@@ -149,7 +149,7 @@ Do not include copyrighted clinical instrument content merely to test infrastruc
 ## DB baseline
 
 Maintain tests that validate:
-- exactly 70 operational tables;
+- exactly 70 V2.1 baseline operational tables plus the owner-approved V2.2 `objetivos_signos_vitales` extension (71 current);
 - technical package/framework tables excluded from the count;
 - key V2 names/columns exist;
 - important V1 tables/columns are absent;

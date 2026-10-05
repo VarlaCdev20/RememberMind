@@ -1,5 +1,7 @@
 # RememberMind — Baseline Rector de la BDD Operativa
 
+> **Extensión aprobada V2.2:** las 70 tablas V2.1 descritas aquí permanecen congeladas. La propietaria aprobó el 4 de octubre de 2026 una tabla adicional `objetivos_signos_vitales` sin alterar las existentes. El inventario vigente tiene **71 tablas operativas**. Véase [decisión V2.2](DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md).
+
 **Estado:** CONGELADO
 **Versión:** BDD Operativa V2.1
 **Ámbito:** RememberMind — sistema residencial/geriátrico con seguimiento clínico y cognitivo

@@ -93,51 +93,39 @@
 
  <div class="mx-auto w-full max-w-[1480px] min-w-0 space-y-5">
  <section class="overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-[0_16px_46px_rgba(47,62,92,0.12)] backdrop-blur-xl">
- <div class="h-1.5 bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
- <div class="flex flex-col gap-4 p-5 xl:flex-row xl:items-end xl:justify-between">
- <div class="max-w-3xl">
- <span class="inline-flex items-center gap-2 rounded-full border border-borde-focus bg-estado-peligroBg px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-boton-acento">
- <i class="ph-bold ph-graph text-sm"></i>
- Familia y Social
- </span>
- <h1 class="mt-2 text-2xl font-black tracking-tight text-titulo sm:text-3xl">Red de apoyo</h1>
- <p class="mt-1 max-w-3xl text-sm font-bold leading-relaxed text-apoyo">
- Mapa interactivo de familiares, responsables y contactos de apoyo relacionados al residente.
- </p>
- </div>
+ <x-ui.page-header
+  title="Red de apoyo"
+  subtitle="Mapa interactivo de familiares, responsables y contactos de apoyo relacionados al residente."
+  overline="Familia y Social"
+  icon="ph-users-three"
+  :date="now()">
+  @can('residentes_contactos.gestionar')
+  <button
+    type="button"
+    wire:click="abrirVincular"
+    class="rm-btn rm-btn-primary">
+    <i class="ph-bold ph-plus-circle text-sm"></i>
+    <span>Vincular familiar</span>
+  </button>
+  @endcan
 
- <div class="flex flex-wrap gap-2">
- @can('residentes_contactos.gestionar')
- <button
- type="button"
- wire:click="abrirVincular"
- class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-boton-acento px-4 text-[11px] font-bold uppercase tracking-wider text-inverso shadow-[0_8px_18px_rgba(226,125,96,0.22)] transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95"
- >
- <i class="ph-bold ph-plus-circle text-sm"></i>
- Vincular familiar
- </button>
- @endcan
+  <button
+    type="button"
+    wire:click="actualizarRed"
+    class="rm-btn rm-btn-secondary">
+    <i class="ph-bold ph-arrows-clockwise text-sm"></i>
+    <span>Actualizar red</span>
+  </button>
 
- <button
- type="button"
- wire:click="actualizarRed"
- class="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-borde-suave bg-fondo-panel px-4 text-[11px] font-bold uppercase tracking-wider text-titulo shadow-sm transition hover:-translate-y-0.5 hover:border-estado-exitoBorde"
- >
- <i class="ph-bold ph-arrows-clockwise text-sm"></i>
- Actualizar red
- </button>
-
- @if($rutas['resumen'])
- <a
- href="{{ $rutas['resumen'] }}"
- class="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-borde-suave bg-fondo-panel px-4 text-[11px] font-bold uppercase tracking-wider text-apoyo transition hover:-translate-y-0.5 hover:border-borde-focus"
- >
- <i class="ph-bold ph-arrow-u-up-left text-sm"></i>
- Volver al resumen
- </a>
- @endif
- </div>
- </div>
+  @if($rutas['resumen'])
+  <a
+    href="{{ $rutas['resumen'] }}"
+    class="rm-btn rm-btn-secondary">
+    <i class="ph-bold ph-arrow-u-up-left text-sm"></i>
+    <span>Volver al resumen</span>
+  </a>
+  @endif
+</x-ui.page-header>
  </section>
 
      <x-ui.filter-bar class="mb-4">

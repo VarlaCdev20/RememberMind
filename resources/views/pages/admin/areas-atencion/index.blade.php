@@ -18,22 +18,12 @@
         }"
         class="space-y-6"
     >
-        {{-- ENCABEZADO Y CONTEXTO INSTITUCIONAL --}}
-        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div class="space-y-1">
-                <div class="inline-flex items-center gap-2 rounded-full border border-[var(--rm-action-primary)]/30 bg-[var(--rm-action-primary-soft)] px-3 py-1 text-xs font-black text-[var(--rm-action-primary-ink)]">
-                    <i class="ph-bold ph-shield-star text-sm"></i>
-                    <span>SUPERADMINISTRACIÓN • GOBERNANZA CLÍNICA Y ASISTENCIAL</span>
-                </div>
-                <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-[var(--rm-text-primary)]">
-                    Centro de Mando de Áreas de Atención
-                </h1>
-                <p class="text-sm font-medium text-[var(--rm-text-secondary)] max-w-3xl leading-relaxed">
-                    Organización y división integral de las áreas asistenciales según los roles profesionales y sus vistas operativas y de supervisión.
-                </p>
-            </div>
-
-            {{-- KPIs RÁPIDOS --}}
+        <x-ui.page-header
+            title="Centro de Mando de Áreas de Atención"
+            subtitle="Organización y división integral de las áreas asistenciales según los roles profesionales y sus vistas operativas y de supervisión."
+            overline="Superadministración · Gobernanza Clínica y Asistencial"
+            icon="ph-shield-star"
+            :date="now()">
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] px-3.5 py-2.5 shadow-2xs text-center sm:text-left">
                     <span class="text-[10px] font-black uppercase tracking-wider text-[var(--rm-text-secondary)]">Áreas Activas</span>
@@ -53,12 +43,10 @@
                 <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] px-3.5 py-2.5 shadow-2xs text-center sm:text-left">
                     <span class="text-[10px] font-black uppercase tracking-wider text-[var(--rm-text-secondary)]">Alertas Clínicas</span>
                     <p class="text-lg font-black {{ $alertasActivas > 0 ? 'text-red-600 dark:text-red-400' : 'text-[var(--rm-text-primary)]' }} leading-none mt-1">{{ $alertasActivas }}</p>
-                    <span class="text-[9.5px] font-bold {{ $alertasActivas > 0 ? 'text-red-500' : 'text-emerald-500' }}">
-                        {{ $alertasActivas > 0 ? 'Requieren atención' : 'Sin alertas' }}
-                    </span>
+                    <span class="text-[9.5px] font-bold {{ $alertasActivas > 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400' }}">{{ $alertasActivas > 0 ? 'Requieren acción' : 'Bajo control' }}</span>
                 </div>
             </div>
-        </div>
+        </x-ui.page-header>
 
         {{-- BARRA DE HERRAMIENTAS Y FILTRO POR ROL / ÁREA --}}
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)]/80 p-2.5 backdrop-blur-md shadow-sm">

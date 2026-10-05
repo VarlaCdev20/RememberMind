@@ -14,19 +14,15 @@
  class="hidden"></div>
 
  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 print:max-w-full print:px-0">
- <!-- ── ENCABEZADO ────────────────────────────────────────── -->
- <div class="mb-8 flex flex-col justify-between gap-4 border-b border-borde-suave pb-6 sm:flex-row sm:items-center print:mb-6 print:border-b-2 print:border-slate-800 print:pb-4">
- <div>
- <h1 class="text-3xl font-black uppercase tracking-tight text-titulo sm:text-4xl print:text-2xl print:text-black">
- Reportes Institucionales
- </h1>
- <p class="mt-1 text-sm font-bold text-apoyo print:text-xs print:text-slate-600">
- Indicadores generales, exportaciones y análisis institucional del módulo Adultos Mayores.
- </p>
- </div>
-
- <!-- Botones Reales de Acción -->
- <div class="flex items-center gap-3 print:hidden">
+ <x-ui.page-header
+    class="mb-6"
+    title="Reportes Institucionales"
+    subtitle="Indicadores generales, exportaciones y análisis institucional de residentes."
+    overline="Dirección y Gestión"
+    icon="ph-chart-bar"
+    :date="now()">
+    <!-- Botones Reales de Acción -->
+    <div class="flex items-center gap-3 print:hidden">
  <button
  type="button"
  onclick="window.print()"

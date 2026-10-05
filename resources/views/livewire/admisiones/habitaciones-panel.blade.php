@@ -1,13 +1,24 @@
 <div class="space-y-6">
-<header class="flex flex-col gap-4 rounded-2xl border border-borde bg-fondo-card p-5 lg:flex-row lg:items-center lg:justify-between">
-<div><p class="text-xs font-bold uppercase tracking-wide text-apoyo">Admisiones y ocupación</p><h1 class="mt-1 text-2xl font-black text-titulo">Habitaciones y camas</h1><p class="mt-1 text-sm text-apoyo">Disponibilidad institucional real, capacidad física y residentes asignados.</p></div>
-@can('habitaciones.crear')<button type="button" wire:click="abrirCrearHabitacion" class="rm-btn-primary"><i class="ph-bold ph-plus"></i> Registrar habitación</button>@endcan
-</header>
+<x-ui.page-header
+    title="Habitaciones y camas"
+    subtitle="Disponibilidad institucional real, capacidad física y residentes asignados."
+    overline="Admisiones y ocupación"
+    icon="ph-door"
+    :date="now()">
+    @can('habitaciones.crear')
+    <button type="button" wire:click="abrirCrearHabitacion" class="rm-btn rm-btn-primary">
+        <i class="ph-bold ph-plus-circle text-lg" aria-hidden="true"></i>
+        <span>Registrar habitación</span>
+    </button>
+    @endcan
+</x-ui.page-header>
 
 <section class="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-@foreach([['Habitaciones',$stats['total'],'ph-door'],['Capacidad total',$stats['capacidad_total'],'ph-users-three'],['Camas libres',$stats['camas_libres'],'ph-bed'],['Camas ocupadas',$stats['camas_ocupadas'],'ph-user-check'],['Fuera de servicio',$stats['fuera_servicio'],'ph-warning']] as [$etiqueta,$valor,$icono])
-<article class="rounded-2xl border border-borde bg-fondo-card p-4"><div class="flex items-center gap-3"><span class="flex h-10 w-10 items-center justify-center rounded-xl bg-fondo-hover text-boton-acento"><i class="ph-bold {{ $icono }}"></i></span><div><p class="text-xs font-semibold text-apoyo">{{ $etiqueta }}</p><p class="text-2xl font-black text-titulo">{{ $valor }}</p></div></div></article>
-@endforeach
+    <x-ui.metric-card label="Habitaciones" :value="$stats['total']" icon="ph-door" variant="neutral" />
+    <x-ui.metric-card label="Capacidad total" :value="$stats['capacidad_total']" icon="ph-users-three" variant="neutral" />
+    <x-ui.metric-card label="Camas libres" :value="$stats['camas_libres']" icon="ph-bed" variant="mint" />
+    <x-ui.metric-card label="Camas ocupadas" :value="$stats['camas_ocupadas']" icon="ph-user-check" variant="sky" />
+    <x-ui.metric-card label="Fuera de servicio" :value="$stats['fuera_servicio']" icon="ph-warning" :variant="$stats['fuera_servicio'] > 0 ? 'coral' : 'neutral'" />
 </section>
 
  {{-- BARRA DE FILTROS UNIFICADA FORMATO ALERTAS --}}

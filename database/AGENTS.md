@@ -14,7 +14,7 @@ The current code is not authority over the frozen baseline.
 
 ## Frozen schema
 
-There are exactly **70 operational tables**. Laravel/Jetstream/Sanctum/Spatie technical tables are outside that count.
+The frozen V2.1 baseline has **70 operational tables**. The owner approved one V2.2 extension, `objetivos_signos_vitales`, on 2026-10-04, so the current inventory is **71 operational tables**. See `docs/base-de-datos/DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md`. Laravel/Jetstream/Sanctum/Spatie technical tables are outside that count.
 
 Without explicit owner approval, do not:
 - add/delete/merge/split/rename a table;

@@ -124,12 +124,11 @@
                         <time class="shrink-0 text-xs font-semibold text-[var(--rm-text-secondary)]">{{ !empty($evento['fecha']) ? \Carbon\Carbon::parse($evento['fecha'])->format('d/m/Y') : 'Fecha no registrada' }}{{ !empty($evento['hora']) ? ' · '.$evento['hora'] : '' }}</time>
                     </div>
                 </article>
-            @empty
-                <div class="rounded-xl border border-dashed border-[var(--rm-border)] p-8 text-center">
-                    <i class="ph ph-folder-open text-3xl text-[var(--rm-text-secondary)]"></i>
-                    <p class="mt-2 font-bold text-[var(--rm-text-primary)]">Sin registros para los filtros seleccionados</p>
-                    <p class="mt-1 text-sm text-[var(--rm-text-secondary)]">Aquí se muestran los registros confirmados del residente.</p>
-                </div>
+                        @empty
+                <x-ui.empty-state
+                    icon="ph-folder-open"
+                    title="Sin registros para los filtros seleccionados"
+                    description="Aquí se muestran los registros confirmados del residente." />
             @endforelse
         </div>
     </article>

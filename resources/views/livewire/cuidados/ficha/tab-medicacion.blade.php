@@ -666,10 +666,12 @@
                 </div>
                 <span class="inline-flex rounded-full border px-2 py-0.5 text-[10px] font-extrabold {{ $item['badgeColor'] }}">{{ $item['estadoHoy'] }}</span>
             </div>
-        @empty
-            <div class="rounded-xl border border-dashed border-[var(--rm-border)] p-5 text-center text-xs text-[var(--rm-text-muted)]">
-                No existen dosis programadas para este residente.
-            </div>
+                @empty
+            <x-ui.empty-state
+                compact="true"
+                icon="ph-pill"
+                title="Sin dosis programadas"
+                description="No existen dosis programadas actualmente para este residente." />
         @endforelse
     </div>
 

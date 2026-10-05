@@ -824,45 +824,10 @@
   </div>
 
   <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-   <div class="rm-card flex items-center gap-3 border border-borde bg-fondo-card px-4 py-3 shadow-sm">
-   <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-boton-acento/10 text-boton-acento">
-    <i class="ph-fill ph-users-three text-xl"></i>
-   </span>
-   <div>
-    <div class="text-2xl font-black text-titulo">{{ $estadisticas['total'] }}</div>
-    <div class="text-[11px] font-black uppercase tracking-wider text-apoyo">Total institucional</div>
-   </div>
-   </div>
-
-   <div class="rm-card flex items-center gap-3 border border-borde bg-fondo-card px-4 py-3 shadow-sm">
-   <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-estado-exitoBg text-estado-exito">
-    <i class="ph-fill ph-check-circle text-xl"></i>
-   </span>
-   <div>
-    <div class="text-2xl font-black text-titulo">{{ $estadisticas['activos'] }}</div>
-    <div class="text-[11px] font-black uppercase tracking-wider text-apoyo">Activos</div>
-   </div>
-   </div>
-
-   <div class="rm-card flex items-center gap-3 border border-borde bg-fondo-card px-4 py-3 shadow-sm">
-   <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-estado-infoBg text-estado-info">
-    <i class="ph-fill ph-clock-user text-xl"></i>
-   </span>
-   <div>
-    <div class="text-2xl font-black text-titulo">{{ $estadisticas['en_turno'] }}</div>
-    <div class="text-[11px] font-black uppercase tracking-wider text-apoyo">En turno</div>
-   </div>
-   </div>
-
-   <div class="rm-card flex items-center gap-3 border border-borde bg-fondo-card px-4 py-3 shadow-sm">
-   <span class="flex h-10 w-10 items-center justify-center rounded-xl {{ $estadisticas['incidencias'] > 0 ? 'bg-estado-advertenciaBg text-estado-advertencia' : 'bg-estado-exitoBg text-estado-exito' }}">
-    <i class="ph-fill ph-warning-circle text-xl"></i>
-   </span>
-   <div>
-    <div class="text-2xl font-black text-titulo">{{ $estadisticas['incidencias'] }}</div>
-    <div class="text-[11px] font-black uppercase tracking-wider text-apoyo">Incidencias</div>
-   </div>
-   </div>
+      <x-ui.metric-card label="Total institucional" :value="$estadisticas['total']" icon="ph-users-three" variant="neutral" />
+      <x-ui.metric-card label="Activos" :value="$estadisticas['activos']" icon="ph-check-circle" variant="mint" />
+      <x-ui.metric-card label="En turno" :value="$estadisticas['en_turno']" icon="ph-clock-user" variant="sky" />
+      <x-ui.metric-card label="Incidencias" :value="$estadisticas['incidencias']" icon="ph-warning-circle" :variant="$estadisticas['incidencias'] > 0 ? 'coral' : 'mint'" />
   </div>
 
   <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">

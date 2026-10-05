@@ -1,17 +1,13 @@
 <div class="rm-pilot-enfermeria rm-page-layout font-sans space-y-5">
-    <header class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
-        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-                <p class="text-xs font-bold uppercase tracking-[0.18em] text-[var(--rm-accent)]">{{ $esSuperAdmin ? 'Supervisión asistencial' : 'Registro asistencial' }}</p>
-                <h1 class="mt-1 text-2xl font-bold text-[var(--rm-text-title)]">Cuidados, dispositivos e incidentes</h1>
-                <p class="mt-1 text-sm text-[var(--rm-text-muted)]">Datos estructurados, firmados y vinculados al residente y al turno.</p>
-            </div>
-            <div class="flex gap-2">
-                <a href="{{ route('admin.enfermeria.agenda') }}" class="rm-btn-secondary px-4 py-2 text-xs font-bold">Agenda</a>
-                <a href="{{ route('admin.enfermeria.pacientes') }}" class="rm-btn-secondary px-4 py-2 text-xs font-bold">{{ $esSuperAdmin ? 'Todos los residentes' : 'Mis pacientes' }}</a>
-            </div>
-        </div>
-    </header>
+    <x-ui.page-header
+    title="Cuidados, dispositivos e incidentes"
+    subtitle="Datos estructurados, firmados y vinculados al residente y al turno."
+    :overline="$esSuperAdmin ? 'Supervisión asistencial' : 'Registro asistencial'"
+    icon="ph-activity"
+    :date="now()">
+    <a href="{{ route('admin.enfermeria.agenda') }}" class="rm-btn rm-btn-secondary">Agenda</a>
+    <a href="{{ route('admin.enfermeria.pacientes') }}" class="rm-btn rm-btn-secondary">{{ $esSuperAdmin ? 'Todos los residentes' : 'Mis pacientes' }}</a>
+</x-ui.page-header>
 
     <section class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-4 shadow-sm">
         <label class="text-xs font-bold text-[var(--rm-text-title)]" for="residente-registro">Residente</label>

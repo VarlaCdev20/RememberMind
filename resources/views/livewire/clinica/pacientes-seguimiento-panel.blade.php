@@ -1,27 +1,19 @@
 <div class="space-y-6">
 
- {{-- Encabezado --}}
- <div class="flex flex-col gap-4 border-b border-borde pb-5 md:flex-row md:items-center md:justify-between">
- <div class="flex items-center gap-3">
-  <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-estado-infoBg text-estado-info">
-  <i class="ph-fill ph-users-three text-3xl"></i>
-  </div>
-  <div>
-  <h2 class="text-2xl font-black tracking-tight text-titulo">Pacientes — Seguimiento Médico</h2>
-  <p class="text-sm font-semibold text-apoyo">Residentes activos y pacientes en valoración</p>
-  </div>
- </div>
- <div class="flex gap-2">
-  <a href="{{ route('admin.medico.dashboard') }}"
-  class="rm-btn-secondary h-10 px-4 flex items-center gap-2">
-  <i class="ph-bold ph-arrow-left"></i>
-  <span class="hidden sm:inline">Dashboard</span>
-  </a>
-  <button wire:click="$refresh" class="rm-btn-secondary h-10 w-10 flex items-center justify-center" title="Actualizar datos">
-  <i class="ph-bold ph-arrows-clockwise text-lg"></i>
-  </button>
- </div>
- </div>
+ <x-ui.page-header
+    title="Pacientes — Seguimiento Médico"
+    subtitle="Residentes activos y pacientes en valoración longitudinal."
+    overline="Clínica y Medicina"
+    icon="ph-stethoscope"
+    :date="now()">
+    <a href="{{ route('admin.medico.dashboard') }}" class="rm-btn rm-btn-secondary">
+        <i class="ph-bold ph-arrow-left text-base"></i>
+        <span>Dashboard</span>
+    </a>
+    <button type="button" wire:click="$refresh" class="rm-btn rm-btn-secondary" title="Actualizar datos">
+        <i class="ph-bold ph-arrows-clockwise text-base"></i>
+    </button>
+</x-ui.page-header>
 
  {{-- Tabs de navegación clínica --}}
  <div class="inline-flex flex-wrap gap-1 rounded-xl bg-[var(--rm-surface-soft)] p-1 border border-[var(--rm-border)]">
@@ -241,6 +233,13 @@
      class="h-8 px-2.5 rounded-lg bg-estado-infoBg text-estado-info hover:bg-estado-info hover:text-white transition text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
      <i class="ph-bold ph-folder-open text-sm"></i> Ficha
     </button>
+    @endcan
+    @can('objetivos_signos_vitales.ver')
+    <a href="{{ route('admin.medico.residente.objetivos-signos-vitales', $pac->cod_residente) }}"
+       class="rm-clinical-goals__list-link"
+       aria-label="Objetivos de signos vitales de {{ $pac->nombres }}">
+        <i class="ph-bold ph-sliders-horizontal" aria-hidden="true"></i> Objetivos
+    </a>
     @endcan
     @if($this->puedeEscribir('notas_clinicas.crear'))
     <button wire:click="nuevaNota('{{ $pac->cod_residente }}')"

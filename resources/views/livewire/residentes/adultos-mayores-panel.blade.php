@@ -204,13 +204,17 @@
  @endif
  @endforeach
  @if(!$hayTarjetasActivas)
- <div class="col-span-full rounded-2xl border border-borde-suave bg-fondo-panel p-5 text-center">
- <i class="ph-bold ph-users-three text-3xl text-apoyo mb-2"></i>
- <p class="text-sm font-bold text-apoyo">No se encontraron adultos mayores activos con los filtros aplicados.</p>
- </div>
- @endif
- </div>
- </section>
+<div class="col-span-full">
+    <x-ui.empty-state
+        icon="ph-users-three"
+        title="Sin residentes encontrados"
+        description="No se encontraron residentes que coincidan con los filtros aplicados."
+        action-method="limpiarFiltros"
+        action-text="Restablecer filtros" />
+</div>
+@endif
+</div>
+</section>
 
  {{-- TABLA GENERAL (HÍBRIDA DESKTOP / RESPONSIVA) --}}
  <section x-show="tab === 'tabla'" class="rm-collection-results" aria-label="Tabla de residentes" style="display: none;">
@@ -241,9 +245,7 @@
  <td class="px-5 py-3.5 text-xs font-bold">{{ $adulto->edad }} años</td>
  <td class="px-5 py-3.5 text-xs">{{ optional($adulto->fecha_ing)->format('d/m/Y') }}</td>
  <td class="px-5 py-3.5">
- <span class="rounded-lg px-2 py-0.5 text-[9px] font-bold uppercase {{ in_array(strtoupper($adulto->estado_adulto), ['ACTIVO', 'ADMITIDO']) ? 'bg-estado-exitoBg text-parrafo' : 'bg-estado-peligroBg text-boton-acento' }}">
- {{ $adulto->estado_adulto }}
- </span>
+ <x-ui.status-badge :estado="$adulto->estado_adulto" />
  </td>
  <td class="px-5 py-3.5 text-xs">
  @if($famPrincipal)

@@ -1,17 +1,17 @@
-@pHp($clave = $campo['key'])
+@php($clave = $campo['key'])
 @php($errorClave = $campo['error'])
 <div class="rm-signos__field" x-bind:class="{ 'rm-signos__field--invalid': hasError('{{ $clave }}') || @js($errors->has($errorClave)) }">
-    @if(isset($campo['label']) && !in_array($clave, ['fc', 'fr', 'temp', 'sat', 'glucosa'], true))
+    @if(isset($campo['label']))
         <label for="signos-{{ $clave }}">{{ $campo['label'] }}</label>
     @endif
     <div class="rm-signos__input-wrap">
         <input id="signos-{{ $clave }}" type="number" inputmode="decimal"
-               min="{{ $clave === 'temp' ? '-99.9' : '0' }}" max="{{ $campo['max'] }}" step="{{ $campo['step'] }}"
-               wire:model="{{ $campo['wire'] }}" x-model="values.{{ $clave }}"
+               min="{{ $clave === 'temp' ? \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::TEMP_MIN : 1 }}" max="{{ $campo['max'] }}" step="{{ $campo['step'] }}"
+               wire:model.live.debounce.350ms="{{ $campo['wire'] }}" x-model="values.{{ $clave }}"
                @focus="focus('{{ $clave }}')" @blur="validate('{{ $clave }}')"
-               @input="if (touched.{{ $clave }}) validate('{{ $clave }}')"
+               @input="focus('{{ $clave }}')" @input.debounce.250ms="validate('{{ $clave }}', false)"
                x-bind:aria-invalid="(hasError('{{ $clave }}') || @js($errors->has($errorClave))) ? 'true' : 'false'"
-               aria-describedby="signos-{{ $clave }}-error signos-{{ $clave }}-server-error">
+               aria-describedby="signos-{{ $clave }}-error{{ $errors->has($errorClave) ? ' signos-'.$clave.'-server-error' : '' }}">
         <span class="rm-signos__input-unit" aria-hidden="true">{{ $campo['unit'] }}</span>
     </div>
     <p id="signos-{{ $clave }}-error" class="rm-signos__error" x-show="hasError('{{ $clave }}')" x-cloak role="alert"><i class="ph-bold ph-x-circle" aria-hidden="true"></i> <span x-text="errors.{{ $clave }}"></span></p>

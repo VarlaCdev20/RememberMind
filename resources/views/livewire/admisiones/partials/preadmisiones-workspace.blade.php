@@ -1,16 +1,18 @@
 <div class="rm-pre-layout {{ $modalDetalle ? 'rm-pre-layout--open' : '' }}" x-data x-init="$nextTick(() => { const code = new URLSearchParams(location.search).get('focus'); if (code) document.getElementById('preadmision-' + code)?.focus() })">
  <main class="rm-pre-main">
-  <header class="rm-pre-heading">
-   <span class="rm-pre-heading__icon" aria-hidden="true"><i class="ph-bold ph-file-text"></i></span>
-   <div class="rm-pre-heading__copy">
-    <p>Administración / Admisión</p>
-    <h1>Preadmisiones</h1>
-    <span>Gestiona y revisa solicitudes previas al ingreso formal.</span>
-   </div>
-   @can('admisiones.crear')
-    <a wire:navigate href="{{ route('admin.admisiones.preadmision') }}" class="rm-pre-primary rm-pre-heading__new"><i class="ph-bold ph-plus" aria-hidden="true"></i> Nueva preadmisión</a>
-   @endcan
-  </header>
+  <x-ui.page-header
+    title="Preadmisiones"
+    subtitle="Gestiona y revisa solicitudes previas al ingreso formal."
+    overline="Administración / Admisión"
+    icon="ph-file-text"
+    :date="now()">
+    @can('admisiones.crear')
+    <a wire:navigate href="{{ route('admin.admisiones.preadmision') }}" class="rm-btn rm-btn-primary">
+        <i class="ph-bold ph-plus-circle text-lg" aria-hidden="true"></i>
+        <span>Nueva preadmisión</span>
+    </a>
+    @endcan
+</x-ui.page-header>
 
   @if($residenteAdmitidoCodigo)
    <div class="rm-pre-notice" role="status">Admisión realizada correctamente. <a href="{{ route('admin.administracion.residentes.show', $residenteAdmitidoCodigo) }}">Ver residente <i class="ph-bold ph-arrow-right"></i></a></div>

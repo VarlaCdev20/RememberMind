@@ -8,36 +8,25 @@
  </div>
 
  {{-- ENCABEZADO Y MÉTRICAS --}}
- <header class="mb-5 rounded-[1.6rem] border border-transparent bg-fondo-panel px-6 py-5 shadow-[0_12px_28px_rgba(47,62,92,0.11)] backdrop-blur-xl">
- <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
- <div class="flex items-center gap-4">
- <div class="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-boton-principal text-inverso shadow-lg shadow-[#2F3E5C]/15 sm:flex">
- <i class="ph-bold ph-shield-check text-2xl"></i>
- </div>
- <div>
- <p class="text-[10px] font-bold uppercase tracking-[0.28em] text-boton-acento">Control de accesos</p>
- <h1 class="mt-1 text-3xl font-black tracking-tight text-titulo md:text-[2.3rem]">
- Roles y <span class="text-boton-acento">permisos</span>
- </h1>
- <p class="mt-1 max-w-2xl text-sm font-semibold leading-6 text-apoyo">
- Gestiona la jerarquía de seguridad y privilegios del sistema institucional.
- </p>
- </div>
- </div>
- 
- <div class="flex items-center gap-4">
- <div class="text-right">
- <p class="text-[10px] font-bold uppercase tracking-widest text-apoyo">Roles del Sistema</p>
- <p class="text-2xl font-black text-titulo">{{ $roles ? $roles->count() : 0 }}</p>
- </div>
- <div class="h-10 w-px bg-fondo-panel"></div>
- <div class="text-left">
- <p class="text-[10px] font-bold uppercase tracking-widest text-apoyo">Permisos Totales</p>
- <p class="text-2xl font-black text-boton-acento">{{ collect($permisosAgrupados)->flatten()->count() }}</p>
- </div>
- </div>
- </div>
- </header>
+ <x-ui.page-header
+  class="mb-5"
+  title="Roles y permisos"
+  subtitle="Gestiona la jerarquía de seguridad y privilegios del sistema institucional."
+  overline="Control de accesos"
+  icon="ph-shield-check"
+  :date="now()">
+  <div class="flex items-center gap-4">
+    <div class="text-right">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-[var(--rm-text-secondary)]">Roles del Sistema</p>
+      <p class="text-2xl font-black text-[var(--rm-text-primary)]">{{ $roles ? $roles->count() : 0 }}</p>
+    </div>
+    <div class="h-10 w-px bg-[var(--rm-border)]"></div>
+    <div class="text-left">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-[var(--rm-text-secondary)]">Permisos Totales</p>
+      <p class="text-2xl font-black text-[var(--rm-action-primary)]">{{ collect($permisosAgrupados)->flatten()->count() }}</p>
+    </div>
+  </div>
+</x-ui.page-header>
 
  @if(!auth()->user()->can('roles.editar_permisos'))
  <div class="mb-5 rounded-[1.35rem] bg-fondo-panel border-none p-4 shadow-sm flex items-center gap-3">

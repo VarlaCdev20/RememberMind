@@ -2,67 +2,47 @@
  {{-- ==================================================
  1. CABECERA COMPACTA CON MICRO-CONTADORES INTEGRADOS
  ================================================== --}}
- <header class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 pb-2 border-b border-[var(--rm-border-soft)]/70 ">
- {{-- Título y Subtítulo --}}
- <div>
- <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--rm-action-primary)] block">
- CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS · ENFERMERÍA
- </span>
- <div class="flex items-center gap-2 mt-0.5">
- <h1 class="text-xl sm:text-2xl font-[800] text-[var(--rm-text-primary)] tracking-tight">
-  Medicación
- </h1>
- <span class="text-[11px] font-mono text-[var(--rm-text-muted)] bg-[var(--rm-surface-soft)] px-2 py-0.5 rounded-md border border-[var(--rm-border-soft)]">
-  {{ $fechaCabecera }}
- </span>
- </div>
- <p class="text-xs text-[var(--rm-text-muted)] mt-0.5">
- Administración y seguimiento del turno
- </p>
- </div>
+ <x-ui.page-header
+  title="Administración de Medicación"
+  subtitle="Administración y seguimiento del turno en curso."
+  overline="Centro Geriátrico Jardín de los Recuerdos · Enfermería"
+  icon="ph-pill"
+  :date="$fechaCabecera ?? now()">
+  <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-[700] bg-[var(--rm-surface-soft)] text-[var(--rm-text-primary)] border border-[var(--rm-border-soft)]" title="Total dosis programadas">
+      <i class="ph ph-pill text-[var(--rm-action-primary)]"></i>
+      <span>Total dosis</span>
+      <span class="ml-0.5 px-1.5 py-0.2 rounded-full bg-[var(--rm-surface-soft)] text-[11px]">{{ count($dosisHoy) }}</span>
+    </span>
 
- {{-- Micro-Contadores Integrados (Reemplazo compacto de tarjetas grandes) --}}
- <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 self-start lg:self-center">
- {{-- Total dosis --}}
- <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-[700] bg-[var(--rm-surface-soft)] text-[var(--rm-text-primary)] border border-[var(--rm-border-soft)]" title="Total dosis programadas">
- <i class="ph ph-pill text-[var(--rm-action-primary)]"></i>
- <span>Total dosis</span>
- <span class="ml-0.5 px-1.5 py-0.2 rounded-full bg-[var(--rm-surface-soft)] text-[11px]">{{ count($dosisHoy) }}</span>
- </span>
+    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-[600] bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary-active)] border border-[var(--rm-action-primary)]/40" title="Dosis administradas">
+      <span class="w-1.5 h-1.5 rounded-full bg-[var(--rm-action-primary)]"></span>
+      <span>{{ $conteoAdministradas }} administradas</span>
+    </span>
 
- {{-- Administradas --}}
- <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-[600] bg-[var(--rm-action-primary-soft)] dark:bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary-active)] border border-[var(--rm-action-primary)]/40 dark:border-[var(--rm-action-primary)]/40" title="Dosis administradas">
- <span class="w-1.5 h-1.5 rounded-full bg-[var(--rm-action-primary)]"></span>
- <span>{{ $conteoAdministradas }} administradas</span>
- </span>
+    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-[600] bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)] border border-[var(--rm-warning-soft)]" title="Dosis pendientes">
+      <span class="w-1.5 h-1.5 rounded-full bg-[var(--rm-warning)]"></span>
+      <span>{{ $conteoPendientes }} pendientes</span>
+    </span>
 
- {{-- Pendientes --}}
- <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-[600] bg-[var(--rm-warning-soft)] dark:bg-[var(--rm-warning)]/20 text-[var(--rm-warning-strong)] dark:text-[var(--rm-warning-soft)] border border-[var(--rm-warning-soft)] dark:border-[var(--rm-warning)]/40" title="Dosis pendientes">
- <span class="w-1.5 h-1.5 rounded-full bg-[var(--rm-warning)]"></span>
- <span>{{ $conteoPendientes }} pendientes</span>
- </span>
+    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-[700] {{ $conteoRetrasadas > 0 ? 'bg-[var(--rm-danger-soft)] text-[var(--rm-danger)] border border-[var(--rm-danger)]/40' : 'bg-[var(--rm-surface-soft)] text-[var(--rm-text-muted)] border border-[var(--rm-border-soft)]' }}" title="Dosis con retraso">
+      <span class="w-1.5 h-1.5 rounded-full {{ $conteoRetrasadas > 0 ? 'bg-[var(--rm-danger)] animate-pulse' : 'bg-[var(--rm-text-muted)]' }}"></span>
+      <span>{{ $conteoRetrasadas }} retrasada{{ $conteoRetrasadas === 1 ? '' : 's' }}</span>
+    </span>
 
- {{-- Con retraso --}}
- <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-[700] {{ $conteoRetrasadas > 0 ? 'bg-[var(--rm-danger-soft)] dark:bg-[var(--rm-danger-soft)] text-[var(--rm-danger)] border border-[var(--rm-danger)]/40 dark:border-[var(--rm-danger)]/40' : 'bg-[var(--rm-surface-soft)] text-[var(--rm-text-muted)] border border-[var(--rm-border-soft)]' }}" title="Dosis con retraso">
- <span class="w-1.5 h-1.5 rounded-full {{ $conteoRetrasadas > 0 ? 'bg-[var(--rm-danger)] animate-pulse' : 'bg-[var(--rm-text-muted)]' }}"></span>
- <span>{{ $conteoRetrasadas }} retrasada{{ $conteoRetrasadas === 1 ? '' : 's' }}</span>
- </span>
+    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-[600] bg-[var(--rm-surface-soft)] text-[var(--rm-action-primary-active)] border border-[var(--rm-border-soft)]" title="Omisiones justificadas">
+      <span class="w-1.5 h-1.5 rounded-full bg-[var(--rm-action-primary-active)]"></span>
+      <span>{{ $conteoOmitidas }} omitida{{ $conteoOmitidas === 1 ? '' : 's' }}</span>
+    </span>
 
- {{-- Omisiones --}}
- <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-[600] bg-[var(--rm-surface-soft)] text-[var(--rm-action-primary-active)] border border-[var(--rm-border-soft)]" title="Omisiones justificadas">
- <span class="w-1.5 h-1.5 rounded-full bg-[var(--rm-action-primary-active)]"></span>
- <span>{{ $conteoOmitidas }} omitida{{ $conteoOmitidas === 1 ? '' : 's' }}</span>
- </span>
-
- {{-- Alergias (chip de seguridad sin alarma si no hay alertas activas) --}}
- @if($residentesConAlergias === 0)
- <span class="hidden sm:inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold bg-[var(--rm-surface-soft)] text-[var(--rm-text-muted)] border border-[var(--rm-border-soft)]" title="Seguridad de alergias">
-  <i class="ph ph-shield-check text-[var(--rm-action-primary)]"></i>
-  <span>Alergia relevante: Sin alertas activas</span>
- </span>
- @endif
- </div>
- </header>
+    @if($residentesConAlergias === 0)
+    <span class="hidden sm:inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold bg-[var(--rm-surface-soft)] text-[var(--rm-text-muted)] border border-[var(--rm-border-soft)]" title="Seguridad de alergias">
+      <i class="ph ph-shield-check text-[var(--rm-action-primary)]"></i>
+      <span>Sin alertas activas de alergia</span>
+    </span>
+    @endif
+  </div>
+</x-ui.page-header>
 
  {{-- Notificación Flash Reactiva --}}
  @if(session()->has('mensaje_exito') || session()->has('mensaje'))

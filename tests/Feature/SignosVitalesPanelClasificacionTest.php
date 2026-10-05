@@ -24,14 +24,14 @@ class SignosVitalesPanelClasificacionTest extends TestCase
 
         $sinRegistro = AdultoMayor::factory()->create(['nombres' => 'SinRegistro', 'cod_est_adul' => 'EST_001']);
         $sinMediciones = AdultoMayor::factory()->create(['nombres' => 'SinMediciones', 'cod_est_adul' => 'EST_001']);
-        $critico = AdultoMayor::factory()->create(['nombres' => 'ConDesaturacion', 'cod_est_adul' => 'EST_001']);
+        $critico = AdultoMayor::factory()->create(['nombres' => 'ConPulsoCritico', 'cod_est_adul' => 'EST_001']);
 
         foreach ([$sinMediciones, $critico] as $residente) {
             SignoVital::create([
                 'cod_residente' => $residente->cod_residente,
                 'cod_personal' => $usuario->personal->cod_personal,
                 'fecha_hora' => today()->setTime(10, 0),
-                'saturacion_oxigeno' => $residente->is($critico) ? 85 : null,
+                'frecuencia_cardiaca' => $residente->is($critico) ? 135 : null,
                 'estado' => 'VIGENTE',
             ]);
         }

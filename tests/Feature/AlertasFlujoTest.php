@@ -56,7 +56,7 @@ class AlertasFlujoTest extends TestCase
             ->call('abrirCrear')->assertForbidden();
     }
 
-    public function test_detecta_signos_y_seguimiento_sin_duplicar_ni_reabrir_alertas_cerradas(): void
+    public function test_detector_general_no_reclasifica_signos_historicos_sin_contexto(): void
     {
         [$user, $adulto] = $this->preparar(['alertas.ver', 'alertas.gestionar']);
         SignoVital::create([
@@ -66,13 +66,10 @@ class AlertasFlujoTest extends TestCase
             'saturacion_oxigeno' => 85,
             'estado' => 'VIGENTE',
         ]);
-        $this->assertSame(1, app(DeteccionAlertasService::class)->detectar());
-        $this->assertDatabaseHas('alertas', ['cod_residente' => $adulto->cod_residente, 'modulo' => 'SIGNOS', 'prioridad' => 'CRITICO']);
-        $alerta = Alerta::sole();
-        $alerta->update(['estado' => 'CERRADA']);
         $this->assertSame(0, app(DeteccionAlertasService::class)->detectar());
-        $this->assertSame(1, Alerta::count());
-        $this->assertSame('CERRADA', $alerta->fresh()->estado);
+        $this->assertDatabaseMissing('alertas', ['cod_residente' => $adulto->cod_residente, 'modulo' => 'SIGNOS']);
+        $this->assertSame(0, app(DeteccionAlertasService::class)->detectar());
+        $this->assertSame(0, Alerta::count());
     }
 
     public function test_control_sin_mediciones_no_genera_alerta_clinica(): void
@@ -89,7 +86,7 @@ class AlertasFlujoTest extends TestCase
         $this->assertDatabaseMissing('alertas', ['cod_residente' => $adulto->cod_residente, 'modulo' => 'SIGNOS']);
     }
 
-    public function test_la_alerta_preventiva_considera_controles_vigentes(): void
+    public function test_la_alerta_preventiva_no_infiere_riesgo_por_saturacion_aislada(): void
     {
         [$user, $adulto] = $this->preparar(['alertas.ver', 'alertas.gestionar']);
         SignoVital::create([
@@ -102,10 +99,9 @@ class AlertasFlujoTest extends TestCase
 
         app(DeteccionAlertasService::class)->detectarPreventivas($adulto->cod_residente);
 
-        $this->assertDatabaseHas('alertas', [
+        $this->assertDatabaseMissing('alertas', [
             'cod_residente' => $adulto->cod_residente,
             'modulo' => 'SIGNOS',
-            'tipo' => 'SIGNOS FUERA DE RANGO',
         ]);
     }
 

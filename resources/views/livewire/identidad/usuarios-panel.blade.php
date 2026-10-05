@@ -738,52 +738,29 @@
  </x-ui.collection-header>
 
  {{-- MÉTRICAS PRINCIPALES (KPIS) --}}
- <section class="mb-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
- <div class="rm-card-metric border-l-4 border-l-[var(--rm-primary)]">
-  <div class="flex items-center justify-between">
-  <span class="rm-metric-label">Usuarios registrados</span>
-  <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--rm-surface-soft)] text-[var(--rm-primary)]">
-   <i class="ph-bold ph-users text-lg"></i>
-  </span>
-  </div>
-  <p class="rm-metric-value mt-2">
-  {{ method_exists($usuarios, 'total') ? $usuarios->total() : $usuarios->count() }}
-  </p>
-  <div class="rm-metric-meta mt-1">
-  <span>Total de cuentas en la base institucional</span>
-  </div>
- </div>
-
- <div class="rm-card-metric border-l-4 border-l-[var(--rm-success)]">
-  <div class="flex items-center justify-between">
-  <span class="rm-metric-label text-[var(--rm-success)]">Usuarios Activos</span>
-  <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--rm-success-soft)] text-[var(--rm-success)]">
-   <i class="ph-bold ph-user-check text-lg"></i>
-  </span>
-  </div>
-  <p class="rm-metric-value mt-2 text-[var(--rm-success)]">
-  {{ $usuarios->filter(fn($u) => $u->estado === 'ACTIVO')->count() }}
-  </p>
-  <div class="rm-metric-meta mt-1">
-  <span>Habilitados para operar en la plataforma</span>
-  </div>
- </div>
-
- <div class="rm-card-metric border-l-4 border-l-[var(--rm-border)]">
-  <div class="flex items-center justify-between">
-  <span class="rm-metric-label">Usuarios Inactivos</span>
-  <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--rm-surface-soft)] text-[var(--rm-text-secondary)]">
-   <i class="ph-bold ph-user-minus text-lg"></i>
-  </span>
-  </div>
-  <p class="rm-metric-value mt-2 text-[var(--rm-text-secondary)]">
-  {{ $usuarios->filter(fn($u) => $u->estado !== 'ACTIVO')->count() }}
-  </p>
-  <div class="rm-metric-meta mt-1">
-  <span>Cuentas suspendidas o bloqueadas</span>
-  </div>
- </div>
- </section>
+    <section class="mb-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <x-ui.metric-card
+            label="Usuarios registrados"
+            :value="method_exists($usuarios, 'total') ? $usuarios->total() : $usuarios->count()"
+            description="Total de cuentas en la base institucional"
+            icon="ph-users"
+            variant="neutral"
+        />
+        <x-ui.metric-card
+            label="Usuarios Activos"
+            :value="$usuarios->filter(fn($u) => $u->estado === 'ACTIVO')->count()"
+            description="Habilitados para operar en la plataforma"
+            icon="ph-user-check"
+            variant="mint"
+        />
+        <x-ui.metric-card
+            label="Usuarios Inactivos"
+            :value="$usuarios->filter(fn($u) => $u->estado !== 'ACTIVO')->count()"
+            description="Acceso deshabilitado temporalmente"
+            icon="ph-user-minus"
+            variant="neutral"
+        />
+    </section>
 
  {{-- SELECTOR DE VISTAS --}}
  <section class="mb-4">
@@ -1259,10 +1236,15 @@
      </div>
     </td>
     </tr>
-   @empty
+      @empty
     <tr>
-    <td colspan="5" class="px-6 py-12 text-center text-xs font-bold text-[var(--rm-text-secondary)]">
-     No se encontraron usuarios.
+    <td colspan="5" class="p-6">
+        <x-ui.empty-state
+            icon="ph-users"
+            title="Sin usuarios encontrados"
+            description="No hay cuentas de usuario que coincidan con los criterios de búsqueda o filtros seleccionados."
+            action-method="limpiarFiltros"
+            action-text="Restablecer filtros" />
     </td>
     </tr>
    @endforelse

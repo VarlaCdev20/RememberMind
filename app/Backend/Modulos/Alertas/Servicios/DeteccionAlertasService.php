@@ -1,8 +1,7 @@
 <?php
 namespace App\Backend\Modulos\Alertas\Servicios;
 
-use App\Backend\Modulos\Clinica\Servicios\ClasificacionSignosVitalesService;
-use App\Models\{AdultoMayor, Alerta, SignoVital, AdministracionMedicacion, Atencion, EjecucionCuidado};
+use App\Models\{AdultoMayor, Alerta, AdministracionMedicacion, Atencion, EjecucionCuidado};
 use Illuminate\Support\Facades\DB;
 
 class DeteccionAlertasService
@@ -10,20 +9,8 @@ class DeteccionAlertasService
     public function detectar(?string $codResidente = null): int
     {
         $creadas = 0;
-        SignoVital::vigentes()->when($codResidente, fn ($q) => $q->where('cod_residente', $codResidente))->orderBy('cod_signo')->chunk(100, function ($registros) use (&$creadas) {
-            foreach ($registros as $s) {
-                $nivel = ClasificacionSignosVitalesService::evaluarRegistro($s)['global'];
-                if (in_array($nivel, ['critico', 'advertencia'], true)) {
-                    $creadas += $this->registrar(
-                        $s,
-                        'SIGNOS',
-                        'SIGNOS FUERA DE PARÁMETROS',
-                        $nivel === 'critico' ? 'CRITICO' : 'MEDIO',
-                        'Control del ' . ($s->fecha?->format('d/m/Y') ?? 'hoy') . ' ' . $s->hora . ': Parámetros clínicos fuera de rango de referencia. Requiere valoración de enfermería.'
-                    );
-                }
-            }
-        });
+        // El flujo de registro confirma signos y crea alertas aprobadas en una sola
+        // transacción. Este detector general no debe crear alertas por advertencias.
 
         AdministracionMedicacion::query()->when($codResidente, fn ($q) => $q->where('cod_residente', $codResidente))->where('resultado', 'OMITIDA')->orderBy('cod_administracion')->chunk(100, function ($registros) use (&$creadas) {
             foreach ($registros as $r) {
@@ -80,7 +67,6 @@ class DeteccionAlertasService
             'fichasMedicas' => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO', 'VIGENTE'])->latest()->limit(1),
             'medicaciones' => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO']),
             'administracionesMedicacion' => fn ($q) => $q->latest('fecha_hora_programada')->limit(3),
-            'signosVitales' => fn ($q) => $q->vigentes()->latest('fecha_hora')->limit(1),
             'valoracionesFuncionales' => fn ($q) => $q->latest('fecha_hora')->limit(1),
         ])
             ->when($codResidente, fn ($q) => $q->where('cod_residente', $codResidente))
@@ -93,7 +79,6 @@ class DeteccionAlertasService
             $fichaMedica = $adulto->fichasMedicas->whereIn('estado', ['ACTIVA', 'ACTIVO', 'VIGENTE'])->first();
             $medicacionesActivas = $adulto->medicaciones->whereIn('estado', ['ACTIVA', 'ACTIVO']);
             $valFuncional = $adulto->valoracionesFuncionales->sortByDesc('fecha_hora')->first();
-            $ultimosSignos = $adulto->signosVitales->sortByDesc('fecha_hora')->first();
 
             // 1. Falta de Ficha Médica activa
             if (!$fichaMedica) {
@@ -124,19 +109,8 @@ class DeteccionAlertasService
                 }
             }
 
-            // 3. Signos vitales desregulados en último control
-            if ($ultimosSignos) {
-                if (ClasificacionSignosVitalesService::requiereAlertaPreventiva($ultimosSignos)) {
-                    $alerta = $this->registrarPreventivaSiNoExiste(
-                        $adulto->cod_residente,
-                        'SIGNOS',
-                        'SIGNOS FUERA DE RANGO',
-                        'CRITICO',
-                        'Signos vitales fuera de rango en el último control (Temp: ' . $ultimosSignos->temperatura . '°C, Sat: ' . $ultimosSignos->saturacion . '%).'
-                    );
-                    if ($alerta) $creadas++;
-                }
-            }
+            // Las alertas de signos se deciden al confirmar el registro, con
+            // reglas aprobadas y evento de autoría en la misma transacción.
 
             // 4. Valoración Funcional: Riesgo de caída, dependencia alta o falta de valoración
             if ($valFuncional) {

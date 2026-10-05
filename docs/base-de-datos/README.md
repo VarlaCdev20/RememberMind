@@ -1,5 +1,7 @@
 # Base de datos de RememberMind
 
+**Inventario vigente:** baseline V2.1 de 70 tablas más la extensión clínica V2.2 `objetivos_signos_vitales` (71 operativas). Véase [decisión V2.2](DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md).
+
 Esta carpeta contiene la documentación canónica y oficial de la **BDD Operativa V2.1** (70 tablas operativas).
 
 ## Índice documental

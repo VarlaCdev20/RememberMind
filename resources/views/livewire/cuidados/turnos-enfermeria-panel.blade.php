@@ -5,26 +5,19 @@
     $errCls   = 'mt-1 text-xs font-bold text-[var(--rm-danger)]';
 @endphp
 <div class="space-y-6 max-w-5xl mx-auto font-sans" x-data @keydown.window.escape="$wire.cerrarModales()">
-    <section class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 sm:p-6 shadow-sm">
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div class="space-y-1">
-                <div class="flex items-center gap-2">
-                    <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary-ink)]">
-                        <i class="ph-bold ph-clock text-lg"></i>
-                    </span>
-                    <p class="text-xs font-bold uppercase tracking-[0.18em] text-[var(--rm-action-primary-ink)]">Gestión de turnos</p>
-                </div>
-                <h1 class="text-2xl font-black tracking-tight text-[var(--rm-text-primary)]">Turnos de Enfermería</h1>
-                <p class="text-xs text-[var(--rm-text-secondary)]">Configuración de turnos institucionales: Mañana, Tarde, Noche, Madrugada.</p>
-            </div>
-            @can('turnos.gestionar')
-            <button wire:click="abrirCrear" class="inline-flex items-center gap-2 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] px-4 py-2.5 text-xs font-bold text-white shadow-sm transition active:scale-[0.98]">
-                <i class="ph-bold ph-plus-circle text-base"></i>
-                <span>Nuevo turno</span>
-            </button>
-            @endcan
-        </div>
-    </section>
+    <x-ui.page-header
+    title="Turnos de Enfermería"
+    subtitle="Configuración de turnos institucionales: Mañana, Tarde, Noche, Madrugada."
+    overline="Gestión de turnos"
+    icon="ph-clock"
+    :date="now()">
+    @can('turnos.gestionar')
+    <button type="button" wire:click="abrirCrear" class="rm-btn rm-btn-primary">
+        <i class="ph-bold ph-plus-circle text-base"></i>
+        <span>Nuevo turno</span>
+    </button>
+    @endcan
+</x-ui.page-header>
 
     <section class="overflow-hidden rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] shadow-sm">
         <div class="border-b border-[var(--rm-border)] px-5 py-3.5 bg-[var(--rm-surface-soft)]">

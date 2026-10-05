@@ -793,7 +793,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertDontSee('type="time"')
             ->assertSet('signosIntentoGuardar', false);
 
-        $this->assertStringContainsString('aria-describedby="signos-sat-error signos-sat-server-error"', $formulario->html());
+        $this->assertStringContainsString('aria-describedby="signos-sat-error"', $formulario->html());
         $this->assertStringNotContainsString('Revisa algunos datos', $formulario->html());
         $this->assertStringNotContainsString('Rango objetivo 92', $formulario->html());
         $this->assertStringContainsString('rmSignosRegistro(', $formulario->html());
@@ -803,6 +803,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSee('Revisa algunos datos')
             ->assertSee('La saturación no puede superar el 100 %.')
             ->assertSet('mostrarSelectorModal', true);
+        $this->assertStringContainsString('aria-describedby="signos-sat-error signos-sat-server-error"', $formulario->html());
     }
 
     public function test_tendencia_aparece_solo_con_tres_lecturas_reales_del_residente(): void
@@ -850,11 +851,55 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSee('Completa también la presión sistólica.');
     }
 
+    public function test_formulario_vacio_no_crea_registro_clinico(): void
+    {
+        $this->actingAs($this->enfermero);
+        $antes = SignoVital::query()->count();
+
+        $this->formularioSignos()->call('guardarSignos')
+            ->assertHasErrors('mediciones')
+            ->assertSet('drawerPaso', 'register-form')
+            ->assertSee('Ingresa al menos una medición.');
+
+        $this->assertSame($antes, SignoVital::query()->count());
+    }
+
+    public function test_lectura_critica_exige_revision_visible_antes_de_guardar_y_generar_alerta(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $this->actingAs($this->enfermero);
+        $signosAntes = SignoVital::query()->count();
+        $alertasAntes = Alerta::query()->count();
+
+        $formulario = $this->formularioSignos()->set('signoFC', '135')
+            ->assertSee('data-tone="danger"', false)
+            ->assertSee('Revisión antes de registrar')
+            ->call('guardarSignos')
+            ->assertHasErrors('signos_confirmacion')
+            ->assertSet('drawerPaso', 'register-form');
+
+        $this->assertSame($signosAntes, SignoVital::query()->count());
+        $this->assertSame($alertasAntes, Alerta::query()->count());
+
+        $formulario->set('signoConfirmarAtipico', true)
+            ->set('signoFC', '136')
+            ->assertSet('signoConfirmarAtipico', false)
+            ->call('guardarSignos')
+            ->assertHasErrors('signos_confirmacion');
+
+        $formulario->set('signoConfirmarAtipico', true)->call('guardarSignos')
+            ->assertHasNoErrors()
+            ->assertSet('drawerPaso', 'resident-summary');
+
+        $this->assertSame($signosAntes + 1, SignoVital::query()->count());
+        $this->assertSame($alertasAntes + 1, Alerta::query()->count());
+    }
+
     public function test_saturacion_fuera_de_0_a_100_y_numericos_invalidos_se_rechazan(): void
     {
         $this->actingAs($this->enfermero);
 
-        foreach ([['101', 'La saturación no puede superar el 100 %.'], ['-1', 'La saturación no puede ser menor a 0 %.']] as [$valor, $mensaje]) {
+        foreach ([['101', 'La saturación no puede superar el 100 %.'], ['-1', 'La saturación debe ser mayor que 0 %.'], ['0', 'La saturación debe ser mayor que 0 %.']] as [$valor, $mensaje]) {
             $this->formularioSignos()->set('signoSat', $valor)->call('guardarSignos')
                 ->assertHasErrors('saturacion_oxigeno')
                 ->assertSee($mensaje);
@@ -865,6 +910,10 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSee('Ingresa un número entero válido.');
         $this->formularioSignos()->set('signoGlucosa', '-0.1')->call('guardarSignos')
             ->assertHasErrors('glucemia');
+        $this->formularioSignos()->set('signoTemp', '46')->call('guardarSignos')
+            ->assertHasErrors('temperatura');
+        $this->formularioSignos()->set('signoFC', '301')->call('guardarSignos')
+            ->assertHasErrors('frecuencia_cardiaca');
     }
 
     public function test_temperatura_decimal_y_observaciones_se_guardan_sin_redondear_ni_truncar(): void
@@ -879,7 +928,7 @@ class MisPacientesRedisenadaTest extends TestCase
 
         $this->formularioSignos()->set('signoSis', '120')->set('signoDia', '80')
             ->set('signoFC', '70')->set('signoFR', '18')->set('signoTemp', '36.5')
-            ->set('signoSat', '0')->set('signoGlucosa', '90.25')
+            ->set('signoSat', '92')->set('signoGlucosa', '90.25')
             ->set('signoObs', '  '.str_repeat('x', 5000).'  ')
             ->call('guardarSignos')->assertHasNoErrors();
 
@@ -887,9 +936,24 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->assertSame($this->personal->cod_personal, $signo->cod_personal);
         $this->assertSame('JOR_MIS_PACIENTES', $signo->cod_jornada);
         $this->assertSame(36.5, $signo->temperatura);
-        $this->assertSame(0.0, $signo->saturacion_oxigeno);
+        $this->assertSame(92.0, $signo->saturacion_oxigeno);
         $this->assertSame(90.25, $signo->glucemia);
         $this->assertSame(str_repeat('x', 5000), $signo->observacion);
+    }
+
+    public function test_la_evaluacion_previa_respeta_la_precision_y_limpia_el_error_al_corregir(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $this->actingAs($this->enfermero);
+
+        $formulario = $this->formularioSignos()->set('signoTemp', '36.55')
+            ->assertSet('signosEvaluacion', [])
+            ->call('guardarSignos')
+            ->assertHasErrors('temperatura');
+
+        $formulario->set('signoTemp', '36.5')
+            ->assertHasNoErrors('temperatura')
+            ->assertSee('data-tone="success"', false);
     }
 
     public function test_residente_sin_asignacion_no_admite_registro_de_signos(): void
@@ -1690,5 +1754,119 @@ class MisPacientesRedisenadaTest extends TestCase
             ->call('mostrarSelectorRegistro')
             ->call('abrirFormularioRegistro', 'movilidad')
             ->assertStatus(403);
+    }
+
+    public function test_signo_critico_confirmado_crea_alerta_y_evento_en_la_misma_operacion(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $this->actingAs($this->enfermero);
+        $registro = app(\App\Backend\Modulos\Clinica\Servicios\SignosVitalesService::class)
+            ->registrarConEvaluacion($this->residenteEstable->cod_residente,
+                ['frecuencia_cardiaca' => 135], $this->enfermero);
+
+        $this->assertSame('CRITICO', $registro->evaluacion->severidadGlobal()?->value);
+        $this->assertNotNull($registro->alerta);
+        $this->assertSame($registro->signo->cod_signo, $registro->alerta->cod_registro);
+        $this->assertSame($this->personal->cod_personal, $registro->signo->cod_personal);
+        $this->assertDatabaseHas('eventos_alerta', [
+            'cod_alerta' => $registro->alerta->cod_alerta,
+            'cod_usuario' => $this->enfermero->cod_usuario,
+            'tipo_evento' => 'CREACION',
+        ]);
+    }
+
+    public function test_advertencia_y_preevaluacion_no_crean_alertas_ni_registros_anticipados(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $this->actingAs($this->enfermero);
+        $servicio = app(\App\Backend\Modulos\Clinica\Servicios\SignosVitalesService::class);
+        $signosAntes = SignoVital::query()->count();
+        $alertasAntes = Alerta::query()->count();
+
+        $evaluacion = $servicio->preEvaluar(['frecuencia_cardiaca' => 135],
+            $this->residenteEstable->cod_residente, $this->enfermero);
+        $this->assertSame('CRITICO', $evaluacion->severidadGlobal()?->value);
+        $this->assertSame($signosAntes, SignoVital::query()->count());
+        $this->assertSame($alertasAntes, Alerta::query()->count());
+
+        $registro = $servicio->registrarConEvaluacion($this->residenteEstable->cod_residente,
+            ['frecuencia_cardiaca' => 45], $this->enfermero);
+        $this->assertSame('ADVERTENCIA', $registro->evaluacion->severidadGlobal()?->value);
+        $this->assertNull($registro->alerta);
+        $this->assertSame($alertasAntes, Alerta::query()->count());
+    }
+
+    public function test_falla_al_crear_alerta_revierte_el_signo_critico(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $this->actingAs($this->enfermero);
+        $signosAntes = SignoVital::query()->count();
+        $alertasAntes = Alerta::query()->count();
+        Alerta::creating(static function (): void {
+            throw new \RuntimeException('Fallo de persistencia simulado en prueba.');
+        });
+
+        try {
+            app(\App\Backend\Modulos\Clinica\Servicios\SignosVitalesService::class)
+                ->registrarConEvaluacion($this->residenteEstable->cod_residente,
+                    ['frecuencia_cardiaca' => 135], $this->enfermero);
+            $this->fail('La transacción debía fallar.');
+        } catch (\RuntimeException $exception) {
+            $this->assertSame('Fallo de persistencia simulado en prueba.', $exception->getMessage());
+        }
+
+        $this->assertSame($signosAntes, SignoVital::query()->count());
+        $this->assertSame($alertasAntes, Alerta::query()->count());
+    }
+
+    public function test_objetivo_medico_individual_se_aplica_al_registro_de_enfermeria(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $medico = User::factory()->create(['estado' => 'ACTIVO']);
+        $medico->assignRole('MEDICO GENERAL/GERIATRA');
+        Personal::create([
+            'cod_personal' => 'PER_MED_SIGNOS', 'cod_usuario' => $medico->cod_usuario,
+            'nombres' => 'Médica', 'apellido_paterno' => 'Prueba',
+            'numero_documento' => 'MED-SIGNOS-01', 'profesion' => 'MEDICINA', 'estado' => 'ACTIVO',
+        ]);
+        $this->actingAs($medico);
+        app(\App\Backend\Modulos\Clinica\Acciones\DefinirObjetivoSignoVitalAction::class)
+            ->ejecutar($this->residenteEstable->cod_residente, [
+                'parametro' => 'saturacion_oxigeno', 'min_objetivo' => 88,
+                'max_objetivo' => 92, 'min_critico' => 85, 'max_critico' => null,
+                'motivo' => 'Rango individual indicado tras valoración médica.',
+            ], $medico);
+
+        $this->actingAs($this->enfermero);
+        $registro = app(\App\Backend\Modulos\Clinica\Servicios\SignosVitalesService::class)
+            ->registrarConEvaluacion($this->residenteEstable->cod_residente,
+                ['saturacion_oxigeno' => 84], $this->enfermero);
+
+        $this->assertSame('OBJETIVO_MEDICO', $registro->evaluacion->resultados[0]->fuenteEvaluacion);
+        $this->assertSame('CRITICO', $registro->evaluacion->severidadGlobal()?->value);
+        $this->assertNotNull($registro->alerta);
+    }
+
+    public function test_formulario_muestra_preevaluacion_sin_persistirla(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $this->actingAs($this->enfermero);
+        $signosAntes = SignoVital::query()->count();
+        $alertasAntes = Alerta::query()->count();
+
+        $formulario = $this->formularioSignos()->set('signoFC', '135');
+        $this->assertSame('CRITICO', $formulario->get('signosEvaluacion')['severidad_global']);
+        $formulario->assertSee('data-tone="danger"', false)
+            ->assertSee('rm-signos__card--fc', false)
+            ->assertSee('wire:model.live.debounce.350ms="signoFC"', false)
+            ->assertSee('wire:loading.class="rm-signos__card--evaluating"', false)
+            ->assertSee('Crítico')
+            ->assertSee('Al confirmar el registro se generará la alerta correspondiente.');
+        $formulario->set('signoGlucosa', '68')->set('signoSat', '90')
+            ->assertSee('data-tone="warning"', false)
+            ->assertSee('Advertencia')
+            ->assertSee('Sin clasificación definida');
+        $this->assertSame($signosAntes, SignoVital::query()->count());
+        $this->assertSame($alertasAntes, Alerta::query()->count());
     }
 }

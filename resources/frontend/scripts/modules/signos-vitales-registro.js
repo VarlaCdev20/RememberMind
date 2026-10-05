@@ -10,38 +10,58 @@ window.rmSignosRegistro = function (history, initial) {
         glucosa: { label: 'glucemia', unit: 'mg/dL', fields: ['glucosa'] },
     };
     const order = { pa: 10, fc: 20, fr: 30, temp: 40, sat: 50, glucosa: 60 };
-    const technicalMax = { sis: 999, dia: 999, fc: 9999, fr: 9999, temp: 999.9, sat: 100, glucosa: 999999.99 };
+    const technicalMax = { sis: 400, dia: 400, fc: 300, fr: 100, temp: 45, sat: 100, glucosa: 999999.99 };
+    const technicalMin = { sis: 1, dia: 1, fc: 1, fr: 1, temp: 25, sat: 1, glucosa: 1 };
 
     return {
         values: { ...initial },
+        initialValues: { ...initial },
         touched: {},
         errors: {},
         history: Array.isArray(history) ? history : [],
         active: null,
         trendOpen: true,
         meta: metadata,
+        init() {
+            this.beforeUnloadHandler = (event) => {
+                const modalOpen = this.$el.closest('.rm-modal-shell')?.classList.contains('is-open');
+                if (!modalOpen || !this.isDirty()) return;
+                event.preventDefault();
+                event.returnValue = '';
+            };
+            window.addEventListener('beforeunload', this.beforeUnloadHandler);
+        },
+        destroy() {
+            window.removeEventListener('beforeunload', this.beforeUnloadHandler);
+        },
+        isDirty() {
+            return Object.keys(this.initialValues).some(key =>
+                String(this.values[key] ?? '') !== String(this.initialValues[key] ?? '')
+            );
+        },
         focus(key) {
             this.active = key === 'sis' || key === 'dia' ? 'pa' : key;
             this.trendOpen = true;
         },
         activeOrder() { return this.active ? order[this.active] + 1 : 70; },
-        validate(key) {
+        validate(key, checkPair = true) {
             this.touched[key] = true;
             const raw = String(this.values[key] ?? '').trim();
             let error = '';
             if (raw !== '') {
                 const integer = ['sis', 'dia', 'fc', 'fr'].includes(key);
                 const decimals = key === 'temp' ? 1 : 2;
-                const pattern = integer ? /^\d+$/ : new RegExp('^' + (key === 'temp' ? '-?' : '') + '\\d+(?:\\.\\d{1,' + decimals + '})?$');
-                if (!pattern.test(raw)) error = raw.startsWith('-') && key !== 'temp'
-                    ? (key === 'sat' ? 'La saturación no puede ser menor a 0 %.' : 'El valor no puede ser negativo.')
+                const pattern = integer ? /^\d+$/ : new RegExp('^\\d+(?:\\.\\d{1,' + decimals + '})?$');
+                if (!pattern.test(raw)) error = raw.startsWith('-')
+                    ? (key === 'sat' ? 'La saturación debe ser mayor que 0 %.' : 'La medición debe ser mayor que cero.')
                     : 'Ingresa un valor numérico válido.';
+                else if (Number(raw) < technicalMin[key]) error = key === 'sat' ? 'La saturación debe ser mayor que 0 %.'
+                    : (key === 'temp' ? 'La temperatura está fuera de la capacidad permitida.' : 'La medición debe ser mayor que cero.');
                 else if (key === 'sat' && Number(raw) > 100) error = 'La saturación no puede superar el 100 %.';
-                else if (key === 'temp' && Number(raw) < -99.9) error = 'El valor está fuera de la capacidad permitida.';
                 else if (Number(raw) > technicalMax[key]) error = 'El valor supera la capacidad permitida.';
             }
             this.errors[key] = error;
-            if (key === 'sis' || key === 'dia') {
+            if (checkPair && (key === 'sis' || key === 'dia')) {
                 const other = key === 'sis' ? 'dia' : 'sis';
                 const otherRaw = String(this.values[other] ?? '').trim();
                 if (raw === '' && otherRaw !== '') {
@@ -63,9 +83,9 @@ window.rmSignosRegistro = function (history, initial) {
                 const raw = String(this.values[field]).trim();
                 const integer = ['sis', 'dia', 'fc', 'fr'].includes(field);
                 const precision = field === 'temp' ? 1 : 2;
-                const pattern = integer ? /^\d+$/ : new RegExp('^' + (field === 'temp' ? '-?' : '') + '\\d+(?:\\.\\d{1,' + precision + '})?$');
+                const pattern = integer ? /^\d+$/ : new RegExp('^\\d+(?:\\.\\d{1,' + precision + '})?$');
                 const value = Number(raw);
-                return pattern.test(raw) && value <= technicalMax[field] && (field === 'temp' ? value >= -99.9 : value >= 0);
+                return pattern.test(raw) && value <= technicalMax[field] && value >= technicalMin[field];
             });
         },
         valueOf(row, key) {

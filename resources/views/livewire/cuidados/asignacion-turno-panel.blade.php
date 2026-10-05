@@ -1,23 +1,18 @@
 ﻿<!-- rm-filter-bar -->
 <div class="space-y-6 font-sans">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-2xl bg-[var(--rm-surface)] border border-[var(--rm-border)] p-5 sm:p-6 shadow-sm">
-        <div class="space-y-1">
-            <div class="flex items-center gap-2">
-                <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary-ink)]">
-                    <i class="ph-bold ph-user-switch text-lg"></i>
-                </span>
-                <p class="text-xs font-bold uppercase tracking-[0.18em] text-[var(--rm-action-primary-ink)]">Jornadas asistenciales</p>
-            </div>
-            <h1 class="text-2xl font-black tracking-tight text-[var(--rm-text-primary)]">Asignaciones de turno y ocupación</h1>
-            <p class="text-xs text-[var(--rm-text-secondary)]">Vinculación de residentes a enfermeros responsables durante cada jornada institucional.</p>
-        </div>
-        @can('turnos.asignar')
-            <button wire:click="abrirCrear" class="inline-flex items-center gap-2 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] px-4 py-2.5 text-xs font-bold text-white shadow-sm transition active:scale-[0.98]">
-                <i class="ph-bold ph-plus-circle text-base"></i>
-                <span>Asignar residente</span>
-            </button>
-        @endcan
-    </div>
+    <x-ui.page-header
+    title="Asignaciones de turno y ocupación"
+    subtitle="Vinculación de residentes a enfermeros responsables durante cada jornada institucional."
+    overline="Jornadas asistenciales"
+    icon="ph-user-switch"
+    :date="now()">
+    @can('turnos.asignar')
+    <button type="button" wire:click="abrirCrear" class="rm-btn rm-btn-primary">
+        <i class="ph-bold ph-plus-circle text-base"></i>
+        <span>Asignar residente</span>
+    </button>
+    @endcan
+</x-ui.page-header>
 
     @if(session('mensaje'))
         <div role="status" class="flex items-center gap-2 rounded-xl border border-[var(--rm-action-primary)]/40 bg-[var(--rm-action-primary-soft)] px-4 py-3 text-xs font-bold text-[var(--rm-action-primary-ink)]">

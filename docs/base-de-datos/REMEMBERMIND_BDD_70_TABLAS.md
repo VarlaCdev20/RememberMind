@@ -1,5 +1,7 @@
 # RememberMind — BDD Operativa V2.1: 70 tablas
 
+> **Extensión aprobada V2.2:** este diccionario conserva las 70 tablas base. La tabla 71 `objetivos_signos_vitales` se especifica en [decisión V2.2](DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md).
+
 **Estado:** CONGELADO
 **Versión:** BDD Operativa V2.1
 **Documento complementario:** `REMEMBERMIND_BDD_BASELINE_CONGELADO.md`

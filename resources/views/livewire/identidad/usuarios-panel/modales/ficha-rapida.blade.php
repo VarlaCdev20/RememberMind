@@ -1,191 +1,173 @@
-@if($mostrarFichaRapida && $usuarioFicha)
- <div class="fixed inset-0 z-[2147483640] flex justify-end" x-data x-transition>
- {{-- Overlay --}}
- <div class="absolute inset-0 bg-black/35 backdrop-blur-sm" wire:click="cerrarFichaRapida"></div>
+@if($usuarioFicha)
+<x-ui.drawer-livewire
+    wire:model="mostrarFichaRapida"
+    title="Ficha Rápida"
+    subtitle="Resumen institucional de cuenta y perfil"
+    badge="PANEL LATERAL DE USUARIO"
+    icon="ph-user"
+    size="lg"
+    close-method="cerrarFichaRapida"
+    :dismiss-on-backdrop="true">
 
- {{-- Panel lateral --}}
- <aside class="relative z-10 flex h-screen w-full flex-col overflow-hidden border-l border-borde-suave bg-fondo-app shadow-[0_0_60px_rgba(0,0,0,0.3)] sm:max-w-xl lg:max-w-2xl"
- style="animation: slideInRight 0.3s ease-out">
+    @php
+        $fichaRoleName = $usuarioFicha->getRoleNames()->first() ?? 'sin_rol';
+        $fichaRoleKey = strtolower($fichaRoleName);
+        $fichaNombreCompleto = trim(($usuarioFicha->nombres ?? '') . ' ' . ($usuarioFicha->ap_paterno ?? '') . ' ' . ($usuarioFicha->ap_materno ?? ''));
+        $fichaInicial = mb_substr(trim($usuarioFicha->nombres ?? 'U'), 0, 1);
 
- {{-- Header ficha --}}
- <header class="flex shrink-0 items-center justify-between border-b border-borde-suave bg-fondo-panel px-6 py-4 backdrop-blur-xl">
- <div class="flex items-center gap-3">
- <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-boton-principal text-inverso shadow-lg">
- <i class="ph-bold ph-clipboard-text text-lg"></i>
- </div>
- <div>
- <h2 class="text-base font-extrabold text-parrafo">Ficha <span class="text-boton-acento">Rápida</span></h2>
- <p class="text-[9px] font-bold uppercase tracking-widest text-meta">Resumen institucional</p>
- </div>
- </div>
- <button type="button" wire:click="cerrarFichaRapida"
- class="group flex h-9 w-9 items-center justify-center rounded-xl bg-fondo-app text-parrafo transition-all hover:bg-boton-acento hover:text-inverso active:scale-90 shadow-sm">
- <i class="ph-bold ph-x text-base transition group-hover:rotate-90"></i>
- </button>
- </header>
+        $fichaAreaDisplay = $usuarioFicha->areaInstitucional?->nombre ?? match($fichaRoleKey) {
+            'super_admin', 'admin' => 'Administración del sistema',
+            'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'Área de salud',
+            'superadministrador', 'administrador' => 'Área administrativa',
+            'FAMILIAR' => 'Familiar autorizado',
+            default => 'Sin área asignada'
+        };
 
- {{-- Contenido scrollable --}}
- <div class="flex-1 overflow-y-auto custom-scrollbar px-6 py-6 space-y-5">
+        $fichaPerfilDetalle = match($fichaRoleKey) {
+            'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => $usuarioFicha->personalSalud?->especialidad?->nombre ?? 'Personal de salud',
+            'superadministrador', 'administrador' => $usuarioFicha->personalAdmin?->cargoAdmin?->nombre ?? $usuarioFicha->personalAdmin?->cargo ?? 'Personal administrativo',
+            'super_admin', 'admin' => 'Administrador del sistema',
+            'FAMILIAR' => 'Familiar autorizado',
+            default => strtoupper(str_replace('_', ' ', $fichaRoleName))
+        };
 
- {{-- Avatar y nombre --}}
- @php
- $fichaRoleName = $usuarioFicha->getRoleNames()->first() ?? 'sin_rol';
- $fichaRoleKey = strtolower($fichaRoleName);
- $fichaNombreCompleto = trim(($usuarioFicha->nombres ?? '') . ' ' . ($usuarioFicha->ap_paterno ?? '') . ' ' . ($usuarioFicha->ap_materno ?? ''));
- $fichaInicial = mb_substr(trim($usuarioFicha->nombres ?? 'U'), 0, 1);
+        $fichaFoto = null;
+        if (!empty($usuarioFicha->foto_de_perfil)) {
+            $fichaFoto = \Illuminate\Support\Facades\Storage::url($usuarioFicha->foto_de_perfil);
+        } elseif (!empty($usuarioFicha->profile_photo_url)) {
+            $fichaFoto = $usuarioFicha->profile_photo_url;
+        }
+    @endphp
 
- $fichaAreaDisplay = $usuarioFicha->areaInstitucional?->nombre ?? match($fichaRoleKey) {
- 'super_admin', 'admin' => 'Administración del sistema',
- 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'Área de salud',
- 'superadministrador', 'administrador' => 'Área administrativa',
- 'FAMILIAR' => 'Familiar autorizado',
- default => 'Sin área asignada'
- };
+    <div class="space-y-5">
+        {{-- Avatar y nombre --}}
+        <div class="flex flex-col items-center text-center p-4 rounded-2xl bg-[var(--rm-surface-soft)] border border-[var(--rm-border-soft)]">
+            <div class="relative">
+                @if($fichaFoto)
+                    <img src="{{ $fichaFoto }}" alt="{{ $fichaNombreCompleto }}"
+                         class="h-16 w-16 rounded-2xl object-cover ring-2 ring-[var(--rm-border)] shadow-md">
+                @else
+                    <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--rm-action-primary)] text-2xl font-black text-white ring-2 ring-[var(--rm-border)] shadow-md">
+                        {{ strtoupper($fichaInicial) }}
+                    </div>
+                @endif
+                <span class="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-[var(--rm-surface)] {{ $usuarioFicha->estado === 'ACTIVO' ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>
+            </div>
 
- $fichaPerfilDetalle = match($fichaRoleKey) {
- 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => $usuarioFicha->personalSalud?->especialidad?->nombre ?? 'Personal de salud',
- 'superadministrador', 'administrador' => $usuarioFicha->personalAdmin?->cargoAdmin?->nombre ?? $usuarioFicha->personalAdmin?->cargo ?? 'Personal administrativo',
- 'super_admin', 'admin' => 'Administrador del sistema',
- 'FAMILIAR' => 'Familiar autorizado',
- default => strtoupper(str_replace('_', ' ', $fichaRoleName))
- };
+            <h3 class="mt-3 text-lg font-extrabold uppercase text-[var(--rm-text-primary)] leading-tight">{{ $fichaNombreCompleto }}</h3>
+            <p class="mt-0.5 text-xs font-medium text-[var(--rm-text-secondary)] lowercase">{{ $usuarioFicha->correo ?: 'Sin correo' }}</p>
 
- $fichaFoto = null;
- if (!empty($usuarioFicha->foto_de_perfil)) {
- $fichaFoto = \Illuminate\Support\Facades\Storage::url($usuarioFicha->foto_de_perfil);
- } elseif (!empty($usuarioFicha->profile_photo_url)) {
- $fichaFoto = $usuarioFicha->profile_photo_url;
- }
- @endphp
+            <div class="mt-2.5 flex flex-wrap justify-center gap-2">
+                <span class="rm-badge {{ $usuarioFicha->estado === 'ACTIVO' ? 'rm-badge-success' : 'rm-badge-neutral' }} text-[10px] font-bold uppercase">
+                    {{ $usuarioFicha->estado }}
+                </span>
+                <span class="rm-badge rm-badge-info text-[10px] font-bold uppercase">
+                    {{ match($fichaRoleKey) {
+                        'superadministrador', 'administrador' => 'PERSONAL ADMINISTRATIVO',
+                        'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'PERSONAL DE SALUD',
+                        'FAMILIAR' => 'FAMILIAR AUTORIZADO',
+                        default => strtoupper(str_replace('_', ' ', $fichaRoleName)),
+                    } }}
+                </span>
+            </div>
+        </div>
 
- <div class="flex flex-col items-center text-center">
- <div class="relative">
- @if($fichaFoto)
- <img src="{{ $fichaFoto }}" alt="{{ $fichaNombreCompleto }}"
- class="h-16 w-16 rounded-2xl object-cover ring-2 ring-white shadow-[0_6px_16px_rgba(47,62,92,0.15)]">
- @else
- <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-boton-principal text-2xl font-black text-inverso ring-2 ring-white shadow-[0_6px_16px_rgba(47,62,92,0.15)]">
- {{ strtoupper($fichaInicial) }}
- </div>
- @endif
- <span class="absolute -bottom-1 -right-1 h-5 w-5 rounded-full border-[3px] border-white {{ $usuarioFicha->estado === 'ACTIVO' ? 'bg-estado-exitoBg' : 'bg-fondo-panel' }}"></span>
- </div>
+        {{-- Datos en bloques --}}
+        <div class="space-y-3">
+            <div class="rounded-2xl border border-[var(--rm-border-soft)] bg-[var(--rm-surface)] p-4 space-y-2.5 shadow-2xs">
+                <h4 class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--rm-action-primary)]">
+                    <i class="ph-bold ph-buildings text-base"></i> Perfil Institucional
+                </h4>
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <p class="text-[9px] font-bold uppercase tracking-wider text-[var(--rm-text-muted)]">Área</p>
+                        <p class="font-bold text-[var(--rm-text-primary)] mt-0.5">{{ $fichaAreaDisplay }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-bold uppercase tracking-wider text-[var(--rm-text-muted)]">Perfil</p>
+                        <p class="font-bold text-[var(--rm-text-primary)] uppercase mt-0.5">{{ $fichaPerfilDetalle }}</p>
+                    </div>
+                </div>
+            </div>
 
- <h3 class="mt-4 text-xl font-extrabold uppercase text-parrafo leading-tight">{{ $fichaNombreCompleto }}</h3>
- <p class="mt-1 text-sm font-semibold lowercase text-parrafo/55">{{ $usuarioFicha->correo ?: 'Sin correo' }}</p>
+            <div class="rounded-2xl border border-[var(--rm-border-soft)] bg-[var(--rm-surface)] p-4 space-y-2.5 shadow-2xs">
+                <h4 class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--rm-action-primary)]">
+                    <i class="ph-bold ph-phone-call text-base"></i> Contacto
+                </h4>
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <p class="text-[9px] font-bold uppercase tracking-wider text-[var(--rm-text-muted)]">Teléfono</p>
+                        <p class="font-bold text-[var(--rm-text-primary)] mt-0.5">{{ $usuarioFicha->codigo_telefono }} {{ $usuarioFicha->telefono ?? 'Sin registrar' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-bold uppercase tracking-wider text-[var(--rm-text-muted)]">Correo</p>
+                        <p class="font-bold text-[var(--rm-text-primary)] lowercase break-all mt-0.5">{{ $usuarioFicha->correo ?: 'Sin registrar' }}</p>
+                    </div>
+                </div>
+            </div>
 
- <div class="mt-3 flex flex-wrap justify-center gap-2">
- <span class="rounded-full {{ $usuarioFicha->estado === 'ACTIVO' ? 'bg-estado-exitoBg text-estado-exito' : 'bg-fondo-panel text-meta' }} px-3 py-1 text-[10px] font-bold uppercase">
- {{ $usuarioFicha->estado }}
- </span>
- <span class="rounded-full bg-fondo-panel px-3 py-1 text-[10px] font-bold uppercase text-parrafo">
- {{ match($fichaRoleKey) {
- 'superadministrador', 'administrador' => 'PERSONAL ADMINISTRATIVO',
- 'enfermeros', 'medico general/geriatra', 'psicologo/a', 'pedagogo', 'nutricionista', 'fisioterapeuta' => 'PERSONAL DE SALUD',
- 'FAMILIAR' => 'FAMILIAR AUTORIZADO',
- default => strtoupper(str_replace('_', ' ', $fichaRoleName)),
- } }}
- </span>
- </div>
- </div>
+            <div class="rounded-2xl border border-[var(--rm-border-soft)] bg-[var(--rm-surface)] p-4 space-y-2.5 shadow-2xs">
+                <h4 class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--rm-action-primary)]">
+                    <i class="ph-bold ph-clock text-base"></i> Acceso y Registro
+                </h4>
+                <div class="grid grid-cols-3 gap-2 text-xs">
+                    <div>
+                        <p class="text-[9px] font-bold uppercase tracking-wider text-[var(--rm-text-muted)]">Último acceso</p>
+                        <p class="font-bold text-[var(--rm-text-primary)] mt-0.5">
+                            {{ $usuarioFicha->ultimo_acceso ? $usuarioFicha->ultimo_acceso->format('d/m/Y H:i') : 'Sin registro' }}
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-bold uppercase tracking-wider text-[var(--rm-text-muted)]">Creación</p>
+                        <p class="font-bold text-[var(--rm-text-primary)] mt-0.5">
+                            {{ $usuarioFicha->created_at ? $usuarioFicha->created_at->format('d/m/Y') : 'Sin dato' }}
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-bold uppercase tracking-wider text-[var(--rm-text-muted)]">Acceso</p>
+                        <p class="font-bold mt-0.5 {{ $usuarioFicha->acceso_sistema === 'HABILITADO' ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400' }}">
+                            {{ $usuarioFicha->acceso_sistema }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
- {{-- Datos en bloques --}}
- <div class="space-y-3">
- <div class="rounded-2xl border border-borde-suave bg-fondo-card/45 p-4 space-y-3">
- <h4 class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-boton-acento">
- <i class="ph-bold ph-buildings text-base"></i> Perfil Institucional
- </h4>
- <div class="grid grid-cols-2 gap-3">
- <div>
- <p class="text-[8px] font-black uppercase tracking-wider text-parrafo/35">Área</p>
- <p class="text-xs font-bold text-parrafo">{{ $fichaAreaDisplay }}</p>
- </div>
- <div>
- <p class="text-[8px] font-black uppercase tracking-wider text-parrafo/35">Perfil</p>
- <p class="text-xs font-bold text-parrafo uppercase">{{ $fichaPerfilDetalle }}</p>
- </div>
- </div>
- </div>
+    {{-- Footer acciones rápidas --}}
+    <x-slot:footer>
+        <div class="flex flex-wrap items-center justify-end gap-2 w-full">
+            <button type="button"
+                    wire:click="abrirVistaCompleta('{{ $usuarioFicha->cod_usuario }}')"
+                    class="rm-btn rm-btn-secondary rm-btn-sm">
+                <i class="ph-bold ph-eye text-base"></i>
+                <span>Ver completo</span>
+            </button>
 
- <div class="rounded-2xl border border-borde-suave bg-fondo-card/45 p-4 space-y-3">
- <h4 class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-boton-acento">
- <i class="ph-bold ph-phone-call text-base"></i> Contacto
- </h4>
- <div class="grid grid-cols-2 gap-3">
- <div>
- <p class="text-[8px] font-black uppercase tracking-wider text-parrafo/35">Teléfono</p>
- <p class="text-xs font-bold text-parrafo">{{ $usuarioFicha->codigo_telefono }} {{ $usuarioFicha->telefono ?? 'Sin registrar' }}</p>
- </div>
- <div>
- <p class="text-[8px] font-black uppercase tracking-wider text-parrafo/35">Correo</p>
- <p class="text-xs font-bold text-parrafo lowercase break-all">{{ $usuarioFicha->correo ?: 'Sin registrar' }}</p>
- </div>
- </div>
- </div>
+            @can('usuarios.editar')
+                @if($usuarioFicha->estado === 'ACTIVO')
+                    <button type="button"
+                            wire:click="editarUsuario('{{ $usuarioFicha->cod_usuario }}')"
+                            onclick="@this.cerrarFichaRapida()"
+                            class="rm-btn rm-btn-primary rm-btn-sm">
+                        <i class="ph-bold ph-pencil-simple text-base"></i>
+                        <span>Editar</span>
+                    </button>
+                @endif
+            @endcan
 
- <div class="rounded-2xl border border-borde-suave bg-fondo-card/45 p-4 space-y-3">
- <h4 class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-boton-acento">
- <i class="ph-bold ph-clock text-base"></i> Acceso y registro
- </h4>
- <div class="grid grid-cols-2 gap-3">
- <div>
- <p class="text-[8px] font-black uppercase tracking-wider text-parrafo/35">Último acceso</p>
- <p class="text-xs font-bold text-parrafo">
- {{ $usuarioFicha->ultimo_acceso ? $usuarioFicha->ultimo_acceso->format('d/m/Y H:i') : 'Sin registro' }}
- </p>
- </div>
- <div>
- <p class="text-[8px] font-black uppercase tracking-wider text-parrafo/35">Fecha de creación</p>
- <p class="text-xs font-bold text-parrafo">
- {{ $usuarioFicha->created_at ? $usuarioFicha->created_at->format('d/m/Y') : 'Sin dato' }}
- </p>
- </div>
- <div>
- <p class="text-[8px] font-black uppercase tracking-wider text-parrafo/35">Acceso sistema</p>
- <p class="text-xs font-bold {{ $usuarioFicha->acceso_sistema === 'HABILITADO' ? 'text-estado-exito' : 'text-boton-acento' }}">
- {{ $usuarioFicha->acceso_sistema }}
- </p>
- </div>
- </div>
- </div>
- </div>
- </div>
-
- {{-- Footer acciones rápidas --}}
- <footer class="shrink-0 border-t border-borde-suave bg-fondo-panel px-6 py-4 backdrop-blur-xl">
- <div class="flex flex-wrap items-center justify-center gap-2">
- <button type="button"
- wire:click="abrirVistaCompleta('{{ $usuarioFicha->cod_usuario }}')"
- class="inline-flex items-center gap-2 rounded-full bg-boton-principal px-5 py-2.5 text-[10px] font-bold text-inverso shadow-lg transition hover:bg-fondo-panel active:scale-95">
- <i class="ph-bold ph-eye"></i> Ver completo
- </button>
-
- @can('usuarios.editar')
- @if($usuarioFicha->estado === 'ACTIVO')
- <button type="button"
- wire:click="editarUsuario('{{ $usuarioFicha->cod_usuario }}')"
- onclick="@this.cerrarFichaRapida()"
- class="inline-flex items-center gap-2 rounded-full bg-boton-acento px-5 py-2.5 text-[10px] font-bold text-inverso shadow-lg transition hover:bg-fondo-panel active:scale-95">
- <i class="ph-bold ph-pencil-simple"></i> Editar
- </button>
- @endif
- @endcan
-
- @can('usuarios.cambiar_estado')
- @if($usuarioFicha->cod_usuario !== auth()->id())
- <button wire:click="toggleEstado('{{ $usuarioFicha->cod_usuario }}')"
- wire:confirm="¿Desea cambiar el estado de este usuario?"
- class="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[10px] font-bold shadow-lg transition active:scale-95
- {{ $usuarioFicha->estado === 'ACTIVO'
- ? 'bg-fondo-panel text-parrafo hover:bg-fondo-panel hover:text-inverso'
- : 'bg-estado-exitoBg text-estado-exito hover:bg-estado-exitoBg hover:text-inverso' }}">
- <i class="ph-bold {{ $usuarioFicha->estado === 'ACTIVO' ? 'ph-user-minus' : 'ph-user-plus' }}"></i>
- {{ $usuarioFicha->estado === 'ACTIVO' ? 'Inactivar' : 'Activar' }}
- </button>
- @endif
- @endcan
- </div>
- </footer>
- </aside>
- </div>
- @endif
+            @can('usuarios.cambiar_estado')
+                @if($usuarioFicha->cod_usuario !== auth()->id())
+                    <button type="button"
+                            wire:click="toggleEstado('{{ $usuarioFicha->cod_usuario }}')"
+                            wire:confirm="¿Desea cambiar el estado de este usuario?"
+                            class="rm-btn rm-btn-sm {{ $usuarioFicha->estado === 'ACTIVO' ? 'rm-btn-secondary text-[var(--rm-danger)]' : 'rm-btn-success' }}">
+                        <i class="ph-bold {{ $usuarioFicha->estado === 'ACTIVO' ? 'ph-user-minus' : 'ph-user-plus' }} text-base"></i>
+                        <span>{{ $usuarioFicha->estado === 'ACTIVO' ? 'Inactivar' : 'Activar' }}</span>
+                    </button>
+                @endif
+            @endcan
+        </div>
+    </x-slot:footer>
+</x-ui.drawer-livewire>
+@endif

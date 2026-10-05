@@ -24,7 +24,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'preadmisiones', 'admisiones', 'residentes_contactos', 'historial_estados_residente',
             'ocupaciones_cama', 'documentos', 'consentimientos', 'atenciones', 'notas_clinicas',
             'antecedentes_clinicos', 'diagnosticos', 'alergias', 'seguros_residente', 'dispositivos_clinicos',
-            'signos_vitales', 'valoraciones_dolor', 'mediciones_antropometricas', 'componentes_estudio',
+            'signos_vitales', 'objetivos_signos_vitales', 'valoraciones_dolor', 'mediciones_antropometricas', 'componentes_estudio',
             'estudios_clinicos', 'resultados_estudio', 'informes_estudio', 'documentos_clinicos', 'derivaciones',
             'incidentes', 'indicaciones_clinicas', 'asignaciones_residente_jornada', 'controles_cognitivos',
             'registros_conductuales', 'registros_sueno', 'registros_ingesta', 'registros_hidratacion',
@@ -66,7 +66,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'habitaciones.gestionar', 'camas.gestionar', 'contactos.gestionar', 'documentos.gestionar',
             'ocupaciones_cama.gestionar', 'documentos.validar', 'consentimientos.gestionar',
             'atenciones.crear', 'notas_clinicas.crear', 'diagnosticos.crear',
-            'antecedentes_clinicos.crear', 'alergias.crear', 'signos_vitales.crear',
+            'antecedentes_clinicos.crear', 'alergias.crear', 'signos_vitales.crear', 'objetivos_signos_vitales.gestionar',
             'valoraciones_dolor.crear', 'mediciones_antropometricas.crear', 'estudios_clinicos.crear',
             'resultados_estudio.crear', 'informes_estudio.crear', 'documentos_clinicos.crear',
             'indicaciones_clinicas.crear', 'derivaciones.crear', 'incidentes.crear', 'asignaciones_residente_jornada.gestionar', 'controles_cognitivos.crear',
@@ -126,7 +126,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $roles['MEDICO GENERAL/GERIATRA']->syncPermissions(array_values(array_unique(array_merge($this->permitir($permisos, [
             'residentes.ver', 'atenciones', 'notas_clinicas', 'antecedentes_clinicos', 'diagnosticos', 'alergias',
-            'seguros_residente.ver', 'dispositivos_clinicos', 'signos_vitales', 'valoraciones_dolor',
+            'seguros_residente.ver', 'dispositivos_clinicos', 'signos_vitales', 'objetivos_signos_vitales', 'valoraciones_dolor',
             'mediciones_antropometricas', 'estudios_clinicos', 'resultados_estudio', 'informes_estudio',
             'documentos_clinicos', 'derivaciones', 'incidentes', 'indicaciones_clinicas', 'controles_cognitivos',
             'registros_', 'heridas', 'curaciones_herida', 'planes_cuidado', 'prescripciones',
@@ -142,7 +142,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'intervenciones_cuidado.ver', 'programaciones_cuidado.ver', 'ejecuciones_cuidado',
             'prescripciones.ver', 'horarios_prescripcion.ver', 'administraciones_medicacion', 'alertas',
         ]), [
-            'salud.ver', 'turnos.ver', 'valoracion_enfermeria.ver', 'valoracion_enfermeria.registrar', 'valoracion_enfermeria.editar',
+            'salud.ver', 'turnos.ver', 'objetivos_signos_vitales.ver', 'valoracion_enfermeria.ver', 'valoracion_enfermeria.registrar', 'valoracion_enfermeria.editar',
             'enfermeria.ver_dashboard', 'enfermeria.ver_pacientes_asignados',
             'enfermeria.ver_ficha_paciente',
         ]))));

@@ -1164,6 +1164,9 @@ class SaludAdministracionMedicacionPanel extends Component
             return strcmp($a['hora'], $b['hora']);
         })->values();
 
+        $dPresc = is_numeric($this->formDosisPrescritaValor) ? (float) $this->formDosisPrescritaValor : 0.0;
+        $dAdmin = is_numeric($this->formDosisAdministrada) ? (float) $this->formDosisAdministrada : 0.0;
+
         return view('livewire.medicacion.salud-administracion-medicacion', [
             'residentes' => $residentes,
             'horasKardex' => $horasKardex,
@@ -1182,6 +1185,9 @@ class SaludAdministracionMedicacionPanel extends Component
             'modalOmisionAbierto' => $this->modalOmisionAbierto,
             'formDosisAdministrada' => $this->formDosisAdministrada,
             'formDosisPrescritaValor' => $this->formDosisPrescritaValor,
+            'dPresc' => $dPresc,
+            'dAdmin' => $dAdmin,
+            'dosisDifiere' => $dPresc > 0 && $dAdmin > 0 && abs($dAdmin - $dPresc) > 0.001,
             'formUnidadDosis' => $this->formUnidadDosis,
             'formEfectoObservado' => $this->formEfectoObservado,
             'formReaccionAdversa' => $this->formReaccionAdversa,

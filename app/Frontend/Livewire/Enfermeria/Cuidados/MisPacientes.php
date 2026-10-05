@@ -13,6 +13,7 @@ use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
 use App\Models\AdministracionMedicacion;
 use App\Models\Alerta;
 use App\Models\IndicacionClinica;
+use App\Models\ObjetivoSignoVital;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Atencion;
 use App\Models\EjecucionCuidado;
@@ -46,6 +47,12 @@ class MisPacientes extends Component
     public string $filtroEnfermero = '';
 
     public string $filtroRapido = 'TODOS';
+
+    public string $filtroAlertas = '';
+
+    public string $filtroMedicacion = '';
+
+    public string $filtroCuidados = '';
 
     public string $vistaModo = 'tarjetas'; // 'tabla' (Lista) | 'tarjetas' (Tarjetas)
 
@@ -98,6 +105,12 @@ class MisPacientes extends Component
 
     #[Locked]
     public array $signosContextoTurno = [];
+
+    #[Locked]
+    public array $signosEvaluacion = [];
+
+    #[Locked]
+    public array $signosObjetivos = [];
 
     public bool $signosIntentoGuardar = false;
 
@@ -277,6 +290,181 @@ class MisPacientes extends Component
         $this->resetPage();
     }
 
+    public function updatingFiltroAlertas(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFiltroMedicacion(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFiltroCuidados(): void
+    {
+        $this->resetPage();
+    }
+
+    public function aplicarFiltro(string $tipo, string $valor): void
+    {
+        // Si el valor ya está seleccionado en ese tipo, alternar (deseleccionar)
+        $valorActual = match ($tipo) {
+            'alertas' => $this->filtroAlertas,
+            'habitacion' => $this->filtroHabitacion,
+            'medicacion' => $this->filtroMedicacion,
+            'cuidados' => $this->filtroCuidados,
+            'estado' => $this->filtroEstado,
+            'rapido' => $this->filtroRapido,
+            default => null,
+        };
+
+        if ($valorActual === $valor) {
+            $this->removerFiltro($tipo);
+            return;
+        }
+
+        match ($tipo) {
+            'alertas' => $this->filtroAlertas = $valor,
+            'habitacion' => $this->filtroHabitacion = $valor,
+            'medicacion' => $this->filtroMedicacion = $valor,
+            'cuidados' => $this->filtroCuidados = $valor,
+            'estado' => $this->filtroEstado = $valor,
+            'rapido' => $this->filtroRapido = $valor,
+            default => null,
+        };
+        if ($tipo === 'alertas' && $valor === 'CON_ALERTAS') {
+            $this->filtroRapido = 'CON_ALERTAS';
+        } elseif ($tipo === 'alertas' && $valor !== 'CON_ALERTAS') {
+            if ($this->filtroRapido === 'CON_ALERTAS') {
+                $this->filtroRapido = 'TODOS';
+            }
+        }
+        $this->resetPage();
+    }
+
+    public function removerFiltro(string $tipo): void
+    {
+        match ($tipo) {
+            'alertas' => $this->filtroAlertas = '',
+            'habitacion' => $this->filtroHabitacion = '',
+            'medicacion' => $this->filtroMedicacion = '',
+            'cuidados' => $this->filtroCuidados = '',
+            'estado' => $this->filtroEstado = 'TODOS',
+            'rapido' => $this->filtroRapido = 'TODOS',
+            default => null,
+        };
+        if ($tipo === 'alertas' && $this->filtroRapido === 'CON_ALERTAS') {
+            $this->filtroRapido = 'TODOS';
+        }
+        $this->resetPage();
+    }
+
+    public function limpiarFiltrosActivos(): void
+    {
+        $this->filtroAlertas = '';
+        $this->filtroHabitacion = '';
+        $this->filtroMedicacion = '';
+        $this->filtroCuidados = '';
+        $this->filtroRapido = 'TODOS';
+        $this->filtroEstado = 'TODOS';
+        $this->resetPage();
+    }
+
+    public function obtenerFiltrosActivos(): array
+    {
+        $activos = [];
+
+        if (! empty($this->filtroAlertas)) {
+            $label = match ($this->filtroAlertas) {
+                'CON_ALERTAS' => 'Con alertas',
+                'SIN_ALERTAS' => 'Sin alertas',
+                'CON_ALERTAS_PRIORITARIAS', 'CRITICAS' => 'Con alertas prioritarias',
+                default => $this->filtroAlertas,
+            };
+            $activos[] = [
+                'tipo' => 'alertas',
+                'categoria' => 'Alertas',
+                'valor' => $this->filtroAlertas,
+                'label' => 'Alertas: ' . $label,
+                'icono' => 'ph-bell',
+                'tono' => 'red',
+            ];
+        } elseif ($this->filtroRapido === 'CON_ALERTAS') {
+            $activos[] = [
+                'tipo' => 'alertas',
+                'categoria' => 'Alertas',
+                'valor' => 'CON_ALERTAS',
+                'label' => 'Alertas: Con alertas',
+                'icono' => 'ph-bell',
+                'tono' => 'red',
+            ];
+        }
+
+        if (! empty($this->filtroHabitacion)) {
+            $activos[] = [
+                'tipo' => 'habitacion',
+                'categoria' => 'Habitación',
+                'valor' => $this->filtroHabitacion,
+                'label' => 'Habitación: ' . $this->filtroHabitacion,
+                'icono' => 'ph-bed',
+                'tono' => 'blue',
+            ];
+        }
+
+        if (! empty($this->filtroMedicacion)) {
+            $label = match ($this->filtroMedicacion) {
+                'CON_MEDICACION_PENDIENTE' => 'Con medicación pendiente',
+                'CON_MEDICACION_PROGRAMADA', 'CON_MEDICACION' => 'Con medicación programada',
+                'SIN_MEDICACION' => 'Sin medicación activa',
+                default => $this->filtroMedicacion,
+            };
+            $activos[] = [
+                'tipo' => 'medicacion',
+                'categoria' => 'Medicación',
+                'valor' => $this->filtroMedicacion,
+                'label' => 'Medicación: ' . $label,
+                'icono' => 'ph-pill',
+                'tono' => 'violet',
+            ];
+        }
+
+        if (! empty($this->filtroCuidados)) {
+            $label = match ($this->filtroCuidados) {
+                'CON_CUIDADOS_PENDIENTES' => 'Con cuidados pendientes',
+                'CON_PLAN_ACTIVO' => 'Con plan de cuidado activo',
+                'SIN_PLAN' => 'Sin plan de cuidado',
+                default => $this->filtroCuidados,
+            };
+            $activos[] = [
+                'tipo' => 'cuidados',
+                'categoria' => 'Cuidados',
+                'valor' => $this->filtroCuidados,
+                'label' => 'Cuidados: ' . $label,
+                'icono' => 'ph-heart',
+                'tono' => 'green',
+            ];
+        }
+
+        if ($this->filtroEstado !== 'TODOS' && ! empty($this->filtroEstado)) {
+            $label = match ($this->filtroEstado) {
+                'REQUIERE_ATENCION' => 'Requiere atención',
+                'VIGILANCIA' => 'Vigilancia',
+                'ESTABLE' => 'Estable',
+                default => $this->filtroEstado,
+            };
+            $activos[] = [
+                'tipo' => 'estado',
+                'categoria' => 'Estado',
+                'valor' => $this->filtroEstado,
+                'label' => 'Estado: ' . $label,
+                'icono' => 'ph-activity',
+                'tono' => 'amber',
+            ];
+        }
+
+        return $activos;
+    }
+
     public function updatingFiltroRapido(): void
     {
         $this->resetPage();
@@ -409,6 +597,8 @@ class MisPacientes extends Component
         $this->registroInicial = [];
         $this->signosHistorial = [];
         $this->signosContextoTurno = [];
+        $this->signosEvaluacion = [];
+        $this->signosObjetivos = [];
         $this->signosIntentoGuardar = false;
         $this->confirmarDescarte = false;
         $this->accionDescarte = null;
@@ -618,6 +808,8 @@ class MisPacientes extends Component
         $this->registroInicial = [];
         $this->signosHistorial = [];
         $this->signosContextoTurno = [];
+        $this->signosEvaluacion = [];
+        $this->signosObjetivos = [];
         $this->signosIntentoGuardar = false;
         $this->confirmarDescarte = false;
         $this->accionDescarte = null;
@@ -961,6 +1153,7 @@ class MisPacientes extends Component
         $this->modalCodResidente = $codResidente;
         $this->reset(['signoPA', 'signoFC', 'signoFR', 'signoTemp', 'signoSat', 'signoGlucosa', 'signoObs', 'signoConfirmarAtipico']);
         $this->reset(['signoSis', 'signoDia']);
+        $this->signosEvaluacion = [];
         $this->signosIntentoGuardar = false;
         $turnoSignos = $this->getTurnoService()->obtenerTurnoActivo(auth()->user());
         $finTurnoSignos = $turnoSignos?->hora_cierre ?: $turnoSignos?->hora_fin;
@@ -980,12 +1173,58 @@ class MisPacientes extends Component
                 'temp' => $signo->temperatura, 'sat' => $signo->saturacion_oxigeno,
                 'glucosa' => $signo->glucemia,
             ])->all() : [];
+        $this->signosObjetivos = auth()->user()?->can('objetivos_signos_vitales.ver')
+            ? ObjetivoSignoVital::query()->where('cod_residente', $codResidente)->where('estado', 'VIGENTE')
+                ->where('vigente_desde', '<=', now())->whereNull('vigente_hasta')
+                ->orderBy('parametro')->get()->map(fn (ObjetivoSignoVital $objetivo) => [
+                    'nombre' => ObjetivoSignoVital::PARAMETROS[$objetivo->parametro],
+                    'min' => $objetivo->min_objetivo, 'max' => $objetivo->max_objetivo,
+                ])->all()
+            : [];
         $this->modalSignos = true;
     }
 
     public function abrirModalSignos(string $codResidente): void
     {
         $this->abrirRegistrarSignos($codResidente);
+    }
+
+    public function updated(string $propiedad): void
+    {
+        if (! in_array($propiedad, ['signoSis', 'signoDia', 'signoFC', 'signoFR',
+            'signoTemp', 'signoSat', 'signoGlucosa'], true)
+            || ! $this->modalSignos || ! $this->modalCodResidente || $this->esModoConsulta) {
+            return;
+        }
+
+        $this->signoConfirmarAtipico = false;
+        $campoError = match ($propiedad) {
+            'signoSis' => 'presion_sistolica',
+            'signoDia' => 'presion_diastolica',
+            'signoFC' => 'frecuencia_cardiaca',
+            'signoFR' => 'frecuencia_respiratoria',
+            'signoTemp' => 'temperatura',
+            'signoSat' => 'saturacion_oxigeno',
+            'signoGlucosa' => 'glucemia',
+        };
+        $this->resetValidation($campoError);
+        $this->resetValidation('mediciones');
+        $this->resetValidation('signos_confirmacion');
+        try {
+            $this->signosEvaluacion = app(SignosVitalesService::class)->preEvaluar([
+                'presion_sistolica' => $this->signoSis,
+                'presion_diastolica' => $this->signoDia,
+                'frecuencia_cardiaca' => $this->signoFC,
+                'frecuencia_respiratoria' => $this->signoFR,
+                'temperatura' => $this->signoTemp,
+                'saturacion_oxigeno' => $this->signoSat,
+                'glucemia' => $this->signoGlucosa,
+            ], $this->modalCodResidente, Auth::user())->toArray();
+        } catch (ValidationException $exception) {
+            // Durante la escritura, la validación visible de los campos muestra
+            // el error técnico; no se presenta una clasificación clínica parcial.
+            $this->signosEvaluacion = [];
+        }
     }
 
     public function guardarSignos(): void
@@ -998,6 +1237,30 @@ class MisPacientes extends Component
             $this->signosIntentoGuardar = true;
             $this->resetValidation();
             try {
+                try {
+                    $evaluacionPrevia = app(SignosVitalesService::class)->preEvaluar([
+                        'presion_sistolica' => $this->signoSis,
+                        'presion_diastolica' => $this->signoDia,
+                        'frecuencia_cardiaca' => $this->signoFC,
+                        'frecuencia_respiratoria' => $this->signoFR,
+                        'temperatura' => $this->signoTemp,
+                        'saturacion_oxigeno' => $this->signoSat,
+                        'glucemia' => $this->signoGlucosa,
+                    ], $this->modalCodResidente, Auth::user());
+                } catch (ValidationException) {
+                    // El validador de registro devuelve los mensajes específicos
+                    // de cada campo y conserva los valores para corregirlos.
+                    $evaluacionPrevia = null;
+                }
+                $requiereRevision = collect($evaluacionPrevia?->resultados ?? [])->contains(
+                    fn ($resultado) => in_array($resultado->severidad?->value, ['ADVERTENCIA', 'ALTO', 'CRITICO'], true)
+                        || $resultado->comportamientoAlerta->value === 'SUGERIR'
+                );
+                if ($requiereRevision && ! $this->signoConfirmarAtipico) {
+                    $this->signosEvaluacion = $evaluacionPrevia->toArray();
+                    $this->addError('signos_confirmacion', 'Revisa las lecturas señaladas y confirma que corresponden a la medición realizada.');
+                    return;
+                }
                 app(SignosVitalesService::class)->registrarDesdeNuevoRegistro($this->modalCodResidente, [
                     'presion_sistolica' => $this->signoSis,
                     'presion_diastolica' => $this->signoDia,
@@ -1643,6 +1906,42 @@ class MisPacientes extends Component
             }
         }
 
+        // Filtro Alertas estructurado
+        if ($this->filtroAlertas === 'CON_ALERTAS' || $this->filtroRapido === 'CON_ALERTAS') {
+            $pacientesQuery->whereHas('alertas', fn ($q) => $q->whereIn('estado', ['ABIERTA', 'EN_ATENCION']));
+        } elseif ($this->filtroAlertas === 'SIN_ALERTAS') {
+            $pacientesQuery->whereDoesntHave('alertas', fn ($q) => $q->whereIn('estado', ['ABIERTA', 'EN_ATENCION']));
+        } elseif ($this->filtroAlertas === 'CON_ALERTAS_PRIORITARIAS' || $this->filtroAlertas === 'CRITICAS') {
+            $pacientesQuery->whereHas('alertas', fn ($q) => $q->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])->whereIn('prioridad', ['CRITICO', 'ALTO', 'CRITICA']));
+        }
+
+        // Filtro Medicación estructurado
+        if ($this->filtroMedicacion === 'CON_MEDICACION_PENDIENTE') {
+            $pacientesQuery->whereHas('medicaciones', function ($pq) use ($fechaHoy) {
+                $pq->where('estado', 'ACTIVA')
+                    ->whereDoesntHave('administracionesMedicacion', function ($aq) use ($fechaHoy) {
+                        $aq->whereDate('fecha_hora_programada', $fechaHoy)
+                            ->whereIn('resultado', ['ADMINISTRADA', 'ADMINISTRADO']);
+                    });
+            });
+        } elseif ($this->filtroMedicacion === 'CON_MEDICACION_PROGRAMADA' || $this->filtroMedicacion === 'CON_MEDICACION') {
+            $pacientesQuery->whereHas('medicaciones', fn ($pq) => $pq->where('estado', 'ACTIVA'));
+        } elseif ($this->filtroMedicacion === 'SIN_MEDICACION') {
+            $pacientesQuery->whereDoesntHave('medicaciones', fn ($pq) => $pq->where('estado', 'ACTIVA'));
+        }
+
+        // Filtro Cuidados estructurado
+        if ($this->filtroCuidados === 'CON_CUIDADOS_PENDIENTES') {
+            $pacientesQuery->whereHas('ejecucionesCuidado', function ($eq) use ($fechaHoy) {
+                $eq->whereIn('estado', ['PENDIENTE', 'EN_PROCESO'])
+                    ->whereDate('fecha_hora_programada', '<=', $fechaHoy);
+            });
+        } elseif ($this->filtroCuidados === 'CON_PLAN_ACTIVO') {
+            $pacientesQuery->whereHas('planCuidadoActivo');
+        } elseif ($this->filtroCuidados === 'SIN_PLAN') {
+            $pacientesQuery->whereDoesntHave('planCuidadoActivo');
+        }
+
         if ($this->filtroHabitacion !== '') {
             $pacientesQuery->whereHas('cama.habitacion', fn ($q) => $q->where('codigo', $this->filtroHabitacion));
         }
@@ -1867,9 +2166,16 @@ class MisPacientes extends Component
         $stats = [
             'total' => $baseParaStats->count(),
             'con_alertas' => $baseParaStats->filter(fn ($p) => $p->alertas_activas_count > 0)->count(),
+            'sin_alertas' => $baseParaStats->filter(fn ($p) => $p->alertas_activas_count === 0)->count(),
             'requiere_atencion' => 0,
             'vigilancia' => 0,
             'estable' => 0,
+            'con_med_pendiente' => $baseParaStats->filter(fn ($p) => ($p->meds_pendientes_count ?? 0) > 0)->count(),
+            'con_med_programada' => $baseParaStats->filter(fn ($p) => ($p->meds_activas_total ?? 0) > 0)->count(),
+            'sin_med' => $baseParaStats->filter(fn ($p) => ($p->meds_activas_total ?? 0) === 0)->count(),
+            'con_cuidados_pendientes' => $baseParaStats->filter(fn ($p) => ($p->tareas_pendientes_count ?? 0) > 0 || ($p->tareas_vencidas_count ?? 0) > 0)->count(),
+            'con_plan_activo' => $baseParaStats->filter(fn ($p) => !empty($p->planCuidadoActivo))->count(),
+            'sin_plan' => $baseParaStats->filter(fn ($p) => empty($p->planCuidadoActivo))->count(),
         ];
 
         foreach ($baseParaStats as $bp) {
@@ -1887,6 +2193,19 @@ class MisPacientes extends Component
             }
         }
 
+        $habitacionesConteo = $baseParaStats
+            ->map(fn ($p) => $p->cama?->habitacion?->codigo)
+            ->filter()
+            ->groupBy(fn ($h) => $h)
+            ->map(fn ($grupo, $codigo) => [
+                'value' => (string) $codigo,
+                'label' => (string) $codigo,
+                'count' => $grupo->count(),
+            ])
+            ->values()
+            ->sortBy('label')
+            ->values();
+
         $habitaciones = $baseParaStats
             ->map(fn ($p) => $p->cama?->habitacion?->codigo)
             ->filter()
@@ -1899,6 +2218,7 @@ class MisPacientes extends Component
             $pacientes = new LengthAwarePaginator([], 0, 12);
             $stats = ['total' => 0, 'con_alertas' => 0, 'requiere_atencion' => 0, 'vigilancia' => 0, 'estable' => 0];
             $habitaciones = collect();
+            $habitacionesConteo = collect();
         }
 
         return view('livewire.cuidados.mis-residentes-directorio', [
@@ -1908,6 +2228,8 @@ class MisPacientes extends Component
             'detalleResidente' => $this->detalleResidente,
             'stats' => $stats,
             'habitaciones' => $habitaciones,
+            'habitacionesConteo' => $habitacionesConteo,
+            'filtrosActivos' => $this->obtenerFiltrosActivos(),
             'errorCarga' => $errorCarga,
             'esSuperAdmin' => $esSuperAdmin,
             'turnoActual' => $turnoActual,

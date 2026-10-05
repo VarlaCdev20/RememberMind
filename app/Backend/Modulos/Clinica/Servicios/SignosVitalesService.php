@@ -8,6 +8,10 @@ use App\Models\SignoVital;
 use App\Models\User;
 use App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
+use App\Backend\Modulos\Clinica\Acciones\RegistrarSignosVitalesAction;
+use App\Backend\Modulos\Clinica\SignosVitales\EvaluadorSignosVitales;
+use App\Backend\Modulos\Clinica\SignosVitales\Resultados\EvaluacionSignosVitales;
+use App\Backend\Modulos\Clinica\SignosVitales\Resultados\RegistroSignosVitales;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -17,10 +21,20 @@ use Illuminate\Validation\ValidationException;
 
 class SignosVitalesService
 {
-    public function __construct(private readonly TurnoEnfermeriaService $turnos) {}
+    public function __construct(
+        private readonly TurnoEnfermeriaService $turnos,
+        private readonly RegistrarSignosVitalesAction $registrarSignos,
+        private readonly EvaluadorSignosVitales $evaluadorSignos,
+    ) {}
 
     /** Captura estricta del formulario Nuevo registro de Enfermería (BDD V2.1). */
     public function registrarDesdeNuevoRegistro(string $codResidente, array $entrada, User $usuario): SignoVital
+    {
+        return $this->registrarConEvaluacion($codResidente, $entrada, $usuario)->signo;
+    }
+
+    /** Devuelve la evaluación confirmada y la alerta persistida, si corresponde. */
+    public function registrarConEvaluacion(string $codResidente, array $entrada, User $usuario): RegistroSignosVitales
     {
         abort_unless(Auth::user()?->cod_usuario === $usuario->cod_usuario, 403, 'La autoría del registro no corresponde al usuario autenticado.');
         $turno = $this->turnos->autorizarMutacionEnfermeria($codResidente, 'signos_vitales.crear', $usuario);
@@ -29,13 +43,13 @@ class SignosVitalesService
         $entrada['observacion'] = isset($entrada['observacion']) ? trim($entrada['observacion']) : null;
 
         $reglas = [
-            'presion_sistolica' => ['nullable', 'integer', 'min:0', 'max:999'],
-            'presion_diastolica' => ['nullable', 'integer', 'min:0', 'max:999'],
-            'frecuencia_cardiaca' => ['nullable', 'integer', 'min:0', 'max:9999'],
-            'frecuencia_respiratoria' => ['nullable', 'integer', 'min:0', 'max:9999'],
-            'temperatura' => ['nullable', 'numeric', 'decimal:0,1', 'between:-99.9,999.9'],
-            'saturacion_oxigeno' => ['nullable', 'numeric', 'decimal:0,2', 'min:0', 'max:100'],
-            'glucemia' => ['nullable', 'numeric', 'decimal:0,2', 'between:0,999999.99'],
+            'presion_sistolica' => ['nullable', 'integer', 'min:1', 'max:'.ValidacionSignosVitalesService::PAS_MAX],
+            'presion_diastolica' => ['nullable', 'integer', 'min:1', 'max:'.ValidacionSignosVitalesService::PAD_MAX],
+            'frecuencia_cardiaca' => ['nullable', 'integer', 'min:1', 'max:'.ValidacionSignosVitalesService::FC_MAX],
+            'frecuencia_respiratoria' => ['nullable', 'integer', 'min:1', 'max:'.ValidacionSignosVitalesService::FR_MAX],
+            'temperatura' => ['nullable', 'numeric', 'decimal:0,1', 'between:'.ValidacionSignosVitalesService::TEMP_MIN.','.ValidacionSignosVitalesService::TEMP_MAX],
+            'saturacion_oxigeno' => ['nullable', 'numeric', 'decimal:0,2', 'min:1', 'max:100'],
+            'glucemia' => ['nullable', 'numeric', 'decimal:0,2', 'between:1,999999.99'],
             'observacion' => ['nullable', 'string', 'max:5000'],
         ];
         $mensajes = [
@@ -44,14 +58,14 @@ class SignosVitalesService
             'integer' => 'Ingresa un número entero válido.',
             'numeric' => 'Ingresa un valor numérico válido.',
             'decimal' => 'El valor excede los decimales permitidos por la base de datos.',
-            'min' => 'El valor no puede ser negativo.',
+            'min' => 'La medición debe ser mayor que cero.',
             'max' => 'El valor supera la capacidad permitida.',
             'between' => 'El valor está fuera de la capacidad permitida.',
-            'saturacion_oxigeno.min' => 'La saturación no puede ser menor a 0 %.',
+            'saturacion_oxigeno.min' => 'La saturación debe ser mayor que 0 %.',
             'saturacion_oxigeno.max' => 'La saturación no puede superar el 100 %.',
-            'glucemia.min' => 'La glucemia no puede ser negativa.',
-            'frecuencia_cardiaca.min' => 'El pulso no puede ser negativo.',
-            'frecuencia_respiratoria.min' => 'La frecuencia respiratoria no puede ser negativa.',
+            'glucemia.between' => 'La glucemia debe ser mayor que cero y estar dentro de la capacidad permitida.',
+            'frecuencia_cardiaca.min' => 'El pulso debe ser mayor que cero.',
+            'frecuencia_respiratoria.min' => 'La frecuencia respiratoria debe ser mayor que cero.',
             'observacion.max' => 'Las observaciones no pueden superar 5000 caracteres.',
         ];
         $atributos = [
@@ -83,21 +97,27 @@ class SignosVitalesService
             ->value('cod_jornada');
         abort_unless($codJornada, 403, 'No existe una jornada activa para este residente.');
 
-        return SignoVital::create([
-            'cod_residente' => $codResidente,
-            'cod_personal' => $codPersonal,
-            'cod_jornada' => $codJornada,
-            'fecha_hora' => now(),
-            'presion_sistolica' => $datos['presion_sistolica'] ?? null,
-            'presion_diastolica' => $datos['presion_diastolica'] ?? null,
-            'frecuencia_cardiaca' => $datos['frecuencia_cardiaca'] ?? null,
-            'frecuencia_respiratoria' => $datos['frecuencia_respiratoria'] ?? null,
-            'temperatura' => $datos['temperatura'] ?? null,
-            'saturacion_oxigeno' => $datos['saturacion_oxigeno'] ?? null,
-            'glucemia' => $datos['glucemia'] ?? null,
-            'observacion' => $datos['observacion'] ?: null,
-            'estado' => 'ACTIVO',
-        ]);
+        return $this->registrarSignos->ejecutar($codResidente, $codPersonal, $codJornada, $datos, $usuario);
+    }
+
+    /** Preevaluación de lectura: no persiste signos ni alertas. */
+    public function preEvaluar(array $mediciones, ?string $codResidente = null, ?User $usuario = null): EvaluacionSignosVitales
+    {
+        $mediciones = array_map(fn ($valor) => $valor === '' ? null : $valor, $mediciones);
+        if ($codResidente !== null) {
+            abort_unless($usuario && Auth::user()?->cod_usuario === $usuario->cod_usuario, 403);
+            $this->turnos->autorizarMutacionEnfermeria($codResidente, 'signos_vitales.crear', $usuario);
+        }
+        $datos = Validator::make($mediciones, [
+            'presion_sistolica' => ['nullable', 'integer', 'min:1', 'max:'.ValidacionSignosVitalesService::PAS_MAX],
+            'presion_diastolica' => ['nullable', 'integer', 'min:1', 'max:'.ValidacionSignosVitalesService::PAD_MAX],
+            'frecuencia_cardiaca' => ['nullable', 'integer', 'min:1', 'max:'.ValidacionSignosVitalesService::FC_MAX],
+            'frecuencia_respiratoria' => ['nullable', 'integer', 'min:1', 'max:'.ValidacionSignosVitalesService::FR_MAX],
+            'temperatura' => ['nullable', 'numeric', 'decimal:0,1', 'between:'.ValidacionSignosVitalesService::TEMP_MIN.','.ValidacionSignosVitalesService::TEMP_MAX],
+            'saturacion_oxigeno' => ['nullable', 'numeric', 'decimal:0,2', 'between:1,100'],
+            'glucemia' => ['nullable', 'numeric', 'decimal:0,2', 'between:1,999999.99'],
+        ])->validate();
+        return $this->evaluadorSignos->evaluar($datos, $codResidente);
     }
 
     public function registrar(string $codResidente, array $entrada, User $usuario, string $permiso = 'signos_vitales.crear'): SignoVital

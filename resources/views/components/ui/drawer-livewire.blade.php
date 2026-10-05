@@ -7,7 +7,7 @@
     'closeMethod' => 'cerrarDrawer',
     'width' => null,
     'footer' => null,
-    'dismissOnBackdrop' => false,
+    'dismissOnBackdrop' => true,
     'dismissOnEscape' => true,
     'backMethod' => null,
     'backLabel' => 'Volver',
@@ -17,7 +17,8 @@
     $resolvedWidth = $width ?? match($size) {
         'sm' => 'w-screen max-w-[var(--rm-drawer-sm,360px)]',
         'lg' => 'w-screen max-w-[var(--rm-drawer-lg,640px)]',
-        default => 'w-screen max-w-[var(--rm-drawer-md,460px)]',
+        'xl' => 'w-screen max-w-[var(--rm-drawer-wide,720px)]',
+        default => 'w-screen max-w-[var(--rm-drawer-md,480px)]',
     };
     $drawerId = 'drawer-'.\Illuminate\Support\Str::slug((string) ($attributes->wire('model')->value() ?: $title));
 @endphp
@@ -40,7 +41,7 @@
                aria-modal="true"
                aria-labelledby="{{ $drawerId }}-title"
                tabindex="-1"
-               class="pointer-events-auto rm-drawer rm-drawer--{{ in_array($size, ['sm', 'lg']) ? $size : 'md' }} flex h-full {{ $resolvedWidth }} flex-col overflow-hidden">
+               class="pointer-events-auto rm-drawer rm-drawer--{{ in_array($size, ['sm', 'lg', 'xl']) ? $size : 'md' }} flex h-full {{ $resolvedWidth }} flex-col overflow-hidden">
 
             {{-- Header Fijo con Badge de Consulta --}}
             <header class="rm-drawer-header p-4 sm:p-5 border-b border-[var(--rm-border-soft)] bg-[var(--rm-surface-soft)]">

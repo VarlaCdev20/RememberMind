@@ -1,65 +1,27 @@
 <div class="relative mx-auto max-w-7xl space-y-6 py-6 px-4 sm:px-6 lg:px-8">
  {{-- ENCABEZADO --}}
- <section class="overflow-hidden rounded-3xl border border-borde bg-fondo-panel shadow-[0_12px_28px_rgba(47,62,92,0.08)] backdrop-blur-xl">
- <div class="h-1 w-full bg-gradient-to-r from-[#E27D60] via-[#D9A27C] to-[#8DA280]"></div>
- <div class="p-6">
- <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
- <div>
- <span class="text-[11px] font-bold uppercase tracking-[0.2em] text-parrafo">
- CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS • Monitoreo Activo
- </span>
- <h1 class="mt-1 text-2xl font-black text-titulo">Alertas y Pendientes</h1>
- <p class="mt-1 text-xs font-bold text-apoyo">
- Seguimiento institucional de registros incompletos, alertas activas y acciones pendientes del módulo Adultos Mayores.
- </p>
- </div>
- <div class="shrink-0">
- <a href="{{ route('admin.adultos-mayores.index') }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-principal px-4 py-2.5 text-xs font-bold text-inverso shadow-md transition hover:bg-fondo-panel active:scale-95">
- <i class="ph-bold ph-arrow-left text-sm"></i> Volver al Centro
- </a>
- </div>
- </div>
- </div>
- </section>
+ <x-ui.page-header
+  title="Alertas y Pendientes"
+  subtitle="Seguimiento institucional de registros incompletos, alertas activas y acciones pendientes del módulo de residentes."
+  overline="Centro Geriátrico Jardín de los Recuerdos · Monitoreo Activo"
+  icon="ph-bell-ringing"
+  :date="now()">
+  <a href="{{ route('admin.adultos-mayores.index') }}" class="rm-btn rm-btn-secondary">
+    <i class="ph-bold ph-arrow-left text-base"></i>
+    <span>Volver al Centro</span>
+  </a>
+</x-ui.page-header>
 
  {{-- TARJETAS DE INDICADORES REALES --}}
- <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-7">
- {{-- Total --}}
- <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-xs">
- <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-apoyo">Total Alertas</p>
- <p class="mt-1.5 text-2xl font-black text-boton-acento">{{ $conteos['total'] }}</p>
- </div>
- {{-- Red de Apoyo --}}
- <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-xs">
- <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-apoyo">Red de Apoyo</p>
- <p class="mt-1.5 text-2xl font-black text-titulo">{{ $conteos['red_de_apoyo'] }}</p>
- </div>
- {{-- Documentos --}}
- <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-xs">
- <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-apoyo">Documentos</p>
- <p class="mt-1.5 text-2xl font-black text-titulo">{{ $conteos['documentacion'] }}</p>
- </div>
- {{-- Salud --}}
- <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-xs">
- <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-apoyo">Salud y Cuidados</p>
- <p class="mt-1.5 text-2xl font-black text-titulo">{{ $conteos['salud_y_cuidados'] }}</p>
- </div>
- {{-- Evaluaciones --}}
- <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-xs">
- <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-apoyo">Evaluaciones</p>
- <p class="mt-1.5 text-2xl font-black text-parrafo">{{ $conteos['evaluaciones'] }}</p>
- </div>
- {{-- Seguimiento --}}
- <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-xs">
- <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-apoyo">Seguimiento</p>
- <p class="mt-1.5 text-2xl font-black text-estado-exito">{{ $conteos['seguimiento'] }}</p>
- </div>
- {{-- Estado --}}
- <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-xs">
- <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-apoyo">Institucional</p>
- <p class="mt-1.5 text-2xl font-black text-slate-500">{{ $conteos['estado_institucional'] }}</p>
- </div>
- </div>
+    <section class="grid gap-3 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
+        <x-ui.metric-card label="Total Alertas" :value="$conteos['total']" icon="ph-bell" :variant="$conteos['total'] > 0 ? 'coral' : 'neutral'" />
+        <x-ui.metric-card label="Red de Apoyo" :value="$conteos['red_de_apoyo']" icon="ph-users-three" variant="neutral" />
+        <x-ui.metric-card label="Documentos" :value="$conteos['documentacion']" icon="ph-files" variant="neutral" />
+        <x-ui.metric-card label="Salud y Cuidados" :value="$conteos['salud_y_cuidados']" icon="ph-first-aid" variant="sky" />
+        <x-ui.metric-card label="Evaluaciones" :value="$conteos['evaluaciones']" icon="ph-clipboard-text" variant="neutral" />
+        <x-ui.metric-card label="Seguimiento" :value="$conteos['seguimiento']" icon="ph-activity" variant="mint" />
+        <x-ui.metric-card label="Institucional" :value="$conteos['estado_institucional']" icon="ph-buildings" variant="neutral" />
+    </section>
 
      {{-- BARRA DE FILTROS Y BÚSQUEDA FORMATO ALERTAS (DESPLAZABLE Y CON COLORCITOS) --}}
     <x-ui.filter-bar class="mb-4">

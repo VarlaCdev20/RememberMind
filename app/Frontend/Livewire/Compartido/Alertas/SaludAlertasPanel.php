@@ -2,7 +2,6 @@
 
 namespace App\Frontend\Livewire\Compartido\Alertas;
 
-use App\Backend\Modulos\Clinica\Servicios\ClasificacionSignosVitalesService;
 use Livewire\Component;
 use App\Models\AdultoMayor;
 
@@ -19,7 +18,6 @@ class SaludAlertasPanel extends Component
             'fichasMedicas'           => fn ($q) => $q->where('estado', 'ACTIVA')->latest()->limit(1),
             'medicaciones'            => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO']),
             'administracionesMedicacion' => fn ($q) => $q->latest('fecha_hora_programada')->limit(3),
-            'signosVitales'           => fn ($q) => $q->whereIn('estado', ['ACTIVO', 'VIGENTE'])->latest('fecha_hora')->limit(1),
             'valoracionesFuncionales' => fn ($q) => $q->latest('fecha_hora')->limit(1),
         ])
             ->whereIn('estado', ['ACTIVO', 'ADMITIDO', 'SEGUIMIENTO_ESPECIAL'])
@@ -31,7 +29,6 @@ class SaludAlertasPanel extends Component
             $fichaMedica = $adulto->fichasMedicas->where('estado', 'ACTIVA')->first();
             $medicacionesActivas = $adulto->medicaciones->whereIn('estado', ['ACTIVA', 'ACTIVO']);
             $valFuncional = $adulto->valoracionesFuncionales->sortByDesc('fecha_hora')->first();
-            $ultimosSignos = $adulto->signosVitales->whereIn('estado', ['ACTIVO', 'VIGENTE'])->sortByDesc('fecha_hora')->first();
             
             if (!$fichaMedica) {
                 $alertas->push([
@@ -54,19 +51,6 @@ class SaludAlertasPanel extends Component
                         'mensaje' => 'Medicación activa sin administración reciente (más de 24h).',
                         'accion' => 'requiere revisión',
                         'ruta' => route('admin.salud-seguimiento.administracion', $adulto->cod_residente)
-                    ]);
-                }
-            }
-
-            if ($ultimosSignos) {
-                if (ClasificacionSignosVitalesService::requiereAlertaPreventiva($ultimosSignos)) {
-                    $alertas->push([
-                        'adulto' => $adulto,
-                        'tipo' => 'Signos Vitales',
-                        'nivel' => 'critica',
-                        'mensaje' => 'Signos vitales fuera de rango orientativo en el último control.',
-                        'accion' => 'este aviso no constituye diagnóstico médico',
-                        'ruta' => route('admin.salud-seguimiento.signos', $adulto->cod_residente)
                     ]);
                 }
             }

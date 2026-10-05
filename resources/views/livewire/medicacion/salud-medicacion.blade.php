@@ -13,7 +13,9 @@
    ? 'Tratamientos y tomas activas para ' . $adulto->nombres . ' ' . $adulto->ap_paterno . ' ' . $adulto->ap_materno
    : 'Control integral de fármacos, horarios y recetas para todos los residentes del centro.'"
   overline="Módulo clínico farmacológico"
-  icon="ph-pill">
+  icon="ph-pill"
+  :date="now()">'
+
  @if($puedeActuarComoMedico && auth()->user()?->can('prescripciones.crear'))
   <x-ui.action-button
    variant="primary"

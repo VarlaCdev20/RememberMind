@@ -1,22 +1,18 @@
 ﻿<!-- rm-filter-bar -->
 <div class="space-y-6 font-sans">
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl bg-[var(--rm-surface)] border border-[var(--rm-border)] p-5 sm:p-6 shadow-sm">
-        <div>
-            <div class="flex items-center gap-2">
-                <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary-ink)]">
-                    <i class="ph-bold ph-calendar-check text-lg"></i>
-                </span>
-                <h1 class="text-2xl font-black tracking-tight text-[var(--rm-text-primary)]">Tareas de cuidado</h1>
-            </div>
-            <p class="mt-1 text-xs text-[var(--rm-text-secondary)]">Programa cuidados, registra resultados y conserva la trazabilidad de cada cambio en el turno.</p>
-        </div>
-        @can('ejecuciones_cuidado.gestionar')
-            <button wire:click="abrirCrear" class="inline-flex items-center gap-2 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] px-4 py-2.5 text-xs font-bold text-white shadow-sm transition active:scale-[0.98]">
-                <i class="ph-bold ph-plus-circle text-base"></i>
-                <span>Crear tarea</span>
-            </button>
-        @endcan
-    </div>
+    <x-ui.page-header
+    title="Tareas de cuidado"
+    subtitle="Programa cuidados, registra resultados y conserva la trazabilidad de cada cambio en el turno."
+    overline="Enfermería operativa"
+    icon="ph-calendar-check"
+    :date="now()">
+    @can('ejecuciones_cuidado.gestionar')
+    <button type="button" wire:click="abrirCrear" class="rm-btn rm-btn-primary">
+        <i class="ph-bold ph-plus-circle text-base"></i>
+        <span>Crear tarea</span>
+    </button>
+    @endcan
+</x-ui.page-header>
 
     @if(session('mensaje'))
         <div role="status" class="flex items-center gap-2 rounded-xl border border-[var(--rm-action-primary)]/40 bg-[var(--rm-action-primary-soft)] px-4 py-3 text-xs font-bold text-[var(--rm-action-primary-ink)]">

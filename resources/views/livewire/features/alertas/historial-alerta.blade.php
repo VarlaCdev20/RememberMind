@@ -1,8 +1,8 @@
 <div class="space-y-4 font-sans text-xs">
- @if (session()->has('mensaje'))
- <div class="p-3 rounded-xl bg-[var(--rm-success-soft)] border border-[var(--rm-success)] text-[var(--rm-success)] font-medium flex items-center justify-between">
-  <span>{{ session('mensaje') }}</span>
- </div>
+  @if (session()->has('mensaje'))
+ <x-ui.callout variant="success" title="Operación completada">
+  {{ session('mensaje') }}
+ </x-ui.callout>
  @endif
 
  {{-- ============================================================
@@ -14,34 +14,14 @@
   <span class="text-[10px] font-black uppercase tracking-wider text-[var(--rm-text-secondary)]">
    Estado Actual:
   </span>
-  <span class="rm-badge font-bold {{ match($alerta->estado) {
-   'ABIERTA' => 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning)] border border-[var(--rm-warning)]',
-   'EN_ATENCION' => 'bg-[var(--rm-info-soft)] text-[var(--rm-info)] border border-[var(--rm-info)]',
-   'CERRADA' => 'bg-[var(--rm-success-soft)] text-[var(--rm-success)] border border-[var(--rm-success)]',
-   default => 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-secondary)]'
-  } }}">
-   {{ match($alerta->estado) {
-   'ABIERTA' => 'Por Atender',
-   'EN_ATENCION' => 'En Atención',
-   'CERRADA' => 'Resuelta / Archivada',
-   default => $alerta->estado
-   } }}
-  </span>
+  <x-ui.status-badge :estado="$alerta->estado" />
   </div>
 
   <div class="flex items-center gap-2">
   <span class="text-[10px] font-black uppercase tracking-wider text-[var(--rm-text-secondary)]">
    Severidad:
   </span>
-  <span class="rm-badge font-extrabold {{ match($alerta->prioridad) {
-   'CRITICO' => 'bg-[var(--rm-danger)] text-white',
-   'ALTO' => 'bg-[var(--rm-primary)] text-white',
-   'MEDIO' => 'bg-[var(--rm-warning)] text-white',
-   'BAJO' => 'bg-[var(--rm-info)] text-white',
-   default => 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-secondary)]'
-  } }}">
-   {{ $alerta->prioridad }}
-  </span>
+  <x-ui.status-badge :estado="$alerta->prioridad" />
   </div>
  </div>
 

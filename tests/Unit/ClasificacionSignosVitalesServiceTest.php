@@ -4,7 +4,7 @@ namespace Tests\Unit;
 
 use App\Backend\Modulos\Clinica\Servicios\ClasificacionSignosVitalesService;
 use App\Models\SignoVital;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class ClasificacionSignosVitalesServiceTest extends TestCase
 {
@@ -18,10 +18,11 @@ class ClasificacionSignosVitalesServiceTest extends TestCase
 
     public function test_una_medicion_critica_prevalece_sobre_una_advertencia(): void
     {
-        $niveles = ClasificacionSignosVitalesService::evaluar(165, 90, 80, 16, 36.5, 85, 100);
+        $niveles = ClasificacionSignosVitalesService::evaluar(90, 70, 131, 16, 36.5, 85, 100);
 
         $this->assertSame('advertencia', $niveles['pa']);
-        $this->assertSame('critico', $niveles['saturacion']);
+        $this->assertSame('sin_dato', $niveles['saturacion']);
+        $this->assertSame('critico', $niveles['fc']);
         $this->assertSame('critico', $niveles['global']);
     }
 
@@ -36,27 +37,24 @@ class ClasificacionSignosVitalesServiceTest extends TestCase
         $niveles = ClasificacionSignosVitalesService::evaluarRegistro($signo);
 
         $this->assertSame('critico', $niveles['fc']);
-        $this->assertSame('advertencia', $niveles['saturacion']);
-        $this->assertSame('normal', $niveles['glucosa']);
+        $this->assertSame('sin_dato', $niveles['saturacion']);
+        $this->assertSame('sin_dato', $niveles['glucosa']);
         $this->assertSame('critico', $niveles['global']);
     }
 
-    public function test_criterio_preventivo_conserva_sus_limites_independientes(): void
+    public function test_saturacion_aislada_no_inventa_una_clasificacion_universal(): void
     {
-        $this->assertFalse(ClasificacionSignosVitalesService::requiereAlertaPreventiva(
-            new SignoVital(['temperatura' => 37.8, 'saturacion_oxigeno' => 92])
-        ));
-        $this->assertTrue(ClasificacionSignosVitalesService::requiereAlertaPreventiva(
-            new SignoVital(['saturacion_oxigeno' => 91.5])
-        ));
+        $niveles = ClasificacionSignosVitalesService::evaluar(null, null, null, null, null, 91.5, null);
+        $this->assertSame('sin_dato', $niveles['saturacion']);
+        $this->assertSame('sin_dato', $niveles['global']);
     }
 
-    public function test_presion_incompleta_no_parece_normal_pero_conserva_un_valor_critico(): void
+    public function test_presion_incompleta_no_se_clasifica(): void
     {
         $sinDiastolica = ClasificacionSignosVitalesService::evaluar(120, null, null, null, null, null, null);
-        $diastolicaCritica = ClasificacionSignosVitalesService::evaluar(null, 110, null, null, null, null, null);
+        $diastolicaCritica = ClasificacionSignosVitalesService::evaluar(null, 121, null, null, null, null, null);
 
         $this->assertSame('sin_dato', $sinDiastolica['pa']);
-        $this->assertSame('critico', $diastolicaCritica['pa']);
+        $this->assertSame('sin_dato', $diastolicaCritica['pa']);
     }
 }

@@ -24,7 +24,7 @@ Never silently blend contradictory sources. Follow the higher-authority source a
 
 ## Frozen DB governance
 
-The Operational DB V2.1 is frozen and contains exactly 70 operational tables. `residentes` is the central entity. Always consult `docs/base-de-datos/` before DB analysis or changes; the 69-table V2.0 document is historical only.
+The Operational DB V2.1 baseline is frozen and contains exactly 70 operational tables. The owner approved the V2.2 `objetivos_signos_vitales` extension on 2026-10-04, bringing the current inventory to 71; see `docs/base-de-datos/DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md`. `residentes` is the central entity. Always consult `docs/base-de-datos/` before DB analysis or changes; the 69-table V2.0 document is historical only.
 
 Without explicit owner approval, do not add/delete/merge/split/rename/modify:
 - tables or columns;

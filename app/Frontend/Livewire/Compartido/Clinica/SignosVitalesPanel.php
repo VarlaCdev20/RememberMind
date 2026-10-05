@@ -87,6 +87,7 @@ class SignosVitalesPanel extends Component
 
         // ── Último signo vital por paciente ──────────────────────────────
         $ultimosSignos = SignoVital::whereIn('cod_residente', $codResidentes)
+            ->with('residente.objetivosSignosVitales')
             ->whereIn('estado', ['VIGENTE', 'ACTIVO'])
             ->orderByDesc('fecha_hora')
             ->get()

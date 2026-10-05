@@ -16,8 +16,10 @@
     @if($drawerPaso === 'register-selector')
         @include('livewire.cuidados.partials.quick-register-selector')
     @elseif($drawerPaso === 'register-form')
-        <h4 class="rm-resident-directory__form-title">{{ $tituloFormulario }}</h4>
-        <p class="rm-resident-directory__register-intro">Completa los datos del registro. Se guardarán en el expediente de este residente.</p>
+        @if($registroTipo !== 'signos')
+            <h4 class="rm-resident-directory__form-title">{{ $tituloFormulario }}</h4>
+            <p class="rm-resident-directory__register-intro">Completa los datos del registro. Se guardarán en el expediente de este residente.</p>
+        @endif
         <div class="rm-resident-directory__form-fields">
             @switch($registroTipo)
                 @case('signos')

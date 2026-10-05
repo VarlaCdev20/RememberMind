@@ -47,6 +47,7 @@ class Residente extends ModeloOperativo {
     public function alertasAbiertas(): HasMany { return $this->hasMany(Alerta::class,'cod_residente','cod_residente')->whereIn('estado',['ABIERTA','EN_ATENCION','PENDIENTE']); }
     public function valoracionesEnfermeria(): HasMany { return $this->hasMany(Atencion::class,'cod_residente','cod_residente'); }
     public function signosVitales(): HasMany { return $this->hasMany(SignoVital::class,'cod_residente','cod_residente'); }
+    public function objetivosSignosVitales(): HasMany { return $this->hasMany(ObjetivoSignoVital::class, 'cod_residente', 'cod_residente')->where('estado', 'VIGENTE'); }
     public function planesCuidado(): HasMany { return $this->hasMany(PlanCuidado::class,'cod_residente','cod_residente'); }
     public function planCuidadoActivo(): HasOne { return $this->hasOne(PlanCuidado::class,'cod_residente','cod_residente')->whereIn('estado',['ACTIVO','ACTIVA']); }
     public function ejecucionesCuidado(): HasMany { return $this->hasMany(EjecucionCuidado::class,'cod_residente','cod_residente'); }

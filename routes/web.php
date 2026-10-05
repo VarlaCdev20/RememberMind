@@ -37,6 +37,7 @@ use App\Frontend\Livewire\Enfermeria\Medicacion\SaludAdministracionMedicacionPan
 use App\Frontend\Livewire\Enfermeria\Valoraciones\ValoracionEnfermeriaPanel;
 use App\Frontend\Livewire\Medico\Clinica\DashboardMedico;
 use App\Frontend\Livewire\Medico\Clinica\PacientesSeguimientoPanel;
+use App\Frontend\Livewire\Medico\Clinica\ObjetivosSignosVitalesPanel;
 use App\Frontend\Livewire\Medico\Medicacion\SaludMedicacionPanel;
 use App\Frontend\Livewire\Medico\Valoraciones\ValoracionMedicaPanel;
 use App\Frontend\Livewire\Psicologia\DashboardPsicologo;
@@ -721,6 +722,10 @@ Route::middleware([
                     // Residentes: todos los residentes del centro.
                     Route::get('/residentes', PacientesSeguimientoPanel::class)
                         ->name('residentes');
+
+                    Route::get('/residente/{residente}/objetivos-signos-vitales', ObjetivosSignosVitalesPanel::class)
+                        ->middleware('permission:objetivos_signos_vitales.ver')
+                        ->name('residente.objetivos-signos-vitales');
 
                     // Compatibilidad con rutas/vistas existentes.
                     Route::get('/pacientes-seguimiento', PacientesSeguimientoPanel::class)

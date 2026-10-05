@@ -23,37 +23,25 @@
   ];
  @endphp
 
- {{-- ENCABEZADO --}}
- <section class="overflow-hidden rounded-2xl border border-borde-suave bg-fondo-panel shadow-[0_16px_44px_rgba(47,62,92,0.10)]">
-  <div class="h-1.5 bg-boton-acento"></div>
-  <div class="flex flex-col gap-4 p-5 xl:flex-row xl:items-end xl:justify-between">
-  <div class="max-w-4xl">
-   <span class="inline-flex items-center gap-2 rounded-full border border-borde-focus bg-estado-peligroBg px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-boton-acento">
-   <i class="ph-bold ph-calendar-check text-sm"></i>
-   Gestión del sistema
-   </span>
-   <h1 class="mt-2 text-2xl font-black tracking-tight text-titulo sm:text-3xl">Horarios y asignaciones</h1>
-   <p class="mt-1 max-w-3xl text-sm font-bold leading-relaxed text-apoyo">
-   Planificación institucional para administración, personal de salud y planilla rotativa de enfermería.
-   </p>
-  </div>
-
-  <div class="flex flex-wrap gap-2">
-   <button type="button" wire:click="$refresh" wire:loading.attr="disabled"
-   class="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-borde-suave bg-fondo-card/45 px-4 text-[11px] font-bold uppercase tracking-wider text-titulo transition hover:-translate-y-0.5 hover:bg-fondo-card">
+  {{-- ENCABEZADO INSTITUCIONAL --}}
+ <x-ui.page-header
+  title="Horarios y asignaciones"
+  subtitle="Planificación institucional para administración, personal de salud y planilla rotativa de enfermería."
+  overline="Gestión del sistema"
+  icon="ph-calendar-check">
+  <button type="button" wire:click="$refresh" wire:loading.attr="disabled"
+   class="rm-btn rm-btn-secondary rm-btn-sm">
    <i class="ph-bold ph-arrows-clockwise text-sm" wire:loading.class="animate-spin" wire:target="$refresh"></i>
-   Actualizar
-   </button>
-   @can('turnos.asignar')
-   <button type="button" wire:click="abrirNuevaAsignacion"
-    class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-boton-acento px-4 text-[11px] font-bold uppercase tracking-wider text-inverso shadow-sm transition hover:-translate-y-0.5 hover:bg-boton-acento/90">
-    <i class="ph-bold ph-plus-circle text-sm"></i>
-    Nueva asignación
-   </button>
-   @endcan
-  </div>
-  </div>
- </section>
+   <span>Actualizar</span>
+  </button>
+  @can('turnos.asignar')
+  <button type="button" wire:click="abrirNuevaAsignacion"
+   class="rm-btn rm-btn-primary rm-btn-sm">
+   <i class="ph-bold ph-plus-circle text-sm"></i>
+   <span>Nueva asignación</span>
+  </button>
+  @endcan
+ </x-ui.page-header>
 
  {{-- KPIS --}}
  <section class="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">

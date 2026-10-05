@@ -97,12 +97,13 @@
                         </div>
                     </div>
                 </div>
-            @empty
-                <div class="rounded-3xl border border-[var(--rm-border)]  bg-[var(--rm-surface)] p-10 text-center">
-                    <i class="ph-bold ph-calendar-blank text-3xl text-[var(--rm-text-secondary)] mb-2 block"></i>
-                    <p class="text-sm font-bold text-[var(--rm-text-primary)]">No se encontraron eventos en este período o filtro.</p>
-                    <p class="text-xs text-[var(--rm-text-secondary)] mt-1">Pruebe seleccionando "Todos" o ampliando el rango de fechas.</p>
-                </div>
+                        @empty
+                <x-ui.empty-state
+                    icon="ph-calendar-blank"
+                    title="No se encontraron eventos en este período"
+                    description="Pruebe seleccionando 'Todos' o ampliando el rango de fechas."
+                    action-method="limpiarFiltrosHistorial"
+                    action-text="Limpiar filtros" />
             @endforelse
         </div>
 

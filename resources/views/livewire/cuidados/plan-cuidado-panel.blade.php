@@ -1,18 +1,19 @@
 <!-- rm-filter-bar -->
 <div class="space-y-6">
 <x-validation-errors />
-    <div class="flex flex-col gap-4 rounded-3xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm md:flex-row md:items-center md:justify-between">
-        <div>
-            <p class="text-xs font-bold uppercase tracking-widest text-[var(--rm-text-secondary)]">Enfermería</p>
-            <h1 class="text-2xl font-bold text-[var(--rm-text-primary)]">Plan de cuidado</h1>
-            <p class="text-sm font-semibold text-[var(--rm-text-secondary)]">Planes activos, tareas vinculadas y estado de cuidado por adulto mayor.</p>
-        </div>
-        @can('planes_cuidado.crear')
-        <button type="button" wire:click="abrirCrear" class="rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] px-4 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-sm">
-            Crear plan
-        </button>
-        @endcan
-    </div>
+    <x-ui.page-header
+    title="Plan de cuidado"
+    subtitle="Planes activos, tareas vinculadas y estado de cuidado por residente."
+    overline="Enfermería institucional"
+    icon="ph-clipboard-text"
+    :date="now()">
+    @can('planes_cuidado.crear')
+    <button type="button" wire:click="abrirCrear" class="rm-btn rm-btn-primary">
+        <i class="ph-bold ph-plus-circle text-base"></i>
+        <span>Crear plan</span>
+    </button>
+    @endcan
+</x-ui.page-header>
 
     <x-ui.filter-bar class="mb-4">
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">

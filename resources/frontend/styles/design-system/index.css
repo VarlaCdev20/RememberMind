@@ -45,6 +45,8 @@
 @import './patterns/system-density.css';
 @import './patterns/nursing-module.css';
 @import './patterns/resident-directory.css';
+@import './patterns/signos-vitales.css';
+@import './patterns/objetivos-signos-vitales.css';
 @import './patterns/nursing-dashboard-layout.css';
 @import './patterns/admin-dashboard-layout.css';
 @import './patterns/admin-visual-redesign.css';
