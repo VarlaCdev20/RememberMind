@@ -21,6 +21,13 @@
             <i class="ph-bold {{ $tono === 'success' ? 'ph-check-circle' : ($tono === 'neutral' ? 'ph-info' : 'ph-warning-circle') }}" aria-hidden="true"></i>
             {{ $etiqueta }}
         </span>
+        @if(filled($resultado['rango_o_umbral'] ?? null))
+            <span class="rm-signos__reading-reference">{{ match($resultado['fuente_evaluacion'] ?? null) {
+                'OBJETIVO_MEDICO' => 'Objetivo individual',
+                'UMBRAL_CRITICO' => 'Umbral de seguridad',
+                default => 'Referencia utilizada'
+            } }} · {{ $resultado['rango_o_umbral'] }}</span>
+        @endif
         <span class="rm-signos__reading-message">{{ $resultado['explicacion'] }}</span>
         @if(($resultado['comportamiento_alerta'] ?? '') === 'AUTOMATICA_AL_CONFIRMAR')
             <small>Al confirmar el registro se generará la alerta correspondiente.</small>

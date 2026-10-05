@@ -13,7 +13,6 @@ use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
 use App\Models\AdministracionMedicacion;
 use App\Models\Alerta;
 use App\Models\IndicacionClinica;
-use App\Models\ObjetivoSignoVital;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Atencion;
 use App\Models\EjecucionCuidado;
@@ -21,7 +20,7 @@ use App\Models\PaseTurno;
 use App\Models\Prescripcion;
 use App\Models\Residente;
 use App\Models\SignoVital;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -109,10 +108,12 @@ class MisPacientes extends Component
     #[Locked]
     public array $signosEvaluacion = [];
 
-    #[Locked]
-    public array $signosObjetivos = [];
-
     public bool $signosIntentoGuardar = false;
+
+    public bool $signosConfirmacionPendiente = false;
+
+    #[Locked]
+    public ?string $signosConfirmacionHuella = null;
 
     public string $signoFC = '';
 
@@ -598,8 +599,9 @@ class MisPacientes extends Component
         $this->signosHistorial = [];
         $this->signosContextoTurno = [];
         $this->signosEvaluacion = [];
-        $this->signosObjetivos = [];
         $this->signosIntentoGuardar = false;
+        $this->signosConfirmacionPendiente = false;
+        $this->signosConfirmacionHuella = null;
         $this->confirmarDescarte = false;
         $this->accionDescarte = null;
         $this->dispatch('resident-directory-opened');
@@ -809,8 +811,9 @@ class MisPacientes extends Component
         $this->signosHistorial = [];
         $this->signosContextoTurno = [];
         $this->signosEvaluacion = [];
-        $this->signosObjetivos = [];
         $this->signosIntentoGuardar = false;
+        $this->signosConfirmacionPendiente = false;
+        $this->signosConfirmacionHuella = null;
         $this->confirmarDescarte = false;
         $this->accionDescarte = null;
         $this->modalCodResidente = null;
@@ -820,7 +823,7 @@ class MisPacientes extends Component
         $this->resetValidation();
     }
 
-    protected function construirDetalleResidente(Residente $adulto, ?TurnoEnfermeria $turnoActual): array
+    protected function construirDetalleResidente(Residente $adulto, ?Turno $turnoActual): array
     {
         $codRes = $adulto->cod_residente;
         $codResidente = $codRes;
@@ -1155,6 +1158,8 @@ class MisPacientes extends Component
         $this->reset(['signoSis', 'signoDia']);
         $this->signosEvaluacion = [];
         $this->signosIntentoGuardar = false;
+        $this->signosConfirmacionPendiente = false;
+        $this->signosConfirmacionHuella = null;
         $turnoSignos = $this->getTurnoService()->obtenerTurnoActivo(auth()->user());
         $finTurnoSignos = $turnoSignos?->hora_cierre ?: $turnoSignos?->hora_fin;
         $this->signosContextoTurno = [
@@ -1173,14 +1178,6 @@ class MisPacientes extends Component
                 'temp' => $signo->temperatura, 'sat' => $signo->saturacion_oxigeno,
                 'glucosa' => $signo->glucemia,
             ])->all() : [];
-        $this->signosObjetivos = auth()->user()?->can('objetivos_signos_vitales.ver')
-            ? ObjetivoSignoVital::query()->where('cod_residente', $codResidente)->where('estado', 'VIGENTE')
-                ->where('vigente_desde', '<=', now())->whereNull('vigente_hasta')
-                ->orderBy('parametro')->get()->map(fn (ObjetivoSignoVital $objetivo) => [
-                    'nombre' => ObjetivoSignoVital::PARAMETROS[$objetivo->parametro],
-                    'min' => $objetivo->min_objetivo, 'max' => $objetivo->max_objetivo,
-                ])->all()
-            : [];
         $this->modalSignos = true;
     }
 
@@ -1198,6 +1195,8 @@ class MisPacientes extends Component
         }
 
         $this->signoConfirmarAtipico = false;
+        $this->signosConfirmacionPendiente = false;
+        $this->signosConfirmacionHuella = null;
         $campoError = match ($propiedad) {
             'signoSis' => 'presion_sistolica',
             'signoDia' => 'presion_diastolica',
@@ -1252,13 +1251,23 @@ class MisPacientes extends Component
                     // de cada campo y conserva los valores para corregirlos.
                     $evaluacionPrevia = null;
                 }
-                $requiereRevision = collect($evaluacionPrevia?->resultados ?? [])->contains(
-                    fn ($resultado) => in_array($resultado->severidad?->value, ['ADVERTENCIA', 'ALTO', 'CRITICO'], true)
-                        || $resultado->comportamientoAlerta->value === 'SUGERIR'
+                $requiereConfirmacion = collect($evaluacionPrevia?->resultados ?? [])->contains(
+                    fn ($resultado) => $resultado->severidad?->value === 'CRITICO'
+                        || $resultado->comportamientoAlerta->value === 'AUTOMATICA_AL_CONFIRMAR'
                 );
-                if ($requiereRevision && ! $this->signoConfirmarAtipico) {
+                $presionAtipica = $evaluacionPrevia !== null
+                    && is_numeric($this->signoSis) && is_numeric($this->signoDia)
+                    && (float) $this->signoSis <= (float) $this->signoDia;
+                $huella = hash('sha256', json_encode([
+                    $this->modalCodResidente, $this->signoSis, $this->signoDia, $this->signoFC,
+                    $this->signoFR, $this->signoTemp, $this->signoSat, $this->signoGlucosa,
+                ]));
+                if (($requiereConfirmacion || $presionAtipica)
+                    && (! $this->signosConfirmacionPendiente || $this->signosConfirmacionHuella !== $huella)) {
                     $this->signosEvaluacion = $evaluacionPrevia->toArray();
-                    $this->addError('signos_confirmacion', 'Revisa las lecturas señaladas y confirma que corresponden a la medición realizada.');
+                    $this->signosConfirmacionPendiente = true;
+                    $this->signosConfirmacionHuella = $huella;
+                    $this->dispatch('resident-directory-step-changed');
                     return;
                 }
                 app(SignosVitalesService::class)->registrarDesdeNuevoRegistro($this->modalCodResidente, [
@@ -1311,6 +1320,12 @@ class MisPacientes extends Component
         }
         $this->dispatch('signos-actualizados');
         $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Signos registrados correctamente.']);
+    }
+
+    public function cancelarConfirmacionSignos(): void
+    {
+        $this->signosConfirmacionPendiente = false;
+        $this->signosConfirmacionHuella = null;
     }
 
     public function abrirRegistrarSeguimiento(string $codResidente): void

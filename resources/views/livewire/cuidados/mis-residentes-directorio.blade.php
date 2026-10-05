@@ -69,7 +69,7 @@
 
     @php
         $esSelectorRegistro = $drawerPaso === 'register-selector';
-        $volverRegistro = $confirmarDescarte ? null : ($drawerPaso === 'register-form' ? 'volverPanelDetalle' : null);
+        $volverRegistro = $confirmarDescarte ? null : ($signosConfirmacionPendiente ? 'cancelarConfirmacionSignos' : ($drawerPaso === 'register-form' ? 'volverPanelDetalle' : null));
         $guardarMetodo = match ($registroTipo) {
             'signos' => 'guardarSignos', 'medicacion' => 'guardarMed', 'dolor' => 'guardarDolor',
             'alimentacion', 'eliminacion', 'movilidad' => 'guardarCuidado',
@@ -99,7 +99,7 @@
         </x-slot:footer>
     </x-ui.resident-summary-drawer>
 
-    <x-ui.quick-register-modal id="resident-register" model="mostrarSelectorModal" class="rm-resident-directory__register-modal {{ $esSelectorRegistro ? 'rm-resident-directory__register-modal--selector' : ($registroTipo === 'signos' ? 'rm-resident-directory__register-modal--signos' : 'rm-resident-directory__register-modal--form') }}" :title="$esSelectorRegistro && $detalleResidente ? 'Registrar para '.\Illuminate\Support\Str::title(mb_strtolower($detalleResidente['nombre_completo'])) : ($registroTipo === 'signos' ? 'Signos vitales' : 'Nuevo registro')" :subtitle="$esSelectorRegistro ? 'Selecciona qué deseas registrar' : ($registroTipo === 'signos' ? 'Registro clínico del residente' : 'Registro del residente seleccionado')" close-method="cerrarSelectorRegistro" :back-method="$volverRegistro" back-label="Volver al selector de registros">
+    <x-ui.quick-register-modal id="resident-register" model="mostrarSelectorModal" class="rm-resident-directory__register-modal {{ $esSelectorRegistro ? 'rm-resident-directory__register-modal--selector' : ($registroTipo === 'signos' ? 'rm-resident-directory__register-modal--signos' : 'rm-resident-directory__register-modal--form') }} {{ $signosConfirmacionPendiente ? 'rm-resident-directory__register-modal--signos-confirm' : '' }}" :title="$esSelectorRegistro && $detalleResidente ? 'Registrar para '.\Illuminate\Support\Str::title(mb_strtolower($detalleResidente['nombre_completo'])) : ($signosConfirmacionPendiente ? 'Confirmar registro' : ($registroTipo === 'signos' ? 'Signos vitales' : 'Nuevo registro'))" :subtitle="$esSelectorRegistro ? 'Selecciona qué deseas registrar' : ($signosConfirmacionPendiente ? 'Comprueba las lecturas señaladas' : ($registroTipo === 'signos' ? 'Registro clínico del residente' : 'Registro del residente seleccionado'))" close-method="cerrarSelectorRegistro" :back-method="$volverRegistro" :back-label="$signosConfirmacionPendiente ? 'Volver y revisar' : 'Volver al selector de registros'">
         <x-slot:icon>
             @if($esSelectorRegistro)
                 <span class="rm-quick-register__header-icon" aria-hidden="true"><i class="ph-bold ph-plus-circle"></i></span>
@@ -122,20 +122,9 @@
                         <span>{{ $detalleResidente['edad_texto'] ?: 'Edad no registrada' }} · {{ $detalleResidente['habitacion_texto'] }} · {{ $detalleResidente['cama_texto'] }}</span>
                     </div>
                     @if($registroTipo === 'signos')
-                        <div class="rm-resident-directory__register-badges" aria-label="Condiciones clínicas y alertas">
-                            @if(!empty($detalleResidente['alertas']) && count($detalleResidente['alertas']) > 0)
-                                @foreach(array_slice($detalleResidente['alertas'], 0, 3) as $alerta)
-                                    <span class="rm-badge-pill rm-badge-pill--warning" title="{{ $alerta['motivo'] }}"><i class="ph-bold ph-warning-circle" aria-hidden="true"></i> {{ \Illuminate\Support\Str::limit($alerta['motivo'], 24) }}</span>
-                                @endforeach
-                            @else
-                                <span class="rm-badge-pill"><i class="ph-bold ph-check-circle" aria-hidden="true"></i> Sin alertas activas</span>
-                            @endif
-                        </div>
-                        @can('residentes.ver')
-                            <a class="rm-btn-secondary rm-resident-directory__register-expediente" href="{{ route('admin.enfermeria.pacientes.ficha', ['adulto' => $detalleResidente['cod_residente']]) }}" target="_blank">
-                                <i class="ph-bold ph-file-text" aria-hidden="true"></i> Ver expediente
-                            </a>
-                        @endcan
+                        @if(($detalleResidente['alertas_count'] ?? 0) > 0)
+                            <span class="rm-badge-pill rm-badge-pill--warning"><i class="ph-bold ph-warning-circle" aria-hidden="true"></i> {{ $detalleResidente['alertas_count'] }} alertas activas</span>
+                        @endif
                     @else
                         @can('alertas.ver')
                             @if($detalleResidente['alertas_count'] > 0)
@@ -158,8 +147,24 @@
             @if($confirmarDescarte)
                 <section class="rm-resident-directory__discard" role="alert" aria-labelledby="resident-discard-title">
                     <i class="ph-bold ph-warning-circle" aria-hidden="true"></i>
-                    <h4 id="resident-discard-title">Cambios sin guardar</h4>
-                    <p>Tienes información que todavía no se ha guardado.</p>
+                    <h4 id="resident-discard-title">¿Salir sin guardar?</h4>
+                    <p>Tienes cambios sin registrar. Si sales ahora se perderán las mediciones introducidas.</p>
+                </section>
+            @elseif($signosConfirmacionPendiente && $registroTipo === 'signos')
+                <section class="rm-signos__confirm" role="group" aria-labelledby="signos-confirm-title" aria-describedby="signos-confirm-description">
+                    <h4 id="signos-confirm-title"><i class="ph-bold ph-warning-circle" aria-hidden="true"></i> Confirmar registro</h4>
+                    <p id="signos-confirm-description">Se detectaron valores que requieren confirmación. Comprueba que corresponden a las mediciones realizadas.</p>
+                    <ul>
+                        @foreach(($signosEvaluacion['resultados'] ?? []) as $resultado)
+                            @if(($resultado['severidad'] ?? null) === 'CRITICO' || ($resultado['comportamiento_alerta'] ?? null) === 'AUTOMATICA_AL_CONFIRMAR')
+                                <li><strong>{{ str_replace('_', ' ', ucfirst($resultado['variable'])) }}</strong><span>{{ $resultado['valor'] }} {{ $resultado['unidad'] }}</span><em>{{ $resultado['severidad'] ?? 'Requiere confirmación' }}</em></li>
+                            @endif
+                        @endforeach
+                        @if(is_numeric($signoSis) && is_numeric($signoDia) && (float)$signoSis <= (float)$signoDia)
+                            <li><strong>Presión arterial atípica</strong><span>{{ $signoSis }} / {{ $signoDia }} mmHg</span><em>Revisar lectura</em></li>
+                        @endif
+                    </ul>
+                    <p>Al confirmar se creará una nueva medición en el historial. Si la regla vigente lo indica, también se generará una alerta.</p>
                 </section>
             @elseif(in_array($drawerPaso, ['register-selector', 'register-form'], true))
                 @include('livewire.cuidados.partials.mis-residentes-registro-contenido')
@@ -168,8 +173,11 @@
         @if($drawerPaso === 'register-form' || $confirmarDescarte)
         <x-slot:footer>
             @if($confirmarDescarte)
-                <button type="button" class="rm-btn-secondary" wire:click="cancelarDescarte">Continuar editando</button>
-                <button type="button" class="rm-btn-danger" wire:click="descartarCambios">Descartar cambios</button>
+                <button type="button" class="rm-btn-secondary" wire:click="cancelarDescarte">Seguir editando</button>
+                <button type="button" class="rm-btn-danger" wire:click="descartarCambios">Salir sin guardar</button>
+            @elseif($signosConfirmacionPendiente && $registroTipo === 'signos')
+                <button type="button" class="rm-btn-secondary" wire:click="cancelarConfirmacionSignos">Volver y revisar</button>
+                <button type="button" class="rm-btn-primary" wire:click="guardarSignos" wire:loading.attr="disabled" wire:target="guardarSignos">Confirmar y registrar</button>
             @elseif($drawerPaso === 'register-form' && $guardarMetodo)
                 @if($registroTipo === 'signos')
                     <button type="button" class="rm-btn-secondary" wire:click="cerrarSelectorRegistro">Cancelar</button>
@@ -185,7 +193,6 @@
                         </button>
                     @endif
                 @elseif($registroTipo === 'signos')
-                    <button type="button" class="rm-btn-secondary rm-signos__btn-review" x-on:click="$dispatch('signos-revisar')"><i class="ph-bold ph-magnifying-glass" aria-hidden="true"></i> Revisar mediciones</button>
                     <button type="button" class="rm-btn-primary rm-btn-primary--confirm" wire:click="guardarSignos" wire:loading.attr="disabled" wire:target="guardarSignos" @if($errors->any()) data-has-errors="true" @endif><i class="ph-bold ph-check" aria-hidden="true"></i><span wire:loading.remove wire:target="guardarSignos">Confirmar y registrar</span><span wire:loading wire:target="guardarSignos">Registrando…</span></button>
                 @else
                     <button type="button" class="rm-btn-primary" wire:click="{{ $guardarMetodo }}" wire:loading.attr="disabled" wire:target="{{ $guardarMetodo }}"><i class="ph-bold ph-floppy-disk" aria-hidden="true"></i> Guardar registro</button>

@@ -3,14 +3,15 @@
     if (auth()->user()->nombres) {
         $nombreResponsable = trim(auth()->user()->nombres . ' ' . (auth()->user()->ap_paterno ?? ''));
     }
+    $limitesTecnicos = \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::limitesRegistro();
     $camposSignos = [
-        ['key' => 'sis', 'error' => 'presion_sistolica', 'label' => 'Sistólica', 'wire' => 'signoSis', 'unit' => 'mmHg', 'max' => \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::PAS_MAX, 'step' => '1'],
-        ['key' => 'dia', 'error' => 'presion_diastolica', 'label' => 'Diastólica', 'wire' => 'signoDia', 'unit' => 'mmHg', 'max' => \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::PAD_MAX, 'step' => '1'],
-        ['key' => 'fc', 'error' => 'frecuencia_cardiaca', 'label' => 'Pulso', 'wire' => 'signoFC', 'unit' => 'lpm', 'max' => \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::FC_MAX, 'step' => '1'],
-        ['key' => 'fr', 'error' => 'frecuencia_respiratoria', 'label' => 'Respiración', 'wire' => 'signoFR', 'unit' => 'rpm', 'max' => \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::FR_MAX, 'step' => '1'],
-        ['key' => 'temp', 'error' => 'temperatura', 'label' => 'Temperatura', 'wire' => 'signoTemp', 'unit' => '°C', 'max' => \App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService::TEMP_MAX, 'step' => '0.1'],
-        ['key' => 'sat', 'error' => 'saturacion_oxigeno', 'label' => 'Saturación de oxígeno', 'wire' => 'signoSat', 'unit' => '%', 'max' => '100', 'step' => '0.01'],
-        ['key' => 'glucosa', 'error' => 'glucemia', 'label' => 'Glucemia', 'wire' => 'signoGlucosa', 'unit' => 'mg/dL', 'max' => '999999.99', 'step' => '0.01'],
+        ['key' => 'sis', 'error' => 'presion_sistolica', 'label' => 'Sistólica', 'wire' => 'signoSis', 'unit' => '', 'step' => '1'],
+        ['key' => 'dia', 'error' => 'presion_diastolica', 'label' => 'Diastólica', 'wire' => 'signoDia', 'unit' => 'mmHg', 'step' => '1'],
+        ['key' => 'fc', 'error' => 'frecuencia_cardiaca', 'label' => 'Pulso', 'wire' => 'signoFC', 'unit' => 'lpm', 'step' => '1'],
+        ['key' => 'fr', 'error' => 'frecuencia_respiratoria', 'label' => 'Respiración', 'wire' => 'signoFR', 'unit' => 'rpm', 'step' => '1'],
+        ['key' => 'temp', 'error' => 'temperatura', 'label' => 'Temperatura', 'wire' => 'signoTemp', 'unit' => '°C', 'step' => '0.1'],
+        ['key' => 'sat', 'error' => 'saturacion_oxigeno', 'label' => 'Saturación de oxígeno', 'wire' => 'signoSat', 'unit' => '%', 'step' => '0.01'],
+        ['key' => 'glucosa', 'error' => 'glucemia', 'label' => 'Glucemia', 'wire' => 'signoGlucosa', 'unit' => 'mg/dL', 'step' => '0.01'],
     ];
     $evaluacionesPorTarjeta = collect($signosEvaluacion['resultados'] ?? [])->groupBy(fn (array $resultado) => match ($resultado['variable']) {
         'presion_arterial', 'presion_sistolica', 'presion_diastolica' => 'pa',
@@ -40,8 +41,7 @@
              sat: @js($signoSat),
              glucosa: @js($signoGlucosa),
              obs: @js($signoObs),
-     })"
-     x-on:signos-revisar.window="review()"
+     }, @js($limitesTecnicos))"
      x-on:signos-validacion-fallida.window="$nextTick(() => review())"
      role="region"
      aria-label="Formulario de signos vitales">
@@ -63,32 +63,14 @@
                 <strong class="rm-signos__context-value">{{ $signosContextoTurno['nombre'] ?? 'Sin turno activo' }} @if(filled($signosContextoTurno['horario'] ?? null))<span class="rm-signos__context-hours">· {{ $signosContextoTurno['horario'] }}</span>@endif</strong>
             </div>
         </div>
-        <p class="rm-signos__context-note"><i class="ph-bold ph-clock" aria-hidden="true"></i> La fecha y hora se asignan al confirmar.</p>
-    </section>
-
-    <section class="rm-signos__medical-goals" aria-label="Objetivos clínicos indicados por médico">
-        <strong>Objetivos clínicos indicados por médico</strong>
-        @forelse($signosObjetivos as $objetivo)
-            <span>{{ $objetivo['nombre'] }}: {{ $objetivo['min'] ?? '—' }}–{{ $objetivo['max'] ?? '—' }}</span>
-        @empty
-            <span>Sin objetivo individual configurado.</span>
-        @endforelse
-    </section>
-
-    <section class="rm-signos__intro" aria-labelledby="signos-intro-title">
-        <i class="ph-bold ph-heartbeat" aria-hidden="true"></i>
-        <div>
-            <strong id="signos-intro-title">Registro de signos vitales</strong>
-            <p>Completa únicamente las mediciones realizadas. Los datos se incorporarán al seguimiento clínico del residente.</p>
-        </div>
-        <span class="rm-signos__evaluating" wire:loading.delay wire:target="signoSis,signoDia,signoFC,signoFR,signoTemp,signoSat,signoGlucosa" role="status">Evaluando lectura…</span>
+        <p class="rm-signos__context-note"><i class="ph-bold ph-clock" aria-hidden="true"></i> Ahora · La hora se asigna al confirmar</p>
     </section>
 
     <!-- ERROR GENERAL -->
     @if($signosIntentoGuardar && $errors->any())
         <div class="rm-signos__global-error" role="alert">
             <i class="ph-bold ph-warning-circle" aria-hidden="true"></i>
-            <span>Revisa algunos datos antes de registrar.</span>
+            <span>No se puede continuar. Revisa las mediciones señaladas.</span>
         </div>
     @endif
     @error('mediciones')
@@ -104,6 +86,7 @@
     @enderror
     <div class="rm-signos__workspace">
         <div class="rm-signos__main-col">
+            <div class="rm-signos__section-heading"><h4>Mediciones</h4><span wire:loading.delay wire:target="signoSis,signoDia,signoFC,signoFR,signoTemp,signoSat,signoGlucosa" role="status">Evaluando lectura…</span></div>
             <div class="rm-signos__cards-grid">
                 <!-- CARD 1: Presión arterial -->
                 <section class="rm-signos__card rm-signos__card--pa" x-bind:class="{ 'rm-signos__card--active': active === 'pa' }" wire:loading.class="rm-signos__card--evaluating" wire:target="signoSis,signoDia" data-tone="{{ $tonosPorTarjeta->get('pa', 'neutral') }}" aria-labelledby="signos-pa-title">
@@ -115,7 +98,6 @@
                             @include('livewire.cuidados.partials.mis-residentes-signos-campo')
                         @endforeach
                     </div>
-                    <p class="rm-signos__reference">Referencia general: sistólica &lt;{{ config('signos_vitales.presion.sistolica_referencia_alta') }} / diastólica &lt;{{ config('signos_vitales.presion.diastolica_referencia_alta') }} mmHg</p>
                     @include('livewire.cuidados.partials.mis-residentes-signos-estado', ['evaluaciones' => $evaluacionesPorTarjeta->get('pa', collect())])
                 </section>
 
@@ -123,10 +105,8 @@
                 <section class="rm-signos__card rm-signos__card--fc" x-bind:class="{ 'rm-signos__card--active': active === 'fc' }" wire:loading.class="rm-signos__card--evaluating" wire:target="signoFC" data-tone="{{ $tonosPorTarjeta->get('fc', 'neutral') }}" aria-labelledby="signos-fc-title">
                     <div class="rm-signos__card-header">
                         <h5 id="signos-fc-title"><i class="ph-bold ph-heart" aria-hidden="true"></i> Pulso</h5>
-                        <span class="rm-signos__unit-badge">bpm</span>
                     </div>
                     @include('livewire.cuidados.partials.mis-residentes-signos-campo', ['campo' => $camposSignos[2]])
-                    <p class="rm-signos__reference">Referencia general: {{ config('signos_vitales.pulso.advertencia_baja') + 1 }}–{{ config('signos_vitales.pulso.normal_alta') }} lpm</p>
                     @include('livewire.cuidados.partials.mis-residentes-signos-estado', ['evaluaciones' => $evaluacionesPorTarjeta->get('fc', collect())])
                 </section>
 
@@ -134,10 +114,8 @@
                 <section class="rm-signos__card rm-signos__card--fr" x-bind:class="{ 'rm-signos__card--active': active === 'fr' }" wire:loading.class="rm-signos__card--evaluating" wire:target="signoFR" data-tone="{{ $tonosPorTarjeta->get('fr', 'neutral') }}" aria-labelledby="signos-fr-title">
                     <div class="rm-signos__card-header">
                         <h5 id="signos-fr-title"><i class="ph-bold ph-lungs" aria-hidden="true"></i> Respiración</h5>
-                        <span class="rm-signos__unit-badge">rpm</span>
                     </div>
                     @include('livewire.cuidados.partials.mis-residentes-signos-campo', ['campo' => $camposSignos[3]])
-                    <p class="rm-signos__reference">Referencia general: {{ config('signos_vitales.respiracion.advertencia_baja') + 1 }}–{{ config('signos_vitales.respiracion.normal_alta') }} rpm</p>
                     @include('livewire.cuidados.partials.mis-residentes-signos-estado', ['evaluaciones' => $evaluacionesPorTarjeta->get('fr', collect())])
                 </section>
 
@@ -145,10 +123,8 @@
                 <section class="rm-signos__card rm-signos__card--temp" x-bind:class="{ 'rm-signos__card--active': active === 'temp' }" wire:loading.class="rm-signos__card--evaluating" wire:target="signoTemp" data-tone="{{ $tonosPorTarjeta->get('temp', 'neutral') }}" aria-labelledby="signos-temp-title">
                     <div class="rm-signos__card-header">
                         <h5 id="signos-temp-title"><i class="ph-bold ph-thermometer" aria-hidden="true"></i> Temperatura</h5>
-                        <span class="rm-signos__unit-badge">°C</span>
                     </div>
                     @include('livewire.cuidados.partials.mis-residentes-signos-campo', ['campo' => $camposSignos[4]])
-                    <p class="rm-signos__reference">Referencia general: {{ config('signos_vitales.temperatura.referencia_baja') }}–{{ config('signos_vitales.temperatura.referencia_alta') }} °C</p>
                     @include('livewire.cuidados.partials.mis-residentes-signos-estado', ['evaluaciones' => $evaluacionesPorTarjeta->get('temp', collect())])
                 </section>
 
@@ -160,7 +136,6 @@
                     <div class="rm-signos__sat-fields">
                         @include('livewire.cuidados.partials.mis-residentes-signos-campo', ['campo' => $camposSignos[5]])
                     </div>
-                    <p class="rm-signos__reference">La saturación se valora según el objetivo individual indicado por médico.</p>
                     @include('livewire.cuidados.partials.mis-residentes-signos-estado', ['evaluaciones' => $evaluacionesPorTarjeta->get('sat', collect())])
                 </section>
 
@@ -168,41 +143,19 @@
                 <section class="rm-signos__card rm-signos__card--glucosa" x-bind:class="{ 'rm-signos__card--active': active === 'glucosa' }" wire:loading.class="rm-signos__card--evaluating" wire:target="signoGlucosa" data-tone="{{ $tonosPorTarjeta->get('glucosa', 'neutral') }}" aria-labelledby="signos-glucosa-title">
                     <div class="rm-signos__card-header">
                         <h5 id="signos-glucosa-title"><i class="ph-bold ph-drop-half" aria-hidden="true"></i> Glucemia</h5>
-                        <span class="rm-signos__unit-badge">mg/dL</span>
                     </div>
                     @include('livewire.cuidados.partials.mis-residentes-signos-campo', ['campo' => $camposSignos[6]])
-                    <p class="rm-signos__reference">Atención si &lt;{{ config('signos_vitales.glucemia.advertencia_baja') }}; revisar contexto si &gt;{{ config('signos_vitales.glucemia.revision_alta') }} mg/dL.</p>
                     @include('livewire.cuidados.partials.mis-residentes-signos-estado', ['evaluaciones' => $evaluacionesPorTarjeta->get('glucosa', collect())])
                 </section>
             </div>
-
-            @php
-                $lecturasParaRevisar = collect($signosEvaluacion['resultados'] ?? [])->filter(
-                    fn (array $resultado) => in_array($resultado['severidad'] ?? null, ['ADVERTENCIA', 'ALTO', 'CRITICO'], true)
-                        || ($resultado['comportamiento_alerta'] ?? null) === 'SUGERIR'
-                );
-            @endphp
-            @if($lecturasParaRevisar->isNotEmpty())
-                <section class="rm-signos__review" aria-labelledby="signos-review-title">
-                    <div>
-                        <strong id="signos-review-title"><i class="ph-bold ph-eye" aria-hidden="true"></i> Revisión antes de registrar</strong>
-                        <p>Hay {{ $lecturasParaRevisar->count() }} {{ $lecturasParaRevisar->count() === 1 ? 'lectura que requiere' : 'lecturas que requieren' }} revisión. Confirma que transcribiste los valores medidos.</p>
-                    </div>
-                    <label for="signos-confirmar-lecturas">
-                        <input id="signos-confirmar-lecturas" type="checkbox" wire:model="signoConfirmarAtipico">
-                        <span>Revisé las mediciones señaladas y deseo registrarlas.</span>
-                    </label>
-                    @error('signos_confirmacion')<p class="rm-signos__error" role="alert">{{ $message }}</p>@enderror
-                </section>
-            @endif
 
             <!-- OBSERVACIONES -->
             <section class="rm-signos__observations" aria-labelledby="signos-obs-title">
                 <div class="rm-signos__obs-header">
                     <h5 id="signos-obs-title"><i class="ph-bold ph-chat-circle-dots" aria-hidden="true"></i> Observaciones</h5>
                 </div>
-                <label class="sr-only" for="signos-observacion">Observación clínica</label>
-                <textarea id="signos-observacion" wire:model="signoObs" x-model="values.obs" maxlength="5000" rows="2" placeholder="Añade contexto relevante sobre la medición, síntomas, condiciones, etc." @error('observacion') aria-invalid="true" aria-describedby="signos-observacion-error" @enderror></textarea>
+                <label for="signos-observacion">Contexto de la medición (opcional)</label>
+                <textarea id="signos-observacion" wire:model="signoObs" x-model="values.obs" maxlength="5000" rows="2" placeholder="Añade contexto relevante sobre la medición, síntomas o condiciones observadas, si corresponde." @error('observacion') aria-invalid="true" aria-describedby="signos-observacion-error" @enderror></textarea>
                 <div class="rm-signos__obs-footer">
                     @error('observacion') <p id="signos-observacion-error" class="rm-signos__error" role="alert"><i class="ph-bold ph-x-circle" aria-hidden="true"></i> {{ $message }}</p> @enderror
                     <span class="rm-signos__char-count" aria-hidden="true" x-text="String(values.obs ?? '').length + '/5000'"></span>
@@ -240,7 +193,7 @@
             <div id="signos-tendencia-contenido" class="rm-signos__trend-content" x-show="active">
                 <template x-if="active">
                     <div>
-                        <div class="rm-signos__trend-section-title"><h6>Últimos registros</h6></div>
+                        <div class="rm-signos__trend-section-title"><h6>Evolución</h6></div>
                         <template x-if="chartRows(active).length >= 3">
                             <div class="rm-signos__chart">
                                 <div class="rm-signos__chart-canvas-wrap">
@@ -253,16 +206,19 @@
                                 </div>
                             </div>
                         </template>
-                        <p x-show="chartRows(active).length < 3">No hay suficientes registros previos para mostrar una tendencia.</p>
+                        <p x-show="chartRows(active).length < 3">No hay suficientes registros anteriores para mostrar una tendencia.</p>
                         <div class="rm-signos__current-block" x-show="validPreview(active)">
                             <div class="rm-signos__current-left">
-                                <span class="rm-signos__current-label">Valor sin guardar</span>
+                                <span class="rm-signos__current-label">Valor actual · Sin guardar</span>
                                 <div class="rm-signos__current-number">
                                     <strong x-text="previewLabel(active)"></strong>
                                     <small x-text="meta[active].unit"></small>
                                 </div>
                             </div>
-                            <div class="rm-signos__current-badge" x-show="previous(active)" x-text="change(active)"></div>
+                            <div class="rm-signos__current-compare" x-show="previous(active)">
+                                <span>Anterior <strong x-text="previous(active) ? labelOf(previous(active), active) + ' ' + meta[active].unit : ''"></strong></span>
+                                <span>Cambio <strong x-text="change(active)"></strong></span>
+                            </div>
                         </div>
                         <div class="rm-signos__history-list" x-show="records(active).length > 0">
                             <h6>Últimos registros</h6>
@@ -277,23 +233,40 @@
                             </template>
                         </div>
                         <p x-show="records(active).length === 0">Sin mediciones previas para este parámetro.</p>
-                        <div class="rm-signos__live-callout">
-                            <i class="ph-bold ph-info" aria-hidden="true"></i>
-                            <div><strong>Vista en vivo</strong><p>Los valores actuales son una vista previa hasta confirmar el registro.</p></div>
-                        </div>
+                        <p class="rm-signos__preview-note">La lectura actual es una vista previa hasta confirmar el registro.</p>
                     </div>
                 </template>
             </div>
-            <section class="rm-signos__validation-key" aria-label="Estados de validación">
-                <h6><i class="ph-bold ph-check-square-offset" aria-hidden="true"></i> Estados de validación</h6>
-                <ul>
-                    <li><span data-tone="success">Verde</span> Dentro de la referencia u objetivo indicado</li>
-                    <li><span data-tone="warning">Ámbar</span> Lectura que requiere revisión</li>
-                    <li><span data-tone="danger">Rojo</span> Valor crítico según la regla vigente</li>
-                    <li><span data-tone="neutral">Neutro</span> Sin clasificación aplicable</li>
-                </ul>
-                <p>La evaluación es orientativa hasta confirmar el registro. Una alerta clínica se crea solo cuando la regla lo requiere y el registro se guarda.</p>
-            </section>
+            @foreach($evaluacionesPorTarjeta as $claveTarjeta => $resultadosTarjeta)
+                <div class="rm-signos__interpretation" x-show="active === @js($claveTarjeta)" x-cloak>
+                    @foreach($resultadosTarjeta as $resultado)
+                        <section aria-label="Interpretación clínica">
+                            <h6>Interpretación · {{ match($resultado['severidad'] ?? null) {
+                                'CRITICO' => 'Crítico', 'ALTO' => 'Alto', 'ADVERTENCIA' => 'Advertencia',
+                                'NORMAL' => 'Normal', 'OBJETIVO_PERSONALIZADO' => 'En objetivo',
+                                default => 'Sin clasificación aplicable'
+                            } }}</h6>
+                            @if(filled($resultado['rango_o_umbral'] ?? null))
+                                <p><strong>{{ match($resultado['fuente_evaluacion'] ?? null) {
+                                    'OBJETIVO_MEDICO' => 'Objetivo individual',
+                                    'UMBRAL_CRITICO' => 'Umbral de seguridad',
+                                    default => 'Referencia utilizada'
+                                } }}:</strong> {{ $resultado['rango_o_umbral'] }}</p>
+                            @endif
+                            @if(filled($resultado['referencia_utilizada'] ?? null))
+                                <p class="rm-signos__reference-source"><strong>Origen:</strong> {{ $resultado['referencia_utilizada'] }}</p>
+                            @endif
+                            <p>{{ $resultado['explicacion'] }}</p>
+                        </section>
+                        <section aria-label="Acción recomendada"><h6>Acción recomendada</h6><p>{{ filled($resultado['recomendacion'] ?? null) ? $resultado['recomendacion'] : 'No hay una acción adicional indicada por la regla vigente para esta lectura.' }}</p></section>
+                        @if(($resultado['comportamiento_alerta'] ?? '') === 'AUTOMATICA_AL_CONFIRMAR')
+                            <p class="rm-signos__alert-note">Al confirmar se generará una alerta y su evento inicial.</p>
+                        @elseif(($resultado['comportamiento_alerta'] ?? '') === 'SUGERIR')
+                            <p class="rm-signos__alert-note">Revisar el contexto; esta lectura aislada no genera alerta automática.</p>
+                        @endif
+                    @endforeach
+                </div>
+            @endforeach
         </aside>
     </div>
 </div>

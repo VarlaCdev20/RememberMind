@@ -39,19 +39,14 @@ final class RegistrarSignosVitalesAction
                     ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO']))->exists(), 403);
             $mediciones = ['presion_sistolica', 'presion_diastolica', 'frecuencia_cardiaca',
                 'frecuencia_respiratoria', 'temperatura', 'saturacion_oxigeno', 'glucemia'];
-            $validator = Validator::make($datos, [
-                'presion_sistolica' => ['nullable', 'integer', 'min:1', 'max:'.ValidacionSignosVitalesService::PAS_MAX],
-                'presion_diastolica' => ['nullable', 'integer', 'min:1', 'max:'.ValidacionSignosVitalesService::PAD_MAX],
-                'frecuencia_cardiaca' => ['nullable', 'integer', 'min:1', 'max:'.ValidacionSignosVitalesService::FC_MAX],
-                'frecuencia_respiratoria' => ['nullable', 'integer', 'min:1', 'max:'.ValidacionSignosVitalesService::FR_MAX],
-                'temperatura' => ['nullable', 'numeric', 'decimal:0,1', 'between:'.ValidacionSignosVitalesService::TEMP_MIN.','.ValidacionSignosVitalesService::TEMP_MAX],
-                'saturacion_oxigeno' => ['nullable', 'numeric', 'decimal:0,2', 'between:1,100'],
-                'glucemia' => ['nullable', 'numeric', 'decimal:0,2', 'between:1,999999.99'],
-                'observacion' => ['nullable', 'string', 'max:5000'],
-            ]);
+            $validator = Validator::make(
+                $datos,
+                ValidacionSignosVitalesService::reglasRegistro(),
+                ValidacionSignosVitalesService::mensajesRegistro(),
+            );
             $validator->after(function ($validator) use ($datos, $mediciones): void {
                 if (! collect($mediciones)->contains(fn ($campo) => ($datos[$campo] ?? null) !== null)) {
-                    $validator->errors()->add('mediciones', 'Ingresa al menos una medición.');
+                    $validator->errors()->add('mediciones', 'Registra al menos una medición antes de confirmar.');
                 }
                 if (($datos['presion_sistolica'] ?? null) === null xor ($datos['presion_diastolica'] ?? null) === null) {
                     $validator->errors()->add('presion_arterial', 'Completa ambos valores de presión arterial.');

@@ -6,6 +6,60 @@ use Illuminate\Contracts\Validation\Validator;
 
 class ValidacionSignosVitalesService
 {
+    /** Límites de captura del registro nuevo; se entregan también al formulario. */
+    public static function limitesRegistro(): array
+    {
+        return [
+            'sis' => ['min' => self::PAS_MIN, 'max' => self::PAS_MAX, 'decimales' => 0],
+            'dia' => ['min' => self::PAD_MIN, 'max' => self::PAD_MAX, 'decimales' => 0],
+            'fc' => ['min' => self::FC_MIN, 'max' => self::FC_MAX, 'decimales' => 0],
+            'fr' => ['min' => self::FR_MIN, 'max' => self::FR_MAX, 'decimales' => 0],
+            'temp' => ['min' => self::TEMP_MIN, 'max' => self::TEMP_MAX, 'decimales' => 1],
+            'sat' => ['min' => 1, 'max' => self::SPO2_MAX, 'decimales' => 2],
+            'glucosa' => ['min' => 1, 'max' => 999999.99, 'decimales' => 2],
+        ];
+    }
+
+    public static function reglasRegistro(): array
+    {
+        $campos = [
+            'presion_sistolica' => 'sis', 'presion_diastolica' => 'dia',
+            'frecuencia_cardiaca' => 'fc', 'frecuencia_respiratoria' => 'fr',
+            'temperatura' => 'temp', 'saturacion_oxigeno' => 'sat', 'glucemia' => 'glucosa',
+        ];
+        $limites = self::limitesRegistro();
+        $reglas = [];
+        foreach ($campos as $campo => $clave) {
+            $limite = $limites[$clave];
+            $reglas[$campo] = ['nullable', $limite['decimales'] === 0 ? 'integer' : 'numeric'];
+            if ($limite['decimales'] > 0) {
+                $reglas[$campo][] = 'decimal:0,'.$limite['decimales'];
+            }
+            $reglas[$campo][] = 'min:'.$limite['min'];
+            $reglas[$campo][] = 'max:'.$limite['max'];
+        }
+        $reglas['observacion'] = ['nullable', 'string', 'max:5000'];
+
+        return $reglas;
+    }
+
+    public static function mensajesRegistro(): array
+    {
+        return [
+            'integer' => 'Revisa el valor ingresado. Esta medición requiere un número entero.',
+            'numeric' => 'Revisa el valor ingresado. Introduce un número válido.',
+            'decimal' => 'Revisa el valor ingresado. Comprueba los decimales de esta medición.',
+            'min' => 'Revisa el valor ingresado. Está por debajo del intervalo técnico admitido para esta medición.',
+            'max' => 'Revisa el valor ingresado. Está por encima del intervalo técnico admitido para esta medición.',
+            'temperatura.min' => 'Revisa el valor ingresado. Está fuera del intervalo admitido para una medición de temperatura corporal. Comprueba que no falte un dígito.',
+            'temperatura.max' => 'Revisa el valor ingresado. Está fuera del intervalo admitido para una medición de temperatura corporal.',
+            'saturacion_oxigeno.min' => 'La saturación de oxígeno debe ser mayor que 0 %.',
+            'saturacion_oxigeno.max' => 'La saturación de oxígeno no puede superar 100 %.',
+            'glucemia.min' => 'Revisa el valor ingresado. La glucemia debe ser mayor que cero.',
+            'glucemia.max' => 'Revisa el valor ingresado. La glucemia está fuera del intervalo técnico admitido.',
+            'observacion.max' => 'Las observaciones no pueden superar 5000 caracteres.',
+        ];
+    }
     // Límites técnicos de captura definidos para Enfermería. Los umbrales
     // clínicos de alerta se evalúan por separado y no deben impedir registrar
     // una medición real tomada al residente.

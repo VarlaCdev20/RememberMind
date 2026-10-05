@@ -4,9 +4,15 @@ import assert from 'node:assert/strict';
 globalThis.window = {};
 await import('../../resources/frontend/scripts/modules/signos-vitales-registro.js');
 
+const limits = {
+    sis: { min: 1, max: 400, decimales: 0 }, dia: { min: 1, max: 400, decimales: 0 },
+    fc: { min: 1, max: 300, decimales: 0 }, fr: { min: 1, max: 100, decimales: 0 },
+    temp: { min: 25, max: 45, decimales: 1 }, sat: { min: 1, max: 100, decimales: 2 },
+    glucosa: { min: 1, max: 999999.99, decimales: 2 },
+};
 const crear = (history = [], initial = {}) => window.rmSignosRegistro(history, {
     sis: '', dia: '', fc: '', fr: '', temp: '', sat: '', glucosa: '', ...initial,
-});
+}, limits);
 
 test('un panel cambia al signo activo y utiliza historial real en orden cronológico', () => {
     const estado = crear([
@@ -14,7 +20,7 @@ test('un panel cambia al signo activo y utiliza historial real en orden cronoló
         { fecha: '01/10 08:10', fc: 72, sat: 92 },
         { fecha: '30/09 18:20', fc: 68, sat: 94 },
     ]);
-    assert.equal(estado.active, null);
+    assert.equal(estado.active, 'pa');
     estado.focus('fc');
     assert.equal(estado.active, 'fc');
     assert.deepEqual(estado.chartRows('fc').map(row => row.value), [68, 72, 75]);
@@ -31,7 +37,7 @@ test('la vista previa válida se distingue del historial y un dato inválido se 
     assert.deepEqual(estado.chartRows('sat').map(row => row.preview), [false, true]);
     estado.values.sat = '135';
     estado.validate('sat');
-    assert.equal(estado.errors.sat, 'La saturación no puede superar el 100 %.');
+    assert.equal(estado.errors.sat, 'La saturación de oxígeno no puede superar 100 %.');
     assert.equal(estado.validPreview('sat'), false);
     assert.deepEqual(estado.chartRows('sat').map(row => row.preview), [false]);
 });
@@ -46,7 +52,33 @@ test('presión incompleta y decimales fuera de escala muestran error local', () 
     assert.equal(estado.validPreview('pa'), true);
     estado.values.temp = '37.23';
     estado.validate('temp');
-    assert.equal(estado.errors.temp, 'Ingresa un valor numérico válido.');
+    assert.equal(estado.errors.temp, 'Revisa el valor ingresado. Introduce un número válido.');
+});
+
+test('historial parcial descarta null, vacíos y valores no finitos sin dibujar NaN', () => {
+    const estado = crear([
+        { fecha: '04/10 08:00', fc: null },
+        { fecha: '03/10 08:00', fc: '', sat: 93 },
+        { fecha: '02/10 08:00', fc: 'NaN' },
+        { fecha: '01/10 08:00', fc: 'Infinity' },
+        { fecha: '30/09 08:00', fc: 72 },
+    ], { fc: '96' });
+    assert.deepEqual(estado.records('fc').map(row => row.fc), [72]);
+    assert.equal(estado.previous('fc').fc, 72);
+    assert.equal(estado.change('fc'), '+24 lpm');
+    assert.deepEqual(estado.chartRows('fc').map(row => row.value), [72, 96]);
+    assert.equal(estado.chartPoints('fc'), '');
+});
+
+test('límites técnicos vienen del servidor y una temperatura de 6 se trata como error de captura', () => {
+    const estado = crear([], { temp: '6' });
+    estado.validate('temp');
+    assert.match(estado.errors.temp, /Comprueba que no falte un dígito/);
+    assert.equal(estado.validPreview('temp'), false);
+    estado.values.temp = '39.4';
+    estado.validate('temp');
+    assert.equal(estado.errors.temp, '');
+    assert.equal(estado.validPreview('temp'), true);
 });
 
 test('la gráfica no supera cinco puntos aunque el historial tenga más lecturas', () => {
