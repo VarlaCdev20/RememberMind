@@ -210,6 +210,7 @@
                             </div>
                         </template>
                         <p x-show="chartRows(active).length < 2" x-text="emptyHistoryMessage(active)"></p>
+                        <h6 class="rm-signos__trend-step-title" x-show="validPreview(active) && previous(active)">Comparación con la última medición</h6>
                         <div class="rm-signos__current-block" x-show="validPreview(active)">
                             <div class="rm-signos__current-left">
                                 <span class="rm-signos__current-label">Valor actual · Sin guardar</span>
@@ -236,8 +237,7 @@
                                 </div>
                             </template>
                         </div>
-                        <p x-show="records(active).length === 0">Sin mediciones previas para este parámetro.</p>
-                        <p class="rm-signos__preview-note">La lectura actual es una vista previa hasta confirmar el registro.</p>
+                        <p class="rm-signos__preview-note" x-show="validPreview(active)">La lectura actual es una vista previa hasta confirmar el registro.</p>
                     </div>
                 </template>
             </div>
@@ -262,6 +262,8 @@
                             @endif
                             <p>{{ $resultado['explicacion'] }}</p>
                         </section>
+                    @endforeach
+                    @foreach($resultadosTarjeta as $resultado)
                         <section aria-label="Acción recomendada"><h6>Acción recomendada</h6><p>{{ filled($resultado['recomendacion'] ?? null) ? $resultado['recomendacion'] : 'No hay una acción adicional indicada por la regla vigente para esta lectura.' }}</p></section>
                         @if(($resultado['comportamiento_alerta'] ?? '') === 'AUTOMATICA_AL_CONFIRMAR')
                             <p class="rm-signos__alert-note">Al confirmar se generará una alerta y su evento inicial.</p>

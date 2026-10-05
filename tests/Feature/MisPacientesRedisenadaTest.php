@@ -975,6 +975,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $formulario = $this->formularioSignos()->set('signoFC', '135')
             ->assertSee('data-tone="danger"', false)
             ->assertSee('1 MEDICIÓN CRÍTICA')
+            ->assertSee('Revisar lectura crítica')
             ->call('guardarSignos')
             ->assertSet('signosConfirmacionPendiente', true)
             ->assertSee('Revisión de medición crítica')

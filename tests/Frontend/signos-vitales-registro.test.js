@@ -121,3 +121,20 @@ test('una sola medición histórica muestra el valor y la vista previa lleva el 
     assert.equal(estado.validPreview('glucosa'), false);
     assert.equal(estado.chartRows('glucosa').length, 1);
 });
+
+test('el historial malformado no llega a etiquetas, comparaciones, tooltip ni gráfica', () => {
+    const estado = crear([
+        { fecha: 'null', glucosa: null, fc: 'NaN' },
+        { fecha: 'undefined', glucosa: 'Infinity', fc: [] },
+        { fecha: null, glucosa: '105', fc: false },
+    ], { glucosa: '120' });
+    assert.deepEqual(estado.records('glucosa').map(row => row.glucosa), [105]);
+    assert.equal(estado.records('glucosa')[0].fecha, 'Registro previo');
+    assert.equal(estado.change('glucosa'), '+15 mg/dL');
+    assert.equal(estado.chartRows('glucosa').length, 2);
+    assert.equal(estado.chartMarkers('glucosa').some(row => /null|NaN|undefined|Infinity/.test(row.markerLabel + row.date)), false);
+    assert.equal(estado.records('fc').length, 0);
+    assert.equal(estado.chartPoints('fc'), '');
+    assert.equal(estado.chartRange('fc').min, 0);
+    assert.match(estado.emptyHistoryMessage('fc'), /No hay mediciones anteriores/);
+});

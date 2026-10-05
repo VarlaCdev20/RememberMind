@@ -10,10 +10,22 @@ window.rmSignosRegistro = function (history, initial, limits, objectiveBands = {
         glucosa: { label: 'glucemia', unit: 'mg/dL', fields: ['glucosa'] },
     };
     const finite = value => {
-        if (value === null || value === undefined || String(value).trim() === '') return null;
-        const parsed = Number(value);
+        if (typeof value !== 'number' && typeof value !== 'string') return null;
+        const raw = String(value).trim();
+        if (!/^-?\d+(?:\.\d+)?$/.test(raw)) return null;
+        const parsed = Number(raw);
         return Number.isFinite(parsed) ? parsed : null;
     };
+    const safeDate = value => {
+        const date = typeof value === 'string' ? value.trim() : '';
+        return date && !/^(null|undefined|nan|infinity)$/i.test(date) ? date : 'Registro previo';
+    };
+    const historyFields = ['sis', 'dia', 'fc', 'fr', 'temp', 'sat', 'glucosa'];
+    const normalizedHistory = (Array.isArray(history) ? history : []).map(row => {
+        const clean = { fecha: safeDate(row?.fecha) };
+        historyFields.forEach(field => { clean[field] = finite(row?.[field]); });
+        return clean;
+    }).filter(row => historyFields.some(field => row[field] !== null));
 
     return {
         values: { ...initial },
@@ -23,7 +35,7 @@ window.rmSignosRegistro = function (history, initial, limits, objectiveBands = {
         clinicalTones,
         touched: {},
         errors: {},
-        history: Array.isArray(history) ? history : [],
+        history: normalizedHistory,
         active: 'pa',
         trendOpen: true,
         meta: metadata,
@@ -104,7 +116,7 @@ window.rmSignosRegistro = function (history, initial, limits, objectiveBands = {
         diastolicOf(row) { return finite(row?.dia); },
         labelOf(row, key) {
             if (this.valueOf(row, key) === null) return '';
-            return key === 'pa' ? `${row.sis}/${row.dia}` : String(row[key]);
+            return key === 'pa' ? `${finite(row.sis)}/${finite(row.dia)}` : String(this.valueOf(row, key));
         },
         previewLabel(key) {
             if (!this.validPreview(key)) return '';
@@ -148,6 +160,7 @@ window.rmSignosRegistro = function (history, initial, limits, objectiveBands = {
             const rows = this.chartRows(key);
             const values = rows.flatMap(row => key === 'pa' ? [row.value, row.dia] : [row.value]);
             this.availableBands(key).forEach(band => values.push(band.min, band.max));
+            if (!values.length) return { min: 0, spread: 1 };
             const min = Math.min(...values), max = Math.max(...values);
             return { min, spread: max - min || 1 };
         },
