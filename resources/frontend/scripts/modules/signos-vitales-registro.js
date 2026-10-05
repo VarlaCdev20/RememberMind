@@ -33,6 +33,7 @@ window.rmSignosRegistro = function (history, initial, limits, objectiveBands = {
         limits,
         objectiveBands,
         clinicalTones,
+        evaluatedValues: Object.keys(clinicalTones).length ? { ...initial } : {},
         touched: {},
         errors: {},
         history: normalizedHistory,
@@ -99,8 +100,36 @@ window.rmSignosRegistro = function (history, initial, limits, objectiveBands = {
         hasEntered(key) {
             return (metadata[key]?.fields ?? []).some(field => String(this.values[field] ?? '').trim() !== '');
         },
-        toneOf(key) { return this.clinicalTones?.[key] ?? 'neutral'; },
+        evaluationCurrent(key) {
+            const fields = metadata[key]?.fields ?? [];
+            return fields.length > 0 && fields.every(field =>
+                String(this.values[field] ?? '').trim() === String(this.evaluatedValues[field] ?? '').trim()
+            ) && this.clinicalTones?.[key] !== undefined;
+        },
+        syncEvaluation(detail) {
+            const priority = { neutral: 0, success: 1, target: 2, warning: 3, high: 4, danger: 5 };
+            const tones = {};
+            const keys = {
+                presion_arterial: 'pa', presion_sistolica: 'pa', presion_diastolica: 'pa',
+                frecuencia_cardiaca: 'fc', frecuencia_respiratoria: 'fr', temperatura: 'temp',
+                saturacion_oxigeno: 'sat', glucemia: 'glucosa',
+            };
+            const levels = {
+                NORMAL: 'success', OBJETIVO_PERSONALIZADO: 'target',
+                ADVERTENCIA: 'warning', ALTO: 'high', CRITICO: 'danger',
+            };
+            for (const result of detail?.evaluacion?.resultados ?? []) {
+                const key = keys[result.variable];
+                if (!key) continue;
+                const tone = levels[result.severidad] ?? (result.comportamiento_alerta === 'SUGERIR' ? 'warning' : 'neutral');
+                if ((priority[tone] ?? 0) >= (priority[tones[key]] ?? -1)) tones[key] = tone;
+            }
+            this.clinicalTones = tones;
+            this.evaluatedValues = { ...(detail?.valores ?? {}) };
+        },
+        toneOf(key) { return this.evaluationCurrent(key) ? this.clinicalTones[key] : 'neutral'; },
         toneLabel(key) {
+            if (!this.evaluationCurrent(key)) return 'Evaluando lectura';
             return ({ success: 'Normal', target: 'En objetivo', warning: 'Advertencia', high: 'Alto', danger: 'Crítico' })[this.toneOf(key)] ?? 'Sin clasificación adicional';
         },
         validPreview(key) {

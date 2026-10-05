@@ -42,6 +42,21 @@ test('la vista previa válida se distingue del historial y un dato inválido se 
     assert.deepEqual(estado.chartRows('sat').map(row => row.preview), [false]);
 });
 
+test('el estado clínico anterior desaparece al editar y vuelve solo con la evaluación nueva', () => {
+    const estado = crear([], { fc: '135' }, {}, { fc: 'danger' });
+    assert.equal(estado.toneOf('fc'), 'danger');
+    estado.values.fc = '72';
+    assert.equal(estado.toneOf('fc'), 'neutral');
+    assert.equal(estado.toneLabel('fc'), 'Evaluando lectura');
+    estado.syncEvaluation({
+        valores: { fc: '72' },
+        evaluacion: { resultados: [{ variable: 'frecuencia_cardiaca', severidad: 'NORMAL' }] },
+    });
+    assert.equal(estado.toneOf('fc'), 'success');
+    estado.values.fc = '135';
+    assert.equal(estado.toneOf('fc'), 'neutral');
+});
+
 test('presión incompleta y decimales fuera de escala muestran error local', () => {
     const estado = crear([], { sis: '120' });
     estado.validate('sis');
@@ -114,6 +129,11 @@ test('una sola medición histórica muestra el valor y la vista previa lleva el 
     assert.equal(estado.chartPoints('glucosa'), '');
     estado.values.glucosa = '48';
     assert.equal(estado.chartRows('glucosa').length, 2);
+    assert.equal(estado.toneOf('glucosa'), 'neutral');
+    estado.syncEvaluation({
+        valores: { glucosa: '48' },
+        evaluacion: { resultados: [{ variable: 'glucemia', severidad: 'CRITICO' }] },
+    });
     assert.match(estado.chartMarkers('glucosa')[1].markerLabel, /Crítico/);
     assert.equal(estado.toneOf('glucosa'), 'danger');
     estado.values.glucosa = 'Infinity';

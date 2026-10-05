@@ -730,6 +730,32 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->assertStringContainsString("querySelector('#resident-register-trigger')?.focus()", $html);
     }
 
+    public function test_no_se_puede_guardar_signos_fuera_del_formulario_de_registro(): void
+    {
+        $this->actingAs($this->enfermero);
+        $antes = SignoVital::query()->count();
+
+        Livewire::test(MisPacientes::class)
+            ->set('modalCodResidente', $this->residenteEstable->cod_residente)
+            ->set('signoFC', '135')
+            ->call('guardarSignos')
+            ->assertStatus(403);
+
+        $this->assertSame($antes, SignoVital::query()->count());
+    }
+
+    public function test_el_menu_del_residente_abre_el_formulario_de_control_completo(): void
+    {
+        $this->actingAs($this->enfermero);
+
+        Livewire::test(MisPacientes::class)
+            ->call('abrirControlDesdeMenu', $this->residenteEstable->cod_residente)
+            ->assertSet('drawerPaso', 'register-form')
+            ->assertSet('registroTipo', 'signos')
+            ->assertSet('mostrarSelectorModal', true)
+            ->assertSee('Evolución y validación');
+    }
+
     public function test_guardar_signos_desde_el_modal_actualiza_el_resumen_sin_abrir_otro_panel(): void
     {
         // El registro inicial del fixture es de las 08:30; el nuevo debe ser posterior

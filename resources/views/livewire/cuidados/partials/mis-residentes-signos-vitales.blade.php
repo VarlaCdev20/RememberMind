@@ -51,6 +51,7 @@
              obs: @js($signoObs),
      }, @js($limitesTecnicos), @js($signosBandasObjetivo), @js($tonosPorTarjeta->all()))"
      x-on:signos-validacion-fallida.window="$nextTick(() => review())"
+     x-on:signos-evaluacion-actualizada.window="syncEvaluation($event.detail)"
      role="region"
      aria-label="Formulario de signos vitales">
 
@@ -89,7 +90,7 @@
             <div class="rm-signos__section-heading"><h4>Mediciones</h4><span wire:loading.delay wire:target="signoSis,signoDia,signoFC,signoFR,signoTemp,signoSat,signoGlucosa" role="status">Evaluando lectura…</span></div>
             <div class="rm-signos__cards-grid">
                 <!-- CARD 1: Presión arterial -->
-                <section class="rm-signos__card rm-signos__card--pa" x-bind:class="{ 'rm-signos__card--active': active === 'pa' }" wire:loading.class="rm-signos__card--evaluating" wire:target="signoSis,signoDia" data-tone="{{ $tonosPorTarjeta->get('pa', 'neutral') }}" aria-labelledby="signos-pa-title">
+                <section class="rm-signos__card rm-signos__card--pa" x-bind:class="{ 'rm-signos__card--active': active === 'pa' }" x-bind:data-tone="toneOf('pa')" wire:loading.class="rm-signos__card--evaluating" wire:target="signoSis,signoDia" aria-labelledby="signos-pa-title">
                     <div class="rm-signos__card-header">
                         <h5 id="signos-pa-title"><i class="ph-bold ph-heart" aria-hidden="true"></i> Presión arterial (PA)</h5>
                         @include('livewire.cuidados.partials.mis-residentes-signos-badge', ['claveTarjeta' => 'pa', 'tonoBadge' => $tonosPorTarjeta->get('pa', 'neutral'), 'evaluacionesBadge' => $evaluacionesPorTarjeta->get('pa', collect())])
@@ -103,7 +104,7 @@
                 </section>
 
                 <!-- CARD 2: Pulso -->
-                <section class="rm-signos__card rm-signos__card--fc" x-bind:class="{ 'rm-signos__card--active': active === 'fc' }" wire:loading.class="rm-signos__card--evaluating" wire:target="signoFC" data-tone="{{ $tonosPorTarjeta->get('fc', 'neutral') }}" aria-labelledby="signos-fc-title">
+                <section class="rm-signos__card rm-signos__card--fc" x-bind:class="{ 'rm-signos__card--active': active === 'fc' }" x-bind:data-tone="toneOf('fc')" wire:loading.class="rm-signos__card--evaluating" wire:target="signoFC" aria-labelledby="signos-fc-title">
                     <div class="rm-signos__card-header">
                         <h5 id="signos-fc-title"><i class="ph-bold ph-heart" aria-hidden="true"></i> Pulso</h5>
                         @include('livewire.cuidados.partials.mis-residentes-signos-badge', ['claveTarjeta' => 'fc', 'tonoBadge' => $tonosPorTarjeta->get('fc', 'neutral'), 'evaluacionesBadge' => $evaluacionesPorTarjeta->get('fc', collect())])
@@ -113,7 +114,7 @@
                 </section>
 
                 <!-- CARD 3: Respiración -->
-                <section class="rm-signos__card rm-signos__card--fr" x-bind:class="{ 'rm-signos__card--active': active === 'fr' }" wire:loading.class="rm-signos__card--evaluating" wire:target="signoFR" data-tone="{{ $tonosPorTarjeta->get('fr', 'neutral') }}" aria-labelledby="signos-fr-title">
+                <section class="rm-signos__card rm-signos__card--fr" x-bind:class="{ 'rm-signos__card--active': active === 'fr' }" x-bind:data-tone="toneOf('fr')" wire:loading.class="rm-signos__card--evaluating" wire:target="signoFR" aria-labelledby="signos-fr-title">
                     <div class="rm-signos__card-header">
                         <h5 id="signos-fr-title"><i class="ph-bold ph-lungs" aria-hidden="true"></i> Respiración</h5>
                         @include('livewire.cuidados.partials.mis-residentes-signos-badge', ['claveTarjeta' => 'fr', 'tonoBadge' => $tonosPorTarjeta->get('fr', 'neutral'), 'evaluacionesBadge' => $evaluacionesPorTarjeta->get('fr', collect())])
@@ -123,7 +124,7 @@
                 </section>
 
                 <!-- CARD 4: Temperatura -->
-                <section class="rm-signos__card rm-signos__card--temp" x-bind:class="{ 'rm-signos__card--active': active === 'temp' }" wire:loading.class="rm-signos__card--evaluating" wire:target="signoTemp" data-tone="{{ $tonosPorTarjeta->get('temp', 'neutral') }}" aria-labelledby="signos-temp-title">
+                <section class="rm-signos__card rm-signos__card--temp" x-bind:class="{ 'rm-signos__card--active': active === 'temp' }" x-bind:data-tone="toneOf('temp')" wire:loading.class="rm-signos__card--evaluating" wire:target="signoTemp" aria-labelledby="signos-temp-title">
                     <div class="rm-signos__card-header">
                         <h5 id="signos-temp-title"><i class="ph-bold ph-thermometer" aria-hidden="true"></i> Temperatura</h5>
                         @include('livewire.cuidados.partials.mis-residentes-signos-badge', ['claveTarjeta' => 'temp', 'tonoBadge' => $tonosPorTarjeta->get('temp', 'neutral'), 'evaluacionesBadge' => $evaluacionesPorTarjeta->get('temp', collect())])
@@ -133,7 +134,7 @@
                 </section>
 
                 <!-- CARD 5: Saturación de oxígeno (SpO₂) -->
-                <section class="rm-signos__card rm-signos__card--sat" x-bind:class="{ 'rm-signos__card--active': active === 'sat' }" wire:loading.class="rm-signos__card--evaluating" wire:target="signoSat" data-tone="{{ $tonosPorTarjeta->get('sat', 'neutral') }}" aria-labelledby="signos-sat-title">
+                <section class="rm-signos__card rm-signos__card--sat" x-bind:class="{ 'rm-signos__card--active': active === 'sat' }" x-bind:data-tone="toneOf('sat')" wire:loading.class="rm-signos__card--evaluating" wire:target="signoSat" aria-labelledby="signos-sat-title">
                     <div class="rm-signos__card-header">
                         <h5 id="signos-sat-title"><i class="ph-bold ph-drop" aria-hidden="true"></i> Saturación de oxígeno <small>(SpO₂)</small></h5>
                         @include('livewire.cuidados.partials.mis-residentes-signos-badge', ['claveTarjeta' => 'sat', 'tonoBadge' => $tonosPorTarjeta->get('sat', 'neutral'), 'evaluacionesBadge' => $evaluacionesPorTarjeta->get('sat', collect())])
@@ -145,7 +146,7 @@
                 </section>
 
                 <!-- CARD 6: Glucemia -->
-                <section class="rm-signos__card rm-signos__card--glucosa" x-bind:class="{ 'rm-signos__card--active': active === 'glucosa' }" wire:loading.class="rm-signos__card--evaluating" wire:target="signoGlucosa" data-tone="{{ $tonosPorTarjeta->get('glucosa', 'neutral') }}" aria-labelledby="signos-glucosa-title">
+                <section class="rm-signos__card rm-signos__card--glucosa" x-bind:class="{ 'rm-signos__card--active': active === 'glucosa' }" x-bind:data-tone="toneOf('glucosa')" wire:loading.class="rm-signos__card--evaluating" wire:target="signoGlucosa" aria-labelledby="signos-glucosa-title">
                     <div class="rm-signos__card-header">
                         <h5 id="signos-glucosa-title"><i class="ph-bold ph-drop-half" aria-hidden="true"></i> Glucemia</h5>
                         @include('livewire.cuidados.partials.mis-residentes-signos-badge', ['claveTarjeta' => 'glucosa', 'tonoBadge' => $tonosPorTarjeta->get('glucosa', 'neutral'), 'evaluacionesBadge' => $evaluacionesPorTarjeta->get('glucosa', collect())])
@@ -242,7 +243,7 @@
                 </template>
             </div>
             @foreach($evaluacionesPorTarjeta as $claveTarjeta => $resultadosTarjeta)
-                <div class="rm-signos__interpretation" x-show="active === @js($claveTarjeta) && !hasCardError(@js($claveTarjeta))" x-cloak>
+                <div class="rm-signos__interpretation" x-show="active === @js($claveTarjeta) && evaluationCurrent(@js($claveTarjeta)) && !hasCardError(@js($claveTarjeta))" x-cloak>
                     @foreach($resultadosTarjeta as $resultado)
                         <section aria-label="Interpretación clínica">
                             <h6>Interpretación · {{ match($resultado['severidad'] ?? null) {

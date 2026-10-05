@@ -10,7 +10,7 @@
             default => ($resultado['comportamiento_alerta'] ?? '') === 'SUGERIR' ? 'warning' : 'neutral',
         };
     @endphp
-    <div class="rm-signos__reading-state" data-tone="{{ $tono }}" x-show="hasEntered(@js($claveTarjeta)) && !hasCardError(@js($claveTarjeta))" aria-live="polite">
+    <div class="rm-signos__reading-state" data-tone="{{ $tono }}" x-show="hasEntered(@js($claveTarjeta)) && evaluationCurrent(@js($claveTarjeta)) && !hasCardError(@js($claveTarjeta))" aria-live="polite">
         @if($tono === 'neutral')<span class="rm-signos__reading-reference">Sin clasificación adicional aplicable</span>@endif
         @if(filled($resultado['rango_o_umbral'] ?? null))
             <span class="rm-signos__reading-reference">{{ match($resultado['fuente_evaluacion'] ?? null) {

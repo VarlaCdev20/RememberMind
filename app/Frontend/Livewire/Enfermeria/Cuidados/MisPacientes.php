@@ -1194,7 +1194,7 @@ class MisPacientes extends Component
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
         abort_unless(auth()->user()?->can('signos_vitales.crear'), 403);
-        $this->getTurnoService()->autorizarAccionPaciente($codResidente);
+        $this->getTurnoService()->autorizarMutacionEnfermeria($codResidente, 'signos_vitales.crear', Auth::user());
         $this->modalCodResidente = $codResidente;
         $this->reset(['signoPA', 'signoFC', 'signoFR', 'signoTemp', 'signoSat', 'signoGlucosa', 'signoObs', 'signoConfirmarAtipico']);
         $this->reset(['signoSis', 'signoDia']);
@@ -1235,6 +1235,14 @@ class MisPacientes extends Component
                 'glucosa' => $signo->glucemia,
             ])->all() : [];
         $this->modalSignos = true;
+    }
+
+    public function abrirControlDesdeMenu(string $codResidente): void
+    {
+        $this->getTurnoService()->autorizarMutacionEnfermeria($codResidente, 'signos_vitales.crear', Auth::user());
+        $this->seleccionarResidente($codResidente);
+        $this->mostrarSelectorRegistro();
+        $this->abrirFormularioRegistro('signos');
     }
 
     public function abrirModalSignos(string $codResidente): void
@@ -1282,60 +1290,30 @@ class MisPacientes extends Component
             // el error técnico; no se presenta una clasificación clínica parcial.
             $this->signosEvaluacion = [];
         }
+        $this->dispatch('signos-evaluacion-actualizada',
+            evaluacion: $this->signosEvaluacion,
+            valores: [
+                'sis' => $this->signoSis, 'dia' => $this->signoDia,
+                'fc' => $this->signoFC, 'fr' => $this->signoFR,
+                'temp' => $this->signoTemp, 'sat' => $this->signoSat,
+                'glucosa' => $this->signoGlucosa,
+            ],
+        );
     }
 
     public function guardarSignos(): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
         abort_if($this->signosResultadoRegistro !== [], 409, 'Este registro ya fue confirmado.');
-        abort_if($this->mostrarSelectorModal && $this->drawerPaso !== 'register-form', 403);
-        if ($this->drawerPaso === 'register-form') {
-            abort_unless($this->mostrarSelectorModal && $this->registroTipo === 'signos'
-                && $this->detalleResidente && $this->modalCodResidente === $this->detalleResidente['cod_residente'], 403);
-            $this->signosIntentoGuardar = true;
-            $this->resetValidation();
+        abort_unless($this->mostrarSelectorModal && $this->drawerPaso === 'register-form'
+            && $this->registroTipo === 'signos' && $this->detalleResidente
+            && $this->modalCodResidente === $this->detalleResidente['cod_residente'], 403);
+        $this->getTurnoService()->autorizarMutacionEnfermeria($this->modalCodResidente, 'signos_vitales.crear', Auth::user());
+        $this->signosIntentoGuardar = true;
+        $this->resetValidation();
+        try {
             try {
-                try {
-                    $evaluacionPrevia = app(SignosVitalesService::class)->preEvaluar([
-                        'presion_sistolica' => $this->signoSis,
-                        'presion_diastolica' => $this->signoDia,
-                        'frecuencia_cardiaca' => $this->signoFC,
-                        'frecuencia_respiratoria' => $this->signoFR,
-                        'temperatura' => $this->signoTemp,
-                        'saturacion_oxigeno' => $this->signoSat,
-                        'glucemia' => $this->signoGlucosa,
-                    ], $this->modalCodResidente, Auth::user());
-                } catch (ValidationException) {
-                    // El validador de registro devuelve los mensajes específicos
-                    // de cada campo y conserva los valores para corregirlos.
-                    $evaluacionPrevia = null;
-                }
-                $requiereConfirmacion = collect($evaluacionPrevia?->resultados ?? [])->contains(
-                    fn ($resultado) => $resultado->severidad?->value === 'CRITICO'
-                        || $resultado->comportamientoAlerta->value === 'AUTOMATICA_AL_CONFIRMAR'
-                );
-                $presionAtipica = $evaluacionPrevia !== null
-                    && is_numeric($this->signoSis) && is_numeric($this->signoDia)
-                    && (float) $this->signoSis <= (float) $this->signoDia;
-                $huella = hash('sha256', json_encode([
-                    $this->modalCodResidente, $this->signoSis, $this->signoDia, $this->signoFC,
-                    $this->signoFR, $this->signoTemp, $this->signoSat, $this->signoGlucosa, $this->signoObs,
-                ]));
-                if (($requiereConfirmacion || $presionAtipica)
-                    && (! $this->signosConfirmacionPendiente || $this->signosConfirmacionHuella !== $huella)) {
-                    $this->signosEvaluacion = $evaluacionPrevia->toArray();
-                    $this->signosConfirmacionPendiente = true;
-                    $this->signosPasoConfirmacion = 'revision';
-                    $this->signosConfirmacionHuella = $huella;
-                    $this->dispatch('resident-directory-step-changed');
-                    return;
-                }
-                if ($requiereConfirmacion && $this->signosPasoConfirmacion !== 'final') {
-                    $this->signosPasoConfirmacion = 'final';
-                    $this->dispatch('resident-directory-step-changed');
-                    return;
-                }
-                $registro = app(SignosVitalesService::class)->registrarConEvaluacion($this->modalCodResidente, [
+                $evaluacionPrevia = app(SignosVitalesService::class)->preEvaluar([
                     'presion_sistolica' => $this->signoSis,
                     'presion_diastolica' => $this->signoDia,
                     'frecuencia_cardiaca' => $this->signoFC,
@@ -1343,69 +1321,86 @@ class MisPacientes extends Component
                     'temperatura' => $this->signoTemp,
                     'saturacion_oxigeno' => $this->signoSat,
                     'glucemia' => $this->signoGlucosa,
-                    'observacion' => $this->signoObs,
-                ], Auth::user());
-            } catch (ValidationException $exception) {
-                foreach ($exception->errors() as $campo => $mensajes) {
-                    $this->addError($campo, $mensajes[0]);
-                }
-                $this->dispatch('signos-validacion-fallida');
-                return;
-            } catch (QueryException $exception) {
-                report($exception);
-                $this->addError('signos_guardado', 'No se pudo guardar el registro. Conservamos los datos para que vuelvas a intentarlo.');
+                ], $this->modalCodResidente, Auth::user());
+            } catch (ValidationException) {
+                // El validador de registro devuelve los mensajes específicos
+                // de cada campo y conserva los valores para corregirlos.
+                $evaluacionPrevia = null;
+            }
+            $requiereConfirmacion = collect($evaluacionPrevia?->resultados ?? [])->contains(
+                fn ($resultado) => $resultado->severidad?->value === 'CRITICO'
+                    || $resultado->comportamientoAlerta->value === 'AUTOMATICA_AL_CONFIRMAR'
+            );
+            $presionAtipica = $evaluacionPrevia !== null
+                && is_numeric($this->signoSis) && is_numeric($this->signoDia)
+                && (float) $this->signoSis <= (float) $this->signoDia;
+            $huella = hash('sha256', json_encode([
+                $this->modalCodResidente, $this->signoSis, $this->signoDia, $this->signoFC,
+                $this->signoFR, $this->signoTemp, $this->signoSat, $this->signoGlucosa, $this->signoObs,
+            ]));
+            if (($requiereConfirmacion || $presionAtipica)
+                && (! $this->signosConfirmacionPendiente || $this->signosConfirmacionHuella !== $huella)) {
+                $this->signosEvaluacion = $evaluacionPrevia->toArray();
+                $this->signosConfirmacionPendiente = true;
+                $this->signosPasoConfirmacion = 'revision';
+                $this->signosConfirmacionHuella = $huella;
+                $this->dispatch('resident-directory-step-changed');
                 return;
             }
-
-            $this->signosResultadoRegistro = [
-                'cod_signo' => $registro->signo->cod_signo,
-                'cod_alerta' => $registro->alerta?->cod_alerta,
-                'hay_critico' => collect($registro->evaluacion->resultados)->contains(
-                    fn ($resultado) => $resultado->severidad?->value === 'CRITICO'
-                ),
-                'fecha_hora' => $registro->signo->fecha_hora?->timezone(config('app.timezone'))->format('d/m/Y H:i'),
-                'profesional' => Auth::user()?->name,
-                'mediciones' => array_values(array_filter([
-                    ['nombre' => 'Presión arterial', 'valor' => $registro->signo->presion_sistolica !== null && $registro->signo->presion_diastolica !== null
-                        ? $registro->signo->presion_sistolica.'/'.$registro->signo->presion_diastolica.' mmHg' : null],
-                    ['nombre' => 'Pulso', 'valor' => $registro->signo->frecuencia_cardiaca !== null ? $registro->signo->frecuencia_cardiaca.' lpm' : null],
-                    ['nombre' => 'Respiración', 'valor' => $registro->signo->frecuencia_respiratoria !== null ? $registro->signo->frecuencia_respiratoria.' rpm' : null],
-                    ['nombre' => 'Temperatura', 'valor' => $registro->signo->temperatura !== null ? $registro->signo->temperatura.' °C' : null],
-                    ['nombre' => 'Saturación', 'valor' => $registro->signo->saturacion_oxigeno !== null ? $registro->signo->saturacion_oxigeno.' %' : null],
-                    ['nombre' => 'Glucemia', 'valor' => $registro->signo->glucemia !== null ? $registro->signo->glucemia.' mg/dL' : null],
-                ], fn (array $medicion) => $medicion['valor'] !== null)),
-                'advertencias' => collect($registro->evaluacion->resultados)
-                    ->filter(fn ($resultado) => in_array($resultado->severidad?->value, ['ADVERTENCIA', 'ALTO'], true))
-                    ->map(fn ($resultado) => ['variable' => str_replace('_', ' ', $resultado->variable), 'valor' => $resultado->valor, 'unidad' => $resultado->unidad])
-                    ->values()->all(),
-            ];
-            $this->signosConfirmacionPendiente = false;
-            $this->signosPasoConfirmacion = 'revision';
-            $this->drawerPaso = 'register-result';
-            $this->dispatch('signos-actualizados');
-            $this->dispatch('resident-directory-step-changed');
-
+            if ($requiereConfirmacion && $this->signosPasoConfirmacion !== 'final') {
+                $this->signosPasoConfirmacion = 'final';
+                $this->dispatch('resident-directory-step-changed');
+                return;
+            }
+            $registro = app(SignosVitalesService::class)->registrarConEvaluacion($this->modalCodResidente, [
+                'presion_sistolica' => $this->signoSis,
+                'presion_diastolica' => $this->signoDia,
+                'frecuencia_cardiaca' => $this->signoFC,
+                'frecuencia_respiratoria' => $this->signoFR,
+                'temperatura' => $this->signoTemp,
+                'saturacion_oxigeno' => $this->signoSat,
+                'glucemia' => $this->signoGlucosa,
+                'observacion' => $this->signoObs,
+            ], Auth::user());
+        } catch (ValidationException $exception) {
+            foreach ($exception->errors() as $campo => $mensajes) {
+                $this->addError($campo, $mensajes[0]);
+            }
+            $this->dispatch('signos-validacion-fallida');
+            return;
+        } catch (QueryException $exception) {
+            report($exception);
+            $this->addError('signos_guardado', 'No se pudo guardar el registro. Conservamos los datos para que vuelvas a intentarlo.');
             return;
         }
 
-        app(SignosVitalesService::class)->registrar($this->modalCodResidente, [
-            'presion_arterial' => $this->signoPA,
-            'frecuencia_cardiaca' => $this->signoFC,
-            'frecuencia_respiratoria' => $this->signoFR,
-            'temperatura' => $this->signoTemp,
-            'saturacion' => $this->signoSat,
-            'glucosa' => $this->signoGlucosa,
-            'valor_atipico_confirmado' => $this->signoConfirmarAtipico,
-            'observacion' => $this->signoObs,
-        ], Auth::user());
-
-        $this->modalSignos = false;
-        $this->modalCodResidente = null;
-        if ($this->residente) {
-            $this->seleccionarResidente($this->residente);
-        }
+        $this->signosResultadoRegistro = [
+            'cod_signo' => $registro->signo->cod_signo,
+            'cod_alerta' => $registro->alerta?->cod_alerta,
+            'hay_critico' => collect($registro->evaluacion->resultados)->contains(
+                fn ($resultado) => $resultado->severidad?->value === 'CRITICO'
+            ),
+            'fecha_hora' => $registro->signo->fecha_hora?->timezone(config('app.timezone'))->format('d/m/Y H:i'),
+            'profesional' => Auth::user()?->name,
+            'mediciones' => array_values(array_filter([
+                ['nombre' => 'Presión arterial', 'valor' => $registro->signo->presion_sistolica !== null && $registro->signo->presion_diastolica !== null
+                    ? $registro->signo->presion_sistolica.'/'.$registro->signo->presion_diastolica.' mmHg' : null],
+                ['nombre' => 'Pulso', 'valor' => $registro->signo->frecuencia_cardiaca !== null ? $registro->signo->frecuencia_cardiaca.' lpm' : null],
+                ['nombre' => 'Respiración', 'valor' => $registro->signo->frecuencia_respiratoria !== null ? $registro->signo->frecuencia_respiratoria.' rpm' : null],
+                ['nombre' => 'Temperatura', 'valor' => $registro->signo->temperatura !== null ? $registro->signo->temperatura.' °C' : null],
+                ['nombre' => 'Saturación', 'valor' => $registro->signo->saturacion_oxigeno !== null ? $registro->signo->saturacion_oxigeno.' %' : null],
+                ['nombre' => 'Glucemia', 'valor' => $registro->signo->glucemia !== null ? $registro->signo->glucemia.' mg/dL' : null],
+            ], fn (array $medicion) => $medicion['valor'] !== null)),
+            'advertencias' => collect($registro->evaluacion->resultados)
+                ->filter(fn ($resultado) => in_array($resultado->severidad?->value, ['ADVERTENCIA', 'ALTO'], true))
+                ->map(fn ($resultado) => ['variable' => str_replace('_', ' ', $resultado->variable), 'valor' => $resultado->valor, 'unidad' => $resultado->unidad])
+                ->values()->all(),
+        ];
+        $this->signosConfirmacionPendiente = false;
+        $this->signosPasoConfirmacion = 'revision';
+        $this->drawerPaso = 'register-result';
         $this->dispatch('signos-actualizados');
-        $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Signos registrados correctamente.']);
+        $this->dispatch('resident-directory-step-changed');
     }
 
     public function cancelarConfirmacionSignos(): void
