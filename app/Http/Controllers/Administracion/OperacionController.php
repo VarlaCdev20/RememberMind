@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Administracion;
 
 use App\Backend\Modulos\Administracion\Servicios\ConsultaOperativaService;
 use App\Backend\Modulos\Administracion\Servicios\DirectorioResidentesService;
+use App\Backend\Modulos\Administracion\Servicios\MapaHabitacionesService;
 use App\Backend\Modulos\Administracion\Servicios\PanelResidenteService;
 use App\Http\Controllers\Controller;
 use App\Models\Residente;
@@ -17,10 +18,17 @@ class OperacionController extends Controller
         $definicion = $consulta->definicion($modulo);
         abort_unless($definicion, 404);
         abort_unless($request->user()?->can($definicion['permiso']), 403);
+        if ($modulo === 'habitaciones') {
+            abort_if($request->user()->hasRole('FAMILIAR'), 403);
+        }
 
         $filtros = $request->validate([
             'search' => ['nullable', 'string', 'max:100'],
-            'estado' => $modulo === 'residentes' ? ['nullable', 'string', 'max:30', 'exists:residentes,estado'] : ['nullable', 'string', 'max:30'],
+            'estado' => match ($modulo) {
+                'residentes' => ['nullable', 'string', 'max:30', 'exists:residentes,estado'],
+                'habitaciones' => ['nullable', 'string', 'max:30', 'exists:camas,estado'],
+                default => ['nullable', 'string', 'max:30'],
+            },
             'prioridad' => ['nullable', 'in:CRITICA,ALTA,MEDIA,BAJA'],
             'fecha' => ['nullable', 'date'],
             'tab' => ['nullable', 'string', 'max:30'],
@@ -28,14 +36,20 @@ class OperacionController extends Controller
             'hasta' => ['nullable', 'date', 'after_or_equal:desde'],
             'residente' => ['nullable', 'string', 'max:20'],
             'panel_tab' => ['nullable', 'in:resumen,datos,salud,documentos,historial'],
-            'vista' => ['nullable', $modulo === 'residentes' ? 'in:tarjetas,tabla,lista,camas' : 'in:tarjetas,tabla,lista'],
+            'vista' => ['nullable', in_array($modulo, ['residentes', 'habitaciones'], true) ? 'in:tarjetas,tabla,lista,camas' : 'in:tarjetas,tabla,lista'],
             'por_pagina' => ['nullable', 'integer', 'in:10,20,50'],
             'page' => ['nullable', 'integer', 'min:1'],
             'orden' => ['nullable', 'in:recientes,antiguas'],
             'piso' => ['nullable', 'string', 'max:30', ...($request->input('piso') === '__sin_piso__' ? [] : ['exists:habitaciones,piso'])],
             'cod_habitacion' => ['nullable', 'string', 'max:20', 'exists:habitaciones,cod_habitacion'],
             'alojamiento' => ['nullable', 'in:con_cama,sin_cama'],
+            'disponibilidad' => ['nullable', 'in:ocupado,disponible,no_habilitado'],
+            'cama' => ['nullable', 'string', 'max:20'],
         ]);
+        if ($modulo === 'habitaciones') {
+            return view('pages.admin.administracion.habitaciones', app(MapaHabitacionesService::class)->datos($filtros, $request->user()))
+                ->with(compact('filtros'));
+        }
         $registros = null;
         $reportes = [];
         $columnas = $consulta->columnas($modulo);
