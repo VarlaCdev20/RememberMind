@@ -149,6 +149,7 @@ import './modules/signos-vitales-registro.js';
 import './modules/filter-selection.js';
 import './modules/controles-institucionales.js';
 import './modules/admisiones-interactivas.js';
+import './modules/residentes-interactivos.js';
 
 import './modules/auth-login-parallax.js';
 import './modules/app-depth-motion.js';

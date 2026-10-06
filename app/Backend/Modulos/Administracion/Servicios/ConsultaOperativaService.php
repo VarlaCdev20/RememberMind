@@ -137,21 +137,8 @@ class ConsultaOperativaService
                 );
             case 'residentes':
                 return $this->armar(
-                    DB::table('residentes as r')
-                        ->leftJoin('ocupaciones_cama as oc', fn ($join) => $join->on('oc.cod_residente', '=', 'r.cod_residente')
-                            ->whereNull('oc.fecha_hora_liberacion')->where('oc.estado', 'ACTIVA'))
-                        ->leftJoin('camas as c', 'c.cod_cama', '=', 'oc.cod_cama')
-                        ->leftJoin('habitaciones as h', 'h.cod_habitacion', '=', 'c.cod_habitacion')
-                        ->leftJoin('residentes_contactos as rc', fn ($join) => $join->on('rc.cod_residente', '=', 'r.cod_residente')
-                            ->where('rc.responsable_principal', true)->where('rc.estado', 'ACTIVO'))
-                        ->leftJoin('contactos as co', 'co.cod_contacto', '=', 'rc.cod_contacto')
-                        ->select('r.cod_residente as codigo', 'r.numero_documento as documento',
-                            'r.fecha_nacimiento as fecha', 'r.foto', 'h.codigo as habitacion', 'h.nombre as sector',
-                            'c.codigo as cama', 'rc.parentesco', 'r.estado as estado')
-                        ->selectRaw("TRIM(r.nombres || ' ' || r.apellido_paterno || ' ' || COALESCE(r.apellido_materno, '')) as titulo")
-                        ->selectRaw("TRIM(COALESCE(co.nombres, '') || ' ' || COALESCE(co.apellido_paterno, '') || ' ' || COALESCE(co.apellido_materno, '')) as responsable")
-                        ->selectRaw("CASE WHEN EXISTS (SELECT 1 FROM admisiones ad WHERE ad.cod_residente = r.cod_residente) THEN 'Registrada' ELSE 'Sin admisión' END as admision"),
-                    ['r.nombres', 'r.apellido_paterno', 'r.numero_documento', 'r.cod_residente'], 'r.estado', 'r.cod_residente'
+                    app(DirectorioResidentesService::class)->consulta(),
+                    ['r.nombres', 'r.apellido_paterno', 'r.apellido_materno', 'r.numero_documento', 'r.cod_residente', 'h.codigo', 'h.nombre', 'c.codigo'], 'r.estado', 'r.cod_residente'
                 );
             case 'habitaciones':
                 $query = DB::table('camas as c')->join('habitaciones as h', 'h.cod_habitacion', '=', 'c.cod_habitacion')

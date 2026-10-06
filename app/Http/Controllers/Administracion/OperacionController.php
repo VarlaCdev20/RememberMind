@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Administracion;
 
 use App\Backend\Modulos\Administracion\Servicios\ConsultaOperativaService;
+use App\Backend\Modulos\Administracion\Servicios\DirectorioResidentesService;
 use App\Backend\Modulos\Administracion\Servicios\PanelResidenteService;
 use App\Http\Controllers\Controller;
 use App\Models\Residente;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class OperacionController extends Controller
 {
-    public function index(Request $request, ConsultaOperativaService $consulta, PanelResidenteService $panelService, string $modulo)
+    public function index(Request $request, ConsultaOperativaService $consulta, PanelResidenteService $panelService, DirectorioResidentesService $directorio, string $modulo)
     {
         $definicion = $consulta->definicion($modulo);
         abort_unless($definicion, 404);
@@ -19,7 +20,7 @@ class OperacionController extends Controller
 
         $filtros = $request->validate([
             'search' => ['nullable', 'string', 'max:100'],
-            'estado' => ['nullable', 'string', 'max:30'],
+            'estado' => $modulo === 'residentes' ? ['nullable', 'string', 'max:30', 'exists:residentes,estado'] : ['nullable', 'string', 'max:30'],
             'prioridad' => ['nullable', 'in:CRITICA,ALTA,MEDIA,BAJA'],
             'fecha' => ['nullable', 'date'],
             'tab' => ['nullable', 'string', 'max:30'],
@@ -27,9 +28,13 @@ class OperacionController extends Controller
             'hasta' => ['nullable', 'date', 'after_or_equal:desde'],
             'residente' => ['nullable', 'string', 'max:20'],
             'panel_tab' => ['nullable', 'in:resumen,datos,salud,documentos,historial'],
-            'vista' => ['nullable', 'in:tarjetas,tabla,lista'],
+            'vista' => ['nullable', $modulo === 'residentes' ? 'in:tarjetas,tabla,lista,camas' : 'in:tarjetas,tabla,lista'],
             'por_pagina' => ['nullable', 'integer', 'in:10,20,50'],
+            'page' => ['nullable', 'integer', 'min:1'],
             'orden' => ['nullable', 'in:recientes,antiguas'],
+            'piso' => ['nullable', 'string', 'max:30', ...($request->input('piso') === '__sin_piso__' ? [] : ['exists:habitaciones,piso'])],
+            'cod_habitacion' => ['nullable', 'string', 'max:20', 'exists:habitaciones,cod_habitacion'],
+            'alojamiento' => ['nullable', 'in:con_cama,sin_cama'],
         ]);
         $registros = null;
         $reportes = [];
@@ -50,23 +55,16 @@ class OperacionController extends Controller
             $resumenAdmision = $consulta->resumenAdmision($estadosAdmision);
         }
         if ($modulo === 'residentes') {
-            $residentes = DB::table('residentes as r')->whereIn('r.estado', ['ACTIVO', 'ADMITIDO']);
-            $resumenResidentes = [
-                'sin_admision' => (clone $residentes)->whereNotExists(fn ($query) => $query->selectRaw('1')
-                    ->from('admisiones as ad')->whereColumn('ad.cod_residente', 'r.cod_residente'))->count(),
-                'sin_cama' => (clone $residentes)->whereNotExists(fn ($query) => $query->selectRaw('1')
-                    ->from('ocupaciones_cama as oc')->whereColumn('oc.cod_residente', 'r.cod_residente')
-                    ->where('oc.estado', 'ACTIVA')->whereNull('oc.fecha_hora_liberacion'))->count(),
-                'sin_responsable' => (clone $residentes)->whereNotExists(fn ($query) => $query->selectRaw('1')
-                    ->from('residentes_contactos as rc')->whereColumn('rc.cod_residente', 'r.cod_residente')
-                    ->where('rc.estado', 'ACTIVO')->where('rc.responsable_principal', true))->count(),
-            ];
+            $this->authorize('viewAny', Residente::class);
             if (filled($filtros['residente'] ?? null)) {
                 $panelResidente = Residente::query()->findOrFail($filtros['residente']);
                 $this->authorize('view', $panelResidente);
                 $panelTab = $filtros['panel_tab'] ?? 'resumen';
                 $panelDatos = $panelService->datos($panelResidente, $panelTab);
             }
+
+            return view('pages.admin.administracion.residentes', $directorio->datos($filtros, $vistaResidentes, $porPagina))
+                ->with(compact('modulo', 'definicion', 'filtros', 'columnas', 'panelResidente', 'panelTab', 'panelDatos', 'vistaResidentes', 'porPagina'));
         }
         $tab = $filtros['tab'] ?? ($modulo === 'admisiones' && $resumenAdmision['por_formalizar'] === 0
             ? 'admitidos' : array_key_first($tabs));

@@ -4,11 +4,12 @@ Punto de entrada para mejorar el rol **ADMINISTRADOR** por procesos. Leer única
 
 ## Etapa actual
 
-**Admisiones**, iniciada el 2026-10-06. Bandeja rediseñada e integrada: tres vistas, filtros, resumen rápido y paginación compartida. Se reforzaron autorización y disponibilidad del ingreso formal. La interfaz de preadmisiones ya tiene cambios documentados, pero eso no acredita que todo el proceso de admisión esté terminado.
+**Residentes y alojamiento**, iniciada el 2026-10-06. Directorio con cuatro vistas, gráficos reales, mapa por pisos/habitaciones y traslado interno con prevención e historial. Admisiones conserva su bandeja ya integrada. Estas entregas no acreditan que todo el rol administrador esté terminado.
 
 - [Admisiones: funcionamiento, mejoras y verificación](01-ADMISIONES.md).
 - [Preadmisiones: controles, vistas y verificación](../frontend/PREADMISIONES_INTERACTIVAS.md).
 - [Componentes compartidos: paginación, selectores y menú](02-COMPONENTES-COMPARTIDOS.md).
+- [Residentes y alojamiento: mapa, traslado, permisos y verificación](03-RESIDENTES-Y-ALOJAMIENTO.md).
 - [Roles y responsabilidades vigentes](../arquitectura/REMEMBERMIND_ROLES_BASELINE_CONGELADO.md).
 - [Baseline de datos](../base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md) y [extensión V2.2 aprobada](../base-de-datos/DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md): inventario actual de 71 tablas, estructura congelada.
 
@@ -17,8 +18,8 @@ Punto de entrada para mejorar el rol **ADMINISTRADOR** por procesos. Leer única
 | Etapa | Proceso | Estado |
 | --- | --- | --- |
 | 1 | Preadmisión, revisión e ingreso formal | Bandeja y refuerzos de ingreso verificados; concurrencia PostgreSQL pendiente |
-| 2 | Habitaciones y ocupación | Pendiente; verificar disponibilidad como dependencia de etapa 1 |
-| 3 | Residentes y expediente administrativo | Pendiente |
+| 2 | Habitaciones y ocupación | Mapa y traslado interno integrados; mantenimiento completo y concurrencia PostgreSQL pendientes |
+| 3 | Residentes y expediente administrativo | Directorio y panel integrados; revisión completa del expediente y cierre de estancia pendientes |
 | 4 | Contactos, documentación, consentimientos y seguros | Pendiente; revisar dependencias del ingreso en etapa 1 |
 | 5 | Jornadas, asignaciones, actividades y visitas | Pendiente |
 | 6 | Alertas e incidentes operativos | Pendiente |
