@@ -1,5 +1,6 @@
 <div class="rm-modal-shell rm-admin-wizard-shell fixed inset-0 flex items-center justify-center p-4">
- <div x-data="{ isDirty: false }" x-on:input="isDirty = true" x-on:change="isDirty = true" role="dialog" aria-modal="true" aria-labelledby="admin-preadmission-title" class="rm-modal-panel rm-admin-wizard relative mx-auto flex w-full max-w-4xl flex-col overflow-hidden">
+ <div x-data="{ isDirty: false }" x-trap.inert.noscroll="true" x-effect="if ($wire.guardadoExitoso) isDirty = false" x-on:input="isDirty = true" x-on:change="isDirty = true" role="dialog" aria-modal="true" aria-labelledby="admin-preadmission-title" class="rm-modal-panel rm-admin-wizard relative mx-auto flex w-full max-w-6xl flex-col overflow-hidden">
+ <div id="rm-wizard-control-layer"></div>
  <!-- Header -->
  <div class="rm-modal-header rm-admin-wizard__header flex items-start justify-between">
   <div class="flex items-center gap-3">
@@ -54,7 +55,7 @@
   5 => 'Documentos'
   ];
 
-  // Simular errores para el stepper
+  // Errores reales de validación por paso
   $pasosErrores = [
   1 => $errors->has('nombres') || $errors->has('ap_paterno') || $errors->has('ap_materno') || $errors->has('ci') || $errors->has('expedicion_ci') || $errors->has('fecha_nac') || $errors->has('genero') || $errors->has('estado_civil') || $errors->has('telefono') || $errors->has('celular'),
   2 => $errors->has('departamento_residencia') || $errors->has('ciudad_municipio') || $errors->has('zona') || $errors->has('calle') || $errors->has('direccion_referencia'),
@@ -64,55 +65,23 @@
   ];
  @endphp
 
- <!-- Stepper Compacto -->
- <div class="rm-admin-wizard__steps">
-  <div class="relative flex items-center justify-between w-full pb-3">
-  <!-- Linea de fondo -->
-  <div class="absolute left-5 right-5 top-4 transform -translate-y-1/2 h-[3px] bg-borde/40 rounded-full z-0"></div>
-  <!-- Linea de progreso -->
-  <div class="absolute left-5 top-4 transform -translate-y-1/2 h-[3px] bg-boton-acento rounded-full z-0 transition-all duration-500 ease-out" style="width: calc({{ (($paso - 1) / 4) * 100 }}% - 2.5rem)"></div>
-
+ <!-- Avance del formulario -->
+ <div class="rm-wizard-flow">
+ <aside class="rm-wizard-guide" aria-label="Avance de la preadmisión">
+  <p class="rm-wizard-guide__eyebrow">UN NUEVO COMIENZO</p>
+  <h4>Una solicitud,<br>paso a paso.</h4>
+  <p>Completa la información para acompañar una decisión bien informada.</p>
+  <div class="rm-wizard-progress"><span>Paso {{ $paso }} de {{ $totalPasos }}</span><strong>{{ round($paso / $totalPasos * 100) }}%</strong><progress value="{{ $paso }}" max="{{ $totalPasos }}">{{ $paso }}/{{ $totalPasos }}</progress></div>
+  <nav aria-label="Pasos del formulario">
   @foreach($pasoActualsLista as $num => $nombre)
-   <div class="relative z-10 flex flex-col items-center group">
-   @php
-    $hasError = $pasosErrores[$num] ?? false;
-    $isCompleted = $paso > $num;
-    $isActive = $paso == $num;
-   @endphp
-   <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition-all duration-300 {{
-    $hasError
-    ? 'bg-estado-peligroBg text-estado-peligro border-2 border-estado-peligro'
-    : ($isActive
-     ? 'bg-boton-acento text-inverso ring-4 ring-boton-acento/20 scale-105 shadow-md'
-     : ($isCompleted
-     ? 'bg-boton-acento text-inverso hover:bg-boton-acentoHover'
-     : 'bg-fondo-card text-apoyo/40 border-2 border-borde/60 hover:border-apoyo/30'))
-   }}">
-    @if($hasError)
-    <i class="ph-bold ph-warning text-sm"></i>
-    @elseif($isCompleted)
-    <i class="ph-bold ph-check text-sm"></i>
-    @else
-    {{ $num }}
-    @endif
-   </div>
-   <span class="absolute top-9 text-[9px] font-bold uppercase tracking-wider whitespace-nowrap transition-colors duration-300 {{
-    $hasError
-    ? 'text-estado-peligro'
-    : ($isActive
-     ? 'text-boton-acento font-black scale-105 origin-top'
-     : ($isCompleted
-     ? 'text-titulo/70'
-     : 'text-apoyo/40'))
-   }} hidden sm:block">{{ $nombre }}</span>
-   </div>
+   <button type="button" wire:click="volverPaso({{ $num }})" @disabled($num >= $paso) @if($num === $paso) aria-current="step" @endif class="{{ $pasosErrores[$num] ? 'has-error' : '' }} {{ $num < $paso ? 'is-complete' : '' }}">
+    <span><i class="ph-bold {{ $pasosErrores[$num] ? 'ph-warning' : ($num < $paso ? 'ph-check' : ([1 => 'ph-user', 2 => 'ph-map-pin', 3 => 'ph-users', 4 => 'ph-note', 5 => 'ph-files'][$num])) }}" aria-hidden="true"></i></span>
+    <div><strong>{{ $nombre }}</strong><small>{{ [1 => 'Conocemos al postulante', 2 => 'Su lugar de referencia', 3 => 'Su red de apoyo', 4 => 'El motivo de la solicitud', 5 => 'Revisar y registrar'][$num] }}</small></div>
+   </button>
   @endforeach
-  </div>
-  <div class="text-center sm:hidden mt-2">
-  <span class="text-[11px] font-black text-boton-acento uppercase tracking-wider bg-boton-acento/10 px-3 py-1.5 rounded-full">Paso {{ $paso }}: {{ $pasoActualsLista[$paso] }}</span>
-  </div>
- </div>
-
+  </nav>
+  <div class="rm-wizard-guide__note"><i class="ph-bold ph-shield-check" aria-hidden="true"></i><p>Registrar esta solicitud <strong>no crea un residente</strong>. El ingreso se formaliza después de la aprobación.</p></div>
+ </aside>
  <!-- Form Body -->
  <div class="rm-modal-body rm-admin-wizard__body flex-1 min-h-0 overflow-y-auto overflow-x-hidden space-y-2 custom-scrollbar">
  @if($guardadoExitoso)
@@ -156,82 +125,66 @@
    'ci' => 'CI *',
    ] as $field => $label)
    <div>
-    <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">{{ $label }}</label>
-    <input type="text" wire:model.blur="{{ $field }}" @class([
+    <label for="pre-{{ $field }}" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">{{ $label }}</label>
+<input type="text" wire:model.blur="{{ $field }}" id="pre-{{ $field }}" @class([
  'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
  'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has($field),
  'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has($field),
  ])>
-    @error($field) <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+    @error($field) <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
    @endforeach
    <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Expedicion CI *</label>
-   <select wire:model.blur="expedicion_ci" @class([
- 'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
- 'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('expedicion_ci'),
- 'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('expedicion_ci'),
- ])>
+   <label for="pre-expedicion_ci" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Expedicion CI *</label>
+<x-ui.selector teleport="#rm-wizard-control-layer" label="Expedición CI" wire:model.blur="expedicion_ci" id="pre-expedicion_ci">
     <option value="">Seleccionar</option>
     @foreach (['LP','SC','CB','OR','PT','CH','TJ','BE','PA'] as $dep)
     <option value="{{ $dep }}">{{ $dep }}</option>
     @endforeach
-   </select>
-    @error('expedicion_ci') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+   </x-ui.selector>
+    @error('expedicion_ci') <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
    <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Fecha de nacimiento *</label>
-   <input type="date" wire:model.blur="fecha_nac" @class([
- 'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
- 'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('fecha_nac'),
- 'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('fecha_nac'),
- ])>
-    @error('fecha_nac') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+   <label for="pre-fecha_nac" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Fecha de nacimiento *</label>
+<x-ui.calendario teleport="#rm-wizard-control-layer" label="Fecha de nacimiento" wire:model.blur="fecha_nac" id="pre-fecha_nac" :max="now()->subYears(60)->toDateString()" />
+    @error('fecha_nac') <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
    <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Genero *</label>
-   <select wire:model.blur="genero" @class([
- 'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
- 'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('genero'),
- 'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('genero'),
- ])>
+   <label for="pre-genero" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Genero *</label>
+<x-ui.selector teleport="#rm-wizard-control-layer" label="Género" wire:model.blur="genero" id="pre-genero">
     <option value="">Seleccionar</option>
     <option value="MASCULINO">Masculino</option>
     <option value="FEMENINO">Femenino</option>
     <option value="OTRO">Otro</option>
-   </select>
-    @error('genero') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+   </x-ui.selector>
+    @error('genero') <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
    <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Estado civil</label>
-   <select wire:model.blur="estado_civil" @class([
- 'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
- 'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('estado_civil'),
- 'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('estado_civil'),
- ])>
+   <label for="pre-estado_civil" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Estado civil</label>
+<x-ui.selector teleport="#rm-wizard-control-layer" label="Estado civil" wire:model.blur="estado_civil" id="pre-estado_civil">
     @foreach (['NO ESPECIFICADO','SOLTERO/A','CASADO/A','VIUDO/A','DIVORCIADO/A','UNION LIBRE'] as $estadoCivil)
     <option value="{{ $estadoCivil }}">{{ $estadoCivil }}</option>
     @endforeach
-   </select>
-    @error('estado_civil') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+   </x-ui.selector>
+    @error('estado_civil') <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
    <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Telefono</label>
-   <input type="text" wire:model.blur="telefono" @class([
+   <label for="pre-telefono" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Telefono</label>
+<input type="text" wire:model.blur="telefono" id="pre-telefono" @class([
  'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
  'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('telefono'),
  'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('telefono'),
  ])>
-    @error('telefono') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+    @error('telefono') <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
    <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Celular</label>
-   <input type="text" wire:model.blur="celular" @class([
+   <label for="pre-celular" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Celular</label>
+<input type="text" wire:model.blur="celular" id="pre-celular" @class([
  'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
  'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('celular'),
  'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('celular'),
  ])>
-    @error('celular') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+    @error('celular') <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
   </div>
   </div>
@@ -242,18 +195,14 @@
   </h4>
   <div class="grid gap-2 md:grid-cols-2">
    <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Departamento *</label>
-   <select wire:model.blur="departamento_residencia" @class([
- 'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
- 'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('departamento_residencia'),
- 'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('departamento_residencia'),
- ])>
+   <label for="pre-departamento_residencia" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Departamento *</label>
+<x-ui.selector teleport="#rm-wizard-control-layer" label="Departamento" wire:model.blur="departamento_residencia" id="pre-departamento_residencia">
     <option value="">Seleccionar</option>
     @foreach (['LA PAZ','SANTA CRUZ','COCHABAMBA','ORURO','POTOSI','CHUQUISACA','TARIJA','BENI','PANDO'] as $dep)
     <option value="{{ $dep }}">{{ $dep }}</option>
     @endforeach
-   </select>
-    @error('departamento_residencia') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+   </x-ui.selector>
+    @error('departamento_residencia') <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
    @foreach ([
    'ciudad_municipio' => 'Ciudad / municipio *',
@@ -261,23 +210,23 @@
    'calle' => 'Calle / avenida *',
    ] as $field => $label)
    <div>
-    <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">{{ $label }}</label>
-    <input type="text" wire:model.blur="{{ $field }}" @class([
+    <label for="pre-{{ $field }}" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">{{ $label }}</label>
+<input type="text" wire:model.blur="{{ $field }}" id="pre-{{ $field }}" @class([
  'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
  'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has($field),
  'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has($field),
  ])>
-    @error($field) <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+    @error($field) <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
    @endforeach
    <div class="md:col-span-2">
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Referencia de direccion</label>
-   <textarea wire:model.blur="direccion_referencia" rows="3" @class([
+   <label for="pre-direccion_referencia" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Referencia de direccion</label>
+<textarea wire:model.blur="direccion_referencia" id="pre-direccion_referencia" rows="3" @class([
  'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
  'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('direccion_referencia'),
  'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('direccion_referencia'),
  ])></textarea>
-    @error('direccion_referencia') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+    @error('direccion_referencia') <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
   </div>
   </div>
@@ -289,60 +238,56 @@
   <div class="grid gap-2 md:grid-cols-3">
    @foreach ([
    'familiar_nombres' => 'Nombres *',
-   'familiar_ap_paterno' => 'Apellido paterno',
+   'familiar_ap_paterno' => 'Apellido paterno *',
    'familiar_ap_materno' => 'Apellido materno',
-   'familiar_ci' => 'CI familiar',
+   'familiar_ci' => 'CI familiar *',
    ] as $field => $label)
    <div>
-    <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">{{ $label }}</label>
-    <input type="text" wire:model.blur="{{ $field }}" @class([
+    <label for="pre-{{ $field }}" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">{{ $label }}</label>
+<input type="text" wire:model.blur="{{ $field }}" id="pre-{{ $field }}" @class([
  'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
  'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has($field),
  'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has($field),
  ])>
-    @error($field) <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+    @error($field) <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
    @endforeach
    <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Parentesco *</label>
-   <select wire:model.blur="familiar_parentesco" @class([
- 'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
- 'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('familiar_parentesco'),
- 'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('familiar_parentesco'),
- ])>
+   <label for="pre-familiar_parentesco" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Parentesco *</label>
+<x-ui.selector teleport="#rm-wizard-control-layer" label="Parentesco" wire:model.blur="familiar_parentesco" id="pre-familiar_parentesco">
     <option value="">Seleccionar</option>
     @foreach (['HIJO/A','ESPOSO/A','HERMANO/A','SOBRINO/A','NIETO/A','TUTOR/A','APODERADO/A','OTRO'] as $parentesco)
-    <option value="{{ $parentesco }}">{{ $parentesco }}</option>
+    <option value="{{ $familiar_parentesco }}">{{ $familiar_parentesco }}</option>
     @endforeach
-   </select>
-    @error('familiar_parentesco') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+   </x-ui.selector>
+    @error('familiar_parentesco') <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
    <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Celular *</label>
-   <input type="text" wire:model.blur="familiar_celular" @class([
+   <label for="pre-familiar_celular" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Celular *</label>
+<input type="text" wire:model.blur="familiar_celular" id="pre-familiar_celular" @class([
  'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
  'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('familiar_celular'),
  'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('familiar_celular'),
  ])>
-    @error('familiar_celular') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+    @error('familiar_celular') <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
    <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Correo</label>
-   <input type="email" wire:model.blur="familiar_correo" @class([
+   <label for="pre-familiar_correo" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Correo</label>
+<input type="email" wire:model.blur="familiar_correo" id="pre-familiar_correo" @class([
  'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
  'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('familiar_correo'),
  'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('familiar_correo'),
  ])>
-    @error('familiar_correo') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+    @error('familiar_correo') <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
    <div class="md:col-span-2">
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Direccion familiar</label>
-   <textarea wire:model.blur="familiar_direccion" rows="3" @class([
+   <label for="pre-familiar_direccion" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Direccion familiar</label>
+<textarea wire:model.blur="familiar_direccion" id="pre-familiar_direccion" rows="3" @class([
  'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
  'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('familiar_direccion'),
  'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('familiar_direccion'),
  ])></textarea>
-    @error('familiar_direccion') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+    @error('familiar_direccion') <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
   </div>
   </div>
@@ -353,80 +298,60 @@
   </h4>
   <div class="grid gap-2 md:grid-cols-2">
    <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Motivo de ingreso *</label>
-   <select wire:model.blur="motivo_ingreso" @class([
- 'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
- 'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('motivo_ingreso'),
- 'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('motivo_ingreso'),
- ])>
+   <label for="pre-motivo_ingreso" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Motivo de ingreso *</label>
+<x-ui.selector teleport="#rm-wizard-control-layer" label="Motivo de ingreso" wire:model.blur="motivo_ingreso" id="pre-motivo_ingreso">
     <option value="">Seleccionar</option>
     @foreach (['CUIDADO_PERMANENTE','CUIDADO_TEMPORAL','CONTROL_MEDICACION','RIESGO_CAIDAS','DEPENDENCIA_FUNCIONAL','SOLEDAD_FAMILIAR','RECUPERACION_POST_HOSPITALARIA','OTRO'] as $motivo)
     <option value="{{ $motivo }}">{{ str_replace('_', ' ', $motivo) }}</option>
     @endforeach
-   </select>
-    @error('motivo_ingreso') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+   </x-ui.selector>
+    @error('motivo_ingreso') <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
    <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Procedencia *</label>
-   <select wire:model.blur="procedencia_ingreso" @class([
- 'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
- 'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('procedencia_ingreso'),
- 'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('procedencia_ingreso'),
- ])>
+   <label for="pre-procedencia_ingreso" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Procedencia *</label>
+<x-ui.selector teleport="#rm-wizard-control-layer" label="Procedencia" wire:model.blur="procedencia_ingreso" id="pre-procedencia_ingreso">
     <option value="">Seleccionar</option>
     @foreach (['DOMICILIO_FAMILIAR','HOSPITAL','OTRO_CENTRO_GERIATRICO','INSTITUCION_SOCIAL','CONSULTA_MEDICA_EXTERNA','OTRO'] as $procedencia)
     <option value="{{ $procedencia }}">{{ str_replace('_', ' ', $procedencia) }}</option>
     @endforeach
-   </select>
-    @error('procedencia_ingreso') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+   </x-ui.selector>
+    @error('procedencia_ingreso') <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
    <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Tipo de ingreso *</label>
-   <select wire:model.blur="tipo_ingreso" @class([
- 'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
- 'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('tipo_ingreso'),
- 'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('tipo_ingreso'),
- ])>
+   <label for="pre-tipo_ingreso" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Tipo de ingreso *</label>
+<x-ui.selector teleport="#rm-wizard-control-layer" label="Tipo de ingreso" wire:model.blur="tipo_ingreso" id="pre-tipo_ingreso">
     <option value="REGULAR">Regular</option>
     <option value="URGENTE">Urgente</option>
     <option value="DERIVACION">Derivacion</option>
-   </select>
-    @error('tipo_ingreso') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+   </x-ui.selector>
+    @error('tipo_ingreso') <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
    <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Permanencia *</label>
-   <select wire:model.blur="permanencia" @class([
- 'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
- 'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('permanencia'),
- 'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('permanencia'),
- ])>
+   <label for="pre-permanencia" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Permanencia *</label>
+<x-ui.selector teleport="#rm-wizard-control-layer" label="Permanencia" wire:model.blur="permanencia" id="pre-permanencia">
     <option value="PERMANENTE">Permanente</option>
     <option value="TEMPORAL">Temporal</option>
     <option value="OBSERVACION">Observacion</option>
-   </select>
-    @error('permanencia') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+   </x-ui.selector>
+    @error('permanencia') <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
    <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Prioridad *</label>
-   <select wire:model.blur="prioridad" @class([
- 'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
- 'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('prioridad'),
- 'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('prioridad'),
- ])>
+   <label for="pre-prioridad" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Prioridad *</label>
+<x-ui.selector teleport="#rm-wizard-control-layer" label="Prioridad" wire:model.blur="prioridad" id="pre-prioridad">
     @foreach (['BAJA','MEDIA','ALTA','CRITICA'] as $nivel)
     <option value="{{ $nivel }}">{{ $nivel }}</option>
     @endforeach
-   </select>
-    @error('prioridad') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+   </x-ui.selector>
+    @error('prioridad') <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
    <div class="md:col-span-2">
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Descripcion del caso</label>
-   <textarea wire:model.blur="descripcion_caso" rows="4" @class([
+   <label for="pre-descripcion_caso" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Descripcion del caso</label>
+<textarea wire:model.blur="descripcion_caso" id="pre-descripcion_caso" rows="4" @class([
  'w-full rounded-xl border bg-input-bg py-1.5 text-xs text-input-texto',
  'border-estado-peligro focus:border-estado-peligro focus:ring-estado-peligro' => $errors->has('descripcion_caso'),
  'border-input-borde focus:border-input-bordeFocus focus:ring-input-ringFocus' => !$errors->has('descripcion_caso'),
  ])></textarea>
-    @error('descripcion_caso') <span class="mt-1 block text-[11px] font-bold text-estado-peligro">{{ $message }}</span> @enderror
+    @error('descripcion_caso') <span class="mt-1 block text-xs font-bold text-estado-peligro">{{ $message }}</span> @enderror
    </div>
   </div>
   </div>
@@ -441,6 +366,14 @@
    </span>
   </div>
 
+  <section class="rm-wizard-review" aria-label="Revisa los datos antes de registrar">
+   <header><h5>Revisa antes de registrar</h5><p>Corrige cualquier dato desde su paso. La solicitud quedará pendiente de revisión.</p></header>
+   <div>
+    <article><i class="ph-bold ph-user" aria-hidden="true"></i><span><small>Postulante</small><strong>{{ trim($nombres.' '.$ap_paterno.' '.$ap_materno) }}</strong><small>CI {{ $ci }} {{ $expedicion_ci }}</small></span><button type="button" wire:click="volverPaso(1)" aria-label="Editar datos del postulante"><i class="ph-bold ph-pencil-simple" aria-hidden="true"></i></button></article>
+    <article><i class="ph-bold ph-users" aria-hidden="true"></i><span><small>Responsable</small><strong>{{ trim($familiar_nombres.' '.$familiar_ap_paterno.' '.$familiar_ap_materno) }}</strong><small>{{ $familiar_parentesco }}</small></span><button type="button" wire:click="volverPaso(3)" aria-label="Editar datos del responsable"><i class="ph-bold ph-pencil-simple" aria-hidden="true"></i></button></article>
+    <article><i class="ph-bold ph-note" aria-hidden="true"></i><span><small>Solicitud</small><strong>{{ str_replace('_', ' ', $motivo_ingreso) }}</strong><small>{{ str_replace('_', ' ', $permanencia) }}</small></span><button type="button" wire:click="volverPaso(4)" aria-label="Editar datos de la solicitud"><i class="ph-bold ph-pencil-simple" aria-hidden="true"></i></button></article>
+   </div>
+  </section>
   {{-- Documentos del Solicitante --}}
   <div class="rm-admin-wizard__group space-y-2 p-3 md:p-4">
    <div class="flex items-center gap-2 pb-3 border-b border-borde/50">
@@ -467,41 +400,41 @@
      <i class="ph-fill {{ $docSubido ? 'ph-check-circle' : ($es48hPend ? 'ph-clock' : 'ph-file-text') }} text-lg"></i>
      </div>
      <div class="min-w-0 flex-1">
-     <h6 class="text-[11px] font-bold text-titulo">{{ $docConf['nombre'] }}</h6>
-     <p class="text-[9px] text-apoyo mt-0.5">{{ $docConf['descripcion'] }}</p>
+     <h6 class="text-xs font-bold text-titulo">{{ $docConf['nombre'] }}</h6>
+     <p class="text-xs text-apoyo mt-0.5">{{ $docConf['descripcion'] }}</p>
      <div class="flex flex-wrap items-center gap-1 mt-1">
       @if($bloqueante)
-      <span class="px-1.5 py-0.5 rounded text-[8px] font-black bg-estado-peligroBg text-estado-peligro border border-estado-peligro/20 uppercase">Obligatorio hoy</span>
+      <span class="px-1.5 py-0.5 rounded text-xs font-black bg-estado-peligroBg text-estado-peligro border border-estado-peligro/20 uppercase">Obligatorio hoy</span>
       @elseif($permite48h)
-      <span class="px-1.5 py-0.5 rounded text-[8px] font-black bg-estado-advertenciaBg text-estado-advertencia border border-estado-advertenciaBorde uppercase">Permite 48 h</span>
+      <span class="px-1.5 py-0.5 rounded text-xs font-black bg-estado-advertenciaBg text-estado-advertencia border border-estado-advertenciaBorde uppercase">Permite 48 h</span>
       @endif
       @if($docConf['requiere_firma'])
-      <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-estado-infoBg text-estado-info border border-estado-infoBorde uppercase">Requiere firma</span>
+      <span class="px-1.5 py-0.5 rounded text-xs font-bold bg-estado-infoBg text-estado-info border border-estado-infoBorde uppercase">Requiere firma</span>
       @endif
      </div>
      @error($propiedad)
-      <p class="text-[9px] text-estado-peligro font-bold mt-0.5">{{ $message }}</p>
+      <p class="text-xs text-estado-peligro font-bold mt-0.5">{{ $message }}</p>
      @enderror
      </div>
     </div>
 
     <div class="flex items-center gap-1 mt-2 pt-2 border-t border-borde/30">
      @if($docSubido)
-     <span class="flex-1 text-center px-2 py-1 text-[10px] font-bold text-estado-exito bg-estado-exitoBg rounded border border-estado-exito/20">
+     <span class="flex-1 text-center px-2 py-1 text-xs font-bold text-estado-exito bg-estado-exitoBg rounded border border-estado-exito/20">
       <i class="ph-bold ph-check"></i> Subido
      </span>
      @else
-     <label class="flex-1 text-center cursor-pointer px-2 py-1 text-[10px] font-bold text-boton-acento border border-boton-acento rounded hover:bg-boton-acento hover:text-inverso transition-all">
+     <label class="flex-1 text-center cursor-pointer px-2 py-1 text-xs font-bold text-boton-acento border border-boton-acento rounded hover:bg-boton-acento hover:text-inverso transition-all">
       <i class="ph-bold ph-upload-simple"></i> Subir
       <input type="file" wire:model="{{ $propiedad }}" class="hidden" accept=".pdf,.jpg,.jpeg,.png">
      </label>
      @if($permite48h && ! $docSubido)
       @if($es48hPend)
-      <span class="px-2 py-1 text-[9px] font-bold text-estado-advertencia bg-estado-advertenciaBg border border-estado-advertenciaBorde rounded">
+      <span class="px-2 py-1 text-xs font-bold text-estado-advertencia bg-estado-advertenciaBg border border-estado-advertenciaBorde rounded">
        <i class="ph-bold ph-clock"></i> Pend. 48 h
       </span>
       @else
-      <span class="px-2 py-1 text-[9px] text-apoyo bg-fondo border border-borde rounded">
+      <span class="px-2 py-1 text-xs text-apoyo bg-fondo border border-borde rounded">
        <i class="ph-bold ph-info"></i> Opcional hoy
       </span>
       @endif
@@ -518,7 +451,7 @@
    {{-- Aviso 48h si hay documentos que permiten plazo --}}
    @php $hayPermite48h = collect($docsSolicitante)->contains('permite_48h', true); @endphp
    @if($hayPermite48h)
-   <div class="mt-2 flex items-start gap-2 p-2.5 bg-estado-advertenciaBg/40 border border-estado-advertenciaBorde rounded-xl text-[10px] text-estado-advertencia font-semibold">
+   <div class="mt-2 flex items-start gap-2 p-2.5 bg-estado-advertenciaBg/40 border border-estado-advertenciaBorde rounded-xl text-xs text-estado-advertencia font-semibold">
     <i class="ph-bold ph-clock text-base shrink-0 mt-0.5"></i>
     <span>Los documentos marcados <strong>"Permite 48 h"</strong> pueden ser presentados después de confirmar. Se notificará al familiar responsable con el plazo exacto.</span>
    </div>
@@ -532,7 +465,7 @@
     <i class="ph-bold ph-file-pdf text-lg"></i>
    </div>
    <h5 class="text-sm font-bold text-titulo uppercase tracking-wider">Documentos Institucionales</h5>
-   <span class="ml-auto px-2 py-1 rounded-full bg-estado-infoBg text-estado-info text-[9px] font-bold border border-estado-infoBorde uppercase tracking-wider">Autogenerados al confirmar</span>
+   <span class="ml-auto px-2 py-1 rounded-full bg-estado-infoBg text-estado-info text-xs font-bold border border-estado-infoBorde uppercase tracking-wider">Autogenerados al confirmar</span>
    </div>
    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
    @foreach ($docsInstitucionales as $docConf)
@@ -542,16 +475,16 @@
      <i class="ph-fill ph-file-pdf text-lg"></i>
      </div>
      <div class="min-w-0 flex-1">
-     <h6 class="text-[11px] font-bold text-titulo truncate">{{ $docConf['nombre'] }}</h6>
+     <h6 class="text-xs font-bold text-titulo truncate">{{ $docConf['nombre'] }}</h6>
      <div class="flex items-center gap-1 mt-0.5">
-      <span class="text-[9px] text-apoyo">PDF generado automáticamente</span>
+      <span class="text-xs text-apoyo">PDF generado automáticamente</span>
       @if($docConf['requiere_firma'])
-      <span class="px-1 py-0.5 rounded text-[8px] font-bold bg-estado-infoBg text-estado-info border border-estado-infoBorde uppercase">Firma requerida</span>
+      <span class="px-1 py-0.5 rounded text-xs font-bold bg-estado-infoBg text-estado-info border border-estado-infoBorde uppercase">Firma requerida</span>
       @endif
      </div>
      </div>
     </div>
-    <span class="px-2 py-1 text-[10px] font-bold text-estado-info bg-estado-infoBg rounded border border-estado-infoBorde shrink-0 ml-2">
+    <span class="px-2 py-1 text-xs font-bold text-estado-info bg-estado-infoBg rounded border border-estado-infoBorde shrink-0 ml-2">
      <i class="ph-bold ph-gear-fine"></i> Al confirmar
     </span>
     </div>
@@ -563,6 +496,7 @@
  @endif
  </div>
 
+ </div>
  <!-- Botonera -->
  <div class="rm-modal-footer rm-admin-wizard__footer flex items-center justify-between">
  <div>

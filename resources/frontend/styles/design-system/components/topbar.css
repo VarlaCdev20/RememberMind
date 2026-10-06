@@ -103,9 +103,9 @@
 .rm-shell .rm-topbar .rm-topbar-search__toggle { display: none; }
 .rm-shell .rm-topbar .rm-topbar__hamburger { display: none; }
 .rm-shell .rm-topbar .rm-topbar__action i { color: var(--rm-text-primary); }
-.rm-shell .rm-topbar .rm-topbar__theme-icon--sun { display: none; }
-:is(.dark, [data-theme="dark"]) .rm-shell .rm-topbar .rm-topbar__theme-icon--moon { display: none; }
-:is(.dark, [data-theme="dark"]) .rm-shell .rm-topbar .rm-topbar__theme-icon--sun { display: inline; }
+.rm-shell .rm-topbar :is(.rm-topbar__theme-toggle, [data-theme-toggle]) .rm-topbar__theme-icon--sun { display: none; }
+:is(.dark, [data-theme="dark"]) .rm-shell .rm-topbar :is(.rm-topbar__theme-toggle, [data-theme-toggle]) .rm-topbar__theme-icon--moon { display: none; }
+:is(.dark, [data-theme="dark"]) .rm-shell .rm-topbar :is(.rm-topbar__theme-toggle, [data-theme-toggle]) .rm-topbar__theme-icon--sun { display: inline; }
 .rm-shell .rm-topbar :is(.rm-topbar__action, .rm-topbar-search__toggle, .rm-topbar-search__submit, .rm-btn-icon) i,
 .rm-shell .rm-topbar .rm-topbar-search__icon { transition: color var(--rm-duration-hover) var(--rm-ease-enter); }
 .rm-shell .rm-topbar :is(.rm-btn-icon, .rm-topbar__notification) > span {

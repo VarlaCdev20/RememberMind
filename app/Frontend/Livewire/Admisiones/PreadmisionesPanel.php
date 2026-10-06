@@ -6,6 +6,7 @@ use App\Backend\Modulos\Admisiones\Acciones\FormalizarAdmision;
 use App\Models\Cama;
 use App\Models\Habitacion;
 use App\Models\Preadmision;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -41,6 +42,10 @@ class PreadmisionesPanel extends Component
     public string $panelModo = 'detalle';
 
     public string $orden = 'recientes';
+
+    public string $vista = 'lista';
+
+    public int $porPagina = 10;
 
     public ?Preadmision $solicitudDetalle = null;
 
@@ -84,6 +89,7 @@ class PreadmisionesPanel extends Component
         'prioridad' => ['except' => ''],
         'fecha_inicio' => ['except' => ''],
         'fecha_fin' => ['except' => ''],
+        'vista' => ['except' => 'lista'],
         'solicitud' => ['except' => ''],
     ];
 
@@ -119,6 +125,53 @@ class PreadmisionesPanel extends Component
         $this->resetPage();
     }
 
+    public function updatedVista(): void
+    {
+        if (! in_array($this->vista, ['lista', 'tarjetas', 'tabla'], true)) {
+            $this->vista = 'lista';
+        }
+    }
+
+    public function updatedPorPagina(): void
+    {
+        if (! in_array($this->porPagina, [10, 20, 50], true)) {
+            $this->porPagina = 10;
+        }
+        $this->resetPage();
+    }
+
+    public function updatingFechaInicio(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFechaFin(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingOrden(): void
+    {
+        $this->resetPage();
+    }
+
+    public function limpiarFechas(): void
+    {
+        $this->reset('fecha_inicio', 'fecha_fin');
+        $this->resetPage();
+    }
+
+    public function filtrarMes(string $mes): void
+    {
+        if (! preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $mes)) {
+            return;
+        }
+        $fecha = Carbon::createFromFormat('!Y-m', $mes);
+        $this->fecha_inicio = $fecha->toDateString();
+        $this->fecha_fin = $fecha->endOfMonth()->toDateString();
+        $this->resetPage();
+    }
+
     public function limpiarFiltros(): void
     {
         $this->reset([
@@ -146,6 +199,12 @@ class PreadmisionesPanel extends Component
     public function cerrarModalDocumentos(): void
     {
         $this->cerrarDetalle();
+    }
+
+    public function verHistorial(string $codPre): void
+    {
+        $this->verDetalle($codPre);
+        $this->panelTab = 'historial';
     }
 
     public function abrirModalRechazo(string $codPre): void
@@ -306,29 +365,29 @@ class PreadmisionesPanel extends Component
 
         try {
             $datos = $this->validate([
-            'codPreAdmision' => ['required', 'exists:preadmisiones,cod_preadmision'],
-            'habitacion_id' => ['required', 'exists:habitaciones,cod_habitacion'],
-            'cama_id' => ['required', 'exists:camas,cod_cama'],
-            'fecha_ingreso' => ['required', 'date', 'before_or_equal:today'],
-            'hora_ingreso' => ['required', 'date_format:H:i'],
-            'nivel_educativo' => ['nullable', 'string', 'max:100'],
-            'seguro_entidad' => ['nullable', 'string', 'max:120', 'required_with:seguro_plan,seguro_afiliacion,seguro_titular,seguro_cobertura'],
-            'seguro_plan' => ['nullable', 'string', 'max:100'],
-            'seguro_afiliacion' => ['nullable', 'string', 'max:80'],
-            'seguro_titular' => ['nullable', 'string', 'max:160'],
-            'seguro_cobertura' => ['nullable', 'string', 'max:3000'],
-            'autoriza_informacion_medica' => ['accepted'],
-            'consentimiento_datos' => ['accepted'],
-            'observaciones_admision' => ['nullable', 'string', 'max:3000'],
-        ], [
-            'required' => 'Este campo es obligatorio para formalizar la admisión.',
-            'exists' => 'La opción seleccionada ya no está disponible.',
-            'before_or_equal' => 'La fecha de ingreso no puede ser posterior a hoy.',
-            'date_format' => 'Ingrese una hora válida.',
-            'accepted' => 'Debe confirmar esta autorización antes de admitir.',
-            'in' => 'Seleccione una opción válida.',
-            'min' => 'Ingrese al menos :min caracteres.',
-            'max' => 'No exceda los :max caracteres.',
+                'codPreAdmision' => ['required', 'exists:preadmisiones,cod_preadmision'],
+                'habitacion_id' => ['required', 'exists:habitaciones,cod_habitacion'],
+                'cama_id' => ['required', 'exists:camas,cod_cama'],
+                'fecha_ingreso' => ['required', 'date', 'before_or_equal:today'],
+                'hora_ingreso' => ['required', 'date_format:H:i'],
+                'nivel_educativo' => ['nullable', 'string', 'max:100'],
+                'seguro_entidad' => ['nullable', 'string', 'max:120', 'required_with:seguro_plan,seguro_afiliacion,seguro_titular,seguro_cobertura'],
+                'seguro_plan' => ['nullable', 'string', 'max:100'],
+                'seguro_afiliacion' => ['nullable', 'string', 'max:80'],
+                'seguro_titular' => ['nullable', 'string', 'max:160'],
+                'seguro_cobertura' => ['nullable', 'string', 'max:3000'],
+                'autoriza_informacion_medica' => ['accepted'],
+                'consentimiento_datos' => ['accepted'],
+                'observaciones_admision' => ['nullable', 'string', 'max:3000'],
+            ], [
+                'required' => 'Este campo es obligatorio para formalizar la admisión.',
+                'exists' => 'La opción seleccionada ya no está disponible.',
+                'before_or_equal' => 'La fecha de ingreso no puede ser posterior a hoy.',
+                'date_format' => 'Ingrese una hora válida.',
+                'accepted' => 'Debe confirmar esta autorización antes de admitir.',
+                'in' => 'Seleccione una opción válida.',
+                'min' => 'Ingrese al menos :min caracteres.',
+                'max' => 'No exceda los :max caracteres.',
             ]);
         } catch (ValidationException $e) {
             $campos = array_keys($e->errors());
@@ -559,7 +618,7 @@ class PreadmisionesPanel extends Component
     public function render()
     {
         $query = Preadmision::query()
-            ->with(['contacto', 'documentos', 'admision.residente'])
+            ->with(['contacto', 'admision.residente'])
             ->withCount('documentos');
 
         if ($this->search !== '') {
@@ -580,12 +639,18 @@ class PreadmisionesPanel extends Component
         if ($this->estado === 'ADMITIDA') {
             $query->where(fn ($q) => $q->where('estado', 'ADMITIDA')->orWhereHas('admision'));
         } elseif ($this->estado === 'PENDIENTE') {
-            $query->whereNotIn('estado', ['APROBADA', 'ADMITIDA', 'RECHAZADA']);
+            $query->where('estado', 'PENDIENTE')->whereDoesntHave('admision');
+        } elseif ($this->estado === 'APROBADA') {
+            $query->where('estado', 'APROBADA')->whereDoesntHave('admision');
+        } elseif ($this->estado === 'RECHAZADA') {
+            $query->where('estado', 'RECHAZADA')->whereDoesntHave('admision');
         } elseif ($this->estado !== '') {
             $query->where('estado', $this->estado);
         }
 
-        if ($this->prioridad !== '') {
+        if ($this->prioridad === 'SIN_REGISTRAR') {
+            $query->where(fn ($q) => $q->whereNull('prioridad')->orWhere('prioridad', ''));
+        } elseif ($this->prioridad !== '') {
             $query->where('prioridad', $this->prioridad);
         }
 
@@ -603,18 +668,36 @@ class PreadmisionesPanel extends Component
 
         $metricas = [
             'total' => Preadmision::count(),
-            'pendientes' => Preadmision::whereNotIn('estado', ['APROBADA', 'ADMITIDA', 'RECHAZADA'])->count(),
+            'pendientes' => Preadmision::where('estado', 'PENDIENTE')->whereDoesntHave('admision')->count(),
             'aprobadas' => Preadmision::where('estado', 'APROBADA')->whereDoesntHave('admision')->count(),
             'admitidas' => Preadmision::where(fn ($q) => $q->where('estado', 'ADMITIDA')->orWhereHas('admision'))->count(),
-            'rechazadas' => Preadmision::where('estado', 'RECHAZADA')->count(),
+            'rechazadas' => Preadmision::where('estado', 'RECHAZADA')->whereDoesntHave('admision')->count(),
             'alta_prioridad' => Preadmision::whereIn('prioridad', ['ALTA', 'CRITICA'])->count(),
             'con_documentos' => Preadmision::whereHas('documentos')->count(),
             'sin_enfermero' => 0,
         ];
 
+        // Seis periodos por límites portables, sin inventar solicitudes.
+        $tendencia = collect(range(5, 0))->map(function (int $atras): array {
+            $inicio = now()->locale('es')->startOfMonth()->subMonths($atras);
+
+            return [
+                'mes' => $inicio->format('Y-m'),
+                'etiqueta' => $inicio->translatedFormat('M'),
+                'descripcion' => $inicio->translatedFormat('F Y'),
+                'cantidad' => Preadmision::whereBetween('fecha_solicitud', [$inicio, $inicio->copy()->endOfMonth()])->count(),
+            ];
+        });
+        $prioridadesDisponibles = Preadmision::query()->select('prioridad')
+            ->selectRaw('COUNT(*) as cantidad')->groupBy('prioridad')->orderBy('prioridad')->get()
+            ->groupBy(fn ($fila) => $fila->prioridad ?: 'SIN_REGISTRAR')
+            ->map(fn ($filas) => (int) $filas->sum('cantidad'));
+
         return view('livewire.admisiones.preadmisiones-panel', [
-            'preadmisiones' => $query->orderBy('fecha_solicitud', $this->orden === 'antiguas' ? 'asc' : 'desc')->orderBy('cod_preadmision', $this->orden === 'antiguas' ? 'asc' : 'desc')->paginate(10),
+            'preadmisiones' => $query->orderBy('fecha_solicitud', $this->orden === 'antiguas' ? 'asc' : 'desc')->orderBy('cod_preadmision', $this->orden === 'antiguas' ? 'asc' : 'desc')->paginate(in_array($this->porPagina, [10, 20, 50], true) ? $this->porPagina : 10),
             'metricas' => $metricas,
+            'tendencia' => $tendencia,
+            'prioridadesDisponibles' => $prioridadesDisponibles,
             'habitacionesAdmision' => Habitacion::query()
                 ->withCount([
                     'camas',
@@ -624,7 +707,7 @@ class PreadmisionesPanel extends Component
                     'camas as camas_bloqueadas_count' => fn ($q) => $q->where('estado', 'BLOQUEADA'),
                 ])->orderBy('codigo')->get(),
             'camasHabitacion' => $this->habitacion_id
-                ? Cama::query()->with('asignacionesActivas.adultoMayor')->where('cod_habitacion', $this->habitacion_id)->orderBy('codigo')->get()
+                ? Cama::query()->with('asignacionesActivas.residente')->where('cod_habitacion', $this->habitacion_id)->orderBy('codigo')->get()
                     ->each(fn (Cama $cama) => $cama->estado === 'ACTIVA' && ! $cama->asignacionesActivas->count() ? $cama->setAttribute('estado', 'DISPONIBLE') : null)
                 : collect(),
             'solicitudAdmision' => $this->codPreAdmision

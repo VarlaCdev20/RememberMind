@@ -23,8 +23,6 @@ const THEME_DARK = 'dark';
 const THEME_LIGHT = 'light';
 const THEME_SYSTEM = 'system';
 
-const root = document.documentElement;
-
 /**
  * Obtiene la preferencia del sistema operativo.
  */
@@ -39,7 +37,12 @@ function getSystemTheme() {
  * Si no existe, respeta el tema del sistema igual que el arranque del layout.
  */
 function getSavedTheme() {
-    return localStorage.getItem(THEME_STORAGE_KEY) || THEME_SYSTEM;
+    try {
+        const saved = localStorage.getItem(THEME_STORAGE_KEY);
+        return [THEME_LIGHT, THEME_DARK, THEME_SYSTEM].includes(saved) ? saved : THEME_SYSTEM;
+    } catch {
+        return document.documentElement.dataset.themePreference || THEME_SYSTEM;
+    }
 }
 
 /**
@@ -57,16 +60,18 @@ function resolveTheme(theme) {
  * Aplica el tema al documento.
  */
 function applyTheme(theme, persist = true) {
+    const root = document.documentElement;
     const resolvedTheme = resolveTheme(theme);
     const isDark = resolvedTheme === THEME_DARK;
 
     root.classList.toggle('dark', isDark);
     root.dataset.theme = resolvedTheme;
+    root.dataset.themePreference = theme;
 
     root.style.colorScheme = resolvedTheme;
 
     if (persist) {
-        localStorage.setItem(THEME_STORAGE_KEY, theme);
+        try { localStorage.setItem(THEME_STORAGE_KEY, theme); } catch { /* La preferencia sigue activa en esta ventana. */ }
     }
 
     updateThemeControls(theme, resolvedTheme);
@@ -245,3 +250,10 @@ window.RememberMindTheme = {
     LIGHT: THEME_LIGHT,
     SYSTEM: THEME_SYSTEM,
 };
+
+// Livewire reemplaza atributos del documento durante la navegación.
+// Reaplicar también sincroniza los controles Alpine de la pantalla nueva.
+document.addEventListener('livewire:navigated', () => applyTheme(getSavedTheme(), false));
+window.addEventListener('storage', (event) => {
+    if (event.key === THEME_STORAGE_KEY) applyTheme(getSavedTheme(), false);
+});

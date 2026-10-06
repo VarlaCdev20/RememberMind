@@ -147,6 +147,7 @@ window.documentosAdulto = documentosAdulto;
 
 import './modules/signos-vitales-registro.js';
 import './modules/filter-selection.js';
+import './modules/controles-institucionales.js';
 
 import './modules/auth-login-parallax.js';
 import './modules/app-depth-motion.js';
