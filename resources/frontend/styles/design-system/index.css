@@ -67,3 +67,5 @@
 @import './components/person-entities.css';
 @import './components/controles-institucionales.css';
 @import './patterns/preadmisiones-interactivas.css';
+@import './components/paginacion.css';
+@import './patterns/admisiones-interactivas.css';

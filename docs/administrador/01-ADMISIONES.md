@@ -1,57 +1,72 @@
-# Admisiones: funcionamiento y revisión inicial
+# Admisiones: funcionamiento, mejoras y verificación
 
-Estado al 2026-10-06: **inspección inicial, rediseño pendiente**.
+Entrega del 2026-10-06 en `REINICIO`: bandeja rediseñada, controles compartidos y refuerzos del ingreso formal. Estructura de datos sin cambios.
 
-## Pantalla y finalidad
+## Qué hace el administrador
 
-Ruta: `/admin/administracion/admisiones`. Es una bandeja administrativa de seguimiento. Ofrece vista, búsqueda, limpieza de filtros y paginación; relaciona el proceso con habitaciones, preadmisiones y expediente del residente.
+Ruta `/admin/administracion/admisiones`. Consultar solicitudes listas para ingreso, admisiones activas e historial. Los indicadores son generales; los resultados responden a filtros. Los valores provienen de registros existentes.
 
-| Vista | Criterio actual |
+| Etapa | Criterio |
 | --- | --- |
 | Por formalizar | Preadmisión `APROBADA` sin admisión |
 | Admitidos | Admisión `ACTIVA` |
 | Historial | Admisión con estado diferente de `ACTIVA` |
 
-Los indicadores muestran cantidades generales, no solo los resultados de la búsqueda. Son datos de seguimiento; no inventan severidad clínica. La existencia de datos locales no justifica crear solicitudes para completar la pantalla.
+Seleccionar un indicador cambia la etapa y conserva búsqueda, orden, tamaño y vista. El enlace de camas lleva al alojamiento habilitado. Tabla, lista y tarjetas consultan los mismos registros y mantienen su contexto.
 
-## Proceso institucional
+La búsqueda por nombre, documento, código o habitación se aplica después de 500 ms sin escribir. También se puede pulsar Buscar. Orden reciente/antiguo y páginas de 10, 20 o 50 registros se validan en backend. Cambiar filtros reinicia la página. No hay polling ni consultas por cada fila; el resumen rápido usa los datos que ya se presentaron.
 
-La solicitud comienza `PENDIENTE`. Tras revisión queda `APROBADA` o `RECHAZADA`. Una aprobación no crea residente. La admisión formal requiere una solicitud aprobada, contacto responsable y cama disponible, además de los datos y validaciones vigentes del formulario.
+Nombre o icono de identificación abre un resumen breve con fecha, etapa, ubicación y estado. El modal conserva foco, permite Escape y vuelve al control que lo abrió. El acceso principal abre el residente o **Preparar ingreso**, que lleva directamente al expediente aprobado mediante `solicitud`; no necesita volver a buscarlo.
 
-La acción `FormalizarAdmision` coordina residente, admisión, ocupación, contacto, historial y consentimiento dentro de una transacción con bloqueos. El residente queda `ADMITIDO`; admisión y ocupación quedan `ACTIVA`. No debe existir alta directa que evite este proceso ni dos ocupaciones activas para un residente.
+## Flujo institucional y seguridad
 
-La bandeja enlaza «Continuar» al panel de preadmisiones, filtrando por solicitud aprobada. La formalización ocurre allí; esta bandeja no ejecuta por sí misma la admisión.
+Preadmisión `PENDIENTE`, revisión, `APROBADA`/`RECHAZADA`, admisión formal con cama y residente `ADMITIDO`. Aprobar no crea residente. No existe alta directa alternativa.
 
-## Fuentes de implementación
+La cuenta debe estar activa y tener `admisiones.formalizar`; la Acción y la interacción Livewire verifican la autorización. Si el modelo tiene una Policy registrada, se evalúa su operación contextual `formalizar`, incluido el registro recargado bajo bloqueo. No se otorgaron permisos ni roles y no se agregaron catálogos.
 
-- [Rutas](../../routes/web.php).
-- [Controlador de operación](../../app/Http/Controllers/Administracion/OperacionController.php).
-- [Consultas y definición de módulos](../../app/Backend/Modulos/Administracion/Servicios/ConsultaOperativaService.php).
-- [Vista administrativa](../../resources/views/pages/admin/administracion/operacion.blade.php).
-- [Interacción de preadmisiones y formulario de admisión](../../app/Frontend/Livewire/Admisiones/PreadmisionesPanel.php).
-- [Acción de admisión formal](../../app/Backend/Modulos/Admisiones/Acciones/FormalizarAdmision.php).
-- [Navegación por actor](../../app/Backend/Modulos/Identidad/Servicios/SidebarService.php).
+`FormalizarAdmision` coordina residente, admisión, ocupación, contacto responsable, historial y consentimiento en una transacción. La solicitud debe seguir aprobada y no tener admisión. Se bloquean solicitud, cama y habitación; una ocupación activa impide reutilizar la cama. La habilitación y disponibilidad se vuelven a consultar al confirmar, aunque el formulario estuviera abierto antes.
 
-Estos archivos prueban implementación actual, no sustituyen reglas institucionales y baseline de datos.
+La misma consulta de disponibilidad sirve al contador y al selector. Se consumen los valores operativos existentes `ACTIVA`, `ACTIVO`, `DISPONIBLE` para habilitación y `ACTIVA`, `ACTIVO` para ocupación; no se modifican estados persistidos por el rediseño. Una habitación inhabilitada no ofrece camas. Historial conserva la última asignación de cama de cada admisión y evita duplicar filas por traslados.
 
-## Próximas mejoras acotadas
+Los errores generales del formulario se anuncian con `role=alert` y reciben foco. La validación local conserva sus mensajes; ninguna visualización inventa gravedad clínica.
 
-1. **Bandeja y continuidad:** mejorar jerarquía, distribución, filtros y acciones con componentes compartidos. Evaluar que «Continuar» abra directamente el expediente correcto mediante el parámetro `solicitud`, ya disponible. Mantener contexto y ambos temas.
-2. **Autorización:** verificar que las mutaciones Livewire exijan el permiso efectivo de formalización y contexto aplicable. La inspección encontró comprobación por roles en `abrirAdmision`/`formalizarAdmision`; el endpoint HTTP sí usa `admisiones.formalizar`. Confirmar y cubrir el caso negativo antes de dar por terminado el flujo.
-3. **Disponibilidad y errores:** contrastar el resumen que acepta `ACTIVA`/`ACTIVO`/`DISPONIBLE` con la acción que exige cama `ACTIVA`. Revisar habitación y ocupación según fuentes vigentes. Añadir anuncio accesible y foco a errores generales, sin perder datos del formulario.
+## Diseño y componentes
 
-Los puntos 2 y 3 son hallazgos de inspección estática. No se comprobaron mediante escrituras operativas ni se cambiaron permisos, catálogos o estructura.
+- Cabecera contextual, indicadores con etapa activa y acceso a alojamiento.
+- Filtros en una fila adaptable, carga visible y tres vistas con los mismos datos.
+- Sombras y elevación leve al acercarse; transiciones breves y movimiento reducido respetado.
+- [Paginación institucional](02-COMPONENTES-COMPARTIDOS.md): altura normal de 68–70 px en escritorio y controles de 44 px. Se reutiliza en preadmisiones y los paginadores Laravel/Livewire generales.
+- Menú lateral con columnas independientes para icono, etiqueta, contador y caret. En compacto, contador debajo del icono, cifras grandes 99+ y total accesible completo.
 
-## Evidencia y estado de validación
+Se conserva el Design System y la preferencia de tema. Tablas anchas se desplazan dentro de su contenedor; las tarjetas se distribuyen en una columna en móvil.
 
-- Rama revisada: `REINICIO`; checkout limpio al iniciar esta etapa.
-- Se abrió la ruta con la sesión administrativa existente y se comprobó «Por formalizar», incluida su respuesta vacía. No se crearon cuentas, residentes ni seeders.
-- Dos subagentes revisaron navegación/alcance y flujo/código, sin modificaciones.
-- Esta entrega agrega documentación y abre la pantalla. No implementa todavía el rediseño ni corrige los hallazgos anteriores.
-- Los resultados previos de preadmisiones están en [su guía](../frontend/PREADMISIONES_INTERACTIVAS.md); deben repetirse cuando una nueva implementación lo requiera.
+## Archivos y lectura selectiva
 
-## Verificación de una futura entrega
+- [Controlador](../../app/Http/Controllers/Administracion/OperacionController.php): filtros, consulta y conexión de la nueva vista.
+- [Servicio de consultas](../../app/Backend/Modulos/Administracion/Servicios/ConsultaOperativaService.php): etapas, agregados y última ocupación.
+- [Bandeja](../../resources/views/pages/admin/administracion/admisiones.blade.php) y [registro](../../resources/views/pages/admin/administracion/partials/admision-registro.blade.php).
+- [Interacción](../../resources/frontend/scripts/modules/admisiones-interactivas.js) y [estilo](../../resources/frontend/styles/design-system/patterns/admisiones-interactivas.css).
+- [Formalización](../../app/Backend/Modulos/Admisiones/Acciones/FormalizarAdmision.php) y [Livewire](../../app/Frontend/Livewire/Admisiones/PreadmisionesPanel.php).
+- [Baseline de datos](../base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md), [extensión V2.2 aprobada](../base-de-datos/DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md), [responsabilidades](../arquitectura/REMEMBERMIND_ROLES_BASELINE_CONGELADO.md).
 
-Cubrir apertura autorizada y denegada, filtros y estados, continuidad de solicitud, rechazo de mutación sin permiso, aprobación sin residente, admisión válida y rollback, cama ocupada e infraestructura no habilitada conforme a reglas vigentes. Usar datos sintéticos en pruebas y revisar bloqueo/concurrencia con PostgreSQL de integración.
+Inventario vigente de 71 tablas; sin migraciones, seeders ni registros operativos creados en esta entrega. Se sustituyó el uso relacionado de entidad antigua por `residente`; la limpieza global del legado pertenece a otra etapa.
 
-En navegador, comprobar lista vacía/con datos, foco y teclado, anuncio de errores, retención de datos, temas claro/oscuro y distribución móvil. No confirmar ingresos reales como parte de QA visual.
+## Validaciones ejecutadas
+
+En PowerShell, desde `C:\laragon\www\RememberMind`:
+
+```powershell
+php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter 'CasosPreadmisionTest|AdmisionesOperativasTest|BddOperativaV2Test|OcupacionCamaIntegrityTest|DashboardAdministracionIntegracionVisualTest|PaginacionInstitucionalTest'
+node --test --test-concurrency=1 "tests/Frontend/**/*.test.js"
+npm.cmd run build
+```
+
+Resultado: **54 pruebas PHP, 590 aserciones; 38 pruebas frontend; build correcto**. Las pruebas PHP usan SQLite de pruebas. Se cubrieron autorización negativa, cuenta inactiva, Policy, persistencia válida, invariantes de residente/ocupación, infraestructura inhabilitada, filtros, orden estable, historial y paginación compartida.
+
+El menú se comprobó en 28 combinaciones de viewport, tema y variante. En navegador real se verificaron tabla/lista/tarjetas, resumen y foco, búsqueda y limpieza, orden, tamaño de página, página siguiente, ambos temas, menú expandido/compacto y pantallas estrechas. No se confirmó una admisión operativa durante la revisión visual.
+
+## Límites y siguiente etapa
+
+Falta probar concurrencia/bloqueos en PostgreSQL de integración. SQLite comprueba reglas y rollback, pero no acredita el comportamiento concurrente de PostgreSQL. La revisión visual del formulario completo con datos nuevos debe usar un entorno aislado y datos sintéticos; no se fabricaron solicitudes en la base operativa para habilitarlo.
+
+Continuar gradualmente con el formulario de ingreso y sus dependencias documentales, y después alojamiento. Esta entrega no declara terminado todo el rol administrador.

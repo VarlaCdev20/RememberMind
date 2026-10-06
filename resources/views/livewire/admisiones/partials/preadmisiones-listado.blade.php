@@ -103,6 +103,6 @@
   @endif
  </section>
  @if($preadmisiones->total() > 0)
-  <footer class="rm-pre-pagination rm-pre-pagination--studio"><div><strong>{{ $preadmisiones->firstItem() }}–{{ $preadmisiones->lastItem() }}</strong><span>de {{ $preadmisiones->total() }} solicitudes</span></div><div class="rm-pre-page-size"><label for="selector-porPagina">Por página</label><x-ui.selector label="Solicitudes por página" wire:model.live="porPagina"><option value="10">10</option><option value="20">20</option><option value="50">50</option></x-ui.selector></div><nav aria-label="Páginas de solicitudes"><button type="button" wire:click="previousPage" @disabled($preadmisiones->onFirstPage()) aria-label="Página anterior"><i class="ph-bold ph-caret-left" aria-hidden="true"></i></button>@foreach($preadmisiones->getUrlRange(max(1, $preadmisiones->currentPage() - 2), min($preadmisiones->lastPage(), $preadmisiones->currentPage() + 2)) as $pagina => $url)<button type="button" wire:click="gotoPage({{ $pagina }})" @if($pagina === $preadmisiones->currentPage()) aria-current="page" @endif aria-label="Página {{ $pagina }}">{{ $pagina }}</button>@endforeach<button type="button" wire:click="nextPage" @disabled(!$preadmisiones->hasMorePages()) aria-label="Página siguiente"><i class="ph-bold ph-caret-right" aria-hidden="true"></i></button></nav></footer>
+  <x-ui.paginacion :paginator="$preadmisiones" mode="livewire" :per-page="$porPagina" per-page-name="porPagina" label="solicitudes" />
  @endif
 </main>

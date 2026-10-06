@@ -13,19 +13,35 @@ export function diasDelMes(year, month) {
     })];
 }
 
-export function rmSelector(value = '') {
+export function rmSelector(value = null, { native = false, autoSubmit = false } = {}) {
     return {
         open: false, search: '', options: [], active: 0, popupStyle: '', value,
         init() {
             this.$nextTick(() => {
                 this.readOptions();
+                if (native && this.value === null) this.readNativeValue();
+                this.syncNativeSelection();
+                this.$watch?.('value', () => this.syncNativeSelection());
+                this.nativeChange = () => { if (native) this.readNativeValue(); };
+                this.$refs.native.addEventListener('change', this.nativeChange);
                 this.observer = new MutationObserver(() => this.readOptions());
                 this.observer.observe(this.$refs.native, { childList: true, subtree: true, attributes: true });
             });
         },
-        destroy() { this.observer?.disconnect(); },
+        destroy() {
+            this.observer?.disconnect();
+            this.$refs.native.removeEventListener('change', this.nativeChange);
+        },
         readOptions() {
             this.options = Array.from(this.$refs.native.options, o => ({ value: o.value, label: o.textContent.trim(), disabled: o.disabled }));
+        },
+        readNativeValue() {
+            this.value = this.multiple
+                ? Array.from(this.$refs.native.options).filter(o => o.selected).map(o => o.value)
+                : this.$refs.native.value;
+        },
+        syncNativeSelection() {
+            for (const option of this.$refs.native.options) option.selected = this.selected(option.value);
         },
         get filtered() { return this.options.filter(o => normalizar(o.label).includes(normalizar(this.search))); },
         get hasSearch() { return this.options.length > 10; },
@@ -60,19 +76,24 @@ export function rmSelector(value = '') {
                 ? (this.selected(option.value) ? this.value.filter(v => v !== option.value) : [...(this.value || []), option.value])
                 : option.value;
             this.$nextTick(() => {
-                for (const o of this.$refs.native.options) o.selected = this.selected(o.value);
+                this.syncNativeSelection();
                 this.$refs.native.dispatchEvent(new Event('change', { bubbles: true }));
                 this.$refs.native.dispatchEvent(new FocusEvent('blur', { bubbles: true }));
+                if (autoSubmit) this.$refs.native.form?.requestSubmit();
             });
             if (!this.multiple) this.close();
         },
         key(event) {
+            if (event.key === 'Tab') { this.open = false; return; }
             if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); this.close(); return; }
             if (event.key === 'Enter') { event.preventDefault(); const item = this.filtered[this.active]; if (item) this.choose(item); return; }
             if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
             event.preventDefault();
-            const last = this.filtered.length - 1;
-            this.active = event.key === 'Home' ? 0 : event.key === 'End' ? last : Math.max(0, Math.min(last, this.active + (event.key === 'ArrowDown' ? 1 : -1)));
+            const enabled = this.filtered.map((option, index) => option.disabled ? -1 : index).filter(index => index >= 0);
+            if (!enabled.length) return;
+            this.active = event.key === 'Home' ? enabled[0] : event.key === 'End' ? enabled.at(-1)
+                : event.key === 'ArrowDown' ? (enabled.find(index => index > this.active) ?? enabled.at(-1))
+                : ([...enabled].reverse().find(index => index < this.active) ?? enabled[0]);
             this.$nextTick(() => {
                 const option = this.$refs.list.querySelectorAll('[role="option"]')[this.active];
                 option?.scrollIntoView({ block: 'nearest' });

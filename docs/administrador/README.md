@@ -4,10 +4,11 @@ Punto de entrada para mejorar el rol **ADMINISTRADOR** por procesos. Leer única
 
 ## Etapa actual
 
-**Admisiones**, iniciada el 2026-10-06. La bandeja está abierta y su funcionamiento actual fue inspeccionado. El rediseño y los ajustes del ingreso formal siguen pendientes. La interfaz de preadmisiones ya tiene cambios documentados, pero eso no acredita que todo el proceso de admisión esté terminado.
+**Admisiones**, iniciada el 2026-10-06. Bandeja rediseñada e integrada: tres vistas, filtros, resumen rápido y paginación compartida. Se reforzaron autorización y disponibilidad del ingreso formal. La interfaz de preadmisiones ya tiene cambios documentados, pero eso no acredita que todo el proceso de admisión esté terminado.
 
-- [Admisiones: funcionamiento y mejoras pendientes](01-ADMISIONES.md).
+- [Admisiones: funcionamiento, mejoras y verificación](01-ADMISIONES.md).
 - [Preadmisiones: controles, vistas y verificación](../frontend/PREADMISIONES_INTERACTIVAS.md).
+- [Componentes compartidos: paginación, selectores y menú](02-COMPONENTES-COMPARTIDOS.md).
 - [Roles y responsabilidades vigentes](../arquitectura/REMEMBERMIND_ROLES_BASELINE_CONGELADO.md).
 - [Baseline de datos](../base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md) y [extensión V2.2 aprobada](../base-de-datos/DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md): inventario actual de 71 tablas, estructura congelada.
 
@@ -15,7 +16,7 @@ Punto de entrada para mejorar el rol **ADMINISTRADOR** por procesos. Leer única
 
 | Etapa | Proceso | Estado |
 | --- | --- | --- |
-| 1 | Preadmisión, revisión e ingreso formal | En revisión; siguiente trabajo: bandeja de Admisiones |
+| 1 | Preadmisión, revisión e ingreso formal | Bandeja y refuerzos de ingreso verificados; concurrencia PostgreSQL pendiente |
 | 2 | Habitaciones y ocupación | Pendiente; verificar disponibilidad como dependencia de etapa 1 |
 | 3 | Residentes y expediente administrativo | Pendiente |
 | 4 | Contactos, documentación, consentimientos y seguros | Pendiente; revisar dependencias del ingreso en etapa 1 |

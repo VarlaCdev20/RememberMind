@@ -41,7 +41,7 @@
     $brandRoute = request()->routeIs('admin.enfermeria.*') ? 'admin.enfermeria.dashboard' : ($inicioAdministracion ? 'admin.administracion.dashboard' : 'dashboard');
 @endphp
 
-<aside id="{{ request()->routeIs('admin.enfermeria.*') ? 'sidebar-enfermeria' : 'sidebar' }}" class="rm-sidebar" wire:transition.navigate="rm-sidebar" aria-label="Navegación principal"
+<aside id="{{ request()->routeIs('admin.enfermeria.*') ? 'sidebar-enfermeria' : 'sidebar' }}" class="rm-sidebar" wire:transition="rm-sidebar" aria-label="Navegación principal"
     :class="{ 'is-mobile-open': sidebarOpen }"
     @toggle-sidebar.window="sidebarOpen = !sidebarOpen"
     x-data="{
@@ -140,7 +140,12 @@
                         <span class="rm-sidebar__indicator" aria-hidden="true"></span>
                         <i class="ph-bold {{ $section['icon'] }} rm-sidebar__icon" aria-hidden="true"></i>
                         <span class="rm-sidebar__label rm-nav-group">{{ $section['title'] }}</span>
-                        @if(!empty($section['badge']))<span class="rm-sidebar__badge" aria-hidden="true">{{ $section['badge'] }}</span>@endif
+                        @if(!empty($section['badge']))
+                            <span class="rm-sidebar__badge" aria-hidden="true">
+                                <span class="rm-sidebar__badge-value">{{ $section['badge'] }}</span>
+                                <span class="rm-sidebar__badge-compact">{{ is_numeric($section['badge']) && (int) $section['badge'] > 99 ? '99+' : $section['badge'] }}</span>
+                            </span>
+                        @endif
                         <i class="ph-bold ph-caret-down rm-sidebar__chevron" aria-hidden="true" :class="{ 'is-open': openSection === {{ $index }} }"></i>
                     </button>
                     <div id="rm-sidebar-submenu-{{ $index }}" class="rm-sidebar__submenu"
@@ -175,7 +180,12 @@
                         <span class="rm-sidebar__indicator" aria-hidden="true"></span>
                         <i class="ph-bold {{ $section['icon'] }} rm-sidebar__icon" aria-hidden="true"></i>
                         <span class="rm-sidebar__label rm-nav-group">{{ $section['title'] }}</span>
-                        @if(!empty($section['badge']))<span @class(['rm-sidebar__badge', 'rm-sidebar__badge--alert' => str_contains($section['route'] ?? '', '.alertas')])>{{ $section['badge'] }}</span>@endif
+                        @if(!empty($section['badge']))
+                            <span @class(['rm-sidebar__badge', 'rm-sidebar__badge--alert' => str_contains($section['route'] ?? '', '.alertas')]) aria-hidden="true">
+                                <span class="rm-sidebar__badge-value">{{ $section['badge'] }}</span>
+                                <span class="rm-sidebar__badge-compact">{{ is_numeric($section['badge']) && (int) $section['badge'] > 99 ? '99+' : $section['badge'] }}</span>
+                            </span>
+                        @endif
                     </a>
                 @endif
             </div>

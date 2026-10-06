@@ -9,8 +9,8 @@
    <p class="text-sm text-apoyo">Complete los datos de ingreso. La ficha de residente se creará al confirmar esta operación.</p>
   </div>
 
-  @error('solicitud') <p class="rounded-xl bg-estado-peligroBg p-3 text-sm font-semibold text-estado-peligro">{{ $message }}</p> @enderror
-  @error('admision') <p class="rounded-xl bg-estado-peligroBg p-3 text-sm font-semibold text-estado-peligro">{{ $message }}</p> @enderror
+  @error('solicitud') <p role="alert" tabindex="-1" x-init="$nextTick(() => $el.focus())" class="rounded-xl bg-estado-peligroBg p-3 text-sm font-semibold text-estado-peligro">{{ $message }}</p> @enderror
+  @error('admision') <p role="alert" tabindex="-1" x-init="$nextTick(() => $el.focus())" class="rounded-xl bg-estado-peligroBg p-3 text-sm font-semibold text-estado-peligro">{{ $message }}</p> @enderror
 
   <nav class="rm-admin-admission__steps" aria-label="Pasos de admisión">
    @foreach(['Identidad', 'Contacto', 'Documentación', 'Consentimientos', 'Seguro', 'Habitación y cama', 'Confirmación'] as $indice => $etiqueta)

@@ -6,6 +6,7 @@ use App\Backend\Modulos\Admisiones\Acciones\FormalizarAdmision;
 use App\Models\Cama;
 use App\Models\Habitacion;
 use App\Models\Preadmision;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
@@ -310,8 +311,9 @@ class PreadmisionesPanel extends Component
 
     public function abrirAdmision(string $codPre): void
     {
-        abort_unless(auth()->user()?->hasAnyRole(['ADMINISTRADOR', 'SUPERADMINISTRADOR']), 403);
+        abort_unless(auth()->user()?->estado === 'ACTIVO' && auth()->user()?->can('admisiones.formalizar'), 403);
         $solicitud = Preadmision::query()->findOrFail($codPre);
+        app(FormalizarAdmision::class)->autorizar($solicitud, auth()->user());
 
         if ($solicitud->estado !== 'APROBADA' || $solicitud->admision()->exists()) {
             $this->dispatch('swal', ['title' => 'Admisión no disponible', 'text' => 'Solo puede admitirse una solicitud aprobada que todavía no tenga residente asociado.', 'icon' => 'warning']);
@@ -361,7 +363,7 @@ class PreadmisionesPanel extends Component
 
     public function formalizarAdmision(FormalizarAdmision $formalizar): void
     {
-        abort_unless(auth()->user()?->hasAnyRole(['ADMINISTRADOR', 'SUPERADMINISTRADOR']), 403);
+        abort_unless(auth()->user()?->estado === 'ACTIVO' && auth()->user()?->can('admisiones.formalizar'), 403);
 
         try {
             $datos = $this->validate([
@@ -407,7 +409,7 @@ class PreadmisionesPanel extends Component
                 $this->pasoAdmision = 6;
                 throw ValidationException::withMessages(['cama_id' => 'La cama no corresponde a la habitación seleccionada.']);
             }
-            $adulto = $formalizar->ejecutar($solicitud, [
+            $residente = $formalizar->ejecutar($solicitud, [
                 'cod_cama' => $datos['cama_id'],
                 'cod_contacto' => $solicitud->cod_contacto,
                 'fecha_hora_admision' => $datos['fecha_ingreso'].' '.$datos['hora_ingreso'],
@@ -423,13 +425,15 @@ class PreadmisionesPanel extends Component
                 'seguro_cobertura' => $datos['seguro_cobertura'] ?: null,
             ], auth()->user());
             $this->cerrarAdmision();
-            $this->residenteAdmitidoCodigo = $adulto->cod_residente;
+            $this->residenteAdmitidoCodigo = $residente->cod_residente;
             $this->dispatch('swal', [
                 'title' => 'Admisión completada',
-                'text' => trim("{$adulto->nombres} {$adulto->apellido_paterno} {$adulto->apellido_materno}").' ya figura como residente institucional y tiene cama asignada.',
+                'text' => trim("{$residente->nombres} {$residente->apellido_paterno} {$residente->apellido_materno}").' ya figura como residente institucional y tiene cama asignada.',
                 'icon' => 'success',
             ]);
         } catch (ValidationException $e) {
+            throw $e;
+        } catch (AuthorizationException $e) {
             throw $e;
         } catch (\Throwable $e) {
             report($e);
@@ -701,14 +705,19 @@ class PreadmisionesPanel extends Component
             'habitacionesAdmision' => Habitacion::query()
                 ->withCount([
                     'camas',
-                    'camasDisponibles as camas_disponibles_count',
-                    'asignacionesActivas as camas_ocupadas_count',
+                    'camas as camas_disponibles_count' => fn ($q) => FormalizarAdmision::filtrarCamasDisponibles($q),
+                    'camas as camas_ocupadas_count' => fn ($q) => $q->whereHas('ocupaciones', fn ($ocupacion) => $ocupacion->whereIn('estado', FormalizarAdmision::ESTADOS_OCUPACION_ACTIVA)),
                     'camas as camas_mantenimiento_count' => fn ($q) => $q->where('estado', 'MANTENIMIENTO'),
                     'camas as camas_bloqueadas_count' => fn ($q) => $q->where('estado', 'BLOQUEADA'),
                 ])->orderBy('codigo')->get(),
             'camasHabitacion' => $this->habitacion_id
-                ? Cama::query()->with('asignacionesActivas.residente')->where('cod_habitacion', $this->habitacion_id)->orderBy('codigo')->get()
-                    ->each(fn (Cama $cama) => $cama->estado === 'ACTIVA' && ! $cama->asignacionesActivas->count() ? $cama->setAttribute('estado', 'DISPONIBLE') : null)
+                ? Cama::query()->where('cod_habitacion', $this->habitacion_id)
+                    ->with(['habitacion', 'ocupaciones' => fn ($q) => $q->whereIn('estado', FormalizarAdmision::ESTADOS_OCUPACION_ACTIVA)->with('residente')])
+                    ->orderBy('codigo')->get()
+                    ->each(fn (Cama $cama) => $cama->setRelation('asignacionesActivas', $cama->ocupaciones)->setAttribute('estado', $cama->ocupaciones->isNotEmpty() ? 'OCUPADA'
+                        : (in_array($cama->estado, FormalizarAdmision::ESTADOS_HABILITADOS, true)
+                            ? (in_array($cama->habitacion?->estado, FormalizarAdmision::ESTADOS_HABILITADOS, true)
+                                ? 'DISPONIBLE' : $cama->habitacion?->estado) : $cama->estado)))
                 : collect(),
             'solicitudAdmision' => $this->codPreAdmision
                 ? Preadmision::query()->with(['contacto', 'documentos'])->find($this->codPreAdmision)

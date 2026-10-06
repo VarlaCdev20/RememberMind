@@ -2,7 +2,10 @@
 
 namespace App\Backend\Modulos\Administracion\Servicios;
 
+use App\Backend\Modulos\Admisiones\Acciones\FormalizarAdmision;
+use App\Models\Cama;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class ConsultaOperativaService
@@ -69,35 +72,68 @@ class ConsultaOperativaService
         };
     }
 
+    public function estadosAdmision(): Collection
+    {
+        return DB::table('admisiones')->select('estado')->selectRaw('COUNT(*) as cantidad')
+            ->groupBy('estado')->orderBy('estado')->get()->pluck('cantidad', 'estado');
+    }
+
+    public function resumenAdmision(?Collection $estados = null): array
+    {
+        $estados ??= $this->estadosAdmision();
+
+        return [
+            'por_formalizar' => $this->consulta('admisiones', 'preparacion')['query']->count(),
+            'admitidos' => (int) $estados->get('ACTIVA', 0),
+            'historial' => (int) $estados->except('ACTIVA')->sum(),
+            'total_admisiones' => (int) $estados->sum(),
+            'camas_disponibles' => FormalizarAdmision::filtrarCamasDisponibles(Cama::query())->count(),
+        ];
+    }
+
     public function consulta(string $modulo, string $tab = ''): array
     {
         switch ($modulo) {
             case 'admisiones':
                 if (in_array($tab, ['admitidos', 'historial'], true)) {
                     $query = DB::table('admisiones as ad')->join('residentes as r', 'r.cod_residente', '=', 'ad.cod_residente')
-                        ->leftJoin('ocupaciones_cama as oc', fn ($join) => $join->on('oc.cod_admision', '=', 'ad.cod_admision')
-                            ->where('oc.estado', 'ACTIVA')->whereNull('oc.fecha_hora_liberacion'))
+                        ->leftJoin('ocupaciones_cama as oc', function ($join) use ($tab) {
+                            $join->on('oc.cod_admision', '=', 'ad.cod_admision');
+                            if ($tab === 'admitidos') {
+                                $join->whereIn('oc.estado', FormalizarAdmision::ESTADOS_OCUPACION_ACTIVA);
+                            }
+                            // Una admisión puede tener varios traslados. Se conserva
+                            // solo su última asignación, incluido el alojamiento histórico.
+                            $join->whereNotExists(fn ($q) => $q->selectRaw('1')->from('ocupaciones_cama as posterior')
+                                ->whereColumn('posterior.cod_admision', 'oc.cod_admision')
+                                ->when($tab === 'admitidos', fn ($q) => $q->whereIn('posterior.estado', FormalizarAdmision::ESTADOS_OCUPACION_ACTIVA))
+                                ->where(fn ($q) => $q->whereColumn('posterior.fecha_hora_asignacion', '>', 'oc.fecha_hora_asignacion')
+                                    ->orWhere(fn ($q) => $q->whereColumn('posterior.fecha_hora_asignacion', 'oc.fecha_hora_asignacion')
+                                        ->whereColumn('posterior.cod_ocupacion', '>', 'oc.cod_ocupacion'))));
+                        })
                         ->leftJoin('camas as c', 'c.cod_cama', '=', 'oc.cod_cama')
                         ->leftJoin('habitaciones as h', 'h.cod_habitacion', '=', 'c.cod_habitacion')
                         ->select('ad.cod_admision as codigo',
-                            'r.numero_documento as documento', 'ad.tipo_ingreso', 'ad.cod_residente',
+                            'r.numero_documento as documento', 'ad.tipo_ingreso', 'ad.cod_residente', 'ad.cod_preadmision',
                             'h.codigo as habitacion', 'c.codigo as cama',
                             'ad.fecha_hora_admision as fecha', 'ad.estado as estado')
-                        ->selectRaw("TRIM(r.nombres || ' ' || r.apellido_paterno) as titulo, 'Formalizada' as etapa");
+                        ->selectRaw("TRIM(r.nombres || ' ' || r.apellido_paterno || ' ' || COALESCE(r.apellido_materno, '')) as titulo, 'Formalizada' as etapa");
                     $query->where('ad.estado', $tab === 'admitidos' ? '=' : '!=', 'ACTIVA');
+
                     return $this->armar(
                         $query,
-                        ['r.nombres', 'r.apellido_paterno', 'ad.cod_admision'], 'ad.estado', 'ad.fecha_hora_admision'
+                        ['r.nombres', 'r.apellido_paterno', 'r.apellido_materno', 'r.numero_documento', 'ad.cod_admision', 'ad.cod_preadmision', 'h.codigo', 'c.codigo'], 'ad.estado', 'ad.fecha_hora_admision'
                     );
                 }
+
                 return $this->armar(
                     DB::table('preadmisiones as pre')->where('pre.estado', 'APROBADA')
                         ->whereNotExists(fn ($query) => $query->selectRaw('1')->from('admisiones as ad')
                             ->whereColumn('ad.cod_preadmision', 'pre.cod_preadmision'))
                         ->select('pre.cod_preadmision as codigo',
-                            'pre.numero_documento as documento', 'pre.tipo_ingreso', 'pre.fecha_revision as fecha', 'pre.estado as estado')
-                        ->selectRaw("TRIM(pre.nombres || ' ' || pre.apellido_paterno) as titulo, 'Por formalizar' as etapa"),
-                    ['pre.nombres', 'pre.apellido_paterno', 'pre.cod_preadmision'], 'pre.estado', 'pre.fecha_revision'
+                            'pre.cod_preadmision', 'pre.numero_documento as documento', 'pre.tipo_ingreso', 'pre.fecha_solicitud as fecha', 'pre.estado as estado')
+                        ->selectRaw("NULL as cod_residente, NULL as habitacion, NULL as cama, TRIM(pre.nombres || ' ' || pre.apellido_paterno || ' ' || COALESCE(pre.apellido_materno, '')) as titulo, 'Por formalizar' as etapa"),
+                    ['pre.nombres', 'pre.apellido_paterno', 'pre.apellido_materno', 'pre.numero_documento', 'pre.cod_preadmision'], 'pre.estado', 'pre.fecha_solicitud'
                 );
             case 'residentes':
                 return $this->armar(
@@ -127,6 +163,7 @@ class ConsultaOperativaService
                         'h.capacidad', 'c.tipo')
                     ->selectRaw("TRIM(r.nombres || ' ' || r.apellido_paterno) as ocupante");
                 $query->addSelect(DB::raw("CASE WHEN oc.cod_ocupacion IS NOT NULL THEN 'OCUPADA' ELSE c.estado END as estado"));
+
                 return $this->armar($query, ['c.codigo', 'h.codigo', 'c.cod_cama'], 'c.estado', 'c.codigo');
             case 'ocupacion':
                 $query = DB::table('ocupaciones_cama as oc')
@@ -142,6 +179,7 @@ class ConsultaOperativaService
                 } else {
                     $query->whereNull('oc.fecha_hora_liberacion')->where('oc.estado', 'ACTIVA');
                 }
+
                 return $this->armar($query, ['r.nombres', 'r.apellido_paterno', 'c.codigo', 'h.codigo', 'oc.cod_ocupacion'], 'oc.estado', 'oc.fecha_hora_asignacion');
             case 'jornadas':
                 return $this->armar(

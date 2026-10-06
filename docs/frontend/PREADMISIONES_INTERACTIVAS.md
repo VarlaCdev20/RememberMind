@@ -34,4 +34,4 @@ npm.cmd run build
 
 Las pruebas PHP usan la configuración SQLite de pruebas, no la base operativa. Comprobar también en navegador: filtro vacío y limpieza, tres vistas, páginas de resultados, búsqueda/teclado en selectores, calendario, navegación con ambos temas y distribución móvil.
 
-La suite frontend general tuvo un timeout en `sidebar-responsive.test.js:72`, al esperar `data-rm-sidebar-ready` después de navegar en su fixture. Esa prueba global del menú queda pendiente de diagnóstico; las pruebas de controles y consistencia de tema pasan. No se realizaron escrituras de registros operativos durante la revisión visual.
+El timeout previo de `sidebar-responsive.test.js` fue corregido en el fixture: faltaba resolver un valor Blade usado por Alpine. Navegación y geometría del menú pasan. La paginación de preadmisiones usa ahora `x-ui.paginacion`, compartida con listados URL y Livewire. No se realizaron escrituras de registros operativos durante la revisión visual.

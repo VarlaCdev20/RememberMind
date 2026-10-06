@@ -27,7 +27,9 @@ class OperacionController extends Controller
             'hasta' => ['nullable', 'date', 'after_or_equal:desde'],
             'residente' => ['nullable', 'string', 'max:20'],
             'panel_tab' => ['nullable', 'in:resumen,datos,salud,documentos,historial'],
-            'vista' => ['nullable', 'in:tarjetas,tabla'],
+            'vista' => ['nullable', 'in:tarjetas,tabla,lista'],
+            'por_pagina' => ['nullable', 'integer', 'in:10,20,50'],
+            'orden' => ['nullable', 'in:recientes,antiguas'],
         ]);
         $registros = null;
         $reportes = [];
@@ -39,21 +41,13 @@ class OperacionController extends Controller
         $panelTab = 'resumen';
         $panelDatos = [];
         $vistaResidentes = $filtros['vista'] ?? 'tarjetas';
+        $vistaAdmisiones = $filtros['vista'] ?? 'tabla';
+        $porPagina = (int) ($filtros['por_pagina'] ?? 10);
+        $ordenAdmisiones = $filtros['orden'] ?? 'recientes';
+        $estadosAdmision = collect();
         if ($modulo === 'admisiones') {
-            $porFormalizar = DB::table('preadmisiones as pre')->where('pre.estado', 'APROBADA')
-                ->whereNotExists(fn ($query) => $query->selectRaw('1')->from('admisiones as ad')
-                    ->whereColumn('ad.cod_preadmision', 'pre.cod_preadmision'))->count();
-            $resumenAdmision = [
-                'por_formalizar' => $porFormalizar,
-                'admitidos' => DB::table('admisiones')->where('estado', 'ACTIVA')->count(),
-                'camas_disponibles' => DB::table('camas as c')
-                    ->join('habitaciones as h', 'h.cod_habitacion', '=', 'c.cod_habitacion')
-                    ->whereIn('c.estado', ['ACTIVA', 'ACTIVO', 'DISPONIBLE'])
-                    ->whereIn('h.estado', ['ACTIVA', 'ACTIVO', 'DISPONIBLE'])
-                    ->whereNotExists(fn ($query) => $query->selectRaw('1')->from('ocupaciones_cama as oc')
-                        ->whereColumn('oc.cod_cama', 'c.cod_cama')->where('oc.estado', 'ACTIVA')
-                        ->whereNull('oc.fecha_hora_liberacion'))->count(),
-            ];
+            $estadosAdmision = $consulta->estadosAdmision();
+            $resumenAdmision = $consulta->resumenAdmision($estadosAdmision);
         }
         if ($modulo === 'residentes') {
             $residentes = DB::table('residentes as r')->whereIn('r.estado', ['ACTIVO', 'ADMITIDO']);
@@ -172,9 +166,21 @@ class OperacionController extends Controller
                         ->orWhereDate('v.fecha_hora_ingreso', $filtros['fecha']);
                 });
             }
-            $registros = $query->orderByDesc($configuracion['orden'])->paginate(15)->withQueryString();
+            if ($modulo === 'admisiones') {
+                if (! empty($filtros['desde'])) {
+                    $query->whereDate($configuracion['orden'], '>=', $filtros['desde']);
+                }
+                if (! empty($filtros['hasta'])) {
+                    $query->whereDate($configuracion['orden'], '<=', $filtros['hasta']);
+                }
+                $direccion = $ordenAdmisiones === 'antiguas' ? 'asc' : 'desc';
+                $registros = $query->orderBy($configuracion['orden'], $direccion)->orderBy('codigo', $direccion)
+                    ->paginate($porPagina)->withQueryString();
+            } else {
+                $registros = $query->orderByDesc($configuracion['orden'])->paginate(15)->withQueryString();
+            }
         }
 
-        return view('pages.admin.administracion.operacion', compact('modulo', 'definicion', 'registros', 'filtros', 'columnas', 'reportes', 'tabs', 'tab', 'resumenAdmision', 'resumenResidentes', 'panelResidente', 'panelTab', 'panelDatos', 'vistaResidentes'));
+        return view($modulo === 'admisiones' ? 'pages.admin.administracion.admisiones' : 'pages.admin.administracion.operacion', compact('modulo', 'definicion', 'registros', 'filtros', 'columnas', 'reportes', 'tabs', 'tab', 'resumenAdmision', 'resumenResidentes', 'panelResidente', 'panelTab', 'panelDatos', 'vistaResidentes', 'vistaAdmisiones', 'porPagina', 'ordenAdmisiones', 'estadosAdmision'));
     }
 }

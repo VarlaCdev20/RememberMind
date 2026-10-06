@@ -1,9 +1,9 @@
-@props(['label' => 'Seleccionar', 'id' => null, 'teleport' => 'body'])
+@props(['label' => 'Seleccionar', 'id' => null, 'value' => null, 'autoSubmit' => false, 'teleport' => 'body'])
 @php
     $model = $attributes->wire('model')->value();
-    $controlId = $id ?: 'selector-'.str_replace('.', '-', $model);
+    $controlId = $id ?: 'selector-'.str_replace('.', '-', $model ?: ($attributes->get('name') ?: uniqid()));
 @endphp
-<div class="rm-choice" x-data="rmSelector(@entangle($model))" wire:key="{{ $controlId }}">
+<div {{ $attributes->only('class')->merge(['class' => 'rm-choice']) }} x-data="rmSelector(@if($model) @entangle($model) @else @js($value) @endif, { native: @js(!$model), autoSubmit: @js((bool) $autoSubmit) })" @if($model) wire:key="{{ $controlId }}" @endif>
     <select x-ref="native" {{ $attributes->except(['class', 'aria-label'])->merge(['id' => $controlId.'-source']) }} tabindex="-1" aria-hidden="true" hidden>{{ $slot }}</select>
     <button type="button" id="{{ $controlId }}" x-ref="trigger" class="rm-choice__trigger" aria-label="{{ $attributes->get('aria-label', $label) }}" aria-haspopup="listbox" :aria-expanded="open" aria-controls="{{ $controlId }}-list" :disabled="$refs.native?.disabled" @click="open ? close() : show()" @keydown.arrow-down.prevent="show()">
         <span x-text="label"></span><i class="ph-bold ph-caret-down" aria-hidden="true" :class="{ 'is-open': open }"></i>

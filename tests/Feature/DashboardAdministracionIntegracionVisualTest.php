@@ -79,7 +79,9 @@ class DashboardAdministracionIntegracionVisualTest extends TestCase
             $this->assertSame(1, substr_count($response->getContent(), '<h1'));
             if (in_array($modulo, ['admisiones', 'ocupacion', 'jornadas', 'documentacion', 'consentimientos', 'visitas', 'alertas'], true)) {
                 $this->assertStringContainsString('name="tab"', $response->getContent());
-                $this->assertStringContainsString('id="admin-vista-'.$modulo.'"', $response->getContent());
+                $this->assertStringContainsString($modulo === 'admisiones'
+                    ? 'aria-label="Situación de admisiones"'
+                    : 'id="admin-vista-'.$modulo.'"', $response->getContent());
                 $this->assertStringNotContainsString('<nav class="rm-admin-page__tabs"', $response->getContent());
             }
         }
