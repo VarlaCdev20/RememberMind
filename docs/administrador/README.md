@@ -4,13 +4,14 @@ Punto de entrada para mejorar el rol **ADMINISTRADOR** por procesos. Leer única
 
 ## Etapa actual
 
-**Habitaciones y camas**, iniciada el 2026-10-06 después de cerrar Residentes. Explorador físico con mapa desplegable, cuatro vistas, ficha e historial autorizado. Residentes conserva su directorio y traslado interno; Admisiones mantiene la bandeja integrada. Estas entregas no acreditan que todo el rol administrador esté terminado.
+**Habitaciones y camas / Ocupación**, revisadas el 2026-10-06 después de cerrar Residentes. Habitaciones mantiene el inventario con formularios modales; Ocupación concentra el mapa interactivo, consulta del ocupante y traslado autorizado. Residentes conserva su directorio y traslado interno; Admisiones mantiene la bandeja integrada. Estas entregas no acreditan que todo el rol administrador esté terminado.
 
 - [Admisiones: funcionamiento, mejoras y verificación](01-ADMISIONES.md).
 - [Preadmisiones: controles, vistas y verificación](../frontend/PREADMISIONES_INTERACTIVAS.md).
 - [Componentes compartidos: paginación, selectores y menú](02-COMPONENTES-COMPARTIDOS.md).
 - [Residentes y alojamiento: mapa, traslado, permisos y verificación](03-RESIDENTES-Y-ALOJAMIENTO.md).
-- [Habitaciones y camas: interacción, disponibilidad y ficha](04-HABITACIONES-Y-CAMAS.md).
+- [Habitaciones y camas: inventario y mantenimiento en modales](04-HABITACIONES-Y-CAMAS.md).
+- [Ocupación: mapa, selección de residente e historial](05-OCUPACION.md).
 - [Roles y responsabilidades vigentes](../arquitectura/REMEMBERMIND_ROLES_BASELINE_CONGELADO.md).
 - [Baseline de datos](../base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md) y [extensión V2.2 aprobada](../base-de-datos/DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md): inventario actual de 71 tablas, estructura congelada.
 

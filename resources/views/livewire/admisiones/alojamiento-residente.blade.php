@@ -2,7 +2,15 @@
     <x-ui.modal-livewire id="alojamiento-residente" wire:model="modalAbierto" title="Alojamiento del residente"
         subtitle="Cambio de cama dentro de una admisión formal vigente" max-width="lg" close-method="cerrarModal">
         <x-slot:icon><i class="ph-bold ph-bed" aria-hidden="true"></i></x-slot:icon>
-        @if($residente)
+        @if(!$residente && $camaOrigenMapa)
+            @if($destinoMapa)
+                <p class="rm-alert rm-alert--info mb-4">Destino: {{ $destinoMapa->habitacion->codigo }} · cama {{ $destinoMapa->codigo }}. Elige un residente ya admitido; después revisarás el traslado antes de confirmarlo.</p>
+                <label for="alojamiento-persona" class="rm-label">Residente con admisión formal</label>
+                <x-ui.selector id="alojamiento-persona" label="Residente" wire:model.live="residenteElegido" teleport="#alojamiento-portales"><option value="">Seleccionar residente</option>@foreach($residentesElegibles as $persona)<option value="{{ $persona->cod_residente }}">{{ trim($persona->nombres.' '.$persona->apellido_paterno.' '.$persona->apellido_materno) }} · {{ $persona->cod_residente }}</option>@endforeach</x-ui.selector>
+                @if($residentesElegibles->isEmpty())<p class="rm-control-help">No hay residentes admitidos disponibles para este flujo. Un nuevo ingreso se formaliza desde Admisiones.</p>@endif
+                @error('residenteElegido')<p class="rm-field-error" role="alert">{{ $message }}</p>@enderror
+            @else<p class="rm-alert rm-alert--warning" role="alert">La cama ya no está disponible. Cierra y actualiza el mapa.</p>@endif
+        @elseif($residente)
             <div class="space-y-4">
                 <div class="rm-card p-4">
                     <p class="font-semibold text-[var(--rm-text-primary)]">{{ $residente->nombres }} {{ $residente->apellido_paterno }} {{ $residente->apellido_materno }}</p>
@@ -62,13 +70,16 @@
                 @error('residente')<p class="rm-field-error" role="alert">{{ $message }}</p>@enderror
             </div>
         @endif
+        <div id="alojamiento-portales"></div>
         <x-slot:footer>
             <button type="button" wire:click="cerrarModal" class="rm-btn rm-btn--secondary" wire:loading.attr="disabled" wire:target="guardar">Cancelar</button>
+            @if(!$residente && $camaOrigenMapa)<button type="button" wire:click="continuarConResidente" class="rm-btn-primary" wire:loading.attr="disabled" @disabled(!$destinoMapa || !$residenteElegido)>Revisar traslado <i class="ph-bold ph-arrow-right" aria-hidden="true"></i></button>@else
             <button type="button" wire:click="guardar" class="rm-btn rm-btn--primary" wire:loading.attr="disabled" wire:target="guardar"
                 @disabled($impedimento || !$camaSeleccionada || !$fecha || !$hora)>
                 <span wire:loading.remove wire:target="guardar">{{ $residente?->ocupacionActiva ? 'Confirmar traslado' : 'Asignar alojamiento' }}</span>
                 <span wire:loading wire:target="guardar">Guardando…</span>
             </button>
+            @endif
         </x-slot:footer>
     </x-ui.modal-livewire>
 </div>

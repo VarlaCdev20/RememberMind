@@ -19,7 +19,13 @@
         :subtitle="$definicion['descripcion'].($modulo === 'residentes' ? ' Los residentes se crean exclusivamente mediante admisión formal.' : '')"
         :icon="$definicion['icono']"
         eyebrow="Administración"
-    />
+    >
+        <x-slot:actions>
+            @if($modulo === 'ocupacion' && $visibilidadNavegacion->puedeVerRuta('admin.administracion.habitaciones'))
+                <a wire:navigate href="{{ route('admin.administracion.ocupacion', ['vista' => 'camas']) }}" class="rm-btn-secondary"><i class="ph-bold ph-bed" aria-hidden="true"></i> Mapa de alojamiento</a>
+            @endif
+        </x-slot:actions>
+    </x-ui.collection-header>
 
     @if($modulo === 'reportes')
         <x-ui.filter-bar as="form" method="GET" class="rm-admin-page__filters" aria-label="Periodo de reportes">
@@ -176,7 +182,7 @@
                     </table>
                 </div>
                 @endif
-                <div class="rm-admin-page__pagination">{{ $registros->links() }}</div>
+                @if($modulo === 'ocupacion')<x-ui.paginacion :paginator="$registros" mode="url" :per-page="$registros->perPage()" label="ocupaciones" />@else<div class="rm-admin-page__pagination">{{ $registros->links() }}</div>@endif
             @else
                 @php
                     $hayFiltros = filled($filtros['search'] ?? null) || filled($filtros['estado'] ?? null)

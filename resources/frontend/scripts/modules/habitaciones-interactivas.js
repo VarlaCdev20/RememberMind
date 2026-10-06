@@ -4,6 +4,7 @@ export function rmHabitaciones() {
     return {
         ...rmResidentes(),
         colapsar: false,
+        gestionAbierta: false,
         vistaPrevia: null,
         temporizadorPrevia: null,
         posicion: { left: '16px', top: '16px' },

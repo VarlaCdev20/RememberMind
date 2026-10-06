@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Backend\Modulos\Administracion\Servicios\MapaHabitacionesService;
 use App\Backend\Modulos\Admisiones\Acciones\CambiarAlojamientoResidente;
 use App\Backend\Modulos\Admisiones\Acciones\FormalizarAdmision;
+use App\Frontend\Livewire\Admisiones\HabitacionesPanel;
 use App\Models\Cama;
 use App\Models\Contacto;
 use App\Models\Habitacion;
@@ -15,6 +16,7 @@ use App\Policies\ResidentePolicy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -154,6 +156,35 @@ class MapaHabitacionesTest extends TestCase
         $this->escenario();
         Gate::policy(Residente::class, MapaResidenteDenegadoPolicy::class);
         $this->get(route('admin.administracion.habitaciones', ['cama' => 'CAM_A']))->assertForbidden();
+        $this->assertDatabaseCount('ocupaciones_cama', 1);
+    }
+
+    public function test_mantenimiento_no_deshabilita_cama_ni_habitacion_con_residente(): void
+    {
+        $this->escenario();
+        foreach (['habitaciones.editar', 'camas.editar'] as $permiso) {
+            Permission::findOrCreate($permiso, 'web');
+            $this->usuario->givePermissionTo($permiso);
+        }
+        Livewire::test(HabitacionesPanel::class)
+            ->call('abrirEditarHabitacion', 'HAB_A')->set('estado', 'BLOQUEADA')->call('guardarHabitacion')->assertHasErrors('estado');
+        Livewire::test(HabitacionesPanel::class)
+            ->call('editarCama', 'CAM_A')->set('estado', 'MANTENIMIENTO')->call('guardarCama')->assertHasErrors('estado');
+        $this->assertDatabaseHas('habitaciones', ['cod_habitacion' => 'HAB_A', 'estado' => 'ACTIVA']);
+        $this->assertDatabaseHas('camas', ['cod_cama' => 'CAM_A', 'estado' => 'ACTIVA']);
+        $this->assertDatabaseCount('ocupaciones_cama', 1);
+    }
+
+    public function test_ocupacion_ofrece_traslado_solo_en_cama_disponible_y_historial_requiere_identidad_autorizada(): void
+    {
+        $this->escenario();
+        Permission::findOrCreate('ocupaciones_cama.ver', 'web');
+        $this->usuario->givePermissionTo('ocupaciones_cama.ver');
+        $this->get(route('admin.administracion.ocupacion'))->assertOk()->assertSee('Elegir residente para cama CB')->assertDontSee('Elegir residente para cama CA');
+        $this->get(route('admin.administracion.habitaciones'))->assertOk()->assertDontSee('Elegir residente para cama CB');
+        $this->usuario->revokePermissionTo('residentes.ver');
+        $this->get(route('admin.administracion.ocupacion'))->assertOk()->assertDontSee('Persona Sintetica')->assertDontSee('Elegir residente para cama');
+        $this->get(route('admin.administracion.ocupacion', ['tab' => 'historial']))->assertForbidden();
         $this->assertDatabaseCount('ocupaciones_cama', 1);
     }
 

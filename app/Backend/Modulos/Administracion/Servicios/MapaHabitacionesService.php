@@ -34,7 +34,8 @@ class MapaHabitacionesService
         $habitaciones = null;
         $camas = null;
         if ($vista === 'camas') {
-            $habQuery = DB::table('habitaciones as h');
+            $habQuery = DB::table('habitaciones as h')->select('h.*')
+                ->selectSub(DB::table('camas')->selectRaw('COUNT(*)')->whereColumn('camas.cod_habitacion', 'h.cod_habitacion'), 'camas_registradas');
             $this->filtrarPiso($habQuery, $filtros, 'h');
             if (filled($filtros['cod_habitacion'] ?? '')) {
                 $habQuery->where('h.cod_habitacion', $filtros['cod_habitacion']);

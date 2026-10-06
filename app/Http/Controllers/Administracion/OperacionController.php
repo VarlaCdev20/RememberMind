@@ -18,7 +18,7 @@ class OperacionController extends Controller
         $definicion = $consulta->definicion($modulo);
         abort_unless($definicion, 404);
         abort_unless($request->user()?->can($definicion['permiso']), 403);
-        if ($modulo === 'habitaciones') {
+        if (in_array($modulo, ['habitaciones', 'ocupacion'], true)) {
             abort_if($request->user()->hasRole('FAMILIAR'), 403);
         }
 
@@ -31,12 +31,12 @@ class OperacionController extends Controller
             },
             'prioridad' => ['nullable', 'in:CRITICA,ALTA,MEDIA,BAJA'],
             'fecha' => ['nullable', 'date'],
-            'tab' => ['nullable', 'string', 'max:30'],
+            'tab' => ['nullable', 'string', 'max:30', ...($modulo === 'ocupacion' ? ['in:actual,historial'] : [])],
             'desde' => ['nullable', 'date'],
             'hasta' => ['nullable', 'date', 'after_or_equal:desde'],
             'residente' => ['nullable', 'string', 'max:20'],
             'panel_tab' => ['nullable', 'in:resumen,datos,salud,documentos,historial'],
-            'vista' => ['nullable', in_array($modulo, ['residentes', 'habitaciones'], true) ? 'in:tarjetas,tabla,lista,camas' : 'in:tarjetas,tabla,lista'],
+            'vista' => ['nullable', in_array($modulo, ['residentes', 'habitaciones', 'ocupacion'], true) ? 'in:tarjetas,tabla,lista,camas' : 'in:tarjetas,tabla,lista'],
             'por_pagina' => ['nullable', 'integer', 'in:10,20,50'],
             'page' => ['nullable', 'integer', 'min:1'],
             'orden' => ['nullable', 'in:recientes,antiguas'],
@@ -46,9 +46,12 @@ class OperacionController extends Controller
             'disponibilidad' => ['nullable', 'in:ocupado,disponible,no_habilitado'],
             'cama' => ['nullable', 'string', 'max:20'],
         ]);
-        if ($modulo === 'habitaciones') {
+        if ($modulo === 'habitaciones' || ($modulo === 'ocupacion' && ($filtros['tab'] ?? '') !== 'historial' && $request->user()->can('habitaciones.ver'))) {
             return view('pages.admin.administracion.habitaciones', app(MapaHabitacionesService::class)->datos($filtros, $request->user()))
-                ->with(compact('filtros'));
+                ->with(compact('filtros'))->with('esOcupacion', $modulo === 'ocupacion');
+        }
+        if ($modulo === 'ocupacion') {
+            $this->authorize('viewAny', Residente::class);
         }
         $registros = null;
         $reportes = [];
@@ -189,7 +192,7 @@ class OperacionController extends Controller
                 $registros = $query->orderBy($configuracion['orden'], $direccion)->orderBy('codigo', $direccion)
                     ->paginate($porPagina)->withQueryString();
             } else {
-                $registros = $query->orderByDesc($configuracion['orden'])->paginate(15)->withQueryString();
+                $registros = $query->orderByDesc($configuracion['orden'])->paginate($modulo === 'ocupacion' ? $porPagina : 15)->withQueryString();
             }
         }
 

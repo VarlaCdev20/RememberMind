@@ -6,7 +6,6 @@ use App\Frontend\Livewire\Administracion\Actividades\ParticipacionPanel;
 use App\Frontend\Livewire\Administracion\Actividades\ReportesActividadesPanel;
 use App\Frontend\Livewire\Administracion\Actividades\TiposActividadPanel;
 use App\Frontend\Livewire\Administracion\Identidad\PersonalInstitucionalPanel;
-use App\Frontend\Livewire\Admisiones\HabitacionesPanel;
 use App\Frontend\Livewire\Admisiones\PreadmisionesPanel;
 use App\Frontend\Livewire\Admisiones\PreadmisionWizard;
 use App\Frontend\Livewire\Compartido\Alertas\AlertasPanel;
@@ -546,7 +545,7 @@ Route::middleware([
                 ->name('habitaciones.')
                 ->middleware('permission:habitaciones.ver')
                 ->group(function () {
-                    Route::get('/', HabitacionesPanel::class)->name('index');
+                    Route::get('/', fn () => redirect()->route('admin.administracion.habitaciones'))->name('index');
                 });
 
             Route::prefix('turnos-enfermeria')

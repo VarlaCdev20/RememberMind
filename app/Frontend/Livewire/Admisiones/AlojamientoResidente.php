@@ -6,6 +6,8 @@ use App\Backend\Modulos\Admisiones\Acciones\CambiarAlojamientoResidente;
 use App\Backend\Modulos\Admisiones\Acciones\FormalizarAdmision;
 use App\Models\Cama;
 use App\Models\Residente;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -27,6 +29,39 @@ class AlojamientoResidente extends Component
     public string $hora = '';
 
     public string $motivo = '';
+
+    public string $residenteElegido = '';
+
+    #[Locked]
+    public ?string $camaOrigenMapa = null;
+
+    #[On('elegir-residente-para-cama')]
+    public function elegirDesdeCama(string $codCama): void
+    {
+        $this->autorizarSeleccion();
+        $this->reset(['codResidente', 'codOcupacionAnterior', 'residenteElegido', 'fecha', 'hora', 'motivo']);
+        $this->resetValidation();
+        $this->camaOrigenMapa = $codCama;
+        $this->codCama = $codCama;
+        $this->modalAbierto = true;
+    }
+
+    public function continuarConResidente(): void
+    {
+        $this->autorizarSeleccion();
+        abort_unless($this->modalAbierto && $this->camaOrigenMapa, 403);
+        $this->validate(['residenteElegido' => ['required', 'string', 'exists:residentes,cod_residente']], ['residenteElegido.required' => 'Elija un residente con admisión formal.']);
+        if (! FormalizarAdmision::filtrarCamasDisponibles(Cama::query())->whereKey($this->camaOrigenMapa)->exists()) {
+            throw ValidationException::withMessages(['residenteElegido' => 'Esta cama ya no está disponible. Actualice el mapa antes de continuar.']);
+        }
+        $this->abrir($this->residenteElegido, $this->camaOrigenMapa);
+    }
+
+    private function autorizarSeleccion(): void
+    {
+        abort_unless(auth()->user()?->estado === 'ACTIVO' && auth()->user()->can('ocupaciones_cama.gestionar') && ! auth()->user()->hasRole('FAMILIAR'), 403);
+        Gate::authorize('viewAny', Residente::class);
+    }
 
     #[On('abrir-alojamiento-residente')]
     public function abrir(string $codResidente, ?string $codCama = null): void
@@ -65,8 +100,9 @@ class AlojamientoResidente extends Component
 
     public function cerrarModal(): void
     {
-        $this->reset(['modalAbierto', 'codResidente', 'codOcupacionAnterior', 'codCama', 'fecha', 'hora', 'motivo']);
+        $this->reset(['modalAbierto', 'codResidente', 'codOcupacionAnterior', 'codCama', 'fecha', 'hora', 'motivo', 'residenteElegido', 'camaOrigenMapa']);
         $this->resetValidation();
+        $this->dispatch('alojamiento-residente-cerrado');
     }
 
     public function render()
@@ -74,6 +110,18 @@ class AlojamientoResidente extends Component
         $residente = null;
         $camas = collect();
         $impedimento = null;
+        $residentesElegibles = collect();
+        $destinoMapa = null;
+        if ($this->modalAbierto && ! $this->codResidente && $this->camaOrigenMapa) {
+            $this->autorizarSeleccion();
+            $destinoMapa = FormalizarAdmision::filtrarCamasDisponibles(Cama::query())->with('habitacion')->whereKey($this->camaOrigenMapa)->first();
+            if ($destinoMapa) {
+                $residentesElegibles = Residente::query()->select(['cod_residente', 'nombres', 'apellido_paterno', 'apellido_materno'])
+                    ->whereIn('estado', ['ACTIVO', 'ADMITIDO'])
+                    ->whereHas('admisiones', fn ($query) => $query->whereIn('estado', ['ACTIVA', 'ACTIVO'])->whereHas('ocupacionesCama'))
+                    ->orderBy('nombres')->get()->filter(fn ($persona) => Gate::allows('view', $persona));
+            }
+        }
         if ($this->modalAbierto && $this->codResidente) {
             $residente = Residente::query()->with(['ocupacionActiva.cama.habitacion', 'admisiones' => fn ($query) => $query
                 ->whereIn('estado', ['ACTIVA', 'ACTIVO'])->withCount('ocupacionesCama')])->findOrFail($this->codResidente);
@@ -94,6 +142,7 @@ class AlojamientoResidente extends Component
         return view('livewire.admisiones.alojamiento-residente', [
             'residente' => $residente, 'camas' => $camas,
             'camaSeleccionada' => $camas->firstWhere('cod_cama', $this->codCama), 'impedimento' => $impedimento,
+            'residentesElegibles' => $residentesElegibles, 'destinoMapa' => $destinoMapa,
         ]);
     }
 }

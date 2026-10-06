@@ -160,6 +160,34 @@ class AlojamientoResidenteTest extends TestCase
         $this->assertDatabaseCount('ocupaciones_cama', 1);
     }
 
+    public function test_desde_cama_se_elige_residente_sin_mutar_hasta_confirmar(): void
+    {
+        $datos = $this->escenario();
+        Livewire::test(AlojamientoResidente::class)->dispatch('elegir-residente-para-cama', codCama: $datos['destino']->getKey())
+            ->assertSet('codResidente', null)->assertSee('Elige un residente ya admitido')
+            ->set('residenteElegido', $datos['residente']->getKey())->call('continuarConResidente')->assertHasNoErrors()
+            ->assertSet('codResidente', $datos['residente']->getKey())->assertSet('codCama', $datos['destino']->getKey());
+        $this->assertDatabaseCount('ocupaciones_cama', 1);
+        $this->assertDatabaseHas('ocupaciones_cama', ['cod_cama' => $datos['origen']->getKey(), 'estado' => 'ACTIVA']);
+    }
+
+    public function test_seleccion_desde_mapa_rechaza_disponibilidad_obsoleta(): void
+    {
+        $datos = $this->escenario();
+        $form = Livewire::test(AlojamientoResidente::class)->call('elegirDesdeCama', $datos['destino']->getKey())->set('residenteElegido', $datos['residente']->getKey());
+        $datos['destino']->update(['estado' => 'BLOQUEADA']);
+        $form->call('continuarConResidente')->assertHasErrors('residenteElegido')->assertSet('codResidente', null);
+        $this->assertDatabaseCount('ocupaciones_cama', 1);
+    }
+
+    public function test_selector_desde_cama_no_expone_personas_sin_permiso(): void
+    {
+        $datos = $this->escenario();
+        $datos['usuario']->revokePermissionTo('residentes.ver');
+        Livewire::test(AlojamientoResidente::class)->call('elegirDesdeCama', $datos['destino']->getKey())->assertForbidden();
+        $this->assertDatabaseCount('ocupaciones_cama', 1);
+    }
+
     private function escenario(string $sufijo = ''): array
     {
         $usuario = User::factory()->create(['estado' => 'ACTIVO']);
