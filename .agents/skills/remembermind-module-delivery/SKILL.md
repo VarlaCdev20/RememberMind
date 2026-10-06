@@ -1,22 +1,55 @@
 ---
 name: remembermind-module-delivery
-description: Implement or complete a RememberMind module end-to-end across backend, UI, permissions, persistence, integration, audit and tests. Use for requests such as "completa el módulo", "implementa el flujo", or substantial cross-layer features.
+description: "Arquitectar y entregar un módulo o flujo completo de RememberMind coordinando contratos, backend, UX, integración, seguridad, persistencia y pruebas. Usar para cambios sustanciales entre capas; absorbe module-architect y selecciona especialistas pertinentes, sin cargarlos todos."
 ---
 
-# RememberMind module delivery
+# Purpose
 
-1. Read applicable `AGENTS.md` files for the directories you will touch.
-2. Consult relevant project sources. Use the frozen DB baseline when persistence/schema is involved and current module docs when available.
-3. Inspect the existing V2 implementation before creating parallel code: Models, relationships, Actions, Services, Policies, Requests, Controllers/Livewire, routes, views, Design System, permissions, tests, seeders/factories.
-4. Reconstruct the real institutional flow: actors, purpose, states, transitions, permissions, negative cases, invariants, traceability and downstream dependencies.
-5. Do not invent new sensitive institutional/clinical rules. Isolate and request a decision only for the material ambiguous rule; continue all safe work.
-6. If the frozen DB would need structural change, stop only that structural action, document impact/options and request approval.
-7. Implement the minimum coherent end-to-end surface. Fix directly related security/V2/legacy/integration blockers.
-8. Ensure backend authorization remains the source of truth; UI hiding alone is insufficient.
-9. For UI work, invoke `$remembermind-ui-review` and `$ui-ux-pro-max` when available.
-10. Add/update tests for happy path, authorization negatives, invalid states/invariants and regressions proportional to risk.
-11. Run the narrow tests first, then the related suite; run `npm run build` for meaningful frontend changes. Use destructive DB verification only on a confirmed disposable environment.
-12. Review `git diff`/`git status`, remove task-related debug/TODO/mock/legacy artifacts and create a coherent local commit when the task is fully verified and self-contained. Never push without explicit instruction.
-13. Report Implementado, Integración, Seguridad, Pruebas, Build, Legacy, Commit and true Pendientes.
+Coordinar una entrega coherente de proceso; cubre la responsabilidad module-architect sin crear coordinador duplicado.
 
-Success means the institutional process works end-to-end, not merely that files were added.
+# Use when
+
+“Completa el módulo”, “implementa el flujo”, una funcionalidad sustancial o reorganización entre varias capas/roles.
+
+# Do not use when
+
+Un retoque localizado, gate de lectura o propuesta de otra arquitectura. Seleccionar surgical-patch/safe-refactor/verify-and-stop si basta su alcance.
+
+# Mandatory sources
+
+AGENTS aplicables, [pipeline del sistema](../../../docs/sistema/STACK_SKILLS_SISTEMA.md), fuentes/contrato del módulo, código/tests/consumidores existentes y UX cuando haya pantalla.
+
+# Domain assumptions
+
+Completitud requiere actores, estados, reglas, autorización, persistencia, navegación, continuidad y evidencia; no solo archivos. Selección proporcional evita cargar todas las skills por defecto.
+
+# Workflow
+
+1. Inspeccionar git status/diff y fuentes con source-of-truth; investigate-first si causa incierta.
+2. Definir alcance/aceptación, guardrails y DOMAIN DESIGN con domain-architect; workflow y matriz de permisos pertinentes.
+3. Mapear entradas/backend/relaciones/routes/UI/consumidores, invariantes, transacción, audit y pruebas; reutilizar componentes y código V2.
+4. Seleccionar integridad/continuidad/alertas/experto solo si el caso los toca. Para UI, remembermind-ui-review elige especialidades; ui-ux-pro-max es auxiliar puntual, no paso obligatorio.
+5. Consolidar plan; en trabajo complejo reviewers de lectura y un implementador. Nunca agentes editando simultáneamente los mismos archivos.
+6. Implementar mínimo flujo completo y corregir bloqueos directamente relacionados de autorización/V2/legacy; no ampliar a reescritura global.
+7. Probar con system-testing y gates pertinentes, build/QA visual cuando aplica; subsanar hallazgos fuera del gate y volver a comprobar lo afectado.
+8. Release-check coordina evidencia y commit local. Reportar Implementado, Integración, Seguridad, Pruebas, Build, Legacy, Commit, Pendientes; no push automático.
+
+# Invariants
+
+Sin cambios sensibles/estructurales no autorizados, CRUD directo de residente, operación clínica solo en UI, pseudopersistencia, placeholders esenciales ni capas V1 permanentes.
+
+# Failure conditions
+
+Módulo no conectado a navegación, datos sin consumidor, pruebas/build/QA declarados por suposición o entrega que oculta un pendiente esencial.
+
+# Escalation rules
+
+Aislar decisión material no resuelta y continuar plan independiente. No pedir aprobación de cada archivo, extracción o componente reversible ya autorizado.
+
+# Tests required
+
+Matriz proporcional positiva/negativa por estado/actor, invariantes/persistencia, recorrido y regresión; integración PostgreSQL y UI cuando riesgo lo exija.
+
+# Definition of Done
+
+Contrato aceptado implementado de punta a punta, consumidores conectados, evidencia suficiente por dimensión, legacy relacionado eliminado y commit de alcance propio verificable.

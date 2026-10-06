@@ -1,22 +1,54 @@
 ---
 name: remembermind-database-audit
-description: Validate RememberMind migrations, models, seeders, factories and persistence against the frozen 70-table V2.1 baseline without changing structural DB rules. Use for schema audits, migration failures, relationship mismatches, V1 cleanup, or requests to verify the database.
+description: "Auditar independientemente esquema, mappings y persistencia de RememberMind contra baseline congelado y extensiones aprobadas. Usar como gate BDD o revisión de relaciones/migraciones; emite evidencia por capa y motor sin implementar correcciones."
 ---
 
-# RememberMind database audit
+# Purpose
 
-1. Read `database/AGENTS.md`.
-2. Read the relevant sections of `docs/base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md` and `docs/base-de-datos/REMEMBERMIND_BDD_70_TABLAS.md`.
-3. Compare current migrations, Models, relationships, seeders/factories and tests with the baseline.
-4. Classify findings:
-   - implementation mismatch that can be corrected to baseline;
-   - legacy V1 artifact to migrate/remove;
-   - actual proposed structural change requiring owner approval.
-5. Never modify frozen tables/columns/PK/FK/cardinality/index rules outside the approved baseline without explicit approval.
-6. Check central invariants: resident/admission, bed occupancy, medication/prescription resident match, instrument question/application match, consent contact/resident match, history deletion, role boundaries.
-7. Check PK/FK types/lengths, nullability, FK indexes, approved priority indexes, delete behavior and Eloquent configuration.
-8. Preserve portability across configured engines; do not claim SQLite proves engine-specific concurrency.
-9. Validate `migrate:fresh --seed` only on a confirmed disposable testing/development DB.
-10. Run relevant tests and report exact mismatch, impacted files and whether the baseline remained unchanged.
+Aceptar/rechazar el contrato de persistencia con evidencia independiente.
 
-Do not "fix" a code mismatch by altering the frozen schema unless the owner explicitly approves the structural change.
+# Use when
+
+Auditoría solicitada, gate de persistencia, migraciones aprobadas, integridad cruzada, V2/legacy relacionado o revisión de inventario cuando se pide global.
+
+# Do not use when
+
+Implementar durante gate, contar todo el esquema por cada cambio local, alterar baseline para conseguir PASS; database-integrity guía desarrollo.
+
+# Mandatory sources
+
+[database/AGENTS](../../../database/AGENTS.md), baseline/diccionario/decisiones vigentes, contrato resuelto, migraciones reales/Models/Actions/seeders/factories/tests del ámbito.
+
+# Domain assumptions
+
+Inventario se deriva de versión/decisiones actuales, no del nombre del diccionario. Garantía SQL, Model, operación y Policy se revisan separadamente; SQLite no demuestra locks/concurrencia PostgreSQL.
+
+# Workflow
+
+1. Fijar ámbito y autoridad. Descubrir migraciones presentes, no confiar en índice de rutas obsoleto.
+2. Comparar esquema/PK/FK/longitudes/nullability/precisión/unique/index/delete con contrato; revisar mapping/casts/relaciones y grano.
+3. Revisar admisión/camas, medicación/residente, instrumento/pregunta/opción, consentimiento/contacto, estudios/componentes y longitudinalidad según ámbito.
+4. Verificar transacciones, garantías bajo SQL directo cuando se afirma integridad física, reintentos y prueba real de concurrencia/rollback.
+5. Ejecutar solo pruebas aplicables y seguras; reset únicamente DB confirmada desechable. Revisar PostgreSQL además de SQLite cuando pertinente.
+6. Emitir PASS/FAIL/BLOQUEADO con hallazgo, fuente, capa, motor, evidencia, impacto y reparación propuesta. Sin edición durante el gate.
+7. Clasificar desajuste de implementación, legacy a retirar o propuesta estructural; devolver al implementador y revisar corrección luego.
+
+# Invariants
+
+No cambios congelados sin decisión, inventario fijo eterno, deletions clínicas ordinarias ni portable a motor no soportado por simple configuración.
+
+# Failure conditions
+
+PASS sin cobertura, Eloquent llamado garantía SQL, carrera no ejecutada presentada como verificada o corrección realizada por el revisor sin fase separada.
+
+# Escalation rules
+
+Propuesta estructural requiere aprobación; fuente conflictiva material requiere resolución. Falta de entorno se registra no verificado/BLOQUEADO para esa aceptación, sin frenar comprobaciones independientes.
+
+# Tests required
+
+Pruebas relevantes por capa/motor; comando, resultados y no cubierto. No ejecutar migrate:fresh --seed universalmente ni simular garantía SQL con mocks.
+
+# Definition of Done
+
+Dictamen verificable y proporcional, baseline intacto salvo extensión autorizada; implementado/verificado SQLite/verificado PostgreSQL/no verificado claramente separados.

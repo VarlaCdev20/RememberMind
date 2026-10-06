@@ -342,6 +342,22 @@ For significant work, report concisely:
 - Commit
 - Pendientes
 
+## System skills
+
+For substantial institutional/domain work, use the selector in
+[`docs/sistema/STACK_SKILLS_SISTEMA.md`](docs/sistema/STACK_SKILLS_SISTEMA.md).
+Resolve sources and applicable approved versions before designing the flow.
+`remembermind-module-delivery` includes module architecture and coordination;
+do not create a parallel module-architect skill.
+Select specialist skills by the changed risk; do not load every stage for a
+localized task. Development guardians guide implementation; security/DB/expert
+review gates return findings without editing. Corrections belong to a separate
+implementation phase.
+UI selection remains with `remembermind-ui-review` and the UX stack.
+The skills do not approve new clinical rules, permissions, frozen structure or
+expert-system methodology. In complex delegated work, consolidate read-only
+reviews, use one implementer and then independent verification.
+
 ## Scoped instructions
 
 Additional rules apply under:
