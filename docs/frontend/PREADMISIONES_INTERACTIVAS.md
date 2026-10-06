@@ -10,7 +10,7 @@ Los iconos de expediente, documentos e historial abren las pestañas existentes.
 
 ## Componentes compartidos
 
-- `x-ui.selector`: opciones nativas como fuente de datos, búsqueda sin acentos, teclado, selección simple o múltiple y un máximo de tres opciones visibles cuando existen más de diez. El resto permanece disponible mediante desplazamiento.
+- `x-ui.selector`: opciones nativas como fuente de datos, búsqueda sin acentos solo al superar diez opciones, teclado, selección simple o múltiple y un máximo de tres opciones visibles cuando existen más de diez. El resto permanece disponible mediante desplazamiento.
 - `x-ui.calendario`: fechas ISO sin conversión UTC, semana desde lunes, cambio de mes/año y límites inclusivos definidos por el formulario. La fecha de nacimiento conserva el límite de edad que ya valida el backend.
 - Ambos requieren contexto Livewire y `wire:model`. En un modal con foco restringido, indicar `teleport` con el selector de una capa interior; el formulario usa `#rm-wizard-control-layer`.
 

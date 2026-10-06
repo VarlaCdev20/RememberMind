@@ -10,6 +10,8 @@
 .rm-control-popover { position: fixed; z-index: 110; padding: 10px; overflow: auto; border: 1px solid var(--rm-border-strong); border-radius: var(--rm-radius-xl); background: var(--rm-surface); color: var(--rm-text-primary); box-shadow: var(--rm-shadow-overlay); font-family: var(--rm-font-body); }
 .rm-choice__search { display: flex; align-items: center; gap: 8px; padding: 4px 9px; margin-bottom: 8px; border: 1px solid var(--rm-border); border-radius: var(--rm-radius-lg); background: var(--rm-input-bg); color: var(--rm-primary-ink); }
 .rm-choice__search input { width: 100%; min-width: 0; min-height: 34px; padding: 0; border: 0; background: transparent; box-shadow: none; color: var(--rm-text-primary); font-size: var(--rm-text-sm); }
+.rm-choice__search:focus-within { outline: 2px solid var(--rm-focus); outline-offset: 2px; }
+.rm-choice__search input:is(:focus, :focus-visible) { outline: none; box-shadow: none; border-color: transparent; }
 .rm-choice__options { display: grid; gap: 2px; max-height: 220px; overflow-y: auto; scrollbar-color: var(--rm-primary) transparent; scrollbar-width: thin; }
 .rm-choice__options.is-long { max-height: 136px; }
 .rm-choice__options > button { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 10px; border: 0; border-radius: var(--rm-radius-md); background: transparent; color: var(--rm-text-primary); text-align: left; font-size: var(--rm-text-sm); transition: background 160ms, color 160ms; }

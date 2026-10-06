@@ -28,6 +28,7 @@ export function rmSelector(value = '') {
             this.options = Array.from(this.$refs.native.options, o => ({ value: o.value, label: o.textContent.trim(), disabled: o.disabled }));
         },
         get filtered() { return this.options.filter(o => normalizar(o.label).includes(normalizar(this.search))); },
+        get hasSearch() { return this.options.length > 10; },
         get multiple() { return this.$refs.native?.multiple || false; },
         selected(value) { return this.multiple ? (Array.isArray(this.value) && this.value.includes(value)) : String(this.value ?? '') === value; },
         get label() {
@@ -37,14 +38,20 @@ export function rmSelector(value = '') {
         position() {
             const r = this.$refs.trigger.getBoundingClientRect();
             const width = Math.min(Math.max(240, r.width), window.innerWidth - 16);
-            const height = Math.min(310, window.innerHeight - 24);
+            const height = Math.min((this.hasSearch ? 244 : Math.min(220, this.options.length * 46) + 20) + (this.multiple ? 44 : 0), window.innerHeight - 24);
             const top = window.innerHeight - r.bottom > height ? r.bottom + 8 : Math.max(8, r.top - height - 8);
             this.popupStyle = `left:${Math.max(8, Math.min(r.left, window.innerWidth - width - 8))}px;top:${top}px;width:${width}px;max-height:${height}px`;
         },
         show() {
             if (this.$refs.native.disabled) return;
-            this.readOptions(); this.search = ''; this.active = 0; this.position(); this.open = true;
-            this.$nextTick(() => this.$refs.search.focus());
+            this.readOptions(); this.search = '';
+            const selectedIndex = this.options.findIndex(o => this.selected(o.value) && !o.disabled);
+            this.active = selectedIndex >= 0 ? selectedIndex : Math.max(0, this.options.findIndex(o => !o.disabled));
+            this.position(); this.open = true;
+            this.$nextTick(() => {
+                if (this.hasSearch) this.$refs.search.focus();
+                else this.$refs.list.querySelectorAll('[role="option"]')[this.active]?.focus({ preventScroll: true });
+            });
         },
         close() { this.open = false; this.$refs.trigger.focus({ preventScroll: true }); },
         choose(option) {
@@ -66,7 +73,11 @@ export function rmSelector(value = '') {
             event.preventDefault();
             const last = this.filtered.length - 1;
             this.active = event.key === 'Home' ? 0 : event.key === 'End' ? last : Math.max(0, Math.min(last, this.active + (event.key === 'ArrowDown' ? 1 : -1)));
-            this.$nextTick(() => this.$refs.list.querySelectorAll('[role="option"]')[this.active]?.scrollIntoView({ block: 'nearest' }));
+            this.$nextTick(() => {
+                const option = this.$refs.list.querySelectorAll('[role="option"]')[this.active];
+                option?.scrollIntoView({ block: 'nearest' });
+                if (!this.hasSearch) option?.focus({ preventScroll: true });
+            });
         },
     };
 }
