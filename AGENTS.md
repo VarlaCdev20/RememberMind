@@ -208,6 +208,13 @@ For Laravel/packages, verify the actual installed version and current official d
 
 Use `resources/AGENTS.md` for visual work.
 
+For RememberMind UX/UI use the specialized stack documented in
+`docs/frontend/STACK_SKILLS_UX_UI.md` and its shared visual contract.
+`remembermind-ui-review` selects the applicable stages; do not load every
+specialty for a localized task. An owner-approved image controls the visual
+structure of its screen, with necessary domain/accessibility adaptations.
+Generic design skills remain auxiliary and cannot override this contract.
+
 RememberMind should be professional, warm, clear, accessible and role/process-oriented. Respect the canonical Design System and use UI/UX Pro Max when relevant.
 
 A UI must not invent clinical severity; the domain determines meaning and the UI represents it.

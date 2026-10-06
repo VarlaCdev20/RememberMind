@@ -27,4 +27,13 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 SKILL.md
+!/.agents/skills/remembermind-*/SKILL.md
+!/.agents/skills/design/SKILL.md
+!/.agents/skills/design-system/SKILL.md
+!/.agents/skills/ui-styling/SKILL.md
+!/.agents/skills/ui-ux-pro-max/SKILL.md
+!/.agents/skills/banner-design/SKILL.md
+!/.agents/skills/brand/SKILL.md
+!/.agents/skills/slides/SKILL.md
+!/.agents/skills/humanizer/SKILL.md
 /public/vendor

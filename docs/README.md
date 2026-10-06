@@ -6,6 +6,9 @@
 - [Arquitectura y estructura de carpetas vigente](arquitectura/README.md)
 - [Auditoría](auditoria.md)
 - [Auditoría de roles y permisos](auditoria_roles_permisos.md)
+- [Stack de skills UX/UI: selección, responsabilidades y pipeline](frontend/STACK_SKILLS_UX_UI.md)
+- [Contrato visual UX/UI aprobado y límites del dominio](frontend/CONTRATO_VISUAL_UX_UI.md)
+- [Auditoría y transición de las skills UX/UI existentes](frontend/AUDITORIA_SKILLS_UX_UI.md)
 
 ## Documentación histórica
 

@@ -21,30 +21,35 @@ Before substantial UI work inspect:
 
 and the related tokens/components/patterns/layouts.
 
-The repository's canonical Design System is the visual source of truth. Reuse it before adding local CSS.
+The repository's canonical Design System is the implementation source of truth.
+The owner's current visual instruction or approved image governs the target
+appearance. Consult `docs/frontend/CONTRATO_VISUAL_UX_UI.md` for approved
+direction and differences from implemented tokens. Reuse and evolve the shared
+system before adding local CSS; do not silently blend conflicting palettes.
 
 Do not create a second palette, typography scale, button system, card system, modal system or role-specific visual language.
 
 Historical/ad-hoc styles may exist. When touched, migrate them toward the canonical system when reasonably in scope; do not extend obsolete patterns.
 
-## UI/UX Pro Max
+## Specialized UX/UI stack
 
-For relevant UI/UX tasks use the installed `$ui-ux-pro-max` skill as design/quality guidance.
+Use `docs/frontend/STACK_SKILLS_UX_UI.md` for the ordered pipeline and select
+only the applicable specialties. `$remembermind-ui-review` is its entry point;
+flow, reference fidelity, art direction, shared components, clinical capture,
+data visualization, motion, accessibility and writing have distinct owners.
+`$remembermind-visual-functional-qa` produces PASS/FAIL from actual evidence
+and does not implement corrections.
 
-Use it for:
-- layout and responsive review;
-- accessibility;
-- forms and validation;
-- touch/interaction;
-- navigation;
-- glassmorphism;
-- modals/drawers;
-- feedback/toasts;
-- charts and data presentation.
+When an approved image exists, analyze it before editing and preserve its
+layout, proportions, density, depth, geometry and glass. Adapt content,
+permissions, clinical rules, data, responsive and necessary accessibility.
+Document any technical limitation and the closest viable alternative.
 
-Its recommendations do not override RememberMind's domain, permissions or canonical Design System. Synthesize recommendations into existing tokens/components instead of generating a parallel design system.
-
-For RememberMind-specific UI review, also use `$remembermind-ui-review`.
+Use `$ui-ux-pro-max` as auxiliary guidance for the concrete concern when useful.
+Its recommendations do not override RememberMind's domain, approved reference
+or shared Design System. Verify resource paths before executing its CLI:
+the repository copy does not include the scripts/datasets advertised.
+Do not generate another visual system from generic recommendations.
 
 ## Glassmorphism
 
@@ -259,7 +264,9 @@ Use pagination for growing lists.
 
 For many row actions prefer one primary action plus a contextual menu rather than a row of tiny icons.
 
-On mobile choose priority columns, controlled horizontal scroll, cards or progressive detail based on usability.
+On mobile choose priority columns, cards or progressive detail based on usability,
+preserving access to necessary information. The current UX brief requires no
+horizontal scroll; do not hide overflow to mask a broken layout.
 
 ## Resident context
 
