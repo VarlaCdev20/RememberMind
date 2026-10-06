@@ -2,6 +2,7 @@
 
 ## Documentación vigente
 
+- [Administrador: etapas, funcionamiento y mejoras](administrador/README.md)
 - [BDD Operativa V2.1 — baseline y 70 tablas](base-de-datos/README.md)
 - [Arquitectura y estructura de carpetas vigente](arquitectura/README.md)
 - [Auditoría](auditoria.md)
