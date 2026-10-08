@@ -1,7 +1,6 @@
 <?php
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Turno extends ModeloOperativo
@@ -19,12 +18,12 @@ class Turno extends ModeloOperativo
         return $this->hasMany(ProgramacionCuidado::class, 'cod_turno', 'cod_turno');
     }
 
-    public function scopeActivos(Builder $query): Builder
+    public function scopeActivos($query)
     {
         return $query->whereIn('estado', ['ACTIVO', 'ACTIVA']);
     }
 
-    public function scopeInactivos(Builder $query): Builder
+    public function scopeInactivos($query)
     {
         return $query->whereIn('estado', ['INACTIVO', 'INACTIVA']);
     }

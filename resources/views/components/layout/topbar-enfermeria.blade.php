@@ -7,10 +7,10 @@
     {{-- LADO IZQUIERDO: LOGO INSTITUCIONAL + REMEMBERMIND + CENTRO GERIÁTRICO --}}
     <div class="rm-topbar__identity">
         {{-- Botón Móvil para abrir sidebar --}}
-        <button type="button"
+        <button type="button" id="sidebar-mobile-trigger"
                 @click="sidebarOpen = true"
                 class="rm-topbar__action rm-topbar__hamburger"
-                aria-label="Abrir menú lateral">
+                aria-label="Abrir menú lateral" aria-controls="sidebar-enfermeria" :aria-expanded="sidebarOpen.toString()">
             <i class="ph-bold ph-list text-xl"></i>
         </button>
 

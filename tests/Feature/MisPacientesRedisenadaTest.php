@@ -830,13 +830,13 @@ class MisPacientesRedisenadaTest extends TestCase
         $css = file_get_contents(resource_path('frontend/styles/design-system/patterns/resident-directory.css'));
 
         $this->assertStringContainsString('.rm-resident-directory__register-modal--selector .rm-modal-panel', $css);
-        $this->assertStringContainsString('width: min(560px, calc(100vw - 32px))', $css);
+        $this->assertStringContainsString('width: min(var(--rm-modal-xl,900px), calc(100vw - 32px))', $css);
         $this->assertStringContainsString('max-height: 82dvh', $css);
-        $this->assertStringContainsString('grid-template-columns: repeat(3, minmax(0, 1fr))', $css);
+        $this->assertStringContainsString('grid-template-columns: repeat(4, minmax(0, 1fr))', $css);
         $this->assertStringContainsString('@media (max-width: 480px)', $css);
         $this->assertStringContainsString('width: calc(100vw - 16px)', $css);
         $this->assertStringContainsString('grid-template-columns: repeat(2, minmax(0, 1fr))', $css);
-        $this->assertStringContainsString('min-height: 93px', $css);
+        $this->assertStringContainsString('min-height: 76px', $css);
         $this->assertStringContainsString('outline: 2px solid var(--rm-focus)', $css);
 
         $this->actingAs($this->enfermero);
@@ -965,7 +965,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertHasErrors('presion_sistolica')
             ->assertSet('drawerPaso', 'register-form')
             ->assertSet('mostrarSelectorModal', true)
-            ->assertDontSee('Registro guardado correctamente')
+            ->assertSet('signosResultadoRegistro', [])
             ->assertSee('Revisa el valor ingresado. Esta medición requiere un número entero.');
     }
 
@@ -1191,7 +1191,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertHasNoErrors()
             ->assertSet('drawerPaso', 'register-result')
             ->assertSee('Registro guardado · Atención requerida')
-            ->assertDontSee('Registro guardado correctamente')
+            ->assertSet('signosResultadoRegistro.hay_critico', true)
             ->assertSee('Alerta crítica generada');
 
         $this->assertSame($signosAntes + 1, SignoVital::query()->count());
@@ -2403,7 +2403,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $fecha = now()->format('Y-m-d\TH:i');
         $formulario = $this->formularioSignos()->set('signoFC', '72')
             ->assertSet('signoFechaHora', $fecha)
-            ->assertSee('Asignadas automáticamente al abrir este registro.')
+            ->assertSee('Fecha y hora automáticas · No editables')
             ->assertDontSee('type="datetime-local"', false)
             ->assertDontSee('wire:model.live="signoFechaHora"', false);
         $this->travel(10)->minutes();

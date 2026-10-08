@@ -12,9 +12,9 @@
     $urlCerrarPanel = route('admin.administracion.residentes', $parametrosListadoResidentes);
 @endphp
 
-<a class="rm-admin-resident-panel__backdrop" href="{{ $urlCerrarPanel }}" aria-label="Cerrar panel del residente"></a>
-<aside class="rm-admin-resident-panel" aria-label="Panel del residente {{ $nombreResidente }}" tabindex="-1"
-    x-data x-init="$nextTick(() => $el.focus())" x-on:keydown.escape.window="window.location.assign(@js($urlCerrarPanel))">
+<a class="rm-admin-resident-panel__backdrop" href="{{ $urlCerrarPanel }}" aria-label="Cerrar panel del residente" tabindex="-1"></a>
+<aside class="rm-admin-resident-panel" role="dialog" aria-modal="true" aria-label="Panel del residente {{ $nombreResidente }}" tabindex="-1"
+    x-data x-trap.inert.noscroll="true" x-init="$nextTick(() => $el.focus())" x-on:keydown.escape.window="if (!$el.querySelector('.rm-modal-shell.is-open')) window.location.assign(@js($urlCerrarPanel))">
     <div class="rm-admin-resident-panel__top">
         <h2>Residente</h2>
         <a href="{{ $urlCerrarPanel }}" aria-label="Cerrar panel de {{ $nombreResidente }}"><i class="ph-bold ph-x" aria-hidden="true"></i></a>
@@ -35,7 +35,7 @@
 
     <nav class="rm-admin-resident-panel__tabs" aria-label="Secciones del residente">
         @foreach(['resumen' => 'Resumen', 'datos' => 'Datos', 'salud' => 'Salud', 'documentos' => 'Documentos', 'historial' => 'Historial'] as $clave => $etiqueta)
-            <a href="{{ route('admin.administracion.residentes', $panelParams + ['panel_tab' => $clave]) }}" @if($panelTab === $clave) aria-current="page" @endif>{{ $etiqueta }}</a>
+            <a href="{{ route('admin.administracion.residentes', array_replace($panelParams, ['panel_tab' => $clave])) }}" @if($panelTab === $clave) aria-current="page" @endif>{{ $etiqueta }}</a>
         @endforeach
     </nav>
 
@@ -47,6 +47,7 @@
                     <dd>
                         <strong class="rm-admin-resident-panel__value">{{ $habitacion->codigo ?? 'Sin habitación asignada' }}</strong>
                         @if($habitacion?->nombre)<span class="rm-admin-resident-panel__support">{{ $habitacion->nombre }}</span>@endif
+                        @if($habitacion)<span class="rm-admin-resident-panel__support">Cama {{ $habitacion->cama ?? 'sin registrar' }}{{ filled($habitacion->piso) ? ' · Piso '.$habitacion->piso : '' }}</span>@endif
                     </dd>
                 </div>
                 <div class="rm-admin-resident-panel__fact">
@@ -79,6 +80,7 @@
                 <h4 id="panel-datos-residenciales">Ubicación y responsable</h4>
                 <dl>
                     <div><dt>Habitación</dt><dd>{{ $habitacion->codigo ?? 'Sin asignación' }}</dd></div>
+                    <div><dt>Cama vigente</dt><dd>{{ $habitacion->cama ?? 'Sin asignación' }}</dd></div>
                     <div><dt>Sector</dt><dd>{{ $habitacion->nombre ?? 'No registrado' }}</dd></div>
                     <div><dt>Planta</dt><dd>{{ $habitacion->piso ?? 'No registrada' }}</dd></div>
                     <div><dt>Tipo</dt><dd>{{ $habitacion->tipo ?? 'No registrado' }}</dd></div>
@@ -109,6 +111,15 @@
                 @endforelse
             </section>
         @else
+            <section class="rm-admin-resident-panel__detail" aria-labelledby="panel-historial-alojamiento">
+                <h4 id="panel-historial-alojamiento"><i class="ph-bold ph-bed" aria-hidden="true"></i> Trayectoria de alojamiento</h4>
+                <p>Últimas 30 ocupaciones. Los cambios conservan la ubicación anterior.</p>
+                @forelse($datosPanel['historial_alojamiento'] ?? [] as $ocupacion)
+                    <div class="rm-admin-resident-panel__record"><strong>{{ $ocupacion->habitacion }} · {{ $ocupacion->cama }}</strong><span>{{ $ocupacion->estado }} · Desde {{ \Carbon\Carbon::parse($ocupacion->fecha_hora_asignacion)->format('d/m/Y H:i') }}@if($ocupacion->fecha_hora_liberacion) · Hasta {{ \Carbon\Carbon::parse($ocupacion->fecha_hora_liberacion)->format('d/m/Y H:i') }}@endif</span>@if($ocupacion->motivo_liberacion)<p>{{ $ocupacion->motivo_liberacion }}</p>@endif</div>
+                @empty
+                    <p>Sin ocupaciones registradas.</p>
+                @endforelse
+            </section>
             <section class="rm-admin-resident-panel__detail" aria-labelledby="panel-historial">
                 <h4 id="panel-historial">Historial de estados</h4>
                 @forelse($datosPanel['historial'] as $evento)
@@ -121,6 +132,14 @@
     </div>
 
     <footer class="rm-admin-resident-panel__footer">
+        @can('ocupaciones_cama.gestionar')
+            @if(in_array($residente->estado, ['ACTIVO', 'ADMITIDO'], true))
+                <button type="button" class="rm-btn-secondary" @click="$dispatch('abrir-alojamiento-residente', {codResidente: @js($residente->cod_residente)})"><i class="ph-bold ph-bed" aria-hidden="true"></i> Gestionar alojamiento</button>
+            @endif
+        @endcan
         <a href="{{ route('admin.administracion.residentes.show', $residente->cod_residente) }}">Ver expediente completo <i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a>
     </footer>
+    @can('ocupaciones_cama.gestionar')
+        @livewire(App\Frontend\Livewire\Admisiones\AlojamientoResidente::class)
+    @endcan
 </aside>

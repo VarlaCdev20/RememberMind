@@ -1,4 +1,5 @@
 import './utilities/bootstrap.js';
+import './modules/operaciones-interactivas.js';
 
 // Alpine lo proporciona Livewire; no iniciar una segunda instancia.
 
@@ -148,6 +149,10 @@ window.documentosAdulto = documentosAdulto;
 import './modules/signos-vitales-registro.js';
 import './modules/clinical-form-feedback.js';
 import './modules/filter-selection.js';
+import './modules/controles-institucionales.js';
+import './modules/admisiones-interactivas.js';
+import './modules/residentes-interactivos.js';
+import './modules/habitaciones-interactivas.js';
 
 import './modules/auth-login-parallax.js';
 import './modules/app-depth-motion.js';

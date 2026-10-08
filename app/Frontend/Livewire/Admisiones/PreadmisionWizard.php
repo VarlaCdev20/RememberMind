@@ -225,6 +225,13 @@ class PreadmisionWizard extends Component
         }
     }
 
+    public function volverPaso(int $paso): void
+    {
+        if ($paso >= 1 && $paso < $this->paso) {
+            $this->paso = $paso;
+        }
+    }
+
     // ─────────────────────────────────────────────────────────────────────────────
     // VALIDACIÓN PASO 5
     // ─────────────────────────────────────────────────────────────────────────────
@@ -395,7 +402,8 @@ class PreadmisionWizard extends Component
 
                     $archivoPdf = $filePath;
                     $estadoDoc = 'GENERADO';
-                } catch (\Throwable) {
+                } catch (\Throwable $exception) {
+                    report($exception);
                     $todosGenerados = false;
                 }
 
@@ -415,6 +423,7 @@ class PreadmisionWizard extends Component
                 }
             }
 
+            $correoPendiente = false;
             if (! empty($docsPendientesNombres) && ! empty($preadmision->familiar_correo)) {
                 try {
                     Mail::to($preadmision->familiar_correo)
@@ -423,8 +432,9 @@ class PreadmisionWizard extends Component
                             $docsPendientesNombres,
                             $fechaLimite48h->format('d/m/Y H:i')
                         ));
-                } catch (\Throwable) {
-                    // El correo no bloquea el flujo de preadmisión.
+                } catch (\Throwable $exception) {
+                    report($exception);
+                    $correoPendiente = true;
                 }
             }
 
@@ -438,22 +448,31 @@ class PreadmisionWizard extends Component
             $textoExito = 'La solicitud quedó pendiente de revisión. Todavía no se creó un residente institucional.';
 
             if (! empty($docsPendientesNombres)) {
-                $textoExito .= ' Se notificó al familiar sobre los documentos pendientes en 48 horas.';
+                $textoExito .= ' Hay documentos pendientes; consulta su estado en el expediente.';
+            }
+
+            if (! $todosGenerados) {
+                $textoExito .= ' Algunos documentos institucionales no pudieron generarse; solicita soporte antes de continuar.';
+            }
+
+            if ($correoPendiente) {
+                $textoExito .= ' No se pudo enviar el aviso por correo; informa al responsable por el canal institucional.';
             }
 
             $this->dispatch('swal', [
                 'title' => 'Preadmisión registrada',
                 'text' => $textoExito,
-                'icon' => 'success',
+                'icon' => $todosGenerados && ! $correoPendiente ? 'success' : 'warning',
             ]);
 
             $this->guardadoExitoso = true;
         } catch (\Throwable $e) {
             DB::rollBack();
+            report($e);
 
             $this->dispatch('swal', [
                 'title' => 'Error al guardar',
-                'text' => 'No se pudo registrar la preadmisión: '.$e->getMessage(),
+                'text' => 'No se pudo registrar la preadmisión. Tus datos permanecen en el formulario. Intenta nuevamente o solicita soporte.',
                 'icon' => 'error',
             ]);
         }

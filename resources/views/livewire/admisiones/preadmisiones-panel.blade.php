@@ -9,8 +9,8 @@
    <p class="text-sm text-apoyo">Complete los datos de ingreso. La ficha de residente se creará al confirmar esta operación.</p>
   </div>
 
-  @error('solicitud') <p class="rounded-xl bg-estado-peligroBg p-3 text-sm font-semibold text-estado-peligro">{{ $message }}</p> @enderror
-  @error('admision') <p class="rounded-xl bg-estado-peligroBg p-3 text-sm font-semibold text-estado-peligro">{{ $message }}</p> @enderror
+  @error('solicitud') <p role="alert" tabindex="-1" x-init="$nextTick(() => $el.focus())" class="rounded-xl bg-estado-peligroBg p-3 text-sm font-semibold text-estado-peligro">{{ $message }}</p> @enderror
+  @error('admision') <p role="alert" tabindex="-1" x-init="$nextTick(() => $el.focus())" class="rounded-xl bg-estado-peligroBg p-3 text-sm font-semibold text-estado-peligro">{{ $message }}</p> @enderror
 
   <nav class="rm-admin-admission__steps" aria-label="Pasos de admisión">
    @foreach(['Identidad', 'Contacto', 'Documentación', 'Consentimientos', 'Seguro', 'Habitación y cama', 'Confirmación'] as $indice => $etiqueta)
@@ -118,7 +118,7 @@
       <input type="radio" wire:model="cama_id" value="{{ $cama->cod_cama }}" class="sr-only" @disabled(!$libre)>
       <span class="block text-sm font-black text-titulo">Cama {{ $cama->codigo ?: $cama->numero }}</span>
       <span class="mt-1 block text-xs {{ $libre ? 'text-estado-exito' : 'text-estado-advertencia' }}">
-      {{ $libre ? 'Disponible para ingreso' : ($asignacion?->adultoMayor ? 'Ocupada por '.trim($asignacion->adultoMayor->nombres.' '.$asignacion->adultoMayor->ap_paterno.' '.$asignacion->adultoMayor->ap_materno) : str_replace('_', ' ', $cama->estado)) }}
+      {{ $libre ? 'Disponible para ingreso' : ($asignacion?->residente ? 'Ocupada por '.trim($asignacion->residente->nombres.' '.$asignacion->residente->apellido_paterno.' '.$asignacion->residente->apellido_materno) : str_replace('_', ' ', $cama->estado)) }}
       </span>
      </label>
      @endforeach

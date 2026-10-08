@@ -2,13 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Backend\Modulos\Administracion\Servicios\CentroCoordinacionService;
 use App\Backend\Modulos\Admisiones\Acciones\FormalizarAdmision;
+use App\Frontend\Livewire\Admisiones\PreadmisionesPanel;
 use App\Models\Cama;
 use App\Models\Contacto;
 use App\Models\Habitacion;
 use App\Models\Preadmision;
 use App\Models\User;
-use App\Frontend\Livewire\Admisiones\PreadmisionesPanel;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -77,9 +78,11 @@ class DashboardAdministracionIntegracionVisualTest extends TestCase
             $response = $this->actingAs($usuario)->get(route('admin.administracion.'.$modulo));
             $response->assertOk();
             $this->assertSame(1, substr_count($response->getContent(), '<h1'));
-            if (in_array($modulo, ['admisiones', 'ocupacion', 'jornadas', 'documentacion', 'consentimientos', 'visitas', 'alertas'], true)) {
+            if (in_array($modulo, ['admisiones', 'jornadas', 'documentacion', 'consentimientos', 'visitas', 'alertas'], true)) {
                 $this->assertStringContainsString('name="tab"', $response->getContent());
-                $this->assertStringContainsString('id="admin-vista-'.$modulo.'"', $response->getContent());
+                $this->assertStringContainsString($modulo === 'admisiones'
+                    ? 'aria-label="Situación de admisiones"'
+                    : 'id="operacion-bandeja"', $response->getContent());
                 $this->assertStringNotContainsString('<nav class="rm-admin-page__tabs"', $response->getContent());
             }
         }
@@ -114,7 +117,7 @@ class DashboardAdministracionIntegracionVisualTest extends TestCase
 
         $dashboard = $this->actingAs($usuario)->get(route('admin.administracion.dashboard'))->assertOk()->getContent();
         $this->assertMatchesRegularExpression('/>0<\/strong>\s*<h2[^>]*>Camas disponibles<\/h2>/', $dashboard);
-        $this->assertSame(1, app(\App\Backend\Modulos\Administracion\Servicios\CentroCoordinacionService::class)->resumen()['ocupacion']['ocupadas']);
+        $this->assertSame(1, app(CentroCoordinacionService::class)->resumen()['ocupacion']['ocupadas']);
         $admisiones = $this->get(route('admin.administracion.admisiones'))->assertOk()->getContent();
         $this->assertStringContainsString('Rosa Flores', $admisiones);
         $this->assertStringContainsString('H-1', $admisiones);
@@ -122,10 +125,12 @@ class DashboardAdministracionIntegracionVisualTest extends TestCase
         $this->assertStringContainsString(route('admin.administracion.residentes.show', $residente->cod_residente), $admisiones);
         $tarjetas = $this->get(route('admin.administracion.residentes'))->assertOk()->getContent();
         $this->assertStringContainsString('Rosa', $tarjetas);
-        $this->assertStringContainsString('rm-admin-residents-cards', $tarjetas);
-        $this->assertStringContainsString('rm-resident-compact-card', $tarjetas);
-        $this->assertStringContainsString('data-variant="administrative"', $tarjetas);
-        $this->assertStringContainsString('Ver resumen', $tarjetas);
+        $this->assertStringContainsString('rm-residents-records--tarjetas', $tarjetas);
+        $this->assertStringContainsString('rm-residents-record', $tarjetas);
+        $this->assertStringContainsString('H-1', $tarjetas);
+        $this->assertStringContainsString('C-1', $tarjetas);
+        $this->assertStringContainsString('Ana Pérez', $tarjetas);
+        $this->assertStringContainsString('Detalle', $tarjetas);
         $this->assertDoesNotMatchRegularExpression('/<table class="[^"]*\brm-table\b[^"]*">/', $tarjetas);
         $tabla = $this->get(route('admin.administracion.residentes', ['vista' => 'tabla']))->assertOk()->getContent();
         $this->assertMatchesRegularExpression('/<table class="[^"]*\brm-table\b[^"]*">/', $tabla);

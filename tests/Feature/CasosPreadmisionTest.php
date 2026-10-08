@@ -2,10 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Frontend\Livewire\Admisiones\PreadmisionesPanel;
+use App\Frontend\Livewire\Admisiones\PreadmisionWizard;
 use App\Models\Personal;
 use App\Models\Preadmision;
 use App\Models\User;
-use App\Frontend\Livewire\Admisiones\PreadmisionesPanel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
@@ -256,5 +257,57 @@ class CasosPreadmisionTest extends TestCase
         exec('git grep -n "PENDIENTE_VALORACION_MEDICA" app resources routes', $salida, $codigoRetorno);
 
         $this->assertSame([], $salida, 'Se detectaron residuos funcionales de PENDIENTE_VALORACION_MEDICA.');
+    }
+
+    public function test_vistas_paginacion_y_graficos_usan_solicitudes_reales(): void
+    {
+        $this->travelTo(now()->setDate(2026, 10, 6));
+        $user = User::factory()->create(['estado' => 'ACTIVO']);
+        $user->assignRole('SUPERADMINISTRADOR');
+        $this->actingAs($user);
+
+        foreach (['PENDIENTE', 'APROBADA', 'RECHAZADA'] as $i => $estado) {
+            Preadmision::create([
+                'cod_preadmision' => 'PRE_GRAF_'.$i,
+                'cod_usuario_registro' => $user->cod_usuario,
+                'estado' => $estado,
+                'nombres' => 'PERSONA SINTETICA',
+                'apellido_paterno' => 'PRUEBA',
+                'fecha_nacimiento' => '1940-01-01',
+                'motivo_ingreso' => 'CUIDADO_PERMANENTE',
+                'fecha_solicitud' => $i === 0 ? '2026-09-10 12:00:00' : '2026-10-01 12:00:00',
+            ]);
+        }
+
+        $panel = Livewire::test(PreadmisionesPanel::class)
+            ->assertViewHas('metricas', fn ($m) => $m['total'] === 3 && $m['pendientes'] === 1 && $m['aprobadas'] === 1 && $m['rechazadas'] === 1)
+            ->assertViewHas('tendencia', fn ($t) => $t->count() === 6 && $t->last()['cantidad'] === 2)
+            ->set('vista', 'tabla')->assertSee('rm-pre-table', false)
+            ->set('vista', 'tarjetas')->assertSee('rm-pre-collection--tarjetas', false)
+            ->set('vista', 'invalida')->assertSet('vista', 'lista')
+            ->set('porPagina', 999)->assertSet('porPagina', 10)
+            ->call('filtrarMes', '2026-09')->assertSet('fecha_inicio', '2026-09-01')->assertSet('fecha_fin', '2026-09-30')
+            ->assertViewHas('preadmisiones', fn ($p) => $p->total() === 1)
+            ->call('limpiarFechas')->assertViewHas('preadmisiones', fn ($p) => $p->total() === 3);
+
+        $panel->call('filtrarMes', 'mes-invalido')->assertSet('fecha_inicio', '');
+        $this->assertDatabaseCount('preadmisiones', 3);
+        $this->assertDatabaseCount('residentes', 0);
+    }
+
+    public function test_formulario_no_permite_saltar_validacion_con_el_nuevo_navegador(): void
+    {
+        $user = User::factory()->create(['estado' => 'ACTIVO']);
+        $user->assignRole('SUPERADMINISTRADOR');
+        $this->actingAs($user);
+        Livewire::test(PreadmisionWizard::class)
+            ->call('volverPaso', 5)->assertSet('paso', 1)
+            ->call('siguiente')->assertHasErrors(['nombres', 'ci', 'fecha_nac'])->assertSet('paso', 1)
+            ->set('paso', 3)->call('volverPaso', 1)->assertSet('paso', 1)
+            ->set('paso', 5)->assertSee('Revisa antes de registrar')
+            ->assertSee('Editar datos del responsable')
+            ->call('volverPaso', 3)->assertSet('paso', 3);
+        $this->assertDatabaseCount('preadmisiones', 0);
+        $this->assertDatabaseCount('residentes', 0);
     }
 }

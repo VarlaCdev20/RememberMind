@@ -1,7 +1,7 @@
 /* Shell institucional: tokens acotados a la barra y al lienzo del layout. */
 .rm-shell {
-    --rm-shell-chrome-bg: #D8D2CC;
-    --rm-app-bg: var(--rm-shell-chrome-bg);
+    --rm-shell-chrome-bg: var(--rm-palette-capuchino);
+    --rm-app-bg: var(--rm-palette-page);
     --rm-bg-app: var(--rm-app-bg);
     --rm-bg-shell: var(--rm-shell-chrome-bg);
     --rm-shell-bar-height: 76px;
@@ -21,26 +21,18 @@
 .rm-shell .rm-app-frame > [data-rm-main]::-webkit-scrollbar { display: none; }
 .rm-shell .rm-sidebar { --rm-sidebar-bg: var(--rm-shell-chrome-bg); background: var(--rm-shell-chrome-bg); }
 .rm-shell .rm-sidebar .rm-sidebar__header {
-    flex-basis: var(--rm-shell-bar-height);
-    height: var(--rm-shell-bar-height);
-    min-height: var(--rm-shell-bar-height);
-    max-height: var(--rm-shell-bar-height);
+    flex-basis: var(--rm-sidebar-header-height, var(--rm-shell-bar-height));
+    height: var(--rm-sidebar-header-height, var(--rm-shell-bar-height));
+    min-height: var(--rm-sidebar-header-height, var(--rm-shell-bar-height));
+    max-height: var(--rm-sidebar-header-height, var(--rm-shell-bar-height));
     background: var(--rm-shell-chrome-bg);
 }
 .rm-shell .rm-topbar {
-    --rm-topbar-bg: var(--rm-shell-chrome-bg);
-    --rm-topbar-surface: #E7E3DF;
+    --rm-topbar-bg: var(--rm-header-bg);
+    --rm-topbar-surface: var(--rm-surface);
     --rm-topbar-control-bg: color-mix(in srgb, var(--rm-topbar-surface) 38%, transparent);
     --rm-topbar-control-hover: var(--rm-shell-sage-selection);
     --rm-topbar-control-active: var(--rm-shell-sage-selection);
-    --rm-text-primary: #4B443F;
-    --rm-text-secondary: #5C554F;
-    --rm-text-muted: #746D67;
-    --rm-border: #A59E97;
-    --rm-sage: #78826E;
-    --rm-sage-text: #56604F;
-    --rm-sage-soft: #D6D9D3;
-    --rm-coral: #D97866;
     --rm-topbar-search-width: clamp(240px, 30vw, 480px);
     position: sticky;
     top: 0;
@@ -60,6 +52,11 @@
     background: var(--rm-topbar-bg);
     color: var(--rm-text-primary);
     box-shadow: var(--rm-shadow-2xs);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+@supports (backdrop-filter: blur(10px)) {
+    .rm-shell .rm-topbar { background: color-mix(in srgb, var(--rm-topbar-bg) 94%, transparent); }
 }
 @media (forced-colors: active) {
     .rm-shell .rm-topbar { background: Canvas; }
@@ -96,16 +93,16 @@
     display: inline-flex; align-items: center; justify-content: center; position: relative;
     width: 44px; height: 44px; min-width: 44px; min-height: 44px; flex: 0 0 44px;
     padding: 0; border: 1px solid transparent; border-radius: 14px;
-    background: var(--rm-topbar-control-bg); color: var(--rm-text-primary); box-shadow: none;
+    background: linear-gradient(180deg, var(--rm-topbar-surface), var(--rm-topbar-control-bg)); color: var(--rm-text-primary); box-shadow: var(--rm-shadow-xs);
     cursor: pointer; transform: none;
     transition: background-color var(--rm-duration-hover) var(--rm-ease-enter), border-color var(--rm-duration-hover) var(--rm-ease-enter), box-shadow var(--rm-duration-hover) var(--rm-ease-enter), transform var(--rm-duration-hover) var(--rm-ease-enter);
 }
 .rm-shell .rm-topbar .rm-topbar-search__toggle { display: none; }
 .rm-shell .rm-topbar .rm-topbar__hamburger { display: none; }
 .rm-shell .rm-topbar .rm-topbar__action i { color: var(--rm-text-primary); }
-.rm-shell .rm-topbar .rm-topbar__theme-icon--sun { display: none; }
-:is(.dark, [data-theme="dark"]) .rm-shell .rm-topbar .rm-topbar__theme-icon--moon { display: none; }
-:is(.dark, [data-theme="dark"]) .rm-shell .rm-topbar .rm-topbar__theme-icon--sun { display: inline; }
+.rm-shell .rm-topbar .rm-topbar__theme-toggle .rm-topbar__theme-icon--sun { display: none; }
+:is(.dark, [data-theme="dark"]) .rm-shell .rm-topbar .rm-topbar__theme-toggle .rm-topbar__theme-icon--moon { display: none; }
+:is(.dark, [data-theme="dark"]) .rm-shell .rm-topbar .rm-topbar__theme-toggle .rm-topbar__theme-icon--sun { display: inline; }
 .rm-shell .rm-topbar :is(.rm-topbar__action, .rm-topbar-search__toggle, .rm-topbar-search__submit, .rm-btn-icon) i,
 .rm-shell .rm-topbar .rm-topbar-search__icon { transition: color var(--rm-duration-hover) var(--rm-ease-enter); }
 .rm-shell .rm-topbar :is(.rm-btn-icon, .rm-topbar__notification) > span {
@@ -136,7 +133,7 @@
 }
 .rm-shell .rm-topbar :is(.rm-topbar__action, .rm-topbar-search__toggle, .rm-topbar__profile)[aria-expanded="true"],
 .rm-shell .rm-topbar__actions > div:has(.rm-calendar[open]) > .rm-topbar__action { background: var(--rm-topbar-control-active); border-color: color-mix(in srgb, var(--rm-sage) 28%, transparent); color: var(--rm-sage-text); }
-.rm-shell .rm-topbar :is(.rm-topbar__action, .rm-topbar-search__toggle, .rm-btn-icon, .rm-topbar__profile):active { transform: translateY(0); box-shadow: none; }
+.rm-shell .rm-topbar :is(.rm-topbar__action, .rm-topbar-search__toggle, .rm-btn-icon, .rm-topbar__profile):active { transform: translateY(1px); box-shadow: var(--rm-shadow-2xs); }
 /* Lienzo uniforme: se apagan únicamente las decoraciones históricas. */
 .rm-shell .rm-app-frame { background: var(--rm-app-bg); }
 .rm-shell :is(.dash-noise, .dash-dots, .mouse-light, .rm-mouse-light, .rm-texture-dots) { display: none; }
@@ -217,101 +214,3 @@
 .rm-calendar__footer { display: flex; align-items: center; gap: var(--rm-space-3); margin-top: var(--rm-space-3); padding-top: var(--rm-space-3); border-top: 1px solid color-mix(in srgb, var(--rm-border) 25%, transparent); }
 .rm-calendar__today { min-height: 44px; padding: var(--rm-space-2) var(--rm-space-3); border-radius: var(--rm-radius-sm); background: var(--rm-sage-soft); color: var(--rm-sage-text); font-weight: var(--rm-weight-semibold); }
 @media (max-width: 767px) { .rm-calendar__panel { padding: var(--rm-space-1); } }
-
-
-/* ============================================================
-   MICRO-ANIMACIONES FLUIDAS PARA BOTONES DE ACCIÓN DEL TOPBAR
-   ============================================================ */
-
-.rm-shell .rm-topbar :is(.rm-topbar__action, .rm-btn-icon) {
-    transition: background-color 160ms cubic-bezier(0.16, 1, 0.3, 1),
-                border-color 160ms cubic-bezier(0.16, 1, 0.3, 1),
-                box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1),
-                transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-}
-
-.rm-shell .rm-topbar :is(.rm-topbar__action, .rm-btn-icon) i {
-    display: inline-block;
-    transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1),
-                color 160ms ease !important;
-    will-change: transform;
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .rm-shell .rm-topbar :is(.rm-topbar__action, .rm-btn-icon):hover {
-        background: var(--rm-topbar-control-hover) !important;
-        box-shadow: 0 4px 14px -1px color-mix(in srgb, var(--rm-primary) 22%, transparent),
-                    0 2px 6px -1px rgba(48, 44, 42, 0.08) !important;
-        transform: translateY(-2px) scale(1.05) !important;
-    }
-
-    /* 1. Calendario: Animación de rebote / balanceo */
-    .rm-shell .rm-topbar :is(.rm-topbar__action:has(.ph-calendar-blank), .rm-topbar__action[aria-label*="calendario" i], .rm-topbar__action[aria-label*="Calendario" i]):hover i,
-    .rm-shell .rm-topbar :is(.rm-topbar__action:has(.ph-calendar), .rm-topbar__action:has(.ph-calendar-blank)):hover i {
-        animation: rmCalendarBounce 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
-        color: var(--rm-action-primary, var(--rm-primary)) !important;
-    }
-
-    /* 2. Modo Oscuro / Claro: Giro cósmico */
-    .rm-shell .rm-topbar :is(.rm-topbar__theme-toggle, [data-theme-toggle]):hover i {
-        animation: rmThemeSpin 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-        color: var(--rm-action-primary, var(--rm-primary)) !important;
-    }
-
-    /* 3. Campana de Notificaciones: Campanada oscilante vibrante */
-    .rm-shell .rm-topbar :is(.rm-topbar__notification, a[aria-label*="alertas" i]):hover i {
-        transform-origin: top center;
-        animation: rmBellRing 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-        color: #DC2626 !important;
-    }
-
-    /* 4. Ajustes / Configuración: Rotación de engranaje mecánico */
-    .rm-shell .rm-topbar :is(.rm-topbar__settings, .rm-topbar__action:has(.ph-gear), [aria-label*="Configuración" i], [aria-label*="configuración" i]):hover i {
-        animation: rmGearTurn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-        color: var(--rm-action-primary, var(--rm-primary)) !important;
-    }
-}
-
-.rm-shell .rm-topbar :is(.rm-topbar__action, .rm-btn-icon):active {
-    transform: translateY(0) scale(0.92) !important;
-    box-shadow: none !important;
-    transition: transform 90ms ease !important;
-}
-
-/* Badge de alertas pulsante suave */
-.rm-shell .rm-topbar .rm-topbar__notification > span {
-    animation: rmBadgeHeartbeat 2s infinite ease-in-out !important;
-}
-
-@keyframes rmCalendarBounce {
-    0% { transform: scale(1) rotate(0deg); }
-    30% { transform: scale(1.22) rotate(-12deg); }
-    60% { transform: scale(1.16) rotate(10deg); }
-    80% { transform: scale(1.2) rotate(-4deg); }
-    100% { transform: scale(1.16) rotate(0deg); }
-}
-
-@keyframes rmThemeSpin {
-    0% { transform: rotate(0deg) scale(1); }
-    50% { transform: rotate(180deg) scale(1.25); }
-    100% { transform: rotate(360deg) scale(1.16); }
-}
-
-@keyframes rmBellRing {
-    0% { transform: rotate(0deg) scale(1); }
-    20% { transform: rotate(18deg) scale(1.2); }
-    40% { transform: rotate(-16deg) scale(1.2); }
-    60% { transform: rotate(12deg) scale(1.16); }
-    80% { transform: rotate(-8deg) scale(1.14); }
-    100% { transform: rotate(0deg) scale(1.14); }
-}
-
-@keyframes rmGearTurn {
-    0% { transform: rotate(0deg) scale(1); }
-    100% { transform: rotate(180deg) scale(1.2); }
-}
-
-@keyframes rmBadgeHeartbeat {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.22); }
-}

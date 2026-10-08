@@ -331,6 +331,7 @@ class BddOperativaV2Test extends TestCase
     private function escenarioAdmision(bool $contactoConCuenta = false): array
     {
         $usuario = User::factory()->create();
+        $usuario->givePermissionTo('admisiones.formalizar');
         $familiar = $contactoConCuenta ? $this->usuarioRol('familiar@test.local','FAMILIAR') : null;
         $contacto = Contacto::query()->create(['cod_contacto'=>'CTO_1','cod_usuario'=>$familiar?->cod_usuario,'nombres'=>'Ana','apellido_paterno'=>'Pérez','estado'=>'ACTIVO']);
         $habitacion = Habitacion::query()->create(['cod_habitacion'=>'HAB_1','codigo'=>'H-1','capacidad'=>2,'estado'=>'ACTIVA']);

@@ -6,6 +6,7 @@ use App\Models\Admision;
 use App\Models\Cama;
 use App\Models\Consentimiento;
 use App\Models\Contacto;
+use App\Models\Habitacion;
 use App\Models\HistorialEstadoResidente;
 use App\Models\OcupacionCama;
 use App\Models\Preadmision;
@@ -13,19 +14,44 @@ use App\Models\Residente;
 use App\Models\ResidenteContacto;
 use App\Models\SeguroResidente;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class FormalizarAdmision
 {
+    public const ESTADOS_HABILITADOS = ['ACTIVA', 'ACTIVO', 'DISPONIBLE'];
+
+    public const ESTADOS_OCUPACION_ACTIVA = ['ACTIVA', 'ACTIVO'];
+
+    public static function filtrarCamasDisponibles(Builder $query): Builder
+    {
+        return $query->whereIn('camas.estado', self::ESTADOS_HABILITADOS)
+            ->whereHas('habitacion', fn ($habitacion) => $habitacion->whereIn('estado', self::ESTADOS_HABILITADOS))
+            ->whereDoesntHave('ocupaciones', fn ($ocupacion) => $ocupacion->whereIn('estado', self::ESTADOS_OCUPACION_ACTIVA));
+    }
+
+    public function autorizar(Preadmision $solicitud, User $usuario): void
+    {
+        abort_unless($usuario->estado === 'ACTIVO' && $usuario->can('admisiones.formalizar'), 403);
+
+        if (Gate::getPolicyFor($solicitud)) {
+            Gate::forUser($usuario)->authorize('formalizar', $solicitud);
+        }
+    }
+
     public function ejecutar(Preadmision $solicitud, array $datos, User $usuario): Residente
     {
+        $this->autorizar($solicitud, $usuario);
+
         // La admisión es la única entrada válida para crear residentes. Toda la
         // operación se confirma o revierte como una sola unidad de trabajo.
         return DB::transaction(function () use ($solicitud, $datos, $usuario): Residente {
             // Los bloqueos evitan admitir dos veces la solicitud o reutilizar una cama.
             $solicitud = Preadmision::query()->lockForUpdate()->findOrFail($solicitud->getKey());
+            $this->autorizar($solicitud, $usuario);
 
             if ($solicitud->estado !== 'APROBADA' || $solicitud->admision()->exists()) {
                 throw ValidationException::withMessages([
@@ -34,7 +60,10 @@ class FormalizarAdmision
             }
 
             $cama = Cama::query()->lockForUpdate()->findOrFail($datos['cod_cama']);
-            if ($cama->estado !== 'ACTIVA' || OcupacionCama::query()->where('cod_cama', $cama->cod_cama)->where('estado', 'ACTIVA')->exists()) {
+            // La habilitación de la habitación también puede cambiar mientras
+            // se completa el formulario; se revalida dentro de la transacción.
+            Habitacion::query()->lockForUpdate()->findOrFail($cama->cod_habitacion);
+            if (! self::filtrarCamasDisponibles(Cama::query())->whereKey($cama->getKey())->exists()) {
                 throw ValidationException::withMessages(['cod_cama' => 'La cama no está disponible.']);
             }
 

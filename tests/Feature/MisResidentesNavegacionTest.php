@@ -61,7 +61,7 @@ class MisResidentesNavegacionTest extends TestCase
         $this->travelTo(Carbon::today()->setTime(10, 0));
         Livewire::actingAs($this->enfermero)->test(\App\Frontend\Livewire\Enfermeria\Cuidados\RegistrosEnfermeria::class, [
             'codResidente' => $this->residenteAsignado->cod_residente, 'cuidado' => 'sueno', 'tipo' => 'SUENO',
-        ])->assertSee('Consulta de sueño')->call('guardarCuidado')->assertForbidden();
+        ])->assertSee('Sin registros de sueño')->call('guardarCuidado')->assertForbidden();
         $this->assertDatabaseCount('registros_sueno', 0);
     }
 

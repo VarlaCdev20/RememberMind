@@ -1,0 +1,16 @@
+.rm-pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--rm-space-3); min-height: 68px; padding: var(--rm-space-3) var(--rm-space-4); border: 1px solid var(--rm-border); border-radius: var(--rm-radius-xl); background: var(--rm-surface); color: var(--rm-text-secondary); box-shadow: var(--rm-shadow-xs); font-size: var(--rm-text-sm); }
+.rm-pagination__range { margin: 0; line-height: 1.5; }
+.rm-pagination__range strong { color: var(--rm-text-primary); font-weight: 700; }
+.rm-pagination__size { display: flex; align-items: center; gap: var(--rm-space-2); margin: 0; }
+.rm-pagination__size > label { white-space: nowrap; }
+.rm-pagination__size > .rm-choice { width: 84px; }
+.rm-pagination__size .rm-choice__trigger { min-height: 44px; padding-block: var(--rm-space-2); }
+.rm-pagination__pages { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+.rm-pagination__page { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 44px; height: 44px; padding: 0; border: 1px solid var(--rm-border); border-radius: var(--rm-radius-lg); background: var(--rm-surface-soft); color: var(--rm-text-primary); font: inherit; font-weight: 650; text-decoration: none; transition: background var(--rm-duration-fast, 160ms), border-color var(--rm-duration-fast, 160ms); }
+.rm-pagination__page:is(a,button):not(:disabled):hover { background: var(--rm-selected-bg); border-color: var(--rm-primary); color: var(--rm-primary-ink); }
+.rm-pagination__page.is-current { border-color: var(--rm-action-primary); background: var(--rm-action-primary); color: var(--rm-text-on-primary); }
+.rm-pagination__page:disabled { opacity: .5; cursor: not-allowed; }
+.rm-pagination__page:focus-visible { outline: 2px solid var(--rm-focus); outline-offset: 2px; }
+.rm-pagination__ellipsis { width: 18px; text-align: center; }
+@media (max-width: 640px) { .rm-pagination { gap: var(--rm-space-2); padding: var(--rm-space-3); } .rm-pagination__range { flex: 1 1 140px; } .rm-pagination__pages { flex-basis: 100%; justify-content: center; } }
+@media (prefers-reduced-motion: reduce) { .rm-pagination * { transition: none !important; } }

@@ -2,328 +2,143 @@
 
 namespace App\Frontend\Livewire\Admisiones;
 
-use App\Models\OcupacionCama;
+use App\Backend\Modulos\Admisiones\Acciones\GuardarEspacioResidencial;
 use App\Models\Cama;
 use App\Models\Habitacion;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Gate;
+use Livewire\Attributes\Locked;
+use Livewire\Attributes\On;
 use Livewire\Component;
-use Livewire\WithPagination;
 
+/** Mantenimiento físico embebido; el directorio vive en el explorador. */
 class HabitacionesPanel extends Component
 {
-    use WithPagination;
-
-    // ── Filtros ───────────────────────────────────────────────────────────────
-    public string $search = '';
-
-    public string $filtroTipo = '';
-
-    public string $filtroEstado = '';
-
-    // ── Modales ───────────────────────────────────────────────────────────────
     public bool $modalHabitacion = false;
 
     public bool $modalCama = false;
 
-    public bool $modalDetalle = false;
-
-    // ── Formulario habitación ──────────────────────────────────────────────────
+    #[Locked]
     public ?string $editandoHabitacionId = null;
+
+    #[Locked]
+    public ?string $editandoCamaId = null;
+
+    #[Locked]
+    public ?string $habitacionParaCama = null;
 
     public string $codigo = '';
 
     public string $nombre = '';
 
-    public string $tipoHabitacion = '';
+    public string $tipo = '';
 
-    public string $ubicacion = '';
+    public string $piso = '';
 
-    public string $capacidad = '';
+    public string $capacidad = '1';
 
-    public string $estadoHab = 'DISPONIBLE';
+    public string $estado = 'ACTIVA';
 
     public string $observacion = '';
 
-    // ── Formulario cama ────────────────────────────────────────────────────────
-    public ?string $editandoCamaId = null;
-
-    public ?string $habitacionParaCama = null;
-
-    public string $codigoCama = '';
-
-    public string $estadoCama = 'DISPONIBLE';
-
-    public string $observacionCama = '';
-
-    // ── Detalle ────────────────────────────────────────────────────────────────
-    public ?string $detalleId = null;
-
-    public function mount(): void
-    {
-        abort_unless(auth()->user()?->can('habitaciones.ver'), 403);
-    }
-
-    public function updatingSearch(): void
-    {
-        $this->resetPage();
-    }
-
-    public function updatingFiltroTipo(): void
-    {
-        $this->resetPage();
-    }
-
-    public function updatingFiltroEstado(): void
-    {
-        $this->resetPage();
-    }
-
-    // ── CRUD Habitación ────────────────────────────────────────────────────────
-
+    #[On('crear-habitacion')]
     public function abrirCrearHabitacion(): void
     {
-        abort_unless(auth()->user()?->can('habitaciones.crear'), 403);
-        $this->resetHabitacion();
+        Gate::authorize('create', Habitacion::class);
+        $this->limpiar();
         $this->modalHabitacion = true;
     }
 
-    public function abrirEditarHabitacion(string $id): void
+    #[On('editar-habitacion')]
+    public function abrirEditarHabitacion(string $codHabitacion): void
     {
-        abort_unless(auth()->user()?->can('habitaciones.editar'), 403);
-        $h = Habitacion::findOrFail($id);
-        $this->editandoHabitacionId = $id;
-        $this->codigo = $h->codigo;
-        $this->nombre = $h->nombre ?? '';
-        $this->tipoHabitacion = $h->tipo_habitacion;
-        $this->ubicacion = $h->ubicacion ?? '';
-        $this->capacidad = (string) $h->capacidad;
-        $this->estadoHab = $h->estado === 'OCUPADA' ? 'DISPONIBLE' : $h->estado;
-        $this->observacion = $h->observacion ?? '';
-        $this->resetValidation();
+        $habitacion = Habitacion::findOrFail($codHabitacion);
+        Gate::authorize('update', $habitacion);
+        $this->limpiar();
+        $this->editandoHabitacionId = $habitacion->getKey();
+        $this->cargar($habitacion);
+        $this->piso = $habitacion->piso ?? '';
+        $this->nombre = $habitacion->nombre ?? '';
+        $this->capacidad = (string) $habitacion->capacidad;
         $this->modalHabitacion = true;
     }
 
-    public function guardarHabitacion(): void
+    #[On('crear-cama')]
+    public function abrirCrearCama(string $codHabitacion): void
     {
-        abort_unless(auth()->user()?->can($this->editandoHabitacionId ? 'habitaciones.editar' : 'habitaciones.crear'), 403);
-        $this->validate([
-            'codigo' => ['required', 'string', 'max:20', Rule::unique('habitaciones', 'codigo')->ignore($this->editandoHabitacionId, 'cod_habitacion')],
-            'nombre' => 'required|string|max:100',
-            'tipoHabitacion' => 'required|in:INDIVIDUAL,COMPARTIDA,UCI,OBSERVACION',
-            'capacidad' => 'required|integer|min:1|max:50',
-            'estadoHab' => 'required|in:DISPONIBLE,MANTENIMIENTO,BLOQUEADA',
-            'observacion' => 'nullable|string|max:500',
-        ], [
-            'codigo.required' => 'Ingrese el número o referencia de la habitación.',
-            'codigo.unique' => 'Ya existe una habitación con esta referencia.',
-            'nombre.required' => 'Ingrese un nombre claro para la habitación.',
-            'tipoHabitacion.required' => 'Seleccione el tipo de habitación.',
-            'tipoHabitacion.in' => 'Tipo de habitación no válido.',
-            'capacidad.required' => 'La capacidad es obligatoria.',
-            'estadoHab.required' => 'El estado es obligatorio.',
-        ]);
-
-        $habitacionActual = $this->editandoHabitacionId ? Habitacion::withCount(['camas', 'asignacionesActivas'])->findOrFail($this->editandoHabitacionId) : null;
-        if ($habitacionActual && (int) $this->capacidad < $habitacionActual->camas_count) {
-            throw ValidationException::withMessages(['capacidad' => "Ya existen {$habitacionActual->camas_count} camas registradas. Retire camas sin uso antes de reducir la capacidad."]);
-        }
-        if ($habitacionActual && in_array($this->estadoHab, ['MANTENIMIENTO', 'BLOQUEADA'], true) && $habitacionActual->asignaciones_activas_count > 0) {
-            throw ValidationException::withMessages(['estadoHab' => 'No puede bloquear la habitación ni enviarla a mantenimiento mientras tenga residentes asignados.']);
-        }
-
-        $datos = [
-            'codigo' => strtoupper(trim($this->codigo)),
-            'nombre' => $this->nombre ?: null,
-            'tipo_habitacion' => $this->tipoHabitacion,
-            'ubicacion' => $this->ubicacion ?: null,
-            'capacidad' => (int) $this->capacidad,
-            'estado' => $this->estadoHab,
-            'observacion' => $this->observacion ?: null,
-        ];
-
-        if ($this->editandoHabitacionId) {
-            $guardada = Habitacion::findOrFail($this->editandoHabitacionId);
-            $guardada->update($datos);
-            $msg = 'Habitación actualizada correctamente.';
-        } else {
-            $guardada = Habitacion::create($datos);
-            $msg = 'Habitación registrada correctamente.';
-        }
-
-        if ($this->estadoHab === 'DISPONIBLE' && $guardada->camas()->exists()) {
-            $guardada->updateQuietly(['estado' => $guardada->camasDisponibles()->exists() ? 'DISPONIBLE' : 'OCUPADA']);
-        }
-
-        $this->modalHabitacion = false;
-        $this->resetHabitacion();
-        $this->dispatch('swal', ['icon' => 'success', 'title' => $msg]);
-    }
-
-    public function eliminarHabitacion(string $id): void
-    {
-        abort_unless(auth()->user()?->can('habitaciones.editar'), 403);
-        $h = Habitacion::withCount('camas')->findOrFail($id);
-        if ($h->camas_count > 0) {
-            $this->dispatch('swal', ['icon' => 'error',
-                'title' => 'No se puede eliminar', 'text' => 'La habitación tiene camas registradas.']);
-
-            return;
-        }
-        $h->delete();
-        $this->dispatch('swal', ['icon' => 'success', 'title' => 'Habitación eliminada.']);
-    }
-
-    // ── CRUD Cama ──────────────────────────────────────────────────────────────
-
-    public function abrirCrearCama(string $habitacionId): void
-    {
-        abort_unless(auth()->user()?->can('camas.crear'), 403);
-        $habitacion = Habitacion::withCount('camas')->findOrFail($habitacionId);
-        if ($habitacion->camas_count >= $habitacion->capacidad) {
-            $this->dispatch('swal', ['icon' => 'warning', 'title' => 'Capacidad completa', 'text' => 'Esta habitación ya tiene registradas todas las camas permitidas.']);
-        }
-        $this->resetCama();
-        $this->habitacionParaCama = $habitacionId;
-        $this->estadoCama = in_array($habitacion->estado, ['MANTENIMIENTO', 'BLOQUEADA'], true) ? 'BLOQUEADA' : 'DISPONIBLE';
+        Gate::authorize('create', Cama::class);
+        Habitacion::findOrFail($codHabitacion);
+        $this->limpiar();
+        $this->habitacionParaCama = $codHabitacion;
         $this->modalCama = true;
     }
 
-    public function verCamas(string $id): void
+    #[On('editar-cama')]
+    public function editarCama(string $codCama): void
     {
-        abort_unless(auth()->user()?->can('camas.ver'), 403);
-        $this->detalleId = $id;
-        $this->modalDetalle = true;
-    }
-
-    public function editarCama(string $id): void
-    {
-        abort_unless(auth()->user()?->can('camas.editar'), 403);
-        $cama = Cama::with('asignacionesActivas')->findOrFail($id);
-        $this->editandoCamaId = $id;
+        $cama = Cama::findOrFail($codCama);
+        Gate::authorize('update', $cama);
+        $this->limpiar();
+        $this->editandoCamaId = $cama->getKey();
         $this->habitacionParaCama = $cama->cod_habitacion;
-        $this->codigoCama = $cama->codigo;
-        $this->estadoCama = $cama->asignacionesActivas->isNotEmpty() ? 'OCUPADA' : $cama->estado;
-        $this->observacionCama = $cama->observacion ?? '';
-        $this->modalDetalle = false;
+        $this->cargar($cama);
         $this->modalCama = true;
     }
 
-    public function guardarCama(): void
+    public function guardarHabitacion(GuardarEspacioResidencial $guardar): void
     {
-        abort_unless(auth()->user()?->can($this->editandoCamaId ? 'camas.editar' : 'camas.crear'), 403);
-        $this->validate([
-            'codigoCama' => ['required', 'string', 'max:20', Rule::unique('camas', 'codigo')->ignore($this->editandoCamaId, 'cod_cama')],
-            'estadoCama' => 'required|in:DISPONIBLE,OCUPADA,MANTENIMIENTO,BLOQUEADA',
-            'habitacionParaCama' => 'required|exists:habitaciones,cod_habitacion',
-        ], [
-            'codigoCama.required' => 'Ingrese el número o referencia visible de la cama.',
-            'codigoCama.unique' => 'Ya existe una cama con esta referencia.',
-            'estadoCama.required' => 'El estado es obligatorio.',
-        ]);
+        abort_unless($this->modalHabitacion, 403);
+        $guardar->habitacion($this->datos() + ['nombre' => $this->nombre, 'piso' => $this->piso, 'capacidad' => $this->capacidad], auth()->user(), $this->editandoHabitacionId);
+        $this->terminar('Habitación guardada correctamente.');
+    }
 
-        DB::transaction(function (): void {
-            $habitacion = Habitacion::lockForUpdate()->findOrFail($this->habitacionParaCama);
-            if (! $this->editandoCamaId && $habitacion->camas()->count() >= $habitacion->capacidad) {
-                throw ValidationException::withMessages(['codigoCama' => 'La habitación alcanzó su capacidad y no admite otra cama.']);
-            }
-            $cama = $this->editandoCamaId ? Cama::lockForUpdate()->findOrFail($this->editandoCamaId) : new Cama;
-            $ocupada = $cama->exists && $cama->asignacionesActivas()->exists();
-            if ($ocupada && $this->estadoCama !== 'OCUPADA') {
-                throw ValidationException::withMessages(['estadoCama' => 'La cama tiene un residente. Finalice o traslade su asignación antes de cambiarla.']);
-            }
-            if (! $ocupada && $this->estadoCama === 'OCUPADA') {
-                throw ValidationException::withMessages(['estadoCama' => 'El estado ocupado se genera al asignar un residente.']);
-            }
-            if (in_array($habitacion->estado, ['MANTENIMIENTO', 'BLOQUEADA'], true) && $this->estadoCama === 'DISPONIBLE') {
-                throw ValidationException::withMessages(['estadoCama' => 'La cama no puede quedar disponible mientras la habitación esté fuera de servicio.']);
-            }
-            $cama->fill(['cod_habitacion' => $habitacion->cod_habitacion, 'codigo' => strtoupper(trim($this->codigoCama)), 'estado' => $this->estadoCama, 'observacion' => $this->observacionCama ?: null])->save();
-            if (! in_array($habitacion->estado, ['MANTENIMIENTO', 'BLOQUEADA'], true)) {
-                $habitacion->updateQuietly(['estado' => $habitacion->camasDisponibles()->exists() ? 'DISPONIBLE' : 'OCUPADA']);
-            }
-        });
-
-        $mensaje = $this->editandoCamaId ? 'Disponibilidad de cama actualizada.' : 'Cama registrada correctamente.';
-        $this->modalCama = false;
-        $this->resetCama();
-        $this->dispatch('swal', ['icon' => 'success', 'title' => $mensaje]);
+    public function guardarCama(GuardarEspacioResidencial $guardar): void
+    {
+        abort_unless($this->modalCama && $this->habitacionParaCama, 403);
+        $guardar->cama($this->datos(), auth()->user(), $this->habitacionParaCama, $this->editandoCamaId);
+        $this->terminar('Cama guardada correctamente.');
     }
 
     public function cerrarModales(): void
     {
-        $this->modalHabitacion = false;
-        $this->modalCama = false;
-        $this->modalDetalle = false;
-        $this->resetHabitacion();
-        $this->resetCama();
+        $this->limpiar();
+        $this->dispatch('editor-espacios-cerrado');
+    }
+
+    private function limpiar(): void
+    {
+        $this->reset(['modalHabitacion', 'modalCama', 'editandoHabitacionId', 'editandoCamaId', 'habitacionParaCama', 'codigo', 'nombre', 'tipo', 'piso', 'capacidad', 'estado', 'observacion']);
         $this->resetValidation();
     }
 
-    // ── Helpers ────────────────────────────────────────────────────────────────
-
-    private function resetHabitacion(): void
+    private function cargar(Habitacion|Cama $espacio): void
     {
-        $this->editandoHabitacionId = null;
-        $this->codigo = '';
-        $this->nombre = '';
-        $this->tipoHabitacion = '';
-        $this->ubicacion = '';
-        $this->capacidad = '';
-        $this->estadoHab = 'DISPONIBLE';
-        $this->observacion = '';
-        $this->resetValidation();
+        $this->codigo = $espacio->codigo;
+        $this->tipo = $espacio->tipo ?? '';
+        $this->estado = $espacio->estado;
+        $this->observacion = $espacio->observacion ?? '';
     }
 
-    private function resetCama(): void
+    private function datos(): array
     {
-        $this->editandoCamaId = null;
-        $this->habitacionParaCama = null;
-        $this->codigoCama = '';
-        $this->estadoCama = 'DISPONIBLE';
-        $this->observacionCama = '';
-        $this->resetValidation();
+        return ['codigo' => $this->codigo, 'tipo' => $this->tipo, 'estado' => $this->estado, 'observacion' => $this->observacion];
     }
 
-    private function getStats(): array
+    private function terminar(string $mensaje): void
     {
-        return [
-            'total' => Habitacion::count(),
-            'disponibles' => Habitacion::where('estado', 'DISPONIBLE')->count(),
-            'ocupadas' => Habitacion::where('estado', 'OCUPADA')->count(),
-            'mantenimiento' => Habitacion::where('estado', 'MANTENIMIENTO')->count(),
-            'camas_total' => Cama::count(),
-            'camas_libres' => Cama::disponibles()->whereHas('habitacion', fn ($q) => $q->whereNotIn('estado', ['MANTENIMIENTO', 'BLOQUEADA']))->count(),
-            'capacidad_total' => (int) Habitacion::sum('capacidad'),
-            'camas_ocupadas' => OcupacionCama::where('estado', 'ACTIVA')->distinct()->count('cod_cama'),
-            'fuera_servicio' => Cama::whereIn('estado', ['MANTENIMIENTO', 'BLOQUEADA'])->count(),
-        ];
+        $this->cerrarModales();
+        $this->dispatch('espacios-actualizados');
+        $this->dispatch('swal', ['icon' => 'success', 'title' => $mensaje]);
     }
 
     public function render()
     {
-        $habitaciones = Habitacion::withCount([
-            'camas', 'camasDisponibles as camas_disponibles_count',
-            'asignacionesActivas as camas_ocupadas_count',
-            'camas as camas_mantenimiento_count' => fn ($q) => $q->where('estado', 'MANTENIMIENTO'),
-            'camas as camas_bloqueadas_count' => fn ($q) => $q->where('estado', 'BLOQUEADA'),
-        ])
-            ->when($this->search, fn ($q) => $q->where(fn ($busqueda) => $busqueda
-                ->where('codigo', 'like', '%'.$this->search.'%')
-                ->orWhere('nombre', 'like', '%'.$this->search.'%')
-                ->orWhere('piso', 'like', '%'.$this->search.'%')
-            ))
-            ->when($this->filtroTipo, fn ($q) => $q->where('tipo', $this->filtroTipo))
-            ->when($this->filtroEstado, fn ($q) => $q->where('estado', $this->filtroEstado))
-            ->orderBy('codigo')
-            ->paginate(10);
+        if ($this->modalHabitacion) {
+            Gate::authorize($this->editandoHabitacionId ? 'update' : 'create', $this->editandoHabitacionId ? Habitacion::findOrFail($this->editandoHabitacionId) : Habitacion::class);
+        }
+        if ($this->modalCama) {
+            Gate::authorize($this->editandoCamaId ? 'update' : 'create', $this->editandoCamaId ? Cama::findOrFail($this->editandoCamaId) : Cama::class);
+        }
 
-        return view('livewire.admisiones.habitaciones-panel', [
-            'habitaciones' => $habitaciones,
-            'stats' => $this->getStats(),
-            'detalleHabitacion' => $this->modalDetalle ? Habitacion::with(['camas' => fn ($q) => $q->with('asignacionesActivas.adultoMayor')->orderBy('codigo')])->withCount(['camas', 'camasDisponibles as camas_disponibles_count', 'asignacionesActivas as camas_ocupadas_count'])->find($this->detalleId) : null,
-            'habitacionFormularioCama' => $this->habitacionParaCama ? Habitacion::find($this->habitacionParaCama) : null,
-        ])->layout('layouts.sistema');
+        return view('livewire.admisiones.habitaciones-panel', ['habitacionContexto' => $this->modalCama ? Habitacion::withCount('camas')->findOrFail($this->habitacionParaCama) : null]);
     }
 }

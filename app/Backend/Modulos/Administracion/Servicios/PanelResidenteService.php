@@ -2,6 +2,7 @@
 
 namespace App\Backend\Modulos\Administracion\Servicios;
 
+use App\Backend\Modulos\Admisiones\Acciones\FormalizarAdmision;
 use App\Models\Residente;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -16,10 +17,10 @@ class PanelResidenteService
             ->join('camas as c', 'c.cod_cama', '=', 'oc.cod_cama')
             ->join('habitaciones as h', 'h.cod_habitacion', '=', 'c.cod_habitacion')
             ->where('oc.cod_residente', $codigo)
-            ->where('oc.estado', 'ACTIVA')
-            ->whereNull('oc.fecha_hora_liberacion')
+            ->whereIn('oc.estado', FormalizarAdmision::ESTADOS_OCUPACION_ACTIVA)
             ->orderByDesc('oc.fecha_hora_asignacion')
-            ->first(['h.codigo', 'h.nombre', 'h.piso', 'h.tipo']);
+            ->orderByDesc('oc.cod_ocupacion')
+            ->first(['h.codigo', 'h.nombre', 'h.piso', 'h.tipo', 'c.codigo as cama', 'c.cod_cama']);
 
         $responsable = DB::table('residentes_contactos as rc')
             ->join('contactos as co', 'co.cod_contacto', '=', 'rc.cod_contacto')
@@ -58,6 +59,13 @@ class PanelResidenteService
             'historial' => $tab === 'historial'
                 ? DB::table('historial_estados_residente')->where('cod_residente', $codigo)
                     ->orderByDesc('fecha_hora')->get(['estado_nuevo', 'motivo', 'fecha_hora'])
+                : collect(),
+            'historial_alojamiento' => $tab === 'historial'
+                ? DB::table('ocupaciones_cama as oc')->join('camas as c', 'c.cod_cama', '=', 'oc.cod_cama')
+                    ->join('habitaciones as h', 'h.cod_habitacion', '=', 'c.cod_habitacion')
+                    ->where('oc.cod_residente', $codigo)->orderByDesc('oc.fecha_hora_asignacion')
+                    ->orderByDesc('oc.cod_ocupacion')->limit(30)
+                    ->get(['h.codigo as habitacion', 'h.piso', 'c.codigo as cama', 'oc.estado', 'oc.fecha_hora_asignacion', 'oc.fecha_hora_liberacion', 'oc.motivo_liberacion'])
                 : collect(),
         ];
     }

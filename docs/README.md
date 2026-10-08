@@ -2,6 +2,7 @@
 
 ## Documentación vigente
 
+- [Administrador: etapas, funcionamiento y mejoras](administrador/README.md)
 - [BDD operativa — baseline congelado y extensiones aprobadas](base-de-datos/README.md)
 - [Arquitectura y estructura de carpetas vigente](arquitectura/README.md)
 - [Roles y competencias vigentes](arquitectura/REMEMBERMIND_ROLES_BASELINE_CONGELADO.md)
