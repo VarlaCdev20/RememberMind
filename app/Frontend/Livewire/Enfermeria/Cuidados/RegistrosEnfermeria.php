@@ -30,8 +30,13 @@ class RegistrosEnfermeria extends Component
     #[Url(as: 'adulto')]
     public string $codResidente = '';
 
+    #[Url]
+    public string $cuidado = '';
+
+    #[Url]
     public string $seccion = 'CUIDADOS';
 
+    #[Url]
     public string $tipo = 'ALIMENTACION';
 
     public string $subtipo = '';
@@ -204,15 +209,6 @@ class RegistrosEnfermeria extends Component
         return app(TurnoEnfermeriaService::class)->obtenerTurnoActivo(Auth::user(), today()->toDateString())?->cod_turno;
     }
 
-    public function updatedCodAm(string $valor): void
-    {
-        $this->codResidente = $valor;
-        if ($valor) {
-            $this->autorizar($valor);
-        }
-        $this->intervencionId = '';
-    }
-
     public function updatedCodResidente(string $valor): void
     {
         if ($valor) {
@@ -225,6 +221,15 @@ class RegistrosEnfermeria extends Component
     {
         $this->resetValidation();
         $this->autorizarMutacion($this->codResidente);
+        $permiso = match ($this->tipo) {
+            'ALIMENTACION' => 'registros_ingesta.crear',
+            'HIDRATACION' => 'registros_hidratacion.crear',
+            'ELIMINACION' => 'registros_eliminacion.crear',
+            'MOVILIDAD' => 'registros_movilidad.crear',
+            'SUENO' => 'registros_sueno.crear',
+            default => 'atenciones.crear',
+        };
+        abort_unless(Auth::user()?->can($permiso), 403);
 
         $user = Auth::user();
         $personal = $user?->personal;
@@ -582,6 +587,7 @@ class RegistrosEnfermeria extends Component
 
     public function guardarSeguimientoLesion(): void
     {
+        abort_unless(Auth::user()?->can('curaciones_herida.crear'), 403);
         $this->autorizarMutacion($this->codResidente);
         $this->validate([
             'lesionId' => 'required|string|max:20',
@@ -692,8 +698,36 @@ class RegistrosEnfermeria extends Component
         $this->dispatch('swal', ['icon' => 'success', 'title' => 'Rectificación registrada', 'text' => 'El original permanece visible con la anotación de rectificación.']);
     }
 
+    public function puedeMutarRegistro(string $permiso): bool
+    {
+        if (! $this->codResidente || ! Auth::user()?->can($permiso)) {
+            return false;
+        }
+        try {
+            $this->autorizarMutacion($this->codResidente);
+            return true;
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            if (in_array($e->getStatusCode(), [403, 409], true)) {
+                return false;
+            }
+            throw $e;
+        }
+    }
+
     public function render()
     {
+        if ($this->cuidado !== '') {
+            $opcion = \App\Backend\Modulos\Enfermeria\Servicios\NavegacionCuidadosService::opcion($this->cuidado);
+            abort_unless(in_array($this->cuidado, ['sueno', 'hidratacion', 'heridas'], true), 404);
+            abort_unless(Auth::user()?->can($opcion['permission']), 403);
+        }
+        abort_unless(in_array($this->seccion, ['CUIDADOS', 'DOLOR', 'DISPOSITIVOS', 'INCIDENTES', 'HISTORIAL', 'HERIDAS'], true), 404);
+        if ($this->seccion === 'HERIDAS') {
+            abort_unless(Auth::user()?->can('heridas.ver'), 403);
+        }
+        if ($this->codResidente) {
+            $this->autorizar($this->codResidente);
+        }
         $turnos = app(TurnoEnfermeriaService::class);
         $esSuperAdmin = $turnos->esSuperAdmin(Auth::user());
         $ids = $turnos->obtenerPacientesAsignadosIds(Auth::user());
@@ -709,7 +743,14 @@ class RegistrosEnfermeria extends Component
             ->whereHas('plan', fn ($q) => $q->where('cod_residente', $this->codResidente)->whereIn('estado', ['ACTIVO', 'ACTIVA', 'VIGENTE']))
             ->get() : collect();
 
-        return view('livewire.cuidados.registros-enfermeria', compact('pacientes', 'adulto', 'esSuperAdmin', 'intervencionesActivas'))
+        $registrosCuidado = collect();
+        if ($this->codResidente && in_array($this->cuidado, ['sueno', 'hidratacion'], true)) {
+            $modelo = $this->cuidado === 'sueno' ? RegistroSueno::class : RegistroHidratacion::class;
+            $fecha = $this->cuidado === 'sueno' ? 'fecha' : 'fecha_hora';
+            $registrosCuidado = $modelo::where('cod_residente', $this->codResidente)->latest($fecha)->limit(12)->get();
+        }
+
+        return view('livewire.cuidados.registros-enfermeria', compact('pacientes', 'adulto', 'esSuperAdmin', 'intervencionesActivas', 'registrosCuidado'))
             ->layout('layouts.enfermeria');
     }
 }

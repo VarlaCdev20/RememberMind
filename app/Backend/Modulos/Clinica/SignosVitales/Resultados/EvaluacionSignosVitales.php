@@ -7,7 +7,7 @@ use App\Backend\Modulos\Clinica\SignosVitales\Tipos\SeveridadClinica;
 final readonly class EvaluacionSignosVitales
 {
     /** @param list<ResultadoReglaClinica> $resultados */
-    public function __construct(public array $resultados, public array $contextoHistorico = []) {}
+    public function __construct(public array $resultados, public array $contextoHistorico = [], public array $erroresCaptura = []) {}
 
     public function severidadGlobal(): ?SeveridadClinica
     {
@@ -28,6 +28,7 @@ final readonly class EvaluacionSignosVitales
             'severidad_global' => $this->severidadGlobal()?->value,
             'resultados' => array_map(fn (ResultadoReglaClinica $resultado) => $resultado->toArray(), $this->resultados),
             'contexto_historico' => $this->contextoHistorico,
+            'errores_captura' => $this->erroresCaptura,
         ];
     }
 }

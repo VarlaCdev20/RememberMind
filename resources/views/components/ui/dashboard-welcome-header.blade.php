@@ -4,6 +4,8 @@
     'secondaryImage' => 'images/FOTOS CENTRO DE ADULTOS MAYORES/558487013_1337134818424437_2282337776297854403_n.jpg',
     'estado' => null,
     'modo' => null,
+    'compact' => false,
+    'scope' => null,
 ])
 
 @php
@@ -31,6 +33,8 @@
             : $usuario?->getRoleNames()->first());
     $rolVisible = $rol ? mb_convert_case(str_replace('_', ' ', $rol), MB_CASE_TITLE, 'UTF-8') : 'Personal';
     $zonaHoraria = config('app.timezone');
+    $horaLocal = now()->timezone($zonaHoraria)->hour;
+    $saludo = $horaLocal < 12 ? 'Buenos días' : ($horaLocal < 19 ? 'Buenas tardes' : 'Buenas noches');
     $contextoTurno = $estado === 'SIN_JORNADA_ACTIVA'
         ? 'No tienes un turno activo en este momento. Revisa los indicadores del centro.'
         : ($modo === 'FUERA_DE_TURNO' ? 'Turno del equipo disponible en modo consulta. Revisa los indicadores del centro.' : 'Cuidados y seguimiento de tu turno. Revisa pendientes y alertas.');
@@ -38,13 +42,14 @@
 
 <x-ui.dashboard-header
     eyebrow="CENTRO GERIÁTRICO LOS ALMENDROS"
-    :title="'Bienvenido, ' . $nombreCompleto"
+    :title="$compact ? 'Mi turno' : $saludo . ', ' . $nombreCompleto"
     :subtitle="$contextoTurno"
     :role="$rolVisible"
-    :image="asset($image)"
-    :scope="$modo === 'FUERA_DE_TURNO' ? 'Turno del equipo · Consulta' : 'Cuidados y seguimiento'"
+    :image="$compact ? null : asset($image)"
+    :compact="$compact"
+    :scope="$scope ?? ($modo === 'FUERA_DE_TURNO' ? 'Turno del equipo · Consulta' : 'Cuidados y seguimiento')"
     data-time-zone="{{ $zonaHoraria }}"
     {{ $attributes }}
 >
-    <x-slot:date>{{ now()->timezone($zonaHoraria)->locale('es')->translatedFormat('D d M Y') }}</x-slot:date>
+    <x-slot:date>{{ ucfirst(now()->timezone($zonaHoraria)->locale('es')->translatedFormat('l, d \\d\\e F \\d\\e Y')) }}</x-slot:date>
 </x-ui.dashboard-header>

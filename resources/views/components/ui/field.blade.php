@@ -24,7 +24,7 @@
 
     @if($error)
         @error($error)
-            <p class="rm-error" role="alert">
+            <p @if($for) id="{{ $for }}-error" @endif class="rm-error" role="alert">
                 <i class="ph-bold ph-warning-circle" aria-hidden="true"></i>
                 <span>{{ $message }}</span>
             </p>
@@ -32,6 +32,6 @@
     @endif
 
     @if($help)
-        <p class="rm-help">{{ $help }}</p>
+        <p @if($for) id="{{ $for }}-help" @endif class="rm-help">{{ $help }}</p>
     @endif
 </div>

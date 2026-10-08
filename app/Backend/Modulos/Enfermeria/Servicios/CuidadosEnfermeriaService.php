@@ -412,6 +412,9 @@ class CuidadosEnfermeriaService
     {
         $this->turnos->autorizarMutacionEnfermeria($codResidente, 'atenciones.crear', $usuario);
         $fase = mb_strtoupper($fase);
+        if ($fase === 'VALORACION') {
+            $this->turnos->autorizarContinuidadControl($codResidente);
+        }
         Validator::make(compact('fase', 'intensidad', 'detalle', 'resultado'), [
             'fase' => 'required|in:VALORACION,INTERVENCION,REEVALUACION',
             'intensidad' => 'required|integer|min:0|max:10',

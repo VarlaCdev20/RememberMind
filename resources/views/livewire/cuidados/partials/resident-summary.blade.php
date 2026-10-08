@@ -4,7 +4,7 @@
         ? ($alertCount > 0 ? $alertCount.' '.($alertCount === 1 ? 'alerta activa' : 'alertas activas') : 'Sin alertas activas')
         : null;
 @endphp
-<x-ui.resident-summary :name="$detalleResidente['nombre_completo']" :metadata="($detalleResidente['edad_texto'] ?: 'Edad no registrada').' · '.$detalleResidente['habitacion_texto'].' · '.$detalleResidente['cama_texto']" :alert-label="$alertLabel" :has-alerts="$alertCount > 0">
+<x-ui.resident-summary :name="$detalleResidente['nombre_completo']" :metadata="($detalleResidente['edad_texto'] ?: 'Edad no registrada').' · '.$detalleResidente['habitacion_texto'].' · '.$detalleResidente['cama_texto']" :context="$esModoConsulta ? 'Consulta fuera de jornada · Solo lectura' : ($turnoActual ? 'Jornada activa · '.$turnoActual->nombre : null)" :alert-label="$alertLabel" :has-alerts="$alertCount > 0">
     @if(auth()->user()?->can('signos_vitales.ver') || auth()->user()?->can('alertas.ver'))
         <x-slot:current>
             <div class="rm-resident-summary__grid rm-resident-summary__grid--current">

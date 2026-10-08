@@ -22,13 +22,20 @@
     $activeLocation = null;
     $bestMatch = -1;
     foreach ($sections as $sectionIndex => $section) {
-        $candidates = [[null, $section['route'] ?? null]];
+        $candidates = [[null, $section['route'] ?? null, [], []]];
         foreach ($section['items'] ?? [] as $itemIndex => $item) {
-            $candidates[] = [$itemIndex, $item['route'] ?? null];
+            $candidates[] = [$itemIndex, $item['route'] ?? null, $item['parameters'] ?? [], $item['active_routes'] ?? []];
         }
-        foreach ($candidates as [$itemIndex, $routeName]) {
-            if (! $routeActive($routeName)) continue;
-            $score = ($currentRoute === $routeName ? 10000 : 0) + strlen($routeName);
+        foreach ($candidates as [$itemIndex, $routeName, $parameters, $activeRoutes]) {
+            $matchesRoute = $routeActive($routeName);
+            foreach ($activeRoutes as $activeRoute) {
+                $matchesRoute = $matchesRoute || $routeActive($activeRoute);
+            }
+            if (! $matchesRoute) continue;
+            foreach ($parameters as $key => $value) {
+                if ((string) request()->query($key) !== (string) $value) continue 2;
+            }
+            $score = ($currentRoute === $routeName ? 10000 : 0) + strlen($routeName) + count($parameters) * 100;
             if ($score > $bestMatch) {
                 $bestMatch = $score;
                 $activeLocation = ['section' => $sectionIndex, 'item' => $itemIndex];
@@ -43,6 +50,7 @@
 
 <aside id="{{ request()->routeIs('admin.enfermeria.*') ? 'sidebar-enfermeria' : 'sidebar' }}" class="rm-sidebar" wire:transition.navigate="rm-sidebar" aria-label="Navegación principal"
     :class="{ 'is-mobile-open': sidebarOpen }"
+    :inert="sidebarRange === 'drawer' && !sidebarOpen"
     @toggle-sidebar.window="sidebarOpen = !sidebarOpen"
     x-data="{
         storageKey: @js($sidebarStorageKey),
@@ -156,7 +164,7 @@
                                     <span>{{ $item['label'] }}</span>
                                 </span>
                             @else
-                                <a href="{{ route($item['route']) }}" wire:navigate @click="sidebarOpen = false"
+                                <a href="{{ route($item['route'], $item['parameters'] ?? []) }}" wire:navigate @click="sidebarOpen = false"
                                     class="rm-sidebar__subitem rm-nav-item {{ $childActive ? 'is-active' : '' }}" data-label="{{ mb_strtoupper($item['label']) }}"
                                     @if($childActive) aria-current="page" @endif>
                                     <span class="rm-sidebar__subindicator" aria-hidden="true"></span>
@@ -198,7 +206,7 @@
                     @if($item['disabled'] ?? false)
                         <span class="rm-sidebar__flyout-link rm-sidebar__flyout-link--pending rm-nav-item" aria-disabled="true" title="Vista todavía no disponible">{{ $item['label'] }}</span>
                     @else
-                        <a href="{{ route($item['route']) }}" wire:navigate @click="flyoutIndex = null; sidebarOpen = false"
+                        <a href="{{ route($item['route'], $item['parameters'] ?? []) }}" wire:navigate @click="flyoutIndex = null; sidebarOpen = false"
                             class="rm-sidebar__flyout-link rm-nav-item {{ $flyoutActive ? 'is-active' : '' }}"
                             @if($flyoutActive) aria-current="page" @endif>{{ $item['label'] }}</a>
                     @endif

@@ -21,7 +21,7 @@ function contrast(first, second) {
     return (values[0] + .05) / (values[1] + .05);
 }
 
-test('la jerarquía del sidebar usa texto petróleo legible y conserva el acento activo', { skip: !executablePath }, async () => {
+test('la jerarquía del sidebar usa tinta cálida legible y conserva el acento activo', { skip: !executablePath }, async () => {
     const browser = await puppeteer.launch({ headless: true, executablePath });
     try {
         const page = await browser.newPage();
@@ -47,7 +47,7 @@ test('la jerarquía del sidebar usa texto petróleo legible y conserva el acento
                 if (theme === 'light') {
                     assert.ok(contrast(styles.activeText, styles.activeBackground) >= 4.5, `${role} selección legible`);
                     const [red, green, blue] = styles.module.match(/\d+/g).slice(0, 3).map(Number);
-                    assert.ok(blue >= red && green >= red, 'texto petróleo en vez de café');
+                    assert.ok(red > green && green > blue, 'tinta cálida del contrato aprobado');
                 }
                 assert.notEqual(styles.activeIcon, styles.activeText, 'el icono mantiene el acento del rol');
             }

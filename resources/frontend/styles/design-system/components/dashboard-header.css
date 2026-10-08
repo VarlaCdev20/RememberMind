@@ -51,6 +51,19 @@
 @media (max-width: 639px) { .rm-dashboard-header { grid-template-columns: 1fr; min-height: 0; } .rm-dashboard-header__visual { display: none; } .rm-dashboard-header .rm-dashboard-header__content { padding: 18px; } .rm-dashboard-header .rm-dashboard-header__title { font-size: 26px; } }
 @media (max-width: 479px) { .rm-dashboard-header__metadata { width: 100%; gap: 5px 10px; } .rm-dashboard-header__metadata > span + span { padding-left: 10px; } .rm-dashboard-header__metadata .rm-dashboard-header__scope { flex-basis: 100%; border-left: 0; padding-left: 0; } }
 
+/* Cabecera operativa: conserva fecha, alcance y rol sin ocupar el área de trabajo. */
+.rm-dashboard-header.rm-dashboard-header--compact {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+    background-image: none;
+    border-radius: var(--rm-radius-card);
+}
+.rm-dashboard-header--compact .rm-dashboard-header__content { padding: var(--rm-space-4); }
+.rm-dashboard-header--compact .rm-dashboard-header__title {
+    font-family: var(--rm-font-friendly);
+    font-size: var(--rm-font-size-page);
+}
+
 .rm-dashboard-divider {
     display: flex;
     grid-column: 1 / -1;

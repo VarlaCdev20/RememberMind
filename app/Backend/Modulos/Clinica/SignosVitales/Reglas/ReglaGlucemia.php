@@ -16,18 +16,18 @@ final class ReglaGlucemia extends ReglaBase
         if ($valor < $c['critico_bajo']) {
             return $this->resultado('glucemia', (string) $valor, 'mg/dL', Nivel::CRITICO, 'GLUCEMIA_BAJA_CRITICA',
                 'Umbral bajo de seguridad', '<'.$c['critico_bajo'].' mg/dL',
-                'La glucemia se encuentra por debajo del umbral bajo crítico.', $this->recomendacionCritica());
+                'Glucemia de '.$valor.' mg/dL, por debajo del límite crítico inferior (<'.$c['critico_bajo'].' mg/dL).', $this->recomendacionCritica());
         }
         if ($valor < $c['advertencia_baja']) {
             return $this->resultado('glucemia', (string) $valor, 'mg/dL', Nivel::ADVERTENCIA, 'GLUCEMIA_BAJA',
                 'Umbral bajo de atención', '<'.$c['advertencia_baja'].' mg/dL',
-                'La glucemia se encuentra por debajo del umbral bajo de atención.');
+                'Glucemia de '.$valor.' mg/dL, por debajo del límite de atención (<'.$c['advertencia_baja'].' mg/dL).');
         }
         if ($valor > $c['revision_alta']) {
             return new ResultadoReglaClinica('glucemia', (string) $valor, 'mg/dL', null,
                 'GLUCEMIA_ALTA_REVISAR_CONTEXTO', 'Orientación para revisión',
                 '>'.$c['revision_alta'].' mg/dL',
-                'Una lectura elevada aislada no establece por sí sola una urgencia ni un patrón persistente.',
+                'Glucemia de '.$valor.' mg/dL, superior a '.$c['revision_alta'].' mg/dL. Una lectura elevada aislada no establece por sí sola una urgencia ni un patrón persistente.',
                 'Revisar las lecturas recientes, síntomas y objetivo individual con el profesional responsable.',
                 ComportamientoAlerta::SUGERIR);
         }

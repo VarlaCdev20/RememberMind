@@ -6,10 +6,13 @@
     @endif
     <div class="rm-signos__input-wrap">
         <input id="signos-{{ $clave }}" type="number" inputmode="decimal"
+               aria-label="{{ $campo['label'] }}{{ $campo['unit'] !== '' ? ' en '.$campo['unit'] : ($clave === 'sis' ? ' en mmHg' : '') }}"
                min="{{ $limitesTecnicos[$clave]['min'] }}" max="{{ $limitesTecnicos[$clave]['max'] }}" step="{{ $campo['step'] }}"
                wire:model.live.debounce.350ms="{{ $campo['wire'] }}" x-model="values.{{ $clave }}"
-               @focus="focus('{{ $clave }}')" @blur="validate('{{ $clave }}')"
-               @input="focus('{{ $clave }}')" @input.debounce.250ms="validate('{{ $clave }}', false)"
+               @focus="focusMeasurement('{{ $clave }}', $event.currentTarget)" @blur="validate('{{ $clave }}')"
+               @click="if (!trendOpen) focusMeasurement('{{ $clave }}', $event.currentTarget)"
+               aria-controls="signos-grafica-popup" :aria-expanded="trendOpen && active === @js(in_array($clave, ['sis', 'dia'], true) ? 'pa' : $clave)"
+               @input="activateMeasurement('{{ $clave }}')" @input.debounce.250ms="validate('{{ $clave }}', false)"
                x-bind:aria-invalid="(hasError('{{ $clave }}') || @js($errors->has($errorClave))) ? 'true' : 'false'"
                aria-describedby="signos-{{ $clave }}-error{{ $errors->has($errorClave) ? ' signos-'.$clave.'-server-error' : '' }}">
         @if($campo['unit'] !== '')<span class="rm-signos__input-unit" aria-hidden="true">{{ $campo['unit'] }}</span>@endif

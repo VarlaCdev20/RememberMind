@@ -8,18 +8,18 @@
        DURACIONES NORMALIZADAS V2
        ------------------------------------------------------------ */
     --rm-duration-fast: 120ms;
-    --rm-duration-hover: 160ms;
-    --rm-duration-normal: 200ms;
-    --rm-duration-slow: 280ms;
-    --rm-duration-enter: 400ms;
+    --rm-duration-hover: 140ms;
+    --rm-duration-normal: 180ms;
+    --rm-duration-slow: 220ms;
+    --rm-duration-enter: 240ms;
 
     /* Movimiento discreto de gráficas y métricas. */
     --rm-motion-instant: 100ms;
-    --rm-motion-fast: 160ms;
-    --rm-motion-base: 240ms;
-    --rm-motion-medium: 380ms;
-    --rm-motion-slow: 620ms;
-    --rm-motion-chart-enter: 720ms;
+    --rm-motion-fast: var(--rm-duration-hover);
+    --rm-motion-base: var(--rm-duration-normal);
+    --rm-motion-medium: var(--rm-duration-slow);
+    --rm-motion-slow: var(--rm-duration-enter);
+    --rm-motion-chart-enter: var(--rm-duration-enter);
 
     /* ------------------------------------------------------------
        TIMING FUNCTIONS NORMALIZADAS V2
@@ -34,7 +34,7 @@
     --rm-motion-scale-hover: 1.015;
     --rm-motion-scale-active: .985;
 
-    --rm-chart-update-duration: 420ms;
+    --rm-chart-update-duration: var(--rm-duration-normal);
     --rm-chart-update-easing: var(--rm-ease-standard);
     --rm-chart-stagger-fast: 35ms;
     --rm-chart-stagger-default: 55ms;

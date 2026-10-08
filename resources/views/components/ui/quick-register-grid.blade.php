@@ -6,8 +6,14 @@
             <div class="rm-quick-register__grid {{ ($section['columns'] ?? 3) === 2 ? 'rm-quick-register__grid--care' : '' }}">
                 @foreach($section['actions'] as $action)
                     @can($action['permiso'])
-                        @php($available = (bool) ($action['disponible'] ?? true))
-                        <x-ui.register-action-card :icon="$action['icon']" :label="$action['label']" :tone="$action['tone'] ?? 'clinical'" :disabled="!$available" :hint="$available ? null : ($action['hint'] ?? 'Sin formulario directo aquí')" wire:click="{{ $onSelect }}('{{ $action['tipo'] }}')" />
+                        @if(auth()->user()->can($action['permisos_adicionales'] ?? []))
+                            @php($available = (bool) ($action['disponible'] ?? true))
+                            @if($available && !empty($action['href']))
+                                <x-ui.register-action-card :icon="$action['icon']" :label="$action['label']" :tone="$action['tone'] ?? 'clinical'" :href="$action['href']" :hint="$action['hint'] ?? null" />
+                            @else
+                                <x-ui.register-action-card :icon="$action['icon']" :label="$action['label']" :tone="$action['tone'] ?? 'clinical'" :disabled="!$available" :hint="$action['hint'] ?? (!$available ? 'No disponible en este momento' : null)" wire:click="{{ $onSelect }}('{{ $action['tipo'] }}')" />
+                            @endif
+                        @endif
                     @endcan
                 @endforeach
             </div>

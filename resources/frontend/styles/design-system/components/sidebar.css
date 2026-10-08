@@ -12,14 +12,15 @@
     --rm-sidebar-radius-item: 10px;
     --rm-sidebar-item-size: 13.5px;
     --rm-shell-sage-tint: #C5E6B8;
-    --rm-shell-sage-surface: color-mix(in srgb, #E7E3DF 90%, var(--rm-palette-capuchino));
+    --rm-shell-sage-surface: var(--rm-surface-soft);
     --rm-shell-sage-selection: color-mix(in srgb, color-mix(in srgb, var(--rm-shell-sage-tint) 44%, transparent) 96%, var(--rm-shell-sage-surface));
 }
 
 .rm-shell .rm-sidebar {
-    --rm-sidebar-ink: #374B50;
-    --rm-sidebar-ink-soft: #3F5358;
-    --rm-sidebar-ink-section: #3D5759;
+    --rm-sidebar-ink: var(--rm-palette-ink);
+    /* Texto pequeño de navegación sobre el shell: conservar una tinta AA. */
+    --rm-sidebar-ink-soft: var(--rm-palette-ink);
+    --rm-sidebar-ink-section: var(--rm-palette-ink);
     --rm-sage-glass-tint: var(--rm-shell-sage-tint);
     --rm-sage-glass: color-mix(in srgb, var(--rm-sage-glass-tint) 28%, transparent);
     --rm-sage-glass-hover: color-mix(in srgb, var(--rm-sage-glass-tint) 34%, transparent);
@@ -33,7 +34,7 @@
     --rm-sage-selected-surface: var(--rm-shell-sage-selection);
     --rm-sage-glass-shadow: 0 1px 4px color-mix(in srgb, var(--rm-sage-accent) 10%, transparent);
     --rm-sidebar-radius-module: 12px;
-    --rm-sidebar-bg: color-mix(in srgb, #D8D2CC 20%, var(--rm-palette-capuchino));
+    --rm-sidebar-bg: var(--rm-bg-shell);
     --rm-sidebar-surface: var(--rm-shell-sage-surface);
     --rm-text-primary: var(--rm-sidebar-ink);
     --rm-text-secondary: var(--rm-sidebar-ink-soft);
@@ -41,7 +42,7 @@
     --rm-icon-default: #746D67;
     --rm-border: #A59E97;
     --rm-item-hover: var(--rm-sage-glass-hover);
-    --rm-item-open: #D9D3D3;
+    --rm-item-open: var(--rm-surface-soft);
     --rm-item-active-bg: var(--rm-sage-selected-surface);
     --rm-item-active-text: var(--rm-sage-selected-text);
     --rm-item-active-accent: var(--rm-sage-accent);
@@ -87,6 +88,7 @@
 .rm-shell .rm-sidebar__brand {
     gap: var(--rm-space-2);
     border-radius: var(--rm-radius-sm);
+    min-height: 44px;
 }
 
 .rm-shell .rm-sidebar__logo {
@@ -112,9 +114,9 @@
 }
 
 .rm-shell .rm-sidebar__header-toggle {
-    width: 32px;
-    height: 32px;
-    flex-basis: 32px;
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
     background: color-mix(in srgb, var(--rm-sidebar-hover) 72%, transparent);
     border: 1px solid var(--rm-sidebar-border);
     color: var(--rm-sidebar-text);
@@ -259,7 +261,7 @@
 .rm-shell .rm-sidebar__subitem {
     border-radius: var(--rm-radius-sm);
     border: 1px solid transparent;
-    min-height: 42px;
+    min-height: 44px;
     padding: var(--rm-space-2) var(--rm-space-2) var(--rm-space-2) var(--rm-space-3);
     color: var(--rm-sidebar-subtext);
     font-size: var(--rm-text-base);
@@ -345,7 +347,7 @@
 
 .rm-shell .rm-sidebar__flyout-link {
     color: var(--rm-sidebar-subtext);
-    min-height: 42px;
+    min-height: 44px;
     display: flex;
     align-items: center;
     font-size: var(--rm-text-base);
@@ -379,18 +381,19 @@
 
 @media (min-width: 1024px) {
     .rm-shell.is-sidebar-collapsed .rm-sidebar__header {
-        flex: 0 0 88px;
-        height: 88px;
-        min-height: 88px;
-        max-height: 88px;
+        --rm-sidebar-header-height: 108px;
+        flex: 0 0 var(--rm-sidebar-header-height);
+        height: var(--rm-sidebar-header-height);
+        min-height: var(--rm-sidebar-header-height);
+        max-height: var(--rm-sidebar-header-height);
         gap: var(--rm-space-1);
         padding: var(--rm-space-2);
     }
 
     .rm-shell.is-sidebar-collapsed .rm-sidebar__header-toggle {
-        width: 32px;
-        height: 32px;
-        flex-basis: 32px;
+        width: 44px;
+        height: 44px;
+        flex-basis: 44px;
     }
 
     .rm-shell.is-sidebar-collapsed .rm-sidebar__logo {
@@ -476,7 +479,7 @@
 }
 
 /* Densidad final y neutralización de efectos históricos. */
-.rm-shell .rm-sidebar .rm-sidebar__header { padding-inline: var(--rm-space-4); }
+.rm-shell .rm-sidebar .rm-sidebar__header { padding-inline: var(--rm-space-2); }
 .rm-shell .rm-sidebar .rm-sidebar__nav { padding-inline: var(--rm-space-4); }
 .rm-shell .rm-sidebar .rm-sidebar__group.rm-nav-section {
     font: var(--rm-sidebar-section-weight) var(--rm-sidebar-section-size)/var(--rm-leading-heading) var(--rm-sidebar-section-font);
@@ -716,7 +719,7 @@
 .rm-shell .rm-sidebar .rm-sidebar__chevron { flex: 0 0 var(--rm-space-3); width: var(--rm-space-3); text-align: center; }
 .rm-shell .rm-sidebar .rm-sidebar__submenu-content { display: grid; gap: var(--rm-space-1); }
 .rm-shell .rm-sidebar .rm-sidebar__subitem {
-    min-height: 40px;
+    min-height: 44px;
     padding-inline: var(--rm-space-2);
     border-radius: var(--rm-sidebar-radius-item);
 }

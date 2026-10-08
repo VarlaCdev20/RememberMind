@@ -1,8 +1,9 @@
-@props(['name', 'metadata', 'alertLabel' => null, 'hasAlerts' => false, 'id' => 'resident-summary'])
+@props(['name', 'metadata', 'context' => null, 'alertLabel' => null, 'hasAlerts' => false, 'id' => 'resident-summary'])
 <div {{ $attributes->class(['rm-resident-summary']) }}>
     <header class="rm-resident-summary__identity">
-        <h3>{{ mb_strtoupper($name) }}</h3>
+        <h3>{{ \Illuminate\Support\Str::title(mb_strtolower($name)) }}</h3>
         <p>{{ $metadata }}</p>
+        @if($context)<p>{{ $context }}</p>@endif
         @if($alertLabel)<span class="rm-resident-summary__alert {{ $hasAlerts ? 'has-alerts' : '' }}"><i class="ph-bold {{ $hasAlerts ? 'ph-warning-circle' : 'ph-check-circle' }}" aria-hidden="true"></i>{{ $alertLabel }}</span>@endif
     </header>
     @if(isset($current) && trim((string) $current) !== '')

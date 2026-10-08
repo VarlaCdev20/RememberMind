@@ -4,6 +4,7 @@
     'image' => null, 'accent' => null,
     'imageAlt' => 'Cuidado y acompañamiento en Los Almendros',
     'imageLabel' => null,
+    'compact' => false,
 ])
 @php
     $assignedRole = app(\App\Backend\Modulos\Identidad\Servicios\RolePreviewService::class)->activeRole(auth()->user())
@@ -20,8 +21,9 @@
     $scope = $scope ?? ($variant['scope'] ?? null);
     $imageLabel = $imageLabel ?? ($variant['image_label'] ?? 'Cuidado centrado en la persona');
 @endphp
-<header {{ $attributes->class('rm-dashboard-header') }} data-accent="{{ $accentToken }}">
+<header {{ $attributes->class(['rm-dashboard-header', 'rm-dashboard-header--compact' => $compact]) }} data-accent="{{ $accentToken }}">
     <div class="rm-dashboard-header__content">
+        @unless($compact)
         <div class="rm-dashboard-header__ornaments" aria-hidden="true">
             <span class="rm-dashboard-header__ornament rm-dashboard-header__ornament--care">
                 <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -36,6 +38,7 @@
                 </svg>
             </span>
         </div>
+        @endunless
         <p class="rm-dashboard-header__eyebrow">{{ $eyebrow }}</p>
         <div class="rm-dashboard-header__heading">
             <h1 class="rm-dashboard-header__title">{{ $title }}</h1>

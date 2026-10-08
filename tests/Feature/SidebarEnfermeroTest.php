@@ -3,12 +3,12 @@
 namespace Tests\Feature;
 
 use App\Backend\Modulos\Identidad\Servicios\SidebarService;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Alerta;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Jornada;
 use App\Models\Personal;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Database\QueryException;
@@ -38,8 +38,8 @@ class SidebarEnfermeroTest extends TestCase
         $sidebarService = app(SidebarService::class);
         $sidebar = $sidebarService->getSidebar();
 
-        // Las vistas pendientes se muestran sin enlace hasta que exista una ruta propia.
-        $this->assertCount(4, $sidebar);
+        $this->assertCount(7, $sidebar);
+        $this->assertSame(['Mi turno', 'Mis residentes', 'Cuidados', 'Medicación', 'Alertas', 'Incidentes', 'Pase de turno'], array_column($sidebar, 'title'));
 
         $this->assertSame('Mi turno', $sidebar[0]['title']);
         $this->assertSame('admin.enfermeria.dashboard', $sidebar[0]['route']);
@@ -47,24 +47,26 @@ class SidebarEnfermeroTest extends TestCase
         $this->assertSame('Mis residentes', $sidebar[1]['title']);
         $this->assertSame('admin.enfermeria.pacientes', $sidebar[1]['route']);
 
-        // Grupo Cuidado
-        $this->assertSame('Cuidado', $sidebar[2]['title']);
+        // Los diez accesos conservan un destino distinto mediante su contexto.
+        $this->assertSame('Cuidados', $sidebar[2]['title']);
         $labelsCuidado = array_column($sidebar[2]['items'], 'label');
-        $this->assertSame(['Cuidados', 'Medicación', 'Controles', 'Heridas y curaciones'], $labelsCuidado);
-        $this->assertNull($sidebar[2]['items'][2]['route']);
-        $this->assertTrue($sidebar[2]['items'][2]['disabled']);
-        $this->assertNull($sidebar[2]['items'][3]['route']);
-        $this->assertTrue($sidebar[2]['items'][3]['disabled']);
-
-        // Grupo Continuidad
-        $this->assertSame('Continuidad', $sidebar[3]['title']);
-        $labelsContinuidad = array_column($sidebar[3]['items'], 'label');
-        $this->assertSame(['Pase de turno', 'Incidentes', 'Alertas'], $labelsContinuidad);
-        $this->assertSame('admin.enfermeria.incidentes', $sidebar[3]['items'][1]['route']);
+        $this->assertSame(['Signos', 'Dolor', 'Cognición', 'Conducta', 'Sueño', 'Ingesta', 'Hidratación', 'Eliminación', 'Movilidad', 'Heridas'], $labelsCuidado);
+        $urls = array_map(fn ($item) => route($item['route'], $item['parameters']), $sidebar[2]['items']);
+        $this->assertCount(10, array_unique($urls));
+        foreach ($sidebar[2]['items'] as $item) {
+            $this->assertFalse($item['disabled']);
+            $clave = $item['parameters']['cuidado'];
+            $opcion = \App\Backend\Modulos\Enfermeria\Servicios\NavegacionCuidadosService::opcion($clave);
+            $this->assertSame($opcion['route'] ?? 'admin.enfermeria.pacientes', $item['route']);
+            foreach ($opcion['parameters'] ?? [] as $parameter => $value) {
+                $this->assertSame($value, $item['parameters'][$parameter]);
+            }
+        }
+        $this->assertSame('admin.enfermeria.incidentes', $sidebar[5]['route']);
 
         // Verificar que elementos prohibidos NO están presentes
         $allTitles = array_column($sidebar, 'title');
-        $allSubLabels = array_merge($labelsCuidado, $labelsContinuidad);
+        $allSubLabels = $labelsCuidado;
         $allVisible = array_merge($allTitles, $allSubLabels);
 
         $this->assertNotContains('Agenda', $allVisible);
@@ -76,13 +78,25 @@ class SidebarEnfermeroTest extends TestCase
         $this->assertNotContains('Usuarios', $allVisible);
     }
 
+    public function test_lecturas_aprobadas_no_conceden_nuevas_escrituras(): void
+    {
+        $enfermero = User::factory()->create(['estado' => 'ACTIVO']);
+        $enfermero->assignRole('ENFERMEROS');
+        foreach (['registros_conductuales', 'registros_sueno', 'registros_ingesta', 'registros_hidratacion', 'registros_eliminacion', 'registros_movilidad'] as $recurso) {
+            $this->assertTrue($enfermero->can($recurso.'.ver'));
+        }
+        $this->assertFalse($enfermero->can('registros_sueno.crear'));
+        $this->assertFalse($enfermero->can('registros_conductuales.crear'));
+        $this->assertFalse($enfermero->can('prescripciones.crear'));
+    }
+
     public function test_alertas_item_muestra_badge_con_cantidad_activa(): void
     {
         $enfermero = User::factory()->create(['estado' => 'ACTIVO']);
         $enfermero->assignRole('ENFERMEROS');
         $this->actingAs($enfermero);
 
-        $turno = TurnoEnfermeria::create([
+        $turno = Turno::create([
             'orden' => 1,
             'nombre' => 'Mañana',
             'hora_inicio' => '07:00',
@@ -90,7 +104,7 @@ class SidebarEnfermeroTest extends TestCase
             'estado' => 'ACTIVO',
         ]);
 
-        $adulto = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
+        $adulto = Residente::factory()->create(['cod_est_adul' => 'EST_001']);
         $personal = Personal::create([
             'cod_personal' => 'PER_SIDEBAR',
             'cod_usuario' => $enfermero->cod_usuario,
@@ -139,6 +153,10 @@ class SidebarEnfermeroTest extends TestCase
             'estado' => 'EN_ATENCION',
         ]);
 
+        foreach (['ASIGNADA', 'RECONOCIDA', 'PENDIENTE'] as $estado) {
+            Alerta::create(['cod_residente' => $adulto->cod_residente, 'tipo' => 'CLINICA', 'estado' => $estado]);
+        }
+
         // Alerta cerrada del mismo residente no debe sumarse al badge activo
         Alerta::create([
             'cod_residente' => $adulto->cod_residente,
@@ -152,7 +170,7 @@ class SidebarEnfermeroTest extends TestCase
         ]);
 
         // Alerta de otro residente no asignado a la jornada no debe sumarse al badge
-        $otroAdulto = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
+        $otroAdulto = Residente::factory()->create(['cod_est_adul' => 'EST_001']);
         Alerta::create([
             'cod_residente' => $otroAdulto->cod_residente,
             'cod_turno' => $turno->cod_turno,
@@ -167,11 +185,9 @@ class SidebarEnfermeroTest extends TestCase
         $sidebarService = app(SidebarService::class);
         $sidebar = $sidebarService->getSidebar();
 
-        $secContinuidad = collect($sidebar)->firstWhere('title', 'Continuidad');
-        $this->assertNotNull($secContinuidad);
-        $itemAlertas = collect($secContinuidad['items'])->firstWhere('label', 'Alertas');
+        $itemAlertas = collect($sidebar)->firstWhere('title', 'Alertas');
         $this->assertNotNull($itemAlertas);
-        $this->assertSame('2', $itemAlertas['badge']);
+        $this->assertSame('5', $itemAlertas['badge']);
     }
 
     public function test_opcion_pendiente_no_se_muestra_sin_su_permiso_actual(): void
@@ -181,9 +197,9 @@ class SidebarEnfermeroTest extends TestCase
         $enfermero->roles->first()->revokePermissionTo('heridas.ver');
 
         $this->actingAs($enfermero);
-        $cuidado = collect(app(SidebarService::class)->getSidebar())->firstWhere('title', 'Cuidado');
+        $cuidado = collect(app(SidebarService::class)->getSidebar())->firstWhere('title', 'Cuidados');
 
-        $this->assertSame(['Cuidados', 'Medicación', 'Controles'], array_column($cuidado['items'], 'label'));
+        $this->assertSame(['Signos', 'Dolor', 'Cognición', 'Conducta', 'Sueño', 'Ingesta', 'Hidratación', 'Eliminación', 'Movilidad'], array_column($cuidado['items'], 'label'));
     }
 
     public function test_usuario_enfermero_sin_personal_no_provoca_creacion_automatica_de_personal(): void
@@ -200,15 +216,14 @@ class SidebarEnfermeroTest extends TestCase
 
         // El servicio no debe fabricar Personal como fallback
         $this->assertSame(0, Personal::where('cod_usuario', $enfermero->cod_usuario)->count());
-        $secContinuidad = collect($sidebar)->firstWhere('title', 'Continuidad');
-        $itemAlertas = collect($secContinuidad['items'])->firstWhere('label', 'Alertas');
+        $itemAlertas = collect($sidebar)->firstWhere('title', 'Alertas');
         $this->assertNull($itemAlertas['badge']);
     }
 
     public function test_cod_usuario_usado_como_cod_personal_responsable_es_rechazado_por_fk(): void
     {
         $enfermero = User::factory()->create(['estado' => 'ACTIVO']);
-        $adulto = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
+        $adulto = Residente::factory()->create(['cod_est_adul' => 'EST_001']);
 
         // cod_usuario pertenece a usuarios, no a personal
         $this->expectException(QueryException::class);
@@ -224,7 +239,7 @@ class SidebarEnfermeroTest extends TestCase
 
     public function test_personal_inexistente_como_responsable_es_rechazado_por_fk(): void
     {
-        $adulto = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
+        $adulto = Residente::factory()->create(['cod_est_adul' => 'EST_001']);
 
         $this->expectException(QueryException::class);
 
@@ -252,11 +267,10 @@ class SidebarEnfermeroTest extends TestCase
         $response->assertSee('Mis residentes');
         $response->assertSee('Cuidados');
         $response->assertSee('Medicación');
-        $response->assertSee('Controles');
-        $response->assertSee('Heridas y curaciones');
-        $response->assertSee('rm-sidebar__subitem--pending');
+        $response->assertSee('Cognición');
+        $response->assertSee('Heridas');
+        $response->assertDontSee('rm-sidebar__subitem--pending');
         $response->assertDontSee('href=""', false);
-        $response->assertSee('Continuidad');
         $response->assertSee('Pase de turno');
         $response->assertSee('Incidentes');
         $response->assertSee('Alertas');
@@ -265,7 +279,7 @@ class SidebarEnfermeroTest extends TestCase
         $response->assertDontSee('Salud y Evaluación Geriátrica');
     }
 
-    public function test_incidentes_abre_su_vista_y_mantiene_continuidad_como_grupo_activo(): void
+    public function test_incidentes_abre_su_vista_como_seccion_activa(): void
     {
         $enfermero = User::factory()->create(['estado' => 'ACTIVO']);
         $enfermero->assignRole('ENFERMEROS');
@@ -274,7 +288,7 @@ class SidebarEnfermeroTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('activeSectionKey:', false);
-        $response->assertSee('openSection: 3', false);
-        $response->assertSee('rm-sidebar__subitem rm-nav-item is-active', false);
+        $response->assertSee('openSection: null', false);
+        $response->assertSee('class="rm-sidebar__item is-active" title="Incidentes"', false);
     }
 }

@@ -31,11 +31,11 @@ abstract class ReglaBase implements ReglaClinica
     protected function sinRegla(string $variable, string $valor, string $unidad): ResultadoReglaClinica
     {
         return $this->resultado($variable, $valor, $unidad, null, 'SIN_REGLA_APROBADA', null, null,
-            'Esta lectura no tiene una clasificación automática aprobada.');
+            'La medición de '.$valor.' '.$unidad.' no tiene una clasificación automática aprobada aplicable. El sistema no puede marcarla como normal ni crítica con las reglas disponibles.');
     }
 
     protected function recomendacionCritica(): string
     {
-        return 'Repetir la medición, verificar la técnica y seguir el protocolo institucional.';
+        return 'Comprueba la técnica utilizada y repite la medición según el protocolo institucional. Registra la lectura confirmada y sigue el protocolo de atención del centro.';
     }
 }

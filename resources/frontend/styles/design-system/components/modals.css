@@ -216,7 +216,8 @@
  justify-content: center;
  gap: 5px;
  min-width: 72px;
- height: 34px;
+ min-height: 44px;
+ height: 44px;
  padding: 0 10px;
  border: 1px solid var(--rm-border-soft);
  border-radius: var(--rm-radius-input);
@@ -226,7 +227,7 @@
  cursor: grab;
  touch-action: none;
  user-select: none;
- transition: transform 150ms ease, border-color 150ms ease, background-color 150ms ease, color 150ms ease;
+ transition: transform var(--rm-duration-fast) var(--rm-ease-standard), border-color var(--rm-duration-fast) var(--rm-ease-standard), background-color var(--rm-duration-fast) var(--rm-ease-standard), color var(--rm-duration-fast) var(--rm-ease-standard);
 }
 
 .rm-modal-panel__drag-handle span {
@@ -244,7 +245,7 @@
 
 .rm-modal-panel__drag-handle:active {
  cursor: grabbing;
- transform: scale(0.97);
+ transform: translateY(1px);
 }
 
 .rm-modal-panel__drag-handle:focus-visible {

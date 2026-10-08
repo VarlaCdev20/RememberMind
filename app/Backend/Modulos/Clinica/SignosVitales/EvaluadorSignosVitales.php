@@ -21,7 +21,8 @@ final class EvaluadorSignosVitales
     /** @param array<string, mixed> $mediciones */
     public function evaluar(array $mediciones, ?string $codResidente = null, ?Collection $objetivosPrecargados = null, bool $incluirHistorial = true): EvaluacionSignosVitales
     {
-        $historial = $codResidente && $incluirHistorial ? $this->basal->lecturasRecientes($codResidente) : [];
+        $fechaMedicion = isset($mediciones['fecha_hora']) ? \Carbon\Carbon::parse($mediciones['fecha_hora']) : now();
+        $historial = $codResidente && $incluirHistorial ? $this->basal->lecturasRecientes($codResidente, fechaMedicion: $fechaMedicion) : [];
         $reglas = [
             new ReglaPresionArterial, new ReglaFrecuenciaCardiaca,
             new ReglaFrecuenciaRespiratoria, new ReglaTemperatura,
@@ -33,7 +34,7 @@ final class EvaluadorSignosVitales
         }
 
         if ($codResidente !== null) {
-            $individuales = $this->objetivos->evaluar($codResidente, $mediciones, $objetivosPrecargados);
+            $individuales = $this->objetivos->evaluar($codResidente, $mediciones, $objetivosPrecargados, $fechaMedicion);
             foreach ($individuales as $individual) {
                 $variableGeneral = str_starts_with($individual->variable, 'presion_')
                     ? 'presion_arterial' : $individual->variable;

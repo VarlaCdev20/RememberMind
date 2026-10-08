@@ -46,6 +46,10 @@
         'INACTIVO', 'INACTIVA' => 'Inactivo',
         'CERRADA', 'CERRADO' => 'Cerrada',
         'ARCHIVADO', 'ARCHIVADA' => 'Archivado',
+        'REALIZADO', 'REALIZADA' => 'Realizada',
+        'CANCELADO', 'CANCELADA' => 'Cancelada',
+        'PROGRAMADO', 'PROGRAMADA' => 'Programada',
+        'EN_CURSO' => 'En curso',
         default => ($valor !== '' ? ucfirst(strtolower(str_replace('_', ' ', $valor))) : ''),
     };
 
@@ -60,13 +64,13 @@
         default => match($valor) {
             'PRIMARY', 'PRINCIPAL', 'INSTITUCIONAL'
                 => 'rm-badge-primary',
-            'ACTIVO', 'ACTIVA', 'ESTABLE', 'VIGENTE', 'DISPONIBLE', 'APROBADA', 'ADMITIDA', 'ADMITIDO', 'EXITO', 'RESUELTA', 'RESUELTO', 'ADMINISTRADO', 'ADMINISTRADA', 'COMPLETADO', 'COMPLETADA', 'BAJO'
+            'ACTIVO', 'ACTIVA', 'ESTABLE', 'VIGENTE', 'DISPONIBLE', 'APROBADA', 'ADMITIDA', 'ADMITIDO', 'EXITO', 'RESUELTA', 'RESUELTO', 'ADMINISTRADO', 'ADMINISTRADA', 'COMPLETADO', 'COMPLETADA', 'BAJO', 'REALIZADA', 'REALIZADO', 'FINALIZADA', 'FINALIZADO'
                 => 'rm-badge-success',
-            'VIGILANCIA', 'SUSPENDIDO', 'SUSPENDIDA', 'EN_REVISION', 'PENDIENTE', 'ABIERTA', 'ABIERTO', 'OCUPADA', 'MEDIO'
+            'VIGILANCIA', 'SUSPENDIDO', 'SUSPENDIDA', 'EN_REVISION', 'PENDIENTE', 'ABIERTA', 'ABIERTO', 'OCUPADA', 'MEDIO', 'EN_CURSO'
                 => 'rm-badge-warning',
-            'CRITICO', 'CRÍTICO', 'ALTO', 'RECHAZADA', 'ALERTA', 'ERROR', 'FALLECIDO', 'RETIRADO', 'VENCIDO', 'VENCIDA'
+            'CRITICO', 'CRÍTICO', 'ALTO', 'RECHAZADA', 'ALERTA', 'ERROR', 'FALLECIDO', 'RETIRADO', 'VENCIDO', 'VENCIDA', 'CANCELADA', 'CANCELADO', 'ANULADA', 'ANULADO'
                 => 'rm-badge-critical',
-            'EN_ATENCION', 'TRASLADADO', 'SEGUIMIENTO_ESPECIAL', 'INFORMATIVO', 'PRESCRITO', 'PROGRAMADO'
+            'EN_ATENCION', 'TRASLADADO', 'SEGUIMIENTO_ESPECIAL', 'INFORMATIVO', 'PRESCRITO', 'PROGRAMADO', 'PROGRAMADA'
                 => 'rm-badge-info',
             default
                 => 'rm-badge-neutral',

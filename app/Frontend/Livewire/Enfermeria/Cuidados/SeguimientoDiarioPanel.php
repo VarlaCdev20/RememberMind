@@ -6,7 +6,7 @@ use App\Backend\Modulos\Enfermeria\Servicios\SeguimientoDiarioService;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use App\Models\Atencion;
 use App\Models\Residente;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -18,6 +18,9 @@ class SeguimientoDiarioPanel extends Component
 
     #[Url(as: 'adulto')]
     public string $filtroAdulto = '';
+
+    #[Url]
+    public string $cuidado = '';
 
     public string $search = '';
 
@@ -445,6 +448,11 @@ class SeguimientoDiarioPanel extends Component
 
     public function render()
     {
+        if ($this->cuidado !== '') {
+            $opcion = \App\Backend\Modulos\Enfermeria\Servicios\NavegacionCuidadosService::opcion($this->cuidado);
+            abort_unless(in_array($this->cuidado, ['cognicion', 'conducta'], true), 404);
+            abort_unless(Auth::user()?->can($opcion['permission']), 403);
+        }
         $turnoService = app(TurnoEnfermeriaService::class);
         $seguimientosQuery = Atencion::query()->when($this->filtroAdulto, fn ($q) => $q->where('cod_residente', $this->filtroAdulto))->with(['adultoMayor', 'personal']);
         $seguimientosQuery = $turnoService->acotarSeguimientosQuery($seguimientosQuery, auth()->user(), $this->filtroTurno ?: null);
@@ -467,7 +475,7 @@ class SeguimientoDiarioPanel extends Component
         return view('livewire.cuidados.seguimiento-diario-panel', [
             'seguimientos' => $seguimientos,
             'adultos' => $adultosQuery->get(),
-            'turnos' => TurnoEnfermeria::activos()->get(),
+            'turnos' => Turno::activos()->orderBy('orden')->get(),
         ])->layout('layouts.enfermeria');
     }
 }

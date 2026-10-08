@@ -11,14 +11,26 @@ use Illuminate\Support\Collection;
 final class ServicioObjetivosPersonalizados
 {
     /** @return list<ResultadoReglaClinica> */
-    public function evaluar(string $codResidente, array $mediciones, ?Collection $objetivosPrecargados = null): array
+    public function vigentesEn(string $codResidente, \Carbon\CarbonInterface $fecha): Collection
     {
-        $objetivos = $objetivosPrecargados ?? ObjetivoSignoVital::query()->where('cod_residente', $codResidente)
-            ->where('estado', 'VIGENTE')->where('vigente_desde', '<=', now())
-            ->whereNull('vigente_hasta')->get();
+        return ObjetivoSignoVital::query()->where('cod_residente', $codResidente)
+            ->whereIn('estado', ['VIGENTE', 'REEMPLAZADO', 'ANULADO'])
+            ->where(fn ($q) => $q->where('estado', 'VIGENTE')->orWhereNotNull('vigente_hasta'))
+            ->where('vigente_desde', '<=', $fecha)
+            ->where(fn ($q) => $q->whereNull('vigente_hasta')->orWhere('vigente_hasta', '>', $fecha))
+            ->with('medico')->get();
+    }
+
+    public function evaluar(string $codResidente, array $mediciones, ?Collection $objetivosPrecargados = null, ?\Carbon\CarbonInterface $fechaMedicion = null): array
+    {
+        $fechaMedicion ??= now();
+        $objetivos = $objetivosPrecargados ?? $this->vigentesEn($codResidente, $fechaMedicion);
         $resultados = [];
         foreach ($objetivos as $objetivo) {
-            if ($objetivo->vigente_hasta !== null || $objetivo->vigente_desde->isFuture()) {
+            if ($objetivo->cod_residente !== $codResidente || $objetivo->vigente_desde->gt($fechaMedicion)
+                || ! in_array($objetivo->estado, ['VIGENTE', 'REEMPLAZADO', 'ANULADO'], true)
+                || ($objetivo->vigente_hasta !== null && $objetivo->vigente_hasta->lte($fechaMedicion))
+                || ($objetivo->estado !== 'VIGENTE' && $objetivo->vigente_hasta === null)) {
                 continue;
             }
             $valor = $mediciones[$objetivo->parametro] ?? null;
@@ -32,14 +44,22 @@ final class ServicioObjetivosPersonalizados
             $severidad = $critico ? SeveridadClinica::CRITICO
                 : ($fuera ? SeveridadClinica::ADVERTENCIA : SeveridadClinica::OBJETIVO_PERSONALIZADO);
             $rango = ($objetivo->min_objetivo ?? '—').'–'.($objetivo->max_objetivo ?? '—');
+            $descripcion = ObjetivoSignoVital::PARAMETROS[$objetivo->parametro].': '.$valor.' '.$this->unidad($objetivo->parametro).'. ';
+            if ($critico) {
+                $descripcion .= $objetivo->min_critico !== null && $valor <= (float) $objetivo->min_critico
+                    ? 'Alcanza el límite crítico inferior indicado por el médico (≤'.$objetivo->min_critico.' '.$this->unidad($objetivo->parametro).').'
+                    : 'Alcanza el límite crítico superior indicado por el médico (≥'.$objetivo->max_critico.' '.$this->unidad($objetivo->parametro).').';
+            } else {
+                $descripcion .= $fuera
+                    ? 'Está fuera del objetivo individual vigente de '.$rango.' '.$this->unidad($objetivo->parametro).'.'
+                    : 'Está dentro del objetivo individual vigente de '.$rango.' '.$this->unidad($objetivo->parametro).'.';
+            }
             $resultados[] = new ResultadoReglaClinica(
                 $objetivo->parametro, (string) $valor, $this->unidad($objetivo->parametro),
                 $severidad, 'OBJETIVO_'.$objetivo->parametro,
                 'Objetivo médico '.$objetivo->cod_objetivo_signo,
                 $rango,
-                $critico ? 'La lectura alcanza un límite crítico definido por el médico.'
-                    : ($fuera ? 'La lectura está fuera del objetivo individual vigente.'
-                        : 'La lectura está dentro del objetivo individual vigente.'),
+                $descripcion,
                 $critico ? 'Repetir la medición y seguir el protocolo institucional.' : null,
                 $critico ? ComportamientoAlerta::AUTOMATICA_AL_CONFIRMAR : ComportamientoAlerta::NINGUNA,
                 'OBJETIVO_MEDICO',

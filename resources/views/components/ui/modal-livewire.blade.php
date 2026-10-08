@@ -15,6 +15,8 @@
     'draggable' => false,
     'backMethod' => null,
     'backLabel' => 'Volver',
+    'alpineModel' => null,
+    'alpineClose' => null,
 ])
 
 @php
@@ -33,7 +35,12 @@ $modalId = $id ?: 'modal-'.\Illuminate\Support\Str::slug((string) ($attributes->
 
 <div
     x-data="{
+        @if($alpineModel)
+        get show() { return {{ $alpineModel }} },
+        set show(value) { {{ $alpineModel }} = value },
+        @else
         show: @entangle($attributes->wire('model')),
+        @endif
         dragX: 0, dragY: 0, dragging: false, pointerId: null, lastX: 0, lastY: 0,
         moveBy(dx, dy) {
             if (!this.$refs.dialog) return;
@@ -69,7 +76,7 @@ $modalId = $id ?: 'modal-'.\Illuminate\Support\Str::slug((string) ($attributes->
     x-trap.noscroll="show"
     x-cloak
     @if($draggable) x-init="$watch('show', value => { if (value) { dragX = 0; dragY = 0 } })" x-on:resize.window="if (show) { if (window.innerWidth <= 640) { dragX = 0; dragY = 0 } else { moveBy(0, 0) } }" @endif
-    x-on:keydown.escape.window="if (show && @js($dismissOnEscape)) { $event.stopPropagation(); $wire.{{ $closeMethod }}() }"
+    x-on:keydown.escape.window="if (show && @js($dismissOnEscape)) { $event.stopPropagation(); {{ $alpineClose ?: '$wire.'.$closeMethod.'()' }} }"
     class="rm-modal-shell fixed inset-0 flex items-center justify-center overflow-y-auto overflow-x-hidden p-4 font-sans {{ $attributes->get('class') }}"
 >
     <!-- Overlay Accesible Cálido -->
@@ -81,7 +88,7 @@ $modalId = $id ?: 'modal-'.\Illuminate\Support\Str::slug((string) ($attributes->
         x-transition:leave="ease-in duration-150"
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
-        @if($dismissOnBackdrop) @click="$wire.{{ $closeMethod }}()" @endif
+        @if($dismissOnBackdrop) @click="{{ $alpineClose ?: '$wire.'.$closeMethod.'()' }}" @endif
         class="rm-modal-shell__overlay"
         aria-hidden="true"
     ></div>
@@ -131,7 +138,7 @@ $modalId = $id ?: 'modal-'.\Illuminate\Support\Str::slug((string) ($attributes->
                         <i class="ph-bold ph-dots-six" aria-hidden="true"></i><span aria-hidden="true">Mover</span>
                     </button>
                 @endif
-                <button type="button" @click="$wire.{{ $closeMethod }}()" class="rm-btn-icon rm-modal-panel__close text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)]" aria-label="Cerrar">
+                <button type="button" @click="{{ $alpineClose ?: '$wire.'.$closeMethod.'()' }}" class="rm-btn-icon rm-modal-panel__close text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)]" aria-label="Cerrar">
                     <i class="ph-bold ph-x text-base" aria-hidden="true"></i>
                 </button>
             </div>

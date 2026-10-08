@@ -42,7 +42,7 @@ class SignosVitalesService
         $turno = $this->turnos->autorizarMutacionEnfermeria($codResidente, 'signos_vitales.crear', $usuario);
         $codPersonal = $this->resolverPersonalActivo($usuario);
         $entrada = array_map(fn ($valor) => $valor === '' ? null : $valor, $entrada);
-        $entrada['observacion'] = isset($entrada['observacion']) ? trim($entrada['observacion']) : null;
+        $entrada['observacion'] = is_string($entrada['observacion'] ?? null) ? trim($entrada['observacion']) : ($entrada['observacion'] ?? null);
 
         $reglas = ValidacionSignosVitalesService::reglasRegistro();
         $mensajes = ValidacionSignosVitalesService::mensajesRegistro();
@@ -79,17 +79,33 @@ class SignosVitalesService
     }
 
     /** Preevaluación de lectura: no persiste signos ni alertas. */
-    public function preEvaluar(array $mediciones, ?string $codResidente = null, ?User $usuario = null): EvaluacionSignosVitales
+    public function preEvaluar(array $mediciones, ?string $codResidente = null, ?User $usuario = null, bool $capturaParcial = false): EvaluacionSignosVitales
     {
         $mediciones = array_map(fn ($valor) => $valor === '' ? null : $valor, $mediciones);
         if ($codResidente !== null) {
             abort_unless($usuario && Auth::user()?->cod_usuario === $usuario->cod_usuario, 403);
             $this->turnos->autorizarMutacionEnfermeria($codResidente, 'signos_vitales.crear', $usuario);
         }
-        $datos = Validator::make($mediciones, array_diff_key(
+        $validator = Validator::make($mediciones, array_diff_key(
             ValidacionSignosVitalesService::reglasRegistro(), ['observacion' => true]
-        ), ValidacionSignosVitalesService::mensajesRegistro())->validate();
-        return $this->evaluadorSignos->evaluar($datos, $codResidente);
+        ), ValidacionSignosVitalesService::mensajesRegistro());
+        if (! $capturaParcial) {
+            return $this->evaluadorSignos->evaluar($validator->validate(), $codResidente);
+        }
+        $validator->fails();
+        $errores = $validator->errors()->toArray();
+        $datos = array_intersect_key(array_diff_key($mediciones, $errores), ValidacionSignosVitalesService::reglasRegistro());
+        // Una entrada inválida no oculta la gravedad de otras mediciones válidas.
+        if (($datos['presion_sistolica'] ?? null) === null || ($datos['presion_diastolica'] ?? null) === null) {
+            unset($datos['presion_sistolica'], $datos['presion_diastolica']);
+        }
+        if (isset($errores['fecha_hora'])) {
+            // Sin hora válida solo se aplican referencias generales: nunca un objetivo de otra vigencia.
+            $evaluacion = $this->evaluadorSignos->evaluar($datos);
+            return new EvaluacionSignosVitales($evaluacion->resultados, [], $errores);
+        }
+        $evaluacion = $this->evaluadorSignos->evaluar($datos, $codResidente);
+        return new EvaluacionSignosVitales($evaluacion->resultados, $evaluacion->contextoHistorico, $errores);
     }
 
     public function registrar(string $codResidente, array $entrada, User $usuario, string $permiso = 'signos_vitales.crear'): SignoVital
@@ -113,6 +129,7 @@ class SignosVitalesService
                 'temperatura' => $datos['temperatura'],
                 'saturacion_oxigeno' => $datos['saturacion'],
                 'glucemia' => $datos['glucosa'],
+                'fecha_hora' => $fechaHora,
             ], $codResidente);
             $signo = SignoVital::create([
                 'cod_signo'               => 'SGN_' . strtoupper(Str::random(10)),
@@ -130,15 +147,17 @@ class SignosVitalesService
                 'observacion'             => $datos['observacion'] ?? null,
             ]);
             $this->alertasClinicas->crearSiCorresponde($signo, $evaluacion, $usuario);
+            activity('clinica')->performedOn($signo)->causedBy($usuario)->event('registro_signos_vitales')
+                ->withProperties(['fecha_medicion' => $signo->fecha_hora->toIso8601String()])->log('Registro de signos vitales');
 
             return $signo;
         });
     }
 
-    public function rectificar(SignoVital $original, array $entrada, string $motivo, User $usuario, string $permiso = 'signos_vitales.crear'): SignoVital
+    public function rectificar(SignoVital $original, array $entrada, string $motivo, User $usuario): SignoVital
     {
         abort_unless(Auth::user()?->cod_usuario === $usuario->cod_usuario, 403, 'La autoría del registro no corresponde al usuario autenticado.');
-        $this->turnos->autorizarMutacionEnfermeria($original->cod_residente, $permiso, $usuario);
+        $this->turnos->autorizarMutacionEnfermeria($original->cod_residente, 'signos_vitales.editar', $usuario);
         Validator::make(['motivo' => $motivo], ['motivo' => 'required|string|min:10|max:2000'], [
             'motivo.required' => 'Debe indicar el motivo de la rectificación.',
             'motivo.min' => 'El motivo de rectificación debe tener al menos 10 caracteres.',
@@ -194,11 +213,15 @@ class SignosVitalesService
             'posicion.in' => 'Seleccione una posición válida para la medición.',
         ]);
         $validator->after(function ($validator) use ($entrada, $sis, $dia) {
+            if (! $validator->errors()->has('fecha') && ! $validator->errors()->has('hora')
+                && Carbon::parse(($entrada['fecha'] ?? today()->toDateString()).' '.($entrada['hora'] ?? now()->format('H:i:s')))->isFuture()) {
+                $validator->errors()->add('hora', 'La medición no puede tener una fecha u hora futura.');
+            }
             ValidacionSignosVitalesService::validarIntegridadCruzada(
                 $validator,
                 $sis,
                 $dia,
-                collect(['presion_sistolica','frecuencia_cardiaca','frecuencia_respiratoria','temperatura','saturacion','glucosa','peso','dolor'])
+                collect(['presion_sistolica','presion_diastolica','frecuencia_cardiaca','frecuencia_respiratoria','temperatura','saturacion','glucosa'])
                     ->map(fn ($campo) => $entrada[$campo] ?? null)->all(),
                 'presion_arterial',
                 'general',

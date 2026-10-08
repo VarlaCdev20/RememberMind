@@ -28,7 +28,7 @@
     padding: 2px 8px;
     border-radius: var(--rm-radius-pill);
     background: var(--rm-role-nursing-soft);
-    color: var(--rm-role-nursing);
+    color: var(--rm-sidebar-text);
     font-weight: var(--rm-weight-semibold);
 }
 
@@ -97,17 +97,23 @@
 }
 
 .rm-shell[data-role] [data-rm-main] .rm-btn-primary {
-    background: var(--rm-role-primary);
+    background-color: var(--rm-role-primary);
     color: var(--rm-role-on-primary);
 }
 
 .rm-shell[data-role] [data-rm-main] .rm-btn-primary:hover:not(:disabled) {
-    background: var(--rm-button-primary-hover);
+    background-color: var(--rm-button-primary-hover);
     color: var(--rm-role-on-primary);
 }
 
 .rm-shell[data-role] [data-rm-main] .rm-btn-primary:active:not(:disabled) {
-    background: var(--rm-button-primary-active);
+    background-color: var(--rm-button-primary-active);
+}
+
+/* El acento de cuidado usa tinta oscura; aclarar sus estados mantiene contraste. */
+.rm-shell[data-role="nursing"] [data-rm-main] {
+    --rm-button-primary-hover: color-mix(in srgb, var(--rm-role-primary) 92%, var(--rm-palette-page));
+    --rm-button-primary-active: color-mix(in srgb, var(--rm-role-primary) 86%, var(--rm-palette-page));
 }
 
 .rm-shell[data-role] [data-rm-main] .rm-tab-line-item:is(.is-active, [aria-selected="true"]) {

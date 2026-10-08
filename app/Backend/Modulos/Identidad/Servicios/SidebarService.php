@@ -228,7 +228,7 @@ class SidebarService
                 $codigosAm = $pacientesQuery->pluck('cod_residente');
                 if ($codigosAm->isNotEmpty()) {
                     $alertasCount = Alerta::whereIn('cod_residente', $codigosAm)
-                        ->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])
+                        ->whereIn('estado', ['ABIERTA', 'ASIGNADA', 'RECONOCIDA', 'EN_ATENCION', 'PENDIENTE'])
                         ->count();
                     if ($alertasCount > 0) {
                         $alertasBadge = (string) $alertasCount;
@@ -236,6 +236,7 @@ class SidebarService
                 }
             }
         } catch (\Throwable $e) {
+            report($e);
             $alertasBadge = null;
         }
 
@@ -274,17 +275,20 @@ class SidebarService
         // Rol de enfermería: navegación operativa breve, sin módulos administrativos.
         $sections[] = $this->buildSection('Mi turno', 'ph-sun-horizon', 'admin.enfermeria.dashboard', [], false, 'enfermeria.ver_dashboard');
         $sections[] = $this->buildSection('Mis residentes', 'ph-users', 'admin.enfermeria.pacientes', [], false, 'enfermeria.ver_pacientes_asignados');
-        $sections[] = $this->buildSection('Cuidado', 'ph-heartbeat', null, [
-            $this->buildItem('Cuidados', 'admin.enfermeria.tareas', 'ejecuciones_cuidado.ver'),
-            $this->buildItem('Medicación', 'admin.enfermeria.medicacion', 'enfermeria.ver_dashboard'),
-            $this->buildPendingItem('Controles', 'signos_vitales.ver'),
-            $this->buildPendingItem('Heridas y curaciones', 'heridas.ver'),
-        ], true);
-        $sections[] = $this->buildSection('Continuidad', 'ph-arrows-clockwise', null, [
-            $this->buildItem('Pase de turno', 'admin.enfermeria.pase-turno', 'pases_turno.ver'),
-            $this->buildItem('Incidentes', 'admin.enfermeria.incidentes', 'atenciones.ver'),
-            $this->buildItem('Alertas', 'admin.enfermeria.alertas', 'alertas.ver', $alertasBadge),
-        ], true);
+        $cuidados = [];
+        foreach (\App\Backend\Modulos\Enfermeria\Servicios\NavegacionCuidadosService::opciones() as $clave => $opcion) {
+            $cuidados[] = $this->buildItem(
+                $opcion['label'], $opcion['route'] ?? 'admin.enfermeria.pacientes',
+                $opcion['permission'], null,
+                array_merge($opcion['parameters'] ?? [], ['cuidado' => $clave]),
+                isset($opcion['route']) ? ['admin.enfermeria.pacientes'] : [],
+            );
+        }
+        $sections[] = $this->buildSection('Cuidados', 'ph-heartbeat', null, $cuidados, true);
+        $sections[] = $this->buildSection('Medicación', 'ph-pill', 'admin.enfermeria.medicacion', [], false, 'enfermeria.ver_dashboard');
+        $sections[] = $this->buildSection('Alertas', 'ph-warning', 'admin.enfermeria.alertas', [], false, 'alertas.ver', $alertasBadge);
+        $sections[] = $this->buildSection('Incidentes', 'ph-first-aid', 'admin.enfermeria.incidentes', [], false, 'atenciones.ver');
+        $sections[] = $this->buildSection('Pase de turno', 'ph-arrows-clockwise', 'admin.enfermeria.pase-turno', [], false, 'pases_turno.ver');
 
         return array_values(array_filter($sections));
     }
@@ -445,7 +449,7 @@ class SidebarService
         ];
     }
 
-    private function buildItem($label, $route, $permission = null, $badge = null)
+    private function buildItem($label, $route, $permission = null, $badge = null, array $parameters = [], array $activeRoutes = [])
     {
         if ($this->isPlaceholderRoute($route) || ! $this->visibilidadNavegacion->puedeVerRuta($route, $permission)) {
             return null;
@@ -459,7 +463,7 @@ class SidebarService
         $routeExists = Route::has($route);
         $active = false;
         if ($routeExists) {
-            if (request()->routeIs($route)) {
+            if (request()->routeIs($route, ...$activeRoutes)) {
                 $active = true;
             } else {
                 $base = preg_replace('/\.index$/', '.*', $route);
@@ -469,9 +473,15 @@ class SidebarService
             }
         }
 
+        foreach ($parameters as $key => $value) {
+            $active = $active && (string) request()->query($key) === (string) $value;
+        }
+
         return [
             'label' => $label,
             'route' => $route,
+            'parameters' => $parameters,
+            'active_routes' => $activeRoutes,
             'active' => $active,
             'badge' => $badge,
             'disabled' => ! $routeExists,

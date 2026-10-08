@@ -8,10 +8,15 @@ const root = new URL('../../', import.meta.url);
 const read = file => readFileSync(new URL(file, root), 'utf8');
 const shell = read('resources/views/components/layout/sidebar-shell-state.blade.php');
 const blade = read('resources/views/components/layout/barra-lateral-sistema.blade.php');
+const sidebarInit = blade.match(/x-init="([^"]+)"/)[1];
+const sidebarEscape = blade.match(/@keydown.escape.window="([^"]+)"/)[1];
+assert.match(read('resources/views/components/layout/topbar-enfermeria.blade.php'), /id="sidebar-mobile-trigger"/, 'El drawer debe devolver el foco al botón real de Enfermería.');
 const sidebarData = blade.match(/x-data="([\s\S]*?)"\s+x-on:livewire:navigating/)[1]
     .replace('@js($sidebarStorageKey)', "'sidebar-test-context'")
+    .replace('@js($activeNursingSection)', 'null')
     .replace("@js(array_map(static fn ($section) => $section['title'], $sections))", "['Sistema', 'Institución']")
     .replace(/\{\{ \$initialOpen[^}]+\}\}/, '0');
+assert.doesNotMatch(sidebarData, /@js\(|\{\{/, 'La fixture debe resolver todas las expresiones Blade antes de iniciar Alpine.');
 const manifest = JSON.parse(read('public/build/manifest.json'));
 const css = manifest['resources/frontend/styles/app.css'].file;
 const browserPath = [process.env.PUPPETEER_EXECUTABLE_PATH, await puppeteer.executablePath(), 'C:/Program Files/Google/Chrome/Application/chrome.exe'].find(path => path && existsSync(path));
@@ -19,7 +24,7 @@ assert.ok(browserPath, 'Se necesita Chrome para verificar la interacción real d
 const fixture = path => `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/build/${css}"><style>${read('resources/frontend/styles/modules/pages-welcome.css')}</style><script>document.addEventListener('alpine:init',()=>Alpine.data('shell',()=>({${shell}})));</script><script src="/livewire.js" data-csrf="test" data-update-uri="/update" defer></script></head>
 <body class="rm-shell" x-data="shell" x-init="initSidebar()" :class="{'is-sidebar-collapsed':sidebarCollapsed}" @resize.window.debounce.150ms="syncSidebarViewport()">
 <button id="sidebar-mobile-trigger" @click="sidebarOpen=true">Abrir</button><div class="rm-sidebar-overlay" x-show="sidebarOpen" @click="sidebarOpen=false" style="display:none"></div>
-<aside class="rm-sidebar" wire:transition.navigate="rm-sidebar" :class="{'is-mobile-open':sidebarOpen}" x-data="${sidebarData}" @livewire:navigating.window="saveSidebarView();closeSidebarForNavigation()" x-init="restoreSidebarView();$watch('openSection',()=>saveSidebarView())" @keydown.escape.window="sidebarOpen=false">
+<aside class="rm-sidebar" wire:transition.navigate="rm-sidebar" :class="{'is-mobile-open':sidebarOpen}" :inert="sidebarRange === 'drawer' && !sidebarOpen" x-data="${sidebarData}" @livewire:navigating.window="saveSidebarView();closeSidebarForNavigation()" x-init="${sidebarInit}" @keydown.escape.window="${sidebarEscape}">
 <header class="rm-sidebar__header"><span class="rm-sidebar__brand-copy"><strong class="rm-brand">RememberMind</strong></span><button id="collapse" class="rm-sidebar__header-toggle" @click="toggleSidebarCollapse()">‹</button><button class="rm-sidebar__mobile-close" x-ref="mobileClose" @click="sidebarOpen=false">Cerrar</button></header>
 <nav class="rm-sidebar__nav" x-ref="navigation" @scroll.debounce.100ms="saveSidebarView()">
 <p class="rm-sidebar__group rm-nav-section">SISTEMA</p><div class="rm-sidebar__entry"><button id="group" class="rm-sidebar__item" :aria-expanded="openSection===0" @click="openSection=openSection===0?null:0">Sistema</button>
@@ -48,6 +53,7 @@ test('sidebar adaptativo: preferencia desktop, laptop temporal, drawer y persist
         const page=await browser.newPage();page.setDefaultTimeout(6000);const errors=[];page.on('pageerror',error=>errors.push(error.message));
         await page.setViewport({width:1440,height:900});await page.goto(origin+'/first');await settle(page);
         await page.waitForFunction(()=>document.body.hasAttribute('data-rm-sidebar-ready'));
+        assert.deepEqual(errors, [], 'Alpine debe iniciar sin errores antes de probar la interacción.');
         assert.equal((await state(page)).width,224);
         const navigationType=await page.evaluate(()=>['.rm-nav-section','#group','.rm-sidebar__subitem'].map(selector=>{const style=getComputedStyle(document.querySelector(selector));return {family:style.fontFamily,size:style.fontSize,weight:style.fontWeight,tracking:style.letterSpacing,case:style.textTransform};}));
         assert.match(navigationType[0].family,/Nunito Sans/);assert.equal(navigationType[0].size,'11px');assert.equal(navigationType[0].weight,'600');assert.equal(navigationType[0].tracking,'1.1px');assert.equal(navigationType[0].case,'lowercase');
@@ -65,6 +71,8 @@ test('sidebar adaptativo: preferencia desktop, laptop temporal, drawer y persist
         await page.click('#sidebar-mobile-trigger');await page.waitForFunction(()=>document.documentElement.classList.contains('rm-sidebar-scroll-locked'));
         assert.equal((await state(page)).width,300);
         await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.documentElement.classList.contains('rm-sidebar-scroll-locked'));await page.waitForFunction(()=>document.querySelector('aside').getBoundingClientRect().right<=0);
+        assert.equal(await page.evaluate(()=>document.activeElement.id), 'sidebar-mobile-trigger', 'Escape devuelve el foco al botón visible de apertura');
+        assert.equal(await page.evaluate(()=>document.querySelector('aside').inert), true, 'El menú cerrado queda fuera del recorrido de teclado');
         await page.click('#sidebar-mobile-trigger');await page.waitForFunction(()=>document.documentElement.classList.contains('rm-sidebar-scroll-locked'));
         await page.waitForFunction(()=>getComputedStyle(document.querySelector('.rm-sidebar-overlay')).display!=='none');await page.mouse.click(700,300);await page.waitForFunction(()=>!document.documentElement.classList.contains('rm-sidebar-scroll-locked'));
         await page.setViewport({width:390,height:844,isMobile:true,hasTouch:true});await settle(page);await page.click('#sidebar-mobile-trigger');await page.waitForFunction(()=>document.querySelector('.rm-sidebar').classList.contains('is-mobile-open'));
@@ -79,7 +87,7 @@ test('sidebar adaptativo: preferencia desktop, laptop temporal, drawer y persist
         const snapshots = await page.evaluate(()=>['old','new'].map(kind=>{const style=getComputedStyle(document.documentElement,'::view-transition-'+kind+'(rm-sidebar)');return {opacity:style.opacity,animation:style.animationName};}));
         assert.deepEqual(snapshots,[{opacity:'0',animation:'none'},{opacity:'1',animation:'none'}],'La página anterior no se superpone con el nuevo sidebar');
         const palette = await page.evaluate(()=>({bg:getComputedStyle(document.querySelector('aside')).backgroundColor,link:getComputedStyle(document.querySelector('nav > a')).color,button:getComputedStyle(document.querySelector('#group')).appearance}));
-        assert.deepEqual(palette,{bg:'rgb(216, 210, 204)',link:'rgb(75, 68, 63)',button:'none'},'La navegación comparte el fondo tierra-ceniza de la topbar, sin colores nativos');
+        assert.deepEqual(palette,{bg:'rgb(221, 214, 207)',link:'rgb(74, 70, 66)',button:'none'},'La navegación conserva el shell y la tinta cálida aprobados en Fase 5');
         assert.equal((await state(page)).locked,false);assert.equal((await state(page)).open,0,'La ruta nueva abre automáticamente su grupo activo');
         await page.evaluate(()=>Alpine.$data(document.body).sidebarOpen=true);
         await page.waitForFunction(()=>document.querySelector('nav').scrollTop===240);

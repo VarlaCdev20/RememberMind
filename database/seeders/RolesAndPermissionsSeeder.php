@@ -145,6 +145,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'salud.ver', 'turnos.ver', 'objetivos_signos_vitales.ver', 'valoracion_enfermeria.ver', 'valoracion_enfermeria.registrar', 'valoracion_enfermeria.editar',
             'enfermeria.ver_dashboard', 'enfermeria.ver_pacientes_asignados',
             'enfermeria.ver_ficha_paciente',
+            // Lecturas de cuidados aprobadas por la propietaria el 2026-10-07.
+            'registros_conductuales.ver', 'registros_sueno.ver', 'registros_ingesta.ver',
+            'registros_hidratacion.ver', 'registros_eliminacion.ver', 'registros_movilidad.ver',
         ]))));
 
         $roles['PSICOLOGO/A']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'controles_cognitivos.ver', 'registros_conductuales', 'registros_sueno.ver', 'instrumentos.ver', 'preguntas_instrumento.ver', 'opciones_pregunta.ver', 'aplicaciones_instrumento', 'respuestas_instrumento.ver', 'valoraciones_psicologicas', 'planes_cuidado.ver', 'alertas.ver']));

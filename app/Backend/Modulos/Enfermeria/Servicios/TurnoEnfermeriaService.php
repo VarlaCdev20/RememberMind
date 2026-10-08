@@ -5,7 +5,7 @@ namespace App\Backend\Modulos\Enfermeria\Servicios;
 use App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Residente;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -38,7 +38,7 @@ class TurnoEnfermeriaService
         ]);
     }
 
-    public function obtenerTurnoActivo(?User $user = null, ?string $fecha = null): ?TurnoEnfermeria
+    public function obtenerTurnoActivo(?User $user = null, ?string $fecha = null): ?Turno
     {
         $user ??= Auth::user();
         $fecha ??= Carbon::today()->toDateString();
@@ -74,7 +74,7 @@ class TurnoEnfermeriaService
                 $fin = $esNocturno ? Carbon::parse("{$fechaStr} {$hFin}")->addDay() : Carbon::parse("{$fechaStr} {$hFin}");
 
                 if (Carbon::hasTestNow() ? ($ahora->gte($ini) && $ahora->lte($fin)) : (($ahora->gte($ini) && $ahora->lte($fin)) || (app()->environment('testing') || app()->runningUnitTests()))) {
-                    return TurnoEnfermeria::query()->find($turno->cod_turno);
+                    return Turno::query()->find($turno->cod_turno);
                 }
             }
 
@@ -84,7 +84,7 @@ class TurnoEnfermeriaService
         }
 
         $hora = Carbon::now()->format('H:i:s');
-        return TurnoEnfermeria::activos()
+        return Turno::activos()
             ->where(function (Builder $turnos) use ($hora): void {
                 $turnos->where(function (Builder $query) use ($hora): void {
                     $query->whereColumn('hora_inicio', '<=', 'hora_cierre')
@@ -198,7 +198,7 @@ class TurnoEnfermeriaService
             'Acción denegada: no tiene asignado a este residente en su turno activo.');
     }
 
-    public function autorizarMutacionPaciente(string|Residente $adulto, string $permiso, ?User $user = null): TurnoEnfermeria
+    public function autorizarMutacionPaciente(string|Residente $adulto, string $permiso, ?User $user = null): Turno
     {
         $user ??= Auth::user();
         abort_unless($user && strtoupper((string) $user->estado) === 'ACTIVO', 403,
@@ -229,7 +229,9 @@ class TurnoEnfermeriaService
             abort_unless($jornadas->count() === 1 && $jornadas->first()->turno, 403,
                 'La acción requiere una jornada activa inequívoca para el residente.');
 
-            return TurnoEnfermeria::query()->findOrFail($jornadas->first()->cod_turno);
+            $this->verificarContinuidadPorPermiso($residente->cod_residente, $permiso);
+
+            return Turno::query()->findOrFail($jornadas->first()->cod_turno);
         }
 
         if (! $user->relationLoaded('personal')) {
@@ -245,15 +247,43 @@ class TurnoEnfermeriaService
         abort_unless($this->esPacienteAsignado($residente, $user, $turno->cod_turno), 403,
             'El residente no está asignado a su turno vigente.');
 
+        $this->verificarContinuidadPorPermiso($residente->cod_residente, $permiso);
+
         return $turno;
     }
 
-    public function autorizarMutacionEnfermeria(string|Residente $adulto, string $permiso, ?User $user = null): ?TurnoEnfermeria
+    public function autorizarMutacionEnfermeria(string|Residente $adulto, string $permiso, ?User $user = null): ?Turno
     {
         $user ??= Auth::user();
         abort_unless(app(AccesoClinicoTemporalService::class)->tieneRol($user, ['ENFERMEROS']), 403,
             'Acción clínica no permitida: Rol ENFERMEROS requerido.');
         return $this->autorizarMutacionPaciente($adulto, $permiso, $user);
+    }
+
+    /** La atención y la reevaluación permanecen disponibles ante una lectura crítica. */
+    public function alertasSignosSinAtencion(string $codResidente): \Illuminate\Database\Eloquent\Builder
+    {
+        return \App\Models\Alerta::query()->where('cod_residente', $codResidente)
+            ->where('modulo', 'SIGNOS')->whereIn('prioridad', ['CRITICO', 'CRITICA'])
+            ->whereIn('estado', ['ABIERTA', 'RECONOCIDA', 'ASIGNADA', 'PENDIENTE']);
+    }
+
+    public function autorizarContinuidadControl(string $codResidente): void
+    {
+        if ($this->alertasSignosSinAtencion($codResidente)->exists()) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'continuidad_signos' => 'Hay una alerta crítica de signos vitales pendiente. Registra la intervención en la alerta antes de iniciar otro control. Puedes repetir signos, atender y administrar medicación indicada.',
+            ]);
+        }
+    }
+
+    private function verificarContinuidadPorPermiso(string $codResidente, string $permiso): void
+    {
+        if (in_array($permiso, ['valoraciones_dolor.crear', 'registros_ingesta.crear',
+            'registros_hidratacion.crear', 'registros_eliminacion.crear', 'registros_movilidad.crear',
+            'registros_sueno.crear', 'registros_conductuales.crear', 'controles_cognitivos.crear'], true)) {
+            $this->autorizarContinuidadControl($codResidente);
+        }
     }
 
     public function acotarTareasQuery(Builder $query, ?User $user = null, ?string $codTurno = null): Builder

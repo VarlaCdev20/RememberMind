@@ -5,7 +5,7 @@
         'warning' => 'Advertencia',
         'target' => 'En objetivo',
         'success' => 'Normal',
-        default => 'Registrada',
+        default => $claveTarjeta === 'sat' ? 'Sin objetivo médico' : 'Registrada',
     };
     $iconoBadge = in_array($tonoBadge, ['success', 'target'], true) ? 'ph-check-circle' : ($tonoBadge === 'neutral' ? 'ph-info' : 'ph-warning-circle');
 @endphp

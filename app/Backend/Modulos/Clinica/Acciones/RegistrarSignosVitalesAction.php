@@ -58,7 +58,7 @@ final class RegistrarSignosVitalesAction
                 'cod_residente' => $codResidente,
                 'cod_personal' => $codPersonal,
                 'cod_jornada' => $codJornada,
-                'fecha_hora' => now(),
+                'fecha_hora' => $datos['fecha_hora'] ?? now(),
                 'presion_sistolica' => $datos['presion_sistolica'] ?? null,
                 'presion_diastolica' => $datos['presion_diastolica'] ?? null,
                 'frecuencia_cardiaca' => $datos['frecuencia_cardiaca'] ?? null,
@@ -70,6 +70,10 @@ final class RegistrarSignosVitalesAction
                 'estado' => 'ACTIVO',
             ]);
             $alerta = $this->alertas->crearSiCorresponde($signo, $evaluacion, $autor);
+            activity('clinica')->performedOn($signo)->causedBy($autor)
+                ->event('registro_signos_vitales')
+                ->withProperties(['fecha_medicion' => $signo->fecha_hora->toIso8601String()])
+                ->log('Registro de signos vitales');
 
             return new RegistroSignosVitales($signo, $evaluacion, $alerta);
         });

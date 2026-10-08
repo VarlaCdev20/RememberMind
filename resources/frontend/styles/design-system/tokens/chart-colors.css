@@ -4,6 +4,14 @@
    ============================================================ */
 
 :root {
+    /* Panel de evolución de signos: referencia aprobada el 2026-10-07.
+       Identifican series; la gravedad conserva sus tokens clínicos. */
+    --rm-chart-vital-primary: #147D70;
+    --rm-chart-vital-secondary: #805AB4;
+    --rm-chart-vital-surface: var(--rm-surface-raised);
+    --rm-chart-vital-ink: var(--rm-text-primary);
+    --rm-chart-vital-muted: var(--rm-text-secondary);
+    --rm-chart-vital-tooltip-ink: var(--rm-palette-petroleum-text);
     /* Semántica compartida por CSS y Chart.js. */
     --rm-chart-care-500: #7FA883;
     --rm-chart-care-100: #D8E9D8;

@@ -39,6 +39,7 @@ class ValidacionSignosVitalesService
             $reglas[$campo][] = 'max:'.$limite['max'];
         }
         $reglas['observacion'] = ['nullable', 'string', 'max:5000'];
+        $reglas['fecha_hora'] = ['sometimes', 'required', 'date', 'before_or_equal:now'];
 
         return $reglas;
     }
@@ -46,6 +47,9 @@ class ValidacionSignosVitalesService
     public static function mensajesRegistro(): array
     {
         return [
+            'fecha_hora.required' => 'Indica cuándo se realizó la medición.',
+            'fecha_hora.date' => 'Introduce una fecha y hora válidas para la medición.',
+            'fecha_hora.before_or_equal' => 'La medición no puede tener una fecha u hora futura.',
             'integer' => 'Revisa el valor ingresado. Esta medición requiere un número entero.',
             'numeric' => 'Revisa el valor ingresado. Introduce un número válido.',
             'decimal' => 'Revisa el valor ingresado. Comprueba los decimales de esta medición.',

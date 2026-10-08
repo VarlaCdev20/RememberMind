@@ -58,6 +58,33 @@ class ReglasSignosVitalesTest extends TestCase
     {
         $regla = new ReglaSaturacionOxigeno;
         $this->assertNull($regla->evaluar([]));
-        $this->assertNull($regla->evaluar(['saturacion_oxigeno' => 89])->severidad);
+        $resultado = $regla->evaluar(['saturacion_oxigeno' => 89]);
+        $this->assertNull($resultado->severidad);
+        $this->assertSame(ComportamientoAlerta::NINGUNA, $resultado->comportamientoAlerta);
+        $this->assertSame('Sin objetivo médico vigente', $resultado->referenciaUtilizada);
+        $this->assertStringContainsString('SpO₂ medida: 89 %', $resultado->explicacion);
+        $this->assertStringContainsString('no indica que la saturación sea normal', $resultado->explicacion);
+    }
+
+    public function test_explicacion_identifica_valor_direccion_y_limite_critico_sin_cambiar_clasificacion(): void
+    {
+        $pulsoAlto = (new ReglaFrecuenciaCardiaca)->evaluar(['frecuencia_cardiaca' => 135]);
+        $pulsoBajo = (new ReglaFrecuenciaCardiaca)->evaluar(['frecuencia_cardiaca' => 40]);
+        $respiracion = (new ReglaFrecuenciaRespiratoria)->evaluar(['frecuencia_respiratoria' => 5]);
+        $temperatura = (new ReglaTemperatura)->evaluar(['temperatura' => 35]);
+        foreach ([$pulsoAlto, $pulsoBajo, $respiracion, $temperatura] as $resultado) {
+            $this->assertSame(SeveridadClinica::CRITICO, $resultado->severidad);
+            $this->assertSame(ComportamientoAlerta::AUTOMATICA_AL_CONFIRMAR, $resultado->comportamientoAlerta);
+        }
+        $this->assertStringContainsString('135 latidos por minuto', $pulsoAlto->explicacion);
+        $this->assertStringContainsString('>130 lpm', $pulsoAlto->explicacion);
+        $this->assertStringContainsString('≤40 lpm', $pulsoBajo->explicacion);
+        $this->assertStringContainsString('5 respiraciones por minuto', $respiracion->explicacion);
+        $this->assertStringContainsString('≤8 rpm', $respiracion->explicacion);
+        $this->assertStringContainsString('límite crítico inferior', $temperatura->explicacion);
+        $normal = (new ReglaFrecuenciaCardiaca)->evaluar(['frecuencia_cardiaca' => 72]);
+        $this->assertSame(SeveridadClinica::NORMAL, $normal->severidad);
+        $this->assertStringContainsString('dentro del intervalo de referencia', $normal->explicacion);
+        $this->assertNull($normal->recomendacion);
     }
 }

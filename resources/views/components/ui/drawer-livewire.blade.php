@@ -11,6 +11,7 @@
     'dismissOnEscape' => true,
     'backMethod' => null,
     'backLabel' => 'Volver',
+    'alpineClose' => null,
 ])
 
 @php
@@ -24,9 +25,9 @@
 @endphp
 
 <div x-data="{ show: @entangle($attributes->wire('model')) }" x-show="show" x-trap.noscroll="show" x-cloak
-     x-on:keydown.escape.window="if (show && @js($dismissOnEscape)) { $event.stopPropagation(); $wire.{{ $closeMethod }}() }" class="rm-drawer-shell fixed inset-0 overflow-hidden font-sans">
+     :class="{ 'is-open': show }" x-on:keydown.escape.window="if (show && @js($dismissOnEscape)) { $event.stopPropagation(); {{ $alpineClose ?: '$wire.'.$closeMethod.'()' }} }" class="rm-drawer-shell fixed inset-0 overflow-hidden font-sans {{ $attributes->get('class') }}">
     {{-- Backdrop estándar del Design System --}}
-    <div class="rm-drawer-backdrop" @if($dismissOnBackdrop) @click="$wire.{{ $closeMethod }}()" @endif aria-hidden="true"></div>
+    <div class="rm-drawer-backdrop" @if($dismissOnBackdrop) @click="{{ $alpineClose ?: '$wire.'.$closeMethod.'()' }}" @endif aria-hidden="true"></div>
 
     <div class="rm-drawer-shell__position pointer-events-none fixed inset-y-0 right-0 flex max-w-full">
         <aside x-show="show"
@@ -72,7 +73,7 @@
                     </div>
                     <button type="button"
                             class="rm-btn-icon rm-drawer__close text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)] shrink-0"
-                            wire:click="{{ $closeMethod }}"
+                            @if($alpineClose) @click="{{ $alpineClose }}" @else wire:click="{{ $closeMethod }}" @endif
                             aria-label="Cerrar panel">
                         <i class="ph-bold ph-x text-base" aria-hidden="true"></i>
                     </button>

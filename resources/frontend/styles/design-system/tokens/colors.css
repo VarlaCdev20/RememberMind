@@ -29,14 +29,15 @@
    --rm-palette-brown-300: var(--rm-earth-300);
 
    /* Las superficies aclaran esta escala para conservar contraste. */
-   --rm-palette-page: #F1EAE4;
-   --rm-palette-capuchino: #D6C6B9;
+   --rm-palette-page: #F3EEE8;
+   --rm-palette-capuchino: #DDD6CF;
+   --rm-palette-header: #E6E0D9;
    --rm-palette-sidebar: var(--rm-palette-capuchino);
-   --rm-palette-surface: color-mix(in srgb, var(--rm-palette-brown-300) 20%, var(--rm-palette-page));
-   --rm-palette-surface-soft: color-mix(in srgb, var(--rm-palette-brown-300) 30%, var(--rm-palette-page));
+   --rm-palette-surface: #F7F3EF;
+   --rm-palette-surface-soft: #EFEAE4;
    --rm-palette-surface-muted: color-mix(in srgb, var(--rm-palette-brown-300) 50%, var(--rm-palette-page));
-   --rm-palette-ink: var(--rm-palette-brown-900);
-   --rm-palette-ink-secondary: var(--rm-palette-brown-800);
+   --rm-palette-ink: #4A4642;
+   --rm-palette-ink-secondary: #67615B;
    /* Salvia complementaria: se conservan los mentas existentes. */
    --rm-palette-sage-900: #78826E;
    --rm-palette-sage-800: #858E7C;
@@ -69,8 +70,8 @@
    --rm-surface: var(--rm-palette-surface);
    --rm-surface-soft: var(--rm-palette-surface-soft);
    --rm-surface-muted: var(--rm-palette-surface-muted);
-   --rm-text-primary: var(--rm-earth-900);
-   --rm-text-secondary: var(--rm-earth-800);
+   --rm-text-primary: var(--rm-palette-ink);
+   --rm-text-secondary: var(--rm-palette-ink-secondary);
    --rm-primary: var(--rm-palette-primary);
    --rm-primary-ink: var(--rm-palette-primary-ink);
    --rm-primary-soft: var(--rm-palette-sage-300);
@@ -87,6 +88,7 @@
 
    /* Superficies y texto: una sola jerarquía compartida. */
    --rm-bg-shell: var(--rm-bg-sidebar);
+   --rm-header-bg: var(--rm-palette-header);
    --rm-bg-layout: var(--rm-bg-app);
    --rm-surface-main: var(--rm-surface);
    --rm-surface-alt: var(--rm-surface-soft);
@@ -95,6 +97,7 @@
    --rm-surface-raised: var(--rm-surface);
    --rm-text-title: var(--rm-text-primary);
    --rm-text-body: var(--rm-text-primary);
+   /* La tinta muted del brief (#847D76) no alcanza AA en texto pequeño. */
    --rm-text-muted: var(--rm-earth-700);
    --rm-icon-default: var(--rm-earth-600);
    --rm-text-soft: var(--rm-text-secondary);
@@ -243,6 +246,19 @@
    --rm-status-stable-soft: var(--rm-success-soft);
    --rm-status-attention: var(--rm-info-strong);
    --rm-status-attention-soft: var(--rm-info-soft);
+   /* Acentos clínicos aprobados; la clasificación pertenece al backend. */
+   --rm-clinical-normal: #1F8A65;
+   --rm-clinical-warning: #E49A00;
+   --rm-clinical-high: #E86618;
+   --rm-clinical-critical: #DC3E38;
+   --rm-clinical-normal-ink: #176348;
+   --rm-clinical-warning-ink: #765000;
+   --rm-clinical-warning-bg: #FFE8A3;
+   --rm-clinical-warning-border: #F2B52B;
+   --rm-clinical-high-ink: #903B0C;
+   --rm-clinical-critical-ink: #9E2724;
+   --rm-clinical-critical-bg: #F8D0CD;
+   --rm-clinical-critical-border: #EF5753;
    --rm-clinical: var(--rm-info);
    --rm-clinical-strong: var(--rm-info-strong);
    --rm-clinical-soft: var(--rm-info-soft);
@@ -478,4 +494,63 @@
    --gradiente-panel: linear-gradient(180deg, var(--rm-surface), var(--rm-surface-soft));
    --gradiente-card: none;
    --gradiente-input: none;
+}
+
+/* Colores existentes de filtros centralizados sin alterar su apariencia.
+   Esta extracción no concilia la paleta del resto de componentes. */
+:root {
+    --rm-filter-green-count-ink: #044E39;
+    --rm-filter-green-icon: #059669;
+    --rm-filter-add-open-ink: #064E3B;
+    --rm-filter-green-selected-ink: #065F46;
+    --rm-filter-view-bg-dark: #0E1D26;
+    --rm-filter-add-hover-ink: #0F3D30;
+    --rm-filter-search-focus-bg-dark: #192E39;
+    --rm-filter-add-ink: #1B4D3E;
+    --rm-filter-blue-count-ink: #1E3A8A;
+    --rm-filter-blue-selected-ink: #1E40AF;
+    --rm-filter-add-hover-bg-dark: #213A47;
+    --rm-filter-blue-icon: #2563EB;
+    --rm-filter-view-border-dark: #29424E;
+    --rm-filter-search-ink: #2C2622;
+    --rm-filter-toolbar-focus-color: #2E7D62;
+    --rm-filter-green-chip-border: #34D399;
+    --rm-filter-choice-ink: #38312B;
+    --rm-filter-border-hover-dark: #3B5A6A;
+    --rm-filter-focus-dark: #3F8F76;
+    --rm-filter-violet-count-ink: #4C1D95;
+    --rm-filter-violet-selected-ink: #5B21B6;
+    --rm-filter-view-ink: #5C5247;
+    --rm-filter-blue-chip-border: #60A5FA;
+    --rm-filter-neutral-icon: #6E6457;
+    --rm-filter-green-count-bg: #6EE7B7;
+    --rm-filter-clear-all-ink: #70665A;
+    --rm-filter-violet-icon: #7C3AED;
+    --rm-filter-red-count-ink: #7F1D1D;
+    --rm-filter-amber-chip-ink: #92400E;
+    --rm-filter-blue-selected-ink-dark: #93C5FD;
+    --rm-filter-placeholder: #948A7D;
+    --rm-filter-red-selected-ink: #991B1B;
+    --rm-filter-rose-selected-ink: #9F1239;
+    --rm-filter-add-ink-dark: #9FE2CB;
+    --rm-filter-violet-chip-border: #A78BFA;
+    --rm-filter-view-ink-dark: #A8BAC2;
+    --rm-filter-green-chip-ink-dark: #BBF7D0;
+    --rm-filter-border-hover: #BDB09E;
+    --rm-filter-blue-chip-ink-dark: #BFDBFE;
+    --rm-filter-violet-selected-ink-dark: #C4B5FD;
+    --rm-filter-scrollbar: #D3C9BC;
+    --rm-filter-amber-icon: #D97706;
+    --rm-filter-danger-icon: #DC2626;
+    --rm-filter-violet-chip-ink-dark: #DDD6FE;
+    --rm-filter-rose-icon: #E11D48;
+    --rm-filter-ink-dark: #EDF5F7;
+    --rm-filter-red-chip-border: #F87171;
+    --rm-filter-amber-chip-border: #FBBF24;
+    --rm-filter-red-selected-ink-dark: #FCA5A5;
+    --rm-filter-rose-selected-ink-dark: #FDA4AF;
+    --rm-filter-amber-chip-ink-dark: #FDE68A;
+    --rm-filter-red-chip-ink-dark: #FECACA;
+    --rm-filter-clear-hover-bg: #FEE2E2;
+    --rm-filter-badge-ink: #FFFFFF;
 }

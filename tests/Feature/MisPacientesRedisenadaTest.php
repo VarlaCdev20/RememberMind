@@ -399,6 +399,87 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertDontSee('Luisa Morales');
     }
 
+    public function test_selector_conecta_controles_y_acciones_con_pantallas_existentes(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $this->actingAs($this->enfermero);
+        $antes = SignoVital::query()->count();
+        $vista = Livewire::test(MisPacientes::class)
+            ->call('seleccionarResidente', $this->residenteEstable->cod_residente)
+            ->call('mostrarSelectorRegistro');
+        $acciones = $this->accionesDelSelector($vista->html());
+
+        foreach (['cognicion' => 'Cognición', 'conducta' => 'Conducta', 'sueno' => 'Sueño', 'hidratacion' => 'Hidratación', 'heridas' => 'Heridas / Curaciones'] as $clave => $label) {
+            $opcion = \App\Backend\Modulos\Enfermeria\Servicios\NavegacionCuidadosService::opcion($clave);
+            $url = route($opcion['route'], array_merge($opcion['parameters'] ?? [], ['adulto' => $this->residenteEstable->cod_residente, 'cuidado' => $clave]));
+            $this->assertSame('a', $acciones[$label]['tag']);
+            $this->assertStringContainsString('href="'.e($url).'"', $acciones[$label]['attributes']);
+            $this->assertStringNotContainsString('wire:click', $acciones[$label]['attributes']);
+        }
+        $this->assertCount(15, $acciones);
+        foreach (['Seguimiento diario', 'Ejecución de cuidado', 'Registrar incidente', 'Administración de medicación'] as $label) {
+            $this->assertSame('a', $acciones[$label]['tag']);
+            $this->assertStringNotContainsString('disabled', $acciones[$label]['attributes']);
+        }
+        foreach (['Signos vitales', 'Dolor', 'Ingesta', 'Eliminación', 'Movilidad', 'Procedimiento'] as $label) {
+            $this->assertSame('button', $acciones[$label]['tag']);
+            $this->assertStringContainsString('wire:click', $acciones[$label]['attributes']);
+            $this->assertStringNotContainsString('disabled', $acciones[$label]['attributes']);
+        }
+        $this->assertSame($antes, SignoVital::query()->count());
+    }
+
+    public function test_selector_critico_ofrece_atencion_sin_eliminar_el_bloqueo_clinico(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $this->actingAs($this->enfermero);
+        $resultado = app(\App\Backend\Modulos\Clinica\Servicios\SignosVitalesService::class)
+            ->registrarConEvaluacion($this->residenteEstable->cod_residente, ['frecuencia_cardiaca' => 135], $this->enfermero);
+        $antes = \App\Models\ValoracionDolor::query()->count();
+        $vista = Livewire::test(MisPacientes::class)
+            ->call('seleccionarResidente', $this->residenteEstable->cod_residente)
+            ->call('mostrarSelectorRegistro');
+        $acciones = $this->accionesDelSelector($vista->html());
+        $url = route('admin.enfermeria.alertas', ['alerta' => $resultado->alerta->cod_alerta, 'adulto' => $this->residenteEstable->cod_residente]);
+        foreach (['Dolor', 'Cognición', 'Conducta', 'Ingesta', 'Hidratación', 'Eliminación', 'Movilidad'] as $label) {
+            $this->assertSame('a', $acciones[$label]['tag']);
+            $this->assertStringContainsString('href="'.e($url).'"', $acciones[$label]['attributes']);
+            $this->assertStringContainsString('Atender alerta para habilitar este control', $acciones[$label]['content']);
+        }
+        $this->assertSame('button', $acciones['Signos vitales']['tag']);
+        $this->assertStringContainsString('tipo=SUENO', $acciones['Sueño']['attributes']);
+        $this->assertStringContainsString('seccion=HERIDAS', $acciones['Heridas / Curaciones']['attributes']);
+        $vista->call('abrirFormularioRegistro', 'dolor')->assertHasErrors('continuidad_signos');
+        $this->assertSame($antes, \App\Models\ValoracionDolor::query()->count());
+        $this->assertDatabaseHas('alertas', ['cod_alerta' => $resultado->alerta->cod_alerta, 'estado' => 'ABIERTA']);
+    }
+
+    public function test_selector_no_expone_accesos_sin_los_permisos_del_destino(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $this->enfermero->roles->first()->revokePermissionTo(['registros_sueno.ver', 'atenciones.ver', 'ejecuciones_cuidado.ver', 'incidentes.crear']);
+        $this->actingAs($this->enfermero);
+        $vista = Livewire::test(MisPacientes::class)
+            ->call('seleccionarResidente', $this->residenteEstable->cod_residente)
+            ->call('mostrarSelectorRegistro');
+        $acciones = $this->accionesDelSelector($vista->html());
+        foreach (['Sueño', 'Cognición', 'Conducta', 'Hidratación', 'Heridas / Curaciones', 'Seguimiento diario', 'Ejecución de cuidado', 'Registrar incidente'] as $label) {
+            $this->assertArrayNotHasKey($label, $acciones);
+        }
+        $this->assertArrayHasKey('Dolor', $acciones);
+    }
+
+    private function accionesDelSelector(string $html): array
+    {
+        preg_match_all('/<(a|button)\b([^>]*\bclass="rm-quick-register__action [^"]*"[^>]*)>(.*?)<\/\1>/s', $html, $matches, PREG_SET_ORDER);
+        $acciones = [];
+        foreach ($matches as $match) {
+            preg_match('/<span>(.*?)<\/span>/s', $match[3], $label);
+            $acciones[html_entity_decode($label[1])] = ['tag' => $match[1], 'attributes' => $match[2], 'content' => $match[3]];
+        }
+        return $acciones;
+    }
+
     public function test_apertura_de_modales_de_accion_rapida(): void
     {
         $this->actingAs($this->enfermero);
@@ -447,7 +528,8 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->assertNotEmpty($identidad);
         $this->assertStringNotContainsString('<img', $identidad[1]);
         $this->assertSame(1, substr_count($html, 'class="rm-drawer-footer'));
-        $this->assertSame(1, substr_count($html, 'class="rm-modal-shell fixed inset-0'));
+        $this->assertSame(1, substr_count($html, 'aria-labelledby="resident-register-titulo"'));
+        $this->assertSame(1, substr_count($html, 'aria-labelledby="clinical-operation-result-titulo"'));
         $this->assertStringContainsString(route('admin.enfermeria.pacientes.ficha', ['adulto' => $this->residenteEstable->cod_residente]), $html);
         $this->assertLessThan(strpos($html, 'Registrar</button>'), strpos($html, '<footer class="rm-drawer-footer'));
 
@@ -463,7 +545,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSee('Eliminación')
             ->assertSee('Movilidad')
             ->assertSee('Administración de medicación')
-            ->assertSee('Curación')
+            ->assertSee('Procedimiento')
             ->assertSet('tieneMedicacionProgramadaPendiente', false)
             ->assertSee('Sin dosis pendiente');
 
@@ -474,9 +556,9 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->assertStringContainsString('$nextTick(() => requestAnimationFrame', $vista->html());
         $this->assertSame(2, substr_count($vista->html(), 'class="rm-quick-register__grid'));
         $this->assertTrue(strpos($vista->html(), "abrirFormularioRegistro('signos')") < strpos($vista->html(), "abrirFormularioRegistro('dolor')"));
-        $this->assertStringContainsString('Sin formulario directo aquí', $vista->html());
+        $this->assertStringNotContainsString('Sin formulario directo aquí', $vista->html());
         $this->assertStringNotContainsString('href="#"', $vista->html());
-        $this->assertSame(0, substr_count($vista->html(), 'class="rm-modal-footer'));
+        $this->assertSame(1, substr_count($vista->html(), 'class="rm-modal-footer'));
 
         $vista->call('cerrarSelectorRegistro')
             ->assertSet('mostrarSelectorModal', false)
@@ -573,6 +655,44 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSet('mostrarPanelDetalle', true)
             ->assertSet('mostrarSelectorModal', false)
             ->assertSet('drawerPaso', 'resident-summary');
+    }
+
+    public function test_descarte_repetido_no_lanza_409_ni_cambia_el_destino(): void
+    {
+        $this->actingAs($this->enfermero);
+        $signosAntes = SignoVital::query()->count();
+        $alertasAntes = Alerta::query()->count();
+
+        foreach (['volverPanelDetalle' => 'register-selector', 'cerrarSelectorRegistro' => 'resident-summary'] as $salida => $destino) {
+            $formulario = $this->formularioSignos()->set('signoFC', '75')
+                ->call($salida)->assertSet('confirmarDescarte', true)
+                ->call('descartarCambios')->assertSet('confirmarDescarte', false)
+                ->assertSet('drawerPaso', $destino);
+
+            $formulario->call('descartarCambios')->assertStatus(200)
+                ->assertSet('drawerPaso', $destino)->assertSet('signoFC', '');
+        }
+
+        $this->assertSame($signosAntes, SignoVital::query()->count());
+        $this->assertSame($alertasAntes, Alerta::query()->count());
+    }
+
+    public function test_descarte_atrasado_tras_seguir_editando_conserva_la_lectura_critica(): void
+    {
+        $this->actingAs($this->enfermero);
+        $signosAntes = SignoVital::query()->count();
+        $alertasAntes = Alerta::query()->count();
+
+        $formulario = $this->formularioSignos()->set('signoFC', '135')
+            ->call('cerrarSelectorRegistro')->assertSet('confirmarDescarte', true)
+            ->call('cancelarDescarte')->assertSet('confirmarDescarte', false);
+
+        $formulario->call('descartarCambios')->assertStatus(200)
+            ->assertSet('mostrarSelectorModal', true)
+            ->assertSet('drawerPaso', 'register-form')->assertSet('signoFC', '135');
+
+        $this->assertSame($signosAntes, SignoVital::query()->count());
+        $this->assertSame($alertasAntes, Alerta::query()->count());
     }
 
     public function test_selector_muestra_el_residente_elegido_y_solo_sus_alertas_reales(): void
@@ -753,7 +873,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSet('drawerPaso', 'register-form')
             ->assertSet('registroTipo', 'signos')
             ->assertSet('mostrarSelectorModal', true)
-            ->assertSee('Evolución y validación');
+            ->assertSee('Interpretación y acción');
     }
 
     public function test_entrada_anterior_de_signos_tambien_genera_alerta_critica_atomica(): void
@@ -812,7 +932,9 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertHasNoErrors()
             ->assertSet('drawerPaso', 'register-result')
             ->assertSet('mostrarSelectorModal', true)
-            ->assertSee('Signos vitales registrados')
+            ->assertSee('Registro guardado correctamente')
+            ->assertSee('Los datos ingresados se validaron y quedaron guardados')
+            ->assertSee('rm-resident-directory__register-modal--signos-result', false)
             ->assertSee('124/78 mmHg')
             ->assertSee('Ver registro');
 
@@ -843,6 +965,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertHasErrors('presion_sistolica')
             ->assertSet('drawerPaso', 'register-form')
             ->assertSet('mostrarSelectorModal', true)
+            ->assertDontSee('Registro guardado correctamente')
             ->assertSee('Revisa el valor ingresado. Esta medición requiere un número entero.');
     }
 
@@ -852,7 +975,17 @@ class MisPacientesRedisenadaTest extends TestCase
 
         $formulario = $this->formularioSignos()
             ->assertDontSee('Sin objetivo individual configurado.')
-            ->assertSee('Evolución y validación')
+            ->assertSee('Interpretación y acción')
+            ->assertSee('Ver gráfica')
+            ->assertSee('Mover gráfica: arrastra o usa las flechas; Inicio restablece la ventana')
+            ->assertSee('Ajustar tamaño: arrastra o usa las flechas')
+            ->assertSee('Ajustar borde izquierdo de la gráfica')
+            ->assertSee('Ajustar borde derecho de la gráfica')
+            ->assertSee('Ajustar borde superior de la gráfica')
+            ->assertSee('Ajustar borde inferior de la gráfica')
+            ->assertSee('aria-labelledby="signos-grafica-title"', false)
+            ->assertSee('popover="manual"', false)
+            ->assertSee('aria-modal="false"', false)
             ->assertSee('Registro clínico')
             ->assertDontSee('type="date"')
             ->assertDontSee('type="time"')
@@ -1057,6 +1190,8 @@ class MisPacientesRedisenadaTest extends TestCase
         $formulario->call('guardarSignos')
             ->assertHasNoErrors()
             ->assertSet('drawerPaso', 'register-result')
+            ->assertSee('Registro guardado · Atención requerida')
+            ->assertDontSee('Registro guardado correctamente')
             ->assertSee('Alerta crítica generada');
 
         $this->assertSame($signosAntes + 1, SignoVital::query()->count());
@@ -1099,7 +1234,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->assertSame($alertasAntes + 1, Alerta::query()->count());
     }
 
-    public function test_una_lectura_critica_sin_guardar_requiere_dos_pasos_para_descartarse(): void
+    public function test_una_lectura_critica_no_se_descarta_y_permite_corregir_transcripcion(): void
     {
         $this->actingAs($this->enfermero);
         $signosAntes = SignoVital::query()->count();
@@ -1111,12 +1246,13 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSee('Hay una medición crítica sin registrar');
 
         $formulario->call('descartarCambios')
-            ->assertSet('descarteCriticoConfirmado', true)
-            ->assertSee('El valor no será registrado');
+            ->assertHasErrors('continuidad_signos')
+            ->assertSet('mostrarSelectorModal', true);
         $this->assertSame($signosAntes, SignoVital::query()->count());
         $this->assertSame($alertasAntes, Alerta::query()->count());
 
-        $formulario->call('descartarCambios')
+        $formulario->call('cancelarDescarte')->set('signoFC', '75')
+            ->call('cerrarSelectorRegistro')->call('descartarCambios')
             ->assertSet('mostrarSelectorModal', false);
         $this->assertSame($signosAntes, SignoVital::query()->count());
         $this->assertSame($alertasAntes, Alerta::query()->count());
@@ -1129,7 +1265,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->get(route('admin.enfermeria.pacientes', [
             'residente' => $this->residenteEstable->cod_residente,
             'registrar' => 'signos',
-        ]))->assertOk()->assertSee('Evolución y validación');
+        ]))->assertOk()->assertSee('Interpretación y acción');
     }
 
     public function test_enfermeria_no_puede_abrir_alerta_de_residente_fuera_de_su_asignacion(): void
@@ -1201,7 +1337,8 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->actingAs($this->enfermero);
 
         $formulario = $this->formularioSignos()->set('signoTemp', '36.55')
-            ->assertSet('signosEvaluacion', [])
+            ->assertSet('signosEvaluacion.resultados', [])
+            ->assertSet('signosEvaluacion.severidad_global', null)
             ->call('guardarSignos')
             ->assertHasErrors('temperatura');
 
@@ -1483,7 +1620,7 @@ class MisPacientesRedisenadaTest extends TestCase
     {
         $this->actingAs($this->enfermero);
         $formulario = $this->formularioDolor();
-        $formulario->assertSee('Reevaluación')
+        $formulario->assertSee('Intensidad inicial')
             ->assertDontSee('wire:model="dolorEvaPosterior"');
 
         $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
@@ -1543,6 +1680,67 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->formularioDolor()->set('dolorEva', '0')->call('guardarDolor')
             ->assertHasNoErrors();
         $this->assertDatabaseHas('valoraciones_dolor', ['intensidad' => 0, 'intervencion' => null]);
+    }
+
+    public function test_dolor_error_conserva_captura_y_no_emite_exito(): void
+    {
+        $this->actingAs($this->enfermero);
+        $this->formularioDolor()
+            ->set('dolorEva', '5')->set('dolorUbicacion', 'Rodilla derecha')
+            ->set('dolorDuracionValor', '30')->set('dolorDuracionUnidad', '')
+            ->call('guardarDolor')->assertHasErrors(['duracion_unidad'])
+            ->assertSet('dolorEva', '5')->assertSet('dolorUbicacion', 'Rodilla derecha')
+            ->assertSeeHtml('id="dolor-unidad-error"')
+            ->assertSeeHtml('aria-invalid="true"')
+            ->assertNotDispatched('dolor-registrado');
+        $this->assertDatabaseCount('valoraciones_dolor', 0);
+    }
+
+    public function test_dolor_sucesivo_conserva_valoracion_anterior(): void
+    {
+        $this->actingAs($this->enfermero);
+        $this->formularioDolor()->set('dolorEva', '5')->set('dolorUbicacion', 'Rodilla derecha')
+            ->call('guardarDolor')->assertHasNoErrors()->assertDispatched('dolor-registrado');
+        $this->formularioDolor()->set('dolorEva', '2')->set('dolorUbicacion', 'Rodilla derecha')
+            ->call('guardarDolor')->assertHasNoErrors()->assertDispatched('dolor-registrado');
+        $this->assertDatabaseCount('valoraciones_dolor', 2);
+        $this->assertDatabaseHas('valoraciones_dolor', ['intensidad' => 5, 'estado' => 'VIGENTE']);
+        $this->assertDatabaseHas('valoraciones_dolor', ['intensidad' => 2, 'estado' => 'VIGENTE']);
+    }
+
+    private function formularioHidratacionClinica()
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        \App\Models\AsignacionPersonal::create([
+            'cod_asignacion_personal' => 'ASP_HID_UI_TEST', 'cod_jornada' => 'JOR_MIS_PACIENTES',
+            'cod_personal' => $this->personal->cod_personal, 'cod_area' => $this->area->cod_area,
+            'tipo_asignacion' => 'TURNO', 'fecha_asignacion' => now(), 'estado' => 'ACTIVA',
+        ]);
+        $this->actingAs($this->enfermero);
+        return Livewire::withQueryParams(['cuidado' => 'hidratacion', 'tipo' => 'HIDRATACION'])
+            ->test(\App\Frontend\Livewire\Enfermeria\Cuidados\RegistrosEnfermeria::class, ['codResidente' => $this->residenteEstable->cod_residente]);
+    }
+
+    public function test_hidratacion_clinica_error_preserva_tipo_de_liquido_y_no_guarda(): void
+    {
+        $this->formularioHidratacionClinica()->assertSee('Sin registros de hidratación')
+            ->set('subtipo', 'Agua')->call('guardarCuidado')->assertHasErrors('cantidadMl')
+            ->assertSet('subtipo', 'Agua')->assertSeeHtml('id="hidratacion-volumen-error"')
+            ->assertNotDispatched('swal');
+        $this->assertDatabaseCount('registros_hidratacion', 0);
+    }
+
+    public function test_hidratacion_clinica_sucesiva_conserva_historial_y_autoria(): void
+    {
+        $vista = $this->formularioHidratacionClinica();
+        $vista->set('subtipo', 'Agua')->set('cantidadMl', 250)->set('tolerancia', 'ADECUADA')
+            ->call('guardarCuidado')->assertHasNoErrors()->assertDispatched('swal')
+            ->assertSee('250.00')->assertSet('cantidadMl', null);
+        $vista->set('subtipo', 'Infusión')->set('cantidadMl', 180)
+            ->call('guardarCuidado')->assertHasNoErrors()->assertSee('180.00')->assertSee('250.00');
+        $this->assertDatabaseCount('registros_hidratacion', 2);
+        $this->assertDatabaseHas('registros_hidratacion', ['cod_residente' => $this->residenteEstable->cod_residente,
+            'cod_personal' => $this->personal->cod_personal, 'cod_jornada' => 'JOR_MIS_PACIENTES', 'cantidad_ml' => 250]);
     }
 
     public function test_valoracion_rechaza_usuario_sin_permiso_y_residente_no_asignado(): void
@@ -1629,9 +1827,9 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->travelTo(today()->setTime(10, 0));
         $this->actingAs($this->enfermero);
         $this->formularioAlimentacion()
-            ->assertSee('Ingesta')
+            ->assertSee('Comida e ingesta')
             ->assertSee('Asistencia')
-            ->assertSee('Tolerancia y dificultades')
+            ->assertSee('Tolerancia y deglución')
             ->set('ingestaTipoComida', 'ALMUERZO')
             ->set('ingestaPorcentaje', '87.50')
             ->set('ingestaCantidadMl', '220.25')
@@ -1882,7 +2080,7 @@ class MisPacientesRedisenadaTest extends TestCase
     {
         $this->actingAs($this->enfermero);
         $this->formularioMovilidad()
-            ->assertSee('Actividad')
+            ->assertSee('Movilidad y apoyo')
             ->assertSee('Movilidad observada')
             ->call('guardarCuidado')->assertHasErrors('marcha');
 
@@ -2116,12 +2314,121 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSee('wire:model.live.debounce.350ms="signoFC"', false)
             ->assertSee('wire:loading.class="rm-signos__card--evaluating"', false)
             ->assertSee('Crítico')
-            ->assertSee('Al confirmar se generará una alerta y su evento inicial.');
+            ->assertSee('Verificar la lectura')
+            ->assertSee('Confirmar y registrar')
+            ->assertSee('Documentar la atención')
+            ->assertSee('Registra la intervención en esa alerta para habilitar los otros controles.');
         $formulario->set('signoGlucosa', '68')->set('signoSat', '90')
             ->assertSee('data-tone="warning"', false)
             ->assertSee('Advertencia')
-            ->assertSee('Sin clasificación adicional aplicable');
+            ->assertSee('Sin objetivo médico')
+            ->assertSee('Clasificación pendiente · Sin objetivo médico vigente');
         $this->assertSame($signosAntes, SignoVital::query()->count());
         $this->assertSame($alertasAntes, Alerta::query()->count());
     }
+    public function test_critico_permanece_visible_con_otro_campo_invalido_y_no_permita_descarte_directo(): void
+    {
+        $this->actingAs($this->enfermero);
+        $formulario = $this->formularioSignos()->set('signoFC', '135')->set('signoTemp', '6')
+            ->assertSet('signosEvaluacion.severidad_global', 'CRITICO')
+            ->call('cerrarSelectorRegistro')->call('descartarCambios')
+            ->assertHasErrors('continuidad_signos')->assertSet('mostrarSelectorModal', true);
+        $formulario->call('cancelarDescarte')->call('seleccionarResidente', $this->residenteCritico->cod_residente)
+            ->assertSet('confirmarDescarte', true)
+            ->assertSet('modalCodResidente', $this->residenteEstable->cod_residente);
+    }
+
+    public function test_limpiar_campos_vacia_captura_y_errores_sin_cambiar_contexto_ni_historia(): void
+    {
+        $this->travelTo(today()->setTime(10, 17));
+        $this->actingAs($this->enfermero);
+        $signosAntes = SignoVital::query()->count();
+        $alertasAntes = Alerta::query()->count();
+        $formulario = $this->formularioSignos();
+        $fecha = $formulario->get('signoFechaHora');
+        $historia = $formulario->get('signosHistorial');
+        $formulario->set('signoSat', '98')->call('solicitarLimpiezaSignos')
+            ->assertSee('Confirmar limpieza')->assertSee('Seguir editando')
+            ->assertSee('id="signos-sat"', false)
+            ->set('confirmarLimpiezaSignos', false)->assertSet('signoSat', '98');
+        $formulario->set('signoFC', '72')->set('signoSat', '98')->set('signoObs', 'Nota temporal')
+            ->set('signoTemp', '6')->call('guardarSignos')->assertHasErrors('temperatura');
+        $this->travel(5)->minutes();
+        $formulario->call('limpiarCamposSignos')->assertHasNoErrors()
+            ->assertDispatched('signos-campos-limpiados')
+            ->assertSet('signoFechaHora', $fecha)
+            ->assertSet('signosHistorial', $historia)
+            ->assertSet('modalCodResidente', $this->residenteEstable->cod_residente)
+            ->assertSet('drawerPaso', 'register-form')->assertSet('mostrarSelectorModal', true)
+            ->assertSet('confirmarLimpiezaSignos', false)
+            ->assertSet('signosConfirmacionPendiente', false)->assertSet('signosIntentoGuardar', false);
+        foreach (['signoSis', 'signoDia', 'signoFC', 'signoFR', 'signoTemp', 'signoSat', 'signoGlucosa', 'signoObs'] as $campo) {
+            $formulario->assertSet($campo, '');
+        }
+        $formulario->call('cerrarSelectorRegistro')->assertSet('confirmarDescarte', false)
+            ->assertSet('mostrarSelectorModal', false);
+        $this->assertSame($signosAntes, SignoVital::query()->count());
+        $this->assertSame($alertasAntes, Alerta::query()->count());
+    }
+
+    public function test_limpiar_campos_no_elimina_critico_aunque_otro_campo_sea_invalido(): void
+    {
+        $this->actingAs($this->enfermero);
+        $formulario = $this->formularioSignos()->set('signoFC', '135')->set('signoTemp', '6')
+            ->set('signoObs', 'Lectura pendiente')->call('solicitarLimpiezaSignos')
+            ->assertHasErrors('continuidad_signos')->assertSet('confirmarLimpiezaSignos', false)
+            ->assertDontSee('Confirmar limpieza')->call('limpiarCamposSignos')
+            ->assertHasErrors('continuidad_signos')->assertNotDispatched('signos-campos-limpiados')
+            ->assertSet('signoFC', '135')->assertSet('signoTemp', '6')
+            ->assertSet('signoObs', 'Lectura pendiente')->assertSet('mostrarSelectorModal', true);
+        $formulario->set('signoFC', '72')->call('limpiarCamposSignos')->assertHasNoErrors()
+            ->assertSet('signoFC', '')->assertDispatched('signos-campos-limpiados');
+    }
+
+    public function test_limpiar_campos_revalida_permiso_y_contexto_del_formulario(): void
+    {
+        $this->actingAs($this->enfermero);
+        Livewire::test(MisPacientes::class)->call('limpiarCamposSignos')->assertForbidden();
+        $formulario = $this->formularioSignos()->set('signoFC', '72');
+        \Spatie\Permission\Models\Role::findByName('ENFERMEROS')->revokePermissionTo('signos_vitales.crear');
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        $this->enfermero->unsetRelation('roles')->unsetRelation('permissions');
+        $formulario->call('limpiarCamposSignos')->assertForbidden();
+    }
+
+    public function test_formulario_fija_fecha_hora_del_servidor_y_conserva_el_momento_al_guardar(): void
+    {
+        $this->travelTo(today()->setTime(10, 17));
+        $this->actingAs($this->enfermero);
+        $fecha = now()->format('Y-m-d\TH:i');
+        $formulario = $this->formularioSignos()->set('signoFC', '72')
+            ->assertSet('signoFechaHora', $fecha)
+            ->assertSee('Asignadas automáticamente al abrir este registro.')
+            ->assertDontSee('type="datetime-local"', false)
+            ->assertDontSee('wire:model.live="signoFechaHora"', false);
+        $this->travel(10)->minutes();
+        $formulario->call('guardarSignos')->assertHasNoErrors()
+            ->assertSet('drawerPaso', 'register-result');
+        $this->assertDatabaseHas('signos_vitales', ['cod_residente' => $this->residenteEstable->cod_residente,
+            'frecuencia_cardiaca' => 72, 'fecha_hora' => Carbon::parse($fecha)]);
+    }
+
+    public function test_fecha_hora_no_admite_manipulacion_del_cliente_ni_genera_registros(): void
+    {
+        $this->actingAs($this->enfermero);
+        $signosAntes = SignoVital::query()->count();
+        $alertasAntes = Alerta::query()->count();
+        foreach ([-20, 20] as $minutos) {
+            $formulario = $this->formularioSignos()->set('signoFC', '72');
+            try {
+                $formulario->set('signoFechaHora', now()->addMinutes($minutos)->format('Y-m-d\TH:i'));
+                $this->fail('La fecha automática no puede modificarse desde el cliente.');
+            } catch (\Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException $exception) {
+                $this->assertStringContainsString('signoFechaHora', $exception->getMessage());
+            }
+        }
+        $this->assertSame($signosAntes, SignoVital::query()->count());
+        $this->assertSame($alertasAntes, Alerta::query()->count());
+    }
+
 }

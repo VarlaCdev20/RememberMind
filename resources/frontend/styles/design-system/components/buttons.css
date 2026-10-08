@@ -145,14 +145,16 @@
 /* 1. Primario (Verde institucional) */
 .rm-btn-primary {
     background-color: var(--rm-button-primary-bg);
+    background-image: linear-gradient(180deg, color-mix(in srgb, var(--rm-palette-page) 8%, transparent), transparent);
     color: var(--rm-button-primary-text);
     border-color: var(--rm-button-primary-border);
-    box-shadow: var(--rm-shadow-sm);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--rm-palette-page) 20%, transparent), var(--rm-shadow-sm);
 }
 
 .rm-btn-primary:hover:not(:disabled) {
     background-color: var(--rm-button-primary-hover);
-    box-shadow: var(--rm-shadow-md);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--rm-palette-page) 20%, transparent), var(--rm-shadow-md);
+    transform: translateY(-1px);
 }
 
 .rm-btn-primary:active:not(:disabled) {
@@ -284,7 +286,7 @@
 .rm-btn-icon--critical:hover:not(:disabled) { background: color-mix(in srgb, var(--rm-critical) 18%, var(--rm-surface)); color: var(--rm-critical); }
 .rm-btn-icon i, .rm-btn-icon svg { color: currentColor; }
 
-.rm-btn:active:not(:disabled):not([aria-busy="true"]) { transform: scale(.98); transition-duration: var(--rm-duration-fast); }
+.rm-btn:active:not(:disabled):not([aria-busy="true"]) { transform: translateY(1px); box-shadow: var(--rm-shadow-xs); transition-duration: var(--rm-duration-fast); }
 
 /* Estado de carga */
 .rm-btn.is-loading,
