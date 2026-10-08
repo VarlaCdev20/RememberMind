@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Administracion;
 
 use App\Backend\Modulos\Administracion\Servicios\ConsultaOperativaService;
 use App\Backend\Modulos\Administracion\Servicios\DirectorioResidentesService;
+use App\Backend\Modulos\Administracion\Servicios\ExploradorAdministrativoService;
 use App\Backend\Modulos\Administracion\Servicios\MapaHabitacionesService;
 use App\Backend\Modulos\Administracion\Servicios\PanelResidenteService;
 use App\Http\Controllers\Controller;
@@ -18,6 +19,7 @@ class OperacionController extends Controller
         $definicion = $consulta->definicion($modulo);
         abort_unless($definicion, 404);
         abort_unless($request->user()?->can($definicion['permiso']), 403);
+        abort_unless($request->user()->estado === 'ACTIVO' && ! $request->user()->hasRole('FAMILIAR'), 403);
         if (in_array($modulo, ['habitaciones', 'ocupacion'], true)) {
             abort_if($request->user()->hasRole('FAMILIAR'), 403);
         }
@@ -29,14 +31,20 @@ class OperacionController extends Controller
                 'habitaciones' => ['nullable', 'string', 'max:30', 'exists:camas,estado'],
                 default => ['nullable', 'string', 'max:30'],
             },
-            'prioridad' => ['nullable', 'in:CRITICA,ALTA,MEDIA,BAJA'],
-            'fecha' => ['nullable', 'date'],
+            'prioridad' => $modulo === 'alertas' ? ['nullable', 'string', 'max:20'] : ['nullable', 'in:CRITICA,ALTA,MEDIA,BAJA'],
+            'fecha' => ['nullable', 'date_format:Y-m-d'],
+            'fecha_visita' => $modulo === 'visitas' ? ['nullable', 'in:programacion,ingreso'] : ['prohibited'],
+            'mes' => ['nullable', 'date_format:Y-m'],
+            'dia' => ['nullable', 'date_format:Y-m-d'],
             'tab' => ['nullable', 'string', 'max:30', ...($modulo === 'ocupacion' ? ['in:actual,historial'] : [])],
-            'desde' => ['nullable', 'date'],
-            'hasta' => ['nullable', 'date', 'after_or_equal:desde'],
+            'desde' => ['nullable', 'date_format:Y-m-d'],
+            'hasta' => ['nullable', 'date_format:Y-m-d', ...($request->filled('desde') ? ['after_or_equal:desde'] : [])],
             'residente' => ['nullable', 'string', 'max:20'],
             'panel_tab' => ['nullable', 'in:resumen,datos,salud,documentos,historial'],
-            'vista' => ['nullable', in_array($modulo, ['residentes', 'habitaciones', 'ocupacion'], true) ? 'in:tarjetas,tabla,lista,camas' : 'in:tarjetas,tabla,lista'],
+            'vista' => ['nullable', in_array($modulo, ['residentes', 'habitaciones', 'ocupacion'], true) ? 'in:tarjetas,tabla,lista,camas' : 'in:tarjetas,tabla,lista,agenda,cronologia,cobertura,tablero,calendario'],
+            'detalle' => ['nullable', 'string', 'max:20'],
+            'categoria' => ['nullable', 'string', 'max:180'],
+            'funcion' => $modulo === 'asignaciones' ? ['nullable', 'string', 'max:180'] : ['prohibited'],
             'por_pagina' => ['nullable', 'integer', 'in:10,20,50'],
             'page' => ['nullable', 'integer', 'min:1'],
             'orden' => ['nullable', 'in:recientes,antiguas'],
@@ -45,7 +53,24 @@ class OperacionController extends Controller
             'alojamiento' => ['nullable', 'in:con_cama,sin_cama'],
             'disponibilidad' => ['nullable', 'in:ocupado,disponible,no_habilitado'],
             'cama' => ['nullable', 'string', 'max:20'],
+        ], [
+            'hasta.after_or_equal' => 'La fecha hasta debe ser igual o posterior a la fecha desde.',
+            'desde.date_format' => 'Elige una fecha válida para desde.',
+            'hasta.date_format' => 'Elige una fecha válida para hasta.',
+            'fecha.date_format' => 'Elige una fecha válida en el calendario.',
+            'por_pagina.in' => 'Elige 10, 20 o 50 registros por página.',
         ]);
+        if (in_array($modulo, ExploradorAdministrativoService::MODULOS, true)) {
+            $datos = app(ExploradorAdministrativoService::class)->datos($modulo, $filtros, $request->user());
+            if ($request->header('X-RM-Ficha') === '1') {
+                abort_unless($datos['detalle'], 404);
+
+                return response()->view('pages.admin.administracion.partials.ficha-fragmento', $datos + compact('filtros', 'definicion'))->header('X-RM-Ficha', '1')->header('Cache-Control', 'private, no-store');
+            }
+
+            return view('pages.admin.administracion.operacion', $datos)
+                ->with(compact('filtros', 'definicion'));
+        }
         if ($modulo === 'habitaciones' || ($modulo === 'ocupacion' && ($filtros['tab'] ?? '') !== 'historial' && $request->user()->can('habitaciones.ver'))) {
             return view('pages.admin.administracion.habitaciones', app(MapaHabitacionesService::class)->datos($filtros, $request->user()))
                 ->with(compact('filtros'))->with('esOcupacion', $modulo === 'ocupacion');
@@ -124,43 +149,6 @@ class OperacionController extends Controller
         } else {
             $configuracion = $consulta->consulta($modulo, $tab ?? '');
             $query = $configuracion['query'];
-            if ($modulo === 'jornadas') {
-                match ($tab) {
-                    'hoy' => $query->whereDate('j.fecha_jornada', today()),
-                    'proximas' => $query->whereDate('j.fecha_jornada', '>', today()),
-                    'finalizadas' => $query->where('j.estado', 'FINALIZADA'),
-                    default => null,
-                };
-            }
-            if ($modulo === 'documentacion') {
-                match ($tab) {
-                    'pendientes' => $query->where('d.estado', 'PENDIENTE'),
-                    'por_vencer' => $query->whereBetween('d.fecha_vencimiento', [today(), today()->addDays(30)]),
-                    'vencidos' => $query->whereDate('d.fecha_vencimiento', '<', today()),
-                    'validados' => $query->whereNotNull('d.fecha_validacion'),
-                    default => null,
-                };
-            }
-            if ($modulo === 'consentimientos' && $tab !== 'todos') {
-                $query->where('co.estado', match ($tab) {
-                    'activos' => 'VIGENTE', 'revocados' => 'REVOCADO', 'anulados' => 'ANULADO',
-                });
-            }
-            if ($modulo === 'visitas') {
-                match ($tab) {
-                    'hoy' => $query->where(fn ($where) => $where->whereDate('v.fecha_hora_programada', today())->orWhereDate('v.fecha_hora_ingreso', today())),
-                    'programadas' => $query->whereNull('v.fecha_hora_ingreso')->whereNotNull('v.fecha_hora_programada'),
-                    'dentro' => $query->whereNotNull('v.fecha_hora_ingreso')->whereNull('v.fecha_hora_salida'),
-                    'finalizadas' => $query->whereNotNull('v.fecha_hora_salida'),
-                    default => null,
-                };
-            }
-            if ($modulo === 'alertas' && $tab !== 'todas') {
-                $query->where('a.estado', match ($tab) {
-                    'abiertas' => 'ABIERTA', 'reconocidas' => 'RECONOCIDA',
-                    'asignadas' => 'ASIGNADA', 'en_atencion' => 'EN_ATENCION', 'cerradas' => 'CERRADA',
-                });
-            }
             $termino = trim((string) ($filtros['search'] ?? ''));
             if ($termino !== '') {
                 $query->where(function ($where) use ($configuracion, $termino) {
@@ -171,15 +159,6 @@ class OperacionController extends Controller
             }
             if (! empty($filtros['estado']) && $configuracion['estado']) {
                 $query->where($configuracion['estado'], $filtros['estado']);
-            }
-            if ($modulo === 'alertas' && ! empty($filtros['prioridad'])) {
-                $query->where('a.prioridad', $filtros['prioridad']);
-            }
-            if ($modulo === 'visitas' && ! empty($filtros['fecha'])) {
-                $query->where(function ($where) use ($filtros) {
-                    $where->whereDate('v.fecha_hora_programada', $filtros['fecha'])
-                        ->orWhereDate('v.fecha_hora_ingreso', $filtros['fecha']);
-                });
             }
             if ($modulo === 'admisiones') {
                 if (! empty($filtros['desde'])) {

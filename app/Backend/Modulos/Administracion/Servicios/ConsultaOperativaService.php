@@ -25,7 +25,7 @@ class ConsultaOperativaService
         'visitas' => ['Visitas', 'Visitas programadas y registradas.', 'visitas.ver', 'ph-door-open'],
         'alertas' => ['Alertas', 'Seguimiento de alertas que requieren coordinación.', 'alertas.ver', 'ph-bell-ringing'],
         'incidentes' => ['Incidentes', 'Registro de incidentes para seguimiento institucional.', 'incidentes.ver', 'ph-warning-octagon'],
-        'reportes' => ['Reportes', 'Información administrativa disponible para consulta y exportación.', 'reportes.ver', 'ph-chart-bar'],
+        'reportes' => ['Reportes', 'Comparación de registros administrativos por periodo.', 'reportes.ver', 'ph-chart-bar'],
     ];
 
     public function definicion(string $modulo): ?array
@@ -44,16 +44,16 @@ class ConsultaOperativaService
             'residentes' => ['documento' => 'Documento', 'admision' => 'Admisión', 'fecha' => 'Nacimiento', 'habitacion' => 'Habitación', 'cama' => 'Cama', 'responsable' => 'Responsable', 'estado' => 'Estado'],
             'habitaciones' => ['detalle' => 'Habitación', 'capacidad' => 'Capacidad habitación', 'tipo' => 'Tipo de cama', 'ocupante' => 'Ocupante', 'estado' => 'Estado'],
             'ocupacion' => ['detalle' => 'Habitación', 'ocupante' => 'Residente', 'fecha' => 'Inicio', 'fecha_fin' => 'Fin', 'estado' => 'Estado'],
-            'jornadas' => ['fecha' => 'Fecha', 'horario' => 'Horario', 'asignados' => 'Personal asignado', 'estado' => 'Estado'],
-            'asignaciones' => ['detalle' => 'Área', 'jornada' => 'Jornada', 'funcion' => 'Función', 'fecha' => 'Fecha', 'estado' => 'Estado'],
-            'contactos' => ['detalle' => 'Residente', 'parentesco' => 'Parentesco', 'principal' => 'Responsable', 'emergencia' => 'Emergencia', 'telefono' => 'Teléfono', 'estado' => 'Estado'],
+            'jornadas' => ['fecha' => 'Día de la jornada', 'horario' => 'Horario del turno', 'asignados' => 'Personal con asignación activa', 'estado' => 'Estado'],
+            'asignaciones' => ['detalle' => 'Área asignada', 'jornada' => 'Turno', 'dia_jornada' => 'Día de la jornada', 'funcion' => 'Función asignada', 'fecha' => 'Fecha de asignación', 'estado' => 'Estado'],
+            'contactos' => ['vinculos' => 'Vínculos activos', 'principal' => 'Responsable en algún vínculo', 'emergencia' => 'Emergencia en algún vínculo', 'telefono' => 'Teléfono', 'estado' => 'Estado'],
             'documentacion' => ['detalle' => 'Tipo', 'titular' => 'Titular', 'fecha' => 'Vencimiento', 'validacion' => 'Validación', 'estado' => 'Estado'],
-            'consentimientos' => ['detalle' => 'Residente', 'firmante' => 'Firmante', 'fecha' => 'Fecha', 'estado' => 'Estado'],
+            'consentimientos' => ['detalle' => 'Residente', 'firmante' => 'Firma registrada por', 'fecha' => 'Fecha del consentimiento', 'estado' => 'Estado'],
             'seguros' => ['detalle' => 'Residente', 'plan' => 'Plan', 'afiliacion' => 'Afiliación', 'titular' => 'Titular', 'estado' => 'Estado'],
-            'actividades' => ['detalle' => 'Lugar', 'area' => 'Área', 'responsable' => 'Responsable', 'fecha' => 'Fecha', 'duracion' => 'Duración (min)', 'cupo' => 'Cupo', 'participantes' => 'Participantes', 'estado' => 'Estado'],
+            'actividades' => ['detalle' => 'Lugar', 'area' => 'Área', 'responsable' => 'Responsable registrado', 'fecha' => 'Fecha de la actividad', 'duracion' => 'Duración (min)', 'cupo' => 'Cupo registrado', 'participantes' => 'Participantes registrados', 'estado' => 'Estado'],
             'visitas' => ['detalle' => 'Residente', 'programada' => 'Programada', 'ingreso' => 'Entrada', 'salida' => 'Salida', 'motivo' => 'Motivo', 'estado' => 'Estado'],
-            'alertas' => ['residente' => 'Residente', 'detalle' => 'Prioridad', 'origen' => 'Origen', 'fecha' => 'Fecha', 'responsable' => 'Responsable', 'estado' => 'Estado'],
-            'incidentes' => ['residente' => 'Residente', 'gravedad' => 'Severidad', 'detalle' => 'Lugar', 'fecha' => 'Fecha', 'requiere_medico' => 'Médico', 'requiere_derivacion' => 'Derivación', 'estado' => 'Estado'],
+            'alertas' => ['residente' => 'Residente', 'detalle' => 'Prioridad registrada', 'origen' => 'Origen', 'fecha' => 'Fecha de la alerta', 'responsable' => 'Responsable registrado', 'estado' => 'Estado'],
+            'incidentes' => ['residente' => 'Residente', 'gravedad' => 'Gravedad registrada', 'detalle' => 'Lugar', 'fecha' => 'Fecha del incidente', 'requiere_medico' => 'Requiere médico según registro', 'requiere_derivacion' => 'Requiere derivación según registro', 'estado' => 'Estado'],
             default => ['detalle' => 'Detalle', 'fecha' => 'Fecha', 'estado' => 'Estado'],
         };
     }
@@ -176,7 +176,7 @@ class ConsultaOperativaService
                             ->groupBy('cod_jornada'), 'ap', 'ap.cod_jornada', '=', 'j.cod_jornada')
                         ->select('j.cod_jornada as codigo', 't.nombre as titulo', 'j.cod_jornada as detalle',
                             'j.fecha_jornada as fecha', 't.hora_inicio', 't.hora_cierre',
-                            'ap.asignados', 'j.estado as estado')
+                            DB::raw('COALESCE(ap.asignados, 0) as asignados'), 'j.estado as estado')
                         ->selectRaw("t.hora_inicio || '–' || t.hora_cierre as horario"),
                     ['t.nombre', 'j.cod_jornada'], 'j.estado', 'j.fecha_jornada'
                 );
@@ -187,21 +187,24 @@ class ConsultaOperativaService
                         ->join('jornadas as j', 'j.cod_jornada', '=', 'ap.cod_jornada')
                         ->join('turnos as t', 't.cod_turno', '=', 'j.cod_turno')
                         ->select('ap.cod_asignacion_personal as codigo', 'a.nombre as detalle',
-                            'ap.fecha_asignacion as fecha', 't.nombre as jornada',
+                            'ap.fecha_asignacion as fecha', 't.nombre as jornada', 'j.fecha_jornada as dia_jornada',
                             'ap.funcion', 'ap.estado as estado')
                         ->selectRaw("TRIM(p.nombres || ' ' || p.apellido_paterno) as titulo"),
                     ['p.nombres', 'p.apellido_paterno', 'a.nombre', 't.nombre', 'ap.cod_asignacion_personal'], 'ap.estado', 'ap.fecha_asignacion'
                 );
             case 'contactos':
+                $vinculos = DB::table('residentes_contactos')->where('estado', 'ACTIVO')->select('cod_contacto')
+                    ->selectRaw('COUNT(*) as vinculos')
+                    ->selectRaw('SUM(CASE WHEN responsable_principal = TRUE THEN 1 ELSE 0 END) as principales')
+                    ->selectRaw('SUM(CASE WHEN contacto_emergencia = TRUE THEN 1 ELSE 0 END) as emergencias')->groupBy('cod_contacto');
+
                 return $this->armar(
-                    DB::table('contactos as c')
-                        ->leftJoin('residentes_contactos as rc', fn ($join) => $join->on('rc.cod_contacto', '=', 'c.cod_contacto')
-                            ->where('rc.estado', 'ACTIVO'))
-                        ->leftJoin('residentes as r', 'r.cod_residente', '=', 'rc.cod_residente')
-                        ->select('c.cod_contacto as codigo', 'c.nombres as titulo',
-                            'r.nombres as detalle', 'c.celular as telefono', 'rc.parentesco',
-                            'rc.responsable_principal as principal', 'rc.contacto_emergencia as emergencia',
-                            'c.estado as estado'),
+                    DB::table('contactos as c')->leftJoinSub($vinculos, 'rc', 'rc.cod_contacto', '=', 'c.cod_contacto')
+                        ->select('c.cod_contacto as codigo', 'c.celular as telefono', 'c.estado')
+                        ->selectRaw("TRIM(c.nombres || ' ' || COALESCE(c.apellido_paterno, '')) as titulo")
+                        ->selectRaw('COALESCE(rc.vinculos, 0) as vinculos, COALESCE(rc.vinculos, 0) as detalle')
+                        ->selectRaw('CASE WHEN rc.principales > 0 THEN TRUE ELSE FALSE END as principal')
+                        ->selectRaw('CASE WHEN rc.emergencias > 0 THEN TRUE ELSE FALSE END as emergencia'),
                     ['c.nombres', 'c.apellido_paterno', 'c.numero_documento', 'c.cod_contacto'], 'c.estado', 'c.cod_contacto'
                 );
             case 'documentacion':
@@ -212,24 +215,24 @@ class ConsultaOperativaService
                         ->leftJoin('contactos as c', 'c.cod_contacto', '=', 'd.cod_contacto')
                         ->where(fn ($query) => $query->whereNotNull('d.cod_residente')
                             ->orWhereNotNull('d.cod_preadmision')->orWhereNotNull('d.cod_contacto'))
-                        ->select('d.cod_documento as codigo', 'd.nombre as titulo',
+                        ->select('d.cod_documento as codigo', 'd.cod_residente as _cod_residente', 'd.nombre as titulo',
                             'd.tipo_documento as detalle', 'd.fecha_vencimiento as fecha',
                             'd.fecha_validacion as validacion', 'd.estado as estado')
-                        ->selectRaw('COALESCE(r.nombres, p.nombres, c.nombres) as titular'),
-                    ['d.nombre', 'd.tipo_documento', 'd.cod_documento'], 'd.estado', 'd.cod_documento'
+                        ->selectRaw('COALESCE('.$this->nombreCompleto('r').', '.$this->nombreCompleto('p').', '.$this->nombreCompleto('c').') as titular'),
+                    ['d.nombre', 'd.tipo_documento', 'd.cod_documento', 'r.nombres', 'r.apellido_paterno', 'p.nombres', 'p.apellido_paterno', 'c.nombres', 'c.apellido_paterno'], 'd.estado', 'd.cod_documento'
                 );
             case 'consentimientos':
                 return $this->armar(
                     DB::table('consentimientos as co')->join('residentes as r', 'r.cod_residente', '=', 'co.cod_residente')
-                        ->select('co.cod_consentimiento as codigo', 'co.tipo_consentimiento as titulo',
-                            'r.nombres as detalle', 'co.fecha_consentimiento as fecha', 'co.estado as estado')
+                        ->select('co.cod_consentimiento as codigo', 'co.cod_residente as _cod_residente', 'co.tipo_consentimiento as titulo',
+                            DB::raw($this->nombreCompleto('r').' as detalle'), 'co.fecha_consentimiento as fecha', 'co.estado as estado')
                         ->selectRaw("CASE WHEN co.firma_residente = TRUE THEN 'Residente' ELSE 'Contacto responsable' END as firmante"),
                     ['co.tipo_consentimiento', 'r.nombres', 'r.apellido_paterno', 'co.cod_consentimiento'], 'co.estado', 'co.fecha_consentimiento'
                 );
             case 'seguros':
                 return $this->armar(
                     DB::table('seguros_residente as s')->join('residentes as r', 'r.cod_residente', '=', 's.cod_residente')
-                        ->select('s.cod_seguro as codigo', 's.entidad as titulo', 'r.nombres as detalle',
+                        ->select('s.cod_seguro as codigo', 's.cod_residente as _cod_residente', 's.entidad as titulo', DB::raw($this->nombreCompleto('r').' as detalle'),
                             's.plan', 's.numero_afiliacion as afiliacion', 's.titular', 's.estado as estado'),
                     ['s.entidad', 'r.nombres', 'r.apellido_paterno', 's.cod_seguro'], 's.estado', 's.cod_seguro'
                 );
@@ -243,38 +246,38 @@ class ConsultaOperativaService
                             ->groupBy('cod_actividad'), 'pa', 'pa.cod_actividad', '=', 'a.cod_actividad')
                         ->select('a.cod_actividad as codigo', 'a.nombre as titulo',
                             'a.lugar as detalle', 'a.fecha_hora as fecha', 'a.duracion_minutos as duracion',
-                            'a.cupo', 'ar.nombre as area', 'p.nombres as responsable', 'pa.participantes',
+                            'a.cupo', 'ar.nombre as area', DB::raw($this->nombreCompleto('p').' as responsable'), DB::raw('COALESCE(pa.participantes, 0) as participantes'),
                             'a.estado as estado'),
-                    ['a.nombre', 'a.lugar', 'a.cod_actividad'], 'a.estado', 'a.fecha_hora'
+                    ['a.nombre', 'a.lugar', 'a.cod_actividad', 'ar.nombre', 'p.nombres', 'p.apellido_paterno'], 'a.estado', 'a.fecha_hora'
                 );
             case 'visitas':
                 return $this->armar(
                     DB::table('visitas as v')->join('contactos as c', 'c.cod_contacto', '=', 'v.cod_contacto')
                         ->join('residentes as r', 'r.cod_residente', '=', 'v.cod_residente')
-                        ->select('v.cod_visita as codigo', 'c.nombres as titulo', 'r.nombres as detalle',
+                        ->select('v.cod_visita as codigo', 'v.cod_residente as _cod_residente', DB::raw($this->nombreCompleto('c').' as titulo'), DB::raw($this->nombreCompleto('r').' as detalle'),
                             DB::raw('COALESCE(v.fecha_hora_programada, v.fecha_hora_ingreso) as fecha'),
                             'v.fecha_hora_programada as programada', 'v.fecha_hora_ingreso as ingreso',
                             'v.fecha_hora_salida as salida', 'v.motivo', 'v.estado as estado'),
-                    ['c.nombres', 'c.apellido_paterno', 'r.nombres', 'v.cod_visita'], 'v.estado', 'v.cod_visita'
+                    ['c.nombres', 'c.apellido_paterno', 'r.nombres', 'r.apellido_paterno', 'v.cod_visita'], 'v.estado', 'v.cod_visita'
                 );
             case 'alertas':
                 return $this->armar(
                     DB::table('alertas as a')
                         ->join('residentes as r', 'r.cod_residente', '=', 'a.cod_residente')
                         ->leftJoin('personal as p', 'p.cod_personal', '=', 'a.cod_personal_responsable')
-                        ->select('a.cod_alerta as codigo', 'a.titulo as titulo',
-                            'a.prioridad as detalle', 'a.tipo as origen', 'r.nombres as residente',
-                            'p.nombres as responsable', 'a.fecha_hora as fecha', 'a.estado as estado'),
-                    ['a.titulo', 'a.cod_alerta'], 'a.estado', 'a.fecha_hora'
+                        ->select('a.cod_alerta as codigo', 'a.cod_residente as _cod_residente', 'a.titulo as titulo',
+                            'a.prioridad as detalle', 'a.tipo as origen', DB::raw($this->nombreCompleto('r').' as residente'),
+                            DB::raw($this->nombreCompleto('p').' as responsable'), 'a.fecha_hora as fecha', 'a.estado as estado'),
+                    ['a.titulo', 'a.cod_alerta', 'r.nombres', 'r.apellido_paterno', 'p.nombres', 'p.apellido_paterno'], 'a.estado', 'a.fecha_hora'
                 );
             case 'incidentes':
                 return $this->armar(
                     DB::table('incidentes as i')->join('residentes as r', 'r.cod_residente', '=', 'i.cod_residente')
-                        ->select('i.cod_incidente as codigo', 'i.tipo_incidente as titulo',
-                            'i.lugar as detalle', 'r.nombres as residente', 'i.gravedad',
+                        ->select('i.cod_incidente as codigo', 'i.cod_residente as _cod_residente', 'i.tipo_incidente as titulo',
+                            'i.lugar as detalle', DB::raw($this->nombreCompleto('r').' as residente'), 'i.gravedad',
                             'i.requiere_medico', 'i.requiere_derivacion',
                             'i.fecha_hora as fecha', 'i.estado as estado'),
-                    ['i.tipo_incidente', 'i.lugar', 'i.cod_incidente'], 'i.estado', 'i.fecha_hora'
+                    ['i.tipo_incidente', 'i.lugar', 'i.cod_incidente', 'r.nombres', 'r.apellido_paterno'], 'i.estado', 'i.fecha_hora'
                 );
         }
 
@@ -284,5 +287,10 @@ class ConsultaOperativaService
     private function armar(Builder $query, array $busqueda, ?string $estado, string $orden): array
     {
         return compact('query', 'busqueda', 'estado', 'orden');
+    }
+
+    private function nombreCompleto(string $alias): string
+    {
+        return "TRIM({$alias}.nombres || ' ' || COALESCE({$alias}.apellido_paterno, ''))";
     }
 }

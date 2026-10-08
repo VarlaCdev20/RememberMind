@@ -1,4 +1,5 @@
 import './utilities/bootstrap.js';
+import './modules/operaciones-interactivas.js';
 
 // Alpine lo proporciona Livewire; no iniciar una segunda instancia.
 

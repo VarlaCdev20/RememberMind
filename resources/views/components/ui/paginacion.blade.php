@@ -1,4 +1,4 @@
-@props(['paginator', 'mode' => 'url', 'perPage' => 10, 'perPageName' => null, 'label' => 'registros', 'showPerPage' => true, 'scrollTo' => false])
+@props(['paginator', 'mode' => 'url', 'perPage' => 10, 'perPageName' => null, 'label' => 'registros', 'showPerPage' => true, 'scrollTo' => false, 'excludeQuery' => []])
 @php
     $livewire = $mode === 'livewire';
     $cursor = method_exists($paginator, 'getCursorName');
@@ -11,8 +11,8 @@
     $windowCurrent = $last ? min($current, $last) : $current;
     $pages = $last ? collect([1, ...range(max(1, $windowCurrent - 1), min($last, $windowCurrent + 1)), $last])->unique()->sort()->values()->all() : [];
     // URL paginators retain filters, including named paginators on the same page.
-    if (! $livewire) $paginator->appends(request()->except($pageName));
-    $query = request()->except([$pageName, $perPageName]);
+    if (! $livewire) $paginator->appends(request()->except([$pageName, ...$excludeQuery]));
+    $query = request()->except([$pageName, $perPageName, ...$excludeQuery]);
     $hiddenFields = [];
     $flattenQuery = function ($values, $prefix = '') use (&$flattenQuery, &$hiddenFields) {
         foreach ($values as $key => $value) {
