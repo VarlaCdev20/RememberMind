@@ -79,6 +79,8 @@ class PaseTurnoReconstruidoTest extends TestCase
     {
         parent::setUp();
 
+        $this->travelTo(Carbon::today()->setTime(10, 0));
+
         // Permisos y Roles
         Permission::firstOrCreate(['name' => 'enfermeria.ver_dashboard', 'guard_name' => 'web']);
         Permission::firstOrCreate(['name' => 'pases_turno.ver', 'guard_name' => 'web']);
