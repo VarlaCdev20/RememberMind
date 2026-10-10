@@ -1,13 +1,21 @@
 <?php
+
 namespace Tests\Feature;
 
-use App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPanel;
-use App\Models\{Residente, Alerta, User, SignoVital, Atencion};
+use App\Models\Alerta;
+use App\Models\EventoAlerta;
+use App\Models\Residente;
+use App\Models\SignoVital;
+use App\Models\User;
 use App\Modulos\Alertas\Aplicacion\Acciones\DeteccionAlertasService;
+use App\Modulos\Alertas\Aplicacion\Acciones\GestionarAtencionAlerta;
+use App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades\CampanaNotificaciones;
+use App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPanel;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 
 class AlertasFlujoTest extends TestCase
@@ -20,8 +28,11 @@ class AlertasFlujoTest extends TestCase
         $user = User::factory()->create(['nombres' => 'Ana', 'ap_paterno' => 'Profesional']);
         $user->assignRole('ADMINISTRADOR');
         $user->roles->each(fn ($role) => $role->syncPermissions([]));
-        foreach ($permisos as $p) $user->givePermissionTo(Permission::findOrCreate($p, 'web'));
+        foreach ($permisos as $p) {
+            $user->givePermissionTo(Permission::findOrCreate($p, 'web'));
+        }
         $this->actingAs($user);
+
         return [$user, Residente::factory()->create(['cod_est_adul' => 'EST_001'])];
     }
 
@@ -244,10 +255,59 @@ class AlertasFlujoTest extends TestCase
             ->assertSet('drawerGrafico', false)
             ->call('cerrarDrawer')
             ->assertSet('drawerGrafico', false)
-            ->assertSet('drawerUbicacion', false)
-            ;
+            ->assertSet('drawerUbicacion', false);
 
         $this->assertSame($nombreOriginal, $adulto->fresh()->nombres);
         $this->assertSame($estadoOriginal, $adulto->fresh()->cod_est_adul);
+    }
+
+    public function test_campana_conserva_atencion_cierre_e_historial(): void
+    {
+        [$usuario, $residente] = $this->preparar(['alertas.ver', 'alertas.seguimiento', 'alertas.cerrar']);
+        $alerta = Alerta::create(['cod_residente' => $residente->cod_residente, 'modulo' => 'MANUAL', 'tipo' => 'Seguimiento sintético', 'descripcion' => 'Revisión sintética', 'estado' => 'ABIERTA']);
+        Livewire::test(CampanaNotificaciones::class)
+            ->call('atenderAlerta', $alerta->cod_alerta, 'Atención sintética')
+            ->assertDispatched('alerta-atendida')
+            ->call('cerrarAlerta', $alerta->cod_alerta, 'Cierre sintético')
+            ->assertDispatched('alerta-cerrada');
+        $this->assertSame('CERRADA', $alerta->fresh()->estado);
+        $this->assertSame(['ATENCION', 'CIERRE'], $alerta->eventos()->orderBy('created_at')->pluck('tipo_evento')->all());
+        $this->assertSame([$usuario->cod_usuario], $alerta->eventos()->pluck('cod_usuario')->unique()->values()->all());
+        try {
+            app(GestionarAtencionAlerta::class)->cerrarAlerta($usuario, $alerta->cod_alerta, 'Reintento');
+            $this->fail('El cierre repetido debe rechazarse.');
+        } catch (HttpException $exception) {
+            $this->assertSame(409, $exception->getStatusCode());
+        }
+        $this->assertSame(2, $alerta->eventos()->count());
+    }
+
+    public function test_campana_sin_permiso_no_muta_al_invocar_el_caso_directamente(): void
+    {
+        [$usuario, $residente] = $this->preparar(['alertas.ver']);
+        $alerta = Alerta::create(['cod_residente' => $residente->cod_residente, 'modulo' => 'MANUAL', 'tipo' => 'Seguimiento sintético', 'descripcion' => 'Revisión sintética', 'estado' => 'ABIERTA']);
+        try {
+            app(GestionarAtencionAlerta::class)->atenderAlerta($usuario, $alerta->cod_alerta, 'Intento no autorizado');
+            $this->fail('El caso exige el permiso original de atención.');
+        } catch (HttpException $exception) {
+            $this->assertSame(403, $exception->getStatusCode());
+        }
+        $this->assertSame('ABIERTA', $alerta->fresh()->estado);
+        $this->assertSame(0, $alerta->eventos()->count());
+    }
+
+    public function test_campana_revierte_estado_si_falla_el_evento(): void
+    {
+        [$usuario, $residente] = $this->preparar(['alertas.seguimiento']);
+        $alerta = Alerta::create(['cod_residente' => $residente->cod_residente, 'modulo' => 'MANUAL', 'tipo' => 'Seguimiento sintético', 'descripcion' => 'Revisión sintética', 'estado' => 'ABIERTA']);
+        EventoAlerta::creating(fn () => throw new \RuntimeException('Fallo sintético de historial'));
+        try {
+            app(GestionarAtencionAlerta::class)->atenderAlerta($usuario, $alerta->cod_alerta, 'Atención sintética');
+            $this->fail('El fallo del historial debe propagarse.');
+        } catch (\RuntimeException $exception) {
+            $this->assertSame('Fallo sintético de historial', $exception->getMessage());
+        }
+        $this->assertSame('ABIERTA', $alerta->fresh()->estado);
+        $this->assertSame(0, $alerta->eventos()->count());
     }
 }

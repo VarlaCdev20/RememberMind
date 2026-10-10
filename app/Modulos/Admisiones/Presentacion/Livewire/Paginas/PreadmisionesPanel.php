@@ -6,6 +6,7 @@ use App\Models\Cama;
 use App\Models\Habitacion;
 use App\Models\Preadmision;
 use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
+use App\Modulos\Admisiones\Aplicacion\Acciones\RevisarSolicitudPreadmision;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
@@ -290,20 +291,12 @@ class PreadmisionesPanel extends Component
 
         abort_unless(auth()->user()?->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'ADMINISTRADOR', 'SUPERADMINISTRADOR']), 403);
 
-        $preadmision->update([
-            'estado' => 'APROBADA',
-            'fecha_revision' => now(),
-            'cod_usuario_revision' => auth()->id(),
-            'motivo_rechazo' => null,
-        ]);
+        app(RevisarSolicitudPreadmision::class)->aprobar(auth()->user(), $preadmision);
 
         if ($this->solicitudDetalle?->getKey() === $codPre) {
             $this->solicitudDetalle = $preadmision->load(['contacto', 'documentos', 'admision.residente']);
             $this->panelModo = 'detalle';
         }
-
-        activity('Admisiones')->causedBy(auth()->user())->performedOn($preadmision)
-            ->log('Solicitud de preadmisión aprobada; queda pendiente formalizar el ingreso.');
 
         $this->dispatch('swal', [
             'title' => 'Preadmisión aprobada',
@@ -464,22 +457,12 @@ class PreadmisionesPanel extends Component
             return;
         }
 
-        $preadmision->update([
-            'estado' => 'RECHAZADA',
-            'motivo_rechazo' => mb_strtoupper(trim($this->motivo_rechazo), 'UTF-8'),
-            'fecha_revision' => now(),
-            'cod_usuario_revision' => auth()->id(),
-        ]);
+        app(RevisarSolicitudPreadmision::class)->rechazar(auth()->user(), $preadmision, $this->motivo_rechazo);
 
         if ($this->solicitudDetalle?->getKey() === $preadmision->getKey()) {
             $this->solicitudDetalle = $preadmision->load(['contacto', 'documentos', 'admision.residente']);
             $this->panelModo = 'detalle';
         }
-
-        activity('Admisiones')
-            ->causedBy(auth()->user())
-            ->performedOn($preadmision)
-            ->log("Preadmisión {$preadmision->cod_preadmision} rechazada.");
 
         $this->cerrarModalRechazo();
 

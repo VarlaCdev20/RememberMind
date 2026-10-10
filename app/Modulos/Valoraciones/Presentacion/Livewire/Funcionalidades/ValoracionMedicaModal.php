@@ -2,13 +2,8 @@
 
 namespace App\Modulos\Valoraciones\Presentacion\Livewire\Funcionalidades;
 
-use App\Models\Atencion;
-use App\Models\HistorialEstadoResidente;
-use App\Models\NotaClinica;
 use App\Models\Residente;
-use App\Models\SignoVital;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use App\Modulos\Valoraciones\Aplicacion\Acciones\RegistrarValoracionMedicaAdmision;
 use Livewire\Component;
 
 class ValoracionMedicaModal extends Component
@@ -119,85 +114,20 @@ class ValoracionMedicaModal extends Component
             'detalle_cuidado_especial.required' => 'Si requiere cuidado especial, debe detallarlo.',
         ]);
 
-        $personal = auth()->user()?->personal;
-        $codArea = $personal?->asignaciones()
-            ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
-            ->latest('fecha_asignacion')
-            ->value('cod_area');
-        abort_unless($personal && $codArea, 422, 'El usuario debe tener personal y área institucional asignados.');
-
-        DB::beginTransaction();
+        app(RegistrarValoracionMedicaAdmision::class)->validarContexto(auth()->user());
         try {
-            $estadoAnterior = $this->adulto->estado;
-            $this->adulto->update(['estado' => 'DECISION_ADMISION']);
-
-            HistorialEstadoResidente::create([
-                'cod_residente' => $this->adulto->cod_residente,
-                'cod_usuario_registro' => auth()->id(),
-                'estado_anterior' => $estadoAnterior,
-                'estado_nuevo' => 'DECISION_ADMISION',
-                'motivo' => 'Valoración médica general completada.',
-            ]);
-
-            $atencion = Atencion::create([
-                'cod_residente' => $this->adulto->cod_residente,
-                'cod_area' => $codArea,
-                'cod_personal' => $personal->cod_personal,
-                'tipo_atencion' => 'VALORACION_MEDICA_ADMISION',
-                'motivo' => 'Valoración médica para decisión de admisión',
-                'fecha_hora' => now(),
-                'estado' => 'FINALIZADA',
-                'observacion' => $this->observacion_medica,
-            ]);
-
-            NotaClinica::create([
-                'cod_nota' => 'NOT_'.strtoupper(Str::random(10)),
-                'cod_atencion' => $atencion->cod_atencion,
-                'cod_residente' => $this->adulto->cod_residente,
-                'cod_personal' => $atencion->cod_personal,
-                'tipo_nota' => 'VALORACION_MEDICA_ADMISION',
-                'contenido' => $this->observacion_medica,
-                'fecha_hora' => now(),
-                'estado' => 'VIGENTE',
-            ]);
-
-            if ($this->pa_sistolica && $this->fc && $this->temp) {
-                SignoVital::create([
-                    'cod_residente' => $this->adulto->cod_residente,
-                    'cod_personal' => $atencion->cod_personal,
-                    'cod_atencion' => $atencion->cod_atencion,
-                    'fecha_hora' => now(),
-                    'presion_sistolica' => $this->pa_sistolica,
-                    'presion_diastolica' => $this->pa_diastolica,
-                    'frecuencia_cardiaca' => $this->fc,
-                    'frecuencia_respiratoria' => $this->fr,
-                    'temperatura' => $this->temp,
-                    'saturacion_oxigeno' => $this->sato2,
-                    'estado' => 'VIGENTE',
-                    'observacion' => 'Signos vitales de valoración médica de admisión.',
-                ]);
-            }
-
-            // Registrar Log
-            activity('Medico')
-                ->causedBy(auth()->user())
-                ->performedOn($this->adulto)
-                ->withProperties([
-                    'condicion_medica' => $this->condicion_medica_general,
-                    'estado_cognitivo' => $this->estado_cognitivo_aparente,
-                    'nivel_dependencia' => $this->nivel_dependencia,
-                    'signos_vitales' => [
-                        'PA' => $this->pa_sistolica.'/'.$this->pa_diastolica,
-                        'FC' => $this->fc,
-                        'FR' => $this->fr,
-                        'Temp' => $this->temp,
-                        'SatO2' => $this->sato2,
-                    ],
-                    'observacion' => $this->observacion_medica,
-                ])
-                ->log('Completó valoración médica general.');
-
-            DB::commit();
+            app(RegistrarValoracionMedicaAdmision::class)->ejecutar(auth()->user(), [
+                'adulto' => $this->adulto,
+                'observacion_medica' => $this->observacion_medica,
+                'pa_sistolica' => $this->pa_sistolica,
+                'fc' => $this->fc,
+                'temp' => $this->temp,
+                'pa_diastolica' => $this->pa_diastolica,
+                'fr' => $this->fr,
+                'sato2' => $this->sato2,
+                'condicion_medica_general' => $this->condicion_medica_general,
+                'estado_cognitivo_aparente' => $this->estado_cognitivo_aparente,
+                'nivel_dependencia' => $this->nivel_dependencia,            ]);
 
             $this->dispatch('swal', [
                 'title' => 'Valoración Médica Completada',
@@ -209,7 +139,6 @@ class ValoracionMedicaModal extends Component
             $this->close();
 
         } catch (\Exception $e) {
-            DB::rollBack();
             $this->dispatch('swal', [
                 'title' => 'Error',
                 'text' => 'Ocurrió un error al guardar la valoración: '.$e->getMessage(),

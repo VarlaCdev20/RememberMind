@@ -4,8 +4,8 @@ namespace App\Modulos\Valoraciones\Presentacion\Livewire\Funcionalidades;
 
 use App\Models\Preadmision;
 use App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService;
-use App\Modulos\Clinica\Presentacion\Http\Validacion\ValidacionSignosVitalesService;
-use Illuminate\Support\Facades\DB;
+use App\Modulos\Clinica\Aplicacion\Validacion\ValidacionSignosVitalesService;
+use App\Modulos\Valoraciones\Aplicacion\Acciones\RegistrarValoracionInicial;
 use Livewire\Component;
 
 class ValoracionInicialModal extends Component
@@ -313,28 +313,24 @@ class ValoracionInicialModal extends Component
             'confirmacion_documentacion.accepted' => 'Debe confirmar que revisó la documentación.',
         ]);
 
-        DB::beginTransaction();
-
         try {
-            $orientacionCombinada = "Persona: {$this->orientacion_persona}, Tiempo: {$this->orientacion_tiempo}, Espacio: {$this->orientacion_espacio}";
-            $valoracion = [
-                'fecha_hora' => now()->toIso8601String(),
-                'estado_general' => $this->estado_general,
-                'nivel_conciencia' => $this->nivel_conciencia,
-                'orientacion' => $orientacionCombinada,
+            app(RegistrarValoracionInicial::class)->ejecutar(auth()->user(), [
+                'valoracionId' => $this->valoracionId,
                 'orientacion_persona' => $this->orientacion_persona,
                 'orientacion_tiempo' => $this->orientacion_tiempo,
                 'orientacion_espacio' => $this->orientacion_espacio,
+                'estado_general' => $this->estado_general,
+                'nivel_conciencia' => $this->nivel_conciencia,
                 'comunicacion' => $this->comunicacion,
-                'hay_dolor' => (bool) $this->hay_dolor,
-                'intensidad_dolor' => $this->hay_dolor ? $this->intensidad_dolor : null,
-                'ubicacion_dolor' => $this->hay_dolor ? $this->ubicacion_dolor : null,
+                'hay_dolor' => $this->hay_dolor,
+                'intensidad_dolor' => $this->intensidad_dolor,
+                'ubicacion_dolor' => $this->ubicacion_dolor,
                 'movilidad' => $this->movilidad,
                 'apoyo_movilidad' => $this->apoyo_movilidad,
                 'riesgo_caida' => $this->riesgo_caida,
                 'piel_estado' => $this->piel_estado,
-                'hay_heridas' => (bool) $this->hay_heridas,
-                'ubicacion_heridas' => $this->hay_heridas ? $this->ubicacion_heridas : null,
+                'hay_heridas' => $this->hay_heridas,
+                'ubicacion_heridas' => $this->ubicacion_heridas,
                 'higiene_ingreso' => $this->higiene_ingreso,
                 'continencia_basica' => $this->continencia_basica,
                 'alimentacion_aparente' => $this->alimentacion_aparente,
@@ -352,39 +348,12 @@ class ValoracionInicialModal extends Component
                 'dependencia_funcional' => $this->dependencia_funcional,
                 'riesgo_nutricional' => $this->riesgo_nutricional,
                 'riesgo_cognitivo' => $this->riesgo_cognitivo,
-                'tipo_evaluacion_cognitiva' => 'CRIBADO_OBSERVACIONAL_ENFERMERIA',
                 'necesidad_apoyo_inmediato' => $this->necesidad_apoyo_inmediato,
                 'prioridad_sugerida' => $this->prioridad_sugerida,
-                'confirmacion_documentacion' => (bool) $this->confirmacion_documentacion,
+                'confirmacion_documentacion' => $this->confirmacion_documentacion,
                 'comentarios_adicionales' => $this->comentarios_adicionales,
                 'recomendacion_enfermeria' => $this->recomendacion_enfermeria,
-                'cod_personal_valorador' => $personal->cod_personal,
-                'registrado_por' => $user->cod_usuario,
-            ];
-
-            $this->preadmision->update([
-                'estado' => 'PENDIENTE',
-                'prioridad' => $this->prioridad_sugerida,
-                'valoracion_enfermeria' => $valoracion,
-            ]);
-
-            activity('Enfermeria')
-                ->causedBy(auth()->user())
-                ->performedOn($this->preadmision)
-                ->withProperties([
-                    'cod_preadmision' => $this->preadmision->cod_preadmision,
-                    'cod_personal_valorador' => $personal->cod_personal,
-                    'cod_usuario_registro' => $user->cod_usuario,
-                    'estado_general' => $this->estado_general,
-                    'orientacion' => $orientacionCombinada,
-                    'movilidad' => $this->movilidad,
-                    'riesgo_caida' => $this->riesgo_caida,
-                    'hay_dolor' => $this->hay_dolor,
-                    'recomendacion' => $this->recomendacion_enfermeria,
-                ])
-                ->log('Completo valoracion inicial de enfermeria.');
-
-            DB::commit();
+                'preadmision' => $this->preadmision,            ]);
 
             $this->dispatch('swal', [
                 'title' => 'Valoracion completada',
@@ -396,7 +365,6 @@ class ValoracionInicialModal extends Component
             $this->dispatch('refreshDashboard');
             $this->close();
         } catch (\Throwable $e) {
-            DB::rollBack();
 
             $this->dispatch('swal', [
                 'title' => 'Error',

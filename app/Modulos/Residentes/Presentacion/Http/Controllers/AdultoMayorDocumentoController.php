@@ -4,10 +4,10 @@ namespace App\Modulos\Residentes\Presentacion\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Residente;
+use App\Modulos\Residentes\Aplicacion\Acciones\GestionarDocumentosResidenteHttp;
 use App\Modulos\Residentes\Presentacion\Http\Requests\StoreDocumentoAdultoRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class AdultoMayorDocumentoController extends Controller
 {
@@ -24,25 +24,7 @@ class AdultoMayorDocumentoController extends Controller
 
     public function store(StoreDocumentoAdultoRequest $request, Residente $adulto_mayor)
     {
-        $data = $request->validated();
-        $file = $request->file('archivo');
-        $path = $file->store('documentos/residentes', 'local');
-
-        $adulto_mayor->documentos()->create([
-            'cod_documento' => 'DOC_'.Str::upper(Str::random(10)),
-            'cod_residente' => $adulto_mayor->cod_residente,
-            'tipo_documento' => $data['tipo_documento'],
-            'nombre' => $data['nombre'],
-            'ruta_archivo' => $path,
-            'tipo_archivo' => $file->getMimeType() ?: 'application/octet-stream',
-            'hash_archivo' => hash_file('sha256', Storage::disk('local')->path($path)),
-            'estado' => 'ACTIVO',
-            'observacion' => $data['observaciones'] ?? null,
-        ]);
-
-        activity('Adulto Mayor')
-            ->performedOn($adulto_mayor)
-            ->log("Se subió un documento para el adulto mayor: {$adulto_mayor->nombres}");
+        app(GestionarDocumentosResidenteHttp::class)->store(auth()->user(), $request->validated(), $adulto_mayor);
 
         return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_residente)->with('success', 'Documento subido correctamente.');
     }
@@ -57,7 +39,6 @@ class AdultoMayorDocumentoController extends Controller
             $disco = Storage::disk('public');
         }
         abort_unless($disco->exists($doc->ruta_archivo), 404, 'Archivo no disponible.');
-
         if ($request->has('ver') || $request->has('preview') || $request->has('inline')) {
             $path = $disco->path($doc->ruta_archivo);
             $mime = $disco->mimeType($doc->ruta_archivo) ?: 'application/pdf';
@@ -70,47 +51,22 @@ class AdultoMayorDocumentoController extends Controller
 
     public function update(Request $request, Residente $adulto_mayor, $documento)
     {
-        $doc = $adulto_mayor->documentos()->findOrFail($documento);
-
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-            'tipo_documento' => 'required|string',
-            'observaciones' => 'nullable|string|max:1000',
-        ]);
-
-        $doc->update([
-            'nombre' => $request->string('nombre')->toString(),
-            'tipo_documento' => $request->string('tipo_documento')->toString(),
-            'observacion' => $request->input('observaciones'),
-        ]);
+        app(GestionarDocumentosResidenteHttp::class)->update(auth()->user(), $request->all(), $adulto_mayor, $documento);
 
         return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_residente)->with('success', 'Metadatos del documento actualizados.');
     }
 
     public function destroy(Residente $adulto_mayor, $documento)
     {
-        $doc = $adulto_mayor->documentos()->findOrFail($documento);
-
-        $doc->update(['estado' => 'ARCHIVADO']);
-
-        activity('Adulto Mayor')
-            ->performedOn($adulto_mayor)
-            ->log("Se archivó un documento (baja lógica) de la ficha {$adulto_mayor->cod_residente}. Se conserva archivo físico.");
+        app(GestionarDocumentosResidenteHttp::class)->destroy(auth()->user(), [], $adulto_mayor, $documento);
 
         return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_residente)->with('success', 'Documento archivado correctamente.');
     }
 
     public function restore(Residente $adulto_mayor, $id)
     {
-        $doc = $adulto_mayor->documentos()->findOrFail($id);
-        $doc->update(['estado' => 'ACTIVO']);
+        app(GestionarDocumentosResidenteHttp::class)->restore(auth()->user(), [], $adulto_mayor, $id);
 
-        activity('Adulto Mayor')
-            ->performedOn($adulto_mayor)
-            ->withProperties(['cod_doc' => $id])
-            ->log('Se restauró un documento previamente archivado.');
-
-        return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_residente)
-            ->with('success', 'Documento restaurado correctamente.');
+        return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_residente)->with('success', 'Documento restaurado correctamente.');
     }
 }

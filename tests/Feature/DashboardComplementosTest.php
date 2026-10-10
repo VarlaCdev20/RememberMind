@@ -2,11 +2,17 @@
 
 namespace Tests\Feature;
 
+use App\Models\Area;
+use App\Models\Jornada;
+use App\Models\Personal;
+use App\Models\Residente;
+use App\Models\Turno;
+use App\Models\User;
 use App\Modulos\Cuidados\Aplicacion\Consultas\DashboardComplementosService;
-use App\Models\{Area, Jornada, Personal, Residente, Turno, User};
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\{Blade, DB};
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -16,9 +22,13 @@ class DashboardComplementosTest extends TestCase
     use RefreshDatabase;
 
     private User $usuario;
+
     private Personal $personal;
+
     private Residente $residente;
+
     private Residente $ajeno;
+
     private array $contexto;
 
     protected function setUp(): void
@@ -69,7 +79,9 @@ class DashboardComplementosTest extends TestCase
 
     public function test_tareas_reales_aislamiento_limite_y_progreso_verificado(): void
     {
-        for ($i = 0; $i < 5; $i++) $this->tarea('EJE_'.$i);
+        for ($i = 0; $i < 5; $i++) {
+            $this->tarea('EJE_'.$i);
+        }
         $this->tarea('EJE_OK', ['estado' => 'REALIZADA', 'fecha_hora_ejecucion' => now()]);
         $this->tarea('EJE_SIN_FECHA', ['estado' => 'REALIZADA']);
         $this->tarea('EJE_OMITIDA', ['estado' => 'OMITIDA', 'fecha_hora_ejecucion' => now()]);
@@ -96,7 +108,9 @@ class DashboardComplementosTest extends TestCase
         $this->assertFalse($r['activo']);
         $this->assertNull($r['tareas']['progreso']);
         $this->assertSame([], $r['notas']['items']);
-        foreach (['ejecuciones_cuidado', 'ocupaciones_cama', 'registros_conductuales'] as $tabla) $this->assertStringNotContainsString($tabla, $consultas);
+        foreach (['ejecuciones_cuidado', 'ocupaciones_cama', 'registros_conductuales'] as $tabla) {
+            $this->assertStringNotContainsString($tabla, $consultas);
+        }
     }
 
     public function test_sin_tareas_o_permisos_no_inventa_datos(): void
@@ -125,7 +139,9 @@ class DashboardComplementosTest extends TestCase
 
     public function test_notas_recientes_reales_orden_limite_sin_emociones_inferidas(): void
     {
-        for ($i = 1; $i <= 4; $i++) $this->nota('NOT_'.$i, ['fecha_hora' => now()->subMinutes($i), 'descripcion' => 'Texto menciona ansiedad sin estado estructurado']);
+        for ($i = 1; $i <= 4; $i++) {
+            $this->nota('NOT_'.$i, ['fecha_hora' => now()->subMinutes($i), 'descripcion' => 'Texto menciona ansiedad sin estado estructurado']);
+        }
         $this->nota('NOT_ANTIGUA', ['fecha_hora' => now()->subHours(25)]);
         $this->nota('NOT_FUTURA', ['fecha_hora' => now()->addMinute()]);
         $this->nota('NOT_AJENA', ['cod_residente' => $this->ajeno->cod_residente]);
@@ -197,7 +213,9 @@ class DashboardComplementosTest extends TestCase
         $this->assertStringContainsString('2 alertas', $location);
         $this->assertStringContainsString('RP', $note);
         $this->assertStringContainsString('Observación registrada', $note);
-        foreach ([$task, $location, $note] as $html) $this->assertStringNotContainsString('href="#"', $html);
+        foreach ([$task, $location, $note] as $html) {
+            $this->assertStringNotContainsString('href="#"', $html);
+        }
         $href = route('admin.enfermeria.pacientes.ficha', ['adulto' => $this->residente->cod_residente, 'tab' => 'seguimiento']);
         $linked = Blade::render('<x-ui.behavior-note :note="$item" :href="$href" />', ['item' => $r['notas']['items'][0], 'href' => $href]);
         $this->assertStringContainsString('tab=seguimiento', $linked);

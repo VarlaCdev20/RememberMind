@@ -2,9 +2,9 @@
 
 namespace App\Modulos\Reportes\Presentacion\Http\Controllers;
 
-use App\Modulos\Reportes\Infraestructura\Exportaciones\Reportes\ReporteFamiliaresExport;
 use App\Http\Controllers\Controller;
 use App\Modulos\Reportes\Aplicacion\Consultas\ReporteDataService;
+use App\Modulos\Reportes\Infraestructura\Exportaciones\Reportes\ReporteFamiliaresExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;

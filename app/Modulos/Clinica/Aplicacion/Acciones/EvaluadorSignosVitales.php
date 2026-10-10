@@ -28,9 +28,9 @@ final class EvaluadorSignosVitales
         $fechaMedicion = isset($mediciones['fecha_hora']) ? Carbon::parse($mediciones['fecha_hora']) : now();
         $historial = $codResidente && $incluirHistorial ? $this->basal->lecturasRecientes($codResidente, fechaMedicion: $fechaMedicion) : [];
         $reglas = [
-            new ReglaPresionArterial, new ReglaFrecuenciaCardiaca,
-            new ReglaFrecuenciaRespiratoria, new ReglaTemperatura,
-            new ReglaSaturacionOxigeno, new ReglaGlucemia,
+            new ReglaPresionArterial(config('signos_vitales.presion')), new ReglaFrecuenciaCardiaca(config('signos_vitales.pulso')),
+            new ReglaFrecuenciaRespiratoria(config('signos_vitales.respiracion')), new ReglaTemperatura(config('signos_vitales.temperatura')),
+            new ReglaSaturacionOxigeno, new ReglaGlucemia(config('signos_vitales.glucemia')),
         ];
         $resultados = [];
         foreach ($reglas as $regla) {

@@ -4,19 +4,16 @@ namespace App\Modulos\Alertas\Presentacion\Livewire\Paginas;
 
 use App\Models\Alerta;
 use App\Models\Area;
-use App\Models\Derivacion;
-use App\Models\EventoAlerta;
 use App\Models\Incidente;
 use App\Models\Jornada;
 use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\ResidenteContacto;
+use App\Modulos\Alertas\Aplicacion\Acciones\GestionarIncidentesPanel;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -334,42 +331,8 @@ class IncidentesPanel extends Component
             ->firstOrFail();
         $codJornada = $jornadaActiva->cod_jornada;
 
-        // Normalización backend
-        $tipoNormalizado = Str::upper(preg_replace('/\s+/', ' ', trim($tipoFinal)));
-        $gravedadNormalizada = Str::upper(trim($this->gravedad));
-
-        DB::beginTransaction();
         try {
-            $incidente = new Incidente;
-            $incidente->cod_residente = $this->cod_residente;
-            $incidente->cod_personal = $codPersonal;
-            $incidente->cod_jornada = $codJornada;
-            $incidente->tipo_incidente = Str::substr($tipoNormalizado, 0, 60);
-            $incidente->gravedad = $gravedadNormalizada;
-            $incidente->lugar = $this->lugar ? Str::substr(trim($this->lugar), 0, 120) : null;
-            $incidente->fecha_hora = $fechaHoraIncidente;
-            $incidente->descripcion = trim($this->descripcion);
-            $incidente->medida_inmediata = $this->medida_inmediata ? trim($this->medida_inmediata) : null;
-            $incidente->requiere_medico = (bool) $this->requiere_medico;
-            $incidente->requiere_derivacion = (bool) $this->requiere_derivacion;
-            $incidente->estado = 'ABIERTO';
-            $incidente->observacion = $this->observacion ? trim($this->observacion) : null;
-            $incidente->save();
-
-            DB::commit();
-
-            // Log de actividad
-            activity()
-                ->performedOn($incidente)
-                ->causedBy($user)
-                ->withProperties([
-                    'residente' => $this->cod_residente,
-                    'tipo' => $tipoNormalizado,
-                    'gravedad' => $gravedadNormalizada,
-                    'requiere_medico' => $this->requiere_medico,
-                    'requiere_derivacion' => $this->requiere_derivacion,
-                ])
-                ->log('Registro de incidente de enfermería');
+            $incidente = app(GestionarIncidentesPanel::class)->registrarIncidente($user, ['tipo_incidente' => $this->tipo_incidente, 'tipo_incidente_otro' => $this->tipo_incidente_otro, 'fecha_incidente' => $this->fecha_incidente, 'hora_incidente' => $this->hora_incidente, 'cod_residente' => $this->cod_residente, 'gravedad' => $this->gravedad, 'lugar' => $this->lugar, 'descripcion' => $this->descripcion, 'medida_inmediata' => $this->medida_inmediata, 'requiere_medico' => $this->requiere_medico, 'requiere_derivacion' => $this->requiere_derivacion, 'observacion' => $this->observacion]);
 
             $this->ultimoCodIncidente = $incidente->cod_incidente;
             $this->ultimoRequiereMedico = (bool) $this->requiere_medico;
@@ -381,7 +344,6 @@ class IncidentesPanel extends Component
 
             session()->flash('mensaje', 'Incidencia registrada con éxito: '.$incidente->cod_incidente);
         } catch (\Throwable $e) {
-            DB::rollBack();
             Log::error('Error al registrar incidente: '.$e->getMessage(), ['exception' => $e]);
             $this->addError('error_general', 'Ocurrió un error al registrar el incidente: '.$e->getMessage());
         }
@@ -485,31 +447,9 @@ class IncidentesPanel extends Component
             'nota_estado.min' => 'La nota debe tener al menos 5 caracteres.',
         ]);
 
-        $incidente = Incidente::find($this->incidenteSeleccionadoId);
-        if (! $incidente) {
+        if (! app(GestionarIncidentesPanel::class)->actualizarEstado(auth()->user(), ['incidenteSeleccionadoId' => $this->incidenteSeleccionadoId, 'nuevo_estado' => $this->nuevo_estado, 'nota_estado' => $this->nota_estado])) {
             return;
         }
-        $this->autorizarMutacionIncidente($incidente);
-
-        $estadoAnterior = $incidente->estado;
-        $incidente->estado = $this->nuevo_estado;
-
-        $fechaActual = Carbon::now()->format('d/m/Y H:i');
-        $usuarioNombre = Auth::user()->name ?? 'Personal';
-        $anexo = "\n[{$fechaActual} - {$usuarioNombre}]: Estado cambiado de {$estadoAnterior} a {$this->nuevo_estado}. Justificación: ".trim($this->nota_estado);
-
-        $incidente->observacion = ($incidente->observacion ?? '').$anexo;
-        $incidente->save();
-
-        activity()
-            ->performedOn($incidente)
-            ->causedBy(Auth::user())
-            ->withProperties([
-                'estado_anterior' => $estadoAnterior,
-                'estado_nuevo' => $this->nuevo_estado,
-                'nota' => $this->nota_estado,
-            ])
-            ->log('Actualización de estado de incidente');
 
         $this->modalEstado = false;
         session()->flash('mensaje', "Estado actualizado a {$this->nuevo_estado} correctamente.");
@@ -544,67 +484,8 @@ class IncidentesPanel extends Component
             return;
         }
 
-        DB::beginTransaction();
         try {
-            $user = Auth::user();
-            $codUsuario = $user->cod_usuario;
-            $personal = Personal::query()
-                ->where('cod_usuario', $codUsuario)
-                ->where('estado', 'ACTIVO')
-                ->first();
-            if (! $personal) {
-                throw new \LogicException('El usuario autenticado no tiene un perfil de personal activo.');
-            }
-            $codPersonal = $personal->cod_personal;
-
-            // Prioridad según gravedad
-            $prioridad = in_array($incidente->gravedad, ['ALTA', 'CRITICA']) ? 'ALTA' : 'MEDIA';
-            if ($incidente->gravedad === 'CRITICA') {
-                $prioridad = 'CRITICA';
-            }
-
-            $alerta = new Alerta;
-            $alerta->cod_alerta = 'ALE_'.strtoupper(Str::random(10));
-            $alerta->cod_residente = $incidente->cod_residente;
-            $alerta->cod_personal_responsable = $codPersonal;
-            $alerta->tipo = 'CLINICA';
-            $alerta->prioridad = $prioridad;
-            $alerta->modulo = 'INCIDENTES';
-            $alerta->cod_registro = $incidente->cod_incidente;
-            $alerta->titulo = "Valoración médica urgente: {$incidente->tipo_incidente}";
-            $alerta->descripcion = "Incidente: {$incidente->tipo_incidente} (Gravedad: {$incidente->gravedad}). Detalle: {$incidente->descripcion}";
-            $alerta->fecha_hora = Carbon::now();
-            $alerta->fecha_hora_limite = Carbon::now()->addHours(2);
-            $alerta->generacion = 'MANUAL';
-            $alerta->estado = 'ACTIVA';
-            $alerta->save();
-
-            // Evento de alerta para trazabilidad
-            $evento = new EventoAlerta;
-            $evento->cod_evento_alerta = 'EAL_'.strtoupper(Str::random(10));
-            $evento->cod_alerta = $alerta->cod_alerta;
-            $evento->cod_usuario = $codUsuario;
-            $evento->tipo_evento = 'CREACION';
-            $evento->estado_anterior = null;
-            $evento->estado_nuevo = 'ACTIVA';
-            $evento->fecha_hora = Carbon::now();
-            $evento->descripcion = "Alerta médica solicitada por enfermería a partir de la incidencia {$incidente->cod_incidente}.";
-            $evento->save();
-
-            // Marcar incidente como requiere_medico = true y en seguimiento si estaba abierto
-            $incidente->requiere_medico = true;
-            if ($incidente->estado === 'ABIERTO') {
-                $incidente->estado = 'EN_SEGUIMIENTO';
-            }
-            $incidente->save();
-
-            DB::commit();
-
-            activity()
-                ->performedOn($alerta)
-                ->causedBy($user)
-                ->withProperties(['incidente' => $incidente->cod_incidente])
-                ->log('Generación de alerta médica para incidente');
+            $alerta = app(GestionarIncidentesPanel::class)->solicitarValoracionMedica(Auth::user(), $incidente);
 
             session()->flash('mensaje', 'Solicitud de valoración médica enviada exitosamente (Alerta: '.$alerta->cod_alerta.').');
 
@@ -612,7 +493,6 @@ class IncidentesPanel extends Component
                 $this->alertaVinculada = $alerta;
             }
         } catch (\Throwable $e) {
-            DB::rollBack();
             Log::error('Error al generar alerta de incidente: '.$e->getMessage());
             session()->flash('error', 'No se pudo generar la solicitud médica: '.$e->getMessage());
         }
@@ -688,41 +568,12 @@ class IncidentesPanel extends Component
             return;
         }
 
-        DB::beginTransaction();
         try {
-            $derivacion = new Derivacion;
-            $derivacion->cod_derivacion = 'DER_'.strtoupper(Str::random(10));
-            $derivacion->cod_residente = $incidente->cod_residente;
-            $derivacion->cod_area_solicitante = $codAreaSolicitante;
-            $derivacion->cod_area_receptora = $this->derivacion_area_receptora;
-            $derivacion->cod_personal_solicitante = $codPersonal;
-            $derivacion->cod_personal_receptor = null;
-            $derivacion->cod_atencion = null;
-            $derivacion->motivo = trim($this->derivacion_motivo);
-            $derivacion->prioridad = $this->derivacion_prioridad;
-            $derivacion->fecha_hora = Carbon::now();
-            $derivacion->respuesta = null;
-            $derivacion->estado = 'SOLICITADA';
-            $derivacion->save();
-
-            // Actualizar flag en incidente y anexo trazable
-            $incidente->requiere_derivacion = true;
-            $fechaActual = Carbon::now()->format('d/m/Y H:i');
-            $incidente->observacion = ($incidente->observacion ?? '')."\n[{$fechaActual}]: Derivación creada ({$derivacion->cod_derivacion}) hacia área receptora.";
-            $incidente->save();
-
-            DB::commit();
-
-            activity()
-                ->performedOn($derivacion)
-                ->causedBy($user)
-                ->withProperties(['incidente' => $incidente->cod_incidente])
-                ->log('Creación de derivación desde incidente de enfermería');
+            $derivacion = app(GestionarIncidentesPanel::class)->crearDerivacion($user, ['derivacion_area_receptora' => $this->derivacion_area_receptora, 'derivacion_motivo' => $this->derivacion_motivo, 'derivacion_prioridad' => $this->derivacion_prioridad], $incidente);
 
             $this->modalDerivacion = false;
             session()->flash('mensaje', 'Derivación '.$derivacion->cod_derivacion.' creada con éxito.');
         } catch (\Throwable $e) {
-            DB::rollBack();
             Log::error('Error al crear derivación: '.$e->getMessage());
             $this->addError('error_derivacion', 'No se pudo crear la derivación: '.$e->getMessage());
         }

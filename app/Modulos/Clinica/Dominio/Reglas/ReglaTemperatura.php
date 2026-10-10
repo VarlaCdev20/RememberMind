@@ -7,13 +7,15 @@ use App\Modulos\Clinica\Dominio\ObjetosValor\ResultadoReglaClinica;
 
 final class ReglaTemperatura extends ReglaBase
 {
+    public function __construct(private readonly array $parametros) {}
+
     public function evaluar(array $mediciones): ?ResultadoReglaClinica
     {
         $valor = $mediciones['temperatura'] ?? null;
         if ($valor === null) {
             return null;
         }
-        $c = config('signos_vitales.temperatura');
+        $c = $this->parametros;
         if ($valor <= $c['critico_bajo'] || $valor >= $c['critico_alto']) {
             return $this->resultado('temperatura', (string) $valor, '°C', Nivel::CRITICO, 'TEMP_CRITICA',
                 'Umbral crítico de seguridad', '≤'.$c['critico_bajo'].' o ≥'.$c['critico_alto'].' °C',

@@ -5,7 +5,7 @@ namespace App\Modulos\Clinica\Presentacion\Livewire\Funcionalidades;
 use App\Models\Residente;
 use App\Models\SignoVital;
 use App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService;
-use App\Modulos\Clinica\Presentacion\Http\Validacion\ValidacionSignosVitalesService;
+use App\Modulos\Clinica\Aplicacion\Validacion\ValidacionSignosVitalesService;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;

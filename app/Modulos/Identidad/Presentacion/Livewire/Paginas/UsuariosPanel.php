@@ -4,29 +4,23 @@ namespace App\Modulos\Identidad\Presentacion\Livewire\Paginas;
 
 use App\Compartido\Infraestructura\Documentos\DocumentacionUsuarioService;
 use App\Compartido\Infraestructura\Documentos\DocumentosUsuarioService;
-use App\Modulos\Reportes\Infraestructura\Exportaciones\UsuariosExport;
-use App\Mail\UsuarioBienvenidaMail;
-use App\Mail\UsuarioCredencialesInicialesMail;
-use App\Mail\UsuarioPasswordActualizadaMail;
-use App\Mail\UsuarioRequisitosDocumentalesMail;
-use App\Models\Area;
 use App\Models\Contacto;
 use App\Models\Personal;
 use App\Models\Residente;
-use App\Models\ResidenteContacto;
 use App\Models\User;
+use App\Modulos\Identidad\Aplicacion\Acciones\GestionarUsuariosPanel;
+use App\Modulos\Identidad\Infraestructura\Notificaciones\EnviarRequisitosDocumentales;
+use App\Modulos\Identidad\Infraestructura\Notificaciones\NotificarUsuarioGuardado;
 use App\Modulos\Reportes\Infraestructura\Exportaciones\ReportExportService;
 use App\Modulos\Reportes\Infraestructura\Exportaciones\ReportFileNameService;
+use App\Modulos\Reportes\Infraestructura\Exportaciones\UsuariosExport;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
-use Spatie\LaravelPdf\Facades\Pdf;
 use Spatie\Permission\Models\Role;
 
 class UsuariosPanel extends Component
@@ -569,30 +563,6 @@ class UsuariosPanel extends Component
             $this->disponibilidad_inicial = null;
             $this->area_apoyo_preferente = null;
             $this->fecha_ingreso = null;
-        }
-    }
-
-    private function guardarVinculosFamiliar(Contacto $contacto): void
-    {
-        foreach ($this->vinculosFamiliar as $vinculo) {
-            $obsSerialized = 'Salud: '.($vinculo['responsable_salud'] ?? 'NO')
-                .' | Económico: '.($vinculo['responsable_economico'] ?? 'NO')
-                .' | Obs: '.($vinculo['observaciones'] ?? '');
-
-            $relacion = ResidenteContacto::firstOrNew([
-                'cod_contacto' => $contacto->cod_contacto,
-                'cod_residente' => $vinculo['cod_residente'] ?? null,
-            ]);
-            $relacion->cod_residente_contacto ??= 'RCO_'.strtoupper(Str::random(10));
-            $relacion->fill([
-                'parentesco' => $vinculo['parentesco_vinculo'],
-                'responsable_principal' => ($vinculo['es_responsable'] ?? 'NO') === 'SI',
-                'contacto_emergencia' => true,
-                'autoriza_informacion' => true,
-                'autoriza_salida' => false,
-                'estado' => 'ACTIVO',
-                'observacion' => $obsSerialized,
-            ])->save();
         }
     }
 
@@ -1697,79 +1667,12 @@ class UsuariosPanel extends Component
             'tipo_vinculacion' => $this->tipo_vinculacion,
         ];
 
-        // Manejar archivo cargado fuera de la transacción
-        $oldPhotoToDelete = null;
-        $newPhotoPath = null;
-        if ($this->foto_de_perfil_upload) {
-            if ($this->isEdit && $this->usuarioId) {
-                $oldUser = User::find($this->usuarioId);
-                if ($oldUser && $oldUser->foto_de_perfil && \Storage::disk('public')->exists($oldUser->foto_de_perfil)) {
-                    $oldPhotoToDelete = $oldUser->foto_de_perfil;
-                }
-            }
-            $newPhotoPath = $this->foto_de_perfil_upload->store('usuarios/fotos', 'public');
-            $userData['foto_de_perfil'] = $newPhotoPath;
-        }
-
-        $mensaje = '';
-        $passwordTemporal = null;
-        $usuario = null;
-
         try {
-            DB::beginTransaction();
-
-            if ($this->isEdit) {
-                $userData['estado'] = $estadoGuardado;
-                $userData['acceso_sistema'] = $accesoGuardado;
-
-                $usuario = User::findOrFail($this->usuarioId);
-
-                if ($usuario->cod_usuario === auth()->id()) {
-                    if (! empty($this->password)) {
-                        $userData['password'] = Hash::make($this->password);
-                        $userData['debe_cambiar_password'] = false;
-                    }
-                } else {
-                    // Para otros usuarios, la contraseña no se cambia mediante el formulario general
-                    unset($userData['password']);
-                }
-
-                if ($usuario->hasRole('SUPERADMINISTRADOR') && $this->rol !== 'SUPERADMINISTRADOR') {
-                    $superadmins = User::role('SUPERADMINISTRADOR')->where('estado', 'ACTIVO')->count();
-                    if ($superadmins <= 1) {
-                        throw new \Exception('No puedes quitar el rol de superadministrador al único superadministrador activo.');
-                    }
-                }
-
-                $usuario->update($userData);
-                $usuario->syncRoles([$this->rol]);
-
-                // Guardar sub-modelos de forma unificada en edición
-                $this->guardarSubModelos($usuario);
-
-            } else {
-                $userData['estado'] = 'ACTIVO';
-                $userData['acceso_sistema'] = 'HABILITADO';
-                $passwordTemporal = $this->passwordTemporalVisual ?: $this->generarPasswordTemporal();
-                $userData['password'] = $passwordTemporal;
-                $userData['debe_cambiar_password'] = true;
-
-                $usuario = User::create($userData);
-                $usuario->assignRole($this->rol);
-
-                // Guardar sub-modelos de forma unificada en creación
-                $this->guardarSubModelos($usuario);
-            }
-
-            DB::commit();
+            $resultado = app(GestionarUsuariosPanel::class)->guardarUsuario(auth()->user(), ['foto_de_perfil_upload' => $this->foto_de_perfil_upload, 'isEdit' => $this->isEdit, 'usuarioId' => $this->usuarioId, 'password' => $this->password, 'rol' => $this->rol, 'passwordTemporalVisual' => $this->passwordTemporalVisual, 'nombres' => $this->nombres, 'ap_paterno' => $this->ap_paterno, 'ap_materno' => $this->ap_materno, 'numero_documento' => $this->numero_documento, 'telefono' => $this->telefono, 'correo' => $this->correo, 'direccion' => $this->direccion, 'parentesco_emergencia' => $this->parentesco_emergencia, 'observacion_vinculo' => $this->observacion_vinculo, 'fecha_ingreso' => $this->fecha_ingreso, 'vinculosFamiliar' => $this->vinculosFamiliar], $userData, $estadoGuardado, $accesoGuardado);
+            $usuario = $resultado['usuario'];
+            $passwordTemporal = $resultado['passwordTemporal'];
+            $oldPhotoToDelete = $resultado['oldPhotoToDelete'];
         } catch (\Exception $e) {
-            DB::rollBack();
-
-            // Revertir físicamente el nuevo archivo en caso de fallo
-            if ($newPhotoPath && \Storage::disk('public')->exists($newPhotoPath)) {
-                \Storage::disk('public')->delete($newPhotoPath);
-            }
-
             Log::error('Error crítico durante el guardado de usuario: '.$e->getMessage(), [
                 'exception' => $e,
                 'user_id' => $this->usuarioId ?? 'nuevo',
@@ -1792,84 +1695,12 @@ class UsuariosPanel extends Component
         $this->procesarPostGuardado($usuario, $passwordTemporal, $oldPhotoToDelete);
     }
 
-    private function guardarSubModelos(User $usuario)
-    {
-        if ($this->rol === 'FAMILIAR') {
-            $fam = Contacto::updateOrCreate(
-                ['cod_usuario' => $usuario->cod_usuario],
-                [
-                    'cod_contacto' => Contacto::where('cod_usuario', $usuario->cod_usuario)->value('cod_contacto') ?: ('CON_'.strtoupper(Str::random(10))),
-                    'nombres' => $this->nombres,
-                    'apellido_paterno' => $this->ap_paterno,
-                    'apellido_materno' => $this->ap_materno,
-                    'numero_documento' => $this->numero_documento,
-                    'telefono' => $this->telefono,
-                    'celular' => $this->telefono,
-                    'correo' => $this->correo,
-                    'direccion' => $this->direccion,
-                    'estado' => 'ACTIVO',
-                    'observacion' => trim(($this->parentesco_emergencia ?? 'Familiar').' | '.($this->observacion_vinculo ?? '')),
-                ]
-            );
-
-            $this->guardarVinculosFamiliar($fam);
-        } else {
-            Personal::updateOrCreate(
-                ['cod_usuario' => $usuario->cod_usuario],
-                [
-                    'cod_personal' => Personal::where('cod_usuario', $usuario->cod_usuario)->value('cod_personal') ?: ('PER_'.strtoupper(Str::random(10))),
-                    'nombres' => $this->nombres,
-                    'apellido_paterno' => $this->ap_paterno,
-                    'apellido_materno' => $this->ap_materno,
-                    'numero_documento' => $this->numero_documento,
-                    'profesion' => $this->rol,
-                    'fecha_ingreso' => $this->fecha_ingreso,
-                    'estado' => $usuario->estado,
-                ]
-            );
-        }
-    }
-
-    // ══════════════════════════════════════════════
-    // VISTA COMPLETA (modal/panel expandido)
-    // ══════════════════════════════════════════════
-
     private function procesarPostGuardado(User $usuario, ?string $passwordTemporal, ?string $oldPhotoToDelete)
     {
-        // 1. Eliminar la foto antigua físicamente de forma segura
-        if ($oldPhotoToDelete) {
-            try {
-                \Storage::disk('public')->delete($oldPhotoToDelete);
-            } catch (\Exception $ex) {
-                Log::error('No se pudo eliminar la foto antigua del storage: '.$ex->getMessage());
-            }
-        }
-
+        $resultado = app(NotificarUsuarioGuardado::class)->ejecutar(auth()->user(), $usuario, $this->isEdit, $this->password, $passwordTemporal, $oldPhotoToDelete, $this->rol, $this->cod_area ?: null);
         if ($this->isEdit) {
-            // Notificación por correo de clave actualizada
-            $correoNotifEnviado = false;
-            $passwordModificada = ($usuario->cod_usuario === auth()->id() && ! empty($this->password));
-            if ($passwordModificada) {
-                try {
-                    \Mail::to($usuario->correo)->send(new UsuarioPasswordActualizadaMail($usuario, $this->password));
-                    $correoNotifEnviado = true;
-                } catch (\Exception $e) {
-                    Log::error("Error al enviar correo de actualización de clave a {$usuario->correo}: ".$e->getMessage());
-                }
-            }
-
-            if (function_exists('activity')) {
-                $actMsg = "Se actualizaron los datos del usuario: {$usuario->name}.";
-                if ($passwordModificada) {
-                    $actMsg .= $correoNotifEnviado ? ' Contraseña actualizada y notificada por correo.' : ' Contraseña actualizada, pero falló envío de notificación.';
-                }
-                activity('Usuarios')
-                    ->causedBy(auth()->user())
-                    ->performedOn($usuario)
-                    ->event('edicion')
-                    ->log($actMsg);
-            }
-
+            $passwordModificada = $resultado['passwordModificada'];
+            $correoNotifEnviado = $resultado['correoNotifEnviado'];
             $mensaje = 'Usuario actualizado correctamente.';
             if ($passwordModificada && ! $correoNotifEnviado) {
                 $mensaje .= " ADVERTENCIA: No se pudo enviar el correo de notificación. La nueva contraseña es: {$this->password}";
@@ -1891,41 +1722,6 @@ class UsuariosPanel extends Component
             $this->dispatch('swal', $swalData);
 
         } else {
-            // Enviar bienvenida
-            $bienvenidaEnviada = false;
-            try {
-                $rolDisplay = strtoupper(str_replace('_', ' ', $this->rol));
-                $areaDisplay = 'Sin área';
-                if ($this->cod_area) {
-                    $areaObj = Area::find($this->cod_area);
-                    if ($areaObj) {
-                        $areaDisplay = $areaObj->nombre;
-                    }
-                }
-                \Mail::to($usuario->correo)->send(new UsuarioBienvenidaMail($usuario, $rolDisplay, $areaDisplay));
-                $bienvenidaEnviada = true;
-            } catch (\Exception $e) {
-                Log::error("Error al enviar correo de bienvenida a {$usuario->correo}: ".$e->getMessage());
-            }
-
-            // Enviar credenciales
-            $credencialesEnviadas = false;
-            try {
-                \Mail::to($usuario->correo)->send(new UsuarioCredencialesInicialesMail($usuario, $passwordTemporal));
-                $credencialesEnviadas = true;
-            } catch (\Exception $e) {
-                Log::error("Error al enviar credenciales a {$usuario->correo}: ".$e->getMessage());
-            }
-
-            if (function_exists('activity')) {
-                $logMsg = "Se registró un nuevo usuario: {$usuario->name} con rol {$this->rol}. ".($credencialesEnviadas ? 'Correo de credenciales enviado con éxito.' : 'Error al enviar correo de credenciales.');
-                activity('Usuarios')
-                    ->causedBy(auth()->user())
-                    ->performedOn($usuario)
-                    ->event('registro')
-                    ->log($logMsg);
-            }
-
             $rolGuardado = $this->rol;
             $this->resetFormulario();
             $this->mostrarFormulario = false;
@@ -2088,17 +1884,7 @@ class UsuariosPanel extends Component
             }
         }
 
-        $nuevoEstado = $usuario->estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
-        $usuario->update(['estado' => $nuevoEstado]);
-
-        // Registrar en bitácora
-        if (function_exists('activity')) {
-            activity('Usuarios')
-                ->causedBy(auth()->user())
-                ->performedOn($usuario)
-                ->event($nuevoEstado === 'ACTIVO' ? 'activacion' : 'inactivacion')
-                ->log("Se cambió el estado de {$usuario->name} a {$nuevoEstado}.");
-        }
+        $nuevoEstado = app(GestionarUsuariosPanel::class)->toggleEstado(auth()->user(), $usuario);
 
         $this->dispatch('swal', [
             'icon' => 'success',
@@ -2132,32 +1918,9 @@ class UsuariosPanel extends Component
             return;
         }
 
-        $passwordTemporal = $this->generarPasswordTemporal();
-        $usuario->update([
-            'password' => $passwordTemporal,
-        ]);
-
-        $correoNotifEnviado = false;
-        try {
-            \Mail::to($usuario->correo)->send(new UsuarioPasswordActualizadaMail($usuario, $passwordTemporal));
-            $correoNotifEnviado = true;
-        } catch (\Exception $e) {
-            \Log::error("Error al enviar correo de restablecimiento a {$usuario->correo}: ".$e->getMessage());
-        }
-
-        if (function_exists('activity')) {
-            $actMsg = "Se restableció la contraseña del usuario: {$usuario->name}.";
-            if ($correoNotifEnviado) {
-                $actMsg .= ' Notificación enviada con éxito.';
-            } else {
-                $actMsg .= ' Error al enviar notificación por correo.';
-            }
-            activity('Usuarios')
-                ->causedBy(auth()->user())
-                ->performedOn($usuario)
-                ->event('restablecer_password')
-                ->log($actMsg);
-        }
+        $resultado = app(GestionarUsuariosPanel::class)->restablecerPasswordUsuario(auth()->user(), $usuario);
+        $passwordTemporal = $resultado['passwordTemporal'];
+        $correoNotifEnviado = $resultado['correoNotifEnviado'];
 
         if ($correoNotifEnviado) {
             $this->dispatch('swal', [
@@ -2342,46 +2105,7 @@ class UsuariosPanel extends Component
                 throw new \Exception('Usuario no encontrado.');
             }
 
-            $rol = $usuario->roles->first()?->name;
-            $documentos = app(DocumentosUsuarioService::class)->documentosRequeridosPorRol($rol);
-            $rolLegible = $this->obtenerNombreRolLegible($rol);
-            $fechaLimite = $usuario->created_at ? $usuario->created_at->addHours(48)->format('d/m/Y H:i') : now()->addHours(48)->format('d/m/Y H:i');
-            $fechaRegistro = $usuario->created_at ? $usuario->created_at->format('d/m/Y H:i') : now()->format('d/m/Y H:i');
-
-            // Generar PDF para adjuntarlo
-            $viewData = [
-                'usuario_reg' => $usuario,
-                'rol_legible' => $rolLegible,
-                'fecha_registro' => $fechaRegistro,
-                'fecha_limite' => $fechaLimite,
-                'documentos' => $documentos,
-                'fecha' => now()->format('d/m/Y H:i'),
-                'usuario' => auth()->check() ? auth()->user()->name : 'Sistema',
-            ];
-
-            $pdfContent = null;
-            try {
-                $pdfContent = Pdf::view('pdf.exports.usuarios.solicitud_documental_pdf', $viewData)->output();
-            } catch (\Throwable $e) {
-                Log::warning("Spatie PDF falló al generar adjunto en panel: {$e->getMessage()}. Usando DomPDF.");
-                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.exports.usuarios.solicitud_documental_pdf', $viewData)
-                    ->setPaper('a4', 'portrait')
-                    ->setWarnings(false);
-                $pdfContent = $pdf->output();
-            }
-
-            $filename = 'solicitud_documental_'.$usuario->cod_usuario.'.pdf';
-            $tempPath = 'temp/'.uniqid().'_'.$filename;
-            \Illuminate\Support\Facades\Storage::disk('public')->put($tempPath, $pdfContent);
-            $fullPath = storage_path('app/public/'.$tempPath);
-
-            \Illuminate\Support\Facades\Mail::to($usuario->correo)
-                ->send(new UsuarioRequisitosDocumentalesMail($usuario, $rolLegible, $documentos, $fechaLimite, $fullPath, $filename));
-
-            if (file_exists($fullPath)) {
-                unlink($fullPath);
-            }
-
+            app(EnviarRequisitosDocumentales::class)->ejecutar(auth()->user(), $usuario);
             $this->correoRequisitosEnviado = true;
             $this->mensajeCorreoRequisitos = 'Correo enviado correctamente al correo registrado.';
 
@@ -2602,5 +2326,12 @@ class UsuariosPanel extends Component
                 ->orderBy('nombres')
                 ->get(),
         ]);
+    }
+
+    public function getFotoUsuarioActualProperty(): ?string
+    {
+        $id = $this->cod_usuario ?? $this->usuarioId;
+
+        return $this->isEdit && $id ? User::find($id)?->foto_de_perfil : null;
     }
 }

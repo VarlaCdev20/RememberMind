@@ -4,6 +4,7 @@ namespace App\Modulos\Clinica\Presentacion\Livewire\Paginas;
 
 use App\Models\Residente;
 use App\Models\SignoVital;
+use App\Modulos\Clinica\Dominio\Reglas\ClasificacionSignosPanel;
 use App\Modulos\Clinica\Presentacion\Adaptadores\ClasificacionSignosVitalesService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -193,13 +194,7 @@ class SignosVitalesPanel extends Component
         ];
 
         // ── Distribución de PA (sistólica) ────────────────────────────────
-        $distPA = [
-            'Hipotensión (<90)' => $conSignos->filter(fn ($sv) => $sv->presion_sistolica > 0 && $sv->presion_sistolica < 90)->count(),
-            'Normal (90-139)' => $conSignos->filter(fn ($sv) => $sv->presion_sistolica >= 90 && $sv->presion_sistolica < 140)->count(),
-            'Pre-HTA (140-159)' => $conSignos->filter(fn ($sv) => $sv->presion_sistolica >= 140 && $sv->presion_sistolica < 160)->count(),
-            'HTA I (160-179)' => $conSignos->filter(fn ($sv) => $sv->presion_sistolica >= 160 && $sv->presion_sistolica < 180)->count(),
-            'HTA II (≥180)' => $conSignos->filter(fn ($sv) => $sv->presion_sistolica >= 180)->count(),
-        ];
+        $distPA = app(ClasificacionSignosPanel::class)->distribucionPresionSistolica($conSignos);
 
         $chartDistPA = [
             'labels' => array_keys($distPA),

@@ -2,9 +2,9 @@
 
 namespace App\Modulos\Cuidados\Presentacion\Livewire\Paginas;
 
-use App\Models\AsignacionResidenteJornada;
 use App\Models\PlanCuidado;
 use App\Models\Residente;
+use App\Modulos\Cuidados\Aplicacion\Acciones\GestionarPlanesCuidado;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Url;
@@ -70,79 +70,17 @@ class PlanCuidadoPanel extends Component
 
     public function guardar(): void
     {
-        abort_unless(auth()->user()?->can($this->editandoId ? 'planes_cuidado.editar' : 'planes_cuidado.crear'), 403);
-        if ($this->editandoId) {
-            abort_unless(PlanCuidado::findOrFail($this->editandoId)->estado === 'BORRADOR', 409);
-        }
-        $this->validate([
-            'codResidente' => 'required|exists:residentes,cod_residente',
-            'tipoPlan' => 'required|in:INICIAL,AJUSTE,REEVALUACION',
-            'nivelCuidado' => 'required|in:PREVENTIVO,ESTANDAR,INTENSIVO,PALIATIVO',
-            'estadoPlan' => 'required|in:BORRADOR,ACTIVO',
-            'fechaInicio' => 'required|date',
-            'fechaFin' => 'nullable|date|after_or_equal:fechaInicio',
-            'resumen' => 'required|string|min:5|max:10000',
-        ], [
-            'codResidente.required' => 'Seleccione un adulto mayor.',
-            'tipoPlan.required' => 'Seleccione el tipo de plan.',
-            'nivelCuidado.required' => 'Seleccione el nivel de cuidado.',
-            'fechaInicio.required' => 'La fecha de inicio es obligatoria.',
+        $msg = app(GestionarPlanesCuidado::class)->guardar(auth()->user(), [
+            'editandoId' => $this->editandoId,
+            'codResidente' => $this->codResidente,
+            'estadoPlan' => $this->estadoPlan,
+            'tipoPlan' => $this->tipoPlan,
+            'resumen' => $this->resumen,
+            'nivelCuidado' => $this->nivelCuidado,
+            'fechaInicio' => $this->fechaInicio,
+            'fechaFin' => $this->fechaFin,
+            'origen' => $this->origen,
         ]);
-        app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria(
-            $this->codResidente, $this->editandoId ? 'planes_cuidado.editar' : 'planes_cuidado.crear', Auth::user()
-        );
-
-        // Validar que no exista plan ACTIVO
-        if ($this->estadoPlan === 'ACTIVO') {
-            $activoExistente = PlanCuidado::where('cod_residente', $this->codResidente)
-                ->where('estado', 'ACTIVO')->when($this->editandoId, fn ($q) => $q->where('cod_plan', '!=', $this->editandoId))->exists();
-            if ($activoExistente) {
-                $this->addError('estadoPlan', 'Este adulto mayor ya tiene un plan de cuidado ACTIVO. Ciérrelo antes de crear uno nuevo.');
-
-                return;
-            }
-        }
-
-        // Validar que haya asignación activa para ACTIVO
-        if ($this->estadoPlan === 'ACTIVO') {
-            $asignado = AsignacionResidenteJornada::where('cod_residente', $this->codResidente)
-                ->whereIn('estado', ['ACTIVO', 'ACTIVA'])->exists();
-            if (! $asignado) {
-                $this->addError('codResidente', 'El adulto mayor debe tener una asignación de turno activa antes de activar el plan.');
-
-                return;
-            }
-        }
-
-        $personal = Auth::user()?->personal;
-        $codArea = $personal?->asignaciones()->whereIn('estado', ['ACTIVA', 'ACTIVO'])->latest('fecha_asignacion')->value('cod_area');
-        if (! $personal || ! $codArea) {
-            $this->addError('codResidente', 'El usuario debe tener personal y área institucional asignados.');
-
-            return;
-        }
-
-        $datos = [
-            'cod_residente' => $this->codResidente,
-            'cod_area' => $codArea,
-            'cod_personal' => $personal->cod_personal,
-            'tipo_plan' => $this->tipoPlan,
-            'nombre' => 'Plan de cuidados '.mb_strtolower($this->tipoPlan),
-            'objetivo_general' => $this->resumen,
-            'prioridad' => $this->nivelCuidado,
-            'fecha_hora_apertura' => $this->fechaInicio.' 00:00:00',
-            'fecha_hora_cierre' => $this->fechaFin ? $this->fechaFin.' 23:59:59' : null,
-            'estado' => $this->estadoPlan,
-            'observacion' => $this->origen,
-        ];
-
-        if ($this->editandoId) {
-            PlanCuidado::findOrFail($this->editandoId)->update($datos);
-            $msg = 'Plan de cuidado actualizado.';
-        } else {
-            PlanCuidado::create($datos);
-            $msg = 'Plan de cuidado creado.';
-        }
 
         $this->modalForm = false;
         $this->dispatch('swal', ['icon' => 'success', 'title' => $msg]);
@@ -165,14 +103,10 @@ class PlanCuidadoPanel extends Component
 
     public function cerrarPlan(string $id): void
     {
-        abort_unless(auth()->user()?->can('planes_cuidado.cerrar'), 403);
-        $plan = PlanCuidado::findOrFail($id);
-        app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria($plan->cod_residente, 'planes_cuidado.cerrar', Auth::user());
-        abort_unless($plan->estado === 'ACTIVO', 409, 'Solo puede cerrar un plan activo.');
-        $plan->update([
-            'estado' => 'CERRADO',
-            'fecha_hora_cierre' => now(),
-        ]);
+        app(GestionarPlanesCuidado::class)->cerrarPlan(auth()->user(), [
+
+        ], $id);
+
         $this->dispatch('swal', ['icon' => 'success', 'title' => 'Plan de cuidado cerrado.']);
     }
 

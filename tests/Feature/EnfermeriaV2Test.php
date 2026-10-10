@@ -8,13 +8,13 @@ use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\Turno;
 use App\Models\User;
-use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\AsignacionTurnoPanel;
-use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\TurnosEnfermeriaPanel;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
+use App\Modulos\Institucion\Presentacion\Livewire\Paginas\AsignacionTurnoPanel;
+use App\Modulos\Institucion\Presentacion\Livewire\Paginas\TurnosEnfermeriaPanel;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Livewire\Livewire;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 
 class EnfermeriaV2Test extends TestCase

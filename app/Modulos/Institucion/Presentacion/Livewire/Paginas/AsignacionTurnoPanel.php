@@ -1,17 +1,12 @@
 <?php
 
-namespace App\Modulos\Cuidados\Presentacion\Livewire\Paginas;
+namespace App\Modulos\Institucion\Presentacion\Livewire\Paginas;
 
 use App\Models\AsignacionResidenteJornada;
-use App\Models\Jornada;
-use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\Turno;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
+use App\Modulos\Institucion\Aplicacion\Acciones\GestionarAsignacionesJornada;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -75,43 +70,14 @@ class AsignacionTurnoPanel extends Component
 
     public function guardar(): void
     {
-        abort_unless(auth()->user()?->can('turnos.asignar'), 403);
-        $this->validate([
-            'codResidente' => 'required|exists:residentes,cod_residente',
-            'codTurno' => ['required', Rule::exists('turnos', 'cod_turno')->where('estado', 'ACTIVO')],
-            'codEnfermero' => ['required', Rule::exists('usuarios', 'cod_usuario')->where('estado', 'ACTIVO')],
-            'fechaInicio' => 'required|date|before_or_equal:today',
-            'nivelSupervision' => 'required|in:MINIMO,ESTANDAR,INTENSIVO,CRITICO',
-            'motivoAsignacion' => 'required|string|min:5|max:1000',
+        app(GestionarAsignacionesJornada::class)->guardar(auth()->user(), [
+            'codEnfermero' => $this->codEnfermero,
+            'codTurno' => $this->codTurno,
+            'fechaInicio' => $this->fechaInicio,
+            'codResidente' => $this->codResidente,
+            'nivelSupervision' => $this->nivelSupervision,
+            'motivoAsignacion' => $this->motivoAsignacion,
         ]);
-
-        DB::transaction(function (): void {
-            $personal = Personal::query()->where('cod_usuario', $this->codEnfermero)->firstOrFail();
-            $jornada = Jornada::query()->firstOrCreate(
-                ['cod_turno' => $this->codTurno, 'fecha_jornada' => $this->fechaInicio],
-                ['cod_jornada' => 'JOR_'.Str::upper(Str::random(12)), 'estado' => 'ABIERTA']
-            );
-
-            if (AsignacionResidenteJornada::query()
-                ->where('cod_residente', $this->codResidente)
-                ->where('cod_jornada', $jornada->cod_jornada)
-                ->where('estado', 'ACTIVA')->exists()) {
-                throw ValidationException::withMessages([
-                    'codTurno' => 'Este residente ya tiene una asignación activa en esta jornada.',
-                ]);
-            }
-
-            AsignacionResidenteJornada::query()->create([
-                'cod_asignacion' => 'ARJ_'.Str::upper(Str::random(12)),
-                'cod_residente' => $this->codResidente,
-                'cod_jornada' => $jornada->cod_jornada,
-                'cod_personal' => $personal->cod_personal,
-                'nivel_supervision' => $this->nivelSupervision,
-                'fecha_hora' => now(),
-                'estado' => 'ACTIVA',
-                'observacion' => trim($this->motivoAsignacion),
-            ]);
-        });
 
         $this->modalForm = false;
         session()->flash('mensaje', 'Asignación de jornada registrada. La cama de admisión se mantiene sin cambios.');
@@ -119,8 +85,10 @@ class AsignacionTurnoPanel extends Component
 
     public function finalizarAsignacion(string $id): void
     {
-        abort_unless(auth()->user()?->can('turnos.finalizar'), 403);
-        AsignacionResidenteJornada::query()->findOrFail($id)->update(['estado' => 'FINALIZADA']);
+        app(GestionarAsignacionesJornada::class)->finalizarAsignacion(auth()->user(), [
+
+        ], $id);
+
         $this->dispatch('swal', ['icon' => 'success', 'title' => 'Asignación finalizada.']);
     }
 

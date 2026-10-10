@@ -2,17 +2,12 @@
 
 namespace App\Modulos\Medicacion\Presentacion\Livewire\Funcionalidades;
 
-use App\Models\Atencion;
-use App\Models\HorarioPrescripcion;
-use App\Models\Medicamento;
 use App\Models\Prescripcion;
 use App\Models\Residente;
 use App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService;
+use App\Modulos\Medicacion\Aplicacion\Acciones\GestionarPrescripciones;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
 class MedicacionAdultoModal extends Component
@@ -139,82 +134,23 @@ class MedicacionAdultoModal extends Component
     {
         $this->autorizarGestionOrden($this->isEditing ? 'prescripciones.editar' : 'prescripciones.crear');
         $this->validate();
-        $personal = auth()->user()?->personal()->where('estado', 'ACTIVO')->first();
-        if (! $personal) {
-            throw ValidationException::withMessages(['medico_indica' => 'El usuario médico no tiene un registro de personal activo.']);
-        }
-        [$cantidad, $unidad] = $this->separarDosis($this->dosis);
-
-        DB::transaction(function () use ($personal, $cantidad, $unidad): void {
-            $medicamento = Medicamento::query()->firstOrCreate(
-                ['nombre_generico' => Str::upper(trim($this->nombre_medicamento))],
-                [
-                    'cod_medicamento' => $this->codigo('MED'),
-                    'via_predeterminada' => Str::upper($this->via_administracion),
-                    'control_especial' => false,
-                    'estado' => 'ACTIVO',
-                ],
-            );
-            $observacion = trim($this->observacion);
-            if (filled($this->fecha_fin)) {
-                $observacion = trim($observacion."\nFecha de finalización prevista: {$this->fecha_fin}");
-            }
-            if ($this->es_prn && $this->intervalo_horas) {
-                $observacion = trim($observacion."\nIntervalo PRN indicado: {$this->intervalo_horas} horas.");
-            }
-
-            if ($this->isEditing) {
-                $prescripcion = Prescripcion::query()->where('cod_residente', $this->cod_residente)
-                    ->findOrFail($this->cod_prescripcion);
-            } else {
-                $atencion = Atencion::query()->where('cod_residente', $this->cod_residente)
-                    ->where('cod_personal', $personal->cod_personal)
-                    ->whereNotIn('estado', ['ANULADA', 'CANCELADA'])
-                    ->latest('fecha_hora')->first();
-                if (! $atencion) {
-                    throw ValidationException::withMessages([
-                        'cod_residente' => 'Registre primero una atención médica; la prescripción V2 debe pertenecer a una atención.',
-                    ]);
-                }
-                $prescripcion = new Prescripcion([
-                    'cod_prescripcion' => $this->codigo('PRE'),
-                    'cod_residente' => $this->cod_residente,
-                    'cod_atencion' => $atencion->cod_atencion,
-                    'cod_personal' => $personal->cod_personal,
-                ]);
-            }
-
-            $prescripcion->fill([
-                'cod_medicamento' => $medicamento->cod_medicamento,
-                'dosis' => $cantidad,
-                'unidad_dosis' => $unidad,
-                'via_administracion' => Str::upper(trim($this->via_administracion)),
-                'frecuencia' => trim($this->frecuencia),
-                'indicacion' => $this->es_prn ? trim($this->condicion_prn) : null,
-                'segun_necesidad' => $this->es_prn,
-                'fecha_hora_prescripcion' => Carbon::parse($this->fecha_inicio.' '.now()->format('H:i:s')),
-                'estado' => $this->estadoV2($this->estado),
-                'observacion' => $observacion !== '' ? $observacion : null,
-            ])->save();
-
-            $horario = $prescripcion->horarios()->first();
-            if ($this->es_prn) {
-                $horario?->update(['estado' => 'INACTIVO']);
-            } else {
-                $datosHorario = [
-                    'hora_programada' => $this->hora_programada,
-                    'dosis_programada' => $cantidad,
-                    'estado' => 'ACTIVO',
-                ];
-                $horario
-                    ? $horario->update($datosHorario)
-                    : HorarioPrescripcion::query()->create([
-                        'cod_horario_prescripcion' => $this->codigo('HPR'),
-                        'cod_prescripcion' => $prescripcion->cod_prescripcion,
-                        ...$datosHorario,
-                    ]);
-            }
-        });
+        app(GestionarPrescripciones::class)->guardarDesdeModal(auth()->user(), [
+            'dosis' => $this->dosis,
+            'nombre_medicamento' => $this->nombre_medicamento,
+            'via_administracion' => $this->via_administracion,
+            'observacion' => $this->observacion,
+            'fecha_fin' => $this->fecha_fin,
+            'es_prn' => $this->es_prn,
+            'intervalo_horas' => $this->intervalo_horas,
+            'isEditing' => $this->isEditing,
+            'cod_residente' => $this->cod_residente,
+            'cod_prescripcion' => $this->cod_prescripcion,
+            'frecuencia' => $this->frecuencia,
+            'condicion_prn' => $this->condicion_prn,
+            'fecha_inicio' => $this->fecha_inicio,
+            'estado' => $this->estado,
+            'hora_programada' => $this->hora_programada,
+        ]);
 
         $mensaje = $this->isEditing ? 'Medicación actualizada correctamente.' : 'Medicación registrada correctamente.';
         $this->cerrarModal();
@@ -225,9 +161,7 @@ class MedicacionAdultoModal extends Component
     public function cambiarEstado($id, $estado): void
     {
         $this->autorizarGestionOrden('prescripciones.editar');
-        validator(['estado' => $estado], ['estado' => ['required', Rule::in(['ACTIVO', 'ACTIVA', 'SUSPENDIDO', 'SUSPENDIDA', 'FINALIZADO', 'FINALIZADA'])]])->validate();
-        Prescripcion::query()->where('cod_residente', $this->cod_residente)->findOrFail($id)
-            ->update(['estado' => $this->estadoV2($estado)]);
+        app(GestionarPrescripciones::class)->cambiarEstadoModal(auth()->user(), $this->cod_residente, $id, $estado);
         $this->dispatch('swal', ['icon' => 'success', 'title' => 'Éxito', 'text' => "Estado cambiado a {$estado}."]);
     }
 
@@ -244,29 +178,5 @@ class MedicacionAdultoModal extends Component
         abort_unless(app(AccesoClinicoTemporalService::class)
             ->tieneRol(auth()->user(), ['MEDICO GENERAL/GERIATRA']) && auth()->user()?->can($permiso), 403,
             'Las órdenes médicas solo pueden ser creadas o modificadas por personal médico autorizado.');
-    }
-
-    private function separarDosis(string $texto): array
-    {
-        preg_match('/(\d+(?:[.,]\d+)?)/', $texto, $coincidencia);
-        $cantidad = isset($coincidencia[1]) ? (float) str_replace(',', '.', $coincidencia[1]) : 1;
-        $unidad = trim(preg_replace('/^\s*'.preg_quote($coincidencia[1] ?? '', '/').'\s*/', '', $texto));
-
-        return [$cantidad, Str::limit($unidad !== '' ? $unidad : 'DOSIS', 30, '')];
-    }
-
-    private function estadoV2(string $estado): string
-    {
-        return match ($estado) {
-            'ACTIVO' => 'ACTIVA',
-            'SUSPENDIDO' => 'SUSPENDIDA',
-            'FINALIZADO' => 'FINALIZADA',
-            default => $estado,
-        };
-    }
-
-    private function codigo(string $prefijo): string
-    {
-        return $prefijo.'_'.Str::upper(Str::random(12));
     }
 }

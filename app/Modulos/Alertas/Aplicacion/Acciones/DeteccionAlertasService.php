@@ -2,12 +2,12 @@
 
 namespace App\Modulos\Alertas\Aplicacion\Acciones;
 
-use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Models\AdministracionMedicacion;
 use App\Models\Alerta;
 use App\Models\Atencion;
 use App\Models\EjecucionCuidado;
 use App\Models\Residente;
+use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

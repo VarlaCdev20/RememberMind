@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Modulos\Clinica\Presentacion\Http\Validacion\ValidacionSignosVitalesService;
 use App\Models\Preadmision;
 use App\Models\Residente;
 use App\Models\User;
+use App\Modulos\Clinica\Aplicacion\Validacion\ValidacionSignosVitalesService;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;

@@ -38,7 +38,6 @@ use App\Modulos\Clinica\Presentacion\Livewire\Paginas\SaludSeguimientoListPanel;
 use App\Modulos\Clinica\Presentacion\Livewire\Paginas\SaludSignosPanel;
 use App\Modulos\Clinica\Presentacion\Livewire\Paginas\SignosVitalesPanel;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\AgendaEnfermeria;
-use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\AsignacionTurnoPanel;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\DashboardTurno;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\MisPacientes;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PaseTurnoPanel;
@@ -46,16 +45,17 @@ use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PlanCuidadoPanel;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\RegistrosEnfermeria;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\SeguimientoDiarioPanel;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\TareasPlanPanel;
-use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\TurnosEnfermeriaPanel;
 use App\Modulos\Identidad\Presentacion\Livewire\Funcionalidades\PersonalInstitucionalForm;
-use App\Modulos\Identidad\Presentacion\Livewire\Paginas\AreasInstitucionalesPanel;
 use App\Modulos\Identidad\Presentacion\Livewire\Paginas\PersonalInstitucionalPanel;
 use App\Modulos\Identidad\Presentacion\Livewire\Paginas\RolesPermisosPanel;
 use App\Modulos\Identidad\Presentacion\Livewire\Paginas\UsuarioFichaPanel;
 use App\Modulos\Identidad\Presentacion\Livewire\Paginas\UsuariosPanel;
 use App\Modulos\Institucion\Presentacion\Livewire\Funcionalidades\PersonalInstitucionalHorarios;
+use App\Modulos\Institucion\Presentacion\Livewire\Paginas\AreasInstitucionalesPanel;
+use App\Modulos\Institucion\Presentacion\Livewire\Paginas\AsignacionTurnoPanel;
 use App\Modulos\Institucion\Presentacion\Livewire\Paginas\HabitacionesPanel;
 use App\Modulos\Institucion\Presentacion\Livewire\Paginas\TurnosAsignacionesPanel;
+use App\Modulos\Institucion\Presentacion\Livewire\Paginas\TurnosEnfermeriaPanel;
 use App\Modulos\Institucion\Presentacion\Policies\CamaPolicy;
 use App\Modulos\Institucion\Presentacion\Policies\HabitacionPolicy;
 use App\Modulos\Medicacion\Presentacion\Livewire\Funcionalidades\AdministracionMedicacionModal;
@@ -93,16 +93,15 @@ use App\Modulos\Valoraciones\Presentacion\Policies\ValoracionEnfermeriaPreadmisi
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
-use MotorExperto\aplicacion\puertos\EvaluadorExperto;
 use MotorExperto\aplicacion\casos_uso\MotorExperto;
+use MotorExperto\aplicacion\puertos\EvaluadorExperto;
 
 final class ArquitecturaModularServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
         $this->app->bind(EvaluadorExperto::class, MotorExperto::class);
-        $this->callAfterResolving('view', function ($view): void {
-            $previous = $view->getFinder();
+        $this->app->extend('view.finder', function ($previous) {
             $finder = new VistaModularFinder(
                 $this->app['files'], $previous->getPaths(),
                 $this->app['config']->get('vistas_modulares', []), $this->app->basePath(),
@@ -110,7 +109,8 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
             foreach ($previous->getHints() as $namespace => $paths) {
                 $finder->addNamespace($namespace, $paths);
             }
-            $view->setFinder($finder);
+
+            return $finder;
         });
     }
 

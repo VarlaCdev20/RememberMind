@@ -2,12 +2,12 @@
 
 namespace App\Modulos\Clinica\Aplicacion\Acciones;
 
-use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Models\Area;
 use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\User;
 use App\Modulos\Clinica\Aplicacion\Consultas\ContextoClinicoService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use LogicException;
 
 class AutorizacionClinicaService

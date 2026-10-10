@@ -3,6 +3,7 @@
 namespace App\Modulos\Social\Presentacion\Livewire\Paginas;
 
 use App\Models\Actividad;
+use App\Modulos\Social\Aplicacion\Acciones\ActualizarTipoActividad;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -105,10 +106,7 @@ class TiposActividadPanel extends Component
     public function actualizarTipo(): void
     {
         $this->validate();
-        if ($this->editandoId) {
-            Actividad::where('tipo', strtoupper(trim($this->editandoId)))
-                ->update(['tipo' => strtoupper(trim($this->tipo))]);
-        }
+        app(ActualizarTipoActividad::class)->ejecutar($this->editandoId, $this->tipo);
         $this->modalEditar = false;
         $this->resetForm();
         $this->dispatch('swal', ['icon' => 'success', 'title' => 'Tipo de actividad actualizado correctamente.']);

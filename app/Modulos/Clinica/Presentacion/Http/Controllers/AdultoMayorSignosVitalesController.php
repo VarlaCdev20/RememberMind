@@ -5,10 +5,9 @@ namespace App\Modulos\Clinica\Presentacion\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Residente;
 use App\Models\SignoVital;
+use App\Modulos\Clinica\Aplicacion\Acciones\AnularSignosVitales;
 use App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService;
 use App\Modulos\Clinica\Presentacion\Http\Requests\StoreSignosVitalesRequest;
-use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
@@ -19,20 +18,14 @@ class AdultoMayorSignosVitalesController extends Controller
         try {
             app(SignosVitalesService::class)->registrar($adulto_mayor->cod_residente, $request->validated(), auth()->user());
 
-            return redirect()
-                ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'signos-vitales'])
-                ->with('success', 'Signos vitales registrados correctamente.');
-
+            return redirect()->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'signos-vitales'])->with('success', 'Signos vitales registrados correctamente.');
         } catch (\Throwable $e) {
-            if ($e instanceof ValidationException
-                || $e instanceof HttpExceptionInterface) {
+            if ($e instanceof ValidationException || $e instanceof HttpExceptionInterface) {
                 throw $e;
             }
             report($e);
 
-            return redirect()->back()
-                ->with('error', 'No se pudieron registrar los signos vitales. Inténtelo nuevamente.')
-                ->withInput();
+            return redirect()->back()->with('error', 'No se pudieron registrar los signos vitales. Inténtelo nuevamente.')->withInput();
         }
     }
 
@@ -40,50 +33,23 @@ class AdultoMayorSignosVitalesController extends Controller
     {
         abort_unless($signo->cod_residente === $adulto_mayor->cod_residente, 404);
         try {
-            app(SignosVitalesService::class)->rectificar(
-                $signo,
-                $request->validated(),
-                $request->input('motivo_rectificacion', 'Rectificación solicitada desde expediente clínico'),
-                auth()->user()
-            );
+            app(SignosVitalesService::class)->rectificar($signo, $request->validated(), $request->input('motivo_rectificacion', 'Rectificación solicitada desde expediente clínico'), auth()->user());
 
-            return redirect()
-                ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'signos-vitales'])
-                ->with('success', 'Signos vitales rectificados correctamente.');
-
+            return redirect()->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'signos-vitales'])->with('success', 'Signos vitales rectificados correctamente.');
         } catch (\Throwable $e) {
-            if ($e instanceof ValidationException
-                || $e instanceof HttpExceptionInterface) {
+            if ($e instanceof ValidationException || $e instanceof HttpExceptionInterface) {
                 throw $e;
             }
             report($e);
 
-            return redirect()->back()
-                ->with('error', 'No se pudieron rectificar los signos vitales. Inténtelo nuevamente.')
-                ->withInput();
+            return redirect()->back()->with('error', 'No se pudieron rectificar los signos vitales. Inténtelo nuevamente.')->withInput();
         }
     }
 
     public function anular(Residente $adulto_mayor, SignoVital $signo)
     {
-        abort_unless($signo->cod_residente === $adulto_mayor->cod_residente, 404);
-        app(TurnoEnfermeriaService::class)
-            ->autorizarMutacionPaciente($adulto_mayor, 'signos_vitales.anular', auth()->user());
+        app(AnularSignosVitales::class)->anular(auth()->user(), [], $adulto_mayor, $signo);
 
-        DB::transaction(function () use ($signo, $adulto_mayor) {
-            $signo = SignoVital::query()->lockForUpdate()->findOrFail($signo->getKey());
-            abort_unless(in_array($signo->estado, ['ACTIVO', 'VIGENTE'], true), 409);
-            $signo->update(['estado' => 'ANULADO']);
-
-            activity('Signos Vitales')
-                ->causedBy(auth()->user())
-                ->performedOn($signo)
-                ->event('anulado')
-                ->log("Se anuló el registro de signos vitales {$signo->cod_signo} del residente {$adulto_mayor->cod_residente}.");
-        });
-
-        return redirect()
-            ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'signos-vitales'])
-            ->with('success', 'Signos vitales anulados correctamente.');
+        return redirect()->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'signos-vitales'])->with('success', 'Signos vitales anulados correctamente.');
     }
 }

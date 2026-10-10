@@ -2,12 +2,10 @@
 
 namespace App\Modulos\Valoraciones\Presentacion\Livewire\Funcionalidades;
 
-use App\Models\AplicacionInstrumento;
 use App\Models\Area;
 use App\Models\Instrumento;
 use App\Models\Residente;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use App\Modulos\Valoraciones\Aplicacion\Acciones\RegistrarEvaluacionGeriatricaArea;
 use Livewire\Component;
 
 class EvaluacionGeriatricaAreaModal extends Component
@@ -141,25 +139,16 @@ class EvaluacionGeriatricaAreaModal extends Component
         $this->validate();
 
         try {
-            DB::transaction(function () {
-                $personal = auth()->user()?->personal;
-                abort_unless($personal, 422, 'El usuario debe tener un registro de personal asociado.');
-                $instrumento = Instrumento::query()->findOrFail($this->cod_instrumento);
-
-                AplicacionInstrumento::create([
-                    'cod_aplicacion' => 'APL_'.Str::upper(Str::random(10)),
-                    'cod_residente' => $this->cod_residente,
-                    'cod_instrumento' => $instrumento->cod_instrumento,
-                    'cod_personal' => $personal->cod_personal,
-                    'fecha_hora' => $this->fecha_eval.' '.($this->hora_eval ?: now()->format('H:i')),
-                    'puntaje_total' => $this->puntaje_total,
-                    'puntaje_maximo' => $instrumento->puntaje_maximo,
-                    'clasificacion' => $this->categoria_resultado ?: $this->nivel_alerta,
-                    'interpretacion' => $this->nivel_riesgo,
-                    'observacion' => $this->observaciones,
-                    'estado' => 'COMPLETA',
-                ]);
-            });
+            app(RegistrarEvaluacionGeriatricaArea::class)->ejecutar(auth()->user(), [
+                'cod_instrumento' => $this->cod_instrumento,
+                'cod_residente' => $this->cod_residente,
+                'fecha_eval' => $this->fecha_eval,
+                'hora_eval' => $this->hora_eval,
+                'puntaje_total' => $this->puntaje_total,
+                'categoria_resultado' => $this->categoria_resultado,
+                'nivel_alerta' => $this->nivel_alerta,
+                'nivel_riesgo' => $this->nivel_riesgo,
+                'observaciones' => $this->observaciones,            ]);
 
             $this->cerrar();
             $this->dispatch('evaluacion-geriatrica-guardada');

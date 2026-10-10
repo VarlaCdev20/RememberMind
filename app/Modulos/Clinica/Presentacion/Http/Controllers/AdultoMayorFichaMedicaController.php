@@ -5,6 +5,7 @@ namespace App\Modulos\Clinica\Presentacion\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Residente;
 use App\Modulos\Clinica\Aplicacion\Acciones\FichaMedicaService;
+use App\Modulos\Clinica\Aplicacion\Acciones\RegistrarEventoFichaMedica;
 use App\Modulos\Clinica\Presentacion\Http\Requests\StoreFichaMedicaRequest;
 use App\Modulos\Clinica\Presentacion\Http\Requests\UpdateFichaMedicaRequest;
 
@@ -46,11 +47,7 @@ class AdultoMayorFichaMedicaController extends Controller
 
     public function archivar(Residente $adulto_mayor, $ficha = null)
     {
-        activity('Ficha Médica')
-            ->causedBy(auth()->user())
-            ->performedOn($adulto_mayor)
-            ->event('archived')
-            ->log("Se archivó la ficha médica del residente {$adulto_mayor->cod_residente}.");
+        app(RegistrarEventoFichaMedica::class)->archivar(auth()->user(), $adulto_mayor);
 
         return redirect()
             ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'ficha-medica'])
@@ -59,11 +56,7 @@ class AdultoMayorFichaMedicaController extends Controller
 
     public function restore(Residente $adulto_mayor, $ficha = null)
     {
-        activity('Ficha Médica')
-            ->causedBy(auth()->user())
-            ->performedOn($adulto_mayor)
-            ->event('restored')
-            ->log("Se restauró la ficha médica del residente {$adulto_mayor->cod_residente}.");
+        app(RegistrarEventoFichaMedica::class)->restore(auth()->user(), $adulto_mayor);
 
         return redirect()
             ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'ficha-medica'])

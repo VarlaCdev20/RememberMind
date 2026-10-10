@@ -2,14 +2,14 @@
 
 namespace App\Modulos\Clinica\Aplicacion\Acciones;
 
-use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Personal;
 use App\Models\SignoVital;
 use App\Models\User;
 use App\Modulos\Alertas\Aplicacion\Acciones\ServicioDecisionAlertaClinica;
 use App\Modulos\Clinica\Aplicacion\DTOs\RegistroSignosVitales;
-use App\Modulos\Clinica\Presentacion\Http\Validacion\ValidacionSignosVitalesService;
+use App\Modulos\Clinica\Aplicacion\Validacion\ValidacionSignosVitalesService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;

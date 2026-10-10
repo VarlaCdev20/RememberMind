@@ -2,12 +2,8 @@
 
 namespace App\Modulos\Valoraciones\Presentacion\Livewire\Funcionalidades;
 
-use App\Models\AplicacionInstrumento;
-use App\Models\Atencion;
 use App\Models\Instrumento;
-use App\Models\Personal;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use App\Modulos\Valoraciones\Aplicacion\Acciones\RegistrarEvaluacionGeriatrica;
 use Livewire\Component;
 
 class EvaluacionGeriatricaModal extends Component
@@ -152,38 +148,16 @@ class EvaluacionGeriatricaModal extends Component
         $this->validate();
 
         try {
-            DB::transaction(function () {
-                $personal = Personal::query()
-                    ->where('cod_usuario', auth()->user()->cod_usuario)
-                    ->where('estado', 'ACTIVO')
-                    ->firstOrFail();
-
-                $atencion = Atencion::query()
-                    ->where('cod_residente', $this->cod_residente)
-                    ->where('cod_personal', $personal->cod_personal)
-                    ->latest('fecha_hora')
-                    ->first();
-
-                $instrumento = Instrumento::findOrFail($this->cod_instrumento);
-                $interpretacion = collect([$this->categoria_resultado, $this->nivel_riesgo])
-                    ->filter()
-                    ->implode(' · ');
-
-                AplicacionInstrumento::create([
-                    'cod_aplicacion' => 'API_'.Str::upper(Str::random(12)),
-                    'cod_instrumento' => $this->cod_instrumento,
-                    'cod_residente' => $this->cod_residente,
-                    'cod_personal' => $personal->cod_personal,
-                    'cod_atencion' => $atencion?->cod_atencion,
-                    'fecha_hora' => $this->fecha_eval.' '.($this->hora_eval ?: '00:00'),
-                    'puntaje_total' => $this->puntaje_total,
-                    'puntaje_maximo' => $instrumento->puntaje_maximo,
-                    'clasificacion' => $this->nivel_alerta,
-                    'interpretacion' => $interpretacion ?: null,
-                    'estado' => 'ACTIVA',
-                    'observacion' => $this->observaciones,
-                ]);
-            });
+            app(RegistrarEvaluacionGeriatrica::class)->ejecutar(auth()->user(), [
+                'cod_residente' => $this->cod_residente,
+                'cod_instrumento' => $this->cod_instrumento,
+                'categoria_resultado' => $this->categoria_resultado,
+                'nivel_riesgo' => $this->nivel_riesgo,
+                'fecha_eval' => $this->fecha_eval,
+                'hora_eval' => $this->hora_eval,
+                'puntaje_total' => $this->puntaje_total,
+                'nivel_alerta' => $this->nivel_alerta,
+                'observaciones' => $this->observaciones,            ]);
 
             $this->cerrar();
             $this->dispatch('evaluacion-geriatrica-guardada');

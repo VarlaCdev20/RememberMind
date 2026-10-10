@@ -7,13 +7,15 @@ use App\Modulos\Clinica\Dominio\ObjetosValor\ResultadoReglaClinica;
 
 final class ReglaFrecuenciaCardiaca extends ReglaBase
 {
+    public function __construct(private readonly array $parametros) {}
+
     public function evaluar(array $mediciones): ?ResultadoReglaClinica
     {
         $valor = $mediciones['frecuencia_cardiaca'] ?? null;
         if ($valor === null) {
             return null;
         }
-        $c = config('signos_vitales.pulso');
+        $c = $this->parametros;
         $nivel = match (true) {
             $valor <= $c['critico_bajo'], $valor > $c['alto_alta'] => Nivel::CRITICO,
             $valor > $c['advertencia_alta'] => Nivel::ALTO,

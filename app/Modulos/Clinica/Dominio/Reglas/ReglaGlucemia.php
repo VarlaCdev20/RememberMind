@@ -8,13 +8,15 @@ use App\Modulos\Clinica\Dominio\ObjetosValor\ResultadoReglaClinica;
 
 final class ReglaGlucemia extends ReglaBase
 {
+    public function __construct(private readonly array $parametros) {}
+
     public function evaluar(array $mediciones): ?ResultadoReglaClinica
     {
         $valor = $mediciones['glucemia'] ?? null;
         if ($valor === null) {
             return null;
         }
-        $c = config('signos_vitales.glucemia');
+        $c = $this->parametros;
         if ($valor < $c['critico_bajo']) {
             return $this->resultado('glucemia', (string) $valor, 'mg/dL', Nivel::CRITICO, 'GLUCEMIA_BAJA_CRITICA',
                 'Umbral bajo de seguridad', '<'.$c['critico_bajo'].' mg/dL',

@@ -2,8 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Modulos\Institucion\Aplicacion\Consultas\ExploradorAdministrativoService;
-use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use App\Models\Actividad;
 use App\Models\Alerta;
 use App\Models\Area;
@@ -22,6 +20,8 @@ use App\Models\SeguroResidente;
 use App\Models\Turno;
 use App\Models\User;
 use App\Models\Visita;
+use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
+use App\Modulos\Institucion\Aplicacion\Consultas\ExploradorAdministrativoService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
@@ -216,7 +216,17 @@ class ExploradorAdministrativoTest extends TestCase
     {
         $tipos = ['jornadas' => 'horarios', 'asignaciones' => 'mosaico', 'contactos' => 'anillo', 'documentacion' => 'barras', 'consentimientos' => 'anillo', 'seguros' => 'anillo', 'actividades' => 'comparacion', 'visitas' => 'estaciones', 'alertas' => 'estaciones', 'incidentes' => 'columnas'];
         foreach ($tipos as $modulo => $tipo) {
-            $this->get(route('admin.administracion.'.$modulo))->assertOk()->assertSee('data-grafico="'.$tipo.'"', false)->assertDontSee('NaN')->assertDontSee('Infinity');
+            $respuesta = $this->get(route('admin.administracion.'.$modulo))->assertOk()->assertSee('data-grafico="'.$tipo.'"', false);
+            // Los IDs aleatorios de Livewire pueden contener "NaN"; validar el gráfico, no el shell.
+            $dom = new \DOMDocument;
+            $dom->loadHTML($respuesta->getContent(), LIBXML_NOERROR | LIBXML_NOWARNING);
+            $graficos = (new \DOMXPath($dom))->query('//*[@data-grafico]');
+            $this->assertGreaterThan(0, $graficos->length);
+            foreach ($graficos as $grafico) {
+                $htmlGrafico = $dom->saveHTML($grafico);
+                $this->assertStringNotContainsString('NaN', $htmlGrafico);
+                $this->assertStringNotContainsString('Infinity', $htmlGrafico);
+            }
         }
         $this->get(route('admin.administracion.alertas', ['vista' => 'tablero']))->assertOk()->assertSee('Seguimiento por estado')->assertSee('Alerta sintética');
         $this->get(route('admin.administracion.asignaciones', ['vista' => 'cobertura']))->assertOk()->assertSee('Cobertura por área')->assertSee('Área de prueba');

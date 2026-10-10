@@ -2,15 +2,7 @@
 
 namespace App\Modulos\Admisiones\Presentacion\Livewire\Paginas;
 
-use App\Mail\PreadmisionDocumentosPendientesMail;
-use App\Models\Contacto;
-use App\Models\Documento;
-use App\Models\Preadmision;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+use App\Modulos\Admisiones\Aplicacion\Acciones\RegistrarSolicitudPreadmision;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -299,153 +291,43 @@ class PreadmisionWizard extends Component
         $this->validate($this->rules(), $this->mensajesValidacion());
 
         try {
-            DB::beginTransaction();
 
-            $hayPendientes48h = ! empty($this->docs_pendientes_48h);
-            $fechaLimite48h = now()->addHours(48);
-
-            $contacto = Contacto::create([
-                'cod_contacto' => 'CTO_'.Str::upper(Str::random(12)),
-                'nombres' => $this->normalizar($this->familiar_nombres),
-                'apellido_paterno' => $this->normalizar($this->familiar_ap_paterno),
-                'apellido_materno' => $this->normalizar($this->familiar_ap_materno),
-                'numero_documento' => trim($this->familiar_ci) ?: null,
-                'celular' => trim($this->familiar_celular),
-                'correo' => trim($this->familiar_correo) ?: null,
-                'direccion' => $this->normalizar($this->familiar_direccion),
-                'estado' => 'ACTIVO',
-            ]);
-
-            $preadmision = Preadmision::create([
-                'cod_preadmision' => 'PRE_'.Str::upper(Str::random(12)),
-                'cod_contacto' => $contacto->cod_contacto,
-                'cod_usuario_registro' => auth()->user()->cod_usuario,
-                'estado' => 'PENDIENTE',
-                'fecha_solicitud' => now(),
-
-                'nombres' => $this->normalizar($this->nombres),
-                'apellido_paterno' => $this->normalizar($this->ap_paterno),
-                'apellido_materno' => $this->normalizar($this->ap_materno),
-                'numero_documento' => trim($this->ci),
-                'expedicion_documento' => $this->expedicion_ci,
-                'fecha_nacimiento' => $this->fecha_nac,
+            $resultado = app(RegistrarSolicitudPreadmision::class)->ejecutar(auth()->user(), [
+                'docs_pendientes_48h' => $this->docs_pendientes_48h,
+                'familiar_nombres' => $this->familiar_nombres,
+                'familiar_ap_paterno' => $this->familiar_ap_paterno,
+                'familiar_ap_materno' => $this->familiar_ap_materno,
+                'familiar_ci' => $this->familiar_ci,
+                'familiar_celular' => $this->familiar_celular,
+                'familiar_correo' => $this->familiar_correo,
+                'familiar_direccion' => $this->familiar_direccion,
+                'nombres' => $this->nombres,
+                'ap_paterno' => $this->ap_paterno,
+                'ap_materno' => $this->ap_materno,
+                'ci' => $this->ci,
+                'expedicion_ci' => $this->expedicion_ci,
+                'fecha_nac' => $this->fecha_nac,
                 'genero' => $this->genero,
                 'estado_civil' => $this->estado_civil,
-                'telefono' => trim($this->celular ?: $this->telefono) ?: null,
-                'direccion' => implode(', ', array_filter([
-                    $this->normalizar($this->departamento_residencia),
-                    $this->normalizar($this->ciudad_municipio),
-                    $this->normalizar($this->zona),
-                    $this->normalizar($this->calle),
-                    $this->normalizar($this->direccion_referencia),
-                ])),
-
+                'celular' => $this->celular,
+                'telefono' => $this->telefono,
+                'departamento_residencia' => $this->departamento_residencia,
+                'ciudad_municipio' => $this->ciudad_municipio,
+                'zona' => $this->zona,
+                'calle' => $this->calle,
+                'direccion_referencia' => $this->direccion_referencia,
                 'motivo_ingreso' => $this->motivo_ingreso,
-                'procedencia' => $this->procedencia_ingreso,
+                'procedencia_ingreso' => $this->procedencia_ingreso,
                 'tipo_ingreso' => $this->tipo_ingreso,
                 'permanencia' => $this->permanencia,
                 'prioridad' => $this->prioridad,
-                'descripcion_caso' => $this->normalizar($this->descripcion_caso),
+                'descripcion_caso' => $this->descripcion_caso,
+                'configuracion_documentos' => $this->configuracionDocumentos(),
+                'archivos' => collect($this->configuracionDocumentos())->reject(fn ($documento) => $documento['es_generado_sistema'])->mapWithKeys(fn ($documento) => [$documento['propiedad'] => $this->{$documento['propiedad']} ?? null])->all(),
             ]);
-
-            $docsPendientesNombres = [];
-
-            foreach ($this->configuracionDocumentos() as $docConfig) {
-                if ($docConfig['es_generado_sistema']) {
-                    continue;
-                }
-
-                $tipo = $docConfig['tipo'];
-                $propiedad = $docConfig['propiedad'];
-                $archivo = $this->$propiedad;
-                $esPendiente48h = in_array($tipo, $this->docs_pendientes_48h, true) && empty($archivo);
-
-                if (! empty($archivo) && ! is_string($archivo)) {
-                    $path = $archivo->store("preadmisiones/{$preadmision->cod_pre}", 'public');
-
-                    Documento::create([
-                        'cod_documento' => 'DOC_'.Str::upper(Str::random(12)),
-                        'cod_preadmision' => $preadmision->cod_preadmision,
-                        'cod_contacto' => $contacto->cod_contacto,
-                        'tipo_documento' => $tipo,
-                        'nombre' => $archivo->getClientOriginalName(),
-                        'ruta_archivo' => $path,
-                        'tipo_archivo' => $archivo->getMimeType() ?: 'application/octet-stream',
-                        'hash_archivo' => hash_file('sha256', Storage::disk('public')->path($path)),
-                        'estado' => 'VIGENTE',
-                        'observacion' => $docConfig['grupo'],
-                    ]);
-                } elseif ($esPendiente48h) {
-                    $docsPendientesNombres[] = $docConfig['nombre'];
-                }
-            }
-
-            $dirPdf = "preadmisiones/{$preadmision->cod_pre}/institucionales";
-            Storage::disk('public')->makeDirectory($dirPdf);
-
-            $todosGenerados = true;
-
-            foreach ($this->configuracionDocumentos() as $docConfig) {
-                if (! $docConfig['es_generado_sistema']) {
-                    continue;
-                }
-
-                $archivoPdf = null;
-                $estadoDoc = 'PENDIENTE_FIRMA';
-
-                try {
-                    $pdf = Pdf::loadView($docConfig['vista_pdf'], [
-                        'preadmision' => $preadmision,
-                        'fecha' => now()->format('d/m/Y H:i'),
-                    ]);
-
-                    $filePath = "{$dirPdf}/{$docConfig['archivo_pdf']}";
-                    Storage::disk('public')->put($filePath, $pdf->output());
-
-                    $archivoPdf = $filePath;
-                    $estadoDoc = 'GENERADO';
-                } catch (\Throwable $exception) {
-                    report($exception);
-                    $todosGenerados = false;
-                }
-
-                if ($archivoPdf) {
-                    Documento::create([
-                        'cod_documento' => 'DOC_'.Str::upper(Str::random(12)),
-                        'cod_preadmision' => $preadmision->cod_preadmision,
-                        'cod_contacto' => $contacto->cod_contacto,
-                        'tipo_documento' => $docConfig['tipo'],
-                        'nombre' => $docConfig['nombre'],
-                        'ruta_archivo' => $archivoPdf,
-                        'tipo_archivo' => 'application/pdf',
-                        'hash_archivo' => hash_file('sha256', Storage::disk('public')->path($archivoPdf)),
-                        'estado' => 'VIGENTE',
-                        'observacion' => 'Generado por el sistema al confirmar la preadmisión.',
-                    ]);
-                }
-            }
-
-            $correoPendiente = false;
-            if (! empty($docsPendientesNombres) && ! empty($preadmision->familiar_correo)) {
-                try {
-                    Mail::to($preadmision->familiar_correo)
-                        ->send(new PreadmisionDocumentosPendientesMail(
-                            $preadmision,
-                            $docsPendientesNombres,
-                            $fechaLimite48h->format('d/m/Y H:i')
-                        ));
-                } catch (\Throwable $exception) {
-                    report($exception);
-                    $correoPendiente = true;
-                }
-            }
-
-            activity('Admisiones')
-                ->causedBy(auth()->user())
-                ->performedOn($preadmision)
-                ->log('Solicitud de preadmisión registrada y pendiente de revisión.');
-
-            DB::commit();
+            $docsPendientesNombres = $resultado['docsPendientesNombres'];
+            $todosGenerados = $resultado['todosGenerados'];
+            $correoPendiente = $resultado['correoPendiente'];
 
             $textoExito = 'La solicitud quedó pendiente de revisión. Todavía no se creó un residente institucional.';
 
@@ -469,7 +351,6 @@ class PreadmisionWizard extends Component
 
             $this->guardadoExitoso = true;
         } catch (\Throwable $e) {
-            DB::rollBack();
             if ($e instanceof ValidationException
                 || $e instanceof HttpExceptionInterface) {
                 throw $e;
@@ -657,12 +538,5 @@ class PreadmisionWizard extends Component
             'email' => 'Ingrese un correo electrónico válido.',
             'regex' => 'Ingrese un número de teléfono válido.',
         ];
-    }
-
-    private function normalizar(?string $value): ?string
-    {
-        $value = trim((string) $value);
-
-        return $value === '' ? null : mb_strtoupper($value, 'UTF-8');
     }
 }

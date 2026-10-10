@@ -1,5 +1,5 @@
 @php
-    $limitesTecnicos = \App\Modulos\Clinica\Presentacion\Http\Validacion\ValidacionSignosVitalesService::limitesRegistro();
+    $limitesTecnicos = \App\Modulos\Clinica\Aplicacion\Validacion\ValidacionSignosVitalesService::limitesRegistro();
     $camposSignos = [
         ['key' => 'sis', 'error' => 'presion_sistolica', 'label' => 'Sistólica', 'wire' => 'signoSis', 'unit' => '', 'step' => '1'],
         ['key' => 'dia', 'error' => 'presion_diastolica', 'label' => 'Diastólica', 'wire' => 'signoDia', 'unit' => 'mmHg', 'step' => '1'],

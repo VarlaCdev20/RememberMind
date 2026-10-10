@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Modulos\Identidad\Presentacion\Livewire\Paginas;
+namespace App\Modulos\Institucion\Presentacion\Livewire\Paginas;
 
-use App\Modulos\Reportes\Infraestructura\Exportaciones\AreasInstitucionalesExport;
-use App\Modulos\Reportes\Infraestructura\Exportaciones\UsuariosPorAreaExport;
 use App\Models\Area;
 use App\Models\User;
+use App\Modulos\Institucion\Aplicacion\Acciones\GestionarAreasInstitucionales;
 use App\Modulos\Reportes\Aplicacion\Consultas\AreasReportDataService;
+use App\Modulos\Reportes\Infraestructura\Exportaciones\AreasInstitucionalesExport;
 use App\Modulos\Reportes\Infraestructura\Exportaciones\ReportExportService;
 use App\Modulos\Reportes\Infraestructura\Exportaciones\ReportFileNameService;
+use App\Modulos\Reportes\Infraestructura\Exportaciones\UsuariosPorAreaExport;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Livewire\Component;
 
 class AreasInstitucionalesPanel extends Component
@@ -174,37 +174,7 @@ class AreasInstitucionalesPanel extends Component
 
         $this->validate($rules);
 
-        $datos = [
-            'nombre' => mb_strtoupper(trim($this->nombre), 'UTF-8'),
-            'descripcion' => $this->descripcion ?: null,
-            'estado' => $this->estado,
-        ];
-
-        if ($this->isEdit) {
-            $area = Area::findOrFail($this->areaId);
-            $area->update($datos);
-
-            // Log de actividad
-            activity('AreasInstitucionales')
-                ->performedOn($area)
-                ->causedBy(Auth::user())
-                ->log("El usuario editó el área institucional {$area->nombre}.");
-
-            $mensaje = 'Área institucional actualizada correctamente.';
-        } else {
-            $area = Area::create($datos + [
-                'cod_area' => 'ARE_'.Str::upper(Str::random(12)),
-            ]);
-
-            // Log de actividad
-            activity('AreasInstitucionales')
-                ->performedOn($area)
-                ->causedBy(Auth::user())
-                ->log("El usuario creó la área institucional {$area->nombre}.");
-
-            $mensaje = 'Área institucional registrada correctamente.';
-        }
-
+        $mensaje = app(GestionarAreasInstitucionales::class)->guardarArea(Auth::user(), ['nombre' => $this->nombre, 'descripcion' => $this->descripcion, 'estado' => $this->estado, 'isEdit' => $this->isEdit, 'areaId' => $this->areaId]);
         $this->mostrarFormulario = false;
         $this->resetForm();
 
@@ -228,17 +198,7 @@ class AreasInstitucionalesPanel extends Component
             return;
         }
 
-        $area = Area::findOrFail($codArea);
-        $nuevoEstado = in_array($area->estado, ['ACTIVO', 'ACTIVA'], true) ? 'INACTIVO' : 'ACTIVO';
-        $area->estado = $nuevoEstado;
-        $area->save();
-
-        // Registrar acción en log
-        activity('AreasInstitucionales')
-            ->performedOn($area)
-            ->causedBy(Auth::user())
-            ->log("Se cambió el estado del área {$area->nombre} a {$nuevoEstado}.");
-
+        [$area, $nuevoEstado] = app(GestionarAreasInstitucionales::class)->toggleEstado(Auth::user(), $codArea);
         $this->dispatch('swal:toast', [
             'type' => 'success',
             'title' => 'Estado modificado',

@@ -3,12 +3,12 @@
 namespace App\Modulos\Identidad\Presentacion\Livewire\Paginas;
 
 use App\Models\User;
+use App\Modulos\Identidad\Aplicacion\Acciones\ActualizarPermisosRol;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-use Spatie\Permission\PermissionRegistrar;
 
 class RolesPermisosPanel extends Component
 {
@@ -162,20 +162,10 @@ class RolesPermisosPanel extends Component
 
         $rol = Role::find($this->rolSeleccionadoId);
         if ($rol) {
-            $rol->syncPermissions($rol->name === 'SUPERADMINISTRADOR'
-                ? Permission::query()->where('guard_name', $rol->guard_name)->get()
-                : $this->permisosSeleccionados);
-            app(PermissionRegistrar::class)->forgetCachedPermissions();
-
+            app(ActualizarPermisosRol::class)->guardar(auth()->user(), $rol, $this->permisosSeleccionados);
             $this->permisosSeleccionados = $rol->fresh('permissions')->permissions->pluck('name')->all();
             $this->hayCambios = false;
             unset($this->roles); // force refresh
-
-            if (function_exists('activity')) {
-                activity('Roles y Permisos')
-                    ->performedOn($rol)
-                    ->log('El usuario '.auth()->user()->nombres.' actualizó los permisos del rol '.strtoupper($rol->name));
-            }
 
             $this->dispatch('swal', [
                 'icon' => 'success',

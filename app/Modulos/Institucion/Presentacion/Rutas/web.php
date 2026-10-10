@@ -6,10 +6,20 @@ use App\Modulos\Institucion\Presentacion\Http\Controllers\CentroCoordinacionCont
 use App\Modulos\Institucion\Presentacion\Http\Controllers\InfraestructuraController;
 use App\Modulos\Institucion\Presentacion\Http\Controllers\InstitucionalController;
 use App\Modulos\Institucion\Presentacion\Http\Controllers\OperacionController;
+use App\Modulos\Institucion\Presentacion\Livewire\Paginas\AsignacionTurnoPanel;
+use App\Modulos\Institucion\Presentacion\Livewire\Paginas\TurnosEnfermeriaPanel;
 use Illuminate\Support\Facades\Route;
 
 // Registered by routes/web.php; do not execute while loading this file.
 return [
+    'ruta_130' => static function (): void {
+        Route::get('/', AsignacionTurnoPanel::class)->name('index');
+    },
+
+    'ruta_127' => static function (): void {
+        Route::get('/', TurnosEnfermeriaPanel::class)->name('index');
+    },
+
     'ruta_005' => static function (): void {
         Route::get('/dashboard', CentroCoordinacionController::class)
             ->name('dashboard');

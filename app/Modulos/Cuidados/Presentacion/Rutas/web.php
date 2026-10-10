@@ -2,7 +2,6 @@
 
 use App\Modulos\Cuidados\Presentacion\Http\Controllers\CuidadoController;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\AgendaEnfermeria;
-use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\AsignacionTurnoPanel;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\DashboardTurno;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\MisPacientes;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PaseTurnoPanel;
@@ -10,17 +9,10 @@ use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PlanCuidadoPanel;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\RegistrosEnfermeria;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\SeguimientoDiarioPanel;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\TareasPlanPanel;
-use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\TurnosEnfermeriaPanel;
 use Illuminate\Support\Facades\Route;
 
 // Registered by routes/web.php; do not execute while loading this file.
 return [
-    'ruta_127' => static function (): void {
-        Route::get('/', TurnosEnfermeriaPanel::class)->name('index');
-    },
-    'ruta_130' => static function (): void {
-        Route::get('/', AsignacionTurnoPanel::class)->name('index');
-    },
     'ruta_131' => static function (): void {
         Route::get('/', PlanCuidadoPanel::class)->name('index');
     },

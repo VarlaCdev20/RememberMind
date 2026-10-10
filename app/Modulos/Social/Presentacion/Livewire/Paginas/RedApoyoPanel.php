@@ -5,6 +5,7 @@ namespace App\Modulos\Social\Presentacion\Livewire\Paginas;
 use App\Models\Contacto;
 use App\Models\Residente;
 use App\Models\ResidenteContacto;
+use App\Modulos\Social\Aplicacion\Acciones\GestionarRedApoyo;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -177,38 +178,7 @@ class RedApoyoPanel extends Component
 
         $this->validate($this->rules(), $this->messages());
 
-        DB::transaction(function () {
-            $contacto = $this->resolverContacto();
-
-            if ((bool) $this->form['es_responsable']) {
-                ResidenteContacto::where('cod_residente', $this->adultoSeleccionado)
-                    ->when($this->vinculoId, fn ($q) => $q->where('cod_residente_contacto', '!=', $this->vinculoId))
-                    ->update(['responsable_principal' => false]);
-            }
-
-            if ((bool) $this->form['es_contacto_emergencia']) {
-                ResidenteContacto::where('cod_residente', $this->adultoSeleccionado)
-                    ->when($this->vinculoId, fn ($q) => $q->where('cod_residente_contacto', '!=', $this->vinculoId))
-                    ->update(['contacto_emergencia' => false]);
-            }
-
-            $payload = [
-                'cod_contacto' => $contacto->cod_contacto,
-                'cod_residente' => $this->adultoSeleccionado,
-                'parentesco' => $this->form['parentesco_vinculo'],
-                'responsable_principal' => (bool) $this->form['es_responsable'],
-                'contacto_emergencia' => (bool) $this->form['es_contacto_emergencia'],
-                'estado' => $this->form['estado'],
-                'observacion' => $this->form['observaciones'] ?: null,
-            ];
-
-            if ($this->modoEdicion && $this->vinculoId) {
-                ResidenteContacto::where('cod_residente_contacto', $this->vinculoId)->update($payload);
-            } else {
-                $payload['cod_residente_contacto'] = 'RC_'.strtoupper(Str::random(10));
-                ResidenteContacto::create($payload);
-            }
-        });
+        app(GestionarRedApoyo::class)->guardarVinculo(auth()->user(), ['form' => $this->form, 'adultoSeleccionado' => $this->adultoSeleccionado, 'vinculoId' => $this->vinculoId, 'modoEdicion' => $this->modoEdicion]);
 
         $this->cerrarFormulario();
         $this->dispatch('swal', [
@@ -278,8 +248,7 @@ class RedApoyoPanel extends Component
     {
         abort_unless(auth()->user()->can('residentes_contactos.gestionar'), 403);
 
-        ResidenteContacto::where('cod_residente', $this->adultoSeleccionado)->update(['responsable_principal' => false]);
-        ResidenteContacto::where('cod_residente_contacto', $vinculoId)->update(['responsable_principal' => true, 'estado' => 'ACTIVO']);
+        app(GestionarRedApoyo::class)->marcarResponsable(auth()->user(), ['adultoSeleccionado' => $this->adultoSeleccionado, 'form' => $this->form, 'modoEdicion' => $this->modoEdicion, 'vinculoId' => $this->vinculoId], $vinculoId);
 
         $this->dispatch('swal', [
             'icon' => 'success',
@@ -292,8 +261,7 @@ class RedApoyoPanel extends Component
     {
         abort_unless(auth()->user()->can('residentes_contactos.gestionar'), 403);
 
-        ResidenteContacto::where('cod_residente', $this->adultoSeleccionado)->update(['contacto_emergencia' => false]);
-        ResidenteContacto::where('cod_residente_contacto', $vinculoId)->update(['contacto_emergencia' => true, 'estado' => 'ACTIVO']);
+        app(GestionarRedApoyo::class)->marcarContactoEmergencia(auth()->user(), ['adultoSeleccionado' => $this->adultoSeleccionado, 'form' => $this->form, 'modoEdicion' => $this->modoEdicion, 'vinculoId' => $this->vinculoId], $vinculoId);
 
         $this->dispatch('swal', [
             'icon' => 'success',
@@ -306,9 +274,7 @@ class RedApoyoPanel extends Component
     {
         abort_unless(auth()->user()->can('residentes_contactos.gestionar'), 403);
 
-        ResidenteContacto::where('cod_residente_contacto', $vinculoId)
-            ->where('cod_residente', $this->adultoSeleccionado)
-            ->update(['estado' => 'INACTIVO']);
+        app(GestionarRedApoyo::class)->desactivarVinculo(auth()->user(), ['adultoSeleccionado' => $this->adultoSeleccionado, 'form' => $this->form, 'modoEdicion' => $this->modoEdicion, 'vinculoId' => $this->vinculoId], $vinculoId);
 
         $this->detalleVinculo = null;
         $this->dispatch('swal', [
@@ -322,9 +288,7 @@ class RedApoyoPanel extends Component
     {
         abort_unless(auth()->user()->can('residentes_contactos.gestionar'), 403);
 
-        ResidenteContacto::where('cod_residente_contacto', $vinculoId)
-            ->where('cod_residente', $this->adultoSeleccionado)
-            ->update(['estado' => 'ACTIVO']);
+        app(GestionarRedApoyo::class)->activarVinculo(auth()->user(), ['adultoSeleccionado' => $this->adultoSeleccionado, 'form' => $this->form, 'modoEdicion' => $this->modoEdicion, 'vinculoId' => $this->vinculoId], $vinculoId);
 
         $this->dispatch('swal', [
             'icon' => 'success',
@@ -546,34 +510,6 @@ class RedApoyoPanel extends Component
                 'nombre' => trim("{$c->nombres} {$c->apellido_paterno} {$c->apellido_materno}"),
                 'parentesco' => 'Contacto',
             ]);
-    }
-
-    private function resolverContacto(): Contacto
-    {
-        if (! empty($this->form['cod_contacto'])) {
-            $contacto = Contacto::findOrFail($this->form['cod_contacto']);
-            $contacto->update([
-                'nombres' => $this->form['nombres'] ?: $contacto->nombres,
-                'apellido_paterno' => $this->form['ap_paterno'] ?: $contacto->apellido_paterno,
-                'apellido_materno' => $this->form['ap_materno'] ?: null,
-                'celular' => $this->form['telefono'] ?: null,
-                'correo' => $this->form['correo'] ?: null,
-                'direccion' => $this->form['direccion'] ?: null,
-            ]);
-
-            return $contacto;
-        }
-
-        return Contacto::create([
-            'cod_contacto' => 'CON_'.strtoupper(Str::random(10)),
-            'nombres' => $this->form['nombres'],
-            'apellido_paterno' => $this->form['ap_paterno'],
-            'apellido_materno' => $this->form['ap_materno'] ?: null,
-            'celular' => $this->form['telefono'] ?: null,
-            'correo' => $this->form['correo'] ?: null,
-            'direccion' => $this->form['direccion'] ?: null,
-            'estado' => 'ACTIVO',
-        ]);
     }
 
     private function detalleAdulto(Residente $adulto): array

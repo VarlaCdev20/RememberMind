@@ -2,10 +2,9 @@
 
 namespace App\Modulos\Admisiones\Presentacion\Livewire\Funcionalidades;
 
-use App\Models\HistorialEstadoResidente;
 use App\Models\Residente;
+use App\Modulos\Admisiones\Aplicacion\Acciones\RegistrarDecisionAdmision;
 use App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -100,40 +99,17 @@ class DecisionAdmisionModal extends Component
         ]);
 
         abort_unless($this->adulto && $this->adulto->fresh()->estado === 'DECISION_ADMISION', 409);
-        DB::beginTransaction();
         try {
-            $this->adulto = Residente::lockForUpdate()->findOrFail($this->adulto->cod_residente);
-            if ($this->adulto->estado !== 'DECISION_ADMISION') {
-                throw new \RuntimeException('La decisión ya fue registrada.');
-            }
-            $estadoAnterior = $this->adulto->estado;
-            $nuevoEstadoStr = ($this->decision === 'DERIVADO') ? 'DERIVADO' : 'PENDIENTE_ASIGNACION';
-            $this->adulto->update(['estado' => $nuevoEstadoStr]);
-
-            HistorialEstadoResidente::create([
-                'cod_residente' => $this->adulto->cod_residente,
-                'cod_usuario_registro' => auth()->id(),
-                'estado_anterior' => $estadoAnterior,
-                'estado_nuevo' => $nuevoEstadoStr,
-                'motivo' => $this->decision.' - '.($this->motivo_decision ?: ($this->motivo_derivacion ?: 'Decisión de Admisión')),
+            $this->adulto = app(RegistrarDecisionAdmision::class)->ejecutar(auth()->user(), [
+                'adulto' => $this->adulto,
+                'decision' => $this->decision,
+                'motivo_decision' => $this->motivo_decision,
+                'motivo_derivacion' => $this->motivo_derivacion,
+                'seguimiento_requerido' => $this->seguimiento_requerido,
+                'cuidado_especial_requerido' => $this->cuidado_especial_requerido,
+                'institucion_derivada' => $this->institucion_derivada,
+                'recomendacion_final' => $this->recomendacion_final,
             ]);
-
-            // Registrar Log
-            activity('Medico')
-                ->causedBy(auth()->user())
-                ->performedOn($this->adulto)
-                ->withProperties([
-                    'decision' => $this->decision,
-                    'motivo_decision' => $this->motivo_decision,
-                    'seguimiento_requerido' => $this->seguimiento_requerido,
-                    'cuidado_especial_requerido' => $this->cuidado_especial_requerido,
-                    'motivo_derivacion' => $this->motivo_derivacion,
-                    'institucion_derivada' => $this->institucion_derivada,
-                    'recomendacion_final' => $this->recomendacion_final,
-                ])
-                ->log("Tomó la decisión de {$this->decision} para el paciente.");
-
-            DB::commit();
 
             $mensajeExito = ($this->decision === 'DERIVADO')
                 ? 'El paciente ha sido marcado como DERIVADO y sale del flujo de admisión.'
@@ -149,7 +125,6 @@ class DecisionAdmisionModal extends Component
             $this->close();
 
         } catch (\Throwable $e) {
-            DB::rollBack();
             if ($e instanceof ValidationException
                 || $e instanceof HttpExceptionInterface) {
                 throw $e;

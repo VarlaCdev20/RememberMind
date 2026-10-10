@@ -13,6 +13,7 @@ class ResidentePolicy
         if ($user->estado !== 'ACTIVO') {
             return false;
         }
+
         return $user->hasRole('SUPERADMINISTRADOR') && in_array($ability, ['viewAny', 'view'], true) ? true : null;
     }
 

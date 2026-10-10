@@ -2,15 +2,14 @@
 
 namespace App\Modulos\Identidad\Presentacion\Livewire\Funcionalidades;
 
-use App\Mail\PersonalInstitucionalBienvenidaMail;
 use App\Models\Area;
-use App\Models\Documento;
 use App\Models\User;
+use App\Modulos\Identidad\Aplicacion\Acciones\GuardarPersonalInstitucional;
+use App\Modulos\Identidad\Infraestructura\Documentos\GenerarDocumentoInstitucional;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
@@ -740,7 +739,7 @@ class PersonalInstitucionalForm extends Component
 
         if (! empty($this->tempId)) {
             $filePath = "personal-institucional/temp/{$this->tempId}/{$fileMap[$codigo]}";
-            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($filePath)) {
+            if (Storage::disk('public')->exists($filePath)) {
                 $url = asset('storage/'.$filePath);
                 $this->dispatch('abrirPdfGenerado', url: $url);
 
@@ -779,15 +778,7 @@ class PersonalInstitucionalForm extends Component
             }
 
             $data = $this->buildPdfData();
-            $tempPath = "personal-institucional/temp/{$this->tempId}";
-            \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory($tempPath);
-
-            $filePath = "{$tempPath}/{$fileMap[$codigo]}";
-
-            // DomPDF: síncrono, sin Chromium, compatible con Livewire (no response()->download)
-            $pdf = Pdf::loadView($viewMap[$codigo], ['data' => $data]);
-            \Illuminate\Support\Facades\Storage::disk('public')->put($filePath, $pdf->output());
-
+            $filePath = app(GenerarDocumentoInstitucional::class)->ejecutar($this->tempId, $viewMap[$codigo], $fileMap[$codigo], $data);
             $this->estado_documentos[$codigo] = 'GENERADO';
             $url = asset('storage/'.$filePath);
 
@@ -1220,162 +1211,8 @@ class PersonalInstitucionalForm extends Component
         $this->estado = 'ACTIVO'; // Siempre se crea como ACTIVO
         $estadoDocumental = $this->determinarEstadoDocumental();
 
-        DB::beginTransaction();
         try {
-            if ($this->esEdicion) {
-                $usuario = User::findOrFail($this->usuarioId);
-            } else {
-                $usuario = new User;
-                $usuario->password = $this->contrasena_temporal;
-                $usuario->debe_cambiar_password = $this->forzar_cambio_password;
-                $usuario->created_at = Carbon::parse($this->fecha_registro.' '.$this->hora_registro);
-            }
-
-            $usuario->nombres = mb_strtoupper(trim($this->nombres), 'UTF-8');
-            $usuario->ap_paterno = $this->ap_paterno ? mb_strtoupper(trim($this->ap_paterno), 'UTF-8') : null;
-            $usuario->ap_materno = $this->ap_materno ? mb_strtoupper(trim($this->ap_materno), 'UTF-8') : null;
-            $usuario->correo = trim(mb_strtolower($this->correo, 'UTF-8'));
-            $usuario->telefono = $this->telefono;
-            $usuario->numero_documento = mb_strtoupper(trim($this->numero_documento), 'UTF-8');
-            $usuario->expedido = $this->expedido ? mb_strtoupper(trim($this->expedido), 'UTF-8') : null;
-            $usuario->fecha_nacimiento = $this->fecha_nacimiento;
-            $usuario->genero = $this->genero;
-            $usuario->estado = $this->estado;
-            $usuario->observaciones = $this->observaciones ? mb_strtoupper(trim($this->observaciones), 'UTF-8') : null;
-            $usuario->direccion = $this->direccion ? mb_strtoupper(trim($this->direccion), 'UTF-8') : null;
-            $usuario->zona = $this->zona ? mb_strtoupper(trim($this->zona), 'UTF-8') : null;
-            $usuario->ciudad = $this->ciudad ? mb_strtoupper(trim($this->ciudad), 'UTF-8') : null;
-            $usuario->cod_area = $this->cod_area;
-
-            if ($this->foto_perfil && ! is_string($this->foto_perfil)) {
-                $path = $this->foto_perfil->store('perfiles', 'public');
-                $usuario->foto_de_perfil = $path;
-            }
-
-            $usuario->save();
-
-            // Sync Spatie Roles correctly
-            if (! empty($this->roles_seleccionados)) {
-                $usuario->syncRoles($this->roles_seleccionados);
-            } else {
-                $usuario->syncRoles([]);
-            }
-
-            $this->guardarDatosLaboralesEnUsuario($usuario, $clasificacion);
-
-            // Registrar exclusivamente archivos reales en la tabla documental unificada V2.
-            $documentosFaltantes = [];
-            $responsableId = auth()->id();
-
-            foreach ($this->documentos_configurados as $doc) {
-                $esInstitucional = ($doc['tipo'] === 'institucional');
-                $estadoDoc = $this->estado_documentos[$doc['id']] ?? 'PENDIENTE';
-
-                if ($estadoDoc === 'CARGADO' && isset($this->archivos_temporales[$doc['id']])) {
-                    $file = $this->archivos_temporales[$doc['id']];
-                    if (! is_string($file)) {
-                        $path = $file->store('documentos_personal', 'public');
-                        $anterior = Documento::where('cod_usuario', $usuario->cod_usuario)
-                            ->where('tipo_documento', $doc['id'])->whereNotIn('estado', ['ANULADO', 'REEMPLAZADO'])->first();
-                        Documento::create([
-                            'cod_documento' => 'DOC_'.strtoupper(Str::random(10)),
-                            'cod_usuario' => $usuario->cod_usuario,
-                            'cod_documento_anterior' => $anterior?->cod_documento,
-                            'tipo_documento' => $doc['id'],
-                            'nombre' => $doc['nombre'],
-                            'ruta_archivo' => $path,
-                            'tipo_archivo' => $file->getMimeType() ?: 'application/octet-stream',
-                            'hash_archivo' => hash_file('sha256', \Storage::disk('public')->path($path)),
-                            'estado' => 'CARGADO',
-                            'observacion' => 'Subido por: '.$responsableId,
-                        ]);
-                        $anterior?->update(['estado' => 'REEMPLAZADO']);
-                    }
-                } elseif ($estadoDoc === 'OBSERVADO') {
-                    $documentosFaltantes[] = $doc['nombre'].': '.($this->observacion_documentos[$doc['id']] ?? 'Documento observado.');
-                } elseif ($estadoDoc === 'PENDIENTE') {
-                    if ($esInstitucional && in_array($doc['id'], ['CONTRATO', 'CONFIDENCIALIDAD'])) {
-                        $documentosFaltantes[] = $doc['nombre'];
-                    }
-                }
-            }
-
-            // Log follow-up alert if institutional documents are missing
-            if (! empty($documentosFaltantes) && function_exists('activity')) {
-                activity()
-                    ->causedBy(auth()->user())
-                    ->performedOn($usuario)
-                    ->useLog('AlertaSeguimiento')
-                    ->withProperties([
-                        'usuario_registrado' => $usuario->nombres.' '.$usuario->ap_paterno,
-                        'ci' => $usuario->numero_documento,
-                        'documentos_faltantes' => $documentosFaltantes,
-                        'plazo_horas' => 48,
-                    ])
-                    ->log('Alerta de Seguimiento: Ingresante registrado en estado PENDIENTE_INSTITUCIONAL debido a falta de documentación institucional firmada obligatoria ('.implode(', ', $documentosFaltantes).'). Requiere regularización en 48 horas.');
-            }
-
-            // Log activity
-            if (function_exists('activity')) {
-                activity()
-                    ->causedBy(auth()->user())
-                    ->performedOn($usuario)
-                    ->log($this->esEdicion ? 'Actualizó datos de personal institucional' : 'Registró nuevo personal institucional');
-            }
-
-            DB::commit();
-
-            if (! $this->esEdicion && class_exists(PersonalInstitucionalBienvenidaMail::class)) {
-                $documentos_pendientes_arr = [];
-                $documentos_subidos_arr = [];
-                $documentos_institucionales_generados_arr = [];
-                $pdfPaths = [];
-
-                foreach ($this->documentos_configurados as $doc) {
-                    $estadoDoc = $this->estado_documentos[$doc['id']] ?? 'PENDIENTE';
-                    if ($estadoDoc === 'PENDIENTE' || $estadoDoc === 'OBSERVADO') {
-                        $documentos_pendientes_arr[] = $doc['nombre'];
-                    } elseif ($estadoDoc === 'CARGADO' || $estadoDoc === 'FIRMADO_SUBIDO' || $estadoDoc === 'GENERADO') {
-                        $documentos_subidos_arr[] = $doc['nombre'];
-                    }
-
-                    if ($doc['tipo'] === 'institucional' && in_array($estadoDoc, ['GENERADO', 'FIRMADO_SUBIDO'])) {
-                        $documentos_institucionales_generados_arr[] = $doc['nombre'];
-
-                        $fileMap = [
-                            'FICHA' => 'ficha.pdf',
-                            'CONTRATO' => 'contrato.pdf',
-                            'CONFIDENCIALIDAD' => 'confidencialidad.pdf',
-                            'FUNCIONES' => 'acta_funciones.pdf',
-                        ];
-                        if (isset($fileMap[$doc['id']]) && ! empty($this->tempId)) {
-                            $path = \Illuminate\Support\Facades\Storage::disk('public')->path("personal-institucional/temp/{$this->tempId}/{$fileMap[$doc['id']]}");
-                            if (file_exists($path)) {
-                                $pdfPaths[$fileMap[$doc['id']]] = $path;
-                            }
-                        }
-                    }
-                }
-
-                try {
-                    Mail::to($usuario->correo)->send(
-                        new PersonalInstitucionalBienvenidaMail(
-                            $usuario,
-                            $clasificacion['rol_label'] ?? 'Personal',
-                            $clasificacion['area_nombre'] ?? 'Área Operativa',
-                            $this->estado,
-                            $documentos_pendientes_arr,
-                            Carbon::now()->addHours(48)->toDateString(),
-                            $pdfPaths,
-                            $this->contrasena_temporal,
-                            $documentos_subidos_arr,
-                            $documentos_institucionales_generados_arr
-                        )
-                    );
-                } catch (\Exception $mailEx) {
-                    logger()->error('No se pudo enviar correo de bienvenida: '.$mailEx->getMessage());
-                }
-            }
+            $usuario = app(GuardarPersonalInstitucional::class)->guardar(auth()->user(), ['esEdicion' => $this->esEdicion, 'usuarioId' => $this->usuarioId, 'contrasena_temporal' => $this->contrasena_temporal, 'forzar_cambio_password' => $this->forzar_cambio_password, 'fecha_registro' => $this->fecha_registro, 'hora_registro' => $this->hora_registro, 'nombres' => $this->nombres, 'ap_paterno' => $this->ap_paterno, 'ap_materno' => $this->ap_materno, 'correo' => $this->correo, 'telefono' => $this->telefono, 'numero_documento' => $this->numero_documento, 'expedido' => $this->expedido, 'fecha_nacimiento' => $this->fecha_nacimiento, 'genero' => $this->genero, 'estado' => $this->estado, 'observaciones' => $this->observaciones, 'direccion' => $this->direccion, 'zona' => $this->zona, 'ciudad' => $this->ciudad, 'cod_area' => $this->cod_area, 'foto_perfil' => $this->foto_perfil, 'roles_seleccionados' => $this->roles_seleccionados, 'documentos_configurados' => $this->documentos_configurados, 'estado_documentos' => $this->estado_documentos, 'archivos_temporales' => $this->archivos_temporales, 'observacion_documentos' => $this->observacion_documentos, 'tempId' => $this->tempId, 'institucion_formacion' => $this->institucion_formacion, 'matricula_prof' => $this->matricula_prof, 'anios_exp' => $this->anios_exp, 'subtipo_enfermeria' => $this->subtipo_enfermeria, 'nivel_responsabilidad' => $this->nivel_responsabilidad], $clasificacion);
 
             if (! $this->esEdicion) {
                 $roles = empty($this->roles_seleccionados) ? 'Ninguno' : implode(', ', $this->roles_seleccionados);
@@ -1411,7 +1248,6 @@ class PersonalInstitucionalForm extends Component
             }
 
         } catch (\Exception $e) {
-            DB::rollBack();
             $this->dispatch('mostrarAlerta', [
                 'type' => 'error',
                 'title' => 'Error al guardar',
@@ -1446,23 +1282,6 @@ class PersonalInstitucionalForm extends Component
             'areas' => Area::whereIn('estado', ['ACTIVA', 'ACTIVO'])->get(),
             'clasificacion_derivada' => $this->clasificacionDesdeRoles(),
         ]);
-    }
-
-    private function guardarDatosLaboralesEnUsuario(User $usuario, ?array $clasificacion): void
-    {
-        $datos = array_filter([
-            $this->observaciones ? trim($this->observaciones) : null,
-            $clasificacion ? 'Clasificación: '.$clasificacion['tipo_label'].' / '.$clasificacion['rol_label'] : null,
-            $this->institucion_formacion ? 'Formación: '.$this->institucion_formacion : null,
-            $this->matricula_prof ? 'Matrícula: '.$this->matricula_prof : null,
-            $this->anios_exp ? 'Años experiencia: '.$this->anios_exp : null,
-            $this->subtipo_enfermeria ? 'Subtipo enfermería: '.$this->subtipo_enfermeria : null,
-            $this->nivel_responsabilidad ? 'Nivel responsabilidad: '.$this->nivel_responsabilidad : null,
-        ]);
-
-        $usuario->forceFill([
-            'observaciones' => $datos ? mb_strtoupper(implode(' | ', $datos), 'UTF-8') : $usuario->observaciones,
-        ])->save();
     }
 
     private function catalogoEspecialidadesPorRol(): Collection

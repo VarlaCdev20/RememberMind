@@ -3,10 +3,6 @@
 namespace Tests\Feature;
 
 use App\Compartido\Infraestructura\Documentos\DocumentacionUsuarioService;
-use App\Modulos\Institucion\Infraestructura\Exportaciones\GeneradorPlanillaEnfermeriaService;
-use App\Modulos\Reportes\Infraestructura\Exportaciones\AdultoIndividualExport;
-use App\Modulos\Institucion\Presentacion\Livewire\Paginas\TurnosAsignacionesPanel;
-use App\Models\Residente;
 use App\Models\AplicacionInstrumento;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
@@ -15,9 +11,13 @@ use App\Models\Instrumento;
 use App\Models\Jornada;
 use App\Models\Personal;
 use App\Models\Preadmision;
+use App\Models\Residente;
 use App\Models\ResidenteContacto;
 use App\Models\Turno;
 use App\Models\User;
+use App\Modulos\Institucion\Infraestructura\Exportaciones\GeneradorPlanillaEnfermeriaService;
+use App\Modulos\Institucion\Presentacion\Livewire\Paginas\TurnosAsignacionesPanel;
+use App\Modulos\Reportes\Infraestructura\Exportaciones\AdultoIndividualExport;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;

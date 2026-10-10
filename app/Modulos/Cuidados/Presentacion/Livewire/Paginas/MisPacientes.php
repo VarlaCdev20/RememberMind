@@ -26,6 +26,7 @@ use App\Modulos\Clinica\Aplicacion\Acciones\EvaluadorSignosVitales;
 use App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService;
 use App\Modulos\Clinica\Aplicacion\Consultas\ServicioObjetivosPersonalizados;
 use App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService;
+use App\Modulos\Cuidados\Aplicacion\Acciones\RegistrarSeguimientoDiario;
 use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Cuidados\Presentacion\Navegacion\NavegacionCuidadosService;
@@ -1799,47 +1800,17 @@ class MisPacientes extends Component
 
     public function guardarSeguimiento(): void
     {
-        abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
-        abort_unless(auth()->user()?->can('atenciones.crear'), 403);
-        $turno = $this->getTurnoService()->autorizarMutacionPaciente($this->modalCodResidente, 'atenciones.crear', Auth::user());
-        $service = $this->getTurnoService();
-        $turno = $service->obtenerTurnoActivo(Auth::user());
-        $this->validate([
-            'segEstado' => 'required|in:ESTABLE,VIGILANCIA,DELICADO,CRITICO',
-            'segAlimentacion' => 'required|in:COMPLETA,PARCIAL,RECHAZADA,AYUNO',
-            'segMovilidad' => 'required|in:INDEPENDIENTE,ASISTIDA,SILLA_RUEDAS,ENCAMADO',
-            'segSueno' => 'required|in:NORMAL,INTERRUMPIDO,INSOMNIO,SOMNOLENCIA',
-            'segObs' => 'required|string|min:10|max:1000',
-        ]);
-        if (($this->segIncidente || $this->segRequiereMedico) && mb_strlen(trim($this->segObs)) < 15) {
-            $this->addError('segObs', 'Describa la situación clínica y las medidas iniciales con al menos 15 caracteres.');
-
-            return;
-        }
-        if (! $turno) {
-            $this->addError('segObs', 'No existe un turno activo para registrar el seguimiento.');
-
-            return;
-        }
-        if (Atencion::where('cod_residente', $this->modalCodResidente)->whereDate('fecha_hora', today())
-            ->where('tipo_atencion', 'SEGUIMIENTO_DIARIO')->exists()) {
-            $this->addError('segObs', 'Ya existe un seguimiento de este residente para el turno actual.');
-
-            return;
-        }
-
-        $personal = Auth::user()?->personal;
-        $codArea = $personal?->asignaciones()->whereIn('estado', ['ACTIVA', 'ACTIVO'])->latest('fecha_asignacion')->value('cod_area');
-        abort_unless($personal && $codArea, 422, 'El usuario debe tener personal y área institucional asignados.');
-        Atencion::create([
-            'cod_residente' => $this->modalCodResidente,
-            'cod_area' => $codArea,
-            'cod_personal' => $personal->cod_personal,
-            'tipo_atencion' => 'SEGUIMIENTO_DIARIO',
-            'motivo' => $this->segEstado,
-            'fecha_hora' => now(),
-            'estado' => 'FINALIZADA',
-            'observacion' => trim($this->segObs),
+        $this->resetValidation();
+        app(RegistrarSeguimientoDiario::class)->guardarSeguimiento(auth()->user(), [
+            'esModoConsulta' => $this->esModoConsulta,
+            'modalCodResidente' => $this->modalCodResidente,
+            'segIncidente' => $this->segIncidente,
+            'segRequiereMedico' => $this->segRequiereMedico,
+            'segObs' => $this->segObs,
+            'segEstado' => $this->segEstado,
+            'segAlimentacion' => $this->segAlimentacion,
+            'segMovilidad' => $this->segMovilidad,
+            'segSueno' => $this->segSueno,
         ]);
 
         $this->modalSeguimiento = false;
@@ -2783,7 +2754,7 @@ class MisPacientes extends Component
                 'signosVitales as signos_hoy_count' => function ($q) use ($fechaHoy) {
                     $q->whereDate('fecha_hora', $fechaHoy);
                 },
-        ]);
+            ]);
 
             if (trim($this->search) !== '') {
                 foreach (preg_split('/\s+/', trim($this->search)) as $termino) {

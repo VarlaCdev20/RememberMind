@@ -2,9 +2,9 @@
 
 namespace App\Modulos\Clinica\Aplicacion\Acciones;
 
-use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use App\Models\User;
 use App\Modulos\Clinica\Aplicacion\Consultas\ContextoClinicoService;
+use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use LogicException;
 
 class AccesoClinicoTemporalService

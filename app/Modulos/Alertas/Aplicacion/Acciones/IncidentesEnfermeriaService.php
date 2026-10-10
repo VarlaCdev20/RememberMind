@@ -2,12 +2,12 @@
 
 namespace App\Modulos\Alertas\Aplicacion\Acciones;
 
-use App\Modulos\Cuidados\Aplicacion\Acciones\LesionesEnfermeriaService;
-use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
-use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Models\Incidente;
 use App\Models\User;
 use App\Modulos\Clinica\Aplicacion\Consultas\ContextoClinicoService;
+use App\Modulos\Cuidados\Aplicacion\Acciones\LesionesEnfermeriaService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;

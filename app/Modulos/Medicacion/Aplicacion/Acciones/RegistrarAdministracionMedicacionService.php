@@ -2,12 +2,12 @@
 
 namespace App\Modulos\Medicacion\Aplicacion\Acciones;
 
-use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Models\AdministracionMedicacion;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\HorarioPrescripcion;
 use App\Models\Prescripcion;
 use App\Models\User;
+use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;

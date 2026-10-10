@@ -4,6 +4,7 @@ namespace App\Modulos\Identidad\Presentacion\Livewire\Paginas;
 
 use App\Models\AsignacionPersonal;
 use App\Models\User;
+use App\Modulos\Identidad\Aplicacion\Acciones\CambiarEstadoPersonal;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Livewire\Component;
@@ -227,11 +228,7 @@ class PersonalInstitucionalPanel extends Component
             return;
         }
 
-        $usuario->estado = $this->esEstadoActivo($usuario->estado)
-            ? 'SUSPENDIDO'
-            : 'ACTIVO';
-
-        $usuario->save();
+        app(CambiarEstadoPersonal::class)->ejecutar(auth()->user(), $usuario);
 
         $this->dispatch('swal', [
             'icon' => 'success',

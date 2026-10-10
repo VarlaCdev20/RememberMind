@@ -32,7 +32,7 @@ class FrontendArchitectureTest extends TestCase
 
         $this->assertEmpty(
             $violaciones,
-            'Los siguientes componentes en components/ui no deben importar ni consultar modelos Eloquent: ' . implode(', ', $violaciones)
+            'Los siguientes componentes en components/ui no deben importar ni consultar modelos Eloquent: '.implode(', ', $violaciones)
         );
     }
 
@@ -61,43 +61,33 @@ class FrontendArchitectureTest extends TestCase
 
         $this->assertEmpty(
             $violaciones,
-            'Los siguientes componentes en components/patterns no deben importar ni consultar modelos Eloquent: ' . implode(', ', $violaciones)
+            'Los siguientes componentes en components/patterns no deben importar ni consultar modelos Eloquent: '.implode(', ', $violaciones)
         );
     }
 
-    /**
-     * Protege que las nuevas Features Livewire ubiquen sus vistas bajo resources/views/livewire/features/.
-     */
-    public function test_nuevas_features_vistas_bajo_livewire_features(): void
+    public function test_livewire_resuelve_vistas_del_modulo_propietario(): void
     {
-        $featuresPhpPath = app_path('Frontend/Livewire/Features');
-        $this->assertDirectoryExists($featuresPhpPath);
-
-        $featuresViewsPath = resource_path('views/livewire/features');
-        $this->assertDirectoryExists($featuresViewsPath);
-
-        $violaciones = [];
-
-        foreach (File::allFiles($featuresPhpPath) as $phpFile) {
-            if (! str_ends_with($phpFile->getFilename(), '.php')) {
-                continue;
-            }
-
-            $contenido = File::get($phpFile->getPathname());
-
-            // Extraer la vista devuelta en el método render: view('...')
-            if (preg_match("/view\(['\"]([^'\"]+)['\"]/i", $contenido, $coincidencias)) {
-                $vistaDeclarada = $coincidencias[1];
-                if (! str_starts_with($vistaDeclarada, 'livewire.features.')) {
-                    $violaciones[] = "{$phpFile->getFilename()} declara la vista '{$vistaDeclarada}' fuera de livewire.features.*";
+        $componentes = 0;
+        foreach (File::directories(app_path('Modulos')) as $modulo) {
+            foreach (File::allFiles($modulo.'/Presentacion/Livewire') as $archivo) {
+                if ($archivo->getExtension() !== 'php') {
+                    continue;
+                }
+                $componentes++;
+                $codigo = File::get($archivo->getPathname());
+                preg_match('/namespace ([^;]+);/', $codigo, $namespace);
+                preg_match('/class (\w+)/', $codigo, $clase);
+                $render = new \ReflectionMethod($namespace[1].'\\'.$clase[1], 'render');
+                $lineas = explode("\n", $codigo);
+                $codigoRender = implode("\n", array_slice($lineas, $render->getStartLine() - 1, $render->getEndLine() - $render->getStartLine() + 1));
+                if (preg_match("/view\\(['\"]([^'\"]+)['\"]/", $codigoRender, $coincidencia)) {
+                    $resuelta = app('view.finder')->find($coincidencia[1]);
+                    $this->assertFileExists($resuelta);
+                    $this->assertStringStartsWith(str_replace('\\', '/', $modulo).'/Presentacion/Vistas/', str_replace('\\', '/', $resuelta));
                 }
             }
         }
-
-        $this->assertEmpty(
-            $violaciones,
-            'Las Features Livewire deben usar vistas bajo resources/views/livewire/features/: ' . implode(', ', $violaciones)
-        );
+        $this->assertSame(71, $componentes);
     }
 
     /**
@@ -468,7 +458,7 @@ class FrontendArchitectureTest extends TestCase
         $this->assertStringContainsString('Centro geriátrico · Atención integral', $vista);
         $this->assertStringContainsString('Centro Geriátrico Los Almendros', $vista);
         $this->assertStringNotContainsString('Jardín de los Recuerdos', $vista);
-        $this->assertStringContainsString("storage/imagenes/LOGO.png", $vista);
+        $this->assertStringContainsString('storage/imagenes/LOGO.png', $vista);
         $this->assertStringContainsString('ph-stethoscope', $vista);
         $this->assertStringContainsString('ph-heartbeat', $vista);
         $this->assertStringContainsString('ph-first-aid', $vista);
@@ -507,7 +497,7 @@ class FrontendArchitectureTest extends TestCase
         $this->assertStringContainsString('wire:model="dosis_administrada"', $medicacion);
         $this->assertStringContainsString('wire:model="reaccion_adversa"', $medicacion);
 
-        foreach (File::files(resource_path('views/livewire/cuidados')) as $vista) {
+        foreach (File::files(base_path('app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados')) as $vista) {
             $this->assertStringNotContainsString('[[var(', File::get($vista->getPathname()), $vista->getFilename().' contiene un token Tailwind mal formado.');
         }
     }

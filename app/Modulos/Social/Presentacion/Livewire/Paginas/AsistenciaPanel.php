@@ -4,6 +4,7 @@ namespace App\Modulos\Social\Presentacion\Livewire\Paginas;
 
 use App\Models\Actividad;
 use App\Models\ParticipanteActividad;
+use App\Modulos\Social\Aplicacion\Acciones\RegistrarResultadosActividad;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -100,7 +101,8 @@ class AsistenciaPanel extends Component
 
     public function marcarRealizada(string $id): void
     {
-        Actividad::findOrFail($id)->update(['estado' => 'REALIZADA']);
+        app(RegistrarResultadosActividad::class)->marcarRealizada(['obs' => $this->obs, 'estado' => $this->estado], $id);
+
         $this->dispatch('swal', [
             'icon' => 'success',
             'title' => 'Actividad marcada como realizada. Cumplimiento institucional registrado.',
@@ -109,7 +111,8 @@ class AsistenciaPanel extends Component
 
     public function marcarCancelada(string $id): void
     {
-        Actividad::findOrFail($id)->update(['estado' => 'CANCELADA']);
+        app(RegistrarResultadosActividad::class)->marcarCancelada(['obs' => $this->obs, 'estado' => $this->estado], $id);
+
         $this->dispatch('swal', [
             'icon' => 'success',
             'title' => 'Actividad marcada como cancelada. El registro se conserva como historial.',
@@ -119,11 +122,8 @@ class AsistenciaPanel extends Component
     public function guardarResultado(): void
     {
         $this->validate();
-        Actividad::findOrFail($this->editandoId)->update([
-            'estado' => strtoupper(trim($this->estado)),
-            'observacion' => $this->obs ?: null,
-            'descripcion' => $this->obs ?: null,
-        ]);
+        app(RegistrarResultadosActividad::class)->guardarResultado(['editandoId' => $this->editandoId, 'estado' => $this->estado, 'obs' => $this->obs]);
+
         $this->modalResultado = false;
         $this->resetForm();
         $this->dispatch('swal', ['icon' => 'success', 'title' => 'Resultado registrado correctamente.']);

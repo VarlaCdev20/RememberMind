@@ -8,16 +8,18 @@ use App\Models\AplicacionInstrumento;
 use App\Models\Area;
 use App\Models\Atencion;
 use App\Models\Documento;
-use App\Models\HistorialEstadoResidente;
 use App\Models\Instrumento;
 use App\Models\NotaClinica;
 use App\Models\Residente;
 use App\Modulos\Reportes\Aplicacion\Consultas\AdultoMayorBitacoraService;
 use App\Modulos\Residentes\Aplicacion\Acciones\AdultoMayorService;
+use App\Modulos\Residentes\Aplicacion\Acciones\CambiarEstadoResidenteHttp;
 use App\Modulos\Residentes\Presentacion\Http\Requests\UpdateAdultoMayorRequest;
+use App\Modulos\Valoraciones\Aplicacion\Acciones\AnularEvaluacionGeriatricaHttp;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Spatie\Activitylog\Models\Activity;
@@ -29,10 +31,8 @@ class AdultoMayorController extends Controller
 
     protected $bitacoraService;
 
-    public function __construct(
-        AdultoMayorService $adultoMayorService,
-        AdultoMayorBitacoraService $bitacoraService
-    ) {
+    public function __construct(AdultoMayorService $adultoMayorService, AdultoMayorBitacoraService $bitacoraService)
+    {
         $this->adultoMayorService = $adultoMayorService;
         $this->bitacoraService = $bitacoraService;
     }
@@ -57,35 +57,27 @@ class AdultoMayorController extends Controller
             return redirect()->route('admin.residentes.show', $adulto_mayor);
         }
         $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_residente);
-
         // Contactos / Familiares
         $familiaresActivos = $adulto->contactos()->wherePivot('estado', 'ACTIVO')->get();
         $familiaresInactivos = $adulto->contactos()->wherePivot('estado', 'INACTIVO')->get();
-
         // Notas Clínicas / Observaciones
         $observacionesActivas = $adulto->observaciones()->where('estado', 'ACTIVO')->orderByDesc('fecha_hora')->get();
         $observacionesAnuladas = $adulto->observaciones()->where('estado', 'ANULADO')->orderByDesc('fecha_hora')->get();
-
         // Actividades
         $actividadesActivas = $adulto->actividades()->orderByDesc('fecha_hora')->get();
         $actividadesAnuladas = collect();
-
         // Atenciones
         $atencionesActivas = $adulto->atenciones()->where('estado', '!=', 'ANULADO')->orderByDesc('fecha_hora')->get();
         $atencionesAnuladas = $adulto->atenciones()->where('estado', 'ANULADO')->orderByDesc('fecha_hora')->get();
-
         // Documentos
         $documentosActivos = $adulto->documentos()->where('estado', '!=', 'ARCHIVADO')->orderByDesc('cod_documento')->get();
         $documentosArchivados = $adulto->documentos()->where('estado', 'ARCHIVADO')->orderByDesc('cod_documento')->get();
-
         // Evaluaciones / Instrumentos V2
         $evaluacionesActivas = $adulto->aplicacionesInstrumento()->with('instrumento')->orderByDesc('fecha_hora')->get();
         $evaluacionesAnuladas = collect();
-
         $evaluacionesGeriatricasActivas = $evaluacionesActivas;
         $evaluacionesGeriatricasAnuladas = collect();
         $areasGeriatricas = Area::where('estado', 'ACTIVO')->get();
-
         // FASE 3: Módulos médicos V2
         $fichasMedicas = $adulto->atenciones()->orderByDesc('fecha_hora')->get();
         $medicaciones = $adulto->prescripciones()->with('medicamento')->get();
@@ -93,133 +85,43 @@ class AdultoMayorController extends Controller
         $signosVitales = $adulto->signosVitales()->orderByDesc('fecha_hora')->get();
         $valoracionesFuncionales = $adulto->valoracionesFuncionales()->orderByDesc('fecha_hora')->get();
         $historialEstados = $adulto->historialEstados()->orderByDesc('fecha_hora')->get();
-
         $estadosAdulto = $this->adultoMayorService->obtenerEstados();
-        $tiposAtenciones = collect([
-            (object) ['cod_tipo_aten' => 'MEDICA', 'tipo' => 'Médica', 'descripcion' => 'Consulta y control médico'],
-            (object) ['cod_tipo_aten' => 'ENFERMERIA', 'tipo' => 'Enfermería', 'descripcion' => 'Cuidados y signos vitales'],
-            (object) ['cod_tipo_aten' => 'PSICOLOGIA', 'tipo' => 'Psicológica', 'descripcion' => 'Evaluación y apoyo emocional'],
-            (object) ['cod_tipo_aten' => 'NUTRICION', 'tipo' => 'Nutricional', 'descripcion' => 'Control dietético y peso'],
-            (object) ['cod_tipo_aten' => 'FISIOTERAPIA', 'tipo' => 'Fisioterapia', 'descripcion' => 'Rehabilitación física'],
-            (object) ['cod_tipo_aten' => 'SOCIAL', 'tipo' => 'Trabajo Social', 'descripcion' => 'Vínculo familiar y social'],
-        ]);
+        $tiposAtenciones = collect([(object) ['cod_tipo_aten' => 'MEDICA', 'tipo' => 'Médica', 'descripcion' => 'Consulta y control médico'], (object) ['cod_tipo_aten' => 'ENFERMERIA', 'tipo' => 'Enfermería', 'descripcion' => 'Cuidados y signos vitales'], (object) ['cod_tipo_aten' => 'PSICOLOGIA', 'tipo' => 'Psicológica', 'descripcion' => 'Evaluación y apoyo emocional'], (object) ['cod_tipo_aten' => 'NUTRICION', 'tipo' => 'Nutricional', 'descripcion' => 'Control dietético y peso'], (object) ['cod_tipo_aten' => 'FISIOTERAPIA', 'tipo' => 'Fisioterapia', 'descripcion' => 'Rehabilitación física'], (object) ['cod_tipo_aten' => 'SOCIAL', 'tipo' => 'Trabajo Social', 'descripcion' => 'Vínculo familiar y social']]);
         $tiposEvaluaciones = Instrumento::where('estado', 'ACTIVO')->get();
-        $tiposActividades = collect([
-            (object) ['cod_tipo_act' => 'RECREATIVA', 'tipo' => 'Recreativa'],
-            (object) ['cod_tipo_act' => 'COGNITIVA', 'tipo' => 'Cognitiva'],
-            (object) ['cod_tipo_act' => 'FISICA', 'tipo' => 'Física'],
-            (object) ['cod_tipo_act' => 'CULTURAL', 'tipo' => 'Cultural'],
-            (object) ['cod_tipo_act' => 'TERAPEUTICA', 'tipo' => 'Terapéutica'],
-        ]);
-
+        $tiposActividades = collect([(object) ['cod_tipo_act' => 'RECREATIVA', 'tipo' => 'Recreativa'], (object) ['cod_tipo_act' => 'COGNITIVA', 'tipo' => 'Cognitiva'], (object) ['cod_tipo_act' => 'FISICA', 'tipo' => 'Física'], (object) ['cod_tipo_act' => 'CULTURAL', 'tipo' => 'Cultural'], (object) ['cod_tipo_act' => 'TERAPEUTICA', 'tipo' => 'Terapéutica']]);
         // Bitácora escalable desde Spatie Activitylog
         $bitacora = $this->bitacoraService->obtenerBitacora($adulto_mayor->cod_residente, 60);
         $eventosFiltro = $this->bitacoraService->obtenerTiposEventos($adulto_mayor->cod_residente);
 
-        return view('pages.adultos-mayores.show', compact(
-            'adulto',
-            'familiaresActivos',
-            'familiaresInactivos',
-            'observacionesActivas',
-            'observacionesAnuladas',
-            'actividadesActivas',
-            'actividadesAnuladas',
-            'atencionesActivas',
-            'atencionesAnuladas',
-            'documentosActivos',
-            'documentosArchivados',
-            'evaluacionesActivas',
-            'evaluacionesAnuladas',
-            'evaluacionesGeriatricasActivas',
-            'evaluacionesGeriatricasAnuladas',
-            'areasGeriatricas',
-            'fichasMedicas',
-            'medicaciones',
-            'administracionesMedicacion',
-            'signosVitales',
-            'valoracionesFuncionales',
-            'historialEstados',
-            'estadosAdulto',
-            'tiposAtenciones',
-            'tiposEvaluaciones',
-            'tiposActividades',
-            'bitacora',
-            'eventosFiltro'
-        ));
+        return view('pages.adultos-mayores.show', compact('adulto', 'familiaresActivos', 'familiaresInactivos', 'observacionesActivas', 'observacionesAnuladas', 'actividadesActivas', 'actividadesAnuladas', 'atencionesActivas', 'atencionesAnuladas', 'documentosActivos', 'documentosArchivados', 'evaluacionesActivas', 'evaluacionesAnuladas', 'evaluacionesGeriatricasActivas', 'evaluacionesGeriatricasAnuladas', 'areasGeriatricas', 'fichasMedicas', 'medicaciones', 'administracionesMedicacion', 'signosVitales', 'valoracionesFuncionales', 'historialEstados', 'estadosAdulto', 'tiposAtenciones', 'tiposEvaluaciones', 'tiposActividades', 'bitacora', 'eventosFiltro'));
     }
 
     public function reporteIndividual(Request $request, Residente $adulto_mayor)
     {
         $format = $request->query('format', 'html');
-
         $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_residente);
         $adulto->edad = $this->adultoMayorService->calcularEdad($adulto->fecha_nacimiento);
-
         $evaluaciones = $adulto->aplicacionesInstrumento()->with('instrumento')->orderByDesc('fecha_hora')->get();
         $evaluacionesAnuladas = collect();
-
         $atenciones = $adulto->atenciones()->orderByDesc('fecha_hora')->get();
         $atencionesAnuladas = collect();
-
         $actividades = $adulto->actividades()->orderByDesc('fecha_hora')->get();
         $actividadesAnuladas = collect();
-
         $observaciones = $adulto->observaciones()->orderByDesc('fecha_hora')->get();
         $observacionesAnuladas = collect();
-
         $documentos = $adulto->documentos()->orderByDesc('cod_documento')->get();
         $documentosArchivados = collect();
-
         $familiares = $adulto->contactos()->wherePivot('estado', 'ACTIVO')->get();
         $familiaresInactivos = $adulto->contactos()->wherePivot('estado', 'INACTIVO')->get();
-
         $fichasMedicas = $adulto->atenciones()->orderByDesc('fecha_hora')->get();
         $medicaciones = $adulto->prescripciones()->with('medicamento')->get();
         $administracionesMedicacion = $adulto->administracionesMedicacion()->orderByDesc('fecha_hora_programada')->get();
         $signosVitales = $adulto->signosVitales()->orderByDesc('fecha_hora')->get();
         $valoracionesFuncionales = $adulto->valoracionesFuncionales()->orderByDesc('fecha_hora')->get();
         $historialEstados = $adulto->historialEstados()->orderByDesc('fecha_hora')->get();
-
-        $bitacora = Activity::where('subject_id', $adulto->cod_residente)
-            ->orWhere('description', 'like', '%'.$adulto->cod_residente.'%')
-            ->orderByDesc('created_at')
-            ->take(50)
-            ->get();
-
-        $resumen = [
-            'total_familiares' => $familiares->count(),
-            'total_observaciones' => $observaciones->count(),
-            'total_atenciones' => $atenciones->count(),
-            'total_actividades' => $actividades->count(),
-            'total_documentos' => $documentos->count(),
-            'total_evaluaciones' => $evaluaciones->count(),
-            'ultima_fecha_seguimiento' => $observaciones->first()?->fecha_hora?->format('d/m/Y') ?? 'Sin seguimiento reciente',
-        ];
-
-        $viewData = [
-            'adulto' => $adulto,
-            'evaluaciones' => $evaluaciones,
-            'evaluacionesAnuladas' => $evaluacionesAnuladas,
-            'atenciones' => $atenciones,
-            'atencionesAnuladas' => $atencionesAnuladas,
-            'actividades' => $actividades,
-            'actividadesAnuladas' => $actividadesAnuladas,
-            'observaciones' => $observaciones,
-            'observacionesAnuladas' => $observacionesAnuladas,
-            'documentos' => $documentos,
-            'documentosArchivados' => $documentosArchivados,
-            'familiares' => $familiares,
-            'familiaresInactivos' => $familiaresInactivos,
-            'bitacora' => $bitacora,
-            'resumen' => $resumen,
-            'fichasMedicas' => $fichasMedicas,
-            'medicaciones' => $medicaciones,
-            'administracionesMedicacion' => $administracionesMedicacion,
-            'signosVitales' => $signosVitales,
-            'valoracionesFuncionales' => $valoracionesFuncionales,
-            'historialEstados' => $historialEstados,
-        ];
-
+        $bitacora = Activity::where('subject_id', $adulto->cod_residente)->orWhere('description', 'like', '%'.$adulto->cod_residente.'%')->orderByDesc('created_at')->take(50)->get();
+        $resumen = ['total_familiares' => $familiares->count(), 'total_observaciones' => $observaciones->count(), 'total_atenciones' => $atenciones->count(), 'total_actividades' => $actividades->count(), 'total_documentos' => $documentos->count(), 'total_evaluaciones' => $evaluaciones->count(), 'ultima_fecha_seguimiento' => $observaciones->first()?->fecha_hora?->format('d/m/Y') ?? 'Sin seguimiento reciente'];
+        $viewData = ['adulto' => $adulto, 'evaluaciones' => $evaluaciones, 'evaluacionesAnuladas' => $evaluacionesAnuladas, 'atenciones' => $atenciones, 'atencionesAnuladas' => $atencionesAnuladas, 'actividades' => $actividades, 'actividadesAnuladas' => $actividadesAnuladas, 'observaciones' => $observaciones, 'observacionesAnuladas' => $observacionesAnuladas, 'documentos' => $documentos, 'documentosArchivados' => $documentosArchivados, 'familiares' => $familiares, 'familiaresInactivos' => $familiaresInactivos, 'bitacora' => $bitacora, 'resumen' => $resumen, 'fichasMedicas' => $fichasMedicas, 'medicaciones' => $medicaciones, 'administracionesMedicacion' => $administracionesMedicacion, 'signosVitales' => $signosVitales, 'valoracionesFuncionales' => $valoracionesFuncionales, 'historialEstados' => $historialEstados];
         if ($format === 'pdf') {
             $pdf = Pdf::loadView('pages.adultos-mayores.reportes.pdf_individual', $viewData)->setPaper('a4', 'portrait');
             $nombreArchivo = Str::slug($adulto->nombre_completo, '_');
@@ -235,16 +137,8 @@ class AdultoMayorController extends Controller
         $format = $request->query('format', 'html');
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
-
         $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_residente);
-
-        $viewData = [
-            'adulto' => $adulto,
-            'tipo' => $tipo,
-            'startDate' => $startDate,
-            'endDate' => $endDate,
-        ];
-
+        $viewData = ['adulto' => $adulto, 'tipo' => $tipo, 'startDate' => $startDate, 'endDate' => $endDate];
         $applyDateFilter = function ($query, $dateColumn = 'fecha_hora') use ($startDate, $endDate) {
             if ($startDate) {
                 $query->where($dateColumn, '>=', Carbon::parse($startDate)->startOfDay());
@@ -255,7 +149,6 @@ class AdultoMayorController extends Controller
 
             return $query;
         };
-
         switch ($tipo) {
             case 'medico':
                 $viewData['fichas'] = $adulto->atenciones()->orderByDesc('fecha_hora')->get();
@@ -279,9 +172,7 @@ class AdultoMayorController extends Controller
                 $titulo = 'Reporte Clínico General';
                 break;
         }
-
         $viewData['titulo'] = $titulo;
-
         if ($format === 'pdf') {
             $pdf = Pdf::loadView('pages.adultos-mayores.reportes.pdf_especifico', $viewData);
 
@@ -294,35 +185,18 @@ class AdultoMayorController extends Controller
     public function reporteGeneral()
     {
         $adultos = Residente::all();
-
         $totalObservaciones = NotaClinica::count();
         $totalAtenciones = Atencion::count();
         $totalActividades = Actividad::count();
         $totalDocumentos = Documento::count();
         $totalEvaluaciones = AplicacionInstrumento::count();
-
         $hace30Dias = now()->subDays(30);
         $sinSeguimiento = Residente::whereDoesntHave('observaciones', function ($q) use ($hace30Dias) {
             $q->where('fecha_hora', '>=', $hace30Dias);
         })->whereDoesntHave('atenciones', function ($q) use ($hace30Dias) {
             $q->where('fecha_hora', '>=', $hace30Dias);
         })->count();
-
-        $stats = [
-            'total' => $adultos->count(),
-            'activos' => $adultos->where('estado', 'ACTIVO')->count(),
-            'archivados' => $adultos->where('estado', 'INACTIVO')->count(),
-            'hombres' => $adultos->where('genero', 'MASCULINO')->count(),
-            'mujeres' => $adultos->where('genero', 'FEMENINO')->count(),
-            'promedio_edad' => round($adultos->avg(fn ($a) => $this->adultoMayorService->calcularEdad($a->fecha_nacimiento))),
-            'obs_totales' => $totalObservaciones,
-            'aten_totales' => $totalAtenciones,
-            'act_totales' => $totalActividades,
-            'doc_totales' => $totalDocumentos,
-            'eval_totales' => $totalEvaluaciones,
-            'sin_seguimiento' => $sinSeguimiento,
-            'ultimos_adultos' => Residente::orderByDesc('cod_residente')->take(5)->get(),
-        ];
+        $stats = ['total' => $adultos->count(), 'activos' => $adultos->where('estado', 'ACTIVO')->count(), 'archivados' => $adultos->where('estado', 'INACTIVO')->count(), 'hombres' => $adultos->where('genero', 'MASCULINO')->count(), 'mujeres' => $adultos->where('genero', 'FEMENINO')->count(), 'promedio_edad' => round($adultos->avg(fn ($a) => $this->adultoMayorService->calcularEdad($a->fecha_nacimiento))), 'obs_totales' => $totalObservaciones, 'aten_totales' => $totalAtenciones, 'act_totales' => $totalActividades, 'doc_totales' => $totalDocumentos, 'eval_totales' => $totalEvaluaciones, 'sin_seguimiento' => $sinSeguimiento, 'ultimos_adultos' => Residente::orderByDesc('cod_residente')->take(5)->get()];
 
         return view('pages.adultos-mayores.reportes.general', compact('adultos', 'stats'));
     }
@@ -333,14 +207,7 @@ class AdultoMayorController extends Controller
         $totalAtenciones = Atencion::count();
         $totalActividades = Actividad::count();
         $totalEvaluaciones = AplicacionInstrumento::count();
-
-        $stats = [
-            'poblacion' => $adultos->count(),
-            'impacto_salud' => $totalAtenciones,
-            'impacto_social' => $totalActividades,
-            'seguimiento_cognitivo' => $totalEvaluaciones,
-            'efectividad' => 98,
-        ];
+        $stats = ['poblacion' => $adultos->count(), 'impacto_salud' => $totalAtenciones, 'impacto_social' => $totalActividades, 'seguimiento_cognitivo' => $totalEvaluaciones, 'efectividad' => 98];
 
         return view('pages.adultos-mayores.reportes.institucional', compact('stats'));
     }
@@ -349,12 +216,7 @@ class AdultoMayorController extends Controller
     {
         $adultos = Residente::all();
         $totalEvaluaciones = AplicacionInstrumento::count();
-
-        $distribucionRiesgo = [
-            'bajo' => \Illuminate\Support\Facades\DB::table('registros_movilidad')->where('riesgo_caida', 'BAJO')->count(),
-            'medio' => \Illuminate\Support\Facades\DB::table('registros_movilidad')->where('riesgo_caida', 'MEDIO')->count(),
-            'alto' => \Illuminate\Support\Facades\DB::table('registros_movilidad')->whereIn('riesgo_caida', ['ALTO', 'INTENTO_CAMINAR_SOLO'])->count(),
-        ];
+        $distribucionRiesgo = ['bajo' => DB::table('registros_movilidad')->where('riesgo_caida', 'BAJO')->count(), 'medio' => DB::table('registros_movilidad')->where('riesgo_caida', 'MEDIO')->count(), 'alto' => DB::table('registros_movilidad')->whereIn('riesgo_caida', ['ALTO', 'INTENTO_CAMINAR_SOLO'])->count()];
 
         return view('pages.adultos-mayores.reportes.bienestar', compact('distribucionRiesgo', 'totalEvaluaciones'));
     }
@@ -378,8 +240,7 @@ class AdultoMayorController extends Controller
     {
         $this->adultoMayorService->actualizarAdultoMayor($adulto_mayor->cod_residente, $request->validated(), $request->file('foto'));
 
-        return redirect()->route('admin.adultos-mayores.show', $adulto_mayor->cod_residente)
-            ->with('success', 'Ficha actualizada correctamente.');
+        return redirect()->route('admin.adultos-mayores.show', $adulto_mayor->cod_residente)->with('success', 'Ficha actualizada correctamente.');
     }
 
     /**
@@ -387,14 +248,9 @@ class AdultoMayorController extends Controller
      */
     public function archivar(Request $request, Residente $adulto_mayor)
     {
-        $this->adultoMayorService->archivar(
-            $adulto_mayor->cod_residente,
-            $request->user()->cod_usuario,
-            $request->motivo,
-        );
+        $this->adultoMayorService->archivar($adulto_mayor->cod_residente, $request->user()->cod_usuario, $request->motivo);
 
-        return redirect()->route('admin.adultos-mayores.index')
-            ->with('success', 'Se archivó el registro del adulto mayor.');
+        return redirect()->route('admin.adultos-mayores.index')->with('success', 'Se archivó el registro del adulto mayor.');
     }
 
     /**
@@ -402,13 +258,9 @@ class AdultoMayorController extends Controller
      */
     public function restaurar(Request $request, Residente $adulto_mayor)
     {
-        $this->adultoMayorService->restaurar(
-            $adulto_mayor->cod_residente,
-            $request->user()->cod_usuario,
-        );
+        $this->adultoMayorService->restaurar($adulto_mayor->cod_residente, $request->user()->cod_usuario);
 
-        return redirect()->route('admin.adultos-mayores.index')
-            ->with('success', 'Se restauró el registro del adulto mayor.');
+        return redirect()->route('admin.adultos-mayores.index')->with('success', 'Se restauró el registro del adulto mayor.');
     }
 
     /**
@@ -417,44 +269,16 @@ class AdultoMayorController extends Controller
     public function cambiarEstado(Request $request, Residente $adulto_mayor)
     {
         try {
-            \DB::beginTransaction();
+            app(CambiarEstadoResidenteHttp::class)->cambiarEstado(auth()->user(), $request->all(), $adulto_mayor);
 
-            $estadoAnterior = $adulto_mayor->estado;
-            $nuevoEstado = $request->input('estado') ?? $request->input('cod_est_adul') ?? 'ACTIVO';
-            if (is_numeric($nuevoEstado)) {
-                $nuevoEstado = ((int) $nuevoEstado === 2 || (int) $nuevoEstado === 3) ? 'INACTIVO' : 'ACTIVO';
-            }
-
-            $adulto_mayor->estado = $nuevoEstado;
-            $adulto_mayor->observacion = $request->motivo ?? $adulto_mayor->observacion;
-            $adulto_mayor->save();
-
-            HistorialEstadoResidente::create([
-                'cod_historial_estado' => 'HER_'.strtoupper(Str::random(10)),
-                'cod_residente' => $adulto_mayor->cod_residente,
-                'cod_usuario_registro' => $request->user()->cod_usuario,
-                'estado_anterior' => $estadoAnterior ?? 'ACTIVO',
-                'estado_nuevo' => $nuevoEstado,
-                'fecha_hora' => now(),
-                'motivo' => $request->motivo ?? 'Cambio de estado administrativo',
-            ]);
-
-            \DB::commit();
-
-            return redirect()->back()
-                ->with('success', 'Se actualizó el estado correctamente y se guardó en el historial.');
-
+            return redirect()->back()->with('success', 'Se actualizó el estado correctamente y se guardó en el historial.');
         } catch (\Throwable $e) {
-            \DB::rollBack();
-            if ($e instanceof ValidationException
-                || $e instanceof HttpExceptionInterface) {
+            if ($e instanceof ValidationException || $e instanceof HttpExceptionInterface) {
                 throw $e;
             }
             report($e);
 
-            return redirect()->back()
-                ->with('error', 'No se pudo cambiar el estado. Inténtelo nuevamente.')
-                ->withInput();
+            return redirect()->back()->with('error', 'No se pudo cambiar el estado. Inténtelo nuevamente.')->withInput();
         }
     }
 
@@ -469,31 +293,13 @@ class AdultoMayorController extends Controller
 
     public function anularEvaluacionGeriatrica(Request $request, Residente $adulto_mayor, $evaluacionId)
     {
-        $request->validate([
-            'motivo_anulacion' => 'required|string|min:10',
-        ], [
-            'motivo_anulacion.required' => 'El motivo de anulación es obligatorio.',
-            'motivo_anulacion.min' => 'El motivo de anulación debe tener al menos 10 caracteres.',
-        ]);
-
+        $request->validate(['motivo_anulacion' => 'required|string|min:10'], ['motivo_anulacion.required' => 'El motivo de anulación es obligatorio.', 'motivo_anulacion.min' => 'El motivo de anulación debe tener al menos 10 caracteres.']);
         try {
-            \DB::transaction(function () use ($request, $adulto_mayor, $evaluacionId) {
-                $eval = AplicacionInstrumento::where('cod_residente', $adulto_mayor->cod_residente)
-                    ->where('cod_aplicacion', $evaluacionId)
-                    ->firstOrFail();
+            app(AnularEvaluacionGeriatricaHttp::class)->anularEvaluacionGeriatrica(auth()->user(), $request->all(), $adulto_mayor, $evaluacionId);
 
-                $eval->update([
-                    'estado' => 'ANULADA',
-                    'observacion' => trim(($eval->observacion ?? '')."\nANULADA: ".$request->input('motivo_anulacion').' ('.auth()->id().', '.now()->toDateTimeString().')'),
-                ]);
-            });
-
-            return redirect()->back()
-                ->with('success', 'Evaluación geriátrica anulada correctamente.');
-
+            return redirect()->back()->with('success', 'Evaluación geriátrica anulada correctamente.');
         } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Error al anular la evaluación: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Error al anular la evaluación: '.$e->getMessage());
         }
     }
 
@@ -501,12 +307,7 @@ class AdultoMayorController extends Controller
     {
         $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_residente);
         $adulto->edad = $this->adultoMayorService->calcularEdad($adulto->fecha_nac);
-
-        $evaluacion = AplicacionInstrumento::where('cod_residente', $adulto_mayor->cod_residente)
-            ->where('cod_aplicacion', $evaluacionId)
-            ->with(['instrumento', 'evaluador'])
-            ->firstOrFail();
-
+        $evaluacion = AplicacionInstrumento::where('cod_residente', $adulto_mayor->cod_residente)->where('cod_aplicacion', $evaluacionId)->with(['instrumento', 'evaluador'])->firstOrFail();
         $pdf = Pdf::loadView('pages.adultos-mayores.reportes.pdf_evaluacion_individual', compact('adulto', 'evaluacion'));
 
         return $pdf->stream("evaluacion_{$evaluacion->cod_eval_ger}.pdf");

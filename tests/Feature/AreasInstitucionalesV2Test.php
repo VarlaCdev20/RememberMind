@@ -2,15 +2,15 @@
 
 namespace Tests\Feature;
 
-use App\Modulos\Reportes\Aplicacion\Consultas\AreasReportDataService;
-use App\Modulos\Reportes\Infraestructura\Exportaciones\ReportExportService;
-use App\Modulos\Reportes\Infraestructura\Exportaciones\AreasInstitucionalesExport;
-use App\Modulos\Identidad\Presentacion\Livewire\Paginas\AreasInstitucionalesPanel;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Jornada;
 use App\Models\Turno;
 use App\Models\User;
+use App\Modulos\Institucion\Presentacion\Livewire\Paginas\AreasInstitucionalesPanel;
+use App\Modulos\Reportes\Aplicacion\Consultas\AreasReportDataService;
+use App\Modulos\Reportes\Infraestructura\Exportaciones\AreasInstitucionalesExport;
+use App\Modulos\Reportes\Infraestructura\Exportaciones\ReportExportService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Exceptions;

@@ -2,10 +2,10 @@
 
 namespace App\Modulos\Medicacion\Aplicacion\Consultas;
 
-use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
 use App\Models\AdministracionMedicacion;
 use App\Models\HorarioPrescripcion;
 use App\Models\Prescripcion;
+use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;

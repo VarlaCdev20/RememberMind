@@ -2,12 +2,12 @@
 
 namespace App\Modulos\Clinica\Aplicacion\Acciones;
 
-use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use App\Models\ObjetivoSignoVital;
 use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\User;
-use App\Modulos\Clinica\Presentacion\Http\Validacion\ValidacionSignosVitalesService;
+use App\Modulos\Clinica\Aplicacion\Validacion\ValidacionSignosVitalesService;
+use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;

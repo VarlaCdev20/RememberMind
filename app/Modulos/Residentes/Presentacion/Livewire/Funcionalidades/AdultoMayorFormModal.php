@@ -3,9 +3,9 @@
 namespace App\Modulos\Residentes\Presentacion\Livewire\Funcionalidades;
 
 use App\Models\Residente;
+use App\Modulos\Residentes\Aplicacion\Acciones\ActualizarExpedienteResidente;
 use App\Modulos\Residentes\Aplicacion\Acciones\AdultoMayorService;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -588,16 +588,10 @@ class AdultoMayorFormModal extends Component
             'consentimiento_datos' => (bool) $this->consentimiento_datos,
         ];
 
-        $service = app(AdultoMayorService::class);
-
         try {
-            DB::beginTransaction();
-
-            abort_unless($this->isEdit && $this->adultoId, 403, 'El residente solo puede crearse mediante la admisión formal.');
-            $service->actualizarAdultoMayor($this->adultoId, $data, $this->foto);
+            app(ActualizarExpedienteResidente::class)
+                ->ejecutar(auth()->user(), $this->isEdit, $this->adultoId, $data, $this->foto);
             $mensaje = 'Expediente actualizado correctamente.';
-
-            DB::commit();
 
             $this->dispatch('adulto-mayor-guardado');
             $this->dispatch('swal', [
@@ -608,7 +602,6 @@ class AdultoMayorFormModal extends Component
 
             $this->cerrar();
         } catch (\Exception $e) {
-            DB::rollBack();
 
             $this->dispatch('swal', [
                 'icon' => 'error',

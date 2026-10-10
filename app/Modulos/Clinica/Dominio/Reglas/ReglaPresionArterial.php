@@ -7,6 +7,8 @@ use App\Modulos\Clinica\Dominio\ObjetosValor\ResultadoReglaClinica;
 
 final class ReglaPresionArterial extends ReglaBase
 {
+    public function __construct(private readonly array $parametros) {}
+
     public function evaluar(array $mediciones): ?ResultadoReglaClinica
     {
         $sis = $mediciones['presion_sistolica'] ?? null;
@@ -18,7 +20,7 @@ final class ReglaPresionArterial extends ReglaBase
             return $this->sinRegla('presion_arterial', ($sis ?? '—').'/'.($dia ?? '—'), 'mmHg');
         }
 
-        $c = config('signos_vitales.presion');
+        $c = $this->parametros;
         $valor = $sis.'/'.$dia;
         $causas = [];
         if ($sis > $c['sistolica_critica_alta']) {

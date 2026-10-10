@@ -3,17 +3,12 @@
 namespace App\Modulos\Cuidados\Presentacion\Livewire\Paginas;
 
 use App\Models\EjecucionCuidado;
-use App\Models\IntervencionCuidado;
-use App\Models\Jornada;
 use App\Models\PlanCuidado;
-use App\Models\ProgramacionCuidado;
 use App\Models\Turno;
 use App\Models\User;
+use App\Modulos\Cuidados\Aplicacion\Acciones\GestionarTareasPlan;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -122,93 +117,19 @@ class TareasPlanPanel extends Component
 
     public function guardarTarea(): void
     {
-        abort_unless(auth()->user()?->can('ejecuciones_cuidado.gestionar'), 403);
-
-        $this->validate([
-            'codPlan' => 'required|exists:planes_cuidado,cod_plan',
-            'codTurno' => ['required', Rule::exists('turnos', 'cod_turno')->where('estado', 'ACTIVO')],
-            'responsableId' => ['nullable', Rule::exists('usuarios', 'cod_usuario')->where('estado', 'ACTIVO')],
-            'horaProgramada' => 'nullable|date_format:H:i',
-            'area' => 'required|in:SIGNOS,MEDICACION,MOVILIDAD,COGNITIVO,ALIMENTACION,HIDRATACION,HIGIENE,SUEÑO,SEGURIDAD,EMOCIONAL,FAMILIAR,REEVALUACION',
-            'titulo' => 'required|string|min:3|max:200',
-            'descripcion' => 'nullable|string|max:2000',
-            'frecuencia' => 'nullable|string|max:100',
-            'fechaProgramada' => 'required|date',
-            'prioridad' => 'required|in:BAJA,NORMAL,ALTA,URGENTE',
-        ], [
-            'codPlan.required' => 'Seleccione un plan de cuidado.',
-            'codTurno.required' => 'Seleccione un turno.',
-            'area.required' => 'Seleccione el área de la tarea.',
-            'titulo.required' => 'El título es obligatorio.',
-            'titulo.min' => 'El título debe tener al menos 3 caracteres.',
-            'fechaProgramada.required' => 'La fecha es obligatoria.',
-            'codTurno.exists' => 'Seleccione un turno activo.',
-            'responsableId.exists' => 'Seleccione un responsable activo.',
+        app(GestionarTareasPlan::class)->guardarTarea(auth()->user(), [
+            'codPlan' => $this->codPlan,
+            'codResidente' => $this->codResidente,
+            'responsableId' => $this->responsableId,
+            'codTurno' => $this->codTurno,
+            'fechaProgramada' => $this->fechaProgramada,
+            'titulo' => $this->titulo,
+            'descripcion' => $this->descripcion,
+            'area' => $this->area,
+            'prioridad' => $this->prioridad,
+            'frecuencia' => $this->frecuencia,
+            'horaProgramada' => $this->horaProgramada,
         ]);
-
-        $plan = PlanCuidado::findOrFail($this->codPlan);
-        if ($plan->estado !== 'ACTIVO') {
-            $this->addError('codPlan', 'Seleccione un plan activo.');
-
-            return;
-        }
-        if ($this->codResidente && $this->codResidente !== $plan->cod_residente) {
-            $this->addError('codPlan', 'El plan de cuidados no corresponde al paciente seleccionado.');
-
-            return;
-        }
-        app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria($plan->cod_residente, 'ejecuciones_cuidado.gestionar', Auth::user());
-
-        // ejecuciones_cuidado.cod_personal exige personal.cod_personal; nunca se
-        // guarda usuarios.cod_usuario como si fuera una FK clínica.
-        $responsable = $this->responsableId
-            ? User::query()->with('personal')->findOrFail($this->responsableId)->personal
-            : Auth::user()?->personal;
-        abort_unless($responsable, 422, 'El usuario responsable no está vinculado a personal.');
-
-        // La ejecución pertenece a una jornada concreta, no directamente a un turno.
-        $jornada = Jornada::query()
-            ->where('cod_turno', $this->codTurno)
-            ->whereDate('fecha_jornada', $this->fechaProgramada)
-            ->whereIn('estado', ['ABIERTA', 'ACTIVA'])
-            ->first();
-        abort_unless($jornada, 422, 'No existe una jornada activa para el turno y la fecha seleccionados.');
-
-        // Una tarea V2 se compone de intervención, programación y ejecución.
-        // Las tres filas se crean atómicamente para evitar tareas incompletas.
-        DB::transaction(function () use ($plan, $responsable, $jornada): void {
-            $intervencion = IntervencionCuidado::query()->create([
-                'cod_intervencion' => 'INT_'.Str::upper(Str::random(10)),
-                'cod_plan' => $plan->cod_plan,
-                'nombre' => trim($this->titulo),
-                'descripcion' => filled($this->descripcion) ? trim($this->descripcion) : trim($this->titulo),
-                'objetivo_especifico' => filled($this->area) ? 'Área de cuidado: '.$this->area : null,
-                'prioridad' => $this->prioridad,
-                'estado' => 'ACTIVA',
-            ]);
-
-            ProgramacionCuidado::query()->create([
-                'cod_programacion' => 'PRG_'.Str::upper(Str::random(10)),
-                'cod_intervencion' => $intervencion->cod_intervencion,
-                'cod_turno' => $this->codTurno,
-                'frecuencia' => filled($this->frecuencia) ? trim($this->frecuencia) : 'UNA VEZ',
-                'dias_semana' => null,
-                'hora_programada' => $this->horaProgramada ?: null,
-                'fecha_activacion' => $this->fechaProgramada,
-                'fecha_desactivacion' => null,
-                'estado' => 'ACTIVA',
-            ]);
-
-            EjecucionCuidado::query()->create([
-                'cod_ejecucion' => 'EJC_'.Str::upper(Str::random(10)),
-                'cod_intervencion' => $intervencion->cod_intervencion,
-                'cod_residente' => $plan->cod_residente,
-                'cod_jornada' => $jornada->cod_jornada,
-                'cod_personal' => $responsable->cod_personal,
-                'fecha_hora_programada' => $this->fechaProgramada.' '.($this->horaProgramada ?: '00:00').':00',
-                'estado' => 'PENDIENTE',
-            ]);
-        });
 
         $this->modalForm = false;
         session()->flash('mensaje', 'Tarea creada correctamente.');
@@ -235,59 +156,16 @@ class TareasPlanPanel extends Component
 
     public function guardarResultado(): void
     {
-        abort_unless(auth()->user()?->can('ejecuciones_cuidado.gestionar'), 403);
-
-        $this->validate([
-            'estadoTarea' => 'required|in:REALIZADA,OMITIDA,REPROGRAMADA',
-            'fechaProgramada' => $this->estadoTarea === 'REPROGRAMADA' ? 'required|date|after_or_equal:today' : 'nullable|date',
-            'horaProgramada' => $this->estadoTarea === 'REPROGRAMADA' ? 'required|date_format:H:i' : 'nullable|date_format:H:i',
-            'resultado' => $this->estadoTarea === 'REALIZADA' ? 'required|string|min:5|max:60' : 'nullable|string|max:60',
-            'observacion' => 'nullable|string|max:2000',
-            'motivoOmision' => in_array($this->estadoTarea, ['OMITIDA', 'REPROGRAMADA']) ? 'required|string|min:5|max:1000' : 'nullable|string|max:1000',
-        ], [
-            'resultado.required' => 'Registre el resultado de la tarea (mínimo 5 caracteres).',
-            'resultado.min' => 'El resultado debe tener al menos 5 caracteres.',
-            'motivoOmision.required' => $this->estadoTarea === 'REPROGRAMADA' ? 'Registre el motivo de la reprogramación.' : 'Registre el motivo de omisión.',
-            'motivoOmision.min' => 'El motivo debe tener al menos 5 caracteres.',
-            'horaProgramada.required' => 'La nueva hora programada es obligatoria para reprogramar.',
-            'fechaProgramada.after_or_equal' => 'La nueva fecha no puede estar en el pasado.',
+        app(GestionarTareasPlan::class)->guardarResultado(auth()->user(), [
+            'estadoTarea' => $this->estadoTarea,
+            'resultandoId' => $this->resultandoId,
+            'fechaProgramada' => $this->fechaProgramada,
+            'horaProgramada' => $this->horaProgramada,
+            'resultado' => $this->resultado,
+            'observacion' => $this->observacion,
+            'motivoOmision' => $this->motivoOmision,
         ]);
 
-        if ($this->estadoTarea === 'OMITIDA') {
-            abort_unless(auth()->user()?->can('ejecuciones_cuidado.gestionar'), 403);
-        }
-        DB::transaction(function (): void {
-            // El bloqueo impide que dos enfermeros completen la misma ejecución.
-            $tarea = EjecucionCuidado::lockForUpdate()->findOrFail($this->resultandoId);
-            abort_unless($tarea->puedeCompletarse(), 409);
-            app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria(
-                $tarea->cod_residente,
-                'ejecuciones_cuidado.gestionar',
-                Auth::user()
-            );
-
-            if ($this->estadoTarea === 'REPROGRAMADA') {
-                // Se conserva la ejecución original y se crea una nueva pendiente;
-                // así no se pierde la trazabilidad clínica de la reprogramación.
-                $nueva = $tarea->replicate();
-                $nueva->cod_ejecucion = 'EJC_'.Str::upper(Str::random(10));
-                $nueva->fecha_hora_programada = $this->fechaProgramada.' '.$this->horaProgramada.':00';
-                $nueva->estado = 'PENDIENTE';
-                $nueva->resultado = null;
-                $nueva->observacion = null;
-                $nueva->motivo_omision = null;
-                $nueva->fecha_hora_ejecucion = null;
-                $nueva->save();
-            }
-
-            $tarea->update([
-                'estado' => $this->estadoTarea,
-                'resultado' => filled($this->resultado) ? trim($this->resultado) : null,
-                'observacion' => filled($this->observacion) ? trim($this->observacion) : null,
-                'motivo_omision' => filled($this->motivoOmision) ? trim($this->motivoOmision) : null,
-                'fecha_hora_ejecucion' => $this->estadoTarea === 'REALIZADA' ? now() : null,
-            ]);
-        });
         $this->modalResultado = false;
         session()->flash('mensaje', 'Resultado registrado.');
     }

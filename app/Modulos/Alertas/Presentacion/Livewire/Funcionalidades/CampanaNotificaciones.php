@@ -3,13 +3,12 @@
 namespace App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades;
 
 use App\Models\Alerta;
-use App\Models\EventoAlerta;
 use App\Models\Residente;
+use App\Modulos\Alertas\Aplicacion\Acciones\GestionarAtencionAlerta;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -147,25 +146,7 @@ class CampanaNotificaciones extends Component
         $this->comprobarPermiso('atender');
         $this->autorizarAlerta($id);
 
-        DB::transaction(function () use ($id, $accion) {
-            $alerta = Alerta::lockForUpdate()->findOrFail($id);
-            abort_unless($alerta->puedeCerrarse(), 409, 'La alerta no está abierta para atención.');
-
-            $textoAccion = $accion ?: ($this->accionTomada ?: 'Atención iniciada desde campana de notificaciones');
-
-            $alerta->update(['estado' => 'EN_ATENCION']);
-
-            EventoAlerta::query()->create([
-                'cod_evento_alerta' => 'EVA_'.Str::upper(Str::random(16)),
-                'cod_alerta' => $alerta->cod_alerta,
-                'cod_usuario' => auth()->id(),
-                'tipo_evento' => 'ATENCION',
-                'estado_anterior' => 'ABIERTA',
-                'estado_nuevo' => 'EN_ATENCION',
-                'fecha_hora' => now(),
-                'descripcion' => $textoAccion,
-            ]);
-        });
+        app(GestionarAtencionAlerta::class)->atenderAlerta(auth()->user(), $id, $accion ?: ($this->accionTomada ?: 'Atención iniciada desde campana de notificaciones'));
 
         $this->actualizarConteoYLista(false);
         $this->dispatch('alerta-atendida');
@@ -189,26 +170,7 @@ class CampanaNotificaciones extends Component
         $this->comprobarPermiso('cerrar');
         $this->autorizarAlerta($id);
 
-        DB::transaction(function () use ($id, $observacion) {
-            $alerta = Alerta::lockForUpdate()->findOrFail($id);
-            abort_unless($alerta->puedeCerrarse(), 409, 'La alerta ya está cerrada.');
-
-            $textoObs = $observacion ?: ($this->observacionCierre ?: 'Cierre registrado desde campana de notificaciones');
-
-            $estadoAnterior = $alerta->estado;
-            $alerta->update(['estado' => 'CERRADA']);
-
-            EventoAlerta::query()->create([
-                'cod_evento_alerta' => 'EVA_'.Str::upper(Str::random(16)),
-                'cod_alerta' => $alerta->cod_alerta,
-                'cod_usuario' => auth()->id(),
-                'tipo_evento' => 'CIERRE',
-                'estado_anterior' => $estadoAnterior,
-                'estado_nuevo' => 'CERRADA',
-                'fecha_hora' => now(),
-                'descripcion' => $textoObs,
-            ]);
-        });
+        app(GestionarAtencionAlerta::class)->cerrarAlerta(auth()->user(), $id, $observacion ?: ($this->observacionCierre ?: 'Cierre registrado desde campana de notificaciones'));
 
         $this->actualizarConteoYLista(false);
         $this->dispatch('alerta-cerrada');

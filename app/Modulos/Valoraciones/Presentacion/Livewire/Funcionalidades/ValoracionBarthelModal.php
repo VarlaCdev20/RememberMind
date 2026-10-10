@@ -2,13 +2,11 @@
 
 namespace App\Modulos\Valoraciones\Presentacion\Livewire\Funcionalidades;
 
-use App\Models\Atencion;
 use App\Models\Residente;
-use App\Models\ValoracionFuncional;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
+use App\Modulos\Valoraciones\Aplicacion\Acciones\RegistrarValoracionBarthel;
+use App\Modulos\Valoraciones\Dominio\Reglas\IndiceBarthel;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Livewire\Component;
 
 class ValoracionBarthelModal extends Component
@@ -92,21 +90,24 @@ class ValoracionBarthelModal extends Component
 
     public function getTotalBarthelProperty(): int
     {
-        return $this->alimentacion + $this->bano + $this->aseo_personal
-            + $this->vestido + $this->control_intestinal + $this->control_vesical
-            + $this->uso_retrete + $this->traslados + $this->deambulacion + $this->escaleras;
+        return IndiceBarthel::total([
+            'alimentacion' => $this->alimentacion,
+            'bano' => $this->bano,
+            'aseo_personal' => $this->aseo_personal,
+            'vestido' => $this->vestido,
+            'control_intestinal' => $this->control_intestinal,
+            'control_vesical' => $this->control_vesical,
+            'uso_retrete' => $this->uso_retrete,
+            'escaleras' => $this->escaleras,
+            'uso_retrete' => $this->uso_retrete,
+            'traslados' => $this->traslados,
+            'deambulacion' => $this->deambulacion,
+            'escaleras' => $this->escaleras,            ]);
     }
 
     public function getClasificacionBarthelProperty(): string
     {
-        return match (true) {
-            $this->totalBarthel >= 100 => 'Independiente',
-            $this->totalBarthel >= 91 => 'Dependencia escasa',
-            $this->totalBarthel >= 61 => 'Dependencia leve',
-            $this->totalBarthel >= 41 => 'Dependencia moderada',
-            $this->totalBarthel >= 21 => 'Dependencia severa',
-            default => 'Dependencia total',
-        };
+        return IndiceBarthel::clasificar($this->totalBarthel);
     }
 
     public function updatedAlimentacion(): void
@@ -195,53 +196,28 @@ class ValoracionBarthelModal extends Component
         $this->validate();
 
         try {
-            DB::transaction(function () {
-                // Marcar anterior como histórica
-                ValoracionFuncional::where('cod_residente', $this->cod_residente)
-                    ->vigente()
-                    ->update(['estado' => 'HISTORICA']);
-
-                $personal = Auth::user()?->personal;
-                $codArea = $personal?->asignaciones()
-                    ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
-                    ->latest('fecha_asignacion')
-                    ->value('cod_area');
-                abort_unless($personal && $codArea, 422, 'El usuario debe tener personal y área institucional activa.');
-
-                $atencion = Atencion::query()->create([
-                    'cod_atencion' => 'ATN_'.Str::upper(Str::random(10)),
-                    'cod_residente' => $this->cod_residente,
-                    'cod_area' => $codArea,
-                    'cod_personal' => $personal->cod_personal,
-                    'tipo_atencion' => 'VALORACION_BARTHEL',
-                    'motivo' => "Índice de Barthel {$this->totalBarthel}/100",
-                    'fecha_hora' => $this->fecha_valoracion.' '.now()->format('H:i:s'),
-                    'estado' => 'FINALIZADA',
-                    'observacion' => $this->observacion ?: null,
-                ]);
-
-                ValoracionFuncional::create([
-                    'cod_valoracion_funcional' => 'VAF_'.Str::upper(Str::random(10)),
-                    'cod_residente' => $this->cod_residente,
-                    'cod_personal' => $personal->cod_personal,
-                    'cod_atencion' => $atencion->cod_atencion,
-                    'fecha_hora' => $this->fecha_valoracion.' '.now()->format('H:i:s'),
-                    'marcha' => $this->deambulacion >= 15 ? 'INDEPENDIENTE' : 'ASISTIDA',
-                    'equilibrio' => ($this->usa_baston || $this->usa_andador) ? 'CON_APOYO' : 'SIN_APOYO',
-                    'traslado' => $this->usa_silla_ruedas ? 'SILLA_RUEDAS' : ($this->traslados >= 15 ? 'INDEPENDIENTE' : 'ASISTIDO'),
-                    'alimentacion_autonoma' => $this->alimentacion >= 10 ? 'INDEPENDIENTE' : 'REQUIERE_APOYO',
-                    'bano_autonomo' => $this->bano >= 5 ? 'INDEPENDIENTE' : 'REQUIERE_APOYO',
-                    'vestido_autonomo' => $this->vestido >= 10 ? 'INDEPENDIENTE' : 'REQUIERE_APOYO',
-                    'higiene_autonoma' => $this->aseo_personal >= 5 ? 'INDEPENDIENTE' : 'REQUIERE_APOYO',
-                    'continencia' => ($this->control_intestinal >= 10 && $this->control_vesical >= 10) ? 'CONTINENTE' : 'REQUIERE_APOYO',
-                    'movilidad_autonoma' => $this->deambulacion >= 15 ? 'INDEPENDIENTE' : 'REQUIERE_APOYO',
-                    'necesita_supervision' => $this->necesita_supervision,
-                    'nivel_dependencia' => $this->nivel_dependencia,
-                    'conclusion' => "Barthel {$this->totalBarthel}/100 ({$this->clasificacionBarthel}). Riesgo de caída: {$this->riesgo_caida}."
-                        .($this->observacion ? " {$this->observacion}" : ''),
-                    'estado' => 'ACTIVA',
-                ]);
-            });
+            app(RegistrarValoracionBarthel::class)->ejecutar(auth()->user(), [
+                'cod_residente' => $this->cod_residente,
+                'totalBarthel' => $this->totalBarthel,
+                'fecha_valoracion' => $this->fecha_valoracion,
+                'observacion' => $this->observacion,
+                'deambulacion' => $this->deambulacion,
+                'usa_baston' => $this->usa_baston,
+                'usa_andador' => $this->usa_andador,
+                'usa_silla_ruedas' => $this->usa_silla_ruedas,
+                'traslados' => $this->traslados,
+                'alimentacion' => $this->alimentacion,
+                'bano' => $this->bano,
+                'vestido' => $this->vestido,
+                'aseo_personal' => $this->aseo_personal,
+                'control_intestinal' => $this->control_intestinal,
+                'control_vesical' => $this->control_vesical,
+                'necesita_supervision' => $this->necesita_supervision,
+                'uso_retrete' => $this->uso_retrete,
+                'escaleras' => $this->escaleras,
+                'nivel_dependencia' => $this->nivel_dependencia,
+                'clasificacionBarthel' => $this->clasificacionBarthel,
+                'riesgo_caida' => $this->riesgo_caida,            ]);
 
             $this->cerrar();
             $this->dispatch('valoracion-barthel-guardada');

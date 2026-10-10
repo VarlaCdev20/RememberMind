@@ -4,19 +4,15 @@ namespace App\Modulos\Cuidados\Presentacion\Livewire\Paginas;
 
 use App\Models\Alerta;
 use App\Models\AsignacionPersonal;
-use App\Models\AsignacionResidenteJornada;
 use App\Models\EjecucionCuidado;
 use App\Models\IntervencionCuidado;
-use App\Models\Jornada;
 use App\Models\PlanCuidado;
 use App\Models\ProgramacionCuidado;
 use App\Models\Residente;
-use App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService;
+use App\Modulos\Cuidados\Aplicacion\Acciones\GestionarEjecucionesAgenda;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Livewire\Component;
 
 class AgendaEnfermeria extends Component
@@ -150,66 +146,24 @@ class AgendaEnfermeria extends Component
         if ($this->procesandoRegistro) {
             return;
         }
-
         $this->validate();
+        if (($this->esNoRealizada || in_array(strtolower($this->resultado), ['no realizada', 'omitida', 'no realizada / omitida'])) && mb_strlen(trim($this->motivoOmision)) < 5) {
+            $this->addError('motivoOmision', 'El motivo de omisión es obligatorio cuando la intervención no se realiza (mínimo 5 caracteres).');
 
-        if ($this->esNoRealizada || in_array(strtolower($this->resultado), ['no realizada', 'omitida', 'no realizada / omitida'])) {
-            if (mb_strlen(trim($this->motivoOmision)) < 5) {
-                $this->addError('motivoOmision', 'El motivo de omisión es obligatorio cuando la intervención no se realiza (mínimo 5 caracteres).');
-
-                return;
-            }
+            return;
         }
-
         $this->procesandoRegistro = true;
-
-        $user = Auth::user();
-        $turno = app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria(
-            $this->residenteId,
-            'ejecuciones_cuidado.crear',
-            $user,
-        );
-        $personal = $user?->personal()
-            ->where('estado', 'ACTIVO')
-            ->first();
-        abort_unless($personal, 409, 'El usuario no tiene un perfil de personal activo.');
-
-        $asignacion = AsignacionResidenteJornada::query()
-            ->with('jornada')
-            ->where('cod_residente', $this->residenteId)
-            ->where('cod_personal', $personal->cod_personal)
-            ->whereIn('estado', ['ACTIVA', 'ACTIVO', 'ASIGNADO'])
-            ->whereHas('jornada', fn ($query) => $query
-                ->where('cod_turno', $turno->cod_turno)
-                ->whereDate('fecha_jornada', today())
-                ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO']))
-            ->latest('fecha_hora')
-            ->first();
-        abort_unless($asignacion?->jornada, 409, 'No existe una jornada activa asignada para registrar el cuidado.');
-
-        $intervencionValida = IntervencionCuidado::query()
-            ->where('cod_intervencion', $this->intervencionId)
-            ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
-            ->whereHas('plan', fn ($query) => $query
-                ->where('cod_residente', $this->residenteId)
-                ->whereIn('estado', ['ACTIVO', 'ACTIVA']))
-            ->exists();
-        abort_unless($intervencionValida, 422, 'La intervención no pertenece al plan activo del residente.');
-
-        $codPersonal = $personal->cod_personal;
-        $codJornada = $asignacion->cod_jornada;
-
-        $horaProg = $this->datosModal['hora_programada'] ?? now()->format('H:i');
-        $fechaHoraProgramada = Carbon::parse(today()->toDateString().' '.$horaProg);
-
-        // Idempotencia: evitar doble ejecución de la misma intervención y programación en el mismo turno
-        $existente = EjecucionCuidado::where('cod_intervencion', $this->intervencionId)
-            ->where('cod_residente', $this->residenteId)
-            ->where('cod_jornada', $codJornada)
-            ->where('fecha_hora_programada', $fechaHoraProgramada)
-            ->first();
-
-        if ($existente) {
+        $registrada = app(GestionarEjecucionesAgenda::class)->registrarEjecucion(auth()->user(), [
+            'procesandoRegistro' => $this->procesandoRegistro,
+            'esNoRealizada' => $this->esNoRealizada,
+            'resultado' => $this->resultado,
+            'motivoOmision' => $this->motivoOmision,
+            'residenteId' => $this->residenteId,
+            'intervencionId' => $this->intervencionId,
+            'datosModal' => $this->datosModal,
+            'observacion' => $this->observacion,
+        ]);
+        if (! $registrada) {
             $this->dispatch('swal', [
                 'icon' => 'warning',
                 'title' => 'Ya registrada',
@@ -219,26 +173,6 @@ class AgendaEnfermeria extends Component
 
             return;
         }
-
-        $estadoEjecucion = ($this->esNoRealizada || in_array(strtolower($this->resultado), ['no realizada', 'omitida', 'no realizada / omitida']))
-            ? 'NO_REALIZADA'
-            : 'REALIZADA';
-
-        DB::transaction(function () use ($codPersonal, $codJornada, $fechaHoraProgramada, $estadoEjecucion) {
-            EjecucionCuidado::create([
-                'cod_ejecucion' => 'EJC_'.strtoupper(Str::random(10)),
-                'cod_intervencion' => $this->intervencionId,
-                'cod_residente' => $this->residenteId,
-                'cod_jornada' => $codJornada,
-                'cod_personal' => $codPersonal,
-                'fecha_hora_programada' => $fechaHoraProgramada,
-                'fecha_hora_ejecucion' => now(),
-                'resultado' => $this->resultado,
-                'motivo_omision' => $this->motivoOmision ?: null,
-                'estado' => $estadoEjecucion,
-                'observacion' => $this->observacion ?: null,
-            ]);
-        });
 
         $this->cerrarModalRegistrar();
         $this->dispatch('swal', [
@@ -250,37 +184,10 @@ class AgendaEnfermeria extends Component
 
     public function recibirTurno(): void
     {
-        $turnos = app(TurnoEnfermeriaService::class);
-        abort_unless(app(AccesoClinicoTemporalService::class)
-            ->tieneRol(Auth::user(), ['ENFERMEROS']) && Auth::user()?->can('enfermeria.ver_dashboard'), 403,
-            'La recepción corresponde al personal operativo de Enfermería.');
-        $turno = $turnos->obtenerTurnoActivo(Auth::user(), today()->toDateString());
-        abort_unless($turno, 409, 'No tiene un turno activo asignado para recibir.');
-
-        $codPersonal = Auth::user()?->personal?->cod_personal;
-        abort_unless($codPersonal, 409, 'El usuario no tiene un perfil de personal activo.');
-
-        $jornada = Jornada::where('cod_turno', $turno->cod_turno)
-            ->whereDate('fecha_jornada', today())
-            ->first();
-        abort_unless($jornada, 409, 'La jornada del turno no está formalizada. Contacte a administración.');
-
-        DB::transaction(function () use ($jornada, $codPersonal) {
-            $asignacion = AsignacionPersonal::where('cod_jornada', $jornada->cod_jornada)
-                ->where('cod_personal', $codPersonal)
-                ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
-                ->lockForUpdate()
-                ->first();
-            abort_unless($asignacion, 409, 'No existe una asignación institucional activa para recibir este turno.');
-
-            $notaRecepcion = trim($this->observacionRecepcion) ?: 'Recepción de turno confirmada';
-            $asignacion->update([
-                'observacion' => trim(implode(' | ', array_filter([
-                    $asignacion->observacion,
-                    $notaRecepcion.' por '.$codPersonal.' el '.now()->format('Y-m-d H:i'),
-                ]))),
-            ]);
-        });
+        app(GestionarEjecucionesAgenda::class)->recibirTurno(auth()->user(), [
+            'observacionRecepcion' => $this->observacionRecepcion,
+            'observacion' => $this->observacion,
+        ]);
 
         $this->dispatch('swal', ['icon' => 'success', 'title' => 'Turno recibido', 'text' => 'La recepción quedó registrada con fecha, hora y responsable.']);
     }

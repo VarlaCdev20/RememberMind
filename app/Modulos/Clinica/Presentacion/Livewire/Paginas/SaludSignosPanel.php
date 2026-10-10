@@ -4,8 +4,10 @@ namespace App\Modulos\Clinica\Presentacion\Livewire\Paginas;
 
 use App\Models\Residente;
 use App\Models\SignoVital;
+use App\Modulos\Clinica\Aplicacion\Acciones\GestionarEstadoSignosPanel;
 use App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService;
-use App\Modulos\Clinica\Presentacion\Http\Validacion\ValidacionSignosVitalesService;
+use App\Modulos\Clinica\Aplicacion\Consultas\AnalisisSignosPanel;
+use App\Modulos\Clinica\Aplicacion\Validacion\ValidacionSignosVitalesService;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -424,16 +426,7 @@ class SaludSignosPanel extends Component
             return;
         }
 
-        $signo = SignoVital::findOrFail($id);
-        abort_if($signo->cod_residente !== $this->adulto->cod_residente, 403);
-
-        $signo->descripcionLog = "Anuló signos vitales del adulto mayor {$this->adulto->cod_residente}.";
-        $signo->update([
-            'estado' => 'ANULADO',
-            'motivo_anulacion' => $motivo,
-            'anulado_por' => auth()->user()->cod_usuario,
-            'fecha_anulacion' => now(),
-        ]);
+        app(GestionarEstadoSignosPanel::class)->anularConMotivo(auth()->user(), ['adulto' => $this->adulto], $id, $motivo);
 
         $this->signoDetalleId = null;
 
@@ -446,26 +439,10 @@ class SaludSignosPanel extends Component
 
     public function confirmarAnular(): void
     {
-        abort_if(auth()->user()?->hasRole('ENFERMEROS'), 403, 'Los registros firmados se rectifican; no se eliminan ni restauran desde Enfermería.');
-        abort_if(! $this->adulto, 403, 'Paciente no seleccionado.');
-        abort_if(! auth()->user()->can('signos_vitales.anular'), 403);
-
-        $this->validateOnly('motivoAnulacion', [
-            'motivoAnulacion' => 'required|string|min:10|max:500',
-        ], [
-            'motivoAnulacion.required' => 'El motivo de anulación es obligatorio.',
-            'motivoAnulacion.min' => 'El motivo debe tener al menos 10 caracteres.',
-        ]);
-
-        $signo = SignoVital::findOrFail($this->signoIdAnular);
-        abort_if($signo->cod_residente !== $this->adulto->cod_residente, 403);
-
-        $signo->descripcionLog = "Anuló signos vitales del adulto mayor {$this->adulto->cod_residente}.";
-        $signo->update([
-            'estado' => 'ANULADO',
-            'motivo_anulacion' => $this->motivoAnulacion,
-            'anulado_por' => auth()->user()->cod_usuario,
-            'fecha_anulacion' => now(),
+        app(GestionarEstadoSignosPanel::class)->confirmarAnular(auth()->user(), [
+            'adulto' => $this->adulto,
+            'signoIdAnular' => $this->signoIdAnular,
+            'motivoAnulacion' => $this->motivoAnulacion,
         ]);
 
         $this->modalAnular = false;
@@ -481,20 +458,9 @@ class SaludSignosPanel extends Component
 
     public function restaurarRegistro(string $id): void
     {
-        abort_if(auth()->user()?->hasRole('ENFERMEROS'), 403, 'Los registros firmados se rectifican; no se eliminan ni restauran desde Enfermería.');
-        abort_if(! $this->adulto, 403, 'Paciente no seleccionado.');
-        abort_if(! auth()->user()->can('signos_vitales.anular'), 403);
-
-        $signo = SignoVital::findOrFail($id);
-        abort_if($signo->cod_residente !== $this->adulto->cod_residente, 403);
-
-        $signo->descripcionLog = "Restauró signos vitales del adulto mayor {$this->adulto->cod_residente}.";
-        $signo->update([
-            'estado' => 'VIGENTE',
-            'motivo_anulacion' => null,
-            'anulado_por' => null,
-            'fecha_anulacion' => null,
-        ]);
+        app(GestionarEstadoSignosPanel::class)->restaurarRegistro(auth()->user(), [
+            'adulto' => $this->adulto,
+        ], $id);
 
         $this->dispatch('swal', [
             'icon' => 'success',
@@ -599,25 +565,15 @@ class SaludSignosPanel extends Component
 
     public function detectarAlertas(): array
     {
-        $alertas = [];
-
-        $this->agregarAlerta($alertas, $this->clasificarPresion($this->presion_sistolica, $this->presion_diastolica), 'Presión arterial');
-        $this->agregarAlerta($alertas, $this->clasificarNumero($this->frecuencia_cardiaca, 60, 100, null, null, 'lpm'), 'Frecuencia cardíaca');
-        $this->agregarAlerta($alertas, $this->clasificarNumero($this->saturacion, 95, null, 92, 94, '%'), 'Saturación de oxígeno');
-        $this->agregarAlerta($alertas, $this->clasificarNumero($this->temperatura, 36.0, 37.5, null, null, '°C'), 'Temperatura');
-        $this->agregarAlerta($alertas, $this->clasificarNumero($this->frecuencia_respiratoria, 12, 20, null, null, 'rpm'), 'Frecuencia respiratoria');
-
-        if ($this->glucosa !== null && $this->glucosa !== '') {
-            $glucosa = (float) $this->glucosa;
-            if ($glucosa < 70 || $glucosa >= 180) {
-                $alertas[] = [
-                    'campo' => 'Glucosa',
-                    'mensaje' => 'Valor fuera del rango referencial interno. Verifique antes de guardar.',
-                ];
-            }
-        }
-
-        return $alertas;
+        return app(AnalisisSignosPanel::class)->detectarAlertas([
+            'presion_sistolica' => $this->presion_sistolica,
+            'presion_diastolica' => $this->presion_diastolica,
+            'frecuencia_cardiaca' => $this->frecuencia_cardiaca,
+            'saturacion' => $this->saturacion,
+            'temperatura' => $this->temperatura,
+            'frecuencia_respiratoria' => $this->frecuencia_respiratoria,
+            'glucosa' => $this->glucosa,
+        ]);
     }
 
     private function calcularImcVisual(): void
@@ -705,155 +661,17 @@ class SaludSignosPanel extends Component
 
     private function construirMetricas(Collection $signos): array
     {
-        return [
-            $this->metricaPresion($signos),
-            $this->metricaNumerica($signos, 'frecuencia_cardiaca', 'Frecuencia cardíaca', 'lpm', 'ph-pulse', 3, fn ($valor) => $this->clasificarNumero($valor, 60, 100, null, null, 'lpm')),
-            $this->metricaNumerica($signos, 'saturacion', 'Saturación de oxígeno', '%', 'ph-wave-sine', 1, fn ($valor) => $this->clasificarNumero($valor, 95, null, 92, 94, '%')),
-            $this->metricaNumerica($signos, 'temperatura', 'Temperatura', '°C', 'ph-thermometer', 0.2, fn ($valor) => $this->clasificarNumero($valor, 36.0, 37.5, null, null, '°C'), 1),
-            $this->metricaNumerica($signos, 'frecuencia_respiratoria', 'Frecuencia respiratoria', 'rpm', 'ph-wind', 1, fn ($valor) => $this->clasificarNumero($valor, 12, 20, null, null, 'rpm')),
-            $this->metricaNumerica($signos, 'peso', 'Peso registrado', 'kg', 'ph-scales', 0.3, fn () => ['key' => 'normal', 'label' => 'Evolución', 'message' => 'Seguimiento antropométrico'], 1),
-            $this->metricaNumerica($signos, 'imc', 'IMC calculado', 'kg/m²', 'ph-chart-line-up', 0.3, fn () => ['key' => 'normal', 'label' => 'Referencial', 'message' => 'Interpretar con contexto clínico'], 1),
-        ];
-    }
-
-    private function metricaPresion(Collection $signos): array
-    {
-        $registros = $signos
-            ->filter(fn ($signo) => $signo->presion_sistolica !== null && $signo->presion_diastolica !== null)
-            ->values();
-
-        $ultimo = $registros->first();
-        $previo = $registros->get(1);
-
-        if (! $ultimo) {
-            return $this->metricaSinDatos('Presión arterial', 'mmHg', 'ph-heartbeat');
-        }
-
-        $estado = $this->clasificarPresion($ultimo->presion_sistolica, $ultimo->presion_diastolica);
-
-        return [
-            'key' => 'presion',
-            'label' => 'Presión arterial',
-            'value' => "{$ultimo->presion_sistolica}/{$ultimo->presion_diastolica}",
-            'unit' => 'mmHg',
-            'icon' => 'ph-heartbeat',
-            'date' => $this->formatearFechaHora($ultimo),
-            'status_key' => $estado['key'],
-            'status_label' => $estado['label'],
-            'variation' => $this->variacionPresion($ultimo, $previo),
-            'avg' => $this->promedioPresion($registros),
-            'min' => $this->minMaxPresion($registros, 'min'),
-            'max' => $this->minMaxPresion($registros, 'max'),
-        ];
-    }
-
-    private function metricaNumerica(Collection $signos, string $campo, string $label, string $unidad, string $icono, float $tolerancia, callable $clasificador, int $decimales = 0): array
-    {
-        $registros = $signos
-            ->filter(fn ($signo) => $signo->{$campo} !== null && $signo->{$campo} !== '')
-            ->values();
-
-        $ultimo = $registros->first();
-        $previo = $registros->get(1);
-
-        if (! $ultimo) {
-            return $this->metricaSinDatos($label, $unidad, $icono);
-        }
-
-        $valor = (float) $ultimo->{$campo};
-        $estado = $clasificador($valor);
-        $valores = $registros->pluck($campo)->map(fn ($item) => (float) $item);
-
-        return [
-            'key' => $campo,
-            'label' => $label,
-            'value' => number_format($valor, $decimales),
-            'unit' => $unidad,
-            'icon' => $icono,
-            'date' => $this->formatearFechaHora($ultimo),
-            'status_key' => $estado['key'],
-            'status_label' => $estado['label'],
-            'variation' => $this->variacionNumerica($ultimo->{$campo}, $previo?->{$campo}, $tolerancia, $unidad, $decimales),
-            'avg' => $valores->isNotEmpty() ? number_format($valores->avg(), $decimales)." {$unidad}" : 'S/D',
-            'min' => $valores->isNotEmpty() ? number_format($valores->min(), $decimales)." {$unidad}" : 'S/D',
-            'max' => $valores->isNotEmpty() ? number_format($valores->max(), $decimales)." {$unidad}" : 'S/D',
-        ];
-    }
-
-    private function metricaSinDatos(string $label, string $unidad, string $icono): array
-    {
-        return [
-            'key' => str($label)->slug('_')->toString(),
-            'label' => $label,
-            'value' => 'S/D',
-            'unit' => $unidad,
-            'icon' => $icono,
-            'date' => 'Sin mediciones',
-            'status_key' => 'sin_datos',
-            'status_label' => 'Sin datos',
-            'variation' => 'Información insuficiente',
-            'avg' => 'S/D',
-            'min' => 'S/D',
-            'max' => 'S/D',
-        ];
+        return app(AnalisisSignosPanel::class)->construirMetricas($signos);
     }
 
     private function construirResumenPeriodo(Collection $signos, Collection $baseSignos): array
     {
-        $analisis = $signos->map(fn ($signo) => $this->analizarRegistro($signo));
-        $normales = $analisis->where('key', 'normal')->count();
-        $fueraRango = $analisis->whereIn('key', ['fuera_rango', 'requiere_revision'])->count();
-        $mesActual = $baseSignos
-            ->where('estado', 'VIGENTE')
-            ->filter(fn ($signo) => $signo->fecha && $signo->fecha->isSameMonth(now()))
-            ->count();
-
-        return [
-            'mediciones_periodo' => $signos->count(),
-            'mediciones_mes' => $mesActual,
-            'fuera_rango' => $fueraRango,
-            'porcentaje_normales' => $signos->count() > 0 ? round(($normales / $signos->count()) * 100) : 0,
-            'ultima_medicion' => $baseSignos->firstWhere('estado', 'VIGENTE')
-                ? $this->formatearFechaHora($baseSignos->firstWhere('estado', 'VIGENTE'))
-                : 'Sin registros',
-            'sin_medicion_reciente' => ! $baseSignos->firstWhere('estado', 'VIGENTE')
-                || $baseSignos->firstWhere('estado', 'VIGENTE')->fecha->lt(now()->subDays(7)),
-        ];
+        return app(AnalisisSignosPanel::class)->construirResumenPeriodo($signos, $baseSignos);
     }
 
     private function construirInterpretacion(Collection $signos): array
     {
-        $conteos = [
-            'normal' => 0,
-            'observacion' => 0,
-            'fuera_rango' => 0,
-            'requiere_revision' => 0,
-            'sin_datos' => 0,
-        ];
-
-        foreach ($signos as $signo) {
-            $estado = $this->analizarRegistro($signo)['key'];
-            if (array_key_exists($estado, $conteos)) {
-                $conteos[$estado]++;
-            }
-        }
-
-        $prioridad = collect(['requiere_revision', 'fuera_rango', 'observacion', 'normal', 'sin_datos'])
-            ->first(fn ($key) => ($conteos[$key] ?? 0) > 0) ?? 'sin_datos';
-
-        $mensajes = [
-            'normal' => 'Los registros filtrados se mantienen dentro de rangos referenciales normales.',
-            'observacion' => 'Existen valores en observación. Conviene confirmar tendencia con próximos controles.',
-            'fuera_rango' => 'Hay valores fuera del rango referencial. Requieren revisión del personal de salud.',
-            'requiere_revision' => 'Se detectan controles que requieren revisión prioritaria del personal de salud.',
-            'sin_datos' => 'Información insuficiente para análisis estadístico.',
-        ];
-
-        return [
-            'conteos' => $conteos,
-            'estado_principal' => $prioridad,
-            'mensaje' => $mensajes[$prioridad],
-        ];
+        return app(AnalisisSignosPanel::class)->construirInterpretacion($signos);
     }
 
     private function construirChartData(Collection $signos): array
@@ -995,235 +813,11 @@ class SaludSignosPanel extends Component
 
     private function analizarRegistro(SignoVital $signo): array
     {
-        if ($signo->estado === 'ANULADO') {
-            return [
-                'key' => 'anulado',
-                'label' => 'Anulado',
-                'message' => 'Registro clínico anulado, conservado por trazabilidad.',
-                'motivos' => ['Registro anulado'],
-            ];
-        }
-
-        $evaluaciones = [];
-
-        $this->agregarEvaluacion($evaluaciones, $this->clasificarPresion($signo->presion_sistolica, $signo->presion_diastolica), 'Presión arterial');
-        $this->agregarEvaluacion($evaluaciones, $this->clasificarNumero($signo->frecuencia_cardiaca, 60, 100, null, null, 'lpm'), 'Frecuencia cardíaca');
-        $this->agregarEvaluacion($evaluaciones, $this->clasificarNumero($signo->saturacion, 95, null, 92, 94, '%'), 'Saturación de oxígeno');
-        $this->agregarEvaluacion($evaluaciones, $this->clasificarNumero($signo->temperatura, 36.0, 37.5, null, null, '°C'), 'Temperatura');
-        $this->agregarEvaluacion($evaluaciones, $this->clasificarNumero($signo->frecuencia_respiratoria, 12, 20, null, null, 'rpm'), 'Frecuencia respiratoria');
-
-        if (empty($evaluaciones)) {
-            return [
-                'key' => 'sin_datos',
-                'label' => 'Sin datos',
-                'message' => 'Sin parámetros clasificables en este registro.',
-                'motivos' => [],
-            ];
-        }
-
-        $motivos = collect($evaluaciones)
-            ->filter(fn ($item) => in_array($item['key'], ['observacion', 'fuera_rango', 'requiere_revision'], true))
-            ->map(fn ($item) => "{$item['campo']}: {$item['message']}")
-            ->values()
-            ->all();
-
-        if (collect($evaluaciones)->contains('key', 'requiere_revision')) {
-            return [
-                'key' => 'requiere_revision',
-                'label' => 'Requiere revisión',
-                'message' => 'Valor fuera del rango referencial con prioridad de revisión.',
-                'motivos' => $motivos,
-            ];
-        }
-
-        if (collect($evaluaciones)->contains('key', 'fuera_rango')) {
-            return [
-                'key' => 'fuera_rango',
-                'label' => 'Fuera de rango',
-                'message' => 'Uno o más parámetros están fuera del rango referencial.',
-                'motivos' => $motivos,
-            ];
-        }
-
-        if (collect($evaluaciones)->contains('key', 'observacion')) {
-            return [
-                'key' => 'observacion',
-                'label' => 'En observación',
-                'message' => 'Uno o más parámetros requieren seguimiento.',
-                'motivos' => $motivos,
-            ];
-        }
-
-        return [
-            'key' => 'normal',
-            'label' => 'Normal',
-            'message' => 'Parámetros dentro de rangos referenciales.',
-            'motivos' => [],
-        ];
-    }
-
-    private function clasificarPresion($sistolica, $diastolica): array
-    {
-        if ($sistolica === null || $sistolica === '' || $diastolica === null || $diastolica === '') {
-            return ['key' => 'sin_datos', 'label' => 'Sin datos', 'message' => 'Presión arterial no registrada.'];
-        }
-
-        $sis = (int) $sistolica;
-        $dia = (int) $diastolica;
-
-        if ($sis <= $dia) {
-            return ['key' => 'requiere_revision', 'label' => 'Confirmación requerida', 'message' => 'La sistólica es menor o igual a la diastólica. Repita la toma y confirme el valor antes de guardarlo.'];
-        }
-
-        if ($sis >= 160 || $dia >= 100 || $sis < 90 || $dia < 60) {
-            return ['key' => 'requiere_revision', 'label' => 'Requiere revisión', 'message' => 'Valor bajo o elevado. Requiere revisión del personal de salud.'];
-        }
-
-        if ($sis >= 140 || $dia >= 90) {
-            return ['key' => 'fuera_rango', 'label' => 'Fuera de rango', 'message' => 'Valor elevado según rango referencial.'];
-        }
-
-        if (($sis >= 130 && $sis <= 139) || ($dia >= 85 && $dia <= 89)) {
-            return ['key' => 'observacion', 'label' => 'En observación', 'message' => 'Valor en observación. Confirmar tendencia.'];
-        }
-
-        if ($sis >= 90 && $sis <= 129 && $dia >= 60 && $dia <= 84) {
-            return ['key' => 'normal', 'label' => 'Normal', 'message' => 'Presión arterial dentro de rango referencial.'];
-        }
-
-        return ['key' => 'fuera_rango', 'label' => 'Fuera de rango', 'message' => 'Valor fuera del rango referencial.'];
-    }
-
-    private function clasificarNumero($valor, ?float $normalMin, ?float $normalMax, ?float $observacionMin, ?float $observacionMax, string $unidad): array
-    {
-        if ($valor === null || $valor === '') {
-            return ['key' => 'sin_datos', 'label' => 'Sin datos', 'message' => 'Parámetro no registrado.'];
-        }
-
-        $numero = (float) $valor;
-
-        if ($unidad === '%' && $numero < 92) {
-            return ['key' => 'requiere_revision', 'label' => 'Requiere revisión', 'message' => 'Saturación baja. Requiere revisión del personal de salud.'];
-        }
-
-        if ($unidad === '°C' && ($numero < 36.0 || $numero > 37.5)) {
-            return [
-                'key' => $numero >= 38.0 ? 'requiere_revision' : 'fuera_rango',
-                'label' => $numero >= 38.0 ? 'Requiere revisión' : 'Fuera de rango',
-                'message' => 'Temperatura fuera del rango referencial.',
-            ];
-        }
-
-        if ($unidad === 'lpm' && ($numero < 60 || $numero > 100)) {
-            return [
-                'key' => ($numero < 50 || $numero > 120) ? 'requiere_revision' : 'fuera_rango',
-                'label' => ($numero < 50 || $numero > 120) ? 'Requiere revisión' : 'Fuera de rango',
-                'message' => 'Frecuencia cardíaca fuera del rango referencial.',
-            ];
-        }
-
-        if ($unidad === 'rpm' && ($numero < 12 || $numero > 20)) {
-            return [
-                'key' => ($numero < 10 || $numero > 24) ? 'requiere_revision' : 'fuera_rango',
-                'label' => ($numero < 10 || $numero > 24) ? 'Requiere revisión' : 'Fuera de rango',
-                'message' => 'Frecuencia respiratoria fuera del rango referencial.',
-            ];
-        }
-
-        if ($normalMin !== null && $normalMax !== null && $numero >= $normalMin && $numero <= $normalMax) {
-            return ['key' => 'normal', 'label' => 'Normal', 'message' => 'Valor dentro del rango referencial.'];
-        }
-
-        if ($normalMin !== null && $normalMax === null && $numero >= $normalMin) {
-            return ['key' => 'normal', 'label' => 'Normal', 'message' => 'Valor dentro del rango referencial.'];
-        }
-
-        if ($observacionMin !== null && $observacionMax !== null && $numero >= $observacionMin && $numero <= $observacionMax) {
-            return ['key' => 'observacion', 'label' => 'En observación', 'message' => 'Valor en observación. Confirmar tendencia.'];
-        }
-
-        return ['key' => 'fuera_rango', 'label' => 'Fuera de rango', 'message' => 'Valor fuera del rango referencial.'];
-    }
-
-    private function agregarEvaluacion(array &$evaluaciones, array $estado, string $campo): void
-    {
-        if ($estado['key'] === 'sin_datos') {
-            return;
-        }
-
-        $estado['campo'] = $campo;
-        $evaluaciones[] = $estado;
-    }
-
-    private function agregarAlerta(array &$alertas, array $estado, string $campo): void
-    {
-        if (in_array($estado['key'], ['observacion', 'fuera_rango', 'requiere_revision'], true)) {
-            $alertas[] = [
-                'campo' => $campo,
-                'mensaje' => $estado['message'],
-            ];
-        }
-    }
-
-    private function variacionPresion(?SignoVital $ultimo, ?SignoVital $previo): string
-    {
-        if (! $ultimo || ! $previo || $previo->presion_sistolica === null) {
-            return 'Sin dato previo';
-        }
-
-        $delta = $ultimo->presion_sistolica - $previo->presion_sistolica;
-
-        if (abs($delta) <= 3) {
-            return 'Estable respecto al último registro';
-        }
-
-        return $delta > 0
-            ? "Subió {$delta} mmHg en sistólica"
-            : 'Bajó '.abs($delta).' mmHg en sistólica';
-    }
-
-    private function variacionNumerica($actual, $previo, float $tolerancia, string $unidad, int $decimales): string
-    {
-        if ($previo === null || $previo === '') {
-            return 'Sin dato previo';
-        }
-
-        $delta = (float) $actual - (float) $previo;
-
-        if (abs($delta) <= $tolerancia) {
-            return 'Estable respecto al último registro';
-        }
-
-        $deltaFormateado = number_format(abs($delta), $decimales);
-
-        return $delta > 0
-            ? "Subió {$deltaFormateado} {$unidad}"
-            : "Bajó {$deltaFormateado} {$unidad}";
-    }
-
-    private function promedioPresion(Collection $registros): string
-    {
-        if ($registros->isEmpty()) {
-            return 'S/D';
-        }
-
-        return round($registros->avg('presion_sistolica')).'/'.round($registros->avg('presion_diastolica')).' mmHg';
-    }
-
-    private function minMaxPresion(Collection $registros, string $modo): string
-    {
-        if ($registros->isEmpty()) {
-            return 'S/D';
-        }
-
-        $sistolica = $modo === 'min' ? $registros->min('presion_sistolica') : $registros->max('presion_sistolica');
-        $diastolica = $modo === 'min' ? $registros->min('presion_diastolica') : $registros->max('presion_diastolica');
-
-        return "{$sistolica}/{$diastolica} mmHg";
+        return app(AnalisisSignosPanel::class)->analizarRegistro($signo);
     }
 
     private function formatearFechaHora(SignoVital $signo): string
     {
-        return $signo->fecha->format('d/m/Y').' '.$signo->hora_formateada;
+        return app(AnalisisSignosPanel::class)->formatearFechaHora($signo);
     }
 }

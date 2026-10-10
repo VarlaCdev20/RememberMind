@@ -3471,7 +3471,7 @@
     ],
     "uri": "admin/turnos-enfermeria",
     "name": "admin.turnos-enfermeria.index",
-    "action": "App\\Modulos\\Cuidados\\Presentacion\\Livewire\\Paginas\\TurnosEnfermeriaPanel",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Livewire\\Paginas\\TurnosEnfermeriaPanel",
     "middleware": [
       "web",
       "auth:sanctum",
@@ -3534,7 +3534,7 @@
     ],
     "uri": "admin/asignacion-turno",
     "name": "admin.asignacion-turno.index",
-    "action": "App\\Modulos\\Cuidados\\Presentacion\\Livewire\\Paginas\\AsignacionTurnoPanel",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Livewire\\Paginas\\AsignacionTurnoPanel",
     "middleware": [
       "web",
       "auth:sanctum",

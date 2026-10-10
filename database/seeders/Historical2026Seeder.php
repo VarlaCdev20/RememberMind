@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use App\Models\Preadmision;
+use App\Models\SignoVital;
 use App\Models\User;
+use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
+use App\Modulos\Clinica\Presentacion\Adaptadores\ClasificacionSignosVitalesService;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
@@ -18,13 +20,19 @@ use RuntimeException;
 class Historical2026Seeder extends Seeder
 {
     public const REFERENCE_DATE = '2026-10-08';
+
     public const CUTOFF = '2026-10-08 10:00:00';
+
     public const VERSION = 'historical2026-v1';
 
     private array $keys = [];
+
     private array $pending = [];
+
     private array $credentials = [];
+
     private array $manifest = [];
+
     private array $medications = [];
 
     public function run(): void
@@ -38,6 +46,7 @@ class Historical2026Seeder extends Seeder
             }
             $this->assertIntegrity();
             $this->command?->info('Carga 2026 existente y verificada; no se sobrescribieron registros ni contraseñas.');
+
             return;
         }
 
@@ -293,6 +302,7 @@ class Historical2026Seeder extends Seeder
     private function nurse(string $date, int $shift, int $slot): string
     {
         $team = ((int) CarbonImmutable::parse($date)->dayOfYear % 2) + $shift * 2;
+
         return sprintf('H26_PER_N%02d', $team * 4 + $slot + 1);
     }
 
@@ -435,7 +445,9 @@ class Historical2026Seeder extends Seeder
     /** Casos sintéticos de continuidad; solo durante la carga nueva, sin sobrescribir historia. */
     private function painEpisodes(int $i, string $resident, string $nurse): void
     {
-        $values = match ($i) { 1 => [4], 2 => [8, 5, 3], 3 => [4, 4], default => [] };
+        $values = match ($i) {
+            1 => [4], 2 => [8, 5, 3], 3 => [4, 4], default => []
+        };
         foreach ($values as $step => $value) {
             $root = 'H26_DV2_'.$i.'_0';
             $this->put('valoraciones_dolor', 'H26_DV2_'.$i.'_'.$step, [
@@ -478,6 +490,7 @@ class Historical2026Seeder extends Seeder
         $this->put('atenciones', $id, ['cod_residente' => $r, 'cod_area' => 'H26_ARE_'.($professional === 'GER' ? 'MED' : $professional),
             'cod_personal' => 'H26_PER_'.$professional, 'tipo_atencion' => $kind, 'motivo' => $reason,
             'fecha_hora' => $date.' '.$time, 'estado' => 'FINALIZADA']);
+
         return $id;
     }
 
@@ -518,6 +531,7 @@ class Historical2026Seeder extends Seeder
             $this->put('horarios_prescripcion', sprintf('H26_HRX_%02d_%d', $i, $slot), ['cod_prescripcion' => $rx,
                 'hora_programada' => $time, 'dosis_programada' => $dose, 'estado' => $end ? 'INACTIVO' : 'ACTIVO']);
         }
+
         return compact('rx', 'dose', 'times', 'end');
     }
 
@@ -654,8 +668,12 @@ class Historical2026Seeder extends Seeder
         foreach (['NUT', 'FIS', 'PSI', 'PED'] as $professional) {
             $rank = 0;
             foreach (require __DIR__.'/data/historical2026.php' as $other => $case) {
-                if ($other + 1 >= $i) { break; }
-                if ($case[5] <= $date && (int) CarbonImmutable::parse($date)->diffInDays(CarbonImmutable::parse($case[5]), true) % 28 === 0) { $rank++; }
+                if ($other + 1 >= $i) {
+                    break;
+                }
+                if ($case[5] <= $date && (int) CarbonImmutable::parse($date)->diffInDays(CarbonImmutable::parse($case[5]), true) % 28 === 0) {
+                    $rank++;
+                }
             }
             $time = $professional === 'PED' ? '09:40:00' : CarbonImmutable::parse($date.' 08:00:00')
                 ->addMinutes($rank * 20 + ['NUT' => 0, 'FIS' => 20, 'PSI' => 40][$professional])->format('H:i:s');
@@ -710,8 +728,8 @@ class Historical2026Seeder extends Seeder
                 $activity = 'H26_AC_'.str_replace('-', '', substr($date, 2));
                 if (! DB::table('actividades')->where('cod_actividad', $activity)->exists()) {
                     $this->put('actividades', $activity, ['cod_area' => 'H26_ARE_PED', 'cod_personal' => 'H26_PER_PED',
-                    'tipo' => 'ESTIMULACION', 'nombre' => 'Lectura y conversación guiada', 'descripcion' => 'Lectura breve y conversación sobre experiencias cotidianas.',
-                    'fecha_hora' => $date.' 09:40:00', 'duracion_minutos' => 20, 'lugar' => 'Sala de actividades', 'cupo' => 30, 'estado' => 'FINALIZADA']);
+                        'tipo' => 'ESTIMULACION', 'nombre' => 'Lectura y conversación guiada', 'descripcion' => 'Lectura breve y conversación sobre experiencias cotidianas.',
+                        'fecha_hora' => $date.' 09:40:00', 'duracion_minutos' => 20, 'lugar' => 'Sala de actividades', 'cupo' => 30, 'estado' => 'FINALIZADA']);
                 }
                 $this->put('participantes_actividad', $this->code('PA', $i, $date), ['cod_actividad' => $activity, 'cod_residente' => $r,
                     'asistencia' => 'ASISTIO', 'nivel_participacion' => $profile === 'participacion' ? 'PARCIAL' : 'ACTIVA', 'desempeno' => 'Actividad con apoyo verbal', 'observacion' => 'Participación y tolerancia registradas.']);
@@ -812,8 +830,8 @@ class Historical2026Seeder extends Seeder
         }
         if ($profile === 'critica') {
             $d = CarbonImmutable::parse($admit)->addDays(21)->toDateString();
-            $source = \App\Models\SignoVital::findOrFail($this->code('SV', $i, $d));
-            if (\App\Backend\Modulos\Clinica\Servicios\ClasificacionSignosVitalesService::evaluarRegistro($source)['global'] !== 'critico') {
+            $source = SignoVital::findOrFail($this->code('SV', $i, $d));
+            if (ClasificacionSignosVitalesService::evaluarRegistro($source)['global'] !== 'critico') {
                 throw new RuntimeException('El caso crítico debe cumplir la regla vigente, sin umbral del seeder.');
             }
             $alert = 'H26_ALC_'.$serial;

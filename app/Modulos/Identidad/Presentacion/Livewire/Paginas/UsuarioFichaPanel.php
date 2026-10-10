@@ -3,16 +3,15 @@
 namespace App\Modulos\Identidad\Presentacion\Livewire\Paginas;
 
 use App\Compartido\Infraestructura\Documentos\DocumentacionUsuarioService;
-use App\Modulos\Reportes\Infraestructura\Exportaciones\UsuarioExpedienteExport;
 use App\Models\Documento;
 use App\Models\User;
+use App\Modulos\Identidad\Aplicacion\Acciones\GestionarSeguridadCuenta;
 use App\Modulos\Identidad\Aplicacion\Consultas\UsuarioFichaService;
 use App\Modulos\Reportes\Infraestructura\Exportaciones\ReportExportService;
 use App\Modulos\Reportes\Infraestructura\Exportaciones\ReportFileNameService;
-use Illuminate\Support\Facades\Hash;
+use App\Modulos\Reportes\Infraestructura\Exportaciones\UsuarioExpedienteExport;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -272,17 +271,7 @@ class UsuarioFichaPanel extends Component
             return;
         }
 
-        $tempPassword = Str::password(16, letters: true, numbers: true, symbols: true, spaces: false);
-
-        $this->usuario->update([
-            'password' => Hash::make($tempPassword),
-        ]);
-
-        activity('Usuarios')
-            ->causedBy(auth()->user())
-            ->performedOn($this->usuario)
-            ->event('seguridad')
-            ->log("Restableció la contraseña del usuario {$this->usuario->name} a una clave temporal.");
+        $tempPassword = app(GestionarSeguridadCuenta::class)->restablecerPassword(auth()->user(), $this->usuario);
 
         $this->dispatch('swal', [
             'icon' => 'success',
@@ -313,14 +302,7 @@ class UsuarioFichaPanel extends Component
             return;
         }
 
-        $nuevoAcceso = $this->usuario->acceso_sistema === 'HABILITADO' ? 'BLOQUEADO' : 'HABILITADO';
-        $this->usuario->update(['acceso_sistema' => $nuevoAcceso]);
-
-        activity('Usuarios')
-            ->causedBy(auth()->user())
-            ->performedOn($this->usuario)
-            ->event('seguridad')
-            ->log(($nuevoAcceso === 'HABILITADO' ? 'Habilitó' : 'Bloqueó')." el acceso de {$this->usuario->name} al sistema.");
+        $nuevoAcceso = app(GestionarSeguridadCuenta::class)->toggleAcceso(auth()->user(), $this->usuario);
 
         $this->dispatch('swal', [
             'icon' => 'success',

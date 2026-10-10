@@ -2,14 +2,20 @@
 
 namespace Tests\Feature;
 
+use App\Models\Personal;
+use App\Models\Residente;
+use App\Models\SignoVital;
+use App\Models\User;
+use App\Modulos\Identidad\Presentacion\Livewire\Funcionalidades\PersonalInstitucionalForm;
 use App\Modulos\Identidad\Presentacion\Livewire\Paginas\PersonalInstitucionalPanel;
-use App\Modulos\Institucion\Presentacion\Livewire\Paginas\TurnosAsignacionesPanel;
 use App\Modulos\Identidad\Presentacion\Livewire\Paginas\UsuariosPanel;
+use App\Modulos\Institucion\Presentacion\Livewire\Paginas\TurnosAsignacionesPanel;
 use App\Modulos\Reportes\Presentacion\Livewire\Paginas\ReportesAdultoPanel;
-use App\Models\{Residente, Personal, SignoVital, User};
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Tests\TestCase;
 
 class VistasModularesTest extends TestCase
@@ -33,7 +39,7 @@ class VistasModularesTest extends TestCase
         Livewire::test(PersonalInstitucionalPanel::class)
             ->call('abrirModalNuevo')
             ->assertSet('modalGestionAbierto', true)
-            ->assertSeeLivewire(\App\Modulos\Identidad\Presentacion\Livewire\Funcionalidades\PersonalInstitucionalForm::class)
+            ->assertSeeLivewire(PersonalInstitucionalForm::class)
             ->call('cerrarModal')
             ->assertSet('modalGestionAbierto', false);
 
@@ -45,8 +51,8 @@ class VistasModularesTest extends TestCase
             ->assertSet('modalAbierto', false);
     }
 
-    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
-    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     public function test_reportes_reubicados_generan_un_pdf_real(): void
     {
         $this->seed(RolesAndPermissionsSeeder::class);
@@ -61,11 +67,11 @@ class VistasModularesTest extends TestCase
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
-    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     public function test_reporte_individual_usa_signos_reales_y_genera_pdf(): void
     {
-        $this->seed([ RolesAndPermissionsSeeder::class]);
+        $this->seed([RolesAndPermissionsSeeder::class]);
         $user = User::factory()->create();
         $user->assignRole('SUPERADMINISTRADOR');
         $this->actingAs($user);

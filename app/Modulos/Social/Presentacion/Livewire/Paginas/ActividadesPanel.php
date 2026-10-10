@@ -5,9 +5,8 @@ namespace App\Modulos\Social\Presentacion\Livewire\Paginas;
 use App\Models\Actividad;
 use App\Models\ParticipanteActividad;
 use App\Models\Residente;
-use App\Modulos\Institucion\Aplicacion\Consultas\ContextoLaboralService;
+use App\Modulos\Social\Aplicacion\Acciones\GestionarActividades;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -143,23 +142,8 @@ class ActividadesPanel extends Component
     {
         abort_unless(auth()->user()?->can('actividades.gestionar'), 403);
         $this->validate();
-        [$personal, $area] = $this->contextoInstitucional();
-        $actividad = Actividad::create([
-            'cod_actividad' => $this->codigo('ACT'),
-            'cod_area' => $area,
-            'cod_personal' => $personal,
-            'tipo' => $this->codTipoAct,
-            'nombre' => Str::headline($this->codTipoAct),
-            'descripcion' => $this->obs ?: null,
-            'fecha_hora' => $this->fecha.' '.$this->hora,
-            'estado' => strtoupper(trim($this->estado)),
-            'observacion' => $this->obs ?: null,
-        ]);
-        ParticipanteActividad::create([
-            'cod_participante' => $this->codigo('PAR'),
-            'cod_actividad' => $actividad->cod_actividad,
-            'cod_residente' => $this->codResidente,
-        ]);
+        app(GestionarActividades::class)->guardarActividad(auth()->user(), ['codTipoAct' => $this->codTipoAct, 'obs' => $this->obs, 'fecha' => $this->fecha, 'hora' => $this->hora, 'estado' => $this->estado, 'codResidente' => $this->codResidente]);
+
         $this->modalRegistrar = false;
         $this->resetForm();
         $this->dispatch('swal', ['icon' => 'success', 'title' => 'Actividad registrada correctamente.']);
@@ -169,21 +153,8 @@ class ActividadesPanel extends Component
     {
         abort_unless(auth()->user()?->can('actividades.gestionar'), 403);
         $this->validate();
-        $a = Actividad::with('participantes')->findOrFail($this->editandoId);
-        $a->update([
-            'tipo' => $this->codTipoAct,
-            'nombre' => Str::headline($this->codTipoAct),
-            'fecha_hora' => $this->fecha.' '.$this->hora,
-            'descripcion' => $this->obs ?: null,
-            'observacion' => $this->obs ?: null,
-            'estado' => strtoupper(trim($this->estado)),
-        ]);
-        $participante = $a->participantes->first();
-        if ($participante) {
-            $participante->update(['cod_residente' => $this->codResidente]);
-        } else {
-            ParticipanteActividad::create(['cod_participante' => $this->codigo('PAR'), 'cod_actividad' => $a->cod_actividad, 'cod_residente' => $this->codResidente]);
-        }
+        app(GestionarActividades::class)->actualizarActividad(auth()->user(), ['editandoId' => $this->editandoId, 'codTipoAct' => $this->codTipoAct, 'fecha' => $this->fecha, 'hora' => $this->hora, 'obs' => $this->obs, 'estado' => $this->estado, 'codResidente' => $this->codResidente]);
+
         $this->modalEditar = false;
         $this->resetForm();
         $this->dispatch('swal', ['icon' => 'success', 'title' => 'Actividad actualizada correctamente.']);
@@ -192,8 +163,8 @@ class ActividadesPanel extends Component
     public function cancelarActividad(string $id): void
     {
         abort_unless(auth()->user()?->can('actividades.gestionar'), 403);
-        $a = Actividad::findOrFail($id);
-        $a->update(['estado' => 'CANCELADA']);
+        app(GestionarActividades::class)->cancelarActividad(auth()->user(), ['codResidente' => $this->codResidente, 'codTipoAct' => $this->codTipoAct, 'fecha' => $this->fecha, 'hora' => $this->hora, 'obs' => $this->obs, 'estado' => $this->estado], $id);
+
         $this->dispatch('swal', ['icon' => 'success', 'title' => 'Actividad cancelada.']);
     }
 
@@ -276,22 +247,6 @@ class ActividadesPanel extends Component
         return $this->detalleId
             ? Actividad::with(['participantes', 'adultoMayor'])->find($this->detalleId)
             : null;
-    }
-
-    private function contextoInstitucional(): array
-    {
-        try {
-            [$personal, $area] = app(ContextoLaboralService::class)->resolver(auth()->user());
-        } catch (\LogicException $exception) {
-            throw ValidationException::withMessages(['codTipoAct' => $exception->getMessage()]);
-        }
-
-        return [$personal->cod_personal, $area->cod_area];
-    }
-
-    private function codigo(string $prefijo): string
-    {
-        return $prefijo.'_'.Str::upper(Str::random(12));
     }
 
     public function render()

@@ -1,0 +1,126 @@
+<?php
+
+namespace App\Modulos\Cuidados\Aplicacion\Acciones;
+
+use App\Models\Atencion;
+use App\Models\ControlCognitivo;
+use App\Models\CuracionHerida;
+use App\Models\EjecucionCuidado;
+use App\Models\Herida;
+use App\Models\IntervencionCuidado;
+use App\Models\PaseTurno;
+use App\Models\PlanCuidado;
+use App\Models\ProgramacionCuidado;
+use App\Models\RegistroConductual;
+use App\Models\RegistroEliminacion;
+use App\Models\RegistroHidratacion;
+use App\Models\RegistroIngesta;
+use App\Models\RegistroMovilidad;
+use App\Models\RegistroSueno;
+use App\Models\Residente;
+use App\Models\User;
+use App\Modulos\Clinica\Aplicacion\Acciones\AutorizacionClinicaService;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+
+final class GestionarCuidadosHttp
+{
+    private const ROLES_PLAN = ['MEDICO GENERAL/GERIATRA', 'ENFERMEROS', 'PSICOLOGO/A', 'NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO'];
+
+    public function __construct(private readonly AutorizacionClinicaService $autorizacion) {}
+
+    public function registrar(User $usuario, array $entrada, Residente $residente, string $tipo): mixed
+    {
+        $definicion = $this->definiciones()[$tipo] ?? abort(404);
+        $personal = $this->autorizacion->autorizarMutacion($usuario, $residente, $definicion['permiso'], $definicion['roles']);
+        $datos = Validator::make($entrada, $definicion['reglas'])->validate();
+        $this->validarAtencion($datos['cod_atencion'] ?? null, $residente);
+        /** @var class-string<Model> $modelo */
+        $modelo = $definicion['modelo'];
+        $registro = $modelo::query()->create([$definicion['pk'] => $this->codigo($definicion['prefijo']), 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, ...$datos, ...$definicion['valores']]);
+
+        return $registro;
+    }
+
+    public function crearPlan(User $usuario, array $entrada, Residente $residente): mixed
+    {
+        $personal = $this->autorizacion->autorizarMutacion($usuario, $residente, 'planes_cuidado.crear', self::ROLES_PLAN);
+        $datos = Validator::make($entrada, ['cod_area' => ['required', 'exists:areas,cod_area'], 'tipo_plan' => ['required', 'string', 'max:50'], 'nombre' => ['required', 'string', 'max:160'], 'objetivo_general' => ['required', 'string'], 'prioridad' => ['nullable', 'string', 'max:20'], 'observacion' => ['nullable', 'string']])->validate();
+        abort_unless($datos['cod_area'] === $this->autorizacion->areaActiva($personal, $datos['cod_area'])->cod_area, 422, 'El área indicada no corresponde a la asignación clínica vigente del profesional.');
+
+        return PlanCuidado::query()->create(['cod_plan' => $this->codigo('PLA'), 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, ...$datos, 'fecha_hora_apertura' => now(), 'estado' => 'ACTIVO']);
+    }
+
+    public function crearIntervencion(User $usuario, array $entrada, PlanCuidado $plan): mixed
+    {
+        $residente = $plan->residente()->firstOrFail();
+        $this->autorizacion->autorizarMutacion($usuario, $residente, 'planes_cuidado.crear', self::ROLES_PLAN);
+        abort_unless(in_array($plan->estado, ['ACTIVO', 'ACTIVA', 'VIGENTE'], true), 409, 'El plan de cuidado ya no admite intervenciones.');
+        $datos = Validator::make($entrada, ['nombre' => ['required', 'string', 'max:160'], 'descripcion' => ['required', 'string'], 'objetivo_especifico' => ['nullable', 'string'], 'prioridad' => ['nullable', 'string', 'max:20']])->validate();
+
+        return IntervencionCuidado::query()->create(['cod_intervencion' => $this->codigo('INT'), 'cod_plan' => $plan->cod_plan, ...$datos, 'estado' => 'ACTIVA']);
+    }
+
+    public function programar(User $usuario, array $entrada, IntervencionCuidado $intervencion): mixed
+    {
+        $plan = $intervencion->plan()->firstOrFail();
+        $residente = $plan->residente()->firstOrFail();
+        $this->autorizacion->autorizarMutacion($usuario, $residente, 'planes_cuidado.crear', self::ROLES_PLAN);
+        abort_unless(in_array($plan->estado, ['ACTIVO', 'ACTIVA', 'VIGENTE'], true) && in_array($intervencion->estado, ['ACTIVO', 'ACTIVA', 'VIGENTE'], true), 409, 'La intervención ya no admite programaciones.');
+        $datos = Validator::make($entrada, ['cod_turno' => ['nullable', 'exists:turnos,cod_turno'], 'frecuencia' => ['required', 'string', 'max:60'], 'dias_semana' => ['nullable', 'string', 'max:50'], 'hora_programada' => ['nullable', 'date_format:H:i'], 'fecha_activacion' => ['required', 'date'], 'fecha_desactivacion' => ['nullable', 'date', 'after_or_equal:fecha_activacion']])->validate();
+
+        return ProgramacionCuidado::query()->create(['cod_programacion' => $this->codigo('PRC'), 'cod_intervencion' => $intervencion->cod_intervencion, ...$datos, 'estado' => 'ACTIVA']);
+    }
+
+    public function curarHerida(User $usuario, array $entrada, Herida $herida): mixed
+    {
+        $residente = $herida->residente()->firstOrFail();
+        $personal = $this->autorizacion->autorizarMutacion($usuario, $residente, 'curaciones_herida.crear', ['ENFERMEROS']);
+        abort_unless(in_array($herida->estado, ['ACTIVA', 'ACTIVO'], true), 409, 'La herida ya no admite nuevas curaciones.');
+        $datos = Validator::make($entrada, ['cod_jornada' => ['nullable', 'exists:jornadas,cod_jornada'], 'longitud' => ['nullable', 'numeric', 'min:0'], 'ancho' => ['nullable', 'numeric', 'min:0'], 'profundidad' => ['nullable', 'numeric', 'min:0'], 'tejido' => ['nullable', 'string', 'max:80'], 'exudado' => ['nullable', 'string', 'max:80'], 'olor' => ['nullable', 'string', 'max:80'], 'dolor' => ['nullable', 'string', 'max:40'], 'procedimiento' => ['required', 'string', 'min:5', 'max:10000'], 'materiales' => ['nullable', 'string'], 'respuesta' => ['nullable', 'string'], 'observacion' => ['nullable', 'string']])->validate();
+
+        return CuracionHerida::query()->create(['cod_curacion' => $this->codigo('CUR'), 'cod_herida' => $herida->cod_herida, 'cod_personal' => $personal->cod_personal, ...$datos, 'fecha_hora' => now()]);
+    }
+
+    public function registrarPase(User $usuario, array $entrada, Residente $residente): mixed
+    {
+        $personal = $this->autorizacion->autorizarMutacion($usuario, $residente, 'pases_turno.crear', ['ENFERMEROS']);
+        $datos = Validator::make($entrada, ['cod_jornada_saliente' => ['required', 'exists:jornadas,cod_jornada'], 'cod_jornada_entrante' => ['required', 'different:cod_jornada_saliente', 'exists:jornadas,cod_jornada'], 'cod_personal_entrante' => ['nullable', 'exists:personal,cod_personal'], 'estado_general' => ['nullable', 'string'], 'resumen' => ['required', 'string'], 'pendientes' => ['nullable', 'string'], 'vigilancia' => ['nullable', 'string'], 'recomendacion' => ['nullable', 'string']])->validate();
+        app(PaseTurnoService::class)->validarContextoEmision($usuario, $residente->cod_residente, $datos);
+
+        return PaseTurno::query()->create(['cod_pase' => $this->codigo('PAS'), 'cod_residente' => $residente->cod_residente, 'cod_personal_saliente' => $personal->cod_personal, ...$datos, 'fecha_hora' => now(), 'estado' => 'EMITIDO']);
+    }
+
+    public function ejecutar(User $usuario, array $entrada, IntervencionCuidado $intervencion): mixed
+    {
+        $plan = $intervencion->plan()->firstOrFail();
+        $residente = $plan->residente()->firstOrFail();
+        $personal = $this->autorizacion->autorizarMutacion($usuario, $residente, 'ejecuciones_cuidado.crear', ['ENFERMEROS']);
+        abort_unless(in_array($plan->estado, ['ACTIVO', 'ACTIVA', 'VIGENTE'], true) && in_array($intervencion->estado, ['ACTIVO', 'ACTIVA', 'VIGENTE'], true), 409, 'La intervención ya no admite ejecuciones.');
+        $datos = Validator::make($entrada, ['cod_jornada' => ['required', 'exists:jornadas,cod_jornada'], 'fecha_hora_programada' => ['nullable', 'date'], 'fecha_hora_ejecucion' => ['nullable', 'date'], 'resultado' => ['nullable', 'string', 'max:60'], 'motivo_omision' => ['nullable', 'string'], 'estado' => ['required', 'in:PENDIENTE,EJECUTADA,OMITIDA,CANCELADA'], 'observacion' => ['nullable', 'string']])->validate();
+        abort_if($datos['estado'] === 'OMITIDA' && blank($datos['motivo_omision'] ?? null), 422, 'Una omisión requiere motivo.');
+
+        return EjecucionCuidado::query()->create(['cod_ejecucion' => $this->codigo('EJC'), 'cod_intervencion' => $intervencion->cod_intervencion, 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, ...$datos]);
+    }
+
+    private function definiciones(): array
+    {
+        $texto = ['nullable', 'string'];
+        $jornada = ['required', 'exists:jornadas,cod_jornada'];
+
+        return ['control-cognitivo' => ['modelo' => ControlCognitivo::class, 'pk' => 'cod_control_cognitivo', 'prefijo' => 'CCO', 'permiso' => 'controles_cognitivos.crear', 'roles' => ['MEDICO GENERAL/GERIATRA', 'ENFERMEROS'], 'reglas' => ['cod_jornada' => ['nullable', 'exists:jornadas,cod_jornada'], 'cod_atencion' => ['nullable', 'exists:atenciones,cod_atencion'], 'orientacion_persona' => ['nullable', 'string', 'max:30'], 'orientacion_lugar' => ['nullable', 'string', 'max:30'], 'orientacion_tiempo' => ['nullable', 'string', 'max:30'], 'memoria_reciente' => ['nullable', 'string', 'max:30'], 'memoria_remota' => ['nullable', 'string', 'max:30'], 'atencion' => ['nullable', 'string', 'max:30'], 'comprension' => ['nullable', 'string', 'max:30'], 'lenguaje' => ['nullable', 'string', 'max:30'], 'sigue_instrucciones' => ['nullable', 'boolean'], 'confusion' => ['nullable', 'boolean'], 'cambio_cognitivo' => ['nullable', 'boolean'], 'observacion' => $texto], 'valores' => ['fecha_hora' => now(), 'estado' => 'VIGENTE']], 'conducta' => ['modelo' => RegistroConductual::class, 'pk' => 'cod_registro_conductual', 'prefijo' => 'RCO', 'permiso' => 'registros_conductuales.crear', 'roles' => ['ENFERMEROS', 'PSICOLOGO/A'], 'reglas' => ['cod_jornada' => ['nullable', 'exists:jornadas,cod_jornada'], 'cod_atencion' => ['nullable', 'exists:atenciones,cod_atencion'], 'estado_animo' => ['nullable', 'string', 'max:40'], 'apatia' => ['nullable', 'boolean'], 'agitacion' => ['nullable', 'boolean'], 'agresividad' => ['nullable', 'boolean'], 'ansiedad' => ['nullable', 'boolean'], 'aislamiento' => ['nullable', 'boolean'], 'deambulacion' => ['nullable', 'boolean'], 'descripcion' => $texto, 'intervencion' => $texto, 'respuesta' => $texto], 'valores' => ['fecha_hora' => now(), 'estado' => 'VIGENTE']], 'sueno' => ['modelo' => RegistroSueno::class, 'pk' => 'cod_registro_sueno', 'prefijo' => 'RSU', 'permiso' => 'registros_sueno.crear', 'roles' => ['ENFERMEROS'], 'reglas' => ['cod_jornada' => ['nullable', 'exists:jornadas,cod_jornada'], 'fecha' => ['required', 'date'], 'horas_sueno' => ['nullable', 'numeric', 'between:0,24'], 'despertares' => ['nullable', 'integer', 'min:0'], 'insomnio' => ['nullable', 'boolean'], 'somnolencia_diurna' => ['nullable', 'boolean'], 'agitacion_nocturna' => ['nullable', 'boolean'], 'calidad' => ['nullable', 'string', 'max:30'], 'observacion' => $texto], 'valores' => ['estado' => 'VIGENTE']], 'ingesta' => ['modelo' => RegistroIngesta::class, 'pk' => 'cod_ingesta', 'prefijo' => 'ING', 'permiso' => 'registros_ingesta.crear', 'roles' => ['ENFERMEROS'], 'reglas' => ['cod_jornada' => $jornada, 'tipo_comida' => ['required', 'string', 'max:40'], 'porcentaje_consumido' => ['nullable', 'numeric', 'between:0,100'], 'apetito' => ['nullable', 'string', 'max:30'], 'tolerancia' => ['nullable', 'string', 'max:30'], 'dificultad_deglucion' => ['nullable', 'boolean'], 'observacion' => $texto], 'valores' => ['fecha_hora' => now(), 'estado' => 'VIGENTE']], 'hidratacion' => ['modelo' => RegistroHidratacion::class, 'pk' => 'cod_hidratacion', 'prefijo' => 'HID', 'permiso' => 'registros_hidratacion.crear', 'roles' => ['ENFERMEROS'], 'reglas' => ['cod_jornada' => $jornada, 'cantidad_ml' => ['required', 'numeric', 'min:0'], 'tipo_liquido' => ['nullable', 'string', 'max:60'], 'tolerancia' => ['nullable', 'string', 'max:30'], 'observacion' => $texto], 'valores' => ['fecha_hora' => now(), 'estado' => 'VIGENTE']], 'eliminacion' => ['modelo' => RegistroEliminacion::class, 'pk' => 'cod_eliminacion', 'prefijo' => 'ELI', 'permiso' => 'registros_eliminacion.crear', 'roles' => ['ENFERMEROS'], 'reglas' => ['cod_jornada' => $jornada, 'tipo_eliminacion' => ['required', 'string', 'max:30'], 'cantidad' => ['nullable', 'string', 'max:40'], 'caracteristica' => ['nullable', 'string', 'max:120'], 'continencia' => ['nullable', 'string', 'max:30'], 'observacion' => $texto], 'valores' => ['fecha_hora' => now(), 'estado' => 'VIGENTE']], 'movilidad' => ['modelo' => RegistroMovilidad::class, 'pk' => 'cod_movilidad', 'prefijo' => 'MOV', 'permiso' => 'registros_movilidad.crear', 'roles' => ['ENFERMEROS', 'FISIOTERAPEUTA'], 'reglas' => ['cod_jornada' => ['nullable', 'exists:jornadas,cod_jornada'], 'cod_atencion' => ['nullable', 'exists:atenciones,cod_atencion'], 'marcha' => ['nullable', 'string', 'max:40'], 'equilibrio' => ['nullable', 'string', 'max:40'], 'traslado' => ['nullable', 'string', 'max:40'], 'tipo_apoyo' => ['nullable', 'string', 'max:60'], 'dispositivo' => ['nullable', 'string', 'max:80'], 'fatiga' => ['nullable', 'string', 'max:30'], 'riesgo_caida' => ['nullable', 'string', 'max:30'], 'observacion' => $texto], 'valores' => ['fecha_hora' => now(), 'estado' => 'VIGENTE']], 'herida' => ['modelo' => Herida::class, 'pk' => 'cod_herida', 'prefijo' => 'HER', 'permiso' => 'heridas.crear', 'roles' => ['MEDICO GENERAL/GERIATRA', 'ENFERMEROS'], 'reglas' => ['tipo_herida' => ['required', 'string', 'max:60'], 'ubicacion' => ['required', 'string', 'max:120'], 'causa' => ['nullable', 'string', 'max:120'], 'clasificacion' => ['nullable', 'string', 'max:60'], 'observacion' => $texto], 'valores' => ['fecha_hora_identificacion' => now(), 'estado' => 'ACTIVA']]];
+    }
+
+    private function validarAtencion(?string $codigo, Residente $residente): void
+    {
+        if ($codigo !== null) {
+            abort_unless(Atencion::query()->whereKey($codigo)->where('cod_residente', $residente->cod_residente)->exists(), 422, 'La atención no pertenece al residente.');
+        }
+    }
+
+    private function codigo(string $prefijo): string
+    {
+        return $prefijo.'_'.Str::upper(Str::random(12));
+    }
+}

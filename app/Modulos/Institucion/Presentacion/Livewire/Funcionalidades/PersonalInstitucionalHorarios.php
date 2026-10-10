@@ -4,13 +4,12 @@ namespace App\Modulos\Institucion\Presentacion\Livewire\Funcionalidades;
 
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
-use App\Models\Jornada;
 use App\Models\Turno;
 use App\Models\User;
+use App\Modulos\Institucion\Aplicacion\Acciones\GestionarHorariosPersonal;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Livewire\Component;
 
@@ -271,48 +270,15 @@ class PersonalInstitucionalHorarios extends Component
         $fechaInicio = Carbon::parse($this->f_fecha_inicio)->startOfDay();
         $isEdit = $this->modoEdicion;
 
-        DB::beginTransaction();
-
         try {
-            $personal = $usuario->personal;
-            if (! $personal) {
-                $this->addError('f_cod_area', 'El usuario no tiene un registro de personal V2 asociado.');
-                DB::rollBack();
-
-                return;
+            app(GestionarHorariosPersonal::class)->guardar(['usuarioId' => $this->usuarioId, 'f_cod_turno' => $this->f_cod_turno, 'f_fecha_inicio' => $this->f_fecha_inicio, 'modoEdicion' => $this->modoEdicion, 'codAsignacionEditar' => $this->codAsignacionEditar, 'f_dias_semana' => $this->f_dias_semana, 'f_cod_area' => $this->f_cod_area, 'f_tipo_asignacion' => $this->f_tipo_asignacion, 'f_observaciones' => $this->f_observaciones, 'asignaciones' => $this->asignaciones]);
+        } catch (ValidationException $e) {
+            foreach ($e->errors() as $field => $messages) {
+                $this->addError($field, $messages[0]);
             }
 
-            if ($isEdit && $this->codAsignacionEditar) {
-                $this->actualizarEstadoAsignacionGrupo(
-                    $this->codAsignacionEditar,
-                    'INACTIVO',
-                    $fechaInicio->copy()->subSecond()
-                );
-            }
-
-            $grupo = 'GRP_'.Str::upper(Str::random(10));
-            foreach ($this->f_dias_semana as $dia) {
-                $fechaJornada = $this->fechaParaDia($fechaInicio, $dia);
-                $jornada = Jornada::query()->firstOrCreate(
-                    ['cod_turno' => $turno->cod_turno, 'fecha_jornada' => $fechaJornada->toDateString()],
-                    ['cod_jornada' => 'JOR_'.Str::upper(Str::random(12)), 'estado' => 'ABIERTA']
-                );
-                AsignacionPersonal::query()->create([
-                    'cod_asignacion_personal' => 'ASP_'.Str::upper(Str::random(12)),
-                    'cod_jornada' => $jornada->cod_jornada,
-                    'cod_personal' => $personal->cod_personal,
-                    'cod_area' => $this->f_cod_area,
-                    'funcion' => $personal->profesion,
-                    'tipo_asignacion' => $this->f_tipo_asignacion,
-                    'fecha_asignacion' => now(),
-                    'estado' => 'ACTIVO',
-                    'observacion' => $this->observacionesSerializadas($grupo),
-                ]);
-            }
-
-            DB::commit();
+            return;
         } catch (\Throwable $e) {
-            DB::rollBack();
 
             report($e);
 
@@ -367,13 +333,9 @@ class PersonalInstitucionalHorarios extends Component
 
         $fechaFin = Carbon::parse($this->f_fecha_fin_finalizar)->endOfDay();
 
-        DB::beginTransaction();
-
         try {
-            $this->actualizarEstadoAsignacionGrupo($this->codAsignacionFinalizar, 'INACTIVO', $fechaFin);
-            DB::commit();
+            app(GestionarHorariosPersonal::class)->confirmarFinalizar(['codAsignacionFinalizar' => $this->codAsignacionFinalizar, 'asignaciones' => $this->asignaciones, 'usuarioId' => $this->usuarioId, 'f_tipo_asignacion' => $this->f_tipo_asignacion, 'f_observaciones' => $this->f_observaciones, 'f_fecha_fin_finalizar' => $this->f_fecha_fin_finalizar]);
         } catch (\Throwable $e) {
-            DB::rollBack();
             report($e);
 
             $this->dispatch('mostrarAlerta', [
@@ -695,15 +657,7 @@ class PersonalInstitucionalHorarios extends Component
 
     private function actualizarEstadoAsignacionGrupo(string $codAsignacion, string $estado, Carbon $fecha): void
     {
-        $ids = collect(collect($this->asignaciones)->firstWhere('cod_asignacion', $codAsignacion)['codigos_registro'] ?? [])->all();
-
-        if ($ids === []) {
-            return;
-        }
-
-        $this->queryHorarios()
-            ->whereIn($this->primaryKeyHorario(), $ids)
-            ->update(['estado' => $estado]);
+        app(GestionarHorariosPersonal::class)->actualizarGrupo(['asignaciones' => $this->asignaciones, 'usuarioId' => $this->usuarioId], $codAsignacion, $estado, $fecha);
     }
 
     private function usuarioBloqueado(): bool

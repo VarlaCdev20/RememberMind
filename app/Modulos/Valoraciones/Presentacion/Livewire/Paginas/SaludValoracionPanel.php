@@ -2,11 +2,9 @@
 
 namespace App\Modulos\Valoraciones\Presentacion\Livewire\Paginas;
 
-use App\Models\Atencion;
 use App\Models\Residente;
 use App\Models\ValoracionFuncional;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use App\Modulos\Valoraciones\Aplicacion\Acciones\GestionarValoracionFuncional;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -160,34 +158,24 @@ class SaludValoracionPanel extends Component
         $this->validate();
         $this->autorizar($this->editandoId ? 'valoraciones_funcionales.editar' : 'valoraciones_funcionales.crear');
 
-        DB::transaction(function (): void {
-            if ($this->editandoId) {
-                $valoracion = $this->valoracion($this->editandoId);
-                $valoracion->update($this->payload($valoracion->cod_personal, $valoracion->cod_atencion, $valoracion->cod_valoracion_funcional));
-
-                return;
-            }
-
-            [$personal, $codArea] = $this->contextoPersonal();
-            ValoracionFuncional::query()
-                ->where('cod_residente', $this->adulto->cod_residente)
-                ->whereIn('estado', ['ACTIVA', 'VIGENTE'])
-                ->update(['estado' => 'HISTORICA']);
-
-            $atencion = Atencion::query()->create([
-                'cod_atencion' => 'ATN_'.Str::upper(Str::random(10)),
-                'cod_residente' => $this->adulto->cod_residente,
-                'cod_area' => $codArea,
-                'cod_personal' => $personal->cod_personal,
-                'tipo_atencion' => 'VALORACION_FUNCIONAL',
-                'motivo' => $this->nivel_dependencia,
-                'fecha_hora' => $this->fecha_valoracion.' '.now()->format('H:i:s'),
-                'estado' => 'FINALIZADA',
-                'observacion' => $this->observacion ?: null,
-            ]);
-
-            ValoracionFuncional::query()->create($this->payload($personal->cod_personal, $atencion->cod_atencion));
-        });
+        app(GestionarValoracionFuncional::class)->guardar(auth()->user(), [
+            'editandoId' => $this->editandoId,
+            'adulto' => $this->adulto,
+            'nivel_dependencia' => $this->nivel_dependencia,
+            'fecha_valoracion' => $this->fecha_valoracion,
+            'observacion' => $this->observacion,
+            'usa_silla_ruedas' => $this->usa_silla_ruedas,
+            'usa_andador' => $this->usa_andador,
+            'usa_baston' => $this->usa_baston,
+            'camina_solo' => $this->camina_solo,
+            'come_solo' => $this->come_solo,
+            'se_bana_solo' => $this->se_bana_solo,
+            'se_viste_solo' => $this->se_viste_solo,
+            'va_bano_solo' => $this->va_bano_solo,
+            'necesita_supervision' => $this->necesita_supervision,
+            'indice_barthel' => $this->indice_barthel,
+            'riesgo_caida' => $this->riesgo_caida,
+        ]);
 
         $this->cerrarModales();
         $this->dispatch('swal:success', ['title' => 'Valoración guardada', 'text' => 'La valoración funcional se guardó en BDD V2.']);
@@ -197,11 +185,7 @@ class SaludValoracionPanel extends Component
     {
         $this->autorizar('valoraciones_funcionales.editar');
         $this->validate(['motivo_anulacion' => ['required', 'string', 'min:10', 'max:500']]);
-        $valoracion = $this->valoracion((string) $this->anulandoId);
-        $valoracion->update([
-            'estado' => 'ANULADA',
-            'conclusion' => trim((string) $valoracion->conclusion."\nAnulada: {$this->motivo_anulacion}"),
-        ]);
+        app(GestionarValoracionFuncional::class)->anular(auth()->user(), ['adulto' => $this->adulto, 'anulandoId' => $this->anulandoId, 'motivo_anulacion' => $this->motivo_anulacion]);
         $this->cerrarModales();
     }
 
@@ -218,41 +202,7 @@ class SaludValoracionPanel extends Component
     private function marcarComoVigente(string $id): void
     {
         $this->autorizar('valoraciones_funcionales.editar');
-        DB::transaction(function () use ($id): void {
-            ValoracionFuncional::query()
-                ->where('cod_residente', $this->adulto->cod_residente)
-                ->whereIn('estado', ['ACTIVA', 'VIGENTE'])
-                ->update(['estado' => 'HISTORICA']);
-            $this->valoracion($id)->update(['estado' => 'ACTIVA']);
-        });
-    }
-
-    private function payload(string $codPersonal, string $codAtencion, ?string $id = null): array
-    {
-        $autonomia = fn (bool $valor): string => $valor ? 'INDEPENDIENTE' : 'REQUIERE_APOYO';
-        $apoyo = $this->usa_silla_ruedas ? 'SILLA_RUEDAS' : ($this->usa_andador ? 'ANDADOR' : ($this->usa_baston ? 'BASTON' : 'SIN_APOYO'));
-
-        return [
-            'cod_valoracion_funcional' => $id ?? 'VAF_'.Str::upper(Str::random(10)),
-            'cod_residente' => $this->adulto->cod_residente,
-            'cod_personal' => $codPersonal,
-            'cod_atencion' => $codAtencion,
-            'fecha_hora' => $this->fecha_valoracion.' '.now()->format('H:i:s'),
-            'marcha' => $this->camina_solo ? 'INDEPENDIENTE' : 'ASISTIDA',
-            'equilibrio' => $apoyo,
-            'traslado' => $this->usa_silla_ruedas ? 'SILLA_RUEDAS' : $autonomia($this->camina_solo),
-            'alimentacion_autonoma' => $autonomia($this->come_solo),
-            'bano_autonomo' => $autonomia($this->se_bana_solo),
-            'vestido_autonomo' => $autonomia($this->se_viste_solo),
-            'higiene_autonoma' => $autonomia($this->se_bana_solo),
-            'continencia' => $autonomia($this->va_bano_solo),
-            'movilidad_autonoma' => $autonomia($this->camina_solo),
-            'necesita_supervision' => $this->necesita_supervision,
-            'nivel_dependencia' => $this->nivel_dependencia,
-            'conclusion' => trim(($this->indice_barthel !== '' ? "Barthel {$this->indice_barthel}/100. " : '')
-                ."Riesgo de caída: {$this->riesgo_caida}. ".$this->observacion),
-            'estado' => 'ACTIVA',
-        ];
+        app(GestionarValoracionFuncional::class)->marcarVigente(auth()->user(), $this->adulto, $id);
     }
 
     private function fillFormDesde(ValoracionFuncional $valoracion): void
@@ -272,15 +222,6 @@ class SaludValoracionPanel extends Component
         return ValoracionFuncional::query()
             ->where('cod_residente', $this->adulto->cod_residente)
             ->findOrFail($id);
-    }
-
-    private function contextoPersonal(): array
-    {
-        $personal = auth()->user()?->personal;
-        $codArea = $personal?->asignaciones()->whereIn('estado', ['ACTIVA', 'ACTIVO'])->latest('fecha_asignacion')->value('cod_area');
-        abort_unless($personal && $codArea, 422, 'El usuario debe tener personal y área institucional activa.');
-
-        return [$personal, $codArea];
     }
 
     private function autorizar(string $permiso): void

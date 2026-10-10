@@ -3,16 +3,9 @@
 namespace App\Modulos\Valoraciones\Presentacion\Livewire\Paginas;
 
 use App\Models\Atencion;
-use App\Models\HistorialEstadoResidente;
-use App\Models\NotaClinica;
 use App\Models\Residente;
-use App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService;
-use App\Modulos\Clinica\Aplicacion\Consultas\ContextoClinicoService;
-use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
-use Carbon\Carbon;
+use App\Modulos\Valoraciones\Aplicacion\Acciones\RegistrarValoracionMedica;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -142,77 +135,21 @@ class ValoracionMedicaPanel extends Component
             'motivoDecision.min' => 'Describa el motivo con al menos 10 caracteres.',
         ]);
 
-        $observacion = trim(implode("\n", array_filter([
-            $this->diagnosticosReferidos ? 'Diagnósticos referidos: '.$this->diagnosticosReferidos : null,
-            $this->antecedentesRelevantes ? 'Antecedentes: '.$this->antecedentesRelevantes : null,
-            $this->medicacionActualResumen ? 'Medicación actual: '.$this->medicacionActualResumen : null,
-            $this->condicionMedicaGeneral ? 'Condición general: '.$this->condicionMedicaGeneral : null,
-            $this->estadoNeurologicoBasico ? 'Estado neurológico: '.$this->estadoNeurologicoBasico : null,
-            $this->nivelDependenciaSugerido ? 'Dependencia sugerida: '.$this->nivelDependenciaSugerido : null,
-            $this->resultadoAdmision ? 'Resultado admisión: '.$this->resultadoAdmision : null,
-            $this->motivoDecision ? 'Motivo: '.$this->motivoDecision : null,
-            $this->recomendacionMedica ? 'Recomendación: '.$this->recomendacionMedica : null,
-        ])));
-
-        $contextoClinico = app(ContextoClinicoService::class);
-        $personal = $contextoClinico->personalActivo(Auth::user());
-        $codPersonal = $personal->cod_personal;
-        $codArea = $contextoClinico->areaAtencion($personal)->cod_area;
-
-        $fechaHora = Carbon::parse($this->fecha.' '.$this->hora);
-        $estadoAtencion = $this->estadoForm === 'COMPLETADA' ? 'COMPLETADA' : 'BORRADOR';
-
-        DB::transaction(function () use ($observacion, $codPersonal, $codArea, $fechaHora, $estadoAtencion) {
-            if ($this->editandoId) {
-                $atencion = Atencion::findOrFail($this->editandoId);
-                $atencion->update([
-                    'fecha_hora' => $fechaHora,
-                    'estado' => $estadoAtencion,
-                    'observacion' => $observacion,
-                ]);
-            } else {
-                $codAtencion = 'ATN_'.strtoupper(Str::random(10));
-                $atencion = Atencion::create([
-                    'cod_atencion' => $codAtencion,
-                    'cod_residente' => $this->codResidente,
-                    'cod_area' => $codArea,
-                    'cod_personal' => $codPersonal,
-                    'tipo_atencion' => 'VALORACION_MEDICA',
-                    'motivo' => 'Valoración médica de admisión ('.$this->resultadoAdmision.')',
-                    'fecha_hora' => $fechaHora,
-                    'estado' => $estadoAtencion,
-                    'observacion' => $observacion,
-                ]);
-
-                NotaClinica::create([
-                    'cod_nota' => 'NOT_'.strtoupper(Str::random(10)),
-                    'cod_atencion' => $codAtencion,
-                    'cod_residente' => $this->codResidente,
-                    'cod_personal' => $codPersonal,
-                    'tipo_nota' => 'VALORACION_MEDICA',
-                    'contenido' => $observacion,
-                    'fecha_hora' => $fechaHora,
-                    'estado' => 'REGISTRADA',
-                ]);
-
-                if ($this->estadoForm === 'COMPLETADA' && $this->resultadoAdmision === 'ADMITIDO') {
-                    $residente = Residente::find($this->codResidente);
-                    if ($residente) {
-                        $estadoAnterior = $residente->estado;
-                        $residente->update(['estado' => 'ACTIVO']);
-                        HistorialEstadoResidente::create([
-                            'cod_historial_estado' => 'HER_'.strtoupper(Str::random(10)),
-                            'cod_residente' => $this->codResidente,
-                            'cod_usuario_registro' => Auth::user()->cod_usuario,
-                            'estado_anterior' => $estadoAnterior,
-                            'estado_nuevo' => 'ACTIVO',
-                            'fecha_hora' => now(),
-                            'motivo' => 'Admisión aprobada en valoración médica: '.$this->motivoDecision,
-                        ]);
-                    }
-                }
-            }
-        });
+        app(RegistrarValoracionMedica::class)->ejecutar(auth()->user(), [
+            'diagnosticosReferidos' => $this->diagnosticosReferidos,
+            'antecedentesRelevantes' => $this->antecedentesRelevantes,
+            'medicacionActualResumen' => $this->medicacionActualResumen,
+            'condicionMedicaGeneral' => $this->condicionMedicaGeneral,
+            'estadoNeurologicoBasico' => $this->estadoNeurologicoBasico,
+            'nivelDependenciaSugerido' => $this->nivelDependenciaSugerido,
+            'resultadoAdmision' => $this->resultadoAdmision,
+            'motivoDecision' => $this->motivoDecision,
+            'recomendacionMedica' => $this->recomendacionMedica,
+            'fecha' => $this->fecha,
+            'hora' => $this->hora,
+            'estadoForm' => $this->estadoForm,
+            'editandoId' => $this->editandoId,
+            'codResidente' => $this->codResidente,            ]);
 
         $this->modalForm = false;
         $this->reset('editandoId', 'codResidente', 'fecha', 'hora', 'resultadoAdmision', 'motivoDecision', 'estadoForm');
@@ -221,14 +158,7 @@ class ValoracionMedicaPanel extends Component
 
     public function puedeRegistrar(): bool
     {
-        $usuario = Auth::user();
-
-        return $usuario?->estado === 'ACTIVO'
-            && app(AccesoClinicoTemporalService::class)
-                ->tieneRol($usuario, ['MEDICO GENERAL/GERIATRA'])
-            && $usuario->can('atenciones.crear')
-            && $usuario->can('notas_clinicas.crear')
-            && ! app(RolePreviewService::class)->isActive($usuario);
+        return app(RegistrarValoracionMedica::class)->puedeRegistrar(Auth::user());
     }
 
     public function cerrarModales(): void

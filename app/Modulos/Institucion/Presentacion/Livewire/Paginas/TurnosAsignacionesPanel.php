@@ -4,15 +4,15 @@ namespace App\Modulos\Institucion\Presentacion\Livewire\Paginas;
 
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
-use App\Models\Jornada;
 use App\Models\Personal;
 use App\Models\Turno;
 use App\Models\User;
+use App\Modulos\Institucion\Aplicacion\Acciones\GestionarPlazasEnfermeria;
+use App\Modulos\Institucion\Aplicacion\Consultas\EnfermerosParaAsignacion;
 use App\Modulos\Institucion\Infraestructura\Exportaciones\GeneradorPlanillaEnfermeriaService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -1171,38 +1171,7 @@ class TurnosAsignacionesPanel extends Component
             }
         }
 
-        $personal = null;
-        $areaId = null;
-        if ($tipo !== 'DESCANSO' && $codUsuario) {
-            $personal = User::findOrFail($codUsuario)->personal;
-            abort_unless($personal, 422, 'El usuario no tiene ficha de personal V2.');
-            $areaId = $this->resolverAreaAsignacionEnfermeria($personal);
-        }
-
-        DB::transaction(function () use ($plaza, $fecha, $tipo, $personal, $areaId, $motivo): void {
-            AsignacionPersonal::where('funcion', 'PLAZA:'.$plaza)->where('estado', 'ACTIVA')
-                ->whereHas('jornada', fn ($q) => $q->whereDate('fecha_jornada', $fecha))
-                ->update(['estado' => 'ANULADA']);
-
-            if ($tipo === 'DESCANSO' || ! $personal || ! $areaId) {
-                return;
-            }
-
-            $turnoCodigo = $this->turnoCodigoParaPlaza($plaza, $fecha);
-            $turnoId = match ($turnoCodigo) {
-                'MANANA' => 'TUR_0001', 'TARDE' => 'TUR_0002', 'NOCHE' => 'TUR_0003', default => 'TUR_0004',
-            };
-            $jornada = Jornada::firstOrCreate(
-                ['cod_turno' => $turnoId, 'fecha_jornada' => $fecha],
-                ['cod_jornada' => 'JOR_'.Str::upper(Str::random(10)), 'estado' => 'ACTIVA']
-            );
-
-            AsignacionPersonal::create([
-                'cod_jornada' => $jornada->cod_jornada, 'cod_personal' => $personal->cod_personal, 'cod_area' => $areaId,
-                'funcion' => 'PLAZA:'.$plaza, 'tipo_asignacion' => $tipo, 'fecha_asignacion' => now(),
-                'estado' => 'ACTIVA', 'observacion' => $motivo,
-            ]);
-        });
+        app(GestionarPlazasEnfermeria::class)->guardarAsignacionPlaza(auth()->user(), ['plazaSeleccionada' => $this->plazaSeleccionada, 'enfermeroSeleccionado' => $this->enfermeroSeleccionado, 'tipoAsignacion' => $this->tipoAsignacion, 'fechaSeleccionadaPlaza' => $this->fechaSeleccionadaPlaza, 'motivoAsignacion' => $this->motivoAsignacion, 'turnoCodigo' => $this->turnoCodigoParaPlaza($plaza, $fecha)]);
 
         $this->modalAsignarPlazaAbierto = false;
         $this->generarPlanillaEnfermeria(silencioso: true);
@@ -1217,11 +1186,7 @@ class TurnosAsignacionesPanel extends Component
     public function desvincularPlaza(string $plaza, string $fecha): void
     {
         $this->autorizarAsignacion();
-        $asignaciones = AsignacionPersonal::where('funcion', 'PLAZA:'.$plaza)->where('estado', 'ACTIVA')
-            ->whereHas('jornada', fn ($q) => $q->whereDate('fecha_jornada', $fecha))->get();
-        foreach ($asignaciones as $asignacion) {
-            $asignacion->update(['estado' => 'ANULADA', 'observacion' => trim(($asignacion->observacion ?? '').' | Desvinculada manualmente')]);
-        }
+        app(GestionarPlazasEnfermeria::class)->desvincularPlaza(auth()->user(), $plaza, $fecha);
 
         $this->generarPlanillaEnfermeria(silencioso: true);
 
@@ -1286,5 +1251,10 @@ class TurnosAsignacionesPanel extends Component
         );
 
         return (string) $areasEnfermeria->sole()->cod_area;
+    }
+
+    public function getEnfermerosParaPlazaProperty(): Collection
+    {
+        return app(EnfermerosParaAsignacion::class)->obtener();
     }
 }

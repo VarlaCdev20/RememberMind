@@ -80,8 +80,8 @@
     @if($foto_de_perfil_upload)
      <img src="{{ $foto_de_perfil_upload->temporaryUrl() }}"
       class="h-24 w-24 rounded-2xl object-cover ring-3 ring-[var(--rm-primary)] shadow-md">
-    @elseif($isEdit && ($cod_usuario ?? $usuarioId) && \App\Models\User::find($cod_usuario ?? $usuarioId)?->foto_de_perfil)
-     <img src="{{ asset('storage/' . \App\Models\User::find($cod_usuario ?? $usuarioId)->foto_de_perfil) }}"
+    @elseif($isEdit && ($cod_usuario ?? $usuarioId) && $this->fotoUsuarioActual)
+     <img src="{{ asset('storage/' . $this->fotoUsuarioActual) }}"
       class="h-24 w-24 rounded-2xl object-cover ring-3 ring-[var(--rm-border)] shadow-md">
     @else
      <div class="flex h-24 w-24 items-center justify-center rounded-2xl bg-[var(--rm-surface-alt)] text-2xl font-black text-[var(--rm-primary)] ring-3 ring-[var(--rm-border)] shadow-sm uppercase">
@@ -706,8 +706,8 @@
      @if($foto_de_perfil_upload)
      <img src="{{ $foto_de_perfil_upload->temporaryUrl() }}"
       class="h-16 w-16 rounded-xl object-cover ring-2 ring-[var(--rm-primary)] shadow-sm">
-     @elseif($isEdit && ($cod_usuario ?? $usuarioId) && \App\Models\User::find($cod_usuario ?? $usuarioId)?->foto_de_perfil)
-     <img src="{{ asset('storage/' . \App\Models\User::find($cod_usuario ?? $usuarioId)->foto_de_perfil) }}"
+     @elseif($isEdit && ($cod_usuario ?? $usuarioId) && $this->fotoUsuarioActual)
+     <img src="{{ asset('storage/' . $this->fotoUsuarioActual) }}"
       class="h-16 w-16 rounded-xl object-cover ring-2 ring-[var(--rm-border)] shadow-sm">
      @else
      <div class="flex h-16 w-16 items-center justify-center rounded-xl bg-[var(--rm-surface-alt)] text-lg font-black text-[var(--rm-primary)] shadow-sm uppercase">

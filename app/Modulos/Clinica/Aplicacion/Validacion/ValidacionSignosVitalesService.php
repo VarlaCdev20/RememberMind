@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modulos\Clinica\Presentacion\Http\Validacion;
+namespace App\Modulos\Clinica\Aplicacion\Validacion;
 
 use Illuminate\Contracts\Validation\Validator;
 

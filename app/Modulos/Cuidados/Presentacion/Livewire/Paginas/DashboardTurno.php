@@ -4,9 +4,7 @@ namespace App\Modulos\Cuidados\Presentacion\Livewire\Paginas;
 
 use App\Models\AdministracionMedicacion;
 use App\Models\Alerta;
-use App\Models\AsignacionPersonal;
 use App\Models\AsignacionResidenteJornada;
-use App\Models\Atencion;
 use App\Models\EjecucionCuidado;
 use App\Models\Prescripcion;
 use App\Models\Residente;
@@ -15,6 +13,7 @@ use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
 use App\Modulos\Alertas\Aplicacion\Consultas\TendenciaIncidentesService;
 use App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService;
 use App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService;
+use App\Modulos\Cuidados\Aplicacion\Acciones\GestionarRegistrosDashboardTurno;
 use App\Modulos\Cuidados\Aplicacion\Consultas\DashboardComplementosService;
 use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
@@ -23,7 +22,6 @@ use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
 use App\Modulos\Reportes\Presentacion\DashboardPhotoRotation;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 
@@ -198,20 +196,9 @@ class DashboardTurno extends Component
 
     public function completarTarea(string $codTarea)
     {
-        $this->asegurarModoOperativo();
-        $tarea = EjecucionCuidado::findOrFail($codTarea);
-        $this->asegurarModoOperativo($tarea->cod_residente, 'ejecuciones_cuidado.gestionar');
-        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($tarea->cod_residente, 'ejecuciones_cuidado.gestionar', Auth::user());
+        app(GestionarRegistrosDashboardTurno::class)->completarTarea(auth()->user(), [
 
-        DB::transaction(function () use ($tarea) {
-            $bloqueada = EjecucionCuidado::lockForUpdate()->findOrFail($tarea->cod_ejecucion);
-            abort_unless($bloqueada->puedeCompletarse(), 409, 'La tarea ya no está pendiente de ejecución.');
-            $bloqueada->update([
-                'estado' => 'REALIZADA',
-                'resultado' => 'Completada y confirmada desde el panel del turno.',
-                'fecha_hora_ejecucion' => now(),
-            ]);
-        });
+        ], $codTarea);
 
         $this->dispatch('swal', [
             'icon' => 'success',
@@ -234,21 +221,10 @@ class DashboardTurno extends Component
 
     public function confirmarOmisionTarea()
     {
-        $this->asegurarModoOperativo();
-        $tarea = EjecucionCuidado::findOrFail($this->tareaOmitirId);
-        $this->asegurarModoOperativo($tarea->cod_residente, 'ejecuciones_cuidado.gestionar');
-        $this->validate([
-            'motivoOmisionTarea' => 'required|string|min:5|max:500',
-        ], [
-            'motivoOmisionTarea.required' => 'Debe registrar el motivo de la omisión.',
-        ]);
-
-        $tarea = EjecucionCuidado::findOrFail($this->tareaOmitirId);
-        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($tarea->cod_residente, 'ejecuciones_cuidado.gestionar', Auth::user());
-        abort_unless($tarea->puedeCompletarse(), 409, 'La tarea ya no está pendiente de ejecución.');
-        $tarea->update([
-            'estado' => 'OMITIDA',
-            'motivo_omision' => trim($this->motivoOmisionTarea),
+        $this->resetValidation();
+        $tarea = app(GestionarRegistrosDashboardTurno::class)->confirmarOmisionTarea(auth()->user(), [
+            'tareaOmitirId' => $this->tareaOmitirId,
+            'motivoOmisionTarea' => $this->motivoOmisionTarea,
         ]);
 
         $this->modalOmitirTarea = false;
@@ -446,53 +422,18 @@ class DashboardTurno extends Component
 
     public function guardarSeguimiento()
     {
-        $this->asegurarModoOperativo($this->segCodResidente, 'atenciones.crear');
-        app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($this->segCodResidente, 'atenciones.crear', Auth::user());
-        $this->validate([
-            'segEstadoGeneral' => 'required|in:ESTABLE,VIGILANCIA,DELICADO,CRITICO',
-            'segAlimentacion' => 'required|in:COMPLETA,PARCIAL,RECHAZADA,AYUNO',
-            'segMovilidad' => 'required|in:INDEPENDIENTE,ASISTIDA,SILLA_RUEDAS,ENCAMADO',
-            'segSueno' => 'required|in:NORMAL,INTERRUMPIDO,INSOMNIO,SOMNOLENCIA',
-            'segObservacion' => 'required|string|min:10|max:1000',
-        ]);
-
-        if (($this->segIncidente || $this->segRequiereMedico) && mb_strlen(trim($this->segObservacion)) < 15) {
-            $this->addError('segObservacion', 'Describa la situación clínica y las medidas iniciales con al menos 15 caracteres.');
-
-            return;
-        }
-        if (! $this->turnoActual) {
-            $this->addError('segObservacion', 'No existe un turno activo para registrar el seguimiento.');
-
-            return;
-        }
-        $personal = Auth::user()?->personal;
-        abort_unless($personal, 422, 'El usuario no está vinculado a personal clínico.');
-        $asignacionArea = AsignacionPersonal::query()
-            ->where('cod_personal', $personal->cod_personal)
-            ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
-            ->latest('fecha_asignacion')
-            ->first();
-        abort_unless($asignacionArea, 422, 'El personal no tiene un área institucional activa.');
-
-        if (Atencion::where('cod_residente', $this->segCodResidente)
-            ->whereDate('fecha_hora', $this->filtroFecha)
-            ->where('cod_personal', $personal->cod_personal)
-            ->where('tipo_atencion', 'SEGUIMIENTO_ENFERMERIA')->exists()) {
-            $this->addError('segObservacion', 'Ya existe un seguimiento de este residente para el turno y la fecha seleccionados.');
-
-            return;
-        }
-
-        Atencion::create([
-            'cod_residente' => $this->segCodResidente,
-            'cod_area' => $asignacionArea->cod_area,
-            'cod_personal' => $personal->cod_personal,
-            'fecha_hora' => now(),
-            'tipo_atencion' => 'SEGUIMIENTO_ENFERMERIA',
-            'motivo' => "Estado: {$this->segEstadoGeneral}; alimentación: {$this->segAlimentacion}; movilidad: {$this->segMovilidad}; sueño: {$this->segSueno}",
-            'estado' => 'FINALIZADA',
-            'observacion' => trim($this->segObservacion),
+        $this->resetValidation();
+        app(GestionarRegistrosDashboardTurno::class)->guardarSeguimiento(auth()->user(), [
+            'segCodResidente' => $this->segCodResidente,
+            'segIncidente' => $this->segIncidente,
+            'segRequiereMedico' => $this->segRequiereMedico,
+            'segObservacion' => $this->segObservacion,
+            'turnoActual' => $this->turnoActual,
+            'filtroFecha' => $this->filtroFecha,
+            'segEstadoGeneral' => $this->segEstadoGeneral,
+            'segAlimentacion' => $this->segAlimentacion,
+            'segMovilidad' => $this->segMovilidad,
+            'segSueno' => $this->segSueno,
         ]);
 
         $this->modalSeguimiento = false;

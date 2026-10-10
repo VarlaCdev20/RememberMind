@@ -385,7 +385,7 @@ Route::middleware([
                 ->name('turnos-enfermeria.')
                 ->middleware('permission:turnos.ver')
                 ->group(function () use ($rutas) {
-                    $rutas['Cuidados']['ruta_127']();
+                    $rutas['Institucion']['ruta_127']();
                 });
 
             /*
@@ -408,7 +408,7 @@ Route::middleware([
                 ->name('asignacion-turno.')
                 ->middleware('permission:turnos.ver')
                 ->group(function () use ($rutas) {
-                    $rutas['Cuidados']['ruta_130']();
+                    $rutas['Institucion']['ruta_130']();
                 });
 
             Route::prefix('plan-cuidado')

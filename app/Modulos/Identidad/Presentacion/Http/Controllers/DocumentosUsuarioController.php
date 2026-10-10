@@ -4,11 +4,10 @@ namespace App\Modulos\Identidad\Presentacion\Http\Controllers;
 
 use App\Compartido\Infraestructura\Documentos\DocumentosUsuarioService;
 use App\Http\Controllers\Controller;
-use App\Mail\Usuarios\PaqueteDocumentalUsuarioMail;
 use App\Models\User;
+use App\Modulos\Identidad\Infraestructura\Notificaciones\EnviarPaqueteDocumental;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 class DocumentosUsuarioController extends Controller
 {
@@ -160,22 +159,7 @@ class DocumentosUsuarioController extends Controller
                 ], 422);
             }
 
-            $datos = $this->docService->prepararPaquete($user);
-            $filename = $this->docService->nombreArchivoPaquete($user);
-
-            $pdf = Pdf::loadView('pages.usuarios.documentos.paquete-documental', $datos)
-                ->setPaper('a4', 'portrait')
-                ->setWarnings(false);
-
-            Mail::to($user->correo)->send(new PaqueteDocumentalUsuarioMail($user, $pdf->output(), $filename, $datos['requisitos']));
-
-            if (function_exists('activity')) {
-                activity('Usuarios')
-                    ->causedBy(auth()->user())
-                    ->performedOn($user)
-                    ->event('reportes')
-                    ->log("Envió paquete documental institucional por correo al usuario: {$user->name}.");
-            }
+            app(EnviarPaqueteDocumental::class)->ejecutar(auth()->user(), $user);
 
             return response()->json([
                 'success' => true,

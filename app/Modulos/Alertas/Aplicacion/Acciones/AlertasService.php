@@ -2,10 +2,10 @@
 
 namespace App\Modulos\Alertas\Aplicacion\Acciones;
 
-use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Models\Alerta;
 use App\Models\Residente;
 use App\Models\User;
+use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
