@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Enfermeria\Medicacion\SaludAdministracionMedicacionPanel;
+use App\Modulos\Medicacion\Presentacion\Livewire\Paginas\SaludAdministracionMedicacionPanel;
 use App\Models\Alergia;
 use App\Models\Residente;
 use App\Models\Medicamento;

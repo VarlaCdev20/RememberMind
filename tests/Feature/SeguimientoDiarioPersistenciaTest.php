@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Enfermeria\Cuidados\SeguimientoDiarioPanel;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\SeguimientoDiarioPanel;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\AsignacionResidenteJornada;

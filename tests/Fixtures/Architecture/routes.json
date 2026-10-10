@@ -1,0 +1,6182 @@
+[
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "login",
+    "name": "login",
+    "action": "Laravel\\Fortify\\Http\\Controllers\\AuthenticatedSessionController@create",
+    "middleware": [
+      "web",
+      "guest:web"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "login",
+    "name": "login.store",
+    "action": "Laravel\\Fortify\\Http\\Controllers\\AuthenticatedSessionController@store",
+    "middleware": [
+      "web",
+      "guest:web",
+      "throttle:login"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "logout",
+    "name": "logout",
+    "action": "Laravel\\Fortify\\Http\\Controllers\\AuthenticatedSessionController@destroy",
+    "middleware": [
+      "web",
+      "auth:web"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "forgot-password",
+    "name": "password.request",
+    "action": "Laravel\\Fortify\\Http\\Controllers\\PasswordResetLinkController@create",
+    "middleware": [
+      "web",
+      "guest:web"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "reset-password/{token}",
+    "name": "password.reset",
+    "action": "Laravel\\Fortify\\Http\\Controllers\\NewPasswordController@create",
+    "middleware": [
+      "web",
+      "guest:web"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "forgot-password",
+    "name": "password.email",
+    "action": "Laravel\\Fortify\\Http\\Controllers\\PasswordResetLinkController@store",
+    "middleware": [
+      "web",
+      "guest:web"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "reset-password",
+    "name": "password.update",
+    "action": "Laravel\\Fortify\\Http\\Controllers\\NewPasswordController@store",
+    "middleware": [
+      "web",
+      "guest:web"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "uri": "user/profile-information",
+    "name": "user-profile-information.update",
+    "action": "Laravel\\Fortify\\Http\\Controllers\\ProfileInformationController@update",
+    "middleware": [
+      "web",
+      "auth:web"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "uri": "user/password",
+    "name": "user-password.update",
+    "action": "Laravel\\Fortify\\Http\\Controllers\\PasswordController@update",
+    "middleware": [
+      "web",
+      "auth:web"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "user/confirm-password",
+    "name": "password.confirm",
+    "action": "Laravel\\Fortify\\Http\\Controllers\\ConfirmablePasswordController@show",
+    "middleware": [
+      "web",
+      "auth:web"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "user/confirmed-password-status",
+    "name": "password.confirmation",
+    "action": "Laravel\\Fortify\\Http\\Controllers\\ConfirmedPasswordStatusController@show",
+    "middleware": [
+      "web",
+      "auth:web"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "user/confirm-password",
+    "name": "password.confirm.store",
+    "action": "Laravel\\Fortify\\Http\\Controllers\\ConfirmablePasswordController@store",
+    "middleware": [
+      "web",
+      "auth:web"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "user/profile",
+    "name": "profile.show",
+    "action": "Laravel\\Jetstream\\Http\\Controllers\\Livewire\\UserProfileController@show",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "sanctum/csrf-cookie",
+    "name": "sanctum.csrf-cookie",
+    "action": "Laravel\\Sanctum\\Http\\Controllers\\CsrfCookieController@show",
+    "middleware": [
+      "web"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "livewire-68709b3a/update",
+    "name": "default-livewire.update",
+    "action": "Livewire\\Mechanisms\\HandleRequests\\HandleRequests@handleUpdate",
+    "middleware": [
+      "web",
+      "Livewire\\Mechanisms\\HandleRequests\\RequireLivewireHeaders"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "livewire-68709b3a/livewire.min.js",
+    "name": null,
+    "action": "Livewire\\Mechanisms\\FrontendAssets\\FrontendAssets@returnJavaScriptAsFile",
+    "middleware": [],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "livewire-68709b3a/livewire.min.js.map",
+    "name": null,
+    "action": "Livewire\\Mechanisms\\FrontendAssets\\FrontendAssets@maps",
+    "middleware": [],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "livewire-68709b3a/livewire.csp.min.js.map",
+    "name": null,
+    "action": "Livewire\\Mechanisms\\FrontendAssets\\FrontendAssets@cspMaps",
+    "middleware": [],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "livewire-68709b3a/upload-file",
+    "name": "livewire.upload-file",
+    "action": "Livewire\\Features\\SupportFileUploads\\FileUploadController@handle",
+    "middleware": [
+      "web",
+      "throttle:60,1"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "livewire-68709b3a/preview-file/{filename}",
+    "name": "livewire.preview-file",
+    "action": "Livewire\\Features\\SupportFileUploads\\FilePreviewController@handle",
+    "middleware": [
+      "web"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "livewire-68709b3a/js/{component}.js",
+    "name": null,
+    "action": "Closure",
+    "middleware": [],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "livewire-68709b3a/css/{component}.css",
+    "name": null,
+    "action": "Closure",
+    "middleware": [],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "livewire-68709b3a/css/{component}.global.css",
+    "name": null,
+    "action": "Closure",
+    "middleware": [],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "up",
+    "name": null,
+    "action": "Closure",
+    "middleware": [],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/",
+    "name": "welcome",
+    "action": "Closure",
+    "middleware": [
+      "web"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "dashboard",
+    "name": "dashboard",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\DashboardController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "ver-como-rol",
+    "name": "role-preview.store",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\RolePreviewController@store",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "ver-como-rol",
+    "name": "role-preview.destroy",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\RolePreviewController@destroy",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/administracion/dashboard",
+    "name": "admin.administracion.dashboard",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\CentroCoordinacionController",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/administracion",
+    "name": "admin.administracion.index",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\CentroCoordinacionController",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/administracion/residentes/{residente}",
+    "name": "admin.administracion.residentes.show",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\ResidenteAdministrativoController@show",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard",
+      "permission:residentes.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/administracion/buscar",
+    "name": "admin.administracion.buscar",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\BuscarAdministracionController",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/administracion/admisiones",
+    "name": "admin.administracion.admisiones",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\OperacionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": {
+      "modulo": "admisiones"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/administracion/residentes",
+    "name": "admin.administracion.residentes",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\OperacionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": {
+      "modulo": "residentes"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/administracion/habitaciones",
+    "name": "admin.administracion.habitaciones",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\OperacionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": {
+      "modulo": "habitaciones"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/administracion/ocupacion",
+    "name": "admin.administracion.ocupacion",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\OperacionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": {
+      "modulo": "ocupacion"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/administracion/jornadas",
+    "name": "admin.administracion.jornadas",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\OperacionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": {
+      "modulo": "jornadas"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/administracion/asignaciones",
+    "name": "admin.administracion.asignaciones",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\OperacionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": {
+      "modulo": "asignaciones"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/administracion/contactos",
+    "name": "admin.administracion.contactos",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\OperacionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": {
+      "modulo": "contactos"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/administracion/documentacion",
+    "name": "admin.administracion.documentacion",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\OperacionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": {
+      "modulo": "documentacion"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/administracion/consentimientos",
+    "name": "admin.administracion.consentimientos",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\OperacionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": {
+      "modulo": "consentimientos"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/administracion/seguros",
+    "name": "admin.administracion.seguros",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\OperacionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": {
+      "modulo": "seguros"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/administracion/actividades",
+    "name": "admin.administracion.actividades",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\OperacionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": {
+      "modulo": "actividades"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/administracion/visitas",
+    "name": "admin.administracion.visitas",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\OperacionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": {
+      "modulo": "visitas"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/administracion/alertas",
+    "name": "admin.administracion.alertas",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\OperacionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": {
+      "modulo": "alertas"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/administracion/incidentes",
+    "name": "admin.administracion.incidentes",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\OperacionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": {
+      "modulo": "incidentes"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/administracion/reportes",
+    "name": "admin.administracion.reportes",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\OperacionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": {
+      "modulo": "reportes"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/vistas-extra",
+    "name": "admin.vistas-extra",
+    "action": "Closure",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/usuarios",
+    "name": "admin.usuarios.index",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\UsuarioController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:usuarios.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/usuarios/create",
+    "name": "admin.usuarios.create",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\UsuarioController@create",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:usuarios.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/usuarios",
+    "name": "admin.usuarios.store",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\UsuarioController@store",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:usuarios.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/usuarios/{usuario}",
+    "name": "admin.usuarios.show",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\UsuarioController@show",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:usuarios.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/usuarios/{usuario}/edit",
+    "name": "admin.usuarios.edit",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\UsuarioController@edit",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:usuarios.editar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PUT",
+      "PATCH"
+    ],
+    "uri": "admin/usuarios/{usuario}",
+    "name": "admin.usuarios.update",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\UsuarioController@update",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:usuarios.editar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "admin/usuarios/{usuario}",
+    "name": "admin.usuarios.destroy",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\UsuarioController@destroy",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:usuarios.editar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/usuarios/{usuario}/desactivar",
+    "name": "admin.usuarios.desactivar",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\UsuarioController@desactivar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:usuarios.cambiar_estado"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/usuarios/{usuario}/activar",
+    "name": "admin.usuarios.activar",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\UsuarioController@activar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:usuarios.cambiar_estado"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/usuarios/{usuario}/ficha/pdf",
+    "name": "admin.usuarios.ficha.pdf",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\UsuarioController@fichaPdf",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:usuarios.reportes.pdf"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/usuarios/{usuario}/documentacion/pdf",
+    "name": "admin.usuarios.documentacion.pdf",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\UsuarioController@documentacionPdf",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:usuarios.reportes.pdf"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/usuarios/{usuario}/solicitud-documental/pdf",
+    "name": "admin.usuarios.solicitud-documental.pdf",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\UsuarioController@solicitudDocumentalPdf",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:usuarios.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/usuarios/{usuario}/horarios/pdf",
+    "name": "admin.usuarios.horarios.pdf",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\UsuarioController@horariosPdf",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:usuarios.reportes.pdf"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/usuarios/{usuario}/ficha/enviar-correo",
+    "name": "admin.usuarios.ficha.enviar-correo",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\UsuarioController@enviarFichaCorreo",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:usuarios.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/usuarios/{user}/documentos",
+    "name": "admin.usuarios.documentos.preview",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\DocumentosUsuarioController@preview",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/usuarios/{user}/documentos/pdf",
+    "name": "admin.usuarios.documentos.pdf",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\DocumentosUsuarioController@paquetePdf",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/usuarios/{user}/documentos/enviar",
+    "name": "admin.usuarios.documentos.enviar",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\DocumentosUsuarioController@enviarPaqueteCorreo",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:usuarios.editar|usuarios.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/usuarios/{user}/documentos/{documento}/ver",
+    "name": "admin.usuarios.documentos.ver",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\DocumentosUsuarioController@verDocumento",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/usuarios/{user}/documentos/{documento}/pdf",
+    "name": "admin.usuarios.documentos.documento-pdf",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\DocumentosUsuarioController@pdfDocumento",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/usuarios/{user}/documentos/{documento}/imprimir",
+    "name": "admin.usuarios.documentos.imprimir",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Http\\Controllers\\DocumentosUsuarioController@imprimirDocumento",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/personal-institucional",
+    "name": "admin.personal-institucional",
+    "action": "App\\Modulos\\Identidad\\Presentacion\\Livewire\\Paginas\\PersonalInstitucionalPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:personal_institucional.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/roles-permisos",
+    "name": "admin.roles-permisos.index",
+    "action": "\\Illuminate\\Routing\\ViewController",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:roles.ver"
+    ],
+    "domain": null,
+    "defaults": {
+      "view": "pages.roles-permisos.index",
+      "data": [],
+      "status": 200,
+      "headers": []
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/sistema-experto",
+    "name": "admin.sistema-experto.index",
+    "action": "App\\Modulos\\ApoyoDecision\\Presentacion\\Livewire\\Paginas\\ConocimientoPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "role:SUPERADMINISTRADOR",
+      "can:consultar,App\\Models\\VersionModeloExperto"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/areas-atencion",
+    "name": "admin.areas-atencion.index",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\AreasAtencionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:areas.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/areas-institucionales",
+    "name": "admin.areas-institucionales.index",
+    "action": "\\Illuminate\\Routing\\ViewController",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:areas.ver"
+    ],
+    "domain": null,
+    "defaults": {
+      "view": "pages.areas-institucionales.index",
+      "data": [],
+      "status": 200,
+      "headers": []
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/turnos-asignaciones",
+    "name": "admin.turnos-asignaciones.index",
+    "action": "\\Illuminate\\Routing\\ViewController",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:turnos.ver"
+    ],
+    "domain": null,
+    "defaults": {
+      "view": "pages.turnos-asignaciones.index",
+      "data": [],
+      "status": 200,
+      "headers": []
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/areas-institucionales/reportes/general/pdf",
+    "name": "admin.areas-institucionales.reportes.general.pdf",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\AreaReporteController@generalPdf",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:areas.reportes"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/areas-institucionales/reportes/general/excel",
+    "name": "admin.areas-institucionales.reportes.general.excel",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\AreaReporteController@generalExcel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:areas.reportes"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/areas-institucionales/reportes/general/csv",
+    "name": "admin.areas-institucionales.reportes.general.csv",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\AreaReporteController@generalCsv",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:areas.reportes"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/areas-institucionales/reportes/{area}/pdf",
+    "name": "admin.areas-institucionales.reportes.area.pdf",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\AreaReporteController@areaPdf",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:areas.reportes"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/areas-institucionales/reportes/{area}/excel",
+    "name": "admin.areas-institucionales.reportes.area.excel",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\AreaReporteController@areaExcel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:areas.reportes"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/adultos-mayores/alertas-pendientes",
+    "name": "admin.adultos-mayores.alertas-pendientes",
+    "action": "App\\Modulos\\Alertas\\Presentacion\\Livewire\\Paginas\\AlertasPendientesPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/admisiones/preadmisiones",
+    "name": "admin.admisiones.preadmisiones",
+    "action": "App\\Modulos\\Admisiones\\Presentacion\\Livewire\\Paginas\\PreadmisionesPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/admisiones/preadmisiones/rechazadas",
+    "name": "admin.admisiones.preadmisiones.rechazadas",
+    "action": "App\\Modulos\\Admisiones\\Presentacion\\Livewire\\Paginas\\PreadmisionesPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/admisiones/preadmision",
+    "name": "admin.admisiones.preadmision",
+    "action": "App\\Modulos\\Admisiones\\Presentacion\\Livewire\\Paginas\\PreadmisionWizard",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.ver_dashboard",
+      "permission:admisiones.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/adultos-mayores",
+    "name": "admin.adultos-mayores.index",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\AdultoMayorController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}",
+    "name": "admin.adultos-mayores.show",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\AdultoMayorController@show",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/edit",
+    "name": "admin.adultos-mayores.edit",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\AdultoMayorController@edit",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PUT",
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}",
+    "name": "admin.adultos-mayores.update",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\AdultoMayorController@update",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/archivar",
+    "name": "admin.adultos-mayores.archivar",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\AdultoMayorController@archivar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/restaurar",
+    "name": "admin.adultos-mayores.restaurar",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\AdultoMayorController@restaurar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/estado",
+    "name": "admin.adultos-mayores.estado",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\AdultoMayorController@cambiarEstado",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/familiares",
+    "name": "admin.adultos-mayores.familiares.index",
+    "action": "App\\Modulos\\Social\\Presentacion\\Http\\Controllers\\AdultoMayorFamiliarController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:residentes_contactos.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/familiares",
+    "name": "admin.adultos-mayores.familiares.store",
+    "action": "App\\Modulos\\Social\\Presentacion\\Http\\Controllers\\AdultoMayorFamiliarController@store",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:residentes_contactos.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/familiares/{familiar}",
+    "name": "admin.adultos-mayores.familiares.update",
+    "action": "App\\Modulos\\Social\\Presentacion\\Http\\Controllers\\AdultoMayorFamiliarController@update",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:residentes_contactos.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/familiares/{familiar}",
+    "name": "admin.adultos-mayores.familiares.destroy",
+    "action": "App\\Modulos\\Social\\Presentacion\\Http\\Controllers\\AdultoMayorFamiliarController@destroy",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:residentes_contactos.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/familiares/{familiar}/restaurar",
+    "name": "admin.adultos-mayores.familiares.restore",
+    "action": "App\\Modulos\\Social\\Presentacion\\Http\\Controllers\\AdultoMayorFamiliarController@restore",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:residentes_contactos.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/observaciones",
+    "name": "admin.adultos-mayores.observaciones.index",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\AdultoMayorObservacionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:notas_clinicas.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/observaciones",
+    "name": "admin.adultos-mayores.observaciones.store",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\AdultoMayorObservacionController@store",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:notas_clinicas.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/observaciones/{observacion}",
+    "name": "admin.adultos-mayores.observaciones.update",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\AdultoMayorObservacionController@update",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:notas_clinicas.editar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/observaciones/{observacion}",
+    "name": "admin.adultos-mayores.observaciones.destroy",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\AdultoMayorObservacionController@destroy",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:notas_clinicas.anular"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/observaciones/{observacion}/restaurar",
+    "name": "admin.adultos-mayores.observaciones.restore",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\AdultoMayorObservacionController@restore",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:notas_clinicas.editar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/atenciones",
+    "name": "admin.adultos-mayores.atenciones.index",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\AdultoMayorAtencionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:atenciones.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/atenciones",
+    "name": "admin.adultos-mayores.atenciones.store",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\AdultoMayorAtencionController@store",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:atenciones.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/atenciones/{atencion}",
+    "name": "admin.adultos-mayores.atenciones.update",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\AdultoMayorAtencionController@update",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:atenciones.editar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/atenciones/{atencion}",
+    "name": "admin.adultos-mayores.atenciones.destroy",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\AdultoMayorAtencionController@destroy",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:atenciones.anular"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/atenciones/{atencion}/restaurar",
+    "name": "admin.adultos-mayores.atenciones.restore",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\AdultoMayorAtencionController@restore",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:atenciones.editar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/evaluaciones",
+    "name": "admin.adultos-mayores.evaluaciones.index",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\AdultoMayorEvaluacionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:aplicaciones_instrumento.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/evaluaciones",
+    "name": "admin.adultos-mayores.evaluaciones.store",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\AdultoMayorEvaluacionController@store",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:aplicaciones_instrumento.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/evaluaciones/{evaluacion}",
+    "name": "admin.adultos-mayores.evaluaciones.show",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\AdultoMayorEvaluacionController@show",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:aplicaciones_instrumento.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/evaluaciones/{evaluacion}",
+    "name": "admin.adultos-mayores.evaluaciones.destroy",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\AdultoMayorEvaluacionController@destroy",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:aplicaciones_instrumento.anular"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/evaluaciones/{evaluacion}/restaurar",
+    "name": "admin.adultos-mayores.evaluaciones.restore",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\AdultoMayorEvaluacionController@restore",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:aplicaciones_instrumento.editar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/evaluaciones-geriatricas/{evaluacion}/anular",
+    "name": "admin.adultos-mayores.evaluaciones-geriatricas.anular",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\AdultoMayorController@anularEvaluacionGeriatrica",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:aplicaciones_instrumento.anular"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/evaluaciones-geriatricas/{evaluacion}/pdf",
+    "name": "admin.adultos-mayores.evaluaciones-geriatricas.pdf",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\AdultoMayorController@pdfEvaluacionGeriatrica",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:reportes.individual"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/actividades",
+    "name": "admin.adultos-mayores.actividades.store",
+    "action": "App\\Modulos\\Social\\Presentacion\\Http\\Controllers\\AdultoMayorActividadController@store",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:actividades.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/actividades/{actividad}",
+    "name": "admin.adultos-mayores.actividades.update",
+    "action": "App\\Modulos\\Social\\Presentacion\\Http\\Controllers\\AdultoMayorActividadController@update",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:actividades.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/actividades/{actividad}",
+    "name": "admin.adultos-mayores.actividades.destroy",
+    "action": "App\\Modulos\\Social\\Presentacion\\Http\\Controllers\\AdultoMayorActividadController@destroy",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:actividades.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/actividades/{actividad}/restaurar",
+    "name": "admin.adultos-mayores.actividades.restore",
+    "action": "App\\Modulos\\Social\\Presentacion\\Http\\Controllers\\AdultoMayorActividadController@restore",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:actividades.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/documentos",
+    "name": "admin.adultos-mayores.documentos.index",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\AdultoMayorDocumentoController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:documentos.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/documentos/{documento}/archivo",
+    "name": "admin.adultos-mayores.documentos.archivo",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\AdultoMayorDocumentoController@archivo",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:documentos.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/documentos",
+    "name": "admin.adultos-mayores.documentos.store",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\AdultoMayorDocumentoController@store",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:documentos.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/documentos/{documento}",
+    "name": "admin.adultos-mayores.documentos.update",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\AdultoMayorDocumentoController@update",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:documentos.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/documentos/{documento}",
+    "name": "admin.adultos-mayores.documentos.destroy",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\AdultoMayorDocumentoController@destroy",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:documentos.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/documentos/{documento}/restaurar",
+    "name": "admin.adultos-mayores.documentos.restore",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\AdultoMayorDocumentoController@restore",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:documentos.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/ficha-medica",
+    "name": "admin.adultos-mayores.ficha-medica.store",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\AdultoMayorFichaMedicaController@store",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:atenciones.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/ficha-medica/{ficha}",
+    "name": "admin.adultos-mayores.ficha-medica.update",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\AdultoMayorFichaMedicaController@update",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:atenciones.editar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/ficha-medica/{ficha}/archivar",
+    "name": "admin.adultos-mayores.ficha-medica.archivar",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\AdultoMayorFichaMedicaController@archivar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:atenciones.anular"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/ficha-medica/{ficha}/restaurar",
+    "name": "admin.adultos-mayores.ficha-medica.restore",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\AdultoMayorFichaMedicaController@restore",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:atenciones.editar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/medicacion",
+    "name": "admin.adultos-mayores.medicacion.store",
+    "action": "App\\Modulos\\Medicacion\\Presentacion\\Http\\Controllers\\AdultoMayorMedicacionController@store",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:prescripciones.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/medicacion/{medicacion}",
+    "name": "admin.adultos-mayores.medicacion.update",
+    "action": "App\\Modulos\\Medicacion\\Presentacion\\Http\\Controllers\\AdultoMayorMedicacionController@update",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:prescripciones.editar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/medicacion/{medicacion}/suspender",
+    "name": "admin.adultos-mayores.medicacion.suspender",
+    "action": "App\\Modulos\\Medicacion\\Presentacion\\Http\\Controllers\\AdultoMayorMedicacionController@suspender",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:prescripciones.suspender"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/medicacion/{medicacion}/finalizar",
+    "name": "admin.adultos-mayores.medicacion.finalizar",
+    "action": "App\\Modulos\\Medicacion\\Presentacion\\Http\\Controllers\\AdultoMayorMedicacionController@finalizar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:prescripciones.editar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/medicacion/{medicacion}/archivar",
+    "name": "admin.adultos-mayores.medicacion.archivar",
+    "action": "App\\Modulos\\Medicacion\\Presentacion\\Http\\Controllers\\AdultoMayorMedicacionController@archivar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:prescripciones.editar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/medicacion/{medicacion}/restaurar",
+    "name": "admin.adultos-mayores.medicacion.restore",
+    "action": "App\\Modulos\\Medicacion\\Presentacion\\Http\\Controllers\\AdultoMayorMedicacionController@restore",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:prescripciones.editar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/administracion-medicacion",
+    "name": "admin.adultos-mayores.administracion-medicacion.store",
+    "action": "App\\Modulos\\Medicacion\\Presentacion\\Http\\Controllers\\AdultoMayorAdministracionMedicacionController@store",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:administraciones_medicacion.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/signos-vitales",
+    "name": "admin.adultos-mayores.signos-vitales.store",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\AdultoMayorSignosVitalesController@store",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:signos_vitales.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/signos-vitales/{signo}",
+    "name": "admin.adultos-mayores.signos-vitales.update",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\AdultoMayorSignosVitalesController@update",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:signos_vitales.editar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/valoracion-funcional",
+    "name": "admin.adultos-mayores.valoracion-funcional.store",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\AdultoMayorValoracionFuncionalController@store",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:valoraciones_funcionales.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/valoracion-funcional/{valoracion}",
+    "name": "admin.adultos-mayores.valoracion-funcional.update",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\AdultoMayorValoracionFuncionalController@update",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:valoraciones_funcionales.editar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/reporte-individual",
+    "name": "admin.adultos-mayores.reporte-individual",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\AdultoMayorController@reporteIndividual",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:reportes.individual"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/reportes/{tipo}",
+    "name": "admin.adultos-mayores.reportes.especifico",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\AdultoMayorController@reporteEspecifico",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:reportes.individual"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reporte-general",
+    "name": "admin.adultos-mayores.reporte-general",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\AdultoMayorController@reporteGeneral",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reporte-institucional",
+    "name": "admin.adultos-mayores.reporte-institucional",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Livewire\\Paginas\\ReportesInstitucionalesPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reporte-bienestar",
+    "name": "admin.adultos-mayores.reporte-bienestar",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\AdultoMayorController@reporteBienestar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/salud-seguimiento",
+    "name": "admin.salud-seguimiento.index",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\SaludSeguimientoListPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:salud.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/salud-seguimiento/resumenes",
+    "name": "admin.salud-seguimiento.resumen.index",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\SaludSeguimientoListPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:salud.ver"
+    ],
+    "domain": null,
+    "defaults": {
+      "seccion": "resumen"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/salud-seguimiento/fichas",
+    "name": "admin.salud-seguimiento.ficha.index",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\SaludSeguimientoListPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:salud.ver"
+    ],
+    "domain": null,
+    "defaults": {
+      "seccion": "ficha"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/salud-seguimiento/medicaciones",
+    "name": "admin.salud-seguimiento.medicacion.index",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\SaludSeguimientoListPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:salud.ver"
+    ],
+    "domain": null,
+    "defaults": {
+      "seccion": "medicacion"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/salud-seguimiento/administraciones",
+    "name": "admin.salud-seguimiento.administracion.index",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\SaludSeguimientoListPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:salud.ver"
+    ],
+    "domain": null,
+    "defaults": {
+      "seccion": "administracion"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/salud-seguimiento/signos-vitales",
+    "name": "admin.salud-seguimiento.signos.index",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\SaludSeguimientoListPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:salud.ver"
+    ],
+    "domain": null,
+    "defaults": {
+      "seccion": "signos"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/salud-seguimiento/valoraciones",
+    "name": "admin.salud-seguimiento.valoracion.index",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\SaludSeguimientoListPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:salud.ver"
+    ],
+    "domain": null,
+    "defaults": {
+      "seccion": "valoracion"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/salud-seguimiento/evaluaciones-geriatricas",
+    "name": "admin.salud-seguimiento.evaluaciones-geriatricas.index",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\SaludSeguimientoListPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:salud.ver"
+    ],
+    "domain": null,
+    "defaults": {
+      "seccion": "evaluaciones"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/salud-seguimiento/alertas",
+    "name": "admin.salud-seguimiento.alertas",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\SaludSeguimientoListPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:salud.ver"
+    ],
+    "domain": null,
+    "defaults": {
+      "seccion": "alertas"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/salud-seguimiento/reportes",
+    "name": "admin.salud-seguimiento.reportes",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\SaludSeguimientoListPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:salud.ver"
+    ],
+    "domain": null,
+    "defaults": {
+      "seccion": "reportes"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/salud-seguimiento/{adulto}/resumen",
+    "name": "admin.salud-seguimiento.resumen",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\SaludResumenPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:salud.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/salud-seguimiento/{adulto}/ficha",
+    "name": "admin.salud-seguimiento.ficha",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\SaludFichaPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:salud.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/salud-seguimiento/{adulto}/medicacion",
+    "name": "admin.salud-seguimiento.medicacion",
+    "action": "App\\Modulos\\Medicacion\\Presentacion\\Livewire\\Paginas\\SaludMedicacionPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:salud.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/salud-seguimiento/{adulto}/administracion",
+    "name": "admin.salud-seguimiento.administracion",
+    "action": "App\\Modulos\\Medicacion\\Presentacion\\Livewire\\Paginas\\SaludAdministracionMedicacionPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:salud.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/salud-seguimiento/{adulto}/signos",
+    "name": "admin.salud-seguimiento.signos",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\SaludSignosPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:salud.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/salud-seguimiento/{adulto}/valoracion",
+    "name": "admin.salud-seguimiento.valoracion",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Livewire\\Paginas\\SaludValoracionPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:salud.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/salud-seguimiento/{adulto}/evaluaciones-geriatricas",
+    "name": "admin.salud-seguimiento.evaluaciones-geriatricas",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Livewire\\Paginas\\SaludEvaluacionesGeriatricasPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:salud.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS"
+    ],
+    "uri": "admin/familia-social",
+    "name": "admin.familia-social.index",
+    "action": "\\Illuminate\\Routing\\RedirectController",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes_contactos.ver"
+    ],
+    "domain": null,
+    "defaults": {
+      "destination": "/admin/familia-social/resumen",
+      "status": 302
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/familia-social/resumen",
+    "name": "admin.familia-social.resumen",
+    "action": "App\\Modulos\\Social\\Presentacion\\Http\\Controllers\\ResumenFamiliaSocialController",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes_contactos.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/familia-social/red-apoyo",
+    "name": "admin.familia-social.red-apoyo",
+    "action": "App\\Modulos\\Social\\Presentacion\\Livewire\\Paginas\\RedApoyoPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes_contactos.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/familia-social/visitas",
+    "name": "admin.familia-social.visitas",
+    "action": "\\Illuminate\\Routing\\ViewController",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes_contactos.ver"
+    ],
+    "domain": null,
+    "defaults": {
+      "view": "pages.familia-social.base",
+      "data": {
+        "titulo": "Visitas",
+        "descripcion": "Visitas familiares, sociales y acompañamiento presencial.",
+        "icono": "ph-hand-heart"
+      },
+      "status": 200,
+      "headers": []
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/familia-social/ficha-social",
+    "name": "admin.familia-social.ficha-social",
+    "action": "\\Illuminate\\Routing\\ViewController",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes_contactos.ver"
+    ],
+    "domain": null,
+    "defaults": {
+      "view": "pages.familia-social.base",
+      "data": {
+        "titulo": "Ficha social",
+        "descripcion": "Situacion social, convivencia, red de apoyo real y observaciones sociales.",
+        "icono": "ph-clipboard-text"
+      },
+      "status": 200,
+      "headers": []
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/habitaciones",
+    "name": "admin.habitaciones.index",
+    "action": "Closure",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:habitaciones.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/turnos-enfermeria",
+    "name": "admin.turnos-enfermeria.index",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Livewire\\Paginas\\TurnosEnfermeriaPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:turnos.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/admision/valoracion-enfermeria",
+    "name": "admin.admision.valoracion-enfermeria",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Livewire\\Paginas\\ValoracionEnfermeriaPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:valoracion_enfermeria.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/admision/valoracion-medica",
+    "name": "admin.admision.valoracion-medica",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Livewire\\Paginas\\ValoracionMedicaPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:valoracion_medica.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/asignacion-turno",
+    "name": "admin.asignacion-turno.index",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Livewire\\Paginas\\AsignacionTurnoPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:turnos.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/plan-cuidado",
+    "name": "admin.plan-cuidado.index",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Livewire\\Paginas\\PlanCuidadoPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:planes_cuidado.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/plan-cuidado/tareas",
+    "name": "admin.plan-cuidado.tareas",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Livewire\\Paginas\\TareasPlanPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:planes_cuidado.ver",
+      "permission:ejecuciones_cuidado.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/plan-cuidado/medicacion",
+    "name": "admin.plan-cuidado.medicacion",
+    "action": "App\\Modulos\\Medicacion\\Presentacion\\Livewire\\Paginas\\SaludAdministracionMedicacionPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:planes_cuidado.ver",
+      "permission:enfermeria.ver_dashboard|administraciones_medicacion.ver|prescripciones.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/seguimiento-diario",
+    "name": "admin.seguimiento-diario.index",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Livewire\\Paginas\\SeguimientoDiarioPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:atenciones.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/alertas-clinicas",
+    "name": "admin.alertas-clinicas.index",
+    "action": "App\\Modulos\\Alertas\\Presentacion\\Livewire\\Paginas\\AlertasPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:alertas.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/pase-turno",
+    "name": "admin.pase-turno.index",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Livewire\\Paginas\\PaseTurnoPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:pases_turno.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/actividades",
+    "name": "admin.actividades.index",
+    "action": "App\\Modulos\\Social\\Presentacion\\Livewire\\Paginas\\ActividadesPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:actividades.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/actividades/tipos",
+    "name": "admin.actividades.tipos",
+    "action": "App\\Modulos\\Social\\Presentacion\\Livewire\\Paginas\\TiposActividadPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:actividades.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/actividades/participacion",
+    "name": "admin.actividades.participacion",
+    "action": "App\\Modulos\\Social\\Presentacion\\Livewire\\Paginas\\ParticipacionPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:actividades.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/actividades/asistencia",
+    "name": "admin.actividades.asistencia",
+    "action": "App\\Modulos\\Social\\Presentacion\\Livewire\\Paginas\\AsistenciaPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:actividades.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/actividades/reportes",
+    "name": "admin.actividades.reportes",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Livewire\\Paginas\\ReportesActividadesPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:actividades.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/enfermeria/dashboard",
+    "name": "admin.enfermeria.dashboard",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Livewire\\Paginas\\DashboardTurno",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:enfermeria.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/enfermeria/agenda",
+    "name": "admin.enfermeria.agenda",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Livewire\\Paginas\\AgendaEnfermeria",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:enfermeria.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/enfermeria/registros",
+    "name": "admin.enfermeria.registros",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Livewire\\Paginas\\RegistrosEnfermeria",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:atenciones.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/enfermeria/seguimiento",
+    "name": "admin.enfermeria.seguimiento",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Livewire\\Paginas\\SeguimientoDiarioPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:atenciones.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/enfermeria/incidentes",
+    "name": "admin.enfermeria.incidentes",
+    "action": "App\\Modulos\\Alertas\\Presentacion\\Livewire\\Paginas\\IncidentesPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:enfermeria.ver_dashboard|incidentes.ver|atenciones.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/enfermeria/pacientes",
+    "name": "admin.enfermeria.pacientes",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Livewire\\Paginas\\MisPacientes",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:enfermeria.ver_pacientes_asignados"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/enfermeria/pacientes/{adulto}",
+    "name": "admin.enfermeria.pacientes.ficha",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\FichaPaciente",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:enfermeria.ver_ficha_paciente"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/enfermeria/pacientes/{residente}/resultados-experto",
+    "name": "admin.enfermeria.pacientes.resultados-experto",
+    "action": "App\\Modulos\\ApoyoDecision\\Presentacion\\Livewire\\Paginas\\ResultadosExpertoResidente",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:enfermeria.ver_ficha_paciente",
+      "can:consultarResultados,App\\Models\\EvaluacionExperta,residente"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/enfermeria/pacientes/{adulto}/pdf",
+    "name": "admin.enfermeria.pacientes.ficha.pdf",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\FichaPacienteReporteController@pdf",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:enfermeria.ver_ficha_paciente"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/enfermeria/tareas",
+    "name": "admin.enfermeria.tareas",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Livewire\\Paginas\\TareasPlanPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:ejecuciones_cuidado.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/enfermeria/medicacion",
+    "name": "admin.enfermeria.medicacion",
+    "action": "App\\Modulos\\Medicacion\\Presentacion\\Livewire\\Paginas\\SaludAdministracionMedicacionPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:enfermeria.ver_dashboard|administraciones_medicacion.ver|prescripciones.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/enfermeria/alertas",
+    "name": "admin.enfermeria.alertas",
+    "action": "App\\Modulos\\Alertas\\Presentacion\\Livewire\\Paginas\\AlertasPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:alertas.ver|alertas.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/enfermeria/pase-turno",
+    "name": "admin.enfermeria.pase-turno",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Livewire\\Paginas\\PaseTurnoPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:pases_turno.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/enfermeria/reportes",
+    "name": "admin.enfermeria.reportes",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Livewire\\Paginas\\ReporteEnfermeria",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:enfermeria.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/medico/dashboard",
+    "name": "admin.medico.dashboard",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\DashboardMedico",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:valoracion_medica.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/medico/residentes",
+    "name": "admin.medico.residentes",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\PacientesSeguimientoPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:valoracion_medica.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/medico/residente/{residente}/objetivos-signos-vitales",
+    "name": "admin.medico.residente.objetivos-signos-vitales",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\ObjetivosSignosVitalesPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:valoracion_medica.ver",
+      "permission:objetivos_signos_vitales.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/medico/residente/{residente}/evaluacion-cognitiva/resultados-experto",
+    "name": "admin.medico.residente.resultados-experto",
+    "action": "App\\Modulos\\ApoyoDecision\\Presentacion\\Livewire\\Paginas\\ResultadosExpertoResidente",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:valoracion_medica.ver",
+      "can:consultarResultados,App\\Models\\EvaluacionExperta,residente"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/medico/pacientes-seguimiento",
+    "name": "admin.medico.pacientes.observacion",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\PacientesSeguimientoPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:valoracion_medica.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/medico/historial-clinico",
+    "name": "admin.medico.pacientes.historial",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\PacientesSeguimientoPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:valoracion_medica.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/medico/consultas-evoluciones",
+    "name": "admin.medico.consultas",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\PacientesSeguimientoPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:valoracion_medica.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/medico/valoraciones-medicas",
+    "name": "admin.medico.valoraciones",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Livewire\\Paginas\\ValoracionMedicaPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:valoracion_medica.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/medico/decisiones-admision",
+    "name": "admin.medico.decisiones",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\DashboardMedico",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:valoracion_medica.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/medico/interconsultas",
+    "name": "admin.medico.interconsultas",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\PacientesSeguimientoPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:valoracion_medica.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/medico/cognicion-riesgo",
+    "name": "admin.medico.cognicion-riesgo",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\SaludSeguimientoListPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:valoracion_medica.ver"
+    ],
+    "domain": null,
+    "defaults": {
+      "seccion": "evaluaciones"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/medico/signos-vitales",
+    "name": "admin.medico.signos-vitales",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\SignosVitalesPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:valoracion_medica.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/medico/medicacion",
+    "name": "admin.medico.medicacion",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\SaludSeguimientoListPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:valoracion_medica.ver"
+    ],
+    "domain": null,
+    "defaults": {
+      "seccion": "medicacion"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/medico/alertas",
+    "name": "admin.medico.alertas",
+    "action": "App\\Modulos\\Alertas\\Presentacion\\Livewire\\Paginas\\AlertasPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:valoracion_medica.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/medico/reportes",
+    "name": "admin.medico.reportes",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\SaludSeguimientoListPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:valoracion_medica.ver"
+    ],
+    "domain": null,
+    "defaults": {
+      "seccion": "reportes"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/medico/residente/{adulto}",
+    "name": "admin.medico.residente.ficha",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\FichaPaciente",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:valoracion_medica.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/medico/paciente/{adulto}",
+    "name": "admin.medico.paciente.ficha",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Livewire\\Paginas\\FichaPaciente",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:valoracion_medica.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/psicologia/dashboard",
+    "name": "admin.psicologia.dashboard",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Livewire\\Paginas\\DashboardPsicologo",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/psicologia/evaluaciones-asignadas",
+    "name": "admin.psicologia.evaluaciones",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Livewire\\Paginas\\DashboardPsicologo",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/psicologia/evaluacion/cognitiva",
+    "name": "admin.psicologia.evaluacion.cognitiva",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Livewire\\Paginas\\EvaluacionesAreaPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified"
+    ],
+    "domain": null,
+    "defaults": {
+      "codArea": "ARE_COG"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/psicologia/evaluacion/afectiva",
+    "name": "admin.psicologia.evaluacion.afectiva",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Livewire\\Paginas\\EvaluacionesAreaPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified"
+    ],
+    "domain": null,
+    "defaults": {
+      "codArea": "ARE_AFE"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/psicologia/evaluacion/funcionamiento",
+    "name": "admin.psicologia.evaluacion.funcionamiento",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Livewire\\Paginas\\EvaluacionesAreaPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified"
+    ],
+    "domain": null,
+    "defaults": {
+      "codArea": "ARE_FUN"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/psicologia/evaluacion/nutricional",
+    "name": "admin.psicologia.evaluacion.nutricional",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Livewire\\Paginas\\EvaluacionesAreaPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified"
+    ],
+    "domain": null,
+    "defaults": {
+      "codArea": "ARE_NUT"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/psicologia/evaluacion/entorno",
+    "name": "admin.psicologia.evaluacion.entorno",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Livewire\\Paginas\\EvaluacionesAreaPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified"
+    ],
+    "domain": null,
+    "defaults": {
+      "codArea": "ARE_SOC"
+    },
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/institucional",
+    "name": "admin.reportes.institucional.preview",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteInstitucionalController@preview",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.institucional"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/institucional/pdf",
+    "name": "admin.reportes.institucional.pdf",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteInstitucionalController@pdf",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.institucional"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/institucional/excel",
+    "name": "admin.reportes.institucional.excel",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteInstitucionalController@excel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.institucional"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/adultos",
+    "name": "admin.reportes.adultos.preview",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteAdultosController@preview",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/adultos/pdf",
+    "name": "admin.reportes.adultos.pdf",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteAdultosController@pdf",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.exportar_pdf"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/adultos/excel",
+    "name": "admin.reportes.adultos.excel",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteAdultosController@excel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.exportar_pdf"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/salud",
+    "name": "admin.reportes.salud.preview",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteSaludController@preview",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/salud/pdf",
+    "name": "admin.reportes.salud.pdf",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteSaludController@pdf",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.exportar_pdf"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/salud/excel",
+    "name": "admin.reportes.salud.excel",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteSaludController@excel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.exportar_pdf"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/familiares",
+    "name": "admin.reportes.familiares.preview",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteFamiliaresController@preview",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/familiares/pdf",
+    "name": "admin.reportes.familiares.pdf",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteFamiliaresController@pdf",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.exportar_pdf"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/familiares/excel",
+    "name": "admin.reportes.familiares.excel",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteFamiliaresController@excel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.exportar_pdf"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/equipo",
+    "name": "admin.reportes.equipo.preview",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteEquipoController@preview",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/equipo/pdf",
+    "name": "admin.reportes.equipo.pdf",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteEquipoController@pdf",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.exportar_pdf"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/equipo/excel",
+    "name": "admin.reportes.equipo.excel",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteEquipoController@excel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.exportar_pdf"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/actividades",
+    "name": "admin.reportes.actividades.preview",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteActividadesController@preview",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/actividades/pdf",
+    "name": "admin.reportes.actividades.pdf",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteActividadesController@pdf",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.exportar_pdf"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/actividades/excel",
+    "name": "admin.reportes.actividades.excel",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteActividadesController@excel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.exportar_pdf"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/bitacora",
+    "name": "admin.reportes.bitacora.preview",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteBitacoraController@preview",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/bitacora/pdf",
+    "name": "admin.reportes.bitacora.pdf",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteBitacoraController@pdf",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:reportes.exportar_pdf"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/bitacora",
+    "name": "admin.bitacora.index",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\BitacoraController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:bitacora.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/residentes",
+    "name": "admin.residentes.index",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\ResidenteController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "can:viewAny,App\\Models\\Residente"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/residentes/{residente}",
+    "name": "admin.residentes.show",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\ResidenteController@show",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "can:view,residente"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/preadmisiones",
+    "name": "admin.preadmisiones.index",
+    "action": "App\\Modulos\\Admisiones\\Presentacion\\Http\\Controllers\\PreadmisionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:preadmisiones.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/preadmisiones",
+    "name": "admin.preadmisiones.store",
+    "action": "App\\Modulos\\Admisiones\\Presentacion\\Http\\Controllers\\PreadmisionController@store",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:preadmisiones.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/preadmisiones/{preadmision}/revision",
+    "name": "admin.preadmisiones.revisar",
+    "action": "App\\Modulos\\Admisiones\\Presentacion\\Http\\Controllers\\PreadmisionController@revisar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:preadmisiones.revisar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/preadmisiones/{preadmision}/admision",
+    "name": "admin.admisiones.store",
+    "action": "App\\Modulos\\Admisiones\\Presentacion\\Http\\Controllers\\AdmisionController@store",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:admisiones.formalizar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/infraestructura",
+    "name": "admin.infraestructura.index",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\InfraestructuraController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:habitaciones.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/habitaciones",
+    "name": "admin.habitaciones.store",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\InfraestructuraController@habitacion",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:habitaciones.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/habitaciones/{habitacion}/camas",
+    "name": "admin.camas.store",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\InfraestructuraController@cama",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:camas.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/institucional/usuarios",
+    "name": "admin.institucional.usuarios",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\InstitucionalController@usuarios",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:usuarios.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/institucional/usuarios",
+    "name": "admin.institucional.usuarios.store",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\InstitucionalController@guardarUsuario",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:usuarios.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/institucional/personal",
+    "name": "admin.institucional.personal.store",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\InstitucionalController@guardarPersonal",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:personal.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/institucional/areas",
+    "name": "admin.institucional.areas.store",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\InstitucionalController@guardarArea",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:areas.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/institucional/turnos",
+    "name": "admin.institucional.turnos.store",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\InstitucionalController@guardarTurno",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:turnos.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/institucional/jornadas",
+    "name": "admin.institucional.jornadas.store",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\InstitucionalController@abrirJornada",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:jornadas.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/institucional/jornadas/{jornada}/personal",
+    "name": "admin.institucional.jornadas.personal",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\InstitucionalController@asignarPersonal",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:asignaciones_personal.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/residentes/{residente}/expediente",
+    "name": "admin.expediente.index",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\ExpedienteClinicoController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:atenciones.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/residentes/{residente}/atenciones",
+    "name": "admin.atenciones.store",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\ExpedienteClinicoController@crearAtencion",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:atenciones.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/residentes/{residente}/clinica/{tipo}",
+    "name": "admin.clinica.store",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\ExpedienteClinicoController@registrar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:notas_clinicas.crear|antecedentes_clinicos.crear|diagnosticos.crear|alergias.crear|signos_vitales.crear|valoraciones_dolor.crear|mediciones_antropometricas.crear|incidentes.crear|indicaciones_clinicas.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/residentes/{residente}/estudios",
+    "name": "admin.estudios.index",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\EstudioClinicoController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:estudios_clinicos.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/residentes/{residente}/estudios",
+    "name": "admin.estudios.store",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\EstudioClinicoController@solicitar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:estudios_clinicos.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/estudios/{estudio}/resultados",
+    "name": "admin.estudios.resultados",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\EstudioClinicoController@resultados",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:resultados_estudio.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/estudios/{estudio}/informes",
+    "name": "admin.estudios.informes",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\EstudioClinicoController@informar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:informes_estudio.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/residentes/{residente}/documentos-clinicos",
+    "name": "admin.documentos-clinicos.store",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\EstudioClinicoController@documento",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:documentos_clinicos.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/documentos-clinicos/{documentoClinico}/descargar",
+    "name": "admin.documentos-clinicos.descargar",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\EstudioClinicoController@descargar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:documentos_clinicos.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/residentes/{residente}/derivaciones",
+    "name": "admin.derivaciones.store",
+    "action": "App\\Modulos\\Clinica\\Presentacion\\Http\\Controllers\\EstudioClinicoController@derivar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:derivaciones.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/residentes/{residente}/cuidados",
+    "name": "admin.cuidados.index",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Http\\Controllers\\CuidadoController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:planes_cuidado.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/residentes/{residente}/cuidados/{tipo}",
+    "name": "admin.cuidados.store",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Http\\Controllers\\CuidadoController@registrar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:controles_cognitivos.crear|registros_conductuales.crear|registros_sueno.crear|registros_ingesta.crear|registros_hidratacion.crear|registros_eliminacion.crear|registros_movilidad.crear|heridas.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/residentes/{residente}/planes",
+    "name": "admin.planes.store",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Http\\Controllers\\CuidadoController@crearPlan",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:planes_cuidado.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/residentes/{residente}/asignaciones-jornada",
+    "name": "admin.cuidados.asignaciones.store",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Http\\Controllers\\CuidadoController@asignarJornada",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:asignaciones_residente_jornada.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/residentes/{residente}/pases-turno",
+    "name": "admin.cuidados.pases.store",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Http\\Controllers\\CuidadoController@registrarPase",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:pases_turno.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/heridas/{herida}/curaciones",
+    "name": "admin.cuidados.curaciones.store",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Http\\Controllers\\CuidadoController@curarHerida",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:curaciones_herida.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/planes/{plan}/intervenciones",
+    "name": "admin.intervenciones.store",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Http\\Controllers\\CuidadoController@crearIntervencion",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:planes_cuidado.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/intervenciones/{intervencion}/programaciones",
+    "name": "admin.programaciones.store",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Http\\Controllers\\CuidadoController@programar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:planes_cuidado.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/intervenciones/{intervencion}/ejecuciones",
+    "name": "admin.ejecuciones.store",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Http\\Controllers\\CuidadoController@ejecutar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:ejecuciones_cuidado.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/residentes/{residente}/medicacion",
+    "name": "admin.medicacion.index",
+    "action": "App\\Modulos\\Medicacion\\Presentacion\\Http\\Controllers\\MedicacionController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:prescripciones.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/residentes/{residente}/prescripciones",
+    "name": "admin.prescripciones.store",
+    "action": "App\\Modulos\\Medicacion\\Presentacion\\Http\\Controllers\\MedicacionController@prescribir",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:prescripciones.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/prescripciones/{prescripcion}/suspender",
+    "name": "admin.prescripciones.suspender",
+    "action": "App\\Modulos\\Medicacion\\Presentacion\\Http\\Controllers\\MedicacionController@suspender",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:prescripciones.suspender"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/prescripciones/{prescripcion}/administraciones",
+    "name": "admin.administraciones.store",
+    "action": "App\\Modulos\\Medicacion\\Presentacion\\Http\\Controllers\\MedicacionController@administrar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:administraciones_medicacion.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/instrumentos",
+    "name": "admin.instrumentos.index",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\InstrumentoController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:instrumentos.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/instrumentos/{instrumento}/residentes/{residente}",
+    "name": "admin.instrumentos.aplicar",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\InstrumentoController@aplicar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:aplicaciones_instrumento.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/residentes/{residente}/valoraciones/{tipo}",
+    "name": "admin.valoraciones.store",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\ValoracionProfesionalController@registrar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:valoraciones_psicologicas.crear|valoraciones_nutricionales.crear|valoraciones_funcionales.crear|seguimientos_pedagogicos.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/actividades",
+    "name": "admin.actividades.store",
+    "action": "App\\Modulos\\Social\\Presentacion\\Http\\Controllers\\ActividadController@store",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:actividades.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/actividades/{actividad}/participantes",
+    "name": "admin.actividades.participantes",
+    "action": "App\\Modulos\\Social\\Presentacion\\Http\\Controllers\\ActividadController@participante",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:actividades.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/alertas",
+    "name": "admin.alertas.index",
+    "action": "App\\Modulos\\Alertas\\Presentacion\\Http\\Controllers\\AlertaController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:alertas.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/residentes/{residente}/alertas",
+    "name": "admin.alertas.store",
+    "action": "App\\Modulos\\Alertas\\Presentacion\\Http\\Controllers\\AlertaController@store",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:alertas.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "admin/alertas/{alerta}/estado",
+    "name": "admin.alertas.estado",
+    "action": "App\\Modulos\\Alertas\\Presentacion\\Http\\Controllers\\AlertaController@cambiarEstado",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:alertas.gestionar|alertas.reconocer|alertas.asignar|alertas.seguimiento|alertas.cerrar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/residentes/{residente}/documentos",
+    "name": "admin.documentos.store",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\DocumentoController@store",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:documentos.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/residentes/{residente}/relaciones",
+    "name": "admin.residentes.relaciones",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\RelacionResidenteController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes_contactos.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/residentes/{residente}/contactos",
+    "name": "admin.residentes.contactos.store",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\RelacionResidenteController@vincularContacto",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:contactos.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/residentes/{residente}/visitas",
+    "name": "admin.residentes.visitas.store",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\RelacionResidenteController@registrarVisita",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:visitas.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/residentes/{residente}/consentimientos",
+    "name": "admin.residentes.consentimientos.store",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\RelacionResidenteController@registrarConsentimiento",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:consentimientos.gestionar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/documentos/{documento}/descargar",
+    "name": "admin.documentos.descargar",
+    "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\DocumentoController@descargar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:documentos.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/residentes/{residente}/reporte.pdf",
+    "name": "admin.reportes.residente",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteV2Controller@residentePdf",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/reportes/residentes.csv",
+    "name": "admin.reportes.residentes",
+    "action": "App\\Modulos\\Reportes\\Presentacion\\Http\\Controllers\\ReporteV2Controller@residentesCsv",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "storage/{path}",
+    "name": "storage.local",
+    "action": "Closure",
+    "middleware": [],
+    "domain": null,
+    "defaults": [],
+    "wheres": {
+      "path": ".*"
+    },
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "uri": "storage/{path}",
+    "name": "storage.local.upload",
+    "action": "Closure",
+    "middleware": [],
+    "domain": null,
+    "defaults": [],
+    "wheres": {
+      "path": ".*"
+    },
+    "bindingFields": []
+  }
+]

@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Modulos\Identidad\Presentacion\Navegacion\SidebarService;
-use App\Frontend\Livewire\Superadministrador\Identidad\RolesPermisosPanel;
+use App\Modulos\Identidad\Presentacion\Livewire\Paginas\RolesPermisosPanel;
 use App\Models\User;
 use App\Modulos\Medicacion\Presentacion\Policies\PrescripcionPolicy;
 use Database\Seeders\RolesAndPermissionsSeeder;

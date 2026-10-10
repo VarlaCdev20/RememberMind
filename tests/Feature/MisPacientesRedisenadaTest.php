@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\MisPacientes;
 use App\Models\Admision;
 use App\Models\Residente;
 use App\Models\Alerta;
@@ -1291,7 +1291,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertOk()
             ->assertSee('Evolución desde la alerta')
             ->assertSee('70 lpm');
-        Livewire::test(\App\Frontend\Livewire\Compartido\Alertas\AlertasPanel::class)
+        Livewire::test(\App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPanel::class)
             ->call('verDetalle', $alerta->cod_alerta)
             ->set('accion', 'Se revisó al residente y se realizó una nueva medición.')
             ->call('guardarAccion')->assertHasNoErrors()
@@ -1347,7 +1347,7 @@ class MisPacientesRedisenadaTest extends TestCase
         ]);
 
         $this->get(route('admin.enfermeria.alertas', ['alerta' => $alerta->cod_alerta]))->assertForbidden();
-        Livewire::test(\App\Frontend\Livewire\Compartido\Alertas\AlertasPanel::class)
+        Livewire::test(\App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPanel::class)
             ->call('verDetalle', $alerta->cod_alerta)->assertForbidden();
     }
 
@@ -2091,7 +2091,7 @@ class MisPacientesRedisenadaTest extends TestCase
         ]);
         $this->actingAs($this->enfermero);
         return Livewire::withQueryParams(['cuidado' => 'hidratacion', 'tipo' => 'HIDRATACION'])
-            ->test(\App\Frontend\Livewire\Enfermeria\Cuidados\RegistrosEnfermeria::class, ['codResidente' => $this->residenteEstable->cod_residente]);
+            ->test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\RegistrosEnfermeria::class, ['codResidente' => $this->residenteEstable->cod_residente]);
     }
 
     public function test_hidratacion_clinica_error_preserva_tipo_de_liquido_y_no_guarda(): void
@@ -3501,7 +3501,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->travelTo(today()->setTime(10, 0));
         $this->actingAs($this->enfermero);
         $this->formularioMovilidad();
-        Livewire::test(\App\Frontend\Livewire\Enfermeria\Cuidados\RegistrosEnfermeria::class, ['codResidente' => $this->residenteEstable->cod_residente])
+        Livewire::test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\RegistrosEnfermeria::class, ['codResidente' => $this->residenteEstable->cod_residente])
             ->set('tipo', 'MOVILIDAD')->set('subtipo', 'ASISTIDA')->set('ayudaTecnica', 'OTRO')
             ->call('guardarCuidado')->assertHasErrors('dispositivoOtro')
             ->set('dispositivoOtro', 'Apoyo sintético')->set('ayudaTecnica', 'ANDADOR')
@@ -3539,7 +3539,7 @@ class MisPacientesRedisenadaTest extends TestCase
         catch (\Illuminate\Validation\ValidationException $e) {$this->assertArrayHasKey('datos',$e->errors());}
         $this->assertDatabaseCount('registros_movilidad',1);
         $painCount = \App\Models\ValoracionDolor::count();
-        Livewire::test(\App\Frontend\Livewire\Enfermeria\Cuidados\RegistrosEnfermeria::class, ['codResidente' => $this->residenteEstable->cod_residente])
+        Livewire::test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\RegistrosEnfermeria::class, ['codResidente' => $this->residenteEstable->cod_residente])
             ->set('tipo', 'MOVILIDAD')->set('subtipo', 'ASISTIDA')->set('ayudaTecnica', 'BASTON')
             ->set('dolor', 5)->call('guardarCuidado')->assertHasNoErrors();
         $this->assertDatabaseCount('registros_movilidad', 2);

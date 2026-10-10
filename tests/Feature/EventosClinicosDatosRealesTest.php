@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Modulos\Clinica\Aplicacion\Consultas\EventosClinicosService;
-use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
+use App\Modulos\Clinica\Presentacion\Livewire\Paginas\FichaPaciente;
 use App\Models\Residente;
 use App\Models\Incidente;
 use App\Models\User;

@@ -7,7 +7,7 @@ use App\Backend\Modulos\SistemaExperto\Conocimiento\CargadorConocimiento;
 use App\Backend\Modulos\SistemaExperto\Conocimiento\PaqueteInvestigadoCOGMEM as P;
 use App\Backend\Modulos\SistemaExperto\Servicios\LecturaResultadosExperto;
 use App\Backend\Modulos\SistemaExperto\Servicios\PreparacionFuentesCOGMEM;
-use App\Frontend\Livewire\Medico\Clinica\ResultadosExpertoResidente;
+use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
 use App\Models\User;
 use DomainException;
 use Illuminate\Auth\Access\AuthorizationException;

@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Compartido\Alertas\AlertasPanel;
-use App\Frontend\Livewire\Medico\Medicacion\MedicacionAdultoModal;
-use App\Frontend\Livewire\Enfermeria\Cuidados\PaseTurnoPanel;
+use App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPanel;
+use App\Modulos\Medicacion\Presentacion\Livewire\Funcionalidades\MedicacionAdultoModal;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PaseTurnoPanel;
 use App\Models\Residente;
 use App\Models\Alerta;
 use App\Models\Area;

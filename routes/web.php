@@ -1,47 +1,47 @@
 <?php
 
-use App\Frontend\Livewire\Administracion\Actividades\ActividadesPanel;
-use App\Frontend\Livewire\Administracion\Actividades\AsistenciaPanel;
-use App\Frontend\Livewire\Administracion\Actividades\ParticipacionPanel;
-use App\Frontend\Livewire\Administracion\Actividades\ReportesActividadesPanel;
-use App\Frontend\Livewire\Administracion\Actividades\TiposActividadPanel;
-use App\Frontend\Livewire\Administracion\Identidad\PersonalInstitucionalPanel;
-use App\Frontend\Livewire\Admisiones\PreadmisionesPanel;
-use App\Frontend\Livewire\Admisiones\PreadmisionWizard;
-use App\Frontend\Livewire\Compartido\Alertas\AlertasPanel;
-use App\Frontend\Livewire\Compartido\Alertas\AlertasPendientesPanel;
-use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
-use App\Frontend\Livewire\Compartido\Clinica\SaludFichaPanel;
-use App\Frontend\Livewire\Compartido\Clinica\SaludResumenPanel;
-use App\Frontend\Livewire\Compartido\Clinica\SaludSeguimientoListPanel;
-use App\Frontend\Livewire\Compartido\Clinica\SaludSignosPanel;
-use App\Frontend\Livewire\Compartido\Clinica\SignosVitalesPanel;
-use App\Frontend\Livewire\Compartido\Residentes\RedApoyoPanel;
-use App\Frontend\Livewire\Compartido\Valoraciones\EvaluacionesAreaPanel;
-use App\Frontend\Livewire\Compartido\Valoraciones\SaludEvaluacionesGeriatricasPanel;
-use App\Frontend\Livewire\Compartido\Valoraciones\SaludValoracionPanel;
-use App\Frontend\Livewire\Enfermeria\Cuidados\AgendaEnfermeria;
-use App\Frontend\Livewire\Enfermeria\Cuidados\AsignacionTurnoPanel;
-use App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno;
-use App\Frontend\Livewire\Enfermeria\Cuidados\IncidentesPanel;
-use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
-use App\Frontend\Livewire\Enfermeria\Cuidados\PaseTurnoPanel;
-use App\Frontend\Livewire\Enfermeria\Cuidados\PlanCuidadoPanel;
-use App\Frontend\Livewire\Enfermeria\Cuidados\RegistrosEnfermeria;
-use App\Frontend\Livewire\Enfermeria\Cuidados\ReporteEnfermeria;
-use App\Frontend\Livewire\Enfermeria\Cuidados\SeguimientoDiarioPanel;
-use App\Frontend\Livewire\Enfermeria\Cuidados\TareasPlanPanel;
-use App\Frontend\Livewire\Enfermeria\Cuidados\TurnosEnfermeriaPanel;
-use App\Frontend\Livewire\Enfermeria\Medicacion\SaludAdministracionMedicacionPanel;
-use App\Frontend\Livewire\Enfermeria\Valoraciones\ValoracionEnfermeriaPanel;
-use App\Frontend\Livewire\Medico\Clinica\DashboardMedico;
-use App\Frontend\Livewire\Medico\Clinica\PacientesSeguimientoPanel;
-use App\Frontend\Livewire\Medico\Clinica\ObjetivosSignosVitalesPanel;
-use App\Frontend\Livewire\Medico\Clinica\ResultadosExpertoResidente;
-use App\Frontend\Livewire\Medico\Medicacion\SaludMedicacionPanel;
-use App\Frontend\Livewire\Medico\Valoraciones\ValoracionMedicaPanel;
-use App\Frontend\Livewire\Psicologia\DashboardPsicologo;
-use App\Frontend\Livewire\Superadministrador\Reportes\ReportesInstitucionalesPanel;
+use App\Modulos\Social\Presentacion\Livewire\Paginas\ActividadesPanel;
+use App\Modulos\Social\Presentacion\Livewire\Paginas\AsistenciaPanel;
+use App\Modulos\Social\Presentacion\Livewire\Paginas\ParticipacionPanel;
+use App\Modulos\Reportes\Presentacion\Livewire\Paginas\ReportesActividadesPanel;
+use App\Modulos\Social\Presentacion\Livewire\Paginas\TiposActividadPanel;
+use App\Modulos\Identidad\Presentacion\Livewire\Paginas\PersonalInstitucionalPanel;
+use App\Modulos\Admisiones\Presentacion\Livewire\Paginas\PreadmisionesPanel;
+use App\Modulos\Admisiones\Presentacion\Livewire\Paginas\PreadmisionWizard;
+use App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPanel;
+use App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPendientesPanel;
+use App\Modulos\Clinica\Presentacion\Livewire\Paginas\FichaPaciente;
+use App\Modulos\Clinica\Presentacion\Livewire\Paginas\SaludFichaPanel;
+use App\Modulos\Clinica\Presentacion\Livewire\Paginas\SaludResumenPanel;
+use App\Modulos\Clinica\Presentacion\Livewire\Paginas\SaludSeguimientoListPanel;
+use App\Modulos\Clinica\Presentacion\Livewire\Paginas\SaludSignosPanel;
+use App\Modulos\Clinica\Presentacion\Livewire\Paginas\SignosVitalesPanel;
+use App\Modulos\Social\Presentacion\Livewire\Paginas\RedApoyoPanel;
+use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\EvaluacionesAreaPanel;
+use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\SaludEvaluacionesGeriatricasPanel;
+use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\SaludValoracionPanel;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\AgendaEnfermeria;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\AsignacionTurnoPanel;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\DashboardTurno;
+use App\Modulos\Alertas\Presentacion\Livewire\Paginas\IncidentesPanel;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\MisPacientes;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PaseTurnoPanel;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PlanCuidadoPanel;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\RegistrosEnfermeria;
+use App\Modulos\Reportes\Presentacion\Livewire\Paginas\ReporteEnfermeria;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\SeguimientoDiarioPanel;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\TareasPlanPanel;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\TurnosEnfermeriaPanel;
+use App\Modulos\Medicacion\Presentacion\Livewire\Paginas\SaludAdministracionMedicacionPanel;
+use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\ValoracionEnfermeriaPanel;
+use App\Modulos\Clinica\Presentacion\Livewire\Paginas\DashboardMedico;
+use App\Modulos\Clinica\Presentacion\Livewire\Paginas\PacientesSeguimientoPanel;
+use App\Modulos\Clinica\Presentacion\Livewire\Paginas\ObjetivosSignosVitalesPanel;
+use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
+use App\Modulos\Medicacion\Presentacion\Livewire\Paginas\SaludMedicacionPanel;
+use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\ValoracionMedicaPanel;
+use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\DashboardPsicologo;
+use App\Modulos\Reportes\Presentacion\Livewire\Paginas\ReportesInstitucionalesPanel;
 use App\Modulos\Social\Presentacion\Http\Controllers\ActividadController;
 use App\Modulos\Social\Presentacion\Http\Controllers\AdultoMayorActividadController;
 use App\Modulos\Institucion\Presentacion\Http\Controllers\AreasAtencionController;
@@ -261,7 +261,7 @@ Route::middleware([
                 ->middleware('permission:roles.ver')
                 ->name('roles-permisos.index');
 
-            Route::get('/sistema-experto', \App\Frontend\Livewire\Superadministrador\SistemaExperto\ConocimientoPanel::class)
+            Route::get('/sistema-experto', \App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ConocimientoPanel::class)
                 ->middleware(['role:SUPERADMINISTRADOR', 'can:consultar,App\Models\VersionModeloExperto'])
                 ->name('sistema-experto.index');
 

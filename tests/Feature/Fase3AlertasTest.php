@@ -4,9 +4,9 @@ namespace Tests\Feature;
 
 use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
 use App\Modulos\Alertas\Aplicacion\Acciones\DeteccionAlertasService;
-use App\Frontend\Livewire\Compartido\Alertas\AlertasPanel;
-use App\Frontend\Livewire\Compartido\Alertas\SaludAlertasPanel;
-use App\Frontend\Livewire\Features\Alertas\HistorialAlerta;
+use App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPanel;
+use App\Modulos\Alertas\Presentacion\Livewire\Paginas\SaludAlertasPanel;
+use App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades\HistorialAlerta;
 use App\Models\Alerta;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;

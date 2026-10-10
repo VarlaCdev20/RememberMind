@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Compartido\Valoraciones\ValoracionInicialModal;
+use App\Modulos\Valoraciones\Presentacion\Livewire\Funcionalidades\ValoracionInicialModal;
 use App\Models\Personal;
 use App\Models\Preadmision;
 use App\Models\User;

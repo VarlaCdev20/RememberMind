@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Compartido\Clinica\SignosVitalesPanel;
+use App\Modulos\Clinica\Presentacion\Livewire\Paginas\SignosVitalesPanel;
 use App\Models\Residente;
 use App\Models\SignoVital;
 use App\Models\User;

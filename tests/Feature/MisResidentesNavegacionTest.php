@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno;
-use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\DashboardTurno;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\MisPacientes;
 use App\Models\Residente;
 use App\Models\Alerta;
 use App\Models\Area;
@@ -59,7 +59,7 @@ class MisResidentesNavegacionTest extends TestCase
     public function test_lectura_de_sueno_aprobada_no_permite_escritura_individual(): void
     {
         $this->travelTo(Carbon::today()->setTime(10, 0));
-        Livewire::actingAs($this->enfermero)->test(\App\Frontend\Livewire\Enfermeria\Cuidados\RegistrosEnfermeria::class, [
+        Livewire::actingAs($this->enfermero)->test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\RegistrosEnfermeria::class, [
             'codResidente' => $this->residenteAsignado->cod_residente, 'cuidado' => 'sueno', 'tipo' => 'SUENO',
         ])->assertSee('Sin registros de sueño')->call('guardarCuidado')->assertForbidden();
         $this->assertDatabaseCount('registros_sueno', 0);
@@ -69,7 +69,7 @@ class MisResidentesNavegacionTest extends TestCase
     {
         $this->travelTo(Carbon::today()->setTime(10, 0));
         $this->enfermero->roles->first()->revokePermissionTo('curaciones_herida.crear');
-        Livewire::actingAs($this->enfermero)->test(\App\Frontend\Livewire\Enfermeria\Cuidados\RegistrosEnfermeria::class, [
+        Livewire::actingAs($this->enfermero)->test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\RegistrosEnfermeria::class, [
             'codResidente' => $this->residenteAsignado->cod_residente, 'seccion' => 'HERIDAS',
         ])->call('guardarSeguimientoLesion')->assertForbidden();
         $this->assertDatabaseCount('curaciones_herida', 0);
@@ -88,7 +88,7 @@ class MisResidentesNavegacionTest extends TestCase
         ]))->assertOk()->assertSee(route('admin.enfermeria.registros', [
             'seccion' => 'HERIDAS', 'adulto' => $this->residenteAsignado->cod_residente, 'cuidado' => 'heridas',
         ]));
-        Livewire::actingAs($this->enfermero)->test(\App\Frontend\Livewire\Enfermeria\Cuidados\RegistrosEnfermeria::class, [
+        Livewire::actingAs($this->enfermero)->test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\RegistrosEnfermeria::class, [
             'seccion' => 'HERIDAS', 'codResidente' => $this->residenteAsignado->cod_residente,
         ])->assertSee('Sin heridas registradas')->set('codResidente', $this->residenteAjeno->cod_residente)->assertForbidden();
         $this->actingAs($this->enfermero)->get(route('admin.enfermeria.registros', [

@@ -4,7 +4,7 @@ namespace App\Modulos\Identidad\Presentacion\Http\Controllers;
 
 use App\Compartido\Infraestructura\Documentos\DocumentacionUsuarioService;
 use App\Compartido\Infraestructura\Documentos\DocumentosUsuarioService;
-use App\Frontend\Livewire\Administracion\Identidad\UsuariosPanel;
+use App\Modulos\Identidad\Presentacion\Livewire\Paginas\UsuariosPanel;
 use App\Http\Controllers\Controller;
 use App\Jobs\EnviarFichaUsuarioJob;
 use App\Models\User;

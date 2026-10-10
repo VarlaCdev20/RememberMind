@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Modulos\Residentes\Aplicacion\Acciones\AdultoMayorService;
-use App\Frontend\Livewire\Compartido\Residentes\AdultoMayorFormModal;
+use App\Modulos\Residentes\Presentacion\Livewire\Funcionalidades\AdultoMayorFormModal;
 use App\Models\Contacto;
 use App\Models\Residente;
 use App\Models\ResidenteContacto;

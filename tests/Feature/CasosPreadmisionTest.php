@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Admisiones\PreadmisionesPanel;
-use App\Frontend\Livewire\Admisiones\PreadmisionWizard;
+use App\Modulos\Admisiones\Presentacion\Livewire\Paginas\PreadmisionesPanel;
+use App\Modulos\Admisiones\Presentacion\Livewire\Paginas\PreadmisionWizard;
 use App\Models\Personal;
 use App\Models\Preadmision;
 use App\Models\User;

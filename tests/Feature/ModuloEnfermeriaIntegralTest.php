@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Enfermeria\Cuidados\AgendaEnfermeria;
-use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
-use App\Frontend\Livewire\Enfermeria\Cuidados\RegistrosEnfermeria;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\AgendaEnfermeria;
+use App\Modulos\Clinica\Presentacion\Livewire\Paginas\FichaPaciente;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\RegistrosEnfermeria;
 use App\Models\Alerta;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;

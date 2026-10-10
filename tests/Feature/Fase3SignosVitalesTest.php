@@ -246,7 +246,7 @@ class Fase3SignosVitalesTest extends TestCase
             ['frecuencia_cardiaca' => 135], $this->usuario);
         foreach (['RECONOCIDA', 'ASIGNADA', 'PENDIENTE'] as $estado) {
             $registro->alerta->update(['estado' => $estado]);
-            \Livewire\Livewire::test(\App\Frontend\Livewire\Compartido\Alertas\AlertasPanel::class)
+            \Livewire\Livewire::test(\App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPanel::class)
                 ->call('verDetalle', $registro->alerta->cod_alerta)->assertSee('Registrar intervención')
                 ->set('accion', 'Se valoró al residente y se comunicó la lectura al médico.')
                 ->call('guardarAccion')->assertHasNoErrors();
@@ -254,7 +254,7 @@ class Fase3SignosVitalesTest extends TestCase
             $this->assertDatabaseHas('eventos_alerta', ['cod_alerta' => $registro->alerta->cod_alerta,
                 'tipo_evento' => 'INTERVENCION', 'estado_anterior' => $estado, 'cod_usuario' => $this->usuario->cod_usuario]);
         }
-        \Livewire\Livewire::test(\App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes::class)
+        \Livewire\Livewire::test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\MisPacientes::class)
             ->call('seleccionarResidente', $this->residente->cod_residente)->call('mostrarSelectorRegistro')
             ->call('abrirFormularioRegistro', 'signos')
             ->assertSet('signosHistorial.0.resultados.0.severidad', 'CRITICO')

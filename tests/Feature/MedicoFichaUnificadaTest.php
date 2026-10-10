@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
-use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
+use App\Modulos\Clinica\Presentacion\Livewire\Paginas\FichaPaciente;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\MisPacientes;
 use App\Models\Residente;
 use App\Models\Area;
 use App\Models\Atencion;

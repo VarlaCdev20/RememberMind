@@ -6,7 +6,7 @@ use App\Backend\Modulos\SistemaExperto\Conocimiento\InventarioExperto;
 use App\Backend\Modulos\SistemaExperto\Servicios\LecturaFuenteEvidencia;
 use App\Backend\Modulos\SistemaExperto\Servicios\LecturaResultadosExperto;
 use App\Backend\Modulos\SistemaExperto\Servicios\LecturaTecnicaPruebas;
-use App\Frontend\Livewire\Medico\Clinica\ResultadosExpertoResidente;
+use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
 use Tests\Support\SistemaExperto\CasoCompletoSintetico;

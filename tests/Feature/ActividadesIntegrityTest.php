@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Administracion\Actividades\ActividadesPanel;
-use App\Frontend\Livewire\Administracion\Actividades\ParticipacionPanel;
+use App\Modulos\Social\Presentacion\Livewire\Paginas\ActividadesPanel;
+use App\Modulos\Social\Presentacion\Livewire\Paginas\ParticipacionPanel;
 use App\Models\Actividad;
 use App\Models\Residente;
 use App\Models\Area;

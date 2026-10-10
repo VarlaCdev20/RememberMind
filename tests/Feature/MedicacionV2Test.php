@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Medico\Medicacion\SaludMedicacionPanel;
+use App\Modulos\Medicacion\Presentacion\Livewire\Paginas\SaludMedicacionPanel;
 use App\Models\Residente;
 use App\Models\Area;
 use App\Models\AsignacionResidenteJornada;

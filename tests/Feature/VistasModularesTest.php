@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Administracion\Identidad\PersonalInstitucionalPanel;
-use App\Frontend\Livewire\Administracion\Identidad\TurnosAsignacionesPanel;
-use App\Frontend\Livewire\Administracion\Identidad\UsuariosPanel;
-use App\Frontend\Livewire\Compartido\Reportes\ReportesAdultoPanel;
+use App\Modulos\Identidad\Presentacion\Livewire\Paginas\PersonalInstitucionalPanel;
+use App\Modulos\Institucion\Presentacion\Livewire\Paginas\TurnosAsignacionesPanel;
+use App\Modulos\Identidad\Presentacion\Livewire\Paginas\UsuariosPanel;
+use App\Modulos\Reportes\Presentacion\Livewire\Paginas\ReportesAdultoPanel;
 use App\Models\{Residente, Personal, SignoVital, User};
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -33,7 +33,7 @@ class VistasModularesTest extends TestCase
         Livewire::test(PersonalInstitucionalPanel::class)
             ->call('abrirModalNuevo')
             ->assertSet('modalGestionAbierto', true)
-            ->assertSeeLivewire(\App\Frontend\Livewire\Administracion\Identidad\PersonalInstitucionalForm::class)
+            ->assertSeeLivewire(\App\Modulos\Identidad\Presentacion\Livewire\Funcionalidades\PersonalInstitucionalForm::class)
             ->call('cerrarModal')
             ->assertSet('modalGestionAbierto', false);
 

@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Modulos\Admisiones\Aplicacion\Acciones\CambiarAlojamientoResidente;
 use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
-use App\Frontend\Livewire\Admisiones\AlojamientoResidente;
+use App\Modulos\Admisiones\Presentacion\Livewire\Paginas\AlojamientoResidente;
 use App\Models\Admision;
 use App\Models\Cama;
 use App\Models\Contacto;

@@ -65,7 +65,7 @@ class PaseTurnoReconstruidoTest extends TestCase
 
         $contexto = app(PaseTurnoService::class)->obtenerContextoClinicoResidente($this->residente1->cod_residente, $this->jornadaSaliente);
         $this->assertSame('CC_NAV_01', $contexto['cognicion']->cod_control_cognitivo);
-        Livewire::test(\App\Frontend\Livewire\Enfermeria\Cuidados\PaseTurnoPanel::class)
+        Livewire::test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PaseTurnoPanel::class)
             ->call('abrirPrepararPase', $this->residente1->cod_residente)
             ->assertSee('Observación cognitiva sintética')->assertSee('Conducta sintética registrada')
             ->assertSee('Marcha sintética')->assertSee('250.00 ml')->assertSee('3/10')
@@ -627,7 +627,7 @@ class PaseTurnoReconstruidoTest extends TestCase
     {
         $this->actingAs($this->userSaliente);
         $ajeno = Residente::factory()->create();
-        Livewire::test(\App\Frontend\Livewire\Enfermeria\Cuidados\PaseTurnoPanel::class)
+        Livewire::test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PaseTurnoPanel::class)
             ->call('abrirPrepararPase', $ajeno->cod_residente)->assertForbidden();
     }
 
@@ -743,7 +743,7 @@ class PaseTurnoReconstruidoTest extends TestCase
         // Actuamos como Rosa (Saliente)
         $this->actingAs($this->userSaliente);
 
-        $testable = Livewire::test(\App\Frontend\Livewire\Enfermeria\Cuidados\PaseTurnoPanel::class);
+        $testable = Livewire::test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PaseTurnoPanel::class);
 
         // Verificar datos contextuales automáticos en el componente
         $testable->assertSet('tabActivo', 'entrega')
@@ -777,7 +777,7 @@ class PaseTurnoReconstruidoTest extends TestCase
         // Ahora actuamos como Elena (Entrante)
         $this->actingAs($this->userEntrante1);
 
-        $testableReceptor = Livewire::test(\App\Frontend\Livewire\Enfermeria\Cuidados\PaseTurnoPanel::class);
+        $testableReceptor = Livewire::test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PaseTurnoPanel::class);
 
         // Elena ve en la sección de "Pases pendientes de recibir" el pase de Mario Gutiérrez
         $testableReceptor->assertSee('Mario Gutiérrez')

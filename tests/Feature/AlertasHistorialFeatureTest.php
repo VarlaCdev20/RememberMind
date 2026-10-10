@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Features\Alertas\HistorialAlerta;
+use App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades\HistorialAlerta;
 use App\Models\Residente;
 use App\Models\Alerta;
 use App\Models\AsignacionResidenteJornada;

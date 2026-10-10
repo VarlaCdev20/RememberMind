@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Administracion\Identidad\UsuariosPanel;
+use App\Modulos\Identidad\Presentacion\Livewire\Paginas\UsuariosPanel;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Jornada;
@@ -62,7 +62,7 @@ class UsuariosResidentesV2Test extends TestCase
             ->call('siguientePaso')
             ->assertHasErrors(['ap_paterno', 'numero_documento']);
 
-        $fuente = file_get_contents(app_path('Frontend/Livewire/Administracion/Identidad/UsuariosPanel.php'));
+        $fuente = file_get_contents(app_path('Modulos/Identidad/Presentacion/Livewire/Paginas/UsuariosPanel.php'));
         $this->assertStringNotContainsString("'numero_documento' => \$this->numero_documento ?:", $fuente);
         $this->assertStringNotContainsString("'apellido_paterno' => \$this->ap_paterno ?:", $fuente);
     }

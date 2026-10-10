@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Modulos\Institucion\Aplicacion\Consultas\MapaHabitacionesService;
 use App\Modulos\Admisiones\Aplicacion\Acciones\CambiarAlojamientoResidente;
 use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
-use App\Frontend\Livewire\Admisiones\HabitacionesPanel;
+use App\Modulos\Institucion\Presentacion\Livewire\Paginas\HabitacionesPanel;
 use App\Models\Cama;
 use App\Models\Contacto;
 use App\Models\Habitacion;

@@ -1,7 +1,7 @@
 <?php
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Compartido\Alertas\AlertasPanel;
+use App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPanel;
 use App\Models\{Residente, Alerta, User, SignoVital, Atencion};
 use App\Modulos\Alertas\Aplicacion\Acciones\DeteccionAlertasService;
 use Database\Seeders\RolesAndPermissionsSeeder;

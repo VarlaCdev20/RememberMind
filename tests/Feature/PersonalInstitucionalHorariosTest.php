@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Administracion\Identidad\PersonalInstitucionalHorarios;
+use App\Modulos\Institucion\Presentacion\Livewire\Funcionalidades\PersonalInstitucionalHorarios;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Personal;

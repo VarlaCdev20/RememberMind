@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Compartido\Alertas\CampanaNotificaciones;
-use App\Frontend\Livewire\Medico\Medicacion\SaludMedicacionPanel;
+use App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades\CampanaNotificaciones;
+use App\Modulos\Medicacion\Presentacion\Livewire\Paginas\SaludMedicacionPanel;
 use App\Models\AdministracionMedicacion;
 use App\Models\Residente;
 use App\Models\Area;

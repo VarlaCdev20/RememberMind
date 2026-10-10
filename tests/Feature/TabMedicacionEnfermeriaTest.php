@@ -4,8 +4,8 @@ namespace Tests\Feature;
 
 use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
 use App\Modulos\Medicacion\Aplicacion\Acciones\RegistrarAdministracionMedicacionService;
-use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
-use App\Frontend\Livewire\Medico\Medicacion\MedicacionAdultoModal;
+use App\Modulos\Clinica\Presentacion\Livewire\Paginas\FichaPaciente;
+use App\Modulos\Medicacion\Presentacion\Livewire\Funcionalidades\MedicacionAdultoModal;
 use App\Models\AdministracionMedicacion;
 use App\Models\Residente;
 use App\Models\Area;

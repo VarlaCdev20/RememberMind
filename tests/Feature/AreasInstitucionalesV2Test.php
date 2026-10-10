@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Modulos\Reportes\Aplicacion\Consultas\AreasReportDataService;
 use App\Modulos\Reportes\Infraestructura\Exportaciones\ReportExportService;
 use App\Exports\AreasInstitucionalesExport;
-use App\Frontend\Livewire\Superadministrador\Identidad\AreasInstitucionalesPanel;
+use App\Modulos\Identidad\Presentacion\Livewire\Paginas\AreasInstitucionalesPanel;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Jornada;

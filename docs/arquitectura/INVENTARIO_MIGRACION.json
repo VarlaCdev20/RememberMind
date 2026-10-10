@@ -743,5 +743,360 @@
     "origen": "app/Policies/VersionModeloExpertoPolicy.php",
     "destino": "app/Modulos/ApoyoDecision/Presentacion/Policies/VersionModeloExpertoPolicy.php",
     "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Actividades/ActividadesPanel.php",
+    "destino": "app/Modulos/Social/Presentacion/Livewire/Paginas/ActividadesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Actividades/AsistenciaPanel.php",
+    "destino": "app/Modulos/Social/Presentacion/Livewire/Paginas/AsistenciaPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Actividades/ParticipacionPanel.php",
+    "destino": "app/Modulos/Social/Presentacion/Livewire/Paginas/ParticipacionPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Actividades/ReportesActividadesPanel.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Livewire/Paginas/ReportesActividadesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Actividades/TiposActividadPanel.php",
+    "destino": "app/Modulos/Social/Presentacion/Livewire/Paginas/TiposActividadPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/PersonalInstitucionalForm.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Livewire/Funcionalidades/PersonalInstitucionalForm.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/PersonalInstitucionalHorarios.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Livewire/Funcionalidades/PersonalInstitucionalHorarios.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/PersonalInstitucionalPanel.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Livewire/Paginas/PersonalInstitucionalPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/TurnosAsignacionesPanel.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Livewire/Paginas/TurnosAsignacionesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/UsuarioFichaPanel.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Livewire/Paginas/UsuarioFichaPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/UsuariosPanel.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Livewire/Paginas/UsuariosPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Admisiones/AlojamientoResidente.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Livewire/Paginas/AlojamientoResidente.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Admisiones/DecisionAdmisionModal.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Livewire/Funcionalidades/DecisionAdmisionModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Admisiones/HabitacionesPanel.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Livewire/Paginas/HabitacionesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Admisiones/PreadmisionesPanel.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Livewire/Paginas/PreadmisionesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Admisiones/PreadmisionWizard.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Livewire/Paginas/PreadmisionWizard.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Alertas/AlertasPanel.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Livewire/Paginas/AlertasPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Alertas/AlertasPendientesPanel.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Livewire/Paginas/AlertasPendientesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Alertas/CampanaNotificaciones.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Livewire/Funcionalidades/CampanaNotificaciones.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Alertas/PanelAlertas.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Livewire/Paginas/PanelAlertas.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Alertas/SaludAlertasPanel.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Livewire/Paginas/SaludAlertasPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/FichaPaciente.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Paginas/FichaPaciente.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/RegistroSignosVitalesModal.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Funcionalidades/RegistroSignosVitalesModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/SaludFichaPanel.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Paginas/SaludFichaPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/SaludResumenPanel.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Paginas/SaludResumenPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/SaludSeguimientoListPanel.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Paginas/SaludSeguimientoListPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/SaludSignosPanel.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Paginas/SaludSignosPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/SignosVitalesPanel.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Paginas/SignosVitalesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Reportes/ReportesAdultoPanel.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Livewire/Paginas/ReportesAdultoPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Reportes/SaludReportesPanel.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Livewire/Paginas/SaludReportesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Residentes/AdultoMayorFormModal.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Livewire/Funcionalidades/AdultoMayorFormModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Residentes/AdultosMayoresPanel.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Livewire/Paginas/AdultosMayoresPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Residentes/ExpedientePanel.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Livewire/Paginas/ExpedientePanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Residentes/RedApoyoPanel.php",
+    "destino": "app/Modulos/Social/Presentacion/Livewire/Paginas/RedApoyoPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Valoraciones/EvaluacionesAreaPanel.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Paginas/EvaluacionesAreaPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Valoraciones/EvaluacionGeriatricaAreaModal.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Funcionalidades/EvaluacionGeriatricaAreaModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Valoraciones/EvaluacionGeriatricaModal.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Funcionalidades/EvaluacionGeriatricaModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Valoraciones/SaludEvaluacionesGeriatricasPanel.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Paginas/SaludEvaluacionesGeriatricasPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Valoraciones/SaludValoracionPanel.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Paginas/SaludValoracionPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Valoraciones/ValoracionBarthelModal.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Funcionalidades/ValoracionBarthelModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Valoraciones/ValoracionInicialModal.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Funcionalidades/ValoracionInicialModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/AgendaEnfermeria.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Livewire/Paginas/AgendaEnfermeria.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/AsignacionTurnoPanel.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Livewire/Paginas/AsignacionTurnoPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/DashboardTurno.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Livewire/Paginas/DashboardTurno.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/IncidentesPanel.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Livewire/Paginas/IncidentesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/MisPacientes.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Livewire/Paginas/MisPacientes.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/PaseTurnoPanel.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Livewire/Paginas/PaseTurnoPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/PlanCuidadoPanel.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Livewire/Paginas/PlanCuidadoPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/RegistrosEnfermeria.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Livewire/Paginas/RegistrosEnfermeria.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/ReporteEnfermeria.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Livewire/Paginas/ReporteEnfermeria.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/SeguimientoDiarioPanel.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Livewire/Paginas/SeguimientoDiarioPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/TareasPlanPanel.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Livewire/Paginas/TareasPlanPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/TurnosEnfermeriaPanel.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Livewire/Paginas/TurnosEnfermeriaPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Medicacion/AdministracionMedicacionModal.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Livewire/Funcionalidades/AdministracionMedicacionModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Medicacion/SaludAdministracionMedicacionPanel.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Livewire/Paginas/SaludAdministracionMedicacionPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Valoraciones/ValoracionEnfermeriaPanel.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Paginas/ValoracionEnfermeriaPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Features/Alertas/HistorialAlerta.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Livewire/Funcionalidades/HistorialAlerta.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Clinica/DashboardMedico.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Paginas/DashboardMedico.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Clinica/NotaEvolucionMedicaModal.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Funcionalidades/NotaEvolucionMedicaModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Clinica/ObjetivosSignosVitalesPanel.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Paginas/ObjetivosSignosVitalesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Clinica/PacientesSeguimientoPanel.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Paginas/PacientesSeguimientoPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Clinica/ResultadosExpertoResidente.php",
+    "destino": "app/Modulos/ApoyoDecision/Presentacion/Livewire/Paginas/ResultadosExpertoResidente.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Medicacion/MedicacionAdultoModal.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Livewire/Funcionalidades/MedicacionAdultoModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Medicacion/SaludMedicacionPanel.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Livewire/Paginas/SaludMedicacionPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Valoraciones/ValoracionMedicaModal.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Funcionalidades/ValoracionMedicaModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Valoraciones/ValoracionMedicaPanel.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Paginas/ValoracionMedicaPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Psicologia/DashboardPsicologo.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Paginas/DashboardPsicologo.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Superadministrador/Identidad/AreasInstitucionalesPanel.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Livewire/Paginas/AreasInstitucionalesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Superadministrador/Identidad/RolesPermisosPanel.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Livewire/Paginas/RolesPermisosPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Superadministrador/Reportes/ReportesInstitucionalesPanel.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Livewire/Paginas/ReportesInstitucionalesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Superadministrador/SistemaExperto/ConocimientoPanel.php",
+    "destino": "app/Modulos/ApoyoDecision/Presentacion/Livewire/Paginas/ConocimientoPanel.php",
+    "estado": "Migrado"
   }
 ]

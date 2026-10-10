@@ -4,11 +4,11 @@ namespace Tests\Feature;
 
 use App\Modulos\Identidad\Presentacion\Navegacion\SidebarService;
 use App\Modulos\Identidad\Presentacion\Navegacion\VisibilidadNavegacion;
-use App\Frontend\Livewire\Medico\Valoraciones\ValoracionMedicaPanel;
-use App\Frontend\Livewire\Medico\Clinica\PacientesSeguimientoPanel;
-use App\Frontend\Livewire\Administracion\Identidad\TurnosAsignacionesPanel;
-use App\Frontend\Livewire\Compartido\Residentes\AdultosMayoresPanel;
-use App\Frontend\Livewire\Compartido\Valoraciones\EvaluacionesAreaPanel;
+use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\ValoracionMedicaPanel;
+use App\Modulos\Clinica\Presentacion\Livewire\Paginas\PacientesSeguimientoPanel;
+use App\Modulos\Institucion\Presentacion\Livewire\Paginas\TurnosAsignacionesPanel;
+use App\Modulos\Residentes\Presentacion\Livewire\Paginas\AdultosMayoresPanel;
+use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\EvaluacionesAreaPanel;
 use App\Models\Residente;
 use App\Models\Contacto;
 use App\Models\ResidenteContacto;

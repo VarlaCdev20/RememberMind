@@ -3,10 +3,10 @@
 namespace Tests\Feature;
 
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
-use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
-use App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno;
-use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
-use App\Frontend\Livewire\Enfermeria\Cuidados\PaseTurnoPanel;
+use App\Modulos\Clinica\Presentacion\Livewire\Paginas\FichaPaciente;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\DashboardTurno;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\MisPacientes;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PaseTurnoPanel;
 use App\Models\Residente;
 use App\Models\Alerta;
 use App\Models\Area;

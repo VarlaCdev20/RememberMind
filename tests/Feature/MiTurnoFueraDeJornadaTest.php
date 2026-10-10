@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\DashboardTurno;
 use App\Models\AdministracionMedicacion;
 use App\Models\Residente;
 use App\Models\Alerta;

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Enfermeria\Cuidados\IncidentesPanel;
+use App\Modulos\Alertas\Presentacion\Livewire\Paginas\IncidentesPanel;
 use App\Models\Alerta;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;

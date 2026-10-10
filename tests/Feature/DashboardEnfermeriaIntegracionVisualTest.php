@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\DashboardTurno;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;

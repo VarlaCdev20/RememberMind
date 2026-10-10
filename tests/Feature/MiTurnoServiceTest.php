@@ -588,7 +588,7 @@ class MiTurnoServiceTest extends TestCase
 
         // Render Livewire
 
-        Livewire::test(\App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno::class)
+        Livewire::test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\DashboardTurno::class)
 
             // La bienvenida compartida sustituye el título compacto «Mi turno».
             ->assertSee('CENTRO GERIÁTRICO LOS ALMENDROS')
@@ -1557,7 +1557,7 @@ class MiTurnoServiceTest extends TestCase
         $this->assertSame(1, $resumen['datasets'][0]['data'][0]);
 
         Auth::login($this->enfermeraUser);
-        Livewire::test(\App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno::class)
+        Livewire::test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\DashboardTurno::class)
             ->assertSee('Total semanal')
             ->assertSee('Caída')
             ->assertSee('Últimos 7 días · residentes de mi turno');
@@ -1568,7 +1568,7 @@ class MiTurnoServiceTest extends TestCase
         $this->jornada->update(['estado' => 'CERRADA']);
         Auth::login($this->enfermeraUser);
 
-        Livewire::test(\App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno::class)
+        Livewire::test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\DashboardTurno::class)
             ->assertSee('La evolución aparecerá con un turno activo.')
             ->assertDontSee('Sin incidentes registrados en los últimos 7 días.');
     }

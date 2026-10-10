@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Modulos\Institucion\Aplicacion\Consultas\ConsultaOperativaService;
 use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
-use App\Frontend\Livewire\Admisiones\PreadmisionesPanel;
+use App\Modulos\Admisiones\Presentacion\Livewire\Paginas\PreadmisionesPanel;
 use App\Models\Admision;
 use App\Models\Cama;
 use App\Models\Contacto;

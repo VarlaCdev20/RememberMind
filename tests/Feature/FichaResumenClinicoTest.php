@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
+use App\Modulos\Clinica\Presentacion\Livewire\Paginas\FichaPaciente;
 use App\Models\Residente;
 use App\Models\Admision;
 use App\Models\Alergia;

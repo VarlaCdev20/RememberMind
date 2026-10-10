@@ -142,7 +142,7 @@ class ObjetivosSignosVitalesTest extends TestCase
 
     public function test_pantalla_medica_muestra_objetivos_y_guarda_con_permiso(): void
     {
-        Livewire::test(\App\Frontend\Livewire\Medico\Clinica\ObjetivosSignosVitalesPanel::class,
+        Livewire::test(\App\Modulos\Clinica\Presentacion\Livewire\Paginas\ObjetivosSignosVitalesPanel::class,
             ['residente' => $this->residente->cod_residente])
             ->assertSee('Objetivos de signos vitales')
             ->set('minObjetivo', '88')->set('maxObjetivo', '92')
@@ -160,7 +160,7 @@ class ObjetivosSignosVitalesTest extends TestCase
         $objetivo = app(DefinirObjetivoSignoVitalAction::class)->ejecutar(
             $this->residente->cod_residente, $this->entrada(), $this->medico);
 
-        Livewire::test(\App\Frontend\Livewire\Medico\Clinica\ObjetivosSignosVitalesPanel::class,
+        Livewire::test(\App\Modulos\Clinica\Presentacion\Livewire\Paginas\ObjetivosSignosVitalesPanel::class,
             ['residente' => $this->residente->cod_residente])
             ->set('codObjetivoRetiro', $objetivo->cod_objetivo_signo)
             ->set('motivoRetiro', 'Retiro tras nueva valoración médica individual.')
@@ -191,7 +191,7 @@ class ObjetivosSignosVitalesTest extends TestCase
         $objetivo = app(DefinirObjetivoSignoVitalAction::class)->ejecutar(
             $otro->cod_residente, $this->entrada(), $this->medico);
 
-        Livewire::test(\App\Frontend\Livewire\Medico\Clinica\ObjetivosSignosVitalesPanel::class,
+        Livewire::test(\App\Modulos\Clinica\Presentacion\Livewire\Paginas\ObjetivosSignosVitalesPanel::class,
             ['residente' => $this->residente->cod_residente])
             ->set('codObjetivoRetiro', $objetivo->cod_objetivo_signo)
             ->set('motivoRetiro', 'Intento de retiro en el residente equivocado.')

@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Frontend\Livewire\Enfermeria\Cuidados\AgendaEnfermeria;
-use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
-use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
-use App\Frontend\Livewire\Medico\Medicacion\MedicacionAdultoModal;
-use App\Frontend\Livewire\Medico\Medicacion\SaludMedicacionPanel;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\AgendaEnfermeria;
+use App\Modulos\Clinica\Presentacion\Livewire\Paginas\FichaPaciente;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\MisPacientes;
+use App\Modulos\Medicacion\Presentacion\Livewire\Funcionalidades\MedicacionAdultoModal;
+use App\Modulos\Medicacion\Presentacion\Livewire\Paginas\SaludMedicacionPanel;
 use App\Models\Residente;
 use App\Models\Alerta;
 use App\Models\Area;
