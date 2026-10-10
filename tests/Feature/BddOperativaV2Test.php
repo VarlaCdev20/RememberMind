@@ -225,6 +225,8 @@ class BddOperativaV2Test extends TestCase
 
     public function test_registro_clinico_toma_el_personal_del_usuario_autenticado(): void
     {
+        $this->travelTo(today()->setTime(10, 0));
+
         [$datos, $residente] = $this->escenarioClinico();
         $enfermera = $this->usuarioRol('enfermera.v2@test.local', 'ENFERMEROS');
         $personal = Personal::query()->create(['cod_personal' => 'PER_ENF', 'cod_usuario' => $enfermera->cod_usuario, 'nombres' => 'Elena', 'apellido_paterno' => 'Rojas', 'numero_documento' => 'ENF-1', 'profesion' => 'ENFERMERA', 'estado' => 'ACTIVO']);
@@ -250,6 +252,8 @@ class BddOperativaV2Test extends TestCase
 
     public function test_alerta_conserva_historial_de_eventos(): void
     {
+        $this->travelTo(today()->setTime(10, 0));
+
         [$datos, $residente] = $this->escenarioClinico();
         $admin = User::query()->where('correo', 'administracion@remembermind.com')->firstOrFail();
         $enfermera = $this->usuarioRol('enfermera.alertas@test.local', 'ENFERMEROS');

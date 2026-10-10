@@ -85,6 +85,7 @@ class AgendaEnfermeria extends Component
         ?string $codProgramacion = null,
         ?string $horaProgramada = null
     ): void {
+        app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria($codResidente, 'ejecuciones_cuidado.crear', Auth::user());
         $this->resetValidation();
         $this->intervencionId = $codIntervencion;
         $this->residenteId = $codResidente;
@@ -411,6 +412,7 @@ class AgendaEnfermeria extends Component
             'historial' => $historial,
             'residentes' => $residentes,
             'esSuperAdmin' => $esSuperAdmin,
+            'puedeRegistrar' => $turno !== null && $user?->can('ejecuciones_cuidado.crear'),
             'turno' => $turno,
             'recepcion' => $recepcion,
         ])->layout('layouts.enfermeria');

@@ -2,36 +2,46 @@
 
 namespace Tests\Feature;
 
-use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\DashboardTurno;
 use App\Models\AdministracionMedicacion;
-use App\Models\Residente;
+use App\Models\Admision;
 use App\Models\Alerta;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Atencion;
 use App\Models\Cama;
-use App\Models\EjecucionCuidado;
 use App\Models\Habitacion;
 use App\Models\HorarioPrescripcion;
 use App\Models\Jornada;
 use App\Models\Medicamento;
 use App\Models\OcupacionCama;
+use App\Models\PaseTurno;
 use App\Models\Personal;
-use App\Models\PlanCuidado;
 use App\Models\Prescripcion;
+use App\Models\Residente;
 use App\Models\Turno;
 use App\Models\User;
+use App\Modulos\Clinica\Presentacion\Livewire\Paginas\FichaPaciente;
+use App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService;
 use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\DashboardTurno;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\MisPacientes;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PaseTurnoPanel;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\RegistrosEnfermeria;
+use App\Modulos\Medicacion\Presentacion\Livewire\Paginas\SaludAdministracionMedicacionPanel;
+use App\Modulos\Residentes\Aplicacion\Acciones\IncorporarDocumentosExpediente;
 use Carbon\Carbon;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 
 class MiTurnoFueraDeJornadaTest extends TestCase
@@ -39,18 +49,25 @@ class MiTurnoFueraDeJornadaTest extends TestCase
     use RefreshDatabase;
 
     protected User $elenaUser;
+
     protected Personal $elenaPersonal;
 
     protected User $mariaUser;
+
     protected Personal $mariaPersonal;
 
     protected User $robertoUser;
+
     protected Personal $robertoPersonal;
 
     protected Area $area;
+
     protected Turno $turnoManana;
+
     protected Turno $turnoTarde;
+
     protected Jornada $jornadaManana;
+
     protected Residente $residenteCarlos;
 
     protected function setUp(): void
@@ -80,13 +97,13 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         $rolEnfermero->givePermissionTo($permisosEnfermeria);
 
         $this->area = Area::create([
-            'cod_area' => 'ARE_' . strtoupper(Str::random(6)),
+            'cod_area' => 'ARE_'.strtoupper(Str::random(6)),
             'nombre' => 'Pabellon Geriatria A',
             'estado' => 'ACTIVA',
         ]);
 
         $this->turnoManana = Turno::create([
-            'cod_turno' => 'TUR_MANANA_' . strtoupper(Str::random(4)),
+            'cod_turno' => 'TUR_MANANA_'.strtoupper(Str::random(4)),
             'nombre' => 'Turno Manana',
             'hora_inicio' => '07:00:00',
             'hora_fin' => '15:00:00',
@@ -94,7 +111,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         ]);
 
         $this->turnoTarde = Turno::create([
-            'cod_turno' => 'TUR_TARDE_' . strtoupper(Str::random(4)),
+            'cod_turno' => 'TUR_TARDE_'.strtoupper(Str::random(4)),
             'nombre' => 'Turno Tarde',
             'hora_inicio' => '15:00:00',
             'hora_fin' => '23:00:00',
@@ -136,7 +153,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
 
         // Jornada Manana ACTIVA hoy
         $this->jornadaManana = Jornada::create([
-            'cod_jornada' => 'JOR_MANANA_' . strtoupper(Str::random(4)),
+            'cod_jornada' => 'JOR_MANANA_'.strtoupper(Str::random(4)),
             'cod_turno' => $this->turnoManana->cod_turno,
             'fecha_jornada' => Carbon::today()->toDateString(),
             'estado' => 'ACTIVA',
@@ -144,7 +161,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
 
         // Asignacion de Elena y Maria a la jornada activa de la manana
         AsignacionPersonal::create([
-            'cod_asignacion_personal' => 'ASP_ELENA_' . strtoupper(Str::random(4)),
+            'cod_asignacion_personal' => 'ASP_ELENA_'.strtoupper(Str::random(4)),
             'cod_jornada' => $this->jornadaManana->cod_jornada,
             'cod_personal' => $this->elenaPersonal->cod_personal,
             'cod_area' => $this->area->cod_area,
@@ -155,7 +172,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         ]);
 
         AsignacionPersonal::create([
-            'cod_asignacion_personal' => 'ASP_MARIA_' . strtoupper(Str::random(4)),
+            'cod_asignacion_personal' => 'ASP_MARIA_'.strtoupper(Str::random(4)),
             'cod_jornada' => $this->jornadaManana->cod_jornada,
             'cod_personal' => $this->mariaPersonal->cod_personal,
             'cod_area' => $this->area->cod_area,
@@ -167,7 +184,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
 
         // Residente Carlos Mendoza
         $this->residenteCarlos = Residente::crearDesdeAdmision([
-            'cod_residente' => 'RES_CARLOS_' . strtoupper(Str::random(4)),
+            'cod_residente' => 'RES_CARLOS_'.strtoupper(Str::random(4)),
             'nombres' => 'Carlos',
             'apellido_paterno' => 'Mendoza',
             'apellido_materno' => 'Silva',
@@ -178,7 +195,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
 
         // Asignacion de Carlos a Elena en la jornada activa
         AsignacionResidenteJornada::create([
-            'cod_asignacion' => 'ARJ_ELENA_' . strtoupper(Str::random(4)),
+            'cod_asignacion' => 'ARJ_ELENA_'.strtoupper(Str::random(4)),
             'cod_jornada' => $this->jornadaManana->cod_jornada,
             'cod_personal' => $this->elenaPersonal->cod_personal,
             'cod_residente' => $this->residenteCarlos->cod_residente,
@@ -189,7 +206,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
 
         // Habitacion 204 y Cama A
         $habitacion = Habitacion::create([
-            'cod_habitacion' => 'HAB_204_' . strtoupper(Str::random(4)),
+            'cod_habitacion' => 'HAB_204_'.strtoupper(Str::random(4)),
             'codigo' => '204',
             'nombre' => 'Habitacion 204',
             'tipo' => 'DOBLE',
@@ -198,15 +215,15 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         ]);
 
         $cama = Cama::create([
-            'cod_cama' => 'CAM_A_' . strtoupper(Str::random(4)),
+            'cod_cama' => 'CAM_A_'.strtoupper(Str::random(4)),
             'cod_habitacion' => $habitacion->cod_habitacion,
             'codigo' => 'A',
             'tipo' => 'INDIVIDUAL',
             'estado' => 'OCUPADA',
         ]);
 
-        $admision = \App\Models\Admision::create([
-            'cod_admision' => 'ADM_' . strtoupper(Str::random(6)),
+        $admision = Admision::create([
+            'cod_admision' => 'ADM_'.strtoupper(Str::random(6)),
             'cod_residente' => $this->residenteCarlos->cod_residente,
             'cod_usuario_registro' => $this->elenaUser->cod_usuario,
             'fecha_hora_admision' => Carbon::now()->subDays(10),
@@ -216,7 +233,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         ]);
 
         OcupacionCama::create([
-            'cod_ocupacion' => 'OCU_' . strtoupper(Str::random(4)),
+            'cod_ocupacion' => 'OCU_'.strtoupper(Str::random(4)),
             'cod_cama' => $cama->cod_cama,
             'cod_usuario_registro' => $this->elenaUser->cod_usuario,
             'cod_residente' => $this->residenteCarlos->cod_residente,
@@ -230,8 +247,207 @@ class MiTurnoFueraDeJornadaTest extends TestCase
      * 1. Enfermero fuera de turno entra en modo consulta:
      * - No deja el dashboard vacio.
      * - Muestra 'FUERA DE TURNO' y 'MODO CONSULTA / SOLO LECTURA'.
-     * - Muestra residentes cubiertos por las jornadas de enfermeria activas.
+     * - No expone residentes de otros enfermeros, aunque haya una guardia activa.
      */
+    public function test_fuera_de_turno_directorio_resumen_ficha_y_kardex_limitan_la_consulta_a_residentes_propios(): void
+    {
+        Carbon::setTestNow(today()->setTime(16, 0));
+        $this->actingAs($this->elenaUser);
+        $turnos = app(TurnoEnfermeriaService::class);
+        $turnos->autorizarConsultaResidente($this->residenteCarlos, $this->elenaUser);
+
+        Livewire::test(MisPacientes::class)
+            ->call('seleccionarResidente', $this->residenteCarlos->cod_residente)
+            ->assertSet('mostrarPanelDetalle', true)
+            ->assertSet('esModoConsulta', true)
+            ->assertSet('esResidenteAsignado', false)
+            ->call('mostrarSelectorRegistro')->assertForbidden();
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->residenteCarlos->cod_residente])
+            ->assertSee('Carlos Mendoza')->assertDontSee('Registrar atención')->assertDontSee('Añadir nota')
+            ->call('abrirModalSignos')->assertForbidden();
+        Livewire::test(SaludAdministracionMedicacionPanel::class)
+            ->assertSet('esModoConsulta', true)
+            ->assertViewHas('residentes', fn ($residentes) => $residentes->count() === 1 && $residentes->first()->is($this->residenteCarlos));
+
+        $this->actingAs($this->robertoUser);
+        $this->assertEmpty($turnos->obtenerPacientesAsignadosIds($this->robertoUser, null, $this->elenaUser->cod_usuario));
+        Livewire::test(SaludAdministracionMedicacionPanel::class)
+            ->assertViewHas('residentes', fn ($residentes) => $residentes->isEmpty());
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->residenteCarlos->cod_residente])
+            ->assertForbidden();
+        $this->assertDatabaseCount('signos_vitales', 0);
+        $this->assertDatabaseCount('administraciones_medicacion', 0);
+    }
+
+    public function test_directorio_abierto_actualiza_modo_y_bloquea_registro_al_terminar_la_guardia(): void
+    {
+        $this->actingAs($this->elenaUser);
+        $pantalla = Livewire::test(MisPacientes::class)
+            ->call('seleccionarResidente', $this->residenteCarlos->cod_residente)
+            ->assertSet('esModoConsulta', false)->assertSet('esResidenteAsignado', true);
+
+        Carbon::setTestNow(today()->setTime(16, 0));
+        $pantalla->call('$refresh')->assertSet('esModoConsulta', true)
+            ->assertSet('esResidenteAsignado', false)->assertSet('mostrarPanelDetalle', true)
+            ->call('mostrarSelectorRegistro')->assertForbidden();
+        $this->assertDatabaseCount('signos_vitales', 0);
+    }
+
+    public function test_historial_de_pases_no_expone_pases_de_residentes_ajenos(): void
+    {
+        $entrante = Jornada::create(['cod_jornada' => 'JOR_QA_ENTRANTE', 'cod_turno' => $this->turnoTarde->cod_turno,
+            'fecha_jornada' => today(), 'estado' => 'PLANIFICADA']);
+        $pase = PaseTurno::create([
+            'cod_residente' => $this->residenteCarlos->cod_residente,
+            'cod_jornada_saliente' => $this->jornadaManana->cod_jornada,
+            'cod_jornada_entrante' => $entrante->cod_jornada,
+            'cod_personal_saliente' => $this->elenaPersonal->cod_personal,
+            'cod_personal_entrante' => $this->mariaPersonal->cod_personal,
+            'fecha_hora' => now(), 'resumen' => 'Resumen sintético de otro equipo', 'estado' => 'ENTREGADO',
+        ]);
+        Carbon::setTestNow(today()->setTime(16, 0));
+        $this->actingAs($this->elenaUser);
+        Livewire::test(PaseTurnoPanel::class)
+            ->assertViewHas('historialPases', fn ($pases) => $pases->total() === 1);
+
+        $this->actingAs($this->robertoUser);
+        Livewire::test(PaseTurnoPanel::class)
+            ->assertViewHas('historialPases', fn ($pases) => $pases->total() === 0)
+            ->call('abrirVer', $pase->cod_pase)->assertForbidden();
+        $this->assertDatabaseCount('pases_turno', 1);
+    }
+
+    public function test_registros_de_cuidados_fuera_de_turno_permiten_consulta_propia_sin_formulario_de_escritura(): void
+    {
+        Carbon::setTestNow(today()->setTime(16, 0));
+        $this->actingAs($this->elenaUser);
+        Livewire::test(RegistrosEnfermeria::class,
+            ['codResidente' => $this->residenteCarlos->cod_residente])
+            ->assertSee('Carlos Mendoza')->assertSee('Consulta fuera de turno')
+            ->assertDontSeeHtml('wire:submit="guardarCuidado"')
+            ->call('guardarCuidado')->assertForbidden();
+        $this->actingAs($this->robertoUser);
+        Livewire::test(RegistrosEnfermeria::class,
+            ['codResidente' => $this->residenteCarlos->cod_residente])->assertForbidden();
+        $this->assertDatabaseCount('ejecuciones_cuidado', 0);
+    }
+
+    public function test_incorporacion_documental_rechaza_escritura_fuera_de_turno_en_el_caso_de_uso(): void
+    {
+        Carbon::setTestNow(today()->setTime(16, 0));
+        $this->elenaUser->givePermissionTo('documentos.subir');
+        $this->actingAs($this->elenaUser);
+        Storage::fake('local');
+
+        try {
+            app(IncorporarDocumentosExpediente::class)
+                ->guardarNuevoDocumento($this->elenaUser, $this->entradaDocumentoSintetico());
+            $this->fail('La escritura documental fuera de turno debe rechazarse.');
+        } catch (HttpException $error) {
+            $this->assertSame(403, $error->getStatusCode());
+        }
+
+        $this->assertDatabaseCount('documentos', 0);
+        $this->assertSame([], Storage::disk('local')->allFiles());
+    }
+
+    public function test_incorporacion_documental_permite_escritura_durante_la_asignacion_propia(): void
+    {
+        $this->elenaUser->givePermissionTo('documentos.subir');
+        $this->actingAs($this->elenaUser);
+        Storage::fake('local');
+
+        $documento = app(IncorporarDocumentosExpediente::class)
+            ->guardarNuevoDocumento($this->elenaUser, $this->entradaDocumentoSintetico());
+
+        $this->assertDatabaseCount('documentos', 1);
+        $this->assertDatabaseHas('documentos', [
+            'cod_documento' => $documento->getKey(),
+            'cod_residente' => $this->residenteCarlos->cod_residente,
+            'cod_usuario' => $this->elenaUser->getKey(),
+        ]);
+        Storage::disk('local')->assertExists($documento->ruta_archivo);
+    }
+
+    private function entradaDocumentoSintetico(): array
+    {
+        return [
+            'adultoMayor' => $this->residenteCarlos,
+            'nuevoDocNombre' => 'Documento sintetico de prueba',
+            'nuevoDocTipo' => 'MEDICO',
+            'nuevoDocCategoria' => 'CLINICO',
+            'nuevoDocFecha' => today()->toDateString(),
+            'nuevoDocDescripcion' => null,
+            'nuevoDocObservaciones' => null,
+            'nuevoDocArchivo' => UploadedFile::fake()->create('documento.pdf', 1, 'application/pdf'),
+        ];
+    }
+
+    public function test_testing_sin_reloj_simulado_no_habilita_una_guardia_fuera_de_horario(): void
+    {
+        Carbon::setTestNow();
+        $ahora = now();
+        $this->jornadaManana->update(['fecha_jornada' => $ahora->toDateString()]);
+        $this->turnoManana->update(['hora_inicio' => $ahora->copy()->addMinutes(10)->format('H:i:s'),
+            'hora_cierre' => $ahora->copy()->addMinutes(20)->format('H:i:s')]);
+        $this->actingAs($this->elenaUser);
+        $turnos = app(TurnoEnfermeriaService::class);
+        $this->assertTrue(app()->environment('testing'));
+        $this->assertNull($turnos->obtenerTurnoActivo($this->elenaUser));
+        $this->assertFalse($turnos->esPacienteAsignado($this->residenteCarlos, $this->elenaUser));
+        $this->assertDatabaseCount('signos_vitales', 0);
+    }
+
+    public function test_enfermero_sin_personal_no_hereda_el_turno_global_del_equipo(): void
+    {
+        $usuario = User::factory()->create(['estado' => 'ACTIVO']);
+        $usuario->assignRole('ENFERMEROS');
+        $this->assertNull($usuario->personal);
+        $turnos = app(TurnoEnfermeriaService::class);
+        $this->assertNull($turnos->obtenerTurnoActivo($usuario));
+        $this->assertEmpty($turnos->obtenerPacientesAsignadosIds($usuario));
+    }
+
+    private function asignarConsultaPropia(): void
+    {
+        AsignacionResidenteJornada::create([
+            'cod_jornada' => $this->jornadaManana->cod_jornada,
+            'cod_personal' => $this->robertoPersonal->cod_personal,
+            'cod_residente' => $this->residenteCarlos->cod_residente,
+            'nivel_supervision' => 'ALTA',
+            'fecha_hora' => now(),
+            'estado' => 'ACTIVA',
+        ]);
+    }
+
+    public function test_guardia_nocturna_conserva_contexto_de_cuidados_y_residentes_despues_de_medianoche(): void
+    {
+        $this->turnoManana->update(['hora_inicio' => '22:00:00', 'hora_cierre' => '06:00:00']);
+        $this->jornadaManana->update(['fecha_jornada' => today()->subDay()]);
+        Carbon::setTestNow(today()->setTime(3, 0));
+        $this->actingAs($this->elenaUser);
+        $cuidados = app(TurnoEnfermeriaService::class);
+
+        $this->assertSame($this->jornadaManana->cod_jornada,
+            app(MiTurnoService::class)->resolverJornadaActual($this->elenaPersonal)?->cod_jornada);
+        $this->assertSame($this->turnoManana->cod_turno, $cuidados->obtenerTurnoActivo($this->elenaUser)?->cod_turno);
+        $this->assertTrue($cuidados->esPacienteAsignado($this->residenteCarlos, $this->elenaUser));
+        $this->assertTrue($cuidados->obtenerPacientesAsignadosQuery($this->elenaUser)
+            ->whereKey($this->residenteCarlos->cod_residente)->exists());
+        $this->assertSame($this->turnoManana->cod_turno,
+            $cuidados->autorizarMutacionEnfermeria($this->residenteCarlos, 'signos_vitales.crear', $this->elenaUser)?->cod_turno);
+
+        $aporte = app(CuidadosEnfermeriaService::class)
+            ->registrarHidratacion($this->residenteCarlos->cod_residente, ['cantidad_ml' => 250], $this->elenaUser);
+        $this->assertSame($this->jornadaManana->cod_jornada, $aporte->cod_jornada);
+        $this->assertSame($this->elenaPersonal->cod_personal, $aporte->cod_personal);
+
+        Carbon::setTestNow(today()->setTime(6, 1));
+        $this->assertNull($cuidados->obtenerTurnoActivo($this->elenaUser));
+        $this->assertFalse($cuidados->esPacienteAsignado($this->residenteCarlos, $this->elenaUser));
+        $this->assertDatabaseCount('signos_vitales', 0);
+    }
+
     public function test_enfermero_fuera_de_turno_entra_en_modo_consulta(): void
     {
         $this->actingAs($this->robertoUser);
@@ -244,28 +460,26 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         $this->assertEquals('MODO CONSULTA / SOLO LECTURA', $datos['submodo_label']);
         $this->assertTrue($datos['es_modo_consulta']);
 
-        // No esta vacio: contiene al residente cubierto por el turno activo
-        $this->assertNotEmpty($datos['residentes']);
-        $cods = collect($datos['residentes'])->pluck('cod_residente')->toArray();
-        $this->assertContains($this->residenteCarlos->cod_residente, $cods);
+        $this->assertEmpty($datos['residentes']);
+        $this->assertEmpty($datos['agenda']);
+        $this->assertEmpty($datos['alertas_recientes']);
 
         // Livewire frontend aprobado
         Livewire::test(DashboardTurno::class)
-            ->assertSee('Turno activo del equipo · solo lectura')
-            ->assertSee('Carlos Mendoza')
+            ->assertSee('Sin residentes asignados para consulta')
+            ->assertDontSee('Carlos Mendoza')
             ->assertDontSee('Asignados a mi turno activo');
     }
 
     /**
-     * 2. Puede ver responsables actuales:
-     * - Nombre, edad, habitacion y cama, nivel de supervision, estado operacional, turno actual.
-     * - Si existen varios responsables activos, se muestran TODOS sin elegir uno arbitrariamente.
+     * 2. La consulta propia mantiene los datos del residente y su contexto asignado.
+     * No presenta una jornada finalizada como guardia actual.
      */
-    public function test_puede_ver_responsables_actuales_completos_y_datos_del_residente(): void
+    public function test_consulta_propia_conserva_identidad_y_no_atribuye_guardia_del_equipo(): void
     {
         // Asignamos tambien a Maria al residente Carlos en la misma jornada activa
         AsignacionResidenteJornada::create([
-            'cod_asignacion' => 'ARJ_MARIA_' . strtoupper(Str::random(4)),
+            'cod_asignacion' => 'ARJ_MARIA_'.strtoupper(Str::random(4)),
             'cod_jornada' => $this->jornadaManana->cod_jornada,
             'cod_personal' => $this->mariaPersonal->cod_personal,
             'cod_residente' => $this->residenteCarlos->cod_residente,
@@ -274,6 +488,8 @@ class MiTurnoFueraDeJornadaTest extends TestCase
             'estado' => 'ACTIVO',
         ]);
 
+        $this->asignarConsultaPropia();
+        Carbon::setTestNow(today()->setTime(16, 0));
         $this->actingAs($this->robertoUser);
 
         $service = app(MiTurnoService::class);
@@ -289,10 +505,12 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         $this->assertEquals('ACTIVO', $cardCarlos['estado_operacional']);
         $this->assertEquals('Turno Manana', $cardCarlos['turno_actual']);
 
-        // Responsables: deben figurar Elena Y Maria sin omitir a ninguna
+        $this->assertFalse($datos['jornada']['activa']);
+        $this->assertSame('FUERA_DE_TURNO', $datos['modo']);
+        // La consulta no atribuye al usuario la guardia de sus compañeros.
         $this->assertStringContainsString('A cargo de:', $cardCarlos['responsable_texto']);
-        $this->assertStringContainsString('Enf. Elena Gomez', $cardCarlos['responsable_texto']);
-        $this->assertStringContainsString('Enf. Maria Rodriguez', $cardCarlos['responsable_texto']);
+        $this->assertStringContainsString('Enf. Roberto Vasquez', $cardCarlos['responsable_texto']);
+        $this->assertStringNotContainsString('Maria Rodriguez', $cardCarlos['responsable_texto']);
     }
 
     /**
@@ -303,7 +521,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
     {
         // Jornada de ayer
         $jornadaAyer = Jornada::create([
-            'cod_jornada' => 'JOR_AYER_' . strtoupper(Str::random(4)),
+            'cod_jornada' => 'JOR_AYER_'.strtoupper(Str::random(4)),
             'cod_turno' => $this->turnoManana->cod_turno,
             'fecha_jornada' => Carbon::yesterday()->toDateString(),
             'estado' => 'FINALIZADA',
@@ -311,7 +529,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
 
         // Asignacion antigua de Roberto a Carlos
         AsignacionResidenteJornada::create([
-            'cod_asignacion' => 'ARJ_AYER_ROB_' . strtoupper(Str::random(4)),
+            'cod_asignacion' => 'ARJ_AYER_ROB_'.strtoupper(Str::random(4)),
             'cod_jornada' => $jornadaAyer->cod_jornada,
             'cod_personal' => $this->robertoPersonal->cod_personal,
             'cod_residente' => $this->residenteCarlos->cod_residente,
@@ -325,25 +543,23 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         $datos = $service->obtenerDatosDashboard($this->robertoUser);
 
         $cardCarlos = collect($datos['residentes'])->firstWhere('cod_residente', $this->residenteCarlos->cod_residente);
-        $this->assertNotNull($cardCarlos);
-
-        // El responsable actual es Elena (de la jornada activa de hoy), NO Roberto
-        $this->assertStringContainsString('Enf. Elena Gomez', $cardCarlos['responsable_texto']);
-        $this->assertStringNotContainsString('Roberto', $cardCarlos['responsable_texto']);
+        $this->assertNull($cardCarlos);
+        $this->assertEmpty($datos['agenda']);
     }
 
     /**
-     * 4. Graficas corresponden al turno actualmente activo:
-     * - Muestra contexto de consulta y agenda del equipo, sin progreso duplicado.
-     * - Calcula el progreso con los residentes asignados a las jornadas activas.
+     * 4. La consulta muestra métricas reales únicamente de residentes propios.
+     * El contexto asignado no concede escritura ni incluye residentes ajenos.
      */
     public function test_graficas_corresponden_al_turno_activo_en_modo_solo_lectura(): void
     {
+        $this->asignarConsultaPropia();
+        Carbon::setTestNow(today()->setTime(16, 0));
         $this->actingAs($this->robertoUser);
 
         // Medicamento, Atencion y Prescripcion
         $medicamento = Medicamento::create([
-            'cod_medicamento' => 'MED_' . strtoupper(Str::random(6)),
+            'cod_medicamento' => 'MED_'.strtoupper(Str::random(6)),
             'nombre_generico' => 'Paracetamol',
             'nombre_comercial' => 'Paracetamol 500mg',
             'concentracion' => '500mg',
@@ -353,7 +569,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         ]);
 
         $atencion = Atencion::create([
-            'cod_atencion' => 'ATE_' . strtoupper(Str::random(6)),
+            'cod_atencion' => 'ATE_'.strtoupper(Str::random(6)),
             'cod_residente' => $this->residenteCarlos->cod_residente,
             'cod_area' => $this->area->cod_area,
             'cod_personal' => $this->elenaPersonal->cod_personal,
@@ -364,7 +580,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         ]);
 
         $prescripcion = Prescripcion::create([
-            'cod_prescripcion' => 'PRE_' . strtoupper(Str::random(6)),
+            'cod_prescripcion' => 'PRE_'.strtoupper(Str::random(6)),
             'cod_residente' => $this->residenteCarlos->cod_residente,
             'cod_atencion' => $atencion->cod_atencion,
             'cod_medicamento' => $medicamento->cod_medicamento,
@@ -379,7 +595,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         ]);
 
         HorarioPrescripcion::create([
-            'cod_horario_prescripcion' => 'HPR_' . strtoupper(Str::random(6)),
+            'cod_horario_prescripcion' => 'HPR_'.strtoupper(Str::random(6)),
             'cod_prescripcion' => $prescripcion->cod_prescripcion,
             'hora_programada' => '08:00:00',
             'dosis_programada' => 500,
@@ -388,7 +604,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
 
         // Registrar como administrada por Elena
         AdministracionMedicacion::create([
-            'cod_administracion' => 'ADM_' . strtoupper(Str::random(6)),
+            'cod_administracion' => 'ADM_'.strtoupper(Str::random(6)),
             'cod_prescripcion' => $prescripcion->cod_prescripcion,
             'cod_residente' => $this->residenteCarlos->cod_residente,
             'cod_personal' => $this->elenaPersonal->cod_personal,
@@ -407,10 +623,10 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         $this->assertEquals(100, $datos['estado_tareas']['porcentaje']);
 
         Livewire::test(DashboardTurno::class)
-            ->assertSee('Turno del equipo disponible en modo consulta.')
+            ->assertSee('Fuera de turno: consulta únicamente tus residentes asignados.')
             ->assertSee('Residentes del turno')
             ->assertSee('Agenda de medicación y cuidados')
-            ->assertSee('Turno del equipo · solo lectura')
+            ->assertSee('Mis residentes asignados · solo lectura')
             ->assertDontSee('Tu progreso');
     }
 
@@ -471,7 +687,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
     {
         // Jornada Tarde activa hoy
         $jornadaTarde = Jornada::create([
-            'cod_jornada' => 'JOR_TARDE_' . strtoupper(Str::random(4)),
+            'cod_jornada' => 'JOR_TARDE_'.strtoupper(Str::random(4)),
             'cod_turno' => $this->turnoTarde->cod_turno,
             'fecha_jornada' => Carbon::today()->toDateString(),
             'estado' => 'ACTIVA',
@@ -479,7 +695,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
 
         // Asignacion de Roberto al turno tarde
         AsignacionPersonal::create([
-            'cod_asignacion_personal' => 'ASP_TARDE_' . strtoupper(Str::random(4)),
+            'cod_asignacion_personal' => 'ASP_TARDE_'.strtoupper(Str::random(4)),
             'cod_jornada' => $jornadaTarde->cod_jornada,
             'cod_personal' => $this->robertoPersonal->cod_personal,
             'cod_area' => $this->area->cod_area,
@@ -491,7 +707,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
 
         // Residente Beatriz asignada exclusivamente a Roberto en la tarde
         $residenteBeatriz = Residente::crearDesdeAdmision([
-            'cod_residente' => 'RES_BEA_' . strtoupper(Str::random(4)),
+            'cod_residente' => 'RES_BEA_'.strtoupper(Str::random(4)),
             'nombres' => 'Beatriz',
             'apellido_paterno' => 'Castro',
             'fecha_nacimiento' => '1948-02-10',
@@ -500,7 +716,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         ]);
 
         AsignacionResidenteJornada::create([
-            'cod_asignacion' => 'ARJ_TARDE_' . strtoupper(Str::random(4)),
+            'cod_asignacion' => 'ARJ_TARDE_'.strtoupper(Str::random(4)),
             'cod_jornada' => $jornadaTarde->cod_jornada,
             'cod_personal' => $this->robertoPersonal->cod_personal,
             'cod_residente' => $residenteBeatriz->cod_residente,
@@ -602,7 +818,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
 
         // Asignacion de Juan a la jornada con funcion "ENFERMERO" para probar que la funcion/cargo NO otorga autoridad si carece del rol Spatie ENFERMEROS
         AsignacionPersonal::create([
-            'cod_asignacion_personal' => 'ASP_MED_' . strtoupper(Str::random(4)),
+            'cod_asignacion_personal' => 'ASP_MED_'.strtoupper(Str::random(4)),
             'cod_jornada' => $this->jornadaManana->cod_jornada,
             'cod_personal' => $medicoPersonal->cod_personal,
             'cod_area' => $this->area->cod_area,
@@ -614,7 +830,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
 
         // Residente Manuel asignado SOLO al medico Juan
         $residenteManuel = Residente::crearDesdeAdmision([
-            'cod_residente' => 'RES_MAN_' . strtoupper(Str::random(4)),
+            'cod_residente' => 'RES_MAN_'.strtoupper(Str::random(4)),
             'nombres' => 'Manuel',
             'apellido_paterno' => 'Ortiz',
             'fecha_nacimiento' => '1940-01-01',
@@ -623,7 +839,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         ]);
 
         AsignacionResidenteJornada::create([
-            'cod_asignacion' => 'ARJ_MED_MAN_' . strtoupper(Str::random(4)),
+            'cod_asignacion' => 'ARJ_MED_MAN_'.strtoupper(Str::random(4)),
             'cod_jornada' => $this->jornadaManana->cod_jornada,
             'cod_personal' => $medicoPersonal->cod_personal,
             'cod_residente' => $residenteManuel->cod_residente,
@@ -637,11 +853,8 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         $datos = $service->obtenerDatosDashboard($this->robertoUser);
 
         $cardManuel = collect($datos['residentes'])->firstWhere('cod_residente', $residenteManuel->cod_residente);
-        $this->assertNotNull($cardManuel);
-
-        // NO debe aparecer como "Enf. Juan"
-        $this->assertStringNotContainsString('Enf. Juan', $cardManuel['responsable_texto']);
-        $this->assertEquals('Sin enfermero asignado', $cardManuel['responsable_texto']);
+        $this->assertNull($cardManuel);
+        $this->assertEmpty($datos['residentes']);
     }
 
     /**
@@ -650,9 +863,11 @@ class MiTurnoFueraDeJornadaTest extends TestCase
      */
     public function test_dos_enfermeros_para_un_residente_no_duplican_progreso(): void
     {
+        $this->asignarConsultaPropia();
+        Carbon::setTestNow(today()->setTime(16, 0));
         // Asignar tambien a Maria al residente Carlos
         AsignacionResidenteJornada::create([
-            'cod_asignacion' => 'ARJ_MARIA_DUP_' . strtoupper(Str::random(4)),
+            'cod_asignacion' => 'ARJ_MARIA_DUP_'.strtoupper(Str::random(4)),
             'cod_jornada' => $this->jornadaManana->cod_jornada,
             'cod_personal' => $this->mariaPersonal->cod_personal,
             'cod_residente' => $this->residenteCarlos->cod_residente,
@@ -663,7 +878,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
 
         // Crear una unica medicacion programada para Carlos
         $medicamento = Medicamento::create([
-            'cod_medicamento' => 'MED_DUP_' . strtoupper(Str::random(4)),
+            'cod_medicamento' => 'MED_DUP_'.strtoupper(Str::random(4)),
             'nombre_generico' => 'Enalapril',
             'nombre_comercial' => 'Enalapril 10mg',
             'concentracion' => '10mg',
@@ -673,7 +888,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         ]);
 
         $atencion = Atencion::create([
-            'cod_atencion' => 'ATE_DUP_' . strtoupper(Str::random(4)),
+            'cod_atencion' => 'ATE_DUP_'.strtoupper(Str::random(4)),
             'cod_residente' => $this->residenteCarlos->cod_residente,
             'cod_area' => $this->area->cod_area,
             'cod_personal' => $this->elenaPersonal->cod_personal,
@@ -684,7 +899,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         ]);
 
         $prescripcion = Prescripcion::create([
-            'cod_prescripcion' => 'PRE_DUP_' . strtoupper(Str::random(4)),
+            'cod_prescripcion' => 'PRE_DUP_'.strtoupper(Str::random(4)),
             'cod_residente' => $this->residenteCarlos->cod_residente,
             'cod_atencion' => $atencion->cod_atencion,
             'cod_medicamento' => $medicamento->cod_medicamento,
@@ -699,7 +914,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         ]);
 
         HorarioPrescripcion::create([
-            'cod_horario_prescripcion' => 'HPR_DUP_' . strtoupper(Str::random(4)),
+            'cod_horario_prescripcion' => 'HPR_DUP_'.strtoupper(Str::random(4)),
             'cod_prescripcion' => $prescripcion->cod_prescripcion,
             'hora_programada' => '08:00:00',
             'dosis_programada' => 10,
@@ -708,7 +923,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
 
         // Administrada por Elena
         AdministracionMedicacion::create([
-            'cod_administracion' => 'ADM_DUP_' . strtoupper(Str::random(4)),
+            'cod_administracion' => 'ADM_DUP_'.strtoupper(Str::random(4)),
             'cod_prescripcion' => $prescripcion->cod_prescripcion,
             'cod_residente' => $this->residenteCarlos->cod_residente,
             'cod_personal' => $this->elenaPersonal->cod_personal,
@@ -729,7 +944,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         $this->assertEquals(100, $datos['estado_tareas']['porcentaje']);
 
         // Distribucion de cuidados: Medicacion = 1 (no 2)
-        $dist = collect($datos['distribucion_cuidados'])->first(fn($i) => stripos($i['label'] ?? '', 'medic') !== false);
+        $dist = collect($datos['distribucion_cuidados'])->first(fn ($i) => stripos($i['label'] ?? '', 'medic') !== false);
         $this->assertEquals(1, $dist['total'] ?? 0);
     }
 
@@ -740,9 +955,11 @@ class MiTurnoFueraDeJornadaTest extends TestCase
      */
     public function test_estado_institucional_y_estado_de_seguimiento_permanecen_separados(): void
     {
+        $this->asignarConsultaPropia();
+        Carbon::setTestNow(today()->setTime(16, 0));
         // Creamos una alerta critica para Carlos
         Alerta::create([
-            'cod_alerta' => 'ALE_CRIT_' . strtoupper(Str::random(4)),
+            'cod_alerta' => 'ALE_CRIT_'.strtoupper(Str::random(4)),
             'cod_residente' => $this->residenteCarlos->cod_residente,
             'tipo_alerta' => 'CLINICA',
             'prioridad' => 'CRITICA',

@@ -204,6 +204,7 @@ class FichaPaciente extends Component
 
     public function abrirModalSubirDoc(): void
     {
+        abort_if($this->consultaEnfermeriaFueraDeTurno(), 403, 'El registro está deshabilitado fuera de turno.');
         $this->resetErrorBag();
         $this->resetValidation();
         $this->nuevoDocArchivo = null;
@@ -225,6 +226,7 @@ class FichaPaciente extends Component
 
     public function guardarNuevoDocumento(): void
     {
+        abort_if($this->consultaEnfermeriaFueraDeTurno(), 403, 'El registro está deshabilitado fuera de turno.');
         $this->resetValidation();
         $doc = app(IncorporarDocumentosExpediente::class)->guardarNuevoDocumento(auth()->user(), [
             'nuevoDocArchivo' => $this->nuevoDocArchivo,
@@ -395,7 +397,11 @@ class FichaPaciente extends Component
         // institucionales; las mutaciones clínicas conservan sus propios guards.
         $user = Auth::user();
         if (! $user?->hasAnyRole(['ADMINISTRADOR', 'GERENTE']) || ! $user->can('residentes.ver')) {
-            app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->adultoMayor, $user);
+            if ($user?->hasRole('ENFERMEROS')) {
+                app(TurnoEnfermeriaService::class)->autorizarConsultaResidente($this->adultoMayor, $user);
+            } else {
+                app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->adultoMayor, $user);
+            }
         }
 
         if (request()->query('tab')) {
@@ -405,6 +411,9 @@ class FichaPaciente extends Component
 
     public function cargarAdulto(string $codResidente): void
     {
+        if (Auth::user()?->hasRole('ENFERMEROS')) {
+            app(TurnoEnfermeriaService::class)->autorizarConsultaResidente($codResidente, Auth::user());
+        }
         $this->adultoMayor = Residente::with([
             'ocupacionActiva.cama.habitacion',
             'admisiones',
@@ -576,6 +585,7 @@ class FichaPaciente extends Component
 
     public function abrirModalRegistrarEvento(): void
     {
+        abort_if($this->consultaEnfermeriaFueraDeTurno(), 403, 'El registro está deshabilitado fuera de turno.');
         $this->resetValidation();
         $this->nuevoEventoTipo = 'CAIDA';
         $this->nuevoEventoFechaHora = now()->format('Y-m-d\TH:i');
@@ -1561,6 +1571,21 @@ class FichaPaciente extends Component
         }
     }
 
+    private function consultaEnfermeriaFueraDeTurno(): bool
+    {
+        $user = Auth::user();
+
+        return $user?->hasRole('ENFERMEROS') && ! app(TurnoEnfermeriaService::class)
+            ->esPacienteAsignado($this->adultoMayor, $user);
+    }
+
+    public function hydrate(): void
+    {
+        if (Auth::user()?->hasRole('ENFERMEROS')) {
+            app(TurnoEnfermeriaService::class)->autorizarConsultaResidente($this->adultoMayor, Auth::user());
+        }
+    }
+
     public function render()
     {
         if (isset($this->adultoMayor)) {
@@ -1583,6 +1608,7 @@ class FichaPaciente extends Component
         }
 
         return view('livewire.cuidados.ficha-paciente', [
+            'consultaEnfermeria' => $this->consultaEnfermeriaFueraDeTurno(),
             'agendaMedicacion' => isset($this->adultoMayor)
                 ? app(AgendaMedicacionService::class)->paraAdulto($this->adultoMayor->cod_residente)
                 : collect(),

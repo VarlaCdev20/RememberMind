@@ -1,5 +1,10 @@
 ﻿{{-- CABECERA CLÍNICA CONFORME A LA REFERENCIA VISUAL OFICIAL --}}
 <div class="space-y-4">
+    @if($consultaEnfermeria)
+        <p role="status" class="rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-4 py-3 text-sm font-semibold text-[var(--rm-text-primary)]">
+            Consulta fuera de turno · Solo lectura. El registro clínico está deshabilitado.
+        </p>
+    @endif
 
     {{-- B. ENCABEZADO PRINCIPAL Y C. ACCIONES SUPERIORES DERECHA --}}
     <x-ui.page-header
@@ -35,12 +40,14 @@
                      x-transition:leave-end="opacity-0 translate-y-1 scale-95"
                      x-cloak
                      class="absolute right-0 mt-1.5 w-56 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-1.5 shadow-xl z-50 text-xs">
-                    <button type="button"
+                    @if(!$consultaEnfermeria)
+<button type="button"
                             @click="openMas = false; drawerExpediente = true"
                             class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-soft)] font-medium transition cursor-pointer">
                         <i class="ph-bold ph-identification-card text-blue-600 text-sm"></i>
                         <span>Expediente Integral</span>
                     </button>
+@endif
                     <button type="button"
                             @click="openMas = false; drawerFamilia = true"
                             class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-soft)] font-medium transition cursor-pointer">
@@ -63,9 +70,11 @@
             </div>
 
             {{-- Botón principal: [ + REGISTRAR ] (Abre Modal de Registro de Enfermería) --}}
-            <x-ui.action-button variant="primary" size="sm" icono="ph-plus-circle" @click="modalSelectorAtencion = true" class="cursor-pointer">
+            @if(!$consultaEnfermeria)
+<x-ui.action-button variant="primary" size="sm" icono="ph-plus-circle" @click="modalSelectorAtencion = true" class="cursor-pointer">
                 Registrar atención
             </x-ui.action-button>
+@endif
     </x-ui.page-header>
 
     {{-- 2. CARD SUPERIOR DEL RESIDENTE (FRANJA CLÍNICA ÚNICA CON DOS DIVISIONES SUAVES) --}}

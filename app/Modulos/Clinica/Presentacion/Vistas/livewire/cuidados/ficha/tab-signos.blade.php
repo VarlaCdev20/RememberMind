@@ -154,13 +154,15 @@
 
         <div class="flex flex-wrap items-center gap-2">
             {{-- Botón Principal: Azul Oscuro Institucional --}}
-            <button type="button"
+            @if(!$consultaEnfermeria)
+<button type="button"
                     wire:click="abrirModalSignos"
                     wire:loading.attr="disabled"
                     class="inline-flex items-center gap-2 rounded-xl bg-[var(--rm-action-primary)] px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-blue-900 transition active:scale-98 cursor-pointer">
                 <i class="ph-bold ph-plus text-sm"></i>
                 <span>+ Registrar signos vitales</span>
             </button>
+@endif
 
             {{-- Botón: Configurar rangos (Abre modal de rangos interactivo) --}}
             <button type="button"
@@ -217,13 +219,15 @@
                             <i class="ph-bold ph-sliders-horizontal text-purple-600 text-sm"></i>
                             <span>Configurar rangos clínicos</span>
                         </button>
-                        <button type="button"
+                        @if(!$consultaEnfermeria)
+<button type="button"
                                 wire:click="abrirModalSignos"
                                 @click="menuCabecera = false;"
                                 class="w-full text-left px-3.5 py-2 flex items-center gap-2 text-[var(--rm-text-body)] hover:bg-[var(--rm-surface-alt)] hover:text-[var(--rm-text-title)] transition cursor-pointer">
                             <i class="ph-bold ph-plus-circle text-[var(--rm-action-primary)] text-sm"></i>
                             <span>Registrar nueva medición</span>
                         </button>
+@endif
                     </div>
                 </div>
             </div>

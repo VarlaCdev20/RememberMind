@@ -40,12 +40,14 @@
 
         <div class="flex items-center gap-2.5">
             {{-- Botón Subir Documento (permiso-gated) --}}
-            <button type="button"
+            @if(!$consultaEnfermeria)
+<button type="button"
                     wire:click="abrirModalSubirDoc"
                     class="px-4 py-2.5 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary)]/90 text-white font-bold text-xs transition-all shadow-sm hover:shadow flex items-center gap-2 cursor-pointer active:scale-95">
                 <i class="ph-bold ph-upload-simple text-sm"></i>
                 <span>+ Subir documento</span>
             </button>
+@endif
         </div>
     </div>
 
@@ -275,12 +277,14 @@
                     <i class="ph-bold ph-folder-open text-3xl text-slate-300 dark:text-slate-600 block"></i>
                     <p class="font-bold text-[var(--rm-text-title)]">No encontramos documentos con estos filtros.</p>
                     <p>Modifique los criterios de búsqueda o suba un nuevo documento al expediente.</p>
-                    <button type="button"
+                    @if(!$consultaEnfermeria)
+<button type="button"
                             wire:click="abrirModalSubirDoc"
                             class="mt-2 px-3.5 py-1.5 rounded-xl bg-[var(--rm-action-primary)] text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-2xs">
                         <i class="ph-bold ph-upload-simple"></i>
                         <span>Subir documento</span>
                     </button>
+@endif
                 </div>
             @else
                 <div class="overflow-x-auto border border-[var(--rm-border)]/60 rounded-2xl">

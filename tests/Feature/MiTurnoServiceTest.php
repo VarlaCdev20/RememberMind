@@ -1,62 +1,44 @@
 <?php
 
-
-
 namespace Tests\Feature;
 
-
-
+use App\Models\Admision;
 use App\Models\Area;
-
 use App\Models\AsignacionPersonal;
-
 use App\Models\AsignacionResidenteJornada;
-
+use App\Models\Atencion;
 use App\Models\Cama;
-
+use App\Models\EjecucionCuidado;
 use App\Models\Habitacion;
-
+use App\Models\HorarioPrescripcion;
+use App\Models\IntervencionCuidado;
 use App\Models\Jornada;
-
+use App\Models\Medicamento;
 use App\Models\OcupacionCama;
-
 use App\Models\Personal;
-
+use App\Models\PlanCuidado;
+use App\Models\Prescripcion;
+use App\Models\ProgramacionCuidado;
 use App\Models\Residente;
-
 use App\Models\Turno;
-
 use App\Models\User;
-
+use App\Modulos\Alertas\Aplicacion\Consultas\TendenciaIncidentesService;
 use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
-
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\DashboardTurno;
 use Carbon\Carbon;
-
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-
 use Illuminate\Support\Facades\Auth;
-
 use Illuminate\Support\Facades\DB;
-
 use Illuminate\Support\Str;
-
 use Livewire\Livewire;
-
 use Spatie\Permission\Models\Role;
-
 use Symfony\Component\HttpKernel\Exception\HttpException;
-
 use Tests\TestCase;
 
-
-
 class MiTurnoServiceTest extends TestCase
-
 {
-
     use RefreshDatabase;
-
-
 
     protected User $enfermeraUser;
 
@@ -72,29 +54,22 @@ class MiTurnoServiceTest extends TestCase
 
     protected Residente $residenteAjeno;
 
-
-
     protected function setUp(): void
-
     {
 
         parent::setUp();
 
         Carbon::setTestNow(Carbon::today()->setTime(10, 0, 0));
 
-
-
         // 1. Rol ENFERMEROS
 
         Role::firstOrCreate(['name' => 'ENFERMEROS', 'guard_name' => 'web']);
-
-
 
         // 2. Area
 
         $this->area = Area::create([
 
-            'cod_area' => 'ARE_' . strtoupper(Str::random(6)),
+            'cod_area' => 'ARE_'.strtoupper(Str::random(6)),
 
             'nombre' => 'Sector Geriatría',
 
@@ -102,13 +77,11 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         // 3. Turno
 
         $this->turno = Turno::create([
 
-            'cod_turno' => 'TUR_' . strtoupper(Str::random(6)),
+            'cod_turno' => 'TUR_'.strtoupper(Str::random(6)),
 
             'nombre' => 'Mañana',
 
@@ -120,13 +93,11 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         // 4. Usuario Enfermera
 
         $this->enfermeraUser = User::create([
 
-            'cod_usuario' => 'USU_' . strtoupper(Str::random(6)),
+            'cod_usuario' => 'USU_'.strtoupper(Str::random(6)),
 
             'correo' => 'elena.salazar@remembermind.test',
 
@@ -138,13 +109,11 @@ class MiTurnoServiceTest extends TestCase
 
         $this->enfermeraUser->assignRole('ENFERMEROS');
 
-
-
         // 5. Personal
 
         $this->enfermeraPersonal = Personal::create([
 
-            'cod_personal' => 'PER_' . strtoupper(Str::random(6)),
+            'cod_personal' => 'PER_'.strtoupper(Str::random(6)),
 
             'cod_usuario' => $this->enfermeraUser->cod_usuario,
 
@@ -162,13 +131,11 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         // 6. Jornada
 
         $this->jornada = Jornada::create([
 
-            'cod_jornada' => 'JOR_' . strtoupper(Str::random(6)),
+            'cod_jornada' => 'JOR_'.strtoupper(Str::random(6)),
 
             'cod_turno' => $this->turno->cod_turno,
 
@@ -178,13 +145,11 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         // 7. Asignacion Personal a Jornada
 
         AsignacionPersonal::create([
 
-            'cod_asignacion_personal' => 'ASP_' . strtoupper(Str::random(6)),
+            'cod_asignacion_personal' => 'ASP_'.strtoupper(Str::random(6)),
 
             'cod_jornada' => $this->jornada->cod_jornada,
 
@@ -202,13 +167,11 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         // 8. Residentes: uno asignado, uno ajeno
 
         $this->residenteAsignado = Residente::crearDesdeAdmision([
 
-            'cod_residente' => 'RES_' . strtoupper(Str::random(6)),
+            'cod_residente' => 'RES_'.strtoupper(Str::random(6)),
 
             'nombres' => 'Carlos',
 
@@ -224,11 +187,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         $this->residenteAjeno = Residente::crearDesdeAdmision([
 
-            'cod_residente' => 'RES_' . strtoupper(Str::random(6)),
+            'cod_residente' => 'RES_'.strtoupper(Str::random(6)),
 
             'nombres' => 'Alberto',
 
@@ -244,13 +205,11 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         // 9. Asignacion Residente Jornada (Carlos a Elena)
 
         AsignacionResidenteJornada::create([
 
-            'cod_asignacion' => 'ARJ_' . strtoupper(Str::random(6)),
+            'cod_asignacion' => 'ARJ_'.strtoupper(Str::random(6)),
 
             'cod_jornada' => $this->jornada->cod_jornada,
 
@@ -268,10 +227,7 @@ class MiTurnoServiceTest extends TestCase
 
     }
 
-
-
     protected function tearDown(): void
-
     {
 
         Carbon::setTestNow();
@@ -280,17 +236,12 @@ class MiTurnoServiceTest extends TestCase
 
     }
 
-
-
     public function test_resuelve_enfermera_jornada_y_area_correctamente(): void
-
     {
 
         $service = app(MiTurnoService::class);
 
         $data = $service->obtenerDatosDashboard($this->enfermeraUser);
-
-
 
         $this->assertEquals($this->enfermeraUser->cod_usuario, $data['usuario']['cod_usuario']);
 
@@ -304,17 +255,12 @@ class MiTurnoServiceTest extends TestCase
 
     }
 
-
-
     public function test_filtra_estrictamente_residentes_asignados_a_la_enfermera(): void
-
     {
 
         $service = app(MiTurnoService::class);
 
         $data = $service->obtenerDatosDashboard($this->enfermeraUser);
-
-
 
         $residentes = $data['residentes'];
 
@@ -326,10 +272,7 @@ class MiTurnoServiceTest extends TestCase
 
     }
 
-
-
     public function test_obtiene_ubicacion_real_de_cama_activa_o_indica_sin_ubicacion(): void
-
     {
 
         // 1. Inicialmente sin cama asignada
@@ -340,13 +283,11 @@ class MiTurnoServiceTest extends TestCase
 
         $this->assertEquals('Sin ubicación asignada', $data['residentes'][0]['ubicacion']);
 
-
-
         // 2. Asignar cama real activa
 
         $habitacion = Habitacion::create([
 
-            'cod_habitacion' => 'HAB_' . strtoupper(Str::random(6)),
+            'cod_habitacion' => 'HAB_'.strtoupper(Str::random(6)),
 
             'codigo' => '204',
 
@@ -360,11 +301,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         $cama = Cama::create([
 
-            'cod_cama' => 'CAM_' . strtoupper(Str::random(6)),
+            'cod_cama' => 'CAM_'.strtoupper(Str::random(6)),
 
             'cod_habitacion' => $habitacion->cod_habitacion,
 
@@ -376,11 +315,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
+        $admision = Admision::create([
 
-
-        $admision = \App\Models\Admision::create([
-
-            'cod_admision' => 'ADM_' . strtoupper(Str::random(6)),
+            'cod_admision' => 'ADM_'.strtoupper(Str::random(6)),
 
             'cod_residente' => $this->residenteAsignado->cod_residente,
 
@@ -396,11 +333,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         OcupacionCama::create([
 
-            'cod_ocupacion' => 'OCU_' . strtoupper(Str::random(6)),
+            'cod_ocupacion' => 'OCU_'.strtoupper(Str::random(6)),
 
             'cod_admision' => $admision->cod_admision,
 
@@ -416,23 +351,16 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         $dataWithBed = $service->obtenerDatosDashboard($this->enfermeraUser);
 
         $this->assertEquals('Hab. 204 · Cama B', $dataWithBed['residentes'][0]['ubicacion']);
 
     }
 
-
-
     public function test_kpis_alertas_y_estado_general_se_derivan_de_alertas_reales(): void
-
     {
 
         $service = app(MiTurnoService::class);
-
-
 
         // Sin alertas -> estado operativo neutral, no estabilidad clínica inferida
 
@@ -450,13 +378,11 @@ class MiTurnoServiceTest extends TestCase
         $this->assertSame(0, $dataSinAlertas['alertas_pendientes_count']);
         $this->assertSame([], $dataSinAlertas['alertas_prioritarias']);
 
-
-
         // Insertar alerta para residente asignado
 
         DB::table('alertas')->insert([
 
-            'cod_alerta' => 'ALA_' . strtoupper(Str::random(6)),
+            'cod_alerta' => 'ALA_'.strtoupper(Str::random(6)),
 
             'cod_residente' => $this->residenteAsignado->cod_residente,
 
@@ -476,13 +402,11 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         // Insertar alerta ajena que NO debe contarse
 
         DB::table('alertas')->insert([
 
-            'cod_alerta' => 'ALA_' . strtoupper(Str::random(6)),
+            'cod_alerta' => 'ALA_'.strtoupper(Str::random(6)),
 
             'cod_residente' => $this->residenteAjeno->cod_residente,
 
@@ -502,11 +426,7 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         $dataConAlertas = $service->obtenerDatosDashboard($this->enfermeraUser);
-
-
 
         // Solo 1 alerta pertenece a la enfermera
 
@@ -524,17 +444,12 @@ class MiTurnoServiceTest extends TestCase
 
     }
 
-
-
     public function test_progreso_del_turno_es_null_si_total_es_cero(): void
-
     {
 
         $service = app(MiTurnoService::class);
 
         $data = $service->obtenerDatosDashboard($this->enfermeraUser);
-
-
 
         $this->assertEquals(0, $data['estado_tareas']['total']);
 
@@ -542,21 +457,14 @@ class MiTurnoServiceTest extends TestCase
 
     }
 
-
-
     public function test_aislamiento_de_seguridad_bloquea_residente_ajeno(): void
-
     {
 
         $service = app(MiTurnoService::class);
 
-
-
         // Residente asignado: autoriza true
 
         $this->assertTrue($service->autorizarAccesoResidente($this->enfermeraUser, $this->residenteAsignado->cod_residente));
-
-
 
         // Residente ajeno: lanza 403 HttpException
 
@@ -568,15 +476,10 @@ class MiTurnoServiceTest extends TestCase
 
     }
 
-
-
     public function test_dashboard_es_estrictamente_solo_lectura(): void
-
     {
 
         Auth::login($this->enfermeraUser);
-
-
 
         $countAlertasBefore = DB::table('alertas')->count();
 
@@ -584,11 +487,9 @@ class MiTurnoServiceTest extends TestCase
 
         $countResidentesBefore = DB::table('residentes')->count();
 
-
-
         // Render Livewire
 
-        Livewire::test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\DashboardTurno::class)
+        Livewire::test(DashboardTurno::class)
 
             // La bienvenida compartida sustituye el título compacto «Mi turno».
             ->assertSee('CENTRO GERIÁTRICO LOS ALMENDROS')
@@ -598,8 +499,6 @@ class MiTurnoServiceTest extends TestCase
 
             ->assertSee('Residentes del turno');
 
-
-
         $this->assertEquals($countAlertasBefore, DB::table('alertas')->count());
 
         $this->assertEquals($countJornadasBefore, DB::table('jornadas')->count());
@@ -608,21 +507,16 @@ class MiTurnoServiceTest extends TestCase
 
     }
 
-
-
     public function test_distribucion_cuidados_usa_categorias_reales_de_planes_y_medicacion(): void
-
     {
 
         $service = app(MiTurnoService::class);
 
-
-
         // Crear plan de cuidado real para Carlos
 
-        $plan = \App\Models\PlanCuidado::create([
+        $plan = PlanCuidado::create([
 
-            'cod_plan' => 'PLC_' . strtoupper(Str::random(6)),
+            'cod_plan' => 'PLC_'.strtoupper(Str::random(6)),
 
             'cod_residente' => $this->residenteAsignado->cod_residente,
 
@@ -640,13 +534,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         $data = $service->obtenerDatosDashboard($this->enfermeraUser);
 
         $dist = $data['distribucion_cuidados'];
-
-
 
         $this->assertNotEmpty($dist);
 
@@ -658,19 +548,14 @@ class MiTurnoServiceTest extends TestCase
 
     }
 
-
-
     public function test_agenda_unificada_y_estados_calculados_en_memoria(): void
-
     {
 
         $service = app(MiTurnoService::class);
 
+        $medicamento = Medicamento::create([
 
-
-        $medicamento = \App\Models\Medicamento::create([
-
-            'cod_medicamento' => 'MED_' . strtoupper(Str::random(6)),
+            'cod_medicamento' => 'MED_'.strtoupper(Str::random(6)),
 
             'nombre_generico' => 'Paracetamol',
 
@@ -686,11 +571,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
+        $atencion = Atencion::create([
 
-
-        $atencion = \App\Models\Atencion::create([
-
-            'cod_atencion' => 'ATE_' . strtoupper(Str::random(6)),
+            'cod_atencion' => 'ATE_'.strtoupper(Str::random(6)),
 
             'cod_residente' => $this->residenteAsignado->cod_residente,
 
@@ -708,11 +591,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
+        $prescripcion = Prescripcion::create([
 
-
-        $prescripcion = \App\Models\Prescripcion::create([
-
-            'cod_prescripcion' => 'PRE_' . strtoupper(Str::random(6)),
+            'cod_prescripcion' => 'PRE_'.strtoupper(Str::random(6)),
 
             'cod_residente' => $this->residenteAsignado->cod_residente,
 
@@ -738,11 +619,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
+        $horario = HorarioPrescripcion::create([
 
-
-        $horario = \App\Models\HorarioPrescripcion::create([
-
-            'cod_horario_prescripcion' => 'HPR_' . strtoupper(Str::random(6)),
+            'cod_horario_prescripcion' => 'HPR_'.strtoupper(Str::random(6)),
 
             'cod_prescripcion' => $prescripcion->cod_prescripcion,
 
@@ -754,13 +633,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         $data = $service->obtenerDatosDashboard($this->enfermeraUser);
 
         $agenda = $data['agenda'];
-
-
 
         $this->assertCount(1, $agenda);
 
@@ -772,15 +647,12 @@ class MiTurnoServiceTest extends TestCase
 
     }
 
-
-
     public function test_dashboard_retorna_sin_jornada_activa_si_no_esta_asignada_al_profesional(): void
-
     {
 
         $otroUser = User::create([
 
-            'cod_usuario' => 'USU_' . strtoupper(Str::random(6)),
+            'cod_usuario' => 'USU_'.strtoupper(Str::random(6)),
 
             'correo' => 'otro.enfermero@remembermind.test',
 
@@ -792,11 +664,9 @@ class MiTurnoServiceTest extends TestCase
 
         $otroUser->assignRole('ENFERMEROS');
 
-
-
         Personal::create([
 
-            'cod_personal' => 'PER_' . strtoupper(Str::random(6)),
+            'cod_personal' => 'PER_'.strtoupper(Str::random(6)),
 
             'cod_usuario' => $otroUser->cod_usuario,
 
@@ -812,13 +682,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         $service = app(MiTurnoService::class);
 
         $data = $service->obtenerDatosDashboard($otroUser);
-
-
 
         $this->assertEquals('FUERA_DE_TURNO', $data['modo']);
 
@@ -828,65 +694,49 @@ class MiTurnoServiceTest extends TestCase
 
         $this->assertTrue($data['es_modo_consulta']);
 
-        $this->assertNotEmpty($data['residentes']);
-
-        $this->assertEquals($this->residenteAsignado->cod_residente, $data['residentes'][0]['cod_residente']);
-
-        $this->assertEquals('A cargo de: Enf. Elena Salazar', $data['residentes'][0]['responsable_texto']);
+        // Decisión del propietario: fuera de turno no hereda residentes del equipo.
+        $this->assertEmpty($data['residentes']);
+        $this->assertEmpty($data['agenda']);
 
     }
 
-
-
-    public function test_dashboard_retorna_sin_jornada_activa_si_hora_actual_fuera_del_turno(): void
-
+    public function test_dashboard_fuera_de_horario_conserva_solo_consulta_de_asignaciones_propias(): void
     {
 
         $service = app(MiTurnoService::class);
-
-
 
         // Turno mañana es de 07:00 a 15:00. Simulamos 16:30 (fuera de horario)
 
         Carbon::setTestNow(Carbon::today()->setTime(16, 30, 0));
 
-
-
         $data = $service->obtenerDatosDashboard($this->enfermeraUser);
-
-
 
         $this->assertEquals('FUERA_DE_TURNO', $data['modo']);
 
         $this->assertTrue($data['es_modo_consulta']);
 
-        $this->assertNull($data['jornada']);
+        $this->assertFalse($data['jornada']['activa']);
 
-        $this->assertEmpty($data['residentes']);
+        $this->assertSame([$this->residenteAsignado->cod_residente], array_column($data['residentes'], 'cod_residente'));
 
         $this->assertEmpty($data['agenda']);
 
         $this->assertEquals(0, $data['alertas']);
 
-        $this->assertNull($data['progreso']);
+        $this->assertNull($data['progreso']['cumplimiento']);
 
     }
 
-
-
     public function test_dashboard_soporta_turnos_nocturnos_donde_hora_cierre_menor_a_hora_inicio(): void
-
     {
 
         $service = app(MiTurnoService::class);
-
-
 
         // Turno nocturno: 22:00 a 06:00
 
         $turnoNoche = Turno::create([
 
-            'cod_turno' => 'TUR_' . strtoupper(Str::random(6)),
+            'cod_turno' => 'TUR_'.strtoupper(Str::random(6)),
 
             'nombre' => 'Noche',
 
@@ -898,13 +748,11 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         // Jornada que inició ayer a las 22:00
 
         $jornadaNoche = Jornada::create([
 
-            'cod_jornada' => 'JOR_' . strtoupper(Str::random(6)),
+            'cod_jornada' => 'JOR_'.strtoupper(Str::random(6)),
 
             'cod_turno' => $turnoNoche->cod_turno,
 
@@ -914,17 +762,13 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         // Desactivar asignación anterior y asignar jornada noche
 
         AsignacionPersonal::where('cod_personal', $this->enfermeraPersonal->cod_personal)->update(['estado' => 'INACTIVO']);
 
-
-
         AsignacionPersonal::create([
 
-            'cod_asignacion_personal' => 'ASP_' . strtoupper(Str::random(6)),
+            'cod_asignacion_personal' => 'ASP_'.strtoupper(Str::random(6)),
 
             'cod_jornada' => $jornadaNoche->cod_jornada,
 
@@ -942,17 +786,11 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         // Simular las 03:00 de la madrugada de hoy (dentro del turno que cruzó medianoche)
 
         Carbon::setTestNow(Carbon::today()->setTime(3, 0, 0));
 
-
-
         $data = $service->obtenerDatosDashboard($this->enfermeraUser);
-
-
 
         $this->assertEquals('ACTIVA', $data['estado']);
 
@@ -962,27 +800,18 @@ class MiTurnoServiceTest extends TestCase
 
     }
 
-
-
     public function test_dashboard_no_reutiliza_jornadas_anteriores_ni_futuras(): void
-
     {
 
         $service = app(MiTurnoService::class);
-
-
 
         // Simular fecha de mañana
 
         Carbon::setTestNow(Carbon::tomorrow()->setTime(10, 0, 0));
 
-
-
         // La jornada registrada es de hoy, no de mañana
 
         $data = $service->obtenerDatosDashboard($this->enfermeraUser);
-
-
 
         $this->assertEquals('FUERA_DE_TURNO', $data['modo']);
 
@@ -1000,21 +829,16 @@ class MiTurnoServiceTest extends TestCase
 
     }
 
-
-
     public function test_kpi_no_cuenta_alertas_historicas_cerradas(): void
-
     {
 
         $service = app(MiTurnoService::class);
-
-
 
         // 1. Alerta cerrada antigua (de ayer): NO debe contarse en el turno
 
         DB::table('alertas')->insert([
 
-            'cod_alerta' => 'ALA_OLD_' . strtoupper(Str::random(4)),
+            'cod_alerta' => 'ALA_OLD_'.strtoupper(Str::random(4)),
 
             'cod_residente' => $this->residenteAsignado->cod_residente,
 
@@ -1034,13 +858,11 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         // 2. Alerta persistente que venía activa desde ayer: SÍ debe contarse en el turno
 
         DB::table('alertas')->insert([
 
-            'cod_alerta' => 'ALA_ACT_' . strtoupper(Str::random(4)),
+            'cod_alerta' => 'ALA_ACT_'.strtoupper(Str::random(4)),
 
             'cod_residente' => $this->residenteAsignado->cod_residente,
 
@@ -1060,13 +882,11 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         // 3. Alerta nueva creada durante la jornada de hoy: SÍ debe contarse
 
         DB::table('alertas')->insert([
 
-            'cod_alerta' => 'ALA_NOW_' . strtoupper(Str::random(4)),
+            'cod_alerta' => 'ALA_NOW_'.strtoupper(Str::random(4)),
 
             'cod_residente' => $this->residenteAsignado->cod_residente,
 
@@ -1086,11 +906,7 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         $data = $service->obtenerDatosDashboard($this->enfermeraUser);
-
-
 
         // De las 3 alertas del residente, solo 2 corresponden a la jornada actual
 
@@ -1104,21 +920,16 @@ class MiTurnoServiceTest extends TestCase
 
     }
 
-
-
     public function test_agenda_incluye_pendientes_aunque_todavia_no_tengan_ejecucion(): void
-
     {
 
         $service = app(MiTurnoService::class);
 
-
-
         // Medicación programada sin administración
 
-        $medicamento = \App\Models\Medicamento::create([
+        $medicamento = Medicamento::create([
 
-            'cod_medicamento' => 'MED_' . strtoupper(Str::random(6)),
+            'cod_medicamento' => 'MED_'.strtoupper(Str::random(6)),
 
             'nombre_generico' => 'Enalapril',
 
@@ -1134,11 +945,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
+        $atencion = Atencion::create([
 
-
-        $atencion = \App\Models\Atencion::create([
-
-            'cod_atencion' => 'ATE_' . strtoupper(Str::random(6)),
+            'cod_atencion' => 'ATE_'.strtoupper(Str::random(6)),
 
             'cod_residente' => $this->residenteAsignado->cod_residente,
 
@@ -1156,11 +965,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
+        $prescripcion = Prescripcion::create([
 
-
-        $prescripcion = \App\Models\Prescripcion::create([
-
-            'cod_prescripcion' => 'PRE_' . strtoupper(Str::random(6)),
+            'cod_prescripcion' => 'PRE_'.strtoupper(Str::random(6)),
 
             'cod_residente' => $this->residenteAsignado->cod_residente,
 
@@ -1186,11 +993,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
+        HorarioPrescripcion::create([
 
-
-        \App\Models\HorarioPrescripcion::create([
-
-            'cod_horario_prescripcion' => 'HPR_' . strtoupper(Str::random(6)),
+            'cod_horario_prescripcion' => 'HPR_'.strtoupper(Str::random(6)),
 
             'cod_prescripcion' => $prescripcion->cod_prescripcion,
 
@@ -1202,13 +1007,11 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         // Cuidado programado sin ejecución
 
-        $plan = \App\Models\PlanCuidado::create([
+        $plan = PlanCuidado::create([
 
-            'cod_plan' => 'PLC_' . strtoupper(Str::random(6)),
+            'cod_plan' => 'PLC_'.strtoupper(Str::random(6)),
 
             'cod_residente' => $this->residenteAsignado->cod_residente,
 
@@ -1226,11 +1029,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
+        $intervencion = IntervencionCuidado::create([
 
-
-        $intervencion = \App\Models\IntervencionCuidado::create([
-
-            'cod_intervencion' => 'INT_' . strtoupper(Str::random(6)),
+            'cod_intervencion' => 'INT_'.strtoupper(Str::random(6)),
 
             'cod_plan' => $plan->cod_plan,
 
@@ -1244,11 +1045,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
+        ProgramacionCuidado::create([
 
-
-        \App\Models\ProgramacionCuidado::create([
-
-            'cod_programacion' => 'PRC_' . strtoupper(Str::random(6)),
+            'cod_programacion' => 'PRC_'.strtoupper(Str::random(6)),
 
             'cod_intervencion' => $intervencion->cod_intervencion,
 
@@ -1264,13 +1063,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         $data = $service->obtenerDatosDashboard($this->enfermeraUser);
 
         $agenda = $data['agenda'];
-
-
 
         // Ambas tareas deben figurar en la agenda aunque NO tengan ejecuciones todavía
 
@@ -1286,19 +1081,14 @@ class MiTurnoServiceTest extends TestCase
 
     }
 
-
-
     public function test_ejecucion_cuidado_funciona_sin_cod_programacion(): void
-
     {
 
         $service = app(MiTurnoService::class);
 
+        $plan = PlanCuidado::create([
 
-
-        $plan = \App\Models\PlanCuidado::create([
-
-            'cod_plan' => 'PLC_' . strtoupper(Str::random(6)),
+            'cod_plan' => 'PLC_'.strtoupper(Str::random(6)),
 
             'cod_residente' => $this->residenteAsignado->cod_residente,
 
@@ -1316,11 +1106,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
+        $intervencion = IntervencionCuidado::create([
 
-
-        $intervencion = \App\Models\IntervencionCuidado::create([
-
-            'cod_intervencion' => 'INT_' . strtoupper(Str::random(6)),
+            'cod_intervencion' => 'INT_'.strtoupper(Str::random(6)),
 
             'cod_plan' => $plan->cod_plan,
 
@@ -1334,11 +1122,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
+        ProgramacionCuidado::create([
 
-
-        \App\Models\ProgramacionCuidado::create([
-
-            'cod_programacion' => 'PRC_' . strtoupper(Str::random(6)),
+            'cod_programacion' => 'PRC_'.strtoupper(Str::random(6)),
 
             'cod_intervencion' => $intervencion->cod_intervencion,
 
@@ -1354,13 +1140,11 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         // Registrar EjecucionCuidado vinculada por cod_intervencion + cod_residente + cod_jornada (SIN cod_programacion)
 
-        \App\Models\EjecucionCuidado::create([
+        EjecucionCuidado::create([
 
-            'cod_ejecucion' => 'EJC_' . strtoupper(Str::random(6)),
+            'cod_ejecucion' => 'EJC_'.strtoupper(Str::random(6)),
 
             'cod_intervencion' => $intervencion->cod_intervencion,
 
@@ -1382,13 +1166,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         $data = $service->obtenerDatosDashboard($this->enfermeraUser);
 
         $agenda = $data['agenda'];
-
-
 
         $this->assertCount(1, $agenda);
 
@@ -1400,15 +1180,10 @@ class MiTurnoServiceTest extends TestCase
 
     }
 
-
-
     public function test_tarea_vencida_cambia_estado_general_a_vigilancia(): void
-
     {
 
         $service = app(MiTurnoService::class);
-
-
 
         // Sin tareas ni alertas -> estado operativo neutral
 
@@ -1416,13 +1191,11 @@ class MiTurnoServiceTest extends TestCase
 
         $this->assertEquals('SIN ALERTAS', $dataInicial['estado_general']['badge']);
 
-
-
         // Crear una prescripción con horario a las 08:00 (en setUp son las 10:00, vencida por > 60 min)
 
-        $medicamento = \App\Models\Medicamento::create([
+        $medicamento = Medicamento::create([
 
-            'cod_medicamento' => 'MED_' . strtoupper(Str::random(6)),
+            'cod_medicamento' => 'MED_'.strtoupper(Str::random(6)),
 
             'nombre_generico' => 'Amlodipino',
 
@@ -1438,11 +1211,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
+        $atencion = Atencion::create([
 
-
-        $atencion = \App\Models\Atencion::create([
-
-            'cod_atencion' => 'ATE_' . strtoupper(Str::random(6)),
+            'cod_atencion' => 'ATE_'.strtoupper(Str::random(6)),
 
             'cod_residente' => $this->residenteAsignado->cod_residente,
 
@@ -1460,11 +1231,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
+        $prescripcion = Prescripcion::create([
 
-
-        $prescripcion = \App\Models\Prescripcion::create([
-
-            'cod_prescripcion' => 'PRE_' . strtoupper(Str::random(6)),
+            'cod_prescripcion' => 'PRE_'.strtoupper(Str::random(6)),
 
             'cod_residente' => $this->residenteAsignado->cod_residente,
 
@@ -1490,11 +1259,9 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
+        HorarioPrescripcion::create([
 
-
-        \App\Models\HorarioPrescripcion::create([
-
-            'cod_horario_prescripcion' => 'HPR_' . strtoupper(Str::random(6)),
+            'cod_horario_prescripcion' => 'HPR_'.strtoupper(Str::random(6)),
 
             'cod_prescripcion' => $prescripcion->cod_prescripcion,
 
@@ -1506,11 +1273,7 @@ class MiTurnoServiceTest extends TestCase
 
         ]);
 
-
-
         $dataConVencida = $service->obtenerDatosDashboard($this->enfermeraUser);
-
-
 
         // La tarea está retrasada
 
@@ -1548,8 +1311,8 @@ class MiTurnoServiceTest extends TestCase
         $crear('INC_TREND_02', $this->residenteAsignado->cod_residente, $hoy->copy()->subDays(7)->endOfDay());
         $crear('INC_TREND_03', $this->residenteAjeno->cod_residente, $hoy->copy()->setTime(9, 0));
 
-        $resumen = app(\App\Modulos\Alertas\Aplicacion\Consultas\TendenciaIncidentesService::class)
-            ->resumir([$this->residenteAsignado->cod_residente], \Carbon\CarbonImmutable::instance($hoy));
+        $resumen = app(TendenciaIncidentesService::class)
+            ->resumir([$this->residenteAsignado->cod_residente], CarbonImmutable::instance($hoy));
 
         $this->assertSame(1, $resumen['total_periodo']);
         $this->assertSame(1, $resumen['total_anterior']);
@@ -1557,7 +1320,7 @@ class MiTurnoServiceTest extends TestCase
         $this->assertSame(1, $resumen['datasets'][0]['data'][0]);
 
         Auth::login($this->enfermeraUser);
-        Livewire::test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\DashboardTurno::class)
+        Livewire::test(DashboardTurno::class)
             ->assertSee('Total semanal')
             ->assertSee('Caída')
             ->assertSee('Últimos 7 días · residentes de mi turno');
@@ -1568,7 +1331,7 @@ class MiTurnoServiceTest extends TestCase
         $this->jornada->update(['estado' => 'CERRADA']);
         Auth::login($this->enfermeraUser);
 
-        Livewire::test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\DashboardTurno::class)
+        Livewire::test(DashboardTurno::class)
             ->assertSee('La evolución aparecerá con un turno activo.')
             ->assertDontSee('Sin incidentes registrados en los últimos 7 días.');
     }

@@ -847,8 +847,12 @@ class MisPacientes extends Component
     public function puedeRegistrar(): bool
     {
         $usuario = auth()->user();
+        $service = $this->getTurnoService();
+        $turno = $service->obtenerTurnoActivo($usuario);
+        $asignacionVigente = $this->detalleResidente && $turno
+            && $service->esPacienteAsignado($this->detalleResidente['cod_residente'], $usuario, $turno->cod_turno);
 
-        return ! $this->esModoConsulta
+        return $asignacionVigente && ! $this->esModoConsulta
             && $this->esResidenteAsignado
             && $usuario?->estado === 'ACTIVO'
             && ! app(RolePreviewService::class)->isActive($usuario)
@@ -2701,6 +2705,19 @@ class MisPacientes extends Component
         $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Procedimiento registrado correctamente.']);
     }
 
+    public function hydrate(): void
+    {
+        $usuario = Auth::user();
+        $service = $this->getTurnoService();
+        $turno = $service->obtenerTurnoActivo($usuario);
+        $this->esModoConsulta = $turno === null && ! $service->esSuperAdmin($usuario);
+        if ($this->detalleResidente && ! $service->tieneLecturaClinicaGlobal($usuario)) {
+            $service->autorizarConsultaResidente($this->detalleResidente['cod_residente'], $usuario);
+            $this->esResidenteAsignado = $turno !== null
+                && $service->esPacienteAsignado($this->detalleResidente['cod_residente'], $usuario, $turno->cod_turno);
+        }
+    }
+
     // ─── RENDER ─────────────────────────────────────────────────────
 
     public function render()
@@ -2711,10 +2728,15 @@ class MisPacientes extends Component
         $esSuperAdmin = $service->esSuperAdmin($user);
         $tieneLecturaClinicaGlobal = $service->tieneLecturaClinicaGlobal($user);
         $turnoActual = $service->obtenerTurnoActivo($user);
+        $this->esModoConsulta = $turnoActual === null && ! $esSuperAdmin;
+        if ($this->detalleResidente && ! $tieneLecturaClinicaGlobal) {
+            $this->esResidenteAsignado = $turnoActual !== null
+                && $service->esPacienteAsignado($this->detalleResidente['cod_residente'], $user, $turnoActual->cod_turno);
+        }
 
         // Asegurar que enfermero estándar no pueda burlar el filtro
         $enfermeroEfectivo = $tieneLecturaClinicaGlobal ? $this->filtroEnfermero : (string) $user?->cod_usuario;
-        $turnoEfectivo = $this->filtroTurno ?: null;
+        $turnoEfectivo = $tieneLecturaClinicaGlobal ? ($this->filtroTurno ?: null) : $turnoActual?->cod_turno;
 
         $errorCarga = false;
         try {

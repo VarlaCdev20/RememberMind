@@ -36,8 +36,8 @@
     $horaLocal = now()->timezone($zonaHoraria)->hour;
     $saludo = $horaLocal < 12 ? 'Buenos días' : ($horaLocal < 19 ? 'Buenas tardes' : 'Buenas noches');
     $contextoTurno = $estado === 'SIN_JORNADA_ACTIVA'
-        ? 'No tienes un turno activo en este momento. Revisa los indicadores del centro.'
-        : ($modo === 'FUERA_DE_TURNO' ? 'Turno del equipo disponible en modo consulta. Revisa los indicadores del centro.' : 'Cuidados y seguimiento de tu turno. Revisa pendientes y alertas.');
+        ? 'No tienes residentes asignados para consultar hoy. El registro clínico está deshabilitado fuera de turno.'
+        : ($modo === 'FUERA_DE_TURNO' ? 'Fuera de turno: consulta únicamente tus residentes asignados. El registro clínico está deshabilitado.' : 'Cuidados y seguimiento de tu turno. Revisa pendientes y alertas.');
 @endphp
 
 <x-ui.dashboard-header
@@ -47,7 +47,7 @@
     :role="$rolVisible"
     :image="$compact ? null : asset($image)"
     :compact="$compact"
-    :scope="$scope ?? ($modo === 'FUERA_DE_TURNO' ? 'Turno del equipo · Consulta' : 'Cuidados y seguimiento')"
+    :scope="$scope ?? ($modo === 'FUERA_DE_TURNO' ? 'Mis residentes asignados · Solo consulta' : 'Cuidados y seguimiento')"
     data-time-zone="{{ $zonaHoraria }}"
     {{ $attributes }}
 >

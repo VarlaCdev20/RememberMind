@@ -199,7 +199,7 @@ class RegistrosEnfermeria extends Component
 
     private function autorizar(string $codResidente): void
     {
-        app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($codResidente, Auth::user());
+        app(TurnoEnfermeriaService::class)->autorizarConsultaResidente($codResidente, Auth::user());
     }
 
     private function autorizarMutacion(string $codResidente): void
@@ -551,7 +551,10 @@ class RegistrosEnfermeria extends Component
             $registrosCuidado = $modelo::where('cod_residente', $this->codResidente)->latest($fecha)->limit(12)->get();
         }
 
-        return view('livewire.cuidados.registros-enfermeria', compact('pacientes', 'adulto', 'esSuperAdmin', 'intervencionesActivas', 'registrosCuidado'))
+        $modoConsulta = Auth::user()?->hasRole('ENFERMEROS')
+            && (! $this->codResidente || ! $turnos->esPacienteAsignado($this->codResidente, Auth::user()));
+
+        return view('livewire.cuidados.registros-enfermeria', compact('pacientes', 'adulto', 'esSuperAdmin', 'intervencionesActivas', 'registrosCuidado', 'modoConsulta'))
             ->layout('layouts.enfermeria');
     }
 }

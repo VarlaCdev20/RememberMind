@@ -295,14 +295,14 @@
                             </span>
 
                             {{-- Acción Registrar --}}
-                            @if(!$esRealizada)
+                            @if(!$esRealizada && $puedeRegistrar)
                                 <button type="button"
                                     wire:click="abrirModalRegistrar('{{ $item['cod_intervencion'] }}', '{{ $item['cod_residente'] }}', '{{ $item['cod_programacion'] }}', '{{ $item['hora_programada'] }}')"
                                     class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[var(--rm-warning)] hover:bg-[var(--rm-warning)] text-white shadow-2xs transition cursor-pointer">
                                     <i class="ph ph-pencil-simple-line"></i>
                                     <span>Registrar</span>
                                 </button>
-                            @else
+                            @elseif($esRealizada)
                                 <span class="text-[11px] font-semibold text-[var(--rm-action-primary)] dark:text-[var(--rm-success)] inline-flex items-center gap-1">
                                     <i class="ph ph-check-circle"></i>
                                     <span>Firmada</span>

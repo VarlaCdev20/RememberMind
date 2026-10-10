@@ -24,6 +24,80 @@ Fase 2 fue una revisión estática. Fase 3 ejecutó verificación acotada en Pos
 
 ## 1. Propósito
 
+### Consulta de Enfermería fuera de turno — decisión del propietario, 2026-10-10
+
+Fuera de turno, Enfermería consulta **solo sus residentes asignados**, sin heredar
+el acceso a residentes de otros enfermeros del equipo de guardia. Este criterio
+sustituye la consulta del equipo descrita anteriormente para «Mi turno».
+
+La implementación comparte el alcance entre «Mi turno», «Mis residentes»,
+resumen, ficha y Medicación: cuenta/personal activos, asignación asistencial
+ACTIVA/ACTIVO/ASIGNADO y jornada ABIERTA/ACTIVA/EN_CURSO/ACTIVO de hoy. La guardia
+nocturna iniciada ayer conserva su contexto mientras su ventana horaria siga
+en curso. No se recuperan asignaciones históricas finalizadas ni revocadas.
+
+Consultar fuera del horario no habilita registro, administración, ejecución ni
+atención/cierre de alertas. La autorización de escritura comprueba nuevamente
+hora, asignación, permiso y contexto profesional en backend; APP_ENV=testing
+no sustituye una guardia real. Una jornada visible para consulta no se presenta
+como activa. La pantalla actualiza el modo en la siguiente interacción/render.
+
+No cambia el esquema, las competencias profesionales ni los permisos globales
+de lectura de Superadministración.
+
+El historial de pases conserva su contrato específico de continuidad: emisor,
+destinatario o asignación propia al residente en la jornada saliente/entrante.
+La lista y el detalle aplican ahora el mismo alcance; no se lista el historial
+ajeno del equipo.
+
+#### Evidencia histórica del cambio original (2026-10-10, `ed6df0e6`)
+
+Las cifras siguientes corresponden a la corrección original en `ARQUITECTURA`,
+antes de integrarla en la arquitectura modular. No son resultados de esta
+integración; sus verificaciones se documentan por separado.
+
+- Regresión de Enfermería: `MiTurnoFueraDeJornadaTest`, `MiTurnoServiceTest`,
+  `MisResidentesNavegacionTest`, `MisPacientesRedisenadaTest`,
+  `ModalesMedicacionSeguridadClinicaTest`, `SeguimientoDiarioPersistenciaTest`:
+  218 PASS / 2054 aserciones.
+- Pases/atomicidad y consulta de cuidados, tras los últimos ajustes:
+  42 PASS / 226 aserciones. Dos negativos adicionales (testing sin reloj
+  simulado y enfermero sin personal): 2 PASS / 7 aserciones.
+- Suite PHP completa: 970 PASS, 15 SKIP, 24 FAIL en la ejecución iniciada
+  antes de terminar el parche. Los 24 fallos tenían la misma causa:
+  clase de cuidados ya cargada sin la variable nueva `modoConsulta`.
+  Repetidos los 24 casos sobre el código actualizado: 24 PASS / 329 aserciones.
+  No se afirma una segunda ejecución completa íntegramente verde.
+- `npm run build`: PASS. Sintaxis PHP y `git diff --check`: PASS.
+- Navegador, PostgreSQL aislado y datos sintéticos: resumen y ficha propios
+  accesibles fuera de turno; aviso de solo lectura y acciones de registro
+  ocultas. Turno original de QA restaurado. Consulta correlacionada de pases
+  ejecutada en PostgreSQL; persistencia nocturna y denegaciones cubiertas
+  por pruebas SQLite.
+
+La evidencia está en `storage/app/qa/fuera-turno-*` (artefactos locales
+excluidos de Git). Es verificación del cambio, no certificación global del
+módulo, de producción ni de accesibilidad. No hubo cambios de esquema ni
+mutaciones de datos reales.
+
+#### Integración en la arquitectura modular (2026-10-10)
+
+La corrección de `ed6df0e6` se integra en Cuidados, Clínica y Medicación,
+conservando las acciones extraídas. `RegistrosEnfermeria` siempre entrega
+`modoConsulta` a la vista; la incorporación documental verifica la asignación
+y el turno también en el caso de uso, antes de guardar archivos o registros.
+
+Las pruebas positivas que requieren una jornada activa fijan el reloj dentro
+de ella; el entorno de pruebas no permite omitir el control horario. La prueba
+frontend del footer público verifica el token global, sin atribuirle la
+sobrescritura de color del shell autenticado.
+
+Verificación de esta integración: 41 pruebas / 222 aserciones en PostgreSQL
+aislado (consulta, alcance, denegación fuera de turno y documentos); 19 pruebas
+/ 223 aserciones de la base operativa en SQLite; 147 pruebas frontend y
+compilación Vite correctas. Los resultados de la ejecución PHP completa se
+entregan por separado, sin reutilizar las cifras históricas anteriores.
+
 Separar catálogo de turno, jornada real y asignaciones laborales/asistenciales.
 
 ## 2. Alcance
@@ -64,7 +138,8 @@ Planificar jornada/plaza; asignar residente explícitamente; resolver contexto p
 
 ## 11. Flujos alternativos
 
-Sin personal/jornada no se fabrica contexto. Noche puede cruzar fecha; testing tiene fallback de hora que no certifica ventana real.
+Sin personal/jornada no se fabrica contexto. Noche puede cruzar fecha; la ventana
+horaria se verifica también en testing, sin habilitar guardias por entorno.
 
 ## 12. Validaciones técnicas
 

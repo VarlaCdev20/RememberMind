@@ -322,12 +322,14 @@
             <div class="flex flex-wrap items-center gap-2 self-start sm:self-auto">
                 @if(app(\App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService::class)
                     ->tieneRol(Auth::user(), ['MEDICO GENERAL/GERIATRA']) && Auth::user()?->can('prescripciones.crear'))
-                <button type="button"
+                @if(!$consultaEnfermeria)
+<button type="button"
                         @click="$dispatch('abrirModalMedicacion', { cod_residente: '{{ $adultoMayor->cod_residente }}' })"
                         class="rm-btn-primary h-9 px-3.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 shadow-xs transition cursor-pointer">
                     <i class="ph-bold ph-plus-circle text-base"></i>
                     <span>Nueva Prescripción</span>
                 </button>
+@endif
                 @endif
                 <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] text-xs font-bold text-[var(--rm-text-title)]">
                     <i class="ph-bold ph-calendar text-blue-600"></i>

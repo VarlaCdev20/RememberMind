@@ -4,6 +4,7 @@ namespace App\Modulos\Residentes\Aplicacion\Acciones;
 
 use App\Models\Documento;
 use App\Models\User;
+use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -11,6 +12,12 @@ final class IncorporarDocumentosExpediente
 {
     public function guardarNuevoDocumento(User $usuario, array $entrada): mixed
     {
+        abort_if(
+            $usuario->hasRole('ENFERMEROS')
+                && ! app(TurnoEnfermeriaService::class)->esPacienteAsignado($entrada['adultoMayor'], $usuario),
+            403,
+            'El registro está deshabilitado fuera de turno.',
+        );
 
         abort_unless(
             $usuario?->can('documentos.subir') || $usuario?->can('documentos.gestionar'),

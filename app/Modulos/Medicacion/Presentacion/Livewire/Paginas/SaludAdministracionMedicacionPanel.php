@@ -155,12 +155,8 @@ class SaludAdministracionMedicacionPanel extends Component
             $this->turnoNombre = 'Sin turno activo asignado';
         }
 
-        // Si es enfermero sin turno o sin asignación, entra en modo consulta
-        if ($user->hasRole('ENFERMEROS') && ! $turnoActivo) {
-            $this->esModoConsulta = true;
-        } elseif (! $user->can('administraciones_medicacion.crear')) {
-            $this->esModoConsulta = true;
-        }
+        $this->esModoConsulta = ($user->hasRole('ENFERMEROS') && ! $turnoActivo)
+            || ! $user->can('administraciones_medicacion.crear');
     }
 
     public function setTab(string $tab): void
@@ -906,14 +902,23 @@ class SaludAdministracionMedicacionPanel extends Component
         // No-op para compatibilidad de tests si fuera llamado
     }
 
+    public function hydrate(): void
+    {
+        $this->verificarTurnoYPermisos();
+    }
+
     public function render()
     {
+        $this->verificarTurnoYPermisos();
         $user = Auth::user();
         $turnosService = app(TurnoEnfermeriaService::class);
         $agendaService = app(AgendaMedicacionService::class);
 
         // 1. Obtener universo de residentes a mostrar
         if ($this->adulto) {
+            if ($user?->hasRole('ENFERMEROS')) {
+                $turnosService->autorizarConsultaResidente($this->adulto, $user);
+            }
             $residentes = collect([$this->adulto]);
         } else {
             $query = $turnosService->obtenerPacientesAsignadosQuery($user);
@@ -928,7 +933,7 @@ class SaludAdministracionMedicacionPanel extends Component
             $residentes = $query->with(['ocupacionActiva.cama.habitacion', 'alergias' => fn ($q) => $q->where('estado', 'ACTIVO')])->get();
 
             // Si el usuario no tiene pacientes asignados en turno (ej. Superadmin supervisando o turno sin asignar)
-            if ($residentes->isEmpty() && ($user->hasRole('SUPERADMINISTRADOR') || ! $this->buscarResidente)) {
+            if ($residentes->isEmpty() && $turnosService->tieneLecturaClinicaGlobal($user)) {
                 $residentes = Residente::query()
                     ->whereNotIn('estado', ['ARCHIVADO', 'FALLECIDO', 'INACTIVO'])
                     ->with(['ocupacionActiva.cama.habitacion', 'alergias' => fn ($q) => $q->where('estado', 'ACTIVO')])

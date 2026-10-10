@@ -156,11 +156,13 @@
                     <span>Información clínica</span>
                     <span class="sr-only">Información Clínica Relevante</span>
                 </h3>
-                <button type="button" @click="drawerExpediente = true"
+                @if(!$consultaEnfermeria)
+<button type="button" @click="drawerExpediente = true"
                    class="rm-btn-secondary h-7 px-2.5 text-[11px] rounded-lg font-semibold inline-flex items-center gap-1 transition">
                     <i class="ph-bold ph-pencil-simple text-xs"></i>
                     <span>Editar</span>
                 </button>
+@endif
             </div>
 
             <div class="space-y-3 text-xs">
@@ -759,12 +761,14 @@
                     <i class="ph-bold ph-bookmarks text-[var(--rm-action-primary)] text-sm"></i>
                     <span>Notas relevantes</span>
                 </h3>
-                <button type="button"
+                @if(!$consultaEnfermeria)
+<button type="button"
                         wire:click="abrirModalSeguimiento"
                         class="rm-btn-secondary h-7 px-2.5 text-[11px] rounded-lg font-semibold inline-flex items-center gap-1 transition">
                     <i class="ph-bold ph-plus text-xs"></i>
                     <span>Añadir nota</span>
                 </button>
+@endif
             </div>
 
             <div class="space-y-2 text-xs">

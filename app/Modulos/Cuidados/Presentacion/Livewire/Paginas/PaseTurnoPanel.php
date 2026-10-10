@@ -499,7 +499,7 @@ class PaseTurnoPanel extends Component
         }
 
         // 4. Query de Historial (Paginado y filtrable)
-        $queryHistorial = PaseTurno::query()
+        $queryHistorial = $service->acotarConsultaPases(PaseTurno::query(), $user)
             ->with([
                 'residente.cama.habitacion',
                 'personalSaliente.usuario',

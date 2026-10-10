@@ -103,6 +103,7 @@
                                 {{ $ultima?->fecha_hora_ejecucion?->format('d/m/Y H:i') ?? 'Sin ejecuciones' }}
                             </td>
                             <td class="px-4 py-3 text-right">
+                                @if(!$consultaEnfermeria)
                                 @can('ejecuciones_cuidado.gestionar')
                                     <button type="button"
                                             @click='abrir(@js(["cod_intervencion" => $intervencion->cod_intervencion, "nombre" => $intervencion->nombre]))'
@@ -110,6 +111,7 @@
                                         Registrar
                                     </button>
                                 @endcan
+                                @endif
                             </td>
                         </tr>
                     @empty

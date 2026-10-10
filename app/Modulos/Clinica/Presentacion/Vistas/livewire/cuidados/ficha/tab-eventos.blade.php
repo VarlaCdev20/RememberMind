@@ -82,12 +82,14 @@
         </div>
 
         <div class="flex items-center gap-2 self-start sm:self-auto">
-            <button type="button"
+            @if(!$consultaEnfermeria)
+<button type="button"
                     wire:click="abrirModalRegistrarEvento"
                     class="px-4 py-2.5 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-white font-extrabold text-xs transition cursor-pointer shadow-sm flex items-center gap-2">
                 <i class="ph-bold ph-plus-circle text-base"></i>
                 <span>Registrar evento</span>
             </button>
+@endif
         </div>
     </div>
 

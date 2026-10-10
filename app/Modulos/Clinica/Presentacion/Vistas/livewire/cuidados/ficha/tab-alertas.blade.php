@@ -72,19 +72,23 @@
                             {{-- ACCIONES SEGÚN ESTADO --}}
                             <div class="shrink-0 pt-1">
                                 @if($esAbierta)
-                                    <button type="button"
+                                    @if(!$consultaEnfermeria)
+<button type="button"
                                             wire:click="abrirModalAtenderAlerta('{{ $al->cod_alerta }}')"
                                             class="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-rose-700 transition">
                                         <i class="ph-bold ph-hand-heart"></i>
                                         <span>Atender alerta</span>
                                     </button>
+@endif
                                 @elseif($esEnAtencion)
-                                    <button type="button"
+                                    @if(!$consultaEnfermeria)
+<button type="button"
                                             wire:click="abrirModalCerrarAlerta('{{ $al->cod_alerta }}')"
                                             class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 transition">
                                         <i class="ph-bold ph-check-circle"></i>
                                         <span>Registrar acción / Cerrar</span>
                                     </button>
+@endif
                                 @endif
                             </div>
                         </div>

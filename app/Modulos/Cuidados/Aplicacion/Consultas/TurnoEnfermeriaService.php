@@ -4,7 +4,7 @@ namespace App\Modulos\Cuidados\Aplicacion\Consultas;
 
 use App\Models\Alerta;
 use App\Models\AsignacionResidenteJornada;
-use App\Models\Personal;
+use App\Models\Jornada;
 use App\Models\Residente;
 use App\Models\Turno;
 use App\Models\User;
@@ -46,46 +46,26 @@ class TurnoEnfermeriaService
     public function obtenerTurnoActivo(?User $user = null, ?string $fecha = null): ?Turno
     {
         $user ??= Auth::user();
-        $fecha ??= Carbon::today()->toDateString();
-        $ahora = Carbon::now();
+        if (! $user || $user->estado !== 'ACTIVO') {
+            return null;
+        }
+        // La fecha del filtro no sustituye la ventana real de autorización.
+        if ($user?->personal && in_array(strtoupper((string) $user->personal->estado), ['ACTIVO', 'ACTIVA'], true)) {
+            $asignacion = $this->obtenerAsignacionesConsulta($user)->with('jornada.turno')->get()
+                ->first(fn (AsignacionResidenteJornada $asignacion) => $this->jornadaEnCurso($asignacion->jornada));
+            if ($asignacion) {
+                return $asignacion->jornada->turno;
+            }
 
-        if (! $user?->personal && $user) {
-            $pers = Personal::where('cod_usuario', $user->cod_usuario)->first();
-            if ($pers) {
-                $user->setRelation('personal', $pers);
+            $jornada = app(MiTurnoService::class)->resolverJornadaActual($user->personal);
+            if ($jornada) {
+                return $jornada->turno;
             }
         }
-        if ($user?->personal) {
-            $asignaciones = AsignacionResidenteJornada::query()
-                ->with('jornada.turno')
-                ->where('cod_personal', $user->personal->cod_personal)
-                ->whereIn('estado', ['ACTIVA', 'ACTIVO', 'ASIGNADO'])
-                ->whereHas('jornada', fn (Builder $query) => $query
-                    ->whereDate('fecha_jornada', $fecha)
-                    ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO']))
-                ->get();
 
-            foreach ($asignaciones as $asig) {
-                $jornada = $asig->jornada;
-                $turno = $jornada?->turno;
-                if (! $turno) {
-                    continue;
-                }
-                $hIni = $turno->hora_inicio ?? '07:00:00';
-                $hFin = $turno->hora_cierre ?: ($turno->hora_fin ?? '15:00:00');
-                $fechaStr = Carbon::parse($jornada->fecha_jornada)->format('Y-m-d');
-                $esNocturno = $hFin < $hIni;
-                $ini = Carbon::parse("{$fechaStr} {$hIni}");
-                $fin = $esNocturno ? Carbon::parse("{$fechaStr} {$hFin}")->addDay() : Carbon::parse("{$fechaStr} {$hFin}");
-
-                if (Carbon::hasTestNow() ? ($ahora->gte($ini) && $ahora->lte($fin)) : (($ahora->gte($ini) && $ahora->lte($fin)) || (app()->environment('testing') || app()->runningUnitTests()))) {
-                    return Turno::query()->find($turno->cod_turno);
-                }
-            }
-
-            if ($user->hasRole('ENFERMEROS') && ! $this->esSuperAdmin($user)) {
-                return null;
-            }
+        // Un turno del equipo no acredita que este profesional esté de guardia.
+        if ($user?->hasRole('ENFERMEROS') && ! $this->esSuperAdmin($user)) {
+            return null;
         }
 
         $hora = Carbon::now()->format('H:i:s');
@@ -117,17 +97,46 @@ class TurnoEnfermeriaService
             return $query;
         }
 
-        $codUsuario = $codEnfermeroFiltro ?: $user?->cod_usuario;
+        $codUsuario = $this->tieneLecturaClinicaGlobal($user)
+            ? ($codEnfermeroFiltro ?: $user?->cod_usuario)
+            : $user?->cod_usuario;
+        $usuarioAsignado = $codUsuario === $user?->cod_usuario ? $user : User::find($codUsuario);
+        $asignaciones = $this->obtenerAsignacionesConsulta($usuarioAsignado)
+            ->when($codTurno, fn (Builder $q) => $q->whereHas('jornada', fn (Builder $j) => $j->where('cod_turno', $codTurno)));
 
-        return $query->whereHas('asignacionesJornada', function (Builder $asignaciones) use ($codUsuario, $codTurno): void {
-            $asignaciones->whereIn('estado', ['ACTIVA', 'ACTIVO'])
-                ->whereHas('personal', fn (Builder $personal) => $personal->where('cod_usuario', $codUsuario))
-                ->whereHas('jornada', function (Builder $jornada) use ($codTurno): void {
-                    $jornada->whereDate('fecha_jornada', Carbon::today())
-                        ->whereIn('estado', ['ABIERTA', 'ACTIVA'])
-                        ->when($codTurno, fn (Builder $q) => $q->where('cod_turno', $codTurno));
-                });
-        });
+        return $query->whereIn('cod_residente', $asignaciones->select('cod_residente'));
+    }
+
+    /** Asignaciones propias de hoy; incluye la guardia nocturna anterior mientras sigue en curso. */
+    public function obtenerAsignacionesConsulta(?User $user): Builder
+    {
+        $ahora = Carbon::now();
+        $jornadas = Jornada::query()
+            ->whereDate('fecha_jornada', '>=', $ahora->copy()->subDay()->toDateString())
+            ->whereDate('fecha_jornada', '<=', $ahora->toDateString())
+            ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO', 'ACTIVO'])
+            ->with('turno')->get()
+            ->filter(fn ($jornada) => $jornada->turno && (
+                Carbon::parse($jornada->fecha_jornada)->isSameDay($ahora) || $this->jornadaEnCurso($jornada)
+            ))->pluck('cod_jornada');
+
+        return AsignacionResidenteJornada::query()
+            ->whereIn('estado', ['ACTIVA', 'ACTIVO', 'ASIGNADO'])
+            ->whereIn('cod_jornada', $jornadas)
+            ->whereHas('personal', fn (Builder $personal) => $personal
+                ->where('cod_usuario', $user?->cod_usuario)
+                ->whereIn('estado', ['ACTIVO', 'ACTIVA']))
+            ->when(! $user || $user->estado !== 'ACTIVO', fn (Builder $q) => $q->whereRaw('1 = 0'));
+    }
+
+    private function jornadaEnCurso(?Jornada $jornada): bool
+    {
+        if (! $jornada?->turno) {
+            return false;
+        }
+        [$inicio, $fin] = app(MiTurnoService::class)->calcularVentanaTurno($jornada);
+
+        return Carbon::now()->betweenIncluded($inicio, $fin);
     }
 
     public function obtenerPacientesAsignadosIds(?User $user = null, ?string $codTurno = null, ?string $codEnfermeroFiltro = null): array
@@ -142,50 +151,23 @@ class TurnoEnfermeriaService
         if ($this->esSuperAdmin($user)) {
             return true;
         }
-        if ($user && (! $user->relationLoaded('personal') || ! $user->personal)) {
-            $pers = Personal::where('cod_usuario', $user->cod_usuario)->first();
-            if ($pers) {
-                $user->setRelation('personal', $pers);
-            }
-        }
-        if (! $user?->personal) {
-            return false;
-        }
-
         $codigo = $adulto instanceof Residente ? $adulto->cod_residente : $adulto;
-        $ahora = Carbon::now();
 
-        $asignaciones = AsignacionResidenteJornada::query()
-            ->with('jornada.turno')
+        return $this->obtenerAsignacionesConsulta($user)
             ->where('cod_residente', $codigo)
-            ->where('cod_personal', $user->personal->cod_personal)
-            ->whereIn('estado', ['ACTIVA', 'ACTIVO', 'ASIGNADO'])
-            ->whereHas('jornada', function (Builder $jornada) use ($codTurno): void {
-                $jornada->whereDate('fecha_jornada', Carbon::today())
-                    ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO'])
-                    ->when($codTurno, fn (Builder $q) => $q->where('cod_turno', $codTurno));
-            })
-            ->get();
+            ->when($codTurno, fn (Builder $q) => $q->whereHas('jornada', fn (Builder $j) => $j->where('cod_turno', $codTurno)))
+            ->with('jornada.turno')->get()
+            ->contains(fn (AsignacionResidenteJornada $asignacion) => $this->jornadaEnCurso($asignacion->jornada));
+    }
 
-        foreach ($asignaciones as $asig) {
-            $j = $asig->jornada;
-            $turno = $j?->turno;
-            if (! $turno) {
-                continue;
-            }
-            $hIni = $turno->hora_inicio ?? '07:00:00';
-            $hFin = $turno->hora_cierre ?: ($turno->hora_fin ?? '15:00:00');
-            $fechaStr = Carbon::parse($j->fecha_jornada)->format('Y-m-d');
-            $esNocturno = $hFin < $hIni;
-            $ini = Carbon::parse("{$fechaStr} {$hIni}");
-            $fin = $esNocturno ? Carbon::parse("{$fechaStr} {$hFin}")->addDay() : Carbon::parse("{$fechaStr} {$hFin}");
-
-            if (Carbon::hasTestNow() ? ($ahora->gte($ini) && $ahora->lte($fin)) : (($ahora->gte($ini) && $ahora->lte($fin)) || (app()->environment('testing') || app()->runningUnitTests()))) {
-                return true;
-            }
-        }
-
-        return false;
+    /** Lectura propia independiente del horario; nunca concede escritura clínica. */
+    public function autorizarConsultaResidente(string|Residente $residente, ?User $user = null): void
+    {
+        $user ??= Auth::user();
+        abort_unless($user && $user->estado === 'ACTIVO', 403);
+        $codigo = $residente instanceof Residente ? $residente->cod_residente : $residente;
+        abort_unless($this->obtenerPacientesAsignadosQuery($user)->whereKey($codigo)->exists(), 403,
+            'No tiene asignado a este residente para consulta.');
     }
 
     public function autorizarAccionPaciente(string|Residente $adulto, ?User $user = null, ?string $codTurno = null): void

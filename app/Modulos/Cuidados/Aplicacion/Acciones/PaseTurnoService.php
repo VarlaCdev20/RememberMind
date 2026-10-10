@@ -27,6 +27,7 @@ use App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -69,16 +70,27 @@ class PaseTurnoService
 
     public function autorizarLecturaPase(PaseTurno $pase, User $usuario): void
     {
+        abort_unless($this->acotarConsultaPases(PaseTurno::query(), $usuario)->whereKey($pase->getKey())->exists(), 403);
+    }
+
+    /** El historial debe respetar el mismo alcance que la apertura de un pase. */
+    public function acotarConsultaPases(Builder $query, User $usuario): Builder
+    {
         abort_unless($usuario->estado === 'ACTIVO' && $usuario->can('pases_turno.ver'), 403);
         if ($usuario->hasAnyRole(['SUPERADMINISTRADOR', 'GERENTE', 'ADMINISTRADOR'])) {
-            return;
+            return $query;
         }
         $personal = $this->autorizarPersonal($usuario);
-        $propio = in_array($personal->cod_personal, [$pase->cod_personal_saliente, $pase->cod_personal_entrante], true);
-        abort_unless($propio || AsignacionResidenteJornada::query()->where('cod_residente', $pase->cod_residente)
-            ->where('cod_personal', $personal->cod_personal)
-            ->whereIn('cod_jornada', [$pase->cod_jornada_saliente, $pase->cod_jornada_entrante])
-            ->whereIn('estado', ['ACTIVO', 'ACTIVA'])->exists(), 403);
+
+        return $query->where(fn ($pases) => $pases
+            ->where('cod_personal_saliente', $personal->cod_personal)
+            ->orWhere('cod_personal_entrante', $personal->cod_personal)
+            ->orWhereHas('residente.asignacionesJornada', fn ($asignaciones) => $asignaciones
+                ->where('cod_personal', $personal->cod_personal)
+                ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
+                ->where(fn ($jornadas) => $jornadas
+                    ->whereColumn('asignaciones_residente_jornada.cod_jornada', 'pases_turno.cod_jornada_saliente')
+                    ->orWhereColumn('asignaciones_residente_jornada.cod_jornada', 'pases_turno.cod_jornada_entrante'))));
     }
 
     public function validarContextoEmision(User $usuario, string $codResidente, array $datos): void

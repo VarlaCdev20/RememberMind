@@ -222,10 +222,12 @@ class MiTurnoService
         // =========================================================================
         // MODO 2: FUERA DE TURNO (MODO CONSULTA / SOLO LECTURA)
         // =========================================================================
-        // NO usar asignaciones históricas del usuario autenticado como si fueran actuales.
-        // Consultar las jornadas de Enfermería actualmente activas:
-        // jornadas activas -> asignaciones_personal -> personal -> asignaciones_residente_jornada -> residentes
-        $jornadasActivas = $this->resolverJornadasActivasSistema($momentoActual);
+        // Consulta propia aprobada: no hereda los residentes del equipo de guardia.
+        $asignacionesConsulta = app(TurnoEnfermeriaService::class)->obtenerAsignacionesConsulta($user);
+        $jornadasActivas = $esSuperAdmin
+            ? $this->resolverJornadasActivasSistema($momentoActual)
+            : Jornada::query()->whereIn('cod_jornada', (clone $asignacionesConsulta)->select('cod_jornada'))
+                ->with('turno')->orderByDesc('fecha_jornada')->get();
 
         if ($jornadasActivas->isEmpty()) {
             return [
@@ -263,8 +265,8 @@ class MiTurnoService
                 ],
                 'estado_general' => [
                     'badge' => 'MODO CONSULTA',
-                    'titulo' => 'Sin turno activo en curso',
-                    'mensaje' => 'No se registran jornadas activas de Enfermería en este momento.',
+                    'titulo' => 'Sin residentes asignados para consulta',
+                    'mensaje' => 'No tienes asignaciones propias vigentes para consultar hoy. No puedes registrar fuera de turno.',
                     'tiempo' => $momentoActual->format('H:i \h\r\s'),
                     'tipo' => 'neutral',
                 ],
@@ -291,15 +293,16 @@ class MiTurnoService
 
         $asigPersonalActivas = AsignacionPersonal::query()
             ->whereIn('cod_jornada', $codJornadasActivas)
+            ->when(! $esSuperAdmin, fn ($q) => $q->where('cod_personal', $personal?->cod_personal))
             ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
             ->with(['personal', 'area'])
             ->get();
 
         $codPersonalActivos = $asigPersonalActivas->pluck('cod_personal')->filter()->unique()->values()->all();
 
-        $asigResidentesActivas = AsignacionResidenteJornada::query()
+        $asigResidentesActivas = ($esSuperAdmin ? AsignacionResidenteJornada::query() : $asignacionesConsulta)
             ->whereIn('cod_jornada', $codJornadasActivas)
-            ->whereIn('cod_personal', $codPersonalActivos)
+            ->when($esSuperAdmin, fn ($q) => $q->whereIn('cod_personal', $codPersonalActivos))
             ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'ASIGNADO'])
             ->with([
                 'personal.usuario.roles',
@@ -343,7 +346,7 @@ class MiTurnoService
             $rawTurnoNombre = $asigs->first()?->jornada?->turno?->nombre;
             $turnoNombre = $rawTurnoNombre
                 ? (str_starts_with(strtolower(trim($rawTurnoNombre)), 'turno') ? trim($rawTurnoNombre) : "Turno {$rawTurnoNombre}")
-                : 'Turno activo';
+                : 'Jornada asignada';
 
             $supervisionRaw = strtoupper(trim((string) ($asigs->pluck('nivel_supervision')->filter()->first() ?? '')));
             $supervisionLabel = match ($supervisionRaw) {
@@ -413,7 +416,7 @@ class MiTurnoService
         unset($card);
 
         $agendaUnificada = $this->resolverAgendaProgramada($codResidentes, $jornadaPrincipal, $inicioTurno, $finTurno, $momentoActual);
-        // En consulta se muestran únicamente residentes del turno activo del equipo.
+        // Los indicadores se limitan a los residentes propios consultables.
         $pacientesTurno = $this->prepararPacientesTurno($residentesCards, $agendaUnificada, $momentoActual);
         $alertasPrioritarias = $this->formatearAlertasPrioritarias($alertas);
         $medicacionTurno = $this->resumirMedicacionTurno($agendaUnificada);
@@ -436,7 +439,7 @@ class MiTurnoService
             'modo_label' => 'FUERA DE TURNO',
             'submodo_label' => 'MODO CONSULTA / SOLO LECTURA',
             'es_modo_consulta' => true,
-            'estado' => 'ACTIVA',
+            'estado' => 'CONSULTA',
             'usuario' => [
                 'cod_usuario' => $user->cod_usuario,
                 'cod_personal' => $personal?->cod_personal,
@@ -451,7 +454,7 @@ class MiTurnoService
                 'nombre' => $turnoPrincipal?->nombre ? (str_starts_with(strtolower(trim($turnoPrincipal->nombre)), 'turno') ? trim($turnoPrincipal->nombre) : "Turno {$turnoPrincipal->nombre}") : "Jornada {$jornadaPrincipal->cod_jornada}",
                 'hora_inicio' => $turnoPrincipal?->hora_inicio ? Carbon::parse($turnoPrincipal->hora_inicio)->format('H:i') : null,
                 'hora_fin' => $turnoPrincipal?->hora_cierre ? Carbon::parse($turnoPrincipal->hora_cierre)->format('H:i') : null,
-                'activa' => true,
+                'activa' => false,
                 'fecha' => Carbon::parse($jornadaPrincipal->fecha_jornada)->format('Y-m-d'),
                 'fecha_humana' => ucfirst(Carbon::parse($jornadaPrincipal->fecha_jornada)->locale('es')->translatedFormat('l, d \d\e F \d\e Y')),
                 'area_nombre' => $areaPrincipal?->nombre ?? 'Área no asignada',

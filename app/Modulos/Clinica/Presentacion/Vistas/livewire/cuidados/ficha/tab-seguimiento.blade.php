@@ -17,11 +17,13 @@
                 <p class="mt-1 text-sm text-[var(--rm-text-secondary)]">Información consolidada únicamente desde registros clínicos persistidos.</p>
             </div>
             @can('atenciones.crear')
-                <button type="button" wire:click="abrirModalSeguimiento"
+                @if(!$consultaEnfermeria)
+<button type="button" wire:click="abrirModalSeguimiento"
                     class="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--rm-action-primary)] px-4 py-2.5 text-sm font-bold text-white hover:bg-[var(--rm-action-primary-hover)]">
                     <i class="ph-bold ph-plus-circle"></i>
                     Registrar seguimiento
                 </button>
+@endif
             @endcan
         </div>
     </header>
