@@ -1,0 +1,36 @@
+<?php
+
+// Datos sintéticos; las fechas de nacimiento anteriores a 2026 están autorizadas.
+// Índices internos de escenarios: nunca se muestran como nombre o diagnóstico.
+return [
+    ['Elena', 'Vargas', 'Mamani', '1945-03-12', 'FEMENINO', '2026-01-05', 'estable'],
+    ['Jorge', 'Salinas', 'Quispe', '1941-07-23', 'MASCULINO', '2026-01-12', 'hta'],
+    ['Teresa', 'Aguilar', 'Rojas', '1939-11-04', 'FEMENINO', '2026-01-19', 'diabetes'],
+    ['Luis', 'Fernández', 'Paredes', '1948-02-16', 'MASCULINO', '2026-01-26', 'estable'],
+    ['Mercedes', 'Choque', 'Rivera', '1943-09-08', 'FEMENINO', '2026-02-02', 'movilidad'],
+    ['Raúl', 'Cabrera', 'Flores', '1937-12-19', 'MASCULINO', '2026-02-09', 'hta'],
+    ['Carmen', 'López', 'Arce', '1946-05-30', 'FEMENINO', '2026-02-16', 'tiroides'],
+    ['Julio', 'Gutiérrez', 'Vega', '1940-01-25', 'MASCULINO', '2026-02-23', 'deterioro'],
+    ['Gloria', 'Sánchez', 'Condori', '1950-06-11', 'FEMENINO', '2026-02-25', 'herida'],
+    ['Hugo', 'Romero', 'Torrico', '1938-10-27', 'MASCULINO', '2026-02-27', 'sueno'],
+    ['Rosa', 'Navarro', 'Salazar', '1944-04-02', 'FEMENINO', '2026-03-05', 'diabetes'],
+    ['Víctor', 'Mendoza', 'Castro', '1949-08-17', 'MASCULINO', '2026-03-12', 'dolor'],
+    ['Julia', 'Paz', 'Alarcón', '1936-02-28', 'FEMENINO', '2026-03-19', 'cognicion'],
+    ['Alberto', 'Ríos', 'Valdez', '1947-12-06', 'MASCULINO', '2026-03-26', 'hta'],
+    ['Nelly', 'Suárez', 'Bautista', '1951-03-09', 'FEMENINO', '2026-04-02', 'estable'],
+    ['Ricardo', 'Torres', 'Medina', '1942-06-24', 'MASCULINO', '2026-04-09', 'herida'],
+    ['Beatriz', 'Molina', 'Escobar', '1935-09-13', 'FEMENINO', '2026-04-16', 'nutricion'],
+    ['Oscar', 'Cárdenas', 'Soria', '1945-11-22', 'MASCULINO', '2026-04-23', 'estable'],
+    ['Alicia', 'Pinto', 'Delgado', '1952-01-14', 'FEMENINO', '2026-05-07', 'tiroides'],
+    ['Fernando', 'Peña', 'Zambrana', '1948-07-03', 'MASCULINO', '2026-05-14', 'critica'],
+    ['María', 'Ortega', 'Arias', '1941-05-18', 'FEMENINO', '2026-05-21', 'abierta'],
+    ['Eduardo', 'Fuentes', 'Guzmán', '1953-10-05', 'MASCULINO', '2026-05-28', 'estable'],
+    ['Isabel', 'Carrasco', 'Soliz', '1934-08-21', 'FEMENINO', '2026-06-04', 'herida'],
+    ['Roberto', 'Díaz', 'Montes', '1946-02-07', 'MASCULINO', '2026-06-11', 'estable'],
+    ['Ana', 'Villanueva', 'Portillo', '1954-04-29', 'FEMENINO', '2026-07-09', 'participacion'],
+    ['Manuel', 'Serrano', 'Miranda', '1940-09-26', 'MASCULINO', '2026-07-23', 'estable'],
+    ['Silvia', 'Álvarez', 'Lara', '1955-12-15', 'FEMENINO', '2026-08-06', 'estable'],
+    ['Pedro', 'Valencia', 'Orellana', '1943-01-31', 'MASCULINO', '2026-08-20', 'incidente'],
+    ['Patricia', 'Ibarra', 'Camacho', '1956-06-20', 'FEMENINO', '2026-09-10', 'estable'],
+    ['Mario', 'Zárate', 'Benítez', '1939-03-27', 'MASCULINO', '2026-10-05', 'estable'],
+];
