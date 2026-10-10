@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\SistemaExperto;
 
-use App\Backend\Modulos\SistemaExperto\Conocimiento\InventarioExperto;
 use App\Models\EvaluacionExperta;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\InventarioExperto;
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use PhpParser\Node;
 use PhpParser\NodeFinder;

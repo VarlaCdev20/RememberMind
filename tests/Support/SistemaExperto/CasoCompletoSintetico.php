@@ -2,23 +2,23 @@
 
 namespace Tests\Support\SistemaExperto;
 
-use App\Backend\Modulos\SistemaExperto\Acciones\PersistirEvaluacionTecnica;
-use App\Backend\Modulos\SistemaExperto\Adaptadores\AdaptadorFuentesCOGMEM;
-use App\Backend\Modulos\SistemaExperto\Conocimiento\CargadorConocimiento;
-use App\Backend\Modulos\SistemaExperto\Conocimiento\EjemploTecnicoCOGMEM as F;
-use App\Backend\Modulos\SistemaExperto\Conocimiento\PaqueteConocimiento;
-use App\Backend\Modulos\SistemaExperto\DTO\ContextoEjecucion;
-use App\Backend\Modulos\SistemaExperto\MemoriaTrabajo\MemoriaTrabajo;
-use App\Backend\Modulos\SistemaExperto\Servicios\LecturaTecnicaPruebas;
 use App\Models\AplicacionInstrumento;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Jornada;
 use App\Models\Personal;
 use App\Models\Turno;
 use App\Models\User;
+use App\Modulos\ApoyoDecision\Aplicacion\Acciones\PersistirEvaluacionTecnica;
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\AdaptadorFuentesCOGMEM;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Eloquent\CargadorConocimiento;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\LecturaTecnicaPruebas;
 use DateTimeImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use MotorExperto\adaptadores\entrada\EjemploTecnicoCOGMEM as F;
+use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\dominio\inferencia\MemoriaTrabajo;
+use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
 use RuntimeException;
 
 /** Caso reproducible: fuentes reales de QA -> adaptación -> motor -> persistencia. */

@@ -75,7 +75,7 @@
     <x-ui.section-card title="Demostración técnica COG-MEM" subtitle="Caso artificial · sin guardar · sin validación clínica">
         <p class="text-sm text-rm-secondary mb-4">Seleccione un caso para seguir el resultado hasta sus reglas, condiciones, mapeos y fuentes artificiales. Los literales de prueba no son una escala médica.</p>
         <div class="flex flex-wrap gap-2 mb-4" aria-label="Casos técnicos">
-            @foreach(\App\Backend\Modulos\SistemaExperto\Servicios\DemostracionCOGMEM::CASOS as $codigo => $nombre)
+            @foreach(\MotorExperto\aplicacion\casos_uso\DemostracionCOGMEM::CASOS as $codigo => $nombre)
                 <button type="button" wire:click="seleccionarCaso('{{ $codigo }}')" wire:loading.attr="disabled"
                     class="rm-btn {{ $caso === $codigo ? 'rm-btn-primary' : 'rm-btn-secondary' }} min-h-11 whitespace-normal" aria-pressed="{{ $caso === $codigo ? 'true' : 'false' }}">{{ $nombre }}</button>
             @endforeach

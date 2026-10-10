@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Backend\Modulos\SistemaExperto\Conocimiento\InventarioExperto;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\InventarioExperto;
 use PHPUnit\Framework\TestCase;
 
 class InventarioExpertoTest extends TestCase

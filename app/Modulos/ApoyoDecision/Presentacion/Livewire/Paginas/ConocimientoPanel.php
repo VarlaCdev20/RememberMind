@@ -2,15 +2,15 @@
 
 namespace App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas;
 
-use App\Backend\Modulos\SistemaExperto\Conocimiento\CargadorConocimiento;
-use App\Backend\Modulos\SistemaExperto\Conocimiento\PaquetesCandidatosCognitivos;
-use App\Backend\Modulos\SistemaExperto\Servicios\DemostracionCOGMEM;
 use App\Models\VersionModeloExperto;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Eloquent\CargadorConocimiento;
 use DomainException;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithPagination;
+use MotorExperto\aplicacion\casos_uso\DemostracionCOGMEM;
+use MotorExperto\dominio\conocimiento\versiones\PaquetesCandidatosCognitivos;
 
 final class ConocimientoPanel extends Component
 {

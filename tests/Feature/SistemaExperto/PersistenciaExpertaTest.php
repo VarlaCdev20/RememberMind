@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\SistemaExperto;
 
-use App\Backend\Modulos\SistemaExperto\Conocimiento\CargadorConocimiento;
-use App\Backend\Modulos\SistemaExperto\Conocimiento\InventarioExperto;
 use App\Models\NodoSemantico;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Eloquent\CargadorConocimiento;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\InventarioExperto;
 use DomainException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;

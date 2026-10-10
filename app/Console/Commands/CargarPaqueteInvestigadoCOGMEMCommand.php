@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Backend\Modulos\SistemaExperto\Acciones\CargarPaqueteInvestigadoCOGMEM;
 use App\Models\User;
+use App\Modulos\ApoyoDecision\Aplicacion\Acciones\CargarPaqueteInvestigadoCOGMEM;
 use Illuminate\Console\Command;
 
 final class CargarPaqueteInvestigadoCOGMEMCommand extends Command

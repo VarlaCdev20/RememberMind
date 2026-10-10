@@ -2,14 +2,14 @@
 
 namespace Tests\Unit\SistemaExperto;
 
-use App\Backend\Modulos\SistemaExperto\Adaptadores\AdaptadorFuentesCOGMEM;
-use App\Backend\Modulos\SistemaExperto\Conocimiento\EjemploTecnicoCOGMEM as F;
-use App\Backend\Modulos\SistemaExperto\Conocimiento\PaqueteConocimiento;
-use App\Backend\Modulos\SistemaExperto\MemoriaTrabajo\MemoriaTrabajo;
-use App\Backend\Modulos\SistemaExperto\Servicios\MotorExperto;
 use App\Models\ControlCognitivo;
 use App\Models\Personal;
 use DomainException;
+use MotorExperto\adaptadores\entrada\AdaptadorHechosCOGMEM as AdaptadorFuentesCOGMEM;
+use MotorExperto\adaptadores\entrada\EjemploTecnicoCOGMEM as F;
+use MotorExperto\aplicacion\casos_uso\MotorExperto;
+use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\dominio\inferencia\MemoriaTrabajo;
 use PHPUnit\Framework\TestCase;
 
 class AdaptadorFuentesCOGMEMTest extends TestCase
@@ -104,7 +104,7 @@ class AdaptadorFuentesCOGMEMTest extends TestCase
         $personal->exists = true;
         $control->setRelation('personal', $personal);
         $m = new MemoriaTrabajo(F::contexto());
-        $emitidas = (new AdaptadorFuentesCOGMEM)->extraerControl($control, F::paquete(), $m);
+        $emitidas = (new \App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\AdaptadorFuentesCOGMEM)->extraerControl($control, F::paquete(), $m);
         $obs = array_values(array_filter($emitidas, fn ($e) => $e->variable === 'VAR_OBS'))[0];
         $cor = array_values(array_filter($emitidas, fn ($e) => $e->variable === 'VAR_COR'))[0];
         $this->assertSame('literal_A', $obs->fuente->valorOriginal);

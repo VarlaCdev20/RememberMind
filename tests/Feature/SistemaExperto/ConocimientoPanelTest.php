@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\SistemaExperto;
 
-use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
-use App\Backend\Modulos\SistemaExperto\Conocimiento\InventarioExperto;
-use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ConocimientoPanel;
 use App\Models\User;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\InventarioExperto;
+use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ConocimientoPanel;
+use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;

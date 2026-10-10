@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\SistemaExperto;
 
-use App\Backend\Modulos\SistemaExperto\Conocimiento\PaquetesCandidatosCognitivos;
-use App\Backend\Modulos\SistemaExperto\Servicios\DemostracionCOGMEM;
 use DomainException;
+use MotorExperto\aplicacion\casos_uso\DemostracionCOGMEM;
+use MotorExperto\dominio\conocimiento\versiones\PaquetesCandidatosCognitivos;
 use PHPUnit\Framework\TestCase;
 
 class DemostracionExpertaTest extends TestCase

@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\SistemaExperto;
 
-use App\Backend\Modulos\SistemaExperto\Conocimiento\InventarioExperto;
-use App\Backend\Modulos\SistemaExperto\Servicios\LecturaFuenteEvidencia;
-use App\Backend\Modulos\SistemaExperto\Servicios\LecturaResultadosExperto;
-use App\Backend\Modulos\SistemaExperto\Servicios\LecturaTecnicaPruebas;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaFuenteEvidencia;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaResultadosExperto;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\InventarioExperto;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\LecturaTecnicaPruebas;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;

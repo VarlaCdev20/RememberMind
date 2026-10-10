@@ -2,17 +2,17 @@
 
 namespace Tests\Feature\SistemaExperto;
 
-use App\Backend\Modulos\SistemaExperto\Acciones\CargarPaqueteInvestigadoCOGMEM;
-use App\Backend\Modulos\SistemaExperto\Conocimiento\CargadorConocimiento;
-use App\Backend\Modulos\SistemaExperto\Conocimiento\PaqueteInvestigadoCOGMEM as P;
-use App\Backend\Modulos\SistemaExperto\Servicios\LecturaResultadosExperto;
-use App\Backend\Modulos\SistemaExperto\Servicios\PreparacionFuentesCOGMEM;
-use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
 use App\Models\User;
+use App\Modulos\ApoyoDecision\Aplicacion\Acciones\CargarPaqueteInvestigadoCOGMEM;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaResultadosExperto;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\PreparacionFuentesCOGMEM;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Eloquent\CargadorConocimiento;
+use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
 use DomainException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
+use MotorExperto\dominio\conocimiento\versiones\PaqueteInvestigadoCOGMEM as P;
 use Tests\Support\SistemaExperto\FixtureLecturaExperta as F;
 use Tests\Support\SistemaExperto\PruebaConBaseDesechable;
 

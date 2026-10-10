@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\SistemaExperto;
 
-use App\Backend\Modulos\SistemaExperto\Acciones\CargarConocimientoOrion;
 use App\Models\User;
+use App\Modulos\ApoyoDecision\Aplicacion\Acciones\CargarConocimientoOrion;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use DomainException;
 use Illuminate\Support\Facades\DB;

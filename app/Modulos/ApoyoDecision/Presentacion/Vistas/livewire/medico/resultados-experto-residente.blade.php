@@ -53,7 +53,7 @@
                 <nav class="rm-expert-criteria" aria-label="Áreas cognitivas">
                     @foreach($datos['perfil'] as $codigo => $area)
                         <button type="button" wire:key="criterio-{{ $codigo }}" wire:click="seleccionarCriterio(@js($codigo))" wire:loading.attr="disabled" aria-pressed="{{ $criterio === $codigo ? 'true' : 'false' }}" aria-controls="detalle-cognitivo"
-                            class="rm-expert-criterion rm-expert-tone-{{ \App\Backend\Modulos\SistemaExperto\Presentacion\LenguajeResultadosExperto::presentacion($area['resultado']['codigo'] ?? null)['tono'] }} {{ $criterio === $codigo ? 'is-selected' : '' }} text-left min-w-0">
+                            class="rm-expert-criterion rm-expert-tone-{{ \App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto::presentacion($area['resultado']['codigo'] ?? null)['tono'] }} {{ $criterio === $codigo ? 'is-selected' : '' }} text-left min-w-0">
                             <span class="rm-expert-criterion-heading"><span class="rm-expert-area-icon"><i class="ph {{ $area['icono'] }}" aria-hidden="true"></i></span><span class="min-w-0"><span class="block font-semibold">{{ $area['nombre'] }}</span><span class="block text-xs text-rm-secondary mt-1">{{ $codigo }}</span></span><i class="ph ph-caret-right" aria-hidden="true"></i></span>
                             <span class="rm-expert-status">{{ $area['estado'] }}</span>
                             <span class="block text-xs text-rm-secondary mt-2">{{ $area['activacion'] }}</span>
@@ -64,7 +64,7 @@
 
             <section id="detalle-cognitivo" class="rm-card rm-expert-detail space-y-4 min-w-0" aria-labelledby="titulo-cognitivo" aria-live="polite" aria-atomic="false">
                 @php($detalle = $datos['detalle'])
-                @php($presentacion = \App\Backend\Modulos\SistemaExperto\Presentacion\LenguajeResultadosExperto::presentacion($detalle['resultado']['codigo'] ?? null))
+                @php($presentacion = \App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto::presentacion($detalle['resultado']['codigo'] ?? null))
                 @if($datos['preparacion_memoria'])
                     @php($preparacion = $datos['preparacion_memoria'])
                     <x-ui.section-card title="Preparación de la valoración de memoria" subtitle="Datos disponibles y requisitos pendientes" icon="ph-list-checks">

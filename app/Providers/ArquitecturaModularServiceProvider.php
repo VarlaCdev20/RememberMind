@@ -93,11 +93,14 @@ use App\Modulos\Valoraciones\Presentacion\Policies\ValoracionEnfermeriaPreadmisi
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
+use MotorExperto\aplicacion\puertos\EvaluadorExperto;
+use MotorExperto\aplicacion\casos_uso\MotorExperto;
 
 final class ArquitecturaModularServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(EvaluadorExperto::class, MotorExperto::class);
         $this->callAfterResolving('view', function ($view): void {
             $previous = $view->getFinder();
             $finder = new VistaModularFinder(

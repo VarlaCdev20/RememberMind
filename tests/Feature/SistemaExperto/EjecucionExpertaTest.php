@@ -2,15 +2,6 @@
 
 namespace Tests\Feature\SistemaExperto;
 
-use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
-use App\Backend\Modulos\SistemaExperto\Acciones\PersistirEvaluacionTecnica;
-use App\Backend\Modulos\SistemaExperto\Adaptadores\AdaptadorFuentesCOGMEM;
-use App\Backend\Modulos\SistemaExperto\Conocimiento\CargadorConocimiento;
-use App\Backend\Modulos\SistemaExperto\Conocimiento\EjemploTecnicoCOGMEM as F;
-use App\Backend\Modulos\SistemaExperto\Conocimiento\PaqueteConocimiento;
-use App\Backend\Modulos\SistemaExperto\DTO\ContextoEjecucion;
-use App\Backend\Modulos\SistemaExperto\DTO\EvidenciaExperta;
-use App\Backend\Modulos\SistemaExperto\MemoriaTrabajo\MemoriaTrabajo;
 use App\Models\AplicacionInstrumento;
 use App\Models\Cama;
 use App\Models\Habitacion;
@@ -18,10 +9,19 @@ use App\Models\Personal;
 use App\Models\Preadmision;
 use App\Models\ResultadoCriterio;
 use App\Models\User;
+use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
+use App\Modulos\ApoyoDecision\Aplicacion\Acciones\PersistirEvaluacionTecnica;
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\AdaptadorFuentesCOGMEM;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Eloquent\CargadorConocimiento;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use MotorExperto\adaptadores\entrada\EjemploTecnicoCOGMEM as F;
+use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\dominio\inferencia\MemoriaTrabajo;
+use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
+use MotorExperto\dominio\objetos_valor\EvidenciaExperta;
 use Tests\Support\SistemaExperto\PruebaConBaseDesechable;
 
 class EjecucionExpertaTest extends PruebaConBaseDesechable

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Backend\Modulos\SistemaExperto\Conocimiento\BuilderExperto;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Eloquent\BuilderExperto;
 use Illuminate\Database\Eloquent\Model;
 use LogicException;
 

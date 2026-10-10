@@ -2,19 +2,28 @@
 
 namespace Tests\Feature\SistemaExperto;
 
-use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
-use App\Backend\Modulos\SistemaExperto\Conocimiento\InventarioExperto;
-use App\Backend\Modulos\SistemaExperto\Servicios\{LecturaResultadosExperto, LecturaFuenteEvidencia};
+use App\Models\AsignacionResidenteJornada;
+use App\Models\Jornada;
+use App\Models\Residente;
+use App\Models\Turno;
+use App\Models\User;
+use App\Modulos\ApoyoDecision\Aplicacion\Acciones\CargarConocimientoOrion;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaFuenteEvidencia;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaResultadosExperto;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\InventarioExperto;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\MisPacientes;
-use App\Models\{Residente, User};
+use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use Illuminate\Support\Facades\DB;
+use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
 use Livewire\Livewire;
-use Tests\Support\SistemaExperto\{PruebaConBaseDesechable, FixtureLecturaExperta as F};
+use Tests\Support\SistemaExperto\FixtureLecturaExperta as F;
+use Tests\Support\SistemaExperto\PruebaConBaseDesechable;
 
 class ResultadosExpertoResidenteTest extends PruebaConBaseDesechable
 {
     private User $medico;
+
     private Residente $residente;
 
     protected function setUp(): void
@@ -35,6 +44,7 @@ class ResultadosExpertoResidenteTest extends PruebaConBaseDesechable
         foreach (array_merge(InventarioExperto::TABLAS, ['alertas', 'notas_clinicas', 'activity_log']) as $tabla) {
             $filas[$tabla] = hash('sha256', json_encode(DB::table($tabla)->get()->all(), JSON_THROW_ON_ERROR));
         }
+
         return $filas;
     }
 
@@ -42,9 +52,9 @@ class ResultadosExpertoResidenteTest extends PruebaConBaseDesechable
     {
         $this->medico->syncRoles(['ENFERMEROS']);
         DB::table('personal')->where('cod_personal', 'PER_MED')->update(['profesion' => 'ENFERMERIA']);
-        \App\Models\Turno::create(['cod_turno' => 'TUR_LECTURA', 'nombre' => 'Turno sintético', 'orden' => 1, 'hora_inicio' => '00:00:00', 'hora_cierre' => '23:59:59', 'estado' => 'ACTIVO']);
-        \App\Models\Jornada::create(['cod_jornada' => 'JOR_LECTURA', 'cod_turno' => 'TUR_LECTURA', 'fecha_jornada' => today(), 'estado' => 'ABIERTA']);
-        \App\Models\AsignacionResidenteJornada::create(['cod_asignacion' => 'ARJ_LECTURA', 'cod_jornada' => 'JOR_LECTURA', 'cod_personal' => 'PER_MED', 'cod_residente' => $this->residente->getKey(), 'fecha_hora' => now(), 'estado' => 'ACTIVA']);
+        Turno::create(['cod_turno' => 'TUR_LECTURA', 'nombre' => 'Turno sintético', 'orden' => 1, 'hora_inicio' => '00:00:00', 'hora_cierre' => '23:59:59', 'estado' => 'ACTIVO']);
+        Jornada::create(['cod_jornada' => 'JOR_LECTURA', 'cod_turno' => 'TUR_LECTURA', 'fecha_jornada' => today(), 'estado' => 'ABIERTA']);
+        AsignacionResidenteJornada::create(['cod_asignacion' => 'ARJ_LECTURA', 'cod_jornada' => 'JOR_LECTURA', 'cod_personal' => 'PER_MED', 'cod_residente' => $this->residente->getKey(), 'fecha_hora' => now(), 'estado' => 'ACTIVA']);
         $this->assertFalse($this->medico->checkPermissionTo('valoracion_medica.ver', 'web'));
     }
 
@@ -110,7 +120,9 @@ class ResultadosExpertoResidenteTest extends PruebaConBaseDesechable
         $this->get(route('admin.medico.residente.resultados-experto', $this->residente))->assertOk()->assertSee('Resultados del sistema experto');
         $c = Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente]);
         $c->call('seleccionarEvaluacion', 'EVAL_D')->assertSee('Dificultad evidenciada')->assertSee('No preservado en la traza.')->assertSee('disabled', false);
-        foreach (['COG-ATE', 'COG-EJE', 'COG-LEN', 'COG-VIS', 'COG-MEM'] as $criterio) { $c->call('seleccionarCriterio', $criterio)->assertSet('criterio', $criterio); }
+        foreach (['COG-ATE', 'COG-EJE', 'COG-LEN', 'COG-VIS', 'COG-MEM'] as $criterio) {
+            $c->call('seleccionarCriterio', $criterio)->assertSet('criterio', $criterio);
+        }
         $c->call('verEvidencia', 'EV_D_A')->assertSee('Registro fuente no disponible')->call('verEvidencia', 'EV_D_A')->assertSet('evidencia', null);
         $c->call('seleccionarEvaluacion', 'EVAL_S')->assertSee('Sin dificultad evidenciada')->call('seleccionarEvaluacion', 'EVAL_M')->assertSee('Hallazgos mixtos');
         $this->assertSame($antes, $this->huella());
@@ -137,7 +149,7 @@ class ResultadosExpertoResidenteTest extends PruebaConBaseDesechable
         $responsableCarga = User::create(['cod_usuario' => 'USR_CARGA_TEST', 'correo' => 'carga@example.test',
             'contrasena' => bin2hex(random_bytes(24)), 'estado' => 'ACTIVO']);
         $responsableCarga->assignRole('SUPERADMINISTRADOR');
-        (new \App\Backend\Modulos\SistemaExperto\Acciones\CargarConocimientoOrion)->ejecutar($responsableCarga);
+        (new CargarConocimientoOrion)->ejecutar($responsableCarga);
         $otro = F::residenteAdicional('CONTROL_AJENO');
         DB::table('evaluaciones_expertas')->update(['origen_activacion' => 'PRUEBA_TECNICA']);
         foreach (range(1, 7) as $i) {
@@ -270,9 +282,11 @@ class ResultadosExpertoResidenteTest extends PruebaConBaseDesechable
             Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])->assertNotFound();
         }
         $this->medico->syncRoles(['MEDICO GENERAL/GERIATRA']);
-        DB::table('usuarios')->where('cod_usuario', $this->medico->getKey())->update(['estado' => 'INACTIVO']); $this->medico->refresh();
+        DB::table('usuarios')->where('cod_usuario', $this->medico->getKey())->update(['estado' => 'INACTIVO']);
+        $this->medico->refresh();
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])->assertNotFound();
-        DB::table('usuarios')->where('cod_usuario', $this->medico->getKey())->update(['estado' => 'ACTIVO']); $this->medico->refresh();
+        DB::table('usuarios')->where('cod_usuario', $this->medico->getKey())->update(['estado' => 'ACTIVO']);
+        $this->medico->refresh();
         DB::table('personal')->where('cod_personal', 'PER_MED')->update(['estado' => 'INACTIVO']);
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])->assertNotFound();
         DB::table('personal')->where('cod_personal', 'PER_MED')->update(['estado' => 'ACTIVO']);
@@ -284,14 +298,18 @@ class ResultadosExpertoResidenteTest extends PruebaConBaseDesechable
     public function test_revocacion_en_accion_y_bypass_superadmin_no_dan_acceso(): void
     {
         $c = Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente]);
-        $this->medico->roles->first()->revokePermissionTo('valoracion_medica.ver'); $this->medico->unsetRelation('roles');
+        $this->medico->roles->first()->revokePermissionTo('valoracion_medica.ver');
+        $this->medico->unsetRelation('roles');
         $c->call('seleccionarCriterio', 'COG-MEM')->assertNotFound();
-        $this->medico->roles->first()->givePermissionTo('valoracion_medica.ver'); $this->medico->unsetRelation('roles');
+        $this->medico->roles->first()->givePermissionTo('valoracion_medica.ver');
+        $this->medico->unsetRelation('roles');
         $c = Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente]);
-        $this->medico->roles->first()->revokePermissionTo('controles_cognitivos.ver'); $this->medico->unsetRelation('roles');
+        $this->medico->roles->first()->revokePermissionTo('controles_cognitivos.ver');
+        $this->medico->unsetRelation('roles');
         $c->call('seleccionarCriterio', 'COG-MEM')->assertNotFound();
         $this->medico->syncRoles(['SUPERADMINISTRADOR']);
-        $this->medico->roles->first()->revokePermissionTo('controles_cognitivos.ver'); $this->medico->unsetRelation('roles');
+        $this->medico->roles->first()->revokePermissionTo('controles_cognitivos.ver');
+        $this->medico->unsetRelation('roles');
         $this->assertTrue($this->medico->can('controles_cognitivos.ver'));
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])->assertNotFound();
     }
@@ -302,13 +320,14 @@ class ResultadosExpertoResidenteTest extends PruebaConBaseDesechable
         $c->call('seleccionarEvaluacion', 'NO_EXISTE')->assertNotFound();
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])->call('seleccionarEvaluacion', 'EVAL_D')->call('verEvidencia', 'EV_S_B')->assertNotFound();
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])->call('seleccionarCriterio', 'NO_EXISTE')->assertStatus(422);
-        $this->expectException(\Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException::class);
+        $this->expectException(CannotUpdateLockedPropertyException::class);
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])->set('codResidente', 'OTRO');
     }
 
     public function test_fuente_instrumental_restringida_y_fuente_cognitiva_actual(): void
     {
-        $this->medico->roles->first()->revokePermissionTo('aplicaciones_instrumento.ver'); $this->medico->unsetRelation('roles');
+        $this->medico->roles->first()->revokePermissionTo('aplicaciones_instrumento.ver');
+        $this->medico->unsetRelation('roles');
         $s = app(LecturaFuenteEvidencia::class);
         $this->assertStringContainsString('restringido', $s->consultar($this->medico, $this->residente, 'EVAL_D', 'EV_D_A')['estado']);
         DB::table('controles_cognitivos')->insert(['cod_control_cognitivo' => 'CC_QA', 'cod_residente' => $this->residente->getKey(), 'cod_personal' => 'PER_MED', 'fecha_hora' => '2026-10-08 11:00:00', 'estado' => 'ACTIVO', 'memoria_reciente' => 'literal_fuente_actual']);
@@ -360,10 +379,17 @@ class ResultadosExpertoResidenteTest extends PruebaConBaseDesechable
         auth()->logout();
         $this->get(route('admin.medico.residente.resultados-experto', $this->residente))->assertRedirect(route('login'));
         $this->actingAs($this->medico);
-        DB::enableQueryLog(); DB::flushQueryLog(); $this->leer(); $una = count(DB::getQueryLog());
-        DB::flushQueryLog(); $this->leer('EVAL_M'); $dos = count(DB::getQueryLog()); DB::disableQueryLog();
+        DB::enableQueryLog();
+        DB::flushQueryLog();
+        $this->leer();
+        $una = count(DB::getQueryLog());
+        DB::flushQueryLog();
+        $this->leer('EVAL_M');
+        $dos = count(DB::getQueryLog());
+        DB::disableQueryLog();
         $this->assertLessThanOrEqual($una + 1, $dos);
     }
+
     public function test_ficha_y_carpeta_cognitiva_contienen_entrada_contextual(): void
     {
         $url = route('admin.medico.residente.resultados-experto', $this->residente);
@@ -395,7 +421,9 @@ class ResultadosExpertoResidenteTest extends PruebaConBaseDesechable
         DB::table('resultados_criterio')->where('cod_resultado_criterio', 'RC_D')->update(['cod_valor_semantico' => 'RES_S']);
         $h = collect($this->leer('EVAL_S')['historial']->items())->firstWhere('id', 'EVAL_D');
         $this->assertSame('Error de inferencia', $h['criterios'][0]['estado']);
-        foreach (range(1, 8) as $i) { F::insertar('evaluaciones_expertas', ['cod_evaluacion_experta' => 'EVAL_EXTRA_'.$i, 'cod_residente' => $this->residente->getKey(), 'cod_version_modelo' => 'VER_TEST', 'origen_activacion' => 'SINTETICA', 'estado_ejecucion' => 'SINTETICA_FINAL']); }
+        foreach (range(1, 8) as $i) {
+            F::insertar('evaluaciones_expertas', ['cod_evaluacion_experta' => 'EVAL_EXTRA_'.$i, 'cod_residente' => $this->residente->getKey(), 'cod_version_modelo' => 'VER_TEST', 'origen_activacion' => 'SINTETICA', 'estado_ejecucion' => 'SINTETICA_FINAL']);
+        }
         $antes = $this->huella();
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])->call('setPage', 2, 'historia')->assertSee('Historial de evaluaciones');
         $this->assertSame($antes, $this->huella());

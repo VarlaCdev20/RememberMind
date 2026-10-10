@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Backend\Modulos\SistemaExperto\Acciones\CargarConocimientoOrion;
 use App\Models\User;
+use App\Modulos\ApoyoDecision\Aplicacion\Acciones\CargarConocimientoOrion;
 use Illuminate\Console\Command;
 
 final class CargarConocimientoOrionCommand extends Command

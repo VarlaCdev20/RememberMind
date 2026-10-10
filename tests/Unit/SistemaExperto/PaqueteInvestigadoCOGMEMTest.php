@@ -2,14 +2,14 @@
 
 namespace Tests\Unit\SistemaExperto;
 
-use App\Backend\Modulos\SistemaExperto\Conocimiento\MapeadorSemantico;
-use App\Backend\Modulos\SistemaExperto\Conocimiento\PaqueteInvestigadoCOGMEM as P;
-use App\Backend\Modulos\SistemaExperto\DTO\ContextoEjecucion;
-use App\Backend\Modulos\SistemaExperto\DTO\FuenteBrutaCOGMEM;
-use App\Backend\Modulos\SistemaExperto\MemoriaTrabajo\MemoriaTrabajo;
-use App\Backend\Modulos\SistemaExperto\Servicios\MotorExperto;
 use DateTimeImmutable;
 use DomainException;
+use MotorExperto\aplicacion\casos_uso\MotorExperto;
+use MotorExperto\dominio\conocimiento\MapeadorSemantico;
+use MotorExperto\dominio\conocimiento\versiones\PaqueteInvestigadoCOGMEM as P;
+use MotorExperto\dominio\inferencia\MemoriaTrabajo;
+use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
+use MotorExperto\dominio\objetos_valor\FuenteBrutaCOGMEM;
 use PHPUnit\Framework\TestCase;
 
 final class PaqueteInvestigadoCOGMEMTest extends TestCase

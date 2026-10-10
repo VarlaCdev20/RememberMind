@@ -1,0 +1,9 @@
+{
+    "contrato": 1,
+    "uso": "PRUEBA_TECNICA",
+    "evaluacion": "EVA_TEST",
+    "residente": "RES_TEST",
+    "version_conocimiento": "VER_TEST",
+    "fecha_corte": "2026-10-08T12:00:00+00:00",
+    "criterio": "MEM"
+}

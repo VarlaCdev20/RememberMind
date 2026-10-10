@@ -2,11 +2,11 @@
 
 namespace App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas;
 
-use App\Backend\Modulos\SistemaExperto\Presentacion\LenguajeResultadosExperto as L;
-use App\Backend\Modulos\SistemaExperto\Servicios\LecturaFuenteEvidencia;
-use App\Backend\Modulos\SistemaExperto\Servicios\LecturaResultadosExperto;
 use App\Models\EvaluacionExperta;
 use App\Models\Residente;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaFuenteEvidencia;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaResultadosExperto;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto as L;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Locked;

@@ -2,16 +2,16 @@
 
 namespace Tests\Unit\SistemaExperto;
 
-use App\Backend\Modulos\SistemaExperto\Adaptadores\AdaptadorFuentesCOGMEM;
-use App\Backend\Modulos\SistemaExperto\Adaptadores\InspectorComponenteInstrumental;
-use App\Backend\Modulos\SistemaExperto\Conocimiento\EjemploTecnicoCOGMEM as F;
-use App\Backend\Modulos\SistemaExperto\Conocimiento\MapeadorSemantico;
-use App\Backend\Modulos\SistemaExperto\Conocimiento\PaqueteConocimiento;
-use App\Backend\Modulos\SistemaExperto\DTO\ContextoEjecucion;
-use App\Backend\Modulos\SistemaExperto\MemoriaTrabajo\MemoriaTrabajo;
-use App\Backend\Modulos\SistemaExperto\Servicios\MotorExperto;
 use DateTimeImmutable;
 use DomainException;
+use MotorExperto\adaptadores\entrada\AdaptadorHechosCOGMEM as AdaptadorFuentesCOGMEM;
+use MotorExperto\adaptadores\entrada\EjemploTecnicoCOGMEM as F;
+use MotorExperto\adaptadores\entrada\InspectorComponenteInstrumental;
+use MotorExperto\aplicacion\casos_uso\MotorExperto;
+use MotorExperto\dominio\conocimiento\MapeadorSemantico;
+use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\dominio\inferencia\MemoriaTrabajo;
+use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
 use PHPUnit\Framework\TestCase;
 
 class RegresionesContratoExpertoTest extends TestCase

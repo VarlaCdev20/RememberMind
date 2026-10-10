@@ -2,17 +2,17 @@
 
 namespace Tests\Support\SistemaExperto;
 
-use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
-use App\Backend\Modulos\SistemaExperto\Conocimiento\EjemploTecnicoCOGMEM as F;
 use App\Models\Cama;
 use App\Models\Habitacion;
 use App\Models\Personal;
 use App\Models\Preadmision;
 use App\Models\Residente;
 use App\Models\User;
+use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use MotorExperto\adaptadores\entrada\EjemploTecnicoCOGMEM as F;
 use RuntimeException;
 
 /** Datos artificiales de lectura, exclusivamente para pruebas aisladas. */
