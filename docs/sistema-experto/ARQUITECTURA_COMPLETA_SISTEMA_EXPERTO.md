@@ -1,3 +1,20 @@
+---
+title: "RememberMind — Arquitectura completa del sistema experto"
+status: PROPOSED
+version: "1.0"
+last_reviewed: 2026-10-06
+owner: RememberMind
+source_of_truth: false
+verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
+> PROPOSED: no norma aprobada ni módulo operativo. Ubicación/arquitectura se subordina a [estructura vigente](../arquitectura/README.md); método/reglas y persistencia requieren decisiones aplicables.
+
 # RememberMind — Arquitectura completa del sistema experto
 
 **Estado:** propuesta maestra para revisión clínica, institucional y técnica

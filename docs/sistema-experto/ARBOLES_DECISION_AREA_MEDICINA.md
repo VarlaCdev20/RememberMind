@@ -1,3 +1,20 @@
+---
+title: "RememberMind — Árboles de decisión del área de Medicina"
+status: PROPOSED
+version: "1.0"
+last_reviewed: 2026-10-06
+owner: RememberMind
+source_of_truth: false
+verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
+> PROPOSED: no aprobación de reglas/tiempos/métricas por su presencia en el documento.
+
 # RememberMind — Árboles de decisión del área de Medicina
 
 **Estado:** diseño funcional y técnico para revisión profesional

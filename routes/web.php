@@ -37,6 +37,7 @@ use App\Frontend\Livewire\Enfermeria\Valoraciones\ValoracionEnfermeriaPanel;
 use App\Frontend\Livewire\Medico\Clinica\DashboardMedico;
 use App\Frontend\Livewire\Medico\Clinica\PacientesSeguimientoPanel;
 use App\Frontend\Livewire\Medico\Clinica\ObjetivosSignosVitalesPanel;
+use App\Frontend\Livewire\Medico\Clinica\ResultadosExpertoResidente;
 use App\Frontend\Livewire\Medico\Medicacion\SaludMedicacionPanel;
 use App\Frontend\Livewire\Medico\Valoraciones\ValoracionMedicaPanel;
 use App\Frontend\Livewire\Psicologia\DashboardPsicologo;
@@ -259,6 +260,10 @@ Route::middleware([
             Route::view('/roles-permisos', 'pages.roles-permisos.index')
                 ->middleware('permission:roles.ver')
                 ->name('roles-permisos.index');
+
+            Route::get('/sistema-experto', \App\Frontend\Livewire\Superadministrador\SistemaExperto\ConocimientoPanel::class)
+                ->middleware(['role:SUPERADMINISTRADOR', 'can:consultar,App\Models\VersionModeloExperto'])
+                ->name('sistema-experto.index');
 
             Route::get('/areas-atencion', [AreasAtencionController::class, 'index'])
                 ->middleware('permission:areas.ver')
@@ -670,6 +675,10 @@ Route::middleware([
                         ->middleware('permission:enfermeria.ver_ficha_paciente')
                         ->name('pacientes.ficha');
 
+                    Route::get('/pacientes/{residente}/resultados-experto', ResultadosExpertoResidente::class)
+                        ->middleware(['permission:enfermeria.ver_ficha_paciente', 'can:consultarResultados,App\\Models\\EvaluacionExperta,residente'])
+                        ->name('pacientes.resultados-experto');
+
                     Route::get('/pacientes/{adulto}/pdf', [FichaPacienteReporteController::class, 'pdf'])
                         ->middleware('permission:enfermeria.ver_ficha_paciente')
                         ->name('pacientes.ficha.pdf');
@@ -725,6 +734,10 @@ Route::middleware([
                     Route::get('/residente/{residente}/objetivos-signos-vitales', ObjetivosSignosVitalesPanel::class)
                         ->middleware('permission:objetivos_signos_vitales.ver')
                         ->name('residente.objetivos-signos-vitales');
+
+                    Route::get('/residente/{residente}/evaluacion-cognitiva/resultados-experto', ResultadosExpertoResidente::class)
+                        ->middleware('can:consultarResultados,App\\Models\\EvaluacionExperta,residente')
+                        ->name('residente.resultados-experto');
 
                     // Compatibilidad con rutas/vistas existentes.
                     Route::get('/pacientes-seguimiento', PacientesSeguimientoPanel::class)

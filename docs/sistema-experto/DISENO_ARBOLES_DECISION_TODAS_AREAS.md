@@ -1,3 +1,20 @@
+---
+title: "RememberMind — Diseño de árboles de decisión para todas las áreas"
+status: PROPOSED
+version: "1.0"
+last_reviewed: 2026-10-06
+owner: RememberMind
+source_of_truth: false
+verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
+> PROPOSED: árboles para revisión, no umbrales/reglas clínicos autorizados por esta cabecera.
+
 # RememberMind — Diseño de árboles de decisión para todas las áreas
 
 **Estado:** propuesta para revisión clínica y técnica
