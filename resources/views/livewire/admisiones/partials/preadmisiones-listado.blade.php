@@ -50,7 +50,7 @@
    </section>
   </div>
  </details>
- <section class="rm-pre-toolbar" aria-label="Filtrar preadmisiones">
+ <x-ui.filter-bar class="rm-pre-toolbar" aria-label="Filtrar preadmisiones">
   <div class="rm-pre-toolbar__top">
    <label class="rm-pre-searchbox" for="buscar-preadmisiones"><i class="ph-bold ph-magnifying-glass" aria-hidden="true"></i><input id="buscar-preadmisiones" type="search" wire:model.live.debounce.350ms="search" placeholder="Nombre, CI, familiar o caso…" aria-label="Buscar preadmisiones">@if($search !== '')<button type="button" wire:click="$set('search', '')" aria-label="Limpiar búsqueda"><i class="ph-bold ph-x" aria-hidden="true"></i></button>@endif</label>
    <div class="rm-pre-view-switch" role="group" aria-label="Vista de solicitudes">
@@ -76,7 +76,7 @@
     <button type="button" wire:click="limpiarFiltros" class="rm-pre-active__clear"><i class="ph-bold ph-arrow-counter-clockwise" aria-hidden="true"></i> Limpiar filtros</button>
    </div>
   @endif
- </section>
+ </x-ui.filter-bar>
  <div class="rm-pre-results" role="status"><div><span class="rm-pre-results__icon"><i class="ph-bold ph-stack" aria-hidden="true"></i></span><div><h2>{{ $preadmisiones->total() }} {{ $preadmisiones->total() === 1 ? 'solicitud encontrada' : 'solicitudes encontradas' }}</h2><p>{{ $hasFiltrosActivos ? 'Resultados según tus filtros' : 'Todas las solicitudes registradas' }}</p></div></div><span wire:loading wire:target="search,estado,prioridad,fecha_inicio,fecha_fin,orden,previousPage,nextPage,gotoPage,porPagina"><i class="ph-bold ph-spinner animate-spin" aria-hidden="true"></i> Actualizando…</span></div>
  <section class="rm-pre-collection rm-pre-collection--{{ $vista }}" aria-label="Solicitudes de preadmisión" wire:loading.class="is-updating" wire:target="search,estado,prioridad,fecha_inicio,fecha_fin,orden,porPagina">
   @if($vista === 'tabla' && $preadmisiones->isNotEmpty())
@@ -98,7 +98,7 @@
      </div>
     </article>
    @empty
-    <div class="rm-pre-empty"><i class="ph-bold ph-folder-open" aria-hidden="true"></i><h2>{{ $metricas['total'] ? 'No encontramos solicitudes con esos criterios' : 'No hay preadmisiones registradas' }}</h2><p>{{ $metricas['total'] ? 'Cambia el estado o elimina un filtro para continuar.' : 'Registra la primera solicitud para iniciar el proceso.' }}</p>@if($metricas['total'])<button type="button" wire:click="limpiarFiltros" class="rm-btn-secondary"><i class="ph-bold ph-arrow-counter-clockwise" aria-hidden="true"></i> Limpiar filtros</button>@endif</div>
+    <x-ui.empty-state icono="ph-folder-open" :titulo="$metricas['total'] ? 'No encontramos solicitudes con esos criterios' : 'No hay preadmisiones registradas'" :texto="$metricas['total'] ? 'Cambia el estado o elimina un filtro para continuar.' : 'Registra la primera solicitud para iniciar el proceso.'" :actionMethod="$metricas['total'] ? 'limpiarFiltros' : null" :actionText="$metricas['total'] ? 'Limpiar filtros' : null" />
    @endforelse
   @endif
  </section>

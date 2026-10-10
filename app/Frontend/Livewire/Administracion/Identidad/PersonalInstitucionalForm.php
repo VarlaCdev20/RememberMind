@@ -4,7 +4,7 @@ namespace App\Frontend\Livewire\Administracion\Identidad;
 
 use Livewire\Component;
 use App\Models\User;
-use App\Models\AreaInstitucional;
+use App\Models\Area;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -423,7 +423,7 @@ class PersonalInstitucionalForm extends Component
 
     private function clasificacionBase(string $rol, string $tipoPersonal, string $tipoLabel, string $rolOperativo, string $rolLabel, string $codArea): array
     {
-        $areaNombre = AreaInstitucional::find($codArea)?->nombre ?? $this->nombreAreaPorDefecto($codArea);
+        $areaNombre = Area::find($codArea)?->nombre ?? $this->nombreAreaPorDefecto($codArea);
 
         return [
             'rol_sistema' => $rol,
@@ -1380,7 +1380,7 @@ class PersonalInstitucionalForm extends Component
             'roles' => $rolesQuery->get(),
             'especialidades' => $this->catalogoEspecialidadesPorRol(),
             'cargos' => $this->catalogoCargosAdministrativosPorRol(),
-            'areas' => AreaInstitucional::whereIn('estado', ['ACTIVA', 'ACTIVO'])->get(),
+            'areas' => Area::whereIn('estado', ['ACTIVA', 'ACTIVO'])->get(),
             'clasificacion_derivada' => $this->clasificacionDesdeRoles(),
         ]);
     }

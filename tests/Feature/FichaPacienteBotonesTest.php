@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
 use App\Models\Admision;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Alerta;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
@@ -19,7 +19,7 @@ use App\Models\Medicamento;
 use App\Models\OcupacionCama;
 use App\Models\PlanCuidado;
 use App\Models\Prescripcion;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -33,9 +33,9 @@ class FichaPacienteBotonesTest extends TestCase
 
     protected User $enfermero;
 
-    protected AdultoMayor $adulto;
+    protected Residente $adulto;
 
-    protected TurnoEnfermeria $turno;
+    protected Turno $turno;
 
     protected Habitacion $habitacion;
 
@@ -56,7 +56,7 @@ class FichaPacienteBotonesTest extends TestCase
         ]);
         $this->enfermero->assignRole('ENFERMEROS');
 
-        $this->turno = TurnoEnfermeria::create([
+        $this->turno = Turno::create([
             'nombre' => 'Turno Mañana',
             'hora_inicio' => '07:00:00',
             'hora_fin' => '15:00:00',
@@ -86,7 +86,7 @@ class FichaPacienteBotonesTest extends TestCase
             'estado' => 'OCUPADA',
         ]);
 
-        $this->adulto = AdultoMayor::factory()->create([
+        $this->adulto = Residente::factory()->create([
             'cod_residente' => 'AM100',
             'nombres' => 'Bernardo',
             'ap_paterno' => 'Pinto',

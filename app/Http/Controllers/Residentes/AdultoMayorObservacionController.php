@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Residentes;
 
 use App\Http\Controllers\Controller;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Atencion;
 use App\Models\NotaClinica;
 use App\Models\Personal;
@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 
 class AdultoMayorObservacionController extends Controller
 {
-    public function index(AdultoMayor $adulto_mayor)
+    public function index(Residente $adulto_mayor)
     {
         $query = $adulto_mayor->observaciones();
         if (request('buscar')) {
@@ -28,7 +28,7 @@ class AdultoMayorObservacionController extends Controller
         ]);
     }
 
-    public function store(Request $request, AdultoMayor $adulto_mayor)
+    public function store(Request $request, Residente $adulto_mayor)
     {
         $data = $request->validate([
             'fecha' => ['nullable', 'date', 'before_or_equal:today'],
@@ -71,7 +71,7 @@ class AdultoMayorObservacionController extends Controller
             ->with('success', 'Observación registrada correctamente.');
     }
 
-    public function update(Request $request, AdultoMayor $adulto_mayor, $observacionId)
+    public function update(Request $request, Residente $adulto_mayor, $observacionId)
     {
         $nota = NotaClinica::where('cod_residente', $adulto_mayor->cod_residente)
             ->where('cod_nota', $observacionId)
@@ -86,7 +86,7 @@ class AdultoMayorObservacionController extends Controller
             ->with('success', 'Observación actualizada correctamente.');
     }
 
-    public function destroy(AdultoMayor $adulto_mayor, $observacionId)
+    public function destroy(Residente $adulto_mayor, $observacionId)
     {
         $nota = NotaClinica::where('cod_residente', $adulto_mayor->cod_residente)
             ->where('cod_nota', $observacionId)
@@ -98,7 +98,7 @@ class AdultoMayorObservacionController extends Controller
             ->with('success', 'Observación anulada correctamente.');
     }
 
-    public function restore(AdultoMayor $adulto_mayor, $observacionId)
+    public function restore(Residente $adulto_mayor, $observacionId)
     {
         $nota = NotaClinica::where('cod_residente', $adulto_mayor->cod_residente)
             ->where('cod_nota', $observacionId)

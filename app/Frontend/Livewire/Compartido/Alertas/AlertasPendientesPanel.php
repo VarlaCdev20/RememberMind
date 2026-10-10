@@ -15,6 +15,7 @@ class AlertasPendientesPanel extends Component
 
     public function render()
     {
+        \Illuminate\Support\Facades\Gate::authorize('viewAny', Residente::class);
         $adultos = Residente::with([
             'contactos',
             'documentos',
@@ -24,9 +25,11 @@ class AlertasPendientesPanel extends Component
             'valoracionesFuncionales',
             'observaciones',
             'actividades'
-        ])->get();
+        ])->when(! auth()->user()->hasAnyRole(['SUPERADMINISTRADOR', 'GERENTE', 'ADMINISTRADOR']), fn ($q) => $q->whereIn('cod_residente',
+            app(\App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService::class)->obtenerPacientesAsignadosQuery(auth()->user())->select('cod_residente')))->get();
 
         $evaluaciones = AplicacionInstrumento::with('instrumento')
+            ->whereIn('cod_residente', $adultos->modelKeys())
             ->where('estado', 'ACTIVO')
             ->get()
             ->groupBy('cod_residente');

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
@@ -18,7 +18,7 @@ class PantallasConectadasTest extends TestCase
         $this->seed([ \Database\Seeders\RolesAndPermissionsSeeder::class]);
         $user = User::factory()->create();
         $user->assignRole(Role::findOrCreate('SUPERADMINISTRADOR', 'web'));
-        $adulto = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
+        $adulto = Residente::factory()->create(['cod_est_adul' => 'EST_001']);
         $this->actingAs($user);
         $fallos = [];
         foreach (Route::getRoutes() as $ruta) {

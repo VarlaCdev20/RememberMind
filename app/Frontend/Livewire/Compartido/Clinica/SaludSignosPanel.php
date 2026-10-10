@@ -378,7 +378,7 @@ class SaludSignosPanel extends Component
         $servicio = app(SignosVitalesService::class);
         if ($esRectificacion) {
             $original = SignoVital::where('cod_residente', $this->adulto->cod_residente)->findOrFail($this->signoId);
-            $servicio->rectificar($original, $datos, $this->motivoRectificacion, auth()->user(), $permiso);
+            $servicio->rectificar($original, $datos, $this->motivoRectificacion, auth()->user());
         } else {
             $servicio->registrar($this->adulto->cod_residente, $datos, auth()->user(), $permiso);
         }

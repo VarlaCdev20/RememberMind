@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
 use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Area;
 use App\Models\Atencion;
 use App\Models\Medicamento;
@@ -24,7 +24,7 @@ class MedicoFichaUnificadaTest extends TestCase
 
     private User $medico;
 
-    private AdultoMayor $residente;
+    private Residente $residente;
 
     protected function setUp(): void
     {
@@ -49,7 +49,7 @@ class MedicoFichaUnificadaTest extends TestCase
             'estado' => 'ACTIVA',
         ]);
 
-        $this->residente = AdultoMayor::factory()->create([
+        $this->residente = Residente::factory()->create([
             'cod_est_adul' => 'EST_001',
             'nombres' => 'Aurelio',
             'ap_paterno' => 'Valdivia',
@@ -137,7 +137,7 @@ class MedicoFichaUnificadaTest extends TestCase
         $this->actingAs($this->medico);
 
         // Residente sin asignación de turno de enfermería
-        $otroResidente = AdultoMayor::factory()->create([
+        $otroResidente = Residente::factory()->create([
             'cod_est_adul' => 'EST_001',
             'nombres' => 'Beatriz',
             'ap_paterno' => 'Sarmiento',
@@ -152,7 +152,7 @@ class MedicoFichaUnificadaTest extends TestCase
     {
         $this->actingAs($this->medico);
 
-        $otroResidente = AdultoMayor::factory()->create([
+        $otroResidente = Residente::factory()->create([
             'cod_est_adul' => 'EST_001',
             'nombres' => 'Beatriz',
             'ap_paterno' => 'Sarmiento',

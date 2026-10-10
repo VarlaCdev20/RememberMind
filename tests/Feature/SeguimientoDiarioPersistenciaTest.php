@@ -10,7 +10,7 @@ use App\Models\Atencion;
 use App\Models\Jornada;
 use App\Models\Personal;
 use App\Models\Residente;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -39,7 +39,7 @@ class SeguimientoDiarioPersistenciaTest extends TestCase
             'nombres' => 'Ana', 'apellido_paterno' => 'Prueba', 'numero_documento' => 'SEG-001',
             'profesion' => 'ENFERMERIA', 'estado' => 'ACTIVO',
         ]);
-        $turno = TurnoEnfermeria::query()->create([
+        $turno = Turno::query()->create([
             'cod_turno' => 'TUR_SEG_DIARIO', 'nombre' => 'Mañana', 'hora_inicio' => '07:00:00',
             'hora_cierre' => '15:00:00', 'orden' => 1, 'estado' => 'ACTIVO',
         ]);

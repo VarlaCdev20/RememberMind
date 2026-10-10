@@ -91,7 +91,7 @@
             <x-ui.field label="Procedimiento realizado" for="curacion-procedimiento" error="accionLesion" :required="true" class="rm-clinical-form__full"><textarea id="curacion-procedimiento" wire:model="accionLesion" rows="3" maxlength="2000" class="rm-textarea" aria-invalid="{{ $errors->has('accionLesion') ? 'true' : 'false' }}" @error('accionLesion') aria-describedby="curacion-procedimiento-error" @enderror></textarea></x-ui.field>
             <x-ui.field label="Observación complementaria" for="curacion-observacion" error="observacionLesion" class="rm-clinical-form__full"><textarea id="curacion-observacion" wire:model="observacionLesion" rows="2" maxlength="2000" class="rm-textarea" aria-invalid="{{ $errors->has('observacionLesion') ? 'true' : 'false' }}" @error('observacionLesion') aria-describedby="curacion-observacion-error" @enderror></textarea></x-ui.field>
         </x-ui.form-section>
-    </form>
+    <x-ui.clinical-clear-action /></form>
     @endif
     @if($this->puedeMutarRegistro('atenciones.crear'))
     <form id="clinical-wound-close-form" @submit.prevent="prepareFeedback('cierre-herida'); $wire.cerrarLesion($wire.lesionId)" x-show="clinicalOperation === 'cierre-herida' && !clinicalDiscardOpen" class="rm-clinical-form" x-data="rmClinicalCapture()" x-effect="if(clinicalFormOpen && clinicalOperation === 'cierre-herida') $nextTick(() => initialCapture = snapshot())" @input="notifyDirty()" @change="notifyDirty()">
@@ -101,7 +101,7 @@
             <x-ui.field label="Resultado clínico al cierre" for="herida-resultado" error="resultadoCierreLesion" :required="true"><textarea id="herida-resultado" wire:model="resultadoCierreLesion" maxlength="1000" rows="3" class="rm-textarea" aria-invalid="{{ $errors->has('resultadoCierreLesion') ? 'true' : 'false' }}" @error('resultadoCierreLesion') aria-describedby="herida-resultado-error" @enderror></textarea></x-ui.field>
             <x-ui.field label="Motivo del cierre" for="herida-motivo" error="motivoCierreLesion" :required="true"><textarea id="herida-motivo" wire:model="motivoCierreLesion" maxlength="1000" rows="3" class="rm-textarea" aria-invalid="{{ $errors->has('motivoCierreLesion') ? 'true' : 'false' }}" @error('motivoCierreLesion') aria-describedby="herida-motivo-error" @enderror></textarea></x-ui.field>
         </x-ui.form-section>
-    </form>
+    <x-ui.clinical-clear-action /></form>
     @endif
     <x-slot:footer>
         <div x-show="clinicalDiscardOpen" class="rm-clinical-workspace__actions"><button type="button" class="rm-btn-secondary" @click="clinicalDiscardOpen = false">Seguir editando</button><button type="button" class="rm-btn-danger" @click="discardClinicalForm(@js($curacionInicial))">Salir sin guardar</button></div>

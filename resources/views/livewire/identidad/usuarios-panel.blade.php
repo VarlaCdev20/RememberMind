@@ -993,9 +993,7 @@
    </x-slot:subtitle>
 
    <x-slot:status>
-    <span class="rm-badge text-[10px] font-extrabold px-2.5 py-0.5 rounded-full {{ $u->estado === 'ACTIVO' ? 'bg-[var(--rm-success-soft)] text-[var(--rm-success)] border border-[var(--rm-success)]' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-secondary)] border border-[var(--rm-border)]' }}">
-    {{ $u->estado === 'ACTIVO' ? 'Activo' : 'Inactivo' }}
-    </span>
+    <x-ui.status-badge :estado="$u->estado" />
    </x-slot:status>
 
    {{-- Detalle de Área y Cargo --}}
@@ -1167,9 +1165,7 @@
     </td>
 
     <td class="px-5 py-3.5">
-     <span class="inline-block rounded-full px-2.5 py-0.5 text-[10px] font-extrabold uppercase {{ $u->estado === 'ACTIVO' ? 'bg-[var(--rm-success-soft)] text-[var(--rm-success)] border border-[var(--rm-success)]' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-secondary)] border border-[var(--rm-border)]' }}">
-     {{ $u->estado === 'ACTIVO' ? 'Activo' : 'Inactivo' }}
-     </span>
+     <x-ui.status-badge :estado="$u->estado" />
     </td>
 
     <td class="px-5 py-3.5">

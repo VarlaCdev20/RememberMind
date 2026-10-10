@@ -36,14 +36,12 @@ class AreasInstitucionalesExport implements FromCollection, WithHeadings, WithMa
     {
         return [
             'Área',
-            'Tipo de área',
             'Responsable',
             'Estado',
             'Total usuarios',
             'Usuarios activos',
             'Usuarios inactivos',
-            'Última actualización',
-            'Observaciones'
+            'Descripción'
         ];
     }
 
@@ -55,14 +53,12 @@ class AreasInstitucionalesExport implements FromCollection, WithHeadings, WithMa
     {
         return [
             $area->nombre,
-            $area->tipo_area,
             $area->responsable ? $area->responsable->name : 'Sin Responsable',
             $area->estado,
             $area->usuarios->count(),
             $area->usuarios->filter(fn($u) => in_array($u->estado, ['ACTIVO', 1, '1']))->count(),
             $area->usuarios->filter(fn($u) => !in_array($u->estado, ['ACTIVO', 1, '1']))->count(),
-            $area->updated_at ? \Carbon\Carbon::parse($area->updated_at)->format('d/m/Y H:i') : 'Sin registro',
-            $area->observaciones ?: 'Sin observaciones',
+            $area->descripcion ?: 'Sin descripción',
         ];
     }
 
@@ -73,7 +69,7 @@ class AreasInstitucionalesExport implements FromCollection, WithHeadings, WithMa
     public function styles(Worksheet $sheet)
     {
         // Activar autofiltros para todas las columnas de la cabecera
-        $sheet->setAutoFilter('A1:I1');
+        $sheet->setAutoFilter('A1:G1');
 
         return [
             // Cabecera: Negrita, texto blanco, fondo azul profundo (#2F3E5C)

@@ -543,7 +543,7 @@
     left: 13px;
     display: flex;
     align-items: center;
-    color: #6E6457;
+    color: var(--rm-filter-neutral-icon);
     font-size: 16px;
     pointer-events: none;
     transition: color 160ms ease, transform 160ms ease;
@@ -554,7 +554,7 @@
     min-height: 40px;
     height: 40px;
     padding: 0 36px 0 38px;
-    color: #2C2622;
+    color: var(--rm-filter-search-ink);
     font-family: var(--rm-font-body, 'Nunito Sans', sans-serif);
     font-size: 13.5px;
     font-weight: 550;
@@ -573,39 +573,39 @@
 
 :is(.dark, [data-theme="dark"]) .rm-filter-search__input {
     background: rgba(25, 46, 57, 0.75);
-    color: #EDF5F7;
+    color: var(--rm-filter-ink-dark);
     border-color: rgba(41, 66, 78, 0.85);
 }
 
 .rm-filter-search__input::placeholder {
-    color: #948A7D;
+    color: var(--rm-filter-placeholder);
     font-weight: 400;
 }
 
 .rm-filter-search__input:hover {
-    border-color: #BDB09E;
+    border-color: var(--rm-filter-border-hover);
     background-color: rgba(250, 245, 240, 0.88);
 }
 
 :is(.dark, [data-theme="dark"]) .rm-filter-search__input:hover {
-    border-color: #3B5A6A;
+    border-color: var(--rm-filter-border-hover-dark);
     background-color: rgba(29, 54, 67, 0.88);
 }
 
 .rm-filter-search__input:focus {
-    border-color: #2E7D62 !important;
+    border-color: var(--rm-filter-toolbar-focus-color) !important;
     background-color: rgba(250, 245, 240, 0.95) !important;
     box-shadow: 0 0 0 3px rgba(46, 125, 98, 0.22), 0 1px 2px rgba(44, 38, 32, 0.04) !important;
 }
 
 :is(.dark, [data-theme="dark"]) .rm-filter-search__input:focus {
-    background-color: #192E39 !important;
-    border-color: #3F8F76 !important;
+    background-color: var(--rm-filter-search-focus-bg-dark) !important;
+    border-color: var(--rm-filter-focus-dark) !important;
     box-shadow: 0 0 0 3px rgba(63, 143, 118, 0.28) !important;
 }
 
 .rm-filter-search__control:focus-within .rm-filter-search__icon {
-    color: #2E7D62;
+    color: var(--rm-filter-toolbar-focus-color);
     transform: scale(1.08);
 }
 
@@ -620,15 +620,15 @@
     border: 0;
     border-radius: 50%;
     background: transparent;
-    color: #6E6457;
+    color: var(--rm-filter-neutral-icon);
     font-size: 13px;
     cursor: pointer;
     transition: all 160ms ease;
 }
 
 .rm-filter-search__clear:hover {
-    background: #FEE2E2;
-    color: #DC2626;
+    background: var(--rm-filter-clear-hover-bg);
+    color: var(--rm-filter-danger-icon);
     transform: rotate(90deg);
 }
 
@@ -639,7 +639,7 @@
     gap: 8px;
     height: 40px;
     padding: 0 14px 0 12px;
-    color: #1B4D3E;
+    color: var(--rm-filter-add-ink);
     font-family: var(--rm-font-body, 'Nunito Sans', sans-serif);
     font-size: 13.5px;
     font-weight: 750;
@@ -657,7 +657,7 @@
 
 :is(.dark, [data-theme="dark"]) .rm-add-filter-btn {
     background: rgba(25, 46, 57, 0.75);
-    color: #9FE2CB;
+    color: var(--rm-filter-add-ink-dark);
     border-color: rgba(63, 143, 118, 0.5);
 }
 
@@ -665,12 +665,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #2E7D62;
+    color: var(--rm-filter-toolbar-focus-color);
     font-size: 14px;
 }
 
 :is(.dark, [data-theme="dark"]) .rm-add-filter-btn__icon-box {
-    color: #9FE2CB;
+    color: var(--rm-filter-add-ink-dark);
 }
 
 .rm-add-filter-btn__icon-plus {
@@ -685,8 +685,8 @@
     height: 20px;
     padding: 0 5px;
     border-radius: 9999px;
-    background: #2E7D62;
-    color: #FFFFFF;
+    background: var(--rm-filter-toolbar-focus-color);
+    color: var(--rm-filter-badge-ink);
     font-size: 11px;
     font-weight: 800;
     line-height: 1;
@@ -695,7 +695,7 @@
 
 .rm-add-filter-btn__caret {
     font-size: 12px;
-    color: #2E7D62;
+    color: var(--rm-filter-toolbar-focus-color);
     transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1), color 160ms ease;
 }
 
@@ -704,33 +704,33 @@
 }
 
 .rm-add-filter-btn:hover {
-    border-color: #2E7D62;
+    border-color: var(--rm-filter-toolbar-focus-color);
     background-color: rgba(230, 244, 237, 0.85);
-    color: #0F3D30;
+    color: var(--rm-filter-add-hover-ink);
 }
 
 :is(.dark, [data-theme="dark"]) .rm-add-filter-btn:hover {
-    background-color: #213A47;
-    border-color: #3F8F76;
-    color: #9FE2CB;
+    background-color: var(--rm-filter-add-hover-bg-dark);
+    border-color: var(--rm-filter-focus-dark);
+    color: var(--rm-filter-add-ink-dark);
 }
 
 .rm-add-filter-btn.is-open {
-    border-color: #2E7D62;
+    border-color: var(--rm-filter-toolbar-focus-color);
     background-color: rgba(225, 245, 236, 0.92);
-    color: #064E3B;
+    color: var(--rm-filter-add-open-ink);
     box-shadow: 0 0 0 3px rgba(46, 125, 98, 0.22);
 }
 
 :is(.dark, [data-theme="dark"]) .rm-add-filter-btn.is-open {
     background-color: rgba(46, 125, 98, 0.35);
-    color: #9FE2CB;
-    border-color: #3F8F76;
+    color: var(--rm-filter-add-ink-dark);
+    border-color: var(--rm-filter-focus-dark);
     box-shadow: 0 0 0 3px rgba(63, 143, 118, 0.28);
 }
 
 .rm-add-filter-btn:focus-visible {
-    outline: 2px solid #2E7D62;
+    outline: 2px solid var(--rm-filter-toolbar-focus-color);
     outline-offset: 2px;
 }
 
@@ -785,7 +785,7 @@
     border: 0;
     border-radius: 12px;
     background: transparent;
-    color: #38312B;
+    color: var(--rm-filter-choice-ink);
     font-family: var(--rm-font-body, 'Nunito Sans', sans-serif);
     font-size: 13.5px;
     font-weight: 650;
@@ -796,7 +796,7 @@
 }
 
 :is(.dark, [data-theme="dark"]) .rm-filter-type-item {
-    color: #EDF5F7;
+    color: var(--rm-filter-ink-dark);
 }
 
 .rm-filter-type-item__left {
@@ -828,65 +828,65 @@
 
 .rm-filter-type-item__caret {
     font-size: 12px;
-    color: #948A7D;
+    color: var(--rm-filter-placeholder);
     transition: transform 140ms ease, color 140ms ease;
 }
 
 /* Variantes Cromáticas Nivel 1 */
 /* Alertas: Rojo */
-.rm-filter-type-item--red .rm-filter-type-item__icon { color: #DC2626; }
-.rm-filter-type-item--red .rm-filter-type-item__dot { background: #DC2626; }
+.rm-filter-type-item--red .rm-filter-type-item__icon { color: var(--rm-filter-danger-icon); }
+.rm-filter-type-item--red .rm-filter-type-item__dot { background: var(--rm-filter-danger-icon); }
 .rm-filter-type-item--red:hover,
 .rm-filter-type-item--red.is-selected {
     background-color: rgba(254, 226, 226, 0.75);
-    color: #991B1B;
+    color: var(--rm-filter-red-selected-ink);
 }
 :is(.dark, [data-theme="dark"]) .rm-filter-type-item--red:hover,
 :is(.dark, [data-theme="dark"]) .rm-filter-type-item--red.is-selected {
     background-color: rgba(220, 38, 38, 0.3);
-    color: #FCA5A5;
+    color: var(--rm-filter-red-selected-ink-dark);
 }
 
 /* Habitación: Azul */
-.rm-filter-type-item--blue .rm-filter-type-item__icon { color: #2563EB; }
-.rm-filter-type-item--blue .rm-filter-type-item__dot { background: #2563EB; }
+.rm-filter-type-item--blue .rm-filter-type-item__icon { color: var(--rm-filter-blue-icon); }
+.rm-filter-type-item--blue .rm-filter-type-item__dot { background: var(--rm-filter-blue-icon); }
 .rm-filter-type-item--blue:hover,
 .rm-filter-type-item--blue.is-selected {
     background-color: rgba(219, 234, 254, 0.75);
-    color: #1E40AF;
+    color: var(--rm-filter-blue-selected-ink);
 }
 :is(.dark, [data-theme="dark"]) .rm-filter-type-item--blue:hover,
 :is(.dark, [data-theme="dark"]) .rm-filter-type-item--blue.is-selected {
     background-color: rgba(37, 99, 235, 0.3);
-    color: #93C5FD;
+    color: var(--rm-filter-blue-selected-ink-dark);
 }
 
 /* Medicación: Violeta */
-.rm-filter-type-item--violet .rm-filter-type-item__icon { color: #7C3AED; }
-.rm-filter-type-item--violet .rm-filter-type-item__dot { background: #7C3AED; }
+.rm-filter-type-item--violet .rm-filter-type-item__icon { color: var(--rm-filter-violet-icon); }
+.rm-filter-type-item--violet .rm-filter-type-item__dot { background: var(--rm-filter-violet-icon); }
 .rm-filter-type-item--violet:hover,
 .rm-filter-type-item--violet.is-selected {
     background-color: rgba(237, 233, 254, 0.75);
-    color: #5B21B6;
+    color: var(--rm-filter-violet-selected-ink);
 }
 :is(.dark, [data-theme="dark"]) .rm-filter-type-item--violet:hover,
 :is(.dark, [data-theme="dark"]) .rm-filter-type-item--violet.is-selected {
     background-color: rgba(124, 58, 237, 0.3);
-    color: #C4B5FD;
+    color: var(--rm-filter-violet-selected-ink-dark);
 }
 
 /* Cuidados: Rose / Green */
-.rm-filter-type-item--green .rm-filter-type-item__icon { color: #E11D48; }
-.rm-filter-type-item--green .rm-filter-type-item__dot { background: #E11D48; }
+.rm-filter-type-item--green .rm-filter-type-item__icon { color: var(--rm-filter-rose-icon); }
+.rm-filter-type-item--green .rm-filter-type-item__dot { background: var(--rm-filter-rose-icon); }
 .rm-filter-type-item--green:hover,
 .rm-filter-type-item--green.is-selected {
     background-color: rgba(255, 228, 230, 0.75);
-    color: #9F1239;
+    color: var(--rm-filter-rose-selected-ink);
 }
 :is(.dark, [data-theme="dark"]) .rm-filter-type-item--green:hover,
 :is(.dark, [data-theme="dark"]) .rm-filter-type-item--green.is-selected {
     background-color: rgba(225, 29, 72, 0.3);
-    color: #FDA4AF;
+    color: var(--rm-filter-rose-selected-ink-dark);
 }
 
 .rm-filter-type-item:hover .rm-filter-type-item__caret,
@@ -953,7 +953,7 @@
     box-shadow: 0 16px 38px -4px rgba(220, 38, 38, 0.14), 0 4px 14px rgba(44, 38, 34, 0.06);
 }
 .rm-filter-value-popover__panel--red .rm-filter-value-popover__title {
-    color: #991B1B;
+    color: var(--rm-filter-red-selected-ink);
 }
 
 /* Habitación (Blue) */
@@ -964,7 +964,7 @@
     box-shadow: 0 16px 38px -4px rgba(37, 99, 235, 0.14), 0 4px 14px rgba(44, 38, 34, 0.06);
 }
 .rm-filter-value-popover__panel--blue .rm-filter-value-popover__title {
-    color: #1E40AF;
+    color: var(--rm-filter-blue-selected-ink);
 }
 
 /* Medicación (Violet) */
@@ -975,7 +975,7 @@
     box-shadow: 0 16px 38px -4px rgba(124, 58, 237, 0.14), 0 4px 14px rgba(44, 38, 34, 0.06);
 }
 .rm-filter-value-popover__panel--violet .rm-filter-value-popover__title {
-    color: #5B21B6;
+    color: var(--rm-filter-violet-selected-ink);
 }
 
 /* Cuidados (Green) */
@@ -986,7 +986,7 @@
     box-shadow: 0 16px 38px -4px rgba(5, 150, 105, 0.14), 0 4px 14px rgba(44, 38, 34, 0.06);
 }
 .rm-filter-value-popover__panel--green .rm-filter-value-popover__title {
-    color: #065F46;
+    color: var(--rm-filter-green-selected-ink);
 }
 
 :is(.dark, [data-theme="dark"]) .rm-filter-level2-card {
@@ -1004,7 +1004,7 @@
     overscroll-behavior: contain;
     padding-right: 3px;
     scrollbar-width: thin;
-    scrollbar-color: #D3C9BC transparent;
+    scrollbar-color: var(--rm-filter-scrollbar) transparent;
 }
 
 .rm-filter-value-item {
@@ -1017,7 +1017,7 @@
     border: 0;
     border-radius: 12px;
     background: transparent;
-    color: #38312B;
+    color: var(--rm-filter-choice-ink);
     font-family: var(--rm-font-body, 'Nunito Sans', sans-serif);
     font-size: 13px;
     font-weight: 600;
@@ -1027,7 +1027,7 @@
 }
 
 :is(.dark, [data-theme="dark"]) .rm-filter-value-item {
-    color: #EDF5F7;
+    color: var(--rm-filter-ink-dark);
 }
 
 .rm-filter-value-item__label {
@@ -1052,56 +1052,56 @@
 
 /* Opciones de Valor con Fondos Redondeados Translúcidos */
 /* Alertas */
-.rm-filter-value-item--red .rm-filter-value-item__icon { color: #DC2626; }
+.rm-filter-value-item--red .rm-filter-value-item__icon { color: var(--rm-filter-danger-icon); }
 .rm-filter-value-item--red:hover {
     background-color: rgba(254, 226, 226, 0.7);
-    color: #991B1B;
+    color: var(--rm-filter-red-selected-ink);
 }
 .rm-filter-value-item--red.is-active-value {
     background-color: rgba(254, 226, 226, 0.95);
-    color: #991B1B;
+    color: var(--rm-filter-red-selected-ink);
     font-weight: 750;
 }
-.rm-filter-value-item--red .rm-filter-value-item__count { background: #FCA5A5; color: #7F1D1D; }
+.rm-filter-value-item--red .rm-filter-value-item__count { background: var(--rm-filter-red-selected-ink-dark); color: var(--rm-filter-red-count-ink); }
 
 /* Habitación */
-.rm-filter-value-item--blue .rm-filter-value-item__icon { color: #2563EB; }
+.rm-filter-value-item--blue .rm-filter-value-item__icon { color: var(--rm-filter-blue-icon); }
 .rm-filter-value-item--blue:hover {
     background-color: rgba(219, 234, 254, 0.7);
-    color: #1E40AF;
+    color: var(--rm-filter-blue-selected-ink);
 }
 .rm-filter-value-item--blue.is-active-value {
     background-color: rgba(219, 234, 254, 0.95);
-    color: #1E40AF;
+    color: var(--rm-filter-blue-selected-ink);
     font-weight: 750;
 }
-.rm-filter-value-item--blue .rm-filter-value-item__count { background: #93C5FD; color: #1E3A8A; }
+.rm-filter-value-item--blue .rm-filter-value-item__count { background: var(--rm-filter-blue-selected-ink-dark); color: var(--rm-filter-blue-count-ink); }
 
 /* Medicación */
-.rm-filter-value-item--violet .rm-filter-value-item__icon { color: #7C3AED; }
+.rm-filter-value-item--violet .rm-filter-value-item__icon { color: var(--rm-filter-violet-icon); }
 .rm-filter-value-item--violet:hover {
     background-color: rgba(237, 233, 254, 0.7);
-    color: #5B21B6;
+    color: var(--rm-filter-violet-selected-ink);
 }
 .rm-filter-value-item--violet.is-active-value {
     background-color: rgba(237, 233, 254, 0.95);
-    color: #5B21B6;
+    color: var(--rm-filter-violet-selected-ink);
     font-weight: 750;
 }
-.rm-filter-value-item--violet .rm-filter-value-item__count { background: #C4B5FD; color: #4C1D95; }
+.rm-filter-value-item--violet .rm-filter-value-item__count { background: var(--rm-filter-violet-selected-ink-dark); color: var(--rm-filter-violet-count-ink); }
 
 /* Cuidados */
-.rm-filter-value-item--green .rm-filter-value-item__icon { color: #059669; }
+.rm-filter-value-item--green .rm-filter-value-item__icon { color: var(--rm-filter-green-icon); }
 .rm-filter-value-item--green:hover {
     background-color: rgba(209, 250, 229, 0.7);
-    color: #065F46;
+    color: var(--rm-filter-green-selected-ink);
 }
 .rm-filter-value-item--green.is-active-value {
     background-color: rgba(209, 250, 229, 0.95);
-    color: #065F46;
+    color: var(--rm-filter-green-selected-ink);
     font-weight: 750;
 }
-.rm-filter-value-item--green .rm-filter-value-item__count { background: #6EE7B7; color: #044E39; }
+.rm-filter-value-item--green .rm-filter-value-item__count { background: var(--rm-filter-green-count-bg); color: var(--rm-filter-green-count-ink); }
 
 :is(.dark, [data-theme="dark"]) .rm-filter-value-item:hover { background-color: rgba(255, 255, 255, 0.08); }
 :is(.dark, [data-theme="dark"]) .rm-filter-value-item.is-active-value { background-color: rgba(255, 255, 255, 0.16); }
@@ -1117,7 +1117,7 @@
     position: absolute;
     left: 12px;
     font-size: 14px;
-    color: #6E6457;
+    color: var(--rm-filter-neutral-icon);
     pointer-events: none;
 }
 
@@ -1125,7 +1125,7 @@
     position: absolute;
     right: 11px;
     font-size: 11px;
-    color: #6E6457;
+    color: var(--rm-filter-neutral-icon);
     pointer-events: none;
 }
 
@@ -1133,7 +1133,7 @@
     height: 40px;
     min-height: 40px;
     padding: 0 30px 0 32px;
-    color: #2C2622;
+    color: var(--rm-filter-search-ink);
     font-family: var(--rm-font-body, 'Nunito Sans', sans-serif);
     font-size: 13px;
     font-weight: 650;
@@ -1152,17 +1152,17 @@
 
 :is(.dark, [data-theme="dark"]) .rm-sort-select__select {
     background: rgba(25, 46, 57, 0.75);
-    color: #EDF5F7;
+    color: var(--rm-filter-ink-dark);
     border-color: rgba(41, 66, 78, 0.85);
 }
 
 .rm-sort-select__select:hover {
-    border-color: #BDB09E;
+    border-color: var(--rm-filter-border-hover);
     background-color: rgba(250, 245, 240, 0.88);
 }
 
 .rm-sort-select__select:focus {
-    border-color: #2E7D62 !important;
+    border-color: var(--rm-filter-toolbar-focus-color) !important;
     box-shadow: 0 0 0 3px rgba(46, 125, 98, 0.22) !important;
 }
 
@@ -1182,8 +1182,8 @@
 }
 
 :is(.dark, [data-theme="dark"]) .rm-view-toggle {
-    background: #0E1D26;
-    border-color: #29424E;
+    background: var(--rm-filter-view-bg-dark);
+    border-color: var(--rm-filter-view-border-dark);
 }
 
 .rm-view-toggle__btn {
@@ -1195,7 +1195,7 @@
     border: 0;
     border-radius: 11px;
     background: transparent;
-    color: #5C5247;
+    color: var(--rm-filter-view-ink);
     font-family: var(--rm-font-body, 'Nunito Sans', sans-serif);
     font-size: 12.5px;
     font-weight: 700;
@@ -1204,21 +1204,21 @@
 }
 
 :is(.dark, [data-theme="dark"]) .rm-view-toggle__btn {
-    color: #A8BAC2;
+    color: var(--rm-filter-view-ink-dark);
 }
 
 .rm-view-toggle__btn:hover {
-    color: #2C2622;
+    color: var(--rm-filter-search-ink);
 }
 
 .rm-view-toggle__btn.is-active {
-    background: #2E7D62;
-    color: #FFFFFF;
+    background: var(--rm-filter-toolbar-focus-color);
+    color: var(--rm-filter-badge-ink);
     box-shadow: 0 1px 4px rgba(46, 125, 98, 0.4);
 }
 
 .rm-view-toggle__btn:focus-visible {
-    outline: 2px solid #2E7D62;
+    outline: 2px solid var(--rm-filter-toolbar-focus-color);
     outline-offset: 1px;
 }
 
@@ -1243,12 +1243,12 @@
     font-weight: 850;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #6E6457;
+    color: var(--rm-filter-neutral-icon);
     white-space: nowrap;
 }
 
 :is(.dark, [data-theme="dark"]) .rm-active-filters-row__label {
-    color: #A8BAC2;
+    color: var(--rm-filter-view-ink-dark);
 }
 
 .rm-active-filters-row__chips {
@@ -1308,76 +1308,76 @@
 /* Chip Rojo (Alertas) */
 .rm-active-filter-chip--red {
     background-color: rgba(254, 226, 226, 0.92);
-    border: 1px solid #F87171;
-    color: #991B1B;
+    border: 1px solid var(--rm-filter-red-chip-border);
+    color: var(--rm-filter-red-selected-ink);
 }
-.rm-active-filter-chip--red .rm-active-filter-chip__icon { color: #DC2626; }
-.rm-active-filter-chip--red .rm-active-filter-chip__remove { color: #991B1B; }
+.rm-active-filter-chip--red .rm-active-filter-chip__icon { color: var(--rm-filter-danger-icon); }
+.rm-active-filter-chip--red .rm-active-filter-chip__remove { color: var(--rm-filter-red-selected-ink); }
 
 :is(.dark, [data-theme="dark"]) .rm-active-filter-chip--red {
     background-color: rgba(220, 38, 38, 0.3);
     border-color: rgba(248, 113, 113, 0.6);
-    color: #FECACA;
+    color: var(--rm-filter-red-chip-ink-dark);
 }
 
 /* Chip Azul (Habitación) */
 .rm-active-filter-chip--blue {
     background-color: rgba(219, 234, 254, 0.92);
-    border: 1px solid #60A5FA;
-    color: #1E40AF;
+    border: 1px solid var(--rm-filter-blue-chip-border);
+    color: var(--rm-filter-blue-selected-ink);
 }
-.rm-active-filter-chip--blue .rm-active-filter-chip__icon { color: #2563EB; }
-.rm-active-filter-chip--blue .rm-active-filter-chip__remove { color: #1E40AF; }
+.rm-active-filter-chip--blue .rm-active-filter-chip__icon { color: var(--rm-filter-blue-icon); }
+.rm-active-filter-chip--blue .rm-active-filter-chip__remove { color: var(--rm-filter-blue-selected-ink); }
 
 :is(.dark, [data-theme="dark"]) .rm-active-filter-chip--blue {
     background-color: rgba(37, 99, 235, 0.3);
     border-color: rgba(147, 197, 253, 0.6);
-    color: #BFDBFE;
+    color: var(--rm-filter-blue-chip-ink-dark);
 }
 
 /* Chip Violeta (Medicación) */
 .rm-active-filter-chip--violet {
     background-color: rgba(237, 233, 254, 0.92);
-    border: 1px solid #A78BFA;
-    color: #5B21B6;
+    border: 1px solid var(--rm-filter-violet-chip-border);
+    color: var(--rm-filter-violet-selected-ink);
 }
-.rm-active-filter-chip--violet .rm-active-filter-chip__icon { color: #7C3AED; }
-.rm-active-filter-chip--violet .rm-active-filter-chip__remove { color: #5B21B6; }
+.rm-active-filter-chip--violet .rm-active-filter-chip__icon { color: var(--rm-filter-violet-icon); }
+.rm-active-filter-chip--violet .rm-active-filter-chip__remove { color: var(--rm-filter-violet-selected-ink); }
 
 :is(.dark, [data-theme="dark"]) .rm-active-filter-chip--violet {
     background-color: rgba(124, 58, 237, 0.3);
     border-color: rgba(196, 181, 253, 0.6);
-    color: #DDD6FE;
+    color: var(--rm-filter-violet-chip-ink-dark);
 }
 
 /* Chip Verde (Cuidados) */
 .rm-active-filter-chip--green {
     background-color: rgba(209, 250, 229, 0.92);
-    border: 1px solid #34D399;
-    color: #065F46;
+    border: 1px solid var(--rm-filter-green-chip-border);
+    color: var(--rm-filter-green-selected-ink);
 }
-.rm-active-filter-chip--green .rm-active-filter-chip__icon { color: #059669; }
-.rm-active-filter-chip--green .rm-active-filter-chip__remove { color: #065F46; }
+.rm-active-filter-chip--green .rm-active-filter-chip__icon { color: var(--rm-filter-green-icon); }
+.rm-active-filter-chip--green .rm-active-filter-chip__remove { color: var(--rm-filter-green-selected-ink); }
 
 :is(.dark, [data-theme="dark"]) .rm-active-filter-chip--green {
     background-color: rgba(46, 125, 98, 0.3);
     border-color: rgba(134, 239, 172, 0.6);
-    color: #BBF7D0;
+    color: var(--rm-filter-green-chip-ink-dark);
 }
 
 /* Chip Ámbar (Estado) */
 .rm-active-filter-chip--amber {
     background-color: rgba(254, 243, 199, 0.92);
-    border: 1px solid #FBBF24;
-    color: #92400E;
+    border: 1px solid var(--rm-filter-amber-chip-border);
+    color: var(--rm-filter-amber-chip-ink);
 }
-.rm-active-filter-chip--amber .rm-active-filter-chip__icon { color: #D97706; }
-.rm-active-filter-chip--amber .rm-active-filter-chip__remove { color: #92400E; }
+.rm-active-filter-chip--amber .rm-active-filter-chip__icon { color: var(--rm-filter-amber-icon); }
+.rm-active-filter-chip--amber .rm-active-filter-chip__remove { color: var(--rm-filter-amber-chip-ink); }
 
 :is(.dark, [data-theme="dark"]) .rm-active-filter-chip--amber {
     background-color: rgba(217, 119, 6, 0.3);
     border-color: rgba(252, 211, 77, 0.6);
-    color: #FDE68A;
+    color: var(--rm-filter-amber-chip-ink-dark);
 }
 
 /* 4.10 ClearAllFilters */
@@ -1389,7 +1389,7 @@
     border: 0;
     border-radius: 8px;
     background: transparent;
-    color: #70665A;
+    color: var(--rm-filter-clear-all-ink);
     font-family: var(--rm-font-body, 'Nunito Sans', sans-serif);
     font-size: 12px;
     font-weight: 700;
@@ -1403,8 +1403,8 @@
 }
 
 .rm-clear-all-filters-btn:hover {
-    color: #991B1B;
-    background-color: #FEE2E2;
+    color: var(--rm-filter-red-selected-ink);
+    background-color: var(--rm-filter-clear-hover-bg);
 }
 
 .rm-clear-all-filters-btn:hover .rm-clear-all-filters-btn__icon {
@@ -1412,12 +1412,12 @@
 }
 
 :is(.dark, [data-theme="dark"]) .rm-clear-all-filters-btn:hover {
-    color: #FCA5A5;
+    color: var(--rm-filter-red-selected-ink-dark);
     background-color: rgba(220, 38, 38, 0.25);
 }
 
 .rm-clear-all-filters-btn:focus-visible {
-    outline: 2px solid #2E7D62;
+    outline: 2px solid var(--rm-filter-toolbar-focus-color);
     outline-offset: 1px;
 }
 

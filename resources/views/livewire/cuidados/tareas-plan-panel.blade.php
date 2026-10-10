@@ -162,7 +162,7 @@
                         @error('codPlan')<span class="block text-xs text-[var(--rm-danger)]">{{ $message }}</span>@enderror
                     </label>
                     <label class="space-y-1 text-xs font-bold text-[var(--rm-text-secondary)]">Turno *
-                        <select class="rm-select w-full text-sm" wire:model="codTurno"><option value="">Seleccione</option>@foreach($turnos as $turno)<option value="{{ $turno->cod_turno }}">{{ $turno->nombre }} · {{ $turno->horario }}</option>@endforeach</select>
+                        <select class="rm-select w-full text-sm" wire:model="codTurno"><option value="">Seleccione</option>@foreach($turnos as $turno)<option value="{{ $turno->cod_turno }}">{{ $turno->nombre }} · {{ substr((string) $turno->hora_inicio, 0, 5) }} – {{ substr((string) $turno->hora_cierre, 0, 5) }}</option>@endforeach</select>
                         @error('codTurno')<span class="block text-xs text-[var(--rm-danger)]">{{ $message }}</span>@enderror
                     </label>
                     <label class="space-y-1 text-xs font-bold text-[var(--rm-text-secondary)]">Responsable

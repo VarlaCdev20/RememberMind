@@ -4,22 +4,24 @@ namespace App\Http\Controllers\Documentos;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Documentos\StoreDocumentoAdultoRequest;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class AdultoMayorDocumentoController extends Controller
 {
-    public function index(AdultoMayor $adulto_mayor)
+    public function index(Residente $adulto_mayor)
     {
+        $this->authorize('view', $adulto_mayor);
+        abort_if(auth()->user()->hasRole('FAMILIAR'), 403, 'Estos documentos no están publicados para familiares.');
         $adulto_mayor->load(['documentos' => function($q) {
             $q->orderByDesc('cod_documento');
         }]);
         return view('pages.adultos-mayores.documentos.index', compact('adulto_mayor'));
     }
 
-    public function store(StoreDocumentoAdultoRequest $request, AdultoMayor $adulto_mayor)
+    public function store(StoreDocumentoAdultoRequest $request, Residente $adulto_mayor)
     {
         $data = $request->validated();
         $file = $request->file('archivo');
@@ -44,8 +46,10 @@ class AdultoMayorDocumentoController extends Controller
         return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_residente)->with('success', 'Documento subido correctamente.');
     }
 
-    public function archivo(Request $request, AdultoMayor $adulto_mayor, string $documento)
+    public function archivo(Request $request, Residente $adulto_mayor, string $documento)
     {
+        $this->authorize('view', $adulto_mayor);
+        abort_if($request->user()->hasRole('FAMILIAR'), 403, 'Estos documentos no están publicados para familiares.');
         $doc = $adulto_mayor->documentos()->findOrFail($documento);
         $disco = \Illuminate\Support\Facades\Storage::disk('local');
         if (!$disco->exists($doc->ruta_archivo)) $disco = \Illuminate\Support\Facades\Storage::disk('public');
@@ -60,7 +64,7 @@ class AdultoMayorDocumentoController extends Controller
         return $disco->download($doc->ruta_archivo);
     }
 
-    public function update(Request $request, AdultoMayor $adulto_mayor, $documento)
+    public function update(Request $request, Residente $adulto_mayor, $documento)
     {
         $doc = $adulto_mayor->documentos()->findOrFail($documento);
         
@@ -79,7 +83,7 @@ class AdultoMayorDocumentoController extends Controller
         return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_residente)->with('success', 'Metadatos del documento actualizados.');
     }
 
-    public function destroy(AdultoMayor $adulto_mayor, $documento)
+    public function destroy(Residente $adulto_mayor, $documento)
     {
         $doc = $adulto_mayor->documentos()->findOrFail($documento);
         
@@ -92,7 +96,7 @@ class AdultoMayorDocumentoController extends Controller
         return redirect()->route('admin.adultos-mayores.documentos.index', $adulto_mayor->cod_residente)->with('success', 'Documento archivado correctamente.');
     }
 
-    public function restore(AdultoMayor $adulto_mayor, $id)
+    public function restore(Residente $adulto_mayor, $id)
     {
         $doc = $adulto_mayor->documentos()->findOrFail($id);
         $doc->update(['estado' => 'ACTIVO']);

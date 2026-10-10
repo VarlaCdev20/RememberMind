@@ -13,6 +13,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class InstitucionalController extends Controller
 {
@@ -49,14 +52,25 @@ class InstitucionalController extends Controller
 
     public function abrirJornada(Request $request): JsonResponse
     {
-        $datos = $request->validate(['cod_turno' => ['required', 'exists:turnos,cod_turno'], 'fecha_jornada' => ['required', 'date']]);
+        abort_unless($request->user()?->estado === 'ACTIVO' && $request->user()->can('jornadas.gestionar'), 403);
+        $datos = $request->validate(['cod_turno' => ['required', Rule::exists('turnos', 'cod_turno')->where('estado', 'ACTIVO')], 'fecha_jornada' => ['required', 'date']]);
         return response()->json(Jornada::query()->create(['cod_jornada' => $this->codigo('JOR'), ...$datos, 'cod_usuario_apertura' => $request->user()->cod_usuario, 'estado' => 'ABIERTA']), 201);
     }
 
     public function asignarPersonal(Request $request, Jornada $jornada): JsonResponse
     {
-        $datos = $request->validate(['cod_personal' => ['required', 'exists:personal,cod_personal'], 'cod_area' => ['required', 'exists:areas,cod_area'], 'funcion' => ['nullable', 'string', 'max:80'], 'tipo_asignacion' => ['required', 'string', 'max:30']]);
-        return response()->json(AsignacionPersonal::query()->create(['cod_asignacion_personal' => $this->codigo('ASP'), 'cod_jornada' => $jornada->cod_jornada, ...$datos, 'fecha_asignacion' => now(), 'estado' => 'ACTIVA']), 201);
+        abort_unless($request->user()?->estado === 'ACTIVO' && $request->user()->can('asignaciones_personal.gestionar'), 403);
+        $datos = $request->validate(['cod_personal' => ['required', Rule::exists('personal', 'cod_personal')->where('estado', 'ACTIVO')], 'cod_area' => ['required', Rule::exists('areas', 'cod_area')->where('estado', 'ACTIVA')], 'funcion' => ['nullable', 'string', 'max:80'], 'tipo_asignacion' => ['required', 'string', 'max:30']]);
+        $asignacion = DB::transaction(function () use ($jornada, $datos) {
+            $jornada = Jornada::query()->lockForUpdate()->findOrFail($jornada->cod_jornada);
+            if (! in_array($jornada->estado, ['PLANIFICADA', 'ABIERTA', 'ACTIVA', 'EN_CURSO'], true)) {
+                throw ValidationException::withMessages(['jornada' => 'La jornada no admite asignaciones de personal.']);
+            }
+
+            return AsignacionPersonal::query()->create(['cod_asignacion_personal' => $this->codigo('ASP'), 'cod_jornada' => $jornada->cod_jornada, ...$datos, 'fecha_asignacion' => now(), 'estado' => 'ACTIVA']);
+        });
+
+        return response()->json($asignacion, 201);
     }
 
     private function codigo(string $prefijo): string { return $prefijo.'_'.Str::upper(Str::random(12)); }

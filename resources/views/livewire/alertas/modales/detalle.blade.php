@@ -1,6 +1,7 @@
 @php $detalle = $detalle ?? $alertaActiva; @endphp
 @if($modalDetalle && $detalle)
 @php
+ $inicioPendiente = in_array($detalle->estado, ['ABIERTA', 'RECONOCIDA', 'ASIGNADA', 'PENDIENTE'], true);
  $badgeEstadoClass = match($detalle->estado) {
      'ABIERTA' => 'rm-badge-warning',
      'EN_ATENCION' => 'rm-badge-info',
@@ -213,14 +214,14 @@
         </div>
 
         <!-- 4. Formulario para Registrar Nueva Intervención (si la alerta no está cerrada) -->
-        @if($detalle->puedeCerrarse())
+        @if($detalle->puedeCerrarse() || $inicioPendiente)
             @canany(['alertas.gestionar', 'alertas.seguimiento'])
                 <div class="p-3.5 rounded-2xl bg-[var(--rm-surface)] border border-[var(--rm-border-soft)] space-y-2 shadow-2xs">
-                    @if($detalle->estado === 'ABIERTA' && ! $detalle->eventos->contains('tipo_evento', 'INTERVENCION'))
+                    @if($inicioPendiente && ! $detalle->eventos->contains('tipo_evento', 'INTERVENCION'))
                         <p class="text-xs font-semibold text-[var(--rm-danger)]">La alerta todavía no tiene una intervención registrada.</p>
                     @endif
                     <label for="nuevaIntervencionInput" class="block text-xs font-bold uppercase tracking-wider text-[var(--rm-text-primary)]">
-                        {{ $detalle->estado === 'ABIERTA' ? '¿Qué acción se realizó?' : 'Añadir seguimiento' }}
+                        {{ $inicioPendiente ? '¿Qué acción se realizó?' : 'Añadir seguimiento' }}
                     </label>
                     <div class="flex gap-2">
                         <textarea
@@ -234,7 +235,7 @@
                                 wire:click="guardarAccion"
                                 wire:loading.attr="disabled"
                                 class="rm-btn rm-btn-sm rm-btn-primary shrink-0">
-                            <span wire:loading.remove wire:target="guardarAccion">{{ $detalle->estado === 'ABIERTA' ? 'Registrar intervención' : 'Añadir seguimiento' }}</span>
+                            <span wire:loading.remove wire:target="guardarAccion">{{ $inicioPendiente ? 'Registrar intervención' : 'Añadir seguimiento' }}</span>
                             <span wire:loading wire:target="guardarAccion">Guardando...</span>
                         </button>
                     </div>
@@ -268,7 +269,7 @@
                     Cerrar panel
                 </button>
 
-                @if($detalle && $detalle->estado === 'ABIERTA')
+                @if($detalle && $inicioPendiente)
                     @canany(['alertas.gestionar', 'alertas.seguimiento'])
                         <button type="button"
                                 wire:click="atenderAlerta('{{ $detalle->cod_alerta }}')"

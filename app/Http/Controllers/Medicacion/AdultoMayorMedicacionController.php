@@ -99,11 +99,16 @@ class AdultoMayorMedicacionController extends Controller
                 ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'medicacion'])
                 ->with('success', "Prescripción de '{$nombreMed}' registrada correctamente.");
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
+            if ($e instanceof \Illuminate\Validation\ValidationException
+                || $e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                throw $e;
+            }
+            report($e);
 
             return redirect()->back()
-                ->with('error', 'Error al registrar medicación: '.$e->getMessage())
+                ->with('error', 'No se pudo registrar la medicación. Inténtelo nuevamente.')
                 ->withInput();
         }
     }
@@ -147,11 +152,16 @@ class AdultoMayorMedicacionController extends Controller
                 ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'medicacion'])
                 ->with('success', 'Prescripción actualizada correctamente.');
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
+            if ($e instanceof \Illuminate\Validation\ValidationException
+                || $e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                throw $e;
+            }
+            report($e);
 
             return redirect()->back()
-                ->with('error', 'Error al actualizar medicación: '.$e->getMessage())
+                ->with('error', 'No se pudo actualizar la medicación. Inténtelo nuevamente.')
                 ->withInput();
         }
     }

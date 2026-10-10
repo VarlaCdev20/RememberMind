@@ -23,13 +23,13 @@
                     <div>
                         <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--rm-text-muted)] block">Residente Asignado</span>
                         <h4 class="text-sm font-bold text-[var(--rm-text-primary)] mt-0.5">
-                            {{ $residenteModal->nombre_completo ?? 'Residente no identificado' }}
+                            {{ $dosisDetalle['residente']['nombre_completo'] ?? 'Residente no identificado' }}
                         </h4>
                     </div>
                     <div class="text-right">
                         <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--rm-text-muted)] block">Ubicación</span>
                         <span class="text-xs font-semibold text-[var(--rm-text-primary)] block mt-0.5">
-                            {{ $residenteModal->ubicacion_cama_habitacion ?? 'Sin ubicación asignada' }}
+                            {{ $dosisDetalle['residente']['habitacion'] ?? 'Sin habitación' }} · {{ $dosisDetalle['residente']['cama'] ?? 'Sin cama' }}
                         </span>
                     </div>
                 </div>
@@ -38,11 +38,11 @@
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
                     <div>
                         <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--rm-text-muted)] block">Medicamento</span>
-                        <span class="text-xs font-bold text-[var(--rm-text-primary)] block mt-0.5 truncate" title="{{ $medicamentoModal->nombre_comercial ?? '' }}">
-                            {{ $medicamentoModal->nombre_comercial ?? 'Fármaco' }}
+                        <span class="text-xs font-bold text-[var(--rm-text-primary)] block mt-0.5 truncate" title="{{ $dosisDetalle['medicamento']['nombre_destacado'] ?? '' }}">
+                            {{ $dosisDetalle['medicamento']['nombre_destacado'] ?? 'Medicamento no identificado' }}
                         </span>
-                        @if(!empty($medicamentoModal->principio_activo))
-                            <span class="text-[10px] text-[var(--rm-text-muted)] truncate block">({{ $medicamentoModal->principio_activo }})</span>
+                        @if(!empty($dosisDetalle['medicamento']['concentracion']))
+                            <span class="text-[10px] text-[var(--rm-text-muted)] truncate block">({{ $dosisDetalle['medicamento']['concentracion'] }})</span>
                         @endif
                     </div>
 
@@ -56,21 +56,21 @@
                     <div>
                         <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--rm-text-muted)] block">Vía y Horario</span>
                         <span class="text-xs font-semibold text-[var(--rm-text-primary)] block mt-0.5">
-                            {{ $prescripcionModal->via_administracion ?? 'Oral' }} · <strong class="font-mono text-[var(--rm-action-primary)]">{{ substr((string)($programacionModal->hora_programada ?? '08:00'), 0, 5) }}</strong>
+                            {{ $dosisDetalle['prescripcion']['via'] ?? 'Vía no registrada' }} · <strong class="font-mono text-[var(--rm-action-primary)]">{{ $dosisDetalle['programacion']['hora_programada'] ?? 'Horario no registrado' }}</strong>
                         </span>
                     </div>
 
                     <div>
                         <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--rm-text-muted)] block">Médico Prescriptor</span>
-                        <span class="text-xs font-semibold text-[var(--rm-text-primary)] block mt-0.5 truncate" title="{{ $prescripcionModal->medico->nombre_completo ?? '' }}">
-                            {{ $prescripcionModal->medico->nombre_completo ?? 'Médico Tratante' }}
+                        <span class="text-xs font-semibold text-[var(--rm-text-primary)] block mt-0.5 truncate" title="{{ $dosisDetalle['prescripcion']['prescriptor'] ?? '' }}">
+                            {{ $dosisDetalle['prescripcion']['prescriptor'] ?? 'Prescriptor no registrado' }}
                         </span>
                     </div>
                 </div>
 
-                @if(!empty($prescripcionModal->indicaciones_extra))
+                @if(!empty($dosisDetalle['prescripcion']['indicacion']))
                     <div class="mt-2 pt-2 border-t border-[var(--rm-border-soft)]/50 text-[11px] text-[var(--rm-text-muted)]">
-                        <strong>Indicaciones especiales:</strong> {{ $prescripcionModal->indicaciones_extra }}
+                        <strong>Indicaciones especiales:</strong> {{ $dosisDetalle['prescripcion']['indicacion'] }}
                     </div>
                 @endif
             </div>

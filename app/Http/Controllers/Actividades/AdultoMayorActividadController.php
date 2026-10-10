@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Actividades;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Residentes\StoreActividadAdultoRequest;
 use App\Models\Actividad;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\ParticipanteActividad;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class AdultoMayorActividadController extends Controller
 {
-    public function store(StoreActividadAdultoRequest $request, AdultoMayor $adulto_mayor): RedirectResponse
+    public function store(StoreActividadAdultoRequest $request, Residente $adulto_mayor): RedirectResponse
     {
         $data = $request->validated();
         [$personal, $codArea] = $this->contextoPersonal();
@@ -44,7 +44,7 @@ class AdultoMayorActividadController extends Controller
         return $this->volver($adulto_mayor)->with('success', 'Actividad registrada correctamente.');
     }
 
-    public function update(Request $request, AdultoMayor $adulto_mayor, Actividad $actividad): RedirectResponse
+    public function update(Request $request, Residente $adulto_mayor, Actividad $actividad): RedirectResponse
     {
         $data = $request->validate([
             'obs' => ['nullable', 'string', 'max:2000'],
@@ -61,7 +61,7 @@ class AdultoMayorActividadController extends Controller
         return $this->volver($adulto_mayor)->with('success', 'Actividad actualizada correctamente.');
     }
 
-    public function destroy(AdultoMayor $adulto_mayor, Actividad $actividad): RedirectResponse
+    public function destroy(Residente $adulto_mayor, Actividad $actividad): RedirectResponse
     {
         $this->autorizarRelacion($adulto_mayor, $actividad);
         $actividad->update(['estado' => 'ANULADA']);
@@ -69,7 +69,7 @@ class AdultoMayorActividadController extends Controller
         return $this->volver($adulto_mayor)->with('success', 'Actividad anulada correctamente.');
     }
 
-    public function restore(AdultoMayor $adulto_mayor, string $actividad): RedirectResponse
+    public function restore(Residente $adulto_mayor, string $actividad): RedirectResponse
     {
         $registro = Actividad::query()->findOrFail($actividad);
         $this->autorizarRelacion($adulto_mayor, $registro);
@@ -90,7 +90,7 @@ class AdultoMayorActividadController extends Controller
         return [$personal, $codArea];
     }
 
-    private function autorizarRelacion(AdultoMayor $adulto, Actividad $actividad): void
+    private function autorizarRelacion(Residente $adulto, Actividad $actividad): void
     {
         abort_unless(
             ParticipanteActividad::query()
@@ -101,7 +101,7 @@ class AdultoMayorActividadController extends Controller
         );
     }
 
-    private function volver(AdultoMayor $adulto): RedirectResponse
+    private function volver(Residente $adulto): RedirectResponse
     {
         return new RedirectResponse(route('admin.adultos-mayores.show', [
             'adulto_mayor' => $adulto->cod_residente,

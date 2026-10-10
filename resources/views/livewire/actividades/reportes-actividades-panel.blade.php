@@ -373,10 +373,8 @@
  {{ $r->hora ? substr($r->hora, 0, 5) : '—' }}
  </td>
  <td class="px-4 py-3">
- <span class="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold {{ $norm['clase'] }}">
- {{ $norm['etiqueta'] }}
- </span>
- </td>
+                            <x-ui.status-badge :estado="$r->estado" />
+                        </td>
  <td class="px-4 py-3">
  <p class="max-w-[150px] truncate text-[11px] font-bold text-apoyo" title="{{ $r->obs }}">
  {{ $r->obs ? \Illuminate\Support\Str::limit($r->obs, 45) : '—' }}
@@ -384,22 +382,19 @@
  </td>
  </tr>
  @empty
- <tr>
- <td colspan="6" class="py-12 text-center">
- <div class="flex flex-col items-center gap-3">
- <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-fondo-panel">
- <i class="ph-bold ph-table text-xl text-apoyo"></i>
- </span>
- @if($buscar || $filtroTipo || $filtroEstado || $fechaDesde || $fechaHasta)
- <p class="text-sm font-bold text-apoyo">No hay actividades para los filtros seleccionados.</p>
- <button wire:click="limpiarFiltros" class="text-xs font-bold text-estado-advertencia hover:underline">Limpiar filtros</button>
- @else
- <p class="text-sm font-bold text-apoyo">No hay actividades registradas.</p>
- @endif
- </div>
- </td>
- </tr>
- @endforelse
+                        <tr>
+                            <td colspan="6" class="py-8">
+                                <x-ui.empty-state
+                                    compact
+                                    icono="ph-table"
+                                    titulo="Sin actividades para reportar"
+                                    :texto="$buscar || $filtroTipo || $filtroEstado || $fechaDesde || $fechaHasta ? 'No hay actividades para los filtros seleccionados.' : 'No hay actividades registradas.'"
+                                    :actionMethod="$buscar || $filtroTipo || $filtroEstado || $fechaDesde || $fechaHasta ? 'limpiarFiltros' : null"
+                                    actionText="Restablecer filtros"
+                                />
+                            </td>
+                        </tr>
+                        @endforelse
  </tbody>
  </table>
  </div>

@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Frontend\Livewire\Compartido\Alertas\AlertasPanel;
 use App\Frontend\Livewire\Medico\Medicacion\MedicacionAdultoModal;
 use App\Frontend\Livewire\Enfermeria\Cuidados\PaseTurnoPanel;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Alerta;
 use App\Models\Area;
 use App\Models\Atencion;
@@ -15,7 +15,7 @@ use App\Models\Medicamento;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Prescripcion;
 use App\Models\AsignacionPersonal;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use App\Models\User;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use App\Backend\Modulos\Enfermeria\Servicios\LesionesEnfermeriaService;
@@ -33,8 +33,8 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
     use RefreshDatabase;
 
     private User $enfermero;
-    private AdultoMayor $residente;
-    private TurnoEnfermeria $turno;
+    private Residente $residente;
+    private Turno $turno;
 
     protected function setUp(): void
     {
@@ -57,11 +57,11 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
             'estado' => 'ACTIVO',
         ]);
         $this->enfermero->load('personal');
-        $this->turno = TurnoEnfermeria::create([
+        $this->turno = Turno::create([
             'nombre' => 'Mañana', 'orden' => 1, 'hora_inicio' => '07:00',
             'hora_fin' => '15:00', 'estado' => 'ACTIVO',
         ]);
-        $this->residente = AdultoMayor::factory()->create([
+        $this->residente = Residente::factory()->create([
             'cod_est_adul' => 'EST_001',
         ]);
         $this->asignar($this->enfermero, $this->residente, $this->turno);
@@ -85,7 +85,7 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
     public function test_mutacion_exige_asignacion_vigente_y_residente_en_centro(): void
     {
         $this->recibir($this->enfermero, $this->turno);
-        $otro = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
+        $otro = Residente::factory()->create(['cod_est_adul' => 'EST_001']);
         try {
             app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente($otro, 'seguimiento.crear', $this->enfermero);
             $this->fail('Se autorizó un residente no asignado.');
@@ -193,7 +193,7 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
 
     public function test_alerta_por_id_fuera_del_alcance_es_rechazada(): void
     {
-        $otro = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
+        $otro = Residente::factory()->create(['cod_est_adul' => 'EST_001']);
         $alerta = Alerta::create([
             'cod_residente' => $otro->cod_residente,
             'modulo' => 'MANUAL',
@@ -209,7 +209,7 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
     public function test_pase_solo_se_entrega_a_enfermero_asignado_al_turno_entrante(): void
     {
         $this->recibir($this->enfermero, $this->turno);
-        $entrante = TurnoEnfermeria::create([
+        $entrante = Turno::create([
             'nombre' => 'Tarde', 'orden' => 2, 'hora_inicio' => '15:00',
             'hora_fin' => '23:00', 'estado' => 'ACTIVO',
         ]);
@@ -286,7 +286,7 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
         }
     }
 
-    private function asignar(User $usuario, AdultoMayor $adulto, TurnoEnfermeria $turno): void
+    private function asignar(User $usuario, Residente $adulto, Turno $turno): void
     {
         $jornada = \App\Models\Jornada::firstOrCreate(
             ['cod_turno' => $turno->cod_turno, 'fecha_jornada' => today()],
@@ -315,7 +315,7 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
         ]);
     }
 
-    private function recibir(User $usuario, TurnoEnfermeria $turno): void
+    private function recibir(User $usuario, Turno $turno): void
     {
         $jornada = \App\Models\Jornada::where('cod_turno', $turno->cod_turno)->whereDate('fecha_jornada', today())->first();
         $personal = $usuario->personal;

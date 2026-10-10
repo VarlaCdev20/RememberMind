@@ -2,7 +2,7 @@
 
 namespace App\Frontend\Livewire\Medico\Clinica;
 
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Atencion;
 use App\Models\NotaClinica;
 use App\Models\SignoVital;
@@ -65,7 +65,7 @@ class NotaEvolucionMedicaModal extends Component
     {
         $this->resetForm();
         $this->cod_residente = $cod_residente;
-        $this->adulto = AdultoMayor::find($cod_residente);
+        $this->adulto = Residente::find($cod_residente);
         $this->fecha = date('Y-m-d');
         $this->hora = date('H:i');
         $this->mostrar = true;

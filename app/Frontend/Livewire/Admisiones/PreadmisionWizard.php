@@ -468,6 +468,10 @@ class PreadmisionWizard extends Component
             $this->guardadoExitoso = true;
         } catch (\Throwable $e) {
             DB::rollBack();
+            if ($e instanceof \Illuminate\Validation\ValidationException
+                || $e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                throw $e;
+            }
             report($e);
 
             $this->dispatch('swal', [

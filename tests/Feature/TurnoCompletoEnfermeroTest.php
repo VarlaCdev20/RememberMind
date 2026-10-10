@@ -7,7 +7,7 @@ use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
 use App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno;
 use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
 use App\Frontend\Livewire\Enfermeria\Cuidados\PaseTurnoPanel;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Alerta;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
@@ -21,7 +21,7 @@ use App\Models\PaseTurno;
 use App\Models\Personal;
 use App\Models\PlanCuidado;
 use App\Models\Prescripcion;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -50,7 +50,7 @@ class TurnoCompletoEnfermeroTest extends TestCase
         $this->seed([RolesAndPermissionsSeeder::class]);
         $enfermero = User::factory()->create(['estado' => 'ACTIVO']);
         $enfermero->assignRole('ENFERMEROS');
-        $pacienteAjeno = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
+        $pacienteAjeno = Residente::factory()->create(['cod_est_adul' => 'EST_001']);
 
         $this->actingAs($enfermero);
         Livewire::test(FichaPaciente::class, ['adulto' => $pacienteAjeno->cod_residente])
@@ -62,14 +62,14 @@ class TurnoCompletoEnfermeroTest extends TestCase
         $this->seed([RolesAndPermissionsSeeder::class]);
 
         // 1. Crear turnos de enfermería
-        $turnoManana = TurnoEnfermeria::create([
+        $turnoManana = Turno::create([
             'orden' => 1,
             'nombre' => 'Mañana Operativa',
             'hora_inicio' => '07:00:00',
             'hora_fin' => '15:00:00',
             'estado' => 'ACTIVO',
         ]);
-        $turnoTarde = TurnoEnfermeria::create([
+        $turnoTarde = Turno::create([
             'orden' => 2,
             'nombre' => 'Tarde Operativa',
             'hora_inicio' => '15:00:00',
@@ -95,13 +95,13 @@ class TurnoCompletoEnfermeroTest extends TestCase
         $enfermeroReceptor->assignRole('ENFERMEROS');
 
         // 3. Crear 2 adultos mayores: Asignado vs No Asignado
-        $pacienteAsignado = AdultoMayor::factory()->create([
+        $pacienteAsignado = Residente::factory()->create([
             'nombres' => 'Juan Asignado',
             'ap_paterno' => 'Pérez',
             'cod_est_adul' => 'EST_001',
         ]);
 
-        $pacienteNoAsignado = AdultoMayor::factory()->create([
+        $pacienteNoAsignado = Residente::factory()->create([
             'nombres' => 'Carlos Ajeno',
             'ap_paterno' => 'Gómez',
             'cod_est_adul' => 'EST_001',
@@ -206,7 +206,7 @@ class TurnoCompletoEnfermeroTest extends TestCase
             ->assertSee('Juan Asignado')->assertSee('Registrar signos');
         $this->get(route('admin.enfermeria.pacientes.ficha', ['adulto' => $pacienteAsignado, 'tab' => 'medicacion']))->assertOk()
             ->assertSee('Juan Asignado')->assertSee('Enalapril 10mg');
-        $this->get(route('admin.enfermeria.pase-turno'))->assertOk()->assertSee('Pase de Turno');
+        $this->get(route('admin.enfermeria.pase-turno'))->assertOk()->assertSee('Pases de turno');
         $this->get(route('admin.alertas-clinicas.index'))->assertOk()->assertSee('Alertas clínicas');
 
         // ─── PASO 1: VERIFICAR ALCANCE (VE SOLO SUS PACIENTES) ───────────────
@@ -348,14 +348,14 @@ class TurnoCompletoEnfermeroTest extends TestCase
     {
         $this->seed([RolesAndPermissionsSeeder::class]);
 
-        $turnoManana = TurnoEnfermeria::create([
+        $turnoManana = Turno::create([
             'orden' => 1,
             'nombre' => 'Mañana Operativa',
             'hora_inicio' => '07:00:00',
             'hora_fin' => '15:00:00',
             'estado' => 'ACTIVO',
         ]);
-        $turnoTarde = TurnoEnfermeria::create([
+        $turnoTarde = Turno::create([
             'orden' => 2,
             'nombre' => 'Tarde Operativa',
             'hora_inicio' => '15:00:00',
@@ -405,7 +405,7 @@ class TurnoCompletoEnfermeroTest extends TestCase
             'estado' => 'ACTIVA',
         ])->cod_area;
 
-        $paciente = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
+        $paciente = Residente::factory()->create(['cod_est_adul' => 'EST_001']);
 
         AsignacionResidenteJornada::create([
             'cod_residente' => $paciente->cod_residente,

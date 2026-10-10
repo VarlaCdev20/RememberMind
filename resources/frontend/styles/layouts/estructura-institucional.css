@@ -114,8 +114,6 @@
         .rm-shell.is-sidebar-collapsed .rm-sidebar { width: var(--rm-sidebar-collapsed); }
         .rm-shell.is-sidebar-collapsed .rm-sidebar__header { flex-direction: column; justify-content: center; gap: 2px; padding: 3px 8px; }
         .rm-shell.is-sidebar-collapsed .rm-sidebar__logo { width: 27px; height: 27px; flex-basis: 27px; }
-        .rm-shell.is-sidebar-collapsed .rm-sidebar__header-toggle { width: 23px; height: 23px; flex-basis: 23px; }
-        .rm-shell.is-sidebar-collapsed .rm-sidebar__header-toggle i { font-size: 13px; }
         .rm-shell.is-sidebar-collapsed .rm-sidebar__brand-copy,
         .rm-shell.is-sidebar-collapsed .rm-sidebar__label,
         .rm-shell.is-sidebar-collapsed .rm-sidebar__chevron,

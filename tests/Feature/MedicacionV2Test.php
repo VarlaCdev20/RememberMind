@@ -3,14 +3,13 @@
 namespace Tests\Feature;
 
 use App\Frontend\Livewire\Medico\Medicacion\SaludMedicacionPanel;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Area;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Atencion;
 use App\Models\Jornada;
 use App\Models\Personal;
-use App\Models\Residente;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use App\Models\User;
 use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
 use Database\Seeders\DatabaseSeeder;
@@ -33,7 +32,7 @@ class MedicacionV2Test extends TestCase
         [$medico, $residente] = $this->escenarioMedico();
         $this->actingAs($medico);
 
-        Livewire::test(SaludMedicacionPanel::class, ['adulto' => AdultoMayor::query()->findOrFail($residente->cod_residente)])
+        Livewire::test(SaludMedicacionPanel::class, ['adulto' => Residente::query()->findOrFail($residente->cod_residente)])
             ->set('nuevo_cod_residente', $residente->cod_residente)
             ->set('nuevo_nombre', 'Paracetamol')
             ->set('nuevo_dosis', '500 mg')
@@ -65,7 +64,7 @@ class MedicacionV2Test extends TestCase
         $this->actingAs($medico);
         $hora = now()->format('H:i');
 
-        Livewire::test(SaludMedicacionPanel::class, ['adulto' => AdultoMayor::query()->findOrFail($residente->cod_residente)])
+        Livewire::test(SaludMedicacionPanel::class, ['adulto' => Residente::query()->findOrFail($residente->cod_residente)])
             ->set('nuevo_cod_residente', $residente->cod_residente)
             ->set('nuevo_nombre', 'Losartan')
             ->set('nuevo_dosis', '50 mg')
@@ -161,7 +160,7 @@ class MedicacionV2Test extends TestCase
             'profesion' => 'ENFERMERIA',
             'estado' => 'ACTIVO',
         ]);
-        $turno = TurnoEnfermeria::query()->create([
+        $turno = Turno::query()->create([
             'cod_turno' => 'TUR_MED_TEST',
             'nombre' => 'TURNO MEDICACION TEST',
             'hora_inicio' => '00:00:00',

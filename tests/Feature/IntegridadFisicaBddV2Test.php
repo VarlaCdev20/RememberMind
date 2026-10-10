@@ -68,6 +68,64 @@ class IntegridadFisicaBddV2Test extends TestCase
         ]);
     }
 
+    public function test_sql_directo_rechaza_segunda_cama_activa_del_residente(): void
+    {
+        DB::table('camas')->insert([
+            'cod_cama' => 'CAM_F4_SEGUNDA', 'cod_habitacion' => 'HAB_INTEGRIDAD',
+            'codigo' => 'CAM-F4', 'estado' => 'ACTIVA',
+        ]);
+        $ocupacion = (array) DB::table('ocupaciones_cama')->where('cod_ocupacion', 'OCP_INTEGRIDAD')->first();
+        $ocupacion['cod_ocupacion'] = 'OCP_F4_DUPLICADA';
+        $ocupacion['cod_cama'] = 'CAM_F4_SEGUNDA';
+
+        try {
+            DB::transaction(fn () => DB::table('ocupaciones_cama')->insert($ocupacion));
+            $this->fail('SQL directo no debe permitir dos camas activas para un residente.');
+        } catch (QueryException $e) {
+            $this->assertStringContainsString(
+                DB::getDriverName() === 'pgsql' ? 'uq_ocupacion_residente_activa' : 'ocupaciones_cama.cod_residente',
+                $e->getMessage()
+            );
+        }
+
+        $this->assertDatabaseMissing('ocupaciones_cama', ['cod_ocupacion' => 'OCP_F4_DUPLICADA']);
+        $this->assertDatabaseHas('ocupaciones_cama', ['cod_ocupacion' => 'OCP_INTEGRIDAD', 'cod_cama' => 'CAM_INTEGRIDAD']);
+    }
+
+    public function test_sql_directo_acepta_administracion_propia_y_rechaza_prescripcion_de_otro_residente(): void
+    {
+        DB::table('turnos')->insert([
+            'cod_turno' => 'TUR_F4_SQL', 'nombre' => 'Turno sintético F4',
+            'hora_inicio' => '00:00:00', 'hora_cierre' => '23:59:59', 'orden' => 99, 'estado' => 'ACTIVO',
+        ]);
+        DB::table('jornadas')->insert([
+            'cod_jornada' => 'JOR_F4_SQL', 'cod_turno' => 'TUR_F4_SQL',
+            'fecha_jornada' => today(), 'estado' => 'ABIERTA',
+        ]);
+        $administracion = [
+            'cod_administracion' => 'AMD_F4_PROPIA', 'cod_prescripcion' => $this->codPrescripcion,
+            'cod_residente' => 'RES_BASE', 'cod_jornada' => 'JOR_F4_SQL', 'cod_personal' => 'PER_0001',
+            'fecha_hora_administracion' => now(), 'resultado' => 'ADMINISTRADA',
+            'dosis_administrada' => 1, 'estado' => 'REGISTRADA',
+        ];
+        DB::table('administraciones_medicacion')->insert($administracion);
+        $this->assertDatabaseHas('administraciones_medicacion', ['cod_administracion' => 'AMD_F4_PROPIA', 'cod_residente' => 'RES_BASE']);
+
+        $administracion['cod_administracion'] = 'AMD_F4_CRUZADA';
+        $administracion['cod_residente'] = 'RES_OTRO';
+        try {
+            DB::transaction(fn () => DB::table('administraciones_medicacion')->insert($administracion));
+            $this->fail('SQL directo no debe cruzar administración y residente de la prescripción.');
+        } catch (QueryException $e) {
+            $this->assertStringContainsString(
+                DB::getDriverName() === 'pgsql' ? 'fk_administracion_prescripcion_residente' : 'La prescripción no corresponde al residente.',
+                $e->getMessage()
+            );
+        }
+
+        $this->assertDatabaseMissing('administraciones_medicacion', ['cod_administracion' => 'AMD_F4_CRUZADA']);
+    }
+
     private function crearEscenarioClinico(): void
     {
         DB::table('areas')->insert([

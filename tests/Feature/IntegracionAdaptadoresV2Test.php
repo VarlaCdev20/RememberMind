@@ -6,7 +6,7 @@ use App\Backend\Modulos\Documentos\Servicios\DocumentacionUsuarioService;
 use App\Backend\Modulos\Identidad\Servicios\GeneradorPlanillaEnfermeriaService;
 use App\Exports\AdultoIndividualExport;
 use App\Frontend\Livewire\Administracion\Identidad\TurnosAsignacionesPanel;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\AplicacionInstrumento;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
@@ -15,7 +15,6 @@ use App\Models\Instrumento;
 use App\Models\Jornada;
 use App\Models\Personal;
 use App\Models\Preadmision;
-use App\Models\Residente;
 use App\Models\ResidenteContacto;
 use App\Models\Turno;
 use App\Models\User;
@@ -121,7 +120,7 @@ class IntegracionAdaptadoresV2Test extends TestCase
             'fecha_nacimiento' => '1942-04-10',
             'estado' => 'ADMITIDO',
         ]);
-        $residente = AdultoMayor::findOrFail($residenteCreado->cod_residente);
+        $residente = Residente::findOrFail($residenteCreado->cod_residente);
         $instrumento = Instrumento::create([
             'cod_instrumento' => 'INS_EXPORT_V2',
             'codigo' => 'COG-EXPORT-V2',

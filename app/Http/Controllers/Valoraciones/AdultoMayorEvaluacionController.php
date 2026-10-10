@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Valoraciones;
 
 use App\Http\Controllers\Controller;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\AplicacionInstrumento;
 use App\Models\Instrumento;
 use App\Models\Personal;
@@ -14,12 +14,12 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class AdultoMayorEvaluacionController extends Controller
 {
-    public function index(AdultoMayor $adulto_mayor)
+    public function index(Residente $adulto_mayor)
     {
         return new RedirectResponse(route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'evaluaciones']));
     }
 
-    public function store(Request $request, AdultoMayor $adulto_mayor)
+    public function store(Request $request, Residente $adulto_mayor)
     {
         $request->validate([
             'cod_tipo_eval' => 'required|exists:instrumentos,cod_instrumento',
@@ -80,12 +80,12 @@ class AdultoMayorEvaluacionController extends Controller
         return ['resultado' => $resultado, 'riesgo' => $riesgo];
     }
 
-    public function show(AdultoMayor $adulto_mayor, $evaluacionId)
+    public function show(Residente $adulto_mayor, $evaluacionId)
     {
         return redirect()->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'evaluaciones']);
     }
 
-    public function destroy(AdultoMayor $adulto_mayor, $id)
+    public function destroy(Residente $adulto_mayor, $id)
     {
         $evaluacion = AplicacionInstrumento::where('cod_residente', $adulto_mayor->cod_residente)
             ->where('cod_aplicacion', $id)
@@ -97,7 +97,7 @@ class AdultoMayorEvaluacionController extends Controller
             ->with('success', 'Evaluación anulada correctamente.');
     }
 
-    public function restore(AdultoMayor $adulto_mayor, $id)
+    public function restore(Residente $adulto_mayor, $id)
     {
         $evaluacion = AplicacionInstrumento::where('cod_residente', $adulto_mayor->cod_residente)
             ->where('cod_aplicacion', $id)

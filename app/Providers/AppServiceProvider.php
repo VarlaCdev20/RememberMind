@@ -40,10 +40,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
         \Illuminate\Support\Facades\Route::bind('adulto_mayor', function ($value) {
-            return \App\Models\AdultoMayor::where('cod_residente', $value)->firstOrFail();
+            return \App\Models\Residente::where('cod_residente', $value)->firstOrFail();
         });
         \Illuminate\Support\Facades\Route::bind('adulto', function ($value) {
-            return \App\Models\AdultoMayor::where('cod_residente', $value)->firstOrFail();
+            return \App\Models\Residente::where('cod_residente', $value)->firstOrFail();
         });
         \Illuminate\Support\Facades\Route::bind('residente', function ($value) {
             return \App\Models\Residente::where('cod_residente', $value)->firstOrFail();

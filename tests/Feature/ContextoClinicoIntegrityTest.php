@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Backend\Modulos\Clinica\Servicios\ContextoClinicoService;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Atencion;
@@ -150,7 +150,7 @@ class ContextoClinicoIntegrityTest extends TestCase
             'fecha_asignacion' => now(),
             'estado' => 'ACTIVA',
         ]);
-        $residente = AdultoMayor::factory()->create();
+        $residente = Residente::factory()->create();
         $atencionPrevia = Atencion::query()->create([
             'cod_atencion' => 'ATN_PREVIA_TEST',
             'cod_residente' => $residente->cod_residente,

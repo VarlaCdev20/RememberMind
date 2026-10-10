@@ -7,7 +7,7 @@ use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Jornada;
 use App\Models\Personal;
-use App\Models\TurnoInstitucional;
+use App\Models\Turno;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -437,7 +437,7 @@ class TurnosAsignacionesPanel extends Component
         $fecha = Carbon::parse($this->fechaSeleccionada);
 
         $areas = $this->areasInstitucionales();
-        $turnos = TurnoInstitucional::activos()->orderBy('hora_inicio')->get();
+        $turnos = Turno::activos()->orderBy('hora_inicio')->get();
         $roles = Role::orderBy('name')->pluck('name');
         $personal = $this->personalFiltrado()->get();
         $asignaciones = $this->asignacionesFiltradas();

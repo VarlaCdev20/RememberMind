@@ -7,7 +7,7 @@ use App\Models\EjecucionCuidado;
 use App\Models\IntervencionCuidado;
 use App\Models\Jornada;
 use App\Models\ProgramacionCuidado;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use App\Models\User;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use Illuminate\Support\Facades\Auth;
@@ -308,7 +308,7 @@ class TareasPlanPanel extends Component
         return view('livewire.cuidados.tareas-plan-panel', [
             'tareas'  => $tareas,
             'planes'  => $planesQuery->get(),
-            'turnos'  => TurnoEnfermeria::activos()->get(),
+            'turnos'  => Turno::activos()->orderBy('orden')->get(),
             'usuarios'=> User::query()->leftJoin('personal', 'usuarios.cod_usuario', '=', 'personal.cod_usuario')->where('usuarios.estado', 'ACTIVO')->orderBy('personal.apellido_paterno')->select('usuarios.*')->with('personal')->get(),
         ])->layout('layouts.enfermeria');
     }

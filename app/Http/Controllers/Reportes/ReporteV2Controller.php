@@ -13,6 +13,7 @@ class ReporteV2Controller extends Controller
     public function residentePdf(Request $request, Residente $residente)
     {
         $this->authorize('view', $residente);
+        abort_if($request->user()->hasRole('FAMILIAR'), 403, 'El expediente clínico no está publicado para familiares.');
         $residente->load(['admisiones', 'vinculosContacto.contacto', 'ocupacionActiva.cama.habitacion', 'atenciones.notas', 'prescripciones.medicamento']);
         activity('Reportes')->causedBy($request->user())->performedOn($residente)->log('Expediente PDF generado.');
         return Pdf::loadView('reportes.residente', compact('residente'))->download('expediente-'.$residente->cod_residente.'.pdf');

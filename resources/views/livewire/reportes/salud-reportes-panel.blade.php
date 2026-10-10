@@ -17,7 +17,7 @@
  ['key' => 'medicacion', 'tag' => 'Farmacia', 'title' => 'Tratamientos', 'text' => 'Medicaciones activas e historial de control.', 'icon' => 'ph-pill', 'color' => 'text-estado-exito', 'bg' => 'bg-estado-exitoBg'],
  ['key' => 'signos', 'tag' => 'Diario', 'title' => 'Signos vitales', 'text' => 'Controles fisiológicos recientes y evolución.', 'icon' => 'ph-activity', 'color' => 'text-parrafo', 'bg' => 'bg-estado-advertenciaBg'],
  ] as $card)
- <button type="button" wire:click="$set('tipoReporte', '{{ $card['key'] }}')" class="group rounded-[1.45rem] border p-5 text-left shadow-sm backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-[0_16px_34px_rgba(47,62,92,0.12)] {{ $tipoReporte === $card['key'] ? 'border-borde-focus bg-fondo-panel' : 'border-borde bg-fondo-panel' }}">
+ <button type="button" wire:click="$set('tipoReporte', '{{ $card['key'] }}')" class="group rounded-[1.45rem] border p-5 text-left shadow-sm backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-md {{ $tipoReporte === $card['key'] ? 'border-borde-focus bg-fondo-panel' : 'border-borde bg-fondo-panel' }}">
  <div class="flex items-start justify-between gap-3">
  <span class="rounded-full px-2.5 py-1 text-[8px] font-black uppercase tracking-wider {{ $card['bg'] }} {{ $card['color'] }}">{{ $card['tag'] }}</span>
  <span class="flex h-10 w-10 items-center justify-center rounded-2xl {{ $card['bg'] }} {{ $card['color'] }} transition group-hover:scale-105">
@@ -41,8 +41,8 @@
  Configure parámetros antes de generar la vista previa o imprimir el documento.
  </p>
  <div class="mt-5 rounded-2xl border border-borde-suave bg-fondo-panel p-3">
- <p class="text-[9px] font-bold uppercase tracking-widest text-parrafo/45">Estado</p>
- <p class="mt-1 text-xs font-bold text-estado-exito">Disponible para vista previa</p>
+ <p class="text-[9px] font-bold uppercase tracking-widest text-parrafo/45 mb-1.5">Estado</p>
+                        <x-ui.status-badge estado="DISPONIBLE" label="Disponible para vista previa" />
  </div>
  </aside>
 
@@ -92,7 +92,7 @@
  <i class="ph-bold ph-eye text-sm"></i>
  Vista previa
  </button>
- <button type="button" onclick="window.print()" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-principal px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-[0_8px_18px_rgba(47,62,92,0.18)] transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95">
+ <button type="button" onclick="window.print()" class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-principal px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-sm transition hover:-translate-y-0.5 hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold ph-download-simple text-sm"></i>
  Generar documento
  </button>
@@ -107,10 +107,8 @@
  <h2 class="text-2xl font-black uppercase tracking-tight text-parrafo">CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS</h2>
  <p class="mt-1 text-[10px] font-bold uppercase tracking-widest text-boton-acento">Reporte institucional de salud</p>
  </div>
- <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-borde bg-fondo-panel py-12 text-center">
- <i class="ph-bold ph-file-pdf mb-4 text-4xl text-meta"></i>
- <h3 class="text-base font-extrabold text-parrafo">Documento en espera</h3>
- <p class="mt-1 text-xs font-bold text-apoyo">Configure los parámetros y genere la vista previa.</p>
- </div>
+ <div class="py-4">
+                <x-ui.empty-state compact icono="ph-file-pdf" titulo="Documento en espera" texto="Configure los parámetros y genere la vista previa." />
+            </div>
  </section>
 </div>

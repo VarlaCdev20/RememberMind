@@ -5,7 +5,7 @@
  x-data x-init="document.body.style.overflow = 'hidden'" x-on:destroy="document.body.style.overflow = 'auto'">
 
  {{-- Modal Container --}}
- <div class="relative w-full max-w-4xl rounded-3xl border border-borde-suave bg-fondo-app shadow-[0_32px_64px_-12px_rgba(0,0,0,0.5)] flex flex-col max-h-[94vh]">
+ <div class="relative w-full max-w-4xl rounded-3xl border border-borde-suave bg-fondo-app shadow-2xl flex flex-col max-h-[94vh]">
 
  {{-- Header --}}
  <div class="flex items-center justify-between border-b border-borde-suave p-4 sm:px-8">
@@ -29,7 +29,7 @@
  {{-- Línea de fondo --}}
  <div class="absolute top-1/2 left-0 w-full h-1 bg-fondo-panel -translate-y-1/2 rounded-full"></div>
  {{-- Línea de progreso activa --}}
- <div class="absolute top-1/2 left-0 h-1 bg-boton-acento -translate-y-1/2 rounded-full transition-all duration-700 ease-out shadow-[0_0_8px_rgba(226,125,96,0.5)]"
+ <div class="absolute top-1/2 left-0 h-1 bg-boton-acento -translate-y-1/2 rounded-full transition-all duration-700 ease-out shadow-sm"
  style="width: {{ (($paso - 1) / ($totalPasos - 1)) * 100 }}%"></div>
 
  {{-- Pasos --}}
@@ -456,7 +456,7 @@
  @endphp
  <button type="button" wire:click="siguiente" wire:loading.attr="disabled" wire:target="siguiente"
  @disabled($bloquearSiguiente)
- class="flex h-11 items-center justify-center gap-2 rounded-xl bg-boton-principal px-8 text-xs font-bold text-inverso shadow-[0_12px_24px_-8px_rgba(47,62,92,0.4)] transition hover:-translate-y-1 hover:bg-fondo-panel active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed">
+ class="flex h-11 items-center justify-center gap-2 rounded-xl bg-boton-principal px-8 text-xs font-bold text-inverso shadow-md transition hover:-translate-y-1 hover:bg-fondo-panel active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed">
  <i wire:loading wire:target="siguiente" class="ph-bold ph-circle-notch animate-spin"></i>
  <i wire:loading.remove wire:target="siguiente" class="ph-bold ph-arrow-right"></i>
  <span wire:loading.remove wire:target="siguiente">{{ $bloquearSiguiente ? 'Corrija fecha de nacimiento' : 'Siguiente paso' }}</span>
@@ -464,7 +464,7 @@
  </button>
  @else
  <button type="button" wire:click="guardar" wire:loading.attr="disabled" wire:target="guardar"
- class="flex h-11 items-center justify-center gap-2 rounded-xl bg-boton-acento px-8 text-xs font-bold text-inverso shadow-[0_12px_24px_-8px_rgba(226,125,96,0.4)] transition hover:-translate-y-1 hover:bg-fondo-panel active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed">
+ class="flex h-11 items-center justify-center gap-2 rounded-xl bg-boton-acento px-8 text-xs font-bold text-inverso shadow-md transition hover:-translate-y-1 hover:bg-fondo-panel active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed">
  <i wire:loading wire:target="guardar" class="ph-bold ph-circle-notch animate-spin"></i>
  <i wire:loading.remove wire:target="guardar" class="ph-bold ph-floppy-disk"></i>
  <span wire:loading.remove wire:target="guardar">{{ $isEdit ? 'Actualizar' : 'Finalizar' }}</span>

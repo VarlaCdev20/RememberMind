@@ -497,9 +497,7 @@
       </div>
      </div>
 
-     <span class="rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider shadow-sm {{ $estadoClass }}">
-      {{ $estadoLabel }}
-     </span>
+     <x-ui.status-badge :estado="$usuario->estado" />
      </div>
 
      <div class="mt-4 grid grid-cols-1 gap-2">
@@ -567,14 +565,14 @@
      </div>
     </x-ui.person-entity-card>
     @empty
-    <div class="col-span-full flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-borde bg-fondo-card/60 px-4 py-12 text-center">
-     <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-xl border border-borde bg-fondo-card">
-     <i class="ph-fill ph-users-slash text-2xl text-apoyo"></i>
-     </div>
-     <h4 class="text-sm font-black text-titulo">No se encontró personal</h4>
-     <p class="mt-1 max-w-sm text-xs font-semibold text-apoyo">
-     Ajusta los filtros o limpia la búsqueda para revisar otros registros institucionales.
-     </p>
+    <div class="col-span-full">
+     <x-ui.empty-state
+      icono="ph-users-slash"
+      titulo="No se encontró personal"
+      texto="Ajusta los filtros o limpia la búsqueda para revisar otros registros institucionales."
+      actionMethod="limpiarFiltrosResumen"
+      actionText="Restablecer filtros"
+     />
     </div>
     @endforelse
    </div>
@@ -647,9 +645,7 @@
       </td>
 
       <td class="px-4 py-3 text-center">
-      <span class="rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider {{ $estadoClass }}">
-       {{ $estadoLabel }}
-      </span>
+      <x-ui.status-badge :estado="$usuario->estado" />
       </td>
 
       <td class="px-4 py-3 text-center">
@@ -689,11 +685,15 @@
      </tr>
      @empty
      <tr>
-      <td colspan="6" class="px-4 py-10 text-center">
-      <h4 class="text-sm font-black text-titulo">No se encontró personal</h4>
-      <p class="mt-1 text-xs font-semibold text-apoyo">
-       No existen registros que coincidan con los filtros seleccionados.
-      </p>
+      <td colspan="6" class="px-4 py-8">
+       <x-ui.empty-state
+        icono="ph-users-slash"
+        titulo="No se encontró personal"
+        texto="No existen registros que coincidan con los filtros seleccionados."
+        compact
+        actionMethod="limpiarFiltrosResumen"
+        actionText="Restablecer filtros"
+       />
       </td>
      </tr>
      @endforelse

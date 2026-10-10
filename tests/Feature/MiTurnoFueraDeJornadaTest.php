@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno;
 use App\Models\AdministracionMedicacion;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Alerta;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
@@ -20,9 +20,7 @@ use App\Models\OcupacionCama;
 use App\Models\Personal;
 use App\Models\PlanCuidado;
 use App\Models\Prescripcion;
-use App\Models\Residente;
 use App\Models\Turno;
-use App\Models\TurnoEnfermeria;
 use App\Models\User;
 use App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService;
 use Carbon\Carbon;
@@ -410,7 +408,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
 
         Livewire::test(DashboardTurno::class)
             ->assertSee('Turno del equipo disponible en modo consulta.')
-            ->assertSee('Pacientes del turno')
+            ->assertSee('Residentes del turno')
             ->assertSee('Agenda de medicación y cuidados')
             ->assertSee('Turno del equipo · solo lectura')
             ->assertDontSee('Tu progreso');

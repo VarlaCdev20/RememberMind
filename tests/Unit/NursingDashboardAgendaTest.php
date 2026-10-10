@@ -78,7 +78,8 @@ class NursingDashboardAgendaTest extends TestCase
         $this->assertStringContainsString('Actividad del turno', $vista);
         $this->assertStringNotContainsString('Tendencia de ocupación', $vista);
         $this->assertStringContainsString('Sin acciones para graficar', $vista);
-        $this->assertStringContainsString('rm-chart-card rm-chart-glass', $vista);
+        $this->assertStringContainsString('rm-chart-card rm-incident-trend', $vista);
+        $this->assertStringContainsString('rm-nursing-distribution rm-chart-card', $vista);
         $this->assertStringContainsString('window.RMCharts.presets.doughnut', $vista);
         $this->assertStringContainsString('window.RMCharts.presets.barHorizontal', $vista);
         $this->assertStringContainsString('prefers-reduced-motion: reduce', $vista);

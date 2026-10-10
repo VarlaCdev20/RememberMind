@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Frontend\Livewire\Enfermeria\Medicacion\SaludAdministracionMedicacionPanel;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -15,7 +15,7 @@ class FiltrosMedicacionTest extends TestCase
     use RefreshDatabase;
 
     private User $enfermero;
-    private AdultoMayor $adulto;
+    private Residente $adulto;
 
     protected function setUp(): void
     {
@@ -29,7 +29,7 @@ class FiltrosMedicacionTest extends TestCase
         ]);
         $this->enfermero->assignRole('SUPERADMINISTRADOR');
 
-        $this->adulto = AdultoMayor::factory()->create([
+        $this->adulto = Residente::factory()->create([
             'cod_est_adul' => 'EST_001',
             'nombres' => 'María Carmen',
             'ap_paterno' => 'Gómez',

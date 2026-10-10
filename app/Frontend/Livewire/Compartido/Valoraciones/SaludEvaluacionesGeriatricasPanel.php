@@ -4,17 +4,17 @@ namespace App\Frontend\Livewire\Compartido\Valoraciones;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\AplicacionInstrumento;
 
 class SaludEvaluacionesGeriatricasPanel extends Component
 {
     use WithPagination;
 
-    public AdultoMayor $adulto;
+    public Residente $adulto;
     public $evaluaciones = [];
 
-    public function mount(AdultoMayor $adulto)
+    public function mount(Residente $adulto)
     {
         $this->adulto = $adulto;
         $this->evaluaciones = AplicacionInstrumento::query()

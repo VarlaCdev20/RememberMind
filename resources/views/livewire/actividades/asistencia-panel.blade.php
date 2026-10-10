@@ -223,23 +223,20 @@
  <tbody class="divide-y divide-[var(--rm-border)]/30">
 
  @if($registros->isEmpty())
- <tr>
- <td colspan="8" class="py-16 text-center">
- <div class="flex flex-col items-center gap-3">
- <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-fondo-panel">
- <i class="ph-bold ph-clipboard-text text-2xl text-apoyo"></i>
- </span>
- @if($search || $filtroTipo || $filtroEstado || $filtroFechaDesde || $filtroFechaHasta)
- <p class="text-sm font-bold text-apoyo">No se encontraron registros con los filtros seleccionados.</p>
- <button wire:click="limpiarFiltros" class="text-xs font-bold text-estado-advertencia hover:underline">Limpiar filtros</button>
- @else
- <p class="text-sm font-bold text-apoyo">No hay actividades registradas para controlar asistencia.</p>
- @endif
- </div>
- </td>
- </tr>
- @else
- @foreach($registros as $r)
+                        <tr>
+                            <td colspan="8" class="py-8">
+                                <x-ui.empty-state
+                                    compact
+                                    icono="ph-clipboard-text"
+                                    titulo="Sin registros de asistencia"
+                                    :texto="$search || $filtroTipo || $filtroEstado || $filtroFechaDesde || $filtroFechaHasta ? 'No se encontraron registros con los filtros seleccionados.' : 'No hay actividades registradas para controlar asistencia.'"
+                                    :actionMethod="$search || $filtroTipo || $filtroEstado || $filtroFechaDesde || $filtroFechaHasta ? 'limpiarFiltros' : null"
+                                    actionText="Restablecer filtros"
+                                />
+                            </td>
+                        </tr>
+                        @else
+                        @foreach($registros as $r)
  @php
  $estadoNorm = \App\Models\Actividad::normalizarEstado($r->estado);
  $res = $resultado($r->estado);
@@ -278,10 +275,8 @@
 
  {{-- Estado --}}
  <td class="px-4 py-3">
- <span class="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold {{ $estadoNorm['clase'] }}">
- {{ $estadoNorm['etiqueta'] }}
- </span>
- </td>
+                            <x-ui.status-badge :estado="$r->estado" />
+                        </td>
 
  {{-- Resultado institucional --}}
  <td class="px-4 py-3">
@@ -465,9 +460,7 @@
  <div class="rounded-xl border border-borde-suave bg-fondo-panel p-3">
  <p class="text-[10px] font-bold uppercase tracking-[0.1em] text-apoyo">Estado actual</p>
  <p class="mt-1.5">
- <span class="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold {{ $dNorm['clase'] }}">
- {{ $dNorm['etiqueta'] }}
- </span>
+ <x-ui.status-badge :estado="$detalle->estado" />
  </p>
  </div>
  <div class="rounded-xl border border-borde-suave bg-fondo-panel p-3">

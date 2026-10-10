@@ -45,7 +45,7 @@ test('los shells por rol conservan fondo y controles completos en claro, oscuro 
     const browser = await puppeteer.launch({ headless: true, executablePath });
     try {
         const page = await browser.newPage();
-        for (const width of [320, 390, 768, 1024, 1440]) {
+        for (const width of [320, 390, 768, 1024, 1280, 1440]) {
             await page.setViewport({ width, height: 900 });
             for (const variant of ['', 'rm-shell--administracion', 'rm-nursing-shell', 'superadmin']) {
                 for (const theme of ['light', 'dark']) {
@@ -79,8 +79,14 @@ test('los shells por rol conservan fondo y controles completos en claro, oscuro 
                         return { main: background('main'), sidebar: background('.rm-sidebar'), topbar: background('.rm-topbar'), buttons, moon, sun, topbarBounds: { left: topbar.left, right: topbar.right }, bannerBounds: { left: banner.left, right: banner.right } };
                     });
                     const context = `${variant || 'sistema'} ${theme} ${width}px`;
-                    assert.equal(result.main, result.sidebar, context);
-                    assert.equal(result.main, result.topbar, context);
+                    if (theme === 'light') {
+                        assert.equal(result.main, 'rgb(243, 238, 232)', `${context}: lienzo aprobado`);
+                        assert.equal(result.sidebar, 'rgb(221, 214, 207)', `${context}: shell aprobado`);
+                        assert.notEqual(result.topbar, result.main, `${context}: cabecera distinguible del lienzo`);
+                        assert.notEqual(result.topbar, result.sidebar, `${context}: cabecera distinguible del shell`);
+                    } else {
+                        assert.equal(result.main, result.sidebar, `${context}: base oscura compartida`);
+                    }
                     assert.equal(result.moon !== 'none', theme === 'light', `${context}: icono luna`);
                     assert.equal(result.sun !== 'none', theme === 'dark', `${context}: icono sol`);
                     assert.ok(Math.abs(result.bannerBounds.left - result.topbarBounds.left) <= 1, `${context}: aviso alineado con topbar`);

@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Medicacion;
 use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Medicacion\StoreAdministracionMedicacionRequest;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 
 class AdultoMayorAdministracionMedicacionController extends Controller
 {
-    public function store(StoreAdministracionMedicacionRequest $request, AdultoMayor $adulto_mayor, RegistrarAdministracionMedicacionService $servicio)
+    public function store(StoreAdministracionMedicacionRequest $request, Residente $adulto_mayor, RegistrarAdministracionMedicacionService $servicio)
     {
         try {
             $datos = $request->validated();
@@ -38,9 +38,14 @@ class AdultoMayorAdministracionMedicacionController extends Controller
                 ->route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto_mayor->cod_residente, 'tab' => 'medicacion'])
                 ->with('success', $tipoEvento.'.');
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            if ($e instanceof \Illuminate\Validation\ValidationException
+                || $e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                throw $e;
+            }
+            report($e);
             return redirect()->back()
-                ->with('error', 'Error al registrar administración: '.$e->getMessage())
+                ->with('error', 'No se pudo registrar la administración. Inténtelo nuevamente.')
                 ->withInput();
         }
     }

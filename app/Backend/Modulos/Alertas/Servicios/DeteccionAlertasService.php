@@ -1,18 +1,22 @@
 <?php
 namespace App\Backend\Modulos\Alertas\Servicios;
 
-use App\Models\{AdultoMayor, Alerta, AdministracionMedicacion, Atencion, EjecucionCuidado};
+use App\Models\{Residente, Alerta, AdministracionMedicacion, Atencion, EjecucionCuidado};
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
+use App\Models\User;
 
 class DeteccionAlertasService
 {
     public function detectar(?string $codResidente = null): int
     {
+        $ids = $this->residentesAutorizados($codResidente);
         $creadas = 0;
         // El flujo de registro confirma signos y crea alertas aprobadas en una sola
         // transacción. Este detector general no debe crear alertas por advertencias.
 
-        AdministracionMedicacion::query()->when($codResidente, fn ($q) => $q->where('cod_residente', $codResidente))->where('resultado', 'OMITIDA')->orderBy('cod_administracion')->chunk(100, function ($registros) use (&$creadas) {
+        AdministracionMedicacion::query()->whereIn('cod_residente', $ids)->where('resultado', 'OMITIDA')->orderBy('cod_administracion')->chunk(100, function ($registros) use (&$creadas) {
             foreach ($registros as $r) {
                 $creadas += $this->registrar(
                     $r,
@@ -25,6 +29,7 @@ class DeteccionAlertasService
         });
 
         EjecucionCuidado::whereIn('estado', ['PENDIENTE', 'EN_PROCESO', 'OMITIDA'])
+            ->whereIn('cod_residente', $ids)
             ->when($codResidente, fn ($q) => $q->where('cod_residente', $codResidente))
             ->whereDate('fecha_hora_programada', '<=', today())->orderBy('cod_ejecucion')->chunk(100, function ($registros) use (&$creadas) {
                 foreach ($registros as $r) {
@@ -42,7 +47,7 @@ class DeteccionAlertasService
                 }
             });
 
-        Atencion::query()->when($codResidente, fn ($q) => $q->where('cod_residente', $codResidente))
+        Atencion::query()->whereIn('cod_residente', $ids)
             ->where(fn ($q) => $q->where('motivo', 'like', '%incidente%')->orWhere('motivo', 'like', '%medico%'))
             ->orderBy('cod_atencion')->chunk(100, function ($registros) use (&$creadas) {
                 foreach ($registros as $r) {
@@ -63,13 +68,14 @@ class DeteccionAlertasService
 
     public function detectarPreventivas(?string $codResidente = null): int
     {
-        $adultos = AdultoMayor::with([
+        $ids = $this->residentesAutorizados($codResidente);
+        $adultos = Residente::with([
             'fichasMedicas' => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO', 'VIGENTE'])->latest()->limit(1),
             'medicaciones' => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO']),
             'administracionesMedicacion' => fn ($q) => $q->latest('fecha_hora_programada')->limit(3),
             'valoracionesFuncionales' => fn ($q) => $q->latest('fecha_hora')->limit(1),
         ])
-            ->when($codResidente, fn ($q) => $q->where('cod_residente', $codResidente))
+            ->whereIn('cod_residente', $ids)
             ->whereIn('estado', ['ACTIVO', 'ADMITIDO', 'ASIGNADO', 'EN_SEGUIMIENTO_ACTIVO', 'OBSERVADO', 'SEGUIMIENTO_ESPECIAL'])
             ->get();
 
@@ -156,7 +162,11 @@ class DeteccionAlertasService
         string $nivel,
         string $motivo
     ): ?Alerta {
-        return DB::transaction(function () use ($codResidente, $origen, $tipoAlerta, $nivel, $motivo) {
+        $usuario = Auth::user();
+        abort_unless($usuario, 403);
+        app(AlertasService::class)->autorizarCoordinacion($codResidente, 'alertas.gestionar', $usuario);
+        return DB::transaction(function () use ($codResidente, $origen, $tipoAlerta, $nivel, $motivo, $usuario) {
+            Residente::whereKey($codResidente)->lockForUpdate()->firstOrFail();
             $existe = Alerta::where('cod_residente', $codResidente)
                 ->where('modulo', $origen)
                 ->where('tipo', $tipoAlerta)
@@ -167,7 +177,7 @@ class DeteccionAlertasService
                 return null;
             }
 
-            return Alerta::create([
+            $alerta = Alerta::create([
                 'cod_alerta' => 'ALA_' . strtoupper(\Illuminate\Support\Str::random(10)),
                 'cod_residente' => $codResidente,
                 'tipo' => $tipoAlerta,
@@ -179,6 +189,8 @@ class DeteccionAlertasService
                 'generacion' => 'AUTOMATICA',
                 'estado' => 'ABIERTA',
             ]);
+            app(AlertasService::class)->registrarCreacionAutomatica($alerta, $usuario);
+            return $alerta;
         });
     }
 
@@ -186,7 +198,7 @@ class DeteccionAlertasService
     {
         $motivo = '['.$registro->getTable().':'.$registro->getKey().'] '.$texto;
         return DB::transaction(function () use ($registro, $origen, $tipo, $nivel, $motivo, $texto) {
-            AdultoMayor::whereKey($registro->cod_residente)->lockForUpdate()->firstOrFail();
+            Residente::whereKey($registro->cod_residente)->lockForUpdate()->firstOrFail();
             $referencia = '['.$registro->getTable().':'.$registro->getKey().'] ';
 
             // 1. Idempotencia por referencia de entidad
@@ -209,7 +221,7 @@ class DeteccionAlertasService
             if ($alertaEquivalente) {
                 return 0;
             }
-            Alerta::create([
+            $alerta = Alerta::create([
                 'cod_alerta' => 'ALA_' . strtoupper(\Illuminate\Support\Str::random(10)),
                 'cod_residente' => $registro->cod_residente,
                 'tipo' => $tipo,
@@ -221,7 +233,23 @@ class DeteccionAlertasService
                 'generacion' => 'AUTOMATICA',
                 'estado' => 'ABIERTA',
             ]);
+            app(AlertasService::class)->registrarCreacionAutomatica($alerta, Auth::user());
             return 1;
         });
+    }
+
+    private function residentesAutorizados(?string $codResidente): array
+    {
+        $usuario = Auth::user();
+        abort_unless($usuario && $usuario->estado === 'ACTIVO' && $usuario->can('alertas.gestionar'), 403);
+        abort_if($usuario->hasRole('FAMILIAR'), 403);
+        $query = $usuario->hasAnyRole(['ADMINISTRADOR', 'GERENTE', 'SUPERADMINISTRADOR']) && ! $usuario->hasRole('ENFERMEROS')
+            ? Residente::query()
+            : app(TurnoEnfermeriaService::class)->obtenerPacientesAsignadosQuery($usuario);
+        $ids = $query->when($codResidente, fn ($q) => $q->whereKey($codResidente))->pluck('cod_residente')->all();
+        foreach ($ids as $id) {
+            app(AlertasService::class)->autorizarCoordinacion($id, 'alertas.gestionar', $usuario);
+        }
+        return $ids;
     }
 }

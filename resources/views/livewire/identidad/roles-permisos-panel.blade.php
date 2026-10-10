@@ -48,7 +48,7 @@
  
  <button type="button" 
  wire:click="seleccionarRol({{ $rol->id }})"
- class="group relative w-full text-left overflow-hidden rounded-[1.45rem] border border-transparent shadow-[0_10px_24px_rgba(47,62,92,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(47,62,92,0.12)] {{ $esActivo ? 'bg-fondo-panel ring-2 ring-[#E27D60]/30' : 'bg-fondo-panel hover:bg-fondo-panel' }}">
+ class="group relative w-full text-left overflow-hidden rounded-[1.45rem] border border-transparent shadow-[0_10px_24px_rgba(47,62,92,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(47,62,92,0.12)] {{ $esActivo ? 'bg-fondo-panel ring-2 ring-boton-acento/30' : 'bg-fondo-panel hover:bg-fondo-panel' }}">
  
  <div class="absolute left-0 top-0 bottom-0 w-1.5 {{ $esActivo ? 'bg-boton-acento' : 'bg-transparent group-hover:bg-fondo-panel' }} transition-colors"></div>
  

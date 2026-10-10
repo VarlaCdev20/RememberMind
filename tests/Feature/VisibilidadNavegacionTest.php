@@ -189,8 +189,13 @@ class VisibilidadNavegacionTest extends TestCase
         $this->actingAs($usuario);
 
         $this->get(route('admin.adultos-mayores.show', $residente->cod_residente))
+            ->assertRedirect(route('admin.residentes.show', $residente));
+        $this->get(route('admin.residentes.show', $residente))
             ->assertOk()
-            ->assertSee('Red de apoyo')
+            ->assertSee($residente->nombres)
+            ->assertDontSee('Contactos autorizados')
+            ->assertDontSee('Prescripciones')
+            ->assertDontSee('Expediente JSON')
             ->assertDontSee('Salud resumida')
             ->assertDontSee('Cognitivo resumido')
             ->assertDontSee('Editar datos')
@@ -198,8 +203,7 @@ class VisibilidadNavegacionTest extends TestCase
         $this->get(route('admin.adultos-mayores.atenciones.index', $residente->cod_residente))->assertForbidden();
         $this->get(route('admin.adultos-mayores.observaciones.index', $residente->cod_residente))->assertForbidden();
         $this->get(route('admin.adultos-mayores.documentos.index', $residente->cod_residente))
-            ->assertOk()
-            ->assertDontSee('Registrar Documento');
+            ->assertForbidden();
         $ajeno = Residente::factory()->create();
         $this->get(route('admin.adultos-mayores.documentos.index', $ajeno->cod_residente))->assertForbidden();
     }

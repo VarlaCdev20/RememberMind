@@ -6,7 +6,7 @@ use App\Models\Residente;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Jornada;
 use App\Models\Personal;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -130,7 +130,7 @@ class AsignacionTurnoPanel extends Component
         return view('livewire.cuidados.asignacion-turno-panel', [
             'asignaciones' => $asignaciones,
             'adultos' => Residente::query()->where('estado', 'ADMITIDO')->orderBy('apellido_paterno')->get(),
-            'turnos' => TurnoEnfermeria::activos()->get(),
+            'turnos' => Turno::activos()->orderBy('orden')->get(),
             'enfermeros' => User::role('ENFERMEROS')->with('personal')->where('estado', 'ACTIVO')->get(),
         ])->layout('layouts.sistema');
     }

@@ -3,7 +3,7 @@
 namespace App\Frontend\Livewire\Admisiones;
 
 use Livewire\Component;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\HistorialEstadoResidente;
 use Illuminate\Support\Facades\DB;
 
@@ -27,7 +27,7 @@ class DecisionAdmisionModal extends Component
         abort_unless(app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class)
             ->tieneRol(auth()->user(), ['MEDICO GENERAL/GERIATRA']), 403);
         $this->resetForm();
-        $this->adulto = AdultoMayor::find($cod_residente);
+        $this->adulto = Residente::find($cod_residente);
         if($this->adulto && $this->adulto->estado === 'DECISION_ADMISION') {
             $this->isOpen = true;
         } else {
@@ -92,7 +92,7 @@ class DecisionAdmisionModal extends Component
         abort_unless($this->adulto && $this->adulto->fresh()->estado === 'DECISION_ADMISION', 409);
         DB::beginTransaction();
         try {
-            $this->adulto = AdultoMayor::lockForUpdate()->findOrFail($this->adulto->cod_residente);
+            $this->adulto = Residente::lockForUpdate()->findOrFail($this->adulto->cod_residente);
             if ($this->adulto->estado !== 'DECISION_ADMISION') throw new \RuntimeException('La decisión ya fue registrada.');
             $estadoAnterior = $this->adulto->estado;
             $nuevoEstadoStr = ($this->decision === 'DERIVADO') ? 'DERIVADO' : 'PENDIENTE_ASIGNACION';
@@ -136,11 +136,16 @@ class DecisionAdmisionModal extends Component
             $this->dispatch('valoracionMedicaCompletada');
             $this->close();
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
+            if ($e instanceof \Illuminate\Validation\ValidationException
+                || $e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                throw $e;
+            }
+            report($e);
             $this->dispatch('swal', [
                 'title' => 'Error',
-                'text' => 'Ocurrió un error al guardar la decisión: ' . $e->getMessage(),
+                'text' => 'No se pudo guardar la decisión. Inténtelo nuevamente.',
                 'icon' => 'error'
             ]);
         }

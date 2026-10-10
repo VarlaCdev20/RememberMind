@@ -3,24 +3,19 @@
 namespace App\Frontend\Livewire\Superadministrador\Identidad;
 
 use Livewire\Component;
-use Livewire\WithFileUploads;
-use App\Models\AreaInstitucional;
+use App\Models\Area;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use App\Backend\Modulos\Reportes\Servicios\ReportExportService;
 use App\Backend\Modulos\Reportes\Servicios\ReportFileNameService;
 use App\Exports\AreasInstitucionalesExport;
 
 class AreasInstitucionalesPanel extends Component
 {
-    use WithFileUploads;
-
     // Filtros de búsqueda
     public $search = '';
     public $filtroEstado = '';
-    public $filtroTipo = '';
     public $filtroResponsable = '';
 
     // Control de modales y paneles
@@ -36,19 +31,8 @@ class AreasInstitucionalesPanel extends Component
     // Propiedades del formulario
     public $areaId; // Corresponde al cod_area
     public $nombre;
-    public $tipo_area = 'Administrativa';
     public $descripcion;
-    public $responsable_id;
-    public $color = '#2F3E5C';
-    public $estado = 'ACTIVA';
-    public $orden = 0;
-    public $observaciones;
-    public $nuevaImagen; // Para la carga de portadas
-
-    // Conservar en BD pero ocultar en UI
-    public $roles_sugeridos = [];
-    public $modulos_relacionados = [];
-    public $icono = 'ph-buildings';
+    public $estado = 'ACTIVO';
 
     // Ficha de detalle de área
     public $areaSeleccionada = null;
@@ -64,17 +48,12 @@ class AreasInstitucionalesPanel extends Component
         $areas = $reporte['areas']
             ->when($this->search, fn ($items) => $items->filter(fn ($area) =>
                 str_contains(mb_strtolower($area->nombre.' '.$area->cod_area), mb_strtolower($this->search))))
-            ->when($this->filtroEstado, fn ($items) => $items->where('estado', $this->filtroEstado))
+            ->when($this->filtroEstado, fn ($items) => $items->whereIn(
+                'estado', $this->filtroEstado === 'ACTIVO' ? ['ACTIVO', 'ACTIVA'] : ['INACTIVO', 'INACTIVA']
+            ))
             ->when($this->filtroResponsable, fn ($items) => $items->filter(fn ($area) =>
                 $area->responsable?->cod_usuario === $this->filtroResponsable))
             ->values();
-
-        // Si estamos en edición, cargamos solo los usuarios de esta área
-        $responsablesDisponibles = collect();
-        if ($this->isEdit && $this->areaId) {
-            $responsablesDisponibles = app(\App\Backend\Modulos\Reportes\Servicios\AreasReportDataService::class)
-                ->getAreaReportData($this->areaId)['area']->usuarios;
-        }
 
         // Todos los usuarios activos para filtro en cabecera
         $todosResponsables = User::where('estado', 'ACTIVO')->get();
@@ -89,7 +68,6 @@ class AreasInstitucionalesPanel extends Component
 
         return view('livewire.identidad.areas-institucionales-panel', [
             'areas' => $areas,
-            'responsablesDisponibles' => $responsablesDisponibles,
             'todosResponsables' => $todosResponsables,
             'totalAreas' => $totalAreas,
             'areasActivas' => $areasActivas,
@@ -104,8 +82,16 @@ class AreasInstitucionalesPanel extends Component
     {
         $this->search = '';
         $this->filtroEstado = '';
-        $this->filtroTipo = '';
         $this->filtroResponsable = '';
+    }
+
+    private function usuarioAutorizado(string $permiso): bool
+    {
+        $usuario = Auth::user();
+
+        return $usuario !== null
+            && strtoupper((string) $usuario->estado) === 'ACTIVO'
+            && $usuario->can($permiso);
     }
 
     // ── GESTIÓN DE ACCESO A FORMULARIO (CRUD) ──
@@ -113,7 +99,7 @@ class AreasInstitucionalesPanel extends Component
     public function crearArea()
     {
         // Validar Spatie Permission
-        if (!Auth::user()->can('areas.crear')) {
+        if (!$this->usuarioAutorizado('areas.crear')) {
             $this->dispatch('swal:modal', [
                 'type' => 'error',
                 'title' => 'Acceso denegado',
@@ -132,7 +118,7 @@ class AreasInstitucionalesPanel extends Component
     public function editarArea($codArea)
     {
         // Validar Spatie Permission
-        if (!Auth::user()->can('areas.editar')) {
+        if (!$this->usuarioAutorizado('areas.editar')) {
             $this->dispatch('swal:modal', [
                 'type' => 'error',
                 'title' => 'Acceso denegado',
@@ -146,29 +132,18 @@ class AreasInstitucionalesPanel extends Component
 
         $this->areaId = $area->cod_area;
         $this->nombre = $area->nombre;
-        $this->tipo_area = $area->tipo_area;
         $this->descripcion = $area->descripcion;
-        $this->responsable_id = $area->responsable_id;
-        $this->color = $area->color ?? '#2F3E5C';
-        $this->estado = $area->estado;
-        $this->orden = $area->orden;
-        $this->observaciones = $area->observaciones;
-
-        // Conservar campos ocultos de BD
-        $this->roles_sugeridos = $area->roles_sugeridos ?? [];
-        $this->modulos_relacionados = $area->modulos_relacionados ?? [];
-        $this->icono = $area->icono ?? 'ph-buildings';
+        $this->estado = in_array($area->estado, ['ACTIVO', 'ACTIVA'], true) ? 'ACTIVO' : 'INACTIVO';
 
         $this->isEdit = true;
         $this->mostrarFormulario = true;
         $this->mostrarFicha = false;
-        $this->nuevaImagen = null;
     }
 
     public function guardarArea()
     {
         $permisoRequerido = $this->isEdit ? 'areas.editar' : 'areas.crear';
-        if (!Auth::user()->can($permisoRequerido)) {
+        if (!$this->usuarioAutorizado($permisoRequerido)) {
             $this->dispatch('swal:modal', [
                 'type' => 'error',
                 'title' => 'Acceso denegado',
@@ -179,31 +154,20 @@ class AreasInstitucionalesPanel extends Component
 
         $rules = [
             'nombre' => 'required|string|max:80|unique:areas,nombre,' . ($this->areaId ?? 'NULL') . ',cod_area',
-            'tipo_area' => 'required|string|max:50',
             'descripcion' => 'nullable|string',
-            'responsable_id' => 'nullable|exists:usuarios,cod_usuario',
-            'color' => 'required|string|max:20',
-            'estado' => 'required|in:ACTIVA,INACTIVA',
-            'orden' => 'required|integer|min:0',
-            'observaciones' => 'nullable|string',
-            'nuevaImagen' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+            'estado' => 'required|in:ACTIVO,INACTIVO',
         ];
 
         $this->validate($rules);
 
-        if ($this->nuevaImagen) {
-            $this->addError('nuevaImagen', 'La BDD V2 congelada no define una columna de imagen para áreas.');
-            return;
-        }
-
         $datos = [
             'nombre' => mb_strtoupper(trim($this->nombre), 'UTF-8'),
             'descripcion' => $this->descripcion ?: null,
-            'estado' => $this->estado === 'ACTIVA' ? 'ACTIVO' : 'INACTIVO',
+            'estado' => $this->estado,
         ];
 
         if ($this->isEdit) {
-            $area = AreaInstitucional::findOrFail($this->areaId);
+            $area = Area::findOrFail($this->areaId);
             $area->update($datos);
 
             // Log de actividad
@@ -214,7 +178,7 @@ class AreasInstitucionalesPanel extends Component
 
             $mensaje = 'Área institucional actualizada correctamente.';
         } else {
-            $area = AreaInstitucional::create($datos + [
+            $area = Area::create($datos + [
                 'cod_area' => 'ARE_'.Str::upper(Str::random(12)),
             ]);
 
@@ -240,7 +204,7 @@ class AreasInstitucionalesPanel extends Component
     public function toggleEstado($codArea)
     {
         // Validar Spatie Permission
-        if (!Auth::user()->can('areas.cambiar_estado')) {
+        if (!$this->usuarioAutorizado('areas.cambiar_estado')) {
             $this->dispatch('swal:modal', [
                 'type' => 'error',
                 'title' => 'Acceso denegado',
@@ -249,8 +213,8 @@ class AreasInstitucionalesPanel extends Component
             return;
         }
 
-        $area = AreaInstitucional::findOrFail($codArea);
-        $nuevoEstado = $area->estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
+        $area = Area::findOrFail($codArea);
+        $nuevoEstado = in_array($area->estado, ['ACTIVO', 'ACTIVA'], true) ? 'INACTIVO' : 'ACTIVO';
         $area->estado = $nuevoEstado;
         $area->save();
 
@@ -299,7 +263,7 @@ class AreasInstitucionalesPanel extends Component
 
     public function abrirReportes()
     {
-        if (!Auth::user()->can('areas.reportes')) {
+        if (!$this->usuarioAutorizado('areas.reportes')) {
             $this->dispatch('swal', [
                 'icon' => 'warning',
                 'title' => 'Acceso denegado',
@@ -327,7 +291,7 @@ class AreasInstitucionalesPanel extends Component
 
     public function abrirReporteArea($codArea)
     {
-        if (!Auth::user()->can('areas.reportes')) {
+        if (!$this->usuarioAutorizado('areas.reportes')) {
             $this->dispatch('swal', [
                 'icon' => 'warning',
                 'title' => 'Acceso denegado',
@@ -358,7 +322,7 @@ class AreasInstitucionalesPanel extends Component
 
     public function generarReporteGeneral()
     {
-        if (!Auth::user()->can('areas.reportes')) {
+        if (!$this->usuarioAutorizado('areas.reportes')) {
             $this->dispatch('swal', [
                 'icon' => 'warning',
                 'title' => 'Acceso denegado',
@@ -392,7 +356,7 @@ class AreasInstitucionalesPanel extends Component
 
     public function exportarReporteGeneralPdf()
     {
-        if (!Auth::user()->can('areas.reportes')) {
+        if (!$this->usuarioAutorizado('areas.reportes')) {
             $this->dispatch('swal', [
                 'icon' => 'warning',
                 'title' => 'Acceso denegado',
@@ -413,7 +377,6 @@ class AreasInstitucionalesPanel extends Component
             foreach ($data['areas'] as $area) {
                 $mappedAreas[] = [
                     'nombre' => $area->nombre,
-                    'tipo_area' => $area->tipo_area,
                     'responsable_nombre' => $area->responsable ? $area->responsable->name : 'Sin asignar',
                     'usuarios_activos_count' => $area->usuarios->filter(fn($u) => in_array($u->estado, ['ACTIVO', 1, '1']))->count(),
                     'usuarios_inactivos_count' => $area->usuarios->filter(fn($u) => !in_array($u->estado, ['ACTIVO', 1, '1']))->count(),
@@ -474,7 +437,7 @@ class AreasInstitucionalesPanel extends Component
 
     public function exportarReporteAreaPdf($codArea)
     {
-        if (!Auth::user()->can('areas.reportes')) {
+        if (!$this->usuarioAutorizado('areas.reportes')) {
             $this->dispatch('swal', [
                 'icon' => 'warning',
                 'title' => 'Acceso denegado',
@@ -520,7 +483,7 @@ class AreasInstitucionalesPanel extends Component
 
     public function exportarReporteGeneralExcel()
     {
-        if (!Auth::user()->can('areas.reportes')) {
+        if (!$this->usuarioAutorizado('areas.reportes')) {
             $this->dispatch('swal', [
                 'icon' => 'warning',
                 'title' => 'Acceso denegado',
@@ -540,17 +503,19 @@ class AreasInstitucionalesPanel extends Component
 
             $exportService = app(ReportExportService::class);
 
+            $respuesta = $exportService->exportExcel(new AreasInstitucionalesExport, $filename);
+
             activity('AreasInstitucionales')
                 ->causedBy(Auth::user())
                 ->log('Se exportó el reporte general de áreas en formato Excel.');
 
-            return $exportService->exportExcel(new AreasInstitucionalesExport, $filename);
+            return $respuesta;
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error("Error exportar Excel general: " . $e->getMessage());
+            report($e);
             $this->dispatch('swal:modal', [
                 'type' => 'error',
                 'title' => 'Error de Exportación',
-                'text' => 'No se pudo generar el reporte en Excel: ' . $e->getMessage(),
+                'text' => 'No se pudo generar el reporte en Excel. Vuelve a intentarlo.',
             ]);
         }
     }
@@ -562,7 +527,7 @@ class AreasInstitucionalesPanel extends Component
 
     public function exportarUsuariosAreaExcel($codArea)
     {
-        if (!Auth::user()->can('areas.reportes')) {
+        if (!$this->usuarioAutorizado('areas.reportes')) {
             $this->dispatch('swal', [
                 'icon' => 'warning',
                 'title' => 'Acceso denegado',
@@ -577,31 +542,39 @@ class AreasInstitucionalesPanel extends Component
         }
 
         try {
-            $area = AreaInstitucional::findOrFail($codArea);
+            $area = Area::findOrFail($codArea);
             $fileNameService = app(ReportFileNameService::class);
             $filename = $fileNameService->generate("usuarios_area_{$area->nombre}", 'xlsx');
 
             $exportService = app(ReportExportService::class);
+
+            $respuesta = $exportService->exportExcel(new \App\Exports\UsuariosPorAreaExport($codArea), $filename);
 
             activity('AreasInstitucionales')
                 ->performedOn($area)
                 ->causedBy(Auth::user())
                 ->log("Se exportó el reporte de usuarios del área '{$area->nombre}' en formato Excel.");
 
-            return $exportService->exportExcel(new \App\Exports\UsuariosPorAreaExport($codArea), $filename);
+            return $respuesta;
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            $this->dispatch('swal:modal', [
+                'type' => 'error',
+                'title' => 'Área no disponible',
+                'text' => 'El área seleccionada ya no está disponible. Actualiza el listado.',
+            ]);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error("Error exportar Excel de usuarios del área: " . $e->getMessage());
+            report($e);
             $this->dispatch('swal:modal', [
                 'type' => 'error',
                 'title' => 'Error de Exportación',
-                'text' => 'No se pudo generar el reporte en Excel de los usuarios: ' . $e->getMessage(),
+                'text' => 'No se pudo generar el reporte en Excel de los usuarios. Vuelve a intentarlo.',
             ]);
         }
     }
 
     public function exportarReporteGeneralCsv()
     {
-        if (!Auth::user()->can('areas.reportes')) {
+        if (!$this->usuarioAutorizado('areas.reportes')) {
             $this->dispatch('swal', [
                 'icon' => 'warning',
                 'title' => 'Acceso denegado',
@@ -621,17 +594,19 @@ class AreasInstitucionalesPanel extends Component
 
             $exportService = app(ReportExportService::class);
 
+            $respuesta = $exportService->exportCsv(new AreasInstitucionalesExport, $filename);
+
             activity('AreasInstitucionales')
                 ->causedBy(Auth::user())
                 ->log('Se exportó el reporte general de áreas en formato CSV.');
 
-            return $exportService->exportCsv(new AreasInstitucionalesExport, $filename);
+            return $respuesta;
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error("Error exportar CSV general: " . $e->getMessage());
+            report($e);
             $this->dispatch('swal:modal', [
                 'type' => 'error',
                 'title' => 'Error de Exportación',
-                'text' => 'No se pudo generar el reporte en CSV: ' . $e->getMessage(),
+                'text' => 'No se pudo generar el reporte en CSV. Vuelve a intentarlo.',
             ]);
         }
     }
@@ -651,9 +626,9 @@ class AreasInstitucionalesPanel extends Component
         return app(\App\Backend\Modulos\Reportes\Servicios\AreasReportDataService::class)->getUsuariosPorArea();
     }
 
-    public function obtenerDatosGraficoAreasPorTipo()
+    public function obtenerDatosGraficoAreasPorEstado()
     {
-        return app(\App\Backend\Modulos\Reportes\Servicios\AreasReportDataService::class)->getAreasPorTipo();
+        return app(\App\Backend\Modulos\Reportes\Servicios\AreasReportDataService::class)->getAreasPorEstado();
     }
 
     public function obtenerDatosGraficoActivosInactivosPorArea()
@@ -688,43 +663,11 @@ class AreasInstitucionalesPanel extends Component
 
     // ── AUXILIARES Y FORMATO DE UI ──
 
-    public function obtenerColorTipo($tipo)
-    {
-        return match ($tipo) {
-            'Administrativa' => 'bg-[#2F3E5C]/10 text-[#2F3E5C] border-[#2F3E5C]/20',
-            'Salud' => 'bg-[#63775B]/10 text-[#63775B] border-[#63775B]/20',
-            'Social' => 'bg-[#967B66]/10 text-[#967B66] border-[#967B66]/20',
-            'Soporte' => 'bg-[#5E6599]/10 text-[#5E6599] border-[#5E6599]/20',
-            default => 'bg-[#9B8B7E]/10 text-[#9B8B7E] border-[#9B8B7E]/20',
-        };
-    }
-
-    public function obtenerIconoTipo($tipo)
-    {
-        return match ($tipo) {
-            'Administrativa' => 'ph-buildings',
-            'Salud' => 'ph-stethoscope',
-            'Social' => 'ph-hand-heart',
-            'Soporte' => 'ph-shield-check',
-            default => 'ph-folder',
-        };
-    }
-
     protected function resetForm()
     {
         $this->areaId = null;
         $this->nombre = '';
-        $this->tipo_area = 'Administrativa';
         $this->descripcion = '';
-        $this->responsable_id = null;
-        $this->color = '#2F3E5C';
-        $this->estado = 'ACTIVA';
-        $this->orden = 0;
-        $this->observaciones = '';
-        $this->nuevaImagen = null;
-        
-        $this->roles_sugeridos = [];
-        $this->modulos_relacionados = [];
-        $this->icono = 'ph-buildings';
+        $this->estado = 'ACTIVO';
     }
 }

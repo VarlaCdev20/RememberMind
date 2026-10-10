@@ -13,6 +13,8 @@ test('la luz sigue al mouse sin bloquear controles y desaparece con movimiento r
     const browser = await puppeteer.launch({ headless: true, executablePath });
     try {
         const page = await browser.newPage();
+        // La fixture comprueba primero el estado animado, independientemente de Windows.
+        await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }]);
         await page.setViewport({ width: 1280, height: 800 });
         await page.setContent(`<html><head><style>${css}</style></head><body class="rm-shell" data-role="superadmin"><button id="control" style="position:fixed;left:300px;top:240px;z-index:1">Acción</button><div class="rm-cursor-glow" aria-hidden="true"></div></body></html>`);
         await page.evaluate(source => {

@@ -4,7 +4,7 @@ namespace App\Frontend\Livewire\Administracion\Actividades;
 
 use App\Backend\Modulos\Identidad\Servicios\ContextoLaboralService;
 use App\Models\Actividad;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\ParticipanteActividad;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -236,7 +236,7 @@ class ParticipacionPanel extends Component
 
     private function getAdultos()
     {
-        return AdultoMayor::select('cod_residente', 'nombres', 'apellido_paterno', 'apellido_materno', 'fecha_nacimiento')
+        return Residente::select('cod_residente', 'nombres', 'apellido_paterno', 'apellido_materno', 'fecha_nacimiento')
             ->orderBy('apellido_paterno')
             ->orderBy('nombres')
             ->get();

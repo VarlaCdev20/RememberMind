@@ -146,34 +146,33 @@
  <x-ui.collection-results title="Catálogo de tipos" :count="$tipos->total()" label="tipos">
  <div class="p-5">
  @if($tipos->isEmpty())
- <div class="flex flex-col items-center gap-3 py-10 text-center">
- <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-fondo-panel">
- <i class="ph-bold ph-tag text-2xl text-apoyo"></i>
- </span>
- @if($search || $filtroUso)
- <p class="text-sm font-bold text-apoyo">No se encontraron tipos con los filtros seleccionados.</p>
- @else
- <p class="text-sm font-bold text-apoyo">No hay tipos de actividades registrados.</p>
- <p class="max-w-sm text-xs font-bold text-apoyo">Registre el primer tipo usando el botón"Registrar tipo".</p>
- @endif
- </div>
- @else
- <div class="overflow-x-auto"
- wire:loading.class="opacity-50 transition-opacity"
- wire:target="search,filtroUso">
- <table class="rm-data-table rm-data-table--actions rm-table w-full min-w-[640px] text-xs">
- <thead>
- <tr class="border-b border-borde-suave">
- <th class="w-10 pb-2.5"></th>
- <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Tipo de actividad</th>
- <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Descripción</th>
- <th class="pb-2.5 text-center font-black uppercase tracking-[0.12em] text-apoyo">Actividades</th>
- <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Estado</th>
- <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Acciones</th>
- </tr>
- </thead>
- <tbody class="divide-y divide-[var(--rm-border)]/30">
- @foreach($tipos as $tipo)
+        <div class="py-4">
+            <x-ui.empty-state
+                compact
+                icono="ph-tag"
+                titulo="Sin tipos de actividad encontrados"
+                :texto="$search || $filtroUso ? 'No se encontraron tipos con los filtros seleccionados.' : 'No hay tipos de actividades registrados en el catálogo.'"
+                :actionMethod="$search || $filtroUso ? 'limpiarFiltros' : null"
+                actionText="Restablecer filtros"
+            />
+        </div>
+        @else
+        <div class="overflow-x-auto"
+            wire:loading.class="opacity-50 transition-opacity"
+            wire:target="search,filtroUso">
+            <table class="rm-data-table rm-data-table--actions rm-table w-full min-w-[640px] text-xs">
+                <thead>
+                    <tr class="border-b border-borde-suave">
+                        <th class="w-10 pb-2.5"></th>
+                        <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Tipo de actividad</th>
+                        <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Descripción</th>
+                        <th class="pb-2.5 text-center font-black uppercase tracking-[0.12em] text-apoyo">Actividades</th>
+                        <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Estado</th>
+                        <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[var(--rm-border)]/30">
+        @foreach($tipos as $tipo)
  @php($vi = $resolverColorIcono($tipo->tipo))
  <tr wire:key="tipo-{{ $tipo->cod_tipo_act }}" class="group transition hover:bg-fondo-panel">
  {{-- Ícono visual --}}
@@ -208,9 +207,7 @@
  </td>
  {{-- Estado --}}
  <td class="py-3 pr-4">
- <span class="inline-flex items-center rounded-full border border-estado-exitoBorde bg-estado-exitoBg px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-estado-exito">
- Activo
- </span>
+ <x-ui.status-badge estado="ACTIVO" />
  </td>
  {{-- Acciones --}}
  <td class="py-3">
@@ -293,7 +290,7 @@
  {{-- ════════════════════════════════════════════════════════════════════════ --}}
  @if($modalRegistrar)
  <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-10"
- style="background: rgba(47,62,92,0.50)"
+ class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8 bg-[var(--rm-modal-backdrop,rgba(47,62,92,0.6))] backdrop-blur-sm"
  wire:click.self="cerrarModales">
  <div class="w-full max-w-lg overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-2xl">
  <div class="h-1 bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
@@ -348,7 +345,7 @@
  {{-- ════════════════════════════════════════════════════════════════════════ --}}
  @if($modalEditar)
  <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-10"
- style="background: rgba(47,62,92,0.50)"
+ class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8 bg-[var(--rm-modal-backdrop,rgba(47,62,92,0.6))] backdrop-blur-sm"
  wire:click.self="cerrarModales">
  <div class="w-full max-w-lg overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-2xl">
  <div class="h-1 bg-gradient-to-r from-[var(--rm-warning)] via-[var(--rm-accent-terracotta)] to-[var(--rm-action-primary)]"></div>
@@ -402,7 +399,7 @@
  @if($modalDetalle && $detalle)
  @php($vi = $resolverColorIcono($detalle->tipo))
  <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-10"
- style="background: rgba(47,62,92,0.50)"
+ class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8 bg-[var(--rm-modal-backdrop,rgba(47,62,92,0.6))] backdrop-blur-sm"
  wire:click.self="cerrarModales">
  <div class="w-full max-w-xl overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-2xl">
  <div class="h-1 bg-gradient-to-r from-[var(--rm-action-primary)] via-[var(--rm-warning)] to-[var(--rm-accent-terracotta)]"></div>
@@ -428,9 +425,7 @@
  <h4 class="mt-1 text-lg font-extrabold text-titulo">{{ $detalle->tipo }}</h4>
  </div>
  <div class="flex shrink-0 flex-col items-end gap-1.5">
- <span class="inline-flex items-center rounded-full border border-estado-exitoBorde bg-estado-exitoBg px-2.5 py-1 text-[9px] font-bold uppercase tracking-wide text-estado-exito">
- Activo
- </span>
+ <x-ui.status-badge estado="ACTIVO" />
  <span class="text-[10px] font-bold text-apoyo">Catálogo institucional</span>
  </div>
  </div>

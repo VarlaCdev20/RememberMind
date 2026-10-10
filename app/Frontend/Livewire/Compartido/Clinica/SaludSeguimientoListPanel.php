@@ -2,7 +2,7 @@
 
 namespace App\Frontend\Livewire\Compartido\Clinica;
 
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Alerta;
 use App\Models\Atencion;
 use App\Models\Prescripcion;
@@ -21,7 +21,7 @@ class SaludSeguimientoListPanel extends Component
 
     public string $seccionActiva = 'resumen';
 
-    public ?AdultoMayor $adultoSeleccionadoParaModal = null;
+    public ?Residente $adultoSeleccionadoParaModal = null;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -58,7 +58,7 @@ class SaludSeguimientoListPanel extends Component
 
     public function abrirExpediente(string $cod_residente)
     {
-        $this->adultoSeleccionadoParaModal = AdultoMayor::where('cod_residente', $cod_residente)->firstOrFail();
+        $this->adultoSeleccionadoParaModal = Residente::where('cod_residente', $cod_residente)->firstOrFail();
     }
 
     public function cerrarExpediente()
@@ -174,7 +174,7 @@ class SaludSeguimientoListPanel extends Component
 
     public function render()
     {
-        $query = AdultoMayor::query()
+        $query = Residente::query()
             ->with([
                 'fichasMedicas' => function ($q) {
                     $q->latest('fecha_hora')->limit(1);
@@ -207,7 +207,7 @@ class SaludSeguimientoListPanel extends Component
         $adultos = $query->orderBy('apellido_paterno')->paginate(12);
 
         $stats = [
-            'seguimientos_activos' => AdultoMayor::whereNotIn('estado', ['ARCHIVADO', 'INACTIVO'])->count(),
+            'seguimientos_activos' => Residente::whereNotIn('estado', ['ARCHIVADO', 'INACTIVO'])->count(),
             'total_fichas' => Atencion::count(),
             'signos_recientes' => SignoVital::where('fecha_hora', '>=', now()->subDays(7))->count(),
             'medicaciones_activas' => Prescripcion::whereIn('estado', ['ACTIVA', 'ACTIVO'])->count(),

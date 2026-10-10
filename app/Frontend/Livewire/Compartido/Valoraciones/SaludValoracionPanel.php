@@ -2,7 +2,7 @@
 
 namespace App\Frontend\Livewire\Compartido\Valoraciones;
 
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Atencion;
 use App\Models\ValoracionFuncional;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +14,7 @@ class SaludValoracionPanel extends Component
 {
     use WithPagination;
 
-    public AdultoMayor $adulto;
+    public Residente $adulto;
     public bool $modalFormOpen = false;
     public bool $modalDetalleOpen = false;
     public bool $modalAnularOpen = false;
@@ -47,7 +47,7 @@ class SaludValoracionPanel extends Component
     public string $observacion = '';
     public string $motivo_anulacion = '';
 
-    public function mount(AdultoMayor $adulto): void
+    public function mount(Residente $adulto): void
     {
         $this->adulto = $adulto;
         $this->fecha_valoracion = today()->toDateString();

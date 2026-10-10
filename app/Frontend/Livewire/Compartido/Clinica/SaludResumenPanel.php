@@ -2,14 +2,14 @@
 
 namespace App\Frontend\Livewire\Compartido\Clinica;
 
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use Livewire\Component;
 
 class SaludResumenPanel extends Component
 {
-    public AdultoMayor $adulto;
+    public Residente $adulto;
 
-    public function mount(AdultoMayor $adulto): void
+    public function mount(Residente $adulto): void
     {
         $this->adulto = $adulto;
     }

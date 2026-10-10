@@ -3,7 +3,7 @@
 namespace App\Frontend\Livewire\Compartido\Alertas;
 
 use Livewire\Component;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 
 class SaludAlertasPanel extends Component
 {
@@ -11,15 +11,17 @@ class SaludAlertasPanel extends Component
 
     public function render()
     {
-        // Persistir y sincronizar alertas preventivas hacia Alerta sin duplicados
-        app(\App\Backend\Modulos\Alertas\Servicios\DeteccionAlertasService::class)->detectarPreventivas();
+        $usuario = auth()->user();
+        abort_unless($usuario && $usuario->estado === 'ACTIVO' && $usuario->can('alertas.ver') && ! $usuario->hasRole('FAMILIAR'), 403);
         // Cargamos solo adultos activos con relaciones acotadas para evitar timeout
-        $adultos = AdultoMayor::with([
+        $adultos = Residente::with([
             'fichasMedicas'           => fn ($q) => $q->where('estado', 'ACTIVA')->latest()->limit(1),
             'medicaciones'            => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO']),
             'administracionesMedicacion' => fn ($q) => $q->latest('fecha_hora_programada')->limit(3),
             'valoracionesFuncionales' => fn ($q) => $q->latest('fecha_hora')->limit(1),
         ])
+            ->when(! $usuario->hasAnyRole(['SUPERADMINISTRADOR', 'GERENTE', 'ADMINISTRADOR']), fn ($q) => $q->whereIn('cod_residente',
+                app(\App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService::class)->obtenerPacientesAsignadosQuery($usuario)->select('cod_residente')))
             ->whereIn('estado', ['ACTIVO', 'ADMITIDO', 'SEGUIMIENTO_ESPECIAL'])
             ->orderBy('apellido_paterno')
             ->get();

@@ -27,7 +27,7 @@ class AreasAtencionSuperadminTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Centro de Mando de Áreas de Atención');
-        $response->assertSee('GOBERNANZA CLÍNICA Y ASISTENCIAL');
+        $response->assertSee('Gobernanza Clínica y Asistencial');
         $response->assertSee('Área de Enfermería y Cuidados Continuos');
         $response->assertSee('Vista Completa de Enfermería • Atención Diaria y Cuidados');
         $response->assertSee('Supervisión y Gestión de Enfermería • Coordinación Institucional');

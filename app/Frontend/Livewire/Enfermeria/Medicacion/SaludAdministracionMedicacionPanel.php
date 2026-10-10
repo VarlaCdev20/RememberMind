@@ -6,12 +6,11 @@ use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
 use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
 use App\Models\AdministracionMedicacion;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Alergia;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Medicamento;
 use App\Models\Prescripcion;
-use App\Models\Residente;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -19,7 +18,7 @@ use Livewire\Component;
 
 class SaludAdministracionMedicacionPanel extends Component
 {
-    public ?AdultoMayor $adulto = null;
+    public ?Residente $adulto = null;
 
     public ?string $filtroResidenteId = null;
 
@@ -130,7 +129,7 @@ class SaludAdministracionMedicacionPanel extends Component
         ]), 403);
 
         if ($adulto) {
-            $this->adulto = $adulto instanceof AdultoMayor ? $adulto : AdultoMayor::query()->find($adulto);
+            $this->adulto = $adulto instanceof Residente ? $adulto : Residente::query()->find($adulto);
             if ($this->adulto) {
                 $this->filtroResidenteId = $this->adulto->cod_residente;
             }
@@ -418,8 +417,13 @@ class SaludAdministracionMedicacionPanel extends Component
 
                 return;
             } catch (\Throwable $t) {
-                $this->addError('formDosisAdministrada', $t->getMessage());
-                $this->dispatch('swal', ['icon' => 'error', 'title' => 'Error de registro', 'text' => $t->getMessage()]);
+                if ($t instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                    throw $t;
+                }
+                report($t);
+                $mensaje = 'No se pudo registrar la administración. Inténtelo nuevamente.';
+                $this->addError('formDosisAdministrada', $mensaje);
+                $this->dispatch('swal', ['icon' => 'error', 'title' => 'Error de registro', 'text' => $mensaje]);
 
                 return;
             }
@@ -504,8 +508,13 @@ class SaludAdministracionMedicacionPanel extends Component
 
                 return;
             } catch (\Throwable $t) {
-                $this->addError('formMotivoOmision', $t->getMessage());
-                $this->dispatch('swal', ['icon' => 'error', 'title' => 'Error de registro', 'text' => $t->getMessage()]);
+                if ($t instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                    throw $t;
+                }
+                report($t);
+                $mensaje = 'No se pudo registrar la omisión. Inténtelo nuevamente.';
+                $this->addError('formMotivoOmision', $mensaje);
+                $this->dispatch('swal', ['icon' => 'error', 'title' => 'Error de registro', 'text' => $mensaje]);
 
                 return;
             }
@@ -783,8 +792,13 @@ class SaludAdministracionMedicacionPanel extends Component
 
                 return;
             } catch (\Throwable $t) {
-                $this->addError('administracion_error', $t->getMessage());
-                $this->dispatch('swal', ['icon' => 'error', 'title' => 'Error de registro', 'text' => $t->getMessage()]);
+                if ($t instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                    throw $t;
+                }
+                report($t);
+                $mensaje = 'No se pudo registrar la administración. Inténtelo nuevamente.';
+                $this->addError('administracion_error', $mensaje);
+                $this->dispatch('swal', ['icon' => 'error', 'title' => 'Error de registro', 'text' => $mensaje]);
 
                 return;
             }
@@ -859,8 +873,13 @@ class SaludAdministracionMedicacionPanel extends Component
 
                 return;
             } catch (\Throwable $t) {
-                $this->addError('motivoOmision', $t->getMessage());
-                $this->dispatch('swal', ['icon' => 'error', 'title' => 'Error', 'text' => $t->getMessage()]);
+                if ($t instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                    throw $t;
+                }
+                report($t);
+                $mensaje = 'No se pudo registrar la omisión. Inténtelo nuevamente.';
+                $this->addError('motivoOmision', $mensaje);
+                $this->dispatch('swal', ['icon' => 'error', 'title' => 'Error', 'text' => $mensaje]);
 
                 return;
             }
@@ -909,7 +928,7 @@ class SaludAdministracionMedicacionPanel extends Component
 
             // Si el usuario no tiene pacientes asignados en turno (ej. Superadmin supervisando o turno sin asignar)
             if ($residentes->isEmpty() && ($user->hasRole('SUPERADMINISTRADOR') || ! $this->buscarResidente)) {
-                $residentes = AdultoMayor::query()
+                $residentes = Residente::query()
                     ->whereNotIn('estado', ['ARCHIVADO', 'FALLECIDO', 'INACTIVO'])
                     ->with(['ocupacionActiva.cama.habitacion', 'alergias' => fn ($q) => $q->where('estado', 'ACTIVO')])
                     ->orderBy('nombres')

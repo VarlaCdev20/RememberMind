@@ -610,7 +610,7 @@
  wire:click="toggleAcceso"
  wire:confirm="¿Está seguro de cambiar el estado de acceso del usuario?"
  class="mt-4 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-[10px] font-bold uppercase text-inverso shadow-md transition hover:-translate-y-0.5 active:translate-y-0
- {{ $usuario->acceso_sistema === 'HABILITADO' ? 'bg-boton-acento shadow-2xs hover:bg-fondo-panel' : 'bg-estado-exitoBg shadow-[#8DA280]/10 hover:bg-fondo-panel' }}">
+ {{ $usuario->acceso_sistema === 'HABILITADO' ? 'bg-boton-acento shadow-2xs hover:bg-fondo-panel' : 'bg-estado-exitoBg shadow-sm hover:bg-fondo-panel' }}">
  <i class="ph-bold {{ $usuario->acceso_sistema === 'HABILITADO' ? 'ph-user-minus' : 'ph-user-plus' }} text-sm"></i>
  {{ $usuario->acceso_sistema === 'HABILITADO' ? 'Bloquear Acceso' : 'Habilitar Acceso' }}
  </button>
@@ -797,7 +797,7 @@
  @can('usuarios.reportes.excel')
  <button type="button"
  wire:click="generarExpedienteExcel"
- class="inline-flex items-center justify-center gap-2 rounded-xl bg-estado-exitoBg py-3 text-xs font-bold uppercase text-inverso shadow-md shadow-[#8DA280]/15 transition hover:-translate-y-0.5 active:translate-y-0">
+ class="inline-flex items-center justify-center gap-2 rounded-xl bg-estado-exitoBg py-3 text-xs font-bold uppercase text-inverso shadow-md shadow-sm transition hover:-translate-y-0.5 active:translate-y-0">
  <i class="ph-bold ph-microsoft-excel-logo text-base"></i> Exportar Ficha Excel
  </button>
  @endcan

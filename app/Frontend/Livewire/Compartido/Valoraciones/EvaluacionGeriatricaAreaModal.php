@@ -2,7 +2,7 @@
 
 namespace App\Frontend\Livewire\Compartido\Valoraciones;
 
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\AplicacionInstrumento;
 use App\Models\Area;
 use App\Models\Instrumento;
@@ -51,7 +51,7 @@ class EvaluacionGeriatricaAreaModal extends Component
         $this->autorizarCreacion();
         $this->fecha_eval = date('Y-m-d');
         $this->hora_eval = date('H:i');
-        $this->pacientes = AdultoMayor::whereIn('estado', ['ACTIVO', 'ADMITIDO'])
+        $this->pacientes = Residente::whereIn('estado', ['ACTIVO', 'ADMITIDO'])
             ->orderBy('nombres')
             ->get(['cod_residente', 'nombres', 'apellido_paterno', 'numero_documento']);
     }

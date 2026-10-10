@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Frontend\Livewire\Enfermeria\Medicacion\SaludAdministracionMedicacionPanel;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\AdministracionMedicacion;
 use App\Models\Area;
 use App\Models\AsignacionResidenteJornada;
@@ -12,7 +12,7 @@ use App\Models\HorarioPrescripcion;
 use App\Models\Jornada;
 use App\Models\Medicamento;
 use App\Models\Prescripcion;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -24,7 +24,7 @@ class ModalesMedicacionSeguridadClinicaTest extends TestCase
     use RefreshDatabase;
 
     private User $enfermero;
-    private AdultoMayor $adulto;
+    private Residente $adulto;
     private Prescripcion $prescripcion;
 
     protected function setUp(): void
@@ -39,14 +39,14 @@ class ModalesMedicacionSeguridadClinicaTest extends TestCase
         ]);
         $this->enfermero->assignRole('ENFERMEROS');
 
-        $this->adulto = AdultoMayor::factory()->create([
+        $this->adulto = Residente::factory()->create([
             'cod_est_adul' => 'EST_001',
             'nombres' => 'Mario',
             'ap_paterno' => 'Gutierrez',
             'ap_materno' => 'Mendoza',
         ]);
 
-        $turno = TurnoEnfermeria::create([
+        $turno = Turno::create([
             'cod_turno' => 'TUR_TEST_MED',
             'nombre' => 'Turno clínico',
             'orden' => 1,
@@ -138,30 +138,44 @@ class ModalesMedicacionSeguridadClinicaTest extends TestCase
         $this->actingAs($this->enfermero);
     }
 
-    public function test_modal_administrar_se_abre_centrado_con_datos_bloqueados_y_5_correctos(): void
+    public function test_modal_administrar_se_abre_con_orden_solo_lectura_y_dosis_administrada_editable(): void
     {
-        Livewire::test(SaludAdministracionMedicacionPanel::class, ['adulto' => $this->adulto])
+        $componente = Livewire::test(SaludAdministracionMedicacionPanel::class, ['adulto' => $this->adulto])
             ->assertSet('modalAdministrarAbierto', false)
             ->call('abrirModalAdministrar', $this->prescripcion->cod_prescripcion, '08:00', $this->adulto->cod_residente)
             ->assertSet('modalAdministrarAbierto', true)
             ->assertSet('drawerDosisAbierto', false) // NO usa panel lateral al administrar
             ->assertSee('Administrar medicación')
-            ->assertSee('Datos de la Prescripción Médica (Solo Lectura)')
+            ->assertSee('Residente Asignado')
             ->assertSee('Mario Gutierrez Mendoza')
             ->assertSee('08:00')
             ->assertSee('Elena')
-            // Verificación de los 5 correctos
-            ->assertSee('Protocolo de los 5 Correctos')
-            ->assertSee('1. Residente correcto')
-            ->assertSee('2. Medicamento correcto')
-            ->assertSee('3. Dosis correcta')
-            ->assertSee('4. Vía correcta')
-            ->assertSee('5. Hora correcta')
+            ->assertSee('Losartan 50mg')
+            ->assertDontSee('Omeprazol')
+            ->assertDontSee('Normon®')
+            ->assertSee('Dosis Prescrita')
+            ->assertSee('Vía y Horario')
+            ->assertSee('Médico Prescriptor')
+            ->assertDontSee('wire:model="formDosisPrescritaValor"', false)
+            ->assertDontSee('wire:model="formUnidadDosis"', false)
+            ->assertSee('wire:model.live.debounce.300ms="formDosisAdministrada"', false)
+            ->assertSet('selectedPrescripcionId', $this->prescripcion->cod_prescripcion)
+            ->assertSet('formDosisPrescritaValor', '50')
             ->assertSee('Cancelar')
             ->assertSee('Confirmar administración')
-            ->assertSet('formDosisAdministrada', '50')
-            ->call('cerrarModalAdministrar')
+            ->assertSet('formDosisAdministrada', '50');
+
+        preg_match('/<form[^>]*id="form-administrar-medicacion"[^>]*>(.*?)<\/form>/s', $componente->html(), $modal);
+        $this->assertNotEmpty($modal);
+        foreach (['Mario Gutierrez Mendoza', 'Losartan 50mg', '50 mg', 'Oral', '08:00', 'Elena', 'Antihipertensivo post-desayuno'] as $dato) {
+            $this->assertStringContainsString($dato, $modal[1]);
+        }
+
+        $componente->call('cerrarModalAdministrar')
             ->assertSet('modalAdministrarAbierto', false);
+
+        $this->assertSame('50.000', $this->prescripcion->fresh()->dosis);
+        $this->assertDatabaseCount('administraciones_medicacion', 0);
     }
 
     public function test_modal_administrar_exige_justificacion_si_dosis_difiere_de_prescrita(): void
@@ -224,7 +238,7 @@ class ModalesMedicacionSeguridadClinicaTest extends TestCase
             ->assertSet('drawerDosisAbierto', false)
             ->call('abrirDrawerDosis', $this->prescripcion->cod_prescripcion, '08:00', $this->adulto->cod_residente)
             ->assertSet('drawerDosisAbierto', true)
-            ->assertSee('Detalle de la Dosis seleccionada')
+            ->assertSee('Detalle de la dosis seleccionada')
             ->assertSee('Mario Gutierrez Mendoza')
             // Al hacer clic en Administrar desde el drawer, se abre la ventana emergente centrada y se cierra el drawer
             ->call('abrirModalAdministrar')

@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Frontend\Livewire\Features\Alertas\HistorialAlerta;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Alerta;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Jornada;
@@ -27,7 +27,7 @@ class AlertasHistorialFeatureTest extends TestCase
             $user->givePermissionTo(Permission::findOrCreate($p, 'web'));
         }
         $this->actingAs($user);
-        $adulto = AdultoMayor::factory()->create(['estado' => 'ACTIVO']);
+        $adulto = Residente::factory()->create(['estado' => 'ACTIVO']);
         return [$user, $adulto];
     }
 
@@ -81,6 +81,7 @@ class AlertasHistorialFeatureTest extends TestCase
     public function test_usuario_con_permiso_ve_estado_actual_y_timeline_cronologico(): void
     {
         [$user, $adulto] = $this->preparar(['alertas.ver']);
+        $user->assignRole('ADMINISTRADOR');
 
         $alerta = Alerta::create([
             'cod_residente' => $adulto->cod_residente,
@@ -118,7 +119,8 @@ class AlertasHistorialFeatureTest extends TestCase
             ->assertSee('Alerta de prueba para trazabilidad')
             ->assertSee('Creación inicial del evento')
             ->assertSee('Revisión presencial efectuada')
-            ->assertSee('Por Atender')
+            ->assertViewHas('alerta', fn ($actual) => $actual->estado === 'ABIERTA')
+            ->assertSee('Abierta')
             ->assertSee('Historial de Intervenciones');
     }
 
@@ -161,8 +163,6 @@ class AlertasHistorialFeatureTest extends TestCase
         ]);
 
         Livewire::test(HistorialAlerta::class, ['alertaId' => $alerta->cod_alerta])
-            ->set('accion', 'Intento fuera de un turno autorizado.')
-            ->call('guardarAccion')
             ->assertForbidden();
 
         $this->assertDatabaseMissing('eventos_alerta', [

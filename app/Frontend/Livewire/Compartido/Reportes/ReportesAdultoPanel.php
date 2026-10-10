@@ -3,17 +3,17 @@
 namespace App\Frontend\Livewire\Compartido\Reportes;
 
 use Livewire\Component;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 
 class ReportesAdultoPanel extends Component
 {
-    public AdultoMayor $adultoMayor;
+    public Residente $adultoMayor;
     public $fecha_inicio;
     public $fecha_fin;
     public $chartSignos = [];
     public $chartCognitivo = [];
 
-    public function mount(AdultoMayor $adultoMayor)
+    public function mount(Residente $adultoMayor)
     {
         $this->adultoMayor = $adultoMayor;
         $this->fecha_inicio = now()->subMonths(6)->format('Y-m-d');

@@ -67,18 +67,18 @@
     border-radius: var(--rm-radius-panel) !important;
 }
 
-.rm-nursing-shell main :is(h1, h2, h3, h4):not(.rm-ficha-detalles *):not(.rm-nursing-dashboard *) {
+.rm-nursing-shell main :is(h1, h2, h3, h4):not(.rm-ficha-detalles *):not(.rm-nursing-dashboard *):not(:where(.rm-resident-directory *)) {
     font-family: var(--rm-font-title);
     color: var(--rm-text-title);
     text-wrap: balance;
 }
 
-.rm-nursing-shell main h1:not(.rm-ficha-detalles *):not(.rm-nursing-dashboard *) { font-size: min(28px, var(--rm-font-page-title)); }
-.rm-nursing-shell main h2:not(.rm-ficha-detalles *):not(.rm-nursing-dashboard *) { font-size: var(--rm-font-section-title); }
-.rm-nursing-shell main h3:not(.rm-ficha-detalles *):not(.rm-nursing-dashboard *) { font-size: var(--rm-font-card-title); }
+.rm-nursing-shell main h1:not(.rm-ficha-detalles *):not(.rm-nursing-dashboard *):not(:where(.rm-resident-directory *)) { font-size: min(28px, var(--rm-font-page-title)); }
+.rm-nursing-shell main h2:not(.rm-ficha-detalles *):not(.rm-nursing-dashboard *):not(:where(.rm-resident-directory *)) { font-size: var(--rm-font-section-title); }
+.rm-nursing-shell main h3:not(.rm-ficha-detalles *):not(.rm-nursing-dashboard *):not(:where(.rm-resident-directory *)) { font-size: var(--rm-font-card-title); }
 
 /* Controles: mismo alto, foco y lectura en todos los CRUD clínicos. */
-.rm-nursing-shell main :is(input, select, textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not(.rm-ficha-detalles *) {
+.rm-nursing-shell main :is(input, select, textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not(.rm-ficha-detalles *):not(:where(.rm-resident-directory *)):not(:where(.rm-clinical-form *)) {
     min-height: var(--rm-clinical-control-height);
     border-radius: var(--rm-radius-input) !important;
     border-color: var(--rm-input-border) !important;
@@ -87,7 +87,7 @@
     font-size: var(--rm-font-size-body);
 }
 
-.rm-nursing-shell main textarea:not(.rm-ficha-detalles *) {
+.rm-nursing-shell main textarea:not(.rm-ficha-detalles *):not(:where(.rm-clinical-form *)) {
     min-height: 96px;
     line-height: var(--rm-line-height-normal);
 }
@@ -103,12 +103,12 @@
     background: color-mix(in srgb, var(--rm-danger) 7%, var(--rm-input-bg)) !important;
 }
 
-.rm-nursing-shell main button:not(.rm-ficha-detalles *),
-.rm-nursing-shell main [role="button"]:not(.rm-ficha-detalles *) {
+.rm-nursing-shell main button:not(.rm-ficha-detalles *):not(:where(.rm-resident-directory *)):not(:where(.rm-clinical-form-modal *)),
+.rm-nursing-shell main [role="button"]:not(.rm-ficha-detalles *):not(:where(.rm-resident-directory *)):not(:where(.rm-clinical-form-modal *)) {
     min-height: 40px;
 }
 
-.rm-nursing-shell main :is(.rm-btn-icon, .rm-action-btn, [aria-label]):not(.rm-btn):not(.rm-ficha-detalles *) {
+.rm-nursing-shell main :is(.rm-btn-icon, .rm-action-btn, [aria-label]):not(.rm-btn):not(.rm-ficha-detalles *):not(:where(.rm-resident-directory *)) {
     min-width: 40px;
 }
 

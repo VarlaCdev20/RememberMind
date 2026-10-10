@@ -19,6 +19,16 @@ class RelacionResidenteController extends Controller
     {
         $this->authorize('view', $residente);
 
+        if (auth()->user()->hasRole('FAMILIAR')) {
+            $visitas = auth()->user()->can('visitas.ver')
+                ? Visita::query()->where('cod_residente', $residente->cod_residente)
+                    ->whereIn('cod_contacto', auth()->user()->contactos()->where('estado', 'ACTIVO')->select('cod_contacto'))
+                    ->latest('fecha_hora_programada')->get(['fecha_hora_programada', 'fecha_hora_ingreso'])
+                : collect();
+
+            return response()->json(['visitas' => $visitas]);
+        }
+
         return response()->json([
             'contactos' => $residente->vinculosContacto()->with('contacto')->get(),
             'consentimientos' => Consentimiento::query()->where('cod_residente', $residente->cod_residente)->latest('fecha_consentimiento')->get(),

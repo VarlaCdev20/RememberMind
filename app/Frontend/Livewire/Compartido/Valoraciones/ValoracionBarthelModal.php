@@ -3,7 +3,7 @@
 namespace App\Frontend\Livewire\Compartido\Valoraciones;
 
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Atencion;
 use App\Models\ValoracionFuncional;
 use Illuminate\Support\Facades\Auth;
@@ -79,7 +79,7 @@ class ValoracionBarthelModal extends Component
         abort_unless(Auth::check(), 401);
         app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($cod_residente, Auth::user());
 
-        $this->adulto = AdultoMayor::find($cod_residente);
+        $this->adulto = Residente::find($cod_residente);
         $this->recalcular();
         $this->mostrar = true;
     }

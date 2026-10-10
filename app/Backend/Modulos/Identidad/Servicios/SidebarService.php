@@ -98,6 +98,7 @@ class SidebarService
                 $this->buildItem('Usuarios', 'admin.usuarios.index', 'usuarios.ver'),
                 $this->buildItem('Roles y permisos', 'admin.roles-permisos.index', 'roles.ver'),
                 $this->buildItem('Auditoría', 'admin.bitacora.index', 'bitacora.ver'),
+                $this->buildItem('Sistema experto · revisión', 'admin.sistema-experto.index', 'auditoria.ver'),
             ], false, null, null, 'SISTEMA'),
             $this->buildSection('Gestión institucional', 'ph-buildings', null, [
                 $this->buildItem('Personal', 'admin.personal-institucional', 'personal_institucional.ver'),

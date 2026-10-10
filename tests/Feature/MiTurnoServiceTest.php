@@ -590,11 +590,13 @@ class MiTurnoServiceTest extends TestCase
 
         Livewire::test(\App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno::class)
 
-            ->assertSee('Elena')
+            // La bienvenida compartida sustituye el título compacto «Mi turno».
+            ->assertSee('CENTRO GERIÁTRICO LOS ALMENDROS')
+            ->assertSee('Cuidados y seguimiento de tu turno.')
 
             ->assertSee('Carlos Mendoza Paredes')
 
-            ->assertSee('Pacientes del turno');
+            ->assertSee('Residentes del turno');
 
 
 

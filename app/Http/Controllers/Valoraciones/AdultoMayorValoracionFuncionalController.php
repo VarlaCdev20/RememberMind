@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Valoraciones;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Valoraciones\StoreValoracionFuncionalRequest;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Atencion;
 use App\Models\ValoracionFuncional;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class AdultoMayorValoracionFuncionalController extends Controller
 {
-    public function store(StoreValoracionFuncionalRequest $request, AdultoMayor $adulto_mayor): RedirectResponse
+    public function store(StoreValoracionFuncionalRequest $request, Residente $adulto_mayor): RedirectResponse
     {
         $data = $request->validated();
         [$personal, $codArea] = $this->contextoPersonal();
@@ -45,7 +45,7 @@ class AdultoMayorValoracionFuncionalController extends Controller
 
     public function update(
         StoreValoracionFuncionalRequest $request,
-        AdultoMayor $adulto_mayor,
+        Residente $adulto_mayor,
         ValoracionFuncional $valoracion
     ): RedirectResponse {
         abort_unless($valoracion->cod_residente === $adulto_mayor->cod_residente, 404);
@@ -104,7 +104,7 @@ class AdultoMayorValoracionFuncionalController extends Controller
         return [$personal, $codArea];
     }
 
-    private function volver(AdultoMayor $adulto): RedirectResponse
+    private function volver(Residente $adulto): RedirectResponse
     {
         return new RedirectResponse(route('admin.adultos-mayores.show', [
             'adulto_mayor' => $adulto->cod_residente,

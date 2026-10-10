@@ -40,16 +40,16 @@
                     </div>
                     <div class="min-w-0">
                         <div class="font-bold text-xs sm:text-[13px] text-[var(--rm-text-primary)] truncate">
-                            {{ $dosisDetalle['medicamento']['nombre_generico'] ?? 'Omeprazol' }} {{ $dosisDetalle['medicamento']['concentracion'] ?? '20 mg' }}
+                            {{ $dosisDetalle['medicamento']['nombre_destacado'] ?? 'Medicamento no identificado' }}
                         </div>
                         <div class="text-[11px] text-[var(--rm-text-secondary)] truncate">
-                            {{ $dosisDetalle['medicamento']['nombre_comercial'] ?? 'Normon®' }} · {{ $dosisDetalle['medicamento']['forma_farmaceutica'] ?? 'Cápsula' }}
+                            {{ $dosisDetalle['medicamento']['concentracion'] ?? 'Concentración no registrada' }} · {{ $dosisDetalle['medicamento']['forma'] ?? 'Forma no registrada' }}
                         </div>
                     </div>
                 </div>
                 <button
                     type="button"
-                    wire:click="abrirModalMedicamento('{{ $dosisDetalle['cod_medicamento'] ?? 'OMEPRAZOL' }}')"
+                    wire:click="abrirModalMedicamento('{{ $dosisDetalle['cod_medicamento'] ?? '' }}')"
                     class="shrink-0 px-2.5 py-1 text-xs font-semibold rounded-lg bg-[var(--rm-surface-soft)] hover:bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)] text-[var(--rm-text-primary)] transition shadow-2xs">
                     Ver ficha
                 </button>

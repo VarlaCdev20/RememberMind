@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Alerta;
 use App\Models\AlertaClinica;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -19,7 +19,7 @@ class AreasAtencionController extends Controller
     public function index(Request $request)
     {
         // 1. Métricas de contexto institucional
-        $totalResidentes = AdultoMayor::count();
+        $totalResidentes = Residente::count();
         $totalUsuarios = User::where('estado', 'ACTIVO')->count();
         
         $alertasActivas = 0;
@@ -35,7 +35,7 @@ class AreasAtencionController extends Controller
 
         $turnosEnfermeriaCount = 0;
         try {
-            $turnosEnfermeriaCount = TurnoEnfermeria::where('estado', 'ACTIVO')->count();
+            $turnosEnfermeriaCount = Turno::where('estado', 'ACTIVO')->count();
         } catch (\Throwable $e) {
             $turnosEnfermeriaCount = 0;
         }

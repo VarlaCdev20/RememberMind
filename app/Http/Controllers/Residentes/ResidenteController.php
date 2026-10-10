@@ -27,6 +27,13 @@ class ResidenteController extends Controller
     public function show(Request $request, Residente $residente): View|JsonResponse
     {
         $this->authorize('view', $residente);
+        if ($request->user()->hasRole('FAMILIAR')) {
+            $informacionFamiliar = $residente->only(['cod_residente', 'nombres', 'apellido_paterno']);
+
+            return $request->expectsJson()
+                ? response()->json($informacionFamiliar)
+                : view('pages.residentes.show', compact('informacionFamiliar'));
+        }
         $residente->load(['admisiones', 'vinculosContacto.contacto', 'ocupacionActiva.cama.habitacion', 'atenciones.notas', 'prescripciones.medicamento']);
 
         return $request->expectsJson() ? response()->json($residente) : view('pages.residentes.show', compact('residente'));

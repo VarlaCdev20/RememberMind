@@ -7,7 +7,7 @@ use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
 use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;
 use App\Frontend\Livewire\Medico\Medicacion\MedicacionAdultoModal;
 use App\Frontend\Livewire\Medico\Medicacion\SaludMedicacionPanel;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Alerta;
 use App\Models\Area;
 use App\Models\AsignacionResidenteJornada;
@@ -16,7 +16,7 @@ use App\Models\HorarioPrescripcion;
 use App\Models\Jornada;
 use App\Models\Medicamento;
 use App\Models\Prescripcion;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use App\Models\User;
 use App\Backend\Modulos\Enfermeria\Servicios\AgendaTurnoService;
 use App\Backend\Modulos\Identidad\Servicios\SidebarService;
@@ -33,10 +33,10 @@ class SuperadminEnfermeriaSupervisionTest extends TestCase
     private User $superadmin;
     private User $enfermeroUno;
     private User $enfermeroDos;
-    private AdultoMayor $residenteUno;
-    private AdultoMayor $residenteDos;
-    private TurnoEnfermeria $turnoManana;
-    private TurnoEnfermeria $turnoNoche;
+    private Residente $residenteUno;
+    private Residente $residenteDos;
+    private Turno $turnoManana;
+    private Turno $turnoNoche;
 
     protected function setUp(): void
     {
@@ -60,17 +60,17 @@ class SuperadminEnfermeriaSupervisionTest extends TestCase
             'descripcion' => 'Área clínica de supervisión', 'estado' => 'ACTIVO',
         ]);
 
-        $this->turnoManana = TurnoEnfermeria::create([
+        $this->turnoManana = Turno::create([
             'orden' => 1, 'nombre' => 'Mañana', 'hora_inicio' => '07:00', 'hora_fin' => '15:00', 'estado' => 'ACTIVO',
         ]);
-        $this->turnoNoche = TurnoEnfermeria::create([
+        $this->turnoNoche = Turno::create([
             'orden' => 2, 'nombre' => 'Noche', 'hora_inicio' => '19:00', 'hora_fin' => '07:00', 'estado' => 'ACTIVO',
         ]);
 
-        $this->residenteUno = AdultoMayor::factory()->create([
+        $this->residenteUno = Residente::factory()->create([
             'cod_est_adul' => 'EST_001', 'nombres' => 'Elena', 'ap_paterno' => 'Flores',
         ]);
-        $this->residenteDos = AdultoMayor::factory()->create([
+        $this->residenteDos = Residente::factory()->create([
             'cod_est_adul' => 'EST_001', 'nombres' => 'Manuela', 'ap_paterno' => 'Quispe',
         ]);
 
@@ -236,7 +236,7 @@ class SuperadminEnfermeriaSupervisionTest extends TestCase
         ]);
     }
 
-    private function asignar(AdultoMayor $residente, User $enfermero, TurnoEnfermeria $turno): void
+    private function asignar(Residente $residente, User $enfermero, Turno $turno): void
     {
         $jornada = Jornada::firstOrCreate(
             ['cod_turno' => $turno->cod_turno, 'fecha_jornada' => today()],

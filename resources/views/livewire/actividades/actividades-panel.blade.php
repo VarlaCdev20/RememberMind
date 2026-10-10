@@ -166,13 +166,17 @@
  <x-ui.collection-results title="Listado de actividades" :count="$actividades->total()" label="registros">
  <div class="p-5">
  @if($actividades->isEmpty())
- <div class="flex flex-col items-center gap-3 py-10 text-center">
- <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-fondo-panel">
- <i class="ph-bold ph-calendar-blank text-2xl text-apoyo"></i>
- </span>
- <p class="text-sm font-bold text-apoyo">No se encontraron actividades con los filtros aplicados.</p>
- </div>
- @else
+        <div class="py-4">
+            <x-ui.empty-state
+                compact
+                icono="ph-calendar-blank"
+                titulo="Sin actividades encontradas"
+                texto="No se encontraron actividades con los filtros aplicados."
+                actionMethod="limpiarFiltros"
+                actionText="Restablecer filtros"
+            />
+        </div>
+        @else
  <div class="overflow-x-auto" wire:loading.class="opacity-50 transition-opacity"
  wire:target="search,filtroTipo,filtroEstado,filtroFechaDesde,filtroFechaHasta">
  <table class="rm-data-table rm-data-table--actions rm-table w-full min-w-[700px] text-xs">
@@ -207,9 +211,7 @@
  {{ $actividad->hora ? substr($actividad->hora, 0, 5) : '—' }}
  </td>
  <td class="py-3 pr-4">
- <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide {{ $ne['clase'] }}">
- {{ $ne['etiqueta'] }}
- </span>
+ <x-ui.status-badge :estado="$actividad->estado" />
  </td>
  <td class="py-3 pr-4 max-w-[160px] truncate text-apoyo">
  {{ $actividad->obs ? mb_substr($actividad->obs, 0, 45) . (mb_strlen($actividad->obs) > 45 ? '…' : '') : '—' }}
@@ -266,7 +268,7 @@
  {{-- ════════════════════════════════════════════════════════════════════════ --}}
  @if($modalRegistrar)
  <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8"
- style="background: rgba(47,62,92,0.50)"
+ class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8 bg-[var(--rm-modal-backdrop,rgba(47,62,92,0.6))] backdrop-blur-sm"
  wire:click.self="cerrarModales">
  <div class="w-full max-w-xl overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-2xl">
  <div class="h-1 bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
@@ -366,7 +368,7 @@
  {{-- ════════════════════════════════════════════════════════════════════════ --}}
  @if($modalEditar)
  <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8"
- style="background: rgba(47,62,92,0.50)"
+ class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8 bg-[var(--rm-modal-backdrop,rgba(47,62,92,0.6))] backdrop-blur-sm"
  wire:click.self="cerrarModales">
  <div class="w-full max-w-xl overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-2xl">
  <div class="h-1 bg-gradient-to-r from-[var(--rm-warning)] via-[var(--rm-accent-terracotta)] to-[var(--rm-action-primary)]"></div>
@@ -469,7 +471,7 @@
  $ne = \App\Models\Actividad::normalizarEstado($detalle->estado ?? '');
  @endphp
  <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8"
- style="background: rgba(47,62,92,0.50)"
+ class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8 bg-[var(--rm-modal-backdrop,rgba(47,62,92,0.6))] backdrop-blur-sm"
  wire:click.self="cerrarModales">
  <div class="w-full max-w-lg overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-2xl">
  <div class="h-1 bg-gradient-to-r from-[var(--rm-action-primary)] via-[var(--rm-warning)] to-[var(--rm-accent-terracotta)]"></div>
@@ -493,9 +495,7 @@
  {{-- Estado badge --}}
  <div class="flex items-center justify-between">
  <span class="text-[10px] font-bold uppercase tracking-[0.15em] text-apoyo">Detalle de actividad</span>
- <span class="inline-flex items-center rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wide {{ $ne['clase'] }}">
- {{ $ne['etiqueta'] }}
- </span>
+ <x-ui.status-badge :estado="$detalle->estado" />
  </div>
  {{-- Adulto Mayor --}}
  <div class="rounded-xl border border-borde-suave bg-fondo-panel px-4 py-3">

@@ -54,9 +54,7 @@
  </div>
  <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 shadow-xs">
  <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-apoyo">Anexo de Trazabilidad</p>
- <span class="mt-1.5 inline-flex items-center rounded-md bg-fondo-panel border border-borde px-2 py-0.5 text-[10px] font-bold text-parrafo">
- ACTIVO
- </span>
+ <x-ui.status-badge estado="ACTIVO" />
  </div>
  </div>
 
@@ -154,12 +152,15 @@
  <div class="rm-chart-header"><i class="ph-bold ph-heartbeat" aria-hidden="true"></i><div class="rm-chart-heading"><h4 class="rm-chart-title">Evolución de Signos Vitales</h4><p class="rm-chart-subtitle">Controles del período seleccionado</p></div></div>
 
  @if(empty($chartSignos['fc'] ?? []))
- <div class="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-borde-suave rounded-xl bg-fondo-panel min-h-[260px]">
- <i class="ph-bold ph-heartbeat text-3xl text-apoyo mb-2"></i>
- <p class="text-xs font-bold text-apoyo">Sin datos suficientes para generar esta gráfica.</p>
- <p class="text-[10px] font-bold text-apoyo mt-0.5">Registre constantes vitales en el rango de fechas seleccionado.</p>
- </div>
- @else
+        <div class="py-6">
+            <x-ui.empty-state
+                compact
+                icono="ph-heartbeat"
+                titulo="Sin datos de constantes vitales"
+                texto="No hay registros de signos vitales en el rango de fechas seleccionado."
+            />
+        </div>
+    @else
  <div class="rm-chart-body is-md relative w-full" wire:ignore
  x-data="{
      chart: null,
@@ -196,12 +197,15 @@
  <div class="rm-chart-header"><i class="ph-bold ph-brain" aria-hidden="true"></i><div class="rm-chart-heading"><h4 class="rm-chart-title">Evolución de Evaluaciones Cognitivas</h4><p class="rm-chart-subtitle">Valoraciones del período seleccionado</p></div></div>
 
  @if(empty($chartCognitivo['puntajes'] ?? []))
- <div class="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-borde-suave rounded-xl bg-fondo-panel min-h-[260px]">
- <i class="ph-bold ph-brain text-3xl text-apoyo mb-2"></i>
- <p class="text-xs font-bold text-apoyo">Sin datos suficientes para generar esta gráfica.</p>
- <p class="text-[10px] font-bold text-apoyo mt-0.5">Registre valoraciones de tamizaje cognitivo en el rango seleccionado.</p>
- </div>
- @else
+        <div class="py-6">
+            <x-ui.empty-state
+                compact
+                icono="ph-brain"
+                titulo="Sin evaluaciones cognitivas"
+                texto="No hay valoraciones de tamizaje cognitivo en el rango seleccionado."
+            />
+        </div>
+    @else
  <div class="rm-chart-body is-md relative w-full" wire:ignore
  x-data="{
      chart: null,

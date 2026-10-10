@@ -3,7 +3,8 @@
 namespace Tests\Feature;
 
 use App\Frontend\Livewire\Enfermeria\Medicacion\SaludAdministracionMedicacionPanel;
-use App\Models\AdultoMayor;
+use App\Models\Alergia;
+use App\Models\Residente;
 use App\Models\Medicamento;
 use App\Models\Prescripcion;
 use App\Models\User;
@@ -17,7 +18,7 @@ class AdministracionMedicacionEnfermeriaTest extends TestCase
     use RefreshDatabase;
 
     private User $enfermero;
-    private AdultoMayor $adulto;
+    private Residente $adulto;
 
     protected function setUp(): void
     {
@@ -31,7 +32,7 @@ class AdministracionMedicacionEnfermeriaTest extends TestCase
         ]);
         $this->enfermero->assignRole('SUPERADMINISTRADOR');
 
-        $this->adulto = AdultoMayor::factory()->create([
+        $this->adulto = Residente::factory()->create([
             'cod_est_adul' => 'EST_001',
             'nombres' => 'María Carmen',
             'ap_paterno' => 'Gómez',
@@ -42,7 +43,17 @@ class AdministracionMedicacionEnfermeriaTest extends TestCase
 
     public function test_vista_medicacion_contiene_cabecera_exacta_y_resumen_compacto(): void
     {
+        Alergia::create([
+            'cod_alergia' => 'ALE_F4_MED',
+            'cod_residente' => $this->adulto->cod_residente,
+            'cod_personal' => $this->enfermero->personal->cod_personal,
+            'sustancia' => 'Sustancia sintética',
+            'fecha_hora' => now(),
+            'estado' => 'ACTIVA',
+        ]);
+
         Livewire::test(SaludAdministracionMedicacionPanel::class, ['adulto' => $this->adulto])
+            ->assertViewHas('residentesConAlergias', 1)
             ->assertSee('Medicación')
             ->assertSee('Administración y seguimiento del turno')
             ->assertSee('administradas')
@@ -54,6 +65,13 @@ class AdministracionMedicacionEnfermeriaTest extends TestCase
             ->assertSee('Próximas dosis')
             ->assertSee('Omisiones')
             ->assertSee('Historial');
+    }
+
+    public function test_resumen_no_inventa_una_alerta_de_alergia_sin_registros(): void
+    {
+        Livewire::test(SaludAdministracionMedicacionPanel::class, ['adulto' => $this->adulto])
+            ->assertViewHas('residentesConAlergias', 0)
+            ->assertDontSee('Alergia relevante');
     }
 
     public function test_kardex_matriz_horaria_y_cambio_de_tabs(): void

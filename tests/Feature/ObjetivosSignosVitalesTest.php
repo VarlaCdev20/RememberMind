@@ -11,6 +11,7 @@ use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -77,13 +78,13 @@ class ObjetivosSignosVitalesTest extends TestCase
             $this->residente->cod_residente, $this->entrada(), $this->medico);
 
         try {
-            ObjetivoSignoVital::create([
+            DB::transaction(fn () => ObjetivoSignoVital::create([
                 'cod_residente' => $this->residente->cod_residente,
                 'cod_personal' => $this->medico->personal->cod_personal,
                 'parametro' => 'saturacion_oxigeno', 'min_objetivo' => 90,
                 'max_objetivo' => 94, 'vigente_desde' => now()->addSecond(),
                 'estado' => 'VIGENTE', 'motivo' => 'Intento de duplicado activo en prueba.',
-            ]);
+            ]));
             $this->fail('La base debe rechazar dos objetivos vigentes.');
         } catch (QueryException) {
             $this->assertSame(1, ObjetivoSignoVital::query()->count());

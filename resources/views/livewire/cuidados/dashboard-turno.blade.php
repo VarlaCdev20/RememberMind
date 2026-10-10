@@ -5,11 +5,10 @@
             :usuario="Auth::user()"
             :estado="$dashboard['estado'] ?? null"
             :modo="$dashboard['modo'] ?? null"
-            :image="$welcomeImage"
-            :secondary-image="$welcomeSecondaryImage"
+            image="images/FOTOS CENTRO DE ADULTOS MAYORES/489963938_1158744422930145_8442506970304201426_n.jpg"
+            :scope="isset($dashboard['jornada']['nombre']) ? implode(' · ', array_filter([$dashboard['jornada']['nombre'], $dashboard['jornada']['hora_inicio'] ?? null, $dashboard['jornada']['hora_fin'] ?? null, ($dashboard['modo'] ?? '') === 'FUERA_DE_TURNO' ? 'Solo consulta' : null])) : 'Sin jornada activa'"
         />
-
-    <x-ui.dashboard-divider />
+<x-ui.dashboard-divider />
 
 @php
         $enTurno = ($dashboard['modo'] ?? '') === 'EN_TURNO';
@@ -25,25 +24,6 @@
         $accionesPendientes = (int) ($accionesTurno['pendientes'] ?? 0);
         $accionesRetrasadas = (int) ($accionesTurno['retrasadas'] ?? 0);
     @endphp
-    <x-ui.metric-card class="rm-nursing-dashboard__kpi rm-nursing-dashboard__kpi--patients"
-        icon="ph-users-three" variant="mint" :value="$pacientesKpi" label="Pacientes"
-        :description="$enTurno ? 'Asignados a mi turno' : 'Sin turno activo'"
-        :href="$enTurno && Route::has('admin.enfermeria.pacientes') && auth()->user()?->can('enfermeria.ver_pacientes_asignados') ? route('admin.enfermeria.pacientes') : null" />
-    <x-ui.metric-card class="rm-nursing-dashboard__kpi rm-nursing-dashboard__kpi--beds"
-        icon="ph-list-checks" variant="sky" :value="$enTurno ? $accionesPendientes : null"
-        label="Cuidados pendientes"
-        :description="$enTurno ? 'Acciones programadas del turno' : 'Sin turno activo'" />
-    <x-ui.metric-card class="rm-nursing-dashboard__kpi rm-nursing-dashboard__kpi--risk"
-        icon="ph-shield-warning" variant="neutral" :value="$enTurno ? $stats['alertas_activas'] : null" label="Alertas del turno"
-        :description="$enTurno ? 'Abiertas o en atención' : 'Sin turno activo'" />
-    <x-ui.metric-card class="rm-nursing-dashboard__kpi rm-nursing-dashboard__kpi--medication"
-        icon="ph-pill" :variant="$medicacionVariante" :value="$medicacionPendiente"
-        label="Medicamentos pendientes"
-        :description="$medicacionPendiente === null ? 'Sin métrica disponible' : 'Del turno actual'"
-        :href="$enTurno && Route::has('admin.enfermeria.medicacion') && auth()->user()?->can('enfermeria.ver_dashboard') ? route('admin.enfermeria.medicacion') : null" />
-    <div class="rm-nursing-dashboard__message rm-nursing-message" aria-labelledby="nursing-message-title">
-        <h2 id="nursing-message-title">Pequeños cuidados,<br>grandes momentos</h2>
-    </div>
 
 @php
             $alertasPendientes = $dashboard['alertas_prioritarias'] ?? [];
@@ -52,8 +32,26 @@
             $puedeVerPacientes = Route::has('admin.enfermeria.pacientes');
         @endphp
 
-        <x-ui.card class="rm-nursing-dashboard__alerts rm-nursing-module" aria-label="Alertas prioritarias">
-            <x-ui.section-header title="Alertas prioritarias" :subtitle="($dashboard['estado'] ?? '') === 'SIN_JORNADA_ACTIVA' ? 'Seguimiento de Enfermería' : 'Abiertas sin atención'"
+        <section class="rm-nursing-dashboard__overview" aria-label="Atención de este turno">
+<x-ui.metric-card class="rm-nursing-dashboard__kpi rm-nursing-dashboard__kpi--risk"
+        icon="ph-shield-warning" variant="neutral" :value="$enTurno ? $stats['alertas_activas'] : null" label="Alertas del turno"
+        :description="$enTurno ? 'Abiertas o en atención' : 'Sin turno activo'" href="#nursing-alerts-title" />
+<x-ui.metric-card class="rm-nursing-dashboard__kpi rm-nursing-dashboard__kpi--medication"
+        icon="ph-pill" :variant="$medicacionVariante" :value="$medicacionPendiente"
+        label="Medicamentos pendientes"
+        :description="$medicacionPendiente === null ? 'Sin métrica disponible' : 'Del turno actual'"
+        :href="$enTurno && Route::has('admin.enfermeria.medicacion') && auth()->user()?->can('enfermeria.ver_dashboard') ? route('admin.enfermeria.medicacion') : null" />
+<x-ui.metric-card class="rm-nursing-dashboard__kpi rm-nursing-dashboard__kpi--beds"
+        icon="ph-list-checks" variant="sky" :value="$enTurno ? $accionesPendientes : null"
+        label="Cuidados pendientes"
+        :description="$enTurno ? 'Acciones programadas del turno' : 'Sin turno activo'" href="#nursing-schedule-title" />
+<x-ui.metric-card class="rm-nursing-dashboard__kpi rm-nursing-dashboard__kpi--patients"
+        icon="ph-users-three" variant="mint" :value="$pacientesKpi" label="Residentes"
+        :description="$enTurno ? 'Asignados a mi turno' : 'Sin turno activo'"
+        :href="$enTurno && Route::has('admin.enfermeria.pacientes') && auth()->user()?->can('enfermeria.ver_pacientes_asignados') ? route('admin.enfermeria.pacientes') : null" />
+</section>
+<x-ui.card class="rm-nursing-dashboard__alerts rm-nursing-module" aria-label="Alertas prioritarias">
+            <x-ui.section-header title="Alertas prioritarias" id="nursing-alerts-title" :subtitle="($dashboard['estado'] ?? '') === 'SIN_JORNADA_ACTIVA' ? 'Seguimiento de Enfermería' : 'Abiertas sin atención'"
                 icon="ph-warning-circle" :count="($dashboard['estado'] ?? '') === 'SIN_JORNADA_ACTIVA' ? null : ($dashboard['alertas_pendientes_count'] ?? 0)" level="2">
                 <x-slot:actions>
                     @if($puedeVerAlertas)
@@ -75,111 +73,6 @@
                 @endforelse
             </div>
         </x-ui.card>
-
-        <x-ui.card class="rm-nursing-dashboard__patients rm-nursing-module" aria-label="Pacientes del turno">
-            <x-ui.section-header title="Pacientes del turno"
-                :subtitle="($dashboard['estado'] ?? '') === 'SIN_JORNADA_ACTIVA' ? 'Asignaciones de Enfermería' : (($dashboard['modo'] ?? '') === 'EN_TURNO' ? 'Asignados a mi turno activo' : 'Turno activo del equipo · solo lectura')"
-                icon="ph-users-three" level="2">
-                <x-slot:actions>
-                    @if($puedeVerPacientes)
-                        <a class="rm-nursing-module__more" href="{{ route('admin.enfermeria.pacientes') }}">Ver todos <i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a>
-                    @endif
-                </x-slot:actions>
-            </x-ui.section-header>
-            <div class="rm-nursing-module__loading" wire:loading aria-live="polite">
-                @for($i = 0; $i < 5; $i++)
-                    <x-ui.skeleton variant="text" label="Cargando pacientes" />
-                @endfor
-            </div>
-            <div class="rm-nursing-module__content" wire:loading.remove>
-                @if(count($pacientesTurno))
-                    <div class="rm-patient-turn-table" aria-label="Pacientes asignados al turno">
-                        <div class="rm-patient-turn-table__head" aria-hidden="true">
-                            <span>Paciente</span><span>Ubicación</span>
-                            <span>Estado cognitivo</span><span>Riesgo</span>
-                            <span>Próxima atención</span>
-                        </div>
-                        @foreach($pacientesTurno as $paciente)
-                            <x-ui.patient-turn-row :patient="$paciente"
-                                :href="$puedeVerPacientes && !empty($paciente['cod_residente']) ? route('admin.enfermeria.pacientes', ['residente' => $paciente['cod_residente']]) : null" />
-                        @endforeach
-                    </div>
-                @else
-                    <x-ui.empty-state compact icono="ph-users-three" titulo="Sin pacientes asignados" :texto="($dashboard['estado'] ?? '') === 'SIN_JORNADA_ACTIVA' ? 'La lista se actualizará cuando comience una jornada.' : 'Revisa las asignaciones de la jornada actual.'" />
-                @endif
-            </div>
-        </x-ui.card>
-        <x-ui.card variant="soft" class="rm-nursing-dashboard__incidents rm-chart-card rm-incident-trend"
-            aria-label="Evolución de incidentes" data-incident-trend
-            data-trend="{{ $incidentesTendencia ? json_encode($incidentesTendencia, JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_HEX_TAG) : '' }}">
-            <x-ui.section-header title="Evolución de incidentes"
-                :subtitle="$incidentesTendencia === null ? 'Últimos 7 días · sin turno activo' : (($dashboard['modo'] ?? '') === 'EN_TURNO' ? 'Últimos 7 días · residentes de mi turno' : 'Últimos 7 días · turno activo del equipo')"
-                icon="ph-chart-line" level="2" />
-            <div class="rm-incident-trend__loading" wire:loading aria-live="polite">
-                <x-ui.skeleton variant="text" label="Cargando evolución de incidentes" />
-                <x-ui.skeleton variant="card" label="Cargando gráfica de incidentes" />
-            </div>
-            <div class="rm-incident-trend__content" wire:loading.remove>
-                @if($incidentesTendencia === null)
-                    <x-ui.empty-state compact icono="ph-chart-line" titulo="Sin datos de incidentes" texto="La evolución aparecerá con un turno activo." />
-                @elseif($incidentesTendencia['total_periodo'] === 0)
-                    <x-ui.empty-state compact icono="ph-check-circle" titulo="Sin incidentes recientes" texto="No hay registros en los últimos 7 días." />
-                @else
-                    <div class="rm-incident-trend__chart" wire:ignore>
-                        <canvas id="incidentTrendCanvas-{{ $this->getId() }}" role="img"
-                            aria-label="Evolución diaria de incidentes de los últimos siete días para residentes del turno">Evolución diaria de incidentes.</canvas>
-                    </div>
-                    <div class="rm-incident-trend__legend" aria-label="Categorías mostradas">
-                        @foreach($incidentesTendencia['datasets'] as $serie)
-                            <span><i style="--incident-series-color: {{ $serie['color'] }}" aria-hidden="true"></i>{{ $serie['label'] }}</span>
-                        @endforeach
-                    </div>
-                @endif
-
-                @if($incidentesTendencia !== null)
-                    <div class="rm-incident-trend__footer">
-                        <div class="rm-incident-trend__stat">
-                            <span>Total semanal</span>
-                            <strong>{{ $incidentesTendencia['total_periodo'] }}</strong>
-                            <small class="rm-incident-trend__variation rm-incident-trend__variation--{{ $incidentesTendencia['variacion_tono'] }}">
-                                {{ $incidentesTendencia['variacion_texto'] }}
-                            </small>
-                        </div>
-                        @if($incidentesTendencia['categoria_principal'])
-                            <div class="rm-incident-trend__stat rm-incident-trend__stat--category">
-                                <span>Incidente más frecuente</span>
-                                <strong>{{ $incidentesTendencia['categoria_principal'] }}</strong>
-                                <small>{{ $incidentesTendencia['categoria_principal_total'] }} esta semana</small>
-                            </div>
-                        @endif
-                    </div>
-                @endif
-            </div>
-        </x-ui.card>
-
-<x-ui.card class="rm-nursing-dashboard__distribution rm-nursing-module rm-nursing-distribution rm-chart-card rm-chart-glass" aria-labelledby="nursing-distribution-title"
-    data-nursing-followup="{{ json_encode(['labels' => ['Sin alertas activas', 'Vigilancia', 'Alerta crítica'], 'values' => array_values($distribucionPacientes)], JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_HEX_TAG) }}">
-        <x-ui.section-header title="Estado de seguimiento" :subtitle="($dashboard['estado'] ?? '') === 'SIN_JORNADA_ACTIVA' ? 'Sin jornada activa' : (($dashboard['modo'] ?? '') === 'FUERA_DE_TURNO' ? 'Residentes del equipo en turno' : 'Residentes asignados a tu turno')" icon="ph-chart-donut" level="2" id="nursing-distribution-title" />
-        @if($totalSeguimiento === 0)
-            <x-ui.empty-state compact icono="ph-users-three" titulo="Sin residentes en turno" texto="La distribución aparecerá cuando haya residentes asignados a una jornada activa." />
-        @else
-            <div class="rm-nursing-donut-layout">
-                <div class="rm-nursing-donut-stage">
-                    <div class="rm-nursing-donut-canvas" wire:ignore>
-                        <canvas id="nursingFollowupCanvas-{{ $this->getId() }}" role="img"
-                            aria-label="{{ $totalSeguimiento }} residentes: {{ $distribucionPacientes['sin_alertas'] }} sin alertas activas, {{ $distribucionPacientes['vigilancia'] }} en vigilancia y {{ $distribucionPacientes['atencion'] }} con alerta crítica">Estado de seguimiento de los residentes.</canvas>
-                    </div>
-                    <span class="rm-nursing-donut__center"><strong>{{ $totalSeguimiento }}</strong><small>residentes</small></span>
-                </div>
-                <ul class="rm-nursing-donut-legend" aria-label="Detalle del seguimiento">
-                    <li><span class="rm-nursing-donut-legend__label"><i class="rm-nursing-donut-legend__dot rm-nursing-donut-legend__dot--mint" aria-hidden="true"></i>Sin alertas activas</span><strong>{{ $distribucionPacientes['sin_alertas'] }}</strong></li>
-                    <li><span class="rm-nursing-donut-legend__label"><i class="rm-nursing-donut-legend__dot rm-nursing-donut-legend__dot--sky" aria-hidden="true"></i>Vigilancia</span><strong>{{ $distribucionPacientes['vigilancia'] }}</strong></li>
-                    <li><span class="rm-nursing-donut-legend__label"><i class="rm-nursing-donut-legend__dot rm-nursing-donut-legend__dot--coral" aria-hidden="true"></i>Alerta crítica</span><strong>{{ $distribucionPacientes['atencion'] }}</strong></li>
-                </ul>
-            </div>
-            <p class="rm-nursing-chart-note">Basado en alertas activas; no equivale a una valoración clínica.</p>
-        @endif
-    </x-ui.card>
 
 <x-ui.card class="rm-nursing-dashboard__schedule rm-nursing-module rm-nursing-agenda" aria-labelledby="nursing-schedule-title">
             <x-ui.section-header title="Agenda de medicación y cuidados" :subtitle="($dashboard['estado'] ?? null) === 'SIN_JORNADA_ACTIVA' ? 'Programación de Enfermería' : (($dashboard['modo'] ?? '') === 'FUERA_DE_TURNO' ? 'Turno del equipo · solo lectura' : 'Programación de tu turno')" icon="ph-calendar-check" level="2" id="nursing-schedule-title">
@@ -231,44 +124,20 @@
         </div>
 </x-ui.card>
 
-<x-ui.card class="rm-nursing-dashboard__activity-bars rm-nursing-module rm-chart-card rm-chart-glass" aria-labelledby="nursing-activity-bars-title"
-    data-nursing-activity="{{ json_encode(['labels' => ['Realizadas', 'Pendientes', 'Retrasadas'], 'values' => [$accionesRealizadas, $accionesPendientes, $accionesRetrasadas]], JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_HEX_TAG) }}">
-    <x-ui.section-header title="Actividad del turno" subtitle="Acciones programadas según estado" icon="ph-chart-bar" level="2" id="nursing-activity-bars-title" />
-    @if(($accionesTurno['total'] ?? 0) === 0)
-        <x-ui.empty-state compact icono="ph-chart-bar" titulo="Sin acciones para graficar" texto="Las acciones del turno aparecerán aquí cuando exista una programación activa." />
-    @else
-        <div class="rm-nursing-analytics-canvas" wire:ignore>
-            <canvas id="nursingActivityCanvas-{{ $this->getId() }}" role="img"
-                aria-label="{{ $accionesRealizadas }} acciones realizadas, {{ $accionesPendientes }} pendientes y {{ $accionesRetrasadas }} retrasadas">Actividad del turno por estado.</canvas>
-        </div>
-        <p class="rm-nursing-analytics-summary">{{ $accionesRealizadas }} realizadas <span aria-hidden="true">·</span> {{ $accionesPendientes }} pendientes <span aria-hidden="true">·</span> {{ $accionesRetrasadas }} retrasadas</p>
-        <p class="rm-nursing-chart-note">{{ $accionesTurno['total'] }} acciones en la agenda del turno. Las retrasadas se muestran por separado.</p>
-    @endif
+<x-ui.card class="rm-nursing-dashboard__controls rm-nursing-module" aria-labelledby="nursing-controls-title">
+    <x-ui.section-header title="Controles por residente" subtitle="Selecciona al residente antes de registrar" icon="ph-heartbeat" level="2" id="nursing-controls-title" />
+    <div class="rm-nursing-dashboard__control-actions">
+        @can('signos_vitales.ver')
+            <a class="rm-btn rm-btn-primary" href="{{ route('admin.enfermeria.pacientes', ['cuidado' => 'signos']) }}"><i class="ph-bold ph-heartbeat" aria-hidden="true"></i>Signos vitales</a>
+        @endcan
+        @can('valoraciones_dolor.ver')
+            <a class="rm-btn rm-btn-secondary" href="{{ route('admin.enfermeria.pacientes', ['cuidado' => 'dolor']) }}"><i class="ph-bold ph-hand-heart" aria-hidden="true"></i>Dolor</a>
+        @endcan
+        @can('enfermeria.ver_pacientes_asignados')
+            <a class="rm-btn rm-btn-secondary" href="{{ route('admin.enfermeria.pacientes') }}">Ver residentes y cuidados</a>
+        @endcan
+    </div>
 </x-ui.card>
-
-<x-ui.card class="rm-nursing-dashboard__location rm-turn-complement" aria-labelledby="nursing-location-title">
-        <x-ui.section-header title="Ubicación de pacientes" subtitle="Habitaciones y camas" icon="ph-bed" level="2" id="nursing-location-title" />
-        <div wire:loading.grid wire:target="refrescarTurno" class="rm-turn-complement__loading" aria-label="Cargando ubicaciones">
-            @for($i = 0; $i < 4; $i++)<x-ui.skeleton variant="text" />@endfor
-        </div>
-        <div wire:loading.remove wire:target="refrescarTurno">
-            @if(!$complementos['activo'] || !$complementos['ubicacion']['total'])
-                <x-ui.empty-state compact icono="ph-bed" titulo="Sin ubicaciones del turno" texto="No hay residentes asignados en este contexto." />
-            @elseif(!$complementos['ubicacion']['disponible'])
-                <x-ui.empty-state compact icono="ph-bed" titulo="Ubicación no disponible" texto="No se pudo consultar la ocupación del turno." />
-            @elseif(empty($complementos['ubicacion']['items']))
-                <x-ui.empty-state compact icono="ph-bed" titulo="Ubicación no disponible" texto="Sin ocupaciones activas verificables en este contexto." />
-            @else
-                <div class="rm-turn-complement__locations">
-                    @foreach($complementos['ubicacion']['items'] as $ubicacion)
-                        <x-ui.location-cell :location="$ubicacion" :href="auth()->user()?->can('enfermeria.ver_ficha_paciente') && Route::has('admin.enfermeria.pacientes.ficha') ? route('admin.enfermeria.pacientes.ficha', ['adulto' => $ubicacion['cod_residente']]) : null" />
-                    @endforeach
-                </div>
-                @if($complementos['ubicacion']['sin_ubicacion'])<p class="rm-turn-complement__hint">{{ $complementos['ubicacion']['sin_ubicacion'] }} sin ubicación verificable.</p>@endif
-                @if(($complementos['ubicacion']['ubicados'] ?? 0) > 6)<p class="rm-turn-complement__hint">Mostrando 6 de {{ $complementos['ubicacion']['ubicados'] }} ubicaciones.</p>@endif
-            @endif
-        </div>
-    </x-ui.card>
 
 <x-ui.card class="rm-nursing-dashboard__notes rm-turn-complement" aria-labelledby="nursing-notes-title">
         <x-ui.section-header title="Conducta y estado emocional" subtitle="Últimas 24 horas" icon="ph-note" level="2" id="nursing-notes-title" />
@@ -288,6 +157,151 @@
                         <x-ui.behavior-note :note="$nota" :href="auth()->user()?->can('enfermeria.ver_ficha_paciente') && Route::has('admin.enfermeria.pacientes.ficha') ? route('admin.enfermeria.pacientes.ficha', ['adulto' => $nota['cod_residente'], 'tab' => 'seguimiento']) : null" />
                     @endforeach
                 </ul>
+            @endif
+        </div>
+    </x-ui.card>
+
+<x-ui.card variant="soft" class="rm-nursing-dashboard__incidents rm-chart-card rm-incident-trend"
+            aria-label="Evolución de incidentes" data-incident-trend
+            data-trend="{{ $incidentesTendencia ? json_encode($incidentesTendencia, JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_HEX_TAG) : '' }}">
+            <x-ui.section-header title="Evolución de incidentes"
+                :subtitle="$incidentesTendencia === null ? 'Últimos 7 días · sin turno activo' : (($dashboard['modo'] ?? '') === 'EN_TURNO' ? 'Últimos 7 días · residentes de mi turno' : 'Últimos 7 días · turno activo del equipo')"
+                icon="ph-chart-line" level="2" />
+            <div class="rm-incident-trend__loading" wire:loading aria-live="polite">
+                <x-ui.skeleton variant="text" label="Cargando evolución de incidentes" />
+                <x-ui.skeleton variant="card" label="Cargando gráfica de incidentes" />
+            </div>
+            <div class="rm-incident-trend__content" wire:loading.remove>
+                @if($incidentesTendencia === null)
+                    <x-ui.empty-state compact icono="ph-chart-line" titulo="Sin datos de incidentes" texto="La evolución aparecerá con un turno activo." />
+                @elseif($incidentesTendencia['total_periodo'] === 0)
+                    <x-ui.empty-state compact icono="ph-check-circle" titulo="Sin incidentes recientes" texto="No hay registros en los últimos 7 días." />
+                @else
+                    <div class="rm-incident-trend__chart" wire:ignore>
+                        <canvas id="incidentTrendCanvas-{{ $this->getId() }}" role="img"
+                            aria-label="Evolución diaria de incidentes de los últimos siete días para residentes del turno">Evolución diaria de incidentes.</canvas>
+                    </div>
+                    <div class="rm-incident-trend__legend" aria-label="Categorías mostradas">
+                        @foreach($incidentesTendencia['datasets'] as $serie)
+                            <span><i style="--incident-series-color: {{ $serie['color'] }}" aria-hidden="true"></i>{{ $serie['label'] }}</span>
+                        @endforeach
+                    </div>
+                @endif
+
+                @if($incidentesTendencia !== null)
+                    <div class="rm-incident-trend__footer">
+                        <div class="rm-incident-trend__stat">
+                            <span>Total semanal</span>
+                            <strong>{{ $incidentesTendencia['total_periodo'] }}</strong>
+                            <small class="rm-incident-trend__variation rm-incident-trend__variation--{{ $incidentesTendencia['variacion_tono'] }}">
+                                {{ $incidentesTendencia['variacion_texto'] }}
+                            </small>
+                        </div>
+                        @if($incidentesTendencia['categoria_principal'])
+                            <div class="rm-incident-trend__stat rm-incident-trend__stat--category">
+                                <span>Incidente más frecuente</span>
+                                <strong>{{ $incidentesTendencia['categoria_principal'] }}</strong>
+                                <small>{{ $incidentesTendencia['categoria_principal_total'] }} esta semana</small>
+                            </div>
+                        @endif
+                    </div>
+                @endif
+            </div>
+        </x-ui.card>
+
+<x-ui.card class="rm-nursing-dashboard__patients rm-nursing-module" aria-label="Residentes del turno">
+            <x-ui.section-header title="Residentes del turno"
+                :subtitle="($dashboard['estado'] ?? '') === 'SIN_JORNADA_ACTIVA' ? 'Asignaciones de Enfermería' : (($dashboard['modo'] ?? '') === 'EN_TURNO' ? 'Asignados a mi turno activo' : 'Turno activo del equipo · solo lectura')"
+                icon="ph-users-three" level="2">
+                <x-slot:actions>
+                    @if($puedeVerPacientes)
+                        <a class="rm-nursing-module__more" href="{{ route('admin.enfermeria.pacientes') }}">Ver todos <i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a>
+                    @endif
+                </x-slot:actions>
+            </x-ui.section-header>
+            <div class="rm-nursing-module__loading" wire:loading aria-live="polite">
+                @for($i = 0; $i < 5; $i++)
+                    <x-ui.skeleton variant="text" label="Cargando pacientes" />
+                @endfor
+            </div>
+            <div class="rm-nursing-module__content" wire:loading.remove>
+                @if(count($pacientesTurno))
+                    <div class="rm-patient-turn-table" aria-label="Residentes asignados al turno">
+                        <div class="rm-patient-turn-table__head" aria-hidden="true">
+                            <span>Residente</span><span>Ubicación</span>
+                            <span>Estado cognitivo</span><span>Riesgo</span>
+                            <span>Próxima atención</span>
+                        </div>
+                        @foreach($pacientesTurno as $paciente)
+                            <x-ui.patient-turn-row :patient="$paciente"
+                                :href="$puedeVerPacientes && !empty($paciente['cod_residente']) ? route('admin.enfermeria.pacientes', ['residente' => $paciente['cod_residente']]) : null" />
+                        @endforeach
+                    </div>
+                @else
+                    <x-ui.empty-state compact icono="ph-users-three" titulo="Sin residentes asignados" :texto="($dashboard['estado'] ?? '') === 'SIN_JORNADA_ACTIVA' ? 'La lista se actualizará cuando comience una jornada.' : 'Revisa las asignaciones de la jornada actual.'" />
+                @endif
+            </div>
+        </x-ui.card>
+
+<x-ui.card class="rm-nursing-dashboard__distribution rm-nursing-module rm-nursing-distribution rm-chart-card" aria-labelledby="nursing-distribution-title"
+    data-nursing-followup="{{ json_encode(['labels' => ['Sin alertas activas', 'Vigilancia', 'Alerta crítica'], 'values' => array_values($distribucionPacientes)], JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_HEX_TAG) }}">
+        <x-ui.section-header title="Estado de seguimiento" :subtitle="($dashboard['estado'] ?? '') === 'SIN_JORNADA_ACTIVA' ? 'Sin jornada activa' : (($dashboard['modo'] ?? '') === 'FUERA_DE_TURNO' ? 'Residentes del equipo en turno' : 'Residentes asignados a tu turno')" icon="ph-chart-donut" level="2" id="nursing-distribution-title" />
+        @if($totalSeguimiento === 0)
+            <x-ui.empty-state compact icono="ph-users-three" titulo="Sin residentes en turno" texto="La distribución aparecerá cuando haya residentes asignados a una jornada activa." />
+        @else
+            <div class="rm-nursing-donut-layout">
+                <div class="rm-nursing-donut-stage">
+                    <div class="rm-nursing-donut-canvas" wire:ignore>
+                        <canvas id="nursingFollowupCanvas-{{ $this->getId() }}" role="img"
+                            aria-label="{{ $totalSeguimiento }} residentes: {{ $distribucionPacientes['sin_alertas'] }} sin alertas activas, {{ $distribucionPacientes['vigilancia'] }} en vigilancia y {{ $distribucionPacientes['atencion'] }} con alerta crítica">Estado de seguimiento de los residentes.</canvas>
+                    </div>
+                    <span class="rm-nursing-donut__center"><strong>{{ $totalSeguimiento }}</strong><small>residentes</small></span>
+                </div>
+                <ul class="rm-nursing-donut-legend" aria-label="Detalle del seguimiento">
+                    <li><span class="rm-nursing-donut-legend__label"><i class="rm-nursing-donut-legend__dot rm-nursing-donut-legend__dot--mint" aria-hidden="true"></i>Sin alertas activas</span><strong>{{ $distribucionPacientes['sin_alertas'] }}</strong></li>
+                    <li><span class="rm-nursing-donut-legend__label"><i class="rm-nursing-donut-legend__dot rm-nursing-donut-legend__dot--sky" aria-hidden="true"></i>Vigilancia</span><strong>{{ $distribucionPacientes['vigilancia'] }}</strong></li>
+                    <li><span class="rm-nursing-donut-legend__label"><i class="rm-nursing-donut-legend__dot rm-nursing-donut-legend__dot--coral" aria-hidden="true"></i>Alerta crítica</span><strong>{{ $distribucionPacientes['atencion'] }}</strong></li>
+                </ul>
+            </div>
+            <p class="rm-nursing-chart-note">Basado en alertas activas; no equivale a una valoración clínica.</p>
+        @endif
+    </x-ui.card>
+
+<x-ui.card class="rm-nursing-dashboard__activity-bars rm-nursing-module rm-chart-card" aria-labelledby="nursing-activity-bars-title"
+    data-nursing-activity="{{ json_encode(['labels' => ['Realizadas', 'Pendientes', 'Retrasadas'], 'values' => [$accionesRealizadas, $accionesPendientes, $accionesRetrasadas]], JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_HEX_TAG) }}">
+    <x-ui.section-header title="Actividad del turno" subtitle="Acciones programadas según estado" icon="ph-chart-bar" level="2" id="nursing-activity-bars-title" />
+    @if(($accionesTurno['total'] ?? 0) === 0)
+        <x-ui.empty-state compact icono="ph-chart-bar" titulo="Sin acciones para graficar" texto="Las acciones del turno aparecerán aquí cuando exista una programación activa." />
+    @else
+        <div class="rm-nursing-analytics-canvas" wire:ignore>
+            <canvas id="nursingActivityCanvas-{{ $this->getId() }}" role="img"
+                aria-label="{{ $accionesRealizadas }} acciones realizadas, {{ $accionesPendientes }} pendientes y {{ $accionesRetrasadas }} retrasadas">Actividad del turno por estado.</canvas>
+        </div>
+        <p class="rm-nursing-analytics-summary">{{ $accionesRealizadas }} realizadas <span aria-hidden="true">·</span> {{ $accionesPendientes }} pendientes <span aria-hidden="true">·</span> {{ $accionesRetrasadas }} retrasadas</p>
+        <p class="rm-nursing-chart-note">{{ $accionesTurno['total'] }} acciones en la agenda del turno. Las retrasadas se muestran por separado.</p>
+    @endif
+</x-ui.card>
+
+<x-ui.card class="rm-nursing-dashboard__location rm-turn-complement" aria-labelledby="nursing-location-title">
+        <x-ui.section-header title="Ubicación de residentes" subtitle="Habitaciones y camas" icon="ph-bed" level="2" id="nursing-location-title" />
+        <div wire:loading.grid wire:target="refrescarTurno" class="rm-turn-complement__loading" aria-label="Cargando ubicaciones">
+            @for($i = 0; $i < 4; $i++)<x-ui.skeleton variant="text" />@endfor
+        </div>
+        <div wire:loading.remove wire:target="refrescarTurno">
+            @if(!$complementos['activo'] || !$complementos['ubicacion']['total'])
+                <x-ui.empty-state compact icono="ph-bed" titulo="Sin ubicaciones del turno" texto="No hay residentes asignados en este contexto." />
+            @elseif(!$complementos['ubicacion']['disponible'])
+                <x-ui.empty-state compact icono="ph-bed" titulo="Ubicación no disponible" texto="No se pudo consultar la ocupación del turno." />
+            @elseif(empty($complementos['ubicacion']['items']))
+                <x-ui.empty-state compact icono="ph-bed" titulo="Ubicación no disponible" texto="Sin ocupaciones activas verificables en este contexto." />
+            @else
+                <div class="rm-turn-complement__locations">
+                    @foreach($complementos['ubicacion']['items'] as $ubicacion)
+                        <x-ui.location-cell :location="$ubicacion" :href="auth()->user()?->can('enfermeria.ver_ficha_paciente') && Route::has('admin.enfermeria.pacientes.ficha') ? route('admin.enfermeria.pacientes.ficha', ['adulto' => $ubicacion['cod_residente']]) : null" />
+                    @endforeach
+                </div>
+                @if($complementos['ubicacion']['sin_ubicacion'])<p class="rm-turn-complement__hint">{{ $complementos['ubicacion']['sin_ubicacion'] }} sin ubicación verificable.</p>@endif
+                @if(($complementos['ubicacion']['ubicados'] ?? 0) > 6)<p class="rm-turn-complement__hint">Mostrando 6 de {{ $complementos['ubicacion']['ubicados'] }} ubicaciones.</p>@endif
             @endif
         </div>
     </x-ui.card>

@@ -120,9 +120,9 @@ class AdultoMayorBitacoraService
                 'personal.apellido_paterno as causer_ap_paterno',
             ])
             ->where(function ($q) use ($codResidente) {
-                // Eventos directos sobre el AdultoMayor
+                // Eventos directos sobre el Residente
                 $q->where(function ($q2) use ($codResidente) {
-                    $q2->where('activity_log.subject_type', 'App\\Models\\AdultoMayor')
+                    $q2->where('activity_log.subject_type', 'App\\Models\\Residente')
                        ->where('activity_log.subject_id', $codResidente);
                 })
                 // Eventos sobre submódulos (observaciones, atenciones, etc.)

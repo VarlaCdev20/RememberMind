@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Frontend\Livewire\Administracion\Actividades\ActividadesPanel;
 use App\Frontend\Livewire\Administracion\Actividades\ParticipacionPanel;
 use App\Models\Actividad;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Jornada;
@@ -65,7 +65,7 @@ class ActividadesIntegrityTest extends TestCase
             'fecha_asignacion' => now(),
             'estado' => 'ACTIVA',
         ]);
-        $residente = AdultoMayor::factory()->create();
+        $residente = Residente::factory()->create();
 
         $this->actingAs($usuario);
         Livewire::test(ParticipacionPanel::class)
@@ -100,7 +100,7 @@ class ActividadesIntegrityTest extends TestCase
         ]);
         $usuario = User::factory()->create();
         $usuario->givePermissionTo(['actividades.ver', 'actividades.gestionar']);
-        $residente = AdultoMayor::factory()->create();
+        $residente = Residente::factory()->create();
 
         $this->actingAs($usuario);
         Livewire::test(ParticipacionPanel::class)
@@ -119,7 +119,7 @@ class ActividadesIntegrityTest extends TestCase
     {
         $usuario = User::factory()->create();
         $usuario->givePermissionTo('actividades.ver');
-        $residente = AdultoMayor::factory()->create();
+        $residente = Residente::factory()->create();
 
         $this->actingAs($usuario);
         Livewire::test(ActividadesPanel::class)

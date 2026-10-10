@@ -40,7 +40,9 @@ class AccesoClinicoTemporalService
 
     public function sustituyeRol(?User $usuario): bool
     {
-        if (! $usuario?->hasRole('SUPERADMINISTRADOR')
+        if (! app()->environment(['local', 'testing'])
+            || $usuario?->estado !== 'ACTIVO'
+            || ! $usuario?->hasRole('SUPERADMINISTRADOR')
             || ! config('remembermind.superadmin_clinical_write', false)
             || app(RolePreviewService::class)->isActive($usuario)) {
             return false;

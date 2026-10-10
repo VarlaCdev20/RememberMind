@@ -1,4 +1,11 @@
 <x-sistema-layout>
+    @if(isset($informacionFamiliar))
+        <x-ui.page-header
+            :title="$informacionFamiliar['nombres'] . ' ' . $informacionFamiliar['apellido_paterno']"
+            overline="Tu familiar"
+            icon="ph-user"
+            :date="now()" />
+    @else
     <div class="space-y-6">
         <x-ui.page-header
     :title="$residente->nombres . ' ' . $residente->apellido_paterno . ' ' . $residente->apellido_materno"
@@ -19,4 +26,5 @@
         </div>
         <livewire:residentes.expediente-panel :residente="$residente" />
     </div>
+    @endif
 </x-sistema-layout>

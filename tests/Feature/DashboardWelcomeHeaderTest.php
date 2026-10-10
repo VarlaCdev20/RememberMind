@@ -19,6 +19,7 @@ class DashboardWelcomeHeaderTest extends TestCase
         parent::setUp();
         $this->seed(RolesAndPermissionsSeeder::class);
         Storage::fake('public');
+        $this->travelTo(now()->setTime(16, 0));
     }
 
     public function test_muestra_nombre_rol_y_reloj_sin_utilidades_duplicadas(): void
@@ -32,7 +33,7 @@ class DashboardWelcomeHeaderTest extends TestCase
 
         $html = Blade::render('<x-ui.dashboard-welcome-header :usuario="$usuario" />', compact('usuario'));
 
-        $this->assertStringContainsString('Bienvenido, Ana Torres Mamani', $html);
+        $this->assertStringContainsString('Buenas tardes, Ana Torres Mamani', $html);
         $this->assertStringContainsString('Enfermeros', $html);
         $this->assertStringNotContainsString('ph-bell', $html);
         $this->assertStringNotContainsString('<input', $html);
@@ -58,7 +59,7 @@ class DashboardWelcomeHeaderTest extends TestCase
 
         $html = Blade::render('<x-ui.dashboard-welcome-header :usuario="$usuario" />', compact('usuario'));
 
-        $this->assertStringContainsString('Bienvenido, María Fernanda de los Ángeles Gutiérrez Quispe', $html);
+        $this->assertStringContainsString('Buenas tardes, María Fernanda de los Ángeles Gutiérrez Quispe', $html);
         $this->assertStringNotContainsString('usuarios/fotos/ana.jpg', $html);
         $this->assertSame(1, substr_count($html, '<img'));
     }
@@ -84,7 +85,7 @@ class DashboardWelcomeHeaderTest extends TestCase
 
         $html = Blade::render('<x-ui.dashboard-welcome-header :usuario="$usuario" />', compact('usuario'));
 
-        $this->assertStringContainsString('Bienvenido, equipo de Enfermería', $html);
+        $this->assertStringContainsString('Buenas tardes, equipo de Enfermería', $html);
         $this->assertStringNotContainsString('ROSA MAMANI', $html);
     }
 
@@ -98,7 +99,7 @@ class DashboardWelcomeHeaderTest extends TestCase
 
         $html = Blade::render('<x-ui.dashboard-welcome-header :usuario="$usuario" />', compact('usuario'));
 
-        $this->assertStringContainsString('Bienvenido, Rosa María de los Ángeles Choque', $html);
+        $this->assertStringContainsString('Buenas tardes, Rosa María de los Ángeles Choque', $html);
     }
 
     public function test_las_dos_fotos_cambian_en_cada_recarga_y_se_mantienen_al_actualizar_el_turno(): void

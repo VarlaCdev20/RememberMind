@@ -7,7 +7,7 @@ use App\Backend\Modulos\Residentes\Servicios\AdultoMayorService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Residentes\UpdateAdultoMayorRequest;
 use App\Models\Actividad;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\AplicacionInstrumento;
 use App\Models\Area;
 use App\Models\Atencion;
@@ -15,7 +15,6 @@ use App\Models\Documento;
 use App\Models\HistorialEstadoResidente;
 use App\Models\Instrumento;
 use App\Models\NotaClinica;
-use App\Models\Residente;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -48,9 +47,12 @@ class AdultoMayorController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(AdultoMayor $adulto_mayor)
+    public function show(Residente $adulto_mayor)
     {
         $this->authorize('view', Residente::query()->findOrFail($adulto_mayor->cod_residente));
+        if (auth()->user()->hasRole('FAMILIAR')) {
+            return redirect()->route('admin.residentes.show', $adulto_mayor);
+        }
         $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_residente);
 
         // Contactos / Familiares
@@ -143,7 +145,7 @@ class AdultoMayorController extends Controller
         ));
     }
 
-    public function reporteIndividual(Request $request, AdultoMayor $adulto_mayor)
+    public function reporteIndividual(Request $request, Residente $adulto_mayor)
     {
         $format = $request->query('format', 'html');
 
@@ -225,7 +227,7 @@ class AdultoMayorController extends Controller
         return view('pages.adultos-mayores.reportes.pdf_individual', $viewData);
     }
 
-    public function reporteEspecifico(Request $request, AdultoMayor $adulto_mayor, $tipo)
+    public function reporteEspecifico(Request $request, Residente $adulto_mayor, $tipo)
     {
         $format = $request->query('format', 'html');
         $startDate = $request->query('start_date');
@@ -357,7 +359,7 @@ class AdultoMayorController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(AdultoMayor $adulto_mayor)
+    public function edit(Residente $adulto_mayor)
     {
         abort_unless(auth()->user()?->can('residentes.gestionar'), 403);
         $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_residente);
@@ -369,7 +371,7 @@ class AdultoMayorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateAdultoMayorRequest $request, AdultoMayor $adulto_mayor)
+    public function update(UpdateAdultoMayorRequest $request, Residente $adulto_mayor)
     {
         $this->adultoMayorService->actualizarAdultoMayor($adulto_mayor->cod_residente, $request->validated(), $request->file('foto'));
 
@@ -380,7 +382,7 @@ class AdultoMayorController extends Controller
     /**
      * Archivar un registro (soft-disable).
      */
-    public function archivar(Request $request, AdultoMayor $adulto_mayor)
+    public function archivar(Request $request, Residente $adulto_mayor)
     {
         $this->adultoMayorService->archivar(
             $adulto_mayor->cod_residente,
@@ -395,7 +397,7 @@ class AdultoMayorController extends Controller
     /**
      * Restaurar un registro.
      */
-    public function restaurar(Request $request, AdultoMayor $adulto_mayor)
+    public function restaurar(Request $request, Residente $adulto_mayor)
     {
         $this->adultoMayorService->restaurar(
             $adulto_mayor->cod_residente,
@@ -409,7 +411,7 @@ class AdultoMayorController extends Controller
     /**
      * Cambiar estado directamente y registrar historial_estados_residente.
      */
-    public function cambiarEstado(Request $request, AdultoMayor $adulto_mayor)
+    public function cambiarEstado(Request $request, Residente $adulto_mayor)
     {
         try {
             \DB::beginTransaction();
@@ -439,11 +441,16 @@ class AdultoMayorController extends Controller
             return redirect()->back()
                 ->with('success', 'Se actualizó el estado correctamente y se guardó en el historial.');
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \DB::rollBack();
+            if ($e instanceof \Illuminate\Validation\ValidationException
+                || $e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                throw $e;
+            }
+            report($e);
 
             return redirect()->back()
-                ->with('error', 'Error al cambiar de estado: '.$e->getMessage())
+                ->with('error', 'No se pudo cambiar el estado. Inténtelo nuevamente.')
                 ->withInput();
         }
     }
@@ -457,7 +464,7 @@ class AdultoMayorController extends Controller
         return redirect()->back()->with('error', 'La eliminación física no está permitida. Use archivar.');
     }
 
-    public function anularEvaluacionGeriatrica(Request $request, AdultoMayor $adulto_mayor, $evaluacionId)
+    public function anularEvaluacionGeriatrica(Request $request, Residente $adulto_mayor, $evaluacionId)
     {
         $request->validate([
             'motivo_anulacion' => 'required|string|min:10',
@@ -487,7 +494,7 @@ class AdultoMayorController extends Controller
         }
     }
 
-    public function pdfEvaluacionGeriatrica(AdultoMayor $adulto_mayor, $evaluacionId)
+    public function pdfEvaluacionGeriatrica(Residente $adulto_mayor, $evaluacionId)
     {
         $adulto = $this->adultoMayorService->obtenerDetalle($adulto_mayor->cod_residente);
         $adulto->edad = $this->adultoMayorService->calcularEdad($adulto->fecha_nac);

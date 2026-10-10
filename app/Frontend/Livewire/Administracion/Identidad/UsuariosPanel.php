@@ -3,7 +3,7 @@
 namespace App\Frontend\Livewire\Administracion\Identidad;
 
 use App\Models\User;
-use App\Models\AreaInstitucional;
+use App\Models\Area;
 use Spatie\Permission\Models\Role;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -498,7 +498,7 @@ class UsuariosPanel extends Component
         }
     }
 
-    private function adultoMayorLabel(\App\Models\AdultoMayor $adultoMayor): string
+    private function adultoMayorLabel(\App\Models\Residente $adultoMayor): string
     {
         $nombre = trim("{$adultoMayor->nombres} {$adultoMayor->ap_paterno} {$adultoMayor->ap_materno}");
         $documento = $adultoMayor->ci
@@ -533,7 +533,7 @@ class UsuariosPanel extends Component
 
         $termino = '%' . $criterio . '%';
 
-        return \App\Models\AdultoMayor::query()
+        return \App\Models\Residente::query()
             ->whereIn('estado', ['ACTIVO', 'ADMITIDO'])
             ->where(function ($q) use ($termino) {
                 $q->whereLike('nombres', $termino)
@@ -570,7 +570,7 @@ class UsuariosPanel extends Component
 
     public function seleccionarAdultoMayor($codResidente): void
     {
-        $adultoMayor = \App\Models\AdultoMayor::whereIn('estado', ['ACTIVO', 'ADMITIDO'])
+        $adultoMayor = \App\Models\Residente::whereIn('estado', ['ACTIVO', 'ADMITIDO'])
             ->where('cod_residente', $codResidente)
             ->first();
 
@@ -601,7 +601,7 @@ class UsuariosPanel extends Component
     public function obtenerAdultoMayorSeleccionado()
     {
         return $this->selected_cod_residente
-            ? \App\Models\AdultoMayor::whereIn('estado', ['ACTIVO', 'ADMITIDO'])
+            ? \App\Models\Residente::whereIn('estado', ['ACTIVO', 'ADMITIDO'])
                 ->where('cod_residente', $this->selected_cod_residente)
                 ->first()
             : null;
@@ -999,7 +999,7 @@ class UsuariosPanel extends Component
             'selected_parentesco.required' => 'Debe ingresar o seleccionar el parentesco.',
         ]);
 
-        $am = \App\Models\AdultoMayor::find($this->selected_cod_residente);
+        $am = \App\Models\Residente::find($this->selected_cod_residente);
         if (!$am) {
             $this->dispatch('swal', [
                 'icon' => 'error',
@@ -1772,7 +1772,7 @@ class UsuariosPanel extends Component
                 $rolDisplay = strtoupper(str_replace('_', ' ', $this->rol));
                 $areaDisplay = 'Sin área';
                 if ($this->cod_area) {
-                    $areaObj = \App\Models\AreaInstitucional::find($this->cod_area);
+                    $areaObj = Area::find($this->cod_area);
                     if ($areaObj) {
                         $areaDisplay = $areaObj->nombre;
                     }
@@ -2083,8 +2083,9 @@ class UsuariosPanel extends Component
             }
 
             if (!empty($this->filtroArea)) {
-                $rolesArea = AreaInstitucional::rolesPorArea($this->filtroArea);
-                $query->whereHas('roles', fn ($q) => $q->whereIn('name', $rolesArea));
+                $query->whereHas('personal.asignaciones', fn ($q) => $q
+                    ->where('cod_area', $this->filtroArea)
+                    ->whereIn('estado', ['ACTIVA', 'ACTIVO']));
             }
 
             $usuarios = $query->leftJoin('personal', 'usuarios.cod_usuario', '=', 'personal.cod_usuario')->orderBy('personal.apellido_paterno')->orderBy('personal.nombres')->select('usuarios.*')->get();
@@ -2437,8 +2438,9 @@ class UsuariosPanel extends Component
         }
 
         if (!empty($this->filtroArea)) {
-            $rolesArea = AreaInstitucional::rolesPorArea($this->filtroArea);
-            $query->whereHas('roles', fn ($q) => $q->whereIn('name', $rolesArea));
+            $query->whereHas('personal.asignaciones', fn ($q) => $q
+                ->where('cod_area', $this->filtroArea)
+                ->whereIn('estado', ['ACTIVA', 'ACTIVO']));
         }
 
         // Ordenamiento: ACTIVOS primero, luego alfabético

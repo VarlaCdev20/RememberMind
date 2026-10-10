@@ -3,10 +3,10 @@
 namespace Tests\Feature;
 
 use App\Frontend\Livewire\Administracion\Identidad\PersonalInstitucionalHorarios;
-use App\Models\AreaInstitucional;
+use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Personal;
-use App\Models\TurnoInstitucional;
+use App\Models\Turno;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -109,9 +109,9 @@ class PersonalInstitucionalHorariosTest extends TestCase
         return $user;
     }
 
-    private function crearArea(string $codigo, string $nombre, string $tipoArea): AreaInstitucional
+    private function crearArea(string $codigo, string $nombre, string $tipoArea): Area
     {
-        return AreaInstitucional::updateOrCreate(
+        return Area::updateOrCreate(
             ['cod_area' => $codigo],
             [
                 'nombre' => $nombre,
@@ -121,9 +121,9 @@ class PersonalInstitucionalHorariosTest extends TestCase
         );
     }
 
-    private function crearTurno(string $codigo, string $nombre, string $horaInicio, string $horaFin): TurnoInstitucional
+    private function crearTurno(string $codigo, string $nombre, string $horaInicio, string $horaFin): Turno
     {
-        return TurnoInstitucional::create([
+        return Turno::create([
             'cod_turno' => $codigo,
             'nombre' => $nombre,
             'hora_inicio' => $horaInicio,

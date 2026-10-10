@@ -45,7 +45,7 @@ class PlanCuidado extends ModeloOperativo
 
     public function adultoMayor(): BelongsTo
     {
-        return $this->belongsTo(AdultoMayor::class, 'cod_residente', 'cod_residente');
+        return $this->belongsTo(Residente::class, 'cod_residente', 'cod_residente');
     }
 
     public function residente(): BelongsTo

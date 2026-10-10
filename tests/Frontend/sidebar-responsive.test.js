@@ -120,7 +120,8 @@ test('sidebar adaptativo: preferencia desktop, laptop temporal, drawer y persist
                     return ['#theme-public-hero','#theme-public-services','#theme-public-footer'].map(selector=>getComputedStyle(document.querySelector(selector)).backgroundColor);
                 } finally { document.body.classList.add('rm-shell'); }
             });
-            assert.deepEqual(publicSurfaces,['rgb(10, 24, 33)','rgb(16, 33, 43)','rgb(7, 20, 28)'],'La landing también comparte el tema petróleo');
+            // El footer CURRENT usa --rm-bg-app, compartido con el shell, no petroleum-950.
+            assert.deepEqual(publicSurfaces,['rgb(10, 24, 33)','rgb(16, 33, 43)',darkPalette.bg],'La landing también comparte el tema petróleo');
             assert.deepEqual(darkPalette,{bg:'rgb(10, 24, 33)',text:'rgb(237, 245, 247)',selected:'rgb(237, 245, 247)'},'El sidebar usa petróleo con ambos selectores del tema oscuro');
         }
         await page.evaluate(()=>{document.documentElement.classList.remove('dark');document.documentElement.dataset.theme='light';});

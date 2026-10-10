@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Backend\Modulos\Clinica\Servicios\EventosClinicosService;
 use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Incidente;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -34,7 +34,7 @@ class EventosClinicosDatosRealesTest extends TestCase
 
     public function test_residente_sin_incidentes_no_recibe_eventos_de_demostracion(): void
     {
-        $residente = AdultoMayor::factory()->create();
+        $residente = Residente::factory()->create();
 
         $eventos = app(EventosClinicosService::class)->obtenerEventos($residente);
 
@@ -57,7 +57,7 @@ class EventosClinicosDatosRealesTest extends TestCase
 
     public function test_incidente_real_conserva_solo_los_datos_persistidos(): void
     {
-        $residente = AdultoMayor::factory()->create();
+        $residente = Residente::factory()->create();
 
         Incidente::create([
             'cod_incidente' => 'INC_REAL_001',

@@ -10,6 +10,9 @@ class ResidentePolicy
 {
     public function before(User $user, string $ability): ?bool
     {
+        if ($user->estado !== 'ACTIVO') {
+            return false;
+        }
         return $user->hasRole('SUPERADMINISTRADOR') && in_array($ability, ['viewAny', 'view'], true) ? true : null;
     }
 
@@ -24,11 +27,16 @@ class ResidentePolicy
             return $user->can('residentes.ver');
         }
 
+        if (! $user->can('residentes.ver')) {
+            return false;
+        }
+
         return ResidenteContacto::query()
             ->where('cod_residente', $residente->cod_residente)
             ->whereIn('cod_contacto', $user->contactos()->select('cod_contacto'))
             ->where('autoriza_informacion', true)
             ->where('estado', 'ACTIVO')
+            ->whereHas('contacto', fn ($query) => $query->where('estado', 'ACTIVO'))
             ->exists();
     }
 

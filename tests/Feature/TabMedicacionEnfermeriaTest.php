@@ -7,7 +7,7 @@ use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionSe
 use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
 use App\Frontend\Livewire\Medico\Medicacion\MedicacionAdultoModal;
 use App\Models\AdministracionMedicacion;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Area;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Atencion;
@@ -15,7 +15,7 @@ use App\Models\Jornada;
 use App\Models\Medicamento;
 use App\Models\Personal;
 use App\Models\Prescripcion;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -32,7 +32,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
 
     private User $enfermero;
 
-    private AdultoMayor $adulto;
+    private Residente $adulto;
 
     private Jornada $jornada;
 
@@ -50,13 +50,13 @@ class TabMedicacionEnfermeriaTest extends TestCase
         ]);
         $this->enfermero->assignRole(['SUPERADMINISTRADOR', 'ENFERMEROS']);
 
-        $this->adulto = AdultoMayor::factory()->create([
+        $this->adulto = Residente::factory()->create([
             'cod_est_adul' => 'EST_001',
             'nombres' => 'María Carmen',
             'ap_paterno' => 'Gómez',
         ]);
 
-        $turno = TurnoEnfermeria::create([
+        $turno = Turno::create([
             'cod_turno' => 'TUR_PRUEBA_MED',
             'orden' => 1,
             'nombre' => 'Turno de prueba medicación',
@@ -283,7 +283,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
 
     public function test_aislamiento_residente_prescripcion_residente_a_visible_y_residente_b_no_visible(): void
     {
-        $adultoB = AdultoMayor::factory()->create([
+        $adultoB = Residente::factory()->create([
             'cod_est_adul' => 'EST_001',
             'nombres' => 'Residente',
             'ap_paterno' => 'B',
@@ -330,7 +330,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
 
     public function test_administracion_no_permite_prescripcion_de_otro_residente(): void
     {
-        $adultoB = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
+        $adultoB = Residente::factory()->create(['cod_est_adul' => 'EST_001']);
         $atencionB = Atencion::create([
             'cod_residente' => $adultoB->cod_residente,
             'cod_area' => $this->atencion->cod_area,

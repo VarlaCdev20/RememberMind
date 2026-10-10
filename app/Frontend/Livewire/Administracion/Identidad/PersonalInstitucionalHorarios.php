@@ -2,10 +2,10 @@
 
 namespace App\Frontend\Livewire\Administracion\Identidad;
 
-use App\Models\AreaInstitucional;
+use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Jornada;
-use App\Models\TurnoInstitucional;
+use App\Models\Turno;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -212,7 +212,7 @@ class PersonalInstitucionalHorarios extends Component
             'f_tipo_asignacion.required' => 'El tipo de asignación es obligatorio.',
         ]);
 
-        $turno = TurnoInstitucional::query()
+        $turno = Turno::query()
             ->where('cod_turno', $this->f_cod_turno)
             ->where('estado', 'ACTIVO')
             ->first();
@@ -463,14 +463,13 @@ class PersonalInstitucionalHorarios extends Component
 
     private function cargarAreas(): array
     {
-        return AreaInstitucional::query()
+        return Area::query()
             ->whereIn('estado', ['ACTIVA', 'ACTIVO'])
             ->orderBy('nombre')
             ->get()
-            ->map(fn (AreaInstitucional $area) => [
+            ->map(fn (Area $area) => [
                 'cod_area' => $area->cod_area,
                 'nombre' => $area->nombre,
-                'tipo_area' => $area->tipo_area,
             ])
             ->values()
             ->toArray();
@@ -478,16 +477,16 @@ class PersonalInstitucionalHorarios extends Component
 
     private function cargarTurnos(): array
     {
-        return TurnoInstitucional::query()
+        return Turno::query()
             ->where('estado', 'ACTIVO')
             ->orderBy('hora_inicio')
             ->get(['cod_turno', 'nombre', 'hora_inicio', 'hora_cierre', 'orden', 'estado'])
-            ->map(fn (TurnoInstitucional $turno) => [
+            ->map(fn (Turno $turno) => [
                 'cod_turno' => $turno->cod_turno,
                 'nombre' => $turno->nombre,
                 'hora_inicio' => $turno->hora_inicio,
                 'hora_fin' => $turno->hora_fin,
-                'color' => $turno->color,
+                'color' => '#2F3E5C',
             ])
             ->toArray();
     }
@@ -598,7 +597,7 @@ class PersonalInstitucionalHorarios extends Component
         return json_encode($payload, JSON_UNESCAPED_UNICODE);
     }
 
-    private function verificarSolapamiento(TurnoInstitucional $turno): ?string
+    private function verificarSolapamiento(Turno $turno): ?string
     {
         $idsExcluir = $this->modoEdicion && $this->codAsignacionEditar
             ? collect(collect($this->asignaciones)->firstWhere('cod_asignacion', $this->codAsignacionEditar)['codigos_registro'] ?? [])->all()

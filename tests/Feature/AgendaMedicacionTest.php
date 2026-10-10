@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Frontend\Livewire\Compartido\Alertas\CampanaNotificaciones;
 use App\Frontend\Livewire\Medico\Medicacion\SaludMedicacionPanel;
 use App\Models\AdministracionMedicacion;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Area;
 use App\Models\Atencion;
 use App\Models\HorarioPrescripcion;
@@ -26,7 +26,7 @@ class AgendaMedicacionTest extends TestCase
     use RefreshDatabase;
 
     private User $usuario;
-    private AdultoMayor $adulto;
+    private Residente $adulto;
     private Atencion $atencion;
     private Jornada $jornada;
 
@@ -40,7 +40,7 @@ class AgendaMedicacionTest extends TestCase
             'estado' => 'ACTIVO',
         ]);
         $this->usuario->assignRole('MEDICO GENERAL/GERIATRA');
-        $this->adulto = AdultoMayor::factory()->create(['estado' => 'ADMITIDO']);
+        $this->adulto = Residente::factory()->create(['estado' => 'ADMITIDO']);
 
         $area = Area::query()->create([
             'cod_area' => 'ARE_MED',

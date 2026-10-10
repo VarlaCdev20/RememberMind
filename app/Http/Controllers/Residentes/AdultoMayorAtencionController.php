@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Residentes;
 
 use App\Http\Controllers\Controller;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Atencion;
 use App\Models\Personal;
 use Illuminate\Http\Request;
@@ -23,7 +23,7 @@ class AdultoMayorAtencionController extends Controller
         ]);
     }
 
-    public function index(AdultoMayor $adulto_mayor)
+    public function index(Residente $adulto_mayor)
     {
         $query = $adulto_mayor->atenciones();
         if (request('buscar')) {
@@ -43,7 +43,7 @@ class AdultoMayorAtencionController extends Controller
         ]);
     }
 
-    public function store(Request $request, AdultoMayor $adulto_mayor)
+    public function store(Request $request, Residente $adulto_mayor)
     {
         $request->validate([
             'fecha' => 'required|date',
@@ -75,7 +75,7 @@ class AdultoMayorAtencionController extends Controller
             ->with('success', 'Atención registrada correctamente.');
     }
 
-    public function update(Request $request, AdultoMayor $adulto_mayor, $atencionId)
+    public function update(Request $request, Residente $adulto_mayor, $atencionId)
     {
         $atencion = Atencion::where('cod_residente', $adulto_mayor->cod_residente)
             ->where('cod_atencion', $atencionId)
@@ -90,7 +90,7 @@ class AdultoMayorAtencionController extends Controller
             ->with('success', 'Atención actualizada correctamente.');
     }
 
-    public function destroy(AdultoMayor $adulto_mayor, $atencionId)
+    public function destroy(Residente $adulto_mayor, $atencionId)
     {
         $atencion = Atencion::where('cod_residente', $adulto_mayor->cod_residente)
             ->where('cod_atencion', $atencionId)
@@ -102,7 +102,7 @@ class AdultoMayorAtencionController extends Controller
             ->with('success', 'Atención anulada correctamente.');
     }
 
-    public function restore(AdultoMayor $adulto_mayor, $atencionId)
+    public function restore(Residente $adulto_mayor, $atencionId)
     {
         $atencion = Atencion::where('cod_residente', $adulto_mayor->cod_residente)
             ->where('cod_atencion', $atencionId)

@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Admision;
 use App\Models\Alergia;
 use App\Models\Contacto;
@@ -38,7 +38,7 @@ class FichaResumenClinicoTest extends TestCase
 
     public function test_resumen_muestra_estado_vacio_sin_inventar_signos_vitales(): void
     {
-        $residente = AdultoMayor::factory()->create();
+        $residente = Residente::factory()->create();
 
         Livewire::test(FichaPaciente::class, ['adulto' => $residente->cod_residente])
             ->call('cambiarTab', 'resumen')
@@ -51,7 +51,7 @@ class FichaResumenClinicoTest extends TestCase
 
     public function test_resumen_muestra_exclusivamente_el_ultimo_control_persistido(): void
     {
-        $residente = AdultoMayor::factory()->create();
+        $residente = Residente::factory()->create();
 
         SignoVital::query()->create([
             'cod_residente' => $residente->cod_residente,
@@ -77,7 +77,7 @@ class FichaResumenClinicoTest extends TestCase
 
     public function test_ficha_lee_datos_de_identidad_clinica_desde_tablas_v2_normalizadas(): void
     {
-        $residente = AdultoMayor::factory()->create([
+        $residente = Residente::factory()->create([
             'grupo_sanguineo' => 'AB',
             'factor_rh' => '-',
         ]);

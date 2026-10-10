@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Area;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Cama;
@@ -23,7 +23,7 @@ class FichaCuidadosTest extends TestCase
     use RefreshDatabase;
 
     private User $enfermero;
-    private AdultoMayor $adulto;
+    private Residente $adulto;
     private PlanCuidado $plan;
     private IntervencionCuidado $intervencion;
     private Jornada $jornada;
@@ -54,7 +54,7 @@ class FichaCuidadosTest extends TestCase
             'estado' => 'DISPONIBLE',
         ]);
 
-        $this->adulto = AdultoMayor::factory()->create([
+        $this->adulto = Residente::factory()->create([
             'cod_est_adul' => 'EST_001',
             'nombres' => 'Rosa María',
             'ap_paterno' => 'Gómez',

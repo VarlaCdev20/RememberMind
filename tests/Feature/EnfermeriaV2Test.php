@@ -6,7 +6,7 @@ use App\Models\AsignacionResidenteJornada;
 use App\Models\Jornada;
 use App\Models\Personal;
 use App\Models\Residente;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use App\Models\User;
 use App\Frontend\Livewire\Enfermeria\Cuidados\AsignacionTurnoPanel;
 use App\Frontend\Livewire\Enfermeria\Cuidados\TurnosEnfermeriaPanel;
@@ -140,7 +140,7 @@ class EnfermeriaV2Test extends TestCase
             'profesion' => 'ENFERMERÍA',
             'estado' => 'ACTIVO',
         ]);
-        $turno = TurnoEnfermeria::query()->create([
+        $turno = Turno::query()->create([
             'cod_turno' => 'TUR_ENF_TEST',
             'nombre' => 'TURNO COMPLETO',
             'hora_inicio' => '00:00:00',

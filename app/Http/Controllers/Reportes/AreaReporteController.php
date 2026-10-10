@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Reportes;
 
 use App\Http\Controllers\Controller;
-use App\Models\AreaInstitucional;
+use App\Models\Area;
 use App\Models\User;
 use App\Backend\Modulos\Reportes\Servicios\ReportExportService;
 use App\Backend\Modulos\Reportes\Servicios\ReportFileNameService;
@@ -59,7 +59,6 @@ class AreaReporteController extends Controller
             foreach ($data['areas'] as $area) {
                 $mappedAreas[] = [
                     'nombre' => $this->cleanUtf8($area->nombre),
-                    'tipo_area' => $this->cleanUtf8($area->tipo_area),
                     'responsable_nombre' => $area->responsable ? $this->cleanUtf8($area->responsable->name) : 'Sin asignar',
                     'usuarios_activos_count' => $area->usuarios->filter(fn($u) => in_array($u->estado, ['ACTIVO', 1, '1']))->count(),
                     'usuarios_inactivos_count' => $area->usuarios->filter(fn($u) => !in_array($u->estado, ['ACTIVO', 1, '1']))->count(),
@@ -198,7 +197,7 @@ class AreaReporteController extends Controller
     public function areaExcel($codArea)
     {
         try {
-            $area = AreaInstitucional::findOrFail($codArea);
+            $area = Area::findOrFail($codArea);
             $nombreSeguro = Str::slug($area->nombre, '_');
             $filename = $this->fileNameService->generate("usuarios_area_{$nombreSeguro}", 'xlsx');
 
@@ -220,4 +219,3 @@ class AreaReporteController extends Controller
         }
     }
 }
-

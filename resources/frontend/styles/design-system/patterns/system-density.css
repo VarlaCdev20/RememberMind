@@ -33,7 +33,7 @@
     font-size: min(var(--rm-font-size-card-title), 15px);
 }
 
-.rm-depth-canvas :where(button, input, select):not([type="checkbox"]):not([type="radio"]):not(.rm-btn-sm):not(.rm-btn-icon-sm):not(.rm-ficha-detalles *) {
+.rm-depth-canvas :where(button, input, select):not([type="checkbox"]):not([type="radio"]):not(.rm-btn-sm):not(.rm-btn-icon-sm):not(.rm-ficha-detalles *):not(:where(.rm-resident-directory *)) {
     min-height: min(var(--rm-control-md), 40px);
 }
 

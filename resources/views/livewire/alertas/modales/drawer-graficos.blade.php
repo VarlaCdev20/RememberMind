@@ -311,7 +311,7 @@
         </div>
 
         {{-- SELECTOR DE VARIABLE Y GRÁFICO --}}
-        <div class="p-4 rounded-2xl bg-[var(--rm-surface)] border border-[var(--rm-border-soft)] space-y-3 shadow-2xs">
+        <div class="rm-chart-card p-4 rounded-2xl bg-[var(--rm-surface)] border border-[var(--rm-border-soft)] space-y-3 shadow-2xs">
             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--rm-border-soft)] pb-2.5">
                 <div class="flex items-center gap-2">
                     <button type="button" @click="tab = 'presion'" :class="tab === 'presion' ? 'bg-[var(--rm-action-primary)] text-white' : 'bg-[var(--rm-surface-soft)] text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)]'" class="px-2.5 py-1 rounded-lg text-xs font-bold transition">PA</button>

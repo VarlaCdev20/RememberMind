@@ -32,7 +32,7 @@
  Vista de Impresión / PDF
  </button>
  </div>
- </div>
+ </x-ui.page-header>
 
      <!-- ── SECCIÓN DE FILTROS FORMATO ALERTAS ─────────────────── -->
     <x-ui.filter-bar class="mb-8 print:hidden">

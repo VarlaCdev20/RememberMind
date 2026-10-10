@@ -3,7 +3,6 @@
 namespace App\Backend\Modulos\Documentos\Servicios;
 
 use App\Models\Residente;
-use App\Models\AdultoMayor;
 use App\Models\Documento;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;

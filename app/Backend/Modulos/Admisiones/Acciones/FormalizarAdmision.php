@@ -35,7 +35,7 @@ class FormalizarAdmision
 
     public function autorizar(Preadmision $solicitud, User $usuario): void
     {
-        abort_unless($usuario->estado === 'ACTIVO' && $usuario->can('admisiones.formalizar'), 403);
+        abort_unless($usuario->estado === 'ACTIVO' && $usuario->hasAnyRole(['ADMINISTRADOR', 'SUPERADMINISTRADOR']) && $usuario->can('admisiones.formalizar'), 403);
 
         if (Gate::getPolicyFor($solicitud)) {
             Gate::forUser($usuario)->authorize('formalizar', $solicitud);

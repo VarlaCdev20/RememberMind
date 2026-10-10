@@ -3,7 +3,7 @@
 namespace App\Frontend\Livewire\Compartido\Reportes;
 
 use Livewire\Component;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 
 class SaludReportesPanel extends Component
 {
@@ -14,7 +14,7 @@ class SaludReportesPanel extends Component
 
     public function render()
     {
-        $adultos = AdultoMayor::orderBy('apellido_paterno')->get();
+        $adultos = Residente::orderBy('apellido_paterno')->get();
 
         return view('livewire.reportes.salud-reportes-panel', [
             'adultos' => $adultos

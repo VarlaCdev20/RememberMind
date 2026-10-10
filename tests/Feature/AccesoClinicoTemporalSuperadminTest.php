@@ -6,11 +6,11 @@ use App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService;
 use App\Backend\Modulos\Clinica\Servicios\AutorizacionClinicaService;
 use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Area;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Jornada;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use App\Models\User;
 use App\Policies\PrescripcionPolicy;
 use App\Policies\ValoracionEnfermeriaPreadmisionPolicy;
@@ -73,7 +73,7 @@ class AccesoClinicoTemporalSuperadminTest extends TestCase
         $superadmin->assignRole('SUPERADMINISTRADOR');
         $enfermera = User::factory()->create(['nombres' => 'Ana', 'ap_paterno' => 'Prueba']);
         $enfermera->assignRole('ENFERMEROS');
-        $residente = AdultoMayor::factory()->create(['cod_est_adul' => 'EST_001']);
+        $residente = Residente::factory()->create(['cod_est_adul' => 'EST_001']);
 
         $this->actingAs($superadmin);
         $turnos = app(TurnoEnfermeriaService::class);
@@ -84,7 +84,7 @@ class AccesoClinicoTemporalSuperadminTest extends TestCase
             $this->assertSame(403, $exception->getStatusCode());
         }
 
-        $turno = TurnoEnfermeria::create([
+        $turno = Turno::create([
             'cod_turno' => 'TUR_SUPER_TEST', 'nombre' => 'Turno clínico', 'orden' => 1,
             'hora_inicio' => '00:00:00', 'hora_fin' => '23:59:59', 'estado' => 'ACTIVO',
         ]);

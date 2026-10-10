@@ -8,6 +8,7 @@ use Livewire\Component;
 
 class HistorialAlerta extends Component
 {
+    #[\Livewire\Attributes\Locked]
     public string $alertaId = '';
     public string $accion = '';
 
@@ -33,6 +34,7 @@ class HistorialAlerta extends Component
             Alerta::query()->findOrFail($this->alertaId),
             $this->accion,
             auth()->user(),
+            coordinacion: auth()->user()->hasAnyRole(['ADMINISTRADOR', 'GERENTE', 'SUPERADMINISTRADOR']),
         );
 
         $this->accion = '';
@@ -42,11 +44,13 @@ class HistorialAlerta extends Component
 
     public function render()
     {
-        $alerta = Alerta::with([
+        $alerta = Alerta::findOrFail($this->alertaId);
+        app(AlertasService::class)->autorizarLectura($alerta, auth()->user());
+        $alerta->load([
             'adultoMayor',
             'responsable.usuario',
             'eventos.usuario',
-        ])->findOrFail($this->alertaId);
+        ]);
 
         // Prepara los eventos cronológicos para el Timeline pattern
         $timelineItems = $alerta->eventos

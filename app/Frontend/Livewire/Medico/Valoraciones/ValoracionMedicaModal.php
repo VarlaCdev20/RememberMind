@@ -3,7 +3,7 @@
 namespace App\Frontend\Livewire\Medico\Valoraciones;
 
 use Livewire\Component;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Atencion;
 use App\Models\HistorialEstadoResidente;
 use App\Models\NotaClinica;
@@ -51,7 +51,7 @@ class ValoracionMedicaModal extends Component
     public function open($cod_residente)
     {
         $this->resetForm();
-        $this->adulto = AdultoMayor::find($cod_residente);
+        $this->adulto = Residente::find($cod_residente);
         if($this->adulto) {
             // Autocompletar alergias conocidas desde la preadmision si existen
             $this->alergias = $this->adulto->alergias;

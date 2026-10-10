@@ -4,7 +4,7 @@ namespace App\Frontend\Livewire\Medico\Medicacion;
 
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Atencion;
 use App\Models\HorarioPrescripcion;
 use App\Models\Medicamento;
@@ -20,7 +20,7 @@ class SaludMedicacionPanel extends Component
 {
     use WithPagination;
 
-    public ?AdultoMayor $adulto = null;
+    public ?Residente $adulto = null;
 
     public string $cod_residente = '';
 
@@ -36,7 +36,7 @@ class SaludMedicacionPanel extends Component
 
     public bool $drawerGrafico = false;
 
-    public ?AdultoMayor $adultoDrawer = null;
+    public ?Residente $adultoDrawer = null;
 
     public mixed $signosDrawer = [];
 
@@ -72,7 +72,7 @@ class SaludMedicacionPanel extends Component
             return;
         }
 
-        $this->adulto = $adulto instanceof AdultoMayor ? $adulto : AdultoMayor::query()->find($adulto);
+        $this->adulto = $adulto instanceof Residente ? $adulto : Residente::query()->find($adulto);
         abort_unless($this->adulto, 404);
         $this->cod_residente = $this->adulto->cod_residente;
         $this->autorizarResidente($this->adulto);
@@ -94,7 +94,7 @@ class SaludMedicacionPanel extends Component
     public function abrirFormularioPara(string $codResidente): void
     {
         $this->autorizarGestionOrden();
-        $this->adulto = AdultoMayor::query()->findOrFail($codResidente);
+        $this->adulto = Residente::query()->findOrFail($codResidente);
         $this->autorizarResidente($this->adulto);
         $this->cod_residente = $codResidente;
         $this->nuevo_cod_residente = $codResidente;
@@ -126,7 +126,7 @@ class SaludMedicacionPanel extends Component
             'nuevo_observacion' => 'nullable|string|max:1000',
         ]);
 
-        $residente = AdultoMayor::query()->findOrFail($this->nuevo_cod_residente);
+        $residente = Residente::query()->findOrFail($this->nuevo_cod_residente);
         $this->autorizarResidente($residente);
         $personal = auth()->user()?->personal()->where('estado', 'ACTIVO')->first();
         if (! $personal) {
@@ -200,7 +200,7 @@ class SaludMedicacionPanel extends Component
 
     public function updatedCodResidente($value): void
     {
-        $this->adulto = $value ? AdultoMayor::query()->findOrFail($value) : null;
+        $this->adulto = $value ? Residente::query()->findOrFail($value) : null;
         if ($this->adulto) {
             $this->autorizarResidente($this->adulto);
         }
@@ -257,14 +257,14 @@ class SaludMedicacionPanel extends Component
 
     public function verUbicacion(string $codResidente): void
     {
-        $this->adultoDrawer = AdultoMayor::query()->with(['ocupacionActiva.cama.habitacion', 'alertas'])->find($codResidente);
+        $this->adultoDrawer = Residente::query()->with(['ocupacionActiva.cama.habitacion', 'alertas'])->find($codResidente);
         $this->drawerUbicacion = true;
         $this->drawerGrafico = false;
     }
 
     public function verGraficos(string $codResidente): void
     {
-        $this->adultoDrawer = AdultoMayor::query()->with([
+        $this->adultoDrawer = Residente::query()->with([
             'ocupacionActiva.cama.habitacion',
             'alergias' => fn ($query) => $query->whereIn('estado', ['ACTIVA', 'ACTIVO']),
             'diagnosticos' => fn ($query) => $query->whereIn('estado', ['ACTIVO', 'CONFIRMADO']),
@@ -286,7 +286,7 @@ class SaludMedicacionPanel extends Component
 
     public function render()
     {
-        $adultosQuery = AdultoMayor::query()->where('estado', 'ADMITIDO');
+        $adultosQuery = Residente::query()->where('estado', 'ADMITIDO');
         if (auth()->user()?->hasRole('ENFERMEROS')) {
             $adultosQuery->whereIn('cod_residente', app(TurnoEnfermeriaService::class)->obtenerPacientesAsignadosIds(auth()->user()));
         }
@@ -337,7 +337,7 @@ class SaludMedicacionPanel extends Component
             'Las prescripciones solo pueden ser creadas o modificadas por personal médico autorizado.');
     }
 
-    private function autorizarResidente(AdultoMayor $adulto): void
+    private function autorizarResidente(Residente $adulto): void
     {
         if (auth()->user()?->hasRole('ENFERMEROS')) {
             app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($adulto, auth()->user());

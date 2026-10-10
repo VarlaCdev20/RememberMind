@@ -10,7 +10,12 @@ class StoreSignosVitalesRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('signos_vitales.crear') === true;
+        return $this->user()?->estado === 'ACTIVO' && $this->user()->can($this->permiso());
+    }
+
+    private function permiso(): string
+    {
+        return $this->isMethod('PUT') || $this->isMethod('PATCH') ? 'signos_vitales.editar' : 'signos_vitales.crear';
     }
 
     protected function prepareForValidation(): void
@@ -20,7 +25,7 @@ class StoreSignosVitalesRequest extends FormRequest
             $this->merge(['cod_residente' => $codRes]);
         }
         if ($this->user()?->hasRole('ENFERMEROS')) {
-            $this->merge(['fecha' => today()->toDateString(), 'hora' => now()->format('H:i')]);
+            $this->merge(['fecha' => $this->input('fecha') ?: today()->toDateString(), 'hora' => $this->input('hora') ?: now()->format('H:i')]);
         }
         $sis = $this->input('presion_sistolica');
         $dia = $this->input('presion_diastolica');
@@ -88,6 +93,10 @@ class StoreSignosVitalesRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
+            if (! $validator->errors()->has('fecha') && ! $validator->errors()->has('hora')
+                && \Carbon\Carbon::parse($this->input('fecha').' '.$this->input('hora'))->isFuture()) {
+                $validator->errors()->add('hora', 'La medición no puede tener una fecha u hora futura.');
+            }
             $sis = $this->input('presion_sistolica');
             $dia = $this->input('presion_diastolica');
 
@@ -98,8 +107,6 @@ class StoreSignosVitalesRequest extends FormRequest
                 $this->input('temperatura'),
                 $this->input('saturacion'),
                 $this->input('glucosa'),
-                $this->input('peso'),
-                $this->input('dolor'),
             ];
 
             ValidacionSignosVitalesService::validarIntegridadCruzada(
@@ -118,11 +125,15 @@ class StoreSignosVitalesRequest extends FormRequest
                 try {
                     if ($this->user()->hasRole('ENFERMEROS')) {
                         app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente(
-                            $codResidente, 'signos_vitales.crear', $this->user()
+                            $codResidente, $this->permiso(), $this->user()
                         );
                     }
                 } catch (\Throwable $e) {
-                    $validator->errors()->add('cod_residente', $e->getMessage());
+                    if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                        throw $e;
+                    }
+                    report($e);
+                    $validator->errors()->add('cod_residente', 'No se pudo verificar el contexto de Enfermería. Inténtelo nuevamente.');
                 }
             }
         });

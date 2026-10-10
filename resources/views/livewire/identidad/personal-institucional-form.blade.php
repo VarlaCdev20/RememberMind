@@ -19,8 +19,8 @@
    text: 'Hay cambios sin guardar en el formulario. Si sale, perderá todos los datos.',
    icon: 'warning',
    showCancelButton: true,
-   confirmButtonColor: '#B34839',
-   cancelButtonColor: '#8FA17F',
+   confirmButtonColor: 'var(--rm-danger)',
+   cancelButtonColor: 'var(--rm-action-primary)',
    confirmButtonText: 'Sí, salir',
    cancelButtonText: 'Permanecer'
   }).then((result) => {
@@ -962,8 +962,8 @@
     text: 'Hay cambios sin guardar en el formulario. Si sale, perderá todos los datos.',
     icon: 'warning',
     showCancelButton: true,
-    confirmButtonColor: '#B34839',
-    cancelButtonColor: '#8FA17F',
+    confirmButtonColor: 'var(--rm-danger)',
+    cancelButtonColor: 'var(--rm-action-primary)',
     confirmButtonText: 'Sí, salir',
     cancelButtonText: 'Permanecer'
    }).then((result) => {

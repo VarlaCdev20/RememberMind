@@ -6,7 +6,7 @@ use App\Frontend\Livewire\Administracion\Identidad\PersonalInstitucionalPanel;
 use App\Frontend\Livewire\Administracion\Identidad\TurnosAsignacionesPanel;
 use App\Frontend\Livewire\Administracion\Identidad\UsuariosPanel;
 use App\Frontend\Livewire\Compartido\Reportes\ReportesAdultoPanel;
-use App\Models\{AdultoMayor, Personal, SignoVital, User};
+use App\Models\{Residente, Personal, SignoVital, User};
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -78,7 +78,7 @@ class VistasModularesTest extends TestCase
             'profesion' => 'MEDICO',
             'estado' => 'ACTIVO',
         ]);
-        $adulto = AdultoMayor::factory()->create([
+        $adulto = Residente::factory()->create([
             'nombres' => 'Reporte Real', 'cod_est_adul' => 'EST_001', 'fecha_nac' => '1945-03-12',
         ]);
         SignoVital::create([

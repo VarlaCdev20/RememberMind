@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\SignoVital;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -33,7 +33,7 @@ class FichaSeguimientoDatosRealesTest extends TestCase
 
     public function test_seguimiento_vacio_no_muestra_metricas_ni_conclusiones_simuladas(): void
     {
-        $residente = AdultoMayor::factory()->create();
+        $residente = Residente::factory()->create();
 
         Livewire::test(FichaPaciente::class, ['adulto' => $residente->cod_residente])
             ->call('cambiarTab', 'seguimiento')
@@ -47,7 +47,7 @@ class FichaSeguimientoDatosRealesTest extends TestCase
 
     public function test_seguimiento_muestra_el_control_real_sin_clasificarlo_como_normal(): void
     {
-        $residente = AdultoMayor::factory()->create();
+        $residente = Residente::factory()->create();
 
         SignoVital::query()->create([
             'cod_residente' => $residente->cod_residente,

@@ -271,6 +271,9 @@ class PreadmisionesPanel extends Component
 
     public function aprobar(string $codPre): void
     {
+        abort_unless(auth()->user()?->estado === 'ACTIVO'
+            && auth()->user()->can('preadmisiones.revisar')
+            && auth()->user()->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'ADMINISTRADOR', 'SUPERADMINISTRADOR']), 403);
         $preadmision = Preadmision::query()->findOrFail($codPre);
 
         if ($preadmision->admision()->exists() || in_array($preadmision->estado, ['APROBADA', 'ADMITIDA'], true)) {
@@ -363,7 +366,8 @@ class PreadmisionesPanel extends Component
 
     public function formalizarAdmision(FormalizarAdmision $formalizar): void
     {
-        abort_unless(auth()->user()?->estado === 'ACTIVO' && auth()->user()?->can('admisiones.formalizar'), 403);
+        abort_unless(auth()->user()?->estado === 'ACTIVO' && auth()->user()->can('admisiones.formalizar')
+            && auth()->user()->hasAnyRole(['ADMINISTRADOR', 'SUPERADMINISTRADOR']), 403);
 
         try {
             $datos = $this->validate([
@@ -443,7 +447,8 @@ class PreadmisionesPanel extends Component
 
     public function rechazar(): void
     {
-        abort_unless(auth()->user()?->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'ADMINISTRADOR', 'SUPERADMINISTRADOR']), 403);
+        abort_unless(auth()->user()?->estado === 'ACTIVO' && auth()->user()->can('preadmisiones.revisar')
+            && auth()->user()->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'ADMINISTRADOR', 'SUPERADMINISTRADOR']), 403);
 
         $this->validate([
             'codPreRechazo' => ['required', 'exists:preadmisiones,cod_preadmision'],

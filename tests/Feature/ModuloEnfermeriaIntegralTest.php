@@ -21,7 +21,7 @@ use App\Models\PlanCuidado;
 use App\Models\Prescripcion;
 use App\Models\RegistroIngesta;
 use App\Models\Residente;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use App\Models\User;
 use App\Backend\Modulos\Enfermeria\Servicios\AgendaTurnoService;
 use App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService;
@@ -40,7 +40,7 @@ class ModuloEnfermeriaIntegralTest extends TestCase
     private User $enfermero;
     private Personal $personal;
     private Residente $residente;
-    private TurnoEnfermeria $turno;
+    private Turno $turno;
     private Jornada $jornada;
 
     protected function setUp(): void
@@ -65,7 +65,7 @@ class ModuloEnfermeriaIntegralTest extends TestCase
             'estado' => 'ACTIVO',
         ]);
 
-        $this->turno = TurnoEnfermeria::create([
+        $this->turno = Turno::create([
             'cod_turno' => 'TUR_001',
             'orden' => 1,
             'nombre' => 'Mañana',

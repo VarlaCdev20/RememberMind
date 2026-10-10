@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Frontend\Livewire\Compartido\Clinica\SignosVitalesPanel;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\SignoVital;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -22,9 +22,9 @@ class SignosVitalesPanelClasificacionTest extends TestCase
         $usuario->assignRole('MEDICO GENERAL/GERIATRA');
         $this->actingAs($usuario);
 
-        $sinRegistro = AdultoMayor::factory()->create(['nombres' => 'SinRegistro', 'cod_est_adul' => 'EST_001']);
-        $sinMediciones = AdultoMayor::factory()->create(['nombres' => 'SinMediciones', 'cod_est_adul' => 'EST_001']);
-        $critico = AdultoMayor::factory()->create(['nombres' => 'ConPulsoCritico', 'cod_est_adul' => 'EST_001']);
+        $sinRegistro = Residente::factory()->create(['nombres' => 'SinRegistro', 'cod_est_adul' => 'EST_001']);
+        $sinMediciones = Residente::factory()->create(['nombres' => 'SinMediciones', 'cod_est_adul' => 'EST_001']);
+        $critico = Residente::factory()->create(['nombres' => 'ConPulsoCritico', 'cod_est_adul' => 'EST_001']);
 
         foreach ([$sinMediciones, $critico] as $residente) {
             SignoVital::create([

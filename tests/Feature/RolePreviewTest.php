@@ -57,14 +57,14 @@ class RolePreviewTest extends TestCase
         $this->assertContains('admin.enfermeria.pacientes', $routes);
         $this->assertNotContains('admin.usuarios.index', $routes);
 
-        $this->followingRedirects()->get(route('dashboard'))->assertOk()
+        $response = $this->followingRedirects()->get(route('dashboard'))->assertOk()
             ->assertSee('Modo previsualización')
-            ->assertSee('livewire.js?rm_ui=20261003&id=', false)
             ->assertSee('Enfermería')
             ->assertSee('Este modo es solo lectura')
             ->assertSee('data-accent="nursing"', false)
             ->assertSee('class="rm-dashboard-header__role"><span aria-hidden="true"></span>Enfermería', false)
             ->assertSee('id="topbar-enfermeria"', false);
+        $this->assertMatchesRegularExpression('/src="[^"\s]*\/livewire(?:\.min)?\.js\?rm_ui=20261003&id=[^"\s]+"/', $response->getContent());
     }
 
     public function test_enlaces_visibles_de_enfermeria_abren_en_previsualizacion(): void

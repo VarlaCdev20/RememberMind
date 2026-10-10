@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -15,7 +15,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class AdultoIndividualExport implements WithMultipleSheets
 {
-    public function __construct(private AdultoMayor $adulto) {}
+    public function __construct(private Residente $adulto) {}
 
     public function sheets(): array
     {
@@ -34,7 +34,7 @@ class AdultoIndividualExport implements WithMultipleSheets
 // ─────────────────────────────────────────────────────────────
 class AdultoGeneralSheet implements FromCollection, ShouldAutoSize, WithHeadings, WithStyles, WithTitle
 {
-    public function __construct(private AdultoMayor $adulto) {}
+    public function __construct(private Residente $adulto) {}
 
     public function title(): string
     {
@@ -68,7 +68,7 @@ class AdultoGeneralSheet implements FromCollection, ShouldAutoSize, WithHeadings
             ['Celular',                 $a->celular ?? '—'],
             ['Teléfono fijo',           $a->telefono_fijo ?? '—'],
             ['Departamento residencia', $a->departamento_residencia ?? '—'],
-            ['Ciudad / Municipio',      $a->ciudad_municipio ?? '—'],
+            ['Dirección',               $a->direccion ?? '—'],
             ['Zona / Barrio',           $a->zona ?? '—'],
             ['Calle / Avenida',         $a->calle ?? '—'],
             ['Fecha de ingreso',        $a->fecha_ing ? $a->fecha_ing->format('d/m/Y') : '—'],
@@ -100,7 +100,7 @@ class AdultoGeneralSheet implements FromCollection, ShouldAutoSize, WithHeadings
 // ─────────────────────────────────────────────────────────────
 class SignosVitalesIndSheet implements FromCollection, ShouldAutoSize, WithHeadings, WithStyles, WithTitle
 {
-    public function __construct(private AdultoMayor $adulto) {}
+    public function __construct(private Residente $adulto) {}
 
     public function title(): string
     {
@@ -152,7 +152,7 @@ class SignosVitalesIndSheet implements FromCollection, ShouldAutoSize, WithHeadi
 // ─────────────────────────────────────────────────────────────
 class MedicacionesIndSheet implements FromCollection, ShouldAutoSize, WithHeadings, WithStyles, WithTitle
 {
-    public function __construct(private AdultoMayor $adulto) {}
+    public function __construct(private Residente $adulto) {}
 
     public function title(): string
     {
@@ -201,7 +201,7 @@ class MedicacionesIndSheet implements FromCollection, ShouldAutoSize, WithHeadin
 // ─────────────────────────────────────────────────────────────
 class ValoracionesIndSheet implements FromCollection, ShouldAutoSize, WithHeadings, WithStyles, WithTitle
 {
-    public function __construct(private AdultoMayor $adulto) {}
+    public function __construct(private Residente $adulto) {}
 
     public function title(): string
     {
@@ -256,7 +256,7 @@ class ValoracionesIndSheet implements FromCollection, ShouldAutoSize, WithHeadin
 // ─────────────────────────────────────────────────────────────
 class EvaluacionesCognitivasIndSheet implements FromCollection, ShouldAutoSize, WithHeadings, WithStyles, WithTitle
 {
-    public function __construct(private AdultoMayor $adulto) {}
+    public function __construct(private Residente $adulto) {}
 
     public function title(): string
     {

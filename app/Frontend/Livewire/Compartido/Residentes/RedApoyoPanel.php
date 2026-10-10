@@ -49,6 +49,7 @@ class RedApoyoPanel extends Component
 
     public function mount(): void
     {
+        \Illuminate\Support\Facades\Gate::authorize('viewAny', Residente::class);
         if (request('adulto')) {
             $this->adultoSeleccionado = (string) request('adulto');
         }
@@ -207,6 +208,7 @@ class RedApoyoPanel extends Component
 
     public function verDetalle(string $vinculoId): void
     {
+        \Illuminate\Support\Facades\Gate::authorize('viewAny', Residente::class);
         $vinculo = ResidenteContacto::with(['contacto', 'residente'])
             ->where('cod_residente_contacto', $vinculoId)
             ->where('cod_residente', $this->adultoSeleccionado)
@@ -319,6 +321,7 @@ class RedApoyoPanel extends Component
 
     public function render()
     {
+        \Illuminate\Support\Facades\Gate::authorize('viewAny', Residente::class);
         $adulto = $this->adultoActual();
         $familiares = $adulto ? $this->familiaresColeccion() : collect();
 

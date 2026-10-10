@@ -25,7 +25,7 @@ class FrontendArchitectureTest extends TestCase
             $contenido = File::get($file->getPathname());
 
             if (preg_match('/App\\\\Models\\\\\w+/i', $contenido)
-                || preg_match('/(?:Residente|User|AdultoMayor|Alerta|TurnoEnfermeria|Atencion)::(?:query|where|find|all)/i', $contenido)) {
+                || preg_match('/(?:Residente|User|Residente|Alerta|Turno|Atencion)::(?:query|where|find|all)/i', $contenido)) {
                 $violaciones[] = $file->getFilename();
             }
         }
@@ -54,7 +54,7 @@ class FrontendArchitectureTest extends TestCase
             $contenido = File::get($file->getPathname());
 
             if (preg_match('/App\\\\Models\\\\\w+/i', $contenido)
-                || preg_match('/(?:Residente|User|AdultoMayor|Alerta|TurnoEnfermeria|Atencion)::(?:query|where|find|all)/i', $contenido)) {
+                || preg_match('/(?:Residente|User|Residente|Alerta|Turno|Atencion)::(?:query|where|find|all)/i', $contenido)) {
                 $violaciones[] = $file->getFilename();
             }
         }
@@ -144,7 +144,7 @@ class FrontendArchitectureTest extends TestCase
         $tailwind = File::get(base_path('tailwind.config.js'));
 
         foreach ([
-            '--rm-palette-page: #F1EAE4',
+            '--rm-palette-page: #F3EEE8',
             '--rm-earth-900: #59524B',
             '--rm-earth-800: #665F57',
             '--rm-earth-700: #746B62',
@@ -152,13 +152,15 @@ class FrontendArchitectureTest extends TestCase
             '--rm-earth-500: #8F857B',
             '--rm-earth-400: #9B9288',
             '--rm-earth-300: #A69E96',
-            '--rm-palette-capuchino: #D6C6B9',
+            '--rm-palette-capuchino: #DDD6CF',
+            '--rm-palette-header: #E6E0D9',
             '--rm-selected-bg: var(--rm-palette-sage-200)',
             '--rm-icon-default: var(--rm-earth-600)',
             '--rm-palette-sidebar: var(--rm-palette-capuchino)',
-            '--rm-palette-surface: color-mix(in srgb, var(--rm-palette-brown-300) 20%, var(--rm-palette-page))',
-            '--rm-palette-ink: var(--rm-palette-brown-900)',
-            '--rm-palette-ink-secondary: var(--rm-palette-brown-800)',
+            '--rm-palette-surface: #F7F3EF',
+            '--rm-palette-surface-soft: #EFEAE4',
+            '--rm-palette-ink: #4A4642',
+            '--rm-palette-ink-secondary: #67615B',
             '--rm-palette-primary: #78826E',
             '--rm-palette-primary-ink: var(--rm-palette-forest-ink)',
             '--rm-palette-primary-soft: color-mix(in srgb, var(--rm-palette-mint) 50%, var(--rm-palette-page))',
@@ -357,7 +359,7 @@ class FrontendArchitectureTest extends TestCase
         $this->assertStringContainsString('rm-drawer', $drawer);
         $this->assertStringContainsString('aria-live="assertive"', $validation);
         $this->assertStringContainsString('rm-alert-danger', $validation);
-        $this->assertStringContainsString('<x-ui.modal-livewire', $detalleAlerta);
+        $this->assertStringContainsString('<x-ui.drawer-livewire', $detalleAlerta);
         $this->assertStringContainsString('<x-ui.status-badge', $panelAlertas);
         $this->assertStringContainsString('overflow-x-auto', $panelAlertas);
     }
@@ -382,15 +384,16 @@ class FrontendArchitectureTest extends TestCase
         $this->assertStringContainsString('<x-ui.dashboard-header', File::get(resource_path('views/pages/admin/administracion/dashboard.blade.php')));
         $this->assertStringContainsString('<x-ui.dashboard-data-panel', $workspaceRol);
 
-        foreach ([$workspaceRol, $enfermeria, $medicina, $psicologia, File::get(resource_path('views/pages/admin/administracion/dashboard.blade.php'))] as $dashboard) {
+        $this->assertStringNotContainsString(':compact="true"', $enfermeria);
+        $this->assertStringContainsString('<x-ui.dashboard-divider />', $enfermeria);
+        foreach ([$workspaceRol, $medicina, $psicologia, File::get(resource_path('views/pages/admin/administracion/dashboard.blade.php'))] as $dashboard) {
             $this->assertStringContainsString('<x-ui.dashboard-divider />', $dashboard);
         }
 
         foreach ([$encabezadoAdmin, $medicina, $psicologia] as $dashboard) {
             $this->assertStringContainsString('images/FOTOS CENTRO DE ADULTOS MAYORES/', $dashboard);
         }
-        $this->assertStringContainsString(':image="$welcomeImage"', $enfermeria);
-        $this->assertStringContainsString(':secondary-image="$welcomeSecondaryImage"', $enfermeria);
+        $this->assertStringContainsString('image="images/FOTOS CENTRO DE ADULTOS MAYORES/489963938_1158744422930145_8442506970304201426_n.jpg"', $enfermeria);
         $this->assertStringContainsString('rotation-context=', $medicina);
         $this->assertStringContainsString('rotation-context=', $psicologia);
         $this->assertStringContainsString('rotation-context=', $workspaceRol);

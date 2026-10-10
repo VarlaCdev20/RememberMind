@@ -190,9 +190,7 @@
      </td>
 
      <td class="px-4 py-2.5 text-center">
-      <span class="inline-block rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider shadow-sm {{ $estadoClass }}">
-      {{ $estadoLabel }}
-      </span>
+      <x-ui.status-badge :estado="$usuario->estado" />
      </td>
 
      <td class="px-4 py-2.5 text-center">
@@ -242,17 +240,16 @@
      </tr>
     @empty
      <tr>
-     <td colspan="6" class="p-8 text-center">
-      <div class="flex flex-col items-center justify-center">
-      <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-xl border border-borde bg-fondo">
-       <i class="ph-fill ph-users-slash text-2xl text-apoyo"></i>
-      </div>
-      <h4 class="text-sm font-black text-titulo">No se encontró personal</h4>
-      <p class="mt-1 max-w-sm text-xs font-medium text-apoyo">
-       Ajusta los filtros de búsqueda o registra nuevo personal institucional.
-      </p>
-      </div>
-     </td>
+      <td colspan="6" class="px-4 py-8">
+       <x-ui.empty-state
+        icono="ph-users-slash"
+        titulo="No se encontró personal"
+        texto="Ajusta los filtros de búsqueda o registra nuevo personal institucional."
+        compact
+        actionMethod="limpiarFiltros"
+        actionText="Restablecer filtros"
+       />
+      </td>
      </tr>
     @endforelse
     </tbody>

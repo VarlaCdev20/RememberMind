@@ -6,9 +6,8 @@ use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
 use App\Frontend\Livewire\Enfermeria\Cuidados\RegistrosEnfermeria;
 use App\Frontend\Livewire\Enfermeria\Cuidados\ReporteEnfermeria;
 use App\Models\AdministracionMedicacion;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Area;
-use App\Models\AreaInstitucional;
 use App\Models\AsignacionPersonal;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Atencion;
@@ -23,8 +22,7 @@ use App\Models\Medicamento;
 use App\Models\Personal;
 use App\Models\Prescripcion;
 use App\Models\RegistroIngesta;
-use App\Models\Residente;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -57,7 +55,7 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
             'profesion' => 'ENFERMERIA',
             'estado' => 'ACTIVO',
         ]);
-        $turno = TurnoEnfermeria::query()->create([
+        $turno = Turno::query()->create([
             'cod_turno' => 'TUR_CRIT_TEST',
             'nombre' => 'TURNO TEST',
             'hora_inicio' => '00:00:00',
@@ -103,6 +101,56 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
         ]);
 
         return [$enfermera, $personal, $residente, $jornada];
+    }
+
+    public function test_sueno_individual_es_consulta_con_nulos_y_cero_sin_confundirlos(): void
+    {
+        [$enfermera, $personal, $residente, $jornada] = $this->crearEscenario();
+        $this->actingAs($enfermera);
+        $vista = Livewire::withQueryParams(['cuidado' => 'sueno', 'tipo' => 'SUENO'])
+            ->test(RegistrosEnfermeria::class, ['codResidente' => $residente->cod_residente]);
+        $vista->assertSee('Sin registros de sueño')->assertDontSee('Nuevo cuidado');
+        \App\Models\RegistroSueno::create([
+            'cod_registro_sueno' => 'RSU_CONSULTA', 'cod_residente' => $residente->cod_residente,
+            'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada,
+            'fecha' => today(), 'horas_sueno' => 0, 'despertares' => 0,
+            'insomnio' => null, 'somnolencia_diurna' => false, 'agitacion_nocturna' => true,
+            'observacion' => 'Observación sintética de descanso.', 'estado' => 'VIGENTE',
+        ]);
+        $vista->call('$refresh')->assertSee('0 h')->assertSee('No registrado')->assertSee('Solo consulta')
+            ->assertSee('Observación sintética de descanso.')->assertDontSee('Registrar sueño');
+        $this->assertStringNotContainsString('<form', $vista->html());
+        $this->assertDatabaseCount('registros_sueno', 1);
+        AsignacionResidenteJornada::where('cod_residente', $residente->cod_residente)->update(['estado' => 'FINALIZADA']);
+        $vista->call('$refresh')->assertStatus(403);
+    }
+
+    public function test_curaciones_sucesivas_preservan_historial_y_error_no_borra_captura(): void
+    {
+        [$enfermera, $personal, $residente, $jornada] = $this->crearEscenario();
+        $this->actingAs($enfermera);
+        $herida = Herida::create(['cod_herida' => 'HER_UI_HISTORY', 'cod_residente' => $residente->cod_residente,
+            'cod_personal' => $personal->cod_personal, 'tipo_herida' => 'LACERACION', 'ubicacion' => 'Antebrazo',
+            'fecha_hora_identificacion' => now(), 'estado' => 'ACTIVA']);
+        $vista = Livewire::withQueryParams(['cuidado' => 'heridas', 'seccion' => 'HERIDAS'])
+            ->test(RegistrosEnfermeria::class, ['codResidente' => $residente->cod_residente]);
+        $vista->set('lesionId', $herida->cod_herida)->set('aspectoLesion', 'Bordes observados')
+            ->call('guardarSeguimientoLesion')->assertHasErrors('accionLesion')
+            ->assertSet('aspectoLesion', 'Bordes observados')->assertNotDispatched('swal');
+        $this->assertDatabaseCount('curaciones_herida', 0);
+        $vista->set('accionLesion', 'Primer procedimiento de prueba')->set('observacionLesion', 'Primer control conservado')
+            ->call('guardarSeguimientoLesion')->assertHasNoErrors();
+        $vista->set('lesionId', $herida->cod_herida)->set('aspectoLesion', 'Segundo aspecto observado')
+            ->set('accionLesion', 'Segundo procedimiento de prueba')->call('guardarSeguimientoLesion')
+            ->assertHasNoErrors()->assertSee('Primer procedimiento de prueba')->assertSee('Segundo procedimiento de prueba');
+        $this->assertDatabaseCount('curaciones_herida', 2);
+        $this->assertDatabaseHas('curaciones_herida', ['cod_herida' => $herida->cod_herida,
+            'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada,
+            'observacion' => 'Primer control conservado']);
+        $vista->set('resultadoCierreLesion', 'Resultado de prueba')->set('motivoCierreLesion', 'Cierre documentado de prueba')
+            ->call('cerrarLesion', $herida->cod_herida)->assertHasNoErrors()->assertSee('Cerrada')
+            ->assertSee('Primer procedimiento de prueba')->assertSee('Segundo procedimiento de prueba');
+        $this->assertDatabaseCount('curaciones_herida', 2);
     }
 
     public function test_registros_enfermeria_carga_sin_buscar_relaciones_v1_ni_consultar_tablas_v1(): void
@@ -438,7 +486,7 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
 
         $this->actingAs($inactivo);
 
-        $adulto = AdultoMayor::query()->findOrFail($residente->cod_residente);
+        $adulto = Residente::query()->findOrFail($residente->cod_residente);
         $component = new FichaPaciente();
         $component->adultoMayor = $adulto;
         $component->nuevoEventoTipo = 'CAIDA';
@@ -455,7 +503,7 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
         [$enfermera, $personal, $residente, $jornada] = $this->crearEscenario();
         $this->actingAs($enfermera);
 
-        $area = AreaInstitucional::first();
+        $area = Area::first();
         $med = Medicamento::query()->create([
             'cod_medicamento' => 'MED_CRIT_01',
             'nombre_comercial' => 'Paracetamol 500mg',

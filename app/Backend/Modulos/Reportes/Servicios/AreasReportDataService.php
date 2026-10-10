@@ -2,7 +2,7 @@
 
 namespace App\Backend\Modulos\Reportes\Servicios;
 
-use App\Models\AreaInstitucional;
+use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -41,7 +41,7 @@ class AreasReportDataService
 
     public function getAreaReportData($codArea): array
     {
-        $area = $this->prepararArea(AreaInstitucional::query()->with('asignaciones.personal.usuario.roles')->findOrFail($codArea));
+        $area = $this->prepararArea(Area::query()->with('asignaciones.personal.usuario.roles')->findOrFail($codArea));
         $totalUsuarios = $area->usuarios->count();
         $usuariosActivos = $area->usuarios->where('estado', 'ACTIVO')->count();
 
@@ -63,9 +63,17 @@ class AreasReportDataService
         return ['labels' => $areas->pluck('nombre')->all(), 'data' => $areas->pluck('usuarios_count')->all()];
     }
 
-    public function getAreasPorTipo(): array
+    public function getAreasPorEstado(): array
     {
-        return ['labels' => ['INSTITUCIONAL'], 'data' => [AreaInstitucional::query()->count()]];
+        $areas = Area::query()->get(['estado']);
+
+        return [
+            'labels' => ['Activas', 'Inactivas'],
+            'data' => [
+                $areas->whereIn('estado', ['ACTIVA', 'ACTIVO'])->count(),
+                $areas->whereIn('estado', ['INACTIVA', 'INACTIVO'])->count(),
+            ],
+        ];
     }
 
     public function getActivosInactivosPorArea(): array
@@ -111,17 +119,18 @@ class AreasReportDataService
 
     private function areasConUsuarios(): EloquentCollection
     {
-        return AreaInstitucional::query()->with('asignaciones.personal.usuario.roles')->orderBy('nombre')->get()
-            ->map(fn (AreaInstitucional $area) => $this->prepararArea($area));
+        return Area::query()->with('asignaciones.personal.usuario.roles')->orderBy('nombre')->get()
+            ->map(fn (Area $area) => $this->prepararArea($area));
     }
 
-    private function prepararArea(AreaInstitucional $area): AreaInstitucional
+    private function prepararArea(Area $area): Area
     {
         // En V2 áreas no almacena responsable_id ni usuarios directos. Ambos se
         // derivan de asignaciones_personal para respetar el esquema congelado.
-        $usuarios = $area->asignaciones->pluck('personal.usuario')->filter()->unique('cod_usuario')
+        $asignacionesActivas = $area->asignaciones->whereIn('estado', ['ACTIVA', 'ACTIVO']);
+        $usuarios = $asignacionesActivas->pluck('personal.usuario')->filter()->unique('cod_usuario')
             ->sortBy(fn (User $usuario) => $usuario->name)->values();
-        $responsable = $area->asignaciones
+        $responsable = $asignacionesActivas
             ->first(fn ($asignacion) => in_array($asignacion->tipo_asignacion, ['RESPONSABLE', 'PRINCIPAL'], true))
             ?->personal?->usuario;
         // Las relaciones calculadas mantienen las vistas existentes sin generar

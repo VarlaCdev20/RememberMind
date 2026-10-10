@@ -3,7 +3,7 @@
 namespace App\Frontend\Livewire\Medico\Clinica;
 
 use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\NotaClinica;
 use App\Models\Prescripcion;
 use App\Models\SignoVital;
@@ -115,7 +115,7 @@ class PacientesSeguimientoPanel extends Component
         $estadosActivos = ['ACTIVO', 'ADMITIDO', 'ASIGNADO', 'EN_SEGUIMIENTO_ACTIVO', 'OBSERVADO', 'SEGUIMIENTO_ESPECIAL'];
         $estadosPendientes = ['VALORACION_MEDICA', 'DECISION_ADMISION'];
 
-        $base = AdultoMayor::query();
+        $base = Residente::query();
 
         if ($this->busqueda) {
             $busq = trim($this->busqueda);
@@ -144,9 +144,9 @@ class PacientesSeguimientoPanel extends Component
         $pacientes = $base->orderBy('nombres')->paginate(20);
 
         // Counts for tab badges
-        $cntActivos = AdultoMayor::whereIn('estado', $estadosActivos)->count();
-        $cntPendientes = AdultoMayor::whereIn('estado', $estadosPendientes)->count();
-        $cntInterconsultas = AdultoMayor::whereIn('estado', $estadosActivos)
+        $cntActivos = Residente::whereIn('estado', $estadosActivos)->count();
+        $cntPendientes = Residente::whereIn('estado', $estadosPendientes)->count();
+        $cntInterconsultas = Residente::whereIn('estado', $estadosActivos)
             ->whereHas('notas', fn ($q) => $q->where('tipo_nota', 'INTERCONSULTA')->where('estado', 'ACTIVO'))
             ->count();
 

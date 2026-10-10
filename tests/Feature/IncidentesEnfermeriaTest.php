@@ -15,7 +15,7 @@ use App\Models\Jornada;
 use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\ResidenteContacto;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -74,7 +74,7 @@ class IncidentesEnfermeriaTest extends TestCase
             'estado' => 'ACTIVO'
         ]);
 
-        $turno = TurnoEnfermeria::create([
+        $turno = Turno::create([
             'cod_turno' => 'TUR_INC_TEST',
             'nombre' => 'Turno incidentes',
             'hora_inicio' => '00:00:00',

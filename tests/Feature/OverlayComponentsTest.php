@@ -64,6 +64,6 @@ class OverlayDrawerFixture extends Component
 
     public function render(): string
     {
-        return '<div><x-ui.drawer-livewire wire:model="abierto" title="Seguimiento" close-method="cerrarDrawer">Contenido</x-ui.drawer-livewire></div>';
+        return '<div><x-ui.drawer-livewire wire:model="abierto" title="Seguimiento" close-method="cerrarDrawer" :dismiss-on-backdrop="false">Contenido</x-ui.drawer-livewire></div>';
     }
 }

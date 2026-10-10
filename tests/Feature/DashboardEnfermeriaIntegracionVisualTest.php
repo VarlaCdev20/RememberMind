@@ -37,7 +37,10 @@ class DashboardEnfermeriaIntegracionVisualTest extends TestCase
 
         $this->assertSame(1, substr_count($html, '<h1'));
         $this->assertMatchesRegularExpression('~<header[^>]*class="[^"]*rm-nursing-dashboard__welcome[^\"]*"~', $html);
-        $this->assertMatchesRegularExpression('~class="rm-dashboard-header__visual">\s*<img src="[^"]*/images/FOTOS CENTRO DE ADULTOS MAYORES/[^"]+"~', $html);
+        $this->assertStringNotContainsString('rm-dashboard-header--compact', $html);
+        $this->assertStringContainsString('class="rm-dashboard-header__visual"', $html);
+        $this->assertStringContainsString('489963938_1158744422930145_8442506970304201426_n.jpg', $html);
+        $this->assertStringContainsString('rm-dashboard-divider', $html);
         $this->assertSame(1, substr_count($html, 'ph-bell text-lg'));
         $this->assertStringNotContainsString('nursing-welcome-search', $html);
         $this->assertStringNotContainsString('Buscar residente, habitación o diagnóstico...', $html);
@@ -51,13 +54,22 @@ class DashboardEnfermeriaIntegracionVisualTest extends TestCase
         $this->assertStringContainsString('Sin contexto del turno', $html);
         $this->assertStringNotContainsString('No hay situaciones que requieran atención inmediata.', $html);
 
-        foreach (['Pacientes del turno', 'Alertas prioritarias', 'Evolución de incidentes',
+        foreach (['Residentes del turno', 'Alertas prioritarias', 'Evolución de incidentes',
             'Estado de seguimiento', 'Cuidados pendientes', 'Agenda de medicación y cuidados',
-            'Tareas del turno', 'Ubicación de pacientes', 'Conducta y estado emocional'] as $titulo) {
+            'Tareas del turno', 'Ubicación de residentes', 'Conducta y estado emocional', 'Controles por residente'] as $titulo) {
             $this->assertStringContainsString($titulo, $html);
         }
         $this->assertStringNotContainsString('Ocupación de camas', $html);
         $this->assertStringNotContainsString('Tendencia de ocupación', $html);
+        $anterior = -1;
+        foreach (['aria-label="Alertas prioritarias"', 'id="nursing-schedule-title"',
+            'id="nursing-tasks-title"', 'id="nursing-controls-title"', 'id="nursing-notes-title"',
+            'aria-label="Residentes del turno"'] as $seccion) {
+            $posicion = strpos($html, $seccion);
+            $this->assertNotFalse($posicion, $seccion);
+            $this->assertGreaterThan($anterior, $posicion, 'El orden de lectura sigue la prioridad operacional.');
+            $anterior = $posicion;
+        }
     }
 
     public function test_actualizacion_del_turno_cambia_la_fecha_al_iniciar_un_nuevo_dia(): void

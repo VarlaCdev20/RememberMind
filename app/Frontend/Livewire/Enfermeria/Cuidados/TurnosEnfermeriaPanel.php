@@ -2,7 +2,7 @@
 
 namespace App\Frontend\Livewire\Enfermeria\Cuidados;
 
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
@@ -33,7 +33,7 @@ class TurnosEnfermeriaPanel extends Component
     public function abrirEditar(string $id): void
     {
         abort_unless(auth()->user()?->can('turnos.gestionar'), 403);
-        $t = TurnoEnfermeria::findOrFail($id);
+        $t = Turno::findOrFail($id);
         $this->editandoId  = $id;
         $this->nombre      = $t->nombre;
         $this->horaInicio  = substr($t->hora_inicio, 0, 5);
@@ -75,10 +75,10 @@ class TurnosEnfermeriaPanel extends Component
         ];
 
         if ($this->editandoId) {
-            TurnoEnfermeria::findOrFail($this->editandoId)->update($datos);
+            Turno::findOrFail($this->editandoId)->update($datos);
             $msg = 'Turno actualizado correctamente.';
         } else {
-            TurnoEnfermeria::create($datos + ['cod_turno' => 'TUR_'.Str::upper(Str::random(12))]);
+            Turno::create($datos + ['cod_turno' => 'TUR_'.Str::upper(Str::random(12))]);
             $msg = 'Turno registrado correctamente.';
         }
 
@@ -95,7 +95,7 @@ class TurnosEnfermeriaPanel extends Component
     public function render()
     {
         return view('livewire.cuidados.turnos-enfermeria-panel', [
-            'turnos' => TurnoEnfermeria::orderBy('orden')->get(),
+            'turnos' => Turno::orderBy('orden')->get(),
         ])->layout('layouts.sistema');
     }
 }

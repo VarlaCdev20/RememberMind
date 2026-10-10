@@ -172,36 +172,35 @@
  <x-ui.collection-results title="Registro de participaciones" :count="$participaciones->total()" label="registros">
  <div class="p-5">
  @if($participaciones->isEmpty())
- <div class="flex flex-col items-center gap-3 py-10 text-center">
- <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-fondo-panel">
- <i class="ph-bold ph-users-four text-2xl text-apoyo"></i>
- </span>
- @if($search || $filtroTipo || $filtroEstado || $filtroFechaDesde || $filtroFechaHasta)
- <p class="text-sm font-bold text-apoyo">No se encontraron participaciones con los filtros seleccionados.</p>
- @else
- <p class="text-sm font-bold text-apoyo">No hay participaciones registradas.</p>
- <p class="max-w-sm text-xs font-bold text-apoyo">Registre la primera participación usando el botón"Registrar participación".</p>
- @endif
- </div>
- @else
- <div class="overflow-x-auto"
- wire:loading.class="opacity-50 transition-opacity"
- wire:target="search,filtroTipo,filtroEstado,filtroFechaDesde,filtroFechaHasta">
- <table class="rm-data-table rm-data-table--actions rm-table w-full min-w-[800px] text-xs">
- <thead>
- <tr class="border-b border-borde-suave">
- <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Residente</th>
- <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Tipo actividad</th>
- <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Fecha</th>
- <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Hora</th>
- <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Estado</th>
- <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Observación</th>
- <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Actualización</th>
- <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Acciones</th>
- </tr>
- </thead>
- <tbody class="divide-y divide-[var(--rm-border)]/30">
- @foreach($participaciones as $p)
+        <div class="py-4">
+            <x-ui.empty-state
+                compact
+                icono="ph-users-four"
+                titulo="Sin participaciones encontradas"
+                :texto="$search || $filtroTipo || $filtroEstado || $filtroFechaDesde || $filtroFechaHasta ? 'No se encontraron participaciones con los filtros seleccionados.' : 'No hay participaciones registradas en este momento.'"
+                :actionMethod="$search || $filtroTipo || $filtroEstado || $filtroFechaDesde || $filtroFechaHasta ? 'limpiarFiltros' : null"
+                actionText="Restablecer filtros"
+            />
+        </div>
+        @else
+        <div class="overflow-x-auto"
+            wire:loading.class="opacity-50 transition-opacity"
+            wire:target="search,filtroTipo,filtroEstado,filtroFechaDesde,filtroFechaHasta">
+            <table class="rm-data-table rm-data-table--actions rm-table w-full min-w-[800px] text-xs">
+                <thead>
+                    <tr class="border-b border-borde-suave">
+                        <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Residente</th>
+                        <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Tipo actividad</th>
+                        <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Fecha</th>
+                        <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Hora</th>
+                        <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Estado</th>
+                        <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Observación</th>
+                        <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Actualización</th>
+                        <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[var(--rm-border)]/30">
+        @foreach($participaciones as $p)
  @php
  $ne = \App\Models\Actividad::normalizarEstado($p->estado ?? '');
  @endphp
@@ -227,9 +226,7 @@
  {{ $p->hora ? substr($p->hora, 0, 5) : '—' }}
  </td>
  <td class="py-3 pr-4">
- <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide {{ $ne['clase'] }}">
- {{ $ne['etiqueta'] }}
- </span>
+ <x-ui.status-badge :estado="$p->estado" />
  </td>
  <td class="py-3 pr-4 max-w-[140px] truncate text-apoyo">
  {{ $p->obs ? mb_substr($p->obs, 0, 40) . (mb_strlen($p->obs) > 40 ? '…' : '') : '—' }}
@@ -344,7 +341,7 @@
  {{-- ════════════════════════════════════════════════════════════════════════ --}}
  @if($modalRegistrar)
  <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8"
- style="background: rgba(47,62,92,0.50)"
+ class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8 bg-[var(--rm-modal-backdrop,rgba(47,62,92,0.6))] backdrop-blur-sm"
  wire:click.self="cerrarModales">
  <div class="w-full max-w-xl overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-2xl">
  <div class="h-1 bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
@@ -439,7 +436,7 @@
  {{-- ════════════════════════════════════════════════════════════════════════ --}}
  @if($modalEditar)
  <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8"
- style="background: rgba(47,62,92,0.50)"
+ class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8 bg-[var(--rm-modal-backdrop,rgba(47,62,92,0.6))] backdrop-blur-sm"
  wire:click.self="cerrarModales">
  <div class="w-full max-w-xl overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-2xl">
  <div class="h-1 bg-gradient-to-r from-[var(--rm-warning)] via-[var(--rm-accent-terracotta)] to-[var(--rm-action-primary)]"></div>
@@ -535,7 +532,7 @@
  $edad = $am?->fecha_nac ? \Carbon\Carbon::parse($am->fecha_nac)->age : null;
  @endphp
  <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8"
- style="background: rgba(47,62,92,0.50)"
+ class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8 bg-[var(--rm-modal-backdrop,rgba(47,62,92,0.6))] backdrop-blur-sm"
  wire:click.self="cerrarModales">
  <div class="w-full max-w-xl overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-2xl">
  <div class="h-1 bg-gradient-to-r from-[var(--rm-action-primary)] via-[var(--rm-warning)] to-[var(--rm-accent-terracotta)]"></div>
@@ -550,9 +547,7 @@
  </div>
  </div>
  <div class="flex items-center gap-2">
- <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[9px] font-bold uppercase tracking-wide {{ $ne['clase'] }}">
- {{ $ne['etiqueta'] }}
- </span>
+ <x-ui.status-badge :estado="$detalle->estado" />
  <button wire:click="cerrarModales" class="flex h-8 w-8 items-center justify-center rounded-xl border border-borde-suave text-apoyo transition hover:border-borde-focus hover:text-boton-acento">
  <i class="ph-bold ph-x text-sm"></i>
  </button>

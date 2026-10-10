@@ -137,8 +137,12 @@ class RegistroSignosVitalesModal extends Component
             }
 
             return;
-        } catch (\Exception $e) {
-            $this->addError('general', $e->getMessage());
+        } catch (\Throwable $e) {
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                throw $e;
+            }
+            report($e);
+            $this->addError('general', 'No se pudieron registrar los signos vitales. Inténtelo nuevamente.');
         }
     }
 

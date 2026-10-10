@@ -29,9 +29,10 @@ class DocumentoController extends Controller
         abort_unless($request->user()->can('documentos.ver'), 403);
         if ($documento->cod_residente) {
             $this->authorize('view', Residente::query()->findOrFail($documento->cod_residente));
+            abort_if($request->user()->hasRole('FAMILIAR'), 403, 'Este documento no está publicado para familiares.');
         }
         if ($request->user()->hasRole('FAMILIAR') && ! $documento->cod_residente) {
-            $contactos = $request->user()->contactos()->pluck('cod_contacto');
+            $contactos = $request->user()->contactos()->where('estado', 'ACTIVO')->pluck('cod_contacto');
             abort_unless(
                 $documento->cod_usuario === $request->user()->cod_usuario
                 || ($documento->cod_contacto && $contactos->contains($documento->cod_contacto)),

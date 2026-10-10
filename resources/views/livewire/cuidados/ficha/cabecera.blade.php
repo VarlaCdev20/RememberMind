@@ -7,6 +7,9 @@
         subtitle="Una visión completa para un cuidado más humano"
         :overline="(Auth::user()?->hasRole('MEDICO GENERAL/GERIATRA') || Auth::user()?->can('valoracion_medica.ver')) ? 'Área médica y clínica' : 'Enfermería y cuidados'"
         icon="ph-identification-card">
+            @can('consultarResultados', [\App\Models\EvaluacionExperta::class, $adultoMayor])
+                <a href="{{ route(auth()->user()->hasRole('ENFERMEROS') && !auth()->user()->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'SUPERADMINISTRADOR']) ? 'admin.enfermeria.pacientes.resultados-experto' : 'admin.medico.residente.resultados-experto', ['residente' => $adultoMayor->cod_residente]) }}" class="rm-btn rm-btn-secondary min-h-11 whitespace-normal"><i class="ph ph-brain" aria-hidden="true"></i> Resultados cognitivos</a>
+            @endcan
             {{-- Botón Imprimir --}}
             <x-ui.action-button variant="secondary" size="sm" icono="ph-printer" onclick="window.print()">
                 Imprimir

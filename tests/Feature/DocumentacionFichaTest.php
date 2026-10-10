@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Documento;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -18,7 +18,7 @@ class DocumentacionFichaTest extends TestCase
     use RefreshDatabase;
 
     private User $usuario;
-    private AdultoMayor $residente;
+    private Residente $residente;
 
     protected function setUp(): void
     {
@@ -33,7 +33,7 @@ class DocumentacionFichaTest extends TestCase
         $this->usuario->assignRole('ADMINISTRADOR');
         $this->actingAs($this->usuario);
 
-        $this->residente = AdultoMayor::factory()->create([
+        $this->residente = Residente::factory()->create([
             'nombres' => 'Carmen',
             'ap_paterno' => 'Mendoza',
             'ap_materno' => 'Ramos',

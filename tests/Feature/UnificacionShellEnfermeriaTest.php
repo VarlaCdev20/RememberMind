@@ -55,7 +55,6 @@ class UnificacionShellEnfermeriaTest extends TestCase
             $response->assertSee('CUIDADO');
             $response->assertSee('CUIDADOS');
             $response->assertSee('MEDICACIÓN');
-            $response->assertSee('CONTINUIDAD');
             $response->assertSee('PASE DE TURNO');
             $response->assertSee('INCIDENTES');
             $response->assertSee('ALERTAS');

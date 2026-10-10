@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Residentes;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Residentes\StoreFamiliarAdultoRequest;
-use App\Models\AdultoMayor;
+use App\Models\Residente;
 use App\Models\Contacto;
 use App\Models\ResidenteContacto;
 use Illuminate\Http\Request;
@@ -14,12 +14,12 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class AdultoMayorFamiliarController extends Controller
 {
-    public function index(AdultoMayor $adulto_mayor): RedirectResponse
+    public function index(Residente $adulto_mayor): RedirectResponse
     {
         return $this->volver($adulto_mayor);
     }
 
-    public function store(StoreFamiliarAdultoRequest $request, AdultoMayor $adulto_mayor): RedirectResponse
+    public function store(StoreFamiliarAdultoRequest $request, Residente $adulto_mayor): RedirectResponse
     {
         $data = $request->validated();
 
@@ -60,7 +60,7 @@ class AdultoMayorFamiliarController extends Controller
         return $this->volver($adulto_mayor)->with('success', 'Contacto vinculado correctamente.');
     }
 
-    public function update(Request $request, AdultoMayor $adulto_mayor, string $familiar): RedirectResponse
+    public function update(Request $request, Residente $adulto_mayor, string $familiar): RedirectResponse
     {
         $data = $request->validate([
             'parentesco_vinculo' => ['required', 'string', 'max:40'],
@@ -88,14 +88,14 @@ class AdultoMayorFamiliarController extends Controller
         return $this->volver($adulto_mayor)->with('success', 'Vínculo actualizado correctamente.');
     }
 
-    public function destroy(AdultoMayor $adulto_mayor, string $familiar): RedirectResponse
+    public function destroy(Residente $adulto_mayor, string $familiar): RedirectResponse
     {
         $this->vinculo($adulto_mayor, $familiar)->update(['estado' => 'INACTIVO']);
 
         return $this->volver($adulto_mayor)->with('success', 'Vínculo desactivado correctamente.');
     }
 
-    public function restore(AdultoMayor $adulto_mayor, string $familiar): RedirectResponse
+    public function restore(Residente $adulto_mayor, string $familiar): RedirectResponse
     {
         $this->vinculo($adulto_mayor, $familiar)->update(['estado' => 'ACTIVO']);
 
@@ -117,7 +117,7 @@ class AdultoMayorFamiliarController extends Controller
         ]);
     }
 
-    private function vinculo(AdultoMayor $adulto, string $id): ResidenteContacto
+    private function vinculo(Residente $adulto, string $id): ResidenteContacto
     {
         return ResidenteContacto::query()
             ->where('cod_residente', $adulto->cod_residente)
@@ -127,7 +127,7 @@ class AdultoMayorFamiliarController extends Controller
             ->firstOrFail();
     }
 
-    private function volver(AdultoMayor $adulto): RedirectResponse
+    private function volver(Residente $adulto): RedirectResponse
     {
         return new RedirectResponse(route('admin.adultos-mayores.show', [
             'adulto_mayor' => $adulto->cod_residente,

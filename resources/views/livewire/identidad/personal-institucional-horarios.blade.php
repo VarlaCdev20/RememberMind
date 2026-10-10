@@ -86,7 +86,7 @@
    <select wire:model="f_cod_area" class="w-full rounded-xl border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
    <option value="">Seleccione un área...</option>
    @foreach($areas as $area)
-    <option value="{{ $area['cod_area'] }}">{{ $area['nombre'] }}{{ $area['tipo_area'] ? ' ('.$area['tipo_area'].')' : '' }}</option>
+    <option value="{{ $area['cod_area'] }}">{{ $area['nombre'] }}</option>
    @endforeach
    </select>
    @error('f_cod_area') <span class="text-xs text-estado-peligro mt-1 block">{{ $message }}</span> @enderror

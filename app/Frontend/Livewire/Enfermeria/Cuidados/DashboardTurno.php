@@ -19,7 +19,7 @@ use App\Models\Atencion;
 use App\Models\EjecucionCuidado;
 use App\Models\Prescripcion;
 use App\Models\Residente;
-use App\Models\TurnoEnfermeria;
+use App\Models\Turno;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -185,7 +185,7 @@ class DashboardTurno extends Component
     public function loadTurnoActual()
     {
         $service = app(TurnoEnfermeriaService::class);
-        $this->turnosActivos = TurnoEnfermeria::activos()->orderBy('orden')->get();
+        $this->turnosActivos = Turno::activos()->orderBy('orden')->get();
         $this->turnoActual = $service->obtenerTurnoActivo(Auth::user(), $this->filtroFecha);
 
         $this->pacientesAsignadosIds = $service->esSuperAdmin(Auth::user())

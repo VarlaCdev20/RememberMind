@@ -86,7 +86,10 @@ class RolesVistasPermisosMatrixTest extends TestCase
 
         // Rutas clave del administrador
         $this->get(route('admin.adultos-mayores.index'))->assertOk();
-        $this->get(route('admin.habitaciones.index'))->assertOk();
+        // El directorio antiguo redirige al explorador administrativo vigente.
+        $this->get(route('admin.habitaciones.index'))
+            ->assertRedirect(route('admin.administracion.habitaciones'));
+        $this->get(route('admin.administracion.habitaciones'))->assertOk();
         $this->get(route('admin.turnos-enfermeria.index'))->assertOk();
         $this->get(route('admin.actividades.index'))->assertOk();
         $this->get(route('admin.usuarios.index'))->assertForbidden();

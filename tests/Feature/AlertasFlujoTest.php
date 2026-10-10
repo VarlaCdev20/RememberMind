@@ -48,14 +48,14 @@ class AlertasFlujoTest extends TestCase
             ->set('filtroEstado', 'CERRADA')
             ->call('verDetalle', $alerta->cod_alerta)->assertSee('Se informa al equipo responsable.');
         $this->assertSame('CERRADA', $alerta->fresh()->estado);
-        $this->assertSame(4, $alerta->eventos()->count());
+        $this->assertSame(5, $alerta->eventos()->count());
         $this->assertEqualsCanonicalizing(
-            ['ASIGNACION', 'INTERVENCION', 'SEGUIMIENTO', 'CIERRE'],
+            ['CREACION', 'ASIGNACION', 'INTERVENCION', 'SEGUIMIENTO', 'CIERRE'],
             $alerta->eventos()->pluck('tipo_evento')->all(),
         );
         $this->assertSame($user->cod_usuario, $alerta->eventos()->latest('fecha_hora')->value('cod_usuario'));
         $panel->set('accion', 'Intento de cambiar el historial.')->call('guardarAccion')->assertStatus(409);
-        $this->assertSame(4, $alerta->eventos()->count());
+        $this->assertSame(5, $alerta->eventos()->count());
     }
 
     public function test_lectura_no_permite_mutar_y_los_filtros_no_mezclan_estados(): void

@@ -182,6 +182,8 @@ class CuidadoController extends Controller
             'pendientes' => ['nullable', 'string'], 'vigilancia' => ['nullable', 'string'],
             'recomendacion' => ['nullable', 'string'],
         ]);
+        app(\App\Backend\Modulos\Enfermeria\Servicios\PaseTurnoService::class)
+            ->validarContextoEmision($request->user(), $residente->cod_residente, $datos);
         return response()->json(PaseTurno::query()->create([
             'cod_pase' => $this->codigo('PAS'), 'cod_residente' => $residente->cod_residente,
             'cod_personal_saliente' => $personal->cod_personal, ...$datos,

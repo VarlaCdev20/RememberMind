@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Backend\Modulos\Admisiones\Acciones\FormalizarAdmision;
+use App\Backend\Modulos\SistemaExperto\Conocimiento\InventarioExperto;
 use App\Models\AdministracionMedicacion;
 use App\Models\Admision;
 use App\Models\AplicacionInstrumento;
@@ -65,7 +66,7 @@ class BddOperativaV2Test extends TestCase
             static fn (string $tabla): string => (string) str($tabla)->afterLast('.'),
             Schema::getTableListing()
         );
-        $reales = array_values(array_diff($listado, $tecnicas));
+        $reales = InventarioExperto::excluirDelInventarioOperativo(array_diff($listado, $tecnicas));
         sort($esperadas);
         sort($reales);
 
@@ -331,6 +332,7 @@ class BddOperativaV2Test extends TestCase
     private function escenarioAdmision(bool $contactoConCuenta = false): array
     {
         $usuario = User::factory()->create();
+        $usuario->assignRole('ADMINISTRADOR');
         $usuario->givePermissionTo('admisiones.formalizar');
         $familiar = $contactoConCuenta ? $this->usuarioRol('familiar@test.local','FAMILIAR') : null;
         $contacto = Contacto::query()->create(['cod_contacto'=>'CTO_1','cod_usuario'=>$familiar?->cod_usuario,'nombres'=>'Ana','apellido_paterno'=>'Pérez','estado'=>'ACTIVO']);

@@ -67,7 +67,6 @@
  <thead>
  <tr>
  <th style="width: 25%;">Nombre del Área</th>
- <th style="width: 15%;">Tipo de Área</th>
  <th style="width: 25%;">Responsable del Área</th>
  <th style="width: 10%; text-align: center;">Activos</th>
  <th style="width: 10%; text-align: center;">Inactivos</th>
@@ -78,12 +77,11 @@
  @foreach ($areas as $area)
  <tr>
  <td><strong>{{ $area['nombre'] }}</strong></td>
- <td>{{ $area['tipo_area'] }}</td>
  <td>{{ $area['responsable_nombre'] ?? 'Sin asignar' }}</td>
  <td style="text-align: center;">{{ $area['usuarios_activos_count'] }}</td>
  <td style="text-align: center;">{{ $area['usuarios_inactivos_count'] }}</td>
  <td style="text-align: center;">
- <span class="badge-status {{ $area['estado'] === 'ACTIVA' ? 'badge-active' : 'badge-inactive' }}">
+ <span class="badge-status {{ in_array($area['estado'], ['ACTIVO', 'ACTIVA'], true) ? 'badge-active' : 'badge-inactive' }}">
  {{ $area['estado'] }}
  </span>
  </td>
@@ -94,7 +92,7 @@
 
  @php
  $sinResponsableList = collect($areas)->filter(fn($a) => $a['responsable_nombre'] === 'Sin asignar' || !$a['responsable_nombre']);
- $inactivasList = collect($areas)->filter(fn($a) => $a['estado'] === 'INACTIVA');
+ $inactivasList = collect($areas)->filter(fn($a) => in_array($a['estado'], ['INACTIVO', 'INACTIVA'], true));
  @endphp
 
  @if($sinResponsableList->count() > 0 || $inactivasList->count() > 0)
@@ -119,4 +117,3 @@
  <strong>Nota Administrativa de Seguridad:</strong> La asignación de personal a cada área y la vigencia del Responsable son clave para la trazabilidad de la auditoría y bitácora de eventos del sistema. Asegúrese de realizar revisiones de seguridad y roles periódicamente.
  </div>
 @endsection
-

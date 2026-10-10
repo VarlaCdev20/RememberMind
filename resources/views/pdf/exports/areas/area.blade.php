@@ -13,17 +13,13 @@
  <td class="value-detail"><strong>{{ $area->nombre }}</strong></td>
  </tr>
  <tr>
- <td class="label-detail">Clasificación / Tipo:</td>
- <td class="value-detail">{{ $area->tipo_area }}</td>
- </tr>
- <tr>
  <td class="label-detail">Responsable Asignado:</td>
  <td class="value-detail"><strong>{{ $area->responsable ? $area->responsable->name : 'Sin Responsable Asignado' }}</strong></td>
  </tr>
  <tr>
  <td class="label-detail">Estado Operativo:</td>
  <td class="value-detail">
- <span class="badge-status {{ strtoupper($area->estado) === 'ACTIVA' ? 'badge-active' : 'badge-inactive' }}">
+ <span class="badge-status {{ in_array(strtoupper($area->estado), ['ACTIVO', 'ACTIVA'], true) ? 'badge-active' : 'badge-inactive' }}">
  {{ $area->estado }}
  </span>
  </td>
@@ -32,12 +28,6 @@
  <td class="label-detail">Descripción Operativa:</td>
  <td class="value-detail">{{ $area->descripcion ?? 'Sin descripción provista.' }}</td>
  </tr>
- @if($area->observaciones)
- <tr>
- <td class="label-detail">Observaciones del Área:</td>
- <td class="value-detail" style="color: #E27D60; font-weight: bold;">{{ $area->observaciones }}</td>
- </tr>
- @endif
  </table>
  </div>
 
@@ -115,4 +105,3 @@
  <strong>Trazabilidad y Control Interno:</strong> Todo cambio en los cargos, roles, o la inhabilitación de usuarios pertenecientes al área se registra automáticamente en la bitácora global del sistema para auditorías periódicas.
  </div>
 @endsection
-

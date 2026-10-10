@@ -18,7 +18,7 @@ class AuthenticationTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Entrar al Portal');
-        $response->assertSee('livewire.js?rm_ui=20261003&id=', false);
+        $this->assertMatchesRegularExpression('/src="[^"\s]*\/livewire(?:\.min)?\.js\?rm_ui=20261003&id=[^"\s]+"/', $response->getContent());
         $response->assertSee("correo: ''", false);
         $response->assertSee("recoverCorreo: ''", false);
         $this->assertMatchesRegularExpression('/<div x-show="\s*panel === \'login\'/u', $response->getContent());

@@ -1,5 +1,5 @@
 @if($adulto)
-    @php($hidratacionInicial = ['subtipo' => '', 'cantidadMl' => null, 'tolerancia' => '', 'cambioBasal' => 'SIN_CAMBIOS', 'dolor' => null, 'motivo' => '', 'observacion' => ''])
+    @php($hidratacionInicial = ['subtipo' => '', 'cantidadMl' => null, 'tolerancia' => '', 'observacion' => ''])
     <x-ui.section-card :title="trim($adulto->nombres.' '.$adulto->ap_paterno.' '.$adulto->ap_materno)" subtitle="Hidratación · Registros del residente" icon="ph-drop" class="rm-clinical-workspace__context">
         <div class="rm-clinical-workspace__actions">
             <p class="rm-clinical-form__note">Cada aporte de líquido queda guardado como un nuevo registro.</p>
@@ -38,7 +38,7 @@
                 <x-validation-errors />
                 <p class="rm-clinical-form__note"><i class="ph-bold ph-lock" aria-hidden="true"></i> Fecha y hora automáticas al guardar.</p>
                 <x-ui.form-section title="Aporte de líquido" icon="ph-drop" :columns="2" class="rm-clinical-form__section">
-                    <x-ui.field label="Tipo de líquido o cuidado realizado" for="hidratacion-tipo" error="subtipo" :required="true">
+                    <x-ui.field label="Tipo de líquido" for="hidratacion-tipo" error="subtipo">
                         <input id="hidratacion-tipo" class="rm-input" wire:model="subtipo" type="text" maxlength="60" aria-invalid="{{ $errors->has('subtipo') ? 'true' : 'false' }}" @error('subtipo') aria-describedby="hidratacion-tipo-error" @enderror>
                     </x-ui.field>
                     <x-ui.field label="Volumen administrado" for="hidratacion-volumen" error="cantidadMl" :required="true" help="Registra el volumen real, entre 1 y 10 000 mL.">
@@ -49,20 +49,11 @@
                     </x-ui.field>
                 </x-ui.form-section>
                 <x-ui.form-section title="Observaciones complementarias" icon="ph-note-pencil" :columns="2" class="rm-clinical-form__section">
-                    <x-ui.field label="Cambio respecto al estado habitual" for="hidratacion-cambio">
-                        <select id="hidratacion-cambio" class="rm-select" wire:model="cambioBasal"><option value="SIN_CAMBIOS">Sin cambios</option><option value="MEJOR">Mejor</option><option value="PEOR">Peor</option><option value="NO_EVALUABLE">No evaluable</option></select>
-                    </x-ui.field>
-                    <x-ui.field label="Dolor, de 0 a 10" for="hidratacion-dolor" error="dolor">
-                        <input id="hidratacion-dolor" class="rm-input" wire:model="dolor" type="number" min="0" max="10" step="1" inputmode="numeric" aria-invalid="{{ $errors->has('dolor') ? 'true' : 'false' }}" @error('dolor') aria-describedby="hidratacion-dolor-error" @enderror>
-                    </x-ui.field>
-                    <x-ui.field label="Motivo o incidencia" for="hidratacion-motivo" error="motivo" class="rm-clinical-form__full">
-                        <input id="hidratacion-motivo" class="rm-input" wire:model="motivo" type="text" maxlength="2000" aria-invalid="{{ $errors->has('motivo') ? 'true' : 'false' }}" @error('motivo') aria-describedby="hidratacion-motivo-error" @enderror>
-                    </x-ui.field>
                     <x-ui.field label="Observación complementaria" for="hidratacion-observacion" error="observacion" class="rm-clinical-form__full">
                         <textarea id="hidratacion-observacion" class="rm-textarea" wire:model="observacion" rows="3" maxlength="5000" aria-invalid="{{ $errors->has('observacion') ? 'true' : 'false' }}" @error('observacion') aria-describedby="hidratacion-observacion-error" @enderror></textarea>
                     </x-ui.field>
                 </x-ui.form-section>
-            </form>
+            <x-ui.clinical-clear-action /></form>
             <x-slot:footer>
                 <template x-if="clinicalDiscardOpen"><div class="rm-clinical-workspace__actions"><button type="button" class="rm-btn-secondary" @click="clinicalDiscardOpen = false">Seguir editando</button><button type="button" class="rm-btn-danger" @click="discardClinicalForm(@js($hidratacionInicial))">Salir sin guardar</button></div></template>
                 <template x-if="!clinicalDiscardOpen"><div class="rm-clinical-workspace__actions"><button type="button" class="rm-btn-secondary" @click="closeClinicalForm()" wire:loading.attr="disabled" wire:target="guardarCuidado">Cancelar</button><button type="submit" form="clinical-hydration-form" class="rm-btn-primary rm-btn-primary--confirm" wire:loading.attr="disabled" wire:target="guardarCuidado"><span wire:loading.remove wire:target="guardarCuidado">Confirmar y registrar</span><span wire:loading wire:target="guardarCuidado">Registrando…</span></button></div></template>

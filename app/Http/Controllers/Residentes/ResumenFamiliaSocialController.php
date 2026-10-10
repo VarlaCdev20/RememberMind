@@ -15,6 +15,7 @@ class ResumenFamiliaSocialController extends Controller
 {
     public function __invoke(): View
     {
+        $this->authorize('viewAny', Residente::class);
         return view('pages.familia-social.resumen', $this->dashboardData());
     }
 
