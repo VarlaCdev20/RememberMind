@@ -18,6 +18,8 @@ related_modules: []
 
 La organización canónica y sus excepciones están en el [índice](README.md) y en el [ADR aprobado](ADR_ARQUITECTURA_HIBRIDA.md). Este mapa describe el código posterior a la migración, sin redefinir reglas clínicas, permisos ni estructura de PostgreSQL. El contenido anterior de esta ruta describía el corte de Fase 2; su historial permanece en Git.
 
+La [limpieza de carpetas posterior](LIMPIEZA_CARPETAS_2026_10_10.md) conserva los doce módulos y sus cuatro capas; solo reserva con `.gitkeep` las capas principales vacías. No mantiene subdirectorios anticipados sin implementación.
+
 ## Propietarios funcionales
 
 | Módulo | Responsabilidad principal |

@@ -18,6 +18,8 @@ related_modules: []
 
 La [decisión híbrida aprobada del 10 de octubre](ADR_ARQUITECTURA_HIBRIDA.md) gobierna las ubicaciones del código. Sustituye la organización anterior Backend/Frontend. Laravel permanece en la raíz; las responsabilidades funcionales pertenecen a doce módulos.
 
+Las cuatro capas de cada propietario se conservan incluso si alguna todavía está vacía. Las subcarpetas se crean cuando existe implementación. La [limpieza posterior de archivos y carpetas](LIMPIEZA_CARPETAS_2026_10_10.md) documenta la reducción de marcadores y las comprobaciones realizadas.
+
 ## Estructura canónica
 
 ```text

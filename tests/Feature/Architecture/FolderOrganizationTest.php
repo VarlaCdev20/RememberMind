@@ -3,6 +3,7 @@
 namespace Tests\Feature\Architecture;
 
 use Illuminate\Support\Facades\File;
+use Livewire\Mechanisms\HandleRequests\EndpointResolver;
 use Tests\TestCase;
 
 class FolderOrganizationTest extends TestCase
@@ -86,7 +87,37 @@ class FolderOrganizationTest extends TestCase
         }
         $esperadas = json_decode(File::get(base_path('tests/Fixtures/Architecture/routes.json')), true, 512, JSON_THROW_ON_ERROR);
         $this->assertCount(296, $actuales);
-        $this->assertSame($esperadas, $actuales);
+        $this->assertSame(
+            $this->normalizarPrefijosLivewire($esperadas),
+            $this->normalizarPrefijosLivewire($actuales, ltrim(EndpointResolver::prefix(), '/')),
+        );
+    }
+
+    private function normalizarPrefijosLivewire(array $rutas, ?string $prefijoActual = null): array
+    {
+        // El prefijo depende de APP_KEY; los contratos y sufijos permanecen exactos.
+        $endpoints = [
+            'update', 'livewire.min.js', 'livewire.min.js.map', 'livewire.csp.min.js.map',
+            'upload-file', 'preview-file/{filename}', 'js/{component}.js',
+            'css/{component}.css', 'css/{component}.global.css',
+        ];
+
+        $normalizadas = 0;
+        foreach ($rutas as &$ruta) {
+            if (preg_match('/^livewire-[a-f0-9]{8}\/(.+)$/D', $ruta['uri'], $coincidencia)
+                && in_array($coincidencia[1], $endpoints, true)) {
+                if ($prefijoActual !== null) {
+                    $this->assertSame($prefijoActual, explode('/', $ruta['uri'], 2)[0]);
+                }
+                $ruta['uri'] = 'livewire-{hash}/'.$coincidencia[1];
+                $normalizadas++;
+            }
+        }
+        unset($ruta);
+
+        $this->assertSame(9, $normalizadas);
+
+        return $rutas;
     }
 
     private function assertNamespacesMatchPath(string $root, string $rootNamespace): void

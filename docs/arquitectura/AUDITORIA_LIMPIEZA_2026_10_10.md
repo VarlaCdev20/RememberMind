@@ -18,6 +18,8 @@ related_modules: [Alertas, Cuidados, Clinica]
 
 Auditoría y limpieza ejecutadas en ARQUI-NUEVA sobre la entrega ed9dd523e8a5287f7fc6d7d90c75aaab6fea1dc8. Se retiraron **108 archivos versionados** (315813 bytes; aproximadamente 308 KiB), seis imports sin uso y se corrigió una operación clínica que podía persistir parcialmente. No se cambió el esquema, las factories, los roles, los permisos ni las reglas/umbrales clínicos. REINICIO se conserva sin push ni merge.
 
+Esta auditoría conserva la evidencia de ese corte. La [limpieza posterior en PODEMOS-SEGUIR](LIMPIEZA_CARPETAS_2026_10_10.md) retira los 94 marcadores de subcarpetas anticipadas, deja 18 marcadores mínimos en las capas principales y retira los stubs después de comprobar que los 14 son idénticos a los del paquete instalado. Los conteos y decisiones de las secciones siguientes describen la revisión anterior.
+
 ## Hallazgos y resolución
 
 | Hallazgo | Resolución |
