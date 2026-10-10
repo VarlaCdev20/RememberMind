@@ -179,3 +179,69 @@ test('el drawer protege cambios y exige intento confirmado antes de mostrar el r
     assert.equal(state.clinicalFeedbackOpen, true);
     assert.equal(state.clinicalFormDirty, false);
 });
+
+test('limpiar restaura captura local y edición inicial sin tocar residente ni campos protegidos', () => {
+    const mutable = { id: 'observacion', type: 'text', value: 'Original', getAttribute: () => 'observacion' };
+    const context = { id: 'residente', type: 'text', value: 'RES_QA', readOnly: true, getAttribute: () => 'residente' };
+    const state = window.rmClinicalCapture();
+    const sent = [];
+    const dirty = [];
+    state.$wire = { observacion: 'Original', residente: 'RES_QA', $set: (...args) => sent.push(args) };
+    state.$dispatch = (_, value) => dirty.push(value.dirty);
+    state.$el = { querySelectorAll: () => [mutable, context], closest: () => null };
+    state.$nextTick = callback => callback();
+    state.init();
+    mutable.value = 'Cambio sin guardar';
+    state.notifyDirty();
+    assert.equal(dirty.at(-1), true);
+    state.restoreCapture();
+    assert.deepEqual(sent, [['observacion', 'Original', false]]);
+    assert.equal(context.value, 'RES_QA');
+    assert.equal(mutable.value, 'Original');
+    assert.equal(dirty.at(-1), false);
+    const event = { prevented: false, preventDefault() { this.prevented = true; } };
+    listeners.get('beforeunload')(event);
+    assert.equal(event.prevented, false);
+    mutable.value = 'Nuevo cambio';
+    listeners.get('beforeunload')(event);
+    assert.equal(event.prevented, true);
+    state.destroy();
+});
+
+test('limpiar restablece select y checkbox desde valores iniciales tras validación fallida', () => {
+    const fields = [
+        { id: 'tipo', type: 'select-one', value: 'OTRO', getAttribute: () => 'tipo' },
+        { id: 'incidente', type: 'checkbox', checked: true, value: 'on', getAttribute: () => 'incidente' },
+    ];
+    const state = window.rmClinicalCapture({ tipo: '', incidente: false });
+    state.$wire = { $set: () => {} };
+    state.$dispatch = () => {};
+    state.$el = { querySelectorAll: () => fields, closest: () => null };
+    state.$nextTick = callback => callback();
+    state.init();
+    state.restoreCapture();
+    assert.equal(fields[0].value, '');
+    assert.equal(fields[1].checked, false);
+    assert.equal(state.snapshot(), state.initialCapture);
+    state.destroy();
+});
+
+test('la limpieza incluye campos condicionales y conserva su baseline al remontarlos', () => {
+    const fields = [];
+    const state = window.rmClinicalCapture();
+    const updates = [];
+    state.$wire = { cantidad: null, $set: (...args) => updates.push(args) };
+    state.$dispatch = () => {};
+    state.$el = { querySelectorAll: () => fields, closest: () => null };
+    state.$nextTick = callback => callback();
+    state.init();
+    fields.push({ id: 'cantidad', type: 'number', value: '', getAttribute: () => 'cantidad' });
+    state.rememberCaptureFields();
+    fields[0] = { ...fields[0], value: '250' };
+    state.$wire.cantidad = 250;
+    state.rememberCaptureFields();
+    state.restoreCapture();
+    assert.deepEqual(updates, [['cantidad', null, false]]);
+    assert.equal(fields[0].value, '');
+    state.destroy();
+});

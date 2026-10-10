@@ -34,6 +34,13 @@ class CuidadosEnfermeriaService
 
     public const MOVILIDAD_OBSERVADA = ['INDEPENDIENTE', 'ASISTIDA', 'SILLA_RUEDAS', 'ENCAMADO'];
 
+    public const MOTIVOS_MOVILIDAD = ['CONTROL_DIARIO', 'CAMBIO_FUNCIONAL', 'POST_CAIDA', 'TRAS_FISIOTERAPIA', 'ANTES_TRASLADO', 'OTRO'];
+    public const ACTIVIDADES_MOVILIDAD = ['CAMINAR_HABITACION', 'CAMINAR_PASILLO', 'LEVANTARSE_CAMA', 'TRANSFERENCIA_CAMA_SILLON', 'CAMBIO_POSTURAL', 'SEDESTACION', 'BIPEDESTACION'];
+    public const ACTIVIDADES_DEAMBULACION = ['CAMINAR_HABITACION', 'CAMINAR_PASILLO'];
+    public const DISPOSITIVOS_MOVILIDAD = ['NINGUNO', 'BASTON', 'ANDADOR', 'SILLA_RUEDAS', 'BARANDILLA', 'OTRO'];
+    public const TOLERANCIAS_MOVILIDAD = ['BUENA', 'PARCIAL', 'MALA'];
+    public const CAMBIOS_HABITUALES = ['SIN_CAMBIOS', 'MEJOR', 'PEOR'];
+
     public const TRASLADOS = ['INDEPENDIENTE', 'SUPERVISION', 'AYUDA_UNA_PERSONA', 'AYUDA_DOS_PERSONAS', 'GRUA'];
 
     public const NIVELES_AYUDA = ['INDEPENDIENTE', 'SUPERVISION', 'PARCIAL', 'COMPLETA', 'UNA_PERSONA', 'DOS_PERSONAS'];
@@ -139,8 +146,72 @@ class CuidadosEnfermeriaService
     public function registrarEliminacion(string $codResidente, array $datos, User $usuario): RegistroEliminacion
     {
         $this->turnos->autorizarMutacionEnfermeria($codResidente, 'registros_eliminacion.crear', $usuario);
+        $campos = array_merge(['tipo_eliminacion'], RegistroEliminacion::COMUNES, RegistroEliminacion::URINARIOS, RegistroEliminacion::INTESTINALES);
+        if (array_diff(array_keys($datos), $campos) !== []) {
+            throw ValidationException::withMessages(['datos' => 'Utiliza los campos estructurados del formulario de eliminación.']);
+        }
+        foreach ($datos as $campo => $valor) {
+            if (is_string($valor)) {
+                $datos[$campo] = trim($valor);
+                if ($datos[$campo] === '') $datos[$campo] = null;
+            }
+        }
+        $tipo = $datos['tipo_eliminacion'] ?? null;
+        if (in_array($tipo, self::TIPOS_ELIMINACION_REGISTRO, true)) {
+            $prohibidos = $tipo === 'URINARIA' ? RegistroEliminacion::INTESTINALES : RegistroEliminacion::URINARIOS;
+            foreach ($prohibidos as $campo) {
+                if (array_key_exists($campo, $datos) && $datos[$campo] !== null) {
+                    throw ValidationException::withMessages([$campo => 'El formulario contiene datos que no corresponden a una eliminación '.strtolower($tipo).'.']);
+                }
+            }
+        }
+        $reglas = [
+            'tipo_eliminacion' => ['required', Rule::in(self::TIPOS_ELIMINACION_REGISTRO)],
+            'volumen_ml' => ['nullable', 'numeric', 'decimal:0,2', 'between:0,999999.99'],
+            'tipo_bristol' => ['nullable', 'integer', 'between:1,7'],
+            'continencia' => ['nullable', Rule::in($tipo === 'URINARIA' ? self::CONTINENCIAS_URINARIAS : self::CONTINENCIAS_INTESTINALES)],
+            'presencia_sangre' => ['nullable', 'boolean'], 'presencia_moco' => ['nullable', 'boolean'],
+            'molestia_eliminacion' => ['nullable', 'boolean'],
+            'descripcion_molestia' => ['nullable', 'string', 'max:250'],
+            'observacion' => ['nullable', 'string', 'max:5000'],
+        ];
+        foreach (RegistroEliminacion::OPCIONES as $campo => $opciones) $reglas[$campo] = ['nullable', Rule::in(array_keys($opciones))];
+        $validados = Validator::make($datos, $reglas, [
+            'tipo_eliminacion.required' => 'Selecciona el tipo de eliminación.',
+            'tipo_eliminacion.in' => 'Selecciona un tipo de eliminación válido.',
+            'volumen_ml.between' => 'El volumen debe estar entre 0 y 999999.99 mL.',
+            'volumen_ml.decimal' => 'El volumen admite como máximo dos decimales.',
+            'tipo_bristol.between' => 'Selecciona un tipo de Bristol del 1 al 7.',
+            'continencia.in' => 'Selecciona una continencia válida para este tipo de eliminación.',
+            'descripcion_molestia.max' => 'La descripción admite hasta 250 caracteres.',
+            'observacion.max' => 'La observación admite hasta 5000 caracteres.',
+        ])->validate();
+        if (! in_array($validados['molestia_eliminacion'] ?? null, [true, 1, '1'], true)) $validados['descripcion_molestia'] = null;
+        $personal = $usuario->personal;
+        abort_unless($personal && in_array($personal->estado, ['ACTIVO', 'ACTIVA'], true), 403);
+        $jornada = app(MiTurnoService::class)->resolverJornadaActual($personal, now());
+        if (! $jornada) throw ValidationException::withMessages(['jornada' => 'No existe una jornada activa asignada al personal.']);
+        return RegistroEliminacion::create(array_merge(array_fill_keys($campos, null), $validados, [
+            'cod_eliminacion' => 'ELI_'.strtoupper(Str::random(10)), 'cod_residente' => $codResidente,
+            'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada,
+            'fecha_hora' => now(), 'cantidad' => null, 'caracteristica' => null, 'estado' => 'VIGENTE',
+        ]));
+    }
 
-        foreach (['cantidad', 'caracteristica', 'continencia', 'observacion'] as $campo) {
+    public function registrarMovilidad(string $codResidente, array $datos, User $usuario): RegistroMovilidad
+    {
+        $this->turnos->autorizarMutacionEnfermeria($codResidente, 'registros_movilidad.crear', $usuario);
+
+        // Las precisiones de «Otro» forman parte de la narrativa, no son columnas nuevas.
+        $detallesOtro = ['motivo_otro' => 'motivo_registro', 'dispositivo_otro' => 'dispositivo'];
+        $camposPermitidos = [...RegistroMovilidad::CAMPOS_CAPTURA, ...array_keys($detallesOtro)];
+        if (array_diff(array_keys($datos), $camposPermitidos) !== []) {
+            throw ValidationException::withMessages([
+                'datos' => 'El formulario incluye campos que este registro de movilidad no puede guardar.',
+            ]);
+        }
+
+        foreach (['observacion', ...array_keys($detallesOtro)] as $campo) {
             if (is_string($datos[$campo] ?? null)) {
                 $datos[$campo] = trim($datos[$campo]);
                 if ($datos[$campo] === '') {
@@ -148,72 +219,19 @@ class CuidadosEnfermeriaService
                 }
             }
         }
-        $tipo = $datos['tipo_eliminacion'] ?? null;
-        $continencias = $tipo === 'URINARIA' ? self::CONTINENCIAS_URINARIAS : self::CONTINENCIAS_INTESTINALES;
         $validados = Validator::make($datos, [
-            'tipo_eliminacion' => ['required', Rule::in(self::TIPOS_ELIMINACION_REGISTRO)],
-            'cantidad' => ['nullable', 'numeric', 'min:0', function (string $atributo, mixed $valor, \Closure $fail) {
-                if (mb_strlen((string) $valor) > 40) {
-                    $fail('La cantidad no puede superar 40 caracteres.');
-                }
-            }],
-            'caracteristica' => ['nullable', 'string', 'max:120'],
-            'continencia' => ['nullable', Rule::in($continencias)],
-            'observacion' => ['nullable', 'string', 'max:5000'],
-        ], [
-            'tipo_eliminacion.required' => 'Selecciona el tipo de eliminación.',
-            'tipo_eliminacion.in' => 'Selecciona un tipo de eliminación válido.',
-            'cantidad.numeric' => 'Ingresa una cantidad numérica válida.',
-            'cantidad.min' => 'La cantidad debe ser mayor o igual a 0.',
-            'caracteristica.string' => 'Ingresa características válidas.',
-            'caracteristica.max' => 'Las características no pueden superar 120 caracteres.',
-            'continencia.in' => 'Selecciona una continencia válida para este tipo de eliminación.',
-            'observacion.string' => 'Ingresa observaciones válidas.',
-            'observacion.max' => 'Las observaciones no pueden superar 5000 caracteres.',
-        ])->validate();
-
-        $personal = $usuario->personal ?: Personal::where('cod_usuario', $usuario->cod_usuario)->first();
-        if (! $personal || ! in_array($personal->estado, ['ACTIVO', 'ACTIVA'], true)) {
-            throw ValidationException::withMessages(['usuario' => 'El usuario no posee un registro de personal activo.']);
-        }
-        $jornada = app(MiTurnoService::class)->resolverJornadaActual($personal, now());
-        if (! $jornada) {
-            throw ValidationException::withMessages(['jornada' => 'No existe una jornada activa asignada al personal.']);
-        }
-
-        return RegistroEliminacion::create([
-            'cod_eliminacion' => 'ELI_'.strtoupper(Str::random(10)),
-            'cod_residente' => $codResidente,
-            'cod_personal' => $personal->cod_personal,
-            'cod_jornada' => $jornada->cod_jornada,
-            'fecha_hora' => now(),
-            'tipo_eliminacion' => $validados['tipo_eliminacion'],
-            'cantidad' => $validados['cantidad'] ?? null,
-            'caracteristica' => $validados['caracteristica'] ?? null,
-            'continencia' => $validados['continencia'] ?? null,
-            'observacion' => $validados['observacion'] ?? null,
-            'estado' => 'VIGENTE',
-        ]);
-    }
-
-    public function registrarMovilidad(string $codResidente, array $datos, User $usuario): RegistroMovilidad
-    {
-        $this->turnos->autorizarMutacionEnfermeria($codResidente, 'registros_movilidad.crear', $usuario);
-
-        $camposPermitidos = ['marcha', 'traslado', 'tipo_apoyo', 'equilibrio', 'fatiga', 'riesgo_caida', 'observacion'];
-        if (array_diff(array_keys($datos), $camposPermitidos) !== []) {
-            throw ValidationException::withMessages([
-                'datos' => 'El formulario incluye campos que este registro de movilidad no puede guardar.',
-            ]);
-        }
-
-        if (is_string($datos['observacion'] ?? null)) {
-            $datos['observacion'] = trim($datos['observacion']);
-            if ($datos['observacion'] === '') {
-                $datos['observacion'] = null;
-            }
-        }
-        $validados = Validator::make($datos, [
+            'motivo_otro' => ['required_if:motivo_registro,OTRO', 'nullable', 'string', 'max:500', Rule::prohibitedIf(($datos['motivo_registro'] ?? null) !== 'OTRO')],
+            'dispositivo_otro' => ['required_if:dispositivo,OTRO', 'nullable', 'string', 'max:500', Rule::prohibitedIf(($datos['dispositivo'] ?? null) !== 'OTRO')],
+            'motivo_registro' => ['nullable', Rule::in(self::MOTIVOS_MOVILIDAD)],
+            'actividad_realizada' => ['nullable', Rule::in(self::ACTIVIDADES_MOVILIDAD)],
+            'dispositivo' => ['nullable', 'string', 'max:80', Rule::in(self::DISPOSITIVOS_MOVILIDAD)],
+            'distancia_metros' => ['nullable', 'numeric', 'decimal:0,2', 'between:0,99999.99'],
+            'tolerancia_movilidad' => ['nullable', Rule::in(self::TOLERANCIAS_MOVILIDAD)],
+            'cambio_habitual' => ['nullable', Rule::in(self::CAMBIOS_HABITUALES)],
+            'dolor_movilidad' => ['nullable', 'boolean'],
+            'mareo' => ['nullable', 'boolean'],
+            'disnea' => ['nullable', 'boolean'],
+            'debilidad' => ['nullable', 'boolean'],
             'marcha' => ['required', Rule::in(self::MOVILIDAD_OBSERVADA)],
             'traslado' => ['nullable', Rule::in(self::TRASLADOS)],
             'tipo_apoyo' => ['nullable', Rule::in(self::NIVELES_AYUDA)],
@@ -222,6 +240,14 @@ class CuidadosEnfermeriaService
             'riesgo_caida' => ['nullable', Rule::in(self::RIESGOS_CAIDA)],
             'observacion' => ['nullable', 'string', 'max:5000'],
         ], [
+            'motivo_otro.required_if' => 'Especifica cuál es el otro motivo.',
+            'dispositivo_otro.required_if' => 'Especifica cuál es el otro dispositivo.',
+            'motivo_otro.string' => 'Describe el otro motivo con texto.',
+            'dispositivo_otro.string' => 'Describe el otro dispositivo con texto.',
+            'motivo_otro.max' => 'El otro motivo no puede superar 500 caracteres.',
+            'dispositivo_otro.max' => 'El otro dispositivo no puede superar 500 caracteres.',
+            'motivo_otro.prohibited' => 'El detalle de otro motivo solo corresponde a la opción Otro.',
+            'dispositivo_otro.prohibited' => 'El detalle de otro dispositivo solo corresponde a la opción Otro.',
             'marcha.required' => 'Selecciona la movilidad observada.',
             'marcha.in' => 'Selecciona una movilidad válida.',
             'traslado.in' => 'Selecciona un tipo de traslado válido.',
@@ -232,6 +258,25 @@ class CuidadosEnfermeriaService
             'observacion.string' => 'Ingresa observaciones válidas.',
             'observacion.max' => 'Las observaciones no pueden superar 5000 caracteres.',
         ])->validate();
+
+        if (isset($validados['distancia_metros']) && ! in_array($validados['actividad_realizada'] ?? null, self::ACTIVIDADES_DEAMBULACION, true)) {
+            throw ValidationException::withMessages(['distancia_metros' => 'La distancia solo corresponde a una actividad de deambulación.']);
+        }
+
+        $narrativa = [];
+        foreach (['motivo_otro' => 'Otro motivo', 'dispositivo_otro' => 'Otro dispositivo'] as $campo => $label) {
+            if (isset($validados[$campo])) {
+                $narrativa[] = $label.': '.$validados[$campo];
+            }
+            unset($validados[$campo]);
+        }
+        if (isset($validados['observacion'])) {
+            $narrativa[] = $validados['observacion'];
+        }
+        $validados['observacion'] = $narrativa ? implode("\n", $narrativa) : null;
+        if (mb_strlen($validados['observacion'] ?? '') > 5000) {
+            throw ValidationException::withMessages(['observacion' => 'Las observaciones y los detalles de Otro juntos no pueden superar 5000 caracteres.']);
+        }
 
         $personal = $usuario->personal ?: Personal::where('cod_usuario', $usuario->cod_usuario)->first();
         if (! $personal || ! in_array($personal->estado, ['ACTIVO', 'ACTIVA'], true)) {
@@ -253,16 +298,82 @@ class CuidadosEnfermeriaService
             'traslado' => $validados['traslado'] ?? null,
             'tipo_apoyo' => $validados['tipo_apoyo'] ?? null,
             'equilibrio' => $validados['equilibrio'] ?? null,
-            'dispositivo' => null,
+            'dispositivo' => $validados['dispositivo'] ?? null,
             'fatiga' => $validados['fatiga'] ?? null,
             'riesgo_caida' => $validados['riesgo_caida'] ?? null,
             'observacion' => $validados['observacion'] ?? null,
+            'estado' => 'VIGENTE',
+        ] + $validados);
+    }
+
+    public const TOLERANCIAS_HIDRATACION = ['ADECUADA', 'PARCIAL', 'RECHAZO', 'NAUSEAS'];
+
+    public function registrarHidratacion(string $codResidente, array $datos, User $usuario): RegistroHidratacion
+    {
+        $this->turnos->autorizarMutacionEnfermeria($codResidente, 'registros_hidratacion.crear', $usuario);
+        if (array_diff(array_keys($datos), ['cantidad_ml', 'tipo_liquido', 'tolerancia', 'observacion']) !== []) {
+            throw ValidationException::withMessages(['datos' => 'El aporte incluye campos que este registro no puede guardar.']);
+        }
+        foreach (['tipo_liquido', 'tolerancia', 'observacion'] as $campo) {
+            if (is_string($datos[$campo] ?? null)) {
+                $datos[$campo] = trim($datos[$campo]);
+                if ($datos[$campo] === '') $datos[$campo] = null;
+            }
+        }
+        $validados = Validator::make($datos, [
+            'cantidad_ml' => ['required', 'integer', 'between:1,10000'],
+            'tipo_liquido' => ['nullable', 'string', 'max:60'],
+            'tolerancia' => ['nullable', Rule::in(self::TOLERANCIAS_HIDRATACION)],
+            'observacion' => ['nullable', 'string', 'max:5000'],
+        ], [
+            'cantidad_ml.required' => 'Ingresa el volumen del aporte.',
+            'cantidad_ml.integer' => 'Ingresa un volumen entero en mililitros.',
+            'cantidad_ml.between' => 'El volumen debe estar entre 1 y 10 000 mL.',
+            'tipo_liquido.max' => 'El tipo de líquido admite hasta 60 caracteres.',
+            'tolerancia.in' => 'Selecciona una tolerancia válida.',
+            'observacion.max' => 'La observación admite hasta 5000 caracteres.',
+        ])->validate();
+
+        $personal = $usuario->personal;
+        abort_unless($personal && in_array($personal->estado, ['ACTIVO', 'ACTIVA'], true), 403);
+        $jornada = app(MiTurnoService::class)->resolverJornadaActual($personal, now());
+        if (! $jornada) {
+            throw ValidationException::withMessages(['jornada' => 'No existe una jornada activa asignada al personal.']);
+        }
+
+        return RegistroHidratacion::create([
+            'cod_hidratacion' => 'HID_'.strtoupper(Str::random(10)),
+            'cod_residente' => $codResidente, 'cod_personal' => $personal->cod_personal,
+            'cod_jornada' => $jornada->cod_jornada, 'fecha_hora' => now(),
+            'cantidad_ml' => $validados['cantidad_ml'], 'tipo_liquido' => $validados['tipo_liquido'] ?? null,
+            'tolerancia' => $validados['tolerancia'] ?? null, 'observacion' => $validados['observacion'] ?? null,
             'estado' => 'VIGENTE',
         ]);
     }
 
     public function registrar(string $codResidente, array $datos, User $usuario): object
     {
+        if (strtoupper(trim($datos['tipo'] ?? '')) === 'MOVILIDAD') {
+            $captura = array_diff_key($datos, array_flip(['tipo', 'subtipo', 'nivel_ayuda', 'ayuda_tecnica', 'tolerancia', 'motivo']));
+            $captura['marcha'] = $datos['marcha'] ?? $datos['subtipo'] ?? null;
+            $captura['tipo_apoyo'] = $datos['tipo_apoyo'] ?? $datos['nivel_ayuda'] ?? null;
+            $captura['dispositivo'] = $datos['dispositivo'] ?? $datos['ayuda_tecnica'] ?? null;
+            $captura['fatiga'] = $datos['fatiga'] ?? $datos['tolerancia'] ?? null;
+            $captura['observacion'] = $datos['observacion'] ?? $datos['motivo'] ?? null;
+            return $this->registrarMovilidad($codResidente, $captura, $usuario);
+        }
+        // El consumidor genérico conserva su entrada, pero comparte el único escritor de hidratación.
+        if (($datos['tipo'] ?? null) === 'HIDRATACION') {
+            return $this->registrarHidratacion($codResidente, [
+                'cantidad_ml' => $datos['cantidad_ml'] ?? null, 'tipo_liquido' => $datos['subtipo'] ?? null,
+                'tolerancia' => $datos['tolerancia'] ?? null, 'observacion' => $datos['observacion'] ?? null,
+            ], $usuario);
+        }
+        if (($datos['tipo'] ?? null) === 'ELIMINACION') {
+            $captura = array_diff_key($datos, array_flip(['tipo', 'subtipo']));
+            $captura['tipo_eliminacion'] = $datos['tipo_eliminacion'] ?? $datos['subtipo'] ?? null;
+            return $this->registrarEliminacion($codResidente, $captura, $usuario);
+        }
         $this->turnos->autorizarMutacionEnfermeria($codResidente, 'atenciones.crear', $usuario);
         $datos = $this->validar($datos);
 
@@ -308,50 +419,6 @@ class CuidadosEnfermeriaService
                     'apetito' => $datos['estado_general'] ?? null,
                     'tolerancia' => $datos['tolerancia'] ?? null,
                     'dificultad_deglucion' => ! empty($datos['presenta_dificultad']),
-                    'fecha_hora' => now(),
-                    'estado' => 'VIGENTE',
-                    'observacion' => $datos['observacion'] ?? $datos['motivo'] ?? null,
-                ]);
-            } elseif ($tipo === 'HIDRATACION') {
-                $registro = RegistroHidratacion::create([
-                    'cod_hidratacion' => 'HID_'.strtoupper(Str::random(10)),
-                    'cod_residente' => $codResidente,
-                    'cod_personal' => $codPersonal,
-                    'cod_jornada' => $codJornada,
-                    'tipo_liquido' => $datos['subtipo'],
-                    'cantidad_ml' => (int) $datos['cantidad_ml'],
-                    'via' => 'ORAL',
-                    'tolerancia' => $datos['tolerancia'] ?? null,
-                    'fecha_hora' => now(),
-                    'estado' => 'VIGENTE',
-                    'observacion' => $datos['observacion'] ?? $datos['motivo'] ?? null,
-                ]);
-            } elseif ($tipo === 'ELIMINACION') {
-                $registro = RegistroEliminacion::create([
-                    'cod_eliminacion' => 'ELM_'.strtoupper(Str::random(10)),
-                    'cod_residente' => $codResidente,
-                    'cod_personal' => $codPersonal,
-                    'cod_jornada' => $codJornada,
-                    'tipo_eliminacion' => $datos['subtipo'],
-                    'consistencia' => $datos['consistencia'] ?? null,
-                    'es_continente' => ! empty($datos['es_continente']),
-                    'usa_dispositivo' => ! empty($datos['usa_dispositivo']),
-                    'dificultad' => ! empty($datos['presenta_dificultad']),
-                    'dolor' => ! empty($datos['presenta_dolor']),
-                    'fecha_hora' => now(),
-                    'estado' => 'VIGENTE',
-                    'observacion' => $datos['observacion'] ?? $datos['motivo'] ?? null,
-                ]);
-            } elseif ($tipo === 'MOVILIDAD') {
-                $registro = RegistroMovilidad::create([
-                    'cod_movilidad' => 'MOV_'.strtoupper(Str::random(10)),
-                    'cod_residente' => $codResidente,
-                    'cod_personal' => $codPersonal,
-                    'cod_jornada' => $codJornada,
-                    'marcha' => $datos['subtipo'],
-                    'tipo_apoyo' => $datos['nivel_ayuda'] ?? null,
-                    'dispositivo' => $datos['ayuda_tecnica'] ?? null,
-                    'fatiga' => $datos['tolerancia'] ?? null,
                     'fecha_hora' => now(),
                     'estado' => 'VIGENTE',
                     'observacion' => $datos['observacion'] ?? $datos['motivo'] ?? null,
@@ -442,36 +509,41 @@ class CuidadosEnfermeriaService
         ]);
     }
 
-    /** Captura de la valoración inicial desde Nuevo registro, con columnas V2.1 reales. */
+    /** Valoración inicial o nueva reevaluación: nunca modifica la fila de origen. */
     public function registrarValoracionDolor(string $codResidente, array $entrada, User $usuario): ValoracionDolor
     {
         abort_unless(\Illuminate\Support\Facades\Auth::user()?->cod_usuario === $usuario->cod_usuario, 403);
         $this->turnos->autorizarMutacionEnfermeria($codResidente, 'valoraciones_dolor.crear', $usuario);
 
-        foreach (['ubicacion', 'duracion_unidad', 'desencadenante', 'intervencion'] as $campo) {
+        foreach (['ubicacion', 'duracion_unidad', 'frecuencia', 'desencadenante', 'factores_alivio', 'intervencion', 'respuesta'] as $campo) {
             if (isset($entrada[$campo]) && is_string($entrada[$campo])) {
                 $entrada[$campo] = trim($entrada[$campo]);
             }
         }
         $validador = Validator::make($entrada, [
-            'fecha_hora' => ['required', 'date_format:Y-m-d\TH:i'],
+            'fecha_hora' => ['prohibited'],
             'intensidad' => ['required', 'integer', 'between:0,10'],
             'ubicacion' => ['nullable', 'string', 'max:120'],
             'duracion_valor' => ['nullable', 'numeric', 'gt:0'],
             'duracion_unidad' => ['required_with:duracion_valor', 'nullable', 'string', 'max:60'],
             'desencadenante' => ['nullable', 'string'],
             'intervencion' => ['nullable', 'string'],
+            'frecuencia' => ['nullable', 'string', 'max:40'],
+            'factores_alivio' => ['nullable', 'string'],
+            'cod_valoracion_origen' => ['nullable', 'string', 'max:20'],
             'tipo_dolor' => ['prohibited'],
             'eva_posterior' => ['prohibited'],
             'hora_reevaluacion' => ['prohibited'],
             'observacion' => ['prohibited'],
+            'respuesta' => [Rule::prohibitedIf(blank($entrada['cod_valoracion_origen'] ?? null)), 'nullable', 'string'],
+            'cod_personal' => ['prohibited'],
         ], [
-            'fecha_hora.required' => 'Ingresa la fecha y hora de valoración.',
-            'fecha_hora.date_format' => 'Ingresa una fecha y hora válidas.',
-            'intensidad.required' => 'Selecciona la intensidad EVA inicial.',
+            'fecha_hora.prohibited' => 'La fecha y hora se generan automáticamente en el servidor.',
+            'intensidad.required' => 'Selecciona la intensidad EVA actual.',
             'intensidad.integer' => 'La intensidad EVA debe ser un número entero.',
             'intensidad.between' => 'La intensidad EVA debe estar entre 0 y 10.',
             'ubicacion.max' => 'La localización no puede superar 120 caracteres.',
+            'frecuencia.max' => 'La frecuencia no puede superar 40 caracteres.',
             'duracion_valor.numeric' => 'Ingresa una duración numérica válida.',
             'duracion_valor.gt' => 'La duración debe ser mayor que cero.',
             'duracion_unidad.required_with' => 'Indica la unidad de duración.',
@@ -485,10 +557,9 @@ class CuidadosEnfermeriaService
         });
         $datos = $validador->validate();
 
-        $fechaHora = \Carbon\Carbon::createFromFormat('!Y-m-d\TH:i', $datos['fecha_hora'], config('app.timezone'));
-        if ($fechaHora->isFuture()) {
-            throw ValidationException::withMessages(['fecha_hora' => 'La valoración no puede tener una fecha u hora futura.']);
-        }
+        // La propietaria aprobó el momento de registro automático para este flujo.
+        // Ni la UI ni un consumidor directo pueden atribuir una fecha o autor externos.
+        $fechaHora = now();
         $duracion = filled($datos['duracion_valor'] ?? null)
             ? trim((string) $datos['duracion_valor'].' '.(string) ($datos['duracion_unidad'] ?? ''))
             : null;
@@ -502,19 +573,62 @@ class CuidadosEnfermeriaService
             throw ValidationException::withMessages(['personal' => 'El usuario autenticado no tiene personal activo.']);
         }
 
-        return ValoracionDolor::create([
-            'cod_valoracion_dolor' => 'VD_'.strtoupper(Str::random(10)),
-            'cod_residente' => $codResidente,
-            'cod_personal' => $personal->cod_personal,
-            'fecha_hora' => $fechaHora,
-            'intensidad' => (int) $datos['intensidad'],
-            'ubicacion' => filled($datos['ubicacion'] ?? null) ? $datos['ubicacion'] : null,
-            'duracion' => $duracion,
-            'desencadenante' => filled($datos['desencadenante'] ?? null) ? $datos['desencadenante'] : null,
-            'intervencion' => filled($datos['intervencion'] ?? null) ? $datos['intervencion'] : null,
-            'respuesta' => null,
-            'estado' => 'VIGENTE',
-        ]);
+        return DB::transaction(function () use ($codResidente, $datos, $personal, $fechaHora, $duracion, $usuario) {
+            $origen = filled($datos['cod_valoracion_origen'] ?? null)
+                ? $this->resolverRaizDolor($codResidente, $datos['cod_valoracion_origen'], true)
+                : null;
+            if ($origen) {
+                abort_unless($usuario->can('valoraciones_dolor.ver'), 403);
+            }
+
+            return ValoracionDolor::create([
+                'cod_valoracion_dolor' => 'VD_'.strtoupper(Str::random(10)),
+                'cod_residente' => $codResidente,
+                'cod_personal' => $personal->cod_personal,
+                'fecha_hora' => $fechaHora,
+                'intensidad' => (int) $datos['intensidad'],
+                'ubicacion' => filled($datos['ubicacion'] ?? null) ? $datos['ubicacion'] : null,
+                'duracion' => $duracion,
+                'cod_valoracion_origen' => $origen?->cod_valoracion_dolor,
+                'frecuencia' => filled($datos['frecuencia'] ?? null) ? $datos['frecuencia'] : null,
+                'factores_alivio' => filled($datos['factores_alivio'] ?? null) ? $datos['factores_alivio'] : null,
+                'desencadenante' => filled($datos['desencadenante'] ?? null) ? $datos['desencadenante'] : null,
+                'intervencion' => filled($datos['intervencion'] ?? null) ? $datos['intervencion'] : null,
+                'respuesta' => $origen && filled($datos['respuesta'] ?? null) ? $datos['respuesta'] : null,
+                'estado' => 'VIGENTE',
+            ]);
+        });
+    }
+
+    public function prepararReevaluacionDolor(string $codResidente, string $codValoracion, User $usuario): ValoracionDolor
+    {
+        abort_unless(\Illuminate\Support\Facades\Auth::user()?->cod_usuario === $usuario->cod_usuario, 403);
+        $this->turnos->autorizarMutacionEnfermeria($codResidente, 'valoraciones_dolor.crear', $usuario);
+        abort_unless($usuario->can('valoraciones_dolor.ver'), 403);
+
+        return $this->resolverRaizDolor($codResidente, $codValoracion);
+    }
+
+    private function resolverRaizDolor(string $codResidente, string $codValoracion, bool $lock = false): ValoracionDolor
+    {
+        $visitadas = [];
+        while (! isset($visitadas[$codValoracion]) && count($visitadas) < 32) {
+            $visitadas[$codValoracion] = true;
+            $query = ValoracionDolor::query()->whereKey($codValoracion)
+                ->where('cod_residente', $codResidente)->where('estado', 'VIGENTE')
+                ->where('fecha_hora', '<=', now());
+            $registro = ($lock ? $query->lockForUpdate() : $query)->first();
+            if (! $registro) {
+                throw ValidationException::withMessages(['cod_valoracion_origen' =>
+                    'La valoración de origen no está disponible para este residente. Revisa el historial.']);
+            }
+            if ($registro->cod_valoracion_origen === null) {
+                return $registro;
+            }
+            $codValoracion = $registro->cod_valoracion_origen;
+        }
+        throw ValidationException::withMessages(['cod_valoracion_origen' =>
+            'El episodio de dolor tiene un vínculo inconsistente. Solicita su revisión.']);
     }
 
     public function colocarDispositivo(string $codResidente, array $datos, User $usuario): DispositivoClinico

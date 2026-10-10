@@ -9,7 +9,6 @@ use App\Models\PaseTurno;
 use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\Turno;
-use App\Models\TurnoEnfermeria;
 use App\Models\User;
 use App\Backend\Modulos\Enfermeria\Servicios\PaseTurnoService;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
@@ -116,6 +115,7 @@ class PaseTurnoPanel extends Component
         $user = Auth::user();
 
         $jornadaSaliente = $service->resolverJornadaSaliente($user);
+        $service->autorizarLecturaResidente($codResidente, $user, $jornadaSaliente);
         $jornadaEntrante = $service->resolverJornadaEntrante($jornadaSaliente);
 
         $residente = Residente::with(['cama.habitacion'])->find($codResidente);
@@ -188,7 +188,11 @@ class PaseTurnoPanel extends Component
         } catch (ValidationException $e) {
             $this->setErrorBag($e->validator->getMessageBag());
         } catch (\Throwable $e) {
-            $this->addError('error_general', $e->getMessage());
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                throw $e;
+            }
+            report($e);
+            $this->addError('error_general', 'No se pudo guardar el pase de turno. Inténtelo nuevamente.');
         }
     }
 
@@ -218,7 +222,11 @@ class PaseTurnoPanel extends Component
         } catch (ValidationException $e) {
             $this->setErrorBag($e->validator->getMessageBag());
         } catch (\Throwable $e) {
-            $this->addError('error_general', $e->getMessage());
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                throw $e;
+            }
+            report($e);
+            $this->addError('error_general', 'No se pudo entregar el pase de turno. Inténtelo nuevamente.');
         }
     }
 
@@ -228,6 +236,7 @@ class PaseTurnoPanel extends Component
 
     public function abrirRevisarPase(string $codPase): void
     {
+        app(PaseTurnoService::class)->autorizarLecturaPase(PaseTurno::findOrFail($codPase), Auth::user());
         $this->paseSeleccionadoId = $codPase;
         $this->paseSeleccionado = PaseTurno::with([
             'residente.cama.habitacion',
@@ -264,7 +273,15 @@ class PaseTurnoPanel extends Component
             session()->flash('mensaje', 'Recepción del pase de turno confirmada exitosamente.');
             $this->modalRevisar = false;
         } catch (\Throwable $e) {
-            $this->addError('error_recepcion', $e->getMessage());
+            if ($e instanceof ValidationException) {
+                $this->setErrorBag($e->validator->getMessageBag());
+                return;
+            }
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                throw $e;
+            }
+            report($e);
+            $this->addError('error_recepcion', 'No se pudo recibir el pase de turno. Inténtelo nuevamente.');
         }
     }
 
@@ -274,6 +291,7 @@ class PaseTurnoPanel extends Component
 
     public function abrirVer(string $id): void
     {
+        app(PaseTurnoService::class)->autorizarLecturaPase(PaseTurno::findOrFail($id), Auth::user());
         $this->paseSeleccionadoId = $id;
         $this->paseSeleccionado = PaseTurno::with([
             'residente.cama.habitacion',

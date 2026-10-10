@@ -147,6 +147,8 @@ import documentosAdulto from './modules/documentos-adulto.js';
 window.documentosAdulto = documentosAdulto;
 
 import './modules/signos-vitales-registro.js';
+import './modules/dolor-registro.js';
+import './modules/ingesta-registro.js';
 import './modules/clinical-form-feedback.js';
 import './modules/filter-selection.js';
 import './modules/controles-institucionales.js';
@@ -156,3 +158,9 @@ import './modules/habitaciones-interactivas.js';
 
 import './modules/auth-login-parallax.js';
 import './modules/app-depth-motion.js';
+
+import './modules/hidratacion-registro.js';
+
+import './modules/eliminacion-registro.js';
+
+import './modules/movilidad-registro.js';

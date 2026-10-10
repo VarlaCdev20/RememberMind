@@ -16,7 +16,7 @@
         ['tipo' => 'conducta', 'label' => 'Conducta', 'icon' => 'ph-smiley', 'tone' => 'lavender', 'permiso' => 'registros_conductuales.ver', 'hint' => 'Seguimiento diario'],
         ['tipo' => 'sueno', 'label' => 'Sueño', 'icon' => 'ph-moon', 'tone' => 'lavender', 'permiso' => 'registros_sueno.ver', 'hint' => 'Consultar registros'],
         ['tipo' => 'alimentacion', 'label' => 'Ingesta', 'icon' => 'ph-bowl-food', 'tone' => 'sand', 'permiso' => 'registros_ingesta.crear', 'disponible' => true],
-        ['tipo' => 'hidratacion', 'label' => 'Hidratación', 'icon' => 'ph-drop', 'tone' => 'clinical', 'permiso' => 'registros_hidratacion.ver'],
+        ['tipo' => 'hidratacion', 'label' => 'Hidratación', 'icon' => 'ph-drop', 'tone' => 'clinical', 'permiso' => 'registros_hidratacion.crear', 'disponible' => true],
         ['tipo' => 'eliminacion', 'label' => 'Eliminación', 'icon' => 'ph-toilet', 'tone' => 'clinical', 'permiso' => 'registros_eliminacion.crear', 'disponible' => true],
         ['tipo' => 'movilidad', 'label' => 'Movilidad', 'icon' => 'ph-person-simple-walk', 'tone' => 'care', 'permiso' => 'registros_movilidad.crear', 'disponible' => true],
         ['tipo' => 'heridas', 'label' => 'Heridas / Curaciones', 'icon' => 'ph-bandaids', 'tone' => 'care', 'permiso' => 'heridas.ver', 'hint' => 'Heridas e historial de curaciones'],
@@ -48,7 +48,15 @@
         }, $controles);
     }
 @endphp
-<x-ui.quick-register-grid :sections="[
-    ['title' => 'Controles', 'actions' => $controles],
-    ['title' => 'Acciones del cuidado', 'columns' => 2, 'actions' => $acciones],
-]" on-select="abrirFormularioRegistro" />
+@php
+    $secciones = [
+        ['title' => 'Controles', 'actions' => $controles],
+        ['title' => 'Acciones del cuidado', 'columns' => 2, 'actions' => $acciones],
+    ];
+    if ($puedeConsultarExperto) {
+        $secciones[] = ['title' => 'Consulta clínica', 'actions' => [
+            ['tipo' => 'experto', 'label' => 'Sistema experto', 'icon' => 'ph-brain', 'tone' => 'lavender', 'permiso' => 'controles_cognitivos.ver', 'href' => route('admin.enfermeria.pacientes.resultados-experto', ['residente' => $codResidente]), 'hint' => 'Resultados, evidencias e historial · Solo lectura'],
+        ]];
+    }
+@endphp
+<x-ui.quick-register-grid :sections="$secciones" on-select="abrirFormularioRegistro" />

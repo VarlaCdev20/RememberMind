@@ -96,6 +96,7 @@ window.rmClinicalFormFeedback = () => ({
 
 window.rmClinicalCapture = (initialValues = {}) => ({
     initialCapture: null,
+    captureDefaults: [],
     snapshot(useInitial = false) {
         return JSON.stringify(Array.from(this.$el.querySelectorAll('input, select, textarea'))
             .filter(field => !field.disabled && !field.readOnly)
@@ -109,16 +110,47 @@ window.rmClinicalCapture = (initialValues = {}) => ({
             }));
     },
     init() {
-        this.$nextTick(() => { this.initialCapture = this.snapshot(true); });
+        this.$nextTick(() => {
+            this.initialCapture = this.snapshot(true);
+            this.rememberCaptureFields();
+            if (typeof MutationObserver !== 'undefined') {
+                this.captureObserver = new MutationObserver(() => this.rememberCaptureFields());
+                this.captureObserver.observe(this.$el, { childList: true, subtree: true });
+            }
+        });
         this.beforeUnloadHandler = event => {
+            const shell = this.$el.closest('.rm-modal-shell, .rm-drawer-shell');
             if ((this.$el.getClientRects && this.$el.getClientRects().length === 0)
-                || !this.$el.closest('.rm-modal-shell, .rm-drawer-shell')?.classList.contains('is-open')
+                || (shell && !shell.classList.contains('is-open'))
                 || this.initialCapture === null || this.snapshot() === this.initialCapture) return;
             event.preventDefault();
             event.returnValue = '';
         };
         window.addEventListener('beforeunload', this.beforeUnloadHandler);
     },
+    rememberCaptureFields() {
+        Array.from(this.$el.querySelectorAll('input, select, textarea'))
+            .filter(field => !field.disabled && !field.readOnly)
+            .forEach(field => {
+                    const model = field.getAttribute('wire:model') ?? field.getAttribute('wire:model.live');
+                    const existing = this.captureDefaults.find(entry => entry.model === model && entry.field.id === field.id);
+                    if (existing) { existing.field = field; return; }
+                    this.captureDefaults.push({ field, model, value: Object.hasOwn(initialValues, model) ? initialValues[model]
+                        : (model && this.$wire ? this.$wire[model]
+                            : field.type === 'checkbox' ? field.checked
+                            : field.type === 'radio' ? (field.checked ? field.value : null) : field.value) });
+            });
+    },
+    restoreCapture() {
+        this.captureDefaults.forEach(({ field, model, value }) => {
+            if (model) this.$wire?.$set(model, value, false);
+            if (field.type === 'checkbox') field.checked = Boolean(value);
+            else if (field.type === 'radio') field.checked = String(value) === field.value;
+            else field.value = value ?? '';
+        });
+        this.initialCapture = this.snapshot();
+        this.notifyDirty();
+    },
     notifyDirty() { this.$dispatch('clinical-capture-changed', { dirty: this.snapshot() !== this.initialCapture }); },
-    destroy() { window.removeEventListener('beforeunload', this.beforeUnloadHandler); },
+    destroy() { this.captureObserver?.disconnect(); window.removeEventListener('beforeunload', this.beforeUnloadHandler); },
 });

@@ -80,7 +80,7 @@
             @elseif($cuidado === 'hidratacion' && ! $this->puedeMutarRegistro('registros_hidratacion.crear'))
                 <p class="text-sm text-[var(--rm-text-muted)]">Consulta de hidratación. El registro requiere permiso y una jornada vigente.</p>
             @else
-            <form wire:submit="guardarCuidado" class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
+            <form x-data="rmClinicalCapture()" wire:submit="guardarCuidado" class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
                 <h2 class="text-lg font-bold text-[var(--rm-text-title)]">Nuevo cuidado</h2>
                 <p class="mt-1 text-xs text-[var(--rm-text-muted)]">El registro se firma al guardar. Una corrección posterior debe crear una rectificación.</p>
                 <div class="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -89,8 +89,12 @@
                             @foreach(['ALIMENTACION'=>'Alimentación','HIDRATACION'=>'Hidratación','ELIMINACION'=>'Eliminación','HIGIENE'=>'Higiene','MOVILIDAD'=>'Movilidad','SUENO'=>'Sueño','VALORACION_RAPIDA'=>'Valoración rápida','PROCEDIMIENTO'=>'Procedimiento'] as $v=>$e)<option value="{{ $v }}">{{ $e }}</option>@endforeach
                         </select>
                     </label>
-                    <label class="text-xs font-bold text-[var(--rm-text-title)]">Detalle del cuidado
-                        <input wire:model="subtipo" type="text" placeholder="Ej. Desayuno, baño, deambulación" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5 text-sm">
+                    <label class="text-xs font-bold text-[var(--rm-text-title)]">{{ $tipo === 'MOVILIDAD' ? 'Movilidad observada' : 'Detalle del cuidado' }}
+                        @if($tipo === 'MOVILIDAD')
+                            <select wire:model="subtipo" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5 text-sm"><option value="">Selecciona una opción</option>@foreach(\App\Models\RegistroMovilidad::catalogos()['marcha'] as $option)<option value="{{ $option }}">{{ \App\Models\RegistroMovilidad::TEXTOS[$option] }}</option>@endforeach</select>
+                        @else
+                            <input wire:model="subtipo" type="text" placeholder="Ej. Desayuno, baño, deambulación" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5 text-sm">
+                        @endif
                         @error('subtipo') <span class="text-xs text-[var(--rm-danger)]">{{ $message }}</span> @enderror
                     </label>
                     <label class="text-xs font-bold text-[var(--rm-text-title)]">Cambio respecto al basal
@@ -124,8 +128,7 @@
                         <label class="text-xs font-bold text-[var(--rm-text-title)]">Tolerancia<select wire:model="tolerancia" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5"><option value="">No registrada</option><option>ADECUADA</option><option>PARCIAL</option><option>RECHAZO</option><option>NAUSEAS</option></select></label>
                     @endif
                     @if($tipo === 'ELIMINACION')
-                        <label class="text-xs font-bold text-[var(--rm-text-title)]">Consistencia<input wire:model="consistencia" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5"></label>
-                        <div class="flex flex-wrap items-center gap-4 md:col-span-2 text-xs font-bold text-[var(--rm-text-title)]"><label><input wire:model="esContinente" type="checkbox"> Continente</label><label><input wire:model="presentaDificultad" type="checkbox"> Dificultad</label><label><input wire:model="presentaDolor" type="checkbox"> Dolor</label><label><input wire:model="usaDispositivo" type="checkbox"> Usa dispositivo</label></div>
+                        <div class="md:col-span-2"><p class="rm-help">La eliminación se registra ahora con campos estructurados desde Mis residentes.</p><a class="rm-btn-secondary" href="{{ route('admin.enfermeria.pacientes', ['residente' => $codResidente, 'cuidado' => 'eliminacion']) }}">Abrir Eliminación V2</a></div>
                     @endif
                     @if(in_array($tipo, ['ALIMENTACION','MOVILIDAD','HIGIENE']))
                         <label class="text-xs font-bold text-[var(--rm-text-title)]">Nivel de ayuda
@@ -133,7 +136,10 @@
                         </label>
                     @endif
                     @if($tipo === 'MOVILIDAD')
-                        <label class="text-xs font-bold text-[var(--rm-text-title)]">Ayuda técnica<input wire:model="ayudaTecnica" placeholder="Andador, bastón, silla" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5"></label>
+                        <label class="text-xs font-bold text-[var(--rm-text-title)]">Dispositivo<select wire:model.live="ayudaTecnica" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5"><option value="">Sin registrar</option>@foreach(\App\Models\RegistroMovilidad::catalogos()['dispositivo'] as $option)<option value="{{ $option }}">{{ \App\Models\RegistroMovilidad::TEXTOS[$option] }}</option>@endforeach</select></label>
+                        @if($ayudaTecnica === 'OTRO')
+                            <x-ui.field for="movilidad-generico-dispositivo-otro" label="Especifica el otro dispositivo" error="dispositivoOtro" required help="Hasta 500 caracteres. Se conserva en las observaciones del registro."><input id="movilidad-generico-dispositivo-otro" class="rm-input" wire:model="dispositivoOtro" maxlength="500" required aria-invalid="{{ $errors->has('dispositivoOtro') ? 'true' : 'false' }}" aria-describedby="movilidad-generico-dispositivo-otro-help @error('dispositivoOtro') movilidad-generico-dispositivo-otro-error @enderror"></x-ui.field>
+                        @endif
                     @endif
                     @if(in_array($tipo, ['HIGIENE','PROCEDIMIENTO']))
                         <label class="text-xs font-bold text-[var(--rm-text-title)]">Resultado<select wire:model="resultado" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5 text-sm"><option value="">Seleccione</option><option>REALIZADO</option><option>PARCIAL</option><option>NO_REALIZADO</option><option>CANCELADO</option></select></label>
@@ -145,13 +151,13 @@
                         <label class="text-xs font-bold text-[var(--rm-text-title)]">Calidad<select wire:model="calidad" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5"><option value="">No registrada</option><option>BUENA</option><option>FRAGMENTADA</option><option>INSOMNIO</option></select></label>
                         <div class="flex items-center gap-4 text-xs font-bold text-[var(--rm-text-title)]"><label><input wire:model="deambulacionNocturna" type="checkbox"> Deambulación</label><label><input wire:model="agitacion" type="checkbox"> Agitación</label></div>
                     @endif
-                    <label class="text-xs font-bold text-[var(--rm-text-title)]">Dolor 0–10<input wire:model="dolor" type="number" min="0" max="10" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5 text-sm"></label>
+                    @if($tipo !== 'MOVILIDAD')<label class="text-xs font-bold text-[var(--rm-text-title)]">Dolor 0–10<input wire:model="dolor" type="number" min="0" max="10" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5 text-sm"></label>@endif
                     <label class="text-xs font-bold text-[var(--rm-text-title)] md:col-span-2">Motivo o incidencia<input wire:model="motivo" type="text" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5 text-sm">@error('motivo')<span class="text-xs text-[var(--rm-danger)]">{{ $message }}</span>@enderror</label>
                     <label class="text-xs font-bold text-[var(--rm-text-title)] md:col-span-2 lg:col-span-3">Observación complementaria<textarea wire:model="observacion" rows="3" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5 text-sm"></textarea></label>
                 </div>
-                <div class="mt-5 flex justify-end"><button class="rm-btn-primary px-5 py-2.5 text-xs font-bold">Firmar registro</button></div>
-            </form>
-            <form wire:submit="rectificarCuidado" class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
+                <div class="mt-5 flex justify-end"><button class="rm-btn-primary px-5 py-2.5 text-xs font-bold" @if($tipo === 'ELIMINACION') disabled @endif>Firmar registro</button></div>
+            <x-ui.clinical-clear-action /></form>
+            <form x-data="rmClinicalCapture()" wire:submit="rectificarCuidado" class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
                 <h2 class="text-lg font-bold text-[var(--rm-text-title)]">Rectificar un registro firmado</h2>
                 <p class="mt-1 text-xs text-[var(--rm-text-muted)]">Complete arriba los valores correctos. Se creará un registro vinculado y el original permanecerá en el historial.</p>
                 <div class="mt-4 grid gap-4 md:grid-cols-2">
@@ -159,10 +165,10 @@
                     <label class="text-xs font-bold text-[var(--rm-text-title)]">Motivo de rectificación<textarea wire:model="motivoRectificacion" rows="2" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5"></textarea></label>
                 </div>
                 <div class="mt-4 flex justify-end"><button class="rm-btn-secondary px-5 py-2.5 text-xs font-bold">Registrar rectificación</button></div>
-            </form>
+            <x-ui.clinical-clear-action /></form>
             @endif
         @elseif($seccion === 'DOLOR')
-            <form wire:submit="guardarDolor" class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
+            <form x-data="rmClinicalCapture()" wire:submit="guardarDolor" class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
                 <h2 class="text-lg font-bold text-[var(--rm-text-title)]">Valoración y seguimiento del dolor</h2>
                 <div class="mt-4 grid gap-4 md:grid-cols-2">
                     <label class="text-xs font-bold text-[var(--rm-text-title)]">Etapa<select wire:model.live="faseDolor" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5"><option>VALORACION</option><option>INTERVENCION</option><option>REEVALUACION</option></select></label>
@@ -172,21 +178,21 @@
                     @if($faseDolor === 'REEVALUACION')<label class="text-xs font-bold text-[var(--rm-text-title)] md:col-span-2">Resultado<textarea wire:model="resultadoDolor" rows="2" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5"></textarea></label>@endif
                 </div>
                 <div class="mt-4 flex justify-end"><button class="rm-btn-primary px-5 py-2.5 text-xs font-bold">Firmar etapa</button></div>
-            </form>
+            <x-ui.clinical-clear-action /></form>
         
         @elseif($seccion === 'DISPOSITIVOS')
             <div class="grid gap-5 lg:grid-cols-2">
-                <form wire:submit="guardarDispositivo" class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
+                <form x-data="rmClinicalCapture()" wire:submit="guardarDispositivo" class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
                     <h2 class="text-lg font-bold text-[var(--rm-text-title)]">Registrar dispositivo</h2>
                     <label class="mt-4 block text-xs font-bold text-[var(--rm-text-title)]">Tipo<select wire:model="tipoDispositivo" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5 text-sm"><option>OXIGENO</option><option>SONDA_URINARIA</option><option>OSTOMIA</option><option>ALIMENTACION_ENTERAL</option><option>OTRO</option></select></label>
                     <label class="mt-3 block text-xs font-bold text-[var(--rm-text-title)]">Ubicación<input wire:model="ubicacionDispositivo" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5 text-sm"></label>
                     <label class="mt-3 block text-xs font-bold text-[var(--rm-text-title)]">Indicación<textarea wire:model="indicacionDispositivo" rows="3" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5 text-sm"></textarea>@error('indicacionDispositivo')<span class="text-xs text-[var(--rm-danger)]">{{ $message }}</span>@enderror</label>
                     <button class="rm-btn-primary mt-4 px-5 py-2.5 text-xs font-bold">Guardar dispositivo</button>
-                </form>
+                <x-ui.clinical-clear-action /></form>
                 <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm"><h2 class="text-lg font-bold text-[var(--rm-text-title)]">Dispositivos activos</h2><label class="mt-3 block text-xs font-bold text-[var(--rm-text-title)]">Motivo del retiro<input wire:model="motivoRetiroDispositivo" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5"></label><div class="mt-4 space-y-2">@forelse($adulto->dispositivosActivos as $d)<div class="flex items-center justify-between rounded-xl bg-[var(--rm-surface-soft)] p-3"><div><p class="text-sm font-bold text-[var(--rm-text-title)]">{{ str_replace('_',' ',$d->tipo) }}</p><p class="text-xs text-[var(--rm-text-muted)]">{{ $d->indicacion }}</p></div><button wire:click="retirarDispositivo('{{ $d->cod_dispositivo }}')" class="text-xs font-bold text-[var(--rm-accent)]">Registrar retiro</button></div>@empty<p class="text-sm text-[var(--rm-text-muted)]">No hay dispositivos activos.</p>@endforelse</div></div>
             </div>
         @elseif($seccion === 'INCIDENTES')
-            <form wire:submit="guardarIncidente" class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
+            <form x-data="rmClinicalCapture()" wire:submit="guardarIncidente" class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
                 <h2 class="text-lg font-bold text-[var(--rm-text-title)]">Registrar incidente o caída</h2>
                 <div class="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     <label class="text-xs font-bold text-[var(--rm-text-title)]">Tipo<select wire:model.live="tipoIncidente" class="mt-1 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5 text-sm"><option>CAIDA</option><option>GOLPE</option><option>ERROR_MEDICACION</option><option>LESION</option><option>CAMBIO_CLINICO</option><option>OTRO</option></select></label>
@@ -204,23 +210,23 @@
                     <div class="flex flex-wrap gap-4 md:col-span-2 lg:col-span-3"><label class="text-xs font-bold text-[var(--rm-text-title)]"><input wire:model="cambioCognitivo" type="checkbox"> Cambio cognitivo</label><label class="text-xs font-bold text-[var(--rm-text-title)]"><input wire:model="medicoInformado" type="checkbox"> Médico informado</label><label class="text-xs font-bold text-[var(--rm-text-title)]"><input wire:model="familiarInformado" type="checkbox"> Familiar informado</label><label class="text-xs font-bold text-[var(--rm-text-title)]"><input wire:model="requiereSeguimiento" type="checkbox"> Requiere seguimiento</label></div>
                 </div>
                 <div class="mt-5 flex justify-end"><button class="rm-btn-primary px-5 py-2.5 text-xs font-bold">Registrar y generar alerta</button></div>
-            </form>
+            <x-ui.clinical-clear-action /></form>
 
             @if($adulto->incidentesClinicos->whereIn('estado', ['ABIERTO','EN_SEGUIMIENTO'])->isNotEmpty())
                 <div class="mt-5 grid gap-5 lg:grid-cols-2">
-                    <form wire:submit="seguimientoIncidente" class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
+                    <form x-data="rmClinicalCapture()" wire:submit="seguimientoIncidente" class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
                         <h2 class="text-lg font-bold text-[var(--rm-text-title)]">Seguimiento del incidente</h2>
                         <select wire:model="incidenteId" class="mt-3 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5"><option value="">Seleccione</option>@foreach($adulto->incidentesClinicos->whereIn('estado',['ABIERTO','EN_SEGUIMIENTO']) as $i)<option value="{{ $i->cod_incidente }}">{{ $i->tipo }} · {{ $i->fecha_hora_evento->format('d/m H:i') }}</option>@endforeach</select>
                         <textarea wire:model="seguimientoIncidente" rows="3" class="mt-3 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5" placeholder="Acción realizada, respuesta y pendientes"></textarea>
                         <button class="rm-btn-primary mt-3 px-5 py-2.5 text-xs font-bold">Pasar a seguimiento</button>
-                    </form>
-                    <form wire:submit="cerrarIncidente" class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
+                    <x-ui.clinical-clear-action /></form>
+                    <form x-data="rmClinicalCapture()" wire:submit="cerrarIncidente" class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
                         <h2 class="text-lg font-bold text-[var(--rm-text-title)]">Cerrar incidente</h2>
                         <select wire:model="incidenteId" class="mt-3 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5"><option value="">Seleccione</option>@foreach($adulto->incidentesClinicos->whereIn('estado',['ABIERTO','EN_SEGUIMIENTO']) as $i)<option value="{{ $i->cod_incidente }}">{{ $i->tipo }} · {{ $i->estado }}</option>@endforeach</select>
                         <textarea wire:model="evaluacionFinalIncidente" rows="2" class="mt-3 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5" placeholder="Evaluación final"></textarea>
                         <textarea wire:model="resultadoIncidente" rows="2" class="mt-3 w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-3 py-2.5" placeholder="Resultado y condición al cierre"></textarea>
                         <button class="rm-btn-secondary mt-3 px-5 py-2.5 text-xs font-bold">Cerrar con resultado</button>
-                    </form>
+                    <x-ui.clinical-clear-action /></form>
                 </div>
             @endif
 

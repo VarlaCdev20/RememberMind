@@ -1,3 +1,20 @@
+---
+title: "Auditoría: Nuevo registro de Enfermería / Medicación programada"
+status: CURRENT
+version: "1.0"
+last_reviewed: 2026-10-06
+owner: RememberMind
+source_of_truth: false
+verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
+> Evidencia localizada con partes propuestas: no autoriza nuevas columnas/reglas. Aplicar decisiones aprobadas posteriores en su alcance, incluida V2.2 para objetivos; consultar [índice](README.md).
+
 # Auditoría: Nuevo registro de Enfermería / Medicación programada
 
 Fuentes: BDD Operativa V2.1 (`REMEMBERMIND_BDD_70_TABLAS.md` y baseline

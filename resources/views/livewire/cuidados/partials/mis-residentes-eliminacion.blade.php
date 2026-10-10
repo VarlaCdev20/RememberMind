@@ -1,38 +1,55 @@
-<div class="rm-clinical-form" x-data="rmClinicalCapture(@js($registroInicial))" aria-label="Registro de eliminación">
-    <x-validation-errors />
-    <p class="rm-clinical-form__note"><i class="ph-bold ph-lock" aria-hidden="true"></i> Fecha y hora automáticas al guardar. Se registra un tipo de eliminación por vez.</p>
-    <x-ui.form-section title="Tipo de eliminación" icon="ph-drop" :columns="1" class="rm-clinical-form__section">
-        <fieldset class="rm-clinical-form__scale" aria-describedby="eliminacion-tipo-help @error('tipo_eliminacion') eliminacion-tipo-error @enderror">
-            <legend>Selecciona el tipo <span class="rm-clinical-form__required">Obligatorio</span></legend>
-            <div class="rm-form-grid rm-form-grid--2">
-                @foreach(['URINARIA' => 'Urinaria', 'INTESTINAL' => 'Intestinal'] as $valor => $texto)
-                    <label class="rm-clinical-form__check"><input id="eliminacion-{{ strtolower($valor) }}" type="radio" wire:model.live="elimTipo" name="tipoEliminacion" value="{{ $valor }}" required aria-invalid="{{ $errors->has('tipo_eliminacion') ? 'true' : 'false' }}"> {{ $texto }}</label>
-                @endforeach
-            </div>
-            @error('tipo_eliminacion')<p id="eliminacion-tipo-error" class="rm-error" role="alert">{{ $message }}</p>@enderror
-            <p id="eliminacion-tipo-help" class="rm-help">Cambiar de tipo limpia la cantidad, las características y la continencia ingresadas.</p>
-        </fieldset>
-    </x-ui.form-section>
-    @if(in_array($elimTipo, ['URINARIA', 'INTESTINAL'], true))
-        @php($sufijoEliminacion = $elimTipo === 'URINARIA' ? 'Urinaria' : 'Intestinal')
-        <x-ui.form-section :title="$elimTipo === 'URINARIA' ? 'Eliminación urinaria' : 'Eliminación intestinal'" icon="ph-note-pencil" :columns="2" class="rm-clinical-form__section" wire:key="eliminacion-campos-{{ $elimTipo }}">
-            <x-ui.field label="Cantidad observada" for="eliminacion-cantidad" error="cantidad" help="Opcional. Registra la cantidad observada; este registro no define una unidad.">
-                <input id="eliminacion-cantidad" class="rm-input" type="number" wire:model="elimCantidad{{ $sufijoEliminacion }}" min="0" step="any" inputmode="decimal" aria-invalid="{{ $errors->has('cantidad') ? 'true' : 'false' }}" aria-describedby="eliminacion-cantidad-help @error('cantidad') eliminacion-cantidad-error @enderror">
-            </x-ui.field>
-            <x-ui.field label="Continencia" for="eliminacion-continencia" error="continencia">
-                <select id="eliminacion-continencia" class="rm-select" wire:model="elimContinencia{{ $sufijoEliminacion }}" aria-invalid="{{ $errors->has('continencia') ? 'true' : 'false' }}" @error('continencia') aria-describedby="eliminacion-continencia-error" @enderror>
-                    <option value="">No registrada</option><option value="CONTINENTE">Continente</option>
-                    @if($elimTipo === 'URINARIA')<option value="INCONTINENCIA_URINARIA">Incontinencia urinaria</option>@else<option value="INCONTINENCIA_FECAL">Incontinencia fecal</option>@endif
-                </select>
-            </x-ui.field>
-            <x-ui.field label="Características observadas" for="eliminacion-caracteristicas" error="caracteristica" :help="$elimTipo === 'URINARIA' ? 'Describe el color, aspecto u olor observado.' : 'Describe la consistencia y otras características observadas.'" class="rm-clinical-form__full">
-                <input id="eliminacion-caracteristicas" class="rm-input" type="text" wire:model="elimCaracteristica{{ $sufijoEliminacion }}" maxlength="120" aria-invalid="{{ $errors->has('caracteristica') ? 'true' : 'false' }}" aria-describedby="eliminacion-caracteristicas-help @error('caracteristica') eliminacion-caracteristicas-error @enderror">
-            </x-ui.field>
-        </x-ui.form-section>
+@php
+    $choicesEliminacion = fn ($field) => array_merge(collect(\App\Models\RegistroEliminacion::OPCIONES[$field])->map(fn ($label, $value) => ['value' => $value, 'label' => $label])->values()->all(), [['value' => '', 'label' => 'Sin registrar']]);
+    $booleanEliminacion = [['value' => false, 'label' => 'No observado/a'], ['value' => true, 'label' => 'Sí, se observó'], ['value' => null, 'label' => 'No valorado']];
+@endphp
+<div class="rm-clinical-form rm-eliminacion" x-data="rmEliminacionRegistro(@js($elimHistorial), @js(array_merge($elimDatos, ['type' => $elimTipo])), false, @js($elimUltimos), @js($registroInicial))" :data-history-open="trendOpen ? 'true' : 'false'" data-type="{{ $elimTipo }}" aria-label="Registro de eliminación">
+    @if($errors->count() > ($errors->has('eliminacion_guardado') ? 1 : 0))<x-validation-errors />@endif
+    @error('eliminacion_guardado')<p class="rm-error" role="alert">{{ $message }}</p>@enderror
+    <div class="rm-eliminacion__timestamp"><i class="ph-bold ph-clock" aria-hidden="true"></i><div><strong>Momento del registro</strong><time>{{ \Carbon\Carbon::parse($elimMomento)->format('d/m/Y · H:i') }}</time></div><span><i class="ph-bold ph-lock" aria-hidden="true"></i> Fecha y hora automáticas · No editables<small>La hora definitiva se asigna al guardar.</small></span></div>
+    <fieldset class="rm-eliminacion__type" aria-describedby="eliminacion-tipo-help @error('tipo_eliminacion') eliminacion-tipo-error @enderror">
+        <legend>¿Qué deseas registrar?</legend><div>
+            @foreach(['URINARIA' => ['Eliminación urinaria', 'ph-drop'], 'INTESTINAL' => ['Eliminación intestinal', 'ph-wave-sine']] as $type => [$label, $icon])
+                <button type="button" data-elimination-type data-type="{{ $type }}" aria-pressed="{{ $elimTipo === $type ? 'true' : 'false' }}" aria-invalid="{{ $errors->has('tipo_eliminacion') ? 'true' : 'false' }}" wire:click="solicitarTipoEliminacion('{{ $type }}')" wire:loading.attr="disabled"><i class="ph-bold {{ $icon }}" aria-hidden="true"></i><span>{{ $label }}</span>@if($elimTipo === $type)<i class="ph-bold ph-check-circle" aria-hidden="true"></i>@endif</button>
+            @endforeach
+        </div><p id="eliminacion-tipo-help" class="rm-help">Selecciona un tipo. Cada confirmación registra un evento independiente.</p>
+        @error('tipo_eliminacion')<p id="eliminacion-tipo-error" class="rm-error" role="alert">{{ $message }}</p>@enderror
+    </fieldset>
+    @if($elimTipoPendiente)
+        <section class="rm-eliminacion__type-confirm" x-data x-trap="true" @keydown.escape.stop.prevent="$wire.cancelarTipoEliminacion()" role="alertdialog" aria-labelledby="eliminacion-cambio-titulo" aria-describedby="eliminacion-cambio-ayuda"><h4 id="eliminacion-cambio-titulo">¿Cambiar el tipo de eliminación?</h4><p id="eliminacion-cambio-ayuda">Se eliminarán los datos específicos del tipo anterior. Los datos comunes y las observaciones se conservarán.</p><button class="rm-btn-secondary" type="button" wire:click="cancelarTipoEliminacion">Seguir editando</button><button class="rm-btn-primary" type="button" wire:click="confirmarTipoEliminacion" wire:loading.attr="disabled">Cambiar tipo</button></section>
     @endif
-    <x-ui.form-section title="Observaciones" icon="ph-note" :columns="1" class="rm-clinical-form__section">
-        <x-ui.field label="Detalles adicionales" for="eliminacion-observacion" error="observacion" help="Describe la asistencia, el dispositivo utilizado u otros detalles relevantes, si corresponde.">
-            <textarea id="eliminacion-observacion" class="rm-textarea" wire:model="elimObservacion" rows="3" maxlength="5000" aria-invalid="{{ $errors->has('observacion') ? 'true' : 'false' }}" aria-describedby="eliminacion-observacion-help @error('observacion') eliminacion-observacion-error @enderror"></textarea>
-        </x-ui.field>
-    </x-ui.form-section>
+    @if(in_array($elimTipo, ['URINARIA', 'INTESTINAL'], true))
+        <div class="rm-eliminacion__layout" @if($elimTipoPendiente) inert @endif>
+            <div class="rm-eliminacion__capture"><div class="rm-eliminacion__fields">
+                <x-ui.elimination-choice-group field="cantidad_cualitativa" title="Cantidad observada" icon="ph-gauge" :options="$choicesEliminacion('cantidad_cualitativa')" />
+                @if($elimTipo === 'URINARIA')
+                    <fieldset class="rm-eliminacion__section"><legend><i class="ph-bold ph-drop" aria-hidden="true"></i> Volumen medido</legend><x-ui.field label="Volumen en mililitros" for="eliminacion-volumen" error="volumen_ml" help="Opcional. Regístralo solo cuando se midió. Cero es distinto de no informado."><div class="rm-eliminacion__unit"><input id="eliminacion-volumen" class="rm-input" type="number" min="0" max="999999.99" step="0.01" inputmode="decimal" x-model="values.volumen_ml" @input="setValue('volumen_ml', $event.target.value)" aria-invalid="{{ $errors->has('volumen_ml') ? 'true' : 'false' }}" aria-describedby="eliminacion-volumen-help @error('volumen_ml') eliminacion-volumen-error @enderror"><span aria-hidden="true">mL</span></div></x-ui.field></fieldset>
+                @endif
+                @php($continenciasEliminacion = [['value' => 'CONTINENTE', 'label' => 'Continente'], ['value' => $elimTipo === 'URINARIA' ? 'INCONTINENCIA_URINARIA' : 'INCONTINENCIA_FECAL', 'label' => $elimTipo === 'URINARIA' ? 'Incontinencia urinaria' : 'Incontinencia fecal'], ['value' => '', 'label' => 'Sin registrar']])
+                @if($elimTipo === 'INTESTINAL')
+                    <fieldset class="rm-eliminacion__section rm-eliminacion__full"><legend>Tipo de Bristol</legend><p class="rm-help">Forma observada · opcional. No determina un diagnóstico.</p><div class="rm-eliminacion__bristol">
+                        @foreach([1 => 'Dura / bolitas separadas', 2 => 'Compacta / grumosa', 3 => 'Formada con grietas', 4 => 'Lisa y blanda', 5 => 'Fragmentos blandos', 6 => 'Pastosa', 7 => 'Acuosa'] as $value => $label)
+                            <button type="button" :aria-pressed="Number(values.tipo_bristol) === {{ $value }}" @click="setValue('tipo_bristol', {{ $value }})" aria-label="Tipo {{ $value }} de Bristol, {{ mb_strtolower($label) }}"><x-ui.bristol-illustration :type="$value" /><strong>Tipo {{ $value }}</strong><small>{{ $label }}</small><span class="rm-eliminacion__bristol-selected" x-show="Number(values.tipo_bristol) === {{ $value }}" x-cloak aria-hidden="true"><i class="ph-bold ph-check" aria-hidden="true"></i> Elegido</span></button>
+                        @endforeach
+                    </div><button class="rm-btn-ghost" type="button" @click="setValue('tipo_bristol', '')" :aria-pressed="values.tipo_bristol === ''">Sin registrar</button>@error('tipo_bristol')<p class="rm-error" role="alert">{{ $message }}</p>@enderror</fieldset>
+                @endif
+                <x-ui.elimination-choice-group field="continencia" title="Continencia" icon="ph-person" :options="$continenciasEliminacion" />
+                @foreach(($elimTipo === 'URINARIA' ? ['color_orina' => ['Color de orina', 'ph-palette'], 'aspecto_orina' => ['Aspecto', 'ph-eye'], 'olor_orina' => ['Olor', 'ph-waves'], 'tipo_miccion' => ['Tipo de micción', 'ph-drop']] : ['color_heces' => ['Color de heces', 'ph-palette'], 'esfuerzo_defecacion' => ['Esfuerzo', 'ph-activity']]) as $field => [$title, $icon])
+                    <x-ui.elimination-choice-group :field="$field" :title="$title" :icon="$icon" :options="$choicesEliminacion($field)" />
+                @endforeach
+                <x-ui.elimination-choice-group field="presencia_sangre" title="¿Se observó sangre?" icon="ph-drop-half" :options="[['value' => false, 'label' => 'No observada'], ['value' => true, 'label' => 'Sí, se observó'], ['value' => null, 'label' => 'No valorado']]" :boolean="true" />
+                @if($elimTipo === 'INTESTINAL')<x-ui.elimination-choice-group field="presencia_moco" title="¿Se observó moco?" :options="[['value' => false, 'label' => 'No observado'], ['value' => true, 'label' => 'Sí, se observó'], ['value' => null, 'label' => 'No valorado']]" :boolean="true" />@endif
+                <div class="rm-eliminacion__full"><x-ui.elimination-choice-group field="molestia_eliminacion" title="¿El residente refirió o mostró molestia durante la eliminación?" icon="ph-warning-circle" :options="[['value' => false, 'label' => 'No observada/referida'], ['value' => true, 'label' => 'Sí'], ['value' => null, 'label' => 'No valorado']]" />
+                    <div class="rm-eliminacion__section" x-show="values.molestia_eliminacion === true" x-cloak><x-ui.field label="Descripción de la molestia" for="eliminacion-molestia" error="descripcion_molestia" help="Opcional. Se recomienda describir lo observado o referido."><input id="eliminacion-molestia" class="rm-input" type="text" maxlength="250" x-model="values.descripcion_molestia" @input="setValue('descripcion_molestia', $event.target.value)" placeholder="Describe únicamente lo observado o referido." aria-describedby="eliminacion-molestia-help @error('descripcion_molestia') eliminacion-molestia-error @enderror" aria-invalid="{{ $errors->has('descripcion_molestia') ? 'true' : 'false' }}"></x-ui.field></div>
+                </div>
+                <fieldset class="rm-eliminacion__section rm-eliminacion__full"><legend><i class="ph-bold ph-note-pencil" aria-hidden="true"></i> Observaciones</legend><x-ui.field label="Detalles del evento" for="eliminacion-observacion" error="observacion" help="Opcional · hasta 5000 caracteres."><textarea id="eliminacion-observacion" class="rm-textarea" maxlength="5000" rows="3" x-model="values.observacion" @input="setValue('observacion', $event.target.value)" placeholder="Describe asistencia, circunstancias u otros detalles relevantes." aria-describedby="eliminacion-observacion-help @error('observacion') eliminacion-observacion-error @enderror" aria-invalid="{{ $errors->has('observacion') ? 'true' : 'false' }}"></textarea></x-ui.field><small class="rm-eliminacion__counter" x-text="(values.observacion?.length ?? 0) + ' / 5000'"></small></fieldset>
+            </div></div>
+            <aside class="rm-eliminacion__continuity" aria-label="Continuidad de eliminación">
+                @can('registros_eliminacion.ver')
+                    <section class="rm-eliminacion__section"><h4><i class="ph-bold ph-clock-counter-clockwise" aria-hidden="true"></i> Continuidad</h4><p class="rm-help">Registros de la jornada actual.</p><div class="rm-eliminacion__counts"><span data-type="URINARIA">Urinarios <b>{{ $elimContinuidad['URINARIA'] ?? 0 }}</b></span><span data-type="INTESTINAL">Intestinales <b>{{ $elimContinuidad['INTESTINAL'] ?? 0 }}</b></span></div><h5>Último registro del mismo tipo</h5><template x-if="previous()"><div><time x-text="previous().fecha + ' · ' + previous().hora"></time><strong class="rm-eliminacion__type-badge" :data-type="previous().tipo" x-text="previous().tipo_label"></strong><span x-show="previous().legacy" class="rm-eliminacion__legacy">Dato de registro anterior</span><dl><template x-for="field in previous().campos" :key="field.nombre"><div><dt x-text="field.nombre"></dt><dd x-text="field.valor"></dd></div></template></dl></div></template><p class="rm-help" x-show="!previous()">Sin registros anteriores de este tipo.</p></section>
+                    <section class="rm-eliminacion__section"><h4>Historial reciente</h4><p class="rm-help" x-show="!history.length">Sin registros anteriores.</p><ol class="rm-eliminacion__recent"><template x-for="row in recent()" :key="row.codigo"><li :data-type="row.tipo"><time x-text="row.fecha + ' · ' + row.hora"></time><strong class="rm-eliminacion__type-badge" :data-type="row.tipo" x-text="row.tipo_label"></strong><small x-show="row.legacy">Dato de registro anterior</small><span x-text="row.campos.map(field => field.nombre + ': ' + field.valor).join(' · ') || 'Sin detalles adicionales'"></span></li></template></ol><button class="rm-btn-secondary rm-eliminacion__history-button" data-type="{{ $elimTipo }}" type="button" @click="openTrend($event.currentTarget)" aria-controls="eliminacion-historial-popup" :aria-expanded="trendOpen"><i class="ph-bold ph-clock-counter-clockwise" aria-hidden="true"></i> Ver historial</button></section>
+                @else<p class="rm-help">No tienes permiso para consultar el historial de eliminación.</p>@endcan
+            </aside>
+        </div>
+    @endif
+    @can('registros_eliminacion.ver')@include('livewire.cuidados.partials.mis-residentes-eliminacion-historial')@endcan
 </div>

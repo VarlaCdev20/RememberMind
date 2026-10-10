@@ -1,0 +1,117 @@
+/* Dolor adopta Clinical Form Pattern V1 y los rangos de intensidad aprobados. */
+.rm-resident-directory__register-modal--dolor .rm-modal-panel { width: min(1160px, calc(100vw - 32px)); max-width: 1160px; border-color: color-mix(in srgb, var(--rm-border-soft) 72%, transparent); }
+.rm-resident-directory__register-modal--dolor .rm-modal-shell__overlay { background: var(--rm-modal-overlay); }
+.rm-resident-directory__register-modal--dolor .rm-modal-panel__title { font-size: 21px; font-weight: 800; }
+.rm-resident-directory__register-modal--dolor .rm-modal-header p { font-size: 13px; }
+.rm-resident-directory__register-modal--dolor .rm-modal-panel__back { width: 44px; height: 44px; min-width: 44px; border-radius: 12px; }
+.rm-resident-directory__register-modal--dolor .rm-modal-panel__drag-handle span { display: none; }
+.rm-resident-directory__register-modal--dolor .rm-clinical-form__icon { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 14px; background: var(--rm-coral-50); color: var(--rm-coral-700); font-size: 24px; }
+.rm-resident-directory__register-modal--dolor .rm-resident-directory__register-context { min-height: 64px; padding: 8px 14px; }
+.rm-resident-directory__register-modal--dolor .rm-resident-directory__register-identity strong { font-size: clamp(18px, 2vw, 23px); font-weight: 800; }
+.rm-resident-directory__register-modal--dolor .rm-resident-directory__register-identity span { font-size: 13px; }
+.rm-dolor { --rm-pain-accent: var(--rm-text-secondary); --rm-pain-soft: var(--rm-surface-soft); --rm-pain-border: var(--rm-border-soft); }
+.rm-dolor[data-intensity="none"], .rm-dolor[data-intensity="low"] { --rm-pain-accent: var(--rm-clinical-normal-ink); --rm-pain-soft: var(--rm-state-success-bg); --rm-pain-border: var(--rm-clinical-normal); }
+.rm-dolor[data-intensity="medium"] { --rm-pain-accent: var(--rm-clinical-warning-ink); --rm-pain-soft: var(--rm-clinical-warning-bg); --rm-pain-border: var(--rm-clinical-warning-border); }
+.rm-dolor[data-intensity="high"] { --rm-pain-accent: var(--rm-clinical-critical-ink); --rm-pain-soft: var(--rm-clinical-critical-bg); --rm-pain-border: var(--rm-clinical-critical-border); }
+.rm-dolor__workspace { display: grid; grid-template-columns: minmax(360px, .9fr) minmax(420px, 1.1fr); align-items: start; gap: 14px; }
+.rm-dolor__column { display: grid; gap: 14px; min-width: 0; }
+.rm-dolor .rm-clinical-form__section { display: grid; gap: 10px; background: var(--rm-surface-main); }
+.rm-dolor h5 { display: flex; align-items: center; gap: 8px; margin: 0; font: 800 15px/1.35 var(--rm-font-friendly); }
+.rm-dolor h5 > i { color: var(--rm-action-primary-ink); font-size: 20px; }
+.rm-dolor__time { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; min-height: 52px; padding: 8px 12px; border: 1px solid var(--rm-border-soft); border-radius: 12px; background: var(--rm-surface-raised); font-size: 13px; }
+.rm-dolor__time > span { margin-left: auto; color: var(--rm-text-secondary); font-size: 12px; }
+.rm-dolor__error-summary { margin: 0; padding: 12px; border: 1px solid var(--rm-state-danger-text); border-radius: 12px; color: var(--rm-state-danger-text); background: var(--rm-state-danger-soft); }
+.rm-dolor .rm-clinical-form__value strong { font-size: 42px; color: var(--rm-pain-accent); }
+.rm-dolor .rm-clinical-form__scale-options { grid-template-columns: repeat(6, minmax(44px, 1fr)); gap: 8px; }
+.rm-dolor .rm-clinical-form__scale-option input:checked + span { background: var(--rm-pain-accent); border-color: var(--rm-pain-accent); color: var(--rm-surface-raised); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--rm-surface-raised) 30%, transparent); }
+.rm-dolor .rm-clinical-form__scale-option:hover span { border-color: var(--rm-pain-accent); }
+/* Color de intensidad aprobado, acompañado de texto. No equivale a una alerta. */
+.rm-dolor .rm-dolor__intensity { background: color-mix(in srgb, var(--rm-pain-soft) 80%, var(--rm-surface-main)); border-color: var(--rm-pain-border); border-inline-start-width: 4px; transition: background var(--rm-duration-fast), border-color var(--rm-duration-fast); }
+.rm-dolor[data-intensity="none"] .rm-dolor__intensity { background: color-mix(in srgb, var(--rm-pain-soft) 40%, var(--rm-surface-main)); }
+.rm-dolor .rm-dolor__intensity .rm-clinical-form__value small { color: var(--rm-text-secondary); font-weight: 600; }
+.rm-dolor__summary dl { display: grid; gap: 6px; margin: 0; font-size: 13px; }
+.rm-dolor__summary dl > div { display: grid; grid-template-columns: minmax(100px, .8fr) minmax(0, 1.2fr); gap: 10px; }
+.rm-dolor__summary dt { color: var(--rm-text-secondary); }
+.rm-dolor__summary dd { margin: 0; overflow-wrap: anywhere; }
+.rm-dolor__origin { margin-block: 12px; font-size: 13px; }
+.rm-dolor__origin p { margin: 0; overflow-wrap: anywhere; }
+.rm-dolor__scale-extremes { display: flex; justify-content: space-between; gap: 12px; color: var(--rm-text-secondary); font-size: 12px; }
+.rm-dolor__body-map { display: flex; justify-content: center; gap: 32px; padding: 4px; }
+.rm-dolor__body-map figure { display: grid; justify-items: center; gap: 4px; margin: 0; }
+.rm-dolor__body-map svg { width: 132px; height: 286px; overflow: visible; }
+.rm-dolor__body-map figcaption { font-size: 12px; color: var(--rm-text-secondary); }
+.rm-dolor__silhouette { fill: var(--rm-surface-raised); stroke: var(--rm-text-muted); stroke-width: 1.4; }
+.rm-dolor__zone { cursor: pointer; outline: none; }
+.rm-dolor__zone > path { fill: transparent; stroke: transparent; stroke-width: 1.5; transition: fill var(--rm-duration-fast) var(--rm-ease-standard), stroke var(--rm-duration-fast) var(--rm-ease-standard); }
+.rm-dolor__zone:hover > path { fill: color-mix(in srgb, var(--rm-pain-accent) 10%, transparent); }
+.rm-dolor__zone[aria-pressed="true"] > path { fill: color-mix(in srgb, var(--rm-pain-border) 38%, var(--rm-pain-soft)); stroke: var(--rm-pain-accent); stroke-width: 2; }
+.rm-dolor__zone:focus-visible > path { stroke: var(--rm-action-primary-ink); stroke-width: 2.5; }
+.rm-dolor__hotspot { fill: var(--rm-pain-accent); stroke: color-mix(in srgb, var(--rm-pain-accent) 16%, transparent); stroke-width: 5; opacity: 0; pointer-events: none; transition: opacity var(--rm-duration-fast) var(--rm-ease-standard); }
+.rm-dolor__zone[aria-pressed="true"] .rm-dolor__hotspot { opacity: 1; }
+.rm-dolor__zone[aria-pressed="true"] .rm-dolor__hotspot { animation: rm-pain-mark var(--rm-duration-fast) var(--rm-ease-standard); transform-box: fill-box; transform-origin: center; }
+@keyframes rm-pain-mark { from { transform: scale(.6); } to { transform: scale(1); } }
+.rm-dolor__map-tabs { display: none; }
+.rm-dolor__zone-list > summary, .rm-dolor__history > summary { cursor: pointer; min-height: 44px; align-content: center; font-size: 13px; font-weight: 700; }
+.rm-dolor__zone-list > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.rm-dolor__zone-list button, .rm-dolor__chips button, .rm-dolor__map-tabs button { min-height: 44px; padding: 6px 10px; border: 1px solid var(--rm-border-soft); border-radius: 12px; background: var(--rm-surface-raised); font-size: 12px; color: var(--rm-text-primary); }
+.rm-dolor__zone-list button[aria-pressed="true"], .rm-dolor__map-tabs button[aria-pressed="true"] { background: var(--rm-pain-soft); color: var(--rm-pain-accent); border-color: var(--rm-pain-accent); }
+.rm-dolor__chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.rm-dolor__chips button { display: inline-flex; align-items: center; gap: 8px; background: var(--rm-pain-soft); border-color: var(--rm-pain-border); color: var(--rm-pain-accent); font-weight: 700; }
+.rm-dolor__location-status { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; }
+.rm-dolor__location-status > span:last-child { flex-shrink: 0; color: var(--rm-text-secondary); }
+/* Selectores de captura con entrada exacta cuando el atajo no aplica. */
+.rm-dolor__capture-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.rm-dolor__capture-grid > p, .rm-dolor__capture-grid > :last-child { grid-column: 1 / -1; }
+.rm-dolor__capture-field, .rm-dolor__custom-value { display: grid; align-content: start; gap: 6px; min-width: 0; }
+.rm-dolor__capture-field label { font-size: var(--rm-font-size-label); font-weight: 700; }
+.rm-dolor__capture-field label small { color: var(--rm-text-secondary); font-weight: 500; }
+.rm-dolor__custom-value { margin-top: 4px; }
+.rm-dolor__custom-value label { font-size: 12px; color: var(--rm-text-secondary); }
+.rm-dolor__capture-field .rm-select, .rm-dolor__capture-field .rm-input { width: 100%; min-width: 0; min-height: 44px; }
+.rm-dolor__select-wrap { position: relative; align-self: start; min-width: 0; }
+.rm-dolor__select-wrap select { appearance: none; padding-right: 36px; }
+.rm-dolor__select-wrap > i { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--rm-text-secondary); }
+.rm-dolor__capture-field [aria-invalid="true"] { border-color: var(--rm-state-danger-text); }
+.rm-dolor .rm-dolor__trigger { min-height: 76px; }
+.rm-dolor .rm-dolor__intervention { min-height: 90px; }
+.rm-dolor__comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding-block: 8px; }
+.rm-dolor__comparison > div { min-width: 0; display: grid; align-content: start; gap: 4px; overflow-wrap: anywhere; }
+.rm-dolor__comparison span, .rm-dolor__comparison small { color: var(--rm-text-secondary); font-size: 12px; }
+.rm-dolor__comparison strong { font-size: 21px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.rm-dolor__comparison--three { grid-template-columns: repeat(3, minmax(0, 1fr)); border-block: 1px solid var(--rm-border-soft); }
+.rm-dolor__comparison--three strong { font-size: 16px; }
+.rm-dolor__evolution { width: 100%; min-height: 44px; }
+.rm-dolor__chart svg { display: block; width: 100%; height: auto; }
+.rm-dolor__chart-grid { stroke: var(--rm-chart-grid); }
+.rm-dolor__chart-axis { fill: var(--rm-text-secondary); font-size: 11px; }
+.rm-dolor__chart-line { stroke: var(--rm-pain-accent); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.rm-dolor__chart-line--preview { stroke-dasharray: 6 5; }
+.rm-dolor__chart-dot { fill: var(--rm-pain-accent); stroke: var(--rm-surface-main); stroke-width: 2; pointer-events: none; }
+.rm-dolor__chart-dot.is-preview { fill: var(--rm-surface-main); stroke: var(--rm-pain-accent); stroke-width: 3; }
+.rm-dolor__chart-hit { fill: transparent; cursor: pointer; }
+.rm-dolor__chart-hit:focus-visible { outline: 0; stroke: var(--rm-action-primary-ink); stroke-width: 2; }
+.rm-dolor__tooltip { padding: 8px 10px; border: 1px solid var(--rm-border-soft); border-radius: 12px; background: var(--rm-surface-raised); font-size: 12px; }
+.rm-dolor__legend { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 12px; font-size: 12px; color: var(--rm-text-secondary); }
+.rm-dolor__history ol { display: grid; gap: 8px; padding: 0; margin: 0; list-style: none; }
+.rm-dolor__history li { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 4px 8px; padding-block: 8px; border-bottom: 1px solid var(--rm-border-soft); font-size: 12px; }
+.rm-dolor__history li > span { grid-column: 1 / -1; overflow-wrap: anywhere; color: var(--rm-text-secondary); }
+.rm-dolor button:focus-visible { outline: var(--rm-focus-ring-width) solid var(--rm-focus-ring-color); outline-offset: var(--rm-focus-ring-offset); }
+.rm-dolor button:not(.rm-signos__graph-edge, .rm-signos__graph-move, .rm-signos__graph-resize):active { transform: translateY(1px); }
+@media (min-width: 1024px) {
+    .rm-resident-directory__register-modal--dolor:has(.rm-dolor[data-graph-open="true"]) .rm-modal-panel { width: calc(100vw - var(--rm-signos-graph-width, 560px) - 48px); max-width: calc(100vw - var(--rm-signos-graph-width, 560px) - 48px); margin-left: 0; margin-right: auto; }
+    .rm-dolor[data-graph-open="true"] .rm-dolor__workspace { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 900px) { .rm-dolor__workspace { grid-template-columns: minmax(0,1fr); } }
+@media (max-width: 1023px) { .rm-resident-directory__register-modal--dolor:has(.rm-dolor[data-graph-open="true"]) .rm-modal-body { padding-bottom: calc(var(--rm-signos-graph-height, 280px) + 24px); } }
+@media (max-width: 480px) {
+    .rm-resident-directory__register-modal--dolor .rm-modal-panel { width: calc(100vw - 16px); max-width: calc(100vw - 16px); }
+    .rm-dolor__time { align-items: start; }
+    .rm-dolor__time > span { flex: 1 1 100%; margin-left: 0; }
+    .rm-dolor__map-tabs { display: flex; gap: 8px; }
+    .rm-dolor__map-tabs button { flex: 1; }
+    .rm-dolor__body-map figure[data-current="false"] { display: none; }
+    .rm-dolor__comparison--three { gap: 8px; }
+    .rm-dolor__body-map svg { width: 120px; height: 260px; }
+    .rm-dolor .rm-clinical-form__scale-options { grid-template-columns: repeat(5, minmax(44px, 1fr)); gap: 6px; }
+}
+@media (prefers-reduced-motion: reduce) { .rm-dolor *, .rm-dolor *::before, .rm-dolor *::after { transition: none; animation: none; } }

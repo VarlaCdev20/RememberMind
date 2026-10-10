@@ -439,6 +439,12 @@ class SeguimientoDiarioPanel extends Component
         session()->flash('mensaje', $msg);
     }
 
+    public function limpiarErroresCaptura(): void
+    {
+        abort_unless(auth()->user()?->estado === 'ACTIVO', 403);
+        $this->resetValidation();
+    }
+
     public function cerrarModales(): void
     {
         $this->modalForm = false;

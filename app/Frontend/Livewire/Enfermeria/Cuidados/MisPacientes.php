@@ -22,6 +22,7 @@ use App\Models\Prescripcion;
 use App\Models\Residente;
 use App\Models\SignoVital;
 use App\Models\Turno;
+use App\Models\ValoracionDolor;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -36,6 +37,24 @@ use Illuminate\Validation\ValidationException;
 class MisPacientes extends Component
 {
     use WithPagination;
+
+    #[\Livewire\Attributes\Computed]
+    public function movilidadOpciones(): array
+    {
+        $catalogos = \App\Models\RegistroMovilidad::catalogos();
+        $result = [];
+        foreach (\App\Models\RegistroMovilidad::LABELS as $field => $label) {
+            $options = isset($catalogos[$field])
+                ? array_map(fn ($code) => ['value' => $code, 'label' => \App\Models\RegistroMovilidad::TEXTOS[$code]], $catalogos[$field])
+                : [['value' => false, 'label' => 'No'], ['value' => true, 'label' => 'Sí'], ['value' => null, 'label' => 'No valorado']];
+            if (isset($catalogos[$field]) && $field !== 'marcha') {
+                $options[] = ['value' => '', 'label' => 'Sin registrar'];
+            }
+            $result[$field] = ['label' => $label, 'options' => $options];
+        }
+
+        return $result;
+    }
 
     #[Url(as: 'buscar')]
     public string $search = '';
@@ -118,6 +137,12 @@ class MisPacientes extends Component
     public array $registroInicial = [];
 
     public bool $confirmarDescarte = false;
+
+    #[Locked]
+    public bool $confirmarLimpiezaRegistro = false;
+
+    #[Locked]
+    public int $registroCapturaVersion = 0;
 
     #[Locked]
     public bool $descarteCriticoConfirmado = false;
@@ -245,6 +270,21 @@ class MisPacientes extends Component
 
     public string $cuidadoObs = '';
 
+    public string $hidratacionCantidad = '';
+    public string $hidratacionTipo = '';
+    public string $hidratacionTolerancia = '';
+    public string $hidratacionObservacion = '';
+    #[Locked]
+    public string $hidratacionMomento = '';
+    #[Locked]
+    public ?string $hidratacionResidenteContexto = null;
+    #[Locked]
+    public array $hidratacionHistorial = [];
+    #[Locked]
+    public array $hidratacionContinuidad = [];
+    #[Locked]
+    public array $hidratacionResultado = [];
+
     public string $ingestaTipoComida = '';
 
     public string $ingestaPorcentaje = '';
@@ -253,25 +293,36 @@ class MisPacientes extends Component
 
     public string $ingestaTolerancia = '';
 
-    public bool $ingestaDificultadDeglucion = false;
+    public ?bool $ingestaDificultadDeglucion = null;
+
+    public bool $ingestaRegistrarLiquidos = false;
+
+    #[Locked]
+    public string $ingestaMomento = '';
+
+    #[Locked]
+    public ?string $ingestaResidenteContexto = null;
+
+    #[Locked]
+    public array $ingestaHistorial = [];
+
+    #[Locked]
+    public array $ingestaResultado = [];
 
     public string $ingestaObservacion = '';
 
     public string $elimTipo = '';
-
-    public string $elimCantidadUrinaria = '';
-
-    public string $elimCaracteristicaUrinaria = '';
-
-    public string $elimContinenciaUrinaria = '';
-
-    public string $elimCantidadIntestinal = '';
-
-    public string $elimCaracteristicaIntestinal = '';
-
-    public string $elimContinenciaIntestinal = '';
-
-    public string $elimObservacion = '';
+    public array $elimDatos = ['cantidad_cualitativa' => '', 'volumen_ml' => '', 'color_orina' => '', 'aspecto_orina' => '',
+        'olor_orina' => '', 'tipo_miccion' => '', 'tipo_bristol' => '', 'color_heces' => '', 'esfuerzo_defecacion' => '',
+        'presencia_sangre' => null, 'presencia_moco' => null, 'molestia_eliminacion' => null,
+        'descripcion_molestia' => '', 'continencia' => '', 'observacion' => ''];
+    #[Locked] public string $elimMomento = '';
+    #[Locked] public string $elimResidenteContexto = '';
+    #[Locked] public ?string $elimTipoPendiente = null;
+    #[Locked] public array $elimHistorial = [];
+    #[Locked] public array $elimUltimos = [];
+    #[Locked] public array $elimContinuidad = [];
+    #[Locked] public array $elimResultado = [];
 
     public string $movMarcha = '';
 
@@ -287,13 +338,27 @@ class MisPacientes extends Component
 
     public string $movObservacion = '';
 
+    public array $movDatos = ['motivo_registro' => '', 'actividad_realizada' => '', 'dispositivo' => '',
+        'distancia_metros' => '', 'tolerancia_movilidad' => '', 'dolor_movilidad' => null, 'mareo' => null,
+        'disnea' => null, 'debilidad' => null, 'cambio_habitual' => '', 'motivo_otro' => '', 'dispositivo_otro' => ''];
+    #[Locked] public string $movResidenteContexto = '';
+    #[Locked] public string $movMomento = '';
+    #[Locked] public array $movHistorial = [];
+    #[Locked] public array $movContinuidad = [];
+    #[Locked] public array $movResultado = [];
+    #[Locked] public int $movLimiteHistorial = 40;
+    #[Locked] public bool $movHayMasHistorial = false;
+
     public bool $modalDolor = false;
 
-    public int $dolorIntensidad = 5;
-
-    public string $dolorDetalle = '';
-
+    #[Locked]
     public string $dolorFechaHora = '';
+
+    #[Locked]
+    public array $dolorHistorial = [];
+
+    #[Locked]
+    public array $dolorResultado = [];
 
     public string $dolorEva = '';
 
@@ -306,6 +371,30 @@ class MisPacientes extends Component
     public string $dolorDesencadenante = '';
 
     public string $dolorIntervencion = '';
+
+    public string $dolorFrecuencia = '';
+
+    public string $dolorFactoresAlivio = '';
+
+    public string $dolorRespuesta = '';
+
+    #[Locked]
+    public ?string $dolorCodOrigen = null;
+
+    #[Locked]
+    public ?string $dolorResidenteContexto = null;
+
+    #[Locked]
+    public array $dolorContextoOrigen = [];
+
+    #[Locked]
+    public array $dolorEpisodio = [];
+
+    #[Locked]
+    public ?string $dolorOrigenPendiente = null;
+
+    #[Locked]
+    public int $dolorCapturaVersion = 0;
 
     public bool $modalProcedimiento = false;
 
@@ -580,7 +669,7 @@ class MisPacientes extends Component
 
     public function seleccionarResidente(?string $codResidente): void
     {
-        if ($this->drawerPaso === 'register-form' && $this->registroTipo === 'signos' && $this->formularioModificado()) {
+        if ($this->drawerPaso === 'register-form' && $this->formularioModificado()) {
             $this->solicitarDescarte('cerrar');
             return;
         }
@@ -725,7 +814,7 @@ class MisPacientes extends Component
             && ! app(RolePreviewService::class)->isActive($usuario)
             && (bool) $usuario->canAny([
                 'signos_vitales.crear', 'administraciones_medicacion.crear',
-                'valoraciones_dolor.crear', 'registros_ingesta.crear',
+                'valoraciones_dolor.crear', 'registros_ingesta.crear', 'registros_hidratacion.crear',
                 'registros_eliminacion.crear', 'registros_movilidad.crear',
                 'atenciones.crear',
             ]);
@@ -764,9 +853,9 @@ class MisPacientes extends Component
         abort_unless($this->mostrarSelectorModal && $this->detalleResidente && $this->drawerPaso === 'register-selector', 403);
         $codResidente = $this->detalleResidente['cod_residente'];
 
-        if (in_array($tipo, ['dolor', 'alimentacion', 'eliminacion', 'movilidad'], true)) {
+        if (in_array($tipo, ['dolor', 'alimentacion', 'hidratacion', 'eliminacion', 'movilidad'], true)) {
             $permiso = match ($tipo) {
-                'dolor' => 'valoraciones_dolor.crear', 'alimentacion' => 'registros_ingesta.crear',
+                'dolor' => 'valoraciones_dolor.crear', 'alimentacion' => 'registros_ingesta.crear', 'hidratacion' => 'registros_hidratacion.crear',
                 'eliminacion' => 'registros_eliminacion.crear', 'movilidad' => 'registros_movilidad.crear',
             };
             $this->getTurnoService()->autorizarMutacionEnfermeria($codResidente, $permiso, Auth::user());
@@ -777,7 +866,8 @@ class MisPacientes extends Component
             'medicacion' => $this->prepararAdministracionProgramada($codResidente),
             'dolor' => $this->abrirRegistrarDolor($codResidente),
             'alimentacion' => $this->abrirRegistrarCuidado($codResidente, 'ALIMENTACION'),
-            'eliminacion' => $this->abrirRegistrarCuidado($codResidente, 'ELIMINACION'),
+            'hidratacion' => $this->abrirRegistrarHidratacion($codResidente),
+            'eliminacion' => $this->abrirRegistrarEliminacion($codResidente),
             'movilidad' => $this->abrirRegistrarCuidado($codResidente, 'MOVILIDAD'),
             'seguimiento' => $this->abrirRegistrarSeguimiento($codResidente),
             'procedimiento' => $this->abrirRegistrarProcedimiento($codResidente),
@@ -822,6 +912,7 @@ class MisPacientes extends Component
 
     public function cancelarDescarte(): void
     {
+        $this->dolorOrigenPendiente = null;
         $this->confirmarDescarte = false;
         $this->accionDescarte = null;
         $this->descarteCriticoConfirmado = false;
@@ -833,12 +924,14 @@ class MisPacientes extends Component
         if (! $this->confirmarDescarte) {
             return;
         }
-        $this->actualizarEvaluacionSignos();
-        if ($this->lecturaCriticaSinGuardar()) {
-            $this->addError('continuidad_signos', 'Revisa o corrige la lectura crítica y regístrala antes de salir.');
+        $accion = $this->accionDescarte;
+        $origenPendiente = $this->dolorOrigenPendiente;
+        if ($accion === 'reevaluar-dolor' && $origenPendiente) {
+            $this->confirmarDescarte = false;
+            $this->dolorOrigenPendiente = null;
+            $this->iniciarReevaluacionDolor($origenPendiente);
             return;
         }
-        $accion = $this->accionDescarte;
         $this->limpiarRegistroEnPanel();
 
         if ($accion === 'cerrar') {
@@ -863,6 +956,7 @@ class MisPacientes extends Component
 
     private function solicitarDescarte(string $accion): void
     {
+        $this->confirmarLimpiezaRegistro = $this->confirmarLimpiezaSignos = false;
         $this->confirmarDescarte = true;
         $this->accionDescarte = $accion;
         $this->descarteCriticoConfirmado = false;
@@ -887,10 +981,11 @@ class MisPacientes extends Component
         $campos = match ($this->registroTipo) {
             'signos' => ['signoSis', 'signoDia', 'signoFC', 'signoFR', 'signoTemp', 'signoSat', 'signoGlucosa', 'signoObs', 'signoFechaHora'],
             'medicacion' => ['medCodMed', 'medAdministrado', 'medMotivoOmision', 'medResultado', 'medFechaHoraReal', 'medDosisAdministrada', 'medObservacion', 'medOcurrenciaSeleccionada'],
-            'dolor' => ['dolorFechaHora', 'dolorEva', 'dolorUbicacion', 'dolorDuracionValor', 'dolorDuracionUnidad', 'dolorDesencadenante', 'dolorIntervencion'],
-            'alimentacion' => ['ingestaTipoComida', 'ingestaPorcentaje', 'ingestaCantidadMl', 'ingestaTolerancia', 'ingestaDificultadDeglucion', 'ingestaObservacion'],
-            'eliminacion' => ['elimTipo', 'elimCantidadUrinaria', 'elimCaracteristicaUrinaria', 'elimContinenciaUrinaria', 'elimCantidadIntestinal', 'elimCaracteristicaIntestinal', 'elimContinenciaIntestinal', 'elimObservacion'],
-            'movilidad' => ['movMarcha', 'movTraslado', 'movTipoApoyo', 'movEquilibrio', 'movFatiga', 'movRiesgoCaida', 'movObservacion'],
+            'dolor' => ['dolorEva', 'dolorUbicacion', 'dolorDuracionValor', 'dolorDuracionUnidad', 'dolorDesencadenante', 'dolorIntervencion', 'dolorFrecuencia', 'dolorFactoresAlivio', 'dolorRespuesta'],
+            'hidratacion' => ['hidratacionCantidad', 'hidratacionTipo', 'hidratacionTolerancia', 'hidratacionObservacion'],
+            'alimentacion' => ['ingestaTipoComida', 'ingestaPorcentaje', 'ingestaCantidadMl', 'ingestaTolerancia', 'ingestaDificultadDeglucion', 'ingestaObservacion', 'ingestaRegistrarLiquidos'],
+            'eliminacion' => ['elimTipo', 'elimDatos'],
+            'movilidad' => ['movMarcha', 'movTraslado', 'movTipoApoyo', 'movEquilibrio', 'movFatiga', 'movRiesgoCaida', 'movObservacion', 'movDatos'],
             'seguimiento' => ['segEstado', 'segAlimentacion', 'segMovilidad', 'segSueno', 'segIncidente', 'segRequiereMedico', 'segObs'],
             'procedimiento' => ['procTipo', 'procDetalle'],
             'alerta' => ['alertaTipo', 'alertaNivel', 'alertaMotivo'],
@@ -902,6 +997,11 @@ class MisPacientes extends Component
 
     private function limpiarRegistroEnPanel(): void
     {
+        $this->reset(['movMomento', 'movResidenteContexto', 'movHistorial', 'movContinuidad', 'movResultado', 'movLimiteHistorial', 'movHayMasHistorial']);
+        $this->reset(['elimMomento', 'elimResidenteContexto', 'elimTipoPendiente', 'elimHistorial', 'elimUltimos', 'elimContinuidad', 'elimResultado']);
+        $this->reset(['hidratacionMomento', 'hidratacionResidenteContexto', 'hidratacionHistorial', 'hidratacionContinuidad', 'hidratacionResultado']);
+        $this->reset(['ingestaMomento', 'ingestaResidenteContexto', 'ingestaHistorial', 'ingestaResultado']);
+        $this->confirmarLimpiezaRegistro = $this->confirmarLimpiezaSignos = false;
         $campos = array_keys($this->estadoFormularioRegistro());
         if ($campos !== []) {
             $this->reset(...$campos);
@@ -918,6 +1018,14 @@ class MisPacientes extends Component
         $this->signosPasoConfirmacion = 'revision';
         $this->signosResultadoRegistro = [];
         $this->signosConfirmacionHuella = null;
+        $this->dolorHistorial = [];
+        $this->dolorResultado = [];
+        $this->dolorFechaHora = '';
+        $this->dolorCodOrigen = null;
+        $this->dolorResidenteContexto = null;
+        $this->dolorContextoOrigen = [];
+        $this->dolorEpisodio = [];
+        $this->dolorOrigenPendiente = null;
         $this->confirmarDescarte = false;
         $this->accionDescarte = null;
         $this->modalCodResidente = null;
@@ -1367,13 +1475,58 @@ class MisPacientes extends Component
             && $this->registroTipo === 'signos' && $this->detalleResidente
             && $this->modalCodResidente === $this->detalleResidente['cod_residente'], 403);
         $this->getTurnoService()->autorizarMutacionEnfermeria($this->modalCodResidente, 'signos_vitales.crear', Auth::user());
-        $this->actualizarEvaluacionSignos();
-        if ($this->lecturaCriticaSinGuardar()) {
-            $this->addError('continuidad_signos', 'Hay una lectura crítica pendiente. Si es un error de transcripción, corrige el valor en su campo. Si la lectura es correcta, confírmala y registra la alerta para atenderla. No se pueden limpiar los campos mientras siga crítica.');
-            return false;
-        }
         $this->resetValidation('continuidad_signos');
         return true;
+    }
+
+    private function validarLimpiezaRegistro(): void
+    {
+        abort_if($this->esModoConsulta, 403);
+        abort_unless($this->mostrarSelectorModal && $this->drawerPaso === 'register-form'
+            && ! $this->confirmarDescarte && $this->detalleResidente
+            && $this->modalCodResidente === $this->detalleResidente['cod_residente'], 403);
+        $permiso = match ($this->registroTipo) {
+            'signos' => 'signos_vitales.crear', 'dolor' => 'valoraciones_dolor.crear',
+            'medicacion' => 'administraciones_medicacion.crear', 'alimentacion' => 'registros_ingesta.crear', 'hidratacion' => 'registros_hidratacion.crear',
+            'eliminacion' => 'registros_eliminacion.crear', 'movilidad' => 'registros_movilidad.crear',
+            'seguimiento', 'procedimiento' => 'atenciones.crear', 'alerta' => 'alertas.crear',
+            default => abort(403),
+        };
+        $this->getTurnoService()->autorizarMutacionEnfermeria($this->modalCodResidente, $permiso, Auth::user());
+        abort_if($this->dolorResultado !== [] || $this->signosResultadoRegistro !== [], 409);
+    }
+
+    public function solicitarLimpiezaRegistro(): void
+    {
+        $this->validarLimpiezaRegistro();
+        $this->confirmarLimpiezaRegistro = true;
+    }
+
+    public function cancelarLimpiezaRegistro(): void
+    {
+        $this->confirmarLimpiezaRegistro = false;
+    }
+
+    public function limpiarCamposRegistro(): void
+    {
+        $this->validarLimpiezaRegistro();
+        abort_unless($this->confirmarLimpiezaRegistro, 409);
+        if ($this->registroTipo === 'signos') {
+            $this->limpiarCamposSignos();
+        } else {
+            // Conserva el contexto y la prescripción seleccionada. Solo limpia captura.
+            $campos = array_diff(array_keys($this->estadoFormularioRegistro()), [
+                'medCodMed', 'medOcurrenciaSeleccionada', 'medFechaHoraReal',
+            ]);
+            $this->reset(...$campos);
+            if ($this->registroTipo === 'eliminacion') $this->elimTipoPendiente = null;
+            $this->registroCapturaVersion++;
+            if ($this->registroTipo === 'dolor') $this->dolorCapturaVersion++;
+            $this->resetValidation();
+            $this->registroInicial = $this->estadoFormularioRegistro();
+        }
+        $this->confirmarLimpiezaRegistro = false;
+        $this->dispatch('registro-campos-limpiados');
     }
 
     public function limpiarCamposSignos(): void
@@ -1880,84 +2033,395 @@ class MisPacientes extends Component
         $this->cuidadoSubtipo = $subtipo ?: 'GENERAL';
         $this->cuidadoObs = '';
         if ($this->cuidadoTipo === 'ALIMENTACION') {
-            $this->reset(['ingestaTipoComida', 'ingestaPorcentaje', 'ingestaCantidadMl', 'ingestaTolerancia', 'ingestaDificultadDeglucion', 'ingestaObservacion']);
+            $this->reset(['ingestaTipoComida', 'ingestaPorcentaje', 'ingestaCantidadMl', 'ingestaTolerancia', 'ingestaDificultadDeglucion', 'ingestaObservacion', 'ingestaRegistrarLiquidos', 'ingestaResultado']);
+            $this->ingestaResidenteContexto = $codResidente;
+            $this->ingestaMomento = now()->format('Y-m-d\TH:i:s');
+            $this->cargarHistorialIngesta();
         }
         if ($this->cuidadoTipo === 'ELIMINACION') {
-            $this->reset(['elimTipo', 'elimCantidadUrinaria', 'elimCaracteristicaUrinaria', 'elimContinenciaUrinaria', 'elimCantidadIntestinal', 'elimCaracteristicaIntestinal', 'elimContinenciaIntestinal', 'elimObservacion']);
+            $this->reset(['elimTipo', 'elimDatos']);
         }
         if ($this->cuidadoTipo === 'MOVILIDAD') {
-            $this->reset(['movMarcha', 'movTraslado', 'movTipoApoyo', 'movEquilibrio', 'movFatiga', 'movRiesgoCaida', 'movObservacion']);
+            $this->getTurnoService()->autorizarMutacionEnfermeria($codResidente, 'registros_movilidad.crear', Auth::user());
+            $this->reset(['movMarcha', 'movTraslado', 'movTipoApoyo', 'movEquilibrio', 'movFatiga', 'movRiesgoCaida', 'movObservacion', 'movDatos', 'movResultado', 'movLimiteHistorial', 'movHayMasHistorial']);
+            $this->movResidenteContexto = $codResidente;
+            $this->movMomento = now()->format('Y-m-d\TH:i:s');
+            $this->cargarMovilidad();
         }
         $this->modalCuidado = true;
     }
 
-    public function updatedElimTipo(): void
+    public function abrirRegistrarHidratacion(string $codResidente): void
     {
-        $this->reset(['elimCantidadUrinaria', 'elimCaracteristicaUrinaria', 'elimContinenciaUrinaria', 'elimCantidadIntestinal', 'elimCaracteristicaIntestinal', 'elimContinenciaIntestinal']);
+        abort_if($this->esModoConsulta, 403);
+        $this->getTurnoService()->autorizarMutacionEnfermeria($codResidente, 'registros_hidratacion.crear', Auth::user());
+        $this->modalCodResidente = $codResidente;
+        $this->reset(['hidratacionCantidad', 'hidratacionTipo', 'hidratacionTolerancia', 'hidratacionObservacion', 'hidratacionResultado']);
+        $this->hidratacionResidenteContexto = $codResidente;
+        $this->hidratacionMomento = now()->format('Y-m-d\TH:i:s');
+        $this->cargarHidratacion();
+    }
+
+    private function cargarHidratacion(): void
+    {
+        $this->hidratacionHistorial = $this->hidratacionContinuidad = [];
+        if (! Auth::user()->can('registros_hidratacion.ver')) {
+            return;
+        }
+        $base = \App\Models\RegistroHidratacion::query()
+            ->where('cod_residente', $this->hidratacionResidenteContexto)
+            ->where('estado', 'VIGENTE')->where('fecha_hora', '<=', now());
+        $this->hidratacionHistorial = (clone $base)->orderByDesc('fecha_hora')->orderByDesc('cod_hidratacion')
+            ->limit(10)->get()->map(fn ($row) => [
+                'codigo' => $row->cod_hidratacion, 'fecha_hora' => $row->fecha_hora->format('Y-m-d\TH:i:s'),
+                'volumen' => $row->cantidad_ml, 'tipo' => $row->tipo_liquido,
+                'tolerancia' => $row->tolerancia,
+            ])->all();
+        $jornada = app(MiTurnoService::class)->resolverJornadaActual(Auth::user()->personal, now());
+        if ($jornada) {
+            $actual = (clone $base)->where('cod_jornada', $jornada->cod_jornada)
+                ->selectRaw('COUNT(*) AS aportes, COALESCE(SUM(cantidad_ml), 0) AS acumulado')->first();
+            $this->hidratacionContinuidad = ['aportes' => (int) $actual->aportes, 'acumulado' => (float) $actual->acumulado];
+        }
+    }
+
+    public function guardarHidratacion(): void
+    {
+        abort_unless(! $this->esModoConsulta && $this->mostrarSelectorModal && $this->drawerPaso === 'register-form'
+            && $this->registroTipo === 'hidratacion' && $this->detalleResidente
+            && $this->modalCodResidente === $this->detalleResidente['cod_residente']
+            && $this->modalCodResidente === $this->hidratacionResidenteContexto, 403);
         $this->resetValidation();
+        try {
+            $registro = app(CuidadosEnfermeriaService::class)->registrarHidratacion($this->hidratacionResidenteContexto, [
+                'cantidad_ml' => $this->hidratacionCantidad, 'tipo_liquido' => $this->hidratacionTipo,
+                'tolerancia' => $this->hidratacionTolerancia, 'observacion' => $this->hidratacionObservacion,
+            ], Auth::user());
+        } catch (QueryException $exception) {
+            report($exception);
+            $this->addError('hidratacion_guardado', 'No se pudo guardar el aporte. Conservamos los datos para que vuelvas a intentarlo.');
+            return;
+        }
+        $this->hidratacionResultado = ['codigo' => $registro->cod_hidratacion,
+            'fecha_hora' => $registro->fecha_hora->format('d/m/Y H:i'), 'profesional' => Auth::user()->name,
+            'mediciones' => [['nombre' => 'Volumen', 'valor' => $registro->cantidad_ml.' mL'],
+                ['nombre' => 'Tipo de líquido', 'valor' => $registro->tipo_liquido ?? 'Sin registrar'],
+                ['nombre' => 'Tolerancia', 'valor' => $registro->tolerancia === 'NAUSEAS' ? 'Náuseas'
+                    : ($registro->tolerancia ? mb_convert_case($registro->tolerancia, MB_CASE_TITLE, 'UTF-8') : 'Sin registrar')]]];
+        $this->cargarHidratacion();
+        $this->drawerPaso = 'register-result';
+        $this->dispatch('resident-directory-step-changed');
+    }
+
+    public function registrarOtroAporte(): void
+    {
+        abort_unless($this->mostrarSelectorModal && $this->registroTipo === 'hidratacion'
+            && $this->drawerPaso === 'register-result' && $this->hidratacionResultado !== [], 409);
+        $this->drawerPaso = 'register-selector';
+        $this->registroCapturaVersion++;
+        $this->abrirFormularioRegistro('hidratacion');
+    }
+
+    public function volverResidenteDesdeHidratacion(): void
+    {
+        abort_unless($this->mostrarSelectorModal && $this->registroTipo === 'hidratacion'
+            && $this->drawerPaso === 'register-result' && $this->hidratacionResultado !== [], 409);
+        $codigo = $this->hidratacionResidenteContexto;
+        $this->cerrarFlujoRegistro();
+        $this->seleccionarResidente($codigo);
+    }
+
+    public function abrirRegistrarEliminacion(string $codResidente): void
+    {
+        abort_if($this->esModoConsulta, 403);
+        $this->getTurnoService()->autorizarMutacionEnfermeria($codResidente, 'registros_eliminacion.crear', Auth::user());
+        $this->modalCodResidente = $codResidente;
+        $this->reset(['elimTipo', 'elimDatos', 'elimResultado', 'elimTipoPendiente']);
+        $this->elimResidenteContexto = $codResidente;
+        $this->elimMomento = now()->format('Y-m-d\TH:i:s');
+        $this->cargarEliminacion();
+    }
+
+    private function autorizarCapturaEliminacion(): void
+    {
+        abort_unless(! $this->esModoConsulta && $this->mostrarSelectorModal && $this->drawerPaso === 'register-form'
+            && $this->registroTipo === 'eliminacion' && $this->detalleResidente
+            && $this->modalCodResidente === $this->detalleResidente['cod_residente']
+            && $this->modalCodResidente === $this->elimResidenteContexto, 403);
+        $this->getTurnoService()->autorizarMutacionEnfermeria($this->elimResidenteContexto, 'registros_eliminacion.crear', Auth::user());
+    }
+
+    public function solicitarTipoEliminacion(string $tipo): void
+    {
+        $this->autorizarCapturaEliminacion();
+        abort_unless(in_array($tipo, ['URINARIA', 'INTESTINAL'], true), 422);
+        if ($tipo === $this->elimTipo) return;
+        if ($this->elimTipo !== '' && collect($this->elimDatos)->contains(fn ($value) => $value !== null && $value !== '')) {
+            $this->elimTipoPendiente = $tipo;
+            return;
+        }
+        $this->aplicarTipoEliminacion($tipo);
+    }
+
+    public function cancelarTipoEliminacion(): void
+    {
+        $this->autorizarCapturaEliminacion();
+        $this->elimTipoPendiente = null;
+    }
+
+    public function confirmarTipoEliminacion(): void
+    {
+        $this->autorizarCapturaEliminacion();
+        abort_unless(in_array($this->elimTipoPendiente, ['URINARIA', 'INTESTINAL'], true), 409);
+        $this->aplicarTipoEliminacion($this->elimTipoPendiente);
+    }
+
+    private function aplicarTipoEliminacion(string $tipo): void
+    {
+        foreach (array_merge(\App\Models\RegistroEliminacion::URINARIOS, \App\Models\RegistroEliminacion::INTESTINALES) as $campo) {
+            $this->elimDatos[$campo] = $campo === 'presencia_moco' ? null : '';
+        }
+        if (($this->elimDatos['continencia'] ?? '') !== 'CONTINENTE') $this->elimDatos['continencia'] = '';
+        $this->elimTipo = $tipo;
+        $this->elimTipoPendiente = null;
+        $this->registroCapturaVersion++;
+        $this->resetValidation();
+    }
+
+    public function updatedMovDatos(mixed $value, ?string $key): void
+    {
+        $detalle = ['motivo_registro' => 'motivo_otro', 'dispositivo' => 'dispositivo_otro'][$key ?? ''] ?? null;
+        if ($detalle && $value !== 'OTRO') {
+            $this->movDatos[$detalle] = '';
+        }
+        if ($key === 'actividad_realizada' && ! in_array($value, CuidadosEnfermeriaService::ACTIVIDADES_DEAMBULACION, true)) {
+            $this->movDatos['distancia_metros'] = '';
+        }
+    }
+
+    private function cargarMovilidad(): void
+    {
+        $this->movHistorial = $this->movContinuidad = [];
+        if (! Auth::user()->can('registros_movilidad.ver')) return;
+        $base = \App\Models\RegistroMovilidad::query()->where('cod_residente', $this->movResidenteContexto)
+            ->where('estado', 'VIGENTE')->where('fecha_hora', '<=', now());
+        $this->movHayMasHistorial = (clone $base)->count() > $this->movLimiteHistorial;
+        $this->movHistorial = (clone $base)->orderByDesc('fecha_hora')->orderByDesc('cod_movilidad')->limit($this->movLimiteHistorial)->get()
+            ->map(fn ($registro) => $registro->resumenOperacional())->all();
+        $jornada = app(MiTurnoService::class)->resolverJornadaActual(Auth::user()->personal, now());
+        if ($jornada) {
+            $actual = (clone $base)->where('cod_jornada', $jornada->cod_jornada);
+            $this->movContinuidad = ['registros' => (clone $actual)->count(),
+                'deambulacion' => (clone $actual)->whereIn('actividad_realizada', CuidadosEnfermeriaService::ACTIVIDADES_DEAMBULACION)->count(),
+                'fatiga' => (clone $actual)->whereNotNull('fatiga')->count()];
+        }
+    }
+
+    public function cargarMasHistorialMovilidad(): void
+    {
+        abort_unless($this->mostrarSelectorModal && $this->registroTipo === 'movilidad'
+            && in_array($this->drawerPaso, ['register-form', 'register-result'], true)
+            && $this->movResidenteContexto === ($this->detalleResidente['cod_residente'] ?? null)
+            && Auth::user()->can('registros_movilidad.ver'), 403);
+        $this->getTurnoService()->autorizarAccionPaciente($this->movResidenteContexto);
+        $this->movLimiteHistorial += 40;
+        $this->cargarMovilidad();
+        $this->dispatch('movilidad-historial-actualizado', historial: $this->movHistorial);
+    }
+
+    public function registrarOtraMovilidad(): void
+    {
+        abort_unless($this->mostrarSelectorModal && $this->registroTipo === 'movilidad'
+            && $this->drawerPaso === 'register-result' && $this->movResultado !== [], 409);
+        $this->drawerPaso = 'register-selector';
+        $this->registroCapturaVersion++;
+        $this->abrirFormularioRegistro('movilidad');
+    }
+
+    public function volverResidenteDesdeMovilidad(): void
+    {
+        abort_unless($this->mostrarSelectorModal && $this->registroTipo === 'movilidad'
+            && $this->drawerPaso === 'register-result' && $this->movResultado !== [], 409);
+        $codigo = $this->movResidenteContexto;
+        $this->cerrarFlujoRegistro();
+        $this->seleccionarResidente($codigo);
+    }
+
+    private function cargarEliminacion(): void
+    {
+        $this->elimHistorial = $this->elimUltimos = $this->elimContinuidad = [];
+        if (! Auth::user()->can('registros_eliminacion.ver')) return;
+        $base = \App\Models\RegistroEliminacion::query()->where('cod_residente', $this->elimResidenteContexto)
+            ->where('estado', 'VIGENTE')->where('fecha_hora', '<=', now());
+        $this->elimHistorial = (clone $base)->orderByDesc('fecha_hora')->orderByDesc('cod_eliminacion')->limit(40)->get()
+            ->map(fn ($registro) => $registro->resumenOperacional())->all();
+        foreach (['URINARIA', 'INTESTINAL'] as $tipo) {
+            $ultimo = (clone $base)->where('tipo_eliminacion', $tipo)->orderByDesc('fecha_hora')->orderByDesc('cod_eliminacion')->first();
+            if ($ultimo) $this->elimUltimos[$tipo] = $ultimo->resumenOperacional();
+        }
+        $jornada = app(MiTurnoService::class)->resolverJornadaActual(Auth::user()->personal, now());
+        if ($jornada) $this->elimContinuidad = (clone $base)->where('cod_jornada', $jornada->cod_jornada)
+            ->selectRaw('tipo_eliminacion, COUNT(*) AS cantidad_eventos')->groupBy('tipo_eliminacion')
+            ->pluck('cantidad_eventos', 'tipo_eliminacion')->map(fn ($count) => (int) $count)->all();
+    }
+
+    public function guardarEliminacion(): void
+    {
+        $this->autorizarCapturaEliminacion();
+        abort_unless($this->elimTipoPendiente === null, 409);
+        $this->resetValidation();
+        try {
+            $registro = app(CuidadosEnfermeriaService::class)->registrarEliminacion($this->elimResidenteContexto,
+                array_merge($this->elimDatos, ['tipo_eliminacion' => $this->elimTipo]), Auth::user());
+        } catch (QueryException $exception) {
+            report($exception);
+            $this->addError('eliminacion_guardado', 'No se pudo guardar la eliminación. Conservamos los datos para que vuelvas a intentarlo.');
+            return;
+        }
+        $presentacion = $registro->resumenOperacional();
+        $this->elimResultado = ['codigo' => $registro->cod_eliminacion, 'fecha_hora' => $registro->fecha_hora->format('d/m/Y H:i'),
+            'profesional' => Auth::user()->name, 'mediciones' => array_merge([['nombre' => 'Tipo', 'valor' => $presentacion['tipo_label']]],
+                $presentacion['campos'])];
+        $this->cargarEliminacion();
+        $this->drawerPaso = 'register-result';
+        $this->dispatch('resident-directory-step-changed');
+    }
+
+    public function registrarOtraEliminacion(): void
+    {
+        abort_unless($this->mostrarSelectorModal && $this->registroTipo === 'eliminacion' && $this->drawerPaso === 'register-result'
+            && $this->elimResultado !== [], 409);
+        $this->drawerPaso = 'register-selector';
+        $this->registroCapturaVersion++;
+        $this->abrirFormularioRegistro('eliminacion');
+    }
+
+    public function volverResidenteDesdeEliminacion(): void
+    {
+        abort_unless($this->mostrarSelectorModal && $this->registroTipo === 'eliminacion' && $this->drawerPaso === 'register-result'
+            && $this->elimResultado !== [], 409);
+        $codigo = $this->elimResidenteContexto;
+        $this->cerrarFlujoRegistro();
+        $this->seleccionarResidente($codigo);
+    }
+
+    public function updatedIngestaRegistrarLiquidos(): void
+    {
+        if (! $this->ingestaRegistrarLiquidos) {
+            $this->ingestaCantidadMl = '';
+        }
+    }
+
+    private function etiquetaComidaIngesta(string $tipo): string
+    {
+        return match ($tipo) { 'MEDIA_MANANA' => 'Media mañana', 'COLACION' => 'Colación',
+            default => mb_convert_case(str_replace('_', ' ', $tipo), MB_CASE_TITLE, 'UTF-8') };
+    }
+
+    private function cargarHistorialIngesta(): void
+    {
+        $this->ingestaHistorial = Auth::user()->can('registros_ingesta.ver')
+            ? \App\Models\RegistroIngesta::query()->where('cod_residente', $this->ingestaResidenteContexto)
+                ->where('estado', 'VIGENTE')->where('fecha_hora', '<=', now())
+                ->orderByDesc('fecha_hora')->orderByDesc('cod_ingesta')->limit(10)->get()
+                ->map(fn ($row) => ['codigo' => $row->cod_ingesta,
+                    'fecha_hora' => $row->fecha_hora->format('Y-m-d\TH:i:s'),
+                    'comida' => $this->etiquetaComidaIngesta($row->tipo_comida),
+                    'porcentaje' => $row->porcentaje_consumido,
+                    'tolerancia' => match ($row->tolerancia) { 'NAUSEAS' => 'Náuseas', 'VOMITO' => 'Vómito',
+                        null, '' => 'Sin registrar', default => mb_convert_case($row->tolerancia, MB_CASE_TITLE, 'UTF-8') },
+                    'deglucion' => $row->dificultad_deglucion === null ? 'Sin registrar'
+                        : ($row->dificultad_deglucion ? 'Dificultad observada' : 'Sin dificultad observada')])->all()
+            : [];
+    }
+
+    public function volverResidenteDesdeIngesta(): void
+    {
+        abort_unless($this->mostrarSelectorModal && $this->registroTipo === 'alimentacion'
+            && $this->drawerPaso === 'register-result' && $this->ingestaResultado !== [], 409);
+        $codigo = $this->ingestaResidenteContexto;
+        $this->cerrarFlujoRegistro();
+        $this->seleccionarResidente($codigo);
+    }
+
+    public function registrarOtraIngesta(): void
+    {
+        abort_unless($this->mostrarSelectorModal && $this->registroTipo === 'alimentacion'
+            && $this->drawerPaso === 'register-result' && $this->ingestaResultado !== [], 409);
+        $this->drawerPaso = 'register-selector';
+        $this->registroCapturaVersion++;
+        $this->abrirFormularioRegistro('alimentacion');
     }
 
     public function guardarCuidado(): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
-        if ($this->drawerPaso === 'register-form' && $this->registroTipo === 'alimentacion') {
-            abort_unless($this->mostrarSelectorModal && $this->detalleResidente
-                && $this->modalCodResidente === $this->detalleResidente['cod_residente'], 403);
-            app(CuidadosEnfermeriaService::class)->registrarAlimentacion($this->modalCodResidente, [
-                'tipo_comida' => $this->ingestaTipoComida,
-                'porcentaje_consumido' => $this->ingestaPorcentaje === '' ? null : $this->ingestaPorcentaje,
-                'cantidad_ml' => $this->ingestaCantidadMl === '' ? null : $this->ingestaCantidadMl,
-                'tolerancia' => $this->ingestaTolerancia === '' ? null : $this->ingestaTolerancia,
-                'dificultad_deglucion' => $this->ingestaDificultadDeglucion,
-                'observacion' => $this->ingestaObservacion,
-            ], Auth::user());
-            $this->cerrarFlujoRegistro();
-            if ($this->residente) {
-                $this->seleccionarResidente($this->residente);
+        if ($this->registroTipo === 'alimentacion') {
+            abort_unless($this->drawerPaso === 'register-form' && $this->mostrarSelectorModal && $this->detalleResidente
+                && $this->modalCodResidente === $this->detalleResidente['cod_residente']
+                && $this->modalCodResidente === $this->ingestaResidenteContexto, 403);
+            $this->resetValidation();
+            if ($this->ingestaCantidadMl !== '') {
+                $this->getTurnoService()->autorizarMutacionEnfermeria($this->modalCodResidente, 'registros_hidratacion.crear', Auth::user());
             }
+            try {
+                $registro = app(CuidadosEnfermeriaService::class)->registrarAlimentacion($this->modalCodResidente, [
+                    'tipo_comida' => $this->ingestaTipoComida,
+                    'porcentaje_consumido' => $this->ingestaPorcentaje === '' ? null : $this->ingestaPorcentaje,
+                    'cantidad_ml' => ! $this->ingestaRegistrarLiquidos || $this->ingestaCantidadMl === '' ? null : $this->ingestaCantidadMl,
+                    'tolerancia' => $this->ingestaTolerancia === '' ? null : $this->ingestaTolerancia,
+                    'dificultad_deglucion' => $this->ingestaDificultadDeglucion,
+                    'observacion' => $this->ingestaObservacion,
+                ], Auth::user());
+            } catch (QueryException $exception) {
+                report($exception);
+                $this->addError('ingesta_guardado', 'No se pudo guardar la ingesta. Conservamos los datos para que vuelvas a intentarlo.');
+                return;
+            }
+            $mediciones = [['nombre' => 'Comida', 'valor' => $this->etiquetaComidaIngesta($registro->tipo_comida)],
+                ['nombre' => 'Porcentaje consumido', 'valor' => $registro->porcentaje_consumido === null ? 'Sin registrar' : $registro->porcentaje_consumido.' %']];
+            if ($this->ingestaRegistrarLiquidos && $this->ingestaCantidadMl !== '') {
+                $mediciones[] = ['nombre' => 'Hidratación', 'valor' => $this->ingestaCantidadMl.' mL registrados'];
+            }
+            $this->ingestaResultado = ['codigo' => $registro->cod_ingesta,
+                'fecha_hora' => $registro->fecha_hora->format('d/m/Y H:i'),
+                'profesional' => Auth::user()->name, 'mediciones' => $mediciones];
+            $this->cargarHistorialIngesta();
+            $this->drawerPaso = 'register-result';
             $this->dispatch('cuidado-registrado');
-            $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Cuidado de alimentación guardado.']);
+            $this->dispatch('resident-directory-step-changed');
 
             return;
         }
-        if ($this->drawerPaso === 'register-form' && $this->registroTipo === 'eliminacion') {
+        if ($this->registroTipo === 'eliminacion') { $this->guardarEliminacion(); return; }
+        if ($this->registroTipo === 'movilidad') {
+            abort_unless($this->drawerPaso === 'register-form', 403);
             abort_unless($this->mostrarSelectorModal && $this->detalleResidente
                 && $this->modalCodResidente === $this->detalleResidente['cod_residente'], 403);
-            $esUrinaria = $this->elimTipo === 'URINARIA';
-            app(CuidadosEnfermeriaService::class)->registrarEliminacion($this->modalCodResidente, [
-                'tipo_eliminacion' => $this->elimTipo,
-                'cantidad' => $esUrinaria ? $this->elimCantidadUrinaria : $this->elimCantidadIntestinal,
-                'caracteristica' => $esUrinaria ? $this->elimCaracteristicaUrinaria : $this->elimCaracteristicaIntestinal,
-                'continencia' => $esUrinaria ? $this->elimContinenciaUrinaria : $this->elimContinenciaIntestinal,
-                'observacion' => $this->elimObservacion,
-            ], Auth::user());
-            $this->cerrarFlujoRegistro();
-            if ($this->residente) {
-                $this->seleccionarResidente($this->residente);
+            abort_unless($this->movResidenteContexto === $this->modalCodResidente, 403);
+            $this->resetValidation();
+            try {
+                $registro = app(CuidadosEnfermeriaService::class)->registrarMovilidad($this->movResidenteContexto, array_merge(
+                    collect($this->movDatos)->map(fn ($value) => $value === '' ? null : $value)->all(), [
+                        'marcha' => $this->movMarcha,
+                        'traslado' => $this->movTraslado === '' ? null : $this->movTraslado,
+                        'tipo_apoyo' => $this->movTipoApoyo === '' ? null : $this->movTipoApoyo,
+                        'equilibrio' => $this->movEquilibrio === '' ? null : $this->movEquilibrio,
+                        'fatiga' => $this->movFatiga === '' ? null : $this->movFatiga,
+                        'riesgo_caida' => $this->movRiesgoCaida === '' ? null : $this->movRiesgoCaida,
+                        'observacion' => $this->movObservacion,
+                    ]), Auth::user());
+            } catch (QueryException $exception) {
+                report($exception);
+                $this->addError('movilidad_guardado', 'No se pudo guardar la movilidad. Conservamos los datos para que vuelvas a intentarlo.');
+                return;
             }
+            $this->movResultado = ['codigo' => $registro->cod_movilidad, 'fecha_hora' => $registro->fecha_hora->format('d/m/Y H:i'),
+                'profesional' => Auth::user()->name, 'mediciones' => $registro->resumenOperacional()['campos']];
+            $this->cargarMovilidad();
+            $this->drawerPaso = 'register-result';
+            $this->dispatch('resident-directory-step-changed');
             $this->dispatch('cuidado-registrado');
-            $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Cuidado de eliminación guardado.']);
-
-            return;
-        }
-        if ($this->drawerPaso === 'register-form' && $this->registroTipo === 'movilidad') {
-            abort_unless($this->mostrarSelectorModal && $this->detalleResidente
-                && $this->modalCodResidente === $this->detalleResidente['cod_residente'], 403);
-            app(CuidadosEnfermeriaService::class)->registrarMovilidad($this->modalCodResidente, [
-                'marcha' => $this->movMarcha,
-                'traslado' => $this->movTraslado === '' ? null : $this->movTraslado,
-                'tipo_apoyo' => $this->movTipoApoyo === '' ? null : $this->movTipoApoyo,
-                'equilibrio' => $this->movEquilibrio === '' ? null : $this->movEquilibrio,
-                'fatiga' => $this->movFatiga === '' ? null : $this->movFatiga,
-                'riesgo_caida' => $this->movRiesgoCaida === '' ? null : $this->movRiesgoCaida,
-                'observacion' => $this->movObservacion,
-            ], Auth::user());
-            $this->cerrarFlujoRegistro();
-            if ($this->residente) {
-                $this->seleccionarResidente($this->residente);
-            }
-            $this->dispatch('cuidado-registrado');
-            $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Cuidado de movilidad guardado.']);
 
             return;
         }
@@ -1983,70 +2447,164 @@ class MisPacientes extends Component
         $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Cuidado registrado correctamente.']);
     }
 
-    public function abrirRegistrarDolor(string $codResidente, int $intensidad = 5): void
+    public function abrirRegistrarDolor(string $codResidente): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
         abort_unless(auth()->user()?->can('valoraciones_dolor.crear'), 403);
         $this->getTurnoService()->autorizarAccionPaciente($codResidente);
         $this->modalCodResidente = $codResidente;
-        $this->dolorIntensidad = max(0, min(10, $intensidad));
-        $this->dolorDetalle = '';
-        $this->dolorFechaHora = now()->format('Y-m-d\TH:i');
+        $this->dolorResidenteContexto = $codResidente;
+        $this->dolorFechaHora = now()->format('Y-m-d\TH:i:s');
         $this->dolorEva = '';
         $this->dolorUbicacion = '';
         $this->dolorDuracionValor = '';
         $this->dolorDuracionUnidad = '';
         $this->dolorDesencadenante = '';
         $this->dolorIntervencion = '';
+        $this->dolorFrecuencia = '';
+        $this->dolorFactoresAlivio = '';
+        $this->dolorRespuesta = '';
+        $this->dolorCodOrigen = null;
+        $this->dolorContextoOrigen = [];
+        $this->dolorEpisodio = [];
+        $this->dolorCapturaVersion++;
+        $this->dolorResultado = [];
+        // Contexto ya autorizado por autorizarAccionPaciente; lectura además exige permiso.
+        $this->dolorHistorial = auth()->user()?->can('valoraciones_dolor.ver')
+            ? ValoracionDolor::query()->where('cod_residente', $codResidente)
+                ->where('estado', 'VIGENTE')->whereNotNull('intensidad')
+                ->orderByDesc('fecha_hora')->orderByDesc('cod_valoracion_dolor')->limit(7)
+                ->where('fecha_hora', '<=', now())->get()
+                ->map(fn (ValoracionDolor $registro) => $this->dolorDto($registro))->all()
+            : [];
         $this->modalDolor = true;
+    }
+
+    private function dolorDto(ValoracionDolor $registro): array
+    {
+        return [
+            'codigo' => $registro->cod_valoracion_dolor,
+            'origen' => $registro->cod_valoracion_origen,
+            'fecha_hora' => $registro->fecha_hora->format('Y-m-d\TH:i:s'),
+            'fecha' => $registro->fecha_hora->format('d/m/Y H:i'),
+            'intensidad' => $registro->intensidad,
+            'ubicacion' => $registro->ubicacion,
+            'duracion' => $registro->duracion,
+            'frecuencia' => $registro->frecuencia,
+            'desencadenante' => $registro->desencadenante,
+            'factores_alivio' => $registro->factores_alivio,
+            'intervencion' => $registro->intervencion,
+            'respuesta' => $registro->respuesta,
+        ];
+    }
+
+    public function abrirReevaluacionDolor(string $codigo): void
+    {
+        abort_unless($this->mostrarSelectorModal && $this->registroTipo === 'dolor'
+            && in_array($this->drawerPaso, ['register-form', 'register-result'], true)
+            && $this->detalleResidente && $this->modalCodResidente === $this->detalleResidente['cod_residente']
+            && $this->modalCodResidente === $this->dolorResidenteContexto, 403);
+        app(CuidadosEnfermeriaService::class)->prepararReevaluacionDolor($this->modalCodResidente, $codigo, Auth::user());
+        if ($this->drawerPaso === 'register-form' && $this->formularioModificado()) {
+            $this->dolorOrigenPendiente = $codigo;
+            $this->solicitarDescarte('reevaluar-dolor');
+            return;
+        }
+        $this->iniciarReevaluacionDolor($codigo);
+    }
+
+    private function iniciarReevaluacionDolor(string $codigo): void
+    {
+        $origen = app(CuidadosEnfermeriaService::class)->prepararReevaluacionDolor($this->modalCodResidente, $codigo, Auth::user());
+        $this->abrirRegistrarDolor($this->modalCodResidente);
+        $this->dolorCodOrigen = $origen->cod_valoracion_dolor;
+        $this->dolorContextoOrigen = $this->dolorDto($origen);
+        $this->dolorEpisodio = ValoracionDolor::query()->where('cod_residente', $this->modalCodResidente)
+            ->where('estado', 'VIGENTE')->where('fecha_hora', '<=', now())
+            ->where(fn ($query) => $query->whereKey($origen->cod_valoracion_dolor)->orWhere('cod_valoracion_origen', $origen->cod_valoracion_dolor))
+            ->orderByDesc('fecha_hora')->orderByDesc('cod_valoracion_dolor')->limit(7)->get()
+            ->map(fn (ValoracionDolor $registro) => $this->dolorDto($registro))->all();
+        $this->drawerPaso = 'register-form';
+        $this->registroInicial = $this->estadoFormularioRegistro();
+        $this->resetValidation();
+        $this->dispatch('resident-directory-step-changed');
     }
 
     public function guardarDolor(): void
     {
         abort_if($this->esModoConsulta, 403, 'Operación no permitida en modo consulta / fuera de turno.');
-        abort_if($this->mostrarSelectorModal && $this->drawerPaso !== 'register-form', 403);
+        abort_unless($this->mostrarSelectorModal && $this->drawerPaso === 'register-form', 403);
         if ($this->drawerPaso === 'register-form') {
             abort_unless($this->mostrarSelectorModal && $this->registroTipo === 'dolor'
-                && $this->detalleResidente && $this->modalCodResidente === $this->detalleResidente['cod_residente'], 403);
-            app(CuidadosEnfermeriaService::class)->registrarValoracionDolor($this->modalCodResidente, [
-                'fecha_hora' => $this->dolorFechaHora,
-                'intensidad' => $this->dolorEva,
-                'ubicacion' => $this->dolorUbicacion,
-                'duracion_valor' => $this->dolorDuracionValor,
-                'duracion_unidad' => $this->dolorDuracionUnidad,
-                'desencadenante' => $this->dolorDesencadenante,
-                'intervencion' => $this->dolorIntervencion,
-            ], Auth::user());
-            $this->cerrarFlujoRegistro();
-            if ($this->residente) {
-                $this->seleccionarResidente($this->residente);
+                && $this->detalleResidente && $this->modalCodResidente === $this->detalleResidente['cod_residente']
+                && $this->modalCodResidente === $this->dolorResidenteContexto, 403);
+            $this->resetValidation();
+            try {
+                $registro = app(CuidadosEnfermeriaService::class)->registrarValoracionDolor($this->modalCodResidente, [
+                    'intensidad' => $this->dolorEva,
+                    'ubicacion' => $this->dolorUbicacion,
+                    'duracion_valor' => $this->dolorDuracionValor,
+                    'duracion_unidad' => $this->dolorDuracionUnidad,
+                    'desencadenante' => $this->dolorDesencadenante,
+                    'intervencion' => $this->dolorIntervencion,
+                    'frecuencia' => $this->dolorFrecuencia,
+                    'factores_alivio' => $this->dolorFactoresAlivio,
+                    'respuesta' => $this->dolorRespuesta,
+                    'cod_valoracion_origen' => $this->dolorCodOrigen,
+                ], Auth::user());
+            } catch (QueryException $exception) {
+                report($exception);
+                $this->addError('dolor_guardado', 'No se pudo guardar la valoración. Conservamos los datos para que vuelvas a intentarlo.');
+                return;
             }
+            $this->dolorResultado = [
+                'codigo' => $registro->cod_valoracion_dolor,
+                'reevaluacion' => $this->dolorCodOrigen !== null,
+                'fecha_hora' => $registro->fecha_hora->format('d/m/Y H:i'),
+                'profesional' => Auth::user()->name,
+                'mediciones' => [['nombre' => 'Intensidad EVA', 'valor' => $registro->intensidad.' / 10']],
+            ];
+            $this->dolorResultado['mediciones'][] = ['nombre' => 'Localización', 'valor' => $registro->ubicacion ?: 'No registrada'];
+            if ($this->dolorCodOrigen !== null) {
+                $anterior = $this->dolorEpisodio[0]['intensidad'] ?? $this->dolorContextoOrigen['intensidad'];
+                if ($anterior !== null) {
+                    $this->dolorResultado['mediciones'][] = ['nombre' => 'Anterior', 'valor' => $anterior.' / 10'];
+                    $this->dolorResultado['mediciones'][] = ['nombre' => 'Diferencia', 'valor' => sprintf('%+d puntos', $registro->intensidad - $anterior)];
+                }
+                $this->dolorResultado['mediciones'][] = ['nombre' => 'Respuesta', 'valor' => $registro->respuesta ?: 'No registrada'];
+            }
+            if (Auth::user()->can('valoraciones_dolor.ver')) {
+                $this->dolorHistorial = ValoracionDolor::query()->where('cod_residente', $this->modalCodResidente)
+                    ->where('estado', 'VIGENTE')->where('fecha_hora', '<=', now())
+                    ->orderByDesc('fecha_hora')->orderByDesc('cod_valoracion_dolor')->limit(7)->get()
+                    ->map(fn (ValoracionDolor $item) => $this->dolorDto($item))->all();
+                if ($this->dolorCodOrigen) {
+                    $this->dolorEpisodio = ValoracionDolor::query()->where('cod_residente', $this->modalCodResidente)
+                        ->where('estado', 'VIGENTE')->where('fecha_hora', '<=', now())
+                        ->where(fn ($query) => $query->whereKey($this->dolorCodOrigen)->orWhere('cod_valoracion_origen', $this->dolorCodOrigen))
+                        ->orderByDesc('fecha_hora')->orderByDesc('cod_valoracion_dolor')->limit(7)->get()
+                        ->map(fn (ValoracionDolor $item) => $this->dolorDto($item))->all();
+                }
+            }
+            $this->registroInicial = $this->estadoFormularioRegistro();
+            $this->drawerPaso = 'register-result';
+            $this->dispatch('resident-directory-step-changed');
             $this->dispatch('dolor-registrado');
-            $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Valoración del dolor guardada.']);
+            $this->dispatch('rm-toast', ['icon' => 'success', 'title' => $this->dolorCodOrigen ? 'Reevaluación registrada.' : 'Valoración de dolor registrada.']);
 
             return;
         }
-        abort_unless(auth()->user()?->can('atenciones.crear'), 403);
-        $this->validate([
-            'dolorIntensidad' => 'required|integer|min:0|max:10',
-            'dolorDetalle' => 'required|string|min:5|max:1000',
-        ]);
+    }
 
-        app(CuidadosEnfermeriaService::class)->registrarDolor(
-            $this->modalCodResidente,
-            'VALORACION',
-            $this->dolorIntensidad,
-            $this->dolorDetalle,
-            Auth::user()
-        );
-
-        $this->modalDolor = false;
-        $this->modalCodResidente = null;
-        if ($this->residente) {
-            $this->seleccionarResidente($this->residente);
+    public function volverResidenteDesdeDolor(): void
+    {
+        abort_unless($this->mostrarSelectorModal && $this->drawerPaso === 'register-result'
+            && $this->dolorResultado !== [], 409);
+        $codResidente = $this->modalCodResidente;
+        $this->cerrarFlujoRegistro();
+        if ($codResidente) {
+            $this->seleccionarResidente($codResidente);
         }
-        $this->dispatch('dolor-registrado');
-        $this->dispatch('rm-toast', ['icon' => 'success', 'title' => 'Valoración del dolor guardada.']);
     }
 
     public function abrirRegistrarProcedimiento(string $codResidente, string $tipo = 'CURACION'): void
@@ -2475,6 +3033,8 @@ class MisPacientes extends Component
         }
 
         return view('livewire.cuidados.mis-residentes-directorio', [
+            'puedeConsultarExperto' => ($seleccionado = Residente::query()->find($this->detalleResidente['cod_residente'] ?? null))
+                && auth()->user()->can('consultarResultados', [\App\Models\EvaluacionExperta::class, $seleccionado]),
             'pacientes' => $pacientes,
             'esModoConsulta' => $this->esModoConsulta,
             'esResidenteAsignado' => $this->esResidenteAsignado,

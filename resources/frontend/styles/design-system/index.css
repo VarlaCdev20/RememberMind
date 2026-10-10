@@ -47,6 +47,8 @@
 @import './patterns/resident-directory.css';
 @import './patterns/signos-vitales.css';
 @import './patterns/clinical-forms.css';
+@import './patterns/dolor.css';
+@import './patterns/ingesta.css';
 @import './patterns/objetivos-signos-vitales.css';
 @import './patterns/nursing-dashboard-layout.css';
 @import './patterns/admin-dashboard-layout.css';
@@ -56,6 +58,7 @@
 @import './patterns/admin-resident-panel.css';
 @import './patterns/unified-data-tables.css';
 @import './patterns/collection-workspace.css';
+@import './patterns/expert-results.css';
 
 /* Navegación lateral compartida: después de los ajustes históricos por módulo. */
 @import './components/sidebar.css';
@@ -74,3 +77,9 @@
 @import './patterns/habitaciones-interactivas.css';
 @import './patterns/operaciones-interactivas.css';
 @import './patterns/calendario-operativo.css';
+
+@import './patterns/hidratacion.css';
+
+@import './patterns/eliminacion.css';
+
+@import './patterns/movilidad.css';

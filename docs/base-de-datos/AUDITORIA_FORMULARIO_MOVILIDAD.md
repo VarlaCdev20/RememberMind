@@ -1,4 +1,36 @@
+---
+title: "Auditoría: cuidado de movilidad en Nuevo registro"
+status: CURRENT
+version: "2.0"
+last_reviewed: 2026-10-10
+owner: RememberMind
+source_of_truth: false
+verified_against_commit: null
+verification_scope: OWNER_APPROVED_MOVILIDAD_V2_CONTRACT
+runtime_verified: true
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
 # Auditoría: cuidado de movilidad en Nuevo registro
+
+## Contrato CURRENT — 10 de octubre de 2026
+
+La propietaria aprobó la [extensión Movilidad V2](DECISION_MOVILIDAD_V2.md): nueve columnas nullable exclusivamente en `registros_movilidad`. La propuesta anterior no autoriza campos adicionales fuera de esa decisión.
+
+- Motivo, actividad, distancia decimal, cuatro síntomas triestado, cambio habitual y tolerancia: aprobados y persistidos.
+- Dispositivo: columna existente; se corrige su pérdida en el escritor y se aplican las opciones de captura aprobadas. Texto libre histórico conservado literalmente.
+- Marcha, traslado, apoyo, equilibrio, fatiga, riesgo, observación, PK/FK/contexto/estado: conservados.
+- Autor, jornada, residente contextual y fecha/hora: servidor; sin edición por captura.
+- Origen/destino/duración, incidentes vinculados, puntuación funcional y recomendaciones automáticas: fuera del alcance. No se crean columnas ni reglas para ellos.
+- Servicio y consumidores genéricos: una validación y escritura canónica; no escritores paralelos.
+
+Evidencia ejecutada y límites: [resultado V2](../frontend/FORMULARIO_MOVILIDAD_V2_RESULTADO.md).
+
+## Revisión histórica del 6 de octubre de 2026
+
+**HISTORICAL — DO NOT USE AS CURRENT SOURCE OF TRUTH.** Revisión estática contra `8e9e20325519c5da5a6b25f6fb26568cad78efe1`, anterior a la extensión y al catálogo de captura aprobados. Se preserva como evidencia de la limitación encontrada entonces.
 
 Referencia: BDD Operativa V2.1, tabla 45 `registros_movilidad`, migración y modelo vigentes. No se modificó el esquema.
 

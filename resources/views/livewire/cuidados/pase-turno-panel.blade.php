@@ -527,25 +527,34 @@
                                     <div>SpO2: {{ $sv->saturacion_oxigeno }}%</div>
                                     <div>Temp: {{ $sv->temperatura }}°C</div>
                                 @else
-                                    <span class="text-[var(--rm-text-secondary)] italic">Sin toma en turno</span>
+                                    <span class="text-[var(--rm-text-secondary)] italic">Sin registro vigente</span>
                                 @endif
                             </div>
 
                             <div class="rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)]/60 p-2.5 space-y-1">
                                 <span class="font-bold text-[var(--rm-text-primary)] block">Dolor y Heridas:</span>
-                                <div>Dolor: {{ $contextoClinico['dolor'] ? $contextoClinico['dolor']->escala_eva . '/10' : 'No evaluado' }}</div>
+                                <div>Dolor: {{ $contextoClinico['dolor']?->intensidad !== null ? $contextoClinico['dolor']->intensidad . '/10' : 'No evaluado' }}</div>
                                 <div>Heridas: {{ count($contextoClinico['heridas']) }} activa(s)</div>
+                                @foreach($contextoClinico['heridas'] as $herida)
+                                    <div>{{ $herida['ubicacion'] }} · Última curación: {{ $herida['ultima_curacion'] ?? 'Sin registro' }}</div>
+                                @endforeach
                             </div>
                         </div>
 
                         {{-- 5. Registros de Necesidades Básicas --}}
                         <div class="rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)]/60 p-2.5 space-y-1 text-[11px]">
-                            <span class="font-bold text-[var(--rm-text-primary)] block">Evolución de Necesidades Básicas:</span>
+                            <span class="font-bold text-[var(--rm-text-primary)] block">Últimos registros guardados:</span>
                             <div class="grid grid-cols-2 gap-1 text-[10px] text-[var(--rm-text-secondary)]">
-                                <div>Ingesta: {{ $contextoClinico['ingesta']?->porcentaje_consumido ?? 'Sin registro' }}%</div>
-                                <div>Hidratación: {{ $contextoClinico['hidratacion']?->volumen_ml ?? 'Sin registro' }} ml</div>
-                                <div>Eliminación: {{ $contextoClinico['eliminacion']?->tipo ?? 'Sin registro' }}</div>
+                                <div>Ingesta: {{ $contextoClinico['ingesta']?->porcentaje_consumido !== null ? $contextoClinico['ingesta']->porcentaje_consumido.'%' : 'Sin registro' }}</div>
+                                <div>Hidratación: {{ $contextoClinico['hidratacion']?->cantidad_ml !== null ? $contextoClinico['hidratacion']->cantidad_ml.' ml' : 'Sin registro' }}</div>
+                                <div>Eliminación: {{ $contextoClinico['eliminacion']?->resumenOperacional()['tipo_label'] ?? 'Sin registro' }}</div>
                                 <div>Sueño: {{ $contextoClinico['sueno']?->calidad ?? 'Sin registro' }}</div>
+                                <div>Cognición: {{ $contextoClinico['cognicion']?->observacion ?? 'Sin observación registrada' }}</div>
+                                @if($contextoClinico['cognicion'])
+                                    <div>Orientación: {{ $contextoClinico['cognicion']->orientacion_persona ?? 'Sin dato' }} / {{ $contextoClinico['cognicion']->orientacion_lugar ?? 'Sin dato' }} / {{ $contextoClinico['cognicion']->orientacion_tiempo ?? 'Sin dato' }} · {{ $contextoClinico['cognicion']->fecha_hora->format('d/m/Y H:i') }}</div>
+                                @endif
+                                <div>Conducta: {{ $contextoClinico['conducta']?->descripcion ?? 'Sin descripción registrada' }}</div>
+                                <div>Movilidad: {{ $contextoClinico['movilidad']?->marcha ?? 'Sin registro' }}</div>
                             </div>
                         </div>
                     </div>

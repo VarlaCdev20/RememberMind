@@ -268,7 +268,7 @@
                     <span class="block text-[11px] font-medium text-meta">Si existe incidente o solicitud médica, detalle claramente lo ocurrido y las medidas iniciales.</span>
                     @error('observacion')<span id="seguimiento-observacion-error" role="alert" class="text-xs text-estado-peligro">{{ $message }}</span>@enderror
                 </label>
-            </form>
+            <x-ui.clinical-clear-action /></form>
             <x-slot:footer>
                 <template x-if="clinicalDiscardOpen"><div class="rm-clinical-workspace__actions"><button type="button" class="rm-btn-secondary" @click="clinicalDiscardOpen = false">Seguir editando</button><button type="button" class="rm-btn-danger" @click="discardClinicalDrawer()">Salir sin guardar</button></div></template>
                 <template x-if="!clinicalDiscardOpen"><div class="rm-clinical-workspace__actions"><button type="button" class="rm-btn-secondary" @click="closeClinicalDrawer()" wire:loading.attr="disabled" wire:target="guardar">Cancelar</button><button type="submit" form="clinical-daily-form" class="rm-btn-primary" wire:loading.attr="disabled" wire:target="guardar"><span wire:loading.remove wire:target="guardar">{{ $editandoId ? 'Guardar corrección' : 'Confirmar y registrar' }}</span><span wire:loading wire:target="guardar">Registrando…</span></button></div></template>

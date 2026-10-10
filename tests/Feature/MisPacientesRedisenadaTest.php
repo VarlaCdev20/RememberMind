@@ -409,19 +409,20 @@ class MisPacientesRedisenadaTest extends TestCase
             ->call('mostrarSelectorRegistro');
         $acciones = $this->accionesDelSelector($vista->html());
 
-        foreach (['cognicion' => 'Cognición', 'conducta' => 'Conducta', 'sueno' => 'Sueño', 'hidratacion' => 'Hidratación', 'heridas' => 'Heridas / Curaciones'] as $clave => $label) {
+        foreach (['cognicion' => 'Cognición', 'conducta' => 'Conducta', 'sueno' => 'Sueño', 'heridas' => 'Heridas / Curaciones'] as $clave => $label) {
             $opcion = \App\Backend\Modulos\Enfermeria\Servicios\NavegacionCuidadosService::opcion($clave);
             $url = route($opcion['route'], array_merge($opcion['parameters'] ?? [], ['adulto' => $this->residenteEstable->cod_residente, 'cuidado' => $clave]));
             $this->assertSame('a', $acciones[$label]['tag']);
             $this->assertStringContainsString('href="'.e($url).'"', $acciones[$label]['attributes']);
             $this->assertStringNotContainsString('wire:click', $acciones[$label]['attributes']);
         }
-        $this->assertCount(15, $acciones);
+        $this->assertCount(16, $acciones);
+        $this->assertSame('a', $acciones['Sistema experto']['tag']);
         foreach (['Seguimiento diario', 'Ejecución de cuidado', 'Registrar incidente', 'Administración de medicación'] as $label) {
             $this->assertSame('a', $acciones[$label]['tag']);
             $this->assertStringNotContainsString('disabled', $acciones[$label]['attributes']);
         }
-        foreach (['Signos vitales', 'Dolor', 'Ingesta', 'Eliminación', 'Movilidad', 'Procedimiento'] as $label) {
+        foreach (['Signos vitales', 'Dolor', 'Ingesta', 'Hidratación', 'Eliminación', 'Movilidad', 'Procedimiento'] as $label) {
             $this->assertSame('button', $acciones[$label]['tag']);
             $this->assertStringContainsString('wire:click', $acciones[$label]['attributes']);
             $this->assertStringNotContainsString('disabled', $acciones[$label]['attributes']);
@@ -457,7 +458,8 @@ class MisPacientesRedisenadaTest extends TestCase
     public function test_selector_no_expone_accesos_sin_los_permisos_del_destino(): void
     {
         $this->travelTo(today()->setTime(10, 0));
-        $this->enfermero->roles->first()->revokePermissionTo(['registros_sueno.ver', 'atenciones.ver', 'ejecuciones_cuidado.ver', 'incidentes.crear']);
+        $this->enfermero->roles->first()->revokePermissionTo(['registros_sueno.ver', 'atenciones.ver', 'ejecuciones_cuidado.ver', 'incidentes.crear',
+            'registros_hidratacion.crear', 'registros_hidratacion.ver']);
         $this->actingAs($this->enfermero);
         $vista = Livewire::test(MisPacientes::class)
             ->call('seleccionarResidente', $this->residenteEstable->cod_residente)
@@ -554,7 +556,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->assertStringContainsString('x-trap.noscroll="show"', $vista->html());
         $this->assertStringContainsString('x-on:keydown.escape.window="if (show', $vista->html());
         $this->assertStringContainsString('$nextTick(() => requestAnimationFrame', $vista->html());
-        $this->assertSame(2, substr_count($vista->html(), 'class="rm-quick-register__grid'));
+        $this->assertSame(3, substr_count($vista->html(), 'class="rm-quick-register__grid'));
         $this->assertTrue(strpos($vista->html(), "abrirFormularioRegistro('signos')") < strpos($vista->html(), "abrirFormularioRegistro('dolor')"));
         $this->assertStringNotContainsString('Sin formulario directo aquí', $vista->html());
         $this->assertStringNotContainsString('href="#"', $vista->html());
@@ -643,7 +645,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->call('volverPanelDetalle')
             ->assertSet('confirmarDescarte', true)
             ->assertSee('¿Salir sin guardar?')
-            ->assertSee('Si sales ahora se perderán las mediciones introducidas.')
+            ->assertSee('El historial guardado permanecerá intacto.')
             ->assertSee('Seguir editando')
             ->assertSee('Salir sin guardar')
             ->call('cancelarDescarte')
@@ -1234,7 +1236,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->assertSame($alertasAntes + 1, Alerta::query()->count());
     }
 
-    public function test_una_lectura_critica_no_se_descarta_y_permite_corregir_transcripcion(): void
+    public function test_lectura_critica_se_descarta_solo_tras_confirmacion_sin_persistir(): void
     {
         $this->actingAs($this->enfermero);
         $signosAntes = SignoVital::query()->count();
@@ -1243,17 +1245,16 @@ class MisPacientesRedisenadaTest extends TestCase
         $formulario = $this->formularioSignos()->set('signoFC', '135')
             ->call('cerrarSelectorRegistro')
             ->assertSet('confirmarDescarte', true)
-            ->assertSee('Hay una medición crítica sin registrar');
+            ->assertSee('¿Salir sin guardar?')->assertSee('Salir sin guardar');
 
+        $formulario->call('cancelarDescarte')->assertSet('signoFC', '135')
+            ->call('descartarCambios')->assertSet('mostrarSelectorModal', true)
+            ->assertSet('signoFC', '135')->call('cerrarSelectorRegistro');
         $formulario->call('descartarCambios')
-            ->assertHasErrors('continuidad_signos')
-            ->assertSet('mostrarSelectorModal', true);
+            ->assertHasNoErrors()->assertSet('mostrarSelectorModal', false);
         $this->assertSame($signosAntes, SignoVital::query()->count());
         $this->assertSame($alertasAntes, Alerta::query()->count());
 
-        $formulario->call('cancelarDescarte')->set('signoFC', '75')
-            ->call('cerrarSelectorRegistro')->call('descartarCambios')
-            ->assertSet('mostrarSelectorModal', false);
         $this->assertSame($signosAntes, SignoVital::query()->count());
         $this->assertSame($alertasAntes, Alerta::query()->count());
     }
@@ -1594,7 +1595,7 @@ class MisPacientesRedisenadaTest extends TestCase
     {
         $this->actingAs($this->enfermero);
 
-        foreach (['-1', '11', '2.5'] as $eva) {
+        foreach (['', '-1', '11', '2.5'] as $eva) {
             $this->formularioDolor()->set('dolorEva', $eva)
                 ->call('guardarDolor')->assertHasErrors('intensidad');
         }
@@ -1620,17 +1621,19 @@ class MisPacientesRedisenadaTest extends TestCase
     {
         $this->actingAs($this->enfermero);
         $formulario = $this->formularioDolor();
-        $formulario->assertSee('Intensidad inicial')
+        $formulario->assertSee('Intensidad EVA')
             ->assertDontSee('wire:model="dolorEvaPosterior"');
 
         $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
         $base = [
-            'fecha_hora' => now()->format('Y-m-d\TH:i'),
             'intensidad' => 4,
         ];
         foreach ([
             ['tipo_dolor' => 'TIPO_INVENTADO'],
             ['eva_posterior' => 2, 'hora_reevaluacion' => now()->subHour()->format('Y-m-d\TH:i')],
+            ['observacion' => 'Campo no soportado'],
+            ['respuesta' => 'No permitida en este flujo'],
+            ['cod_personal' => 'PER_AJENO'],
         ] as $noSoportado) {
             try {
                 $servicio->registrarValoracionDolor($this->residenteEstable->cod_residente,
@@ -1650,8 +1653,8 @@ class MisPacientesRedisenadaTest extends TestCase
 
         $this->formularioDolor()
             ->assertSet('dolorEva', '')
-            ->assertSet('dolorFechaHora', now()->format('Y-m-d\TH:i'))
-            ->assertSee('Escala EVA inicial, de 0 a 10')
+            ->assertSet('dolorFechaHora', now()->format('Y-m-d\TH:i:s'))
+            ->assertSee('Intensidad EVA')
             ->set('dolorEva', '6')
             ->set('dolorUbicacion', '  Rodilla derecha  ')
             ->set('dolorDuracionValor', '30')
@@ -1659,7 +1662,10 @@ class MisPacientesRedisenadaTest extends TestCase
             ->set('dolorDesencadenante', '  Al caminar  ')
             ->set('dolorIntervencion', '  Reposo y aviso a enfermería  ')
             ->call('guardarDolor')->assertHasNoErrors()
-            ->assertSet('drawerPaso', 'resident-summary');
+            ->assertSet('drawerPaso', 'register-result')
+            ->assertSee('Valoración de dolor registrada')
+            ->assertSet('dolorResultado.mediciones.0.valor', '6 / 10')
+            ->call('volverResidenteDesdeDolor')->assertSet('drawerPaso', 'resident-summary');
 
         $this->assertDatabaseHas('valoraciones_dolor', [
             'cod_residente' => $this->residenteEstable->cod_residente,
@@ -1706,6 +1712,308 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->assertDatabaseCount('valoraciones_dolor', 2);
         $this->assertDatabaseHas('valoraciones_dolor', ['intensidad' => 5, 'estado' => 'VIGENTE']);
         $this->assertDatabaseHas('valoraciones_dolor', ['intensidad' => 2, 'estado' => 'VIGENTE']);
+    }
+
+    public function test_dolor_fecha_del_cliente_es_rechazada_y_el_registro_usa_el_reloj_del_servidor(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $this->actingAs($this->enfermero);
+        $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        try {
+            $servicio->registrarValoracionDolor($this->residenteEstable->cod_residente,
+                ['intensidad' => 6, 'fecha_hora' => '2000-01-01T00:00'], $this->enfermero);
+            $this->fail('Se aceptó una fecha suministrada por el cliente.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->assertArrayHasKey('fecha_hora', $e->errors());
+        }
+        $this->assertDatabaseCount('valoraciones_dolor', 0);
+        $formulario = $this->formularioDolor();
+        $this->travel(2)->minutes();
+        $formulario->set('dolorEva', '6')->call('guardarDolor')->assertHasNoErrors();
+        $registro = \App\Models\ValoracionDolor::firstOrFail();
+        $this->assertTrue($registro->fecha_hora->equalTo(now()));
+        $this->assertSame($this->personal->cod_personal, $registro->cod_personal);
+        $formulario->call('guardarDolor')->assertStatus(403);
+        $this->assertDatabaseCount('valoraciones_dolor', 1);
+    }
+
+    public function test_dolor_fecha_livewire_esta_bloqueada(): void
+    {
+        $this->actingAs($this->enfermero);
+        $this->expectException(\Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException::class);
+        $this->formularioDolor()->set('dolorFechaHora', '2000-01-01T00:00');
+    }
+
+    public function test_dolor_historial_plano_del_residente_vigente_limitado_y_con_permiso(): void
+    {
+        $this->actingAs($this->enfermero);
+        foreach (range(1, 9) as $index) {
+            \App\Models\ValoracionDolor::create([
+                'cod_valoracion_dolor' => 'VD_DTO_'.$index,
+                'cod_residente' => $this->residenteEstable->cod_residente,
+                'cod_personal' => $this->personal->cod_personal,
+                'fecha_hora' => now()->subHours($index), 'intensidad' => $index,
+                'ubicacion' => 'Rodilla derecha', 'estado' => 'VIGENTE',
+            ]);
+        }
+        \App\Models\ValoracionDolor::create([
+            'cod_valoracion_dolor' => 'VD_DTO_ANULADO', 'cod_residente' => $this->residenteEstable->cod_residente,
+            'cod_personal' => $this->personal->cod_personal, 'fecha_hora' => now(),
+            'intensidad' => 10, 'estado' => 'ANULADO',
+        ]);
+        $vista = $this->formularioDolor();
+        $historial = $vista->get('dolorHistorial');
+        $this->assertCount(7, $historial);
+        $this->assertSame(1, $historial[0]['intensidad']);
+        $this->assertSame(['codigo', 'origen', 'fecha_hora', 'fecha', 'intensidad', 'ubicacion', 'duracion', 'frecuencia', 'desencadenante', 'factores_alivio', 'intervencion', 'respuesta'], array_keys($historial[0]));
+        \Spatie\Permission\Models\Role::findByName('ENFERMEROS')->revokePermissionTo('valoraciones_dolor.ver');
+        $this->enfermero->unsetRelation('roles')->unsetRelation('permissions');
+        $this->formularioDolor()->assertSet('dolorHistorial', [])->assertDontSee('Ver evolución');
+    }
+
+    public function test_dolor_duracion_unidad_sola_y_longitud_total_invalidas(): void
+    {
+        $this->actingAs($this->enfermero);
+        $this->formularioDolor()->set('dolorEva', '4')->set('dolorDuracionUnidad', 'minutos')
+            ->call('guardarDolor')->assertHasErrors('duracion_valor');
+        $this->formularioDolor()->set('dolorEva', '4')->set('dolorDuracionValor', '-1')
+            ->set('dolorDuracionUnidad', 'minutos')->call('guardarDolor')->assertHasErrors('duracion_valor');
+        $this->formularioDolor()->set('dolorEva', '4')->set('dolorDuracionValor', str_repeat('1', 25))
+            ->set('dolorDuracionUnidad', str_repeat('x', 60))->call('guardarDolor')->assertHasErrors('duracion_valor');
+        $this->assertDatabaseCount('valoraciones_dolor', 0);
+    }
+
+    public function test_dolor_descarte_protege_captura_y_resetea_historial_sin_persistir(): void
+    {
+        $this->actingAs($this->enfermero);
+        $vista = $this->formularioDolor()->set('dolorUbicacion', 'Rodilla derecha, Zona lumbar')
+            ->call('cerrarSelectorRegistro')->assertSet('confirmarDescarte', true)
+            ->assertSet('dolorUbicacion', 'Rodilla derecha, Zona lumbar')
+            ->call('cancelarDescarte')->assertSet('drawerPaso', 'register-form')
+            ->call('volverPanelDetalle')->assertSet('confirmarDescarte', true)
+            ->call('descartarCambios')->assertSet('drawerPaso', 'register-selector');
+        $this->assertDatabaseCount('valoraciones_dolor', 0);
+    }
+
+    public function test_dolor_eva_diez_no_crea_severidad_ni_alerta_automatica(): void
+    {
+        $this->actingAs($this->enfermero);
+        $alertas = Alerta::count();
+        $this->formularioDolor()->set('dolorEva', '10')->call('guardarDolor')
+            ->assertHasNoErrors()->assertSee('Valoración de dolor registrada');
+        $this->assertDatabaseHas('valoraciones_dolor', ['intensidad' => 10, 'respuesta' => null]);
+        $this->assertSame($alertas, Alerta::count());
+    }
+
+    public function test_dolor_fallo_de_persistencia_conserva_captura_y_ofrece_reintento(): void
+    {
+        $this->actingAs($this->enfermero);
+        $formulario = $this->formularioDolor()->set('dolorEva', '6')
+            ->set('dolorUbicacion', 'Rodilla derecha')->set('dolorIntervencion', 'Reposo');
+        $this->partialMock(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class,
+            function ($mock) {
+                $mock->shouldReceive('registrarValoracionDolor')->once()->andThrow(
+                    new \Illuminate\Database\QueryException('sqlite', 'insert test', [], new \RuntimeException('Synthetic persistence failure'))
+                );
+            });
+        $formulario->call('guardarDolor')->assertHasErrors('dolor_guardado')
+            ->assertSet('drawerPaso', 'register-form')->assertSet('dolorEva', '6')
+            ->assertSet('dolorUbicacion', 'Rodilla derecha')->assertSet('dolorIntervencion', 'Reposo')
+            ->assertSee('Conservamos los datos')->assertDontSee('Synthetic persistence failure')
+            ->assertNotDispatched('dolor-registrado')->assertNotDispatched('rm-toast');
+        $this->assertDatabaseCount('valoraciones_dolor', 0);
+    }
+
+    public function test_dolor_revalida_cuenta_y_asignacion_antes_de_persistir(): void
+    {
+        $this->actingAs($this->enfermero);
+        $formulario = $this->formularioDolor()->set('dolorEva', '6');
+        $this->enfermero->update(['estado' => 'INACTIVO']);
+        $formulario->call('guardarDolor')->assertStatus(403);
+        $this->assertDatabaseCount('valoraciones_dolor', 0);
+        $this->enfermero->update(['estado' => 'ACTIVO']);
+        $formulario = $this->formularioDolor()->set('dolorEva', '6');
+        AsignacionResidenteJornada::where('cod_residente', $this->residenteEstable->cod_residente)
+            ->update(['estado' => 'INACTIVA']);
+        $formulario->call('guardarDolor')->assertStatus(403);
+        $this->assertDatabaseCount('valoraciones_dolor', 0);
+    }
+
+    public function test_dolor_v2_episodio_8_5_3_conserva_origen_y_autoria_sin_sobrescribir(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $this->actingAs($this->enfermero);
+        $vista = $this->formularioDolor()->set('dolorEva', '8')->set('dolorUbicacion', 'Rodilla derecha')
+            ->set('dolorFrecuencia', '  Intermitente  ')->set('dolorFactoresAlivio', '  Reposo  ')
+            ->set('dolorIntervencion', 'Cambio de posición')->call('guardarDolor')->assertHasNoErrors();
+        $a = \App\Models\ValoracionDolor::firstOrFail();
+        $original = $a->getAttributes();
+        $this->assertNull($a->cod_valoracion_origen);
+        $this->assertNull($a->respuesta);
+        $this->assertNull($a->tipo_dolor);
+        $this->assertSame('Intermitente', $a->frecuencia);
+        $this->assertSame('Reposo', $a->factores_alivio);
+        $this->travel(10)->minutes();
+        $vista->call('abrirReevaluacionDolor', $a->getKey())
+            ->assertSet('dolorCodOrigen', $a->getKey())->assertSet('dolorEva', '')
+            ->assertSee('Reevaluación del dolor')->assertSee('Episodio iniciado')
+            ->set('dolorEva', '5')->set('dolorRespuesta', 'Refiere menor intensidad')
+            ->call('guardarDolor')->assertHasNoErrors()->assertSee('Reevaluación registrada');
+        $b = \App\Models\ValoracionDolor::where('intensidad', 5)->firstOrFail();
+        $this->assertSame($a->getKey(), $b->cod_valoracion_origen);
+        $this->assertSame('Refiere menor intensidad', $b->respuesta);
+        $this->travel(10)->minutes();
+        $vista->call('abrirReevaluacionDolor', $b->getKey())->assertSet('dolorCodOrigen', $a->getKey())
+            ->set('dolorEva', '3')->call('guardarDolor')->assertHasNoErrors();
+        $c = \App\Models\ValoracionDolor::where('intensidad', 3)->firstOrFail();
+        $this->assertSame($a->getKey(), $c->cod_valoracion_origen);
+        $this->assertNull($c->respuesta);
+        $this->assertSame($original, $a->fresh()->getAttributes());
+        $this->assertSame($this->personal->getKey(), $c->cod_personal);
+        $this->assertTrue($c->fecha_hora->equalTo(now()));
+        $this->assertCount(2, $a->reevaluaciones);
+        $this->assertTrue($b->origen->is($a));
+        $this->assertDatabaseCount('valoraciones_dolor', 3);
+    }
+
+    public function test_dolor_v2_origen_ajeno_inexistente_futuro_anulado_y_ciclico_no_persisten(): void
+    {
+        $this->actingAs($this->enfermero);
+        $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        foreach (['AJENO', 'FUTURO', 'ANULADO', 'CICLO'] as $caso) {
+            \App\Models\ValoracionDolor::create([
+                'cod_valoracion_dolor' => 'VD_'.$caso,
+                'cod_residente' => $caso === 'AJENO' ? $this->residenteCritico->getKey() : $this->residenteEstable->getKey(),
+                'cod_personal' => $this->personal->getKey(), 'intensidad' => 4,
+                'fecha_hora' => $caso === 'FUTURO' ? now()->addHour() : now()->subHour(),
+                'estado' => $caso === 'ANULADO' ? 'ANULADO' : 'VIGENTE',
+            ]);
+        }
+        \App\Models\ValoracionDolor::whereKey('VD_CICLO')->update(['cod_valoracion_origen' => 'VD_CICLO']);
+        foreach (['VD_AJENO', 'VD_FUTURO', 'VD_ANULADO', 'VD_CICLO', 'VD_INEXISTENTE'] as $codigo) {
+            try {
+                $servicio->registrarValoracionDolor($this->residenteEstable->getKey(), ['intensidad' => 2, 'cod_valoracion_origen' => $codigo], $this->enfermero);
+                $this->fail('No puede aceptar un origen inválido.');
+            } catch (\Illuminate\Validation\ValidationException $exception) {
+                $this->assertArrayHasKey('cod_valoracion_origen', $exception->errors());
+            }
+        }
+        $this->assertDatabaseCount('valoraciones_dolor', 4);
+    }
+
+    public function test_dolor_v2_origen_locked_y_respuesta_inicial_prohibida(): void
+    {
+        $this->actingAs($this->enfermero);
+        $vista = $this->formularioDolor()->set('dolorEva', '4')->set('dolorRespuesta', 'Texto sin episodio')
+            ->call('guardarDolor')->assertHasErrors('respuesta');
+        $this->assertDatabaseCount('valoraciones_dolor', 0);
+        $this->expectException(\Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException::class);
+        $vista->set('dolorCodOrigen', 'VD_INVENTADO');
+    }
+
+    public function test_dolor_v2_textos_nuevos_validan_y_participan_en_descarte(): void
+    {
+        $this->actingAs($this->enfermero);
+        $this->formularioDolor()->set('dolorEva', '4')->set('dolorFrecuencia', str_repeat('a', 41))
+            ->call('guardarDolor')->assertHasErrors('frecuencia')->assertSet('dolorEva', '4');
+        foreach (['dolorFrecuencia', 'dolorFactoresAlivio', 'dolorRespuesta'] as $campo) {
+            $this->formularioDolor()->set($campo, 'Texto')->call('cerrarSelectorRegistro')
+                ->assertSet('confirmarDescarte', true)->call('cancelarDescarte')->assertSet($campo, 'Texto');
+        }
+        $this->assertDatabaseCount('valoraciones_dolor', 0);
+    }
+
+    public function test_dolor_v2_reevaluar_protege_captura_y_conserva_residente(): void
+    {
+        $this->actingAs($this->enfermero);
+        $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $origen = $servicio->registrarValoracionDolor($this->residenteEstable->getKey(), ['intensidad' => 4], $this->enfermero);
+        $vista = $this->formularioDolor()->set('dolorEva', '6')->set('dolorFactoresAlivio', 'Reposo')
+            ->call('abrirReevaluacionDolor', $origen->getKey())->assertSet('confirmarDescarte', true)
+            ->call('cancelarDescarte')->assertSet('dolorEva', '6')->assertSet('dolorFactoresAlivio', 'Reposo')
+            ->call('abrirReevaluacionDolor', $origen->getKey())->call('descartarCambios')
+            ->assertSet('dolorCodOrigen', $origen->getKey())->assertSet('dolorEva', '')
+            ->assertSet('modalCodResidente', $this->residenteEstable->getKey())
+            ->set('dolorEva', '4')->call('guardarDolor')->assertHasNoErrors()
+            ->assertSet('dolorResultado.mediciones.3.valor', '+0 puntos');
+        $this->assertDatabaseCount('valoraciones_dolor', 2);
+    }
+
+    public function test_dolor_v2_reevaluacion_revalida_permiso_lectura_y_asignacion(): void
+    {
+        $this->actingAs($this->enfermero);
+        $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $origen = $servicio->registrarValoracionDolor($this->residenteEstable->getKey(), ['intensidad' => 4], $this->enfermero);
+        $vista = $this->formularioDolor()->call('abrirReevaluacionDolor', $origen->getKey())->set('dolorEva', '3');
+        \Spatie\Permission\Models\Role::findByName('ENFERMEROS')->revokePermissionTo('valoraciones_dolor.ver');
+        $this->enfermero->unsetRelation('roles')->unsetRelation('permissions');
+        $vista->call('guardarDolor')->assertForbidden();
+        $this->assertDatabaseCount('valoraciones_dolor', 1);
+    }
+
+    public function test_dolor_v2_fk_impide_vinculo_ajeno_incluso_por_sql(): void
+    {
+        $this->actingAs($this->enfermero);
+        $origen = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class)
+            ->registrarValoracionDolor($this->residenteEstable->getKey(), ['intensidad' => 4], $this->enfermero);
+        try {
+            \Illuminate\Support\Facades\DB::transaction(fn () => \Illuminate\Support\Facades\DB::table('valoraciones_dolor')->insert([
+                'cod_valoracion_dolor' => 'VD_CRUCE_SQL', 'cod_valoracion_origen' => $origen->getKey(),
+                'cod_residente' => $this->residenteCritico->getKey(), 'cod_personal' => $this->personal->getKey(),
+                'fecha_hora' => now(), 'intensidad' => 3, 'estado' => 'VIGENTE',
+            ]));
+            $this->fail('La FK debe impedir otro residente incluso por SQL directo.');
+        } catch (\Illuminate\Database\QueryException $exception) {
+            $this->assertNotEmpty($exception->getCode());
+        }
+        $this->assertDatabaseCount('valoraciones_dolor', 1);
+    }
+
+    public function test_dolor_v2_contexto_no_puede_cambiar_silenciosamente_de_residente(): void
+    {
+        $this->actingAs($this->enfermero);
+        $vista = $this->formularioDolor()->set('dolorEva', '4')
+            ->call('seleccionarResidente', $this->residenteCritico->getKey())
+            ->assertSet('confirmarDescarte', true)->assertSet('modalCodResidente', $this->residenteEstable->getKey())
+            ->call('cancelarDescarte');
+        $detail = $vista->get('detalleResidente');
+        $detail['cod_residente'] = $this->residenteCritico->getKey();
+        $vista->set('detalleResidente', $detail)->set('modalCodResidente', $this->residenteCritico->getKey())
+            ->call('guardarDolor')->assertForbidden();
+        $this->assertDatabaseCount('valoraciones_dolor', 0);
+    }
+
+    public function test_dolor_v2_no_tiene_guardado_alternativo_fuera_de_la_captura(): void
+    {
+        $this->actingAs($this->enfermero);
+        $this->formularioDolor()->set('dolorEva', '4')
+            ->set('mostrarSelectorModal', false)->set('drawerPaso', 'resident-summary')
+            ->call('guardarDolor')->assertForbidden();
+        $this->assertDatabaseCount('valoraciones_dolor', 0);
+    }
+
+    public function test_dolor_v2_fk_restringe_borrado_y_origen_inexistente(): void
+    {
+        $this->actingAs($this->enfermero);
+        $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $a = $servicio->registrarValoracionDolor($this->residenteEstable->getKey(), ['intensidad' => 8], $this->enfermero);
+        $b = $servicio->registrarValoracionDolor($this->residenteEstable->getKey(), ['intensidad' => 5, 'cod_valoracion_origen' => $a->getKey()], $this->enfermero);
+        foreach (['delete', 'missing'] as $case) {
+            try {
+                \Illuminate\Support\Facades\DB::transaction(function () use ($case, $a, $b) {
+                    if ($case === 'delete') {
+                        \Illuminate\Support\Facades\DB::table('valoraciones_dolor')->where('cod_valoracion_dolor', $a->getKey())->delete();
+                    } else {
+                        \Illuminate\Support\Facades\DB::table('valoraciones_dolor')->where('cod_valoracion_dolor', $b->getKey())->update(['cod_valoracion_origen' => 'VD_NO_EXISTE']);
+                    }
+                });
+                $this->fail('La FK debía rechazar la operación.');
+            } catch (\Illuminate\Database\QueryException $exception) {
+                $this->assertNotEmpty($exception->getCode());
+            }
+        }
+        $this->assertDatabaseCount('valoraciones_dolor', 2);
+        $this->assertSame($a->getKey(), $b->fresh()->cod_valoracion_origen);
     }
 
     private function formularioHidratacionClinica()
@@ -1765,6 +2073,8 @@ class MisPacientesRedisenadaTest extends TestCase
 
     private function formularioAlimentacion()
     {
+        // Fixture de captura dentro de la jornada; no depender del reloj de ejecución.
+        $this->travelTo(today()->setTime(10, 0));
         \App\Models\AsignacionPersonal::firstOrCreate(
             ['cod_asignacion_personal' => 'ASP_INGESTA_TEST'],
             [
@@ -1786,7 +2096,7 @@ class MisPacientesRedisenadaTest extends TestCase
     {
         $this->actingAs($this->enfermero);
         $this->formularioAlimentacion()
-            ->assertSee('Comida')
+            ->assertSee('Tipo de comida')
             ->assertDontSee('wire:model="ingestaEspecificar"')
             ->set('ingestaTipoComida', 'OTRO')
             ->call('guardarCuidado')->assertHasErrors('tipo_comida');
@@ -1816,29 +2126,33 @@ class MisPacientesRedisenadaTest extends TestCase
         foreach (['-1', 'texto'] as $volumen) {
             $this->formularioAlimentacion()
                 ->set('ingestaTipoComida', 'ALMUERZO')
+                ->set('ingestaRegistrarLiquidos', true)
                 ->set('ingestaCantidadMl', $volumen)
                 ->call('guardarCuidado')->assertHasErrors('cantidad_ml');
         }
         $this->assertDatabaseCount('registros_hidratacion', 0);
     }
 
-    public function test_alimentacion_guarda_ingesta_e_hidratacion_reales_y_limpia_formulario(): void
+    public function test_alimentacion_guarda_ingesta_e_hidratacion_reales_y_muestra_resultado(): void
     {
         $this->travelTo(today()->setTime(10, 0));
         $this->actingAs($this->enfermero);
         $this->formularioAlimentacion()
-            ->assertSee('Comida e ingesta')
+            ->assertSee('Tipo de comida')
             ->assertSee('Asistencia')
-            ->assertSee('Tolerancia y deglución')
+            ->assertSee('Deglución')
             ->set('ingestaTipoComida', 'ALMUERZO')
             ->set('ingestaPorcentaje', '87.50')
-            ->set('ingestaCantidadMl', '220.25')
+            ->set('ingestaRegistrarLiquidos', true)
+                ->set('ingestaCantidadMl', '220.25')
             ->set('ingestaTolerancia', 'BUENA')
             ->set('ingestaDificultadDeglucion', true)
             ->set('ingestaObservacion', '  Necesitó ayuda para comer.  ')
             ->call('guardarCuidado')->assertHasNoErrors()
-            ->assertSet('drawerPaso', 'resident-summary')
-            ->assertSet('ingestaTipoComida', '');
+            ->assertSet('drawerPaso', 'register-result')
+            ->assertSee('Ingesta registrada')
+            ->call('registrarOtraIngesta')->assertSet('drawerPaso', 'register-form')
+            ->assertSet('ingestaTipoComida', '')->assertSet('ingestaDificultadDeglucion', null);
 
         $this->assertDatabaseHas('registros_ingesta', [
             'cod_residente' => $this->residenteEstable->cod_residente,
@@ -1864,6 +2178,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->actingAs($this->enfermero);
         $this->formularioAlimentacion()
             ->set('ingestaTipoComida', 'CENA')
+            ->set('ingestaDificultadDeglucion', false)
             ->set('ingestaPorcentaje', '100')
             ->call('guardarCuidado')->assertHasNoErrors();
         $this->assertDatabaseCount('registros_hidratacion', 0);
@@ -1875,6 +2190,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->actingAs($this->enfermero);
         $this->formularioAlimentacion()
             ->set('ingestaTipoComida', 'DESAYUNO')
+            ->set('ingestaDificultadDeglucion', false)
             ->set('ingestaPorcentaje', '49.50')
             ->call('guardarCuidado')->assertHasNoErrors();
 
@@ -1912,148 +2228,324 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertStatus(403);
     }
 
+    public function test_ingesta_v2_exige_respuesta_explicita_y_conserva_captura_invalida(): void
+    {
+        $this->actingAs($this->enfermero);
+        $this->formularioAlimentacion()->assertSet('ingestaDificultadDeglucion', null)
+            ->set('ingestaTipoComida', 'CENA')->set('ingestaObservacion', 'Dato capturado')
+            ->call('guardarCuidado')->assertHasErrors('dificultad_deglucion')
+            ->assertSet('drawerPaso', 'register-form')->assertSet('ingestaObservacion', 'Dato capturado')
+            ->assertSet('ingestaResultado', [])->assertNotDispatched('cuidado-registrado');
+        $this->assertDatabaseCount('registros_ingesta', 0);
+    }
+
+    public function test_ingesta_v2_catalogo_nulos_autoria_y_hora_son_reales(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $this->actingAs($this->enfermero);
+        $this->formularioAlimentacion();
+        $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $alertas = Alerta::count();
+        foreach ($servicio::TIPOS_COMIDA as $comida) {
+            $registro = $servicio->registrarAlimentacion($this->residenteEstable->cod_residente, [
+                'tipo_comida' => $comida, 'dificultad_deglucion' => false, 'observacion' => '  ',
+                'cod_personal' => 'AUTOR_FALSO', 'fecha_hora' => '2000-01-01', 'apetito' => 'INVENTADO',
+            ], $this->enfermero);
+            $this->assertNull($registro->porcentaje_consumido);
+            $this->assertNull($registro->tolerancia);
+            $this->assertNull($registro->apetito);
+            $this->assertNull($registro->observacion);
+            $this->assertFalse($registro->dificultad_deglucion);
+            $this->assertSame($this->personal->cod_personal, $registro->cod_personal);
+            $this->assertTrue($registro->fecha_hora->equalTo(now()));
+        }
+        $this->assertSame($alertas, Alerta::count());
+        $this->assertDatabaseCount('registros_hidratacion', 0);
+    }
+
+    public function test_ingesta_v2_extremos_decimales_y_umbral_configurado(): void
+    {
+        $this->actingAs($this->enfermero);
+        config(['enfermeria.porcentaje_baja_ingesta' => 70]);
+        $this->formularioAlimentacion();
+        $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $alertas = Alerta::count();
+        foreach (['0', '69.99', '70', '72.50', '100.00'] as $porcentaje) {
+            $registro = $servicio->registrarAlimentacion($this->residenteEstable->cod_residente, [
+                'tipo_comida' => 'ALMUERZO', 'porcentaje_consumido' => $porcentaje,
+                'dificultad_deglucion' => true, 'cantidad_ml' => '0',
+            ], $this->enfermero);
+            $this->assertEquals((float) $porcentaje, $registro->porcentaje_consumido);
+            // La alerta activa se deduplica por residente y tipo; el segundo registro no la duplica.
+            $this->assertSame($alertas + 1, Alerta::count());
+        }
+        $this->assertDatabaseHas('alertas', ['tipo' => 'BAJA INGESTA', 'prioridad' => 'MEDIO', 'modulo' => 'SEGUIMIENTO']);
+        $this->assertDatabaseCount('registros_hidratacion', 5);
+        $ingesta = \App\Models\RegistroIngesta::first();
+        $hidratacion = \App\Models\RegistroHidratacion::first();
+        foreach (['cod_residente', 'cod_personal', 'cod_jornada'] as $campo) {
+            $this->assertSame($ingesta->$campo, $hidratacion->$campo);
+        }
+        $this->assertTrue($ingesta->fecha_hora->equalTo($hidratacion->fecha_hora));
+    }
+
+    public function test_ingesta_v2_valida_observacion_y_limites_sin_truncar(): void
+    {
+        $this->actingAs($this->enfermero);
+        $this->formularioAlimentacion();
+        $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        foreach ([['porcentaje_consumido' => '100.01'], ['cantidad_ml' => '999999.999'],
+            ['cantidad_ml' => '1000000'], ['observacion' => str_repeat('a', 5001)],
+            ['dificultad_deglucion' => 'quizá']] as $dato) {
+            try {
+                $servicio->registrarAlimentacion($this->residenteEstable->cod_residente,
+                    array_merge(['tipo_comida' => 'CENA', 'dificultad_deglucion' => false], $dato), $this->enfermero);
+                $this->fail('Se aceptó un valor inválido.');
+            } catch (\Illuminate\Validation\ValidationException $exception) {
+                $this->assertArrayHasKey(array_key_first($dato), $exception->errors());
+            }
+        }
+        $this->assertDatabaseCount('registros_ingesta', 0);
+        $registro = $servicio->registrarAlimentacion($this->residenteEstable->cod_residente,
+            ['tipo_comida' => 'CENA', 'dificultad_deglucion' => false,
+                'observacion' => str_repeat('á', 5000), 'cantidad_ml' => '999999.99'], $this->enfermero);
+        $this->assertSame(5000, mb_strlen($registro->observacion));
+    }
+
+    public function test_ingesta_v2_toggle_limpia_y_no_guarda_cantidad_oculta(): void
+    {
+        $this->actingAs($this->enfermero);
+        $this->formularioAlimentacion()->set('ingestaTipoComida', 'CENA')
+            ->set('ingestaDificultadDeglucion', false)->set('ingestaRegistrarLiquidos', true)
+            ->set('ingestaCantidadMl', '220.25')->set('ingestaRegistrarLiquidos', false)
+            ->assertSet('ingestaCantidadMl', '')->set('ingestaCantidadMl', '220.25')
+            ->call('guardarCuidado')->assertHasNoErrors()->assertSet('drawerPaso', 'register-result');
+        $this->assertDatabaseCount('registros_hidratacion', 0);
+    }
+
+    public function test_ingesta_v2_no_concede_hidratacion_por_manipulacion(): void
+    {
+        $this->actingAs($this->enfermero);
+        $formulario = $this->formularioAlimentacion()->set('ingestaTipoComida', 'CENA')->set('ingestaDificultadDeglucion', false);
+        \Spatie\Permission\Models\Role::findByName('ENFERMEROS')->revokePermissionTo('registros_hidratacion.crear');
+        $this->enfermero->unsetRelation('roles')->unsetRelation('permissions');
+        $formulario->set('ingestaRegistrarLiquidos', true)->set('ingestaCantidadMl', '0')
+            ->call('guardarCuidado')->assertStatus(403);
+        $this->assertDatabaseCount('registros_ingesta', 0);
+        $this->assertDatabaseCount('registros_hidratacion', 0);
+    }
+
+    public function test_ingesta_v2_fallo_hidratacion_revierte_transaccion_y_conserva_datos(): void
+    {
+        $this->actingAs($this->enfermero);
+        $formulario = $this->formularioAlimentacion()->set('ingestaTipoComida', 'CENA')
+            ->set('ingestaDificultadDeglucion', false)->set('ingestaPorcentaje', '10')
+            ->set('ingestaRegistrarLiquidos', true)->set('ingestaCantidadMl', '220.25');
+        $alertas = Alerta::count();
+        \App\Models\RegistroHidratacion::creating(static function (): void {
+            throw new \Illuminate\Database\QueryException('sqlite', 'insert synthetic', [], new \RuntimeException('Synthetic persistence failure'));
+        });
+        $formulario->call('guardarCuidado')->assertHasErrors('ingesta_guardado')
+            ->assertSet('drawerPaso', 'register-form')->assertSet('ingestaPorcentaje', '10')
+            ->assertSet('ingestaCantidadMl', '220.25')->assertSet('ingestaResultado', [])
+            ->assertNotDispatched('cuidado-registrado')->assertSee('Conservamos los datos')
+            ->assertDontSee('Synthetic persistence failure');
+        $this->assertDatabaseCount('registros_ingesta', 0);
+        $this->assertDatabaseCount('registros_hidratacion', 0);
+        $this->assertSame($alertas, Alerta::count());
+    }
+
+    public function test_ingesta_v2_historial_acotado_a_residente_vigencia_y_fecha(): void
+    {
+        $this->actingAs($this->enfermero);
+        $this->formularioAlimentacion();
+        $base = ['cod_residente' => $this->residenteEstable->cod_residente,
+            'cod_personal' => $this->personal->cod_personal, 'cod_jornada' => 'JOR_MIS_PACIENTES',
+            'tipo_comida' => 'CENA', 'estado' => 'VIGENTE'];
+        for ($i = 0; $i < 12; $i++) {
+            \App\Models\RegistroIngesta::create($base + ['cod_ingesta' => 'ING_HIST_'.$i,
+                'fecha_hora' => now()->subMinutes($i + 1), 'porcentaje_consumido' => $i === 0 ? null : 0]);
+        }
+        foreach (['ANULADA', 'FUTURA', 'OTRO'] as $caso) {
+            \App\Models\RegistroIngesta::create(array_merge($base,
+                ['cod_ingesta' => 'ING_'.$caso, 'fecha_hora' => $caso === 'FUTURA' ? now()->addHour() : now(),
+                    'estado' => $caso === 'ANULADA' ? 'ANULADO' : 'VIGENTE',
+                    'cod_residente' => $caso === 'OTRO' ? $this->residenteCritico->cod_residente : $this->residenteEstable->cod_residente]));
+        }
+        $formulario = $this->formularioAlimentacion();
+        $historial = $formulario->get('ingestaHistorial');
+        $this->assertCount(10, $historial);
+        $this->assertSame('ING_HIST_0', $historial[0]['codigo']);
+        $this->assertNull($historial[0]['porcentaje']);
+        $this->assertEquals(0, $historial[1]['porcentaje']);
+    }
+
+    public function test_ingesta_v2_resultado_impide_reenvio_y_vuelve_al_mismo_residente(): void
+    {
+        $this->actingAs($this->enfermero);
+        $formulario = $this->formularioAlimentacion()->set('ingestaTipoComida', 'CENA')
+            ->set('ingestaDificultadDeglucion', false)->call('guardarCuidado')->assertHasNoErrors();
+        $formulario->call('volverResidenteDesdeIngesta')->assertSet('drawerPaso', 'resident-summary')
+            ->assertSet('detalleResidente.cod_residente', $this->residenteEstable->cod_residente);
+        $this->assertDatabaseCount('registros_ingesta', 1);
+        $this->formularioAlimentacion()->set('ingestaTipoComida', 'CENA')
+            ->set('ingestaDificultadDeglucion', false)->call('guardarCuidado')->assertHasNoErrors()
+            ->call('guardarCuidado')->assertStatus(403);
+        $this->assertDatabaseCount('registros_ingesta', 2);
+    }
+
+    public function test_ingesta_v2_revalida_cuenta_personal_jornada_y_asignacion_al_guardar(): void
+    {
+        $this->actingAs($this->enfermero);
+        $this->formularioAlimentacion();
+        $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        foreach (['cuenta', 'personal', 'jornada', 'asignacion'] as $caso) {
+            if ($caso === 'cuenta') $this->enfermero->update(['estado' => 'INACTIVO']);
+            if ($caso === 'personal') {
+                $this->personal->update(['estado' => 'INACTIVO']);
+                $this->enfermero->unsetRelation('personal');
+            }
+            if ($caso === 'jornada') Jornada::whereKey('JOR_MIS_PACIENTES')->update(['estado' => 'FINALIZADA']);
+            if ($caso === 'asignacion') AsignacionResidenteJornada::where('cod_residente', $this->residenteEstable->cod_residente)->update(['estado' => 'FINALIZADA']);
+            try {
+                $servicio->registrarAlimentacion($this->residenteEstable->cod_residente,
+                    ['tipo_comida' => 'CENA', 'dificultad_deglucion' => false], $this->enfermero);
+                $this->fail('Se aceptó un contexto inválido: '.$caso);
+            } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
+                $this->assertSame(403, $exception->getStatusCode(), $caso);
+            }
+            $this->enfermero->update(['estado' => 'ACTIVO']);
+            $this->personal->update(['estado' => 'ACTIVO']);
+            $this->enfermero->unsetRelation('personal');
+            Jornada::whereKey('JOR_MIS_PACIENTES')->update(['estado' => 'ACTIVA']);
+            AsignacionResidenteJornada::where('cod_residente', $this->residenteEstable->cod_residente)->update(['estado' => 'ACTIVA']);
+        }
+        $this->assertDatabaseCount('registros_ingesta', 0);
+    }
+
+    public function test_ingesta_v2_fallo_alerta_revierte_ingesta_e_hidratacion(): void
+    {
+        $this->actingAs($this->enfermero);
+        $formulario = $this->formularioAlimentacion()->set('ingestaTipoComida', 'CENA')
+            ->set('ingestaDificultadDeglucion', false)->set('ingestaPorcentaje', '10')
+            ->set('ingestaRegistrarLiquidos', true)->set('ingestaCantidadMl', '100');
+        $alertas = Alerta::count();
+        $this->partialMock(\App\Backend\Modulos\Alertas\Servicios\AlertasService::class, function ($mock) {
+            $mock->shouldReceive('crear')->once()->andThrow(
+                new \Illuminate\Database\QueryException('sqlite', 'insert synthetic', [], new \RuntimeException('Synthetic alert persistence failure')));
+        });
+        $formulario->call('guardarCuidado')->assertHasErrors('ingesta_guardado')
+            ->assertSet('ingestaPorcentaje', '10')->assertSet('ingestaResultado', [])
+            ->assertNotDispatched('cuidado-registrado');
+        $this->assertDatabaseCount('registros_ingesta', 0);
+        $this->assertDatabaseCount('registros_hidratacion', 0);
+        $this->assertSame($alertas, Alerta::count());
+    }
+
+    public function test_ingesta_v2_descartar_o_limpiar_conserva_historial_y_contexto(): void
+    {
+        $this->actingAs($this->enfermero);
+        $formulario = $this->formularioAlimentacion()->set('ingestaDificultadDeglucion', false)
+            ->call('cerrarSelectorRegistro')->assertSet('confirmarDescarte', true)
+            ->call('cancelarDescarte')->assertSet('ingestaDificultadDeglucion', false)
+            ->call('solicitarLimpiezaRegistro')->assertSet('confirmarLimpiezaRegistro', true)
+            ->call('limpiarCamposRegistro')->assertSet('ingestaDificultadDeglucion', null)
+            ->assertSet('ingestaRegistrarLiquidos', false)->assertSet('ingestaCantidadMl', '')
+            ->assertSet('ingestaResidenteContexto', $this->residenteEstable->cod_residente);
+        $this->assertDatabaseCount('registros_ingesta', 0);
+        $formulario->set('ingestaRegistrarLiquidos', true)->call('volverPanelDetalle')
+            ->assertSet('confirmarDescarte', true)->call('descartarCambios')
+            ->assertSet('drawerPaso', 'register-selector');
+    }
+
+    public function test_ingesta_v2_sin_permiso_lectura_no_expone_historial_ni_finge_ausencia(): void
+    {
+        $this->actingAs($this->enfermero);
+        \Spatie\Permission\Models\Role::findByName('ENFERMEROS')->revokePermissionTo('registros_ingesta.ver');
+        $this->enfermero->unsetRelation('roles')->unsetRelation('permissions');
+        $this->formularioAlimentacion()->assertSet('ingestaHistorial', [])
+            ->assertSee('Sin permiso para consultar las ingestas anteriores.')
+            ->assertDontSee('Último registro guardado')->assertDontSee('id="ingesta-grafica-popup"', false);
+    }
+
     private function formularioEliminacion()
     {
-        \App\Models\AsignacionPersonal::firstOrCreate(
-            ['cod_asignacion_personal' => 'ASP_ELIM_TEST'],
-            [
-                'cod_jornada' => 'JOR_MIS_PACIENTES',
-                'cod_personal' => $this->personal->cod_personal,
-                'cod_area' => $this->area->cod_area,
-                'tipo_asignacion' => 'TURNO',
-                'fecha_asignacion' => now(),
-                'estado' => 'ACTIVA',
-            ]
-        );
-
-        return Livewire::test(MisPacientes::class)
-            ->call('seleccionarResidente', $this->residenteEstable->cod_residente)
-            ->call('mostrarSelectorRegistro')
-            ->call('abrirFormularioRegistro', 'eliminacion')->assertStatus(200);
+        $this->travelTo(today()->setTime(10, 0));
+        \App\Models\AsignacionPersonal::firstOrCreate(['cod_asignacion_personal' => 'ASP_ELIM_TEST'], [
+            'cod_jornada' => 'JOR_MIS_PACIENTES', 'cod_personal' => $this->personal->cod_personal,
+            'cod_area' => $this->area->cod_area, 'tipo_asignacion' => 'TURNO', 'fecha_asignacion' => now(), 'estado' => 'ACTIVA']);
+        return Livewire::test(MisPacientes::class)->call('seleccionarResidente', $this->residenteEstable->cod_residente)
+            ->call('mostrarSelectorRegistro')->call('abrirFormularioRegistro', 'eliminacion')->assertStatus(200);
     }
 
     public function test_eliminacion_exige_tipo_y_rechaza_tipo_fuera_del_formulario(): void
     {
         $this->actingAs($this->enfermero);
-        $this->formularioEliminacion()
-            ->assertSee('Urinaria')
-            ->assertSee('Intestinal')
-            ->call('guardarCuidado')->assertHasErrors('tipo_eliminacion');
-
-        $this->formularioEliminacion()
-            ->set('elimTipo', 'AMBAS')
-            ->call('guardarCuidado')->assertHasErrors('tipo_eliminacion');
+        $this->formularioEliminacion()->assertSee('Eliminación urinaria')->assertSee('Eliminación intestinal')
+            ->call('guardarEliminacion')->assertHasErrors('tipo_eliminacion');
+        $this->formularioEliminacion()->set('elimTipo', 'AMBAS')->call('guardarEliminacion')->assertHasErrors('tipo_eliminacion');
         $this->assertDatabaseCount('registros_eliminacion', 0);
     }
 
     public function test_eliminacion_cambiar_tipo_limpia_campos_urinarios_e_intestinales(): void
     {
         $this->actingAs($this->enfermero);
-        $formulario = $this->formularioEliminacion()
-            ->set('elimTipo', 'URINARIA')
-            ->set('elimCantidadUrinaria', '250')
-            ->set('elimCaracteristicaUrinaria', 'Ámbar')
-            ->set('elimContinenciaUrinaria', 'CONTINENTE')
-            ->set('elimTipo', 'INTESTINAL')
-            ->assertSet('elimCantidadUrinaria', '')
-            ->assertSet('elimCaracteristicaUrinaria', '')
-            ->assertSet('elimContinenciaUrinaria', '');
-
-        $formulario->set('elimCantidadIntestinal', '1')
-            ->set('elimCaracteristicaIntestinal', 'Blanda')
-            ->set('elimContinenciaIntestinal', 'INCONTINENCIA_FECAL')
-            ->set('elimTipo', 'URINARIA')
-            ->assertSet('elimCantidadIntestinal', '')
-            ->assertSet('elimCaracteristicaIntestinal', '')
-            ->assertSet('elimContinenciaIntestinal', '');
+        $formulario = $this->formularioEliminacion()->call('solicitarTipoEliminacion', 'URINARIA')
+            ->set('elimDatos.volumen_ml', '250')->set('elimDatos.color_orina', 'AMBAR')
+            ->set('elimDatos.cantidad_cualitativa', 'HABITUAL')->set('elimDatos.observacion', 'Asistencia observada')
+            ->call('solicitarTipoEliminacion', 'INTESTINAL')->assertSet('elimTipo', 'URINARIA')
+            ->assertSet('elimTipoPendiente', 'INTESTINAL')->call('cancelarTipoEliminacion')->assertSet('elimDatos.volumen_ml','250')
+            ->call('solicitarTipoEliminacion','INTESTINAL')->call('confirmarTipoEliminacion')
+            ->assertSet('elimTipo','INTESTINAL')->assertSet('elimDatos.volumen_ml','')->assertSet('elimDatos.color_orina','')
+            ->assertSet('elimDatos.cantidad_cualitativa','HABITUAL')->assertSet('elimDatos.observacion','Asistencia observada');
+        $formulario->set('elimDatos.tipo_bristol',4)->set('elimDatos.presencia_moco',false)
+            ->call('solicitarTipoEliminacion','URINARIA')->call('confirmarTipoEliminacion')
+            ->assertSet('elimDatos.tipo_bristol','')->assertSet('elimDatos.presencia_moco',null);
     }
 
     public function test_eliminacion_no_persiste_campos_ocultos_aunque_se_manipulen(): void
     {
-        $this->travelTo(today()->setTime(10, 0));
         $this->actingAs($this->enfermero);
-        $this->formularioEliminacion()
-            ->set('elimTipo', 'INTESTINAL')
-            ->set('elimCantidadIntestinal', '2')
-            ->set('elimCaracteristicaIntestinal', 'Blanda')
-            ->set('elimCantidadUrinaria', '999')
-            ->set('elimCaracteristicaUrinaria', 'Valor oculto')
-            ->set('elimContinenciaUrinaria', 'INCONTINENCIA_URINARIA')
-            ->call('guardarCuidado')->assertHasNoErrors();
-
-        $this->assertDatabaseHas('registros_eliminacion', [
-            'cod_residente' => $this->residenteEstable->cod_residente,
-            'tipo_eliminacion' => 'INTESTINAL',
-            'cantidad' => '2',
-            'caracteristica' => 'Blanda',
-            'continencia' => null,
-        ]);
-        $this->assertDatabaseMissing('registros_eliminacion', ['cantidad' => '999']);
+        $this->formularioEliminacion()->call('solicitarTipoEliminacion','INTESTINAL')->set('elimDatos.tipo_bristol',4)
+            ->set('elimDatos.volumen_ml','999')->call('guardarEliminacion')->assertHasErrors('volumen_ml');
+        $this->assertDatabaseCount('registros_eliminacion',0);
     }
 
     public function test_eliminacion_rechaza_cantidad_negativa_y_continencia_invalida(): void
     {
         $this->actingAs($this->enfermero);
-        $this->formularioEliminacion()
-            ->set('elimTipo', 'URINARIA')
-            ->set('elimCantidadUrinaria', '-1')
-            ->call('guardarCuidado')->assertHasErrors('cantidad');
-
-        $this->formularioEliminacion()
-            ->set('elimTipo', 'INTESTINAL')
-            ->set('elimContinenciaIntestinal', 'INCONTINENCIA_URINARIA')
-            ->call('guardarCuidado')->assertHasErrors('continencia');
-        $this->assertDatabaseCount('registros_eliminacion', 0);
+        $this->formularioEliminacion()->call('solicitarTipoEliminacion','URINARIA')->set('elimDatos.volumen_ml','-1')
+            ->call('guardarEliminacion')->assertHasErrors('volumen_ml');
+        $this->formularioEliminacion()->call('solicitarTipoEliminacion','INTESTINAL')->set('elimDatos.continencia','INCONTINENCIA_URINARIA')
+            ->call('guardarEliminacion')->assertHasErrors('continencia');
+        $this->assertDatabaseCount('registros_eliminacion',0);
     }
 
     public function test_eliminacion_guarda_campos_reales_con_autoria_y_observaciones(): void
     {
-        $this->travelTo(today()->setTime(10, 0));
         $this->actingAs($this->enfermero);
-        $this->formularioEliminacion()
-            ->set('elimTipo', 'URINARIA')
-            ->set('elimCantidadUrinaria', '250.5')
-            ->set('elimCaracteristicaUrinaria', '  Color ámbar  ')
-            ->set('elimContinenciaUrinaria', 'CONTINENTE')
-            ->set('elimObservacion', '  Requirió asistencia.  ')
-            ->call('guardarCuidado')->assertHasNoErrors()
-            ->assertSet('drawerPaso', 'resident-summary');
-
-        $this->assertDatabaseHas('registros_eliminacion', [
-            'cod_residente' => $this->residenteEstable->cod_residente,
-            'cod_personal' => $this->personal->cod_personal,
-            'cod_jornada' => 'JOR_MIS_PACIENTES',
-            'tipo_eliminacion' => 'URINARIA',
-            'cantidad' => '250.5',
-            'caracteristica' => 'Color ámbar',
-            'continencia' => 'CONTINENTE',
-            'observacion' => 'Requirió asistencia.',
-            'estado' => 'VIGENTE',
-        ]);
+        $this->formularioEliminacion()->call('solicitarTipoEliminacion','URINARIA')->set('elimDatos.volumen_ml','250.50')
+            ->set('elimDatos.color_orina','AMBAR')->set('elimDatos.continencia','CONTINENTE')
+            ->set('elimDatos.observacion','  Requirió asistencia.  ')->call('guardarEliminacion')->assertHasNoErrors()
+            ->assertSet('drawerPaso','register-result');
+        $this->assertDatabaseHas('registros_eliminacion',['cod_residente'=>$this->residenteEstable->cod_residente,
+            'cod_personal'=>$this->personal->cod_personal,'cod_jornada'=>'JOR_MIS_PACIENTES','tipo_eliminacion'=>'URINARIA',
+            'volumen_ml'=>'250.50','color_orina'=>'AMBAR','continencia'=>'CONTINENTE','cantidad'=>null,'caracteristica'=>null,
+            'observacion'=>'Requirió asistencia.','estado'=>'VIGENTE']);
     }
 
     public function test_eliminacion_rechaza_residente_no_asignado_y_usuario_sin_permiso(): void
     {
-        $this->actingAs($this->enfermero);
-        AsignacionResidenteJornada::query()->where('cod_residente', $this->residenteCritico->cod_residente)
-            ->update(['estado' => 'FINALIZADA']);
-
-        try {
-            app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class)
-                ->registrarEliminacion($this->residenteCritico->cod_residente, [
-                    'tipo_eliminacion' => 'URINARIA',
-                ], $this->enfermero);
+        $this->actingAs($this->enfermero); $this->formularioEliminacion();
+        AsignacionResidenteJornada::where('cod_residente',$this->residenteCritico->cod_residente)->update(['estado'=>'FINALIZADA']);
+        try { app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class)
+            ->registrarEliminacion($this->residenteCritico->cod_residente,['tipo_eliminacion'=>'URINARIA'],$this->enfermero);
             $this->fail('Se aceptó un residente no asignado.');
-        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
-            $this->assertSame(403, $e->getStatusCode());
-        }
-
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) { $this->assertSame(403,$e->getStatusCode()); }
         \Spatie\Permission\Models\Role::findByName('ENFERMEROS')->revokePermissionTo('registros_eliminacion.crear');
-        Livewire::test(MisPacientes::class)
-            ->call('seleccionarResidente', $this->residenteEstable->cod_residente)
-            ->call('mostrarSelectorRegistro')
-            ->call('abrirFormularioRegistro', 'eliminacion')
-            ->assertStatus(403);
+        Livewire::test(MisPacientes::class)->call('seleccionarResidente',$this->residenteEstable->cod_residente)
+            ->call('mostrarSelectorRegistro')->call('abrirFormularioRegistro','eliminacion')->assertStatus(403);
+        $this->assertDatabaseCount('registros_eliminacion',0);
     }
 
     private function formularioMovilidad()
@@ -2080,7 +2572,7 @@ class MisPacientesRedisenadaTest extends TestCase
     {
         $this->actingAs($this->enfermero);
         $this->formularioMovilidad()
-            ->assertSee('Movilidad y apoyo')
+            ->assertSee('Capacidad observada')
             ->assertSee('Movilidad observada')
             ->call('guardarCuidado')->assertHasErrors('marcha');
 
@@ -2169,7 +2661,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->set('movRiesgoCaida', 'MEDIO')
             ->set('movObservacion', '  Usó andador con supervisión.  ')
             ->call('guardarCuidado')->assertHasNoErrors()
-            ->assertSet('drawerPaso', 'resident-summary');
+            ->assertSet('drawerPaso', 'register-result')->assertSee('Movilidad registrada');
 
         $this->assertDatabaseHas('registros_movilidad', [
             'cod_residente' => $this->residenteEstable->cod_residente,
@@ -2326,14 +2818,13 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->assertSame($signosAntes, SignoVital::query()->count());
         $this->assertSame($alertasAntes, Alerta::query()->count());
     }
-    public function test_critico_permanece_visible_con_otro_campo_invalido_y_no_permita_descarte_directo(): void
+    public function test_critico_con_otro_campo_invalido_protege_salida_hasta_confirmacion(): void
     {
         $this->actingAs($this->enfermero);
         $formulario = $this->formularioSignos()->set('signoFC', '135')->set('signoTemp', '6')
             ->assertSet('signosEvaluacion.severidad_global', 'CRITICO')
-            ->call('cerrarSelectorRegistro')->call('descartarCambios')
-            ->assertHasErrors('continuidad_signos')->assertSet('mostrarSelectorModal', true);
-        $formulario->call('cancelarDescarte')->call('seleccionarResidente', $this->residenteCritico->cod_residente)
+            ->call('cerrarSelectorRegistro')->assertSet('confirmarDescarte', true)
+            ->call('cancelarDescarte')->call('seleccionarResidente', $this->residenteCritico->cod_residente)
             ->assertSet('confirmarDescarte', true)
             ->assertSet('modalCodResidente', $this->residenteEstable->cod_residente);
     }
@@ -2371,18 +2862,20 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->assertSame($alertasAntes, Alerta::query()->count());
     }
 
-    public function test_limpiar_campos_no_elimina_critico_aunque_otro_campo_sea_invalido(): void
+    public function test_limpieza_confirmada_descarta_critico_sin_registro_ni_alerta(): void
     {
         $this->actingAs($this->enfermero);
+        $signosAntes = SignoVital::query()->count();
+        $alertasAntes = Alerta::query()->count();
         $formulario = $this->formularioSignos()->set('signoFC', '135')->set('signoTemp', '6')
-            ->set('signoObs', 'Lectura pendiente')->call('solicitarLimpiezaSignos')
-            ->assertHasErrors('continuidad_signos')->assertSet('confirmarLimpiezaSignos', false)
-            ->assertDontSee('Confirmar limpieza')->call('limpiarCamposSignos')
-            ->assertHasErrors('continuidad_signos')->assertNotDispatched('signos-campos-limpiados')
-            ->assertSet('signoFC', '135')->assertSet('signoTemp', '6')
-            ->assertSet('signoObs', 'Lectura pendiente')->assertSet('mostrarSelectorModal', true);
-        $formulario->set('signoFC', '72')->call('limpiarCamposSignos')->assertHasNoErrors()
-            ->assertSet('signoFC', '')->assertDispatched('signos-campos-limpiados');
+            ->set('signoObs', 'Lectura pendiente')->call('solicitarLimpiezaRegistro')
+            ->assertSet('confirmarLimpiezaRegistro', true)->assertSee('Confirmar limpieza')
+            ->assertSet('signoFC', '135')->call('limpiarCamposRegistro')->assertHasNoErrors()
+            ->assertSet('signoFC', '')->assertSet('signoTemp', '')->assertSet('signoObs', '')
+            ->assertSet('mostrarSelectorModal', true)->assertDispatched('signos-campos-limpiados');
+        $this->assertDatabaseMissing('signos_vitales', ['frecuencia_cardiaca' => 135]);
+        $this->assertSame($signosAntes, SignoVital::query()->count());
+        $this->assertSame($alertasAntes, Alerta::query()->count());
     }
 
     public function test_limpiar_campos_revalida_permiso_y_contexto_del_formulario(): void
@@ -2394,6 +2887,57 @@ class MisPacientesRedisenadaTest extends TestCase
         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
         $this->enfermero->unsetRelation('roles')->unsetRelation('permissions');
         $formulario->call('limpiarCamposSignos')->assertForbidden();
+    }
+
+    public function test_limpieza_comun_cubre_capturas_y_exige_confirmacion_sin_perder_contexto(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $this->actingAs($this->enfermero);
+        $this->crearDosisProgramada($this->residenteEstable);
+        foreach (['dolor' => 'dolorUbicacion', 'alimentacion' => 'ingestaObservacion',
+            'eliminacion' => 'elimDatos.observacion', 'movilidad' => 'movObservacion',
+            'seguimiento' => 'segObs', 'procedimiento' => 'procDetalle', 'medicacion' => 'medObservacion'] as $tipo => $campo) {
+            $formulario = Livewire::test(MisPacientes::class)
+                ->call('seleccionarResidente', $this->residenteEstable->cod_residente)
+                ->call('mostrarSelectorRegistro')->call('abrirFormularioRegistro', $tipo)
+                ->assertSee('Limpiar campos')->set($campo, 'Captura sin guardar');
+            $formulario->call('solicitarLimpiezaRegistro')->assertSet('confirmarLimpiezaRegistro', true)
+                ->call('cancelarLimpiezaRegistro')->assertSet($campo, 'Captura sin guardar')
+                ->call('solicitarLimpiezaRegistro')->call('limpiarCamposRegistro')->assertHasNoErrors()
+                ->assertSet($campo, '')->assertSet('registroTipo', $tipo)
+                ->assertSet('modalCodResidente', $this->residenteEstable->cod_residente)
+                ->assertSet('drawerPaso', 'register-form')->assertSet('mostrarSelectorModal', true)
+                ->assertSet('confirmarLimpiezaRegistro', false)->assertDispatched('registro-campos-limpiados')
+                ->call('cerrarSelectorRegistro')->assertSet('confirmarDescarte', false)
+                ->assertSet('mostrarSelectorModal', false);
+        }
+        $this->formularioDolor()->set('dolorEva', '7')->call('limpiarCamposRegistro')->assertStatus(409);
+    }
+
+    public function test_cambio_de_residente_protege_capturas_del_selector_ademas_de_signos_y_dolor(): void
+    {
+        $this->actingAs($this->enfermero);
+        Livewire::test(MisPacientes::class)
+            ->call('seleccionarResidente', $this->residenteEstable->cod_residente)
+            ->call('mostrarSelectorRegistro')->call('abrirFormularioRegistro', 'alimentacion')
+            ->set('ingestaObservacion', 'Captura pendiente')
+            ->call('seleccionarResidente', $this->residenteCritico->cod_residente)
+            ->assertSet('confirmarDescarte', true)
+            ->assertSet('modalCodResidente', $this->residenteEstable->cod_residente)
+            ->call('cancelarDescarte')->assertSet('ingestaObservacion', 'Captura pendiente')
+            ->call('cerrarSelectorRegistro')->call('descartarCambios')
+            ->assertSet('mostrarSelectorModal', false);
+    }
+
+    public function test_limpieza_comun_revalida_permiso_y_no_actua_fuera_del_formulario(): void
+    {
+        $this->actingAs($this->enfermero);
+        Livewire::test(MisPacientes::class)->call('solicitarLimpiezaRegistro')->assertForbidden();
+        $formulario = $this->formularioDolor()->set('dolorEva', '7')->call('solicitarLimpiezaRegistro');
+        \Spatie\Permission\Models\Role::findByName('ENFERMEROS')->revokePermissionTo('valoraciones_dolor.crear');
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        $this->enfermero->unsetRelation('roles')->unsetRelation('permissions');
+        $formulario->call('limpiarCamposRegistro')->assertForbidden();
     }
 
     public function test_formulario_fija_fecha_hora_del_servidor_y_conserva_el_momento_al_guardar(): void
@@ -2431,4 +2975,547 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->assertSame($alertasAntes, Alerta::query()->count());
     }
 
+    private function formularioHidratacionV2()
+    {
+        $this->formularioHidratacionClinica();
+        return Livewire::test(MisPacientes::class)
+            ->call('seleccionarResidente', $this->residenteEstable->cod_residente)
+            ->call('mostrarSelectorRegistro')->call('abrirFormularioRegistro', 'hidratacion');
+    }
+
+    public function test_hidratacion_v2_captura_vacia_y_validacion_preservan_datos(): void
+    {
+        $vista = $this->formularioHidratacionV2()->assertSee('Volumen del aporte')->assertSet('hidratacionCantidad', '')
+            ->assertSee('Fecha y hora automáticas')->assertDontSee('Cambio respecto al estado habitual')
+            ->set('hidratacionTipo', 'Agua')->call('guardarHidratacion')->assertHasErrors('cantidad_ml')
+            ->assertSet('drawerPaso', 'register-form')->assertSet('hidratacionTipo', 'Agua');
+        foreach (['0', '-1', '10001', '250.5', 'NaN'] as $cantidad) {
+            $vista->set('hidratacionCantidad', $cantidad)->call('guardarHidratacion')->assertHasErrors('cantidad_ml');
+        }
+        $this->assertDatabaseCount('registros_hidratacion', 0);
+    }
+
+    public function test_hidratacion_v2_guarda_opcionales_nulos_autoria_hora_y_resultado_reales(): void
+    {
+        $vista = $this->formularioHidratacionV2()->set('hidratacionCantidad', '250')
+            ->set('hidratacionTipo', '   ')->set('hidratacionObservacion', '   ')
+            ->call('guardarHidratacion')->assertHasNoErrors()->assertSet('drawerPaso', 'register-result')
+            ->assertSee('Hidratación registrada')->assertSee('250.00 mL')->assertSee('Registrar otro aporte');
+        $registro = \App\Models\RegistroHidratacion::sole();
+        $this->assertNull($registro->tipo_liquido);
+        $this->assertNull($registro->tolerancia);
+        $this->assertNull($registro->observacion);
+        $this->assertSame($this->personal->cod_personal, $registro->cod_personal);
+        $this->assertTrue(now()->equalTo($registro->fecha_hora));
+        $vista->call('guardarHidratacion')->assertForbidden();
+        $this->assertDatabaseCount('registros_hidratacion', 1);
+    }
+
+    public function test_hidratacion_v2_continuidad_acumulado_jornada_y_historial_por_residente(): void
+    {
+        $vista = $this->formularioHidratacionV2();
+        $service = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        foreach ([150,250,200,350] as $cantidad) {
+            $ultimo = $service->registrarHidratacion($this->residenteEstable->cod_residente, ['cantidad_ml' => $cantidad], $this->enfermero);
+            $this->travel(1)->minutes();
+        }
+        $anulado = $service->registrarHidratacion($this->residenteEstable->cod_residente, ['cantidad_ml' => 500], $this->enfermero);
+        $anulado->update(['estado' => 'ANULADO']);
+        $service->registrarHidratacion($this->residenteCritico->cod_residente, ['cantidad_ml' => 500], $this->enfermero);
+        $vista->call('cerrarSelectorRegistro')->call('mostrarSelectorRegistro')->call('abrirFormularioRegistro', 'hidratacion')
+            ->assertSet('hidratacionContinuidad', ['aportes' => 4, 'acumulado' => 950.0])
+            ->assertSet('hidratacionHistorial.0.codigo', $ultimo->getKey());
+        $this->assertCount(4, $vista->get('hidratacionHistorial'));
+    }
+
+    public function test_hidratacion_v2_tolerancia_limites_texto_y_trim_backend(): void
+    {
+        $vista = $this->formularioHidratacionV2()->set('hidratacionCantidad', '1');
+        foreach (['BUENA', 'VOMITO', 'MALA', 'inventado'] as $tolerancia) {
+            $vista->set('hidratacionTolerancia', $tolerancia)->call('guardarHidratacion')->assertHasErrors('tolerancia');
+        }
+        $vista->set('hidratacionTolerancia', 'ADECUADA')->set('hidratacionTipo', str_repeat('a',61))
+            ->set('hidratacionObservacion', str_repeat('b',5001))->call('guardarHidratacion')
+            ->assertHasErrors(['tipo_liquido','observacion']);
+        $vista->set('hidratacionCantidad', '10000')->set('hidratacionTipo', ' Agua ')->set('hidratacionObservacion', ' Aporte observado ')
+            ->call('guardarHidratacion')->assertHasNoErrors();
+        $this->assertDatabaseHas('registros_hidratacion', ['cantidad_ml' => 10000, 'tipo_liquido' => 'Agua', 'observacion' => 'Aporte observado']);
+    }
+
+    public function test_hidratacion_v2_limpiar_descartar_y_contexto_bloqueado(): void
+    {
+        $vista = $this->formularioHidratacionV2()->set('hidratacionCantidad','250')->set('hidratacionTipo','Agua')
+            ->call('cerrarSelectorRegistro')->assertSet('confirmarDescarte', true)->assertSet('hidratacionCantidad','250')
+            ->call('cancelarDescarte')->call('solicitarLimpiezaRegistro')->call('limpiarCamposRegistro')
+            ->assertSet('hidratacionCantidad', '')->assertSet('hidratacionTipo','')
+            ->assertSet('hidratacionResidenteContexto', $this->residenteEstable->cod_residente)
+            ->assertDispatched('registro-campos-limpiados');
+        $vista->set('hidratacionCantidad','350')->set('modalCodResidente', $this->residenteCritico->cod_residente)
+            ->call('guardarHidratacion')->assertForbidden();
+        $this->assertDatabaseCount('registros_hidratacion',0);
+    }
+
+    public function test_hidratacion_v2_servicio_canonico_no_usa_via_ni_campos_ajenos(): void
+    {
+        $this->formularioHidratacionV2();
+        $service = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $registro = $service->registrar($this->residenteEstable->cod_residente, ['tipo' => 'HIDRATACION', 'cantidad_ml' => 250], $this->enfermero);
+        $this->assertSame('250.00', $registro->cantidad_ml);
+        $this->assertArrayNotHasKey('via', $registro->getAttributes());
+        foreach (['via','cod_personal','fecha_hora','cod_jornada'] as $campo) {
+            try {
+                $service->registrarHidratacion($this->residenteEstable->cod_residente, ['cantidad_ml' => 350, $campo => 'manipulado'], $this->enfermero);
+                $this->fail('El servicio aceptó un campo ajeno.');
+            } catch (\Illuminate\Validation\ValidationException $exception) {
+                $this->assertArrayHasKey('datos', $exception->errors());
+            }
+        }
+        $this->assertDatabaseCount('registros_hidratacion',1);
+    }
+
+    public function test_hidratacion_v2_fallo_real_db_preserva_formulario_y_no_finge_exito(): void
+    {
+        $vista = $this->formularioHidratacionV2()->set('hidratacionCantidad','250')->set('hidratacionTipo','Agua');
+        \Illuminate\Support\Facades\DB::unprepared("CREATE TRIGGER hydration_test_failure BEFORE INSERT ON registros_hidratacion BEGIN SELECT RAISE(ABORT, 'controlled hydration failure'); END");
+        try {
+            $vista->call('guardarHidratacion')->assertHasErrors('hidratacion_guardado')
+                ->assertSet('drawerPaso','register-form')->assertSet('hidratacionCantidad','250')
+                ->assertSet('hidratacionTipo','Agua')->assertSet('hidratacionResultado',[])
+                ->assertNotDispatched('cuidado-registrado');
+            $this->assertDatabaseCount('registros_hidratacion',0);
+        } finally {
+            \Illuminate\Support\Facades\DB::unprepared('DROP TRIGGER hydration_test_failure');
+        }
+        $vista->call('guardarHidratacion')->assertHasNoErrors()->assertSet('drawerPaso','register-result');
+    }
+
+    public function test_hidratacion_v2_reautoriza_permiso_cuenta_y_asignacion_al_guardar(): void
+    {
+        $vista = $this->formularioHidratacionV2()->set('hidratacionCantidad','250');
+        \Spatie\Permission\Models\Role::findByName('ENFERMEROS')->revokePermissionTo('registros_hidratacion.crear');
+        $this->enfermero->unsetRelation('roles')->unsetRelation('permissions');
+        $vista->call('guardarHidratacion')->assertForbidden();
+        $this->assertDatabaseCount('registros_hidratacion',0);
+    }
+
+    public function test_hidratacion_v2_no_expone_historial_sin_permiso_de_lectura(): void
+    {
+        $this->formularioHidratacionV2();
+        app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class)
+            ->registrarHidratacion($this->residenteEstable->cod_residente, ['cantidad_ml'=>250], $this->enfermero);
+        \Spatie\Permission\Models\Role::findByName('ENFERMEROS')->revokePermissionTo('registros_hidratacion.ver');
+        $this->enfermero->unsetRelation('roles')->unsetRelation('permissions');
+        Livewire::withQueryParams([])->test(MisPacientes::class)->call('seleccionarResidente', $this->residenteEstable->cod_residente)
+            ->call('mostrarSelectorRegistro')->call('abrirFormularioRegistro', 'hidratacion')
+            ->assertSet('hidratacionHistorial',[])->assertSet('hidratacionContinuidad',[])
+            ->assertSee('Sin permiso para consultar los aportes anteriores.')->assertDontSee('Historial reciente');
+    }
+
+    public function test_hidratacion_v2_servicio_deniega_cuenta_inactiva_personal_sin_jornada_y_residente_fuera_de_asignacion(): void
+    {
+        $this->formularioHidratacionV2();
+        $service=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $denegar=function () use ($service) {
+            try {
+                $service->registrarHidratacion($this->residenteEstable->cod_residente,['cantidad_ml'=>250],$this->enfermero);
+                $this->fail('Se aceptó un contexto no autorizado.');
+            } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
+                $this->assertSame(403,$exception->getStatusCode());
+            }
+            $this->assertDatabaseCount('registros_hidratacion',0);
+        };
+        $this->enfermero->estado='INACTIVO'; $denegar(); $this->enfermero->estado='ACTIVO';
+        $this->enfermero->personal->estado='INACTIVO'; $denegar(); $this->enfermero->personal->estado='ACTIVO';
+        AsignacionResidenteJornada::where('cod_residente',$this->residenteEstable->cod_residente)->update(['estado'=>'FINALIZADA']);
+        $denegar();
+        AsignacionResidenteJornada::where('cod_residente',$this->residenteEstable->cod_residente)->update(['estado'=>'ACTIVA']);
+        Jornada::where('cod_jornada','JOR_MIS_PACIENTES')->update(['estado'=>'CERRADA']);
+        $denegar();
+    }
+
+    public function test_hidratacion_v2_acumulado_no_trunca_decimales_ni_incluye_futuros_otras_jornadas_o_anulados(): void
+    {
+        $vista=$this->formularioHidratacionV2();
+        $row=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class)
+            ->registrarHidratacion($this->residenteEstable->cod_residente,['cantidad_ml'=>250],$this->enfermero);
+        // La captura nueva es entera; aportes decimales existentes desde Ingesta conservan su precisión.
+        $row->update(['cantidad_ml'=>'250.25']);
+        $otra=Jornada::findOrFail('JOR_MIS_PACIENTES')->replicate();$otra->cod_jornada='JOR_HID_OTRA';$otra->save();
+        foreach ([['cod_jornada'=>$otra->getKey()],['fecha_hora'=>now()->addDay()],['estado'=>'ANULADO']] as $cambio) {
+            $copia=$row->replicate();$copia->cod_hidratacion='HID_'.\Illuminate\Support\Str::random(10);$copia->fill($cambio)->save();
+        }
+        $vista->call('cerrarSelectorRegistro')->call('mostrarSelectorRegistro')->call('abrirFormularioRegistro','hidratacion')
+            ->assertSet('hidratacionContinuidad',['aportes'=>1,'acumulado'=>250.25])->assertSee('250,25');
+        $this->assertCount(2,$vista->get('hidratacionHistorial')); // La otra jornada permanece en el historial longitudinal.
+    }
+
+    public function test_eliminacion_v2_minimos_cero_y_booleanos_nullable_se_distinguen(): void
+    {
+        $this->actingAs($this->enfermero); $this->formularioEliminacion();
+        $service=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        foreach ([null,false,true] as $value) {
+            $row=$service->registrarEliminacion($this->residenteEstable->cod_residente,['tipo_eliminacion'=>'INTESTINAL',
+                'presencia_sangre'=>$value,'presencia_moco'=>$value,'molestia_eliminacion'=>$value],$this->enfermero);
+            $this->assertSame($value,$row->fresh()->presencia_sangre);
+            $this->assertSame($value,$row->fresh()->presencia_moco);
+            $this->assertSame($value,$row->fresh()->molestia_eliminacion);
+        }
+        $zero=$service->registrarEliminacion($this->residenteEstable->cod_residente,['tipo_eliminacion'=>'URINARIA','volumen_ml'=>'0.00'],$this->enfermero);
+        $empty=$service->registrarEliminacion($this->residenteEstable->cod_residente,['tipo_eliminacion'=>'URINARIA'],$this->enfermero);
+        $this->assertSame('0.00',$zero->fresh()->volumen_ml); $this->assertNull($empty->fresh()->volumen_ml);
+        $this->assertNull($zero->cantidad); $this->assertNull($zero->caracteristica);
+    }
+
+    public function test_eliminacion_v2_validacion_condicional_catalogos_y_escala_completa(): void
+    {
+        $this->actingAs($this->enfermero); $this->formularioEliminacion();
+        $service=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $cases=[];
+        foreach (\App\Models\RegistroEliminacion::OPCIONES as $field=>$options) $cases[]=[$field,in_array($field,['color_heces','esfuerzo_defecacion'])?'INTESTINAL':'URINARIA','MANIPULADO'];
+        foreach (['-1','1000000','1.001','NaN'] as $value) $cases[]=['volumen_ml','URINARIA',$value];
+        foreach ([0,8,'abc'] as $value) $cases[]=['tipo_bristol','INTESTINAL',$value];
+        foreach (\App\Models\RegistroEliminacion::URINARIOS as $field) $cases[]=[$field,'INTESTINAL',$field==='volumen_ml'?0:'VALOR'];
+        foreach (\App\Models\RegistroEliminacion::INTESTINALES as $field) $cases[]=[$field,'URINARIA',$field==='presencia_moco'?false:1];
+        foreach ($cases as [$field,$type,$value]) {
+            $before=\App\Models\RegistroEliminacion::count();
+            try { $service->registrarEliminacion($this->residenteEstable->cod_residente,['tipo_eliminacion'=>$type,$field=>$value],$this->enfermero); $this->fail('Aceptó '.$field); }
+            catch (\Illuminate\Validation\ValidationException $e) { $this->assertArrayHasKey($field,$e->errors()); }
+            $this->assertSame($before,\App\Models\RegistroEliminacion::count());
+        }
+        foreach (range(1,7) as $bristol) {
+            $row=$service->registrarEliminacion($this->residenteEstable->cod_residente,['tipo_eliminacion'=>'INTESTINAL','tipo_bristol'=>$bristol,'color_heces'=>'MARRON','esfuerzo_defecacion'=>'SIN_ESFUERZO'],$this->enfermero);
+            $this->assertSame($bristol,$row->fresh()->tipo_bristol);
+        }
+        $full=$service->registrarEliminacion($this->residenteEstable->cod_residente,['tipo_eliminacion'=>'URINARIA','cantidad_cualitativa'=>'HABITUAL',
+            'volumen_ml'=>'350.00','color_orina'=>'AMARILLO_CLARO','aspecto_orina'=>'CLARO','olor_orina'=>'HABITUAL','tipo_miccion'=>'ESPONTANEA',
+            'presencia_sangre'=>false,'molestia_eliminacion'=>false,'continencia'=>'CONTINENTE'],$this->enfermero);
+        $this->assertSame('350.00',$full->fresh()->volumen_ml);
+        $this->assertSame('AMARILLO_CLARO',$full->color_orina);
+        $this->assertSame(0,\App\Models\Alerta::where('tipo','ELIMINACION')->count());
+    }
+
+    public function test_eliminacion_v2_descripcion_trim_limites_y_campos_ajenos(): void
+    {
+        $this->actingAs($this->enfermero); $this->formularioEliminacion();
+        $service=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        foreach ([false,null] as $value) {
+            $row=$service->registrarEliminacion($this->residenteEstable->cod_residente,['tipo_eliminacion'=>'URINARIA','molestia_eliminacion'=>$value,'descripcion_molestia'=>'Dato anterior'],$this->enfermero);
+            $this->assertNull($row->descripcion_molestia);
+        }
+        $row=$service->registrarEliminacion($this->residenteEstable->cod_residente,['tipo_eliminacion'=>'URINARIA','molestia_eliminacion'=>true,'descripcion_molestia'=>'  Molestia referida  ','observacion'=>'  Asistencia  '],$this->enfermero);
+        $this->assertSame('Molestia referida',$row->descripcion_molestia);$this->assertSame('Asistencia',$row->observacion);
+        foreach (['descripcion_molestia'=>str_repeat('a',251),'observacion'=>str_repeat('a',5001),'cantidad'=>'350','cod_personal'=>'OTRO','fecha_hora'=>'2020-01-01','cod_jornada'=>'OTRA','via'=>'ORAL'] as $field=>$value) {
+            try {$service->registrarEliminacion($this->residenteEstable->cod_residente,['tipo_eliminacion'=>'URINARIA','molestia_eliminacion'=>true,$field=>$value],$this->enfermero);$this->fail('Aceptó '.$field);}
+            catch (\Illuminate\Validation\ValidationException $e) {$this->assertNotEmpty($e->errors());}
+        }
+    }
+
+    public function test_eliminacion_v2_historia_legacy_continuidad_y_filtros_preservan_datos(): void
+    {
+        $this->actingAs($this->enfermero); $this->formularioEliminacion();
+        $legacy=\App\Models\RegistroEliminacion::create(['cod_eliminacion'=>'ELI_OLD','cod_residente'=>$this->residenteEstable->cod_residente,'cod_personal'=>$this->personal->cod_personal,
+            'cod_jornada'=>'JOR_MIS_PACIENTES','fecha_hora'=>now()->subMinutes(20),'tipo_eliminacion'=>'URINARIA','cantidad'=>'350','caracteristica'=>'Amarillo claro','continencia'=>'CONTINENTE','estado'=>'VIGENTE']);
+        $service=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $service->registrarEliminacion($this->residenteEstable->cod_residente,['tipo_eliminacion'=>'INTESTINAL','tipo_bristol'=>4],$this->enfermero);
+        $future=$legacy->replicate()->fill(['cod_eliminacion'=>'ELI_FUT','fecha_hora'=>now()->addDay()]);$future->save();
+        $other=$legacy->replicate()->fill(['cod_eliminacion'=>'ELI_OTHER','cod_residente'=>$this->residenteCritico->cod_residente]);$other->save();
+        $anulado=$legacy->replicate()->fill(['cod_eliminacion'=>'ELI_ANU','estado'=>'ANULADO']);$anulado->save();
+        $this->formularioEliminacion()->assertSet('elimContinuidad.URINARIA',1)->assertSet('elimContinuidad.INTESTINAL',1)
+            ->assertSet('elimHistorial',fn($rows)=>count($rows)===2 && $rows[1]['legacy'] && $rows[1]['campos'][1]['valor']==='350');
+        $this->assertSame('350',$legacy->fresh()->cantidad);$this->assertNull($legacy->fresh()->volumen_ml);
+        $this->assertTrue($legacy->resumenOperacional()['legacy']);
+    }
+
+    public function test_eliminacion_v2_resultado_replay_limpiar_y_permiso_revocado(): void
+    {
+        $this->actingAs($this->enfermero);
+        $form=$this->formularioEliminacion()->call('solicitarTipoEliminacion','URINARIA')->set('elimDatos.volumen_ml','0')
+            ->call('solicitarLimpiezaRegistro')->call('limpiarCamposRegistro')->assertSet('elimTipo','')->assertSet('elimDatos.volumen_ml','')
+            ->call('solicitarTipoEliminacion','URINARIA')->call('guardarEliminacion')->assertHasNoErrors()->assertSet('drawerPaso','register-result')
+            ->assertSee('Eliminación registrada')->call('guardarEliminacion')->assertStatus(403);
+        $this->assertDatabaseCount('registros_eliminacion',1);
+        $this->formularioEliminacion()->call('solicitarTipoEliminacion','URINARIA')->set('elimDatos.observacion','Conservar')
+            ->call('cerrarSelectorRegistro')->assertSet('confirmarDescarte',true)->call('cancelarDescarte')->assertSet('elimDatos.observacion','Conservar');
+        $form=$this->formularioEliminacion()->call('solicitarTipoEliminacion','URINARIA');
+        \Spatie\Permission\Models\Role::findByName('ENFERMEROS')->revokePermissionTo('registros_eliminacion.crear');
+        $form->call('guardarEliminacion')->assertStatus(403);$this->assertDatabaseCount('registros_eliminacion',1);
+    }
+
+    public function test_eliminacion_v2_migracion_aditiva_rollback_y_reaplicar_conservan_historia(): void
+    {
+        $this->actingAs($this->enfermero);$this->formularioEliminacion();
+        $columns=['cantidad_cualitativa','volumen_ml','color_orina','aspecto_orina','olor_orina','tipo_miccion','tipo_bristol','color_heces','esfuerzo_defecacion','presencia_sangre','presencia_moco','molestia_eliminacion','descripcion_molestia'];
+        $schema=\Illuminate\Support\Facades\Schema::getColumns('registros_eliminacion');
+        foreach ($columns as $name) {$column=collect($schema)->firstWhere('name',$name);$this->assertNotNull($column);$this->assertTrue($column['nullable']);}
+        $row=\App\Models\RegistroEliminacion::create(['cod_eliminacion'=>'ELI_OLD_SCHEMA','cod_residente'=>$this->residenteEstable->cod_residente,
+            'cod_personal'=>$this->personal->cod_personal,'cod_jornada'=>'JOR_MIS_PACIENTES','fecha_hora'=>now(),'tipo_eliminacion'=>'URINARIA',
+            'cantidad'=>'350','caracteristica'=>'Amarillo claro','estado'=>'VIGENTE']);
+        $tables=\Illuminate\Support\Facades\Schema::getTableListing();
+        $migration=require database_path('migrations/2026_10_09_000200_extend_registros_eliminacion_v2.php');
+        $migration->down();
+        $this->assertSame(count($schema)-13,count(\Illuminate\Support\Facades\Schema::getColumns('registros_eliminacion')));
+        $this->assertDatabaseHas('registros_eliminacion',['cod_eliminacion'=>$row->cod_eliminacion,'cantidad'=>'350','caracteristica'=>'Amarillo claro']);
+        $migration->up();$this->assertSame($tables,\Illuminate\Support\Facades\Schema::getTableListing());
+        $this->assertNull($row->fresh()->volumen_ml);$this->assertSame(count($schema),count(\Illuminate\Support\Facades\Schema::getColumns('registros_eliminacion')));
+    }
+
+    public function test_eliminacion_v2_fallo_real_db_preserva_captura_y_no_finge_exito(): void
+    {
+        if (\Illuminate\Support\Facades\DB::getDriverName() !== 'sqlite') {$this->markTestSkipped('Trigger de fallo controlado SQLite; QA de timeout PostgreSQL se ejecuta separadamente.');}
+        $this->actingAs($this->enfermero);$form=$this->formularioEliminacion()->call('solicitarTipoEliminacion','URINARIA')->set('elimDatos.volumen_ml','350');
+        \Illuminate\Support\Facades\DB::unprepared("CREATE TRIGGER eliminacion_qa_failure BEFORE INSERT ON registros_eliminacion BEGIN SELECT RAISE(ABORT, 'qa insert failure'); END");
+        try {$form->call('guardarEliminacion')->assertHasErrors('eliminacion_guardado')->assertSet('elimDatos.volumen_ml','350')
+            ->assertSet('drawerPaso','register-form')->assertSet('elimResultado',[]);$this->assertDatabaseCount('registros_eliminacion',0);}
+        finally {\Illuminate\Support\Facades\DB::unprepared('DROP TRIGGER eliminacion_qa_failure');}
+        $form->call('guardarEliminacion')->assertHasNoErrors()->assertSet('drawerPaso','register-result');$this->assertDatabaseCount('registros_eliminacion',1);
+    }
+
+    public function test_eliminacion_v2_autorizacion_personal_jornada_y_roles_no_conceden_escritura(): void
+    {
+        $this->actingAs($this->enfermero);$this->formularioEliminacion();
+        $service=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        foreach (['cuenta','personal','jornada'] as $case) {
+            if ($case==='cuenta') $this->enfermero->update(['estado'=>'INACTIVO']);
+            if ($case==='personal') $this->personal->update(['estado'=>'INACTIVO']);
+            if ($case==='jornada') \App\Models\Jornada::where('cod_jornada','JOR_MIS_PACIENTES')->update(['estado'=>'CERRADA']);
+            try {$service->registrarEliminacion($this->residenteEstable->cod_residente,['tipo_eliminacion'=>'URINARIA'],$this->enfermero->fresh());$this->fail('Aceptó '.$case);}
+            catch (\Symfony\Component\HttpKernel\Exception\HttpException|\Illuminate\Validation\ValidationException $e) {$this->assertNotEmpty($e->getMessage());}
+            $this->enfermero->update(['estado'=>'ACTIVO']);$this->personal->update(['estado'=>'ACTIVO']);
+            \App\Models\Jornada::where('cod_jornada','JOR_MIS_PACIENTES')->update(['estado'=>'ABIERTA']);
+        }
+        foreach (['ADMINISTRADOR','SUPERADMINISTRADOR'] as $role) {
+            $account=\App\Models\User::factory()->create(['estado'=>'ACTIVO']);$account->assignRole($role);$account->givePermissionTo('registros_eliminacion.crear');
+            try {$service->registrarEliminacion($this->residenteEstable->cod_residente,['tipo_eliminacion'=>'URINARIA'],$account);$this->fail('Escritura automática '.$role);}
+            catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {$this->assertSame(403,$e->getStatusCode());}
+        }
+        $this->assertDatabaseCount('registros_eliminacion',0);
+    }
+
+    public function test_eliminacion_v2_ultimo_global_por_tipo_y_historial_sin_permiso(): void
+    {
+        $this->actingAs($this->enfermero);$this->formularioEliminacion();$service=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $old=$service->registrarEliminacion($this->residenteEstable->cod_residente,['tipo_eliminacion'=>'URINARIA','volumen_ml'=>'0'],$this->enfermero);
+        $old->update(['fecha_hora'=>now()->subMinutes(90)]);
+        for ($i=0;$i<41;$i++) $service->registrarEliminacion($this->residenteEstable->cod_residente,['tipo_eliminacion'=>'INTESTINAL'],$this->enfermero);
+        $this->formularioEliminacion()->assertSet('elimHistorial',fn($rows)=>count($rows)===40)
+            ->assertSet('elimUltimos.URINARIA.codigo',$old->cod_eliminacion)->assertSet('elimContinuidad.URINARIA',1)->assertSet('elimContinuidad.INTESTINAL',41);
+        \Spatie\Permission\Models\Role::findByName('ENFERMEROS')->revokePermissionTo('registros_eliminacion.ver');
+        Livewire::withQueryParams([])->test(MisPacientes::class)->call('seleccionarResidente',$this->residenteEstable->cod_residente)
+            ->call('mostrarSelectorRegistro')->call('abrirFormularioRegistro','eliminacion')
+            ->assertSet('elimHistorial',[])->assertSet('elimUltimos',[])->assertSet('elimContinuidad',[])->assertDontSee('Ver historial');
+    }
+
+    public function test_movilidad_v2_persiste_todos_los_campos_y_contexto_sin_incidentes(): void
+    {
+        $this->travelTo(today()->setTime(10, 0)); $this->actingAs($this->enfermero);
+        $ui = $this->formularioMovilidad()->set('movMarcha', 'ASISTIDA')->set('movTraslado', 'AYUDA_UNA_PERSONA')
+            ->set('movTipoApoyo', 'PARCIAL')->set('movEquilibrio', 'ESTABLE')->set('movFatiga', 'LEVE')
+            ->set('movRiesgoCaida', 'BAJO')->set('movDatos', ['motivo_registro' => 'CONTROL_DIARIO',
+                'actividad_realizada' => 'CAMINAR_PASILLO', 'dispositivo' => 'ANDADOR', 'distancia_metros' => '10.25',
+                'tolerancia_movilidad' => 'BUENA', 'cambio_habitual' => 'SIN_CAMBIOS', 'dolor_movilidad' => false,
+                'mareo' => false, 'disnea' => false, 'debilidad' => false])->call('guardarCuidado')
+            ->assertHasNoErrors()->assertSet('drawerPaso', 'register-result')->assertSee('Movilidad registrada');
+        $record = \App\Models\RegistroMovilidad::sole();
+        $this->assertSame('ANDADOR', $record->dispositivo); $this->assertSame('10.25', $record->distancia_metros);
+        $this->assertSame('JOR_MIS_PACIENTES', $record->cod_jornada);
+        $this->assertSame($this->personal->cod_personal, $record->cod_personal);
+        $this->assertTrue($record->fecha_hora->equalTo(now())); $this->assertSame('VIGENTE', $record->estado);
+        $this->assertSame('CONTROL_DIARIO', $record->motivo_registro); $this->assertSame('SIN_CAMBIOS', $record->cambio_habitual);
+        $this->assertSame('BUENA', $record->tolerancia_movilidad); $this->assertFalse($record->dolor_movilidad);
+        $this->assertDatabaseCount('incidentes', 0); $this->assertDatabaseCount('alertas', 1);
+        $ui->call('guardarCuidado')->assertStatus(403); $this->assertDatabaseCount('registros_movilidad', 1);
+    }
+
+    public function test_movilidad_v2_rechaza_todos_los_catalogos_y_payload_server_owned(): void
+    {
+        $this->travelTo(today()->setTime(10,0)); $this->actingAs($this->enfermero); $this->formularioMovilidad();
+        $service = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        foreach (array_keys(\App\Models\RegistroMovilidad::catalogos()) as $field) {
+            try { $service->registrarMovilidad($this->residenteEstable->cod_residente, array_merge(['marcha'=>'INDEPENDIENTE'],[$field=>'INVENTADO']),$this->enfermero); $this->fail($field); }
+            catch (\Illuminate\Validation\ValidationException $e) { $this->assertArrayHasKey($field,$e->errors()); }
+        }
+        foreach (['cod_residente','cod_personal','cod_jornada','fecha_hora','estado','cod_atencion','campo_inventado'] as $field) {
+            try { $service->registrarMovilidad($this->residenteEstable->cod_residente,['marcha'=>'INDEPENDIENTE',$field=>'FALSO'],$this->enfermero);$this->fail($field); }
+            catch (\Illuminate\Validation\ValidationException $e) { $this->assertArrayHasKey('datos',$e->errors()); }
+        }
+        $this->assertDatabaseCount('registros_movilidad',0);
+    }
+
+    public function test_movilidad_v2_distancia_decimal_triestados_y_dispositivo_ninguno(): void
+    {
+        $this->travelTo(today()->setTime(10,0)); $this->actingAs($this->enfermero); $this->formularioMovilidad();
+        $service = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        foreach ([null,false,true] as $value) {
+            $record=$service->registrarMovilidad($this->residenteEstable->cod_residente,['marcha'=>'INDEPENDIENTE','dispositivo'=>'NINGUNO',
+                'dolor_movilidad'=>$value,'mareo'=>$value,'disnea'=>$value,'debilidad'=>$value],$this->enfermero)->fresh();
+            foreach (['dolor_movilidad','mareo','disnea','debilidad'] as $field) $this->assertSame($value,$record->{$field});
+            $this->assertSame('NINGUNO',$record->dispositivo); $this->assertNull($record->distancia_metros);
+        }
+        foreach ([null,0,5,'10.25'] as $value) {
+            $record=$service->registrarMovilidad($this->residenteEstable->cod_residente,['marcha'=>'INDEPENDIENTE',
+                'actividad_realizada'=>'CAMINAR_PASILLO','distancia_metros'=>$value],$this->enfermero)->fresh();
+            $this->assertSame($value===null?null:number_format((float)$value,2,'.',''),$record->distancia_metros);
+        }
+        foreach ([-1,100000,'1.234','10 m'] as $value) {
+            try {$service->registrarMovilidad($this->residenteEstable->cod_residente,['marcha'=>'INDEPENDIENTE','actividad_realizada'=>'CAMINAR_PASILLO','distancia_metros'=>$value],$this->enfermero);$this->fail('Distancia inválida');}
+            catch (\Illuminate\Validation\ValidationException $e) {$this->assertArrayHasKey('distancia_metros',$e->errors());}
+        }
+        try {$service->registrarMovilidad($this->residenteEstable->cod_residente,['marcha'=>'ENCAMADO','actividad_realizada'=>'CAMBIO_POSTURAL','distancia_metros'=>0],$this->enfermero);$this->fail('Distancia incompatible');}
+        catch (\Illuminate\Validation\ValidationException $e) {$this->assertArrayHasKey('distancia_metros',$e->errors());}
+        $this->assertDatabaseCount('registros_movilidad',7);
+    }
+
+    public function test_movilidad_otro_exige_detalles_y_preserva_captura_sin_persistir(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $this->actingAs($this->enfermero);
+        $ui = $this->formularioMovilidad()->set('movMarcha', 'ASISTIDA')
+            ->set('movDatos.motivo_registro', 'OTRO')->set('movDatos.dispositivo', 'OTRO')
+            ->set('movDatos.motivo_otro', '   ')->set('movObservacion', 'Datos conservados')
+            ->call('guardarCuidado')->assertHasErrors(['motivo_otro', 'dispositivo_otro'])
+            ->assertSet('drawerPaso', 'register-form')->assertSet('movObservacion', 'Datos conservados');
+        $this->assertDatabaseCount('registros_movilidad', 0);
+
+        $ui->set('movDatos.motivo_otro', '  Revisión tras descanso  ')
+            ->set('movDatos.dispositivo_otro', '  Apoyo de antebrazo  ')
+            ->call('guardarCuidado')->assertHasNoErrors()->assertSet('drawerPaso', 'register-result');
+        $record = \App\Models\RegistroMovilidad::sole();
+        $this->assertSame('OTRO', $record->motivo_registro);
+        $this->assertSame('OTRO', $record->dispositivo);
+        $this->assertSame("Otro motivo: Revisión tras descanso\nOtro dispositivo: Apoyo de antebrazo\nDatos conservados", $record->observacion);
+        $this->assertArrayNotHasKey('motivo_otro', $record->getAttributes());
+        $this->assertArrayNotHasKey('dispositivo_otro', $record->getAttributes());
+    }
+
+    public function test_movilidad_otro_backend_rechaza_detalles_incompatibles_malformados_y_excesivos(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $this->actingAs($this->enfermero);
+        $this->formularioMovilidad();
+        $service = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        foreach ([
+            [['motivo_registro' => 'OTRO'], 'motivo_otro'],
+            [['dispositivo' => 'OTRO'], 'dispositivo_otro'],
+            [['motivo_registro' => 'CONTROL_DIARIO', 'motivo_otro' => 'Residual'], 'motivo_otro'],
+            [['dispositivo' => 'BASTON', 'dispositivo_otro' => 'Residual'], 'dispositivo_otro'],
+            [['motivo_registro' => 'OTRO', 'motivo_otro' => ['No es texto']], 'motivo_otro'],
+            [['dispositivo' => 'OTRO', 'dispositivo_otro' => str_repeat('x', 501)], 'dispositivo_otro'],
+            [['motivo_registro' => 'OTRO', 'motivo_otro' => 'Detalle', 'observacion' => str_repeat('x', 5000)], 'observacion'],
+            [['dolor_movilidad' => 'quizás'], 'dolor_movilidad'],
+            [['observacion' => str_repeat('x', 5001)], 'observacion'],
+        ] as [$datos, $error]) {
+            try {
+                $service->registrarMovilidad($this->residenteEstable->cod_residente, ['marcha' => 'ASISTIDA'] + $datos, $this->enfermero);
+                $this->fail('Debe rechazar '.$error);
+            } catch (\Illuminate\Validation\ValidationException $exception) {
+                $this->assertArrayHasKey($error, $exception->errors());
+            }
+        }
+        $this->assertDatabaseCount('registros_movilidad', 0);
+    }
+
+    public function test_movilidad_al_cambiar_otro_o_limpiar_no_quedan_detalles_residuales(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $this->actingAs($this->enfermero);
+        $this->formularioMovilidad()->set('movDatos.motivo_registro', 'OTRO')
+            ->set('movDatos.motivo_otro', 'Detalle')->set('movDatos.motivo_registro', 'CONTROL_DIARIO')
+            ->assertSet('movDatos.motivo_otro', '')->set('movDatos.dispositivo', 'OTRO')
+            ->set('movDatos.dispositivo_otro', 'Detalle')->set('movDatos.dispositivo', 'ANDADOR')
+            ->assertSet('movDatos.dispositivo_otro', '')
+            ->set('movDatos.motivo_registro', 'OTRO')->set('movDatos.motivo_otro', 'Detalle')
+            ->set('movDatos.dispositivo', 'OTRO')->set('movDatos.dispositivo_otro', 'Detalle')
+            ->call('solicitarLimpiezaRegistro')->assertSet('confirmarLimpiezaRegistro', true)
+            ->call('limpiarCamposRegistro')->assertStatus(200)->assertSet('movDatos.motivo_otro', '')
+            ->assertSet('movDatos.dispositivo_otro', '')->assertSet('movDatos.dispositivo', '')
+            ->assertSet('movResidenteContexto', $this->residenteEstable->cod_residente);
+    }
+
+    public function test_movilidad_otro_en_consumidor_generico_exige_descripcion_y_la_guarda(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $this->actingAs($this->enfermero);
+        $this->formularioMovilidad();
+        Livewire::test(\App\Frontend\Livewire\Enfermeria\Cuidados\RegistrosEnfermeria::class, ['codResidente' => $this->residenteEstable->cod_residente])
+            ->set('tipo', 'MOVILIDAD')->set('subtipo', 'ASISTIDA')->set('ayudaTecnica', 'OTRO')
+            ->call('guardarCuidado')->assertHasErrors('dispositivoOtro')
+            ->set('dispositivoOtro', 'Apoyo sintético')->set('ayudaTecnica', 'ANDADOR')
+            ->assertSet('dispositivoOtro', '')->set('ayudaTecnica', 'OTRO')
+            ->set('dispositivoOtro', 'Apoyo sintético')->call('guardarCuidado')->assertHasNoErrors()
+            ->assertSet('dispositivoOtro', '');
+        $record = \App\Models\RegistroMovilidad::sole();
+        $this->assertSame('OTRO', $record->dispositivo);
+        $this->assertSame('Otro dispositivo: Apoyo sintético', $record->observacion);
+    }
+
+    public function test_movilidad_v2_historial_residente_jornada_y_continuidad(): void
+    {
+        $this->travelTo(today()->setTime(10,0));$this->actingAs($this->enfermero);$ui=$this->formularioMovilidad();
+        $ui->assertSet('movHistorial',[])->assertSee('Sin registros previos de movilidad.');
+        $service=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $older=$service->registrarMovilidad($this->residenteEstable->cod_residente,['marcha'=>'ASISTIDA','fatiga'=>'LEVE'],$this->enfermero);
+        $this->travel(1)->minutes();
+        $latest=$service->registrarMovilidad($this->residenteEstable->cod_residente,['marcha'=>'INDEPENDIENTE','actividad_realizada'=>'CAMINAR_HABITACION','distancia_metros'=>5],$this->enfermero);
+        $service->registrarMovilidad($this->residenteCritico->cod_residente,['marcha'=>'ENCAMADO'],$this->enfermero);
+        $ui=$this->formularioMovilidad()->assertSet('movContinuidad',['registros'=>2,'deambulacion'=>1,'fatiga'=>1]);
+        $this->assertSame([$latest->cod_movilidad,$older->cod_movilidad],array_column($ui->get('movHistorial'),'codigo'));
+        $ui->set('movMarcha','ASISTIDA')->call('cerrarSelectorRegistro')->assertSet('confirmarDescarte',true)
+            ->call('cancelarDescarte')->assertSet('movMarcha','ASISTIDA')->call('solicitarLimpiezaRegistro')
+            ->call('limpiarCamposRegistro')->assertSet('movMarcha','')->assertSet('movResidenteContexto',$this->residenteEstable->cod_residente);
+    }
+
+    public function test_movilidad_v2_generic_es_canonico_y_no_acepta_spoofing(): void
+    {
+        $this->travelTo(today()->setTime(10,0));$this->actingAs($this->enfermero);$this->formularioMovilidad();
+        $service=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $record=$service->registrar($this->residenteEstable->cod_residente,['tipo'=>'MOVILIDAD','subtipo'=>'ASISTIDA','ayuda_tecnica'=>'ANDADOR','nivel_ayuda'=>'PARCIAL'],$this->enfermero);
+        $this->assertSame('ANDADOR',$record->dispositivo);$this->assertSame('ASISTIDA',$record->marcha);
+        try {$service->registrar($this->residenteEstable->cod_residente,['tipo'=>'MOVILIDAD','subtipo'=>'ASISTIDA','cod_personal'=>'OTRO'],$this->enfermero);$this->fail('Aceptó autor');}
+        catch (\Illuminate\Validation\ValidationException $e) {$this->assertArrayHasKey('datos',$e->errors());}
+        $this->assertDatabaseCount('registros_movilidad',1);
+        $painCount = \App\Models\ValoracionDolor::count();
+        Livewire::test(\App\Frontend\Livewire\Enfermeria\Cuidados\RegistrosEnfermeria::class, ['codResidente' => $this->residenteEstable->cod_residente])
+            ->set('tipo', 'MOVILIDAD')->set('subtipo', 'ASISTIDA')->set('ayudaTecnica', 'BASTON')
+            ->set('dolor', 5)->call('guardarCuidado')->assertHasNoErrors();
+        $this->assertDatabaseCount('registros_movilidad', 2);
+        $this->assertDatabaseHas('registros_movilidad', ['cod_residente' => $this->residenteEstable->cod_residente, 'dispositivo' => 'BASTON', 'marcha' => 'ASISTIDA']);
+        $this->assertSame($painCount, \App\Models\ValoracionDolor::count());
+    }
+    public function test_movilidad_v2_deniega_cuenta_personal_inactivos_sin_jornada_y_roles_no_competentes(): void
+    {
+        config(['remembermind.superadmin_clinical_write' => false]);
+        $this->travelTo(today()->setTime(10,0));$this->actingAs($this->enfermero);$this->formularioMovilidad();
+        $service=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        foreach (['cuenta','personal','jornada','ADMINISTRADOR','SUPERADMINISTRADOR'] as $condition) {
+            \Illuminate\Support\Facades\DB::beginTransaction();
+            try {
+                $user=$this->enfermero->fresh();
+                if ($condition==='cuenta') $user->update(['estado'=>'INACTIVO']);
+                elseif ($condition==='personal') $user->personal->update(['estado'=>'INACTIVO']);
+                elseif ($condition==='jornada') \App\Models\AsignacionPersonal::where('cod_personal',$this->personal->cod_personal)->update(['estado'=>'FINALIZADA']);
+                else $user->syncRoles([$condition]);
+                $service->registrarMovilidad($this->residenteEstable->cod_residente,['marcha'=>'INDEPENDIENTE'],$user);
+                $this->fail('Se aceptó '.$condition);
+            } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {$this->assertSame(403,$e->getStatusCode());}
+            catch (\Illuminate\Validation\ValidationException $e) {$this->assertSame('jornada',$condition);$this->assertArrayHasKey('jornada',$e->errors());}
+            finally {\Illuminate\Support\Facades\DB::rollBack();}
+        }
+        $this->assertDatabaseCount('registros_movilidad',0);
+    }
+
+    public function test_movilidad_v2_fallo_real_preserva_formulario_y_no_finge_exito(): void
+    {
+        if (\Illuminate\Support\Facades\DB::getDriverName() !== 'sqlite') {$this->markTestSkipped('El trigger sintético está escrito para SQLite. PostgreSQL se verifica en QA aislado con timeout de bloqueo.');}
+        $this->travelTo(today()->setTime(10,0));$this->actingAs($this->enfermero);
+        \Illuminate\Support\Facades\DB::unprepared("CREATE TRIGGER movilidad_qa_failure BEFORE INSERT ON registros_movilidad BEGIN SELECT RAISE(ABORT, 'qa insert failure'); END");
+        try {
+            $this->formularioMovilidad()->set('movMarcha','ASISTIDA')->set('movDatos.dispositivo','ANDADOR')
+                ->set('movObservacion','Captura que debe conservarse')->call('guardarCuidado')
+                ->assertHasErrors('movilidad_guardado')->assertSet('drawerPaso','register-form')
+                ->assertSet('mostrarSelectorModal',true)->assertSet('movMarcha','ASISTIDA')
+                ->assertSet('movDatos.dispositivo','ANDADOR')->assertSet('movObservacion','Captura que debe conservarse')
+                ->assertSet('movResultado',[])->assertSee('Conservamos los datos')->assertDontSee('qa insert failure');
+            $this->assertDatabaseCount('registros_movilidad',0);
+        } finally {\Illuminate\Support\Facades\DB::unprepared('DROP TRIGGER movilidad_qa_failure');}
+    }
 }

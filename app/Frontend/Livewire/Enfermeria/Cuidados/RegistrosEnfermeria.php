@@ -11,7 +11,6 @@ use App\Models\EjecucionCuidado;
 use App\Models\Herida;
 use App\Models\Incidente;
 use App\Models\IntervencionCuidado;
-use App\Models\RegistroEliminacion;
 use App\Models\RegistroHidratacion;
 use App\Models\RegistroIngesta;
 use App\Models\RegistroMovilidad;
@@ -58,6 +57,12 @@ class RegistrosEnfermeria extends Component
     public string $consistencia = '';
 
     public string $ayudaTecnica = '';
+    public string $dispositivoOtro = '';
+
+    public function updatedAyudaTecnica(string $value): void
+    {
+        if ($value !== 'OTRO') $this->dispositivoOtro = '';
+    }
 
     public string $cambioBasal = 'SIN_CAMBIOS';
 
@@ -245,6 +250,45 @@ class RegistrosEnfermeria extends Component
 
         $tipoNorm = strtoupper(trim($this->tipo));
 
+        if ($tipoNorm === 'ELIMINACION') {
+            throw ValidationException::withMessages(['tipo' => 'Registra la eliminación desde Mis residentes, con el formulario estructurado.']);
+        }
+        if ($tipoNorm === 'HIDRATACION') {
+            try {
+                app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class)->registrarHidratacion($this->codResidente, [
+                    'cantidad_ml' => $this->cantidadMl, 'tipo_liquido' => $this->subtipo,
+                    'tolerancia' => $this->tolerancia, 'observacion' => $this->observacion,
+                ], $user);
+            } catch (ValidationException $exception) {
+                throw ValidationException::withMessages(collect($exception->errors())->mapWithKeys(
+                    fn ($messages, $key) => [match ($key) { 'cantidad_ml' => 'cantidadMl', 'tipo_liquido' => 'subtipo', default => $key } => $messages]
+                )->all());
+            }
+            $this->reset(['cantidadMl', 'subtipo', 'tolerancia', 'observacion']);
+            $this->dispatch('swal', icon: 'success', title: 'Hidratación registrada', text: 'El aporte quedó guardado en el historial del residente.');
+            return;
+        }
+
+        if ($tipoNorm === 'MOVILIDAD') {
+            try {
+                app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class)->registrarMovilidad($this->codResidente, [
+                    'marcha' => $this->subtipo,
+                    'tipo_apoyo' => $this->nivelAyuda ?: null,
+                    'dispositivo' => $this->ayudaTecnica ?: null,
+                    'dispositivo_otro' => $this->dispositivoOtro ?: null,
+                    'observacion' => $this->observacion ?: $this->motivo ?: null,
+                ], $user);
+            } catch (ValidationException $exception) {
+                throw ValidationException::withMessages(collect($exception->errors())->mapWithKeys(
+                    fn ($messages, $key) => [match ($key) { 'marcha' => 'subtipo', 'tipo_apoyo' => 'nivelAyuda', 'dispositivo' => 'ayudaTecnica', 'dispositivo_otro' => 'dispositivoOtro', default => $key } => $messages]
+                )->all());
+            }
+            $this->reset(['subtipo', 'nivelAyuda', 'ayudaTecnica', 'dispositivoOtro', 'observacion', 'motivo']);
+            $this->dispatch('swal', icon: 'success', title: 'Movilidad registrada', text: 'El registro quedó guardado en el historial del residente.');
+
+            return;
+        }
+
         $reglas = [
             'tipo' => 'required|in:ALIMENTACION,HIDRATACION,ELIMINACION,HIGIENE,MOVILIDAD,SUENO,VALORACION_RAPIDA,PROCEDIMIENTO',
             'subtipo' => 'required|string|max:60',
@@ -282,45 +326,6 @@ class RegistrosEnfermeria extends Component
                     'apetito' => $this->estadoGeneral ?: null,
                     'tolerancia' => $this->tolerancia ?: null,
                     'dificultad_deglucion' => (bool) $this->presentaDificultad,
-                    'fecha_hora' => now(),
-                    'estado' => 'VIGENTE',
-                    'observacion' => $this->observacion ?: $this->motivo ?: null,
-                ]);
-            } elseif ($tipoNorm === 'HIDRATACION') {
-                RegistroHidratacion::create([
-                    'cod_hidratacion' => 'HID_'.strtoupper(Str::random(10)),
-                    'cod_residente' => $this->codResidente,
-                    'cod_personal' => $personal->cod_personal,
-                    'cod_jornada' => $jornada->cod_jornada,
-                    'cantidad_ml' => (float) $this->cantidadMl,
-                    'tipo_liquido' => $this->subtipo,
-                    'tolerancia' => $this->tolerancia ?: null,
-                    'fecha_hora' => now(),
-                    'estado' => 'VIGENTE',
-                    'observacion' => $this->observacion ?: $this->motivo ?: null,
-                ]);
-            } elseif ($tipoNorm === 'ELIMINACION') {
-                RegistroEliminacion::create([
-                    'cod_eliminacion' => 'ELI_'.strtoupper(Str::random(10)),
-                    'cod_residente' => $this->codResidente,
-                    'cod_personal' => $personal->cod_personal,
-                    'cod_jornada' => $jornada->cod_jornada,
-                    'tipo_eliminacion' => $this->subtipo,
-                    'caracteristica' => $this->consistencia ?: null,
-                    'continencia' => $this->esContinente === null ? null : ($this->esContinente ? 'CONTINENTE' : 'INCONTINENTE'),
-                    'fecha_hora' => now(),
-                    'estado' => 'VIGENTE',
-                    'observacion' => $this->observacion ?: $this->motivo ?: null,
-                ]);
-            } elseif ($tipoNorm === 'MOVILIDAD') {
-                RegistroMovilidad::create([
-                    'cod_movilidad' => 'MOV_'.strtoupper(Str::random(10)),
-                    'cod_residente' => $this->codResidente,
-                    'cod_personal' => $personal->cod_personal,
-                    'cod_jornada' => $jornada->cod_jornada,
-                    'tipo_apoyo' => $this->nivelAyuda ?: null,
-                    'dispositivo' => $this->ayudaTecnica ?: null,
-                    'marcha' => $this->estadoGeneral ?: null,
                     'fecha_hora' => now(),
                     'estado' => 'VIGENTE',
                     'observacion' => $this->observacion ?: $this->motivo ?: null,
@@ -407,8 +412,15 @@ class RegistrosEnfermeria extends Component
         $this->dispatch('swal', ['icon' => 'success', 'title' => 'Cuidado registrado', 'text' => 'El registro quedó firmado y disponible en la evolución del residente.']);
     }
 
+    public function limpiarErroresCaptura(): void
+    {
+        abort_unless(auth()->user()?->estado === 'ACTIVO', 403);
+        $this->resetValidation();
+    }
+
     private function resetFormularioCuidado(): void
     {
+        $this->reset('dispositivoOtro');
         $this->reset(['intervencionId', 'subtipo', 'nivelAyuda', 'tolerancia', 'resultado', 'porcentaje', 'cantidadMl', 'cantidadDespertares', 'dolor', 'consistencia', 'ayudaTecnica', 'calidad', 'esContinente', 'presentaDificultad', 'presentaDolor', 'usaDispositivo', 'deambulacionNocturna', 'agitacion', 'horaInicio', 'horaFin', 'motivo', 'observacion', 'conciencia', 'cognicion', 'conducta', 'respiracion']);
         $this->cambioBasal = 'SIN_CAMBIOS';
         $this->estadoGeneral = 'SIN_CAMBIOS';
