@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Backend\Modulos\Identidad\Servicios;
+namespace App\Modulos\Institucion\Aplicacion\Consultas;
 
 use App\Models\Area;
 use App\Models\AsignacionPersonal;

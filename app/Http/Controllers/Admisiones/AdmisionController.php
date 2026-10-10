@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admisiones;
 
-use App\Backend\Modulos\Admisiones\Acciones\FormalizarAdmision;
+use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use App\Http\Controllers\Controller;
 use App\Models\Preadmision;
 use Illuminate\Http\JsonResponse;

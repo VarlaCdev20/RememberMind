@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Backend\Modulos\Admisiones\Acciones;
+namespace App\Modulos\Institucion\Aplicacion\Acciones;
 
 use App\Models\Cama;
 use App\Models\Habitacion;
 use App\Models\User;
+use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;

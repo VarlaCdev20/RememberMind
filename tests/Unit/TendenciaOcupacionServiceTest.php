@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Backend\Modulos\Enfermeria\Servicios\TendenciaOcupacionService;
+use App\Modulos\Institucion\Aplicacion\Consultas\TendenciaOcupacionService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Mockery;

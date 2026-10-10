@@ -1,0 +1,52 @@
+[
+  {
+    "origen": "app/Backend/Modulos/Administracion/Servicios/CentroCoordinacionService.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Consultas/CentroCoordinacionService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Administracion/Servicios/ConsultaOperativaService.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Consultas/ConsultaOperativaService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Administracion/Servicios/ExploradorAdministrativoService.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Consultas/ExploradorAdministrativoService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Administracion/Servicios/MapaHabitacionesService.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Consultas/MapaHabitacionesService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Admisiones/Acciones/CambiarAlojamientoResidente.php",
+    "destino": "app/Modulos/Admisiones/Aplicacion/Acciones/CambiarAlojamientoResidente.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Admisiones/Acciones/FormalizarAdmision.php",
+    "destino": "app/Modulos/Admisiones/Aplicacion/Acciones/FormalizarAdmision.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Admisiones/Acciones/GuardarEspacioResidencial.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Acciones/GuardarEspacioResidencial.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/TendenciaOcupacionService.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Consultas/TendenciaOcupacionService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Servicios/ContextoLaboralService.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Consultas/ContextoLaboralService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Servicios/GeneradorPlanillaEnfermeriaService.php",
+    "destino": "app/Modulos/Institucion/Infraestructura/Exportaciones/GeneradorPlanillaEnfermeriaService.php",
+    "estado": "Migrado"
+  }
+]

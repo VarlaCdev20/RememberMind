@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Administracion;
 
-use App\Backend\Modulos\Administracion\Servicios\CentroCoordinacionService;
+use App\Modulos\Institucion\Aplicacion\Consultas\CentroCoordinacionService;
 use App\Backend\Modulos\Reportes\Servicios\DashboardService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;

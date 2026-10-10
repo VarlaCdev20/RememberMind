@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Administracion\Servicios\CentroCoordinacionService;
-use App\Backend\Modulos\Admisiones\Acciones\FormalizarAdmision;
+use App\Modulos\Institucion\Aplicacion\Consultas\CentroCoordinacionService;
+use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use App\Frontend\Livewire\Admisiones\PreadmisionesPanel;
 use App\Models\Cama;
 use App\Models\Contacto;

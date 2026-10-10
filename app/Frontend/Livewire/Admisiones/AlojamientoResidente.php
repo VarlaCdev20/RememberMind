@@ -2,8 +2,8 @@
 
 namespace App\Frontend\Livewire\Admisiones;
 
-use App\Backend\Modulos\Admisiones\Acciones\CambiarAlojamientoResidente;
-use App\Backend\Modulos\Admisiones\Acciones\FormalizarAdmision;
+use App\Modulos\Admisiones\Aplicacion\Acciones\CambiarAlojamientoResidente;
+use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use App\Models\Cama;
 use App\Models\Residente;
 use Illuminate\Support\Facades\Gate;

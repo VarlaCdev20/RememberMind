@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Backend\Modulos\Administracion\Servicios;
+namespace App\Modulos\Institucion\Aplicacion\Consultas;
 
 use App\Models\Documento;
 use App\Models\Residente;

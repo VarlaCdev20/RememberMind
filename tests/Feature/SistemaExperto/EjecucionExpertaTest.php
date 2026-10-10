@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\SistemaExperto;
 
-use App\Backend\Modulos\Admisiones\Acciones\FormalizarAdmision;
+use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use App\Backend\Modulos\SistemaExperto\Acciones\PersistirEvaluacionTecnica;
 use App\Backend\Modulos\SistemaExperto\Adaptadores\AdaptadorFuentesCOGMEM;
 use App\Backend\Modulos\SistemaExperto\Conocimiento\CargadorConocimiento;

@@ -1,21 +1,27 @@
 <?php
 
-namespace App\Backend\Modulos\Identidad\Servicios;
+namespace App\Modulos\Institucion\Infraestructura\Exportaciones;
 
-use Carbon\Carbon;
 use App\Models\AsignacionPersonal;
+use Carbon\Carbon;
 use Throwable;
 
 class GeneradorPlanillaEnfermeriaService
 {
     private const ROL_REGULAR = 'REGULAR';
+
     private const ROL_APOYO = 'APOYO';
+
     private const ROL_DESCANSO = 'DESCANSO';
 
     private const TURNO_MANANA = 'MANANA';
+
     private const TURNO_TARDE = 'TARDE';
+
     private const TURNO_NOCHE = 'NOCHE';
+
     private const TURNO_APOYO = 'APOYO';
+
     private const TURNO_DESCANSO = 'DESCANSO';
 
     protected array $temporales = [];
@@ -164,7 +170,7 @@ class GeneradorPlanillaEnfermeriaService
                 ->groupBy(fn (array $item) => $item['plaza'].'_'.$item['fecha'])
                 ->map(fn ($items) => $items->values()->all())
                 ->all();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             report($e);
             $this->temporales = [];
         }
@@ -266,7 +272,7 @@ class GeneradorPlanillaEnfermeriaService
             $total = max(12, (int) ($config['total_enfermeros'] ?? 12));
 
             for ($i = 1; $i <= $total; $i++) {
-                $codigo = 'E' . str_pad((string) $i, 2, '0', STR_PAD_LEFT);
+                $codigo = 'E'.str_pad((string) $i, 2, '0', STR_PAD_LEFT);
                 $titular = $titulares->get($codigo);
                 $user = $titular?->personal?->usuario;
 
@@ -274,7 +280,7 @@ class GeneradorPlanillaEnfermeriaService
                     $enfermeros[] = [
                         'codigo' => $codigo,
                         'cod_usuario' => $user->cod_usuario,
-                        'nombre' => trim(($user->nombres ?? '') . ' ' . ($user->ap_paterno ?? '')) ?: $codigo,
+                        'nombre' => trim(($user->nombres ?? '').' '.($user->ap_paterno ?? '')) ?: $codigo,
                         'correo' => $user->correo ?? null,
                         'rol' => 'ENFERMEROS',
                         'estado' => $user->estado ?? 'ACTIVO',
@@ -296,8 +302,9 @@ class GeneradorPlanillaEnfermeriaService
                     ];
                 }
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             report($e);
+
             return $this->enfermerosVirtuales($config['total_enfermeros'] ?? 12);
         }
 
@@ -308,7 +315,7 @@ class GeneradorPlanillaEnfermeriaService
     {
         return collect(range(1, $total))
             ->map(function (int $numero) {
-                $codigo = 'E' . str_pad((string) $numero, 2, '0', STR_PAD_LEFT);
+                $codigo = 'E'.str_pad((string) $numero, 2, '0', STR_PAD_LEFT);
 
                 return [
                     'codigo' => $codigo,
@@ -367,14 +374,14 @@ class GeneradorPlanillaEnfermeriaService
 
             foreach ($codigosBase as $posicionEnTurno => $codigoBase) {
                 $codigoRotado = $this->rotarCodigo($codigoBase, $numeroSemana, $saltoSemanal, $total);
-                
+
                 // Get titular first
                 $titularBase = $this->buscarEnfermeroPorCodigo($enfermeros, $codigoRotado);
-                $titular_cod = ($titularBase && !empty($titularBase['cod_usuario'])) ? $titularBase['cod_usuario'] : null;
-                $titular_nom = ($titularBase && !empty($titularBase['cod_usuario'])) ? $titularBase['nombre'] : 'Sin enfermero asignado';
+                $titular_cod = ($titularBase && ! empty($titularBase['cod_usuario'])) ? $titularBase['cod_usuario'] : null;
+                $titular_nom = ($titularBase && ! empty($titularBase['cod_usuario'])) ? $titularBase['nombre'] : 'Sin enfermero asignado';
 
                 $fechaStr = $fecha->toDateString();
-                $tempKey = $codigoRotado . '_' . $fechaStr;
+                $tempKey = $codigoRotado.'_'.$fechaStr;
 
                 $reemplazo_cod = null;
                 $reemplazo_nom = null;
@@ -385,12 +392,12 @@ class GeneradorPlanillaEnfermeriaService
                 $active_enfermero = $titularBase;
 
                 // Check if date-specific assignment exists
-                if (isset($this->temporales[$tempKey]) && !empty($this->temporales[$tempKey])) {
+                if (isset($this->temporales[$tempKey]) && ! empty($this->temporales[$tempKey])) {
                     $temporal = $this->temporales[$tempKey][0];
                     $user = $temporal['user'] ?? null;
 
                     $reemplazo_cod = $user ? ($user['cod_usuario'] ?? null) : null;
-                    $reemplazo_nom = $user ? trim(($user['nombres'] ?? '') . ' ' . ($user['ap_paterno'] ?? '')) : 'Sin enfermero asignado';
+                    $reemplazo_nom = $user ? trim(($user['nombres'] ?? '').' '.($user['ap_paterno'] ?? '')) : 'Sin enfermero asignado';
                     $es_reemplazo = true;
                     $motivo = $temporal['motivo'] ?? null;
                     $tipo_asignacion = $temporal['tipo'] ?? 'REEMPLAZO';
@@ -420,14 +427,14 @@ class GeneradorPlanillaEnfermeriaService
                     'turno_codigo' => $codigoTurno,
                     'turno_nombre' => $turno['nombre'],
                     'grupo' => $grupo,
-                    'grupo_nombre' => $grupo ? 'Grupo ' . $grupo : null,
+                    'grupo_nombre' => $grupo ? 'Grupo '.$grupo : null,
                     'hora_inicio' => $turno['hora_inicio'],
                     'hora_fin' => $turno['hora_fin'],
                     'horas' => $turno['horas'],
                     'familia_visual' => $this->familiaVisual($codigoRotado),
                     'clase_familia' => $this->claseFamilia($codigoRotado),
                     'clase_turno' => $turno['clase_visual'],
-                    
+
                     // Added metadata
                     'titular_cod' => $titular_cod,
                     'titular_nom' => $titular_nom,
@@ -472,7 +479,7 @@ class GeneradorPlanillaEnfermeriaService
 
         $posicionFinal = ($posicionBase + (($semana - 1) * $saltoSemanal)) % $total;
 
-        return 'E' . str_pad((string) ($posicionFinal + 1), 2, '0', STR_PAD_LEFT);
+        return 'E'.str_pad((string) ($posicionFinal + 1), 2, '0', STR_PAD_LEFT);
     }
 
     protected function buscarEnfermeroPorCodigo(array $enfermeros, string $codigo): ?array
@@ -595,18 +602,21 @@ class GeneradorPlanillaEnfermeriaService
         if ($registro['noches_consecutivas_max'] >= 3) {
             $registro['estado'] = 'Revisar noches';
             $registro['clase_estado'] = 'bg-boton-acento/10 text-boton-acento';
+
             return $registro;
         }
 
         if ($diferencia >= 16) {
             $registro['estado'] = 'Carga alta';
             $registro['clase_estado'] = 'bg-estado-peligroBg text-estado-peligro';
+
             return $registro;
         }
 
         if ($diferencia <= -16) {
             $registro['estado'] = 'Carga baja';
             $registro['clase_estado'] = 'bg-fondo-hover text-apoyo';
+
             return $registro;
         }
 
@@ -818,7 +828,7 @@ class GeneradorPlanillaEnfermeriaService
             };
         }
 
-        $turnosCubiertosTexto = ((int) ($turnosRegularesCubiertos / 3)) . '/' . $turnosRegularesEsperados;
+        $turnosCubiertosTexto = ((int) ($turnosRegularesCubiertos / 3)).'/'.$turnosRegularesEsperados;
 
         $alertasCriticas = collect($alertas)->where('nivel', 'CRITICO')->count();
 
@@ -1094,7 +1104,7 @@ class GeneradorPlanillaEnfermeriaService
 
         $fechaStr = $fechaCarbon->toDateString();
         $semana = $resultado['planilla'][0] ?? null;
-        if (!$semana) {
+        if (! $semana) {
             return null;
         }
 

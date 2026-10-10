@@ -2,7 +2,7 @@
 
 namespace App\Backend\Modulos\Administracion\Servicios;
 
-use App\Backend\Modulos\Admisiones\Acciones\FormalizarAdmision;
+use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use App\Models\Residente;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;

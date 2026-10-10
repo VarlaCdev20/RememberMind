@@ -2,7 +2,7 @@
 
 namespace App\Backend\Modulos\Identidad\Servicios;
 
-use App\Backend\Modulos\Administracion\Servicios\ConsultaOperativaService;
+use App\Modulos\Institucion\Aplicacion\Consultas\ConsultaOperativaService;
 use Illuminate\Support\Facades\Route;
 
 class VisibilidadNavegacion

@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Administracion\Servicios\ExploradorAdministrativoService;
-use App\Backend\Modulos\Admisiones\Acciones\FormalizarAdmision;
+use App\Modulos\Institucion\Aplicacion\Consultas\ExploradorAdministrativoService;
+use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use App\Models\Actividad;
 use App\Models\Alerta;
 use App\Models\Area;

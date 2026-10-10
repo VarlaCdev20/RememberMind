@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Backend\Modulos\Administracion\Servicios;
+namespace App\Modulos\Institucion\Aplicacion\Consultas;
 
-use App\Backend\Modulos\Admisiones\Acciones\FormalizarAdmision;
 use App\Models\Cama;
 use App\Models\Residente;
 use App\Models\User;
+use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;

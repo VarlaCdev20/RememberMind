@@ -2,7 +2,7 @@
 
 namespace App\Frontend\Livewire\Administracion\Actividades;
 
-use App\Backend\Modulos\Identidad\Servicios\ContextoLaboralService;
+use App\Modulos\Institucion\Aplicacion\Consultas\ContextoLaboralService;
 use App\Models\Actividad;
 use App\Models\Residente;
 use App\Models\ParticipanteActividad;

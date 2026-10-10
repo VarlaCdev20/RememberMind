@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Backend\Modulos\Enfermeria\Servicios;
+namespace App\Modulos\Institucion\Aplicacion\Consultas;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;

@@ -2,7 +2,7 @@
 
 namespace App\Frontend\Livewire\Admisiones;
 
-use App\Backend\Modulos\Admisiones\Acciones\GuardarEspacioResidencial;
+use App\Modulos\Institucion\Aplicacion\Acciones\GuardarEspacioResidencial;
 use App\Models\Cama;
 use App\Models\Habitacion;
 use Illuminate\Support\Facades\Gate;

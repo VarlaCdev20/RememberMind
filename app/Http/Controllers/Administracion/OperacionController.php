@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Administracion;
 
-use App\Backend\Modulos\Administracion\Servicios\ConsultaOperativaService;
+use App\Modulos\Institucion\Aplicacion\Consultas\ConsultaOperativaService;
 use App\Backend\Modulos\Administracion\Servicios\DirectorioResidentesService;
-use App\Backend\Modulos\Administracion\Servicios\ExploradorAdministrativoService;
-use App\Backend\Modulos\Administracion\Servicios\MapaHabitacionesService;
+use App\Modulos\Institucion\Aplicacion\Consultas\ExploradorAdministrativoService;
+use App\Modulos\Institucion\Aplicacion\Consultas\MapaHabitacionesService;
 use App\Backend\Modulos\Administracion\Servicios\PanelResidenteService;
 use App\Http\Controllers\Controller;
 use App\Models\Residente;

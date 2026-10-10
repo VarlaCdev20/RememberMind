@@ -2,7 +2,7 @@
 
 namespace Tests\Support\SistemaExperto;
 
-use App\Backend\Modulos\Admisiones\Acciones\FormalizarAdmision;
+use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use App\Backend\Modulos\SistemaExperto\Conocimiento\EjemploTecnicoCOGMEM as F;
 use App\Models\Cama;
 use App\Models\Habitacion;

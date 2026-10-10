@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Admisiones\Acciones\GuardarEspacioResidencial;
+use App\Modulos\Institucion\Aplicacion\Acciones\GuardarEspacioResidencial;
 use App\Frontend\Livewire\Admisiones\HabitacionesPanel;
 use App\Models\Cama;
 use App\Models\Habitacion;

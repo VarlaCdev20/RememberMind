@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Backend\Modulos\Documentos\Servicios\DocumentacionUsuarioService;
-use App\Backend\Modulos\Identidad\Servicios\GeneradorPlanillaEnfermeriaService;
+use App\Modulos\Institucion\Infraestructura\Exportaciones\GeneradorPlanillaEnfermeriaService;
 use App\Exports\AdultoIndividualExport;
 use App\Frontend\Livewire\Administracion\Identidad\TurnosAsignacionesPanel;
 use App\Models\Residente;

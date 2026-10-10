@@ -2,7 +2,7 @@
 
 namespace App\Frontend\Livewire\Administracion\Identidad;
 
-use App\Backend\Modulos\Identidad\Servicios\GeneradorPlanillaEnfermeriaService;
+use App\Modulos\Institucion\Infraestructura\Exportaciones\GeneradorPlanillaEnfermeriaService;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Jornada;

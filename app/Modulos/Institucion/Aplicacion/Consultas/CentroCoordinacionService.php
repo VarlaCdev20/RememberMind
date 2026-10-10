@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Backend\Modulos\Administracion\Servicios;
+namespace App\Modulos\Institucion\Aplicacion\Consultas;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -40,8 +40,7 @@ class CentroCoordinacionService
             $historia[] = [
                 'fecha' => $dia->toDateString(),
                 'etiqueta' => $dia->format('d/m'),
-                'ocupadas' => $ocupaciones->filter(fn ($fila) =>
-                    CarbonImmutable::parse($fila->fecha_hora_asignacion)->lessThan($finDia)
+                'ocupadas' => $ocupaciones->filter(fn ($fila) => CarbonImmutable::parse($fila->fecha_hora_asignacion)->lessThan($finDia)
                     && ($fila->fecha_hora_liberacion === null || CarbonImmutable::parse($fila->fecha_hora_liberacion)->greaterThanOrEqualTo($finDia))
                 )->pluck('cod_cama')->unique()->count(),
                 'admisiones' => (int) ($admisionesPorDia[$dia->toDateString()] ?? 0),
