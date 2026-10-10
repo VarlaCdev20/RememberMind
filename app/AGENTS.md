@@ -2,7 +2,7 @@
 
 Applies to `app/`. Inherit all root rules.
 
-Place Livewire frontend classes in `app/Frontend/Livewire/` and modular backend code in `app/Backend/Modulos/`. Do not add `app/Livewire/` or `app/Services/`. Authenticate by `correo` with account state `ACTIVO`; public registration is disabled. `usuarios.cod_usuario` and `residentes.cod_residente` are string canonical keys.
+Place functional code in the owner's `app/Modulos/{owner}/{Dominio,Aplicacion,Infraestructura,Presentacion}`. Livewire, HTTP, policies, views and route registries belong in `Presentacion`; pure rules in `Dominio`; operations/queries in `Aplicacion`; files, integrations and persistence details in `Infraestructura`. Shared framework responsibilities belong in `app/Compartido`. Keep the technical expert engine independent in `motor-experto`, with Laravel integration in `ApoyoDecision`. Do not recreate `app/Backend`, `app/Frontend`, `app/Livewire` or `app/Services`. Authenticate by `correo` with account state `ACTIVO`; public registration is disabled. `usuarios.cod_usuario` and `residentes.cod_residente` are string canonical keys.
 
 ## Core backend contract
 

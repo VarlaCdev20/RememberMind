@@ -6,7 +6,7 @@ Base de partida: ARQUITECTURA 0d3942bd638c1294cad184c51a3f6224b8d1ab75. Referenc
 
 Fuentes consultadas: docs/architecture-audit/04_ARQUITECTURA_TO_BE.md, 05_CAPAS_Y_RESPONSABILIDADES.md, 06_MAPA_MODULOS.md, 15_PLAN_REFACTORIZACION_BACKEND.md, 18_SISTEMA_EXPERTO_INTEGRACION.md, 20_DECISIONES_ARQUITECTONICAS.md; docs/arquitectura/REMEMBERMIND_ARQUITECTURA_FRONTEND.md (deprecado); docs/sistema-experto/ARQUITECTURA_COMPLETA_SISTEMA_EXPERTO.md (propuesta); baseline congelado y decisiones posteriores.
 
-El baseline vigente contiene 71 tablas operativas y 23 tablas expertas aprobadas por separado (D-123/D-137). No se cambia ningun archivo database, tabla, columna, cod_*, FK, factory ni dato clinico. Los modelos conservan App\Models para evitar cambiar identidades polimorficas/Activitylog, relaciones, Fortify/Jetstream/Spatie y factories durante este corte.
+El baseline vigente contiene 71 tablas operativas y 23 tablas expertas aprobadas por separado (D-123/D-137). No se cambia ninguna migracion, tabla, columna, cod_*, FK, factory ni dato clinico. En database solo se adapta un import de Historical2026Seeder a su clase trasladada. Los 96 modelos/bases conservan App\Models para evitar cambiar identidades polimorficas/Activitylog, relaciones, Fortify/Jetstream/Spatie y factories durante este corte; su propiedad se documenta individualmente en MODELOS_ELOQUENT.json.
 
 Se conserva Livewire 4, Blade y resources/frontend/styles/design-system. Los alias publicos se registran explicitamente; las vistas modulares conservan sus nombres logicos mediante rutas de busqueda compatibles. Las rutas se componen respetando orden, grupos, middleware y binding. Las policies movidas se registran explicitamente.
 

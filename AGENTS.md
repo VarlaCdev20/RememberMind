@@ -132,7 +132,7 @@ Respect and evolve the existing Laravel architecture. Check `composer.lock` and 
 
 Use existing Models, Actions, Services, Policies, Form Requests, Controllers, Livewire components, events/listeners/jobs and Blade components when appropriate.
 
-Frontend Livewire code belongs in `app/Frontend/Livewire/`; modular backend code belongs in `app/Backend/Modulos/`. Do not add `app/Livewire/` or `app/Services/`. The canonical user PK is string `cod_usuario`, never `cod_usu` or an auto-increment key; the resident PK is string `cod_residente`, never `cod_am`.
+The owner-approved hybrid architecture (2026-10-10) places functional code in `app/Modulos/{owner}/{Dominio,Aplicacion,Infraestructura,Presentacion}`. Livewire, HTTP, policies, views and route registries belong in the owner's `Presentacion`. Use `app/Compartido` for real shared responsibilities; do not recreate `app/Backend`, `app/Frontend`, `app/Livewire` or `app/Services`. The framework-independent technical expert engine lives in `motor-experto`; Laravel integration belongs in `ApoyoDecision`. See `docs/arquitectura/ADR_ARQUITECTURA_HIBRIDA.md`. The canonical user PK is string `cod_usuario`, never `cod_usu` or an auto-increment key; the resident PK is string `cod_residente`, never `cod_am`.
 
 Guideline:
 - Models: relationships, casts, scopes, entity-local behavior and small invariants.
