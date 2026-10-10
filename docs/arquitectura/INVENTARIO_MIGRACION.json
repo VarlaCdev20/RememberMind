@@ -383,5 +383,365 @@
     "origen": "app/Backend/Modulos/Residentes/Servicios/AdultoMayorService.php",
     "destino": "app/Modulos/Residentes/Aplicacion/Acciones/AdultoMayorService.php",
     "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Actividades/ActividadController.php",
+    "destino": "app/Modulos/Social/Presentacion/Http/Controllers/ActividadController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Actividades/AdultoMayorActividadController.php",
+    "destino": "app/Modulos/Social/Presentacion/Http/Controllers/AdultoMayorActividadController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Admin/AreasAtencionController.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Http/Controllers/AreasAtencionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Administracion/BuscarAdministracionController.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Http/Controllers/BuscarAdministracionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Administracion/CentroCoordinacionController.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Http/Controllers/CentroCoordinacionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Administracion/OperacionController.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Http/Controllers/OperacionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Administracion/ResidenteAdministrativoController.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Http/Controllers/ResidenteAdministrativoController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Admisiones/AdmisionController.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Http/Controllers/AdmisionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Admisiones/InfraestructuraController.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Http/Controllers/InfraestructuraController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Admisiones/PreadmisionController.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Http/Controllers/PreadmisionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Alertas/AlertaController.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Http/Controllers/AlertaController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Clinica/AdultoMayorFichaMedicaController.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Controllers/AdultoMayorFichaMedicaController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Clinica/AdultoMayorSignosVitalesController.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Controllers/AdultoMayorSignosVitalesController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Clinica/EstudioClinicoController.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Controllers/EstudioClinicoController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Clinica/ExpedienteClinicoController.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Controllers/ExpedienteClinicoController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Cuidados/CuidadoController.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Http/Controllers/CuidadoController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Documentos/AdultoMayorDocumentoController.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Http/Controllers/AdultoMayorDocumentoController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Documentos/DocumentoController.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Http/Controllers/DocumentoController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Documentos/DocumentosUsuarioController.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Http/Controllers/DocumentosUsuarioController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Identidad/InstitucionalController.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Http/Controllers/InstitucionalController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Identidad/RolePreviewController.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Http/Controllers/RolePreviewController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Identidad/UsuarioController.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Http/Controllers/UsuarioController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Instrumentos/InstrumentoController.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Http/Controllers/InstrumentoController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Medicacion/AdultoMayorAdministracionMedicacionController.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Http/Controllers/AdultoMayorAdministracionMedicacionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Medicacion/AdultoMayorMedicacionController.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Http/Controllers/AdultoMayorMedicacionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Medicacion/MedicacionController.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Http/Controllers/MedicacionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/AreaReporteController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/AreaReporteController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/BitacoraController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/BitacoraController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/DashboardController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/DashboardController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/FichaPacienteReporteController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/FichaPacienteReporteController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/ReporteActividadesController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/ReporteActividadesController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/ReporteAdultosController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/ReporteAdultosController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/ReporteBitacoraController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/ReporteBitacoraController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/ReporteEquipoController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/ReporteEquipoController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/ReporteFamiliaresController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/ReporteFamiliaresController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/ReporteInstitucionalController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/ReporteInstitucionalController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/ReporteSaludController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/ReporteSaludController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/ReporteV2Controller.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/ReporteV2Controller.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Residentes/AdultoMayorAtencionController.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Controllers/AdultoMayorAtencionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Residentes/AdultoMayorController.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Http/Controllers/AdultoMayorController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Residentes/AdultoMayorFamiliarController.php",
+    "destino": "app/Modulos/Social/Presentacion/Http/Controllers/AdultoMayorFamiliarController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Residentes/AdultoMayorObservacionController.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Controllers/AdultoMayorObservacionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Residentes/RelacionResidenteController.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Http/Controllers/RelacionResidenteController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Residentes/ResidenteController.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Http/Controllers/ResidenteController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Residentes/ResumenFamiliaSocialController.php",
+    "destino": "app/Modulos/Social/Presentacion/Http/Controllers/ResumenFamiliaSocialController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Valoraciones/AdultoMayorEvaluacionController.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Http/Controllers/AdultoMayorEvaluacionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Valoraciones/AdultoMayorValoracionFuncionalController.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Http/Controllers/AdultoMayorValoracionFuncionalController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Valoraciones/ValoracionProfesionalController.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Http/Controllers/ValoracionProfesionalController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Clinica/StoreCambioEstadoRequest.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Requests/StoreCambioEstadoRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Clinica/StoreFichaMedicaRequest.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Requests/StoreFichaMedicaRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Clinica/StoreSignosVitalesRequest.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Requests/StoreSignosVitalesRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Clinica/UpdateFichaMedicaRequest.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Requests/UpdateFichaMedicaRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Documentos/StoreDocumentoAdultoRequest.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Http/Requests/StoreDocumentoAdultoRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Identidad/StoreUsuarioRequest.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Http/Requests/StoreUsuarioRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Identidad/UpdateUsuarioRequest.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Http/Requests/UpdateUsuarioRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Medicacion/StoreAdministracionMedicacionRequest.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Http/Requests/StoreAdministracionMedicacionRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Medicacion/StoreMedicacionRequest.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Http/Requests/StoreMedicacionRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Medicacion/UpdateMedicacionRequest.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Http/Requests/UpdateMedicacionRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Residentes/StoreActividadAdultoRequest.php",
+    "destino": "app/Modulos/Social/Presentacion/Http/Requests/StoreActividadAdultoRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Residentes/StoreAtencionAdultoRequest.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Requests/StoreAtencionAdultoRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Residentes/StoreFamiliarAdultoRequest.php",
+    "destino": "app/Modulos/Social/Presentacion/Http/Requests/StoreFamiliarAdultoRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Residentes/StoreObservacionAdultoRequest.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Requests/StoreObservacionAdultoRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Residentes/UpdateAdultoMayorRequest.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Http/Requests/UpdateAdultoMayorRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Valoraciones/StoreValoracionFuncionalRequest.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Http/Requests/StoreValoracionFuncionalRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Policies/AdministracionMedicacionPolicy.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Policies/AdministracionMedicacionPolicy.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Policies/CamaPolicy.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Policies/CamaPolicy.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Policies/EvaluacionExpertaPolicy.php",
+    "destino": "app/Modulos/ApoyoDecision/Presentacion/Policies/EvaluacionExpertaPolicy.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Policies/HabitacionPolicy.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Policies/HabitacionPolicy.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Policies/PrescripcionPolicy.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Policies/PrescripcionPolicy.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Policies/ResidentePolicy.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Policies/ResidentePolicy.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Policies/ValoracionEnfermeriaPreadmisionPolicy.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Policies/ValoracionEnfermeriaPreadmisionPolicy.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Policies/VersionModeloExpertoPolicy.php",
+    "destino": "app/Modulos/ApoyoDecision/Presentacion/Policies/VersionModeloExpertoPolicy.php",
+    "estado": "Migrado"
   }
 ]

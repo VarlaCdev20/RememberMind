@@ -206,7 +206,7 @@ class SuperadminEnfermeriaSupervisionTest extends TestCase
         $this->actingAs($this->superadmin);
 
         $this->assertTrue($this->superadmin->can('administraciones_medicacion.ver'));
-        $this->assertFalse(app(\App\Policies\AdministracionMedicacionPolicy::class)->create($this->superadmin));
+        $this->assertFalse(app(\App\Modulos\Medicacion\Presentacion\Policies\AdministracionMedicacionPolicy::class)->create($this->superadmin));
     }
 
     public function test_enfermeria_puede_administrar_pero_no_crear_ni_modificar_ordenes_medicas(): void

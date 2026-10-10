@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Modulos\Identidad\Presentacion\Navegacion\SidebarService;
 use App\Frontend\Livewire\Superadministrador\Identidad\RolesPermisosPanel;
 use App\Models\User;
-use App\Policies\PrescripcionPolicy;
+use App\Modulos\Medicacion\Presentacion\Policies\PrescripcionPolicy;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;

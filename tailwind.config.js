@@ -55,7 +55,9 @@ export default {
         './resources/views/**/*.blade.php',
         './resources/frontend/scripts/**/*.js',
         './resources/frontend/scripts/**/*.blade.php',
-        './app/Frontend/Livewire/**/*.php',
+        './app/Modulos/**/*.php',
+        './app/Modulos/**/Presentacion/Vistas/**/*.blade.php',
+        './app/Compartido/**/Presentacion/Vistas/**/*.blade.php',
     ],
 
     theme: {

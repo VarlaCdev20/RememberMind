@@ -13,7 +13,7 @@ use App\Models\OcupacionCama;
 use App\Models\Preadmision;
 use App\Models\Residente;
 use App\Models\User;
-use App\Policies\ResidentePolicy;
+use App\Modulos\Residentes\Presentacion\Policies\ResidentePolicy;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;

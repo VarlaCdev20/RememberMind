@@ -42,50 +42,50 @@ use App\Frontend\Livewire\Medico\Medicacion\SaludMedicacionPanel;
 use App\Frontend\Livewire\Medico\Valoraciones\ValoracionMedicaPanel;
 use App\Frontend\Livewire\Psicologia\DashboardPsicologo;
 use App\Frontend\Livewire\Superadministrador\Reportes\ReportesInstitucionalesPanel;
-use App\Http\Controllers\Actividades\ActividadController;
-use App\Http\Controllers\Actividades\AdultoMayorActividadController;
-use App\Http\Controllers\Admin\AreasAtencionController;
-use App\Http\Controllers\Admisiones\AdmisionController;
-use App\Http\Controllers\Admisiones\InfraestructuraController;
-use App\Http\Controllers\Admisiones\PreadmisionController;
-use App\Http\Controllers\Alertas\AlertaController;
-use App\Http\Controllers\Clinica\AdultoMayorFichaMedicaController;
-use App\Http\Controllers\Clinica\AdultoMayorSignosVitalesController;
-use App\Http\Controllers\Clinica\EstudioClinicoController;
-use App\Http\Controllers\Clinica\ExpedienteClinicoController;
-use App\Http\Controllers\Cuidados\CuidadoController;
-use App\Http\Controllers\Documentos\AdultoMayorDocumentoController;
-use App\Http\Controllers\Documentos\DocumentoController;
-use App\Http\Controllers\Documentos\DocumentosUsuarioController;
-use App\Http\Controllers\Identidad\InstitucionalController;
-use App\Http\Controllers\Identidad\RolePreviewController;
-use App\Http\Controllers\Identidad\UsuarioController;
-use App\Http\Controllers\Instrumentos\InstrumentoController;
-use App\Http\Controllers\Medicacion\AdultoMayorAdministracionMedicacionController;
-use App\Http\Controllers\Medicacion\AdultoMayorMedicacionController;
-use App\Http\Controllers\Medicacion\MedicacionController;
-use App\Http\Controllers\Reportes\AreaReporteController;
-use App\Http\Controllers\Reportes\BitacoraController;
-use App\Http\Controllers\Reportes\DashboardController;
-use App\Http\Controllers\Reportes\FichaPacienteReporteController;
-use App\Http\Controllers\Reportes\ReporteActividadesController;
-use App\Http\Controllers\Reportes\ReporteAdultosController;
-use App\Http\Controllers\Reportes\ReporteBitacoraController;
-use App\Http\Controllers\Reportes\ReporteEquipoController;
-use App\Http\Controllers\Reportes\ReporteFamiliaresController;
-use App\Http\Controllers\Reportes\ReporteInstitucionalController;
-use App\Http\Controllers\Reportes\ReporteSaludController;
-use App\Http\Controllers\Reportes\ReporteV2Controller;
-use App\Http\Controllers\Residentes\AdultoMayorAtencionController;
-use App\Http\Controllers\Residentes\AdultoMayorController;
-use App\Http\Controllers\Residentes\AdultoMayorFamiliarController;
-use App\Http\Controllers\Residentes\AdultoMayorObservacionController;
-use App\Http\Controllers\Residentes\RelacionResidenteController;
-use App\Http\Controllers\Residentes\ResidenteController;
-use App\Http\Controllers\Residentes\ResumenFamiliaSocialController;
-use App\Http\Controllers\Valoraciones\AdultoMayorEvaluacionController;
-use App\Http\Controllers\Valoraciones\AdultoMayorValoracionFuncionalController;
-use App\Http\Controllers\Valoraciones\ValoracionProfesionalController;
+use App\Modulos\Social\Presentacion\Http\Controllers\ActividadController;
+use App\Modulos\Social\Presentacion\Http\Controllers\AdultoMayorActividadController;
+use App\Modulos\Institucion\Presentacion\Http\Controllers\AreasAtencionController;
+use App\Modulos\Admisiones\Presentacion\Http\Controllers\AdmisionController;
+use App\Modulos\Institucion\Presentacion\Http\Controllers\InfraestructuraController;
+use App\Modulos\Admisiones\Presentacion\Http\Controllers\PreadmisionController;
+use App\Modulos\Alertas\Presentacion\Http\Controllers\AlertaController;
+use App\Modulos\Clinica\Presentacion\Http\Controllers\AdultoMayorFichaMedicaController;
+use App\Modulos\Clinica\Presentacion\Http\Controllers\AdultoMayorSignosVitalesController;
+use App\Modulos\Clinica\Presentacion\Http\Controllers\EstudioClinicoController;
+use App\Modulos\Clinica\Presentacion\Http\Controllers\ExpedienteClinicoController;
+use App\Modulos\Cuidados\Presentacion\Http\Controllers\CuidadoController;
+use App\Modulos\Residentes\Presentacion\Http\Controllers\AdultoMayorDocumentoController;
+use App\Modulos\Residentes\Presentacion\Http\Controllers\DocumentoController;
+use App\Modulos\Identidad\Presentacion\Http\Controllers\DocumentosUsuarioController;
+use App\Modulos\Institucion\Presentacion\Http\Controllers\InstitucionalController;
+use App\Modulos\Identidad\Presentacion\Http\Controllers\RolePreviewController;
+use App\Modulos\Identidad\Presentacion\Http\Controllers\UsuarioController;
+use App\Modulos\Valoraciones\Presentacion\Http\Controllers\InstrumentoController;
+use App\Modulos\Medicacion\Presentacion\Http\Controllers\AdultoMayorAdministracionMedicacionController;
+use App\Modulos\Medicacion\Presentacion\Http\Controllers\AdultoMayorMedicacionController;
+use App\Modulos\Medicacion\Presentacion\Http\Controllers\MedicacionController;
+use App\Modulos\Reportes\Presentacion\Http\Controllers\AreaReporteController;
+use App\Modulos\Reportes\Presentacion\Http\Controllers\BitacoraController;
+use App\Modulos\Reportes\Presentacion\Http\Controllers\DashboardController;
+use App\Modulos\Reportes\Presentacion\Http\Controllers\FichaPacienteReporteController;
+use App\Modulos\Reportes\Presentacion\Http\Controllers\ReporteActividadesController;
+use App\Modulos\Reportes\Presentacion\Http\Controllers\ReporteAdultosController;
+use App\Modulos\Reportes\Presentacion\Http\Controllers\ReporteBitacoraController;
+use App\Modulos\Reportes\Presentacion\Http\Controllers\ReporteEquipoController;
+use App\Modulos\Reportes\Presentacion\Http\Controllers\ReporteFamiliaresController;
+use App\Modulos\Reportes\Presentacion\Http\Controllers\ReporteInstitucionalController;
+use App\Modulos\Reportes\Presentacion\Http\Controllers\ReporteSaludController;
+use App\Modulos\Reportes\Presentacion\Http\Controllers\ReporteV2Controller;
+use App\Modulos\Clinica\Presentacion\Http\Controllers\AdultoMayorAtencionController;
+use App\Modulos\Residentes\Presentacion\Http\Controllers\AdultoMayorController;
+use App\Modulos\Social\Presentacion\Http\Controllers\AdultoMayorFamiliarController;
+use App\Modulos\Clinica\Presentacion\Http\Controllers\AdultoMayorObservacionController;
+use App\Modulos\Residentes\Presentacion\Http\Controllers\RelacionResidenteController;
+use App\Modulos\Residentes\Presentacion\Http\Controllers\ResidenteController;
+use App\Modulos\Social\Presentacion\Http\Controllers\ResumenFamiliaSocialController;
+use App\Modulos\Valoraciones\Presentacion\Http\Controllers\AdultoMayorEvaluacionController;
+use App\Modulos\Valoraciones\Presentacion\Http\Controllers\AdultoMayorValoracionFuncionalController;
+use App\Modulos\Valoraciones\Presentacion\Http\Controllers\ValoracionProfesionalController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -147,15 +147,15 @@ Route::middleware([
                 ->name('administracion.')
                 ->middleware('permission:admisiones.ver_dashboard')
                 ->group(function () {
-                    Route::get('/dashboard', \App\Http\Controllers\Administracion\CentroCoordinacionController::class)
+                    Route::get('/dashboard', \App\Modulos\Institucion\Presentacion\Http\Controllers\CentroCoordinacionController::class)
                         ->name('dashboard');
 
-                    Route::get('/', \App\Http\Controllers\Administracion\CentroCoordinacionController::class)
+                    Route::get('/', \App\Modulos\Institucion\Presentacion\Http\Controllers\CentroCoordinacionController::class)
                         ->name('index');
 
-                    Route::get('/residentes/{residente}', [\App\Http\Controllers\Administracion\ResidenteAdministrativoController::class, 'show'])
+                    Route::get('/residentes/{residente}', [\App\Modulos\Residentes\Presentacion\Http\Controllers\ResidenteAdministrativoController::class, 'show'])
                         ->middleware('permission:residentes.ver')->name('residentes.show');
-                    Route::get('/buscar', \App\Http\Controllers\Administracion\BuscarAdministracionController::class)
+                    Route::get('/buscar', \App\Modulos\Institucion\Presentacion\Http\Controllers\BuscarAdministracionController::class)
                         ->name('buscar');
 
                     foreach ([
@@ -164,7 +164,7 @@ Route::middleware([
                         'consentimientos', 'seguros', 'actividades', 'visitas',
                         'alertas', 'incidentes', 'reportes',
                     ] as $modulo) {
-                        Route::get('/'.$modulo, [\App\Http\Controllers\Administracion\OperacionController::class, 'index'])
+                        Route::get('/'.$modulo, [\App\Modulos\Institucion\Presentacion\Http\Controllers\OperacionController::class, 'index'])
                             ->defaults('modulo', $modulo)->name($modulo);
                     }
                 });
