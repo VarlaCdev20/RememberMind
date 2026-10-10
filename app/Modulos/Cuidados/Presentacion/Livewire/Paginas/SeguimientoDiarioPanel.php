@@ -3,7 +3,6 @@
 namespace App\Modulos\Cuidados\Presentacion\Livewire\Paginas;
 
 use App\Models\Atencion;
-use App\Models\Residente;
 use App\Models\Turno;
 use App\Modulos\Cuidados\Aplicacion\Acciones\SeguimientoDiarioService;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;

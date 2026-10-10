@@ -2,7 +2,7 @@
 title: "Continuidad asistencial"
 status: CURRENT
 version: "2.0"
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-10
 owner: RememberMind
 source_of_truth: false
 source_of_truth_scope: [care_continuity]
@@ -15,6 +15,8 @@ supersedes: []
 related_docs: ["../TRAZABILIDAD.md", "../README.md"]
 related_modules: [jornadas, signos, medicacion, planes, alertas, pase]
 ---
+
+> Revisión de localizadores del 10/10/2026: rutas actualizadas al mapa modular y evidencia del servicio de incidentes retirado sustituida por los casos activos. Las garantías de fases históricas conservan su alcance; la auditoría y sus pruebas están en [AUDITORIA_LIMPIEZA](../arquitectura/AUDITORIA_LIMPIEZA_2026_10_10.md).
 
 # Continuidad asistencial
 
@@ -55,7 +57,7 @@ flowchart LR
 | Alertas | Manual/detección y eventos | Permiso por acción, scope según entrada | MiTurno y Pase incluyen RECONOCIDA/ASIGNADA tras corrección Fase 3 |
 | Pase | Panel borrador/entrega/recepción | Emisor/receptor legítimos; permisos/cuenta/jornada exacta revalidados Fase 3 | Campos textuales con fecha de recepción; no ejecución automática de pendientes |
 
-Fuentes: [MiTurno](../../app/Backend/Modulos/Enfermeria/Servicios/MiTurnoService.php), [Pase](../../app/Backend/Modulos/Enfermeria/Servicios/PaseTurnoService.php), [Agenda](../../app/Backend/Modulos/Medicacion/Servicios/AgendaMedicacionService.php), [Contexto](../../app/Backend/Modulos/Enfermeria/Servicios/TurnoEnfermeriaService.php), [Autorización](../../docs/seguridad/MODELO_AUTORIZACION.md).
+Fuentes: [MiTurno](../../app/Modulos/Cuidados/Aplicacion/Consultas/MiTurnoService.php), [Pase](../../app/Modulos/Cuidados/Aplicacion/Acciones/PaseTurnoService.php), [Agenda](../../app/Modulos/Medicacion/Aplicacion/Consultas/AgendaMedicacionService.php), [Contexto](../../app/Modulos/Cuidados/Aplicacion/Consultas/TurnoEnfermeriaService.php), [Autorización](../../docs/seguridad/MODELO_AUTORIZACION.md).
 
 ## Longitudinalidad por entidad
 
@@ -79,7 +81,7 @@ Fuentes: [MiTurno](../../app/Backend/Modulos/Enfermeria/Servicios/MiTurnoService
 | valoraciones_funcionales | [ValoracionFuncional](../../app/Models/ValoracionFuncional.php) | Autoría/atención y contenido funcional |
 | seguimientos_pedagogicos | [SeguimientoPedagogico](../../app/Models/SeguimientoPedagogico.php) | Registro propio con fecha, conclusión/recomendación |
 
-Entradas concretas: [registrar/definiciones](../../app/Http/Controllers/Cuidados/CuidadoController.php), [valoración profesional](../../app/Http/Controllers/Valoraciones/ValoracionProfesionalController.php), [aplicar](../../app/Http/Controllers/Instrumentos/InstrumentoController.php). **TESTED EXPECTATION:** TEST-CLI-001/INS-001 y tests por módulo, sin ejecución.
+Entradas concretas: [registrar/definiciones](../../app/Modulos/Cuidados/Presentacion/Http/Controllers/CuidadoController.php), [valoración profesional](../../app/Modulos/Valoraciones/Presentacion/Http/Controllers/ValoracionProfesionalController.php), [aplicar](../../app/Modulos/Valoraciones/Presentacion/Http/Controllers/InstrumentoController.php). **TESTED EXPECTATION:** TEST-CLI-001/INS-001 y tests por módulo, sin ejecución.
 
 ## Corrección y cierre observados
 
@@ -94,7 +96,7 @@ Entradas concretas: [registrar/definiciones](../../app/Http/Controllers/Cuidados
 | Objetivos individuales | Nueva versión REEMPLAZADO, retiro ANULADO | Decisión V2.2; historial y autor propio |
 | Models operativos | ModeloOperativo::boot veta delete de instancia | No bloquea todo SQL/Query Builder; INV-CLI-003 PARTIAL |
 
-Fuentes: [app/Backend/Modulos/Clinica/Servicios/SignosVitalesService.php](../../app/Backend/Modulos/Clinica/Servicios/SignosVitalesService.php), [app/Backend/Modulos/Enfermeria/Servicios/IncidentesEnfermeriaService.php](../../app/Backend/Modulos/Enfermeria/Servicios/IncidentesEnfermeriaService.php), [app/Backend/Modulos/Enfermeria/Servicios/LesionesEnfermeriaService.php](../../app/Backend/Modulos/Enfermeria/Servicios/LesionesEnfermeriaService.php), [app/Models/ModeloOperativo.php](../../app/Models/ModeloOperativo.php), [V2.2](../../docs/base-de-datos/DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md).
+Fuentes: [app/Modulos/Clinica/Aplicacion/Acciones/SignosVitalesService.php](../../app/Modulos/Clinica/Aplicacion/Acciones/SignosVitalesService.php), [GestionarIncidentesEnfermeria](../../app/Modulos/Alertas/Aplicacion/Acciones/GestionarIncidentesEnfermeria.php) y [GestionarIncidentesPanel](../../app/Modulos/Alertas/Aplicacion/Acciones/GestionarIncidentesPanel.php) (sustituyen la referencia histórica al servicio sin consumidores retirado; no equivalen a todas sus reglas), [app/Modulos/Cuidados/Aplicacion/Acciones/LesionesEnfermeriaService.php](../../app/Modulos/Cuidados/Aplicacion/Acciones/LesionesEnfermeriaService.php), [app/Models/ModeloOperativo.php](../../app/Models/ModeloOperativo.php), [V2.2](../../docs/base-de-datos/DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md).
 
 ## Hallazgo histórico Fase 2 — TECH-008 (corregido en Fase 3)
 

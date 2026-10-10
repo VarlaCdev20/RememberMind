@@ -2,7 +2,7 @@
 title: "RememberMind Documentation"
 status: CURRENT
 version: "1.0"
-last_reviewed: 2026-10-08
+last_reviewed: 2026-10-10
 owner: RememberMind
 source_of_truth: true
 source_of_truth_scope: [document_governance, source_routing]
@@ -58,7 +58,7 @@ Jerarquía: instrucción actual de propietaria → baseline/diccionario y decisi
 - [Arquitectura](arquitectura/README.md), [roles](arquitectura/REMEMBERMIND_ROLES_BASELINE_CONGELADO.md), [dashboards por rol](arquitectura/DASHBOARDS_POR_ROL.md).
 - [BDD](base-de-datos/README.md), [UX](frontend/STACK_SKILLS_UX_UI.md), [skills sistema](sistema/STACK_SKILLS_SISTEMA.md).
 - [Changelog documental](CHANGELOG.md), [verificación Fase 1](VERIFICACION_DOCUMENTAL_FASE_1.md).
-- [Arquitectura contrastada Fase 2](arquitectura/ARQUITECTURA_VIGENTE.md), [flujos](sistema/FLUJOS_GERIATRICOS.md), [ciclos de vida](sistema/ESTADOS_Y_CICLOS_DE_VIDA.md).
+- [Arquitectura híbrida vigente](arquitectura/ARQUITECTURA_VIGENTE.md), [migración ejecutada](arquitectura/INFORME_MIGRACION_HIBRIDA.md) y [auditoría/limpieza posterior](arquitectura/AUDITORIA_LIMPIEZA_2026_10_10.md), [flujos](sistema/FLUJOS_GERIATRICOS.md), [ciclos de vida](sistema/ESTADOS_Y_CICLOS_DE_VIDA.md).
 - [Modelo de autorización](seguridad/MODELO_AUTORIZACION.md), [matriz de roles y entradas](seguridad/MATRIZ_ROLES_PERMISOS.md), [invariantes](sistema/INVARIANTES_NEGOCIO.md), [continuidad asistencial](sistema/CONTINUIDAD_ASISTENCIAL.md).
 - [Plantilla de contrato](modulos/_PLANTILLA_CONTRATO_MODULO.md), [ingreso](modulos/ingreso-institucional/README.md), [residentes/alojamiento](modulos/residentes-alojamiento/README.md), [jornadas/asignaciones](modulos/jornadas-asignaciones/README.md), [medicación](modulos/medicacion/README.md), [signos vitales](modulos/signos-vitales/README.md), [alertas](modulos/alertas/README.md), [pase de turno](modulos/pase-turno/README.md).
 - [Trazabilidad y cobertura estática Fase 2](TRAZABILIDAD.md).

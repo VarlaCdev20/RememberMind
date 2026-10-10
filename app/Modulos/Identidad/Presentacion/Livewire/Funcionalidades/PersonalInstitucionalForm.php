@@ -6,7 +6,6 @@ use App\Models\Area;
 use App\Models\User;
 use App\Modulos\Identidad\Aplicacion\Acciones\GuardarPersonalInstitucional;
 use App\Modulos\Identidad\Infraestructura\Documentos\GenerarDocumentoInstitucional;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;

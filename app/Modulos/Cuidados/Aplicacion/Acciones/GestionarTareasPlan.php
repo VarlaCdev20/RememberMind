@@ -7,7 +7,6 @@ use App\Models\IntervencionCuidado;
 use App\Models\Jornada;
 use App\Models\PlanCuidado;
 use App\Models\ProgramacionCuidado;
-use App\Models\Turno;
 use App\Models\User;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Illuminate\Support\Facades\DB;

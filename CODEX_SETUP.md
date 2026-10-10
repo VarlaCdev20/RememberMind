@@ -2,7 +2,7 @@
 title: "Codex en RememberMind"
 status: CURRENT
 version: "1.0"
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-10
 owner: RememberMind
 source_of_truth: false
 verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
@@ -20,6 +20,7 @@ Entrada documental: [docs/README](docs/README.md). Instrucciones por alcance y s
 ## Autoridad y estructura
 
 - [AGENTS raíz](AGENTS.md).
+- [Arquitectura híbrida vigente](docs/arquitectura/README.md): doce propietarios en app/Modulos, motor técnico independiente en motor-experto.
 - [app/AGENTS](app/AGENTS.md), [database/AGENTS](database/AGENTS.md), [resources/AGENTS](resources/AGENTS.md), [tests/AGENTS](tests/AGENTS.md).
 - [Estado actual](docs/ESTADO_ACTUAL.md), [glosario](docs/GLOSARIO_DOMINIO.md) y [decisiones pendientes](docs/DECISIONES_PENDIENTES.md).
 - [BDD](docs/base-de-datos/README.md): baseline congelado y extensiones aprobadas; el número del nombre del diccionario no fija inventario eterno.

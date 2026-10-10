@@ -202,7 +202,8 @@
   {
     "origen": "app/Backend/Modulos/Enfermeria/Servicios/IncidentesEnfermeriaService.php",
     "destino": "app/Modulos/Alertas/Aplicacion/Acciones/IncidentesEnfermeriaService.php",
-    "estado": "Migrado"
+    "estado": "Retirado tras auditoria",
+    "detalle": "Servicio sin consumidores ni descubrimiento dinámico; los flujos usan GestionarIncidentesPanel, GestionarIncidentesEnfermeria y RegistrarIncidenteEnFicha. Véase AUDITORIA_LIMPIEZA_2026_10_10.md."
   },
   {
     "origen": "app/Backend/Modulos/Enfermeria/Servicios/TendenciaIncidentesService.php",
@@ -627,7 +628,8 @@
   {
     "origen": "app/Http/Requests/Clinica/StoreCambioEstadoRequest.php",
     "destino": "app/Modulos/Clinica/Presentacion/Http/Requests/StoreCambioEstadoRequest.php",
-    "estado": "Migrado"
+    "estado": "Retirado tras auditoria",
+    "detalle": "FormRequest sin consumidores, bindings ni descubrimiento automático; validación activa en entradas/casos actuales. Véase AUDITORIA_LIMPIEZA_2026_10_10.md."
   },
   {
     "origen": "app/Http/Requests/Clinica/StoreFichaMedicaRequest.php",
@@ -682,7 +684,8 @@
   {
     "origen": "app/Http/Requests/Residentes/StoreAtencionAdultoRequest.php",
     "destino": "app/Modulos/Clinica/Presentacion/Http/Requests/StoreAtencionAdultoRequest.php",
-    "estado": "Migrado"
+    "estado": "Retirado tras auditoria",
+    "detalle": "FormRequest sin consumidores, bindings ni descubrimiento automático; validación activa en entradas/casos actuales. Véase AUDITORIA_LIMPIEZA_2026_10_10.md."
   },
   {
     "origen": "app/Http/Requests/Residentes/StoreFamiliarAdultoRequest.php",
@@ -692,7 +695,8 @@
   {
     "origen": "app/Http/Requests/Residentes/StoreObservacionAdultoRequest.php",
     "destino": "app/Modulos/Clinica/Presentacion/Http/Requests/StoreObservacionAdultoRequest.php",
-    "estado": "Migrado"
+    "estado": "Retirado tras auditoria",
+    "detalle": "FormRequest sin consumidores, bindings ni descubrimiento automático; validación activa en entradas/casos actuales. Véase AUDITORIA_LIMPIEZA_2026_10_10.md."
   },
   {
     "origen": "app/Http/Requests/Residentes/UpdateAdultoMayorRequest.php",

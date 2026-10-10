@@ -3,7 +3,6 @@
 namespace App\Modulos\Cuidados\Presentacion\Livewire\Paginas;
 
 use App\Models\AsignacionResidenteJornada;
-use App\Models\Jornada;
 use App\Models\PaseTurno;
 use App\Models\Personal;
 use App\Models\Residente;

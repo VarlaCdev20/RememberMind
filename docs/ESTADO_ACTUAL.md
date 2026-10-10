@@ -2,7 +2,7 @@
 title: "Estado actual de RememberMind"
 status: CURRENT
 version: "1.0"
-last_reviewed: 2026-10-08
+last_reviewed: 2026-10-10
 owner: RememberMind
 source_of_truth: true
 verified_against_commit: null
@@ -10,7 +10,7 @@ verification_scope: STATIC_REPOSITORY_REVIEW
 runtime_verified: false
 runtime_evidence_status: PARTIAL
 runtime_evidence_scope: FASE_3_AND_4_AND_EXPERT_V1_SCOPED_VERIFICATIONS
-automated_global_gate_status: FAIL
+automated_global_gate_status: NOT_RERUN_AFTER_ARCHITECTURE_CLEANUP
 supersedes: []
 related_docs: ["README.md","ROADMAP.md","DEUDA_TECNICA.md","DECISIONES_PENDIENTES.md"]
 related_modules: []
@@ -18,7 +18,13 @@ related_modules: []
 
 # Estado actual de RememberMind
 
-## Resumen ejecutivo
+## Actualización arquitectónica — 10/10/2026
+
+El código está en ARQUI-NUEVA, organizado en doce módulos con cuatro capas; Backend/Frontend dejaron de ser raíces ejecutables. El motor técnico vive en motor-experto y su integración Laravel en ApoyoDecision. El [informe de migración](arquitectura/INFORME_MIGRACION_HIBRIDA.md) conserva la ejecución completa (1006 pasaron, 15 omitidas y un falso positivo) y la reejecución corregida (21/21); su métrica consolidada por identidad fue 1007/1022, sin fallos pendientes. No es una única suite completa verde.
+
+La [auditoría posterior](arquitectura/AUDITORIA_LIMPIEZA_2026_10_10.md) registra la limpieza, la corrección de atomicidad del incidente y sus pruebas dirigidas. No se repitió la suite completa después de este corte; las cifras de fases anteriores se conservan como historia y no certifican el árbol actual. Eloquent, autorización directa de algunos casos y capacidades clínicas futuras mantienen excepciones explícitas.
+
+## Resumen ejecutivo histórico — fases anteriores
 
 RememberMind es un sistema residencial geriátrico con seguimiento clínico, cognitivo, funcional e interdisciplinario. Hay implementación Laravel de admisión, residentes/camas, identidad, cuidados, medicación, alertas, documentación, consultas y reportes, con tests asociados.
 
@@ -26,7 +32,7 @@ Fases 1–2 describen el commit base y cambios previos sin commit mediante revis
 
 Fase 4 posterior: PHP oficial 8.3.33 habilitado con autorización «habilita php», sin alterar política de seguridad. Baseline repetida antes de cambiar código: 670 tests, 12.082 aserciones, 14 fallos, 0 errores, 13 omitidos. Se clasificaron y repararon esos catorce fallos PHP y dos JS con parches acotados. Suite global final: 686 tests, 12.219 aserciones, 0 fallos, 0 errores y los mismos 13 omitidos justificados; 900,178 s reloj. npm test 30/30, build y migrate:fresh --seed aislado 71/71 PASS. Las seis cohortes F3 se reejecutaron dentro de la suite final sin fallos ni omisiones. **Gate global automatizado F4: PASS**; el FAIL histórico F3 se conserva. Esto no certifica operación clínica integral, producción ni cierre de TECH. runtime_verified=false expresa ese límite de certificación, no ausencia de ejecución de suites. Pint mantiene siete archivos con fixers preexistentes, sin hallazgos de formato nuevos. Inventario individual de skips y evidencia en [TRAZABILIDAD](TRAZABILIDAD.md).
 
-Verificación posterior del 2026-10-08 para sistema experto V1: unitarias 66/1973, feature SQLite 23/1275, feature PostgreSQL desechable 23/1414 e inventario operativo 19/223 PASS; build PASS. Se instalaron con autorización 23 tablas expertas vacías en `remembermind_dev`, preservando las 71 operativas y sus datos. La suite global de ese árbol de trabajo terminó con 888 tests, 18.077 aserciones, cinco fallos, un error y 15 omitidos. El error de una fixture experta fue corregido y su batería específica revalidada en ambos motores; los cinco fallos restantes corresponden a expectativas de vistas, copy, decimales y redirección ajenas al experto. **Gate global actual: FAIL**; el PASS histórico de Fase 4 no certifica el árbol actual. [Implementación y límites](sistema-experto/IMPLEMENTACION_V1.md). No hay conocimiento clínico cargado ni activado.
+Verificación posterior del 2026-10-08 para sistema experto V1: unitarias 66/1973, feature SQLite 23/1275, feature PostgreSQL desechable 23/1414 e inventario operativo 19/223 PASS; build PASS. Se instalaron con autorización 23 tablas expertas vacías en `remembermind_dev`, preservando las 71 operativas y sus datos. La suite global de ese árbol de trabajo terminó con 888 tests, 18.077 aserciones, cinco fallos, un error y 15 omitidos. El error de una fixture experta fue corregido y su batería específica revalidada en ambos motores; los cinco fallos restantes corresponden a expectativas de vistas, copy, decimales y redirección ajenas al experto. **Gate global de aquel corte experto V1: FAIL**; el PASS histórico de Fase 4 no certifica el árbol actual. [Implementación y límites](sistema-experto/IMPLEMENTACION_V1.md). No hay conocimiento clínico cargado ni activado.
 
 Versión del producto: no se encontraron tags locales; una release global no fue verificada. El contrato BDD operativo vigente es V2.1 congelado con extensión V2.2 aprobada; las 23 tablas expertas aprobadas se inventarían separadamente. No equiparar esas versiones a una release de todo RememberMind.
 

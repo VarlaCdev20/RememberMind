@@ -2,7 +2,7 @@
 title: "Sistema experto"
 status: CURRENT
 version: "2.0"
-last_reviewed: 2026-10-08
+last_reviewed: 2026-10-10
 owner: RememberMind
 source_of_truth: false
 verified_against_commit: null
@@ -18,7 +18,9 @@ related_modules: []
 
 # Sistema experto
 
-El núcleo técnico está implementado en `app/Backend/Modulos/SistemaExperto/`.
+El núcleo técnico independiente está en `motor-experto/`; la adaptación y
+persistencia Laravel están en `app/Modulos/ApoyoDecision/`. La [arquitectura
+híbrida vigente](../arquitectura/README.md) y el [informe de migración](../arquitectura/INFORME_MIGRACION_HIBRIDA.md) sustituyen sus ubicaciones anteriores.
 Las 23 tablas expertas se incorporaron, con autorización expresa, a
 `remembermind_dev`, preservando las 71 operativas y los datos anteriores.
 La versión documental `ORION-V1-20261008` contiene 55 nodos y 29 relaciones

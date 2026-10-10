@@ -9,7 +9,6 @@ use App\Models\Herida;
 use App\Models\IntervencionCuidado;
 use App\Models\RegistroIngesta;
 use App\Models\RegistroSueno;
-use App\Models\Residente;
 use App\Models\User;
 use App\Models\ValoracionDolor;
 use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;

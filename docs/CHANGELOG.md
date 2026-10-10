@@ -2,7 +2,7 @@
 title: Changelog documental de RememberMind
 status: CURRENT
 version: "1.0"
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-10
 owner: RememberMind
 source_of_truth: false
 verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
@@ -14,6 +14,13 @@ related_modules: []
 ---
 
 # Changelog documental
+
+## 2026-10-10 — Auditoría posterior a la migración híbrida
+
+- Organización vigente actualizada a doce propietarios y cuatro capas; retiradas las instrucciones canónicas Backend/Frontend.
+- Índices de arquitectura, agentes y sistema experto apuntan a las ubicaciones reales. La evidencia histórica conserva su alcance y los documentos anteriores permanecen en Git.
+- [Auditoría y limpieza](arquitectura/AUDITORIA_LIMPIEZA_2026_10_10.md) documenta archivos retirados, comprobaciones y deuda abierta; el inventario de migración distingue los cuatro PHP retirados posteriormente.
+- La evidencia del servicio de incidentes sin consumidores se identifica como histórica; no se atribuyen sus reglas a los casos activos.
 
 Registro de decisiones de documentación; no changelog de commits ni prueba de funcionalidades. Este registro se inicia en Fase 1; no inventa una historia de entregas anteriores.
 

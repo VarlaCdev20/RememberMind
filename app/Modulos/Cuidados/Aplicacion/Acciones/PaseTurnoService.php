@@ -19,7 +19,6 @@ use App\Models\RegistroHidratacion;
 use App\Models\RegistroIngesta;
 use App\Models\RegistroMovilidad;
 use App\Models\RegistroSueno;
-use App\Models\Residente;
 use App\Models\SignoVital;
 use App\Models\Turno;
 use App\Models\User;

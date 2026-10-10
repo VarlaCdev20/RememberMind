@@ -2,7 +2,7 @@
 title: "RememberMind"
 status: CURRENT
 version: "1.0"
-last_reviewed: 2026-10-08
+last_reviewed: 2026-10-10
 owner: RememberMind
 source_of_truth: false
 verified_against_commit: null
@@ -25,6 +25,7 @@ Entrada oficial: [RememberMind Documentation](docs/README.md).
 - [Roadmap: trabajo, propuestas e ideas](docs/ROADMAP.md).
 - [Glosario](docs/GLOSARIO_DOMINIO.md), [decisiones pendientes](docs/DECISIONES_PENDIENTES.md), [deuda evidenciada](docs/DEUDA_TECNICA.md).
 - [Arquitectura vigente](docs/arquitectura/README.md), [BDD y extensiones aprobadas](docs/base-de-datos/README.md).
+- [Migración híbrida ejecutada](docs/arquitectura/INFORME_MIGRACION_HIBRIDA.md) y [auditoría/limpieza posterior](docs/arquitectura/AUDITORIA_LIMPIEZA_2026_10_10.md).
 - [Gobernanza/changelog documental](docs/CHANGELOG.md).
 
 Hay código y tests en varias áreas; esta revisión documental no ejecutó suites/build ni verificó producción. No se afirma completitud o porcentaje global de aprobación.
