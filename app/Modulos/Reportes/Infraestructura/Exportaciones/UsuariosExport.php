@@ -1,0 +1,47 @@
+<?php
+
+namespace App\Modulos\Reportes\Infraestructura\Exportaciones;
+
+use App\Models\User;
+use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
+
+class UsuariosExport implements FromCollection, WithHeadings, WithMapping
+{
+    /**
+     * @return Collection
+     */
+    public function collection()
+    {
+        return User::query()->leftJoin('personal', 'usuarios.cod_usuario', '=', 'personal.cod_usuario')->with(['personal', 'roles'])->orderBy('personal.apellido_paterno')->orderBy('personal.apellido_materno')->orderBy('personal.nombres')->select('usuarios.*')->get();
+    }
+
+    public function headings(): array
+    {
+        return [
+            'Nombre Completo',
+            'Correo Electrónico',
+            'Área Institucional',
+            'Rol Principal',
+            'Estado',
+            'Fecha de Registro',
+        ];
+    }
+
+    /**
+     * @param  mixed  $user
+     */
+    public function map($user): array
+    {
+        return [
+            $user->name,
+            $user->email,
+            $user->area ? $user->area->nombre : 'Sin Área',
+            $user->getRoleNames()->first() ?? 'Sin Rol',
+            $user->estado == 1 ? 'Activo' : 'Inactivo',
+            $user->created_at ? $user->created_at->format('d/m/Y H:i') : 'Sin fecha',
+        ];
+    }
+}

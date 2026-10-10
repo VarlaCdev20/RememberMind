@@ -4,7 +4,7 @@ namespace App\Modulos\Identidad\Presentacion\Livewire\Paginas;
 
 use App\Compartido\Infraestructura\Documentos\DocumentacionUsuarioService;
 use App\Compartido\Infraestructura\Documentos\DocumentosUsuarioService;
-use App\Exports\UsuariosExport;
+use App\Modulos\Reportes\Infraestructura\Exportaciones\UsuariosExport;
 use App\Mail\UsuarioBienvenidaMail;
 use App\Mail\UsuarioCredencialesInicialesMail;
 use App\Mail\UsuarioPasswordActualizadaMail;

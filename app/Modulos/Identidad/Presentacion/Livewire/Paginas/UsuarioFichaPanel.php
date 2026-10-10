@@ -3,7 +3,7 @@
 namespace App\Modulos\Identidad\Presentacion\Livewire\Paginas;
 
 use App\Compartido\Infraestructura\Documentos\DocumentacionUsuarioService;
-use App\Exports\UsuarioExpedienteExport;
+use App\Modulos\Reportes\Infraestructura\Exportaciones\UsuarioExpedienteExport;
 use App\Models\Documento;
 use App\Models\User;
 use App\Modulos\Identidad\Aplicacion\Consultas\UsuarioFichaService;

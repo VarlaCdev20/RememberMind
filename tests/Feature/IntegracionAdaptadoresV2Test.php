@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Compartido\Infraestructura\Documentos\DocumentacionUsuarioService;
 use App\Modulos\Institucion\Infraestructura\Exportaciones\GeneradorPlanillaEnfermeriaService;
-use App\Exports\AdultoIndividualExport;
+use App\Modulos\Reportes\Infraestructura\Exportaciones\AdultoIndividualExport;
 use App\Modulos\Institucion\Presentacion\Livewire\Paginas\TurnosAsignacionesPanel;
 use App\Models\Residente;
 use App\Models\AplicacionInstrumento;

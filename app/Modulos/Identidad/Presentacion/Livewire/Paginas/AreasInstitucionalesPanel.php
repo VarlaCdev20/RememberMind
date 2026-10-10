@@ -2,8 +2,8 @@
 
 namespace App\Modulos\Identidad\Presentacion\Livewire\Paginas;
 
-use App\Exports\AreasInstitucionalesExport;
-use App\Exports\UsuariosPorAreaExport;
+use App\Modulos\Reportes\Infraestructura\Exportaciones\AreasInstitucionalesExport;
+use App\Modulos\Reportes\Infraestructura\Exportaciones\UsuariosPorAreaExport;
 use App\Models\Area;
 use App\Models\User;
 use App\Modulos\Reportes\Aplicacion\Consultas\AreasReportDataService;

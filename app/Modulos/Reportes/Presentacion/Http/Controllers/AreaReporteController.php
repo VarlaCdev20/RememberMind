@@ -2,8 +2,8 @@
 
 namespace App\Modulos\Reportes\Presentacion\Http\Controllers;
 
-use App\Exports\AreasInstitucionalesExport;
-use App\Exports\UsuariosPorAreaExport;
+use App\Modulos\Reportes\Infraestructura\Exportaciones\AreasInstitucionalesExport;
+use App\Modulos\Reportes\Infraestructura\Exportaciones\UsuariosPorAreaExport;
 use App\Http\Controllers\Controller;
 use App\Models\Area;
 use App\Models\User;

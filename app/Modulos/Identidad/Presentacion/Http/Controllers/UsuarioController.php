@@ -6,7 +6,7 @@ use App\Compartido\Infraestructura\Documentos\DocumentacionUsuarioService;
 use App\Compartido\Infraestructura\Documentos\DocumentosUsuarioService;
 use App\Modulos\Identidad\Presentacion\Livewire\Paginas\UsuariosPanel;
 use App\Http\Controllers\Controller;
-use App\Jobs\EnviarFichaUsuarioJob;
+use App\Modulos\Identidad\Infraestructura\Jobs\EnviarFichaUsuarioJob;
 use App\Models\User;
 use App\Modulos\Identidad\Aplicacion\Consultas\UsuarioFichaService;
 use App\Modulos\Identidad\Presentacion\Http\Requests\StoreUsuarioRequest;

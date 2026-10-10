@@ -2,7 +2,7 @@
 
 namespace App\Modulos\Reportes\Presentacion\Http\Controllers;
 
-use App\Exports\Reportes\ReporteEquipoExport;
+use App\Modulos\Reportes\Infraestructura\Exportaciones\Reportes\ReporteEquipoExport;
 use App\Http\Controllers\Controller;
 use App\Modulos\Reportes\Aplicacion\Consultas\ReporteDataService;
 use Barryvdh\DomPDF\Facade\Pdf;
