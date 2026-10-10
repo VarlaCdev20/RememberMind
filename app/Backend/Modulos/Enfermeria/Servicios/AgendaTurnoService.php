@@ -2,7 +2,7 @@
 
 namespace App\Backend\Modulos\Enfermeria\Servicios;
 
-use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
+use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
 use App\Models\Alerta;
 use App\Models\EjecucionCuidado;
 use App\Models\Residente;

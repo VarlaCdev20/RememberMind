@@ -85,7 +85,7 @@ class Residente extends ModeloOperativo {
     public function getEdadAttribute(): ?int { return $this->fecha_nacimiento?->age; }
     public function getEstadoAdultoAttribute(): string { return (string) ($this->attributes['estado'] ?? 'ACTIVO'); }
         public function getFichaResumenAttribute(): ?object {
-        return app(\App\Backend\Modulos\Clinica\Servicios\FichaMedicaService::class)->obtenerFichaAgregada($this->cod_residente);
+        return app(\App\Modulos\Clinica\Aplicacion\Acciones\FichaMedicaService::class)->obtenerFichaAgregada($this->cod_residente);
     }
     public function getFechaIngAttribute(): ?\Carbon\Carbon { $adm = $this->admisiones()->orderBy('fecha_hora_admision', 'asc')->first(); return $adm && $adm->fecha_hora_admision ? \Carbon\Carbon::parse($adm->fecha_hora_admision) : null; }
 

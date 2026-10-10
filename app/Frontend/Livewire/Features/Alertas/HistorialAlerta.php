@@ -2,7 +2,7 @@
 
 namespace App\Frontend\Livewire\Features\Alertas;
 
-use App\Backend\Modulos\Alertas\Servicios\AlertasService;
+use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
 use App\Models\Alerta;
 use Livewire\Component;
 

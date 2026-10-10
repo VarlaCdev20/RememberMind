@@ -24,7 +24,7 @@ class DecisionAdmisionModal extends Component
 
     public function open($cod_residente)
     {
-        abort_unless(app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class)
+        abort_unless(app(\App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService::class)
             ->tieneRol(auth()->user(), ['MEDICO GENERAL/GERIATRA']), 403);
         $this->resetForm();
         $this->adulto = Residente::find($cod_residente);
@@ -63,7 +63,7 @@ class DecisionAdmisionModal extends Component
 
     public function guardar()
     {
-        abort_unless(app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class)
+        abort_unless(app(\App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService::class)
             ->tieneRol(auth()->user(), ['MEDICO GENERAL/GERIATRA']), 403);
         $rules = [
             'decision' => 'required|in:ADMITIDO_NORMAL,ADMITIDO_CON_SEGUIMIENTO,ADMITIDO_CON_CUIDADO_ESPECIAL,DERIVADO',

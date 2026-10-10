@@ -2,7 +2,7 @@
 
 namespace App\Frontend\Livewire\Medico\Valoraciones;
 
-use App\Backend\Modulos\Clinica\Servicios\ContextoClinicoService;
+use App\Modulos\Clinica\Aplicacion\Consultas\ContextoClinicoService;
 use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
 use App\Models\Atencion;
 use App\Models\HistorialEstadoResidente;
@@ -223,7 +223,7 @@ class ValoracionMedicaPanel extends Component
         $usuario = Auth::user();
 
         return $usuario?->estado === 'ACTIVO'
-            && app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class)
+            && app(\App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService::class)
                 ->tieneRol($usuario, ['MEDICO GENERAL/GERIATRA'])
             && $usuario->can('atenciones.crear')
             && $usuario->can('notas_clinicas.crear')

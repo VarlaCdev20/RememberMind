@@ -19,7 +19,7 @@ use App\Models\Turno;
 use App\Models\User;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use App\Backend\Modulos\Enfermeria\Servicios\LesionesEnfermeriaService;
-use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
+use App\Modulos\Medicacion\Aplicacion\Acciones\RegistrarAdministracionMedicacionService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;

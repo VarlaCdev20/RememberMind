@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
-use App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService;
+use App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Atencion;

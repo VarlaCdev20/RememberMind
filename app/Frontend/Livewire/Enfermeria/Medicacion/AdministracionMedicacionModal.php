@@ -3,7 +3,7 @@
 namespace App\Frontend\Livewire\Enfermeria\Medicacion;
 
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
-use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
+use App\Modulos\Medicacion\Aplicacion\Acciones\RegistrarAdministracionMedicacionService;
 use App\Models\AdministracionMedicacion;
 use App\Models\Prescripcion;
 use Carbon\Carbon;

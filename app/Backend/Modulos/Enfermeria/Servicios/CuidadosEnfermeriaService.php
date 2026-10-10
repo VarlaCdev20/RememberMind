@@ -2,7 +2,7 @@
 
 namespace App\Backend\Modulos\Enfermeria\Servicios;
 
-use App\Backend\Modulos\Alertas\Servicios\AlertasService;
+use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
 use App\Models\AsignacionPersonal;
 use App\Models\Atencion;
 use App\Models\DispositivoClinico;

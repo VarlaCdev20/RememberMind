@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Backend\Modulos\Admisiones\Acciones\FormalizarAdmision;
+use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use App\Models\Preadmision;
 use App\Models\User;
 use Carbon\Carbon;

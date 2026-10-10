@@ -240,7 +240,7 @@ class MedicacionAdultoModal extends Component
 
     private function autorizarGestionOrden(string $permiso): void
     {
-        abort_unless(app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class)
+        abort_unless(app(\App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService::class)
             ->tieneRol(auth()->user(), ['MEDICO GENERAL/GERIATRA']) && auth()->user()?->can($permiso), 403,
             'Las órdenes médicas solo pueden ser creadas o modificadas por personal médico autorizado.');
     }

@@ -678,7 +678,7 @@ class PaseTurnoReconstruidoTest extends TestCase
             \App\Models\HorarioPrescripcion::create(['cod_horario_prescripcion' => 'HPR_F3_'.str_replace(':', '', $hora), 'cod_prescripcion' => $prescripcion->cod_prescripcion,
                 'hora_programada' => $hora, 'dosis_programada' => 1, 'dias_semana' => 'TODOS', 'estado' => 'ACTIVO']);
         }
-        $registro = app(\App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService::class);
+        $registro = app(\App\Modulos\Medicacion\Aplicacion\Acciones\RegistrarAdministracionMedicacionService::class);
         $registro->registrarProgramada($this->userSaliente, $this->residente1->cod_residente, $prescripcion->cod_prescripcion, '08:00', true);
         $registro->registrarProgramada($this->userSaliente, $this->residente1->cod_residente, $prescripcion->cod_prescripcion, '09:00', false, 'Motivo sintético registrado.');
         $servicio = app(PaseTurnoService::class);

@@ -104,7 +104,7 @@ class PacientesSeguimientoPanel extends Component
         $usuario = auth()->user();
 
         return $usuario?->estado === 'ACTIVO'
-            && app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class)
+            && app(\App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService::class)
                 ->tieneRol($usuario, ['MEDICO GENERAL/GERIATRA'])
             && $usuario->can($permiso)
             && ! app(RolePreviewService::class)->isActive($usuario);

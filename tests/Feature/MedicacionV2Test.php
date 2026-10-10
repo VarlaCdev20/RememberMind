@@ -11,7 +11,7 @@ use App\Models\Jornada;
 use App\Models\Personal;
 use App\Models\Turno;
 use App\Models\User;
-use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
+use App\Modulos\Medicacion\Aplicacion\Acciones\RegistrarAdministracionMedicacionService;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;

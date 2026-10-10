@@ -2,13 +2,13 @@
 
 namespace App\Frontend\Livewire\Enfermeria\Cuidados;
 
-use App\Backend\Modulos\Alertas\Servicios\AlertasService;
-use App\Backend\Modulos\Clinica\Servicios\SignosVitalesService;
+use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
+use App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService;
 use App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService;
 use App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
-use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
-use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
+use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
+use App\Modulos\Medicacion\Aplicacion\Acciones\RegistrarAdministracionMedicacionService;
 use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
 use App\Models\AdministracionMedicacion;
 use App\Models\Alerta;
@@ -1380,7 +1380,7 @@ class MisPacientes extends Component
             $alertasHistoricas = auth()->user()?->can('alertas.ver') ? Alerta::query()->where('cod_residente', $codResidente)
                 ->where('modulo', 'SIGNOS')->whereIn('cod_registro', $historicos->pluck('cod_signo'))
                 ->orderByDesc('fecha_hora')->get()->unique('cod_registro')->keyBy('cod_registro') : collect();
-            $evaluador = app(\App\Backend\Modulos\Clinica\SignosVitales\EvaluadorSignosVitales::class);
+            $evaluador = app(\App\Modulos\Clinica\Aplicacion\Acciones\EvaluadorSignosVitales::class);
             $this->signosHistorial = $historicos->map(function (SignoVital $signo) use ($codResidente, $objetivosHistoricos, $alertasHistoricas, $evaluador) {
                 return [
                     'fecha' => $signo->fecha_hora->timezone(config('app.timezone'))->format('d/m/Y H:i'),
@@ -1546,7 +1546,7 @@ class MisPacientes extends Component
         }
         $campos = ['presion_sistolica' => 'sis', 'presion_diastolica' => 'dia', 'frecuencia_cardiaca' => 'fc',
             'frecuencia_respiratoria' => 'fr', 'temperatura' => 'temp', 'saturacion_oxigeno' => 'sat', 'glucemia' => 'glucosa'];
-        $objetivos = app(\App\Backend\Modulos\Clinica\SignosVitales\ServicioObjetivosPersonalizados::class)
+        $objetivos = app(\App\Modulos\Clinica\Aplicacion\Consultas\ServicioObjetivosPersonalizados::class)
             ->vigentesEn($this->modalCodResidente, Carbon::parse($this->signoFechaHora));
         $this->signosObjetivos = $objetivos->map(fn (ObjetivoSignoVital $objetivo) => [
             'codigo' => $objetivo->cod_objetivo_signo,

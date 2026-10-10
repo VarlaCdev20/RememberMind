@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Clinica\Acciones\DefinirObjetivoSignoVitalAction;
-use App\Backend\Modulos\Clinica\SignosVitales\EvaluadorSignosVitales;
+use App\Modulos\Clinica\Aplicacion\Acciones\DefinirObjetivoSignoVitalAction;
+use App\Modulos\Clinica\Aplicacion\Acciones\EvaluadorSignosVitales;
 use App\Models\ObjetivoSignoVital;
 use App\Models\Personal;
 use App\Models\Residente;

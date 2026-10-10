@@ -4,10 +4,10 @@ namespace App\Frontend\Livewire\Compartido\Alertas;
 
 use App\Models\Alerta;
 use App\Models\EventoAlerta;
-use App\Backend\Modulos\Alertas\Servicios\DeteccionAlertasService;
-use App\Backend\Modulos\Alertas\Servicios\AlertasService;
+use App\Modulos\Alertas\Aplicacion\Acciones\DeteccionAlertasService;
+use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
-use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
+use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
 use App\Models\Residente;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;

@@ -13,7 +13,7 @@ class StoreAdministracionMedicacionRequest extends FormRequest
     public function authorize(): bool
     {
         return Auth::check()
-            && app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class)
+            && app(\App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService::class)
                 ->tieneRol(Auth::user(), ['ENFERMEROS'])
             && Auth::user()->can('administraciones_medicacion.crear');
     }

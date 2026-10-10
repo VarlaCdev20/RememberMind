@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService;
+use App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService;
 use App\Models\Preadmision;
 use App\Models\User;
 use App\Models\ValoracionEnfermeriaPreadmision;

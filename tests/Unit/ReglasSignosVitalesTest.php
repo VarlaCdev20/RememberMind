@@ -2,14 +2,14 @@
 
 namespace Tests\Unit;
 
-use App\Backend\Modulos\Clinica\SignosVitales\Reglas\ReglaFrecuenciaCardiaca;
-use App\Backend\Modulos\Clinica\SignosVitales\Reglas\ReglaFrecuenciaRespiratoria;
-use App\Backend\Modulos\Clinica\SignosVitales\Reglas\ReglaGlucemia;
-use App\Backend\Modulos\Clinica\SignosVitales\Reglas\ReglaPresionArterial;
-use App\Backend\Modulos\Clinica\SignosVitales\Reglas\ReglaSaturacionOxigeno;
-use App\Backend\Modulos\Clinica\SignosVitales\Reglas\ReglaTemperatura;
-use App\Backend\Modulos\Clinica\SignosVitales\Tipos\ComportamientoAlerta;
-use App\Backend\Modulos\Clinica\SignosVitales\Tipos\SeveridadClinica;
+use App\Modulos\Clinica\Dominio\Reglas\ReglaFrecuenciaCardiaca;
+use App\Modulos\Clinica\Dominio\Reglas\ReglaFrecuenciaRespiratoria;
+use App\Modulos\Clinica\Dominio\Reglas\ReglaGlucemia;
+use App\Modulos\Clinica\Dominio\Reglas\ReglaPresionArterial;
+use App\Modulos\Clinica\Dominio\Reglas\ReglaSaturacionOxigeno;
+use App\Modulos\Clinica\Dominio\Reglas\ReglaTemperatura;
+use App\Modulos\Clinica\Dominio\Enumeraciones\ComportamientoAlerta;
+use App\Modulos\Clinica\Dominio\Enumeraciones\SeveridadClinica;
 use Tests\TestCase;
 
 class ReglasSignosVitalesTest extends TestCase

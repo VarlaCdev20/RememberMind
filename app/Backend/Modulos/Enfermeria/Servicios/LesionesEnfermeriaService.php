@@ -2,8 +2,8 @@
 
 namespace App\Backend\Modulos\Enfermeria\Servicios;
 
-use App\Backend\Modulos\Alertas\Servicios\AlertasService;
-use App\Backend\Modulos\Clinica\Servicios\ContextoClinicoService;
+use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
+use App\Modulos\Clinica\Aplicacion\Consultas\ContextoClinicoService;
 use App\Models\CuracionHerida;
 use App\Models\Herida;
 use App\Models\Incidente;

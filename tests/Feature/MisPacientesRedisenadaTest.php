@@ -499,7 +499,7 @@ class MisPacientesRedisenadaTest extends TestCase
     {
         $this->travelTo(today()->setTime(10, 0));
         $this->actingAs($this->enfermero);
-        $resultado = app(\App\Backend\Modulos\Clinica\Servicios\SignosVitalesService::class)
+        $resultado = app(\App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService::class)
             ->registrarConEvaluacion($this->residenteEstable->cod_residente, ['frecuencia_cardiaca' => 135], $this->enfermero);
         $antes = \App\Models\ValoracionDolor::query()->count();
         $vista = Livewire::test(MisPacientes::class)
@@ -948,7 +948,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->travelTo(today()->setTime(10, 0));
         $this->actingAs($this->enfermero);
 
-        $signo = app(\App\Backend\Modulos\Clinica\Servicios\SignosVitalesService::class)
+        $signo = app(\App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService::class)
             ->registrar($this->residenteEstable->cod_residente, ['frecuencia_cardiaca' => 135], $this->enfermero);
 
         $this->assertDatabaseHas('alertas', [
@@ -966,7 +966,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $antes = SignoVital::query()->count();
 
         try {
-            app(\App\Backend\Modulos\Clinica\Servicios\SignosVitalesService::class)
+            app(\App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService::class)
                 ->registrar($this->residenteEstable->cod_residente, ['frecuencia_cardiaca' => 72], $otroUsuario);
             $this->fail('Se permitió atribuir el registro a otro usuario.');
         } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
@@ -1421,7 +1421,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->update(['estado' => 'FINALIZADA']);
 
         $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
-        app(\App\Backend\Modulos\Clinica\Servicios\SignosVitalesService::class)
+        app(\App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService::class)
             ->registrarDesdeNuevoRegistro($this->residenteCritico->cod_residente, [
                 'fecha' => today()->toDateString(), 'hora' => now()->format('H:i'),
                 'frecuencia_cardiaca' => '70',
@@ -1433,7 +1433,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->travelTo(today()->setTime(10, 17));
         $this->actingAs($this->enfermero);
 
-        app(\App\Backend\Modulos\Clinica\Servicios\SignosVitalesService::class)
+        app(\App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService::class)
             ->registrarDesdeNuevoRegistro($this->residenteEstable->cod_residente, [
                 'fecha' => 'ayer',
                 'hora' => '25:80',
@@ -1585,7 +1585,7 @@ class MisPacientesRedisenadaTest extends TestCase
     {
         $this->actingAs($this->enfermero);
         $this->crearDosisProgramada($this->residenteEstable, 'A');
-        $servicio = app(\App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService::class);
+        $servicio = app(\App\Modulos\Medicacion\Aplicacion\Acciones\RegistrarAdministracionMedicacionService::class);
 
         foreach (['PRE_INEXISTENTE', 'PRE_PROG_A'] as $codigo) {
             if ($codigo === 'PRE_PROG_A') {
@@ -1615,7 +1615,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->actingAs($this->enfermero);
         $this->crearDosisProgramada($this->residenteEstable);
         $this->formularioMedicacion()->call('guardarMed')->assertHasNoErrors();
-        $servicio = app(\App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService::class);
+        $servicio = app(\App\Modulos\Medicacion\Aplicacion\Acciones\RegistrarAdministracionMedicacionService::class);
 
         try {
             $servicio->registrarProgramada($this->enfermero, $this->residenteEstable->cod_residente,
@@ -2495,7 +2495,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->set('ingestaDificultadDeglucion', false)->set('ingestaPorcentaje', '10')
             ->set('ingestaRegistrarLiquidos', true)->set('ingestaCantidadMl', '100');
         $alertas = Alerta::count();
-        $this->partialMock(\App\Backend\Modulos\Alertas\Servicios\AlertasService::class, function ($mock) {
+        $this->partialMock(\App\Modulos\Alertas\Aplicacion\Acciones\AlertasService::class, function ($mock) {
             $mock->shouldReceive('crear')->once()->andThrow(
                 new \Illuminate\Database\QueryException('sqlite', 'insert synthetic', [], new \RuntimeException('Synthetic alert persistence failure')));
         });
@@ -2769,7 +2769,7 @@ class MisPacientesRedisenadaTest extends TestCase
     {
         $this->travelTo(today()->setTime(10, 0));
         $this->actingAs($this->enfermero);
-        $registro = app(\App\Backend\Modulos\Clinica\Servicios\SignosVitalesService::class)
+        $registro = app(\App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService::class)
             ->registrarConEvaluacion($this->residenteEstable->cod_residente,
                 ['frecuencia_cardiaca' => 135], $this->enfermero);
 
@@ -2788,7 +2788,7 @@ class MisPacientesRedisenadaTest extends TestCase
     {
         $this->travelTo(today()->setTime(10, 0));
         $this->actingAs($this->enfermero);
-        $servicio = app(\App\Backend\Modulos\Clinica\Servicios\SignosVitalesService::class);
+        $servicio = app(\App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService::class);
         $signosAntes = SignoVital::query()->count();
         $alertasAntes = Alerta::query()->count();
 
@@ -2816,7 +2816,7 @@ class MisPacientesRedisenadaTest extends TestCase
         });
 
         try {
-            app(\App\Backend\Modulos\Clinica\Servicios\SignosVitalesService::class)
+            app(\App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService::class)
                 ->registrarConEvaluacion($this->residenteEstable->cod_residente,
                     ['frecuencia_cardiaca' => 135], $this->enfermero);
             $this->fail('La transacción debía fallar.');
@@ -2839,7 +2839,7 @@ class MisPacientesRedisenadaTest extends TestCase
             'numero_documento' => 'MED-SIGNOS-01', 'profesion' => 'MEDICINA', 'estado' => 'ACTIVO',
         ]);
         $this->actingAs($medico);
-        app(\App\Backend\Modulos\Clinica\Acciones\DefinirObjetivoSignoVitalAction::class)
+        app(\App\Modulos\Clinica\Aplicacion\Acciones\DefinirObjetivoSignoVitalAction::class)
             ->ejecutar($this->residenteEstable->cod_residente, [
                 'parametro' => 'saturacion_oxigeno', 'min_objetivo' => 88,
                 'max_objetivo' => 92, 'min_critico' => 85, 'max_critico' => null,
@@ -2848,7 +2848,7 @@ class MisPacientesRedisenadaTest extends TestCase
 
         $this->actingAs($this->enfermero);
         $this->assertSame(['sat' => ['min' => 88.0, 'max' => 92.0]], $this->formularioSignos()->get('signosBandasObjetivo'));
-        $registro = app(\App\Backend\Modulos\Clinica\Servicios\SignosVitalesService::class)
+        $registro = app(\App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService::class)
             ->registrarConEvaluacion($this->residenteEstable->cod_residente,
                 ['saturacion_oxigeno' => 84], $this->enfermero);
 

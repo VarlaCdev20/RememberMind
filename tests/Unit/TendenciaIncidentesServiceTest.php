@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Backend\Modulos\Enfermeria\Servicios\TendenciaIncidentesService;
+use App\Modulos\Alertas\Aplicacion\Consultas\TendenciaIncidentesService;
 use Carbon\CarbonImmutable;
 use Tests\TestCase;
 

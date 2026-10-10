@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Clinica\Servicios\EventosClinicosService;
+use App\Modulos\Clinica\Aplicacion\Consultas\EventosClinicosService;
 use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
 use App\Models\Residente;
 use App\Models\Incidente;

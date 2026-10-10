@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Medicacion;
 
-use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
+use App\Modulos\Medicacion\Aplicacion\Acciones\RegistrarAdministracionMedicacionService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Medicacion\StoreAdministracionMedicacionRequest;
 use App\Models\Residente;

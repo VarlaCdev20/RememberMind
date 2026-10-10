@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Alertas;
 
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
-use App\Backend\Modulos\Alertas\Servicios\AlertasService;
+use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
 use App\Http\Controllers\Controller;
 use App\Models\Alerta;
 use App\Models\Residente;

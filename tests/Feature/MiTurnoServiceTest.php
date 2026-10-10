@@ -1548,7 +1548,7 @@ class MiTurnoServiceTest extends TestCase
         $crear('INC_TREND_02', $this->residenteAsignado->cod_residente, $hoy->copy()->subDays(7)->endOfDay());
         $crear('INC_TREND_03', $this->residenteAjeno->cod_residente, $hoy->copy()->setTime(9, 0));
 
-        $resumen = app(\App\Backend\Modulos\Enfermeria\Servicios\TendenciaIncidentesService::class)
+        $resumen = app(\App\Modulos\Alertas\Aplicacion\Consultas\TendenciaIncidentesService::class)
             ->resumir([$this->residenteAsignado->cod_residente], \Carbon\CarbonImmutable::instance($hoy));
 
         $this->assertSame(1, $resumen['total_periodo']);

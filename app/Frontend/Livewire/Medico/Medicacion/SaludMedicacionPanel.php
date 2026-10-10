@@ -3,7 +3,7 @@
 namespace App\Frontend\Livewire\Medico\Medicacion;
 
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
-use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
+use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
 use App\Models\Residente;
 use App\Models\Atencion;
 use App\Models\HorarioPrescripcion;
@@ -331,7 +331,7 @@ class SaludMedicacionPanel extends Component
 
     private function autorizarGestionOrden(): void
     {
-        abort_unless(app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class)
+        abort_unless(app(\App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService::class)
                 ->tieneRol(auth()->user(), ['MEDICO GENERAL/GERIATRA'])
             && auth()->user()?->can('prescripciones.crear'), 403,
             'Las prescripciones solo pueden ser creadas o modificadas por personal médico autorizado.');

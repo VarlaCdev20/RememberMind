@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Clinica\Servicios\ContextoClinicoService;
+use App\Modulos\Clinica\Aplicacion\Consultas\ContextoClinicoService;
 use App\Models\Residente;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;

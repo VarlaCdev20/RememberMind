@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService;
+use App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService;
 use App\Models\AdministracionMedicacion;
 use App\Models\AsignacionPersonal;
 use App\Models\Jornada;

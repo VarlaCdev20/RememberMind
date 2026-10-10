@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Alertas\Servicios\AlertasService;
-use App\Backend\Modulos\Alertas\Servicios\DeteccionAlertasService;
+use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
+use App\Modulos\Alertas\Aplicacion\Acciones\DeteccionAlertasService;
 use App\Frontend\Livewire\Compartido\Alertas\AlertasPanel;
 use App\Frontend\Livewire\Compartido\Alertas\SaludAlertasPanel;
 use App\Frontend\Livewire\Features\Alertas\HistorialAlerta;

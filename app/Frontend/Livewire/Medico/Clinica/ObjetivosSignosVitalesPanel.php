@@ -2,7 +2,7 @@
 
 namespace App\Frontend\Livewire\Medico\Clinica;
 
-use App\Backend\Modulos\Clinica\Acciones\DefinirObjetivoSignoVitalAction;
+use App\Modulos\Clinica\Aplicacion\Acciones\DefinirObjetivoSignoVitalAction;
 use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
 use App\Models\ObjetivoSignoVital;
 use App\Models\Residente;

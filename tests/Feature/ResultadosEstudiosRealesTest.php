@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Clinica\Servicios\ResultadosEstudiosService;
+use App\Modulos\Clinica\Aplicacion\Consultas\ResultadosEstudiosService;
 use App\Models\Residente;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Clinica\Servicios\SignosVitalesService;
+use App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\AsignacionResidenteJornada;
@@ -189,7 +189,7 @@ class Fase3SignosVitalesTest extends TestCase
             'vigente_desde' => now()->subHour(), 'vigente_hasta' => null, 'estado' => 'VIGENTE']));
         SignoVital::create(['cod_residente' => $this->residente->cod_residente, 'cod_personal' => $this->usuario->personal->cod_personal,
             'fecha_hora' => now()->subMinutes(30), 'frecuencia_cardiaca' => 105, 'estado' => 'ACTIVO']);
-        $evaluador = app(\App\Backend\Modulos\Clinica\SignosVitales\EvaluadorSignosVitales::class);
+        $evaluador = app(\App\Modulos\Clinica\Aplicacion\Acciones\EvaluadorSignosVitales::class);
         $historica = $evaluador->evaluar(['frecuencia_cardiaca' => 72, 'fecha_hora' => now()->subHours(2)], $this->residente->cod_residente);
         $this->assertSame('OBJETIVO_PERSONALIZADO', $historica->severidadGlobal()->value);
         $this->assertSame([], $historica->contextoHistorico);
@@ -213,14 +213,14 @@ class Fase3SignosVitalesTest extends TestCase
             }
         }
         $turnos->autorizarMutacionEnfermeria($this->residente->cod_residente, 'signos_vitales.crear', $this->usuario);
-        app(\App\Backend\Modulos\Alertas\Servicios\AlertasService::class)->registrarIntervencion(
+        app(\App\Modulos\Alertas\Aplicacion\Acciones\AlertasService::class)->registrarIntervencion(
             $registro->alerta, 'Se revisó al residente y se comunicó la lectura al médico.', $this->usuario);
         $this->assertSame('EN_ATENCION', $registro->alerta->fresh()->estado);
         $turnos->autorizarMutacionEnfermeria($this->residente->cod_residente, 'valoraciones_dolor.crear', $this->usuario);
         $this->assertDatabaseHas('eventos_alerta', ['cod_alerta' => $registro->alerta->cod_alerta, 'tipo_evento' => 'INTERVENCION']);
         $this->assertSame(135.0, $registro->signo->fresh()->frecuencia_cardiaca);
         $this->assertSame('CRITICO', $registro->evaluacion->severidadGlobal()->value);
-        $this->assertSame('CRITICO', app(\App\Backend\Modulos\Clinica\SignosVitales\EvaluadorSignosVitales::class)
+        $this->assertSame('CRITICO', app(\App\Modulos\Clinica\Aplicacion\Acciones\EvaluadorSignosVitales::class)
             ->evaluar(['frecuencia_cardiaca' => $registro->signo->frecuencia_cardiaca], $this->residente->cod_residente)->severidadGlobal()->value);
     }
 

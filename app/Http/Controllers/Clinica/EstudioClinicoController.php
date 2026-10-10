@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Clinica;
 
-use App\Backend\Modulos\Clinica\Servicios\AutorizacionClinicaService;
+use App\Modulos\Clinica\Aplicacion\Acciones\AutorizacionClinicaService;
 use App\Http\Controllers\Controller;
 use App\Models\Atencion;
 use App\Models\ComponenteEstudio;

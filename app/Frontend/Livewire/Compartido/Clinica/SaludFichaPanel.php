@@ -5,7 +5,7 @@ namespace App\Frontend\Livewire\Compartido\Clinica;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Residente;
-use App\Backend\Modulos\Clinica\Servicios\FichaMedicaService;
+use App\Modulos\Clinica\Aplicacion\Acciones\FichaMedicaService;
 use Illuminate\Support\Facades\DB;
 
 class SaludFichaPanel extends Component

@@ -2,16 +2,16 @@
 
 namespace App\Frontend\Livewire\Compartido\Clinica;
 
-use App\Backend\Modulos\Alertas\Servicios\AlertasService;
-use App\Backend\Modulos\Clinica\Servicios\ContextoClinicoService;
-use App\Backend\Modulos\Clinica\Servicios\EventosClinicosService;
-use App\Backend\Modulos\Clinica\Servicios\ResultadosEstudiosService;
-use App\Backend\Modulos\Clinica\Servicios\SignosVitalesService;
+use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
+use App\Modulos\Clinica\Aplicacion\Consultas\ContextoClinicoService;
+use App\Modulos\Clinica\Aplicacion\Consultas\EventosClinicosService;
+use App\Modulos\Clinica\Aplicacion\Consultas\ResultadosEstudiosService;
+use App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService;
 use App\Backend\Modulos\Documentos\Servicios\DocumentacionResidenteService;
 use App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
-use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
-use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
+use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
+use App\Modulos\Medicacion\Aplicacion\Acciones\RegistrarAdministracionMedicacionService;
 use App\Models\Alerta;
 use App\Models\Atencion;
 use App\Models\Documento;

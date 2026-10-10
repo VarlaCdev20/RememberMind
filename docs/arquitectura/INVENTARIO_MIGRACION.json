@@ -48,5 +48,175 @@
     "origen": "app/Backend/Modulos/Identidad/Servicios/GeneradorPlanillaEnfermeriaService.php",
     "destino": "app/Modulos/Institucion/Infraestructura/Exportaciones/GeneradorPlanillaEnfermeriaService.php",
     "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Alertas/Servicios/AlertasService.php",
+    "destino": "app/Modulos/Alertas/Aplicacion/Acciones/AlertasService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Alertas/Servicios/DeteccionAlertasService.php",
+    "destino": "app/Modulos/Alertas/Aplicacion/Acciones/DeteccionAlertasService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Acciones/DefinirObjetivoSignoVitalAction.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/DefinirObjetivoSignoVitalAction.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Acciones/RegistrarSignosVitalesAction.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/RegistrarSignosVitalesAction.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Servicios/AccesoClinicoTemporalService.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/AccesoClinicoTemporalService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Servicios/AutorizacionClinicaService.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/AutorizacionClinicaService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Servicios/ClasificacionSignosVitalesService.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Adaptadores/ClasificacionSignosVitalesService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Servicios/ContextoClinicoService.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Consultas/ContextoClinicoService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Servicios/EventosClinicosService.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Consultas/EventosClinicosService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Servicios/FichaMedicaService.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/FichaMedicaService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Servicios/ResultadosEstudiosService.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Consultas/ResultadosEstudiosService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Servicios/SignosVitalesService.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/SignosVitalesService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Servicios/ValidacionSignosVitalesService.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Validacion/ValidacionSignosVitalesService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/EvaluadorSignosVitales.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/EvaluadorSignosVitales.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Reglas/ReglaBase.php",
+    "destino": "app/Modulos/Clinica/Dominio/Reglas/ReglaBase.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Reglas/ReglaClinica.php",
+    "destino": "app/Modulos/Clinica/Dominio/Reglas/ReglaClinica.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Reglas/ReglaFrecuenciaCardiaca.php",
+    "destino": "app/Modulos/Clinica/Dominio/Reglas/ReglaFrecuenciaCardiaca.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Reglas/ReglaFrecuenciaRespiratoria.php",
+    "destino": "app/Modulos/Clinica/Dominio/Reglas/ReglaFrecuenciaRespiratoria.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Reglas/ReglaGlucemia.php",
+    "destino": "app/Modulos/Clinica/Dominio/Reglas/ReglaGlucemia.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Reglas/ReglaPresionArterial.php",
+    "destino": "app/Modulos/Clinica/Dominio/Reglas/ReglaPresionArterial.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Reglas/ReglaSaturacionOxigeno.php",
+    "destino": "app/Modulos/Clinica/Dominio/Reglas/ReglaSaturacionOxigeno.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Reglas/ReglaTemperatura.php",
+    "destino": "app/Modulos/Clinica/Dominio/Reglas/ReglaTemperatura.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Resultados/EvaluacionSignosVitales.php",
+    "destino": "app/Modulos/Clinica/Dominio/ObjetosValor/EvaluacionSignosVitales.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Resultados/RegistroSignosVitales.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/DTOs/RegistroSignosVitales.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Resultados/ResultadoReglaClinica.php",
+    "destino": "app/Modulos/Clinica/Dominio/ObjetosValor/ResultadoReglaClinica.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/ServicioBasalSignosVitales.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Consultas/ServicioBasalSignosVitales.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/ServicioDecisionAlertaClinica.php",
+    "destino": "app/Modulos/Alertas/Aplicacion/Acciones/ServicioDecisionAlertaClinica.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/ServicioObjetivosPersonalizados.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Consultas/ServicioObjetivosPersonalizados.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Tipos/ComportamientoAlerta.php",
+    "destino": "app/Modulos/Clinica/Dominio/Enumeraciones/ComportamientoAlerta.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Tipos/SeveridadClinica.php",
+    "destino": "app/Modulos/Clinica/Dominio/Enumeraciones/SeveridadClinica.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/IncidentesEnfermeriaService.php",
+    "destino": "app/Modulos/Alertas/Aplicacion/Acciones/IncidentesEnfermeriaService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/TendenciaIncidentesService.php",
+    "destino": "app/Modulos/Alertas/Aplicacion/Consultas/TendenciaIncidentesService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Medicacion/Servicios/AgendaMedicacionService.php",
+    "destino": "app/Modulos/Medicacion/Aplicacion/Consultas/AgendaMedicacionService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Medicacion/Servicios/RegistrarAdministracionMedicacionService.php",
+    "destino": "app/Modulos/Medicacion/Aplicacion/Acciones/RegistrarAdministracionMedicacionService.php",
+    "estado": "Migrado"
   }
 ]

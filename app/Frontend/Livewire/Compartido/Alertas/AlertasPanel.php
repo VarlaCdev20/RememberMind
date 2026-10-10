@@ -3,8 +3,8 @@
 namespace App\Frontend\Livewire\Compartido\Alertas;
 
 use App\Models\{Residente, Alerta, SignoVital, Turno, User};
-use App\Backend\Modulos\Alertas\Servicios\DeteccionAlertasService;
-use App\Backend\Modulos\Alertas\Servicios\AlertasService;
+use App\Modulos\Alertas\Aplicacion\Acciones\DeteccionAlertasService;
+use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\Attributes\Locked;

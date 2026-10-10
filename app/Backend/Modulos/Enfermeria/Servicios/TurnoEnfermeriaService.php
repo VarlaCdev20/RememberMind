@@ -2,7 +2,7 @@
 
 namespace App\Backend\Modulos\Enfermeria\Servicios;
 
-use App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService;
+use App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Residente;
 use App\Models\Turno;

@@ -3,7 +3,7 @@ namespace Tests\Feature;
 
 use App\Frontend\Livewire\Compartido\Alertas\AlertasPanel;
 use App\Models\{Residente, Alerta, User, SignoVital, Atencion};
-use App\Backend\Modulos\Alertas\Servicios\DeteccionAlertasService;
+use App\Modulos\Alertas\Aplicacion\Acciones\DeteccionAlertasService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;

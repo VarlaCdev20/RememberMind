@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Clinica;
 
-use App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService;
+use App\Modulos\Clinica\Presentacion\Http\Validacion\ValidacionSignosVitalesService;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use Illuminate\Foundation\Http\FormRequest;
 

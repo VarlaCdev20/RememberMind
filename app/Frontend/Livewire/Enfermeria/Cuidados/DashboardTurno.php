@@ -2,14 +2,14 @@
 
 namespace App\Frontend\Livewire\Enfermeria\Cuidados;
 
-use App\Backend\Modulos\Alertas\Servicios\AlertasService;
-use App\Backend\Modulos\Clinica\Servicios\SignosVitalesService;
+use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
+use App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService;
 use App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService;
 use App\Backend\Modulos\Enfermeria\Servicios\DashboardComplementosService;
-use App\Backend\Modulos\Enfermeria\Servicios\TendenciaIncidentesService;
+use App\Modulos\Alertas\Aplicacion\Consultas\TendenciaIncidentesService;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
-use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
-use App\Backend\Modulos\Medicacion\Servicios\RegistrarAdministracionMedicacionService;
+use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
+use App\Modulos\Medicacion\Aplicacion\Acciones\RegistrarAdministracionMedicacionService;
 use App\Backend\Modulos\Reportes\Servicios\DashboardPhotoRotation;
 use App\Models\AdministracionMedicacion;
 use App\Models\Alerta;
@@ -137,7 +137,7 @@ class DashboardTurno extends Component
         $personal = $user->personal;
         abort_unless($personal, 403, 'Acción no permitida: Personal no vinculado al usuario.');
 
-        $accesoTemporal = app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class);
+        $accesoTemporal = app(\App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService::class);
         if ($accesoTemporal->sustituyeRol($user)) {
             if ($permiso) {
                 abort_unless($user->can($permiso), 403);
@@ -161,7 +161,7 @@ class DashboardTurno extends Component
             abort_unless($user->can($permiso), 403, "Acción no permitida: Carece del permiso [{$permiso}].");
         }
 
-        abort_unless(app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class)
+        abort_unless(app(\App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService::class)
             ->tieneRol($user, ['ENFERMEROS']), 403, 'Acción clínica no permitida: Rol ENFERMEROS requerido.');
 
         // 5. Residente asignado en la jornada activa

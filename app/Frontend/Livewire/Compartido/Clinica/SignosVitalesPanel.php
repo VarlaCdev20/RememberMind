@@ -2,7 +2,7 @@
 
 namespace App\Frontend\Livewire\Compartido\Clinica;
 
-use App\Backend\Modulos\Clinica\Servicios\ClasificacionSignosVitalesService;
+use App\Modulos\Clinica\Presentacion\Adaptadores\ClasificacionSignosVitalesService;
 use Livewire\Component;
 use App\Models\Residente;
 use App\Models\SignoVital;

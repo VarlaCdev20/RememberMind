@@ -14,7 +14,7 @@ use App\Models\Medicamento;
 use App\Models\Prescripcion;
 use App\Models\Turno;
 use App\Models\User;
-use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
+use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
 use Carbon\Carbon;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;

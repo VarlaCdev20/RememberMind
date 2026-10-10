@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Clinica\StoreSignosVitalesRequest;
 use App\Models\Residente;
 use App\Models\SignoVital;
-use App\Backend\Modulos\Clinica\Servicios\SignosVitalesService;
+use App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService;
 
 class AdultoMayorSignosVitalesController extends Controller
 {

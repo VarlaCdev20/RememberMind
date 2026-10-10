@@ -2,7 +2,7 @@
 
 namespace App\Frontend\Livewire\Compartido\Valoraciones;
 
-use App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService;
+use App\Modulos\Clinica\Presentacion\Http\Validacion\ValidacionSignosVitalesService;
 use App\Models\Preadmision;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -262,7 +262,7 @@ class ValoracionInicialModal extends Component
             abort(403, 'Usuario no autenticado o inactivo.');
         }
 
-        if (! app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class)
+        if (! app(\App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService::class)
             ->tieneRol($user, ['ENFERMEROS'])) {
             abort(403, 'El usuario no posee el rol institucional de ENFERMEROS.');
         }

@@ -2,8 +2,8 @@
 
 namespace App\Frontend\Livewire\Compartido\Clinica;
 
-use App\Backend\Modulos\Clinica\Servicios\SignosVitalesService;
-use App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService;
+use App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService;
+use App\Modulos\Clinica\Presentacion\Http\Validacion\ValidacionSignosVitalesService;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use App\Models\Residente;
 use App\Models\SignoVital;

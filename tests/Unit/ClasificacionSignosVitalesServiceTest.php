@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Backend\Modulos\Clinica\Servicios\ClasificacionSignosVitalesService;
+use App\Modulos\Clinica\Presentacion\Adaptadores\ClasificacionSignosVitalesService;
 use App\Models\SignoVital;
 use Tests\TestCase;
 

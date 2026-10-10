@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Medicacion;
 
-use App\Backend\Modulos\Clinica\Servicios\ContextoClinicoService;
+use App\Modulos\Clinica\Aplicacion\Consultas\ContextoClinicoService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Medicacion\StoreMedicacionRequest;
 use App\Http\Requests\Medicacion\UpdateMedicacionRequest;

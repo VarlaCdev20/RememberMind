@@ -26,7 +26,7 @@ use App\Models\SignoVital;
 use App\Models\Turno;
 use App\Models\User;
 use App\Models\ValoracionDolor;
-use App\Backend\Modulos\Medicacion\Servicios\AgendaMedicacionService;
+use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -45,7 +45,7 @@ class PaseTurnoService
     private function autorizarPersonal(?User $usuario, ?string $permiso = null): Personal
     {
         abort_unless($usuario?->estado === 'ACTIVO'
-            && app(\App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService::class)
+            && app(\App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService::class)
                 ->tieneRol($usuario, ['ENFERMEROS']), 403, 'La operación requiere una cuenta activa de Enfermería.');
         abort_if($permiso !== null && ! $usuario->can($permiso), 403, 'No cuenta con el permiso requerido para esta acción.');
         $personal = Personal::query()->where('cod_usuario', $usuario->cod_usuario)->where('estado', 'ACTIVO')->first();

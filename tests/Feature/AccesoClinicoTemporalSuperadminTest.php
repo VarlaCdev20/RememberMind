@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Clinica\Servicios\AccesoClinicoTemporalService;
-use App\Backend\Modulos\Clinica\Servicios\AutorizacionClinicaService;
+use App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService;
+use App\Modulos\Clinica\Aplicacion\Acciones\AutorizacionClinicaService;
 use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
 use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
 use App\Models\Residente;

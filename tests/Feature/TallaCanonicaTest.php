@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Clinica\Servicios\ValidacionSignosVitalesService;
+use App\Modulos\Clinica\Presentacion\Http\Validacion\ValidacionSignosVitalesService;
 use App\Models\Preadmision;
 use App\Models\Residente;
 use App\Models\User;
