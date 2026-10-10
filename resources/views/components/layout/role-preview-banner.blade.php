@@ -1,4 +1,4 @@
-@inject('rolePreview', 'App\Backend\Modulos\Identidad\Servicios\RolePreviewService')
+@inject('rolePreview', 'App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService')
 @php
     $previewLabel = $rolePreview->label(auth()->user());
 @endphp

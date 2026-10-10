@@ -1,5 +1,5 @@
 @props(['perfil' => [], 'saludo' => []])
-@inject('visibilidadNavegacion', 'App\Backend\Modulos\Identidad\Servicios\VisibilidadNavegacion')
+@inject('visibilidadNavegacion', 'App\Modulos\Identidad\Presentacion\Navegacion\VisibilidadNavegacion')
 
 @php
     $indicadores = $perfil['indicadores'] ?? [];

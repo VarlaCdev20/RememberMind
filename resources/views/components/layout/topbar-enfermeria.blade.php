@@ -45,7 +45,7 @@
 
         {{-- Campana de Notificaciones / Alertas --}}
         @auth
-            @if(app(\App\Backend\Modulos\Identidad\Servicios\VisibilidadNavegacion::class)->puedeVerRuta('admin.enfermeria.alertas'))
+            @if(app(\App\Modulos\Identidad\Presentacion\Navegacion\VisibilidadNavegacion::class)->puedeVerRuta('admin.enfermeria.alertas'))
             <a href="{{ route('admin.enfermeria.alertas') }}"
                class="rm-topbar__action rm-topbar__notification"
                title="Notificaciones y alertas" aria-label="Ver alertas">
@@ -116,7 +116,7 @@
                 class="absolute right-0 mt-2 w-56 rounded-[var(--rm-radius-lg)] border border-[var(--rm-border-soft)] bg-[var(--rm-surface-main)] p-2 shadow-[var(--rm-shadow-floating)] z-50">
 
         @if(auth()->user()?->hasRole('SUPERADMINISTRADOR'))
-            @inject('rolePreview', 'App\Backend\Modulos\Identidad\Servicios\RolePreviewService')
+            @inject('rolePreview', 'App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService')
             <form method="POST" action="{{ route('role-preview.store') }}" class="rm-topbar__role-preview">
                 @csrf
                 <label for="nursing-role-preview-selector" class="sr-only">Ver como rol</label>

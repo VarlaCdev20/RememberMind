@@ -7,7 +7,7 @@
     'compact' => false,
 ])
 @php
-    $assignedRole = app(\App\Backend\Modulos\Identidad\Servicios\RolePreviewService::class)->activeRole(auth()->user())
+    $assignedRole = app(\App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService::class)->activeRole(auth()->user())
         ?? (request()->routeIs('admin.enfermeria.*') && auth()->user()?->hasRole('ENFERMEROS')
             ? 'ENFERMEROS'
             : auth()->user()?->getRoleNames()->first());

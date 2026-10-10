@@ -1,5 +1,5 @@
 @php
-    $topbarPreviewRole = app(\App\Backend\Modulos\Identidad\Servicios\RolePreviewService::class)->activeRole(auth()->user());
+    $topbarPreviewRole = app(\App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService::class)->activeRole(auth()->user());
     $isAdministracionTopbar = $topbarPreviewRole === 'ADMINISTRADOR'
         || ($topbarPreviewRole === null && auth()->user()?->hasRole('ADMINISTRADOR') && ! auth()->user()?->hasRole('SUPERADMINISTRADOR'));
     $nombreUsuario = trim((string) (auth()->user()?->nombres ?: auth()->user()?->name ?: 'Usuario'));
@@ -7,10 +7,10 @@
     $rolUsuario = $isAdministracionTopbar ? 'Administración' : (auth()->user()?->getRoleNames()->first() ?? 'Usuario');
     $partesNombreUsuario = preg_split('/\s+/u', $nombreUsuario, -1, PREG_SPLIT_NO_EMPTY) ?: [];
     $inicialesUsuario = mb_strtoupper(mb_substr($partesNombreUsuario[0] ?? 'U', 0, 1).(isset($partesNombreUsuario[1]) ? mb_substr($partesNombreUsuario[1], 0, 1) : ''));
-    $brandRoute = $isAdministracionTopbar && app(\App\Backend\Modulos\Identidad\Servicios\VisibilidadNavegacion::class)->puedeVerRuta('admin.administracion.dashboard')
+    $brandRoute = $isAdministracionTopbar && app(\App\Modulos\Identidad\Presentacion\Navegacion\VisibilidadNavegacion::class)->puedeVerRuta('admin.administracion.dashboard')
         ? 'admin.administracion.dashboard' : 'dashboard';
     $subtituloModulo = $isAdministracionTopbar ? 'Administración' : 'Panel General';
-    $puedeBuscarAdministracion = app(\App\Backend\Modulos\Identidad\Servicios\VisibilidadNavegacion::class)
+    $puedeBuscarAdministracion = app(\App\Modulos\Identidad\Presentacion\Navegacion\VisibilidadNavegacion::class)
         ->puedeVerRuta('admin.administracion.buscar');
     $rutaBuscar = $puedeBuscarAdministracion ? route('admin.administracion.buscar') : null;
     $placeholderBuscar = $isAdministracionTopbar ? 'Buscar en Administración (residentes, documentos, etc.)…' : 'Buscar en el sistema…';
@@ -114,7 +114,7 @@
                 class="absolute right-0 mt-2 w-56 rounded-[var(--rm-radius-lg)] border border-[var(--rm-border-soft)] bg-[var(--rm-surface-main)] p-2 shadow-[var(--rm-shadow-floating)] z-50">
 
         @if(auth()->user()?->hasRole('SUPERADMINISTRADOR'))
-            @inject('rolePreview', 'App\Backend\Modulos\Identidad\Servicios\RolePreviewService')
+            @inject('rolePreview', 'App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService')
             <form method="POST" action="{{ route('role-preview.store') }}" class="rm-topbar__role-preview">
                 @csrf
                 <label for="role-preview-selector" class="sr-only">Ver como rol</label>

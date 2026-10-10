@@ -107,7 +107,7 @@
 </head>
 
 @php
-    $shellVisualRole = app(\App\Backend\Modulos\Identidad\Servicios\RolePreviewService::class)->activeRole(auth()->user())
+    $shellVisualRole = app(\App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService::class)->activeRole(auth()->user())
         ?? (auth()->user()?->hasRole('ENFERMEROS') ? 'ENFERMEROS' : auth()->user()?->getRoleNames()->first());
     $shellRoleAccent = config('dashboard-header.variants.'.($shellVisualRole ?? '').'.tone', 'nursing');
 @endphp
@@ -171,7 +171,7 @@
 
         <x-layout.role-preview-banner />
 
-        @inject('rolePreview', 'App\Backend\Modulos\Identidad\Servicios\RolePreviewService')
+        @inject('rolePreview', 'App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService')
         @php($rolePreviewActive = $rolePreview->isActive(auth()->user()))
 
         {{-- ========================================================= --}}

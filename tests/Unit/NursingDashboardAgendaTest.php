@@ -63,7 +63,7 @@ class NursingDashboardAgendaTest extends TestCase
 
     public function test_graficas_del_turno_usan_indicadores_verificables_sin_inventar_clasificacion_clinica(): void
     {
-        $vista = file_get_contents(resource_path('views/livewire/cuidados/dashboard-turno.blade.php'));
+        $vista = file_get_contents(base_path('app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/dashboard-turno.blade.php'));
         $inicio = strpos($vista, '<x-ui.card class="rm-nursing-dashboard__distribution');
         $fin = strpos($vista, '</x-ui.card>', $inicio);
         $card = substr($vista, $inicio, $fin - $inicio);

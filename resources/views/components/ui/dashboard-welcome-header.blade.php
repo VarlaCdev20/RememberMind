@@ -27,7 +27,7 @@
         $nombreCompleto = 'equipo de Enfermería';
     }
     $nombreLargo = mb_strlen($nombreCompleto, 'UTF-8') > 32;
-    $rol = app(\App\Backend\Modulos\Identidad\Servicios\RolePreviewService::class)->activeRole($usuario)
+    $rol = app(\App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService::class)->activeRole($usuario)
         ?? (request()->routeIs('admin.enfermeria.*') && $usuario?->hasRole('ENFERMEROS')
             ? 'ENFERMEROS'
             : $usuario?->getRoleNames()->first());

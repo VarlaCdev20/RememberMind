@@ -276,7 +276,7 @@ class FrontendArchitectureTest extends TestCase
         ];
 
         foreach ($vistas as $vista) {
-            $path = resource_path("views/{$vista}");
+            $path = $this->rutaVistaArchivo($vista);
             $this->assertFileExists($path);
 
             $contenido = File::get($path);
@@ -306,7 +306,7 @@ class FrontendArchitectureTest extends TestCase
         ];
 
         foreach ($vistas as $vista) {
-            $path = resource_path("views/{$vista}");
+            $path = $this->rutaVistaArchivo($vista);
             $contenido = File::get($path);
 
             $this->assertStringContainsString('<x-ui.page-header', $contenido, "{$vista} debe usar la cabecera canónica.");
@@ -318,11 +318,11 @@ class FrontendArchitectureTest extends TestCase
             );
         }
 
-        $signos = File::get(resource_path('views/livewire/clinica/salud-signos-panel.blade.php'));
-        $seguimiento = File::get(resource_path('views/livewire/clinica/salud-seguimiento-list-panel.blade.php'));
-        $resumenFicha = File::get(resource_path('views/livewire/cuidados/ficha/tab-resumen.blade.php'));
-        $ficha = File::get(resource_path('views/livewire/cuidados/ficha-paciente.blade.php'));
-        $cabeceraFicha = File::get(resource_path('views/livewire/cuidados/ficha/cabecera.blade.php'));
+        $signos = File::get(base_path('app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/salud-signos-panel.blade.php'));
+        $seguimiento = File::get(base_path('app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/salud-seguimiento-list-panel.blade.php'));
+        $resumenFicha = File::get(base_path('app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-resumen.blade.php'));
+        $ficha = File::get(base_path('app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha-paciente.blade.php'));
+        $cabeceraFicha = File::get(base_path('app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/cabecera.blade.php'));
         $this->assertStringContainsString('<x-ui.filter-bar', $signos, 'Signos vitales debe usar la barra de filtros canónica.');
         $this->assertStringContainsString("['card' =>", $signos, 'Los estados de signos vitales deben conservar clases de tarjeta y texto separadas.');
         $this->assertStringContainsString('rm-drawer-wide', $seguimiento, 'El expediente de seguimiento debe usar el drawer flotante ancho.');
@@ -340,7 +340,7 @@ class FrontendArchitectureTest extends TestCase
     public function test_layouts_y_overlays_comparten_profundidad_y_validacion_canonicas(): void
     {
         foreach (['layouts/sistema.blade.php', 'layouts/enfermeria.blade.php'] as $vista) {
-            $contenido = File::get(resource_path("views/{$vista}"));
+            $contenido = File::get($this->rutaVistaArchivo($vista));
             $this->assertStringContainsString('rm-depth-canvas', $contenido, "{$vista} debe activar la profundidad ambiental canónica.");
         }
 
@@ -352,8 +352,8 @@ class FrontendArchitectureTest extends TestCase
         $modal = File::get(resource_path('views/components/ui/modal-livewire.blade.php'));
         $drawer = File::get(resource_path('views/components/ui/drawer-livewire.blade.php'));
         $validation = File::get(resource_path('views/components/validation-errors.blade.php'));
-        $detalleAlerta = File::get(resource_path('views/livewire/alertas/modales/detalle.blade.php'));
-        $panelAlertas = File::get(resource_path('views/livewire/alertas/alertas-panel.blade.php'));
+        $detalleAlerta = File::get(base_path('app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/detalle.blade.php'));
+        $panelAlertas = File::get(base_path('app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/alertas-panel.blade.php'));
 
         $this->assertStringContainsString('<x-validation-errors', $modal);
         $this->assertStringContainsString('rm-drawer', $drawer);
@@ -368,9 +368,9 @@ class FrontendArchitectureTest extends TestCase
     {
         $componente = File::get(resource_path('views/components/ui/role-dashboard-hero.blade.php'));
         $encabezadoAdmin = File::get(resource_path('views/components/ui/encabezado-dashboard.blade.php'));
-        $enfermeria = File::get(resource_path('views/livewire/cuidados/dashboard-turno.blade.php'));
-        $medicina = File::get(resource_path('views/livewire/clinica/dashboard-medico.blade.php'));
-        $psicologia = File::get(resource_path('views/livewire/valoraciones/dashboard-psicologo.blade.php'));
+        $enfermeria = File::get(base_path('app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/dashboard-turno.blade.php'));
+        $medicina = File::get(base_path('app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/dashboard-medico.blade.php'));
+        $psicologia = File::get(base_path('app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/dashboard-psicologo.blade.php'));
         $workspaceRol = File::get(resource_path('views/components/ui/role-workspace-dashboard.blade.php'));
 
         $this->assertStringContainsString('<x-ui.dashboard-header', $componente);
@@ -381,12 +381,12 @@ class FrontendArchitectureTest extends TestCase
         $this->assertStringContainsString('<x-ui.role-dashboard-hero', $psicologia);
         $this->assertStringContainsString('<x-ui.role-dashboard-hero', $workspaceRol);
         $this->assertStringContainsString('<x-ui.dashboard-header', File::get(resource_path('views/components/ui/dashboard-welcome-header.blade.php')));
-        $this->assertStringContainsString('<x-ui.dashboard-header', File::get(resource_path('views/pages/admin/administracion/dashboard.blade.php')));
+        $this->assertStringContainsString('<x-ui.dashboard-header', File::get(base_path('app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/dashboard.blade.php')));
         $this->assertStringContainsString('<x-ui.dashboard-data-panel', $workspaceRol);
 
         $this->assertStringNotContainsString(':compact="true"', $enfermeria);
         $this->assertStringContainsString('<x-ui.dashboard-divider />', $enfermeria);
-        foreach ([$workspaceRol, $medicina, $psicologia, File::get(resource_path('views/pages/admin/administracion/dashboard.blade.php'))] as $dashboard) {
+        foreach ([$workspaceRol, $medicina, $psicologia, File::get(base_path('app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/dashboard.blade.php'))] as $dashboard) {
             $this->assertStringContainsString('<x-ui.dashboard-divider />', $dashboard);
         }
 
@@ -451,7 +451,7 @@ class FrontendArchitectureTest extends TestCase
         ];
 
         foreach ($vistasConGraficas as $vista) {
-            $contenido = File::get(resource_path("views/{$vista}"));
+            $contenido = File::get($this->rutaVistaArchivo($vista));
             $this->assertStringContainsString(
                 'rm-chart-card',
                 $contenido,
@@ -492,8 +492,8 @@ class FrontendArchitectureTest extends TestCase
         $indice = File::get(resource_path('frontend/styles/design-system/index.css'));
         $workspace = File::get(resource_path('frontend/styles/design-system/patterns/nursing-module.css'));
         $layout = File::get(resource_path('views/layouts/enfermeria.blade.php'));
-        $seguimiento = File::get(resource_path('views/livewire/cuidados/seguimiento-diario-panel.blade.php'));
-        $medicacion = File::get(resource_path('views/livewire/medicacion/administracion-medicacion-modal.blade.php'));
+        $seguimiento = File::get(base_path('app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/seguimiento-diario-panel.blade.php'));
+        $medicacion = File::get(base_path('app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/administracion-medicacion-modal.blade.php'));
 
         $this->assertStringContainsString("@import './patterns/nursing-module.css'", $indice);
         $this->assertStringContainsString('rm-nursing-shell', $layout);

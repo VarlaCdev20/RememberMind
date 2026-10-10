@@ -1,5 +1,5 @@
 @props(['adulto'])
-@inject('visibilidadNavegacion', 'App\Backend\Modulos\Identidad\Servicios\VisibilidadNavegacion')
+@inject('visibilidadNavegacion', 'App\Modulos\Identidad\Presentacion\Navegacion\VisibilidadNavegacion')
 
 @php
     $codigo = data_get($adulto, 'cod_residente');

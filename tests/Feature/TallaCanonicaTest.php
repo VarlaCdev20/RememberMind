@@ -85,18 +85,18 @@ class TallaCanonicaTest extends TestCase
 
     public function test_vistas_declaran_step_0_1_y_rango_canonico_en_inputs_de_talla(): void
     {
-        $f1 = resource_path('views/livewire/clinica/registro-signos-vitales-modal.blade.php');
+        $f1 = base_path('app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/registro-signos-vitales-modal.blade.php');
         $c1 = file_get_contents($f1);
         $this->assertStringContainsString('step="0.1"', $c1);
         $this->assertStringContainsString('min="50"', $c1);
         $this->assertStringContainsString('max="240"', $c1);
 
-        $f2 = resource_path('views/livewire/clinica/salud-signos-panel.blade.php');
+        $f2 = base_path('app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/salud-signos-panel.blade.php');
         $c2 = file_get_contents($f2);
         $this->assertStringNotContainsString('step="0.5"', $c2);
         $this->assertStringContainsString('step="0.1"', $c2);
 
-        $f3 = resource_path('views/livewire/valoraciones/valoracion-inicial-modal.blade.php');
+        $f3 = base_path('app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/valoracion-inicial-modal.blade.php');
         $c3 = file_get_contents($f3);
         $this->assertStringContainsString('step="0.1"', $c3);
         $this->assertStringContainsString('min="50"', $c3);

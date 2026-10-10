@@ -1,11 +1,11 @@
-@inject('sidebarService', 'App\Backend\Modulos\Identidad\Servicios\SidebarService')
+@inject('sidebarService', 'App\Modulos\Identidad\Presentacion\Navegacion\SidebarService')
 @php
     $sections = $sidebarService->getSidebar();
     $sidebarUser = auth()->user();
     $sidebarName = trim((string) ($sidebarUser?->nombres ?: $sidebarUser?->name ?: 'Usuario'));
     $sidebarNameParts = preg_split('/\s+/u', $sidebarName, -1, PREG_SPLIT_NO_EMPTY) ?: [];
     $sidebarInitials = mb_strtoupper(mb_substr($sidebarNameParts[0] ?? 'U', 0, 1).mb_substr($sidebarNameParts[1] ?? '', 0, 1));
-    $previewRole = app(\App\Backend\Modulos\Identidad\Servicios\RolePreviewService::class)->activeRole(auth()->user());
+    $previewRole = app(\App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService::class)->activeRole(auth()->user());
     $sidebarRole = $previewRole
         ?? (request()->routeIs('admin.enfermeria.*') && $sidebarUser?->hasRole('ENFERMEROS')
             ? 'ENFERMEROS'
@@ -44,7 +44,7 @@
     }
     $initialOpen = $activeLocation !== null && $activeLocation['item'] !== null ? $activeLocation['section'] : null;
     $activeNursingSection = $sidebarRole === 'ENFERMEROS' && $initialOpen !== null ? $sections[$initialOpen]['title'] : null;
-    $inicioAdministracion = $isAdministracion && app(\App\Backend\Modulos\Identidad\Servicios\VisibilidadNavegacion::class)->puedeVerRuta('admin.administracion.dashboard');
+    $inicioAdministracion = $isAdministracion && app(\App\Modulos\Identidad\Presentacion\Navegacion\VisibilidadNavegacion::class)->puedeVerRuta('admin.administracion.dashboard');
     $brandRoute = request()->routeIs('admin.enfermeria.*') ? 'admin.enfermeria.dashboard' : ($inicioAdministracion ? 'admin.administracion.dashboard' : 'dashboard');
 @endphp
 

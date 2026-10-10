@@ -105,7 +105,7 @@
 </head>
 
 @php
-    $shellPreviewRole = app(\App\Backend\Modulos\Identidad\Servicios\RolePreviewService::class)->activeRole(auth()->user());
+    $shellPreviewRole = app(\App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService::class)->activeRole(auth()->user());
     $shellAdministracion = $shellPreviewRole === 'ADMINISTRADOR'
         || ($shellPreviewRole === null && auth()->user()?->hasRole('ADMINISTRADOR') && ! auth()->user()?->hasRole('SUPERADMINISTRADOR'));
     $shellVisualRole = $shellPreviewRole
@@ -172,7 +172,7 @@
 
         <x-layout.role-preview-banner />
 
-        @inject('rolePreview', 'App\Backend\Modulos\Identidad\Servicios\RolePreviewService')
+        @inject('rolePreview', 'App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService')
         @php($rolePreviewActive = $rolePreview->isActive(auth()->user()))
 
         {{-- Área Principal de Contenido --}}

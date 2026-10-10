@@ -17,7 +17,7 @@
 
 @php
     $heroImage = $rotationContext
-        ? app(\App\Backend\Modulos\Reportes\Servicios\DashboardPhotoRotation::class)->heroImage($rotationContext, $image)
+        ? app(\App\Modulos\Reportes\Presentacion\DashboardPhotoRotation::class)->heroImage($rotationContext, $image)
         : $image;
 @endphp
 

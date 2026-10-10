@@ -1098,5 +1098,1245 @@
     "origen": "app/Frontend/Livewire/Superadministrador/SistemaExperto/ConocimientoPanel.php",
     "destino": "app/Modulos/ApoyoDecision/Presentacion/Livewire/Paginas/ConocimientoPanel.php",
     "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/actividades/actividades-panel.blade.php",
+    "destino": "app/Modulos/Social/Presentacion/Vistas/livewire/actividades/actividades-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/actividades/asistencia-panel.blade.php",
+    "destino": "app/Modulos/Social/Presentacion/Vistas/livewire/actividades/asistencia-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/actividades/participacion-panel.blade.php",
+    "destino": "app/Modulos/Social/Presentacion/Vistas/livewire/actividades/participacion-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/actividades/reportes-actividades-panel.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/livewire/actividades/reportes-actividades-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/actividades/tipos-actividad-panel.blade.php",
+    "destino": "app/Modulos/Social/Presentacion/Vistas/livewire/actividades/tipos-actividad-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/admisiones/alojamiento-residente.blade.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Vistas/livewire/admisiones/alojamiento-residente.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/admisiones/decision-admision-modal.blade.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Vistas/livewire/admisiones/decision-admision-modal.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/admisiones/habitaciones-panel.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/livewire/admisiones/habitaciones-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/admisiones/partials/preadmisiones-listado.blade.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Vistas/livewire/admisiones/partials/preadmisiones-listado.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/admisiones/partials/preadmisiones-timeline.blade.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Vistas/livewire/admisiones/partials/preadmisiones-timeline.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/admisiones/partials/preadmisiones-workspace.blade.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Vistas/livewire/admisiones/partials/preadmisiones-workspace.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/admisiones/preadmision-wizard.blade.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Vistas/livewire/admisiones/preadmision-wizard.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/admisiones/preadmisiones-panel.blade.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Vistas/livewire/admisiones/preadmisiones-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/alertas-panel.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/alertas-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/alertas-pendientes-panel.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/alertas-pendientes-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/campana-notificaciones.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/campana-notificaciones.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/modales/atender.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/atender.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/modales/cerrar.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/cerrar.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/modales/crear.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/crear.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/modales/detalle.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/detalle.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/modales/drawer-graficos.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/drawer-graficos.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/modales/drawer-ubicacion.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/drawer-ubicacion.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/modales/resultado-cierre.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/resultado-cierre.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/panel-alertas.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/panel-alertas.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/salud-alertas-panel.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/salud-alertas-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/dashboard-medico.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/dashboard-medico.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/nota-evolucion-medica-modal.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/nota-evolucion-medica-modal.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/objetivos-signos-vitales-panel.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/objetivos-signos-vitales-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/pacientes-seguimiento-panel.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/pacientes-seguimiento-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/registro-signos-vitales-modal.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/registro-signos-vitales-modal.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/salud-ficha-general.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/salud-ficha-general.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/salud-ficha-panel.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/salud-ficha-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/salud-resumen-panel.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/salud-resumen-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/salud-seguimiento-list-panel.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/salud-seguimiento-list-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/salud-signos-panel.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/salud-signos-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/signos-vitales-panel.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/signos-vitales-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/agenda-enfermeria.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/agenda-enfermeria.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/asignacion-turno-panel.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/asignacion-turno-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/dashboard-turno.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/dashboard-turno.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/cabecera.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/cabecera.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/modales.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/modales.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/tab-alertas.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-alertas.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/tab-cuidados.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-cuidados.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/tab-documentos.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-documentos.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/tab-estudios.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-estudios.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/tab-eventos.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-eventos.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/tab-historial.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-historial.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/tab-medicacion.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-medicacion.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/tab-resumen.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-resumen.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/tab-seguimiento.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-seguimiento.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/tab-signos.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-signos.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha-paciente.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha-paciente.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/incidentes-panel.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/incidentes-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/mis-residentes-directorio.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/mis-residentes-directorio.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/clinical-operation-result.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/clinical-operation-result.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/heridas-curaciones.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/heridas-curaciones.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/hidratacion-clinica.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/hidratacion-clinica.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-dolor-grafica.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-dolor-grafica.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-dolor.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-dolor.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-eliminacion-historial.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-eliminacion-historial.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-eliminacion.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-eliminacion.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-hidratacion-grafica.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-hidratacion-grafica.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-hidratacion.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-hidratacion.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-ingesta-grafica.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-ingesta-grafica.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-ingesta.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-ingesta.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-movilidad-historial.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-movilidad-historial.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-movilidad.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-movilidad.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-registro-contenido.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-registro-contenido.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-signos-badge.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-signos-badge.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-signos-campo.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-signos-campo.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-signos-estado.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-signos-estado.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-signos-grafica.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-signos-grafica.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-signos-vitales.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-signos-vitales.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/nursing-resident-menu.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/nursing-resident-menu.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/quick-register-selector.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/quick-register-selector.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/resident-summary.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/resident-summary.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/sueno-consulta.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/sueno-consulta.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/pase-turno-panel.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/pase-turno-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/plan-cuidado-panel.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/plan-cuidado-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/registros-enfermeria.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/registros-enfermeria.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/reporte-enfermeria.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/livewire/cuidados/reporte-enfermeria.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/seguimiento-diario-panel.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/seguimiento-diario-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/tareas-plan-panel.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/tareas-plan-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/turnos-enfermeria-panel.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/turnos-enfermeria-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/features/alertas/historial-alerta.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/features/alertas/historial-alerta.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/areas-institucionales-panel.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/areas-institucionales-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/personal-institucional-form.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/personal-institucional-form.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/personal-institucional-horarios.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/livewire/identidad/personal-institucional-horarios.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/personal-institucional-panel/modales/directorio.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/personal-institucional-panel/modales/directorio.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/personal-institucional-panel/modales/gestion.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/personal-institucional-panel/modales/gestion.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/personal-institucional-panel.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/personal-institucional-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/roles-permisos-panel.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/roles-permisos-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/turnos-asignaciones-panel/modales/asignar-plaza.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/livewire/identidad/turnos-asignaciones-panel/modales/asignar-plaza.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/turnos-asignaciones-panel/modales/turno.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/livewire/identidad/turnos-asignaciones-panel/modales/turno.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/turnos-asignaciones-panel.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/livewire/identidad/turnos-asignaciones-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/usuario-ficha-panel.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/usuario-ficha-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/usuarios-panel/modales/ficha-rapida.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/usuarios-panel/modales/ficha-rapida.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/usuarios-panel/modales/formulario.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/usuarios-panel/modales/formulario.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/usuarios-panel/modales/post-registro.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/usuarios-panel/modales/post-registro.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/usuarios-panel/modales/subir-documento.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/usuarios-panel/modales/subir-documento.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/usuarios-panel/modales/vista-completa.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/usuarios-panel/modales/vista-completa.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/usuarios-panel.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/usuarios-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/administracion-medicacion-modal.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/administracion-medicacion-modal.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/medicacion-adulto-modal.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/medicacion-adulto-modal.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/partials/drawer-dosis.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/drawer-dosis.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/partials/historial.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/historial.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/partials/kardex-matriz.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/kardex-matriz.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/partials/modal-administrar.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/modal-administrar.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/partials/modal-medicamento.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/modal-medicamento.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/partials/modal-omision.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/modal-omision.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/partials/omisiones.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/omisiones.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/partials/proximas-dosis.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/proximas-dosis.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/salud-administracion-medicacion.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/salud-administracion-medicacion.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/salud-medicacion.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/salud-medicacion.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/medico/resultados-experto/evidencias.blade.php",
+    "destino": "app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/evidencias.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/medico/resultados-experto/fundamento.blade.php",
+    "destino": "app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/fundamento.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/medico/resultados-experto/historial.blade.php",
+    "destino": "app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/historial.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/medico/resultados-experto/simulado.blade.php",
+    "destino": "app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/simulado.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/medico/resultados-experto-residente.blade.php",
+    "destino": "app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto-residente.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/reportes/reportes-adulto-panel.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/livewire/reportes/reportes-adulto-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/reportes/reportes-institucionales-panel.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/livewire/reportes/reportes-institucionales-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/reportes/salud-reportes-panel.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/livewire/reportes/salud-reportes-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/residentes/adulto-mayor-form-modal.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/livewire/residentes/adulto-mayor-form-modal.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/residentes/adultos-mayores-panel.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/livewire/residentes/adultos-mayores-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/residentes/expediente-panel.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/livewire/residentes/expediente-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/residentes/partials/resident-list-card.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/livewire/residentes/partials/resident-list-card.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/residentes/partials/_nodo-familiar.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/livewire/residentes/partials/_nodo-familiar.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/residentes/red-apoyo-panel.blade.php",
+    "destino": "app/Modulos/Social/Presentacion/Vistas/livewire/residentes/red-apoyo-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/superadministrador/sistema-experto/conocimiento-panel.blade.php",
+    "destino": "app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/superadministrador/sistema-experto/conocimiento-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/dashboard-psicologo.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/dashboard-psicologo.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/evaluacion-geriatrica-area-modal.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/evaluacion-geriatrica-area-modal.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/evaluacion-geriatrica-modal.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/evaluacion-geriatrica-modal.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/evaluaciones-area-panel.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/evaluaciones-area-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/salud-evaluaciones-geriatricas-panel.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/salud-evaluaciones-geriatricas-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/salud-valoracion-funcional.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/salud-valoracion-funcional.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/valoracion-barthel-modal.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/valoracion-barthel-modal.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/valoracion-enfermeria-panel.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/valoracion-enfermeria-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/valoracion-inicial-modal.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/valoracion-inicial-modal.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/valoracion-medica-modal.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/valoracion-medica-modal.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/valoracion-medica-panel.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/valoracion-medica-panel.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/admisiones.blade.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Vistas/paginas/admin/administracion/admisiones.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/buscar.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/buscar.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/dashboard.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/dashboard.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/habitaciones.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/habitaciones.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/operacion.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/operacion.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/acciones-directorio.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/admin/administracion/partials/acciones-directorio.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/admision-registro.blade.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Vistas/paginas/admin/administracion/partials/admision-registro.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/calendario-operativo.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/calendario-operativo.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/cama-visual.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/cama-visual.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/campo-operativo.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/campo-operativo.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/detalle-cama.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/detalle-cama.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/detalle-operativo.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/detalle-operativo.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/ficha-fragmento.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/admin/administracion/partials/ficha-fragmento.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/filtros-operativos.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/filtros-operativos.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/graficos-por-proceso.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/graficos-por-proceso.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/guia-operativa.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/guia-operativa.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/historial-ocupacion.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/historial-ocupacion.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/identidad-directorio.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/admin/administracion/partials/identidad-directorio.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/indicador-modal.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/indicador-modal.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/panel-residente.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/admin/administracion/partials/panel-residente.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/reportes-operativos.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/admin/administracion/partials/reportes-operativos.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/tarjeta-operativa.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/tarjeta-operativa.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/vista-agrupada-operativa.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/vista-agrupada-operativa.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/residente.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/admin/administracion/residente.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/residentes.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/admin/administracion/residentes.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/areas-atencion/index.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/areas-atencion/index.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/admin/vistas-extra.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/vistas-extra.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/atenciones/index.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/paginas/adultos-mayores/atenciones/index.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/atenciones/partials/crear.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/paginas/adultos-mayores/atenciones/partials/crear.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/atenciones/partials/registro.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/paginas/adultos-mayores/atenciones/partials/registro.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/documentos/index.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/documentos/index.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/documentos/partials/formulario.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/documentos/partials/formulario.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/edit.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/edit.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/index.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/index.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/observaciones/index.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/paginas/adultos-mayores/observaciones/index.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/observaciones/partials/crear.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/paginas/adultos-mayores/observaciones/partials/crear.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/observaciones/partials/registro.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/paginas/adultos-mayores/observaciones/partials/registro.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/reportes/bienestar.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/adultos-mayores/reportes/bienestar.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/reportes/general.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/adultos-mayores/reportes/general.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/reportes/institucional.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/adultos-mayores/reportes/institucional.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/reportes/pdf_especifico.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/adultos-mayores/reportes/pdf_especifico.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/reportes/pdf_evaluacion_individual.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/adultos-mayores/reportes/pdf_evaluacion_individual.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/reportes/pdf_individual.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/adultos-mayores/reportes/pdf_individual.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show/carpetas/_cognitivo.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show/carpetas/_cognitivo.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show/carpetas/_documentos.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show/carpetas/_documentos.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show/carpetas/_historial.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show/carpetas/_historial.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show/carpetas/_identificacion.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show/carpetas/_identificacion.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show/carpetas/_participacion.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show/carpetas/_participacion.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show/carpetas/_red-apoyo.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show/carpetas/_red-apoyo.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show/carpetas/_reportes.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/adultos-mayores/show/carpetas/_reportes.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show/carpetas/_salud.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show/carpetas/_salud.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show/_cabecera-expediente.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show/_cabecera-expediente.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show/_modales-existentes.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show/_modales-existentes.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/areas-institucionales/index.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/areas-institucionales/index.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/bitacora/index.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/bitacora/index.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/dashboard.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/dashboard.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/enfermeria/reportes/ficha-paciente-pdf.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/enfermeria/reportes/ficha-paciente-pdf.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/familia-social/base.blade.php",
+    "destino": "app/Modulos/Social/Presentacion/Vistas/paginas/familia-social/base.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/familia-social/resumen.blade.php",
+    "destino": "app/Modulos/Social/Presentacion/Vistas/paginas/familia-social/resumen.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/preadmisiones/index.blade.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Vistas/paginas/preadmisiones/index.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/reportes/actividades/index.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/reportes/actividades/index.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/reportes/adultos/index.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/reportes/adultos/index.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/reportes/bitacora/index.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/reportes/bitacora/index.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/reportes/equipo/index.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/reportes/equipo/index.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/reportes/familiares/index.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/reportes/familiares/index.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/reportes/institucional/general.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/reportes/institucional/general.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/reportes/partials/grafica-barras-pdf.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/reportes/partials/grafica-barras-pdf.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/reportes/salud/index.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/reportes/salud/index.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/residentes/index.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/residentes/index.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/residentes/show.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/residentes/show.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/roles-permisos/index.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/roles-permisos/index.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/turnos-asignaciones/index.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/turnos-asignaciones/index.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/create.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/create.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/autorizacion-administrativa.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/autorizacion-administrativa.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/autorizacion-comunicacion.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/autorizacion-comunicacion.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/carta-bienvenida.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/carta-bienvenida.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/checklist-institucional.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/checklist-institucional.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/checklist-requeridos.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/checklist-requeridos.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/confidencialidad-clinica.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/confidencialidad-clinica.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/confidencialidad.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/confidencialidad.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/constancia-familiar.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/constancia-familiar.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/constancia-registro.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/constancia-registro.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/protocolo-documental.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/protocolo-documental.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/protocolo-emergencias.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/protocolo-emergencias.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/protocolo-registro-clinico.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/protocolo-registro-clinico.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/reglamento-visitas.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/reglamento-visitas.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/responsabilidad-administrativa.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/responsabilidad-administrativa.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/responsabilidad-clinica.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/responsabilidad-clinica.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/responsabilidad-documental.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/responsabilidad-documental.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/trato-digno.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/trato-digno.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/uso-responsable.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/uso-responsable.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/layout.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/layout.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/paquete-documental.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/paquete-documental.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/paquete_documental.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/paquete_documental.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/partials/acuerdo_corresponsabilidad.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/partials/acuerdo_corresponsabilidad.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/partials/caratula.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/partials/caratula.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/partials/checklist_recepcion.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/partials/checklist_recepcion.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/partials/compromiso_confidencialidad.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/partials/compromiso_confidencialidad.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/partials/datos-usuario.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/partials/datos-usuario.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/partials/datos_personales.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/partials/datos_personales.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/partials/encabezado-documento.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/partials/encabezado-documento.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/partials/firmas.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/partials/firmas.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/partials/pie-documento.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/partials/pie-documento.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/partials/reglamento_interno.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/partials/reglamento_interno.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/edit.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/edit.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/index.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/index.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/show.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/show.blade.php",
+    "estado": "Migrado (nombre de vista compatible)"
   }
 ]
