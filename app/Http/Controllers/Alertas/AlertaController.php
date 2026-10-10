@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Alertas;
 
-use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
 use App\Http\Controllers\Controller;
 use App\Models\Alerta;

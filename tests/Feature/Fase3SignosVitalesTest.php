@@ -202,7 +202,7 @@ class Fase3SignosVitalesTest extends TestCase
     {
         $registro = app(SignosVitalesService::class)->registrarConEvaluacion($this->residente->cod_residente,
             ['frecuencia_cardiaca' => 135], $this->usuario);
-        $turnos = app(\App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService::class);
+        $turnos = app(\App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService::class);
         foreach (['ABIERTA', 'RECONOCIDA', 'ASIGNADA', 'PENDIENTE'] as $estado) {
             $registro->alerta->update(['estado' => $estado]);
             try {
@@ -230,7 +230,7 @@ class Fase3SignosVitalesTest extends TestCase
             ['frecuencia_cardiaca' => 135], $this->usuario);
         $antes = \App\Models\ValoracionDolor::count();
         try {
-            app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class)->registrarDolor(
+            app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class)->registrarDolor(
                 $this->residente->cod_residente, 'VALORACION', 3, 'Registro sintético de valoración.', $this->usuario);
             $this->fail('La ruta alternativa no debe eludir la continuidad.');
         } catch (ValidationException $e) {

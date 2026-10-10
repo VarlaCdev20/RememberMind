@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Identidad\Servicios\SidebarService;
+use App\Modulos\Identidad\Presentacion\Navegacion\SidebarService;
 use App\Models\Residente;
 use App\Models\Alerta;
 use App\Models\AsignacionResidenteJornada;
@@ -56,7 +56,7 @@ class SidebarEnfermeroTest extends TestCase
         foreach ($sidebar[2]['items'] as $item) {
             $this->assertFalse($item['disabled']);
             $clave = $item['parameters']['cuidado'];
-            $opcion = \App\Backend\Modulos\Enfermeria\Servicios\NavegacionCuidadosService::opcion($clave);
+            $opcion = \App\Modulos\Cuidados\Presentacion\Navegacion\NavegacionCuidadosService::opcion($clave);
             $this->assertSame($opcion['route'] ?? 'admin.enfermeria.pacientes', $item['route']);
             foreach ($opcion['parameters'] ?? [] as $parameter => $value) {
                 $this->assertSame($value, $item['parameters'][$parameter]);

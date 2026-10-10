@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Identidad\Servicios\SidebarService;
+use App\Modulos\Identidad\Presentacion\Navegacion\SidebarService;
 use App\Frontend\Livewire\Superadministrador\Identidad\RolesPermisosPanel;
 use App\Models\User;
 use App\Policies\PrescripcionPolicy;

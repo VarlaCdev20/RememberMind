@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Administracion\Servicios\DirectorioResidentesService;
-use App\Backend\Modulos\Administracion\Servicios\PanelResidenteService;
+use App\Modulos\Residentes\Aplicacion\Consultas\DirectorioResidentesService;
+use App\Modulos\Residentes\Aplicacion\Consultas\PanelResidenteService;
 use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use App\Models\Cama;
 use App\Models\Contacto;

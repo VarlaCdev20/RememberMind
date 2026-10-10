@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService as Cuidados;
+use App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService as Cuidados;
 
 class RegistroMovilidad extends ModeloOperativo
 {

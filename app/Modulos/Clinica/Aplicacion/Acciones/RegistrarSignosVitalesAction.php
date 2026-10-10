@@ -2,7 +2,7 @@
 
 namespace App\Modulos\Clinica\Aplicacion\Acciones;
 
-use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Personal;
 use App\Models\SignoVital;

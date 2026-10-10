@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Medicacion;
 
-use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Models\AdministracionMedicacion;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;

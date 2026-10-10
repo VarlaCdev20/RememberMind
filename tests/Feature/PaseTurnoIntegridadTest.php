@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Enfermeria\Servicios\PaseTurnoService;
+use App\Modulos\Cuidados\Aplicacion\Acciones\PaseTurnoService;
 use App\Models\Jornada;
 use App\Models\Turno;
 use App\Models\User;

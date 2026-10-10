@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
 use App\Models\Alerta;
 use App\Models\Residente;
 use Carbon\Carbon;

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Residentes;
 
-use App\Backend\Modulos\Reportes\Servicios\AdultoMayorBitacoraService;
-use App\Backend\Modulos\Residentes\Servicios\AdultoMayorService;
+use App\Modulos\Reportes\Aplicacion\Consultas\AdultoMayorBitacoraService;
+use App\Modulos\Residentes\Aplicacion\Acciones\AdultoMayorService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Residentes\UpdateAdultoMayorRequest;
 use App\Models\Actividad;

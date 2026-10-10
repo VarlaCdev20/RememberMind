@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Residentes\Servicios\AdultoMayorService;
+use App\Modulos\Residentes\Aplicacion\Acciones\AdultoMayorService;
 use App\Models\Residente;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;

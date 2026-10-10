@@ -2,7 +2,7 @@
 
 namespace App\Modulos\Institucion\Aplicacion\Consultas;
 
-use App\Backend\Modulos\Administracion\Servicios\DirectorioResidentesService;
+use App\Modulos\Residentes\Aplicacion\Consultas\DirectorioResidentesService;
 use App\Models\Cama;
 use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use Illuminate\Database\Query\Builder;

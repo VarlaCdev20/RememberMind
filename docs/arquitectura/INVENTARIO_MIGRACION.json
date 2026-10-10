@@ -218,5 +218,170 @@
     "origen": "app/Backend/Modulos/Medicacion/Servicios/RegistrarAdministracionMedicacionService.php",
     "destino": "app/Modulos/Medicacion/Aplicacion/Acciones/RegistrarAdministracionMedicacionService.php",
     "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Administracion/Servicios/DirectorioResidentesService.php",
+    "destino": "app/Modulos/Residentes/Aplicacion/Consultas/DirectorioResidentesService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Administracion/Servicios/PanelResidenteService.php",
+    "destino": "app/Modulos/Residentes/Aplicacion/Consultas/PanelResidenteService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Documentos/Servicios/DocumentacionResidenteService.php",
+    "destino": "app/Compartido/Infraestructura/Documentos/DocumentacionResidenteService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Documentos/Servicios/DocumentacionUsuarioService.php",
+    "destino": "app/Compartido/Infraestructura/Documentos/DocumentacionUsuarioService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Documentos/Servicios/DocumentosUsuarioService.php",
+    "destino": "app/Compartido/Infraestructura/Documentos/DocumentosUsuarioService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/AgendaTurnoService.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Consultas/AgendaTurnoService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/CuidadosEnfermeriaService.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Acciones/CuidadosEnfermeriaService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/DashboardComplementosService.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Consultas/DashboardComplementosService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/LesionesEnfermeriaService.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Acciones/LesionesEnfermeriaService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/MiTurnoService.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Consultas/MiTurnoService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/NavegacionCuidadosService.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Navegacion/NavegacionCuidadosService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/PaseTurnoService.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Acciones/PaseTurnoService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/SeguimientoDiarioService.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Acciones/SeguimientoDiarioService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/TurnoEnfermeriaService.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Consultas/TurnoEnfermeriaService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Acciones/Fortify/CreateNewUser.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/Fortify/CreateNewUser.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Acciones/Fortify/PasswordValidationRules.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/Fortify/PasswordValidationRules.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Acciones/Fortify/ResetUserPassword.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/Fortify/ResetUserPassword.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Acciones/Fortify/UpdateUserPassword.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/Fortify/UpdateUserPassword.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Acciones/Fortify/UpdateUserProfileInformation.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/Fortify/UpdateUserProfileInformation.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Acciones/Jetstream/DeleteUser.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/Jetstream/DeleteUser.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Servicios/RolePreviewService.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/RolePreviewService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Servicios/SidebarService.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Navegacion/SidebarService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Servicios/UsuarioFichaService.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Consultas/UsuarioFichaService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Servicios/VisibilidadNavegacion.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Navegacion/VisibilidadNavegacion.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Reportes/Servicios/AdultoMayorBitacoraService.php",
+    "destino": "app/Modulos/Reportes/Aplicacion/Consultas/AdultoMayorBitacoraService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Reportes/Servicios/AreasReportDataService.php",
+    "destino": "app/Modulos/Reportes/Aplicacion/Consultas/AreasReportDataService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Reportes/Servicios/DashboardPhotoRotation.php",
+    "destino": "app/Modulos/Reportes/Presentacion/DashboardPhotoRotation.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Reportes/Servicios/DashboardService.php",
+    "destino": "app/Modulos/Reportes/Aplicacion/Consultas/DashboardService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Reportes/Servicios/ReporteDataService.php",
+    "destino": "app/Modulos/Reportes/Aplicacion/Consultas/ReporteDataService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Reportes/Servicios/ReportExportService.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/ReportExportService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Reportes/Servicios/ReportFileNameService.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/ReportFileNameService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Reportes/Servicios/RoleDashboardDataService.php",
+    "destino": "app/Modulos/Reportes/Aplicacion/Consultas/RoleDashboardDataService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Residentes/Servicios/AdultoMayorService.php",
+    "destino": "app/Modulos/Residentes/Aplicacion/Acciones/AdultoMayorService.php",
+    "estado": "Migrado"
   }
 ]

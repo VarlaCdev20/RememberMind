@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Clinica;
 
 use App\Modulos\Clinica\Presentacion\Http\Validacion\ValidacionSignosVitalesService;
-use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreSignosVitalesRequest extends FormRequest

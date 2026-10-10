@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Identidad;
 
-use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
+use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

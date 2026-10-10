@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Reportes\Servicios\RoleDashboardDataService;
+use App\Modulos\Reportes\Aplicacion\Consultas\RoleDashboardDataService;
 use App\Models\Residente;
 use App\Models\Personal;
 use App\Models\User;

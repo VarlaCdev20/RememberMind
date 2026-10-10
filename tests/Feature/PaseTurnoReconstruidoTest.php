@@ -11,7 +11,7 @@ use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\Turno;
 use App\Models\User;
-use App\Backend\Modulos\Enfermeria\Servicios\PaseTurnoService;
+use App\Modulos\Cuidados\Aplicacion\Acciones\PaseTurnoService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;

@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Reportes;
 
 use App\Http\Controllers\Controller;
 
-use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
-use App\Backend\Modulos\Identidad\Servicios\VisibilidadNavegacion;
-use App\Backend\Modulos\Reportes\Servicios\DashboardService;
+use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
+use App\Modulos\Identidad\Presentacion\Navegacion\VisibilidadNavegacion;
+use App\Modulos\Reportes\Aplicacion\Consultas\DashboardService;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 

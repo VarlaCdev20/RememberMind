@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Administracion;
 
 use App\Modulos\Institucion\Aplicacion\Consultas\CentroCoordinacionService;
-use App\Backend\Modulos\Reportes\Servicios\DashboardService;
+use App\Modulos\Reportes\Aplicacion\Consultas\DashboardService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 

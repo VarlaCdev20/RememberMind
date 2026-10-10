@@ -22,7 +22,7 @@ use App\Models\PlanCuidado;
 use App\Models\Prescripcion;
 use App\Models\Turno;
 use App\Models\User;
-use App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
 use Carbon\Carbon;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;

@@ -10,7 +10,7 @@ use App\Models\Turno;
 use App\Models\User;
 use App\Frontend\Livewire\Enfermeria\Cuidados\AsignacionTurnoPanel;
 use App\Frontend\Livewire\Enfermeria\Cuidados\TurnosEnfermeriaPanel;
-use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\HttpKernel\Exception\HttpException;

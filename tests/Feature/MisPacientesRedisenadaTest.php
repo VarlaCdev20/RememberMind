@@ -475,7 +475,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $acciones = $this->accionesDelSelector($vista->html());
 
         foreach (['cognicion' => 'Cognición', 'conducta' => 'Conducta', 'sueno' => 'Sueño', 'heridas' => 'Heridas / Curaciones'] as $clave => $label) {
-            $opcion = \App\Backend\Modulos\Enfermeria\Servicios\NavegacionCuidadosService::opcion($clave);
+            $opcion = \App\Modulos\Cuidados\Presentacion\Navegacion\NavegacionCuidadosService::opcion($clave);
             $url = route($opcion['route'], array_merge($opcion['parameters'] ?? [], ['adulto' => $this->residenteEstable->cod_residente, 'cuidado' => $clave]));
             $this->assertSame('a', $acciones[$label]['tag']);
             $this->assertStringContainsString('href="'.e($url).'"', $acciones[$label]['attributes']);
@@ -1689,7 +1689,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $formulario->assertSee('Intensidad EVA')
             ->assertDontSee('wire:model="dolorEvaPosterior"');
 
-        $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $servicio = app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         $base = [
             'intensidad' => 4,
         ];
@@ -1783,7 +1783,7 @@ class MisPacientesRedisenadaTest extends TestCase
     {
         $this->travelTo(today()->setTime(10, 0));
         $this->actingAs($this->enfermero);
-        $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $servicio = app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         try {
             $servicio->registrarValoracionDolor($this->residenteEstable->cod_residente,
                 ['intensidad' => 6, 'fecha_hora' => '2000-01-01T00:00'], $this->enfermero);
@@ -1875,7 +1875,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->actingAs($this->enfermero);
         $formulario = $this->formularioDolor()->set('dolorEva', '6')
             ->set('dolorUbicacion', 'Rodilla derecha')->set('dolorIntervencion', 'Reposo');
-        $this->partialMock(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class,
+        $this->partialMock(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class,
             function ($mock) {
                 $mock->shouldReceive('registrarValoracionDolor')->once()->andThrow(
                     new \Illuminate\Database\QueryException('sqlite', 'insert test', [], new \RuntimeException('Synthetic persistence failure'))
@@ -1944,7 +1944,7 @@ class MisPacientesRedisenadaTest extends TestCase
     public function test_dolor_v2_origen_ajeno_inexistente_futuro_anulado_y_ciclico_no_persisten(): void
     {
         $this->actingAs($this->enfermero);
-        $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $servicio = app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         foreach (['AJENO', 'FUTURO', 'ANULADO', 'CICLO'] as $caso) {
             \App\Models\ValoracionDolor::create([
                 'cod_valoracion_dolor' => 'VD_'.$caso,
@@ -1991,7 +1991,7 @@ class MisPacientesRedisenadaTest extends TestCase
     public function test_dolor_v2_reevaluar_protege_captura_y_conserva_residente(): void
     {
         $this->actingAs($this->enfermero);
-        $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $servicio = app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         $origen = $servicio->registrarValoracionDolor($this->residenteEstable->getKey(), ['intensidad' => 4], $this->enfermero);
         $vista = $this->formularioDolor()->set('dolorEva', '6')->set('dolorFactoresAlivio', 'Reposo')
             ->call('abrirReevaluacionDolor', $origen->getKey())->assertSet('confirmarDescarte', true)
@@ -2007,7 +2007,7 @@ class MisPacientesRedisenadaTest extends TestCase
     public function test_dolor_v2_reevaluacion_revalida_permiso_lectura_y_asignacion(): void
     {
         $this->actingAs($this->enfermero);
-        $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $servicio = app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         $origen = $servicio->registrarValoracionDolor($this->residenteEstable->getKey(), ['intensidad' => 4], $this->enfermero);
         $vista = $this->formularioDolor()->call('abrirReevaluacionDolor', $origen->getKey())->set('dolorEva', '3');
         \Spatie\Permission\Models\Role::findByName('ENFERMEROS')->revokePermissionTo('valoraciones_dolor.ver');
@@ -2019,7 +2019,7 @@ class MisPacientesRedisenadaTest extends TestCase
     public function test_dolor_v2_fk_impide_vinculo_ajeno_incluso_por_sql(): void
     {
         $this->actingAs($this->enfermero);
-        $origen = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class)
+        $origen = app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class)
             ->registrarValoracionDolor($this->residenteEstable->getKey(), ['intensidad' => 4], $this->enfermero);
         try {
             \Illuminate\Support\Facades\DB::transaction(fn () => \Illuminate\Support\Facades\DB::table('valoraciones_dolor')->insert([
@@ -2060,7 +2060,7 @@ class MisPacientesRedisenadaTest extends TestCase
     public function test_dolor_v2_fk_restringe_borrado_y_origen_inexistente(): void
     {
         $this->actingAs($this->enfermero);
-        $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $servicio = app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         $a = $servicio->registrarValoracionDolor($this->residenteEstable->getKey(), ['intensidad' => 8], $this->enfermero);
         $b = $servicio->registrarValoracionDolor($this->residenteEstable->getKey(), ['intensidad' => 5, 'cod_valoracion_origen' => $a->getKey()], $this->enfermero);
         foreach (['delete', 'missing'] as $case) {
@@ -2123,7 +2123,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->update(['estado' => 'FINALIZADA']);
 
         try {
-            app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class)
+            app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class)
                 ->registrarValoracionDolor($this->residenteCritico->cod_residente, [
                     'fecha_hora' => now()->format('Y-m-d\TH:i'), 'intensidad' => 5,
                 ], $this->enfermero);
@@ -2276,7 +2276,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->update(['estado' => 'FINALIZADA']);
 
         try {
-            app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class)
+            app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class)
                 ->registrarAlimentacion($this->residenteCritico->cod_residente, [
                     'tipo_comida' => 'CENA', 'dificultad_deglucion' => false,
                 ], $this->enfermero);
@@ -2309,7 +2309,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->travelTo(today()->setTime(10, 0));
         $this->actingAs($this->enfermero);
         $this->formularioAlimentacion();
-        $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $servicio = app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         $alertas = Alerta::count();
         foreach ($servicio::TIPOS_COMIDA as $comida) {
             $registro = $servicio->registrarAlimentacion($this->residenteEstable->cod_residente, [
@@ -2333,7 +2333,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->actingAs($this->enfermero);
         config(['enfermeria.porcentaje_baja_ingesta' => 70]);
         $this->formularioAlimentacion();
-        $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $servicio = app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         $alertas = Alerta::count();
         foreach (['0', '69.99', '70', '72.50', '100.00'] as $porcentaje) {
             $registro = $servicio->registrarAlimentacion($this->residenteEstable->cod_residente, [
@@ -2358,7 +2358,7 @@ class MisPacientesRedisenadaTest extends TestCase
     {
         $this->actingAs($this->enfermero);
         $this->formularioAlimentacion();
-        $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $servicio = app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         foreach ([['porcentaje_consumido' => '100.01'], ['cantidad_ml' => '999999.999'],
             ['cantidad_ml' => '1000000'], ['observacion' => str_repeat('a', 5001)],
             ['dificultad_deglucion' => 'quizá']] as $dato) {
@@ -2463,7 +2463,7 @@ class MisPacientesRedisenadaTest extends TestCase
     {
         $this->actingAs($this->enfermero);
         $this->formularioAlimentacion();
-        $servicio = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $servicio = app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         foreach (['cuenta', 'personal', 'jornada', 'asignacion'] as $caso) {
             if ($caso === 'cuenta') $this->enfermero->update(['estado' => 'INACTIVO']);
             if ($caso === 'personal') {
@@ -2603,7 +2603,7 @@ class MisPacientesRedisenadaTest extends TestCase
     {
         $this->actingAs($this->enfermero); $this->formularioEliminacion();
         AsignacionResidenteJornada::where('cod_residente',$this->residenteCritico->cod_residente)->update(['estado'=>'FINALIZADA']);
-        try { app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class)
+        try { app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class)
             ->registrarEliminacion($this->residenteCritico->cod_residente,['tipo_eliminacion'=>'URINARIA'],$this->enfermero);
             $this->fail('Se aceptó un residente no asignado.');
         } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) { $this->assertSame(403,$e->getStatusCode()); }
@@ -2695,7 +2695,7 @@ class MisPacientesRedisenadaTest extends TestCase
         ]);
 
         try {
-            app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class)
+            app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class)
                 ->registrarMovilidad($this->residenteEstable->cod_residente, [
                 'marcha' => 'INDEPENDIENTE',
                 'origen' => 'CAMA',
@@ -2750,7 +2750,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->update(['estado' => 'FINALIZADA']);
 
         try {
-            app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class)
+            app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class)
                 ->registrarMovilidad($this->residenteCritico->cod_residente, ['marcha' => 'ASISTIDA'], $this->enfermero);
             $this->fail('Se aceptó un residente no asignado.');
         } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
@@ -3079,7 +3079,7 @@ class MisPacientesRedisenadaTest extends TestCase
     public function test_hidratacion_v2_continuidad_acumulado_jornada_y_historial_por_residente(): void
     {
         $vista = $this->formularioHidratacionV2();
-        $service = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $service = app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         foreach ([150,250,200,350] as $cantidad) {
             $ultimo = $service->registrarHidratacion($this->residenteEstable->cod_residente, ['cantidad_ml' => $cantidad], $this->enfermero);
             $this->travel(1)->minutes();
@@ -3123,7 +3123,7 @@ class MisPacientesRedisenadaTest extends TestCase
     public function test_hidratacion_v2_servicio_canonico_no_usa_via_ni_campos_ajenos(): void
     {
         $this->formularioHidratacionV2();
-        $service = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $service = app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         $registro = $service->registrar($this->residenteEstable->cod_residente, ['tipo' => 'HIDRATACION', 'cantidad_ml' => 250], $this->enfermero);
         $this->assertSame('250.00', $registro->cantidad_ml);
         $this->assertArrayNotHasKey('via', $registro->getAttributes());
@@ -3166,7 +3166,7 @@ class MisPacientesRedisenadaTest extends TestCase
     public function test_hidratacion_v2_no_expone_historial_sin_permiso_de_lectura(): void
     {
         $this->formularioHidratacionV2();
-        app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class)
+        app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class)
             ->registrarHidratacion($this->residenteEstable->cod_residente, ['cantidad_ml'=>250], $this->enfermero);
         \Spatie\Permission\Models\Role::findByName('ENFERMEROS')->revokePermissionTo('registros_hidratacion.ver');
         $this->enfermero->unsetRelation('roles')->unsetRelation('permissions');
@@ -3179,7 +3179,7 @@ class MisPacientesRedisenadaTest extends TestCase
     public function test_hidratacion_v2_servicio_deniega_cuenta_inactiva_personal_sin_jornada_y_residente_fuera_de_asignacion(): void
     {
         $this->formularioHidratacionV2();
-        $service=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $service=app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         $denegar=function () use ($service) {
             try {
                 $service->registrarHidratacion($this->residenteEstable->cod_residente,['cantidad_ml'=>250],$this->enfermero);
@@ -3201,7 +3201,7 @@ class MisPacientesRedisenadaTest extends TestCase
     public function test_hidratacion_v2_acumulado_no_trunca_decimales_ni_incluye_futuros_otras_jornadas_o_anulados(): void
     {
         $vista=$this->formularioHidratacionV2();
-        $row=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class)
+        $row=app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class)
             ->registrarHidratacion($this->residenteEstable->cod_residente,['cantidad_ml'=>250],$this->enfermero);
         // La captura nueva es entera; aportes decimales existentes desde Ingesta conservan su precisión.
         $row->update(['cantidad_ml'=>'250.25']);
@@ -3217,7 +3217,7 @@ class MisPacientesRedisenadaTest extends TestCase
     public function test_eliminacion_v2_minimos_cero_y_booleanos_nullable_se_distinguen(): void
     {
         $this->actingAs($this->enfermero); $this->formularioEliminacion();
-        $service=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $service=app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         foreach ([null,false,true] as $value) {
             $row=$service->registrarEliminacion($this->residenteEstable->cod_residente,['tipo_eliminacion'=>'INTESTINAL',
                 'presencia_sangre'=>$value,'presencia_moco'=>$value,'molestia_eliminacion'=>$value],$this->enfermero);
@@ -3234,7 +3234,7 @@ class MisPacientesRedisenadaTest extends TestCase
     public function test_eliminacion_v2_validacion_condicional_catalogos_y_escala_completa(): void
     {
         $this->actingAs($this->enfermero); $this->formularioEliminacion();
-        $service=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $service=app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         $cases=[];
         foreach (\App\Models\RegistroEliminacion::OPCIONES as $field=>$options) $cases[]=[$field,in_array($field,['color_heces','esfuerzo_defecacion'])?'INTESTINAL':'URINARIA','MANIPULADO'];
         foreach (['-1','1000000','1.001','NaN'] as $value) $cases[]=['volumen_ml','URINARIA',$value];
@@ -3262,7 +3262,7 @@ class MisPacientesRedisenadaTest extends TestCase
     public function test_eliminacion_v2_descripcion_trim_limites_y_campos_ajenos(): void
     {
         $this->actingAs($this->enfermero); $this->formularioEliminacion();
-        $service=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $service=app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         foreach ([false,null] as $value) {
             $row=$service->registrarEliminacion($this->residenteEstable->cod_residente,['tipo_eliminacion'=>'URINARIA','molestia_eliminacion'=>$value,'descripcion_molestia'=>'Dato anterior'],$this->enfermero);
             $this->assertNull($row->descripcion_molestia);
@@ -3280,7 +3280,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->actingAs($this->enfermero); $this->formularioEliminacion();
         $legacy=\App\Models\RegistroEliminacion::create(['cod_eliminacion'=>'ELI_OLD','cod_residente'=>$this->residenteEstable->cod_residente,'cod_personal'=>$this->personal->cod_personal,
             'cod_jornada'=>'JOR_MIS_PACIENTES','fecha_hora'=>now()->subMinutes(20),'tipo_eliminacion'=>'URINARIA','cantidad'=>'350','caracteristica'=>'Amarillo claro','continencia'=>'CONTINENTE','estado'=>'VIGENTE']);
-        $service=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $service=app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         $service->registrarEliminacion($this->residenteEstable->cod_residente,['tipo_eliminacion'=>'INTESTINAL','tipo_bristol'=>4],$this->enfermero);
         $future=$legacy->replicate()->fill(['cod_eliminacion'=>'ELI_FUT','fecha_hora'=>now()->addDay()]);$future->save();
         $other=$legacy->replicate()->fill(['cod_eliminacion'=>'ELI_OTHER','cod_residente'=>$this->residenteCritico->cod_residente]);$other->save();
@@ -3338,7 +3338,7 @@ class MisPacientesRedisenadaTest extends TestCase
     public function test_eliminacion_v2_autorizacion_personal_jornada_y_roles_no_conceden_escritura(): void
     {
         $this->actingAs($this->enfermero);$this->formularioEliminacion();
-        $service=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $service=app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         foreach (['cuenta','personal','jornada'] as $case) {
             if ($case==='cuenta') $this->enfermero->update(['estado'=>'INACTIVO']);
             if ($case==='personal') $this->personal->update(['estado'=>'INACTIVO']);
@@ -3358,7 +3358,7 @@ class MisPacientesRedisenadaTest extends TestCase
 
     public function test_eliminacion_v2_ultimo_global_por_tipo_y_historial_sin_permiso(): void
     {
-        $this->actingAs($this->enfermero);$this->formularioEliminacion();$service=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $this->actingAs($this->enfermero);$this->formularioEliminacion();$service=app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         $old=$service->registrarEliminacion($this->residenteEstable->cod_residente,['tipo_eliminacion'=>'URINARIA','volumen_ml'=>'0'],$this->enfermero);
         $old->update(['fecha_hora'=>now()->subMinutes(90)]);
         for ($i=0;$i<41;$i++) $service->registrarEliminacion($this->residenteEstable->cod_residente,['tipo_eliminacion'=>'INTESTINAL'],$this->enfermero);
@@ -3394,7 +3394,7 @@ class MisPacientesRedisenadaTest extends TestCase
     public function test_movilidad_v2_rechaza_todos_los_catalogos_y_payload_server_owned(): void
     {
         $this->travelTo(today()->setTime(10,0)); $this->actingAs($this->enfermero); $this->formularioMovilidad();
-        $service = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $service = app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         foreach (array_keys(\App\Models\RegistroMovilidad::catalogos()) as $field) {
             try { $service->registrarMovilidad($this->residenteEstable->cod_residente, array_merge(['marcha'=>'INDEPENDIENTE'],[$field=>'INVENTADO']),$this->enfermero); $this->fail($field); }
             catch (\Illuminate\Validation\ValidationException $e) { $this->assertArrayHasKey($field,$e->errors()); }
@@ -3409,7 +3409,7 @@ class MisPacientesRedisenadaTest extends TestCase
     public function test_movilidad_v2_distancia_decimal_triestados_y_dispositivo_ninguno(): void
     {
         $this->travelTo(today()->setTime(10,0)); $this->actingAs($this->enfermero); $this->formularioMovilidad();
-        $service = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $service = app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         foreach ([null,false,true] as $value) {
             $record=$service->registrarMovilidad($this->residenteEstable->cod_residente,['marcha'=>'INDEPENDIENTE','dispositivo'=>'NINGUNO',
                 'dolor_movilidad'=>$value,'mareo'=>$value,'disnea'=>$value,'debilidad'=>$value],$this->enfermero)->fresh();
@@ -3457,7 +3457,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->travelTo(today()->setTime(10, 0));
         $this->actingAs($this->enfermero);
         $this->formularioMovilidad();
-        $service = app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $service = app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         foreach ([
             [['motivo_registro' => 'OTRO'], 'motivo_otro'],
             [['dispositivo' => 'OTRO'], 'dispositivo_otro'],
@@ -3517,7 +3517,7 @@ class MisPacientesRedisenadaTest extends TestCase
     {
         $this->travelTo(today()->setTime(10,0));$this->actingAs($this->enfermero);$ui=$this->formularioMovilidad();
         $ui->assertSet('movHistorial',[])->assertSee('Sin registros previos de movilidad.');
-        $service=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $service=app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         $older=$service->registrarMovilidad($this->residenteEstable->cod_residente,['marcha'=>'ASISTIDA','fatiga'=>'LEVE'],$this->enfermero);
         $this->travel(1)->minutes();
         $latest=$service->registrarMovilidad($this->residenteEstable->cod_residente,['marcha'=>'INDEPENDIENTE','actividad_realizada'=>'CAMINAR_HABITACION','distancia_metros'=>5],$this->enfermero);
@@ -3532,7 +3532,7 @@ class MisPacientesRedisenadaTest extends TestCase
     public function test_movilidad_v2_generic_es_canonico_y_no_acepta_spoofing(): void
     {
         $this->travelTo(today()->setTime(10,0));$this->actingAs($this->enfermero);$this->formularioMovilidad();
-        $service=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $service=app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         $record=$service->registrar($this->residenteEstable->cod_residente,['tipo'=>'MOVILIDAD','subtipo'=>'ASISTIDA','ayuda_tecnica'=>'ANDADOR','nivel_ayuda'=>'PARCIAL'],$this->enfermero);
         $this->assertSame('ANDADOR',$record->dispositivo);$this->assertSame('ASISTIDA',$record->marcha);
         try {$service->registrar($this->residenteEstable->cod_residente,['tipo'=>'MOVILIDAD','subtipo'=>'ASISTIDA','cod_personal'=>'OTRO'],$this->enfermero);$this->fail('Aceptó autor');}
@@ -3550,7 +3550,7 @@ class MisPacientesRedisenadaTest extends TestCase
     {
         config(['remembermind.superadmin_clinical_write' => false]);
         $this->travelTo(today()->setTime(10,0));$this->actingAs($this->enfermero);$this->formularioMovilidad();
-        $service=app(\App\Backend\Modulos\Enfermeria\Servicios\CuidadosEnfermeriaService::class);
+        $service=app(\App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService::class);
         foreach (['cuenta','personal','jornada','ADMINISTRADOR','SUPERADMINISTRADOR'] as $condition) {
             \Illuminate\Support\Facades\DB::beginTransaction();
             try {

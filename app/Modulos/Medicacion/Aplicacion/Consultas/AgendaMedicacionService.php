@@ -2,7 +2,7 @@
 
 namespace App\Modulos\Medicacion\Aplicacion\Consultas;
 
-use App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
 use App\Models\AdministracionMedicacion;
 use App\Models\HorarioPrescripcion;
 use App\Models\Prescripcion;

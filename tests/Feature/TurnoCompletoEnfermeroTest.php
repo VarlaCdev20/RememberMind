@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Frontend\Livewire\Compartido\Clinica\FichaPaciente;
 use App\Frontend\Livewire\Enfermeria\Cuidados\DashboardTurno;
 use App\Frontend\Livewire\Enfermeria\Cuidados\MisPacientes;

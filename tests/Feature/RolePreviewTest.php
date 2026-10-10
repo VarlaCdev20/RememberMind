@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
-use App\Backend\Modulos\Identidad\Servicios\SidebarService;
+use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
+use App\Modulos\Identidad\Presentacion\Navegacion\SidebarService;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;

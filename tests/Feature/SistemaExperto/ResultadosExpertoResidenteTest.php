@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\SistemaExperto;
 
-use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
+use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use App\Backend\Modulos\SistemaExperto\Conocimiento\InventarioExperto;
 use App\Backend\Modulos\SistemaExperto\Servicios\{LecturaResultadosExperto, LecturaFuenteEvidencia};
 use App\Frontend\Livewire\Medico\Clinica\ResultadosExpertoResidente;

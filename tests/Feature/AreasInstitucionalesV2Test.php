@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Reportes\Servicios\AreasReportDataService;
-use App\Backend\Modulos\Reportes\Servicios\ReportExportService;
+use App\Modulos\Reportes\Aplicacion\Consultas\AreasReportDataService;
+use App\Modulos\Reportes\Infraestructura\Exportaciones\ReportExportService;
 use App\Exports\AreasInstitucionalesExport;
 use App\Frontend\Livewire\Superadministrador\Identidad\AreasInstitucionalesPanel;
 use App\Models\Area;

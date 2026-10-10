@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Http\Requests\Identidad\StoreUsuarioRequest;
 use App\Http\Requests\Identidad\UpdateUsuarioRequest;
-use App\Backend\Modulos\Reportes\Servicios\DashboardService;
+use App\Modulos\Reportes\Aplicacion\Consultas\DashboardService;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -171,8 +171,8 @@ class UsuarioController extends Controller
     public function fichaPdf(User $usuario)
     {
         try {
-            $fichaService = app(\App\Backend\Modulos\Identidad\Servicios\UsuarioFichaService::class);
-            $docService = app(\App\Backend\Modulos\Documentos\Servicios\DocumentacionUsuarioService::class);
+            $fichaService = app(\App\Modulos\Identidad\Aplicacion\Consultas\UsuarioFichaService::class);
+            $docService = app(\App\Compartido\Infraestructura\Documentos\DocumentacionUsuarioService::class);
 
             $expediente = $fichaService->obtenerExpedienteCompleto($usuario);
             $checklist = $docService->obtenerChecklistUsuario($usuario);
@@ -189,10 +189,10 @@ class UsuarioController extends Controller
                 'usuario_solicitante' => auth()->user()->name,
             ];
 
-            $fileNameService = app(\App\Backend\Modulos\Reportes\Servicios\ReportFileNameService::class);
+            $fileNameService = app(\App\Modulos\Reportes\Infraestructura\Exportaciones\ReportFileNameService::class);
             $filename = $fileNameService->generate('expediente_' . $usuario->cod_usuario, 'pdf');
 
-            $exportService = app(\App\Backend\Modulos\Reportes\Servicios\ReportExportService::class);
+            $exportService = app(\App\Modulos\Reportes\Infraestructura\Exportaciones\ReportExportService::class);
 
             activity('Usuarios')
                 ->causedBy(auth()->user())
@@ -209,8 +209,8 @@ class UsuarioController extends Controller
     public function documentacionPdf(User $usuario)
     {
         try {
-            $fichaService = app(\App\Backend\Modulos\Identidad\Servicios\UsuarioFichaService::class);
-            $docService = app(\App\Backend\Modulos\Documentos\Servicios\DocumentacionUsuarioService::class);
+            $fichaService = app(\App\Modulos\Identidad\Aplicacion\Consultas\UsuarioFichaService::class);
+            $docService = app(\App\Compartido\Infraestructura\Documentos\DocumentacionUsuarioService::class);
 
             $expediente = $fichaService->obtenerExpedienteCompleto($usuario);
             $checklist = $docService->obtenerChecklistUsuario($usuario);
@@ -226,10 +226,10 @@ class UsuarioController extends Controller
                 'usuario_solicitante' => auth()->user()->name,
             ];
 
-            $fileNameService = app(\App\Backend\Modulos\Reportes\Servicios\ReportFileNameService::class);
+            $fileNameService = app(\App\Modulos\Reportes\Infraestructura\Exportaciones\ReportFileNameService::class);
             $filename = $fileNameService->generate('checklist_documentacion_' . $usuario->cod_usuario, 'pdf');
 
-            $exportService = app(\App\Backend\Modulos\Reportes\Servicios\ReportExportService::class);
+            $exportService = app(\App\Modulos\Reportes\Infraestructura\Exportaciones\ReportExportService::class);
 
             activity('Usuarios')
                 ->causedBy(auth()->user())
@@ -246,7 +246,7 @@ class UsuarioController extends Controller
     public function horariosPdf(User $usuario)
     {
         try {
-            $fichaService = app(\App\Backend\Modulos\Identidad\Servicios\UsuarioFichaService::class);
+            $fichaService = app(\App\Modulos\Identidad\Aplicacion\Consultas\UsuarioFichaService::class);
 
             $expediente = $fichaService->obtenerExpedienteCompleto($usuario);
 
@@ -261,10 +261,10 @@ class UsuarioController extends Controller
                 'usuario_solicitante' => auth()->user()->name,
             ];
 
-            $fileNameService = app(\App\Backend\Modulos\Reportes\Servicios\ReportFileNameService::class);
+            $fileNameService = app(\App\Modulos\Reportes\Infraestructura\Exportaciones\ReportFileNameService::class);
             $filename = $fileNameService->generate('control_horarios_' . $usuario->cod_usuario, 'pdf');
 
-            $exportService = app(\App\Backend\Modulos\Reportes\Servicios\ReportExportService::class);
+            $exportService = app(\App\Modulos\Reportes\Infraestructura\Exportaciones\ReportExportService::class);
 
             activity('Usuarios')
                 ->causedBy(auth()->user())
@@ -309,7 +309,7 @@ class UsuarioController extends Controller
             $rol = $usuario->roles->first()?->name;
             
             $usuariosPanel = new \App\Frontend\Livewire\Administracion\Identidad\UsuariosPanel();
-            $documentos = app(\App\Backend\Modulos\Documentos\Servicios\DocumentosUsuarioService::class)->documentosRequeridosPorRol($rol);
+            $documentos = app(\App\Compartido\Infraestructura\Documentos\DocumentosUsuarioService::class)->documentosRequeridosPorRol($rol);
             $rolLegible = $usuariosPanel->obtenerNombreRolLegible($rol);
             
             $fechaRegistro = $usuario->created_at ? $usuario->created_at->format('d/m/Y H:i') : now()->format('d/m/Y H:i');
@@ -325,10 +325,10 @@ class UsuarioController extends Controller
                 'usuario' => auth()->check() ? auth()->user()->name : 'Sistema',
             ];
 
-            $fileNameService = app(\App\Backend\Modulos\Reportes\Servicios\ReportFileNameService::class);
+            $fileNameService = app(\App\Modulos\Reportes\Infraestructura\Exportaciones\ReportFileNameService::class);
             $filename = $fileNameService->generate('solicitud_documental_' . $usuario->cod_usuario, 'pdf');
 
-            $exportService = app(\App\Backend\Modulos\Reportes\Servicios\ReportExportService::class);
+            $exportService = app(\App\Modulos\Reportes\Infraestructura\Exportaciones\ReportExportService::class);
 
             activity('Usuarios')
                 ->causedBy(auth()->user())

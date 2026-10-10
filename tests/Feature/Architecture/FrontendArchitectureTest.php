@@ -397,12 +397,12 @@ class FrontendArchitectureTest extends TestCase
         $this->assertStringContainsString('rotation-context=', $medicina);
         $this->assertStringContainsString('rotation-context=', $psicologia);
         $this->assertStringContainsString('rotation-context=', $workspaceRol);
-        $this->assertStringContainsString('images/FOTOS CENTRO DE ADULTOS MAYORES/', File::get(app_path('Backend/Modulos/Reportes/Servicios/DashboardPhotoRotation.php')));
+        $this->assertStringContainsString('images/FOTOS CENTRO DE ADULTOS MAYORES/', File::get(app_path('Modulos/Reportes/Presentacion/DashboardPhotoRotation.php')));
 
         $this->assertStringContainsString('<x-ui.metric-card', $medicina);
         $this->assertStringContainsString('<x-ui.metric-card', $psicologia);
 
-        $servicio = File::get(app_path('Backend/Modulos/Reportes/Servicios/DashboardService.php'));
+        $servicio = File::get(app_path('Modulos/Reportes/Aplicacion/Consultas/DashboardService.php'));
         foreach (['NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO', 'FAMILIAR'] as $rol) {
             $this->assertStringContainsString("'{$rol}' => [", $servicio);
         }

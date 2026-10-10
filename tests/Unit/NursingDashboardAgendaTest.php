@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
 use Illuminate\Support\Facades\Blade;
 use Tests\TestCase;
 

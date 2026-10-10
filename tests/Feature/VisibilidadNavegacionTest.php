@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Identidad\Servicios\SidebarService;
-use App\Backend\Modulos\Identidad\Servicios\VisibilidadNavegacion;
+use App\Modulos\Identidad\Presentacion\Navegacion\SidebarService;
+use App\Modulos\Identidad\Presentacion\Navegacion\VisibilidadNavegacion;
 use App\Frontend\Livewire\Medico\Valoraciones\ValoracionMedicaPanel;
 use App\Frontend\Livewire\Medico\Clinica\PacientesSeguimientoPanel;
 use App\Frontend\Livewire\Administracion\Identidad\TurnosAsignacionesPanel;

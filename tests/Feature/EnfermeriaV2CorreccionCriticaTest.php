@@ -641,7 +641,7 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
             'estado' => 'ACTIVA',
         ]);
 
-        $miTurnoService = app(\App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService::class);
+        $miTurnoService = app(\App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService::class);
         $dashboard = $miTurnoService->obtenerDatosDashboard($enfermera);
 
         $card = collect($dashboard['residentes'])->firstWhere('cod_residente', $residente->cod_residente);

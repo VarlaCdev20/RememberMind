@@ -24,7 +24,7 @@ use App\Models\ProgramacionCuidado;
 use App\Models\Residente;
 use App\Models\Turno;
 use App\Models\User;
-use App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;

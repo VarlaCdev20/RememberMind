@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Enfermeria\Servicios\DashboardComplementosService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\DashboardComplementosService;
 use App\Models\{Area, Jornada, Personal, Residente, Turno, User};
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;

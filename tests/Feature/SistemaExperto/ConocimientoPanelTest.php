@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\SistemaExperto;
 
-use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
+use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use App\Backend\Modulos\SistemaExperto\Conocimiento\InventarioExperto;
 use App\Frontend\Livewire\Superadministrador\SistemaExperto\ConocimientoPanel;
 use App\Models\User;

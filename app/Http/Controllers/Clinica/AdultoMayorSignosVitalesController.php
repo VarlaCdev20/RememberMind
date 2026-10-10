@@ -61,7 +61,7 @@ class AdultoMayorSignosVitalesController extends Controller
     public function anular(Residente $adulto_mayor, SignoVital $signo)
     {
         abort_unless($signo->cod_residente === $adulto_mayor->cod_residente, 404);
-        app(\App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService::class)
+        app(\App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService::class)
             ->autorizarMutacionPaciente($adulto_mayor, 'signos_vitales.anular', auth()->user());
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($signo, $adulto_mayor) {

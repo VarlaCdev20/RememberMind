@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Documentos;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Backend\Modulos\Documentos\Servicios\DocumentosUsuarioService;
+use App\Compartido\Infraestructura\Documentos\DocumentosUsuarioService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;

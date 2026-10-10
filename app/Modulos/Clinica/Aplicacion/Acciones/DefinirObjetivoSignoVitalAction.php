@@ -2,7 +2,7 @@
 
 namespace App\Modulos\Clinica\Aplicacion\Acciones;
 
-use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
+use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use App\Models\ObjetivoSignoVital;
 use App\Models\Personal;
 use App\Models\Residente;

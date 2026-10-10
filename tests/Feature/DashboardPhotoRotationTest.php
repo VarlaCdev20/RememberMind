@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Backend\Modulos\Reportes\Servicios\DashboardPhotoRotation;
+use App\Modulos\Reportes\Presentacion\DashboardPhotoRotation;
 use Tests\TestCase;
 
 class DashboardPhotoRotationTest extends TestCase

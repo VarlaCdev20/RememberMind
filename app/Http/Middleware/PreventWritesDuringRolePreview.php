@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Backend\Modulos\Identidad\Servicios\RolePreviewService;
+use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;

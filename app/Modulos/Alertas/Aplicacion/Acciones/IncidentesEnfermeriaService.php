@@ -2,9 +2,9 @@
 
 namespace App\Modulos\Alertas\Aplicacion\Acciones;
 
-use App\Backend\Modulos\Enfermeria\Servicios\LesionesEnfermeriaService;
-use App\Backend\Modulos\Enfermeria\Servicios\MiTurnoService;
-use App\Backend\Modulos\Enfermeria\Servicios\TurnoEnfermeriaService;
+use App\Modulos\Cuidados\Aplicacion\Acciones\LesionesEnfermeriaService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Models\Incidente;
 use App\Models\User;
 use App\Modulos\Clinica\Aplicacion\Consultas\ContextoClinicoService;
