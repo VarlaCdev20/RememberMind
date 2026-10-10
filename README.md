@@ -1,107 +1,93 @@
+---
+title: "RememberMind"
+status: CURRENT
+version: "1.0"
+last_reviewed: 2026-10-08
+owner: RememberMind
+source_of_truth: false
+verified_against_commit: null
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
 # RememberMind
 
-Sistema web de gestión integral para residencia geriátrica, seguimiento clínico, funcional y cognitivo.
+Sistema web para una residencia geriátrica: operación institucional y seguimiento clínico, cognitivo, funcional e interdisciplinario.
 
-## Objetivo
-Proporcionar una plataforma integral, robusta y segura para el registro, atención, supervisión clínica y gestión de residentes geriátricos, asegurando trazabilidad médica, control riguroso de fármacos, alertas oportunas y soporte a la toma de decisiones multidisciplinarias.
+## Documentación y estado
 
-## Stack tecnológico
-- **Backend:** PHP 8.3+, Laravel 13, Fortify, Sanctum
-- **Frontend:** Livewire 4, Alpine.js, Tailwind CSS 3, Chart.js, GSAP, AOS
-- **Base de Datos:** PostgreSQL (entorno principal de desarrollo y producción), SQLite `:memory:` (testing automatizado)
-- **Permisos y Auditoría:** Spatie Laravel Permission 7.3, Spatie Activitylog 4.12
-- **Reportes:** Barryvdh DomPDF 3.1, Spatie Laravel PDF 2.8, Maatwebsite Excel 3.1
+Entrada oficial: [RememberMind Documentation](docs/README.md).
 
-## Requisitos
-- PHP 8.3 o superior con extensiones activas (`pdo_pgsql`, `pdo_sqlite`, `intl`, `mbstring`, `openssl`, `curl`, `gd` o `imagick`)
-- Composer 2+
-- Node.js 20+ y npm
-- PostgreSQL 15+
+- [Estado real del repositorio](docs/ESTADO_ACTUAL.md).
+- [Roadmap: trabajo, propuestas e ideas](docs/ROADMAP.md).
+- [Glosario](docs/GLOSARIO_DOMINIO.md), [decisiones pendientes](docs/DECISIONES_PENDIENTES.md), [deuda evidenciada](docs/DEUDA_TECNICA.md).
+- [Arquitectura vigente](docs/arquitectura/README.md), [BDD y extensiones aprobadas](docs/base-de-datos/README.md).
+- [Gobernanza/changelog documental](docs/CHANGELOG.md).
 
-## Instalación
+Hay código y tests en varias áreas; esta revisión documental no ejecutó suites/build ni verificó producción. No se afirma completitud o porcentaje global de aprobación.
+
+## Dominio y flujo institucional
+
+Postulante ≠ residente ≠ usuario ≠ personal ≠ contacto.
+
+Preadmisión → revisión → APROBADA/RECHAZADA → admisión formal con cama → residente admitido. Aprobación no crea residente; formalización es transaccional. Fuente: [AGENTS](AGENTS.md) y [baseline](docs/base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md); valores físicos divergentes están en DEC-OPEN-001.
+
+Áreas: institucional/alojamiento, clínica, cuidado continuo, medicación, trabajo interdisciplinario, actividades/visitas, documentación, alertas, reportes, seguridad/auditoría, UX/testing. El [sistema experto](docs/sistema-experto/README.md) tiene núcleo técnico, esquema y revisión administrativa implementados; su conocimiento institucional y activación clínica siguen pendientes.
+
+## Stack y requisitos
+
+Versiones bloqueadas y motores: [estado actual](docs/ESTADO_ACTUAL.md) y [baseline técnico](docs/arquitectura/REMEMBERMIND_BASELINE_TECNICO.md).
+
+- PHP ^8.3 y extensiones de la instalación; runtime no comprobado aquí.
+- Laravel 13.33.0, Livewire 4.4.6, Tailwind 3.4.19 y Vite 8.3.1 según locks.
+- Node >=22.12.0 para satisfacer el lock completo, incluido Puppeteer; Composer según entorno.
+- PostgreSQL para desarrollo integrado/staging/producción; SQLite :memory: para tests rápidos. MySQL/MariaDB fuera del baseline.
+
+## Preparar desarrollo
+
 ```bash
 composer install
 npm ci
-cp .env.example .env
-php artisan key:generate
 ```
 
-## Variables de entorno
-Configurar en `.env` los parámetros de conexión PostgreSQL:
-```env
-DB_CONNECTION=pgsql
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_DATABASE=remembermind
-DB_USERNAME=postgres
-DB_PASSWORD=tu_password
-```
+En instalación nueva, crear .env desde el ejemplo solo si no existe y configurar conexión/secretos del entorno. No sobrescribir .env existente. Generar clave únicamente para la instalación nueva; no regenerarla en un sistema con datos cifrados.
 
-## Base de datos
-BDD Operativa V2.1 — 70 tablas operativas congeladas y normalizadas:
-- Consultar siempre la documentación oficial en `docs/base-de-datos/`.
-- Prohibida la mutación estructural sin autorización previa.
-- Todas las entidades emplean nomenclatura estandarizada `cod_<entidad>`.
-
-## Migraciones
 ```bash
-php artisan migrate --seed
+php artisan key:generate
+php artisan migrate
 ```
 
-## Ejecución
+Antes de migrate confirmar DB destino y contrato aprobado. Seeders sintéticos solo con carga explícita según [guía local](docs/base-de-datos/SEEDERS_LOCALES.md); sin seed automático contra datos reales. migrate:fresh --seed solo en DB confirmada desechable cuando la verificación lo necesita.
+
+## Ejecución, pruebas y build
+
 ```bash
 composer dev
-```
-O ejecutando los servicios por separado:
-```bash
-php artisan serve
-npm run dev
-```
-
-## Compilación frontend
-```bash
+composer test
+php artisan test --filter=BddOperativaV2Test
+npm test
 npm run build
 ```
 
-## Pruebas
-```bash
-# Suite completa de tests PHP (SQLite en memoria)
-composer test
+Comandos disponibles, no ejecutados por Fase 1. PostgreSQL para garantías físicas/concurrencia; QA visual independiente del build. Producción tiene [procedimiento propio](docs/produccion/DESPLIEGUE_SEGURO.md).
 
-# Tests específicos de verificación
-php artisan test --filter=BddOperativaV2Test
+## Roles y seguridad
 
-# Tests frontend JavaScript (runner nativo node:test)
-npm test
-```
+Fuente: [roles congelados](docs/arquitectura/REMEMBERMIND_ROLES_BASELINE_CONGELADO.md).
 
-## Roles principales
-- **Superadministrador:** Configuración institucional, gestión de accesos y supervisión global.
-- **Administrador:** Gestión operativa de admisiones, personal y residentes.
-- **Médico:** Valoraciones médicas integrales, diagnósticos, órdenes médicas y evolución clínica.
-- **Enfermero / Personal de Cuidado:** Administración de medicación, registro de signos vitales, notas de enfermería y pases de turno.
-- **Psicólogo / Fisioterapeuta / Nutricionista / Pedagogo:** Valoraciones y planes de intervención especializada.
-- **Familiar:** Consulta protegida del estado y avances de su residente asignado (con estricto control anti-IDOR).
+- Superadministrador: acceso técnico/supervisión; no escritura clínica automática por rol.
+- Gerente: dirección, personal y planificación.
+- Administrador: operación diaria; no gestión de cuentas/RRHH ni clínica por rol.
+- Medicina/geriatría: competencias clínicas y prescripción autorizadas.
+- Enfermería: administración/documentación de cuidado; no prescribir.
+- Psicología, Nutrición, Fisioterapia y Pedagogía: ámbito profesional permitido.
+- Familiar: solo información autorizada de residentes vinculados; ver residente no publica expediente completo.
 
-## Arquitectura
-- `app/Backend/Modulos/`: Servicios y casos de uso organizados por módulo (`Admisiones`, `Alertas`, `Clinica`, `Identidad`, `Medicacion`, `Reportes`).
-- `app/Frontend/Livewire/`: Componentes reactivos por dominio funcional.
-- `app/Models/`: Modelos Eloquent normalizados bajo esquema V2 (`cod_usuario`, `cod_residente`).
-- `resources/frontend/`: Estilos (`styles/`) y scripts (`scripts/`).
-- `resources/views/`: Vistas Blade y plantillas modulares.
+Cuenta ACTIVO autenticada por correo + permiso + Policy + estado/regla + vínculo/scope/competencia. Registro público deshabilitado; archivos clínicos privados y descargas reautorizadas. Las deudas conocidas no se ocultan con un resumen de seguridad.
 
-## Documentación
-- [Índice General](docs/README.md)
-- [Arquitectura Vigente](docs/arquitectura/README.md)
-- [Base de Datos Operativa V2.1 (70 Tablas)](docs/base-de-datos/README.md)
-- [Auditoría del Sistema](docs/auditoria.md)
+## Agentes
 
-## Seguridad
-- Autenticación estricta mediante `correo` y verificación de `estado === 'ACTIVO'`.
-- Registro público deshabilitado institucionalmente.
-- Control de acceso granular por roles y permisos (RBAC Spatie).
-- Documentación clínica almacenada en disco privado (`storage/app/private/`).
-- Integridad referencial con validación exhaustiva de llaves foráneas.
-
-## Estado del proyecto
-Esquema V2.1 operativo, arquitectura modular consolidada, suite de pruebas automatizadas al 100% de aprobación.
+[CODEX_SETUP](CODEX_SETUP.md), [stack sistema](docs/sistema/STACK_SKILLS_SISTEMA.md) y [stack UX](docs/frontend/STACK_SKILLS_UX_UI.md). Instrucciones por alcance; historia y propuestas no gobiernan implementación.

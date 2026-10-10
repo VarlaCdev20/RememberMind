@@ -1,3 +1,20 @@
+---
+title: "Despliegue seguro de RememberMind"
+status: CURRENT
+version: "1.0"
+last_reviewed: 2026-10-06
+owner: RememberMind
+source_of_truth: true
+verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
+> Procedimiento requerido; despliegue/HTTPS/colas/backups/restauración NO VERIFICADOS en Fase 1. Alcance BDD actual: [núcleo y extensiones](../base-de-datos/README.md).
+
 # Despliegue seguro de RememberMind
 
 ## Condiciones obligatorias
@@ -20,7 +37,7 @@ php artisan optimize
 php artisan storage:link
 ```
 
-No ejecutar `migrate:fresh`, `db:wipe` ni `db:seed` en producción. La BDD V2.1 permanece congelada en 70 tablas operativas.
+No ejecutar `migrate:fresh`, `db:wipe` ni `db:seed` en producción. El núcleo V2.1 permanece congelado; aplicar solo sus extensiones explícitamente aprobadas y consultar el inventario vigente en el índice BDD.
 
 ## Verificación posterior
 

@@ -1,3 +1,18 @@
+---
+title: "Decisión de Arquitectura — BDD Operativa V2.1"
+status: APPROVED
+version: "V2.1"
+last_reviewed: 2026-10-06
+owner: RememberMind
+source_of_truth: true
+verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
 # Decisión de Arquitectura — BDD Operativa V2.1
 
 - **Fecha de aprobación:** 25/09/2026

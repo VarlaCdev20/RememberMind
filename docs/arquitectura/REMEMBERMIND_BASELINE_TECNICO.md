@@ -1,3 +1,20 @@
+---
+title: "RememberMind — Baseline técnico y entorno de ejecución"
+status: CURRENT
+version: "2.1"
+last_reviewed: 2026-10-06
+owner: RememberMind
+source_of_truth: true
+verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
+> Versiones declaradas compatibles; versiones concretas del lock y runtime no verificado se separan en [ESTADO_ACTUAL](../ESTADO_ACTUAL.md).
+
 # RememberMind — Baseline técnico y entorno de ejecución
 
 **Versión:** 2.1

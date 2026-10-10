@@ -1,3 +1,20 @@
+---
+title: "RememberMind — BDD Operativa V2.1: 70 tablas"
+status: CURRENT
+version: "V2.1"
+last_reviewed: 2026-10-06
+owner: RememberMind
+source_of_truth: true
+verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
+> Diccionario del núcleo, con extensión en decisión separada. Coherencias puntuales de resumen/garantías por capa: [auditoría](../AUDITORIA_DOCUMENTAL_FASE_1.md) y [deuda](../DEUDA_TECNICA.md); no se cambió especificación física.
+
 # RememberMind — BDD Operativa V2.1: 70 tablas
 
 > **Extensión aprobada V2.2:** este diccionario conserva las 70 tablas base. La tabla 71 `objetivos_signos_vitales` se especifica en [decisión V2.2](DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md).
@@ -1095,6 +1112,9 @@ Todas las PK `cod_*` usan `string(20)` salvo decisión futura explícitamente ap
 
 ## 27. `valoraciones_dolor` — Transaccional
 
+Extensión explícitamente aprobada el 09/10/2026:
+[Dolor V2](DECISION_DOLOR_V2.md). Conserva la tabla y su PK.
+
 **PK:** `cod_valoracion_dolor string(20)`
 
 
@@ -1105,6 +1125,8 @@ Todas las PK `cod_*` usan `string(20)` salvo decisión futura explícitamente ap
 - `cod_personal → personal.cod_personal`
 
 - `cod_atencion → atenciones.cod_atencion NULL`
+
+- `cod_valoracion_origen → valoraciones_dolor.cod_valoracion_dolor NULL`, DELETE RESTRICT; FK compuesta adicional con `cod_residente` impide origen de otro residente.
 
 
 **Atributos:**
@@ -1124,6 +1146,12 @@ Todas las PK `cod_*` usan `string(20)` salvo decisión futura explícitamente ap
 - `intervencion text NULL`
 
 - `respuesta text NULL`
+
+- `cod_valoracion_origen string(20) NULL`
+
+- `frecuencia string(40) NULL`
+
+- `factores_alivio text NULL`
 
 - `estado string(20)`
 
@@ -1805,6 +1833,14 @@ Todas las PK `cod_*` usan `string(20)` salvo decisión futura explícitamente ap
 
 - N — 1 residente
 
+
+### Extensión aprobada — Eliminación V2 (09/10/2026)
+
+Se conservan `cantidad` y `caracteristica` para historia, sin inferir unidades ni realizar backfill. La [decisión actual](DECISION_ELIMINACION_V2.md) añade exclusivamente estas trece columnas nullable:
+
+`cantidad_cualitativa string(20)`, `volumen_ml decimal(8,2)`, `color_orina string(30)`, `aspecto_orina string(30)`, `olor_orina string(30)`, `tipo_miccion string(30)`, `tipo_bristol unsignedTinyInteger`, `color_heces string(30)`, `esfuerzo_defecacion string(30)`, `presencia_sangre boolean`, `presencia_moco boolean`, `molestia_eliminacion boolean`, `descripcion_molestia string(250)`.
+
+No cambia PK/FK, relaciones ni inventario de tablas. Las ramas URINARIA/INTESTINAL se validan en backend; campos incompatibles no NULL se rechazan. Sin interpretación clínica automática. La sección anterior conserva la estructura del núcleo V2.1; esta nota expresa la extensión posterior, no una modificación histórica del baseline.
 
 ## 45. `registros_movilidad` — Transaccional
 

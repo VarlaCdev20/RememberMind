@@ -1,8 +1,30 @@
+---
+title: "RememberMind — Baseline Rector de la BDD Operativa"
+status: CURRENT
+version: "V2.1 + extensión V2.2"
+last_reviewed: 2026-10-06
+owner: RememberMind
+source_of_truth: true
+verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
+> Contrato rector congelado; el núcleo y las extensiones aprobadas mantienen su alcance. Conflictos puntuales de estados/catálogos y trazabilidad: [decisiones](../DECISIONES_PENDIENTES.md) y [deuda](../DEUDA_TECNICA.md). Esta revisión documental no modifica reglas ni acredita ejecución de tests.
+
 # RememberMind — Baseline Rector de la BDD Operativa
 
 > **Extensión aprobada V2.2:** las 70 tablas V2.1 descritas aquí permanecen congeladas. La propietaria aprobó el 4 de octubre de 2026 una tabla adicional `objetivos_signos_vitales` sin alterar las existentes. El inventario vigente tiene **71 tablas operativas**. Véase [decisión V2.2](DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md).
 
 **Estado:** CONGELADO
+
+**Ampliación aprobada Dolor V2 — 09/10/2026:** tres columnas y self-FK con
+coherencia de residente en `valoraciones_dolor`; sin nuevas tablas. Alcance
+exacto y reversión en [DECISION_DOLOR_V2](DECISION_DOLOR_V2.md). El resto del
+baseline conserva su congelamiento.
 **Versión:** BDD Operativa V2.1
 **Ámbito:** RememberMind — sistema residencial/geriátrico con seguimiento clínico y cognitivo
 **Tablas operativas:** 70
@@ -517,3 +539,11 @@ Los ciclos de vida específicos de `planes_cuidado`, `alertas`, `consentimientos
 **LA BASE DE DATOS OPERATIVA V2.1 SE ENCUENTRA FORMALMENTE CONGELADA.**
 
 Cualquier cambio estructural en tablas, campos, tipos, nulabilidad o relaciones requiere la apertura formal de un proceso de control de cambios, evaluación de impacto, aprobación del propietario y registro documental correspondiente. Ningún agente automatizado o desarrollador está facultado para alterar el esquema por iniciativa propia.
+
+## Extensión aprobada posterior: Eliminación V2 — 2026-10-09
+
+La [decisión Eliminación V2](DECISION_ELIMINACION_V2.md) autoriza únicamente trece columnas nullable en `registros_eliminacion`. Conserva `cantidad`, `caracteristica`, todas las PK/FK y 71 tablas operativas. No abre autorización estructural para otras tablas o campos; el núcleo congelado se mantiene bajo las decisiones posteriores de alcance explícito.
+
+## Extensión aprobada posterior: Movilidad V2 — 2026-10-10
+
+La [decisión Movilidad V2](DECISION_MOVILIDAD_V2.md) autoriza exactamente nueve columnas nullable en `registros_movilidad`. Conserva las columnas previas, filas históricas, PK/FK, relaciones, índices y el inventario de 71 tablas operativas. La aprobación no incluye cambios estructurales en otros módulos ni nuevas reglas clínicas.

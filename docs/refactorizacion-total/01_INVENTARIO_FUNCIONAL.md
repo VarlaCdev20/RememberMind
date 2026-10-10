@@ -51,7 +51,7 @@ Cobertura: 60 archivos de migraciones, 29 seeders, 46 modelos, 71 archivos Livew
 
 ## Seeders: contenido y uso
 
-DatabaseSeeder carga el catálogo canónico de roles y permisos. La carga ficticia de las 70 tablas operativas está separada en LocalSampleDataSeeder y requiere ejecución explícita en local/testing. Sus registros no deben utilizarse para atención ni acreditaciones reales. Las áreas se insertan también en una migración, aspecto a revisar en una futura evolución estructural.
+DatabaseSeeder carga el catálogo canónico de roles y permisos. La carga de muestra observada en este inventario histórico fue retirada el 08/10/2026. La carga local vigente es Historical2026Seeder; véase [Carga sintética histórica 2026](../base-de-datos/SEED_HISTORICO_2026.md), con sus restricciones y evidencia propia. Sus registros no deben utilizarse para atención ni acreditaciones reales. Las áreas se insertan también en una migración, aspecto a revisar en una futura evolución estructural.
 
 GeriatricSuiteSeeder contiene FVS, Mini-Cog, MMSE, MoCA, GDS-15, CESD-7, Katz, Lawton, SPPB, FRAIL, TUG, Susurro, revisión medicación, velocidad marcha, Peek, Snellen, cartilla bolsillo, Braden, Norton, MNA-SF, MUST, SARC-F, barreras, maltrato, OARS y Díaz-Veiga. Cada versión prospectiva exige formulario, reglas, prueba de puntuación y aprobación clínica; no inventar licencias ni equivalencia clínica.
 

@@ -1,3 +1,20 @@
+---
+title: "Dashboards por rol: fuentes y límites"
+status: CURRENT
+version: "1.0"
+last_reviewed: 2026-10-06
+owner: RememberMind
+source_of_truth: true
+verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
+> Contrato/consultas por rol; no certifica completitud de módulos. Estado comprobado por lectura en [ESTADO_ACTUAL](../ESTADO_ACTUAL.md).
+
 # Dashboards por rol: fuentes y límites
 
 Los paneles comparten `dashboard-header`, `metric-card` y bloques de datos del Design System. La selección visual de bloques no concede permisos. Las rutas y Policies existentes siguen siendo la autoridad para abrir cada módulo.

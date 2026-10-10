@@ -1,3 +1,20 @@
+---
+title: "Fase 9B: tareas, ubicación y observaciones de Enfermería"
+status: HISTORICAL
+version: "1.0"
+last_reviewed: 2026-10-06
+owner: RememberMind
+source_of_truth: false
+verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
+> HISTORICAL — DO NOT USE AS CURRENT SOURCE OF TRUTH. Snapshot; nombres/deuda pueden haber cambiado desde la entrega.
+
 # Fase 9B: tareas, ubicación y observaciones de Enfermería
 
 ## Alcance

@@ -1,3 +1,20 @@
+---
+title: "Stack de skills UX/UI de RememberMind"
+status: CURRENT
+version: "1.0"
+last_reviewed: 2026-10-06
+owner: RememberMind
+source_of_truth: false
+verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
+> La solicitud ajena a esta guía fue preservada íntegra en [archivo histórico](../historico/SOLICITUD_STACK_SKILLS_SISTEMA.md); la guía conserva su contenido UX previo.
+
 # Stack de skills UX/UI de RememberMind
 
 Ubicación: `.agents/skills/`. Diez especialidades y un punto de entrada existente (`remembermind-ui-review`). Auditoría previa: [mapa de conservación y transición](AUDITORIA_SKILLS_UX_UI.md). Autoridad común: [contrato visual y límites](CONTRATO_VISUAL_UX_UI.md).

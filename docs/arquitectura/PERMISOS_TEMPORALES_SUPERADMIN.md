@@ -1,3 +1,20 @@
+---
+title: "Permisos temporales del superadministrador"
+status: CURRENT
+version: "1.0"
+last_reviewed: 2026-10-06
+owner: RememberMind
+source_of_truth: true
+verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
+> Excepción temporal documentada; guardia efectiva por entorno y configuración desplegada requieren verificación. Ver [TECH-004](../DEUDA_TECNICA.md#tech-004); no se cambian permisos en Fase 1.
+
 # Permisos temporales del superadministrador
 
 Durante la construcción de RememberMind, `SUPERADMINISTRADOR` recibe todos los permisos Spatie del guard `web`. El seeder conserva permisos nuevos ya existentes y los asigna al rol; el evento de creación asigna cada permiso `web` nuevo en el momento de crearlo. El panel de roles impide retirar permisos de este rol mientras dure esta etapa. La asignación persiste en `role_has_permissions`; para permisos clínicos de escritura, `can()` también exige el contexto temporal válido.

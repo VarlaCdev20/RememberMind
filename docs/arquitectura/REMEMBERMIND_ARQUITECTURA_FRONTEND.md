@@ -1,7 +1,24 @@
+---
+title: "RememberMind — Arquitectura Frontend Canónica"
+status: DEPRECATED
+version: "1.0"
+last_reviewed: 2026-10-06
+owner: RememberMind
+source_of_truth: false
+verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
+> DEPRECATED como norma: contiene objetivos/rutas y criterios visuales anteriores. Consultar [estructura canónica](README.md), [resources/AGENTS](../../resources/AGENTS.md), [contrato visual vigente](../frontend/CONTRATO_VISUAL_UX_UI.md) y [tokens implementados](../../resources/frontend/styles/design-system/README.md). El contenido siguiente se conserva como antecedente, no obliga a migrar a Features/Pages ni a cambiar UX.
+
 # RememberMind — Arquitectura Frontend Canónica
 
 **Versión:** 1.0 (Fase 1: Consolidación)
-**Estado:** VIGENTE (Norma Arquitectónica)
+**Estado:** DEPRECATED como norma; se conserva como antecedente de transición.
 **Ámbito:** Capa de Presentación, Sistema de Diseño, Componentes Blade, Livewire 4 y Maquetación.
 
 ---

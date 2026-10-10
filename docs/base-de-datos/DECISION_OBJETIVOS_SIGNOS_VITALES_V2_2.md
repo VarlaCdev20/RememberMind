@@ -1,3 +1,18 @@
+---
+title: "Extensión clínica V2.2 — objetivos individuales de signos vitales"
+status: APPROVED
+version: "V2.2"
+last_reviewed: 2026-10-06
+owner: RememberMind
+source_of_truth: true
+verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
 # Extensión clínica V2.2 — objetivos individuales de signos vitales
 
 **Aprobación de la propietaria:** 4 de octubre de 2026. La extensión se autorizó condicionada a consistencia, cuarta forma normal y reutilización. No modifica las 70 tablas del baseline V2.1; añade una tabla operativa, por lo que el inventario actual contiene **71 tablas operativas**.

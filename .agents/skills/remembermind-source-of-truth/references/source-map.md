@@ -1,6 +1,6 @@
 # Mapa de fuentes y conflictos
 
-Fecha de revisión: 2026-10-06. Catálogo de descubrimiento, no copia de los contratos. Verificar estado/alcance y decisiones posteriores antes de cada tarea.
+Fecha de revisión: 2026-10-08. Catálogo de descubrimiento, no copia de los contratos. Verificar estado/alcance y decisiones posteriores antes de cada tarea.
 
 ## Resolución
 
@@ -21,7 +21,7 @@ Fecha de revisión: 2026-10-06. Catálogo de descubrimiento, no copia de los con
 | REMEMBERMIND_ROLES_BASELINE_CONGELADO.md | VIGENTE | Competencias y límites por rol; no otorgar permisos desde una lista conceptual. |
 | PERMISOS_TEMPORALES_SUPERADMIN.md | VIGENTE, excepción acotada | Solo entorno/flag/identidad y condiciones allí definidos; no autorización clínica permanente. |
 | DASHBOARDS_POR_ROL.md | VIGENTE para contrato específico | Algunas propuestas/expectativas necesitan contraste con límites actuales y código. |
-| REMEMBERMIND_ARQUITECTURA_FRONTEND.md | CONFLICTIVA parcialmente | Conservar intención pertinente; carpetas Features/Pages u otras prescripciones divergentes no prevalecen sobre arquitectura/AGENTS actuales. |
+| REMEMBERMIND_ARQUITECTURA_FRONTEND.md | DEPRECADA como norma | Fase 1 marcó sustitución por arquitectura canónica/resources/contrato visual; se conserva como antecedente. Features/Pages y prescripciones divergentes no gobiernan implementación. |
 | Baseline congelado y diccionario físico | VIGENTE con extensiones aprobadas | Autoridad de estructura y terminología. Los valores físicos de estado requieren resolver divergencias puntuales. |
 | DECISION_ARQUITECTURA_BDD_V2_1.md | VIGENTE aprobada | Normalización y autor clínico frente a actor técnico. |
 | DECISION_UNIDAD_TALLA_CM.md | VIGENTE aprobada | Unidad y migración de talla; no convertir silenciosamente datos ambiguos. |
@@ -33,11 +33,11 @@ Fecha de revisión: 2026-10-06. Catálogo de descubrimiento, no copia de los con
 | docs/architecture-audit/* y docs/refactorizacion-total/* | HISTÓRICA | Inventarios, opciones y arquitectura anterior. |
 | docs/auditoria.md y auditoria_roles_permisos.md | HISTÓRICA | Snapshot V1/inventarios anteriores; no matriz vigente. |
 | CONTRATO_VISUAL_UX_UI.md y AUDITORIA_SKILLS_UX_UI.md | VIGENTE | Contrato/selección visual; no método clínico. |
-| STACK_SKILLS_UX_UI.md | VIGENTE para guía UX, CONFLICTIVA por pegado preexistente | Texto de tarea de sistema insertado en cambios locales: preservar; usar instrucción actual para alcance de skills, no como protocolo aprobado. |
+| STACK_SKILLS_UX_UI.md | VIGENTE para guía UX | Fase 1 separó solicitud de sistema a docs/historico/SOLICITUD_STACK_SKILLS_SISTEMA.md, preservada íntegra. Una solicitud histórica no es protocolo clínico aprobado. |
 | PLAN_UNIFICACION_VISUAL.md y FASE_9*, FASE_11* | HISTÓRICA como evidencia de entregas; contratos puntuales a contrastar | Fotografías de implementación y limitaciones, no nuevas reglas clínicas. |
 | PENDIENTE_BADGES_ESTADO_RESIDENTE.md | NO RESUELTA la clasificación clínica; VIGENTE su restricción | No inferir estabilidad por ausencia de alertas. |
-| docs/produccion/DESPLIEGUE_SEGURO.md | VIGENTE auxiliar; conteo anterior DEPRECADO | Operación segura del entorno; actualizar alcance por decisiones posteriores, no ejecutar despliegue por leerlo. |
-| docs/sistema-experto/README.md | VIGENTE para estado de propuesta | No existe aprobación clínica por declarar una intención académica. |
+| docs/produccion/DESPLIEGUE_SEGURO.md | VIGENTE como procedimiento | Núcleo y extensiones vigentes enlazados; despliegue/backup/restauración no acreditados por presencia de guía. No ejecutar producción por leerla. |
+| docs/sistema-experto/README.md e IMPLEMENTACION_V1.md | VIGENTE para routing y evidencia técnica | O.R.I.O.N. gobierna el contrato experto aprobado. Núcleo y 23 tablas verificados con datos artificiales; ORION-V1 documental cargado e inactivo y MEM-INV observacional propuesto. Activación clínica pendiente de paquete ejecutable validado y datos admisibles. Los diseños locales siguen propuestos. |
 | Tres diseños en docs/sistema-experto/ | PROPUESTA; CONFLICTIVA ubicación/arquitectura vieja | Árboles/arquitectura futura, no reglas ejecutables aprobadas. |
 | RM-EXPERT-001 en baseline | PROPUESTA para aprobación formal / DOCUMENTAL | No fingir aprobación del sistema experto por estar en el baseline. |
 | Pesos, umbrales, catálogos abiertos, PRN/reintentos, licencias de instrumentos | NO RESUELTA donde no haya decisión concreta | Aislar requisito, ofrecer opciones; continuar trabajo técnico independiente. |

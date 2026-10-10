@@ -1,10 +1,27 @@
+---
+title: "RememberMind — Baseline funcional congelado de roles"
+status: CURRENT
+version: "2.1"
+last_reviewed: 2026-10-06
+owner: RememberMind
+source_of_truth: true
+verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
+> La extensión BDD V2.2 no otorga permisos nuevos por inferencia. Ver [índice BDD](../base-de-datos/README.md).
+
 # RememberMind — Baseline funcional congelado de roles
 
 **Estado:** CONGELADO
 **Aprobación:** modificación expresamente aprobada por la responsable del proyecto
 **Ámbito:** roles, permisos, navegación, dashboards y flujos funcionales
 **Persistencia:** Spatie Permission; no se crean tablas empresariales de roles
-**BDD vigente:** Operativa V2.1, exactamente 70 tablas operativas congeladas
+**BDD:** núcleo Operativo V2.1 de 70 tablas congeladas, más extensiones explícitamente aprobadas; consultar el índice BDD para inventario vigente.
 
 ## Modelo funcional
 

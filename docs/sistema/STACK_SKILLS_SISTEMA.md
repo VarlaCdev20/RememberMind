@@ -1,3 +1,20 @@
+---
+title: "Stack de skills de sistema de RememberMind"
+status: CURRENT
+version: "1.0"
+last_reviewed: 2026-10-06
+owner: RememberMind
+source_of_truth: false
+verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
+> Infraestructura/registro de skills; no aprobación clínica ni certificación de producto. Fase documental actual: [portal](../README.md).
+
 # Stack de skills de sistema de RememberMind
 
 Skills institucionales en [`.agents/skills/`](../../.agents/skills); documentación en [`docs/sistema/`](.). Los conteos siguientes describen esta entrega de skills, no el inventario BDD: 14 nuevas, 4 evolucionadas, 15 responsabilidades solicitadas.
@@ -76,7 +93,7 @@ La selección depende del riesgo, no de cargar todas las skills. Una vez resuelt
 
 ## Integración con UX
 
-La [guía UX existente](../frontend/STACK_SKILLS_UX_UI.md), [contrato visual](../frontend/CONTRATO_VISUAL_UX_UI.md) y remembermind-ui-review siguen siendo sus autoridades específicas. La guía UX contiene un pegado local previo de esta tarea; no se edita aquí ni se trata ese pegado como aprobación clínica.
+La [guía UX existente](../frontend/STACK_SKILLS_UX_UI.md), [contrato visual](../frontend/CONTRATO_VISUAL_UX_UI.md) y remembermind-ui-review siguen siendo sus autoridades específicas. En Fase 1 documental se separó el pegado de la solicitud de sistema a [archivo histórico](../historico/SOLICITUD_STACK_SKILLS_SISTEMA.md), conservándolo íntegro; no es aprobación clínica.
 
 Selección especializada: flujo → fidelidad solo con imagen aprobada → dirección artística si falta → tokens/componentes → interacción clínica/datos cuando aplican → motion funcional → responsive/accessibility → writing → QA. No cargar diez etapas para cambiar un label. QA visual emite evidencia/PASS/FAIL, no diseña ni corrige durante revisión.
 

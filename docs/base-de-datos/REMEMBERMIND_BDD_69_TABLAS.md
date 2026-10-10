@@ -1,3 +1,20 @@
+---
+title: "RememberMind — HISTÓRICO — BDD Operativa V2.0: 69 tablas"
+status: HISTORICAL
+version: "V2.0"
+last_reviewed: 2026-10-06
+owner: RememberMind
+source_of_truth: false
+verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
+> HISTORICAL — DO NOT USE AS CURRENT SOURCE OF TRUTH. Consultar [índice vigente](README.md).
+
 # RememberMind — HISTÓRICO — BDD Operativa V2.0: 69 tablas
 
 **Estado:** HISTÓRICO (V2.0)
@@ -2950,4 +2967,3 @@ Si una necesidad nueva no cabe en el modelo:
 - evaluar 3FN y relaciones;
 - solicitar autorización;
 - crear una migración nueva solo después de aprobar el cambio.
-

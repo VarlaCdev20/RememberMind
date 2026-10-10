@@ -1,3 +1,20 @@
+---
+title: "Verificación del stack de skills de sistema"
+status: CURRENT
+version: "1.0"
+last_reviewed: 2026-10-06
+owner: RememberMind
+source_of_truth: false
+verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
+> Infraestructura/registro de skills; no aprobación clínica ni certificación de producto. Fase documental actual: [portal](../README.md).
+
 # Verificación del stack de skills de sistema
 
 Fecha: 2026-10-06. Alcance verificado: instrucciones/documentación, no funcionamiento de producto.

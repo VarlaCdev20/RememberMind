@@ -1,3 +1,20 @@
+---
+title: "Auditoría de Base de Datos - RememberMind"
+status: HISTORICAL
+version: "1.0"
+last_reviewed: 2026-10-06
+owner: RememberMind
+source_of_truth: false
+verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
+
+> HISTORICAL — DO NOT USE AS CURRENT SOURCE OF TRUTH. Auditoría V1; consultar [BDD vigente](base-de-datos/README.md).
+
 # Auditoría de Base de Datos - RememberMind
 
 ### 1. Inventario de Tablas (64 tablas)
@@ -196,4 +213,3 @@
 - **horarios_personal_salud**: Falta columna `created_at`/`updated_at`.
 - **tipo_actividades_adulto**: Falta columna `created_at`/`updated_at`.
 - **tipo_atenciones_adulto**: Falta columna `created_at`/`updated_at`.
-
