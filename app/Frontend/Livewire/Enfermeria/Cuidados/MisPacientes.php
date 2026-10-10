@@ -718,32 +718,19 @@ class MisPacientes extends Component
         if ($tieneLecturaClinicaGlobal) {
             $esPermitido = true;
             $esAsignadoAlUsuario = false;
-        } elseif ($turnoActual) {
-            // EN_TURNO: Verificar que el residente esté asignado al usuario en el turno activo
-            $esAsignadoAlUsuario = $service->esPacienteAsignado($codResidente, $user, $turnoActual->cod_turno)
-                                || $service->esPacienteAsignado($codRes, $user, $turnoActual->cod_turno);
-            $esPermitido = $esAsignadoAlUsuario;
         } else {
-            // FUERA_DE_TURNO: Verificar si el residente está cubierto por alguna jornada de enfermería activa del sistema
-            $miTurnoService = app(MiTurnoService::class);
-            $jornadasActivas = $miTurnoService->resolverJornadasActivasSistema(Carbon::now());
-            if ($jornadasActivas->isNotEmpty()) {
-                $codJornadasActivas = $jornadasActivas->pluck('cod_jornada')->all();
-                $esPermitido = AsignacionResidenteJornada::query()
-                    ->whereIn('cod_jornada', $codJornadasActivas)
-                    ->where(function ($q) use ($codResidente, $codRes) {
-                        $q->where('cod_residente', $codResidente)
-                            ->orWhere('cod_residente', $codRes);
-                    })
-                    ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'ASIGNADO'])
-                    ->exists();
-            }
-            $esAsignadoAlUsuario = false;
+            // La lectura usa el mismo alcance propio del directorio, incluso
+            // si el horario termina mientras la pantalla permanece abierta.
+            $esPermitido = $service->obtenerPacientesAsignadosQuery($user, null, $user->cod_usuario)
+                ->whereKey($codResidente)->exists();
+            // Consultar el resumen no habilita una escritura fuera de turno.
+            $esAsignadoAlUsuario = $esPermitido && $turnoActual
+                && $service->esPacienteAsignado($codResidente, $user, $turnoActual->cod_turno);
         }
 
         if (! $esPermitido) {
             $this->cerrarPanelAhora();
-            abort(403, 'No tiene autorización para acceder al residente indicado o no se encuentra asignado a su turno.');
+            abort(403, 'No tiene autorización para consultar este residente o su asignación ya no está disponible.');
         }
 
         $this->residente = $codResidente;

@@ -399,6 +399,71 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertDontSee('Luisa Morales');
     }
 
+    public function test_resumen_del_directorio_sigue_disponible_al_terminar_el_horario_sin_habilitar_registro(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $this->actingAs($this->enfermero);
+        $vista = Livewire::test(MisPacientes::class)->assertSee('Pedro Gomez');
+        $signosAntes = SignoVital::query()->count();
+
+        $this->travelTo(today()->setTime(16, 0));
+
+        $vista->call('seleccionarResidente', $this->residenteEstable->cod_residente)
+            ->assertStatus(200)
+            ->assertSet('mostrarPanelDetalle', true)
+            ->assertSet('esModoConsulta', true)
+            ->assertSet('esResidenteAsignado', false)
+            ->assertSee('Resumen del residente')
+            ->assertSee('Pedro Gomez');
+        $this->assertFalse($vista->instance()->puedeRegistrar());
+        $vista->call('mostrarSelectorRegistro')->assertStatus(403);
+        $this->assertSame($signosAntes, SignoVital::query()->count());
+    }
+
+    public function test_resumen_revalida_asignacion_y_rechaza_un_residente_retirado_del_directorio(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $this->actingAs($this->enfermero);
+        $vista = Livewire::test(MisPacientes::class)->assertSee('Pedro Gomez');
+
+        AsignacionResidenteJornada::query()
+            ->where('cod_residente', $this->residenteEstable->cod_residente)
+            ->update(['estado' => 'INACTIVA']);
+
+        $vista->call('seleccionarResidente', $this->residenteEstable->cod_residente)
+            ->assertStatus(403)
+            ->assertSet('mostrarPanelDetalle', false)
+            ->assertSet('detalleResidente', null);
+    }
+
+    public function test_resumen_no_expone_residentes_asignados_solo_a_otro_enfermero(): void
+    {
+        $this->travelTo(today()->setTime(10, 0));
+        $otroEnfermero = User::factory()->create(['estado' => 'ACTIVO']);
+        $otroEnfermero->assignRole('ENFERMEROS');
+        $otroPersonal = Personal::create([
+            'cod_personal' => 'PER_ENF_RESUMEN_02',
+            'cod_usuario' => $otroEnfermero->cod_usuario,
+            'nombres' => 'Enfermero',
+            'apellido_paterno' => 'Prueba',
+            'numero_documento' => 'ENF-RESUMEN-02',
+            'profesion' => 'ENFERMERIA',
+            'estado' => 'ACTIVO',
+        ]);
+        AsignacionResidenteJornada::query()->update([
+            'cod_personal' => $otroPersonal->cod_personal,
+        ]);
+        $this->actingAs($this->enfermero);
+
+        Livewire::test(MisPacientes::class)
+            ->assertSet('esModoConsulta', true)
+            ->assertDontSee('Pedro Gomez')
+            ->call('seleccionarResidente', $this->residenteEstable->cod_residente)
+            ->assertStatus(403)
+            ->assertSet('mostrarPanelDetalle', false)
+            ->assertSet('detalleResidente', null);
+    }
+
     public function test_selector_conecta_controles_y_acciones_con_pantallas_existentes(): void
     {
         $this->travelTo(today()->setTime(10, 0));
