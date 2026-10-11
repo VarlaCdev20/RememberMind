@@ -55,7 +55,8 @@ jobs:
           node scripts/verificar-auditoria-npm.mjs npm-audit-full.json
       - run: npm run build
       - name: Frontend with desktop and touch fixtures
-        run: xvfb-run --auto-servernum npm test
+        # Las ventanas comparten Xvfb; serializar evita que se roben el foco.
+        run: xvfb-run --auto-servernum node --test --test-concurrency=1 "tests/Frontend/**/*.test.js"
         env:
           RM_BROWSER_HEADFUL: '1'
       - name: Independent expert engine
