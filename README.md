@@ -49,12 +49,14 @@ Versiones bloqueadas y motores: [estado actual](docs/ESTADO_ACTUAL.md) y [baseli
 
 ## Preparar desarrollo
 
+Trabajo nuevo: `feature/<modulo>-<objetivo>` desde `develop`, PR de vuelta a `develop` y entrega `release/*` hacia `main`. [Flujo Git, commits y comprobaciones](docs/sistema/GIT_FLOW.md). Los doce módulos forman la base técnica; sus pendientes siguen documentados.
+
 ```bash
 composer install
 npm ci
 ```
 
-La copia de desarrollo local está en `C:\Users\CARLAENCINAS\Desktop\RememberMind`, rama `PODEMOS-SEGUIR`. La carpeta de Codex contiene informes y temporales de auditoría. `composer setup` instala dependencias y compila; no regenera claves ni ejecuta migraciones.
+La copia de desarrollo local está en `C:\Users\CARLAENCINAS\Desktop\RememberMind`; el trabajo nuevo parte de `develop`. `PODEMOS-SEGUIR` conserva el checkpoint anterior. La carpeta de Codex contiene informes y temporales de auditoría. `composer setup` instala dependencias y compila; no regenera claves ni ejecuta migraciones.
 
 En instalación nueva, crear .env desde el ejemplo solo si no existe y configurar conexión/secretos del entorno. No sobrescribir .env existente. Generar clave únicamente para la instalación nueva; no regenerarla en un sistema con datos cifrados.
 

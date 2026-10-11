@@ -11,6 +11,32 @@ const fixture = () => ({
 });
 const vigente = new Date('2026-10-11T00:00:00Z');
 
+function fixtureLinux() {
+    const { informe, lock } = fixture();
+    informe.vulnerabilities.tailwindcss = { name: 'tailwindcss', severity: 'high', nodes: ['node_modules/tailwindcss'], via: ['braces'] };
+    informe.vulnerabilities['@tailwindcss/typography'] = { name: '@tailwindcss/typography', severity: 'high', nodes: ['node_modules/@tailwindcss/typography'], via: ['tailwindcss'] };
+    informe.metadata.vulnerabilities.total = 3;
+    lock.packages['node_modules/tailwindcss'].dev = true;
+    lock.packages['node_modules/@tailwindcss/typography'] = { dev: true, version: '0.5.19' };
+    return { informe, lock };
+}
+
+test('la propagación Linux a typography conserva el mismo advisory de build', () => {
+    const { informe, lock } = fixtureLinux();
+    assert.equal(verificarAuditoria(informe, lock, vigente).pendientes, 1);
+    lock.packages['node_modules/@tailwindcss/typography'].dev = false;
+    assert.throws(() => verificarAuditoria(informe, lock, vigente), /alcanza ejecución/);
+});
+
+test('typography no permite otra causa ni otra versión por la excepción de braces', () => {
+    const { informe, lock } = fixtureLinux();
+    informe.vulnerabilities['@tailwindcss/typography'].via = ['braces'];
+    assert.throws(() => verificarAuditoria(informe, lock, vigente), /propagación/);
+    informe.vulnerabilities['@tailwindcss/typography'].via = ['tailwindcss'];
+    lock.packages['node_modules/@tailwindcss/typography'].version = 'otra';
+    assert.throws(() => verificarAuditoria(informe, lock, vigente), /propagación/);
+});
+
 test('la deuda conocida se informa con su advisory y nunca como cero', () => {
     const { informe, lock } = fixture();
     assert.equal(verificarAuditoria(informe, lock, vigente).pendientes, 1);

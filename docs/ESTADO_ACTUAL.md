@@ -18,9 +18,15 @@ related_modules: []
 
 # Estado actual de RememberMind
 
-## Corte vigente — 11/10/2026
+## Flujo Git y alcance aceptado — 11/10/2026
 
-Desacoplamiento posterior terminado en `2818ff4`: contexto autenticado, sesión, archivos, correo, PDF, enlaces y adaptadores expertos detrás de contratos; consultas de ficha y paneles preparadas y reautorizadas tras hidratación Livewire. SQLite completa: **1.094 pruebas / 32.023 aserciones, cero fallos, 15 omisiones**, 17m25.825s. PostgreSQL desechable: **183 / 3.035, sin omisiones**. Frontend 151 y build aprobados; motor independiente cinco casos; 50 archivos protegidos sin cambios. [Informe por etapas y límites](arquitectura/DESACOPLAMIENTO_2026_10_11.md). Se conserva arquitectura híbrida, excepciones Laravel/Eloquent y deuda de archivos; no hay activación clínica ni push.
+El propietario conserva los doce módulos como base técnica y mantiene visibles sus capacidades pendientes. El trabajo nuevo parte de `develop` en `feature/*`; las entregas llegan a `main` mediante `release/*` y las urgencias mediante `hotfix/*`. `PODEMOS-SEGUIR` conserva el checkpoint publicado del desacoplamiento. [Procedimiento, controles y respaldos](sistema/GIT_FLOW.md).
+
+Los cortes de pruebas siguientes corresponden a los commits y entornos indicados; el resultado actual de integración se consulta en [GitHub Actions](https://github.com/VarlaCdev20/RememberMind/actions). La aceptación de esta base no implica producción ni validación institucional o clínica. Siguen vigentes los pendientes de [deuda técnica](DEUDA_TECNICA.md) y [decisiones](DECISIONES_PENDIENTES.md).
+
+## Corte de desacoplamiento — 11/10/2026
+
+Desacoplamiento posterior terminado en `2818ff4`: contexto autenticado, sesión, archivos, correo, PDF, enlaces y adaptadores expertos detrás de contratos; consultas de ficha y paneles preparadas y reautorizadas tras hidratación Livewire. SQLite completa: **1.094 pruebas / 32.023 aserciones, cero fallos, 15 omisiones**, 17m25.825s. PostgreSQL desechable: **183 / 3.035, sin omisiones**. Frontend 151 y build aprobados; motor independiente cinco casos; 50 archivos protegidos sin cambios. [Informe por etapas y límites](arquitectura/DESACOPLAMIENTO_2026_10_11.md). Se conserva arquitectura híbrida, excepciones Laravel/Eloquent y deuda de archivos; en ese corte no hubo activación clínica ni push.
 
 ## Preparación anterior del mismo día
 
@@ -30,7 +36,7 @@ Suite SQLite completa en el commit indicado: **1.079 pruebas, 31.452 aserciones,
 
 La arquitectura administrativa conserva doce propietarios y cuatro capas, con excepciones Eloquent explícitas; el núcleo experto verifica independencia de Laravel y adaptadores. No se afirma separación absoluta de todo el legado. Composer y auditoría npm runtime sin avisos; npm completo mantiene un advisory alto de desarrollo (`braces`), controlado temporalmente hasta 11/11/2026. Documentos de usuario en disco público requieren un trabajo específico de privacidad. Los 50 archivos protegidos conservan hash y tamaño; no se modificó el esquema congelado ni la base instalada.
 
-Los commits son locales; CI remoto, QA visual integral, producción y validación clínica quedan fuera de esta evidencia. `runtime_verified: false` conserva el límite de certificación integral, aunque las suites indicadas sí fueron ejecutadas. Las secciones siguientes son históricas y no sustituyen este corte.
+En ese corte los commits eran locales; CI remoto, QA visual integral, producción y validación clínica quedaban fuera de esa evidencia. `runtime_verified: false` conserva el límite de certificación integral, aunque las suites indicadas sí fueron ejecutadas. Las secciones siguientes son históricas y no sustituyen este corte.
 
 ## Actualización arquitectónica — 10/10/2026
 

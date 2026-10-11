@@ -2,7 +2,9 @@ name: CI
 
 on:
   pull_request:
+    branches: [main, develop]
   push:
+    branches: [main, develop, PODEMOS-SEGUIR]
   workflow_dispatch:
 
 permissions:
@@ -14,7 +16,7 @@ concurrency:
 
 jobs:
   quality:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 45
     env:
       APP_ENV: testing
@@ -43,14 +45,19 @@ jobs:
       - name: Validate PHP syntax
         run: find app bootstrap config database routes tests motor-experto/src -name '*.php' -print0 | xargs -0 -n1 php -l
       - run: npm ci
+      - name: Install browser for frontend tests
+        run: npx puppeteer browsers install chrome
       - name: Audit dependencies
         shell: bash
         run: |
           npm audit --omit=dev
           npm audit --json > npm-audit-full.json || true
           node scripts/verificar-auditoria-npm.mjs npm-audit-full.json
-      - run: npm test
       - run: npm run build
+      - name: Frontend with desktop and touch fixtures
+        run: xvfb-run --auto-servernum npm test
+        env:
+          RM_BROWSER_HEADFUL: '1'
       - name: Independent expert engine
         run: php motor-experto/tests/independencia.php
       - name: Full SQLite suite
@@ -124,7 +131,7 @@ jobs:
       - name: PostgreSQL contracts, role login and concurrency
         run: >-
           php vendor/phpunit/phpunit/phpunit -c phpunit.postgres.xml
-          --filter 'AccesoDashboardPorRolTest|AuthenticationTest|BddOperativaV2Test|ContratoPersonalInstitucionalTest|ContratoDocumentacionUsuarioTest|ContratoSeguridadCuentaTest|FichaCuidadosTest|CargaConocimientoOrionTest|ConocimientoPanelTest|RolesVistasPermisosMatrixTest|Fase3AdmisionAtomicidadTest|AlojamientoBloqueoPostgresTest|Fase3ConcurrenciaCamaPostgresTest|PersistenciaExpertaTest|ResultadosExpertoResidenteTest|PaqueteInvestigadoCOGMEMTest|DolorMigrationTest'
+          --filter 'AccesoDashboardPorRolTest|AuthenticationTest|BddOperativaV2Test|ContratoPersonalInstitucionalTest|ContratoDocumentacionUsuarioTest|ContratoSeguridadCuentaTest|FichaCuidadosTest|CargaConocimientoOrionTest|ConocimientoPanelTest|RolesVistasPermisosMatrixTest|Fase3AdmisionAtomicidadTest|AlojamientoBloqueoPostgresTest|Fase3ConcurrenciaCamaPostgresTest|PersistenciaExpertaTest|ResultadosExpertoResidenteTest|PaqueteInvestigadoCOGMEMTest|DolorMigrationTest|DesacoplamientoContextoTest|PanelAlertaPreparadoTest|ConsultasPorCapaTest|ExploradorAdministrativoTest|ApplicationBoundaryTest|DesacoplamientoArchivosTest|ReportesPortabilidadTest|FrontendRestauradoV2Test|PantallasConectadasTest|VistasModularesTest|DashboardAdministracionIntegracionVisualTest'
           --log-junit=phpunit-postgres.xml
       - name: PostgreSQL evidence
         if: always()

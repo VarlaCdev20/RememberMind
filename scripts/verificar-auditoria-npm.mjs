@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const advisoryPendiente = 'https://github.com/advisories/GHSA-vfj7-8cjw-p6xm';
-const cadenaBuild = new Set(['braces', 'chokidar', 'fast-glob', 'micromatch', 'tailwindcss']);
+const cadenaBuild = new Set(['braces', 'chokidar', 'fast-glob', 'micromatch', 'tailwindcss', '@tailwindcss/typography']);
 
 // Control temporal y visible de una deuda de build; no certifica su corrección.
 export function verificarAuditoria(informe, lock, fecha = new Date()) {
@@ -19,6 +19,11 @@ export function verificarAuditoria(informe, lock, fecha = new Date()) {
         throw new Error('Venció la revisión temporal de braces. Revisar parche upstream o migración de Tailwind.');
     }
     for (const paquete of afectados) {
+        if (paquete.name === '@tailwindcss/typography'
+            && (lock.packages?.['node_modules/@tailwindcss/typography']?.version !== '0.5.19'
+                || paquete.via?.length !== 1 || paquete.via[0] !== 'tailwindcss')) {
+            throw new Error('La propagación de typography cambió y exige nueva revisión.');
+        }
         if (! cadenaBuild.has(paquete.name) || paquete.severity !== 'high' || ! paquete.nodes?.length) {
             throw new Error(`Alerta nueva o no contemplada: ${paquete.name}.`);
         }

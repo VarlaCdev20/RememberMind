@@ -2,6 +2,8 @@
 
 Lock verificado mediante npm ci; se mantiene Tailwind 3.4.19 y el diseño actual.
 
+Verificación remota posterior del 11/10/2026: npm en Linux también propaga el mismo advisory de braces a `@tailwindcss/typography` 0.5.19 a través de Tailwind. El informe remoto contiene seis paquetes de desarrollo afectados, frente a cinco en Windows; sigue siendo un advisory único. El control comprueba esa versión y causa exactas, conserva el rechazo de nodos runtime/alertas nuevas y la fecha de vencimiento. Regresiones positivas y negativas verifican la diferencia entre entornos; no se amplía la excepción a otra vulnerabilidad.
+
 - concurrently 9.2.5 incorpora shell-quote 1.12.0.
 - source-map-js 1.2.2 actualizado dentro del rango de PostCSS.
 - Override explícito postcss-selector-parser 7.1.6: no existe parche de la rama 6. La rama 7 cruza los rangos originales de Tailwind/nesting/typography. Para este repositorio se verificaron 147 tests y build; los dos CSS generados son idénticos byte por byte respecto al build anterior.

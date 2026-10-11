@@ -11,11 +11,12 @@ const css = ['spacing', 'sizing', 'radius', 'motion', 'typography', 'shadows'].m
 const chrome = [process.env.PUPPETEER_EXECUTABLE_PATH, await puppeteer.executablePath(), 'C:/Program Files/Google/Chrome/Application/chrome.exe', 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'].find(path => path && existsSync(path));
 
 test('una cama ocupa su habitación sin espacio vacío y el más funciona con foco y pantalla táctil', { skip: !chrome }, async () => {
-    const browser = await puppeteer.launch({ headless: true, executablePath: chrome });
+    const browser = await puppeteer.launch({ headless: process.env.RM_BROWSER_HEADFUL !== '1', executablePath: chrome });
     try {
         for (const width of [1200, 820, 390]) {
             const page = await browser.newPage();
             await page.setViewport({ width, height: 844, hasTouch: width === 390 });
+            assert.equal(await page.evaluate(() => matchMedia('(hover: none)').matches), width === 390, 'La fixture distingue ratón y pantalla táctil.');
             await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
             await page.setContent(`<style>*{box-sizing:border-box}body{margin:0}.rm-btn-icon{width:44px;height:44px}</style><div class="rm-residents rm-building is-inventory"><section class="rm-building-rooms"><article class="rm-building-room"><button class="rm-building-room__toggle">Habitación sintética</button><div class="rm-building-room__inside"><div class="rm-building-beds"><div class="rm-building-bed-wrap"><a class="rm-building-bed is-disponible" href="#ficha"><span class="rm-building-bed__picture"></span><span class="rm-building-bed__content"><strong>CAM-PRUEBA</strong><span class="rm-building-status">Disponible</span><small>Articulada</small></span></a><button class="rm-building-bed__assign rm-btn-icon" aria-label="Elegir residente sintético">+</button></div></div></div></article></section></div>`);
             await page.addStyleTag({ content: css });

@@ -370,7 +370,7 @@ class RedApoyoPanel extends Component
 
         if ($this->buscarAdulto !== '') {
             $buscar = '%'.mb_strtolower(trim($this->buscarAdulto)).'%';
-            $query->whereRaw("LOWER(CONCAT(nombres, ' ', apellido_paterno, ' ', COALESCE(apellido_materno, ''))) LIKE ?", [$buscar]);
+            $query->whereRaw("LOWER(COALESCE(nombres, '') || ' ' || COALESCE(apellido_paterno, '') || ' ' || COALESCE(apellido_materno, '')) LIKE ?", [$buscar]);
         }
 
         return $query

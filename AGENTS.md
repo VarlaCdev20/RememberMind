@@ -282,6 +282,8 @@ Use synthetic data in tests, seeders, examples and screenshots.
 
 ## Commits
 
+Owner-approved Git Flow (2026-10-11): new tasks use `feature/<module>-<objective>` from `develop`; integrate by PR to `develop`; releases/hotfixes reach `main` only by PR with required checks. See `docs/sistema/GIT_FLOW.md`. Preserve the twelve approved modules and explicit functional debt. Never equate technical CI with clinical approval. Use conventional commit subjects up to 100 characters; do not rewrite shared history. PODEMOS-SEGUIR is a checkpoint, not the source of new feature branches.
+
 Local commits are allowed.
 
 For a small, self-contained, fully verified task, create a local commit automatically. Larger work may use coherent logical commits.
