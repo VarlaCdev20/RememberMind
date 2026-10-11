@@ -1,6 +1,6 @@
 <?php
 
-use MotorExperto\aplicacion\casos_uso\DemostracionCOGMEM;
+use MotorExperto\adaptadores\entrada\DemostracionCOGMEM;
 
 // Ejecutable con PHP 8.3 sin bootstrap Laravel, Composer ni base de datos.
 spl_autoload_register(function (string $class): void {

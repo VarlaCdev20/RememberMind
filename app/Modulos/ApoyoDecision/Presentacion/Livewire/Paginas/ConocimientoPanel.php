@@ -3,13 +3,13 @@
 namespace App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas;
 
 use App\Models\VersionModeloExperto;
-use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Eloquent\CargadorConocimiento;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarConocimientoAdministrativo;
 use DomainException;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithPagination;
-use MotorExperto\aplicacion\casos_uso\DemostracionCOGMEM;
+use MotorExperto\adaptadores\entrada\DemostracionCOGMEM;
 use MotorExperto\dominio\conocimiento\versiones\PaquetesCandidatosCognitivos;
 
 final class ConocimientoPanel extends Component
@@ -30,7 +30,7 @@ final class ConocimientoPanel extends Component
     public function seleccionarVersion(string $id): void
     {
         $this->autorizar();
-        abort_unless(strlen($id) <= 20 && VersionModeloExperto::query()->whereKey($id)->exists(), 404);
+        abort_unless(app(ConsultarConocimientoAdministrativo::class)->existeVersion($id), 404);
         $this->version = $id;
     }
 
@@ -44,12 +44,13 @@ final class ConocimientoPanel extends Component
     public function render()
     {
         $this->autorizar();
-        $versiones = VersionModeloExperto::query()->orderByDesc('fecha_hora_creacion')->paginate(12);
+        $consulta = app(ConsultarConocimientoAdministrativo::class);
+        $versiones = $consulta->versiones();
         $filas = [];
         $errorConocimiento = null;
         if ($this->version !== null) {
             try {
-                $filas = (new CargadorConocimiento)->instantanea($this->version);
+                $filas = $consulta->instantanea($this->version);
             } catch (DomainException $e) {
                 $errorConocimiento = $e->getMessage();
             }

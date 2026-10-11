@@ -16,6 +16,7 @@ use App\Modulos\Clinica\Aplicacion\Consultas\EventosClinicosService;
 use App\Modulos\Clinica\Aplicacion\Consultas\ResultadosEstudiosService;
 use App\Modulos\Clinica\Aplicacion\Consultas\ResumenLongitudinalResidente;
 use App\Modulos\Cuidados\Aplicacion\Acciones\GestionarCuidadosEnFicha;
+use App\Modulos\Cuidados\Aplicacion\Consultas\ConsultarCuidadosFicha;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Medicacion\Aplicacion\Acciones\RegistrarAdministracionMedicacionService;
 use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
@@ -1607,7 +1608,11 @@ class FichaPaciente extends Component
             ]);
         }
 
-        return view('livewire.cuidados.ficha-paciente', [
+        $cuidadosFicha = isset($this->adultoMayor)
+            ? app(ConsultarCuidadosFicha::class)->consultar($this->adultoMayor, $this->tabActivo, Auth::user())
+            : [];
+
+        return view('livewire.cuidados.ficha-paciente', $cuidadosFicha + [
             'consultaEnfermeria' => $this->consultaEnfermeriaFueraDeTurno(),
             'agendaMedicacion' => isset($this->adultoMayor)
                 ? app(AgendaMedicacionService::class)->paraAdulto($this->adultoMayor->cod_residente)

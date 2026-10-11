@@ -3,6 +3,7 @@
 namespace App\Modulos\ApoyoDecision\Aplicacion\Acciones;
 
 use App\Models\User;
+use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoOrion;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 
@@ -11,9 +12,11 @@ final class CargarConocimientoOrion
 {
     public const VERSION = 'VER_ORION_20261008';
 
+    public function __construct(private readonly FuenteConocimientoOrion $fuente) {}
+
     public function ejecutar(User $autor): array
     {
-        $datos = json_decode(file_get_contents(__DIR__.'/../../Infraestructura/Persistencia/datos/orion-v1-conceptos.json'), true, 512, JSON_THROW_ON_ERROR);
+        $datos = $this->fuente->leer();
 
         return DB::transaction(function () use ($autor, $datos): array {
             $usuario = User::query()->lockForUpdate()->findOrFail($autor->getKey());

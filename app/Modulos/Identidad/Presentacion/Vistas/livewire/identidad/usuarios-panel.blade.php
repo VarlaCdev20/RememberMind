@@ -13,10 +13,6 @@
  $rolDisplay = mb_strtoupper(str_replace('_', ' ', $rolKey), 'UTF-8');
  }
 
- // Documentación
- $documentacionService = app(\App\Modulos\Identidad\Aplicacion\Acciones\DocumentacionUsuarioService::class);
- $checklist = $documentacionService->obtenerChecklistUsuario($usuarioDetalle);
- $avance = $documentacionService->calcularAvanceDocumental($usuarioDetalle);
 
  // Dirección
  $partesDireccion = [];

@@ -149,7 +149,7 @@ class ResultadosExpertoResidenteTest extends PruebaConBaseDesechable
         $responsableCarga = User::create(['cod_usuario' => 'USR_CARGA_TEST', 'correo' => 'carga@example.test',
             'contrasena' => bin2hex(random_bytes(24)), 'estado' => 'ACTIVO']);
         $responsableCarga->assignRole('SUPERADMINISTRADOR');
-        (new CargarConocimientoOrion)->ejecutar($responsableCarga);
+        app(CargarConocimientoOrion::class)->ejecutar($responsableCarga);
         $otro = F::residenteAdicional('CONTROL_AJENO');
         DB::table('evaluaciones_expertas')->update(['origen_activacion' => 'PRUEBA_TECNICA']);
         foreach (range(1, 7) as $i) {

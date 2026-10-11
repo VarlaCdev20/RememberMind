@@ -112,7 +112,6 @@
     $tempPoly = implode(' ', $tempPoints);
 
     // Relaciones clave
-    $ultSeg = $adultoMayor->pasesTurno()->first();
     $ultFunc = $adultoMayor->valoracionesFuncionales->sortByDesc('fecha_hora')->first();
     $ultControlCognitivo = $adultoMayor->controlesCognitivos->sortByDesc('fecha_hora')->first();
     $ultDolor = $adultoMayor->valoracionesDolor->sortByDesc('fecha_hora')->first();
@@ -136,8 +135,6 @@
     $movilidadHoy = $adultoMayor->registrosMovilidad->first(fn ($r) => $r->fecha_hora?->isToday());
     $asignacionActiva = $adultoMayor->asignacionesJornada->first(fn ($a) => in_array($a->estado, ['ACTIVA', 'ACTIVO'], true));
     $alertasAct = $adultoMayor->alertas->whereIn('estado', ['ABIERTA', 'EN_ATENCION']);
-    $totalTareasHoy = $adultoMayor->ejecucionesCuidado()->whereDate('fecha_hora_programada', today())->count();
-    $tareasCompletadasHoy = $adultoMayor->ejecucionesCuidado()->whereDate('fecha_hora_programada', today())->whereIn('estado', ['REALIZADA', 'EJECUTADA', 'COMPLETADA'])->count();
 @endphp
 
 {{-- GRID DE 3 COLUMNAS EXACTO COMO LA IMAGEN --}}

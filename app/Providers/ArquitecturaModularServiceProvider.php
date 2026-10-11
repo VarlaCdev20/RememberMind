@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Compartido\Infraestructura\Vistas\VistaModularFinder;
+use App\Compartido\Presentacion\Componentes\DashboardWelcomeHeader;
 use App\Models\AdministracionMedicacion;
 use App\Models\Cama;
 use App\Models\EvaluacionExperta;
@@ -22,6 +23,8 @@ use App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPendientesPanel;
 use App\Modulos\Alertas\Presentacion\Livewire\Paginas\IncidentesPanel;
 use App\Modulos\Alertas\Presentacion\Livewire\Paginas\PanelAlertas;
 use App\Modulos\Alertas\Presentacion\Livewire\Paginas\SaludAlertasPanel;
+use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoOrion;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoOrion;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ConocimientoPanel;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
 use App\Modulos\ApoyoDecision\Presentacion\Policies\EvaluacionExpertaPolicy;
@@ -90,6 +93,7 @@ use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\SaludValoracionPanel;
 use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\ValoracionEnfermeriaPanel;
 use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\ValoracionMedicaPanel;
 use App\Modulos\Valoraciones\Presentacion\Policies\ValoracionEnfermeriaPreadmisionPolicy;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
@@ -100,6 +104,8 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(FuenteConocimientoOrion::class,
+            ArchivoConocimientoOrion::class);
         $this->app->bind(EvaluadorExperto::class, MotorExperto::class);
         $this->app->extend('view.finder', function ($previous) {
             $finder = new VistaModularFinder(
@@ -116,6 +122,8 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Blade::component('ui.dashboard-welcome-header',
+            DashboardWelcomeHeader::class);
         foreach (glob($this->app->basePath('app/Modulos/*/Presentacion/Vistas'), GLOB_ONLYDIR) as $path) {
             $module = basename(dirname(dirname($path)));
             $this->loadViewsFrom($path, strtolower($module));

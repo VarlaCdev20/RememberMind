@@ -1,20 +1,3 @@
-@php
-    $planActivo = $adultoMayor->planCuidadoActivo;
-    $intervenciones = $planActivo
-        ? $planActivo->intervenciones()->whereIn('estado', ['ACTIVA', 'ACTIVO'])->with(['ejecuciones' => fn ($q) => $q->latest('fecha_hora_programada')])->get()
-        : collect();
-    $ejecuciones = $adultoMayor->registrosCuidados()
-        ->with(['intervencion', 'personal'])
-        ->latest('fecha_hora_programada')
-        ->take(30)
-        ->get();
-    $ejecucionesHoy = $ejecuciones->filter(fn ($e) => optional($e->fecha_hora_programada)->isToday());
-    $realizadosHoy = $ejecucionesHoy->where('estado', 'REALIZADA')->count();
-    $incidenciasHoy = $ejecucionesHoy->whereIn('estado', ['OMITIDA', 'INCIDENCIA'])->count();
-    $pendientesHoy = $ejecucionesHoy->whereIn('estado', ['PENDIENTE', 'EN_PROCESO'])->count();
-    $totalHoy = $ejecucionesHoy->count();
-    $cumplimientoPct = $totalHoy > 0 ? (int) round(($realizadosHoy / $totalHoy) * 100) : 0;
-@endphp
 
 <div x-data="{
     modalRegistro: false,

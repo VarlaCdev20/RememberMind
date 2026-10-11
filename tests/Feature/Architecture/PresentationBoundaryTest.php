@@ -74,4 +74,41 @@ class PresentationBoundaryTest extends TestCase
             $this->assertDoesNotMatchRegularExpression('/\\\\App\\\\Models\\\\\w+::(?:query|where\w*|find\w*|all|role|with\w*|join|leftJoin|select)\s*\(/', File::get($file->getPathname()), $file->getPathname());
         }
     }
+
+    public function test_blade_no_invoca_metodos_de_relacion_para_consultar(): void
+    {
+        $parser = (new ParserFactory)->createForHostVersion();
+        $finder = new NodeFinder;
+        $relaciones = [];
+        foreach (File::allFiles(app_path('Models')) as $file) {
+            $ast = (new NodeTraverser(new NameResolver))->traverse($parser->parse(File::get($file->getPathname())));
+            foreach ($finder->findInstanceOf($ast, Node\Stmt\ClassMethod::class) as $method) {
+                if ($method->returnType instanceof Node\Name
+                    && str_starts_with($method->returnType->toString(), 'Illuminate\\Database\\Eloquent\\Relations\\')) {
+                    $relaciones[] = preg_quote($method->name->toString(), '/');
+                }
+            }
+        }
+        $this->assertNotEmpty($relaciones);
+        $patron = '/(?:->|\?->)(?:'.implode('|', array_unique($relaciones)).')\s*\(/';
+        foreach ([app_path('Modulos'), resource_path('views')] as $root) {
+            foreach (File::allFiles($root) as $file) {
+                if (str_ends_with($file->getFilename(), '.blade.php')) {
+                    $this->assertDoesNotMatchRegularExpression($patron, File::get($file->getPathname()), $file->getPathname());
+                }
+            }
+        }
+    }
+
+    public function test_nucleo_experto_no_depende_de_adaptadores_o_laravel(): void
+    {
+        foreach (['dominio', 'aplicacion'] as $capa) {
+            foreach (File::allFiles(base_path('motor-experto/src/motor_experto/'.$capa)) as $file) {
+                $contenido = File::get($file->getPathname());
+                foreach (['MotorExperto\\adaptadores\\', 'Illuminate\\', 'App\\Models\\', 'Livewire\\'] as $dependencia) {
+                    $this->assertStringNotContainsString($dependencia, $contenido, $file->getPathname());
+                }
+            }
+        }
+    }
 }

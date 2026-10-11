@@ -3,7 +3,7 @@
 namespace Tests\Unit\SistemaExperto;
 
 use DomainException;
-use MotorExperto\aplicacion\casos_uso\DemostracionCOGMEM;
+use MotorExperto\adaptadores\entrada\DemostracionCOGMEM;
 use MotorExperto\dominio\conocimiento\versiones\PaquetesCandidatosCognitivos;
 use PHPUnit\Framework\TestCase;
 

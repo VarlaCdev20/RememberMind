@@ -52,9 +52,9 @@ class DocumentacionUsuarioService
         })->all();
     }
 
-    public function calcularAvanceDocumental(User $usuario): array
+    public function calcularAvanceDocumental(User $usuario, ?array $checklist = null): array
     {
-        $items = collect($this->obtenerChecklistUsuario($usuario));
+        $items = collect($checklist ?? $this->obtenerChecklistUsuario($usuario));
         $requeridos = $items->where('obligatorio', true);
         $validadosRequeridos = $requeridos->where('estado', 'VALIDADO')->count();
 

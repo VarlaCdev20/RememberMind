@@ -24,7 +24,7 @@ final class CargaConocimientoOrionTest extends PruebaConBaseDesechable
 
     public function test_carga_versionada_con_procedencia_sin_activar_ni_generar_resultados(): void
     {
-        $resultado = (new CargarConocimientoOrion)->ejecutar($this->autor());
+        $resultado = app(CargarConocimientoOrion::class)->ejecutar($this->autor());
         $this->assertSame(55, $resultado['nodos']);
         $this->assertSame(29, $resultado['relaciones']);
         $this->assertFalse($resultado['activacion_clinica']);
@@ -50,7 +50,7 @@ final class CargaConocimientoOrionTest extends PruebaConBaseDesechable
     public function test_repetir_la_carga_no_duplica_conocimiento_ni_auditoria(): void
     {
         $autor = $this->autor();
-        $carga = new CargarConocimientoOrion;
+        $carga = app(CargarConocimientoOrion::class);
         $carga->ejecutar($autor);
         $antes = DB::table('versiones_modelo_experto')->get()->toJson();
         $auditoria = DB::table('activity_log')->count();
@@ -65,7 +65,7 @@ final class CargaConocimientoOrionTest extends PruebaConBaseDesechable
     {
         $autor = $this->autor('ENFERMEROS');
         try {
-            (new CargarConocimientoOrion)->ejecutar($autor);
+            app(CargarConocimientoOrion::class)->ejecutar($autor);
             $this->fail('La carga debía rechazar el rol.');
         } catch (DomainException) {
             $this->assertDatabaseCount('versiones_modelo_experto', 0);
@@ -76,7 +76,7 @@ final class CargaConocimientoOrionTest extends PruebaConBaseDesechable
     public function test_no_sobrescribe_una_version_que_difiere_de_la_fuente(): void
     {
         $autor = $this->autor();
-        $carga = new CargarConocimientoOrion;
+        $carga = app(CargarConocimientoOrion::class);
         $carga->ejecutar($autor);
         DB::table('nodos_semanticos')->where('codigo_semantico', 'COG-MEM')->update(['definicion' => 'Conflicto de prueba']);
         try {
@@ -99,7 +99,7 @@ final class CargaConocimientoOrionTest extends PruebaConBaseDesechable
                 Role::findByName('SUPERADMINISTRADOR')->revokePermissionTo('auditoria.ver');
             }
             try {
-                (new CargarConocimientoOrion)->ejecutar($autor);
+                app(CargarConocimientoOrion::class)->ejecutar($autor);
                 $this->fail('La carga debía rechazar '.$caso);
             } catch (DomainException) {
                 $this->assertDatabaseCount('versiones_modelo_experto', 0);

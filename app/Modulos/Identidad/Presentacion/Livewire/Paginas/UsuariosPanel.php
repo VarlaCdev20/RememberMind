@@ -2317,7 +2317,15 @@ class UsuariosPanel extends Component
             ])->where('cod_usuario', $this->usuarioFichaId)->first();
         }
 
+        $documentacion = app(DocumentacionUsuarioService::class);
+        $checklist = $this->modoVista === 'detalle' && $this->usuarioDetalle
+            ? $documentacion->obtenerChecklistUsuario($this->usuarioDetalle) : [];
+        $avance = $this->modoVista === 'detalle' && $this->usuarioDetalle
+            ? $documentacion->calcularAvanceDocumental($this->usuarioDetalle, $checklist) : [];
+
         return view('livewire.identidad.usuarios-panel', [
+            'checklist' => $checklist,
+            'avance' => $avance,
             'usuarios' => $query->paginate(12),
             'roles' => Role::all(),
             'especialidades' => collect(),
