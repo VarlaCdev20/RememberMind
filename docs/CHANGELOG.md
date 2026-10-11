@@ -15,6 +15,14 @@ related_modules: []
 
 # Changelog documental
 
+## 2026-10-11 — Retirada de documentación sustituida
+
+- Por instrucción de la propietaria, retirados 43 Markdown: 25 de architecture-audit, 15 de refactorizacion-total, dos auditorías V1 y la guía frontend deprecada.
+- Índices, fuentes auxiliares y enlaces actualizados; los informes conservados distinguen sus rutas históricas del árbol vigente. Recuperación en el [commit anterior a la limpieza](https://github.com/VarlaCdev20/RememberMind/tree/155a1516a5388b6bb1dbb7ea1ef2a6791bb432a0/docs).
+- Conservados el diccionario de 69 tablas enlazado desde el baseline, las decisiones aprobadas, la documentación vigente y la evidencia de implementación. Sin cambios de aplicación, pruebas, configuración ni datos.
+- Verificación: alcance de eliminaciones, existencia de los originales en Git, enlaces locales afectados y git diff --check.
+
+
 ## 2026-10-11 — Desacoplamiento posterior a la preparación
 
 - [Informe por etapas](arquitectura/DESACOPLAMIENTO_2026_10_11.md): contexto autenticado, sesión de previsualización, archivos, correo, PDF, enlaces y adaptadores expertos detrás de contratos.

@@ -17,6 +17,8 @@ related_modules: []
 
 # Inventario inicial de migración de aplicación
 
+> Actualización 2026-10-11: las dos carpetas de análisis anteriores, las auditorías V1 y la guía frontend sustituida se retiraron por instrucción de la propietaria. Las rutas citadas en este informe describen su corte histórico; sus originales pueden consultarse en el [historial anterior a la limpieza](https://github.com/VarlaCdev20/RememberMind/tree/155a1516a5388b6bb1dbb7ea1ef2a6791bb432a0/docs). No son fuentes vigentes.
+
 Fecha: 18/09/2026  
 Rama: `REFAC_BDD`
 

@@ -1,6 +1,6 @@
 # Mapa de fuentes y conflictos
 
-Fecha de revisión: 2026-10-08. Catálogo de descubrimiento, no copia de los contratos. Verificar estado/alcance y decisiones posteriores antes de cada tarea.
+Fecha de revisión del catálogo: 2026-10-08. Rutas históricas actualizadas: 2026-10-11. Catálogo de descubrimiento, no copia de los contratos. Verificar estado/alcance y decisiones posteriores antes de cada tarea.
 
 ## Resolución
 
@@ -21,7 +21,7 @@ Fecha de revisión: 2026-10-08. Catálogo de descubrimiento, no copia de los con
 | REMEMBERMIND_ROLES_BASELINE_CONGELADO.md | VIGENTE | Competencias y límites por rol; no otorgar permisos desde una lista conceptual. |
 | PERMISOS_TEMPORALES_SUPERADMIN.md | VIGENTE, excepción acotada | Solo entorno/flag/identidad y condiciones allí definidos; no autorización clínica permanente. |
 | DASHBOARDS_POR_ROL.md | VIGENTE para contrato específico | Algunas propuestas/expectativas necesitan contraste con límites actuales y código. |
-| REMEMBERMIND_ARQUITECTURA_FRONTEND.md | DEPRECADA como norma | Fase 1 marcó sustitución por arquitectura canónica/resources/contrato visual; se conserva como antecedente. Features/Pages y prescripciones divergentes no gobiernan implementación. |
+| REMEMBERMIND_ARQUITECTURA_FRONTEND.md | DEPRECADA como norma | Fase 1 marcó sustitución por arquitectura canónica/resources/contrato visual; se conserva como antecedente en el [historial de Git](https://github.com/VarlaCdev20/RememberMind/tree/155a1516a5388b6bb1dbb7ea1ef2a6791bb432a0/docs). Features/Pages y prescripciones divergentes no gobiernan implementación. |
 | Baseline congelado y diccionario físico | VIGENTE con extensiones aprobadas | Autoridad de estructura y terminología. Los valores físicos de estado requieren resolver divergencias puntuales. |
 | DECISION_ARQUITECTURA_BDD_V2_1.md | VIGENTE aprobada | Normalización y autor clínico frente a actor técnico. |
 | DECISION_UNIDAD_TALLA_CM.md | VIGENTE aprobada | Unidad y migración de talla; no convertir silenciosamente datos ambiguos. |
@@ -30,8 +30,8 @@ Fecha de revisión: 2026-10-08. Catálogo de descubrimiento, no copia de los con
 | AUDITORIA_FORMULARIO_SIGNOS_VITALES: objetivo “propuesto”/neutralidad anterior | DEPRECADA parcialmente | Sustituida en ese alcance por decisión V2.2; otras partes siguen siendo evidencia contextual. |
 | SEEDERS_LOCALES.md | VIGENTE auxiliar | Instrucción local, no prueba de esquema actual ni permiso para resetear datos. |
 | REMEMBERMIND_BDD_69_TABLAS.md, INVENTARIO_MIGRACION_APLICACION.md, RESULTADO_MIGRACION_APLICACION_V2.md | HISTÓRICA | Snapshots de transición; no reintroducir V1. |
-| docs/architecture-audit/* y docs/refactorizacion-total/* | HISTÓRICA | Inventarios, opciones y arquitectura anterior. |
-| docs/auditoria.md y auditoria_roles_permisos.md | HISTÓRICA | Snapshot V1/inventarios anteriores; no matriz vigente. |
+| docs/architecture-audit/* y docs/refactorizacion-total/* | HISTÓRICA | Inventarios, opciones y arquitectura anterior, retirados del árbol actual; consultar el [historial de Git](https://github.com/VarlaCdev20/RememberMind/tree/155a1516a5388b6bb1dbb7ea1ef2a6791bb432a0/docs). |
+| docs/auditoria.md y auditoria_roles_permisos.md | HISTÓRICA | Snapshot V1/inventarios anteriores, retirados del árbol actual; consultar el [historial de Git](https://github.com/VarlaCdev20/RememberMind/tree/155a1516a5388b6bb1dbb7ea1ef2a6791bb432a0/docs). No es la matriz vigente. |
 | CONTRATO_VISUAL_UX_UI.md y AUDITORIA_SKILLS_UX_UI.md | VIGENTE | Contrato/selección visual; no método clínico. |
 | STACK_SKILLS_UX_UI.md | VIGENTE para guía UX | Fase 1 separó solicitud de sistema a docs/historico/SOLICITUD_STACK_SKILLS_SISTEMA.md, preservada íntegra. Una solicitud histórica no es protocolo clínico aprobado. |
 | PLAN_UNIFICACION_VISUAL.md y FASE_9*, FASE_11* | HISTÓRICA como evidencia de entregas; contratos puntuales a contrastar | Fotografías de implementación y limitaciones, no nuevas reglas clínicas. |
