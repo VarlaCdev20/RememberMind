@@ -93,7 +93,9 @@ class DashboardAdministracionIntegracionVisualTest extends TestCase
 
     public function test_admision_formal_alimenta_indicadores_y_detalle_administrativo(): void
     {
-        $usuario = User::factory()->create(['estado' => 'ACTIVO']);
+        $usuario = User::factory()->create([
+            'estado' => 'ACTIVO', 'correo' => 'Rosa.operadora@example.test',
+        ]);
         $usuario->assignRole('ADMINISTRADOR');
         $contacto = Contacto::query()->create([
             'cod_contacto' => 'CTO_ADMIN_1', 'nombres' => 'Ana', 'apellido_paterno' => 'Pérez', 'estado' => 'ACTIVO',
@@ -173,8 +175,10 @@ class DashboardAdministracionIntegracionVisualTest extends TestCase
         DB::table('ocupaciones_cama')->where('cod_residente', $residente->cod_residente)->update([
             'estado' => 'LIBERADA', 'fecha_hora_liberacion' => now(),
         ]);
-        $this->assertStringNotContainsString('Rosa', $this->get(route('admin.administracion.ocupacion', ['tab' => 'actual']))->assertOk()->getContent());
-        $this->assertStringContainsString('Rosa', $this->get(route('admin.administracion.ocupacion', ['tab' => 'historial']))->assertOk()->getContent());
+        $ocupacionActual = $this->get(route('admin.administracion.ocupacion', ['tab' => 'actual']))->assertOk()->getContent();
+        $this->assertStringContainsString('Rosa.operadora@example.test', $ocupacionActual);
+        $this->assertStringNotContainsString('Rosa Flores', $ocupacionActual);
+        $this->assertStringContainsString('Rosa Flores', $this->get(route('admin.administracion.ocupacion', ['tab' => 'historial']))->assertOk()->getContent());
     }
 
     public function test_formalizar_desde_panel_administrativo_no_escribe_ficha_clinica(): void
