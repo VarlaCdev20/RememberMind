@@ -22,6 +22,7 @@ test('la luz sigue al mouse sin bloquear controles y desaparece con movimiento r
             const start = new Function(source.replace('export function', 'function') + '\nreturn iniciarEfectosAmbientales;')();
             start({ init() {} });
         }, effects);
+        await page.bringToFront();
         await page.mouse.move(320, 260);
         await page.waitForFunction(() => {
             const style = getComputedStyle(document.querySelector('.rm-cursor-glow'));
