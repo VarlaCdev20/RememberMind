@@ -56,7 +56,7 @@ composer install
 npm ci
 ```
 
-La copia de desarrollo local está en `C:\Users\CARLAENCINAS\Desktop\RememberMind`, rama `PODEMOS-SEGUIR`. La carpeta de Codex contiene informes y temporales de auditoría. `composer setup` instala dependencias y compila; no regenera claves ni ejecuta migraciones.
+La copia de desarrollo local está en `C:\Users\CARLAENCINAS\Desktop\RememberMind`; el trabajo nuevo parte de `develop`. `PODEMOS-SEGUIR` conserva el checkpoint anterior. La carpeta de Codex contiene informes y temporales de auditoría. `composer setup` instala dependencias y compila; no regenera claves ni ejecuta migraciones.
 
 En instalación nueva, crear .env desde el ejemplo solo si no existe y configurar conexión/secretos del entorno. No sobrescribir .env existente. Generar clave únicamente para la instalación nueva; no regenerarla en un sistema con datos cifrados.
 

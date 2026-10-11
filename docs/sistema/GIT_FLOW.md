@@ -33,7 +33,7 @@ Las tareas se integran con squash y un título convencional. Las releases y hotf
 
 `quality` ejecuta sintaxis, auditoría de dependencias, frontend, build, motor independiente y suite SQLite completa. `postgres-integration` ejecuta contratos, roles, concurrencia y regresiones de desacoplamiento en una base desechable. `git-flow` comprueba el recorrido de ramas y mensajes nuevos en PR de trabajo/hotfix. La implementación de la política tiene pruebas propias en scripts.
 
-Main y develop requieren PR, checks aprobados y rama actualizada; no permiten force push ni eliminación, también para administradores. En el arranque con una sola persona no se exige una aprobación externa imposible de obtener del propio autor. La revisión de alcance y evidencia sigue siendo obligatoria; al incorporar otro revisor se debe activar al menos una aprobación independiente.
+Main y develop requieren PR, una aprobación independiente, checks aprobados y rama actualizada; no permiten force push ni eliminación, también para administradores. GitHub registra al propietario y otro colaborador con acceso write, por lo que puede existir revisión por otra persona. Durante la transición inicial se integra exclusivamente la base autorizada por el propietario con checks obligatorios y cero aprobaciones externas; al terminar se activa una aprobación para el trabajo posterior. No se suplanta al revisor ni se aprueba un PR propio.
 
 ## Doce módulos conservados y pendientes
 
