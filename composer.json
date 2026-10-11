@@ -60,6 +60,10 @@
             "Composer\\Config::disableProcessTimeout",
             "@php vendor/phpunit/phpunit/phpunit"
         ],
+        "test:postgres": [
+            "Composer\\Config::disableProcessTimeout",
+            "@php vendor/phpunit/phpunit/phpunit -c phpunit.postgres.xml"
+        ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"

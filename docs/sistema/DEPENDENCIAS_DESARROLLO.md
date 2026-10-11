@@ -13,6 +13,8 @@ braces 3.0.3 sigue siendo la última versión publicada al revisar. El reemplazo
 
 La auditoría completa debe conservarse visible como evidencia de CI. El gate de dependencias de ejecución permanece estricto y toda alerta nueva debe revisarse. La migración de Tailwind o un parche upstream siguen pendientes de implementación y validación.
 
+El control temporal `scripts/verificar-auditoria-npm.mjs` admite exclusivamente ese advisory de build, su cadena actual, versiones y nodos marcados dev en el lock; informa el pendiente. Rechaza errores/inventario incompleto, dependencias afectadas de ejecución, alertas nuevas y cambios de cadena. La revisión vence el **2026-11-11**; desde esa fecha bloquea CI mientras subsista la alerta. Es un tratamiento técnico temporal para continuar desarrollo, no una declaración de biblioteca corregida o certificación para producción.
+
 Fuentes primarias:
 - https://github.com/advisories/GHSA-vfj7-8cjw-p6xm
 - https://github.com/advisories/GHSA-rj75-hqrm-r3gf

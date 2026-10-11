@@ -20,6 +20,7 @@
     <php>
         <ini name="memory_limit" value="512M"/>
         <env name="APP_ENV" value="testing" force="true"/>
+        <env name="RM_TEST_PROFILE" value="sqlite" force="true"/>
         <env name="APP_KEY" value="base64:ABEiM0RVZneImaq7zN3u/wARIjNEVWZ3iJmqu8zd7v8=" force="true"/>
         <env name="APP_DEBUG" value="false" force="true"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file" force="true"/>

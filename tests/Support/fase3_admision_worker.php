@@ -1,18 +1,19 @@
 <?php
 
-use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use App\Models\Preadmision;
 use App\Models\User;
+use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Tests\Support\EntornoPruebas;
 
-require dirname(__DIR__, 2).'/vendor/autoload.php';
+require dirname(__DIR__).'/bootstrap.php';
 $app = require dirname(__DIR__, 2).'/bootstrap/app.php';
 $app->make(Kernel::class)->bootstrap();
 if (! $app->environment('testing') || config('database.default') !== 'pgsql'
-    || ! preg_match('/^remembermind_f3_test_[a-f0-9]{8}$/', config('database.connections.pgsql.database'))) {
+    || ! EntornoPruebas::postgresDesechable(config('database.connections.pgsql.database'), config('database.connections.pgsql.username'), config('database.connections.pgsql.host'))) {
     throw new RuntimeException('El worker solo opera en PostgreSQL desechable de Fase 3.');
 }
 [$script, $direccion, $codUsuario, $codPreadmision, $codCama] = $argv;

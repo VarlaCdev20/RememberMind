@@ -2,6 +2,7 @@
 
 namespace App\Modulos\ApoyoDecision\Infraestructura\Persistencia;
 
+use App\Modulos\ApoyoDecision\Dominio\Reglas\BaseTecnicaDesechable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
@@ -15,8 +16,7 @@ final class LecturaTecnicaPruebas
         }
         $c = DB::connection();
 
-        return ($c->getDriverName() === 'sqlite' && $c->getDatabaseName() === ':memory:')
-            || ($c->getDriverName() === 'pgsql' && preg_match('/^remembermind_experto_test_[0-9]{8}_[a-z0-9]+$/D', $c->getDatabaseName()) === 1);
+        return BaseTecnicaDesechable::permite($c->getDriverName(), $c->getDatabaseName(), $c->getConfig('username'), $c->getConfig('host'));
     }
 
     public static function limitar(Builder $query): Builder

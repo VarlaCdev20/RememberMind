@@ -12,6 +12,7 @@ use App\Models\Residente;
 use App\Models\RespuestaInstrumento;
 use App\Models\User;
 use App\Models\VersionModeloExperto;
+use App\Modulos\ApoyoDecision\Dominio\Reglas\BaseTecnicaDesechable;
 use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\AdaptadorFuentesCOGMEM;
 use DomainException;
 use Illuminate\Support\Facades\DB;
@@ -28,8 +29,7 @@ final class PersistirEvaluacionTecnica
     public function ejecutar(PaqueteConocimiento $p, MemoriaTrabajo $m, string $criterio, array $contexto, User $autor, array $componentesInstrumentales = []): string
     {
         $c = DB::connection();
-        $desechable = ($c->getDriverName() === 'sqlite' && $c->getDatabaseName() === ':memory:')
-            || ($c->getDriverName() === 'pgsql' && preg_match('/^remembermind_experto_test_[0-9]{8}_[a-z0-9]+$/D', $c->getDatabaseName()));
+        $desechable = BaseTecnicaDesechable::permite($c->getDriverName(), $c->getDatabaseName(), $c->getConfig('username'), $c->getConfig('host'));
         if (! app()->environment('testing') || ! $desechable || ! $p->soloPruebasTecnicas) {
             throw new DomainException('La persistencia técnica solo está habilitada en la base desechable de pruebas.');
         }

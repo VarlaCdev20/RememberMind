@@ -9,6 +9,7 @@ use App\Models\Preadmision;
 use App\Models\Residente;
 use App\Models\User;
 use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
+use App\Modulos\ApoyoDecision\Dominio\Reglas\BaseTecnicaDesechable;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -30,7 +31,7 @@ final class FixtureLecturaExperta
     {
         $c = DB::connection();
         if (! app()->environment('testing') || ! (($c->getDriverName() === 'sqlite' && ($c->getDatabaseName() === ':memory:' || str_ends_with(str_replace('\\', '/', $c->getDatabaseName()), '/remembermind-medical-results-qa/qa-medical.sqlite')))
-            || ($c->getDriverName() === 'pgsql' && preg_match('/^remembermind_experto_test_[0-9]{8}_[a-z0-9]+$/D', $c->getDatabaseName())))) {
+            || BaseTecnicaDesechable::permite($c->getDriverName(), $c->getDatabaseName(), $c->getConfig('username'), $c->getConfig('host')))) {
             throw new RuntimeException('Fixture solo para BDD de prueba aislada.');
         }
         (new RolesAndPermissionsSeeder)->run();

@@ -5,12 +5,15 @@ namespace Tests\Feature;
 use App\Models\Cama;
 use App\Models\Habitacion;
 use Illuminate\Database\QueryException;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 /** Prueba optativa; exige una BDD PostgreSQL de pruebas ya migrada. */
 class AlojamientoBloqueoPostgresTest extends TestCase
 {
+    use DatabaseMigrations;
+
     protected function setUp(): void
     {
         if (getenv('RM_POSTGRES_CONCURRENCIA') !== '1') {

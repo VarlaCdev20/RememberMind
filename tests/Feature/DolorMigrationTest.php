@@ -6,6 +6,7 @@ use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\User;
 use App\Models\ValoracionDolor;
+use App\Modulos\ApoyoDecision\Dominio\Reglas\BaseTecnicaDesechable;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -19,8 +20,7 @@ class DolorMigrationTest extends TestCase
     {
         $db = DB::connection();
         $this->assertTrue(app()->environment('testing'));
-        $this->assertTrue(($db->getDriverName() === 'sqlite' && $db->getDatabaseName() === ':memory:')
-            || ($db->getDriverName() === 'pgsql' && preg_match('/^remembermind_experto_test_[0-9]{8}_[a-z0-9]+$/D', $db->getDatabaseName())));
+        $this->assertTrue(BaseTecnicaDesechable::permite($db->getDriverName(), $db->getDatabaseName(), $db->getConfig('username'), $db->getConfig('host')));
     }
 
     public function test_dolor_v2_rollback_reapply_preserves_rows_triggers_and_table_count(): void

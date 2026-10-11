@@ -23,7 +23,7 @@ class Fase3ConcurrenciaCamaPostgresTest extends TestCase
             $this->markTestSkipped('Prueba de locks PostgreSQL; debe ejecutarse en base desechable dedicada.');
         }
         $this->assertTrue(app()->environment('testing'));
-        $this->assertMatchesRegularExpression('/^remembermind_f3_test_[a-f0-9]{8}$/', config('database.connections.pgsql.database'));
+        $this->assertMatchesRegularExpression('/^remembermind_test_[a-f0-9]{8}_testing$/', config('database.connections.pgsql.database'));
         $contexto = DB::selectOne('select current_database() as db, current_user as usuario');
         $this->assertSame(config('database.connections.pgsql.database'), $contexto->db);
         $this->assertSame($contexto->db.'_runner', $contexto->usuario);

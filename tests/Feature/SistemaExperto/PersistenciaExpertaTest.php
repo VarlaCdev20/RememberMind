@@ -3,10 +3,12 @@
 namespace Tests\Feature\SistemaExperto;
 
 use App\Models\NodoSemantico;
+use App\Modulos\ApoyoDecision\Dominio\Reglas\BaseTecnicaDesechable;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Eloquent\CargadorConocimiento;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\InventarioExperto;
 use DomainException;
 use Illuminate\Database\QueryException;
+use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use RuntimeException;
@@ -21,8 +23,7 @@ class PersistenciaExpertaTest extends TestCase
     {
         parent::setUp();
         $conexion = DB::connection();
-        $segura = ($conexion->getDriverName() === 'sqlite' && $conexion->getDatabaseName() === ':memory:')
-            || ($conexion->getDriverName() === 'pgsql' && preg_match('/^remembermind_experto_test_[0-9]{8}_[a-z0-9]+$/D', $conexion->getDatabaseName()));
+        $segura = BaseTecnicaDesechable::permite($conexion->getDriverName(), $conexion->getDatabaseName(), $conexion->getConfig('username'), $conexion->getConfig('host'));
         if (! app()->environment('testing') || ! $segura) {
             throw new RuntimeException('Esta prueba requiere SQLite :memory: o una PostgreSQL desechable dedicada al experto.');
         }
@@ -38,6 +39,7 @@ class PersistenciaExpertaTest extends TestCase
                 DB::rollBack();
             }
             $this->artisan('migrate:rollback', ['--force' => true])->assertSuccessful();
+            RefreshDatabaseState::$migrated = false;
         }
         parent::tearDown();
     }

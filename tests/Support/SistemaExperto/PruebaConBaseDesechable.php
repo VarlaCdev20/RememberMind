@@ -2,8 +2,10 @@
 
 namespace Tests\Support\SistemaExperto;
 
+use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
+use Tests\Support\EntornoPruebas;
 use Tests\TestCase;
 
 abstract class PruebaConBaseDesechable extends TestCase
@@ -13,7 +15,7 @@ abstract class PruebaConBaseDesechable extends TestCase
         parent::setUp();
         $c = DB::connection();
         $segura = ($c->getDriverName() === 'sqlite' && $c->getDatabaseName() === ':memory:')
-            || ($c->getDriverName() === 'pgsql' && preg_match('/^remembermind_experto_test_[0-9]{8}_[a-z0-9]+$/D', $c->getDatabaseName()));
+            || ($c->getDriverName() === 'pgsql' && EntornoPruebas::postgresDesechable($c->getDatabaseName(), $c->getConfig('username'), $c->getConfig('host')));
         if (! app()->environment('testing') || ! $segura) {
             throw new RuntimeException('La prueba experta exige una BDD desechable dedicada.');
         }
@@ -27,6 +29,7 @@ abstract class PruebaConBaseDesechable extends TestCase
             DB::rollBack();
         }
         $this->artisan('migrate:rollback', ['--force' => true])->assertSuccessful();
+        RefreshDatabaseState::$migrated = false;
         parent::tearDown();
     }
 }
