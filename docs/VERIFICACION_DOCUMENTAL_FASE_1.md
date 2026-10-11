@@ -15,6 +15,8 @@ related_modules: []
 
 # Verificación documental de Fase 1
 
+> Actualización 2026-10-11: las dos carpetas de análisis anteriores, las auditorías V1 y la guía frontend sustituida se retiraron por instrucción de la propietaria. Las rutas citadas en este informe describen su corte histórico; sus originales pueden consultarse en el [historial anterior a la limpieza](https://github.com/VarlaCdev20/RememberMind/tree/155a1516a5388b6bb1dbb7ea1ef2a6791bb432a0/docs). No son fuentes vigentes.
+
 ## Alcance y snapshot
 
 91 documentos previos inventariados y clasificados; lectura dirigida de fuentes y contraste estático con código/tests/locks. Base HEAD 8e9e20325519c5da5a6b25f6fb26568cad78efe1, con cambios previos sin commit. No se ejecutaron `migrate:fresh`, seed, suites, build, comprobación de una BDD real ni producción. `verified_against_commit` identifica la base de revisión estática; no certifica runtime.

@@ -68,4 +68,4 @@ El [motor técnico](../../motor-experto/README.md) contiene 22 PHP sin dependenc
 - [Auditoría posterior, eliminaciones y comprobaciones](AUDITORIA_LIMPIEZA_2026_10_10.md).
 - [Pruebas estructurales](../../tests/Feature/Architecture/FolderOrganizationTest.php), [frontera de presentación](../../tests/Feature/Architecture/PresentationBoundaryTest.php) y [cuatro capas](../../tests/Unit/EstructuraModularTest.php).
 
-Los inventarios de architecture-audit y refactorizacion-total se conservan como historia. Los alias públicos, nombres lógicos de vistas y algunos nombres AdultoMayor se conservan por compatibilidad. El baseline BDD y sus decisiones aprobadas siguen gobernando el esquema.
+Los inventarios de architecture-audit y refactorizacion-total se retiraron del árbol actual y se conservan en el [historial de Git](https://github.com/VarlaCdev20/RememberMind/tree/155a1516a5388b6bb1dbb7ea1ef2a6791bb432a0/docs). Los alias públicos, nombres lógicos de vistas y algunos nombres AdultoMayor se conservan por compatibilidad. El baseline BDD y sus decisiones aprobadas siguen gobernando el esquema.

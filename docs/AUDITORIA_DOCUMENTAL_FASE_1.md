@@ -15,6 +15,8 @@ related_modules: []
 
 # DOCUMENT AUDIT
 
+> Actualización 2026-10-11: las dos carpetas de análisis anteriores, las auditorías V1 y la guía frontend sustituida se retiraron por instrucción de la propietaria. Las rutas citadas en este informe describen su corte histórico; sus originales pueden consultarse en el [historial anterior a la limpieza](https://github.com/VarlaCdev20/RememberMind/tree/155a1516a5388b6bb1dbb7ea1ef2a6791bb432a0/docs). No son fuentes vigentes.
+
 ## Alcance y método
 
 91 documentos existentes inventariados y clasificados: 80 en docs, tres Markdown raíz, cuatro AGENTS internos, dos referencias de Design System y dos plantillas legales. Inspección de títulos/estado/índices y lectura dirigida de secciones importantes; no se afirma lectura clínica exhaustiva de cada párrafo del diccionario o de todos los históricos. Skills consultadas como contexto de autoridad/routing, fuera de este conteo.

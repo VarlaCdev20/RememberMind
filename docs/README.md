@@ -69,14 +69,11 @@ El flujo institucional se localiza en AGENTS/baseline y FormalizarAdmision: prea
 
 **HISTORICAL — DO NOT USE AS CURRENT SOURCE OF TRUTH.**
 
-- [architecture-audit](architecture-audit/README.md): propuestas/análisis anteriores.
-- [refactorizacion-total](refactorizacion-total/README.md): inventario/roadmap de otra etapa.
-- [Auditoría V1](auditoria.md), [roles/permisos V1](auditoria_roles_permisos.md).
+- [Análisis anteriores y auditorías V1 en Git](https://github.com/VarlaCdev20/RememberMind/tree/155a1516a5388b6bb1dbb7ea1ef2a6791bb432a0/docs): retirados del árbol actual el 11/10/2026.
 - [Diccionario V2.0](base-de-datos/REMEMBERMIND_BDD_69_TABLAS.md), [inventario migración](base-de-datos/INVENTARIO_MIGRACION_APLICACION.md), [resultado inicial](base-de-datos/RESULTADO_MIGRACION_APLICACION_V2.md).
-- [Arquitectura frontend anterior](arquitectura/REMEMBERMIND_ARQUITECTURA_FRONTEND.md): DEPRECATED como norma; consultar fuentes sustitutas.
 - [Archivo de solicitudes históricas](historico/README.md) y snapshots UX señalados como HISTORICAL.
 
-No se mueven masivamente archivos; sus enlaces se conservan. Contratos canónicos vigentes pueden referenciar historia para contexto explícito, sin otorgarle autoridad.
+Los 43 documentos sustituidos se eliminaron del árbol actual; las referencias conservadas apuntan a su versión histórica en Git. Contratos canónicos vigentes pueden referenciar historia para contexto explícito, sin otorgarle autoridad.
 
 ## Documentación en construcción
 
