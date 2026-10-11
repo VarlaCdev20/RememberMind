@@ -24,6 +24,8 @@ automated_global_gate_status: FAIL
 
 # Sistema experto V1
 
+Este corte conserva rutas y resultados históricos de la implementación inicial. Para ubicaciones vigentes y evidencia posterior, consultar [arquitectura actual](../arquitectura/README.md), [límites verificados](../arquitectura/LIMITES_VERIFICADOS_2026_10_11.md) y [preparación para desarrollo](../sistema/PREPARACION_DESARROLLO_2026_10_11.md). La demostración COGMEM pertenece ahora al adaptador de entrada del motor; la carga de conocimiento Laravel usa un puerto de dominio. Esto no activa conocimiento clínico.
+
 ## Autoridad y alcance
 
 Este documento registra implementación y evidencia técnica; no constituye un

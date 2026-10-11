@@ -51,7 +51,7 @@ Guardianes guían implementación; gates revisan sin editar; corrección en fase
 
 Contrato → guardrails/dominio/workflow → autorización/integridad → UX cuando aplica → implementación → tests/gates → QA pertinente → release. Código/test presente no demuestra ejecución. PostgreSQL acredita garantías específicas solo tras prueba; SQLite :memory: rápido no basta para carreras.
 
-Datos sintéticos; no reset de DB desconocida ni uso de datos clínicos reales para capturas. Secretos/configuración funcional no forman parte de tareas documentales. Commit/push se rigen por instrucción actual: **esta Fase 1 no autoriza commit**.
+Datos sintéticos; no reset de DB desconocida ni uso de datos clínicos reales para capturas. Secretos/configuración funcional no forman parte de tareas documentales. Commit/push se rigen por la instrucción actual y AGENTS; la limitación de commits de Fase 1 era histórica. La [entrega del 11/10/2026](docs/sistema/PREPARACION_DESARROLLO_2026_10_11.md) registra los commits locales y los comandos seguros vigentes; no se realizó push en ese lote.
 
 ## Historia
 

@@ -2,7 +2,7 @@
 title: "RememberMind"
 status: CURRENT
 version: "1.0"
-last_reviewed: 2026-10-10
+last_reviewed: 2026-10-11
 owner: RememberMind
 source_of_truth: false
 verified_against_commit: null
@@ -28,7 +28,7 @@ Entrada oficial: [RememberMind Documentation](docs/README.md).
 - [Migración híbrida ejecutada](docs/arquitectura/INFORME_MIGRACION_HIBRIDA.md) y [auditoría/limpieza posterior](docs/arquitectura/AUDITORIA_LIMPIEZA_2026_10_10.md).
 - [Gobernanza/changelog documental](docs/CHANGELOG.md).
 
-Hay código y tests en varias áreas; esta revisión documental no ejecutó suites/build ni verificó producción. No se afirma completitud o porcentaje global de aprobación.
+Preparación para continuar desarrollo verificada el 11/10/2026 en `PODEMOS-SEGUIR`: suite SQLite completa sin fallos (1.079 pruebas, 31.452 aserciones, 15 omisiones), cohorte PostgreSQL aislada (143/2.489), frontend (151) y build aprobados. [Informe vigente y límites](docs/sistema/PREPARACION_DESARROLLO_2026_10_11.md). No acredita producción ni validación clínica.
 
 ## Dominio y flujo institucional
 
@@ -42,7 +42,7 @@ Preadmisión → revisión → APROBADA/RECHAZADA → admisión formal con cama 
 
 Versiones bloqueadas y motores: [estado actual](docs/ESTADO_ACTUAL.md) y [baseline técnico](docs/arquitectura/REMEMBERMIND_BASELINE_TECNICO.md).
 
-- PHP ^8.3 y extensiones de la instalación; runtime no comprobado aquí.
+- PHP ^8.3 y extensiones de la instalación; verificación local con PHP 8.3.33.
 - Laravel 13.33.0, Livewire 4.4.6, Tailwind 3.4.19 y Vite 8.3.1 según locks.
 - Node >=22.12.0 para satisfacer el lock completo, incluido Puppeteer; Composer según entorno.
 - PostgreSQL para desarrollo integrado/staging/producción; SQLite :memory: para tests rápidos. MySQL/MariaDB fuera del baseline.
@@ -53,6 +53,8 @@ Versiones bloqueadas y motores: [estado actual](docs/ESTADO_ACTUAL.md) y [baseli
 composer install
 npm ci
 ```
+
+La copia de desarrollo local está en `C:\Users\CARLAENCINAS\Desktop\RememberMind`, rama `PODEMOS-SEGUIR`. La carpeta de Codex contiene informes y temporales de auditoría. `composer setup` instala dependencias y compila; no regenera claves ni ejecuta migraciones.
 
 En instalación nueva, crear .env desde el ejemplo solo si no existe y configurar conexión/secretos del entorno. No sobrescribir .env existente. Generar clave únicamente para la instalación nueva; no regenerarla en un sistema con datos cifrados.
 
@@ -68,12 +70,13 @@ Antes de migrate confirmar DB destino y contrato aprobado. Seeders sintéticos s
 ```bash
 composer dev
 composer test
-php artisan test --filter=BddOperativaV2Test
+composer test -- --filter=BddOperativaV2Test
 npm test
 npm run build
+php motor-experto/tests/independencia.php
 ```
 
-Comandos disponibles, no ejecutados por Fase 1. PostgreSQL para garantías físicas/concurrencia; QA visual independiente del build. Producción tiene [procedimiento propio](docs/produccion/DESPLIEGUE_SEGURO.md).
+Usar las pruebas mediante Composer para activar el aislamiento antes de cargar Laravel. PostgreSQL desechable en Windows: `pwsh -File scripts/probar-postgres.ps1`; requisitos y perfiles en [desarrollo seguro](docs/sistema/DESARROLLO_SEGURO.md). PostgreSQL verifica garantías físicas/concurrencia; QA visual es independiente del build. Producción tiene [procedimiento propio](docs/produccion/DESPLIEGUE_SEGURO.md).
 
 ## Roles y seguridad
 

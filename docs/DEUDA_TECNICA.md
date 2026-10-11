@@ -17,6 +17,10 @@ related_modules: []
 
 # Deuda técnica
 
+## Actualización de preparación — 11/10/2026
+
+El [informe vigente](sistema/PREPARACION_DESARROLLO_2026_10_11.md) acredita la suite SQLite completa sin fallos, contratos corregidos y límites entre capas. Mantener pendientes explícitos: advisory alto `braces` en dependencias de desarrollo con excepción que expira el 11/11/2026; almacenamiento público de documentación de usuarios; uso pragmático de Eloquent en Aplicación y dependencias de contexto HTTP por reducir gradualmente. La inspección estática de Blade no detecta todos los accesos indirectos por propiedades o llamadas dinámicas. CI remoto y QA visual integral aún no acreditados. El conocimiento clínico experto continúa sin activación. Los registros históricos siguientes conservan su contexto; no describen automáticamente errores todavía presentes.
+
 Las descripciones originales de problema/implementación/evidencia registran hallazgos de Fases 1–2. Las actualizaciones Fases 3–4 y Estado tienen prioridad para conocer correcciones y verificación actuales; no se borran los hallazgos históricos. Referencias de línea antiguas se relocalizan por símbolo. Evidencia runtime acotada en TRAZABILIDAD; no certificación global.
 
 **BUG:** discrepancia concreta de contrato e implementación; reproducción/impacto indicado aparte. **DEUDA:** riesgo o mantenimiento con evidencia. **DECISIÓN PENDIENTE:** [registro institucional](DECISIONES_PENDIENTES.md). **MEJORA FUTURA:** [roadmap](ROADMAP.md). No duplicar como deuda una idea sin señal real.

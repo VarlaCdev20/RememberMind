@@ -15,6 +15,12 @@ related_modules: []
 
 # Changelog documental
 
+## 2026-10-11 — Preparación para continuar desarrollo
+
+- [Entrega vigente](sistema/PREPARACION_DESARROLLO_2026_10_11.md) con seis etapas, commits locales, comandos seguros y limitaciones abiertas.
+- Estado actual actualizado con suite SQLite completa (1.079/31.452, 15 omisiones), cohorte PostgreSQL (143/2.489), frontend (151) y build; evidencia separada de historia, producción y validación clínica.
+- README e índices apuntan al repositorio canónico y a los límites de arquitectura comprobados. Instalación general sin migraciones ni regeneración de claves automáticas.
+
 ## 2026-10-10 — Auditoría posterior a la migración híbrida
 
 - Organización vigente actualizada a doce propietarios y cuatro capas; retiradas las instrucciones canónicas Backend/Frontend.

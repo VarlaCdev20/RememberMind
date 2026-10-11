@@ -2,21 +2,31 @@
 title: "Estado actual de RememberMind"
 status: CURRENT
 version: "1.0"
-last_reviewed: 2026-10-10
+last_reviewed: 2026-10-11
 owner: RememberMind
 source_of_truth: true
-verified_against_commit: null
-verification_scope: STATIC_REPOSITORY_REVIEW
+verified_against_commit: 28d4e51fd67a45c7a2bfc2a6f8d8b36ff92d29d7
+verification_scope: FULL_SQLITE_AND_SCOPED_POSTGRES_FRONTEND_BUILD
 runtime_verified: false
 runtime_evidence_status: PARTIAL
-runtime_evidence_scope: FASE_3_AND_4_AND_EXPERT_V1_SCOPED_VERIFICATIONS
-automated_global_gate_status: NOT_RERUN_AFTER_ARCHITECTURE_CLEANUP
+runtime_evidence_scope: FULL_SQLITE_SCOPED_POSTGRES_FRONTEND_BUILD_2026_10_11
+automated_global_gate_status: PASS_SQLITE_WITH_15_SKIPS
 supersedes: []
 related_docs: ["README.md","ROADMAP.md","DEUDA_TECNICA.md","DECISIONES_PENDIENTES.md"]
 related_modules: []
 ---
 
 # Estado actual de RememberMind
+
+## Corte vigente — 11/10/2026
+
+La copia canónica local está en `C:\Users\CARLAENCINAS\Desktop\RememberMind`, rama `PODEMOS-SEGUIR`. Se completaron seis etapas de preparación: acceso y aislamiento, contratos V2, dependencias, límites de arquitectura, PostgreSQL/roles/CI y limpieza final. [Entrega, comandos y deuda pendiente](sistema/PREPARACION_DESARROLLO_2026_10_11.md).
+
+Suite SQLite completa en el commit indicado: **1.079 pruebas, 31.452 aserciones, cero fallos/errores y 15 omisiones**, 16m27.333s. Dos omisiones necesitan PostgreSQL y se ejecutaron en la cohorte aislada; trece corresponden a funciones Jetstream/Fortify deshabilitadas. Cohorte PostgreSQL: **143 pruebas / 2.489 aserciones, sin omisiones**. Frontend: **151 pruebas**; build aprobado; motor independiente: cinco casos aprobados. Los grupos dirigidos se solapan y no se suman a la suite global.
+
+La arquitectura administrativa conserva doce propietarios y cuatro capas, con excepciones Eloquent explícitas; el núcleo experto verifica independencia de Laravel y adaptadores. No se afirma separación absoluta de todo el legado. Composer y auditoría npm runtime sin avisos; npm completo mantiene un advisory alto de desarrollo (`braces`), controlado temporalmente hasta 11/11/2026. Documentos de usuario en disco público requieren un trabajo específico de privacidad. Los 50 archivos protegidos conservan hash y tamaño; no se modificó el esquema congelado ni la base instalada.
+
+Los commits son locales; CI remoto, QA visual integral, producción y validación clínica quedan fuera de esta evidencia. `runtime_verified: false` conserva el límite de certificación integral, aunque las suites indicadas sí fueron ejecutadas. Las secciones siguientes son históricas y no sustituyen este corte.
 
 ## Actualización arquitectónica — 10/10/2026
 
