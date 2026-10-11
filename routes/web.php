@@ -736,7 +736,3 @@ Route::middleware(['auth:sanctum', 'cuenta.activa', config('jetstream.auth_sessi
         $rutas['Reportes']['ruta_254']();
         $rutas['Reportes']['ruta_255']();
     });
-
-if (app()->environment('local')) {
-    $rutas['Identidad']['ruta_256']();
-}

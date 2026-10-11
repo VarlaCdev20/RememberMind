@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use App\Modulos\Identidad\Presentacion\Http\Controllers\DocumentosUsuarioController;
 use App\Modulos\Identidad\Presentacion\Http\Controllers\RolePreviewController;
 use App\Modulos\Identidad\Presentacion\Http\Controllers\UsuarioController;
@@ -108,15 +107,6 @@ return [
         Route::get('/personal-institucional', PersonalInstitucionalPanel::class)
             ->middleware('permission:personal_institucional.ver')
             ->name('personal-institucional');
-    },
-    'ruta_256' => static function (): void {
-        Route::get('/local-login-enfermeria', function () {
-            $u = User::where('correo', 'enfermeria@remembermind.com')->first();
-            auth()->login($u);
-            request()->session()->regenerate();
-
-            return redirect('/admin/enfermeria/pacientes');
-        });
     },
     'ruta_032' => static function (): void {
         Route::view('/roles-permisos', 'pages.roles-permisos.index')
