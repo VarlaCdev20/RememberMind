@@ -24,6 +24,14 @@ Fase 2 fue una revisión estática. Fase 3 ejecutó verificación acotada en Pos
 
 ## 1. Propósito
 
+### Planificación asistencial en jornadas futuras — 2026-10-11
+
+La instrucción de la propietaria de mantener los residentes asignados durante una guardia continua de 48 horas requiere registrar también sus jornadas futuras. `GestionarAsignacionesJornada` admite esas fechas únicamente sobre jornadas existentes, abiertas a planificación, y con asignación laboral activa del profesional a un área activa. La cuenta y el perfil de Enfermería deben estar activos y el residente admitido. El actor necesita cuenta activa y `turnos.asignar`; los niveles de supervisión se indican expresamente por residente.
+
+Planificar no habilita escritura clínica antes del horario: se conservan los controles de ventana temporal y alcance de Enfermería. La operación bloquea la jornada antes de comprobar duplicados y registra actor y asignación mediante Activitylog en la misma transacción. No altera camas, historia clínica, permisos ni esquema. La validación adicional de planificación se aplica a fechas futuras; no certifica todos los caminos históricos del módulo.
+
+Evidencia ejecutable: `AsignacionesJornadaPlanificadaTest` cubre los cuatro niveles, denegaciones de cuenta/permiso/rol/personal/área/asignación/jornada/turno/residente, duplicados, auditoría y límites horarios. Se incluye en el gate PostgreSQL. Los resultados de ejecución se informan por entorno; SQLite no acredita concurrencia PostgreSQL.
+
 ### Consulta de Enfermería fuera de turno — decisión del propietario, 2026-10-10
 
 Fuera de turno, Enfermería consulta **solo sus residentes asignados**, sin heredar
