@@ -25,6 +25,7 @@ function ejecutar() {
     const pr = evento.pull_request;
     if (!pr) throw new Error('La comprobación requiere un evento pull_request.');
     validarRamas(pr.base.ref, pr.head.ref);
+    validarMensajes([pr.title]);
     // Las entregas iniciales conservan el historial anterior; no se reescriben sus mensajes.
     if (tarea.test(pr.head.ref) || pr.head.ref.startsWith('hotfix/')) {
         if (![pr.base.sha, pr.head.sha].every(sha => /^[a-f0-9]{40}$/i.test(sha))) {
