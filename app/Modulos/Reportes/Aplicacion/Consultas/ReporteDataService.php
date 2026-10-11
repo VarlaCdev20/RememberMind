@@ -79,7 +79,7 @@ class ReporteDataService
         return DB::table('residentes as r')
             ->select(
                 'r.cod_residente',
-                DB::raw("TRIM(CONCAT(r.nombres, ' ', r.apellido_paterno, ' ', COALESCE(r.apellido_materno, ''))) AS nombre_completo"),
+                DB::raw("TRIM(COALESCE(r.nombres, '') || ' ' || COALESCE(r.apellido_paterno, '') || ' ' || COALESCE(r.apellido_materno, '')) AS nombre_completo"),
                 'r.numero_documento as ci',
                 'r.genero',
                 'r.fecha_nacimiento as fecha_nac',
@@ -106,7 +106,7 @@ class ReporteDataService
         return DB::table('residentes as r')
             ->select(
                 'r.cod_residente',
-                DB::raw("TRIM(CONCAT(r.nombres, ' ', r.apellido_paterno, ' ', COALESCE(r.apellido_materno, ''))) AS nombre_completo"),
+                DB::raw("TRIM(COALESCE(r.nombres, '') || ' ' || COALESCE(r.apellido_paterno, '') || ' ' || COALESCE(r.apellido_materno, '')) AS nombre_completo"),
                 'r.numero_documento as ci',
                 'r.genero',
                 'r.fecha_nacimiento as fecha_nac',
@@ -216,7 +216,7 @@ class ReporteDataService
             ->join('residentes as r', 'a.cod_residente', '=', 'r.cod_residente')
             ->select(
                 'r.cod_residente',
-                DB::raw("TRIM(CONCAT(r.nombres, ' ', r.apellido_paterno)) AS nombre"),
+                DB::raw("TRIM(COALESCE(r.nombres, '') || ' ' || COALESCE(r.apellido_paterno, '')) AS nombre"),
                 'a.estado',
                 'a.fecha_hora as created_at'
             )
@@ -232,7 +232,7 @@ class ReporteDataService
             ->leftJoin('medicamentos as m', 'p.cod_medicamento', '=', 'm.cod_medicamento')
             ->select(
                 'r.cod_residente',
-                DB::raw("TRIM(CONCAT(r.nombres, ' ', r.apellido_paterno)) AS nombre"),
+                DB::raw("TRIM(COALESCE(r.nombres, '') || ' ' || COALESCE(r.apellido_paterno, '')) AS nombre"),
                 DB::raw("COALESCE(m.nombre_comercial, m.nombre_generico, 'Medicamento') AS medicamento"),
                 'p.dosis',
                 'p.via_administracion as via',
@@ -251,7 +251,7 @@ class ReporteDataService
             ->leftJoin('instrumentos as i', 'ai.cod_instrumento', '=', 'i.cod_instrumento')
             ->select(
                 'r.cod_residente',
-                DB::raw("TRIM(CONCAT(r.nombres, ' ', r.apellido_paterno)) AS nombre"),
+                DB::raw("TRIM(COALESCE(r.nombres, '') || ' ' || COALESCE(r.apellido_paterno, '')) AS nombre"),
                 DB::raw("COALESCE(i.nombre, 'Instrumento') AS tipo"),
                 'ai.puntaje_total as puntaje',
                 'ai.clasificacion as clasificacion',
@@ -350,8 +350,8 @@ class ReporteDataService
             ->join('contactos as c', 'rc.cod_contacto', '=', 'c.cod_contacto')
             ->select(
                 'r.cod_residente',
-                DB::raw("TRIM(CONCAT(r.nombres, ' ', r.apellido_paterno)) AS adulto"),
-                DB::raw("TRIM(CONCAT(c.nombres, ' ', c.apellido_paterno, ' ', COALESCE(c.apellido_materno, ''))) AS familiar"),
+                DB::raw("TRIM(COALESCE(r.nombres, '') || ' ' || COALESCE(r.apellido_paterno, '')) AS adulto"),
+                DB::raw("TRIM(COALESCE(c.nombres, '') || ' ' || COALESCE(c.apellido_paterno, '') || ' ' || COALESCE(c.apellido_materno, '')) AS familiar"),
                 'rc.parentesco as parentesco_vinculo',
                 'rc.responsable_principal as es_responsable',
                 'rc.estado'
@@ -372,7 +372,7 @@ class ReporteDataService
         return DB::table('residentes')
             ->where('estado', 'ACTIVO')
             ->whereNotIn('cod_residente', $conFamiliar)
-            ->select('cod_residente', DB::raw("TRIM(CONCAT(nombres, ' ', apellido_paterno)) AS nombre"))
+            ->select('cod_residente', DB::raw("TRIM(COALESCE(nombres, '') || ' ' || COALESCE(apellido_paterno, '')) AS nombre"))
             ->orderBy('apellido_paterno')
             ->get()
             ->toArray();
@@ -421,7 +421,7 @@ class ReporteDataService
             ->whereIn('p.profesion', ['ENFERMERÍA', 'MEDICINA', 'PSICOLOGÍA', 'NUTRICIÓN', 'FISIOTERAPIA'])
             ->select(
                 'p.cod_personal',
-                DB::raw("TRIM(CONCAT(p.nombres, ' ', p.apellido_paterno, ' ', COALESCE(p.apellido_materno, ''))) AS nombre_completo"),
+                DB::raw("TRIM(COALESCE(p.nombres, '') || ' ' || COALESCE(p.apellido_paterno, '') || ' ' || COALESCE(p.apellido_materno, '')) AS nombre_completo"),
                 'p.profesion as rol_nombre',
                 'p.especialidad',
                 'p.matricula_profesional',
@@ -444,7 +444,7 @@ class ReporteDataService
             ->whereNotIn('p.profesion', ['ENFERMERÍA', 'MEDICINA', 'PSICOLOGÍA', 'NUTRICIÓN', 'FISIOTERAPIA'])
             ->select(
                 'p.cod_personal',
-                DB::raw("TRIM(CONCAT(p.nombres, ' ', p.apellido_paterno, ' ', COALESCE(p.apellido_materno, ''))) AS nombre_completo"),
+                DB::raw("TRIM(COALESCE(p.nombres, '') || ' ' || COALESCE(p.apellido_paterno, '') || ' ' || COALESCE(p.apellido_materno, '')) AS nombre_completo"),
                 'p.profesion as rol_nombre',
                 'u.correo',
                 'p.telefono',
@@ -539,7 +539,7 @@ class ReporteDataService
             ->join('residentes as r', 'pa.cod_residente', '=', 'r.cod_residente')
             ->select(
                 'r.cod_residente',
-                DB::raw("TRIM(CONCAT(r.nombres, ' ', r.apellido_paterno)) AS nombre"),
+                DB::raw("TRIM(COALESCE(r.nombres, '') || ' ' || COALESCE(r.apellido_paterno, '')) AS nombre"),
                 DB::raw('COUNT(pa.cod_actividad) as total_actividades')
             )
             ->groupBy('r.cod_residente', 'r.nombres', 'r.apellido_paterno')
@@ -573,7 +573,7 @@ class ReporteDataService
                 'al.description',
                 'al.event',
                 'al.created_at',
-                DB::raw("COALESCE(TRIM(CONCAT(p.nombres, ' ', p.apellido_paterno)), u.correo, 'Sistema') AS usuario_nombre")
+                DB::raw("COALESCE(TRIM(COALESCE(p.nombres, '') || ' ' || COALESCE(p.apellido_paterno, '')), u.correo, 'Sistema') AS usuario_nombre")
             )
             ->orderByDesc('al.created_at')
             ->limit($limite)

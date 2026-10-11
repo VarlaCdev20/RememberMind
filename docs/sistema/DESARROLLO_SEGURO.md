@@ -73,8 +73,9 @@ resuelve el mismo perfil; no provisiona un servidor. La cohorte está verificada
 no se atribuye esa ejecución a toda la suite PostgreSQL.
 
 Las vistas de pruebas tienen una caché temporal distinta por proceso y se limpian
-al terminar. CI escucha todos los pushes/PR, separa suite SQLite de integración
-PostgreSQL y conserva evidencias. Su ejecución remota requiere publicar los commits;
+al terminar. CI verifica los pushes a main/develop/PODEMOS-SEGUIR y los PR hacia
+main/develop; separa la suite SQLite de integración PostgreSQL y conserva evidencias.
+Las etiquetas de archivo no disparan CI. Su ejecución remota requiere publicar los commits;
 la validación local del workflow no equivale a un run de GitHub Actions.
 
 Dependencias: consultar DEPENDENCIAS_DESARROLLO.md. `npm audit --omit=dev` es estricto;
