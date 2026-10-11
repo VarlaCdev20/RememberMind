@@ -54,7 +54,10 @@ jobs:
           npm audit --json > npm-audit-full.json || true
           node scripts/verificar-auditoria-npm.mjs npm-audit-full.json
       - run: npm run build
-      - run: npm test
+      - name: Frontend with desktop and touch fixtures
+        run: xvfb-run --auto-servernum npm test
+        env:
+          RM_BROWSER_HEADFUL: '1'
       - name: Independent expert engine
         run: php motor-experto/tests/independencia.php
       - name: Full SQLite suite
