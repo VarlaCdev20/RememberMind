@@ -2,8 +2,8 @@
 
 namespace App\Modulos\Reportes\Infraestructura\Exportaciones;
 
-use App\Compartido\Infraestructura\Documentos\DocumentacionUsuarioService;
 use App\Models\User;
+use App\Modulos\Identidad\Aplicacion\Acciones\DocumentacionUsuarioService;
 use App\Modulos\Identidad\Aplicacion\Consultas\UsuarioFichaService;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;

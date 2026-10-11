@@ -50,7 +50,7 @@
                     <p style="margin: 5px 0 0 0;"><strong>Contraseña Temporal:</strong></p>
                     <div class="password">{{ $plainPassword }}</div>
                     <p style="font-size: 12px; color: #166534; margin-top: 15px; margin-bottom: 0;">
-                        <em>* Por seguridad, el sistema te solicitará cambiar esta contraseña en tu primer ingreso. No compartas estas credenciales.</em>
+                        <em>Puedes actualizar esta contraseña desde tu cuenta. No compartas estas credenciales.</em>
                     </p>
                 </div>
             @else

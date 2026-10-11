@@ -2,9 +2,9 @@
 
 namespace App\Modulos\Identidad\Infraestructura\Jobs;
 
-use App\Compartido\Infraestructura\Documentos\DocumentacionUsuarioService;
 use App\Mail\UsuarioFichaAdjuntaMail;
 use App\Models\User;
+use App\Modulos\Identidad\Aplicacion\Acciones\DocumentacionUsuarioService;
 use App\Modulos\Identidad\Aplicacion\Consultas\UsuarioFichaService;
 use App\Modulos\Reportes\Infraestructura\Exportaciones\ReportFileNameService;
 use Illuminate\Bus\Queueable;

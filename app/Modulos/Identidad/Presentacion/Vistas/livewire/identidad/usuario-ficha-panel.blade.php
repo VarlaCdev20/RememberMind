@@ -33,8 +33,8 @@
  <span class="inline-flex items-center gap-1 rounded-full bg-fondo-panel px-3.5 py-1 text-[10px] font-bold uppercase text-parrafo">
  <i class="ph-bold ph-shield-star"></i> {{ $nombre_rol }}
  </span>
- <span class="inline-flex items-center gap-1 rounded-full px-3.5 py-1 text-[10px] font-bold {{ $usuario->acceso_sistema === 'HABILITADO' ? 'bg-estado-exitoBg text-estado-exito' : 'bg-estado-peligroBg text-boton-acento' }}">
- <i class="ph-bold {{ $usuario->acceso_sistema === 'HABILITADO' ? 'ph-lock-open' : 'ph-lock' }}"></i> ACCESO {{ $usuario->acceso_sistema }}
+ <span class="inline-flex items-center gap-1 rounded-full px-3.5 py-1 text-[10px] font-bold {{ $usuario->estado === 'ACTIVO' ? 'bg-estado-exitoBg text-estado-exito' : 'bg-estado-peligroBg text-boton-acento' }}">
+ <i class="ph-bold {{ $usuario->estado === 'ACTIVO' ? 'ph-lock-open' : 'ph-lock' }}"></i> ACCESO {{ $usuario->estado === 'ACTIVO' ? 'HABILITADO' : 'BLOQUEADO' }}
  </span>
  </div>
  </div>
@@ -598,7 +598,7 @@
  <div class="grid gap-4 sm:grid-cols-1">
  <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-5 text-center flex flex-col justify-between max-w-md mx-auto w-full">
  <div>
- <i class="ph-bold {{ $usuario->acceso_sistema === 'HABILITADO' ? 'ph-user-check text-estado-exito' : 'ph-user-focus text-boton-acento' }} text-3xl"></i>
+ <i class="ph-bold {{ $usuario->estado === 'ACTIVO' ? 'ph-user-check text-estado-exito' : 'ph-user-focus text-boton-acento' }} text-3xl"></i>
  <h4 class="mt-3 text-sm font-bold text-parrafo uppercase">Bloqueo de Cuenta</h4>
  <p class="mt-1.5 text-[10px] font-bold text-meta leading-relaxed">
  Impide o reactiva de inmediato el inicio de sesión y uso del portal RememberMind.
@@ -610,9 +610,9 @@
  wire:click="toggleAcceso"
  wire:confirm="¿Está seguro de cambiar el estado de acceso del usuario?"
  class="mt-4 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-[10px] font-bold uppercase text-inverso shadow-md transition hover:-translate-y-0.5 active:translate-y-0
- {{ $usuario->acceso_sistema === 'HABILITADO' ? 'bg-boton-acento shadow-2xs hover:bg-fondo-panel' : 'bg-estado-exitoBg shadow-sm hover:bg-fondo-panel' }}">
- <i class="ph-bold {{ $usuario->acceso_sistema === 'HABILITADO' ? 'ph-user-minus' : 'ph-user-plus' }} text-sm"></i>
- {{ $usuario->acceso_sistema === 'HABILITADO' ? 'Bloquear Acceso' : 'Habilitar Acceso' }}
+ {{ $usuario->estado === 'ACTIVO' ? 'bg-boton-acento shadow-2xs hover:bg-fondo-panel' : 'bg-estado-exitoBg shadow-sm hover:bg-fondo-panel' }}">
+ <i class="ph-bold {{ $usuario->estado === 'ACTIVO' ? 'ph-user-minus' : 'ph-user-plus' }} text-sm"></i>
+ {{ $usuario->estado === 'ACTIVO' ? 'Bloquear Acceso' : 'Habilitar Acceso' }}
  </button>
  @endif
  @endcan

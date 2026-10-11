@@ -3,17 +3,22 @@
 namespace App\Modulos\Identidad\Presentacion\Livewire\Funcionalidades;
 
 use App\Models\Area;
+use App\Models\Personal;
 use App\Models\User;
 use App\Modulos\Identidad\Aplicacion\Acciones\GuardarPersonalInstitucional;
+use App\Modulos\Identidad\Dominio\Reglas\ClasificacionRolInstitucional;
+use App\Modulos\Identidad\Dominio\Reglas\DocumentosPersonalInstitucional;
 use App\Modulos\Identidad\Infraestructura\Documentos\GenerarDocumentoInstitucional;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Spatie\Permission\Models\Role;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PersonalInstitucionalForm extends Component
 {
@@ -127,7 +132,9 @@ class PersonalInstitucionalForm extends Component
 
     public $mostrar_credenciales = true;
 
-    public $forzar_cambio_password = true;
+    public $forzar_cambio_password = false;
+
+    public $fecha_ingreso;
 
     public $tempId = '';
 
@@ -177,38 +184,43 @@ class PersonalInstitucionalForm extends Component
 
     public function cargarDatos()
     {
-        $usuario = User::with(['roles'])->find($this->usuarioId);
+        $usuario = User::with(['roles', 'personal', 'documentos'])->find($this->usuarioId);
         if (! $usuario) {
             return;
         }
 
-        $this->nombres = $usuario->nombres;
-        $this->ap_paterno = $usuario->ap_paterno;
-        $this->ap_materno = $usuario->ap_materno;
+        $personal = $usuario->personal;
+        $this->fecha_ingreso = $personal?->fecha_ingreso?->format('Y-m-d');
+        $this->foto_perfil = $usuario->foto;
+        $this->nombres = $personal?->nombres;
+        $this->ap_paterno = $personal?->apellido_paterno;
+        $this->ap_materno = $personal?->apellido_materno;
         $this->correo = $usuario->correo;
-        $this->telefono = $usuario->telefono;
-        $this->numero_documento = $usuario->numero_documento;
-        $this->expedido = $usuario->expedido;
-        $this->genero = $usuario->genero;
-        $this->fecha_nacimiento = $usuario->fecha_nacimiento ? Carbon::parse($usuario->fecha_nacimiento)->format('Y-m-d') : null;
+        $this->telefono = $personal?->telefono;
+        $this->numero_documento = $personal?->numero_documento;
+        $this->expedido = $personal?->expedicion_documento;
+        $this->genero = $personal?->genero;
+        $this->fecha_nacimiento = $personal?->fecha_nacimiento?->format('Y-m-d');
         $this->calcularEdad($this->fecha_nacimiento);
         $this->estado = $usuario->estado;
 
-        $this->direccion = $usuario->direccion;
-        $this->zona = $usuario->zona;
-        $this->ciudad = $usuario->ciudad;
-        $this->observaciones = $usuario->observaciones;
+        $this->direccion = $personal?->direccion;
+        $this->zona = null;
+        $this->ciudad = null;
+        $this->observaciones = $personal?->observacion;
 
         // Cargar direcciones jerárquicas usando catálogos internos
-        $direccionRaw = $usuario->direccion;
-        $ciudadRaw = $usuario->ciudad;
-        $zonaRaw = $usuario->zona;
+        $direccionRaw = $personal?->direccion;
+        $ciudadRaw = null;
+        $zonaRaw = null;
 
         $municipioNombre = '';
         $calleNombre = '';
         $nroCasa = '';
 
-        if ($direccionRaw && preg_match('/MUNICIPIO:\s*(.*?)\s*\|\s*CALLE:\s*(.*?)\s*\|\s*NRO:\s*(.*)/i', $direccionRaw, $matches)) {
+        if ($direccionRaw && preg_match('/^DEPARTAMENTO:\s*(.*?)\s*\|\s*MUNICIPIO:\s*(.*?)\s*\|\s*ZONA:\s*(.*?)\s*\|\s*CALLE:\s*(.*?)\s*\|\s*NRO:\s*(.*)$/i', $direccionRaw, $matches)) {
+            [$ciudadRaw, $municipioNombre, $zonaRaw, $calleNombre, $nroCasa] = array_map('trim', array_slice($matches, 1));
+        } elseif ($direccionRaw && preg_match('/MUNICIPIO:\s*(.*?)\s*\|\s*CALLE:\s*(.*?)\s*\|\s*NRO:\s*(.*)/i', $direccionRaw, $matches)) {
             $municipioNombre = trim($matches[1]);
             $calleNombre = trim($matches[2]);
             $nroCasa = trim($matches[3]);
@@ -217,7 +229,7 @@ class PersonalInstitucionalForm extends Component
             $nroCasa = 'S/N';
         }
 
-        $dept = collect($this->getDepartamentosCatalogo())->firstWhere('nombre', mb_strtoupper($ciudadRaw));
+        $dept = collect($this->getDepartamentosCatalogo())->firstWhere('nombre', mb_strtoupper($ciudadRaw ?? ''));
         if ($dept) {
             $this->ciudad_id = $dept->id;
             $this->municipios_list = $this->getMunicipiosCatalogo($dept->id);
@@ -227,7 +239,7 @@ class PersonalInstitucionalForm extends Component
                 $this->municipio_id = $mun->id;
                 $this->zonas_list = $this->getZonasCatalogo($mun->id);
 
-                $zonaModel = collect($this->zonas_list)->firstWhere('nombre', mb_strtoupper($zonaRaw));
+                $zonaModel = collect($this->zonas_list)->firstWhere('nombre', mb_strtoupper($zonaRaw ?? ''));
                 if ($zonaModel) {
                     $this->zona_id = $zonaModel->id;
                     $this->calles_list = $this->getCallesCatalogo($zonaModel->id);
@@ -254,31 +266,9 @@ class PersonalInstitucionalForm extends Component
         $this->nro_casa = $nroCasa;
         $this->roles_seleccionados = $usuario->roles->pluck('name')->toArray();
         $this->rol_seleccionado = count($this->roles_seleccionados) > 0 ? $this->roles_seleccionados[0] : '';
-        $this->cod_area = $usuario->cod_area;
-
-        if ($usuario->personalSalud) {
-            $this->cod_esp = data_get($usuario->personalSalud, 'cod_esp') ?? '';
-            $this->anios_exp = data_get($usuario->personalSalud, 'anios_exp', 0);
-            $this->matricula_prof = data_get($usuario->personalSalud, 'matricula_prof') ?? '';
-            $this->institucion_formacion = data_get($usuario->personalSalud, 'institucion_formacion') ?? '';
-            $this->subtipo_enfermeria = data_get($usuario->personalSalud, 'subtipo_enfermeria') ?? '';
-
-            if (empty($this->anios_exp) && preg_match('/EXPERIENCIA:\s*(\d+)/i', (string) $usuario->observaciones, $m)) {
-                $this->anios_exp = (int) $m[1];
-            }
-            if (empty($this->matricula_prof) && preg_match('/MATR[IÍ]CULA:\s*([^|]+)/ui', (string) $usuario->observaciones, $m)) {
-                $this->matricula_prof = trim($m[1]);
-            }
-            if (empty($this->subtipo_enfermeria) && preg_match('/SUBTIPO.*?:\s*([^|]+)/ui', (string) $usuario->observaciones, $m)) {
-                $this->subtipo_enfermeria = trim($m[1]);
-            }
-        }
-
-        if ($usuario->personalAdmin) {
-            $this->cod_cargo_admin = data_get($usuario->personalAdmin, 'cod_cargo_admin') ?? '';
-            if (empty($this->anios_exp) && preg_match('/EXPERIENCIA:\s*(\d+)/i', (string) $usuario->observaciones, $m)) {
-                $this->anios_exp = (int) $m[1];
-            }
+        $this->matricula_prof = $personal?->matricula_profesional;
+        foreach ($usuario->documentos->whereNotIn('estado', ['ANULADO', 'ANULADA', 'REEMPLAZADO']) as $documento) {
+            $this->estado_documentos[$documento->tipo_documento] = $documento->estado;
         }
 
         $this->sincronizarClasificacionDesdeRoles(false);
@@ -287,14 +277,15 @@ class PersonalInstitucionalForm extends Component
     protected function rules()
     {
         return [
-            'nombres' => 'required|string|max:255',
-            'ap_paterno' => 'required_without:ap_materno|string|max:255|nullable',
-            'ap_materno' => 'required_without:ap_paterno|string|max:255|nullable',
-            'correo' => 'required|email|max:255|unique:usuarios,correo,'.$this->usuarioId.',cod_usuario',
-            'numero_documento' => 'required|regex:/^[0-9]{5,10}$/|unique:usuarios,numero_documento,'.$this->usuarioId.',cod_usuario',
+            'nombres' => 'required|string|max:100',
+            'ap_paterno' => 'required|string|max:80',
+            'ap_materno' => 'nullable|string|max:80',
+            'correo' => 'required|email|max:120|unique:usuarios,correo,'.$this->usuarioId.',cod_usuario',
+            'fecha_ingreso' => 'nullable|date',
+            'numero_documento' => ['required', 'regex:/^[0-9]{5,10}$/', Rule::unique('personal', 'numero_documento')->ignore(Personal::where('cod_usuario', $this->usuarioId)->value('cod_personal'), 'cod_personal')],
             'estado' => 'required|string',
-            'fecha_nacimiento' => 'nullable|date|before_or_equal:'.now()->subYears(18)->format('Y-m-d').'|after_or_equal:'.now()->subYears(100)->format('Y-m-d'),
-            'foto_perfil' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'fecha_nacimiento' => 'required|date|before_or_equal:'.now()->subYears(18)->format('Y-m-d').'|after_or_equal:'.now()->subYears(100)->format('Y-m-d'),
+            'foto_perfil' => is_string($this->foto_perfil) ? 'nullable|string' : 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'roles_seleccionados' => 'required|array|min:1',
             'roles_seleccionados.*' => 'exists:roles,name',
             'tipo_personal' => 'required|in:salud,admin',
@@ -451,272 +442,29 @@ class PersonalInstitucionalForm extends Component
 
     private function mapearRolInstitucional(string $rol): ?array
     {
-        return match ($rol) {
-            'ENFERMEROS' => $this->clasificacionSalud($rol, 'ENFERMERO', 'Enfermero(a)', 'ARE_0004'),
-            'MEDICO GENERAL', 'MEDICO GENERAL/GERIATRA', 'MEDICO_GENERAL' => $this->clasificacionSalud($rol, 'MEDICO_GENERAL', 'Médico General/Geriatra', 'ARE_0004'),
-            'PSICOLOGO/A' => $this->clasificacionSalud($rol, 'PSICOLOGO', 'Psicólogo(a)', 'ARE_0005'),
-            'PEDAGOGO' => $this->clasificacionSalud($rol, 'PEDAGOGO', 'Pedagogo(a)', 'ARE_0005'),
-            'NUTRICIONISTA' => $this->clasificacionSalud($rol, 'NUTRICIONISTA', 'Nutricionista', 'ARE_0004'),
-            'FISIOTERAPEUTA' => $this->clasificacionSalud($rol, 'FISIOTERAPEUTA', 'Fisioterapeuta', 'ARE_0004'),
-            'SUPERADMINISTRADOR' => $this->clasificacionAdministrativa($rol, 'SUPERADMINISTRADOR', 'Superadministrador(a)', 'ARE_0009'),
-            'ADMINISTRADOR' => $this->clasificacionAdministrativa($rol, 'ADMINISTRADOR', 'Administrador(a)', 'ARE_0003'),
-            default => null,
-        };
-    }
-
-    private function clasificacionSalud(string $rol, string $rolOperativo, string $rolLabel, string $codArea): array
-    {
-        return $this->clasificacionBase($rol, 'salud', 'Personal de Salud', $rolOperativo, $rolLabel, $codArea);
-    }
-
-    private function clasificacionAdministrativa(string $rol, string $rolOperativo, string $rolLabel, string $codArea): array
-    {
-        return $this->clasificacionBase($rol, 'admin', 'Personal Administrativo', $rolOperativo, $rolLabel, $codArea);
-    }
-
-    private function clasificacionBase(string $rol, string $tipoPersonal, string $tipoLabel, string $rolOperativo, string $rolLabel, string $codArea): array
-    {
-        $areaNombre = Area::find($codArea)?->nombre ?? $this->nombreAreaPorDefecto($codArea);
-
-        return [
-            'rol_sistema' => $rol,
-            'tipo_personal' => $tipoPersonal,
-            'tipo_label' => $tipoLabel,
-            'rol_operativo' => $rolOperativo,
-            'rol_label' => $rolLabel,
-            'cod_area' => $codArea,
-            'area_nombre' => $areaNombre,
-        ];
-    }
-
-    private function nombreAreaPorDefecto(string $codArea): string
-    {
-        return match ($codArea) {
-            'ARE_0003' => 'Área Administrativa y Registro Institucional',
-            'ARE_0004' => 'Área de Atención Médica',
-            'ARE_0005' => 'Área de Psicología y Seguimiento Cognitivo',
-            'ARE_0009' => 'Administración del Sistema',
-            default => 'Área institucional',
-        };
-    }
-
-    public function getDocumentosConfiguradosProperty()
-    {
-        $rol = $this->rol_seleccionado ?? (count($this->roles_seleccionados) > 0 ? $this->roles_seleccionados[0] : '');
-
-        $docs = [];
-
-        // --- BLOQUE: DOCUMENTACIÓN DEL INGRESANTE ---
-
-        // Cédula de Identidad (Obligatorio inmediato para todos)
-        $docs[] = [
-            'id' => 'CI',
-            'cod_tipo_doc' => 'TDU_0001',
-            'nombre' => 'Cédula de Identidad (Anverso y Reverso)',
-            'desc' => 'Copia legible del documento de identidad',
-            'obligatorio_inmediato' => true,
-            'permite_plazo' => false,
-            'tipo' => 'ingresante',
-        ];
-
-        // Fotografía actual (Obligatorio inmediato para todos)
-        $docs[] = [
-            'id' => 'FOTO_DOC',
-            'cod_tipo_doc' => 'TDU_0003',
-            'nombre' => 'Fotografía Actual',
-            'desc' => 'Fotografía formal fondo blanco',
-            'obligatorio_inmediato' => true,
-            'permite_plazo' => false,
-            'tipo' => 'ingresante',
-        ];
-
-        // Hoja de Vida
-        $docs[] = [
-            'id' => 'CV',
-            'cod_tipo_doc' => 'TDU_0006',
-            'nombre' => 'Hoja de Vida / CV',
-            'desc' => 'Curriculum Vitae actualizado y documentado',
-            'obligatorio_inmediato' => true,
-            'permite_plazo' => false,
-            'tipo' => 'ingresante',
-        ];
-
-        // Roles específicos
-        if (in_array($rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO'])) {
-            $docs[] = [
-                'id' => 'TITULO',
-                'cod_tipo_doc' => 'TDU_0008',
-                'nombre' => 'Título o Certificado de Formación',
-                'desc' => 'Título profesional o certificado académico/técnico',
-                'obligatorio_inmediato' => true,
-                'permite_plazo' => false,
-                'tipo' => 'ingresante',
-            ];
-
-            if (in_array($rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
-                $docs[] = [
-                    'id' => 'MATRICULA',
-                    'cod_tipo_doc' => 'TDU_0010',
-                    'nombre' => 'Matrícula Profesional',
-                    'desc' => 'Registro profesional vigente (Obligatorio para médicos)',
-                    'obligatorio_inmediato' => $rol === 'MEDICO GENERAL/GERIATRA',
-                    'permite_plazo' => $rol !== 'MEDICO GENERAL/GERIATRA',
-                    'tipo' => 'ingresante',
-                ];
-            }
-
-            if ($rol === 'MEDICO GENERAL/GERIATRA') {
-                $docs[] = [
-                    'id' => 'CERT_ESP',
-                    'cod_tipo_doc' => 'TDU_0011',
-                    'nombre' => 'Certificado de Especialidad',
-                    'desc' => 'Requerido si se registra como especialista (Ej. Geriatra)',
-                    'obligatorio_inmediato' => false,
-                    'permite_plazo' => true,
-                    'tipo' => 'ingresante',
-                ];
-            }
+        $clasificacion = ClasificacionRolInstitucional::paraRol($rol);
+        if ($clasificacion === null) {
+            return null;
         }
-
-        // Con Plazo (48 horas)
-        $docs[] = [
-            'id' => 'DOMICILIO',
-            'nombre' => 'Referencia o Comprobante de Domicilio',
-            'desc' => 'Factura de luz, agua o croquis',
-            'obligatorio_inmediato' => false,
-            'permite_plazo' => true,
-            'tipo' => 'ingresante',
-        ];
-
-        $docs[] = [
-            'id' => 'EXP_LABORAL',
-            'nombre' => 'Certificados de Experiencia',
-            'desc' => 'Respaldo de la experiencia laboral',
-            'obligatorio_inmediato' => false,
-            'permite_plazo' => true,
-            'tipo' => 'ingresante',
-        ];
-
-        $docs[] = [
-            'id' => 'CAPACITACION',
-            'cod_tipo_doc' => 'TDU_0018',
-            'nombre' => 'Capacitaciones Específicas',
-            'desc' => 'Certificados relevantes al cargo',
-            'obligatorio_inmediato' => false,
-            'permite_plazo' => true,
-            'tipo' => 'ingresante',
-        ];
-
-        $docs[] = [
-            'id' => 'ANTECEDENTES',
-            'cod_tipo_doc' => 'TDU_0007',
-            'nombre' => 'Certificado de Antecedentes',
-            'desc' => 'FELCC, FELCN, REJAP (si la institución lo exige)',
-            'obligatorio_inmediato' => false,
-            'permite_plazo' => true,
-            'tipo' => 'ingresante',
-        ];
-
-        // Opcionales
-        $docs[] = [
-            'id' => 'RECOMENDACION',
-            'nombre' => 'Cartas de Recomendación',
-            'desc' => 'Referencias laborales opcionales',
-            'obligatorio_inmediato' => false,
-            'permite_plazo' => false,
-            'tipo' => 'ingresante',
-        ];
-
-        $docs[] = [
-            'id' => 'OTROS',
-            'nombre' => 'Otros Respaldos',
-            'desc' => 'Documentación adicional',
-            'obligatorio_inmediato' => false,
-            'permite_plazo' => false,
-            'tipo' => 'ingresante',
-        ];
-
-        // --- BLOQUE: DOCUMENTACIÓN INSTITUCIONAL ---
-        $docs = array_merge($docs, $this->obtenerDocumentosInstitucionalesPorRol($rol));
-
-        return $docs;
-    }
-
-    public function obtenerDocumentosInstitucionalesPorRol($rol)
-    {
-        $docs = [];
-        $esAdmin = in_array($rol, ['SUPERADMINISTRADOR', 'ADMINISTRADOR']);
-
-        // 1. Ficha institucional del personal
-        $docs[] = [
-            'id' => 'FICHA',
-            'nombre' => 'Ficha Institucional del Personal',
-            'desc' => 'Resumen de datos y relación con la institución',
-            'tipo' => 'institucional',
-            'obligatorio_inmediato' => false,
-            'permite_plazo' => true,
-            'requiere_firma' => true,
-            'archivo_generado' => null,
-            'archivo_firmado' => null,
-            'estado' => 'PENDIENTE',
-        ];
-
-        // 2. Contrato laboral o prestación profesional
-        $docs[] = [
-            'id' => 'CONTRATO',
-            'cod_tipo_doc' => 'TDU_0004',
-            'nombre' => $esAdmin ? 'Contrato Laboral' : 'Contrato Laboral o Prestación Profesional',
-            'desc' => 'Acuerdo formal de relación laboral o servicios',
-            'tipo' => 'institucional',
-            'obligatorio_inmediato' => false,
-            'permite_plazo' => true,
-            'requiere_firma' => true,
-            'archivo_generado' => null,
-            'archivo_firmado' => null,
-            'estado' => 'PENDIENTE',
-        ];
-
-        // 3. Declaración de confidencialidad
-        $docs[] = [
-            'id' => 'CONFIDENCIALIDAD',
-            'cod_tipo_doc' => 'TDU_0002',
-            'nombre' => 'Declaración de Confidencialidad y Manejo de Información Sensible',
-            'desc' => 'Compromiso de resguardo de información clínica/administrativa',
-            'tipo' => 'institucional',
-            'obligatorio_inmediato' => false,
-            'permite_plazo' => true,
-            'requiere_firma' => true,
-            'archivo_generado' => null,
-            'archivo_firmado' => null,
-            'estado' => 'PENDIENTE',
-        ];
-
-        // 4. Acta de asignación de funciones
-        $descFunciones = match ($rol) {
-            'SUPERADMINISTRADOR', 'ADMINISTRADOR' => 'Funciones administrativas, gestión institucional y documental',
-            'ENFERMEROS' => 'Atención al adulto mayor, signos vitales, bioseguridad, medicamentos',
-            'MEDICO GENERAL/GERIATRA' => 'Valoración médica, indicaciones, derivaciones y registro clínico',
-            'PSICOLOGO/A' => 'Evaluaciones cognitivas/emocionales y observaciones psicológicas',
-            'NUTRICIONISTA' => 'Valoración nutricional, dietas y restricciones alimentarias',
-            'FISIOTERAPEUTA' => 'Movilidad segura, prevención de caídas y sesiones',
-            'PEDAGOGO' => 'Estimulación cognitiva/social y acompañamiento socioeducativo',
-            default => 'Asignación general de funciones'
+        $codigo = $clasificacion['cod_area_referencia'];
+        $nombre = $codigo ? Area::find($codigo)?->nombre : null;
+        $nombre ??= match ($codigo) {
+            'ARE_0004' => 'SALUD', 'ARE_0005' => 'PSICOLOGÍA Y PEDAGOGÍA',
+            'ARE_0003' => 'ADMINISTRATIVA', 'ARE_0009' => 'SISTEMA',
+            default => 'Sin área de referencia',
         };
 
-        $docs[] = [
-            'id' => 'FUNCIONES',
-            'nombre' => 'Acta de Asignación de Funciones y Horario',
-            'desc' => $descFunciones,
-            'tipo' => 'institucional',
-            'obligatorio_inmediato' => false,
-            'permite_plazo' => true,
-            'requiere_firma' => true,
-            'archivo_generado' => null,
-            'archivo_firmado' => null,
-            'estado' => 'PENDIENTE',
-        ];
+        return [...$clasificacion, 'cod_area' => $codigo, 'area_nombre' => $nombre];
+    }
 
-        return $docs;
+    public function getDocumentosConfiguradosProperty(): array
+    {
+        return DocumentosPersonalInstitucional::paraRol((string) ($this->roles_seleccionados[0] ?? ''));
+    }
+
+    public function obtenerDocumentosInstitucionalesPorRol($rol): array
+    {
+        return DocumentosPersonalInstitucional::institucionales((string) $rol);
     }
 
     public function descargarPdfInstitucional($codigo)
@@ -818,7 +566,7 @@ class PersonalInstitucionalForm extends Component
             'anios_exp' => $this->anios_exp,
             'matricula_prof' => $this->matricula_prof,
             'institucion' => $this->institucion_formacion,
-            'fecha_ingreso' => Carbon::parse($this->fecha_registro)->format('d/m/Y'),
+            'fecha_ingreso' => $this->fecha_ingreso ? Carbon::parse($this->fecha_ingreso)->format('d/m/Y') : 'No registrada',
             'fecha_generacion' => now()->format('d/m/Y H:i'),
             'responsable' => auth()->user()
                                     ? auth()->user()->nombres.' '.auth()->user()->ap_paterno
@@ -885,14 +633,14 @@ class PersonalInstitucionalForm extends Component
             ]);
         } elseif ($this->pasoActual === 2) {
             $this->validate([
-                'nombres' => 'required|string|max:255|regex:/^[\pL\s]+$/u',
-                'ap_paterno' => 'required_without:ap_materno|nullable|string|max:255|regex:/^[\pL\s]+$/u',
-                'ap_materno' => 'required_without:ap_paterno|nullable|string|max:255|regex:/^[\pL\s]+$/u',
-                'numero_documento' => 'required|regex:/^[0-9]+$/|min:5|max:15|unique:usuarios,numero_documento,'.$this->usuarioId.',cod_usuario',
+                'nombres' => 'required|string|max:100|regex:/^[\pL\s]+$/u',
+                'ap_paterno' => 'required|string|max:80|regex:/^[\pL\s]+$/u',
+                'ap_materno' => 'nullable|string|max:80|regex:/^[\pL\s]+$/u',
+                'numero_documento' => ['required', 'regex:/^[0-9]{5,10}$/', Rule::unique('personal', 'numero_documento')->ignore(Personal::where('cod_usuario', $this->usuarioId)->value('cod_personal'), 'cod_personal')],
                 'expedido' => 'required|string|max:10',
                 'genero' => 'required|in:M,F',
                 'fecha_nacimiento' => 'required|date|before_or_equal:'.now()->subYears(18)->format('Y-m-d').'|after_or_equal:'.now()->subYears(100)->format('Y-m-d'),
-                'foto_perfil' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+                'foto_perfil' => is_string($this->foto_perfil) ? 'nullable|string' : 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             ], [
                 'nombres.required' => 'El nombre es obligatorio.',
                 'nombres.regex' => 'El nombre no debe contener números.',
@@ -968,7 +716,7 @@ class PersonalInstitucionalForm extends Component
 
             $this->ciudad = $dept ? $dept->nombre : '';
             $this->zona = $zonaNombre;
-            $this->direccion = 'MUNICIPIO: '.($mun ? $mun->nombre : '').' | CALLE: '.$calleNombre.' | NRO: '.mb_strtoupper($this->nro_casa);
+            $this->direccion = 'DEPARTAMENTO: '.$this->ciudad.' | MUNICIPIO: '.($mun ? $mun->nombre : '').' | ZONA: '.$zonaNombre.' | CALLE: '.$calleNombre.' | NRO: '.mb_strtoupper($this->nro_casa);
 
         } elseif ($this->pasoActual === 4) {
             // Validar rol seleccionado
@@ -1024,11 +772,11 @@ class PersonalInstitucionalForm extends Component
             }
 
             if ($this->faltan_documentos && $this->estado === 'ACTIVO') {
-                $this->estado = 'DOCUMENTACION_PENDIENTE';
+
                 $this->dispatch('mostrarAlerta', [
                     'type' => 'warning',
                     'title' => 'Documentos pendientes',
-                    'message' => 'El personal se registrará en estado DOCUMENTACION_PENDIENTE. Tendrá 48 horas para regularizar.',
+                    'message' => 'Hay documentos pendientes de regularización en 48 horas.',
                 ]);
             }
         }
@@ -1089,7 +837,7 @@ class PersonalInstitucionalForm extends Component
             if ($this->pasoActual < $this->totalPasos) {
                 $this->pasoActual++;
                 if ($this->pasoActual === 7) {
-                    $this->estado = $this->determinarEstadoDocumental();
+                    // El resumen documental no modifica el estado de acceso de la cuenta.
                     $this->sincronizarSessionTemporal();
                 }
             }
@@ -1205,37 +953,32 @@ class PersonalInstitucionalForm extends Component
     {
         $clasificacion = $this->sincronizarClasificacionDesdeRoles();
 
-        // La validación ya se completó en cada avanzarPaso()
+        $this->validate();
 
-        $this->estado = 'ACTIVO'; // Siempre se crea como ACTIVO
+        if (! $this->esEdicion) {
+            $this->estado = 'ACTIVO';
+        }
         $estadoDocumental = $this->determinarEstadoDocumental();
 
         try {
-            $usuario = app(GuardarPersonalInstitucional::class)->guardar(auth()->user(), ['esEdicion' => $this->esEdicion, 'usuarioId' => $this->usuarioId, 'contrasena_temporal' => $this->contrasena_temporal, 'forzar_cambio_password' => $this->forzar_cambio_password, 'fecha_registro' => $this->fecha_registro, 'hora_registro' => $this->hora_registro, 'nombres' => $this->nombres, 'ap_paterno' => $this->ap_paterno, 'ap_materno' => $this->ap_materno, 'correo' => $this->correo, 'telefono' => $this->telefono, 'numero_documento' => $this->numero_documento, 'expedido' => $this->expedido, 'fecha_nacimiento' => $this->fecha_nacimiento, 'genero' => $this->genero, 'estado' => $this->estado, 'observaciones' => $this->observaciones, 'direccion' => $this->direccion, 'zona' => $this->zona, 'ciudad' => $this->ciudad, 'cod_area' => $this->cod_area, 'foto_perfil' => $this->foto_perfil, 'roles_seleccionados' => $this->roles_seleccionados, 'documentos_configurados' => $this->documentos_configurados, 'estado_documentos' => $this->estado_documentos, 'archivos_temporales' => $this->archivos_temporales, 'observacion_documentos' => $this->observacion_documentos, 'tempId' => $this->tempId, 'institucion_formacion' => $this->institucion_formacion, 'matricula_prof' => $this->matricula_prof, 'anios_exp' => $this->anios_exp, 'subtipo_enfermeria' => $this->subtipo_enfermeria, 'nivel_responsabilidad' => $this->nivel_responsabilidad], $clasificacion);
+            $resultado = app(GuardarPersonalInstitucional::class)->guardar(auth()->user(), ['esEdicion' => $this->esEdicion, 'usuarioId' => $this->usuarioId, 'contrasena_temporal' => $this->contrasena_temporal, 'forzar_cambio_password' => $this->forzar_cambio_password, 'fecha_registro' => $this->fecha_registro, 'hora_registro' => $this->hora_registro, 'fecha_ingreso' => $this->fecha_ingreso, 'nombres' => $this->nombres, 'ap_paterno' => $this->ap_paterno, 'ap_materno' => $this->ap_materno, 'correo' => $this->correo, 'telefono' => $this->telefono, 'numero_documento' => $this->numero_documento, 'expedido' => $this->expedido, 'fecha_nacimiento' => $this->fecha_nacimiento, 'genero' => $this->genero, 'estado' => $this->estado, 'observaciones' => $this->observaciones, 'direccion' => $this->direccion, 'zona' => $this->zona, 'ciudad' => $this->ciudad, 'cod_area' => $this->cod_area, 'foto_perfil' => $this->foto_perfil, 'roles_seleccionados' => $this->roles_seleccionados, 'documentos_configurados' => $this->documentos_configurados, 'estado_documentos' => $this->estado_documentos, 'archivos_temporales' => $this->archivos_temporales, 'observacion_documentos' => $this->observacion_documentos, 'tempId' => $this->tempId, 'institucion_formacion' => $this->institucion_formacion, 'matricula_prof' => $this->matricula_prof, 'anios_exp' => $this->anios_exp, 'subtipo_enfermeria' => $this->subtipo_enfermeria, 'nivel_responsabilidad' => $this->nivel_responsabilidad]);
+            $usuario = $resultado['usuario'];
 
             if (! $this->esEdicion) {
-                $roles = empty($this->roles_seleccionados) ? 'Ninguno' : implode(', ', $this->roles_seleccionados);
-                $html = "<div class='text-left space-y-3 mt-4'>".
-                        "<div class='p-3 bg-fondo border border-borde rounded-xl'>".
-                        "<p class='text-sm mb-1'><span class='font-bold text-apoyo uppercase text-[10px] block'>Usuario:</span> <span class='font-semibold text-titulo'>{$this->nombres} {$this->ap_paterno}</span></p>".
-                        "<p class='text-sm mb-1'><span class='font-bold text-apoyo uppercase text-[10px] block'>Correo:</span> <span class='font-semibold text-titulo'>{$this->correo}</span></p>".
-                        "<p class='text-sm mb-1'><span class='font-bold text-apoyo uppercase text-[10px] block'>Rol Asignado:</span> <span class='font-semibold text-titulo'>{$roles}</span></p>".
-                        "<p class='text-sm mb-1'><span class='font-bold text-apoyo uppercase text-[10px] block'>Estado:</span> <span class='font-bold ".($this->estado === 'ACTIVO' ? 'text-estado-exito' : 'text-estado-peligro')."'>{$this->estado}</span></p>".
-                        '</div>'.
-                        "<div class='p-4 bg-boton-acento/10 border border-boton-acento rounded-xl flex items-center justify-between'>".
-                        "<div><span class='font-bold text-boton-acento uppercase text-[10px] block'>Contraseña Temporal</span>".
-                        "<span class='font-mono font-bold text-lg tracking-widest text-titulo'>".htmlspecialchars($this->contrasena_temporal).'</span></div>'.
-                        '</div>'.
-                        "<div class='p-3 bg-estado-peligroBg border border-estado-peligro rounded-xl flex gap-2'>".
-                        "<i class='ph-bold ph-warning-circle text-estado-peligro text-lg'></i>".
-                        "<p class='text-xs text-estado-peligro font-semibold text-left'>Copie estas credenciales. La contraseña temporal no volverá a mostrarse. El usuario deberá cambiarla en su primer inicio de sesión.</p>".
-                        '</div>'.
-                        '</div>';
-
-                $this->dispatch('credencialesGeneradas', [
-                    'html' => $html,
-                    'usuarioId' => $usuario->cod_usuario,
-                ]);
+                $correoTexto = match ($resultado['correo_enviado']) {
+                    true => 'La bienvenida se envió al correo registrado.',
+                    false => 'La cuenta quedó registrada, pero no se pudo enviar la bienvenida. Solicita a gestión de cuentas la entrega del acceso.',
+                    default => 'La bienvenida se enviará cuando se confirme la operación.',
+                };
+                $html = '<div class="text-left space-y-3 mt-4"><p class="font-semibold text-titulo">'.e($usuario->name).'</p>'
+                    .'<p>'.e($usuario->correo).'</p><p>'.e($correoTexto).'</p>';
+                if ($this->mostrar_credenciales) {
+                    $html .= '<div class="p-4 bg-boton-acento/10 border border-boton-acento rounded-xl"><span class="font-bold text-boton-acento">Contraseña temporal</span>'
+                        .'<p class="font-mono text-titulo">'.e($this->contrasena_temporal).'</p><p>Entrega estas credenciales de forma segura.</p></div>';
+                }
+                $html .= '</div>';
+                $this->dispatch('credencialesGeneradas', ['html' => $html, 'usuarioId' => $usuario->getKey()]);
+                $this->contrasena_temporal = '';
             } else {
                 $this->dispatch('mostrarAlerta', [
                     'type' => 'success',
@@ -1246,27 +989,23 @@ class PersonalInstitucionalForm extends Component
                 $this->dispatch('actualizarTablaPersonal');
             }
 
-        } catch (\Exception $e) {
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (HttpException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            report($e);
             $this->dispatch('mostrarAlerta', [
                 'type' => 'error',
                 'title' => 'Error al guardar',
-                'message' => 'Ocurrió un error al guardar: '.$e->getMessage(),
+                'message' => 'No se pudo completar el registro. Compruebe los datos e inténtelo nuevamente.',
             ]);
         }
     }
 
     public function render()
     {
-        $rolesPermitidos = [
-            'SUPERADMINISTRADOR',
-            'ADMINISTRADOR',
-            'ENFERMEROS',
-            'MEDICO GENERAL/GERIATRA',
-            'PSICOLOGO/A',
-            'PEDAGOGO',
-            'NUTRICIONISTA',
-            'FISIOTERAPEUTA',
-        ];
+        $rolesPermitidos = ClasificacionRolInstitucional::ROLES;
 
         $rolesQuery = Role::query()->whereIn('name', $rolesPermitidos);
 

@@ -2,10 +2,10 @@
 
 namespace App\Modulos\Identidad\Aplicacion\Consultas;
 
-use App\Compartido\Infraestructura\Documentos\DocumentacionUsuarioService;
 use App\Models\AsignacionPersonal;
 use App\Models\Documento;
 use App\Models\User;
+use App\Modulos\Identidad\Aplicacion\Acciones\DocumentacionUsuarioService;
 use Spatie\Activitylog\Models\Activity;
 
 class UsuarioFichaService

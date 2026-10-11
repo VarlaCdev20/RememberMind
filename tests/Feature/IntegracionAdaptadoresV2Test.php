@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Compartido\Infraestructura\Documentos\DocumentacionUsuarioService;
 use App\Models\AplicacionInstrumento;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
@@ -15,6 +14,7 @@ use App\Models\Residente;
 use App\Models\ResidenteContacto;
 use App\Models\Turno;
 use App\Models\User;
+use App\Modulos\Identidad\Aplicacion\Acciones\DocumentacionUsuarioService;
 use App\Modulos\Institucion\Infraestructura\Exportaciones\GeneradorPlanillaEnfermeriaService;
 use App\Modulos\Institucion\Presentacion\Livewire\Paginas\TurnosAsignacionesPanel;
 use App\Modulos\Reportes\Infraestructura\Exportaciones\AdultoIndividualExport;

@@ -996,6 +996,7 @@ class PersonalInstitucionalPanel extends Component
     private function rolesAdministrativos(): array
     {
         return [
+            'GERENTE',
             'personal_admin',
             'PERSONAL_ADMIN',
             'PERSONAL ADMIN',

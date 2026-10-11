@@ -2,12 +2,12 @@
 
 namespace App\Modulos\Identidad\Presentacion\Livewire\Paginas;
 
-use App\Compartido\Infraestructura\Documentos\DocumentacionUsuarioService;
 use App\Compartido\Infraestructura\Documentos\DocumentosUsuarioService;
 use App\Models\Contacto;
 use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\User;
+use App\Modulos\Identidad\Aplicacion\Acciones\DocumentacionUsuarioService;
 use App\Modulos\Identidad\Aplicacion\Acciones\GestionarUsuariosPanel;
 use App\Modulos\Identidad\Infraestructura\Notificaciones\EnviarRequisitosDocumentales;
 use App\Modulos\Identidad\Infraestructura\Notificaciones\NotificarUsuarioGuardado;
@@ -18,10 +18,12 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Spatie\Permission\Models\Role;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class UsuariosPanel extends Component
 {
@@ -2204,14 +2206,14 @@ class UsuariosPanel extends Component
         $this->validate([
             'archivoTemporal' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240', // 10MB max
             'fechaEmisionDoc' => 'nullable|date',
-            'fechaVencimientoDoc' => 'nullable|date|after_or_equal:fechaEmisionDoc',
+            'fechaVencimientoDoc' => 'nullable|date|after:fechaEmisionDoc',
             'observacionesDoc' => 'nullable|string|max:1000',
         ], [
             'archivoTemporal.required' => 'Debe seleccionar un archivo.',
             'archivoTemporal.file' => 'El archivo no es válido.',
             'archivoTemporal.mimes' => 'Solo se permiten archivos PDF, JPG, JPEG o PNG.',
             'archivoTemporal.max' => 'El tamaño máximo del archivo es de 10 MB.',
-            'fechaVencimientoDoc.after_or_equal' => 'La fecha de vencimiento debe ser posterior o igual a la de emisión.',
+            'fechaVencimientoDoc.after' => 'La fecha de vencimiento debe ser posterior a la de emisión.',
         ]);
 
         $usuario = $this->usuarioDetalle;
@@ -2247,12 +2249,18 @@ class UsuariosPanel extends Component
                 'title' => 'Documento cargado',
                 'text' => 'El archivo ha sido registrado correctamente.',
             ]);
-        } catch (\Exception $e) {
-            $this->dispatch('swal', [
-                'icon' => 'error',
-                'title' => 'Error al subir',
-                'text' => $e->getMessage(),
-            ]);
+        } catch (ValidationException $e) {
+            $mapa = ['file' => 'archivoTemporal', 'fechaEmision' => 'fechaEmisionDoc', 'fechaVencimiento' => 'fechaVencimientoDoc', 'observaciones' => 'observacionesDoc'];
+            foreach ($e->errors() as $campo => $mensajes) {
+                foreach ($mensajes as $mensaje) {
+                    $this->addError($mapa[$campo] ?? $campo, $mensaje);
+                }
+            }
+        } catch (HttpException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            report($e);
+            $this->dispatch('swal', ['icon' => 'error', 'title' => 'Error al subir', 'text' => 'No se pudo guardar el archivo. Intente nuevamente.']);
         }
     }
 

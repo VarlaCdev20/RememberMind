@@ -2,10 +2,10 @@
 
 namespace App\Modulos\Identidad\Presentacion\Http\Controllers;
 
-use App\Compartido\Infraestructura\Documentos\DocumentacionUsuarioService;
 use App\Compartido\Infraestructura\Documentos\DocumentosUsuarioService;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Modulos\Identidad\Aplicacion\Acciones\DocumentacionUsuarioService;
 use App\Modulos\Identidad\Aplicacion\Acciones\GestionarUsuariosHttp;
 use App\Modulos\Identidad\Aplicacion\Consultas\UsuarioFichaService;
 use App\Modulos\Identidad\Infraestructura\Jobs\EnviarFichaUsuarioJob;

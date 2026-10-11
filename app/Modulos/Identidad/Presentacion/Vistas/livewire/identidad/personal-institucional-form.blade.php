@@ -1,4 +1,9 @@
 <div x-data="{ isDirty: false }" x-on:input="isDirty = true" x-on:change="isDirty = true" x-on:abrir-pdf-generado.window="try{ let u = $event.detail.url || ($event.detail[0] && $event.detail[0].url); if(u) window.open(u, '_blank'); }catch(e){console.error(e)}" class="max-w-5xl mx-auto w-full max-h-[85vh] flex flex-col">
+<div class="mb-2">
+ <label for="personal-fecha-ingreso" class="block text-xs font-bold text-apoyo">Fecha de ingreso laboral (opcional)</label>
+ <input id="personal-fecha-ingreso" type="date" wire:model="fecha_ingreso" class="rounded-xl border-input-borde bg-input-bg text-sm">
+ @error('fecha_ingreso') <span class="text-xs text-estado-peligro">{{ $message }}</span> @enderror
+</div>
 @if(!$esEdicion)
 <div class="p-3 md:p-4 bg-[var(--rm-surface-soft)] flex flex-col h-full rounded-xl shadow-xl overflow-hidden">
  <!-- Header Compacto -->
@@ -194,10 +199,6 @@
      <input type="checkbox" wire:model="mostrar_credenciales" class="rounded text-boton-acento focus:ring-boton-acento h-4 w-4">
      <span class="text-xs font-bold text-titulo">Mostrar credenciales al finalizar el registro</span>
      </label>
-     <label class="flex items-center gap-2 cursor-pointer">
-     <input type="checkbox" wire:model="forzar_cambio_password" class="rounded text-boton-acento focus:ring-boton-acento h-4 w-4">
-     <span class="text-xs font-bold text-titulo">Forzar cambio de contraseña al primer inicio de sesión</span>
-     </label>
     </div>
     </div>
    </div>
@@ -322,11 +323,6 @@
     <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Celular <span class="text-estado-peligro">*</span></label>
     <input type="text" wire:model="telefono" x-init="$nextTick(() => $el.focus())" class="w-full rounded-xl {{ $errors->has('telefono') ? 'border-estado-peligro focus:ring-estado-peligro focus:border-estado-peligro' : 'border-input-borde focus:ring-input-ringFocus focus:border-input-bordeFocus' }} bg-input-bg text-xs py-1.5" placeholder="Ej: 77712345">
     @error('telefono') <span class="text-xs text-estado-peligro block">{{ $message }}</span> @enderror
-    </div>
-    <div>
-    <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Teléfono Alternativo</label>
-    <input type="text" wire:model="telefono_alternativo" class="w-full rounded-xl {{ $errors->has('telefono_alternativo') ? 'border-estado-peligro focus:ring-estado-peligro focus:border-estado-peligro' : 'border-input-borde focus:ring-input-ringFocus focus:border-input-bordeFocus' }} bg-input-bg text-xs py-1.5">
-    @error('telefono_alternativo') <span class="text-xs text-estado-peligro block">{{ $message }}</span> @enderror
     </div>
     <div>
     <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Correo Registrado</label>
@@ -473,7 +469,7 @@
      <span class="text-xs font-black text-titulo">{{ $clsf['rol_label'] }}</span>
      </div>
      <div class="rounded-xl border border-borde bg-[var(--rm-surface)] p-2.5 shadow-sm col-span-2 sm:col-span-1">
-     <span class="block text-[9px] font-bold uppercase tracking-wider text-apoyo mb-0.5">Área</span>
+     <span class="block text-[9px] font-bold uppercase tracking-wider text-apoyo mb-0.5">Área de referencia</span>
      <span class="text-xs font-black text-titulo">{{ $clsf['area_nombre'] }}</span>
      </div>
     </div>
@@ -829,7 +825,6 @@
     </div>
     <div class="space-y-2 text-xs">
     <div class="flex justify-between"><span class="text-apoyo">Celular:</span> <span class="font-semibold text-titulo">{{ $telefono }}</span></div>
-    <div class="flex justify-between"><span class="text-apoyo">Teléfono Alt:</span> <span class="font-semibold text-titulo">{{ $telefono_alternativo ?: 'Ninguno' }}</span></div>
     <div class="pt-1 border-t border-borde/40">
      <span class="text-[9px] font-bold text-apoyo uppercase block">Dirección:</span>
      <p class="text-titulo font-medium leading-relaxed mt-0.5 text-[10px]">{{ $direccion }}</p>
@@ -1027,7 +1022,6 @@
    <div class="flex gap-2">
    <select wire:model="tipo_documento" class="w-1/3 rounded-xl border-input-borde bg-input-bg text-sm">
     <option value="CI">CI</option>
-    <option value="PASAPORTE">PAS</option>
    </select>
    <input type="text" wire:model="numero_documento" class="w-2/3 rounded-xl border-input-borde bg-input-bg text-sm" required>
    </div>
@@ -1038,7 +1032,7 @@
   <div class="grid grid-cols-2 gap-2">
   <div>
    <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Correo Electrónico <span class="text-estado-peligro">*</span></label>
-   <input type="email" wire:model="correo" class="w-full rounded-xl border-input-borde bg-input-bg text-sm lowercase" required>
+   <input type="email" wire:model="correo" class="w-full rounded-xl border-input-borde bg-input-bg text-sm lowercase" required @disabled(!auth()->user()?->can('usuarios.editar'))>
    @error('correo') <span class="text-xs text-estado-peligro">{{ $message }}</span> @enderror
   </div>
   <div>
@@ -1049,12 +1043,10 @@
 
   <div class="grid grid-cols-1 gap-2">
   <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Estado</label>
-   <select wire:model="estado" class="w-full rounded-xl border-input-borde bg-input-bg text-sm">
+   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-0.5">Estado de acceso (gestión de cuentas)</label>
+   <select wire:model="estado" class="w-full rounded-xl border-input-borde bg-input-bg text-sm" disabled>
    <option value="ACTIVO">ACTIVO</option>
    <option value="INACTIVO">INACTIVO</option>
-   <option value="SUSPENDIDO">SUSPENDIDO</option>
-   <option value="RETIRADO">RETIRADO</option>
    </select>
   </div>
   </div>
@@ -1064,7 +1056,7 @@
   <div class="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 border border-input-borde rounded-xl bg-input-bg">
    @foreach($roles as $rol)
    <label class="inline-flex items-center gap-2 cursor-pointer">
-    <input type="checkbox" wire:model.live="roles_seleccionados" value="{{ $rol->name }}" class="rounded text-boton-acento focus:ring-boton-acento">
+    <input type="checkbox" wire:model.live="roles_seleccionados" value="{{ $rol->name }}" class="rounded text-boton-acento focus:ring-boton-acento" @disabled(!auth()->user()?->can('usuarios.editar'))>
     <span class="text-sm font-semibold text-parrafo">{{ $rol->name }}</span>
    </label>
    @endforeach

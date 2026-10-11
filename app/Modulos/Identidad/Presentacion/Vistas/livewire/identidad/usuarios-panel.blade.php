@@ -14,7 +14,7 @@
  }
 
  // Documentación
- $documentacionService = app(\App\Compartido\Infraestructura\Documentos\DocumentacionUsuarioService::class);
+ $documentacionService = app(\App\Modulos\Identidad\Aplicacion\Acciones\DocumentacionUsuarioService::class);
  $checklist = $documentacionService->obtenerChecklistUsuario($usuarioDetalle);
  $avance = $documentacionService->calcularAvanceDocumental($usuarioDetalle);
 

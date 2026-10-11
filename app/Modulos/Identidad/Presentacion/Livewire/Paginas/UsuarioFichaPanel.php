@@ -2,9 +2,9 @@
 
 namespace App\Modulos\Identidad\Presentacion\Livewire\Paginas;
 
-use App\Compartido\Infraestructura\Documentos\DocumentacionUsuarioService;
 use App\Models\Documento;
 use App\Models\User;
+use App\Modulos\Identidad\Aplicacion\Acciones\DocumentacionUsuarioService;
 use App\Modulos\Identidad\Aplicacion\Acciones\GestionarSeguridadCuenta;
 use App\Modulos\Identidad\Aplicacion\Consultas\UsuarioFichaService;
 use App\Modulos\Reportes\Infraestructura\Exportaciones\ReportExportService;
@@ -12,9 +12,11 @@ use App\Modulos\Reportes\Infraestructura\Exportaciones\ReportFileNameService;
 use App\Modulos\Reportes\Infraestructura\Exportaciones\UsuarioExpedienteExport;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class UsuarioFichaPanel extends Component
 {
@@ -133,12 +135,21 @@ class UsuarioFichaPanel extends Component
                 'title' => 'Documento cargado',
                 'text' => 'El documento ha sido cargado satisfactoriamente y está pendiente de validación.',
             ]);
+        } catch (ValidationException $e) {
+            $mapa = ['file' => 'archivoSubida', 'observaciones' => 'observacionesArchivo'];
+            foreach ($e->errors() as $campo => $mensajes) {
+                foreach ($mensajes as $mensaje) {
+                    $this->addError($mapa[$campo] ?? $campo, $mensaje);
+                }
+            }
+        } catch (HttpException $e) {
+            throw $e;
         } catch (\Throwable $e) {
-            Log::error('Error al subir documento de usuario: '.$e->getMessage());
+            report($e);
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Error de subida',
-                'text' => 'No se pudo guardar el archivo: '.$e->getMessage(),
+                'text' => 'No se pudo guardar el archivo. Intente nuevamente.',
             ]);
         }
     }
@@ -156,7 +167,7 @@ class UsuarioFichaPanel extends Component
         }
 
         $documento = Documento::where('cod_usuario', $this->usuario->cod_usuario)->findOrFail($codDoc);
-        app(DocumentacionUsuarioService::class)->validarDocumento($documento, auth()->user());
+        app(DocumentacionUsuarioService::class)->validarDocumento($documento, auth()->user(), $this->usuario->getKey());
 
         $this->dispatch('swal', [
             'icon' => 'success',
@@ -186,7 +197,7 @@ class UsuarioFichaPanel extends Component
         ]);
 
         $documento = Documento::where('cod_usuario', $this->usuario->cod_usuario)->findOrFail($this->selectedDocId);
-        app(DocumentacionUsuarioService::class)->observarDocumento($documento, $this->motivoRechazo, auth()->user());
+        app(DocumentacionUsuarioService::class)->observarDocumento($documento, $this->motivoRechazo, auth()->user(), $this->usuario->getKey());
 
         $this->mostrarObservacionModal = false;
         $this->reset(['selectedDocId', 'motivoRechazo']);
@@ -224,7 +235,7 @@ class UsuarioFichaPanel extends Component
         ]);
 
         $documento = Documento::where('cod_usuario', $this->usuario->cod_usuario)->findOrFail($this->selectedDocId);
-        app(DocumentacionUsuarioService::class)->anularDocumento($documento, $this->motivoRechazo, auth()->user());
+        app(DocumentacionUsuarioService::class)->anularDocumento($documento, $this->motivoRechazo, auth()->user(), $this->usuario->getKey());
 
         $this->mostrarAnulacionModal = false;
         $this->reset(['selectedDocId', 'motivoRechazo']);
@@ -303,6 +314,7 @@ class UsuarioFichaPanel extends Component
         }
 
         $nuevoAcceso = app(GestionarSeguridadCuenta::class)->toggleAcceso(auth()->user(), $this->usuario);
+        $this->usuario->refresh();
 
         $this->dispatch('swal', [
             'icon' => 'success',
