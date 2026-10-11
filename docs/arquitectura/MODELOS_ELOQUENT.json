@@ -1,0 +1,3700 @@
+{
+  "schema_version": 1,
+  "generated_at_utc": "2026-10-10T19:55:52Z",
+  "baseline_ref": "0d3942bd638c1294cad184c51a3f6224b8d1ab75",
+  "current_branch": "ARQUI-NUEVA",
+  "repository_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind",
+  "scope": "Inventario estatico de las 96 clases nombradas en app/Models, incluidas 2 bases abstractas. Se crea solo este artefacto; no modifica implementacion, tablas ni datos.",
+  "methodology": [
+    "Lectura de archivos PHP y declaracion explicita de tabla, PK, clase y herencia.",
+    "Comparacion estatica de identidad contra git show 0d3942bd por archivo.",
+    "Asignacion explicita de owner logico; Eloquent se mantiene como infraestructura.",
+    "Inspeccion de config/auth.php y migraciones de Sanctum, RBAC y auditoria; ninguna consulta a una BDD.",
+    "Asercion de cobertura de 96 archivos, nombres y FQCN unicos; entradas ordenadas por nombre de modelo."
+  ],
+  "database_inspected": false,
+  "implementation_edited": false,
+  "physical_models_moved": false,
+  "inheritance_or_history_guards_changed": false,
+  "module_counts": {
+    "Admisiones": 3,
+    "Alertas": 3,
+    "ApoyoDecision": 24,
+    "Clinica": 17,
+    "Cuidados": 14,
+    "Identidad": 1,
+    "Institucion": 8,
+    "Medicacion": 4,
+    "Reportes": 0,
+    "Residentes": 7,
+    "Social": 3,
+    "Valoraciones": 11,
+    "Compartido": 1
+  },
+  "model_type_counts": {
+    "abstract_base": 2,
+    "eloquent_model": 92,
+    "authenticatable": 1,
+    "eloquent_pivot": 1
+  },
+  "base_inheritance_counts": {
+    "ModeloOperativo_concrete": 69,
+    "ModeloExperto_concrete": 23,
+    "Authenticatable": 1,
+    "Pivot": 1,
+    "abstract_bases": 2
+  },
+  "coverage_assertion": {
+    "expected_models": 96,
+    "source_file_count": 96,
+    "baseline_file_count": 96,
+    "inventoried_models": 96,
+    "unique_fqcn": 96,
+    "unique_model_names": 96,
+    "unowned_models": 0,
+    "baseline_path_difference": [],
+    "all_tables_keys_fqcn_and_inheritance_preserved": true,
+    "assertion_passed": true
+  },
+  "exceptions": [
+    {
+      "id": "M01",
+      "reason": "Mantener los FQCN App\\Models evita cambiar contratos existentes de relaciones Eloquent, providers, bindings, factories y consumidores durante una migracion sin cambios de BDD. La pertenencia al modulo se documenta como ownership logico, sin afirmar un traslado fisico.",
+      "evidence": [
+        "app/Models/ModeloOperativo.php",
+        "app/Models/Residente.php",
+        "app/Providers/AppServiceProvider.php",
+        "app/Providers/ArquitecturaModularServiceProvider.php",
+        "database/factories"
+      ]
+    },
+    {
+      "id": "M02",
+      "reason": "Las columnas polimorficas de auditoria admiten nombres de clase para subject/causer. Cambiar FQCN puede afectar referencias historicas. Esta es una capacidad/riesgo constatada en el esquema y el codigo; no se inspeccionaron filas reales de ninguna BDD ni se afirma que existan valores concretos almacenados.",
+      "evidence": [
+        "database/migrations/2026_04_15_028000_create_activity_log_table.php:17",
+        "database/migrations/2026_04_15_028000_create_activity_log_table.php:19",
+        "app/Models/User.php:15"
+      ],
+      "risk_status": "potencial_por_esquema_no_confirmado_en_datos"
+    },
+    {
+      "id": "M03",
+      "reason": "Los 23 modelos expertos concretos y ModeloExperto pertenecen a ApoyoDecision como persistencia Eloquent. Permanecen fuera del paquete motor-experto y conservan tablas, claves, relaciones y guardas de inmutabilidad. El motor puro recibe objetos/puertos y no debe incorporar estos modelos Laravel.",
+      "evidence": [
+        "app/Models/ModeloExperto.php",
+        "app/Modulos/ApoyoDecision/Infraestructura/Persistencia/Eloquent/BuilderExperto.php",
+        "app/Modulos/ApoyoDecision/Infraestructura/Persistencia/Eloquent",
+        "motor-experto/src/motor_experto"
+      ]
+    },
+    {
+      "id": "M04",
+      "reason": "ModeloOperativo y ModeloExperto son bases abstractas sin tabla propia. Conservar su herencia evita perder relaciones comunes, claves string, timestamps/incrementing desactivados y guardas historicas. ModeloOperativo pertenece a Compartido; ModeloExperto a ApoyoDecision.",
+      "evidence": [
+        "app/Models/ModeloOperativo.php:8",
+        "app/Models/ModeloOperativo.php:48",
+        "app/Models/ModeloExperto.php:10",
+        "app/Models/ModeloExperto.php:27",
+        "vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:73",
+        "vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:80"
+      ]
+    },
+    {
+      "id": "M05",
+      "reason": "User es el modelo Authenticatable configurado por auth y usa Sanctum, HasRoles y LogsActivity. Mantener App\\Models\\User conserva AUTH_MODEL y la compatibilidad de referencias tokenable_type, model_type y causer_type sin migrar datos.",
+      "evidence": [
+        "config/auth.php:3",
+        "config/auth.php:67",
+        "app/Models/User.php:12",
+        "app/Models/User.php:15",
+        "app/Models/User.php:18",
+        "database/migrations/2026_04_14_224954_create_personal_access_tokens_table.php:16",
+        "database/migrations/2026_04_19_035621_create_permission_tables.php:57",
+        "database/migrations/2026_04_19_035621_create_permission_tables.php:80"
+      ],
+      "risk_status": "potencial_por_esquema_no_confirmado_en_datos"
+    },
+    {
+      "id": "M06",
+      "reason": "ResidenteContacto hereda de Pivot, es seleccionado mediante using(ResidenteContacto::class) y conserva su clave string y validacion de unicidad activa. Su ownership es Residentes aunque sus datos se consuman desde la red social de apoyo.",
+      "evidence": [
+        "app/Models/ResidenteContacto.php",
+        "app/Models/Residente.php:17",
+        "app/Models/Residente.php:76"
+      ]
+    }
+  ],
+  "ownership_decisions": [
+    {
+      "models": [
+        "OcupacionCama"
+      ],
+      "owner": "Admisiones",
+      "rationale": "La ocupacion representa la asignacion y continuidad de alojamiento del residente dentro del ingreso; el catalogo Cama/Habitacion pertenece a Institucion."
+    },
+    {
+      "models": [
+        "HistorialEstadoResidente"
+      ],
+      "owner": "Residentes",
+      "rationale": "Conserva la historia del residente a traves de multiples flujos; las acciones de Admisiones y Valoraciones son consumidoras/autoras."
+    },
+    {
+      "models": [
+        "Contacto",
+        "ResidenteContacto",
+        "Consentimiento",
+        "SeguroResidente",
+        "Documento"
+      ],
+      "owner": "Residentes",
+      "rationale": "Identidad documental, consentimiento, aseguramiento y vinculos pertenecen al expediente del residente; la infraestructura compartida de archivos y la red de apoyo son consumidoras."
+    },
+    {
+      "models": [
+        "Herida",
+        "CuracionHerida",
+        "RegistroConductual",
+        "ControlCognitivo"
+      ],
+      "owner": "Cuidados",
+      "rationale": "Registros y seguimiento cotidiano firmados en los flujos de cuidados; su posible uso como fuente experta no cambia el owner."
+    },
+    {
+      "models": [
+        "MedicionAntropometrica",
+        "DispositivoClinico"
+      ],
+      "owner": "Clinica",
+      "rationale": "Medicion y dispositivo del expediente clinico, aunque puedan registrarse durante un turno de enfermeria."
+    },
+    {
+      "models": [
+        "ValoracionDolor",
+        "ValoracionEnfermeriaPreadmision",
+        "SeguimientoPedagogico"
+      ],
+      "owner": "Valoraciones",
+      "rationale": "Valoraciones profesionales e instrumentos; la etapa de preadmision o el contexto de turno no cambia su responsabilidad de evaluacion."
+    },
+    {
+      "models": [
+        "Personal",
+        "Area",
+        "AsignacionPersonal",
+        "AsignacionResidenteJornada",
+        "Jornada",
+        "Turno",
+        "Cama",
+        "Habitacion"
+      ],
+      "owner": "Institucion",
+      "rationale": "Estructura institucional, plazas, jornadas, catalogos de turno y recursos residenciales; User y credenciales siguen en Identidad."
+    },
+    {
+      "models": [
+        "ModeloExperto",
+        "todos_los_modelos_que_extienden_ModeloExperto"
+      ],
+      "owner": "ApoyoDecision",
+      "rationale": "Persistencia de conocimiento y ejecuciones expertas como adaptador Laravel; excluida del dominio motor-experto."
+    },
+    {
+      "models": [
+        "ModeloOperativo"
+      ],
+      "owner": "Compartido",
+      "rationale": "Unica base transversal en este inventario; no implica asignar ownership Compartido a entidades de negocio concretas."
+    },
+    {
+      "models": [],
+      "owner": "Reportes",
+      "rationale": "No hay modelo propio entre las 96 clases actuales; los reportes leen registros de sus respectivos owners."
+    }
+  ],
+  "models": [
+    {
+      "name": "Actividad",
+      "fqcn": "App\\Models\\Actividad",
+      "current_path": "app/Models/Actividad.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Actividad.php",
+      "logical_owner": "Social",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "actividades",
+      "primary_key": "cod_actividad",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Actividad.php",
+          "class_line": 9,
+          "table_line": 11,
+          "primary_key_line": 12
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "AdministracionMedicacion",
+      "fqcn": "App\\Models\\AdministracionMedicacion",
+      "current_path": "app/Models/AdministracionMedicacion.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/AdministracionMedicacion.php",
+      "logical_owner": "Medicacion",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "administraciones_medicacion",
+      "primary_key": "cod_administracion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/AdministracionMedicacion.php",
+          "class_line": 10,
+          "table_line": 12,
+          "primary_key_line": 14
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Admision",
+      "fqcn": "App\\Models\\Admision",
+      "current_path": "app/Models/Admision.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Admision.php",
+      "logical_owner": "Admisiones",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "admisiones",
+      "primary_key": "cod_admision",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Admision.php",
+          "class_line": 5,
+          "table_line": 6,
+          "primary_key_line": 6
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Alergia",
+      "fqcn": "App\\Models\\Alergia",
+      "current_path": "app/Models/Alergia.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Alergia.php",
+      "logical_owner": "Clinica",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "alergias",
+      "primary_key": "cod_alergia",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Alergia.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Alerta",
+      "fqcn": "App\\Models\\Alerta",
+      "current_path": "app/Models/Alerta.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Alerta.php",
+      "logical_owner": "Alertas",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "alertas",
+      "primary_key": "cod_alerta",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Alerta.php",
+          "class_line": 10,
+          "table_line": 12,
+          "primary_key_line": 14
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "AntecedenteClinico",
+      "fqcn": "App\\Models\\AntecedenteClinico",
+      "current_path": "app/Models/AntecedenteClinico.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/AntecedenteClinico.php",
+      "logical_owner": "Clinica",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "antecedentes_clinicos",
+      "primary_key": "cod_antecedente",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/AntecedenteClinico.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "AplicacionInstrumento",
+      "fqcn": "App\\Models\\AplicacionInstrumento",
+      "current_path": "app/Models/AplicacionInstrumento.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/AplicacionInstrumento.php",
+      "logical_owner": "Valoraciones",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "aplicaciones_instrumento",
+      "primary_key": "cod_aplicacion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/AplicacionInstrumento.php",
+          "class_line": 5,
+          "table_line": 6,
+          "primary_key_line": 6
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Area",
+      "fqcn": "App\\Models\\Area",
+      "current_path": "app/Models/Area.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Area.php",
+      "logical_owner": "Institucion",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "areas",
+      "primary_key": "cod_area",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Area.php",
+          "class_line": 4,
+          "table_line": 5,
+          "primary_key_line": 5
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "AsignacionPersonal",
+      "fqcn": "App\\Models\\AsignacionPersonal",
+      "current_path": "app/Models/AsignacionPersonal.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/AsignacionPersonal.php",
+      "logical_owner": "Institucion",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "asignaciones_personal",
+      "primary_key": "cod_asignacion_personal",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/AsignacionPersonal.php",
+          "class_line": 9,
+          "table_line": 11,
+          "primary_key_line": 12
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "AsignacionResidenteJornada",
+      "fqcn": "App\\Models\\AsignacionResidenteJornada",
+      "current_path": "app/Models/AsignacionResidenteJornada.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/AsignacionResidenteJornada.php",
+      "logical_owner": "Institucion",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "asignaciones_residente_jornada",
+      "primary_key": "cod_asignacion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/AsignacionResidenteJornada.php",
+          "class_line": 9,
+          "table_line": 11,
+          "primary_key_line": 12
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Atencion",
+      "fqcn": "App\\Models\\Atencion",
+      "current_path": "app/Models/Atencion.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Atencion.php",
+      "logical_owner": "Clinica",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "atenciones",
+      "primary_key": "cod_atencion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Atencion.php",
+          "class_line": 8,
+          "table_line": 10,
+          "primary_key_line": 11
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Cama",
+      "fqcn": "App\\Models\\Cama",
+      "current_path": "app/Models/Cama.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Cama.php",
+      "logical_owner": "Institucion",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "camas",
+      "primary_key": "cod_cama",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Cama.php",
+          "class_line": 9,
+          "table_line": 11,
+          "primary_key_line": 12
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "ComponenteEstudio",
+      "fqcn": "App\\Models\\ComponenteEstudio",
+      "current_path": "app/Models/ComponenteEstudio.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/ComponenteEstudio.php",
+      "logical_owner": "Clinica",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "componentes_estudio",
+      "primary_key": "cod_componente",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/ComponenteEstudio.php",
+          "class_line": 5,
+          "table_line": 5,
+          "primary_key_line": 5
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "CondicionReglaExperta",
+      "fqcn": "App\\Models\\CondicionReglaExperta",
+      "current_path": "app/Models/CondicionReglaExperta.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/CondicionReglaExperta.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "condiciones_regla_experta",
+      "primary_key": "cod_condicion_regla",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/CondicionReglaExperta.php",
+          "class_line": 9,
+          "table_line": 11,
+          "primary_key_line": 13
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "ConsecuenciaReglaExperta",
+      "fqcn": "App\\Models\\ConsecuenciaReglaExperta",
+      "current_path": "app/Models/ConsecuenciaReglaExperta.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/ConsecuenciaReglaExperta.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "consecuencias_regla_experta",
+      "primary_key": "cod_consecuencia_regla",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/ConsecuenciaReglaExperta.php",
+          "class_line": 8,
+          "table_line": 10,
+          "primary_key_line": 12
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Consentimiento",
+      "fqcn": "App\\Models\\Consentimiento",
+      "current_path": "app/Models/Consentimiento.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Consentimiento.php",
+      "logical_owner": "Residentes",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "consentimientos",
+      "primary_key": "cod_consentimiento",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Consentimiento.php",
+          "class_line": 4,
+          "table_line": 5,
+          "primary_key_line": 5
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Contacto",
+      "fqcn": "App\\Models\\Contacto",
+      "current_path": "app/Models/Contacto.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Contacto.php",
+      "logical_owner": "Residentes",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "contactos",
+      "primary_key": "cod_contacto",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Contacto.php",
+          "class_line": 6,
+          "table_line": 7,
+          "primary_key_line": 7
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "ControlCognitivo",
+      "fqcn": "App\\Models\\ControlCognitivo",
+      "current_path": "app/Models/ControlCognitivo.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/ControlCognitivo.php",
+      "logical_owner": "Cuidados",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "controles_cognitivos",
+      "primary_key": "cod_control_cognitivo",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/ControlCognitivo.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "CriterioDominioResultado",
+      "fqcn": "App\\Models\\CriterioDominioResultado",
+      "current_path": "app/Models/CriterioDominioResultado.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/CriterioDominioResultado.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "criterios_dominios_resultado",
+      "primary_key": "cod_criterio_dominio_resultado",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/CriterioDominioResultado.php",
+          "class_line": 9,
+          "table_line": 11,
+          "primary_key_line": 13
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "CuracionHerida",
+      "fqcn": "App\\Models\\CuracionHerida",
+      "current_path": "app/Models/CuracionHerida.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/CuracionHerida.php",
+      "logical_owner": "Cuidados",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "curaciones_herida",
+      "primary_key": "cod_curacion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/CuracionHerida.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Derivacion",
+      "fqcn": "App\\Models\\Derivacion",
+      "current_path": "app/Models/Derivacion.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Derivacion.php",
+      "logical_owner": "Clinica",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "derivaciones",
+      "primary_key": "cod_derivacion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Derivacion.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Diagnostico",
+      "fqcn": "App\\Models\\Diagnostico",
+      "current_path": "app/Models/Diagnostico.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Diagnostico.php",
+      "logical_owner": "Clinica",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "diagnosticos",
+      "primary_key": "cod_diagnostico",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Diagnostico.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "DispositivoClinico",
+      "fqcn": "App\\Models\\DispositivoClinico",
+      "current_path": "app/Models/DispositivoClinico.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/DispositivoClinico.php",
+      "logical_owner": "Clinica",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "dispositivos_clinicos",
+      "primary_key": "cod_dispositivo",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/DispositivoClinico.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Documento",
+      "fqcn": "App\\Models\\Documento",
+      "current_path": "app/Models/Documento.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Documento.php",
+      "logical_owner": "Residentes",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "documentos",
+      "primary_key": "cod_documento",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Documento.php",
+          "class_line": 4,
+          "table_line": 5,
+          "primary_key_line": 5
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "DocumentoClinico",
+      "fqcn": "App\\Models\\DocumentoClinico",
+      "current_path": "app/Models/DocumentoClinico.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/DocumentoClinico.php",
+      "logical_owner": "Clinica",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "documentos_clinicos",
+      "primary_key": "cod_documento_clinico",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/DocumentoClinico.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "DominioValoresExperto",
+      "fqcn": "App\\Models\\DominioValoresExperto",
+      "current_path": "app/Models/DominioValoresExperto.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/DominioValoresExperto.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "dominios_valores_expertos",
+      "primary_key": "cod_dominio_valores",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/DominioValoresExperto.php",
+          "class_line": 9,
+          "table_line": 11,
+          "primary_key_line": 13
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "EjecucionCuidado",
+      "fqcn": "App\\Models\\EjecucionCuidado",
+      "current_path": "app/Models/EjecucionCuidado.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/EjecucionCuidado.php",
+      "logical_owner": "Cuidados",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "ejecuciones_cuidado",
+      "primary_key": "cod_ejecucion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/EjecucionCuidado.php",
+          "class_line": 9,
+          "table_line": 11,
+          "primary_key_line": 12
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "EstudioClinico",
+      "fqcn": "App\\Models\\EstudioClinico",
+      "current_path": "app/Models/EstudioClinico.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/EstudioClinico.php",
+      "logical_owner": "Clinica",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "estudios_clinicos",
+      "primary_key": "cod_estudio",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/EstudioClinico.php",
+          "class_line": 5,
+          "table_line": 5,
+          "primary_key_line": 5
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "EvaluacionCondicionRegla",
+      "fqcn": "App\\Models\\EvaluacionCondicionRegla",
+      "current_path": "app/Models/EvaluacionCondicionRegla.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/EvaluacionCondicionRegla.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "evaluaciones_condiciones_regla",
+      "primary_key": "cod_evaluacion_condicion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/EvaluacionCondicionRegla.php",
+          "class_line": 9,
+          "table_line": 11,
+          "primary_key_line": 13
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "EvaluacionCriterio",
+      "fqcn": "App\\Models\\EvaluacionCriterio",
+      "current_path": "app/Models/EvaluacionCriterio.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/EvaluacionCriterio.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "evaluacion_criterios",
+      "primary_key": "cod_evaluacion_criterio",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/EvaluacionCriterio.php",
+          "class_line": 10,
+          "table_line": 12,
+          "primary_key_line": 14
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "EvaluacionExperta",
+      "fqcn": "App\\Models\\EvaluacionExperta",
+      "current_path": "app/Models/EvaluacionExperta.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/EvaluacionExperta.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "evaluaciones_expertas",
+      "primary_key": "cod_evaluacion_experta",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/EvaluacionExperta.php",
+          "class_line": 9,
+          "table_line": 11,
+          "primary_key_line": 13
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "EvaluacionRegla",
+      "fqcn": "App\\Models\\EvaluacionRegla",
+      "current_path": "app/Models/EvaluacionRegla.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/EvaluacionRegla.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "evaluaciones_reglas",
+      "primary_key": "cod_evaluacion_regla",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/EvaluacionRegla.php",
+          "class_line": 9,
+          "table_line": 11,
+          "primary_key_line": 13
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "EventoAlerta",
+      "fqcn": "App\\Models\\EventoAlerta",
+      "current_path": "app/Models/EventoAlerta.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/EventoAlerta.php",
+      "logical_owner": "Alertas",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "eventos_alerta",
+      "primary_key": "cod_evento_alerta",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/EventoAlerta.php",
+          "class_line": 7,
+          "table_line": 9,
+          "primary_key_line": 10
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "EvidenciaCriterioEvaluacion",
+      "fqcn": "App\\Models\\EvidenciaCriterioEvaluacion",
+      "current_path": "app/Models/EvidenciaCriterioEvaluacion.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/EvidenciaCriterioEvaluacion.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "evidencias_criterio_evaluacion",
+      "primary_key": "cod_evidencia_criterio",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/EvidenciaCriterioEvaluacion.php",
+          "class_line": 8,
+          "table_line": 10,
+          "primary_key_line": 12
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "EvidenciaEvaluacion",
+      "fqcn": "App\\Models\\EvidenciaEvaluacion",
+      "current_path": "app/Models/EvidenciaEvaluacion.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/EvidenciaEvaluacion.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "evidencias_evaluacion",
+      "primary_key": "cod_evidencia_evaluacion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/EvidenciaEvaluacion.php",
+          "class_line": 9,
+          "table_line": 11,
+          "primary_key_line": 13
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "EvidenciaSoporteCondicion",
+      "fqcn": "App\\Models\\EvidenciaSoporteCondicion",
+      "current_path": "app/Models/EvidenciaSoporteCondicion.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/EvidenciaSoporteCondicion.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "evidencias_soporte_condicion",
+      "primary_key": "cod_evidencia_soporte_condicion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/EvidenciaSoporteCondicion.php",
+          "class_line": 8,
+          "table_line": 10,
+          "primary_key_line": 12
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "FuenteDatoExperta",
+      "fqcn": "App\\Models\\FuenteDatoExperta",
+      "current_path": "app/Models/FuenteDatoExperta.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/FuenteDatoExperta.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "fuentes_datos_expertas",
+      "primary_key": "cod_fuente_dato_experta",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/FuenteDatoExperta.php",
+          "class_line": 9,
+          "table_line": 11,
+          "primary_key_line": 13
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Habitacion",
+      "fqcn": "App\\Models\\Habitacion",
+      "current_path": "app/Models/Habitacion.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Habitacion.php",
+      "logical_owner": "Institucion",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "habitaciones",
+      "primary_key": "cod_habitacion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Habitacion.php",
+          "class_line": 8,
+          "table_line": 10,
+          "primary_key_line": 11
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Herida",
+      "fqcn": "App\\Models\\Herida",
+      "current_path": "app/Models/Herida.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Herida.php",
+      "logical_owner": "Cuidados",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "heridas",
+      "primary_key": "cod_herida",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Herida.php",
+          "class_line": 4,
+          "table_line": 4,
+          "primary_key_line": 4
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "HistorialEstadoResidente",
+      "fqcn": "App\\Models\\HistorialEstadoResidente",
+      "current_path": "app/Models/HistorialEstadoResidente.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/HistorialEstadoResidente.php",
+      "logical_owner": "Residentes",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "historial_estados_residente",
+      "primary_key": "cod_historial_estado",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/HistorialEstadoResidente.php",
+          "class_line": 8,
+          "table_line": 10,
+          "primary_key_line": 11
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "HorarioPrescripcion",
+      "fqcn": "App\\Models\\HorarioPrescripcion",
+      "current_path": "app/Models/HorarioPrescripcion.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/HorarioPrescripcion.php",
+      "logical_owner": "Medicacion",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "horarios_prescripcion",
+      "primary_key": "cod_horario_prescripcion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/HorarioPrescripcion.php",
+          "class_line": 4,
+          "table_line": 4,
+          "primary_key_line": 4
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Incidente",
+      "fqcn": "App\\Models\\Incidente",
+      "current_path": "app/Models/Incidente.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Incidente.php",
+      "logical_owner": "Alertas",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "incidentes",
+      "primary_key": "cod_incidente",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Incidente.php",
+          "class_line": 11,
+          "table_line": 13,
+          "primary_key_line": 14
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "IndicacionClinica",
+      "fqcn": "App\\Models\\IndicacionClinica",
+      "current_path": "app/Models/IndicacionClinica.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/IndicacionClinica.php",
+      "logical_owner": "Clinica",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "indicaciones_clinicas",
+      "primary_key": "cod_indicacion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/IndicacionClinica.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "InformeEstudio",
+      "fqcn": "App\\Models\\InformeEstudio",
+      "current_path": "app/Models/InformeEstudio.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/InformeEstudio.php",
+      "logical_owner": "Clinica",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "informes_estudio",
+      "primary_key": "cod_informe_estudio",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/InformeEstudio.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Instrumento",
+      "fqcn": "App\\Models\\Instrumento",
+      "current_path": "app/Models/Instrumento.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Instrumento.php",
+      "logical_owner": "Valoraciones",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "instrumentos",
+      "primary_key": "cod_instrumento",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Instrumento.php",
+          "class_line": 4,
+          "table_line": 5,
+          "primary_key_line": 5
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "IntervencionCuidado",
+      "fqcn": "App\\Models\\IntervencionCuidado",
+      "current_path": "app/Models/IntervencionCuidado.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/IntervencionCuidado.php",
+      "logical_owner": "Cuidados",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "intervenciones_cuidado",
+      "primary_key": "cod_intervencion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/IntervencionCuidado.php",
+          "class_line": 5,
+          "table_line": 5,
+          "primary_key_line": 5
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Jornada",
+      "fqcn": "App\\Models\\Jornada",
+      "current_path": "app/Models/Jornada.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Jornada.php",
+      "logical_owner": "Institucion",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "jornadas",
+      "primary_key": "cod_jornada",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Jornada.php",
+          "class_line": 5,
+          "table_line": 6,
+          "primary_key_line": 6
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "MapeoValorFuente",
+      "fqcn": "App\\Models\\MapeoValorFuente",
+      "current_path": "app/Models/MapeoValorFuente.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/MapeoValorFuente.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "mapeos_valores_fuente",
+      "primary_key": "cod_mapeo_valor_fuente",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/MapeoValorFuente.php",
+          "class_line": 8,
+          "table_line": 10,
+          "primary_key_line": 12
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "MapeoVariableFuente",
+      "fqcn": "App\\Models\\MapeoVariableFuente",
+      "current_path": "app/Models/MapeoVariableFuente.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/MapeoVariableFuente.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "mapeos_variables_fuente",
+      "primary_key": "cod_mapeo_variable_fuente",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/MapeoVariableFuente.php",
+          "class_line": 9,
+          "table_line": 11,
+          "primary_key_line": 13
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Medicamento",
+      "fqcn": "App\\Models\\Medicamento",
+      "current_path": "app/Models/Medicamento.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Medicamento.php",
+      "logical_owner": "Medicacion",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "medicamentos",
+      "primary_key": "cod_medicamento",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Medicamento.php",
+          "class_line": 4,
+          "table_line": 5,
+          "primary_key_line": 5
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "MedicionAntropometrica",
+      "fqcn": "App\\Models\\MedicionAntropometrica",
+      "current_path": "app/Models/MedicionAntropometrica.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/MedicionAntropometrica.php",
+      "logical_owner": "Clinica",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "mediciones_antropometricas",
+      "primary_key": "cod_medicion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/MedicionAntropometrica.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "ModeloExperto",
+      "fqcn": "App\\Models\\ModeloExperto",
+      "current_path": "app/Models/ModeloExperto.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/ModeloExperto.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "abstract_base",
+      "abstract": true,
+      "base_class": "Illuminate\\Database\\Eloquent\\Model",
+      "table": null,
+      "primary_key": "id",
+      "primary_key_explicit": false,
+      "primary_key_note": "Default id heredado de Eloquent Model; base abstracta sin tabla propia. Todos los modelos concretos declaran su propia clave.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M03",
+        "M04"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/ModeloExperto.php",
+          "class_line": 10,
+          "table_line": null,
+          "primary_key_line": null
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "ModeloOperativo",
+      "fqcn": "App\\Models\\ModeloOperativo",
+      "current_path": "app/Models/ModeloOperativo.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/ModeloOperativo.php",
+      "logical_owner": "Compartido",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "abstract_base",
+      "abstract": true,
+      "base_class": "Illuminate\\Database\\Eloquent\\Model",
+      "table": null,
+      "primary_key": "id",
+      "primary_key_explicit": false,
+      "primary_key_note": "Default id heredado de Eloquent Model; base abstracta sin tabla propia. Todos los modelos concretos declaran su propia clave.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M04"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/ModeloOperativo.php",
+          "class_line": 8,
+          "table_line": null,
+          "primary_key_line": null
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "NodoSemantico",
+      "fqcn": "App\\Models\\NodoSemantico",
+      "current_path": "app/Models/NodoSemantico.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/NodoSemantico.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "nodos_semanticos",
+      "primary_key": "cod_nodo_semantico",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/NodoSemantico.php",
+          "class_line": 10,
+          "table_line": 12,
+          "primary_key_line": 14
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "NotaClinica",
+      "fqcn": "App\\Models\\NotaClinica",
+      "current_path": "app/Models/NotaClinica.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/NotaClinica.php",
+      "logical_owner": "Clinica",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "notas_clinicas",
+      "primary_key": "cod_nota",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/NotaClinica.php",
+          "class_line": 4,
+          "table_line": 5,
+          "primary_key_line": 5
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "ObjetivoSignoVital",
+      "fqcn": "App\\Models\\ObjetivoSignoVital",
+      "current_path": "app/Models/ObjetivoSignoVital.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/ObjetivoSignoVital.php",
+      "logical_owner": "Clinica",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "objetivos_signos_vitales",
+      "primary_key": "cod_objetivo_signo",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/ObjetivoSignoVital.php",
+          "class_line": 8,
+          "table_line": 10,
+          "primary_key_line": 11
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "OcupacionCama",
+      "fqcn": "App\\Models\\OcupacionCama",
+      "current_path": "app/Models/OcupacionCama.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/OcupacionCama.php",
+      "logical_owner": "Admisiones",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "ocupaciones_cama",
+      "primary_key": "cod_ocupacion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/OcupacionCama.php",
+          "class_line": 8,
+          "table_line": 10,
+          "primary_key_line": 11
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "OpcionPregunta",
+      "fqcn": "App\\Models\\OpcionPregunta",
+      "current_path": "app/Models/OpcionPregunta.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/OpcionPregunta.php",
+      "logical_owner": "Valoraciones",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "opciones_pregunta",
+      "primary_key": "cod_opcion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/OpcionPregunta.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "ParticipanteActividad",
+      "fqcn": "App\\Models\\ParticipanteActividad",
+      "current_path": "app/Models/ParticipanteActividad.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/ParticipanteActividad.php",
+      "logical_owner": "Social",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "participantes_actividad",
+      "primary_key": "cod_participante",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/ParticipanteActividad.php",
+          "class_line": 7,
+          "table_line": 9,
+          "primary_key_line": 10
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "PaseTurno",
+      "fqcn": "App\\Models\\PaseTurno",
+      "current_path": "app/Models/PaseTurno.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/PaseTurno.php",
+      "logical_owner": "Cuidados",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "pases_turno",
+      "primary_key": "cod_pase",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/PaseTurno.php",
+          "class_line": 8,
+          "table_line": 10,
+          "primary_key_line": 11
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Personal",
+      "fqcn": "App\\Models\\Personal",
+      "current_path": "app/Models/Personal.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Personal.php",
+      "logical_owner": "Institucion",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "personal",
+      "primary_key": "cod_personal",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Personal.php",
+          "class_line": 8,
+          "table_line": 10,
+          "primary_key_line": 12
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "PlanCuidado",
+      "fqcn": "App\\Models\\PlanCuidado",
+      "current_path": "app/Models/PlanCuidado.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/PlanCuidado.php",
+      "logical_owner": "Cuidados",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "planes_cuidado",
+      "primary_key": "cod_plan",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/PlanCuidado.php",
+          "class_line": 10,
+          "table_line": 12,
+          "primary_key_line": 14
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Preadmision",
+      "fqcn": "App\\Models\\Preadmision",
+      "current_path": "app/Models/Preadmision.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Preadmision.php",
+      "logical_owner": "Admisiones",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "preadmisiones",
+      "primary_key": "cod_preadmision",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Preadmision.php",
+          "class_line": 11,
+          "table_line": 13,
+          "primary_key_line": 15
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "PreguntaInstrumento",
+      "fqcn": "App\\Models\\PreguntaInstrumento",
+      "current_path": "app/Models/PreguntaInstrumento.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/PreguntaInstrumento.php",
+      "logical_owner": "Valoraciones",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "preguntas_instrumento",
+      "primary_key": "cod_pregunta",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/PreguntaInstrumento.php",
+          "class_line": 5,
+          "table_line": 5,
+          "primary_key_line": 5
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Prescripcion",
+      "fqcn": "App\\Models\\Prescripcion",
+      "current_path": "app/Models/Prescripcion.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Prescripcion.php",
+      "logical_owner": "Medicacion",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "prescripciones",
+      "primary_key": "cod_prescripcion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Prescripcion.php",
+          "class_line": 8,
+          "table_line": 11,
+          "primary_key_line": 12
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "ProgramacionCuidado",
+      "fqcn": "App\\Models\\ProgramacionCuidado",
+      "current_path": "app/Models/ProgramacionCuidado.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/ProgramacionCuidado.php",
+      "logical_owner": "Cuidados",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "programaciones_cuidado",
+      "primary_key": "cod_programacion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/ProgramacionCuidado.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "RegistroConductual",
+      "fqcn": "App\\Models\\RegistroConductual",
+      "current_path": "app/Models/RegistroConductual.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/RegistroConductual.php",
+      "logical_owner": "Cuidados",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "registros_conductuales",
+      "primary_key": "cod_registro_conductual",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/RegistroConductual.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "RegistroEliminacion",
+      "fqcn": "App\\Models\\RegistroEliminacion",
+      "current_path": "app/Models/RegistroEliminacion.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/RegistroEliminacion.php",
+      "logical_owner": "Cuidados",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "registros_eliminacion",
+      "primary_key": "cod_eliminacion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/RegistroEliminacion.php",
+          "class_line": 5,
+          "table_line": 7,
+          "primary_key_line": 8
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "RegistroHidratacion",
+      "fqcn": "App\\Models\\RegistroHidratacion",
+      "current_path": "app/Models/RegistroHidratacion.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/RegistroHidratacion.php",
+      "logical_owner": "Cuidados",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "registros_hidratacion",
+      "primary_key": "cod_hidratacion",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/RegistroHidratacion.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "RegistroIngesta",
+      "fqcn": "App\\Models\\RegistroIngesta",
+      "current_path": "app/Models/RegistroIngesta.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/RegistroIngesta.php",
+      "logical_owner": "Cuidados",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "registros_ingesta",
+      "primary_key": "cod_ingesta",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/RegistroIngesta.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "RegistroMovilidad",
+      "fqcn": "App\\Models\\RegistroMovilidad",
+      "current_path": "app/Models/RegistroMovilidad.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/RegistroMovilidad.php",
+      "logical_owner": "Cuidados",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "registros_movilidad",
+      "primary_key": "cod_movilidad",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/RegistroMovilidad.php",
+          "class_line": 7,
+          "table_line": 9,
+          "primary_key_line": 11
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "RegistroSueno",
+      "fqcn": "App\\Models\\RegistroSueno",
+      "current_path": "app/Models/RegistroSueno.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/RegistroSueno.php",
+      "logical_owner": "Cuidados",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "registros_sueno",
+      "primary_key": "cod_registro_sueno",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/RegistroSueno.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "ReglaExperta",
+      "fqcn": "App\\Models\\ReglaExperta",
+      "current_path": "app/Models/ReglaExperta.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/ReglaExperta.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "reglas_expertas",
+      "primary_key": "cod_regla_experta",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/ReglaExperta.php",
+          "class_line": 9,
+          "table_line": 11,
+          "primary_key_line": 13
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "RelacionEvidenciaEvaluacion",
+      "fqcn": "App\\Models\\RelacionEvidenciaEvaluacion",
+      "current_path": "app/Models/RelacionEvidenciaEvaluacion.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/RelacionEvidenciaEvaluacion.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "relaciones_evidencias_evaluacion",
+      "primary_key": "cod_relacion_evidencia",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/RelacionEvidenciaEvaluacion.php",
+          "class_line": 8,
+          "table_line": 10,
+          "primary_key_line": 12
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "RelacionSemantica",
+      "fqcn": "App\\Models\\RelacionSemantica",
+      "current_path": "app/Models/RelacionSemantica.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/RelacionSemantica.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "relaciones_semanticas",
+      "primary_key": "cod_relacion_semantica",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/RelacionSemantica.php",
+          "class_line": 8,
+          "table_line": 10,
+          "primary_key_line": 12
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Residente",
+      "fqcn": "App\\Models\\Residente",
+      "current_path": "app/Models/Residente.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Residente.php",
+      "logical_owner": "Residentes",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "residentes",
+      "primary_key": "cod_residente",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Residente.php",
+          "class_line": 8,
+          "table_line": 12,
+          "primary_key_line": 12
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "ResidenteContacto",
+      "fqcn": "App\\Models\\ResidenteContacto",
+      "current_path": "app/Models/ResidenteContacto.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/ResidenteContacto.php",
+      "logical_owner": "Residentes",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_pivot",
+      "abstract": false,
+      "base_class": "Illuminate\\Database\\Eloquent\\Relations\\Pivot",
+      "table": "residentes_contactos",
+      "primary_key": "cod_residente_contacto",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva Pivot y su validacion de vinculo activo duplicado.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M06"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/ResidenteContacto.php",
+          "class_line": 5,
+          "table_line": 6,
+          "primary_key_line": 6
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "RespuestaInstrumento",
+      "fqcn": "App\\Models\\RespuestaInstrumento",
+      "current_path": "app/Models/RespuestaInstrumento.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/RespuestaInstrumento.php",
+      "logical_owner": "Valoraciones",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "respuestas_instrumento",
+      "primary_key": "cod_respuesta",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/RespuestaInstrumento.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "ResultadoCriterio",
+      "fqcn": "App\\Models\\ResultadoCriterio",
+      "current_path": "app/Models/ResultadoCriterio.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/ResultadoCriterio.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "resultados_criterio",
+      "primary_key": "cod_resultado_criterio",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/ResultadoCriterio.php",
+          "class_line": 8,
+          "table_line": 10,
+          "primary_key_line": 12
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "ResultadoEstudio",
+      "fqcn": "App\\Models\\ResultadoEstudio",
+      "current_path": "app/Models/ResultadoEstudio.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/ResultadoEstudio.php",
+      "logical_owner": "Clinica",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "resultados_estudio",
+      "primary_key": "cod_resultado_estudio",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/ResultadoEstudio.php",
+          "class_line": 4,
+          "table_line": 4,
+          "primary_key_line": 4
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "SeguimientoPedagogico",
+      "fqcn": "App\\Models\\SeguimientoPedagogico",
+      "current_path": "app/Models/SeguimientoPedagogico.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/SeguimientoPedagogico.php",
+      "logical_owner": "Valoraciones",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "seguimientos_pedagogicos",
+      "primary_key": "cod_seguimiento_pedagogico",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/SeguimientoPedagogico.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "SeguroResidente",
+      "fqcn": "App\\Models\\SeguroResidente",
+      "current_path": "app/Models/SeguroResidente.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/SeguroResidente.php",
+      "logical_owner": "Residentes",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "seguros_residente",
+      "primary_key": "cod_seguro",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/SeguroResidente.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "SignoVital",
+      "fqcn": "App\\Models\\SignoVital",
+      "current_path": "app/Models/SignoVital.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/SignoVital.php",
+      "logical_owner": "Clinica",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "signos_vitales",
+      "primary_key": "cod_signo",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/SignoVital.php",
+          "class_line": 8,
+          "table_line": 10,
+          "primary_key_line": 11
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "TipoEstudioClinico",
+      "fqcn": "App\\Models\\TipoEstudioClinico",
+      "current_path": "app/Models/TipoEstudioClinico.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/TipoEstudioClinico.php",
+      "logical_owner": "Clinica",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "tipos_estudio_clinico",
+      "primary_key": "cod_tipo_estudio",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/TipoEstudioClinico.php",
+          "class_line": 4,
+          "table_line": 5,
+          "primary_key_line": 5
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "TrazaInferencia",
+      "fqcn": "App\\Models\\TrazaInferencia",
+      "current_path": "app/Models/TrazaInferencia.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/TrazaInferencia.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "trazas_inferencia",
+      "primary_key": "cod_traza_inferencia",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/TrazaInferencia.php",
+          "class_line": 9,
+          "table_line": 11,
+          "primary_key_line": 13
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Turno",
+      "fqcn": "App\\Models\\Turno",
+      "current_path": "app/Models/Turno.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Turno.php",
+      "logical_owner": "Institucion",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "turnos",
+      "primary_key": "cod_turno",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Turno.php",
+          "class_line": 6,
+          "table_line": 8,
+          "primary_key_line": 9
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "User",
+      "fqcn": "App\\Models\\User",
+      "current_path": "app/Models/User.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/User.php",
+      "logical_owner": "Identidad",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "authenticatable",
+      "abstract": false,
+      "base_class": "Illuminate\\Foundation\\Auth\\User",
+      "table": "usuarios",
+      "primary_key": "cod_usuario",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva Authenticatable y sus traits de autenticacion, roles, tokens y auditoria.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M05"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/User.php",
+          "class_line": 18,
+          "table_line": 63,
+          "primary_key_line": 64
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "ValoracionDolor",
+      "fqcn": "App\\Models\\ValoracionDolor",
+      "current_path": "app/Models/ValoracionDolor.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/ValoracionDolor.php",
+      "logical_owner": "Valoraciones",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "valoraciones_dolor",
+      "primary_key": "cod_valoracion_dolor",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/ValoracionDolor.php",
+          "class_line": 8,
+          "table_line": 10,
+          "primary_key_line": 12
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "ValoracionEnfermeriaPreadmision",
+      "fqcn": "App\\Models\\ValoracionEnfermeriaPreadmision",
+      "current_path": "app/Models/ValoracionEnfermeriaPreadmision.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/ValoracionEnfermeriaPreadmision.php",
+      "logical_owner": "Valoraciones",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "valoraciones_enfermeria_preadmision",
+      "primary_key": "cod_valoracion_enfermeria",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/ValoracionEnfermeriaPreadmision.php",
+          "class_line": 7,
+          "table_line": 9,
+          "primary_key_line": 11
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "ValoracionFuncional",
+      "fqcn": "App\\Models\\ValoracionFuncional",
+      "current_path": "app/Models/ValoracionFuncional.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/ValoracionFuncional.php",
+      "logical_owner": "Valoraciones",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "valoraciones_funcionales",
+      "primary_key": "cod_valoracion_funcional",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/ValoracionFuncional.php",
+          "class_line": 8,
+          "table_line": 10,
+          "primary_key_line": 11
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "ValoracionNutricional",
+      "fqcn": "App\\Models\\ValoracionNutricional",
+      "current_path": "app/Models/ValoracionNutricional.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/ValoracionNutricional.php",
+      "logical_owner": "Valoraciones",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "valoraciones_nutricionales",
+      "primary_key": "cod_valoracion_nutricional",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/ValoracionNutricional.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "ValoracionPsicologica",
+      "fqcn": "App\\Models\\ValoracionPsicologica",
+      "current_path": "app/Models/ValoracionPsicologica.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/ValoracionPsicologica.php",
+      "logical_owner": "Valoraciones",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "valoraciones_psicologicas",
+      "primary_key": "cod_valoracion_psicologica",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/ValoracionPsicologica.php",
+          "class_line": 3,
+          "table_line": 3,
+          "primary_key_line": 3
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "ValorSemantico",
+      "fqcn": "App\\Models\\ValorSemantico",
+      "current_path": "app/Models/ValorSemantico.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/ValorSemantico.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "valores_semanticos",
+      "primary_key": "cod_valor_semantico",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/ValorSemantico.php",
+          "class_line": 9,
+          "table_line": 11,
+          "primary_key_line": 13
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "VariableExperta",
+      "fqcn": "App\\Models\\VariableExperta",
+      "current_path": "app/Models/VariableExperta.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/VariableExperta.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "variables_expertas",
+      "primary_key": "cod_variable_experta",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/VariableExperta.php",
+          "class_line": 9,
+          "table_line": 11,
+          "primary_key_line": 13
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "VersionModeloExperto",
+      "fqcn": "App\\Models\\VersionModeloExperto",
+      "current_path": "app/Models/VersionModeloExperto.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/VersionModeloExperto.php",
+      "logical_owner": "ApoyoDecision",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloExperto",
+      "table": "versiones_modelo_experto",
+      "primary_key": "cod_version_modelo",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": true,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloExperto: rechaza actualizacion/borrado de instancia y mutacion masiva mediante BuilderExperto.",
+      "exception_reason_ids": [
+        "M01",
+        "M02",
+        "M03"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/VersionModeloExperto.php",
+          "class_line": 9,
+          "table_line": 11,
+          "primary_key_line": 13
+        }
+      ],
+      "baseline_identity_preserved": true
+    },
+    {
+      "name": "Visita",
+      "fqcn": "App\\Models\\Visita",
+      "current_path": "app/Models/Visita.php",
+      "absolute_path": "C:/Users/CARLAENCINAS/Documents/Codex/2026-10-10/files-pasted-by-the-user-prompt/work/RememberMind/app/Models/Visita.php",
+      "logical_owner": "Social",
+      "owner_layer": "Infraestructura/Persistencia/Eloquent",
+      "physical_location_status": "excepcion_documentada_conservar_app_models",
+      "migration_disposition": "mantener_archivo_fqcn_tabla_clave_y_herencia_actuales",
+      "model_type": "eloquent_model",
+      "abstract": false,
+      "base_class": "App\\Models\\ModeloOperativo",
+      "table": "visitas",
+      "primary_key": "cod_visita",
+      "primary_key_explicit": true,
+      "primary_key_note": "Clave explicita verificada contra baseline.",
+      "key_type": "string",
+      "incrementing": false,
+      "timestamps": false,
+      "expert_model": false,
+      "motor_experto_membership": false,
+      "history_policy": "Conserva ModeloOperativo: rechaza borrado fisico ordinario de instancia; las actualizaciones y transiciones existentes siguen permitidas.",
+      "exception_reason_ids": [
+        "M01",
+        "M02"
+      ],
+      "evidence": [
+        {
+          "path": "app/Models/Visita.php",
+          "class_line": 7,
+          "table_line": 9,
+          "primary_key_line": 10
+        }
+      ],
+      "baseline_identity_preserved": true
+    }
+  ]
+}

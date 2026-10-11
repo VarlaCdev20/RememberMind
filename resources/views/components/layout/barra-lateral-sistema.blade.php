@@ -1,305 +1,268 @@
-<aside
+@inject('sidebarService', 'App\Modulos\Identidad\Presentacion\Navegacion\SidebarService')
+@php
+    $sections = $sidebarService->getSidebar();
+    $sidebarUser = auth()->user();
+    $sidebarName = trim((string) ($sidebarUser?->nombres ?: $sidebarUser?->name ?: 'Usuario'));
+    $sidebarNameParts = preg_split('/\s+/u', $sidebarName, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+    $sidebarInitials = mb_strtoupper(mb_substr($sidebarNameParts[0] ?? 'U', 0, 1).mb_substr($sidebarNameParts[1] ?? '', 0, 1));
+    $previewRole = app(\App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService::class)->activeRole(auth()->user());
+    $sidebarRole = $previewRole
+        ?? (request()->routeIs('admin.enfermeria.*') && $sidebarUser?->hasRole('ENFERMEROS')
+            ? 'ENFERMEROS'
+            : ($sidebarUser?->getRoleNames()->first() ?? 'Usuario'));
+    $sidebarRoleLabel = mb_convert_case(str_replace('_', ' ', $sidebarRole), MB_CASE_TITLE, 'UTF-8');
+    $isAdministracion = $previewRole === 'ADMINISTRADOR' || ($previewRole === null && auth()->user()?->hasRole('ADMINISTRADOR') && ! auth()->user()?->hasRole('SUPERADMINISTRADOR'));
+    $sidebarStorageKey = 'remembermind-sidebar-view-'.hash('sha256', (string) $sidebarUser?->getAuthIdentifier().'|'.$sidebarRole);
+    $currentRoute = request()->route()?->getName() ?? '';
+    $routeActive = static function (?string $name) use ($currentRoute): bool {
+        if (!$name) return false;
+        if ($currentRoute === $name || str_starts_with($currentRoute, $name . '.')) return true;
+        return str_ends_with($name, '.index') && str_starts_with($currentRoute, substr($name, 0, -6) . '.');
+    };
+    $activeLocation = null;
+    $bestMatch = -1;
+    foreach ($sections as $sectionIndex => $section) {
+        $candidates = [[null, $section['route'] ?? null, [], []]];
+        foreach ($section['items'] ?? [] as $itemIndex => $item) {
+            $candidates[] = [$itemIndex, $item['route'] ?? null, $item['parameters'] ?? [], $item['active_routes'] ?? []];
+        }
+        foreach ($candidates as [$itemIndex, $routeName, $parameters, $activeRoutes]) {
+            $matchesRoute = $routeActive($routeName);
+            foreach ($activeRoutes as $activeRoute) {
+                $matchesRoute = $matchesRoute || $routeActive($activeRoute);
+            }
+            if (! $matchesRoute) continue;
+            foreach ($parameters as $key => $value) {
+                if ((string) request()->query($key) !== (string) $value) continue 2;
+            }
+            $score = ($currentRoute === $routeName ? 10000 : 0) + strlen($routeName) + count($parameters) * 100;
+            if ($score > $bestMatch) {
+                $bestMatch = $score;
+                $activeLocation = ['section' => $sectionIndex, 'item' => $itemIndex];
+            }
+        }
+    }
+    $initialOpen = $activeLocation !== null && $activeLocation['item'] !== null ? $activeLocation['section'] : null;
+    $activeNursingSection = $sidebarRole === 'ENFERMEROS' && $initialOpen !== null ? $sections[$initialOpen]['title'] : null;
+    $inicioAdministracion = $isAdministracion && app(\App\Modulos\Identidad\Presentacion\Navegacion\VisibilidadNavegacion::class)->puedeVerRuta('admin.administracion.dashboard');
+    $brandRoute = request()->routeIs('admin.enfermeria.*') ? 'admin.enfermeria.dashboard' : ($inicioAdministracion ? 'admin.administracion.dashboard' : 'dashboard');
+@endphp
+
+<aside id="{{ request()->routeIs('admin.enfermeria.*') ? 'sidebar-enfermeria' : 'sidebar' }}" class="rm-sidebar" wire:transition="rm-sidebar" aria-label="Navegación principal"
+    :class="{ 'is-mobile-open': sidebarOpen }"
+    :inert="sidebarRange === 'drawer' && !sidebarOpen"
     @toggle-sidebar.window="sidebarOpen = !sidebarOpen"
-    :class="[
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
-        sidebarCollapsed ? 'lg:w-[82px]' : 'lg:w-[240px]'
-    ]"
-    class="fixed left-0 top-0 z-50 flex h-screen w-[240px] flex-col border-r border-[#C7B5A3]/70 bg-[#E6DDD3]/95 shadow-[18px_0_55px_rgba(47,62,92,0.12)] backdrop-blur-xl transition-all duration-300 ease-in-out"
->
-    {{-- BOTÓN COLAPSAR --}}
-    <button
-        type="button"
-        @click="sidebarCollapsed = !sidebarCollapsed"
-        class="absolute -right-4 top-8 hidden h-8 w-8 items-center justify-center rounded-full border border-[#C7B5A3] bg-[#E6DDD3] text-azul-profundo shadow-md transition-all duration-300 hover:bg-terracota hover:text-white active:scale-90 lg:flex"
-        aria-label="Contraer o expandir menú lateral"
-    >
-        <i
-            class="ph-bold ph-caret-left text-sm transition-transform duration-300"
-            :class="sidebarCollapsed ? 'rotate-180' : ''"
-        ></i>
-    </button>
-
-    {{-- HEADER --}}
-    <div class="shrink-0 px-3 pt-4">
-        <div
-            class="flex items-center rounded-[1.35rem] bg-[#D5C7B9]/40 px-3 py-3 shadow-inner transition-all duration-300"
-            :class="sidebarCollapsed ? 'justify-center' : 'justify-between'"
-        >
-            <div class="flex min-w-0 items-center gap-3">
-                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-terracota text-white font-black shadow-md transition-all duration-500 hover:rotate-6">
-                    <span class="text-xl">C</span>
-                </div>
-
-                <div
-                    x-show="!sidebarCollapsed"
-                    x-transition.opacity.duration.300ms
-                    class="min-w-0"
-                >
-                    <h2 class="truncate text-lg font-black text-azul-profundo leading-tight">
-                        Casa Amandita
-                    </h2>
-                    <p class="truncate text-[11px] font-black uppercase tracking-widest text-terracota">
-                        RememberMind
-                    </p>
-                </div>
-            </div>
-
-            <button
-                @click="sidebarOpen = false"
-                class="flex h-8 w-8 items-center justify-center rounded-full bg-[#E6DDD3] text-azul-profundo transition hover:bg-terracota hover:text-white lg:hidden"
-                aria-label="Cerrar menú lateral"
-            >
-                <i class="ph-bold ph-x"></i>
-            </button>
-        </div>
+    x-data="{
+        storageKey: @js($sidebarStorageKey),
+        sectionKeys: @js(array_map(static fn ($section) => $section['title'], $sections)),
+        activeSectionKey: @js($activeNursingSection),
+        saveSidebarView() {
+            const view = { path: window.location.pathname, open: this.openSection === null ? null : this.sectionKeys[this.openSection], scroll: this.$refs.navigation.scrollTop };
+            try { sessionStorage.setItem(this.storageKey, JSON.stringify(view)); }
+            catch (error) { this.savedView = view; }
+        },
+        restoreSidebarView() {
+            let view = null;
+            try { view = JSON.parse(sessionStorage.getItem(this.storageKey) || 'null'); }
+            catch (error) { view = null; }
+            if (view) {
+                if (this.activeSectionKey) {
+                    this.openSection = this.sectionKeys.indexOf(this.activeSectionKey);
+                } else if (view.path === window.location.pathname || this.openSection === null) {
+                    const index = this.sectionKeys.indexOf(view.open);
+                    this.openSection = index >= 0 ? index : null;
+                }
+                this.$nextTick(() => { this.$refs.navigation.scrollTop = Number(view.scroll) || 0; });
+            }
+        },
+        openSection: {{ $initialOpen !== null ? $initialOpen : 'null' }},
+        flyoutIndex: null,
+        flyoutTop: 0,
+        tooltipLabel: null,
+        tooltipTop: 0,
+        showTooltip(label, element) {
+            if (!sidebarCollapsed || window.innerWidth < 1024) return;
+            this.tooltipLabel = label;
+            this.tooltipTop = element.getBoundingClientRect().top + 10;
+        },
+        hoverFlyout(index, element) {
+            if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+            this.showFlyout(index, element);
+        },
+        showFlyout(index, element) {
+            if (!sidebarCollapsed || window.innerWidth < 1024) return;
+            this.flyoutIndex = index;
+            this.$nextTick(() => {
+                const flyout = document.getElementById('rm-sidebar-flyout-' + index);
+                const height = flyout?.getBoundingClientRect().height ?? 280;
+                this.flyoutTop = Math.max(12, Math.min(element.getBoundingClientRect().top, window.innerHeight - height - 12));
+            });
+        }
+    }"
+    x-on:livewire:navigating.window="saveSidebarView(); closeSidebarForNavigation()"
+    x-init="restoreSidebarView(); $watch('openSection', () => saveSidebarView()); $watch('sidebarOpen', open => { if (window.innerWidth >= 1024) return; if (open) $nextTick(() => $refs.mobileClose.focus()); else if ($el.contains(document.activeElement)) document.getElementById('sidebar-mobile-trigger')?.focus(); })"
+    @keydown.tab="if (sidebarOpen && window.innerWidth < 1024) { const controls = [...$el.querySelectorAll('a[href], button:not([disabled]), summary')].filter(control => control.getClientRects().length); const first = controls[0], last = controls[controls.length - 1]; if ($event.shiftKey && document.activeElement === first) { $event.preventDefault(); last.focus(); } else if (!$event.shiftKey && document.activeElement === last) { $event.preventDefault(); first.focus(); } }"
+    @keydown.escape.window="if (flyoutIndex !== null && document.activeElement?.closest('.rm-sidebar__flyout')) document.getElementById('rm-sidebar-trigger-' + flyoutIndex)?.focus(); flyoutIndex = null; tooltipLabel = null; if (sidebarOpen) sidebarOpen = false">
+    <div class="rm-sidebar__header">
+        <a href="{{ route($brandRoute) }}" class="rm-sidebar__brand" wire:navigate @click="sidebarOpen = false" aria-label="RememberMind, inicio">
+            <img src="{{ asset('storage/imagenes/LOGO.png') }}" alt="" class="rm-sidebar__logo">
+            <span class="rm-sidebar__brand-copy">
+                <strong class="rm-brand">RememberMind</strong>
+                <small>Cuidado geriátrico</small>
+            </span>
+        </a>
+        <button type="button" class="rm-sidebar__header-toggle" @click="toggleSidebarCollapse(); flyoutIndex = null; tooltipLabel = null"
+            :aria-label="sidebarCollapsed ? 'Expandir menú lateral' : 'Contraer menú lateral'"
+            :title="sidebarCollapsed ? 'Expandir menú lateral' : 'Contraer menú lateral'"
+            :aria-expanded="sidebarCollapsed ? 'false' : 'true'"
+            aria-controls="{{ request()->routeIs('admin.enfermeria.*') ? 'sidebar-enfermeria-nav' : 'sidebar-nav' }}">
+            <i class="ph-bold ph-caret-double-left" aria-hidden="true" :class="{ 'is-collapsed': sidebarCollapsed }"></i>
+        </button>
+        <button type="button" class="rm-sidebar__mobile-close" x-ref="mobileClose" @click="sidebarOpen = false" aria-label="Cerrar menú lateral">
+            <i class="ph-bold ph-x" aria-hidden="true"></i>
+        </button>
     </div>
 
-    {{-- MENÚ --}}
-    <div class="mt-5 flex-1 overflow-y-auto px-3 pb-6 [scrollbar-width:thin] [scrollbar-color:#C7B5A3_transparent]">
-        @php
-            $safeUrl = function (?string $route, string $fallback = '#') {
-                return $route && Route::has($route) ? route($route) : $fallback;
-            };
-
-            $isDisabled = function (?string $route) {
-                return ! $route || ! Route::has($route);
-            };
-
-            $isActiveItem = function (array $item) {
-                if (isset($item['route']) && $item['route'] && request()->routeIs($item['route'] . '*')) {
-                    return true;
-                }
-                return false;
-            };
-
-            $isActiveSection = function (array $section) use ($isActiveItem) {
-                if (isset($section['items'])) {
-                    foreach ($section['items'] as $item) {
-                        if ($isActiveItem($item)) return true;
-                    }
-                }
-                return false;
-            };
-
-            $sections = [
-                [
-                    'title' => 'Inicio',
-                    'icon' => 'ph-house',
-                    'route' => 'dashboard',
-                ],
-                [
-                    'title' => 'Administración',
-                    'icon' => 'ph-gear-six',
-                    'items' => [
-                        ['label' => 'Usuarios', 'route' => 'admin.usuarios.index'],
-                        ['label' => 'Roles y permisos', 'route' => null],
-                        ['label' => 'Personal institucional', 'route' => null],
-                        ['label' => 'Áreas institucionales', 'route' => null],
-                        ['label' => 'Turnos y asignaciones', 'route' => null],
-                        ['label' => 'Bitácora y auditoría', 'route' => 'admin.bitacora.index'],
-                    ],
-                ],
-                [
-                    'title' => 'Adultos Mayores',
-                    'icon' => 'ph-users-four',
-                    'items' => [
-                        ['label' => 'Lista general', 'route' => 'admin.adultos-mayores.index'],
-                        ['label' => 'Registro', 'route' => null],
-                        ['label' => 'Expedientes', 'route' => null],
-                        ['label' => 'Estados institucionales', 'route' => null],
-                        ['label' => 'Documentación', 'route' => null],
-                        ['label' => 'Reportes', 'route' => null],
-                    ],
-                ],
-                [
-                    'title' => 'Salud y Seguimiento',
-                    'icon' => 'ph-heartbeat',
-                    'items' => [
-                        ['label' => 'Ficha médica', 'route' => null],
-                        ['label' => 'Medicación', 'route' => null],
-                        ['label' => 'Adm. de Medicación', 'route' => null],
-                        ['label' => 'Signos vitales', 'route' => null],
-                        ['label' => 'Valoración funcional', 'route' => null],
-                        ['label' => 'Observación diaria', 'route' => null],
-                        ['label' => 'Atenciones e incidentes', 'route' => null],
-                        ['label' => 'Evaluación cognitiva', 'route' => null],
-                    ],
-                ],
-                [
-                    'title' => 'Familia y Social',
-                    'icon' => 'ph-house-line',
-                    'items' => [
-                        ['label' => 'Familiares', 'route' => null],
-                        ['label' => 'Responsables', 'route' => null],
-                        ['label' => 'Contactos de emergencia', 'route' => null],
-                        ['label' => 'Autorizaciones', 'route' => null],
-                        ['label' => 'Visitas', 'route' => null],
-                        ['label' => 'Comunicaciones', 'route' => null],
-                        ['label' => 'Ficha social', 'route' => null],
-                    ],
-                ],
-                [
-                    'title' => 'Actividades',
-                    'icon' => 'ph-calendar-check',
-                    'items' => [
-                        ['label' => 'Actividades', 'route' => null],
-                        ['label' => 'Tipos de actividades', 'route' => null],
-                        ['label' => 'Participación', 'route' => null],
-                        ['label' => 'Asistencia', 'route' => null],
-                        ['label' => 'Reportes', 'route' => null],
-                    ],
-                ],
-                [
-                    'title' => 'Voluntariado',
-                    'icon' => 'ph-hand-heart',
-                    'items' => [
-                        ['label' => 'Voluntarios', 'route' => null],
-                        ['label' => 'Disponibilidad', 'route' => null],
-                        ['label' => 'Asignaciones', 'route' => null],
-                        ['label' => 'Asistencia', 'route' => null],
-                        ['label' => 'Reportes', 'route' => null],
-                    ],
-                ],
-            ];
-        @endphp
-
-        <nav class="space-y-2">
-            @foreach($sections as $section)
-                @php
-                    $isDirect = isset($section['route']);
-                    $isSectionActive = $isDirect 
-                        ? (request()->routeIs($section['route'] . '*'))
-                        : $isActiveSection($section);
-                @endphp
-
-                @if($isDirect)
-                    <div class="group/section relative">
-                        @php
-                            $disabled = $isDisabled($section['route']);
-                            $url = $safeUrl($section['route']);
-                        @endphp
-                        <a
-                            href="{{ $url }}"
-                            @if($disabled) title="Próximamente" @else title="{{ $section['title'] }}" @endif
-                            class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-black transition-all duration-300
-                            {{ $isSectionActive ? 'bg-[#D5C7B9] text-terracota shadow-sm' : 'text-azul-profundo/80 hover:bg-[#D5C7B9]/50 hover:text-terracota' }}"
-                            :class="sidebarCollapsed ? 'justify-center px-0' : ''"
-                        >
-                            <div class="flex items-center gap-3">
-                                <i class="ph-bold {{ $section['icon'] }} text-xl shrink-0 transition-all duration-300
-                                    {{ $isSectionActive ? 'text-terracota' : 'text-azul-profundo/60 group-hover/section:text-terracota group-hover/section:rotate-3' }}"></i>
-                                <span
-                                    x-show="!sidebarCollapsed"
-                                    x-transition.opacity.duration.300ms
-                                    class="text-xs uppercase tracking-[0.15em] font-black"
-                                >
-                                    {{ $section['title'] }}
+    <nav id="{{ request()->routeIs('admin.enfermeria.*') ? 'sidebar-enfermeria-nav' : 'sidebar-nav' }}" class="rm-sidebar__nav" x-ref="navigation" @scroll.debounce.100ms="saveSidebarView()" aria-label="Secciones del sistema" @mouseleave="if (!$event.relatedTarget?.closest('.rm-sidebar__flyout')) flyoutIndex = null; tooltipLabel = null">
+        @foreach ($sections as $index => $section)
+            @php
+                $items = $section['items'] ?? [];
+                $hasChildren = count($items) > 0;
+                $currentSection = $activeLocation !== null && $activeLocation['section'] === $index;
+                $active = $currentSection && $activeLocation['item'] === null;
+                $group = $section['group'] ?? null;
+                $previousGroup = $index > 0 ? ($sections[$index - 1]['group'] ?? null) : null;
+            @endphp
+            @if($group && $group !== $previousGroup)
+                <p class="rm-sidebar__group rm-nav-section">{{ $group }}</p>
+            @endif
+            <div class="rm-sidebar__entry">
+                @if($hasChildren)
+                    <button type="button" id="rm-sidebar-trigger-{{ $index }}" class="rm-sidebar__item {{ $currentSection ? 'is-current-section' : '' }}"
+                        title="{{ $section['title'] }}" aria-label="{{ $section['title'] }}{{ !empty($section['badge']) ? ', '.$section['badge'] : '' }}" data-label="{{ mb_strtoupper($section['title']) }}"
+                        :aria-expanded="((!sidebarCollapsed || window.innerWidth < 1024) && openSection === {{ $index }}) || (sidebarCollapsed && flyoutIndex === {{ $index }}) ? 'true' : 'false'"
+                        :aria-controls="sidebarCollapsed && window.innerWidth >= 1024 ? 'rm-sidebar-flyout-{{ $index }}' : 'rm-sidebar-submenu-{{ $index }}'"
+                        @click="if (sidebarCollapsed && window.innerWidth >= 1024) { showFlyout({{ $index }}, $el); if ($event.detail === 0) $nextTick(() => document.querySelector('#rm-sidebar-flyout-{{ $index }} a')?.focus()); } else openSection = openSection === {{ $index }} ? null : {{ $index }}"
+                        @mouseenter="showTooltip(@js($section['title']), $el); hoverFlyout({{ $index }}, $el)" @focus="showTooltip(@js($section['title']), $el)" @blur="tooltipLabel = null"
+                        @mouseleave="if (!$event.relatedTarget?.closest('.rm-sidebar__flyout')) flyoutIndex = null">
+                        <span class="rm-sidebar__indicator" aria-hidden="true"></span>
+                        <i class="ph-bold {{ $section['icon'] }} rm-sidebar__icon" aria-hidden="true"></i>
+                        <span class="rm-sidebar__label rm-nav-group">{{ $section['title'] }}</span>
+                        @if(!empty($section['badge']))
+                            <span class="rm-sidebar__badge" aria-hidden="true">
+                                <span class="rm-sidebar__badge-value">{{ $section['badge'] }}</span>
+                                <span class="rm-sidebar__badge-compact">{{ is_numeric($section['badge']) && (int) $section['badge'] > 99 ? '99+' : $section['badge'] }}</span>
+                            </span>
+                        @endif
+                        <i class="ph-bold ph-caret-down rm-sidebar__chevron" aria-hidden="true" :class="{ 'is-open': openSection === {{ $index }} }"></i>
+                    </button>
+                    <div id="rm-sidebar-submenu-{{ $index }}" class="rm-sidebar__submenu"
+                        x-show="openSection === {{ $index }} && (!sidebarCollapsed || window.innerWidth < 1024)"
+                        x-collapse.duration.200ms
+                        style="display: none;">
+                        <div class="rm-sidebar__submenu-content" :class="{ 'is-visible': openSection === {{ $index }} }">
+                        @foreach($items as $itemIndex => $item)
+                            @php $childActive = $currentSection && $activeLocation['item'] === $itemIndex; @endphp
+                            @if($item['disabled'] ?? false)
+                                <span class="rm-sidebar__subitem rm-sidebar__subitem--pending rm-nav-item" aria-disabled="true" title="Vista todavía no disponible">
+                                    <span class="rm-sidebar__subindicator" aria-hidden="true"></span>
+                                    <span>{{ $item['label'] }}</span>
                                 </span>
-                            </div>
-                        </a>
-                        
-                        {{-- DIVISOR EN MODO COLAPSADO --}}
-                        <div class="mx-auto h-px w-8 bg-[#C7B5A3]/40 my-2" x-show="sidebarCollapsed"></div>
-
-                        {{-- TOOLTIP CUANDO ESTÁ COLAPSADO --}}
-                        <div
-                            x-show="sidebarCollapsed"
-                            class="pointer-events-none absolute left-full z-50 ml-4 hidden whitespace-nowrap rounded-lg bg-azul-profundo px-3 py-2 text-[11px] font-black text-white shadow-2xl transition-all group-hover/section:block"
-                        >
-                            {{ $section['title'] }}
+                            @else
+                                <a href="{{ route($item['route'], $item['parameters'] ?? []) }}" wire:navigate @click="sidebarOpen = false"
+                                    class="rm-sidebar__subitem rm-nav-item {{ $childActive ? 'is-active' : '' }}" data-label="{{ mb_strtoupper($item['label']) }}"
+                                    @if($childActive) aria-current="page" @endif>
+                                    <span class="rm-sidebar__subindicator" aria-hidden="true"></span>
+                                    <span>{{ $item['label'] }}</span>
+                                    @if(!empty($item['badge']))<span @class(['rm-sidebar__badge', 'rm-sidebar__badge--alert' => str_contains($item['route'], '.alertas')])>{{ $item['badge'] }}</span>@endif
+                                </a>
+                            @endif
+                        @endforeach
                         </div>
                     </div>
                 @else
-                    <div x-data="{ expanded: {{ $isSectionActive ? 'true' : 'false' }} }" class="group/section relative">
-                        {{-- HEADER DE SECCIÓN --}}
-                        <button
-                            @click="expanded = !expanded"
-                            class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-black transition-all duration-300
-                            {{ $isSectionActive ? 'bg-[#D5C7B9] text-terracota shadow-sm' : 'text-azul-profundo/80 hover:bg-[#D5C7B9]/50 hover:text-terracota' }}"
-                            :class="sidebarCollapsed ? 'justify-center px-0' : ''"
-                        >
-                            <div class="flex items-center gap-3">
-                                <i class="ph-bold {{ $section['icon'] }} text-xl shrink-0 transition-all duration-300
-                                    {{ $isSectionActive ? 'text-terracota' : 'text-azul-profundo/60 group-hover/section:text-terracota group-hover/section:rotate-3' }}"></i>
-                                <span
-                                    x-show="!sidebarCollapsed"
-                                    x-transition.opacity.duration.300ms
-                                    class="text-xs uppercase tracking-[0.15em] font-black"
-                                >
-                                    {{ $section['title'] }}
-                                </span>
-                            </div>
-
-                            <i
-                                x-show="!sidebarCollapsed"
-                                class="ph-bold ph-caret-down text-[10px] transition-transform duration-500"
-                                :class="expanded ? 'rotate-180 text-terracota' : 'text-azul-profundo/40'"
-                            ></i>
-                        </button>
-
-                        {{-- ITEMS DE SECCIÓN --}}
-                        <div
-                            x-show="expanded && !sidebarCollapsed"
-                            x-transition:enter="transition ease-out duration-300"
-                            x-transition:enter-start="opacity-0 -translate-y-2"
-                            x-transition:enter-end="opacity-100 translate-y-0"
-                            class="mt-1 space-y-0.5 pl-10"
-                        >
-                            @foreach($section['items'] as $item)
-                                @php
-                                    $active = $isActiveItem($item);
-                                    $disabled = $isDisabled($item['route']);
-                                    $url = $safeUrl($item['route']);
-                                @endphp
-
-                                <a
-                                    href="{{ $url }}"
-                                    @if($disabled) title="Próximamente" @else title="{{ $item['label'] }}" @endif
-                                    class="group/item relative flex items-center gap-2.5 rounded-lg py-2 text-sm font-black transition-all duration-300
-                                    {{ $active
-                                        ? 'text-terracota'
-                                        : 'text-azul-profundo/60 hover:text-terracota hover:translate-x-1'
-                                    }}
-                                    {{ $disabled ? 'opacity-40 cursor-not-allowed grayscale' : '' }}
-                                    "
-                                >
-                                    @if($active)
-                                        <span class="absolute -left-4 top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-terracota shadow-[0_0_8px_rgba(233,122,95,0.6)]"></span>
-                                    @endif
-
-                                    <span class="truncate">{{ $item['label'] }}</span>
-                                </a>
-                            @endforeach
-                        </div>
-                        
-                        {{-- DIVISOR EN MODO COLAPSADO --}}
-                        <div class="mx-auto h-px w-8 bg-[#C7B5A3]/40 my-2" x-show="sidebarCollapsed"></div>
-
-                        {{-- TOOLTIP CUANDO ESTÁ COLAPSADO --}}
-                        <div
-                            x-show="sidebarCollapsed"
-                            class="pointer-events-none absolute left-full z-50 ml-4 hidden whitespace-nowrap rounded-lg bg-azul-profundo px-3 py-2 text-[11px] font-black text-white shadow-2xl transition-all group-hover/section:block"
-                        >
-                            {{ $section['title'] }}
-                        </div>
-                    </div>
+                    <a href="{{ route($section['route']) }}" wire:navigate @click="sidebarOpen = false; flyoutIndex = null; tooltipLabel = null"
+                        class="rm-sidebar__item {{ $active ? 'is-active' : '' }}" title="{{ $section['title'] }}" aria-label="{{ $section['title'] }}{{ !empty($section['badge']) ? ', '.$section['badge'] : '' }}" data-label="{{ mb_strtoupper($section['title']) }}"
+                        @mouseenter="showTooltip(@js($section['title']), $el)" @focus="showTooltip(@js($section['title']), $el)" @mouseleave="tooltipLabel = null" @blur="tooltipLabel = null"
+                        @if($active) aria-current="page" @endif>
+                        <span class="rm-sidebar__indicator" aria-hidden="true"></span>
+                        <i class="ph-bold {{ $section['icon'] }} rm-sidebar__icon" aria-hidden="true"></i>
+                        <span class="rm-sidebar__label rm-nav-group">{{ $section['title'] }}</span>
+                        @if(!empty($section['badge']))
+                            <span @class(['rm-sidebar__badge', 'rm-sidebar__badge--alert' => str_contains($section['route'] ?? '', '.alertas')]) aria-hidden="true">
+                                <span class="rm-sidebar__badge-value">{{ $section['badge'] }}</span>
+                                <span class="rm-sidebar__badge-compact">{{ is_numeric($section['badge']) && (int) $section['badge'] > 99 ? '99+' : $section['badge'] }}</span>
+                            </span>
+                        @endif
+                    </a>
                 @endif
-            @endforeach
-        </nav>
-    </div>
+            </div>
+        @endforeach
+    </nav>
 
-    {{-- FOOTER --}}
-    <div class="shrink-0 border-t border-[#C7B5A3]/40 p-3">
-        <a
-            href="#"
-            class="group flex items-center gap-3 rounded-xl px-3 py-3 text-[15px] font-black text-azul-profundo/70 transition-all duration-300 hover:bg-terracota hover:text-white active:scale-95"
-            :class="sidebarCollapsed ? 'justify-center px-0' : ''"
-        >
-            <i class="ph-bold ph-question text-xl shrink-0 group-hover:rotate-12 transition-transform"></i>
+    <div class="rm-sidebar__tooltip" x-show="sidebarCollapsed && tooltipLabel && window.innerWidth >= 1024"
+        x-transition:enter="rm-sidebar__tooltip-enter" x-transition:enter-start="rm-sidebar__tooltip-start" x-transition:enter-end="rm-sidebar__tooltip-end"
+        :style="{ top: tooltipTop + 'px' }" x-text="tooltipLabel" role="tooltip" x-cloak></div>
 
-            <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms>
-                Centro de Ayuda
-            </span>
-        </a>
+    @foreach ($sections as $index => $section)
+        @if(!empty($section['items']))
+            <div id="rm-sidebar-flyout-{{ $index }}" class="rm-sidebar__flyout" x-show="sidebarCollapsed && flyoutIndex === {{ $index }} && window.innerWidth >= 1024"
+                :style="{ top: flyoutTop + 'px' }" @mouseenter="flyoutIndex = {{ $index }}" @mouseleave="flyoutIndex = null"
+                x-transition:enter="rm-sidebar__flyout-enter" x-transition:enter-start="rm-sidebar__flyout-start" x-transition:enter-end="rm-sidebar__flyout-end"
+                x-transition:leave="rm-sidebar__flyout-leave" x-transition:leave-start="rm-sidebar__flyout-end" x-transition:leave-end="rm-sidebar__flyout-start" x-cloak>
+                <strong class="rm-sidebar__flyout-title rm-nav-group">{{ $section['title'] }}</strong>
+                @foreach($section['items'] as $itemIndex => $item)
+                    @php $flyoutActive = $activeLocation !== null && $activeLocation['section'] === $index && $activeLocation['item'] === $itemIndex; @endphp
+                    @if($item['disabled'] ?? false)
+                        <span class="rm-sidebar__flyout-link rm-sidebar__flyout-link--pending rm-nav-item" aria-disabled="true" title="Vista todavía no disponible">{{ $item['label'] }}</span>
+                    @else
+                        <a href="{{ route($item['route'], $item['parameters'] ?? []) }}" wire:navigate @click="flyoutIndex = null; sidebarOpen = false"
+                            class="rm-sidebar__flyout-link rm-nav-item {{ $flyoutActive ? 'is-active' : '' }}"
+                            @if($flyoutActive) aria-current="page" @endif>{{ $item['label'] }}</a>
+                    @endif
+                @endforeach
+            </div>
+        @endif
+    @endforeach
+
+    <div class="rm-sidebar__footer">
+        <details class="rm-sidebar__account" @click.outside="$el.removeAttribute('open')"
+            @keydown.escape="if ($el.open) { $event.stopPropagation(); $el.open = false; $el.querySelector('summary').focus(); }">
+            <summary class="rm-sidebar__account-trigger" aria-label="Información de la cuenta de {{ $sidebarName }}"
+                @mouseenter="showTooltip(@js($sidebarName), $el)" @focus="showTooltip(@js($sidebarName), $el)"
+                @mouseleave="tooltipLabel = null" @blur="tooltipLabel = null">
+                <span class="rm-sidebar__avatar" aria-hidden="true">
+                    {{ $sidebarInitials }}
+                    @if($sidebarUser?->estado === 'ACTIVO')<span class="rm-sidebar__presence"></span>@endif
+                </span>
+                <span class="rm-sidebar__account-copy">
+                    <strong>{{ $sidebarName }}</strong>
+                    <small>{{ $sidebarRoleLabel }}</small>
+                </span>
+                <i class="ph-bold ph-dots-three-vertical rm-sidebar__account-more" aria-hidden="true"></i>
+            </summary>
+            <div class="rm-sidebar__account-panel">
+                <p class="rm-sidebar__account-name">{{ $sidebarName }}</p>
+                <p class="rm-sidebar__account-role">{{ $sidebarRoleLabel }}</p>
+                @if($isAdministracion)
+                    <a href="{{ route('profile.show') }}" wire:navigate @click="sidebarOpen = false; tooltipLabel = null"
+                        @mouseenter="showTooltip('Mi perfil', $el)" @focus="showTooltip('Mi perfil', $el)" @mouseleave="tooltipLabel = null" @blur="tooltipLabel = null"
+                        class="rm-sidebar__item rm-sidebar__profile {{ $routeActive('profile.show') ? 'is-active' : '' }}" title="Mi perfil" aria-label="Mi perfil" @if($routeActive('profile.show')) aria-current="page" @endif>
+                        <span class="rm-sidebar__indicator" aria-hidden="true"></span>
+                        <i class="ph-bold ph-user-circle rm-sidebar__icon" aria-hidden="true"></i>
+                        <span class="rm-sidebar__label rm-nav-group">Mi perfil</span>
+                    </a>
+                    <form method="POST" action="{{ route('logout') }}" class="rm-sidebar__logout">
+                        @csrf
+                        <button type="submit" class="rm-sidebar__item" title="Cerrar sesión" aria-label="Cerrar sesión"
+                            @mouseenter="showTooltip('Cerrar sesión', $el)" @focus="showTooltip('Cerrar sesión', $el)" @mouseleave="tooltipLabel = null" @blur="tooltipLabel = null">
+                            <span class="rm-sidebar__indicator" aria-hidden="true"></span>
+                            <i class="ph-bold ph-sign-out rm-sidebar__icon" aria-hidden="true"></i>
+                            <span class="rm-sidebar__label rm-nav-group">Cerrar sesión</span>
+                        </button>
+                    </form>
+                @endif
+            </div>
+        </details>
     </div>
 </aside>

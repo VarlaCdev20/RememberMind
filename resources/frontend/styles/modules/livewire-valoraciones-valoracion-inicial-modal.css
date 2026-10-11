@@ -1,0 +1,14 @@
+
+                        /* Validación visual automática */
+                        input:has(+ span.text-estado-peligro), 
+                        select:has(+ span.text-estado-peligro), 
+                        textarea:has(+ span.text-estado-peligro) {
+                            border-color: #ef4444 !important; 
+                            color: #ef4444 !important;
+                        }
+                        input:has(+ span.text-estado-peligro):focus, 
+                        select:has(+ span.text-estado-peligro):focus, 
+                        textarea:has(+ span.text-estado-peligro):focus {
+                            --tw-ring-color: #ef4444 !important;
+                        }
+                    

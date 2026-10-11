@@ -1,0 +1,19 @@
+
+ .salud-resumen-scope .bg-fondo-card {
+ background-color: rgba(243, 236, 228, 0.78) !important;
+ }
+ .salud-resumen-scope .shadow-sm {
+ box-shadow: 0 12px 32px rgba(47, 62, 92, 0.08) !important;
+ }
+ .salud-resumen-scope .border-\[\#C7B5A3\]\/40,
+ .salud-resumen-scope .border-\[\#C7B5A3\]\/30 {
+ border-color: rgba(199, 181, 163, 0.62) !important;
+ }
+ .salud-resumen-scope .rounded-2xl {
+ border-radius: 1.35rem !important;
+ }
+ .salud-resumen-scope a.bg-fondo-card,
+ .salud-resumen-scope .bg-\[\#F7F5F2\] {
+ background-color: rgba(230, 221, 211, 0.58) !important;
+ }
+ 

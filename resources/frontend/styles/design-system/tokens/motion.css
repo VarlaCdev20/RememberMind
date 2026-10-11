@@ -1,0 +1,80 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — TOKENS / MOTION
+   Transiciones explícitas, fluidas y respetuosas con accesibilidad.
+   ============================================================ */
+
+:root {
+    /* ------------------------------------------------------------
+       DURACIONES NORMALIZADAS V2
+       ------------------------------------------------------------ */
+    --rm-duration-fast: 120ms;
+    --rm-duration-hover: 140ms;
+    --rm-duration-normal: 180ms;
+    --rm-duration-slow: 220ms;
+    --rm-duration-enter: 240ms;
+
+    /* Movimiento discreto de gráficas y métricas. */
+    --rm-motion-instant: 100ms;
+    --rm-motion-fast: var(--rm-duration-hover);
+    --rm-motion-base: var(--rm-duration-normal);
+    --rm-motion-medium: var(--rm-duration-slow);
+    --rm-motion-slow: var(--rm-duration-enter);
+    --rm-motion-chart-enter: var(--rm-duration-enter);
+
+    /* ------------------------------------------------------------
+       TIMING FUNCTIONS NORMALIZADAS V2
+       ------------------------------------------------------------ */
+    --rm-ease-standard: cubic-bezier(.2, .8, .2, 1);
+    --rm-ease-enter: cubic-bezier(.16, 1, .3, 1);
+    --rm-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+    --rm-ease-emphasized: cubic-bezier(.22, 1, .36, 1);
+
+    --rm-motion-lift-sm: -1px;
+    --rm-motion-lift-md: -2px;
+    --rm-motion-scale-hover: 1.015;
+    --rm-motion-scale-active: .985;
+
+    --rm-chart-update-duration: var(--rm-duration-normal);
+    --rm-chart-update-easing: var(--rm-ease-standard);
+    --rm-chart-stagger-fast: 35ms;
+    --rm-chart-stagger-default: 55ms;
+
+    /* Curvas complementarias y de retrocompatibilidad */
+    --rm-ease-default: var(--rm-ease-standard);
+    --rm-ease-in: var(--rm-ease-exit);
+    --rm-ease-out: var(--rm-ease-enter);
+
+    /* Transiciones preensambladas */
+    --rm-transition-color: color var(--rm-duration-fast) var(--rm-ease-standard),
+                           background-color var(--rm-duration-fast) var(--rm-ease-standard),
+                           border-color var(--rm-duration-fast) var(--rm-ease-standard);
+
+    --rm-transition-all: color var(--rm-duration-normal) var(--rm-ease-standard),
+                         background-color var(--rm-duration-normal) var(--rm-ease-standard),
+                         border-color var(--rm-duration-normal) var(--rm-ease-standard),
+                         box-shadow var(--rm-duration-normal) var(--rm-ease-standard),
+                         transform var(--rm-duration-normal) var(--rm-ease-standard),
+                         opacity var(--rm-duration-normal) var(--rm-ease-standard);
+}
+
+/* ------------------------------------------------------------
+   ACCESIBILIDAD: PREFERS-REDUCED-MOTION
+   ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --rm-duration-fast: 0.01ms;
+        --rm-duration-hover: 0.01ms;
+        --rm-duration-normal: 0.01ms;
+        --rm-duration-slow: 0.01ms;
+        --rm-duration-enter: 0.01ms;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

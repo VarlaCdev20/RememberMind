@@ -1,0 +1,101 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — PATTERNS / RESIDENT SUMMARY
+   Cabecera 360 del residente: avatar, datos biométricos,
+   etiquetas de estado y condiciones de atención sin reglas médicas acopladas.
+   ============================================================ */
+
+.rm-resident-banner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--rm-space-4);
+    padding: var(--rm-space-5);
+    background-color: var(--rm-surface);
+    border: 1px solid var(--rm-border);
+    border-radius: var(--rm-radius-panel);
+    box-shadow: var(--rm-shadow-sm);
+}
+
+@media (min-width: 1024px) {
+    .rm-resident-banner {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.rm-resident-profile {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--rm-space-4);
+    min-width: 0;
+}
+
+.rm-resident-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--rm-radius-card);
+    border: 2px solid var(--rm-border);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.rm-resident-avatar-fallback {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--rm-radius-card);
+    background-color: var(--rm-surface-alt);
+    color: var(--rm-primary);
+    font-family: var(--rm-font-title);
+    font-size: 20px;
+    font-weight: var(--rm-font-weight-bold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--rm-border);
+    flex-shrink: 0;
+}
+
+.rm-resident-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--rm-space-1);
+    min-width: 0;
+}
+
+.rm-resident-name {
+    font-family: var(--rm-font-title);
+    font-size: var(--rm-font-section-title);
+    font-weight: var(--rm-font-weight-bold);
+    color: var(--rm-text-title);
+    margin: 0;
+}
+
+.rm-resident-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--rm-space-3);
+    font-size: var(--rm-font-label);
+    color: var(--rm-text-body);
+}
+
+.rm-resident-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--rm-space-2);
+    margin-top: var(--rm-space-2);
+}
+
+.rm-tag-notice {
+    background-color: var(--rm-state-danger-bg);
+    color: var(--rm-state-danger-text);
+    border: 1px solid var(--rm-state-danger-border);
+    border-radius: var(--rm-radius-input);
+    padding: 2px 8px;
+    font-size: var(--rm-font-badge);
+    font-weight: var(--rm-font-weight-bold);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rm-space-1);
+}

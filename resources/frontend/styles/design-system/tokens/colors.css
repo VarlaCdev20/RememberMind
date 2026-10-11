@@ -1,0 +1,556 @@
+/* RememberMind Design System: paleta oficial y contratos semánticos.
+   Las áreas funcionales usan acentos; todas las superficies siguen siendo neutras. */
+:root {
+   /* Familia petróleo histórica para el modo oscuro global. */
+   --rm-palette-petroleum-950: #07141C;
+   --rm-palette-petroleum-900: #0A1821;
+   --rm-palette-petroleum-800: #10212B;
+   --rm-palette-petroleum-700: #142832;
+   --rm-palette-petroleum-raised: #192E39;
+   --rm-palette-petroleum-border: #29424E;
+   --rm-palette-petroleum-text: #EDF5F7;
+   --rm-palette-petroleum-secondary: #A8BAC2;
+   --rm-palette-petroleum-mint: #A9C792;
+   /* Familia tierra oficial. Una única definición de cada tono. */
+   --rm-earth-900: #59524B;
+   --rm-earth-800: #665F57;
+   --rm-earth-700: #746B62;
+   --rm-earth-600: #82786E;
+   --rm-earth-500: #8F857B;
+   --rm-earth-400: #9B9288;
+   --rm-earth-300: #A69E96;
+   /* Alias conservados para componentes que ya consumen la familia café. */
+   --rm-palette-brown-900: var(--rm-earth-900);
+   --rm-palette-brown-800: var(--rm-earth-800);
+   --rm-palette-brown-700: var(--rm-earth-700);
+   --rm-palette-brown-600: var(--rm-earth-600);
+   --rm-palette-brown-500: var(--rm-earth-500);
+   --rm-palette-brown-400: var(--rm-earth-400);
+   --rm-palette-brown-300: var(--rm-earth-300);
+
+   /* Las superficies aclaran esta escala para conservar contraste. */
+   --rm-palette-page: #F3EEE8;
+   --rm-palette-capuchino: #DDD6CF;
+   --rm-palette-header: #E6E0D9;
+   --rm-palette-sidebar: var(--rm-palette-capuchino);
+   --rm-palette-surface: #F7F3EF;
+   --rm-palette-surface-soft: #EFEAE4;
+   --rm-palette-surface-muted: color-mix(in srgb, var(--rm-palette-brown-300) 50%, var(--rm-palette-page));
+   --rm-palette-ink: #4A4642;
+   --rm-palette-ink-secondary: #67615B;
+   /* Salvia complementaria: se conservan los mentas existentes. */
+   --rm-palette-sage-900: #78826E;
+   --rm-palette-sage-800: #858E7C;
+   --rm-palette-sage-700: #939B8B;
+   --rm-palette-sage-600: #A0A799;
+   --rm-palette-sage-500: #AEB4A8;
+   --rm-palette-sage-400: #BBC0B6;
+   --rm-palette-sage-300: #C9CDC5;
+   --rm-palette-sage-200: #D6D9D3;
+   --rm-palette-sage-100: #E4E6E2;
+   --rm-palette-forest-ink: #56604F;
+   --rm-contrast-ink: color-mix(in srgb, var(--rm-palette-brown-900) 85%, black);
+   --rm-sage-deep: var(--rm-palette-sage-900);
+   --rm-palette-mint: #C4C6B4;
+   --rm-palette-primary: #78826E;
+   --rm-palette-primary-ink: var(--rm-palette-forest-ink);
+   --rm-palette-primary-soft: color-mix(in srgb, var(--rm-palette-mint) 50%, var(--rm-palette-page));
+   --rm-palette-sage: #A8BAA3;
+   --rm-palette-sage-soft: #C2CEBE;
+   --rm-palette-info: #8699AC;
+   --rm-palette-info-soft: #C2CCD5;
+   --rm-palette-psychology: #CEB0B0;
+   --rm-palette-nutrition: #C4C4A0;
+   --rm-palette-warning: #C69245;
+   --rm-palette-danger: #B85C58;
+
+   /* Tokens de uso: los componentes consumen esta capa. */
+   --rm-bg-app: var(--rm-palette-page);
+   --rm-bg-sidebar: var(--rm-palette-sidebar);
+   --rm-surface: var(--rm-palette-surface);
+   --rm-surface-soft: var(--rm-palette-surface-soft);
+   --rm-surface-muted: var(--rm-palette-surface-muted);
+   --rm-text-primary: var(--rm-palette-ink);
+   --rm-text-secondary: var(--rm-palette-ink-secondary);
+   --rm-primary: var(--rm-palette-primary);
+   --rm-primary-ink: var(--rm-palette-primary-ink);
+   --rm-primary-soft: var(--rm-palette-sage-300);
+   --rm-sage: var(--rm-palette-sage);
+   --rm-sage-soft: color-mix(in srgb, var(--rm-palette-sage-soft) 65%, var(--rm-palette-page));
+   --rm-info: var(--rm-palette-info);
+   --rm-info-soft: var(--rm-palette-info-soft);
+   --rm-psychology: var(--rm-palette-psychology);
+   --rm-nutrition: var(--rm-palette-nutrition);
+   --rm-warning: var(--rm-palette-warning);
+   --rm-danger: var(--rm-palette-danger);
+   --rm-border: rgba(89, 82, 75, .14);
+   --rm-border-strong: rgba(89, 82, 75, .24);
+
+   /* Superficies y texto: una sola jerarquía compartida. */
+   --rm-bg-shell: var(--rm-bg-sidebar);
+   --rm-header-bg: var(--rm-palette-header);
+   --rm-bg-layout: var(--rm-bg-app);
+   --rm-surface-main: var(--rm-surface);
+   --rm-surface-alt: var(--rm-surface-soft);
+   --rm-surface-strong: var(--rm-surface-muted);
+   --rm-surface-beige: var(--rm-surface);
+   --rm-surface-raised: var(--rm-surface);
+   --rm-text-title: var(--rm-text-primary);
+   --rm-text-body: var(--rm-text-primary);
+   /* La tinta muted del brief (#847D76) no alcanza AA en texto pequeño. */
+   --rm-text-muted: var(--rm-earth-700);
+   --rm-icon-default: var(--rm-earth-600);
+   --rm-text-soft: var(--rm-text-secondary);
+   --rm-text-inverse: var(--rm-palette-page);
+   --rm-text-on-primary: color-mix(in srgb, var(--rm-palette-brown-900) 25%, black);
+   --rm-text-on-dark: var(--rm-text-inverse);
+   --rm-text-on-dark-soft: color-mix(in srgb, var(--rm-text-inverse) 85%, transparent);
+   --rm-border-soft: var(--rm-border);
+   --rm-border-medium: var(--rm-border-strong);
+   --rm-border-hover: color-mix(in srgb, var(--rm-text-primary) 40%, transparent);
+   --rm-divider: var(--rm-border);
+   --rm-shadow-ink: var(--rm-contrast-ink);
+
+   /* Acción institucional y selección. */
+   --rm-primary-hover: var(--rm-palette-sage-800);
+   --rm-primary-active: color-mix(in srgb, var(--rm-primary) 76%, var(--rm-shadow-ink));
+   --rm-action-primary: var(--rm-primary);
+   --rm-action-primary-hover: var(--rm-primary-hover);
+   --rm-action-primary-active: var(--rm-primary-active);
+   --rm-action-primary-ink: var(--rm-primary-ink);
+   --rm-action-primary-soft: var(--rm-selected-bg);
+   --rm-accent: var(--rm-primary);
+   --rm-accent-hover: var(--rm-primary-hover);
+   --rm-accent-soft: var(--rm-primary-soft);
+   --rm-accent-action: var(--rm-primary);
+   --rm-accent-action-hover: var(--rm-primary-hover);
+   --rm-focus: var(--rm-primary-ink);
+   --rm-focus-tint: color-mix(in srgb, var(--rm-primary) 24%, transparent);
+   --rm-focus-ring: 0 0 0 3px var(--rm-focus-tint);
+   --rm-disabled-opacity: .55;
+   --rm-selected-bg: var(--rm-palette-sage-200);
+   --rm-selected-hover: color-mix(in srgb, var(--rm-selected-bg) 85%, var(--rm-palette-page));
+   --rm-selected-text: var(--rm-primary-ink);
+   --rm-selected-text-soft: var(--rm-primary-ink);
+   --rm-selected-icon: var(--rm-primary-ink);
+   --rm-selected-border: color-mix(in srgb, var(--rm-primary) 24%, transparent);
+   --rm-selected-soft: var(--rm-selected-bg);
+
+   /* Sidebar: grupo abierto y destino seleccionado son estados distintos. */
+   --rm-sidebar-bg: var(--rm-bg-sidebar);
+   --rm-sidebar-hover: var(--rm-surface);
+   --rm-sidebar-open: var(--rm-sage-soft);
+   --rm-sidebar-active: var(--rm-selected-bg);
+   --rm-sidebar-border: var(--rm-border);
+   --rm-sidebar-text: var(--rm-text-primary);
+   --rm-sidebar-text-soft: var(--rm-text-primary);
+   --rm-sidebar-indicator: var(--rm-primary);
+   --rm-sidebar-subtext: var(--rm-text-secondary);
+   --rm-sidebar-submenu-bg: var(--rm-surface);
+   --rm-nav-bg: transparent;
+   --rm-nav-text: var(--rm-text-primary);
+   --rm-nav-hover: var(--rm-surface-soft);
+   --rm-nav-text-hover: var(--rm-text-primary);
+   --rm-nav-border: var(--rm-border);
+   --rm-nav-selected: var(--rm-selected-bg);
+   --rm-nav-selected-hover: var(--rm-selected-hover);
+   --rm-nav-selected-text: var(--rm-selected-text);
+   --rm-nav-selected-icon: var(--rm-selected-icon);
+   --rm-nav-selected-border: var(--rm-selected-border);
+
+   /* Contratos de componentes existentes. */
+   --rm-topbar-bg: var(--rm-bg-sidebar);
+   --rm-topbar-search-bg: var(--rm-surface);
+   --rm-topbar-border: var(--rm-border);
+   --rm-topbar-text: var(--rm-text-primary);
+   --rm-topbar-focus: var(--rm-focus);
+   --rm-button-primary-bg: var(--rm-primary);
+   --rm-button-primary-text: var(--rm-text-on-primary);
+   --rm-button-primary-hover: var(--rm-primary-hover);
+   --rm-button-primary-active: var(--rm-primary-active);
+   --rm-button-secondary-bg: var(--rm-surface);
+   --rm-button-secondary-text: var(--rm-text-primary);
+   --rm-button-secondary-border: var(--rm-border);
+   --rm-button-secondary-hover-bg: var(--rm-surface-soft);
+   --rm-button-ghost-text: var(--rm-text-primary);
+   --rm-input-bg: var(--rm-surface);
+   --rm-input-border: var(--rm-border-strong);
+   --rm-input-text: var(--rm-text-primary);
+   --rm-input-placeholder: var(--rm-text-secondary);
+   --rm-input-focus-border: var(--rm-primary);
+   --rm-input-focus-ring: var(--rm-focus-ring);
+   --rm-card-bg: var(--rm-surface);
+   --rm-dashboard-card-bg: #F7F3EF;
+   --rm-card-border: var(--rm-border);
+   --rm-card-selected-bg: var(--rm-selected-bg);
+   --rm-filter-bar-bg: var(--rm-surface-soft);
+   --rm-chip-active-bg: var(--rm-selected-bg);
+   --rm-chip-active-text: var(--rm-primary-ink);
+   --rm-table-container-bg: var(--rm-surface);
+   --rm-table-header-bg: var(--rm-surface-soft);
+   --rm-table-row-bg: var(--rm-surface);
+   --rm-table-row-hover: var(--rm-surface-soft);
+   --rm-table-row-selected: var(--rm-selected-bg);
+   --rm-table-border: var(--rm-border);
+   --rm-table-text: var(--rm-text-primary);
+   --rm-table-metadata: var(--rm-text-secondary);
+   --rm-modal-bg: var(--rm-surface);
+   --rm-modal-border: var(--rm-border);
+   --rm-modal-overlay: color-mix(in srgb, var(--rm-shadow-ink) 48%, transparent);
+   --rm-tab-text-default: var(--rm-text-secondary);
+   --rm-tab-text-selected: var(--rm-primary-ink);
+   --rm-tab-underline-selected: var(--rm-primary);
+   --rm-tab-soft-selected-bg: var(--rm-selected-bg);
+   --rm-botanical-1: var(--rm-sage);
+   --rm-botanical-2: var(--rm-sage-soft);
+   --rm-botanical-3: var(--rm-primary-soft);
+   --rm-leaf-decoration: var(--rm-sage);
+   --rm-leaf-decoration-soft: var(--rm-sage-soft);
+
+   /* Acentos suaves; variantes strong para texto y action para botones.
+      No se deduce ninguna severidad clínica en esta capa. */
+   --rm-success: var(--rm-sage);
+   --rm-success-strong: var(--rm-primary-ink);
+   --rm-success-soft: var(--rm-sage-soft);
+   --rm-success-hover: var(--rm-primary-hover);
+   --rm-success-action: var(--rm-primary);
+   --rm-success-action-hover: var(--rm-primary-hover);
+   --rm-info-strong: color-mix(in srgb, var(--rm-info) 15%, var(--rm-contrast-ink));
+   --rm-info-hover: color-mix(in srgb, var(--rm-info) 20%, var(--rm-text-primary));
+   --rm-info-action: var(--rm-info-strong);
+   --rm-info-action-hover: var(--rm-info-hover);
+   --rm-info-secondary: var(--rm-info-strong);
+   --rm-info-secondary-soft: var(--rm-info-soft);
+   --rm-psychology-strong: color-mix(in srgb, var(--rm-psychology) 15%, var(--rm-contrast-ink));
+   --rm-psychology-soft: color-mix(in srgb, var(--rm-psychology) 35%, var(--rm-bg-app));
+   --rm-nutrition-strong: color-mix(in srgb, var(--rm-nutrition) 15%, var(--rm-contrast-ink));
+   --rm-nutrition-soft: color-mix(in srgb, var(--rm-nutrition) 35%, var(--rm-bg-app));
+   --rm-warning-strong: color-mix(in srgb, var(--rm-warning) 20%, var(--rm-contrast-ink));
+   --rm-warning-soft: color-mix(in srgb, var(--rm-warning) 16%, var(--rm-bg-app));
+   --rm-warning-hover: color-mix(in srgb, var(--rm-warning) 25%, var(--rm-text-primary));
+   --rm-warning-action: var(--rm-warning-strong);
+   --rm-warning-action-hover: var(--rm-warning-hover);
+   --rm-danger-strong: color-mix(in srgb, var(--rm-danger) 30%, var(--rm-contrast-ink));
+   --rm-danger-soft: color-mix(in srgb, var(--rm-danger) 14%, var(--rm-bg-app));
+   --rm-danger-action: color-mix(in srgb, var(--rm-danger) 70%, var(--rm-shadow-ink));
+   --rm-danger-hover: color-mix(in srgb, var(--rm-danger) 60%, var(--rm-text-primary));
+   --rm-danger-action-hover: var(--rm-danger-hover);
+   --rm-critical: var(--rm-danger-strong);
+   --rm-success-bg: var(--rm-success-soft);
+   --rm-info-bg: var(--rm-info-soft);
+   --rm-warning-bg: var(--rm-warning-soft);
+   --rm-critical-bg: var(--rm-danger-soft);
+   --rm-status-high: var(--rm-warning-strong);
+   --rm-status-high-soft: var(--rm-warning-soft);
+   --rm-status-stable: var(--rm-success-strong);
+   --rm-status-stable-soft: var(--rm-success-soft);
+   --rm-status-attention: var(--rm-info-strong);
+   --rm-status-attention-soft: var(--rm-info-soft);
+   /* Acentos clínicos aprobados; la clasificación pertenece al backend. */
+   --rm-clinical-normal: #1F8A65;
+   --rm-clinical-warning: #E49A00;
+   --rm-clinical-high: #E86618;
+   --rm-clinical-critical: #DC3E38;
+   --rm-clinical-normal-ink: #176348;
+   --rm-clinical-warning-ink: #765000;
+   --rm-clinical-warning-bg: #FFE8A3;
+   --rm-clinical-warning-border: #F2B52B;
+   --rm-clinical-high-ink: #903B0C;
+   --rm-clinical-critical-ink: #9E2724;
+   --rm-clinical-critical-bg: #F8D0CD;
+   --rm-clinical-critical-border: #EF5753;
+   --rm-clinical: var(--rm-info);
+   --rm-clinical-strong: var(--rm-info-strong);
+   --rm-clinical-soft: var(--rm-info-soft);
+   --rm-clinical-hover: var(--rm-info-hover);
+   --rm-clinical-legacy: var(--rm-info-strong);
+   --rm-cyan: var(--rm-info);
+   --rm-cyan-strong: var(--rm-info-strong);
+   --rm-cyan-soft: var(--rm-info-soft);
+   --rm-violet: var(--rm-psychology);
+   --rm-violet-strong: var(--rm-psychology-strong);
+   --rm-violet-soft: var(--rm-psychology-soft);
+
+
+}
+
+/* Modo oscuro petróleo global. Los componentes mantienen sus contratos semánticos. */
+.dark,
+[data-theme="dark"] {
+   --rm-bg-app: var(--rm-palette-petroleum-950);
+   --rm-bg-sidebar: var(--rm-palette-petroleum-900);
+   --rm-surface: var(--rm-palette-petroleum-800);
+   --rm-surface-soft: var(--rm-palette-petroleum-700);
+   --rm-surface-muted: var(--rm-palette-petroleum-900);
+   --rm-surface-raised: var(--rm-palette-petroleum-raised);
+   --rm-shadow-ink: var(--rm-palette-petroleum-950);
+   --rm-text-inverse: var(--rm-palette-petroleum-text);
+   --rm-text-on-primary: var(--rm-palette-petroleum-950);
+   --rm-text-primary: var(--rm-text-inverse);
+   --rm-text-secondary: var(--rm-palette-petroleum-secondary);
+   --rm-text-muted: var(--rm-text-secondary);
+   --rm-icon-default: var(--rm-palette-sage-400);
+   --rm-selected-bg: color-mix(in srgb, var(--rm-palette-sage-200) 18%, var(--rm-surface));
+   --rm-primary: var(--rm-palette-petroleum-mint);
+   --rm-primary-hover: color-mix(in srgb, var(--rm-primary) 85%, var(--rm-text-primary));
+   --rm-primary-active: color-mix(in srgb, var(--rm-primary) 85%, var(--rm-bg-app));
+   --rm-primary-ink: var(--rm-palette-petroleum-mint);
+   --rm-selected-hover: color-mix(in srgb, var(--rm-primary) 25%, var(--rm-surface));
+   --rm-primary-soft: color-mix(in srgb, var(--rm-primary) 18%, var(--rm-surface));
+   --rm-border: var(--rm-palette-petroleum-border);
+   --rm-border-strong: color-mix(in srgb, var(--rm-text-primary) 24%, transparent);
+   --rm-sage-soft: color-mix(in srgb, var(--rm-sage) 18%, var(--rm-surface));
+   --rm-info-soft: color-mix(in srgb, var(--rm-info) 18%, var(--rm-surface));
+   --rm-psychology-soft: color-mix(in srgb, var(--rm-psychology) 18%, var(--rm-surface));
+   --rm-nutrition-soft: color-mix(in srgb, var(--rm-nutrition) 18%, var(--rm-surface));
+   --rm-warning-soft: color-mix(in srgb, var(--rm-warning) 18%, var(--rm-surface));
+   --rm-danger-soft: color-mix(in srgb, var(--rm-danger) 18%, var(--rm-surface));
+   --rm-danger-strong: color-mix(in srgb, var(--rm-danger) 35%, var(--rm-text-primary));
+   --rm-info-strong: color-mix(in srgb, var(--rm-info) 25%, var(--rm-text-primary));
+   --rm-warning-strong: color-mix(in srgb, var(--rm-warning) 30%, var(--rm-text-primary));
+   --rm-psychology-strong: color-mix(in srgb, var(--rm-psychology) 25%, var(--rm-text-primary));
+   --rm-nutrition-strong: color-mix(in srgb, var(--rm-nutrition) 25%, var(--rm-text-primary));
+   --rm-danger-action: color-mix(in srgb, var(--rm-danger) 70%, var(--rm-shadow-ink));
+   --rm-danger-hover: color-mix(in srgb, var(--rm-danger) 60%, var(--rm-shadow-ink));
+   --rm-info-action: color-mix(in srgb, var(--rm-info) 30%, var(--rm-shadow-ink));
+   --rm-info-action-hover: color-mix(in srgb, var(--rm-info) 20%, var(--rm-shadow-ink));
+   --rm-warning-action: color-mix(in srgb, var(--rm-warning) 30%, var(--rm-shadow-ink));
+   --rm-warning-action-hover: color-mix(in srgb, var(--rm-warning) 25%, var(--rm-shadow-ink));
+   --rm-modal-overlay: color-mix(in srgb, var(--rm-shadow-ink) 72%, transparent);
+}
+
+/* Las clases históricas también consumen el contrato canónico.
+   La especificidad del modo oscuro coincide con el antiguo archivo de tema. */
+:root,
+.dark,
+[data-theme="dark"] {
+   /* ============================================================
+      18. LEGACY BRIDGE (compatibilidad V1)
+      ============================================================ */
+   --color-fondo-app: var(--rm-bg-app);
+   --color-fondo-panel: var(--rm-surface);
+   --color-fondo-panel-alt: var(--rm-surface-soft);
+   --color-fondo-card: var(--rm-surface);
+   --color-fondo-card-suave: var(--rm-surface-soft);
+   --color-fondo-card-hover: var(--rm-surface-soft);
+   --color-fondo-card-calido: var(--rm-surface-soft);
+   --color-fondo-input: var(--rm-input-bg);
+   --color-fondo-hover: var(--rm-surface-soft);
+
+   --color-sidebar-bg: var(--rm-bg-sidebar);
+   --color-sidebar-texto: var(--rm-nav-text);
+   --color-sidebar-header-bg: var(--rm-surface);
+   --color-sidebar-texto-hover: var(--rm-nav-text-hover);
+   --color-sidebar-item-activo: var(--rm-selected-bg);
+   --color-sidebar-item-activo-borde: var(--rm-action-primary);
+   --color-sidebar-seccion-hover-bg: var(--rm-nav-hover);
+   --color-sidebar-seccion-activa-bg: var(--rm-sage-soft);
+   --color-sidebar-seccion-activa-texto: var(--rm-text-primary);
+   --color-sidebar-seccion-texto: var(--rm-text-secondary);
+
+   --color-header-bg: var(--rm-topbar-bg);
+   --color-header-borde: var(--rm-border-soft);
+   --color-header-texto: var(--rm-text-primary);
+
+   --color-input-bg: var(--rm-input-bg);
+   --color-input-borde: var(--rm-input-border);
+   --color-input-borde-hover: var(--rm-border-hover);
+   --color-input-borde-focus: var(--rm-focus);
+   --color-input-ring-focus: var(--rm-focus-tint);
+   --color-input-texto: var(--rm-input-text);
+   --color-input-placeholder: var(--rm-input-placeholder);
+   --color-input-bg-disabled: var(--rm-surface-soft);
+
+   --color-titulo: var(--rm-text-title);
+   --color-subtitulo: var(--rm-text-secondary);
+   --color-parrafo: var(--rm-text-body);
+   --color-texto-inverso: var(--rm-text-on-primary);
+   --color-texto-principal: var(--rm-text-primary);
+   --color-texto-secundario: var(--rm-text-secondary);
+   --color-texto-apoyo: var(--rm-text-secondary);
+   --color-texto-muted: var(--rm-text-muted);
+   --color-label: var(--rm-text-primary);
+
+   --color-boton-principal: var(--rm-button-primary-bg);
+   --color-boton-principal-hover: var(--rm-button-primary-hover);
+   --color-boton-principal-texto: var(--rm-button-primary-text);
+   --color-boton-acento: var(--rm-action-primary);
+   --color-boton-acento-hover: var(--rm-action-primary-hover);
+   --color-boton-acento-texto: var(--rm-text-on-primary);
+   --color-boton-secundario: var(--rm-button-secondary-bg);
+   --color-boton-secundario-texto: var(--rm-button-secondary-text);
+   --color-boton-secundario-borde: var(--rm-button-secondary-border);
+   --color-boton-secundario-hover: var(--rm-button-secondary-hover-bg);
+   --color-boton-fantasma-bg: transparent;
+   --color-boton-fantasma-texto: var(--rm-text-secondary);
+   --color-boton-fantasma-borde: transparent;
+   --color-boton-icono-texto: var(--rm-text-secondary);
+   --color-boton-icono-texto-hover: var(--rm-text-primary);
+
+   --color-borde-general: var(--rm-border);
+   --color-borde-medio: var(--rm-border);
+   --color-borde-suave: var(--rm-border-soft);
+   --color-borde-fuerte: var(--rm-border-strong);
+
+   --color-modal-overlay: var(--rm-modal-overlay);
+   --color-modal-bg: var(--rm-modal-bg);
+   --color-modal-borde: var(--rm-modal-border);
+   --color-modal-header-borde: var(--rm-border-soft);
+   --color-modal-footer-borde: var(--rm-border-soft);
+   --color-modal-titulo: var(--rm-text-primary);
+   --color-modal-texto: var(--rm-text-body);
+
+   --color-tabla-header-bg: var(--rm-table-header-bg);
+   --color-tabla-header-texto: var(--rm-text-primary);
+   --color-tabla-header-borde: var(--rm-border-soft);
+   --color-tabla-row-borde: var(--rm-border-soft);
+   --color-tabla-row-hover: var(--rm-table-row-hover);
+   --color-tabla-cell-label: var(--rm-text-body);
+   --color-tabla-cell-meta: var(--rm-text-muted);
+
+   --color-estado-exito-texto: var(--rm-success-strong);
+   --color-estado-exito-bg: var(--rm-success-soft);
+   --color-estado-exito-borde: var(--rm-success);
+   --color-estado-advertencia-texto: var(--rm-warning-strong);
+   --color-estado-advertencia-bg: var(--rm-warning-soft);
+   --color-estado-advertencia-borde: var(--rm-warning);
+   --color-estado-peligro-texto: var(--rm-danger-strong);
+   --color-estado-peligro-bg: var(--rm-danger-soft);
+   --color-estado-peligro-borde: var(--rm-danger);
+   --color-estado-info-texto: var(--rm-info-strong);
+   --color-estado-info-bg: var(--rm-info-soft);
+   --color-estado-info-borde: var(--rm-info);
+   --color-estado-neutral-texto: var(--rm-text-primary);
+   --color-estado-neutral-bg: var(--rm-surface-soft);
+   --color-estado-neutral-borde: var(--rm-border-soft);
+   --color-estado-restaurado-texto: var(--rm-success-strong);
+   --color-estado-restaurado-bg: var(--rm-success-soft);
+   --color-estado-restaurado-borde: var(--rm-success);
+
+   --color-signo-normal-texto: var(--rm-success-strong);
+   --color-signo-normal-bg: var(--rm-success-soft);
+   --color-signo-normal-borde: var(--rm-success);
+   --color-signo-observacion-texto: var(--rm-warning-strong);
+   --color-signo-observacion-bg: var(--rm-warning-soft);
+   --color-signo-observacion-borde: var(--rm-warning);
+   --color-signo-critico-texto: var(--rm-danger-strong);
+   --color-signo-critico-bg: var(--rm-danger-soft);
+   --color-signo-critico-borde: var(--rm-danger);
+   --color-signo-sin-datos-texto: var(--rm-text-muted);
+   --color-signo-sin-datos-bg: var(--rm-surface-soft);
+   --color-signo-sin-datos-borde: var(--rm-border-soft);
+
+   --color-kpi-residentes-texto: var(--rm-info);
+   --color-kpi-residentes-bg: var(--rm-info-soft);
+   --color-kpi-salud-texto: var(--rm-success);
+   --color-kpi-salud-bg: var(--rm-success-soft);
+   --color-kpi-cognitivo-texto: var(--rm-success-strong);
+   --color-kpi-cognitivo-bg: var(--rm-sage-soft);
+   --color-kpi-alertas-texto: var(--rm-danger);
+   --color-kpi-alertas-bg: var(--rm-danger-soft);
+   --color-kpi-actividades-texto: var(--rm-action-primary);
+   --color-kpi-actividades-bg: var(--rm-action-primary-soft);
+   --color-kpi-apoyo-texto: var(--rm-warning);
+   --color-kpi-apoyo-bg: var(--rm-warning-soft);
+
+   --color-modulo-adulto-mayor: var(--rm-info);
+   --color-modulo-adulto-mayor-hover: var(--rm-info-hover);
+   --color-modulo-adulto-mayor-fondo: var(--rm-info-soft);
+   --color-modulo-salud: var(--rm-success);
+   --color-modulo-salud-suave: var(--rm-success-soft);
+   --color-modulo-salud-fondo: var(--rm-success-soft);
+   --color-modulo-cognitivo: var(--rm-success-strong);
+   --color-modulo-cognitivo-hover: var(--rm-primary-hover);
+   --color-modulo-cognitivo-texto: var(--rm-success-strong);
+   --color-modulo-cognitivo-fondo: var(--rm-sage-soft);
+   --color-modulo-reportes: var(--rm-info-secondary);
+   --color-modulo-reportes-fondo: var(--rm-info-secondary-soft);
+   --color-modulo-alertas: var(--rm-danger);
+   --color-modulo-alertas-texto: var(--rm-danger);
+   --color-modulo-alertas-fondo: var(--rm-danger-soft);
+   --color-modulo-bitacora: var(--rm-text-secondary);
+   --color-modulo-bitacora-fondo: var(--rm-surface-soft);
+   --color-modulo-apoyo: var(--rm-warning);
+   --color-modulo-apoyo-texto: var(--rm-warning);
+   --color-modulo-apoyo-fondo: var(--rm-warning-soft);
+
+   --color-scrollbar-thumb: var(--rm-border);
+
+   /* Sombras bridge */
+   --sombra-card: var(--rm-shadow-sm);
+   --sombra-card-hover: var(--rm-shadow-md);
+   --sombra-panel: var(--rm-shadow-md);
+   --sombra-sidebar: var(--rm-shadow-md);
+   --sombra-modal: var(--rm-shadow-overlay);
+
+   --glow-acento: 0 0 0 transparent;
+   --glow-acento-hover: 0 0 0 transparent;
+
+   /* Gradientes legacy */
+   --gradiente-progreso: linear-gradient(90deg, var(--rm-action-primary), var(--rm-action-primary-hover));
+   --gradiente-salud: linear-gradient(135deg, var(--rm-success), var(--rm-success-hover));
+   --gradiente-cognitivo: linear-gradient(135deg, var(--rm-success-strong), var(--rm-primary-hover));
+   --gradiente-acento: linear-gradient(135deg, var(--rm-action-primary), var(--rm-action-primary-active));
+   --gradiente-panel: linear-gradient(180deg, var(--rm-surface), var(--rm-surface-soft));
+   --gradiente-card: none;
+   --gradiente-input: none;
+}
+
+/* Colores existentes de filtros centralizados sin alterar su apariencia.
+   Esta extracción no concilia la paleta del resto de componentes. */
+:root {
+    --rm-filter-green-count-ink: #044E39;
+    --rm-filter-green-icon: #059669;
+    --rm-filter-add-open-ink: #064E3B;
+    --rm-filter-green-selected-ink: #065F46;
+    --rm-filter-view-bg-dark: #0E1D26;
+    --rm-filter-add-hover-ink: #0F3D30;
+    --rm-filter-search-focus-bg-dark: #192E39;
+    --rm-filter-add-ink: #1B4D3E;
+    --rm-filter-blue-count-ink: #1E3A8A;
+    --rm-filter-blue-selected-ink: #1E40AF;
+    --rm-filter-add-hover-bg-dark: #213A47;
+    --rm-filter-blue-icon: #2563EB;
+    --rm-filter-view-border-dark: #29424E;
+    --rm-filter-search-ink: #2C2622;
+    --rm-filter-toolbar-focus-color: #2E7D62;
+    --rm-filter-green-chip-border: #34D399;
+    --rm-filter-choice-ink: #38312B;
+    --rm-filter-border-hover-dark: #3B5A6A;
+    --rm-filter-focus-dark: #3F8F76;
+    --rm-filter-violet-count-ink: #4C1D95;
+    --rm-filter-violet-selected-ink: #5B21B6;
+    --rm-filter-view-ink: #5C5247;
+    --rm-filter-blue-chip-border: #60A5FA;
+    --rm-filter-neutral-icon: #6E6457;
+    --rm-filter-green-count-bg: #6EE7B7;
+    --rm-filter-clear-all-ink: #70665A;
+    --rm-filter-violet-icon: #7C3AED;
+    --rm-filter-red-count-ink: #7F1D1D;
+    --rm-filter-amber-chip-ink: #92400E;
+    --rm-filter-blue-selected-ink-dark: #93C5FD;
+    --rm-filter-placeholder: #948A7D;
+    --rm-filter-red-selected-ink: #991B1B;
+    --rm-filter-rose-selected-ink: #9F1239;
+    --rm-filter-add-ink-dark: #9FE2CB;
+    --rm-filter-violet-chip-border: #A78BFA;
+    --rm-filter-view-ink-dark: #A8BAC2;
+    --rm-filter-green-chip-ink-dark: #BBF7D0;
+    --rm-filter-border-hover: #BDB09E;
+    --rm-filter-blue-chip-ink-dark: #BFDBFE;
+    --rm-filter-violet-selected-ink-dark: #C4B5FD;
+    --rm-filter-scrollbar: #D3C9BC;
+    --rm-filter-amber-icon: #D97706;
+    --rm-filter-danger-icon: #DC2626;
+    --rm-filter-violet-chip-ink-dark: #DDD6FE;
+    --rm-filter-rose-icon: #E11D48;
+    --rm-filter-ink-dark: #EDF5F7;
+    --rm-filter-red-chip-border: #F87171;
+    --rm-filter-amber-chip-border: #FBBF24;
+    --rm-filter-red-selected-ink-dark: #FCA5A5;
+    --rm-filter-rose-selected-ink-dark: #FDA4AF;
+    --rm-filter-amber-chip-ink-dark: #FDE68A;
+    --rm-filter-red-chip-ink-dark: #FECACA;
+    --rm-filter-clear-hover-bg: #FEE2E2;
+    --rm-filter-badge-ink: #FFFFFF;
+}

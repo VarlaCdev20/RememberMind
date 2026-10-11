@@ -1,58 +1,99 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+---
+title: "RememberMind"
+status: CURRENT
+version: "1.0"
+last_reviewed: 2026-10-11
+owner: RememberMind
+source_of_truth: false
+verified_against_commit: null
+verification_scope: STATIC_REPOSITORY_REVIEW
+runtime_verified: false
+supersedes: []
+related_docs: []
+related_modules: []
+---
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# RememberMind
 
-## About Laravel
+Sistema web para una residencia geriátrica: operación institucional y seguimiento clínico, cognitivo, funcional e interdisciplinario.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Documentación y estado
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Entrada oficial: [RememberMind Documentation](docs/README.md).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- [Estado real del repositorio](docs/ESTADO_ACTUAL.md).
+- [Roadmap: trabajo, propuestas e ideas](docs/ROADMAP.md).
+- [Glosario](docs/GLOSARIO_DOMINIO.md), [decisiones pendientes](docs/DECISIONES_PENDIENTES.md), [deuda evidenciada](docs/DEUDA_TECNICA.md).
+- [Arquitectura vigente](docs/arquitectura/README.md), [BDD y extensiones aprobadas](docs/base-de-datos/README.md).
+- [Migración híbrida ejecutada](docs/arquitectura/INFORME_MIGRACION_HIBRIDA.md) y [auditoría/limpieza posterior](docs/arquitectura/AUDITORIA_LIMPIEZA_2026_10_10.md).
+- [Gobernanza/changelog documental](docs/CHANGELOG.md).
 
-## Learning Laravel
+Desacoplamiento de fronteras verificado el 11/10/2026 en `PODEMOS-SEGUIR`: suite SQLite completa sin fallos (1.094 pruebas, 32.023 aserciones, 15 omisiones), cohorte PostgreSQL aislada (183/3.035), frontend (151) y build aprobados. [Informe vigente y límites](docs/arquitectura/DESACOPLAMIENTO_2026_10_11.md); [preparación anterior](docs/sistema/PREPARACION_DESARROLLO_2026_10_11.md). No acredita producción ni validación clínica.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Dominio y flujo institucional
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Postulante ≠ residente ≠ usuario ≠ personal ≠ contacto.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+Preadmisión → revisión → APROBADA/RECHAZADA → admisión formal con cama → residente admitido. Aprobación no crea residente; formalización es transaccional. Fuente: [AGENTS](AGENTS.md) y [baseline](docs/base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md); valores físicos divergentes están en DEC-OPEN-001.
 
-## Agentic Development
+Áreas: institucional/alojamiento, clínica, cuidado continuo, medicación, trabajo interdisciplinario, actividades/visitas, documentación, alertas, reportes, seguridad/auditoría, UX/testing. El [sistema experto](docs/sistema-experto/README.md) tiene núcleo técnico, esquema y revisión administrativa implementados; su conocimiento institucional y activación clínica siguen pendientes.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Stack y requisitos
+
+Versiones bloqueadas y motores: [estado actual](docs/ESTADO_ACTUAL.md) y [baseline técnico](docs/arquitectura/REMEMBERMIND_BASELINE_TECNICO.md).
+
+- PHP ^8.3 y extensiones de la instalación; verificación local con PHP 8.3.33.
+- Laravel 13.33.0, Livewire 4.4.6, Tailwind 3.4.19 y Vite 8.3.1 según locks.
+- Node >=22.12.0 para satisfacer el lock completo, incluido Puppeteer; Composer según entorno.
+- PostgreSQL para desarrollo integrado/staging/producción; SQLite :memory: para tests rápidos. MySQL/MariaDB fuera del baseline.
+
+## Preparar desarrollo
+
+Trabajo nuevo: `feature/<modulo>-<objetivo>` desde `develop`, PR de vuelta a `develop` y entrega `release/*` hacia `main`. [Flujo Git, commits y comprobaciones](docs/sistema/GIT_FLOW.md). Los doce módulos forman la base técnica; sus pendientes siguen documentados.
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
+npm ci
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+La copia de desarrollo local está en `C:\Users\CARLAENCINAS\Desktop\RememberMind`; el trabajo nuevo parte de `develop`. `PODEMOS-SEGUIR` conserva el checkpoint anterior. La carpeta de Codex contiene informes y temporales de auditoría. `composer setup` instala dependencias y compila; no regenera claves ni ejecuta migraciones.
 
-## Contributing
+En instalación nueva, crear .env desde el ejemplo solo si no existe y configurar conexión/secretos del entorno. No sobrescribir .env existente. Generar clave únicamente para la instalación nueva; no regenerarla en un sistema con datos cifrados.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+php artisan key:generate
+php artisan migrate
+```
 
-## Code of Conduct
+Antes de migrate confirmar DB destino y contrato aprobado. Seeders sintéticos solo con carga explícita según [guía local](docs/base-de-datos/SEEDERS_LOCALES.md); sin seed automático contra datos reales. migrate:fresh --seed solo en DB confirmada desechable cuando la verificación lo necesita.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Ejecución, pruebas y build
 
-## Security Vulnerabilities
+```bash
+composer dev
+composer test
+composer test -- --filter=BddOperativaV2Test
+npm test
+npm run build
+php motor-experto/tests/independencia.php
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Usar las pruebas mediante Composer para activar el aislamiento antes de cargar Laravel. PostgreSQL desechable en Windows: `pwsh -File scripts/probar-postgres.ps1`; requisitos y perfiles en [desarrollo seguro](docs/sistema/DESARROLLO_SEGURO.md). PostgreSQL verifica garantías físicas/concurrencia; QA visual es independiente del build. Producción tiene [procedimiento propio](docs/produccion/DESPLIEGUE_SEGURO.md).
 
-## License
+## Roles y seguridad
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Fuente: [roles congelados](docs/arquitectura/REMEMBERMIND_ROLES_BASELINE_CONGELADO.md).
+
+- Superadministrador: acceso técnico/supervisión; no escritura clínica automática por rol.
+- Gerente: dirección, personal y planificación.
+- Administrador: operación diaria; no gestión de cuentas/RRHH ni clínica por rol.
+- Medicina/geriatría: competencias clínicas y prescripción autorizadas.
+- Enfermería: administración/documentación de cuidado; no prescribir.
+- Psicología, Nutrición, Fisioterapia y Pedagogía: ámbito profesional permitido.
+- Familiar: solo información autorizada de residentes vinculados; ver residente no publica expediente completo.
+
+Cuenta ACTIVO autenticada por correo + permiso + Policy + estado/regla + vínculo/scope/competencia. Registro público deshabilitado; archivos clínicos privados y descargas reautorizadas. Las deudas conocidas no se ocultan con un resumen de seguridad.
+
+## Agentes
+
+[CODEX_SETUP](CODEX_SETUP.md), [stack sistema](docs/sistema/STACK_SKILLS_SISTEMA.md) y [stack UX](docs/frontend/STACK_SKILLS_UX_UI.md). Instrucciones por alcance; historia y propuestas no gobiernan implementación.

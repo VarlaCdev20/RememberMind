@@ -1,0 +1,85 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — ÍNDICE CANÓNICO
+   Fuente única de verdad de estilos y componentes.
+   Orden de cascada: Tokens → Componentes → Patrones.
+   ============================================================ */
+
+/* 1. TOKENS */
+@import './tokens/primitives.css';
+@import './tokens/colors.css';
+@import './tokens/role-accents.css';
+@import './tokens/typography.css';
+@import './tokens/spacing.css';
+@import './tokens/sizing.css';
+@import './tokens/radius.css';
+@import './tokens/shadows.css';
+@import './tokens/layout.css';
+@import './tokens/z-index.css';
+@import './tokens/states.css';
+@import './tokens/motion.css';
+@import './tokens/accessibility.css';
+@import './tokens/chart-colors.css';
+
+/* 2. COMPONENTES */
+@import './components/buttons.css';
+@import './components/cards.css';
+@import './components/forms.css';
+@import './components/badges.css';
+@import './components/tables.css';
+@import './components/tabs.css';
+@import './components/filters.css';
+@import './components/modals.css';
+@import './components/drawers.css';
+@import './components/alerts.css';
+@import './components/charts.css';
+@import './components/empty-states.css';
+@import './components/legacy-palette-bridge.css';
+
+/* 3. PATRONES */
+@import './patterns/module-page.css';
+@import './patterns/clinical-dashboard.css';
+@import './patterns/resident-summary.css';
+@import './patterns/clinical-table.css';
+@import './patterns/clinical-detail.css';
+@import './patterns/depth-canvas.css';
+@import './patterns/system-density.css';
+@import './patterns/nursing-module.css';
+@import './patterns/resident-directory.css';
+@import './patterns/signos-vitales.css';
+@import './patterns/clinical-forms.css';
+@import './patterns/dolor.css';
+@import './patterns/ingesta.css';
+@import './patterns/objetivos-signos-vitales.css';
+@import './patterns/nursing-dashboard-layout.css';
+@import './patterns/admin-dashboard-layout.css';
+@import './patterns/admin-visual-redesign.css';
+@import './patterns/admin-workspace-consistency.css';
+@import './patterns/admin-preadmissions.css';
+@import './patterns/admin-resident-panel.css';
+@import './patterns/unified-data-tables.css';
+@import './patterns/collection-workspace.css';
+@import './patterns/expert-results.css';
+
+/* Navegación lateral compartida: después de los ajustes históricos por módulo. */
+@import './components/sidebar.css';
+@import './components/topbar.css';
+@import './components/dashboard-header.css';
+@import './components/dashboard-data.css';
+@import './components/dashboard-workspace.css';
+@import './components/role-accent.css';
+@import './components/cursor-glow.css';
+@import './components/person-entities.css';
+@import './components/controles-institucionales.css';
+@import './patterns/preadmisiones-interactivas.css';
+@import './components/paginacion.css';
+@import './patterns/admisiones-interactivas.css';
+@import './patterns/residentes-interactivos.css';
+@import './patterns/habitaciones-interactivas.css';
+@import './patterns/operaciones-interactivas.css';
+@import './patterns/calendario-operativo.css';
+
+@import './patterns/hidratacion.css';
+
+@import './patterns/eliminacion.css';
+
+@import './patterns/movilidad.css';

@@ -1,0 +1,19 @@
+@props(['id', 'title', 'resident', 'windowLabel' => 'gráfica'])
+<div id="{{ $id }}" popover="manual" role="dialog" aria-modal="false" class="rm-signos__graph-popup rm-dolor__graph" x-ref="trendDialog" wire:ignore.self :style="trendStyle()" aria-labelledby="{{ $id }}-title" aria-describedby="{{ $id }}-description" @resize.window="if (trendOpen) fitTrend()" @keydown.escape.prevent.stop="closeTrend()">
+    @foreach(['w' => 'izquierdo', 'e' => 'derecho', 'n' => 'superior', 's' => 'inferior', 'nw' => 'superior izquierdo', 'ne' => 'superior derecho', 'sw' => 'inferior izquierdo', 'se' => 'inferior derecho'] as $edge => $name)
+        <button type="button" class="rm-signos__graph-edge rm-signos__graph-edge--{{ $edge }}" aria-label="Ajustar borde {{ $name }} de la ventana {{ $windowLabel }}" title="Arrastra o usa las flechas para ajustar el tamaño" @pointerdown="startTrendPointer($event, 'resize', '{{ $edge }}')" @pointermove="updateTrendPointer($event)" @pointerup="endTrendPointer($event)" @pointercancel="endTrendPointer($event)" @lostpointercapture="trendPointer = null" @keydown.arrow-left.prevent="resizeTrendEdge('{{ $edge }}', -24, 0)" @keydown.arrow-right.prevent="resizeTrendEdge('{{ $edge }}', 24, 0)" @keydown.arrow-up.prevent="resizeTrendEdge('{{ $edge }}', 0, -24)" @keydown.arrow-down.prevent="resizeTrendEdge('{{ $edge }}', 0, 24)"></button>
+    @endforeach
+    <header class="rm-signos__graph-popup-header">
+        <button data-trend-move type="button" class="rm-btn-icon rm-signos__graph-move" aria-label="Mover {{ $windowLabel }}: arrastra o usa las flechas; Inicio restablece la ventana" @pointerdown="startTrendPointer($event, 'move')" @pointermove="updateTrendPointer($event)" @pointerup="endTrendPointer($event)" @pointercancel="endTrendPointer($event)" @lostpointercapture="trendPointer = null" @keydown.arrow-left.prevent="moveTrend(-24, 0)" @keydown.arrow-right.prevent="moveTrend(24, 0)" @keydown.arrow-up.prevent="moveTrend(0, -24)" @keydown.arrow-down.prevent="moveTrend(0, 24)" @keydown.home.prevent="resetTrend()"><i class="ph-bold ph-arrows-out-cardinal" aria-hidden="true"></i></button>
+        <div><h5 id="{{ $id }}-title">{{ $title }}</h5><p id="{{ $id }}-description">{{ $resident }}<br>La captura se conserva al cerrar esta ventana.</p></div>
+        <button type="button" class="rm-btn-icon" aria-label="Cerrar {{ $windowLabel }}" @click="closeTrend()"><i class="ph-bold ph-x" aria-hidden="true"></i></button>
+    </header>
+    <div class="rm-signos__graph-popup-body">{{ $slot }}</div>
+    <footer class="rm-signos__graph-popup-tools">
+        <span>Arrastra los bordes para ajustar. Usa las flechas con teclado.</span>
+        <button type="button" class="rm-btn-icon" aria-label="Reducir {{ $windowLabel }}" @click="resizeTrend(-48, -48)"><i class="ph-bold ph-minus" aria-hidden="true"></i></button>
+        <button type="button" class="rm-btn-icon" aria-label="Ampliar {{ $windowLabel }}" @click="resizeTrend(48, 48)"><i class="ph-bold ph-plus" aria-hidden="true"></i></button>
+        <button type="button" class="rm-btn-icon" aria-label="Restablecer {{ $windowLabel }}" @click="resetTrend()"><i class="ph-bold ph-arrow-counter-clockwise" aria-hidden="true"></i></button>
+        <button type="button" class="rm-btn-icon rm-signos__graph-resize" aria-label="Ajustar tamaño: arrastra o usa las flechas" @pointerdown="startTrendPointer($event, 'resize')" @pointermove="updateTrendPointer($event)" @pointerup="endTrendPointer($event)" @pointercancel="endTrendPointer($event)" @lostpointercapture="trendPointer = null" @keydown.arrow-left.prevent="resizeTrend(-24, 0)" @keydown.arrow-right.prevent="resizeTrend(24, 0)" @keydown.arrow-up.prevent="resizeTrend(0, -24)" @keydown.arrow-down.prevent="resizeTrend(0, 24)"><i class="ph-bold ph-arrows-out-simple" aria-hidden="true"></i></button>
+    </footer>
+</div>

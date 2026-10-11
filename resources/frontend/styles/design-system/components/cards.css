@@ -1,0 +1,292 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — COMPONENTS / CARDS
+   Tarjetas estructuradas, paneles de contenido y bloques KPI normalizados:
+   - Superficies cálidas de beige institucional (var(--rm-surface))
+   - Bordes estructurales (var(--rm-card-border))
+   - Radios semánticos: var(--rm-card-radius)
+   - Sombras orgánicas sutiles (var(--rm-card-shadow) a var(--rm-card-hover-shadow))
+   - Estados: default, hover, selected, inactive, disabled
+   ============================================================ */
+
+:root {
+    /* ------------------------------------------------------------
+       CONTRATO DE TARJETAS
+       ------------------------------------------------------------ */
+    --rm-card-bg: var(--rm-surface-main); /* fondo */
+    --rm-card-border: var(--rm-border-soft); /* borde */
+    --rm-card-radius: var(--rm-radius-lg); /* radio */
+    --rm-card-shadow: var(--rm-shadow-card); /* sombra */
+    --rm-card-padding: 12px 14px;
+    --rm-card-hover-shadow: var(--rm-shadow-raised); /* hover */
+    --rm-card-selected-bg: var(--rm-action-primary-soft); /* seleccionada */
+
+    /* Metric Card Component Tokens */
+    --rm-metric-bg: var(--rm-surface);
+    --rm-metric-border: var(--rm-border);
+    --rm-metric-radius: var(--rm-radius-card);
+    --rm-metric-accent-width: 3px;
+    --rm-metric-accent-danger: var(--rm-danger);
+    --rm-metric-accent-warning: var(--rm-warning);
+    --rm-metric-accent-info: var(--rm-info);
+    --rm-metric-accent-success: var(--rm-success);
+    --rm-metric-accent-clinical: var(--rm-clinical);
+    --rm-metric-accent-primary: var(--rm-action-primary);
+
+}
+
+.rm-surface,
+.rm-card {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background-color: var(--rm-card-bg);
+    border: 1px solid var(--rm-card-border);
+    border-radius: var(--rm-card-radius);
+    box-shadow: var(--rm-card-shadow);
+    color: var(--rm-text-primary);
+    overflow: hidden;
+    box-sizing: border-box;
+    background-image:
+        radial-gradient(circle at 100% 0%, var(--rm-card-trama-glow, color-mix(in srgb, var(--rm-sage) 3.5%, transparent)), transparent 45%),
+        radial-gradient(circle at 0% 100%, var(--rm-card-trama-accent, color-mix(in srgb, var(--rm-info) 2%, transparent)), transparent 45%),
+        radial-gradient(circle at center, color-mix(in srgb, var(--rm-text-primary) 6.5%, transparent) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 20px 20px;
+}
+
+.rm-card { padding: var(--rm-card-padding); border-radius: 13px; }
+.rm-card--spacious { padding: 14px 16px; }
+
+/* Metric Card: un solo contrato para KPIs con dato, ausencia y progreso opcional. */
+.rm-metric-card {
+    gap: 3px;
+    padding: 11px 13px;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms ease;
+}
+.rm-metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--rm-shadow-raised);
+    border-color: var(--rm-border-hover);
+}
+.rm-metric-card__top {
+    position: absolute;
+    top: 11px;
+    right: 11px;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--rm-space-1);
+}
+.rm-metric-card__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 30px;
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    font-size: 15px;
+    box-shadow: var(--rm-shadow-xs);
+}
+.rm-metric-card--mint .rm-metric-card__icon { background: var(--rm-success-soft); color: var(--rm-success-strong); }
+.rm-metric-card--sky .rm-metric-card__icon { background: var(--rm-info-soft); color: var(--rm-info-strong); }
+.rm-metric-card--critical .rm-metric-card__icon { background: var(--rm-danger-soft); color: var(--rm-danger-strong); }
+.rm-metric-card--coral .rm-metric-card__icon { background: var(--rm-surface-soft); color: var(--rm-text-secondary); }
+.rm-metric-card--neutral .rm-metric-card__icon { background: var(--rm-surface-soft); color: var(--rm-text-secondary); }
+.rm-metric-card__body { display: grid; min-width: 0; align-content: end; flex: 1 1 auto; }
+.rm-metric-card__value { padding-right: 22px; font: 700 clamp(22px, 2.1vw, 26px)/1 var(--rm-font-display); letter-spacing: -0.025em; overflow-wrap: anywhere; color: var(--rm-text-primary); }
+.rm-metric-card__label { margin: 3px 0 0; color: var(--rm-text-primary); font: 700 12px/1.25 var(--rm-font-display); letter-spacing: -0.01em; }
+.rm-metric-card__description { margin: 2px 0 0; color: var(--rm-text-secondary); font: 500 10.5px/1.3 var(--rm-font-body); }
+.rm-metric-card__trend { color: var(--rm-text-secondary); font: var(--rm-weight-semibold) var(--rm-text-xs)/1.25 var(--rm-font-body); }
+.rm-metric-card__progress { width: 100%; height: 6px; margin-top: var(--rm-space-1); border-radius: var(--rm-radius-pill); background: var(--rm-surface-soft); overflow: hidden; }
+.rm-metric-card__progress > span { display: block; height: 100%; border-radius: inherit; background: var(--rm-info); }
+.rm-metric-card__skeleton { display: block; width: 58%; height: 34px; margin-bottom: var(--rm-space-2); }
+
+.rm-section-header { display: flex; align-items: center; justify-content: space-between; gap: var(--rm-space-3); min-width: 0; }
+.rm-card__section-header { padding-bottom: 6px; margin-bottom: 8px; border-bottom: 1px solid var(--rm-border-soft); }
+.rm-section-header__main { display: flex; align-items: center; gap: var(--rm-space-3); min-width: 0; }
+.rm-section-header__copy { min-width: 0; }
+.rm-section-header__icon { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 28px; height: 28px; border-radius: 8px; background: var(--rm-action-primary-soft); color: var(--rm-action-primary-ink); font-size: 13px; }
+.rm-section-header__title { margin: 0; font: 650 14px/1.2 var(--rm-font-display); color: var(--rm-text-primary); }
+.rm-section-header__subtitle { margin: 1px 0 0; font: 450 11px/1.35 var(--rm-font-body); color: var(--rm-text-secondary); }
+.rm-section-header__count { padding: 2px 8px; border-radius: var(--rm-radius-pill); background: var(--rm-surface-soft); color: var(--rm-text-primary); font: 700 var(--rm-text-xs)/1.4 var(--rm-font-body); }
+.rm-section-header__actions { display: flex; align-items: center; gap: var(--rm-space-2); flex-shrink: 0; font: 600 var(--rm-text-xs)/1.4 var(--rm-font-body); }
+
+.rm-surface--default, .rm-card-default { background-color: var(--rm-surface-main); }
+.rm-surface--soft, .rm-card-soft { background-color: var(--rm-surface-soft); }
+.rm-surface--mint { background-color: var(--rm-surface); border-inline-start: var(--rm-metric-accent-width) solid var(--rm-sage); }
+.rm-surface--sky { background-color: var(--rm-surface); border-inline-start: var(--rm-metric-accent-width) solid var(--rm-info); }
+.rm-surface--coral { background-color: var(--rm-surface-soft); }
+
+.rm-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--rm-space-3);
+    padding: var(--rm-space-3) var(--rm-card-padding);
+    border-bottom: 1px solid var(--rm-border-soft);
+    background-color: var(--rm-surface-soft);
+}
+
+.rm-card-body {
+    padding: var(--rm-card-padding);
+    flex: 1 1 auto;
+}
+
+.rm-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--rm-space-3) var(--rm-card-padding);
+    border-top: 1px solid var(--rm-border-soft);
+    background-color: var(--rm-surface-soft);
+}
+
+/* Variantes */
+.rm-card-default {
+    background-color: var(--rm-card-bg);
+    border-color: var(--rm-card-border);
+}
+
+.rm-card-soft {
+    border-color: var(--rm-border-soft);
+}
+
+.rm-card-raised {
+    background-color: var(--rm-surface-raised);
+    border-color: var(--rm-card-border);
+    box-shadow: var(--rm-card-hover-shadow);
+}
+
+.rm-card-interactive,
+.rm-card--interactive {
+    cursor: pointer;
+    transition: background-color var(--rm-duration-normal) var(--rm-ease-standard), border-color var(--rm-duration-normal) var(--rm-ease-standard), box-shadow var(--rm-duration-normal) var(--rm-ease-standard), transform var(--rm-duration-normal) var(--rm-ease-standard);
+}
+
+.rm-card-interactive:hover,
+.rm-card--interactive:hover {
+    border-color: var(--rm-border-hover);
+    box-shadow: var(--rm-card-hover-shadow);
+    transform: translateY(-1px);
+}
+
+.rm-card-interactive:focus-visible,
+.rm-card--interactive:focus-visible { outline: 2px solid var(--rm-focus-ring-color); outline-offset: 2px; }
+
+/* Estados */
+.rm-card.is-selected,
+.rm-card-selected {
+    background-color: var(--rm-card-selected-bg);
+    border-color: var(--rm-action-primary) !important;
+    box-shadow: 0 0 0 2px var(--rm-action-primary), var(--rm-card-hover-shadow) !important;
+}
+
+.rm-card.is-inactive,
+.rm-card-inactive {
+    opacity: 0.70;
+    background-color: var(--rm-surface-muted);
+}
+
+.rm-card:disabled,
+.rm-card[aria-disabled="true"] {
+    opacity: var(--rm-state-disabled-opacity);
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Variante Métrica / KPI Compacta */
+.rm-card-metric {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--rm-card-padding);
+    background-color: var(--rm-card-bg);
+    border: 1px solid var(--rm-card-border);
+    border-radius: var(--rm-card-radius);
+    box-shadow: var(--rm-card-shadow);
+    min-height: 108px;
+    max-height: 120px;
+    box-sizing: border-box;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rm-card-metric:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--rm-shadow-md);
+    border-color: var(--rm-border-hover);
+}
+
+
+.rm-card-metric.is-danger {
+    border-left: var(--rm-metric-accent-width) solid var(--rm-metric-accent-danger) !important;
+}
+.rm-card-metric.is-warning {
+    border-left: var(--rm-metric-accent-width) solid var(--rm-metric-accent-warning) !important;
+}
+.rm-card-metric.is-info {
+    border-left: var(--rm-metric-accent-width) solid var(--rm-metric-accent-info) !important;
+}
+.rm-card-metric.is-success {
+    border-left: var(--rm-metric-accent-width) solid var(--rm-metric-accent-success) !important;
+}
+.rm-card-metric.is-clinical {
+    border-left: var(--rm-metric-accent-width) solid var(--rm-metric-accent-clinical) !important;
+}
+.rm-card-metric.is-primary {
+    border-left: var(--rm-metric-accent-width) solid var(--rm-metric-accent-primary) !important;
+}
+
+.rm-card-metric .rm-metric-label {
+    font-size: var(--rm-font-size-meta);
+    font-weight: var(--rm-font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: var(--rm-letter-spacing-wide);
+    color: var(--rm-text-secondary);
+}
+
+.rm-card-metric .rm-metric-value {
+    font-family: var(--rm-font-family);
+    font-size: var(--rm-font-size-kpi);
+    font-weight: var(--rm-font-weight-extrabold);
+    color: var(--rm-text-primary);
+    line-height: 1.1;
+    margin: var(--rm-space-1) 0;
+}
+
+.rm-card-metric .rm-metric-meta {
+    font-size: var(--rm-font-size-meta);
+    color: var(--rm-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--rm-space-1);
+}
+
+/* Modo oscuro */
+.dark .rm-card,
+.dark .rm-surface {
+    background-color: var(--rm-surface-main);
+    border-color: var(--rm-border);
+    background-image:
+        radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--rm-info) 4%, transparent), transparent 45%),
+        radial-gradient(circle at 0% 100%, color-mix(in srgb, var(--rm-sage) 3%, transparent), transparent 45%),
+        radial-gradient(circle at center, color-mix(in srgb, var(--rm-text-primary) 7.5%, transparent) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 20px 20px;
+}
+
+.dark .rm-card-soft {
+    background-color: var(--rm-surface-soft);
+    border-color: var(--rm-border-soft);
+}
+
+.dark .rm-surface--soft { background-color: var(--rm-surface-soft); }
+.dark .rm-surface--mint { background-color: var(--rm-surface); }
+.dark .rm-surface--sky { background-color: var(--rm-surface); }
+.dark .rm-surface--coral { background-color: color-mix(in srgb, var(--rm-text-secondary) 14%, var(--rm-surface-main)); }
+
+.dark .rm-card-metric {
+    background-color: var(--rm-surface);
+    border-color: var(--rm-border);
+}

@@ -1,0 +1,356 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — COMPONENTS / BUTTONS
+   Botones semánticos institucionales normalizados:
+   Café Tierra + Crema + Taupe + Mocha + Eucalipto/Oliva Claro
+   - Altura estándar: var(--rm-button-height)
+   - Altura compacta: var(--rm-button-height-sm)
+   - Altura prioritaria: var(--rm-button-height-lg)
+   - Radios: var(--rm-button-radius)
+   - Tipografía: var(--rm-font-size-button) / var(--rm-button-font-weight)
+   - Contraste WCAG AA garantizado.
+   ============================================================ */
+
+:root {
+    /* ------------------------------------------------------------
+       CONTRATO DE BOTONES
+       ------------------------------------------------------------ */
+    --rm-button-height: var(--rm-control-lg); /* altura estándar: 44px */
+    --rm-button-height-sm: var(--rm-control-sm);
+    --rm-button-height-lg: 48px;
+    --rm-button-radius: var(--rm-radius-md); /* radio */
+    --rm-button-gap: var(--rm-space-2); /* espacio icono-texto */
+    --rm-button-padding-x: var(--rm-space-4); /* padding */
+
+    --rm-button-font-size: var(--rm-font-size-button);
+    --rm-button-font-weight: var(--rm-weight-semibold);
+
+    /* Primary: Verde institucional */
+    --rm-button-primary-bg: var(--rm-action-primary); /* fondo principal */
+    --rm-button-primary-hover: var(--rm-action-primary-hover); /* hover */
+    --rm-button-primary-active: var(--rm-action-primary-active); /* activo */
+    --rm-button-primary-text: var(--rm-text-on-primary); /* texto */
+    --rm-button-primary-border: transparent;
+
+    /* Secondary: Superficie cálida con borde visible */
+    --rm-button-secondary-bg: var(--rm-surface-soft); /* fondo secundario */
+    --rm-button-secondary-border: var(--rm-border-soft); /* borde secundario */
+    --rm-button-secondary-text: var(--rm-text-primary); /* texto secundario */
+    --rm-button-secondary-hover-bg: var(--rm-surface-soft);
+    --rm-button-secondary-hover-border: var(--rm-border-hover);
+
+    /* Ghost: Fondo transparente */
+    --rm-button-ghost-bg: transparent;
+    --rm-button-ghost-text: var(--rm-text-primary);
+    --rm-button-ghost-border: transparent;
+    --rm-button-ghost-hover-bg: var(--rm-surface-soft);
+
+    /* Success: Verde Cuidados */
+    --rm-button-success-bg: var(--rm-action-primary);
+    --rm-button-success-text: var(--rm-text-on-primary);
+    --rm-button-success-hover: var(--rm-action-primary-hover);
+    --rm-button-success-border: transparent;
+
+    /* Danger: Coral / Rojo Tierra */
+    --rm-button-danger-bg: var(--rm-danger-action);
+    --rm-button-danger-text: var(--rm-text-inverse);
+    --rm-button-danger-hover: var(--rm-danger-hover);
+    --rm-button-danger-border: transparent;
+
+    /* Warning: Cobre Institucional */
+    --rm-button-warning-bg: var(--rm-warning-action);
+    --rm-button-warning-text: var(--rm-text-inverse);
+    --rm-button-warning-hover: var(--rm-warning-action-hover);
+    --rm-button-warning-border: transparent;
+
+    /* Info: Azul Informativo */
+    --rm-button-info-bg: var(--rm-info-action);
+    --rm-button-info-text: var(--rm-text-inverse);
+    --rm-button-info-hover: var(--rm-info-action-hover);
+    --rm-button-info-border: transparent;
+
+    /* Clinical: Azul Clínico Oficial */
+    --rm-button-clinical-bg: var(--rm-info-action);
+    --rm-button-clinical-text: var(--rm-text-inverse);
+    --rm-button-clinical-hover: var(--rm-info-action-hover);
+    --rm-button-clinical-border: transparent;
+
+    /* Icon button */
+    --rm-button-icon-size: var(--rm-control-lg);
+    --rm-button-icon-sm-size: var(--rm-control-sm);
+    --rm-button-icon-lg-size: 48px;
+}
+
+.rm-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--rm-button-gap);
+    font-family: var(--rm-font-display);
+    font-size: var(--rm-button-font-size);
+    font-weight: var(--rm-button-font-weight);
+    line-height: 1.25;
+    border-radius: var(--rm-button-radius);
+    padding: 0 var(--rm-button-padding-x);
+    height: var(--rm-button-height);
+    min-height: var(--rm-button-height);
+    transition: color var(--rm-duration-hover) ease-out, background-color var(--rm-duration-hover) ease-out, border-color var(--rm-duration-hover) ease-out, box-shadow var(--rm-duration-hover) ease-out, transform var(--rm-duration-hover) ease-out;
+    cursor: pointer;
+    outline: none;
+    text-decoration: none;
+    white-space: nowrap;
+    user-select: none;
+    border: 1px solid transparent;
+    box-sizing: border-box;
+}
+
+.rm-btn:focus-visible {
+    outline: 2px solid var(--rm-focus-ring-color) !important;
+    outline-offset: 2px !important;
+}
+
+.rm-btn:disabled,
+.rm-btn[aria-disabled="true"],
+.rm-btn[aria-busy="true"] {
+    opacity: var(--rm-state-disabled-opacity);
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Tamaños */
+.rm-btn-sm {
+    height: var(--rm-button-height-sm);
+    min-height: var(--rm-button-height-sm);
+    padding: 0 var(--rm-space-3);
+    font-size: var(--rm-font-size-table);
+    gap: var(--rm-space-1);
+}
+
+.rm-btn-md {
+    height: var(--rm-button-height);
+    min-height: var(--rm-button-height);
+    padding: 0 var(--rm-button-padding-x);
+    font-size: var(--rm-button-font-size);
+    gap: var(--rm-button-gap);
+}
+
+.rm-btn-lg {
+    height: var(--rm-button-height-lg);
+    min-height: var(--rm-button-height-lg);
+    padding: 0 var(--rm-space-6);
+    font-size: var(--rm-font-size-body);
+}
+
+/* 1. Primario (Verde institucional) */
+.rm-btn-primary {
+    background-color: var(--rm-button-primary-bg);
+    background-image: linear-gradient(180deg, color-mix(in srgb, var(--rm-palette-page) 8%, transparent), transparent);
+    color: var(--rm-button-primary-text);
+    border-color: var(--rm-button-primary-border);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--rm-palette-page) 20%, transparent), var(--rm-shadow-sm);
+}
+
+.rm-btn-primary:hover:not(:disabled) {
+    background-color: var(--rm-button-primary-hover);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--rm-palette-page) 20%, transparent), var(--rm-shadow-md);
+    transform: translateY(-1px);
+}
+
+.rm-btn-primary:active:not(:disabled) {
+    background-color: var(--rm-button-primary-active);
+    transform: translateY(0);
+}
+
+/* 2. Secundario (Superficie Cálida con Borde) */
+.rm-btn-secondary {
+    background-color: var(--rm-button-secondary-bg);
+    color: var(--rm-button-secondary-text);
+    border-color: var(--rm-button-secondary-border);
+    box-shadow: var(--rm-shadow-sm);
+}
+
+.rm-btn-secondary:hover:not(:disabled) {
+    background-color: var(--rm-button-secondary-hover-bg);
+    border-color: var(--rm-button-secondary-hover-border);
+    color: var(--rm-button-secondary-text);
+    box-shadow: var(--rm-shadow-md);
+}
+
+.rm-btn-secondary:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+/* 3. Ghost (Fondo Transparente) */
+.rm-btn-ghost {
+    background-color: var(--rm-button-ghost-bg);
+    color: var(--rm-button-ghost-text);
+    border-color: var(--rm-button-ghost-border);
+}
+
+.rm-btn-ghost:hover:not(:disabled) {
+    background-color: var(--rm-button-ghost-hover-bg);
+    color: var(--rm-text-primary);
+}
+
+/* 4. Success (Verde Cuidados) */
+.rm-btn-success {
+    background-color: var(--rm-button-success-bg);
+    color: var(--rm-button-success-text);
+    border-color: var(--rm-button-success-border);
+    box-shadow: var(--rm-shadow-sm);
+}
+
+.rm-btn-success:hover:not(:disabled) {
+    background-color: var(--rm-button-success-hover);
+    box-shadow: var(--rm-shadow-md);
+}
+
+/* 5. Danger (Coral / Rojo Tierra) */
+.rm-btn-danger {
+    background-color: var(--rm-button-danger-bg);
+    color: var(--rm-button-danger-text);
+    border-color: var(--rm-button-danger-border);
+    box-shadow: var(--rm-shadow-sm);
+}
+
+.rm-btn-danger:hover:not(:disabled) {
+    background-color: var(--rm-button-danger-hover);
+    box-shadow: var(--rm-shadow-md);
+}
+
+/* 5.1 Warning (Cobre) */
+.rm-btn-warning {
+    background-color: var(--rm-button-warning-bg);
+    color: var(--rm-button-warning-text);
+    border-color: var(--rm-button-warning-border);
+    box-shadow: var(--rm-shadow-sm);
+}
+
+.rm-btn-warning:hover:not(:disabled) {
+    background-color: var(--rm-button-warning-hover);
+    box-shadow: var(--rm-shadow-md);
+    transform: translateY(-1px);
+}
+
+/* 6. Info (Azul Informativo) */
+.rm-btn-info {
+    background-color: var(--rm-button-info-bg);
+    color: var(--rm-button-info-text);
+    border-color: var(--rm-button-info-border);
+    box-shadow: var(--rm-shadow-sm);
+}
+
+.rm-btn-info:hover:not(:disabled) {
+    background-color: var(--rm-button-info-hover);
+    box-shadow: var(--rm-shadow-md);
+    transform: translateY(-1px);
+}
+
+/* 7. Botón de Icono */
+.rm-btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--rm-button-icon-size);
+    height: var(--rm-button-icon-size);
+    min-height: var(--rm-button-icon-size);
+    padding: 0;
+    border-radius: var(--rm-button-radius);
+    background-color: var(--rm-surface);
+    color: var(--rm-text-primary);
+    border: 1px solid var(--rm-border);
+    cursor: pointer;
+    transition: var(--rm-transition-all);
+    box-sizing: border-box;
+}
+
+.rm-btn-icon:hover:not(:disabled) {
+    background-color: var(--rm-surface-soft);
+    border-color: var(--rm-border-hover);
+    color: var(--rm-text-primary);
+    box-shadow: var(--rm-shadow-md);
+}
+
+.rm-btn-icon-sm {
+    width: var(--rm-button-icon-sm-size);
+    height: var(--rm-button-icon-sm-size);
+    min-height: var(--rm-button-icon-sm-size);
+    border-radius: var(--rm-radius-sm);
+}
+
+.rm-btn-icon-lg { width: var(--rm-button-icon-lg-size); height: var(--rm-button-icon-lg-size); min-height: var(--rm-button-icon-lg-size); }
+.rm-btn-icon--ghost { background: transparent; border-color: transparent; }
+.rm-btn-icon--soft { background: var(--rm-surface-soft); border-color: var(--rm-border-soft); }
+.rm-btn-icon--critical { background: var(--rm-critical-bg); border-color: color-mix(in srgb, var(--rm-critical) 25%, transparent); color: var(--rm-critical); }
+.rm-btn-icon--critical:hover:not(:disabled) { background: color-mix(in srgb, var(--rm-critical) 18%, var(--rm-surface)); color: var(--rm-critical); }
+.rm-btn-icon i, .rm-btn-icon svg { color: currentColor; }
+
+.rm-btn:active:not(:disabled):not([aria-busy="true"]) { transform: translateY(1px); box-shadow: var(--rm-shadow-xs); transition-duration: var(--rm-duration-fast); }
+
+/* Estado de carga */
+.rm-btn.is-loading,
+.rm-btn[aria-busy="true"] {
+    position: relative;
+    pointer-events: none;
+    opacity: .7;
+}
+
+.rm-btn__spinner { display: none; width: 17px; height: 17px; flex: 0 0 17px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: rmButtonSpin .9s linear infinite; }
+.rm-btn.is-loading .rm-btn__spinner, .rm-btn[aria-busy="true"] .rm-btn__spinner { display: inline-block; }
+.rm-btn__spinner--wire { display: none; }
+.rm-btn.is-loading .rm-btn__spinner--wire { display: inline-block; }
+@keyframes rmButtonSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .rm-btn__spinner { animation: none; border-right-color: currentColor; } }
+
+/* Alias de compatibilidad V1 */
+
+.rm-btn-clinical {
+    background-color: var(--rm-button-clinical-bg);
+    color: var(--rm-button-clinical-text) !important;
+    border: 1px solid var(--rm-button-clinical-border);
+}
+.rm-btn-clinical:hover:not(:disabled) {
+    background-color: var(--rm-button-clinical-hover);
+    color: var(--rm-button-clinical-text) !important;
+}
+
+.rm-btn-accent {
+    background-color: var(--rm-accent-action);
+    color: var(--rm-text-on-primary);
+}
+.rm-btn-accent:hover:not(:disabled) {
+    background-color: var(--rm-accent-action-hover);
+}
+
+/* Acciones compactas de tablas clínicas: área táctil uniforme y lectura por color. */
+.rm-action-btn {
+    width: var(--rm-control-height, 40px);
+    height: var(--rm-control-height, 40px);
+    min-width: var(--rm-control-height, 40px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--rm-border-soft);
+    border-radius: 10px;
+    background: var(--rm-surface-soft);
+    color: var(--rm-text-secondary);
+    transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
+}
+
+.rm-action-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: var(--rm-border-hover);
+    background: var(--rm-surface-raised);
+    color: var(--rm-text-primary);
+}
+
+.rm-action-btn:focus-visible {
+    outline: var(--rm-focus-ring-width) solid var(--rm-focus-ring-color);
+    outline-offset: 2px;
+}
+
+.rm-action-btn-atender { color: var(--rm-info-strong); }
+.rm-action-btn-drawer { color: var(--rm-clinical-strong); }
+.rm-action-btn-ubicacion { color: var(--rm-success-strong); }
+.rm-action-btn-more { color: var(--rm-text-muted); }

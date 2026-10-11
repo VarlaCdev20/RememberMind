@@ -1,0 +1,65 @@
+.rm-operation-calendar { min-width: 0; padding: var(--rm-space-4); }
+.rm-operation-calendar__header, .rm-operation-calendar__panel-header { display: flex; align-items: center; justify-content: space-between; gap: var(--rm-space-3); }
+.rm-operation-calendar__header h3, .rm-operation-calendar__panel-header h4 { margin: 0; color: var(--rm-text-primary); font: 750 var(--rm-font-size-section)/1.4 var(--rm-font-title); }
+.rm-operation-calendar__header p, .rm-operation-calendar__panel-header p { margin: var(--rm-space-1) 0 0; color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); }
+.rm-operation-calendar__navigation { display: flex; align-items: center; gap: var(--rm-space-2); flex: none; }
+.rm-operation-calendar__navigation > a { min-width: var(--rm-control-lg); min-height: var(--rm-control-lg); }
+.rm-operation-calendar__help { margin: var(--rm-space-3) 0; color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); line-height: 1.5; }
+.rm-operation-calendar__scroll { overflow-x: auto; padding: var(--rm-space-1); border-radius: var(--rm-radius-lg); }
+.rm-operation-calendar__weekdays, .rm-operation-calendar__grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: var(--rm-space-2); min-width: 420px; }
+.rm-operation-calendar__weekdays { margin-bottom: var(--rm-space-2); text-align: center; color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); font-weight: 700; }
+.rm-operation-calendar__day { display: flex; flex-direction: column; gap: var(--rm-space-2); min-width: 0; min-height: calc(var(--rm-control-lg) * 2); padding: var(--rm-space-3); border: 1px solid var(--rm-border); border-radius: var(--rm-radius-lg); background: var(--rm-surface); color: var(--rm-text-primary); text-align: left; cursor: pointer; transition: var(--rm-transition-color), box-shadow var(--rm-duration-fast) var(--rm-ease-standard); }
+.rm-operation-calendar__day:hover { background: var(--rm-surface-soft); border-color: var(--rm-primary); }
+.rm-operation-calendar__day.is-selected { background: var(--rm-selected-bg); border-color: var(--rm-primary); box-shadow: inset 0 0 0 1px var(--rm-primary); }
+.rm-operation-calendar__day-top { display: flex; align-items: center; justify-content: space-between; gap: var(--rm-space-1); min-height: var(--rm-space-5); }
+.rm-operation-calendar__day-top time { font-weight: 750; }
+.rm-operation-calendar__day-top small { color: var(--rm-primary-ink); font-size: var(--rm-font-size-meta); }
+.rm-operation-calendar__day.is-today time { color: var(--rm-primary-ink); text-decoration: underline; text-underline-offset: var(--rm-space-1); }
+.rm-operation-calendar__count { color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); }
+.rm-operation-calendar__day.has-events .rm-operation-calendar__count { color: var(--rm-primary-ink); font-weight: 700; }
+.rm-operation-calendar__preview { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%; font-size: var(--rm-font-size-meta); color: var(--rm-text-secondary); }
+.rm-operation-calendar__blank { border-radius: var(--rm-radius-lg); background: var(--rm-surface-soft); }
+.rm-operation-calendar__notice { display: flex; align-items: flex-start; gap: var(--rm-space-2); margin: var(--rm-space-3) 0 0; color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); line-height: 1.5; }
+.rm-operation-calendar__notice > i { font-size: var(--rm-icon-md); flex: none; color: var(--rm-primary-ink); }
+.rm-operation-calendar__panels { margin-top: var(--rm-space-4); border-top: 1px solid var(--rm-border); padding-top: var(--rm-space-4); }
+.rm-operation-calendar__panel-header h4 { font-size: var(--rm-font-size-card-title); }
+.rm-operation-calendar__panel-header > a { min-height: var(--rm-control-lg); }
+.rm-operation-calendar__events { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--rm-space-3); margin-top: var(--rm-space-3); }
+.rm-operation-calendar__event { display: flex; flex-direction: column; gap: var(--rm-space-3); min-width: 0; padding: var(--rm-space-4); background: var(--rm-surface); border: 1px solid var(--rm-border); border-radius: var(--rm-radius-xl); }
+.rm-operation-calendar__event > header { display: flex; align-items: flex-start; gap: var(--rm-space-2); flex-wrap: wrap; }
+.rm-operation-calendar__event > header > div { flex: 1; min-width: 0; }
+.rm-operation-calendar__event h5 { margin: 0; color: var(--rm-text-primary); font: 750 var(--rm-font-size-card-title)/1.4 var(--rm-font-title); overflow-wrap: anywhere; }
+.rm-operation-calendar__event small { color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); overflow-wrap: anywhere; }
+.rm-operation-calendar__event-icon { color: var(--rm-primary-ink); font-size: var(--rm-icon-lg); flex: none; }
+.rm-operation-calendar__time { display: flex; align-items: flex-start; gap: var(--rm-space-2); margin: 0; color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); line-height: 1.5; }
+.rm-operation-calendar__time > i { flex: none; font-size: var(--rm-icon-md); }
+.rm-operation-calendar__event dl { display: grid; gap: var(--rm-space-2); margin: 0; }
+.rm-operation-calendar__event dt { color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); }
+.rm-operation-calendar__event dd { margin: var(--rm-space-1) 0 0; color: var(--rm-text-primary); font-size: var(--rm-font-size-meta); overflow-wrap: anywhere; }
+.rm-operation-calendar__event > a { min-height: var(--rm-control-lg); margin-top: auto; align-self: flex-start; }
+.rm-operation-calendar__empty { grid-column: 1 / -1; margin: 0; padding: var(--rm-space-4); border: 1px dashed var(--rm-border); border-radius: var(--rm-radius-lg); color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); }
+.rm-operation-calendar :is(button, a):focus-visible, .rm-operation-calendar__scroll:focus-visible { outline: 2px solid var(--rm-focus); outline-offset: 3px; }
+@container (max-width: 1050px) { .rm-operation-calendar__events { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container (max-width: 650px) {
+    .rm-operation-calendar__header, .rm-operation-calendar__panel-header { flex-wrap: wrap; align-items: flex-start; }
+    .rm-operation-calendar__events { grid-template-columns: 1fr; }
+    .rm-operation-calendar__day { padding: var(--rm-space-2); }
+    .rm-operation-calendar__count > span { display: none; }
+    .rm-operation-calendar__preview { display: none; }
+}
+@media (max-width: 540px) {
+    .rm-operation-calendar { padding: var(--rm-space-3); }
+    .rm-operation-calendar__events { grid-template-columns: 1fr; }
+    .rm-operation-calendar__header, .rm-operation-calendar__panel-header { flex-wrap: wrap; }
+    .rm-operation-calendar__panel-header > a { width: 100%; }
+}
+/* La selección confirma el día; solo su panel aparece, sin mover la cuadrícula. */
+.rm-operation-calendar__day { transition: var(--rm-transition-color), transform var(--rm-motion-fast) var(--rm-ease-standard), box-shadow var(--rm-motion-fast) var(--rm-ease-standard); }
+.rm-operation-calendar__day:active { transform: scale(var(--rm-motion-scale-active)); }
+.rm-operation-calendar__day-top time { transition: transform var(--rm-motion-fast) var(--rm-ease-standard); transform-origin: left center; }
+.rm-operation-calendar__day.is-selected .rm-operation-calendar__day-top time { transform: scale(var(--rm-motion-scale-hover)); }
+.rm-operation-calendar__panel { animation: rm-calendar-day-reveal var(--rm-duration-normal) var(--rm-ease-enter); }
+.rm-operation-calendar__event { transition: border-color var(--rm-motion-fast) var(--rm-ease-standard), background-color var(--rm-motion-fast) var(--rm-ease-standard); }
+.rm-operation-calendar__event:focus-within { border-color: var(--rm-primary); background: var(--rm-surface-soft); }
+@keyframes rm-calendar-day-reveal { from { opacity: 0; transform: translateY(var(--rm-space-2)); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .rm-operation-calendar *, .rm-operation-calendar *::before, .rm-operation-calendar *::after { animation: none !important; transition: none !important; transform: none !important; } }

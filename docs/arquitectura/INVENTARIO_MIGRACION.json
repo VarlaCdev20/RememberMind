@@ -1,0 +1,3505 @@
+[
+  {
+    "origen": "app/Backend/Modulos/Administracion/Servicios/CentroCoordinacionService.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Consultas/CentroCoordinacionService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Administracion/Servicios/ConsultaOperativaService.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Consultas/ConsultaOperativaService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Administracion/Servicios/ExploradorAdministrativoService.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Consultas/ExploradorAdministrativoService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Administracion/Servicios/MapaHabitacionesService.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Consultas/MapaHabitacionesService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Admisiones/Acciones/CambiarAlojamientoResidente.php",
+    "destino": "app/Modulos/Admisiones/Aplicacion/Acciones/CambiarAlojamientoResidente.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Admisiones/Acciones/FormalizarAdmision.php",
+    "destino": "app/Modulos/Admisiones/Aplicacion/Acciones/FormalizarAdmision.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Admisiones/Acciones/GuardarEspacioResidencial.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Acciones/GuardarEspacioResidencial.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/TendenciaOcupacionService.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Consultas/TendenciaOcupacionService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Servicios/ContextoLaboralService.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Consultas/ContextoLaboralService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Servicios/GeneradorPlanillaEnfermeriaService.php",
+    "destino": "app/Modulos/Institucion/Infraestructura/Exportaciones/GeneradorPlanillaEnfermeriaService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Alertas/Servicios/AlertasService.php",
+    "destino": "app/Modulos/Alertas/Aplicacion/Acciones/AlertasService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Alertas/Servicios/DeteccionAlertasService.php",
+    "destino": "app/Modulos/Alertas/Aplicacion/Acciones/DeteccionAlertasService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Acciones/DefinirObjetivoSignoVitalAction.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/DefinirObjetivoSignoVitalAction.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Acciones/RegistrarSignosVitalesAction.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/RegistrarSignosVitalesAction.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Servicios/AccesoClinicoTemporalService.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/AccesoClinicoTemporalService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Servicios/AutorizacionClinicaService.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/AutorizacionClinicaService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Servicios/ClasificacionSignosVitalesService.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Adaptadores/ClasificacionSignosVitalesService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Servicios/ContextoClinicoService.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Consultas/ContextoClinicoService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Servicios/EventosClinicosService.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Consultas/EventosClinicosService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Servicios/FichaMedicaService.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/FichaMedicaService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Servicios/ResultadosEstudiosService.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Consultas/ResultadosEstudiosService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Servicios/SignosVitalesService.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/SignosVitalesService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/Servicios/ValidacionSignosVitalesService.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Validacion/ValidacionSignosVitalesService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/EvaluadorSignosVitales.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/EvaluadorSignosVitales.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Reglas/ReglaBase.php",
+    "destino": "app/Modulos/Clinica/Dominio/Reglas/ReglaBase.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Reglas/ReglaClinica.php",
+    "destino": "app/Modulos/Clinica/Dominio/Reglas/ReglaClinica.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Reglas/ReglaFrecuenciaCardiaca.php",
+    "destino": "app/Modulos/Clinica/Dominio/Reglas/ReglaFrecuenciaCardiaca.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Reglas/ReglaFrecuenciaRespiratoria.php",
+    "destino": "app/Modulos/Clinica/Dominio/Reglas/ReglaFrecuenciaRespiratoria.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Reglas/ReglaGlucemia.php",
+    "destino": "app/Modulos/Clinica/Dominio/Reglas/ReglaGlucemia.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Reglas/ReglaPresionArterial.php",
+    "destino": "app/Modulos/Clinica/Dominio/Reglas/ReglaPresionArterial.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Reglas/ReglaSaturacionOxigeno.php",
+    "destino": "app/Modulos/Clinica/Dominio/Reglas/ReglaSaturacionOxigeno.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Reglas/ReglaTemperatura.php",
+    "destino": "app/Modulos/Clinica/Dominio/Reglas/ReglaTemperatura.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Resultados/EvaluacionSignosVitales.php",
+    "destino": "app/Modulos/Clinica/Dominio/ObjetosValor/EvaluacionSignosVitales.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Resultados/RegistroSignosVitales.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/DTOs/RegistroSignosVitales.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Resultados/ResultadoReglaClinica.php",
+    "destino": "app/Modulos/Clinica/Dominio/ObjetosValor/ResultadoReglaClinica.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/ServicioBasalSignosVitales.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Consultas/ServicioBasalSignosVitales.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/ServicioDecisionAlertaClinica.php",
+    "destino": "app/Modulos/Alertas/Aplicacion/Acciones/ServicioDecisionAlertaClinica.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/ServicioObjetivosPersonalizados.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Consultas/ServicioObjetivosPersonalizados.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Tipos/ComportamientoAlerta.php",
+    "destino": "app/Modulos/Clinica/Dominio/Enumeraciones/ComportamientoAlerta.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Clinica/SignosVitales/Tipos/SeveridadClinica.php",
+    "destino": "app/Modulos/Clinica/Dominio/Enumeraciones/SeveridadClinica.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/IncidentesEnfermeriaService.php",
+    "destino": "app/Modulos/Alertas/Aplicacion/Acciones/IncidentesEnfermeriaService.php",
+    "estado": "Retirado tras auditoria",
+    "detalle": "Servicio sin consumidores ni descubrimiento dinámico; los flujos usan GestionarIncidentesPanel, GestionarIncidentesEnfermeria y RegistrarIncidenteEnFicha. Véase AUDITORIA_LIMPIEZA_2026_10_10.md."
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/TendenciaIncidentesService.php",
+    "destino": "app/Modulos/Alertas/Aplicacion/Consultas/TendenciaIncidentesService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Medicacion/Servicios/AgendaMedicacionService.php",
+    "destino": "app/Modulos/Medicacion/Aplicacion/Consultas/AgendaMedicacionService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Medicacion/Servicios/RegistrarAdministracionMedicacionService.php",
+    "destino": "app/Modulos/Medicacion/Aplicacion/Acciones/RegistrarAdministracionMedicacionService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Administracion/Servicios/DirectorioResidentesService.php",
+    "destino": "app/Modulos/Residentes/Aplicacion/Consultas/DirectorioResidentesService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Administracion/Servicios/PanelResidenteService.php",
+    "destino": "app/Modulos/Residentes/Aplicacion/Consultas/PanelResidenteService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Documentos/Servicios/DocumentacionResidenteService.php",
+    "destino": "app/Compartido/Infraestructura/Documentos/DocumentacionResidenteService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Documentos/Servicios/DocumentacionUsuarioService.php",
+    "destino": "app/Compartido/Infraestructura/Documentos/DocumentacionUsuarioService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Documentos/Servicios/DocumentosUsuarioService.php",
+    "destino": "app/Compartido/Infraestructura/Documentos/DocumentosUsuarioService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/AgendaTurnoService.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Consultas/AgendaTurnoService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/CuidadosEnfermeriaService.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Acciones/CuidadosEnfermeriaService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/DashboardComplementosService.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Consultas/DashboardComplementosService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/LesionesEnfermeriaService.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Acciones/LesionesEnfermeriaService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/MiTurnoService.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Consultas/MiTurnoService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/NavegacionCuidadosService.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Navegacion/NavegacionCuidadosService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/PaseTurnoService.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Acciones/PaseTurnoService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/SeguimientoDiarioService.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Acciones/SeguimientoDiarioService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Enfermeria/Servicios/TurnoEnfermeriaService.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Consultas/TurnoEnfermeriaService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Acciones/Fortify/CreateNewUser.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/Fortify/CreateNewUser.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Acciones/Fortify/PasswordValidationRules.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/Fortify/PasswordValidationRules.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Acciones/Fortify/ResetUserPassword.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/Fortify/ResetUserPassword.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Acciones/Fortify/UpdateUserPassword.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/Fortify/UpdateUserPassword.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Acciones/Fortify/UpdateUserProfileInformation.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/Fortify/UpdateUserProfileInformation.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Acciones/Jetstream/DeleteUser.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/Jetstream/DeleteUser.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Servicios/RolePreviewService.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/RolePreviewService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Servicios/SidebarService.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Navegacion/SidebarService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Servicios/UsuarioFichaService.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Consultas/UsuarioFichaService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Identidad/Servicios/VisibilidadNavegacion.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Navegacion/VisibilidadNavegacion.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Reportes/Servicios/AdultoMayorBitacoraService.php",
+    "destino": "app/Modulos/Reportes/Aplicacion/Consultas/AdultoMayorBitacoraService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Reportes/Servicios/AreasReportDataService.php",
+    "destino": "app/Modulos/Reportes/Aplicacion/Consultas/AreasReportDataService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Reportes/Servicios/DashboardPhotoRotation.php",
+    "destino": "app/Modulos/Reportes/Presentacion/DashboardPhotoRotation.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Reportes/Servicios/DashboardService.php",
+    "destino": "app/Modulos/Reportes/Aplicacion/Consultas/DashboardService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Reportes/Servicios/ReporteDataService.php",
+    "destino": "app/Modulos/Reportes/Aplicacion/Consultas/ReporteDataService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Reportes/Servicios/ReportExportService.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/ReportExportService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Reportes/Servicios/ReportFileNameService.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/ReportFileNameService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Reportes/Servicios/RoleDashboardDataService.php",
+    "destino": "app/Modulos/Reportes/Aplicacion/Consultas/RoleDashboardDataService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/Residentes/Servicios/AdultoMayorService.php",
+    "destino": "app/Modulos/Residentes/Aplicacion/Acciones/AdultoMayorService.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Actividades/ActividadController.php",
+    "destino": "app/Modulos/Social/Presentacion/Http/Controllers/ActividadController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Actividades/AdultoMayorActividadController.php",
+    "destino": "app/Modulos/Social/Presentacion/Http/Controllers/AdultoMayorActividadController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Admin/AreasAtencionController.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Http/Controllers/AreasAtencionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Administracion/BuscarAdministracionController.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Http/Controllers/BuscarAdministracionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Administracion/CentroCoordinacionController.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Http/Controllers/CentroCoordinacionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Administracion/OperacionController.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Http/Controllers/OperacionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Administracion/ResidenteAdministrativoController.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Http/Controllers/ResidenteAdministrativoController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Admisiones/AdmisionController.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Http/Controllers/AdmisionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Admisiones/InfraestructuraController.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Http/Controllers/InfraestructuraController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Admisiones/PreadmisionController.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Http/Controllers/PreadmisionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Alertas/AlertaController.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Http/Controllers/AlertaController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Clinica/AdultoMayorFichaMedicaController.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Controllers/AdultoMayorFichaMedicaController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Clinica/AdultoMayorSignosVitalesController.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Controllers/AdultoMayorSignosVitalesController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Clinica/EstudioClinicoController.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Controllers/EstudioClinicoController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Clinica/ExpedienteClinicoController.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Controllers/ExpedienteClinicoController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Cuidados/CuidadoController.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Http/Controllers/CuidadoController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Documentos/AdultoMayorDocumentoController.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Http/Controllers/AdultoMayorDocumentoController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Documentos/DocumentoController.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Http/Controllers/DocumentoController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Documentos/DocumentosUsuarioController.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Http/Controllers/DocumentosUsuarioController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Identidad/InstitucionalController.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Http/Controllers/InstitucionalController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Identidad/RolePreviewController.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Http/Controllers/RolePreviewController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Identidad/UsuarioController.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Http/Controllers/UsuarioController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Instrumentos/InstrumentoController.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Http/Controllers/InstrumentoController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Medicacion/AdultoMayorAdministracionMedicacionController.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Http/Controllers/AdultoMayorAdministracionMedicacionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Medicacion/AdultoMayorMedicacionController.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Http/Controllers/AdultoMayorMedicacionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Medicacion/MedicacionController.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Http/Controllers/MedicacionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/AreaReporteController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/AreaReporteController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/BitacoraController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/BitacoraController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/DashboardController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/DashboardController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/FichaPacienteReporteController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/FichaPacienteReporteController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/ReporteActividadesController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/ReporteActividadesController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/ReporteAdultosController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/ReporteAdultosController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/ReporteBitacoraController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/ReporteBitacoraController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/ReporteEquipoController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/ReporteEquipoController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/ReporteFamiliaresController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/ReporteFamiliaresController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/ReporteInstitucionalController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/ReporteInstitucionalController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/ReporteSaludController.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/ReporteSaludController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Reportes/ReporteV2Controller.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Http/Controllers/ReporteV2Controller.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Residentes/AdultoMayorAtencionController.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Controllers/AdultoMayorAtencionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Residentes/AdultoMayorController.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Http/Controllers/AdultoMayorController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Residentes/AdultoMayorFamiliarController.php",
+    "destino": "app/Modulos/Social/Presentacion/Http/Controllers/AdultoMayorFamiliarController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Residentes/AdultoMayorObservacionController.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Controllers/AdultoMayorObservacionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Residentes/RelacionResidenteController.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Http/Controllers/RelacionResidenteController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Residentes/ResidenteController.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Http/Controllers/ResidenteController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Residentes/ResumenFamiliaSocialController.php",
+    "destino": "app/Modulos/Social/Presentacion/Http/Controllers/ResumenFamiliaSocialController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Valoraciones/AdultoMayorEvaluacionController.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Http/Controllers/AdultoMayorEvaluacionController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Valoraciones/AdultoMayorValoracionFuncionalController.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Http/Controllers/AdultoMayorValoracionFuncionalController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Valoraciones/ValoracionProfesionalController.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Http/Controllers/ValoracionProfesionalController.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Clinica/StoreCambioEstadoRequest.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Requests/StoreCambioEstadoRequest.php",
+    "estado": "Retirado tras auditoria",
+    "detalle": "FormRequest sin consumidores, bindings ni descubrimiento automático; validación activa en entradas/casos actuales. Véase AUDITORIA_LIMPIEZA_2026_10_10.md."
+  },
+  {
+    "origen": "app/Http/Requests/Clinica/StoreFichaMedicaRequest.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Requests/StoreFichaMedicaRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Clinica/StoreSignosVitalesRequest.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Requests/StoreSignosVitalesRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Clinica/UpdateFichaMedicaRequest.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Requests/UpdateFichaMedicaRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Documentos/StoreDocumentoAdultoRequest.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Http/Requests/StoreDocumentoAdultoRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Identidad/StoreUsuarioRequest.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Http/Requests/StoreUsuarioRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Identidad/UpdateUsuarioRequest.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Http/Requests/UpdateUsuarioRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Medicacion/StoreAdministracionMedicacionRequest.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Http/Requests/StoreAdministracionMedicacionRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Medicacion/StoreMedicacionRequest.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Http/Requests/StoreMedicacionRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Medicacion/UpdateMedicacionRequest.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Http/Requests/UpdateMedicacionRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Residentes/StoreActividadAdultoRequest.php",
+    "destino": "app/Modulos/Social/Presentacion/Http/Requests/StoreActividadAdultoRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Residentes/StoreAtencionAdultoRequest.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Requests/StoreAtencionAdultoRequest.php",
+    "estado": "Retirado tras auditoria",
+    "detalle": "FormRequest sin consumidores, bindings ni descubrimiento automático; validación activa en entradas/casos actuales. Véase AUDITORIA_LIMPIEZA_2026_10_10.md."
+  },
+  {
+    "origen": "app/Http/Requests/Residentes/StoreFamiliarAdultoRequest.php",
+    "destino": "app/Modulos/Social/Presentacion/Http/Requests/StoreFamiliarAdultoRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Residentes/StoreObservacionAdultoRequest.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Http/Requests/StoreObservacionAdultoRequest.php",
+    "estado": "Retirado tras auditoria",
+    "detalle": "FormRequest sin consumidores, bindings ni descubrimiento automático; validación activa en entradas/casos actuales. Véase AUDITORIA_LIMPIEZA_2026_10_10.md."
+  },
+  {
+    "origen": "app/Http/Requests/Residentes/UpdateAdultoMayorRequest.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Http/Requests/UpdateAdultoMayorRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Requests/Valoraciones/StoreValoracionFuncionalRequest.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Http/Requests/StoreValoracionFuncionalRequest.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Policies/AdministracionMedicacionPolicy.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Policies/AdministracionMedicacionPolicy.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Policies/CamaPolicy.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Policies/CamaPolicy.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Policies/EvaluacionExpertaPolicy.php",
+    "destino": "app/Modulos/ApoyoDecision/Presentacion/Policies/EvaluacionExpertaPolicy.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Policies/HabitacionPolicy.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Policies/HabitacionPolicy.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Policies/PrescripcionPolicy.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Policies/PrescripcionPolicy.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Policies/ResidentePolicy.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Policies/ResidentePolicy.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Policies/ValoracionEnfermeriaPreadmisionPolicy.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Policies/ValoracionEnfermeriaPreadmisionPolicy.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Policies/VersionModeloExpertoPolicy.php",
+    "destino": "app/Modulos/ApoyoDecision/Presentacion/Policies/VersionModeloExpertoPolicy.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Actividades/ActividadesPanel.php",
+    "destino": "app/Modulos/Social/Presentacion/Livewire/Paginas/ActividadesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Actividades/AsistenciaPanel.php",
+    "destino": "app/Modulos/Social/Presentacion/Livewire/Paginas/AsistenciaPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Actividades/ParticipacionPanel.php",
+    "destino": "app/Modulos/Social/Presentacion/Livewire/Paginas/ParticipacionPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Actividades/ReportesActividadesPanel.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Livewire/Paginas/ReportesActividadesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Actividades/TiposActividadPanel.php",
+    "destino": "app/Modulos/Social/Presentacion/Livewire/Paginas/TiposActividadPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/PersonalInstitucionalForm.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Livewire/Funcionalidades/PersonalInstitucionalForm.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/PersonalInstitucionalHorarios.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Livewire/Funcionalidades/PersonalInstitucionalHorarios.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/PersonalInstitucionalPanel.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Livewire/Paginas/PersonalInstitucionalPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/TurnosAsignacionesPanel.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Livewire/Paginas/TurnosAsignacionesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/UsuarioFichaPanel.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Livewire/Paginas/UsuarioFichaPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/UsuariosPanel.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Livewire/Paginas/UsuariosPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Admisiones/AlojamientoResidente.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Livewire/Paginas/AlojamientoResidente.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Admisiones/DecisionAdmisionModal.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Livewire/Funcionalidades/DecisionAdmisionModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Admisiones/HabitacionesPanel.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Livewire/Paginas/HabitacionesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Admisiones/PreadmisionesPanel.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Livewire/Paginas/PreadmisionesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Admisiones/PreadmisionWizard.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Livewire/Paginas/PreadmisionWizard.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Alertas/AlertasPanel.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Livewire/Paginas/AlertasPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Alertas/AlertasPendientesPanel.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Livewire/Paginas/AlertasPendientesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Alertas/CampanaNotificaciones.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Livewire/Funcionalidades/CampanaNotificaciones.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Alertas/PanelAlertas.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Livewire/Paginas/PanelAlertas.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Alertas/SaludAlertasPanel.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Livewire/Paginas/SaludAlertasPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/FichaPaciente.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Paginas/FichaPaciente.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/RegistroSignosVitalesModal.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Funcionalidades/RegistroSignosVitalesModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/SaludFichaPanel.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Paginas/SaludFichaPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/SaludResumenPanel.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Paginas/SaludResumenPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/SaludSeguimientoListPanel.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Paginas/SaludSeguimientoListPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/SaludSignosPanel.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Paginas/SaludSignosPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/SignosVitalesPanel.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Paginas/SignosVitalesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Reportes/ReportesAdultoPanel.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Livewire/Paginas/ReportesAdultoPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Reportes/SaludReportesPanel.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Livewire/Paginas/SaludReportesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Residentes/AdultoMayorFormModal.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Livewire/Funcionalidades/AdultoMayorFormModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Residentes/AdultosMayoresPanel.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Livewire/Paginas/AdultosMayoresPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Residentes/ExpedientePanel.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Livewire/Paginas/ExpedientePanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Residentes/RedApoyoPanel.php",
+    "destino": "app/Modulos/Social/Presentacion/Livewire/Paginas/RedApoyoPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Valoraciones/EvaluacionesAreaPanel.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Paginas/EvaluacionesAreaPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Valoraciones/EvaluacionGeriatricaAreaModal.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Funcionalidades/EvaluacionGeriatricaAreaModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Valoraciones/EvaluacionGeriatricaModal.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Funcionalidades/EvaluacionGeriatricaModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Valoraciones/SaludEvaluacionesGeriatricasPanel.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Paginas/SaludEvaluacionesGeriatricasPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Valoraciones/SaludValoracionPanel.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Paginas/SaludValoracionPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Valoraciones/ValoracionBarthelModal.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Funcionalidades/ValoracionBarthelModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Valoraciones/ValoracionInicialModal.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Funcionalidades/ValoracionInicialModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/AgendaEnfermeria.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Livewire/Paginas/AgendaEnfermeria.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/AsignacionTurnoPanel.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Livewire/Paginas/AsignacionTurnoPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/DashboardTurno.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Livewire/Paginas/DashboardTurno.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/IncidentesPanel.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Livewire/Paginas/IncidentesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/MisPacientes.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Livewire/Paginas/MisPacientes.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/PaseTurnoPanel.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Livewire/Paginas/PaseTurnoPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/PlanCuidadoPanel.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Livewire/Paginas/PlanCuidadoPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/RegistrosEnfermeria.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Livewire/Paginas/RegistrosEnfermeria.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/ReporteEnfermeria.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Livewire/Paginas/ReporteEnfermeria.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/SeguimientoDiarioPanel.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Livewire/Paginas/SeguimientoDiarioPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/TareasPlanPanel.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Livewire/Paginas/TareasPlanPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/TurnosEnfermeriaPanel.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Livewire/Paginas/TurnosEnfermeriaPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Medicacion/AdministracionMedicacionModal.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Livewire/Funcionalidades/AdministracionMedicacionModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Medicacion/SaludAdministracionMedicacionPanel.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Livewire/Paginas/SaludAdministracionMedicacionPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Valoraciones/ValoracionEnfermeriaPanel.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Paginas/ValoracionEnfermeriaPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Features/Alertas/HistorialAlerta.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Livewire/Funcionalidades/HistorialAlerta.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Clinica/DashboardMedico.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Paginas/DashboardMedico.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Clinica/NotaEvolucionMedicaModal.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Funcionalidades/NotaEvolucionMedicaModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Clinica/ObjetivosSignosVitalesPanel.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Paginas/ObjetivosSignosVitalesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Clinica/PacientesSeguimientoPanel.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Livewire/Paginas/PacientesSeguimientoPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Clinica/ResultadosExpertoResidente.php",
+    "destino": "app/Modulos/ApoyoDecision/Presentacion/Livewire/Paginas/ResultadosExpertoResidente.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Medicacion/MedicacionAdultoModal.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Livewire/Funcionalidades/MedicacionAdultoModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Medicacion/SaludMedicacionPanel.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Livewire/Paginas/SaludMedicacionPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Valoraciones/ValoracionMedicaModal.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Funcionalidades/ValoracionMedicaModal.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Valoraciones/ValoracionMedicaPanel.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Paginas/ValoracionMedicaPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Psicologia/DashboardPsicologo.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Livewire/Paginas/DashboardPsicologo.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Superadministrador/Identidad/AreasInstitucionalesPanel.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Livewire/Paginas/AreasInstitucionalesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Superadministrador/Identidad/RolesPermisosPanel.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Livewire/Paginas/RolesPermisosPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Superadministrador/Reportes/ReportesInstitucionalesPanel.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Livewire/Paginas/ReportesInstitucionalesPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Frontend/Livewire/Superadministrador/SistemaExperto/ConocimientoPanel.php",
+    "destino": "app/Modulos/ApoyoDecision/Presentacion/Livewire/Paginas/ConocimientoPanel.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Acciones/CargarConocimientoOrion.php",
+    "destino": "app/Modulos/ApoyoDecision/Aplicacion/Acciones/CargarConocimientoOrion.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Acciones/CargarPaqueteInvestigadoCOGMEM.php",
+    "destino": "app/Modulos/ApoyoDecision/Aplicacion/Acciones/CargarPaqueteInvestigadoCOGMEM.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Acciones/PersistirEvaluacionTecnica.php",
+    "destino": "app/Modulos/ApoyoDecision/Aplicacion/Acciones/PersistirEvaluacionTecnica.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Adaptadores/AdaptadorFuentesCOGMEM.php",
+    "destino": "app/Modulos/ApoyoDecision/Infraestructura/Adaptadores/AdaptadorFuentesCOGMEM.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Adaptadores/InspectorComponenteInstrumental.php",
+    "destino": "motor-experto/src/motor_experto/adaptadores/entrada/InspectorComponenteInstrumental.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Conocimiento/BuilderExperto.php",
+    "destino": "app/Modulos/ApoyoDecision/Infraestructura/Persistencia/Eloquent/BuilderExperto.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Conocimiento/CargadorConocimiento.php",
+    "destino": "app/Modulos/ApoyoDecision/Infraestructura/Persistencia/Eloquent/CargadorConocimiento.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Conocimiento/EjemploTecnicoCOGMEM.php",
+    "destino": "motor-experto/src/motor_experto/adaptadores/entrada/EjemploTecnicoCOGMEM.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Conocimiento/InventarioExperto.php",
+    "destino": "app/Modulos/ApoyoDecision/Infraestructura/Persistencia/InventarioExperto.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Conocimiento/MapeadorSemantico.php",
+    "destino": "motor-experto/src/motor_experto/dominio/conocimiento/MapeadorSemantico.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Conocimiento/PaqueteConocimiento.php",
+    "destino": "motor-experto/src/motor_experto/dominio/conocimiento/PaqueteConocimiento.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Conocimiento/PaqueteInvestigadoCOGMEM.php",
+    "destino": "motor-experto/src/motor_experto/dominio/conocimiento/versiones/PaqueteInvestigadoCOGMEM.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Conocimiento/PaquetesCandidatosCognitivos.php",
+    "destino": "motor-experto/src/motor_experto/dominio/conocimiento/versiones/PaquetesCandidatosCognitivos.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Conocimiento/RedSemantica.php",
+    "destino": "motor-experto/src/motor_experto/dominio/conocimiento/red_semantica/RedSemantica.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Conocimiento/ValidadorPaqueteConocimiento.php",
+    "destino": "motor-experto/src/motor_experto/dominio/conocimiento/ValidadorPaqueteConocimiento.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/DTO/ContextoEjecucion.php",
+    "destino": "motor-experto/src/motor_experto/dominio/objetos_valor/ContextoEjecucion.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/DTO/EvidenciaExperta.php",
+    "destino": "motor-experto/src/motor_experto/dominio/objetos_valor/EvidenciaExperta.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/DTO/FuenteBrutaCOGMEM.php",
+    "destino": "motor-experto/src/motor_experto/dominio/objetos_valor/FuenteBrutaCOGMEM.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Evaluadores/EvaluadorAdmisibilidad.php",
+    "destino": "motor-experto/src/motor_experto/dominio/inferencia/EvaluadorAdmisibilidad.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Evaluadores/EvaluadorContextoCOGMEM.php",
+    "destino": "motor-experto/src/motor_experto/dominio/inferencia/EvaluadorContextoCOGMEM.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Evaluadores/EvaluadorEvaluabilidadCOGMEM.php",
+    "destino": "motor-experto/src/motor_experto/dominio/inferencia/EvaluadorEvaluabilidadCOGMEM.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Inferencia/EvaluadorReglas.php",
+    "destino": "motor-experto/src/motor_experto/dominio/conocimiento/reglas/EvaluadorReglas.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/MemoriaTrabajo/MemoriaTrabajo.php",
+    "destino": "motor-experto/src/motor_experto/dominio/inferencia/MemoriaTrabajo.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Presentacion/LenguajeResultadosExperto.php",
+    "destino": "app/Modulos/ApoyoDecision/Aplicacion/DTOs/LenguajeResultadosExperto.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Resolucion/ResolvedorSoportesCOGMEM.php",
+    "destino": "motor-experto/src/motor_experto/dominio/inferencia/ResolvedorSoportesCOGMEM.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Servicios/DemostracionCOGMEM.php",
+    "destino": "motor-experto/src/motor_experto/aplicacion/casos_uso/DemostracionCOGMEM.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Servicios/LecturaFuenteEvidencia.php",
+    "destino": "app/Modulos/ApoyoDecision/Aplicacion/Consultas/LecturaFuenteEvidencia.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Servicios/LecturaResultadosExperto.php",
+    "destino": "app/Modulos/ApoyoDecision/Aplicacion/Consultas/LecturaResultadosExperto.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Servicios/LecturaTecnicaPruebas.php",
+    "destino": "app/Modulos/ApoyoDecision/Infraestructura/Persistencia/LecturaTecnicaPruebas.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Servicios/MotorExperto.php",
+    "destino": "motor-experto/src/motor_experto/aplicacion/casos_uso/MotorExperto.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Servicios/PreparacionFuentesCOGMEM.php",
+    "destino": "app/Modulos/ApoyoDecision/Aplicacion/Consultas/PreparacionFuentesCOGMEM.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Trazabilidad/ConstructorTraza.php",
+    "destino": "motor-experto/src/motor_experto/dominio/explicacion/ConstructorTraza.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/AdultoIndividualExport.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/AdultoIndividualExport.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/AreasInstitucionalesExport.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/AreasInstitucionalesExport.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/ReporteActividadesExport.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/ReporteActividadesExport.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/ReporteAdultosExport.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/ReporteAdultosExport.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/ReporteEquipoExport.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/ReporteEquipoExport.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/ReporteFamiliaresExport.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/ReporteFamiliaresExport.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/ReporteInstitucionalExport.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/ReporteInstitucionalExport.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/ReporteSaludExport.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/ReporteSaludExport.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/Sheets/Actividades/ActividadesListaSheet.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/Sheets/Actividades/ActividadesListaSheet.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/Sheets/Actividades/ActividadesResumenSheet.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/Sheets/Actividades/ActividadesResumenSheet.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/Sheets/Adultos/AdultosListaSheet.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/Sheets/Adultos/AdultosListaSheet.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/Sheets/Adultos/AdultosResumenSheet.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/Sheets/Adultos/AdultosResumenSheet.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/Sheets/BitacoraSheet.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/Sheets/BitacoraSheet.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/Sheets/Equipo/EquipoPersonalAdminSheet.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/Sheets/Equipo/EquipoPersonalAdminSheet.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/Sheets/Equipo/EquipoPersonalSaludSheet.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/Sheets/Equipo/EquipoPersonalSaludSheet.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/Sheets/Equipo/EquipoResumenSheet.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/Sheets/Equipo/EquipoResumenSheet.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/Sheets/EquipoSheet.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/Sheets/EquipoSheet.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/Sheets/Familiares/FamiliaresResumenSheet.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/Sheets/Familiares/FamiliaresResumenSheet.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/Sheets/Familiares/FamiliaresVinculosSheet.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/Sheets/Familiares/FamiliaresVinculosSheet.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/Sheets/FamiliaresSheet.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/Sheets/FamiliaresSheet.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/Sheets/ResumenGeneralSheet.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/Sheets/ResumenGeneralSheet.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/Sheets/Salud/SaludFichasSheet.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/Sheets/Salud/SaludFichasSheet.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/Sheets/Salud/SaludMedicacionSheet.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/Sheets/Salud/SaludMedicacionSheet.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/Sheets/Salud/SaludResumenSheet.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/Sheets/Salud/SaludResumenSheet.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/Sheets/Salud/SaludValoracionesSheet.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/Sheets/Salud/SaludValoracionesSheet.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/Reportes/Sheets/SaludSheet.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/Reportes/Sheets/SaludSheet.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/UsuarioExpedienteExport.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/UsuarioExpedienteExport.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/UsuariosExport.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/UsuariosExport.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Exports/UsuariosPorAreaExport.php",
+    "destino": "app/Modulos/Reportes/Infraestructura/Exportaciones/UsuariosPorAreaExport.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Jobs/EnviarFichaUsuarioJob.php",
+    "destino": "app/Modulos/Identidad/Infraestructura/Jobs/EnviarFichaUsuarioJob.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/actividades/actividades-panel.blade.php",
+    "destino": "app/Modulos/Social/Presentacion/Vistas/livewire/actividades/actividades-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/actividades/asistencia-panel.blade.php",
+    "destino": "app/Modulos/Social/Presentacion/Vistas/livewire/actividades/asistencia-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/actividades/participacion-panel.blade.php",
+    "destino": "app/Modulos/Social/Presentacion/Vistas/livewire/actividades/participacion-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/actividades/reportes-actividades-panel.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/livewire/actividades/reportes-actividades-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/actividades/tipos-actividad-panel.blade.php",
+    "destino": "app/Modulos/Social/Presentacion/Vistas/livewire/actividades/tipos-actividad-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/admisiones/alojamiento-residente.blade.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Vistas/livewire/admisiones/alojamiento-residente.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/admisiones/decision-admision-modal.blade.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Vistas/livewire/admisiones/decision-admision-modal.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/admisiones/habitaciones-panel.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/livewire/admisiones/habitaciones-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/admisiones/partials/preadmisiones-listado.blade.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Vistas/livewire/admisiones/partials/preadmisiones-listado.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/admisiones/partials/preadmisiones-timeline.blade.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Vistas/livewire/admisiones/partials/preadmisiones-timeline.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/admisiones/partials/preadmisiones-workspace.blade.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Vistas/livewire/admisiones/partials/preadmisiones-workspace.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/admisiones/preadmision-wizard.blade.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Vistas/livewire/admisiones/preadmision-wizard.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/admisiones/preadmisiones-panel.blade.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Vistas/livewire/admisiones/preadmisiones-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/alertas-panel.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/alertas-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/alertas-pendientes-panel.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/alertas-pendientes-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/campana-notificaciones.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/campana-notificaciones.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/modales/atender.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/atender.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/modales/cerrar.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/cerrar.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/modales/crear.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/crear.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/modales/detalle.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/detalle.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/modales/drawer-graficos.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/drawer-graficos.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/modales/drawer-ubicacion.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/drawer-ubicacion.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/modales/resultado-cierre.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/resultado-cierre.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/panel-alertas.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/panel-alertas.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/alertas/salud-alertas-panel.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/salud-alertas-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/dashboard-medico.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/dashboard-medico.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/nota-evolucion-medica-modal.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/nota-evolucion-medica-modal.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/objetivos-signos-vitales-panel.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/objetivos-signos-vitales-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/pacientes-seguimiento-panel.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/pacientes-seguimiento-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/registro-signos-vitales-modal.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/registro-signos-vitales-modal.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/salud-ficha-general.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/salud-ficha-general.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/salud-ficha-panel.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/salud-ficha-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/salud-resumen-panel.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/salud-resumen-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/salud-seguimiento-list-panel.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/salud-seguimiento-list-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/salud-signos-panel.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/salud-signos-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/clinica/signos-vitales-panel.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/signos-vitales-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/agenda-enfermeria.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/agenda-enfermeria.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/asignacion-turno-panel.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/livewire/cuidados/asignacion-turno-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/dashboard-turno.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/dashboard-turno.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/cabecera.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/cabecera.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/modales.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/modales.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/tab-alertas.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-alertas.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/tab-cuidados.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-cuidados.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/tab-documentos.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-documentos.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/tab-estudios.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-estudios.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/tab-eventos.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-eventos.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/tab-historial.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-historial.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/tab-medicacion.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-medicacion.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/tab-resumen.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-resumen.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/tab-seguimiento.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-seguimiento.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha/tab-signos.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-signos.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/ficha-paciente.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha-paciente.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/incidentes-panel.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/cuidados/incidentes-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/mis-residentes-directorio.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/mis-residentes-directorio.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/clinical-operation-result.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/clinical-operation-result.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/heridas-curaciones.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/heridas-curaciones.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/hidratacion-clinica.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/hidratacion-clinica.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-dolor-grafica.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-dolor-grafica.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-dolor.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-dolor.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-eliminacion-historial.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-eliminacion-historial.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-eliminacion.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-eliminacion.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-hidratacion-grafica.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-hidratacion-grafica.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-hidratacion.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-hidratacion.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-ingesta-grafica.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-ingesta-grafica.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-ingesta.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-ingesta.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-movilidad-historial.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-movilidad-historial.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-movilidad.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-movilidad.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-registro-contenido.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-registro-contenido.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-signos-badge.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-signos-badge.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-signos-campo.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-signos-campo.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-signos-estado.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-signos-estado.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-signos-grafica.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-signos-grafica.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/mis-residentes-signos-vitales.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/mis-residentes-signos-vitales.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/nursing-resident-menu.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/nursing-resident-menu.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/quick-register-selector.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/quick-register-selector.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/resident-summary.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/resident-summary.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/partials/sueno-consulta.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/sueno-consulta.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/pase-turno-panel.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/pase-turno-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/plan-cuidado-panel.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/plan-cuidado-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/registros-enfermeria.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/registros-enfermeria.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/reporte-enfermeria.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/livewire/cuidados/reporte-enfermeria.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/seguimiento-diario-panel.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/seguimiento-diario-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/tareas-plan-panel.blade.php",
+    "destino": "app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/tareas-plan-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/cuidados/turnos-enfermeria-panel.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/livewire/cuidados/turnos-enfermeria-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/features/alertas/historial-alerta.blade.php",
+    "destino": "app/Modulos/Alertas/Presentacion/Vistas/livewire/features/alertas/historial-alerta.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/areas-institucionales-panel.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/livewire/identidad/areas-institucionales-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/personal-institucional-form.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/personal-institucional-form.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/personal-institucional-horarios.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/livewire/identidad/personal-institucional-horarios.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/personal-institucional-panel/modales/directorio.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/personal-institucional-panel/modales/directorio.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/personal-institucional-panel/modales/gestion.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/personal-institucional-panel/modales/gestion.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/personal-institucional-panel.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/personal-institucional-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/roles-permisos-panel.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/roles-permisos-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/turnos-asignaciones-panel/modales/asignar-plaza.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/livewire/identidad/turnos-asignaciones-panel/modales/asignar-plaza.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/turnos-asignaciones-panel/modales/turno.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/livewire/identidad/turnos-asignaciones-panel/modales/turno.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/turnos-asignaciones-panel.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/livewire/identidad/turnos-asignaciones-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/usuario-ficha-panel.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/usuario-ficha-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/usuarios-panel/modales/ficha-rapida.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/usuarios-panel/modales/ficha-rapida.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/usuarios-panel/modales/formulario.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/usuarios-panel/modales/formulario.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/usuarios-panel/modales/post-registro.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/usuarios-panel/modales/post-registro.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/usuarios-panel/modales/subir-documento.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/usuarios-panel/modales/subir-documento.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/usuarios-panel/modales/vista-completa.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/usuarios-panel/modales/vista-completa.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/identidad/usuarios-panel.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/usuarios-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/administracion-medicacion-modal.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/administracion-medicacion-modal.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/medicacion-adulto-modal.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/medicacion-adulto-modal.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/partials/drawer-dosis.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/drawer-dosis.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/partials/historial.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/historial.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/partials/kardex-matriz.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/kardex-matriz.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/partials/modal-administrar.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/modal-administrar.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/partials/modal-medicamento.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/modal-medicamento.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/partials/modal-omision.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/modal-omision.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/partials/omisiones.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/omisiones.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/partials/proximas-dosis.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/proximas-dosis.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/salud-administracion-medicacion.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/salud-administracion-medicacion.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/medicacion/salud-medicacion.blade.php",
+    "destino": "app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/salud-medicacion.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/medico/resultados-experto/evidencias.blade.php",
+    "destino": "app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/evidencias.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/medico/resultados-experto/fundamento.blade.php",
+    "destino": "app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/fundamento.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/medico/resultados-experto/historial.blade.php",
+    "destino": "app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/historial.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/medico/resultados-experto/simulado.blade.php",
+    "destino": "app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/simulado.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/medico/resultados-experto-residente.blade.php",
+    "destino": "app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto-residente.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/reportes/reportes-adulto-panel.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/livewire/reportes/reportes-adulto-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/reportes/reportes-institucionales-panel.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/livewire/reportes/reportes-institucionales-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/reportes/salud-reportes-panel.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/livewire/reportes/salud-reportes-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/residentes/adulto-mayor-form-modal.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/livewire/residentes/adulto-mayor-form-modal.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/residentes/adultos-mayores-panel.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/livewire/residentes/adultos-mayores-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/residentes/expediente-panel.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/livewire/residentes/expediente-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/residentes/partials/resident-list-card.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/livewire/residentes/partials/resident-list-card.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/residentes/partials/_nodo-familiar.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/livewire/residentes/partials/_nodo-familiar.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/residentes/red-apoyo-panel.blade.php",
+    "destino": "app/Modulos/Social/Presentacion/Vistas/livewire/residentes/red-apoyo-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/superadministrador/sistema-experto/conocimiento-panel.blade.php",
+    "destino": "app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/superadministrador/sistema-experto/conocimiento-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/dashboard-psicologo.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/dashboard-psicologo.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/evaluacion-geriatrica-area-modal.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/evaluacion-geriatrica-area-modal.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/evaluacion-geriatrica-modal.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/evaluacion-geriatrica-modal.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/evaluaciones-area-panel.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/evaluaciones-area-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/salud-evaluaciones-geriatricas-panel.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/salud-evaluaciones-geriatricas-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/salud-valoracion-funcional.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/salud-valoracion-funcional.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/valoracion-barthel-modal.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/valoracion-barthel-modal.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/valoracion-enfermeria-panel.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/valoracion-enfermeria-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/valoracion-inicial-modal.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/valoracion-inicial-modal.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/valoracion-medica-modal.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/valoracion-medica-modal.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/livewire/valoraciones/valoracion-medica-panel.blade.php",
+    "destino": "app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/valoracion-medica-panel.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/admisiones.blade.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Vistas/paginas/admin/administracion/admisiones.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/buscar.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/buscar.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/dashboard.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/dashboard.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/habitaciones.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/habitaciones.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/operacion.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/operacion.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/acciones-directorio.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/admin/administracion/partials/acciones-directorio.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/admision-registro.blade.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Vistas/paginas/admin/administracion/partials/admision-registro.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/calendario-operativo.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/calendario-operativo.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/cama-visual.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/cama-visual.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/campo-operativo.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/campo-operativo.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/detalle-cama.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/detalle-cama.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/detalle-operativo.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/detalle-operativo.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/ficha-fragmento.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/admin/administracion/partials/ficha-fragmento.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/filtros-operativos.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/filtros-operativos.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/graficos-por-proceso.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/graficos-por-proceso.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/guia-operativa.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/guia-operativa.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/historial-ocupacion.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/historial-ocupacion.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/identidad-directorio.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/admin/administracion/partials/identidad-directorio.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/indicador-modal.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/indicador-modal.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/panel-residente.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/admin/administracion/partials/panel-residente.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/reportes-operativos.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/admin/administracion/partials/reportes-operativos.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/tarjeta-operativa.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/tarjeta-operativa.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/partials/vista-agrupada-operativa.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/administracion/partials/vista-agrupada-operativa.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/residente.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/admin/administracion/residente.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/administracion/residentes.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/admin/administracion/residentes.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/areas-atencion/index.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/areas-atencion/index.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/admin/vistas-extra.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/admin/vistas-extra.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/atenciones/index.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/paginas/adultos-mayores/atenciones/index.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/atenciones/partials/crear.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/paginas/adultos-mayores/atenciones/partials/crear.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/atenciones/partials/registro.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/paginas/adultos-mayores/atenciones/partials/registro.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/documentos/index.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/documentos/index.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/documentos/partials/formulario.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/documentos/partials/formulario.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/edit.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/edit.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/index.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/index.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/observaciones/index.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/paginas/adultos-mayores/observaciones/index.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/observaciones/partials/crear.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/paginas/adultos-mayores/observaciones/partials/crear.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/observaciones/partials/registro.blade.php",
+    "destino": "app/Modulos/Clinica/Presentacion/Vistas/paginas/adultos-mayores/observaciones/partials/registro.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/reportes/bienestar.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/adultos-mayores/reportes/bienestar.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/reportes/general.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/adultos-mayores/reportes/general.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/reportes/institucional.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/adultos-mayores/reportes/institucional.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/reportes/pdf_especifico.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/adultos-mayores/reportes/pdf_especifico.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/reportes/pdf_evaluacion_individual.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/adultos-mayores/reportes/pdf_evaluacion_individual.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/reportes/pdf_individual.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/adultos-mayores/reportes/pdf_individual.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show/carpetas/_cognitivo.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show/carpetas/_cognitivo.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show/carpetas/_documentos.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show/carpetas/_documentos.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show/carpetas/_historial.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show/carpetas/_historial.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show/carpetas/_identificacion.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show/carpetas/_identificacion.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show/carpetas/_participacion.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show/carpetas/_participacion.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show/carpetas/_red-apoyo.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show/carpetas/_red-apoyo.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show/carpetas/_reportes.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/adultos-mayores/show/carpetas/_reportes.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show/carpetas/_salud.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show/carpetas/_salud.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show/_cabecera-expediente.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show/_cabecera-expediente.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show/_modales-existentes.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show/_modales-existentes.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/adultos-mayores/show.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/areas-institucionales/index.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/areas-institucionales/index.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/bitacora/index.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/bitacora/index.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/dashboard.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/dashboard.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/enfermeria/reportes/ficha-paciente-pdf.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/enfermeria/reportes/ficha-paciente-pdf.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/familia-social/base.blade.php",
+    "destino": "app/Modulos/Social/Presentacion/Vistas/paginas/familia-social/base.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/familia-social/resumen.blade.php",
+    "destino": "app/Modulos/Social/Presentacion/Vistas/paginas/familia-social/resumen.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/preadmisiones/index.blade.php",
+    "destino": "app/Modulos/Admisiones/Presentacion/Vistas/paginas/preadmisiones/index.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/reportes/actividades/index.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/reportes/actividades/index.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/reportes/adultos/index.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/reportes/adultos/index.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/reportes/bitacora/index.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/reportes/bitacora/index.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/reportes/equipo/index.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/reportes/equipo/index.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/reportes/familiares/index.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/reportes/familiares/index.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/reportes/institucional/general.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/reportes/institucional/general.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/reportes/partials/grafica-barras-pdf.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/reportes/partials/grafica-barras-pdf.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/reportes/salud/index.blade.php",
+    "destino": "app/Modulos/Reportes/Presentacion/Vistas/paginas/reportes/salud/index.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/residentes/index.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/residentes/index.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/residentes/show.blade.php",
+    "destino": "app/Modulos/Residentes/Presentacion/Vistas/paginas/residentes/show.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/roles-permisos/index.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/roles-permisos/index.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/turnos-asignaciones/index.blade.php",
+    "destino": "app/Modulos/Institucion/Presentacion/Vistas/paginas/turnos-asignaciones/index.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/create.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/create.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/autorizacion-administrativa.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/autorizacion-administrativa.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/autorizacion-comunicacion.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/autorizacion-comunicacion.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/carta-bienvenida.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/carta-bienvenida.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/checklist-institucional.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/checklist-institucional.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/checklist-requeridos.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/checklist-requeridos.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/confidencialidad-clinica.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/confidencialidad-clinica.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/confidencialidad.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/confidencialidad.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/constancia-familiar.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/constancia-familiar.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/constancia-registro.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/constancia-registro.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/protocolo-documental.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/protocolo-documental.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/protocolo-emergencias.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/protocolo-emergencias.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/protocolo-registro-clinico.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/protocolo-registro-clinico.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/reglamento-visitas.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/reglamento-visitas.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/responsabilidad-administrativa.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/responsabilidad-administrativa.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/responsabilidad-clinica.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/responsabilidad-clinica.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/responsabilidad-documental.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/responsabilidad-documental.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/trato-digno.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/trato-digno.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/individuales/uso-responsable.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/uso-responsable.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/layout.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/layout.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/paquete-documental.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/paquete-documental.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/paquete_documental.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/paquete_documental.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/partials/acuerdo_corresponsabilidad.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/partials/acuerdo_corresponsabilidad.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/partials/caratula.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/partials/caratula.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/partials/checklist_recepcion.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/partials/checklist_recepcion.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/partials/compromiso_confidencialidad.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/partials/compromiso_confidencialidad.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/partials/datos-usuario.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/partials/datos-usuario.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/partials/datos_personales.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/partials/datos_personales.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/partials/encabezado-documento.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/partials/encabezado-documento.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/partials/firmas.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/partials/firmas.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/partials/pie-documento.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/partials/pie-documento.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/documentos/partials/reglamento_interno.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/partials/reglamento_interno.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/edit.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/edit.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/index.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/index.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "resources/views/pages/usuarios/show.blade.php",
+    "destino": "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/show.blade.php",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Backend/Modulos/SistemaExperto/Conocimiento/datos/orion-v1-conceptos.json",
+    "destino": "app/Modulos/ApoyoDecision/Infraestructura/Persistencia/datos/orion-v1-conceptos.json",
+    "estado": "Migrado"
+  },
+  {
+    "origen": "app/Http/Controllers/Admisiones/PreadmisionController.php",
+    "destino": "app/Modulos/Admisiones/Aplicacion/Acciones/GestionarPreadmisionesHttp.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "store",
+      "revisar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Admisiones/DecisionAdmisionModal.php",
+    "destino": "app/Modulos/Admisiones/Aplicacion/Acciones/RegistrarDecisionAdmision.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "ejecutar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Admisiones/PreadmisionWizard.php",
+    "destino": "app/Modulos/Admisiones/Aplicacion/Acciones/RegistrarSolicitudPreadmision.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "ejecutar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Admisiones/PreadmisionesPanel.php",
+    "destino": "app/Modulos/Admisiones/Aplicacion/Acciones/RevisarSolicitudPreadmision.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "aprobar",
+      "rechazar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Alertas/CampanaNotificaciones.php",
+    "destino": "app/Modulos/Alertas/Aplicacion/Acciones/GestionarAtencionAlerta.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "atenderAlerta",
+      "cerrarAlerta"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/RegistrosEnfermeria.php",
+    "destino": "app/Modulos/Alertas/Aplicacion/Acciones/GestionarIncidentesEnfermeria.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardarIncidente",
+      "seguimientoIncidente",
+      "cerrarIncidente"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/IncidentesPanel.php",
+    "destino": "app/Modulos/Alertas/Aplicacion/Acciones/GestionarIncidentesPanel.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "registrarIncidente",
+      "actualizarEstado",
+      "solicitarValoracionMedica",
+      "crearDerivacion"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/FichaPaciente.php",
+    "destino": "app/Modulos/Alertas/Aplicacion/Acciones/RegistrarIncidenteEnFicha.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardarNuevoEvento"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Alertas/SaludAlertasPanel.php",
+    "destino": "app/Modulos/Alertas/Aplicacion/Consultas/AlertasOrientativasSalud.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "consultar"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Clinica/AdultoMayorSignosVitalesController.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/AnularSignosVitales.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "anular"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Residentes/AdultoMayorAtencionController.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/GestionarAtenciones.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "store",
+      "update",
+      "destroy",
+      "restore"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/RegistrosEnfermeria.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/GestionarDispositivosClinicos.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardarDispositivo",
+      "retirarDispositivo"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/SaludSignosPanel.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/GestionarEstadoSignosPanel.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "confirmarAnular",
+      "restaurarRegistro",
+      "anularConMotivo"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Clinica/EstudioClinicoController.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/GestionarEstudiosClinicos.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "solicitar",
+      "resultados",
+      "informar",
+      "documento",
+      "derivar"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Residentes/AdultoMayorObservacionController.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/GestionarNotasClinicas.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "store",
+      "update",
+      "destroy",
+      "restore"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Clinica/AdultoMayorFichaMedicaController.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/RegistrarEventoFichaMedica.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "archivar",
+      "restore"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Clinica/ExpedienteClinicoController.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/RegistrarExpedienteClinico.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "crearAtencion",
+      "registrar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Clinica/NotaEvolucionMedicaModal.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Acciones/RegistrarNotaEvolucionMedica.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "ejecutar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/SaludSignosPanel.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Consultas/AnalisisSignosPanel.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "detectarAlertas",
+      "construirMetricas",
+      "construirResumenPeriodo",
+      "construirInterpretacion",
+      "analizarRegistro",
+      "formatearFechaHora"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/FichaPaciente.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Consultas/ResumenLongitudinalResidente.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "consultar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/SaludResumenPanel.php",
+    "destino": "app/Modulos/Clinica/Aplicacion/Consultas/ResumenSeguimientoResidente.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "consultar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/SaludSignosPanel.php ; app/Frontend/Livewire/Compartido/Clinica/SignosVitalesPanel.php",
+    "destino": "app/Modulos/Clinica/Dominio/Reglas/ClasificacionSignosPanel.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "distribucionPresionSistolica",
+      "clasificarPresion",
+      "clasificarNumero",
+      "agregarEvaluacion",
+      "agregarAlerta"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/FichaPaciente.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Acciones/GestionarCuidadosEnFicha.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "completarTarea",
+      "guardarAccionTarea",
+      "guardarSeguimiento",
+      "registrarCuidadoDirecto"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Cuidados/CuidadoController.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Acciones/GestionarCuidadosHttp.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "registrar",
+      "crearPlan",
+      "crearIntervencion",
+      "programar",
+      "curarHerida",
+      "registrarPase",
+      "ejecutar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/AgendaEnfermeria.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Acciones/GestionarEjecucionesAgenda.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "recibirTurno",
+      "registrarEjecucion"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/PlanCuidadoPanel.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Acciones/GestionarPlanesCuidado.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardar",
+      "cerrarPlan"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/DashboardTurno.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Acciones/GestionarRegistrosDashboardTurno.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "completarTarea",
+      "confirmarOmisionTarea",
+      "guardarSeguimiento",
+      "asegurarModoOperativo"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/TareasPlanPanel.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Acciones/GestionarTareasPlan.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardarTarea",
+      "guardarResultado"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/RegistrosEnfermeria.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Acciones/RegistrarCuidadosDeTurno.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardarSeguimientoLesion",
+      "cerrarLesion",
+      "rectificarCuidado",
+      "guardarCuidado"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/MisPacientes.php",
+    "destino": "app/Modulos/Cuidados/Aplicacion/Acciones/RegistrarSeguimientoDiario.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardarSeguimiento"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Superadministrador/Identidad/RolesPermisosPanel.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/ActualizarPermisosRol.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/PersonalInstitucionalPanel.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/CambiarEstadoPersonal.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "ejecutar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/UsuarioFichaPanel.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/GestionarSeguridadCuenta.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "restablecerPassword",
+      "toggleAcceso"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Identidad/UsuarioController.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/GestionarUsuariosHttp.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "store",
+      "update",
+      "desactivar",
+      "activar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/UsuariosPanel.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/GestionarUsuariosPanel.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardarUsuario",
+      "toggleEstado",
+      "restablecerPasswordUsuario"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/PersonalInstitucionalForm.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/GuardarPersonalInstitucional.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardar"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Identidad/InstitucionalController.php",
+    "destino": "app/Modulos/Identidad/Aplicacion/Acciones/RegistrarCuentaInstitucionalHttp.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardarUsuario"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/PersonalInstitucionalForm.php",
+    "destino": "app/Modulos/Identidad/Infraestructura/Documentos/GenerarDocumentoInstitucional.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "ejecutar"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Documentos/DocumentosUsuarioController.php",
+    "destino": "app/Modulos/Identidad/Infraestructura/Notificaciones/EnviarPaqueteDocumental.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "ejecutar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/UsuariosPanel.php",
+    "destino": "app/Modulos/Identidad/Infraestructura/Notificaciones/EnviarRequisitosDocumentales.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "ejecutar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/UsuariosPanel.php",
+    "destino": "app/Modulos/Identidad/Infraestructura/Notificaciones/NotificarUsuarioGuardado.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "ejecutar"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Identidad/InstitucionalController.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Acciones/AsignarResidenteJornadaHttp.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "asignarJornada"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Superadministrador/Identidad/AreasInstitucionalesPanel.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Acciones/GestionarAreasInstitucionales.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardarArea",
+      "toggleEstado"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/AsignacionTurnoPanel.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Acciones/GestionarAsignacionesJornada.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardar",
+      "finalizarAsignacion"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/PersonalInstitucionalHorarios.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Acciones/GestionarHorariosPersonal.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardar",
+      "confirmarFinalizar",
+      "actualizarGrupo"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Admisiones/InfraestructuraController.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Acciones/GestionarInfraestructuraResidencialHttp.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "habitacion",
+      "cama"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Identidad/InstitucionalController.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Acciones/GestionarInstitucionHttp.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardarPersonal",
+      "guardarArea",
+      "guardarTurno",
+      "abrirJornada",
+      "asignarPersonal"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/TurnosAsignacionesPanel.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Acciones/GestionarPlazasEnfermeria.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardarAsignacionPlaza",
+      "desvincularPlaza"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/TurnosEnfermeriaPanel.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Acciones/GestionarTurnosInstitucionales.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Identidad/TurnosAsignacionesPanel.php",
+    "destino": "app/Modulos/Institucion/Aplicacion/Consultas/EnfermerosParaAsignacion.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "obtener"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Medicacion/MedicacionController.php ; app/Frontend/Livewire/Medico/Medicacion/SaludMedicacionPanel.php ; app/Frontend/Livewire/Medico/Medicacion/MedicacionAdultoModal.php",
+    "destino": "app/Modulos/Medicacion/Aplicacion/Acciones/GestionarPrescripciones.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardarDesdePanel",
+      "guardarDesdeModal",
+      "suspenderMedicamento",
+      "finalizarMedicamento",
+      "cambiarEstadoModal",
+      "prescribir",
+      "suspender"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Medicacion/AdultoMayorMedicacionController.php",
+    "destino": "app/Modulos/Medicacion/Aplicacion/Acciones/GestionarPrescripcionFichaHttp.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "store",
+      "update",
+      "suspender",
+      "finalizar",
+      "archivar",
+      "restore"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Medicacion/AdultoMayorAdministracionMedicacionController.php",
+    "destino": "app/Modulos/Medicacion/Aplicacion/Acciones/RegistrarAdministracionFichaHttp.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "ejecutar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Residentes/AdultoMayorFormModal.php",
+    "destino": "app/Modulos/Residentes/Aplicacion/Acciones/ActualizarExpedienteResidente.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "ejecutar"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Residentes/AdultoMayorController.php",
+    "destino": "app/Modulos/Residentes/Aplicacion/Acciones/CambiarEstadoResidenteHttp.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "cambiarEstado"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Documentos/AdultoMayorDocumentoController.php",
+    "destino": "app/Modulos/Residentes/Aplicacion/Acciones/GestionarDocumentosResidenteHttp.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "store",
+      "update",
+      "destroy",
+      "restore"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Clinica/FichaPaciente.php",
+    "destino": "app/Modulos/Residentes/Aplicacion/Acciones/IncorporarDocumentosExpediente.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardarNuevoDocumento"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Documentos/DocumentoController.php",
+    "destino": "app/Modulos/Residentes/Aplicacion/Acciones/RegistrarDocumentoHttp.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "store"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Residentes/RelacionResidenteController.php",
+    "destino": "app/Modulos/Residentes/Aplicacion/Acciones/RegistrarVisitaConsentimientoHttp.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "registrarVisita",
+      "registrarConsentimiento"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Actividades/TiposActividadPanel.php",
+    "destino": "app/Modulos/Social/Aplicacion/Acciones/ActualizarTipoActividad.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "ejecutar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Actividades/ActividadesPanel.php",
+    "destino": "app/Modulos/Social/Aplicacion/Acciones/GestionarActividades.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardarActividad",
+      "actualizarActividad",
+      "cancelarActividad"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Actividades/ActividadController.php",
+    "destino": "app/Modulos/Social/Aplicacion/Acciones/GestionarActividadesHttp.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "store",
+      "participante"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Actividades/AdultoMayorActividadController.php",
+    "destino": "app/Modulos/Social/Aplicacion/Acciones/GestionarActividadResidenteHttp.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "store",
+      "update",
+      "destroy",
+      "restore"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Actividades/ParticipacionPanel.php",
+    "destino": "app/Modulos/Social/Aplicacion/Acciones/GestionarParticipacion.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardarActividad",
+      "actualizarActividad",
+      "cancelarActividad"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Residentes/RedApoyoPanel.php",
+    "destino": "app/Modulos/Social/Aplicacion/Acciones/GestionarRedApoyo.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardarVinculo",
+      "marcarResponsable",
+      "marcarContactoEmergencia",
+      "desactivarVinculo",
+      "activarVinculo"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Residentes/AdultoMayorFamiliarController.php",
+    "destino": "app/Modulos/Social/Aplicacion/Acciones/GestionarVinculoFamiliarHttp.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "store",
+      "update",
+      "destroy",
+      "restore"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Administracion/Actividades/AsistenciaPanel.php",
+    "destino": "app/Modulos/Social/Aplicacion/Acciones/RegistrarResultadosActividad.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "marcarRealizada",
+      "marcarCancelada",
+      "guardarResultado"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Residentes/RelacionResidenteController.php",
+    "destino": "app/Modulos/Social/Aplicacion/Acciones/VincularContactoResidenteHttp.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "vincularContacto"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Valoraciones/AdultoMayorEvaluacionController.php",
+    "destino": "app/Modulos/Valoraciones/Aplicacion/Acciones/AnularEvaluacionGeriatricaHttp.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "anularEvaluacionGeriatrica"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Instrumentos/InstrumentoController.php",
+    "destino": "app/Modulos/Valoraciones/Aplicacion/Acciones/AplicarInstrumento.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "aplicar"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Valoraciones/AdultoMayorEvaluacionController.php",
+    "destino": "app/Modulos/Valoraciones/Aplicacion/Acciones/GestionarEvaluaciones.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "store",
+      "destroy",
+      "restore"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Valoraciones/SaludValoracionPanel.php",
+    "destino": "app/Modulos/Valoraciones/Aplicacion/Acciones/GestionarValoracionFuncional.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardar",
+      "anular",
+      "marcarVigente"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Valoraciones/AdultoMayorValoracionFuncionalController.php",
+    "destino": "app/Modulos/Valoraciones/Aplicacion/Acciones/GestionarValoracionFuncionalHttp.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "store",
+      "update"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Valoraciones/EvaluacionGeriatricaModal.php",
+    "destino": "app/Modulos/Valoraciones/Aplicacion/Acciones/RegistrarEvaluacionGeriatrica.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "ejecutar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Valoraciones/EvaluacionGeriatricaAreaModal.php",
+    "destino": "app/Modulos/Valoraciones/Aplicacion/Acciones/RegistrarEvaluacionGeriatricaArea.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "ejecutar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Valoraciones/ValoracionBarthelModal.php",
+    "destino": "app/Modulos/Valoraciones/Aplicacion/Acciones/RegistrarValoracionBarthel.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "ejecutar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Enfermeria/Cuidados/RegistrosEnfermeria.php",
+    "destino": "app/Modulos/Valoraciones/Aplicacion/Acciones/RegistrarValoracionDolor.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "guardarDolor"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Valoraciones/ValoracionInicialModal.php",
+    "destino": "app/Modulos/Valoraciones/Aplicacion/Acciones/RegistrarValoracionInicial.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "ejecutar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Valoraciones/ValoracionMedicaPanel.php",
+    "destino": "app/Modulos/Valoraciones/Aplicacion/Acciones/RegistrarValoracionMedica.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "ejecutar",
+      "puedeRegistrar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Medico/Valoraciones/ValoracionMedicaModal.php",
+    "destino": "app/Modulos/Valoraciones/Aplicacion/Acciones/RegistrarValoracionMedicaAdmision.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "ejecutar",
+      "validarContexto"
+    ]
+  },
+  {
+    "origen": "app/Http/Controllers/Valoraciones/ValoracionProfesionalController.php",
+    "destino": "app/Modulos/Valoraciones/Aplicacion/Acciones/RegistrarValoracionProfesional.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "registrar"
+    ]
+  },
+  {
+    "origen": "app/Frontend/Livewire/Compartido/Valoraciones/ValoracionBarthelModal.php",
+    "destino": "app/Modulos/Valoraciones/Dominio/Reglas/IndiceBarthel.php",
+    "estado": "Migrado",
+    "detalle": "Responsabilidad extraida; interfaz conserva delegacion y estado UI",
+    "operaciones": [
+      "total",
+      "clasificar"
+    ]
+  }
+]

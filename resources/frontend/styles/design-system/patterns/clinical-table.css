@@ -1,0 +1,41 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — PATTERNS / CLINICAL TABLE
+   Filas con severidad clínica determinada por el dominio,
+   consumiendo tokens semánticos (sin colores hardcodeados)
+   y microtextos normalizados (>= 11px).
+   ============================================================ */
+
+.rm-clinical-table .rm-table-row.is-critical {
+    background-color: var(--rm-row-danger-bg);
+}
+
+.rm-clinical-table .rm-table-row.is-warning {
+    background-color: var(--rm-row-warning-bg);
+}
+
+.rm-param-chip {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.rm-param-value {
+    font-family: var(--rm-font-mono);
+    font-size: var(--rm-font-table);
+    font-weight: var(--rm-font-weight-bold);
+    color: var(--rm-text-title);
+}
+
+.rm-param-label {
+    font-size: var(--rm-font-badge);
+    text-transform: uppercase;
+    color: var(--rm-text-muted);
+}
+
+.rm-param-diff {
+    font-size: var(--rm-font-badge);
+    font-weight: var(--rm-font-weight-bold);
+}
+.rm-param-diff.is-worse { color: var(--rm-danger); }
+.rm-param-diff.is-better { color: var(--rm-success); }
+.rm-param-diff.is-stable { color: var(--rm-text-soft); }

@@ -1,0 +1,2499 @@
+{
+  "source": {
+    "url": "https://docs.google.com/document/d/1d68S-EZTyYVKsYm-cOtaktYSNUBfDAi59FHexkEd88I",
+    "docx_sha256": "70D1B0E968FD9E77B3E9D36FD30959F180FC7CBE593FB23949482B1D85F7D8C2",
+    "sections": [
+      "4.16",
+      "4.19",
+      "4.29.1"
+    ],
+    "reviewed_at": "2026-10-08"
+  },
+  "tables": [
+    {
+      "name": "versiones_modelo_experto",
+      "model": "VersionModeloExperto",
+      "migration": "database/migrations/2026_10_08_120001_create_versiones_modelo_experto_table.php",
+      "columns": [
+        {
+          "name": "cod_version_modelo",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "codigo_version",
+          "type": "string",
+          "length": 30,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "nombre",
+          "type": "string",
+          "length": 120,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "descripcion",
+          "type": "text",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "estado",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_creacion",
+          "type": "dateTime",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_vigencia",
+          "type": "dateTime",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_retiro",
+          "type": "dateTime",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "motivo_cambio",
+          "type": "text",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "cod_version_anterior",
+          "type": "string",
+          "length": 20,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "cod_usuario_creacion",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "observacion",
+          "type": "text",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_version_anterior"
+          ],
+          "references_table": "versiones_modelo_experto",
+          "references_columns": [
+            "cod_version_modelo"
+          ]
+        },
+        {
+          "columns": [
+            "cod_usuario_creacion"
+          ],
+          "references_table": "usuarios",
+          "references_columns": [
+            "cod_usuario"
+          ]
+        }
+      ],
+      "unique": [
+        [
+          "codigo_version"
+        ]
+      ],
+      "indexes": [
+        [
+          "estado"
+        ],
+        [
+          "cod_version_anterior"
+        ],
+        [
+          "cod_usuario_creacion"
+        ]
+      ]
+    },
+    {
+      "name": "nodos_semanticos",
+      "model": "NodoSemantico",
+      "migration": "database/migrations/2026_10_08_120002_create_nodos_semanticos_table.php",
+      "columns": [
+        {
+          "name": "cod_nodo_semantico",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_version_modelo",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "codigo_semantico",
+          "type": "string",
+          "length": 50,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "nombre",
+          "type": "string",
+          "length": 160,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "tipo_nodo",
+          "type": "string",
+          "length": 40,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "definicion",
+          "type": "text",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "estado",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_creacion",
+          "type": "dateTime",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_usuario_creacion",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "observacion",
+          "type": "text",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_version_modelo"
+          ],
+          "references_table": "versiones_modelo_experto",
+          "references_columns": [
+            "cod_version_modelo"
+          ]
+        },
+        {
+          "columns": [
+            "cod_usuario_creacion"
+          ],
+          "references_table": "usuarios",
+          "references_columns": [
+            "cod_usuario"
+          ]
+        }
+      ],
+      "unique": [
+        [
+          "cod_version_modelo",
+          "codigo_semantico"
+        ],
+        [
+          "cod_nodo_semantico",
+          "cod_version_modelo"
+        ]
+      ],
+      "indexes": [
+        [
+          "tipo_nodo"
+        ],
+        [
+          "cod_usuario_creacion"
+        ]
+      ]
+    },
+    {
+      "name": "relaciones_semanticas",
+      "model": "RelacionSemantica",
+      "migration": "database/migrations/2026_10_08_120003_create_relaciones_semanticas_table.php",
+      "columns": [
+        {
+          "name": "cod_relacion_semantica",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_version_modelo",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_nodo_origen",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "tipo_relacion",
+          "type": "string",
+          "length": 50,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "modalidad_relacion",
+          "type": "string",
+          "length": 30,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "cod_nodo_destino",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "significado",
+          "type": "text",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "estado",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_creacion",
+          "type": "dateTime",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_usuario_creacion",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "observacion",
+          "type": "text",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_version_modelo"
+          ],
+          "references_table": "versiones_modelo_experto",
+          "references_columns": [
+            "cod_version_modelo"
+          ]
+        },
+        {
+          "columns": [
+            "cod_nodo_origen"
+          ],
+          "references_table": "nodos_semanticos",
+          "references_columns": [
+            "cod_nodo_semantico"
+          ]
+        },
+        {
+          "columns": [
+            "cod_nodo_destino"
+          ],
+          "references_table": "nodos_semanticos",
+          "references_columns": [
+            "cod_nodo_semantico"
+          ]
+        },
+        {
+          "columns": [
+            "cod_usuario_creacion"
+          ],
+          "references_table": "usuarios",
+          "references_columns": [
+            "cod_usuario"
+          ]
+        },
+        {
+          "columns": [
+            "cod_nodo_origen",
+            "cod_version_modelo"
+          ],
+          "references_table": "nodos_semanticos",
+          "references_columns": [
+            "cod_nodo_semantico",
+            "cod_version_modelo"
+          ]
+        },
+        {
+          "columns": [
+            "cod_nodo_destino",
+            "cod_version_modelo"
+          ],
+          "references_table": "nodos_semanticos",
+          "references_columns": [
+            "cod_nodo_semantico",
+            "cod_version_modelo"
+          ]
+        }
+      ],
+      "unique": [
+        [
+          "cod_version_modelo",
+          "cod_nodo_origen",
+          "tipo_relacion",
+          "cod_nodo_destino"
+        ]
+      ],
+      "indexes": [
+        [
+          "cod_nodo_destino"
+        ],
+        [
+          "tipo_relacion"
+        ],
+        [
+          "cod_usuario_creacion"
+        ]
+      ]
+    },
+    {
+      "name": "dominios_valores_expertos",
+      "model": "DominioValoresExperto",
+      "migration": "database/migrations/2026_10_08_120004_create_dominios_valores_expertos_table.php",
+      "columns": [
+        {
+          "name": "cod_dominio_valores",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_version_modelo",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "codigo_dominio",
+          "type": "string",
+          "length": 50,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "nombre",
+          "type": "string",
+          "length": 160,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "descripcion",
+          "type": "text",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "tipo_dominio",
+          "type": "string",
+          "length": 30,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "estado",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_creacion",
+          "type": "dateTime",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_usuario_creacion",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "observacion",
+          "type": "text",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_version_modelo"
+          ],
+          "references_table": "versiones_modelo_experto",
+          "references_columns": [
+            "cod_version_modelo"
+          ]
+        },
+        {
+          "columns": [
+            "cod_usuario_creacion"
+          ],
+          "references_table": "usuarios",
+          "references_columns": [
+            "cod_usuario"
+          ]
+        }
+      ],
+      "unique": [
+        [
+          "cod_version_modelo",
+          "codigo_dominio"
+        ],
+        [
+          "cod_dominio_valores",
+          "cod_version_modelo"
+        ]
+      ],
+      "indexes": [
+        [
+          "cod_usuario_creacion"
+        ]
+      ]
+    },
+    {
+      "name": "valores_semanticos",
+      "model": "ValorSemantico",
+      "migration": "database/migrations/2026_10_08_120005_create_valores_semanticos_table.php",
+      "columns": [
+        {
+          "name": "cod_valor_semantico",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_dominio_valores",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "codigo_valor",
+          "type": "string",
+          "length": 60,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "nombre",
+          "type": "string",
+          "length": 160,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "definicion_semantica",
+          "type": "text",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "estado_aprobacion",
+          "type": "string",
+          "length": 40,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "estado",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_creacion",
+          "type": "dateTime",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_usuario_creacion",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "observacion",
+          "type": "text",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_dominio_valores"
+          ],
+          "references_table": "dominios_valores_expertos",
+          "references_columns": [
+            "cod_dominio_valores"
+          ]
+        },
+        {
+          "columns": [
+            "cod_usuario_creacion"
+          ],
+          "references_table": "usuarios",
+          "references_columns": [
+            "cod_usuario"
+          ]
+        }
+      ],
+      "unique": [
+        [
+          "cod_dominio_valores",
+          "codigo_valor"
+        ]
+      ],
+      "indexes": [
+        [
+          "estado_aprobacion"
+        ],
+        [
+          "cod_usuario_creacion"
+        ]
+      ]
+    },
+    {
+      "name": "variables_expertas",
+      "model": "VariableExperta",
+      "migration": "database/migrations/2026_10_08_120006_create_variables_expertas_table.php",
+      "columns": [
+        {
+          "name": "cod_variable_experta",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_version_modelo",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_nodo_semantico",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_nodo_propietario_primario",
+          "type": "string",
+          "length": 20,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "cod_dominio_valores",
+          "type": "string",
+          "length": 20,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "tipo_semantico",
+          "type": "string",
+          "length": 30,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "papel_inferencial",
+          "type": "string",
+          "length": 40,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "estado",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_creacion",
+          "type": "dateTime",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_usuario_creacion",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "observacion",
+          "type": "text",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_version_modelo"
+          ],
+          "references_table": "versiones_modelo_experto",
+          "references_columns": [
+            "cod_version_modelo"
+          ]
+        },
+        {
+          "columns": [
+            "cod_nodo_semantico"
+          ],
+          "references_table": "nodos_semanticos",
+          "references_columns": [
+            "cod_nodo_semantico"
+          ]
+        },
+        {
+          "columns": [
+            "cod_nodo_propietario_primario"
+          ],
+          "references_table": "nodos_semanticos",
+          "references_columns": [
+            "cod_nodo_semantico"
+          ]
+        },
+        {
+          "columns": [
+            "cod_dominio_valores"
+          ],
+          "references_table": "dominios_valores_expertos",
+          "references_columns": [
+            "cod_dominio_valores"
+          ]
+        },
+        {
+          "columns": [
+            "cod_usuario_creacion"
+          ],
+          "references_table": "usuarios",
+          "references_columns": [
+            "cod_usuario"
+          ]
+        },
+        {
+          "columns": [
+            "cod_nodo_semantico",
+            "cod_version_modelo"
+          ],
+          "references_table": "nodos_semanticos",
+          "references_columns": [
+            "cod_nodo_semantico",
+            "cod_version_modelo"
+          ]
+        },
+        {
+          "columns": [
+            "cod_nodo_propietario_primario",
+            "cod_version_modelo"
+          ],
+          "references_table": "nodos_semanticos",
+          "references_columns": [
+            "cod_nodo_semantico",
+            "cod_version_modelo"
+          ]
+        },
+        {
+          "columns": [
+            "cod_dominio_valores",
+            "cod_version_modelo"
+          ],
+          "references_table": "dominios_valores_expertos",
+          "references_columns": [
+            "cod_dominio_valores",
+            "cod_version_modelo"
+          ]
+        }
+      ],
+      "unique": [
+        [
+          "cod_nodo_semantico"
+        ],
+        [
+          "cod_variable_experta",
+          "cod_version_modelo"
+        ]
+      ],
+      "indexes": [
+        [
+          "cod_version_modelo"
+        ],
+        [
+          "cod_nodo_propietario_primario"
+        ],
+        [
+          "cod_dominio_valores"
+        ],
+        [
+          "cod_usuario_creacion"
+        ]
+      ]
+    },
+    {
+      "name": "fuentes_datos_expertas",
+      "model": "FuenteDatoExperta",
+      "migration": "database/migrations/2026_10_08_120007_create_fuentes_datos_expertas_table.php",
+      "columns": [
+        {
+          "name": "cod_fuente_dato_experta",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_version_modelo",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "codigo_fuente",
+          "type": "string",
+          "length": 50,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "nombre",
+          "type": "string",
+          "length": 160,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "tipo_fuente",
+          "type": "string",
+          "length": 30,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "tabla_raiz",
+          "type": "string",
+          "length": 80,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "campo_pk_raiz",
+          "type": "string",
+          "length": 80,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "campo_residente",
+          "type": "string",
+          "length": 80,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "campo_temporal",
+          "type": "string",
+          "length": 80,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "campo_personal",
+          "type": "string",
+          "length": 80,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "campo_estado",
+          "type": "string",
+          "length": 80,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "clave_adaptador",
+          "type": "string",
+          "length": 80,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "estado",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_creacion",
+          "type": "dateTime",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_usuario_creacion",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "observacion",
+          "type": "text",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_version_modelo"
+          ],
+          "references_table": "versiones_modelo_experto",
+          "references_columns": [
+            "cod_version_modelo"
+          ]
+        },
+        {
+          "columns": [
+            "cod_usuario_creacion"
+          ],
+          "references_table": "usuarios",
+          "references_columns": [
+            "cod_usuario"
+          ]
+        }
+      ],
+      "unique": [
+        [
+          "cod_version_modelo",
+          "codigo_fuente"
+        ],
+        [
+          "cod_fuente_dato_experta",
+          "cod_version_modelo"
+        ]
+      ],
+      "indexes": [
+        [
+          "tabla_raiz"
+        ],
+        [
+          "cod_usuario_creacion"
+        ]
+      ]
+    },
+    {
+      "name": "mapeos_variables_fuente",
+      "model": "MapeoVariableFuente",
+      "migration": "database/migrations/2026_10_08_120008_create_mapeos_variables_fuente_table.php",
+      "columns": [
+        {
+          "name": "cod_mapeo_variable_fuente",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_version_modelo",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_variable_experta",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_fuente_dato_experta",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "tipo_extraccion",
+          "type": "string",
+          "length": 30,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "campo_valor",
+          "type": "string",
+          "length": 80,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "clave_selector",
+          "type": "string",
+          "length": 80,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "estado",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_creacion",
+          "type": "dateTime",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_usuario_creacion",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "observacion",
+          "type": "text",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_version_modelo"
+          ],
+          "references_table": "versiones_modelo_experto",
+          "references_columns": [
+            "cod_version_modelo"
+          ]
+        },
+        {
+          "columns": [
+            "cod_variable_experta"
+          ],
+          "references_table": "variables_expertas",
+          "references_columns": [
+            "cod_variable_experta"
+          ]
+        },
+        {
+          "columns": [
+            "cod_fuente_dato_experta"
+          ],
+          "references_table": "fuentes_datos_expertas",
+          "references_columns": [
+            "cod_fuente_dato_experta"
+          ]
+        },
+        {
+          "columns": [
+            "cod_usuario_creacion"
+          ],
+          "references_table": "usuarios",
+          "references_columns": [
+            "cod_usuario"
+          ]
+        },
+        {
+          "columns": [
+            "cod_variable_experta",
+            "cod_version_modelo"
+          ],
+          "references_table": "variables_expertas",
+          "references_columns": [
+            "cod_variable_experta",
+            "cod_version_modelo"
+          ]
+        },
+        {
+          "columns": [
+            "cod_fuente_dato_experta",
+            "cod_version_modelo"
+          ],
+          "references_table": "fuentes_datos_expertas",
+          "references_columns": [
+            "cod_fuente_dato_experta",
+            "cod_version_modelo"
+          ]
+        }
+      ],
+      "unique": [],
+      "indexes": [
+        [
+          "cod_version_modelo"
+        ],
+        [
+          "cod_variable_experta",
+          "cod_fuente_dato_experta"
+        ],
+        [
+          "cod_fuente_dato_experta"
+        ],
+        [
+          "cod_usuario_creacion"
+        ]
+      ]
+    },
+    {
+      "name": "mapeos_valores_fuente",
+      "model": "MapeoValorFuente",
+      "migration": "database/migrations/2026_10_08_120009_create_mapeos_valores_fuente_table.php",
+      "columns": [
+        {
+          "name": "cod_mapeo_valor_fuente",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_mapeo_variable_fuente",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_valor_semantico",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "tipo_valor_fuente",
+          "type": "string",
+          "length": 30,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "valor_fuente_exacto",
+          "type": "text",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "estado_aprobacion",
+          "type": "string",
+          "length": 40,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_vigencia_desde",
+          "type": "dateTime",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_vigencia_hasta",
+          "type": "dateTime",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "estado",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_creacion",
+          "type": "dateTime",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_usuario_creacion",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "observacion",
+          "type": "text",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_mapeo_variable_fuente"
+          ],
+          "references_table": "mapeos_variables_fuente",
+          "references_columns": [
+            "cod_mapeo_variable_fuente"
+          ]
+        },
+        {
+          "columns": [
+            "cod_valor_semantico"
+          ],
+          "references_table": "valores_semanticos",
+          "references_columns": [
+            "cod_valor_semantico"
+          ]
+        },
+        {
+          "columns": [
+            "cod_usuario_creacion"
+          ],
+          "references_table": "usuarios",
+          "references_columns": [
+            "cod_usuario"
+          ]
+        }
+      ],
+      "unique": [],
+      "indexes": [
+        [
+          "cod_mapeo_variable_fuente",
+          "estado"
+        ],
+        [
+          "cod_valor_semantico"
+        ],
+        [
+          "cod_usuario_creacion"
+        ]
+      ]
+    },
+    {
+      "name": "criterios_dominios_resultado",
+      "model": "CriterioDominioResultado",
+      "migration": "database/migrations/2026_10_08_120010_create_criterios_dominios_resultado_table.php",
+      "columns": [
+        {
+          "name": "cod_criterio_dominio_resultado",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_nodo_criterio",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_dominio_valores",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "estado",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_creacion",
+          "type": "dateTime",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_usuario_creacion",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "observacion",
+          "type": "text",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_nodo_criterio"
+          ],
+          "references_table": "nodos_semanticos",
+          "references_columns": [
+            "cod_nodo_semantico"
+          ]
+        },
+        {
+          "columns": [
+            "cod_dominio_valores"
+          ],
+          "references_table": "dominios_valores_expertos",
+          "references_columns": [
+            "cod_dominio_valores"
+          ]
+        },
+        {
+          "columns": [
+            "cod_usuario_creacion"
+          ],
+          "references_table": "usuarios",
+          "references_columns": [
+            "cod_usuario"
+          ]
+        }
+      ],
+      "unique": [
+        [
+          "cod_nodo_criterio"
+        ]
+      ],
+      "indexes": [
+        [
+          "cod_dominio_valores"
+        ],
+        [
+          "estado"
+        ],
+        [
+          "cod_usuario_creacion"
+        ]
+      ]
+    },
+    {
+      "name": "reglas_expertas",
+      "model": "ReglaExperta",
+      "migration": "database/migrations/2026_10_08_120011_create_reglas_expertas_table.php",
+      "columns": [
+        {
+          "name": "cod_regla_experta",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_version_modelo",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "codigo_regla",
+          "type": "string",
+          "length": 50,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "nombre",
+          "type": "string",
+          "length": 160,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "tipo_regla",
+          "type": "string",
+          "length": 30,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "descripcion",
+          "type": "text",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "estado",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_creacion",
+          "type": "dateTime",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_usuario_creacion",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "observacion",
+          "type": "text",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_version_modelo"
+          ],
+          "references_table": "versiones_modelo_experto",
+          "references_columns": [
+            "cod_version_modelo"
+          ]
+        },
+        {
+          "columns": [
+            "cod_usuario_creacion"
+          ],
+          "references_table": "usuarios",
+          "references_columns": [
+            "cod_usuario"
+          ]
+        }
+      ],
+      "unique": [
+        [
+          "cod_version_modelo",
+          "codigo_regla"
+        ]
+      ],
+      "indexes": [
+        [
+          "cod_version_modelo",
+          "tipo_regla",
+          "estado"
+        ],
+        [
+          "cod_usuario_creacion"
+        ]
+      ]
+    },
+    {
+      "name": "condiciones_regla_experta",
+      "model": "CondicionReglaExperta",
+      "migration": "database/migrations/2026_10_08_120012_create_condiciones_regla_experta_table.php",
+      "columns": [
+        {
+          "name": "cod_condicion_regla",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_regla_experta",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_variable_experta",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_valor_semantico",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_regla_experta"
+          ],
+          "references_table": "reglas_expertas",
+          "references_columns": [
+            "cod_regla_experta"
+          ]
+        },
+        {
+          "columns": [
+            "cod_variable_experta"
+          ],
+          "references_table": "variables_expertas",
+          "references_columns": [
+            "cod_variable_experta"
+          ]
+        },
+        {
+          "columns": [
+            "cod_valor_semantico"
+          ],
+          "references_table": "valores_semanticos",
+          "references_columns": [
+            "cod_valor_semantico"
+          ]
+        }
+      ],
+      "unique": [
+        [
+          "cod_regla_experta",
+          "cod_variable_experta",
+          "cod_valor_semantico"
+        ]
+      ],
+      "indexes": [
+        [
+          "cod_variable_experta",
+          "cod_valor_semantico"
+        ]
+      ]
+    },
+    {
+      "name": "consecuencias_regla_experta",
+      "model": "ConsecuenciaReglaExperta",
+      "migration": "database/migrations/2026_10_08_120013_create_consecuencias_regla_experta_table.php",
+      "columns": [
+        {
+          "name": "cod_consecuencia_regla",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_regla_experta",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_criterio_dominio_resultado",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_valor_semantico",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_regla_experta"
+          ],
+          "references_table": "reglas_expertas",
+          "references_columns": [
+            "cod_regla_experta"
+          ]
+        },
+        {
+          "columns": [
+            "cod_criterio_dominio_resultado"
+          ],
+          "references_table": "criterios_dominios_resultado",
+          "references_columns": [
+            "cod_criterio_dominio_resultado"
+          ]
+        },
+        {
+          "columns": [
+            "cod_valor_semantico"
+          ],
+          "references_table": "valores_semanticos",
+          "references_columns": [
+            "cod_valor_semantico"
+          ]
+        }
+      ],
+      "unique": [
+        [
+          "cod_regla_experta",
+          "cod_criterio_dominio_resultado"
+        ]
+      ],
+      "indexes": [
+        [
+          "cod_criterio_dominio_resultado"
+        ],
+        [
+          "cod_valor_semantico"
+        ]
+      ]
+    },
+    {
+      "name": "evaluaciones_expertas",
+      "model": "EvaluacionExperta",
+      "migration": "database/migrations/2026_10_08_120014_create_evaluaciones_expertas_table.php",
+      "columns": [
+        {
+          "name": "cod_evaluacion_experta",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_residente",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_version_modelo",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_personal_solicitante",
+          "type": "string",
+          "length": 20,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "origen_activacion",
+          "type": "string",
+          "length": 30,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_inicio",
+          "type": "dateTime",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_fin",
+          "type": "dateTime",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "estado_ejecucion",
+          "type": "string",
+          "length": 30,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "motivo_activacion",
+          "type": "text",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "observacion",
+          "type": "text",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_residente"
+          ],
+          "references_table": "residentes",
+          "references_columns": [
+            "cod_residente"
+          ]
+        },
+        {
+          "columns": [
+            "cod_version_modelo"
+          ],
+          "references_table": "versiones_modelo_experto",
+          "references_columns": [
+            "cod_version_modelo"
+          ]
+        },
+        {
+          "columns": [
+            "cod_personal_solicitante"
+          ],
+          "references_table": "personal",
+          "references_columns": [
+            "cod_personal"
+          ]
+        }
+      ],
+      "unique": [],
+      "indexes": [
+        [
+          "cod_residente",
+          "fecha_hora_inicio"
+        ],
+        [
+          "cod_version_modelo",
+          "fecha_hora_inicio"
+        ],
+        [
+          "cod_personal_solicitante"
+        ],
+        [
+          "estado_ejecucion"
+        ]
+      ]
+    },
+    {
+      "name": "evidencias_evaluacion",
+      "model": "EvidenciaEvaluacion",
+      "migration": "database/migrations/2026_10_08_120015_create_evidencias_evaluacion_table.php",
+      "columns": [
+        {
+          "name": "cod_evidencia_evaluacion",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_evaluacion_experta",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_mapeo_variable_fuente",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_registro_fuente",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "estado_representacion",
+          "type": "string",
+          "length": 30,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_valor_semantico",
+          "type": "string",
+          "length": 20,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "estado_admisibilidad",
+          "type": "string",
+          "length": 30,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "motivo_admisibilidad",
+          "type": "text",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_incorporacion",
+          "type": "dateTime",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_evaluacion_experta"
+          ],
+          "references_table": "evaluaciones_expertas",
+          "references_columns": [
+            "cod_evaluacion_experta"
+          ]
+        },
+        {
+          "columns": [
+            "cod_mapeo_variable_fuente"
+          ],
+          "references_table": "mapeos_variables_fuente",
+          "references_columns": [
+            "cod_mapeo_variable_fuente"
+          ]
+        },
+        {
+          "columns": [
+            "cod_valor_semantico"
+          ],
+          "references_table": "valores_semanticos",
+          "references_columns": [
+            "cod_valor_semantico"
+          ]
+        }
+      ],
+      "unique": [
+        [
+          "cod_evaluacion_experta",
+          "cod_mapeo_variable_fuente",
+          "cod_registro_fuente"
+        ]
+      ],
+      "indexes": [
+        [
+          "cod_mapeo_variable_fuente"
+        ],
+        [
+          "cod_valor_semantico"
+        ],
+        [
+          "cod_evaluacion_experta",
+          "estado_admisibilidad"
+        ]
+      ]
+    },
+    {
+      "name": "relaciones_evidencias_evaluacion",
+      "model": "RelacionEvidenciaEvaluacion",
+      "migration": "database/migrations/2026_10_08_120016_create_relaciones_evidencias_evaluacion_table.php",
+      "columns": [
+        {
+          "name": "cod_relacion_evidencia",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_evidencia_origen",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_evidencia_destino",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "tipo_relacion",
+          "type": "string",
+          "length": 50,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "estado",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "justificacion",
+          "type": "text",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_creacion",
+          "type": "dateTime",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_evidencia_origen"
+          ],
+          "references_table": "evidencias_evaluacion",
+          "references_columns": [
+            "cod_evidencia_evaluacion"
+          ]
+        },
+        {
+          "columns": [
+            "cod_evidencia_destino"
+          ],
+          "references_table": "evidencias_evaluacion",
+          "references_columns": [
+            "cod_evidencia_evaluacion"
+          ]
+        }
+      ],
+      "unique": [
+        [
+          "cod_evidencia_origen",
+          "cod_evidencia_destino",
+          "tipo_relacion"
+        ]
+      ],
+      "indexes": [
+        [
+          "cod_evidencia_destino"
+        ],
+        [
+          "tipo_relacion"
+        ]
+      ]
+    },
+    {
+      "name": "evaluacion_criterios",
+      "model": "EvaluacionCriterio",
+      "migration": "database/migrations/2026_10_08_120017_create_evaluacion_criterios_table.php",
+      "columns": [
+        {
+          "name": "cod_evaluacion_criterio",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_evaluacion_experta",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_nodo_criterio",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "estado_evaluabilidad",
+          "type": "string",
+          "length": 30,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "codigo_modificador_interpretacion",
+          "type": "string",
+          "length": 30,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "motivo_evaluabilidad",
+          "type": "text",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_determinacion",
+          "type": "dateTime",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_evaluacion_experta"
+          ],
+          "references_table": "evaluaciones_expertas",
+          "references_columns": [
+            "cod_evaluacion_experta"
+          ]
+        },
+        {
+          "columns": [
+            "cod_nodo_criterio"
+          ],
+          "references_table": "nodos_semanticos",
+          "references_columns": [
+            "cod_nodo_semantico"
+          ]
+        }
+      ],
+      "unique": [
+        [
+          "cod_evaluacion_experta",
+          "cod_nodo_criterio"
+        ]
+      ],
+      "indexes": [
+        [
+          "cod_nodo_criterio"
+        ],
+        [
+          "estado_evaluabilidad"
+        ]
+      ]
+    },
+    {
+      "name": "evidencias_criterio_evaluacion",
+      "model": "EvidenciaCriterioEvaluacion",
+      "migration": "database/migrations/2026_10_08_120018_create_evidencias_criterio_evaluacion_table.php",
+      "columns": [
+        {
+          "name": "cod_evidencia_criterio",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_evaluacion_criterio",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_evidencia_evaluacion",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "rol_en_criterio",
+          "type": "string",
+          "length": 30,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "estado_participacion",
+          "type": "string",
+          "length": 30,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "justificacion",
+          "type": "text",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_vinculacion",
+          "type": "dateTime",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_evaluacion_criterio"
+          ],
+          "references_table": "evaluacion_criterios",
+          "references_columns": [
+            "cod_evaluacion_criterio"
+          ]
+        },
+        {
+          "columns": [
+            "cod_evidencia_evaluacion"
+          ],
+          "references_table": "evidencias_evaluacion",
+          "references_columns": [
+            "cod_evidencia_evaluacion"
+          ]
+        }
+      ],
+      "unique": [
+        [
+          "cod_evaluacion_criterio",
+          "cod_evidencia_evaluacion"
+        ]
+      ],
+      "indexes": [
+        [
+          "cod_evidencia_evaluacion"
+        ],
+        [
+          "estado_participacion"
+        ]
+      ]
+    },
+    {
+      "name": "resultados_criterio",
+      "model": "ResultadoCriterio",
+      "migration": "database/migrations/2026_10_08_120019_create_resultados_criterio_table.php",
+      "columns": [
+        {
+          "name": "cod_resultado_criterio",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_evaluacion_criterio",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_valor_semantico",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_determinacion",
+          "type": "dateTime",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_evaluacion_criterio"
+          ],
+          "references_table": "evaluacion_criterios",
+          "references_columns": [
+            "cod_evaluacion_criterio"
+          ]
+        },
+        {
+          "columns": [
+            "cod_valor_semantico"
+          ],
+          "references_table": "valores_semanticos",
+          "references_columns": [
+            "cod_valor_semantico"
+          ]
+        }
+      ],
+      "unique": [
+        [
+          "cod_evaluacion_criterio"
+        ]
+      ],
+      "indexes": [
+        [
+          "cod_valor_semantico"
+        ]
+      ]
+    },
+    {
+      "name": "trazas_inferencia",
+      "model": "TrazaInferencia",
+      "migration": "database/migrations/2026_10_08_120020_create_trazas_inferencia_table.php",
+      "columns": [
+        {
+          "name": "cod_traza_inferencia",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_evaluacion_criterio",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "estado_inferencia",
+          "type": "string",
+          "length": 30,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_inicio",
+          "type": "dateTime",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_fin",
+          "type": "dateTime",
+          "length": null,
+          "nullable": true,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_evaluacion_criterio"
+          ],
+          "references_table": "evaluacion_criterios",
+          "references_columns": [
+            "cod_evaluacion_criterio"
+          ]
+        }
+      ],
+      "unique": [
+        [
+          "cod_evaluacion_criterio"
+        ]
+      ],
+      "indexes": [
+        [
+          "estado_inferencia"
+        ]
+      ]
+    },
+    {
+      "name": "evaluaciones_reglas",
+      "model": "EvaluacionRegla",
+      "migration": "database/migrations/2026_10_08_120021_create_evaluaciones_reglas_table.php",
+      "columns": [
+        {
+          "name": "cod_evaluacion_regla",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_traza_inferencia",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_regla_experta",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "estado_regla",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_evaluacion",
+          "type": "dateTime",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_traza_inferencia"
+          ],
+          "references_table": "trazas_inferencia",
+          "references_columns": [
+            "cod_traza_inferencia"
+          ]
+        },
+        {
+          "columns": [
+            "cod_regla_experta"
+          ],
+          "references_table": "reglas_expertas",
+          "references_columns": [
+            "cod_regla_experta"
+          ]
+        }
+      ],
+      "unique": [
+        [
+          "cod_traza_inferencia",
+          "cod_regla_experta"
+        ]
+      ],
+      "indexes": [
+        [
+          "cod_regla_experta"
+        ],
+        [
+          "estado_regla"
+        ]
+      ]
+    },
+    {
+      "name": "evaluaciones_condiciones_regla",
+      "model": "EvaluacionCondicionRegla",
+      "migration": "database/migrations/2026_10_08_120022_create_evaluaciones_condiciones_regla_table.php",
+      "columns": [
+        {
+          "name": "cod_evaluacion_condicion",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_evaluacion_regla",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_condicion_regla",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "estado_condicion",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "fecha_hora_evaluacion",
+          "type": "dateTime",
+          "length": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_evaluacion_regla"
+          ],
+          "references_table": "evaluaciones_reglas",
+          "references_columns": [
+            "cod_evaluacion_regla"
+          ]
+        },
+        {
+          "columns": [
+            "cod_condicion_regla"
+          ],
+          "references_table": "condiciones_regla_experta",
+          "references_columns": [
+            "cod_condicion_regla"
+          ]
+        }
+      ],
+      "unique": [
+        [
+          "cod_evaluacion_regla",
+          "cod_condicion_regla"
+        ]
+      ],
+      "indexes": [
+        [
+          "cod_condicion_regla"
+        ],
+        [
+          "estado_condicion"
+        ]
+      ]
+    },
+    {
+      "name": "evidencias_soporte_condicion",
+      "model": "EvidenciaSoporteCondicion",
+      "migration": "database/migrations/2026_10_08_120023_create_evidencias_soporte_condicion_table.php",
+      "columns": [
+        {
+          "name": "cod_evidencia_soporte_condicion",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "cod_evaluacion_condicion",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "cod_evidencia_evaluacion",
+          "type": "string",
+          "length": 20,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "cod_evaluacion_condicion"
+          ],
+          "references_table": "evaluaciones_condiciones_regla",
+          "references_columns": [
+            "cod_evaluacion_condicion"
+          ]
+        },
+        {
+          "columns": [
+            "cod_evidencia_evaluacion"
+          ],
+          "references_table": "evidencias_evaluacion",
+          "references_columns": [
+            "cod_evidencia_evaluacion"
+          ]
+        }
+      ],
+      "unique": [
+        [
+          "cod_evaluacion_condicion",
+          "cod_evidencia_evaluacion"
+        ]
+      ],
+      "indexes": [
+        [
+          "cod_evidencia_evaluacion"
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,635 @@
+@php
+ $inputCls = 'w-full rounded-xl border border-borde-suave bg-fondo-app px-3 py-2.5 text-sm font-bold text-titulo outline-none ring-[var(--rm-accent-terracotta)]/25 transition focus:border-borde-focus focus:ring-2';
+ $labelCls = 'block text-[10px] font-bold uppercase tracking-[0.15em] text-apoyo mb-1.5';
+ $errCls = 'mt-1 text-[10px] font-bold text-boton-acento';
+@endphp
+
+<div class="min-h-screen bg-transparent px-4 py-5 text-titulo sm:px-6 lg:px-8"
+ x-data
+ @keydown.window.escape="$wire.cerrarModales()">
+ <div class="mx-auto max-w-7xl space-y-6">
+
+ {{-- ── CABECERA ─────────────────────────────────────────────────────── --}}
+ <x-ui.collection-header title="Participación en actividades" subtitle="Consulta y gestión de residentes vinculados a actividades programadas." icon="ph-users-four" eyebrow="Área de actividades">
+ <x-slot:actions>
+ <a href="{{ route('admin.actividades.index') }}"
+ class="inline-flex items-center justify-center gap-2 rounded-xl border border-borde-suave bg-fondo-app px-4 py-2.5 text-xs font-bold text-apoyo transition hover:border-borde-fuerte hover:text-titulo">
+ <i class="ph-bold ph-calendar-check text-sm"></i>
+ Ver actividades
+ </a>
+ <button wire:click="$refresh"
+ class="inline-flex items-center justify-center gap-2 rounded-xl border border-borde-suave bg-fondo-app px-4 py-2.5 text-xs font-bold text-apoyo transition hover:border-borde-fuerte hover:text-titulo">
+ <i class="ph-bold ph-arrows-clockwise text-sm" wire:loading.class="animate-spin" wire:target="$refresh"></i>
+ Actualizar
+ </button>
+ @can('actividades.gestionar')
+ <button wire:click="abrirRegistrar"
+ class="inline-flex items-center justify-center gap-2 rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-inverso shadow-sm transition hover:bg-fondo-panel hover:shadow-md active:scale-95">
+ <i class="ph-bold ph-plus text-sm"></i>
+ Registrar participación
+ </button>
+ @endcan
+ </x-slot:actions>
+ </x-ui.collection-header>
+
+ {{-- ── 8 MÉTRICAS ──────────────────────────────────────────────────── --}}
+ @php
+ $metricas = [
+ ['label' => 'Participaciones', 'valor' => $stats['total'], 'icono' => 'ph-clipboard-text', 'tono' => 'azul'],
+ ['label' => 'Residentes participantes', 'valor' => $stats['adultos_distintos'],'icono' => 'ph-user-check', 'tono' => 'verde'],
+ ['label' => 'Tipos utilizados', 'valor' => $stats['tipos_distintos'], 'icono' => 'ph-tag', 'tono' => 'dorado'],
+ ['label' => 'Programadas', 'valor' => $stats['programadas'], 'icono' => 'ph-clock', 'tono' => 'dorado'],
+ ['label' => 'Realizadas', 'valor' => $stats['realizadas'], 'icono' => 'ph-check-circle', 'tono' => 'verde'],
+ ['label' => 'Canceladas', 'valor' => $stats['canceladas'], 'icono' => 'ph-x-circle', 'tono' => 'terracota'],
+ ['label' => 'Hoy', 'valor' => $stats['hoy'], 'icono' => 'ph-sun', 'tono' => 'dorado'],
+ ['label' => 'Próximas programadas', 'valor' => $stats['proximas'], 'icono' => 'ph-calendar-dots', 'tono' => 'violeta'],
+ ];
+ $tonoVariantes = ['azul' => 'sky', 'verde' => 'mint', 'terracota' => 'coral', 'dorado' => 'neutral', 'violeta' => 'neutral'];
+ @endphp
+ <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+ @foreach($metricas as $m)
+ <x-ui.metric-card :icon="$m['icono']" :value="number_format($m['valor'])" :label="$m['label']" :variant="$tonoVariantes[$m['tono']]" />
+ @endforeach
+ </section>
+
+     {{-- ── FILTROS Y BÚSQUEDA ───────────────────────────────────────────── --}}
+    <x-ui.filter-bar class="mb-4">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+            {{-- Búsqueda textual --}}
+            <div class="lg:col-span-3">
+                <label for="participacion-buscar" class="rm-collection-filter-label">Buscar residente</label>
+                <div class="relative flex items-center">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
+                    <i class="ph-bold ph-magnifying-glass text-base"></i>
+                </span>
+                <input id="participacion-buscar" wire:model.live.debounce.300ms="search"
+                    type="text"
+                    placeholder="Nombre del residente"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
+                @if(!empty($search))
+                    <button type="button"
+                        wire:click="$set('search', '')"
+                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-primary)] cursor-pointer"
+                        title="Limpiar búsqueda">
+                        <i class="ph-bold ph-x-circle text-base"></i>
+                    </button>
+                @endif
+                </div>
+            </div>
+
+            {{-- Tipo de actividad --}}
+            <div class="lg:col-span-3">
+                <label for="participacion-tipo" class="rm-collection-filter-label">Tipo de actividad</label>
+                <select id="participacion-tipo" wire:model.live="filtroTipo"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                    <option value="">Todos los tipos</option>
+                    @foreach($tipos as $tipo)
+                        <option value="{{ $tipo->cod_tipo_act }}">{{ $tipo->tipo }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Estado --}}
+            <div class="lg:col-span-2">
+                <label for="participacion-estado" class="rm-collection-filter-label">Estado</label>
+                <select id="participacion-estado" wire:model.live="filtroEstado"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                    <option value="">Todos los estados</option>
+                    <option value="PROGRAMADA">Programada</option>
+                    <option value="REALIZADA">Realizada</option>
+                    <option value="COMPLETADA">Completada</option>
+                    <option value="CANCELADA">Cancelada</option>
+                    <option value="REPROGRAMADA">Reprogramada</option>
+                </select>
+            </div>
+
+            {{-- Fecha Desde --}}
+            <div class="lg:col-span-2">
+                <label for="participacion-desde" class="rm-collection-filter-label">Desde</label>
+                <input id="participacion-desde" wire:model.live="filtroFechaDesde"
+                    type="date"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
+            </div>
+
+            {{-- Fecha Hasta --}}
+            <div class="lg:col-span-2">
+                <label for="participacion-hasta" class="rm-collection-filter-label">Hasta</label>
+                <input id="participacion-hasta" wire:model.live="filtroFechaHasta"
+                    type="date"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
+            </div>
+        </div>
+
+        @php
+            $hasFiltrosActivos = !empty($search) || !empty($filtroTipo) || !empty($filtroEstado) || !empty($filtroFechaDesde) || !empty($filtroFechaHasta);
+        @endphp
+        @if($hasFiltrosActivos)
+            <div class="rm-filter-bar__active">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="rm-filter-bar__active-label">
+                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
+                    </span>
+                    @if(!empty($search))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Búsqueda: "{{ Str::limit($search, 16) }}"</span>
+                            <button type="button" wire:click="$set('search', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroTipo))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Tipo seleccionado</span>
+                            <button type="button" wire:click="$set('filtroTipo', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroEstado))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Estado: {{ $filtroEstado }}</span>
+                            <button type="button" wire:click="$set('filtroEstado', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroFechaDesde))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Desde: {{ $filtroFechaDesde }}</span>
+                            <button type="button" wire:click="$set('filtroFechaDesde', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                    @if(!empty($filtroFechaHasta))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
+                            <span>Hasta: {{ $filtroFechaHasta }}</span>
+                            <button type="button" wire:click="$set('filtroFechaHasta', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
+                        </span>
+                    @endif
+                </div>
+                <button type="button" wire:click="limpiarFiltros" class="rm-filter-bar__clear-btn">
+                    <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
+                    Limpiar filtros
+                </button>
+            </div>
+        @endif
+    </x-ui.filter-bar>
+
+ {{-- ── TABLA PRINCIPAL ──────────────────────────────────────────────── --}}
+ <x-ui.collection-results title="Registro de participaciones" :count="$participaciones->total()" label="registros">
+ <div class="p-5">
+ @if($participaciones->isEmpty())
+        <div class="py-4">
+            <x-ui.empty-state
+                compact
+                icono="ph-users-four"
+                titulo="Sin participaciones encontradas"
+                :texto="$search || $filtroTipo || $filtroEstado || $filtroFechaDesde || $filtroFechaHasta ? 'No se encontraron participaciones con los filtros seleccionados.' : 'No hay participaciones registradas en este momento.'"
+                :actionMethod="$search || $filtroTipo || $filtroEstado || $filtroFechaDesde || $filtroFechaHasta ? 'limpiarFiltros' : null"
+                actionText="Restablecer filtros"
+            />
+        </div>
+        @else
+        <div class="overflow-x-auto"
+            wire:loading.class="opacity-50 transition-opacity"
+            wire:target="search,filtroTipo,filtroEstado,filtroFechaDesde,filtroFechaHasta">
+            <table class="rm-data-table rm-data-table--actions rm-table w-full min-w-[800px] text-xs">
+                <thead>
+                    <tr class="border-b border-borde-suave">
+                        <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Residente</th>
+                        <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Tipo actividad</th>
+                        <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Fecha</th>
+                        <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Hora</th>
+                        <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Estado</th>
+                        <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Observación</th>
+                        <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Actualización</th>
+                        <th class="pb-2.5 text-left font-black uppercase tracking-[0.12em] text-apoyo">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[var(--rm-border)]/30">
+        @foreach($participaciones as $p)
+ @php
+ $ne = \App\Models\Actividad::normalizarEstado($p->estado ?? '');
+ @endphp
+ <tr wire:key="part-{{ $p->cod_act_adul }}" class="group transition hover:bg-fondo-panel">
+ <td class="py-3 pr-4">
+ <div class="min-w-0">
+ <p class="font-black text-titulo">
+ {{ optional($p->adultoMayor)->ap_paterno ?? '—' }}
+ {{ optional($p->adultoMayor)->nombres ?? '' }}
+ </p>
+ @if($p->adultoMayor)
+ <p class="text-[9px] font-bold text-apoyo">{{ $p->adultoMayor?->edad ?? 'Edad no registrada' }}{{ $p->adultoMayor?->edad ? ' años' : '' }}</p>
+ @endif
+ </div>
+ </td>
+ <td class="py-3 pr-4 text-apoyo">
+ {{ optional($p->tipoActividad)->tipo ?? '—' }}
+ </td>
+ <td class="py-3 pr-4 text-apoyo whitespace-nowrap">
+ {{ \Carbon\Carbon::parse($p->fecha)->format('d/m/Y') }}
+ </td>
+ <td class="py-3 pr-4 text-apoyo">
+ {{ $p->hora ? substr($p->hora, 0, 5) : '—' }}
+ </td>
+ <td class="py-3 pr-4">
+ <x-ui.status-badge :estado="$p->estado" />
+ </td>
+ <td class="py-3 pr-4 max-w-[140px] truncate text-apoyo">
+ {{ $p->obs ? mb_substr($p->obs, 0, 40) . (mb_strlen($p->obs) > 40 ? '…' : '') : '—' }}
+ </td>
+ <td class="py-3 pr-4 text-apoyo whitespace-nowrap">
+ {{ $p->updated_at ? $p->updated_at->format('d/m/Y') : '—' }}
+ </td>
+ <td class="py-3">
+ <div class="flex items-center gap-1.5">
+ {{-- Ver detalle --}}
+ <button wire:click="abrirDetalle('{{ $p->cod_act_adul }}')"
+ title="Ver detalle"
+ class="flex h-7 w-7 items-center justify-center rounded-lg border border-borde-fuerte bg-fondo-panel text-apoyo transition hover:border-borde-fuerte hover:bg-fondo-panel">
+ <i class="ph-bold ph-eye text-xs"></i>
+ </button>
+ {{-- Editar --}}
+ @can('actividades.gestionar')
+ @if(strtoupper($p->estado) !== 'CANCELADA')
+ <button wire:click="abrirEditar('{{ $p->cod_act_adul }}')"
+ title="Editar participación"
+ class="flex h-7 w-7 items-center justify-center rounded-lg border border-estado-advertenciaBorde bg-estado-advertenciaBg text-estado-advertencia transition hover:border-estado-advertenciaBorde hover:bg-estado-advertenciaBg">
+ <i class="ph-bold ph-pencil text-xs"></i>
+ </button>
+ @endif
+ @endcan
+ {{-- Cancelar --}}
+ @can('actividades.gestionar')
+ @if(strtoupper($p->estado) !== 'CANCELADA')
+ <button type="button"
+ title="Cancelar participación"
+ x-data
+ @click="
+ window.SwalAmandita.fire({
+ title: '¿Cancelar participación?',
+ text: 'La participación no será eliminada. Se conservará como registro institucional.',
+ icon: 'warning',
+ showCancelButton: true,
+ confirmButtonText: 'Sí, cancelar',
+ cancelButtonText: 'No'
+ }).then(r => { if (r.isConfirmed) $wire.cancelarActividad(@js($p->cod_act_adul)) })"
+ class="flex h-7 w-7 items-center justify-center rounded-lg border border-borde-focus bg-estado-peligroBg text-boton-acento transition hover:border-borde-focus hover:bg-estado-peligroBg">
+ <i class="ph-bold ph-x-circle text-xs"></i>
+ </button>
+ @endif
+ @endcan
+ {{-- Ir a ficha --}}
+ @if($p->adultoMayor)
+ <a href="{{ route('admin.adultos-mayores.show', ['adulto_mayor' => $p->adultoMayor->cod_residente]) }}"
+ title="Ver ficha del residente"
+ class="flex h-7 w-7 items-center justify-center rounded-lg border border-estado-exitoBorde bg-estado-exitoBg text-estado-exito transition hover:border-estado-exitoBorde hover:bg-estado-exitoBg">
+ <i class="ph-bold ph-arrow-square-out text-xs"></i>
+ </a>
+ @endif
+ </div>
+ </td>
+ </tr>
+ @endforeach
+ </tbody>
+ </table>
+ </div>
+ @if($participaciones->hasPages())
+ <div class="mt-5 border-t border-borde-suave pt-4">
+ {{ $participaciones->links() }}
+ </div>
+ @endif
+ @endif
+ </div>
+ </x-ui.collection-results>
+
+ {{-- ── PARTICIPACIÓN POR TIPO (ANALÍTICA) ──────────────────────────── --}}
+ @if($participacionPorTipo->isNotEmpty())
+ <section class="overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-sm backdrop-blur-xl">
+ <div class="border-b border-borde-suave bg-fondo-panel px-5 py-3.5">
+ <div class="flex items-center gap-2.5">
+ <i class="ph-bold ph-chart-bar text-boton-acento text-lg"></i>
+ <h2 class="text-sm font-bold uppercase tracking-[0.15em] text-titulo">Distribución por tipo de actividad</h2>
+ </div>
+ </div>
+ <div class="p-5 space-y-3">
+ @foreach($participacionPorTipo as $fila)
+ @php
+ $pct = $maximo > 0 ? round(($fila->total / $maximo) * 100) : 0;
+ @endphp
+ <div class="space-y-1.5">
+ <div class="flex items-center justify-between gap-4">
+ <span class="min-w-0 truncate text-xs font-bold text-titulo">{{ $fila->tipo ?? 'Sin tipo asignado' }}</span>
+ <span class="shrink-0 text-xs font-bold text-apoyo">{{ number_format($fila->total) }}</span>
+ </div>
+ <div class="h-2 w-full overflow-hidden rounded-full bg-fondo-panel">
+ <div class="h-2 rounded-full bg-gradient-to-r from-[var(--rm-accent-terracotta)] to-[var(--rm-warning)] transition-all duration-700"
+ style="width: {{ $pct }}%"></div>
+ </div>
+ </div>
+ @endforeach
+ </div>
+ </section>
+ @endif
+
+ {{-- ── NOTA INSTITUCIONAL ───────────────────────────────────────────── --}}
+ <div class="flex items-start gap-3 rounded-2xl border border-borde-suave bg-fondo-panel p-4">
+ <i class="ph-bold ph-info mt-0.5 shrink-0 text-lg text-apoyo"></i>
+ <p class="text-xs font-bold leading-relaxed text-apoyo">
+ La participación institucional usa <strong>actividades</strong> y <strong>participantes_actividad</strong>. Cada registro representa la vinculación de un residente a una actividad.
+ Para una gestión avanzada de estados (confirmado, invitado, en espera), se recomienda crear una tabla <em>participaciones_actividades</em> en una fase futura.
+ </p>
+ </div>
+
+ </div>
+
+ {{-- ════════════════════════════════════════════════════════════════════════ --}}
+ {{-- MODAL — REGISTRAR PARTICIPACIÓN --}}
+ {{-- ════════════════════════════════════════════════════════════════════════ --}}
+ @if($modalRegistrar)
+ <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8"
+ class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8 bg-[var(--rm-modal-backdrop,rgba(47,62,92,0.6))] backdrop-blur-sm"
+ wire:click.self="cerrarModales">
+ <div class="w-full max-w-xl overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-2xl">
+ <div class="h-1 bg-gradient-to-r from-[var(--rm-accent-terracotta)] via-[var(--rm-warning)] to-[var(--rm-action-primary)]"></div>
+ <div class="flex items-center justify-between border-b border-borde-suave bg-fondo-panel px-5 py-4">
+ <div class="flex items-center gap-2.5">
+ <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-estado-peligroBg text-boton-acento">
+ <i class="ph-bold ph-user-plus text-lg"></i>
+ </span>
+ <div>
+ <p class="text-[10px] font-bold uppercase tracking-[0.15em] text-apoyo">Participación</p>
+ <h3 class="text-sm font-bold text-titulo">Registrar participación</h3>
+ </div>
+ </div>
+ <button wire:click="cerrarModales" class="flex h-8 w-8 items-center justify-center rounded-xl border border-borde-suave text-apoyo transition hover:border-borde-focus hover:text-boton-acento">
+ <i class="ph-bold ph-x text-sm"></i>
+ </button>
+ </div>
+ <form wire:submit.prevent="guardarActividad" class="p-5 space-y-4">
+ <div>
+ <label class="{{ $labelCls }}">Residente <span class="text-boton-acento">*</span></label>
+ <select wire:model="codResidente" class="{{ $inputCls }}">
+ <option value="">Seleccione un residente...</option>
+ @foreach($adultos as $adulto)
+ <option value="{{ $adulto->cod_residente }}">
+ {{ $adulto->ap_paterno }} {{ $adulto->ap_materno ?? '' }}, {{ $adulto->nombres }}
+ </option>
+ @endforeach
+ </select>
+ @error('codResidente') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
+ </div>
+ <div>
+ <label class="{{ $labelCls }}">Tipo de actividad <span class="text-boton-acento">*</span></label>
+ <select wire:model="codTipoAct" class="{{ $inputCls }}">
+ <option value="">Seleccione un tipo...</option>
+ @foreach($tipos as $tipo)
+ <option value="{{ $tipo->cod_tipo_act }}">{{ $tipo->tipo }}</option>
+ @endforeach
+ </select>
+ @error('codTipoAct') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
+ </div>
+ <div class="grid grid-cols-2 gap-3">
+ <div>
+ <label class="{{ $labelCls }}">Fecha <span class="text-boton-acento">*</span></label>
+ <input wire:model="fecha" type="date" class="{{ $inputCls }}" />
+ @error('fecha') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
+ </div>
+ <div>
+ <label class="{{ $labelCls }}">Hora <span class="text-boton-acento">*</span></label>
+ <input wire:model="hora" type="time" class="{{ $inputCls }}" />
+ @error('hora') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
+ </div>
+ </div>
+ <div>
+ <label class="{{ $labelCls }}">Estado <span class="text-boton-acento">*</span></label>
+ <select wire:model="estado" class="{{ $inputCls }}">
+ <option value="PROGRAMADA">Programada</option>
+ <option value="REALIZADA">Realizada</option>
+ <option value="COMPLETADA">Completada</option>
+ <option value="REPROGRAMADA">Reprogramada</option>
+ <option value="CANCELADA">Cancelada</option>
+ </select>
+ @error('estado') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
+ </div>
+ <div>
+ <label class="{{ $labelCls }}">Observaciones <span class="text-apoyo normal-case tracking-normal">(opcional)</span></label>
+ <textarea wire:model="obs" rows="3" maxlength="2000"
+ placeholder="Notas sobre la participación..."
+ class="{{ $inputCls }} resize-none"></textarea>
+ @error('obs') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
+ </div>
+ <p class="text-[10px] font-bold text-apoyo leading-relaxed">
+ El sistema validará que no exista una participación duplicada del mismo residente, tipo, fecha y hora.
+ </p>
+ <div class="flex justify-end gap-2.5 border-t border-borde-suave pt-4">
+ <button type="button" wire:click="cerrarModales"
+ class="rounded-xl border border-borde-suave bg-fondo-card px-4 py-2 text-xs font-bold text-apoyo transition hover:border-borde-suave hover:text-titulo">
+ Cancelar
+ </button>
+ <button type="submit"
+ class="inline-flex items-center gap-2 rounded-xl bg-boton-acento px-5 py-2 text-xs font-bold text-inverso shadow-sm transition hover:bg-fondo-panel active:scale-95">
+ <i class="ph-bold ph-floppy-disk text-sm"></i>
+ Registrar
+ </button>
+ </div>
+ </form>
+ </div>
+ </div>
+ @endif
+
+ {{-- ════════════════════════════════════════════════════════════════════════ --}}
+ {{-- MODAL — EDITAR PARTICIPACIÓN --}}
+ {{-- ════════════════════════════════════════════════════════════════════════ --}}
+ @if($modalEditar)
+ <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8"
+ class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8 bg-[var(--rm-modal-backdrop,rgba(47,62,92,0.6))] backdrop-blur-sm"
+ wire:click.self="cerrarModales">
+ <div class="w-full max-w-xl overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-2xl">
+ <div class="h-1 bg-gradient-to-r from-[var(--rm-warning)] via-[var(--rm-accent-terracotta)] to-[var(--rm-action-primary)]"></div>
+ <div class="flex items-center justify-between border-b border-borde-suave bg-fondo-panel px-5 py-4">
+ <div class="flex items-center gap-2.5">
+ <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-estado-advertenciaBg text-estado-advertencia">
+ <i class="ph-bold ph-pencil-simple text-lg"></i>
+ </span>
+ <div>
+ <p class="text-[10px] font-bold uppercase tracking-[0.15em] text-apoyo">Participación</p>
+ <h3 class="text-sm font-bold text-titulo">Editar participación #{{ $editandoId }}</h3>
+ </div>
+ </div>
+ <button wire:click="cerrarModales" class="flex h-8 w-8 items-center justify-center rounded-xl border border-borde-suave text-apoyo transition hover:border-borde-focus hover:text-boton-acento">
+ <i class="ph-bold ph-x text-sm"></i>
+ </button>
+ </div>
+ <form wire:submit.prevent="actualizarActividad" class="p-5 space-y-4">
+ <div>
+ <label class="{{ $labelCls }}">Residente <span class="text-boton-acento">*</span></label>
+ <select wire:model="codResidente" class="{{ $inputCls }}">
+ <option value="">Seleccione un residente...</option>
+ @foreach($adultos as $adulto)
+ <option value="{{ $adulto->cod_residente }}">
+ {{ $adulto->ap_paterno }} {{ $adulto->ap_materno ?? '' }}, {{ $adulto->nombres }}
+ </option>
+ @endforeach
+ </select>
+ @error('codResidente') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
+ </div>
+ <div>
+ <label class="{{ $labelCls }}">Tipo de actividad <span class="text-boton-acento">*</span></label>
+ <select wire:model="codTipoAct" class="{{ $inputCls }}">
+ <option value="">Seleccione un tipo...</option>
+ @foreach($tipos as $tipo)
+ <option value="{{ $tipo->cod_tipo_act }}">{{ $tipo->tipo }}</option>
+ @endforeach
+ </select>
+ @error('codTipoAct') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
+ </div>
+ <div class="grid grid-cols-2 gap-3">
+ <div>
+ <label class="{{ $labelCls }}">Fecha <span class="text-boton-acento">*</span></label>
+ <input wire:model="fecha" type="date" class="{{ $inputCls }}" />
+ @error('fecha') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
+ </div>
+ <div>
+ <label class="{{ $labelCls }}">Hora <span class="text-boton-acento">*</span></label>
+ <input wire:model="hora" type="time" class="{{ $inputCls }}" />
+ @error('hora') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
+ </div>
+ </div>
+ <div>
+ <label class="{{ $labelCls }}">Estado <span class="text-boton-acento">*</span></label>
+ <select wire:model="estado" class="{{ $inputCls }}">
+ <option value="PROGRAMADA">Programada</option>
+ <option value="REALIZADA">Realizada</option>
+ <option value="COMPLETADA">Completada</option>
+ <option value="REPROGRAMADA">Reprogramada</option>
+ <option value="CANCELADA">Cancelada</option>
+ </select>
+ @error('estado') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
+ </div>
+ <div>
+ <label class="{{ $labelCls }}">Observaciones <span class="text-apoyo normal-case tracking-normal">(opcional)</span></label>
+ <textarea wire:model="obs" rows="3" maxlength="2000"
+ class="{{ $inputCls }} resize-none"></textarea>
+ @error('obs') <p class="{{ $errCls }}">{{ $message }}</p> @enderror
+ </div>
+ <div class="flex justify-end gap-2.5 border-t border-borde-suave pt-4">
+ <button type="button" wire:click="cerrarModales"
+ class="rounded-xl border border-borde-suave bg-fondo-card px-4 py-2 text-xs font-bold text-apoyo transition hover:border-borde-suave hover:text-titulo">
+ Cancelar
+ </button>
+ <button type="submit"
+ class="inline-flex items-center gap-2 rounded-xl bg-estado-advertenciaBg px-5 py-2 text-xs font-bold text-inverso shadow-sm transition hover:bg-fondo-panel active:scale-95">
+ <i class="ph-bold ph-floppy-disk text-sm"></i>
+ Guardar cambios
+ </button>
+ </div>
+ </form>
+ </div>
+ </div>
+ @endif
+
+ {{-- ════════════════════════════════════════════════════════════════════════ --}}
+ {{-- MODAL — DETALLE --}}
+ {{-- ════════════════════════════════════════════════════════════════════════ --}}
+ @if($modalDetalle && $detalle)
+ @php
+ $ne = \App\Models\Actividad::normalizarEstado($detalle->estado ?? '');
+ $am = $detalle->adultoMayor;
+ $edad = $am?->fecha_nac ? \Carbon\Carbon::parse($am->fecha_nac)->age : null;
+ @endphp
+ <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8"
+ class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8 bg-[var(--rm-modal-backdrop,rgba(47,62,92,0.6))] backdrop-blur-sm"
+ wire:click.self="cerrarModales">
+ <div class="w-full max-w-xl overflow-hidden rounded-[1.45rem] border border-borde-suave bg-fondo-panel shadow-2xl">
+ <div class="h-1 bg-gradient-to-r from-[var(--rm-action-primary)] via-[var(--rm-warning)] to-[var(--rm-accent-terracotta)]"></div>
+ <div class="flex items-center justify-between border-b border-borde-suave bg-fondo-panel px-5 py-4">
+ <div class="flex items-center gap-2.5">
+ <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-estado-exitoBg text-estado-exito">
+ <i class="ph-bold ph-users-four text-lg"></i>
+ </span>
+ <div>
+ <p class="text-[10px] font-bold uppercase tracking-[0.15em] text-apoyo">Participación</p>
+ <h3 class="text-sm font-bold text-titulo">Detalle de participación</h3>
+ </div>
+ </div>
+ <div class="flex items-center gap-2">
+ <x-ui.status-badge :estado="$detalle->estado" />
+ <button wire:click="cerrarModales" class="flex h-8 w-8 items-center justify-center rounded-xl border border-borde-suave text-apoyo transition hover:border-borde-focus hover:text-boton-acento">
+ <i class="ph-bold ph-x text-sm"></i>
+ </button>
+ </div>
+ </div>
+ <div class="p-5 space-y-4">
+ {{-- Adulto Mayor --}}
+ <div class="rounded-xl border border-borde-suave bg-fondo-panel px-4 py-3">
+ <p class="text-[10px] font-bold uppercase tracking-[0.13em] text-apoyo">Residente</p>
+ <p class="mt-1 text-sm font-bold text-titulo">
+ {{ $am?->ap_paterno ?? '—' }}
+ {{ $am?->ap_materno ?? '' }}
+ {{ $am?->nombres ?? '' }}
+ </p>
+ <div class="mt-1 flex items-center gap-3 text-[10px] font-bold text-apoyo">
+ @if($edad !== null)
+ <span>{{ $edad }} años</span>
+ @endif
+ </div>
+ </div>
+ {{-- Actividad --}}
+ <div class="grid grid-cols-2 gap-3">
+ <div class="rounded-xl border border-borde-suave bg-fondo-panel px-4 py-3">
+ <p class="text-[10px] font-bold uppercase tracking-[0.13em] text-apoyo">Tipo de actividad</p>
+ <p class="mt-1 text-sm font-bold text-titulo">
+ {{ optional($detalle->tipoActividad)->tipo ?? '—' }}
+ </p>
+ </div>
+ <div class="rounded-xl border border-borde-suave bg-fondo-panel px-4 py-3">
+ <p class="text-[10px] font-bold uppercase tracking-[0.13em] text-apoyo">Fecha y hora</p>
+ <p class="mt-1 text-sm font-bold text-titulo">
+ {{ \Carbon\Carbon::parse($detalle->fecha)->format('d/m/Y') }}
+ </p>
+ @if($detalle->hora)
+ <p class="text-xs font-bold text-apoyo">{{ substr($detalle->hora, 0, 5) }} hrs.</p>
+ @endif
+ </div>
+ </div>
+ {{-- Observación --}}
+ <div class="rounded-xl border border-borde-suave bg-fondo-panel px-4 py-3">
+ <p class="text-[10px] font-bold uppercase tracking-[0.13em] text-apoyo">Observaciones</p>
+ <p class="mt-1 text-xs font-bold leading-relaxed text-apoyo">
+ {{ $detalle->obs ?: 'Sin observaciones registradas.' }}
+ </p>
+ </div>
+ {{-- Timestamps --}}
+ @if($detalle->created_at || $detalle->updated_at)
+ <div class="flex flex-wrap gap-4 text-[10px] font-bold text-apoyo">
+ @if($detalle->created_at)
+ <span>Registrado: {{ $detalle->created_at->format('d/m/Y H:i') }}</span>
+ @endif
+ @if($detalle->updated_at && $detalle->created_at && $detalle->updated_at->ne($detalle->created_at))
+ <span>Editado: {{ $detalle->updated_at->format('d/m/Y H:i') }}</span>
+ @endif
+ </div>
+ @endif
+ {{-- Botones --}}
+ <div class="flex flex-wrap justify-end gap-2.5 border-t border-borde-suave pt-4">
+ @if($am)
+ <a href="{{ route('admin.adultos-mayores.show', ['adulto_mayor' => $am->cod_residente]) }}"
+ class="inline-flex items-center gap-1.5 rounded-xl border border-estado-exitoBorde bg-estado-exitoBg px-4 py-2 text-xs font-bold text-estado-exito transition hover:bg-estado-exitoBg">
+ <i class="ph-bold ph-user text-xs"></i>
+ Ver ficha
+ </a>
+ @endif
+ @can('actividades.gestionar')
+ @if(strtoupper($detalle->estado) !== 'CANCELADA')
+ <button type="button" wire:click="abrirEditar('{{ $detalle->cod_act_adul }}')"
+ class="inline-flex items-center gap-1.5 rounded-xl border border-estado-advertenciaBorde bg-estado-advertenciaBg px-4 py-2 text-xs font-bold text-estado-advertencia transition hover:bg-estado-advertenciaBg">
+ <i class="ph-bold ph-pencil text-xs"></i>
+ Editar
+ </button>
+ @endif
+ @endcan
+ <button type="button" wire:click="cerrarModales"
+ class="rounded-xl border border-borde-suave bg-fondo-card px-4 py-2 text-xs font-bold text-apoyo transition hover:border-borde-suave hover:text-titulo">
+ Cerrar
+ </button>
+ </div>
+ </div>
+ </div>
+ </div>
+ @endif
+
+</div>

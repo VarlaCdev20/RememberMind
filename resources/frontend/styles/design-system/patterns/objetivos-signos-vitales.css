@@ -1,0 +1,29 @@
+.rm-clinical-goals { display: grid; gap: 18px; max-width: 1100px; margin: 0 auto; padding: 24px; color: var(--rm-text-primary); }
+.rm-clinical-goals__header, .rm-clinical-goals__card { border: 1px solid var(--rm-border); border-radius: 20px; background: var(--rm-card-bg); box-shadow: var(--rm-chart-card-shadow, 0 8px 24px rgba(74,70,66,.06)); }
+.rm-clinical-goals__header { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 22px 26px; }
+.rm-clinical-goals__header h1 { margin: 4px 0; font: 800 clamp(24px,3vw,32px)/1.2 'Nunito Sans',sans-serif; }
+.rm-clinical-goals__header p, .rm-clinical-goals__hint, .rm-clinical-goals__empty { color: var(--rm-text-secondary); line-height: 1.5; }
+.rm-clinical-goals__eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .11em; color: var(--rm-accent) !important; }
+.rm-clinical-goals__card { padding: 22px 26px; }
+.rm-clinical-goals__card h2 { margin: 0 0 12px; font: 800 20px/1.3 'Nunito Sans',sans-serif; }
+.rm-clinical-goals__row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 0; border-top: 1px solid var(--rm-border); }
+.rm-clinical-goals__row strong, .rm-clinical-goals__row span { display: block; }
+.rm-clinical-goals__row span { color: var(--rm-text-secondary); font-size: 13px; }
+.rm-clinical-goals__values { text-align: right; }
+.rm-clinical-goals__form { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; margin-top: 18px; }
+.rm-clinical-goals__field { display: grid; align-content: start; gap: 6px; }
+.rm-clinical-goals__field--wide, .rm-clinical-goals__actions { grid-column: 1 / -1; }
+.rm-clinical-goals__field label { font-weight: 700; font-size: 14px; }
+.rm-clinical-goals__field input, .rm-clinical-goals__field select, .rm-clinical-goals__field textarea { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--rm-border); border-radius: 12px; color: var(--rm-text-primary); background: var(--rm-surface-soft); }
+.rm-clinical-goals__field :is(input,select,textarea):focus-visible, .rm-clinical-goals :is(button,a):focus-visible { outline: 2px solid var(--rm-accent); outline-offset: 2px; }
+.rm-clinical-goals__field [aria-invalid='true'] { border-color: var(--rm-coral-700); }
+.rm-clinical-goals__field [role='alert'] { color: var(--rm-coral-700); font-size: 13px; }
+.rm-clinical-goals__actions { display: flex; justify-content: flex-end; }
+.rm-clinical-goals__actions button { min-height: 44px; padding: 0 18px; border-radius: 12px; background: var(--rm-accent); color: var(--rm-card-bg); font-weight: 800; }
+.rm-clinical-goals__actions button:disabled { opacity: .6; cursor: wait; }
+.rm-clinical-goals__actions .rm-clinical-goals__secondary-action { border: 1px solid var(--rm-border); background: var(--rm-surface-soft); color: var(--rm-text-primary); }
+.rm-clinical-goals__actions .rm-clinical-goals__secondary-action:hover { background: var(--rm-sage-100); }
+.rm-clinical-goals__back, .rm-clinical-goals__history-button, .rm-clinical-goals__list-link { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 0 13px; border: 1px solid var(--rm-border); border-radius: 12px; background: var(--rm-surface-soft); color: var(--rm-text-primary); font-weight: 700; text-decoration: none; }
+.rm-clinical-goals__history-button { cursor: pointer; }
+.rm-clinical-goals__list-link { font-size: 12px; }
+@media (max-width: 700px) { .rm-clinical-goals { padding: 14px; } .rm-clinical-goals__header, .rm-clinical-goals__row { align-items: flex-start; flex-direction: column; } .rm-clinical-goals__header, .rm-clinical-goals__card { padding: 18px; } .rm-clinical-goals__values { text-align: left; } .rm-clinical-goals__form { grid-template-columns: 1fr; } }

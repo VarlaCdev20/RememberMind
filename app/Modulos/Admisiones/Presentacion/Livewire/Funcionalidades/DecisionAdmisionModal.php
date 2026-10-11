@@ -1,0 +1,145 @@
+<?php
+
+namespace App\Modulos\Admisiones\Presentacion\Livewire\Funcionalidades;
+
+use App\Models\Residente;
+use App\Modulos\Admisiones\Aplicacion\Acciones\RegistrarDecisionAdmision;
+use App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService;
+use Illuminate\Validation\ValidationException;
+use Livewire\Component;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+
+class DecisionAdmisionModal extends Component
+{
+    public $isOpen = false;
+
+    public $adulto;
+
+    public $decision;
+
+    public $motivo_decision;
+
+    public $seguimiento_requerido;
+
+    public $cuidado_especial_requerido;
+
+    public $institucion_derivada;
+
+    public $motivo_derivacion;
+
+    public $recomendacion_final;
+
+    protected $listeners = ['abrirDecisionAdmision' => 'open'];
+
+    public function open($cod_residente)
+    {
+        abort_unless(app(AccesoClinicoTemporalService::class)
+            ->tieneRol(auth()->user(), ['MEDICO GENERAL/GERIATRA']), 403);
+        $this->resetForm();
+        $this->adulto = Residente::find($cod_residente);
+        if ($this->adulto && $this->adulto->estado === 'DECISION_ADMISION') {
+            $this->isOpen = true;
+        } else {
+            $this->dispatch('notificar', ['tipo' => 'error', 'mensaje' => 'No se puede decidir sin valoración médica completa.']);
+        }
+    }
+
+    public function close()
+    {
+        $this->isOpen = false;
+        $this->resetForm();
+    }
+
+    public function resetForm()
+    {
+        $this->reset([
+            'decision', 'motivo_decision', 'seguimiento_requerido',
+            'cuidado_especial_requerido', 'institucion_derivada',
+            'motivo_derivacion', 'recomendacion_final',
+        ]);
+        $this->resetValidation();
+    }
+
+    public function updatedDecision($value)
+    {
+        // Limpiar campos condicionales cuando cambia la decisión
+        $this->motivo_decision = '';
+        $this->seguimiento_requerido = '';
+        $this->cuidado_especial_requerido = '';
+        $this->institucion_derivada = '';
+        $this->motivo_derivacion = '';
+    }
+
+    public function guardar()
+    {
+        abort_unless(app(AccesoClinicoTemporalService::class)
+            ->tieneRol(auth()->user(), ['MEDICO GENERAL/GERIATRA']), 403);
+        $rules = [
+            'decision' => 'required|in:ADMITIDO_NORMAL,ADMITIDO_CON_SEGUIMIENTO,ADMITIDO_CON_CUIDADO_ESPECIAL,DERIVADO',
+            'recomendacion_final' => 'nullable|string',
+        ];
+
+        if ($this->decision === 'ADMITIDO_NORMAL') {
+            $rules['motivo_decision'] = 'required|min:5';
+        } elseif ($this->decision === 'ADMITIDO_CON_SEGUIMIENTO') {
+            $rules['seguimiento_requerido'] = 'required|min:5';
+        } elseif ($this->decision === 'ADMITIDO_CON_CUIDADO_ESPECIAL') {
+            $rules['cuidado_especial_requerido'] = 'required|min:5';
+        } elseif ($this->decision === 'DERIVADO') {
+            $rules['motivo_derivacion'] = 'required|min:5';
+            $rules['institucion_derivada'] = 'nullable|string';
+        }
+
+        $this->validate($rules, [
+            'decision.required' => 'Debe seleccionar una decisión médica.',
+            'motivo_decision.required' => 'El motivo de decisión es obligatorio para admisión normal.',
+            'seguimiento_requerido.required' => 'El detalle del seguimiento es obligatorio.',
+            'cuidado_especial_requerido.required' => 'El detalle de cuidado especial es obligatorio.',
+            'motivo_derivacion.required' => 'Debe justificar el motivo de la derivación.',
+        ]);
+
+        abort_unless($this->adulto && $this->adulto->fresh()->estado === 'DECISION_ADMISION', 409);
+        try {
+            $this->adulto = app(RegistrarDecisionAdmision::class)->ejecutar(auth()->user(), [
+                'adulto' => $this->adulto,
+                'decision' => $this->decision,
+                'motivo_decision' => $this->motivo_decision,
+                'motivo_derivacion' => $this->motivo_derivacion,
+                'seguimiento_requerido' => $this->seguimiento_requerido,
+                'cuidado_especial_requerido' => $this->cuidado_especial_requerido,
+                'institucion_derivada' => $this->institucion_derivada,
+                'recomendacion_final' => $this->recomendacion_final,
+            ]);
+
+            $mensajeExito = ($this->decision === 'DERIVADO')
+                ? 'El paciente ha sido marcado como DERIVADO y sale del flujo de admisión.'
+                : 'El paciente ha sido admitido y pasa a la etapa de asignación de habitación.';
+
+            $this->dispatch('swal', [
+                'title' => 'Decisión Registrada',
+                'text' => $mensajeExito,
+                'icon' => 'success',
+            ]);
+
+            $this->dispatch('valoracionMedicaCompletada');
+            $this->close();
+
+        } catch (\Throwable $e) {
+            if ($e instanceof ValidationException
+                || $e instanceof HttpExceptionInterface) {
+                throw $e;
+            }
+            report($e);
+            $this->dispatch('swal', [
+                'title' => 'Error',
+                'text' => 'No se pudo guardar la decisión. Inténtelo nuevamente.',
+                'icon' => 'error',
+            ]);
+        }
+    }
+
+    public function render()
+    {
+        return view('livewire.admisiones.decision-admision-modal');
+    }
+}

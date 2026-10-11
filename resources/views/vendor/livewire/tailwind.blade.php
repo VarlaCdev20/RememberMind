@@ -1,0 +1,1 @@
+@include('components.ui.paginacion', ['paginator' => $paginator, 'mode' => 'livewire', 'showPerPage' => false, 'scrollTo' => $scrollTo ?? 'body', 'attributes' => new \Illuminate\View\ComponentAttributeBag])

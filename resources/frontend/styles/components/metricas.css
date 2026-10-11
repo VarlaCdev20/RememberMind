@@ -1,0 +1,47 @@
+@layer components {
+
+    .rm-metric-card {
+        border: 1px solid var(--color-borde-suave);
+        border-radius: 0.875rem;
+        background: var(--surface-metric-card);
+        color: var(--color-parrafo);
+        box-shadow: var(--sombra-card);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        padding: 0.875rem;
+        transition:
+            transform 180ms ease,
+            box-shadow 180ms ease,
+            border-color 180ms ease;
+    }
+
+    .rm-metric-card:hover {
+        border-color: rgba(217, 121, 95, 0.22);
+        box-shadow: var(--sombra-card-hover);
+        transform: translateY(-1px);
+    }
+
+    .rm-metric-label {
+        color: var(--color-meta);
+        font-family: var(--font-ui);
+        font-size: 0.625rem;
+        font-weight: var(--font-bold);
+        letter-spacing: var(--tracking-widest);
+        text-transform: uppercase;
+    }
+
+    .rm-metric-value {
+        margin-top: 0.25rem;
+        color: var(--color-modulo-salud);
+        font-family: var(--font-titulos);
+        font-weight: var(--font-extrabold);
+        line-height: var(--leading-tight);
+    }
+
+    .rm-metric-value-neutral {
+        margin-top: 0.25rem;
+        color: var(--color-titulo);
+        font-size: 1.25rem;
+        font-weight: 900;
+    }
+}

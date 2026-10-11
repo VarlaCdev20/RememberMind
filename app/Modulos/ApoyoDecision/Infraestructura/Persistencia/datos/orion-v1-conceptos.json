@@ -1,0 +1,910 @@
+{
+  "documento": "O.R.I.O.N.",
+  "documento_maestro_sha256": "70d1b0e968fd9e77b3e9d36fd30959f180fc7cbe593fb23949482b1d85f7d8c2",
+  "matrices_sha256": "5495b104a7c62311193d24e5f32cee96b2b8e450fcebd03f230c5e4f56a053c4",
+  "documento_url": "https://docs.google.com/document/d/1d68S-EZTyYVKsYm-cOtaktYSNUBfDAi59FHexkEd88I",
+  "matrices_url": "https://docs.google.com/spreadsheets/d/1lPFoZD6LlIoOkuWsLN3VTjvsgBowBl0mBQekjyOiyVA",
+  "fecha_consulta": "2026-10-08",
+  "nodos": [
+    {
+      "codigo": "CC-001",
+      "nombre": "Cambio cognitivo relevante",
+      "tipo": "TRANSVERSAL",
+      "definicion": "Variación nueva, persistente o progresiva respecto al nivel previo, respaldada cuando sea posible por evidencia objetiva y/o repercusión funcional.",
+      "estado_fuente": "CONGELADO",
+      "procedencia": [
+        2
+      ],
+      "limites": ""
+    },
+    {
+      "codigo": "BL-COG",
+      "nombre": "Cognición",
+      "tipo": "BLOQUE",
+      "definicion": "Evidencia primaria del funcionamiento cognitivo.",
+      "estado_fuente": "CONGELADO",
+      "procedencia": [
+        3
+      ],
+      "limites": ""
+    },
+    {
+      "codigo": "BL-LON",
+      "nombre": "Cambio longitudinal",
+      "tipo": "BLOQUE",
+      "definicion": "Proceso de comparar evidencia cognitiva válida y temporalmente ordenada del mismo residente para identificar una variación nueva y determinar, cuando la evidencia lo permita, si se mantiene, progresa, fluctúa o corresponde a un episodio/contexto no comparable. No equivale a una diferencia bruta entre dos registros.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA INTERNA V1",
+      "procedencia": [
+        4,
+        36
+      ],
+      "limites": "La existencia del bloque Cambio longitudinal ya está DEFINIDA/CONGELADA; esta ficha propone su arquitectura interna. Línea base no se sobrescribe automáticamente. Ventanas, cantidades mínimas, RCI/fórmulas y reglas ejecutables permanecen para Formalización."
+    },
+    {
+      "codigo": "BL-FUN",
+      "nombre": "Funcionalidad",
+      "tipo": "BLOQUE",
+      "definicion": "Repercusión del cambio en autonomía y desempeño.",
+      "estado_fuente": "CONGELADO",
+      "procedencia": [
+        5
+      ],
+      "limites": ""
+    },
+    {
+      "codigo": "BL-PSI",
+      "nombre": "Conducta / estado psicológico",
+      "tipo": "BLOQUE",
+      "definicion": "Organiza cambios de ánimo, ansiedad, motivación/apatía, regulación conductual, interacción social y percepción que pueden acompañar, modificar o explicar el rendimiento cognitivo sin equivaler automáticamente a deterioro cognitivo.",
+      "estado_fuente": "DEFINIDO/CONGELADO — BLOQUE Y ARQUITECTURA INTERNA V1",
+      "procedencia": [
+        6
+      ],
+      "limites": "La existencia del bloque ya estaba definida/congelada. Esta actualización desarrolla su arquitectura interna; pesos, ventanas, reglas ejecutables y atribución causal permanecen pendientes."
+    },
+    {
+      "codigo": "BL-CONF",
+      "nombre": "Confusores clínicos",
+      "tipo": "BLOQUE",
+      "definicion": "Condiciones que pueden alterar o explicar el rendimiento cognitivo.",
+      "estado_fuente": "CONGELADO",
+      "procedencia": [
+        7
+      ],
+      "limites": ""
+    },
+    {
+      "codigo": "BL-RISK",
+      "nombre": "Perfil de riesgo",
+      "tipo": "BLOQUE",
+      "definicion": "Organiza factores demográficos, de reserva, clínicos, sensoriales, conductuales, psicosociales y ambientales asociados con vulnerabilidad a deterioro cognitivo/demencia, sin demostrar deterioro actual ni predecir individualmente una enfermedad.",
+      "estado_fuente": "DEFINIDO/CONGELADO — BLOQUE Y ARQUITECTURA INTERNA V1",
+      "procedencia": [
+        8
+      ],
+      "limites": "Factor de riesgo ≠ señal de deterioro ≠ criterio de evaluación ≠ diagnóstico. Sin pesos, puntos, probabilidades ni niveles calculados en Fase 2."
+    },
+    {
+      "codigo": "COG-MEM",
+      "nombre": "Aprendizaje y memoria",
+      "tipo": "CRITERIO",
+      "definicion": "Procesos de adquisición, retención y recuperación de información; se interpreta respecto a trayectoria y contexto.",
+      "estado_fuente": "DEFINIDO/CONGELADO — V1",
+      "procedencia": [
+        9
+      ],
+      "limites": "Conceptualización de COG-MEM completada; parámetros computables permanecen pendientes de Fase 3."
+    },
+    {
+      "codigo": "COG-ATE",
+      "nombre": "Atención",
+      "tipo": "CRITERIO",
+      "definicion": "Capacidad de seleccionar y mantener el foco sobre información relevante y distribuir/controlar recursos atencionales ante demandas concurrentes; su desempeño puede modificar memoria, lenguaje y ejecución de instrucciones.",
+      "estado_fuente": "DEFINIDO/CONGELADO — V1",
+      "procedencia": [
+        10
+      ],
+      "limites": "Fronteras conceptuales revisadas: sostenida/selectiva/dividida permanecen en COG-ATE; set shifting se reserva primariamente para COG-EJE; memoria de trabajo queda transversal COG-EJE/COG-MEM; velocidad de procesamiento permanece separada. Evidencia observacional gruesa no permite inferir subtipos sin tarea/instrumento específico."
+    },
+    {
+      "codigo": "MEM-S01",
+      "nombre": "Aprendizaje / adquisición",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Incorporación de información nueva dentro del dominio de aprendizaje y memoria.",
+      "estado_fuente": "CANDIDATO",
+      "procedencia": [
+        11
+      ],
+      "limites": "Se mantiene dentro de COG-MEM."
+    },
+    {
+      "codigo": "MEM-S02",
+      "nombre": "Recuerdo diferido libre",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Recuperación posterior de información sin ayuda.",
+      "estado_fuente": "CANDIDATO",
+      "procedencia": [
+        12
+      ],
+      "limites": "Puede provenir de instrumentos que lo midan explícitamente."
+    },
+    {
+      "codigo": "MEM-S03",
+      "nombre": "Recuerdo con claves",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Recuperación de información con claves o ayudas estructuradas.",
+      "estado_fuente": "CANDIDATO",
+      "procedencia": [
+        13
+      ],
+      "limites": "No debe recibir peso propio por defecto."
+    },
+    {
+      "codigo": "MEM-S04",
+      "nombre": "Reconocimiento",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Reconocimiento de información previamente presentada cuando el instrumento lo evalúa.",
+      "estado_fuente": "CANDIDATO",
+      "procedencia": [
+        14
+      ],
+      "limites": "Se representa solo cuando existe evidencia válida."
+    },
+    {
+      "codigo": "ATE-S01",
+      "nombre": "Atención sostenida",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Capacidad de mantener el foco atencional durante un intervalo o actividad.",
+      "estado_fuente": "CANDIDATO",
+      "procedencia": [
+        15
+      ],
+      "limites": "Respaldado por taxonomía neuropsicológica y metaanálisis de progresión; no se define escala todavía."
+    },
+    {
+      "codigo": "ATE-S02",
+      "nombre": "Atención selectiva",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Capacidad de priorizar información relevante frente a distractores.",
+      "estado_fuente": "CANDIDATO — FRONTERA REVISADA",
+      "procedencia": [
+        16
+      ],
+      "limites": "Se mantiene en COG-ATE. Si la tarea exige inhibición/interferencia, la evidencia se etiqueta como mixta Atención–Ejecutiva."
+    },
+    {
+      "codigo": "ATE-S03",
+      "nombre": "Atención dividida",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Capacidad de distribuir recursos atencionales entre demandas concurrentes.",
+      "estado_fuente": "CANDIDATO — FRONTERA REVISADA",
+      "procedencia": [
+        17
+      ],
+      "limites": "Se mantiene en COG-ATE. Las tareas duales con alta demanda de coordinación ejecutiva se etiquetan como evidencia mixta y no generan doble contribución."
+    },
+    {
+      "codigo": "COG-EJE",
+      "nombre": "Función ejecutiva",
+      "tipo": "CRITERIO",
+      "definicion": "Conjunto de procesos de control que permiten regular conducta orientada a metas, inhibir respuestas inadecuadas, cambiar de estrategia, actualizar información relevante y planificar/resolver problemas.",
+      "estado_fuente": "DEFINIDO/CONGELADO — V1",
+      "procedencia": [
+        18
+      ],
+      "limites": "Conceptualización de COG-EJE completada: estructura, fronteras, evaluabilidad, confusores, solapamientos y mapeo conceptual de instrumentos documentados. Pendientes de Fase 3: variables, reglas exactas, ventanas, escalas, normalización, peso, agregación y umbrales."
+    },
+    {
+      "codigo": "EJE-S01",
+      "nombre": "Control inhibitorio / inhibición",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Capacidad de suprimir o controlar respuestas dominantes o inadecuadas para mantener una conducta dirigida a objetivos.",
+      "estado_fuente": "CANDIDATO",
+      "procedencia": [
+        19
+      ],
+      "limites": "Distinguir de atención selectiva; tareas de interferencia pueden producir evidencia mixta."
+    },
+    {
+      "codigo": "EJE-S02",
+      "nombre": "Flexibilidad cognitiva / set shifting",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Capacidad de cambiar entre reglas, estrategias, tareas u operaciones mentales cuando la situación lo requiere.",
+      "estado_fuente": "CANDIDATO",
+      "procedencia": [
+        20
+      ],
+      "limites": "Tras revisión de COG-ATE, su asignación primaria queda en COG-EJE; conserva relación con recursos atencionales."
+    },
+    {
+      "codigo": "EJE-S03",
+      "nombre": "Actualización / manipulación en memoria de trabajo",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Mantener y actualizar información relevante mientras se manipula para cumplir una meta o tarea.",
+      "estado_fuente": "CANDIDATO — TRANSVERSAL",
+      "procedencia": [
+        21
+      ],
+      "limites": "Relacionada con COG-MEM; no debe duplicarse como evidencia independiente en ambos dominios."
+    },
+    {
+      "codigo": "EJE-S04",
+      "nombre": "Planificación y resolución de problemas",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Organizar secuencias y estrategias para alcanzar objetivos y resolver situaciones nuevas o complejas.",
+      "estado_fuente": "CANDIDATO",
+      "procedencia": [
+        22
+      ],
+      "limites": "Razonamiento se mantiene relacionado y será evaluado como posible parte de este nivel antes de crear un criterio separado."
+    },
+    {
+      "codigo": "EJE-S05",
+      "nombre": "Razonamiento / abstracción",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Capacidad de establecer relaciones, extraer conclusiones, aplicar reglas y razonar sobre situaciones o problemas, apoyándose en otros procesos ejecutivos y de memoria de trabajo.",
+      "estado_fuente": "CANDIDATO — INTEGRADO EN COG-EJE",
+      "procedencia": [
+        23
+      ],
+      "limites": "COG-RAZ no avanza como criterio independiente; se conserva trazabilidad del concepto dentro de COG-EJE. Reabrible solo si nueva evidencia justifica separación."
+    },
+    {
+      "codigo": "COG-LEN",
+      "nombre": "Lenguaje",
+      "tipo": "CRITERIO",
+      "definicion": "Capacidad de comprender y producir lenguaje, acceder a palabras, denominarlas, generar verbalmente información y repetir mensajes; se interpreta separando lenguaje de atención, memoria, audición y control ejecutivo.",
+      "estado_fuente": "DEFINIDO/CONGELADO — V1",
+      "procedencia": [
+        24
+      ],
+      "limites": "Conceptualización completada: estructura, fronteras, evaluabilidad, confusores y mapeo de instrumentos. Habla motora se controla como modificador, no como Lenguaje. Lectura/escritura se reconocen clínicamente pero quedan fuera del núcleo operativo V1 y no generan variables propias."
+    },
+    {
+      "codigo": "LEN-S01",
+      "nombre": "Denominación / acceso léxico",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Acceder y producir la palabra correspondiente a un objeto, concepto o referente.",
+      "estado_fuente": "CANDIDATO — FRONTERA REVISADA",
+      "procedencia": [
+        25
+      ],
+      "limites": "Núcleo de COG-LEN; no existe campo observacional específico de denominación en la BDD congelada."
+    },
+    {
+      "codigo": "LEN-S02",
+      "nombre": "Fluidez verbal / generación léxica",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Generar palabras o contenido verbal de manera eficiente bajo una consigna; puede implicar también velocidad y control ejecutivo.",
+      "estado_fuente": "CANDIDATO — FRONTERA REVISADA",
+      "procedencia": [
+        26
+      ],
+      "limites": "Permanece en COG-LEN; tareas pueden ser mixtas con COG-EJE/COG-VEL según demanda."
+    },
+    {
+      "codigo": "LEN-S03",
+      "nombre": "Comprensión del lenguaje",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Comprender palabras, mensajes, consignas y relaciones expresadas verbalmente.",
+      "estado_fuente": "CANDIDATO — FRONTERA REVISADA",
+      "procedencia": [
+        27
+      ],
+      "limites": "Permanece en COG-LEN; comprensión de instrucciones es evidencia multidominio salvo tarea que aísle el componente lingüístico."
+    },
+    {
+      "codigo": "LEN-S04",
+      "nombre": "Repetición",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Reproducir material verbal presentado, conservando su forma lingüística.",
+      "estado_fuente": "CANDIDATO — FRONTERA REVISADA",
+      "procedencia": [
+        28
+      ],
+      "limites": "Permanece en COG-LEN cuando tarea válida la mida; controlar audición y memoria de trabajo verbal."
+    },
+    {
+      "codigo": "LEN-S05",
+      "nombre": "Producción verbal / discurso",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Expresar mensajes verbales comprensibles y organizados; incluye aspectos de producción lingüística y coherencia comunicativa.",
+      "estado_fuente": "CANDIDATO — FRONTERA REVISADA",
+      "procedencia": [
+        29
+      ],
+      "limites": "Permanece en COG-LEN; discurso/comunicación pueden ser evidencia mixta con memoria, atención y función ejecutiva."
+    },
+    {
+      "codigo": "COG-VIS",
+      "nombre": "Función visuoespacial",
+      "tipo": "CRITERIO",
+      "definicion": "Procesamiento de información visual y espacial necesario para percibir relaciones espaciales y organizar/construir configuraciones visuales; se interpreta separando percepción cognitiva de limitaciones sensoriales y motoras.",
+      "estado_fuente": "DEFINIDO/CONGELADO — V1",
+      "procedencia": [
+        31
+      ],
+      "limites": "Conceptualización de COG-VIS completada: núcleo V1 VIS-S01/VIS-S02, fronteras, evaluabilidad, confusores, solapamientos y mapeo conceptual de instrumentos documentados. Pendientes de Fase 3: variables, reglas exactas, ventanas, escalas, normalización, peso, agregación y umbrales."
+    },
+    {
+      "codigo": "VIS-S01",
+      "nombre": "Percepción / relaciones visuoespaciales",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Procesar posiciones, direcciones, configuraciones y relaciones espaciales entre estímulos visuales.",
+      "estado_fuente": "CANDIDATO",
+      "procedencia": [
+        32
+      ],
+      "limites": "Distinguir de agudeza visual, campo visual y otras limitaciones sensoriales; requiere tarea/instrumento válido."
+    },
+    {
+      "codigo": "VIS-S02",
+      "nombre": "Visuoconstrucción",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Organizar e integrar elementos visuales y espaciales para copiar, dibujar o construir una configuración.",
+      "estado_fuente": "CANDIDATO — SOLAPAMIENTO ALTO",
+      "procedencia": [
+        33
+      ],
+      "limites": "Tareas visuoconstructivas pueden depender también de motricidad fina, atención y planificación ejecutiva; controlar evidencia mixta."
+    },
+    {
+      "codigo": "COG-ORI",
+      "nombre": "Orientación cognitiva",
+      "tipo": "TRANSVERSAL",
+      "definicion": "Capacidad de situarse respecto de referencias temporales, personales y del lugar/contexto inmediato. En RememberMind se interpreta como evidencia transversal y longitudinal relacionada con otros dominios, no como constructo autónomo ponderado.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ROL TRANSVERSAL V1; VALIDACIÓN OPERATIVA PENDIENTE",
+      "procedencia": [
+        34
+      ],
+      "limites": "Mantener como nodo de red semántica. Orientación persona/lugar/tiempo ≠ navegación espacial. Evitar doble conteo con memoria; desorientación aguda/fluctuante exige advertencia y revisión clínica."
+    },
+    {
+      "codigo": "COG-VEL",
+      "nombre": "Velocidad de procesamiento cognitivo",
+      "tipo": "TRANSVERSAL",
+      "definicion": "Eficiencia con la que una persona procesa información y produce una respuesta en tareas cuya demanda temporal está explícitamente definida. Debe diferenciarse de velocidad motora, búsqueda visual, atención y control ejecutivo, porque muchas tareas cronometradas mezclan estos procesos.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ROL TRANSVERSAL V1; VALIDACIÓN OPERATIVA PENDIENTE",
+      "procedencia": [
+        35
+      ],
+      "limites": "No existe campo BDD directo de velocidad de procesamiento. Mantener como nodo transversal de la red semántica y dimensión interpretativa de tareas temporizadas; no asignar peso propio."
+    },
+    {
+      "codigo": "FUN-BADL",
+      "nombre": "Autonomía en actividades básicas de la vida diaria",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Capacidad de realizar autocuidado y movilidad básica como alimentación, baño, vestido, higiene, continencia, traslado y movilidad. Describe independencia funcional, pero no identifica por sí sola si la causa es cognitiva, física, sensorial o clínica.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA INTERNA V1",
+      "procedencia": [
+        37
+      ],
+      "limites": "Cobertura directa en valoraciones_funcionales y potencialmente Barthel/Katz. La atribución causal a cognición requiere integración con otros bloques."
+    },
+    {
+      "codigo": "FUN-IADL",
+      "nombre": "Funcionamiento instrumental / actividades complejas de la vida diaria",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Desempeño en tareas complejas de la vida diaria que requieren organización, memoria, atención, lenguaje, función ejecutiva, orientación y otras capacidades, además de condiciones físicas y oportunidades de ejecución.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA V1 / COBERTURA OPERATIVA LIMITADA",
+      "procedencia": [
+        38
+      ],
+      "limites": "Científicamente relevante para impacto temprano; la BDD congelada no posee campos estructurados específicos de finanzas, compras, cocina, transporte, tecnología o manejo de medicación como capacidad funcional. No inventar cobertura."
+    },
+    {
+      "codigo": "FUN-SUP",
+      "nombre": "Necesidad de supervisión / asistencia funcional",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Necesidad documentada de supervisión, ayuda o dependencia para realizar actividades. Expresa impacto funcional global, pero es causalmente inespecífica y puede derivarse de razones cognitivas, físicas, sensoriales, clínicas, de seguridad o institucionales.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA V1 / CAUSALIDAD NO ESPECÍFICA",
+      "procedencia": [
+        39
+      ],
+      "limites": "Mapea necesita_supervision y nivel_dependencia como evidencia de impacto; nunca como sustituto de evaluación cognitiva."
+    },
+    {
+      "codigo": "PSI-AFE",
+      "nombre": "Estado afectivo / ánimo y ansiedad",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Cambios en estado de ánimo, afecto y ansiedad que pueden coexistir con síntomas cognitivos, modificar su expresión o constituir una condición psicológica propia.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA INTERNA V1",
+      "procedencia": [
+        40
+      ],
+      "limites": "Mapea estado_animo, afecto y ansiedad; exige diferenciar condición afectiva de deterioro cognitivo."
+    },
+    {
+      "codigo": "PSI-MOT",
+      "nombre": "Motivación / apatía y participación",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Disminución de iniciativa, motivación o participación y presencia de apatía/aislamiento, interpretadas respecto del nivel previo y contexto social, funcional, afectivo y médico.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA INTERNA V1",
+      "procedencia": [
+        41
+      ],
+      "limites": "Apatía puede ser relevante, pero no equivale a depresión ni a deterioro cognitivo y no recibe peso propio."
+    },
+    {
+      "codigo": "PSI-CON",
+      "nombre": "Regulación / cambio conductual",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Cambios como agitación, agresividad, deambulación o cambio de conducta, cuya interpretación requiere causas médicas, ambientales, afectivas, sensoriales y de seguridad.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA INTERNA V1",
+      "procedencia": [
+        42
+      ],
+      "limites": "Deambulación o agitación no se consideran evidencia cognitiva por sí mismas; deben interpretarse con contexto y posibles causas."
+    },
+    {
+      "codigo": "PSI-SOC",
+      "nombre": "Interacción / participación social",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Cambios en aislamiento, participación e interacción social que pueden reflejar ánimo, apatía, cognición, barreras sensoriales, adaptación institucional u otros factores.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA INTERNA V1",
+      "procedencia": [
+        43
+      ],
+      "limites": "No interpretar baja participación como deterioro cognitivo sin conocer preferencias, oportunidades y contexto."
+    },
+    {
+      "codigo": "PSI-PER",
+      "nombre": "Percepción / contenido experiencial observado",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Alteraciones perceptivas o experiencias inusuales documentadas profesionalmente que pueden requerir evaluación clínica y control de causas agudas, psiquiátricas, neurológicas, sensoriales o farmacológicas.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA V1 / COBERTURA ESTRUCTURADA LIMITADA",
+      "procedencia": [
+        44
+      ],
+      "limites": "La BDD posee percepcion en texto en valoraciones_psicologicas, pero no campos estructurados específicos para alucinaciones/delirios. No inventar codificación."
+    },
+    {
+      "codigo": "CLN-AGU",
+      "nombre": "Estado clínico agudo / fluctuante",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Cambio reciente o fluctuante del estado clínico, cognitivo, conductual o de alerta que puede alterar transitoriamente el rendimiento y exige diferenciarlo de una trayectoria persistente/progresiva.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA INTERNA V1",
+      "procedencia": [
+        45
+      ],
+      "limites": "Incluye posible delirium/estado confusional como hipótesis clínica a revisar; RememberMind no diagnostica delirium."
+    },
+    {
+      "codigo": "CLN-FIS",
+      "nombre": "Alteración fisiológica / metabólica / enfermedad intercurrente",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Condiciones médicas o fisiológicas activas como infección, hipoxia, alteraciones metabólicas, hidratación/nutrición o descompensación orgánica que pueden modificar cognición, conducta o función.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA INTERNA V1",
+      "procedencia": [
+        46
+      ],
+      "limites": "No se fijan valores fisiológicos/laboratoriales de corte en Fase 2; usar contexto y referencias clínicas válidas."
+    },
+    {
+      "codigo": "CLN-FAR",
+      "nombre": "Exposición farmacológica / cambio de medicación",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Exposición documentada a medicamentos, cambios de dosis/esquema, sedación o efectos observados que pueden modificar alerta, atención, memoria, velocidad, conducta, sueño o función.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA INTERNA V1",
+      "procedencia": [
+        47
+      ],
+      "limites": "Prescripción ≠ administración ≠ efecto adverso. La relación temporal y la valoración profesional son necesarias."
+    },
+    {
+      "codigo": "CLN-DOL",
+      "nombre": "Dolor / carga sintomática",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Dolor documentado u otra carga sintomática relevante que puede reducir atención, participación, sueño, movilidad o desempeño durante observación/evaluación.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA INTERNA V1",
+      "procedencia": [
+        48
+      ],
+      "limites": "Dolor puede ser clínicamente real y a la vez confundir atribución cognitiva; no se niega el síntoma."
+    },
+    {
+      "codigo": "CLN-SEN",
+      "nombre": "Barreras sensoriales / comunicación de entrada-salida",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Déficits visuales, auditivos o barreras de comunicación que pueden impedir percibir consignas/estímulos o expresar respuestas y simular alteración de uno o más dominios.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA INTERNA V1 / COBERTURA LIMITADA",
+      "procedencia": [
+        49
+      ],
+      "limites": "BDD no posee un módulo sensorial estructurado completo; usar antecedente/dispositivo/nota solo cuando esté documentado, sin inferencia."
+    },
+    {
+      "codigo": "CLN-SUE",
+      "nombre": "Sueño-vigilia / somnolencia / fatiga",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Alteraciones documentadas del sueño, somnolencia o fatiga que pueden modificar atención, memoria, velocidad, ánimo, conducta y participación en evaluación.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA INTERNA V1",
+      "procedencia": [
+        50
+      ],
+      "limites": "Mantiene enlace con BL-PSI y registros_sueno sin duplicar el mismo fenómeno."
+    },
+    {
+      "codigo": "RISK-NMOD",
+      "nombre": "Contexto no modificable / curso de vida",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Edad y antecedentes familiares/genéticos documentados que pueden asociarse con vulnerabilidad, sin constituir enfermedad, señal cognitiva ni destino individual.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA INTERNA V1",
+      "procedencia": [
+        51
+      ],
+      "limites": "Edad se deriva de fecha_nacimiento y fecha de evaluación; historia genética no está estructurada. No puntuar género automáticamente."
+    },
+    {
+      "codigo": "RISK-RES",
+      "nombre": "Reserva cognitiva / contexto educativo",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Nivel educativo y experiencias relacionadas con reserva cognitiva como contexto de vulnerabilidad y de interpretación del rendimiento, sin tratarlos como protección o penalización determinista.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA INTERNA V1",
+      "procedencia": [
+        52
+      ],
+      "limites": "nivel_educativo tiene cobertura directa; evitar doble uso como riesgo y como ajuste normativo."
+    },
+    {
+      "codigo": "RISK-CAR",
+      "nombre": "Carga cardiometabólica / vascular",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Antecedentes o condiciones documentadas como hipertensión, diabetes, dislipidemia, obesidad y enfermedad vascular/cerebrovascular que pueden asociarse con mayor vulnerabilidad cognitiva a lo largo del tiempo.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA INTERNA V1",
+      "procedencia": [
+        53
+      ],
+      "limites": "Condición crónica como riesgo ≠ descompensación activa como confusor. No definir puntos de corte propios."
+    },
+    {
+      "codigo": "RISK-NEU",
+      "nombre": "Antecedente neurológico / lesión cerebral",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Historia documentada de accidente cerebrovascular, traumatismo craneoencefálico u otra lesión neurológica relevante como contexto de vulnerabilidad, sin inferir etiología del cambio actual.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA INTERNA V1",
+      "procedencia": [
+        54
+      ],
+      "limites": "Cobertura mediante antecedentes/diagnósticos cuando exista; no inferir desde movilidad o cognición."
+    },
+    {
+      "codigo": "RISK-SEN",
+      "nombre": "Pérdida sensorial crónica",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Pérdida auditiva o visual documentada como factor asociado a riesgo a largo plazo; cuando afecta una tarea actual también puede actuar como confusor de evaluación.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA V1 / COBERTURA ESTRUCTURADA LIMITADA",
+      "procedencia": [
+        55
+      ],
+      "limites": "Mismo dato no se puntúa simultáneamente como riesgo y confusor; rol depende del objetivo/temporalidad."
+    },
+    {
+      "codigo": "RISK-LIFE",
+      "nombre": "Estilo de vida / conductas de salud",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Actividad física, tabaco, alcohol, alimentación y otros hábitos de salud asociados con riesgo modificable a lo largo del curso de vida.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA V1 / COBERTURA LIMITADA",
+      "procedencia": [
+        56
+      ],
+      "limites": "BDD no posee campos estructurados específicos de tabaco/alcohol; movilidad, actividades e ingesta no equivalen automáticamente a exposición habitual."
+    },
+    {
+      "codigo": "RISK-PSO",
+      "nombre": "Contexto psicosocial / salud mental crónica",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Depresión documentada, aislamiento social u otros factores psicosociales persistentes como contexto de vulnerabilidad; se separan de síntomas psicológicos actuales y de preferencias personales.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ARQUITECTURA V1 / COBERTURA PARCIAL",
+      "procedencia": [
+        57
+      ],
+      "limites": "Visitas/participación no miden aislamiento por sí solas; depresión actual puede pertenecer a BL-PSI además de historia de riesgo, sin doble conteo."
+    },
+    {
+      "codigo": "RISK-ENV",
+      "nombre": "Exposición ambiental",
+      "tipo": "SUBCOMPONENTE",
+      "definicion": "Exposiciones ambientales asociadas con riesgo de deterioro cognitivo/demencia, incluida contaminación del aire, tratadas como contexto científico cuando exista documentación fiable.",
+      "estado_fuente": "DEFINIDO/CONGELADO — ROL V1 / SIN COBERTURA ESTRUCTURADA",
+      "procedencia": [
+        58
+      ],
+      "limites": "No inferir exposición desde dirección de residencia ni crear geocodificación/índice ambiental sin proyecto específico aprobado."
+    }
+  ],
+  "relaciones": [
+    {
+      "codigo": "RS-001",
+      "origen": "COG-MEM",
+      "relacion": "PARTE_DE",
+      "destino": "BL-COG",
+      "significado": "Aprendizaje y memoria forma parte del dominio cognitivo.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 2,
+      "limites": ""
+    },
+    {
+      "codigo": "RS-009",
+      "origen": "MEM-S01",
+      "relacion": "SUBCOMPONENTE_DE",
+      "destino": "COG-MEM",
+      "significado": "Aprendizaje/adquisición forma parte de la estructura conceptual de aprendizaje y memoria.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 10,
+      "limites": "No implica peso independiente."
+    },
+    {
+      "codigo": "RS-010",
+      "origen": "MEM-S02",
+      "relacion": "SUBCOMPONENTE_DE",
+      "destino": "COG-MEM",
+      "significado": "El recuerdo diferido libre describe una forma específica de evaluar recuperación.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 11,
+      "limites": "Derivado de guía DETeCD-ADRD."
+    },
+    {
+      "codigo": "RS-011",
+      "origen": "MEM-S03",
+      "relacion": "SUBCOMPONENTE_DE",
+      "destino": "COG-MEM",
+      "significado": "El recuerdo con claves complementa la evaluación de recuperación.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 12,
+      "limites": "Derivado de guía DETeCD-ADRD."
+    },
+    {
+      "codigo": "RS-012",
+      "origen": "MEM-S04",
+      "relacion": "SUBCOMPONENTE_DE",
+      "destino": "COG-MEM",
+      "significado": "El reconocimiento puede aportar evidencia diferenciada del dominio.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 13,
+      "limites": "Solo cuando el instrumento lo evalúa."
+    },
+    {
+      "codigo": "RS-013",
+      "origen": "COG-ATE",
+      "relacion": "PARTE_DE",
+      "destino": "BL-COG",
+      "significado": "Atención forma parte del bloque cognitivo.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 14,
+      "limites": ""
+    },
+    {
+      "codigo": "RS-014",
+      "origen": "ATE-S01",
+      "relacion": "SUBCOMPONENTE_DE",
+      "destino": "COG-ATE",
+      "significado": "Atención sostenida describe mantenimiento del foco en el tiempo.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 15,
+      "limites": ""
+    },
+    {
+      "codigo": "RS-015",
+      "origen": "ATE-S02",
+      "relacion": "SUBCOMPONENTE_DE",
+      "destino": "COG-ATE",
+      "significado": "Atención selectiva describe priorización de estímulos relevantes frente a distractores.",
+      "estado_fuente": "PROPUESTA PARA CONGELAR",
+      "fila": 16,
+      "limites": "Subcomponente de COG-ATE; tareas de interferencia/inhibición pueden producir evidencia mixta con COG-EJE."
+    },
+    {
+      "codigo": "RS-016",
+      "origen": "ATE-S03",
+      "relacion": "SUBCOMPONENTE_DE",
+      "destino": "COG-ATE",
+      "significado": "Atención dividida describe distribución de recursos entre demandas concurrentes.",
+      "estado_fuente": "PROPUESTA PARA CONGELAR",
+      "fila": 17,
+      "limites": "Subcomponente de COG-ATE; dual-tasking puede requerir control ejecutivo y debe etiquetarse como evidencia mixta."
+    },
+    {
+      "codigo": "RS-024",
+      "origen": "COG-EJE",
+      "relacion": "PARTE_DE",
+      "destino": "BL-COG",
+      "significado": "Función ejecutiva forma parte del bloque cognitivo.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 25,
+      "limites": "Candidato fuerte respaldado por DETeCD-ADRD."
+    },
+    {
+      "codigo": "RS-025",
+      "origen": "EJE-S01",
+      "relacion": "SUBCOMPONENTE_DE",
+      "destino": "COG-EJE",
+      "significado": "El control inhibitorio integra la estructura ejecutiva candidata.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 26,
+      "limites": "Controlar tareas mixtas con Atención."
+    },
+    {
+      "codigo": "RS-026",
+      "origen": "EJE-S02",
+      "relacion": "SUBCOMPONENTE_DE",
+      "destino": "COG-EJE",
+      "significado": "La flexibilidad/set shifting integra la estructura ejecutiva candidata.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 27,
+      "limites": "Frontera con Atención revisada."
+    },
+    {
+      "codigo": "RS-027",
+      "origen": "EJE-S03",
+      "relacion": "SUBCOMPONENTE_CANDIDATO_DE",
+      "destino": "COG-EJE",
+      "significado": "La actualización/manipulación de información es un proceso ejecutivo candidato, con relación transversal a memoria.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 28,
+      "limites": "No duplicar contribución con COG-MEM."
+    },
+    {
+      "codigo": "RS-028",
+      "origen": "EJE-S04",
+      "relacion": "SUBCOMPONENTE_DE",
+      "destino": "COG-EJE",
+      "significado": "Planificación y resolución de problemas representan funciones ejecutivas de alto nivel.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 29,
+      "limites": "Razonamiento se revisará dentro de esta frontera."
+    },
+    {
+      "codigo": "RS-030",
+      "origen": "EJE-S05",
+      "relacion": "SUBCOMPONENTE_DE",
+      "destino": "COG-EJE",
+      "significado": "Razonamiento/abstracción se representa como función ejecutiva de alto nivel dentro de COG-EJE.",
+      "estado_fuente": "PROPUESTA PARA CONGELAR",
+      "fila": 31,
+      "limites": "Basado en FC-025 y coherente con DETeCD-ADRD; evita un criterio COG-RAZ redundante."
+    },
+    {
+      "codigo": "RS-032",
+      "origen": "COG-LEN",
+      "relacion": "PARTE_DE",
+      "destino": "BL-COG",
+      "significado": "Lenguaje forma parte del bloque cognitivo.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 33,
+      "limites": "Dominio mínimo respaldado por DETeCD-ADRD."
+    },
+    {
+      "codigo": "RS-033",
+      "origen": "LEN-S01",
+      "relacion": "SUBCOMPONENTE_DE",
+      "destino": "COG-LEN",
+      "significado": "Denominación/acceso léxico integra la estructura conceptual de Lenguaje.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 34,
+      "limites": "No implica peso independiente."
+    },
+    {
+      "codigo": "RS-034",
+      "origen": "LEN-S02",
+      "relacion": "SUBCOMPONENTE_DE",
+      "destino": "COG-LEN",
+      "significado": "Fluidez verbal/generación léxica aporta evidencia lingüística con posible carga ejecutiva y de velocidad.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 35,
+      "limites": "Controlar solapamiento con COG-EJE/COG-VEL."
+    },
+    {
+      "codigo": "RS-035",
+      "origen": "LEN-S03",
+      "relacion": "SUBCOMPONENTE_DE",
+      "destino": "COG-LEN",
+      "significado": "Comprensión forma parte de Lenguaje, pero tareas de instrucciones son multidominio.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 36,
+      "limites": "Controlar audición, atención y memoria."
+    },
+    {
+      "codigo": "RS-036",
+      "origen": "LEN-S04",
+      "relacion": "SUBCOMPONENTE_DE",
+      "destino": "COG-LEN",
+      "significado": "Repetición verbal puede aportar evidencia del dominio cuando una tarea válida la evalúa.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 37,
+      "limites": "Puede depender de audición y memoria de trabajo verbal."
+    },
+    {
+      "codigo": "RS-037",
+      "origen": "LEN-S05",
+      "relacion": "SUBCOMPONENTE_DE",
+      "destino": "COG-LEN",
+      "significado": "Producción verbal/discurso integra la estructura conceptual de Lenguaje.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 38,
+      "limites": "La coherencia discursiva puede ser evidencia mixta con función ejecutiva y memoria."
+    },
+    {
+      "codigo": "RS-040",
+      "origen": "COG-VIS",
+      "relacion": "PARTE_DE",
+      "destino": "BL-COG",
+      "significado": "Función visuoespacial forma parte del bloque cognitivo.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 41,
+      "limites": "Dominio mínimo respaldado por DETeCD-ADRD."
+    },
+    {
+      "codigo": "RS-041",
+      "origen": "VIS-S01",
+      "relacion": "SUBCOMPONENTE_DE",
+      "destino": "COG-VIS",
+      "significado": "Percepción/relaciones visuoespaciales integra la estructura conceptual inicial.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 42,
+      "limites": "No implica peso independiente."
+    },
+    {
+      "codigo": "RS-042",
+      "origen": "VIS-S02",
+      "relacion": "SUBCOMPONENTE_DE",
+      "destino": "COG-VIS",
+      "significado": "Visuoconstrucción integra la estructura conceptual inicial.",
+      "estado_fuente": "CANDIDATA",
+      "fila": 43,
+      "limites": "Controlar demanda ejecutiva, atencional y motora."
+    },
+    {
+      "codigo": "RS-049",
+      "origen": "COG-ORI",
+      "relacion": "PARTE_DE",
+      "destino": "BL-COG",
+      "significado": "Orientación cognitiva pertenece al bloque Cognición como concepto transversal, sin implicar criterio ponderado independiente.",
+      "estado_fuente": "PROPUESTA PARA VALIDACIÓN",
+      "fila": 50,
+      "limites": "Nodo semántico; no pasa a Formalización como criterio V1."
+    },
+    {
+      "codigo": "RS-054",
+      "origen": "COG-ORI",
+      "relacion": "RELACIONADA_CON",
+      "destino": "COG-MEM",
+      "significado": "Orientación depende en parte de adquisición/recuperación de información contextual y muestra fuerte asociación con memoria episódica.",
+      "estado_fuente": "PROPUESTA PARA VALIDACIÓN",
+      "fila": 55,
+      "limites": "Alto riesgo de doble conteo; FC-035."
+    },
+    {
+      "codigo": "RS-058",
+      "origen": "COG-VEL",
+      "relacion": "PARTE_DE",
+      "destino": "BL-COG",
+      "significado": "La velocidad de procesamiento se conserva como dimensión cognitiva transversal dentro del bloque Cognición, sin implicar criterio ponderado independiente.",
+      "estado_fuente": "PROPUESTA PARA VALIDACIÓN",
+      "fila": 59,
+      "limites": "Nodo semántico; no pasa a Formalización como criterio V1."
+    },
+    {
+      "codigo": "RS-071",
+      "origen": "FUN-BADL",
+      "relacion": "PARTE_DE",
+      "destino": "BL-FUN",
+      "significado": "La autonomía en autocuidado y movilidad básica forma parte del bloque funcional.",
+      "estado_fuente": "PROPUESTA PARA CONGELAR",
+      "fila": 72,
+      "limites": "No implica origen cognitivo."
+    },
+    {
+      "codigo": "RS-072",
+      "origen": "FUN-IADL",
+      "relacion": "PARTE_DE",
+      "destino": "BL-FUN",
+      "significado": "Las actividades instrumentales complejas representan funcionamiento cotidiano de mayor complejidad y posible repercusión temprana.",
+      "estado_fuente": "PROPUESTA PARA CONGELAR",
+      "fila": 73,
+      "limites": "Cobertura estructurada actual limitada."
+    }
+  ],
+  "relaciones_documentales_no_materializadas": 107,
+  "limite": "Solo conceptos y aristas entre conceptos identificados. Las menciones de campos operativos y proposiciones no se convierten en nodos. No incluye reglas ni mapeos clínicos."
+}

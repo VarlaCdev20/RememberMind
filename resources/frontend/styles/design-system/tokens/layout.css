@@ -1,0 +1,40 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM V2 — TOKENS / LAYOUT
+   Contrato estructural para la navegación, página, drawers y modales.
+   ============================================================ */
+
+:root {
+    /* ------------------------------------------------------------
+       1. SHELL Y NAVEGACIÓN
+       ------------------------------------------------------------ */
+    --rm-sidebar-width: 232px;          /* Ancho estándar del menú lateral */
+    --rm-sidebar-collapsed: 76px;       /* Ancho colapsado en modo compacto */
+    --rm-topbar-height: 60px;           /* Altura fija de la barra superior */
+
+    /* ------------------------------------------------------------
+       2. CONTENEDOR DE PÁGINA
+       ------------------------------------------------------------ */
+    --rm-page-max-width: 1360px;        /* Ancho máximo de contenido */
+    --rm-page-padding-x: 20px;          /* Relleno horizontal de pantalla */
+    --rm-page-padding-y: 16px;          /* Relleno vertical de pantalla */
+    --rm-content-gap: 16px;             /* Separación entre secciones operativas */
+    --rm-grid-gap: 12px;                /* Separación interna de grids */
+    --rm-page-header-height: 76px;      /* Cabecera de vistas internas */
+    --rm-dashboard-hero-height: 172px;  /* Encabezado compacto de dashboards */
+    --rm-panel-max-height: 300px;       /* Panel visual de lectura rápida */
+
+    /* ------------------------------------------------------------
+       3. ANCHOS DE DRAWERS (Paneles Laterales Deslizables)
+       ------------------------------------------------------------ */
+    --rm-drawer-sm: 360px;              /* Filtros rápidos y detalles simples */
+    --rm-drawer-md: 480px;              /* Historial de eventos y formularios rápidos */
+    --rm-drawer-lg: 640px;              /* Expediente resumido y gráficos clínicos */
+
+    /* ------------------------------------------------------------
+       4. ANCHOS DE MODALES (Ventanas Emergentes)
+       ------------------------------------------------------------ */
+    --rm-modal-sm: 420px;               /* Confirmaciones y alertas de diálogo */
+    --rm-modal-md: 560px;               /* Formularios medianos y acciones puntuales */
+    --rm-modal-lg: 768px;               /* Formularios estructurados y fichas */
+    --rm-modal-xl: 960px;               /* Fichas complejas y asistentes multi-paso */
+}

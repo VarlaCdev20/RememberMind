@@ -1,0 +1,41 @@
+@props([
+    'eyebrow' => 'CENTRO GERIÁTRICO LOS ALMENDROS',
+    'title',
+    'highlight' => null,
+    'role' => null,
+    'date' => null,
+    'scope' => null,
+    'description' => null,
+    'image',
+    'rotationContext' => null,
+    'personalGreeting' => false,
+    'imageAlt' => 'Acompañamiento a residentes del centro geriátrico',
+    'quote' => 'Historias que siguen floreciendo',
+    'meta' => [],
+    'imageLabel' => null,
+])
+
+@php
+    $heroImage = $rotationContext
+        ? app(\App\Modulos\Reportes\Presentacion\DashboardPhotoRotation::class)->heroImage($rotationContext, $image)
+        : $image;
+@endphp
+
+<x-ui.dashboard-header
+    :eyebrow="$eyebrow"
+    :title="$title"
+    :subtitle="$description"
+    :role="$role ?? ($meta[1]['label'] ?? '')"
+    :date="$date ?? ($meta[0]['label'] ?? '')"
+    :scope="$scope ?? ($meta[2]['label'] ?? '')"
+    :image="$heroImage"
+    :image-alt="$rotationContext ? 'Actividades y acompañamiento de residentes en Los Almendros' : $imageAlt"
+    :image-label="$imageLabel"
+    {{ $attributes }}
+/>
+@if($highlight || trim((string) $slot) !== '')
+    <div class="rm-dashboard-header-context">
+        @if($highlight)<p class="rm-caption">{{ $highlight }}</p>@endif
+        @if(trim((string) $slot) !== '')<div class="rm-dashboard-header-actions">{{ $slot }}</div>@endif
+    </div>
+@endif

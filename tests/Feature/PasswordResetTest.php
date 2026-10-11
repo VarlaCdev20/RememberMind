@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Auth\Notifications\ResetPassword;
+use App\Notifications\ResetPasswordNotification as ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Fortify\Features;
@@ -35,7 +35,7 @@ class PasswordResetTest extends TestCase
         $user = User::factory()->create();
 
         $this->post('/forgot-password', [
-            'email' => $user->email,
+            'correo' => $user->correo,
         ]);
 
         Notification::assertSentTo($user, ResetPassword::class);
@@ -52,7 +52,7 @@ class PasswordResetTest extends TestCase
         $user = User::factory()->create();
 
         $this->post('/forgot-password', [
-            'email' => $user->email,
+            'correo' => $user->correo,
         ]);
 
         Notification::assertSentTo($user, ResetPassword::class, function (object $notification) {
@@ -75,15 +75,15 @@ class PasswordResetTest extends TestCase
         $user = User::factory()->create();
 
         $this->post('/forgot-password', [
-            'email' => $user->email,
+            'correo' => $user->correo,
         ]);
 
         Notification::assertSentTo($user, ResetPassword::class, function (object $notification) use ($user) {
             $response = $this->post('/reset-password', [
                 'token' => $notification->token,
-                'email' => $user->email,
-                'password' => 'password',
-                'password_confirmation' => 'password',
+                'correo' => $user->correo,
+                'password' => 'NuevaClave123!',
+                'password_confirmation' => 'NuevaClave123!',
             ]);
 
             $response->assertSessionHasNoErrors();

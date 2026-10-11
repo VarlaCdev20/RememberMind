@@ -1,0 +1,44 @@
+/* ============================================================
+   REMEMBERMIND DESIGN SYSTEM — PATTERNS / CLINICAL DETAIL
+   Jerarquía de bloques internos contrastados (#F2E8DD) sobre card (#FBF7F2).
+   ============================================================ */
+
+.rm-clinical-detail-block {
+    background-color: var(--rm-surface-alt);
+    border: 1px solid var(--rm-border);
+    border-radius: var(--rm-radius-card);
+    padding: var(--rm-space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--rm-space-3);
+    margin-bottom: var(--rm-space-4);
+}
+
+.rm-clinical-detail-title {
+    font-family: var(--rm-font-title);
+    font-size: var(--rm-font-card-title);
+    font-weight: var(--rm-font-weight-bold);
+    color: var(--rm-text-title);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+}
+
+.rm-clinical-signing-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--rm-space-3) var(--rm-space-4);
+    background-color: var(--rm-surface-soft);
+    border: 1px solid var(--rm-border);
+    border-radius: var(--rm-radius-input);
+    font-size: var(--rm-font-label);
+    color: var(--rm-text-body);
+}
+
+.rm-signature-badge {
+    font-family: var(--rm-font-mono);
+    font-size: var(--rm-font-badge);
+    color: var(--rm-text-muted);
+}

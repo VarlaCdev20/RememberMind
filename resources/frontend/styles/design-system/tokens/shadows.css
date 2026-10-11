@@ -1,0 +1,26 @@
+/* Elevaciones suaves: todas comparten la tinta cálida de la paleta oficial. */
+:root {
+   --rm-shadow-none: none;
+   --rm-shadow-2xs: 0 1px 2px color-mix(in srgb, var(--rm-shadow-ink) 3%, transparent);
+   --rm-shadow-xs: 0 1px 2px color-mix(in srgb, var(--rm-shadow-ink) 4%, transparent);
+   --rm-shadow-sm:
+      0 1px 2px color-mix(in srgb, var(--rm-shadow-ink) 4%, transparent),
+      0 8px 24px color-mix(in srgb, var(--rm-shadow-ink) 6%, transparent);
+   --rm-shadow-md:
+      0 2px 6px color-mix(in srgb, var(--rm-shadow-ink) 5%, transparent),
+      0 12px 28px color-mix(in srgb, var(--rm-shadow-ink) 8%, transparent);
+   --rm-shadow-lg:
+      0 4px 12px color-mix(in srgb, var(--rm-shadow-ink) 6%, transparent),
+      0 20px 40px color-mix(in srgb, var(--rm-shadow-ink) 10%, transparent);
+   --rm-shadow-overlay:
+      0 4px 12px color-mix(in srgb, var(--rm-shadow-ink) 8%, transparent),
+      0 24px 56px color-mix(in srgb, var(--rm-shadow-ink) 18%, transparent);
+   --rm-shadow-input: var(--rm-shadow-2xs);
+   --rm-shadow-card: var(--rm-shadow-sm);
+   --rm-shadow-raised: var(--rm-shadow-md);
+   --rm-shadow-floating: var(--rm-shadow-lg);
+   --rm-shadow-card-hover: var(--rm-shadow-md);
+   --rm-shadow-dropdown: var(--rm-shadow-md);
+   --rm-shadow-drawer: var(--rm-shadow-lg);
+   --rm-shadow-modal: var(--rm-shadow-overlay);
+}

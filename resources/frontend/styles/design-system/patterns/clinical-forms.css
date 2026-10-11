@@ -1,0 +1,98 @@
+/* Familia clínica: comparte los materiales del patrón aprobado de Signos.
+   La composición depende de los campos del formulario. */
+.rm-clinical-form-modal { margin-block: 0 !important; }
+.rm-clinical-form-modal .rm-modal-panel { overflow: clip; }
+.rm-clinical-form-modal .rm-modal-panel { width: min(900px, calc(100vw - 32px)); max-width: 900px; max-height: calc(100dvh - 32px); border-radius: 22px; background: color-mix(in srgb, var(--rm-surface-main) 94%, transparent); box-shadow: var(--rm-shadow-floating); font-family: var(--rm-font-friendly); }
+.rm-clinical-form-modal .rm-modal-shell__overlay { background: var(--rm-modal-overlay); backdrop-filter: blur(5px); }
+.rm-clinical-form-modal .rm-modal-header { min-height: 72px; padding: 10px 22px; }
+.rm-clinical-form-modal .rm-modal-panel__title { font-family: var(--rm-font-friendly); }
+.rm-clinical-form-modal .rm-modal-context { padding: 12px 22px 0; }
+.rm-clinical-form-modal .rm-resident-directory__register-context { display: grid; grid-template-columns: 44px minmax(0, 1.4fr) minmax(150px, 1fr); height: auto; min-height: 76px; max-height: none; gap: 12px; padding: 12px 14px; border: 1px solid var(--rm-border-soft); border-radius: 16px; background: var(--rm-surface-soft); }
+.rm-clinical-form-modal .rm-resident-directory__register-avatar { width: 44px; height: 44px; border-radius: 50%; }
+.rm-clinical-form-modal .rm-resident-directory__register-identity { min-width: 0; display: grid; gap: 3px; }
+.rm-clinical-form-modal .rm-resident-directory__register-identity strong { white-space: normal; font-size: var(--rm-font-size-section); line-height: 1.25; overflow-wrap: anywhere; }
+.rm-clinical-form-modal .rm-resident-directory__register-identity span { white-space: normal; color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); }
+.rm-clinical-form__personnel { display: grid; gap: 3px; padding-left: 12px; border-left: 1px solid var(--rm-border-soft); font-size: var(--rm-font-size-meta); }
+.rm-clinical-form__personnel span { color: var(--rm-text-secondary); }
+.rm-clinical-form__personnel strong { overflow-wrap: anywhere; }
+.rm-clinical-form-modal .rm-modal-body { padding: 14px 22px; }
+.rm-clinical-form { display: grid; gap: 14px; min-width: 0; }
+.rm-clinical-form__lead { display: grid; grid-template-columns: minmax(230px, .8fr) minmax(0, 1.4fr); gap: 14px; align-items: start; }
+.rm-clinical-form__section { min-width: 0; margin: 0; padding: 14px 16px; border: 1px solid var(--rm-border-soft); border-radius: 15px; background: var(--rm-surface-soft); box-shadow: var(--rm-shadow-card); }
+.rm-clinical-form__section > legend { padding: 0 6px; font-size: var(--rm-font-size-card); font-family: var(--rm-font-friendly); }
+.rm-clinical-form__section .rm-form-grid { gap: 12px; }
+.rm-clinical-form__full { grid-column: 1 / -1; }
+.rm-clinical-form__unit { position: relative; }
+.rm-clinical-form__unit .rm-input { width: 100%; padding-right: 48px; }
+.rm-clinical-form__unit > span { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); pointer-events: none; }
+.rm-clinical-form__check { display: flex; align-items: center; gap: 10px; min-height: 44px; color: var(--rm-text-primary); font-size: var(--rm-font-size-label); cursor: pointer; }
+.rm-clinical-form__check input { width: 20px; height: 20px; accent-color: var(--rm-action-primary-ink); }
+.rm-clinical-form .rm-label { font-family: var(--rm-font-friendly); letter-spacing: normal; }
+.rm-clinical-form :is(.rm-input, .rm-select, .rm-textarea) { min-height: 44px; background: var(--rm-surface-raised); border-color: var(--rm-border-soft); box-shadow: none; }
+.rm-clinical-form :is(.rm-input, .rm-select) { height: 44px; line-height: var(--rm-line-height-normal); padding-block: 8px; }
+.rm-clinical-form .rm-textarea { resize: vertical; min-height: 68px; }
+.rm-clinical-form :is(.rm-input, .rm-select, .rm-textarea):focus { border-color: var(--rm-input-focus-border); outline: var(--rm-focus-ring-width) solid var(--rm-focus-ring-color); outline-offset: var(--rm-focus-ring-offset); }
+.rm-clinical-form :is(.rm-input, .rm-select, .rm-textarea)[aria-invalid="true"] { border-color: var(--rm-state-danger-text); }
+.rm-clinical-form__note, .rm-clinical-form .rm-help { margin: 0; color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); line-height: 1.5; }
+.rm-clinical-form__scale { min-width: 0; padding: 0; margin: 0; border: 0; }
+.rm-clinical-form__scale legend { font-size: var(--rm-font-size-label); font-weight: 700; }
+.rm-clinical-form__required { margin-left: 6px; color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); font-weight: 500; }
+.rm-clinical-form__value { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; margin: 10px 0; color: var(--rm-text-primary); }
+.rm-clinical-form__value strong { font: 800 36px/1.1 var(--rm-font-friendly); font-variant-numeric: tabular-nums; }
+.rm-clinical-form__value > span { font-size: var(--rm-font-size-card); }
+.rm-clinical-form__value small { flex: 1 1 120px; color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); }
+.rm-clinical-form__scale-options { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; margin-bottom: 10px; }
+.rm-clinical-form__scale-option { position: relative; min-width: 0; cursor: pointer; }
+.rm-clinical-form__scale-option input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.rm-clinical-form__scale-option span { display: grid; place-items: center; min-height: 44px; border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-md); background: var(--rm-surface-raised); color: var(--rm-text-primary); font-size: var(--rm-font-size-body); font-weight: 800; transition: background var(--rm-duration-fast) var(--rm-ease-standard), border-color var(--rm-duration-fast) var(--rm-ease-standard); }
+.rm-clinical-form__scale-option input:checked + span { border-color: var(--rm-action-primary-ink); background: var(--rm-action-primary-soft); color: var(--rm-action-primary-ink); box-shadow: inset 0 0 0 1px var(--rm-action-primary-ink); }
+.rm-clinical-form__scale-option input:focus-visible + span { outline: var(--rm-focus-ring-width) solid var(--rm-focus-ring-color); outline-offset: var(--rm-focus-ring-offset); }
+.rm-clinical-form__continuity { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0; color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); }
+.rm-clinical-form__history-link { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--rm-action-primary-ink); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.rm-clinical-form-modal .rm-modal-footer { padding: 12px 22px; gap: 10px; }
+.rm-clinical-form-modal .rm-modal-footer button { min-height: 44px !important; }
+.rm-clinical-form-modal .rm-modal-panel__close { width: 44px; height: 44px; min-width: 44px; min-height: 44px; }
+.rm-clinical-form-result .rm-modal-panel { width: min(620px, calc(100vw - 32px)); }
+.rm-clinical-form-drawer .rm-drawer { background: var(--rm-surface-main); font-family: var(--rm-font-friendly); box-shadow: var(--rm-shadow-floating); }
+.rm-clinical-form-drawer .rm-drawer-body { min-height: 0; }
+.rm-clinical-form__context { display: grid; gap: 4px; margin-bottom: 14px; }
+.rm-clinical-form__context strong { color: var(--rm-text-primary); overflow-wrap: anywhere; }
+.rm-clinical-form-drawer :is(.rm-drawer-footer button, .rm-drawer__close) { min-height: 44px !important; }
+.rm-clinical-form-drawer .rm-drawer-footer { background: var(--rm-surface-soft); }
+.rm-clinical-form-drawer .rm-clinical-form__check span { display: grid; gap: 4px; }
+.rm-clinical-form-drawer .rm-clinical-form__check small { font-size: var(--rm-font-size-meta); color: var(--rm-text-secondary); font-weight: 400; }
+.rm-clinical-workspace__actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 12px; }
+.rm-clinical-workspace__actions > p { flex: 1 1 240px; }
+.rm-clinical-workspace__history { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+.rm-clinical-workspace__record { min-width: 0; padding: 16px; border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-lg); background: var(--rm-surface-soft); box-shadow: var(--rm-shadow-card); overflow-wrap: anywhere; }
+.rm-clinical-workspace__record-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: var(--rm-font-size-meta); color: var(--rm-text-secondary); }
+.rm-clinical-workspace__value { display: block; margin: 12px 0; color: var(--rm-text-primary); font: 800 28px/1.2 var(--rm-font-friendly); }
+.rm-clinical-workspace__value small { font-size: var(--rm-font-size-body); }
+.rm-clinical-workspace__details { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin: 0 0 12px; font-size: var(--rm-font-size-body); }
+.rm-clinical-workspace__details dt { color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); }
+.rm-clinical-workspace__details dd { margin: 4px 0 0; color: var(--rm-text-primary); }
+.rm-clinical-workspace__evolution > summary { min-height: 44px; display: list-item; padding-block: 12px; color: var(--rm-action-primary-ink); cursor: pointer; font-weight: 700; }
+.rm-clinical-workspace__timeline { display: grid; gap: 12px; padding-left: 20px; }
+.rm-clinical-workspace__timeline > li { border-top: 1px solid var(--rm-border-soft); padding-top: 12px; }
+.rm-clinical-workspace__timeline time { display: block; color: var(--rm-text-secondary); margin-bottom: 12px; }
+@media (max-width: 767px) {
+    .rm-clinical-workspace__history { grid-template-columns: minmax(0,1fr); }
+    .rm-clinical-form__lead { grid-template-columns: minmax(0, 1fr); }
+    .rm-clinical-form-modal .rm-resident-directory__register-context { grid-template-columns: 44px minmax(0, 1fr); }
+    .rm-clinical-form__personnel { grid-column: 2; padding-left: 0; border-left: 0; }
+}
+@media (max-width: 480px) {
+    .rm-clinical-form-modal .rm-modal-panel { width: calc(100vw - 16px); max-width: calc(100vw - 16px); }
+    .rm-clinical-form-modal .rm-modal-header { padding: 10px 12px; }
+    .rm-clinical-form-modal .rm-modal-context { padding: 10px 12px 0; }
+    .rm-clinical-form-modal .rm-modal-body { padding: 12px; }
+    .rm-clinical-form-modal .rm-resident-directory__register-identity strong { font-size: var(--rm-font-size-card); }
+    .rm-clinical-form__section { padding: 12px; }
+    .rm-clinical-form-modal .rm-modal-footer { flex-wrap: wrap; padding: 10px 12px; }
+    .rm-clinical-form-modal .rm-modal-footer button { flex: 1 1 100%; }
+    .rm-clinical-form-drawer .rm-drawer-footer button { flex: 1 1 100%; }
+    .rm-clinical-form__scale-options { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .rm-clinical-form__scale-option span { transition: none; }
+}

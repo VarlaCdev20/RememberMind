@@ -1,0 +1,95 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
+use LogicException;
+
+class AsignacionPersonal extends ModeloOperativo
+{
+    protected $table = 'asignaciones_personal';
+    protected $primaryKey = 'cod_asignacion_personal';
+
+    /**
+     * Solo se permiten columnas físicas de la BDD V2. La aplicación debe resolver
+     * usuario, personal, jornada y área antes de crear la asignación.
+     */
+    protected $fillable = [
+        'cod_asignacion_personal', 'cod_jornada', 'cod_personal', 'cod_area',
+        'funcion', 'tipo_asignacion', 'fecha_asignacion', 'estado', 'observacion',
+    ];
+
+    protected function casts(): array
+    {
+        return ['fecha_asignacion' => 'datetime'];
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $asig): void {
+            if (empty($asig->cod_asignacion_personal)) {
+                $asig->cod_asignacion_personal = 'ASP_'.Str::upper(Str::random(10));
+            }
+            if (empty($asig->fecha_asignacion)) {
+                $asig->fecha_asignacion = now();
+            }
+            if (empty($asig->estado)) {
+                $asig->estado = 'ACTIVA';
+            }
+            if (empty($asig->tipo_asignacion)) {
+                $asig->tipo_asignacion = 'TURNO';
+            }
+            if (empty($asig->cod_personal)) {
+                throw new LogicException('La asignación de personal requiere un profesional explícito.');
+            }
+            if (empty($asig->cod_jornada)) {
+                throw new LogicException('La asignación de personal requiere una jornada explícita.');
+            }
+            if (empty($asig->cod_area)) {
+                throw new LogicException('La asignación de personal requiere un área explícita.');
+            }
+        });
+    }
+
+    public function jornada(): BelongsTo
+    {
+        return $this->belongsTo(Jornada::class, 'cod_jornada', 'cod_jornada');
+    }
+
+    public function personal(): BelongsTo
+    {
+        return $this->belongsTo(Personal::class, 'cod_personal', 'cod_personal');
+    }
+
+    public function area(): BelongsTo
+    {
+        return $this->belongsTo(Area::class, 'cod_area', 'cod_area');
+    }
+
+    // Accessors de presentación: nunca cambian columnas ni reescriben SQL.
+    public function getDiaSemanaAttribute(): ?string
+    {
+        return $this->jornada?->fecha_jornada?->locale('es')->isoFormat('dddd');
+    }
+
+    public function getHoraInicioAttribute(): ?string
+    {
+        return $this->jornada?->turno?->hora_inicio;
+    }
+
+    public function getHoraFinAttribute(): ?string
+    {
+        return $this->jornada?->turno?->hora_cierre;
+    }
+
+    public function getCodTurnoAttribute(): ?string
+    {
+        return $this->jornada?->cod_turno;
+    }
+
+    public function getCodUsuarioAttribute(): ?string
+    {
+        return $this->personal?->cod_usuario;
+    }
+}
