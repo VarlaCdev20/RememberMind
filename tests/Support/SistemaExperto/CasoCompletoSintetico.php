@@ -9,9 +9,9 @@ use App\Models\Personal;
 use App\Models\Turno;
 use App\Models\User;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\PersistirEvaluacionTecnica;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\AlcanceLecturaExperta;
 use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\AdaptadorFuentesCOGMEM;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Eloquent\CargadorConocimiento;
-use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\LecturaTecnicaPruebas;
 use DateTimeImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -26,7 +26,7 @@ final class CasoCompletoSintetico
 {
     public static function crear(): array
     {
-        if (! LecturaTecnicaPruebas::habilitada()) {
+        if (! AlcanceLecturaExperta::habilitada()) {
             throw new RuntimeException('El caso completo requiere una base desechable y lectura técnica explícita.');
         }
         if (DB::table('usuarios')->exists()) {
@@ -95,7 +95,7 @@ final class CasoCompletoSintetico
                 throw new RuntimeException('El componente artificial completo no pudo verificarse.');
             }
             $memoria->vincular('MEM', $adaptada['evidencia']->id, 'INSTRUMENTAL');
-            $id = (new PersistirEvaluacionTecnica)->ejecutar($paquete, $memoria, 'MEM', F::contextoClinico(), $autor, ['MAP_INS' => $componente]);
+            $id = app(PersistirEvaluacionTecnica::class)->ejecutar($paquete, $memoria, 'MEM', F::contextoClinico(), $autor, ['MAP_INS' => $componente]);
 
             // Artefacto de la ejecución QA, separado del historial clínico normalizado.
             $informe = ['evaluacion' => $id, 'residente' => $residente->getKey(), 'version' => 'VER_TEST',

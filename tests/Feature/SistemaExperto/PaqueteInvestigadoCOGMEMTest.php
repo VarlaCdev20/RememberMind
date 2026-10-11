@@ -32,7 +32,7 @@ final class PaqueteInvestigadoCOGMEMTest extends PruebaConBaseDesechable
     {
         [$autor] = $this->escenario();
         $historia = DB::table('evaluaciones_expertas')->get()->toJson();
-        $resultado = (new CargarPaqueteInvestigadoCOGMEM)->ejecutar($autor);
+        $resultado = app(CargarPaqueteInvestigadoCOGMEM::class)->ejecutar($autor);
         $this->assertFalse($resultado['activacion_clinica']);
         $this->assertDatabaseHas('versiones_modelo_experto', ['cod_version_modelo' => P::VERSION,
             'estado' => 'INACTIVO', 'fecha_hora_vigencia' => null]);
@@ -57,7 +57,7 @@ final class PaqueteInvestigadoCOGMEMTest extends PruebaConBaseDesechable
     public function test_idempotencia_y_rechazo_de_version_alterada_sin_sobrescribir(): void
     {
         [$autor] = $this->escenario();
-        $carga = new CargarPaqueteInvestigadoCOGMEM;
+        $carga = app(CargarPaqueteInvestigadoCOGMEM::class);
         $carga->ejecutar($autor);
         $antes = (new CargadorConocimiento)->instantanea(P::VERSION);
         $auditoria = DB::table('activity_log')->count();
@@ -82,7 +82,7 @@ final class PaqueteInvestigadoCOGMEMTest extends PruebaConBaseDesechable
         DB::table('usuarios')->where('cod_usuario', $autor->getKey())->update(['estado' => 'INACTIVO']);
         foreach ([$autor, $medico] as $noAutorizado) {
             try {
-                (new CargarPaqueteInvestigadoCOGMEM)->ejecutar($noAutorizado);
+                app(CargarPaqueteInvestigadoCOGMEM::class)->ejecutar($noAutorizado);
                 $this->fail('Debe rechazar la carga.');
             } catch (DomainException) {
                 $this->assertDatabaseMissing('versiones_modelo_experto', ['cod_version_modelo' => P::VERSION]);
@@ -93,7 +93,7 @@ final class PaqueteInvestigadoCOGMEMTest extends PruebaConBaseDesechable
     public function test_preparacion_respeta_corte_estado_y_residente_sin_emitir_evaluacion(): void
     {
         [$autor, $medico, $residente] = $this->escenario();
-        (new CargarPaqueteInvestigadoCOGMEM)->ejecutar($autor);
+        app(CargarPaqueteInvestigadoCOGMEM::class)->ejecutar($autor);
         $otro = F::residenteAdicional('MEM_AJENO');
         foreach (['VIGENTE' => [$residente->getKey(), now()->subHour(), 'VIGENTE'],
             'ANULADO' => [$residente->getKey(), now()->subHour(), 'ANULADO'],
@@ -136,7 +136,7 @@ final class PaqueteInvestigadoCOGMEMTest extends PruebaConBaseDesechable
     public function test_sin_permiso_no_consulta_aplicaciones_y_cuenta_inactiva_no_lee(): void
     {
         [$autor, $medico, $residente] = $this->escenario();
-        (new CargarPaqueteInvestigadoCOGMEM)->ejecutar($autor);
+        app(CargarPaqueteInvestigadoCOGMEM::class)->ejecutar($autor);
         $medico->roles->first()->revokePermissionTo('aplicaciones_instrumento.ver');
         $medico->unsetRelation('roles');
         DB::enableQueryLog();

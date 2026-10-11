@@ -2,6 +2,8 @@
 
 namespace App\Modulos\Institucion\Aplicacion\Consultas;
 
+use App\Compartido\Aplicacion\Contratos\ArchivosAplicacion;
+use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
 use App\Models\Documento;
 use App\Models\Residente;
 use App\Models\User;
@@ -9,7 +11,6 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -32,12 +33,12 @@ class ExploradorAdministrativoService
         'incidentes' => ['Consulta los sucesos registrados', 'Seguimiento institucional y detalles del registro autorizado.', 'cronologia', ['cronologia', 'lista', 'tabla'], 'gravedad', 'Gravedad registrada por el profesional', 'fecha', 'incidentes'],
     ];
 
-    public function __construct(private ConsultaOperativaService $consulta) {}
+    public function __construct(private readonly ArchivosAplicacion $ficheros, private readonly ContextoEjecucion $contexto, private ConsultaOperativaService $consulta) {}
 
     public function datos(string $modulo, array $filtros, User $usuario): array
     {
         abort_unless(in_array($modulo, self::MODULOS, true), 404);
-        abort_unless(auth()->id() === $usuario->getKey() && $usuario->estado === 'ACTIVO'
+        abort_unless($this->contexto->usuario()?->getKey() === $usuario->getKey() && $usuario->estado === 'ACTIVO'
             && ! $usuario->hasRole('FAMILIAR') && $usuario->can($this->consulta->definicion($modulo)['permiso']), 403);
         if (! in_array($modulo, ['jornadas', 'asignaciones', 'actividades'], true)) {
             Gate::forUser($usuario)->authorize('viewAny', Residente::class);
@@ -167,7 +168,7 @@ class ExploradorAdministrativoService
         $orden = $campoFecha ? 'registro.'.$campoFecha : 'registro.titulo';
         $ordenInicial = $vista === 'agenda' ? 'antiguas' : ($campoFecha ? 'recientes' : 'antiguas');
         $direccion = ($filtros['orden'] ?? $ordenInicial) === 'antiguas' ? 'asc' : 'desc';
-        $registros = $resultados->select('registro.*')->orderBy($orden, $direccion)->orderBy('registro.codigo')->paginate($porPagina)->appends(request()->except('detalle'));
+        $registros = $resultados->select('registro.*')->orderBy($orden, $direccion)->orderBy('registro.codigo')->paginate($porPagina);
         $detalle = null;
         $vinculos = collect();
         $descarga = false;
@@ -193,7 +194,7 @@ class ExploradorAdministrativoService
                 $vinculos = $vinculos->filter(fn ($vinculo) => Gate::forUser($usuario)->allows('view', $residentes->get($vinculo->cod_residente)));
             }
             if ($modulo === 'documentacion') {
-                $descarga = Storage::disk('local')->exists(Documento::findOrFail($detalle->codigo)->ruta_archivo);
+                $descarga = $this->ficheros->existe('local', Documento::findOrFail($detalle->codigo)->ruta_archivo);
             }
         }
         $columnas = $this->consulta->columnas($modulo);

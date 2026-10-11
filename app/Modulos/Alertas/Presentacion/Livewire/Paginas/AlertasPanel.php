@@ -9,6 +9,7 @@ use App\Models\Turno;
 use App\Models\User;
 use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
 use App\Modulos\Alertas\Aplicacion\Acciones\DeteccionAlertasService;
+use App\Modulos\Alertas\Aplicacion\Consultas\ConsultarPanelResidenteAlerta;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Locked;
@@ -337,13 +338,7 @@ class AlertasPanel extends Component
         $this->comprobarPermiso('ver');
         $this->autorizarLecturaResidente($codResidente);
         $this->adultoDrawerId = $codResidente;
-        $this->adultoDrawer = Residente::with([
-            'cama.habitacion',
-            'alergias' => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO']),
-            'diagnosticos' => fn ($q) => $q->whereIn('estado', ['ACTIVO', 'CONFIRMADO']),
-            'planCuidadoActivo',
-            'signosVitales' => fn ($q) => $q->where('estado', '!=', 'ANULADO')->latest('fecha_hora')->take(10),
-        ])->find($codResidente);
+        $this->adultoDrawer = app(ConsultarPanelResidenteAlerta::class)->consultar(auth()->user(), $codResidente, 'graficos');
 
         $this->signosDrawer = $this->adultoDrawer?->signosVitales ?? collect();
         $this->drawerGrafico = true;
@@ -355,10 +350,7 @@ class AlertasPanel extends Component
         $this->comprobarPermiso('ver');
         $this->autorizarLecturaResidente($codResidente);
         $this->adultoDrawerId = $codResidente;
-        $this->adultoDrawer = Residente::with([
-            'cama.habitacion',
-            'alertas' => fn ($q) => $q->orderByDesc('fecha_hora')->take(5),
-        ])->find($codResidente);
+        $this->adultoDrawer = app(ConsultarPanelResidenteAlerta::class)->consultar(auth()->user(), $codResidente, 'ubicacion');
 
         $this->drawerUbicacion = true;
         $this->drawerGrafico = false;
@@ -391,6 +383,13 @@ class AlertasPanel extends Component
 
     public function render()
     {
+        if (($this->drawerGrafico || $this->drawerUbicacion) && $this->adultoDrawerId) {
+            $this->adultoDrawer = app(ConsultarPanelResidenteAlerta::class)->consultar(auth()->user(), $this->adultoDrawerId, $this->drawerGrafico ? 'graficos' : 'ubicacion');
+            if ($this->drawerGrafico) {
+                $this->signosDrawer = $this->adultoDrawer->signosVitales;
+            }
+        }
+
         $this->comprobarPermiso('ver');
         $turnoService = app(TurnoEnfermeriaService::class);
         $alertasQuery = Alerta::query()

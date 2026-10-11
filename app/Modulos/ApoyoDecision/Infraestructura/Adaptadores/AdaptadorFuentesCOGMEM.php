@@ -6,6 +6,7 @@ use App\Models\AplicacionInstrumento;
 use App\Models\ControlCognitivo;
 use App\Models\OpcionPregunta;
 use App\Models\PreguntaInstrumento;
+use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ExtraccionFuentesCOGMEM;
 use DateTimeImmutable;
 use DomainException;
 use MotorExperto\adaptadores\entrada\AdaptadorHechosCOGMEM;
@@ -15,7 +16,7 @@ use MotorExperto\dominio\inferencia\MemoriaTrabajo;
 use MotorExperto\dominio\objetos_valor\EvidenciaExperta;
 use MotorExperto\dominio\objetos_valor\FuenteBrutaCOGMEM;
 
-final class AdaptadorFuentesCOGMEM
+final class AdaptadorFuentesCOGMEM implements ExtraccionFuentesCOGMEM
 {
     private const VARIABLES_POR_CAMPO = AdaptadorHechosCOGMEM::VARIABLES_POR_CAMPO;
 

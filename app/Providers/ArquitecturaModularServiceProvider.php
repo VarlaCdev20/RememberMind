@@ -2,6 +2,18 @@
 
 namespace App\Providers;
 
+use App\Compartido\Aplicacion\Contratos\ArchivosAplicacion;
+use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
+use App\Compartido\Aplicacion\Contratos\DocumentosUsuario;
+use App\Compartido\Aplicacion\Contratos\EnlacesAplicacion;
+use App\Compartido\Aplicacion\Contratos\GeneradorPdf;
+use App\Compartido\Aplicacion\Contratos\NotificacionesRegistro;
+use App\Compartido\Infraestructura\Documentos\AlmacenamientoDocumentosUsuario;
+use App\Compartido\Infraestructura\Documentos\ArchivosLaravel;
+use App\Compartido\Infraestructura\Documentos\GeneradorPdfLaravel;
+use App\Compartido\Infraestructura\Navegacion\EnlacesLaravel;
+use App\Compartido\Infraestructura\Notificaciones\NotificacionesRegistroLaravel;
+use App\Compartido\Infraestructura\Seguridad\ContextoEjecucionLaravel;
 use App\Compartido\Infraestructura\Vistas\VistaModularFinder;
 use App\Compartido\Presentacion\Componentes\DashboardWelcomeHeader;
 use App\Models\AdministracionMedicacion;
@@ -23,8 +35,12 @@ use App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPendientesPanel;
 use App\Modulos\Alertas\Presentacion\Livewire\Paginas\IncidentesPanel;
 use App\Modulos\Alertas\Presentacion\Livewire\Paginas\PanelAlertas;
 use App\Modulos\Alertas\Presentacion\Livewire\Paginas\SaludAlertasPanel;
+use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
+use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ExtraccionFuentesCOGMEM;
 use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoOrion;
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\AdaptadorFuentesCOGMEM;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoOrion;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Eloquent\CargadorConocimiento;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ConocimientoPanel;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
 use App\Modulos\ApoyoDecision\Presentacion\Policies\EvaluacionExpertaPolicy;
@@ -48,6 +64,8 @@ use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PlanCuidadoPanel;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\RegistrosEnfermeria;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\SeguimientoDiarioPanel;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\TareasPlanPanel;
+use App\Modulos\Identidad\Aplicacion\Contratos\EstadoPrevisualizacion;
+use App\Modulos\Identidad\Infraestructura\Seguridad\PrevisualizacionEnSesion;
 use App\Modulos\Identidad\Presentacion\Livewire\Funcionalidades\PersonalInstitucionalForm;
 use App\Modulos\Identidad\Presentacion\Livewire\Paginas\PersonalInstitucionalPanel;
 use App\Modulos\Identidad\Presentacion\Livewire\Paginas\RolesPermisosPanel;
@@ -104,6 +122,15 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(ArchivosAplicacion::class, ArchivosLaravel::class);
+        $this->app->bind(GeneradorPdf::class, GeneradorPdfLaravel::class);
+        $this->app->bind(NotificacionesRegistro::class, NotificacionesRegistroLaravel::class);
+        $this->app->bind(DocumentosUsuario::class, AlmacenamientoDocumentosUsuario::class);
+        $this->app->bind(EnlacesAplicacion::class, EnlacesLaravel::class);
+        $this->app->bind(ConocimientoVersionado::class, CargadorConocimiento::class);
+        $this->app->bind(ExtraccionFuentesCOGMEM::class, AdaptadorFuentesCOGMEM::class);
+        $this->app->bind(ContextoEjecucion::class, ContextoEjecucionLaravel::class);
+        $this->app->bind(EstadoPrevisualizacion::class, PrevisualizacionEnSesion::class);
         $this->app->bind(FuenteConocimientoOrion::class,
             ArchivoConocimientoOrion::class);
         $this->app->bind(EvaluadorExperto::class, MotorExperto::class);

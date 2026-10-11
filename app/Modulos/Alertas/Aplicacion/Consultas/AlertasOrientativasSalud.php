@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Alertas\Aplicacion\Consultas;
 
+use App\Compartido\Aplicacion\Contratos\EnlacesAplicacion;
 use App\Models\Residente;
 use App\Models\User;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
@@ -9,6 +10,8 @@ use Carbon\Carbon;
 
 final class AlertasOrientativasSalud
 {
+    public function __construct(private readonly EnlacesAplicacion $enlaces) {}
+
     public function consultar(?User $usuario, string $filtroTipo = ''): array
     {
 
@@ -21,23 +24,23 @@ final class AlertasOrientativasSalud
             $medicacionesActivas = $adulto->medicaciones->whereIn('estado', ['ACTIVA', 'ACTIVO']);
             $valFuncional = $adulto->valoracionesFuncionales->sortByDesc('fecha_hora')->first();
             if (! $fichaMedica) {
-                $alertas->push(['adulto' => $adulto, 'tipo' => 'Ficha Médica', 'nivel' => 'atencion', 'mensaje' => 'Ficha médica no registrada.', 'accion' => 'requiere revisión', 'ruta' => route('admin.salud-seguimiento.ficha', $adulto->cod_residente)]);
+                $alertas->push(['adulto' => $adulto, 'tipo' => 'Ficha Médica', 'nivel' => 'atencion', 'mensaje' => 'Ficha médica no registrada.', 'accion' => 'requiere revisión', 'ruta' => $this->enlaces->destino('admin.salud-seguimiento.ficha', $adulto->cod_residente)]);
             }
             if ($medicacionesActivas->isNotEmpty()) {
                 $ultimaToma = $adulto->administracionesMedicacion->sortByDesc('fecha_hora_programada')->first();
                 if (! $ultimaToma || Carbon::parse($ultimaToma->fecha_hora_programada)->diffInDays(now()) >= 1) {
-                    $alertas->push(['adulto' => $adulto, 'tipo' => 'Medicación', 'nivel' => 'atencion', 'mensaje' => 'Medicación activa sin administración reciente (más de 24h).', 'accion' => 'requiere revisión', 'ruta' => route('admin.salud-seguimiento.administracion', $adulto->cod_residente)]);
+                    $alertas->push(['adulto' => $adulto, 'tipo' => 'Medicación', 'nivel' => 'atencion', 'mensaje' => 'Medicación activa sin administración reciente (más de 24h).', 'accion' => 'requiere revisión', 'ruta' => $this->enlaces->destino('admin.salud-seguimiento.administracion', $adulto->cod_residente)]);
                 }
             }
             if ($valFuncional) {
                 if ($valFuncional->riesgo_caida === 'ALTO') {
-                    $alertas->push(['adulto' => $adulto, 'tipo' => 'Valoración', 'nivel' => 'critica', 'mensaje' => 'Riesgo de caída alto.', 'accion' => 'requiere revisión', 'ruta' => route('admin.salud-seguimiento.valoracion', $adulto->cod_residente)]);
+                    $alertas->push(['adulto' => $adulto, 'tipo' => 'Valoración', 'nivel' => 'critica', 'mensaje' => 'Riesgo de caída alto.', 'accion' => 'requiere revisión', 'ruta' => $this->enlaces->destino('admin.salud-seguimiento.valoracion', $adulto->cod_residente)]);
                 }
                 if (\in_array($valFuncional->nivel_dependencia, ['ALTA_DEPENDENCIA', 'SUPERVISION_PERMANENTE'])) {
-                    $alertas->push(['adulto' => $adulto, 'tipo' => 'Valoración', 'nivel' => 'atencion', 'mensaje' => 'Dependencia funcional alta.', 'accion' => 'requiere revisión', 'ruta' => route('admin.salud-seguimiento.valoracion', $adulto->cod_residente)]);
+                    $alertas->push(['adulto' => $adulto, 'tipo' => 'Valoración', 'nivel' => 'atencion', 'mensaje' => 'Dependencia funcional alta.', 'accion' => 'requiere revisión', 'ruta' => $this->enlaces->destino('admin.salud-seguimiento.valoracion', $adulto->cod_residente)]);
                 }
             } else {
-                $alertas->push(['adulto' => $adulto, 'tipo' => 'Valoración', 'nivel' => 'atencion', 'mensaje' => 'Sin valoración funcional registrada.', 'accion' => 'requiere revisión', 'ruta' => route('admin.salud-seguimiento.valoracion', $adulto->cod_residente)]);
+                $alertas->push(['adulto' => $adulto, 'tipo' => 'Valoración', 'nivel' => 'atencion', 'mensaje' => 'Sin valoración funcional registrada.', 'accion' => 'requiere revisión', 'ruta' => $this->enlaces->destino('admin.salud-seguimiento.valoracion', $adulto->cod_residente)]);
             }
         }
         if ($filtroTipo) {

@@ -98,7 +98,7 @@ class EjecucionExpertaTest extends PruebaConBaseDesechable
     public function test_persistencia_normalizada_y_reconstruccion_resultado_hasta_fuente(): void
     {
         [$p, $m, $autor] = $this->escenario();
-        $id = (new PersistirEvaluacionTecnica)->ejecutar($p, $m, 'MEM', F::contextoClinico(), $autor, $this->componentesInstrumentales);
+        $id = app(PersistirEvaluacionTecnica::class)->ejecutar($p, $m, 'MEM', F::contextoClinico(), $autor, $this->componentesInstrumentales);
         $this->assertSame('EVAL_TEST', $id);
         $this->assertDatabaseCount('evaluaciones_expertas', 1);
         $this->assertDatabaseCount('evidencias_evaluacion', 1);
@@ -120,7 +120,7 @@ class EjecucionExpertaTest extends PruebaConBaseDesechable
     public function test_ev1_conserva_evidencias_y_traza_sin_resultado_ni_reglas(): void
     {
         [$p, $m, $autor] = $this->escenario();
-        (new PersistirEvaluacionTecnica)->ejecutar($p, $m, 'MEM', [...F::contextoClinico(), 'confusores_revisados' => false], $autor, $this->componentesInstrumentales);
+        app(PersistirEvaluacionTecnica::class)->ejecutar($p, $m, 'MEM', [...F::contextoClinico(), 'confusores_revisados' => false], $autor, $this->componentesInstrumentales);
         $this->assertDatabaseCount('evidencias_evaluacion', 1);
         $this->assertDatabaseCount('resultados_criterio', 0);
         $this->assertDatabaseCount('evaluaciones_reglas', 0);
@@ -130,7 +130,7 @@ class EjecucionExpertaTest extends PruebaConBaseDesechable
     public function test_reintento_no_sobrescribe_ni_duplica_ejecucion(): void
     {
         [$p, $m, $autor] = $this->escenario();
-        $accion = new PersistirEvaluacionTecnica;
+        $accion = app(PersistirEvaluacionTecnica::class);
         $accion->ejecutar($p, $m, 'MEM', F::contextoClinico(), $autor, $this->componentesInstrumentales);
         try {
             $accion->ejecutar($p, $m, 'MEM', F::contextoClinico(), $autor, $this->componentesInstrumentales);
@@ -148,7 +148,7 @@ class EjecucionExpertaTest extends PruebaConBaseDesechable
         [$p, $m, $autor] = $this->escenario();
         DB::table('mapeos_valores_fuente')->where('cod_mapeo_valor_fuente', 'MV_INS_A')->update(['valor_fuente_exacto' => 'otro_literal']);
         try {
-            (new PersistirEvaluacionTecnica)->ejecutar($p, $m, 'MEM', F::contextoClinico(), $autor, $this->componentesInstrumentales);
+            app(PersistirEvaluacionTecnica::class)->ejecutar($p, $m, 'MEM', F::contextoClinico(), $autor, $this->componentesInstrumentales);
             $this->fail('La instantánea incompatible debe fallar.');
         } catch (DomainException $e) {
             $this->assertStringContainsString('instantánea', $e->getMessage());
@@ -192,7 +192,7 @@ class EjecucionExpertaTest extends PruebaConBaseDesechable
         $instante = now()->setDate(2026, 10, 9)->setTime(15, 30, 0);
         $this->travelTo($instante);
         try {
-            (new PersistirEvaluacionTecnica)->ejecutar($p, $m, 'MEM', F::contextoClinico(), $autor, $this->componentesInstrumentales);
+            app(PersistirEvaluacionTecnica::class)->ejecutar($p, $m, 'MEM', F::contextoClinico(), $autor, $this->componentesInstrumentales);
             $this->assertDatabaseHas('evaluaciones_expertas', ['fecha_hora_inicio' => '2026-10-09 15:30:00', 'fecha_hora_fin' => '2026-10-09 15:30:00']);
             $this->assertDatabaseHas('evidencias_evaluacion', ['fecha_hora_incorporacion' => '2026-10-09 15:30:00']);
             $this->assertDatabaseHas('trazas_inferencia', ['fecha_hora_inicio' => '2026-10-09 15:30:00']);
@@ -205,7 +205,7 @@ class EjecucionExpertaTest extends PruebaConBaseDesechable
     private function rechazarSinPersistir(PaqueteConocimiento $p, MemoriaTrabajo $m, User $autor): void
     {
         try {
-            (new PersistirEvaluacionTecnica)->ejecutar($p, $m, 'MEM', F::contextoClinico(), $autor, $this->componentesInstrumentales);
+            app(PersistirEvaluacionTecnica::class)->ejecutar($p, $m, 'MEM', F::contextoClinico(), $autor, $this->componentesInstrumentales);
             $this->fail('La fuente o representación incompatible debe rechazarse.');
         } catch (DomainException $e) {
             $this->assertStringContainsString('instantánea', $e->getMessage());

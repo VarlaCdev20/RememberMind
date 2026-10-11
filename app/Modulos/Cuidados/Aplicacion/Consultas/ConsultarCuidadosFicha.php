@@ -2,15 +2,18 @@
 
 namespace App\Modulos\Cuidados\Aplicacion\Consultas;
 
+use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
 use App\Models\Residente;
 use App\Models\User;
 
 /** Conserva el alcance, límites y estados de las lecturas anteriores de la ficha. */
 final class ConsultarCuidadosFicha
 {
+    public function __construct(private readonly ContextoEjecucion $contexto) {}
+
     public function consultar(Residente $residente, string $tab = 'resumen', ?User $actor = null): array
     {
-        $actor ??= auth()->user();
+        $actor ??= $this->contexto->usuario();
         $actor = $actor ? User::find($actor->getKey()) : null;
         abort_unless($actor?->estado === 'ACTIVO', 403);
         if (! $actor->hasAnyRole(['ADMINISTRADOR', 'GERENTE']) || ! $actor->can('residentes.ver')) {
@@ -25,6 +28,7 @@ final class ConsultarCuidadosFicha
             return [];
         }
         if (! in_array($tab, ['cuidado', 'cuidados'], true)) {
+            $residente->loadMissing('planCuidadoActivo');
             $ultSeg = $residente->pasesTurno()->with('personalSaliente.usuario')->first();
             $totalTareasHoy = $residente->ejecucionesCuidado()->whereDate('fecha_hora_programada', today())->count();
             $tareasCompletadasHoy = $residente->ejecucionesCuidado()->whereDate('fecha_hora_programada', today())

@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Modulos\ApoyoDecision\Infraestructura\Persistencia;
+namespace App\Modulos\ApoyoDecision\Aplicacion\Consultas;
 
 use App\Modulos\ApoyoDecision\Dominio\Reglas\BaseTecnicaDesechable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 /** Publicación técnica aislada; nunca habilita conocimiento clínico. */
-final class LecturaTecnicaPruebas
+final class AlcanceLecturaExperta
 {
     public static function habilitada(): bool
     {

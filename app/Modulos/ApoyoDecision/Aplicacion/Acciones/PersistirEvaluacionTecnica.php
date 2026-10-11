@@ -12,11 +12,10 @@ use App\Models\Residente;
 use App\Models\RespuestaInstrumento;
 use App\Models\User;
 use App\Models\VersionModeloExperto;
+use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ExtraccionFuentesCOGMEM;
 use App\Modulos\ApoyoDecision\Dominio\Reglas\BaseTecnicaDesechable;
-use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\AdaptadorFuentesCOGMEM;
 use DomainException;
 use Illuminate\Support\Facades\DB;
-use MotorExperto\aplicacion\casos_uso\MotorExperto;
 use MotorExperto\aplicacion\puertos\EvaluadorExperto;
 use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
 use MotorExperto\dominio\inferencia\MemoriaTrabajo;
@@ -24,7 +23,7 @@ use MotorExperto\dominio\inferencia\MemoriaTrabajo;
 /** Persistencia real D-133 en BDD desechable; no es una entrada clínica institucional. */
 final class PersistirEvaluacionTecnica
 {
-    public function __construct(private readonly EvaluadorExperto $motor = new MotorExperto) {}
+    public function __construct(private readonly ExtraccionFuentesCOGMEM $fuentes, private readonly EvaluadorExperto $motor) {}
 
     public function ejecutar(PaqueteConocimiento $p, MemoriaTrabajo $m, string $criterio, array $contexto, User $autor, array $componentesInstrumentales = []): string
     {
@@ -129,7 +128,7 @@ final class PersistirEvaluacionTecnica
             }
         }
         $reconstruida = new MemoriaTrabajo($m->contexto);
-        $adaptador = new AdaptadorFuentesCOGMEM;
+        $adaptador = $this->fuentes;
         foreach ($m->todas() as $e) {
             $fuente = $p->fila('fuentes_datos_expertas', $e->fuente->fuente);
             if (! in_array($fuente['tabla_raiz'], ['controles_cognitivos', 'aplicaciones_instrumento'], true)) {

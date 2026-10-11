@@ -62,6 +62,7 @@ class OperacionController extends Controller
         ]);
         if (in_array($modulo, ExploradorAdministrativoService::MODULOS, true)) {
             $datos = app(ExploradorAdministrativoService::class)->datos($modulo, $filtros, $request->user());
+            $datos['registros']->appends($request->except('detalle'));
             if ($request->header('X-RM-Ficha') === '1') {
                 abort_unless($datos['detalle'], 404);
 

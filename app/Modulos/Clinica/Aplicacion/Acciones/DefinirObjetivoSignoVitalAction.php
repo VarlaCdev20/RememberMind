@@ -2,13 +2,13 @@
 
 namespace App\Modulos\Clinica\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
 use App\Models\ObjetivoSignoVital;
 use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\User;
 use App\Modulos\Clinica\Aplicacion\Validacion\ValidacionSignosVitalesService;
 use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
@@ -16,6 +16,8 @@ use Illuminate\Validation\Rule;
 
 final class DefinirObjetivoSignoVitalAction
 {
+    public function __construct(private readonly ContextoEjecucion $contexto) {}
+
     /** @param array<string, mixed> $entrada */
     public function ejecutar(string $codResidente, array $entrada, User $medico): ObjetivoSignoVital
     {
@@ -126,7 +128,7 @@ final class DefinirObjetivoSignoVitalAction
 
     private function autorizarMedico(User $medico): void
     {
-        abort_unless(Auth::user()?->cod_usuario === $medico->cod_usuario
+        abort_unless($this->contexto->usuario()?->cod_usuario === $medico->cod_usuario
             && $medico->estado === 'ACTIVO'
             && $medico->hasRole('MEDICO GENERAL/GERIATRA')
             && $medico->can('objetivos_signos_vitales.gestionar')

@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Admisiones\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
 use App\Models\Admision;
 use App\Models\Cama;
 use App\Models\Habitacion;
@@ -17,9 +18,11 @@ use Illuminate\Validation\ValidationException;
 /** Traslado interno o nueva ocupación dentro de una admisión ya formalizada. */
 class CambiarAlojamientoResidente
 {
+    public function __construct(private readonly ContextoEjecucion $contexto) {}
+
     public function autorizar(Residente $residente, User $usuario): void
     {
-        abort_unless(auth()->id() === $usuario->getKey() && $usuario->estado === 'ACTIVO'
+        abort_unless($this->contexto->usuario()?->getKey() === $usuario->getKey() && $usuario->estado === 'ACTIVO'
             && $usuario->can('ocupaciones_cama.gestionar'), 403);
         Gate::forUser($usuario)->authorize('viewAny', Residente::class);
         Gate::forUser($usuario)->authorize('view', $residente);

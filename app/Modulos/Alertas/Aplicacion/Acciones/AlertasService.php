@@ -2,22 +2,22 @@
 
 namespace App\Modulos\Alertas\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
 use App\Models\Alerta;
 use App\Models\Residente;
 use App\Models\User;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class AlertasService
 {
-    public function __construct(private readonly TurnoEnfermeriaService $turnos) {}
+    public function __construct(private readonly ContextoEjecucion $contexto, private readonly TurnoEnfermeriaService $turnos) {}
 
     public function autorizarCoordinacion(string $codResidente, string $permiso, User $usuario): void
     {
-        abort_unless(Auth::id() === $usuario->cod_usuario && $usuario->estado === 'ACTIVO', 403);
+        abort_unless($this->contexto->usuario()?->getKey() === $usuario->cod_usuario && $usuario->estado === 'ACTIVO', 403);
         abort_if($usuario->hasRole('FAMILIAR'), 403);
         abort_unless($usuario->canAny([$permiso, 'alertas.gestionar']), 403);
         if ($usuario->hasRole('ENFERMEROS')) {
@@ -208,7 +208,7 @@ class AlertasService
             'EN_ATENCION', 'ATENDIDA' => 'alertas.seguimiento', 'CERRADA', 'ANULADA' => 'alertas.cerrar',
         };
         if ($usuario->hasRole('ADMINISTRADOR')) {
-            abort_unless(Auth::id() === $usuario->cod_usuario && $usuario->estado === 'ACTIVO' && $usuario->can($permiso), 403);
+            abort_unless($this->contexto->usuario()?->getKey() === $usuario->cod_usuario && $usuario->estado === 'ACTIVO' && $usuario->can($permiso), 403);
         } else {
             $this->turnos->autorizarMutacionEnfermeria($alerta->cod_residente, 'alertas.gestionar', $usuario);
         }

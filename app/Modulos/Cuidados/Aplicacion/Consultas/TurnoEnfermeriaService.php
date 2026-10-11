@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Cuidados\Aplicacion\Consultas;
 
+use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
 use App\Models\Alerta;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Jornada;
@@ -11,21 +12,22 @@ use App\Models\User;
 use App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class TurnoEnfermeriaService
 {
+    public function __construct(private readonly ContextoEjecucion $contexto) {}
+
     public function esSuperAdmin(?User $user = null): bool
     {
-        $user ??= Auth::user();
+        $user ??= $this->contexto->usuario();
 
         return (bool) $user?->hasRole('SUPERADMINISTRADOR');
     }
 
     public function esPersonalClinicoAutorizado(?User $user = null): bool
     {
-        $user ??= Auth::user();
+        $user ??= $this->contexto->usuario();
 
         return (bool) $user?->hasAnyRole([
             'ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'NUTRICIONISTA',
@@ -35,7 +37,7 @@ class TurnoEnfermeriaService
 
     public function tieneLecturaClinicaGlobal(?User $user = null): bool
     {
-        $user ??= Auth::user();
+        $user ??= $this->contexto->usuario();
 
         return $this->esSuperAdmin($user) || (bool) $user?->hasAnyRole([
             'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'NUTRICIONISTA',
@@ -45,7 +47,7 @@ class TurnoEnfermeriaService
 
     public function obtenerTurnoActivo(?User $user = null, ?string $fecha = null): ?Turno
     {
-        $user ??= Auth::user();
+        $user ??= $this->contexto->usuario();
         if (! $user || $user->estado !== 'ACTIVO') {
             return null;
         }
@@ -90,7 +92,7 @@ class TurnoEnfermeriaService
 
     public function obtenerPacientesAsignadosQuery(?User $user = null, ?string $codTurno = null, ?string $codEnfermeroFiltro = null): Builder
     {
-        $user ??= Auth::user();
+        $user ??= $this->contexto->usuario();
         $query = Residente::query();
 
         if ($this->tieneLecturaClinicaGlobal($user) && ! $codEnfermeroFiltro && ! $codTurno) {
@@ -147,7 +149,7 @@ class TurnoEnfermeriaService
 
     public function esPacienteAsignado(string|Residente $adulto, ?User $user = null, ?string $codTurno = null): bool
     {
-        $user ??= Auth::user();
+        $user ??= $this->contexto->usuario();
         if ($this->esSuperAdmin($user)) {
             return true;
         }
@@ -163,7 +165,7 @@ class TurnoEnfermeriaService
     /** Lectura propia independiente del horario; nunca concede escritura clínica. */
     public function autorizarConsultaResidente(string|Residente $residente, ?User $user = null): void
     {
-        $user ??= Auth::user();
+        $user ??= $this->contexto->usuario();
         abort_unless($user && $user->estado === 'ACTIVO', 403);
         $codigo = $residente instanceof Residente ? $residente->cod_residente : $residente;
         abort_unless($this->obtenerPacientesAsignadosQuery($user)->whereKey($codigo)->exists(), 403,
@@ -172,7 +174,7 @@ class TurnoEnfermeriaService
 
     public function autorizarAccionPaciente(string|Residente $adulto, ?User $user = null, ?string $codTurno = null): void
     {
-        $user ??= Auth::user();
+        $user ??= $this->contexto->usuario();
         if ($user?->hasAnyRole([
             'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'NUTRICIONISTA',
             'FISIOTERAPEUTA', 'PEDAGOGO',
@@ -180,7 +182,7 @@ class TurnoEnfermeriaService
             return;
         }
         // Lectura global permitida para superadmin si la peticion es de lectura (GET)
-        if ($this->esSuperAdmin($user) && request()->isMethod('get')) {
+        if ($this->esSuperAdmin($user) && $this->contexto->esLectura()) {
             return;
         }
         abort_unless($this->esPacienteAsignado($adulto, $user, $codTurno), 403,
@@ -189,7 +191,7 @@ class TurnoEnfermeriaService
 
     public function autorizarMutacionPaciente(string|Residente $adulto, string $permiso, ?User $user = null): Turno
     {
-        $user ??= Auth::user();
+        $user ??= $this->contexto->usuario();
         abort_unless($user && strtoupper((string) $user->estado) === 'ACTIVO', 403,
             'La cuenta de usuario no se encuentra activa.');
         abort_unless(app(AccesoClinicoTemporalService::class)->tieneRol($user, ['ENFERMEROS']), 403,
@@ -243,7 +245,7 @@ class TurnoEnfermeriaService
 
     public function autorizarMutacionEnfermeria(string|Residente $adulto, string $permiso, ?User $user = null): ?Turno
     {
-        $user ??= Auth::user();
+        $user ??= $this->contexto->usuario();
         abort_unless(app(AccesoClinicoTemporalService::class)->tieneRol($user, ['ENFERMEROS']), 403,
             'Acción clínica no permitida: Rol ENFERMEROS requerido.');
 

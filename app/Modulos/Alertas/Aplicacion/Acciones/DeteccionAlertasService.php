@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Alertas\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
 use App\Models\AdministracionMedicacion;
 use App\Models\Alerta;
 use App\Models\Atencion;
@@ -9,12 +10,13 @@ use App\Models\EjecucionCuidado;
 use App\Models\Residente;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class DeteccionAlertasService
 {
+    public function __construct(private readonly ContextoEjecucion $contexto) {}
+
     public function detectar(?string $codResidente = null): int
     {
         $ids = $this->residentesAutorizados($codResidente);
@@ -178,7 +180,7 @@ class DeteccionAlertasService
         string $nivel,
         string $motivo
     ): ?Alerta {
-        $usuario = Auth::user();
+        $usuario = $this->contexto->usuario();
         abort_unless($usuario, 403);
         app(AlertasService::class)->autorizarCoordinacion($codResidente, 'alertas.gestionar', $usuario);
 
@@ -252,7 +254,7 @@ class DeteccionAlertasService
                 'generacion' => 'AUTOMATICA',
                 'estado' => 'ABIERTA',
             ]);
-            app(AlertasService::class)->registrarCreacionAutomatica($alerta, Auth::user());
+            app(AlertasService::class)->registrarCreacionAutomatica($alerta, $this->contexto->usuario());
 
             return 1;
         });
@@ -260,7 +262,7 @@ class DeteccionAlertasService
 
     private function residentesAutorizados(?string $codResidente): array
     {
-        $usuario = Auth::user();
+        $usuario = $this->contexto->usuario();
         abort_unless($usuario && $usuario->estado === 'ACTIVO' && $usuario->can('alertas.gestionar'), 403);
         abort_if($usuario->hasRole('FAMILIAR'), 403);
         $query = $usuario->hasAnyRole(['ADMINISTRADOR', 'GERENTE', 'SUPERADMINISTRADOR']) && ! $usuario->hasRole('ENFERMEROS')

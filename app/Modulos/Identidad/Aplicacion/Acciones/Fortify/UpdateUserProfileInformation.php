@@ -2,16 +2,18 @@
 
 namespace App\Modulos\Identidad\Aplicacion\Acciones\Fortify;
 
+use App\Compartido\Aplicacion\Contratos\ArchivosAplicacion;
 use App\Models\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 
 class UpdateUserProfileInformation implements UpdatesUserProfileInformation
 {
+    public function __construct(private readonly ArchivosAplicacion $ficheros) {}
+
     public function update(User $user, array $input): void
     {
         $validated = Validator::make($input, [
@@ -26,9 +28,9 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             $datosUsuario = Arr::only($validated, ['correo']);
             if (isset($validated['photo'])) {
                 if ($user->foto) {
-                    Storage::disk('public')->delete($user->foto);
+                    $this->ficheros->eliminar('public', $user->foto);
                 }
-                $datosUsuario['foto'] = $validated['photo']->store('usuarios', 'public');
+                $datosUsuario['foto'] = $this->ficheros->recibir($validated['photo'], 'usuarios', 'public');
             }
             if ($datosUsuario !== []) {
                 $user->fill($datosUsuario)->save();

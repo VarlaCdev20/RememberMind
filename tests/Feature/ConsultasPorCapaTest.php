@@ -6,6 +6,7 @@ use App\Compartido\Presentacion\Componentes\DashboardWelcomeHeader;
 use App\Models\Residente;
 use App\Models\User;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarConocimientoAdministrativo;
+use App\Modulos\Clinica\Aplicacion\Consultas\PrepararFichaClinica;
 use App\Modulos\Cuidados\Aplicacion\Consultas\ConsultarCuidadosFicha;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -17,6 +18,36 @@ use Tests\TestCase;
 class ConsultasPorCapaTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_ficha_rehidratada_prepara_datos_de_resumen_antes_de_presentarlos(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $actor = User::factory()->create();
+        $actor->assignRole('ADMINISTRADOR');
+        $this->actingAs($actor);
+        $residente = Residente::factory()->create();
+        $preparador = app(PrepararFichaClinica::class);
+        $residente = $preparador->cargar($residente->getKey());
+        $residente->unsetRelations();
+        $preparador->preparar($residente);
+        app(ConsultarCuidadosFicha::class)->consultar($residente, 'resumen', $actor);
+        DB::enableQueryLog();
+        DB::flushQueryLog();
+        try {
+            $this->assertSame('', $residente->cama_texto);
+            $this->assertNull($residente->planCuidadoActivo);
+            $this->assertCount(0, $residente->controlesCognitivos);
+            $this->assertCount(0, $residente->valoracionesDolor);
+            $this->assertCount(0, $residente->ejecucionesCuidado);
+            $this->assertCount(0, $residente->actividades);
+            $this->assertCount(0, $residente->notasClinicas);
+            $this->assertCount(0, $residente->registrosIngesta);
+            $this->assertCount(0, $residente->registrosHidratacion);
+            $this->assertSame([], DB::getQueryLog());
+        } finally {
+            DB::disableQueryLog();
+        }
+    }
 
     public function test_signos_no_prepara_consultas_de_otras_pestanas(): void
     {

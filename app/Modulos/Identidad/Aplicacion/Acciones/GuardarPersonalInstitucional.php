@@ -2,16 +2,14 @@
 
 namespace App\Modulos\Identidad\Aplicacion\Acciones;
 
-use App\Compartido\Infraestructura\Documentos\AlmacenamientoDocumentosUsuario;
-use App\Mail\PersonalInstitucionalBienvenidaMail;
+use App\Compartido\Aplicacion\Contratos\DocumentosUsuario;
+use App\Compartido\Aplicacion\Contratos\NotificacionesRegistro;
 use App\Models\Documento;
 use App\Models\Personal;
 use App\Models\User;
 use App\Modulos\Identidad\Dominio\Reglas\ClasificacionRolInstitucional;
 use App\Modulos\Identidad\Dominio\Reglas\DocumentosPersonalInstitucional;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -19,7 +17,7 @@ use Illuminate\Validation\ValidationException;
 
 final class GuardarPersonalInstitucional
 {
-    public function __construct(private readonly AlmacenamientoDocumentosUsuario $archivos) {}
+    public function __construct(private readonly NotificacionesRegistro $notificaciones, private readonly DocumentosUsuario $archivos) {}
 
     /** @return array{usuario: User, correo_enviado: ?bool} */
     public function guardar(?User $actor, array $entrada): array
@@ -45,7 +43,7 @@ final class GuardarPersonalInstitucional
         sort($actualesOrdenados);
         $cambiaRoles = $ordenados !== $actualesOrdenados;
         $cambiaCuenta = $edicion && ($entrada['correo'] !== mb_strtolower(trim($usuario->correo)) || $cambiaRoles
-            || (($entrada['foto_perfil'] ?? null) instanceof UploadedFile));
+            || $this->archivos->esArchivo($entrada['foto_perfil'] ?? null));
         abort_if($cambiaCuenta && ! $actor->can('usuarios.editar'), 403);
         abort_if($edicion && $usuario->getKey() === 'USU_0001' && $cambiaCuenta && $actor->getKey() !== 'USU_0001', 403);
         abort_if($cambiaRoles && in_array('SUPERADMINISTRADOR', $roles, true) && ! $actor->hasRole('SUPERADMINISTRADOR'), 403);
@@ -117,7 +115,7 @@ final class GuardarPersonalInstitucional
                     $usuario->correo = $datos['correo'];
                 }
                 $usuario->save();
-                if (($datos['foto_perfil'] ?? null) instanceof UploadedFile) {
+                if ($this->archivos->esArchivo($datos['foto_perfil'] ?? null)) {
                     $foto = $this->archivos->guardar($usuario->getKey(), $datos['foto_perfil'], 'perfiles');
                     $nuevosArchivos[] = $foto['ruta_archivo'];
                     $usuario->update(['foto' => $foto['ruta_archivo']]);
@@ -161,8 +159,8 @@ final class GuardarPersonalInstitucional
                     }
                     DB::afterCommit(function () use ($guardado, $clasificacion, $pendientes, $subidos, $adjuntos, $datos, &$correoEnviado) {
                         try {
-                            Mail::to($guardado->correo)->send(new PersonalInstitucionalBienvenidaMail($guardado, $clasificacion['rol_label'], 'Sin asignación operativa',
-                                $guardado->estado, $pendientes, now()->addHours(48)->toDateString(), $adjuntos, $datos['contrasena_temporal'], $subidos));
+                            $this->notificaciones->bienvenidaPersonal($guardado, $clasificacion['rol_label'], 'Sin asignación operativa',
+                                $guardado->estado, $pendientes, now()->addHours(48)->toDateString(), $adjuntos, $datos['contrasena_temporal'], $subidos);
                             $correoEnviado = true;
                         } catch (\Throwable $error) {
                             $correoEnviado = false;

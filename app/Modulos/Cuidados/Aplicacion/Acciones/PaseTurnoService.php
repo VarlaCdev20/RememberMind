@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Cuidados\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
 use App\Models\AdministracionMedicacion;
 use App\Models\Alerta;
 use App\Models\AsignacionPersonal;
@@ -29,7 +30,6 @@ use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -38,7 +38,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PaseTurnoService
 {
-    public function __construct(
+    public function __construct(private readonly ContextoEjecucion $contexto,
         private readonly TurnoEnfermeriaService $turnos,
         private readonly AgendaMedicacionService $medicacion
     ) {}
@@ -125,7 +125,7 @@ class PaseTurnoService
      */
     public function resolverJornadaSaliente(?User $usuario = null): Jornada
     {
-        $usuario = $usuario ?: Auth::user();
+        $usuario = $usuario ?: $this->contexto->usuario();
 
         if (! $usuario || $usuario->estado !== 'ACTIVO') {
             throw ValidationException::withMessages([
@@ -575,7 +575,7 @@ class PaseTurnoService
             $codResidente = $datos['cod_residente'] ?? '';
         } else {
             $codResidente = $residenteOUsuario;
-            $usuario = $usuario ?: Auth::user();
+            $usuario = $usuario ?: $this->contexto->usuario();
         }
 
         return $this->procesarPase($codResidente, $datos, $usuario, 'BORRADOR');
@@ -591,7 +591,7 @@ class PaseTurnoService
             $codResidente = $datos['cod_residente'] ?? '';
         } else {
             $codResidente = $residenteOUsuario;
-            $usuario = $usuario ?: Auth::user();
+            $usuario = $usuario ?: $this->contexto->usuario();
         }
 
         Validator::make($datos, [
@@ -711,7 +711,7 @@ class PaseTurnoService
         } else {
             $pase = $arg1 instanceof PaseTurno ? $arg1 : PaseTurno::findOrFail($arg1);
             $observacionRecepcion = is_string($arg2) ? $arg2 : null;
-            $usuario = $arg3 instanceof User ? $arg3 : ($arg2 instanceof User ? $arg2 : Auth::user());
+            $usuario = $arg3 instanceof User ? $arg3 : ($arg2 instanceof User ? $arg2 : $this->contexto->usuario());
         }
 
         $personal = $this->autorizarPersonal($usuario, 'pases_turno.editar');
@@ -769,7 +769,7 @@ class PaseTurnoService
             $pase = $arg2 instanceof PaseTurno ? $arg2 : PaseTurno::findOrFail($arg2);
         } else {
             $pase = $arg1 instanceof PaseTurno ? $arg1 : PaseTurno::findOrFail($arg1);
-            $usuario = $arg2 instanceof User ? $arg2 : Auth::user();
+            $usuario = $arg2 instanceof User ? $arg2 : $this->contexto->usuario();
         }
 
         $personal = $this->autorizarPersonal($usuario, 'pases_turno.editar');

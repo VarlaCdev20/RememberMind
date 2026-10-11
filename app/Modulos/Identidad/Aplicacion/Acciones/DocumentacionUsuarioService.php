@@ -2,17 +2,17 @@
 
 namespace App\Modulos\Identidad\Aplicacion\Acciones;
 
-use App\Compartido\Infraestructura\Documentos\AlmacenamientoDocumentosUsuario;
+use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
+use App\Compartido\Aplicacion\Contratos\DocumentosUsuario;
 use App\Models\Documento;
 use App\Models\User;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class DocumentacionUsuarioService
 {
-    public function __construct(private readonly AlmacenamientoDocumentosUsuario $archivos) {}
+    public function __construct(private readonly ContextoEjecucion $contexto, private readonly DocumentosUsuario $archivos) {}
 
     public function tiposDisponibles(User $usuario): array
     {
@@ -68,9 +68,9 @@ class DocumentacionUsuarioService
         ];
     }
 
-    public function subirDocumento(User $usuario, string $codTipoDoc, UploadedFile $file, ?string $fechaEmision = null, ?string $fechaVencimiento = null, ?string $observaciones = null, ?User $subidoPor = null): Documento
+    public function subirDocumento(User $usuario, string $codTipoDoc, object $file, ?string $fechaEmision = null, ?string $fechaVencimiento = null, ?string $observaciones = null, ?User $subidoPor = null): Documento
     {
-        $actor = $this->autorizar($subidoPor ?? auth()->user(), ['documentos.subir', 'documentos.gestionar']);
+        $actor = $this->autorizar($subidoPor ?? $this->contexto->usuario(), ['documentos.subir', 'documentos.gestionar']);
         $usuario = User::query()->findOrFail($usuario->getKey());
         $tipo = $this->tipoDisponible($usuario, $codTipoDoc);
         $vencimiento = [$tipo->requiere_vencimiento ? 'required' : 'nullable', 'date'];
@@ -90,7 +90,7 @@ class DocumentacionUsuarioService
                     ->whereIn('estado', ['PENDIENTE', 'CARGADO', 'VALIDADO', 'OBSERVADO', 'VENCIDO'])->lockForUpdate()->first();
                 $archivo = $this->archivos->guardar($usuario->getKey(), $file);
                 $detalle = array_filter([$observaciones, $fechaEmision ? "Fecha de emisión: {$fechaEmision}" : null,
-                    "Nombre original: {$file->getClientOriginalName()}", 'Subido por: '.$actor->getKey()]);
+                    "Nombre original: {$this->archivos->nombreOriginal($file)}", 'Subido por: '.$actor->getKey()]);
                 $documento = Documento::create([
                     'cod_documento' => 'DOC_'.strtoupper(Str::random(10)), 'cod_usuario' => $usuario->getKey(),
                     'cod_documento_anterior' => $previo?->getKey(), 'tipo_documento' => $codTipoDoc, 'nombre' => $tipo->nombre,

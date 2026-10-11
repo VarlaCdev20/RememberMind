@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Residentes\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\ArchivosAplicacion;
 use App\Models\Documento;
 use App\Models\User;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
@@ -10,6 +11,8 @@ use Illuminate\Support\Str;
 
 final class IncorporarDocumentosExpediente
 {
+    public function __construct(private readonly ArchivosAplicacion $ficheros) {}
+
     public function guardarNuevoDocumento(User $usuario, array $entrada): mixed
     {
         abort_if(
@@ -40,8 +43,8 @@ final class IncorporarDocumentosExpediente
             'nuevoDocArchivo.max' => 'El tamaño máximo del archivo no debe exceder los 15 MB.',
         ])->validate();
 
-        $hashArchivo = hash_file('sha256', $entrada['nuevoDocArchivo']->getRealPath());
-        $rutaArchivo = $entrada['nuevoDocArchivo']->store('documentos/adultos-mayores', 'local');
+        $hashArchivo = $this->ficheros->hashEntrada($entrada['nuevoDocArchivo']);
+        $rutaArchivo = $this->ficheros->recibir($entrada['nuevoDocArchivo'], 'documentos/adultos-mayores', 'local');
 
         $doc = Documento::create([
             'cod_documento' => 'DOC_'.Str::upper(Str::random(12)),

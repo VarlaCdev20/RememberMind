@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Clinica\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\ArchivosAplicacion;
 use App\Models\Atencion;
 use App\Models\ComponenteEstudio;
 use App\Models\Derivacion;
@@ -19,7 +20,7 @@ final class GestionarEstudiosClinicos
 {
     private const ROLES_SOLICITUD = ['MEDICO GENERAL/GERIATRA'];
 
-    public function __construct(private readonly AutorizacionClinicaService $autorizacion) {}
+    public function __construct(private readonly ArchivosAplicacion $ficheros, private readonly AutorizacionClinicaService $autorizacion) {}
 
     public function solicitar(User $usuario, array $entrada, Residente $residente): mixed
     {
@@ -82,8 +83,8 @@ final class GestionarEstudiosClinicos
         $archivo = data_get($entrada, 'archivo');
         unset($datos['archivo']);
         $codigo = $this->codigo('DCL');
-        $ruta = $archivo->storeAs('documentos-clinicos/'.$residente->cod_residente, $codigo.'.'.$archivo->extension(), 'local');
-        $documento = DocumentoClinico::query()->create(['cod_documento_clinico' => $codigo, 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, ...$datos, 'ruta_archivo' => $ruta, 'formato' => $archivo->getMimeType() ?: 'application/octet-stream', 'tamano_bytes' => $archivo->getSize(), 'hash_archivo' => hash_file('sha256', $archivo->getRealPath()), 'fecha_hora' => now(), 'estado' => 'VIGENTE']);
+        $ruta = $this->ficheros->recibirComo($archivo, 'documentos-clinicos/'.$residente->cod_residente, $codigo.'.'.$archivo->extension(), 'local');
+        $documento = DocumentoClinico::query()->create(['cod_documento_clinico' => $codigo, 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, ...$datos, 'ruta_archivo' => $ruta, 'formato' => $archivo->getMimeType() ?: 'application/octet-stream', 'tamano_bytes' => $archivo->getSize(), 'hash_archivo' => $this->ficheros->hashEntrada($archivo), 'fecha_hora' => now(), 'estado' => 'VIGENTE']);
 
         return $documento;
     }

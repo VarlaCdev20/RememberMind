@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Clinica\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Personal;
 use App\Models\SignoVital;
@@ -12,7 +13,6 @@ use App\Modulos\Clinica\Aplicacion\Validacion\ValidacionSignosVitalesService;
 use App\Modulos\Clinica\Dominio\ObjetosValor\EvaluacionSignosVitales;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -20,7 +20,7 @@ use Illuminate\Validation\ValidationException;
 
 class SignosVitalesService
 {
-    public function __construct(
+    public function __construct(private readonly ContextoEjecucion $contexto,
         private readonly TurnoEnfermeriaService $turnos,
         private readonly RegistrarSignosVitalesAction $registrarSignos,
         private readonly EvaluadorSignosVitales $evaluadorSignos,
@@ -36,7 +36,7 @@ class SignosVitalesService
     /** Devuelve la evaluación confirmada y la alerta persistida, si corresponde. */
     public function registrarConEvaluacion(string $codResidente, array $entrada, User $usuario): RegistroSignosVitales
     {
-        abort_unless(Auth::user()?->cod_usuario === $usuario->cod_usuario, 403, 'La autoría del registro no corresponde al usuario autenticado.');
+        abort_unless($this->contexto->usuario()?->cod_usuario === $usuario->cod_usuario, 403, 'La autoría del registro no corresponde al usuario autenticado.');
         $turno = $this->turnos->autorizarMutacionEnfermeria($codResidente, 'signos_vitales.crear', $usuario);
         $codPersonal = $this->resolverPersonalActivo($usuario);
         $entrada = array_map(fn ($valor) => $valor === '' ? null : $valor, $entrada);
@@ -81,7 +81,7 @@ class SignosVitalesService
     {
         $mediciones = array_map(fn ($valor) => $valor === '' ? null : $valor, $mediciones);
         if ($codResidente !== null) {
-            abort_unless($usuario && Auth::user()?->cod_usuario === $usuario->cod_usuario, 403);
+            abort_unless($usuario && $this->contexto->usuario()?->cod_usuario === $usuario->cod_usuario, 403);
             $this->turnos->autorizarMutacionEnfermeria($codResidente, 'signos_vitales.crear', $usuario);
         }
         $validator = Validator::make($mediciones, array_diff_key(
@@ -110,7 +110,7 @@ class SignosVitalesService
 
     public function registrar(string $codResidente, array $entrada, User $usuario, string $permiso = 'signos_vitales.crear'): SignoVital
     {
-        abort_unless(Auth::user()?->cod_usuario === $usuario->cod_usuario, 403, 'La autoría del registro no corresponde al usuario autenticado.');
+        abort_unless($this->contexto->usuario()?->cod_usuario === $usuario->cod_usuario, 403, 'La autoría del registro no corresponde al usuario autenticado.');
         $this->turnos->autorizarMutacionEnfermeria($codResidente, $permiso, $usuario);
         $datos = $this->validarYNormalizar($entrada);
 
@@ -156,7 +156,7 @@ class SignosVitalesService
 
     public function rectificar(SignoVital $original, array $entrada, string $motivo, User $usuario): SignoVital
     {
-        abort_unless(Auth::user()?->cod_usuario === $usuario->cod_usuario, 403, 'La autoría del registro no corresponde al usuario autenticado.');
+        abort_unless($this->contexto->usuario()?->cod_usuario === $usuario->cod_usuario, 403, 'La autoría del registro no corresponde al usuario autenticado.');
         $this->turnos->autorizarMutacionEnfermeria($original->cod_residente, 'signos_vitales.editar', $usuario);
         Validator::make(['motivo' => $motivo], ['motivo' => 'required|string|min:10|max:2000'], [
             'motivo.required' => 'Debe indicar el motivo de la rectificación.',

@@ -39,6 +39,21 @@ class ExploradorAdministrativoTest extends TestCase
 
     private Residente $residente;
 
+    public function test_paginacion_web_conserva_filtros_y_excluye_detalle(): void
+    {
+        $codigo = Contacto::query()->value('cod_contacto');
+        $this->get(route('admin.administracion.contactos', ['vista' => 'tabla', 'por_pagina' => 10, 'detalle' => $codigo]))
+            ->assertOk()->assertViewHas('registros', function ($registros) {
+                parse_str(parse_url($registros->url(2), PHP_URL_QUERY), $parametros);
+                $this->assertSame('tabla', $parametros['vista']);
+                $this->assertSame('10', $parametros['por_pagina']);
+                $this->assertSame('2', $parametros['page']);
+                $this->assertArrayNotHasKey('detalle', $parametros);
+
+                return true;
+            });
+    }
+
     protected function setUp(): void
     {
         parent::setUp();

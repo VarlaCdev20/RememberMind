@@ -2,14 +2,17 @@
 
 namespace App\Modulos\Identidad\Aplicacion\Consultas;
 
+use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
 use App\Models\User;
 use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 
 final class ConsultarEncabezadoUsuario
 {
-    public function preparar(?User $usuario, ?string $estado, ?string $modo): array
+    public function __construct(private readonly ContextoEjecucion $contexto) {}
+
+    public function preparar(?User $usuario, ?string $estado, ?string $modo, bool $enfermeria = false): array
     {
-        $usuario ??= auth()->user();
+        $usuario ??= $this->contexto->usuario();
         $usuario?->loadMissing(['personal', 'contactos', 'roles']);
         $persona = $usuario?->personal ?: $usuario?->contactos->first();
         $nombreCompleto = trim(implode(' ', array_filter([
@@ -24,7 +27,7 @@ final class ConsultarEncabezadoUsuario
         }
         $nombreLargo = mb_strlen($nombreCompleto, 'UTF-8') > 32;
         $rol = app(RolePreviewService::class)->activeRole($usuario)
-            ?? (request()->routeIs('admin.enfermeria.*') && $usuario?->hasRole('ENFERMEROS')
+            ?? ($enfermeria && $usuario?->hasRole('ENFERMEROS')
                 ? 'ENFERMEROS' : $usuario?->getRoleNames()->first());
         $rolVisible = $rol ? mb_convert_case(str_replace('_', ' ', $rol), MB_CASE_TITLE, 'UTF-8') : 'Personal';
         $zonaHoraria = config('app.timezone');

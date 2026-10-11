@@ -2,16 +2,32 @@
 
 namespace App\Compartido\Infraestructura\Documentos;
 
+use App\Compartido\Aplicacion\Contratos\DocumentosUsuario;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use RuntimeException;
 
-final class AlmacenamientoDocumentosUsuario
+final class AlmacenamientoDocumentosUsuario implements DocumentosUsuario
 {
-    public function guardar(string $usuario, UploadedFile $archivo, string $prefijo = 'documentos/usuarios'): array
+    public function esArchivo(mixed $archivo): bool
     {
+        return $archivo instanceof UploadedFile;
+    }
+
+    public function nombreOriginal(object $archivo): string
+    {
+        if (! $this->esArchivo($archivo)) {
+            throw new InvalidArgumentException('Entrada documental no válida.');
+        }
+
+        return $archivo->getClientOriginalName();
+    }
+
+    public function guardar(string $usuario, object $archivo, string $prefijo = 'documentos/usuarios'): array
+    {
+        $this->nombreOriginal($archivo);
         if (! in_array($prefijo, ['documentos/usuarios', 'documentos_personal', 'perfiles'], true)) {
             throw new InvalidArgumentException('Destino documental no válido.');
         }

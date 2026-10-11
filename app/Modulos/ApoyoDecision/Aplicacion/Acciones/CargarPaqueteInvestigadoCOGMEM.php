@@ -3,7 +3,7 @@
 namespace App\Modulos\ApoyoDecision\Aplicacion\Acciones;
 
 use App\Models\User;
-use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Eloquent\CargadorConocimiento;
+use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
@@ -12,6 +12,8 @@ use MotorExperto\dominio\conocimiento\versiones\PaqueteInvestigadoCOGMEM as P;
 /** Registro de una propuesta: nunca cambia vigencias, aprobaciones o historia clínica. */
 final class CargarPaqueteInvestigadoCOGMEM
 {
+    public function __construct(private readonly ConocimientoVersionado $conocimiento) {}
+
     public function ejecutar(User $autor): array
     {
         return DB::transaction(function () use ($autor): array {
@@ -37,7 +39,7 @@ final class CargarPaqueteInvestigadoCOGMEM
                 if ((array) $guardada != $version) {
                     throw new DomainException('La propuesta conservada difiere. Requiere otra versión; no se sobrescribe.');
                 }
-                $actual = (new CargadorConocimiento)->instantanea(P::VERSION);
+                $actual = $this->conocimiento->instantanea(P::VERSION);
                 foreach ($tablas as $tabla => $filas) {
                     $pk = PaqueteConocimiento::CLAVES[$tabla];
                     if (collect($actual[$tabla])->keyBy($pk)->all() != collect($filas)->keyBy($pk)->all()) {

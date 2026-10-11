@@ -2,19 +2,20 @@
 
 namespace App\Modulos\Admisiones\Aplicacion\Acciones;
 
-use App\Mail\PreadmisionDocumentosPendientesMail;
+use App\Compartido\Aplicacion\Contratos\ArchivosAplicacion;
+use App\Compartido\Aplicacion\Contratos\GeneradorPdf;
+use App\Compartido\Aplicacion\Contratos\NotificacionesRegistro;
 use App\Models\Contacto;
 use App\Models\Documento;
 use App\Models\Preadmision;
 use App\Models\User;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 final class RegistrarSolicitudPreadmision
 {
+    public function __construct(private readonly NotificacionesRegistro $notificaciones, private readonly GeneradorPdf $pdf, private readonly ArchivosAplicacion $ficheros) {}
+
     public function ejecutar(User $usuario, array $datos): array
     {
         return DB::transaction(function () use ($usuario, $datos): array {
@@ -78,7 +79,7 @@ final class RegistrarSolicitudPreadmision
                 $esPendiente48h = in_array($tipo, $datos['docs_pendientes_48h'], true) && empty($archivo);
 
                 if (! empty($archivo) && ! is_string($archivo)) {
-                    $path = $archivo->store("preadmisiones/{$preadmision->cod_pre}", 'public');
+                    $path = $this->ficheros->recibir($archivo, "preadmisiones/{$preadmision->cod_pre}", 'public');
 
                     Documento::create([
                         'cod_documento' => 'DOC_'.Str::upper(Str::random(12)),
@@ -88,7 +89,7 @@ final class RegistrarSolicitudPreadmision
                         'nombre' => $archivo->getClientOriginalName(),
                         'ruta_archivo' => $path,
                         'tipo_archivo' => $archivo->getMimeType() ?: 'application/octet-stream',
-                        'hash_archivo' => hash_file('sha256', Storage::disk('public')->path($path)),
+                        'hash_archivo' => $this->ficheros->hash('public', $path),
                         'estado' => 'VIGENTE',
                         'observacion' => $docConfig['grupo'],
                     ]);
@@ -98,8 +99,6 @@ final class RegistrarSolicitudPreadmision
             }
 
             $dirPdf = "preadmisiones/{$preadmision->cod_pre}/institucionales";
-            Storage::disk('public')->makeDirectory($dirPdf);
-
             $todosGenerados = true;
 
             foreach ($datos['configuracion_documentos'] as $docConfig) {
@@ -111,13 +110,19 @@ final class RegistrarSolicitudPreadmision
                 $estadoDoc = 'PENDIENTE_FIRMA';
 
                 try {
-                    $pdf = Pdf::loadView($docConfig['vista_pdf'], [
+                    if (! $this->ficheros->crearDirectorio('public', $dirPdf)) {
+                        throw new \RuntimeException('No se pudo preparar el directorio del documento.');
+                    }
+
+                    $pdf = $this->pdf->contenido($docConfig['vista_pdf'], [
                         'preadmision' => $preadmision,
                         'fecha' => now()->format('d/m/Y H:i'),
                     ]);
 
                     $filePath = "{$dirPdf}/{$docConfig['archivo_pdf']}";
-                    Storage::disk('public')->put($filePath, $pdf->output());
+                    if (! $this->ficheros->escribir('public', $filePath, $pdf)) {
+                        throw new \RuntimeException('No se pudo guardar el documento generado.');
+                    }
 
                     $archivoPdf = $filePath;
                     $estadoDoc = 'GENERADO';
@@ -135,7 +140,7 @@ final class RegistrarSolicitudPreadmision
                         'nombre' => $docConfig['nombre'],
                         'ruta_archivo' => $archivoPdf,
                         'tipo_archivo' => 'application/pdf',
-                        'hash_archivo' => hash_file('sha256', Storage::disk('public')->path($archivoPdf)),
+                        'hash_archivo' => $this->ficheros->hash('public', $archivoPdf),
                         'estado' => 'VIGENTE',
                         'observacion' => 'Generado por el sistema al confirmar la preadmisión.',
                     ]);
@@ -145,12 +150,10 @@ final class RegistrarSolicitudPreadmision
             $correoPendiente = false;
             if (! empty($docsPendientesNombres) && ! empty($preadmision->familiar_correo)) {
                 try {
-                    Mail::to($preadmision->familiar_correo)
-                        ->send(new PreadmisionDocumentosPendientesMail(
-                            $preadmision,
-                            $docsPendientesNombres,
-                            $fechaLimite48h->format('d/m/Y H:i')
-                        ));
+                    $this->notificaciones->pendientesPreadmision($preadmision,
+                        $docsPendientesNombres,
+                        $fechaLimite48h->format('d/m/Y H:i')
+                    );
                 } catch (\Throwable $exception) {
                     report($exception);
                     $correoPendiente = true;

@@ -3,7 +3,7 @@
 namespace App\Modulos\Identidad\Aplicacion\Acciones;
 
 use App\Models\User;
-use Illuminate\Contracts\Session\Session;
+use App\Modulos\Identidad\Aplicacion\Contratos\EstadoPrevisualizacion;
 use Illuminate\Validation\ValidationException;
 
 class RolePreviewService
@@ -23,7 +23,7 @@ class RolePreviewService
         'FAMILIAR' => 'Familiar',
     ];
 
-    public function __construct(private readonly Session $session) {}
+    public function __construct(private readonly EstadoPrevisualizacion $estado) {}
 
     public function availableRoles(): array
     {
@@ -46,17 +46,17 @@ class RolePreviewService
             return;
         }
 
-        $this->session->put(self::SESSION_KEY, $role);
+        $this->estado->guardar($role);
     }
 
     public function clear(): void
     {
-        $this->session->forget(self::SESSION_KEY);
+        $this->estado->limpiar();
     }
 
     public function activeRole(?User $user = null): ?string
     {
-        $role = $this->session->get(self::SESSION_KEY);
+        $role = $this->estado->obtener();
 
         if (! is_string($role)) {
             return null;

@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Institucion\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
 use App\Models\Cama;
 use App\Models\Habitacion;
 use App\Models\User;
@@ -15,6 +16,8 @@ use Illuminate\Validation\ValidationException;
 /** Mantenimiento físico; no asigna residentes ni sustituye la admisión. */
 class GuardarEspacioResidencial
 {
+    public function __construct(private readonly ContextoEjecucion $contexto) {}
+
     public function habitacion(array $datos, User $usuario, ?string $codigo = null): Habitacion
     {
         return DB::transaction(function () use ($datos, $usuario, $codigo) {
@@ -59,7 +62,7 @@ class GuardarEspacioResidencial
 
     private function autorizar(Habitacion|Cama $espacio, User $usuario): void
     {
-        abort_unless(auth()->id() === $usuario->getKey(), 403);
+        abort_unless($this->contexto->usuario()?->getKey() === $usuario->getKey(), 403);
         Gate::forUser($usuario)->authorize($espacio->exists ? 'update' : 'create', $espacio->exists ? $espacio : $espacio::class);
     }
 

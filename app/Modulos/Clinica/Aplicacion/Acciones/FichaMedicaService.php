@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Clinica\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
 use App\Models\Alergia;
 use App\Models\AntecedenteClinico;
 use App\Models\Atencion;
@@ -17,7 +18,7 @@ use Illuminate\Support\Str;
 
 class FichaMedicaService
 {
-    public function __construct(private readonly ContextoClinicoService $contextoClinico) {}
+    public function __construct(private readonly ContextoEjecucion $contexto, private readonly ContextoClinicoService $contextoClinico) {}
 
     public const CONDICIONES_MAP = [
         'hipertension' => 'Hipertensión',
@@ -42,7 +43,7 @@ class FichaMedicaService
     {
         $usuario = $codUsuario
             ? User::query()->find($codUsuario)
-            : auth()->user();
+            : $this->contexto->usuario();
 
         return $this->contextoClinico->personalActivo($usuario)->cod_personal;
     }

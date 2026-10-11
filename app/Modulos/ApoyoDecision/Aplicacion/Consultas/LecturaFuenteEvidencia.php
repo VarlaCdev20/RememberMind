@@ -9,7 +9,6 @@ use App\Models\EvidenciaEvaluacion;
 use App\Models\PreguntaInstrumento;
 use App\Models\Residente;
 use App\Models\User;
-use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\LecturaTecnicaPruebas;
 use Illuminate\Support\Facades\Gate;
 
 final class LecturaFuenteEvidencia
@@ -18,7 +17,7 @@ final class LecturaFuenteEvidencia
     {
         Gate::forUser($user)->authorize('consultarResultados', [EvaluacionExperta::class, $residente]);
         $e = EvidenciaEvaluacion::query()->whereKey($evidencia)->where('cod_evaluacion_experta', $evaluacion)
-            ->whereHas('evaluacion', fn ($q) => LecturaTecnicaPruebas::limitar($q->where('cod_residente', $residente->getKey())))
+            ->whereHas('evaluacion', fn ($q) => AlcanceLecturaExperta::limitar($q->where('cod_residente', $residente->getKey())))
             ->with(['evaluacion', 'mapeoVariableFuente.fuente'])->firstOrFail();
         $mapa = $e->mapeoVariableFuente;
         abort_unless($mapa->cod_version_modelo === $e->evaluacion->cod_version_modelo && $mapa->fuente->cod_version_modelo === $e->evaluacion->cod_version_modelo, 404);
@@ -37,7 +36,7 @@ final class LecturaFuenteEvidencia
             if (! $registro) {
                 return ['estado' => 'Registro fuente no disponible para este residente.'];
             }
-            if (LecturaTecnicaPruebas::habilitada() && $mapa->getKey() === 'MAP_INS'
+            if (AlcanceLecturaExperta::habilitada() && $mapa->getKey() === 'MAP_INS'
                 && $registro->cod_instrumento === 'INST_COMPLETO' && $registro->instrumento?->version === 'TECNICA_1') {
                 $preguntas = PreguntaInstrumento::query()->where('cod_instrumento', 'INST_COMPLETO')
                     ->whereIn('cod_pregunta', ['QA_REC', 'QA_REM', 'QA_IND'])->get()->keyBy('cod_pregunta');

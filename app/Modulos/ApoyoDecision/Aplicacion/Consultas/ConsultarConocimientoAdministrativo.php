@@ -3,14 +3,14 @@
 namespace App\Modulos\ApoyoDecision\Aplicacion\Consultas;
 
 use App\Models\VersionModeloExperto;
-use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Eloquent\CargadorConocimiento;
+use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Gate;
 
 /** Proyección administrativa; no interpreta, activa ni modifica conocimiento. */
 final class ConsultarConocimientoAdministrativo
 {
-    public function __construct(private readonly CargadorConocimiento $conocimiento) {}
+    public function __construct(private readonly ConocimientoVersionado $conocimiento) {}
 
     public function existeVersion(string $version): bool
     {

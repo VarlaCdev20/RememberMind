@@ -13,6 +13,7 @@ use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
 use App\Modulos\Alertas\Aplicacion\Acciones\RegistrarIncidenteEnFicha;
 use App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService;
 use App\Modulos\Clinica\Aplicacion\Consultas\EventosClinicosService;
+use App\Modulos\Clinica\Aplicacion\Consultas\PrepararFichaClinica;
 use App\Modulos\Clinica\Aplicacion\Consultas\ResultadosEstudiosService;
 use App\Modulos\Clinica\Aplicacion\Consultas\ResumenLongitudinalResidente;
 use App\Modulos\Cuidados\Aplicacion\Acciones\GestionarCuidadosEnFicha;
@@ -415,33 +416,7 @@ class FichaPaciente extends Component
         if (Auth::user()?->hasRole('ENFERMEROS')) {
             app(TurnoEnfermeriaService::class)->autorizarConsultaResidente($codResidente, Auth::user());
         }
-        $this->adultoMayor = Residente::with([
-            'ocupacionActiva.cama.habitacion',
-            'admisiones',
-            'familiares',
-            'alergias' => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO'])->orderByDesc('fecha_hora'),
-            'diagnosticos' => fn ($q) => $q->whereIn('estado', ['ACTIVO', 'ACTIVA', 'VIGENTE'])->orderByDesc('fecha_hora'),
-            'antecedentesClinicos' => fn ($q) => $q->whereNotIn('estado', ['ANULADO', 'INACTIVO'])->orderByDesc('fecha_referencia'),
-            'seguros' => fn ($q) => $q->whereIn('estado', ['ACTIVO', 'ACTIVA']),
-            'asignacionesJornada.jornada.turno',
-            'asignacionesJornada.personal.usuario',
-            'atenciones',
-            'pasesTurno.personalSaliente.usuario',
-            'notasClinicas' => fn ($q) => $q->whereNotIn('estado', ['ANULADA', 'ANULADO', 'INACTIVA', 'INACTIVO'])->orderByDesc('fecha_hora')->take(10),
-            'actividades' => fn ($q) => $q->orderBy('fecha_hora')->take(20),
-            'signosVitales' => fn ($q) => $q->orderByDesc('fecha_hora')->take(60),
-            'ejecucionesCuidado' => fn ($q) => $q->with('intervencion')->orderBy('fecha_hora_programada')->take(30),
-            'registrosIngesta' => fn ($q) => $q->orderByDesc('fecha_hora')->take(10),
-            'registrosHidratacion' => fn ($q) => $q->orderByDesc('fecha_hora')->take(30),
-            'registrosMovilidad' => fn ($q) => $q->orderByDesc('fecha_hora')->take(10),
-            'controlesCognitivos' => fn ($q) => $q->orderByDesc('fecha_hora')->take(10),
-            'valoracionesDolor' => fn ($q) => $q->orderByDesc('fecha_hora')->take(10),
-            'medicaciones' => fn ($q) => $q->with(['medicamento', 'horarios'])->where('estado', 'ACTIVA'),
-            'administracionesMedicacion' => fn ($q) => $q->with('medicacion.medicamento')->orderByDesc('fecha_hora_programada')->take(30),
-            'alertas' => fn ($q) => $q->with('eventos.usuario')->orderByDesc('fecha_hora')->take(25),
-            'evaluacionesGeriatricas' => fn ($q) => $q->orderByDesc('fecha_hora')->take(10),
-            'valoracionesFuncionales' => fn ($q) => $q->with('registradoPor')->orderByDesc('fecha_hora')->take(10),
-        ])->findOrFail($codResidente);
+        $this->adultoMayor = app(PrepararFichaClinica::class)->cargar($codResidente);
     }
 
     public function cambiarTab(string $tab): void
@@ -1590,22 +1565,7 @@ class FichaPaciente extends Component
     public function render()
     {
         if (isset($this->adultoMayor)) {
-            $this->adultoMayor->loadMissing([
-                'ocupacionActiva.cama.habitacion',
-                'asignacionesJornada.jornada.turno',
-                'asignacionesJornada.personal.usuario',
-                'atenciones',
-                'alergias' => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO'])->orderByDesc('fecha_hora'),
-                'diagnosticos' => fn ($q) => $q->whereIn('estado', ['ACTIVO', 'ACTIVA', 'VIGENTE'])->orderByDesc('fecha_hora'),
-                'antecedentesClinicos' => fn ($q) => $q->whereNotIn('estado', ['ANULADO', 'INACTIVO'])->orderByDesc('fecha_referencia'),
-                'seguros' => fn ($q) => $q->whereIn('estado', ['ACTIVO', 'ACTIVA']),
-                'signosVitales' => fn ($q) => $q->orderByDesc('fecha_hora')->take(60),
-                'medicaciones' => fn ($q) => $q->with(['medicamento', 'horarios'])->where('estado', 'ACTIVA'),
-                'administracionesMedicacion' => fn ($q) => $q->with('medicacion.medicamento')->orderByDesc('fecha_hora_programada')->take(30),
-                'alertas' => fn ($q) => $q->with('eventos.usuario')->orderByDesc('fecha_hora')->take(25),
-                'evaluacionesGeriatricas' => fn ($q) => $q->orderByDesc('fecha_hora')->take(10),
-                'valoracionesFuncionales' => fn ($q) => $q->with('registradoPor')->orderByDesc('fecha_hora')->take(10),
-            ]);
+            app(PrepararFichaClinica::class)->preparar($this->adultoMayor);
         }
 
         $cuidadosFicha = isset($this->adultoMayor)

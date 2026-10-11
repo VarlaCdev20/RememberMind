@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Residentes\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\ArchivosAplicacion;
 use App\Models\Contacto;
 use App\Models\HistorialEstadoResidente;
 use App\Models\Residente;
@@ -9,12 +10,13 @@ use App\Models\ResidenteContacto;
 use App\Models\SeguroResidente;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AdultoMayorService
 {
+    public function __construct(private readonly ArchivosAplicacion $ficheros) {}
+
     /**
      * Obtener listado completo de residentes con indicadores V2.
      */
@@ -133,7 +135,7 @@ class AdultoMayorService
         if ($file) {
             $filename = Str::uuid().'.'.$file->getClientOriginalExtension();
 
-            return $file->storeAs('residentes', $filename, 'public');
+            return $this->ficheros->recibirComo($file, 'residentes', $filename, 'public');
         }
 
         return null;
@@ -148,7 +150,7 @@ class AdultoMayorService
 
         if ($foto) {
             if ($residente->foto) {
-                Storage::disk('public')->delete($residente->foto);
+                $this->ficheros->eliminar('public', $residente->foto);
             }
             $data['foto'] = $this->guardarFoto($foto);
         }

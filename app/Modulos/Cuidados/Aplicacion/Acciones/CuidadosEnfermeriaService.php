@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Cuidados\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
 use App\Models\AsignacionPersonal;
 use App\Models\Atencion;
 use App\Models\DispositivoClinico;
@@ -16,7 +17,6 @@ use App\Models\ValoracionDolor;
 use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
 use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -59,7 +59,7 @@ class CuidadosEnfermeriaService
 
     public const RIESGOS_CAIDA = ['BAJO', 'MEDIO', 'ALTO'];
 
-    public function __construct(private readonly TurnoEnfermeriaService $turnos, private readonly AlertasService $alertas) {}
+    public function __construct(private readonly ContextoEjecucion $contexto, private readonly TurnoEnfermeriaService $turnos, private readonly AlertasService $alertas) {}
 
     public function registrarAlimentacion(string $codResidente, array $datos, User $usuario): RegistroIngesta
     {
@@ -533,7 +533,7 @@ class CuidadosEnfermeriaService
     /** Valoración inicial o nueva reevaluación: nunca modifica la fila de origen. */
     public function registrarValoracionDolor(string $codResidente, array $entrada, User $usuario): ValoracionDolor
     {
-        abort_unless(Auth::user()?->cod_usuario === $usuario->cod_usuario, 403);
+        abort_unless($this->contexto->usuario()?->cod_usuario === $usuario->cod_usuario, 403);
         $this->turnos->autorizarMutacionEnfermeria($codResidente, 'valoraciones_dolor.crear', $usuario);
 
         foreach (['ubicacion', 'duracion_unidad', 'frecuencia', 'desencadenante', 'factores_alivio', 'intervencion', 'respuesta'] as $campo) {
@@ -623,7 +623,7 @@ class CuidadosEnfermeriaService
 
     public function prepararReevaluacionDolor(string $codResidente, string $codValoracion, User $usuario): ValoracionDolor
     {
-        abort_unless(Auth::user()?->cod_usuario === $usuario->cod_usuario, 403);
+        abort_unless($this->contexto->usuario()?->cod_usuario === $usuario->cod_usuario, 403);
         $this->turnos->autorizarMutacionEnfermeria($codResidente, 'valoraciones_dolor.crear', $usuario);
         abort_unless($usuario->can('valoraciones_dolor.ver'), 403);
 

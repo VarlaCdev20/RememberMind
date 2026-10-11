@@ -2,23 +2,25 @@
 
 namespace App\Modulos\Residentes\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\ArchivosAplicacion;
 use App\Models\Residente;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 final class GestionarDocumentosResidenteHttp
 {
+    public function __construct(private readonly ArchivosAplicacion $ficheros) {}
+
     public function store(User $actor, array $entrada, Residente $adulto_mayor): mixed
     {
         abort_unless($actor->can('documentos.gestionar'), 403);
         $this->autorizarResidente($actor, $adulto_mayor);
         $data = $entrada;
         $file = data_get($entrada, 'archivo');
-        $path = $file->store('documentos/residentes', 'local');
-        $adulto_mayor->documentos()->create(['cod_documento' => 'DOC_'.Str::upper(Str::random(10)), 'cod_residente' => $adulto_mayor->cod_residente, 'tipo_documento' => $data['tipo_documento'], 'nombre' => $data['nombre'], 'ruta_archivo' => $path, 'tipo_archivo' => $file->getMimeType() ?: 'application/octet-stream', 'hash_archivo' => hash_file('sha256', Storage::disk('local')->path($path)), 'estado' => 'ACTIVO', 'observacion' => $data['observaciones'] ?? null]);
+        $path = $this->ficheros->recibir($file, 'documentos/residentes', 'local');
+        $adulto_mayor->documentos()->create(['cod_documento' => 'DOC_'.Str::upper(Str::random(10)), 'cod_residente' => $adulto_mayor->cod_residente, 'tipo_documento' => $data['tipo_documento'], 'nombre' => $data['nombre'], 'ruta_archivo' => $path, 'tipo_archivo' => $file->getMimeType() ?: 'application/octet-stream', 'hash_archivo' => $this->ficheros->hash('local', $path), 'estado' => 'ACTIVO', 'observacion' => $data['observaciones'] ?? null]);
         activity('Adulto Mayor')->causedBy($actor)->performedOn($adulto_mayor)->log("Se subió un documento para el adulto mayor: {$adulto_mayor->nombres}");
 
         return null;

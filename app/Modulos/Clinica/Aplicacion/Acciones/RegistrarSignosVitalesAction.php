@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Clinica\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Personal;
 use App\Models\SignoVital;
@@ -10,13 +11,12 @@ use App\Modulos\Alertas\Aplicacion\Acciones\ServicioDecisionAlertaClinica;
 use App\Modulos\Clinica\Aplicacion\DTOs\RegistroSignosVitales;
 use App\Modulos\Clinica\Aplicacion\Validacion\ValidacionSignosVitalesService;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 final class RegistrarSignosVitalesAction
 {
-    public function __construct(
+    public function __construct(private readonly ContextoEjecucion $contexto,
         private readonly EvaluadorSignosVitales $evaluador,
         private readonly ServicioDecisionAlertaClinica $alertas,
         private readonly TurnoEnfermeriaService $turnos,
@@ -26,7 +26,7 @@ final class RegistrarSignosVitalesAction
     public function ejecutar(string $codResidente, string $codPersonal, string $codJornada, array $datos, User $autor): RegistroSignosVitales
     {
         return DB::transaction(function () use ($codResidente, $codPersonal, $codJornada, $datos, $autor) {
-            abort_unless(Auth::user()?->cod_usuario === $autor->cod_usuario, 403);
+            abort_unless($this->contexto->usuario()?->cod_usuario === $autor->cod_usuario, 403);
             $turno = $this->turnos->autorizarMutacionEnfermeria($codResidente, 'signos_vitales.crear', $autor);
             abort_unless(Personal::query()->where('cod_personal', $codPersonal)
                 ->where('cod_usuario', $autor->cod_usuario)->where('estado', 'ACTIVO')->exists(), 403);

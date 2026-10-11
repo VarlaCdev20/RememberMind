@@ -10,7 +10,6 @@ use App\Models\Residente;
 use App\Models\User;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\CargarConocimientoOrion;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto as L;
-use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\LecturaTecnicaPruebas;
 use Illuminate\Support\Facades\Gate;
 
 /** Lectura exacta del historial: no ejecuta el motor ni remapea fuentes. */
@@ -20,7 +19,7 @@ final class LecturaResultadosExperto
     {
         Gate::forUser($usuario)->authorize('consultarResultados', [EvaluacionExperta::class, $residente]);
         abort_unless(isset(L::CRITERIOS[$criterio]), 422);
-        $base = LecturaTecnicaPruebas::limitar(EvaluacionExperta::query()->where('cod_residente', $residente->cod_residente));
+        $base = AlcanceLecturaExperta::limitar(EvaluacionExperta::query()->where('cod_residente', $residente->cod_residente));
         $historial = (clone $base)
             ->orderByDesc('fecha_hora_inicio')->orderByDesc('cod_evaluacion_experta')->paginate(8, ['*'], 'historia', $pagina);
         $id ??= (clone $base)->orderByDesc('fecha_hora_inicio')->orderByDesc('cod_evaluacion_experta')->value('cod_evaluacion_experta');
@@ -67,9 +66,9 @@ final class LecturaResultadosExperto
         return ['residente' => ['codigo' => $residente->cod_residente, 'nombre' => trim(implode(' ', [$residente->nombres, $residente->apellido_paterno, $residente->apellido_materno])), 'edad' => $edad],
             'evaluacion' => $evaluacion ? ['id' => $evaluacion->getKey(), 'fecha' => $evaluacion->fecha_hora_inicio?->format('d/m/Y H:i'), 'version' => $evaluacion->version?->codigo_version ?? 'No disponible', 'estado' => $evaluacion->estado_ejecucion, 'solicitante' => $evaluacion->personalSolicitante ? trim(implode(' ', [$evaluacion->personalSolicitante->nombres, $evaluacion->personalSolicitante->apellido_paterno, $evaluacion->personalSolicitante->apellido_materno])) : null] : null,
             'perfil' => $perfil, 'detalle' => $perfil[$criterio], 'historial' => $historial,
-            'prueba_tecnica' => LecturaTecnicaPruebas::habilitada(),
+            'prueba_tecnica' => AlcanceLecturaExperta::habilitada(),
             'informe_tecnico' => $criterio === 'COG-MEM'
-                ? LecturaTecnicaPruebas::informe($evaluacion?->getKey(), $residente->getKey()) : null,
+                ? AlcanceLecturaExperta::informe($evaluacion?->getKey(), $residente->getKey()) : null,
             'conocimiento_documental' => ! $evaluacion ? $this->conocimientoDocumental($criterio) : null,
             'preparacion_memoria' => $criterio === 'COG-MEM' && ! $evaluacion
                 ? (new PreparacionFuentesCOGMEM)->consultar($usuario, $residente) : null,
@@ -128,11 +127,11 @@ final class LecturaResultadosExperto
         $d['evaluabilidad'] = L::evaluabilidad($ec->estado_evaluabilidad);
         $d['modificador'] = $ec->codigo_modificador_interpretacion === 'MOD-CM-1' ? 'Resultado con factores que limitan su interpretación' : ($ec->codigo_modificador_interpretacion ? 'Modificador sin contrato de presentación' : null);
         $d['motivo'] = $ec->motivo_evaluabilidad;
-        $contrato = LecturaTecnicaPruebas::contrato($evaluacion->cod_version_modelo);
+        $contrato = AlcanceLecturaExperta::contrato($evaluacion->cod_version_modelo);
         $autorizado = in_array($codigo, $contrato['criterios'] ?? [], true)
             && in_array($evaluacion->estado_ejecucion, $contrato['estados_ejecucion'] ?? [], true);
         $d['autorizado'] = $autorizado;
-        $d['activacion'] = $autorizado ? (LecturaTecnicaPruebas::habilitada() ? 'Resultado de prueba técnica' : 'Lectura histórica autorizada') : 'Conocimiento no activado';
+        $d['activacion'] = $autorizado ? (AlcanceLecturaExperta::habilitada() ? 'Resultado de prueba técnica' : 'Lectura histórica autorizada') : 'Conocimiento no activado';
         $d['estado'] = 'Publicación clínica no habilitada';
         $d['interpretacion'] = 'El conocimiento de esta área y versión no tiene un contrato de publicación clínica habilitado. No se publica una interpretación.';
         if (! in_array($ec->estado_evaluabilidad, ['EV-CM-0', 'EV-CM-1', 'EV-CM-2'], true)) {
@@ -287,7 +286,7 @@ final class LecturaResultadosExperto
                     $d['integridad'][] = 'El resultado no coincide con las consecuencias conservadas de reglas satisfechas.';
                 } elseif ($autorizado) {
                     $d['resultado'] = L::RESULTADOS[$valor->codigo_valor] + ['codigo' => $valor->codigo_valor];
-                    $d['interpretacion'] = LecturaTecnicaPruebas::habilitada()
+                    $d['interpretacion'] = AlcanceLecturaExperta::habilitada()
                         ? 'Resultado semántico de la ejecución artificial: '.$valor->codigo_valor.'. Comprueba el recorrido del motor, la evidencia y la presentación; no determina el estado cognitivo de una persona ni acredita validación profesional.'
                         : $d['resultado']['interpretacion'];
                     $d['estado'] = $d['resultado']['titulo'];

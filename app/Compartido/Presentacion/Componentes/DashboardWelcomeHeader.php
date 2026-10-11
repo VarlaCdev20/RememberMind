@@ -22,6 +22,6 @@ final class DashboardWelcomeHeader extends Component
     public function render(): View
     {
         return view('components.ui.dashboard-welcome-header',
-            app(ConsultarEncabezadoUsuario::class)->preparar($this->usuario, $this->estado, $this->modo));
+            app(ConsultarEncabezadoUsuario::class)->preparar($this->usuario, $this->estado, $this->modo, request()->routeIs('admin.enfermeria.*')));
     }
 }

@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\SistemaExperto;
 
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\AlcanceLecturaExperta;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaFuenteEvidencia;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaResultadosExperto;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\InventarioExperto;
-use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\LecturaTecnicaPruebas;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
@@ -56,7 +56,7 @@ class CasoCompletoSinteticoTest extends PruebaConBaseDesechable
     public function test_bandera_tecnica_no_publica_pruebas_en_entorno_produccion(): void
     {
         $this->app->instance('env', 'production');
-        $this->assertFalse(LecturaTecnicaPruebas::habilitada());
+        $this->assertFalse(AlcanceLecturaExperta::habilitada());
         $datos = app(LecturaResultadosExperto::class)->consultar($this->caso['usuario'], $this->caso['residente'], null, 'COG-MEM');
         $this->assertNull($datos['evaluacion']);
         $this->assertNull($datos['informe_tecnico']);
@@ -68,7 +68,7 @@ class CasoCompletoSinteticoTest extends PruebaConBaseDesechable
         $nombre = $c->getDatabaseName();
         try {
             $c->setDatabaseName('remembermind_dev');
-            $this->assertFalse(LecturaTecnicaPruebas::habilitada());
+            $this->assertFalse(AlcanceLecturaExperta::habilitada());
         } finally {
             $c->setDatabaseName($nombre);
         }

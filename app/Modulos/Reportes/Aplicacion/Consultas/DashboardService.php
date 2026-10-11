@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Reportes\Aplicacion\Consultas;
 
+use App\Compartido\Aplicacion\Contratos\EnlacesAplicacion;
 use App\Models\Personal;
 use App\Models\User;
 use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardService
 {
-    public function __construct(
+    public function __construct(private readonly EnlacesAplicacion $enlaces,
         private readonly RolePreviewService $rolePreview,
         private readonly RoleDashboardDataService $roleDashboardData,
     ) {}
@@ -441,7 +442,7 @@ class DashboardService
                 'descripcion' => $a->descripcion,
                 'icono' => 'ph-warning-octagon',
                 'accion' => 'Revisar en módulo de alertas',
-                'url' => route('admin.alertas.index'),
+                'url' => $this->enlaces->destino('admin.alertas.index'),
             ];
         }
 
@@ -460,7 +461,7 @@ class DashboardService
                 'descripcion' => "{$etiqueta} — requiere revisión.",
                 'icono' => 'ph-warning-circle',
                 'accion' => 'Ir a Residentes',
-                'url' => route('admin.residentes.index'),
+                'url' => $this->enlaces->destino('admin.residentes.index'),
             ];
         }
 
@@ -474,7 +475,7 @@ class DashboardService
                 'descripcion' => "{$etiqueta} seguimiento especial — alerta orientativa.",
                 'icono' => 'ph-eye',
                 'accion' => 'Ver residentes',
-                'url' => route('admin.residentes.index'),
+                'url' => $this->enlaces->destino('admin.residentes.index'),
             ];
         }
 
@@ -713,12 +714,12 @@ class DashboardService
     private function obtenerModulosInstitucionales(): array
     {
         return [
-            ['titulo' => 'Usuarios',       'descripcion' => 'Control de accesos y perfiles',    'icono' => 'ph-users-three',        'ruta' => route('admin.usuarios.index')],
-            ['titulo' => 'Residentes',     'descripcion' => 'Seguimiento y fichas clínicas',     'icono' => 'ph-identification-card', 'ruta' => route('admin.residentes.index')],
-            ['titulo' => 'Personal',       'descripcion' => 'Gestión de RRHH y especialistas',  'icono' => 'ph-stethoscope',         'ruta' => route('admin.personal-institucional')],
-            ['titulo' => 'Preadmisiones',  'descripcion' => 'Casos y admisiones formalizadas',   'icono' => 'ph-door',                'ruta' => route('admin.preadmisiones.index')],
-            ['titulo' => 'Actividades',    'descripcion' => 'Planificación de talleres diarios', 'icono' => 'ph-calendar-check',      'ruta' => route('admin.actividades.index')],
-            ['titulo' => 'Alertas',        'descripcion' => 'Gestión de alertas y eventos',     'icono' => 'ph-warning',             'ruta' => route('admin.alertas.index')],
+            ['titulo' => 'Usuarios',       'descripcion' => 'Control de accesos y perfiles',    'icono' => 'ph-users-three',        'ruta' => $this->enlaces->destino('admin.usuarios.index')],
+            ['titulo' => 'Residentes',     'descripcion' => 'Seguimiento y fichas clínicas',     'icono' => 'ph-identification-card', 'ruta' => $this->enlaces->destino('admin.residentes.index')],
+            ['titulo' => 'Personal',       'descripcion' => 'Gestión de RRHH y especialistas',  'icono' => 'ph-stethoscope',         'ruta' => $this->enlaces->destino('admin.personal-institucional')],
+            ['titulo' => 'Preadmisiones',  'descripcion' => 'Casos y admisiones formalizadas',   'icono' => 'ph-door',                'ruta' => $this->enlaces->destino('admin.preadmisiones.index')],
+            ['titulo' => 'Actividades',    'descripcion' => 'Planificación de talleres diarios', 'icono' => 'ph-calendar-check',      'ruta' => $this->enlaces->destino('admin.actividades.index')],
+            ['titulo' => 'Alertas',        'descripcion' => 'Gestión de alertas y eventos',     'icono' => 'ph-warning',             'ruta' => $this->enlaces->destino('admin.alertas.index')],
         ];
     }
 

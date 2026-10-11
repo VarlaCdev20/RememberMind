@@ -2,7 +2,8 @@
 
 namespace App\Modulos\Identidad\Aplicacion\Acciones;
 
-use App\Mail\UsuarioPasswordActualizadaMail;
+use App\Compartido\Aplicacion\Contratos\ArchivosAplicacion;
+use App\Compartido\Aplicacion\Contratos\NotificacionesRegistro;
 use App\Models\Contacto;
 use App\Models\Personal;
 use App\Models\ResidenteContacto;
@@ -13,6 +14,8 @@ use Illuminate\Support\Str;
 
 final class GestionarUsuariosPanel
 {
+    public function __construct(private readonly NotificacionesRegistro $notificaciones, private readonly ArchivosAplicacion $ficheros) {}
+
     public function guardarUsuario(User $actor, array $entrada, array $userData, string $estadoGuardado, string $accesoGuardado): array
     {
         abort_unless($actor->can($entrada['isEdit'] ? 'usuarios.editar' : 'usuarios.crear'), 403);
@@ -29,11 +32,11 @@ final class GestionarUsuariosPanel
         if ($entrada['foto_de_perfil_upload']) {
             if ($entrada['isEdit'] && $entrada['usuarioId']) {
                 $oldUser = User::find($entrada['usuarioId']);
-                if ($oldUser && $oldUser->foto_de_perfil && \Storage::disk('public')->exists($oldUser->foto_de_perfil)) {
+                if ($oldUser && $oldUser->foto_de_perfil && $this->ficheros->existe('public', $oldUser->foto_de_perfil)) {
                     $oldPhotoToDelete = $oldUser->foto_de_perfil;
                 }
             }
-            $newPhotoPath = $entrada['foto_de_perfil_upload']->store('usuarios/fotos', 'public');
+            $newPhotoPath = $this->ficheros->recibir($entrada['foto_de_perfil_upload'], 'usuarios/fotos', 'public');
             $userData['foto_de_perfil'] = $newPhotoPath;
         }
 
@@ -88,8 +91,8 @@ final class GestionarUsuariosPanel
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            if ($newPhotoPath && \Storage::disk('public')->exists($newPhotoPath)) {
-                \Storage::disk('public')->delete($newPhotoPath);
+            if ($newPhotoPath && $this->ficheros->existe('public', $newPhotoPath)) {
+                $this->ficheros->eliminar('public', $newPhotoPath);
             }
             throw $e;
         }
@@ -132,7 +135,7 @@ final class GestionarUsuariosPanel
 
         $correoNotifEnviado = false;
         try {
-            \Mail::to($usuario->correo)->send(new UsuarioPasswordActualizadaMail($usuario, $passwordTemporal));
+            $this->notificaciones->claveActualizada($usuario, $passwordTemporal);
             $correoNotifEnviado = true;
         } catch (\Exception $e) {
             \Log::error("Error al enviar correo de restablecimiento a {$usuario->correo}: ".$e->getMessage());

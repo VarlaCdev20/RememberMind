@@ -2,15 +2,17 @@
 
 namespace App\Modulos\Reportes\Aplicacion\Consultas;
 
+use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 
 class AreasReportDataService
 {
+    public function __construct(private readonly ContextoEjecucion $contexto) {}
+
     public function getGeneralReportData(): array
     {
         $areas = $this->areasConUsuarios();
@@ -35,7 +37,7 @@ class AreasReportDataService
             'porcentajeAreasResponsable' => $totalAreas > 0 ? round(($areasConResponsable / $totalAreas) * 100, 1) : 0,
             'areas' => $areas,
             'fecha' => date('d/m/Y H:i'),
-            'usuario' => Auth::user()?->name ?? 'Sistema',
+            'usuario' => $this->contexto->usuario()?->name ?? 'Sistema',
         ];
     }
 
@@ -53,7 +55,7 @@ class AreasReportDataService
             'porcentajeActivos' => $totalUsuarios > 0 ? round(($usuariosActivos / $totalUsuarios) * 100, 1) : 0,
             'roles' => $this->distribucionRoles($area->usuarios),
             'fecha' => date('d/m/Y H:i'),
-            'usuario' => Auth::user()?->name ?? 'Sistema',
+            'usuario' => $this->contexto->usuario()?->name ?? 'Sistema',
         ];
     }
 

@@ -15,13 +15,14 @@ use App\Models\RelacionSemantica;
 use App\Models\ValorSemantico;
 use App\Models\VariableExperta;
 use App\Models\VersionModeloExperto;
+use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use DateTimeImmutable;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
 
 /** Acceso Eloquent por versión concreta; no ejecuta ni activa conocimiento. */
-final class CargadorConocimiento
+final class CargadorConocimiento implements ConocimientoVersionado
 {
     private const MODELOS = [
         'nodos_semanticos' => [NodoSemantico::class, null],

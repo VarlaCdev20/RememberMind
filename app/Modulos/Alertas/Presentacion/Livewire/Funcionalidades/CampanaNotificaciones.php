@@ -5,6 +5,7 @@ namespace App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades;
 use App\Models\Alerta;
 use App\Models\Residente;
 use App\Modulos\Alertas\Aplicacion\Acciones\GestionarAtencionAlerta;
+use App\Modulos\Alertas\Aplicacion\Consultas\ConsultarPanelResidenteAlerta;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
 use Carbon\Carbon;
@@ -182,13 +183,7 @@ class CampanaNotificaciones extends Component
     public function verGraficos(string $codResidente): void
     {
         $this->adultoDrawerId = $codResidente;
-        $this->adultoDrawer = Residente::with([
-            'cama.habitacion',
-            'alergias' => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO']),
-            'diagnosticos' => fn ($q) => $q->whereIn('estado', ['ACTIVO', 'CONFIRMADO']),
-            'planCuidadoActivo',
-            'signosVitales' => fn ($q) => $q->where('estado', '!=', 'ANULADO')->latest('fecha_hora')->take(10),
-        ])->find($codResidente);
+        $this->adultoDrawer = app(ConsultarPanelResidenteAlerta::class)->consultar(auth()->user(), $codResidente, 'graficos');
 
         $this->signosDrawer = $this->adultoDrawer?->signosVitales ?? collect();
         $this->drawerGrafico = true;
@@ -198,10 +193,7 @@ class CampanaNotificaciones extends Component
     public function verUbicacion(string $codResidente): void
     {
         $this->adultoDrawerId = $codResidente;
-        $this->adultoDrawer = Residente::with([
-            'cama.habitacion',
-            'alertas' => fn ($q) => $q->latest('fecha_hora')->take(5),
-        ])->find($codResidente);
+        $this->adultoDrawer = app(ConsultarPanelResidenteAlerta::class)->consultar(auth()->user(), $codResidente, 'ubicacion');
 
         $this->drawerUbicacion = true;
         $this->drawerGrafico = false;
@@ -238,6 +230,13 @@ class CampanaNotificaciones extends Component
 
     public function render()
     {
+        if (($this->drawerGrafico || $this->drawerUbicacion) && $this->adultoDrawerId) {
+            $this->adultoDrawer = app(ConsultarPanelResidenteAlerta::class)->consultar(auth()->user(), $this->adultoDrawerId, $this->drawerGrafico ? 'graficos' : 'ubicacion');
+            if ($this->drawerGrafico) {
+                $this->signosDrawer = $this->adultoDrawer->signosVitales;
+            }
+        }
+
         if (! $this->puedeVer()) {
             return '<div></div>';
         }
