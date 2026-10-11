@@ -28,7 +28,7 @@ Entrada oficial: [RememberMind Documentation](docs/README.md).
 - [Migración híbrida ejecutada](docs/arquitectura/INFORME_MIGRACION_HIBRIDA.md) y [auditoría/limpieza posterior](docs/arquitectura/AUDITORIA_LIMPIEZA_2026_10_10.md).
 - [Gobernanza/changelog documental](docs/CHANGELOG.md).
 
-Preparación para continuar desarrollo verificada el 11/10/2026 en `PODEMOS-SEGUIR`: suite SQLite completa sin fallos (1.079 pruebas, 31.452 aserciones, 15 omisiones), cohorte PostgreSQL aislada (143/2.489), frontend (151) y build aprobados. [Informe vigente y límites](docs/sistema/PREPARACION_DESARROLLO_2026_10_11.md). No acredita producción ni validación clínica.
+Desacoplamiento de fronteras verificado el 11/10/2026 en `PODEMOS-SEGUIR`: suite SQLite completa sin fallos (1.094 pruebas, 32.023 aserciones, 15 omisiones), cohorte PostgreSQL aislada (183/3.035), frontend (151) y build aprobados. [Informe vigente y límites](docs/arquitectura/DESACOPLAMIENTO_2026_10_11.md); [preparación anterior](docs/sistema/PREPARACION_DESARROLLO_2026_10_11.md). No acredita producción ni validación clínica.
 
 ## Dominio y flujo institucional
 

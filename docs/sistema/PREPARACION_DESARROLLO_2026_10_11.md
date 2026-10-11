@@ -19,6 +19,8 @@ RememberMind queda preparado para continuar desarrollo sobre la arquitectura hí
 
 ## Etapas terminadas
 
+Continuación posterior: [desacoplamiento de fronteras terminado](../arquitectura/DESACOPLAMIENTO_2026_10_11.md) en `2818ff4`, con suite SQLite completa 1.094/32.023 (15 omisiones), PostgreSQL 183/3.035, frontend 151 y build aprobados. Las cifras siguientes conservan el corte anterior de las seis etapas.
+
 | Etapa | Resultado | Commit local |
 |---|---|---|
 | 1. Acceso y aislamiento | Retirado acceso automático de enfermería; pruebas aisladas antes de cargar Laravel | `730ce21` |
@@ -62,7 +64,7 @@ JUnit, logs y seis informes de etapa se entregan en la carpeta `outputs` del cha
 
 - **Dependencias:** `braces` 3.0.3, GHSA-vfj7-8cjw-p6xm, sigue afectado en la cadena de desarrollo Tailwind 3. La excepción valida advisory, versiones, cadena y alcance dev; expira el **11/11/2026**. Priorizar actualización compatible o migración Tailwind como lote propio, con revisión visual. [Detalle](DEPENDENCIAS_DESARROLLO.md).
 - **Privacidad documental:** documentos de usuario conservan el disco público existente. Planificar almacenamiento privado, descargas autorizadas y migración controlada de archivos; no trasladar ni eliminar archivos reales durante limpieza general.
-- **Arquitectura:** reducir gradualmente contexto HTTP en Aplicación y acoplamientos heredados al tocar cada flujo. La regla estática de vistas no garantiza ausencia de todo acceso indirecto por relaciones o llamadas dinámicas.
+- **Arquitectura:** el [corte posterior de desacoplamiento](../arquitectura/DESACOPLAMIENTO_2026_10_11.md) resuelve contexto HTTP/sesión y efectos concretos mediante contratos. Se conservan las excepciones Laravel/Eloquent aprobadas; la regla estática de vistas no garantiza ausencia de todo acceso indirecto por relaciones o llamadas dinámicas.
 - **Validación:** no se ejecutó GitHub Actions remoto, QA visual integral ni despliegue de producción. Las pruebas automatizadas no sustituyen aceptación institucional.
 - **Experto:** conservar motor independiente y adaptadores explícitos. Las pruebas usan conocimiento técnico/sintético; no acreditan validación ni activación clínica.
 

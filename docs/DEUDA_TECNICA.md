@@ -17,6 +17,8 @@ related_modules: []
 
 # Deuda técnica
 
+Actualización arquitectónica del 11/10/2026: el [desacoplamiento de fronteras](arquitectura/DESACOPLAMIENTO_2026_10_11.md) retira request/session y efectos concretos de los flujos de Aplicación auditados. Se corrigió el falso éxito al escribir PDFs de preadmisión y recibir archivos. Permanecen la excepción Eloquent/Laravel aprobada, el tipo Symfony UploadedFile en gestión de usuarios, hashes con retorno false, riesgo de archivos huérfanos ante fallos posteriores de DB y privacidad del disco público. Este corte no cierra TECH ni decisiones institucionales ajenas a su alcance.
+
 ## Actualización de preparación — 11/10/2026
 
 El [informe vigente](sistema/PREPARACION_DESARROLLO_2026_10_11.md) acredita la suite SQLite completa sin fallos, contratos corregidos y límites entre capas. Mantener pendientes explícitos: advisory alto `braces` en dependencias de desarrollo con excepción que expira el 11/11/2026; almacenamiento público de documentación de usuarios; uso pragmático de Eloquent en Aplicación y dependencias de contexto HTTP por reducir gradualmente. La inspección estática de Blade no detecta todos los accesos indirectos por propiedades o llamadas dinámicas. CI remoto y QA visual integral aún no acreditados. El conocimiento clínico experto continúa sin activación. Los registros históricos siguientes conservan su contexto; no describen automáticamente errores todavía presentes.

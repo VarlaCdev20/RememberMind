@@ -5,7 +5,7 @@ version: "1.0"
 last_reviewed: 2026-10-11
 owner: RememberMind
 source_of_truth: true
-verified_against_commit: 28d4e51fd67a45c7a2bfc2a6f8d8b36ff92d29d7
+verified_against_commit: 2818ff44e9325754dd3d42ea84d19ec7902baf71
 verification_scope: FULL_SQLITE_AND_SCOPED_POSTGRES_FRONTEND_BUILD
 runtime_verified: false
 runtime_evidence_status: PARTIAL
@@ -19,6 +19,10 @@ related_modules: []
 # Estado actual de RememberMind
 
 ## Corte vigente — 11/10/2026
+
+Desacoplamiento posterior terminado en `2818ff4`: contexto autenticado, sesión, archivos, correo, PDF, enlaces y adaptadores expertos detrás de contratos; consultas de ficha y paneles preparadas y reautorizadas tras hidratación Livewire. SQLite completa: **1.094 pruebas / 32.023 aserciones, cero fallos, 15 omisiones**, 17m25.825s. PostgreSQL desechable: **183 / 3.035, sin omisiones**. Frontend 151 y build aprobados; motor independiente cinco casos; 50 archivos protegidos sin cambios. [Informe por etapas y límites](arquitectura/DESACOPLAMIENTO_2026_10_11.md). Se conserva arquitectura híbrida, excepciones Laravel/Eloquent y deuda de archivos; no hay activación clínica ni push.
+
+## Preparación anterior del mismo día
 
 La copia canónica local está en `C:\Users\CARLAENCINAS\Desktop\RememberMind`, rama `PODEMOS-SEGUIR`. Se completaron seis etapas de preparación: acceso y aislamiento, contratos V2, dependencias, límites de arquitectura, PostgreSQL/roles/CI y limpieza final. [Entrega, comandos y deuda pendiente](sistema/PREPARACION_DESARROLLO_2026_10_11.md).
 

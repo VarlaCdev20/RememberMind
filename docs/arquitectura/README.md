@@ -61,6 +61,8 @@ El [motor técnico](../../motor-experto/README.md) contiene 22 PHP sin dependenc
 
 ## Evidencia
 
+- [Desacoplamiento de contexto, efectos externos y consultas de presentación](DESACOPLAMIENTO_2026_10_11.md).
+
 - [Mapa de responsabilidades y límites](ARQUITECTURA_VIGENTE.md).
 - [Migración ejecutada y verificaciones de su corte](INFORME_MIGRACION_HIBRIDA.md).
 - [Auditoría posterior, eliminaciones y comprobaciones](AUDITORIA_LIMPIEZA_2026_10_10.md).

@@ -15,6 +15,12 @@ related_modules: []
 
 # Changelog documental
 
+## 2026-10-11 — Desacoplamiento posterior a la preparación
+
+- [Informe por etapas](arquitectura/DESACOPLAMIENTO_2026_10_11.md): contexto autenticado, sesión de previsualización, archivos, correo, PDF, enlaces y adaptadores expertos detrás de contratos.
+- Consultas de ficha y paneles de alertas centralizadas, con preparación después de hidratación Livewire y autorización compartida de pacientes.
+- Gate AST y regresiones de identidad/petición, alcance, carga diferida y almacenamiento fallido. Las excepciones Laravel/Eloquent y los límites de atomicidad de archivos permanecen explícitos.
+
 ## 2026-10-11 — Preparación para continuar desarrollo
 
 - [Entrega vigente](sistema/PREPARACION_DESARROLLO_2026_10_11.md) con seis etapas, commits locales, comandos seguros y limitaciones abiertas.
