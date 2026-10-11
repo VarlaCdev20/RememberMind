@@ -49,6 +49,8 @@ Versiones bloqueadas y motores: [estado actual](docs/ESTADO_ACTUAL.md) y [baseli
 
 ## Preparar desarrollo
 
+Trabajo nuevo: `feature/<modulo>-<objetivo>` desde `develop`, PR de vuelta a `develop` y entrega `release/*` hacia `main`. [Flujo Git, commits y comprobaciones](docs/sistema/GIT_FLOW.md). Los doce módulos forman la base técnica; sus pendientes siguen documentados.
+
 ```bash
 composer install
 npm ci
