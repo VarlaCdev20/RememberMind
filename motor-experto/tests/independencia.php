@@ -1,6 +1,10 @@
 <?php
 
 use MotorExperto\adaptadores\entrada\DemostracionCOGMEM;
+use MotorExperto\adaptadores\entrada\AdaptadorHechosCOGMEM;
+use MotorExperto\adaptadores\entrada\EjemploTecnicoCOGMEM as E;
+use MotorExperto\aplicacion\casos_uso\MotorExperto;
+use MotorExperto\dominio\inferencia\MemoriaTrabajo;
 
 // Ejecutable con PHP 8.3 sin bootstrap Laravel, Composer ni base de datos.
 spl_autoload_register(function (string $class): void {
@@ -46,9 +50,37 @@ try {
         throw $error;
     }
 }
+// Regresión D-099/D-131: grupos opuestos que se solapan no prueban
+// independencia, aunque uno de los lados tenga un episodio extra.
+foreach ([
+    'solo_un_lado_exclusivo' => ['literales' => ['literal_A', 'literal_B', 'literal_A'], 'mixto' => false],
+    'ambos_lados_exclusivos' => ['literales' => ['literal_A', 'literal_B', 'literal_A', 'literal_B'], 'mixto' => true],
+] as $caso => $config) {
+    $paquete = E::paquete();
+    $memoria = new MemoriaTrabajo(E::contexto());
+    $ids = [];
+    foreach ($config['literales'] as $i => $literal) {
+        $fuente = E::fuente($literal, registro: 'APP_EPISODIO_'.$caso.'_'.$i);
+        $e = (new AdaptadorHechosCOGMEM)->adaptar($paquete, $memoria, $fuente, 'MAP_INS');
+        $memoria->vincular('MEM', $e->id, 'INSTRUMENTAL');
+        $ids[] = $e->id;
+    }
+    $memoria->relacionar($ids[0], $ids[1], 'MISMO_EPISODIO_CLINICO', 'Un mismo episodio');
+    try {
+        $evaluacion = (new MotorExperto)->evaluarCOGMEM($paquete, $memoria, 'MEM', E::contextoClinico());
+        if (! $config['mixto'] || ($evaluacion['resultado']['codigo'] ?? null) !== 'HALLAZGOS_MIXTOS') {
+            throw new RuntimeException("Caso {$caso}: se emitió un resultado contradictorio o inesperado.");
+        }
+    } catch (DomainException $error) {
+        if ($config['mixto'] || ! str_contains($error->getMessage(), 'Soportes opuestos no independientes')) {
+            throw $error;
+        }
+    }
+}
+
 foreach (get_declared_classes() as $class) {
     if (str_starts_with($class, 'Illuminate\\') || str_starts_with($class, 'App\\')) {
         throw new RuntimeException('El motor cargó clases de Laravel.');
     }
 }
-echo "PASS: cinco casos técnicos con resultados, evaluabilidad, traza y aislamiento de Laravel.\n";
+echo "PASS: siete casos técnicos con regresión de episodios, resultados y trazabilidad.\n";
