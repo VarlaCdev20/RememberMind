@@ -34,7 +34,7 @@
              class="relative w-full max-w-[800px] max-h-[90vh] flex flex-col rounded-[18px] border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#25221E] shadow-xl overflow-hidden text-left font-sans my-4">
 
             {{-- 1. Cabecera --}}
-            <div class="p-5 sm:p-6 pb-4 border-b border-[#D5CABE]/70 dark:border-[#494139] flex items-center justify-between gap-4 bg-[#F0E8DE]/60 dark:bg-[#1E1B18]/60">
+            <div class="p-5 sm:p-6 pb-4 border-b border-[#D5CABE]/70 dark:border-[#494139] flex items-center justify-between gap-4 bg-[var(--rm-surface-soft)]/60 dark:bg-[#1E1B18]/60">
                 <div class="flex items-center gap-3.5">
                     <div class="h-10 w-10 rounded-xl bg-[#A85847]/15 dark:bg-[#A85847]/25 text-[#A85847] dark:text-[#E89E8D] flex items-center justify-center shrink-0">
                         <i class="ph-bold ph-note-pencil text-xl"></i>
@@ -58,7 +58,7 @@
             </div>
 
             {{-- 2. Tarjeta de contexto SOLO LECTURA --}}
-            <div class="mx-5 sm:mx-6 mt-4 p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F0E8DE]/70 dark:bg-[#2D2924]/60 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
+            <div class="mx-5 sm:mx-6 mt-4 p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[var(--rm-surface-soft)]/70 dark:bg-[#2D2924]/60 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
                 <div class="flex items-center gap-3 min-w-0">
                     @if($adultoMayor->foto && \Illuminate\Support\Facades\Storage::disk('public')->exists($adultoMayor->foto))
                         <img src="{{ asset('storage/' . $adultoMayor->foto) }}"
@@ -94,7 +94,7 @@
                     {{-- 1. Signos vitales --}}
                     <button type="button"
                             @click="modalSelectorAtencion = false; $wire.abrirModalSignos()"
-                            class="group w-full text-left p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[#F0E8DE] dark:hover:bg-[#34302A] hover:border-[#A85847]/60 dark:hover:border-[#A85847] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
+                            class="group w-full text-left p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[var(--rm-surface-soft)] dark:hover:bg-[#34302A] hover:border-[#A85847]/60 dark:hover:border-[#A85847] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
                         <div class="flex items-center gap-3 min-w-0">
                             <div class="h-10 w-10 rounded-xl bg-[#F5E6E4] dark:bg-[#3E2C2C] text-[#A85847] dark:text-[#E89E8D] flex items-center justify-center shrink-0">
                                 <i class="ph-bold ph-heartbeat text-xl"></i>
@@ -114,7 +114,7 @@
                     {{-- 2. Medicación programada --}}
                     <button type="button"
                             @click="modalSelectorAtencion = false; activeTab = 'medicacion'; $wire.cambiarTab('medicacion'); $wire.abrirModalMedicacion()"
-                            class="group w-full text-left p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[#F0E8DE] dark:hover:bg-[#34302A] hover:border-[#A85847]/60 dark:hover:border-[#A85847] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
+                            class="group w-full text-left p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[var(--rm-surface-soft)] dark:hover:bg-[#34302A] hover:border-[#A85847]/60 dark:hover:border-[#A85847] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
                         <div class="flex items-center gap-3 min-w-0">
                             <div class="h-10 w-10 rounded-xl bg-[#E8F1E5] dark:bg-[#293627] text-[#71876A] dark:text-[#A3B89C] flex items-center justify-center shrink-0">
                                 <i class="ph-bold ph-pill text-xl"></i>
@@ -134,7 +134,7 @@
                     {{-- 3. Valoración de dolor --}}
                     <button type="button"
                             @click="modalSelectorAtencion = false; $wire.abrirModalSignos()"
-                            class="group w-full text-left p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[#F0E8DE] dark:hover:bg-[#34302A] hover:border-[#A85847]/60 dark:hover:border-[#A85847] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
+                            class="group w-full text-left p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[var(--rm-surface-soft)] dark:hover:bg-[#34302A] hover:border-[#A85847]/60 dark:hover:border-[#A85847] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
                         <div class="flex items-center gap-3 min-w-0">
                             <div class="h-10 w-10 rounded-xl bg-[#FDF0DE] dark:bg-[#3B3224] text-[#B87A38] dark:text-[#E2AE6D] flex items-center justify-center shrink-0">
                                 <i class="ph-bold ph-smiley-sad text-xl"></i>
@@ -154,7 +154,7 @@
                     {{-- 4. Ingesta / Hidratación --}}
                     <button type="button"
                             @click="modalSelectorAtencion = false; activeTab = 'cuidados'; $wire.cambiarTab('cuidados')"
-                            class="group w-full text-left p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[#F0E8DE] dark:hover:bg-[#34302A] hover:border-[#A85847]/60 dark:hover:border-[#A85847] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
+                            class="group w-full text-left p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[var(--rm-surface-soft)] dark:hover:bg-[#34302A] hover:border-[#A85847]/60 dark:hover:border-[#A85847] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
                         <div class="flex items-center gap-3 min-w-0">
                             <div class="h-10 w-10 rounded-xl bg-[#E5EFF5] dark:bg-[#23333D] text-[#4C758F] dark:text-[#83ACC8] flex items-center justify-center shrink-0">
                                 <i class="ph-bold ph-drop text-xl"></i>
@@ -174,7 +174,7 @@
                     {{-- 5. Eliminación --}}
                     <button type="button"
                             @click="modalSelectorAtencion = false; activeTab = 'cuidados'; $wire.cambiarTab('cuidados')"
-                            class="group w-full text-left p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[#F0E8DE] dark:hover:bg-[#34302A] hover:border-[#A85847]/60 dark:hover:border-[#A85847] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
+                            class="group w-full text-left p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[var(--rm-surface-soft)] dark:hover:bg-[#34302A] hover:border-[#A85847]/60 dark:hover:border-[#A85847] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
                         <div class="flex items-center gap-3 min-w-0">
                             <div class="h-10 w-10 rounded-xl bg-[#ECE8F5] dark:bg-[#2D283E] text-[#695E8F] dark:text-[#A497CD] flex items-center justify-center shrink-0">
                                 <i class="ph-bold ph-toilet text-xl"></i>
@@ -194,7 +194,7 @@
                     {{-- 6. Movilidad --}}
                     <button type="button"
                             @click="modalSelectorAtencion = false; activeTab = 'cuidados'; $wire.cambiarTab('cuidados')"
-                            class="group w-full text-left p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[#F0E8DE] dark:hover:bg-[#34302A] hover:border-[#A85847]/60 dark:hover:border-[#A85847] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
+                            class="group w-full text-left p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[var(--rm-surface-soft)] dark:hover:bg-[#34302A] hover:border-[#A85847]/60 dark:hover:border-[#A85847] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
                         <div class="flex items-center gap-3 min-w-0">
                             <div class="h-10 w-10 rounded-xl bg-[#E5F2EC] dark:bg-[#23372F] text-[#4F846B] dark:text-[#80BFA0] flex items-center justify-center shrink-0">
                                 <i class="ph-bold ph-person-simple-walk text-xl"></i>
@@ -214,7 +214,7 @@
                     {{-- 7. Cognición --}}
                     <button type="button"
                             @click="modalSelectorAtencion = false; activeTab = 'historial'; $wire.cambiarTab('historial'); $wire.abrirModalSeguimiento()"
-                            class="group w-full text-left p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[#F0E8DE] dark:hover:bg-[#34302A] hover:border-[#A85847]/60 dark:hover:border-[#A85847] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
+                            class="group w-full text-left p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[var(--rm-surface-soft)] dark:hover:bg-[#34302A] hover:border-[#A85847]/60 dark:hover:border-[#A85847] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
                         <div class="flex items-center gap-3 min-w-0">
                             <div class="h-10 w-10 rounded-xl bg-[#E7EDF5] dark:bg-[#263140] text-[#4F6C8A] dark:text-[#84A7CE] flex items-center justify-center shrink-0">
                                 <i class="ph-bold ph-brain text-xl"></i>
@@ -234,7 +234,7 @@
                     {{-- 8. Conducta / Seguimiento --}}
                     <button type="button"
                             @click="modalSelectorAtencion = false; activeTab = 'historial'; $wire.cambiarTab('historial'); $wire.abrirModalSeguimiento()"
-                            class="group w-full text-left p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[#F0E8DE] dark:hover:bg-[#34302A] hover:border-[#A85847]/60 dark:hover:border-[#A85847] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
+                            class="group w-full text-left p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[var(--rm-surface-soft)] dark:hover:bg-[#34302A] hover:border-[#A85847]/60 dark:hover:border-[#A85847] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
                         <div class="flex items-center gap-3 min-w-0">
                             <div class="h-10 w-10 rounded-xl bg-[#F4ECE3] dark:bg-[#383028] text-[#8C6D4F] dark:text-[#C7A583] flex items-center justify-center shrink-0">
                                 <i class="ph-bold ph-clipboard-text text-xl"></i>
@@ -254,7 +254,7 @@
                     {{-- 9. Sueño --}}
                     <button type="button"
                             @click="modalSelectorAtencion = false; activeTab = 'cuidados'; $wire.cambiarTab('cuidados')"
-                            class="group w-full text-left p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[#F0E8DE] dark:hover:bg-[#34302A] hover:border-[#A85847]/60 dark:hover:border-[#A85847] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
+                            class="group w-full text-left p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[var(--rm-surface-soft)] dark:hover:bg-[#34302A] hover:border-[#A85847]/60 dark:hover:border-[#A85847] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
                         <div class="flex items-center gap-3 min-w-0">
                             <div class="h-10 w-10 rounded-xl bg-[#EAE8F4] dark:bg-[#28263A] text-[#5B5488] dark:text-[#9A91D0] flex items-center justify-center shrink-0">
                                 <i class="ph-bold ph-moon text-xl"></i>
@@ -274,7 +274,7 @@
                     {{-- 10. Heridas / Curaciones --}}
                     <button type="button"
                             @click="modalSelectorAtencion = false; activeTab = 'cuidados'; $wire.cambiarTab('cuidados')"
-                            class="group w-full text-left p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[#F0E8DE] dark:hover:bg-[#34302A] hover:border-[#A85847]/60 dark:hover:border-[#A85847] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
+                            class="group w-full text-left p-3.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[var(--rm-surface-soft)] dark:hover:bg-[#34302A] hover:border-[#A85847]/60 dark:hover:border-[#A85847] hover:shadow-xs transition-all duration-150 flex items-center justify-between gap-3 cursor-pointer">
                         <div class="flex items-center gap-3 min-w-0">
                             <div class="h-10 w-10 rounded-xl bg-[#F8EBE6] dark:bg-[#3D2C28] text-[#A05C4D] dark:text-[#DF8F7E] flex items-center justify-center shrink-0">
                                 <i class="ph-bold ph-first-aid text-xl"></i>
@@ -300,7 +300,7 @@
                                 <i class="ph-bold ph-warning-circle text-xl"></i>
                             </div>
                             <div class="min-w-0">
-                                <h4 class="text-xs sm:text-[13px] font-bold text-[#B33A3A] dark:text-[#E57373] group-hover:text-red-700 dark:group-hover:text-red-400 transition-colors leading-tight">
+                                <h4 class="text-xs sm:text-[13px] font-bold text-[#B33A3A] dark:text-[#E57373] group-hover:text-[var(--rm-danger-strong)] dark:group-hover:text-[var(--rm-danger-strong)] transition-colors leading-tight">
                                     Registrar incidente
                                 </h4>
                                 <p class="text-[11px] text-[#8C5E5A] dark:text-[#C49390] mt-0.5 line-clamp-2 leading-relaxed">
@@ -315,10 +315,10 @@
             </div>
 
             {{-- 4. Pie (solo botón secundario Cancelar) --}}
-            <div class="p-4 sm:p-5 border-t border-[#D5CABE]/70 dark:border-[#494139] bg-[#F0E8DE]/60 dark:bg-[#1E1B18]/60 flex items-center justify-end">
+            <div class="p-4 sm:p-5 border-t border-[#D5CABE]/70 dark:border-[#494139] bg-[var(--rm-surface-soft)]/60 dark:bg-[#1E1B18]/60 flex items-center justify-end">
                 <button type="button"
                         @click="modalSelectorAtencion = false"
-                        class="px-5 py-2.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[#F0E8DE] dark:hover:bg-[#34302A] text-xs font-bold text-[#304060] dark:text-[#F0E8DE] transition cursor-pointer shadow-2xs">
+                        class="px-5 py-2.5 rounded-xl border border-[#D5CABE] dark:border-[#494139] bg-[#F7F2EC] dark:bg-[#2D2924] hover:bg-[var(--rm-surface-soft)] dark:hover:bg-[#34302A] text-xs font-bold text-[#304060] dark:text-[#F0E8DE] transition cursor-pointer shadow-2xs">
                     Cancelar
                 </button>
             </div>
@@ -358,32 +358,32 @@
                 <div>
                     <label class="font-bold text-[var(--rm-text-body)] block mb-1">Presión Arterial (PA) *</label>
                     <input type="text" wire:model="signoPA" placeholder="120/80" class="rm-input w-full text-xs" />
-                    @error('signoPA') <span class="text-rose-600 text-[10px] font-bold">{{ $message }}</span> @enderror
+                    @error('signoPA') <span class="text-[var(--rm-danger-strong)] text-[10px] font-bold">{{ $message }}</span> @enderror
                 </div>
                 <div>
                     <label class="font-bold text-[var(--rm-text-body)] block mb-1">Frecuencia Cardaca (FC)</label>
                     <input type="number" wire:model="signoFC" placeholder="75" class="rm-input w-full text-xs" />
-                    @error('signoFC') <span class="text-rose-600 text-[10px] font-bold">{{ $message }}</span> @enderror
+                    @error('signoFC') <span class="text-[var(--rm-danger-strong)] text-[10px] font-bold">{{ $message }}</span> @enderror
                 </div>
                 <div>
                     <label class="font-bold text-[var(--rm-text-body)] block mb-1">Frecuencia Resp. (FR)</label>
                     <input type="number" wire:model="signoFR" placeholder="18" class="rm-input w-full text-xs" />
-                    @error('signoFR') <span class="text-rose-600 text-[10px] font-bold">{{ $message }}</span> @enderror
+                    @error('signoFR') <span class="text-[var(--rm-danger-strong)] text-[10px] font-bold">{{ $message }}</span> @enderror
                 </div>
                 <div>
                     <label class="font-bold text-[var(--rm-text-body)] block mb-1">Temperatura (°C)</label>
                     <input type="number" step="0.1" wire:model="signoTemp" placeholder="36.5" class="rm-input w-full text-xs" />
-                    @error('signoTemp') <span class="text-rose-600 text-[10px] font-bold">{{ $message }}</span> @enderror
+                    @error('signoTemp') <span class="text-[var(--rm-danger-strong)] text-[10px] font-bold">{{ $message }}</span> @enderror
                 </div>
                 <div>
                     <label class="font-bold text-[var(--rm-text-body)] block mb-1">Saturación SpO2 (%)</label>
                     <input type="number" wire:model="signoSat" placeholder="98" class="rm-input w-full text-xs" />
-                    @error('signoSat') <span class="text-rose-600 text-[10px] font-bold">{{ $message }}</span> @enderror
+                    @error('signoSat') <span class="text-[var(--rm-danger-strong)] text-[10px] font-bold">{{ $message }}</span> @enderror
                 </div>
                 <div>
                     <label class="font-bold text-[var(--rm-text-body)] block mb-1">Glucosa (mg/dL)</label>
                     <input type="number" wire:model="signoGlucosa" placeholder="105" class="rm-input w-full text-xs" />
-                    @error('signoGlucosa') <span class="text-rose-600 text-[10px] font-bold">{{ $message }}</span> @enderror
+                    @error('signoGlucosa') <span class="text-[var(--rm-danger-strong)] text-[10px] font-bold">{{ $message }}</span> @enderror
                 </div>
                 <div class="col-span-2">
                     <label class="font-bold text-[var(--rm-text-body)] block mb-1">Nivel de Dolor (Escala EVA 0 a 10)</label>
@@ -415,10 +415,10 @@
             </div>
 
             <div class="mt-6 flex justify-end gap-2">
-                <button type="button" wire:click="cerrarModalSignos" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 transition">
+                <button type="button" wire:click="cerrarModalSignos" class="rounded-xl bg-[var(--rm-surface-soft)] px-4 py-2 text-xs font-bold text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-soft)] transition">
                     Cancelar
                 </button>
-                <button type="button" wire:click="guardarSignos" wire:loading.attr="disabled" class="rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700 transition">
+                <button type="button" wire:click="guardarSignos" wire:loading.attr="disabled" class="rounded-xl bg-[var(--rm-info-action)] px-4 py-2 text-xs font-bold text-[var(--rm-text-inverse)] hover:bg-[var(--rm-action-primary)] transition">
                     <span wire:loading.remove wire:target="guardarSignos">Guardar signos</span>
                     <span wire:loading wire:target="guardarSignos">Guardando...</span>
                 </button>
@@ -443,12 +443,12 @@
                     <div class="grid grid-cols-2 gap-2">
                         <button type="button"
                                 wire:click="$set('medAccion', 'ADMINISTRAR')"
-                                class="rounded-xl py-2 font-bold text-center border transition {{ $medAccion === 'ADMINISTRAR' ? 'bg-emerald-50 text-emerald-800 border-emerald-300' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-muted)] border-[var(--rm-border)]' }}">
+                                class="rounded-xl py-2 font-bold text-center border transition {{ $medAccion === 'ADMINISTRAR' ? 'bg-[var(--rm-success-soft)] text-[var(--rm-success-strong)] border-[var(--rm-success-strong)]' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-muted)] border-[var(--rm-border)]' }}">
                             <i class="ph-bold ph-check mr-1"></i> Administrada
                         </button>
                         <button type="button"
                                 wire:click="$set('medAccion', 'OMITIR')"
-                                class="rounded-xl py-2 font-bold text-center border transition {{ $medAccion === 'OMITIR' ? 'bg-amber-50 text-amber-800 border-amber-300' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-muted)] border-[var(--rm-border)]' }}">
+                                class="rounded-xl py-2 font-bold text-center border transition {{ $medAccion === 'OMITIR' ? 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)] border-[var(--rm-warning-strong)]' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-muted)] border-[var(--rm-border)]' }}">
                             <i class="ph-bold ph-warning mr-1"></i> Omitida
                         </button>
                         <button type="button" wire:click="$set('medAccion', 'RECHAZAR')" class="rounded-xl py-2 font-bold text-center border transition {{ $medAccion === 'RECHAZAR' ? 'bg-estado-advertenciaBg text-estado-advertencia border-estado-advertenciaBorde' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-muted)] border-[var(--rm-border)]' }}"><i class="ph-bold ph-hand mr-1"></i> Rechazada</button>
@@ -458,9 +458,9 @@
 
                 @if($medAccion !== 'ADMINISTRAR')
                     <div>
-                        <label class="font-bold text-rose-700 block mb-1">Motivo de Omisión *</label>
+                        <label class="font-bold text-[var(--rm-danger-strong)] block mb-1">Motivo de Omisión *</label>
                         <textarea wire:model="medMotivoOmision" rows="2" placeholder="Rechazo del paciente, náuseas, etc." class="rm-input w-full text-xs"></textarea>
-                        @error('medMotivoOmision') <span class="text-rose-600 text-[10px] font-bold">{{ $message }}</span> @enderror
+                        @error('medMotivoOmision') <span class="text-[var(--rm-danger-strong)] text-[10px] font-bold">{{ $message }}</span> @enderror
                     </div>
                 @endif
 
@@ -481,10 +481,10 @@
             </div>
 
             <div class="mt-6 flex justify-end gap-2">
-                <button type="button" wire:click="cerrarModalMedicacion" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 transition">
+                <button type="button" wire:click="cerrarModalMedicacion" class="rounded-xl bg-[var(--rm-surface-soft)] px-4 py-2 text-xs font-bold text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-soft)] transition">
                     Cancelar
                 </button>
-                <button type="button" wire:click="guardarMedicacion" wire:loading.attr="disabled" class="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition">
+                <button type="button" wire:click="guardarMedicacion" wire:loading.attr="disabled" class="rounded-xl bg-[var(--rm-success-action)] px-4 py-2 text-xs font-bold text-[var(--rm-text-inverse)] hover:bg-[var(--rm-action-primary)] transition">
                     <span wire:loading.remove wire:target="guardarMedicacion">Confirmar registro</span>
                     <span wire:loading wire:target="guardarMedicacion">Guardando...</span>
                 </button>
@@ -506,12 +506,12 @@
                     <div class="grid grid-cols-2 gap-2">
                         <button type="button"
                                 wire:click="$set('tareaEstadoAccion', 'REALIZADA')"
-                                class="rounded-xl py-2 font-bold text-center border transition {{ $tareaEstadoAccion === 'REALIZADA' ? 'bg-emerald-50 text-emerald-800 border-emerald-300' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-muted)] border-[var(--rm-border)]' }}">
+                                class="rounded-xl py-2 font-bold text-center border transition {{ $tareaEstadoAccion === 'REALIZADA' ? 'bg-[var(--rm-success-soft)] text-[var(--rm-success-strong)] border-[var(--rm-success-strong)]' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-muted)] border-[var(--rm-border)]' }}">
                             <i class="ph-bold ph-check-circle mr-1"></i> Realizada
                         </button>
                         <button type="button"
                                 wire:click="$set('tareaEstadoAccion', 'OMITIDA')"
-                                class="rounded-xl py-2 font-bold text-center border transition {{ $tareaEstadoAccion === 'OMITIDA' ? 'bg-amber-50 text-amber-800 border-amber-300' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-muted)] border-[var(--rm-border)]' }}">
+                                class="rounded-xl py-2 font-bold text-center border transition {{ $tareaEstadoAccion === 'OMITIDA' ? 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)] border-[var(--rm-warning-strong)]' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-muted)] border-[var(--rm-border)]' }}">
                             <i class="ph-bold ph-prohibit mr-1"></i> Omitida
                         </button>
                     </div>
@@ -524,18 +524,18 @@
                     </div>
                 @else
                     <div>
-                        <label class="font-bold text-rose-700 block mb-1">Motivo de Omisión *</label>
+                        <label class="font-bold text-[var(--rm-danger-strong)] block mb-1">Motivo de Omisión *</label>
                         <textarea wire:model="tareaMotivoOmision" rows="2" placeholder="Motivo de no realización..." class="rm-input w-full text-xs"></textarea>
-                        @error('tareaMotivoOmision') <span class="text-rose-600 text-[10px] font-bold">{{ $message }}</span> @enderror
+                        @error('tareaMotivoOmision') <span class="text-[var(--rm-danger-strong)] text-[10px] font-bold">{{ $message }}</span> @enderror
                     </div>
                 @endif
             </div>
 
             <div class="mt-6 flex justify-end gap-2">
-                <button type="button" wire:click="cerrarModalTarea" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 transition">
+                <button type="button" wire:click="cerrarModalTarea" class="rounded-xl bg-[var(--rm-surface-soft)] px-4 py-2 text-xs font-bold text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-soft)] transition">
                     Cancelar
                 </button>
-                <button type="button" wire:click="guardarTarea" wire:loading.attr="disabled" class="rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700 transition">
+                <button type="button" wire:click="guardarTarea" wire:loading.attr="disabled" class="rounded-xl bg-[var(--rm-info-action)] px-4 py-2 text-xs font-bold text-[var(--rm-text-inverse)] hover:bg-[var(--rm-action-primary)] transition">
                     <span wire:loading.remove wire:target="guardarTarea">Guardar registro</span>
                     <span wire:loading wire:target="guardarTarea">Guardando...</span>
                 </button>
@@ -627,12 +627,12 @@
 
                 {{-- Opciones de Alerta / Seguimiento --}}
                 <div class="col-span-1 sm:col-span-2 p-3 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] space-y-2">
-                    <label class="flex items-center gap-2 font-bold text-amber-800 dark:text-amber-300 cursor-pointer text-xs">
-                        <input type="checkbox" wire:model="segRequiereMedico" class="rounded border-[var(--rm-border)] text-amber-600 focus:ring-amber-500" />
+                    <label class="flex items-center gap-2 font-bold text-[var(--rm-warning-strong)] dark:text-[var(--rm-warning-strong)] cursor-pointer text-xs">
+                        <input type="checkbox" wire:model="segRequiereMedico" class="rounded border-[var(--rm-border)] text-[var(--rm-warning-strong)] focus:ring-[var(--rm-focus-ring-color)]" />
                         <span>Requiere seguimiento o valoración médica complementaria</span>
                     </label>
-                    <label class="flex items-center gap-2 font-bold text-rose-700 dark:text-rose-400 cursor-pointer text-xs">
-                        <input type="checkbox" wire:model="segIncidente" class="rounded border-[var(--rm-border)] text-rose-600 focus:ring-rose-500" />
+                    <label class="flex items-center gap-2 font-bold text-[var(--rm-danger-strong)] dark:text-[var(--rm-danger-strong)] cursor-pointer text-xs">
+                        <input type="checkbox" wire:model="segIncidente" class="rounded border-[var(--rm-border)] text-[var(--rm-danger-strong)] focus:ring-[var(--rm-focus-ring-color)]" />
                         <span>Ocurrió un incidente clínico en el turno</span>
                     </label>
                 </div>
@@ -641,7 +641,7 @@
                 <div class="col-span-1 sm:col-span-2">
                     <label class="font-bold text-[var(--rm-text-title)] block mb-1">Evolución Clínica y Observaciones Asistenciales *</label>
                     <textarea wire:model="segObs" rows="3" placeholder="Detalle de cambios observados, respuesta al tratamiento, estado de ánimo y acciones realizadas..." class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] p-3 text-xs text-[var(--rm-text-title)] focus:ring-1 focus:ring-[var(--rm-action-primary)]"></textarea>
-                    @error('segObs') <span class="text-rose-600 text-[11px] font-bold block mt-1">{{ $message }}</span> @enderror
+                    @error('segObs') <span class="text-[var(--rm-danger-strong)] text-[11px] font-bold block mt-1">{{ $message }}</span> @enderror
                 </div>
             </div>
 
@@ -656,7 +656,7 @@
                     <button type="button" wire:click="cerrarModalSeguimiento" class="px-4 py-2 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] text-xs font-bold text-[var(--rm-text-title)] hover:bg-[var(--rm-border)] transition">
                         Cancelar
                     </button>
-                    <button type="button" wire:click="guardarSeguimiento" wire:loading.attr="disabled" class="px-4 py-2 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-xs font-bold text-white shadow-xs transition inline-flex items-center gap-1.5">
+                    <button type="button" wire:click="guardarSeguimiento" wire:loading.attr="disabled" class="px-4 py-2 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-xs font-bold text-[var(--rm-text-on-primary)] shadow-xs transition inline-flex items-center gap-1.5">
                         <i class="ph-bold ph-check" wire:loading.remove wire:target="guardarSeguimiento"></i>
                         <span wire:loading.remove wire:target="guardarSeguimiento">Registrar evolución</span>
                         <span wire:loading wire:target="guardarSeguimiento">Guardando...</span>
@@ -672,7 +672,7 @@
 @if($modalIncidente)
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
         <div class="w-full max-w-md rounded-3xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-6 shadow-panel">
-            <h3 class="text-base font-bold text-rose-700 flex items-center gap-2">
+            <h3 class="text-base font-bold text-[var(--rm-danger-strong)] flex items-center gap-2">
                 <i class="ph-bold ph-warning-octagon text-lg"></i>
                 <span>Reportar Incidente Asistencial</span>
             </h3>
@@ -702,15 +702,15 @@
                 <div>
                     <label class="font-bold text-[var(--rm-text-body)] block mb-1">Descripción de lo Sucedido *</label>
                     <textarea wire:model="incidenteMotivo" rows="3" placeholder="Circunstancias, estado físico y medidas inmediatas adoptadas..." class="rm-input w-full text-xs"></textarea>
-                    @error('incidenteMotivo') <span class="text-rose-600 text-[10px] font-bold">{{ $message }}</span> @enderror
+                    @error('incidenteMotivo') <span class="text-[var(--rm-danger-strong)] text-[10px] font-bold">{{ $message }}</span> @enderror
                 </div>
             </div>
 
             <div class="mt-6 flex justify-end gap-2">
-                <button type="button" wire:click="cerrarModalIncidente" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 transition">
+                <button type="button" wire:click="cerrarModalIncidente" class="rounded-xl bg-[var(--rm-surface-soft)] px-4 py-2 text-xs font-bold text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-soft)] transition">
                     Cancelar
                 </button>
-                <button type="button" wire:click="guardarIncidente" wire:loading.attr="disabled" class="rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-700 transition">
+                <button type="button" wire:click="guardarIncidente" wire:loading.attr="disabled" class="rounded-xl bg-[var(--rm-danger-action)] px-4 py-2 text-xs font-bold text-[var(--rm-text-inverse)] hover:bg-[var(--rm-danger-action)] transition">
                     <span wire:loading.remove wire:target="guardarIncidente">Emitir reporte de alerta</span>
                     <span wire:loading wire:target="guardarIncidente">Emitiendo...</span>
                 </button>
@@ -730,15 +730,15 @@
                 <div>
                     <label class="font-bold text-[var(--rm-text-body)] block mb-1">Acción Inmediata Realizada *</label>
                     <textarea wire:model="accionTomadaAlerta" rows="3" placeholder="Ej: Se acomodó en cama, se verificó vía aérea, se administró medicación indicada..." class="rm-input w-full text-xs"></textarea>
-                    @error('accionTomadaAlerta') <span class="text-rose-600 text-[10px] font-bold">{{ $message }}</span> @enderror
+                    @error('accionTomadaAlerta') <span class="text-[var(--rm-danger-strong)] text-[10px] font-bold">{{ $message }}</span> @enderror
                 </div>
             </div>
 
             <div class="mt-6 flex justify-end gap-2">
-                <button type="button" wire:click="cerrarModalAtenderAlerta" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 transition">
+                <button type="button" wire:click="cerrarModalAtenderAlerta" class="rounded-xl bg-[var(--rm-surface-soft)] px-4 py-2 text-xs font-bold text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-soft)] transition">
                     Cancelar
                 </button>
-                <button type="button" wire:click="guardarAtenderAlerta" wire:loading.attr="disabled" class="rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700 transition">
+                <button type="button" wire:click="guardarAtenderAlerta" wire:loading.attr="disabled" class="rounded-xl bg-[var(--rm-info-action)] px-4 py-2 text-xs font-bold text-[var(--rm-text-inverse)] hover:bg-[var(--rm-action-primary)] transition">
                     <span wire:loading.remove wire:target="guardarAtenderAlerta">Registrar atención</span>
                     <span wire:loading wire:target="guardarAtenderAlerta">Guardando...</span>
                 </button>
@@ -758,15 +758,15 @@
                 <div>
                     <label class="font-bold text-[var(--rm-text-body)] block mb-1">Observación de Cierre / Resolución *</label>
                     <textarea wire:model="observacionCierreAlerta" rows="3" placeholder="Parámetros normalizados, residente estable..." class="rm-input w-full text-xs"></textarea>
-                    @error('observacionCierreAlerta') <span class="text-rose-600 text-[10px] font-bold">{{ $message }}</span> @enderror
+                    @error('observacionCierreAlerta') <span class="text-[var(--rm-danger-strong)] text-[10px] font-bold">{{ $message }}</span> @enderror
                 </div>
             </div>
 
             <div class="mt-6 flex justify-end gap-2">
-                <button type="button" wire:click="cerrarModalCerrarAlerta" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 transition">
+                <button type="button" wire:click="cerrarModalCerrarAlerta" class="rounded-xl bg-[var(--rm-surface-soft)] px-4 py-2 text-xs font-bold text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-soft)] transition">
                     Cancelar
                 </button>
-                <button type="button" wire:click="guardarCerrarAlerta" wire:loading.attr="disabled" class="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition">
+                <button type="button" wire:click="guardarCerrarAlerta" wire:loading.attr="disabled" class="rounded-xl bg-[var(--rm-success-action)] px-4 py-2 text-xs font-bold text-[var(--rm-text-inverse)] hover:bg-[var(--rm-action-primary)] transition">
                     <span wire:loading.remove wire:target="guardarCerrarAlerta">Cerrar alerta</span>
                     <span wire:loading wire:target="guardarCerrarAlerta">Cerrando...</span>
                 </button>
@@ -799,7 +799,7 @@
         {{-- Header --}}
         <div class="flex items-start justify-between border-b border-[var(--rm-border)] pb-4">
             <div class="flex items-center gap-3">
-                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-[var(--rm-action-primary)] border border-blue-200">
+                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[var(--rm-info-soft)] text-[var(--rm-action-primary)] border border-[var(--rm-info-strong)]">
                     <i class="ph-bold ph-download-simple text-2xl"></i>
                 </span>
                 <div>
@@ -817,9 +817,9 @@
         {{-- Grid de Opciones de Exportación --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
             {{-- Opción 1: Ficha Médica Completa --}}
-            <div class="p-3.5 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] hover:border-blue-300 hover:bg-blue-50/20 transition flex flex-col justify-between gap-3">
+            <div class="p-3.5 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] hover:border-[var(--rm-info-strong)] hover:bg-[var(--rm-info-soft)] transition flex flex-col justify-between gap-3">
                 <div class="flex items-start gap-2.5">
-                    <span class="p-2 rounded-xl bg-blue-100 text-[var(--rm-action-primary)] shrink-0">
+                    <span class="p-2 rounded-xl bg-[var(--rm-info-soft)] text-[var(--rm-action-primary)] shrink-0">
                         <i class="ph-bold ph-file-pdf text-xl"></i>
                     </span>
                     <div>
@@ -829,16 +829,16 @@
                 </div>
                 <button type="button"
                         onclick="window.print()"
-                        class="w-full py-2 px-3 rounded-xl bg-[var(--rm-action-primary)] text-white font-bold text-xs hover:bg-[var(--rm-action-primary-hover)] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
+                        class="w-full py-2 px-3 rounded-xl bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] font-bold text-xs hover:bg-[var(--rm-action-primary-hover)] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
                     <i class="ph-bold ph-printer"></i>
                     <span>Imprimir / Guardar PDF</span>
                 </button>
             </div>
 
             {{-- Opción 2: Signos Vitales CSV --}}
-            <div class="p-3.5 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] hover:border-emerald-300 hover:bg-emerald-50/20 transition flex flex-col justify-between gap-3">
+            <div class="p-3.5 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] hover:border-[var(--rm-success-strong)] hover:bg-[var(--rm-success-soft)] transition flex flex-col justify-between gap-3">
                 <div class="flex items-start gap-2.5">
-                    <span class="p-2 rounded-xl bg-emerald-100 text-emerald-800 shrink-0">
+                    <span class="p-2 rounded-xl bg-[var(--rm-success-soft)] text-[var(--rm-success-strong)] shrink-0">
                         <i class="ph-bold ph-file-csv text-xl"></i>
                     </span>
                     <div>
@@ -848,16 +848,16 @@
                 </div>
                 <button type="button"
                         @click="modalExportar = false; activeTab = 'signos'; $wire.cambiarTab('signos')"
-                        class="w-full py-2 px-3 rounded-xl bg-emerald-700 text-white font-bold text-xs hover:bg-emerald-800 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
+                        class="w-full py-2 px-3 rounded-xl bg-[var(--rm-success-action)] text-[var(--rm-text-inverse)] font-bold text-xs hover:bg-[var(--rm-action-primary)] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
                     <i class="ph-bold ph-table"></i>
                     <span>Ver y Exportar en Signos</span>
                 </button>
             </div>
 
             {{-- Opción 3: Plan Farmacológico --}}
-            <div class="p-3.5 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] hover:border-amber-300 hover:bg-amber-50/20 transition flex flex-col justify-between gap-3">
+            <div class="p-3.5 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] hover:border-[var(--rm-warning-strong)] hover:bg-[var(--rm-warning-soft)] transition flex flex-col justify-between gap-3">
                 <div class="flex items-start gap-2.5">
-                    <span class="p-2 rounded-xl bg-amber-100 text-amber-800 shrink-0">
+                    <span class="p-2 rounded-xl bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)] shrink-0">
                         <i class="ph-bold ph-pill text-xl"></i>
                     </span>
                     <div>
@@ -867,16 +867,16 @@
                 </div>
                 <button type="button"
                         @click="modalExportar = false; activeTab = 'medicacion'; $wire.cambiarTab('medicacion')"
-                        class="w-full py-2 px-3 rounded-xl bg-amber-700 text-white font-bold text-xs hover:bg-amber-800 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
+                        class="w-full py-2 px-3 rounded-xl bg-[var(--rm-warning-action)] text-[var(--rm-text-inverse)] font-bold text-xs hover:bg-[var(--rm-warning-action)] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
                     <i class="ph-bold ph-eye"></i>
                     <span>Consultar en Medicación</span>
                 </button>
             </div>
 
             {{-- Opción 4: Documentos y Estudios --}}
-            <div class="p-3.5 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] hover:border-indigo-300 hover:bg-indigo-50/20 transition flex flex-col justify-between gap-3">
+            <div class="p-3.5 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] hover:border-[var(--rm-border-strong)] hover:bg-[var(--rm-action-primary-soft)] transition flex flex-col justify-between gap-3">
                 <div class="flex items-start gap-2.5">
-                    <span class="p-2 rounded-xl bg-indigo-100 text-indigo-800 shrink-0">
+                    <span class="p-2 rounded-xl bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] shrink-0">
                         <i class="ph-bold ph-folder-open text-xl"></i>
                     </span>
                     <div>
@@ -886,7 +886,7 @@
                 </div>
                 <button type="button"
                         @click="modalExportar = false; activeTab = 'documentos'; $wire.cambiarTab('documentos')"
-                        class="w-full py-2 px-3 rounded-xl bg-indigo-700 text-white font-bold text-xs hover:bg-indigo-800 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
+                        class="w-full py-2 px-3 rounded-xl bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] font-bold text-xs hover:bg-[var(--rm-action-primary)] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
                     <i class="ph-bold ph-folder"></i>
                     <span>Ir a Documentación</span>
                 </button>
@@ -896,7 +896,7 @@
         {{-- Footer --}}
         <div class="flex items-center justify-between border-t border-[var(--rm-border)] pt-3 text-xs">
             <span class="text-[11px] text-[var(--rm-text-muted)] flex items-center gap-1">
-                <i class="ph-bold ph-shield-check text-emerald-600 text-sm"></i>
+                <i class="ph-bold ph-shield-check text-[var(--rm-success-strong)] text-sm"></i>
                 Documento trazable y validado por auditoría clínica.
             </span>
             <button type="button"
@@ -945,11 +945,11 @@
             <header class="rm-drawer-header p-5 border-b border-[var(--rm-border)] bg-[var(--rm-surface)] flex items-start justify-between gap-3 shrink-0">
                 <div class="space-y-1">
                     <span class="rm-drawer-badge">
-                        <span class="h-1.5 w-1.5 rounded-full bg-blue-600 animate-pulse"></span>
+                        <span class="h-1.5 w-1.5 rounded-full bg-[var(--rm-info-action)] animate-pulse"></span>
                         EXPEDIENTE CLÍNICO INTEGRAL
                     </span>
                     <div class="flex items-center gap-2 pt-0.5">
-                        <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-[var(--rm-action-primary)] border border-blue-200 text-base shadow-2xs">
+                        <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--rm-info-soft)] text-[var(--rm-action-primary)] border border-[var(--rm-info-strong)] text-base shadow-2xs">
                             <i class="ph-bold ph-identification-card"></i>
                         </span>
                         <h2 class="text-lg font-bold text-[var(--rm-text-title)]">{{ $adultoMayor->nombres }} {{ $adultoMayor->ap_paterno }} {{ $adultoMayor->ap_materno }}</h2>
@@ -966,8 +966,8 @@
             {{-- Body Scrollable --}}
             <div class="rm-drawer-body flex-1 overflow-y-auto p-5 space-y-4 text-xs">
                 {{-- Bloque Ubicación Habitacional --}}
-                <div class="p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-900/60 space-y-2">
-                    <span class="text-[10px] font-bold uppercase text-amber-800 dark:text-amber-300 tracking-wider block">Ubicación y Censo Activo</span>
+                <div class="p-4 rounded-2xl bg-[var(--rm-warning-soft)] dark:bg-[var(--rm-warning-soft)] border border-[var(--rm-warning-strong)] dark:border-[var(--rm-warning-strong)] space-y-2">
+                    <span class="text-[10px] font-bold uppercase text-[var(--rm-warning-strong)] dark:text-[var(--rm-warning-strong)] tracking-wider block">Ubicación y Censo Activo</span>
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
                         <div>
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Habitación</span>
@@ -979,7 +979,7 @@
                         </div>
                         <div>
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Estado Residente</span>
-                            <span class="font-bold text-emerald-700">{{ $adultoMayor->estado ?: 'No registrado' }}</span>
+                            <span class="font-bold text-[var(--rm-success-strong)]">{{ $adultoMayor->estado ?: 'No registrado' }}</span>
                         </div>
                     </div>
                 </div>
@@ -1021,7 +1021,7 @@
                     <div class="grid grid-cols-2 gap-3 text-xs">
                         <div>
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Grupo Sanguíneo</span>
-                            <span class="font-bold text-rose-700">{{ $grupoSanguineo ?: 'No registrado' }}</span>
+                            <span class="font-bold text-[var(--rm-danger-strong)]">{{ $grupoSanguineo ?: 'No registrado' }}</span>
                         </div>
                         <div>
                             <span class="text-[10.5px] text-[var(--rm-text-muted)] block">Seguro de Salud</span>
@@ -1089,11 +1089,11 @@
             <header class="rm-drawer-header p-5 border-b border-[var(--rm-border)] bg-[var(--rm-surface)] flex items-start justify-between gap-3 shrink-0">
                 <div class="space-y-1">
                     <span class="rm-drawer-badge">
-                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                        <span class="h-1.5 w-1.5 rounded-full bg-[var(--rm-success-action)] animate-pulse"></span>
                         RED DE APOYO Y CONTACTOS FAMILIARES
                     </span>
                     <div class="flex items-center gap-2 pt-0.5">
-                        <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-base shadow-2xs">
+                        <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--rm-success-soft)] text-[var(--rm-success-strong)] border border-[var(--rm-success-strong)] text-base shadow-2xs">
                             <i class="ph-bold ph-users-three"></i>
                         </span>
                         <h2 class="text-lg font-bold text-[var(--rm-text-title)]">Contactos Familiares</h2>
@@ -1110,13 +1110,13 @@
             {{-- Body Scrollable --}}
             <div class="rm-drawer-body flex-1 overflow-y-auto p-5 space-y-4 text-xs">
                 {{-- Contacto Principal de Emergencia --}}
-                <div class="p-4 rounded-2xl bg-rose-50/70 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/60 space-y-2.5">
+                <div class="p-4 rounded-2xl bg-[var(--rm-danger-soft)] dark:bg-[var(--rm-danger-soft)] border border-[var(--rm-danger-strong)] dark:border-[var(--rm-danger-strong)] space-y-2.5">
                     <div class="flex items-center justify-between">
-                        <span class="text-[10.5px] font-bold uppercase text-rose-800 dark:text-rose-300 tracking-wider flex items-center gap-1.5">
+                        <span class="text-[10.5px] font-bold uppercase text-[var(--rm-danger-strong)] dark:text-[var(--rm-danger-strong)] tracking-wider flex items-center gap-1.5">
                             <i class="ph-bold ph-phone-call text-sm"></i>
                             Contacto Principal de Emergencia
                         </span>
-                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-200/80 text-rose-900 dark:bg-rose-900/60 dark:text-rose-200 uppercase">Prioridad 1</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-[var(--rm-danger-soft)] text-[var(--rm-danger-strong)] dark:bg-[var(--rm-danger-soft)] dark:text-[var(--rm-danger-strong)] uppercase">Prioridad 1</span>
                     </div>
                     <div class="flex items-center justify-between gap-3 pt-1">
                         <div>
@@ -1125,7 +1125,7 @@
                         </div>
                         @if($contactoEmergencia?->celular || $contactoEmergencia?->telefono)
                         <a href="tel:{{ $contactoEmergencia->celular ?: $contactoEmergencia->telefono }}"
-                           class="px-3 py-2 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 transition inline-flex items-center gap-1.5 shadow-2xs">
+                           class="px-3 py-2 rounded-xl bg-[var(--rm-success-action)] text-[var(--rm-text-inverse)] font-bold text-xs hover:bg-[var(--rm-success-action)] transition inline-flex items-center gap-1.5 shadow-2xs">
                             <i class="ph-bold ph-phone"></i>
                             <span>{{ $contactoEmergencia->celular ?: $contactoEmergencia->telefono }}</span>
                         </a>
@@ -1143,7 +1143,7 @@
                         @foreach($familiaresActivos as $fam)
                         <div class="p-3.5 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] flex items-center justify-between gap-3">
                             <div class="flex items-center gap-3">
-                                <div class="h-10 w-10 rounded-xl bg-blue-100 dark:bg-blue-950 text-[var(--rm-action-primary)] flex items-center justify-center font-bold text-sm shrink-0">
+                                <div class="h-10 w-10 rounded-xl bg-[var(--rm-info-soft)] dark:bg-[var(--rm-info-soft)] text-[var(--rm-action-primary)] flex items-center justify-center font-bold text-sm shrink-0">
                                     <i class="ph-bold ph-user"></i>
                                 </div>
                                 <div>
@@ -1153,7 +1153,7 @@
                             </div>
                             @if($fam->telefono || $fam->celular)
                             <a href="tel:{{ $fam->telefono ?: $fam->celular }}"
-                               class="h-8 w-8 rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface)] hover:bg-emerald-50 text-emerald-700 flex items-center justify-center transition"
+                               class="h-8 w-8 rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface)] hover:bg-[var(--rm-success-soft)] text-[var(--rm-success-strong)] flex items-center justify-center transition"
                                title="Llamar">
                                 <i class="ph-bold ph-phone text-sm"></i>
                             </a>
@@ -1163,7 +1163,7 @@
                     @else
                         <div class="p-3.5 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] flex items-center justify-between gap-3">
                             <div class="flex items-center gap-3">
-                                <div class="h-10 w-10 rounded-xl bg-blue-100 dark:bg-blue-950 text-[var(--rm-action-primary)] flex items-center justify-center font-bold text-sm shrink-0">
+                                <div class="h-10 w-10 rounded-xl bg-[var(--rm-info-soft)] dark:bg-[var(--rm-info-soft)] text-[var(--rm-action-primary)] flex items-center justify-center font-bold text-sm shrink-0">
                                     <i class="ph-bold ph-user"></i>
                                 </div>
                                 <div>

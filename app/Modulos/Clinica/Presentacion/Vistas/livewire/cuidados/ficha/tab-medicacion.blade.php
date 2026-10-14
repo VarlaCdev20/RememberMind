@@ -35,33 +35,33 @@
             $urgencia = 4; // PROGRAMADA por defecto
             $estadoHoy = 'Programada';
             $minutosBadge = $horaProg ? 'Horario ' . $horaProg : 'Sin horario registrado';
-            $badgeColor = 'bg-blue-50 text-blue-800 border-blue-200';
-            $filaColor = 'bg-blue-50/20 hover:bg-blue-50/40';
+            $badgeColor = 'bg-[var(--rm-info-soft)] text-[var(--rm-info-strong)] border-[var(--rm-info-strong)]';
+            $filaColor = 'bg-[var(--rm-info-soft)] hover:bg-[var(--rm-info-soft)]';
 
             if ($registroHoy || ($ultAdmin && ($ultAdmin->administrado ?? false))) {
                 $urgencia = 5; // ADMINISTRADA
                 $estadoHoy = 'Administrada';
                 $minutosBadge = $ultAdmin?->fecha_hora_administracion ? 'Administrada ' . $ultAdmin->fecha_hora_administracion->format('H:i') : 'Administrada';
-                $badgeColor = 'bg-emerald-50 text-emerald-800 border-emerald-200';
-                $filaColor = 'bg-emerald-50/30 hover:bg-emerald-50/50';
+                $badgeColor = 'bg-[var(--rm-success-soft)] text-[var(--rm-success-strong)] border-[var(--rm-success-strong)]';
+                $filaColor = 'bg-[var(--rm-success-soft)] hover:bg-[var(--rm-success-soft)]';
             } elseif (in_array(strtoupper($m->estado ?? ''), ['SUSPENDIDA', 'SUSPENDIDO', 'INACTIVO'])) {
                 $urgencia = 6; // SUSPENDIDA
                 $estadoHoy = 'Suspendida';
                 $minutosBadge = 'Tratamiento suspendido';
-                $badgeColor = 'bg-slate-100 text-slate-700 border-slate-200';
-                $filaColor = 'bg-slate-50/40 hover:bg-slate-50/60 opacity-80';
+                $badgeColor = 'bg-[var(--rm-surface-soft)] text-[var(--rm-text-primary)] border-[var(--rm-border)]';
+                $filaColor = 'bg-[var(--rm-surface)] hover:bg-[var(--rm-surface)] opacity-80';
             } elseif (in_array(strtoupper((string)($proximaToma['estado'] ?? '')), ['VENCIDA', 'RETRASADA'], true)) {
                 $urgencia = 1;
                 $estadoHoy = 'Atrasada';
                 $minutosBadge = 'Dosis atrasada';
-                $badgeColor = 'bg-rose-50 text-rose-800 border-rose-200';
-                $filaColor = 'bg-rose-50/40 hover:bg-rose-50/60';
+                $badgeColor = 'bg-[var(--rm-danger-soft)] text-[var(--rm-danger-strong)] border-[var(--rm-danger-strong)]';
+                $filaColor = 'bg-[var(--rm-danger-soft)] hover:bg-[var(--rm-danger-soft)]';
             } elseif (strtoupper((string)($proximaToma['estado'] ?? '')) === 'PROXIMA') {
                 $urgencia = 3;
                 $estadoHoy = 'Próxima';
                 $minutosBadge = 'Próxima dosis';
-                $badgeColor = 'bg-amber-50 text-amber-800 border-amber-200';
-                $filaColor = 'bg-amber-50/30 hover:bg-amber-50/50';
+                $badgeColor = 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)] border-[var(--rm-warning-strong)]';
+                $filaColor = 'bg-[var(--rm-warning-soft)] hover:bg-[var(--rm-warning-soft)]';
             }
 
             $listaItems->push([
@@ -123,7 +123,7 @@
                 'dosis' => $adm->dosis_administrada ?: ($adm->medicacion?->dosis ?: '1 dosis'),
                 'via' => ucfirst(strtolower($adm->medicacion?->via_administracion ?: 'Oral')),
                 'resultado' => $resTxt,
-                'badgeClass' => $esAdm ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-amber-50 text-amber-800 border-amber-200',
+                'badgeClass' => $esAdm ? 'bg-[var(--rm-success-soft)] text-[var(--rm-success-strong)] border-[var(--rm-success-strong)]' : 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)] border-[var(--rm-warning-strong)]',
                 'administradoPor' => $adm->personal ? trim("{$adm->personal->nombres} {$adm->personal->apellido_paterno}") : 'Enfermero/a',
                 'observaciones' => $adm->observacion ?: ($adm->motivo_omision ?: 'Registro asistencial en expediente.'),
             ]);
@@ -295,7 +295,7 @@
     <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-4 sm:p-5 shadow-2xs space-y-3.5">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div class="flex items-start gap-3">
-                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[var(--rm-action-primary)] border border-blue-200 shadow-2xs">
+                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--rm-info-soft)] text-[var(--rm-action-primary)] border border-[var(--rm-info-strong)] shadow-2xs">
                     <i class="ph-bold ph-pill text-2xl"></i>
                 </span>
                 <div>
@@ -304,11 +304,11 @@
                             MEDICACIÓN
                         </h2>
                         {{-- Badges de contexto institucional --}}
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-blue-50 text-[var(--rm-action-primary)] border border-blue-200">
-                            <span class="h-1.5 w-1.5 rounded-full bg-blue-600 animate-pulse"></span>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-[var(--rm-info-soft)] text-[var(--rm-action-primary)] border border-[var(--rm-info-strong)]">
+                            <span class="h-1.5 w-1.5 rounded-full bg-[var(--rm-info-action)] animate-pulse"></span>
                             Medicación Activa Prescrita
                         </span>
-                        <span class="text-[11px] font-bold text-blue-700 bg-blue-50/80 px-2 py-0.5 rounded-md border border-blue-100">
+                        <span class="text-[11px] font-bold text-[var(--rm-info-strong)] bg-[var(--rm-info-soft)] px-2 py-0.5 rounded-md border border-[var(--rm-info-strong)]">
                             Plan de medicación
                         </span>
                     </div>
@@ -332,19 +332,19 @@
 @endif
                 @endif
                 <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] text-xs font-bold text-[var(--rm-text-title)]">
-                    <i class="ph-bold ph-calendar text-blue-600"></i>
+                    <i class="ph-bold ph-calendar text-[var(--rm-info-strong)]"></i>
                     <span>Hoy, {{ today()->translatedFormat('d \d\e F \d\e Y') }}</span>
                 </div>
 
-                <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 text-xs font-bold text-emerald-800 dark:text-emerald-300 shadow-2xs">
-                    <i class="ph-bold ph-desktop text-emerald-600 animate-pulse"></i>
-                    <span>Hora actual PC: <strong x-text="relojPC.hora12" class="font-mono font-bold text-emerald-900 dark:text-emerald-200"></strong></span>
+                <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--rm-success-strong)] bg-[var(--rm-success-soft)] dark:bg-[var(--rm-success-soft)] text-xs font-bold text-[var(--rm-success-strong)] dark:text-[var(--rm-success-strong)] shadow-2xs">
+                    <i class="ph-bold ph-desktop text-[var(--rm-success-strong)] animate-pulse"></i>
+                    <span>Hora actual PC: <strong x-text="relojPC.hora12" class="font-mono font-bold text-[var(--rm-success-strong)] dark:text-[var(--rm-success-strong)]"></strong></span>
                 </div>
 
                 <button type="button"
                         @click="modalIndicaciones = true"
                         class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] hover:bg-[var(--rm-surface)] text-xs font-bold text-[var(--rm-text-title)] transition cursor-pointer shadow-2xs">
-                    <i class="ph-bold ph-info text-blue-600"></i>
+                    <i class="ph-bold ph-info text-[var(--rm-info-strong)]"></i>
                     <span>Ver indicaciones generales</span>
                 </button>
             </div>
@@ -365,53 +365,53 @@
     {{-- ========================================================================= --}}
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 text-xs">
         {{-- KPI 1: POR ADMINISTRAR AHORA (ROJO si existen dosis vencidas/actuales) --}}
-        <div class="p-3.5 rounded-2xl border bg-rose-50/70 border-rose-300 shadow-2xs space-y-1">
+        <div class="p-3.5 rounded-2xl border bg-[var(--rm-danger-soft)] border-[var(--rm-danger-strong)] shadow-2xs space-y-1">
             <div class="flex items-center justify-between">
-                <span class="text-[10px] font-bold text-rose-800 uppercase tracking-wider">POR ADMINISTRAR AHORA</span>
-                <i class="ph-bold ph-warning-circle text-rose-600 text-base animate-pulse"></i>
+                <span class="text-[10px] font-bold text-[var(--rm-danger-strong)] uppercase tracking-wider">POR ADMINISTRAR AHORA</span>
+                <i class="ph-bold ph-warning-circle text-[var(--rm-danger-strong)] text-base animate-pulse"></i>
             </div>
             <div class="flex items-baseline gap-1.5 pt-0.5">
-                <span class="text-2xl font-bold text-rose-700 font-mono">{{ $conteoPrioritarias }}</span>
-                <span class="text-[10px] font-bold text-rose-600">dosis prioritarias</span>
+                <span class="text-2xl font-bold text-[var(--rm-danger-strong)] font-mono">{{ $conteoPrioritarias }}</span>
+                <span class="text-[10px] font-bold text-[var(--rm-danger-strong)]">dosis prioritarias</span>
             </div>
-            <span class="text-[10px] text-rose-700 font-semibold block">Atrasadas o pendientes ahora</span>
+            <span class="text-[10px] text-[var(--rm-danger-strong)] font-semibold block">Atrasadas o pendientes ahora</span>
         </div>
 
         {{-- KPI 2: PRÓXIMAS DOSIS (En las próximas 2 horas) --}}
-        <div class="p-3.5 rounded-2xl border border-amber-200 bg-amber-50/50 shadow-2xs space-y-1">
+        <div class="p-3.5 rounded-2xl border border-[var(--rm-warning-strong)] bg-[var(--rm-warning-soft)] shadow-2xs space-y-1">
             <div class="flex items-center justify-between">
-                <span class="text-[10px] font-bold text-amber-800 uppercase tracking-wider">PRÓXIMAS DOSIS</span>
-                <i class="ph-bold ph-clock-countdown text-amber-600 text-base"></i>
+                <span class="text-[10px] font-bold text-[var(--rm-warning-strong)] uppercase tracking-wider">PRÓXIMAS DOSIS</span>
+                <i class="ph-bold ph-clock-countdown text-[var(--rm-warning-strong)] text-base"></i>
             </div>
             <div class="flex items-baseline gap-1.5 pt-0.5">
-                <span class="text-2xl font-bold text-amber-800 font-mono">{{ $conteoProximas }}</span>
-                <span class="text-[10px] font-bold text-amber-700">próximas</span>
+                <span class="text-2xl font-bold text-[var(--rm-warning-strong)] font-mono">{{ $conteoProximas }}</span>
+                <span class="text-[10px] font-bold text-[var(--rm-warning-strong)]">próximas</span>
             </div>
-            <span class="text-[10px] text-amber-800 font-medium block">Ventana de administración</span>
+            <span class="text-[10px] text-[var(--rm-warning-strong)] font-medium block">Ventana de administración</span>
         </div>
 
         {{-- KPI 3: ADMINISTRADAS HOY (4 de 6 programadas) --}}
         <div class="p-3.5 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] shadow-2xs space-y-1">
             <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase tracking-wider">ADMINISTRADAS HOY</span>
-                <i class="ph-bold ph-check-circle text-emerald-600 text-base"></i>
+                <i class="ph-bold ph-check-circle text-[var(--rm-success-strong)] text-base"></i>
             </div>
             <div class="flex items-baseline gap-1.5 pt-0.5">
-                <span class="text-2xl font-bold text-emerald-700 font-mono">{{ $conteoAdministradas }} de {{ $totalProgramadas }}</span>
+                <span class="text-2xl font-bold text-[var(--rm-success-strong)] font-mono">{{ $conteoAdministradas }} de {{ $totalProgramadas }}</span>
                 <span class="text-[10px] text-[var(--rm-text-muted)]">programadas</span>
             </div>
-            <span class="text-[10px] text-emerald-600 font-semibold block">Registros confirmados</span>
+            <span class="text-[10px] text-[var(--rm-success-strong)] font-semibold block">Registros confirmados</span>
         </div>
 
         {{-- KPI 4: OMITIDAS / ATRASADAS (1 Requiere atención) --}}
         <div class="p-3.5 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] shadow-2xs space-y-1">
             <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase tracking-wider">OMITIDAS / ATRASADAS</span>
-                <i class="ph-bold ph-bell-ringing text-rose-500 text-base"></i>
+                <i class="ph-bold ph-bell-ringing text-[var(--rm-danger-strong)] text-base"></i>
             </div>
             <div class="flex items-baseline gap-1.5 pt-0.5">
-                <span class="text-2xl font-bold text-rose-600 font-mono">{{ $conteoOmitidas + $listaOrdenada->where('estadoHoy', 'Atrasada')->count() }}</span>
-                <span class="text-[10px] font-bold text-rose-600">requiere atención</span>
+                <span class="text-2xl font-bold text-[var(--rm-danger-strong)] font-mono">{{ $conteoOmitidas + $listaOrdenada->where('estadoHoy', 'Atrasada')->count() }}</span>
+                <span class="text-[10px] font-bold text-[var(--rm-danger-strong)]">requiere atención</span>
             </div>
             <span class="text-[10px] text-[var(--rm-text-muted)] font-medium block">Según registros clínicos</span>
         </div>
@@ -420,13 +420,13 @@
         <div class="p-3.5 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] shadow-2xs space-y-1">
             <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase tracking-wider">ADHERENCIA HOY</span>
-                <i class="ph-bold ph-chart-donut text-blue-600 text-base"></i>
+                <i class="ph-bold ph-chart-donut text-[var(--rm-info-strong)] text-base"></i>
             </div>
             <div class="flex items-baseline gap-1.5 pt-0.5">
                 <span class="text-2xl font-bold text-[var(--rm-action-primary)] font-mono">{{ $adherencia }}%</span>
                 <span class="text-[10px] text-[var(--rm-text-muted)]">{{ $conteoAdministradas }} de {{ $totalProgramadas }} administradas</span>
             </div>
-            <div class="w-full bg-slate-200 rounded-full h-1.5 mt-1 overflow-hidden">
+            <div class="w-full bg-[var(--rm-surface-soft)] rounded-full h-1.5 mt-1 overflow-hidden">
                 <div class="bg-[var(--rm-action-primary)] h-1.5 rounded-full" style="width: {{ $adherencia }}%"></div>
             </div>
         </div>
@@ -444,7 +444,7 @@
                     class="rm-filter-pill">
                 <i class="ph-bold ph-bell-ringing text-xs"></i>
                 <span>Por administrar</span>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold" :class="filtroPrioritario === 'por_administrar' ? 'bg-white text-[var(--rm-action-primary-ink)]' : 'bg-[var(--rm-danger-soft)] text-[var(--rm-danger)]'">{{ $conteoPrioritarias }}</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold" :class="filtroPrioritario === 'por_administrar' ? 'bg-white text-[var(--rm-action-primary-ink)]' : 'bg-[var(--rm-danger-soft)] text-[var(--rm-danger-strong)]'">{{ $conteoPrioritarias }}</span>
             </button>
 
             {{-- Próximas --}}
@@ -532,7 +532,7 @@
                             {{-- Medicamento --}}
                             <td class="py-3.5 px-4">
                                 <div class="flex items-center gap-2.5">
-                                    <div class="h-8 w-8 rounded-lg flex items-center justify-center shrink-0 {{ $item['urgencia'] <= 2 ? 'bg-rose-100 text-rose-700' : ($item['urgencia'] === 3 ? 'bg-amber-100 text-amber-700' : ($item['urgencia'] === 5 ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700')) }}">
+                                    <div class="h-8 w-8 rounded-lg flex items-center justify-center shrink-0 {{ $item['urgencia'] <= 2 ? 'bg-[var(--rm-danger-soft)] text-[var(--rm-danger-strong)]' : ($item['urgencia'] === 3 ? 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)]' : ($item['urgencia'] === 5 ? 'bg-[var(--rm-success-soft)] text-[var(--rm-success-strong)]' : 'bg-[var(--rm-info-soft)] text-[var(--rm-info-strong)]')) }}">
                                         <i class="ph-bold ph-pill text-base"></i>
                                     </div>
                                     <div>
@@ -574,7 +574,7 @@
                                     </span>
                                 @else
                                     <span class="inline-block mt-0.5 px-2 py-0.2 rounded-full text-[10px] font-bold border"
-                                          :class="relojPC.evaluarHorario('{{ $item['horario_12h'] ?? $item['horario'] }}', false).sePaso ? 'bg-rose-100 text-rose-800 border-rose-300 animate-pulse' : '{{ $item['badgeColor'] }}'"
+                                          :class="relojPC.evaluarHorario('{{ $item['horario_12h'] ?? $item['horario'] }}', false).sePaso ? 'bg-[var(--rm-danger-soft)] text-[var(--rm-danger-strong)] border-[var(--rm-danger-strong)] animate-pulse' : '{{ $item['badgeColor'] }}'"
                                           x-text="relojPC.evaluarHorario('{{ $item['horario_12h'] ?? $item['horario'] }}', false).texto">
                                         {{ $item['minutosBadge'] }}
                                     </span>
@@ -590,11 +590,11 @@
                             <td class="py-3.5 px-3 whitespace-nowrap">
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold border {{ $item['badgeColor'] }}">
                                     @if($item['urgencia'] === 1)
-                                        <span class="h-1.5 w-1.5 rounded-full bg-rose-600 animate-pulse"></span>
+                                        <span class="h-1.5 w-1.5 rounded-full bg-[var(--rm-danger-action)] animate-pulse"></span>
                                     @elseif($item['urgencia'] === 2)
-                                        <span class="h-1.5 w-1.5 rounded-full bg-orange-600 animate-pulse"></span>
+                                        <span class="h-1.5 w-1.5 rounded-full bg-[var(--rm-warning-action)] animate-pulse"></span>
                                     @elseif($item['urgencia'] === 3)
-                                        <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                                        <span class="h-1.5 w-1.5 rounded-full bg-[var(--rm-warning)]"></span>
                                     @elseif($item['urgencia'] === 5)
                                         <i class="ph-bold ph-check text-[11px]"></i>
                                     @endif
@@ -613,14 +613,14 @@
                                     @if($item['urgencia'] <= 2)
                                         <button type="button"
                                                 @click="abrirFormularioAdministrar({{ json_encode($item) }})"
-                                                class="px-3 py-1.5 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-white font-extrabold text-[11px] transition cursor-pointer shadow-2xs flex items-center gap-1">
+                                                class="px-3 py-1.5 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-[var(--rm-text-on-primary)] font-extrabold text-[11px] transition cursor-pointer shadow-2xs flex items-center gap-1">
                                             <i class="ph-bold ph-check"></i>
                                             <span>ADMINISTRAR</span>
                                         </button>
                                     @elseif($item['urgencia'] === 3)
                                         <button type="button"
                                                 @click="abrirFormularioAdministrar({{ json_encode($item) }})"
-                                                class="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-[11px] transition cursor-pointer shadow-2xs flex items-center gap-1">
+                                                class="px-3 py-1.5 rounded-xl bg-[var(--rm-warning-action)] hover:bg-[var(--rm-warning-action)] text-[var(--rm-text-inverse)] font-extrabold text-[11px] transition cursor-pointer shadow-2xs flex items-center gap-1">
                                             <i class="ph-bold ph-clock"></i>
                                             <span>ADMINISTRAR</span>
                                         </button>
@@ -690,8 +690,8 @@
                     Administración condicionada a valoración clínica previa (intervalo mínimo, dosis máxima y prescripción médica)
                 </p>
             </div>
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-[var(--rm-action-primary)] text-xs font-bold border border-blue-200 self-start sm:self-auto">
-                <i class="ph-bold ph-shield-check text-blue-600"></i>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--rm-info-soft)] text-[var(--rm-action-primary)] text-xs font-bold border border-[var(--rm-info-strong)] self-start sm:self-auto">
+                <i class="ph-bold ph-shield-check text-[var(--rm-info-strong)]"></i>
                 Validación previa obligatoria
             </span>
         </div>
@@ -742,7 +742,7 @@
                                             indicacion: '{{ $prn['indicacion'] }}',
                                             estadoHoy: 'PRN'
                                         })"
-                                        class="px-3.5 py-1.5 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-white font-bold text-xs transition cursor-pointer shadow-2xs inline-flex items-center gap-1.5">
+                                        class="px-3.5 py-1.5 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-[var(--rm-text-on-primary)] font-bold text-xs transition cursor-pointer shadow-2xs inline-flex items-center gap-1.5">
                                     <i class="ph-bold ph-plus-circle"></i>
                                     <span>REGISTRAR ADMINISTRACIÓN</span>
                                 </button>
@@ -836,7 +836,7 @@
              x-transition:leave-start="opacity-100"
              x-transition:leave-end="opacity-0"
              @click="drawerMedAbierto = false"
-             class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"></div>
+             class="fixed inset-0 bg-[var(--rm-modal-overlay)] backdrop-blur-xs transition-opacity"></div>
 
         <div class="fixed inset-0 overflow-hidden pointer-events-none">
             <div class="absolute inset-0 overflow-hidden">
@@ -853,7 +853,7 @@
                         {{-- Drawer Header --}}
                         <div class="p-5 border-b border-[var(--rm-border)] bg-[var(--rm-surface-alt)]">
                             <div class="flex items-center justify-between">
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-[var(--rm-action-primary)]">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[var(--rm-info-soft)] text-[var(--rm-action-primary)]">
                                     PANEL LATERAL DE CONSULTA
                                 </span>
                                 <button type="button"
@@ -876,7 +876,7 @@
                             {{-- BLOQUE 1: Ficha del Medicamento --}}
                             <div class="p-4 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] space-y-3">
                                 <div class="flex items-center gap-3">
-                                    <div class="h-10 w-10 rounded-xl bg-blue-100 text-[var(--rm-action-primary)] flex items-center justify-center shrink-0">
+                                    <div class="h-10 w-10 rounded-xl bg-[var(--rm-info-soft)] text-[var(--rm-action-primary)] flex items-center justify-center shrink-0">
                                         <i class="ph-bold ph-pill text-xl"></i>
                                     </div>
                                     <div>
@@ -918,12 +918,12 @@
                                     </div>
 
                                     {{-- Precauciones y Alertas --}}
-                                    <div class="p-3.5 rounded-2xl border border-amber-200 bg-amber-50/50 space-y-1.5">
-                                        <div class="flex items-center gap-1.5 text-amber-900 font-bold text-[11px]">
-                                            <i class="ph-bold ph-shield-warning text-amber-600 text-sm"></i>
+                                    <div class="p-3.5 rounded-2xl border border-[var(--rm-warning-strong)] bg-[var(--rm-warning-soft)] space-y-1.5">
+                                        <div class="flex items-center gap-1.5 text-[var(--rm-warning-strong)] font-bold text-[11px]">
+                                            <i class="ph-bold ph-shield-warning text-[var(--rm-warning-strong)] text-sm"></i>
                                             <span>PRECAUCIONES Y ALERTAS</span>
                                         </div>
-                                        <p class="text-[11px] text-amber-900" x-text="medSeleccionado.precauciones"></p>
+                                        <p class="text-[11px] text-[var(--rm-warning-strong)]" x-text="medSeleccionado.precauciones"></p>
                                     </div>
 
                                     {{-- Documentos Relacionados --}}
@@ -932,14 +932,14 @@
                                         <div class="space-y-1.5">
                                             <div class="p-2.5 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] flex items-center justify-between">
                                                 <div class="flex items-center gap-2">
-                                                    <i class="ph-bold ph-file-text text-blue-600 text-base"></i>
+                                                    <i class="ph-bold ph-file-text text-[var(--rm-info-strong)] text-base"></i>
                                                     <span class="font-bold text-[var(--rm-text-title)] text-[11px]" x-text="medSeleccionado.documentoPlan"></span>
                                                 </div>
                                                 <i class="ph-bold ph-arrow-square-out text-[var(--rm-text-muted)]"></i>
                                             </div>
                                             <div class="p-2.5 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] flex items-center justify-between">
                                                 <div class="flex items-center gap-2">
-                                                    <i class="ph-bold ph-file-plus text-emerald-600 text-base"></i>
+                                                    <i class="ph-bold ph-file-plus text-[var(--rm-success-strong)] text-base"></i>
                                                     <span class="font-bold text-[var(--rm-text-title)] text-[11px]" x-text="medSeleccionado.documentoNota"></span>
                                                 </div>
                                                 <i class="ph-bold ph-arrow-square-out text-[var(--rm-text-muted)]"></i>
@@ -953,8 +953,8 @@
                             <template x-if="drawerPaso === 'administrar' || drawerPaso === 'justificar'">
                                 <div class="space-y-3.5">
                                     {{-- Aviso de sólo lectura de prescripción --}}
-                                    <div class="p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-[11px] flex items-center gap-2">
-                                        <i class="ph-bold ph-lock-key text-blue-700 text-sm shrink-0"></i>
+                                    <div class="p-2.5 rounded-xl bg-[var(--rm-info-soft)] border border-[var(--rm-info-strong)] text-[var(--rm-info-strong)] text-[11px] flex items-center gap-2">
+                                        <i class="ph-bold ph-lock-key text-[var(--rm-info-strong)] text-sm shrink-0"></i>
                                         <span>Datos prescritos por médico bloqueados para seguridad. Registre los datos de ejecución.</span>
                                     </div>
 
@@ -966,13 +966,13 @@
                                         <div class="grid grid-cols-2 gap-2">
                                             <button type="button"
                                                     @click="formAdmin.resultado = 'ADMINISTRADA'"
-                                                    :class="formAdmin.resultado === 'ADMINISTRADA' ? 'bg-emerald-600 text-white font-bold' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-title)] font-bold border border-[var(--rm-border)]'"
+                                                    :class="formAdmin.resultado === 'ADMINISTRADA' ? 'bg-[var(--rm-success-action)] text-[var(--rm-text-inverse)] font-bold' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-title)] font-bold border border-[var(--rm-border)]'"
                                                     class="py-2 px-3 rounded-xl text-center transition cursor-pointer text-xs">
                                                 ✓ Administrada
                                             </button>
                                             <button type="button"
                                                     @click="formAdmin.resultado = 'OMITIDA'"
-                                                    :class="formAdmin.resultado === 'OMITIDA' ? 'bg-amber-600 text-white font-bold' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-title)] font-bold border border-[var(--rm-border)]'"
+                                                    :class="formAdmin.resultado === 'OMITIDA' ? 'bg-[var(--rm-warning-action)] text-[var(--rm-text-inverse)] font-bold' : 'bg-[var(--rm-surface-alt)] text-[var(--rm-text-title)] font-bold border border-[var(--rm-border)]'"
                                                     class="py-2 px-3 rounded-xl text-center transition cursor-pointer text-xs">
                                                 ✕ Omitida / Justificada
                                             </button>
@@ -1000,13 +1000,13 @@
                                     {{-- Motivo de omisión si aplica --}}
                                     <template x-if="formAdmin.resultado === 'OMITIDA'">
                                         <div>
-                                            <label class="text-[10.5px] font-bold uppercase text-amber-800 tracking-wider block mb-1">
+                                            <label class="text-[10.5px] font-bold uppercase text-[var(--rm-warning-strong)] tracking-wider block mb-1">
                                                 Motivo justificado de omisión / demora *
                                             </label>
                                             <textarea x-model="formAdmin.motivoOmision"
                                                       rows="2"
                                                       placeholder="Indique la causa clínica o asistencial..."
-                                                      class="w-full rounded-xl border border-amber-300 bg-amber-50/50 p-2.5 text-xs text-[var(--rm-text-title)]"></textarea>
+                                                      class="w-full rounded-xl border border-[var(--rm-warning-strong)] bg-[var(--rm-warning-soft)] p-2.5 text-xs text-[var(--rm-text-title)]"></textarea>
                                         </div>
                                     </template>
 
@@ -1052,7 +1052,7 @@
                                     </button>
                                     <button type="button"
                                             @click="drawerPaso = 'administrar'"
-                                            class="px-4 py-2.5 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-white text-xs font-bold transition cursor-pointer shadow-sm flex items-center gap-1.5">
+                                            class="px-4 py-2.5 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-[var(--rm-text-on-primary)] text-xs font-bold transition cursor-pointer shadow-sm flex items-center gap-1.5">
                                         <i class="ph-bold ph-check"></i>
                                         <span>ADMINISTRAR AHORA</span>
                                     </button>
@@ -1062,7 +1062,7 @@
                             <template x-if="drawerPaso === 'administrar' || drawerPaso === 'justificar'">
                                 <button type="button"
                                         @click="confirmarAdministracion()"
-                                        class="px-5 py-2.5 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-white text-xs font-bold transition cursor-pointer shadow-sm flex items-center gap-1.5">
+                                        class="px-5 py-2.5 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-[var(--rm-text-on-primary)] text-xs font-bold transition cursor-pointer shadow-sm flex items-center gap-1.5">
                                     <i class="ph-bold ph-check-circle"></i>
                                     <span>CONFIRMAR REGISTRO</span>
                                 </button>
@@ -1080,11 +1080,11 @@
     {{-- ========================================================================= --}}
     <div x-show="modalIndicaciones"
          x-cloak
-         class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
+         class="fixed inset-0 z-50 flex items-center justify-center bg-[var(--rm-modal-overlay)] backdrop-blur-xs p-4">
         <div class="w-full max-w-lg rounded-3xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-6 shadow-2xl space-y-4">
             <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-3">
                 <div class="flex items-center gap-2.5">
-                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-[var(--rm-action-primary)] border border-blue-200">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--rm-info-soft)] text-[var(--rm-action-primary)] border border-[var(--rm-info-strong)]">
                         <i class="ph-bold ph-info text-lg"></i>
                     </span>
                     <h3 class="text-sm font-bold text-[var(--rm-text-title)] uppercase">
@@ -1099,7 +1099,7 @@
             </div>
 
             <div class="space-y-3 text-xs text-[var(--rm-text-body)]">
-                <div class="p-3 rounded-xl bg-blue-50/60 border border-blue-200 text-blue-900">
+                <div class="p-3 rounded-xl bg-[var(--rm-info-soft)] border border-[var(--rm-info-strong)] text-[var(--rm-info-strong)]">
                     <p class="font-bold">Protocolo Institucional RememberMind:</p>
                     <p class="text-[11px] mt-1">El personal de enfermería administra estrictamente los tratamientos prescritos en el expediente clínico del residente. Toda omisión o rechazo debe justificarse en el sistema.</p>
                 </div>
@@ -1118,7 +1118,7 @@
             <div class="flex justify-end pt-2 border-t border-[var(--rm-border)]">
                 <button type="button"
                         @click="modalIndicaciones = false"
-                        class="px-4 py-2 rounded-xl bg-[var(--rm-action-primary)] text-white text-xs font-bold hover:bg-[var(--rm-action-primary-hover)] transition">
+                        class="px-4 py-2 rounded-xl bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] text-xs font-bold hover:bg-[var(--rm-action-primary-hover)] transition">
                     Entendido
                 </button>
             </div>

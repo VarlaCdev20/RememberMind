@@ -22,7 +22,7 @@
                     <input type="date" wire:model.live="historialFechaHasta" class="bg-transparent text-xs text-[var(--rm-text-primary)] border-none p-0 focus:ring-0 focus:outline-none" />
                 </div>
                 @if($historialFechaDesde || $historialFechaHasta || $historialFiltroTipo !== 'TODOS')
-                    <button type="button" wire:click="limpiarFiltrosHistorial" class="rounded-xl bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-200 transition">
+                    <button type="button" wire:click="limpiarFiltrosHistorial" class="rounded-xl bg-[var(--rm-surface-soft)] px-3 py-1.5 text-xs font-bold text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-soft)] transition">
                         Limpiar filtros
                     </button>
                 @endif
@@ -44,7 +44,7 @@
             ] as $keyFiltro => $labelFiltro)
                 <button type="button"
                         wire:click="setHistorialFiltro('{{ $keyFiltro }}')"
-                        class="rounded-xl px-3 py-1.5 text-xs font-bold transition {{ $historialFiltroTipo === $keyFiltro ? 'bg-[var(--rm-action-primary)] text-white shadow-xs shadow-sm' : 'bg-[var(--rm-surface-soft)] text-[var(--rm-text-body)] hover:bg-borde' }}">
+                        class="rounded-xl px-3 py-1.5 text-xs font-bold transition {{ $historialFiltroTipo === $keyFiltro ? 'bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] shadow-xs shadow-sm' : 'bg-[var(--rm-surface-soft)] text-[var(--rm-text-body)] hover:bg-borde' }}">
                     {{ $labelFiltro }}
                 </button>
             @endforeach
@@ -60,17 +60,17 @@
             @endphp
 
             @forelse($eventos as $ev)
-                <div class="rounded-2xl border border-[var(--rm-border)]  bg-[var(--rm-surface)] p-4 shadow-sm transition hover:border-blue-300">
+                <div class="rounded-2xl border border-[var(--rm-border)]  bg-[var(--rm-surface)] p-4 shadow-sm transition hover:border-[var(--rm-info-strong)]">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 border-b border-[var(--rm-border)]/50 pb-2 mb-2.5">
                         <div class="flex items-center gap-2">
                             <span class="inline-flex items-center gap-1.5 rounded-lg px-2 py-0.5 text-[11px] font-bold uppercase
-                                {{ $ev['tipo'] === 'SIGNOS' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : '' }}
-                                {{ $ev['tipo'] === 'MEDICACION' ? 'bg-teal-50 text-teal-700 border border-teal-200' : '' }}
-                                {{ $ev['tipo'] === 'TAREA' ? 'bg-blue-50 text-blue-700 border border-blue-200' : '' }}
-                                {{ $ev['tipo'] === 'SEGUIMIENTO' ? 'bg-sky-50 text-sky-700 border border-sky-200' : '' }}
-                                {{ $ev['tipo'] === 'ALERTA' ? 'bg-rose-50 text-rose-700 border border-rose-200' : '' }}
-                                {{ $ev['tipo'] === 'VALORACION' ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : '' }}
-                                {{ $ev['tipo'] === 'PASE_TURNO' ? 'bg-purple-50 text-purple-700 border border-purple-200' : '' }}">
+                                {{ $ev['tipo'] === 'SIGNOS' ? 'bg-[var(--rm-success-soft)] text-[var(--rm-success-strong)] border border-[var(--rm-success-strong)]' : '' }}
+                                {{ $ev['tipo'] === 'MEDICACION' ? 'bg-[var(--rm-success-soft)] text-[var(--rm-success-strong)] border border-[var(--rm-success-strong)]' : '' }}
+                                {{ $ev['tipo'] === 'TAREA' ? 'bg-[var(--rm-info-soft)] text-[var(--rm-info-strong)] border border-[var(--rm-info-strong)]' : '' }}
+                                {{ $ev['tipo'] === 'SEGUIMIENTO' ? 'bg-[var(--rm-info-soft)] text-[var(--rm-info-strong)] border border-[var(--rm-info-strong)]' : '' }}
+                                {{ $ev['tipo'] === 'ALERTA' ? 'bg-[var(--rm-danger-soft)] text-[var(--rm-danger-strong)] border border-[var(--rm-danger-strong)]' : '' }}
+                                {{ $ev['tipo'] === 'VALORACION' ? 'bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] border border-[var(--rm-border-strong)]' : '' }}
+                                {{ $ev['tipo'] === 'PASE_TURNO' ? 'bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] border border-[var(--rm-border-strong)]' : '' }}">
                                 <i class="ph-bold {{ $ev['icon'] ?? 'ph-circle' }}"></i>
                                 {{ $ev['tipo_label'] ?? $ev['tipo'] }}
                             </span>
@@ -119,10 +119,10 @@
                 <div class="rounded-2xl bg-[var(--rm-surface-soft)] p-3 border border-[var(--rm-border)] space-y-1.5 text-xs">
                     <div class="flex items-center justify-between">
                         <span class="font-bold text-[var(--rm-text-body)]">Adherencia Medicación</span>
-                        <span class="font-bold text-emerald-700">{{ $this->resumenLongitudinal['adherencia_pct'] }}%</span>
+                        <span class="font-bold text-[var(--rm-success-strong)]">{{ $this->resumenLongitudinal['adherencia_pct'] }}%</span>
                     </div>
                     <div class="h-1.5 w-full rounded-full bg-borde overflow-hidden">
-                        <div class="h-full bg-emerald-500 rounded-full" style="width: {{ $this->resumenLongitudinal['adherencia_pct'] }}%;"></div>
+                        <div class="h-full bg-[var(--rm-success)] rounded-full" style="width: {{ $this->resumenLongitudinal['adherencia_pct'] }}%;"></div>
                     </div>
                     <p class="text-[11px] text-[var(--rm-text-secondary)]">
                         {{ $this->resumenLongitudinal['admin_ok'] }} administradas de {{ $this->resumenLongitudinal['total_admin'] }} programadas
@@ -133,10 +133,10 @@
                 <div class="rounded-2xl bg-[var(--rm-surface-soft)] p-3 border border-[var(--rm-border)] space-y-1.5 text-xs">
                     <div class="flex items-center justify-between">
                         <span class="font-bold text-[var(--rm-text-body)]">Cumplimiento Cuidados</span>
-                        <span class="font-bold text-blue-700">{{ $this->resumenLongitudinal['cumplimiento_pct'] }}%</span>
+                        <span class="font-bold text-[var(--rm-info-strong)]">{{ $this->resumenLongitudinal['cumplimiento_pct'] }}%</span>
                     </div>
                     <div class="h-1.5 w-full rounded-full bg-borde overflow-hidden">
-                        <div class="h-full bg-blue-500 rounded-full" style="width: {{ $this->resumenLongitudinal['cumplimiento_pct'] }}%;"></div>
+                        <div class="h-full bg-[var(--rm-info)] rounded-full" style="width: {{ $this->resumenLongitudinal['cumplimiento_pct'] }}%;"></div>
                     </div>
                     <p class="text-[11px] text-[var(--rm-text-secondary)]">
                         {{ $this->resumenLongitudinal['tareas_realizadas'] }} realizadas de {{ $this->resumenLongitudinal['total_tareas'] }} totales
@@ -147,13 +147,13 @@
                 <div class="rounded-2xl bg-[var(--rm-surface-soft)] p-3 border border-[var(--rm-border)] text-xs space-y-1">
                     <span class="font-bold text-[var(--rm-text-body)] block mb-1">Vigilancia de Alertas</span>
                     <div class="grid grid-cols-2 gap-2 text-center">
-                        <div class="rounded-lg bg-rose-50 p-2 border border-rose-200">
-                            <span class="text-sm font-bold text-rose-800 block">{{ $this->resumenLongitudinal['alertas_activas'] }}</span>
-                            <span class="text-[11px] font-bold text-rose-700 uppercase">Activas</span>
+                        <div class="rounded-lg bg-[var(--rm-danger-soft)] p-2 border border-[var(--rm-danger-strong)]">
+                            <span class="text-sm font-bold text-[var(--rm-danger-strong)] block">{{ $this->resumenLongitudinal['alertas_activas'] }}</span>
+                            <span class="text-[11px] font-bold text-[var(--rm-danger-strong)] uppercase">Activas</span>
                         </div>
-                        <div class="rounded-lg bg-emerald-50 p-2 border border-emerald-200">
-                            <span class="text-sm font-bold text-emerald-800 block">{{ $this->resumenLongitudinal['alertas_cerradas'] }}</span>
-                            <span class="text-[11px] font-bold text-emerald-700 uppercase">Cerradas</span>
+                        <div class="rounded-lg bg-[var(--rm-success-soft)] p-2 border border-[var(--rm-success-strong)]">
+                            <span class="text-sm font-bold text-[var(--rm-success-strong)] block">{{ $this->resumenLongitudinal['alertas_cerradas'] }}</span>
+                            <span class="text-[11px] font-bold text-[var(--rm-success-strong)] uppercase">Cerradas</span>
                         </div>
                     </div>
                 </div>

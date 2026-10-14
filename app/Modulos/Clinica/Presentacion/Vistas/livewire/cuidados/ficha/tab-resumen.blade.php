@@ -185,12 +185,12 @@
                 {{-- Alergias --}}
                 <div class="border-t border-[var(--rm-border-soft)] pt-2.5">
                     <span class="text-[11px] font-bold text-[var(--rm-text-title)] flex items-center gap-1.5 mb-1.5">
-                        <i class="ph-bold ph-warning-circle text-[var(--rm-danger)]"></i>
+                        <i class="ph-bold ph-warning-circle text-[var(--rm-danger-strong)]"></i>
                         <span>Alergias</span>
                     </span>
                     @if($alergiasConocidas->isNotEmpty())
                         <div class="flex items-center gap-1.5 rounded-xl border border-[var(--rm-danger)]/25 bg-[var(--rm-danger-soft)] p-2 text-xs font-semibold text-[var(--rm-danger-strong)]">
-                            <i class="ph-bold ph-warning text-[var(--rm-danger)] text-sm shrink-0"></i>
+                            <i class="ph-bold ph-warning text-[var(--rm-danger-strong)] text-sm shrink-0"></i>
                             <span>{{ $alergiasTexto }}</span>
                         </div>
                     @else
@@ -201,7 +201,7 @@
                 {{-- Antecedentes relevantes --}}
                 <div class="border-t border-[var(--rm-border-soft)] pt-2.5">
                     <span class="text-[11px] font-bold text-[var(--rm-text-title)] flex items-center gap-1.5 mb-1.5">
-                        <i class="ph-bold ph-clock-counter-clockwise text-[var(--rm-info)]"></i>
+                        <i class="ph-bold ph-clock-counter-clockwise text-[var(--rm-info-strong)]"></i>
                         <span>Antecedentes relevantes</span>
                     </span>
                     @if($antecedentesRelevantes->isNotEmpty())
@@ -237,7 +237,7 @@
                 {{-- Contacto de emergencia --}}
                 <div class="border-t border-[var(--rm-border-soft)] pt-2.5">
                     <span class="text-[11px] font-bold text-[var(--rm-text-title)] flex items-center gap-1.5 mb-1.5">
-                        <i class="ph-bold ph-phone-call text-[var(--rm-success)]"></i>
+                        <i class="ph-bold ph-phone-call text-[var(--rm-success-strong)]"></i>
                         <span>Contacto de emergencia</span>
                     </span>
                     @if($contactoEmergencia)
@@ -293,7 +293,7 @@
         <div class="rm-clinical-card space-y-3">
             <div class="rm-clinical-card__header">
                 <h3 class="rm-clinical-card__title">
-                    <i class="ph-bold ph-warning-octagon text-[var(--rm-danger)] text-sm"></i>
+                    <i class="ph-bold ph-warning-octagon text-[var(--rm-danger-strong)] text-sm"></i>
                     <span>Alertas activas</span>
                 </h3>
                 <button type="button"
@@ -310,14 +310,14 @@
                         <div class="rm-action-item border-[var(--rm-danger)]/25 bg-[var(--rm-danger-soft)]">
                             <div class="min-w-0 pr-1">
                                 <span class="block truncate font-bold text-[var(--rm-danger-strong)]">{{ $al->tipo_alerta ?? $al->motivo ?? $al->tipo }}</span>
-                                <span class="block text-[10px] text-[var(--rm-danger)]">{{ $al->origen ?: 'Origen no registrado' }}</span>
+                                <span class="block text-[10px] text-[var(--rm-danger-strong)]">{{ $al->origen ?: 'Origen no registrado' }}</span>
                             </div>
                             <x-ui.status-badge :estado="$al->nivel ?? $al->prioridad" class="shrink-0" />
                         </div>
                     @endforeach
                 @else
                     <div class="flex items-center gap-2 rounded-xl border border-[var(--rm-success)]/25 bg-[var(--rm-success-soft)] p-3 text-xs text-[var(--rm-success-strong)]">
-                        <i class="ph-bold ph-shield-check text-[var(--rm-success)] text-base shrink-0"></i>
+                        <i class="ph-bold ph-shield-check text-[var(--rm-success-strong)] text-base shrink-0"></i>
                         <span>Sin alertas clínicas activas registradas.</span>
                     </div>
                 @endif
@@ -363,7 +363,7 @@
                 {{-- Dependencia (Barthel) --}}
                 <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Dependencia</span>
-                    <span class="mt-0.5 block text-xs font-bold text-[var(--rm-info)]">
+                    <span class="mt-0.5 block text-xs font-bold text-[var(--rm-info-strong)]">
                         {{ $ultFunc?->indice_barthel !== null ? $ultFunc->indice_barthel.' / 100' : 'No registrado' }}
                     </span>
                 </div>
@@ -578,7 +578,7 @@
                         <div x-show="metrica === 'fc'" x-cloak>
                             <div class="flex items-center justify-between text-[10px] font-semibold text-[var(--rm-text-muted)] mb-1">
                                 <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-[var(--rm-danger)]"></span> Frecuencia cardíaca</span>
-                                <span class="font-bold text-[var(--rm-danger)]">bpm</span>
+                                <span class="font-bold text-[var(--rm-danger-strong)]">bpm</span>
                             </div>
                             <svg viewBox="0 0 {{ $width }} {{ $height }}" class="w-full h-24 overflow-visible">
                                 <defs>
@@ -605,7 +605,7 @@
                         <div x-show="metrica === 'spo2'" x-cloak>
                             <div class="flex items-center justify-between text-[10px] font-semibold text-[var(--rm-text-muted)] mb-1">
                                 <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-[var(--rm-success)]"></span> Saturación SpO₂</span>
-                                <span class="font-bold text-[var(--rm-success)]">%</span>
+                                <span class="font-bold text-[var(--rm-success-strong)]">%</span>
                             </div>
                             <svg viewBox="0 0 {{ $width }} {{ $height }}" class="w-full h-24 overflow-visible">
                                 <defs>
@@ -632,7 +632,7 @@
                         <div x-show="metrica === 'temp'" x-cloak>
                             <div class="flex items-center justify-between text-[10px] font-semibold text-[var(--rm-text-muted)] mb-1">
                                 <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-[var(--rm-warning)]"></span> Temperatura</span>
-                                <span class="font-bold text-[var(--rm-warning)]">°C</span>
+                                <span class="font-bold text-[var(--rm-warning-strong)]">°C</span>
                             </div>
                             <svg viewBox="0 0 {{ $width }} {{ $height }}" class="w-full h-24 overflow-visible">
                                 <defs>
@@ -670,15 +670,15 @@
                             </div>
                             <div class="p-1 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
                                 <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">FC</span>
-                                <span class="block text-xs font-bold text-[var(--rm-danger)]">{{ $ultimoSigno->frecuencia_cardiaca ?: '—' }}</span>
+                                <span class="block text-xs font-bold text-[var(--rm-danger-strong)]">{{ $ultimoSigno->frecuencia_cardiaca ?: '—' }}</span>
                             </div>
                             <div class="p-1 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
                                 <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">SpO₂</span>
-                                <span class="block text-xs font-bold text-[var(--rm-success)]">{{ ($ultimoSigno->saturacion_oxigeno ?? $ultimoSigno->saturacion) ? ($ultimoSigno->saturacion_oxigeno ?? $ultimoSigno->saturacion) . '%' : '—' }}</span>
+                                <span class="block text-xs font-bold text-[var(--rm-success-strong)]">{{ ($ultimoSigno->saturacion_oxigeno ?? $ultimoSigno->saturacion) ? ($ultimoSigno->saturacion_oxigeno ?? $ultimoSigno->saturacion) . '%' : '—' }}</span>
                             </div>
                             <div class="p-1 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border-soft)]">
                                 <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Temp</span>
-                                <span class="block text-xs font-bold text-[var(--rm-warning)]">{{ $ultimoSigno->temperatura ? $ultimoSigno->temperatura . ' °C' : '—' }}</span>
+                                <span class="block text-xs font-bold text-[var(--rm-warning-strong)]">{{ $ultimoSigno->temperatura ? $ultimoSigno->temperatura . ' °C' : '—' }}</span>
                             </div>
                         </div>
                     </div>
@@ -707,7 +707,7 @@
                 @foreach($proxTareas as $tarea)
                     <div class="rm-action-item">
                         <div class="flex items-center gap-2 min-w-0 pr-2">
-                            <i class="ph-bold ph-hand-heart text-[var(--rm-info)] text-base shrink-0"></i>
+                            <i class="ph-bold ph-hand-heart text-[var(--rm-info-strong)] text-base shrink-0"></i>
                             <div class="truncate">
                                 <span class="font-bold text-[var(--rm-text-title)] block truncate">{{ $tarea->intervencion?->nombre ?: 'Intervención de cuidado' }}</span>
                                 <span class="text-[10px] text-[var(--rm-text-muted)] block">{{ $tarea->fecha_hora_programada->format('d/m/Y H:i') }}</span>
@@ -720,7 +720,7 @@
                 @foreach($proxAdmin as $administracion)
                     <div class="rm-action-item">
                         <div class="flex items-center gap-2 min-w-0 pr-2">
-                            <i class="ph-bold ph-pill text-[var(--rm-success)] text-base shrink-0"></i>
+                            <i class="ph-bold ph-pill text-[var(--rm-success-strong)] text-base shrink-0"></i>
                             <div class="truncate">
                                 <span class="font-bold text-[var(--rm-text-title)] block truncate">{{ $administracion->medicacion?->medicamento?->nombre ?: 'Medicación prescrita' }}</span>
                                 <span class="text-[10px] text-[var(--rm-text-muted)] block">{{ $administracion->fecha_hora_programada->format('d/m/Y H:i') }}</span>

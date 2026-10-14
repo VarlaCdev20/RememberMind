@@ -68,7 +68,7 @@
     {{-- ========================================================================= --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 sm:p-5 rounded-3xl border border-[var(--rm-border)] bg-[var(--rm-surface)] shadow-xs">
         <div class="flex items-center gap-3.5">
-            <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-[var(--rm-action-primary)] border border-blue-200/70 shadow-2xs dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+            <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--rm-info-soft)] text-[var(--rm-action-primary)] border border-[var(--rm-info-strong)] shadow-2xs dark:bg-[var(--rm-info-soft)] dark:text-[var(--rm-info-strong)] dark:border-[var(--rm-info-strong)]">
                 <i class="ph-bold ph-shield-warning text-2xl"></i>
             </span>
             <div>
@@ -85,7 +85,7 @@
             @if(!$consultaEnfermeria)
 <button type="button"
                     wire:click="abrirModalRegistrarEvento"
-                    class="px-4 py-2.5 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-white font-extrabold text-xs transition cursor-pointer shadow-sm flex items-center gap-2">
+                    class="px-4 py-2.5 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-[var(--rm-text-on-primary)] font-extrabold text-xs transition cursor-pointer shadow-sm flex items-center gap-2">
                 <i class="ph-bold ph-plus-circle text-base"></i>
                 <span>Registrar evento</span>
             </button>
@@ -100,48 +100,48 @@
         {{-- PARTE IZQUIERDA: 4 KPIS COMPACTOS (5 cols en lg) --}}
         <div class="lg:col-span-5 grid grid-cols-2 gap-3">
             {{-- KPI 1: Eventos activos --}}
-            <div class="p-3.5 sm:p-4 rounded-2xl border border-rose-200/90 bg-rose-50/70 shadow-2xs dark:bg-rose-950/30 dark:border-rose-900/60 flex flex-col justify-between">
+            <div class="p-3.5 sm:p-4 rounded-2xl border border-[var(--rm-danger-strong)] bg-[var(--rm-danger-soft)] shadow-2xs dark:bg-[var(--rm-danger-soft)] dark:border-[var(--rm-danger-strong)] flex flex-col justify-between">
                 <div class="flex items-center justify-between">
-                    <span class="text-[11px] font-bold text-rose-900 dark:text-rose-200 uppercase tracking-wider">Eventos activos</span>
-                    <i class="ph-bold ph-warning-octagon text-rose-600 text-lg"></i>
+                    <span class="text-[11px] font-bold text-[var(--rm-danger-strong)] dark:text-[var(--rm-danger-strong)] uppercase tracking-wider">Eventos activos</span>
+                    <i class="ph-bold ph-warning-octagon text-[var(--rm-danger-strong)] text-lg"></i>
                 </div>
                 <div class="mt-2.5">
-                    <span class="text-2xl sm:text-3xl font-bold text-rose-700 dark:text-rose-300 font-mono tracking-tight">
+                    <span class="text-2xl sm:text-3xl font-bold text-[var(--rm-danger-strong)] dark:text-[var(--rm-danger-strong)] font-mono tracking-tight">
                         {{ $metricas['activos'] }}
                     </span>
-                    <p class="text-[10.5px] font-semibold text-rose-800/90 dark:text-rose-300/80 mt-0.5">
+                    <p class="text-[10.5px] font-semibold text-[var(--rm-danger-strong)] dark:text-[var(--rm-danger-strong)] mt-0.5">
                         Requieren seguimiento
                     </p>
                 </div>
             </div>
 
             {{-- KPI 2: En seguimiento --}}
-            <div class="p-3.5 sm:p-4 rounded-2xl border border-amber-200/90 bg-amber-50/70 shadow-2xs dark:bg-amber-950/30 dark:border-amber-900/60 flex flex-col justify-between">
+            <div class="p-3.5 sm:p-4 rounded-2xl border border-[var(--rm-warning-strong)] bg-[var(--rm-warning-soft)] shadow-2xs dark:bg-[var(--rm-warning-soft)] dark:border-[var(--rm-warning-strong)] flex flex-col justify-between">
                 <div class="flex items-center justify-between">
-                    <span class="text-[11px] font-bold text-amber-900 dark:text-amber-200 uppercase tracking-wider">En seguimiento</span>
-                    <i class="ph-bold ph-clock-countdown text-amber-600 text-lg"></i>
+                    <span class="text-[11px] font-bold text-[var(--rm-warning-strong)] dark:text-[var(--rm-warning-strong)] uppercase tracking-wider">En seguimiento</span>
+                    <i class="ph-bold ph-clock-countdown text-[var(--rm-warning-strong)] text-lg"></i>
                 </div>
                 <div class="mt-2.5">
-                    <span class="text-2xl sm:text-3xl font-bold text-amber-700 dark:text-amber-300 font-mono tracking-tight">
+                    <span class="text-2xl sm:text-3xl font-bold text-[var(--rm-warning-strong)] dark:text-[var(--rm-warning-strong)] font-mono tracking-tight">
                         {{ $metricas['en_seguimiento'] }}
                     </span>
-                    <p class="text-[10.5px] font-semibold text-amber-800/90 dark:text-amber-300/80 mt-0.5">
+                    <p class="text-[10.5px] font-semibold text-[var(--rm-warning-strong)] dark:text-[var(--rm-warning-strong)] mt-0.5">
                         En evaluación
                     </p>
                 </div>
             </div>
 
             {{-- KPI 3: Resueltos --}}
-            <div class="p-3.5 sm:p-4 rounded-2xl border border-emerald-200/90 bg-emerald-50/70 shadow-2xs dark:bg-emerald-950/30 dark:border-emerald-900/60 flex flex-col justify-between">
+            <div class="p-3.5 sm:p-4 rounded-2xl border border-[var(--rm-success-strong)] bg-[var(--rm-success-soft)] shadow-2xs dark:bg-[var(--rm-success-soft)] dark:border-[var(--rm-success-strong)] flex flex-col justify-between">
                 <div class="flex items-center justify-between">
-                    <span class="text-[11px] font-bold text-emerald-900 dark:text-emerald-200 uppercase tracking-wider">Resueltos</span>
-                    <i class="ph-bold ph-check-circle text-emerald-600 text-lg"></i>
+                    <span class="text-[11px] font-bold text-[var(--rm-success-strong)] dark:text-[var(--rm-success-strong)] uppercase tracking-wider">Resueltos</span>
+                    <i class="ph-bold ph-check-circle text-[var(--rm-success-strong)] text-lg"></i>
                 </div>
                 <div class="mt-2.5">
-                    <span class="text-2xl sm:text-3xl font-bold text-emerald-700 dark:text-emerald-300 font-mono tracking-tight">
+                    <span class="text-2xl sm:text-3xl font-bold text-[var(--rm-success-strong)] dark:text-[var(--rm-success-strong)] font-mono tracking-tight">
                         {{ $metricas['resueltos'] }}
                     </span>
-                    <p class="text-[10.5px] font-semibold text-emerald-800/90 dark:text-emerald-300/80 mt-0.5">
+                    <p class="text-[10.5px] font-semibold text-[var(--rm-success-strong)] dark:text-[var(--rm-success-strong)] mt-0.5">
                         Sin pendientes
                     </p>
                 </div>
@@ -151,10 +151,10 @@
             <div class="p-3.5 sm:p-4 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] shadow-2xs flex flex-col justify-between">
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-bold text-[var(--rm-text-muted)] uppercase tracking-wider">Críticos</span>
-                    <i class="ph-bold ph-shield-warning {{ $metricas['criticos'] > 0 ? 'text-rose-600' : 'text-slate-400' }} text-lg"></i>
+                    <i class="ph-bold ph-shield-warning {{ $metricas['criticos'] > 0 ? 'text-[var(--rm-danger-strong)]' : 'text-[var(--rm-text-muted)]' }} text-lg"></i>
                 </div>
                 <div class="mt-2.5">
-                    <span class="text-2xl sm:text-3xl font-bold {{ $metricas['criticos'] > 0 ? 'text-rose-600' : 'text-[var(--rm-text-title)]' }} font-mono tracking-tight">
+                    <span class="text-2xl sm:text-3xl font-bold {{ $metricas['criticos'] > 0 ? 'text-[var(--rm-danger-strong)]' : 'text-[var(--rm-text-title)]' }} font-mono tracking-tight">
                         {{ $metricas['criticos'] }}
                     </span>
                     <p class="text-[10.5px] font-semibold text-[var(--rm-text-muted)] mt-0.5">
@@ -218,28 +218,28 @@
                     </div>
                     <div class="flex items-center justify-between gap-1">
                         <span class="flex items-center gap-1.5 truncate">
-                            <span class="h-2 w-2 rounded-full bg-amber-500 shrink-0"></span>
+                            <span class="h-2 w-2 rounded-full bg-[var(--rm-warning)] shrink-0"></span>
                             <span>Lesiones</span>
                         </span>
                         <strong class="font-mono text-[var(--rm-text-title)]">{{ $porTipo['percentages']['Lesiones'] ?? 0 }}%</strong>
                     </div>
                     <div class="flex items-center justify-between gap-1">
                         <span class="flex items-center gap-1.5 truncate">
-                            <span class="h-2 w-2 rounded-full bg-blue-500 shrink-0"></span>
+                            <span class="h-2 w-2 rounded-full bg-[var(--rm-info)] shrink-0"></span>
                             <span>Incidentes</span>
                         </span>
                         <strong class="font-mono text-[var(--rm-text-title)]">{{ $porTipo['percentages']['Incidentes'] ?? 0 }}%</strong>
                     </div>
                     <div class="flex items-center justify-between gap-1">
                         <span class="flex items-center gap-1.5 truncate">
-                            <span class="h-2 w-2 rounded-full bg-rose-500 shrink-0"></span>
+                            <span class="h-2 w-2 rounded-full bg-[var(--rm-danger)] shrink-0"></span>
                             <span>Complicac.</span>
                         </span>
                         <strong class="font-mono text-[var(--rm-text-title)]">{{ $porTipo['percentages']['Complicaciones'] ?? 0 }}%</strong>
                     </div>
                     <div class="flex items-center justify-between gap-1">
                         <span class="flex items-center gap-1.5 truncate">
-                            <span class="h-2 w-2 rounded-full bg-slate-400 shrink-0"></span>
+                            <span class="h-2 w-2 rounded-full bg-[var(--rm-surface-soft)] shrink-0"></span>
                             <span>Otros</span>
                         </span>
                         <strong class="font-mono text-[var(--rm-text-title)]">{{ $porTipo['percentages']['Otros'] ?? 0 }}%</strong>
@@ -329,7 +329,7 @@
                     </h3>
                 </div>
                 <div class="flex items-center gap-2">
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-blue-50 text-[var(--rm-action-primary)] dark:bg-blue-950/50 dark:text-blue-300 border border-blue-200 dark:border-blue-900/50" title="Panel deslizable verticalmente">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-[var(--rm-info-soft)] text-[var(--rm-action-primary)] dark:bg-[var(--rm-info-soft)] dark:text-[var(--rm-info-strong)] border border-[var(--rm-info-strong)] dark:border-[var(--rm-info-strong)]" title="Panel deslizable verticalmente">
                         <i class="ph-bold ph-arrows-down-up text-[11px]"></i>
                         <span>Deslizable</span>
                     </span>
@@ -341,7 +341,7 @@
 
             @if(count($eventos) === 0)
                 <div class="py-12 text-center text-xs text-[var(--rm-text-muted)] space-y-2">
-                    <i class="ph-bold ph-shield-check text-3xl text-slate-300 dark:text-slate-600 block"></i>
+                    <i class="ph-bold ph-shield-check text-3xl text-[var(--rm-text-muted)] dark:text-[var(--rm-text-secondary)] block"></i>
                     <p class="font-bold text-[var(--rm-text-title)]">No se encontraron eventos clínicos con los filtros actuales.</p>
                     <p>Modifique la búsqueda o el período seleccionado.</p>
                 </div>
@@ -349,18 +349,18 @@
                 {{-- Contenedor deslizable (scrollable timeline) para explorar eventos cómodamente --}}
                 <div class="max-h-[640px] overflow-y-auto pr-2 sm:pr-2.5 space-y-3.5 custom-timeline-scroll focus:outline-hidden" tabindex="0" title="Desliza verticalmente para ver todos los eventos">
                     {{-- Línea vertical con puntos semánticos --}}
-                    <div class="relative pl-6 space-y-3.5 before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-700">
+                    <div class="relative pl-6 space-y-3.5 before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-[var(--rm-surface-soft)] dark:before:bg-[var(--rm-surface-soft)]">
                     @foreach($eventos as $ev)
                         @php
                             $esSeleccionado = ($eventoActivo['id'] ?? '') === $ev['id'];
                         @endphp
                         <div class="relative">
                             {{-- Punto semántico vertical --}}
-                            <span class="absolute -left-6 top-4 h-3.5 w-3.5 rounded-full border-2 border-white dark:border-slate-900 {{ $ev['color_dot'] }} shadow-xs transition-transform {{ $esSeleccionado ? 'scale-125 ring-2 ring-[var(--rm-action-primary)]/40' : '' }}"></span>
+                            <span class="absolute -left-6 top-4 h-3.5 w-3.5 rounded-full border-2 border-white dark:border-[var(--rm-border)] {{ $ev['color_dot'] }} shadow-xs transition-transform {{ $esSeleccionado ? 'scale-125 ring-2 ring-[var(--rm-action-primary)]/40' : '' }}"></span>
 
                             {{-- Tarjeta interactiva del evento --}}
                             <div wire:click="seleccionarEvento('{{ $ev['id'] }}')"
-                                 class="w-full text-left p-3.5 rounded-2xl border transition cursor-pointer {{ $esSeleccionado ? 'border-[var(--rm-action-primary)] bg-blue-50/70 dark:bg-blue-950/30 ring-1 ring-[var(--rm-action-primary)]/30 shadow-xs' : 'border-[var(--rm-border)] bg-[var(--rm-surface-alt)] hover:border-slate-300 dark:hover:border-slate-600' }}">
+                                 class="w-full text-left p-3.5 rounded-2xl border transition cursor-pointer {{ $esSeleccionado ? 'border-[var(--rm-action-primary)] bg-[var(--rm-info-soft)] dark:bg-[var(--rm-info-soft)] ring-1 ring-[var(--rm-action-primary)]/30 shadow-xs' : 'border-[var(--rm-border)] bg-[var(--rm-surface-alt)] hover:border-[var(--rm-border)] dark:hover:border-[var(--rm-border)]' }}">
                                 <div class="flex items-start justify-between gap-2">
                                     <div class="flex items-center gap-2">
                                         <span class="font-mono text-[10.5px] font-bold text-[var(--rm-text-muted)]">
@@ -387,7 +387,7 @@
                                     <span class="font-medium">
                                         {{ $ev['profesional_nombre'] }} · {{ $ev['profesional_rol'] }}
                                     </span>
-                                    <span class="flex items-center gap-0.5 text-xs font-bold {{ $esSeleccionado ? 'text-[var(--rm-action-primary)] dark:text-blue-400' : 'text-slate-400' }}">
+                                    <span class="flex items-center gap-0.5 text-xs font-bold {{ $esSeleccionado ? 'text-[var(--rm-action-primary)] dark:text-[var(--rm-info-strong)]' : 'text-[var(--rm-text-muted)]' }}">
                                         <span>Detalle</span>
                                         <i class="ph-bold ph-caret-right"></i>
                                     </span>
@@ -419,7 +419,7 @@
         <div class="lg:col-span-6 rounded-3xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-4 sm:p-5 shadow-sm space-y-4 lg:sticky lg:top-4">
             @if(!$eventoActivo)
                 <div class="py-16 text-center text-xs text-[var(--rm-text-muted)]">
-                    <i class="ph-bold ph-cursor-click text-3xl text-slate-300 block mb-1"></i>
+                    <i class="ph-bold ph-cursor-click text-3xl text-[var(--rm-text-muted)] block mb-1"></i>
                     <p class="font-bold text-[var(--rm-text-title)]">Seleccione un evento clínico de la lista</p>
                     <p>Haga clic en cualquier evento de la izquierda para ver su detalle completo.</p>
                 </div>
@@ -442,12 +442,12 @@
 
                     {{-- Si está resuelto, mostrar banner con datos de cierre --}}
                     @if($eventoActivo['estado'] === 'RESUELTO' && !empty($eventoActivo['resolucion']))
-                        <div class="p-2.5 rounded-xl bg-emerald-50/80 border border-emerald-300 text-emerald-950 text-xs flex items-center justify-between gap-2">
+                        <div class="p-2.5 rounded-xl bg-[var(--rm-success-soft)] border border-[var(--rm-success-strong)] text-[var(--rm-success-strong)] text-xs flex items-center justify-between gap-2">
                             <span class="flex items-center gap-1.5 font-bold">
-                                <i class="ph-bold ph-check-circle text-emerald-600"></i>
+                                <i class="ph-bold ph-check-circle text-[var(--rm-success-strong)]"></i>
                                 <span>Resuelto: {{ $eventoActivo['resolucion']['descripcion'] ?? 'Caso cerrado satisfactoriamente.' }}</span>
                             </span>
-                            <span class="font-mono text-[10.5px] text-emerald-800 shrink-0">
+                            <span class="font-mono text-[10.5px] text-[var(--rm-success-strong)] shrink-0">
                                 {{ $eventoActivo['resolucion']['fecha'] ?? '' }}
                             </span>
                         </div>
@@ -470,7 +470,7 @@
                     @foreach($tabsDetalle as $tKey => $tLabel)
                         <button type="button"
                                 wire:click="setTabDetalleEvento('{{ $tKey }}')"
-                                class="px-3 py-1.5 rounded-xl font-extrabold transition cursor-pointer whitespace-nowrap {{ $tabDetalleEvento === $tKey ? 'bg-[var(--rm-action-primary)] text-white shadow-2xs' : 'text-[var(--rm-text-body)] hover:text-[var(--rm-text-title)] hover:bg-[var(--rm-surface-alt)]' }}">
+                                class="px-3 py-1.5 rounded-xl font-extrabold transition cursor-pointer whitespace-nowrap {{ $tabDetalleEvento === $tKey ? 'bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] shadow-2xs' : 'text-[var(--rm-text-body)] hover:text-[var(--rm-text-title)] hover:bg-[var(--rm-surface-alt)]' }}">
                             {{ $tLabel }}
                         </button>
                     @endforeach
@@ -529,8 +529,8 @@
                                     </div>
 
                                     {{-- Conclusión inicial --}}
-                                    <div class="p-3 rounded-xl bg-blue-50/80 border border-blue-200 dark:bg-blue-950/40 dark:border-blue-900 text-blue-950 dark:text-blue-200">
-                                        <h5 class="text-[10.5px] font-bold uppercase tracking-wide text-[var(--rm-action-primary)] dark:text-blue-300">
+                                    <div class="p-3 rounded-xl bg-[var(--rm-info-soft)] border border-[var(--rm-info-strong)] dark:bg-[var(--rm-info-soft)] dark:border-[var(--rm-info-strong)] text-[var(--rm-info-strong)] dark:text-[var(--rm-info-strong)]">
+                                        <h5 class="text-[10.5px] font-bold uppercase tracking-wide text-[var(--rm-action-primary)] dark:text-[var(--rm-info-strong)]">
                                             Conclusión inicial
                                         </h5>
                                         <p class="text-xs font-semibold mt-0.5">
@@ -559,7 +559,7 @@
                                 {{-- 2. Próxima evaluación --}}
                                 <div class="p-3 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] flex flex-col justify-between">
                                     <div class="flex items-center gap-2">
-                                        <i class="ph-bold ph-calendar-check text-amber-600 text-base"></i>
+                                        <i class="ph-bold ph-calendar-check text-[var(--rm-warning-strong)] text-base"></i>
                                         <h5 class="text-[11px] font-bold uppercase tracking-wider text-[var(--rm-text-title)]">
                                             Próxima evaluación
                                         </h5>
@@ -573,7 +573,7 @@
                                 {{-- 3. Plan de seguimiento --}}
                                 <div class="p-3 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] flex flex-col justify-between">
                                     <div class="flex items-center gap-2">
-                                        <i class="ph-bold ph-check-square-offset text-emerald-600 text-base"></i>
+                                        <i class="ph-bold ph-check-square-offset text-[var(--rm-success-strong)] text-base"></i>
                                         <h5 class="text-[11px] font-bold uppercase tracking-wider text-[var(--rm-text-title)]">
                                             Plan de seguimiento
                                         </h5>
@@ -581,7 +581,7 @@
                                     <ul class="mt-2 space-y-1 text-[11px] text-[var(--rm-text-body)]">
                                         @foreach($eventoActivo['plan_seguimiento'] as $tarea)
                                             <li class="flex items-center gap-1.5">
-                                                <i class="ph-bold ph-check text-emerald-600 text-xs"></i>
+                                                <i class="ph-bold ph-check text-[var(--rm-success-strong)] text-xs"></i>
                                                 <span class="truncate">{{ $tarea['texto'] }}</span>
                                             </li>
                                         @endforeach
@@ -609,7 +609,7 @@
                                 </div>
                                 <div class="p-3 rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)]">
                                     <span class="text-[10.5px] font-bold uppercase text-[var(--rm-text-muted)] block">Dolor (Escala EVA)</span>
-                                    <p class="font-bold text-rose-700 mt-0.5">{{ $eventoActivo['valoracion']['dolor_eva'] }} / 10</p>
+                                    <p class="font-bold text-[var(--rm-danger-strong)] mt-0.5">{{ $eventoActivo['valoracion']['dolor_eva'] }} / 10</p>
                                 </div>
                                 <div class="p-3 rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)]">
                                     <span class="text-[10.5px] font-bold uppercase text-[var(--rm-text-muted)] block">Signos vitales al momento</span>
@@ -642,7 +642,7 @@
                                         </span>
                                         <div class="flex-1">
                                             <p class="font-bold text-[var(--rm-text-title)] text-xs flex items-center gap-1.5">
-                                                <i class="ph-bold ph-check text-emerald-600"></i>
+                                                <i class="ph-bold ph-check text-[var(--rm-success-strong)]"></i>
                                                 <span>{{ $acc['accion'] }}</span>
                                             </p>
                                             <p class="text-[10.5px] text-[var(--rm-text-muted)] mt-0.5">
@@ -681,7 +681,7 @@
                                     @foreach($eventoActivo['seguimiento']['acciones_pendientes'] as $ap)
                                         <div class="flex items-center justify-between p-2.5 rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)]">
                                             <span class="font-bold text-xs text-[var(--rm-text-title)]">{{ $ap['titulo'] }}</span>
-                                            <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-blue-50 text-[var(--rm-action-primary)] border border-blue-200">
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-[var(--rm-info-soft)] text-[var(--rm-action-primary)] border border-[var(--rm-info-strong)]">
                                                 {{ $ap['estado'] }}
                                             </span>
                                         </div>
@@ -710,7 +710,7 @@
                                         </div>
                                         <button type="button"
                                                 onclick="alert('Descargando copia clínica oficial: {{ $doc['nombre'] }}')"
-                                                class="px-2.5 py-1 rounded-lg border border-[var(--rm-border)] hover:bg-slate-100 text-xs font-bold transition cursor-pointer">
+                                                class="px-2.5 py-1 rounded-lg border border-[var(--rm-border)] hover:bg-[var(--rm-surface-soft)] text-xs font-bold transition cursor-pointer">
                                             Consultar
                                         </button>
                                     </div>
@@ -728,7 +728,7 @@
                                 <i class="ph-bold ph-fingerprint text-[var(--rm-action-primary)]"></i>
                                 <span>Trazabilidad y auditoría clínica (Inmutable)</span>
                             </h4>
-                            <div class="space-y-2.5 relative pl-4 before:absolute before:left-1.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-300 dark:before:bg-slate-700">
+                            <div class="space-y-2.5 relative pl-4 before:absolute before:left-1.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-[var(--rm-surface-soft)] dark:before:bg-[var(--rm-surface-soft)]">
                                 @foreach($eventoActivo['trazabilidad'] as $tz)
                                     <div class="relative flex items-start gap-2 text-xs">
                                         <span class="h-2 w-2 rounded-full bg-[var(--rm-action-primary)] mt-1 shrink-0 -ml-[19px]"></span>
@@ -754,12 +754,12 @@
     {{-- ========================================================================= --}}
     @if($modalRegistrarEvento)
         <div class="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
-            <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity" wire:click="cerrarModalRegistrarEvento"></div>
+            <div class="fixed inset-0 bg-[var(--rm-modal-overlay)] backdrop-blur-xs transition-opacity" wire:click="cerrarModalRegistrarEvento"></div>
             <div class="flex min-h-screen items-center justify-center p-4">
                 <div class="relative w-full max-w-xl rounded-3xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-6 shadow-2xl space-y-4">
                     <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-3">
                         <div class="flex items-center gap-2.5">
-                            <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-[var(--rm-action-primary)] border border-blue-200">
+                            <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--rm-info-soft)] text-[var(--rm-action-primary)] border border-[var(--rm-info-strong)]">
                                 <i class="ph-bold ph-first-aid text-xl"></i>
                             </span>
                             <div>
@@ -769,7 +769,7 @@
                                 <p class="text-[11px] text-[var(--rm-text-muted)]">Ficha del Residente: {{ $adultoMayor->nombres }} {{ $adultoMayor->ap_paterno }}</p>
                             </div>
                         </div>
-                        <button type="button" wire:click="cerrarModalRegistrarEvento" class="text-slate-400 hover:text-slate-700 text-lg font-bold cursor-pointer">✕</button>
+                        <button type="button" wire:click="cerrarModalRegistrarEvento" class="text-[var(--rm-text-muted)] hover:text-[var(--rm-text-primary)] text-lg font-bold cursor-pointer">✕</button>
                     </div>
 
                     <form wire:submit.prevent="guardarNuevoEvento" class="space-y-4 text-xs">
@@ -783,13 +783,13 @@
                                     <option value="COMPLICACION">Complicación clínica</option>
                                     <option value="OTRO">Otro evento relevante</option>
                                 </select>
-                                @error('nuevoEventoTipo') <span class="text-rose-600 font-bold">{{ $message }}</span> @enderror
+                                @error('nuevoEventoTipo') <span class="text-[var(--rm-danger-strong)] font-bold">{{ $message }}</span> @enderror
                             </div>
 
                             <div>
                                 <label class="block font-bold text-[var(--rm-text-title)] mb-1">Fecha y Hora *</label>
                                 <input type="datetime-local" wire:model="nuevoEventoFechaHora" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] p-2 font-mono font-bold focus:border-[var(--rm-action-primary)] focus:outline-hidden">
-                                @error('nuevoEventoFechaHora') <span class="text-rose-600 font-bold">{{ $message }}</span> @enderror
+                                @error('nuevoEventoFechaHora') <span class="text-[var(--rm-danger-strong)] font-bold">{{ $message }}</span> @enderror
                             </div>
                         </div>
 
@@ -797,7 +797,7 @@
                             <div>
                                 <label class="block font-bold text-[var(--rm-text-title)] mb-1">Lugar del Evento *</label>
                                 <input type="text" wire:model="nuevoEventoLugar" placeholder="Ej: Pasillo · 2° piso / Baño..." class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] p-2.5 font-medium focus:border-[var(--rm-action-primary)] focus:outline-hidden">
-                                @error('nuevoEventoLugar') <span class="text-rose-600 font-bold">{{ $message }}</span> @enderror
+                                @error('nuevoEventoLugar') <span class="text-[var(--rm-danger-strong)] font-bold">{{ $message }}</span> @enderror
                             </div>
 
                             <div>
@@ -813,7 +813,7 @@
                         <div>
                             <label class="block font-bold text-[var(--rm-text-title)] mb-1">Descripción Clínica Completa *</label>
                             <textarea wire:model="nuevoEventoDescripcion" rows="3" placeholder="Describa el hecho, síntomas del residente, entorno y acciones iniciales..." class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] p-2.5 focus:border-[var(--rm-action-primary)] focus:outline-hidden"></textarea>
-                            @error('nuevoEventoDescripcion') <span class="text-rose-600 font-bold">{{ $message }}</span> @enderror
+                            @error('nuevoEventoDescripcion') <span class="text-[var(--rm-danger-strong)] font-bold">{{ $message }}</span> @enderror
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -822,20 +822,20 @@
                                 <input type="number" min="0" max="10" wire:model="nuevoEventoDolor" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] p-2 font-mono font-bold">
                             </div>
                             <div class="flex items-center gap-2 pt-6">
-                                <input type="checkbox" id="chkLesion" wire:model="nuevoEventoLesion" class="rounded border-slate-300 text-[var(--rm-action-primary)] focus:ring-[var(--rm-action-primary)]">
+                                <input type="checkbox" id="chkLesion" wire:model="nuevoEventoLesion" class="rounded border-[var(--rm-border)] text-[var(--rm-action-primary)] focus:ring-[var(--rm-action-primary)]">
                                 <label for="chkLesion" class="font-bold cursor-pointer">¿Presenta lesión física?</label>
                             </div>
                             <div class="flex items-center gap-2 pt-6">
-                                <input type="checkbox" id="chkPresenciado" wire:model="nuevoEventoPresenciado" class="rounded border-slate-300 text-[var(--rm-action-primary)] focus:ring-[var(--rm-action-primary)]">
+                                <input type="checkbox" id="chkPresenciado" wire:model="nuevoEventoPresenciado" class="rounded border-[var(--rm-border)] text-[var(--rm-action-primary)] focus:ring-[var(--rm-action-primary)]">
                                 <label for="chkPresenciado" class="font-bold cursor-pointer">¿Fue presenciado?</label>
                             </div>
                         </div>
 
                         <div class="flex justify-end gap-2.5 pt-3 border-t border-[var(--rm-border)]">
-                            <button type="button" wire:click="cerrarModalRegistrarEvento" class="px-4 py-2 rounded-xl border border-[var(--rm-border)] font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer">
+                            <button type="button" wire:click="cerrarModalRegistrarEvento" class="px-4 py-2 rounded-xl border border-[var(--rm-border)] font-bold text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-soft)] transition cursor-pointer">
                                 Cancelar
                             </button>
-                            <button type="submit" class="px-5 py-2 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-white font-extrabold transition cursor-pointer shadow-sm">
+                            <button type="submit" class="px-5 py-2 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-[var(--rm-text-on-primary)] font-extrabold transition cursor-pointer shadow-sm">
                                 Guardar Evento Clínico
                             </button>
                         </div>

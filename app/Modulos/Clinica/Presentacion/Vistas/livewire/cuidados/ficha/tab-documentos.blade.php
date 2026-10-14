@@ -43,7 +43,7 @@
             @if(!$consultaEnfermeria)
 <button type="button"
                     wire:click="abrirModalSubirDoc"
-                    class="px-4 py-2.5 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary)]/90 text-white font-bold text-xs transition-all shadow-sm hover:shadow flex items-center gap-2 cursor-pointer active:scale-95">
+                    class="px-4 py-2.5 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary)]/90 text-[var(--rm-text-on-primary)] font-bold text-xs transition-all shadow-sm hover:shadow flex items-center gap-2 cursor-pointer active:scale-95">
                 <i class="ph-bold ph-upload-simple text-sm"></i>
                 <span>+ Subir documento</span>
             </button>
@@ -54,94 +54,94 @@
     {{-- ========================================================================= --}}
     {{-- 2. KPIS SUPERIORES (5 CARDS COMPACTAS SEGÚN GOLDEN REFERENCE)             --}}
     {{-- ========================================================================= --}}
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+    <div class="rm-clinical-category-metrics grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
 
         {{-- Card 1: Total de documentos (Azul) --}}
-        <div class="rounded-2xl border border-blue-200/80 bg-blue-50/40 p-3.5 flex items-center justify-between gap-3 shadow-2xs hover:shadow-sm transition">
+        <div class="rounded-2xl border border-[var(--rm-info-strong)] bg-[var(--rm-info-soft)] p-3.5 flex items-center justify-between gap-3 shadow-2xs hover:shadow-sm transition">
             <div class="min-w-0">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-blue-800/80 block truncate">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--rm-info-strong)] block truncate">
                     Total de documentos
                 </span>
-                <span class="text-2xl font-bold text-blue-900 tracking-tight mt-0.5 block">
+                <span class="text-2xl font-bold text-[var(--rm-info-strong)] tracking-tight mt-0.5 block">
                     {{ $metricas['total'] }}
                 </span>
-                <span class="text-[10.5px] font-medium text-blue-700/80 block mt-0.5">
+                <span class="text-[10.5px] font-medium text-[var(--rm-info-strong)] block mt-0.5">
                     Todos los registros
                 </span>
             </div>
-            <div class="h-10 w-10 rounded-xl bg-blue-100 border border-blue-200 text-blue-700 flex items-center justify-center shrink-0">
+            <div class="h-10 w-10 rounded-xl bg-[var(--rm-info-soft)] border border-[var(--rm-info-strong)] text-[var(--rm-info-strong)] flex items-center justify-center shrink-0">
                 <i class="ph-bold ph-folder text-xl"></i>
             </div>
         </div>
 
         {{-- Card 2: Clínicos (Verde) --}}
-        <div class="rounded-2xl border border-emerald-200/80 bg-emerald-50/40 p-3.5 flex items-center justify-between gap-3 shadow-2xs hover:shadow-sm transition">
+        <div class="rounded-2xl border border-[var(--rm-success-strong)] bg-[var(--rm-success-soft)] p-3.5 flex items-center justify-between gap-3 shadow-2xs hover:shadow-sm transition">
             <div class="min-w-0">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-800/80 block truncate">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--rm-success-strong)] block truncate">
                     Clínicos
                 </span>
-                <span class="text-2xl font-bold text-emerald-900 tracking-tight mt-0.5 block">
+                <span class="text-2xl font-bold text-[var(--rm-success-strong)] tracking-tight mt-0.5 block">
                     {{ $metricas['clinicos'] }}
                 </span>
-                <span class="text-[10.5px] font-medium text-emerald-700/80 block mt-0.5">
+                <span class="text-[10.5px] font-medium text-[var(--rm-success-strong)] block mt-0.5">
                     Informes y resultados
                 </span>
             </div>
-            <div class="h-10 w-10 rounded-xl bg-emerald-100 border border-emerald-200 text-emerald-700 flex items-center justify-center shrink-0">
+            <div class="h-10 w-10 rounded-xl bg-[var(--rm-success-soft)] border border-[var(--rm-success-strong)] text-[var(--rm-success-strong)] flex items-center justify-center shrink-0">
                 <i class="ph-bold ph-heartbeat text-xl"></i>
             </div>
         </div>
 
         {{-- Card 3: Administrativos (Violeta) --}}
-        <div class="rounded-2xl border border-purple-200/80 bg-purple-50/40 p-3.5 flex items-center justify-between gap-3 shadow-2xs hover:shadow-sm transition">
+        <div class="rounded-2xl border border-[var(--rm-border-strong)] bg-[var(--rm-action-primary-soft)] p-3.5 flex items-center justify-between gap-3 shadow-2xs hover:shadow-sm transition">
             <div class="min-w-0">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-purple-800/80 block truncate">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--rm-action-primary)] block truncate">
                     Administrativos
                 </span>
-                <span class="text-2xl font-bold text-purple-900 tracking-tight mt-0.5 block">
+                <span class="text-2xl font-bold text-[var(--rm-action-primary)] tracking-tight mt-0.5 block">
                     {{ $metricas['administrativos'] }}
                 </span>
-                <span class="text-[10.5px] font-medium text-purple-700/80 block mt-0.5">
+                <span class="text-[10.5px] font-medium text-[var(--rm-action-primary)] block mt-0.5">
                     Formularios y autorizaciones
                 </span>
             </div>
-            <div class="h-10 w-10 rounded-xl bg-purple-100 border border-purple-200 text-purple-700 flex items-center justify-center shrink-0">
+            <div class="h-10 w-10 rounded-xl bg-[var(--rm-action-primary-soft)] border border-[var(--rm-border-strong)] text-[var(--rm-action-primary)] flex items-center justify-center shrink-0">
                 <i class="ph-bold ph-file-text text-xl"></i>
             </div>
         </div>
 
         {{-- Card 4: Imágenes (Ámbar) --}}
-        <div class="rounded-2xl border border-amber-200/80 bg-amber-50/40 p-3.5 flex items-center justify-between gap-3 shadow-2xs hover:shadow-sm transition">
+        <div class="rounded-2xl border border-[var(--rm-warning-strong)] bg-[var(--rm-warning-soft)] p-3.5 flex items-center justify-between gap-3 shadow-2xs hover:shadow-sm transition">
             <div class="min-w-0">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-amber-800/80 block truncate">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--rm-warning-strong)] block truncate">
                     Imágenes
                 </span>
-                <span class="text-2xl font-bold text-amber-900 tracking-tight mt-0.5 block">
+                <span class="text-2xl font-bold text-[var(--rm-warning-strong)] tracking-tight mt-0.5 block">
                     {{ $metricas['imagenes'] }}
                 </span>
-                <span class="text-[10.5px] font-medium text-amber-700/80 block mt-0.5">
+                <span class="text-[10.5px] font-medium text-[var(--rm-warning-strong)] block mt-0.5">
                     Estudios y fotografías
                 </span>
             </div>
-            <div class="h-10 w-10 rounded-xl bg-amber-100 border border-amber-200 text-amber-700 flex items-center justify-center shrink-0">
+            <div class="h-10 w-10 rounded-xl bg-[var(--rm-warning-soft)] border border-[var(--rm-warning-strong)] text-[var(--rm-warning-strong)] flex items-center justify-center shrink-0">
                 <i class="ph-bold ph-camera text-xl"></i>
             </div>
         </div>
 
         {{-- Card 5: Legales (Azul Institucional) --}}
-        <div class="rounded-2xl border border-indigo-200/80 bg-indigo-50/40 p-3.5 flex items-center justify-between gap-3 shadow-2xs hover:shadow-sm transition col-span-2 sm:col-span-1">
+        <div class="rounded-2xl border border-[var(--rm-border-strong)] bg-[var(--rm-action-primary-soft)] p-3.5 flex items-center justify-between gap-3 shadow-2xs hover:shadow-sm transition col-span-2 sm:col-span-1">
             <div class="min-w-0">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-800/80 block truncate">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--rm-action-primary)] block truncate">
                     Legales
                 </span>
-                <span class="text-2xl font-bold text-indigo-900 tracking-tight mt-0.5 block">
+                <span class="text-2xl font-bold text-[var(--rm-action-primary)] tracking-tight mt-0.5 block">
                     {{ $metricas['legales'] }}
                 </span>
-                <span class="text-[10.5px] font-medium text-indigo-700/80 block mt-0.5">
+                <span class="text-[10.5px] font-medium text-[var(--rm-action-primary)] block mt-0.5">
                     Consentimientos
                 </span>
             </div>
-            <div class="h-10 w-10 rounded-xl bg-indigo-100 border border-indigo-200 text-indigo-700 flex items-center justify-center shrink-0">
+            <div class="h-10 w-10 rounded-xl bg-[var(--rm-action-primary-soft)] border border-[var(--rm-border-strong)] text-[var(--rm-action-primary)] flex items-center justify-center shrink-0">
                 <i class="ph-bold ph-scales text-xl"></i>
             </div>
         </div>
@@ -274,13 +274,13 @@
 
             @if(count($documentos) === 0)
                 <div class="py-14 text-center text-xs text-[var(--rm-text-muted)] space-y-2">
-                    <i class="ph-bold ph-folder-open text-3xl text-slate-300 dark:text-slate-600 block"></i>
+                    <i class="ph-bold ph-folder-open text-3xl text-[var(--rm-text-muted)] dark:text-[var(--rm-text-secondary)] block"></i>
                     <p class="font-bold text-[var(--rm-text-title)]">No encontramos documentos con estos filtros.</p>
                     <p>Modifique los criterios de búsqueda o suba un nuevo documento al expediente.</p>
                     @if(!$consultaEnfermeria)
 <button type="button"
                             wire:click="abrirModalSubirDoc"
-                            class="mt-2 px-3.5 py-1.5 rounded-xl bg-[var(--rm-action-primary)] text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-2xs">
+                            class="mt-2 px-3.5 py-1.5 rounded-xl bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] text-xs font-bold inline-flex items-center gap-1.5 shadow-2xs">
                         <i class="ph-bold ph-upload-simple"></i>
                         <span>Subir documento</span>
                     </button>
@@ -305,13 +305,13 @@
                                     $esSeleccionado = ($documentoActivo['id'] ?? '') === $doc['id'];
                                 @endphp
                                 <tr wire:click="seleccionarDocumento('{{ $doc['id'] }}')"
-                                    class="transition cursor-pointer {{ $esSeleccionado ? 'bg-blue-50/80 dark:bg-blue-950/40 text-[var(--rm-text-title)] ring-1 ring-[var(--rm-action-primary)]/30' : 'hover:bg-[var(--rm-surface-alt)]/60 text-[var(--rm-text-body)]' }}">
+                                    class="transition cursor-pointer {{ $esSeleccionado ? 'bg-[var(--rm-info-soft)] dark:bg-[var(--rm-info-soft)] text-[var(--rm-text-title)] ring-1 ring-[var(--rm-action-primary)]/30' : 'hover:bg-[var(--rm-surface-alt)]/60 text-[var(--rm-text-body)]' }}">
                                     
                                     {{-- Nombre del documento + Icono según tipo + Descripción corta --}}
                                     <td class="py-3 px-3.5 min-w-[220px]">
                                         <div class="flex items-start gap-2.5">
-                                            <div class="h-8 w-8 rounded-xl flex items-center justify-center shrink-0 border {{ $doc['icono_bg'] ?? 'bg-blue-50' }} {{ $doc['badge_border'] ?? 'border-blue-200' }}">
-                                                <i class="ph-bold {{ $doc['icono'] ?? 'ph-file-text' }} {{ $doc['icono_color'] ?? 'text-blue-600' }} text-base"></i>
+                                            <div class="h-8 w-8 rounded-xl flex items-center justify-center shrink-0 border {{ $doc['icono_bg'] ?? 'bg-[var(--rm-info-soft)]' }} {{ $doc['badge_border'] ?? 'border-[var(--rm-info-strong)]' }}">
+                                                <i class="ph-bold {{ $doc['icono'] ?? 'ph-file-text' }} {{ $doc['icono_color'] ?? 'text-[var(--rm-info-strong)]' }} text-base"></i>
                                             </div>
                                             <div class="min-w-0">
                                                 <span class="font-bold text-[var(--rm-text-title)] block leading-snug truncate" title="{{ $doc['nombre'] }}">
@@ -326,7 +326,7 @@
 
                                     {{-- Tipo (Badge semántico) --}}
                                     <td class="py-3 px-3 whitespace-nowrap">
-                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold border {{ $doc['badge_bg'] ?? 'bg-blue-50' }} {{ $doc['badge_color'] ?? 'text-blue-700' }} {{ $doc['badge_border'] ?? 'border-blue-200' }}">
+                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold border {{ $doc['badge_bg'] ?? 'bg-[var(--rm-info-soft)]' }} {{ $doc['badge_color'] ?? 'text-[var(--rm-info-strong)]' }} {{ $doc['badge_border'] ?? 'border-[var(--rm-info-strong)]' }}">
                                             {{ $doc['tipo_etiqueta'] ?? $doc['tipo'] }}
                                         </span>
                                     </td>
@@ -361,7 +361,7 @@
                                             <button type="button"
                                                     wire:click="seleccionarDocumento('{{ $doc['id'] }}')"
                                                     title="Ver documento en panel"
-                                                    class="p-1.5 rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface)] hover:bg-[var(--rm-action-primary)] hover:text-white text-[var(--rm-text-title)] transition shadow-2xs">
+                                                    class="p-1.5 rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface)] hover:bg-[var(--rm-action-primary)] hover:text-[var(--rm-text-on-primary)] text-[var(--rm-text-title)] transition shadow-2xs">
                                                 <i class="ph-bold ph-eye text-sm"></i>
                                             </button>
 
@@ -390,14 +390,14 @@
                                                                 wire:click="seleccionarDocumento('{{ $doc['id'] }}'); setTabDetalleDoc('informacion')"
                                                                 @click="abierto = false"
                                                                 class="w-full px-3 py-1.5 flex items-center gap-2 hover:bg-[var(--rm-surface-alt)] text-[var(--rm-text-title)] transition text-left">
-                                                            <i class="ph-bold ph-info text-blue-600"></i>
+                                                            <i class="ph-bold ph-info text-[var(--rm-info-strong)]"></i>
                                                             <span>Ver información</span>
                                                         </button>
                                                         <button type="button"
                                                                 wire:click="seleccionarDocumento('{{ $doc['id'] }}'); setTabDetalleDoc('historial')"
                                                                 @click="abierto = false"
                                                                 class="w-full px-3 py-1.5 flex items-center gap-2 hover:bg-[var(--rm-surface-alt)] text-[var(--rm-text-title)] transition text-left">
-                                                            <i class="ph-bold ph-clock-counter-clockwise text-purple-600"></i>
+                                                            <i class="ph-bold ph-clock-counter-clockwise text-[var(--rm-action-primary)]"></i>
                                                             <span>Ver historial</span>
                                                         </button>
                                                     </div>
@@ -406,7 +406,7 @@
                                                                 onclick="window.print()"
                                                                 @click="abierto = false"
                                                                 class="w-full px-3 py-1.5 flex items-center gap-2 hover:bg-[var(--rm-surface-alt)] text-[var(--rm-text-title)] transition text-left">
-                                                            <i class="ph-bold ph-printer text-emerald-600"></i>
+                                                            <i class="ph-bold ph-printer text-[var(--rm-success-strong)]"></i>
                                                             <span>Imprimir</span>
                                                         </button>
                                                     </div>
@@ -441,7 +441,7 @@
                             @for($p = 1; $p <= $paginacion['total_paginas']; $p++)
                                 <button type="button"
                                         wire:click="cambiarPaginaDoc({{ $p }})"
-                                        class="h-7 w-7 rounded-lg text-xs font-bold transition {{ $p === $paginacion['pagina_actual'] ? 'bg-[var(--rm-action-primary)] text-white' : 'border border-[var(--rm-border)] bg-[var(--rm-surface)] hover:bg-[var(--rm-surface-alt)] text-[var(--rm-text-title)]' }}">
+                                        class="h-7 w-7 rounded-lg text-xs font-bold transition {{ $p === $paginacion['pagina_actual'] ? 'bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)]' : 'border border-[var(--rm-border)] bg-[var(--rm-surface)] hover:bg-[var(--rm-surface-alt)] text-[var(--rm-text-title)]' }}">
                                     {{ $p }}
                                 </button>
                             @endfor
@@ -479,8 +479,8 @@
                     {{-- Cabecera del Panel de Vista Previa --}}
                     <div class="flex items-start justify-between gap-2 border-b border-[var(--rm-border)] pb-3">
                         <div class="min-w-0 flex items-start gap-2.5">
-                            <div class="h-9 w-9 rounded-xl flex items-center justify-center shrink-0 border {{ $documentoActivo['icono_bg'] ?? 'bg-blue-50' }} {{ $documentoActivo['badge_border'] ?? 'border-blue-200' }}">
-                                <i class="ph-bold {{ $documentoActivo['icono'] ?? 'ph-file-text' }} {{ $documentoActivo['icono_color'] ?? 'text-blue-600' }} text-lg"></i>
+                            <div class="h-9 w-9 rounded-xl flex items-center justify-center shrink-0 border {{ $documentoActivo['icono_bg'] ?? 'bg-[var(--rm-info-soft)]' }} {{ $documentoActivo['badge_border'] ?? 'border-[var(--rm-info-strong)]' }}">
+                                <i class="ph-bold {{ $documentoActivo['icono'] ?? 'ph-file-text' }} {{ $documentoActivo['icono_color'] ?? 'text-[var(--rm-info-strong)]' }} text-lg"></i>
                             </div>
                             <div class="min-w-0">
                                 <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--rm-text-muted)] block">
@@ -498,7 +498,7 @@
                         <div class="flex items-center gap-1.5 shrink-0">
                             {{-- Badge Verificado --}}
                             @if($documentoActivo['es_verificado'])
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center gap-1">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--rm-success-soft)] border border-[var(--rm-success-strong)] text-[var(--rm-success-strong)] flex items-center gap-1">
                                     <i class="ph-bold ph-check-circle text-xs"></i>
                                     <span class="hidden sm:inline">Documento verificado</span>
                                     <span class="sm:hidden">Verificado</span>
@@ -509,7 +509,7 @@
                             <button type="button"
                                     wire:click="seleccionarDocumento('')"
                                     title="Cerrar vista previa"
-                                    class="p-1 rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface)] hover:bg-rose-50 hover:text-rose-600 text-[var(--rm-text-muted)] transition">
+                                    class="p-1 rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface)] hover:bg-[var(--rm-danger-soft)] hover:text-[var(--rm-danger-strong)] text-[var(--rm-text-muted)] transition">
                                 <i class="ph-bold ph-x text-xs"></i>
                             </button>
                         </div>
@@ -519,17 +519,17 @@
                     <div class="flex items-center gap-1.5 p-1 rounded-xl bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-xs font-bold">
                         <button type="button"
                                 wire:click="setTabDetalleDoc('preview')"
-                                class="flex-1 py-1.5 px-2 rounded-lg transition text-center {{ $tabDetalleDoc === 'preview' ? 'bg-[var(--rm-action-primary)] text-white shadow-2xs' : 'text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)]' }}">
+                                class="flex-1 py-1.5 px-2 rounded-lg transition text-center {{ $tabDetalleDoc === 'preview' ? 'bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] shadow-2xs' : 'text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)]' }}">
                             Vista previa
                         </button>
                         <button type="button"
                                 wire:click="setTabDetalleDoc('informacion')"
-                                class="flex-1 py-1.5 px-2 rounded-lg transition text-center {{ in_array($tabDetalleDoc, ['informacion', 'info']) ? 'bg-[var(--rm-action-primary)] text-white shadow-2xs' : 'text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)]' }}">
+                                class="flex-1 py-1.5 px-2 rounded-lg transition text-center {{ in_array($tabDetalleDoc, ['informacion', 'info']) ? 'bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] shadow-2xs' : 'text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)]' }}">
                             Información
                         </button>
                         <button type="button"
                                 wire:click="setTabDetalleDoc('historial')"
-                                class="flex-1 py-1.5 px-2 rounded-lg transition text-center {{ $tabDetalleDoc === 'historial' ? 'bg-[var(--rm-action-primary)] text-white shadow-2xs' : 'text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)]' }}">
+                                class="flex-1 py-1.5 px-2 rounded-lg transition text-center {{ $tabDetalleDoc === 'historial' ? 'bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] shadow-2xs' : 'text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)]' }}">
                             Historial
                         </button>
                     </div>
@@ -568,7 +568,7 @@
                             </div>
 
                             {{-- Visor Embebido (PDF o Imagen) --}}
-                            <div class="rounded-2xl border border-[var(--rm-border)] bg-slate-900/5 dark:bg-slate-950/40 p-2 min-h-[300px] flex items-center justify-center overflow-auto max-h-[420px]">
+                            <div class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-modal-overlay)] dark:bg-[var(--rm-modal-overlay)] p-2 min-h-[300px] flex items-center justify-center overflow-auto max-h-[420px]">
                                 @if($documentoActivo['es_imagen'])
                                     {{-- Visor de Imágenes --}}
                                     <div class="relative w-full flex items-center justify-center">
@@ -579,47 +579,47 @@
                                     </div>
                                 @elseif($documentoActivo['es_pdf'])
                                     {{-- Simulación fiel de primera página de PDF con alta resolución --}}
-                                    <div class="w-full bg-[#F0E8DE] dark:bg-slate-900 text-slate-800 dark:text-slate-200 rounded-xl p-5 shadow-sm border border-slate-200 dark:border-slate-800 font-sans space-y-3"
+                                    <div class="w-full bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-surface-soft)] text-[var(--rm-text-primary)] dark:text-[var(--rm-text-muted)] rounded-xl p-5 shadow-sm border border-[var(--rm-border)] dark:border-[var(--rm-border)] font-sans space-y-3"
                                          style="transform: scale({{ $zoomDoc / 100 }}); transform-origin: top center;">
                                         
                                         {{-- Membrete institucional del documento --}}
-                                        <div class="border-b border-slate-200 dark:border-slate-800 pb-3 flex items-center justify-between">
+                                        <div class="border-b border-[var(--rm-border)] dark:border-[var(--rm-border)] pb-3 flex items-center justify-between">
                                             <div>
                                                 <h4 class="text-xs font-bold uppercase text-[var(--rm-action-primary)]">HOGAR RESIDENCIAL REMEMBERMIND</h4>
-                                                <p class="text-[9.5px] text-slate-500">Dirección Médica Asistencial · Expediente Clínico</p>
+                                                <p class="text-[9.5px] text-[var(--rm-text-secondary)]">Dirección Médica Asistencial · Expediente Clínico</p>
                                             </div>
-                                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-surface-soft)] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
                                                 ID: {{ $documentoActivo['id'] }}
                                             </span>
                                         </div>
 
                                         {{-- Título y metadatos clínicos --}}
                                         <div>
-                                            <h3 class="text-xs font-bold uppercase tracking-tight text-slate-900 dark:text-white">
+                                            <h3 class="text-xs font-bold uppercase tracking-tight text-[var(--rm-text-primary)] dark:text-[var(--rm-text-on-primary)]">
                                                 {{ $documentoActivo['nombre'] }}
                                             </h3>
-                                            <p class="text-[10px] text-slate-500 mt-0.5">
+                                            <p class="text-[10px] text-[var(--rm-text-secondary)] mt-0.5">
                                                 Residente: {{ $adultoMayor->nombres }} {{ $adultoMayor->ap_paterno }} · Fecha: {{ $documentoActivo['fecha_formateada'] }}
                                             </p>
                                         </div>
 
                                         {{-- Resumen de contenido simulado --}}
-                                        <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800 text-[10.5px] leading-relaxed text-slate-600 dark:text-slate-300">
-                                            <p class="font-bold text-slate-700 dark:text-slate-200 mb-1">Descripción del registro:</p>
+                                        <div class="p-3 rounded-lg bg-[var(--rm-surface)] dark:bg-[var(--rm-modal-overlay)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] text-[10.5px] leading-relaxed text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
+                                            <p class="font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-text-muted)] mb-1">Descripción del registro:</p>
                                             <p>{{ $documentoActivo['descripcion'] }}</p>
-                                            <p class="mt-2 text-[10px] text-slate-400 italic">
+                                            <p class="mt-2 text-[10px] text-[var(--rm-text-muted)] italic">
                                                 {{ $documentoActivo['observaciones'] }}
                                             </p>
                                         </div>
 
                                         {{-- Firma institucional simulada --}}
-                                        <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[9.5px]">
+                                        <div class="pt-3 border-t border-[var(--rm-border)] dark:border-[var(--rm-border)] flex items-center justify-between text-[9.5px]">
                                             <div>
                                                 <span class="font-bold block">{{ $documentoActivo['subido_por'] }}</span>
-                                                <span class="text-slate-500">{{ $documentoActivo['area_origen'] }}</span>
+                                                <span class="text-[var(--rm-text-secondary)]">{{ $documentoActivo['area_origen'] }}</span>
                                             </div>
                                             <div class="text-right">
-                                                <span class="text-emerald-600 font-bold flex items-center gap-1">
+                                                <span class="text-[var(--rm-success-strong)] font-bold flex items-center gap-1">
                                                     <i class="ph-bold ph-seal-check"></i> Firma autorizada
                                                 </span>
                                             </div>
@@ -628,11 +628,11 @@
                                 @else
                                     {{-- Empty State de no previsualizable --}}
                                     <div class="text-center py-8 text-xs text-[var(--rm-text-muted)] space-y-2">
-                                        <i class="ph-bold ph-file-dashed text-3xl block text-slate-400"></i>
+                                        <i class="ph-bold ph-file-dashed text-3xl block text-[var(--rm-text-muted)]"></i>
                                         <p class="font-bold text-[var(--rm-text-title)]">No es posible mostrar una vista previa de este archivo.</p>
                                         <p class="text-[11px]">Puede descargar el documento completo para visualizarlo en su dispositivo.</p>
                                         <a href="{{ $documentoActivo['url_descarga'] }}"
-                                           class="mt-2 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[var(--rm-action-primary)] text-white text-xs font-bold shadow-2xs">
+                                           class="mt-2 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] text-xs font-bold shadow-2xs">
                                             <i class="ph-bold ph-download-simple"></i>
                                             <span>Descargar documento</span>
                                         </a>
@@ -724,10 +724,10 @@
                     {{-- ========================================================= --}}
                     {{-- 6. ACCIONES INFERIORES DEL PANEL (Descargar, Compartir, Imprimir) --}}
                     {{-- ========================================================= --}}
-                    <div class="pt-3 border-t border-[var(--rm-border)] flex items-center justify-between gap-2">
+                    <div class="rm-clinical-document-actions pt-3 border-t border-[var(--rm-border)] flex items-center justify-between gap-2">
                         <a href="{{ $documentoActivo['url_descarga'] }}"
                            download
-                           class="flex-1 px-3 py-2 rounded-xl bg-[var(--rm-action-primary)] text-white font-bold text-xs hover:bg-[var(--rm-action-primary)]/90 transition text-center flex items-center justify-center gap-1.5 shadow-2xs">
+                           class="flex-1 px-3 py-2 rounded-xl bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] font-bold text-xs hover:bg-[var(--rm-action-primary)]/90 transition text-center flex items-center justify-center gap-1.5 shadow-2xs">
                             <i class="ph-bold ph-download-simple"></i>
                             <span>Descargar</span>
                         </a>
@@ -751,7 +751,7 @@
             @else
                 {{-- Empty state si no hay ningún documento seleccionado --}}
                 <div class="rounded-3xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-8 text-center space-y-3 shadow-sm">
-                    <div class="h-12 w-12 rounded-2xl bg-blue-50 border border-blue-200 text-[var(--rm-action-primary)] flex items-center justify-center mx-auto">
+                    <div class="h-12 w-12 rounded-2xl bg-[var(--rm-info-soft)] border border-[var(--rm-info-strong)] text-[var(--rm-action-primary)] flex items-center justify-center mx-auto">
                         <i class="ph-bold ph-file-search text-2xl"></i>
                     </div>
                     <div>
@@ -819,13 +819,13 @@
                             </div>
                         </div>
                         @if($nuevoDocArchivo)
-                            <div class="mt-2 p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
-                                <i class="ph-bold ph-check-circle text-emerald-600"></i>
+                            <div class="mt-2 p-2 rounded-xl bg-[var(--rm-success-soft)] border border-[var(--rm-success-strong)] text-[var(--rm-success-strong)] text-xs font-bold flex items-center gap-2">
+                                <i class="ph-bold ph-check-circle text-[var(--rm-success-strong)]"></i>
                                 <span class="truncate">Archivo listo para cargar: {{ $nuevoDocArchivo->getClientOriginalName() }}</span>
                             </div>
                         @endif
                         @error('nuevoDocArchivo')
-                            <span class="text-[11px] font-bold text-rose-600 mt-1 block">{{ $message }}</span>
+                            <span class="text-[11px] font-bold text-[var(--rm-danger-strong)] mt-1 block">{{ $message }}</span>
                         @enderror
                     </div>
 
@@ -839,7 +839,7 @@
                                placeholder="Ej. Evaluación médica geriátrica semestral"
                                class="w-full px-3.5 py-2.5 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] text-xs font-bold text-[var(--rm-text-title)] focus:ring-1 focus:ring-[var(--rm-action-primary)] outline-hidden">
                         @error('nuevoDocNombre')
-                            <span class="text-[11px] font-bold text-rose-600 mt-1 block">{{ $message }}</span>
+                            <span class="text-[11px] font-bold text-[var(--rm-danger-strong)] mt-1 block">{{ $message }}</span>
                         @enderror
                     </div>
 
@@ -854,7 +854,7 @@
                                    placeholder="Ej. Informe, Estudio, Consentimiento"
                                    class="w-full px-3.5 py-2.5 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] text-xs font-bold text-[var(--rm-text-title)] focus:ring-1 focus:ring-[var(--rm-action-primary)] outline-hidden">
                             @error('nuevoDocTipo')
-                                <span class="text-[11px] font-bold text-rose-600 mt-1 block">{{ $message }}</span>
+                                <span class="text-[11px] font-bold text-[var(--rm-danger-strong)] mt-1 block">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -871,7 +871,7 @@
                                 <option value="PERSONAL">Personal</option>
                             </select>
                             @error('nuevoDocCategoria')
-                                <span class="text-[11px] font-bold text-rose-600 mt-1 block">{{ $message }}</span>
+                                <span class="text-[11px] font-bold text-[var(--rm-danger-strong)] mt-1 block">{{ $message }}</span>
                             @enderror
                         </div>
                     </div>
@@ -886,7 +886,7 @@
                                    wire:model="nuevoDocFecha"
                                    class="w-full px-3.5 py-2.5 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] text-xs font-bold text-[var(--rm-text-title)] focus:ring-1 focus:ring-[var(--rm-action-primary)] outline-hidden">
                             @error('nuevoDocFecha')
-                                <span class="text-[11px] font-bold text-rose-600 mt-1 block">{{ $message }}</span>
+                                <span class="text-[11px] font-bold text-[var(--rm-danger-strong)] mt-1 block">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -933,7 +933,7 @@
 
                         <button type="submit"
                                 wire:loading.attr="disabled"
-                                class="px-5 py-2 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary)]/90 text-white text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer">
+                                class="px-5 py-2 rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary)]/90 text-[var(--rm-text-on-primary)] text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer">
                             <span wire:loading.remove wire:target="guardarNuevoDocumento">Registrar documento</span>
                             <span wire:loading wire:target="guardarNuevoDocumento">Subiendo archivo...</span>
                         </button>

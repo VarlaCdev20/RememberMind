@@ -42,3 +42,169 @@
     font-size: var(--rm-font-badge);
     color: var(--rm-text-muted);
 }
+
+/* Ficha compartida de todos los residentes: una paleta de consulta y acción.
+   Los estados clínicos conservan los tokens success/info/warning/danger.
+   La identidad del rol permanece en el shell, fuera de esta superficie. */
+.rm-ficha-detalles {
+    --rm-action-primary: var(--rm-mint-700);
+    --rm-action-primary-hover: color-mix(in srgb, var(--rm-mint-700) 85%, var(--rm-coffee-950));
+    --rm-action-primary-active: color-mix(in srgb, var(--rm-mint-700) 75%, var(--rm-coffee-950));
+    --rm-action-primary-ink: var(--rm-action-primary);
+    --rm-action-primary-soft: var(--rm-mint-50);
+    --rm-text-on-primary: var(--rm-palette-petroleum-text);
+    --rm-role-primary: var(--rm-action-primary);
+    --rm-role-on-primary: var(--rm-text-on-primary);
+    --rm-button-primary-bg: var(--rm-action-primary);
+    --rm-button-primary-hover: var(--rm-action-primary-hover);
+    --rm-button-primary-active: var(--rm-action-primary-active);
+    --rm-button-primary-text: var(--rm-text-on-primary);
+    --rm-button-primary-highlight: 5%;
+    --rm-button-secondary-bg: var(--rm-surface-soft);
+    --rm-button-secondary-text: var(--rm-text-primary);
+    --rm-button-secondary-border: var(--rm-border-strong);
+    --rm-button-secondary-hover-bg: var(--rm-surface);
+    --rm-button-secondary-hover-border: var(--rm-action-primary);
+    --rm-focus-ring-color: var(--rm-action-primary);
+    color: var(--rm-text-primary);
+}
+
+html:not(.dark):not([data-theme="dark"]) .rm-ficha-detalles {
+    --rm-surface: var(--rm-capture-card-solid, var(--rm-palette-surface));
+    --rm-surface-raised: var(--rm-capture-input, var(--rm-palette-surface));
+    --rm-surface-main: var(--rm-surface);
+    --rm-surface-soft: var(--rm-capture-soft, var(--rm-palette-surface-soft));
+    --rm-surface-alt: var(--rm-surface-soft);
+    --rm-surface-muted: var(--rm-surface-soft);
+    --rm-text-primary: var(--rm-capture-ink, var(--rm-palette-ink));
+    --rm-text-title: var(--rm-text-primary);
+    --rm-text-body: var(--rm-text-primary);
+    --rm-text-secondary: var(--rm-capture-secondary, var(--rm-palette-ink-secondary));
+    --rm-text-muted: var(--rm-text-secondary);
+    --rm-border: var(--rm-capture-border, var(--rm-border-strong));
+    --rm-border-soft: var(--rm-border);
+    --rm-input-bg: var(--rm-surface-raised);
+    --rm-input-text: var(--rm-text-primary);
+    --rm-modal-bg: var(--rm-surface);
+}
+
+:is(.dark, [data-theme="dark"]) .rm-ficha-detalles {
+    --rm-action-primary: var(--rm-primary);
+    --rm-action-primary-hover: var(--rm-primary-hover);
+    --rm-action-primary-active: var(--rm-primary-active);
+    --rm-action-primary-soft: var(--rm-selected-bg);
+    --rm-text-on-primary: var(--rm-palette-petroleum-950);
+}
+
+/* Encabezados de sección y menús de navegación usan el mismo acento.
+   No afecta iconos de estado dentro del contenido de las tarjetas. */
+.rm-ficha-detalles :is(h2, h3, h4, .rm-clinical-card__title) > i,
+.rm-ficha-detalles .rm-clinical-menu-icon {
+    color: var(--rm-action-primary);
+}
+
+.rm-ficha-detalles .rm-clinical-resident-context::before {
+    background: var(--rm-action-primary);
+}
+
+.rm-ficha-detalles .rm-clinical-tabs {
+    flex-wrap: wrap;
+    overflow: visible;
+    padding: var(--rm-space-2);
+    border: 1px solid var(--rm-border);
+    border-radius: var(--rm-radius-panel);
+    background: var(--rm-surface-soft);
+}
+
+.rm-ficha-detalles .rm-clinical-tabs > button {
+    min-height: var(--rm-control-lg);
+    border-radius: var(--rm-radius-control);
+    border-bottom: 2px solid transparent;
+}
+
+.rm-ficha-detalles .rm-clinical-tabs > button[aria-current="page"] {
+    background: var(--rm-action-primary-soft);
+    color: var(--rm-action-primary-ink);
+    border-bottom-color: var(--rm-action-primary);
+}
+
+.rm-ficha-detalles :is(button, a, input, select, textarea):focus-visible {
+    outline: var(--rm-focus-ring-width) solid var(--rm-focus-ring-color);
+    outline-offset: var(--rm-focus-ring-offset);
+}
+
+/* Categorías documentales: la etiqueta identifica el tipo; el color no es estado. */
+.rm-ficha-detalles .rm-clinical-category-metrics > div {
+    background: var(--rm-surface);
+    border-color: var(--rm-border);
+}
+.rm-ficha-detalles .rm-clinical-category-metrics > div :is(span, i) {
+    color: var(--rm-text-primary);
+}
+.rm-ficha-detalles .rm-clinical-category-metrics > div > div:last-child {
+    background: var(--rm-action-primary-soft);
+    border-color: var(--rm-border);
+    color: var(--rm-action-primary);
+}
+
+/* El lector longitudinal aún transporta estas clases de presentación.
+   Se normalizan aquí sin cambiar sus decisiones ni sus estados persistidos. */
+.rm-ficha-detalles .bg-rose-100 { background-color: var(--rm-danger-soft); }
+.rm-ficha-detalles :is(.text-rose-700, .text-rose-800) { color: var(--rm-danger-strong); }
+.rm-ficha-detalles .border-rose-200 { border-color: var(--rm-danger-strong); }
+.rm-ficha-detalles .bg-amber-100 { background-color: var(--rm-warning-soft); }
+.rm-ficha-detalles .text-amber-800 { color: var(--rm-warning-strong); }
+.rm-ficha-detalles .border-amber-200 { border-color: var(--rm-warning-strong); }
+.rm-ficha-detalles .bg-blue-100 { background-color: var(--rm-info-soft); }
+.rm-ficha-detalles .text-blue-800 { color: var(--rm-info-strong); }
+.rm-ficha-detalles .border-blue-200 { border-color: var(--rm-info-strong); }
+.rm-ficha-detalles .bg-emerald-100 { background-color: var(--rm-success-soft); }
+.rm-ficha-detalles .text-emerald-800 { color: var(--rm-success-strong); }
+.rm-ficha-detalles .border-emerald-200 { border-color: var(--rm-success-strong); }
+.rm-ficha-detalles .bg-slate-100 { background-color: var(--rm-surface-soft); }
+.rm-ficha-detalles :is(.text-slate-600, .text-slate-700) { color: var(--rm-text-secondary); }
+.rm-ficha-detalles .border-slate-200 { border-color: var(--rm-border); }
+
+/* Una cabecera de sección conserva el mismo color en las tres columnas. */
+html:not(.dark):not([data-theme="dark"]) .rm-ficha-detalles .rm-clinical-summary-grid > div:nth-child(n) .rm-clinical-card__header {
+    background: var(--rm-surface-soft);
+}
+
+/* Las categorías y los filtros se distribuyen sin ensanchar la ficha. */
+.rm-ficha-detalles .grid > *,
+.rm-ficha-detalles .rm-filter-bar > .flex > .flex {
+    min-width: 0;
+}
+.rm-ficha-detalles .rm-filter-bar > .flex {
+    flex-wrap: wrap;
+}
+.rm-ficha-detalles .rm-filter-pills {
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
+    white-space: normal;
+    overflow: visible;
+}
+.rm-ficha-detalles .rm-clinical-document-actions {
+    flex-wrap: wrap;
+}
+.rm-ficha-detalles .rm-clinical-document-actions > :is(a, button) {
+    flex: 1 1 auto;
+    white-space: normal;
+}
+
+/* Metadatos de consulta transportados por lectores existentes: mismo contrato. */
+.rm-ficha-detalles .bg-blue-50 { background-color: var(--rm-info-soft); }
+.rm-ficha-detalles :is(.text-blue-600, .text-blue-700) { color: var(--rm-info-strong); }
+.rm-ficha-detalles .bg-emerald-50 { background-color: var(--rm-success-soft); }
+.rm-ficha-detalles :is(.text-emerald-600, .text-emerald-700) { color: var(--rm-success-strong); }
+.rm-ficha-detalles .bg-rose-50 { background-color: var(--rm-danger-soft); }
+.rm-ficha-detalles .text-rose-600 { color: var(--rm-danger-strong); }
+.rm-ficha-detalles .text-amber-600 { color: var(--rm-warning-strong); }
+
+/* PDF identifica un formato de archivo, no una alerta clínica. */
+.rm-ficha-detalles .ph-file-pdf { color: var(--rm-action-primary); }
+.rm-ficha-detalles :is(div, span):has(> .ph-file-pdf) {
+    background-color: var(--rm-surface-soft);
+    border-color: var(--rm-border);
+}

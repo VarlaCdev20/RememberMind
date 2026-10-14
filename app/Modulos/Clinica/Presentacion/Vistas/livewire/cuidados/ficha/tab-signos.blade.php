@@ -41,36 +41,36 @@
         $paStr = ($pas && $pad) ? "{$pas}/{$pad}" : ($s->presion_arterial ?: '--');
 
         $estado = 'Normal';
-        $badgeClass = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+        $badgeClass = 'bg-[var(--rm-success-soft)] text-[var(--rm-success-strong)] border-[var(--rm-success-strong)]';
         $criterioClinico = 'Constantes basales estables';
 
         if ($pas && $pad && ($pas >= 140 || $pad >= 90)) {
             $estado = 'Elevada';
-            $badgeClass = 'bg-rose-100 text-rose-800 border-rose-200';
+            $badgeClass = 'bg-[var(--rm-danger-soft)] text-[var(--rm-danger-strong)] border-[var(--rm-danger-strong)]';
             $criterioClinico = "PA Elevada ({$pas}/{$pad} ≥ 140/90 mmHg)";
         } elseif ($pas && $pas < 90) {
             $estado = 'Hipotensión';
-            $badgeClass = 'bg-amber-100 text-amber-800 border-amber-200';
+            $badgeClass = 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)] border-[var(--rm-warning-strong)]';
             $criterioClinico = "Hipotensión ({$pas} < 90 mmHg)";
         } elseif ($s->temperatura && $s->temperatura >= 37.5) {
             $estado = 'Febrícula';
-            $badgeClass = 'bg-amber-100 text-amber-800 border-amber-200';
+            $badgeClass = 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)] border-[var(--rm-warning-strong)]';
             $criterioClinico = "Alza térmica ({$s->temperatura}°C ≥ 37.5°C)";
         } elseif ($s->saturacion && $s->saturacion < 92) {
             $estado = 'Alerta';
-            $badgeClass = 'bg-rose-100 text-rose-800 border-rose-200';
+            $badgeClass = 'bg-[var(--rm-danger-soft)] text-[var(--rm-danger-strong)] border-[var(--rm-danger-strong)]';
             $criterioClinico = "Desaturación SpO₂ ({$s->saturacion}% < 92%)";
         } elseif ($s->frecuencia_cardiaca && $s->frecuencia_cardiaca > 100) {
             $estado = 'Taquicardia';
-            $badgeClass = 'bg-amber-100 text-amber-800 border-amber-200';
+            $badgeClass = 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)] border-[var(--rm-warning-strong)]';
             $criterioClinico = "Taquicardia ({$s->frecuencia_cardiaca} lpm > 100)";
         } elseif ($s->frecuencia_cardiaca && $s->frecuencia_cardiaca < 60) {
             $estado = 'Bradicardia';
-            $badgeClass = 'bg-amber-100 text-amber-800 border-amber-200';
+            $badgeClass = 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)] border-[var(--rm-warning-strong)]';
             $criterioClinico = "Bradicardia ({$s->frecuencia_cardiaca} lpm < 60)";
         } elseif (($s->dolor ?? $s->nivel_dolor ?? 0) >= 4) {
             $estado = 'Dolor';
-            $badgeClass = 'bg-amber-100 text-amber-800 border-amber-200';
+            $badgeClass = 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)] border-[var(--rm-warning-strong)]';
             $criterioClinico = "Dolor EVA " . ($s->dolor ?? $s->nivel_dolor) . "/10";
         } else {
             $criterioClinico = "Parámetros dentro de rango normal";
@@ -140,8 +140,8 @@
                 <h2 class="text-sm sm:text-base font-bold text-[var(--rm-text-title)] tracking-tight uppercase">
                     SIGNOS VITALES
                 </h2>
-                <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 border border-blue-200">
-                    <span class="h-1.5 w-1.5 rounded-full bg-blue-600 animate-pulse"></span>
+                <span class="inline-flex items-center gap-1 rounded-full bg-[var(--rm-info-soft)] px-2 py-0.5 text-[10px] font-bold text-[var(--rm-info-strong)] border border-[var(--rm-info-strong)]">
+                    <span class="h-1.5 w-1.5 rounded-full bg-[var(--rm-info-action)] animate-pulse"></span>
                     Monitoreo activo
                 </span>
             </div>
@@ -158,7 +158,7 @@
 <button type="button"
                     wire:click="abrirModalSignos"
                     wire:loading.attr="disabled"
-                    class="inline-flex items-center gap-2 rounded-xl bg-[var(--rm-action-primary)] px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-blue-900 transition active:scale-98 cursor-pointer">
+                    class="inline-flex items-center gap-2 rounded-xl bg-[var(--rm-action-primary)] px-3.5 py-2 text-xs font-bold text-[var(--rm-text-on-primary)] shadow-xs hover:bg-[var(--rm-action-primary)] transition active:scale-98 cursor-pointer">
                 <i class="ph-bold ph-plus text-sm"></i>
                 <span>+ Registrar signos vitales</span>
             </button>
@@ -196,19 +196,19 @@
                         <button type="button"
                                 @click="exportarSignosPDF(); menuCabecera = false;"
                                 class="w-full text-left px-3.5 py-2 flex items-center gap-2 text-[var(--rm-text-body)] hover:bg-[var(--rm-surface-alt)] hover:text-[var(--rm-text-title)] transition cursor-pointer">
-                            <i class="ph-bold ph-file-pdf text-rose-600 text-sm"></i>
+                            <i class="ph-bold ph-file-pdf text-[var(--rm-danger-strong)] text-sm"></i>
                             <span>Exportar informe (PDF)</span>
                         </button>
                         <button type="button"
                                 @click="exportarSignosExcel(); menuCabecera = false;"
                                 class="w-full text-left px-3.5 py-2 flex items-center gap-2 text-[var(--rm-text-body)] hover:bg-[var(--rm-surface-alt)] hover:text-[var(--rm-text-title)] transition cursor-pointer">
-                            <i class="ph-bold ph-file-xls text-emerald-600 text-sm"></i>
+                            <i class="ph-bold ph-file-xls text-[var(--rm-success-strong)] text-sm"></i>
                             <span>Descargar histórico (Excel/CSV)</span>
                         </button>
                         <button type="button"
                                 @click="imprimirGrafica(); menuCabecera = false;"
                                 class="w-full text-left px-3.5 py-2 flex items-center gap-2 text-[var(--rm-text-body)] hover:bg-[var(--rm-surface-alt)] hover:text-[var(--rm-text-title)] transition cursor-pointer">
-                            <i class="ph-bold ph-printer text-blue-600 text-sm"></i>
+                            <i class="ph-bold ph-printer text-[var(--rm-info-strong)] text-sm"></i>
                             <span>Imprimir gráfica y resumen</span>
                         </button>
                     </div>
@@ -216,7 +216,7 @@
                         <button type="button"
                                 @click="abrirModalRangos(); menuCabecera = false;"
                                 class="w-full text-left px-3.5 py-2 flex items-center gap-2 text-[var(--rm-text-body)] hover:bg-[var(--rm-surface-alt)] hover:text-[var(--rm-text-title)] transition cursor-pointer">
-                            <i class="ph-bold ph-sliders-horizontal text-purple-600 text-sm"></i>
+                            <i class="ph-bold ph-sliders-horizontal text-[var(--rm-action-primary)] text-sm"></i>
                             <span>Configurar rangos clínicos</span>
                         </button>
                         @if(!$consultaEnfermeria)
@@ -244,7 +244,7 @@
             <div class="rm-chart-header flex-col sm:flex-row sm:items-center">
                 <div>
                     <div class="flex items-center gap-2">
-                        <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-[var(--rm-action-primary)] border border-blue-200 text-sm">
+                        <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--rm-info-soft)] text-[var(--rm-action-primary)] border border-[var(--rm-info-strong)] text-sm">
                             <i class="ph-bold" :class="metricasInfo[metricaActiva]?.icon || 'ph-chart-line'"></i>
                         </span>
                         <h3 class="rm-chart-title"
@@ -270,7 +270,7 @@
                         <button type="button"
                                 @click="cambiarPeriodo('{{ $perKey }}')"
                                 :class="periodoActivo === '{{ $perKey }}'
-                                    ? 'bg-[var(--rm-action-primary)] text-white shadow-2xs font-bold'
+                                    ? 'bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] shadow-2xs font-bold'
                                     : 'text-[var(--rm-text-muted)] hover:text-[var(--rm-text-title)] hover:bg-[var(--rm-surface)] font-medium'"
                                 class="px-2.5 py-1 text-[11px] rounded-lg transition cursor-pointer">
                             {{ $perLabel }}
@@ -293,7 +293,7 @@
                                 Diastólica (mmHg)
                             </span>
                             <span class="inline-flex items-center gap-1.5 text-[var(--rm-text-muted)] italic font-medium">
-                                <span class="h-2 w-4 rounded-xs bg-emerald-500/20 border border-emerald-400/40"></span>
+                                <span class="h-2 w-4 rounded-xs bg-[var(--rm-success)] border border-[var(--rm-success-strong)]"></span>
                                 Rango normal (<span x-text="`${rangos.pas_min}-${rangos.pas_max}`">90-140</span> / <span x-text="`${rangos.pad_min}-${rangos.pad_max}`">60-90</span>)
                             </span>
                         </div>
@@ -312,14 +312,14 @@
                     <span>Otras métricas:</span>
                     <button type="button"
                             @click="seleccionarMetrica('GLUCOSA')"
-                            :class="metricaActiva === 'GLUCOSA' ? 'text-sky-700 font-bold underline' : 'hover:text-[var(--rm-text-title)]'"
+                            :class="metricaActiva === 'GLUCOSA' ? 'text-[var(--rm-info-strong)] font-bold underline' : 'hover:text-[var(--rm-text-title)]'"
                             class="transition cursor-pointer">
                         Glucemia
                     </button>
                     <span>·</span>
                     <button type="button"
                             @click="seleccionarMetrica('PESO')"
-                            :class="metricaActiva === 'PESO' ? 'text-slate-700 font-bold underline' : 'hover:text-[var(--rm-text-title)]'"
+                            :class="metricaActiva === 'PESO' ? 'text-[var(--rm-text-primary)] font-bold underline' : 'hover:text-[var(--rm-text-title)]'"
                             class="transition cursor-pointer">
                         Peso
                     </button>
@@ -360,7 +360,7 @@
                         120/78 mmHg
                     </span>
                     <span class="inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold border"
-                          :class="resumenActivo.estado_badge || 'bg-slate-100 text-slate-700 border-slate-200'"
+                          :class="resumenActivo.estado_badge || 'bg-[var(--rm-surface-soft)] text-[var(--rm-text-primary)] border-[var(--rm-border)]'"
                           x-text="resumenActivo.estado || 'Sin datos'">
                         Sin datos
                     </span>
@@ -403,7 +403,7 @@
                         +2 mmHg vs toma previa
                     </span>
                     <span class="inline-flex items-center text-xs font-bold"
-                          :class="(resumenActivo.variacion && resumenActivo.variacion.includes('-')) ? 'text-blue-600' : 'text-rose-600'">
+                          :class="(resumenActivo.variacion && resumenActivo.variacion.includes('-')) ? 'text-[var(--rm-info-strong)]' : 'text-[var(--rm-danger-strong)]'">
                         <i class="ph-bold" :class="(resumenActivo.variacion && resumenActivo.variacion.includes('-')) ? 'ph-arrow-down' : 'ph-arrow-up'"></i>
                         <span x-text="resumenActivo.tendencia || 'Estable'"></span>
                     </span>
@@ -429,18 +429,18 @@
         {{-- CARD 1: Presión arterial --}}
         <div @click="seleccionarMetrica('PA')"
              :class="metricaActiva === 'PA'
-                ? 'border-blue-600 ring-2 ring-blue-500/25 bg-blue-50/40 shadow-xs'
-                : 'border-[var(--rm-border)] bg-[var(--rm-surface)] hover:border-blue-300'"
+                ? 'border-[var(--rm-info-strong)] ring-2 ring-[var(--rm-focus-ring-color)] bg-[var(--rm-info-soft)] shadow-xs'
+                : 'border-[var(--rm-border)] bg-[var(--rm-surface)] hover:border-[var(--rm-info-strong)]'"
              class="rounded-2xl border p-3 shadow-2xs cursor-pointer transition flex flex-col justify-between space-y-2">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-1.5">
-                    <span class="h-6 w-6 rounded-lg bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center text-xs">
+                    <span class="h-6 w-6 rounded-lg bg-[var(--rm-danger-soft)] text-[var(--rm-danger-strong)] border border-[var(--rm-danger-strong)] flex items-center justify-center text-xs">
                         <i class="ph-bold ph-heartbeat"></i>
                     </span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)]">Presión art.</span>
                 </div>
                 <span class="text-[10px] font-bold px-1.5 py-0.5 rounded border"
-                      :class="metricasInfo['PA']?.estado_badge || 'bg-emerald-100 text-emerald-800 border-emerald-200'"
+                      :class="metricasInfo['PA']?.estado_badge || 'bg-[var(--rm-success-soft)] text-[var(--rm-success-strong)] border-[var(--rm-success-strong)]'"
                       x-text="metricasInfo['PA']?.estado || 'Normal'">
                     Normal
                 </span>
@@ -460,18 +460,18 @@
         {{-- CARD 2: Frecuencia cardíaca --}}
         <div @click="seleccionarMetrica('FC')"
              :class="metricaActiva === 'FC'
-                ? 'border-blue-600 ring-2 ring-blue-500/25 bg-blue-50/40 shadow-xs'
-                : 'border-[var(--rm-border)] bg-[var(--rm-surface)] hover:border-blue-300'"
+                ? 'border-[var(--rm-info-strong)] ring-2 ring-[var(--rm-focus-ring-color)] bg-[var(--rm-info-soft)] shadow-xs'
+                : 'border-[var(--rm-border)] bg-[var(--rm-surface)] hover:border-[var(--rm-info-strong)]'"
              class="rounded-2xl border p-3 shadow-2xs cursor-pointer transition flex flex-col justify-between space-y-2">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-1.5">
-                    <span class="h-6 w-6 rounded-lg bg-red-50 text-red-600 border border-red-200 flex items-center justify-center text-xs">
+                    <span class="h-6 w-6 rounded-lg bg-[var(--rm-danger-soft)] text-[var(--rm-danger-strong)] border border-[var(--rm-danger-strong)] flex items-center justify-center text-xs">
                         <i class="ph-bold ph-heart"></i>
                     </span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)]">Frec. card.</span>
                 </div>
                 <span class="text-[10px] font-bold px-1.5 py-0.5 rounded border"
-                      :class="metricasInfo['FC']?.estado_badge || 'bg-emerald-100 text-emerald-800 border-emerald-200'"
+                      :class="metricasInfo['FC']?.estado_badge || 'bg-[var(--rm-success-soft)] text-[var(--rm-success-strong)] border-[var(--rm-success-strong)]'"
                       x-text="metricasInfo['FC']?.estado || 'Normal'">
                     Normal
                 </span>
@@ -491,18 +491,18 @@
         {{-- CARD 3: Saturación O₂ --}}
         <div @click="seleccionarMetrica('SPO2')"
              :class="metricaActiva === 'SPO2'
-                ? 'border-blue-600 ring-2 ring-blue-500/25 bg-blue-50/40 shadow-xs'
-                : 'border-[var(--rm-border)] bg-[var(--rm-surface)] hover:border-blue-300'"
+                ? 'border-[var(--rm-info-strong)] ring-2 ring-[var(--rm-focus-ring-color)] bg-[var(--rm-info-soft)] shadow-xs'
+                : 'border-[var(--rm-border)] bg-[var(--rm-surface)] hover:border-[var(--rm-info-strong)]'"
              class="rounded-2xl border p-3 shadow-2xs cursor-pointer transition flex flex-col justify-between space-y-2">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-1.5">
-                    <span class="h-6 w-6 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center text-xs">
+                    <span class="h-6 w-6 rounded-lg bg-[var(--rm-success-soft)] text-[var(--rm-success-strong)] border border-[var(--rm-success-strong)] flex items-center justify-center text-xs">
                         <i class="ph-bold ph-drop"></i>
                     </span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)]">Saturación O₂</span>
                 </div>
                 <span class="text-[10px] font-bold px-1.5 py-0.5 rounded border"
-                      :class="metricasInfo['SPO2']?.estado_badge || 'bg-emerald-100 text-emerald-800 border-emerald-200'"
+                      :class="metricasInfo['SPO2']?.estado_badge || 'bg-[var(--rm-success-soft)] text-[var(--rm-success-strong)] border-[var(--rm-success-strong)]'"
                       x-text="metricasInfo['SPO2']?.estado || 'Normal'">
                     Normal
                 </span>
@@ -522,18 +522,18 @@
         {{-- CARD 4: Temperatura --}}
         <div @click="seleccionarMetrica('TEMP')"
              :class="metricaActiva === 'TEMP'
-                ? 'border-blue-600 ring-2 ring-blue-500/25 bg-blue-50/40 shadow-xs'
-                : 'border-[var(--rm-border)] bg-[var(--rm-surface)] hover:border-blue-300'"
+                ? 'border-[var(--rm-info-strong)] ring-2 ring-[var(--rm-focus-ring-color)] bg-[var(--rm-info-soft)] shadow-xs'
+                : 'border-[var(--rm-border)] bg-[var(--rm-surface)] hover:border-[var(--rm-info-strong)]'"
              class="rounded-2xl border p-3 shadow-2xs cursor-pointer transition flex flex-col justify-between space-y-2">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-1.5">
-                    <span class="h-6 w-6 rounded-lg bg-orange-50 text-orange-600 border border-orange-200 flex items-center justify-center text-xs">
+                    <span class="h-6 w-6 rounded-lg bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)] border border-[var(--rm-warning-strong)] flex items-center justify-center text-xs">
                         <i class="ph-bold ph-thermometer"></i>
                     </span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)]">Temperatura</span>
                 </div>
                 <span class="text-[10px] font-bold px-1.5 py-0.5 rounded border"
-                      :class="metricasInfo['TEMP']?.estado_badge || 'bg-emerald-100 text-emerald-800 border-emerald-200'"
+                      :class="metricasInfo['TEMP']?.estado_badge || 'bg-[var(--rm-success-soft)] text-[var(--rm-success-strong)] border-[var(--rm-success-strong)]'"
                       x-text="metricasInfo['TEMP']?.estado || 'Afebril'">
                     Afebril
                 </span>
@@ -553,18 +553,18 @@
         {{-- CARD 5: Frecuencia respiratoria --}}
         <div @click="seleccionarMetrica('FR')"
              :class="metricaActiva === 'FR'
-                ? 'border-blue-600 ring-2 ring-blue-500/25 bg-blue-50/40 shadow-xs'
-                : 'border-[var(--rm-border)] bg-[var(--rm-surface)] hover:border-blue-300'"
+                ? 'border-[var(--rm-info-strong)] ring-2 ring-[var(--rm-focus-ring-color)] bg-[var(--rm-info-soft)] shadow-xs'
+                : 'border-[var(--rm-border)] bg-[var(--rm-surface)] hover:border-[var(--rm-info-strong)]'"
              class="rounded-2xl border p-3 shadow-2xs cursor-pointer transition flex flex-col justify-between space-y-2">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-1.5">
-                    <span class="h-6 w-6 rounded-lg bg-cyan-50 text-cyan-600 border border-cyan-200 flex items-center justify-center text-xs">
+                    <span class="h-6 w-6 rounded-lg bg-[var(--rm-info-soft)] text-[var(--rm-info-strong)] border border-[var(--rm-info-strong)] flex items-center justify-center text-xs">
                         <i class="ph-bold ph-wind"></i>
                     </span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)]">Frec. resp.</span>
                 </div>
                 <span class="text-[10px] font-bold px-1.5 py-0.5 rounded border"
-                      :class="metricasInfo['FR']?.estado_badge || 'bg-emerald-100 text-emerald-800 border-emerald-200'"
+                      :class="metricasInfo['FR']?.estado_badge || 'bg-[var(--rm-success-soft)] text-[var(--rm-success-strong)] border-[var(--rm-success-strong)]'"
                       x-text="metricasInfo['FR']?.estado || 'Eupnea'">
                     Eupnea
                 </span>
@@ -584,18 +584,18 @@
         {{-- CARD 6: Dolor EVA --}}
         <div @click="seleccionarMetrica('DOLOR')"
              :class="metricaActiva === 'DOLOR'
-                ? 'border-blue-600 ring-2 ring-blue-500/25 bg-blue-50/40 shadow-xs'
-                : 'border-[var(--rm-border)] bg-[var(--rm-surface)] hover:border-blue-300'"
+                ? 'border-[var(--rm-info-strong)] ring-2 ring-[var(--rm-focus-ring-color)] bg-[var(--rm-info-soft)] shadow-xs'
+                : 'border-[var(--rm-border)] bg-[var(--rm-surface)] hover:border-[var(--rm-info-strong)]'"
              class="rounded-2xl border p-3 shadow-2xs cursor-pointer transition flex flex-col justify-between space-y-2">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-1.5">
-                    <span class="h-6 w-6 rounded-lg bg-purple-50 text-purple-600 border border-purple-200 flex items-center justify-center text-xs">
+                    <span class="h-6 w-6 rounded-lg bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] border border-[var(--rm-border-strong)] flex items-center justify-center text-xs">
                         <i class="ph-bold ph-smiley-meh"></i>
                     </span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)]">Dolor EVA</span>
                 </div>
                 <span class="text-[10px] font-bold px-1.5 py-0.5 rounded border"
-                      :class="metricasInfo['DOLOR']?.estado_badge || 'bg-emerald-100 text-emerald-800 border-emerald-200'"
+                      :class="metricasInfo['DOLOR']?.estado_badge || 'bg-[var(--rm-success-soft)] text-[var(--rm-success-strong)] border-[var(--rm-success-strong)]'"
                       x-text="metricasInfo['DOLOR']?.estado || 'Leve'">
                     Leve
                 </span>
@@ -624,12 +624,12 @@
             <div class="flex items-center justify-between border-b border-[var(--rm-border)]/60 pb-2.5">
                 <div>
                     <h3 class="text-xs font-bold text-[var(--rm-text-title)] uppercase tracking-wider flex items-center gap-1.5">
-                        <i class="ph-bold ph-warning-circle text-amber-600"></i>
+                        <i class="ph-bold ph-warning-circle text-[var(--rm-warning-strong)]"></i>
                         <span>Eventos relevantes</span>
                     </h3>
                     <p class="text-[11px] text-[var(--rm-text-muted)] mt-0.5">Alteraciones detectadas en el periodo</p>
                 </div>
-                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)] border border-[var(--rm-warning-strong)]">
                     {{ count($eventosRelevantes) }} hallazgos
                 </span>
             </div>
@@ -647,13 +647,13 @@
                         </div>
                         <div class="flex items-baseline justify-between pt-0.5">
                             <span class="text-xs font-bold text-[var(--rm-text-title)]">{{ $ev['evento'] }}</span>
-                            <span class="text-xs font-bold text-rose-600 font-mono">{{ $ev['valor'] }}</span>
+                            <span class="text-xs font-bold text-[var(--rm-danger-strong)] font-mono">{{ $ev['valor'] }}</span>
                         </div>
                         <p class="text-[11px] text-[var(--rm-text-muted)] leading-tight">{{ $ev['motivo'] ?? ($ev['registro']->observacion ?? ($ev['registro']->observaciones ?? ($ev['evento'] ?? 'Hallazgo hemodinámico reportado.'))) }}</p>
                     </div>
                 @empty
                     <div class="p-4 text-center text-xs text-[var(--rm-text-muted)] italic bg-[var(--rm-surface-alt)]/40 rounded-xl border border-[var(--rm-border)]/50">
-                        <i class="ph-bold ph-shield-check text-2xl text-emerald-600 mb-1 block"></i>
+                        <i class="ph-bold ph-shield-check text-2xl text-[var(--rm-success-strong)] mb-1 block"></i>
                         <span>Sin eventos de alerta o alteraciones críticas registradas en este periodo.</span>
                     </div>
                 @endforelse
@@ -665,7 +665,7 @@
             <div class="flex items-center justify-between border-b border-[var(--rm-border)]/60 pb-2.5">
                 <div>
                     <h3 class="text-xs font-bold text-[var(--rm-text-title)] uppercase tracking-wider flex items-center gap-1.5">
-                        <i class="ph-bold ph-clock-counter-clockwise text-blue-600"></i>
+                        <i class="ph-bold ph-clock-counter-clockwise text-[var(--rm-info-strong)]"></i>
                         <span>Histórico de registros</span>
                     </h3>
                     <p class="text-[11px] text-[var(--rm-text-muted)] mt-0.5">Valores numéricos, motivo clínico y justificación de control</p>
@@ -678,7 +678,7 @@
                             @click="exportarSignosExcel()"
                             title="Descargar Excel"
                             class="inline-flex items-center gap-1 px-2 py-1 rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] text-[10px] font-bold text-[var(--rm-text-body)] hover:text-[var(--rm-text-title)] transition cursor-pointer">
-                        <i class="ph-bold ph-file-xls text-emerald-600 text-xs"></i>
+                        <i class="ph-bold ph-file-xls text-[var(--rm-success-strong)] text-xs"></i>
                         <span>Excel</span>
                     </button>
                 </div>
@@ -735,7 +735,7 @@
                                 <td class="py-2.5 px-3">
                                     <div class="flex flex-col gap-0.5">
                                         <span class="font-bold text-[11px] text-[var(--rm-text-title)] flex items-center gap-1.5">
-                                            <span class="h-1.5 w-1.5 rounded-full {{ str_contains($item['badgeClass'], 'rose') ? 'bg-rose-500' : (str_contains($item['badgeClass'], 'amber') ? 'bg-amber-500' : 'bg-emerald-500') }}"></span>
+                                            <span class="h-1.5 w-1.5 rounded-full {{ str_contains($item['badgeClass'], '--rm-danger') ? 'bg-[var(--rm-danger)]' : (str_contains($item['badgeClass'], '--rm-warning') ? 'bg-[var(--rm-warning)]' : 'bg-[var(--rm-success)]') }}"></span>
                                             <span>{{ $item['criterio'] }}</span>
                                         </span>
                                         <span class="text-[10px] text-[var(--rm-text-muted)] truncate max-w-[240px] block" title="{{ $item['observaciones'] }}">
@@ -797,7 +797,7 @@
          x-on:keydown.escape.window="modalRangos = false">
 
         {{-- Backdrop oscurecido suave sin blur ni opacidad heredada --}}
-        <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-[0.5px] transition-opacity z-40"
+        <div class="fixed inset-0 bg-[var(--rm-modal-overlay)] backdrop-blur-[0.5px] transition-opacity z-40"
              @click="modalRangos = false"></div>
 
         {{-- Contenedor del Modal (100% Nítido, Alto Contraste, Sin opacidad) --}}
@@ -805,7 +805,7 @@
             {{-- Encabezado --}}
             <div class="flex items-start justify-between border-b border-[var(--rm-border)] pb-3.5">
                 <div class="flex items-center gap-3">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-[var(--rm-action-primary)] border border-blue-200 shadow-2xs">
+                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--rm-info-soft)] text-[var(--rm-action-primary)] border border-[var(--rm-info-strong)] shadow-2xs">
                         <i class="ph-bold ph-sliders-horizontal text-xl"></i>
                     </span>
                     <div>
@@ -837,12 +837,12 @@
                         <div>
                             <span class="text-[10.5px] font-medium text-[var(--rm-text-muted)] block mb-1">Mínimo</span>
                             <input type="number" x-model.number="rangos.pas_min"
-                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[#F0E8DE] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition">
+                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-[var(--rm-focus-ring-color)] focus:border-[var(--rm-action-primary)] transition">
                         </div>
                         <div>
                             <span class="text-[10.5px] font-medium text-[var(--rm-text-muted)] block mb-1">Máximo</span>
                             <input type="number" x-model.number="rangos.pas_max"
-                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[#F0E8DE] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition">
+                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-[var(--rm-focus-ring-color)] focus:border-[var(--rm-action-primary)] transition">
                         </div>
                     </div>
                 </div>
@@ -857,12 +857,12 @@
                         <div>
                             <span class="text-[10.5px] font-medium text-[var(--rm-text-muted)] block mb-1">Mínimo</span>
                             <input type="number" x-model.number="rangos.pad_min"
-                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[#F0E8DE] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition">
+                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-[var(--rm-focus-ring-color)] focus:border-[var(--rm-action-primary)] transition">
                         </div>
                         <div>
                             <span class="text-[10.5px] font-medium text-[var(--rm-text-muted)] block mb-1">Máximo</span>
                             <input type="number" x-model.number="rangos.pad_max"
-                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[#F0E8DE] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition">
+                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-[var(--rm-focus-ring-color)] focus:border-[var(--rm-action-primary)] transition">
                         </div>
                     </div>
                 </div>
@@ -877,12 +877,12 @@
                         <div>
                             <span class="text-[10.5px] font-medium text-[var(--rm-text-muted)] block mb-1">Mínimo</span>
                             <input type="number" x-model.number="rangos.fc_min"
-                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[#F0E8DE] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition">
+                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-[var(--rm-focus-ring-color)] focus:border-[var(--rm-action-primary)] transition">
                         </div>
                         <div>
                             <span class="text-[10.5px] font-medium text-[var(--rm-text-muted)] block mb-1">Máximo</span>
                             <input type="number" x-model.number="rangos.fc_max"
-                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[#F0E8DE] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition">
+                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-[var(--rm-focus-ring-color)] focus:border-[var(--rm-action-primary)] transition">
                         </div>
                     </div>
                 </div>
@@ -897,11 +897,11 @@
                         <div>
                             <span class="text-[10.5px] font-medium text-[var(--rm-text-muted)] block mb-1">Umbral Alerta (&lt;)</span>
                             <input type="number" x-model.number="rangos.spo2_min"
-                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[#F0E8DE] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition">
+                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-[var(--rm-focus-ring-color)] focus:border-[var(--rm-action-primary)] transition">
                         </div>
                         <div class="flex flex-col items-center justify-center p-1.5 rounded-lg bg-[var(--rm-surface)] border border-[var(--rm-border)] text-[10.5px] text-[var(--rm-text-muted)]">
                             <span>Rango normal</span>
-                            <span class="font-bold text-emerald-600 dark:text-emerald-400">≥ <span x-text="rangos.spo2_min"></span>%</span>
+                            <span class="font-bold text-[var(--rm-success-strong)] dark:text-[var(--rm-success-strong)]">≥ <span x-text="rangos.spo2_min"></span>%</span>
                         </div>
                     </div>
                 </div>
@@ -916,12 +916,12 @@
                         <div>
                             <span class="text-[10.5px] font-medium text-[var(--rm-text-muted)] block mb-1">Mínimo</span>
                             <input type="number" step="0.1" x-model.number="rangos.temp_min"
-                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[#F0E8DE] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition">
+                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-[var(--rm-focus-ring-color)] focus:border-[var(--rm-action-primary)] transition">
                         </div>
                         <div>
                             <span class="text-[10.5px] font-medium text-[var(--rm-text-muted)] block mb-1">Máximo</span>
                             <input type="number" step="0.1" x-model.number="rangos.temp_max"
-                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[#F0E8DE] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition">
+                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-[var(--rm-focus-ring-color)] focus:border-[var(--rm-action-primary)] transition">
                         </div>
                     </div>
                 </div>
@@ -936,12 +936,12 @@
                         <div>
                             <span class="text-[10.5px] font-medium text-[var(--rm-text-muted)] block mb-1">Mínimo</span>
                             <input type="number" x-model.number="rangos.fr_min"
-                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[#F0E8DE] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition">
+                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-[var(--rm-focus-ring-color)] focus:border-[var(--rm-action-primary)] transition">
                         </div>
                         <div>
                             <span class="text-[10.5px] font-medium text-[var(--rm-text-muted)] block mb-1">Máximo</span>
                             <input type="number" x-model.number="rangos.fr_max"
-                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[#F0E8DE] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition">
+                                   class="w-full rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-surface)] px-2.5 py-1.5 font-bold text-[var(--rm-text-title)] text-center shadow-xs focus:ring-2 focus:ring-[var(--rm-focus-ring-color)] focus:border-[var(--rm-action-primary)] transition">
                         </div>
                     </div>
                 </div>
@@ -951,7 +951,7 @@
             <div class="flex items-center justify-between border-t border-[var(--rm-border)] pt-3.5">
                 <button type="button"
                         @click="restablecerRangos()"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition cursor-pointer">
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[var(--rm-danger-strong)] hover:text-[var(--rm-danger-strong)] hover:bg-[var(--rm-danger-soft)] dark:hover:bg-[var(--rm-danger-action)] rounded-xl transition cursor-pointer">
                     <i class="ph-bold ph-arrow-counter-clockwise text-sm"></i>
                     <span>Restablecer estándar</span>
                 </button>
@@ -964,7 +964,7 @@
                     </button>
                     <button type="button"
                             @click="guardarRangos()"
-                            class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold text-white bg-[var(--rm-action-primary)] hover:bg-blue-900 rounded-xl transition cursor-pointer shadow-xs">
+                            class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold text-[var(--rm-text-on-primary)] bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary)] rounded-xl transition cursor-pointer shadow-xs">
                         <i class="ph-bold ph-check text-sm"></i>
                         <span>Guardar rangos</span>
                     </button>
@@ -1007,7 +1007,7 @@
                     <div class="flex items-start justify-between gap-3">
                         <div class="space-y-1">
                             <span class="rm-drawer-badge">
-                                <span class="h-1.5 w-1.5 rounded-full bg-blue-600 animate-pulse"></span>
+                                <span class="h-1.5 w-1.5 rounded-full bg-[var(--rm-info-action)] animate-pulse"></span>
                                 PANEL LATERAL DE CONSULTA
                             </span>
                             <div class="flex items-center gap-2 pt-0.5">
@@ -1032,7 +1032,7 @@
                     {{-- Card del Residente (Horizontal Compacta Golden Reference) --}}
                     <div class="rm-drawer-resident">
                         <div class="flex items-center gap-3 min-w-0">
-                            <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-[var(--rm-action-primary)] text-white font-bold text-sm shadow-xs">
+                            <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] font-bold text-sm shadow-xs">
                                 {{ substr($adultoMayor->nombres, 0, 1) }}{{ substr($adultoMayor->ap_paterno, 0, 1) }}
                             </div>
                             <div class="min-w-0">
@@ -1067,7 +1067,7 @@
                             <div class="rm-drawer-card-highlight space-y-2">
                                 <div class="flex items-center justify-between">
                                     <span class="inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-xs font-bold border"
-                                          :class="registroActivo.badgeClass || 'bg-emerald-100 text-emerald-800 border-emerald-200'">
+                                          :class="registroActivo.badgeClass || 'bg-[var(--rm-success-soft)] text-[var(--rm-success-strong)] border-[var(--rm-success-strong)]'">
                                         <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
                                         <span x-text="registroActivo.estado"></span>
                                     </span>
@@ -1083,7 +1083,7 @@
                             {{-- Profesional Responsable --}}
                             <div class="rm-drawer-card flex items-center justify-between">
                                 <div class="flex items-center gap-2.5">
-                                    <div class="h-8 w-8 rounded-full bg-[var(--rm-action-primary)] text-white flex items-center justify-center font-bold text-xs">
+                                    <div class="h-8 w-8 rounded-full bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] flex items-center justify-center font-bold text-xs">
                                         <i class="ph-bold ph-user"></i>
                                     </div>
                                     <div>
@@ -1187,9 +1187,9 @@
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100 translate-y-0"
          x-transition:leave-end="opacity-0 translate-y-2"
-         class="fixed bottom-5 right-5 z-50 flex items-center gap-2.5 rounded-xl bg-slate-900 text-white px-4 py-2.5 shadow-2xl border border-slate-700 text-xs font-semibold"
+         class="fixed bottom-5 right-5 z-50 flex items-center gap-2.5 rounded-xl bg-[var(--rm-surface-soft)] text-[var(--rm-text-on-primary)] px-4 py-2.5 shadow-2xl border border-[var(--rm-border)] text-xs font-semibold"
          style="display: none;">
-        <i class="ph-bold ph-check-circle text-emerald-400 text-base"></i>
+        <i class="ph-bold ph-check-circle text-[var(--rm-success-strong)] text-base"></i>
         <span x-text="toastMensaje"></span>
     </div>
 
@@ -1448,7 +1448,7 @@ document.addEventListener('alpine:init', () => {
                     observaciones: r.observacion || r.observaciones || 'Sin observaciones registradas.',
                     responsable: r.registrado_por || 'Responsable no registrado',
                     estado: ev.estado || 'Relevante',
-                    badgeClass: ev.badge_bg || 'bg-amber-100 text-amber-800 border-amber-200',
+                    badgeClass: ev.badge_bg || 'bg-[var(--rm-warning-soft)] text-[var(--rm-warning-strong)] border-[var(--rm-warning-strong)]',
                 };
             } else {
                 this.registroActivo = {
