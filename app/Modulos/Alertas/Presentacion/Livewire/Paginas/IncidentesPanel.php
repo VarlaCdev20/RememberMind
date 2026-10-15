@@ -14,6 +14,8 @@ use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -149,6 +151,8 @@ class IncidentesPanel extends Component
     public function setTab(string $tab): void
     {
         $this->tabActiva = in_array($tab, ['listado', 'historial']) ? $tab : 'listado';
+        $this->filtro_estado = '';
+        $this->cerrarMenus();
         $this->resetPage();
     }
 
@@ -195,7 +199,26 @@ class IncidentesPanel extends Component
         $this->filtro_estado = '';
         $this->fecha_desde = '';
         $this->fecha_hasta = '';
+        $this->resetValidation(['fecha_desde', 'fecha_hasta']);
         $this->resetPage();
+    }
+
+    public function limpiarFiltro(string $campo): void
+    {
+        if (! in_array($campo, ['search', 'filtro_tipo', 'filtro_gravedad', 'filtro_estado', 'fecha_desde', 'fecha_hasta'], true)) {
+            return;
+        }
+        $this->{$campo} = '';
+        $this->resetPage();
+    }
+
+    private function consultaIncidentes(): Builder
+    {
+        $usuario = Auth::user();
+        abort_unless($usuario && $usuario->estado === 'ACTIVO', 403);
+
+        return Incidente::query()->when($usuario->hasRole('ENFERMEROS'), fn (Builder $query) => $query
+            ->whereIn('cod_residente', app(TurnoEnfermeriaService::class)->obtenerPacientesAsignadosIds($usuario)));
     }
 
     public function toggleMenuContextual(string $id): void
@@ -345,7 +368,7 @@ class IncidentesPanel extends Component
             session()->flash('mensaje', 'Incidencia registrada con éxito: '.$incidente->cod_incidente);
         } catch (\Throwable $e) {
             Log::error('Error al registrar incidente: '.$e->getMessage(), ['exception' => $e]);
-            $this->addError('error_general', 'Ocurrió un error al registrar el incidente: '.$e->getMessage());
+            $this->addError('error_general', 'No se pudo registrar el incidente. Conservamos los datos; inténtelo de nuevo.');
         }
     }
 
@@ -355,18 +378,13 @@ class IncidentesPanel extends Component
     public function verIncidente(string $codIncidente): void
     {
         $this->cerrarMenus();
-        $this->incidenteSeleccionadoId = $codIncidente;
-        $this->incidenteDetalle = Incidente::with([
+        $incidente = $this->consultaIncidentes()->with([
             'residente.cama.habitacion',
             'personal.usuario',
             'jornada',
-        ])->find($codIncidente);
-
-        if (! $this->incidenteDetalle) {
-            session()->flash('error', 'El incidente no existe o ha sido retirado.');
-
-            return;
-        }
+        ])->findOrFail($codIncidente);
+        $this->incidenteSeleccionadoId = $codIncidente;
+        $this->incidenteDetalle = $incidente;
 
         // Buscar alerta asociada
         $this->alertaVinculada = Alerta::where('modulo', 'INCIDENTES')
@@ -419,11 +437,9 @@ class IncidentesPanel extends Component
     public function abrirModalEstado(string $codIncidente): void
     {
         $this->cerrarMenus();
+        $incidente = $this->consultaIncidentes()->findOrFail($codIncidente);
+        $this->autorizarMutacionIncidente($incidente);
         $this->incidenteSeleccionadoId = $codIncidente;
-        $incidente = Incidente::find($codIncidente);
-        if (! $incidente) {
-            return;
-        }
 
         $this->nuevo_estado = $incidente->estado;
         $this->nota_estado = '';
@@ -494,7 +510,7 @@ class IncidentesPanel extends Component
             }
         } catch (\Throwable $e) {
             Log::error('Error al generar alerta de incidente: '.$e->getMessage());
-            session()->flash('error', 'No se pudo generar la solicitud médica: '.$e->getMessage());
+            session()->flash('error', 'No se pudo generar la solicitud médica. Inténtelo de nuevo.');
         }
     }
 
@@ -509,10 +525,8 @@ class IncidentesPanel extends Component
             return;
         }
 
-        $incidente = Incidente::find($id);
-        if (! $incidente) {
-            return;
-        }
+        $incidente = $this->consultaIncidentes()->findOrFail($id);
+        $this->autorizarMutacionIncidente($incidente);
 
         $this->incidenteSeleccionadoId = $id;
         $this->derivacion_prioridad = in_array($incidente->gravedad, ['ALTA', 'CRITICA']) ? 'ALTA' : 'MEDIA';
@@ -575,7 +589,7 @@ class IncidentesPanel extends Component
             session()->flash('mensaje', 'Derivación '.$derivacion->cod_derivacion.' creada con éxito.');
         } catch (\Throwable $e) {
             Log::error('Error al crear derivación: '.$e->getMessage());
-            $this->addError('error_derivacion', 'No se pudo crear la derivación: '.$e->getMessage());
+            $this->addError('error_derivacion', 'No se pudo crear la derivación. Conservamos los datos; inténtelo de nuevo.');
         }
     }
 
@@ -614,27 +628,41 @@ class IncidentesPanel extends Component
         $residentesDisponibles = $residentesQuery->orderBy('apellido_paterno')->limit(30)->get();
 
         // 2. Query de Incidentes
-        $query = Incidente::query()
+        $query = $this->consultaIncidentes()
             ->with([
                 'residente.cama.habitacion',
                 'personal.usuario',
                 'alertaAsociada',
-            ])
-            ->when($restringirPorAsignacion, fn ($incidentes) => $incidentes->whereIn('cod_residente', $residentesAsignados));
+            ]);
+
+        // Totales y tipos pertenecen exclusivamente al mismo alcance autorizado.
+        $totalesEstado = (clone $query)->reorder()->selectRaw('estado, COUNT(*) as cantidad')->groupBy('estado')->pluck('cantidad', 'estado');
+        $conteos = [
+            'listado' => (int) ($totalesEstado['ABIERTO'] ?? 0) + (int) ($totalesEstado['EN_SEGUIMIENTO'] ?? 0),
+            'historial' => (int) ($totalesEstado['CERRADO'] ?? 0) + (int) ($totalesEstado['ANULADO'] ?? 0),
+        ];
+        $tiposFiltro = collect($this->tiposFrecuentes)->reject(fn ($tipo) => $tipo === 'OTRO')
+            ->merge((clone $query)->reorder()->distinct()->pluck('tipo_incidente'))->unique()->sort()->values();
+        $estadosFiltro = $this->tabActiva === 'historial'
+            ? ['CERRADO' => 'Cerrado', 'ANULADO' => 'Anulado']
+            : ['ABIERTO' => 'Abierto', 'EN_SEGUIMIENTO' => 'En seguimiento'];
+        $query->whereIn('estado', array_keys($estadosFiltro));
 
         // Filtro texto: residente, tipo, descripción
-        if (! empty($this->search)) {
-            $term = '%'.trim($this->search).'%';
-            $query->where(function ($q) use ($term) {
-                $q->where('tipo_incidente', 'LIKE', $term)
-                    ->orWhere('descripcion', 'LIKE', $term)
-                    ->orWhere('lugar', 'LIKE', $term)
-                    ->orWhereHas('residente', function ($r) use ($term) {
-                        $r->where('nombres', 'LIKE', $term)
-                            ->orWhere('apellido_paterno', 'LIKE', $term)
-                            ->orWhere('apellido_materno', 'LIKE', $term);
-                    });
-            });
+        if (trim($this->search) !== '') {
+            foreach (preg_split('/\s+/u', trim($this->search), -1, PREG_SPLIT_NO_EMPTY) as $palabra) {
+                $term = '%'.$palabra.'%';
+                $query->where(function ($q) use ($term) {
+                    $q->where('tipo_incidente', 'LIKE', $term)
+                        ->orWhere('descripcion', 'LIKE', $term)
+                        ->orWhere('lugar', 'LIKE', $term)
+                        ->orWhereHas('residente', function ($r) use ($term) {
+                            $r->where('nombres', 'LIKE', $term)
+                                ->orWhere('apellido_paterno', 'LIKE', $term)
+                                ->orWhere('apellido_materno', 'LIKE', $term);
+                        });
+                });
+            }
         }
 
         // Filtro tipo
@@ -653,10 +681,28 @@ class IncidentesPanel extends Component
         }
 
         // Filtro rango de fechas
-        if (! empty($this->fecha_desde)) {
+        $fechas = Validator::make([
+            'fecha_desde' => $this->fecha_desde,
+            'fecha_hasta' => $this->fecha_hasta,
+        ], [
+            'fecha_desde' => 'nullable|date_format:Y-m-d',
+            'fecha_hasta' => 'nullable|date_format:Y-m-d'.($this->fecha_desde !== '' ? '|after_or_equal:fecha_desde' : ''),
+        ], [
+            'fecha_desde.date_format' => 'Seleccione una fecha inicial válida.',
+            'fecha_hasta.date_format' => 'Seleccione una fecha final válida.',
+            'fecha_hasta.after_or_equal' => 'Hasta debe ser igual o posterior a Desde.',
+        ]);
+        $this->resetValidation(['fecha_desde', 'fecha_hasta']);
+        if ($fechas->fails()) {
+            foreach ($fechas->errors()->messages() as $campo => $mensajes) {
+                $this->addError($campo, $mensajes[0]);
+            }
+            $query->whereRaw('1 = 0');
+        }
+        if (! $fechas->fails() && $this->fecha_desde !== '') {
             $query->whereDate('fecha_hora', '>=', $this->fecha_desde);
         }
-        if (! empty($this->fecha_hasta)) {
+        if (! $fechas->fails() && $this->fecha_hasta !== '') {
             $query->whereDate('fecha_hora', '<=', $this->fecha_hasta);
         }
 
@@ -683,7 +729,7 @@ class IncidentesPanel extends Component
             $query->orderBy('fecha_hora', 'desc');
         }
 
-        $incidentes = $query->paginate(15);
+        $incidentes = $query->orderBy('cod_incidente', 'desc')->paginate(15);
 
         // Áreas disponibles para derivación
         $areasDisponibles = Area::where('estado', 'ACTIVO')
@@ -694,6 +740,10 @@ class IncidentesPanel extends Component
             'incidentes' => $incidentes,
             'residentesDisponibles' => $residentesDisponibles,
             'areasDisponibles' => $areasDisponibles,
+            'conteos' => $conteos,
+            'tiposFiltro' => $tiposFiltro,
+            'estadosFiltro' => $estadosFiltro,
+            'puedeRegistrar' => (bool) $usuario?->can('incidentes.crear') && (! $restringirPorAsignacion || $turnos->obtenerTurnoActivo($usuario) !== null),
         ])->layout(request()->routeIs('admin.enfermeria.*') ? 'layouts.enfermeria' : 'layouts.sistema');
     }
 

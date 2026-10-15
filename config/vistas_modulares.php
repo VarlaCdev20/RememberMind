@@ -55,6 +55,8 @@ return [
     'livewire.cuidados.ficha.tab-signos' => 'app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-signos.blade.php',
     'livewire.cuidados.ficha-paciente' => 'app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha-paciente.blade.php',
     'livewire.cuidados.incidentes-panel' => 'app/Modulos/Alertas/Presentacion/Vistas/livewire/cuidados/incidentes-panel.blade.php',
+    'livewire.cuidados.partials.incidentes-listado' => 'app/Modulos/Alertas/Presentacion/Vistas/livewire/cuidados/partials/incidentes-listado.blade.php',
+    'livewire.cuidados.partials.incidente-detalle' => 'app/Modulos/Alertas/Presentacion/Vistas/livewire/cuidados/partials/incidente-detalle.blade.php',
     'livewire.cuidados.mis-residentes-directorio' => 'app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/mis-residentes-directorio.blade.php',
     'livewire.cuidados.partials.clinical-operation-result' => 'app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/clinical-operation-result.blade.php',
     'livewire.cuidados.partials.heridas-curaciones' => 'app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/heridas-curaciones.blade.php',
