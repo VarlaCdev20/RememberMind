@@ -126,7 +126,7 @@ class AdaptadorFuentesCOGMEMTest extends TestCase
         F::paquete($t);
     }
 
-    public function test_soportes_con_prerrequisito_comun_y_hecho_independiente_no_se_descartan(): void
+    public function test_prerrequisito_comun_y_soporte_exclusivo_en_un_solo_lado_no_generan_mixtos(): void
     {
         $t = F::tablas();
         $t['condiciones_regla_experta'][1]['cod_valor_semantico'] = 'VAL_A';
@@ -138,6 +138,32 @@ class AdaptadorFuentesCOGMEMTest extends TestCase
         $m->vincular('MEM', $ins->id, 'INSTRUMENTAL');
         $obs = $a->adaptar($p, $m, F::fuente('literal_B', 'memoria_reciente', 'CTRL_OBS'), 'MAP_OBS');
         $m->vincular('MEM', $obs->id, 'OBSERVACIONAL');
+
+        // RULE_A depende solo del episodio común; RULE_B añade un segundo hecho.
+        // La diferencia entre conjuntos no constituye exclusividad en ambas categorías.
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('Soportes opuestos no independientes');
+        (new MotorExperto)->evaluarCOGMEM($p, $m, 'MEM', F::contextoClinico());
+    }
+
+    public function test_prerrequisito_comun_con_soportes_exclusivos_en_ambas_categorias_si_genera_mixtos(): void
+    {
+        $t = F::tablas();
+        $t['condiciones_regla_experta'][1]['cod_valor_semantico'] = 'VAL_A';
+        $t['condiciones_regla_experta'][] = ['cod_condicion_regla' => 'COND_OBS_A', 'cod_regla_experta' => 'RULE_A', 'cod_variable_experta' => 'VAR_OBS', 'cod_valor_semantico' => 'VAL_A'];
+        $t['condiciones_regla_experta'][] = ['cod_condicion_regla' => 'COND_OBS_B', 'cod_regla_experta' => 'RULE_B', 'cod_variable_experta' => 'VAR_OBS', 'cod_valor_semantico' => 'VAL_B'];
+        $p = F::paquete($t);
+        $m = new MemoriaTrabajo(F::contexto());
+        $a = new AdaptadorFuentesCOGMEM;
+        $ins = $a->adaptar($p, $m, F::fuente(), 'MAP_INS');
+        $m->vincular('MEM', $ins->id, 'INSTRUMENTAL');
+
+        // Un mismo prerrequisito no debe invalidar hallazgos adicionales distintos.
+        foreach (['A', 'B'] as $valor) {
+            $obs = $a->adaptar($p, $m, F::fuente('literal_'.$valor, 'memoria_reciente', 'CTRL_OBS_'.$valor), 'MAP_OBS');
+            $m->vincular('MEM', $obs->id, 'OBSERVACIONAL');
+        }
+
         $r = (new MotorExperto)->evaluarCOGMEM($p, $m, 'MEM', F::contextoClinico());
         $this->assertSame('HALLAZGOS_MIXTOS', $r['resultado']['codigo']);
         $this->assertSame('RES_TEST', $r['traza']['residente']);
