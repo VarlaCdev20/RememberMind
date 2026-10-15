@@ -359,6 +359,9 @@ final class LecturaResultadosExperto
             $conjuntos[] = $efectivos;
         }
 
-        return (bool) $conjuntos[0] && (bool) $conjuntos[1] && $conjuntos[0] !== $conjuntos[1];
+        // El lector debe verificar la misma independencia bilateral que el motor D-131.
+        // Una diferencia de conjuntos con soporte exclusivo en un solo lado no basta.
+        return (bool) array_diff($conjuntos[0], $conjuntos[1])
+            && (bool) array_diff($conjuntos[1], $conjuntos[0]);
     }
 }

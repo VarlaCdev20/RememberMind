@@ -41,7 +41,13 @@ final class ResolvedorSoportesCOGMEM
         if ($dificultad && $sin) {
             $dEfectivos = $memoria->soportesEfectivos($dificultad);
             $sEfectivos = $memoria->soportesEfectivos($sin);
-            if ($dEfectivos === $sEfectivos) {
+            // La desigualdad de conjuntos no prueba independencia: una ruta puede
+            // aportar soportes extra mientras la opuesta depende solo del episodio compartido.
+            // D-099/D-131: cada categoría necesita al menos un episodio que no
+            // pertenezca a los soportes efectivos de la categoría contraria.
+            $dExclusivos = array_diff($dEfectivos, $sEfectivos);
+            $sExclusivos = array_diff($sEfectivos, $dEfectivos);
+            if (! $dExclusivos || ! $sExclusivos) {
                 throw new DomainException('Soportes opuestos no independientes; no fabricar hallazgos mixtos.');
             }
             $codigo = 'HALLAZGOS_MIXTOS';
