@@ -1,0 +1,674 @@
+{
+  "version": "FC4-20261016-v1.0-TECNICA",
+  "fecha": "2026-10-16",
+  "estado": "FORMALIZACION_DOCUMENTAL_VERSIONADA_PARA_DICTAMEN",
+  "validacion_clinica": false,
+  "conocimiento_clinico_activo": false,
+  "autorizacion_inferencial": false,
+  "fuentes": [
+    "Anexo A: 2_Conceptos, 3_Evidencias, 8_Evaluabilidad, 11_Confusores, 13_Solapamientos",
+    "Documento 15",
+    "G06",
+    "G07",
+    "G08",
+    "G09",
+    "G10",
+    "G12"
+  ],
+  "restricciones": [
+    "sin datos reales de residentes",
+    "sin mapeos clínicos activos",
+    "sin instrumentos sin licencia/edición/norma aprobada",
+    "sin pesos ni umbrales",
+    "sin inferencia por ausencia",
+    "sin duplicar episodios",
+    "sin copiar D-131 de COG-MEM",
+    "sin diagnósticos ni activación clínica"
+  ],
+  "criterios": [
+    {
+      "codigo": "COG-ATE",
+      "nombre": "Atención",
+      "estado_tecnico": "INACTIVO",
+      "subcomponentes": [
+        {
+          "codigo": "ATE-S01",
+          "nombre": "Atención sostenida",
+          "valor_resultado_documental": "ATE-R-SOSTENIMIENTO",
+          "regla": {
+            "codigo": "REG-ATE-S01-G09-PROP",
+            "antecedentes_positivos_AND": [
+              "EVALUABILIDAD_APROBADA",
+              "INSTRUMENTO_VERSION_COMPONENTE_AUTORIZADOS",
+              "EVIDENCIA_ESPECIFICA_ADMISIBLE",
+              "CONTEXTO_SUFICIENTE",
+              "SOPORTE_NO_DUPLICADO",
+              "CONSECUENCIA_APROBADA"
+            ],
+            "ejecutable": false
+          },
+          "instrumentacion": "PENDIENTE_G08"
+        },
+        {
+          "codigo": "ATE-S02",
+          "nombre": "Atención selectiva",
+          "valor_resultado_documental": "ATE-R-SELECCION",
+          "regla": {
+            "codigo": "REG-ATE-S02-G09-PROP",
+            "antecedentes_positivos_AND": [
+              "EVALUABILIDAD_APROBADA",
+              "INSTRUMENTO_VERSION_COMPONENTE_AUTORIZADOS",
+              "EVIDENCIA_ESPECIFICA_ADMISIBLE",
+              "CONTEXTO_SUFICIENTE",
+              "SOPORTE_NO_DUPLICADO",
+              "CONSECUENCIA_APROBADA"
+            ],
+            "ejecutable": false
+          },
+          "instrumentacion": "PENDIENTE_G08"
+        },
+        {
+          "codigo": "ATE-S03",
+          "nombre": "Atención dividida",
+          "valor_resultado_documental": "ATE-R-DISTRIBUCION",
+          "regla": {
+            "codigo": "REG-ATE-S03-G09-PROP",
+            "antecedentes_positivos_AND": [
+              "EVALUABILIDAD_APROBADA",
+              "INSTRUMENTO_VERSION_COMPONENTE_AUTORIZADOS",
+              "EVIDENCIA_ESPECIFICA_ADMISIBLE",
+              "CONTEXTO_SUFICIENTE",
+              "SOPORTE_NO_DUPLICADO",
+              "CONSECUENCIA_APROBADA"
+            ],
+            "ejecutable": false
+          },
+          "instrumentacion": "PENDIENTE_G08"
+        }
+      ],
+      "evidencias": [
+        {
+          "codigo": "EV-ATE-01",
+          "origen": "controles_cognitivos.atencion",
+          "clase": "observacional",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        },
+        {
+          "codigo": "EV-ATE-02",
+          "origen": "seguimientos_pedagogicos.atencion",
+          "clase": "corroborativa",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        },
+        {
+          "codigo": "EV-ATE-03",
+          "origen": "controles_cognitivos.sigue_instrucciones",
+          "clase": "multidominio",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        },
+        {
+          "codigo": "EV-ATE-04",
+          "origen": "controles_cognitivos.olvida_indicaciones",
+          "clase": "multidominio",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        },
+        {
+          "codigo": "EV-ATE-05",
+          "origen": "aplicaciones_instrumento + respuestas_instrumento",
+          "clase": "instrumental pendiente",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        },
+        {
+          "codigo": "EV-ATE-06",
+          "origen": "cambio_desempeno + cambio_cognitivo",
+          "clase": "metaevidencia",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        }
+      ],
+      "evaluabilidad": [
+        {
+          "codigo": "EV-CA-0",
+          "estado": "PENDIENTE_G07",
+          "resultados_permitidos": false
+        },
+        {
+          "codigo": "EV-CA-1",
+          "estado": "PENDIENTE_G07",
+          "resultados_permitidos": false
+        },
+        {
+          "codigo": "EV-CA-2",
+          "estado": "PENDIENTE_G07",
+          "resultados_permitidos": false
+        }
+      ],
+      "modificador": {
+        "codigo": "MOD-CA-1",
+        "tipo": "ADVERTENCIA_INDEPENDIENTE",
+        "estado": "PENDIENTE_G07"
+      },
+      "factores_a_revisar": [
+        "delirium posible/estado agudo",
+        "sueño/fatiga",
+        "sedación/medicación",
+        "audición",
+        "visión",
+        "estado afectivo"
+      ],
+      "politica_solapamientos": "MANTENER_ID_EVIDENCIA_Y_EPISODIO_UNICOS; SIN_SUMAR_SOPORTE_INDEPENDIENTE",
+      "registro_traza": [
+        "version",
+        "criterio",
+        "subcomponente",
+        "fuente",
+        "episodio",
+        "admisibilidad",
+        "regla",
+        "condiciones",
+        "soportes",
+        "no_emision"
+      ],
+      "resultados_clinicos": [],
+      "casos_referencia_profesional": "PENDIENTE_G12",
+      "dictamen_firmado": false
+    },
+    {
+      "codigo": "COG-EJE",
+      "nombre": "Función ejecutiva",
+      "estado_tecnico": "INACTIVO",
+      "subcomponentes": [
+        {
+          "codigo": "EJE-S01",
+          "nombre": "Control inhibitorio",
+          "valor_resultado_documental": "EJE-R-INHIBICION",
+          "regla": {
+            "codigo": "REG-EJE-S01-G09-PROP",
+            "antecedentes_positivos_AND": [
+              "EVALUABILIDAD_APROBADA",
+              "INSTRUMENTO_VERSION_COMPONENTE_AUTORIZADOS",
+              "EVIDENCIA_ESPECIFICA_ADMISIBLE",
+              "CONTEXTO_SUFICIENTE",
+              "SOPORTE_NO_DUPLICADO",
+              "CONSECUENCIA_APROBADA"
+            ],
+            "ejecutable": false
+          },
+          "instrumentacion": "PENDIENTE_G08"
+        },
+        {
+          "codigo": "EJE-S02",
+          "nombre": "Flexibilidad cognitiva",
+          "valor_resultado_documental": "EJE-R-FLEXIBILIDAD",
+          "regla": {
+            "codigo": "REG-EJE-S02-G09-PROP",
+            "antecedentes_positivos_AND": [
+              "EVALUABILIDAD_APROBADA",
+              "INSTRUMENTO_VERSION_COMPONENTE_AUTORIZADOS",
+              "EVIDENCIA_ESPECIFICA_ADMISIBLE",
+              "CONTEXTO_SUFICIENTE",
+              "SOPORTE_NO_DUPLICADO",
+              "CONSECUENCIA_APROBADA"
+            ],
+            "ejecutable": false
+          },
+          "instrumentacion": "PENDIENTE_G08"
+        },
+        {
+          "codigo": "EJE-S03",
+          "nombre": "Actualización/manipulación",
+          "valor_resultado_documental": "EJE-R-ACTUALIZACION",
+          "regla": {
+            "codigo": "REG-EJE-S03-G09-PROP",
+            "antecedentes_positivos_AND": [
+              "EVALUABILIDAD_APROBADA",
+              "INSTRUMENTO_VERSION_COMPONENTE_AUTORIZADOS",
+              "EVIDENCIA_ESPECIFICA_ADMISIBLE",
+              "CONTEXTO_SUFICIENTE",
+              "SOPORTE_NO_DUPLICADO",
+              "CONSECUENCIA_APROBADA"
+            ],
+            "ejecutable": false
+          },
+          "instrumentacion": "PENDIENTE_G08"
+        },
+        {
+          "codigo": "EJE-S04",
+          "nombre": "Planificación",
+          "valor_resultado_documental": "EJE-R-PLANIFICACION",
+          "regla": {
+            "codigo": "REG-EJE-S04-G09-PROP",
+            "antecedentes_positivos_AND": [
+              "EVALUABILIDAD_APROBADA",
+              "INSTRUMENTO_VERSION_COMPONENTE_AUTORIZADOS",
+              "EVIDENCIA_ESPECIFICA_ADMISIBLE",
+              "CONTEXTO_SUFICIENTE",
+              "SOPORTE_NO_DUPLICADO",
+              "CONSECUENCIA_APROBADA"
+            ],
+            "ejecutable": false
+          },
+          "instrumentacion": "PENDIENTE_G08"
+        },
+        {
+          "codigo": "EJE-S05",
+          "nombre": "Razonamiento/abstracción",
+          "valor_resultado_documental": "EJE-R-RAZONAMIENTO",
+          "regla": {
+            "codigo": "REG-EJE-S05-G09-PROP",
+            "antecedentes_positivos_AND": [
+              "EVALUABILIDAD_APROBADA",
+              "INSTRUMENTO_VERSION_COMPONENTE_AUTORIZADOS",
+              "EVIDENCIA_ESPECIFICA_ADMISIBLE",
+              "CONTEXTO_SUFICIENTE",
+              "SOPORTE_NO_DUPLICADO",
+              "CONSECUENCIA_APROBADA"
+            ],
+            "ejecutable": false
+          },
+          "instrumentacion": "PENDIENTE_G08"
+        }
+      ],
+      "evidencias": [
+        {
+          "codigo": "EV-EJE-01",
+          "origen": "seguimientos_pedagogicos.ejecucion_tarea",
+          "clase": "multidominio",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        },
+        {
+          "codigo": "EV-EJE-02",
+          "origen": "seguimientos_pedagogicos.cambio_desempeno",
+          "clase": "metaevidencia",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        },
+        {
+          "codigo": "EV-EJE-03",
+          "origen": "controles_cognitivos.sigue_instrucciones",
+          "clase": "multidominio",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        },
+        {
+          "codigo": "EV-EJE-04",
+          "origen": "aplicaciones_instrumento + respuestas_instrumento",
+          "clase": "instrumental pendiente",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        },
+        {
+          "codigo": "EV-EJE-05",
+          "origen": "valoraciones_funcionales.necesita_supervision / nivel_dependencia",
+          "clase": "contexto funcional",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        }
+      ],
+      "evaluabilidad": [
+        {
+          "codigo": "EV-CE-0",
+          "estado": "PENDIENTE_G07",
+          "resultados_permitidos": false
+        },
+        {
+          "codigo": "EV-CE-1",
+          "estado": "PENDIENTE_G07",
+          "resultados_permitidos": false
+        },
+        {
+          "codigo": "EV-CE-2",
+          "estado": "PENDIENTE_G07",
+          "resultados_permitidos": false
+        }
+      ],
+      "modificador": {
+        "codigo": "MOD-CE-1",
+        "tipo": "ADVERTENCIA_INDEPENDIENTE",
+        "estado": "PENDIENTE_G07"
+      },
+      "factores_a_revisar": [
+        "atención",
+        "delirium posible",
+        "visión/audición",
+        "motricidad/praxia",
+        "idioma/escolaridad",
+        "fatiga"
+      ],
+      "politica_solapamientos": "MANTENER_ID_EVIDENCIA_Y_EPISODIO_UNICOS; SIN_SUMAR_SOPORTE_INDEPENDIENTE",
+      "registro_traza": [
+        "version",
+        "criterio",
+        "subcomponente",
+        "fuente",
+        "episodio",
+        "admisibilidad",
+        "regla",
+        "condiciones",
+        "soportes",
+        "no_emision"
+      ],
+      "resultados_clinicos": [],
+      "casos_referencia_profesional": "PENDIENTE_G12",
+      "dictamen_firmado": false
+    },
+    {
+      "codigo": "COG-LEN",
+      "nombre": "Lenguaje",
+      "estado_tecnico": "INACTIVO",
+      "subcomponentes": [
+        {
+          "codigo": "LEN-S01",
+          "nombre": "Denominación",
+          "valor_resultado_documental": "LEN-R-DENOMINACION",
+          "regla": {
+            "codigo": "REG-LEN-S01-G09-PROP",
+            "antecedentes_positivos_AND": [
+              "EVALUABILIDAD_APROBADA",
+              "INSTRUMENTO_VERSION_COMPONENTE_AUTORIZADOS",
+              "EVIDENCIA_ESPECIFICA_ADMISIBLE",
+              "CONTEXTO_SUFICIENTE",
+              "SOPORTE_NO_DUPLICADO",
+              "CONSECUENCIA_APROBADA"
+            ],
+            "ejecutable": false
+          },
+          "instrumentacion": "PENDIENTE_G08"
+        },
+        {
+          "codigo": "LEN-S02",
+          "nombre": "Fluidez verbal",
+          "valor_resultado_documental": "LEN-R-FLUIDEZ",
+          "regla": {
+            "codigo": "REG-LEN-S02-G09-PROP",
+            "antecedentes_positivos_AND": [
+              "EVALUABILIDAD_APROBADA",
+              "INSTRUMENTO_VERSION_COMPONENTE_AUTORIZADOS",
+              "EVIDENCIA_ESPECIFICA_ADMISIBLE",
+              "CONTEXTO_SUFICIENTE",
+              "SOPORTE_NO_DUPLICADO",
+              "CONSECUENCIA_APROBADA"
+            ],
+            "ejecutable": false
+          },
+          "instrumentacion": "PENDIENTE_G08"
+        },
+        {
+          "codigo": "LEN-S03",
+          "nombre": "Comprensión",
+          "valor_resultado_documental": "LEN-R-COMPRENSION",
+          "regla": {
+            "codigo": "REG-LEN-S03-G09-PROP",
+            "antecedentes_positivos_AND": [
+              "EVALUABILIDAD_APROBADA",
+              "INSTRUMENTO_VERSION_COMPONENTE_AUTORIZADOS",
+              "EVIDENCIA_ESPECIFICA_ADMISIBLE",
+              "CONTEXTO_SUFICIENTE",
+              "SOPORTE_NO_DUPLICADO",
+              "CONSECUENCIA_APROBADA"
+            ],
+            "ejecutable": false
+          },
+          "instrumentacion": "PENDIENTE_G08"
+        },
+        {
+          "codigo": "LEN-S04",
+          "nombre": "Repetición",
+          "valor_resultado_documental": "LEN-R-REPETICION",
+          "regla": {
+            "codigo": "REG-LEN-S04-G09-PROP",
+            "antecedentes_positivos_AND": [
+              "EVALUABILIDAD_APROBADA",
+              "INSTRUMENTO_VERSION_COMPONENTE_AUTORIZADOS",
+              "EVIDENCIA_ESPECIFICA_ADMISIBLE",
+              "CONTEXTO_SUFICIENTE",
+              "SOPORTE_NO_DUPLICADO",
+              "CONSECUENCIA_APROBADA"
+            ],
+            "ejecutable": false
+          },
+          "instrumentacion": "PENDIENTE_G08"
+        },
+        {
+          "codigo": "LEN-S05",
+          "nombre": "Producción verbal/discurso",
+          "valor_resultado_documental": "LEN-R-DISCURSO",
+          "regla": {
+            "codigo": "REG-LEN-S05-G09-PROP",
+            "antecedentes_positivos_AND": [
+              "EVALUABILIDAD_APROBADA",
+              "INSTRUMENTO_VERSION_COMPONENTE_AUTORIZADOS",
+              "EVIDENCIA_ESPECIFICA_ADMISIBLE",
+              "CONTEXTO_SUFICIENTE",
+              "SOPORTE_NO_DUPLICADO",
+              "CONSECUENCIA_APROBADA"
+            ],
+            "ejecutable": false
+          },
+          "instrumentacion": "PENDIENTE_G08"
+        }
+      ],
+      "evidencias": [
+        {
+          "codigo": "EV-LEN-01",
+          "origen": "controles_cognitivos.lenguaje",
+          "clase": "observacional",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        },
+        {
+          "codigo": "EV-LEN-02",
+          "origen": "controles_cognitivos.comprension",
+          "clase": "multidominio",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        },
+        {
+          "codigo": "EV-LEN-03",
+          "origen": "valoraciones_psicologicas.comunicacion",
+          "clase": "contextual",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        },
+        {
+          "codigo": "EV-LEN-04",
+          "origen": "seguimientos_pedagogicos.comprension_instrucciones",
+          "clase": "multidominio",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        },
+        {
+          "codigo": "EV-LEN-05",
+          "origen": "controles_cognitivos.sigue_instrucciones",
+          "clase": "multidominio",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        },
+        {
+          "codigo": "EV-LEN-06",
+          "origen": "aplicaciones_instrumento + respuestas_instrumento",
+          "clase": "instrumental pendiente",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        }
+      ],
+      "evaluabilidad": [
+        {
+          "codigo": "EV-CL-0",
+          "estado": "PENDIENTE_G07",
+          "resultados_permitidos": false
+        },
+        {
+          "codigo": "EV-CL-1",
+          "estado": "PENDIENTE_G07",
+          "resultados_permitidos": false
+        },
+        {
+          "codigo": "EV-CL-2",
+          "estado": "PENDIENTE_G07",
+          "resultados_permitidos": false
+        }
+      ],
+      "modificador": {
+        "codigo": "MOD-CL-1",
+        "tipo": "ADVERTENCIA_INDEPENDIENTE",
+        "estado": "PENDIENTE_G07"
+      },
+      "factores_a_revisar": [
+        "audición",
+        "idioma/bilingüismo",
+        "alfabetización",
+        "atención/memoria",
+        "motricidad del habla",
+        "estado agudo"
+      ],
+      "politica_solapamientos": "MANTENER_ID_EVIDENCIA_Y_EPISODIO_UNICOS; SIN_SUMAR_SOPORTE_INDEPENDIENTE",
+      "registro_traza": [
+        "version",
+        "criterio",
+        "subcomponente",
+        "fuente",
+        "episodio",
+        "admisibilidad",
+        "regla",
+        "condiciones",
+        "soportes",
+        "no_emision"
+      ],
+      "resultados_clinicos": [],
+      "casos_referencia_profesional": "PENDIENTE_G12",
+      "dictamen_firmado": false
+    },
+    {
+      "codigo": "COG-VIS",
+      "nombre": "Función visuoespacial",
+      "estado_tecnico": "INACTIVO",
+      "subcomponentes": [
+        {
+          "codigo": "VIS-S01",
+          "nombre": "Percepción/relaciones espaciales",
+          "valor_resultado_documental": "VIS-R-PERCEPCION",
+          "regla": {
+            "codigo": "REG-VIS-S01-G09-PROP",
+            "antecedentes_positivos_AND": [
+              "EVALUABILIDAD_APROBADA",
+              "INSTRUMENTO_VERSION_COMPONENTE_AUTORIZADOS",
+              "EVIDENCIA_ESPECIFICA_ADMISIBLE",
+              "CONTEXTO_SUFICIENTE",
+              "SOPORTE_NO_DUPLICADO",
+              "CONSECUENCIA_APROBADA"
+            ],
+            "ejecutable": false
+          },
+          "instrumentacion": "PENDIENTE_G08"
+        },
+        {
+          "codigo": "VIS-S02",
+          "nombre": "Visuoconstrucción",
+          "valor_resultado_documental": "VIS-R-CONSTRUCCION",
+          "regla": {
+            "codigo": "REG-VIS-S02-G09-PROP",
+            "antecedentes_positivos_AND": [
+              "EVALUABILIDAD_APROBADA",
+              "INSTRUMENTO_VERSION_COMPONENTE_AUTORIZADOS",
+              "EVIDENCIA_ESPECIFICA_ADMISIBLE",
+              "CONTEXTO_SUFICIENTE",
+              "SOPORTE_NO_DUPLICADO",
+              "CONSECUENCIA_APROBADA"
+            ],
+            "ejecutable": false
+          },
+          "instrumentacion": "PENDIENTE_G08"
+        }
+      ],
+      "evidencias": [
+        {
+          "codigo": "EV-VIS-01",
+          "origen": "aplicaciones_instrumento + respuestas_instrumento",
+          "clase": "instrumental pendiente",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        },
+        {
+          "codigo": "EV-VIS-02",
+          "origen": "seguimientos_pedagogicos.ejecucion_tarea",
+          "clase": "contextual",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        },
+        {
+          "codigo": "EV-VIS-03",
+          "origen": "orientacion_persona/lugar/tiempo",
+          "clase": "contexto orientación no directo",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        },
+        {
+          "codigo": "EV-VIS-04",
+          "origen": "reconoce_personas / reconoce_entorno",
+          "clase": "multidominio",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        },
+        {
+          "codigo": "EV-VIS-05",
+          "origen": "recuerdo/retención visual instrumento",
+          "clase": "principalmente memoria",
+          "mapeo": "PENDIENTE_G06",
+          "autorizada": false
+        }
+      ],
+      "evaluabilidad": [
+        {
+          "codigo": "EV-CV-0",
+          "estado": "PENDIENTE_G07",
+          "resultados_permitidos": false
+        },
+        {
+          "codigo": "EV-CV-1",
+          "estado": "PENDIENTE_G07",
+          "resultados_permitidos": false
+        },
+        {
+          "codigo": "EV-CV-2",
+          "estado": "PENDIENTE_G07",
+          "resultados_permitidos": false
+        }
+      ],
+      "modificador": {
+        "codigo": "MOD-CV-1",
+        "tipo": "ADVERTENCIA_INDEPENDIENTE",
+        "estado": "PENDIENTE_G07"
+      },
+      "factores_a_revisar": [
+        "visión",
+        "motricidad/praxia",
+        "atención/planificación",
+        "fatiga/sedación",
+        "idioma",
+        "estado agudo"
+      ],
+      "politica_solapamientos": "MANTENER_ID_EVIDENCIA_Y_EPISODIO_UNICOS; SIN_SUMAR_SOPORTE_INDEPENDIENTE",
+      "registro_traza": [
+        "version",
+        "criterio",
+        "subcomponente",
+        "fuente",
+        "episodio",
+        "admisibilidad",
+        "regla",
+        "condiciones",
+        "soportes",
+        "no_emision"
+      ],
+      "resultados_clinicos": [],
+      "casos_referencia_profesional": "PENDIENTE_G12",
+      "dictamen_firmado": false
+    }
+  ]
+}
