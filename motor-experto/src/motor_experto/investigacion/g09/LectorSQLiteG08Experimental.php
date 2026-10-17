@@ -21,16 +21,23 @@ final class LectorSQLiteG08Experimental
         if ($db->getAttribute(PDO::ATTR_DRIVER_NAME) !== 'sqlite') {
             throw new DomainException('G08: se exige SQLite descartable, nunca conexión asistencial.');
         }
-        foreach ($db->query('PRAGMA database_list')->fetchAll(PDO::FETCH_ASSOC) as $base) {
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->verificarMemoria();
+    }
+
+    /** Revalidar en cada lectura también evita adjuntar después una BDD en disco. */
+    private function verificarMemoria(): void
+    {
+        foreach ($this->db->query('PRAGMA database_list')->fetchAll(PDO::FETCH_ASSOC) as $base) {
             if ((string)($base['file'] ?? '') !== '') {
                 throw new DomainException('G08: no se permite base SQLite guardada en disco.');
             }
         }
-        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
     public function leer(string $codAplicacion, string $residente): array
     {
+        $this->verificarMemoria();
         if (!str_starts_with($codAplicacion, 'SIM-')
             || !str_starts_with($residente, 'SINTETICO-')) {
             throw new DomainException('G08: identificadores fuera del conjunto ficticio.');
