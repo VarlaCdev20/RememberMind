@@ -39,7 +39,7 @@
             </div>
         @endif
 
-        @if(auth()->user()->can($anterior ? 'valoraciones_funcionales.editar' : 'valoraciones_funcionales.crear'))
+        @if(auth()->user()->can($anterior ? 'controles_funcionales_iadl.rectificar' : 'controles_funcionales_iadl.crear'))
             <form method="POST" action="{{ route('admin.adultos-mayores.iadl.store', ['adulto_mayor' => $adulto->cod_residente]) }}"
                 class="rounded-xl bg-white p-5 shadow-sm border border-slate-200 space-y-5">
                 @csrf
@@ -129,7 +129,7 @@
                                     @if($fila['cod_control_anterior'])
                                         <p>Corrige {{ $fila['cod_control_anterior'] }}</p>
                                     @endif
-                                    @if(auth()->user()->can('valoraciones_funcionales.editar'))
+                                    @if(auth()->user()->can('controles_funcionales_iadl.rectificar'))
                                         <a class="text-indigo-700 underline" href="{{ route('admin.adultos-mayores.iadl.index', ['adulto_mayor' => $adulto->cod_residente, 'rectificar' => $fila['cod_control_iadl']]) }}">Rectificar</a>
                                     @endif
                                 </td>
