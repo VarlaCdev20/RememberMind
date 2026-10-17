@@ -1,0 +1,25 @@
+name: ORION G09 experimental isolated PHP checks
+on:
+  pull_request:
+    paths:
+      - 'motor-experto/src/motor_experto/investigacion/g09/**'
+      - 'motor-experto/tests/g09_experimental.php'
+      - '.github/workflows/orion-g09-experimental.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test-g09:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+      - name: PHP syntax check
+        run: |
+          php -l motor-experto/src/motor_experto/investigacion/g09/CatalogoReglasG09Experimental.php
+          php -l motor-experto/src/motor_experto/investigacion/g09/EvaluadorG09Experimental.php
+          php -l motor-experto/tests/g09_experimental.php
+      - name: Isolated synthetic rule tests
+        run: php motor-experto/tests/g09_experimental.php
