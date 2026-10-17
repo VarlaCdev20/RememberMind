@@ -107,6 +107,22 @@ exigir($negativo['perfil'][$criterio]['resultado']['estado_tecnico'] === 'EVALUA
 exigir(count($negativo['perfil'][$criterio]['resultado']['traza']) === 1, 'Tarea interpretable sin traza');
 $pruebas += 2;
 
+// La fuente usa fecha_hora; una evaluación del mismo día debe admitirse
+// si el corte es diario o si el instante está antes de la hora de corte.
+$db->prepare("UPDATE respuestas_instrumento SET valor_texto = ? WHERE cod_pregunta = ?")->execute(['FALLO_SIMULADO', $pregunta]);
+$mismoDia = $base; $mismoDia['fecha_corte'] = '2026-10-16';
+$r = $ejecutor->evaluar($mismoDia, [$primer]);
+exigir($r['perfil'][$criterio]['resultado']['estado_tecnico'] === 'HALLAZGO_ACOTADO', 'Excluyó erróneamente la evidencia del día de corte');
+$pruebas++;
+$previoHora = $base; $previoHora['fecha_corte'] = '2026-10-16 10:00:00';
+$r = $ejecutor->evaluar($previoHora, [$primer]);
+exigir($r['perfil'][$criterio]['resultado']['estado_tecnico'] === 'SIN_EVIDENCIA_ADMISIBLE', 'Admitió registro futuro dentro del mismo día');
+$pruebas++;
+$despuesHora = $base; $despuesHora['fecha_corte'] = '2026-10-16 11:00:00';
+$r = $ejecutor->evaluar($despuesHora, [$primer]);
+exigir($r['perfil'][$criterio]['resultado']['estado_tecnico'] === 'HALLAZGO_ACOTADO', 'Excluyó registro anterior a hora de corte');
+$pruebas++;
+
 $malCorte = $base; $malCorte['fecha_corte'] = '2026-10-15';
 $r = $ejecutor->evaluar($malCorte, [$primer]);
 exigir($r['perfil'][$criterio]['resultado']['estado_tecnico'] === 'SIN_EVIDENCIA_ADMISIBLE', 'Aceptó registro posterior a corte');
