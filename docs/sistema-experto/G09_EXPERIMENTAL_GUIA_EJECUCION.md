@@ -55,3 +55,21 @@ El informe técnico reconstruye: identificador de regla → condiciones satisfec
 **La clasificación global de DCL todavía no se incluye**: requiere contrato de criterios generales, autonomía funcional, subtipos y validación diferenciada de G09 por subcomponentes.
 
 Referencias: [EXP-01](https://docs.google.com/document/d/1jLV4WU1PMvNHk7hnERVCmVCT6QaXtBe2eIyQMKBACPc/edit) y [G09-EXP](https://docs.google.com/document/d/1b4Vf4MrkodLJIUQF_PtQ_7frOe8F4-nnasedktlaMfw/edit).
+
+## Incremento de integración con BDD efímera (17/10/2026)
+
+Se agregó `LectorSQLiteG08Experimental` y `EjecutorPerfilG09Experimental`, que recorren el flujo íntegro de los **cuatro criterios adicionales** desde una instantánea de **SQLite `:memory:`** hasta el informe reproducible, sin usar Laravel ni consultar una base institucional.
+
+El lector utiliza nombres y columnas existentes en las migraciones operativas de RememberMind: `instrumentos.cod_instrumento/version`, `aplicaciones_instrumento.cod_aplicacion/cod_residente/cod_instrumento/fecha_hora/estado`, `preguntas_instrumento.cod_pregunta/tipo_respuesta`, `respuestas_instrumento.cod_respuesta/cod_pregunta/cod_aplicacion/valor_texto` y `opciones_pregunta`. Se corrigió el campo antes llamado erróneamente `fecha_aplicacion` por `fecha_hora`. SQLite en disco o adjunta queda bloqueada por el lector, incluso si se adjunta después de la construcción.
+
+**Diferencia esencial:** una tarea válida de prueba con `SIN_HALLAZGO_SIMULADO` conserva `EV-2` pero no satisface una regla positiva, por lo que devuelve `EVALUABLE_SIN_SOPORTE`, **no** normalidad. Una tarea ausente o inadmisible queda en `EV-0` (o `EV-1` con contexto parcial). Se corrigió el corte temporal para incluir fuentes del mismo día cuando el corte es diario y respetar la hora cuando el corte es horario.
+
+Comandos de verificación:
+
+```sh
+php motor-experto/tests/g09_experimental.php
+php motor-experto/tests/g08_g09_puente.php
+php motor-experto/tests/g08_g09_integracion_sqlite.php
+```
+
+La prueba integrada genera 15 instrumentos y aplicaciones **ficticios**, comprueba cada regla y las combinaciones multicomponente de Atención, Ejecutiva, Lenguaje y Visuoespacial, así como independencia por residente, cortes y no emisión. **No** hay conexión con fuentes reales, perfiles instrumentales G08 aprobados, integración asistencial ni clasificación de DCL. El piloto COG-MEM continúa separado en su contrato D-131.
