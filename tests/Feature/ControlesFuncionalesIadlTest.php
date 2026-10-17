@@ -24,6 +24,8 @@ class ControlesFuncionalesIadlTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // Esta suite de contrato no compila recursos frontend; el diseño se valida en CI global.
+        $this->withoutVite();
         $this->seed(RolesAndPermissionsSeeder::class);
         $this->profesional = User::factory()->create([
             'estado' => 'ACTIVO', 'nombres'=>'Lucía',
