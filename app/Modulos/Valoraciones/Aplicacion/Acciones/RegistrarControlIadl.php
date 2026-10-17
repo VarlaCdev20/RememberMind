@@ -21,6 +21,7 @@ final class RegistrarControlIadl
             $usuario->can($rectifica ? 'controles_funcionales_iadl.rectificar' : 'controles_funcionales_iadl.crear'),
             403
         );
+        abort_if($usuario->hasRole('SUPERADMINISTRADOR'), 403, 'Superadministración solo consulta IADL.');
         $personal = $usuario->personal;
         abort_unless($personal && $personal->estado === 'ACTIVO', 403, 'Se requiere personal activo vinculado.');
 
