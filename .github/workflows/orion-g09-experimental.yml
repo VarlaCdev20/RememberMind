@@ -10,6 +10,7 @@ on:
       - 'motor-experto/tests/g09_nucleo_semantico.php'
       - 'motor-experto/tests/dcl_petersen_experimental.php'
       - 'motor-experto/tests/dcl_puente_referencias_experimental.php'
+      - 'motor-experto/tests/dcl_puente_integracion_cinco_dominios.php'
       - 'motor-experto/tests/orion_cinco_dominios_experimental.php'
       - 'motor-experto/tests/fixtures/dcl_03a_*.json'
       - '.github/workflows/orion-g09-experimental.yml'
@@ -46,6 +47,7 @@ jobs:
           php -l motor-experto/src/motor_experto/investigacion/dcl/AdaptadorEstadosPetersenExperimental.php
           php -l motor-experto/src/motor_experto/investigacion/dcl/IntegradorReferenciasDCLExperimental.php
           php -l motor-experto/tests/dcl_puente_referencias_experimental.php
+          php -l motor-experto/tests/dcl_puente_integracion_cinco_dominios.php
           php -l motor-experto/src/motor_experto/investigacion/dcl/OrquestadorCincoDominiosExperimental.php
           php -l motor-experto/tests/orion_cinco_dominios_experimental.php
       - name: Isolated synthetic rule tests
@@ -56,4 +58,5 @@ jobs:
           php motor-experto/tests/g09_nucleo_semantico.php
           php motor-experto/tests/dcl_petersen_experimental.php
           php motor-experto/tests/dcl_puente_referencias_experimental.php
+          php motor-experto/tests/dcl_puente_integracion_cinco_dominios.php
           php motor-experto/tests/orion_cinco_dominios_experimental.php
