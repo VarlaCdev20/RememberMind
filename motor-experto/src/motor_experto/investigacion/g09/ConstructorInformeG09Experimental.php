@@ -55,6 +55,22 @@ final class ConstructorInformeG09Experimental
             $titulo = 'Hallazgo experimental en '.$ruta['proceso'];
             $interpretacion = 'Una tarea simulada produjo soporte para el subcomponente '.$ruta['componente'].'. Este resultado está limitado a la prueba técnica.';
             $fundamento = 'La regla '.$ruta['regla'].' se satisfizo porque se verificaron C1 (soporte específico de prueba), C2 (atribución de tarea) y C3 (contexto), con referencia a la evidencia '.$ruta['evidencia'].'.';
+        } elseif ($estado === 'EVALUABLE_SIN_SOPORTE') {
+            $titulo = 'Tarea experimental interpretable sin soporte positivo';
+            $interpretacion = 'La tarea fue admisible y alcanzó evaluabilidad suficiente, pero no se satisfizo una regla positiva de dificultad. No equivale a preservación cognitiva.';
+            $fallidas = [];
+            foreach ($trazas as $t) {
+                if (($t['cumple'] ?? false) !== true) {
+                    $faltantes = [];
+                    foreach ($t['condiciones'] ?? [] as $codigo => $cumple) {
+                        if ($cumple !== true) $faltantes[] = $codigo;
+                    }
+                    $fallidas[] = ($t['regla'] ?? 'REGLA_SIN_ID').': '.implode(', ', $faltantes);
+                }
+            }
+            $fundamento = $fallidas
+                ? 'Condiciones positivas no satisfechas: '.implode('; ', $fallidas).'.'
+                : 'No hay regla positiva satisfecha con evidencia admisible.';
         } elseif ($estado === 'MULTIPLES_HALLAZGOS_PENDIENTES_DE_RESOLUCION') {
             $titulo = 'Varios hallazgos experimentales sin resolución unitaria';
             $interpretacion = 'Se cumplieron reglas de diferentes subcomponentes; ninguna se prioriza automáticamente.';
