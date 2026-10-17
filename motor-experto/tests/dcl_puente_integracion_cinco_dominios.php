@@ -35,7 +35,7 @@ function verificarFlujo(bool $ok, string $motivo): void {
 }
 
 $flujo = new IntegradorReferenciasDCLExperimental($integrador);
-$plan = array_slice($tareas, 0, 3);
+$plan = $tareas; // Ejecución de los 15 subcomponentes sintéticos en cada recorrido.
 $evaluados = 0;
 $pruebasPatrones = [
     ['PET-01',['COG-MEM'=>'A','COG-ATE'=>'P','COG-EJE'=>'P','COG-LEN'=>'P','COG-VIS'=>'P']],
