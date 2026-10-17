@@ -1,12 +1,15 @@
-name: ORION G09 experimental isolated PHP checks
+name: ORION G09 and DCL experimental PHP checks
 on:
   pull_request:
     paths:
       - 'motor-experto/src/motor_experto/investigacion/g09/**'
+      - 'motor-experto/src/motor_experto/investigacion/dcl/**'
       - 'motor-experto/tests/g09_experimental.php'
       - 'motor-experto/tests/g08_g09_puente.php'
       - 'motor-experto/tests/g08_g09_integracion_sqlite.php'
       - 'motor-experto/tests/g09_nucleo_semantico.php'
+      - 'motor-experto/tests/dcl_petersen_experimental.php'
+      - 'motor-experto/tests/fixtures/dcl_03a_*.json'
       - '.github/workflows/orion-g09-experimental.yml'
   workflow_dispatch:
 permissions:
@@ -35,9 +38,13 @@ jobs:
           php -l motor-experto/src/motor_experto/investigacion/g09/PaqueteSemanticoG09Experimental.php
           php -l motor-experto/src/motor_experto/investigacion/g09/VerificadorNucleoG09Experimental.php
           php -l motor-experto/tests/g09_nucleo_semantico.php
+          php -l motor-experto/src/motor_experto/investigacion/dcl/ClasificadorPetersenExperimental.php
+          php -l motor-experto/src/motor_experto/investigacion/dcl/ConstructorInformePetersenExperimental.php
+          php -l motor-experto/tests/dcl_petersen_experimental.php
       - name: Isolated synthetic rule tests
         run: |
           php motor-experto/tests/g09_experimental.php
           php motor-experto/tests/g08_g09_puente.php
           php motor-experto/tests/g08_g09_integracion_sqlite.php
           php motor-experto/tests/g09_nucleo_semantico.php
+          php motor-experto/tests/dcl_petersen_experimental.php
