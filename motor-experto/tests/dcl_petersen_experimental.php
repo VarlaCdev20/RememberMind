@@ -78,7 +78,6 @@ foreach ($casos as $fila) {
 
 $exhaustiva = filasDcl('dcl_03a_32_configuraciones.json');
 comprobar(count($exhaustiva) === 32, 'Faltan las 32 combinaciones');
-$discrepancias = []; // Estructura histórica de verificación; tras conciliación debe seguir vacía.
 foreach ($exhaustiva as $fila) {
     [$id,$mem,$ate,$eje,$len,$vis,$esperadosA,$esperado] = $fila;
     $caso = fixtureDcl(['S','S','S','S','S'],[$mem,$ate,$eje,$len,$vis],'EXH-'.$id);
@@ -88,8 +87,9 @@ foreach ($exhaustiva as $fila) {
     comprobar($r['estado'] === $esperado, 'Configuración '.$id.' esperaba '.$esperado.' y obtuvo '.$r['estado']);
     $n += 2;
 }
-comprobar($discrepancias === [], 'La matriz 03A y el contrato 03 deben coincidir sin excepciones');
-$n++;
+comprobar(count($exhaustiva) === 32, 'DCL: se exige verificar todas las configuraciones oficiales, ninguna excepción');
+comprobar(!str_contains(file_get_contents(__DIR__.'/fixtures/dcl_03a_32_configuraciones.json'), 'REQUIERE_ADJUDICACION_C02_SIN_SOPORTE'), 'El identificador anterior solo se conserva en el historial documental');
+$n += 2;
 
 $base = fixtureDcl(['S','S','S','S','S'],['A','P','P','P','P'],'SEGURIDAD-01');
 unset($base['dominios']['COG-ATE']['soporte']);
