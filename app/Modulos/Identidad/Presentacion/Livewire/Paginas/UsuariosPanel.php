@@ -897,17 +897,21 @@ class UsuariosPanel extends Component
 
     private function validarUnicidadDocumento($fail)
     {
-        $query = User::whereRaw('UPPER(pais_documento) = ?', [mb_strtoupper((string) $this->pais_documento, 'UTF-8')])
-            ->whereRaw('UPPER(tipo_documento) = ?', [mb_strtoupper((string) $this->tipo_documento, 'UTF-8')])
-            ->whereRaw('UPPER(numero_documento) = ?', [mb_strtoupper((string) $this->numero_documento, 'UTF-8')]);
-        if (mb_strtoupper((string) $this->pais_documento, 'UTF-8') === 'BOLIVIA') {
-            $query->whereRaw('UPPER(expedido) = ?', [mb_strtoupper((string) $this->expedido, 'UTF-8')]);
-        }
-        if ($this->isEdit) {
-            $query->where('cod_usuario', '!=', $this->usuarioId);
-        }
-        if ($query->exists()) {
-            $fail('El documento de identidad ya está registrado en el sistema.');
+        // La identidad pertenece a personal/contactos; usuarios solo conserva el acceso.
+        // El número es único en personal, independientemente del lugar de expedición.
+        foreach ([Personal::class, Contacto::class] as $modelo) {
+            $query = $modelo::query()->whereRaw('UPPER(numero_documento) = ?', [
+                mb_strtoupper(trim((string) $this->numero_documento), 'UTF-8'),
+            ]);
+            if ($this->isEdit && $this->usuarioId) {
+                $query->where(fn ($persona) => $persona->whereNull('cod_usuario')
+                    ->orWhere('cod_usuario', '!=', $this->usuarioId));
+            }
+            if ($query->exists()) {
+                $fail('El documento de identidad ya está registrado en el sistema.');
+
+                return;
+            }
         }
     }
 
