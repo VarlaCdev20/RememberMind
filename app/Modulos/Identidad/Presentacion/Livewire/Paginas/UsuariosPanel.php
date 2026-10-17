@@ -929,16 +929,23 @@ class UsuariosPanel extends Component
             return;
         }
 
-        // 1. Unicidad del teléfono completo
-        $query = User::where('codigo_telefono', $this->codigo_telefono)
-            ->where('telefono', $this->telefono);
-        if ($this->isEdit) {
-            $query->where('cod_usuario', '!=', $this->usuarioId);
-        }
-        if ($query->exists()) {
-            $fail('El celular ya está registrado.');
+        // El contacto se almacena en los perfiles V2, no en la cuenta de acceso.
+        foreach ([Personal::class, Contacto::class] as $modelo) {
+            $query = $modelo::query()->where(function ($perfil) use ($modelo) {
+                $perfil->where('telefono', $this->telefono);
+                if ($modelo === Contacto::class) {
+                    $perfil->orWhere('celular', $this->telefono);
+                }
+            });
+            if ($this->isEdit && $this->usuarioId) {
+                $query->where(fn ($perfil) => $perfil->whereNull('cod_usuario')
+                    ->orWhere('cod_usuario', '!=', $this->usuarioId));
+            }
+            if ($query->exists()) {
+                $fail('El celular ya está registrado.');
 
-            return;
+                return;
+            }
         }
 
         // 2. Sin letras o símbolos

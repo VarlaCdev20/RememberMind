@@ -189,6 +189,7 @@ final class GestionarUsuariosPanel
                     'apellido_materno' => $entrada['ap_materno'],
                     'numero_documento' => $entrada['numero_documento'],
                     'profesion' => $entrada['rol'],
+                    'telefono' => $entrada['telefono'],
                     'fecha_ingreso' => $entrada['fecha_ingreso'],
                     'estado' => $usuario->estado,
                 ]
