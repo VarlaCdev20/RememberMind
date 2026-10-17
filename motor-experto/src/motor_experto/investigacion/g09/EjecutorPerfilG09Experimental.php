@@ -81,9 +81,13 @@ final class EjecutorPerfilG09Experimental
         foreach ($contextos as $criterio => $contexto) {
             $contexto['motivos_g08'] = array_values(array_unique($contexto['motivos_g08']));
             $resultado = $this->evaluador->evaluar($contexto);
+            // Comparar toda inferencia técnica contra EvaluadorReglas D-130.
+            // Si divergen, abortar: nunca ocultar incoherencias con una salida única.
+            $cotejo = (new VerificadorNucleoG09Experimental)->cotejar($resultado);
             $perfil[$criterio] = [
                 'resultado' => $resultado,
                 'informe' => $this->informes->construir($resultado),
+                'cotejo_nucleo_d130' => $cotejo,
             ];
         }
         return [
