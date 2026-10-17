@@ -1962,7 +1962,7 @@ class UsuariosPanel extends Component
 
             if (! empty($this->search)) {
                 $query->where(function ($q) {
-                    $q->whereLike('correo', '%'.$this->search.'%')
+                    $q->whereLike('usuarios.correo', '%'.$this->search.'%')
                         ->orWhereHas('personal', function ($pq) {
                             $pq->whereLike('nombres', '%'.$this->search.'%')
                                 ->orWhereLike('apellido_paterno', '%'.$this->search.'%')
@@ -1972,7 +1972,7 @@ class UsuariosPanel extends Component
             }
 
             if (! empty($this->filtroEstado)) {
-                $query->where('estado', $this->filtroEstado);
+                $query->where('usuarios.estado', $this->filtroEstado);
             }
 
             if (! empty($this->filtroRol)) {
@@ -2280,8 +2280,8 @@ class UsuariosPanel extends Component
 
         if (! empty($this->search)) {
             $query->where(function ($q) {
-                $q->whereLike('correo', '%'.$this->search.'%')
-                    ->orWhereLike('cod_usuario', '%'.$this->search.'%')
+                $q->whereLike('usuarios.correo', '%'.$this->search.'%')
+                    ->orWhereLike('usuarios.cod_usuario', '%'.$this->search.'%')
                     ->orWhereHas('personal', function ($pq) {
                         $pq->whereLike('nombres', '%'.$this->search.'%')
                             ->orWhereLike('apellido_paterno', '%'.$this->search.'%')
@@ -2291,7 +2291,7 @@ class UsuariosPanel extends Component
         }
 
         if (! empty($this->filtroEstado)) {
-            $query->where('estado', $this->filtroEstado);
+            $query->where('usuarios.estado', $this->filtroEstado);
         }
 
         if (! empty($this->filtroRol)) {
@@ -2299,7 +2299,7 @@ class UsuariosPanel extends Component
         }
 
         if (! empty($this->filtroGenero)) {
-            $query->where('genero', $this->filtroGenero);
+            $query->where('personal.genero', $this->filtroGenero);
         }
 
         if (! empty($this->filtroArea)) {
