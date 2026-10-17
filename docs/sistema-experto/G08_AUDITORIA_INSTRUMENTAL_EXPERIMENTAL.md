@@ -83,3 +83,16 @@ La revisión de las migraciones `2026_09_18_001011_create_instrumentos_table.php
 El puente experimental ya demuestra la lectura íntegra desde **SQLite exclusivamente en memoria con registros sintéticos**, pero **la mera existencia de estas columnas no resuelve G08**: siguen sin seleccionarse ni verificarse la edición, la normativa aplicable y la interpretación de las 15 pruebas en personas reales.
 
 Para cerrar por instrumento, las fichas requerirán correspondencia verificable entre **preguntas codificadas, tareas/subpruebas reales, instrumento, edición, idioma, baremo, población, confusores y fundamento de decisión**. No se extrapolarán reglas de un estudio de normas a una edición no identificada.
+
+
+## Incremento G08 — catálogo verificable y controles de aplicabilidad (17/10/2026)
+
+Se agregó el [dossier bibliográfico por instrumento](G08_FICHAS_CANDIDATAS_PUBLICACIONES_Y_BRECHAS.md), contrastado con los siete resúmenes primarios indexados en PubMed y las decisiones del expediente G08. Distingue **6 subcomponentes con fuente normativa candidata**, **7 artículos candidatos distintos** y **15 subcomponentes todavía sin perfil interpretativo admitido**. EJE-S05 mantiene estado `NO_RESUELTO` pese a compartir un artículo sobre M-WCST, porque la atribución al razonamiento general no está acreditada.
+
+Se implementaron `CatalogoExpedientesG08Investigacion` y `AuditorAplicabilidadG08Investigacion`. El primero registra constructo, instrumentos, tareas, publicaciones localizadas y pendientes. El segundo verifica coherencia de instrumento/tarea y lista explícitamente las pruebas documentales por edad, escolaridad, norma, idioma, edición, aplicación, derechos, condiciones sensoriales, confusores y revisión.
+
+**Decisión de ingeniería vigente:** una checklist completa `declaracion_completa=true` es solamente una declaración del evaluador técnico; **nunca** convierte el registro en perfil clínico autorizado. Todas las salidas mantienen `NO_INTERPRETABLE_POR_G08`, `puede_emitir_A_o_P=false`, `evidencia_clinica=null` y `perfil_normativo_activado=false`.
+
+La suite `g08_auditoria_instrumental.php` cubre las 15 fichas, sus fuentes, seis estados bibliográficos, alternativas TMT-B/M-WCST, exclusión de BNT abreviado, diferenciación copia/recuerdo ROCF, confusores BTA, advertencia Ruff para edad mayor a 70 según el expediente (sin adoptar un rango normativo en software), rechazo de razonamiento EJE-S05 y denegación de uso asistencial. Se incluyó en `.github/workflows/orion-g09-experimental.yml`; las pruebas específicas resultaron satisfactorias en GitHub Actions.
+
+La próxima decisión científica no consiste en activar una puntuación, sino en **seleccionar con sustento una edición/protocolo concreto y comprobar la compatibilidad de su tabla normativa**. Las normas de adultos saludables de varios países, aunque incluyan Bolivia, no autorizan extrapolación automática a residentes institucionalizados.
