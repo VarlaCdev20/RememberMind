@@ -16,7 +16,7 @@
                     <img src="{{ $adultoDrawer->foto_url }}" alt="{{ $adultoDrawer->nombre_completo }}" class="h-11 w-11 shrink-0 rounded-xl object-cover border border-[var(--rm-border-soft)] shadow-2xs" />
                 @else
                     <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--rm-action-primary)] text-white font-bold text-sm shadow-2xs">
-                        {{ substr($adultoDrawer->nombres, 0, 1) }}{{ substr($adultoDrawer->ap_paterno, 0, 1) }}
+                        {{ mb_substr($adultoDrawer->nombres, 0, 1, 'UTF-8') }}{{ mb_substr($adultoDrawer->ap_paterno, 0, 1, 'UTF-8') }}
                     </div>
                 @endif
                 <div class="min-w-0">

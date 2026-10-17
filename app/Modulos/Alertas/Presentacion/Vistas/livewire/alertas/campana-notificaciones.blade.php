@@ -153,7 +153,7 @@
    <div class="min-w-0 flex-1">
     <div class="flex items-center gap-2">
     <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/60 font-black text-[10px] text-[var(--rm-action-primary-hover)] dark:text-blue-300">
-     {{ substr($adultoRec?->nombres ?? 'A', 0, 1) }}{{ substr($adultoRec?->ap_paterno ?? 'M', 0, 1) }}
+     {{ mb_substr($adultoRec?->nombres ?? 'A', 0, 1, 'UTF-8') }}{{ mb_substr($adultoRec?->ap_paterno ?? 'M', 0, 1, 'UTF-8') }}
     </span>
     <p class="truncate text-xs font-bold text-[var(--rm-text-primary)]">
      {{ $adultoRec?->nombres }} {{ $adultoRec?->ap_paterno }}
@@ -269,7 +269,7 @@
    <div class="min-w-0 flex-1">
     <div class="flex items-center gap-2">
     <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl font-black text-[10px] {{ $esCritica ? 'bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-300' : 'bg-[var(--rm-surface-soft)] text-slate-700 dark:bg-slate-800 dark:text-slate-200' }}">
-     {{ substr($alerta->adultoMayor?->nombres ?? 'A', 0, 1) }}{{ substr($alerta->adultoMayor?->ap_paterno ?? 'M', 0, 1) }}
+     {{ mb_substr($alerta->adultoMayor?->nombres ?? 'A', 0, 1, 'UTF-8') }}{{ mb_substr($alerta->adultoMayor?->ap_paterno ?? 'M', 0, 1, 'UTF-8') }}
     </div>
     <div class="min-w-0">
      <p class="text-xs font-bold text-[var(--rm-text-primary)] truncate">

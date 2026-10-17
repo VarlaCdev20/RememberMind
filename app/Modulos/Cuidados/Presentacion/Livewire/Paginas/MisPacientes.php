@@ -1286,7 +1286,7 @@ class MisPacientes extends Component
         })->values()->all();
 
         // Iniciales y Foto
-        $iniciales = strtoupper(substr($adulto->nombres ?: 'A', 0, 1).substr($adulto->apellido_paterno ?: 'M', 0, 1));
+        $iniciales = mb_strtoupper(mb_substr($adulto->nombres ?: 'A', 0, 1, 'UTF-8').mb_substr($adulto->apellido_paterno ?: 'M', 0, 1, 'UTF-8'), 'UTF-8');
 
         $medicacion = $usuario?->can('prescripciones.ver')
             ? $adulto->prescripciones()->whereIn('estado', ['ACTIVA', 'ACTIVO', 'VIGENTE'])

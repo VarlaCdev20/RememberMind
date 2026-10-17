@@ -544,7 +544,7 @@
                             <td class="px-2.5 py-2">
                                 <div class="flex items-center gap-2">
                                     <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--rm-surface-alt)] dark:bg-slate-800 border border-[var(--rm-border)]  text-[var(--rm-text-title)] dark:text-slate-200 font-extrabold text-[11px] shadow-2xs">
-                                        {{ substr($alerta->adultoMayor?->nombres ?? 'R', 0, 1) }}{{ substr($alerta->adultoMayor?->ap_paterno ?? 'M', 0, 1) }}
+                                        {{ mb_substr($alerta->adultoMayor?->nombres ?? 'R', 0, 1, 'UTF-8') }}{{ mb_substr($alerta->adultoMayor?->ap_paterno ?? 'M', 0, 1, 'UTF-8') }}
                                     </div>
                                     <div class="min-w-0 flex-1">
                                         <div class="font-bold text-[var(--rm-text-title)] dark:text-slate-100 truncate text-xs">

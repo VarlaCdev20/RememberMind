@@ -1,0 +1,77 @@
+name: ORION G09 and DCL experimental PHP checks
+on:
+  pull_request:
+    paths:
+      - 'motor-experto/src/motor_experto/investigacion/g09/**'
+      - 'motor-experto/src/motor_experto/investigacion/g08/**'
+      - 'motor-experto/src/motor_experto/investigacion/dcl/**'
+      - 'motor-experto/tests/g09_experimental.php'
+      - 'motor-experto/tests/g08_g09_puente.php'
+      - 'motor-experto/tests/g08_auditoria_instrumental.php'
+      - 'motor-experto/tests/g08_anexos_bolivia.php'
+      - 'motor-experto/tests/g08_captura_y_muestras.php'
+      - 'motor-experto/tests/g08_g09_integracion_sqlite.php'
+      - 'motor-experto/tests/g09_nucleo_semantico.php'
+      - 'motor-experto/tests/dcl_petersen_experimental.php'
+      - 'motor-experto/tests/dcl_puente_referencias_experimental.php'
+      - 'motor-experto/tests/dcl_puente_integracion_cinco_dominios.php'
+      - 'motor-experto/tests/orion_cinco_dominios_experimental.php'
+      - 'motor-experto/tests/fixtures/dcl_03a_*.json'
+      - '.github/workflows/orion-g09-experimental.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test-g09:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_sqlite
+      - name: PHP syntax check
+        run: |
+          php -l motor-experto/src/motor_experto/investigacion/g09/CatalogoReglasG09Experimental.php
+          php -l motor-experto/src/motor_experto/investigacion/g09/EvaluadorG09Experimental.php
+          php -l motor-experto/tests/g09_experimental.php
+          php -l motor-experto/src/motor_experto/investigacion/g09/PerfilInstrumentalG08Experimental.php
+          php -l motor-experto/src/motor_experto/investigacion/g09/AdaptadorInstrumentalG08G09Experimental.php
+          php -l motor-experto/src/motor_experto/investigacion/g09/ConstructorInformeG09Experimental.php
+          php -l motor-experto/tests/g08_g09_puente.php
+          php -l motor-experto/src/motor_experto/investigacion/g08/CatalogoExpedientesG08Investigacion.php
+          php -l motor-experto/src/motor_experto/investigacion/g08/AuditorAplicabilidadG08Investigacion.php
+          php -l motor-experto/tests/g08_auditoria_instrumental.php
+          php -l motor-experto/src/motor_experto/investigacion/g08/LocalizadoresAnexosBoliviaG08Investigacion.php
+          php -l motor-experto/tests/g08_anexos_bolivia.php
+          php -l motor-experto/src/motor_experto/investigacion/g08/ContratoCapturaCrudaG08Investigacion.php
+          php -l motor-experto/src/motor_experto/investigacion/g08/AuditorCapturaYComparabilidadG08Investigacion.php
+          php -l motor-experto/tests/g08_captura_y_muestras.php
+          php -l motor-experto/src/motor_experto/investigacion/g09/LectorSQLiteG08Experimental.php
+          php -l motor-experto/src/motor_experto/investigacion/g09/EjecutorPerfilG09Experimental.php
+          php -l motor-experto/tests/g08_g09_integracion_sqlite.php
+          php -l motor-experto/src/motor_experto/investigacion/g09/PaqueteSemanticoG09Experimental.php
+          php -l motor-experto/src/motor_experto/investigacion/g09/VerificadorNucleoG09Experimental.php
+          php -l motor-experto/tests/g09_nucleo_semantico.php
+          php -l motor-experto/src/motor_experto/investigacion/dcl/ClasificadorPetersenExperimental.php
+          php -l motor-experto/src/motor_experto/investigacion/dcl/ConstructorInformePetersenExperimental.php
+          php -l motor-experto/tests/dcl_petersen_experimental.php
+          php -l motor-experto/src/motor_experto/investigacion/dcl/AdaptadorEstadosPetersenExperimental.php
+          php -l motor-experto/src/motor_experto/investigacion/dcl/IntegradorReferenciasDCLExperimental.php
+          php -l motor-experto/tests/dcl_puente_referencias_experimental.php
+          php -l motor-experto/tests/dcl_puente_integracion_cinco_dominios.php
+          php -l motor-experto/src/motor_experto/investigacion/dcl/OrquestadorCincoDominiosExperimental.php
+          php -l motor-experto/tests/orion_cinco_dominios_experimental.php
+      - name: Isolated synthetic rule tests
+        run: |
+          php motor-experto/tests/g09_experimental.php
+          php motor-experto/tests/g08_g09_puente.php
+          php motor-experto/tests/g08_auditoria_instrumental.php
+          php motor-experto/tests/g08_anexos_bolivia.php
+          php motor-experto/tests/g08_captura_y_muestras.php
+          php motor-experto/tests/g08_g09_integracion_sqlite.php
+          php motor-experto/tests/g09_nucleo_semantico.php
+          php motor-experto/tests/dcl_petersen_experimental.php
+          php motor-experto/tests/dcl_puente_referencias_experimental.php
+          php motor-experto/tests/dcl_puente_integracion_cinco_dominios.php
+          php motor-experto/tests/orion_cinco_dominios_experimental.php

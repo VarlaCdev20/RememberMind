@@ -45,7 +45,7 @@
         <div class="flex items-center justify-between p-3.5 rounded-2xl bg-[var(--rm-surface-soft)] border border-[var(--rm-border-soft)] shadow-2xs flex-wrap gap-2.5">
             <div class="flex items-center gap-3">
                 <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--rm-action-primary)] text-white font-bold text-sm shadow-xs shrink-0">
-                    {{ substr($detalle->adultoMayor?->nombres ?? 'A', 0, 1) }}{{ substr($detalle->adultoMayor?->ap_paterno ?? 'M', 0, 1) }}
+                    {{ mb_substr($detalle->adultoMayor?->nombres ?? 'A', 0, 1, 'UTF-8') }}{{ mb_substr($detalle->adultoMayor?->ap_paterno ?? 'M', 0, 1, 'UTF-8') }}
                 </div>
                 <div>
                     <h4 class="font-bold text-[var(--rm-text-primary)] text-sm leading-tight">
