@@ -5,6 +5,7 @@ on:
       - 'database/migrations/*controles_funcionales_iadl*'
       - 'app/Models/ControlFuncionalIadl.php'
       - 'app/Models/Residente.php'
+      - 'app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarEvidenciaIadlC03.php'
       - 'app/Modulos/Valoraciones/**'
       - 'database/seeders/RolesAndPermissionsSeeder.php'
       - 'resources/views/valoraciones/iadl/**'
@@ -41,6 +42,7 @@ jobs:
           php -l app/Models/ControlFuncionalIadl.php
           php -l app/Modulos/Valoraciones/Aplicacion/Acciones/RegistrarControlIadl.php
           php -l app/Modulos/Valoraciones/Dominio/Servicios/AnalizadorIadlC03.php
+          php -l app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarEvidenciaIadlC03.php
           php -l app/Modulos/Valoraciones/Presentacion/Http/Controllers/ControlFuncionalIadlController.php
           php -l tests/Feature/ControlesFuncionalesIadlTest.php
       - name: IADL feature contracts — isolated disposable DB
