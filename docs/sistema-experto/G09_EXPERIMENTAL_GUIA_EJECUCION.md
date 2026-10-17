@@ -73,3 +73,19 @@ php motor-experto/tests/g08_g09_integracion_sqlite.php
 ```
 
 La prueba integrada genera 15 instrumentos y aplicaciones **ficticios**, comprueba cada regla y las combinaciones multicomponente de Atención, Ejecutiva, Lenguaje y Visuoespacial, así como independencia por residente, cortes y no emisión. **No** hay conexión con fuentes reales, perfiles instrumentales G08 aprobados, integración asistencial ni clasificación de DCL. El piloto COG-MEM continúa separado en su contrato D-131.
+
+## Verificación de inferencia por el núcleo D-130 (17/10/2026)
+
+Se agregó un **paquete semántico técnico G09-EXP** que materializa los quince subcomponentes como nodos, relaciones tipadas `SUBCOMPONENTE_DE` y `SIM_APORTA`, variables para C1/C2/C3, dominios de resultado, 15 reglas positivas de tipo `RESULTADO` y 45 condiciones AND. El objeto se valida mediante `PaqueteConocimiento` y `ValidadorPaqueteConocimiento`, reutilizando los controles de estructura de RememberMind.
+
+El **VerificadorNucleoG09Experimental** convierte exclusivamente la traza de condiciones sintéticas en hechos artificiales de `MemoriaTrabajo`, ejecuta el verdadero `EvaluadorReglas` (D-130) por criterio y coteja las consecuencias con `EvaluadorG09Experimental`. Ahora `EjecutorPerfilG09Experimental` realiza este cotejo obligatoriamente antes de devolver un perfil y registra `cotejo_nucleo_d130`. Ante discrepancias lanza una excepción, sin producir una respuesta aparentemente conforme.
+
+**Importante:** las marcas `APROBADO` en valores del paquete semántico representan únicamente un requisito formal del evaluador para **literales SIMULADOS y de prueba**. No tienen valor de dictamen G09, autorización de uso o aprobación clínica. El paquete no se persiste ni se incorpora al catálogo activo de residentes.
+
+```bash
+php motor-experto/tests/g09_nucleo_semantico.php
+```
+
+La prueba comprueba los 15 códigos, los 45 antecedentes, cada una de las condiciones positivas por separado, ausencia/confusión, casos multicomponente y abstención por contradicción. **Es verificación de consistencia entre dos caminos técnicos que parten de la misma evidencia de prueba; no es validación de la interpretación neuropsicológica ni contraste con un médico.**
+
+El motor de Memoria mantiene su implementación/versión independiente. La reunión de los cinco dominios para un mismo residente y una misma línea temporal **no se declara completada**: requerirá un contrato de versión y procedencia común que no mezcle arbitrariamente los pilotos.
