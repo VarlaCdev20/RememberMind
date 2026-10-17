@@ -28,9 +28,9 @@
 php motor-experto/tests/dcl_petersen_experimental.php
 ```
 
-## Hallazgo de auditoría: discrepancia entre las fuentes
+## Conciliación documental de Matriz 03A — resuelta el 17/10/2026
 
-La **fila 00** de la pestaña `10_Cobertura_Exhaustiva` tiene como salida `REQUIERE_ADJUDICACION_C02_SIN_SOPORTE`, mientras que el Documento 03 y los casos `CAS-09` y `CAS-27` usan `REQUIERE_ADJUDICACION_CONTRATO` cuando C02=S pero todos los dominios son P. El código sigue el Documento 03 y los casos sintéticos, y **la prueba registra expresamente esta diferencia sin modificar ni normalizar la fuente original**. Queda pendiente el acuerdo de un único código documental para esa abstención.
+Se corrigió la **fila 00** de `10_Cobertura_Exhaustiva` para utilizar el código canónico `REQUIERE_ADJUDICACION_CONTRATO` del Documento 03 y de `CAS-09`/`CAS-27`. El identificador anterior `REQUIERE_ADJUDICACION_C02_SIN_SOPORTE` se preservó en una nota de la celda H2 y en el historial de versiones de Google Sheets. La rectificación cambia solo el nombre de la salida, nunca la lógica de abstención, el criterio C02 ni la interpretación clínica. Se sincronizó el fixture JSON y se eliminó la excepción previa de la prueba, que ahora exige **32/32 coincidencias exactas** con la matriz. La fuente documental y los casos quedan conciliados; la aprobación clínica sigue pendiente.
 
 La precedencia de discrepancia C02 frente a C02=N se codifica de acuerdo con `CAS-11`: una afirmación objetiva contradictoria con los dominios requiere adjudicación, no un descarte forzado.
 
