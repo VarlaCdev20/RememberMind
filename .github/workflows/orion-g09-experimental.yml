@@ -4,6 +4,7 @@ on:
     paths:
       - 'motor-experto/src/motor_experto/investigacion/g09/**'
       - 'motor-experto/tests/g09_experimental.php'
+      - 'motor-experto/tests/g08_g09_puente.php'
       - '.github/workflows/orion-g09-experimental.yml'
   workflow_dispatch:
 permissions:
@@ -21,5 +22,10 @@ jobs:
           php -l motor-experto/src/motor_experto/investigacion/g09/CatalogoReglasG09Experimental.php
           php -l motor-experto/src/motor_experto/investigacion/g09/EvaluadorG09Experimental.php
           php -l motor-experto/tests/g09_experimental.php
+          php -l motor-experto/src/motor_experto/investigacion/g09/PerfilInstrumentalG08Experimental.php
+          php -l motor-experto/src/motor_experto/investigacion/g09/AdaptadorInstrumentalG08G09Experimental.php
+          php -l motor-experto/tests/g08_g09_puente.php
       - name: Isolated synthetic rule tests
-        run: php motor-experto/tests/g09_experimental.php
+        run: |
+          php motor-experto/tests/g09_experimental.php
+          php motor-experto/tests/g08_g09_puente.php
