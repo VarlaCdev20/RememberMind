@@ -116,7 +116,10 @@ final class EvaluadorG09Experimental
             'uso' => 'PRUEBA_TECNICA_NO_CLINICA',
             'version' => CatalogoReglasG09Experimental::VERSION,
             'criterio' => $entrada['criterio'],
-            'evaluabilidad' => 'EV-'.substr($entrada['criterio'],4).'-'.$evaluabilidad,
+            'evaluabilidad' => match ($entrada['criterio']) {
+                'COG-ATE' => 'EV-CA-', 'COG-EJE' => 'EV-CE-',
+                'COG-LEN' => 'EV-CL-', 'COG-VIS' => 'EV-CV-',
+            }.$evaluabilidad,
             'estado_tecnico' => $estado,
             'consecuencias_candidatas' => $resultados,
             'excluidas' => $excluidas,
