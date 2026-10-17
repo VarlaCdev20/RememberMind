@@ -33,7 +33,7 @@
             </div>
         @endif
 
-        @if(auth()->user()->can($anterior ? 'controles_funcionales_iadl.rectificar' : 'controles_funcionales_iadl.crear'))
+        @if(!auth()->user()->hasRole('SUPERADMINISTRADOR') && auth()->user()->can($anterior ? 'controles_funcionales_iadl.rectificar' : 'controles_funcionales_iadl.crear'))
             <form method="POST" action="{{ route('admin.adultos-mayores.iadl.store', ['adulto_mayor' => $adulto->cod_residente]) }}"
                 class="rounded-xl bg-white p-5 shadow-sm border border-slate-200 space-y-5">
                 @csrf
