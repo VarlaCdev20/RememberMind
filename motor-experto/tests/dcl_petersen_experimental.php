@@ -78,24 +78,17 @@ foreach ($casos as $fila) {
 
 $exhaustiva = filasDcl('dcl_03a_32_configuraciones.json');
 comprobar(count($exhaustiva) === 32, 'Faltan las 32 combinaciones');
-$discrepancias = [];
+$discrepancias = []; // Estructura histórica de verificación; tras conciliación debe seguir vacía.
 foreach ($exhaustiva as $fila) {
     [$id,$mem,$ate,$eje,$len,$vis,$esperadosA,$esperado] = $fila;
     $caso = fixtureDcl(['S','S','S','S','S'],[$mem,$ate,$eje,$len,$vis],'EXH-'.$id);
     $r = $m->clasificar($caso);
     $nA = count(array_filter([$ate,$eje,$len,$vis], fn($x) => $x === 'A'));
     comprobar($r['traza']['otros_dominios_alterados'] === $nA, 'N incorrecto en configuración '.$id);
-    if ($id === '00' && $esperado === 'REQUIERE_ADJUDICACION_C02_SIN_SOPORTE') {
-        // Diferencia REAL entre 10_Cobertura_Exhaustiva y 03 + 05_Casos_Sinteticos:
-        // no reinterpretarla silenciosamente ni presentarla como exacta.
-        comprobar($r['estado'] === 'REQUIERE_ADJUDICACION_CONTRATO', 'Fila 00 no sigue Documento 03');
-        $discrepancias[] = ['fila'=>$id,'matriz'=>$esperado,'contrato03'=>$r['estado']];
-    } else {
-        comprobar($r['estado'] === $esperado, 'Configuración '.$id.' esperaba '.$esperado.' y obtuvo '.$r['estado']);
-    }
+    comprobar($r['estado'] === $esperado, 'Configuración '.$id.' esperaba '.$esperado.' y obtuvo '.$r['estado']);
     $n += 2;
 }
-comprobar(count($discrepancias) === 1, 'Discrepancia de 03A no registrada exactamente una vez');
+comprobar($discrepancias === [], 'La matriz 03A y el contrato 03 deben coincidir sin excepciones');
 $n++;
 
 $base = fixtureDcl(['S','S','S','S','S'],['A','P','P','P','P'],'SEGURIDAD-01');
@@ -126,4 +119,4 @@ catch (DomainException $ex) { $n++; }
 $base = fixtureDcl(['S','S','S','S','S'],['A','P','P','P','P'],'SEGURIDAD-06');
 comprobar($m->clasificar($base) === $m->clasificar($base), 'No determinista'); $n++;
 
-echo 'PASS: 30 casos + 32 configuraciones de 03A; '.$n." aserciones adicionales; 1 discrepancia documental registrada; DCL solo simulación.\n";
+echo 'PASS: 30 casos + 32 configuraciones de 03A; '.$n." aserciones adicionales; 0 discrepancias entre Documento 03 y Matriz 03A; DCL solo simulación.\n";
