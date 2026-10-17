@@ -57,3 +57,19 @@ El ejecutor G09-EXP puede comprobar 15 reglas AND sobre condiciones **ya interpr
 - Rey–Osterrieth copy/recall: doi:10.3233/NRE-151285
 
 **Limitación científica:** estas referencias derivan del expediente instrumental G08; no se han reextraído manuales protegidos por derechos ni creado interpretaciones nuevas. La correspondencia exacta con edición/población debe resolverse antes de uso con datos reales.
+
+## Cotejo bibliográfico adicional con publicaciones primarias (17/10/2026)
+
+La auditoría contrastó los artículos normativos originales mencionados en el expediente del proyecto. **Ninguno se transforma automáticamente en un perfil clínico activo**. No se han implementado fórmulas normativas ni cortes en el código.
+
+| Publicación | Confirmación verificable | Restricción de interpretación |
+|---|---|---|
+| BTA — Rivera y colaboradores (2015), [PMID 26639928](https://pubmed.ncbi.nlm.nih.gov/26639928/) | Normas multicéntricas de 11 países, incluida Bolivia, con muestra total de 3977 adultos sanos; el estudio identifica atención auditiva dividida | Requiere examinar edición y protocolo auditivo exactos; la presencia de Bolivia no acredita automáticamente una interpretación aplicable a todo residente |
+| Stroop — Rivera y colaboradores (2015), [PMID 26639926](https://pubmed.ncbi.nlm.nih.gov/26639926/) | Población multicéntrica de 11 países, Bolivia incluida | La interpretación de inhibición requiere precisar condición de interferencia, edición, lectura, percepción de colores y variables normativas |
+| TMT — Arango-Lasprilla y colaboradores (2015), [PMID 26639932](https://pubmed.ncbi.nlm.nih.gov/26639932/) | Estudio de 11 países, Bolivia incluida; modelos distintos para TMT-A y TMT-B | No inferir flexibilidad desde TMT-A ni confundir velocidad/motricidad con el proceso ejecutivo |
+| M-WCST — Arango-Lasprilla y colaboradores (2015), [PMID 26639931](https://pubmed.ncbi.nlm.nih.gov/26639931/) | Normas latinoamericanas multicéntricas | Verificar subresultado antes de atribuir flexibilidad; razonamiento general EJE-S05 aún sin respaldo suficiente |
+| Boston Naming Test estándar — Olabarrieta-Landa y colaboradores (2015), [PMID 26639925](https://pubmed.ncbi.nlm.nih.gov/26639925/) | **3779 adultos sanos de diez países, entre ellos Bolivia** | No extrapolar edición estándar a BNT abreviado ni BNT-2, ni omitir escolaridad/idioma |
+| Fluidez verbal — Olabarrieta-Landa y colaboradores (2015), [PMID 26639930](https://pubmed.ncbi.nlm.nih.gov/26639930/) | Normas de once países, entre ellos Bolivia | Los protocolos fonémico y semántico no son intercambiables; registrar modalidad y reglas de administración |
+| Rey–Osterrieth — Rivera y colaboradores (2015), [PMID 26639929](https://pubmed.ncbi.nlm.nih.gov/26639929/) | 3977 participantes de once países, Bolivia incluida, con resultados separados de copia y recuerdo inmediato | Para VIS-S02 considerar específicamente **copia**; recuerdo pertenece prioritariamente a Memoria |
+
+**Estado científico:** confirmación bibliográfica positiva de la existencia y alcance general de los estudios. Siguen abiertas: la compatibilidad con cada edición disponible, condiciones de aplicación, cobertura por edad/escolaridad/población institucionalizada, método de normalización e interpretación del componente y derechos de uso. Los 15 componentes permanecen sin `PERFIL_INTERPRETATIVO_ADMITIDO`. La regla experimental podrá funcionar con fixtures **TEST_ONLY**, pero no con respuestas clínicas reales.
