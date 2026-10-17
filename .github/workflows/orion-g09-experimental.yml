@@ -5,6 +5,7 @@ on:
       - 'motor-experto/src/motor_experto/investigacion/g09/**'
       - 'motor-experto/tests/g09_experimental.php'
       - 'motor-experto/tests/g08_g09_puente.php'
+      - 'motor-experto/tests/g08_g09_integracion_sqlite.php'
       - '.github/workflows/orion-g09-experimental.yml'
   workflow_dispatch:
 permissions:
@@ -17,6 +18,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
+          extensions: pdo_sqlite
       - name: PHP syntax check
         run: |
           php -l motor-experto/src/motor_experto/investigacion/g09/CatalogoReglasG09Experimental.php
@@ -26,7 +28,11 @@ jobs:
           php -l motor-experto/src/motor_experto/investigacion/g09/AdaptadorInstrumentalG08G09Experimental.php
           php -l motor-experto/src/motor_experto/investigacion/g09/ConstructorInformeG09Experimental.php
           php -l motor-experto/tests/g08_g09_puente.php
+          php -l motor-experto/src/motor_experto/investigacion/g09/LectorSQLiteG08Experimental.php
+          php -l motor-experto/src/motor_experto/investigacion/g09/EjecutorPerfilG09Experimental.php
+          php -l motor-experto/tests/g08_g09_integracion_sqlite.php
       - name: Isolated synthetic rule tests
         run: |
           php motor-experto/tests/g09_experimental.php
           php motor-experto/tests/g08_g09_puente.php
+          php motor-experto/tests/g08_g09_integracion_sqlite.php
