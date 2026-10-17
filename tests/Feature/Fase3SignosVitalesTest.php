@@ -240,8 +240,45 @@ class Fase3SignosVitalesTest extends TestCase
         $this->assertSame('ABIERTA', $registro->alerta->fresh()->estado);
     }
 
+    public static function nombresParaIniciales(): array
+    {
+        return [
+            'vocales acentuadas' => ['Álvaro', 'Íñiguez', 'ÁÍ'],
+            'iniciales multibyte minúsculas' => ['ñora', 'örtiz', 'ñö'],
+            'iniciales ASCII' => ['Elena', 'Pérez', 'EP'],
+        ];
+    }
+
+    #[DataProvider('nombresParaIniciales')]
+    public function test_alertas_y_drawers_conservan_iniciales_utf8(string $nombre, string $apellido, string $iniciales): void
+    {
+        $this->residente->update(['nombres' => $nombre, 'apellido_paterno' => $apellido]);
+        app(SignosVitalesService::class)->registrarConEvaluacion($this->residente->cod_residente,
+            ['frecuencia_cardiaca' => 135], $this->usuario);
+
+        foreach ([
+            \App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPanel::class,
+            \App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades\CampanaNotificaciones::class,
+        ] as $componente) {
+            $panel = \Livewire\Livewire::test($componente);
+            if ($componente === \App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades\CampanaNotificaciones::class) {
+                $panel->call('togglePanel');
+            }
+            $panel->assertSee($iniciales)
+                ->call('verUbicacion', $this->residente->cod_residente)->assertSee($iniciales)
+                ->call('verGraficos', $this->residente->cod_residente)->assertSee($iniciales);
+            $this->assertTrue(mb_check_encoding($panel->html(), 'UTF-8'));
+            $this->assertNotEmpty(json_encode($panel->html(), JSON_THROW_ON_ERROR));
+        }
+        \Livewire\Livewire::test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\MisPacientes::class)
+            ->call('seleccionarResidente', $this->residente->cod_residente)
+            ->assertSet('detalleResidente.iniciales', mb_strtoupper($iniciales, 'UTF-8'));
+    }
+
     public function test_panel_permite_intervencion_en_alertas_reconocidas_asignadas_y_pendientes(): void
     {
+        // Reproducir el fallo de serialización que antes dependía de Faker.
+        $this->residente->update(['nombres' => 'Álvaro', 'apellido_paterno' => 'Íñiguez']);
         $registro = app(SignosVitalesService::class)->registrarConEvaluacion($this->residente->cod_residente,
             ['frecuencia_cardiaca' => 135], $this->usuario);
         foreach (['RECONOCIDA', 'ASIGNADA', 'PENDIENTE'] as $estado) {
