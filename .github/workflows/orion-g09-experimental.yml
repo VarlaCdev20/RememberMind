@@ -24,6 +24,7 @@ jobs:
           php -l motor-experto/tests/g09_experimental.php
           php -l motor-experto/src/motor_experto/investigacion/g09/PerfilInstrumentalG08Experimental.php
           php -l motor-experto/src/motor_experto/investigacion/g09/AdaptadorInstrumentalG08G09Experimental.php
+          php -l motor-experto/src/motor_experto/investigacion/g09/ConstructorInformeG09Experimental.php
           php -l motor-experto/tests/g08_g09_puente.php
       - name: Isolated synthetic rule tests
         run: |
