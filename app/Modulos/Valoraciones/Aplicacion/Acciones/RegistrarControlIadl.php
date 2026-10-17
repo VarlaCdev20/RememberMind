@@ -18,7 +18,7 @@ final class RegistrarControlIadl
     {
         $rectifica = !empty($entrada['cod_control_anterior']);
         abort_unless(
-            $usuario->can($rectifica ? 'valoraciones_funcionales.editar' : 'valoraciones_funcionales.crear'),
+            $usuario->can($rectifica ? 'controles_funcionales_iadl.rectificar' : 'controles_funcionales_iadl.crear'),
             403
         );
         $personal = $usuario->personal;
