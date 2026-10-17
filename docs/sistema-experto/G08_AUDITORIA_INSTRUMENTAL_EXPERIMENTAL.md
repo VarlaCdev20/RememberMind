@@ -109,3 +109,14 @@ Al menos dos hallazgos son importantes para controlar errores: el **BNT estánda
 Se añadió `LocalizadoresAnexosBoliviaG08Investigacion` y la prueba `g08_anexos_bolivia.php`; comprueban identidad por componente, instrumento, métrica, país, PMID, DOI y número de anexo. **No se han importado valores normativos ni se ofrece un percentil o criterio de DCL.** La selección de edición, permisos, algoritmo y aplicabilidad geriátrica permanece pendiente; las referencias editoriales `>77` no acreditan por sí mismas generalización a población institucionalizada.
 
 **G08 sigue 0/15 perfiles interpretativos admitidos y el uso asistencial continúa bloqueado.**
+
+
+## Captura cruda y comparabilidad de cohortes (17/10/2026)
+
+La especificación G08 avanza desde el **localizador de un anexo** hacia un **contrato de captura cruda por tarea**, documentado en [G08_CONTRATO_CAPTURA_Y_COMPARABILIDAD_MUESTRA.md](G08_CONTRATO_CAPTURA_Y_COMPARABILIDAD_MUESTRA.md). Se incorporaron `ContratoCapturaCrudaG08Investigacion` y `AuditorCapturaYComparabilidadG08Investigacion` junto a la prueba `g08_captura_y_muestras.php`.
+
+Para los 12 pares tarea–anexo localizados se tipifican los **campos crudos de ensayo y la unidad** antes de cualquier normalización: BTA separa aciertos N y L, Stroop conserva sus mediciones básicas pero NO calcula el índice de interferencia, TMT-B conserva tiempo y errores, M-WCST diferencia categorías de tipos de errores, BNT conserva denominaciones correctas, fluidez conserva modalidad/tiempo/respuestas y Rey–Osterrieth usa solamente copia. Las claves son contratos **ficticios** y todavía no están homologadas a preguntas BDD del instrumento real.
+
+La revisión primaria de metodología BTA, TMT, Stroop y BNT confirmó que sus muestras son de voluntarios sanos comunitarios con rangos y criterios de selección: 18–95 años, español materno, alfabetización y al menos un año de escolaridad, además de condiciones de cribado y exclusión. Estos requisitos describen **cómo se seleccionó la muestra del estudio**, no umbrales diagnósticos de O.R.I.O.N. ni reglas automáticas de elegibilidad de residentes. El auditor advierte sobre origen, idioma, educación, edad, población institucionalizada y diferencias de selección; una persona institucionalizada no se presume equivalente a la muestra comunitaria.
+
+**Invariantes:** ninguna condición documental habilita norma ni estudio clínico. Las salidas mantienen `NO_INTERPRETABLE_POR_G08`, `NO_HOMOLOGADO_A_GERIATRICO`, `percentil=null`, `interpretacion_A_P=null` y `uso_asistencial_autorizado=false`, aun si el fixture afirma haber verificado todos sus campos. **0/15 perfiles G08 admitidos.**
