@@ -1076,7 +1076,7 @@
   <div class="p-4 {{ $clasificacion['tipo_personal'] === 'salud' ? 'bg-estado-infoBg border-estado-infoBorde' : 'bg-estado-advertenciaBg border-estado-advertenciaBorde' }} border rounded-xl space-y-2">
    <div>
    <h5 class="text-xs font-bold uppercase tracking-wider {{ $clasificacion['tipo_personal'] === 'salud' ? 'text-estado-info' : 'text-estado-advertencia' }}">Derivada del rol</h5>
-   <p class="text-sm font-bold text-titulo">{{ $clasificacion['rol_sistema'] }}</p>
+   <p class="text-sm font-bold text-titulo">{{ $clasificacion['rol'] }}</p>
    </div>
 
    <div class="space-y-2">
