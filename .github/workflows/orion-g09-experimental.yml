@@ -6,6 +6,7 @@ on:
       - 'motor-experto/tests/g09_experimental.php'
       - 'motor-experto/tests/g08_g09_puente.php'
       - 'motor-experto/tests/g08_g09_integracion_sqlite.php'
+      - 'motor-experto/tests/g09_nucleo_semantico.php'
       - '.github/workflows/orion-g09-experimental.yml'
   workflow_dispatch:
 permissions:
@@ -31,8 +32,12 @@ jobs:
           php -l motor-experto/src/motor_experto/investigacion/g09/LectorSQLiteG08Experimental.php
           php -l motor-experto/src/motor_experto/investigacion/g09/EjecutorPerfilG09Experimental.php
           php -l motor-experto/tests/g08_g09_integracion_sqlite.php
+          php -l motor-experto/src/motor_experto/investigacion/g09/PaqueteSemanticoG09Experimental.php
+          php -l motor-experto/src/motor_experto/investigacion/g09/VerificadorNucleoG09Experimental.php
+          php -l motor-experto/tests/g09_nucleo_semantico.php
       - name: Isolated synthetic rule tests
         run: |
           php motor-experto/tests/g09_experimental.php
           php motor-experto/tests/g08_g09_puente.php
           php motor-experto/tests/g08_g09_integracion_sqlite.php
+          php motor-experto/tests/g09_nucleo_semantico.php
