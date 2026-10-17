@@ -31,7 +31,7 @@ final class ControlFuncionalIadlController extends Controller
         ])->all();
         $anterior = null;
         if ($request->filled('rectificar')) {
-            abort_unless($request->user()->can('valoraciones_funcionales.editar'), 403);
+            abort_unless($request->user()->can('controles_funcionales_iadl.rectificar'), 403);
             $anterior = $historial->firstWhere('cod_control_iadl', $request->string('rectificar')->toString());
             abort_unless($anterior, 404);
             abort_if($historial->contains('cod_control_anterior', $anterior->cod_control_iadl), 409,
