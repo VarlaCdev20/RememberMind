@@ -73,3 +73,13 @@ La auditoría contrastó los artículos normativos originales mencionados en el 
 | Rey–Osterrieth — Rivera y colaboradores (2015), [PMID 26639929](https://pubmed.ncbi.nlm.nih.gov/26639929/) | 3977 participantes de once países, Bolivia incluida, con resultados separados de copia y recuerdo inmediato | Para VIS-S02 considerar específicamente **copia**; recuerdo pertenece prioritariamente a Memoria |
 
 **Estado científico:** confirmación bibliográfica positiva de la existencia y alcance general de los estudios. Siguen abiertas: la compatibilidad con cada edición disponible, condiciones de aplicación, cobertura por edad/escolaridad/población institucionalizada, método de normalización e interpretación del componente y derechos de uso. Los 15 componentes permanecen sin `PERFIL_INTERPRETATIVO_ADMITIDO`. La regla experimental podrá funcionar con fixtures **TEST_ONLY**, pero no con respuestas clínicas reales.
+
+## Conciliación con el esquema operacional (17/10/2026)
+
+La revisión de las migraciones `2026_09_18_001011_create_instrumentos_table.php`, `2026_09_18_001057_create_preguntas_instrumento_table.php`, `2026_09_18_001058_create_opciones_pregunta_table.php`, `2026_09_18_001059_create_aplicaciones_instrumento_table.php` y `2026_09_18_001060_create_respuestas_instrumento_table.php` confirmó las **fuentes que ya existen**: `instrumentos`, `preguntas_instrumento`, `opciones_pregunta`, `aplicaciones_instrumento` y `respuestas_instrumento`.
+
+`aplicaciones_instrumento` utiliza **`fecha_hora` DATETIME** (no `fecha_aplicacion`), `cod_residente`, `cod_personal`, `estado` y datos de resultados globales como `puntaje_total`, `clasificacion`, `interpretacion`. Ninguno de esos totales o textos de clasificación constituye evidencia admisible de un componente sin vinculación con la tarea/versión/norma. En las respuestas, `valor_texto` y `valor_numero` no son intercambiables; las respuestas deben identificarse por `cod_pregunta` y `cod_aplicacion`.
+
+El puente experimental ya demuestra la lectura íntegra desde **SQLite exclusivamente en memoria con registros sintéticos**, pero **la mera existencia de estas columnas no resuelve G08**: siguen sin seleccionarse ni verificarse la edición, la normativa aplicable y la interpretación de las 15 pruebas en personas reales.
+
+Para cerrar por instrumento, las fichas requerirán correspondencia verificable entre **preguntas codificadas, tareas/subpruebas reales, instrumento, edición, idioma, baremo, población, confusores y fundamento de decisión**. No se extrapolarán reglas de un estudio de normas a una edición no identificada.
