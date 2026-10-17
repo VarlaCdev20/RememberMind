@@ -96,3 +96,16 @@ Se implementaron `CatalogoExpedientesG08Investigacion` y `AuditorAplicabilidadG0
 La suite `g08_auditoria_instrumental.php` cubre las 15 fichas, sus fuentes, seis estados bibliográficos, alternativas TMT-B/M-WCST, exclusión de BNT abreviado, diferenciación copia/recuerdo ROCF, confusores BTA, advertencia Ruff para edad mayor a 70 según el expediente (sin adoptar un rango normativo en software), rechazo de razonamiento EJE-S05 y denegación de uso asistencial. Se incluyó en `.github/workflows/orion-g09-experimental.yml`; las pruebas específicas resultaron satisfactorias en GitHub Actions.
 
 La próxima decisión científica no consiste en activar una puntuación, sino en **seleccionar con sustento una edición/protocolo concreto y comprobar la compatibilidad de su tabla normativa**. Las normas de adultos saludables de varios países, aunque incluyan Bolivia, no autorizan extrapolación automática a residentes institucionalizados.
+
+
+## Precisión de anexos bolivianos (17/10/2026)
+
+Se verificaron directamente las publicaciones completas de los siete estudios candidatos, identificando los **12 localizadores de tablas** para los **6 subcomponentes** G08 con referencia normativa candidata. Véase [G08_LOCALIZADORES_BOLIVIA_PUBLICACIONES_2015.md](G08_LOCALIZADORES_BOLIVIA_PUBLICACIONES_2015.md).
+
+Tabla boliviana por subresultado: BTA **A2**; Stroop **interferencia A35** (no confundir con Word, Color, Word-Color); TMT **B A14**; M-WCST **categorías A2**, **perseveraciones A13**, **errores totales A24**; Boston Naming Test **estándar A2**; fluidez **letra F A2**, **letra A A13**, **letra S A24**, **animales A35**; Rey–Osterrieth **copia A2**. El nombre «A2» se reutiliza **entre publicaciones**: nunca constituye una clave normativa independiente sin DOI, instrumento y tarea.
+
+Al menos dos hallazgos son importantes para controlar errores: el **BNT estándar Bolivia** usa una tabla por escolaridad, mientras la tabla boliviana de **Stroop Interference** no se encuentra estratificada por edad/escolaridad en su anexo. En cambio BTA y TMT-B ofrecen tablas bolivianas por edad/escolaridad. Estas diferencias refutan adoptar «una sola fórmula normativa» para todos los dominios.
+
+Se añadió `LocalizadoresAnexosBoliviaG08Investigacion` y la prueba `g08_anexos_bolivia.php`; comprueban identidad por componente, instrumento, métrica, país, PMID, DOI y número de anexo. **No se han importado valores normativos ni se ofrece un percentil o criterio de DCL.** La selección de edición, permisos, algoritmo y aplicabilidad geriátrica permanece pendiente; las referencias editoriales `>77` no acreditan por sí mismas generalización a población institucionalizada.
+
+**G08 sigue 0/15 perfiles interpretativos admitidos y el uso asistencial continúa bloqueado.**
