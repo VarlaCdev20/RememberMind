@@ -123,6 +123,7 @@ final class EvaluadorG09Experimental
             'estado_tecnico' => $estado,
             'consecuencias_candidatas' => $resultados,
             'excluidas' => $excluidas,
+            'motivos_g08' => $entrada['motivos_g08'] ?? [],
             'traza' => $traza,
             'explicacion' => $estado === 'HALLAZGO_ACOTADO'
                 ? 'El hallazgo experimental se sustenta exclusivamente en las condiciones positivas C1, C2 y C3 de las reglas listadas en la traza.'
