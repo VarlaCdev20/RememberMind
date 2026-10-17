@@ -6,6 +6,7 @@ use App\Models\ControlFuncionalIadl;
 use App\Models\Residente;
 use App\Models\User;
 use App\Modulos\Valoraciones\Aplicacion\Acciones\RegistrarControlIadl;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarEvidenciaIadlC03;
 use App\Modulos\Valoraciones\Dominio\Servicios\AnalizadorIadlC03;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -257,4 +258,39 @@ class ControlesFuncionalesIadlTest extends TestCase
             $this->assertDatabaseCount('controles_funcionales_iadl',0);
         }
     }
+
+    public function test_apoyo_decision_recibe_solo_evidencia_anterior_al_corte_y_no_emite_c03_s(): void
+    {
+        $viejo = $this->registrar([
+            'actividad'=>'RUTINAS',
+            'fecha_hora'=>now()->subDays(3)->format('Y-m-d H:i:s'),
+        ]);
+        $this->registrar([
+            'actividad'=>'PERTENENCIAS',
+            'fecha_hora'=>now()->subMinutes(20)->format('Y-m-d H:i:s'),
+        ]);
+        $r = app(ConsultarEvidenciaIadlC03::class)->ejecutar(
+            $this->profesional, $this->residente, now()->subDay()->format('Y-m-d')
+        );
+        $this->assertSame(1, $r['registros_consultados']);
+        $this->assertSame([$viejo->cod_control_iadl], $r['traza_controles']);
+        $this->assertSame('U', $r['criterio_dcl_c03']);
+        $this->assertFalse($r['puede_emitir_clasificacion_dcl']);
+        $this->assertSame($this->residente->cod_residente, $r['cod_residente']);
+    }
+
+    public function test_consulta_del_motor_rechaza_actor_sin_permiso_clinico(): void
+    {
+        $familiar = User::factory()->create();
+        $familiar->assignRole('FAMILIAR');
+        try {
+            app(ConsultarEvidenciaIadlC03::class)->ejecutar(
+                $familiar, $this->residente, now()->format('Y-m-d')
+            );
+            $this->fail('Se leyó evidencia IADL fuera de acceso clínico.');
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            $this->assertSame(403, $e->getStatusCode());
+        }
+    }
+
 }
