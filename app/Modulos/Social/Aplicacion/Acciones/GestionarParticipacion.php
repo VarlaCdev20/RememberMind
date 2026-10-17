@@ -18,7 +18,7 @@ final class GestionarParticipacion
         Validator::make($entrada, $this->rules($usuario, $entrada))->validate();
         [$personal, $area] = $this->contextoInstitucional($usuario, $entrada);
         $actividad = Actividad::create([
-            'cod_actividad' => $this->codigo($usuario, $entrada, 'ACT'),
+            'cod_actividad' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('actividades'),
             'cod_area' => $area,
             'cod_personal' => $personal,
             'tipo' => strtoupper(trim($entrada['codTipoAct'])),
@@ -29,7 +29,7 @@ final class GestionarParticipacion
             'observacion' => $entrada['obs'] ?: null,
         ]);
         ParticipanteActividad::create([
-            'cod_participante' => $this->codigo($usuario, $entrada, 'PAR'),
+            'cod_participante' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('participantes_actividad'),
             'cod_actividad' => $actividad->cod_actividad,
             'cod_residente' => $entrada['codResidente'],
         ]);
@@ -53,7 +53,7 @@ final class GestionarParticipacion
             $participante->update(['cod_residente' => $entrada['codResidente']]);
         } else {
             ParticipanteActividad::create([
-                'cod_participante' => $this->codigo($usuario, $entrada, 'PAR'),
+                'cod_participante' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('participantes_actividad'),
                 'cod_actividad' => $a->cod_actividad,
                 'cod_residente' => $entrada['codResidente'],
             ]);
@@ -78,10 +78,6 @@ final class GestionarParticipacion
         return [$personal->cod_personal, $area->cod_area];
     }
 
-    private function codigo(User $usuario, array $entrada, string $prefijo): string
-    {
-        return $prefijo.'_'.Str::upper(Str::random(12));
-    }
 
     protected function rules(User $usuario, array $entrada): array
     {

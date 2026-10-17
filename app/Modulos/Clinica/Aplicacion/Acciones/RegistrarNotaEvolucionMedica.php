@@ -24,7 +24,7 @@ final class RegistrarNotaEvolucionMedica
 
             $fechaHora = $datos['fecha'].' '.($datos['hora'] ?: now()->format('H:i'));
             $atencion = Atencion::query()->create([
-                'cod_atencion' => 'ATN_'.Str::upper(Str::random(10)),
+                'cod_atencion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('atenciones'),
                 'cod_residente' => $datos['cod_residente'],
                 'cod_area' => $codArea,
                 'cod_personal' => $personal->cod_personal,
@@ -36,7 +36,7 @@ final class RegistrarNotaEvolucionMedica
             ]);
 
             NotaClinica::query()->create([
-                'cod_nota' => 'NCL_'.Str::upper(Str::random(10)),
+                'cod_nota' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('notas_clinicas'),
                 'cod_atencion' => $atencion->cod_atencion,
                 'cod_residente' => $datos['cod_residente'],
                 'cod_personal' => $personal->cod_personal,
@@ -54,7 +54,7 @@ final class RegistrarNotaEvolucionMedica
 
             if ($datos['incluirSignos']) {
                 SignoVital::query()->create([
-                    'cod_signo' => 'SGN_'.Str::upper(Str::random(10)),
+                    'cod_signo' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('signos_vitales'),
                     'cod_residente' => $datos['cod_residente'],
                     'cod_personal' => $personal->cod_personal,
                     'cod_atencion' => $atencion->cod_atencion,

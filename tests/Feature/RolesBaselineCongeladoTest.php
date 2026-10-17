@@ -50,9 +50,11 @@ class RolesBaselineCongeladoTest extends TestCase
         $this->assertTrue($user->can('admisiones.formalizar'));
         $this->assertTrue(app(PrescripcionPolicy::class)->create($user));
         $this->assertEqualsCanonicalizing(
-            Permission::query()->where('guard_name', 'web')->pluck('name')->all(),
+            Permission::query()->where('guard_name', 'web')->where('name', '!=', 'fotografias_institucionales.gestionar')->pluck('name')->all(),
             $user->getAllPermissions()->pluck('name')->all()
         );
+        $this->assertFalse($user->can('fotografias_institucionales.gestionar'));
+        $this->assertTrue($user->can('fotografias_institucionales.ver'));
     }
 
     public function test_permiso_nuevo_se_asigna_al_superadmin_y_sobrevive_al_resembrado(): void
@@ -142,7 +144,7 @@ class RolesBaselineCongeladoTest extends TestCase
             ->assertOk()->assertSee('Superadministración')->assertSee('Residentes activos');
 
         $this->actingAs($this->usuarioConRol('GERENTE'))->get(route('dashboard'))
-            ->assertOk()->assertSee('con visión de cobertura')->assertSee('Personal activo');
+            ->assertOk()->assertSee('Organización y planificación')->assertSee('Personal activo');
 
         $this->actingAs($this->usuarioConRol('ADMINISTRADOR'))->get(route('dashboard'))
             ->assertRedirect(route('admin.administracion.dashboard'));

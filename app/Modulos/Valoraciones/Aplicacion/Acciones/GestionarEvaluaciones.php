@@ -18,7 +18,7 @@ final class GestionarEvaluaciones
         $instrumento = Instrumento::findOrFail(data_get($entrada, 'cod_tipo_eval'));
         $personal = Personal::where('cod_usuario', $usuario?->cod_usuario)->first();
         $interpretacion = $this->interpretarPuntaje($instrumento, data_get($entrada, 'puntaje_total'));
-        AplicacionInstrumento::create(['cod_aplicacion' => 'API_'.strtoupper(Str::random(10)), 'cod_instrumento' => $instrumento->cod_instrumento, 'cod_residente' => $adulto_mayor->cod_residente, 'cod_personal' => $personal?->cod_personal, 'fecha_hora' => data_get($entrada, 'fecha_eval').' '.now()->format('H:i:s'), 'puntaje_total' => data_get($entrada, 'puntaje_total'), 'puntaje_maximo' => $instrumento->puntaje_maximo ?? 30, 'clasificacion' => $interpretacion['riesgo'], 'interpretacion' => $interpretacion['resultado'], 'observacion' => data_get($entrada, 'observaciones'), 'estado' => 'ACTIVO']);
+        AplicacionInstrumento::create(['cod_aplicacion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('aplicaciones_instrumento'), 'cod_instrumento' => $instrumento->cod_instrumento, 'cod_residente' => $adulto_mayor->cod_residente, 'cod_personal' => $personal?->cod_personal, 'fecha_hora' => data_get($entrada, 'fecha_eval').' '.now()->format('H:i:s'), 'puntaje_total' => data_get($entrada, 'puntaje_total'), 'puntaje_maximo' => $instrumento->puntaje_maximo ?? 30, 'clasificacion' => $interpretacion['riesgo'], 'interpretacion' => $interpretacion['resultado'], 'observacion' => data_get($entrada, 'observaciones'), 'estado' => 'ACTIVO']);
 
         return null;
     }

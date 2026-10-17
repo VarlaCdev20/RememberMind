@@ -16,10 +16,10 @@
  };
 
  $badgeNivelClass = match($detalle->prioridad) {
-     'CRITICO' => 'rm-badge-danger',
-     'ALTO' => 'rm-badge-warning',
-     'MEDIO' => 'rm-badge-info',
-     'BAJO' => 'rm-badge-neutral',
+     'CRITICO', 'CRITICA' => 'rm-badge-danger',
+     'ALTO', 'ALTA' => 'rm-badge-warning',
+     'MEDIO', 'MEDIA' => 'rm-badge-info',
+     'BAJO', 'BAJA' => 'rm-badge-neutral',
      default => 'rm-badge-neutral'
  };
 @endphp
@@ -45,18 +45,18 @@
         <div class="flex items-center justify-between p-3.5 rounded-2xl bg-[var(--rm-surface-soft)] border border-[var(--rm-border-soft)] shadow-2xs flex-wrap gap-2.5">
             <div class="flex items-center gap-3">
                 <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--rm-action-primary)] text-white font-bold text-sm shadow-xs shrink-0">
-                    {{ substr($detalle->adultoMayor?->nombres ?? 'A', 0, 1) }}{{ substr($detalle->adultoMayor?->ap_paterno ?? 'M', 0, 1) }}
+                    {{ substr($detalle->residente?->nombres ?? 'A', 0, 1) }}{{ substr($detalle->residente?->apellido_paterno ?? 'M', 0, 1) }}
                 </div>
                 <div>
                     <h4 class="font-bold text-[var(--rm-text-primary)] text-sm leading-tight">
-                        {{ $detalle->adultoMayor?->ap_paterno }} {{ $detalle->adultoMayor?->ap_materno }} {{ $detalle->adultoMayor?->nombres }}
+                        {{ $detalle->residente?->apellido_paterno }} {{ $detalle->residente?->apellido_materno }} {{ $detalle->residente?->nombres }}
                     </h4>
                     <div class="flex items-center gap-2 text-[11px] text-[var(--rm-text-secondary)] mt-0.5">
-                        <span>{{ $detalle->adultoMayor?->edad_texto ?? 'Edad no registrada' }}</span>
+                        <span>{{ $detalle->residente?->edad_texto ?? 'Edad no registrada' }}</span>
                         <span>•</span>
                         <span class="inline-flex items-center gap-1">
                             <i class="ph ph-map-pin text-[var(--rm-action-primary)]"></i>
-                            <span>{{ $detalle->adultoMayor?->ubicacion_texto ?? 'Sin ubicación asignada' }}</span>
+                            <span>{{ $detalle->residente?->ubicacion_formateada ?? 'Sin ubicación asignada' }}</span>
                         </span>
                     </div>
                 </div>
@@ -118,7 +118,7 @@
                     Motivo y recomendación registrados
                 </span>
                 <p class="p-3 rounded-xl bg-[var(--rm-surface-soft)] border border-[var(--rm-border-soft)] text-xs text-[var(--rm-text-primary)] leading-relaxed whitespace-pre-line">
-                    <strong class="text-[var(--rm-text-primary)]">{{ $detalle->tipo }}:</strong> {{ $detalle->descripcion }}
+                    <strong class="text-[var(--rm-text-primary)]">{{ $detalle->tipo }}:</strong> {{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($detalle->descripcion) }}
                 </p>
             </div>
         </div>
@@ -197,7 +197,7 @@
                         'tipo' => $acc->tipo_evento,
                         'estado' => $cambioEstado,
                         'fecha' => $fechaFormat,
-                        'descripcion' => $acc->descripcion,
+                        'descripcion' => \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($acc->descripcion),
                         'variant' => match($acc->tipo_evento) {
                             'CREACION' => 'info',
                             'ATENCION', 'INTERVENCION', 'SEGUIMIENTO' => 'terracota',

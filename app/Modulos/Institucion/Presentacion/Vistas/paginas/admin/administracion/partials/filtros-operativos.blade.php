@@ -1,10 +1,10 @@
 @php
     $busquedaEjemplo = match($modulo) {
-        'jornadas' => 'Turno o código de jornada', 'asignaciones' => 'Personal, área, turno o código',
-        'contactos' => 'Nombre, documento o código del contacto', 'documentacion' => 'Documento, tipo o titular',
-        'consentimientos' => 'Tipo, residente o código', 'seguros' => 'Entidad, residente o código',
-        'actividades' => 'Actividad, lugar, área o responsable', 'visitas' => 'Visitante, residente o código',
-        'alertas' => 'Título, residente, responsable o código', 'incidentes' => 'Tipo, lugar, residente o código',
+        'jornadas' => 'Nombre del turno', 'asignaciones' => 'Personal, área o turno',
+        'contactos' => 'Nombre o documento del contacto', 'documentacion' => 'Documento, tipo o titular',
+        'consentimientos' => 'Tipo o residente', 'seguros' => 'Entidad o residente',
+        'actividades' => 'Actividad, lugar, área o responsable', 'visitas' => 'Visitante o residente',
+        'alertas' => 'Título, residente o responsable', 'incidentes' => 'Tipo, lugar o residente',
     };
     $fechaAnalizada = match($modulo) {
         'jornadas' => 'Día de la jornada', 'asignaciones' => 'Día de la jornada', 'documentacion' => 'Vencimiento del documento',

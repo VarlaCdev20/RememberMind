@@ -493,7 +493,7 @@
                         ✓ Incidencia registrada
                     </h3>
                     <p class="text-xs text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
-                        Código asignado: <strong class="text-[var(--rm-text-primary)]">{{ $ultimoCodIncidente }}</strong>
+                        Disponible en el historial del residente.
                     </p>
                 </div>
 

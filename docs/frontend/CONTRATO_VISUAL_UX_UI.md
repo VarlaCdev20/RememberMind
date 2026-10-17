@@ -68,18 +68,22 @@ Las superficies ordinarias son neutras. Normal se representa con badge, icono, b
 
 ## Paleta objetivo y correspondencia con el producto
 
+Actualización final aprobada el 14/10/2026: paleta completa institucional y posterior eliminación de degradados en fondos/controles/gráficas. Solo permanecen los degradados tipográficos. El relieve procede de bordes y sombras compartidas. La corrección posterior mantiene navbar y sidebar en capuchino (#D7CEC7) y aclara el fondo general (#D7CEC7), con trama de puntos menudos solo en el fondo. La instrucción vigente sustituye el corrugado y la propuesta orgánica por puntos de radio 0.6 px, separados 16 px, conservando la profundidad interior. Esta decisión sustituye la propuesta salvia #8DA18A/fondo #E7E0D9. Ver [paleta final y verificación](PALETA_FINAL_SOLIDA_Y_RELIEVE.md).
+
+Corrección posterior vigente: fondo café grisáceo `#D8D2CD`, cards más claras `#ECE9E6`, apoyo `#DFD9D4`, ventanas `#F0EDEA` y campos `#E7E2DE`, sin dominante amarilla. Sustituye los valores de la propuesta anterior descrita arriba. Véanse [paleta cálida](PALETA_CALIDA_COMPOSICION_2026_10_14.md) y [composición global](COMPOSICION_GLOBAL_2026_10_14.md).
+
 Estos valores vienen de la tarea de la propietaria. La futura implementación los consolida en el Design System, sin HEX locales ni una segunda paleta por rol.
 
 | Nombre del brief | Objetivo | Contrato implementado a inspeccionar |
 |---|---|---|
-| `--rm-app-bg` | `#F3EEE8` | `--rm-bg-app` |
-| `--rm-shell-bg` | `#DDD6CF` | `--rm-bg-shell` |
-| `--rm-header-bg` | `#E6E0D9` | Tokens de topbar/header y superficies |
-| `--rm-card-bg` | `#F7F3EF` | `--rm-surface` y tokens de cards |
-| `--rm-surface-soft` | `#EFEAE4` | `--rm-surface-soft` |
-| `--rm-text-primary` | `#4A4642` | `--rm-text-primary` |
-| `--rm-text-secondary` | `#67615B` | `--rm-text-secondary` |
-| `--rm-text-muted` | `#847D76` | `--rm-text-muted` |
+| `--rm-app-bg` | `#D8D2CD` | `--rm-bg-app` y trama solo en el lienzo |
+| `--rm-shell-bg` | `#D7CEC7` | `--rm-bg-shell` |
+| Navbar | `#D7CEC7` | `--rm-bg-shell` en topbar; headers de contenido conservan su superficie |
+| `--rm-card-bg` | `#ECE9E6` | `--rm-surface` y tokens de cards |
+| `--rm-surface-soft` | `#DFD9D4` | `--rm-surface-soft` |
+| `--rm-text-primary` | `#4F4742` | `--rm-text-primary` |
+| `--rm-text-secondary` | `#6B625C` | `--rm-text-secondary` |
+| `--rm-text-muted` | `#8A8078` | `--rm-text-muted` |
 | Acento Enfermería | `#3F8F76` | Acento de cuidado/acción compartido, según función |
 
 Los nombres del brief son conceptuales; preferir evolucionar el token semántico existente y documentar alias realmente necesarios. No crear `--rm-enf-*` ni convertir todas las superficies en verdes. Sage, tonos tierra y acentos clínicos acompañan la base neutral.
@@ -135,3 +139,9 @@ Antes de crear: buscar componente, comparar responsabilidad, extender si procede
 Cada ejecución informa, proporcionalmente al alcance: ANTES (diagnóstico), PLAN (qué conservar/cambiar y por qué), IMPLEMENTACIÓN (archivos, o «sin edición» si es análisis/QA), VERIFICACIÓN (desktop/tablet/mobile/estados realmente revisados y limitaciones). Usar datos sintéticos en pruebas y capturas. No exponer datos clínicos en servicios externos.
 
 Para aceptación visual revisar 1440, 1280, 1024, 768 y 390 px; teclado, foco, touch aproximado mínimo de 44 × 44 CSS px, contraste, ausencia de scroll horizontal, loading/empty/error/success y estados pertinentes. Tests y build no sustituyen inspección visual. Si falta evidencia requerida, QA produce `FAIL` por verificación incompleta, sin inventar un defecto observado.
+
+Corrección de superficies del 14/10/2026: la propietaria pide unificar las áreas y retirar blancos. En el shell operativo, cabeceras/filtros/cards/paneles/modales/menús comparten #E6DED6; campos #D6CCC3. Se conservan el fondo general aclarado, puntos menudos, chrome capuchino, texto legible y estados semánticos. El tema oscuro mantiene su reinterpretación petróleo.
+
+Dirección vigente: neutros arena/cacao de intensidad media, superficies de apoyo #D2C5BB y elevadas #EBE3DC. Acentos salvia, petróleo, coral, oro, menta y lavanda más presentes en sus funciones existentes. Relieve con bordes y sombras cálidas; el color de estado sigue procediendo del dominio. No se cambian layout ni reglas clínicas.
+
+Corrección vigente: sidebar y navbar se aclaran al mismo café grisáceo #D7CEC7 del fondo. El token capuchino reutiliza el de página, sin duplicar color; acentos y relieve de Inicio se conservan.

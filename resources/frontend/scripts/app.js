@@ -1,12 +1,9 @@
 import './utilities/bootstrap.js';
 import './modules/operaciones-interactivas.js';
+import './modules/medicacion-registro.js';
+import './modules/medicacion-agenda-graficas.js';
 
 // Alpine lo proporciona Livewire; no iniciar una segunda instancia.
-
-// GSAP
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-gsap.registerPlugin(ScrollTrigger);
 
 // AOS
 import AOS from 'aos';
@@ -18,8 +15,6 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 Chart.register(ChartDataLabels);
 
 // Asignar al objeto window para acceso global
-window.gsap = gsap;
-window.ScrollTrigger = ScrollTrigger;
 window.Chart = Chart;
 window.AOS = AOS;
 
@@ -150,6 +145,11 @@ import './modules/signos-vitales-registro.js';
 import './modules/dolor-registro.js';
 import './modules/ingesta-registro.js';
 import './modules/clinical-form-feedback.js';
+import './components/clinical-consultations.js';
+import './modules/conducta-registro.js';
+import './modules/observacion-cognitiva.js';
+import './modules/wound-evidence.js';
+import './modules/free-text-select.js';
 import './modules/filter-selection.js';
 import './modules/controles-institucionales.js';
 import './modules/admisiones-interactivas.js';
@@ -164,3 +164,12 @@ import './modules/hidratacion-registro.js';
 import './modules/eliminacion-registro.js';
 
 import './modules/movilidad-registro.js';
+
+// Comportamiento de la ficha clínica, registrado una vez por el bundle.
+import './modules/ficha-signos.js';
+import './modules/ficha-eventos.js';
+import './modules/ficha-estudios.js';
+
+// Dashboard de Enfermería: ciclos de gráficas y navegación compartidos.
+import './modules/nursing-dashboard.js';
+import './modules/livewire-access-feedback.js';

@@ -78,7 +78,7 @@ class HistorialAlerta extends Component
                     'tipo' => $ev->tipo_evento,
                     'estado' => $cambioEstado,
                     'fecha' => $fechaFormat,
-                    'descripcion' => $ev->descripcion,
+                    'descripcion' => \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($ev->descripcion),
                     'variant' => $variant,
                     'icon' => match ($ev->tipo_evento) {
                         'CREACION' => 'ph ph-plus-circle',

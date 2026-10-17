@@ -17,7 +17,7 @@ class AlertasService
 
     public function autorizarCoordinacion(string $codResidente, string $permiso, User $usuario): void
     {
-        abort_unless($this->contexto->usuario()?->getKey() === $usuario->cod_usuario && $usuario->estado === 'ACTIVO', 403);
+        abort_unless($this->contexto->usuario()?->getKey() === $usuario->cod_usuario && $usuario->fresh()?->estado === 'ACTIVO', 403);
         abort_if($usuario->hasRole('FAMILIAR'), 403);
         abort_unless($usuario->canAny([$permiso, 'alertas.gestionar']), 403);
         if ($usuario->hasRole('ENFERMEROS')) {
@@ -70,7 +70,7 @@ class AlertasService
             }
             $codPersonal = $usuario->personal?->cod_personal;
             $alerta = Alerta::create([
-                'cod_alerta' => 'ALA_'.strtoupper(Str::random(10)),
+                'cod_alerta' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('alertas'),
                 'cod_residente' => $codResidente,
                 'cod_personal_responsable' => $codPersonal,
                 'tipo' => $tipo,
@@ -241,7 +241,7 @@ class AlertasService
     private function accion(Alerta $alerta, string $tipo, string $texto, User $usuario, ?string $estadoAnterior): void
     {
         $alerta->eventos()->create([
-            'cod_evento_alerta' => 'EVA_'.strtoupper(Str::random(10)),
+            'cod_evento_alerta' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('eventos_alerta'),
             'cod_usuario' => $usuario->cod_usuario,
             'tipo_evento' => $tipo,
             'estado_anterior' => $estadoAnterior,

@@ -44,7 +44,7 @@ class HistorialEstadoResidente extends ModeloOperativo
     {
         static::creating(function (self $model) {
             if (empty($model->cod_historial_estado)) {
-                $model->cod_historial_estado = 'HER_' . strtoupper(Str::random(10));
+                $model->cod_historial_estado = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('historial_estados_residente', $model->getConnectionName());
             }
             if (empty($model->fecha_hora)) {
                 $model->fecha_hora = now();

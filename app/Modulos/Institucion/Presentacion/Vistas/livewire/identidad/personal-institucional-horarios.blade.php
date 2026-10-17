@@ -1,4 +1,4 @@
-<div class="space-y-5">
+<div class="rm-staff-schedule space-y-5">
 
  {{-- ══ SIN CLASIFICACIÓN ══ --}}
  @if($tipoPersonal === 'ninguno')
@@ -13,7 +13,7 @@
  @else
 
  {{-- ══ HEADER ══ --}}
- <div class="flex items-center justify-between">
+ <div class="rm-staff-schedule__heading flex items-center justify-between">
   <div>
   <h4 class="text-sm font-black text-titulo flex items-center gap-2">
    <i class="ph-fill ph-calendar-check text-boton-acento"></i>
@@ -28,7 +28,7 @@
   <p class="text-xs text-apoyo font-semibold mt-0.5">
    {{ $tipoPersonal === 'salud' && $esEnfermeria
    ? 'Enfermería: validación estricta de solapamientos. Tipo ROTATIVO recomendado.'
-   : 'Gestiona turnos, áreas y das laborales del personal.' }}
+   : 'Gestiona turnos, áreas y días laborales del personal.' }}
   </p>
   </div>
   @if(!$formAbierto)
@@ -65,7 +65,7 @@
    <i class="ph-bold {{ $modoEdicion ? 'ph-pencil-simple' : 'ph-plus-circle' }} text-boton-acento"></i>
    {{ $modoEdicion ? 'Editar Asignación (se creará historial)' : 'Nueva Asignación de Turno' }}
   </h5>
-  <button type="button" wire:click="cancelarFormulario" class="h-7 w-7 flex items-center justify-center rounded-lg text-apoyo hover:bg-estado-peligroBg hover:text-estado-peligro transition-colors">
+  <button type="button" wire:click="cancelarFormulario" aria-label="Cerrar formulario de horario" class="h-7 w-7 flex items-center justify-center rounded-lg text-apoyo hover:bg-estado-peligroBg hover:text-estado-peligro transition-colors">
    <i class="ph-bold ph-x"></i>
   </button>
   </div>
@@ -80,10 +80,10 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
   {{-- Área --}}
   <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">
+   <label for="staff-schedule-f_cod_area" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">
    Área <span class="text-estado-peligro">*</span>
    </label>
-   <select wire:model="f_cod_area" class="w-full rounded-xl border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
+   <select id="staff-schedule-f_cod_area" wire:model="f_cod_area" class="w-full rounded-xl border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
    <option value="">Seleccione un área...</option>
    @foreach($areas as $area)
     <option value="{{ $area['cod_area'] }}">{{ $area['nombre'] }}</option>
@@ -94,10 +94,10 @@
 
   {{-- Turno --}}
   <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">
+   <label for="staff-schedule-f_cod_turno" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">
    Turno <span class="text-estado-peligro">*</span>
    </label>
-   <select wire:model.live="f_cod_turno" class="w-full rounded-xl border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
+   <select id="staff-schedule-f_cod_turno" wire:model.live="f_cod_turno" class="w-full rounded-xl border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
    <option value="">Seleccione un turno...</option>
    @foreach($turnos as $turno)
     <option value="{{ $turno['cod_turno'] }}">
@@ -127,10 +127,10 @@
 
   {{-- Tipo de asignación --}}
   <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">
+   <label for="staff-schedule-f_tipo_asignacion" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">
    Tipo de Asignación <span class="text-estado-peligro">*</span>
    </label>
-   <select wire:model="f_tipo_asignacion" class="w-full rounded-xl border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
+   <select id="staff-schedule-f_tipo_asignacion" wire:model="f_tipo_asignacion" class="w-full rounded-xl border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
    <option value="FIJO">FIJO – Horario fijo semanal</option>
    <option value="ROTATIVO">ROTATIVO – Turnos rotativos</option>
    <option value="TEMPORAL">TEMPORAL – Vigencia limitada</option>
@@ -141,33 +141,33 @@
 
   {{-- Fecha inicio --}}
   <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">
+   <label for="staff-schedule-f_fecha_inicio" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">
    Fecha Inicio <span class="text-estado-peligro">*</span>
    </label>
-   <input type="date" wire:model="f_fecha_inicio" class="w-full rounded-xl border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
+   <input id="staff-schedule-f_fecha_inicio" type="date" wire:model="f_fecha_inicio" class="w-full rounded-xl border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
    @error('f_fecha_inicio') <span class="text-xs text-estado-peligro mt-1 block">{{ $message }}</span> @enderror
   </div>
 
   {{-- Fecha fin (opcional) --}}
   <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">
+   <label for="staff-schedule-f_fecha_fin" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">
    Fecha Fin <span class="text-xs text-apoyo font-normal">(opcional)</span>
    </label>
-   <input type="date" wire:model="f_fecha_fin" class="w-full rounded-xl border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
+   <input id="staff-schedule-f_fecha_fin" type="date" wire:model="f_fecha_fin" class="w-full rounded-xl border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
    @error('f_fecha_fin') <span class="text-xs text-estado-peligro mt-1 block">{{ $message }}</span> @enderror
   </div>
 
   {{-- Observaciones --}}
   <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">Observaciones</label>
-   <input type="text" wire:model="f_observaciones" placeholder="Ej: Cobertura temporal, reemplazo..." class="w-full rounded-xl border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
+   <label for="staff-schedule-f_observaciones" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">Observaciones</label>
+   <input id="staff-schedule-f_observaciones" type="text" wire:model="f_observaciones" placeholder="Ej: Cobertura temporal, reemplazo..." class="w-full rounded-xl border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
   </div>
   </div>
 
   {{-- Das de la semana --}}
   <div>
   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-2">
-   Das Laborales <span class="text-estado-peligro">*</span>
+   Días laborales <span class="text-estado-peligro">*</span>
    @if($tipoPersonal === 'salud' && $esEnfermeria)
    <span class="ml-2 text-estado-info text-[10px] font-bold normal-case">Enfermería: sin solapamiento en ningún día</span>
    @endif
@@ -211,24 +211,24 @@
 
  {{-- ══ TABLA DE ASIGNACIONES ══ --}}
  @if(count($asignaciones) > 0)
- <div class="bg-[var(--rm-surface-soft)] rounded-2xl border border-borde overflow-x-auto">
-  <table class="rm-data-table rm-data-table--actions w-full min-w-[760px] text-left text-sm">
+ <div class="bg-[var(--rm-surface-soft)] rounded-2xl border border-borde rm-staff-table-wrap">
+  <table role="table" class="rm-staff-table rm-data-table rm-data-table--actions w-full min-w-[760px] text-left text-sm">
   <thead class="bg-fondo-tabla text-apoyo uppercase text-[10px] font-bold tracking-wider">
    <tr>
    <th class="px-4 py-3">Turno / Área</th>
-   <th class="px-4 py-3">Das</th>
+   <th class="px-4 py-3">Días</th>
    <th class="px-4 py-3 text-center">Tipo</th>
    <th class="px-4 py-3 text-center">Vigencia</th>
    <th class="px-4 py-3 text-center">Estado</th>
    <th class="px-4 py-3 text-right">Acciones</th>
    </tr>
   </thead>
-  <tbody class="divide-y divide-borde/50">
+  <tbody role="rowgroup" class="divide-y divide-borde/50">
    @foreach($asignaciones as $asig)
-   <tr wire:key="asig-{{ $asig['cod_asignacion'] }}"
+   <tr role="row" wire:key="asig-{{ $asig['cod_asignacion'] }}"
    class="hover:bg-fondo-hover/50 transition-colors {{ $asig['estado'] !== 'ACTIVA' ? 'opacity-60' : '' }}">
 
-   <td class="px-4 py-3">
+   <td role="cell" data-label="Turno / Área" class="px-4 py-3">
     <div class="flex items-center gap-2">
     @if($asig['turno_color'])
      <span class="h-3 w-3 rounded-full flex-shrink-0" style="background-color: {{ $asig['turno_color'] }}"></span>
@@ -240,7 +240,7 @@
     </div>
    </td>
 
-   <td class="px-4 py-3">
+   <td role="cell" data-label="Días" class="px-4 py-3">
     <div class="flex flex-wrap gap-1 max-w-[180px]">
     @foreach($asig['dias_semana'] as $dia)
      <span class="inline-block px-1.5 py-0.5 bg-boton-acento/10 text-boton-acento text-[10px] font-bold rounded">
@@ -250,7 +250,7 @@
     </div>
    </td>
 
-   <td class="px-4 py-3 text-center">
+   <td role="cell" data-label="Tipo" class="px-4 py-3 text-center">
     <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider
     {{ $asig['tipo_asignacion'] === 'ROTATIVO'
      ? 'bg-estado-infoBg text-estado-info border border-estado-infoBorde'
@@ -259,7 +259,7 @@
     </span>
    </td>
 
-   <td class="px-4 py-3 text-center text-[11px] text-apoyo font-semibold whitespace-nowrap">
+   <td role="cell" data-label="Vigencia" class="px-4 py-3 text-center text-[11px] text-apoyo font-semibold whitespace-nowrap">
     {{ $asig['fecha_inicio'] }}
     @if($asig['fecha_fin'])
     <br><span class="text-[10px]">→ {{ $asig['fecha_fin'] }}</span>
@@ -268,7 +268,7 @@
     @endif
    </td>
 
-   <td class="px-4 py-3 text-center">
+   <td role="cell" data-label="Estado" class="px-4 py-3 text-center">
     @php
     $estadoClasses = match($asig['estado']) {
      'ACTIVA' => 'bg-estado-exitoBg text-estado-exito border-estado-exitoBorde',
@@ -281,11 +281,11 @@
     </span>
    </td>
 
-   <td class="px-4 py-3 text-right">
+   <td role="cell" data-label="Acciones" class="px-4 py-3 text-right">
     <div class="flex items-center justify-end gap-1">
     {{-- Ver detalle --}}
     <button type="button" wire:click="verDetalle('{{ $asig['cod_asignacion'] }}')"
-     title="Ver detalle"
+     aria-label="Ver detalle" title="Ver detalle"
      class="h-7 w-7 rounded-lg border border-borde text-apoyo hover:bg-fondo-hover hover:text-titulo transition-colors inline-flex items-center justify-center">
      <i class="ph-bold ph-eye text-xs"></i>
     </button>
@@ -293,13 +293,13 @@
     @if($asig['estado'] === 'ACTIVA')
      {{-- Editar --}}
      <button type="button" wire:click="editarAsignacion('{{ $asig['cod_asignacion'] }}')"
-     title="Editar asignación"
+     aria-label="Editar asignación" title="Editar asignación"
      class="h-7 w-7 rounded-lg border border-borde text-apoyo hover:bg-boton-acento/10 hover:text-boton-acento hover:border-boton-acento/30 transition-colors inline-flex items-center justify-center">
      <i class="ph-bold ph-pencil-simple text-xs"></i>
      </button>
      {{-- Finalizar --}}
      <button type="button" wire:click="prepararFinalizar('{{ $asig['cod_asignacion'] }}')"
-     title="Finalizar asignación"
+     aria-label="Finalizar asignación" title="Finalizar asignación"
      class="h-7 w-7 rounded-lg border border-borde text-apoyo hover:bg-estado-advertenciaBg hover:text-estado-advertencia hover:border-estado-advertenciaBorde transition-colors inline-flex items-center justify-center">
      <i class="ph-bold ph-flag-checkered text-xs"></i>
      </button>

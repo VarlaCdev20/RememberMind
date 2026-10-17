@@ -8,12 +8,14 @@ use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class StoreAdministracionMedicacionRequest extends FormRequest
 {
     public function authorize(): bool
     {
         return Auth::check()
+            && Auth::user()->fresh()?->estado === 'ACTIVO'
             && app(AccesoClinicoTemporalService::class)
                 ->tieneRol(Auth::user(), ['ENFERMEROS'])
             && Auth::user()->can('administraciones_medicacion.crear');
@@ -24,9 +26,6 @@ class StoreAdministracionMedicacionRequest extends FormRequest
         if ($adulto = $this->route('adulto_mayor')) {
             $codRes = $adulto->cod_residente;
             $this->merge(['cod_residente' => $codRes]);
-        }
-        if (! $this->has('administrado')) {
-            $this->merge(['administrado' => false]);
         }
         $this->merge([
             'fecha' => today()->toDateString(),
@@ -44,17 +43,19 @@ class StoreAdministracionMedicacionRequest extends FormRequest
                 'string',
                 Rule::exists('prescripciones', 'cod_prescripcion')
                     ->where('cod_residente', $codRes)
-                    ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'VIGENTE'])
-                    ->whereNull('deleted_at'),
+                    ->whereIn('estado', ['ACTIVO', 'ACTIVA']),
             ],
             'cod_residente' => 'required|string|exists:residentes,cod_residente',
+            'cod_horario_prescripcion' => ['nullable', 'string', Rule::exists('horarios_prescripcion', 'cod_horario_prescripcion')->where('cod_prescripcion', $this->input('cod_prescripcion'))->where('estado', 'ACTIVO')],
             'fecha' => 'required|date|before_or_equal:today',
             'hora_programada' => 'required|date_format:H:i',
             'hora_real' => 'required_if:administrado,1,true|nullable|date_format:H:i',
             'administrado' => 'required|boolean',
-            'motivo_omision' => 'required_if:administrado,0,false|nullable|string|min:5|max:2000',
+            'motivo_omision' => 'required_if:administrado,0,false|nullable|string|min:5|max:500',
             'efecto_observado' => 'nullable|string|max:2000',
-            'observacion' => 'nullable|string|max:5000',
+            'dosis_administrada' => 'nullable|numeric|decimal:0,3|between:0.001,9999999.999',
+            'reaccion_adversa' => 'nullable|string|max:2000',
+            'observacion' => 'nullable|string|max:2000',
         ];
     }
 
@@ -91,8 +92,8 @@ class StoreAdministracionMedicacionRequest extends FormRequest
                     app(TurnoEnfermeriaService::class)->autorizarMutacionPaciente(
                         $codRes, 'administraciones_medicacion.crear', Auth::user()
                     );
-                } catch (\Throwable $e) {
-                    $validator->errors()->add('cod_residente', $e->getMessage());
+                } catch (HttpException $e) {
+                    $validator->errors()->add('cod_residente', 'No dispone de un contexto autorizado para registrar medicación de este residente.');
                 }
             }
 
@@ -100,6 +101,7 @@ class StoreAdministracionMedicacionRequest extends FormRequest
             if ($codMed && $fecha && $horaProg) {
                 $h = substr($horaProg, 0, 5);
                 $duplicado = AdministracionMedicacion::where('cod_prescripcion', $codMed)
+                    ->when($this->input('cod_horario_prescripcion'), fn ($q, $codigo) => $q->where('cod_horario_prescripcion', $codigo))
                     ->whereDate('fecha_hora_programada', $fecha)
                     ->whereTime('fecha_hora_programada', $h)
                     ->exists();

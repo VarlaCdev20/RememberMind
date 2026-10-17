@@ -7,6 +7,7 @@ use App\Models\Prescripcion;
 use App\Models\Residente;
 use App\Models\SignoVital;
 use App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService;
+use App\Modulos\Clinica\Aplicacion\Consultas\InterpretacionSignosVitales;
 use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -158,7 +159,10 @@ class PacientesSeguimientoPanel extends Component
             ->whereIn('estado', ['VIGENTE', 'ACTIVO'])
             ->orderByDesc('fecha_hora')
             ->get()
+            ->unique('cod_residente')
             ->keyBy('cod_residente');
+
+        $interpretacionesSignos = app(InterpretacionSignosVitales::class)->coleccion($ultimosSignos);
 
         $ultimasNotas = NotaClinica::whereIn('cod_residente', $codResidentes)
             ->where('estado', 'ACTIVO')
@@ -174,7 +178,7 @@ class PacientesSeguimientoPanel extends Component
 
         return view('livewire.clinica.pacientes-seguimiento-panel', compact(
             'pacientes', 'cntActivos', 'cntPendientes', 'cntInterconsultas',
-            'ultimosSignos', 'ultimasNotas', 'cntMedicacion'
+            'ultimosSignos', 'ultimasNotas', 'cntMedicacion', 'interpretacionesSignos'
         ))->layout('layouts.sistema');
     }
 }

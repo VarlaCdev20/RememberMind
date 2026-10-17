@@ -11,19 +11,23 @@
     </h3>
 
     <div class="flex w-full flex-col gap-2 sm:flex-row md:w-auto">
-    <div class="group relative w-full sm:w-72">
+    <div class="rm-staff-directory-search group relative w-full sm:w-72">
+     <label for="staff-directory-search" class="rm-collection-filter-label">Buscar en el directorio</label>
+     <div class="relative">
      <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-apoyo transition-colors group-focus-within:text-boton-acento"></i>
      <input
-     type="text"
+     id="staff-directory-search" type="search"
      wire:model.live.debounce.300ms="busqueda"
      placeholder="Buscar nombre, correo o CI..."
      class="h-9 w-full rounded-lg border border-borde bg-fondo-card pl-9 pr-3 text-xs text-texto shadow-sm outline-none transition-all placeholder:text-apoyo/70 focus:border-boton-acento focus:ring-1 focus:ring-boton-acento"
      >
+     </div>
     </div>
 
     <button
      type="button"
      @click="openFilters = !openFilters"
+     :aria-expanded="openFilters.toString()" aria-controls="staff-directory-filters"
      class="flex h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-borde bg-fondo-card px-3 text-xs font-bold text-texto shadow-sm transition-colors hover:bg-fondo-hover hover:text-titulo sm:w-auto"
     >
      <i class="ph-bold ph-funnel text-base"></i>
@@ -41,10 +45,10 @@
     </div>
    </div>
 
-   <div x-show="openFilters" x-cloak class="mt-3 grid grid-cols-1 gap-3 border-t border-borde pt-3 sm:grid-cols-2 lg:grid-cols-4">
+   <div id="staff-directory-filters" x-show="openFilters" x-cloak class="mt-3 grid grid-cols-1 gap-3 border-t border-borde pt-3 sm:grid-cols-2 lg:grid-cols-4">
     <div>
-    <label class="mb-1 block text-[10px] font-bold uppercase tracking-wider text-apoyo">Tipo</label>
-    <select wire:model.live="filtroTipo" class="h-8 w-full rounded-lg border border-borde bg-fondo-card px-2.5 text-xs text-texto outline-none focus:border-boton-acento">
+    <label for="staff-filtroTipo" class="rm-collection-filter-label">Tipo</label>
+    <select id="staff-filtroTipo" wire:model.live="filtroTipo" class="h-8 w-full rounded-lg border border-borde bg-fondo-card px-2.5 text-xs text-texto outline-none focus:border-boton-acento">
      <option value="">Todos</option>
      <option value="salud">Salud</option>
      <option value="admin">Administrativo</option>
@@ -52,8 +56,8 @@
     </div>
 
     <div>
-    <label class="mb-1 block text-[10px] font-bold uppercase tracking-wider text-apoyo">Rol</label>
-    <select wire:model.live="filtroRol" class="h-8 w-full rounded-lg border border-borde bg-fondo-card px-2.5 text-xs text-texto outline-none focus:border-boton-acento">
+    <label for="staff-filtroRol" class="rm-collection-filter-label">Rol</label>
+    <select id="staff-filtroRol" wire:model.live="filtroRol" class="h-8 w-full rounded-lg border border-borde bg-fondo-card px-2.5 text-xs text-texto outline-none focus:border-boton-acento">
      <option value="">Todos</option>
      <option value="medico">Médico</option>
      <option value="enfermero">Enfermero</option>
@@ -64,8 +68,8 @@
     </div>
 
     <div>
-    <label class="mb-1 block text-[10px] font-bold uppercase tracking-wider text-apoyo">Estado</label>
-    <select wire:model.live="filtroEstado" class="h-8 w-full rounded-lg border border-borde bg-fondo-card px-2.5 text-xs text-texto outline-none focus:border-boton-acento">
+    <label for="staff-filtroEstado" class="rm-collection-filter-label">Estado</label>
+    <select id="staff-filtroEstado" wire:model.live="filtroEstado" class="h-8 w-full rounded-lg border border-borde bg-fondo-card px-2.5 text-xs text-texto outline-none focus:border-boton-acento">
      <option value="">Todos</option>
      <option value="activo">Activo</option>
      <option value="suspendido">Suspendido</option>
@@ -74,8 +78,8 @@
     </div>
 
     <div>
-    <label class="mb-1 block text-[10px] font-bold uppercase tracking-wider text-apoyo">Disponibilidad</label>
-    <select wire:model.live="filtroDisponibilidad" class="h-8 w-full rounded-lg border border-borde bg-fondo-card px-2.5 text-xs text-texto outline-none focus:border-boton-acento">
+    <label for="staff-filtroDisponibilidad" class="rm-collection-filter-label">Disponibilidad</label>
+    <select id="staff-filtroDisponibilidad" wire:model.live="filtroDisponibilidad" class="h-8 w-full rounded-lg border border-borde bg-fondo-card px-2.5 text-xs text-texto outline-none focus:border-boton-acento">
      <option value="">Todas</option>
      <option value="libre">Libre</option>
      <option value="ocupado">Ocupado</option>
@@ -84,8 +88,8 @@
    </div>
    </x-ui.filter-bar>
 
-   <div class="overflow-x-auto">
-   <table class="rm-data-table rm-data-table--actions w-full min-w-[920px] text-left">
+   <div class="rm-staff-table-wrap">
+   <table role="table" class="rm-staff-table rm-data-table rm-data-table--actions w-full min-w-[920px] text-left">
     <thead class="border-y border-borde bg-fondo-hover/50 text-[10px] font-bold uppercase tracking-wider text-apoyo">
     <tr>
      <th class="px-4 py-3">Personal</th>
@@ -97,7 +101,7 @@
     </tr>
     </thead>
 
-    <tbody class="divide-y divide-borde/50 bg-fondo-card">
+    <tbody role="rowgroup" class="divide-y divide-borde/50 bg-fondo-card">
     @forelse($usuarios as $usuario)
      @php
      $nombreUsuario = $usuario->name
@@ -132,8 +136,8 @@
      $esEnfermeria = in_array($tipoSalud, ['ENFERMERO', 'ENFERMERA', 'ENFERMEROS', 'ENFERMERAS'], true);
      @endphp
 
-     <tr class="group transition-colors hover:bg-fondo-hover/60">
-     <td class="px-4 py-2.5">
+     <tr role="row" class="group transition-colors hover:bg-fondo-hover/60">
+     <td role="cell" data-label="Personal" class="px-4 py-2.5">
       <div class="flex items-center gap-3">
       <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border border-borde bg-fondo text-xs font-black text-boton-acento shadow-sm">
        @if($usuario->profile_photo_path ?? false)
@@ -160,7 +164,7 @@
       </div>
      </td>
 
-     <td class="px-4 py-2.5">
+     <td role="cell" data-label="Rol / Tipo" class="px-4 py-2.5">
       <div class="truncate text-xs font-black text-titulo">{{ $tipo }}</div>
 
       @if($usuario->personalSalud)
@@ -178,7 +182,7 @@
       @endif
      </td>
 
-     <td class="px-4 py-2.5">
+     <td role="cell" data-label="Área / Turno" class="px-4 py-2.5">
       <div class="truncate text-xs font-bold text-titulo">
       {{ $area }}
       </div>
@@ -189,11 +193,11 @@
       </div>
      </td>
 
-     <td class="px-4 py-2.5 text-center">
+     <td role="cell" data-label="Estado" class="px-4 py-2.5 text-center">
       <x-ui.status-badge :estado="$usuario->estado" />
      </td>
 
-     <td class="px-4 py-2.5 text-center">
+     <td role="cell" data-label="Carga" class="px-4 py-2.5 text-center">
       @if($usuario->personalSalud && $esEnfermeria)
       <span class="rounded-md border border-borde bg-fondo px-2 py-1 text-xs font-black text-titulo" title="Asignaciones activas">
        {{ $usuario->asignacionesTurno->whereIn('estado', ['ACTIVO', 'ACTIVA'])->count() }}
@@ -203,14 +207,14 @@
       @endif
      </td>
 
-     <td class="px-4 py-2.5 text-center">
+     <td role="cell" data-label="Acciones" class="px-4 py-2.5 text-center">
       <div class="flex items-center justify-center gap-1 opacity-70 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
       @can('usuarios.editar')
        <button
        type="button"
        wire:click="abrirModalEdicion('{{ $usuario->cod_usuario }}')"
        class="tooltip-btn flex h-8 w-8 items-center justify-center rounded-lg border border-transparent text-apoyo shadow-sm transition-colors hover:border-borde-hover hover:bg-fondo-hover hover:text-boton-acento"
-       title="Ver / Editar ficha"
+       aria-label="Ver / Editar ficha" title="Ver / Editar ficha"
        >
        <i class="ph-bold ph-pencil-simple text-base"></i>
        </button>
@@ -220,7 +224,7 @@
        type="button"
        wire:click="abrirHorariosPersonal('{{ $usuario->cod_usuario }}')"
        class="tooltip-btn flex h-8 w-8 items-center justify-center rounded-lg border border-transparent text-apoyo shadow-sm transition-colors hover:border-borde-hover hover:bg-fondo-hover hover:text-estado-info"
-       title="Ver / asignar horarios"
+       aria-label="Ver / asignar horarios" title="Ver / asignar horarios"
       >
        <i class="ph-bold ph-calendar-plus text-base"></i>
       </button>
@@ -230,7 +234,7 @@
        type="button"
        wire:click="toggleEstado('{{ $usuario->cod_usuario }}')"
        class="tooltip-btn flex h-8 w-8 items-center justify-center rounded-lg border border-transparent text-apoyo shadow-sm transition-colors hover:border-borde-hover hover:bg-fondo-hover hover:text-estado-peligro"
-       title="{{ $estadoActivo ? 'Suspender' : 'Reactivar' }}"
+       aria-label="{{ $estadoActivo ? 'Suspender' : 'Reactivar' }}" title="{{ $estadoActivo ? 'Suspender' : 'Reactivar' }}"
        >
        <i class="ph-bold {{ $estadoActivo ? 'ph-pause-circle' : 'ph-play-circle' }} text-base"></i>
        </button>
@@ -239,7 +243,7 @@
      </td>
      </tr>
     @empty
-     <tr>
+     <tr role="row">
       <td colspan="6" class="px-4 py-8">
        <x-ui.empty-state
         icono="ph-users-slash"

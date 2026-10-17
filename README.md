@@ -78,6 +78,8 @@ npm run build
 php motor-experto/tests/independencia.php
 ```
 
+`composer dev` arranca PHP en loopback con límites por proceso de 8 MB por archivo y 45 MB por petición para evidencia fotográfica clínica. Para arrancar solo PHP o elegir otro puerto: `php scripts/servir-local.php 8000`. No modifica el `php.ini` global; los despliegues deben configurar sus propios límites PHP/proxy.
+
 Usar las pruebas mediante Composer para activar el aislamiento antes de cargar Laravel. PostgreSQL desechable en Windows: `pwsh -File scripts/probar-postgres.ps1`; requisitos y perfiles en [desarrollo seguro](docs/sistema/DESARROLLO_SEGURO.md). PostgreSQL verifica garantías físicas/concurrencia; QA visual es independiente del build. Producción tiene [procedimiento propio](docs/produccion/DESPLIEGUE_SEGURO.md).
 
 ## Roles y seguridad

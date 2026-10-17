@@ -106,7 +106,7 @@
     <div class="rm-incidents-list">
         @forelse($incidentes as $inc)
             @php
-                $nombre = $inc->residente?->nombre_completo ?? 'Residente '.$inc->cod_residente;
+                $nombre = $inc->residente?->nombre_completo ?? 'Residente no disponible';
                 $gravedadTono = match($inc->gravedad) { 'CRITICA', 'ALTA' => 'danger', 'MEDIA' => 'warning', default => 'neutral' };
                 $estadoTono = match($inc->estado) { 'CERRADO' => 'success', 'EN_SEGUIMIENTO' => 'info', 'ANULADO' => 'neutral', default => 'warning' };
             @endphp

@@ -28,5 +28,21 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->respond(function ($response, $exception, $request) {
+            if ($response->getStatusCode() === 403 && $request->hasHeader('X-Livewire')) {
+                $categoria = match (true) {
+                    $exception->getMessage() === 'Disponible únicamente fuera del modo de previsualización.' => 'PREVISUALIZACION',
+                    $exception->getMessage() === 'La cuenta de usuario no está activa.' => 'CUENTA_INACTIVA',
+                    $exception instanceof \Spatie\Permission\Exceptions\UnauthorizedException => 'PERMISO_O_ROL',
+                    default => 'RESTRICCION_CONTEXTUAL',
+                };
+                \Illuminate\Support\Facades\Log::notice('Solicitud Livewire rechazada', [
+                    'ruta' => $request->route()?->getName(),
+                    'categoria' => $categoria,
+                    'cuenta_activa' => $request->user()?->estado === 'ACTIVO',
+                ]);
+            }
+
+            return $response;
+        });
     })->create();

@@ -50,11 +50,11 @@ final class GestionarUsuariosHttp
                 $path = $this->ficheros->recibir(data_get($entrada, 'foto_perfil'), 'perfiles', 'public');
                 $data['foto_de_perfil'] = $path;
             }
-            if ($usuario->cod_usuario === 'USU_0001') {
+            if ($usuario->esCuentaPrincipal()) {
                 unset($data['estado'], $data['acceso_sistema']);
             }
             $usuario->update($data);
-            if ($usuario->cod_usuario !== 'USU_0001') {
+            if (! $usuario->esCuentaPrincipal()) {
                 $usuario->syncRoles([data_get($entrada, 'rol')]);
             }
             // Actualizar o crear registros vinculados (Removido por limpieza de base de datos)

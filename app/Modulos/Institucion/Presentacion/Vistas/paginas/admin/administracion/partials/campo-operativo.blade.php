@@ -7,5 +7,5 @@
 @elseif(in_array($campo, ['fecha', 'fecha_fin', 'programada', 'ingreso', 'salida', 'validacion', 'dia_jornada'], true))
     {{ $valor ? \Carbon\Carbon::parse($valor)->format($campo === 'dia_jornada' || in_array($modulo, ['jornadas', 'documentacion'], true) ? 'd/m/Y' : 'd/m/Y H:i') : 'Sin registrar' }}
 @else
-    {{ $valor === null || $valor === '' ? 'Sin registrar' : $valor }}
+    {{ $valor === null || $valor === '' ? 'Sin registrar' : \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos((string) $valor) }}
 @endif

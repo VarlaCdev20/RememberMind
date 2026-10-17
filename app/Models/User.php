@@ -44,21 +44,21 @@ class User extends Authenticatable
     {
         static::creating(function (self $user): void {
             if (empty($user->cod_usuario)) {
-                $user->cod_usuario = 'USU_' . strtoupper(\Illuminate\Support\Str::random(10));
+                $user->cod_usuario = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('usuarios', $user->getConnectionName());
             }
             if (empty($user->estado)) {
                 $user->estado = 'ACTIVO';
             }
+            app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->registrarExplicito('usuarios', (string) $user->getKey(), $user->getConnectionName());
+        });
+        static::updating(function (self $user): void {
+            if ($user->isDirty($user->getKeyName())) {
+                throw new \LogicException('La identidad de una cuenta no se modifica mediante una edición.');
+            }
         });
     }
 
-public static array $areasEstaticas = [
-        'ARE_0001' => 'DIRECCIÓN GENERAL',
-        'ARE_0002' => 'COORDINACIÓN DE PROGRAMAS Y SERVICIOS',
-        'ARE_0003' => 'ÁREA ADMINISTRATIVA Y REGISTRO INSTITUCIONAL',
-        'ARE_0004' => 'ÁREA DE ATENCIÓN MÉDICA',
-        'ARE_0005' => 'ÁREA DE PSICOLOGÍA Y SEGUIMIENTO COGNITIVO',
-    ];
+
 
     protected $table = 'usuarios';
     protected $primaryKey = 'cod_usuario';
@@ -78,6 +78,16 @@ public static array $areasEstaticas = [
     public function getAuthIdentifierName(): string
     {
         return 'cod_usuario';
+    }
+
+    public function esCuentaPrincipal(): bool
+    {
+        $codigo = config('identidad.cuenta_principal_codigo');
+
+        // Una identidad configurada conserva su protección aunque cambie el correo.
+        return filled($codigo)
+            ? $this->getKey() === $codigo
+            : $this->correo === 'admincasaamandita@gmail.com';
     }
 
     public function getAuthPasswordName(): string

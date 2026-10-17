@@ -34,7 +34,7 @@ final class GestionarAsignacionesJornada
             $futura = Carbon::parse($entrada['fechaInicio'])->startOfDay()->gt(today());
             $jornada = $futura ? $this->jornadaPlanificada($entrada, $personal) : Jornada::query()->firstOrCreate(
                 ['cod_turno' => $entrada['codTurno'], 'fecha_jornada' => $entrada['fechaInicio']],
-                ['cod_jornada' => 'JOR_'.Str::upper(Str::random(12)), 'estado' => 'ABIERTA']
+                ['cod_jornada' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('jornadas'), 'estado' => 'ABIERTA']
             );
 
             $jornada = Jornada::query()->lockForUpdate()->findOrFail($jornada->cod_jornada);
@@ -46,7 +46,7 @@ final class GestionarAsignacionesJornada
             }
 
             $asignacion = AsignacionResidenteJornada::query()->create([
-                'cod_asignacion' => 'ARJ_'.Str::upper(Str::random(12)),
+                'cod_asignacion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('asignaciones_residente_jornada'),
                 'cod_residente' => $entrada['codResidente'],
                 'cod_jornada' => $jornada->cod_jornada,
                 'cod_personal' => $personal->cod_personal,

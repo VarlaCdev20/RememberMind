@@ -8,14 +8,17 @@ use App\Modulos\Identidad\Aplicacion\Acciones\CambiarEstadoPersonal;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class PersonalInstitucionalPanel extends Component
 {
+    use WithPagination;
+
     public string $tabActiva = 'resumen';
 
     public int $tabVersion = 0;
 
-    public string $vistaListadoResumen = 'tarjetas';
+    public string $vistaListadoResumen = 'tabla';
 
     public string $rubroResumen = 'institucional';
 
@@ -119,8 +122,16 @@ class PersonalInstitucionalPanel extends Component
         $this->vistaListadoResumen = $vista;
     }
 
+    public function updated(string $property): void
+    {
+        if (in_array($property, ['busquedaResumen', 'rubroResumen', 'estadoResumen', 'turnoResumen'], true)) {
+            $this->resetPage('personalPage');
+        }
+    }
+
     public function limpiarFiltrosResumen(): void
     {
+        $this->resetPage('personalPage');
         $this->busquedaResumen = '';
         $this->rubroResumen = 'institucional';
         $this->estadoResumen = '';
@@ -275,6 +286,8 @@ class PersonalInstitucionalPanel extends Component
                 'roles',
                 'horariosSalud',
                 'horariosAdmin',
+                'asignacionesTurno.turno',
+                'areaInstitucional',
             ]);
 
         $this->aplicarRubroResumen($query);
@@ -282,16 +295,14 @@ class PersonalInstitucionalPanel extends Component
         $this->aplicarEstadoResumen($query);
         $this->aplicarTurnoResumen($query);
 
-        $total = (clone $query)->count();
-
         $items = $query
             ->orderBy('correo')
-            ->limit($this->vistaListadoResumen === 'tarjetas' ? 8 : 12)
-            ->get();
+            ->orderBy('cod_usuario')
+            ->paginate(12, pageName: 'personalPage');
 
         return [
             'items' => $items,
-            'total' => $total,
+            'total' => $items->total(),
         ];
     }
 

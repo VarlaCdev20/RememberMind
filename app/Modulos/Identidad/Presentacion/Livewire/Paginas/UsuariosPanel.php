@@ -336,10 +336,10 @@ class UsuariosPanel extends Component
             $this->cod_area = null;
             $this->fecha_ingreso = null;
         } elseif (in_array($val, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
-            $this->cod_area = 'ARE_0004'; // Sugerencia inicial
+            $this->cod_area = null; // El área se selecciona del catálogo vigente.
             $this->fecha_ingreso = now()->format('Y-m-d');
         } elseif (in_array($val, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
-            $this->cod_area = 'ARE_0003'; // Sugerencia inicial
+            $this->cod_area = null; // El área se selecciona del catálogo vigente.
             $this->fecha_ingreso = now()->format('Y-m-d');
         }
 
@@ -720,9 +720,9 @@ class UsuariosPanel extends Component
         $nombre = strtoupper((string) $val);
         if ($nombre !== '') {
             if (in_array($nombre, ['ENFERMERÍA', 'GERIATRÍA', 'NUTRICIÓN', 'FISIOTERAPIA'])) {
-                $this->cod_area = 'ARE_0004'; // Área de Atención Médica
+                $this->cod_area = null; // El área se selecciona del catálogo vigente.
             } elseif (in_array($nombre, ['PSICOLOGÍA', 'PEDAGOGÍA'])) {
-                $this->cod_area = 'ARE_0005'; // Área de Psicología y Seguimiento Cognitivo
+                $this->cod_area = null; // El área se selecciona del catálogo vigente.
             }
         }
     }
@@ -736,11 +736,11 @@ class UsuariosPanel extends Component
         $nombre = strtoupper((string) $val);
         if ($nombre !== '') {
             if (str_contains($nombre, 'COORDINACIÓN DE PROGRAMAS') || str_contains($nombre, 'PROGRAMAS')) {
-                $this->cod_area = 'ARE_0002'; // Coordinación de Programas y Servicios
+                $this->cod_area = null; // El área se selecciona del catálogo vigente.
             } elseif (str_contains($nombre, 'DIRECCIÓN')) {
-                $this->cod_area = 'ARE_0001'; // Dirección General
+                $this->cod_area = null; // El área se selecciona del catálogo vigente.
             } else {
-                $this->cod_area = 'ARE_0003'; // Área Administrativa y Registro Institucional
+                $this->cod_area = null; // El área se selecciona del catálogo vigente.
             }
         }
     }
@@ -815,7 +815,7 @@ class UsuariosPanel extends Component
             'parentesco_emergencia' => ['required', 'string', 'max:100'],
             'celular_emergencia' => ['required', 'string', 'max:20', 'different:telefono', 'regex:/^\d+$/'],
             'rol' => ['required', 'exists:roles,name'],
-            'cod_area' => ['nullable', 'string', 'in:ARE_0001,ARE_0002,ARE_0003,ARE_0004,ARE_0005'],
+            'cod_area' => ['nullable', 'string', 'exists:areas,cod_area'],
         ];
 
         $rules = array_merge($rules, $this->reglasDireccion());
@@ -1171,8 +1171,8 @@ class UsuariosPanel extends Component
             return;
         }
 
-        // Protección absoluta de USU_0001
-        if ($cod_usuario === 'USU_0001' && auth()->id() !== 'USU_0001') {
+        // Protección absoluta de COD_USU_000001
+        if (User::find($cod_usuario)?->esCuentaPrincipal() && ! auth()->user()?->esCuentaPrincipal()) {
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Acceso denegado',
@@ -1632,7 +1632,7 @@ class UsuariosPanel extends Component
             return;
         }
 
-        // Determinar estado y acceso por defecto en modo creación, protegiendo a USU_0001
+        // Determinar estado y acceso por defecto en modo creación, protegiendo a COD_USU_000001
         $estadoGuardado = $this->estado;
         $accesoGuardado = $this->acceso_sistema;
 
@@ -1641,7 +1641,7 @@ class UsuariosPanel extends Component
             $accesoGuardado = 'HABILITADO';
         }
 
-        if ($this->isEdit && $this->usuarioId === 'USU_0001') {
+        if ($this->isEdit && User::find($this->usuarioId)?->esCuentaPrincipal()) {
             $estadoGuardado = 'ACTIVO';
             $accesoGuardado = 'HABILITADO';
             $this->rol = 'admin';
@@ -1862,7 +1862,7 @@ class UsuariosPanel extends Component
         $usuario = User::findOrFail($id);
 
         // Protección absoluta del Administrador Principal
-        if ($usuario->cod_usuario === 'USU_0001' || $usuario->correo === 'admincasaamandita@gmail.com') {
+        if ($usuario->esCuentaPrincipal()) {
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Acción denegada',
@@ -1920,8 +1920,8 @@ class UsuariosPanel extends Component
 
         $usuario = User::findOrFail($cod_usuario);
 
-        // Protección absoluta de USU_0001
-        if ($usuario->cod_usuario === 'USU_0001' && auth()->id() !== 'USU_0001') {
+        // Protección absoluta de COD_USU_000001
+        if ($usuario->esCuentaPrincipal() && ! auth()->user()?->esCuentaPrincipal()) {
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Acción no permitida',
@@ -2341,10 +2341,7 @@ class UsuariosPanel extends Component
             'roles' => Role::all(),
             'especialidades' => collect(),
             'cargosAdmin' => collect(),
-            'areas' => collect(User::$areasEstaticas)->map(fn ($nombre, $codigo) => (object) [
-                'cod_area' => $codigo,
-                'nombre' => $nombre,
-            ]),
+            'areas' => \App\Models\Area::query()->where('estado', 'ACTIVA')->orderBy('nombre')->get(),
             'usuarioFicha' => $usuarioFichaModel,
             'residentesDisponibles' => Residente::query()
                 ->whereIn('estado', ['ACTIVO', 'ADMITIDO'])

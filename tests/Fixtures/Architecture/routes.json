@@ -235,7 +235,7 @@
     "methods": [
       "POST"
     ],
-    "uri": "livewire-68709b3a/update",
+    "uri": "livewire-{hash}/update",
     "name": "default-livewire.update",
     "action": "Livewire\\Mechanisms\\HandleRequests\\HandleRequests@handleUpdate",
     "middleware": [
@@ -252,7 +252,7 @@
       "GET",
       "HEAD"
     ],
-    "uri": "livewire-68709b3a/livewire.min.js",
+    "uri": "livewire-{hash}/livewire.min.js",
     "name": null,
     "action": "Livewire\\Mechanisms\\FrontendAssets\\FrontendAssets@returnJavaScriptAsFile",
     "middleware": [],
@@ -266,7 +266,7 @@
       "GET",
       "HEAD"
     ],
-    "uri": "livewire-68709b3a/livewire.min.js.map",
+    "uri": "livewire-{hash}/livewire.min.js.map",
     "name": null,
     "action": "Livewire\\Mechanisms\\FrontendAssets\\FrontendAssets@maps",
     "middleware": [],
@@ -280,7 +280,7 @@
       "GET",
       "HEAD"
     ],
-    "uri": "livewire-68709b3a/livewire.csp.min.js.map",
+    "uri": "livewire-{hash}/livewire.csp.min.js.map",
     "name": null,
     "action": "Livewire\\Mechanisms\\FrontendAssets\\FrontendAssets@cspMaps",
     "middleware": [],
@@ -293,7 +293,7 @@
     "methods": [
       "POST"
     ],
-    "uri": "livewire-68709b3a/upload-file",
+    "uri": "livewire-{hash}/upload-file",
     "name": "livewire.upload-file",
     "action": "Livewire\\Features\\SupportFileUploads\\FileUploadController@handle",
     "middleware": [
@@ -310,7 +310,7 @@
       "GET",
       "HEAD"
     ],
-    "uri": "livewire-68709b3a/preview-file/{filename}",
+    "uri": "livewire-{hash}/preview-file/{filename}",
     "name": "livewire.preview-file",
     "action": "Livewire\\Features\\SupportFileUploads\\FilePreviewController@handle",
     "middleware": [
@@ -326,7 +326,7 @@
       "GET",
       "HEAD"
     ],
-    "uri": "livewire-68709b3a/js/{component}.js",
+    "uri": "livewire-{hash}/js/{component}.js",
     "name": null,
     "action": "Closure",
     "middleware": [],
@@ -340,7 +340,7 @@
       "GET",
       "HEAD"
     ],
-    "uri": "livewire-68709b3a/css/{component}.css",
+    "uri": "livewire-{hash}/css/{component}.css",
     "name": null,
     "action": "Closure",
     "middleware": [],
@@ -354,7 +354,7 @@
       "GET",
       "HEAD"
     ],
-    "uri": "livewire-68709b3a/css/{component}.global.css",
+    "uri": "livewire-{hash}/css/{component}.global.css",
     "name": null,
     "action": "Closure",
     "middleware": [],
@@ -1424,6 +1424,50 @@
       "headers": []
     },
     "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/galeria",
+    "name": "admin.galeria.index",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Livewire\\Paginas\\GaleriaInstitucionalPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:fotografias_institucionales.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/galeria/fotografias/{fotografia}/{variante}",
+    "name": "admin.galeria.archivo",
+    "action": "App\\Modulos\\Institucion\\Presentacion\\Http\\Controllers\\FotografiaInstitucionalController",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:fotografias_institucionales.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": {
+      "variante": "imagen|miniatura"
+    },
     "bindingFields": []
   },
   {
@@ -3828,6 +3872,27 @@
       "GET",
       "HEAD"
     ],
+    "uri": "admin/enfermeria/cuidados",
+    "name": "admin.enfermeria.cuidados",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Livewire\\Paginas\\CentralCuidados",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:enfermeria.ver_dashboard"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
     "uri": "admin/enfermeria/registros",
     "name": "admin.enfermeria.registros",
     "action": "App\\Modulos\\Cuidados\\Presentacion\\Livewire\\Paginas\\RegistrosEnfermeria",
@@ -5655,6 +5720,26 @@
       "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
       "verified",
       "permission:pases_turno.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "admin/residentes/{residente}/fotografias-heridas/{documentoClinico}",
+    "name": "admin.cuidados.fotografias.ver",
+    "action": "App\\Modulos\\Cuidados\\Presentacion\\Http\\Controllers\\FotografiaHeridaController",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified"
     ],
     "domain": null,
     "defaults": [],

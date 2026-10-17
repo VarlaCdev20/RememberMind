@@ -63,10 +63,10 @@ final class GestionarHorariosPersonal
                 $fechaJornada = $this->fechaParaDia($entrada, $fechaInicio, $dia);
                 $jornada = Jornada::query()->firstOrCreate(
                     ['cod_turno' => $turno->cod_turno, 'fecha_jornada' => $fechaJornada->toDateString()],
-                    ['cod_jornada' => 'JOR_'.Str::upper(Str::random(12)), 'estado' => 'ABIERTA']
+                    ['cod_jornada' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('jornadas'), 'estado' => 'ABIERTA']
                 );
                 AsignacionPersonal::query()->create([
-                    'cod_asignacion_personal' => 'ASP_'.Str::upper(Str::random(12)),
+                    'cod_asignacion_personal' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('asignaciones_personal'),
                     'cod_jornada' => $jornada->cod_jornada,
                     'cod_personal' => $personal->cod_personal,
                     'cod_area' => $entrada['f_cod_area'],

@@ -15,18 +15,20 @@ Los nombres de la paleta identifican una función, nunca una escala como brown-1
 Los alias existentes `--color-*` y las familias numéricas de Tailwind consumen
 el mismo contrato durante la migración progresiva. No introducir otra paleta por rol.
 
+Paleta final aprobada el 14/10/2026 y corrección posterior: superficies y controles sólidos, relieve con bordes/sombras y conservación de los degradados tipográficos. Reemplaza las propuestas anteriores. Ver [implementación y verificación](../../../../docs/frontend/PALETA_FINAL_SOLIDA_Y_RELIEVE.md).
+
 ## Paleta oficial en modo claro
 
 | Token semántico | Valor | Uso |
 |---|---|---|
-| `--rm-bg-app` | #F1EAE4 | Fondo de la aplicación |
+| `--rm-bg-app` | #E7E0D9 | Fondo de la aplicación |
 | `--rm-bg-sidebar` | #D6C6B9 | Estructura y sidebar |
 | `--rm-surface` | Mezcla 20% de #A69E96 con el fondo | Capuchino suave para cards, formularios, menús y modales |
 | `--rm-surface-soft` | Mezcla 30% de #A69E96 con el fondo | Hover y subdivisiones |
 | `--rm-surface-muted` | Mezcla 50% de #A69E96 con el fondo | Superficie atenuada |
 | `--rm-text-primary` | #59524B | Títulos, datos, navegación e iconos |
 | `--rm-text-secondary` | #665F57 | Descripciones y metadatos |
-| `--rm-primary` | #78826E | Verde principal salvia |
+| `--rm-primary` | #8DA18A | Verde principal salvia |
 | `--rm-primary-ink` | #56604F | Texto, iconos y foco contrastados sobre fondos claros |
 | `--rm-primary-soft` | #C9CDC5 | Salvia suave para acentos |
 | `--rm-selected-bg` | #D6D9D3 | Selección suave con texto #56604F |
@@ -71,8 +73,8 @@ La referencia histórica autorizada es
 `SUPERADMINISTRADOR:resources/views/components/layout/barra-lateral-sistema.blade.php`.
 Se conservan marca, grupos, jerarquía, iconografía, submenús, badges,
 colapsado desktop, flyouts y drawer móvil.
-En el shell autenticado, sidebar, barra superior y lienzo comparten el fondo
-tierra-ceniza `#D8D2CC` (petróleo en modo oscuro). El sidebar abierto mide
+En el shell autenticado, sidebar y barra superior usan capuchino `#D7CEC7`;
+el lienzo usa el fondo aclarado `#D7CEC7` (petróleo en modo oscuro). El sidebar abierto mide
 `224px` y el colapsado `80px`. El hover de los iconos superiores consume la
 misma superficie salvia translúcida que la selección del sidebar.
 
@@ -162,15 +164,9 @@ reducido. No sustituye la aprobación visual de cada pantalla institucional.
 Los tonos intermedios sirven para bordes y profundidad; el texto pequeño usa
 los dos tonos oscuros sobre superficies aclaradas para mantener contraste.
 
-### Salvia complementaria
+### Paleta final y relieve
 
-`#78826E · #858E7C · #939B8B · #A0A799 · #AEB4A8 · #BBC0B6 · #C9CDC5 · #D6D9D3 · #E4E6E2`.
-Se conservan los mentas originales. La selección usa #D6D9D3 y la tinta
-activa #56604F; hover principal #858E7C.
-
-El verde principal es `#78826E`; `#56604F` es tinta contrastada sobre
-superficies claras. Se mantiene `--rm-palette-mint: #C4C6B4` y los mentas anteriores. Sobre botones rellenos se usa tinta neutra más oscura
-para alcanzar contraste de texto, sin oscurecer el fondo salvia aprobado.
+La salvia institucional es #689D7C y el fondo general #D7CEC7. La serie de gráficas es salvia, petróleo, coral, oro, menta y lavanda. Las superficies y rellenos de gráficas son uniformes. El degradado de letras de la cabecera se conserva. Los tokens rm-relief-card-shadow y rm-relief-panel-shadow centralizan el relieve.
 
 ### Familia earth y superficies
 
@@ -184,8 +180,26 @@ iconos neutros: earth-600. Los iconos acompañados de texto son decorativos.
 Earth-400 y earth-300 son tonos de divisores y superficies, no texto importante.
 Los bordes semánticos son rgba(89, 82, 75, .14) y rgba(89, 82, 75, .24).
 
-El sidebar estructural conserva capuchino #D6C6B9. Los submenús usan una
+El sidebar estructural conserva cacao #D7CEC7. Los submenús usan una
 superficie lino aclarada para permitir texto earth-800; los captions pequeños
 conservan earth-800 cuando earth-700 no alcanza 4.5:1 sobre su superficie.
-El fondo general lino #F1EAE4 y las cards aclaradas conservan la separación visual.
+El fondo general #D7CEC7 y las cards aclaradas conservan la separación visual.
 El tema oscuro reinterpreta texto, iconos y superficies sin alterar las primitivas.
+
+Corrección del 14 de octubre: el fondo general usa café grisáceo #D7CEC7; navbar y sidebar conservan capuchino #D7CEC7. Solo el lienzo tiene una trama discreta de puntos menudos: radio de 0.6 px y separación de 16 px, adaptada a ambos temas. Conserva la profundidad interior. Los tokens rm-canvas-relief-* están en tokens/shadows.css; tarjetas y controles siguen sólidos.
+
+El listado de residentes conserva su sección, contador y estados, sin superficie, borde ni sombra envolvente. Las tarjetas individuales mantienen su relieve.
+
+Superficies cálidas unificadas: cabeceras, filtros, cards, paneles, modales y menús usan #E6DED6; los campos #D6CCC3. Header reutiliza la superficie principal; soft y elevated tienen tonos cálidos propios para distinguir profundidad. Las utilidades blancas heredadas del shell reciben la superficie semántica del tema. El relieve distingue elevación sin aclarar los paneles hasta blanco.
+
+Dirección vigente: neutros arena/cacao de intensidad media, superficies de apoyo #D2C5BB y elevadas #EBE3DC. Acentos salvia, petróleo, coral, oro, menta y lavanda más presentes en sus funciones existentes. Relieve con bordes y sombras cálidas; el color de estado sigue procediendo del dominio. No se cambian layout ni reglas clínicas.
+
+Corrección vigente: sidebar y navbar se aclaran al mismo café grisáceo #D7CEC7 del fondo. El token capuchino reutiliza el de página, sin duplicar color; acentos y relieve de Inicio se conservan.
+
+## Composición global vigente (14/10/2026)
+
+La actualización de legibilidad comparte Nunito Sans en títulos funcionales e Inter en texto: página 28 px, sección 18 px, card 16 px, cuerpo 15 px, tablas 14 px y labels 13 px. Outfit conserva la marca y el saludo destacado. Los contenedores usan separación de 20 px, grids de 16 px y filtros de 44 px de alto, con selección sin bisel. La base cálida y los acentos de estado conservan su significado. Ver [alcance y evidencia](../../../../docs/frontend/COMPOSICION_GLOBAL_2026_10_14.md).
+
+Iconografía compartida: `--rm-icon-md` para iconos de tarjetas/acciones con texto (20 px), `--rm-icon-lg` para navegación y controles de solo icono (24 px). El soporte conserva espacio suficiente y las tintas se verifican sobre la superficie compuesta en claro/oscuro. Los estados conservan sus variantes semánticas. Véase la sección de iconos del informe de composición global.
+
+Escala vigente tras la petición de compactar (15/10/2026): títulos de página 26 px, dashboard 28 px, sección 17 px, card 15 px y cuerpo 14 px. Espacios principales 14/18/22 px y card base 14 px. Se conservan iconos legibles y targets de acción. Esta actualización sustituye los tamaños superiores de la sección de composición global; ver su informe para evidencia.

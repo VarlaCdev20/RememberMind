@@ -62,8 +62,10 @@ use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\MisPacientes;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PaseTurnoPanel;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PlanCuidadoPanel;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\RegistrosEnfermeria;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\RegistroConducta;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\SeguimientoDiarioPanel;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\TareasPlanPanel;
+use App\Modulos\Cuidados\Presentacion\Policies\DocumentoHeridaPolicy;
 use App\Modulos\Identidad\Aplicacion\Contratos\EstadoPrevisualizacion;
 use App\Modulos\Identidad\Infraestructura\Seguridad\PrevisualizacionEnSesion;
 use App\Modulos\Identidad\Presentacion\Livewire\Funcionalidades\PersonalInstitucionalForm;
@@ -122,6 +124,11 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(\App\Modulos\Medicacion\Aplicacion\Contratos\ImagenesMedicamentos::class, \App\Modulos\Medicacion\Infraestructura\Archivos\ImagenMedicamento::class);
+        $this->app->bind(\App\Modulos\Institucion\Aplicacion\Contratos\ArchivosFotografias::class, \App\Modulos\Institucion\Infraestructura\Fotografias\AlmacenamientoFotografias::class);
+        $this->app->bind(\App\Modulos\Institucion\Aplicacion\Contratos\GestionFotografias::class, \App\Modulos\Institucion\Presentacion\Policies\FotografiaInstitucionalPolicy::class);
+        $this->app->singleton(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class, \App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class);
+        $this->app->bind(\App\Modulos\ApoyoDecision\Aplicacion\Contratos\IdentidadesConocimiento::class, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\IdentidadesConocimiento::class);
         $this->app->bind(ArchivosAplicacion::class, ArchivosLaravel::class);
         $this->app->bind(GeneradorPdf::class, GeneradorPdfLaravel::class);
         $this->app->bind(NotificacionesRegistro::class, NotificacionesRegistroLaravel::class);
@@ -149,6 +156,7 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Gate::policy(\App\Models\FotografiaInstitucional::class, \App\Modulos\Institucion\Presentacion\Policies\FotografiaInstitucionalPolicy::class);
         Blade::component('ui.dashboard-welcome-header',
             DashboardWelcomeHeader::class);
         foreach (glob($this->app->basePath('app/Modulos/*/Presentacion/Vistas'), GLOB_ONLYDIR) as $path) {
@@ -163,6 +171,9 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
         Gate::policy(Habitacion::class, HabitacionPolicy::class);
         Gate::policy(Prescripcion::class, PrescripcionPolicy::class);
         Gate::policy(Residente::class, ResidentePolicy::class);
+        Gate::define('consultar-evidencia-herida', [DocumentoHeridaPolicy::class, 'consultar']);
+        Gate::define('consultar-contexto-evidencia-herida', [DocumentoHeridaPolicy::class, 'consultarHerida']);
+        Gate::define('adjuntar-evidencia-herida', [DocumentoHeridaPolicy::class, 'adjuntar']);
         Gate::policy(ValoracionEnfermeriaPreadmision::class, ValoracionEnfermeriaPreadmisionPolicy::class);
         Gate::policy(VersionModeloExperto::class, VersionModeloExpertoPolicy::class);
 
@@ -216,6 +227,8 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
         Livewire::component('app.frontend.livewire.enfermeria.cuidados.pase-turno-panel', PaseTurnoPanel::class);
         Livewire::component('app.frontend.livewire.enfermeria.cuidados.plan-cuidado-panel', PlanCuidadoPanel::class);
         Livewire::component('app.frontend.livewire.enfermeria.cuidados.registros-enfermeria', RegistrosEnfermeria::class);
+        Livewire::component('cuidados.registro-conducta', RegistroConducta::class);
+        Livewire::component('cuidados.observacion-cognitiva', \App\Modulos\Cuidados\Presentacion\Livewire\Paginas\ObservacionCognitiva::class);
         Livewire::component('app.frontend.livewire.enfermeria.cuidados.reporte-enfermeria', ReporteEnfermeria::class);
         Livewire::component('app.frontend.livewire.enfermeria.cuidados.seguimiento-diario-panel', SeguimientoDiarioPanel::class);
         Livewire::component('app.frontend.livewire.enfermeria.cuidados.tareas-plan-panel', TareasPlanPanel::class);

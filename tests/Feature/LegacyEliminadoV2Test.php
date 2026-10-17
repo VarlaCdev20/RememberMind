@@ -3,25 +3,24 @@
 namespace Tests\Feature;
 
 use Illuminate\Support\Facades\File;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class LegacyEliminadoV2Test extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_todos_los_modelos_persistentes_apuntan_a_tablas_del_esquema_vigente(): void
     {
-        $migraciones = collect(File::files(database_path('migrations')))
-            ->map(fn ($archivo) => File::get($archivo->getPathname()))
-            ->implode("\n");
-
         foreach (File::files(app_path('Models')) as $archivo) {
             $contenido = File::get($archivo->getPathname());
             if (! preg_match('/protected\s+\$table\s*=\s*[\'\"]([^\'\"]+)[\'\"]/', $contenido, $coincidencia)) {
                 continue;
             }
 
-            $this->assertStringContainsString(
-                "Schema::create('{$coincidencia[1]}'",
-                $migraciones,
+            $this->assertTrue(
+                Schema::hasTable($coincidencia[1]),
                 "{$archivo->getFilename()} apunta a una tabla inexistente: {$coincidencia[1]}",
             );
         }

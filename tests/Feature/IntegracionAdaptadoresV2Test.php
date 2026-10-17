@@ -88,7 +88,7 @@ class IntegracionAdaptadoresV2Test extends TestCase
         $enfermero = User::where('correo', 'admincasaamandita@gmail.com')->firstOrFail();
         $enfermero->assignRole('ENFERMEROS');
         $turno = Turno::create([
-            'cod_turno' => 'TUR_0001', 'nombre' => 'TURNO MAÑANA', 'hora_inicio' => '07:00:00',
+            'cod_turno' => 'COD_TUR_000001', 'nombre' => 'TURNO MAÑANA', 'hora_inicio' => '07:00:00',
             'hora_cierre' => '15:00:00', 'orden' => 1, 'estado' => 'ACTIVO',
         ]);
         $area = Area::create(['cod_area' => 'ARE_TEST', 'nombre' => 'ENFERMERÍA', 'estado' => 'ACTIVA']);
@@ -112,7 +112,7 @@ class IntegracionAdaptadoresV2Test extends TestCase
 
     public function test_exportacion_cognitiva_consulta_relaciones_y_columnas_canonicas_v2(): void
     {
-        $personal = Personal::query()->where('cod_personal', 'PER_0001')->firstOrFail();
+        $personal = Personal::query()->where('cod_personal', 'COD_PER_000001')->firstOrFail();
         $residenteCreado = Residente::crearDesdeAdmision([
             'cod_residente' => 'RES_EXPORT_V2',
             'nombres' => 'Elena',

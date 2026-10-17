@@ -16,10 +16,11 @@ class AgendaMedicacionService
      * Construye la agenda desde prescripciones y horarios V2. La ausencia de
      * una administración significa pendiente y no genera registros ficticios.
      */
-    public function paraAdultos(array $codigosResidente, ?CarbonInterface $momento = null): Collection
+    public function paraAdultos(array $codigosResidente, ?CarbonInterface $momento = null, ?CarbonInterface $fechaAgenda = null): Collection
     {
         $ahora = ($momento ? Carbon::instance($momento) : now())->copy();
-        $fecha = $ahora->toDateString();
+        $dia = $fechaAgenda ? Carbon::instance($fechaAgenda)->copy() : $ahora->copy();
+        $fecha = $dia->toDateString();
 
         if ($codigosResidente === []) {
             return collect();
@@ -38,6 +39,8 @@ class AgendaMedicacionService
             ->get();
 
         $administraciones = AdministracionMedicacion::query()
+            ->whereNotIn('estado', ['ANULADA','ANULADO'])
+            ->whereIn('resultado', ['ADMINISTRADA','OMITIDA','RECHAZADA'])
             ->whereIn('cod_residente', $codigosResidente)
             ->whereDate('fecha_hora_programada', $fecha)
             ->get()
@@ -47,19 +50,19 @@ class AgendaMedicacionService
                 $registro->cod_horario_prescripcion,
             ));
 
-        return $prescripciones->flatMap(function (Prescripcion $prescripcion) use ($administraciones, $ahora, $fecha) {
+        return $prescripciones->flatMap(function (Prescripcion $prescripcion) use ($administraciones, $ahora, $fecha, $dia) {
             return $prescripcion->horarios
                 ->filter(fn (HorarioPrescripcion $horario) => ! filled($horario->dias_semana)
                     || strtoupper(trim($horario->dias_semana)) === 'TODOS'
-                    || app(MiTurnoService::class)->correspondeDiaSemana($horario->dias_semana, $ahora))
+                    || app(MiTurnoService::class)->correspondeDiaSemana($horario->dias_semana, $dia))
                 ->map(function (HorarioPrescripcion $horario) use ($prescripcion, $administraciones, $ahora, $fecha) {
                     $hora = $this->normalizarHora($horario->hora_programada);
                     $programada = Carbon::parse("{$fecha} {$hora}", $ahora->timezone);
                     $registro = $administraciones->get($this->clave($prescripcion->cod_prescripcion, $hora, $horario->cod_horario_prescripcion))?->first();
 
                     if ($registro) {
-                        $estado = $registro->administrado ? 'ADMINISTRADA' : 'OMITIDA';
-                    } elseif ($programada->isPast()) {
+                        $estado = $registro->administrado ? 'ADMINISTRADA' : ($registro->resultado === 'RECHAZADA' ? 'RECHAZADA' : 'OMITIDA');
+                    } elseif ($programada->lt($ahora)) {
                         $estado = 'VENCIDA';
                     } elseif ($ahora->diffInMinutes($programada, false) <= config('enfermeria.minutos_proximo_medicacion', 60)) {
                         $estado = 'PROXIMA';
@@ -68,13 +71,13 @@ class AgendaMedicacionService
                     }
 
                     return [
-                        'id' => $prescripcion->cod_prescripcion.'|'.$fecha.'|'.$hora,
+                        'id' => $prescripcion->cod_prescripcion.'|'.$horario->cod_horario_prescripcion.'|'.$fecha.'|'.$hora,
                         'medicacion' => $prescripcion,
-                        'adulto' => $prescripcion->adultoMayor,
+                        'adulto' => $prescripcion->residente,
                         'horario' => $horario,
                         'hora' => $hora,
                         'hora_12h' => Carbon::parse("2000-01-01 {$hora}")->format('h:i A'),
-                        'se_paso' => $programada->isPast() && ! $registro,
+                        'se_paso' => $programada->lt($ahora) && ! $registro,
                         'programada' => $programada,
                         'registro' => $registro,
                         'estado' => $estado,
@@ -84,9 +87,9 @@ class AgendaMedicacionService
         })->sortBy('programada')->values();
     }
 
-    public function paraAdulto(string $codResidente, ?CarbonInterface $momento = null): Collection
+    public function paraAdulto(string $codResidente, ?CarbonInterface $momento = null, ?CarbonInterface $fechaAgenda = null): Collection
     {
-        return $this->paraAdultos([$codResidente], $momento);
+        return $this->paraAdultos([$codResidente], $momento, $fechaAgenda);
     }
 
     public function recordatorios(array $codigosResidente, ?CarbonInterface $momento = null): Collection

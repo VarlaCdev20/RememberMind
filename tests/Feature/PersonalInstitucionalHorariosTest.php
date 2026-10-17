@@ -21,7 +21,7 @@ class PersonalInstitucionalHorariosTest extends TestCase
     {
         $user = $this->crearUsuarioConRol('ENFERMEROS');
         $area = $this->crearArea('ARE_0004', 'AREA DE ATENCION MEDICA', 'Salud');
-        $turno = $this->crearTurno('TUR_0001', 'MANANA', '08:00:00', '16:00:00');
+        $turno = $this->crearTurno('COD_TUR_000001', 'MANANA', '08:00:00', '16:00:00');
 
         Livewire::test(PersonalInstitucionalHorarios::class, [
             'usuarioId' => $user->cod_usuario,
@@ -48,7 +48,7 @@ class PersonalInstitucionalHorariosTest extends TestCase
     {
         $user = $this->crearUsuarioConRol('ENFERMEROS');
         $area = $this->crearArea('ARE_0004', 'AREA DE ATENCION MEDICA', 'Salud');
-        $turnoManana = $this->crearTurno('TUR_0001', 'MANANA', '08:00:00', '16:00:00');
+        $turnoManana = $this->crearTurno('COD_TUR_000001', 'MANANA', '08:00:00', '16:00:00');
         $turnoTarde = $this->crearTurno('TUR_0002', 'TARDE', '16:00:00', '22:00:00');
 
         Livewire::test(PersonalInstitucionalHorarios::class, [

@@ -4,6 +4,31 @@ namespace App\Modulos\Reportes\Presentacion;
 
 final class DashboardPhotoRotation
 {
+    private array $leyendas = [];
+
+    public function altFor(string $url, string $fallback): string
+    {
+        return $this->leyendas[$url] ?? $fallback;
+    }
+
+    private function fotografiasInstitucionales(string $context): array
+    {
+        $usuario = auth()->user();
+        if (! in_array($context, ['gerencia', 'administracion'], true) || ! $usuario?->hasAnyRole(['GERENTE', 'ADMINISTRADOR'])
+            || ! \Illuminate\Support\Facades\Schema::hasTable('fotografias_institucionales')
+            || ! app(\App\Modulos\Institucion\Presentacion\Policies\FotografiaInstitucionalPolicy::class)->viewAny($usuario)) {
+            return [];
+        }
+        $urls = [];
+        foreach (\App\Models\FotografiaInstitucional::where('estado', 'ACTIVA')->where('usar_en_bienvenida', true)
+            ->orderBy('cod_fotografia')->get() as $foto) {
+            if (! \Illuminate\Support\Facades\Storage::disk('local')->exists($foto->ruta_archivo)) continue;
+            $url = route('admin.galeria.archivo', [$foto->getKey(), 'imagen']);
+            $urls[] = $url;
+            $this->leyendas[$url] = $foto->texto_alternativo ?: $foto->titulo;
+        }
+        return $urls;
+    }
     private const PHOTO_DIRECTORY = 'images/FOTOS CENTRO DE ADULTOS MAYORES/';
 
     private const PHOTOS = [
@@ -49,6 +74,11 @@ final class DashboardPhotoRotation
     /** @return array{string, string} Rutas públicas del par seleccionado. */
     public function pair(string $context): array
     {
+        $gestionadas = $this->fotografiasInstitucionales($context);
+        if ($gestionadas) {
+            $indice = $this->nextIndex('gallery-pair:'.$context, count($gestionadas));
+            return [$gestionadas[$indice], $gestionadas[($indice + 1) % count($gestionadas)]];
+        }
         $pairs = self::PHOTO_PAIRS[$context] ?? self::PHOTO_PAIRS['administracion'];
         [$primary, $secondary] = $pairs[$this->nextIndex('pair:'.$context, count($pairs))];
 
@@ -57,6 +87,8 @@ final class DashboardPhotoRotation
 
     public function heroImage(string $context, string $fallback): string
     {
+        $gestionadas = $this->fotografiasInstitucionales($context);
+        if ($gestionadas) return $gestionadas[$this->nextIndex('gallery-hero:'.$context, count($gestionadas))];
         $photos = self::HERO_PHOTOS[$context] ?? [];
         $urls = $photos
             ? array_map(fn (string $photo) => asset(self::path($photo)), $photos)

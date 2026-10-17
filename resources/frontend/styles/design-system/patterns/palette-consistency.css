@@ -1,0 +1,614 @@
+/* Paleta final: propagación de los tokens canónicos a los consumidores reales.
+   No define HEX ni geometría; los estados y el grano clínico siguen en el dominio. */
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-shell, [data-rm-main], .rm-dashboard-composition, .rm-nursing-dashboard,
+    .rm-resident-directory, .rm-ficha-detalles, .rm-clinical-form-modal,
+    .rm-clinical-form-drawer, .rm-clinical-form, .rm-signos, .rm-dolor,
+    .rm-ingesta, .rm-hidratacion, .rm-eliminacion, .rm-movilidad,
+    .rm-wound, .rm-conducta, .rm-cognicion, .rm-medication
+) {
+    --rm-surface: var(--rm-palette-surface);
+    --rm-surface-main: var(--rm-palette-surface);
+    --rm-surface-soft: var(--rm-palette-surface-soft);
+    --rm-surface-alt: var(--rm-palette-surface-soft);
+    --rm-surface-muted: var(--rm-palette-surface-muted);
+    --rm-surface-elevated: var(--rm-palette-surface-elevated);
+    --rm-surface-raised: var(--rm-palette-surface-elevated);
+    --rm-text-primary: var(--rm-palette-ink);
+    --rm-text-title: var(--rm-palette-ink);
+    --rm-text-body: var(--rm-palette-ink);
+    --rm-text-secondary: var(--rm-text-secondary-readable);
+    /* El muted aprobado queda disponible en la paleta; texto pequeño usa tinta AA. */
+    --rm-text-muted: var(--rm-text-muted-readable);
+    --rm-border: var(--rm-palette-border-soft);
+    --rm-border-soft: var(--rm-palette-border-soft);
+    --rm-border-medium: var(--rm-palette-border-medium);
+    --rm-border-strong: var(--rm-palette-border-strong);
+    --rm-action-primary: var(--rm-palette-primary);
+    --rm-action-primary-hover: var(--rm-palette-primary-hover);
+    --rm-action-primary-active: var(--rm-palette-primary-strong);
+    --rm-action-primary-soft: var(--rm-palette-primary-soft);
+    --rm-action-primary-ink: var(--rm-palette-primary-ink);
+    --rm-text-on-primary: var(--rm-primary-action-text);
+    --rm-input-bg: var(--rm-palette-input);
+    --rm-input-border: var(--rm-palette-border-strong);
+    --rm-input-text: var(--rm-palette-ink);
+    --rm-input-placeholder: var(--rm-text-secondary-readable);
+    --rm-modal-bg: var(--rm-palette-surface-elevated);
+    --rm-card-bg: var(--rm-palette-surface);
+    --rm-card-border: var(--rm-palette-border-soft);
+    --rm-dashboard-card-bg: var(--rm-palette-surface);
+    --rm-button-primary-bg: var(--rm-palette-primary);
+    --rm-button-primary-hover: var(--rm-palette-primary-hover);
+    --rm-button-primary-active: var(--rm-palette-primary-strong);
+    --rm-button-primary-text: var(--rm-primary-action-text);
+    --rm-button-secondary-bg: var(--rm-palette-surface-soft);
+    --rm-button-secondary-text: var(--rm-palette-ink);
+    --rm-button-secondary-border: var(--rm-palette-border-medium);
+    --rm-button-secondary-hover-bg: var(--rm-palette-surface-elevated);
+    --rm-button-secondary-hover-border: var(--rm-palette-primary-strong);
+}
+
+html:not(.dark):not([data-theme="dark"]) .rm-shell {
+    --rm-dashboard-app-bg: var(--rm-bg-app);
+    --rm-dashboard-shell-bg: var(--rm-bg-shell);
+    --rm-dashboard-header-bg: var(--rm-surface-soft);
+    --rm-dashboard-card-surface: var(--rm-surface-main);
+    --rm-dashboard-inset-surface: var(--rm-surface-elevated);
+    --rm-dashboard-surface-soft: var(--rm-surface-soft);
+    --rm-dashboard-text: var(--rm-text-primary);
+    --rm-dashboard-text-secondary: var(--rm-text-secondary);
+    --rm-dashboard-text-muted: var(--rm-text-muted-readable);
+    --rm-dashboard-card-outline: var(--rm-border-soft);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-dashboard-composition {
+    --rm-dashboard-card-shadow: var(--rm-relief-card-shadow);
+}
+
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-sidebar {
+    background: var(--rm-bg-shell);
+    border-right: 1px solid var(--rm-border-soft);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-sidebar :is(.rm-sidebar__header, .rm-sidebar__footer) {
+    background: transparent;
+}
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-topbar {
+    background: var(--rm-bg-shell);
+    border-bottom: 1px solid var(--rm-topbar-glass-border);
+    -webkit-backdrop-filter: blur(var(--rm-capture-glass-blur, 14px));
+    backdrop-filter: blur(var(--rm-capture-glass-blur, 14px));
+}
+@supports (backdrop-filter: blur(14px)) {
+    html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-topbar { background: var(--rm-bg-shell); }
+}
+
+html:not(.dark):not([data-theme="dark"]) :is(.rm-shell, .rm-ficha-detalles) :is(
+    .rm-card, .rm-metric-card, .rm-clinical-card, .rm-resident-compact-card,
+    .rm-clinical-resident-context, .rm-nursing-dashboard__kpi,
+    .rm-admin-dashboard__state-strip > *, .rm-dashboard-data-panel
+) {
+    background: var(--rm-capture-section-glass);
+    border-color: var(--rm-border-soft);
+}
+html:not(.dark):not([data-theme="dark"]) :is(.rm-panel, .rm-chart-card, .rm-modal-panel) {
+    background: var(--rm-surface-elevated);
+    border-color: var(--rm-elevated-border);
+    box-shadow: var(--rm-elevated-shadow);
+}
+
+html:not(.dark):not([data-theme="dark"]) :is(.rm-shell, .rm-clinical-workspace) :is(
+    .rm-input, .rm-select, .rm-textarea,
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="hidden"]):not([type="file"]):not([type="submit"]):not([type="button"]), select, textarea
+) {
+    background-color: var(--rm-input-bg);
+    border-color: var(--rm-input-border);
+    color: var(--rm-text-primary);
+}
+html:not(.dark):not([data-theme="dark"]) :is(.rm-input, .rm-select, .rm-textarea, input, select, textarea):focus-visible {
+    border-color: var(--rm-primary);
+    box-shadow: var(--rm-input-focus-ring);
+    outline-color: var(--rm-primary-strong);
+}
+
+/* Un botón primario mantiene su significado entre roles y módulos. */
+html:not(.dark):not([data-theme="dark"]) :is(.rm-shell, .rm-ficha-detalles) .rm-btn-primary {
+    background: var(--rm-capture-action-bg);
+    color: var(--rm-capture-action-ink);
+    border-color: var(--rm-palette-button-primary-border);
+}
+html:not(.dark):not([data-theme="dark"]) :is(.rm-shell, .rm-ficha-detalles) .rm-btn-primary:hover:not(:disabled) {
+    background: var(--rm-capture-action-hover);
+    color: var(--rm-capture-action-ink);
+}
+html:not(.dark):not([data-theme="dark"]) :is(.rm-shell, .rm-ficha-detalles) .rm-btn-secondary {
+    background: color-mix(in srgb, var(--rm-surface-soft) 70%, transparent);
+    color: var(--rm-text-primary);
+    border-color: var(--rm-border-medium);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-btn-info {
+    background: var(--rm-info);
+    color: var(--rm-palette-button-info-ink);
+    border-color: var(--rm-palette-button-info-border);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-btn-info:hover:not(:disabled) { background: var(--rm-info-hover); }
+html:not(.dark):not([data-theme="dark"]) .rm-btn-danger {
+    background: var(--rm-danger);
+    /* Blanco sobre coral no pasa AA; conservar el coral con tinta oscura existente. */
+    color: var(--rm-palette-petroleum-950);
+    border-color: var(--rm-palette-button-danger-border);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-btn-danger:hover:not(:disabled) {
+    background: var(--rm-danger-soft);
+    color: var(--rm-danger-text);
+}
+
+.rm-shell .rm-badge-danger { background: var(--rm-danger-soft); color: var(--rm-danger-text); }
+.rm-shell .rm-badge-critical { background: var(--rm-critical-soft); color: var(--rm-critical-text); }
+.rm-shell .rm-badge-neutral { background: var(--rm-neutral-soft); color: var(--rm-neutral-text); }
+.rm-shell .rm-badge-success { background: var(--rm-success-soft); color: var(--rm-success-text); }
+.rm-shell .rm-badge-info { background: var(--rm-info-soft); color: var(--rm-info-text); }
+.rm-shell .rm-badge-warning { background: var(--rm-warning-soft); color: var(--rm-warning-text); }
+
+/* Acentos de contexto en los consumidores actuales; no reinterpretan estados. */
+html:not(.dark):not([data-theme="dark"]) :is(.rm-cognicion, .rm-conducta) { --rm-context-accent: var(--rm-accent-lavender); --rm-context-soft: var(--rm-accent-lavender-soft); --rm-context-ink: var(--rm-accent-lavender-text); }
+html:not(.dark):not([data-theme="dark"]) :is(.rm-ingesta, .rm-hidratacion) { --rm-context-accent: var(--rm-accent-gold); --rm-context-soft: var(--rm-accent-gold-soft); --rm-context-ink: var(--rm-accent-gold-text); }
+html:not(.dark):not([data-theme="dark"]) .rm-medication { --rm-context-accent: var(--rm-info); --rm-context-soft: var(--rm-info-soft); --rm-context-ink: var(--rm-info-text); }
+
+/* Corrección de la propietaria: fondos enteros y relieve; conservar degradados tipográficos. */
+html:not(.dark):not([data-theme="dark"]) :is(.rm-cognicion, .rm-conducta, .rm-ingesta, .rm-hidratacion, .rm-medication) :is(.rm-clinical-form__icon, .rm-medication__icon) {
+    background: var(--rm-context-soft);
+    border-color: var(--rm-context-accent);
+    color: var(--rm-context-ink);
+}
+html:is(:not(.dark):not([data-theme="dark"]), .dark, [data-theme="dark"]) .rm-shell [data-rm-main] :is(.rm-card, .rm-metric-card, .rm-panel, .rm-chart-card, .rm-chart-body, .rm-modal-panel, .rm-modal-header, .rm-modal-footer, .rm-filter-bar, .rm-clinical-card, .rm-clinical-resident-context, .rm-resident-compact-card, .rm-dashboard-header, .rm-topbar, .rm-sidebar, .rm-btn, .rm-topbar__action, .rm-topbar__profile, .rm-topbar__theme, .rm-topbar-search__form, .rm-nursing-dashboard, .rm-nursing-dashboard__kpi, .rm-dashboard-data-panel, .rm-ficha-detalles) {
+    background-image: none;
+}
+.rm-shell :is(.rm-card, .rm-chart-card, .rm-dashboard-header, .rm-clinical-card)::before,
+.rm-shell :is(.rm-card, .rm-chart-card, .rm-dashboard-header)::after { background-image: none; }
+html:not(.dark):not([data-theme="dark"]) .rm-shell :is(.rm-card, .rm-metric-card, .rm-clinical-card, .rm-resident-compact-card, .rm-clinical-resident-context, .rm-nursing-dashboard__kpi, .rm-dashboard-data-panel) {
+    box-shadow: var(--rm-relief-card-shadow);
+    border: 1px solid var(--rm-border-soft);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-shell :is(.rm-panel, .rm-chart-card, .rm-modal-panel) {
+    box-shadow: var(--rm-relief-panel-shadow);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-btn {
+    box-shadow: var(--rm-button-relief-shadow);
+}
+
+/* El lienzo del módulo también es sólido; prevalece sobre las tramas de captura. */
+html:is(:not(.dark):not([data-theme="dark"]), .dark, [data-theme="dark"]) .rm-shell [data-rm-main] :is(.rm-nursing-dashboard, .rm-dashboard-composition, .rm-ficha-detalles) {
+    background-image: none;
+}
+
+/* Fondo aclarado; navbar y sidebar conservan su base. Trama solo en el lienzo. */
+html:is(:not(.dark):not([data-theme="dark"]), .dark, [data-theme="dark"]) .rm-shell .rm-topbar {
+    background: var(--rm-bg-shell);
+}
+html:is(:not(.dark):not([data-theme="dark"]), .dark, [data-theme="dark"]) :is(.rm-shell [data-rm-main], .rm-shell .rm-app-frame > [data-rm-main].rm-depth-canvas) {
+    background-color: var(--rm-app-bg);
+    background-image: var(--rm-canvas-relief-pattern);
+    background-size: var(--rm-canvas-dot-spacing) var(--rm-canvas-dot-spacing);
+    background-blend-mode: normal;
+    box-shadow: var(--rm-canvas-relief-shadow);
+    background-repeat: repeat;
+    background-attachment: scroll;
+}
+/* Los wrappers dejan ver la trama; cards y controles conservan sus superficies. */
+html:is(:not(.dark):not([data-theme="dark"]), .dark, [data-theme="dark"]) .rm-shell [data-rm-main] :is(.rm-nursing-dashboard, .rm-dashboard-composition, .rm-ficha-detalles) {
+    background-color: transparent;
+}
+.rm-shell [data-rm-main].rm-depth-canvas::before,
+.rm-shell [data-rm-main].rm-depth-canvas::after { display: none; }
+@media (forced-colors: active) {
+    .rm-shell .rm-topbar { background: Canvas !important; }
+    .rm-shell [data-rm-main] { background-image: none !important; }
+}
+
+
+/* Las tarjetas de residentes se apoyan directamente sobre el lienzo. */
+html:is(:not(.dark):not([data-theme="dark"]), .dark, [data-theme="dark"]) .rm-shell [data-rm-main] .rm-resident-directory__results {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+    overflow: visible;
+}
+.rm-shell .rm-resident-directory__results > .rm-resident-directory__results-header {
+    padding: 0 0 var(--rm-space-3);
+    border: 0;
+}
+.rm-shell .rm-resident-directory__results > .rm-resident-directory__cards { padding: 0; }
+
+
+/* Superficies institucionales unificadas: cabeceras y filtros sin fondos blancos. */
+html:not(.dark):not([data-theme="dark"]) .rm-shell [data-rm-main] :is(
+    .rm-collection-header, .rm-page-header, .rm-filter-bar, .rm-filter-toolbar,
+    .rm-collection-toolbar, .rm-resident-directory__header,
+    .rm-resident-directory__toolbar, .rm-resident-directory__filters,
+    .rm-table-container, .rm-table-wrapper, .rm-table-card
+) {
+    background: var(--rm-surface-main);
+    border-color: var(--rm-border-soft);
+}
+/* Utilidades heredadas consumen la misma superficie, incluidos los temas existentes. */
+.rm-shell :is(.bg-white, .bg-gray-50, .bg-slate-50, .bg-zinc-50, .bg-neutral-50) {
+    background-color: var(--rm-surface-main);
+}
+
+
+/* Color y relieve funcionales; fondos sólidos y estados semánticos preservados. */
+html:not(.dark):not([data-theme="dark"]) .rm-shell [data-rm-main] .rm-collection-header {
+    border-inline-start: 4px solid var(--rm-primary-strong);
+    box-shadow: var(--rm-relief-card-shadow);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-collection-header__icon {
+    background: var(--rm-primary-strong);
+    color: var(--rm-text-on-dark);
+    box-shadow: var(--rm-shadow-sm);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-shell :is(.rm-filter-bar, .rm-filter-toolbar) {
+    box-shadow: var(--rm-relief-card-shadow);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-shell :is(.rm-resident-directory__open, .rm-resident-directory__filter-chip.is-active, .rm-clinical-tabs > button[aria-current="page"]) {
+    background: var(--rm-capture-action-bg);
+    color: var(--rm-capture-action-ink);
+    border-color: var(--rm-primary-strong);
+    box-shadow: var(--rm-button-relief-shadow);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-resident-directory__open:hover {
+    background: var(--rm-capture-action-hover);
+}
+html:not(.dark):not([data-theme="dark"]) :is(.rm-cognicion, .rm-conducta, .rm-ingesta, .rm-hidratacion) :is(.rm-clinical-form__icon, .rm-medication__icon) {
+    background: var(--rm-context-accent);
+    color: var(--rm-palette-petroleum-950);
+    box-shadow: var(--rm-shadow-sm);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-medication :is(.rm-clinical-form__icon, .rm-medication__icon) {
+    background: var(--rm-info);
+    color: var(--rm-text-on-dark);
+    box-shadow: var(--rm-shadow-sm);
+}
+
+/* Consumidores clínicos reales: el icono de ingesta precede al root del formulario. */
+html:not(.dark):not([data-theme="dark"]) .rm-shell [data-rm-main] :is(.rm-cognicion__icon, .rm-conducta__module-icon) {
+    background: var(--rm-accent-lavender);
+    color: var(--rm-palette-petroleum-950);
+    box-shadow: var(--rm-shadow-sm);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-shell [data-rm-main] .rm-ingesta__header-icon {
+    background: var(--rm-accent-gold);
+    color: var(--rm-palette-petroleum-950);
+    box-shadow: var(--rm-shadow-sm);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-shell [data-rm-main] .rm-hidratacion__header-icon {
+    background: var(--rm-accent-mint);
+    color: var(--rm-palette-petroleum-950);
+    box-shadow: var(--rm-shadow-sm);
+}
+
+/* Jerarquía operativa compartida: base neutra, acentos por función y glass contenido. */
+.rm-shell .rm-dashboard-composition .rm-section-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--rm-space-3);
+}
+.rm-shell .rm-dashboard-composition .rm-section-header__main { align-items: flex-start; }
+.rm-shell .rm-dashboard-composition .rm-section-header__actions { margin-inline-start: auto; align-self: flex-start; }
+.rm-shell .rm-dashboard-composition .rm-section-header__title { font: 700 var(--rm-font-size-section)/1.3 var(--rm-font-friendly); }
+.rm-shell .rm-dashboard-composition .rm-section-header__subtitle { margin-top: var(--rm-space-1); font-size: calc(var(--rm-font-size-meta) + 1px); line-height: 1.45; }
+.rm-shell .rm-nursing-dashboard { gap: var(--rm-space-5); align-items: start; }
+.rm-shell .rm-nursing-dashboard .rm-card:not(.rm-metric-card) { min-height: 0; }
+.rm-shell .rm-nursing-dashboard .rm-nursing-dashboard__controls { grid-column: 1 / -1; }
+.rm-shell .rm-dashboard-composition > .rm-dashboard-header:not(.rm-dashboard-header--compact) { --rm-dashboard-hero-height: 180px; }
+.rm-shell .rm-dashboard-composition .rm-dashboard-header__content { padding: var(--rm-space-4) var(--rm-space-5); gap: var(--rm-space-2); }
+.rm-shell .rm-dashboard-composition .rm-dashboard-header__title { font-size: var(--rm-font-size-dashboard); }
+.rm-shell .rm-nursing-dashboard .rm-empty-state--compact { display: grid; grid-template-columns: 32px minmax(0,1fr); column-gap: var(--rm-space-3); align-content: center; justify-items: start; min-height: 76px; padding: var(--rm-space-3) 0; text-align: start; }
+.rm-shell .rm-nursing-dashboard .rm-empty-state--compact .rm-empty-state-icon { grid-row: span 2; width: 32px; height: 32px; margin: 0; background: transparent; }
+.rm-shell .rm-nursing-dashboard .rm-empty-state--compact .rm-empty-state-text { max-width: none; font-size: var(--rm-font-size-body); }
+.rm-shell .rm-nursing-dashboard :is(.rm-priority-alert__description,.rm-priority-alert__meta,.rm-priority-alert__time,.rm-nursing-module__more,.rm-patient-turn-row) { font-size: var(--rm-font-size-body); }
+.rm-shell .rm-nursing-dashboard .rm-priority-alert__top { flex-wrap: wrap; }
+.rm-shell .rm-nursing-dashboard .rm-priority-alert__name { white-space: normal; overflow-wrap: anywhere; }
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-dashboard-composition :is(.rm-card,.rm-metric-card,.rm-dashboard-data-panel,.rm-admin-dashboard__attention-body) {
+    border-color: var(--rm-palette-border-soft);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-nursing-dashboard .rm-section-header__icon { background: var(--rm-primary-soft); color: var(--rm-primary-strong); }
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-nursing-dashboard :is(.rm-nursing-dashboard__schedule,.rm-nursing-dashboard__location,.rm-nursing-dashboard__incidents) .rm-section-header__icon { background: var(--rm-sky-50); color: var(--rm-info-strong); }
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-nursing-dashboard .rm-nursing-dashboard__notes .rm-section-header__icon { background: var(--rm-violet-200); color: var(--rm-violet-700); }
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-nursing-dashboard .rm-metric-card__icon { background: var(--rm-primary-soft); color: var(--rm-action-primary-ink); }
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-nursing-dashboard .rm-nursing-dashboard__kpi--beds .rm-metric-card__icon { background: var(--rm-sky-50); color: var(--rm-info-strong); }
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-nursing-dashboard .rm-priority-alert { --rm-priority-ink: var(--rm-info-strong); --rm-priority-bg: var(--rm-sky-50); background: var(--rm-priority-bg); border: 1px solid var(--rm-border-soft); }
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-nursing-dashboard .rm-priority-alert--medium { --rm-priority-ink: var(--rm-clinical-warning-ink); --rm-priority-bg: var(--rm-clinical-warning-bg); }
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-nursing-dashboard .rm-priority-alert--high { --rm-priority-ink: var(--rm-clinical-high-ink); --rm-priority-bg: color-mix(in srgb, var(--rm-clinical-high) 18%, var(--rm-palette-surface)); }
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-nursing-dashboard .rm-priority-alert--critical { --rm-priority-ink: var(--rm-clinical-critical-ink); --rm-priority-bg: var(--rm-clinical-critical-bg); }
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-nursing-dashboard .rm-priority-alert :is(.rm-priority-alert__icon,.rm-priority-alert__priority) { color: var(--rm-priority-ink); }
+@media (max-width: 639px) {
+    .rm-shell .rm-dashboard-composition .rm-dashboard-header__content { padding: var(--rm-space-4); }
+    .rm-shell .rm-dashboard-composition .rm-dashboard-header__title { font-size: var(--rm-font-size-page); }
+}
+
+/* Dirección vigente: arena y cafés grisáceos, salvia con presencia, sin bisel. */
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-dashboard-composition[class] :is(.rm-card,.rm-metric-card,.rm-dashboard-data-panel,.rm-admin-dashboard__attention-body) {
+    background: var(--rm-capture-section-glass);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-shell {
+    --rm-dashboard-heading-coffee: var(--rm-earth-900);
+    --rm-dashboard-heading-mint: var(--rm-palette-primary-strong);
+    --rm-dashboard-heading-ink: var(--rm-palette-primary-ink);
+    --rm-dashboard-sage-700: var(--rm-palette-primary-strong);
+    --rm-dashboard-sage-600: var(--rm-palette-primary);
+    --rm-dashboard-sage-100: var(--rm-palette-primary-soft);
+}
+.rm-shell .rm-dashboard-composition .rm-dashboard-header:not(.rm-dashboard-header--compact) .rm-dashboard-header__content {
+    padding: var(--rm-space-4) var(--rm-space-5);
+    gap: var(--rm-space-2);
+}
+.rm-shell .rm-dashboard-composition .rm-metric-card { justify-content: flex-start; }
+.rm-shell .rm-dashboard-composition .rm-metric-card__body { align-content: start; }
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-dashboard-composition .rm-section-header__title { color: var(--rm-palette-primary-ink); }
+.rm-shell .rm-nursing-dashboard :is(.rm-nursing-dashboard__alerts,.rm-nursing-dashboard__schedule) { align-self: stretch; }
+.rm-shell .rm-nursing-dashboard .rm-card:not(.rm-metric-card) { padding: var(--rm-space-5); }
+.rm-shell .rm-nursing-dashboard .rm-nursing-module__more { display: inline-flex; align-items: center; justify-content: flex-end; min-height: 44px; gap: var(--rm-space-2); text-align: end; }
+.rm-shell .rm-nursing-dashboard .rm-patient-turn-row { padding-block: var(--rm-space-3); line-height: 1.5; }
+.rm-shell .rm-nursing-dashboard .rm-patient-turn-row__person strong { font-size: var(--rm-font-size-card); }
+.rm-shell .rm-nursing-dashboard :is(.rm-patient-turn-row__person small,.rm-patient-turn-row__next small,.rm-patient-turn-table__head) { font-size: calc(var(--rm-font-size-meta) + 1px); }
+@media (min-width: 1200px) {
+    .rm-shell .rm-nursing-dashboard .rm-nursing-dashboard__controls { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: var(--rm-space-5); }
+    html .rm-shell .rm-dashboard-composition.rm-nursing-dashboard .rm-nursing-dashboard__controls .rm-section-header { padding: 0; border: 0; }
+    .rm-shell .rm-nursing-dashboard .rm-nursing-dashboard__control-actions { margin-top: 0; }
+}
+@media (max-width: 639px) {
+    .rm-shell .rm-nursing-dashboard { gap: var(--rm-space-4); }
+    .rm-shell .rm-nursing-dashboard .rm-card:not(.rm-metric-card) { padding: var(--rm-space-4); }
+    .rm-shell .rm-nursing-dashboard .rm-nursing-dashboard__control-actions { gap: var(--rm-space-2); }
+    .rm-shell .rm-nursing-dashboard .rm-nursing-dashboard__control-actions .rm-btn { flex: 1 1 140px; }
+}
+html:not(.dark):not([data-theme="dark"]) :is(.rm-shell, .rm-ficha-detalles) .rm-btn-primary:is(:hover,:active):not(:disabled) {
+    background: var(--rm-palette-primary-hover);
+    color: var(--rm-palette-on-dark);
+    box-shadow: none;
+}
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-resident-directory__open:hover {
+    background: var(--rm-palette-primary-hover);
+    color: var(--rm-palette-on-dark);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-btn-info { color: var(--rm-palette-petroleum-950); }
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-dashboard-composition .rm-section-header {
+    padding-bottom: var(--rm-space-3);
+    border-bottom: 1px solid var(--rm-palette-border-soft);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-nursing-dashboard :is(.rm-nursing-dashboard__schedule,.rm-nursing-dashboard__location) .rm-section-header__icon {
+    background: var(--rm-palette-info-soft); color: var(--rm-palette-info-text);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-nursing-dashboard .rm-nursing-dashboard__notes .rm-section-header__icon {
+    background: var(--rm-palette-psychology-soft); color: var(--rm-palette-psychology-text);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-nursing-dashboard .rm-nursing-dashboard__alerts .rm-section-header__icon {
+    background: var(--rm-palette-warning-soft); color: var(--rm-palette-warning-text);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-nursing-dashboard .rm-priority-alert--medium {
+    --rm-priority-ink: var(--rm-palette-warning-text);
+    --rm-priority-bg: color-mix(in srgb, var(--rm-palette-warning) 24%, var(--rm-palette-surface-elevated));
+}
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-nursing-dashboard .rm-priority-alert--critical {
+    --rm-priority-ink: var(--rm-palette-critical-text);
+    --rm-priority-bg: var(--rm-palette-critical-soft);
+    border-color: var(--rm-palette-critical);
+}
+@media (hover: hover) and (pointer: fine) {
+    .rm-shell .rm-nursing-dashboard .rm-nursing-module:hover { transform: none; }
+}
+
+/* Directorio compartido: identidad, contexto y acción con jerarquía estable. */
+.rm-shell .rm-resident-directory { gap: var(--rm-space-5); }
+.rm-shell .rm-resident-directory .rm-collection-header__aside { font-size: calc(var(--rm-font-size-meta) + 1px); }
+.rm-shell .rm-resident-directory .rm-resident-directory__header { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--rm-space-5); padding: var(--rm-space-4) var(--rm-space-5); border-left-width: 1px; }
+.rm-shell .rm-resident-directory .rm-resident-directory__header .rm-collection-header__identity { gap: var(--rm-space-3); }
+.rm-shell .rm-resident-directory .rm-resident-directory__header .rm-collection-header__icon { width: 48px; height: 48px; border-radius: var(--rm-radius-card); font-size: 24px; background: var(--rm-role-primary-soft); color: var(--rm-action-primary-ink); box-shadow: none; }
+.rm-shell .rm-resident-directory .rm-resident-directory__header .rm-collection-header__aside { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; justify-items: start; gap: 4px var(--rm-space-4); max-width: none; padding-left: var(--rm-space-4); border-left: 1px solid var(--rm-border-soft); }
+.rm-shell .rm-resident-directory .rm-resident-directory__header .rm-collection-header__context { display: grid; justify-items: start; gap: 5px; grid-column: 1; padding: 0; border: 0; border-radius: 0; background: transparent; text-align: left; }
+.rm-resident-directory__shift-status { display: inline-flex; align-items: center; gap: 6px; padding: 5px 9px; border-radius: var(--rm-radius-md); background: var(--rm-role-primary-soft); color: var(--rm-action-primary-ink); font-size: var(--rm-font-size-meta); font-weight: 700; line-height: 1.4; }
+.rm-resident-directory__shift-status > i { flex: none; font-size: 16px; }
+.rm-resident-directory__shift-name { color: var(--rm-text-primary); font-size: var(--rm-font-size-label); font-weight: 700; line-height: 1.35; overflow-wrap: anywhere; }
+.rm-shell .rm-resident-directory .rm-resident-directory__header time { grid-column: 1; font-size: var(--rm-font-size-meta); line-height: 1.4; font-variant-numeric: tabular-nums; }
+.rm-shell .rm-resident-directory .rm-resident-directory__header .rm-collection-header__actions { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+.rm-shell .rm-resident-directory .rm-resident-directory__header .rm-collection-header__actions .rm-btn { gap: 8px; padding-inline: 12px; background: var(--rm-role-primary-soft); color: var(--rm-action-primary-ink); border-color: var(--rm-selected-border); font-size: var(--rm-font-size-label); }
+.rm-shell .rm-resident-directory .rm-resident-directory__filters :is(input,select,.rm-filter-chip,.rm-view-toggle__btn) { font-size: var(--rm-font-size-body); }
+.rm-shell .rm-resident-directory .rm-resident-compact-card { padding: var(--rm-space-4); }
+.rm-shell .rm-resident-directory .rm-resident-compact-card .rm-resident-directory__name { min-height: 44px; }
+.rm-shell .rm-resident-directory .rm-resident-compact-card__identity { gap: var(--rm-space-2); }
+.rm-shell .rm-resident-directory .rm-resident-compact-card__facts { border: 0; gap: var(--rm-space-2); padding-block: var(--rm-space-1); }
+.rm-shell .rm-resident-directory .rm-resident-compact-card__next { padding: var(--rm-space-2); border-radius: var(--rm-radius-md); }
+.rm-shell .rm-resident-directory .rm-resident-compact-card__next > span { font-size: calc(var(--rm-font-size-meta) + 1px); }
+.rm-shell .rm-resident-directory .rm-resident-compact-card__next strong { font-weight: 700; }
+.rm-shell .rm-resident-directory .rm-resident-compact-card__footer { gap: var(--rm-space-2); padding-top: var(--rm-space-2); border-top: 1px solid var(--rm-border-soft); }
+.rm-shell .rm-resident-directory .rm-resident-directory__item--row .rm-resident-directory__name { font: 800 calc(var(--rm-font-size-body) + 2px)/1.35 var(--rm-font-friendly); }
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-resident-directory .rm-resident-compact-card__next { background: color-mix(in srgb,var(--rm-palette-info) 12%,var(--rm-palette-surface)); }
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-resident-directory .rm-resident-compact-card__next > span { color: var(--rm-palette-info-text); }
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-resident-directory .rm-resident-compact-card__facts p > i { color: var(--rm-palette-info-text); }
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-resident-directory .rm-resident-compact-card .rm-resident-directory__avatar--initials { background: var(--rm-palette-primary-soft); color: var(--rm-palette-primary-ink); border-color: var(--rm-palette-primary); }
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-resident-directory .rm-view-toggle__btn.is-active { background: var(--rm-palette-primary-soft); color: var(--rm-palette-primary-ink); box-shadow: none; }
+@media (max-width: 639px) {
+    .rm-shell .rm-resident-directory { gap: var(--rm-space-4); }
+    .rm-shell .rm-resident-directory .rm-resident-compact-card { padding: var(--rm-space-4); }
+}
+@media (max-width: 760px) {
+    .rm-shell .rm-resident-directory .rm-resident-directory__header { grid-template-columns: minmax(0, 1fr); gap: var(--rm-space-3); }
+    .rm-shell .rm-resident-directory .rm-resident-directory__header .rm-collection-header__aside { width: 100%; padding: var(--rm-space-3) 0 0; border-left: 0; border-top: 1px solid var(--rm-border-soft); }
+    .rm-shell .rm-resident-directory .rm-resident-directory__header .rm-collection-header__actions { max-width: 160px; }
+    .rm-shell .rm-resident-directory .rm-resident-directory__header .rm-collection-header__actions .rm-btn { white-space: normal; text-align: left; }
+}
+
+/* Inicio de Enfermería: niveles de lectura de la ficha clínica compartida. */
+html .rm-shell [data-rm-main] .rm-dashboard-composition.rm-nursing-dashboard :is(.rm-nursing-module, .rm-turn-complement, .rm-chart-card) {
+    box-shadow: var(--rm-capture-box-shadow, var(--rm-shadow-lg));
+}
+html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-nursing-dashboard :is(.rm-nursing-dashboard__schedule, .rm-nursing-dashboard__location, .rm-nursing-dashboard__activity-bars) {
+    --rm-section-header-bg: color-mix(in srgb, var(--rm-sky-50) 52%, var(--rm-surface-main));
+}
+.rm-shell .rm-dashboard-composition.rm-nursing-dashboard {
+    --rm-section-header-bg: color-mix(in srgb, var(--rm-action-primary-soft) 52%, var(--rm-surface-main));
+    --rm-section-header-ink: var(--rm-text-primary);
+}
+.rm-shell .rm-nursing-dashboard :is(.rm-nursing-dashboard__schedule, .rm-nursing-dashboard__location, .rm-nursing-dashboard__activity-bars) {
+    --rm-section-header-bg: color-mix(in srgb, var(--rm-info-soft) 52%, var(--rm-surface-main));
+}
+.rm-shell .rm-nursing-dashboard .rm-nursing-dashboard__notes {
+    --rm-section-header-bg: color-mix(in srgb, var(--rm-accent-lavender-soft) 52%, var(--rm-surface-main));
+}
+.rm-shell .rm-nursing-dashboard .rm-nursing-dashboard__alerts {
+    --rm-section-header-bg: color-mix(in srgb, var(--rm-warning-soft) 52%, var(--rm-surface-main));
+}
+.rm-shell .rm-nursing-dashboard .rm-nursing-dashboard__incidents {
+    --rm-section-header-bg: color-mix(in srgb, var(--rm-accent-coral-soft) 52%, var(--rm-surface-main));
+}
+html .rm-shell [data-rm-main] .rm-dashboard-composition.rm-nursing-dashboard .rm-section-header {
+    align-items: center;
+    gap: var(--rm-space-2) var(--rm-space-3);
+    padding: var(--rm-space-3);
+    border: 0;
+    border-radius: var(--rm-radius-lg);
+    background: var(--rm-section-header-bg);
+    color: var(--rm-section-header-ink);
+}
+html .rm-shell [data-rm-main] .rm-dashboard-composition.rm-nursing-dashboard .rm-section-header__main {
+    align-items: center;
+    gap: var(--rm-space-2);
+    flex-wrap: wrap;
+}
+html .rm-shell [data-rm-main] .rm-dashboard-composition.rm-nursing-dashboard .rm-section-header__icon {
+    flex-basis: 28px;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--rm-radius-md);
+    background: var(--rm-surface-main);
+    color: var(--rm-section-header-ink);
+}
+html .rm-shell [data-rm-main] .rm-dashboard-composition.rm-nursing-dashboard .rm-section-header__copy { flex: 1 1 140px; }
+html .rm-shell [data-rm-main] .rm-dashboard-composition.rm-nursing-dashboard .rm-section-header__title {
+    color: var(--rm-text-primary);
+    font: var(--rm-font-weight-extrabold) calc(var(--rm-font-size-card) + 1px)/1.35 var(--rm-font-body);
+    overflow-wrap: anywhere;
+}
+html .rm-shell [data-rm-main] .rm-dashboard-composition.rm-nursing-dashboard .rm-section-header__subtitle {
+    color: var(--rm-text-secondary);
+    font-size: var(--rm-font-size-meta);
+}
+html .rm-shell [data-rm-main] .rm-dashboard-composition.rm-nursing-dashboard .rm-section-header__actions { align-self: center; }
+html .rm-shell [data-rm-main] .rm-dashboard-composition.rm-nursing-dashboard .rm-nursing-module__more {
+    min-width: 44px;
+    min-height: 44px;
+    padding: var(--rm-space-2);
+    border: 1px solid var(--rm-border-soft);
+    border-radius: var(--rm-radius-md);
+    background: var(--rm-surface-main);
+    color: var(--rm-text-primary);
+    box-shadow: var(--rm-shadow-xs);
+    text-align: center;
+    white-space: normal;
+}
+html .rm-shell [data-rm-main] .rm-dashboard-composition.rm-nursing-dashboard .rm-nursing-module__more:hover { background: var(--rm-surface-soft); border-color: var(--rm-border-strong); }
+html .rm-shell [data-rm-main] .rm-dashboard-composition.rm-nursing-dashboard .rm-nursing-module__more:focus-visible { outline: 2px solid var(--rm-focus); outline-offset: 3px; }
+.rm-shell .rm-nursing-dashboard .rm-nursing-dashboard__control-actions { padding: var(--rm-space-3); border-radius: var(--rm-radius-lg); background: var(--rm-surface-soft); }
+.rm-shell .rm-nursing-dashboard .rm-patient-turn-table__head { padding-inline: var(--rm-space-3); background: var(--rm-surface-soft); border-radius: var(--rm-radius-md); }
+.rm-shell .rm-nursing-dashboard .rm-patient-turn-row { padding-inline: var(--rm-space-3); border-radius: var(--rm-radius-md); }
+.rm-shell .rm-nursing-dashboard .rm-patient-turn-row:hover { background: var(--rm-surface-soft); }
+@media (max-width: 639px) {
+    html .rm-shell [data-rm-main] .rm-dashboard-composition.rm-nursing-dashboard .rm-section-header { grid-template-columns: minmax(0, 1fr); }
+    html .rm-shell [data-rm-main] .rm-dashboard-composition.rm-nursing-dashboard .rm-section-header__actions { justify-self: end; }
+}
+
+:is(.dark, [data-theme="dark"]) .rm-shell .rm-nursing-dashboard .rm-nursing-dashboard__notes {
+    --rm-section-header-bg: color-mix(in srgb, var(--rm-accent-lavender) 16%, var(--rm-surface-main));
+}
+:is(.dark, [data-theme="dark"]) .rm-shell .rm-nursing-dashboard .rm-nursing-dashboard__incidents {
+    --rm-section-header-bg: color-mix(in srgb, var(--rm-accent-coral) 16%, var(--rm-surface-main));
+}
+
+/* Elevación compartida: los contenedores de contenido se separan del lienzo;
+   el movimiento identifica únicamente acciones reales. Sin bisel ni cambios de layout. */
+html .rm-shell[class] :is(
+    .rm-card, .rm-panel, .rm-chart-card, .rm-dashboard-header, .rm-dashboard-data-panel,
+    .rm-collection-header, .rm-filter-bar, .rm-filter-toolbar, .rm-person-entity-card,
+    .rm-resident-compact-card, .rm-clinical-card, .rm-clinical-form__section,
+    .rm-conducta__card, .rm-cognicion__card, .rm-wound__section
+):not([aria-disabled="true"]):not(.is-disabled) {
+    box-shadow: var(--rm-shadow-card);
+    transition: box-shadow var(--rm-duration-normal) var(--rm-ease-standard),
+        border-color var(--rm-duration-hover) var(--rm-ease-standard),
+        background-color var(--rm-duration-hover) var(--rm-ease-standard);
+}
+html .rm-shell :is(.rm-modal-panel, .rm-drawer-panel) { box-shadow: var(--rm-shadow-modal); }
+html .rm-shell[class] :is(.rm-card, .rm-panel, .rm-chart-card, .rm-clinical-form__section,
+    .rm-conducta__card, .rm-cognicion__card, .rm-wound__section):focus-within {
+    box-shadow: var(--rm-shadow-card-hover);
+}
+html .rm-shell :is(.rm-card, .rm-panel, .rm-chart-card, .rm-dashboard-data-panel,
+    .rm-person-entity-card):not(a):not(button):not([role="button"]):not(.rm-card-interactive):not(.rm-card--interactive):hover {
+    transform: none;
+}
+html .rm-shell :is(.rm-btn, .rm-nursing-module__more, .rm-resident-directory__open,
+    .rm-patient-turn-row--link, .rm-location-cell, .rm-filter-chip, .rm-view-toggle__btn) {
+    transition: color var(--rm-duration-hover) var(--rm-ease-standard),
+        background-color var(--rm-duration-hover) var(--rm-ease-standard),
+        border-color var(--rm-duration-hover) var(--rm-ease-standard),
+        box-shadow var(--rm-duration-normal) var(--rm-ease-standard),
+        transform var(--rm-duration-fast) var(--rm-ease-standard);
+}
+html .rm-shell :is(a.rm-card, button.rm-card, .rm-card-interactive, .rm-card--interactive) {
+    transition: transform var(--rm-duration-normal) var(--rm-ease-emphasized),
+        box-shadow var(--rm-duration-normal) var(--rm-ease-standard),
+        border-color var(--rm-duration-hover) var(--rm-ease-standard);
+}
+html .rm-shell :is(.rm-btn, .rm-nursing-module__more, .rm-resident-directory__open) > .ph-arrow-right {
+    transition: transform var(--rm-duration-normal) var(--rm-ease-emphasized);
+}
+html .rm-shell :is(.rm-btn, .rm-nursing-module__more, .rm-resident-directory__open,
+    .rm-patient-turn-row--link, .rm-location-cell, .rm-filter-chip, .rm-view-toggle__btn):focus-visible {
+    outline: 2px solid var(--rm-focus);
+    outline-offset: 3px;
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    html .rm-shell :is(a.rm-card, button.rm-card, .rm-card-interactive, .rm-card--interactive):not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):hover {
+        transform: translateY(var(--rm-motion-lift-md));
+        box-shadow: var(--rm-shadow-card-hover);
+        border-color: var(--rm-border-hover);
+    }
+    html .rm-shell :is(.rm-btn, .rm-nursing-module__more, .rm-resident-directory__open):not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):hover {
+        box-shadow: var(--rm-shadow-sm);
+        transform: translateY(var(--rm-motion-lift-md)) scale(var(--rm-motion-scale-hover));
+    }
+    html .rm-shell :is(.rm-btn, .rm-nursing-module__more, .rm-resident-directory__open):hover > .ph-arrow-right {
+        transform: translateX(calc(var(--rm-motion-lift-md) * -1));
+    }
+    html .rm-shell :is(.rm-patient-turn-row--link, .rm-location-cell):hover {
+        background-color: var(--rm-action-primary-soft);
+    }
+}
+@media (prefers-reduced-motion: no-preference) {
+    html .rm-shell :is(.rm-btn, .rm-nursing-module__more, .rm-resident-directory__open):not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):active {
+        transform: translateY(calc(var(--rm-motion-lift-sm) * -1)) scale(var(--rm-motion-scale-active));
+        box-shadow: none;
+    }
+    html .rm-shell :is(a.rm-card, button.rm-card, .rm-card-interactive, .rm-card--interactive):not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):active {
+        transform: scale(var(--rm-motion-scale-active));
+        box-shadow: var(--rm-shadow-card);
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    html .rm-shell :is(.rm-card, .rm-panel, .rm-chart-card, .rm-person-entity-card,
+        .rm-clinical-form__section, .rm-conducta__card, .rm-cognicion__card, .rm-wound__section,
+        .rm-btn, .rm-nursing-module__more, .rm-resident-directory__open) {
+        transition: none;
+        animation: none;
+        transform: none;
+        filter: none;
+    }
+    html .rm-shell :is(.rm-btn, .rm-nursing-module__more, .rm-resident-directory__open) > .ph-arrow-right { transition: none; transform: none; }
+}

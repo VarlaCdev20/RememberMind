@@ -191,7 +191,7 @@
  </span>
  <div class="min-w-0 flex-1">
  <div class="flex flex-wrap items-center gap-2">
- <p class="truncate text-xs font-bold text-parrafo">{{ $alerta['titulo'] }}</p>
+ <p class="truncate text-xs font-bold text-parrafo">{{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($alerta['titulo']) }}</p>
  <span class="rounded-full bg-fondo-panel px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-apoyo">{{ $alerta['tipo'] }}</span>
  </div>
  <p class="mt-1 text-[11px] font-bold leading-relaxed text-parrafo/65">{{ $alerta['detalle'] }}</p>

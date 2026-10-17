@@ -33,7 +33,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: mbstring, pdo_sqlite
+          extensions: mbstring, pdo_sqlite, gd, exif
           coverage: none
       - uses: actions/setup-node@v4
         with:
@@ -106,7 +106,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: mbstring, pdo_pgsql
+          extensions: mbstring, pdo_pgsql, gd, exif
           coverage: none
       - uses: actions/setup-node@v4
         with:
@@ -132,7 +132,7 @@ jobs:
       - name: PostgreSQL contracts, role login and concurrency
         run: >-
           php vendor/phpunit/phpunit/phpunit -c phpunit.postgres.xml
-          --filter 'AsignacionesJornadaPlanificadaTest|AccesoDashboardPorRolTest|AuthenticationTest|BddOperativaV2Test|ContratoPersonalInstitucionalTest|ContratoDocumentacionUsuarioTest|ContratoSeguridadCuentaTest|FichaCuidadosTest|CargaConocimientoOrionTest|ConocimientoPanelTest|RolesVistasPermisosMatrixTest|Fase3AdmisionAtomicidadTest|AlojamientoBloqueoPostgresTest|Fase3ConcurrenciaCamaPostgresTest|PersistenciaExpertaTest|ResultadosExpertoResidenteTest|PaqueteInvestigadoCOGMEMTest|DolorMigrationTest|DesacoplamientoContextoTest|PanelAlertaPreparadoTest|ConsultasPorCapaTest|ExploradorAdministrativoTest|ApplicationBoundaryTest|DesacoplamientoArchivosTest|ReportesPortabilidadTest|FrontendRestauradoV2Test|PantallasConectadasTest|VistasModularesTest|DashboardAdministracionIntegracionVisualTest'
+          --filter 'FotografiasHeridasTest|FotografiasHeridasMigrationTest|GaleriaInstitucionalTest|GaleriaInstitucionalConcurrenciaPostgresTest|GerenciaDashboardTest|PersonalInstitucionalResponsiveTest|CodigosCorrelativosTest|AsignacionesJornadaPlanificadaTest|AccesoDashboardPorRolTest|AuthenticationTest|BddOperativaV2Test|ContratoPersonalInstitucionalTest|ContratoDocumentacionUsuarioTest|ContratoSeguridadCuentaTest|FichaCuidadosTest|CargaConocimientoOrionTest|ConocimientoPanelTest|RolesVistasPermisosMatrixTest|Fase3AdmisionAtomicidadTest|AlojamientoBloqueoPostgresTest|Fase3ConcurrenciaCamaPostgresTest|PersistenciaExpertaTest|ResultadosExpertoResidenteTest|PaqueteInvestigadoCOGMEMTest|DolorMigrationTest|DesacoplamientoContextoTest|PanelAlertaPreparadoTest|ConsultasPorCapaTest|ExploradorAdministrativoTest|ApplicationBoundaryTest|DesacoplamientoArchivosTest|ReportesPortabilidadTest|FrontendRestauradoV2Test|PantallasConectadasTest|VistasModularesTest|DashboardAdministracionIntegracionVisualTest'
           --log-junit=phpunit-postgres.xml
       - name: PostgreSQL evidence
         if: always()

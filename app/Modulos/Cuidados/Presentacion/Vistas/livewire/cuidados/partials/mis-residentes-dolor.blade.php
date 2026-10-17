@@ -17,6 +17,12 @@
     @if($errors->hasAny(['intensidad', 'ubicacion', 'duracion_valor', 'duracion_unidad', 'frecuencia', 'factores_alivio', 'respuesta', 'cod_valoracion_origen', 'desencadenante', 'intervencion']))<p class="rm-dolor__error-summary" role="alert">No se puede continuar. Revisa los campos señalados.</p>@endif
     @error('cod_valoracion_origen')<p class="rm-error" role="alert">{{ $message }}</p>@enderror
     @error('dolor_guardado')<x-ui.resultado-operacion-clinica variant="error" :resident="$detalleResidente['nombre_completo']" :message="$message" />@enderror
+    @can('valoraciones_dolor.ver')
+    <x-ui.clinical-consultation-bar>
+        <x-ui.action-button variant="secondary" icono="ph-clock-counter-clockwise" @click="openTrend($event.currentTarget); $nextTick(() => rmFocusClinicalHistory($refs.trendDialog))" x-bind:aria-expanded="trendOpen" aria-controls="dolor-grafica-popup" aria-haspopup="dialog">Ver historial</x-ui.action-button>
+        <button class="rm-btn rm-btn-secondary rm-dolor__evolution" type="button" aria-controls="dolor-grafica-popup" :aria-expanded="trendOpen" @click="openTrend($event.currentTarget)"><i class="ph-bold ph-chart-line" aria-hidden="true"></i> Ver evolución</button>
+    </x-ui.clinical-consultation-bar>
+    @endcan
     <div class="rm-dolor__workspace">
         <div class="rm-dolor__column">
             <section class="rm-clinical-form__section rm-dolor__intensity" :data-intensity="intensityPresentation().state">
@@ -51,7 +57,7 @@
                         <div><span>Última guardada</span><strong x-text="previous() ? previous().value + ' / 10' : '—'"></strong><small x-text="previous()?.date ?? 'Sin valoración anterior'"></small><small x-text="previous()?.location || ''"></small></div>
                         <div><span>Actual · Sin guardar</span><strong x-text="current() === null ? '—' : current() + ' / 10'"></strong><small x-text="comparison()"></small></div>
                     </div>
-                    <button class="rm-btn-secondary rm-dolor__evolution" type="button" aria-controls="dolor-grafica-popup" :aria-expanded="trendOpen" @click="openTrend($event.currentTarget)"><i class="ph-bold ph-chart-line" aria-hidden="true"></i> Ver evolución</button>
+
                     @if(!$esModoConsulta)
                         <template x-if="previous()?.code"><button class="rm-btn-secondary" type="button" @click="$wire.abrirReevaluacionDolor(previous().code)" wire:loading.attr="disabled" wire:target="abrirReevaluacionDolor">Reevaluar dolor</button></template>
                     @endif

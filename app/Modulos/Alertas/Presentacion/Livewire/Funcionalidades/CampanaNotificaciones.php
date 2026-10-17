@@ -18,8 +18,10 @@ class CampanaNotificaciones extends Component
 {
     public int $conteoAbiertas = 0;
 
+    #[\Livewire\Attributes\Locked]
     public array $alertaIdsConocidos = [];
 
+    #[\Livewire\Attributes\Locked]
     public array $recordatorioIdsConocidos = [];
 
     public bool $panelAbierto = false;
@@ -57,7 +59,7 @@ class CampanaNotificaciones extends Component
     {
         $user = auth()->user();
 
-        return (bool) $user?->canAny([
+        return $user && $user->fresh()?->estado === 'ACTIVO' && ! $user->hasRole('FAMILIAR') && (bool) $user->canAny([
             'alertas.ver', 'alertas.gestionar', 'prescripciones.ver', 'administraciones_medicacion.ver',
         ]);
     }
@@ -83,53 +85,30 @@ class CampanaNotificaciones extends Component
 
     public function actualizarConteoYLista(bool $detectarNuevas = true): void
     {
-        $pendientes = $this->consultaPendientes()->with(['adultoMayor.cama.habitacion'])
-            ->latest('fecha_hora')
-            ->get();
-
+        if (! $this->puedeVer()) { $this->conteoAbiertas = 0; return; }
+        $pendientes = $this->consultaPendientes()->with('residente')->get();
         $recordatorios = $this->recordatoriosMedicacion();
         $this->conteoAbiertas = $pendientes->count() + $recordatorios->count();
-
-        $idsActuales = $pendientes->pluck('cod_alerta')->toArray();
-
-        if ($detectarNuevas && ! empty($this->alertaIdsConocidos)) {
-            $nuevosIds = array_diff($idsActuales, $this->alertaIdsConocidos);
-            if (! empty($nuevosIds)) {
-                $nuevas = $pendientes->whereIn('cod_alerta', $nuevosIds)->where('estado', 'ABIERTA');
-                if ($nuevas->isNotEmpty()) {
-                    $primera = $nuevas->first();
-                    $nombreResidente = $primera->adultoMayor
-                        ? trim("{$primera->adultoMayor->nombres} {$primera->adultoMayor->apellido_paterno}")
-                        : 'Residente';
-
-                    $this->dispatch('alerta-nueva', [
-                        'id' => $primera->cod_alerta,
-                        'titulo' => "Alerta [{$primera->prioridad}] {$primera->tipo}",
-                        'mensaje' => "{$nombreResidente}: ".Str::limit($primera->descripcion, 75),
-                        'nivel' => $primera->prioridad,
-                    ]);
-                }
-            }
+        $nuevas = $pendientes->reject(fn ($a) => in_array($a->cod_alerta.'|'.$a->prioridad, $this->alertaIdsConocidos, true));
+        if ($detectarNuevas && $nuevas->isNotEmpty()) {
+            $primera = $nuevas->first();
+            $this->dispatch('alerta-nueva', [
+                'id' => $primera->cod_alerta, 'nivel' => $primera->prioridad,
+                'titulo' => $nuevas->count().' aviso(s) clínico(s) nuevo(s)',
+                'mensaje' => $primera->prioridad.' · '.$primera->residente?->nombre_completo.' · '.$primera->tipo.' · Registrada '.($primera->fecha_hora?->timezone(config('app.timezone'))->format('d/m/Y H:i:s T') ?? 'sin fecha').'. Revise la lista de alertas; recibir este aviso no registra atención.',
+            ]);
         }
-
-        $this->alertaIdsConocidos = array_values(array_unique(array_merge($this->alertaIdsConocidos, $idsActuales)));
-
-        $recordatorioIds = $recordatorios->pluck('id')->all();
-        if ($detectarNuevas && $this->recordatorioIdsConocidos !== []) {
-            $nuevo = $recordatorios->first(fn (array $item) => ! in_array($item['id'], $this->recordatorioIdsConocidos, true));
-            if ($nuevo) {
-                $nombre = trim(($nuevo['adulto']?->nombres ?? 'Residente').' '.($nuevo['adulto']?->ap_paterno ?? ''));
-                $hora12 = $nuevo['hora_12h'] ?? Carbon::parse("2000-01-01 {$nuevo['hora']}")->format('h:i A');
-                $horaCompleta = now()->format('h:i:s A');
-                $this->dispatch('alerta-nueva', [
-                    'id' => $nuevo['id'],
-                    'titulo' => $nuevo['estado'] === 'VENCIDA' ? '⚠️ Se pasó de hora: Dosis vencida' : 'Próxima dosis de medicación',
-                    'mensaje' => "{$nombre}: {$nuevo['medicacion']->nombre_medicamento} programada para las {$nuevo['hora']} ({$hora12}) [Hora: {$horaCompleta}]",
-                    'nivel' => $nuevo['estado'] === 'VENCIDA' ? 'ALTO' : 'MEDIO',
-                ]);
-            }
+        $this->alertaIdsConocidos = $pendientes->map(fn ($a) => $a->cod_alerta.'|'.$a->prioridad)->values()->all();
+        $nuevasDosis = $recordatorios->reject(fn ($r) => in_array($r['id'].'|'.$r['estado'], $this->recordatorioIdsConocidos, true));
+        if ($detectarNuevas && $nuevasDosis->isNotEmpty()) {
+            $primera = $nuevasDosis->first();
+            $this->dispatch('alerta-nueva', [
+                'id' => $primera['id'], 'nivel' => $primera['estado'],
+                'titulo' => $nuevasDosis->count().' aviso(s) de medicación',
+                'mensaje' => $primera['estado'].' · '.$primera['adulto']?->nombre_completo.' · '.$primera['medicacion']->nombre_medicamento.' · Programada '.$primera['programada']->format('d/m/Y H:i:s T').'. Compruebe la orden, el residente y el registro antes de administrar. Revisar el aviso no confirma una dosis.',
+            ]);
         }
-        $this->recordatorioIdsConocidos = array_values(array_unique(array_merge($this->recordatorioIdsConocidos, $recordatorioIds)));
+        $this->recordatorioIdsConocidos = $recordatorios->map(fn ($r) => $r['id'].'|'.$r['estado'])->values()->all();
     }
 
     public function abrirAtender(string $id): void
@@ -147,7 +126,7 @@ class CampanaNotificaciones extends Component
         $this->comprobarPermiso('atender');
         $this->autorizarAlerta($id);
 
-        app(GestionarAtencionAlerta::class)->atenderAlerta(auth()->user(), $id, $accion ?: ($this->accionTomada ?: 'Atención iniciada desde campana de notificaciones'));
+        app(GestionarAtencionAlerta::class)->atenderAlerta(auth()->user(), $id, $accion ?? $this->accionTomada);
 
         $this->actualizarConteoYLista(false);
         $this->dispatch('alerta-atendida');
@@ -171,7 +150,7 @@ class CampanaNotificaciones extends Component
         $this->comprobarPermiso('cerrar');
         $this->autorizarAlerta($id);
 
-        app(GestionarAtencionAlerta::class)->cerrarAlerta(auth()->user(), $id, $observacion ?: ($this->observacionCierre ?: 'Cierre registrado desde campana de notificaciones'));
+        app(GestionarAtencionAlerta::class)->cerrarAlerta(auth()->user(), $id, $observacion ?? $this->observacionCierre);
 
         $this->actualizarConteoYLista(false);
         $this->dispatch('alerta-cerrada');
@@ -241,8 +220,8 @@ class CampanaNotificaciones extends Component
             return '<div></div>';
         }
 
-        $alertas = $this->consultaPendientes()->with(['adultoMayor.cama.habitacion', 'responsable'])
-            ->latest('fecha_hora')
+        $alertas = $this->consultaPendientes()->with(['residente.cama.habitacion', 'responsable'])
+            ->tap(fn ($q) => \App\Modulos\Alertas\Aplicacion\Consultas\OrdenAlertas::aplicar($q))
             ->take(15)
             ->get();
 
@@ -260,14 +239,15 @@ class CampanaNotificaciones extends Component
 
     private function consultaPendientes(): Builder
     {
-        $query = Alerta::query()->whereIn('estado', ['ABIERTA', 'EN_ATENCION']);
+        $query = Alerta::query()->whereIn('estado', ['ABIERTA', 'EN_ATENCION', 'RECONOCIDA', 'ASIGNADA', 'PENDIENTE']);
+        \App\Modulos\Alertas\Aplicacion\Consultas\OrdenAlertas::aplicar($query);
         $user = auth()->user();
 
-        if (! $user?->canAny(['alertas.ver', 'alertas.gestionar', 'alertas.seguimiento', 'alertas.cerrar'])) {
+        if (! $this->puedeVer() || ! $user?->canAny(['alertas.ver', 'alertas.gestionar', 'alertas.seguimiento', 'alertas.cerrar'])) {
             return $query->whereRaw('1 = 0');
         }
 
-        if ($user?->hasRole('ENFERMEROS')) {
+        if (! $user?->hasAnyRole(['SUPERADMINISTRADOR','GERENTE','ADMINISTRADOR'])) {
             $query->whereIn('cod_residente', app(TurnoEnfermeriaService::class)->obtenerPacientesAsignadosIds($user));
         }
 
@@ -288,7 +268,7 @@ class CampanaNotificaciones extends Component
     {
         $user = auth()->user();
 
-        if (! $user || ! $user->canAny(['prescripciones.ver', 'administraciones_medicacion.ver'])) {
+        if (! $this->puedeVer() || ! $user || ! $user->canAny(['prescripciones.ver', 'administraciones_medicacion.ver'])) {
             return collect();
         }
 
@@ -296,7 +276,7 @@ class CampanaNotificaciones extends Component
             return collect();
         }
 
-        $codigos = $user->hasRole('ENFERMEROS')
+        $codigos = ! $user->hasAnyRole(['SUPERADMINISTRADOR','GERENTE','ADMINISTRADOR'])
             ? app(TurnoEnfermeriaService::class)->obtenerPacientesAsignadosIds($user)
             : Residente::query()->pluck('cod_residente')->all();
 

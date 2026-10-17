@@ -10,12 +10,12 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[var(--rm-border)] pb-3">
             <div>
                 <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--rm-text-primary)] flex items-center gap-2">
-                    <i class="ph-bold ph-warning-octagon text-rose-600 text-sm"></i>
+                    <i class="ph-bold ph-warning-octagon text-[var(--rm-danger-strong)] text-sm"></i>
                     <span>Alertas Clínicas Activas</span>
                 </h2>
                 <p class="text-xs text-[var(--rm-text-secondary)] mt-0.5">Situaciones de vigilancia prioritaria que requieren intervención asistencial.</p>
             </div>
-            <span class="rounded-full px-3 py-1 text-xs font-bold self-start sm:self-auto {{ $alertasActivas->count() > 0 ? 'bg-rose-100 text-rose-800 border border-rose-300 animate-pulse' : 'bg-emerald-50 text-emerald-700 border border-emerald-200' }}">
+            <span class="rounded-full px-3 py-1 text-xs font-bold self-start sm:self-auto {{ $alertasActivas->count() > 0 ? 'bg-[var(--rm-danger-soft)] text-[var(--rm-danger-strong)] border border-[var(--rm-danger-strong)] animate-pulse' : 'bg-[var(--rm-success-soft)] text-[var(--rm-success-strong)] border border-[var(--rm-success-strong)]' }}">
                 {{ $alertasActivas->count() }} {{ $alertasActivas->count() === 1 ? 'alerta activa' : 'alertas activas' }}
             </span>
         </div>
@@ -27,14 +27,14 @@
                         $esAbierta = $al->estado === 'ABIERTA';
                         $esEnAtencion = $al->estado === 'EN_ATENCION';
                     @endphp
-                    <div class="rounded-2xl border p-4 transition {{ $esAbierta ? 'border-rose-200 bg-rose-50/40' : 'border-amber-200 bg-amber-50/40' }}">
+                    <div class="rounded-2xl border p-4 transition {{ $esAbierta ? 'border-[var(--rm-danger-strong)] bg-[var(--rm-danger-soft)]' : 'border-[var(--rm-warning-strong)] bg-[var(--rm-warning-soft)]' }}">
                         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                             <div class="space-y-1.5 min-w-0">
                                 <div class="flex flex-wrap items-center gap-2">
-                                    <span class="rounded-full px-2 py-0.5 text-[11px] font-bold uppercase {{ $esAbierta ? 'bg-rose-600 text-white' : 'bg-amber-600 text-white' }}">
+                                    <span class="rounded-full px-2 py-0.5 text-[11px] font-bold uppercase {{ $esAbierta ? 'bg-[var(--rm-danger-action)] text-[var(--rm-text-inverse)]' : 'bg-[var(--rm-warning-action)] text-[var(--rm-text-inverse)]' }}">
                                         {{ $al->estado }}
                                     </span>
-                                    <span class="rounded-md px-2 py-0.5 text-[11px] font-bold uppercase {{ in_array(strtoupper($al->prioridad), ['ALTO', 'CRITICO']) ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-700' }}">
+                                    <span class="rounded-md px-2 py-0.5 text-[11px] font-bold uppercase {{ in_array(strtoupper($al->prioridad), ['ALTO', 'CRITICO']) ? 'bg-[var(--rm-danger-soft)] text-[var(--rm-danger-strong)]' : 'bg-[var(--rm-surface-soft)] text-[var(--rm-text-primary)]' }}">
                                         Nivel {{ $al->prioridad }}
                                     </span>
                                     <span class="text-xs font-bold text-[var(--rm-text-primary)]">
@@ -43,7 +43,7 @@
                                 </div>
 
                                 <p class="text-xs font-medium text-[var(--rm-text-body)] leading-relaxed">
-                                    {{ $al->descripcion }}
+                                    {{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($al->descripcion) }}
                                 </p>
 
                                 <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[var(--rm-text-secondary)] pt-1">
@@ -62,7 +62,7 @@
                                         <span class="font-bold text-[var(--rm-text-primary)] text-[11px] block">Acciones registradas:</span>
                                         @foreach($al->eventos->sortBy('fecha_hora') as $evento)
                                             <p class="text-[var(--rm-text-body)] text-[11px]">
-                                                · {{ $evento->descripcion }} <span class="text-[var(--rm-text-secondary)]">({{ $evento->fecha_hora?->format('H:i') }})</span>
+                                                · {{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($evento->descripcion) }} <span class="text-[var(--rm-text-secondary)]">({{ $evento->fecha_hora?->format('H:i') }})</span>
                                             </p>
                                         @endforeach
                                     </div>
@@ -75,7 +75,7 @@
                                     @if(!$consultaEnfermeria)
 <button type="button"
                                             wire:click="abrirModalAtenderAlerta('{{ $al->cod_alerta }}')"
-                                            class="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-rose-700 transition">
+                                            class="inline-flex items-center gap-1.5 rounded-xl bg-[var(--rm-danger-action)] px-3.5 py-2 text-xs font-bold text-[var(--rm-text-inverse)] shadow-sm hover:bg-[var(--rm-danger-action)] transition">
                                         <i class="ph-bold ph-hand-heart"></i>
                                         <span>Atender alerta</span>
                                     </button>
@@ -84,7 +84,7 @@
                                     @if(!$consultaEnfermeria)
 <button type="button"
                                             wire:click="abrirModalCerrarAlerta('{{ $al->cod_alerta }}')"
-                                            class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 transition">
+                                            class="inline-flex items-center gap-1.5 rounded-xl bg-[var(--rm-success-action)] px-3.5 py-2 text-xs font-bold text-[var(--rm-text-inverse)] shadow-sm hover:bg-[var(--rm-success-action)] transition">
                                         <i class="ph-bold ph-check-circle"></i>
                                         <span>Registrar acción / Cerrar</span>
                                     </button>
@@ -96,10 +96,10 @@
                 @endforeach
             </div>
         @else
-            <div class="rounded-2xl bg-emerald-50/40 p-6 border border-emerald-200 text-center">
-                <i class="ph-bold ph-shield-check text-2xl text-emerald-600 mb-1 block"></i>
-                <p class="text-xs font-bold text-emerald-900">Sin alertas clínicas activas</p>
-                <p class="text-[11px] text-emerald-700 mt-0.5">El residente se encuentra hemodinámicamente estable y sin condiciones críticas abiertas.</p>
+            <div class="rounded-2xl bg-[var(--rm-success-soft)] p-6 border border-[var(--rm-success-strong)] text-center">
+                <i class="ph-bold ph-shield-check text-2xl text-[var(--rm-success-strong)] mb-1 block"></i>
+                <p class="text-xs font-bold text-[var(--rm-success-strong)]">Sin alertas clínicas activas</p>
+                <p class="text-[11px] text-[var(--rm-success-strong)] mt-0.5">El residente se encuentra hemodinámicamente estable y sin condiciones críticas abiertas.</p>
             </div>
         @endif
     </div>
@@ -109,7 +109,7 @@
         <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-3">
             <div>
                 <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--rm-text-primary)] flex items-center gap-2">
-                    <i class="ph-bold ph-clock-counter-clockwise text-blue-600 text-sm"></i>
+                    <i class="ph-bold ph-clock-counter-clockwise text-[var(--rm-info-strong)] text-sm"></i>
                     <span>Historial de Alertas Resueltas</span>
                 </h2>
                 <p class="text-xs text-[var(--rm-text-secondary)] mt-0.5">Registro auditado de alertas atendidas, cerradas o anuladas.</p>
@@ -144,8 +144,8 @@
 
                             <td class="py-3 px-3 font-bold text-[var(--rm-text-primary)] max-w-[200px]">
                                 {{ $alc->tipo }}
-                                <span class="text-[var(--rm-text-body)] font-normal text-[11px] block truncate" title="{{ $alc->descripcion }}">
-                                    {{ $alc->descripcion }}
+                                <span class="text-[var(--rm-text-body)] font-normal text-[11px] block truncate" title="{{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($alc->descripcion) }}">
+                                    {{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($alc->descripcion) }}
                                 </span>
                             </td>
 
@@ -157,14 +157,14 @@
 
                             <td class="py-3 px-3 text-[var(--rm-text-body)] max-w-[260px]">
                                 @if($eventoCierre)
-                                    <span class="text-[var(--rm-text-primary)] font-medium block">{{ $eventoCierre->descripcion }}</span>
+                                    <span class="text-[var(--rm-text-primary)] font-medium block">{{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($eventoCierre->descripcion) }}</span>
                                 @else
                                     <span class="text-[11px] text-[var(--rm-text-secondary)]">Cerrada tras resolución clínica</span>
                                 @endif
                             </td>
 
                             <td class="py-3 px-3 whitespace-nowrap">
-                                <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-700 border border-slate-200">
+                                <span class="inline-flex items-center gap-1 rounded-full bg-[var(--rm-surface-soft)] px-2 py-0.5 text-[11px] font-bold text-[var(--rm-text-primary)] border border-[var(--rm-border)]">
                                     <i class="ph-bold ph-check"></i> CERRADA
                                 </span>
                             </td>

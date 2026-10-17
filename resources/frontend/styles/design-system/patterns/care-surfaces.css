@@ -1,0 +1,1172 @@
+/* Shared light surfaces for Mi turno and clinical capture. State colors remain authoritative. */
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-nursing-dashboard, .rm-resident-directory, .rm-resident-directory__register-modal, .rm-clinical-form-modal,
+    .rm-clinical-form-drawer, .rm-clinical-form, .rm-signos, .rm-dolor, .rm-ingesta,
+    .rm-hidratacion, .rm-eliminacion, .rm-movilidad, .rm-wound, .rm-conducta, .rm-cognicion
+) {
+    --rm-surface: var(--rm-capture-card);
+    --rm-surface-main: var(--rm-capture-panel);
+    --rm-surface-soft: var(--rm-capture-soft);
+    --rm-surface-raised: var(--rm-capture-input);
+    --rm-surface-alt: var(--rm-capture-soft);
+    --rm-surface-muted: var(--rm-capture-soft);
+    --rm-card-bg: var(--rm-capture-card);
+    --rm-card-shadow: var(--rm-capture-elevation);
+    --rm-modal-bg: var(--rm-capture-panel);
+    --rm-input-bg: var(--rm-capture-input);
+    --rm-input-text: var(--rm-capture-ink);
+    --rm-input-placeholder: var(--rm-capture-secondary);
+    --rm-text-primary: var(--rm-capture-ink);
+    --rm-text-title: var(--rm-capture-ink);
+    --rm-text-body: var(--rm-capture-ink);
+    --rm-text-secondary: var(--rm-capture-secondary);
+    --rm-text-muted: var(--rm-capture-secondary);
+    --rm-border-soft: var(--rm-capture-border);
+    --rm-border-strong: var(--rm-capture-border);
+    --rm-card-border: var(--rm-capture-border);
+    --rm-input-border: var(--rm-capture-border);
+    --rm-button-primary-bg: var(--rm-capture-action-bg);
+    --rm-button-primary-hover: var(--rm-capture-action-hover);
+    --rm-button-primary-text: var(--rm-capture-action-ink);
+    --rm-button-secondary-bg: color-mix(in srgb, var(--rm-mint-100) 70%, var(--rm-capture-input));
+    --rm-button-secondary-text: color-mix(in srgb, var(--rm-mint-700) 65%, var(--rm-capture-ink));
+    --rm-button-secondary-border: color-mix(in srgb, var(--rm-mint-700) 85%, transparent);
+    --rm-button-secondary-hover-bg: var(--rm-mint-100);
+    --rm-button-secondary-hover-border: var(--rm-mint-700);
+    --rm-border: var(--rm-capture-border);
+    --rm-wound-card: var(--rm-capture-card);
+    --rm-wound-border: var(--rm-capture-border);
+    --rm-wound-heading: var(--rm-capture-ink);
+    --conducta-ink: var(--rm-capture-ink);
+    --conducta-muted: var(--rm-capture-secondary);
+    --conducta-border: var(--rm-capture-border);
+    --rm-metric-accent-width: 0px;
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-resident-directory__register-modal, .rm-clinical-form-modal, .rm-clinical-form-drawer,
+    .rm-clinical-form, .rm-wound, .rm-conducta
+) :is(.rm-clinical-form__section:not(.rm-dolor__intensity), .rm-conducta__card, .rm-wound__section) {
+    background: var(--rm-capture-card);
+    border-color: var(--rm-capture-border);
+    box-shadow: var(--rm-capture-elevation);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-resident-directory .rm-person-entity-card {
+    background-color: var(--rm-capture-card);
+    box-shadow: var(--rm-capture-elevation);
+}
+/* Resident cards sit one level above the neutral workspace. */
+html:not(.dark):not([data-theme="dark"]) .rm-resident-directory .rm-resident-compact-card {
+    background: color-mix(in srgb, var(--rm-capture-input) 96%, transparent);
+    border-color: color-mix(in srgb, var(--rm-mint-700) 24%, var(--rm-capture-input));
+}
+html:not(.dark):not([data-theme="dark"]) .rm-resident-directory .rm-resident-compact-card .rm-resident-directory__avatar--initials {
+    background: var(--rm-mint-50);
+    color: var(--rm-mint-700);
+    border-color: var(--rm-mint-300);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-resident-directory .rm-resident-compact-card .rm-resident-directory__name {
+    color: color-mix(in srgb, var(--rm-capture-ink) 75%, var(--rm-mint-700));
+}
+html:not(.dark):not([data-theme="dark"]) .rm-resident-directory .rm-resident-compact-card .rm-resident-directory__open {
+    background: var(--rm-mint-100);
+    color: var(--rm-mint-700);
+    border-color: var(--rm-mint-300);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-resident-directory .rm-resident-compact-card .rm-resident-directory__open:hover {
+    background: var(--rm-mint-50);
+    border-color: var(--rm-mint-700);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-resident-directory .rm-resident-compact-card__alert:not(.has-alerts) {
+    color: var(--rm-mint-700) !important;
+}
+html:not(.dark):not([data-theme="dark"]) :is(.rm-dashboard-composition, .rm-nursing-dashboard) {
+    --rm-card-bg: var(--rm-capture-card);
+    --rm-card-shadow: var(--rm-capture-elevation);
+    --rm-dashboard-card-bg: var(--rm-capture-card);
+    --rm-dashboard-card-surface: var(--rm-capture-card);
+    --rm-dashboard-inset-surface: var(--rm-capture-input);
+    --rm-dashboard-surface-soft: var(--rm-capture-soft);
+    --rm-dashboard-header-bg: var(--rm-capture-panel);
+    --rm-dashboard-card-outline: var(--rm-capture-border);
+    --rm-dashboard-card-border: var(--rm-capture-border);
+    --rm-dashboard-card-shadow: var(--rm-capture-elevation);
+    --rm-dashboard-text: var(--rm-capture-ink);
+    --rm-dashboard-text-secondary: var(--rm-capture-secondary);
+    --rm-dashboard-text-muted: var(--rm-capture-secondary);
+    --rm-dashboard-heading-coffee: var(--rm-capture-ink);
+    --rm-dashboard-heading-mint: var(--rm-mint-700);
+    --rm-dashboard-heading-ink: var(--rm-capture-ink);
+    --rm-chart-surface-bg: var(--rm-capture-card);
+    --rm-chart-surface-bg-soft: var(--rm-capture-input);
+    --rm-chart-surface-border: var(--rm-capture-border);
+    --rm-chart-card-bg: var(--rm-capture-card);
+    --rm-chart-card-glass: var(--rm-capture-input);
+    --rm-chart-card-border: var(--rm-capture-border);
+}
+html:not(.dark):not([data-theme="dark"]) :is(.rm-dashboard-composition, .rm-nursing-dashboard) > .rm-dashboard-header {
+    --rm-dashboard-header-bg: var(--rm-capture-card-solid);
+    --rm-header-bg: var(--rm-capture-card);
+    --rm-header-text: var(--rm-capture-ink);
+    --rm-header-secondary: var(--rm-capture-secondary);
+    --rm-header-muted: var(--rm-capture-secondary);
+    --rm-header-surface: color-mix(in srgb, var(--rm-capture-input) 65%, var(--rm-palette-page));
+    --rm-dashboard-surface-soft: var(--rm-header-surface);
+    --rm-header-accent: var(--rm-mint-500);
+    --rm-dashboard-sage-600: var(--rm-mint-500);
+    --rm-dashboard-sage-700: color-mix(in srgb, var(--rm-mint-700) 65%, var(--rm-capture-ink));
+    --rm-dashboard-sage-100: var(--rm-mint-100);
+    box-shadow: var(--rm-capture-elevation);
+}
+
+/* Surface contrast belongs to the workspace, without repainting semantic states. */
+html:not(.dark):not([data-theme="dark"]) :is(.rm-nursing-shell, .rm-shell[data-role="nursing"]):has(:is(.rm-nursing-dashboard, .rm-resident-directory)) {
+    --rm-bg-app: var(--rm-capture-panel);
+    --rm-dashboard-app-bg: var(--rm-capture-panel);
+}
+html:not(.dark):not([data-theme="dark"]) :is(.rm-nursing-shell, .rm-shell[data-role="nursing"]) :is(main, [data-rm-main]):has(:is(.rm-nursing-dashboard, .rm-resident-directory)) {
+    background-color: var(--rm-capture-panel);
+    background-image: var(--rm-workspace-pattern);
+    background-size: var(--rm-workspace-pattern-size);
+    background-attachment: scroll;
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-resident-directory__register-modal, .rm-clinical-form-modal, .rm-conducta, .rm-wound
+) .rm-modal-panel {
+    background-image: var(--rm-capture-pattern);
+    background-size: var(--rm-capture-pattern-size);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard :is(.rm-nursing-dashboard__schedule, .rm-nursing-dashboard__notes) .rm-section-header__icon {
+    background: var(--rm-blue-clinical-100);
+    color: var(--rm-blue-clinical-700);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-nursing-dashboard :is(.rm-nursing-dashboard__controls, .rm-nursing-dashboard__patients, .rm-nursing-dashboard__tasks) .rm-section-header__icon {
+    background: var(--rm-mint-100);
+    color: var(--rm-mint-700);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-conducta__module-icon {
+    background: var(--rm-violet-200);
+    color: var(--rm-violet-700);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-conducta__evolution-trigger {
+    --rm-button-secondary-bg: var(--rm-blue-clinical-100);
+    --rm-button-secondary-text: var(--rm-blue-clinical-700);
+    --rm-button-secondary-hover-bg: var(--rm-sky-100);
+}
+/* Normalize older button declarations through the canonical tokens in this workspace. */
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-nursing-dashboard, .rm-resident-directory, .rm-clinical-form-modal,
+    .rm-clinical-form-drawer, .rm-clinical-form, .rm-conducta, .rm-wound
+) .rm-btn-secondary {
+    background: var(--rm-button-secondary-bg);
+    color: var(--rm-button-secondary-text);
+    border-color: var(--rm-button-secondary-border);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-nursing-dashboard, .rm-resident-directory, .rm-clinical-form-modal,
+    .rm-clinical-form-drawer, .rm-clinical-form, .rm-conducta, .rm-wound
+) .rm-btn-secondary:hover:not(:disabled) {
+    background: var(--rm-button-secondary-hover-bg);
+    color: var(--rm-button-secondary-text);
+    border-color: var(--rm-button-secondary-hover-border);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-nursing-dashboard, .rm-resident-directory, .rm-clinical-form-modal,
+    .rm-clinical-form-drawer, .rm-clinical-form, .rm-conducta, .rm-wound
+) .rm-btn-primary {
+    --rm-button-primary-bg: var(--rm-capture-action-bg);
+    --rm-button-primary-hover: var(--rm-capture-action-hover);
+    --rm-button-primary-active: var(--rm-capture-action-hover);
+    --rm-button-primary-text: var(--rm-capture-action-ink);
+    background: var(--rm-button-primary-bg);
+    color: var(--rm-button-primary-text);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-nursing-dashboard, .rm-resident-directory, .rm-clinical-form-modal,
+    .rm-clinical-form-drawer, .rm-clinical-form, .rm-conducta, .rm-wound
+) .rm-btn-primary:hover:not(:disabled) {
+    background: var(--rm-button-primary-hover);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-conducta__card:has(.rm-conducta__indicators) > header > b {
+    background: var(--rm-violet-700);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-conducta__card:has(.rm-conducta__chips[data-tone="context"]) > header > b,
+html:not(.dark):not([data-theme="dark"]) .rm-conducta__response-heading > b {
+    background: var(--rm-blue-clinical-700);
+}
+
+/* Clinical capture hierarchy: warm sections, distinct fields and preserved state palettes. */
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-clinical-form-drawer, .rm-clinical-form,
+    .rm-signos, .rm-dolor, .rm-ingesta, .rm-hidratacion, .rm-eliminacion,
+    .rm-movilidad, .rm-wound, .rm-conducta, .rm-cognicion
+) {
+    --rm-surface: var(--rm-capture-section);
+    --rm-font-body: var(--rm-capture-font);
+    --rm-font-family: var(--rm-capture-font);
+    --rm-font-display: var(--rm-capture-font);
+    --rm-font-title: var(--rm-capture-font);
+    --rm-font-heading: var(--rm-capture-font);
+    --rm-font-emphasis: var(--rm-capture-font);
+    --rm-capture-accent: var(--rm-mint-700);
+    --rm-capture-accent-soft: var(--rm-mint-50);
+    --rm-surface-raised: var(--rm-capture-field);
+    --rm-card-bg: var(--rm-capture-section);
+    --rm-card-shadow: var(--rm-shadow-none);
+    --rm-input-bg: var(--rm-capture-field);
+    --rm-input-border: var(--rm-capture-field-border);
+    --rm-border: var(--rm-capture-section-border);
+    --rm-border-soft: var(--rm-capture-section-border);
+    --rm-border-strong: var(--rm-capture-field-border);
+    --rm-wound-card: var(--rm-capture-section);
+    --rm-wound-border: var(--rm-capture-section-border);
+    --conducta-border: var(--rm-capture-section-border);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-clinical-form-drawer, .rm-clinical-form,
+    .rm-signos, .rm-dolor, .rm-ingesta, .rm-hidratacion, .rm-eliminacion,
+    .rm-movilidad, .rm-wound, .rm-conducta, .rm-cognicion
+) :is(
+    .rm-clinical-form__section:not(.rm-dolor__intensity), .rm-form-section,
+    .rm-conducta__card, .rm-cognicion__card, .rm-wound__section, .rm-wound__side-card,
+    .rm-wound__initial-section, .rm-wound__photo-section,
+    .rm-movilidad__section, .rm-eliminacion__section:not([data-attention="true"])
+) {
+    background: var(--rm-capture-section-glass);
+    border-radius: var(--rm-radius-card);
+    border-color: var(--rm-capture-section-rim);
+    box-shadow: var(--rm-capture-box-shadow);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-signos__card[data-tone="neutral"] {
+    background: var(--rm-capture-section-glass);
+    box-shadow: var(--rm-capture-box-shadow);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-cognicion :is(.rm-cognicion__field, .rm-cognicion__signal) {
+    background: var(--rm-capture-field);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-clinical-form-drawer, .rm-clinical-form,
+    .rm-dolor, .rm-ingesta, .rm-hidratacion, .rm-eliminacion,
+    .rm-movilidad, .rm-wound, .rm-conducta, .rm-cognicion
+) :is(.rm-input, .rm-select, .rm-textarea):not(.rm-signos *):not([aria-invalid="true"]):not(:focus) {
+    background-color: var(--rm-capture-field);
+    border-color: var(--rm-capture-field-border);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-signos__card[data-tone="neutral"]:not(.rm-signos__card--evaluating) .rm-signos__field:not(.rm-signos__field--invalid) .rm-signos__input-wrap:not(:focus-within) {
+    background: var(--rm-capture-field);
+    border-color: var(--rm-capture-field-border);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-clinical-form-drawer, .rm-clinical-form,
+    .rm-signos, .rm-dolor, .rm-ingesta, .rm-hidratacion, .rm-eliminacion,
+    .rm-movilidad, .rm-wound, .rm-conducta, .rm-cognicion
+) :is(.rm-label, .rm-field-label, label) {
+    color: var(--rm-capture-ink);
+    font-size: var(--rm-font-size-table);
+    font-weight: var(--rm-font-weight-bold);
+    line-height: 1.4;
+}
+
+/* One clinical typography and geometry contract, after module declarations.
+   State backgrounds/borders and popup sizing remain owned by each workflow. */
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-clinical-form-drawer, .rm-clinical-form,
+    .rm-signos, .rm-dolor, .rm-ingesta, .rm-hidratacion, .rm-eliminacion,
+    .rm-movilidad, .rm-wound, .rm-conducta, .rm-cognicion
+) {
+    font-family: var(--rm-capture-font);
+    font-size: var(--rm-font-size-body);
+    line-height: var(--rm-line-height-body);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-clinical-form-drawer, .rm-clinical-form,
+    .rm-signos, .rm-dolor, .rm-ingesta, .rm-hidratacion, .rm-eliminacion,
+    .rm-movilidad, .rm-wound, .rm-conducta, .rm-cognicion
+) :is(button, input, select, textarea, label, legend, h2, h3, h4, h5, h6,
+    .rm-modal-panel__title, .rm-help, .rm-field-label) {
+    font-family: var(--rm-capture-font);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-clinical-form-drawer, .rm-clinical-form,
+    .rm-signos, .rm-dolor, .rm-ingesta, .rm-hidratacion, .rm-eliminacion,
+    .rm-movilidad, .rm-wound, .rm-conducta, .rm-cognicion
+) :is(.rm-input, .rm-select, .rm-textarea, .rm-btn, .rm-btn-primary, .rm-btn-secondary) {
+    border-radius: var(--rm-radius-input);
+    font-size: var(--rm-font-size-body);
+    line-height: var(--rm-line-height-body);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-clinical-form-drawer, .rm-clinical-form,
+    .rm-signos, .rm-dolor, .rm-ingesta, .rm-hidratacion, .rm-eliminacion,
+    .rm-movilidad, .rm-wound, .rm-conducta, .rm-cognicion
+) :is(.rm-label, .rm-field-label) {
+    font-size: var(--rm-font-size-body);
+    line-height: var(--rm-line-height-title);
+    letter-spacing: var(--rm-letter-spacing-normal);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-clinical-form-drawer,
+    .rm-conducta__modal, .rm-cognicion__modal,
+    .rm-resident-directory__register-modal--signos,
+    .rm-resident-directory__register-modal--movilidad
+) .rm-modal-panel__title {
+    font-family: var(--rm-capture-font);
+    font-size: var(--rm-capture-title-size);
+    font-weight: var(--rm-font-weight-extrabold);
+    line-height: var(--rm-line-height-title);
+    letter-spacing: var(--rm-letter-spacing-tight);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-conducta__modal, .rm-cognicion__modal,
+    .rm-resident-directory__register-modal--signos,
+    .rm-resident-directory__register-modal--movilidad
+) .rm-modal-panel {
+    border-radius: var(--rm-radius-modal);
+    background-color: var(--rm-capture-section);
+    background-image: none;
+    box-shadow: var(--rm-shadow-md);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-conducta__modal, .rm-cognicion__modal,
+    .rm-resident-directory__register-modal--signos,
+    .rm-resident-directory__register-modal--movilidad
+) .rm-modal-header {
+    background: var(--rm-capture-glass-header-solid);
+    border-bottom-color: var(--rm-capture-section-border);
+}
+html:not(.dark):not([data-theme="dark"]) :is(.rm-signos, .rm-movilidad) {
+    --rm-capture-accent: var(--rm-blue-clinical-700);
+    --rm-capture-accent-soft: var(--rm-blue-clinical-100);
+}
+html:not(.dark):not([data-theme="dark"]) :is(.rm-conducta, .rm-cognicion) {
+    --rm-capture-accent: var(--rm-violet-700);
+    --rm-capture-accent-soft: var(--rm-violet-200);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-conducta__card > header, .rm-cognicion__card > header,
+    .rm-cognicion__section > summary,
+    .rm-wound__section > header, .rm-wound__side-card > header,
+    .rm-wound__initial-section > header, .rm-wound__photo-section > header
+) {
+    padding: var(--rm-space-2) var(--rm-space-3);
+    border-radius: var(--rm-radius-sm);
+    background: color-mix(in srgb, var(--rm-action-primary-soft) 44%, var(--rm-capture-section));
+    box-shadow: var(--rm-shadow-xs), inset 0 1px 0 var(--rm-capture-section-rim);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-conducta__card > header h3, .rm-cognicion__card > header h3,
+    .rm-cognicion__section > summary h3,
+    .rm-wound__section > header h3, .rm-wound__side-card > header h3,
+    .rm-wound__initial-section > header h3, .rm-wound__photo-section > header h3,
+    .rm-wound__section-heading h4,
+    .rm-movilidad__section > h4, .rm-eliminacion__section > h4,
+    .rm-signos__card-header h5, .rm-form-section-title,
+    .rm-clinical-form__section > legend
+) {
+    font-size: var(--rm-font-size-card);
+    font-weight: var(--rm-font-weight-extrabold);
+    line-height: var(--rm-line-height-title);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-conducta__indicator, .rm-cognicion__field, .rm-cognicion__signal
+) {
+    border-radius: var(--rm-radius-md);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-conducta__tri span, .rm-conducta__chips button,
+    .rm-cognicion__segmented span, .rm-movilidad__choices button,
+    .rm-clinical-form__scale-option span
+) {
+    border-radius: var(--rm-radius-button);
+    font-family: var(--rm-capture-font);
+    font-size: var(--rm-font-size-meta);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-signos__card, .rm-dolor__intensity,
+    .rm-eliminacion__section[data-attention="true"]
+) {
+    border-radius: var(--rm-radius-card);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-conducta__module-icon, .rm-cognicion__icon,
+    .rm-ingesta__header-icon, .rm-hidratacion__header-icon,
+    .rm-clinical-form__icon
+) {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: var(--rm-radius-md);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-conducta__card > header > b,
+    .rm-cognicion__section > summary > b,
+    .rm-wound__section-heading > .rm-wound__section-number,
+    .rm-movilidad__section > h4 > b
+) {
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    border-radius: var(--rm-radius-sm);
+    font-size: var(--rm-font-size-card);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-clinical-form-drawer, .rm-clinical-form,
+    .rm-signos, .rm-dolor, .rm-ingesta, .rm-hidratacion, .rm-eliminacion,
+    .rm-movilidad, .rm-wound, .rm-conducta, .rm-cognicion
+) .rm-help {
+    font-size: var(--rm-font-size-meta);
+    line-height: var(--rm-line-height-body);
+}
+
+/* Flat capture surfaces; frosted chrome carries the floating-layer feedback.
+   Keep blur off fields and long record lists, and off the panel containing popups. */
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-clinical-form-drawer, .rm-clinical-form,
+    .rm-signos, .rm-dolor, .rm-ingesta, .rm-hidratacion, .rm-eliminacion,
+    .rm-movilidad, .rm-wound, .rm-conducta, .rm-cognicion
+) :is(.rm-btn-primary, .rm-btn-secondary):not(:focus-visible) {
+    box-shadow: var(--rm-shadow-none);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-clinical-form-drawer :is(.rm-drawer-header, .rm-drawer-footer) {
+    background: var(--rm-capture-glass-header-solid);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    html:not(.dark):not([data-theme="dark"]) :is(
+        .rm-clinical-form-modal, .rm-conducta__modal, .rm-cognicion__modal,
+        .rm-resident-directory__register-modal--signos,
+        .rm-resident-directory__register-modal--movilidad
+    ) .rm-modal-panel {
+        background-color: var(--rm-capture-glass-bg);
+    }
+    html:not(.dark):not([data-theme="dark"]) :is(
+        .rm-clinical-form-modal, .rm-conducta__modal, .rm-cognicion__modal,
+        .rm-resident-directory__register-modal--signos,
+        .rm-resident-directory__register-modal--movilidad
+    ) :is(.rm-modal-header, .rm-modal-footer),
+    html:not(.dark):not([data-theme="dark"]) .rm-clinical-form-drawer :is(.rm-drawer-header, .rm-drawer-footer) {
+        background: var(--rm-capture-glass-header);
+        -webkit-backdrop-filter: blur(var(--rm-capture-glass-blur));
+        backdrop-filter: blur(var(--rm-capture-glass-blur));
+    }
+}
+
+/* Clinical masthead: identity first, legible provenance, consistent controls.
+   Existing grids and mobile disclosures keep each workflow's available context. */
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-resident-directory__register-modal--form,
+    .rm-resident-directory__register-modal--signos, .rm-conducta__modal, .rm-cognicion__modal
+) :is(.rm-modal-panel__title > i, .rm-clinical-form__icon, .rm-conducta__module-icon, .rm-cognicion__icon) {
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--rm-radius-md);
+    font-size: var(--rm-font-size-page);
+}
+
+/* Shared floating clinical windows, including native popovers in the top layer.
+   Keep positioning, drag/resize edges, data and clinical state colors untouched. */
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-signos__graph-popup, .rm-conducta__history-panel, .rm-cognicion__history-panel,
+    .rm-wound__history-overlay > .rm-wound__viewer-panel
+) {
+    --rm-font-body: var(--rm-capture-font);
+    --rm-text-primary: var(--rm-capture-ink);
+    --rm-text-secondary: var(--rm-capture-secondary);
+    --rm-text-muted: var(--rm-capture-secondary);
+    --rm-surface-main: var(--rm-capture-section);
+    --rm-surface-soft: var(--rm-capture-field);
+    --rm-surface-raised: var(--rm-capture-field);
+    --rm-border-soft: var(--rm-capture-section-border);
+    background: var(--rm-capture-section);
+    color: var(--rm-capture-ink);
+    border: 1px solid var(--rm-capture-section-border);
+    border-radius: var(--rm-radius-modal);
+    box-shadow: var(--rm-shadow-md);
+    font: var(--rm-font-weight-regular) var(--rm-font-size-body)/var(--rm-line-height-body) var(--rm-capture-font);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-signos__graph-popup-body {
+    margin-inline: 0;
+    padding: var(--rm-space-4);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-signos__graph-popup-header, .rm-signos__graph-popup-tools,
+    .rm-conducta__history-panel > header, .rm-cognicion__history-panel > header,
+    .rm-wound__history-overlay > .rm-wound__viewer-panel > header
+) {
+    background: var(--rm-capture-glass-header-solid);
+    padding: var(--rm-space-3) var(--rm-space-4);
+    gap: var(--rm-space-3);
+    align-items: center;
+    border-color: var(--rm-capture-section-border);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-conducta__history-panel > header, .rm-cognicion__history-panel > header,
+    .rm-wound__history-overlay > .rm-wound__viewer-panel > header
+) {
+    border-radius: var(--rm-radius-md);
+    border: 1px solid var(--rm-capture-section-border);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-signos__graph-popup-header :is(h3, h5),
+    .rm-conducta__history-panel > header h3, .rm-cognicion__history-panel > header h3,
+    .rm-wound__history-overlay > .rm-wound__viewer-panel > header h3
+) {
+    font: var(--rm-font-weight-extrabold) calc(var(--rm-font-size-section) + 2px)/var(--rm-line-height-title) var(--rm-capture-font);
+    color: var(--rm-capture-ink);
+    letter-spacing: var(--rm-letter-spacing-tight);
+    overflow-wrap: anywhere;
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-signos__graph-popup-header p,
+    .rm-conducta__history-panel > header p, .rm-cognicion__history-panel > header p,
+    .rm-wound__history-overlay > .rm-wound__viewer-panel > header p
+) {
+    font: var(--rm-font-weight-medium) var(--rm-font-size-body)/var(--rm-line-height-body) var(--rm-capture-font);
+    color: var(--rm-capture-secondary);
+    overflow-wrap: anywhere;
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-signos__graph-popup-header, .rm-signos__graph-popup-tools,
+    .rm-conducta__history-panel > header, .rm-cognicion__history-panel > header,
+    .rm-wound__history-overlay > .rm-wound__viewer-panel > header
+) button {
+    min-width: 44px;
+    min-height: 44px;
+    flex-shrink: 0;
+    border-radius: var(--rm-radius-button);
+    border: 1px solid var(--rm-capture-section-border);
+    background: var(--rm-capture-field);
+    color: var(--rm-capture-ink);
+    box-shadow: var(--rm-shadow-none);
+    font-family: var(--rm-capture-font);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-signos__graph-popup-header, .rm-signos__graph-popup-tools,
+    .rm-conducta__history-panel > header, .rm-cognicion__history-panel > header,
+    .rm-wound__history-overlay > .rm-wound__viewer-panel > header
+) button:hover:not(:disabled) {
+    background: var(--rm-mint-100);
+    color: var(--rm-mint-700);
+    border-color: var(--rm-mint-700);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-signos__graph-popup-tools {
+    flex-wrap: wrap;
+    gap: var(--rm-space-2);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-signos__graph-popup-tools > span {
+    min-width: 0;
+    font-size: var(--rm-font-size-meta);
+    overflow-wrap: anywhere;
+}
+html:not(.dark):not([data-theme="dark"]) .rm-signos__graph-popup :is(
+    .rm-signos__visual-metrics > div, .rm-signos__point-detail
+) {
+    border-radius: var(--rm-radius-card);
+    background: var(--rm-capture-field);
+    border-color: var(--rm-capture-section-border);
+    box-shadow: var(--rm-shadow-none);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-signos__graph-popup :is(
+    .rm-signos__visual-heading h6, .rm-signos__trend-titles h5
+) {
+    font: var(--rm-font-weight-extrabold) var(--rm-font-size-section)/var(--rm-line-height-title) var(--rm-capture-font);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-signos__graph-popup :is(
+    .rm-signos__chart-summary, .rm-signos__visual .rm-signos__chart-legend,
+    .rm-signos__visual .rm-signos__chart-detail
+) {
+    font-size: var(--rm-font-size-body);
+    line-height: var(--rm-line-height-body);
+}
+/* Reading rhythm: controls, saved/current comparison, plot and point detail. */
+html:not(.dark):not([data-theme="dark"]) .rm-signos__graph-popup :is(
+    .rm-cognicion__filters, .rm-signos__visual-metrics, .rm-cognicion__comparison,
+    .rm-dolor__comparison
+) {
+    gap: var(--rm-space-3);
+    margin-block: var(--rm-space-3);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-signos__graph-popup .rm-cognicion__filters,
+    .rm-cognicion__history-panel > .rm-cognicion__filters
+) {
+    padding: var(--rm-space-3);
+    border: 1px solid var(--rm-capture-section-border);
+    border-radius: var(--rm-radius-card);
+    background: color-mix(in srgb, var(--rm-blue-clinical-100) 38%, var(--rm-capture-section));
+}
+html:not(.dark):not([data-theme="dark"]) .rm-signos__graph-popup :is(
+    .rm-label, .rm-cognicion__filters label, .rm-signos__visual-metrics > div > span:first-child
+) {
+    font-size: var(--rm-font-size-body);
+    font-weight: var(--rm-font-weight-bold);
+    line-height: var(--rm-line-height-title);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-signos__graph-popup .rm-cognicion__filters select {
+    margin-top: var(--rm-space-2);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-signos__graph-popup :is(
+    .rm-signos__visual-metrics > div, .rm-cognicion__comparison > .rm-cognicion__card,
+    .rm-dolor__comparison:not(.rm-dolor__comparison--three) > div
+) {
+    padding: var(--rm-space-3);
+    border: 1px solid var(--rm-capture-section-border);
+    border-radius: var(--rm-radius-card);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-signos__graph-popup :is(
+    .rm-signos__visual-metrics > div:first-child, .rm-cognicion__comparison > .rm-cognicion__card:first-child,
+    .rm-dolor__comparison:not(.rm-dolor__comparison--three) > div:first-child
+) {
+    background: color-mix(in srgb, var(--rm-sky-50) 65%, var(--rm-capture-section));
+}
+html:not(.dark):not([data-theme="dark"]) .rm-signos__graph-popup :is(
+    .rm-signos__visual-metrics > div:nth-child(2), .rm-cognicion__comparison > .rm-cognicion__card:nth-child(2),
+    .rm-dolor__comparison:not(.rm-dolor__comparison--three) > div:nth-child(2)
+) {
+    background: color-mix(in srgb, var(--rm-violet-200) 35%, var(--rm-capture-section));
+}
+html:not(.dark):not([data-theme="dark"]) .rm-signos__graph-popup .rm-signos__visual-metrics strong {
+    font-size: var(--rm-font-size-dashboard);
+    font-weight: var(--rm-font-weight-extrabold);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-signos__graph-popup :is(
+    .rm-signos__visual-metrics small, .rm-cognicion__comparison p,
+    .rm-cognicion__comparison small, .rm-help, .rm-clinical-form__note,
+    .rm-conducta__help, .rm-conducta__chart-purpose
+) {
+    font-size: calc(var(--rm-font-size-meta) + 1px);
+    line-height: var(--rm-line-height-body);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-signos__graph-popup :is(
+    .rm-cognicion__evolution > h4, .rm-conducta__evolution > header h3
+) {
+    font-size: var(--rm-font-size-section);
+    font-weight: var(--rm-font-weight-extrabold);
+    margin-block: var(--rm-space-3) var(--rm-space-1);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-signos__graph-popup :is(
+    .rm-signos__point-detail, .rm-conducta__chart-readout
+) {
+    padding: var(--rm-space-3);
+    margin-top: var(--rm-space-3);
+    background: var(--rm-mint-50);
+    border-color: var(--rm-mint-300);
+    border-radius: var(--rm-radius-card);
+    font-size: var(--rm-font-size-body);
+    line-height: var(--rm-line-height-body);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    html:not(.dark):not([data-theme="dark"]) :is(
+        .rm-signos__graph-popup-header, .rm-signos__graph-popup-tools,
+        .rm-conducta__history-panel > header, .rm-cognicion__history-panel > header,
+        .rm-wound__history-overlay > .rm-wound__viewer-panel > header
+    ) {
+        background: var(--rm-capture-glass-header);
+        -webkit-backdrop-filter: blur(var(--rm-capture-glass-blur));
+        backdrop-filter: blur(var(--rm-capture-glass-blur));
+    }
+}
+@media (max-width: 600px) {
+    :is(.rm-clinical-form-modal, .rm-clinical-form-drawer, .rm-resident-directory__register-modal--form, .rm-resident-directory__register-modal--signos, .rm-conducta__modal, .rm-cognicion__modal) .rm-modal-footer .rm-btn {
+        padding-inline: var(--rm-space-2);
+        min-height: var(--rm-control-lg);
+    }
+    html:not(.dark):not([data-theme="dark"]) :is(
+        .rm-signos__graph-popup-header, .rm-signos__graph-popup-tools,
+        .rm-signos__graph-popup-body
+    ) {
+        padding: var(--rm-space-3);
+        gap: var(--rm-space-2);
+    }
+    html:not(.dark):not([data-theme="dark"]) .rm-signos__graph-popup-tools > span {
+        flex-basis: 100%;
+    }
+    html:not(.dark):not([data-theme="dark"]) .rm-signos__graph-popup-header :is(h3, h5) {
+        font-size: var(--rm-font-size-section);
+    }
+    html:not(.dark):not([data-theme="dark"]) .rm-signos__graph-popup :is(.rm-signos__graph-popup-header, .rm-signos__graph-popup-tools) {
+        padding: var(--rm-space-2) var(--rm-space-3);
+    }
+    html:not(.dark):not([data-theme="dark"]) .rm-conducta__graph-popup .rm-conducta__line-chart {
+        margin-block: var(--rm-space-4) var(--rm-space-6);
+    }
+    html:not(.dark):not([data-theme="dark"]) .rm-conducta__graph-popup .rm-conducta__line-plot {
+        height: 160px;
+    }
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-resident-directory__register-modal--form,
+    .rm-resident-directory__register-modal--signos
+) .rm-modal-panel__title > i {
+    color: var(--rm-mint-700);
+    background: var(--rm-mint-50);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-resident-directory__register-modal--form,
+    .rm-resident-directory__register-modal--signos, .rm-conducta__modal, .rm-cognicion__modal
+) .rm-modal-header {
+    height: auto;
+    min-height: 80px;
+    max-height: none;
+    padding: var(--rm-space-3) var(--rm-space-4);
+    gap: var(--rm-space-3);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-resident-directory__register-modal--form,
+    .rm-resident-directory__register-modal--signos, .rm-conducta__modal, .rm-cognicion__modal
+) .rm-modal-header__heading {
+    align-items: center;
+    gap: var(--rm-space-3);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-resident-directory__register-modal--form,
+    .rm-resident-directory__register-modal--signos, .rm-conducta__modal, .rm-cognicion__modal
+) .rm-modal-header__heading > div > p {
+    font: var(--rm-font-weight-medium) var(--rm-font-size-body)/var(--rm-line-height-body) var(--rm-capture-font);
+    color: var(--rm-capture-secondary);
+    margin-top: var(--rm-space-1);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-resident-directory__register-modal--form,
+    .rm-resident-directory__register-modal--signos, .rm-conducta__modal, .rm-cognicion__modal
+) :is(.rm-modal-panel__back, .rm-modal-panel__close, .rm-modal-panel__drag-handle) {
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: var(--rm-radius-button);
+    background: var(--rm-capture-field);
+    border: 1px solid var(--rm-capture-section-border);
+    color: var(--rm-capture-ink);
+    box-shadow: var(--rm-shadow-none);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-resident-directory__register-modal--form,
+    .rm-resident-directory__register-modal--signos, .rm-conducta__modal, .rm-cognicion__modal
+) .rm-modal-context {
+    padding: var(--rm-space-3) var(--rm-space-4);
+    background: transparent;
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-resident-directory__register-modal--form,
+    .rm-resident-directory__register-modal--signos, .rm-conducta__modal, .rm-cognicion__modal
+) :is(.rm-resident-directory__register-context, .rm-conducta__context, .rm-cognicion__context, .rm-wound__resident-context) {
+    height: auto;
+    max-height: none;
+    min-height: 88px;
+    padding: var(--rm-space-3) var(--rm-space-4);
+    border: 1px solid var(--rm-capture-section-border);
+    border-radius: var(--rm-radius-card);
+    background: var(--rm-capture-field);
+    box-shadow: var(--rm-shadow-none);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-resident-directory__register-context, .rm-conducta__context,
+    .rm-cognicion__context, .rm-wound__resident-context
+) :is(strong, small, span) {
+    overflow-wrap: anywhere;
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-resident-directory__register-context, .rm-conducta__context,
+    .rm-cognicion__context, .rm-wound__resident-context
+) strong {
+    font: var(--rm-font-weight-bold) var(--rm-font-size-body)/var(--rm-line-height-title) var(--rm-capture-font);
+    color: var(--rm-capture-ink);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-resident-directory__register-identity, .rm-conducta__identity,
+    .rm-cognicion__context > div:first-child, .rm-wound__resident
+) strong {
+    font-size: var(--rm-capture-resident-size);
+    font-weight: var(--rm-font-weight-extrabold);
+    letter-spacing: var(--rm-letter-spacing-tight);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-resident-directory__register-identity > span,
+    .rm-conducta__identity > small, .rm-cognicion__context small,
+    .rm-wound__resident > span, .rm-wound__context-item small,
+    .rm-clinical-form__personnel > span, .rm-signos__resident-meta small
+) {
+    font-size: var(--rm-font-size-body);
+    line-height: var(--rm-line-height-body);
+    color: var(--rm-capture-secondary);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-signos__resident-meta > div > span, .rm-signos__resident-label,
+    .rm-conducta__context > div:not(.rm-conducta__identity) > span,
+    .rm-wound__context-item > div > span
+) {
+    font-size: var(--rm-font-size-meta);
+    font-weight: var(--rm-font-weight-semibold);
+    line-height: var(--rm-line-height-body);
+    color: var(--rm-capture-secondary);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-resident-directory__register-modal--form,
+    .rm-resident-directory__register-modal--signos, .rm-conducta__modal, .rm-cognicion__modal
+) :is(.rm-resident-directory__register-avatar, .rm-conducta__avatar, .rm-cognicion__avatar, .rm-wound__avatar) {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    font-size: var(--rm-font-size-section);
+    font-weight: var(--rm-font-weight-extrabold);
+}
+/* Depth replaces colored edge strips. Clinical text, badges and input states
+   still carry the domain meaning; neutral cards do not acquire a severity. */
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-clinical-form-drawer, .rm-clinical-form,
+    .rm-signos, .rm-dolor, .rm-ingesta, .rm-hidratacion, .rm-eliminacion,
+    .rm-movilidad, .rm-wound, .rm-conducta, .rm-cognicion, .rm-signos__graph-popup
+) :is(
+    .rm-signos__card, .rm-dolor__intensity, .rm-alert, .rm-ingesta__notice,
+    .rm-wound__entry-notice, .rm-free-text-select__custom
+) {
+    border-left-width: 1px;
+    border-inline-start-width: 1px;
+    border-left-color: var(--rm-capture-section-rim);
+    border-inline-start-color: var(--rm-capture-section-rim);
+    box-shadow: var(--rm-capture-box-shadow);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-resident-directory__register-context, .rm-conducta__context,
+    .rm-cognicion__context, .rm-wound__resident-context,
+    .rm-signos__graph-popup .rm-signos__visual-metrics > div,
+    .rm-signos__graph-popup .rm-cognicion__comparison > .rm-cognicion__card,
+    .rm-signos__graph-popup .rm-dolor__comparison:not(.rm-dolor__comparison--three) > div
+) {
+    border-color: var(--rm-capture-section-rim);
+    box-shadow: var(--rm-capture-box-shadow);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-resident-directory__register-context, .rm-conducta__context,
+    .rm-cognicion__context, .rm-wound__resident-context
+) {
+    background: var(--rm-capture-section-glass);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-cognicion__domains > div {
+    border-inline-start: 0;
+}
+/* Supporting information stays quieter than the capture sections. */
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-cognicion__orientation .rm-cognicion__card,
+    .rm-medication__medication, .rm-medication__safety
+) {
+    background: color-mix(in srgb, var(--rm-capture-section) 88%, var(--rm-sky-50));
+    box-shadow: var(--rm-shadow-sm);
+}
+html:not(.dark):not([data-theme="dark"]) :is(.rm-cognicion__history-panel, .rm-conducta__history-panel) {
+    background: color-mix(in srgb, var(--rm-capture-section) 85%, var(--rm-sky-50));
+}
+.rm-eliminacion__other { margin-top: var(--rm-space-4); }
+.rm-clinical-form--generic { min-width: 0; }
+.rm-clinical-form--generic > .rm-clinical-form__section > .rm-section-header {
+    padding: var(--rm-space-3);
+    border-radius: var(--rm-radius-sm);
+    background: var(--rm-action-primary-soft);
+}
+.rm-clinical-form--generic :is(.rm-section-header__title, label) {
+    font-family: var(--rm-capture-font);
+    font-size: var(--rm-font-size-body);
+    line-height: var(--rm-line-height-body);
+}
+.rm-clinical-form--generic .rm-section-header__title { font-size: var(--rm-font-size-section); font-weight: 800; }
+.rm-clinical-form--generic :is(input,select,textarea) { max-width: 100%; min-width: 0; }
+.rm-clinical-form--generic :is(.rm-input,.rm-select,.rm-textarea) { display: block; margin-top: var(--rm-space-2); width: 100%; }
+html:not(.dark):not([data-theme="dark"]) .rm-clinical-form--generic {
+    padding: var(--rm-space-4);
+    border-radius: var(--rm-radius-card);
+    background: var(--rm-capture-workspace);
+    background-image: var(--rm-capture-pattern);
+    background-size: var(--rm-capture-pattern-size);
+}
+html:is(.dark,[data-theme="dark"]) .rm-pilot-enfermeria {
+    --rm-dashboard-card-bg: var(--rm-palette-petroleum-800);
+    --rm-surface: var(--rm-palette-petroleum-800);
+    --rm-surface-main: var(--rm-palette-petroleum-800);
+    --rm-surface-soft: var(--rm-palette-petroleum-900);
+    --rm-card-bg: var(--rm-palette-petroleum-800);
+    --rm-text-primary: var(--rm-palette-petroleum-text);
+    --rm-text-title: var(--rm-palette-petroleum-text);
+    --rm-text-secondary: var(--rm-palette-petroleum-secondary);
+    --rm-text-muted: var(--rm-palette-petroleum-secondary);
+}
+html:is(.dark,[data-theme="dark"]) .rm-clinical-form--generic > .rm-clinical-form__section {
+    background: var(--rm-palette-petroleum-800);
+    border-color: var(--rm-palette-petroleum-border);
+}
+.rm-clinical-form--generic label:has(input[type="checkbox"]) { min-height: 44px; }
+html:not(.dark):not([data-theme="dark"]) .rm-eliminacion :is(.rm-eliminacion__timeline li, .rm-eliminacion__recent li) {
+    border-left: 0;
+    border-radius: var(--rm-radius-card);
+}
+/* Layered capture workspace: canvas, elevated sections, inset field groups.
+   These surfaces do not own clinical state or change overlay positioning. */
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-resident-directory__register-modal--form,
+    .rm-resident-directory__register-modal--signos, .rm-conducta__modal, .rm-cognicion__modal
+) .rm-modal-body {
+    background: var(--rm-capture-workspace);
+    background-image: var(--rm-capture-pattern);
+    background-size: var(--rm-capture-pattern-size);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form, .rm-conducta__editable, .rm-conducta__continuity,
+    .rm-cognicion__editable, .rm-cognicion__orientation
+) {
+    gap: var(--rm-space-4);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-clinical-form-drawer, .rm-clinical-form,
+    .rm-signos, .rm-dolor, .rm-ingesta, .rm-hidratacion, .rm-eliminacion,
+    .rm-movilidad, .rm-wound, .rm-conducta, .rm-cognicion
+) :is(
+    .rm-clinical-form__section > legend, .rm-form-section-title,
+    .rm-movilidad__section > h4, .rm-eliminacion__section > legend
+) {
+    padding: var(--rm-space-2) var(--rm-space-3);
+    border-radius: var(--rm-radius-sm);
+    background: color-mix(in srgb, var(--rm-action-primary-soft) 44%, var(--rm-capture-section));
+    box-shadow: var(--rm-shadow-xs);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-conducta__modal, .rm-cognicion__modal, .rm-wound__modal
+) :is(
+    .rm-conducta__card > header h3, .rm-cognicion__card > header h3,
+    .rm-cognicion__section > summary h3, .rm-wound__section-heading h4
+) {
+    font-size: var(--rm-font-size-section);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-conducta__indicator:not([data-observed="true"]),
+    .rm-cognicion__field:not([data-answered="true"]), .rm-cognicion__signal
+) {
+    box-shadow: var(--rm-shadow-input), inset 0 1px 0 var(--rm-capture-section-rim);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-conducta__card > header > b, .rm-cognicion__card header > b,
+    .rm-cognicion__section > summary > b, .rm-wound__section-number
+) {
+    box-shadow: var(--rm-shadow-sm);
+}
+/* Complete the shared hierarchy for common capture and standalone medication. */
+html:not(.dark):not([data-theme="dark"]) .rm-medication {
+    --rm-font-body: var(--rm-capture-font);
+    --rm-font-family: var(--rm-capture-font);
+    --rm-surface: var(--rm-capture-section);
+    --rm-surface-main: var(--rm-capture-panel);
+    --rm-surface-soft: var(--rm-capture-field);
+    --rm-surface-raised: var(--rm-capture-field);
+    --rm-text-primary: var(--rm-capture-ink);
+    --rm-text-secondary: var(--rm-capture-secondary);
+    --rm-border-soft: var(--rm-capture-section-border);
+    --rm-input-bg: var(--rm-capture-field);
+    --rm-input-border: var(--rm-capture-field-border);
+    --rm-capture-accent-soft: var(--rm-mint-50);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-medication .rm-medication__context {
+    background: var(--rm-capture-section-glass);
+    border-color: var(--rm-capture-section-rim);
+    box-shadow: var(--rm-capture-box-shadow);
+}
+html:not(.dark):not([data-theme="dark"]) :is(.rm-medication, .rm-resident-directory__register-modal--form) :is(
+    .rm-input, .rm-select, .rm-textarea, .rm-label,
+    .rm-resident-directory__field > input, .rm-resident-directory__field > select,
+    .rm-resident-directory__field > textarea
+) {
+    font-family: var(--rm-capture-font);
+}
+html:not(.dark):not([data-theme="dark"]) :is(.rm-medication, .rm-resident-directory__register-modal--form) :is(
+    .rm-input, .rm-select, .rm-textarea,
+    .rm-resident-directory__field > input, .rm-resident-directory__field > select,
+    .rm-resident-directory__field > textarea
+):not([aria-invalid="true"]):not(.is-invalid):not(:focus):not(:disabled):not([readonly]) {
+    background-color: var(--rm-capture-field);
+    border-color: var(--rm-capture-field-border);
+}
+html:not(.dark):not([data-theme="dark"]) .rm-clinical-form-drawer .rm-drawer-body,
+html:not(.dark):not([data-theme="dark"]) .rm-medication .rm-modal-body,
+html:not(.dark):not([data-theme="dark"]) .rm-resident-directory__register-modal--form .rm-modal-body {
+    background: var(--rm-capture-workspace);
+    background-image: var(--rm-capture-pattern);
+    background-size: var(--rm-capture-pattern-size);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-clinical-form-drawer,
+    .rm-resident-directory__register-modal--form, .rm-medication
+) :is(
+    .rm-medication__section, .rm-resident-directory__form-section,
+    .rm-resident-directory__form-fields > .rm-resident-directory__form-grid
+) {
+    padding: var(--rm-space-4);
+    background: var(--rm-capture-section-glass);
+    border: 1px solid var(--rm-capture-section-rim);
+    border-radius: var(--rm-radius-card);
+    box-shadow: var(--rm-capture-box-shadow);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-clinical-form-drawer, .rm-clinical-form,
+    .rm-resident-directory__register-modal--form, .rm-medication
+) :is(
+    .rm-clinical-form__section > h4, .rm-clinical-form__section > h5,
+    .rm-signos__card[data-tone="neutral"] > .rm-signos__card-header,
+    .rm-movilidad__section > h5, .rm-eliminacion__section > h4,
+    .rm-medication__section > header, .rm-resident-directory__form-section > h5
+) {
+    padding: var(--rm-space-2) var(--rm-space-3);
+    border-radius: var(--rm-radius-sm);
+    background: color-mix(in srgb, var(--rm-action-primary-soft) 44%, var(--rm-capture-section));
+    box-shadow: var(--rm-shadow-xs);
+    font: var(--rm-font-weight-bold) var(--rm-font-size-section)/1.35 var(--rm-capture-font);
+    margin-bottom: var(--rm-space-3);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-medication__section > header h4,
+    .rm-clinical-form-modal .rm-form-section-title,
+    .rm-clinical-form-drawer .rm-form-section-title
+) {
+    font-size: var(--rm-font-size-section);
+    font-weight: var(--rm-font-weight-extrabold);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form, .rm-clinical-form__lead, .rm-signos__cards-grid,
+    .rm-ingesta__layout, .rm-ingesta__column,
+    .rm-hidratacion__layout, .rm-hidratacion__column,
+    .rm-eliminacion__layout, .rm-eliminacion__fields,
+    .rm-movilidad__layout, .rm-movilidad__capture, .rm-movilidad__continuity,
+    .rm-conducta__workspace, .rm-conducta__editable, .rm-conducta__continuity,
+    .rm-cognicion__workspace, .rm-cognicion__editable, .rm-cognicion__orientation,
+    .rm-wound__workspace, .rm-medication__workspace,
+    .rm-medication__capture, .rm-medication__support,
+    .rm-resident-directory__register .rm-resident-directory__form-fields
+) {
+    gap: var(--rm-capture-section-gap);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-clinical-form-drawer,
+    .rm-resident-directory__register-modal--form, .rm-medication, .rm-cognicion__modal
+) :is(.rm-form-grid, .rm-resident-directory__form-grid, .rm-cognicion__fields, .rm-cognicion__signals) {
+    gap: var(--rm-capture-field-gap);
+}
+@media (max-width: 600px) {
+    html:not(.dark):not([data-theme="dark"]) :is(
+        .rm-clinical-form, .rm-clinical-form__lead, .rm-signos__cards-grid,
+        .rm-ingesta__layout, .rm-ingesta__column,
+        .rm-hidratacion__layout, .rm-hidratacion__column,
+        .rm-eliminacion__layout, .rm-eliminacion__fields,
+        .rm-movilidad__layout, .rm-movilidad__capture, .rm-movilidad__continuity,
+        .rm-conducta__workspace, .rm-conducta__editable, .rm-conducta__continuity,
+        .rm-cognicion__workspace, .rm-cognicion__editable, .rm-cognicion__orientation,
+        .rm-wound__workspace, .rm-medication__workspace,
+        .rm-medication__capture, .rm-medication__support,
+        .rm-resident-directory__register .rm-resident-directory__form-fields
+    ) {
+        gap: var(--rm-capture-field-gap);
+    }
+}
+/* Clinical labels, section icons and choices reuse the dashboard hierarchy. */
+:is(.rm-clinical-form-modal, .rm-clinical-form-drawer, .rm-clinical-form, .rm-medication)
+:is(.rm-clinical-form__section > legend, .rm-form-section-title, .rm-signos__card-header h5,
+.rm-movilidad__section > h4, .rm-eliminacion__section > legend) > i {
+    font-size: var(--rm-icon-md);
+    line-height: 1;
+    flex-shrink: 0;
+}
+:is(.rm-clinical-form-modal, .rm-clinical-form-drawer, .rm-clinical-form, .rm-medication)
+:is(.rm-clinical-choice, .rm-conducta__chips button, .rm-cognicion__segmented span,
+.rm-movilidad__choices button, .rm-eliminacion__type button) {
+    font-family: var(--rm-capture-font);
+    font-size: var(--rm-font-size-table);
+    font-weight: var(--rm-font-weight-semibold);
+    line-height: 1.4;
+}
+
+/* Quiet choice feedback: animate paint, never geometry or clinical meaning. */
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-clinical-form-drawer, .rm-clinical-form,
+    .rm-ingesta, .rm-hidratacion, .rm-eliminacion, .rm-movilidad, .rm-conducta, .rm-cognicion
+) :is(
+    .rm-clinical-choice, .rm-conducta__tri span, .rm-conducta__chips button,
+    .rm-cognicion__segmented span, .rm-movilidad__choices button,
+    .rm-eliminacion__bristol button, .rm-eliminacion__type button,
+    .rm-hidratacion__radios span, .rm-clinical-form__scale-option span
+) {
+    transition: background-color var(--rm-duration-slow) var(--rm-ease-standard),
+        border-color var(--rm-duration-slow) var(--rm-ease-standard),
+        color var(--rm-duration-normal) var(--rm-ease-standard),
+        box-shadow var(--rm-duration-normal) var(--rm-ease-standard);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-clinical-form-drawer, .rm-clinical-form,
+    .rm-ingesta, .rm-hidratacion, .rm-eliminacion, .rm-movilidad, .rm-conducta, .rm-cognicion
+) :is(
+    .rm-clinical-choice, .rm-conducta__chips button, .rm-movilidad__choices button,
+    .rm-eliminacion__bristol button, .rm-eliminacion__type button
+):is([aria-pressed="true"], [aria-checked="true"], [data-added="true"]),
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-conducta__tri, .rm-cognicion__segmented, .rm-hidratacion__radios,
+    .rm-clinical-form__scale-option
+) input:checked + span {
+    border-width: 1px;
+    box-shadow: var(--rm-shadow-xs);
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-conducta__tri, .rm-cognicion__segmented
+) input[value=""]:checked + span {
+    background: var(--rm-capture-field);
+    border-style: solid;
+    border-color: var(--rm-capture-section-border);
+    color: var(--rm-capture-secondary);
+    box-shadow: none;
+}
+html:not(.dark):not([data-theme="dark"]) :is(
+    .rm-clinical-form-modal, .rm-clinical-form-drawer, .rm-clinical-form,
+    .rm-ingesta, .rm-hidratacion, .rm-eliminacion, .rm-movilidad, .rm-conducta, .rm-cognicion
+) :is(
+    .rm-clinical-choice, .rm-conducta__chips button, .rm-movilidad__choices button,
+    .rm-eliminacion__bristol button, .rm-eliminacion__type button
+):active:not(:disabled) {
+    transform: none;
+    box-shadow: none;
+}
+@media (hover: hover) and (pointer: fine) {
+    html:not(.dark):not([data-theme="dark"]) :is(
+        .rm-clinical-form-modal, .rm-clinical-form-drawer, .rm-clinical-form,
+        .rm-ingesta, .rm-hidratacion, .rm-eliminacion, .rm-movilidad, .rm-conducta, .rm-cognicion
+    ) :is(
+        .rm-clinical-choice, .rm-conducta__chips button, .rm-movilidad__choices button,
+        .rm-eliminacion__bristol button, .rm-eliminacion__type button
+    ):hover:not(:disabled):not(:active) {
+        transform: none;
+        box-shadow: var(--rm-shadow-sm);
+    }
+}
+@media (max-width: 600px) {
+    html:not(.dark):not([data-theme="dark"]) :is(
+        .rm-clinical-form-modal, .rm-resident-directory__register-modal--form,
+        .rm-resident-directory__register-modal--signos, .rm-conducta__modal, .rm-cognicion__modal
+    ) {
+        --rm-capture-title-size: calc(var(--rm-font-size-section) + 2px);
+        --rm-capture-resident-size: var(--rm-font-size-section);
+    }
+    html:not(.dark):not([data-theme="dark"]) :is(
+        .rm-clinical-form-modal, .rm-resident-directory__register-modal--form,
+        .rm-resident-directory__register-modal--signos, .rm-conducta__modal, .rm-cognicion__modal
+    ) :is(.rm-modal-header, .rm-modal-context) {
+        padding: var(--rm-space-2);
+        gap: var(--rm-space-2);
+    }
+    html:not(.dark):not([data-theme="dark"]) :is(
+        .rm-clinical-form-modal, .rm-resident-directory__register-modal--form,
+        .rm-resident-directory__register-modal--signos, .rm-conducta__modal, .rm-cognicion__modal
+    ) :is(.rm-resident-directory__register-context, .rm-conducta__context, .rm-cognicion__context, .rm-wound__resident-context) {
+        padding: var(--rm-space-2);
+    }
+    html:not(.dark):not([data-theme="dark"]) :is(
+        .rm-clinical-form-modal, .rm-resident-directory__register-modal--form,
+        .rm-resident-directory__register-modal--signos, .rm-conducta__modal, .rm-cognicion__modal
+    ) :is(.rm-modal-panel__title > i, .rm-clinical-form__icon, .rm-conducta__module-icon, .rm-cognicion__icon) {
+        width: var(--rm-control-sm);
+        height: var(--rm-control-sm);
+        font-size: var(--rm-icon-lg);
+    }
+}

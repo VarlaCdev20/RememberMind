@@ -150,24 +150,30 @@ final class RoleDashboardDataService
         $today = today();
         $assignments = DB::table('asignaciones_personal as ap')
             ->join('jornadas as j', 'j.cod_jornada', '=', 'ap.cod_jornada')
+            ->join('personal as p', 'p.cod_personal', '=', 'ap.cod_personal')
+            ->join('areas as a', 'a.cod_area', '=', 'ap.cod_area')
+            ->join('turnos as t', 't.cod_turno', '=', 'j.cod_turno')
             ->whereDate('j.fecha_jornada', $today)
-            ->whereIn('j.estado', ['ABIERTA', 'ACTIVA'])
-            ->where('ap.estado', 'ACTIVA');
-        $coverage = (clone $assignments)->join('areas as a', 'a.cod_area', '=', 'ap.cod_area')
+            ->whereIn('j.estado', ['ABIERTA', 'ACTIVA', 'ACTIVO', 'EN_CURSO'])
+            ->whereIn('ap.estado', ['ACTIVO', 'ACTIVA'])
+            ->where('p.estado', 'ACTIVO')
+            ->whereIn('a.estado', ['ACTIVO', 'ACTIVA'])
+            ->whereIn('t.estado', ['ACTIVO', 'ACTIVA']);
+        $coverage = (clone $assignments)
             ->select('a.nombre as label')->selectRaw('COUNT(DISTINCT ap.cod_personal) as total')
-            ->groupBy('a.cod_area', 'a.nombre')->orderByDesc('total')->limit(8)->get();
+            ->groupBy('a.cod_area', 'a.nombre')->orderByDesc('total')->orderBy('a.nombre')->get();
         $professions = DB::table('personal')->where('estado', 'ACTIVO')->select('profesion as label')
-            ->selectRaw('COUNT(*) as total')->groupBy('profesion')->orderByDesc('total')->limit(8)->get();
+            ->selectRaw('COUNT(*) as total')->groupBy('profesion')->orderByDesc('total')->get();
 
         return [
             'metrics' => [
                 $this->metric('Personal activo', DB::table('personal')->where('estado', 'ACTIVO')->count(), 'Plantilla vigente', 'ph-identification-badge', 'mint'),
-                $this->metric('Personal asignado hoy', (clone $assignments)->distinct('ap.cod_personal')->count('ap.cod_personal'), 'Jornadas abiertas', 'ph-calendar-check', 'sky'),
-                $this->metric('Áreas cubiertas hoy', $coverage->count(), 'Con personal asignado', 'ph-buildings', 'neutral'),
+                $this->metric('Personal asignado hoy', (clone $assignments)->distinct('ap.cod_personal')->count('ap.cod_personal'), 'Personas únicas · jornadas de hoy', 'ph-calendar-check', 'sky'),
+                $this->metric('Áreas cubiertas hoy', $coverage->count(), 'Con personal activo asignado', 'ph-buildings', 'neutral'),
                 $this->metric('Actividades próximas', DB::table('actividades')->where('estado', 'PROGRAMADA')->whereBetween('fecha_hora', [now(), now()->addDays(7)])->count(), 'Próximos siete días', 'ph-calendar-blank', 'coral'),
             ],
             'panels' => [
-                $this->panel('Cobertura por área hoy', 'bars', $this->countItems($coverage), 'No hay asignaciones activas hoy.', 'ph-buildings', 'wide', 'Personal asignado por área', 'Hoy'),
+                $this->panel('Cobertura por área hoy', 'bars', $this->countItems($coverage), 'No hay asignaciones laborales activas para hoy. Revisa la planificación y la cobertura.', 'ph-buildings', 'wide', 'Personal único por área · no acredita presencia física', 'Hoy'),
                 $this->panel('Equipo por profesión', 'bars', $this->countItems($professions), 'No hay personal activo registrado.', 'ph-users-three', subtitle: 'Distribución del personal activo', period: 'Actual'),
                 $this->panel('Próximas actividades', 'timeline', $this->upcomingActivities(), 'No hay actividades programadas.', 'ph-calendar-check'),
             ],

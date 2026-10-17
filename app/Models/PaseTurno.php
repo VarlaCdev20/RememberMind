@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Str;
 
 class PaseTurno extends ModeloOperativo
 {
@@ -43,28 +42,10 @@ class PaseTurno extends ModeloOperativo
             'fecha_hora_recepcion' => 'datetime',
         ];
     }
-
-    public function newEloquentBuilder($query)
-    {
-        return new class($query) extends \Illuminate\Database\Eloquent\Builder {
-            public function where($column, $operator = null, $value = null, $boolean = 'and')
-            {
-
-                return parent::where($column, $operator, $value, $boolean);
-            }
-        };
-    }
-
     public function residente(): BelongsTo
     {
         return $this->belongsTo(Residente::class, 'cod_residente', 'cod_residente');
     }
-
-    public function adultoMayor(): BelongsTo
-    {
-        return $this->belongsTo(Residente::class, 'cod_residente', 'cod_residente');
-    }
-
     public function jornadaSaliente(): BelongsTo
     {
         return $this->belongsTo(Jornada::class, 'cod_jornada_saliente', 'cod_jornada');
@@ -135,17 +116,6 @@ class PaseTurno extends ModeloOperativo
     {
         return $this->personalEntrante?->usuario;
     }
-
-    public function getCodAmAttribute(): string
-    {
-        return (string) ($this->attributes['cod_residente'] ?? '');
-    }
-
-    public function getFechaRecibidoAttribute(): ?\Carbon\Carbon
-    {
-        return $this->fecha_hora_recepcion ?? ($this->estado === 'RECIBIDO' ? now() : null);
-    }
-
     public function getFechaAttribute(): mixed
     {
         return $this->fecha_hora;
@@ -178,7 +148,7 @@ class PaseTurno extends ModeloOperativo
 
         static::creating(function (self $model) {
             if (empty($model->cod_pase)) {
-                $model->cod_pase = 'PAS_' . strtoupper(Str::random(10));
+                $model->cod_pase = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('pases_turno', $model->getConnectionName());
             }
             if (empty($model->fecha_hora)) {
                 $model->fecha_hora = now();

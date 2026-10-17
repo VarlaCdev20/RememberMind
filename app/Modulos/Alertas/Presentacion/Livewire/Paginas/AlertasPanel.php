@@ -148,6 +148,11 @@ class AlertasPanel extends Component
         }
     }
 
+    public function verPrioritarias(): void
+    {
+        $this->filtroNivel = 'PRIORITARIAS'; $this->filtroEstado = ''; $this->resetPage();
+    }
+
     public function detectarAlertas(): void
     {
         $this->comprobarPermiso('crear');
@@ -394,7 +399,7 @@ class AlertasPanel extends Component
         $turnoService = app(TurnoEnfermeriaService::class);
         $alertasQuery = Alerta::query()
             ->when($this->filtroAdulto, fn ($q) => $q->where('cod_residente', $this->filtroAdulto))
-            ->with(['adultoMayor.cama.habitacion', 'responsable']);
+            ->with(['residente.cama.habitacion', 'responsable']);
 
         if (! auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'GERENTE', 'ADMINISTRADOR'])) {
             $alertasQuery = $turnoService->acotarAlertasQuery($alertasQuery, auth()->user());
@@ -405,8 +410,8 @@ class AlertasPanel extends Component
 
         $conteos = [
             'total' => (clone $baseStatsQuery)->count(),
-            'criticas' => (clone $baseStatsQuery)->whereIn('prioridad', ['CRITICO', 'CRITICA'])->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])->count(),
-            'altas' => (clone $baseStatsQuery)->whereIn('prioridad', ['ALTO', 'ALTA'])->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])->count(),
+            'criticas' => (clone $baseStatsQuery)->whereIn('prioridad', ['CRITICO', 'CRITICA'])->whereIn('estado', ['ABIERTA', 'EN_ATENCION', 'RECONOCIDA', 'ASIGNADA', 'PENDIENTE'])->count(),
+            'altas' => (clone $baseStatsQuery)->whereIn('prioridad', ['ALTO', 'ALTA'])->whereIn('estado', ['ABIERTA', 'EN_ATENCION', 'RECONOCIDA', 'ASIGNADA', 'PENDIENTE'])->count(),
             'abiertas' => (clone $baseStatsQuery)->where('estado', 'ABIERTA')->count(),
             'en_atencion' => (clone $baseStatsQuery)->where('estado', 'EN_ATENCION')->count(),
             'cerradas' => (clone $baseStatsQuery)->where('estado', 'CERRADA')->count(),
@@ -462,17 +467,18 @@ class AlertasPanel extends Component
         ];
 
         $alertas = $alertasQuery
-            ->when($this->search, fn ($q) => $q->where(fn ($q) => $q->whereHas('adultoMayor', fn ($sq) => $sq->whereLike('nombres', '%'.$this->search.'%')
+            ->when($this->search, fn ($q) => $q->where(fn ($q) => $q->whereHas('residente', fn ($sq) => $sq->whereLike('nombres', '%'.$this->search.'%')
                 ->orWhereLike('apellido_paterno', '%'.$this->search.'%'))
                 ->orWhereLike('tipo', '%'.$this->search.'%')
                 ->orWhereLike('titulo', '%'.$this->search.'%')
                 ->orWhereLike('descripcion', '%'.$this->search.'%')
             ))
             ->when($this->filtroEstado, fn ($q) => $q->where('estado', $this->filtroEstado))
-            ->when($this->filtroNivel, fn ($q) => $q->where('prioridad', $this->filtroNivel))
+            ->when($this->filtroNivel === 'PRIORITARIAS', fn ($q) => $q->whereIn('prioridad', ['CRITICO','CRITICA','ALTO','ALTA'])->whereIn('estado', ['ABIERTA','EN_ATENCION','RECONOCIDA','ASIGNADA','PENDIENTE']))
+            ->when($this->filtroNivel && $this->filtroNivel !== 'PRIORITARIAS', fn ($q) => $q->whereIn('prioridad', match ($this->filtroNivel) { 'CRITICO', 'CRITICA' => ['CRITICO','CRITICA'], 'ALTO', 'ALTA' => ['ALTO','ALTA'], 'MEDIO', 'MEDIA' => ['MEDIO','MEDIA'], 'BAJO', 'BAJA' => ['BAJO','BAJA'], default => [$this->filtroNivel] }))
             ->when($this->filtroOrigen, fn ($q) => $q->where('modulo', $this->filtroOrigen))
-            ->orderByDesc('fecha_hora')
-            ->paginate($this->perPage);
+            ->tap(fn ($q) => \App\Modulos\Alertas\Aplicacion\Consultas\OrdenAlertas::aplicar($q))
+            ->paginate(min(100, max(5, $this->perPage)));
 
         $adultosQuery = $turnoService->obtenerPacientesAsignadosQuery(auth()->user())
             ->orderBy('apellido_paterno');
@@ -481,7 +487,7 @@ class AlertasPanel extends Component
         $this->chartData = $chartData;
 
         $detalle = $this->alertaId ? Alerta::with([
-            'adultoMayor.cama.habitacion',
+            'residente.cama.habitacion',
             'responsable.usuario',
             'eventos' => fn ($q) => $q->with('usuario')->orderByDesc('fecha_hora'),
         ])->find($this->alertaId) : null;
@@ -510,6 +516,7 @@ class AlertasPanel extends Component
 
         return view('livewire.alertas.alertas-panel', [
             'alertas' => $alertas,
+            'prioritarias' => \App\Modulos\Alertas\Aplicacion\Consultas\OrdenAlertas::aplicar((clone $baseStatsQuery)->whereIn('estado', ['ABIERTA','EN_ATENCION','RECONOCIDA','ASIGNADA','PENDIENTE'])->whereIn('prioridad', ['CRITICO','CRITICA','ALTO','ALTA']))->limit(3)->get(),
             'conteos' => $conteos,
             'chartData' => $chartData,
             'alertaActiva' => $detalle,

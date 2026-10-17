@@ -72,7 +72,7 @@ final class GestionarTareasPlan
         // Las tres filas se crean atómicamente para evitar tareas incompletas.
         DB::transaction(function () use ($plan, $responsable, $jornada, $entrada): void {
             $intervencion = IntervencionCuidado::query()->create([
-                'cod_intervencion' => 'INT_'.Str::upper(Str::random(10)),
+                'cod_intervencion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('intervenciones_cuidado'),
                 'cod_plan' => $plan->cod_plan,
                 'nombre' => trim($entrada['titulo']),
                 'descripcion' => filled($entrada['descripcion']) ? trim($entrada['descripcion']) : trim($entrada['titulo']),
@@ -82,7 +82,7 @@ final class GestionarTareasPlan
             ]);
 
             ProgramacionCuidado::query()->create([
-                'cod_programacion' => 'PRG_'.Str::upper(Str::random(10)),
+                'cod_programacion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('programaciones_cuidado'),
                 'cod_intervencion' => $intervencion->cod_intervencion,
                 'cod_turno' => $entrada['codTurno'],
                 'frecuencia' => filled($entrada['frecuencia']) ? trim($entrada['frecuencia']) : 'UNA VEZ',
@@ -94,7 +94,7 @@ final class GestionarTareasPlan
             ]);
 
             EjecucionCuidado::query()->create([
-                'cod_ejecucion' => 'EJC_'.Str::upper(Str::random(10)),
+                'cod_ejecucion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('ejecuciones_cuidado'),
                 'cod_intervencion' => $intervencion->cod_intervencion,
                 'cod_residente' => $plan->cod_residente,
                 'cod_jornada' => $jornada->cod_jornada,
@@ -144,7 +144,7 @@ final class GestionarTareasPlan
                 // Se conserva la ejecución original y se crea una nueva pendiente;
                 // así no se pierde la trazabilidad clínica de la reprogramación.
                 $nueva = $tarea->replicate();
-                $nueva->cod_ejecucion = 'EJC_'.Str::upper(Str::random(10));
+                $nueva->cod_ejecucion = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('ejecuciones_cuidado');
                 $nueva->fecha_hora_programada = $entrada['fechaProgramada'].' '.$entrada['horaProgramada'].':00';
                 $nueva->estado = 'PENDIENTE';
                 $nueva->resultado = null;

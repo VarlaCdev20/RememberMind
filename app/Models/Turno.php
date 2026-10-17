@@ -58,7 +58,7 @@ class Turno extends ModeloOperativo
         parent::boot();
         static::saving(function (self $turno) {
             if (empty($turno->attributes['cod_turno'])) {
-                $turno->attributes['cod_turno'] = 'TUR_' . \Illuminate\Support\Str::upper(\Illuminate\Support\Str::random(10));
+                $turno->attributes['cod_turno'] = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('turnos', $turno->getConnectionName());
             }
             if (!isset($turno->attributes['orden'])) {
                 $turno->attributes['orden'] = 1;

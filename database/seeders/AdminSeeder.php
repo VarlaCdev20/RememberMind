@@ -13,9 +13,9 @@ class AdminSeeder extends Seeder
     /**
      * Matriz de usuarios y perfiles normados de RememberMind.
      * Cumple con la BDD Operativa V2.1:
-     * - cod_usuario canonico (string USU_...)
-     * - cod_personal canonico (string PER_...)
-     * - cod_contacto canonico para rol FAMILIAR (string CON_...)
+     * - cod_usuario correlativo (string COD_USU_...)
+     * - cod_personal correlativo (string COD_PER_...)
+     * - cod_contacto correlativo para rol FAMILIAR (string COD_CON_...)
      * - Contrasenas no hardcodeadas generadas dinamicamente o leidas de entorno.
      */
     public function run(): void
@@ -30,11 +30,9 @@ class AdminSeeder extends Seeder
             // 1. Superadministrador - cuenta histórica de soporte técnico
             [
                 'correo' => 'admincasaamandita@gmail.com',
-                'cod_usuario' => 'USU_0001',
                 'rol' => 'SUPERADMINISTRADOR',
                 'tipo_entidad' => 'personal',
                 'entidad' => [
-                    'cod_personal' => 'PER_0001',
                     'nombres' => 'CARLA',
                     'apellido_paterno' => 'ENCINAS',
                     'numero_documento' => 'ADMIN-0001',
@@ -47,11 +45,9 @@ class AdminSeeder extends Seeder
             // 2. Superadministrador - Desarrollador TI
             [
                 'correo' => 'carlaencinas78@gmail.com',
-                'cod_usuario' => 'USU_0002',
                 'rol' => 'SUPERADMINISTRADOR',
                 'tipo_entidad' => 'personal',
                 'entidad' => [
-                    'cod_personal' => 'PER_0002',
                     'nombres' => 'CARLA',
                     'apellido_paterno' => 'ENCINAS',
                     'numero_documento' => 'DEV-0001',
@@ -64,11 +60,9 @@ class AdminSeeder extends Seeder
             // 3. Enfermeria - Cuidados Continuos
             [
                 'correo' => 'enfermeria@remembermind.com',
-                'cod_usuario' => 'USU_0003',
                 'rol' => 'ENFERMEROS',
                 'tipo_entidad' => 'personal',
                 'entidad' => [
-                    'cod_personal' => 'PER_0003',
                     'nombres' => 'ROSA',
                     'apellido_paterno' => 'MAMANI',
                     'apellido_materno' => 'CHOQUE',
@@ -84,11 +78,9 @@ class AdminSeeder extends Seeder
             // 4. Administrador - Gestion Institucional
             [
                 'correo' => 'administracion@remembermind.com',
-                'cod_usuario' => 'USU_0004',
                 'rol' => 'ADMINISTRADOR',
                 'tipo_entidad' => 'personal',
                 'entidad' => [
-                    'cod_personal' => 'PER_0004',
                     'nombres' => 'MARCELO',
                     'apellido_paterno' => 'ROCHA',
                     'apellido_materno' => 'ROJAS',
@@ -103,11 +95,9 @@ class AdminSeeder extends Seeder
             // 5. Medico General / Geriatra - Atencion Medica
             [
                 'correo' => 'medico@remembermind.com',
-                'cod_usuario' => 'USU_0005',
                 'rol' => 'MEDICO GENERAL/GERIATRA',
                 'tipo_entidad' => 'personal',
                 'entidad' => [
-                    'cod_personal' => 'PER_0005',
                     'nombres' => 'JAVIER',
                     'apellido_paterno' => 'MONTES',
                     'apellido_materno' => 'FLORES',
@@ -123,11 +113,9 @@ class AdminSeeder extends Seeder
             // 6. Psicologo/a - Salud Mental y Evaluacion Cognitiva
             [
                 'correo' => 'psicologia@remembermind.com',
-                'cod_usuario' => 'USU_0006',
                 'rol' => 'PSICOLOGO/A',
                 'tipo_entidad' => 'personal',
                 'entidad' => [
-                    'cod_personal' => 'PER_0006',
                     'nombres' => 'VALERIA',
                     'apellido_paterno' => 'TORREZ',
                     'apellido_materno' => 'MENDOZA',
@@ -143,11 +131,9 @@ class AdminSeeder extends Seeder
             // 7. Pedagogo - Estimulacion Cognitiva y Recreacion
             [
                 'correo' => 'pedagogia@remembermind.com',
-                'cod_usuario' => 'USU_0007',
                 'rol' => 'PEDAGOGO',
                 'tipo_entidad' => 'personal',
                 'entidad' => [
-                    'cod_personal' => 'PER_0007',
                     'nombres' => 'ANDREA',
                     'apellido_paterno' => 'GOMEZ',
                     'apellido_materno' => 'GUTIERREZ',
@@ -162,11 +148,9 @@ class AdminSeeder extends Seeder
             // 8. Nutricionista - Nutricion y Dietetica
             [
                 'correo' => 'nutricion@remembermind.com',
-                'cod_usuario' => 'USU_0008',
                 'rol' => 'NUTRICIONISTA',
                 'tipo_entidad' => 'personal',
                 'entidad' => [
-                    'cod_personal' => 'PER_0008',
                     'nombres' => 'PATRICIA',
                     'apellido_paterno' => 'SUAREZ',
                     'apellido_materno' => 'LOPEZ',
@@ -182,11 +166,9 @@ class AdminSeeder extends Seeder
             // 9. Fisioterapeuta - Rehabilitacion y Terapia Fisica
             [
                 'correo' => 'fisioterapia@remembermind.com',
-                'cod_usuario' => 'USU_0009',
                 'rol' => 'FISIOTERAPEUTA',
                 'tipo_entidad' => 'personal',
                 'entidad' => [
-                    'cod_personal' => 'PER_0009',
                     'nombres' => 'GABRIEL',
                     'apellido_paterno' => 'PAREDES',
                     'apellido_materno' => 'CALLISAYA',
@@ -202,11 +184,9 @@ class AdminSeeder extends Seeder
             // 10. Familiar - Contacto y Seguimiento Familiar
             [
                 'correo' => 'familiar@remembermind.com',
-                'cod_usuario' => 'USU_0010',
                 'rol' => 'FAMILIAR',
                 'tipo_entidad' => 'contacto',
                 'entidad' => [
-                    'cod_contacto' => 'CON_0001',
                     'nombres' => 'MARIO',
                     'apellido_paterno' => 'ENCINAS',
                     'apellido_materno' => 'VACA',
@@ -222,11 +202,9 @@ class AdminSeeder extends Seeder
             // 11. Gerencia - Dirección institucional
             [
                 'correo' => 'gerencia@remembermind.com',
-                'cod_usuario' => 'USU_0011',
                 'rol' => 'GERENTE',
                 'tipo_entidad' => 'personal',
                 'entidad' => [
-                    'cod_personal' => 'PER_0010',
                     'nombres' => 'DIRECCION',
                     'apellido_paterno' => 'INSTITUCIONAL',
                     'numero_documento' => 'GER-0001',
@@ -244,7 +222,6 @@ class AdminSeeder extends Seeder
             $user = User::firstOrCreate(
                 ['correo' => $cuenta['correo']],
                 [
-                    'cod_usuario' => $cuenta['cod_usuario'],
                     'contrasena' => $rawPassword,
                     'estado' => 'ACTIVO',
                 ]
@@ -257,12 +234,12 @@ class AdminSeeder extends Seeder
             if ($cuenta['tipo_entidad'] === 'personal') {
                 Personal::updateOrCreate(
                     ['cod_usuario' => $user->cod_usuario],
-                    $cuenta['entidad']
+                    \Illuminate\Support\Arr::except($cuenta['entidad'], ['cod_personal', 'cod_contacto'])
                 );
             } elseif ($cuenta['tipo_entidad'] === 'contacto') {
                 Contacto::updateOrCreate(
                     ['cod_usuario' => $user->cod_usuario],
-                    $cuenta['entidad']
+                    \Illuminate\Support\Arr::except($cuenta['entidad'], ['cod_personal', 'cod_contacto'])
                 );
             }
         }

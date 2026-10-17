@@ -41,12 +41,17 @@
 @import './patterns/resident-summary.css';
 @import './patterns/clinical-table.css';
 @import './patterns/clinical-detail.css';
+@import './patterns/clinical-timeline.css';
 @import './patterns/depth-canvas.css';
 @import './patterns/system-density.css';
 @import './patterns/nursing-module.css';
 @import './patterns/resident-directory.css';
 @import './patterns/signos-vitales.css';
 @import './patterns/clinical-forms.css';
+@import './patterns/wounds.css';
+@import './patterns/wound-curation.css';
+@import './patterns/conducta.css';
+@import './patterns/observacion-cognitiva.css';
 @import './patterns/dolor.css';
 @import './patterns/ingesta.css';
 @import './patterns/objetivos-signos-vitales.css';
@@ -83,4 +88,20 @@
 @import './patterns/eliminacion.css';
 
 @import './patterns/movilidad.css';
+
+/* Shared clinical surfaces follow module overrides; geometry and states are unchanged. */
+@import './patterns/care-surfaces.css';
+@import './patterns/medication-administration.css';
+@import './components/medication-media.css';
+@import './patterns/clinical-consultations.css';
+
+/* Paleta final aprobada: después de las superficies históricas de los módulos. */
+@import './patterns/palette-consistency.css';
+@import './patterns/medication-workspace.css';
+@import './patterns/medication-dose-detail.css';
 @import './patterns/incidents-workspace.css';
+@import './patterns/emergency-workspace.css';
+@import './patterns/handoff-workspace.css';
+@import './patterns/management-workspace.css';
+@import './patterns/staff-workspace.css';
+@import './patterns/institutional-gallery.css';

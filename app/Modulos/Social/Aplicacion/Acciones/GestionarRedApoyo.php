@@ -43,7 +43,7 @@ final class GestionarRedApoyo
             if ($entrada['modoEdicion'] && $entrada['vinculoId']) {
                 ResidenteContacto::where('cod_residente_contacto', $entrada['vinculoId'])->update($payload);
             } else {
-                $payload['cod_residente_contacto'] = 'RC_'.strtoupper(Str::random(10));
+                $payload['cod_residente_contacto'] = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('residentes_contactos');
                 ResidenteContacto::create($payload);
             }
         });
@@ -101,7 +101,7 @@ final class GestionarRedApoyo
         }
 
         return Contacto::create([
-            'cod_contacto' => 'CON_'.strtoupper(Str::random(10)),
+            'cod_contacto' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('contactos'),
             'nombres' => $entrada['form']['nombres'],
             'apellido_paterno' => $entrada['form']['ap_paterno'],
             'apellido_materno' => $entrada['form']['ap_materno'] ?: null,

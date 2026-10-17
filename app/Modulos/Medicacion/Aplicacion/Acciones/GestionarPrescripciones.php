@@ -48,7 +48,7 @@ final class GestionarPrescripciones
             $medicamento = Medicamento::query()->firstOrCreate(
                 ['nombre_generico' => Str::upper(trim($datos['nuevo_nombre']))],
                 [
-                    'cod_medicamento' => $this->codigo('MED'),
+                    'cod_medicamento' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('medicamentos'),
                     'via_predeterminada' => Str::upper(trim($datos['nuevo_via'])),
                     'control_especial' => false,
                     'estado' => 'ACTIVO',
@@ -61,7 +61,7 @@ final class GestionarPrescripciones
             }
 
             $prescripcion = Prescripcion::query()->create([
-                'cod_prescripcion' => $this->codigo('PRE'),
+                'cod_prescripcion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('prescripciones'),
                 'cod_residente' => $residente->cod_residente,
                 'cod_atencion' => $atencion->cod_atencion,
                 'cod_medicamento' => $medicamento->cod_medicamento,
@@ -78,7 +78,7 @@ final class GestionarPrescripciones
             ]);
 
             HorarioPrescripcion::query()->create([
-                'cod_horario_prescripcion' => $this->codigo('HPR'),
+                'cod_horario_prescripcion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('horarios_prescripcion'),
                 'cod_prescripcion' => $prescripcion->cod_prescripcion,
                 'hora_programada' => $datos['nuevo_hora'],
                 'dosis_programada' => $dosis,
@@ -104,7 +104,7 @@ final class GestionarPrescripciones
             $medicamento = Medicamento::query()->firstOrCreate(
                 ['nombre_generico' => Str::upper(trim($datos['nombre_medicamento']))],
                 [
-                    'cod_medicamento' => $this->codigo('MED'),
+                    'cod_medicamento' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('medicamentos'),
                     'via_predeterminada' => Str::upper($datos['via_administracion']),
                     'control_especial' => false,
                     'estado' => 'ACTIVO',
@@ -132,7 +132,7 @@ final class GestionarPrescripciones
                     ]);
                 }
                 $prescripcion = new Prescripcion([
-                    'cod_prescripcion' => $this->codigo('PRE'),
+                    'cod_prescripcion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('prescripciones'),
                     'cod_residente' => $datos['cod_residente'],
                     'cod_atencion' => $atencion->cod_atencion,
                     'cod_personal' => $personal->cod_personal,
@@ -164,7 +164,7 @@ final class GestionarPrescripciones
                 $horario
                     ? $horario->update($datosHorario)
                     : HorarioPrescripcion::query()->create([
-                        'cod_horario_prescripcion' => $this->codigo('HPR'),
+                        'cod_horario_prescripcion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('horarios_prescripcion'),
                         'cod_prescripcion' => $prescripcion->cod_prescripcion,
                         ...$datosHorario,
                     ]);
@@ -218,9 +218,9 @@ final class GestionarPrescripciones
         abort_if(! $datos['segun_necesidad'] && $horarios === [], 422,
             'Una prescripción programada requiere al menos un horario.');
         $prescripcion = DB::transaction(function () use ($residente, $personal, $datos, $horarios): Prescripcion {
-            $prescripcion = Prescripcion::query()->create(['cod_prescripcion' => $this->codigo('PRE'), 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, ...$datos, 'fecha_hora_prescripcion' => now(), 'estado' => 'ACTIVA']);
+            $prescripcion = Prescripcion::query()->create(['cod_prescripcion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('prescripciones'), 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, ...$datos, 'fecha_hora_prescripcion' => now(), 'estado' => 'ACTIVA']);
             foreach ($horarios as $horario) {
-                HorarioPrescripcion::query()->create(['cod_horario_prescripcion' => $this->codigo('HPR'), 'cod_prescripcion' => $prescripcion->cod_prescripcion, ...$horario, 'estado' => 'ACTIVO']);
+                HorarioPrescripcion::query()->create(['cod_horario_prescripcion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('horarios_prescripcion'), 'cod_prescripcion' => $prescripcion->cod_prescripcion, ...$horario, 'estado' => 'ACTIVO']);
             }
 
             return $prescripcion;
@@ -258,10 +258,6 @@ final class GestionarPrescripciones
         }
     }
 
-    private function codigo(string $prefijo): string
-    {
-        return $prefijo.'_'.Str::upper(Str::random(12));
-    }
 
     private function separarDosis(string $texto): array
     {

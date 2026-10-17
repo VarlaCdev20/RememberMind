@@ -27,7 +27,7 @@
             <div class="rm-dolor__legend"><span>● Guardado</span><span x-show="!persisted">◯ Sin guardar · conexión discontinua</span></div>
         </div>
     </template>
-    <div class="rm-dolor__history">
+    <div class="rm-dolor__history" data-clinical-history>
         <h6>Últimos aportes registrados</h6>
         <table x-show="history.length" class="rm-hidratacion__history-table">
             <caption class="sr-only">Historial de hidratación del residente</caption>

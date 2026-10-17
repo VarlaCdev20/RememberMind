@@ -2,7 +2,7 @@
 title: "Contrato de módulo — Medicación"
 status: CURRENT
 version: "2.0"
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-14
 owner: RememberMind
 source_of_truth: false
 source_of_truth_scope: [module_contract_compilation]
@@ -100,31 +100,31 @@ Agenda recordatorios no equivale a alerta persistida. Creación automática por 
 
 ## 20. Auditoría
 
-Suspensión conserva autor/motivo/fecha; Activitylog universal de administración NOT VERIFIED.
+Suspensión conserva autor/motivo/fecha. La administración programada registra Activitylog dentro de la misma transacción; el fallo de auditoría revierte la operación. Esto no certifica auditoría universal de PRN u otras variantes.
 
 ## 21. Continuidad asistencial
 
-Agenda deriva ausencia de registro; Pase filtra estado en vez de resultado, gap TECH-008.
+Agenda deriva ausencia de registro. La evolución programada distingue resultado y estado, utilizando las combinaciones vigentes de la lectura de Pase de turno; conserva los anulados en historial sin contarlos como administraciones vigentes.
 
 ## 22. Entrada UI
 
-[resources/views/livewire/medicacion/salud-administracion-medicacion.blade.php](../../../resources/views/livewire/medicacion/salud-administracion-medicacion.blade.php)
+[Administración programada](../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/administracion-medicacion-modal.blade.php), desde Mis residentes → Registrar. Historial y evolución son consultas independientes del mismo componente. [Informe y límites de la entrega](../../frontend/ADMINISTRACION_MEDICACION_RESULTADO.md).
 
 ## 23. Livewire / Controllers
 
-[app/Http/Controllers/Medicacion/MedicacionController.php](../../../app/Http/Controllers/Medicacion/MedicacionController.php), [app/Frontend/Livewire/Medico/Medicacion/SaludMedicacionPanel.php](../../../app/Frontend/Livewire/Medico/Medicacion/SaludMedicacionPanel.php), [app/Frontend/Livewire/Enfermeria/Medicacion/SaludAdministracionMedicacionPanel.php](../../../app/Frontend/Livewire/Enfermeria/Medicacion/SaludAdministracionMedicacionPanel.php)
+[AdministracionMedicacionModal](../../../app/Modulos/Medicacion/Presentacion/Livewire/Funcionalidades/AdministracionMedicacionModal.php), [SaludMedicacionPanel](../../../app/Modulos/Medicacion/Presentacion/Livewire/Paginas/SaludMedicacionPanel.php), [SaludAdministracionMedicacionPanel](../../../app/Modulos/Medicacion/Presentacion/Livewire/Paginas/SaludAdministracionMedicacionPanel.php). Los controladores HTTP pertenecen a `Medicacion/Presentacion/Http/Controllers`.
 
 ## 24. Actions
 
-NONE OBSERVED en el recorrido investigado; no se exige una clase vacía por simetría.
+[RegistrarAdministracionFichaHttp](../../../app/Modulos/Medicacion/Aplicacion/Acciones/RegistrarAdministracionFichaHttp.php) coordina la entrada HTTP y delega la persistencia programada al escritor central.
 
 ## 25. Services
 
-[app/Backend/Modulos/Medicacion/Servicios/AgendaMedicacionService.php](../../../app/Backend/Modulos/Medicacion/Servicios/AgendaMedicacionService.php), [app/Backend/Modulos/Medicacion/Servicios/RegistrarAdministracionMedicacionService.php](../../../app/Backend/Modulos/Medicacion/Servicios/RegistrarAdministracionMedicacionService.php), [app/Backend/Modulos/Clinica/Servicios/AutorizacionClinicaService.php](../../../app/Backend/Modulos/Clinica/Servicios/AutorizacionClinicaService.php)
+[AgendaMedicacionService](../../../app/Modulos/Medicacion/Aplicacion/Consultas/AgendaMedicacionService.php), [RegistrarAdministracionMedicacionService](../../../app/Modulos/Medicacion/Aplicacion/Acciones/RegistrarAdministracionMedicacionService.php), [ConsultarAdministracionMedicacion](../../../app/Modulos/Medicacion/Aplicacion/Consultas/ConsultarAdministracionMedicacion.php), [AutorizacionClinicaService](../../../app/Modulos/Clinica/Aplicacion/Acciones/AutorizacionClinicaService.php).
 
 ## 26. Policies
 
-[app/Policies/PrescripcionPolicy.php](../../../app/Policies/PrescripcionPolicy.php), [app/Policies/AdministracionMedicacionPolicy.php](../../../app/Policies/AdministracionMedicacionPolicy.php)
+[PrescripcionPolicy](../../../app/Modulos/Medicacion/Presentacion/Policies/PrescripcionPolicy.php), [AdministracionMedicacionPolicy](../../../app/Modulos/Medicacion/Presentacion/Policies/AdministracionMedicacionPolicy.php).
 
 ## 27. Models
 
@@ -152,7 +152,7 @@ Enfermería prescribe, modifica orden o atribuye administración; duplicar progr
 
 ## 33. Tests faltantes
 
-Fase 3 acredita lector de continuidad contra escritor real, separando estado/resultado y agenda sin inserciones. Siguen pendientes reintento PRN según decisión, carrera real de administración y rollback programada por todas las entradas.
+La entrega del 14/10/2026 agrega carrera real de administración programada en dos procesos PostgreSQL, rollback de registro/correlativo ante fallo de auditoría, autoría propia, relación de horario exacta y consultas del formulario. La prueba no certifica todas las entradas del producto. Sigue pendiente el reintento PRN según decisión institucional. Evidencia acotada en el informe de entrega.
 
 ## 34. Deuda técnica
 

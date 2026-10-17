@@ -89,7 +89,7 @@ final class SeguimientoDiarioService
 
             $this->actualizarOCrear(
                 RegistroIngesta::query()->where($comunes)->where('fecha_hora', $fechaHora),
-                ['cod_ingesta' => 'ING_'.Str::upper(Str::random(10))] + $comunes,
+                ['cod_ingesta' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('registros_ingesta')] + $comunes,
                 [
                     'fecha_hora' => $fechaHora,
                     'tipo_comida' => $datos['tipo_comida'],
@@ -104,7 +104,7 @@ final class SeguimientoDiarioService
 
             $this->actualizarOCrear(
                 RegistroHidratacion::query()->where($comunes)->where('fecha_hora', $fechaHora),
-                ['cod_hidratacion' => 'HID_'.Str::upper(Str::random(10))] + $comunes,
+                ['cod_hidratacion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('registros_hidratacion')] + $comunes,
                 [
                     'fecha_hora' => $fechaHora,
                     'cantidad_ml' => $datos['cantidad_hidratacion_ml'],
@@ -117,7 +117,7 @@ final class SeguimientoDiarioService
 
             $this->actualizarOCrear(
                 RegistroMovilidad::query()->where('cod_atencion', $atencion->cod_atencion),
-                ['cod_movilidad' => 'MOV_'.Str::upper(Str::random(10)), 'cod_atencion' => $atencion->cod_atencion] + $comunes,
+                ['cod_movilidad' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('registros_movilidad'), 'cod_atencion' => $atencion->cod_atencion] + $comunes,
                 [
                     'fecha_hora' => $fechaHora,
                     'marcha' => $datos['movilidad'],
@@ -134,7 +134,7 @@ final class SeguimientoDiarioService
 
             $this->actualizarOCrear(
                 RegistroSueno::query()->where($comunes)->whereDate('fecha', $fechaHora->toDateString()),
-                ['cod_registro_sueno' => 'RSU_'.Str::upper(Str::random(10))] + $comunes,
+                ['cod_registro_sueno' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('registros_sueno')] + $comunes,
                 [
                     'fecha' => $fechaHora->toDateString(),
                     'insomnio' => $datos['sueno'] === 'INSOMNIO',
@@ -156,7 +156,7 @@ final class SeguimientoDiarioService
                 $orientacion = $datos['orientacion'] ?: null;
                 $this->actualizarOCrear(
                     ControlCognitivo::query()->where('cod_atencion', $atencion->cod_atencion),
-                    ['cod_control_cognitivo' => 'CCO_'.Str::upper(Str::random(10)), 'cod_atencion' => $atencion->cod_atencion] + $comunes,
+                    ['cod_control_cognitivo' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('controles_cognitivos'), 'cod_atencion' => $atencion->cod_atencion] + $comunes,
                     [
                         'fecha_hora' => $fechaHora,
                         'orientacion_persona' => $orientacion,
@@ -185,7 +185,7 @@ final class SeguimientoDiarioService
                 || $datos['ansiedad'] || $datos['aislamiento'] || $datos['deambulacion']) {
                 $this->actualizarOCrear(
                     RegistroConductual::query()->where('cod_atencion', $atencion->cod_atencion),
-                    ['cod_registro_conductual' => 'RCO_'.Str::upper(Str::random(10)), 'cod_atencion' => $atencion->cod_atencion] + $comunes,
+                    ['cod_registro_conductual' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('registros_conductuales'), 'cod_atencion' => $atencion->cod_atencion] + $comunes,
                     [
                         'fecha_hora' => $fechaHora,
                         'estado_animo' => $datos['conducta'] ?: null,
@@ -208,7 +208,7 @@ final class SeguimientoDiarioService
             if ($datos['tipo_eliminacion']) {
                 $this->actualizarOCrear(
                     RegistroEliminacion::query()->where($comunes)->where('fecha_hora', $fechaHora),
-                    ['cod_eliminacion' => 'ELI_'.Str::upper(Str::random(10))] + $comunes,
+                    ['cod_eliminacion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('registros_eliminacion')] + $comunes,
                     [
                         'fecha_hora' => $fechaHora,
                         'tipo_eliminacion' => $datos['tipo_eliminacion'],

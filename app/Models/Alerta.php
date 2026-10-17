@@ -105,7 +105,7 @@ class Alerta extends ModeloOperativo
 
         static::creating(function (self $model) {
             if (empty($model->cod_alerta)) {
-                $model->cod_alerta = 'ALA_' . strtoupper(Str::random(10));
+                $model->cod_alerta = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('alertas', $model->getConnectionName());
             }
 
 

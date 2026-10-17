@@ -448,11 +448,7 @@ class PersonalInstitucionalForm extends Component
         }
         $codigo = $clasificacion['cod_area_referencia'];
         $nombre = $codigo ? Area::find($codigo)?->nombre : null;
-        $nombre ??= match ($codigo) {
-            'ARE_0004' => 'SALUD', 'ARE_0005' => 'PSICOLOGÍA Y PEDAGOGÍA',
-            'ARE_0003' => 'ADMINISTRATIVA', 'ARE_0009' => 'SISTEMA',
-            default => 'Sin área de referencia',
-        };
+        $nombre ??= 'Selecciona un área institucional';
 
         return [...$clasificacion, 'cod_area' => $codigo, 'area_nombre' => $nombre];
     }

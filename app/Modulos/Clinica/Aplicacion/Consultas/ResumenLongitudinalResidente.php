@@ -58,48 +58,19 @@ final class ResumenLongitudinalResidente
         }
 
         // 6. Tendencia longitudinal y análisis estructurado de signos vitales
-        $todosSignosOrdenados = $residente->signosVitales
-            ->sortBy(fn ($s) => ($s->fecha ? (is_string($s->fecha) ? substr($s->fecha, 0, 10) : $s->fecha->format('Y-m-d')) : '2000-01-01').' '.($s->hora ? substr((string) $s->hora, 0, 5) : '00:00'))
-            ->values();
-
-        // Filtrar según el periodo activo: '24h', '7d', '30d', '3m', 'personalizado'
-        $periodo = $periodo ?? '7d';
+        $historialCompleto = $residente->signosVitales->sortBy('fecha_hora')->values();
+        $todosSignosOrdenados = $historialCompleto->whereIn('estado', ['VIGENTE', 'ACTIVO'])->values();
+        $periodo ??= '7d';
         $ahora = now();
-
-        $signosOrdenados = match ($periodo) {
-            '24h' => $todosSignosOrdenados->filter(function ($s) use ($ahora) {
-                $fStr = $s->fecha ? (is_string($s->fecha) ? substr($s->fecha, 0, 10) : $s->fecha->format('Y-m-d')) : '';
-
-                return $fStr ? Carbon::parse($fStr)->diffInHours($ahora) <= 36 : true;
-            })->values(),
-            '7d' => $todosSignosOrdenados->filter(function ($s) use ($ahora) {
-                $fStr = $s->fecha ? (is_string($s->fecha) ? substr($s->fecha, 0, 10) : $s->fecha->format('Y-m-d')) : '';
-
-                return $fStr ? Carbon::parse($fStr)->diffInDays($ahora) <= 7 : true;
-            })->values(),
-            '30d' => $todosSignosOrdenados->filter(function ($s) use ($ahora) {
-                $fStr = $s->fecha ? (is_string($s->fecha) ? substr($s->fecha, 0, 10) : $s->fecha->format('Y-m-d')) : '';
-
-                return $fStr ? Carbon::parse($fStr)->diffInDays($ahora) <= 30 : true;
-            })->values(),
-            '3m' => $todosSignosOrdenados->filter(function ($s) use ($ahora) {
-                $fStr = $s->fecha ? (is_string($s->fecha) ? substr($s->fecha, 0, 10) : $s->fecha->format('Y-m-d')) : '';
-
-                return $fStr ? Carbon::parse($fStr)->diffInDays($ahora) <= 90 : true;
-            })->values(),
-            default => $todosSignosOrdenados,
+        $desde = match ($periodo) {
+            '24h' => $ahora->copy()->subHours(24),
+            '7d' => $ahora->copy()->subDays(7),
+            '30d' => $ahora->copy()->subDays(30),
+            '3m' => $ahora->copy()->subMonths(3),
+            default => null,
         };
-
-        // Si el filtro temporal deja menos de 2 registros pero existen tomas previas, conservar al menos las últimas tomas
-        if ($signosOrdenados->count() < 2 && $todosSignosOrdenados->isNotEmpty()) {
-            $takeCount = match ($periodo) {
-                '24h' => 4,
-                '7d' => 8,
-                '30d' => 15,
-                default => 20,
-            };
-            $signosOrdenados = $todosSignosOrdenados->take(-$takeCount)->values();
-        }
+        $signosOrdenados = $todosSignosOrdenados->filter(fn ($s) => $s->fecha_hora !== null
+            && $s->fecha_hora->lte($ahora) && ($desde === null || $s->fecha_hora->gte($desde)))->values();
 
         $labels = [];
         $labelsLargas = [];
@@ -186,7 +157,7 @@ final class ResumenLongitudinalResidente
         $statsGlucosa = $calcStats($glucosa, 0);
         $statsPeso = $calcStats($peso, 1);
 
-        // Determinación de estado clínico y variaciones
+        // Variaciones numéricas; la interpretación clínica procede del evaluador compartido.
         $diffPas = ($ultPas !== null && $prevPas !== null && is_numeric($ultPas) && is_numeric($prevPas)) ? ((int) $ultPas - (int) $prevPas) : 0;
         $diffPad = ($ultPad !== null && $prevPad !== null && is_numeric($ultPad) && is_numeric($prevPad)) ? ((int) $ultPad - (int) $prevPad) : 0;
         $signoDiff = function ($val) {
@@ -200,12 +171,10 @@ final class ResumenLongitudinalResidente
                 'clave' => 'PA',
                 'nombre' => 'Presión arterial',
                 'titulo_grafico' => 'PRESIÓN ARTERIAL',
-                'subtitulo' => 'Evolución de presión sistólica y diastólica con rangos de normalidad',
+                'subtitulo' => 'Evolución de presión sistólica y diastólica con interpretación del servidor',
                 'unidad' => 'mmHg',
                 'ultimo' => ($ultPas !== null && $ultPad !== null) ? "{$ultPas}/{$ultPad}" : ($ultimoSigno?->presion_arterial ?: 'Sin datos'),
                 'ultimo_fmt' => ($ultPas !== null && $ultPad !== null) ? "{$ultPas}/{$ultPad} mmHg" : ($ultimoSigno?->presion_arterial ? "{$ultimoSigno->presion_arterial} mmHg" : 'Sin datos'),
-                'estado' => ($ultPas === null || $ultPad === null) ? 'Sin datos' : (($ultPas >= 140 || $ultPad >= 90) ? 'Elevada' : ($ultPas < 90 ? 'Hipotensión' : 'Normal')),
-                'estado_badge' => ($ultPas === null || $ultPad === null) ? $sinDatosBadge : (($ultPas >= 140 || $ultPad >= 90) ? 'bg-rose-100 text-rose-700 border-rose-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'),
                 'min' => "{$statsSistolica['min']}/{$statsDiastolica['min']}",
                 'max' => "{$statsSistolica['max']}/{$statsDiastolica['max']}",
                 'promedio' => "{$statsSistolica['avg']}/{$statsDiastolica['avg']}",
@@ -223,8 +192,6 @@ final class ResumenLongitudinalResidente
                 'unidad' => 'lpm',
                 'ultimo' => $ultimoSigno?->frecuencia_cardiaca !== null ? (string) $ultimoSigno->frecuencia_cardiaca : 'Sin datos',
                 'ultimo_fmt' => $ultimoSigno?->frecuencia_cardiaca !== null ? "{$ultimoSigno->frecuencia_cardiaca} lpm" : 'Sin datos',
-                'estado' => $ultimoSigno?->frecuencia_cardiaca === null ? 'Sin datos' : (($ultimoSigno->frecuencia_cardiaca > 100) ? 'Taquicardia' : (($ultimoSigno->frecuencia_cardiaca < 55) ? 'Bradicardia' : 'Normal')),
-                'estado_badge' => $ultimoSigno?->frecuencia_cardiaca === null ? $sinDatosBadge : (($ultimoSigno->frecuencia_cardiaca > 100 || $ultimoSigno->frecuencia_cardiaca < 55) ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'),
                 'min' => $statsFc['min'],
                 'max' => $statsFc['max'],
                 'promedio' => $statsFc['avg'],
@@ -242,8 +209,6 @@ final class ResumenLongitudinalResidente
                 'unidad' => '% SpO₂',
                 'ultimo' => $ultimoSigno?->saturacion !== null ? "{$ultimoSigno->saturacion}%" : 'Sin datos',
                 'ultimo_fmt' => $ultimoSigno?->saturacion !== null ? "{$ultimoSigno->saturacion}% SpO₂" : 'Sin datos',
-                'estado' => $ultimoSigno?->saturacion === null ? 'Sin datos' : (($ultimoSigno->saturacion < 92) ? 'Desaturación' : (($ultimoSigno->saturacion < 95) ? 'Aceptable' : 'Normal')),
-                'estado_badge' => $ultimoSigno?->saturacion === null ? $sinDatosBadge : (($ultimoSigno->saturacion < 92) ? 'bg-rose-100 text-rose-700 border-rose-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'),
                 'min' => $statsSpo2['min'],
                 'max' => $statsSpo2['max'],
                 'promedio' => $statsSpo2['avg'],
@@ -261,8 +226,6 @@ final class ResumenLongitudinalResidente
                 'unidad' => '°C',
                 'ultimo' => $ultimoSigno?->temperatura !== null ? "{$ultimoSigno->temperatura}°C" : 'Sin datos',
                 'ultimo_fmt' => $ultimoSigno?->temperatura !== null ? "{$ultimoSigno->temperatura} °C" : 'Sin datos',
-                'estado' => $ultimoSigno?->temperatura === null ? 'Sin datos' : (($ultimoSigno->temperatura >= 38.0) ? 'Fiebre' : (($ultimoSigno->temperatura >= 37.3) ? 'Febrícula' : 'Afebril')),
-                'estado_badge' => $ultimoSigno?->temperatura === null ? $sinDatosBadge : (($ultimoSigno->temperatura >= 37.5) ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'),
                 'min' => $statsTemp['min'],
                 'max' => $statsTemp['max'],
                 'promedio' => $statsTemp['avg'],
@@ -280,8 +243,6 @@ final class ResumenLongitudinalResidente
                 'unidad' => 'rpm',
                 'ultimo' => $ultimoSigno?->frecuencia_respiratoria !== null ? (string) $ultimoSigno->frecuencia_respiratoria : 'Sin datos',
                 'ultimo_fmt' => $ultimoSigno?->frecuencia_respiratoria !== null ? "{$ultimoSigno->frecuencia_respiratoria} rpm" : 'Sin datos',
-                'estado' => $ultimoSigno?->frecuencia_respiratoria === null ? 'Sin datos' : (($ultimoSigno->frecuencia_respiratoria > 22) ? 'Taquipnea' : (($ultimoSigno->frecuencia_respiratoria < 12) ? 'Bradipnea' : 'Eupnea')),
-                'estado_badge' => $ultimoSigno?->frecuencia_respiratoria === null ? $sinDatosBadge : (($ultimoSigno->frecuencia_respiratoria > 22 || $ultimoSigno->frecuencia_respiratoria < 12) ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'),
                 'min' => $statsFr['min'],
                 'max' => $statsFr['max'],
                 'promedio' => $statsFr['avg'],
@@ -292,6 +253,7 @@ final class ResumenLongitudinalResidente
                 'sparkline' => $fr,
             ],
             'DOLOR' => [
+                'estado' => 'Sin datos', 'estado_badge' => $sinDatosBadge,
                 'clave' => 'DOLOR',
                 'nombre' => 'Dolor EVA',
                 'titulo_grafico' => 'NIVEL DE DOLOR (ESCALA EVA)',
@@ -299,8 +261,6 @@ final class ResumenLongitudinalResidente
                 'unidad' => 'Escala 0-10',
                 'ultimo' => ($ultimoSigno?->dolor ?? $ultimoSigno?->nivel_dolor) !== null ? ($ultimoSigno->dolor ?? $ultimoSigno->nivel_dolor).'/10' : 'Sin datos',
                 'ultimo_fmt' => ($ultimoSigno?->dolor ?? $ultimoSigno?->nivel_dolor) !== null ? ($ultimoSigno->dolor ?? $ultimoSigno->nivel_dolor).'/10' : 'Sin datos',
-                'estado' => ($ultimoSigno?->dolor ?? $ultimoSigno?->nivel_dolor) === null ? 'Sin datos' : ((($ultimoSigno->dolor ?? $ultimoSigno->nivel_dolor) >= 4) ? 'Moderado' : ((($ultimoSigno->dolor ?? $ultimoSigno->nivel_dolor) > 0) ? 'Leve' : 'Sin dolor')),
-                'estado_badge' => ($ultimoSigno?->dolor ?? $ultimoSigno?->nivel_dolor) === null ? $sinDatosBadge : ((($ultimoSigno->dolor ?? $ultimoSigno->nivel_dolor) >= 4) ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'),
                 'min' => $statsDolor['min'],
                 'max' => $statsDolor['max'],
                 'promedio' => $statsDolor['avg'],
@@ -318,8 +278,6 @@ final class ResumenLongitudinalResidente
                 'unidad' => 'mg/dL',
                 'ultimo' => $ultimoSigno?->glucosa !== null ? "{$ultimoSigno->glucosa} mg/dL" : 'Sin datos',
                 'ultimo_fmt' => $ultimoSigno?->glucosa !== null ? "{$ultimoSigno->glucosa} mg/dL" : 'Sin datos',
-                'estado' => $ultimoSigno?->glucosa === null ? 'Sin datos' : (($ultimoSigno->glucosa > 140) ? 'Hiperglucemia' : (($ultimoSigno->glucosa < 70) ? 'Hipoglucemia' : 'Normal')),
-                'estado_badge' => $ultimoSigno?->glucosa === null ? $sinDatosBadge : (($ultimoSigno->glucosa > 140 || $ultimoSigno->glucosa < 70) ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'),
                 'min' => $statsGlucosa['min'],
                 'max' => $statsGlucosa['max'],
                 'promedio' => $statsGlucosa['avg'],
@@ -330,6 +288,7 @@ final class ResumenLongitudinalResidente
                 'sparkline' => $glucosa,
             ],
             'PESO' => [
+                'estado' => $ultimoSigno?->peso === null ? 'Sin datos' : 'Registrado', 'estado_badge' => $sinDatosBadge,
                 'clave' => 'PESO',
                 'nombre' => 'Peso corporal',
                 'titulo_grafico' => 'PESO CORPORAL',
@@ -337,8 +296,6 @@ final class ResumenLongitudinalResidente
                 'unidad' => 'kg',
                 'ultimo' => $ultimoSigno?->peso !== null ? "{$ultimoSigno->peso} kg" : 'Sin datos',
                 'ultimo_fmt' => $ultimoSigno?->peso !== null ? "{$ultimoSigno->peso} kg" : 'Sin datos',
-                'estado' => $ultimoSigno?->peso === null ? 'Sin datos' : 'Registrado',
-                'estado_badge' => $ultimoSigno?->peso === null ? $sinDatosBadge : 'bg-blue-100 text-blue-800 border-blue-200',
                 'min' => $statsPeso['min'],
                 'max' => $statsPeso['max'],
                 'promedio' => $statsPeso['avg'],
@@ -350,142 +307,29 @@ final class ResumenLongitudinalResidente
             ],
         ];
 
-        // Detección de Eventos Relevantes a partir de los controles reales
-        $eventosRelevantes = collect();
-        foreach ($todosSignosOrdenados->reverse() as $s) {
-            $pasVal = $s->presion_sistolica ?? (explode('/', $s->presion_arterial ?? '')[0] ?? null);
-            $padVal = $s->presion_diastolica ?? (explode('/', $s->presion_arterial ?? '')[1] ?? null);
-
-            $fechaHoraFmt = '';
-            if ($s->fecha) {
-                $cFecha = $s->fecha instanceof Carbon ? $s->fecha : Carbon::parse(substr((string) $s->fecha, 0, 10));
-                $horaFmt = '';
-                if ($s->hora) {
-                    if (preg_match('/(\d{1,2}:\d{2})/', (string) $s->hora, $m)) {
-                        $horaFmt = $m[1];
-                    } else {
-                        $horaFmt = substr((string) $s->hora, 0, 5);
-                    }
-                }
-                $fechaHoraFmt = $cFecha->translatedFormat('d M Y').($horaFmt ? " · {$horaFmt}" : '');
-            }
-
-            // Hallazgo PA
-            if ($pasVal && $padVal && ($pasVal >= 140 || $padVal >= 90)) {
-                $eventosRelevantes->push([
-                    'fecha_hora' => $fechaHoraFmt ?: 'Reciente',
-                    'evento' => 'Presión arterial elevada',
-                    'motivo' => $s->observacion ?: "Sistólica/Diastólica ({$pasVal}/{$padVal} mmHg) superior a 140/90",
-                    'valor' => "{$pasVal}/{$padVal} mmHg",
-                    'estado' => 'Elevada',
-                    'badge_bg' => 'bg-rose-100 text-rose-800 border-rose-200',
-                    'icon' => 'ph-heartbeat',
-                    'icon_color' => 'text-rose-600',
-                    'registro' => $s,
-                ]);
-            } elseif ($pasVal && $pasVal < 90) {
-                $eventosRelevantes->push([
-                    'fecha_hora' => $fechaHoraFmt ?: 'Reciente',
-                    'evento' => 'Hipotensión registrada',
-                    'motivo' => $s->observacion ?: "Sistólica ({$pasVal} mmHg) por debajo de 90 mmHg",
-                    'valor' => "{$pasVal}/{$padVal} mmHg",
-                    'estado' => 'Vigilancia',
-                    'badge_bg' => 'bg-amber-100 text-amber-800 border-amber-200',
-                    'icon' => 'ph-heartbeat',
-                    'icon_color' => 'text-amber-600',
-                    'registro' => $s,
-                ]);
-            }
-
-            // Hallazgo Temperatura
-            if ($s->temperatura && $s->temperatura >= 37.5) {
-                $eventosRelevantes->push([
-                    'fecha_hora' => $fechaHoraFmt ?: 'Reciente',
-                    'evento' => $s->temperatura >= 38.0 ? 'Fiebre registrada' : 'Febrícula',
-                    'motivo' => $s->observacion ?: ($s->temperatura >= 38.0 ? 'Temperatura corporal en rango febril (≥38.0 °C)' : 'Alza térmica reactiva (≥37.5 °C)'),
-                    'valor' => "{$s->temperatura} °C",
-                    'estado' => $s->temperatura >= 38.0 ? 'Fiebre' : 'Vigilancia',
-                    'badge_bg' => 'bg-amber-100 text-amber-800 border-amber-200',
-                    'icon' => 'ph-thermometer',
-                    'icon_color' => 'text-amber-600',
-                    'registro' => $s,
-                ]);
-            }
-
-            // Hallazgo SpO2
-            if ($s->saturacion && $s->saturacion < 92) {
-                $eventosRelevantes->push([
-                    'fecha_hora' => $fechaHoraFmt ?: 'Reciente',
-                    'evento' => 'Desaturación de oxígeno',
-                    'motivo' => $s->observacion ?: 'Saturación periférica SpO₂ en rango de riesgo (<92%)',
-                    'valor' => "{$s->saturacion}% SpO₂",
-                    'estado' => 'Alerta',
-                    'badge_bg' => 'bg-rose-100 text-rose-800 border-rose-200',
-                    'icon' => 'ph-drop',
-                    'icon_color' => 'text-rose-600',
-                    'registro' => $s,
-                ]);
-            }
-
-            // Hallazgo Frecuencia Cardíaca
-            if ($s->frecuencia_cardiaca && ($s->frecuencia_cardiaca > 100 || $s->frecuencia_cardiaca < 55)) {
-                $eventosRelevantes->push([
-                    'fecha_hora' => $fechaHoraFmt ?: 'Reciente',
-                    'evento' => $s->frecuencia_cardiaca > 100 ? 'Taquicardia en reposo' : 'Bradicardia',
-                    'motivo' => $s->observacion ?: ($s->frecuencia_cardiaca > 100 ? 'Frecuencia cardíaca acelerada (>100 lpm)' : 'Frecuencia cardíaca disminuida (<55 lpm)'),
-                    'valor' => "{$s->frecuencia_cardiaca} lpm",
-                    'estado' => 'Atención',
-                    'badge_bg' => 'bg-amber-100 text-amber-800 border-amber-200',
-                    'icon' => 'ph-activity',
-                    'icon_color' => 'text-amber-600',
-                    'registro' => $s,
-                ]);
-            }
-
-            // Hallazgo Dolor
-            $dolorVal = $s->dolor ?? $s->nivel_dolor;
-            if ($dolorVal !== null && $dolorVal >= 4) {
-                $eventosRelevantes->push([
-                    'fecha_hora' => $fechaHoraFmt ?: 'Reciente',
-                    'evento' => 'Dolor moderado manifestado',
-                    'motivo' => $s->observacion ?: "Puntuación de dolor de {$dolorVal}/10 en escala EVA",
-                    'valor' => "{$dolorVal}/10 EVA",
-                    'estado' => 'Dolor',
-                    'badge_bg' => 'bg-amber-100 text-amber-800 border-amber-200',
-                    'icon' => 'ph-smiley-sad',
-                    'icon_color' => 'text-amber-600',
-                    'registro' => $s,
-                ]);
-            }
+        $lector = app(InterpretacionSignosVitales::class);
+        $interpretaciones = $lector->coleccion($historialCompleto);
+        $registrosHistoricos = $historialCompleto->reverse()->map(
+            fn ($s) => $lector->fila($s, $interpretaciones[$s->cod_signo])
+        )->values();
+        foreach (InterpretacionSignosVitales::VARIABLES as $clave => $variables) {
+            $estado = $ultimoSigno ? $interpretaciones[$ultimoSigno->cod_signo]['metricas'][$clave] : $lector->resumir([]);
+            $metricasInfo[$clave]['estado'] = $estado['label'];
+            $metricasInfo[$clave]['estado_badge'] = $estado['estado_badge'];
+            $metricasInfo[$clave]['criterio'] = $estado['message'];
+            $metricasInfo[$clave]['resultados'] = $estado['resultados'];
         }
-
-        // Si no hay alteraciones, mostrar controles reales sin inferir valores ni diagnósticos.
-        if ($eventosRelevantes->isEmpty() && $todosSignosOrdenados->isNotEmpty()) {
-            foreach ($todosSignosOrdenados->reverse()->take(3) as $s) {
-                $fechaHoraFmt = '';
-                if ($s->fecha) {
-                    $cFecha = $s->fecha instanceof Carbon ? $s->fecha : Carbon::parse(substr((string) $s->fecha, 0, 10));
-                    $horaFmt = $s->hora ? substr((string) $s->hora, 0, 5) : '';
-                    $fechaHoraFmt = $cFecha->translatedFormat('d M Y').($horaFmt ? " · {$horaFmt}" : '');
-                }
-                $eventosRelevantes->push([
-                    'fecha_hora' => $fechaHoraFmt ?: 'Reciente',
-                    'evento' => 'Control hemodinámico de rutina',
-                    'motivo' => $s->observacion ?: 'Control registrado sin observaciones adicionales.',
-                    'valor' => collect([
-                        $s->presion_arterial ? "{$s->presion_arterial} mmHg" : null,
-                        $s->frecuencia_cardiaca !== null ? "{$s->frecuencia_cardiaca} lpm" : null,
-                        $s->saturacion !== null ? "{$s->saturacion}% SpO₂" : null,
-                        $s->temperatura !== null ? "{$s->temperatura} °C" : null,
-                    ])->filter()->join(' · ') ?: 'Sin valores cuantitativos registrados',
-                    'estado' => 'Registrado',
-                    'badge_bg' => 'bg-blue-100 text-blue-800 border-blue-200',
-                    'icon' => 'ph-check-circle',
-                    'icon_color' => 'text-emerald-600',
-                    'registro' => $s,
-                ]);
-            }
-        }
+        $puntosInterpretados = $signosOrdenados->map(
+            fn ($s) => $interpretaciones[$s->cod_signo]['metricas']
+        )->values()->all();
+        $filasPorCodigo = $registrosHistoricos->keyBy('id');
+        $eventosRelevantes = $signosOrdenados->reverse()->map(fn ($s) => $filasPorCodigo[$s->cod_signo])->map(fn (array $fila) => [
+            'fecha_hora' => trim($fila['fecha'].' '.$fila['hora']),
+            'evento' => 'Control de signos vitales', 'motivo' => $fila['criterio'],
+            'valor' => $fila['pa'] !== '--' ? $fila['pa'].' mmHg' : 'Ver mediciones',
+            'estado' => $fila['estado'], 'badge_bg' => $fila['badgeClass'],
+            'icon' => 'ph-heartbeat', 'icon_color' => 'text-[var(--rm-text-primary)]', 'registro' => $fila,
+        ]);
 
         $metricaActivaKey = $metricaSeleccionada ?? 'PA';
         $resumenPeriodoActivo = $metricasInfo[$metricaActivaKey] ?? $metricasInfo['PA'];
@@ -496,6 +340,11 @@ final class ResumenLongitudinalResidente
         } else {
             $resumenPeriodoActivo['ultimo_registro_fecha'] = 'Sin registros';
         }
+
+        foreach ($metricasInfo as &$metrica) {
+            $metrica['ultimo_registro_fecha'] = $resumenPeriodoActivo['ultimo_registro_fecha'];
+        }
+        unset($metrica);
 
         return [
             'alertas_total' => $alertasTotal,
@@ -525,6 +374,8 @@ final class ResumenLongitudinalResidente
                 'peso' => $peso,
                 'ultimo' => $ultimoSigno,
                 'metricas_info' => $metricasInfo,
+                'registros_historicos' => $registrosHistoricos->all(),
+                'interpretaciones' => $puntosInterpretados,
                 'resumen_periodo' => $resumenPeriodoActivo,
                 'eventos_relevantes' => $eventosRelevantes->take(6)->values(),
             ],

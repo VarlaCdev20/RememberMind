@@ -16,26 +16,24 @@
                     <img src="{{ $adultoDrawer->foto_url }}" alt="{{ $adultoDrawer->nombre_completo }}" class="h-11 w-11 shrink-0 rounded-xl object-cover border border-[var(--rm-border-soft)] shadow-2xs" />
                 @else
                     <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--rm-action-primary)] text-white font-bold text-sm shadow-2xs">
-                        {{ substr($adultoDrawer->nombres, 0, 1) }}{{ substr($adultoDrawer->ap_paterno, 0, 1) }}
+                        {{ substr($adultoDrawer->nombres, 0, 1) }}{{ substr($adultoDrawer->apellido_paterno, 0, 1) }}
                     </div>
                 @endif
                 <div class="min-w-0">
                     <h3 class="font-bold text-[var(--rm-text-primary)] text-sm leading-tight truncate uppercase">
-                        {{ $adultoDrawer->ap_paterno }} {{ $adultoDrawer->ap_materno }} {{ $adultoDrawer->nombres }}
+                        {{ $adultoDrawer->apellido_paterno }} {{ $adultoDrawer->apellido_materno }} {{ $adultoDrawer->nombres }}
                     </h3>
                     <div class="flex items-center gap-2 text-xs text-[var(--rm-text-secondary)] mt-0.5 flex-wrap">
                         <span>{{ $adultoDrawer->edad_texto }}</span>
                         <span>•</span>
                         <span>CI: {{ $adultoDrawer->ci ?: 'Documento S/D' }}</span>
-                        <span>•</span>
-                        <span class="font-mono text-[11px]">{{ $adultoDrawer->cod_residente }}</span>
                     </div>
                 </div>
             </div>
 
             <div class="text-right shrink-0">
                 <span class="inline-block px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-soft)] border border-[var(--rm-border-soft)] text-[var(--rm-text-primary)] font-semibold text-xs">
-                    {{ $adultoDrawer->ubicacion_texto }}
+                    {{ $adultoDrawer->ubicacion_formateada }}
                 </span>
                 <div class="mt-1 flex items-center justify-end gap-1.5">
                     <span class="text-[10.5px] text-[var(--rm-text-secondary)]">Estado:</span>

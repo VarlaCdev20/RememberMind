@@ -17,6 +17,13 @@ class Historical2026SeedIntegrityTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // La carga prolongada no comparte archivos falsos con otras suites de QA.
+        $this->app->useStoragePath(storage_path('framework/testing/historical-'.bin2hex(random_bytes(6))));
+    }
+
     public function test_complete_histories_daily_coverage_roles_and_idempotency(): void
     {
         Storage::fake('local');
@@ -36,25 +43,25 @@ class Historical2026SeedIntegrityTest extends TestCase
         $this->assertFalse(DB::table('signos_vitales')->where('fecha_hora', '>', Historical2026Seeder::CUTOFF)->exists());
         $this->assertSame(10, DB::table('preguntas_instrumento')->where('estado', 'ACTIVA')->count());
         $this->assertFalse(DB::table('valoraciones_dolor')->where('intensidad', '>', 0)->where('respuesta', 'No refiere dolor.')->exists());
-        $this->assertSame([8, 5, 3], DB::table('valoraciones_dolor')->where('cod_valoracion_dolor', 'like', 'H26_DV2_2_%')->orderBy('fecha_hora')->pluck('intensidad')->map(fn ($value) => (int) $value)->all());
-        $this->assertSame(2, DB::table('valoraciones_dolor')->where('cod_valoracion_origen', 'H26_DV2_2_0')->count());
-        $this->assertSame([4, 4], DB::table('valoraciones_dolor')->where('cod_valoracion_dolor', 'like', 'H26_DV2_3_%')->orderBy('fecha_hora')->pluck('intensidad')->map(fn ($value) => (int) $value)->all());
-        $this->assertNull(DB::table('valoraciones_dolor')->where('cod_valoracion_dolor', 'H26_DV2_1_0')->value('respuesta'));
+        $this->assertSame([8, 5, 3], DB::table('valoraciones_dolor')->where('cod_residente', DB::table('residentes')->where('numero_documento', '99000002')->value('cod_residente'))->whereIn('fecha_hora', [Historical2026Seeder::REFERENCE_DATE.' 07:20:00', Historical2026Seeder::REFERENCE_DATE.' 08:20:00', Historical2026Seeder::REFERENCE_DATE.' 09:20:00'])->orderBy('fecha_hora')->pluck('intensidad')->map(fn ($value) => (int) $value)->all());
+        $this->assertSame(2, DB::table('valoraciones_dolor')->where('cod_valoracion_origen', DB::table('valoraciones_dolor')->where('cod_residente', DB::table('residentes')->where('numero_documento', '99000002')->value('cod_residente'))->whereIn('fecha_hora', [Historical2026Seeder::REFERENCE_DATE.' 07:20:00', Historical2026Seeder::REFERENCE_DATE.' 08:20:00', Historical2026Seeder::REFERENCE_DATE.' 09:20:00'])->whereNull('cod_valoracion_origen')->sole(['cod_valoracion_dolor'])->cod_valoracion_dolor)->count());
+        $this->assertSame([4, 4], DB::table('valoraciones_dolor')->where('cod_residente', DB::table('residentes')->where('numero_documento', '99000003')->value('cod_residente'))->whereIn('fecha_hora', [Historical2026Seeder::REFERENCE_DATE.' 07:20:00', Historical2026Seeder::REFERENCE_DATE.' 08:20:00', Historical2026Seeder::REFERENCE_DATE.' 09:20:00'])->orderBy('fecha_hora')->pluck('intensidad')->map(fn ($value) => (int) $value)->all());
+        $this->assertNull(DB::table('valoraciones_dolor')->where('cod_residente', DB::table('residentes')->where('numero_documento', '99000001')->value('cod_residente'))->whereIn('fecha_hora', [Historical2026Seeder::REFERENCE_DATE.' 07:20:00', Historical2026Seeder::REFERENCE_DATE.' 08:20:00', Historical2026Seeder::REFERENCE_DATE.' 09:20:00'])->whereNull('cod_valoracion_origen')->value('respuesta'));
         $this->assertFalse(DB::table('registros_hidratacion')->whereNotIn('tolerancia', ['ADECUADA', 'PARCIAL', 'INSUFICIENTE', 'RECHAZADA'])->exists());
         $this->assertFalse(DB::table('registros_movilidad')->whereNotIn('traslado', ['INDEPENDIENTE', 'SUPERVISION', 'AYUDA_UNA_PERSONA', 'AYUDA_DOS_PERSONAS', 'GRUA'])->exists());
-        $this->assertFalse(User::findOrFail('H26_USU_N01')->can('prescripciones.crear'));
-        $this->assertTrue(User::findOrFail('H26_USU_MED')->can('prescripciones.crear'));
-        $nurse = DB::table('asignaciones_residente_jornada')->where('cod_jornada', 'H26_J_261008_0')->first()->cod_personal;
+        $this->assertFalse(User::where('correo', 'enfermeria.01@remembermind.test')->sole()->can('prescripciones.crear'));
+        $this->assertTrue(User::where('correo', 'med@remembermind.test')->sole()->can('prescripciones.crear'));
+        $nurse = DB::table('asignaciones_residente_jornada')->where('cod_jornada', DB::table('jornadas as j')->join('turnos as t', 't.cod_turno', '=', 'j.cod_turno')->where('j.fecha_jornada', '2026-10-08')->where('t.hora_inicio', '00:00:00')->where('t.hora_cierre', '12:00:00')->sole(['j.cod_jornada'])->cod_jornada)->first()->cod_personal;
         $this->travelTo(Carbon::parse(Historical2026Seeder::CUTOFF));
-        $dashboard = app(MiTurnoService::class)->obtenerDatosDashboard(User::findOrFail(str_replace('PER', 'USU', $nurse)));
+        $dashboard = app(MiTurnoService::class)->obtenerDatosDashboard(\App\Models\Personal::findOrFail($nurse)->usuario);
         $this->assertSame('EN_TURNO', $dashboard['modo']);
         $this->assertNotEmpty($dashboard['residentes']);
         $this->travelBack();
         $before = DB::table('signos_vitales')->orderBy('cod_signo')->get()->toJson();
-        $password = User::findOrFail('H26_USU_MED')->contrasena;
+        $password = User::where('correo', 'med@remembermind.test')->sole()->contrasena;
         $this->seed(Historical2026Seeder::class);
         $this->assertSame($before, DB::table('signos_vitales')->orderBy('cod_signo')->get()->toJson());
-        $this->assertSame($password, User::findOrFail('H26_USU_MED')->contrasena);
+        $this->assertSame($password, User::where('correo', 'med@remembermind.test')->sole()->contrasena);
         // Detecta corrupción en una familia antes omitida; jamás declara verificada una carga incompleta.
         DB::table('registros_sueno')->where('cod_registro_sueno', DB::table('registros_sueno')->value('cod_registro_sueno'))->delete();
         $this->expectException(RuntimeException::class);

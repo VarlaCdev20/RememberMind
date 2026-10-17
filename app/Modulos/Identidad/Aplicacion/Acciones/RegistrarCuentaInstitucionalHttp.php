@@ -13,14 +13,10 @@ final class RegistrarCuentaInstitucionalHttp
     {
         abort_unless($usuario->can('usuarios.gestionar'), 403);
         $datos = Validator::make($entrada, ['correo' => ['required', 'email', 'max:120', 'unique:usuarios,correo'], 'password' => ['required', 'string', 'min:12'], 'estado' => ['required', 'in:ACTIVO,INACTIVO'], 'rol' => ['required', 'exists:roles,name']])->validate();
-        $usuario = User::query()->create(['cod_usuario' => $this->codigo('USU'), 'correo' => $datos['correo'], 'contrasena' => Hash::make($datos['password']), 'estado' => $datos['estado']]);
+        $usuario = User::query()->create(['cod_usuario' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('usuarios'), 'correo' => $datos['correo'], 'contrasena' => Hash::make($datos['password']), 'estado' => $datos['estado']]);
         $usuario->assignRole($datos['rol']);
 
         return $usuario->load('roles');
     }
 
-    private function codigo(string $prefijo): string
-    {
-        return $prefijo.'_'.Str::upper(Str::random(12));
-    }
 }

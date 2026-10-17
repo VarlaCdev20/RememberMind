@@ -131,7 +131,7 @@ class DashboardService
             'GERENTE' => [
                 'title' => 'Dirección institucional,',
                 'highlight' => 'con visión de cobertura',
-                'description' => 'Conduce personal, áreas, turnos y planificación general con indicadores institucionales de consulta.',
+                'description' => 'Organiza el equipo, revisa la planificación y consulta la cobertura de la residencia.',
                 'quote' => 'Planificar es cuidar la capacidad institucional',
                 'areas' => [
                     ['icon' => 'ph-identification-badge', 'title' => 'Personal', 'copy' => 'Incorporación, profesión, especialidad y vigencia.'],
@@ -140,9 +140,11 @@ class DashboardService
                     ['icon' => 'ph-chart-line-up', 'title' => 'Cobertura', 'copy' => 'Planificación y disponibilidad futura.'],
                 ],
                 'accesos' => [
-                    ['route' => 'admin.personal-institucional', 'permission' => 'personal_institucional.ver', 'icon' => 'ph-identification-badge', 'label' => 'Personal'],
-                    ['route' => 'admin.turnos-asignaciones.index', 'permission' => 'turnos.ver', 'icon' => 'ph-clock', 'label' => 'Turnos'],
-                    ['route' => 'admin.reportes.institucional.preview', 'permission' => 'reportes.institucional', 'icon' => 'ph-chart-bar', 'label' => 'Reportes gerenciales'],
+                    ['route' => 'admin.personal-institucional', 'permission' => 'personal_institucional.ver', 'icon' => 'ph-identification-badge', 'label' => 'Personal', 'description' => 'Perfiles y documentación laboral.'],
+                    ['route' => 'admin.areas-institucionales.index', 'permission' => 'areas.ver', 'icon' => 'ph-buildings', 'label' => 'Áreas', 'description' => 'Organización del equipo por área.'],
+                    ['route' => 'admin.turnos-asignaciones.index', 'permission' => 'turnos.ver', 'icon' => 'ph-calendar-check', 'label' => 'Planificación', 'description' => 'Turnos y horarios del personal.'],
+                    ['route' => 'admin.turnos-enfermeria.index', 'permission' => 'jornadas.ver', 'icon' => 'ph-users-three', 'label' => 'Cobertura', 'description' => 'Consulta de jornadas y asignaciones.'],
+                    ['route' => 'admin.reportes.institucional.preview', 'permission' => 'reportes.institucional', 'icon' => 'ph-chart-bar', 'label' => 'Reportes gerenciales', 'description' => 'Información institucional consolidada.'],
                 ],
             ],
             'ADMINISTRADOR' => [

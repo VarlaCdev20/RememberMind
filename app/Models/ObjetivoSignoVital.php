@@ -44,7 +44,7 @@ class ObjetivoSignoVital extends ModeloOperativo
     {
         static::creating(function (self $objetivo): void {
             if (! $objetivo->cod_objetivo_signo) {
-                $objetivo->cod_objetivo_signo = 'OSV_'.strtoupper(Str::random(12));
+                $objetivo->cod_objetivo_signo = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('objetivos_signos_vitales', $objetivo->getConnectionName());
             }
         });
     }

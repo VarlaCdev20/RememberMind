@@ -1,5 +1,7 @@
 @props(['alert', 'href' => null])
 @php
+    // El prefijo de vínculo es técnico; la descripción clínica se conserva intacta.
+    $description = \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($alert['descripcion'] ?? null);
     $priority = strtoupper(trim((string) ($alert['prioridad'] ?? '')));
     $tone = match ($priority) {
         'CRITICO', 'CRITICA' => 'critical',
@@ -34,6 +36,6 @@
             @if(!empty($alert['habitacion']))<span>{{ $alert['habitacion'] }}</span>@endif
             <span class="rm-priority-alert__priority">{{ $label }}</span>
         </span>
-        <span class="rm-priority-alert__description">{{ $alert['descripcion'] ?? 'Alerta sin descripción' }}</span>
+        <span class="rm-priority-alert__description">{{ $description !== '' ? $description : 'Alerta sin descripción' }}</span>
     </span>
 @if($href)</a>@else</div>@endif

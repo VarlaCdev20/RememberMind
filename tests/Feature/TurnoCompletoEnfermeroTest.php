@@ -433,6 +433,13 @@ class TurnoCompletoEnfermeroTest extends TestCase
         ]);
 
         $this->actingAs($enfermero);
+        $asignacionEntrante = AsignacionPersonal::create([
+            'cod_jornada' => $jornadaTarde->cod_jornada,
+            'cod_personal' => $personalEntrante->cod_personal,
+            'cod_area' => $codArea,
+            'fecha_asignacion' => now(),
+            'estado' => 'PLANIFICADO',
+        ]);
         Livewire::test(PaseTurnoPanel::class)
             ->call('abrirGenerar')
             ->set('codResidente', $paciente->cod_residente)
@@ -450,17 +457,12 @@ class TurnoCompletoEnfermeroTest extends TestCase
         // Relevo entrante confirma la recepción de guardia
         $this->actingAs($enfermeroReceptor);
         Carbon::setTestNow('2026-09-10 16:00:00');
-        AsignacionPersonal::create([
-            'cod_jornada' => $jornadaTarde->cod_jornada,
-            'cod_personal' => $personalEntrante->cod_personal,
-            'cod_area' => $codArea,
-            'fecha_asignacion' => now(),
-        ]);
+        $asignacionEntrante->update(['estado' => 'ACTIVA']);
         Livewire::test(PaseTurnoPanel::class)
             ->call('recibirPase', $pase->cod_pase)
             ->assertHasNoErrors();
 
         $this->assertSame('RECIBIDO', $pase->fresh()->estado);
-        $this->assertNotNull($pase->fresh()->fecha_recibido);
+        $this->assertNotNull($pase->fresh()->fecha_hora_recepcion);
     }
 }

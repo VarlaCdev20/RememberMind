@@ -27,7 +27,7 @@ final class GestionarEstudiosClinicos
         $personal = $this->autorizacion->autorizarMutacion($usuario, $residente, 'estudios_clinicos.crear', self::ROLES_SOLICITUD);
         $datos = Validator::make($entrada, ['cod_atencion' => ['required', 'exists:atenciones,cod_atencion'], 'cod_tipo_estudio' => ['required', 'exists:tipos_estudio_clinico,cod_tipo_estudio'], 'motivo' => ['nullable', 'string'], 'prioridad' => ['nullable', 'string', 'max:20'], 'centro_medico' => ['nullable', 'string', 'max:160'], 'observacion' => ['nullable', 'string']])->validate();
         $this->validarAtencion($datos['cod_atencion'], $residente);
-        $estudio = EstudioClinico::query()->create(['cod_estudio' => $this->codigo('EST'), 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, ...$datos, 'fecha_solicitud' => now(), 'estado' => 'SOLICITADO']);
+        $estudio = EstudioClinico::query()->create(['cod_estudio' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('estudios_clinicos'), 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, ...$datos, 'fecha_solicitud' => now(), 'estado' => 'SOLICITADO']);
 
         return $estudio;
     }
@@ -51,7 +51,7 @@ final class GestionarEstudiosClinicos
             abort_if($yaRegistrados, 409, 'Un resultado clínico existente no puede sobrescribirse; registre una rectificación trazable.');
             $creados = [];
             foreach ($datos['resultados'] as $fila) {
-                $creados[] = ResultadoEstudio::query()->create(['cod_resultado_estudio' => $this->codigo('RES'), 'cod_estudio' => $estudioBloqueado->cod_estudio, ...$fila]);
+                $creados[] = ResultadoEstudio::query()->create(['cod_resultado_estudio' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('resultados_estudio'), 'cod_estudio' => $estudioBloqueado->cod_estudio, ...$fila]);
             }
             $estudioBloqueado->update(['fecha_realizacion' => now(), 'estado' => 'REALIZADO']);
 
@@ -67,7 +67,7 @@ final class GestionarEstudiosClinicos
         $personal = $this->autorizacion->autorizarMutacion($usuario, $residente, 'informes_estudio.crear', self::ROLES_SOLICITUD);
         abort_unless(in_array($estudio->estado, ['REALIZADO', 'INFORMADO'], true), 409, 'El estudio debe estar realizado antes de emitir un informe.');
         $datos = Validator::make($entrada, ['hallazgos' => ['nullable', 'string'], 'conclusion' => ['required', 'string', 'min:5'], 'recomendacion' => ['nullable', 'string'], 'origen' => ['required', 'in:INTERNO,EXTERNO'], 'profesional_externo' => ['nullable', 'required_if:origen,EXTERNO', 'string', 'max:160']])->validate();
-        $informe = InformeEstudio::query()->create(['cod_informe_estudio' => $this->codigo('INF'), 'cod_estudio' => $estudio->cod_estudio, 'cod_personal' => $personal->cod_personal, ...$datos, 'fecha_hora' => now(), 'estado' => 'VIGENTE']);
+        $informe = InformeEstudio::query()->create(['cod_informe_estudio' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('informes_estudio'), 'cod_estudio' => $estudio->cod_estudio, 'cod_personal' => $personal->cod_personal, ...$datos, 'fecha_hora' => now(), 'estado' => 'VIGENTE']);
 
         return $informe;
     }
@@ -75,14 +75,14 @@ final class GestionarEstudiosClinicos
     public function documento(User $usuario, array $entrada, Residente $residente): mixed
     {
         $personal = $this->autorizacion->autorizarMutacion($usuario, $residente, 'documentos_clinicos.crear', self::ROLES_SOLICITUD);
-        $datos = Validator::make($entrada, ['archivo' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png,doc,docx', 'max:20480'], 'cod_estudio' => ['nullable', 'exists:estudios_clinicos,cod_estudio'], 'cod_atencion' => ['nullable', 'exists:atenciones,cod_atencion'], 'tipo_documento' => ['required', 'string', 'max:60'], 'titulo' => ['required', 'string', 'max:180'], 'descripcion' => ['nullable', 'string'], 'origen' => ['nullable', 'string', 'max:20'], 'observacion' => ['nullable', 'string']])->validate();
+        $datos = Validator::make($entrada, ['archivo' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png,doc,docx', 'max:20480'], 'cod_estudio' => ['nullable', 'exists:estudios_clinicos,cod_estudio'], 'cod_atencion' => ['nullable', 'exists:atenciones,cod_atencion'], 'tipo_documento' => ['required', 'string', 'max:60', 'not_in:FOTO_HERIDA'], 'titulo' => ['required', 'string', 'max:180'], 'descripcion' => ['nullable', 'string'], 'origen' => ['nullable', 'string', 'max:20'], 'observacion' => ['nullable', 'string']])->validate();
         if (isset($datos['cod_estudio'])) {
             abort_unless(EstudioClinico::query()->whereKey($datos['cod_estudio'])->where('cod_residente', $residente->cod_residente)->exists(), 422, 'El estudio no pertenece al residente.');
         }
         $this->validarAtencion($datos['cod_atencion'] ?? null, $residente);
         $archivo = data_get($entrada, 'archivo');
         unset($datos['archivo']);
-        $codigo = $this->codigo('DCL');
+        $codigo = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('documentos_clinicos');
         $ruta = $this->ficheros->recibirComo($archivo, 'documentos-clinicos/'.$residente->cod_residente, $codigo.'.'.$archivo->extension(), 'local');
         $documento = DocumentoClinico::query()->create(['cod_documento_clinico' => $codigo, 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, ...$datos, 'ruta_archivo' => $ruta, 'formato' => $archivo->getMimeType() ?: 'application/octet-stream', 'tamano_bytes' => $archivo->getSize(), 'hash_archivo' => $this->ficheros->hashEntrada($archivo), 'fecha_hora' => now(), 'estado' => 'VIGENTE']);
 
@@ -96,7 +96,7 @@ final class GestionarEstudiosClinicos
         $this->validarAtencion($datos['cod_atencion'] ?? null, $residente);
         abort_unless($datos['cod_area_solicitante'] === $this->autorizacion->areaActiva($personal, $datos['cod_area_solicitante'])->cod_area, 422, 'El área solicitante no corresponde a la asignación clínica vigente del profesional.');
 
-        return Derivacion::query()->create(['cod_derivacion' => $this->codigo('DER'), 'cod_residente' => $residente->cod_residente, 'cod_personal_solicitante' => $personal->cod_personal, ...$datos, 'fecha_hora' => now(), 'estado' => 'PENDIENTE']);
+        return Derivacion::query()->create(['cod_derivacion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('derivaciones'), 'cod_residente' => $residente->cod_residente, 'cod_personal_solicitante' => $personal->cod_personal, ...$datos, 'fecha_hora' => now(), 'estado' => 'PENDIENTE']);
     }
 
     private function validarAtencion(?string $codigo, Residente $residente): void
@@ -106,8 +106,4 @@ final class GestionarEstudiosClinicos
         }
     }
 
-    private function codigo(string $prefijo): string
-    {
-        return $prefijo.'_'.Str::upper(Str::random(12));
-    }
 }

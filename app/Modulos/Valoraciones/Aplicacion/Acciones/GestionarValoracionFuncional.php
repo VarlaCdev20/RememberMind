@@ -29,7 +29,7 @@ final class GestionarValoracionFuncional
                 ->update(['estado' => 'HISTORICA']);
 
             $atencion = Atencion::query()->create([
-                'cod_atencion' => 'ATN_'.Str::upper(Str::random(10)),
+                'cod_atencion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('atenciones'),
                 'cod_residente' => $datos['adulto']->cod_residente,
                 'cod_area' => $codArea,
                 'cod_personal' => $personal->cod_personal,
@@ -74,7 +74,7 @@ final class GestionarValoracionFuncional
         $apoyo = $datos['usa_silla_ruedas'] ? 'SILLA_RUEDAS' : ($datos['usa_andador'] ? 'ANDADOR' : ($datos['usa_baston'] ? 'BASTON' : 'SIN_APOYO'));
 
         return [
-            'cod_valoracion_funcional' => $id ?? 'VAF_'.Str::upper(Str::random(10)),
+            'cod_valoracion_funcional' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('valoraciones_funcionales'),
             'cod_residente' => $datos['adulto']->cod_residente,
             'cod_personal' => $codPersonal,
             'cod_atencion' => $codAtencion,

@@ -39,7 +39,6 @@
                 </div>
                 <div>
                     <h2 class="text-lg font-bold text-rm-text-primary leading-tight">{{ $simulado['residente']['nombre_corto'] }}</h2>
-                    <p class="text-xs text-rm-secondary mt-0.5">Código: <span class="font-mono">{{ $simulado['residente']['codigo'] }}</span></p>
                 </div>
             </div>
 
@@ -152,7 +151,6 @@
                     </div>
                     <div>
                         <h2 class="text-xl font-bold text-rm-text-primary leading-tight">{{ $actual['nombre'] }}</h2>
-                        <p class="text-xs text-rm-secondary font-mono tracking-wider">{{ $actual['codigo'] }}</p>
                     </div>
                 </div>
                 <div>
@@ -275,7 +273,6 @@
                         <table class="w-full text-left text-xs border-collapse">
                             <thead>
                                 <tr class="border-b border-rm text-slate-400 font-semibold">
-                                    <th class="py-2.5 px-3">Código</th>
                                     <th class="py-2.5 px-3">Evidencia</th>
                                     <th class="py-2.5 px-3">Fuente</th>
                                     <th class="py-2.5 px-3 text-right">Estado</th>
@@ -284,7 +281,6 @@
                             <tbody class="divide-y divide-rm">
                                 @foreach($actual['evidencias'] as $ev)
                                     <tr class="hover:bg-slate-50/50 transition">
-                                        <td class="py-3 px-3 font-mono font-medium text-slate-800">{{ $ev['codigo'] }}</td>
                                         <td class="py-3 px-3 font-semibold text-slate-900">{{ $ev['nombre'] }}</td>
                                         <td class="py-3 px-3 text-slate-600">{{ $ev['fuente'] }}</td>
                                         <td class="py-3 px-3 text-right">

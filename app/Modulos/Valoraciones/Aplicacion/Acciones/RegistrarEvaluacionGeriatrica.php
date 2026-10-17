@@ -33,7 +33,7 @@ final class RegistrarEvaluacionGeriatrica
                 ->implode(' · ');
 
             AplicacionInstrumento::create([
-                'cod_aplicacion' => 'API_'.Str::upper(Str::random(12)),
+                'cod_aplicacion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('aplicaciones_instrumento'),
                 'cod_instrumento' => $datos['cod_instrumento'],
                 'cod_residente' => $datos['cod_residente'],
                 'cod_personal' => $personal->cod_personal,

@@ -3,6 +3,7 @@
 namespace App\Modulos\Clinica\Presentacion\Adaptadores;
 
 use App\Models\SignoVital;
+use Illuminate\Support\Collection;
 use App\Modulos\Clinica\Aplicacion\Acciones\EvaluadorSignosVitales;
 use App\Modulos\Clinica\Dominio\Enumeraciones\SeveridadClinica;
 use App\Modulos\Clinica\Dominio\ObjetosValor\EvaluacionSignosVitales;
@@ -22,9 +23,10 @@ final class ClasificacionSignosVitalesService
         ];
     }
 
-    public static function evaluarRegistro(SignoVital $signo): array
+    public static function evaluarRegistro(SignoVital $signo, ?Collection $objetivos = null): array
     {
         return self::adaptar(app(EvaluadorSignosVitales::class)->evaluar([
+            'fecha_hora' => $signo->fecha_hora,
             'presion_sistolica' => $signo->presion_sistolica,
             'presion_diastolica' => $signo->presion_diastolica,
             'frecuencia_cardiaca' => $signo->frecuencia_cardiaca,
@@ -33,8 +35,7 @@ final class ClasificacionSignosVitalesService
             'saturacion_oxigeno' => $signo->saturacion_oxigeno,
             'glucemia' => $signo->glucemia,
         ], $signo->cod_residente,
-            $signo->relationLoaded('residente') && $signo->residente?->relationLoaded('objetivosSignosVitales')
-                ? $signo->residente->objetivosSignosVitales : null,
+            $objetivos,
             false));
     }
 

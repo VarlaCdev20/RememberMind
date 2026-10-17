@@ -19,7 +19,7 @@ final class RegistrarEvaluacionGeriatricaArea
             $instrumento = Instrumento::query()->findOrFail($datos['cod_instrumento']);
 
             AplicacionInstrumento::create([
-                'cod_aplicacion' => 'APL_'.Str::upper(Str::random(10)),
+                'cod_aplicacion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('aplicaciones_instrumento'),
                 'cod_residente' => $datos['cod_residente'],
                 'cod_instrumento' => $instrumento->cod_instrumento,
                 'cod_personal' => $personal->cod_personal,

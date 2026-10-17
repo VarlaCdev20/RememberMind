@@ -124,7 +124,7 @@ class Atencion extends ModeloOperativo
 
         static::creating(function (self $model) {
             if (empty($model->cod_atencion)) {
-                $model->cod_atencion = 'ATN_' . strtoupper(Str::random(10));
+                $model->cod_atencion = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('atenciones', $model->getConnectionName());
             }
 
             if (isset($model->attributes['fecha_hora_atencion'])) {

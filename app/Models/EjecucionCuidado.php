@@ -29,7 +29,7 @@ class EjecucionCuidado extends ModeloOperativo
     {
         static::creating(function (EjecucionCuidado $model) {
             if (empty($model->cod_ejecucion)) {
-                $model->cod_ejecucion = 'EJE_'.Str::upper(Str::random(10));
+                $model->cod_ejecucion = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('ejecuciones_cuidado', $model->getConnectionName());
             }
             if (empty($model->cod_residente)) {
                 throw new LogicException('La ejecución de cuidado requiere un residente explícito.');

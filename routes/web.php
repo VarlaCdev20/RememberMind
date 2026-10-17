@@ -153,6 +153,7 @@ Route::middleware([
             $rutas['Institucion']['ruta_034']();
 
             $rutas['Institucion']['ruta_035']();
+            $rutas['Institucion']['galeria']();
 
             $rutas['Institucion']['ruta_036']();
 

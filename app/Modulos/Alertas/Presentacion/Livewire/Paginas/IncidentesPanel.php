@@ -365,7 +365,7 @@ class IncidentesPanel extends Component
             $this->modalRegistrar = false;
             $this->modalExito = true;
 
-            session()->flash('mensaje', 'Incidencia registrada con éxito: '.$incidente->cod_incidente);
+            session()->flash('mensaje', 'Incidencia registrada con éxito.');
         } catch (\Throwable $e) {
             Log::error('Error al registrar incidente: '.$e->getMessage(), ['exception' => $e]);
             $this->addError('error_general', 'No se pudo registrar el incidente. Conservamos los datos; inténtelo de nuevo.');
@@ -495,7 +495,7 @@ class IncidentesPanel extends Component
             ->first();
 
         if ($alertaExistente) {
-            session()->flash('info', 'Ya existe una solicitud médica/alerta activa para este incidente ('.$alertaExistente->cod_alerta.').');
+            session()->flash('info', 'Ya existe una solicitud médica o alerta activa para este incidente.');
 
             return;
         }
@@ -503,7 +503,7 @@ class IncidentesPanel extends Component
         try {
             $alerta = app(GestionarIncidentesPanel::class)->solicitarValoracionMedica(Auth::user(), $incidente);
 
-            session()->flash('mensaje', 'Solicitud de valoración médica enviada exitosamente (Alerta: '.$alerta->cod_alerta.').');
+            session()->flash('mensaje', 'Solicitud de valoración médica enviada exitosamente.');
 
             if ($this->modalVer) {
                 $this->alertaVinculada = $alerta;
@@ -586,7 +586,7 @@ class IncidentesPanel extends Component
             $derivacion = app(GestionarIncidentesPanel::class)->crearDerivacion($user, ['derivacion_area_receptora' => $this->derivacion_area_receptora, 'derivacion_motivo' => $this->derivacion_motivo, 'derivacion_prioridad' => $this->derivacion_prioridad], $incidente);
 
             $this->modalDerivacion = false;
-            session()->flash('mensaje', 'Derivación '.$derivacion->cod_derivacion.' creada con éxito.');
+            session()->flash('mensaje', 'Derivación creada con éxito.');
         } catch (\Throwable $e) {
             Log::error('Error al crear derivación: '.$e->getMessage());
             $this->addError('error_derivacion', 'No se pudo crear la derivación. Conservamos los datos; inténtelo de nuevo.');

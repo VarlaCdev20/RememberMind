@@ -45,8 +45,19 @@ abstract class ModeloOperativo extends Model
     protected static function boot(): void
     {
         parent::boot();
+        static::creating(function (self $modelo): void {
+            if (empty($modelo->getKey())) {
+                $modelo->setAttribute($modelo->getKeyName(), app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente($modelo->getTable(), $modelo->getConnectionName()));
+            }
+            app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->registrarExplicito($modelo->getTable(), (string) $modelo->getKey(), $modelo->getConnectionName());
+        });
         static::deleting(function (): void {
             throw new \LogicException('Los registros operativos conservan historia y no admiten borrado físico ordinario.');
+        });
+        static::updating(function (self $modelo): void {
+            if ($modelo->isDirty($modelo->getKeyName())) {
+                throw new \LogicException('La identidad de un registro operativo no se modifica mediante una edición.');
+            }
         });
     }
 }

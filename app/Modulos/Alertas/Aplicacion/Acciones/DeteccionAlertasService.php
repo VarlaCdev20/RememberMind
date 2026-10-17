@@ -24,7 +24,7 @@ class DeteccionAlertasService
         // El flujo de registro confirma signos y crea alertas aprobadas en una sola
         // transacción. Este detector general no debe crear alertas por advertencias.
 
-        AdministracionMedicacion::query()->whereIn('cod_residente', $ids)->where('resultado', 'OMITIDA')->orderBy('cod_administracion')->chunk(100, function ($registros) use (&$creadas) {
+        AdministracionMedicacion::query()->whereIn('cod_residente', $ids)->where('resultado', 'OMITIDA')->whereNotIn('estado', ['ANULADA', 'ANULADO'])->orderBy('cod_administracion')->chunk(100, function ($registros) use (&$creadas) {
             foreach ($registros as $r) {
                 $creadas += $this->registrar(
                     $r,
@@ -197,7 +197,7 @@ class DeteccionAlertasService
             }
 
             $alerta = Alerta::create([
-                'cod_alerta' => 'ALA_'.strtoupper(Str::random(10)),
+                'cod_alerta' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('alertas'),
                 'cod_residente' => $codResidente,
                 'tipo' => $tipoAlerta,
                 'prioridad' => $nivel,
@@ -243,7 +243,7 @@ class DeteccionAlertasService
                 return 0;
             }
             $alerta = Alerta::create([
-                'cod_alerta' => 'ALA_'.strtoupper(Str::random(10)),
+                'cod_alerta' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('alertas'),
                 'cod_residente' => $registro->cod_residente,
                 'tipo' => $tipo,
                 'prioridad' => $nivel,

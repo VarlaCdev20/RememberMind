@@ -20,26 +20,41 @@ use Illuminate\Validation\ValidationException;
 
 final class RegistrarCuidadosDeTurno
 {
-    public function guardarSeguimientoLesion(User $usuario, array $entrada): void
+    public function guardarSeguimientoLesion(User $usuario, array $entrada): CuracionHerida
     {
         abort_unless($usuario?->can('curaciones_herida.crear'), 403);
         $this->autorizarMutacion($usuario, $entrada['codResidente']);
-        Validator::make($entrada, ['lesionId' => 'required|string|max:20', 'largoLesion' => 'nullable|numeric|min:0|max:99999', 'anchoLesion' => 'nullable|numeric|min:0|max:99999', 'profundidadLesion' => 'nullable|numeric|min:0|max:99999', 'dolorLesion' => 'nullable|integer|min:0|max:10', 'aspectoLesion' => 'required|string|min:5|max:1000', 'accionLesion' => 'required|string|min:5|max:2000', 'observacionLesion' => 'nullable|string|max:2000'])->validate();
+        Validator::make($entrada, ['lesionId' => 'required|string|max:20', 'largoLesion' => 'nullable|numeric|min:0|max:99999', 'anchoLesion' => 'nullable|numeric|min:0|max:99999', 'profundidadLesion' => 'nullable|numeric|min:0|max:99999', 'dolorLesion' => 'nullable|integer|min:0|max:10', 'aspectoLesion' => 'required|string|min:5|max:80', 'exudadoLesion' => 'nullable|string|max:80', 'olorLesion' => 'nullable|string|max:80', 'materialesLesion' => 'nullable|string|max:2000', 'respuestaLesion' => 'nullable|string|max:2000', 'accionLesion' => 'required|string|min:5|max:2000', 'observacionLesion' => 'nullable|string|max:2000'])->validate();
         $personal = $usuario?->personal;
         abort_unless($personal, 403, 'Personal clínico no vinculado.');
         $herida = Herida::query()->where('cod_residente', $entrada['codResidente'])->where('estado', 'ACTIVA')->findOrFail($entrada['lesionId']);
         $miTurnoService = app(MiTurnoService::class);
         $jornada = $miTurnoService->resolverJornadaActual($personal, now());
         abort_unless($jornada, 409, 'No existe una jornada profesional activa para firmar la curación.');
-        CuracionHerida::create(['cod_curacion' => 'CUR_'.strtoupper(Str::random(10)), 'cod_herida' => $herida->cod_herida, 'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada, 'fecha_hora' => now(), 'longitud' => $entrada['largoLesion'] !== null ? (float) $entrada['largoLesion'] : null, 'ancho' => $entrada['anchoLesion'] !== null ? (float) $entrada['anchoLesion'] : null, 'profundidad' => $entrada['profundidadLesion'] !== null ? (float) $entrada['profundidadLesion'] : null, 'tejido' => $entrada['aspectoLesion'] ?: null, 'exudado' => $entrada['exudadoLesion'] ?: null, 'dolor' => $entrada['dolorLesion'] !== null ? (string) $entrada['dolorLesion'] : null, 'procedimiento' => $entrada['accionLesion'], 'observacion' => $entrada['observacionLesion'] ?: null]);
+
+        return app(PersistirFotosHerida::class)->conRegistro($usuario, $entrada['fotografias'] ?? [], $entrada['descripcionesFotos'] ?? [], function () use ($entrada, $herida, $personal, $jornada): CuracionHerida {
+            $bloqueada = Herida::query()->lockForUpdate()->findOrFail($herida->getKey());
+            abort_unless($bloqueada->estado === 'ACTIVA', 409, 'La herida ya no admite curaciones.');
+
+            return CuracionHerida::create(['cod_curacion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('curaciones_herida'), 'cod_herida' => $bloqueada->cod_herida, 'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada, 'fecha_hora' => now(), 'longitud' => $entrada['largoLesion'], 'ancho' => $entrada['anchoLesion'], 'profundidad' => $entrada['profundidadLesion'], 'tejido' => $entrada['aspectoLesion'], 'exudado' => $entrada['exudadoLesion'] ?: null, 'olor' => ($entrada['olorLesion'] ?? '') ?: null, 'dolor' => $entrada['dolorLesion'] !== null ? (string) $entrada['dolorLesion'] : null, 'procedimiento' => $entrada['accionLesion'], 'materiales' => ($entrada['materialesLesion'] ?? '') ?: null, 'respuesta' => ($entrada['respuestaLesion'] ?? '') ?: null, 'observacion' => $entrada['observacionLesion'] ?: null]);
+        });
     }
 
     public function cerrarLesion(User $usuario, array $entrada, string $codigo): void
     {
         $this->autorizarMutacion($usuario, $entrada['codResidente']);
         Validator::make($entrada, ['resultadoCierreLesion' => 'required|string|min:5|max:1000', 'motivoCierreLesion' => 'required|string|min:5|max:1000'])->validate();
-        $herida = Herida::where('cod_residente', $entrada['codResidente'])->where('estado', 'ACTIVA')->findOrFail($codigo);
-        $herida->update(['estado' => 'CERRADA', 'fecha_hora_cierre' => now(), 'observacion' => trim($herida->observacion."\n[Cierre: ".$entrada['resultadoCierreLesion'].' - '.$entrada['motivoCierreLesion'].']')]);
+        DB::transaction(function () use ($usuario, $entrada, $codigo): void {
+            $herida = Herida::where('cod_residente', $entrada['codResidente'])->lockForUpdate()->findOrFail($codigo);
+            // Revalidar después de esperar el lock: el turno o el vínculo pueden haber cambiado.
+            $this->autorizarMutacion($usuario, $entrada['codResidente']);
+            if ($herida->estado !== 'ACTIVA') {
+                throw ValidationException::withMessages([
+                    'resultadoCierreLesion' => 'Esta herida ya no está activa. Actualiza su resumen antes de volver a documentar el cierre.',
+                ]);
+            }
+            $herida->update(['estado' => 'CERRADA', 'fecha_hora_cierre' => now(), 'observacion' => trim($herida->observacion."\n[Cierre: ".$entrada['resultadoCierreLesion'].' - '.$entrada['motivoCierreLesion'].']')]);
+        });
     }
 
     public function rectificarCuidado(User $usuario, array $entrada): void
@@ -78,9 +93,9 @@ final class RegistrarCuidadosDeTurno
         $tipoNorm = strtoupper(trim($entrada['tipo']));
         DB::transaction(function () use ($personal, $jornada, $tipoNorm, $entrada) {
             if ($tipoNorm === 'ALIMENTACION') {
-                RegistroIngesta::create(['cod_ingesta' => 'ING_'.strtoupper(Str::random(10)), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada, 'tipo_comida' => $entrada['subtipo'], 'porcentaje_consumido' => $entrada['porcentaje'] !== null ? (float) $entrada['porcentaje'] : null, 'apetito' => $entrada['estadoGeneral'] ?: null, 'tolerancia' => $entrada['tolerancia'] ?: null, 'dificultad_deglucion' => (bool) $entrada['presentaDificultad'], 'fecha_hora' => now(), 'estado' => 'VIGENTE', 'observacion' => ($entrada['observacion'] ?: $entrada['motivo']) ?: null]);
+                RegistroIngesta::create(['cod_ingesta' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('registros_ingesta'), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada, 'tipo_comida' => $entrada['subtipo'], 'porcentaje_consumido' => $entrada['porcentaje'] !== null ? (float) $entrada['porcentaje'] : null, 'apetito' => $entrada['estadoGeneral'] ?: null, 'tolerancia' => $entrada['tolerancia'] ?: null, 'dificultad_deglucion' => (bool) $entrada['presentaDificultad'], 'fecha_hora' => now(), 'estado' => 'VIGENTE', 'observacion' => ($entrada['observacion'] ?: $entrada['motivo']) ?: null]);
             } elseif ($tipoNorm === 'SUENO') {
-                RegistroSueno::create(['cod_registro_sueno' => 'RSU_'.strtoupper(Str::random(10)), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada, 'fecha' => today()->toDateString(), 'despertares' => $entrada['cantidadDespertares'] !== null ? (int) $entrada['cantidadDespertares'] : null, 'insomnio' => (bool) $entrada['agitacion'], 'calidad' => $entrada['calidad'] ?: null, 'estado' => 'VIGENTE', 'observacion' => ($entrada['observacion'] ?: $entrada['motivo']) ?: null]);
+                RegistroSueno::create(['cod_registro_sueno' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('registros_sueno'), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada, 'fecha' => today()->toDateString(), 'despertares' => $entrada['cantidadDespertares'] !== null ? (int) $entrada['cantidadDespertares'] : null, 'insomnio' => (bool) $entrada['agitacion'], 'calidad' => $entrada['calidad'] ?: null, 'estado' => 'VIGENTE', 'observacion' => ($entrada['observacion'] ?: $entrada['motivo']) ?: null]);
             } else {
                 // HIGIENE, PROCEDIMIENTO y cuidados generales
                 // Validar: intervencion -> plan -> plan.cod_residente == residente actual
@@ -96,13 +111,13 @@ final class RegistrarCuidadosDeTurno
                     abort(422, 'Intervención de cuidado no válida o no activa.');
                 }
                 $codIntervencion = $intervencion->cod_intervencion;
-                EjecucionCuidado::create(['cod_intervencion' => $codIntervencion, 'cod_ejecucion' => 'EJC_'.strtoupper(Str::random(10)), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada, 'fecha_hora_programada' => now(), 'fecha_hora_ejecucion' => now(), 'resultado' => $entrada['resultado'] ?: 'REALIZADA', 'estado' => 'REALIZADA', 'observacion' => trim(($entrada['subtipo'] ? $entrada['subtipo'].': ' : '').(($entrada['observacion'] ?: $entrada['motivo']) ?: 'Cuidado firmado en turno.'))]);
+                EjecucionCuidado::create(['cod_intervencion' => $codIntervencion, 'cod_ejecucion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('ejecuciones_cuidado'), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada, 'fecha_hora_programada' => now(), 'fecha_hora_ejecucion' => now(), 'resultado' => $entrada['resultado'] ?: 'REALIZADA', 'estado' => 'REALIZADA', 'observacion' => trim(($entrada['subtipo'] ? $entrada['subtipo'].': ' : '').(($entrada['observacion'] ?: $entrada['motivo']) ?: 'Cuidado firmado en turno.'))]);
             }
             if ($entrada['dolor'] !== null) {
-                ValoracionDolor::create(['cod_valoracion_dolor' => 'VDL_'.strtoupper(Str::random(10)), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'fecha_hora' => now(), 'intensidad' => (int) $entrada['dolor'], 'ubicacion' => null, 'tipo_dolor' => null, 'estado' => 'ACTIVA', 'observacion' => null]);
+                ValoracionDolor::create(['cod_valoracion_dolor' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('valoraciones_dolor'), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'fecha_hora' => now(), 'intensidad' => (int) $entrada['dolor'], 'ubicacion' => null, 'tipo_dolor' => null, 'estado' => 'ACTIVA', 'observacion' => null]);
             }
             if ($entrada['cambioBasal'] === 'PEOR' || $tipoNorm === 'ALIMENTACION' && $entrada['porcentaje'] !== null && $entrada['porcentaje'] < 50) {
-                Alerta::create(['cod_alerta' => 'ALE_'.strtoupper(Str::random(10)), 'cod_residente' => $entrada['codResidente'], 'cod_personal_responsable' => $personal->cod_personal, 'origen' => 'CUIDADO', 'tipo' => $entrada['cambioBasal'] === 'PEOR' ? 'CAMBIO RESPECTO AL ESTADO BASAL' : 'BAJA INGESTA', 'prioridad' => 'MEDIA', 'titulo' => 'Alerta clínica generada desde cuidado', 'descripcion' => $entrada['motivo'] ?: 'Alerta automática por registro de cuidado.', 'fecha_hora' => now(), 'generacion' => 'AUTOMATICA', 'estado' => 'ABIERTA']);
+                Alerta::create(['cod_alerta' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('alertas'), 'cod_residente' => $entrada['codResidente'], 'cod_personal_responsable' => $personal->cod_personal, 'origen' => 'CUIDADO', 'tipo' => $entrada['cambioBasal'] === 'PEOR' ? 'CAMBIO RESPECTO AL ESTADO BASAL' : 'BAJA INGESTA', 'prioridad' => 'MEDIA', 'titulo' => 'Alerta clínica generada desde cuidado', 'descripcion' => $entrada['motivo'] ?: 'Alerta automática por registro de cuidado.', 'fecha_hora' => now(), 'generacion' => 'AUTOMATICA', 'estado' => 'ABIERTA']);
             }
         });
     }

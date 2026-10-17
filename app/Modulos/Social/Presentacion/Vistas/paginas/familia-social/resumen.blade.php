@@ -216,7 +216,7 @@
  <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
  <div class="min-w-0">
  <p class="truncate text-sm font-bold text-titulo">{{ $alerta['adulto'] }}</p>
- <p class="mt-0.5 text-xs font-bold leading-snug text-apoyo">{{ $alerta['motivo'] }}</p>
+ <p class="mt-0.5 text-xs font-bold leading-snug text-apoyo">{{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($alerta['motivo']) }}</p>
  </div>
  <div class="flex shrink-0 items-center gap-2">
  <span class="rounded-full border px-2.5 py-1 text-[11px] font-bold {{ $priorityClasses[$alerta['prioridad']] ?? $priorityClasses['Media'] }}">{{ $alerta['prioridad'] }}</span>

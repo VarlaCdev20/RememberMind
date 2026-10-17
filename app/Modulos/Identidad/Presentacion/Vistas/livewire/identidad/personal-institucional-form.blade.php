@@ -1,4 +1,4 @@
-<div x-data="{ isDirty: false }" x-on:input="isDirty = true" x-on:change="isDirty = true" x-on:abrir-pdf-generado.window="try{ let u = $event.detail.url || ($event.detail[0] && $event.detail[0].url); if(u) window.open(u, '_blank'); }catch(e){console.error(e)}" class="max-w-5xl mx-auto w-full max-h-[85vh] flex flex-col">
+<div x-data="{ isDirty: false }" x-on:input="isDirty = true" x-on:change="isDirty = true" x-on:abrir-pdf-generado.window="(() => { try { const url = $event.detail.url || ($event.detail[0] && $event.detail[0].url); if (url) window.open(url, '_blank'); } catch (error) { console.error(error); } })()" class="max-w-5xl mx-auto w-full max-h-[85vh] flex flex-col">
 <div class="mb-2">
  <label for="personal-fecha-ingreso" class="block text-xs font-bold text-apoyo">Fecha de ingreso laboral (opcional)</label>
  <input id="personal-fecha-ingreso" type="date" wire:model="fecha_ingreso" class="rounded-xl border-input-borde bg-input-bg text-sm">

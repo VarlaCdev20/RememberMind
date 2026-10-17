@@ -24,6 +24,7 @@ use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
 use App\Modulos\Residentes\Aplicacion\Acciones\IncorporarDocumentosExpediente;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -47,6 +48,24 @@ class FichaPaciente extends Component
     public Residente $adultoMayor;
 
     public string $tabActivo = 'resumen';
+
+    public bool $modalHeridas = false;
+
+    public function abrirModalHeridas(): void
+    {
+        abort_unless(Auth::user()?->can('heridas.ver'), 403);
+        $permiso = Auth::user()->can('curaciones_herida.crear') ? 'curaciones_herida.crear' : 'heridas.crear';
+        app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria($this->adultoMayor->getKey(), $permiso, Auth::user());
+        $this->modalHeridas = true;
+    }
+
+    #[On('heridas-popup-cerrado')]
+    public function cerrarPopupHeridas(bool $volverAlResidente = false): void
+    {
+        $this->modalHeridas = false;
+        $this->refrescarFicha();
+        $this->dispatch('ficha-heridas-popup-cerrado', volverAlResidente: $volverAlResidente);
+    }
 
     // Modales de Acción Rápida
     // Filtros y Métricas de Historial Clínico

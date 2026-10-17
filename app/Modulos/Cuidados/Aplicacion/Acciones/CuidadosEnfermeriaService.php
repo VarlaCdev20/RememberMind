@@ -108,7 +108,7 @@ class CuidadosEnfermeriaService
         return DB::transaction(function () use ($codResidente, $personal, $jornada, $validados, $usuario) {
             $fechaHora = now();
             $ingesta = RegistroIngesta::create([
-                'cod_ingesta' => 'ING_'.strtoupper(Str::random(10)),
+                'cod_ingesta' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('registros_ingesta'),
                 'cod_residente' => $codResidente,
                 'cod_personal' => $personal->cod_personal,
                 'cod_jornada' => $jornada->cod_jornada,
@@ -124,7 +124,7 @@ class CuidadosEnfermeriaService
 
             if (isset($validados['cantidad_ml'])) {
                 RegistroHidratacion::create([
-                    'cod_hidratacion' => 'HID_'.strtoupper(Str::random(10)),
+                    'cod_hidratacion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('registros_hidratacion'),
                     'cod_residente' => $codResidente,
                     'cod_personal' => $personal->cod_personal,
                     'cod_jornada' => $jornada->cod_jornada,
@@ -154,8 +154,12 @@ class CuidadosEnfermeriaService
     public function registrarEliminacion(string $codResidente, array $datos, User $usuario): RegistroEliminacion
     {
         $this->turnos->autorizarMutacionEnfermeria($codResidente, 'registros_eliminacion.crear', $usuario);
+        // Detalles de captura conservados en la narrativa existente, sin columnas nuevas.
+        $otros = ['color_orina_otro' => ['color_orina', 'Otro color de orina'],
+            'aspecto_orina_otro' => ['aspecto_orina', 'Otro aspecto de orina'],
+            'color_heces_otro' => ['color_heces', 'Otro color de heces']];
         $campos = array_merge(['tipo_eliminacion'], RegistroEliminacion::COMUNES, RegistroEliminacion::URINARIOS, RegistroEliminacion::INTESTINALES);
-        if (array_diff(array_keys($datos), $campos) !== []) {
+        if (array_diff(array_keys($datos), [...$campos, ...array_keys($otros)]) !== []) {
             throw ValidationException::withMessages(['datos' => 'Utiliza los campos estructurados del formulario de eliminación.']);
         }
         foreach ($datos as $campo => $valor) {
@@ -188,7 +192,14 @@ class CuidadosEnfermeriaService
         foreach (RegistroEliminacion::OPCIONES as $campo => $opciones) {
             $reglas[$campo] = ['nullable', Rule::in(array_keys($opciones))];
         }
+        foreach ($otros as $detalle => [$campo, $label]) {
+            $reglas[$detalle] = ['required_if:'.$campo.',OTRO', 'nullable', 'string', 'max:250',
+                Rule::prohibitedIf(($datos[$campo] ?? null) !== 'OTRO')];
+        }
         $validados = Validator::make($datos, $reglas, [
+            '*.required_if' => 'Especifica cuál es la otra opción observada.',
+            '*.prohibited' => 'El detalle solo corresponde a la opción Otro.',
+            '*.max' => 'El detalle no puede superar 250 caracteres.',
             'tipo_eliminacion.required' => 'Selecciona el tipo de eliminación.',
             'tipo_eliminacion.in' => 'Selecciona un tipo de eliminación válido.',
             'volumen_ml.between' => 'El volumen debe estar entre 0 y 999999.99 mL.',
@@ -198,6 +209,20 @@ class CuidadosEnfermeriaService
             'descripcion_molestia.max' => 'La descripción admite hasta 250 caracteres.',
             'observacion.max' => 'La observación admite hasta 5000 caracteres.',
         ])->validate();
+        $narrativa = [];
+        foreach ($otros as $detalle => [$campo, $label]) {
+            if (isset($validados[$detalle])) {
+                $narrativa[] = $label.': '.$validados[$detalle];
+            }
+            unset($validados[$detalle]);
+        }
+        if (isset($validados['observacion'])) {
+            $narrativa[] = $validados['observacion'];
+        }
+        $validados['observacion'] = $narrativa ? implode("\n", $narrativa) : null;
+        if (mb_strlen($validados['observacion'] ?? '') > 5000) {
+            throw ValidationException::withMessages(['observacion' => 'Las observaciones y los detalles de Otro juntos no pueden superar 5000 caracteres.']);
+        }
         if (! in_array($validados['molestia_eliminacion'] ?? null, [true, 1, '1'], true)) {
             $validados['descripcion_molestia'] = null;
         }
@@ -209,7 +234,7 @@ class CuidadosEnfermeriaService
         }
 
         return RegistroEliminacion::create(array_merge(array_fill_keys($campos, null), $validados, [
-            'cod_eliminacion' => 'ELI_'.strtoupper(Str::random(10)), 'cod_residente' => $codResidente,
+            'cod_eliminacion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('registros_eliminacion'), 'cod_residente' => $codResidente,
             'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada,
             'fecha_hora' => now(), 'cantidad' => null, 'caracteristica' => null, 'estado' => 'VIGENTE',
         ]));
@@ -305,7 +330,7 @@ class CuidadosEnfermeriaService
         }
 
         return RegistroMovilidad::create([
-            'cod_movilidad' => 'MOV_'.strtoupper(Str::random(10)),
+            'cod_movilidad' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('registros_movilidad'),
             'cod_residente' => $codResidente,
             'cod_personal' => $personal->cod_personal,
             'cod_jornada' => $jornada->cod_jornada,
@@ -361,7 +386,7 @@ class CuidadosEnfermeriaService
         }
 
         return RegistroHidratacion::create([
-            'cod_hidratacion' => 'HID_'.strtoupper(Str::random(10)),
+            'cod_hidratacion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('registros_hidratacion'),
             'cod_residente' => $codResidente, 'cod_personal' => $personal->cod_personal,
             'cod_jornada' => $jornada->cod_jornada, 'fecha_hora' => now(),
             'cantidad_ml' => $validados['cantidad_ml'], 'tipo_liquido' => $validados['tipo_liquido'] ?? null,
@@ -431,7 +456,7 @@ class CuidadosEnfermeriaService
 
             if ($tipo === 'ALIMENTACION') {
                 $registro = RegistroIngesta::create([
-                    'cod_ingesta' => 'ING_'.strtoupper(Str::random(10)),
+                    'cod_ingesta' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('registros_ingesta'),
                     'cod_residente' => $codResidente,
                     'cod_personal' => $codPersonal,
                     'cod_jornada' => $codJornada,
@@ -446,7 +471,7 @@ class CuidadosEnfermeriaService
                 ]);
             } elseif ($tipo === 'SUENO') {
                 $registro = RegistroSueno::create([
-                    'cod_registro_sueno' => 'RSU_'.strtoupper(Str::random(10)),
+                    'cod_registro_sueno' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('registros_sueno'),
                     'cod_residente' => $codResidente,
                     'cod_personal' => $codPersonal,
                     'cod_jornada' => $codJornada,
@@ -467,7 +492,7 @@ class CuidadosEnfermeriaService
                 }
 
                 $registro = Atencion::create([
-                    'cod_atencion' => 'ATN_'.strtoupper(Str::random(10)),
+                    'cod_atencion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('atenciones'),
                     'cod_residente' => $codResidente,
                     'cod_area' => $codArea,
                     'cod_personal' => $codPersonal,
@@ -516,7 +541,7 @@ class CuidadosEnfermeriaService
         }
 
         return ValoracionDolor::create([
-            'cod_valoracion_dolor' => 'VD_'.strtoupper(Str::random(10)),
+            'cod_valoracion_dolor' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('valoraciones_dolor'),
             'cod_residente' => $codResidente,
             'cod_personal' => $personal->cod_personal,
             'fecha_hora' => now(),
@@ -603,7 +628,7 @@ class CuidadosEnfermeriaService
             }
 
             return ValoracionDolor::create([
-                'cod_valoracion_dolor' => 'VD_'.strtoupper(Str::random(10)),
+                'cod_valoracion_dolor' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('valoraciones_dolor'),
                 'cod_residente' => $codResidente,
                 'cod_personal' => $personal->cod_personal,
                 'fecha_hora' => $fechaHora,
@@ -665,7 +690,7 @@ class CuidadosEnfermeriaService
         }
 
         return DispositivoClinico::create([
-            'cod_dispositivo' => 'DIS_'.strtoupper(Str::random(10)),
+            'cod_dispositivo' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('dispositivos_clinicos'),
             'cod_residente' => $codResidente,
             'cod_personal' => $personal->cod_personal,
             'tipo' => $datos['tipo'],

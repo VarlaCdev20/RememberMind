@@ -23,7 +23,7 @@ final class GestionarVinculoFamiliarHttp
             }
             $vinculo = ResidenteContacto::query()->firstOrNew(['cod_residente' => $adulto_mayor->cod_residente, 'cod_contacto' => $contacto->cod_contacto]);
             if (! $vinculo->exists) {
-                $vinculo->cod_residente_contacto = 'RC_'.Str::upper(Str::random(10));
+                $vinculo->cod_residente_contacto = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('residentes_contactos');
             }
             $vinculo->fill(['parentesco' => $data['parentesco_vinculo'], 'responsable_principal' => (bool) $data['es_responsable'], 'contacto_emergencia' => (bool) $data['es_responsable'], 'autoriza_informacion' => true, 'autoriza_salida' => false, 'estado' => $data['estado'], 'observacion' => $data['observaciones'] ?? null])->save();
         });
@@ -69,7 +69,7 @@ final class GestionarVinculoFamiliarHttp
         $apellido = count($partes) > 1 ? array_pop($partes) : 'SIN APELLIDO';
         $nombres = trim(implode(' ', $partes)) ?: trim($data['nombre_nuevo']);
 
-        return Contacto::query()->create(['cod_contacto' => 'CON_'.Str::upper(Str::random(10)), 'nombres' => $nombres, 'apellido_paterno' => $apellido, 'correo' => $data['email_nuevo'] ?? null, 'estado' => 'ACTIVO']);
+        return Contacto::query()->create(['cod_contacto' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('contactos'), 'nombres' => $nombres, 'apellido_paterno' => $apellido, 'correo' => $data['email_nuevo'] ?? null, 'estado' => 'ACTIVO']);
     }
 
     private function vinculo(Residente $adulto, string $id): ResidenteContacto

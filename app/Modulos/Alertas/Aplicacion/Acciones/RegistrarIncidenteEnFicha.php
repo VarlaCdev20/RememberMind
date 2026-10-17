@@ -56,7 +56,7 @@ final class RegistrarIncidenteEnFicha
         $observacionTexto = ! empty($obs) ? implode('. ', $obs) : null;
 
         $incidente = Incidente::create([
-            'cod_incidente' => 'INC_'.strtoupper(Str::random(10)),
+            'cod_incidente' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('incidentes'),
             'cod_residente' => $codResidente,
             'cod_personal' => $personal->cod_personal,
             'cod_jornada' => $jornada->cod_jornada,

@@ -1,8 +1,8 @@
 ---
 title: "Contrato de módulo — Pase de turno y continuidad"
 status: CURRENT
-version: "2.0"
-last_reviewed: 2026-10-06
+version: "2.1"
+last_reviewed: 2026-10-17
 owner: RememberMind
 source_of_truth: false
 source_of_truth_scope: [module_contract_compilation]
@@ -10,7 +10,7 @@ verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
 verification_scope: STATIC_REPOSITORY_REVIEW
 runtime_verified: false
 runtime_evidence_status: PARTIAL
-runtime_evidence_scope: FASE_3_TARGETED_TESTS_ISOLATED_POSTGRESQL
+runtime_evidence_scope: TARGETED_PASE_TESTS_AND_CONCURRENCY_ISOLATED_POSTGRESQL
 supersedes: []
 related_docs: ["../../TRAZABILIDAD.md", "../../sistema/INVARIANTES_NEGOCIO.md", "../../seguridad/MODELO_AUTORIZACION.md"]
 related_modules: [pase-turno]
@@ -20,7 +20,7 @@ related_modules: [pase-turno]
 
 Compilación vigente, no aprobación de reglas nuevas. **APPROVED CONTRACT**: [AGENTS](../../../AGENTS.md), [baseline](../../../docs/base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md), [diccionario](../../../docs/base-de-datos/REMEMBERMIND_BDD_70_TABLAS.md), [roles](../../../docs/arquitectura/REMEMBERMIND_ROLES_BASELINE_CONGELADO.md). Descripciones de entradas, estados, clases y efectos son **OBSERVED IMPLEMENTATION**, sin certificar cumplimiento en todas las variantes. **CONFLICT** y **TECHNICAL DEBT** señalan discrepancias; **OPEN DECISION** no autoriza cambiar contrato.
 
-Fase 2 fue una revisión estática. Fase 3 ejecutó verificación acotada en PostgreSQL aislado; resultados y límites en [trazabilidad](../../TRAZABILIDAD.md). runtime_verified: false no certifica globalmente el módulo; verified_against_commit identifica la base y no un commit de estos cambios.
+Fase 2 fue una revisión estática. Fase 3 ejecutó verificación acotada en PostgreSQL aislado; resultados y límites en [trazabilidad](../../TRAZABILIDAD.md). El cierre del flujo del 16/10/2026 se documenta en [resultado y evidencia](CIERRE_PASE_TURNO_2026_10_16.md). runtime_verified: false no certifica globalmente el módulo; verified_against_commit identifica la base histórica y no un commit de estos cambios.
 
 ## 1. Propósito
 
@@ -84,7 +84,7 @@ Service revalida cuenta/personal activos, permisos crear/editar según operació
 
 ## 16. Transaction boundary
 
-procesarPase, confirmarRecepcion y anularPase usan transacción/lock. generar y HTTP siguen siendo creación de una fila con guardias de contexto; no se acredita mismo log o concurrencia de pases. Carrera real ejecutada en Fase 3 corresponde a admisión/cama, no a todo módulo.
+Las tres entradas de escritura (panel, generar y HTTP) comparten transacción, bloqueo del residente antes del primer insert, revalidación de contexto y auditoría. Recepción y anulación bloquean el pase y vuelven a autorizar dentro de la transacción. Pruebas reales en PostgreSQL aislado cubren dos primeros escritores y dos recepciones concurrentes; no acreditan todos los cambios simultáneos posibles de planificación.
 
 ## 17. Persistencia
 
@@ -100,7 +100,7 @@ Lectura de alertas activas; no cerrar/crear alerta automáticamente por entregar
 
 ## 20. Auditoría
 
-activity en procesar/recibir/anular; no toda entrada HTTP/generar acredita mismo log.
+Activitylog en las entradas panel/HTTP/generar, recepción y anulación, dentro de su transacción. La recepción registra al profesional real y conserva la designación previa en las propiedades de auditoría. Un fallo de auditoría revierte la entrega.
 
 ## 21. Continuidad asistencial
 
@@ -108,11 +108,11 @@ Hecho histórico != pendiente != alerta != acción futura != resumen. Fase 3 cor
 
 ## 22. Entrada UI
 
-[resources/views/livewire/cuidados/pase-turno-panel.blade.php](../../../resources/views/livewire/cuidados/pase-turno-panel.blade.php)
+[Pase de turno](../../../app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/pase-turno-panel.blade.php), con componentes institucionales compartidos y parciales de contexto y detalle.
 
 ## 23. Livewire / Controllers
 
-[app/Frontend/Livewire/Enfermeria/Cuidados/PaseTurnoPanel.php](../../../app/Frontend/Livewire/Enfermeria/Cuidados/PaseTurnoPanel.php), [app/Http/Controllers/Cuidados/CuidadoController.php](../../../app/Http/Controllers/Cuidados/CuidadoController.php)
+[PaseTurnoPanel](../../../app/Modulos/Cuidados/Presentacion/Livewire/Paginas/PaseTurnoPanel.php). Las entradas HTTP delegan en [GestionarCuidadosHttp](../../../app/Modulos/Cuidados/Aplicacion/Acciones/GestionarCuidadosHttp.php).
 
 ## 24. Actions
 
@@ -120,7 +120,7 @@ NONE OBSERVED en el recorrido investigado; no se exige una clase vacía por sime
 
 ## 25. Services
 
-[app/Backend/Modulos/Enfermeria/Servicios/PaseTurnoService.php](../../../app/Backend/Modulos/Enfermeria/Servicios/PaseTurnoService.php), [app/Backend/Modulos/Enfermeria/Servicios/MiTurnoService.php](../../../app/Backend/Modulos/Enfermeria/Servicios/MiTurnoService.php), [app/Backend/Modulos/Enfermeria/Servicios/TurnoEnfermeriaService.php](../../../app/Backend/Modulos/Enfermeria/Servicios/TurnoEnfermeriaService.php)
+[PaseTurnoService](../../../app/Modulos/Cuidados/Aplicacion/Acciones/PaseTurnoService.php), [MiTurnoService](../../../app/Modulos/Cuidados/Aplicacion/Consultas/MiTurnoService.php), [TurnoEnfermeriaService](../../../app/Modulos/Cuidados/Aplicacion/Consultas/TurnoEnfermeriaService.php).
 
 ## 26. Policies
 
@@ -152,7 +152,7 @@ Fabricar jornada/receptor, entregar residente fuera de scope, modificar clínica
 
 ## 33. Tests faltantes
 
-Fase 2 identificó faltantes de permisos/cuenta/scope/anulación/proyección/carrera. Fase 3 acredita negativos de permiso, cuenta/receptor inactivos, ARJ/jornada/residente ajenos, turno inválido, anulación ajena y proyección fiel. Permanece pendiente una carrera real de duplicados de pase y cobertura de todas las revocaciones por cada mutación.
+Fase 2 identificó faltantes de permisos/cuenta/scope/anulación/proyección/carrera. Fase 3 acredita negativos de permiso, cuenta/receptor inactivos, ARJ/jornada/residente ajenos, turno inválido, anulación ajena y proyección fiel. El cierre del 16/10/2026 añade carreras reales de primer insert y recepción, autoría del borrador, reasignación entrante, API HTTP, guardia nocturna, relevo inmediato, paginación y rollback por fallo de auditoría. Cobertura de todas las revocaciones simultáneas de planificación por cada entrada: no certificada.
 
 ## 34. Deuda técnica
 

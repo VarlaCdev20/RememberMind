@@ -125,7 +125,7 @@ class Incidente extends ModeloOperativo
     {
         static::creating(function (self $registro): void {
             if (empty($registro->cod_incidente)) {
-                $registro->cod_incidente = 'INC_' . strtoupper(Str::random(10));
+                $registro->cod_incidente = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('incidentes', $registro->getConnectionName());
             }
             if (empty($registro->estado)) {
                 $registro->estado = 'ABIERTO';

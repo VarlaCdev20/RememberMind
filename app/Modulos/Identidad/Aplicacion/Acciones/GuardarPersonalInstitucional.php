@@ -45,7 +45,7 @@ final class GuardarPersonalInstitucional
         $cambiaCuenta = $edicion && ($entrada['correo'] !== mb_strtolower(trim($usuario->correo)) || $cambiaRoles
             || $this->archivos->esArchivo($entrada['foto_perfil'] ?? null));
         abort_if($cambiaCuenta && ! $actor->can('usuarios.editar'), 403);
-        abort_if($edicion && $usuario->getKey() === 'USU_0001' && $cambiaCuenta && $actor->getKey() !== 'USU_0001', 403);
+        abort_if($edicion && $usuario->esCuentaPrincipal() && $cambiaCuenta && ! $actor->esCuentaPrincipal(), 403);
         abort_if($cambiaRoles && in_array('SUPERADMINISTRADOR', $roles, true) && ! $actor->hasRole('SUPERADMINISTRADOR'), 403);
         if ($edicion && isset($entrada['estado']) && $entrada['estado'] !== $usuario->estado) {
             throw ValidationException::withMessages(['estado' => 'El acceso se cambia desde la gestión de cuentas.']);
@@ -120,7 +120,7 @@ final class GuardarPersonalInstitucional
                     $nuevosArchivos[] = $foto['ruta_archivo'];
                     $usuario->update(['foto' => $foto['ruta_archivo']]);
                 }
-                $personal = Personal::query()->where('cod_usuario', $usuario->getKey())->lockForUpdate()->first() ?? new Personal(['cod_personal' => 'PER_'.Str::upper(Str::random(12)), 'cod_usuario' => $usuario->getKey()]);
+                $personal = Personal::query()->where('cod_usuario', $usuario->getKey())->lockForUpdate()->first() ?? new Personal(['cod_personal' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('personal'), 'cod_usuario' => $usuario->getKey()]);
                 $personal->fill(['nombres' => mb_strtoupper(trim($datos['nombres'])), 'apellido_paterno' => mb_strtoupper(trim($datos['ap_paterno'])),
                     'apellido_materno' => filled($datos['ap_materno'] ?? null) ? mb_strtoupper(trim($datos['ap_materno'])) : null,
                     'numero_documento' => $datos['numero_documento'], 'expedicion_documento' => $datos['expedido'],
@@ -140,7 +140,7 @@ final class GuardarPersonalInstitucional
                     $almacenado = $this->archivos->guardar($usuario->getKey(), $archivo, 'documentos_personal');
                     $nuevosArchivos[] = $almacenado['ruta_archivo'];
                     $anterior = Documento::query()->where('cod_usuario', $usuario->getKey())->where('tipo_documento', $codigo)->whereNotIn('estado', ['ANULADO', 'ANULADA', 'REEMPLAZADO'])->lockForUpdate()->first();
-                    Documento::create(['cod_documento' => 'DOC_'.Str::upper(Str::random(12)), 'cod_usuario' => $usuario->getKey(),
+                    Documento::create(['cod_documento' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('documentos'), 'cod_usuario' => $usuario->getKey(),
                         'cod_documento_anterior' => $anterior?->getKey(), 'tipo_documento' => $codigo, 'nombre' => $catalogoPorCodigo[$codigo]['nombre'],
                         ...$almacenado, 'estado' => 'CARGADO', 'observacion' => 'Subido por: '.$actor->getKey()]);
                     $anterior?->update(['estado' => 'REEMPLAZADO']);

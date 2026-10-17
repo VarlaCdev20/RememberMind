@@ -79,7 +79,7 @@ final class LecturaResultadosExperto
     private function conocimientoDocumental(string $criterio): ?array
     {
         $nodo = NodoSemantico::query()->with('version')
-            ->where('cod_version_modelo', CargarConocimientoOrion::VERSION)->where('codigo_semantico', $criterio)->first();
+            ->whereHas('version', fn ($q) => $q->where('codigo_version', 'ORION-V1-20261008'))->where('codigo_semantico', $criterio)->first();
 
         return $nodo ? ['version' => $nodo->version->codigo_version, 'nombre' => $nodo->nombre,
             'definicion' => $nodo->definicion, 'procedencia' => $nodo->observacion] : null;

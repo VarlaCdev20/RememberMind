@@ -1,7 +1,9 @@
 <?php
 
 use App\Modulos\Cuidados\Presentacion\Http\Controllers\CuidadoController;
+use App\Modulos\Cuidados\Presentacion\Http\Controllers\FotografiaHeridaController;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\AgendaEnfermeria;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\CentralCuidados;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\DashboardTurno;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\MisPacientes;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PaseTurnoPanel;
@@ -38,6 +40,9 @@ return [
             ->name('agenda');
     },
     'ruta_144' => static function (): void {
+        Route::get('/cuidados', CentralCuidados::class)
+            ->middleware('permission:enfermeria.ver_dashboard')
+            ->name('cuidados');
         Route::get('/registros', RegistrosEnfermeria::class)
             ->middleware('permission:atenciones.ver')
             ->name('registros');
@@ -80,6 +85,8 @@ return [
         Route::post('/residentes/{residente}/pases-turno', [CuidadoController::class, 'registrarPase'])->middleware('permission:pases_turno.crear')->name('cuidados.pases.store');
     },
     'ruta_232' => static function (): void {
+        Route::get('/residentes/{residente}/fotografias-heridas/{documentoClinico}', FotografiaHeridaController::class)
+            ->name('cuidados.fotografias.ver');
         Route::post('/heridas/{herida}/curaciones', [CuidadoController::class, 'curarHerida'])->middleware('permission:curaciones_herida.crear')->name('cuidados.curaciones.store');
     },
     'ruta_233' => static function (): void {

@@ -91,7 +91,7 @@ test('sidebar adaptativo: preferencia desktop, laptop temporal, drawer y persist
         const snapshots = await page.evaluate(()=>['old','new'].map(kind=>{const style=getComputedStyle(document.documentElement,'::view-transition-'+kind+'(rm-sidebar)');return {opacity:style.opacity,animation:style.animationName};}));
         assert.deepEqual(snapshots,[{opacity:'0',animation:'none'},{opacity:'1',animation:'none'}],'La página anterior no se superpone con el nuevo sidebar');
         const palette = await page.evaluate(()=>({bg:getComputedStyle(document.querySelector('aside')).backgroundColor,link:getComputedStyle(document.querySelector('nav > a')).color,button:getComputedStyle(document.querySelector('#group')).appearance}));
-        assert.deepEqual(palette,{bg:'rgb(221, 214, 207)',link:'rgb(74, 70, 66)',button:'none'},'La navegación conserva el shell y la tinta cálida aprobados en Fase 5');
+        assert.deepEqual(palette,{bg:'rgb(216, 210, 205)',link:'rgb(79, 71, 66)',button:'none'},'La navegación conserva el shell y la tinta cálida de la paleta final aprobada');
         assert.equal((await state(page)).locked,false);assert.equal((await state(page)).open,0,'La ruta nueva abre automáticamente su grupo activo');
         await page.evaluate(()=>Alpine.$data(document.body).sidebarOpen=true);
         await page.waitForFunction(()=>document.querySelector('nav').scrollTop===240);

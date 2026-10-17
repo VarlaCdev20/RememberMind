@@ -34,14 +34,10 @@ final class AsignarResidenteJornadaHttp
             $existe = AsignacionResidenteJornada::query()->where('cod_residente', $residente->cod_residente)->where('cod_jornada', $datos['cod_jornada'])->where('cod_personal', $datos['cod_personal'])->whereIn('estado', ['ACTIVA', 'ACTIVO'])->lockForUpdate()->exists();
             abort_if($existe, 409, 'La asignación activa ya existe.');
 
-            return AsignacionResidenteJornada::query()->create(['cod_asignacion' => $this->codigo('ARJ'), 'cod_residente' => $residente->cod_residente, ...$datos, 'fecha_hora' => now(), 'estado' => 'ACTIVA']);
+            return AsignacionResidenteJornada::query()->create(['cod_asignacion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('asignaciones_residente_jornada'), 'cod_residente' => $residente->cod_residente, ...$datos, 'fecha_hora' => now(), 'estado' => 'ACTIVA']);
         });
 
         return $asignacion;
     }
 
-    private function codigo(string $prefijo): string
-    {
-        return $prefijo.'_'.Str::upper(Str::random(12));
-    }
 }

@@ -26,7 +26,7 @@
     --rm-sage-glass-hover: color-mix(in srgb, var(--rm-sage-glass-tint) 34%, transparent);
     --rm-sage-glass-active: color-mix(in srgb, var(--rm-sage-glass-tint) 44%, transparent);
     --rm-sage-border: color-mix(in srgb, var(--rm-sage-accent) 22%, transparent);
-    --rm-sage-accent: #78826E;
+    --rm-sage-accent: var(--rm-primary);
     --rm-sage-text: #56604F;
     --rm-sage-selected-text: var(--rm-sidebar-ink);
     --rm-sage-selected-accent: var(--rm-sage-accent);
@@ -39,7 +39,7 @@
     --rm-text-primary: var(--rm-sidebar-ink);
     --rm-text-secondary: var(--rm-sidebar-ink-soft);
     --rm-text-muted: var(--rm-sidebar-ink-soft);
-    --rm-icon-default: #746D67;
+    --rm-icon-default: var(--rm-sidebar-ink);
     --rm-border: #A59E97;
     --rm-item-hover: var(--rm-sage-glass-hover);
     --rm-item-open: var(--rm-surface-soft);
@@ -207,9 +207,10 @@
 
 .rm-shell .rm-sidebar__icon {
     color: var(--rm-icon-default);
-    flex-basis: 20px;
-    width: 20px;
-    font-size: 20px;
+    flex-basis: var(--rm-icon-lg);
+    width: var(--rm-icon-lg);
+    font-size: var(--rm-icon-lg);
+    line-height: 1;
 }
 
 .rm-shell .rm-sidebar__label {
@@ -407,9 +408,9 @@
     }
 
     .rm-shell.is-sidebar-collapsed .rm-sidebar__icon {
-        flex-basis: 22px;
-        width: 22px;
-        font-size: 22px;
+        flex-basis: var(--rm-icon-lg);
+        width: var(--rm-icon-lg);
+        font-size: var(--rm-icon-lg);
     }
 
     .rm-shell.is-sidebar-collapsed .rm-sidebar__badge {
@@ -716,14 +717,14 @@
 .rm-shell .rm-sidebar .rm-sidebar__group:first-child { margin-top: var(--rm-space-1); }
 .rm-shell .rm-sidebar .rm-sidebar__item {
     display: grid;
-    grid-template-columns: 20px minmax(0, 1fr) auto;
+    grid-template-columns: var(--rm-icon-lg) minmax(0, 1fr) auto;
     min-height: 48px;
     align-items: center;
     column-gap: var(--rm-space-1);
     padding-inline: var(--rm-space-2);
 }
 .rm-shell .rm-sidebar .rm-sidebar__item:has(> .rm-sidebar__chevron) {
-    grid-template-columns: 20px minmax(0, 1fr) auto var(--rm-space-3);
+    grid-template-columns: var(--rm-icon-lg) minmax(0, 1fr) auto var(--rm-space-3);
 }
 .rm-shell .rm-sidebar .rm-sidebar__item > .rm-sidebar__icon { grid-column: 1; grid-row: 1; text-align: center; }
 .rm-shell .rm-sidebar .rm-sidebar__label.rm-nav-group {
@@ -764,6 +765,21 @@
     text-align: center;
 }
 .rm-shell .rm-sidebar .rm-sidebar__flyout-link { justify-content: center; text-align: center; }
+
+/* Enfermería conserva accesos prioritarios al desplegar los diez cuidados. */
+.rm-shell .rm-sidebar[data-rm-nursing] {
+    --rm-sidebar-divider: color-mix(in srgb, var(--rm-border) 30%, transparent);
+}
+.rm-shell .rm-sidebar[data-rm-nursing] .rm-sidebar__submenu-content {
+    max-height: min(10rem, 20dvh);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rm-sidebar-border) transparent;
+    padding-block: var(--rm-space-1);
+}
+.rm-shell .rm-sidebar[data-rm-nursing] .rm-sidebar__subitem > span:not(.rm-sidebar__subindicator):not(.rm-sidebar__badge),
+.rm-shell .rm-sidebar[data-rm-nursing] .rm-sidebar__flyout-title { text-align: left; }
+.rm-shell .rm-sidebar[data-rm-nursing] .rm-sidebar__flyout-link { justify-content: flex-start; text-align: left; }
 @media (max-width: 1023px) {
     .rm-shell .rm-sidebar .rm-sidebar__subitem { min-height: 44px; }
 }

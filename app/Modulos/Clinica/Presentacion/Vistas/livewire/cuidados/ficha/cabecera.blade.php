@@ -44,26 +44,26 @@
 <button type="button"
                             @click="openMas = false; drawerExpediente = true"
                             class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-soft)] font-medium transition cursor-pointer">
-                        <i class="ph-bold ph-identification-card text-blue-600 text-sm"></i>
+                        <i class="ph-bold ph-identification-card rm-clinical-menu-icon text-sm"></i>
                         <span>Expediente Integral</span>
                     </button>
 @endif
                     <button type="button"
                             @click="openMas = false; drawerFamilia = true"
                             class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-soft)] font-medium transition cursor-pointer">
-                        <i class="ph-bold ph-users-three text-emerald-600 text-sm"></i>
+                        <i class="ph-bold ph-users-three rm-clinical-menu-icon text-sm"></i>
                         <span>Red de apoyo familiar</span>
                     </button>
                     <button type="button"
                             @click="openMas = false; activeTab = 'documentos'; $wire.cambiarTab('documentos')"
                             class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-soft)] font-medium transition cursor-pointer">
-                        <i class="ph-bold ph-folder-open text-amber-600 text-sm"></i>
+                        <i class="ph-bold ph-folder-open rm-clinical-menu-icon text-sm"></i>
                         <span>Gestión documental</span>
                     </button>
                     <button type="button"
                             @click="openMas = false; modalExportar = true"
                             class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-[var(--rm-text-primary)] hover:bg-[var(--rm-surface-soft)] font-medium transition cursor-pointer">
-                        <i class="ph-bold ph-file-pdf text-rose-600 text-sm"></i>
+                        <i class="ph-bold ph-file-pdf rm-clinical-menu-icon text-sm"></i>
                         <span>Informes clínicos PDF</span>
                     </button>
                 </div>
@@ -100,13 +100,11 @@
                         {{ $adultoMayor->nombre_completo }}
                     </h2>
 
-                    {{-- Edad, Fecha de Nacimiento, Código AM, Habitación, Cama --}}
+                    {{-- Edad, fecha de nacimiento, habitación y cama --}}
                     <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-[var(--rm-text-body)]">
                         <span><strong>{{ $adultoMayor->edad_texto }}</strong> ({{ $adultoMayor->fecha_nac ? \Carbon\Carbon::parse($adultoMayor->fecha_nac)->format('d/m/Y') : 'Sin fecha nac.' }})</span>
                 <span class="text-[var(--rm-border)]">|</span>
                 <span>Ingreso: <strong class="text-[var(--rm-text-primary)]">{{ $adultoMayor->fecha_ingreso ? \Carbon\Carbon::parse($adultoMayor->fecha_ingreso)->format('d/m/Y') : ($adultoMayor->admisiones?->first()?->fecha_hora_admision?->format('d/m/Y') ?: ($adultoMayor->fecha_ing?->format('d/m/Y') ?: 'N/D')) }}</strong></span>
-                        <span class="text-[var(--rm-border)]">•</span>
-                        <span>Código AM: <strong class="text-[var(--rm-text-primary)]">{{ $adultoMayor->cod_residente }}</strong></span>
                         <span class="text-[var(--rm-border)]">•</span>
                         <span>Habitación: <strong class="text-[var(--rm-text-primary)]">{{ $adultoMayor->habitacion_texto }}</strong></span>
                         <span class="text-[var(--rm-border)]">•</span>
@@ -116,26 +114,26 @@
                     {{-- Badges o chips debajo del nombre --}}
                     <div class="flex flex-wrap items-center gap-2 pt-1">
                         {{-- Badge Estado / Vigilancia --}}
-                        <span class="inline-flex items-center gap-1 rounded-lg bg-amber-50 dark:bg-amber-950/40 px-2.5 py-0.5 text-xs font-bold text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900/60">
-                            <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                        <span class="inline-flex items-center gap-1 rounded-lg bg-[var(--rm-surface-soft)] px-2.5 py-0.5 text-xs font-bold text-[var(--rm-text-primary)] border border-[var(--rm-border)]">
+                            <span class="h-1.5 w-1.5 rounded-full bg-[var(--rm-action-primary)]"></span>
                             <span>{{ $ultimoPaseTurno?->estado_general ?: 'Estado clínico no registrado' }}</span>
                         </span>
 
                         {{-- Nivel de cuidado --}}
                         <span class="inline-flex items-center gap-1 rounded-lg bg-[var(--rm-surface-soft)] px-2.5 py-0.5 text-xs font-semibold text-[var(--rm-text-primary)] border border-[var(--rm-border)]">
-                            <i class="ph-bold ph-shield-check text-blue-600"></i>
+                            <i class="ph-bold ph-shield-check text-[var(--rm-info-strong)]"></i>
                             <span>Nivel de cuidado: {{ $asignacionJornadaActiva?->nivel_supervision ?: 'No registrado' }}</span>
                         </span>
 
                         {{-- Contador de alertas activas --}}
                         @php $totalAlertasAct = $adultoMayor->alertas->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])->count(); @endphp
                         @if($totalAlertasAct > 0)
-                            <span class="inline-flex items-center gap-1 rounded-lg bg-rose-50 dark:bg-rose-950/40 px-2.5 py-0.5 text-xs font-bold text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/60">
+                            <span class="inline-flex items-center gap-1 rounded-lg bg-[var(--rm-danger-soft)] dark:bg-[var(--rm-danger-soft)] px-2.5 py-0.5 text-xs font-bold text-[var(--rm-danger-strong)] dark:text-[var(--rm-danger-strong)] border border-[var(--rm-danger-strong)] dark:border-[var(--rm-danger-strong)]">
                                 <i class="ph-bold ph-warning"></i>
                                 <span>{{ $totalAlertasAct }} alertas activas</span>
                             </span>
                         @else
-                            <span class="inline-flex items-center gap-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 text-xs font-bold text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/60">
+                            <span class="inline-flex items-center gap-1 rounded-lg bg-[var(--rm-success-soft)] dark:bg-[var(--rm-success-soft)] px-2.5 py-0.5 text-xs font-bold text-[var(--rm-success-strong)] dark:text-[var(--rm-success-strong)] border border-[var(--rm-success-strong)] dark:border-[var(--rm-success-strong)]">
                                 <i class="ph-bold ph-check-circle"></i>
                                 <span>0 alertas activas</span>
                             </span>
@@ -188,11 +186,12 @@
     </div>
 
     {{-- 3. BARRA DE TABS PRINCIPAL (UNA SOLA FILA, RESALTADO CLARO CON LÍNEA AZUL) --}}
-    <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar border-b border-[var(--rm-border)] pb-1 text-xs">
+    <div class="rm-clinical-tabs flex items-center gap-1.5 border-b border-[var(--rm-border)] pb-1 text-xs">
         {{-- 1. Resumen clínico --}}
         <button type="button"
                 @click="activeTab = 'resumen'; $wire.cambiarTab('resumen')"
                 :class="activeTab === 'resumen' ? 'border-b-2 border-[var(--rm-action-primary)] text-[var(--rm-action-primary)] font-bold bg-[var(--rm-surface)] shadow-xs' : 'text-[var(--rm-text-body)] hover:text-[var(--rm-text-primary)] font-medium hover:bg-[var(--rm-surface)]/50'"
+                :aria-current="activeTab === 'resumen' ? 'page' : null"
                 class="flex items-center gap-1.5 rounded-t-xl px-4 py-2.5 transition whitespace-nowrap shrink-0">
             <i class="ph-bold ph-clipboard-text text-sm"></i>
             <span>Resumen clínico</span>
@@ -202,6 +201,7 @@
         <button type="button"
                 @click="activeTab = 'seguimiento'; $wire.cambiarTab('seguimiento'); window.dispatchEvent(new CustomEvent('render-graficos-seguimiento'));"
                 :class="activeTab === 'seguimiento' ? 'border-b-2 border-[var(--rm-action-primary)] text-[var(--rm-action-primary)] font-bold bg-[var(--rm-surface)] shadow-xs' : 'text-[var(--rm-text-body)] hover:text-[var(--rm-text-primary)] font-medium hover:bg-[var(--rm-surface)]/50'"
+                :aria-current="activeTab === 'seguimiento' ? 'page' : null"
                 class="flex items-center gap-1.5 rounded-t-xl px-4 py-2.5 transition whitespace-nowrap shrink-0">
             <i class="ph-bold ph-chart-line-up text-sm"></i>
             <span>Evolución</span>
@@ -212,18 +212,20 @@
         <button type="button"
                 @click="activeTab = 'signos'; $wire.cambiarTab('signos'); window.dispatchEvent(new CustomEvent('render-graficos-signos'));"
                 :class="activeTab === 'signos' ? 'border-b-2 border-[var(--rm-action-primary)] text-[var(--rm-action-primary)] font-bold bg-[var(--rm-surface)] shadow-xs' : 'text-[var(--rm-text-body)] hover:text-[var(--rm-text-primary)] font-medium hover:bg-[var(--rm-surface)]/50'"
+                :aria-current="activeTab === 'signos' ? 'page' : null"
                 class="flex items-center gap-1.5 rounded-t-xl px-4 py-2.5 transition whitespace-nowrap shrink-0">
             <i class="ph-bold ph-heartbeat text-sm"></i>
             <span>Signos vitales</span>
         </button>
 
-        {{-- 4. Medicaciónes --}}
+        {{-- 4. Medicación --}}
         <button type="button"
                 @click="activeTab = 'medicacion'; $wire.cambiarTab('medicacion')"
                 :class="activeTab === 'medicacion' ? 'border-b-2 border-[var(--rm-action-primary)] text-[var(--rm-action-primary)] font-bold bg-[var(--rm-surface)] shadow-xs' : 'text-[var(--rm-text-body)] hover:text-[var(--rm-text-primary)] font-medium hover:bg-[var(--rm-surface)]/50'"
+                :aria-current="activeTab === 'medicacion' ? 'page' : null"
                 class="flex items-center gap-1.5 rounded-t-xl px-4 py-2.5 transition whitespace-nowrap shrink-0">
             <i class="ph-bold ph-pill text-sm"></i>
-            <span>Medicaciónes</span>
+            <span>Medicación</span>
             <span class="hidden">Medicación</span>
         </button>
 
@@ -231,6 +233,7 @@
         <button type="button"
                 @click="activeTab = 'cuidados'; $wire.cambiarTab('cuidados')"
                 :class="(activeTab === 'cuidados' || activeTab === 'cuidado') ? 'border-b-2 border-[var(--rm-action-primary)] text-[var(--rm-action-primary)] font-bold bg-[var(--rm-surface)] shadow-xs' : 'text-[var(--rm-text-body)] hover:text-[var(--rm-text-primary)] font-medium hover:bg-[var(--rm-surface)]/50'"
+                :aria-current="(activeTab === 'cuidados' || activeTab === 'cuidado') ? 'page' : null"
                 class="flex items-center gap-1.5 rounded-t-xl px-4 py-2.5 transition whitespace-nowrap shrink-0">
             <i class="ph-bold ph-hand-heart text-sm"></i>
             <span>Cuidados</span>
@@ -240,6 +243,7 @@
         <button type="button"
                 @click="activeTab = 'eventos'; $wire.cambiarTab('eventos'); window.dispatchEvent(new CustomEvent('render-graficos-eventos'));"
                 :class="(activeTab === 'eventos' || activeTab === 'alertas') ? 'border-b-2 border-[var(--rm-action-primary)] text-[var(--rm-action-primary)] font-bold bg-[var(--rm-surface)] shadow-xs' : 'text-[var(--rm-text-body)] hover:text-[var(--rm-text-primary)] font-medium hover:bg-[var(--rm-surface)]/50'"
+                :aria-current="(activeTab === 'eventos' || activeTab === 'alertas') ? 'page' : null"
                 class="flex items-center gap-1.5 rounded-t-xl px-4 py-2.5 transition whitespace-nowrap shrink-0 cursor-pointer">
             <i class="ph-bold ph-shield-warning text-sm"></i>
             <span>Eventos clínicos</span>
@@ -250,6 +254,7 @@
         <button type="button"
                 @click="activeTab = 'estudios'; $wire.cambiarTab('estudios'); window.dispatchEvent(new CustomEvent('render-graficos-estudios'));"
                 :class="(activeTab === 'estudios' || activeTab === 'historial' || activeTab === 'resultados') ? 'border-b-2 border-[var(--rm-action-primary)] text-[var(--rm-action-primary)] font-bold bg-[var(--rm-surface)] shadow-xs' : 'text-[var(--rm-text-body)] hover:text-[var(--rm-text-primary)] font-medium hover:bg-[var(--rm-surface)]/50'"
+                :aria-current="(activeTab === 'estudios' || activeTab === 'historial' || activeTab === 'resultados') ? 'page' : null"
                 class="flex items-center gap-1.5 rounded-t-xl px-4 py-2.5 transition whitespace-nowrap shrink-0 cursor-pointer">
             <i class="ph-bold ph-flask text-sm"></i>
             <span>Resultados y estudios</span>
@@ -260,6 +265,7 @@
         <button type="button"
                 @click="activeTab = 'documentos'; $wire.cambiarTab('documentos')"
                 :class="activeTab === 'documentos' ? 'border-b-2 border-[var(--rm-action-primary)] text-[var(--rm-action-primary)] font-bold bg-[var(--rm-surface)] shadow-xs' : 'text-[var(--rm-text-body)] hover:text-[var(--rm-text-primary)] font-medium hover:bg-[var(--rm-surface)]/50'"
+                :aria-current="activeTab === 'documentos' ? 'page' : null"
                 class="flex items-center gap-1.5 rounded-t-xl px-4 py-2.5 transition whitespace-nowrap shrink-0 cursor-pointer">
             <i class="ph-bold ph-folder text-sm"></i>
             <span>Documentos</span>

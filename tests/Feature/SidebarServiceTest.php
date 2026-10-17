@@ -94,7 +94,7 @@ class SidebarServiceTest extends TestCase
         ], array_column($sidebar, 'title'));
         $this->assertSame(['Preadmisiones', 'Admisiones'], array_column($sidebar[1]['items'], 'label'));
         $this->assertSame(['Residentes', 'Habitaciones y camas', 'Ocupación'], array_column($sidebar[2]['items'], 'label'));
-        $this->assertSame(['Jornadas', 'Asignaciones', 'Actividades', 'Visitas'], array_column($sidebar[3]['items'], 'label'));
+        $this->assertSame(['Galería del centro', 'Jornadas', 'Asignaciones', 'Actividades', 'Visitas'], array_column($sidebar[3]['items'], 'label'));
         $this->assertSame(['Contactos y responsables', 'Documentos', 'Consentimientos', 'Seguros'], array_column($sidebar[4]['items'], 'label'));
         $this->assertSame(['Alertas', 'Incidentes'], array_column($sidebar[5]['items'], 'label'));
         $this->assertSame(count($routes), count(array_unique($routes)));

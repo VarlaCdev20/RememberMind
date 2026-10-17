@@ -3,7 +3,9 @@
  'normal' => ['card' => 'border-[var(--rm-success)]/45 bg-[var(--rm-success-soft)]', 'text' => 'text-[var(--rm-success-strong)]'],
  'observacion' => ['card' => 'border-[var(--rm-warning)]/45 bg-[var(--rm-warning-soft)]', 'text' => 'text-[var(--rm-warning-strong)]'],
  'fuera_rango' => ['card' => 'border-[var(--rm-danger)]/45 bg-[var(--rm-danger-soft)]', 'text' => 'text-[var(--rm-danger-strong)]'],
- 'requiere_revision' => ['card' => 'border-[var(--rm-info)]/45 bg-[var(--rm-info-soft)]', 'text' => 'text-[var(--rm-info-strong)]'],
+ 'requiere_revision' => ['card' => 'border-[var(--rm-danger)]/45 bg-[var(--rm-danger-soft)]', 'text' => 'text-[var(--rm-danger-strong)]'],
+ 'objetivo_personalizado' => ['card' => 'border-[var(--rm-success)]/45 bg-[var(--rm-success-soft)]', 'text' => 'text-[var(--rm-success-strong)]'],
+ 'sin_interpretacion' => ['card' => 'border-[var(--rm-border)] bg-[var(--rm-surface-soft)]', 'text' => 'text-[var(--rm-text-muted)]'],
  'sin_datos' => ['card' => 'border-[var(--rm-border)] bg-[var(--rm-surface-soft)]', 'text' => 'text-[var(--rm-text-muted)]'],
  'anulado' => ['card' => 'border-[var(--rm-border)] bg-[var(--rm-surface-muted)]', 'text' => 'text-[var(--rm-text-secondary)]'],
  ];
@@ -14,7 +16,7 @@
  'fuera_rango' => 'ph-warning-octagon',
  'requiere_revision' => 'ph-first-aid-kit',
  'sin_datos' => 'ph-minus-circle',
- 'anulado' => 'ph-prohibit',
+ 'anulado' => 'ph-prohibit', 'objetivo_personalizado' => 'ph-check-circle', 'sin_interpretacion' => 'ph-info',
  ];
 
  $graficaOpciones = [

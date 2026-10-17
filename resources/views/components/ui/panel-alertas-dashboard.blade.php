@@ -27,7 +27,7 @@ $estilosNivel = [
  <span class="{{ $estilo['badge'] }}">{{ $nivel }}</span>
  </div>
  <p class="text-xs font-bold leading-4 text-apoyo">
- {{ $alerta['descripcion'] ?? 'Sin descripción' }}
+ {{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($alerta['descripcion'] ?? 'Sin descripción') }}
  </p>
  @if(!empty($alerta['accion']))
  <div class="mt-2 flex items-center">

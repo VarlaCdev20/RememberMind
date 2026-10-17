@@ -108,6 +108,8 @@ class MiTurnoServiceTest extends TestCase
         ]);
 
         $this->enfermeraUser->assignRole('ENFERMEROS');
+        \Spatie\Permission\Models\Permission::findOrCreate('enfermeria.ver_dashboard', 'web');
+        $this->enfermeraUser->givePermissionTo('enfermeria.ver_dashboard');
 
         // 5. Personal
 

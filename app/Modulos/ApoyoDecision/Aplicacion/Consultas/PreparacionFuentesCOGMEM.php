@@ -18,7 +18,7 @@ final class PreparacionFuentesCOGMEM
     public function consultar(User $usuario, Residente $residente): ?array
     {
         Gate::forUser($usuario)->authorize('consultarResultados', [EvaluacionExperta::class, $residente]);
-        $version = VersionModeloExperto::query()->find(P::VERSION);
+        $version = VersionModeloExperto::query()->where('codigo_version', P::CODIGO)->first();
         if (! $version) {
             return null;
         }

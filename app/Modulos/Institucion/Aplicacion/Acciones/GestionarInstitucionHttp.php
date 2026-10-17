@@ -21,7 +21,7 @@ final class GestionarInstitucionHttp
         abort_unless($usuario->can('personal.gestionar'), 403);
         $datos = Validator::make($entrada, ['cod_usuario' => ['required', 'exists:usuarios,cod_usuario', 'unique:personal,cod_usuario'], 'nombres' => ['required', 'string', 'max:100'], 'apellido_paterno' => ['required', 'string', 'max:80'], 'apellido_materno' => ['nullable', 'string', 'max:80'], 'numero_documento' => ['required', 'string', 'max:30', 'unique:personal,numero_documento'], 'profesion' => ['required', 'string', 'max:80'], 'especialidad' => ['nullable', 'string', 'max:120'], 'matricula_profesional' => ['nullable', 'string', 'max:50'], 'telefono' => ['nullable', 'string', 'max:30'], 'estado' => ['required', 'in:ACTIVO,INACTIVO']])->validate();
 
-        return Personal::query()->create(['cod_personal' => $this->codigo('PER'), ...$datos]);
+        return Personal::query()->create(['cod_personal' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('personal'), ...$datos]);
     }
 
     public function guardarArea(User $usuario, array $entrada): mixed
@@ -29,7 +29,7 @@ final class GestionarInstitucionHttp
         abort_unless($usuario->can('areas.gestionar'), 403);
         $datos = Validator::make($entrada, ['nombre' => ['required', 'string', 'max:80', 'unique:areas,nombre'], 'descripcion' => ['nullable', 'string'], 'estado' => ['required', 'in:ACTIVA,INACTIVA']])->validate();
 
-        return Area::query()->create(['cod_area' => $this->codigo('ARE'), ...$datos]);
+        return Area::query()->create(['cod_area' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('areas'), ...$datos]);
     }
 
     public function guardarTurno(User $usuario, array $entrada): mixed
@@ -37,7 +37,7 @@ final class GestionarInstitucionHttp
         abort_unless($usuario->can('turnos.gestionar'), 403);
         $datos = Validator::make($entrada, ['nombre' => ['required', 'string', 'max:50', 'unique:turnos,nombre'], 'hora_inicio' => ['required', 'date_format:H:i'], 'hora_cierre' => ['required', 'date_format:H:i'], 'orden' => ['required', 'integer', 'min:1'], 'estado' => ['required', 'in:ACTIVO,INACTIVO'], 'observacion' => ['nullable', 'string']])->validate();
 
-        return Turno::query()->create(['cod_turno' => $this->codigo('TUR'), ...$datos]);
+        return Turno::query()->create(['cod_turno' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('turnos'), ...$datos]);
     }
 
     public function abrirJornada(User $usuario, array $entrada): mixed
@@ -45,7 +45,7 @@ final class GestionarInstitucionHttp
         abort_unless($usuario?->estado === 'ACTIVO' && $usuario->can('jornadas.gestionar'), 403);
         $datos = Validator::make($entrada, ['cod_turno' => ['required', Rule::exists('turnos', 'cod_turno')->where('estado', 'ACTIVO')], 'fecha_jornada' => ['required', 'date']])->validate();
 
-        return Jornada::query()->create(['cod_jornada' => $this->codigo('JOR'), ...$datos, 'cod_usuario_apertura' => $usuario->cod_usuario, 'estado' => 'ABIERTA']);
+        return Jornada::query()->create(['cod_jornada' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('jornadas'), ...$datos, 'cod_usuario_apertura' => $usuario->cod_usuario, 'estado' => 'ABIERTA']);
     }
 
     public function asignarPersonal(User $usuario, array $entrada, Jornada $jornada): mixed
@@ -58,14 +58,10 @@ final class GestionarInstitucionHttp
                 throw ValidationException::withMessages(['jornada' => 'La jornada no admite asignaciones de personal.']);
             }
 
-            return AsignacionPersonal::query()->create(['cod_asignacion_personal' => $this->codigo('ASP'), 'cod_jornada' => $jornada->cod_jornada, ...$datos, 'fecha_asignacion' => now(), 'estado' => 'ACTIVA']);
+            return AsignacionPersonal::query()->create(['cod_asignacion_personal' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('asignaciones_personal'), 'cod_jornada' => $jornada->cod_jornada, ...$datos, 'fecha_asignacion' => now(), 'estado' => 'ACTIVA']);
         });
 
         return $asignacion;
     }
 
-    private function codigo(string $prefijo): string
-    {
-        return $prefijo.'_'.Str::upper(Str::random(12));
-    }
 }

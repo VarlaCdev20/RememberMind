@@ -165,7 +165,7 @@ class Prescripcion extends ModeloOperativo
             $horaProg = $model->hora_programada_temp ?? $model->attributes['hora_programada'] ?? null;
             if ($horaProg) {
                 \App\Models\HorarioPrescripcion::create([
-                    'cod_horario_prescripcion' => 'HPR_' . strtoupper(\Illuminate\Support\Str::random(10)),
+                    'cod_horario_prescripcion' => app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('horarios_prescripcion'),
                     'cod_prescripcion' => $model->cod_prescripcion,
                     'hora_programada' => $horaProg,
                     'dosis_programada' => $model->dosis ?? 1.0,
@@ -182,7 +182,7 @@ class Prescripcion extends ModeloOperativo
                 $model->hora_programada_temp = $model->attributes['hora_programada'];
             }
             if (empty($model->cod_prescripcion)) {
-                $model->cod_prescripcion = "PRS_" . strtoupper(\Illuminate\Support\Str::random(10));
+                $model->cod_prescripcion = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('prescripciones', $model->getConnectionName());
             }
 
             if (empty($model->cod_medicamento)) {

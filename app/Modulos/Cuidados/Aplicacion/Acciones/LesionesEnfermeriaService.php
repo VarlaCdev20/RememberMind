@@ -27,14 +27,16 @@ class LesionesEnfermeriaService
     public function registrar(string $codResidente, array $datos, User $usuario): Herida
     {
         $this->turnos->autorizarMutacionEnfermeria($codResidente, 'heridas.crear', $usuario);
+        $fotografias = $datos['fotografias'] ?? [];
+        $descripciones = $datos['descripcionesFotos'] ?? [];
         $datos = $this->validar($datos);
 
         $personal = $this->contextoClinico->personalActivo($usuario);
         $codPersonal = $personal->cod_personal;
 
-        return DB::transaction(function () use ($codResidente, $datos, $usuario, $codPersonal) {
+        return app(PersistirFotosHerida::class)->conRegistro($usuario, $fotografias, $descripciones, function () use ($codResidente, $datos, $usuario, $codPersonal) {
             $herida = Herida::create([
-                'cod_herida' => 'HER_'.strtoupper(Str::random(10)),
+                'cod_herida' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('heridas'),
                 'cod_residente' => $codResidente,
                 'cod_personal' => $codPersonal,
                 'tipo_herida' => $datos['tipo'],
@@ -87,7 +89,7 @@ class LesionesEnfermeriaService
             abort_unless($bloqueada->estado === 'ACTIVA', 409, 'La lesión ya no admite seguimientos.');
 
             return CuracionHerida::create([
-                'cod_curacion' => 'CUR_'.strtoupper(Str::random(10)),
+                'cod_curacion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('curaciones_herida'),
                 'cod_herida' => $bloqueada->getKey(),
                 'cod_personal' => $personal->cod_personal,
                 'cod_jornada' => $jornada->cod_jornada,

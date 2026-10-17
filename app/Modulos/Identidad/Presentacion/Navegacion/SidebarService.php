@@ -151,6 +151,7 @@ class SidebarService
                 $this->buildItem('Personal por área', 'admin.areas-institucionales.index', 'areas.ver'),
             ]),
             $this->buildSection('Organización', 'ph-buildings', null, [
+                $this->buildItem('Galería del centro', 'admin.galeria.index', 'fotografias_institucionales.ver'),
                 $this->buildItem('Áreas', 'admin.areas-institucionales.index', 'areas.ver'),
                 $this->buildItem('Turnos y planificación', 'admin.turnos-asignaciones.index', 'turnos.ver'),
                 $this->buildItem('Cobertura', 'admin.turnos-enfermeria.index', 'jornadas.ver'),
@@ -185,6 +186,7 @@ class SidebarService
                 $this->buildItem('Ocupación', 'admin.administracion.ocupacion', 'ocupaciones_cama.ver'),
             ]),
             $this->buildAdministradorGroup('Operación diaria', 'ph-calendar-check', [
+                $this->buildItem('Galería del centro', 'admin.galeria.index', 'fotografias_institucionales.ver'),
                 $this->buildItem('Jornadas', 'admin.administracion.jornadas', 'jornadas.ver'),
                 $this->buildItem('Asignaciones', 'admin.administracion.asignaciones', 'asignaciones_personal.ver'),
                 $this->buildItem('Actividades', 'admin.administracion.actividades', 'actividades.ver'),
@@ -279,19 +281,18 @@ class SidebarService
         // Rol de enfermería: navegación operativa breve, sin módulos administrativos.
         $sections[] = $this->buildSection('Mi turno', 'ph-sun-horizon', 'admin.enfermeria.dashboard', [], false, 'enfermeria.ver_dashboard');
         $sections[] = $this->buildSection('Mis residentes', 'ph-users', 'admin.enfermeria.pacientes', [], false, 'enfermeria.ver_pacientes_asignados');
-        $cuidados = [];
-        foreach (NavegacionCuidadosService::opciones() as $clave => $opcion) {
-            $cuidados[] = $this->buildItem(
-                $opcion['label'], $opcion['route'] ?? 'admin.enfermeria.pacientes',
-                $opcion['permission'], null,
-                array_merge($opcion['parameters'] ?? [], ['cuidado' => $clave]),
-                isset($opcion['route']) ? ['admin.enfermeria.pacientes'] : [],
-            );
-        }
-        $sections[] = $this->buildSection('Cuidados', 'ph-heartbeat', null, $cuidados, true);
         $sections[] = $this->buildSection('Medicación', 'ph-pill', 'admin.enfermeria.medicacion', [], false, 'enfermeria.ver_dashboard');
         $sections[] = $this->buildSection('Alertas', 'ph-warning', 'admin.enfermeria.alertas', [], false, 'alertas.ver', $alertasBadge);
         $sections[] = $this->buildSection('Incidentes', 'ph-first-aid', 'admin.enfermeria.incidentes', [], false, 'atenciones.ver');
+        $cuidados = $this->buildSection('Cuidados', 'ph-heartbeat', 'admin.enfermeria.cuidados', [], false, 'enfermeria.ver_dashboard');
+        if ($cuidados && collect(NavegacionCuidadosService::opciones())->contains(fn ($opcion) => $user?->can($opcion['permission']))) {
+            $cuidados['active_routes'] = ['admin.enfermeria.registros', 'admin.enfermeria.seguimiento'];
+            if (is_string(request()->query('cuidado')) && request()->query('cuidado') !== '') {
+                $cuidados['active_routes'][] = 'admin.enfermeria.pacientes';
+                $cuidados['parameters'] = ['cuidado' => request()->query('cuidado')];
+            }
+            $sections[] = $cuidados;
+        }
         $sections[] = $this->buildSection('Pase de turno', 'ph-arrows-clockwise', 'admin.enfermeria.pase-turno', [], false, 'pases_turno.ver');
 
         return array_values(array_filter($sections));
