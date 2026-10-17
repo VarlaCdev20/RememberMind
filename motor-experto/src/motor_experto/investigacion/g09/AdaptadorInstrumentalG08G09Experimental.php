@@ -42,11 +42,16 @@ final class AdaptadorInstrumentalG08G09Experimental
             || ($aplicacion['cod_aplicacion'] ?? '') === '') {
             return $this->noAdmitida($contexto, 'PERFIL_SINTETICO_O_APLICACION_INCOMPATIBLE');
         }
-        $fecha = $aplicacion['fecha_aplicacion'] ?? null;
+        // DDL operacional: fecha_hora DATETIME, sin inventar fecha_aplicacion.
+        $fecha = $aplicacion['fecha_hora'] ?? null;
         $corte = $contexto['fecha_corte'] ?? null;
-        if (!is_string($fecha) || !preg_match('/^\d{4}-\d{2}-\d{2}$/D', $fecha)
-            || !is_string($corte) || !preg_match('/^\d{4}-\d{2}-\d{2}$/D', $corte)
-            || $fecha > $corte) {
+        $hora = is_string($fecha) ? \DateTimeImmutable::createFromFormat('!Y-m-d H:i:s', $fecha) : false;
+        $fechaValida = $hora !== false && $hora->format('Y-m-d H:i:s') === $fecha;
+        $corteFecha = is_string($corte) && preg_match('/^\d{4}-\d{2}-\d{2}$/D', $corte) === 1;
+        $corteHora = is_string($corte) && preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/D', $corte) === 1;
+        if (!$fechaValida || (!$corteFecha && !$corteHora)
+            || ($corteFecha && substr($fecha, 0, 10) > $corte)
+            || ($corteHora && $fecha > $corte)) {
             return $this->noAdmitida($contexto, 'FECHA_FUERA_DEL_CORTE');
         }
         $inspeccion = (new InspectorComponenteInstrumental)->inspeccionar(
@@ -56,9 +61,11 @@ final class AdaptadorInstrumentalG08G09Experimental
         if (!$inspeccion['verificado']) {
             return $this->noAdmitida($contexto, implode(',', $inspeccion['motivos']));
         }
-        if (($inspeccion['valor'] ?? null) !== 'DIFICULTAD_SINTETICA') {
-            return $this->noAdmitida($contexto, 'SIN_SOPORTE_ESPECIFICO');
+        $valor = $inspeccion['valor'] ?? null;
+        if (!in_array($valor, ['DIFICULTAD_SINTETICA', 'SIN_HALLAZGO_SINTETICO'], true)) {
+            return $this->noAdmitida($contexto, 'VALOR_SINTETICO_DESCONOCIDO');
         }
+        // Una tarea admisible sin dificultad simulada conserva EV-2, sin inferir normalidad.
         $respuestas = $inspeccion['procedencia']['respuestas'];
         sort($respuestas, SORT_STRING);
 
@@ -76,9 +83,12 @@ final class AdaptadorInstrumentalG08G09Experimental
             'instrumento_test_only' => true,
             'tarea_atribuible' => true,
             'confusor_invalidante' => ($captura['confusor_invalidante'] ?? false) === true,
-            'dificultad_especifica_test_only' => true,
+            'dificultad_especifica_test_only' => $valor === 'DIFICULTAD_SINTETICA',
             'atribucion_test_only' => true,
             'contexto_regla_suficiente' => ($contexto['contexto_suficiente'] ?? false) === true,
+            'perfil_instrumental' => $perfil['codigo'],
+            'version_instrumento' => $perfil['version_instrumento'],
+            'respuestas_fuente' => $respuestas,
         ]];
         $salida['motivos_g08'] = [];
         return $salida;
