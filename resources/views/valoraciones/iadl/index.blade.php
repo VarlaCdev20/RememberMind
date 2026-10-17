@@ -1,14 +1,8 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-slate-800 leading-tight">
-            Actividades instrumentales de la vida diaria (IADL)
-        </h2>
-        <p class="mt-1 text-sm text-slate-600">
-            Residente: {{ $adulto->nombres }} {{ $adulto->apellido_paterno }} · {{ $adulto->cod_residente }}
-        </p>
-    </x-slot>
-
-    <div class="max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
+@component('layouts.sistema')
+    <header class="mb-4 rounded-xl bg-white p-5 border border-slate-200">
+        <h2 class="font-semibold text-xl text-slate-900">Actividades instrumentales de la vida diaria (IADL)</h2>
+        <p class="text-sm text-slate-600">Residente: {{ $adulto->nombres }} {{ $adulto->apellido_paterno }} · {{ $adulto->cod_residente }}</p>
+    </header><div class="max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
         <section class="rounded-xl bg-white p-5 shadow-sm border border-slate-200">
             <h3 class="font-semibold text-slate-900">Situación funcional documentada</h3>
             <p class="mt-2 text-sm text-slate-700">
@@ -142,4 +136,4 @@
             </div>
         </section>
     </div>
-</x-app-layout>
+@endcomponent
