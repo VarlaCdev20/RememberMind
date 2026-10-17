@@ -51,10 +51,24 @@ final class EvaluadorG09Experimental
             }
             $origenes[$id] = true;
             $regla = CatalogoReglasG09Experimental::obtener((string)($e['regla'] ?? ''));
+            $fechaFuente = $e['fecha'] ?? null;
+            $corte = $entrada['fecha_corte'];
+            // Un corte de día incluye toda la fecha; un corte horario requiere
+            // un instante registrado en la evidencia y una comparación exacta.
+            $fechaValida = is_string($fechaFuente)
+                && (preg_match('/^\d{4}-\d{2}-\d{2}$/D', $fechaFuente) === 1
+                    || preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/D', $fechaFuente) === 1)
+                && is_string($corte)
+                && (preg_match('/^\d{4}-\d{2}-\d{2}$/D', $corte) === 1
+                    || preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/D', $corte) === 1);
+            $fechaEnCorte = $fechaValida
+                && (strlen($corte) === 10
+                    ? substr($fechaFuente, 0, 10) <= $corte
+                    : (strlen($fechaFuente) === 19 && $fechaFuente <= $corte));
             $valida = ($e['residente_ficticio'] ?? null) === $entrada['residente_ficticio']
                 && ($e['evaluacion'] ?? null) === $entrada['evaluacion']
                 && ($e['version'] ?? null) === $entrada['version']
-                && ($e['fecha'] ?? '9999') <= $entrada['fecha_corte']
+                && $fechaEnCorte
                 && $regla['criterio'] === $entrada['criterio']
                 && ($e['procedencia_verificada'] ?? false) === true
                 && ($e['instrumento_test_only'] ?? false) === true
