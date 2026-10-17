@@ -42,7 +42,7 @@ function fixture(string $id): array {
                 'cod_aplicacion' => $aplicacion,
                 'cod_instrumento' => $p['instrumento'],
                 'cod_residente' => 'SINTETICO-INDIVIDUO-01',
-                'fecha_aplicacion' => '2026-10-16',
+                'fecha_hora' => '2026-10-16 10:30:00',
                 'estado' => 'COMPLETA',
             ],
             'instrumento' => [
@@ -80,9 +80,12 @@ foreach (array_keys(Catalogo::todas()) as $regla) {
     $neg = fixture($regla);
     $neg['captura']['respuestas'][0]['valor_texto'] = 'SIN_HALLAZGO_SIMULADO';
     $r = $motor->evaluar($adaptador->preparar($regla, $neg['contexto'], $neg['captura']));
-    exige($r['estado_tecnico'] === 'SIN_EVIDENCIA_ADMISIBLE', $regla.': inferencia por ausencia');
-    exige(str_contains((new Informe)->construir($r)['como_se_llego'], 'G08'), $regla.': no explicó rechazo G08');
-    $pruebas += 2;
+    exige($r['estado_tecnico'] === 'EVALUABLE_SIN_SOPORTE', $regla.': tarea válida sin hallazgo confundida con inadmisible');
+    exige($r['evaluabilidad'] === match (substr($regla, 2, 3)) {
+        'ATE' => 'EV-CA-2', 'EJE' => 'EV-CE-2', 'LEN' => 'EV-CL-2', 'VIS' => 'EV-CV-2'
+    }, $regla.': evaluabilidad incorrecta en tarea válida sin soporte');
+    exige((new Informe)->construir($r)['estado_tecnico'] === 'EVALUABLE_SIN_SOPORTE', $regla.': informe confundió la ausencia de soporte');
+    $pruebas += 3;
 
     $sinRespuesta = fixture($regla);
     $sinRespuesta['captura']['respuestas'] = [];
@@ -97,7 +100,7 @@ foreach (array_keys(Catalogo::todas()) as $regla) {
     $pruebas++;
 
     $fecha = fixture($regla);
-    $fecha['captura']['aplicacion']['fecha_aplicacion'] = '2026-10-18';
+    $fecha['captura']['aplicacion']['fecha_hora'] = '2026-10-18 09:00:00';
     $r = $motor->evaluar($adaptador->preparar($regla,$fecha['contexto'],$fecha['captura']));
     exige($r['estado_tecnico'] === 'SIN_EVIDENCIA_ADMISIBLE', $regla.': aceptó futuro');
     $pruebas++;
