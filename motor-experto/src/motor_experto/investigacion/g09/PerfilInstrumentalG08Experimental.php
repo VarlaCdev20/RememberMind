@@ -34,10 +34,16 @@ final class PerfilInstrumentalG08Experimental
                     'valores_permitidos' => ['FALLO_SIMULADO', 'SIN_HALLAZGO_SIMULADO'],
                 ],
             ],
-            'patrones' => [[
-                'respuestas' => [$pregunta => 'FALLO_SIMULADO'],
-                'valor_fuente' => 'DIFICULTAD_SINTETICA',
-            ]],
+            'patrones' => [
+                [
+                    'respuestas' => [$pregunta => 'FALLO_SIMULADO'],
+                    'valor_fuente' => 'DIFICULTAD_SINTETICA',
+                ],
+                [
+                    'respuestas' => [$pregunta => 'SIN_HALLAZGO_SIMULADO'],
+                    'valor_fuente' => 'SIN_HALLAZGO_SINTETICO',
+                ],
+            ],
         ];
     }
 
