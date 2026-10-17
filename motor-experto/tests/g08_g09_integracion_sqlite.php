@@ -82,7 +82,8 @@ foreach ($perfil['perfil'] as $criterio => $reporte) {
     exigir($reporte['resultado']['estado_tecnico'] === 'MULTIPLES_HALLAZGOS_PENDIENTES_DE_RESOLUCION', $criterio.': perdió hallazgos simultáneos');
     exigir(count($reporte['resultado']['consecuencias_candidatas']) >= 2, $criterio.': no hay soportes múltiples');
     exigir($reporte['informe']['estado_tecnico'] === $reporte['resultado']['estado_tecnico'], $criterio.': informe incoherente');
-    $pruebas += 3;
+    exigir($reporte['cotejo_nucleo_d130']['coincidencia'] === 'COINCIDE', $criterio.': diverge del motor semántico D-130');
+    $pruebas += 4;
 }
 foreach ($tareas as $tarea) {
     $r = $ejecutor->evaluar($base, [$tarea]);
