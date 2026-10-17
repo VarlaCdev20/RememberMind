@@ -1,0 +1,49 @@
+name: IADL C03 functional capture
+on:
+  pull_request:
+    paths:
+      - 'database/migrations/*controles_funcionales_iadl*'
+      - 'app/Models/ControlFuncionalIadl.php'
+      - 'app/Models/Residente.php'
+      - 'app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarEvidenciaIadlC03.php'
+      - 'app/Modulos/Valoraciones/**'
+      - 'database/seeders/RolesAndPermissionsSeeder.php'
+      - 'resources/views/valoraciones/iadl/**'
+      - 'routes/web.php'
+      - 'tests/Feature/ControlesFuncionalesIadlTest.php'
+      - '.github/workflows/iadl-contracts.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  iadl:
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: testing
+      APP_KEY: base64:ABEiM0RVZneImaq7zN3u/wARIjNEVWZ3iJmqu8zd7v8=
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ':memory:'
+      DB_URL: ''
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo_sqlite
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP syntax
+        run: |
+          php -l database/migrations/2026_10_17_190000_create_controles_funcionales_iadl_table.php
+          php -l app/Models/ControlFuncionalIadl.php
+          php -l app/Modulos/Valoraciones/Aplicacion/Acciones/RegistrarControlIadl.php
+          php -l app/Modulos/Valoraciones/Dominio/Servicios/AnalizadorIadlC03.php
+          php -l app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarEvidenciaIadlC03.php
+          php -l app/Modulos/Valoraciones/Presentacion/Http/Controllers/ControlFuncionalIadlController.php
+          php -l tests/Feature/ControlesFuncionalesIadlTest.php
+      - name: IADL feature contracts — isolated disposable DB
+        run: php artisan test --filter=ControlesFuncionalesIadlTest

@@ -32,7 +32,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'planes_cuidado', 'intervenciones_cuidado', 'programaciones_cuidado', 'ejecuciones_cuidado',
             'prescripciones', 'horarios_prescripcion', 'administraciones_medicacion', 'preguntas_instrumento',
             'opciones_pregunta', 'aplicaciones_instrumento', 'respuestas_instrumento',
-            'valoraciones_psicologicas', 'valoraciones_nutricionales', 'valoraciones_funcionales',
+            'valoraciones_psicologicas', 'valoraciones_nutricionales', 'valoraciones_funcionales', 'controles_funcionales_iadl',
             'seguimientos_pedagogicos', 'actividades', 'participantes_actividad', 'visitas', 'alertas', 'eventos_alerta',
         ];
 
@@ -42,7 +42,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'roles.ver', 'areas.reportes', 'salud.ver',
             'valoracion_enfermeria.ver', 'valoracion_medica.ver',
             'enfermeria.ver_dashboard', 'enfermeria.ver_pacientes_asignados',
-            'enfermeria.ver_ficha_paciente',
+            'enfermeria.ver_ficha_paciente', 'controles_funcionales_iadl',
             'asignacion_turno.ver', 'asignaciones.ver',
             'reportes.ver', 'reportes.institucional',
             'reportes.exportar_pdf', 'reportes.individual', 'bitacora.ver',
@@ -79,7 +79,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'signos_vitales.editar', 'signos_vitales.anular', 'administraciones_medicacion.crear',
             'aplicaciones_instrumento.crear', 'aplicaciones_instrumento.editar', 'aplicaciones_instrumento.anular',
             'valoraciones_psicologicas.crear', 'valoraciones_nutricionales.crear',
-            'valoraciones_funcionales.crear', 'valoraciones_funcionales.editar', 'seguimientos_pedagogicos.crear', 'actividades.gestionar',
+            'valoraciones_funcionales.crear', 'valoraciones_funcionales.editar', 'controles_funcionales_iadl.crear', 'controles_funcionales_iadl.rectificar', 'seguimientos_pedagogicos.crear', 'actividades.gestionar',
             'visitas.gestionar', 'alertas.gestionar', 'alertas.reconocer', 'alertas.asignar',
             'alertas.seguimiento', 'alertas.cerrar',
             'valoracion_enfermeria.registrar', 'valoracion_enfermeria.editar',
@@ -131,7 +131,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'documentos_clinicos', 'derivaciones', 'incidentes', 'indicaciones_clinicas', 'controles_cognitivos',
             'registros_', 'heridas', 'curaciones_herida', 'planes_cuidado', 'prescripciones',
             'horarios_prescripcion.ver', 'administraciones_medicacion', 'aplicaciones_instrumento',
-            'valoraciones_', 'alertas.ver',
+            'valoraciones_', 'controles_funcionales_iadl', 'alertas.ver',
         ]), ['salud.ver', 'valoracion_medica.ver', 'valoracion_enfermeria.ver']))));
 
         $roles['ENFERMEROS']->syncPermissions(array_values(array_unique(array_merge($this->permitir($permisos, [
@@ -150,9 +150,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'registros_hidratacion.ver', 'registros_eliminacion.ver', 'registros_movilidad.ver',
         ]))));
 
-        $roles['PSICOLOGO/A']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'controles_cognitivos.ver', 'registros_conductuales', 'registros_sueno.ver', 'instrumentos.ver', 'preguntas_instrumento.ver', 'opciones_pregunta.ver', 'aplicaciones_instrumento', 'respuestas_instrumento.ver', 'valoraciones_psicologicas', 'planes_cuidado.ver', 'alertas.ver']));
+        $roles['PSICOLOGO/A']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'controles_cognitivos.ver', 'registros_conductuales', 'registros_sueno.ver', 'instrumentos.ver', 'preguntas_instrumento.ver', 'opciones_pregunta.ver', 'aplicaciones_instrumento', 'respuestas_instrumento.ver', 'valoraciones_psicologicas', 'controles_funcionales_iadl', 'planes_cuidado.ver', 'alertas.ver']));
         $roles['NUTRICIONISTA']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'diagnosticos.ver', 'alergias.ver', 'indicaciones_clinicas.ver', 'mediciones_antropometricas', 'registros_ingesta.ver', 'registros_hidratacion.ver', 'registros_eliminacion.ver', 'valoraciones_nutricionales', 'planes_cuidado']));
-        $roles['FISIOTERAPEUTA']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'diagnosticos.ver', 'dispositivos_clinicos.ver', 'signos_vitales.ver', 'valoraciones_dolor', 'registros_movilidad', 'valoraciones_funcionales', 'planes_cuidado']));
+        $roles['FISIOTERAPEUTA']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'diagnosticos.ver', 'dispositivos_clinicos.ver', 'signos_vitales.ver', 'valoraciones_dolor', 'registros_movilidad', 'valoraciones_funcionales', 'controles_funcionales_iadl', 'planes_cuidado']));
         $roles['PEDAGOGO']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'indicaciones_clinicas.ver', 'controles_cognitivos.ver', 'registros_conductuales.ver', 'planes_cuidado', 'seguimientos_pedagogicos', 'actividades']));
         $roles['FAMILIAR']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'residentes_contactos.ver', 'documentos.ver', 'consentimientos.ver', 'actividades.ver', 'participantes_actividad.ver', 'visitas.ver']));
 

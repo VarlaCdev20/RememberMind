@@ -28,6 +28,20 @@
  @endcan
  </div>
  </section>
+
+ @can('controles_funcionales_iadl.ver')
+ <section class="rounded-2xl border border-borde/65 bg-fondo-panel p-4 shadow-sm flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+     <div>
+         <h3 class="text-sm font-bold text-titulo">Autonomía instrumental (IADL)</h3>
+         <p class="text-xs text-parrafo/70">Medicación, pertenencias, rutinas y otras actividades complejas, con distinción entre ayuda y falta de oportunidad. Sin diagnóstico automático.</p>
+     </div>
+     <a class="inline-flex justify-center rounded-xl bg-boton-acento px-4 py-2 text-xs font-bold text-inverso"
+        href="{{ route('admin.adultos-mayores.iadl.index', ['adulto_mayor' => $adulto->cod_residente]) }}">
+        Abrir registro IADL
+     </a>
+ </section>
+ @endcan
+
  {{-- ENCABEZADO DE SECCIÓN --}}
  <div class="hidden">
  <div>

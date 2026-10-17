@@ -2833,6 +2833,51 @@
       "GET",
       "HEAD"
     ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/iadl",
+    "name": "admin.adultos-mayores.iadl.index",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\ControlFuncionalIadlController@index",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:controles_funcionales_iadl.ver"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/adultos-mayores/{adulto_mayor}/iadl",
+    "name": "admin.adultos-mayores.iadl.store",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\ControlFuncionalIadlController@store",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:residentes.ver",
+      "App\\Http\\Middleware\\AutorizarResidenteVinculado",
+      "permission:controles_funcionales_iadl.crear|controles_funcionales_iadl.rectificar"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
     "uri": "admin/adultos-mayores/{adulto_mayor}/reporte-individual",
     "name": "admin.adultos-mayores.reporte-individual",
     "action": "App\\Modulos\\Residentes\\Presentacion\\Http\\Controllers\\AdultoMayorController@reporteIndividual",
