@@ -100,9 +100,9 @@ return [
     },
     'ruta_260' => static function (): void {
         Route::get('/iadl', [ControlFuncionalIadlController::class, 'index'])
-            ->middleware('permission:valoraciones_funcionales.ver')->name('iadl.index');
+            ->middleware('permission:controles_funcionales_iadl.ver')->name('iadl.index');
         Route::post('/iadl', [ControlFuncionalIadlController::class, 'store'])
-            ->middleware('permission:valoraciones_funcionales.crear|valoraciones_funcionales.editar')
+            ->middleware('permission:controles_funcionales_iadl.crear|controles_funcionales_iadl.rectificar')
             ->name('iadl.store');
     },
 ];
