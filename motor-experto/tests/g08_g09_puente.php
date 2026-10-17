@@ -12,6 +12,7 @@ use MotorExperto\investigacion\g09\CatalogoReglasG09Experimental as Catalogo;
 use MotorExperto\investigacion\g09\PerfilInstrumentalG08Experimental as G08;
 use MotorExperto\investigacion\g09\AdaptadorInstrumentalG08G09Experimental as Adaptador;
 use MotorExperto\investigacion\g09\EvaluadorG09Experimental as Motor;
+use MotorExperto\investigacion\g09\ConstructorInformeG09Experimental as Informe;
 
 function exige(bool $ok, string $motivo): void {
     if (!$ok) {
@@ -71,13 +72,17 @@ foreach (array_keys(Catalogo::todas()) as $regla) {
     $r = $motor->evaluar($c);
     exige($r['estado_tecnico'] === 'HALLAZGO_ACOTADO', $regla.': fallo puente');
     exige(str_starts_with($r['evaluabilidad'],'EV-'), $regla.': compuerta ausente');
-    $pruebas += 3;
+    $informe = (new Informe)->construir($r);
+    exige(str_contains($informe['como_se_llego'], $regla), $regla.': explicación sin regla');
+    exige(count($informe['trazas_positivas']) === 1, $regla.': sin trazabilidad de informe');
+    $pruebas += 5;
 
     $neg = fixture($regla);
     $neg['captura']['respuestas'][0]['valor_texto'] = 'SIN_HALLAZGO_SIMULADO';
     $r = $motor->evaluar($adaptador->preparar($regla, $neg['contexto'], $neg['captura']));
     exige($r['estado_tecnico'] === 'SIN_EVIDENCIA_ADMISIBLE', $regla.': inferencia por ausencia');
-    $pruebas++;
+    exige(str_contains((new Informe)->construir($r)['como_se_llego'], 'G08'), $regla.': no explicó rechazo G08');
+    $pruebas += 2;
 
     $sinRespuesta = fixture($regla);
     $sinRespuesta['captura']['respuestas'] = [];
