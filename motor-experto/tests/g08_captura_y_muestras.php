@@ -77,7 +77,7 @@ foreach($contratos as $componente=>$tareas) {
             $incorrecto=$bien;$incorrecto[$key]='SIM-OTRO';
             $r=$auditor->revisar($componente,$tarea,$incorrecto);
             exigirCaptura($r['comprobacion_formal_sin_hallazgos']===false,
-                $tarea.' permite '+$key.' ajeno');
+                $tarea.' permite '.$key.' ajeno');
             $n++;
         }
         $incompleto=$bien;unset($incompleto['datos_crudos'][array_key_first($incompleto['datos_crudos'])]);
