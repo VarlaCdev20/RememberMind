@@ -1,6 +1,7 @@
 <?php
 
 use App\Modulos\Valoraciones\Presentacion\Http\Controllers\AdultoMayorEvaluacionController;
+use App\Modulos\Valoraciones\Presentacion\Http\Controllers\ControlFuncionalIadlController;
 use App\Modulos\Valoraciones\Presentacion\Http\Controllers\AdultoMayorValoracionFuncionalController;
 use App\Modulos\Valoraciones\Presentacion\Http\Controllers\InstrumentoController;
 use App\Modulos\Valoraciones\Presentacion\Http\Controllers\ValoracionProfesionalController;
@@ -96,5 +97,12 @@ return [
         Route::post('/residentes/{residente}/valoraciones/{tipo}', [ValoracionProfesionalController::class, 'registrar'])
             ->middleware('permission:valoraciones_psicologicas.crear|valoraciones_nutricionales.crear|valoraciones_funcionales.crear|seguimientos_pedagogicos.crear')
             ->name('valoraciones.store');
+    },
+    'ruta_260' => static function (): void {
+        Route::get('/iadl', [ControlFuncionalIadlController::class, 'index'])
+            ->middleware('permission:valoraciones_funcionales.ver')->name('iadl.index');
+        Route::post('/iadl', [ControlFuncionalIadlController::class, 'store'])
+            ->middleware('permission:valoraciones_funcionales.crear|valoraciones_funcionales.editar')
+            ->name('iadl.store');
     },
 ];
