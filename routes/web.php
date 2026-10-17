@@ -302,6 +302,9 @@ Route::middleware([
                     $rutas['Valoraciones']['ruta_097']();
                     $rutas['Valoraciones']['ruta_098']();
 
+                    // IADL: captura de autonomía instrumental, sin inferencia DCL-C03 automática.
+                    $rutas['Valoraciones']['ruta_260']();
+
                     // Reportes individuales
                     $rutas['Residentes']['ruta_099']();
 
