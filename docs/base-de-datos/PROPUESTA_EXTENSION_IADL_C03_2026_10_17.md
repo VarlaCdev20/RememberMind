@@ -77,3 +77,10 @@ FK restrictivas, índices específicos por residente/fecha, residente/tarea/fech
 - Riesgo abierto: validación de autorización técnica/científica de C03, procedencia de informantes y asociación a escalas tipo Lawton–Brody **requiere edición y normas identificadas, sin inventar puntuaciones**.
 
 **Estado actual de la decisión:** cambio implementado para revisión en PR independiente de [PR #15 (O.R.I.O.N. sintético)](https://github.com/VarlaCdev20/RememberMind/pull/15). **No fusionar o desplegar sin revisar el esquema, permisos, pruebas y autorización de operación.**
+
+
+## Contrato de lectura con O.R.I.O.N. (ApoyoDecision)
+
+`ConsultarEvidenciaIadlC03` ofrece consulta autenticada del historial del residente hasta una fecha de corte, retorna IDs de los registros como procedencia y ejecuta la síntesis descriptiva `AnalizadorIadlC03`. La interfaz de salida exige `criterio_dcl_c03=U`, `puede_emitir_clasificacion_dcl=false` y registra de forma explícita los límites de la evidencia. Verifica `ResidentePolicy` más `controles_funcionales_iadl.ver` antes de leer registros sensibles.
+
+Esta capa **sí conecta la tabla a la consulta de ApoyoDecision**, pero **no** conecta automáticamente con el clasificador clínico de Petersen del PR #15 ni transforma observaciones, supuestos de causalidad o ausencia de datos en `S`. La revisión C03 será objeto de una decisión técnica/científica posterior. Los ensayos de corte temporal, procedencia y privacidad forman parte de `ControlesFuncionalesIadlTest`.
