@@ -43,6 +43,10 @@ return new class extends Migration
             $table->foreign('cod_personal')->references('cod_personal')->on('personal')->restrictOnDelete();
             $table->foreign('cod_usuario_registro')->references('cod_usuario')->on('usuarios')->restrictOnDelete();
             $table->foreign('cod_atencion')->references('cod_atencion')->on('atenciones')->restrictOnDelete();
+        });
+
+        // PostgreSQL necesita la PK ya instalada antes de crear la autorreferencia.
+        Schema::table('controles_funcionales_iadl', function (Blueprint $table): void {
             $table->foreign('cod_control_anterior')->references('cod_control_iadl')->on('controles_funcionales_iadl')->restrictOnDelete();
         });
     }

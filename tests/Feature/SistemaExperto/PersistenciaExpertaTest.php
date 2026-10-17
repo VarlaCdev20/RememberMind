@@ -48,7 +48,7 @@ class PersistenciaExpertaTest extends TestCase
     {
         $instaladas = Schema::getTableListing(schemaQualified: false);
         $this->assertCount(23, array_intersect($instaladas, InventarioExperto::TABLAS));
-        $this->assertCount(71, array_diff(InventarioExperto::excluirDelInventarioOperativo($instaladas), [
+        $this->assertCount(72, array_diff(InventarioExperto::excluirDelInventarioOperativo($instaladas), [
             'migrations', 'password_reset_tokens', 'sessions', 'cache', 'cache_locks', 'jobs', 'job_batches', 'failed_jobs',
             'personal_access_tokens', 'activity_log', 'permissions', 'roles', 'model_has_permissions', 'model_has_roles', 'role_has_permissions',
         ]));
@@ -133,23 +133,47 @@ class PersistenciaExpertaTest extends TestCase
 
     public function test_rollback_inverso_de_23_expertas_conserva_esquema_operacional_y_reinstala(): void
     {
-        $antes = Schema::getColumns('residentes');
-        // Movilidad V2, Dolor V2 y Eliminación V2 son extensiones aprobadas posteriores al módulo experto.
-        $this->artisan('migrate:rollback', ['--step' => 3, '--force' => true])->assertSuccessful();
+        $antes = $this->contratoOperativoInstalado();
+        $migraciones = app('migrator')->getMigrationFiles(database_path('migrations'));
+        $expertas = array_filter(array_keys($migraciones), static fn (string $nombre): bool => str_starts_with($nombre, '2026_10_08_1200'));
+        $this->assertCount(23, $expertas);
+        $ultimaExperta = max($expertas);
+        $posteriores = array_filter(array_keys($migraciones), static fn (string $nombre): bool => $nombre > $ultimaExperta);
+        // Respetar dependencias sin asumir que siempre habrá tres extensiones posteriores.
+        $this->artisan('migrate:rollback', ['--step' => count($posteriores), '--force' => true])->assertSuccessful();
+        $this->assertFalse(Schema::hasTable('controles_funcionales_iadl'));
         $this->assertFalse(Schema::hasColumn('registros_movilidad', 'distancia_metros'));
         $this->assertFalse(Schema::hasColumn('valoraciones_dolor', 'cod_valoracion_origen'));
         $this->assertFalse(Schema::hasColumn('registros_eliminacion', 'volumen_ml'));
+        $sinExtensionesPosteriores = $this->contratoOperativoInstalado();
         $this->artisan('migrate:rollback', ['--step' => 23, '--force' => true])->assertSuccessful();
         foreach (InventarioExperto::TABLAS as $tabla) {
             $this->assertFalse(Schema::hasTable($tabla));
         }
-        $this->assertSame($antes, Schema::getColumns('residentes'));
+        $this->assertSame($sinExtensionesPosteriores, $this->contratoOperativoInstalado());
         $this->artisan('migrate', ['--force' => true])->assertSuccessful();
         $this->assertTrue(Schema::hasColumn('registros_eliminacion', 'volumen_ml'));
         $this->assertTrue(Schema::hasColumn('registros_movilidad', 'distancia_metros'));
         foreach (InventarioExperto::TABLAS as $tabla) {
             $this->assertTrue(Schema::hasTable($tabla));
         }
+        $this->assertSame($antes, $this->contratoOperativoInstalado());
+    }
+
+    private function contratoOperativoInstalado(): array
+    {
+        $contrato = [];
+        $tablas = InventarioExperto::excluirDelInventarioOperativo(Schema::getTableListing(schemaQualified: false));
+        sort($tablas);
+        foreach ($tablas as $tabla) {
+            $contrato[$tabla] = [
+                'columnas' => Schema::getColumns($tabla),
+                'indices' => Schema::getIndexes($tabla),
+                'relaciones' => Schema::getForeignKeys($tabla),
+            ];
+        }
+
+        return $contrato;
     }
 
     public function test_cargador_aisla_versiones_y_no_activa_conocimiento(): void

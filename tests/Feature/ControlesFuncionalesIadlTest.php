@@ -25,6 +25,7 @@ class ControlesFuncionalesIadlTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->freezeTime();
         // Esta suite de contrato no compila recursos frontend; el diseño se valida en CI global.
         $this->withoutVite();
         $this->seed(RolesAndPermissionsSeeder::class);
@@ -66,6 +67,16 @@ class ControlesFuncionalesIadlTest extends TestCase
             'cod_control_anterior','fecha_hora','actividad','oportunidad',
             'desempeno','tipo_ayuda','causa_ayuda','nivel_previo','fuente','registrado_en',
         ]));
+        $primarias = array_values(array_filter(Schema::getIndexes('controles_funcionales_iadl'), fn ($indice) => $indice['primary']));
+        $this->assertCount(1, $primarias);
+        $this->assertSame(['cod_control_iadl'], $primarias[0]['columns']);
+        $relaciones = Schema::getForeignKeys('controles_funcionales_iadl');
+        $this->assertCount(5, $relaciones);
+        $anterior = array_values(array_filter($relaciones, fn ($fk) => $fk['columns'] === ['cod_control_anterior']));
+        $this->assertCount(1, $anterior);
+        $this->assertSame('controles_funcionales_iadl', $anterior[0]['foreign_table']);
+        $this->assertSame(['cod_control_iadl'], $anterior[0]['foreign_columns']);
+        $this->assertSame('restrict', $anterior[0]['on_delete']);
     }
 
     public function test_guardar_observacion_atribuye_profesional_y_usuario_sin_diagnostico(): void
@@ -243,7 +254,7 @@ class ControlesFuncionalesIadlTest extends TestCase
     public function test_base_de_datos_exige_residente_y_profesional_reales_por_fk(): void
     {
         try {
-            DB::table('controles_funcionales_iadl')->insert([
+            DB::transaction(fn () => DB::table('controles_funcionales_iadl')->insert([
                 'cod_control_iadl'=>'IAD_ORPHAN',
                 'cod_residente'=>'RES_INEXISTENTE',
                 'cod_personal'=>$this->profesional->personal->cod_personal,
@@ -252,10 +263,27 @@ class ControlesFuncionalesIadlTest extends TestCase
                 'desempeno'=>'INDEPENDIENTE','tipo_ayuda'=>'NINGUNA',
                 'causa_ayuda'=>'NINGUNA','nivel_previo'=>'INDEPENDIENTE',
                 'fuente'=>'OBSERVACION_DIRECTA','estado'=>'REGISTRADO','registrado_en'=>now(),
-            ]);
+            ]));
             $this->fail('La FK no protegió al residente.');
         } catch(\Illuminate\Database\QueryException) {
             $this->assertDatabaseCount('controles_funcionales_iadl',0);
+        }
+    }
+
+    public function test_fk_de_rectificacion_rechaza_un_registro_anterior_inexistente(): void
+    {
+        $original = $this->registrar();
+        $fila = array_replace($original->getAttributes(), [
+            'cod_control_iadl' => 'IAD_RECT_HUERFANA',
+            'cod_control_anterior' => 'IAD_INEXISTENTE',
+            'estado' => 'RECTIFICACION',
+        ]);
+        try {
+            DB::transaction(fn () => DB::table('controles_funcionales_iadl')->insert($fila));
+            $this->fail('La autorreferencia debe rechazar un registro inexistente.');
+        } catch (\Illuminate\Database\QueryException) {
+            $this->assertDatabaseCount('controles_funcionales_iadl', 1);
+            $this->assertDatabaseHas('controles_funcionales_iadl', ['cod_control_iadl' => $original->cod_control_iadl]);
         }
     }
 

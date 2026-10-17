@@ -86,7 +86,7 @@ class FolderOrganizationTest extends TestCase
                 'wheres' => $ruta->wheres, 'bindingFields' => $ruta->bindingFields()];
         }
         $esperadas = json_decode(File::get(base_path('tests/Fixtures/Architecture/routes.json')), true, 512, JSON_THROW_ON_ERROR);
-        $this->assertCount(296, $actuales);
+        $this->assertCount(298, $actuales);
         $this->assertSame(
             $this->normalizarPrefijosLivewire($esperadas),
             $this->normalizarPrefijosLivewire($actuales, ltrim(EndpointResolver::prefix(), '/')),
