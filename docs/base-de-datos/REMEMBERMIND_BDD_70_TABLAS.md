@@ -17,6 +17,9 @@ related_modules: []
 
 # RememberMind — BDD Operativa V2.1: 70 tablas
 
+**Extensión aprobada — 17/10/2026:** una tabla `fotografias_institucionales`; inventario vigente **72 operativas**, conservando las existentes. Véase [decisión Galería y 4FN](DECISION_GALERIA_INSTITUCIONAL_2026_10_17.md). Los conteos anteriores conservan el alcance de sus versiones.
+
+
 > **Extensión aprobada V2.2:** este diccionario conserva las 70 tablas base. La tabla 71 `objetivos_signos_vitales` se especifica en [decisión V2.2](DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md).
 
 **Estado:** CONGELADO
@@ -1372,6 +1375,8 @@ Extensión explícitamente aprobada el 09/10/2026:
 
 
 ## 34. `documentos_clinicos` — Transaccional
+
+**Extensión posterior aprobada — 11/10/2026:** se añaden `cod_herida string(20) NULL` y `cod_curacion string(20) NULL`, cada una con índice y FK RESTRICT a su entidad. No se usan simultáneamente. El resto de esta sección describe el núcleo histórico; contrato adicional en [DECISION_FOTOGRAFIAS_HERIDAS_V2](DECISION_FOTOGRAFIAS_HERIDAS_V2.md).
 
 **PK:** `cod_documento_clinico string(20)`
 

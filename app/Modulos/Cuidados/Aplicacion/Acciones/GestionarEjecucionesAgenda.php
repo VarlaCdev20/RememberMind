@@ -126,7 +126,7 @@ final class GestionarEjecucionesAgenda
 
         DB::transaction(function () use ($codPersonal, $codJornada, $fechaHoraProgramada, $estadoEjecucion, $entrada) {
             EjecucionCuidado::create([
-                'cod_ejecucion' => 'EJC_'.strtoupper(Str::random(10)),
+                'cod_ejecucion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('ejecuciones_cuidado'),
                 'cod_intervencion' => $entrada['intervencionId'],
                 'cod_residente' => $entrada['residenteId'],
                 'cod_jornada' => $codJornada,

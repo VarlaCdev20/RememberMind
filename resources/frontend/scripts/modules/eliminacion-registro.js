@@ -2,7 +2,8 @@ const geometryKeys = ['trendOpen', 'trendBounds', 'trendViewportCompact', 'trend
     'trendReturnFocus', 'restoringTrendFocus', 'closeTrend', 'fitTrend', 'trendStyle', 'moveTrend', 'resizeTrend',
     'resizeTrendEdge', 'resetTrend', 'startTrendPointer', 'updateTrendPointer', 'endTrendPointer', 'openTrend'];
 const captureFields = ['cantidad_cualitativa','volumen_ml','continencia','color_orina','aspecto_orina','olor_orina','tipo_miccion',
-    'tipo_bristol','color_heces','esfuerzo_defecacion','presencia_sangre','presencia_moco','molestia_eliminacion','descripcion_molestia','observacion'];
+    'tipo_bristol','color_heces','esfuerzo_defecacion','presencia_sangre','presencia_moco','molestia_eliminacion','descripcion_molestia','observacion',
+    'color_orina_otro','aspecto_orina_otro','color_heces_otro'];
 const cleanText = value => typeof value === 'string' && !/^(null|undefined|NaN|Infinity|\[object Object\])$/i.test(value.trim()) ? value : '';
 export const normalizeEliminationHistory = history => (Array.isArray(history) ? history : [])
     .filter(row => row && ['URINARIA','INTESTINAL'].includes(row.tipo) && cleanText(row.codigo) && cleanText(row.fecha) && cleanText(row.hora))
@@ -46,6 +47,9 @@ export function createEliminationCapture(history = [], initial = {}, persisted =
         setValue(field, value) {
             if (!captureFields.includes(field)) return;
             this.values[field] = value;
+            if (['color_orina','aspecto_orina','color_heces'].includes(field) && value !== 'OTRO') {
+                this.values[field+'_otro'] = ''; this.$wire?.$set('elimDatos.'+field+'_otro','',false);
+            }
             if (field === 'molestia_eliminacion' && value !== true) {
                 this.values.descripcion_molestia = ''; this.$wire?.$set('elimDatos.descripcion_molestia','',false);
             }

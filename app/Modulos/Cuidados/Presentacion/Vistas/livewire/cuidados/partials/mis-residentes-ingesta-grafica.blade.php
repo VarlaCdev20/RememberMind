@@ -26,7 +26,7 @@
         </div>
     </template>
     <p class="rm-dolor__empty" x-show="!rows().length">Sin porcentajes disponibles. Los registros sin porcentaje permanecen en el historial.</p>
-    <div class="rm-dolor__history rm-ingesta__history">
+    <div class="rm-dolor__history rm-ingesta__history" data-clinical-history>
         <h6>Últimas ingestas registradas</h6>
         <p x-show="!history.length">Sin registros de ingesta anteriores.</p>
         <table x-show="history.length" class="rm-ingesta__history-table">

@@ -36,7 +36,7 @@
  $personalResumenTotal = $personalResumenTotal ?? 0;
  $personalResumenMostrados = $personalResumenMostrados ?? $personalResumen->count();
  $interpretacionReportes = $interpretacionReportes ?? [];
- $vistaListadoResumen = $vistaListadoResumen ?? 'tarjetas';
+ $vistaListadoResumen = $vistaListadoResumen ?? 'tabla';
  $rubroResumen = $rubroResumen ?? 'institucional';
 
  $mostrarDirectorio = in_array($tabActiva, ['salud', 'admin'], true);
@@ -169,24 +169,17 @@
  ];
 @endphp
 
-<div class="space-y-4">
- <x-ui.collection-header title="Personal institucional" subtitle="Equipo médico y administrativo, disponibilidad y horarios institucionales." icon="ph-users-three" eyebrow="Gestión del sistema">
+<div class="rm-staff-workspace space-y-4">
+ <x-ui.collection-header class="rm-staff-heading" title="Personal institucional" subtitle="Consulta el equipo y gestiona sus horarios." icon="ph-users-three">
  <x-slot:actions>
   <button
   type="button"
   wire:click="$refresh"
   class="tooltip-btn flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-borde bg-fondo-card text-texto shadow-sm transition-colors hover:border-borde-hover hover:bg-fondo-hover hover:text-titulo"
+  aria-label="Actualizar personal"
   title="Actualizar"
   >
   <i class="ph-bold ph-arrows-clockwise text-base"></i>
-  </button>
-
-  <button
-  type="button"
-  class="flex h-9 items-center gap-1.5 rounded-lg border border-borde bg-fondo-card px-3 text-xs font-bold text-texto shadow-sm transition-colors hover:border-borde-hover hover:bg-fondo-hover hover:text-titulo"
-  >
-  <i class="ph-bold ph-file-pdf text-base"></i>
-  Exportar PDF
   </button>
 
   <button
@@ -195,7 +188,7 @@
   class="rm-btn-success h-9 gap-1.5 rounded-lg px-3 text-xs"
   >
   <i class="ph-bold ph-calendar-plus text-base"></i>
-  Asignar horario
+  Ver disponibilidad
   </button>
 
   @can('usuarios.crear')
@@ -211,38 +204,42 @@
  </x-slot:actions>
  </x-ui.collection-header>
 
- <div class="flex overflow-x-auto border-b border-borde scrollbar-hide">
- <div class="flex min-w-max items-center gap-1 px-1">
+ <nav class="rm-staff-tabs border-b border-borde" aria-label="Secciones de personal">
+ <div class="rm-staff-tabs__items">
   <button
   type="button"
   wire:click="setTab('resumen')"
+  aria-pressed="{{ $tabActiva === 'resumen' ? 'true' : 'false' }}"
   class="flex items-center gap-1.5 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-xs font-bold transition-all {{ $tabActiva === 'resumen' ? 'border-boton-acento text-boton-acento' : 'border-transparent text-apoyo hover:text-titulo' }}"
   >
   <i class="{{ $tabActiva === 'resumen' ? 'ph-fill' : 'ph-bold' }} ph-squares-four text-lg"></i>
-  Resumen
+  Personal
   </button>
 
   <button
   type="button"
   wire:click="setTab('salud')"
+  aria-pressed="{{ $tabActiva === 'salud' ? 'true' : 'false' }}"
   class="flex items-center gap-1.5 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-xs font-bold transition-all {{ $tabActiva === 'salud' ? 'border-estado-info text-estado-info' : 'border-transparent text-apoyo hover:text-titulo' }}"
   >
   <i class="{{ $tabActiva === 'salud' ? 'ph-fill' : 'ph-bold' }} ph-stethoscope text-lg"></i>
-  Personal de salud
+  Salud
   </button>
 
   <button
   type="button"
   wire:click="setTab('admin')"
+  aria-pressed="{{ $tabActiva === 'admin' ? 'true' : 'false' }}"
   class="flex items-center gap-1.5 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-xs font-bold transition-all {{ $tabActiva === 'admin' ? 'border-estado-advertencia text-estado-advertencia' : 'border-transparent text-apoyo hover:text-titulo' }}"
   >
   <i class="{{ $tabActiva === 'admin' ? 'ph-fill' : 'ph-bold' }} ph-desktop text-lg"></i>
-  Personal administrativo
+  Administrativo
   </button>
 
   <button
   type="button"
   wire:click="setTab('disponibilidad')"
+  aria-pressed="{{ $tabActiva === 'disponibilidad' ? 'true' : 'false' }}"
   class="flex items-center gap-1.5 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-xs font-bold transition-all {{ $tabActiva === 'disponibilidad' ? 'border-boton-acento text-boton-acento' : 'border-transparent text-apoyo hover:text-titulo' }}"
   >
   <i class="{{ $tabActiva === 'disponibilidad' ? 'ph-fill' : 'ph-bold' }} ph-clock-user text-lg"></i>
@@ -252,53 +249,51 @@
   <button
   type="button"
   wire:click="setTab('reportes')"
+  aria-pressed="{{ $tabActiva === 'reportes' ? 'true' : 'false' }}"
   class="flex items-center gap-1.5 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-xs font-bold transition-all {{ $tabActiva === 'reportes' ? 'border-boton-acento text-boton-acento' : 'border-transparent text-apoyo hover:text-titulo' }}"
   >
   <i class="{{ $tabActiva === 'reportes' ? 'ph-fill' : 'ph-bold' }} ph-chart-bar text-lg"></i>
   Reportes
   </button>
  </div>
- </div>
+ </nav>
 
  <div class="min-h-[260px]" wire:key="personal-institucional-tab-{{ $tabActiva }}-{{ $tabVersion ?? 0 }}">
  @if($tabActiva === 'resumen')
   <div class="space-y-4" wire:key="contenido-resumen-{{ $tabVersion ?? 0 }}">
-  <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+  <dl class="rm-staff-overview" aria-label="Resumen de personal">
    @foreach($metricasResumen as $metrica)
-   <x-ui.metric-card :icon="$metrica['icono']" :value="$metrica['valor']" :label="$metrica['titulo']" :description="$metrica['descripcion']" variant="neutral" />
+   <div><dt>{{ $metrica['titulo'] }}</dt><dd>{{ $metrica['valor'] }}</dd></div>
    @endforeach
-  </div>
+  </dl>
 
-  <div class="rm-card flex flex-col gap-3 border border-borde bg-fondo-card px-4 py-3 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+  <div class="rm-collection-results">
+  <div class="rm-staff-directory-toolbar">
    <div>
-   <h3 class="flex items-center gap-2 text-sm font-black text-titulo">
-    <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-boton-acento/10 text-boton-acento">
-    <i class="ph-fill ph-users-three text-lg"></i>
-    </span>
-    Personal mostrado
-   </h3>
-   <p class="mt-1 text-xs font-semibold text-apoyo">
-    Revisión del personal interno, excluyendo cuentas familiares.
-   </p>
+   <h2 class="rm-section-title">Directorio</h2>
+   <p class="rm-body text-apoyo">{{ $personalResumenMostrados }} de {{ $personalResumenTotal }} personas</p>
    </div>
 
    <x-ui.collection-view-switch mode="livewire" change-method="cambiarVistaListadoResumen" :value="$vistaListadoResumen" label="Modo de vista de personal" :options="[
-    ['value' => 'tarjetas', 'label' => 'Grid', 'icon' => 'ph-squares-four'],
+    ['value' => 'tarjetas', 'label' => 'Tarjetas', 'icon' => 'ph-squares-four'],
     ['value' => 'tabla', 'label' => 'Lista', 'icon' => 'ph-list-dashes'],
    ]" />
   </div>
 
-  <div class="rm-collection-results">
-   <div class="p-3">
-   <x-ui.filter-bar class="mb-4">
-    <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+   @php
+    $hayFiltrosSecundarios = $rubroResumen !== 'institucional' || $estadoResumen !== '' || $turnoResumen !== '';
+   @endphp
+   <x-ui.filter-bar class="rm-staff-summary-toolbar" :x-data="'{ filtrosAbiertos: '.($hayFiltrosSecundarios ? 'true' : 'false').' }'">
+    <div class="rm-staff-search-row">
     {{-- Buscador Principal --}}
-    <div class="lg:col-span-4 relative flex items-center">
+    <div class="rm-staff-filters__search">
+     <label for="staff-search" class="rm-collection-filter-label">Buscar personal</label>
+     <div class="relative flex items-center">
      <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-muted)]">
      <i class="ph-bold ph-magnifying-glass text-base"></i>
      </span>
      <input
-     type="text"
+     id="staff-search" type="search"
      wire:model.live.debounce.300ms="busquedaResumen"
      placeholder="Nombre, correo o CI..."
      class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-input-placeholder)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]"
@@ -307,15 +302,23 @@
      <button type="button"
       wire:click="$set('busquedaResumen', '')"
       class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-muted)] hover:text-[var(--rm-action-primary)] cursor-pointer"
-      title="Limpiar búsqueda">
+      aria-label="Limpiar búsqueda" title="Limpiar búsqueda">
       <i class="ph-bold ph-x-circle text-base"></i>
      </button>
      @endif
+     </div>
     </div>
 
+    <button type="button" class="rm-btn-secondary" x-on:click="filtrosAbiertos = !filtrosAbiertos" x-bind:aria-expanded="filtrosAbiertos" aria-controls="staff-summary-filters">
+     <i class="ph-bold ph-funnel" aria-hidden="true"></i>
+     Filtros @if($hayFiltrosSecundarios)<span class="sr-only">activos</span><span aria-hidden="true">•</span>@endif
+    </button>
+    </div>
+    <div id="staff-summary-filters" class="rm-staff-filters w-full grid gap-3 items-end" x-show="filtrosAbiertos" x-cloak>
     {{-- Rubro --}}
-    <div class="lg:col-span-3">
-     <select
+    <div>
+     <label for="staff-rubroResumen" class="rm-collection-filter-label">Tipo de personal</label>
+     <select id="staff-rubroResumen"
      wire:model.live="rubroResumen"
      class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]"
      >
@@ -331,8 +334,9 @@
     </div>
 
     {{-- Estado --}}
-    <div class="lg:col-span-2">
-     <select
+    <div>
+     <label for="staff-estadoResumen" class="rm-collection-filter-label">Estado</label>
+     <select id="staff-estadoResumen"
      wire:model.live="estadoResumen"
      class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]"
      >
@@ -344,8 +348,9 @@
     </div>
 
     {{-- Turno --}}
-    <div class="lg:col-span-3">
-     <select
+    <div>
+     <label for="staff-turnoResumen" class="rm-collection-filter-label">Turno</label>
+     <select id="staff-turnoResumen"
      wire:model.live="turnoResumen"
      class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]"
      >
@@ -405,37 +410,6 @@
     </div>
     @endif
    </x-ui.filter-bar>
-   </div>
-
-   <div class="flex flex-col gap-2 border-b border-borde px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-   <div class="text-xs font-bold text-texto">
-    Mostrando
-    <span class="font-black text-titulo">{{ $personalResumenMostrados }}</span>
-    de
-    <span class="font-black text-titulo">{{ $personalResumenTotal }}</span>
-    personas institucionales
-   </div>
-
-   <div class="flex flex-wrap gap-1.5">
-    @if($rubroResumen !== 'institucional')
-    <span class="rounded-full bg-boton-acento/10 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-boton-acento">
-     Rubro filtrado
-    </span>
-    @endif
-
-    @if($estadoResumen !== '')
-    <span class="rounded-full bg-estado-infoBg px-2 py-1 text-[10px] font-black uppercase tracking-wide text-estado-info">
-     Estado filtrado
-    </span>
-    @endif
-
-    @if($turnoResumen !== '')
-    <span class="rounded-full bg-estado-exitoBg px-2 py-1 text-[10px] font-black uppercase tracking-wide text-estado-exito">
-     Turno filtrado
-    </span>
-    @endif
-   </div>
-   </div>
 
    @if($vistaListadoResumen === 'tarjetas')
    <div class="rm-collection-grid p-4">
@@ -457,7 +431,7 @@
 
      $tipo = $usuario->categoria_institucional ?? ($usuario->roles->first()?->name ?? 'Sistema');
 
-     $area = $usuario->areaInstitucional?->nombre ?? ($usuario->tipo_personal === 'salud' ? 'Salud' : ($usuario->tipo_personal === 'admin' ? 'Administrativo' : 'Sistema'));
+     $area = $usuario->areaInstitucional?->asignaciones->first()?->area?->nombre ?? ($usuario->tipo_personal === 'salud' ? 'Salud' : ($usuario->tipo_personal === 'admin' ? 'Administrativo' : 'Sistema'));
 
      $estadoActivo = $usuario->estado === 'ACTIVO' || $usuario->estado == 1;
      $estadoSuspendido = $usuario->estado === 'SUSPENDIDO';
@@ -469,9 +443,7 @@
      $estadoLabel = $estadoActivo ? 'Activo' : ($usuario->estado ?? 'Inactivo');
     @endphp
 
-    <x-ui.person-entity-card entity="staff" class="rm-card group relative overflow-hidden border border-borde bg-fondo-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[var(--rm-role-primary)] hover:shadow-md">
-     <div class="absolute right-0 top-0 h-16 w-16 rounded-bl-[2rem] bg-boton-acento/10 opacity-80 transition-transform group-hover:scale-110"></div>
-
+    <x-ui.person-entity-card entity="staff" class="rm-card relative overflow-hidden border border-borde bg-fondo-card p-4">
      <div class="relative z-10 flex items-start justify-between gap-3">
      <div class="flex min-w-0 items-center gap-3">
       <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-borde bg-fondo text-lg font-black text-boton-acento shadow-sm">
@@ -483,7 +455,7 @@
       </div>
 
       <div class="min-w-0">
-      <h4 class="truncate text-sm font-black uppercase tracking-tight text-titulo">
+      <h4 class="truncate text-sm font-semibold text-titulo">
        {{ $nombreUsuario ?: 'Personal sin nombre' }}
       </h4>
       <p class="mt-0.5 truncate text-[11px] font-semibold text-apoyo">
@@ -500,25 +472,22 @@
      <x-ui.status-badge :estado="$usuario->estado" />
      </div>
 
-     <div class="mt-4 grid grid-cols-1 gap-2">
-     <div class="rounded-xl border border-borde bg-fondo px-3 py-2">
-      <div class="text-[10px] font-black uppercase tracking-[0.16em] text-apoyo">Área</div>
-      <div class="mt-0.5 truncate text-xs font-black text-titulo">{{ $area }}</div>
+     <dl class="rm-staff-person-facts">
+     <div>
+      <dt>Área</dt>
+      <dd>{{ $area }}</dd>
      </div>
 
-     <div class="rounded-xl border border-borde bg-fondo px-3 py-2">
-      <div class="text-[10px] font-black uppercase tracking-[0.16em] text-apoyo">Rol / Tipo</div>
-      <div class="mt-0.5 truncate text-xs font-black text-titulo">{{ $tipo }}</div>
+     <div>
+      <dt>Rol / Tipo</dt>
+      <dd>{{ $tipo }}</dd>
      </div>
 
-     <div class="rounded-xl border border-borde bg-fondo px-3 py-2">
-      <div class="text-[10px] font-black uppercase tracking-[0.16em] text-apoyo">Turno</div>
-      <div class="mt-0.5 flex items-center gap-1 text-xs font-bold text-texto">
-      <i class="ph-fill ph-clock text-apoyo"></i>
-      {{ $asignacionActiva?->turno?->nombre ?? 'Sin turno asignado' }}
-      </div>
+     <div>
+      <dt>Turno</dt>
+      <dd>{{ $asignacionActiva?->turno?->nombre ?? 'Sin turno asignado' }}</dd>
      </div>
-     </div>
+     </dl>
 
      <div class="mt-4 flex flex-wrap items-center gap-2">
      @can('usuarios.ver')
@@ -557,7 +526,7 @@
       type="button"
       wire:click="toggleEstado('{{ $usuario->cod_usuario }}')"
       class="ml-auto flex h-8 w-8 items-center justify-center rounded-lg border border-borde bg-fondo-card text-apoyo shadow-sm transition-colors hover:bg-fondo-hover hover:text-estado-peligro"
-      title="{{ $estadoActivo ? 'Suspender' : 'Reactivar' }}"
+      aria-label="{{ $estadoActivo ? 'Suspender' : 'Reactivar' }}" title="{{ $estadoActivo ? 'Suspender' : 'Reactivar' }}"
       >
       <i class="ph-bold {{ $estadoActivo ? 'ph-pause-circle' : 'ph-play-circle' }}"></i>
       </button>
@@ -577,21 +546,8 @@
     @endforelse
    </div>
    @else
-   <div class="overflow-x-auto">
-    <table class="rm-data-table rm-data-table--actions rm-table w-full min-w-[900px] text-left">
-    <thead class="border-b border-borde bg-fondo text-[10px] font-black uppercase tracking-wider text-apoyo">
-     <tr>
-     <th class="px-4 py-3">Personal</th>
-     <th class="px-4 py-3">Área</th>
-     <th class="px-4 py-3">Rol / Tipo</th>
-     <th class="px-4 py-3">Turno</th>
-     <th class="px-4 py-3 text-center">Estado</th>
-     <th class="px-4 py-3 text-center">Acciones</th>
-     </tr>
-    </thead>
-
-    <tbody class="divide-y divide-borde/60">
-     @forelse($personalResumen as $usuario)
+   <ul class="rm-staff-list" aria-label="Directorio de personal">
+    @forelse($personalResumen as $usuario)
      @php
       $nombreUsuario = $usuario->name
       ?? trim(($usuario->nombres ?? '') . ' ' . ($usuario->ap_paterno ?? '') . ' ' . ($usuario->ap_materno ?? ''));
@@ -608,103 +564,49 @@
 
       $tipo = $usuario->categoria_institucional ?? ($usuario->roles->first()?->name ?? 'Sistema');
 
-      $area = $usuario->areaInstitucional?->nombre ?? ($usuario->tipo_personal === 'salud' ? 'Salud' : ($usuario->tipo_personal === 'admin' ? 'Administrativo' : 'Sistema'));
+      $area = $usuario->areaInstitucional?->asignaciones->first()?->area?->nombre ?? ($usuario->tipo_personal === 'salud' ? 'Salud' : ($usuario->tipo_personal === 'admin' ? 'Administrativo' : 'Sistema'));
 
       $estadoActivo = $usuario->estado === 'ACTIVO' || $usuario->estado == 1;
-      $estadoSuspendido = $usuario->estado === 'SUSPENDIDO';
-
-      $estadoClass = $estadoActivo
-      ? 'bg-estado-exito text-white'
-      : ($estadoSuspendido ? 'bg-estado-advertencia text-white' : 'bg-estado-peligro text-white');
-
-      $estadoLabel = $estadoActivo ? 'Activo' : ($usuario->estado ?? 'Inactivo');
      @endphp
-
-     <tr class="transition-colors hover:bg-fondo-hover/60">
-      <td class="px-4 py-3">
-      <div class="flex items-center gap-3">
-       <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border border-borde bg-fondo text-xs font-black text-boton-acento">
-       @if($usuario->profile_photo_path ?? false)
-        <img src="{{ $usuario->profile_photo_url }}" alt="{{ $nombreUsuario }}" class="h-full w-full object-cover">
-       @else
-        {{ $iniciales ?: 'PI' }}
-       @endif
+     <li wire:key="personal-lista-{{ $usuario->cod_usuario }}">
+      <x-ui.person-entity-card entity="staff" class="rm-staff-list__row">
+       <div class="rm-staff-list__identity">
+        <h3>{{ $nombreUsuario ?: 'Personal sin nombre' }}</h3>
+        <p>{{ $correoUsuario }}</p>
+        <dl class="rm-staff-list__facts">
+         <div><dt>Rol / Tipo</dt><dd>{{ $tipo }}</dd></div>
+         <div><dt>Área</dt><dd>{{ $area }}</dd></div>
+         <div><dt>Turno</dt><dd>{{ $asignacionActiva?->turno?->nombre ?? 'Sin turno asignado' }}</dd></div>
+        </dl>
        </div>
-
-       <div class="min-w-0">
-       <div class="truncate text-sm font-black text-titulo">{{ $nombreUsuario ?: 'Personal sin nombre' }}</div>
-       <div class="mt-0.5 truncate text-[11px] font-semibold text-apoyo">{{ $correoUsuario }}</div>
+       <div class="rm-staff-list__actions">
+        <x-ui.status-badge :estado="$usuario->estado" />
+        <div>
+         <button type="button" wire:click="abrirHorariosPersonal('{{ $usuario->cod_usuario }}')" class="rm-btn-secondary" aria-label="Horarios de {{ $nombreUsuario }}">
+          <i class="ph-bold ph-calendar-plus" aria-hidden="true"></i> Horarios
+         </button>
+         @can('usuarios.editar')
+          <button type="button" wire:click="abrirModalEdicion('{{ $usuario->cod_usuario }}')" class="rm-btn-secondary" aria-label="Editar {{ $nombreUsuario }}">Editar</button>
+         @endcan
+         @can('usuarios.cambiar_estado')
+          <button type="button" wire:click="toggleEstado('{{ $usuario->cod_usuario }}')" class="rm-btn-secondary" aria-label="{{ $estadoActivo ? 'Suspender' : 'Reactivar' }} a {{ $nombreUsuario }}">{{ $estadoActivo ? 'Suspender' : 'Reactivar' }}</button>
+         @endcan
+        </div>
        </div>
-      </div>
-      </td>
-
-      <td class="px-4 py-3 text-xs font-bold text-texto">{{ $area }}</td>
-      <td class="px-4 py-3 text-xs font-black text-titulo">{{ $tipo }}</td>
-      <td class="px-4 py-3 text-xs font-semibold text-apoyo">
-      {{ $asignacionActiva?->turno?->nombre ?? 'Sin turno' }}
-      </td>
-
-      <td class="px-4 py-3 text-center">
-      <x-ui.status-badge :estado="$usuario->estado" />
-      </td>
-
-      <td class="px-4 py-3 text-center">
-      <div class="flex items-center justify-center gap-1">
-       @can('usuarios.editar')
-       <button
-        type="button"
-        wire:click="abrirModalEdicion('{{ $usuario->cod_usuario }}')"
-        class="tooltip-btn flex h-8 w-8 items-center justify-center rounded-lg border border-borde bg-fondo-card text-apoyo transition-colors hover:bg-fondo-hover hover:text-boton-acento"
-        title="Ver / editar"
-       >
-        <i class="ph-bold ph-pencil-simple"></i>
-       </button>
-       @endcan
-
-       <button
-       type="button"
-       wire:click="abrirHorariosPersonal('{{ $usuario->cod_usuario }}')"
-       class="tooltip-btn flex h-8 w-8 items-center justify-center rounded-lg border border-borde bg-fondo-card text-apoyo transition-colors hover:bg-fondo-hover hover:text-estado-info"
-       title="Horarios"
-       >
-       <i class="ph-bold ph-calendar-plus"></i>
-       </button>
-
-       @can('usuarios.cambiar_estado')
-       <button
-        type="button"
-        wire:click="toggleEstado('{{ $usuario->cod_usuario }}')"
-        class="tooltip-btn flex h-8 w-8 items-center justify-center rounded-lg border border-borde bg-fondo-card text-apoyo transition-colors hover:bg-fondo-hover hover:text-estado-peligro"
-        title="{{ $estadoActivo ? 'Suspender' : 'Reactivar' }}"
-       >
-        <i class="ph-bold {{ $estadoActivo ? 'ph-pause-circle' : 'ph-play-circle' }}"></i>
-       </button>
-       @endcan
-      </div>
-      </td>
-     </tr>
-     @empty
-     <tr>
-      <td colspan="6" class="px-4 py-8">
-       <x-ui.empty-state
-        icono="ph-users-slash"
-        titulo="No se encontró personal"
-        texto="No existen registros que coincidan con los filtros seleccionados."
-        compact
-        actionMethod="limpiarFiltrosResumen"
-        actionText="Restablecer filtros"
-       />
-      </td>
-     </tr>
-     @endforelse
-    </tbody>
-    </table>
-   </div>
+      </x-ui.person-entity-card>
+     </li>
+    @empty
+     <li><x-ui.empty-state icono="ph-users-slash" titulo="No se encontró personal" texto="Ajusta la búsqueda o restablece los filtros." compact actionMethod="limpiarFiltrosResumen" actionText="Restablecer filtros" /></li>
+    @endforelse
+   </ul>
+   @endif
+   @if($personalResumen->hasPages())
+    <x-ui.paginacion :paginator="$personalResumen" mode="livewire" :show-per-page="false" label="personas" scroll-to=".rm-staff-directory-toolbar" />
    @endif
   </div>
   </div>
  @elseif($tabActiva === 'salud')
-  <div class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5" wire:key="contenido-salud-{{ $tabVersion ?? 0 }}">
+  <div class="rm-staff-metrics rm-staff-metrics--professions mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5" wire:key="contenido-salud-{{ $tabVersion ?? 0 }}">
   @foreach($tarjetasSalud as $tarjeta)
    <div class="rm-card group flex cursor-default items-center gap-3 border border-borde bg-fondo-card px-4 py-3 shadow-sm transition-all hover:-translate-y-0.5 hover:border-borde-hover hover:shadow-md">
    <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg {{ $tarjeta['fondo'] }} {{ $tarjeta['texto'] }} shadow-sm transition-colors {{ $tarjeta['hover'] }} group-hover:text-white">
@@ -723,7 +625,7 @@
   @endforeach
   </div>
  @elseif($tabActiva === 'admin')
-  <div class="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4" wire:key="contenido-admin-{{ $tabVersion ?? 0 }}">
+  <div class="rm-staff-metrics mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4" wire:key="contenido-admin-{{ $tabVersion ?? 0 }}">
   @foreach($tarjetasAdmin as $tarjeta)
    <div class="rm-card group flex cursor-default items-center gap-3 border border-borde bg-fondo-card px-4 py-3 shadow-sm transition-all hover:-translate-y-0.5 hover:border-borde-hover hover:shadow-md">
    <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg {{ $tarjeta['fondo'] }} {{ $tarjeta['texto'] }} shadow-sm">
@@ -743,7 +645,7 @@
   </div>
  @elseif($tabActiva === 'disponibilidad')
   <div class="space-y-4" wire:key="contenido-disponibilidad-{{ $tabVersion ?? 0 }}">
-  <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
+  <div class="rm-staff-metrics rm-staff-metrics--availability grid grid-cols-1 gap-3 md:grid-cols-3">
    <div class="rm-card flex items-center gap-3 border border-borde bg-fondo-card px-4 py-4 shadow-sm">
    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-estado-infoBg text-estado-info">
     <i class="ph-fill ph-clock-user text-xl"></i>
@@ -801,17 +703,23 @@
    </div>
 
    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:flex xl:items-center">
-   <select class="h-9 rounded-lg border border-borde bg-fondo-card px-3 text-xs font-bold text-texto outline-none focus:border-boton-acento">
+   <div>
+   <label for="staff-report-period" class="rm-collection-filter-label">Periodo</label>
+   <select id="staff-report-period" class="h-9 w-full rounded-lg border border-borde bg-fondo-card px-3 text-xs font-bold text-texto outline-none focus:border-boton-acento">
     <option>Periodo: Este mes</option>
     <option>Periodo: Esta semana</option>
     <option>Periodo: Hoy</option>
    </select>
+   </div>
 
-   <select class="h-9 rounded-lg border border-borde bg-fondo-card px-3 text-xs font-bold text-texto outline-none focus:border-boton-acento">
+   <div>
+   <label for="staff-report-area" class="rm-collection-filter-label">Área</label>
+   <select id="staff-report-area" class="h-9 w-full rounded-lg border border-borde bg-fondo-card px-3 text-xs font-bold text-texto outline-none focus:border-boton-acento">
     <option>Área: Todas</option>
     <option>Área: Salud</option>
     <option>Área: Administrativo</option>
    </select>
+   </div>
 
    <button type="button" class="h-9 rounded-lg border border-borde bg-fondo-card px-3 text-xs font-black text-texto transition-colors hover:bg-fondo-hover">
     Exportar Excel
@@ -823,7 +731,7 @@
    </div>
   </div>
 
-  <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+  <div class="rm-staff-metrics grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
       <x-ui.metric-card label="Total institucional" :value="$estadisticas['total']" icon="ph-users-three" variant="neutral" />
       <x-ui.metric-card label="Activos" :value="$estadisticas['activos']" icon="ph-check-circle" variant="mint" />
       <x-ui.metric-card label="En turno" :value="$estadisticas['en_turno']" icon="ph-clock-user" variant="sky" />
@@ -981,8 +889,8 @@
    </h3>
    </div>
 
-   <div class="overflow-x-auto">
-   <table class="rm-data-table rm-data-table--actions rm-table w-full min-w-[880px] text-left">
+   <div class="rm-staff-table-wrap">
+   <table role="table" class="rm-staff-table rm-data-table rm-data-table--actions rm-table w-full min-w-[880px] text-left">
     <thead class="border-b border-borde bg-fondo text-[10px] font-black uppercase tracking-wider text-apoyo">
     <tr>
      <th class="px-4 py-3">Indicador</th>
@@ -992,10 +900,10 @@
     </tr>
     </thead>
 
-    <tbody class="divide-y divide-borde/60">
+    <tbody role="rowgroup" class="divide-y divide-borde/60">
     @forelse($interpretacionReportes as $fila)
-     <tr class="transition-colors hover:bg-fondo-hover/60">
-     <td class="px-4 py-3">
+     <tr role="row" class="transition-colors hover:bg-fondo-hover/60">
+     <td role="cell" data-label="Indicador" class="px-4 py-3">
       <div class="flex items-center gap-2">
       <span class="flex h-8 w-8 items-center justify-center rounded-lg border border-borde bg-fondo-card text-boton-acento">
        <i class="ph-fill {{ $fila['icono'] ?? 'ph-info' }}"></i>
@@ -1003,12 +911,12 @@
       <span class="text-xs font-black text-titulo">{{ $fila['indicador'] ?? 'Indicador' }}</span>
       </div>
      </td>
-     <td class="px-4 py-3 text-xs font-black text-titulo">{{ $fila['resultado'] ?? '-' }}</td>
-     <td class="px-4 py-3 text-xs font-semibold text-texto">{{ $fila['interpretacion'] ?? '-' }}</td>
-     <td class="px-4 py-3 text-xs font-semibold text-apoyo">{{ $fila['accion'] ?? '-' }}</td>
+     <td role="cell" data-label="Resultado" class="px-4 py-3 text-xs font-black text-titulo">{{ $fila['resultado'] ?? '-' }}</td>
+     <td role="cell" data-label="Interpretación" class="px-4 py-3 text-xs font-semibold text-texto">{{ $fila['interpretacion'] ?? '-' }}</td>
+     <td role="cell" data-label="Acción sugerida" class="px-4 py-3 text-xs font-semibold text-apoyo">{{ $fila['accion'] ?? '-' }}</td>
      </tr>
     @empty
-     <tr>
+     <tr role="row">
      <td colspan="4" class="px-4 py-8 text-center text-xs font-semibold text-apoyo">
       No existen datos suficientes para interpretar el reporte.
      </td>

@@ -22,7 +22,12 @@ class FrontendRestauradoV2Test extends TestCase
 {
     use RefreshDatabase;
 
-    protected $seed = true;
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Sembrar dentro de la transacción del caso, sin contaminar el PDO compartido.
+        $this->seed(\Database\Seeders\DatabaseSeeder::class);
+    }
 
     public function test_portada_y_login_originales_siguen_disponibles(): void
     {

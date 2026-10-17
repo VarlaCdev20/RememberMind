@@ -23,6 +23,15 @@
 .rm-drawer-shell { z-index: var(--rm-z-drawer, 500); }
 .rm-drawer-shell__position { z-index: 1; }
 .rm-drawer__close { width: 44px; height: 44px; min-width: 44px; }
+.rm-drawer .rm-drawer__heading-icon {
+    width: var(--rm-control-sm);
+    height: var(--rm-control-sm);
+    font-size: var(--rm-icon-lg);
+    line-height: 1;
+    color: var(--rm-action-primary-ink);
+    background: var(--rm-action-primary-soft);
+}
+:is(.dark, [data-theme="dark"]) .rm-drawer .rm-drawer__heading-icon { color: var(--rm-text-primary); }
 
 /* 1. Backdrop / Overlay de fondo */
 .rm-drawer-backdrop {

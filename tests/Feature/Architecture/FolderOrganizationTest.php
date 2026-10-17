@@ -86,7 +86,7 @@ class FolderOrganizationTest extends TestCase
                 'wheres' => $ruta->wheres, 'bindingFields' => $ruta->bindingFields()];
         }
         $esperadas = json_decode(File::get(base_path('tests/Fixtures/Architecture/routes.json')), true, 512, JSON_THROW_ON_ERROR);
-        $this->assertCount(296, $actuales);
+        $this->assertCount(300, $actuales);
         $this->assertSame(
             $this->normalizarPrefijosLivewire($esperadas),
             $this->normalizarPrefijosLivewire($actuales, ltrim(EndpointResolver::prefix(), '/')),
@@ -104,7 +104,7 @@ class FolderOrganizationTest extends TestCase
 
         $normalizadas = 0;
         foreach ($rutas as &$ruta) {
-            if (preg_match('/^livewire-[a-f0-9]{8}\/(.+)$/D', $ruta['uri'], $coincidencia)
+            if (preg_match('/^livewire-(?:[a-f0-9]{8}|\{hash\})\/(.+)$/D', $ruta['uri'], $coincidencia)
                 && in_array($coincidencia[1], $endpoints, true)) {
                 if ($prefijoActual !== null) {
                     $this->assertSame($prefijoActual, explode('/', $ruta['uri'], 2)[0]);

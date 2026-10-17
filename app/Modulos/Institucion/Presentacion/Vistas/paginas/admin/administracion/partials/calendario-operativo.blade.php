@@ -70,7 +70,7 @@
                     @forelse($registrosPanel as $registro)
                         @php($fechaEvento = $registro->{$presentacion['campoFecha']} ?? null)
                         <article class="rm-operation-calendar__event">
-                            <header><span class="rm-operation-calendar__event-icon"><i class="ph-bold {{ $definicion['icono'] }}" aria-hidden="true"></i></span><div><h5>{{ $registro->titulo }}</h5><small>{{ $registro->codigo }}</small></div><x-ui.status-badge :estado="$registro->estado" /></header>
+                            <header><span class="rm-operation-calendar__event-icon"><i class="ph-bold {{ $definicion['icono'] }}" aria-hidden="true"></i></span><div><h5>{{ $registro->titulo }}</h5></div><x-ui.status-badge :estado="$registro->estado" /></header>
                             <p class="rm-operation-calendar__time"><i class="ph-bold ph-clock" aria-hidden="true"></i>@if($modulo === 'jornadas'){{ $registro->horario ?? 'Horario sin registrar' }}@else{{ $fechaEvento ? \Carbon\Carbon::parse($fechaEvento)->format('d/m/Y H:i') : 'Fecha sin registrar' }}@endif</p>
                             <dl>@foreach($camposCalendario as $campo)<div><dt>{{ $columnas[$campo] }}</dt><dd>@include('pages.admin.administracion.partials.campo-operativo', ['valor' => $registro->{$campo} ?? null])</dd></div>@endforeach</dl>
                             <a class="rm-btn-secondary" href="{{ $enlace(['detalle' => $registro->codigo]) }}" data-registro="{{ $registro->codigo }}" @click.prevent="abrirFicha(@js($enlace(['detalle' => $registro->codigo])), @js($registro->codigo), $event)" aria-label="Abrir ficha de {{ $registro->titulo }}"><i class="ph-bold ph-eye" aria-hidden="true"></i> Abrir ficha</a>

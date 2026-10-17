@@ -5,6 +5,12 @@
 
 :root {
 
+   /* Superficies terrosas aclaradas; la transparencia se define en aliases de captura. */
+   --rm-taupe-gray-50: #E8E3DD;
+   --rm-taupe-gray-100: #DED8D2;
+   --rm-taupe-gray-150: #D5CDC5;
+   --rm-taupe-gray-200: #C9C1B8;
+
    /* Paleta base de la fase de tokens. Los componentes usan aliases semánticos. */
    --rm-chocolate-50: #EEE6E0;
    --rm-chocolate-100: #E1D5CD;

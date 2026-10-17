@@ -1,8 +1,8 @@
 import { afterEach, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { rmChartColor, rmChartNumber, rmHexToRgba, rmInstallGlobalChartTheme } from '../../resources/frontend/styles/design-system/charts/chart-theme.js';
-import { rmPieChartConfig, rmSemanticChartConfig } from '../../resources/frontend/styles/design-system/charts/chart-presets.js';
+import { rmChartColor, rmChartNumber, rmHexToRgba, rmInstallGlobalChartTheme, rmCreateGradient, rmCreateBarGradient } from '../../resources/frontend/styles/design-system/charts/chart-theme.js';
+import { rmPieChartConfig, rmSemanticChartConfig, rmSparklineChartConfig } from '../../resources/frontend/styles/design-system/charts/chart-presets.js';
 import { rmDestroyAllCharts, rmInitChart } from '../../resources/frontend/styles/design-system/charts/chart-livewire.js';
 
 const css = readFileSync(new URL('../../resources/frontend/styles/design-system/tokens/chart-colors.css', import.meta.url), 'utf8');
@@ -34,6 +34,19 @@ globalThis.document = { documentElement: { classList: { contains: () => false },
 globalThis.getComputedStyle = () => ({ getPropertyValue: name => values[name] ?? '' });
 
 afterEach(() => { values['--rm-chart-care-500'] = '#7FA883'; });
+
+test('rellenos sólidos conservan series y no dependen de degradados ni tamaño del canvas', () => {
+    const ctx = { createLinearGradient() { throw new Error('No debe crear un degradado'); } };
+    assert.equal(rmCreateGradient(ctx, '#7FA58D', 100), 'rgba(127, 165, 141, 0.12)');
+    assert.equal(rmCreateBarGradient(ctx, '#7FA58D', 500), 'rgba(127, 165, 141, 0.52)');
+    const datos = [2, null, 4];
+    const sparkline = rmSparklineChartConfig(['Lun', 'Mar', 'Mié'], datos, '#7FA58D');
+    assert.equal(typeof sparkline.data.datasets[0].backgroundColor, 'string');
+    assert.deepEqual(sparkline.data.datasets[0].data, datos);
+    const varias = rmSparklineChartConfig(['Lun'], [{ label: 'Serie real', data: [3], color: '#3F6B7D' }]);
+    assert.equal(typeof varias.data.datasets[0].backgroundColor, 'string');
+    assert.deepEqual(varias.data.datasets[0].data, [3]);
+});
 
 test('tokens semánticos y de estructura están en el módulo CSS global', () => {
     for (const name of ['care', 'clinical', 'alert', 'neutral', 'cognitive', 'rehab', 'reference']) {

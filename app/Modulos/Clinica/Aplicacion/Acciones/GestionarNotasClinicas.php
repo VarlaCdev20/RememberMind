@@ -20,8 +20,8 @@ final class GestionarNotasClinicas
         $codArea = $personal?->asignaciones()->whereIn('estado', ['ACTIVA', 'ACTIVO'])->latest('fecha_asignacion')->value('cod_area');
         abort_unless($personal && $codArea, 422, 'El usuario debe tener personal y área institucional activa.');
         DB::transaction(function () use ($data, $adulto_mayor, $personal, $codArea): void {
-            $atencion = Atencion::query()->create(['cod_atencion' => 'ATN_'.strtoupper(Str::random(10)), 'cod_residente' => $adulto_mayor->cod_residente, 'cod_area' => $codArea, 'cod_personal' => $personal->cod_personal, 'tipo_atencion' => 'NOTA_CLINICA', 'fecha_hora' => ($data['fecha'] ?? today()->toDateString()).' '.now()->format('H:i:s'), 'estado' => 'FINALIZADA', 'observacion' => $data['descripcion']]);
-            NotaClinica::create(['cod_nota' => 'NOT_'.strtoupper(Str::random(10)), 'cod_atencion' => $atencion->cod_atencion, 'cod_residente' => $adulto_mayor->cod_residente, 'cod_personal' => $personal->cod_personal, 'tipo_nota' => $data['tipo_obs'] ?? 'GENERAL', 'contenido' => $data['descripcion'], 'fecha_hora' => $atencion->fecha_hora, 'estado' => 'ACTIVA']);
+            $atencion = Atencion::query()->create(['cod_atencion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('atenciones'), 'cod_residente' => $adulto_mayor->cod_residente, 'cod_area' => $codArea, 'cod_personal' => $personal->cod_personal, 'tipo_atencion' => 'NOTA_CLINICA', 'fecha_hora' => ($data['fecha'] ?? today()->toDateString()).' '.now()->format('H:i:s'), 'estado' => 'FINALIZADA', 'observacion' => $data['descripcion']]);
+            NotaClinica::create(['cod_nota' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('notas_clinicas'), 'cod_atencion' => $atencion->cod_atencion, 'cod_residente' => $adulto_mayor->cod_residente, 'cod_personal' => $personal->cod_personal, 'tipo_nota' => $data['tipo_obs'] ?? 'GENERAL', 'contenido' => $data['descripcion'], 'fecha_hora' => $atencion->fecha_hora, 'estado' => 'ACTIVA']);
         });
 
         return null;

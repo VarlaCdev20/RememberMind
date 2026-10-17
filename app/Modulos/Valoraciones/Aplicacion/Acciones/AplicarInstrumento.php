@@ -48,9 +48,9 @@ final class AplicarInstrumento
         $datos['puntaje_total'] = collect($respuestas)->sum(fn (array $fila) => (float) ($fila['puntaje'] ?? 0));
         $datos['puntaje_maximo'] = $preguntas->sum(fn (PreguntaInstrumento $pregunta) => (float) ($pregunta->puntaje_maximo ?? 0));
         $aplicacion = DB::transaction(function () use ($instrumento, $residente, $personal, $datos, $respuestas): AplicacionInstrumento {
-            $aplicacion = AplicacionInstrumento::query()->create(['cod_aplicacion' => $this->codigo('APL'), 'cod_instrumento' => $instrumento->cod_instrumento, 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, ...$datos, 'fecha_hora' => now(), 'estado' => 'COMPLETA']);
+            $aplicacion = AplicacionInstrumento::query()->create(['cod_aplicacion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('aplicaciones_instrumento'), 'cod_instrumento' => $instrumento->cod_instrumento, 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, ...$datos, 'fecha_hora' => now(), 'estado' => 'COMPLETA']);
             foreach ($respuestas as $respuesta) {
-                RespuestaInstrumento::query()->create(['cod_respuesta' => $this->codigo('RSP'), 'cod_aplicacion' => $aplicacion->cod_aplicacion, ...$respuesta]);
+                RespuestaInstrumento::query()->create(['cod_respuesta' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('respuestas_instrumento'), 'cod_aplicacion' => $aplicacion->cod_aplicacion, ...$respuesta]);
             }
 
             return $aplicacion;
@@ -59,8 +59,4 @@ final class AplicarInstrumento
         return $aplicacion->load('respuestas');
     }
 
-    private function codigo(string $prefijo): string
-    {
-        return $prefijo.'_'.Str::upper(Str::random(12));
-    }
 }

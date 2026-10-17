@@ -92,7 +92,7 @@ class DocumentacionUsuarioService
                 $detalle = array_filter([$observaciones, $fechaEmision ? "Fecha de emisión: {$fechaEmision}" : null,
                     "Nombre original: {$this->archivos->nombreOriginal($file)}", 'Subido por: '.$actor->getKey()]);
                 $documento = Documento::create([
-                    'cod_documento' => 'DOC_'.strtoupper(Str::random(10)), 'cod_usuario' => $usuario->getKey(),
+                    'cod_documento' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('documentos'), 'cod_usuario' => $usuario->getKey(),
                     'cod_documento_anterior' => $previo?->getKey(), 'tipo_documento' => $codTipoDoc, 'nombre' => $tipo->nombre,
                     ...$archivo, 'fecha_vencimiento' => $fechaVencimiento, 'estado' => 'CARGADO', 'observacion' => implode("\n", $detalle),
                 ]);

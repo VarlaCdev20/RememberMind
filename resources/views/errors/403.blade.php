@@ -1,10 +1,15 @@
+@php
+    $nombreAplicacion = config('app.name');
+    $nombreAplicacion = ! $nombreAplicacion || strtolower($nombreAplicacion) === 'laravel' ? 'RememberMind' : $nombreAplicacion;
+    $cuentaActiva = auth()->user()?->estado === 'ACTIVO';
+@endphp
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
-    <title>Acceso restringido · {{ config('app.name', 'RememberMind') }}</title>
+    <title>Acceso restringido · {{ $nombreAplicacion }}</title>
     <style>
         :root { color-scheme: light; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
         * { box-sizing: border-box; }
@@ -26,7 +31,7 @@
 </head>
 <body>
     <main>
-        <div class="brand">{{ config('app.name', 'RememberMind') }}</div>
+        <div class="brand">{{ $nombreAplicacion }}</div>
         <div class="icon" aria-hidden="true">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
@@ -35,9 +40,15 @@
         </div>
         <p class="code">Código 403</p>
         <h1>Acceso restringido</h1>
-        <p class="message">No tienes acceso a esta sección con tu cuenta actual. Si necesitas ingresar, comunícate con la administración del centro.</p>
+        <p class="message">No tienes acceso a esta sección con tu cuenta actual.
+            @if($cuentaActiva)
+                Vuelve al inicio de tu cuenta para consultar las secciones disponibles. Si necesitas otro acceso, comunícate con la administración del centro.
+            @else
+                Si necesitas ingresar, comunícate con la administración del centro.
+            @endif
+        </p>
         <div class="actions">
-            <a class="button" href="{{ route('welcome') }}">Ir al inicio</a>
+            <a class="button" href="{{ route($cuentaActiva ? 'dashboard' : 'welcome') }}">{{ $cuentaActiva ? 'Volver a mi inicio' : 'Ir al inicio' }}</a>
             @auth
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

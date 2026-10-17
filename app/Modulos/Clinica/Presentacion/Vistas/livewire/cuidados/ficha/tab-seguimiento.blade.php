@@ -19,7 +19,7 @@
             @can('atenciones.crear')
                 @if(!$consultaEnfermeria)
 <button type="button" wire:click="abrirModalSeguimiento"
-                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--rm-action-primary)] px-4 py-2.5 text-sm font-bold text-white hover:bg-[var(--rm-action-primary-hover)]">
+                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--rm-action-primary)] px-4 py-2.5 text-sm font-bold text-[var(--rm-text-on-primary)] hover:bg-[var(--rm-action-primary-hover)]">
                     <i class="ph-bold ph-plus-circle"></i>
                     Registrar seguimiento
                 </button>
@@ -116,7 +116,7 @@
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div class="min-w-0">
                             <div class="flex flex-wrap items-center gap-2">
-                                <span class="rounded-full bg-[var(--rm-action-primary-soft)] px-2.5 py-1 text-[11px] font-bold uppercase text-[var(--rm-action-primary-ink)] dark:bg-blue-950/50 dark:text-blue-200">{{ $evento['tipo_label'] }}</span>
+                                <span class="rounded-full bg-[var(--rm-action-primary-soft)] px-2.5 py-1 text-[11px] font-bold uppercase text-[var(--rm-action-primary-ink)] dark:bg-[var(--rm-info-soft)] dark:text-[var(--rm-info-strong)]">{{ $evento['tipo_label'] }}</span>
                                 @if(!empty($evento['estado_badge']))<span class="text-xs font-bold text-[var(--rm-text-secondary)]">{{ $evento['estado_badge'] }}</span>@endif
                             </div>
                             <h4 class="mt-2 font-bold text-[var(--rm-text-primary)]">{{ $evento['titulo'] }}</h4>

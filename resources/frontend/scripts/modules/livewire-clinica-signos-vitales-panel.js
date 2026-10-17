@@ -141,7 +141,7 @@
             const canvas = document.getElementById('chartDistPA');
             if (!canvas || typeof Chart === 'undefined') return;
 
-            const colors = [window.RMCharts.color('clinical'), window.RMCharts.color('care'), window.RMCharts.color('neutral'), window.RMCharts.color('alert'), window.RMCharts.color('alert')];
+            const colors = (data.color_tokens || data.labels.map(() => '--rm-text-muted')).map(token => window.RMCharts.getCss(token));
 
             const config = window.RMCharts && window.RMCharts.presets
                 ? window.RMCharts.presets.doughnut(

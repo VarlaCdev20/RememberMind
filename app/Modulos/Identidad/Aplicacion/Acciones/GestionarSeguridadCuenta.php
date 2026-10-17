@@ -12,7 +12,7 @@ final class GestionarSeguridadCuenta
     {
         $actor = $this->autorizar($actor);
         $usuario = User::findOrFail($usuario->getKey());
-        abort_if($usuario->getKey() === 'USU_0001' && $actor->getKey() !== 'USU_0001', 403);
+        abort_if($usuario->esCuentaPrincipal() && ! $actor->esCuentaPrincipal(), 403);
         $tempPassword = Str::password(16, letters: true, numbers: true, symbols: true, spaces: false);
 
         DB::transaction(function () use ($actor, $usuario, $tempPassword) {
@@ -36,7 +36,7 @@ final class GestionarSeguridadCuenta
             $superadmins = User::whereHas('roles', fn ($query) => $query->where('name', 'SUPERADMINISTRADOR')->where('guard_name', 'web'))->where('estado', 'ACTIVO')->orderBy('cod_usuario')->lockForUpdate()->get();
             $usuario = User::query()->lockForUpdate()->findOrFail($usuario->getKey());
             abort_if($usuario->cod_usuario === $actor->getKey(), 422, 'No puedes bloquear tu propia cuenta.');
-            abort_if($usuario->cod_usuario === 'USU_0001' || $usuario->correo === 'admincasaamandita@gmail.com', 422, 'No puedes bloquear al Administrador Principal.');
+            abort_if($usuario->esCuentaPrincipal(), 422, 'No puedes bloquear al Administrador Principal.');
             abort_if($usuario->estado === 'ACTIVO' && $usuario->hasRole('SUPERADMINISTRADOR') && $superadmins->count() <= 1, 422, 'No puedes bloquear al único superadministrador activo.');
             $nuevoAcceso = $usuario->estado === 'ACTIVO' ? 'BLOQUEADO' : 'HABILITADO';
             $usuario->update(['estado' => $nuevoAcceso === 'HABILITADO' ? 'ACTIVO' : 'INACTIVO']);

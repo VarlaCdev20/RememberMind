@@ -41,6 +41,7 @@ class TabMedicacionEnfermeriaTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        Carbon::setTestNow('2026-10-14 09:00:00');
         $this->seed([RolesAndPermissionsSeeder::class]);
 
         $this->enfermero = User::factory()->create([
@@ -95,6 +96,12 @@ class TabMedicacionEnfermeriaTest extends TestCase
         ]);
 
         $this->actingAs($this->enfermero);
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
     }
 
     public function test_escenario_a_b_c_d_e_f_g_en_pestana_medicaciones(): void

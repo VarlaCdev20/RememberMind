@@ -3,46 +3,56 @@
 namespace App\Modulos\Clinica\Aplicacion\Consultas;
 
 use App\Models\SignoVital;
-use App\Modulos\Clinica\Dominio\Reglas\ClasificacionSignosPanel;
+use App\Modulos\Clinica\Aplicacion\Acciones\EvaluadorSignosVitales;
 use Illuminate\Support\Collection;
 
 final class AnalisisSignosPanel
 {
-    public function __construct(private readonly ClasificacionSignosPanel $clasificacion = new ClasificacionSignosPanel) {}
+    private array $interpretaciones = [];
 
-    public function detectarAlertas(array $entrada): array
+    public function __construct(private readonly InterpretacionSignosVitales $interpretacion) {}
+
+    public function preparar(Collection $signos): void
     {
-        $alertas = [];
+        $this->interpretaciones = $this->interpretacion->coleccion($signos)->all();
+    }
 
-        $this->clasificacion->agregarAlerta($alertas, $this->clasificacion->clasificarPresion($entrada['presion_sistolica'], $entrada['presion_diastolica']), 'Presión arterial');
-        $this->clasificacion->agregarAlerta($alertas, $this->clasificacion->clasificarNumero($entrada['frecuencia_cardiaca'], 60, 100, null, null, 'lpm'), 'Frecuencia cardíaca');
-        $this->clasificacion->agregarAlerta($alertas, $this->clasificacion->clasificarNumero($entrada['saturacion'], 95, null, 92, 94, '%'), 'Saturación de oxígeno');
-        $this->clasificacion->agregarAlerta($alertas, $this->clasificacion->clasificarNumero($entrada['temperatura'], 36.0, 37.5, null, null, '°C'), 'Temperatura');
-        $this->clasificacion->agregarAlerta($alertas, $this->clasificacion->clasificarNumero($entrada['frecuencia_respiratoria'], 12, 20, null, null, 'rpm'), 'Frecuencia respiratoria');
-
-        if ($entrada['glucosa'] !== null && $entrada['glucosa'] !== '') {
-            $glucosa = (float) $entrada['glucosa'];
-            if ($glucosa < 70 || $glucosa >= 180) {
-                $alertas[] = [
-                    'campo' => 'Glucosa',
-                    'mensaje' => 'Valor fuera del rango referencial interno. Verifique antes de guardar.',
-                ];
+    public function detectarAlertas(array $entrada, ?string $codResidente = null): array
+    {
+        $mediciones = [];
+        foreach (['presion_sistolica', 'presion_diastolica', 'frecuencia_cardiaca',
+            'frecuencia_respiratoria', 'temperatura', 'saturacion_oxigeno', 'glucemia'] as $campo) {
+            $alias = match ($campo) { 'saturacion_oxigeno' => 'saturacion', 'glucemia' => 'glucosa', default => $campo };
+            $valor = $entrada[$campo] ?? $entrada[$alias] ?? null;
+            $mediciones[$campo] = is_numeric($valor) ? (float) $valor : null;
+        }
+        if (array_key_exists('fecha_hora', $entrada)) {
+            $fecha = $entrada['fecha_hora'];
+            if (is_string($fecha) && ! \Illuminate\Support\Facades\Validator::make(
+                ['fecha_hora' => $fecha], ['fecha_hora' => 'required|date_format:Y-m-d H:i']
+            )->fails()) {
+                $mediciones['fecha_hora'] = $fecha;
+            } else {
+                // Sin fecha válida no se aplica el objetivo de otra vigencia.
+                $codResidente = null;
             }
         }
-
-        return $alertas;
+        return collect(app(EvaluadorSignosVitales::class)->evaluar($mediciones, $codResidente,
+            incluirHistorial: false)->toArray()['resultados'])
+            ->filter(fn (array $r) => in_array($r['severidad'], ['ADVERTENCIA', 'ALTO', 'CRITICO'], true)
+                || $r['comportamiento_alerta'] === 'SUGERIR')
+            ->map(fn (array $r) => ['campo' => $r['variable'], 'mensaje' => $r['explicacion'], 'severidad' => $r['severidad']])->values()->all();
     }
 
     public function construirMetricas(Collection $signos): array
     {
         return [
             $this->metricaPresion($signos),
-            $this->metricaNumerica($signos, 'frecuencia_cardiaca', 'Frecuencia cardíaca', 'lpm', 'ph-pulse', 3, fn ($valor) => $this->clasificacion->clasificarNumero($valor, 60, 100, null, null, 'lpm')),
-            $this->metricaNumerica($signos, 'saturacion', 'Saturación de oxígeno', '%', 'ph-wave-sine', 1, fn ($valor) => $this->clasificacion->clasificarNumero($valor, 95, null, 92, 94, '%')),
-            $this->metricaNumerica($signos, 'temperatura', 'Temperatura', '°C', 'ph-thermometer', 0.2, fn ($valor) => $this->clasificacion->clasificarNumero($valor, 36.0, 37.5, null, null, '°C'), 1),
-            $this->metricaNumerica($signos, 'frecuencia_respiratoria', 'Frecuencia respiratoria', 'rpm', 'ph-wind', 1, fn ($valor) => $this->clasificacion->clasificarNumero($valor, 12, 20, null, null, 'rpm')),
-            $this->metricaNumerica($signos, 'peso', 'Peso registrado', 'kg', 'ph-scales', 0.3, fn () => ['key' => 'normal', 'label' => 'Evolución', 'message' => 'Seguimiento antropométrico'], 1),
-            $this->metricaNumerica($signos, 'imc', 'IMC calculado', 'kg/m²', 'ph-chart-line-up', 0.3, fn () => ['key' => 'normal', 'label' => 'Referencial', 'message' => 'Interpretar con contexto clínico'], 1),
+            $this->metricaNumerica($signos, 'frecuencia_cardiaca', 'Frecuencia cardíaca', 'lpm', 'ph-pulse', 3, 'FC'),
+            $this->metricaNumerica($signos, 'saturacion', 'Saturación de oxígeno', '%', 'ph-wave-sine', 1, 'SPO2'),
+            $this->metricaNumerica($signos, 'temperatura', 'Temperatura', '°C', 'ph-thermometer', 0.2, 'TEMP', 1),
+            $this->metricaNumerica($signos, 'frecuencia_respiratoria', 'Frecuencia respiratoria', 'rpm', 'ph-wind', 1, 'FR'),
+            $this->metricaNumerica($signos, 'glucosa', 'Glucemia', 'mg/dL', 'ph-drop', 1, 'GLUCOSA'),
         ];
     }
 
@@ -59,7 +69,7 @@ final class AnalisisSignosPanel
             return $this->metricaSinDatos('Presión arterial', 'mmHg', 'ph-heartbeat');
         }
 
-        $estado = $this->clasificacion->clasificarPresion($ultimo->presion_sistolica, $ultimo->presion_diastolica);
+        $estado = $this->analizarRegistro($ultimo)['metricas']['PA'];
 
         return [
             'key' => 'presion',
@@ -77,7 +87,7 @@ final class AnalisisSignosPanel
         ];
     }
 
-    private function metricaNumerica(Collection $signos, string $campo, string $label, string $unidad, string $icono, float $tolerancia, callable $clasificador, int $decimales = 0): array
+    private function metricaNumerica(Collection $signos, string $campo, string $label, string $unidad, string $icono, float $tolerancia, string $metrica, int $decimales = 0): array
     {
         $registros = $signos
             ->filter(fn ($signo) => $signo->{$campo} !== null && $signo->{$campo} !== '')
@@ -91,7 +101,7 @@ final class AnalisisSignosPanel
         }
 
         $valor = (float) $ultimo->{$campo};
-        $estado = $clasificador($valor);
+        $estado = $this->analizarRegistro($ultimo)['metricas'][$metrica];
         $valores = $registros->pluck($campo)->map(fn ($item) => (float) $item);
 
         return [
@@ -131,8 +141,8 @@ final class AnalisisSignosPanel
     public function construirResumenPeriodo(Collection $signos, Collection $baseSignos): array
     {
         $analisis = $signos->map(fn ($signo) => $this->analizarRegistro($signo));
-        $normales = $analisis->where('key', 'normal')->count();
-        $fueraRango = $analisis->whereIn('key', ['fuera_rango', 'requiere_revision'])->count();
+        $normales = $analisis->whereIn('key', ['normal', 'objetivo_personalizado'])->count();
+        $fueraRango = $analisis->whereIn('key', ['observacion', 'fuera_rango', 'requiere_revision'])->count();
         $mesActual = $baseSignos
             ->where('estado', 'VIGENTE')
             ->filter(fn ($signo) => $signo->fecha && $signo->fecha->isSameMonth(now()))
@@ -158,7 +168,7 @@ final class AnalisisSignosPanel
             'observacion' => 0,
             'fuera_rango' => 0,
             'requiere_revision' => 0,
-            'sin_datos' => 0,
+            'sin_datos' => 0, 'sin_interpretacion' => 0, 'objetivo_personalizado' => 0,
         ];
 
         foreach ($signos as $signo) {
@@ -168,11 +178,13 @@ final class AnalisisSignosPanel
             }
         }
 
-        $prioridad = collect(['requiere_revision', 'fuera_rango', 'observacion', 'normal', 'sin_datos'])
+        $prioridad = collect(['requiere_revision', 'fuera_rango', 'observacion', 'sin_interpretacion', 'objetivo_personalizado', 'normal', 'sin_datos'])
             ->first(fn ($key) => ($conteos[$key] ?? 0) > 0) ?? 'sin_datos';
 
         $mensajes = [
-            'normal' => 'Los registros filtrados se mantienen dentro de rangos referenciales normales.',
+            'normal' => 'Los parámetros clasificados están en referencia. Consulte los detalles de cada toma.',
+            'objetivo_personalizado' => 'Hay parámetros dentro del objetivo médico válido en su fecha de medición.',
+            'sin_interpretacion' => 'Hay mediciones sin interpretación automática aprobada. Consulte los detalles.',
             'observacion' => 'Existen valores en observación. Conviene confirmar tendencia con próximos controles.',
             'fuera_rango' => 'Hay valores fuera del rango referencial. Requieren revisión del personal de salud.',
             'requiere_revision' => 'Se detectan controles que requieren revisión prioritaria del personal de salud.',
@@ -188,71 +200,7 @@ final class AnalisisSignosPanel
 
     public function analizarRegistro(SignoVital $signo): array
     {
-        if ($signo->estado === 'ANULADO') {
-            return [
-                'key' => 'anulado',
-                'label' => 'Anulado',
-                'message' => 'Registro clínico anulado, conservado por trazabilidad.',
-                'motivos' => ['Registro anulado'],
-            ];
-        }
-
-        $evaluaciones = [];
-
-        $this->clasificacion->agregarEvaluacion($evaluaciones, $this->clasificacion->clasificarPresion($signo->presion_sistolica, $signo->presion_diastolica), 'Presión arterial');
-        $this->clasificacion->agregarEvaluacion($evaluaciones, $this->clasificacion->clasificarNumero($signo->frecuencia_cardiaca, 60, 100, null, null, 'lpm'), 'Frecuencia cardíaca');
-        $this->clasificacion->agregarEvaluacion($evaluaciones, $this->clasificacion->clasificarNumero($signo->saturacion, 95, null, 92, 94, '%'), 'Saturación de oxígeno');
-        $this->clasificacion->agregarEvaluacion($evaluaciones, $this->clasificacion->clasificarNumero($signo->temperatura, 36.0, 37.5, null, null, '°C'), 'Temperatura');
-        $this->clasificacion->agregarEvaluacion($evaluaciones, $this->clasificacion->clasificarNumero($signo->frecuencia_respiratoria, 12, 20, null, null, 'rpm'), 'Frecuencia respiratoria');
-
-        if (empty($evaluaciones)) {
-            return [
-                'key' => 'sin_datos',
-                'label' => 'Sin datos',
-                'message' => 'Sin parámetros clasificables en este registro.',
-                'motivos' => [],
-            ];
-        }
-
-        $motivos = collect($evaluaciones)
-            ->filter(fn ($item) => in_array($item['key'], ['observacion', 'fuera_rango', 'requiere_revision'], true))
-            ->map(fn ($item) => "{$item['campo']}: {$item['message']}")
-            ->values()
-            ->all();
-
-        if (collect($evaluaciones)->contains('key', 'requiere_revision')) {
-            return [
-                'key' => 'requiere_revision',
-                'label' => 'Requiere revisión',
-                'message' => 'Valor fuera del rango referencial con prioridad de revisión.',
-                'motivos' => $motivos,
-            ];
-        }
-
-        if (collect($evaluaciones)->contains('key', 'fuera_rango')) {
-            return [
-                'key' => 'fuera_rango',
-                'label' => 'Fuera de rango',
-                'message' => 'Uno o más parámetros están fuera del rango referencial.',
-                'motivos' => $motivos,
-            ];
-        }
-
-        if (collect($evaluaciones)->contains('key', 'observacion')) {
-            return [
-                'key' => 'observacion',
-                'label' => 'En observación',
-                'message' => 'Uno o más parámetros requieren seguimiento.',
-                'motivos' => $motivos,
-            ];
-        }
-
-        return [
-            'key' => 'normal',
-            'label' => 'Normal',
-            'message' => 'Parámetros dentro de rangos referenciales.',
-            'motivos' => [],
-        ];
+        return $this->interpretaciones[$signo->cod_signo] ?? $this->interpretacion->registro($signo);
     }
 
     private function variacionPresion(?SignoVital $ultimo, ?SignoVital $previo): string

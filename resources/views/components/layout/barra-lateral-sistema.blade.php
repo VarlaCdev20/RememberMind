@@ -22,7 +22,7 @@
     $activeLocation = null;
     $bestMatch = -1;
     foreach ($sections as $sectionIndex => $section) {
-        $candidates = [[null, $section['route'] ?? null, [], []]];
+        $candidates = [[null, $section['route'] ?? null, $section['parameters'] ?? [], $section['active_routes'] ?? []]];
         foreach ($section['items'] ?? [] as $itemIndex => $item) {
             $candidates[] = [$itemIndex, $item['route'] ?? null, $item['parameters'] ?? [], $item['active_routes'] ?? []];
         }
@@ -35,7 +35,7 @@
             foreach ($parameters as $key => $value) {
                 if ((string) request()->query($key) !== (string) $value) continue 2;
             }
-            $score = ($currentRoute === $routeName ? 10000 : 0) + strlen($routeName) + count($parameters) * 100;
+            $score = ($currentRoute === $routeName || in_array($currentRoute, $activeRoutes, true) ? 10000 : 0) + strlen($routeName) + count($parameters) * 100;
             if ($score > $bestMatch) {
                 $bestMatch = $score;
                 $activeLocation = ['section' => $sectionIndex, 'item' => $itemIndex];
@@ -49,6 +49,7 @@
 @endphp
 
 <aside id="{{ request()->routeIs('admin.enfermeria.*') ? 'sidebar-enfermeria' : 'sidebar' }}" class="rm-sidebar" wire:transition="rm-sidebar" aria-label="Navegación principal"
+    @if($sidebarRole === 'ENFERMEROS') data-rm-nursing @endif
     :class="{ 'is-mobile-open': sidebarOpen }"
     :inert="sidebarRange === 'drawer' && !sidebarOpen"
     @toggle-sidebar.window="sidebarOpen = !sidebarOpen"
@@ -89,13 +90,18 @@
             if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
             this.showFlyout(index, element);
         },
-        showFlyout(index, element) {
+        showFlyout(index, element, focusFirst = false) {
             if (!sidebarCollapsed || window.innerWidth < 1024) return;
             this.flyoutIndex = index;
             this.$nextTick(() => {
                 const flyout = document.getElementById('rm-sidebar-flyout-' + index);
                 const height = flyout?.getBoundingClientRect().height ?? 280;
                 this.flyoutTop = Math.max(12, Math.min(element.getBoundingClientRect().top, window.innerHeight - height - 12));
+                if (focusFirst) {
+                    requestAnimationFrame(() => requestAnimationFrame(() => {
+                        if (this.flyoutIndex === index) flyout?.querySelector('a[href]')?.focus();
+                    }));
+                }
             });
         }
     }"
@@ -142,7 +148,7 @@
                         title="{{ $section['title'] }}" aria-label="{{ $section['title'] }}{{ !empty($section['badge']) ? ', '.$section['badge'] : '' }}" data-label="{{ mb_strtoupper($section['title']) }}"
                         :aria-expanded="((!sidebarCollapsed || window.innerWidth < 1024) && openSection === {{ $index }}) || (sidebarCollapsed && flyoutIndex === {{ $index }}) ? 'true' : 'false'"
                         :aria-controls="sidebarCollapsed && window.innerWidth >= 1024 ? 'rm-sidebar-flyout-{{ $index }}' : 'rm-sidebar-submenu-{{ $index }}'"
-                        @click="if (sidebarCollapsed && window.innerWidth >= 1024) { showFlyout({{ $index }}, $el); if ($event.detail === 0) $nextTick(() => document.querySelector('#rm-sidebar-flyout-{{ $index }} a')?.focus()); } else openSection = openSection === {{ $index }} ? null : {{ $index }}"
+                        @click="if (sidebarCollapsed && window.innerWidth >= 1024) { showFlyout({{ $index }}, $el, $event.detail === 0); } else openSection = openSection === {{ $index }} ? null : {{ $index }}"
                         @mouseenter="showTooltip(@js($section['title']), $el); hoverFlyout({{ $index }}, $el)" @focus="showTooltip(@js($section['title']), $el)" @blur="tooltipLabel = null"
                         @mouseleave="if (!$event.relatedTarget?.closest('.rm-sidebar__flyout')) flyoutIndex = null">
                         <span class="rm-sidebar__indicator" aria-hidden="true"></span>

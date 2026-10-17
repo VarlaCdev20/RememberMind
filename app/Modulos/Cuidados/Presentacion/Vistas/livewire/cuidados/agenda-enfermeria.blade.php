@@ -1,4 +1,4 @@
-﻿<!-- rm-filter-bar -->
+<!-- rm-filter-bar -->
 <div class="space-y-4 font-sans bg-transparent p-3 sm:p-5">
     {{-- ==================================================
          1. CABECERA INSTITUCIONAL Y NAVEGACIÓN DE TURNO
@@ -281,7 +281,7 @@
 
                                 @if($esAlerta && !empty($item['alerta_descripcion']))
                                     <p class="text-[11px] font-semibold text-[var(--rm-danger)] dark:text-[var(--rm-warning-soft)] mt-0.5">
-                                        ⚠ {{ $item['alerta_descripcion'] }}
+                                        ⚠ {{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($item['alerta_descripcion']) }}
                                     </p>
                                 @endif
                             </div>

@@ -43,6 +43,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -247,11 +248,11 @@ class MisPacientes extends Component
 
     public ?string $medCodMed = null;
 
-    public bool $medAdministrado = true;
+    public ?bool $medAdministrado = null;
 
     public string $medMotivoOmision = '';
 
-    public string $medResultado = 'ADMINISTRADA';
+    public string $medResultado = '';
 
     public string $medFechaHoraReal = '';
 
@@ -338,7 +339,8 @@ class MisPacientes extends Component
     public array $elimDatos = ['cantidad_cualitativa' => '', 'volumen_ml' => '', 'color_orina' => '', 'aspecto_orina' => '',
         'olor_orina' => '', 'tipo_miccion' => '', 'tipo_bristol' => '', 'color_heces' => '', 'esfuerzo_defecacion' => '',
         'presencia_sangre' => null, 'presencia_moco' => null, 'molestia_eliminacion' => null,
-        'descripcion_molestia' => '', 'continencia' => '', 'observacion' => ''];
+        'descripcion_molestia' => '', 'continencia' => '', 'observacion' => '',
+        'color_orina_otro' => '', 'aspecto_orina_otro' => '', 'color_heces_otro' => ''];
 
     #[Locked]
     public string $elimMomento = '';
@@ -487,6 +489,8 @@ class MisPacientes extends Component
             if (request()->query('registrar') === 'signos') {
                 $this->mostrarSelectorRegistro();
                 $this->abrirFormularioRegistro('signos');
+            } elseif (request()->query('registrar') === 'cuidado') {
+                $this->abrirCuidadoSeleccionado();
             }
         } elseif (! empty($this->residente)) {
             $this->seleccionarResidente($this->residente);
@@ -501,6 +505,22 @@ class MisPacientes extends Component
     public function updatingFiltroAlertas(): void
     {
         $this->resetPage();
+    }
+
+    public function updatedFiltroAlertas(): void
+    {
+        if ($this->filtroAlertas === 'CON_ALERTAS') {
+            $this->filtroRapido = 'CON_ALERTAS';
+        } elseif ($this->filtroRapido === 'CON_ALERTAS') {
+            $this->filtroRapido = 'TODOS';
+        }
+    }
+
+    public function updatedFiltroRapido(): void
+    {
+        if (in_array($this->filtroRapido, ['TODOS', 'CON_ALERTAS'], true)) {
+            $this->filtroAlertas = $this->filtroRapido === 'CON_ALERTAS' ? 'CON_ALERTAS' : '';
+        }
     }
 
     public function updatingFiltroMedicacion(): void
@@ -541,12 +561,10 @@ class MisPacientes extends Component
             'rapido' => $this->filtroRapido = $valor,
             default => null,
         };
-        if ($tipo === 'alertas' && $valor === 'CON_ALERTAS') {
-            $this->filtroRapido = 'CON_ALERTAS';
-        } elseif ($tipo === 'alertas' && $valor !== 'CON_ALERTAS') {
-            if ($this->filtroRapido === 'CON_ALERTAS') {
-                $this->filtroRapido = 'TODOS';
-            }
+        if ($tipo === 'alertas') {
+            $this->updatedFiltroAlertas();
+        } elseif ($tipo === 'rapido') {
+            $this->updatedFiltroRapido();
         }
         $this->resetPage();
     }
@@ -554,6 +572,7 @@ class MisPacientes extends Component
     public function removerFiltro(string $tipo): void
     {
         match ($tipo) {
+            'buscar' => $this->search = '',
             'alertas' => $this->filtroAlertas = '',
             'habitacion' => $this->filtroHabitacion = '',
             'medicacion' => $this->filtroMedicacion = '',
@@ -564,12 +583,15 @@ class MisPacientes extends Component
         };
         if ($tipo === 'alertas' && $this->filtroRapido === 'CON_ALERTAS') {
             $this->filtroRapido = 'TODOS';
+        } elseif ($tipo === 'rapido') {
+            $this->updatedFiltroRapido();
         }
         $this->resetPage();
     }
 
     public function limpiarFiltrosActivos(): void
     {
+        $this->search = '';
         $this->filtroAlertas = '';
         $this->filtroHabitacion = '';
         $this->filtroMedicacion = '';
@@ -582,6 +604,17 @@ class MisPacientes extends Component
     public function obtenerFiltrosActivos(): array
     {
         $activos = [];
+
+        $busqueda = preg_replace('/\s+/u', ' ', trim($this->search));
+        if ($busqueda !== '') {
+            $activos[] = [
+                'tipo' => 'buscar',
+                'valor' => $busqueda,
+                'label' => 'Búsqueda: '.$busqueda,
+                'icono' => 'ph-magnifying-glass',
+                'tono' => 'blue',
+            ];
+        }
 
         if (! empty($this->filtroAlertas)) {
             $label = match ($this->filtroAlertas) {
@@ -606,6 +639,22 @@ class MisPacientes extends Component
                 'label' => 'Alertas: Con alertas',
                 'icono' => 'ph-bell',
                 'tono' => 'red',
+            ];
+        }
+
+        $etiquetaRapida = match ($this->filtroRapido) {
+            'CON_TAREAS' => 'Con tareas pendientes',
+            'CON_SIGNOS_PENDIENTES' => 'Sin signos vitales registrados hoy',
+            'SIN_SEGUIMIENTO' => 'Sin seguimiento registrado hoy',
+            default => null,
+        };
+        if ($etiquetaRapida !== null) {
+            $activos[] = [
+                'tipo' => 'rapido',
+                'valor' => $this->filtroRapido,
+                'label' => $etiquetaRapida,
+                'icono' => 'ph-funnel',
+                'tono' => 'blue',
             ];
         }
 
@@ -711,12 +760,8 @@ class MisPacientes extends Component
 
     public function limpiarFiltros(): void
     {
-        $this->search = '';
-        $this->filtroEstado = 'TODOS';
-        $this->filtroRapido = 'TODOS';
-        $this->filtroHabitacion = '';
+        $this->limpiarFiltrosActivos();
         $this->orden = 'NOMBRE_ASC';
-        $this->resetPage();
     }
 
     public function seleccionarResidente(?string $codResidente): void
@@ -897,6 +942,51 @@ class MisPacientes extends Component
         abort_unless($this->mostrarSelectorModal && $this->detalleResidente && $this->drawerPaso === 'register-selector', 403);
         $codResidente = $this->detalleResidente['cod_residente'];
 
+        if ($tipo === 'medicacion') {
+            $this->getTurnoService()->autorizarMutacionPaciente($codResidente, 'administraciones_medicacion.crear', Auth::user());
+            $this->registroTipo = 'medicacion';
+            $this->mostrarSelectorModal = false;
+            $this->dispatch('abrirModalAdministracion', cod_residente: $codResidente, origen: 'selector');
+            return;
+        }
+
+        if ($tipo === 'cognicion') {
+            abort_unless(Auth::user()?->can('controles_cognitivos.ver'), 403);
+            $this->getTurnoService()->autorizarMutacionEnfermeria($codResidente, 'controles_cognitivos.crear', Auth::user());
+            $this->registroTipo = 'cognicion';
+            $this->registroInicial = [];
+            $this->drawerPaso = 'register-form';
+            $this->confirmarDescarte = false;
+            $this->resetValidation();
+
+            return;
+        }
+
+        if ($tipo === 'conducta') {
+            abort_unless(Auth::user()?->can('registros_conductuales.ver'), 403);
+            $this->getTurnoService()->autorizarMutacionEnfermeria($codResidente, 'registros_conductuales.crear', Auth::user());
+            $this->registroTipo = 'conducta';
+            $this->registroInicial = [];
+            $this->drawerPaso = 'register-form';
+            $this->confirmarDescarte = false;
+            $this->resetValidation();
+
+            return;
+        }
+
+        if ($tipo === 'heridas') {
+            abort_unless(Auth::user()?->can('heridas.ver'), 403);
+            $permiso = Auth::user()->can('curaciones_herida.crear') ? 'curaciones_herida.crear' : 'heridas.crear';
+            $this->getTurnoService()->autorizarMutacionEnfermeria($codResidente, $permiso, Auth::user());
+            $this->registroTipo = 'heridas';
+            $this->registroInicial = [];
+            $this->drawerPaso = 'register-form';
+            $this->confirmarDescarte = false;
+            $this->resetValidation();
+
+            return;
+        }
+
         if (in_array($tipo, ['dolor', 'alimentacion', 'hidratacion', 'eliminacion', 'movilidad'], true)) {
             $permiso = match ($tipo) {
                 'dolor' => 'valoraciones_dolor.crear', 'alimentacion' => 'registros_ingesta.crear', 'hidratacion' => 'registros_hidratacion.crear',
@@ -952,6 +1042,67 @@ class MisPacientes extends Component
         if ($this->drawerPaso === 'register-selector') {
             $this->cerrarSelectorRegistro();
         }
+    }
+
+    #[On('heridas-popup-cerrado')]
+    public function cerrarPopupHeridas(bool $volverAlResidente = false): void
+    {
+        if ($this->registroTipo !== 'heridas' || ! $this->mostrarSelectorModal) {
+            return;
+        }
+        if ($volverAlResidente) {
+            $this->cerrarFlujoRegistro();
+
+            return;
+        }
+        $this->limpiarRegistroEnPanel();
+        $this->drawerPaso = 'register-selector';
+        $this->dispatch('resident-directory-selector-opened');
+    }
+
+    #[On('conducta-popup-cerrado')]
+    public function cerrarPopupConducta(bool $volverAlResidente = false): void
+    {
+        if ($this->registroTipo !== 'conducta' || ! $this->mostrarSelectorModal) {
+            return;
+        }
+        if ($volverAlResidente) {
+            $codigo = $this->detalleResidente['cod_residente'];
+            $this->cerrarFlujoRegistro();
+            $this->seleccionarResidente($codigo);
+
+            return;
+        }
+        $this->limpiarRegistroEnPanel();
+        $this->drawerPaso = 'register-selector';
+        $this->dispatch('resident-directory-selector-opened');
+    }
+
+    #[On('cognicion-popup-cerrado')]
+    public function cerrarPopupCognicion(bool $volverAlResidente = false): void
+    {
+        if ($this->registroTipo !== 'cognicion' || ! $this->mostrarSelectorModal) {
+            return;
+        }
+        if ($volverAlResidente) {
+            $codigo = $this->detalleResidente['cod_residente'];
+            $this->cerrarFlujoRegistro();
+            $this->seleccionarResidente($codigo);
+
+            return;
+        }
+        $this->limpiarRegistroEnPanel();
+        $this->drawerPaso = 'register-selector';
+        $this->dispatch('resident-directory-selector-opened');
+    }
+
+    #[On('medicacion-formulario-cerrado')]
+    public function cerrarPopupMedicacion(bool $volver = false, ?string $residente = null): void
+    {
+        if ($this->registroTipo !== 'medicacion' || !$this->detalleResidente || $residente !== $this->detalleResidente['cod_residente']) return;
+        $this->getTurnoService()->autorizarConsultaResidente($residente, Auth::user());
+        $this->seleccionarResidente($residente);
+        if ($volver) $this->mostrarSelectorRegistro();
     }
 
     public function cancelarDescarte(): void
@@ -1335,6 +1486,24 @@ class MisPacientes extends Component
             : null;
 
         $seguimientoReciente = collect();
+        if ($usuario?->can('controles_cognitivos.ver')) {
+            \App\Models\ControlCognitivo::query()->where('cod_residente', $codResidente)->where('estado', 'VIGENTE')
+                ->orderByDesc('fecha_hora')->limit(3)->get(['fecha_hora', 'observacion'])
+                ->each(fn ($item) => $seguimientoReciente->push([
+                    'fecha_hora' => Carbon::parse($item->fecha_hora),
+                    'tipo' => 'Observación cognitiva',
+                    'dato' => Str::limit(trim((string) ($item->observacion ?: 'Indicadores de cognición documentados')), 110),
+                ]));
+        }
+        if ($usuario?->can('registros_conductuales.ver')) {
+            \App\Models\RegistroConductual::query()->where('cod_residente', $codResidente)->where('estado', 'VIGENTE')
+                ->orderByDesc('fecha_hora')->limit(3)->get(['fecha_hora', 'descripcion', 'estado_animo'])
+                ->each(fn ($item) => $seguimientoReciente->push([
+                    'fecha_hora' => Carbon::parse($item->fecha_hora),
+                    'tipo' => 'Registro de conducta',
+                    'dato' => Str::limit(trim((string) ($item->descripcion ?? $item->estado_animo ?? 'Sin descripción complementaria')), 110),
+                ]));
+        }
         if ($ultimoSignoModel) {
             $seguimientoReciente->push([
                 'fecha_hora' => Carbon::parse($ultimoSignoModel->fecha_hora),
@@ -1836,9 +2005,8 @@ class MisPacientes extends Component
             ->whereIn('estado', ['ACTIVA', 'ACTIVO', 'VIGENTE'])
             ->where('segun_necesidad', false)
             ->get();
-        $primerMed = $this->medicacionesPaciente->first();
-        $this->medCodMed = $primerMed?->cod_prescripcion ?? '';
-        $this->medAdministrado = true;
+        $this->medCodMed = '';
+        $this->medAdministrado = null;
         $this->medMotivoOmision = '';
         $this->modalMed = true;
     }
@@ -1858,11 +2026,10 @@ class MisPacientes extends Component
                 'dosis' => $item['horario']->dosis_programada ?? $item['medicacion']->dosis,
                 'unidad' => $item['medicacion']->unidad_dosis,
             ])->values()->all();
-        abort_if($this->medOpcionesProgramadas === [], 422, 'No hay dosis programadas pendientes para este residente.');
         $this->medOcurrenciaSeleccionada = null;
         $this->medDetalleProgramado = [];
         $this->medCodMed = null;
-        $this->medResultado = 'ADMINISTRADA';
+        $this->medResultado = '';
         $this->medFechaHoraReal = now()->format('Y-m-d\TH:i');
         $this->medDosisAdministrada = '';
         $this->medMotivoOmision = '';
@@ -1897,7 +2064,7 @@ class MisPacientes extends Component
         ];
         $this->medDosisAdministrada = (string) ($ocurrencia['horario']->dosis_programada ?? $prescripcion->dosis ?? '');
         $this->medFechaHoraReal = now()->format('Y-m-d\TH:i');
-        $this->medResultado = 'ADMINISTRADA';
+        $this->medResultado = '';
         $this->medMotivoOmision = '';
         $this->resetValidation();
     }
@@ -1988,7 +2155,7 @@ class MisPacientes extends Component
         $this->getTurnoService()->autorizarMutacionPaciente($this->modalCodResidente, 'administraciones_medicacion.crear', Auth::user());
         $this->validate([
             'medCodMed' => 'required|exists:prescripciones,cod_prescripcion',
-            'medAdministrado' => 'boolean',
+            'medAdministrado' => 'required|boolean',
             'medMotivoOmision' => $this->medAdministrado ? 'nullable|string|max:500' : 'required|string|min:5|max:500',
         ], [
             'medCodMed.required' => 'Seleccione un medicamento activo.',
@@ -1996,13 +2163,14 @@ class MisPacientes extends Component
             'medMotivoOmision.min' => 'El motivo de omisión debe tener al menos 5 caracteres.',
         ]);
 
-        $ocurrencia = app(AgendaMedicacionService::class)->paraAdulto($this->modalCodResidente)
-            ->first(fn (array $item) => $item['medicacion']->cod_prescripcion === $this->medCodMed && $item['registro'] === null);
-        if (! $ocurrencia) {
-            $this->addError('medCodMed', 'No existe una dosis programada pendiente para este medicamento hoy.');
+        $ocurrencias = app(AgendaMedicacionService::class)->paraAdulto($this->modalCodResidente)
+            ->filter(fn (array $item) => $item['medicacion']->cod_prescripcion === $this->medCodMed && $item['registro'] === null);
+        if ($ocurrencias->count() !== 1) {
+            $this->addError('medCodMed', 'Selecciona una ocurrencia exacta desde Administración de medicación.');
 
             return;
         }
+        $ocurrencia = $ocurrencias->first();
         app(RegistrarAdministracionMedicacionService::class)->registrarProgramada(
             Auth::user(), $this->modalCodResidente, $this->medCodMed, $ocurrencia['hora'],
             (bool) $this->medAdministrado, $this->medMotivoOmision, 'Registrado desde Mis Pacientes.'
@@ -2217,7 +2385,8 @@ class MisPacientes extends Component
 
     private function aplicarTipoEliminacion(string $tipo): void
     {
-        foreach (array_merge(RegistroEliminacion::URINARIOS, RegistroEliminacion::INTESTINALES) as $campo) {
+        foreach (array_merge(RegistroEliminacion::URINARIOS, RegistroEliminacion::INTESTINALES,
+            ['color_orina_otro', 'aspecto_orina_otro', 'color_heces_otro']) as $campo) {
             $this->elimDatos[$campo] = $campo === 'presencia_moco' ? null : '';
         }
         if (($this->elimDatos['continencia'] ?? '') !== 'CONTINENTE') {
@@ -2798,11 +2967,12 @@ class MisPacientes extends Component
             }
 
             // Filtro Alertas estructurado
-            if ($this->filtroAlertas === 'CON_ALERTAS' || $this->filtroRapido === 'CON_ALERTAS') {
+            $filtroAlertas = $this->filtroAlertas ?: ($this->filtroRapido === 'CON_ALERTAS' ? 'CON_ALERTAS' : '');
+            if ($filtroAlertas === 'CON_ALERTAS') {
                 $pacientesQuery->whereHas('alertas', fn ($q) => $q->whereIn('estado', ['ABIERTA', 'EN_ATENCION']));
-            } elseif ($this->filtroAlertas === 'SIN_ALERTAS') {
+            } elseif ($filtroAlertas === 'SIN_ALERTAS') {
                 $pacientesQuery->whereDoesntHave('alertas', fn ($q) => $q->whereIn('estado', ['ABIERTA', 'EN_ATENCION']));
-            } elseif ($this->filtroAlertas === 'CON_ALERTAS_PRIORITARIAS' || $this->filtroAlertas === 'CRITICAS') {
+            } elseif (in_array($filtroAlertas, ['CON_ALERTAS_PRIORITARIAS', 'CRITICAS'], true)) {
                 $pacientesQuery->whereHas('alertas', fn ($q) => $q->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])->whereIn('prioridad', ['CRITICO', 'ALTO', 'CRITICA']));
             }
 
@@ -2867,8 +3037,6 @@ class MisPacientes extends Component
             // Filtros rápidos adicionales
             if ($this->filtroRapido === 'CON_TAREAS') {
                 $pacientesQuery->whereHas('tareasActuales', fn ($q) => $q->whereIn('estado', ['PENDIENTE', 'EN_PROCESO'])->whereDate('fecha_hora_programada', '<=', $fechaHoy));
-            } elseif ($this->filtroRapido === 'CON_ALERTAS') {
-                $pacientesQuery->whereHas('alertas', fn ($q) => $q->whereIn('estado', ['ABIERTA', 'EN_ATENCION']));
             } elseif ($this->filtroRapido === 'CON_SIGNOS_PENDIENTES') {
                 $pacientesQuery->whereDoesntHave('signosVitales', fn ($vq) => $vq->whereDate('fecha_hora', $fechaHoy));
             } elseif ($this->filtroRapido === 'SIN_SEGUIMIENTO') {
@@ -2889,7 +3057,11 @@ class MisPacientes extends Component
                     $direccion
                 );
             }
-            $pacientesQuery->orderBy('nombres', $this->orden === 'NOMBRE_DESC' ? 'desc' : 'asc');
+            $direccionNombre = $this->orden === 'NOMBRE_DESC' ? 'desc' : 'asc';
+            $pacientesQuery->orderBy('nombres', $direccionNombre)
+                ->orderBy('apellido_paterno', $direccionNombre)
+                ->orderBy('apellido_materno', $direccionNombre)
+                ->orderBy('residentes.cod_residente');
             $pacientes = $pacientesQuery->paginate(12);
 
             // Pre-cargar datos detallados de los pacientes paginados (signos recientes, medicación pendiente)

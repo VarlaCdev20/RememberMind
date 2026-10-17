@@ -4,7 +4,8 @@ namespace App\Modulos\Clinica\Presentacion\Livewire\Paginas;
 
 use App\Models\Residente;
 use App\Models\SignoVital;
-use App\Modulos\Clinica\Dominio\Reglas\ClasificacionSignosPanel;
+use App\Modulos\Clinica\Aplicacion\Consultas\InterpretacionSignosVitales;
+use App\Models\ObjetivoSignoVital;
 use App\Modulos\Clinica\Presentacion\Adaptadores\ClasificacionSignosVitalesService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -92,15 +93,15 @@ class SignosVitalesPanel extends Component
 
         // ── Último signo vital por paciente ──────────────────────────────
         $ultimosSignos = SignoVital::whereIn('cod_residente', $codResidentes)
-            ->with('residente.objetivosSignosVitales')
             ->whereIn('estado', ['VIGENTE', 'ACTIVO'])
             ->orderByDesc('fecha_hora')
             ->get()
             ->unique('cod_residente')
             ->keyBy('cod_residente');
 
+        $objetivos = ObjetivoSignoVital::whereIn('cod_residente', $codResidentes)->get();
         $nivelesPorResidente = $ultimosSignos->map(
-            fn (SignoVital $signo) => ClasificacionSignosVitalesService::evaluarRegistro($signo)
+            fn (SignoVital $signo) => ClasificacionSignosVitalesService::evaluarRegistro($signo, $objetivos)
         );
         $leyendaAvisos = ClasificacionSignosVitalesService::leyendaAvisos();
 
@@ -194,18 +195,35 @@ class SignosVitalesPanel extends Component
         ];
 
         // ── Distribución de PA (sistólica) ────────────────────────────────
-        $distPA = app(ClasificacionSignosPanel::class)->distribucionPresionSistolica($conSignos);
+        $lector = app(InterpretacionSignosVitales::class);
+        $distPA = [];
+        $tonosPA = [];
+        $interpretacionesPorResidente = [];
+        foreach ($conSignos as $signo) {
+            $lectura = $lector->registro($signo, $objetivos);
+            $interpretacionesPorResidente[$signo->cod_residente] = $lectura;
+            $pa = $lectura['metricas']['PA'];
+            $estado = $pa['label'];
+            $tonosPA[$estado] = match ($pa['key']) {
+                'requiere_revision' => '--rm-danger',
+                'fuera_rango', 'observacion' => '--rm-warning',
+                'normal', 'objetivo_personalizado' => '--rm-success',
+                default => '--rm-text-muted',
+            };
+            $distPA[$estado] = ($distPA[$estado] ?? 0) + 1;
+        }
 
         $chartDistPA = [
             'labels' => array_keys($distPA),
             'values' => array_values($distPA),
+            'color_tokens' => array_values($tonosPA),
         ];
 
         return view('livewire.clinica.signos-vitales-panel', compact(
             'pacientesFiltrados', 'ultimosSignos', 'nivelesPorResidente', 'leyendaAvisos', 'hoy',
             'kpiPaMedia', 'kpiFcMedia', 'kpiSatMedia',
             'kpiCriticos', 'kpiAdvertencia', 'kpiNormales', 'kpiSinDatos', 'kpiSinRegistroHoy',
-            'chartTendencia7d', 'chartDistPA'
+            'chartTendencia7d', 'chartDistPA', 'interpretacionesPorResidente'
         ))->layout('layouts.sistema');
     }
 }

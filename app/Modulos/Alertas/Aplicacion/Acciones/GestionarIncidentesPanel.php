@@ -185,7 +185,7 @@ final class GestionarIncidentesPanel
             }
 
             $alerta = new Alerta;
-            $alerta->cod_alerta = 'ALE_'.strtoupper(Str::random(10));
+            $alerta->cod_alerta = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('alertas');
             $alerta->cod_residente = $incidente->cod_residente;
             $alerta->cod_personal_responsable = $codPersonal;
             $alerta->tipo = 'CLINICA';
@@ -202,7 +202,7 @@ final class GestionarIncidentesPanel
 
             // Evento de alerta para trazabilidad
             $evento = new EventoAlerta;
-            $evento->cod_evento_alerta = 'EAL_'.strtoupper(Str::random(10));
+            $evento->cod_evento_alerta = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('eventos_alerta');
             $evento->cod_alerta = $alerta->cod_alerta;
             $evento->cod_usuario = $codUsuario;
             $evento->tipo_evento = 'CREACION';
@@ -268,7 +268,7 @@ final class GestionarIncidentesPanel
         DB::beginTransaction();
         try {
             $derivacion = new Derivacion;
-            $derivacion->cod_derivacion = 'DER_'.strtoupper(Str::random(10));
+            $derivacion->cod_derivacion = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('derivaciones');
             $derivacion->cod_residente = $incidente->cod_residente;
             $derivacion->cod_area_solicitante = $codAreaSolicitante;
             $derivacion->cod_area_receptora = $entrada['derivacion_area_receptora'];

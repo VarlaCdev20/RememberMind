@@ -32,7 +32,7 @@ final class GestionarAreasInstitucionales
             $mensaje = 'Área institucional actualizada correctamente.';
         } else {
             $area = Area::create($datos + [
-                'cod_area' => 'ARE_'.Str::upper(Str::random(12)),
+                'cod_area' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('areas'),
             ]);
 
             // Log de actividad

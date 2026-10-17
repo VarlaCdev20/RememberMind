@@ -34,7 +34,8 @@ class MapaHabitacionesTest extends TestCase
         foreach (['habitaciones.ver', 'admisiones.ver_dashboard', 'residentes.ver', 'admisiones.formalizar', 'ocupaciones_cama.gestionar'] as $permiso) {
             Permission::findOrCreate($permiso, 'web');
         }
-        Role::findOrCreate('ADMINISTRADOR', 'web');
+        // Estos escenarios conceden permisos directos; no heredan concesiones de otros fixtures.
+        Role::findOrCreate('ADMINISTRADOR', 'web')->syncPermissions([]);
         Role::findOrCreate('FAMILIAR', 'web');
         $this->usuario = User::factory()->create(['estado' => 'ACTIVO']);
         $this->usuario->assignRole('ADMINISTRADOR');

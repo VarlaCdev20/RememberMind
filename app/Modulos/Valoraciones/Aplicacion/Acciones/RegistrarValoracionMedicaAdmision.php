@@ -40,7 +40,7 @@ final class RegistrarValoracionMedicaAdmision
             ]);
 
             NotaClinica::create([
-                'cod_nota' => 'NOT_'.strtoupper(Str::random(10)),
+                'cod_nota' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('notas_clinicas'),
                 'cod_atencion' => $atencion->cod_atencion,
                 'cod_residente' => $datos['adulto']->cod_residente,
                 'cod_personal' => $atencion->cod_personal,

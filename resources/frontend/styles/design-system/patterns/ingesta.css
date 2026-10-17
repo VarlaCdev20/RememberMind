@@ -105,7 +105,7 @@
     .rm-ingesta__history-table td::before { content: attr(data-label); color: var(--rm-text-secondary); }
 }
 @media (min-width: 1024px) {
-    .rm-resident-directory__register-modal--ingesta:has(.rm-ingesta[data-graph-open="true"]) .rm-modal-panel { width: calc(100vw - var(--rm-signos-graph-width, 560px) - 48px); max-width: calc(100vw - var(--rm-signos-graph-width, 560px) - 48px); margin-left: 0; margin-right: auto; }
+
     .rm-ingesta[data-graph-open="true"] .rm-ingesta__layout { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 1023px) { .rm-resident-directory__register-modal--ingesta:has(.rm-ingesta[data-graph-open="true"]) .rm-modal-body { padding-bottom: calc(var(--rm-signos-graph-height, 280px) + 24px); } }

@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Cuidados\Presentacion\Livewire\Paginas;
 
+use App\Models\Herida;
 use App\Models\IntervencionCuidado;
 use App\Models\RegistroHidratacion;
 use App\Models\RegistroSueno;
@@ -9,19 +10,167 @@ use App\Models\Residente;
 use App\Modulos\Alertas\Aplicacion\Acciones\GestionarIncidentesEnfermeria;
 use App\Modulos\Clinica\Aplicacion\Acciones\GestionarDispositivosClinicos;
 use App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService;
+use App\Modulos\Cuidados\Aplicacion\Acciones\LesionesEnfermeriaService;
+use App\Modulos\Cuidados\Aplicacion\Acciones\PersistirFotosHerida;
 use App\Modulos\Cuidados\Aplicacion\Acciones\RegistrarCuidadosDeTurno;
 use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\PrepararEvolucionHerida;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Cuidados\Presentacion\Navegacion\NavegacionCuidadosService;
 use App\Modulos\Valoraciones\Aplicacion\Acciones\RegistrarValoracionDolor;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Locked;
+use Livewire\Attributes\Renderless;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class RegistrosEnfermeria extends Component
 {
+    use WithFileUploads { _startUpload as protected iniciarCargaTemporal; }
+
+    public array $fotografias = [];
+
+    public array $loteFotografias = [];
+
+    public ?int $reemplazarFotografiaIndice = null;
+
+    public bool $registrandoNuevaHerida = false;
+
+    #[Locked]
+    public int $revisionFotos = 0;
+
+    public array $descripcionesFotos = [];
+
+    public string $olorLesion = '';
+
+    public string $materialesLesion = '';
+
+    public string $respuestaLesion = '';
+
+    public string $nuevaHeridaTipo = '';
+
+    public string $nuevaHeridaUbicacion = '';
+
+    public string $nuevaHeridaClasificacion = '';
+
+    public string $nuevaHeridaCausa = '';
+
+    public string $nuevaHeridaObservacion = '';
+
+    #[Locked]
+    public array $resultadoHerida = [];
+
+    #[Locked]
+    public bool $emergente = false;
+
+    public bool $mostrarFormularioHerida = false;
+
+    #[Renderless]
+    public function _startUpload($name, $fileInfo, $isMultiple)
+    {
+        abort_unless(in_array($name, ['loteFotografias', 'fotografias'], true), 403);
+        $residente = Residente::findOrFail($this->codResidente);
+        $permiso = $this->registrandoNuevaHerida ? 'heridas.crear' : 'curaciones_herida.crear';
+        Gate::authorize('adjuntar-evidencia-herida', [$residente, $permiso]);
+        if (! $this->registrandoNuevaHerida) {
+            abort_unless(Herida::whereKey($this->lesionId)->where('cod_residente', $residente->getKey())->where('estado', 'ACTIVA')->exists(), 403);
+        }
+        $this->iniciarCargaTemporal($name, $fileInfo, $isMultiple);
+    }
+
+    public function updatedFotografias(): void
+    {
+        app(PersistirFotosHerida::class)->validar($this->fotografias, $this->descripcionesFotos);
+    }
+
+    public function updatedLoteFotografias(): void
+    {
+        $candidatas = $this->fotografias;
+        if ($this->reemplazarFotografiaIndice !== null && isset($candidatas[$this->reemplazarFotografiaIndice]) && count($this->loteFotografias) === 1) {
+            $candidatas[$this->reemplazarFotografiaIndice] = $this->loteFotografias[0];
+        } else {
+            $candidatas = array_merge($candidatas, $this->loteFotografias);
+        }
+        app(PersistirFotosHerida::class)->validar($candidatas, $this->descripcionesFotos);
+        foreach (array_keys($this->getErrorBag()->getMessages()) as $campo) {
+            if (in_array($campo, ['loteFotografias', 'fotografias'], true) || str_starts_with($campo, 'fotografias.')) {
+                $this->resetValidation($campo);
+            }
+        }
+        $this->fotografias = $candidatas;
+        $this->revisionFotos++;
+        $this->loteFotografias = [];
+        $this->reemplazarFotografiaIndice = null;
+    }
+
+    public function quitarFotografia(int $indice): void
+    {
+        unset($this->fotografias[$indice], $this->descripcionesFotos[$indice]);
+        $this->descripcionesFotos = array_map(fn ($key) => $this->descripcionesFotos[$key] ?? '', array_keys($this->fotografias));
+        $this->fotografias = array_values($this->fotografias);
+        $this->resetValidation();
+    }
+
+    public function descartarFotosHerida(): void
+    {
+        $this->reset('fotografias', 'loteFotografias', 'descripcionesFotos', 'reemplazarFotografiaIndice');
+        $this->resetValidation();
+    }
+
+    public function seleccionarHerida(string $codigo): void
+    {
+        $this->autorizar($this->codResidente);
+        abort_unless(strlen($codigo) <= 20, 404);
+        Herida::query()->where('cod_residente', $this->codResidente)->findOrFail($codigo);
+        $this->reset('largoLesion', 'anchoLesion', 'profundidadLesion', 'dolorLesion', 'exudadoLesion', 'aspectoLesion', 'accionLesion', 'observacionLesion', 'olorLesion', 'materialesLesion', 'respuestaLesion');
+        $this->descartarFotosHerida();
+        $this->lesionId = $codigo;
+    }
+
+    public function guardarNuevaHerida(): void
+    {
+        $this->resetValidation();
+        $this->validate(['nuevaHeridaTipo' => 'required|string|max:60', 'nuevaHeridaUbicacion' => 'required|string|max:120', 'nuevaHeridaClasificacion' => 'nullable|string|max:60', 'nuevaHeridaCausa' => 'nullable|string|max:120', 'nuevaHeridaObservacion' => 'nullable|string|max:1000']);
+        $herida = app(LesionesEnfermeriaService::class)->registrar($this->codResidente, [
+            'tipo' => $this->nuevaHeridaTipo, 'zona_corporal' => $this->nuevaHeridaUbicacion,
+            'causa_probable' => $this->nuevaHeridaCausa, 'estadio_upp' => $this->nuevaHeridaClasificacion,
+            'aspecto_inicial' => $this->nuevaHeridaObservacion, 'fotografias' => $this->fotografias, 'descripcionesFotos' => $this->descripcionesFotos,
+        ], auth()->user());
+        $this->resultadoHerida = ['tipo' => 'herida', 'cod_herida' => $herida->getKey(), 'tipo_herida' => $herida->tipo_herida, 'ubicacion' => $herida->ubicacion, 'clasificacion' => $herida->clasificacion, 'causa' => $herida->causa, 'observacion' => $herida->observacion, 'fecha' => $herida->fecha_hora_identificacion->format('d/m/Y H:i'), 'fotografias' => count($this->fotografias)];
+        $this->lesionId = $herida->getKey();
+        $this->reset('fotografias', 'descripcionesFotos', 'nuevaHeridaTipo', 'nuevaHeridaUbicacion', 'nuevaHeridaClasificacion', 'nuevaHeridaCausa', 'nuevaHeridaObservacion');
+        $this->dispatch('herida-evidencia-registrada');
+    }
+
+    protected function validationAttributes(): array
+    {
+        return ['nuevaHeridaTipo' => 'tipo de herida', 'nuevaHeridaUbicacion' => 'ubicación', 'nuevaHeridaClasificacion' => 'clasificación', 'nuevaHeridaCausa' => 'causa', 'nuevaHeridaObservacion' => 'observación inicial'];
+    }
+
+    public function prepararNuevaHerida(): void
+    {
+        $this->autorizar($this->codResidente);
+        Gate::authorize('adjuntar-evidencia-herida', [Residente::findOrFail($this->codResidente), 'heridas.crear']);
+        $this->reset('lesionId', 'largoLesion', 'anchoLesion', 'profundidadLesion', 'dolorLesion', 'exudadoLesion', 'aspectoLesion', 'accionLesion', 'observacionLesion', 'olorLesion', 'materialesLesion', 'respuestaLesion', 'nuevaHeridaTipo', 'nuevaHeridaUbicacion', 'nuevaHeridaClasificacion', 'nuevaHeridaCausa', 'nuevaHeridaObservacion');
+        $this->descartarFotosHerida();
+        $this->registrandoNuevaHerida = true;
+    }
+
+    public function prepararPrimeraCuracion(): void
+    {
+        $this->autorizar($this->codResidente);
+        abort_unless(($this->resultadoHerida['tipo'] ?? '') === 'herida' && ($this->resultadoHerida['cod_herida'] ?? '') === $this->lesionId, 409);
+        $herida = Herida::where('cod_residente', $this->codResidente)->where('estado', 'ACTIVA')->findOrFail($this->lesionId);
+        Gate::authorize('adjuntar-evidencia-herida', [$herida->residente, 'curaciones_herida.crear']);
+        $this->reset('resultadoHerida', 'largoLesion', 'anchoLesion', 'profundidadLesion', 'dolorLesion', 'exudadoLesion', 'aspectoLesion', 'accionLesion', 'observacionLesion', 'olorLesion', 'materialesLesion', 'respuestaLesion');
+        $this->descartarFotosHerida();
+        $this->registrandoNuevaHerida = false;
+    }
+
     #[Url(as: 'adulto')]
     public string $codResidente = '';
 
@@ -187,13 +336,22 @@ class RegistrosEnfermeria extends Component
 
     public string $motivoRectificacion = '';
 
-    public function mount(?string $codResidente = null): void
+    public function mount(?string $codResidente = null, bool $emergente = false): void
     {
         abort_unless(Auth::user()?->canAny(['atenciones.ver', 'enfermeria.ver_ficha_paciente']), 403);
         $this->codResidente = $codResidente ?: $this->codResidente;
 
         if ($this->codResidente) {
             $this->autorizar($this->codResidente);
+        }
+        $this->emergente = $emergente;
+        if ($emergente) {
+            $this->cuidado = 'heridas';
+            $this->seccion = 'HERIDAS';
+            $residente = Residente::findOrFail($this->codResidente);
+            $this->lesionId = Herida::where('cod_residente', $this->codResidente)->where('estado', 'ACTIVA')->latest('fecha_hora_identificacion')->value('cod_herida') ?? '';
+            Gate::authorize('adjuntar-evidencia-herida', [$residente, $this->lesionId !== '' ? 'curaciones_herida.crear' : 'heridas.crear']);
+            $this->mostrarFormularioHerida = true;
         }
     }
 
@@ -437,7 +595,7 @@ class RegistrosEnfermeria extends Component
     public function guardarSeguimientoLesion(): void
     {
         $this->resetValidation();
-        app(RegistrarCuidadosDeTurno::class)->guardarSeguimientoLesion(auth()->user(), [
+        $curacion = app(RegistrarCuidadosDeTurno::class)->guardarSeguimientoLesion(auth()->user(), [
             'codResidente' => $this->codResidente,
             'lesionId' => $this->lesionId,
             'largoLesion' => $this->largoLesion,
@@ -448,11 +606,17 @@ class RegistrosEnfermeria extends Component
             'dolorLesion' => $this->dolorLesion,
             'accionLesion' => $this->accionLesion,
             'observacionLesion' => $this->observacionLesion,
+            'olorLesion' => $this->olorLesion,
+            'materialesLesion' => $this->materialesLesion,
+            'respuestaLesion' => $this->respuestaLesion,
+            'fotografias' => $this->fotografias,
+            'descripcionesFotos' => $this->descripcionesFotos,
         ]);
-
-        $this->reset(['lesionId', 'largoLesion', 'anchoLesion', 'profundidadLesion', 'dolorLesion', 'exudadoLesion', 'pielLesion', 'aspectoLesion', 'accionLesion', 'observacionLesion']);
+        $this->resultadoHerida = ['tipo' => 'curacion', 'ubicacion' => $curacion->herida->ubicacion, 'fecha' => $curacion->fecha_hora->format('d/m/Y H:i'), 'longitud' => $curacion->longitud, 'ancho' => $curacion->ancho, 'profundidad' => $curacion->profundidad, 'fotografias' => count($this->fotografias)];
+        $this->reset('fotografias', 'descripcionesFotos', 'olorLesion', 'materialesLesion', 'respuestaLesion');
+        $this->reset(['largoLesion', 'anchoLesion', 'profundidadLesion', 'dolorLesion', 'exudadoLesion', 'pielLesion', 'aspectoLesion', 'accionLesion', 'observacionLesion']);
         $this->lesionMedible = true;
-        $this->dispatch('swal', ['icon' => 'success', 'title' => 'Curación registrada', 'text' => 'El control se añadió conservando mediciones anteriores.']);
+        $this->dispatch('herida-evidencia-registrada');
     }
 
     public function cerrarLesion(string $codigo): void
@@ -534,8 +698,11 @@ class RegistrosEnfermeria extends Component
         $ids = $turnos->obtenerPacientesAsignadosIds(Auth::user());
         $pacientes = Residente::whereIn('cod_residente', $ids)->orderBy('apellido_paterno')->get();
         $adulto = $this->codResidente ? Residente::with([
+            'cama.habitacion',
             'dispositivosActivos',
-            'heridas.curaciones',
+            'heridas.curaciones.documentosClinicos.personal',
+            'heridas.curaciones.personal',
+            'heridas.documentosClinicos.personal',
             'ejecucionesCuidado' => fn ($q) => $q->latest('fecha_hora_programada')->limit(30),
             'incidentesClinicos' => fn ($q) => $q->latest('fecha_hora')->limit(20),
         ])->find($this->codResidente) : null;
@@ -554,7 +721,29 @@ class RegistrosEnfermeria extends Component
         $modoConsulta = Auth::user()?->hasRole('ENFERMEROS')
             && (! $this->codResidente || ! $turnos->esPacienteAsignado($this->codResidente, Auth::user()));
 
-        return view('livewire.cuidados.registros-enfermeria', compact('pacientes', 'adulto', 'esSuperAdmin', 'intervencionesActivas', 'registrosCuidado', 'modoConsulta'))
+        $heridaSeleccionada = $adulto?->heridas->firstWhere('cod_herida', $this->lesionId);
+        $galeriaHerida = collect();
+        $evolucionHerida = [];
+        if ($heridaSeleccionada) {
+            $curaciones = $heridaSeleccionada->curaciones->sortByDesc('fecha_hora');
+            $documentos = $heridaSeleccionada->documentosClinicos->concat($curaciones->flatMap->documentosClinicos)->sortByDesc('fecha_hora');
+            $puedeConsultar = Gate::allows('consultar-contexto-evidencia-herida', $heridaSeleccionada);
+            $puedeCuraciones = Auth::user()->can('curaciones_herida.ver');
+            $galeriaHerida = $documentos->filter(fn ($doc) => $puedeConsultar && $doc->estado === 'VIGENTE'
+                && $doc->tipo_documento === 'FOTO_HERIDA' && $doc->cod_residente === $adulto->getKey()
+                && (($doc->cod_herida === $heridaSeleccionada->getKey() && $doc->cod_curacion === null)
+                    || ($doc->cod_herida === null && $puedeCuraciones && $curaciones->contains('cod_curacion', $doc->cod_curacion))))->map(function ($doc) use ($heridaSeleccionada, $curaciones) {
+                        $curacion = $curaciones->firstWhere('cod_curacion', $doc->cod_curacion);
+
+                        return ['codigo' => $doc->getKey(), 'curacion' => $doc->cod_curacion, 'url' => route('admin.cuidados.fotografias.ver', [$doc->cod_residente, $doc->getKey()]), 'fecha' => $doc->fecha_hora->format('d/m/Y H:i'), 'profesional' => trim(($doc->personal?->nombres ?? '').' '.($doc->personal?->apellido_paterno ?? '')), 'descripcion' => $doc->descripcion ?? '', 'ubicacion' => $heridaSeleccionada->ubicacion, 'dimensiones' => $curacion && $curacion->longitud !== null && $curacion->ancho !== null ? $curacion->longitud.' × '.$curacion->ancho.' cm' : 'Sin medidas registradas', 'grupo' => ! $doc->cod_curacion ? 'Herida original' : ($curaciones->first()?->getKey() === $doc->cod_curacion ? 'Curación actual' : 'Curación anterior')];
+                    })->values();
+        }
+
+        $datosHerida = app(PrepararEvolucionHerida::class)->desde($heridaSeleccionada && Auth::user()->can('curaciones_herida.ver') ? $heridaSeleccionada->curaciones : collect());
+        $evolucionHerida = $datosHerida['serie'];
+        $jornadaHerida = $this->cuidado === 'heridas' && Auth::user()?->personal ? app(MiTurnoService::class)->resolverJornadaActual(Auth::user()->personal, now()) : null;
+
+        return view('livewire.cuidados.registros-enfermeria', compact('pacientes', 'adulto', 'esSuperAdmin', 'intervencionesActivas', 'registrosCuidado', 'modoConsulta', 'heridaSeleccionada', 'galeriaHerida', 'evolucionHerida', 'datosHerida', 'jornadaHerida'))
             ->layout('layouts.enfermeria');
     }
 }

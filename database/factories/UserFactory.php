@@ -16,7 +16,7 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'cod_usuario' => 'USU_'.fake()->unique()->numerify('########'),
+            'cod_usuario' => app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('usuarios'),
             'correo' => fake()->unique()->safeEmail(),
             'contrasena' => static::$password ??= Hash::make('password'),
             'foto' => null,
@@ -60,8 +60,7 @@ class UserFactory extends Factory
 
             // Auto-crear Personal únicamente si se pasaron explícitamente atributos de nombre y no existe Personal
             if ($attrs && !empty($attrs['_explicit']) && !\App\Models\Personal::where('cod_usuario', $user->cod_usuario)->exists()) {
-                $digits = preg_replace('/[^0-9]/', '', (string)$user->cod_usuario);
-                $codPersonal = 'PER_' . str_pad(substr($digits, -8) ?: fake()->numerify('########'), 8, '0', STR_PAD_LEFT);
+                $codPersonal = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('personal');
 
                 \App\Models\Personal::create([
                     'cod_personal' => $codPersonal,

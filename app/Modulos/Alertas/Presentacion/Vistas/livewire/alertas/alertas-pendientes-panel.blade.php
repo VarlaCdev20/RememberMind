@@ -153,7 +153,7 @@
 
  				{{-- Descripción de la alerta --}}
 				<p class="rm-alert-description">
-					{{ $alerta['descripcion'] }}
+					{{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($alerta['descripcion']) }}
 				</p>
 
  				{{-- Fecha relacionada si existe --}}

@@ -32,7 +32,7 @@
 
  {{-- 2. Resultado (Administrada / Omitida / Rechazada) --}}
  <div class="lg:col-span-3">
- <select wire:model.live="filtroHistorialResultado"
+ <select wire:model.live="filtroHistorialResultado" aria-label="Resultado de administración"
   class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]">
   <option value="">Todos los resultados</option>
   <option value="ADMINISTRADA">Administradas</option>
@@ -43,7 +43,7 @@
 
  {{-- 3. Residente --}}
  <div class="lg:col-span-3">
- <select wire:model.live="filtroHistorialResidente"
+ <select wire:model.live="filtroHistorialResidente" aria-label="Residente del historial"
   class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]">
   <option value="">Todos los residentes</option>
   @foreach($residentes as $res)
@@ -56,7 +56,7 @@
 
  {{-- 4. Vía de Administración --}}
  <div class="lg:col-span-2">
- <select wire:model.live="filtroHistorialVia"
+ <select wire:model.live="filtroHistorialVia" aria-label="Vía de administración"
   class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]">
   <option value="">Vía (Todas)</option>
   <option value="ORAL">Oral</option>
@@ -80,7 +80,7 @@
  </span>
  <span class="sr-only">Buscar residente...</span>
  <input type="text"
-  wire:model.live.debounce.300ms="filtroHistorialMedicamento"
+  wire:model.live.debounce.300ms="filtroHistorialMedicamento" aria-label="Filtrar por medicamento"
   placeholder="Filtrar por medicamento..."
   class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]" />
  @if(!empty($filtroHistorialMedicamento))

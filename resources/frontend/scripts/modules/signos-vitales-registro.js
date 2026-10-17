@@ -127,7 +127,8 @@ window.rmSignosRegistro = function (history, initial, limits, objectiveBands = {
             const maxWidth = Math.max(0, window.innerWidth - edge * 2);
             const maxHeight = Math.max(0, window.innerHeight - edge * 2);
             const width = Math.min(maxWidth, Math.max(Math.min(360, maxWidth), bounds?.width ?? 440));
-            const height = Math.min(maxHeight, Math.max(Math.min(240, maxHeight), bounds?.height ?? (compact ? 280 : 680)));
+            const initialHeight = compact ? Math.min(680, Math.round(window.innerHeight * 0.72)) : 680;
+            const height = Math.min(maxHeight, Math.max(Math.min(240, maxHeight), bounds?.height ?? initialHeight));
             this.trendBounds = {
                 width, height,
                 x: Math.max(edge, Math.min(bounds?.x ?? window.innerWidth - width - 20, window.innerWidth - width - edge)),

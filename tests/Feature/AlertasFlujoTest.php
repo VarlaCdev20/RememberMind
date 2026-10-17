@@ -36,6 +36,40 @@ class AlertasFlujoTest extends TestCase
         return [$user, Residente::factory()->create(['cod_est_adul' => 'EST_001'])];
     }
 
+    public function test_referencias_internas_no_son_texto_visible_y_se_conservan_en_la_historia(): void
+    {
+        [$usuario, $residente] = $this->preparar(['alertas.ver', 'alertas.gestionar']);
+        $descripcion = '[heridas:COD_HER_000004] Herida cortante en Pierna derecha [observación de enfermería]';
+        $alerta = Alerta::create([
+            'cod_residente' => $residente->cod_residente,
+            'modulo' => 'HERIDAS',
+            'tipo' => 'LESIÓN DETECTADA',
+            'cod_registro' => 'COD_HER_000004',
+            'descripcion' => $descripcion,
+            'estado' => 'ABIERTA',
+        ]);
+        $evento = $alerta->eventos()->create([
+            'cod_usuario' => $usuario->cod_usuario,
+            'tipo_evento' => 'SEGUIMIENTO', 'estado_anterior' => 'ABIERTA', 'estado_nuevo' => 'ABIERTA',
+            'descripcion' => 'Derivación creada (COD_DER_000001) hacia área receptora.',
+            'fecha_hora' => now(),
+        ]);
+
+        $panel = Livewire::test(AlertasPanel::class)
+            ->assertSeeText('Herida cortante en Pierna derecha [observación de enfermería]')
+            ->assertDontSeeText('[heridas:')->assertDontSeeText('COD_HER_000004')
+            ->call('verDetalle', $alerta->getKey())
+            ->assertSeeText('Derivación creada hacia área receptora.')
+            ->assertDontSeeText('COD_DER_000001')->assertDontSeeText('COD_HER_000004');
+        $panel->call('atenderAlerta', $alerta->getKey())->assertDontSeeText('COD_HER_000004')
+            ->call('cerrarAlerta', $alerta->getKey())->assertDontSeeText('COD_HER_000004');
+
+        $this->assertSame($descripcion, $alerta->fresh()->descripcion);
+        $this->assertSame('COD_HER_000004', $alerta->fresh()->cod_registro);
+        $this->assertSame('Derivación creada (COD_DER_000001) hacia área receptora.', $evento->fresh()->descripcion);
+        $this->assertSame('ABIERTA', $alerta->fresh()->estado);
+    }
+
     public function test_registrar_asignar_atender_agregar_accion_cerrar_y_consultar_historial(): void
     {
         [$user, $adulto] = $this->preparar(['alertas.ver', 'alertas.gestionar']);
@@ -271,7 +305,7 @@ class AlertasFlujoTest extends TestCase
             ->call('cerrarAlerta', $alerta->cod_alerta, 'Cierre sintético')
             ->assertDispatched('alerta-cerrada');
         $this->assertSame('CERRADA', $alerta->fresh()->estado);
-        $this->assertSame(['ATENCION', 'CIERRE'], $alerta->eventos()->orderBy('created_at')->pluck('tipo_evento')->all());
+        $this->assertSame(['INTERVENCION', 'CIERRE'], $alerta->eventos()->orderBy('created_at')->pluck('tipo_evento')->all());
         $this->assertSame([$usuario->cod_usuario], $alerta->eventos()->pluck('cod_usuario')->unique()->values()->all());
         try {
             app(GestionarAtencionAlerta::class)->cerrarAlerta($usuario, $alerta->cod_alerta, 'Reintento');
@@ -309,5 +343,41 @@ class AlertasFlujoTest extends TestCase
         }
         $this->assertSame('ABIERTA', $alerta->fresh()->estado);
         $this->assertSame(0, $alerta->eventos()->count());
+    }
+
+    public function test_critica_antigua_aparece_antes_de_bajas_nuevas_y_fuera_del_filtro(): void
+    {
+        [, $residente] = $this->preparar(['alertas.ver']);
+        $critica = Alerta::create(['cod_residente'=>$residente->cod_residente,'modulo'=>'MANUAL','tipo'=>'Crítica sintética','descripcion'=>'Revisión prioritaria de prueba','estado'=>'EN_ATENCION','prioridad'=>'CRITICA','fecha_hora'=>now()->subDays(2)]);
+        for ($i=0;$i<18;$i++) { Alerta::create(['cod_residente'=>$residente->cod_residente,'modulo'=>'MANUAL','tipo'=>'Baja sintética '.$i,'descripcion'=>'Aviso de prueba','estado'=>'ABIERTA','prioridad'=>'BAJO','fecha_hora'=>now()]); }
+        Livewire::test(AlertasPanel::class)->set('filtroEstado','')->assertViewHas('alertas',fn($items)=>$items->first()->getKey()===$critica->getKey())
+            ->set('filtroEstado','CERRADA')->assertViewHas('prioritarias',fn($items)=>$items->contains('cod_alerta',$critica->cod_alerta));
+    }
+
+    public function test_primera_novedad_desde_lista_vacia_y_varias_alertas_se_anuncian_agrupadas(): void
+    {
+        [, $residente] = $this->preparar(['alertas.ver']);
+        $campana = Livewire::test(CampanaNotificaciones::class)->assertNotDispatched('alerta-nueva');
+        foreach (['BAJO','CRITICO'] as $nivel) { Alerta::create(['cod_residente'=>$residente->cod_residente,'modulo'=>'MANUAL','tipo'=>'Revisión sintética','descripcion'=>'Aviso de prueba','estado'=>'ABIERTA','prioridad'=>$nivel,'fecha_hora'=>now()]); }
+        $campana->call('verificarAlertas')->assertSet('conteoAbiertas',2)->assertDispatched('alerta-nueva',fn($name,$params)=>$params[0]['nivel']==='CRITICO' && str_contains($params[0]['titulo'],'2 aviso'));
+        $campana->call('verificarAlertas')->assertCount('alertaIdsConocidos',2)->assertNotDispatched('alerta-nueva');
+    }
+
+    public function test_campana_no_expone_residentes_a_familiar_con_permiso_generico(): void
+    {
+        [$usuario,$residente] = $this->preparar(['alertas.ver','administraciones_medicacion.ver']);
+        $usuario->syncRoles(['FAMILIAR']);
+        Alerta::create(['cod_residente'=>$residente->cod_residente,'modulo'=>'MANUAL','tipo'=>'Aviso reservado de prueba','descripcion'=>'No debe verse','estado'=>'ABIERTA','prioridad'=>'CRITICO']);
+        Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAbiertas',0)->assertDontSee('Aviso reservado de prueba');
+    }
+
+    public function test_accion_de_campana_rechaza_cuenta_inactiva_sin_eventos(): void
+    {
+        [$usuario,$residente] = $this->preparar(['alertas.gestionar']);
+        $alerta=Alerta::create(['cod_residente'=>$residente->cod_residente,'modulo'=>'MANUAL','tipo'=>'Revisión','descripcion'=>'Prueba','estado'=>'ABIERTA']);
+        User::whereKey($usuario->getKey())->update(['estado'=>'INACTIVO']);
+        try { app(GestionarAtencionAlerta::class)->atenderAlerta($usuario,$alerta->cod_alerta,'Revisión documentada'); $this->fail('Debe rechazar cuenta revocada'); }
+        catch (HttpException $e) { $this->assertSame(403,$e->getStatusCode()); }
+        $this->assertSame('ABIERTA',$alerta->fresh()->estado); $this->assertSame(0,$alerta->eventos()->count());
     }
 }

@@ -61,7 +61,7 @@
                         @endif
                         <div class="flex items-center gap-2 pt-0.5 min-w-0">
                             @if($icon)
-                                <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--rm-action-primary)]/10 text-[var(--rm-action-primary)] border border-[var(--rm-action-primary)]/20 text-sm shadow-2xs">
+                                <span class="rm-drawer__heading-icon flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--rm-action-primary)]/10 text-[var(--rm-action-primary)] border border-[var(--rm-action-primary)]/20 text-sm shadow-2xs">
                                     <i class="ph-bold {{ $icon }}"></i>
                                 </span>
                             @endif

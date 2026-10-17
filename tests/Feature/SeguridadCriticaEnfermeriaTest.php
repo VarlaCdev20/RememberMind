@@ -228,6 +228,7 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
         $this->asignar($receptor, $this->residente, $entrante);
         $receptor->unsetRelation('personal');
         $receptor->load('personal');
+        $this->recibir($receptor, $entrante);
         $componente->set('enfermeroEntranteId', $receptor->cod_usuario)
             ->call('generarPase')->assertHasNoErrors();
         $this->assertDatabaseHas('pases_turno', [

@@ -18,15 +18,15 @@
                 <div class="flex items-start justify-between gap-3">
                     <div class="min-w-0">
                         <h4 class="text-sm font-bold text-[var(--rm-text-primary)]">
-                            {{ $alertaActiva->adultoMayor?->ap_paterno }} {{ $alertaActiva->adultoMayor?->ap_materno }} {{ $alertaActiva->adultoMayor?->nombres }}
+                            {{ $alertaActiva->residente?->apellido_paterno }} {{ $alertaActiva->residente?->apellido_materno }} {{ $alertaActiva->residente?->nombres }}
                         </h4>
-                        <p class="mt-0.5 font-mono text-xs text-[var(--rm-text-secondary)]">{{ $alertaActiva->adultoMayor?->ubicacion_texto ?? 'Sin ubicación asignada' }}</p>
+                        <p class="mt-0.5 font-mono text-xs text-[var(--rm-text-secondary)]">{{ $alertaActiva->residente?->ubicacion_formateada ?? 'Sin ubicación asignada' }}</p>
                     </div>
                     <x-ui.status-badge :estado="$alertaActiva->prioridad ?? 'MEDIO'" />
                 </div>
                 <div class="mt-3 border-t border-[var(--rm-border-soft)] pt-3 text-xs">
-                    <p class="font-semibold text-[var(--rm-text-body)]"><strong class="text-[var(--rm-text-primary)]">Diagnóstico:</strong> {{ $alertaActiva->tipo }}</p>
-                    <p class="mt-1 line-clamp-2 text-[var(--rm-text-secondary)]">{{ $alertaActiva->descripcion }}</p>
+                    <p class="font-semibold text-[var(--rm-text-body)]"><strong class="text-[var(--rm-text-primary)]">Tipo de alerta:</strong> {{ $alertaActiva->tipo }}</p>
+                    <p class="mt-1 line-clamp-2 text-[var(--rm-text-secondary)]">{{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($alertaActiva->descripcion) }}</p>
                 </div>
             </x-ui.section-card>
 

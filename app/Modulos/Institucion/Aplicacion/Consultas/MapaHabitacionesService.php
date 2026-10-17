@@ -76,7 +76,7 @@ class MapaHabitacionesService
                 $historial = DB::table('ocupaciones_cama as oc')->join('residentes as r', 'r.cod_residente', '=', 'oc.cod_residente')
                     ->where('oc.cod_cama', $detalle->cod_cama)->orderByDesc('oc.fecha_hora_asignacion')->orderByDesc('oc.cod_ocupacion')
                     ->limit(12)->get(['oc.estado', 'oc.fecha_hora_asignacion', 'oc.fecha_hora_liberacion', 'oc.motivo_liberacion', 'oc.cod_admision'])
-                    ->each(fn ($evento) => $evento->origen = 'Ocupación registrada en la admisión '.$evento->cod_admision);
+                    ->each(fn ($evento) => $evento->origen = 'Ocupación registrada en la admisión formal.');
             }
         }
 

@@ -21,13 +21,9 @@ final class RegistrarDocumentoHttp
         $datos = Validator::make($entrada, ['tipo_documento' => ['required', 'string', 'max:60'], 'nombre' => ['required', 'string', 'max:160'], 'archivo' => ['required', 'file', 'max:20480'], 'fecha_vencimiento' => ['nullable', 'date'], 'observacion' => ['nullable', 'string'], 'cod_documento_anterior' => ['nullable', 'exists:documentos,cod_documento']])->validate();
         $archivo = data_get($entrada, 'archivo');
         $ruta = $this->ficheros->recibir($archivo, 'documentos', 'local');
-        $documento = Documento::query()->create(['cod_documento' => $this->codigo('DOC'), 'cod_residente' => $residente->cod_residente, 'tipo_documento' => $datos['tipo_documento'], 'nombre' => $datos['nombre'], 'ruta_archivo' => $ruta, 'tipo_archivo' => $archivo->getMimeType() ?: 'application/octet-stream', 'hash_archivo' => $this->ficheros->hashEntrada($archivo), 'fecha_vencimiento' => $datos['fecha_vencimiento'] ?? null, 'cod_documento_anterior' => $datos['cod_documento_anterior'] ?? null, 'estado' => 'PENDIENTE', 'observacion' => $datos['observacion'] ?? null]);
+        $documento = Documento::query()->create(['cod_documento' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('documentos'), 'cod_residente' => $residente->cod_residente, 'tipo_documento' => $datos['tipo_documento'], 'nombre' => $datos['nombre'], 'ruta_archivo' => $ruta, 'tipo_archivo' => $archivo->getMimeType() ?: 'application/octet-stream', 'hash_archivo' => $this->ficheros->hashEntrada($archivo), 'fecha_vencimiento' => $datos['fecha_vencimiento'] ?? null, 'cod_documento_anterior' => $datos['cod_documento_anterior'] ?? null, 'estado' => 'PENDIENTE', 'observacion' => $datos['observacion'] ?? null]);
 
         return $documento;
     }
 
-    private function codigo(string $prefijo): string
-    {
-        return $prefijo.'_'.Str::upper(Str::random(12));
-    }
 }

@@ -21,6 +21,16 @@ test('molestia no/null elimina descripción stale, sí la conserva',()=>{
  state.setValue('molestia_eliminacion',false);assert.equal(state.values.descripcion_molestia,'');
  state.setValue('descripcion_molestia','Nuevo');state.setValue('molestia_eliminacion',null);assert.equal(state.values.descripcion_molestia,'');
 });
+
+test('Otro conserva detalle y cambiar la opción elimina únicamente su precisión',()=>{
+ const state=createEliminationCapture([],{...initial,color_orina:'',color_orina_otro:'',observacion:'Texto manual'});
+ const calls=[];state.$wire={$set(...args){calls.push(args);}};
+ state.setValue('color_orina','OTRO');state.setValue('color_orina_otro','Descripción observada');
+ assert.equal(state.values.color_orina_otro,'Descripción observada');assert.equal(state.isDirty(),true);
+ state.setValue('color_orina','CLARA');assert.equal(state.values.color_orina_otro,'');
+ assert.equal(state.values.observacion,'Texto manual');
+ assert.ok(calls.some(call=>call[0]==='elimDatos.color_orina_otro'&&call[1]===''));
+});
 test('último siempre es del mismo tipo; no compara urinaria con intestinal',()=>{
  const state=createEliminationCapture([row('I1','INTESTINAL'),row('U1','URINARIA')],{...initial,type:'URINARIA'});
  assert.equal(state.previous().codigo,'U1');state.values.type='INTESTINAL';assert.equal(state.previous().codigo,'I1');state.values.type='';assert.equal(state.previous(),null);

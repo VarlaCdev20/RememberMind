@@ -2,7 +2,9 @@
 
 namespace App\Modulos\Cuidados\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\CodigosEntidad;
 use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
+use App\Compartido\Aplicacion\Formato\TextoVisible;
 use App\Models\AdministracionMedicacion;
 use App\Models\Alerta;
 use App\Models\AsignacionPersonal;
@@ -20,11 +22,13 @@ use App\Models\RegistroHidratacion;
 use App\Models\RegistroIngesta;
 use App\Models\RegistroMovilidad;
 use App\Models\RegistroSueno;
+use App\Models\Residente;
 use App\Models\SignoVital;
 use App\Models\Turno;
 use App\Models\User;
 use App\Models\ValoracionDolor;
 use App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
 use Carbon\Carbon;
@@ -32,7 +36,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -125,69 +128,39 @@ class PaseTurnoService
      */
     public function resolverJornadaSaliente(?User $usuario = null): Jornada
     {
-        $usuario = $usuario ?: $this->contexto->usuario();
-
+        $usuario ??= $this->contexto->usuario();
         if (! $usuario || $usuario->estado !== 'ACTIVO') {
-            throw ValidationException::withMessages([
-                'usuario' => 'Se requiere un usuario activo para resolver la jornada saliente.',
-            ]);
+            throw ValidationException::withMessages(['usuario' => 'Se requiere una cuenta activa.']);
+        }
+        $personal = Personal::query()->where('cod_usuario', $usuario->getKey())->where('estado', 'ACTIVO')->first();
+        if (! $personal) {
+            throw ValidationException::withMessages(['usuario' => 'No cuenta con personal activo vinculado.']);
+        }
+        $relaciones = collect();
+        foreach ([AsignacionPersonal::class, AsignacionResidenteJornada::class] as $modelo) {
+            $relaciones = $relaciones->concat($modelo::query()->where('cod_personal', $personal->getKey())
+                ->whereIn('estado', ['ACTIVO', 'ACTIVA'])->whereHas('jornada', fn ($q) => $q
+                ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO'])
+                ->whereDate('fecha_jornada', '>=', today()->subDay()->toDateString())
+                ->whereDate('fecha_jornada', '<=', today()->toDateString()))
+                ->with('jornada.turno')->get()->pluck('jornada'));
+        }
+        $ventanas = app(MiTurnoService::class);
+        $jornadas = $relaciones->filter()->unique('cod_jornada')->filter(function ($jornada) use ($ventanas) {
+            if (! $jornada->turno || ! in_array($jornada->turno->estado, ['ACTIVO', 'ACTIVA'], true)) {
+                return false;
+            }
+            [$inicio, $fin] = $ventanas->calcularVentanaTurno($jornada);
+
+            return now()->gte($inicio) && now()->lt($fin);
+        })->values();
+        if ($jornadas->count() !== 1) {
+            throw ValidationException::withMessages(['jornada' => $jornadas->isEmpty()
+                ? 'No tiene una jornada activa en este momento. Puede consultar sus pases en el historial.'
+                : 'Hay varias jornadas activas superpuestas. Solicite revisar la planificación antes de entregar.']);
         }
 
-        $personal = $usuario->personal ?: Personal::where('cod_usuario', $usuario->cod_usuario)->first();
-
-        if (! $personal || ! in_array($personal->estado, ['ACTIVO', 'ACTIVA'], true)) {
-            throw ValidationException::withMessages([
-                'usuario' => 'El usuario no posee un registro de personal activo.',
-            ]);
-        }
-
-        // 1. Buscar jornada donde el personal tiene asignaciones activas hoy
-        $asignacion = AsignacionResidenteJornada::where('cod_personal', $personal->cod_personal)
-            ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'ASIGNADO'])
-            ->whereDate('fecha_hora', today())
-            ->whereHas('jornada', fn ($query) => $query
-                ->whereDate('fecha_jornada', today())
-                ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO']))
-            ->latest('fecha_hora')
-            ->first();
-
-        if ($asignacion?->jornada) {
-            return $asignacion->jornada;
-        }
-
-        $asigPersonal = AsignacionPersonal::where('cod_personal', $personal->cod_personal)
-            ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'ASIGNADO', 'PRESENTE'])
-            ->whereDate('fecha_asignacion', today())
-            ->whereHas('jornada', fn ($query) => $query
-                ->whereDate('fecha_jornada', today())
-                ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO']))
-            ->latest('fecha_asignacion')
-            ->first();
-
-        if ($asigPersonal?->jornada) {
-            return $asigPersonal->jornada;
-        }
-
-        // 2. Buscar jornada activa para el turno según la hora actual
-        $turnoActual = $this->turnos->obtenerTurnoActivo($usuario, today()->toDateString());
-        if (! $turnoActual) {
-            throw ValidationException::withMessages([
-                'jornada' => 'El personal no tiene un turno activo y asignado para la fecha actual.',
-            ]);
-        }
-
-        $jornada = Jornada::where('cod_turno', $turnoActual->cod_turno)
-            ->whereDate('fecha_jornada', today())
-            ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO'])
-            ->first();
-
-        if (! $jornada) {
-            throw ValidationException::withMessages([
-                'jornada' => 'No existe una jornada abierta para el turno activo del personal.',
-            ]);
-        }
-
-        return $jornada;
+        return $jornadas->first();
     }
 
     /**
@@ -195,48 +168,41 @@ class PaseTurnoService
      */
     public function resolverJornadaEntrante(Jornada $jornadaSaliente): Jornada
     {
-        $turnoSaliente = $jornadaSaliente->turno ?: Turno::find($jornadaSaliente->cod_turno);
-
-        if (! $turnoSaliente || ! in_array($turnoSaliente->estado, ['ACTIVO', 'ACTIVA'], true)) {
-            throw ValidationException::withMessages([
-                'jornada' => 'La jornada saliente no está vinculada a un turno activo.',
-            ]);
+        $ventanas = app(MiTurnoService::class);
+        if (! $jornadaSaliente->turno || ! in_array($jornadaSaliente->turno->estado, ['ACTIVO', 'ACTIVA'], true)) {
+            throw ValidationException::withMessages(['jornada' => 'La jornada saliente requiere un turno activo.']);
         }
-
-        $ordenActual = $turnoSaliente->orden;
-
-        // Buscar siguiente turno con orden superior
-        $siguienteTurno = Turno::whereIn('estado', ['ACTIVO', 'ACTIVA'])
-            ->where('orden', '>', $ordenActual)
-            ->orderBy('orden')
-            ->first();
-
-        $fechaEntrante = Carbon::parse($jornadaSaliente->fecha_jornada)->format('Y-m-d');
-
-        if (! $siguienteTurno) {
-            // Ciclo cumplido (rollover): vuelve al primer turno del día siguiente
-            $siguienteTurno = Turno::whereIn('estado', ['ACTIVO', 'ACTIVA'])->orderBy('orden')->first();
-            $fechaEntrante = Carbon::parse($jornadaSaliente->fecha_jornada)->addDay()->format('Y-m-d');
-        }
-
-        if (! $siguienteTurno) {
-            throw ValidationException::withMessages([
-                'turno_entrante' => 'No existe un turno activo configurado para continuar el pase.',
-            ]);
-        }
-
-        $jornadaEntrante = Jornada::where('cod_turno', $siguienteTurno->cod_turno)
-            ->whereDate('fecha_jornada', $fechaEntrante)
+        [, $fin] = $ventanas->calcularVentanaTurno($jornadaSaliente);
+        $areas = AsignacionPersonal::query()->where('cod_jornada', $jornadaSaliente->getKey())
+            ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'PRESENTE', 'PLANIFICADO', 'PLANIFICADA', 'ASIGNADO'])->pluck('cod_area');
+        $candidatas = Jornada::query()->whereKeyNot($jornadaSaliente->getKey())
             ->whereIn('estado', ['PLANIFICADA', 'ABIERTA', 'ACTIVA', 'EN_CURSO'])
-            ->first();
-
-        if (! $jornadaEntrante) {
-            throw ValidationException::withMessages([
-                'jornada_entrante' => 'La siguiente jornada debe estar planificada antes de realizar el pase.',
-            ]);
+            ->whereDate('fecha_jornada', '>=', $fin->toDateString())
+            ->whereDate('fecha_jornada', '<=', $fin->copy()->addDay()->toDateString())
+            ->whereHas('turno', fn ($q) => $q->whereIn('estado', ['ACTIVO', 'ACTIVA']))
+            ->when($areas->isNotEmpty(), fn ($q) => $q->whereHas('asignacionesPersonal', fn ($a) => $a
+                ->whereIn('cod_area', $areas)->whereIn('estado', ['ACTIVO', 'ACTIVA', 'PRESENTE', 'PLANIFICADO', 'PLANIFICADA', 'ASIGNADO'])))
+            ->with('turno')->get()
+            ->filter(fn ($j) => $ventanas->calcularVentanaTurno($j)[0]->gte($fin));
+        $residentes = AsignacionResidenteJornada::query()->where('cod_jornada', $jornadaSaliente->getKey())
+            ->whereIn('estado', ['ACTIVO', 'ACTIVA'])->pluck('cod_residente');
+        $vinculadas = AsignacionResidenteJornada::query()->whereIn('cod_jornada', $candidatas->modelKeys())
+            ->whereIn('cod_residente', $residentes)->whereIn('estado', ['ACTIVO', 'ACTIVA'])->pluck('cod_jornada');
+        $candidatas = $candidatas->sortBy(fn ($j) => $ventanas->calcularVentanaTurno($j)[0]->getTimestamp())->values();
+        if ($candidatas->isEmpty()) {
+            throw ValidationException::withMessages(['jornada_entrante' => 'La siguiente jornada debe estar planificada antes de realizar el pase.']);
+        }
+        $inicio = $ventanas->calcularVentanaTurno($candidatas->first())[0];
+        $candidatas = $candidatas->filter(fn ($j) => $ventanas->calcularVentanaTurno($j)[0]->equalTo($inicio));
+        $vinculadasAlInicio = $candidatas->whereIn('cod_jornada', $vinculadas);
+        if ($vinculadasAlInicio->isNotEmpty()) {
+            $candidatas = $vinculadasAlInicio;
+        }
+        if ($candidatas->count() !== 1) {
+            throw ValidationException::withMessages(['jornada_entrante' => 'Hay varias jornadas posibles para el relevo. Solicite revisar la planificación.']);
         }
 
-        return $jornadaEntrante;
+        return $candidatas->first();
     }
 
     // ========================================================
@@ -278,7 +244,12 @@ class PaseTurnoService
         }
 
         if (! $jornadaEntrante) {
-            $jornadaEntrante = $this->resolverJornadaEntrante($jornadaSaliente);
+            try {
+                $jornadaEntrante = $this->resolverJornadaEntrante($jornadaSaliente);
+            } catch (ValidationException) {
+                // La consulta conserva los residentes propios aunque falte planificar el relevo.
+                $jornadaEntrante = null;
+            }
         }
 
         // 1. Obtener asignaciones de residentes del profesional en la jornada saliente
@@ -291,7 +262,7 @@ class PaseTurnoService
         $codigosResidentes = $asignaciones->pluck('cod_residente')->unique()->values()->all();
 
         // 2. Para cada residente, buscar quién lo tiene asignado en la jornada entrante
-        $asignacionesEntrantes = AsignacionResidenteJornada::where('cod_jornada', $jornadaEntrante->cod_jornada)
+        $asignacionesEntrantes = AsignacionResidenteJornada::where('cod_jornada', $jornadaEntrante?->cod_jornada)
             ->whereIn('cod_residente', $codigosResidentes)
             ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
             ->with(['personal.usuario'])
@@ -300,7 +271,7 @@ class PaseTurnoService
 
         // 3. Buscar pases existentes entre estas dos jornadas
         $pasesExistentes = PaseTurno::where('cod_jornada_saliente', $jornadaSaliente->cod_jornada)
-            ->where('cod_jornada_entrante', $jornadaEntrante->cod_jornada)
+            ->when($jornadaEntrante, fn ($q) => $q->where('cod_jornada_entrante', $jornadaEntrante->cod_jornada))
             ->whereIn('cod_residente', $codigosResidentes)
             ->get()
             ->keyBy('cod_residente');
@@ -375,25 +346,18 @@ class PaseTurnoService
     /**
      * Obtiene los pases pendientes de recibir para el profesional autenticado en la jornada entrante
      */
-    public function obtenerPasesPendientesRecibir(Personal $personalEntrante, Jornada $jornadaEntrante): array
+    public function obtenerPasesPendientesRecibir(Personal $personalEntrante, ?Jornada $jornadaEntrante = null): array
     {
-        // 1. Obtener residentes asignados al profesional entrante en esta jornada
-        $residentesAsignados = AsignacionResidenteJornada::where('cod_jornada', $jornadaEntrante->cod_jornada)
-            ->where('cod_personal', $personalEntrante->cod_personal)
-            ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
-            ->pluck('cod_residente')
-            ->all();
-
-        // 2. Buscar pases en estado ENTREGADO dirigidos a esta jornada
-        // Donde el residente esté asignado a él O cod_personal_entrante sea él
-        $query = PaseTurno::where('cod_jornada_entrante', $jornadaEntrante->cod_jornada)
-            ->whereIn('estado', ['ENTREGADO', 'GENERADO'])
-            ->where(function ($q) use ($personalEntrante, $residentesAsignados) {
+        // Designación o asignación del residente en la jornada entrante exacta.
+        $query = PaseTurno::query()
+            ->when($jornadaEntrante, fn ($q) => $q->where('cod_jornada_entrante', $jornadaEntrante->cod_jornada))
+            ->whereIn('estado', ['ENTREGADO', 'GENERADO', 'EMITIDO', 'PENDIENTE'])
+            ->where(function ($q) use ($personalEntrante) {
                 $q->where('cod_personal_entrante', $personalEntrante->cod_personal)
-                    ->orWhere(function ($sub) use ($residentesAsignados) {
-                        $sub->whereNull('cod_personal_entrante')
-                            ->whereIn('cod_residente', $residentesAsignados);
-                    });
+                    ->orWhereHas('residente.asignacionesJornada', fn ($a) => $a
+                        ->where('cod_personal', $personalEntrante->getKey())
+                        ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
+                        ->whereColumn('asignaciones_residente_jornada.cod_jornada', 'pases_turno.cod_jornada_entrante'));
             })
             ->with(['residente.cama.habitacion', 'personalSaliente.usuario', 'jornadaSaliente.turno', 'jornadaEntrante.turno']);
 
@@ -409,12 +373,13 @@ class PaseTurnoService
      */
     public function obtenerContextoClinicoResidente(string $codResidente, Jornada $jornadaSaliente): array
     {
+        [$inicio, $fin] = app(MiTurnoService::class)->calcularVentanaTurno($jornadaSaliente);
         $fecha = Carbon::parse($jornadaSaliente->fecha_jornada)->format('Y-m-d');
         $codJornada = $jornadaSaliente->cod_jornada;
 
         // 1. Medicación administrada
         $medsAdministradas = AdministracionMedicacion::where('cod_residente', $codResidente)
-            ->whereDate('fecha_hora_administracion', $fecha)
+            ->where('fecha_hora_administracion', '>=', $inicio)->where('fecha_hora_administracion', '<', $fin)
             ->where('resultado', 'ADMINISTRADA')
             ->whereIn('estado', ['REGISTRADA', 'ADMINISTRADA'])
             ->with('prescripcion.medicamento')
@@ -422,13 +387,14 @@ class PaseTurnoService
             ->map(fn ($m) => [
                 'medicamento' => $m->prescripcion?->medicamento?->nombre_generico ?? 'Medicación',
                 'dosis' => $m->dosis_administrada ?? $m->prescripcion?->dosis,
+                'unidad_dosis' => $m->prescripcion?->unidad_dosis,
                 'via' => $m->prescripcion?->via_administracion,
                 'hora' => Carbon::parse($m->fecha_hora_administracion)->format('H:i'),
             ])->all();
 
         // Omisión documentada es un hecho; ausencia de registro se deriva de la agenda.
         $medsOmitidas = AdministracionMedicacion::where('cod_residente', $codResidente)
-            ->whereDate('fecha_hora_programada', $fecha)
+            ->where('fecha_hora_programada', '>=', $inicio)->where('fecha_hora_programada', '<', $fin)
             ->where('resultado', 'OMITIDA')
             ->whereIn('estado', ['REGISTRADA', 'OMITIDA'])
             ->with('prescripcion.medicamento')
@@ -439,8 +405,11 @@ class PaseTurnoService
                 'motivo' => $m->motivo_omision,
                 'cod_administracion' => $m->cod_administracion,
             ])->all();
-        $momentoAgenda = Carbon::parse($fecha)->isToday() ? now() : Carbon::parse($fecha)->endOfDay();
-        $agendaPendiente = $this->medicacion->paraAdulto($codResidente, $momentoAgenda)
+        $agenda = collect();
+        for ($dia = $inicio->copy()->startOfDay(); $dia->lt($fin); $dia->addDay()) {
+            $agenda = $agenda->concat($this->medicacion->paraAdulto($codResidente, now(), $dia));
+        }
+        $agendaPendiente = $agenda->filter(fn ($item) => $item['programada']->gte($inicio) && $item['programada']->lt($fin))
             ->whereIn('estado', ['PENDIENTE', 'PROXIMA', 'VENCIDA'])
             ->map(fn ($item) => [
                 'medicamento' => $item['medicacion']->medicamento?->nombre_generico ?? 'Medicación',
@@ -493,7 +462,7 @@ class PaseTurnoService
             ->latest('fecha_hora')
             ->get()
             ->map(fn ($a) => [
-                'titulo' => $a->titulo,
+                'titulo' => TextoVisible::sinCodigosInternos($a->titulo),
                 'prioridad' => $a->prioridad,
                 'tipo' => $a->tipo,
             ])->all();
@@ -506,6 +475,7 @@ class PaseTurnoService
 
         // 8. Dolor
         $dolor = ValoracionDolor::where('cod_residente', $codResidente)
+            ->whereNotIn('estado', ['ANULADO', 'RECTIFICADO'])
             ->latest('fecha_hora')
             ->first();
 
@@ -521,26 +491,27 @@ class PaseTurnoService
             ])->all();
 
         // 10. Movilidad
-        $movilidad = RegistroMovilidad::where('cod_residente', $codResidente)->latest('fecha_hora')->first();
+        $movilidad = RegistroMovilidad::where('cod_residente', $codResidente)->whereNotIn('estado', ['ANULADO', 'RECTIFICADO'])->latest('fecha_hora')->first();
 
         // 11. Ingesta
-        $ingesta = RegistroIngesta::where('cod_residente', $codResidente)->latest('fecha_hora')->first();
+        $ingesta = RegistroIngesta::where('cod_residente', $codResidente)->whereNotIn('estado', ['ANULADO', 'RECTIFICADO'])->latest('fecha_hora')->first();
 
         // 12. Hidratación
-        $hidratacion = RegistroHidratacion::where('cod_residente', $codResidente)->latest('fecha_hora')->first();
+        $hidratacion = RegistroHidratacion::where('cod_residente', $codResidente)->whereNotIn('estado', ['ANULADO', 'RECTIFICADO'])->latest('fecha_hora')->first();
 
         // 13. Eliminación
-        $eliminacion = RegistroEliminacion::where('cod_residente', $codResidente)->latest('fecha_hora')->first();
+        $eliminacion = RegistroEliminacion::where('cod_residente', $codResidente)->whereNotIn('estado', ['ANULADO', 'RECTIFICADO'])->latest('fecha_hora')->first();
 
         // Observaciones cognitivas guardadas; no constituyen un diagnóstico.
         $cognicion = ControlCognitivo::where('cod_residente', $codResidente)
             ->whereIn('estado', ['ACTIVO', 'VIGENTE'])->latest('fecha_hora')->first();
 
         // 14. Conducta y Sueño
-        $conducta = RegistroConductual::where('cod_residente', $codResidente)->latest('fecha_hora')->first();
-        $sueno = RegistroSueno::where('cod_residente', $codResidente)->latest('fecha')->first();
+        $conducta = RegistroConductual::where('cod_residente', $codResidente)->whereNotIn('estado', ['ANULADO', 'RECTIFICADO'])->latest('fecha_hora')->first();
+        $sueno = RegistroSueno::where('cod_residente', $codResidente)->whereNotIn('estado', ['ANULADO', 'RECTIFICADO'])->latest('fecha')->first();
 
         return [
+            'ventana' => $inicio->format('d/m/Y H:i').' — '.$fin->format('d/m/Y H:i'),
             'meds_administradas' => $medsAdministradas,
             'meds_pendientes' => $medsPendientes,
             'meds_omitidas' => $medsOmitidas,
@@ -578,6 +549,12 @@ class PaseTurnoService
             $usuario = $usuario ?: $this->contexto->usuario();
         }
 
+        Validator::make($datos, [
+            'resumen' => 'required|string|max:5000', 'estado_general' => 'nullable|string|max:200',
+            'pendientes' => 'nullable|string|max:3000', 'vigilancia' => 'nullable|string|max:3000',
+            'recomendacion' => 'nullable|string|max:3000',
+        ])->validate();
+
         return $this->procesarPase($codResidente, $datos, $usuario, 'BORRADOR');
     }
 
@@ -611,44 +588,73 @@ class PaseTurnoService
     /**
      * Lógica interna para persistir BORRADOR o ENTREGADO sin permitir duplicados
      */
-    private function procesarPase(string $codResidente, array $datos, ?User $usuario, string $estadoDestino): PaseTurno
+    public function emitir(User $usuario, string $codResidente, array $datos): PaseTurno
     {
-        $personalSaliente = $this->autorizarPersonal($usuario);
-        if (! $personalSaliente) {
-            throw ValidationException::withMessages(['usuario' => 'El usuario no posee un registro de personal activo.']);
-        }
+        $this->validarContextoEmision($usuario, $codResidente, $datos);
+        Validator::make($datos, [
+            'resumen' => 'required|string|min:5|max:5000', 'estado_general' => 'nullable|string|max:200',
+            'pendientes' => 'nullable|string|max:3000', 'vigilancia' => 'nullable|string|max:3000',
+            'recomendacion' => 'nullable|string|max:3000',
+        ])->validate();
 
-        $jornadaSaliente = $this->resolverJornadaSaliente($usuario);
-        $jornadaEntrante = $this->resolverJornadaEntrante($jornadaSaliente);
+        return $this->procesarPase($codResidente, $datos, $usuario, 'EMITIDO', true);
+    }
 
-        // Validar que el residente pertenezca al alcance/asignación
-        $asignadoSaliente = AsignacionResidenteJornada::where('cod_residente', $codResidente)
-            ->where('cod_personal', $personalSaliente->cod_personal)
-            ->where('cod_jornada', $jornadaSaliente->cod_jornada)
-            ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
-            ->exists();
+    private function procesarPase(string $codResidente, array $datos, ?User $usuario, string $estadoDestino, bool $soloCrear = false): PaseTurno
+    {
+        return DB::transaction(function () use ($codResidente, $datos, $usuario, $estadoDestino, $soloCrear) {
+            // Bloqueo común incluso cuando todavía no existe un pase para este relevo.
+            Residente::query()->whereKey($codResidente)->lockForUpdate()->firstOrFail();
+            $personalSaliente = $this->autorizarPersonal($usuario);
+            if (! $personalSaliente) {
+                throw ValidationException::withMessages(['usuario' => 'El usuario no posee un registro de personal activo.']);
+            }
 
-        if (! $asignadoSaliente) {
-            throw new HttpException(403, 'El residente no está asignado a su guardia actual.', null, [], 403);
-        }
+            try {
+                $jornadaSaliente = $this->resolverJornadaSaliente($usuario);
+            } catch (ValidationException $exception) {
+                throw new HttpException(403, 'La entrega requiere una jornada vigente y asignada.', $exception);
+            }
+            $jornadaEntrante = $this->resolverJornadaEntrante($jornadaSaliente);
 
-        // Resolver receptor para este residente en la jornada entrante
-        $asigEntrante = AsignacionResidenteJornada::where('cod_jornada', $jornadaEntrante->cod_jornada)
-            ->where('cod_residente', $codResidente)
-            ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
-            ->first();
-        $codPersonalEntrante = $asigEntrante?->cod_personal;
+            // Validar que el residente pertenezca al alcance/asignación
+            $asignadoSaliente = AsignacionResidenteJornada::where('cod_residente', $codResidente)
+                ->where('cod_personal', $personalSaliente->cod_personal)
+                ->where('cod_jornada', $jornadaSaliente->cod_jornada)
+                ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
+                ->exists();
 
-        return DB::transaction(function () use ($codResidente, $jornadaSaliente, $jornadaEntrante, $personalSaliente, $codPersonalEntrante, $datos, $estadoDestino, $usuario) {
+            if (! $asignadoSaliente) {
+                throw new HttpException(403, 'El residente no está asignado a su guardia actual.', null, [], 403);
+            }
+
+            // Resolver receptor para este residente en la jornada entrante
+            $asigEntrante = AsignacionResidenteJornada::where('cod_jornada', $jornadaEntrante->cod_jornada)
+                ->where('cod_residente', $codResidente)
+                ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
+                ->first();
+            $codPersonalEntrante = $asigEntrante?->cod_personal;
+
+            if (array_key_exists('cod_personal_entrante', $datos)) {
+                $this->validarContextoEmision($usuario, $codResidente, $datos);
+                $codPersonalEntrante = $datos['cod_personal_entrante'];
+            }
+
             $paseExistente = PaseTurno::where('cod_residente', $codResidente)
                 ->where('cod_jornada_saliente', $jornadaSaliente->cod_jornada)
                 ->where('cod_jornada_entrante', $jornadaEntrante->cod_jornada)
                 ->lockForUpdate()
                 ->first();
 
+            if ($soloCrear && $paseExistente) {
+                throw ValidationException::withMessages(['cod_residente' => 'Ya existe un pase para este residente y relevo. Consulta el pase registrado.']);
+            }
+
             $this->turnos->autorizarMutacionPaciente($codResidente,
                 $paseExistente ? 'pases_turno.editar' : 'pases_turno.crear', $usuario);
             if ($paseExistente) {
+                abort_unless($paseExistente->cod_personal_saliente === $personalSaliente->cod_personal, 403,
+                    'Solo el profesional que preparó el borrador puede modificarlo o entregarlo.');
                 // Si ya fue entregado o recibido, no se puede sobrescribir
                 if (! $paseExistente->puedeEditarse()) {
                     throw new HttpException(409, 'El pase ya fue confirmado y no puede modificarse.', null, [], 409);
@@ -661,8 +667,8 @@ class PaseTurnoService
                 $paseExistente->recomendacion = $datos['recomendacion'] ?? $paseExistente->recomendacion;
                 $paseExistente->cod_personal_entrante = $codPersonalEntrante ?: $paseExistente->cod_personal_entrante;
 
-                if ($estadoDestino === 'ENTREGADO') {
-                    $paseExistente->estado = 'ENTREGADO';
+                if ($estadoDestino !== 'BORRADOR') {
+                    $paseExistente->estado = $estadoDestino;
                     $paseExistente->fecha_hora = now();
                 }
                 $paseExistente->save();
@@ -677,7 +683,7 @@ class PaseTurnoService
             }
 
             $pase = new PaseTurno;
-            $pase->cod_pase = 'PAS_'.strtoupper(Str::random(10));
+            $pase->cod_pase = app(CodigosEntidad::class)->siguiente('pases_turno');
             $pase->cod_residente = $codResidente;
             $pase->cod_jornada_saliente = $jornadaSaliente->cod_jornada;
             $pase->cod_jornada_entrante = $jornadaEntrante->cod_jornada;
@@ -702,6 +708,19 @@ class PaseTurnoService
         });
     }
 
+    public function puedeRecibir(PaseTurno $pase, User $usuario): bool
+    {
+        $personal = $usuario->personal;
+
+        return $usuario->estado === 'ACTIVO' && $usuario->can('pases_turno.editar')
+            && app(AccesoClinicoTemporalService::class)->tieneRol($usuario, ['ENFERMEROS'])
+            && $personal?->estado === 'ACTIVO' && $pase->puedeRecibirse()
+            && ($pase->cod_personal_entrante === $personal->getKey()
+                || AsignacionResidenteJornada::query()->where('cod_residente', $pase->cod_residente)
+                    ->where('cod_personal', $personal->getKey())->where('cod_jornada', $pase->cod_jornada_entrante)
+                    ->whereIn('estado', ['ACTIVO', 'ACTIVA'])->exists());
+    }
+
     public function confirmarRecepcion(mixed $arg1, mixed $arg2 = null, mixed $arg3 = null): PaseTurno
     {
         if ($arg1 instanceof User || $arg1 instanceof Personal) {
@@ -723,26 +742,29 @@ class PaseTurnoService
             throw new HttpException(409, 'El pase no se encuentra en estado entregado para recepción.', null, [], 409);
         }
 
-        $asignadoEntrante = AsignacionResidenteJornada::where('cod_jornada', $pase->cod_jornada_entrante)
-            ->where('cod_residente', $pase->cod_residente)
-            ->where('cod_personal', $personal->cod_personal)
-            ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
-            ->exists();
+        Validator::make(['observacion_recepcion' => $observacionRecepcion], [
+            'observacion_recepcion' => 'nullable|string|max:3000',
+        ])->validate();
 
-        $esReceptorDesignado = $pase->cod_personal_entrante === $personal->cod_personal;
-        if (! $asignadoEntrante && ! $esReceptorDesignado) {
-            throw new HttpException(403, 'No está autorizado para recibir este residente en la jornada entrante.', null, [], 403);
-        }
-
-        return DB::transaction(function () use ($pase, $personal, $observacionRecepcion, $usuario) {
+        return DB::transaction(function () use ($pase, $observacionRecepcion, $usuario) {
             $bloqueado = PaseTurno::lockForUpdate()->findOrFail($pase->getKey());
+            $personal = $this->autorizarPersonal($usuario, 'pases_turno.editar');
             if (! $bloqueado->puedeRecibirse()) {
                 throw new HttpException(409, 'El pase ya fue recibido previamente.', null, [], 409);
             }
+            $asignadoEntrante = AsignacionResidenteJornada::where('cod_jornada', $bloqueado->cod_jornada_entrante)
+                ->where('cod_residente', $bloqueado->cod_residente)
+                ->where('cod_personal', $personal->cod_personal)
+                ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
+                ->exists();
 
-            if (empty($bloqueado->cod_personal_entrante)) {
-                $bloqueado->cod_personal_entrante = $personal->cod_personal;
+            $esReceptorDesignado = $bloqueado->cod_personal_entrante === $personal->cod_personal;
+            if (! $asignadoEntrante && ! $esReceptorDesignado) {
+                throw new HttpException(403, 'No está autorizado para recibir este residente en la jornada entrante.', null, [], 403);
             }
+
+            $receptorDesignado = $bloqueado->cod_personal_entrante;
+            $bloqueado->cod_personal_entrante = $personal->cod_personal;
 
             $bloqueado->estado = PaseTurno::ESTADO_RECIBIDO ?? 'RECIBIDO';
             $bloqueado->fecha_hora_recepcion = now();
@@ -752,7 +774,7 @@ class PaseTurnoService
             activity()
                 ->performedOn($bloqueado)
                 ->causedBy($usuario)
-                ->withProperties(['estado' => PaseTurno::ESTADO_RECIBIDO ?? 'RECIBIDO', 'receptor' => $personal->cod_personal])
+                ->withProperties(['estado' => PaseTurno::ESTADO_RECIBIDO, 'receptor' => $personal->cod_personal, 'receptor_designado' => $receptorDesignado])
                 ->log('Confirmación de recepción de pase de turno');
 
             return $bloqueado->refresh();
@@ -762,6 +784,19 @@ class PaseTurnoService
     /**
      * Anula lógicamente un pase de turno
      */
+    public function puedeAnular(PaseTurno $pase, User $usuario): bool
+    {
+        $personal = $usuario->personal;
+
+        return $usuario->estado === 'ACTIVO' && $usuario->can('pases_turno.editar')
+            && app(AccesoClinicoTemporalService::class)->tieneRol($usuario, ['ENFERMEROS'])
+            && $personal?->estado === 'ACTIVO' && ! $pase->esAnulado()
+            && $pase->cod_personal_saliente === $personal->getKey()
+            && AsignacionResidenteJornada::query()->where('cod_residente', $pase->cod_residente)
+                ->where('cod_personal', $personal->getKey())->where('cod_jornada', $pase->cod_jornada_saliente)
+                ->whereIn('estado', ['ACTIVO', 'ACTIVA'])->exists();
+    }
+
     public function anularPase(mixed $arg1, mixed $arg2 = null, ?string $motivo = null): PaseTurno
     {
         if ($arg1 instanceof User || $arg1 instanceof Personal) {
@@ -781,6 +816,8 @@ class PaseTurnoService
         return DB::transaction(function () use ($pase, $usuario, $motivo) {
             $pase = PaseTurno::query()->lockForUpdate()->findOrFail($pase->getKey());
             abort_if($pase->esAnulado(), 409, 'El pase ya está anulado.');
+            abort_unless($this->puedeAnular($pase, $usuario), 403);
+            Validator::make(['motivo' => $motivo], ['motivo' => 'nullable|string|max:3000'])->validate();
             $pase->update(['estado' => PaseTurno::ESTADO_ANULADO]);
             activity()->performedOn($pase)->causedBy($usuario)->withProperties(['motivo' => $motivo])
                 ->log('Anulación lógica de pase de turno');
@@ -856,12 +893,9 @@ class PaseTurnoService
             ]);
         }
 
-        $jornadaEntrante = Jornada::whereDate('fecha_jornada', today())
-            ->where('cod_turno', $turnoEntranteId)
-            ->whereIn('estado', ['PLANIFICADA', 'ABIERTA', 'ACTIVA', 'EN_CURSO'])
-            ->first();
+        $jornadaEntrante = $this->resolverJornadaEntrante($jornadaSaliente);
 
-        if (! $jornadaEntrante) {
+        if ($jornadaEntrante->cod_turno !== $turnoEntranteId) {
             throw ValidationException::withMessages([
                 'jornada_entrante' => 'La jornada entrante debe existir y estar planificada antes de generar el pase.',
             ]);
@@ -873,33 +907,16 @@ class PaseTurnoService
             'cod_personal_entrante' => $codPersonalEntrante,
         ]);
 
-        $paseExistente = PaseTurno::where('cod_residente', $codResidente)
-            ->where('cod_jornada_saliente', $jornadaSaliente->cod_jornada)
-            ->whereDate('fecha_hora', today())
-            ->exists();
-
-        if ($paseExistente) {
-            throw ValidationException::withMessages(['cod_residente' => 'Ya existe el pase de este residente para el turno actual.']);
-        }
-
-        $pendientes = $this->pendientes($codResidente, $saliente);
-        $resumen = trim($datosValidados['observaciones']);
-
-        return PaseTurno::create([
-            'cod_pase' => 'PAS_'.strtoupper(Str::random(10)),
-            'cod_residente' => $codResidente,
-            'cod_jornada_saliente' => $jornadaSaliente->cod_jornada,
-            'cod_jornada_entrante' => $jornadaEntrante->cod_jornada,
-            'cod_personal_saliente' => $codPersonalSaliente,
+        return $this->procesarPase($codResidente, [
+            'cod_jornada_saliente' => $jornadaSaliente->getKey(),
+            'cod_jornada_entrante' => $jornadaEntrante->getKey(),
             'cod_personal_entrante' => $codPersonalEntrante,
-            'fecha_hora' => now(),
             'estado_general' => $datosValidados['estado_general'] ?? null,
-            'resumen' => $resumen,
-            'pendientes' => json_encode($pendientes),
-            'vigilancia' => $datosValidados['vigilancia'] ? ($datosValidados['motivo_vigilancia'] ?? 'SI') : null,
+            'resumen' => trim($datosValidados['observaciones']),
+            'pendientes' => json_encode($this->pendientes($codResidente, $saliente), JSON_THROW_ON_ERROR),
+            'vigilancia' => $datosValidados['vigilancia'] ? $datosValidados['motivo_vigilancia'] : null,
             'recomendacion' => $datosValidados['recomendacion'] ?? null,
-            'estado' => 'GENERADO',
-        ]);
+        ], $usuario, 'GENERADO', true);
     }
 
     public function recibir(PaseTurno $pase, User $usuario): PaseTurno

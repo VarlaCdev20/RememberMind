@@ -1,6 +1,41 @@
 /* RememberMind Design System: paleta oficial y contratos semánticos.
    Las áreas funcionales usan acentos; todas las superficies siguen siendo neutras. */
 :root {
+   /* Mi turno y captura: gris café compartido; los estados conservan sus acentos. */
+   --rm-capture-panel: var(--rm-palette-surface);
+   --rm-capture-card-solid: var(--rm-palette-surface);
+   --rm-capture-card: color-mix(in srgb, var(--rm-capture-card-solid) 82%, transparent);
+   --rm-capture-soft: var(--rm-palette-surface-soft);
+   --rm-capture-input: var(--rm-palette-input);
+   --rm-capture-section: var(--rm-palette-surface);
+   --rm-capture-field: color-mix(in srgb, var(--rm-capture-section) 80%, var(--rm-mint-50));
+   --rm-capture-section-border: color-mix(in srgb, var(--rm-coffee-900) 16%, var(--rm-capture-section));
+   --rm-capture-field-border: color-mix(in srgb, var(--rm-coffee-700) 70%, var(--rm-capture-field));
+   --rm-capture-glass-bg: color-mix(in srgb, var(--rm-capture-section) 84%, transparent);
+   --rm-capture-section-glass: color-mix(in srgb, var(--rm-capture-section) 84%, transparent);
+   --rm-capture-section-rim: color-mix(in srgb, var(--rm-palette-surface) 85%, transparent);
+   --rm-capture-workspace: var(--rm-palette-page);
+   --rm-capture-glass-header-solid: color-mix(in srgb, var(--rm-capture-section) 78%, var(--rm-mint-50));
+   --rm-capture-glass-header: color-mix(in srgb, var(--rm-capture-glass-header-solid) 76%, transparent);
+   --rm-capture-glass-blur: 14px;
+   --rm-capture-ink: var(--rm-palette-ink);
+   --rm-capture-secondary: var(--rm-text-secondary-readable);
+   --rm-capture-border: color-mix(in srgb, var(--rm-coffee-700) 20%, transparent);
+   --rm-capture-action-bg: color-mix(in srgb, var(--rm-palette-primary) 88%, transparent);
+   --rm-capture-action-hover: var(--rm-palette-primary-hover);
+   --rm-capture-action-ink: var(--rm-palette-petroleum-950);
+   --rm-capture-pattern:
+       radial-gradient(ellipse at 0% 0%, color-mix(in srgb, var(--rm-mint-50) 38%, transparent), transparent 55%),
+       radial-gradient(ellipse at 100% 100%, color-mix(in srgb, var(--rm-sky-50) 28%, transparent), transparent 60%),
+       radial-gradient(circle, color-mix(in srgb, var(--rm-coffee-700) 6%, transparent) .7px, transparent .9px),
+       repeating-linear-gradient(135deg, color-mix(in srgb, var(--rm-coffee-700) 2%, transparent) 0 1px, transparent 1px 8px);
+   --rm-capture-pattern-size: auto, auto, var(--rm-textura-dot-size, 22px) var(--rm-textura-dot-size, 22px), auto;
+   --rm-workspace-pattern:
+       radial-gradient(circle, color-mix(in srgb, var(--rm-coffee-700) 11%, transparent) .85px, transparent 1.1px),
+       repeating-linear-gradient(45deg, color-mix(in srgb, var(--rm-coffee-700) 3.5%, transparent) 0 1px, transparent 1px 10px),
+       repeating-linear-gradient(135deg, color-mix(in srgb, var(--rm-coffee-700) 2.5%, transparent) 0 1px, transparent 1px 10px);
+   --rm-workspace-pattern-size: 22px 22px, auto, auto;
+   --rm-capture-elevation: var(--rm-shadow-card);
    /* Familia petróleo histórica para el modo oscuro global. */
    --rm-palette-petroleum-950: #07141C;
    --rm-palette-petroleum-900: #0A1821;
@@ -12,12 +47,12 @@
    --rm-palette-petroleum-secondary: #A8BAC2;
    --rm-palette-petroleum-mint: #A9C792;
    /* Familia tierra oficial. Una única definición de cada tono. */
-   --rm-earth-900: #59524B;
-   --rm-earth-800: #665F57;
-   --rm-earth-700: #746B62;
-   --rm-earth-600: #82786E;
-   --rm-earth-500: #8F857B;
-   --rm-earth-400: #9B9288;
+   --rm-earth-900: #5B514B;
+   --rm-earth-800: #6E625A;
+   --rm-earth-700: #7D6F65;
+   --rm-earth-600: #8F8075;
+   --rm-earth-500: #A49589;
+   --rm-earth-400: #B7AAA0;
    --rm-earth-300: #A69E96;
    /* Alias conservados para componentes que ya consumen la familia café. */
    --rm-palette-brown-900: var(--rm-earth-900);
@@ -29,17 +64,17 @@
    --rm-palette-brown-300: var(--rm-earth-300);
 
    /* Las superficies aclaran esta escala para conservar contraste. */
-   --rm-palette-page: #F3EEE8;
-   --rm-palette-capuchino: #DDD6CF;
-   --rm-palette-header: #E6E0D9;
+   --rm-palette-page: #D8D2CD;
+   --rm-palette-capuchino: var(--rm-palette-page);
+   --rm-palette-header: var(--rm-palette-surface);
    --rm-palette-sidebar: var(--rm-palette-capuchino);
-   --rm-palette-surface: #F7F3EF;
-   --rm-palette-surface-soft: #EFEAE4;
-   --rm-palette-surface-muted: color-mix(in srgb, var(--rm-palette-brown-300) 50%, var(--rm-palette-page));
-   --rm-palette-ink: #4A4642;
-   --rm-palette-ink-secondary: #67615B;
+   --rm-palette-surface: #ECE9E6;
+   --rm-palette-surface-soft: #DFD9D4;
+   --rm-palette-surface-muted: #B8ADA1;
+   --rm-palette-ink: #4F4742;
+   --rm-palette-ink-secondary: #7D6F65;
    /* Salvia complementaria: se conservan los mentas existentes. */
-   --rm-palette-sage-900: #78826E;
+   --rm-palette-sage-900: var(--rm-palette-primary-strong);
    --rm-palette-sage-800: #858E7C;
    --rm-palette-sage-700: #939B8B;
    --rm-palette-sage-600: #A0A799;
@@ -48,71 +83,72 @@
    --rm-palette-sage-300: #C9CDC5;
    --rm-palette-sage-200: #D6D9D3;
    --rm-palette-sage-100: #E4E6E2;
-   --rm-palette-forest-ink: #56604F;
+   --rm-palette-forest-ink: var(--rm-palette-primary-ink);
    --rm-contrast-ink: color-mix(in srgb, var(--rm-palette-brown-900) 85%, black);
    --rm-sage-deep: var(--rm-palette-sage-900);
-   --rm-palette-mint: #C4C6B4;
-   --rm-palette-primary: #78826E;
-   --rm-palette-primary-ink: var(--rm-palette-forest-ink);
-   --rm-palette-primary-soft: color-mix(in srgb, var(--rm-palette-mint) 50%, var(--rm-palette-page));
-   --rm-palette-sage: #A8BAA3;
-   --rm-palette-sage-soft: #C2CEBE;
-   --rm-palette-info: #8699AC;
-   --rm-palette-info-soft: #C2CCD5;
-   --rm-palette-psychology: #CEB0B0;
-   --rm-palette-nutrition: #C4C4A0;
-   --rm-palette-warning: #C69245;
-   --rm-palette-danger: #B85C58;
+   --rm-palette-mint: #6FB89A;
+   --rm-palette-primary: #7D9282;
+   --rm-palette-primary-ink: #354C3D;
+   --rm-palette-primary-soft: #C4D3C7;
+   --rm-palette-sage: #7D9282;
+   --rm-palette-sage-soft: #DCE7DF;
+   --rm-palette-info: #7D94A8;
+   --rm-palette-info-soft: #E7E6E3;
+   --rm-palette-psychology: #9B83BF;
+   --rm-palette-nutrition: var(--rm-palette-gold);
+   --rm-palette-warning: #C7A56B;
+   --rm-palette-danger: #C97C73;
 
    /* Tokens de uso: los componentes consumen esta capa. */
    --rm-bg-app: var(--rm-palette-page);
    --rm-bg-sidebar: var(--rm-palette-sidebar);
-   --rm-surface: var(--rm-palette-surface);
+   --rm-surface: var(--rm-surface-main);
    --rm-surface-soft: var(--rm-palette-surface-soft);
    --rm-surface-muted: var(--rm-palette-surface-muted);
    --rm-text-primary: var(--rm-palette-ink);
    --rm-text-secondary: var(--rm-palette-ink-secondary);
    --rm-primary: var(--rm-palette-primary);
-   --rm-primary-ink: var(--rm-palette-primary-ink);
-   --rm-primary-soft: var(--rm-palette-sage-300);
+   --rm-primary-ink: var(--rm-primary-text);
+   --rm-primary-soft: var(--rm-palette-primary-soft);
    --rm-sage: var(--rm-palette-sage);
    --rm-sage-soft: color-mix(in srgb, var(--rm-palette-sage-soft) 65%, var(--rm-palette-page));
    --rm-info: var(--rm-palette-info);
    --rm-info-soft: var(--rm-palette-info-soft);
-   --rm-psychology: var(--rm-palette-psychology);
-   --rm-nutrition: var(--rm-palette-nutrition);
+   --rm-psychology: var(--rm-accent-lavender);
+   --rm-nutrition: var(--rm-accent-gold);
    --rm-warning: var(--rm-palette-warning);
    --rm-danger: var(--rm-palette-danger);
-   --rm-border: rgba(89, 82, 75, .14);
-   --rm-border-strong: rgba(89, 82, 75, .24);
+   --rm-border: var(--rm-palette-border-soft);
+   --rm-border-strong: var(--rm-palette-border-strong);
 
    /* Superficies y texto: una sola jerarquía compartida. */
    --rm-bg-shell: var(--rm-bg-sidebar);
    --rm-header-bg: var(--rm-palette-header);
    --rm-bg-layout: var(--rm-bg-app);
-   --rm-surface-main: var(--rm-surface);
+   --rm-surface-main: var(--rm-palette-surface);
    --rm-surface-alt: var(--rm-surface-soft);
    --rm-surface-strong: var(--rm-surface-muted);
    --rm-surface-beige: var(--rm-surface);
-   --rm-surface-raised: var(--rm-surface);
+   --rm-surface-raised: var(--rm-surface-elevated);
    --rm-text-title: var(--rm-text-primary);
    --rm-text-body: var(--rm-text-primary);
-   /* La tinta muted del brief (#847D76) no alcanza AA en texto pequeño. */
-   --rm-text-muted: var(--rm-earth-700);
+   /* El fondo cacao aprobado requiere tinta secundaria AA para texto pequeño. */
+   --rm-text-muted: var(--rm-palette-ink-muted);
    --rm-icon-default: var(--rm-earth-600);
    --rm-text-soft: var(--rm-text-secondary);
-   --rm-text-inverse: var(--rm-palette-page);
-   --rm-text-on-primary: color-mix(in srgb, var(--rm-palette-brown-900) 25%, black);
-   --rm-text-on-dark: var(--rm-text-inverse);
+   /* La tinta de acciones oscuras conserva contraste al cambiar el lienzo. */
+   --rm-text-inverse: var(--rm-text-on-dark);
+   --rm-text-on-primary: var(--rm-primary-action-text);
+   --rm-text-on-dark: var(--rm-palette-on-dark);
    --rm-text-on-dark-soft: color-mix(in srgb, var(--rm-text-inverse) 85%, transparent);
-   --rm-border-soft: var(--rm-border);
-   --rm-border-medium: var(--rm-border-strong);
+   --rm-border-soft: var(--rm-palette-border-soft);
+   --rm-border-medium: var(--rm-palette-border-medium);
    --rm-border-hover: color-mix(in srgb, var(--rm-text-primary) 40%, transparent);
    --rm-divider: var(--rm-border);
    --rm-shadow-ink: var(--rm-contrast-ink);
 
    /* Acción institucional y selección. */
-   --rm-primary-hover: var(--rm-palette-sage-800);
+   --rm-primary-hover: var(--rm-palette-primary-hover);
    --rm-primary-active: color-mix(in srgb, var(--rm-primary) 76%, var(--rm-shadow-ink));
    --rm-action-primary: var(--rm-primary);
    --rm-action-primary-hover: var(--rm-primary-hover);
@@ -128,7 +164,7 @@
    --rm-focus-tint: color-mix(in srgb, var(--rm-primary) 24%, transparent);
    --rm-focus-ring: 0 0 0 3px var(--rm-focus-tint);
    --rm-disabled-opacity: .55;
-   --rm-selected-bg: var(--rm-palette-sage-200);
+   --rm-selected-bg: var(--rm-primary-soft);
    --rm-selected-hover: color-mix(in srgb, var(--rm-selected-bg) 85%, var(--rm-palette-page));
    --rm-selected-text: var(--rm-primary-ink);
    --rm-selected-text-soft: var(--rm-primary-ink);
@@ -173,12 +209,12 @@
    --rm-button-secondary-border: var(--rm-border);
    --rm-button-secondary-hover-bg: var(--rm-surface-soft);
    --rm-button-ghost-text: var(--rm-text-primary);
-   --rm-input-bg: var(--rm-surface);
-   --rm-input-border: var(--rm-border-strong);
+   --rm-input-bg: var(--rm-palette-input);
+   --rm-input-border: var(--rm-border-medium);
    --rm-input-text: var(--rm-text-primary);
    --rm-input-placeholder: var(--rm-text-secondary);
    --rm-input-focus-border: var(--rm-primary);
-   --rm-input-focus-ring: var(--rm-focus-ring);
+   --rm-input-focus-ring: 0 0 0 4px color-mix(in srgb, var(--rm-primary) 16%, transparent);
    --rm-card-bg: var(--rm-surface);
    --rm-dashboard-card-bg: #F7F3EF;
    --rm-card-border: var(--rm-border);
@@ -209,37 +245,37 @@
 
    /* Acentos suaves; variantes strong para texto y action para botones.
       No se deduce ninguna severidad clínica en esta capa. */
-   --rm-success: var(--rm-sage);
-   --rm-success-strong: var(--rm-primary-ink);
-   --rm-success-soft: var(--rm-sage-soft);
+   --rm-success: var(--rm-palette-success);
+   --rm-success-strong: var(--rm-success-text);
+   --rm-success-soft: var(--rm-palette-success-soft);
    --rm-success-hover: var(--rm-primary-hover);
    --rm-success-action: var(--rm-primary);
    --rm-success-action-hover: var(--rm-primary-hover);
-   --rm-info-strong: color-mix(in srgb, var(--rm-info) 15%, var(--rm-contrast-ink));
-   --rm-info-hover: color-mix(in srgb, var(--rm-info) 20%, var(--rm-text-primary));
-   --rm-info-action: var(--rm-info-strong);
+   --rm-info-strong: var(--rm-info-text);
+   --rm-info-hover: var(--rm-palette-info-hover);
+   --rm-info-action: var(--rm-info);
    --rm-info-action-hover: var(--rm-info-hover);
    --rm-info-secondary: var(--rm-info-strong);
    --rm-info-secondary-soft: var(--rm-info-soft);
-   --rm-psychology-strong: color-mix(in srgb, var(--rm-psychology) 15%, var(--rm-contrast-ink));
-   --rm-psychology-soft: color-mix(in srgb, var(--rm-psychology) 35%, var(--rm-bg-app));
-   --rm-nutrition-strong: color-mix(in srgb, var(--rm-nutrition) 15%, var(--rm-contrast-ink));
-   --rm-nutrition-soft: color-mix(in srgb, var(--rm-nutrition) 35%, var(--rm-bg-app));
-   --rm-warning-strong: color-mix(in srgb, var(--rm-warning) 20%, var(--rm-contrast-ink));
-   --rm-warning-soft: color-mix(in srgb, var(--rm-warning) 16%, var(--rm-bg-app));
+   --rm-psychology-strong: var(--rm-accent-lavender-text);
+   --rm-psychology-soft: var(--rm-accent-lavender-soft);
+   --rm-nutrition-strong: var(--rm-accent-gold-text);
+   --rm-nutrition-soft: var(--rm-accent-gold-soft);
+   --rm-warning-strong: var(--rm-warning-text);
+   --rm-warning-soft: var(--rm-palette-warning-soft);
    --rm-warning-hover: color-mix(in srgb, var(--rm-warning) 25%, var(--rm-text-primary));
    --rm-warning-action: var(--rm-warning-strong);
    --rm-warning-action-hover: var(--rm-warning-hover);
-   --rm-danger-strong: color-mix(in srgb, var(--rm-danger) 30%, var(--rm-contrast-ink));
-   --rm-danger-soft: color-mix(in srgb, var(--rm-danger) 14%, var(--rm-bg-app));
-   --rm-danger-action: color-mix(in srgb, var(--rm-danger) 70%, var(--rm-shadow-ink));
-   --rm-danger-hover: color-mix(in srgb, var(--rm-danger) 60%, var(--rm-text-primary));
+   --rm-danger-strong: var(--rm-danger-text);
+   --rm-danger-soft: var(--rm-palette-danger-soft);
+   --rm-danger-action: var(--rm-danger);
+   --rm-danger-hover: var(--rm-critical);
    --rm-danger-action-hover: var(--rm-danger-hover);
-   --rm-critical: var(--rm-danger-strong);
+   --rm-critical: var(--rm-palette-critical);
    --rm-success-bg: var(--rm-success-soft);
    --rm-info-bg: var(--rm-info-soft);
    --rm-warning-bg: var(--rm-warning-soft);
-   --rm-critical-bg: var(--rm-danger-soft);
+   --rm-critical-bg: var(--rm-critical-soft);
    --rm-status-high: var(--rm-warning-strong);
    --rm-status-high-soft: var(--rm-warning-soft);
    --rm-status-stable: var(--rm-success-strong);
@@ -272,11 +308,119 @@
    --rm-violet-soft: var(--rm-psychology-soft);
 
 
+   /* Paleta final aprobada 14/10/2026: aliases y tintas de componentes. */
+   --rm-relief-card-shadow: var(--rm-shadow-card);
+   --rm-relief-panel-shadow: var(--rm-shadow-raised);
+   --rm-palette-surface-elevated: #F0EDEA;
+   --rm-palette-border-soft: #CBBFB2;
+   --rm-palette-border-medium: #B7AAA0;
+   --rm-palette-border-strong: #8F8075;
+   --rm-palette-ink-muted: #7D6F65;
+   --rm-palette-on-dark: #F8F5F2;
+   --rm-palette-primary-hover: #5F7567;
+   --rm-palette-primary-strong: #5F7567;
+   --rm-palette-info-hover: #2C5E72;
+   --rm-palette-info-text: #3D5365;
+   --rm-palette-coral: #C97C73;
+   --rm-palette-coral-soft: #E2BEAF;
+   --rm-palette-coral-text: #643C2F;
+   --rm-palette-gold: #C7A56B;
+   --rm-palette-gold-soft: #E9D49B;
+   --rm-palette-gold-text: #6F4C14;
+   --rm-palette-mint-soft: #BFDDCF;
+   --rm-palette-mint-text: #254B3C;
+   --rm-palette-psychology-soft: #D2C4E4;
+   --rm-palette-psychology-text: #4E3A6E;
+   --rm-palette-success: #7E9B85;
+   --rm-palette-success-soft: #DCECDF;
+   --rm-palette-success-text: #2F5A3F;
+   --rm-palette-warning-soft: #F5E7C6;
+   --rm-palette-warning-text: #78561B;
+   --rm-palette-danger-soft: #F2D9D7;
+   --rm-palette-danger-text: #7A3D39;
+   --rm-palette-critical: #B95C55;
+   --rm-palette-critical-soft: #EFD3D0;
+   --rm-palette-critical-text: #6A2C28;
+   --rm-palette-neutral: #A49589;
+   --rm-palette-neutral-soft: #ECE5E0;
+   --rm-palette-neutral-text: #5F5751;
+   --rm-palette-sidebar-start: #DED4CB;
+   --rm-palette-sidebar-end: #D8CDC3;
+   --rm-palette-input: #E7E2DE;
+   --rm-palette-elevation-ink: #625144;
+   --rm-palette-button-primary-top: #91B39D;
+   --rm-palette-button-primary-hover-top: #86AC93;
+   --rm-palette-button-primary-border: #739A82;
+   --rm-palette-button-info-top: #4B7D91;
+   --rm-palette-button-info-border: #345B6A;
+   --rm-palette-button-info-ink: #F7FAFC;
+   --rm-palette-button-danger-top: #D7837D;
+   --rm-palette-button-danger-border: #B8615C;
+   --rm-palette-button-danger-ink: #FFF8F7;
+   --rm-surface-elevated: var(--rm-palette-surface-elevated);
+   --rm-text-secondary-readable: color-mix(in srgb, var(--rm-palette-ink-secondary) 40%, var(--rm-palette-ink));
+   --rm-text-muted-readable: var(--rm-text-secondary-readable);
+   --rm-primary-strong: var(--rm-palette-primary-strong);
+   --rm-primary-text: var(--rm-palette-primary-ink);
+   --rm-primary-action-text: var(--rm-palette-petroleum-950);
+   --rm-info-text: var(--rm-palette-info-text);
+   --rm-accent-coral: var(--rm-palette-coral);
+   --rm-accent-coral-soft: var(--rm-palette-coral-soft);
+   --rm-accent-coral-text: var(--rm-palette-coral-text);
+   --rm-accent-gold: var(--rm-palette-gold);
+   --rm-accent-gold-soft: var(--rm-palette-gold-soft);
+   --rm-accent-gold-text: var(--rm-palette-gold-text);
+   --rm-accent-mint: var(--rm-palette-mint);
+   --rm-accent-mint-soft: var(--rm-palette-mint-soft);
+   --rm-accent-mint-text: var(--rm-palette-mint-text);
+   --rm-accent-lavender: var(--rm-palette-psychology);
+   --rm-accent-lavender-soft: var(--rm-palette-psychology-soft);
+   --rm-accent-lavender-text: var(--rm-palette-psychology-text);
+   --rm-success-text: var(--rm-palette-success-text);
+   --rm-warning-text: var(--rm-palette-warning-text);
+   --rm-danger-text: var(--rm-palette-danger-text);
+   --rm-critical-soft: var(--rm-palette-critical-soft);
+   --rm-critical-text: var(--rm-palette-critical-text);
+   --rm-neutral: var(--rm-palette-neutral);
+   --rm-neutral-soft: var(--rm-palette-neutral-soft);
+   --rm-neutral-text: var(--rm-palette-neutral-text);
+
+   --rm-topbar-glass: color-mix(in srgb, var(--rm-surface-soft) 82%, transparent);
+   --rm-topbar-glass-border: color-mix(in srgb, var(--rm-border-medium) 55%, transparent);
+
+   --rm-elevated-border: color-mix(in srgb, white 55%, transparent);
+   --rm-elevated-shadow: 0 10px 24px color-mix(in srgb, var(--rm-palette-elevation-ink) 10%, transparent);
+
+
+
+
 }
 
 /* Modo oscuro petróleo global. Los componentes mantienen sus contratos semánticos. */
 .dark,
 [data-theme="dark"] {
+   --rm-text-secondary-readable: var(--rm-text-secondary);
+   --rm-success-soft: color-mix(in srgb, var(--rm-palette-success) 20%, var(--rm-surface));
+   --rm-surface-main: var(--rm-surface);
+   --rm-surface-elevated: var(--rm-surface-raised);
+   --rm-border-soft: var(--rm-border);
+   --rm-border-medium: var(--rm-border-strong);
+   --rm-primary-strong: var(--rm-primary);
+   --rm-primary-text: var(--rm-primary-ink);
+   --rm-text-on-dark: var(--rm-palette-petroleum-text);
+   --rm-info-text: var(--rm-info-strong);
+   --rm-warning-text: var(--rm-warning-strong);
+   --rm-danger-text: var(--rm-danger-strong);
+   --rm-success-text: var(--rm-primary-ink);
+   --rm-critical-soft: color-mix(in srgb, var(--rm-palette-critical) 20%, var(--rm-surface));
+   --rm-critical-text: color-mix(in srgb, var(--rm-palette-critical) 35%, var(--rm-text-primary));
+   --rm-neutral-soft: var(--rm-surface-soft);
+   --rm-neutral-text: var(--rm-text-secondary);
+   --rm-input-bg: var(--rm-surface-raised);
+
+
+
+   --rm-card-gradient: linear-gradient(180deg, var(--rm-surface), var(--rm-surface-soft));
    --rm-bg-app: var(--rm-palette-petroleum-950);
    --rm-bg-sidebar: var(--rm-palette-petroleum-900);
    --rm-surface: var(--rm-palette-petroleum-800);

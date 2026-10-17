@@ -5,9 +5,12 @@ namespace App\Modulos\Clinica\Presentacion\Livewire\Funcionalidades;
 use App\Models\Residente;
 use App\Models\SignoVital;
 use App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService;
+use App\Modulos\Clinica\Aplicacion\Consultas\AnalisisSignosPanel;
+use Livewire\Attributes\Locked;
 use App\Modulos\Clinica\Aplicacion\Validacion\ValidacionSignosVitalesService;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -16,6 +19,7 @@ class RegistroSignosVitalesModal extends Component
 {
     public bool $mostrar = false;
 
+    #[Locked]
     public ?string $cod_residente = null;
 
     public $adulto = null;
@@ -65,18 +69,8 @@ class RegistroSignosVitalesModal extends Component
 
         $this->resetForm();
 
-        $this->adulto = Residente::find($cod_residente);
-
-        // Pre-cargar último peso/talla conocido
-        $ultimo = SignoVital::where('cod_residente', $cod_residente)
-            ->where('estado', 'VIGENTE')
-            ->whereNotNull('peso')
-            ->orderByDesc('fecha_hora')->first();
-        if ($ultimo) {
-            $this->peso = $ultimo->peso;
-            $this->talla = $ultimo->talla;
-            $this->imc = $ultimo->imc;
-        }
+        $this->cod_residente = $cod_residente;
+        $this->adulto = Residente::findOrFail($cod_residente);
 
         $this->mostrar = true;
     }
@@ -172,6 +166,20 @@ class RegistroSignosVitalesModal extends Component
 
     public function render()
     {
-        return view('livewire.clinica.registro-signos-vitales-modal');
+        $avisosClinicos = [];
+        if ($this->mostrar && $this->cod_residente) {
+            app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($this->cod_residente, Auth::user());
+            $fechaValida = ! Validator::make(
+                ['fecha' => $this->fecha, 'hora' => $this->hora],
+                ['fecha' => 'required|date_format:Y-m-d', 'hora' => 'required|date_format:H:i']
+            )->fails();
+            $avisosClinicos = app(AnalisisSignosPanel::class)->detectarAlertas([
+                'presion_sistolica' => $this->pa_sistolica, 'presion_diastolica' => $this->pa_diastolica,
+                'frecuencia_cardiaca' => $this->fc, 'frecuencia_respiratoria' => $this->fr,
+                'temperatura' => $this->temperatura, 'saturacion' => $this->saturacion, 'glucosa' => $this->glucosa,
+                'fecha_hora' => $fechaValida ? $this->fecha.' '.$this->hora : null,
+            ], $fechaValida ? $this->cod_residente : null);
+        }
+        return view('livewire.clinica.registro-signos-vitales-modal', compact('avisosClinicos'));
     }
 }

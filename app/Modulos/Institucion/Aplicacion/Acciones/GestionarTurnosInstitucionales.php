@@ -44,7 +44,7 @@ final class GestionarTurnosInstitucionales
             Turno::findOrFail($entrada['editandoId'])->update($datos);
             $msg = 'Turno actualizado correctamente.';
         } else {
-            Turno::create($datos + ['cod_turno' => 'TUR_'.Str::upper(Str::random(12))]);
+            Turno::create($datos + ['cod_turno' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('turnos')]);
             $msg = 'Turno registrado correctamente.';
         }
 

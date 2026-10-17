@@ -39,7 +39,7 @@ class SidebarEnfermeroTest extends TestCase
         $sidebar = $sidebarService->getSidebar();
 
         $this->assertCount(7, $sidebar);
-        $this->assertSame(['Mi turno', 'Mis residentes', 'Cuidados', 'Medicación', 'Alertas', 'Incidentes', 'Pase de turno'], array_column($sidebar, 'title'));
+        $this->assertSame(['Mi turno', 'Mis residentes', 'Medicación', 'Alertas', 'Incidentes', 'Cuidados', 'Pase de turno'], array_column($sidebar, 'title'));
 
         $this->assertSame('Mi turno', $sidebar[0]['title']);
         $this->assertSame('admin.enfermeria.dashboard', $sidebar[0]['route']);
@@ -47,26 +47,15 @@ class SidebarEnfermeroTest extends TestCase
         $this->assertSame('Mis residentes', $sidebar[1]['title']);
         $this->assertSame('admin.enfermeria.pacientes', $sidebar[1]['route']);
 
-        // Los diez accesos conservan un destino distinto mediante su contexto.
-        $this->assertSame('Cuidados', $sidebar[2]['title']);
-        $labelsCuidado = array_column($sidebar[2]['items'], 'label');
-        $this->assertSame(['Signos', 'Dolor', 'Cognición', 'Conducta', 'Sueño', 'Ingesta', 'Hidratación', 'Eliminación', 'Movilidad', 'Heridas'], $labelsCuidado);
-        $urls = array_map(fn ($item) => route($item['route'], $item['parameters']), $sidebar[2]['items']);
-        $this->assertCount(10, array_unique($urls));
-        foreach ($sidebar[2]['items'] as $item) {
-            $this->assertFalse($item['disabled']);
-            $clave = $item['parameters']['cuidado'];
-            $opcion = \App\Modulos\Cuidados\Presentacion\Navegacion\NavegacionCuidadosService::opcion($clave);
-            $this->assertSame($opcion['route'] ?? 'admin.enfermeria.pacientes', $item['route']);
-            foreach ($opcion['parameters'] ?? [] as $parameter => $value) {
-                $this->assertSame($value, $item['parameters'][$parameter]);
-            }
-        }
-        $this->assertSame('admin.enfermeria.incidentes', $sidebar[5]['route']);
+        // Cuidados abre el centro de consulta sin saturar el menú con formularios.
+        $this->assertSame('Cuidados', $sidebar[5]['title']);
+        $this->assertSame('admin.enfermeria.cuidados', $sidebar[5]['route']);
+        $this->assertSame([], $sidebar[5]['items']);
+        $this->assertSame('admin.enfermeria.incidentes', $sidebar[4]['route']);
 
         // Verificar que elementos prohibidos NO están presentes
         $allTitles = array_column($sidebar, 'title');
-        $allSubLabels = $labelsCuidado;
+        $allSubLabels = array_merge(...array_column($sidebar, 'items'));
         $allVisible = array_merge($allTitles, $allSubLabels);
 
         $this->assertNotContains('Agenda', $allVisible);
@@ -78,7 +67,7 @@ class SidebarEnfermeroTest extends TestCase
         $this->assertNotContains('Usuarios', $allVisible);
     }
 
-    public function test_lecturas_aprobadas_no_conceden_nuevas_escrituras(): void
+    public function test_lecturas_y_creacion_contextual_de_conducta_respetan_aprobacion(): void
     {
         $enfermero = User::factory()->create(['estado' => 'ACTIVO']);
         $enfermero->assignRole('ENFERMEROS');
@@ -86,7 +75,8 @@ class SidebarEnfermeroTest extends TestCase
             $this->assertTrue($enfermero->can($recurso.'.ver'));
         }
         $this->assertFalse($enfermero->can('registros_sueno.crear'));
-        $this->assertFalse($enfermero->can('registros_conductuales.crear'));
+        // La propietaria autorizó esta escritura contextual el 2026-10-13.
+        $this->assertTrue($enfermero->can('registros_conductuales.crear'));
         $this->assertFalse($enfermero->can('prescripciones.crear'));
     }
 
@@ -199,7 +189,10 @@ class SidebarEnfermeroTest extends TestCase
         $this->actingAs($enfermero);
         $cuidado = collect(app(SidebarService::class)->getSidebar())->firstWhere('title', 'Cuidados');
 
-        $this->assertSame(['Signos', 'Dolor', 'Cognición', 'Conducta', 'Sueño', 'Ingesta', 'Hidratación', 'Eliminación', 'Movilidad'], array_column($cuidado['items'], 'label'));
+        $this->assertSame([], $cuidado['items']);
+        $tipos = app(\App\Modulos\Cuidados\Aplicacion\Consultas\ConsultaCentralCuidados::class)->tiposDisponibles($enfermero);
+        $this->assertArrayNotHasKey('heridas', $tipos);
+        $this->assertCount(9, $tipos);
     }
 
     public function test_usuario_enfermero_sin_personal_no_provoca_creacion_automatica_de_personal(): void
@@ -267,8 +260,8 @@ class SidebarEnfermeroTest extends TestCase
         $response->assertSee('Mis residentes');
         $response->assertSee('Cuidados');
         $response->assertSee('Medicación');
-        $response->assertSee('Cognición');
-        $response->assertSee('Heridas');
+        $response->assertSee(route('admin.enfermeria.cuidados'));
+        $response->assertDontSee('id="rm-sidebar-trigger-', false);
         $response->assertDontSee('rm-sidebar__subitem--pending');
         $response->assertDontSee('href=""', false);
         $response->assertSee('Pase de turno');

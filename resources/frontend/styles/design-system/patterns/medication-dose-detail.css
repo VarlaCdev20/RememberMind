@@ -1,0 +1,112 @@
+/* Detalle contextual de dosis y ficha compartida del catálogo. */
+.rm-medication-workspace { --rm-dose-drawer-width: 460px; }
+.rm-medication-dose-drawer { --rm-drawer-bg: var(--rm-surface-soft); }
+.rm-medication-dose-drawer .rm-drawer { width: var(--rm-dose-drawer-width); max-width: 100vw; background: var(--rm-surface-soft); }
+.rm-medication-dose-drawer .rm-drawer-header { background: var(--rm-surface-raised); padding: var(--rm-space-5); }
+.rm-medication-dose-drawer .rm-drawer-header h2 { font: 800 var(--rm-font-size-section)/1.3 var(--rm-font-friendly); }
+.rm-medication-dose-drawer .rm-drawer-header p { white-space: normal; font-size: var(--rm-font-size-label); }
+.rm-medication-dose-drawer .rm-drawer-body { padding: 16px; }
+.rm-dose-detail { display: grid; gap: 16px; color: var(--rm-text-primary); font: 400 var(--rm-font-size-body)/1.5 var(--rm-font-body); }
+.rm-dose-detail__identity { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 8px 12px; padding: var(--rm-space-4); border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-card); background: var(--rm-surface-raised); box-shadow: var(--rm-shadow-xs); }
+.rm-dose-detail__identity .rm-dose-avatar { background: var(--rm-action-primary-soft); color: var(--rm-action-primary-ink); }
+.rm-dose-detail__identity .rm-dose-avatar { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; font-size: var(--rm-font-size-card-title); }
+.rm-dose-detail__identity h3 { font: 800 var(--rm-font-size-card-title)/1.35 var(--rm-font-friendly); overflow-wrap: anywhere; }
+.rm-dose-detail__identity p { font-size: var(--rm-font-size-label); color: var(--rm-text-secondary); overflow-wrap: anywhere; }
+.rm-dose-detail__identity > .rm-badge { grid-column: 2; justify-self: start; }
+.rm-dose-detail__section { display: grid; gap: var(--rm-space-3); padding: var(--rm-space-4); border-radius: var(--rm-radius-card); background: var(--rm-surface-raised); box-shadow: var(--rm-shadow-sm); min-width: 0; }
+.rm-dose-detail__section > h3 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font: 800 var(--rm-font-size-card-title)/1.35 var(--rm-font-friendly); }
+.rm-dose-detail__section > h3 > i, .rm-medication-catalog__section > h4 > i { display: inline-grid; place-items: center; width: 30px; height: 30px; flex: none; border-radius: var(--rm-radius-md); background: var(--rm-action-primary-soft); color: var(--rm-action-primary-ink); font-size: 18px; }
+.rm-dose-detail__section > h3 > span { font: 600 var(--rm-font-size-meta)/1.4 var(--rm-font-body); color: var(--rm-text-secondary); margin-left: auto; }
+.rm-dose-detail__section--medication { background: color-mix(in srgb, var(--rm-info) 10%, var(--rm-surface-raised)); }
+.rm-dose-detail__section--medication > h3 > i, .rm-dose-detail__section--order > h3 > i { background: var(--rm-info-soft); color: var(--rm-info-strong); }
+.rm-dose-detail__section--safety { background: color-mix(in srgb, var(--rm-action-primary-soft) 38%, var(--rm-surface-raised)); box-shadow: var(--rm-shadow-xs); }
+.rm-dose-detail__section--capture { border: 1px solid var(--rm-border-soft); }
+.rm-dose-detail__drug { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; }
+.rm-dose-detail__drug strong { display: block; font: 800 var(--rm-font-size-section)/1.35 var(--rm-font-friendly); text-transform: uppercase; overflow-wrap: anywhere; }
+.rm-dose-detail__drug p { font-size: var(--rm-font-size-label); color: var(--rm-text-secondary); overflow-wrap: anywhere; }
+.rm-dose-detail__catalog-button { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 8px 10px; font-size: var(--rm-font-size-label); }
+.rm-dose-detail__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--rm-space-2); }
+.rm-dose-detail__facts > div { display: grid; align-content: start; gap: var(--rm-space-1); min-width: 0; padding: var(--rm-space-3); border-radius: var(--rm-radius-md); background: var(--rm-surface-main); }
+.rm-dose-detail__facts > div:first-child dd { font: 800 var(--rm-font-size-section)/1.4 var(--rm-font-friendly); font-variant-numeric: tabular-nums; }
+.rm-dose-detail dt { font-size: var(--rm-font-size-label); color: var(--rm-text-secondary); }
+.rm-dose-detail dd { font-size: var(--rm-font-size-body); font-weight: 700; overflow-wrap: anywhere; }
+.rm-dose-detail .rm-dose-detail__time { display: flex; align-items: center; flex-wrap: wrap; gap: var(--rm-space-2); padding: var(--rm-space-2); border-radius: var(--rm-radius-md); background: color-mix(in srgb, var(--rm-info) 12%, var(--rm-surface-raised)); color: var(--rm-text-primary); font: 800 var(--rm-font-size-kpi)/1.2 var(--rm-font-friendly); font-variant-numeric: tabular-nums; }
+.rm-dose-detail__time > i { color: var(--rm-info-strong); font-size: var(--rm-font-size-section); }
+.rm-dose-detail__indication { padding: 10px 12px; border-radius: var(--rm-radius-md); background: var(--rm-surface-main); }
+.rm-dose-detail__indication h4 { font-weight: 700; font-size: var(--rm-font-size-label); margin-bottom: 4px; }
+.rm-dose-detail__indication p { font-size: var(--rm-font-size-label); white-space: pre-line; overflow-wrap: anywhere; }
+.rm-dose-detail__provenance > div { display: grid; gap: 3px; }
+.rm-dose-detail__provenance dd { font-size: var(--rm-font-size-label); }
+.rm-dose-detail__provenance { display: grid; gap: var(--rm-space-3); }
+.rm-dose-detail__schedule { display: grid; gap: var(--rm-space-2); }
+.rm-dose-detail__schedule h4 { font-size: var(--rm-font-size-label); font-weight: 700; }
+.rm-dose-detail__schedule-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--rm-space-2); list-style: none; }
+.rm-dose-detail__schedule-list li { display: grid; align-content: start; gap: var(--rm-space-1); min-width: 0; padding: var(--rm-space-3); border-radius: var(--rm-radius-md); background: var(--rm-surface-main); overflow-wrap: anywhere; }
+.rm-dose-detail__schedule-list li.is-selected { background: var(--rm-info-soft); }
+.rm-dose-detail__schedule-list strong { display: flex; align-items: center; gap: var(--rm-space-2); font: 800 var(--rm-font-size-section)/1.35 var(--rm-font-friendly); font-variant-numeric: tabular-nums; }
+.rm-dose-detail__schedule-list strong > i { color: var(--rm-info-strong); }
+.rm-dose-detail__schedule-list span { font-size: var(--rm-font-size-label); color: var(--rm-text-secondary); }
+.rm-dose-detail__schedule-current { font-weight: 700; }
+.rm-dose-detail__note { font-size: var(--rm-font-size-label); color: var(--rm-text-secondary); line-height: 1.5; }
+.rm-dose-detail__checks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; list-style: none; font-size: var(--rm-font-size-label); }
+.rm-dose-detail__checks li { display: flex; align-items: baseline; gap: 6px; }
+.rm-dose-detail__checks i { color: var(--rm-action-primary-ink); flex: none; }
+.rm-dose-detail__allergies { display: flex; align-items: flex-start; gap: 8px; padding: 10px; border-radius: var(--rm-radius-md); background: var(--rm-info-soft); font-size: var(--rm-font-size-label); }
+.rm-dose-detail__allergies > i { flex: none; font-size: 20px; color: var(--rm-info-strong); }
+.rm-dose-detail__allergies.has-alert { background: var(--rm-danger-soft); border: 1px solid var(--rm-danger); }
+.rm-dose-detail__allergies.has-alert > i { color: var(--rm-danger-strong); }
+.rm-dose-detail textarea { min-height: 96px; padding: 10px 12px; font-size: var(--rm-font-size-body); resize: vertical; }
+.rm-dose-detail__counter { text-align: right; font-size: var(--rm-font-size-meta); color: var(--rm-text-secondary); }
+.rm-dose-detail__error { color: var(--rm-danger-strong); font-size: var(--rm-font-size-label); }
+.rm-dose-detail__actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.rm-medication-dose-drawer .rm-dose-detail__actions button { min-height: 44px; padding: 10px; white-space: normal; font-size: var(--rm-font-size-label); }
+.rm-medication-catalog { z-index: var(--rm-z-modal); }
+.rm-medication-catalog .rm-modal-panel { max-height: calc(100dvh - 32px); background: var(--rm-surface-soft); box-shadow: var(--rm-shadow-modal); }
+.rm-medication-catalog .rm-modal-header { padding: 14px; gap: 8px; }
+.rm-medication-catalog .rm-modal-panel__title { font: 800 var(--rm-font-size-card-title)/1.35 var(--rm-font-friendly); }
+.rm-medication-catalog .rm-modal-panel__drag-handle { width: 44px; height: 44px; padding: 0; flex: none; }
+.rm-medication-catalog .rm-modal-panel__drag-handle > span { display: none; }
+.rm-medication-catalog .rm-modal-body { padding: var(--rm-space-4); }
+.rm-medication-catalog .rm-modal-footer { padding: 12px 14px; }
+.rm-medication-catalog .rm-modal-footer button { width: 100%; min-height: 44px; }
+.rm-medication-catalog__content { display: grid; gap: var(--rm-space-4); color: var(--rm-text-primary); font-family: var(--rm-font-body); }
+.rm-medication-catalog__identity { display: grid; grid-template-columns: minmax(0, 1fr) 100px; gap: var(--rm-space-3); padding: var(--rm-space-4); border-radius: var(--rm-radius-card); background: var(--rm-surface-raised); box-shadow: var(--rm-shadow-sm); }
+.rm-medication-catalog__name { display: grid; align-content: start; justify-items: start; gap: var(--rm-space-1); min-width: 0; }
+.rm-medication-catalog__name > .rm-badge { margin-top: var(--rm-space-2); }
+.rm-medication-catalog__identity h4 { font: 800 var(--rm-font-size-section)/1.35 var(--rm-font-friendly); text-transform: uppercase; overflow-wrap: anywhere; }
+.rm-medication-catalog__identity p { font-size: var(--rm-font-size-label); color: var(--rm-text-secondary); }
+.rm-medication-catalog__identity .rm-medication-catalog__eyebrow { font-weight: 600; font-size: var(--rm-font-size-meta); }
+.rm-medication-catalog__identity .rm-medication-media { display: contents; }
+.rm-medication-catalog .rm-medication-media__stage { min-height: 0; height: 92px; padding: var(--rm-space-1); background: var(--rm-action-primary-soft); border: 0; border-radius: var(--rm-radius-md); }
+.rm-medication-catalog .rm-medication-media__photo { height: 84px; }
+.rm-medication-catalog .rm-medication-media__illustration svg { max-height: 84px; }
+.rm-medication-catalog .rm-medication-media figcaption { grid-column: 1 / -1; margin-top: 0; font-size: var(--rm-font-size-meta); line-height: 1.4; }
+.rm-medication-catalog__section { padding: var(--rm-space-4); border-radius: var(--rm-radius-card); background: var(--rm-surface-raised); box-shadow: var(--rm-shadow-sm); }
+.rm-medication-catalog__section > h4 { display: flex; align-items: center; gap: var(--rm-space-2); margin-bottom: var(--rm-space-3); font: 800 var(--rm-font-size-card-title)/1.35 var(--rm-font-friendly); }
+.rm-medication-catalog__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--rm-space-2); font-size: var(--rm-font-size-label); }
+.rm-medication-catalog__facts > div { display: grid; gap: var(--rm-space-1); min-width: 0; padding: var(--rm-space-2); border-radius: var(--rm-radius-md); background: var(--rm-surface-main); }
+.rm-medication-catalog__fact--wide { grid-column: 1 / -1; }
+.rm-medication-catalog__facts dt { color: var(--rm-text-secondary); }
+.rm-medication-catalog__facts dd { font-weight: 700; overflow-wrap: anywhere; }
+.rm-medication-catalog__facts > div:first-child dd { text-transform: uppercase; }
+.rm-medication-catalog__observation { padding: var(--rm-space-3); border-radius: var(--rm-radius-md); background: var(--rm-info-soft); font-size: var(--rm-font-size-label); }
+.rm-medication-catalog__observation h4 { display: flex; align-items: center; gap: var(--rm-space-2); font-weight: 800; margin-bottom: 4px; }
+.rm-medication-catalog__observation h4 > i { color: var(--rm-info-strong); font-size: 18px; }
+.rm-medication-catalog__observation p { white-space: pre-line; overflow-wrap: anywhere; }
+.rm-medication-catalog__references { margin-top: var(--rm-space-2); }
+.rm-medication-catalog__references summary { display: list-item; align-content: center; min-height: 44px; cursor: pointer; font-weight: 600; color: var(--rm-text-primary); overflow-wrap: anywhere; }
+.rm-medication-catalog__references summary:focus-visible { outline: 2px solid var(--rm-focus); outline-offset: 2px; border-radius: var(--rm-radius-md); }
+.rm-medication-catalog__references[open] > p { padding-top: var(--rm-space-2); }
+.rm-medication-catalog :is(button, a):focus-visible, .rm-medication-dose-drawer :is(button, textarea):focus-visible { outline: 2px solid var(--rm-focus); outline-offset: 2px; }
+@supports (backdrop-filter: blur(1px)) {
+    .rm-medication-catalog .rm-modal-header, .rm-medication-dose-drawer .rm-drawer-header { background: var(--rm-topbar-glass); backdrop-filter: blur(var(--rm-capture-glass-blur)); }
+}
+@media (min-width: 1024px) {
+    .rm-medication-catalog { pointer-events: none; }
+    .rm-medication-catalog .rm-modal-shell__overlay { display: none; }
+    .rm-medication-catalog .rm-modal-panel { pointer-events: auto; position: fixed; inset: auto; right: calc(var(--rm-dose-drawer-width) + 16px); top: 24px; margin: 0; width: 360px; max-width: calc(100vw - 32px); max-height: calc(100dvh - 48px); }
+}
+@media (max-width: 480px) {
+    .rm-dose-detail__drug { grid-template-columns: minmax(0, 1fr); }
+    .rm-dose-detail__catalog-button { justify-self: start; }
+}

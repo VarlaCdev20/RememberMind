@@ -520,7 +520,7 @@ class PersonalInstitucionalHorarios extends Component
                         ->all(),
                     'fecha_inicio' => $fechas->min()?->format('d/m/Y') ?? '—',
                     'fecha_inicio_raw' => $fechas->min()?->format('Y-m-d'),
-                    'fecha_fin' => null,
+                    'fecha_fin' => $fechas->max()?->format('d/m/Y'),
                     'fecha_fin_raw' => null,
                     'estado' => $primero->estado === 'ACTIVO' ? 'ACTIVA' : 'FINALIZADA',
                     'tipo_asignacion' => $primero->tipo_asignacion,

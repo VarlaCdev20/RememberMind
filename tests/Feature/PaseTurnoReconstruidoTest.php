@@ -57,6 +57,7 @@ class PaseTurnoReconstruidoTest extends TestCase
         \App\Models\ControlCognitivo::create(array_replace($base, ['cod_control_cognitivo' => 'CC_NAV_AN', 'fecha_hora' => now()->addMinute(), 'estado' => 'ANULADO', 'observacion' => 'Control anulado invisible']));
         \App\Models\ControlCognitivo::create(array_replace($base, ['cod_control_cognitivo' => 'CC_NAV_AJ', 'cod_residente' => $this->residente3->cod_residente, 'observacion' => 'Control de otro residente']));
         \App\Models\RegistroConductual::create($base + ['cod_registro_conductual' => 'RC_NAV_01', 'descripcion' => 'Conducta sintética registrada']);
+        \App\Models\RegistroConductual::create(array_replace($base, ['fecha_hora' => now()->addMinute(), 'estado' => 'ANULADO', 'descripcion' => 'Conducta anulada invisible']));
         \App\Models\RegistroMovilidad::create($base + ['cod_movilidad' => 'RM_NAV_01', 'marcha' => 'Marcha sintética']);
         \App\Models\RegistroHidratacion::create($base + ['cod_hidratacion' => 'RH_NAV_01', 'cantidad_ml' => 250]);
         $dolor = $base;
@@ -70,6 +71,7 @@ class PaseTurnoReconstruidoTest extends TestCase
             ->assertSee('Observación cognitiva sintética')->assertSee('Conducta sintética registrada')
             ->assertSee('Marcha sintética')->assertSee('250.00 ml')->assertSee('3/10')
             ->assertDontSee('Control anulado invisible')->assertDontSee('Control de otro residente')
+            ->assertDontSee('Conducta anulada invisible')
             ->assertDontSee('Sin registro%')->assertDontSee('Sin registro ml');
         $this->assertDatabaseCount('controles_cognitivos', 3);
         $this->assertDatabaseCount('pases_turno', 0);
@@ -99,7 +101,7 @@ class PaseTurnoReconstruidoTest extends TestCase
 
         // Turnos ordenados: Mañana (1), Tarde (2), Noche (3)
         $this->turnoManana = Turno::create([
-            'cod_turno' => 'TUR_0001',
+            'cod_turno' => 'COD_TUR_000001',
             'nombre' => 'TURNO MAÑANA',
             'hora_inicio' => '07:00:00',
             'hora_cierre' => '15:00:00',
@@ -687,6 +689,7 @@ class PaseTurnoReconstruidoTest extends TestCase
         $contexto = $servicio->obtenerContextoClinicoResidente($this->residente1->cod_residente, $this->jornadaSaliente);
         $this->assertCount(1, $contexto['meds_administradas']);
         $this->assertSame('Sintético', $contexto['meds_administradas'][0]['medicamento']);
+        $this->assertSame('mg', $contexto['meds_administradas'][0]['unidad_dosis']);
         $this->assertCount(1, $contexto['meds_omitidas']);
         $this->assertSame('Sintético', $contexto['meds_omitidas'][0]['medicamento']);
         $this->assertSame('Sintético', $contexto['meds_pendientes'][1]['medicamento']);
@@ -738,6 +741,159 @@ class PaseTurnoReconstruidoTest extends TestCase
             $this->assertArrayHasKey('cod_personal_entrante', $e->errors());
         }
         $this->assertDatabaseCount('pases_turno', 0);
+    }
+
+    public function test_otro_enfermero_no_puede_entregar_el_borrador_del_autor_original(): void
+    {
+        $service = app(PaseTurnoService::class);
+        $pase = $service->guardarBorrador($this->userSaliente, ['cod_residente' => $this->residente1->getKey(), 'resumen' => 'Resumen original conservado']);
+        AsignacionResidenteJornada::where('cod_residente', $this->residente1->getKey())
+            ->where('cod_jornada', $this->jornadaSaliente->getKey())->update(['cod_personal' => $this->personalAjeno->getKey()]);
+        try {
+            $service->confirmarEntrega($this->userAjeno, ['cod_residente' => $this->residente1->getKey(), 'resumen' => 'Intento de sobrescribir autoría']);
+            $this->fail('Debe conservar la autoría del borrador.');
+        } catch (HttpException $exception) {
+            $this->assertSame(403, $exception->getStatusCode());
+        }
+        $this->assertSame('Resumen original conservado', $pase->fresh()->resumen);
+        $this->assertSame($this->personalSaliente->getKey(), $pase->fresh()->cod_personal_saliente);
+        $this->assertSame('BORRADOR', $pase->fresh()->estado);
+    }
+
+    public function test_reasignacion_entrante_se_lista_y_registra_al_receptor_real(): void
+    {
+        $service = app(PaseTurnoService::class);
+        $pase = $service->confirmarEntrega($this->userSaliente, ['cod_residente' => $this->residente1->getKey(), 'resumen' => 'Entrega con receptor designado']);
+        AsignacionResidenteJornada::where('cod_residente', $this->residente1->getKey())
+            ->where('cod_jornada', $this->jornadaEntrante->getKey())->update(['cod_personal' => $this->personalEntrante2->getKey()]);
+        $this->assertContains($pase->getKey(), array_map(fn ($fila) => $fila->getKey(), $service->obtenerPasesPendientesRecibir($this->personalEntrante2)));
+        $service->confirmarRecepcion($pase, 'Recibido tras reasignación', $this->userEntrante2);
+        $this->assertSame($this->personalEntrante2->getKey(), $pase->fresh()->cod_personal_entrante);
+        $this->assertSame('Recibido tras reasignación', $pase->fresh()->observacion_recepcion);
+        $auditoria = \Spatie\Activitylog\Models\Activity::where('subject_id', $pase->getKey())->latest('id')->firstOrFail();
+        $this->assertSame($this->personalEntrante1->getKey(), $auditoria->properties['receptor_designado']);
+        $this->assertSame($this->userEntrante2->getKey(), $auditoria->causer_id);
+    }
+
+    public function test_entrada_http_comparte_guardias_y_no_duplica_ni_oculta_el_pase_emitido(): void
+    {
+        AsignacionPersonal::whereKey('ASP_SAL_001')->update(['estado' => 'ACTIVO']);
+        $datos = ['cod_jornada_saliente' => $this->jornadaSaliente->getKey(), 'cod_jornada_entrante' => $this->jornadaEntrante->getKey(),
+            'cod_personal_entrante' => $this->personalEntrante1->getKey(), 'resumen' => 'Entrega mediante entrada HTTP'];
+        $accion = app(\App\Modulos\Cuidados\Aplicacion\Acciones\GestionarCuidadosHttp::class);
+        $pase = $accion->registrarPase($this->userSaliente, $datos, $this->residente1);
+        $this->assertSame('EMITIDO', $pase->estado);
+        $this->assertContains($pase->getKey(), array_map(fn ($fila) => $fila->getKey(), app(PaseTurnoService::class)->obtenerPasesPendientesRecibir($this->personalEntrante1)));
+        try {
+            $accion->registrarPase($this->userSaliente, $datos, $this->residente1);
+            $this->fail('El reintento no debe duplicar el pase.');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('cod_residente', $exception->errors());
+        }
+        $this->assertDatabaseCount('pases_turno', 1);
+        $this->assertSame(1, \Spatie\Activitylog\Models\Activity::where('subject_type', PaseTurno::class)->count());
+    }
+
+    public function test_campos_largos_muestran_error_visible_y_limpiar_historial_no_envia_null(): void
+    {
+        $this->actingAs($this->userSaliente);
+        Livewire::test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PaseTurnoPanel::class)
+            ->call('abrirPrepararPase', $this->residente1->getKey())->set('pendientesTurno', str_repeat('x', 3001))
+            ->call('guardarBorrador')->assertHasErrors('pendientesTurno')->assertSee('handoff-pendientesTurno-error')
+            ->call('cerrarModalPreparar')->call('cambiarTab', 'historial')->call('limpiarHistorial')
+            ->assertSet('filtroFechaHistorial', '')->assertHasNoErrors();
+        $this->assertDatabaseCount('pases_turno', 0);
+    }
+
+    public function test_guardia_nocturna_iniciada_ayer_y_relevo_cronologico(): void
+    {
+        $this->jornadaSaliente->update(['cod_turno' => $this->turnoNoche->getKey(), 'fecha_jornada' => today()->subDay()]);
+        $this->jornadaEntrante->update(['cod_turno' => $this->turnoManana->getKey()]);
+        $this->travelTo(Carbon::today()->setTime(2, 0));
+        $service = app(PaseTurnoService::class);
+        $this->assertSame($this->jornadaSaliente->getKey(), $service->resolverJornadaSaliente($this->userSaliente)->getKey());
+        $this->assertSame($this->jornadaEntrante->getKey(), $service->resolverJornadaEntrante($this->jornadaSaliente->fresh())->getKey());
+        $pase = $service->confirmarEntrega($this->userSaliente, ['cod_residente' => $this->residente1->getKey(), 'resumen' => 'Entrega durante guardia nocturna']);
+        $this->assertSame($this->jornadaSaliente->getKey(), $pase->cod_jornada_saliente);
+    }
+
+    public function test_falta_relevo_muestra_causa_y_conserva_residentes_propios(): void
+    {
+        $this->actingAs($this->userSaliente);
+        $this->jornadaEntrante->update(['estado' => 'CERRADA']);
+        Livewire::test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PaseTurnoPanel::class)
+            ->assertSee('La siguiente jornada debe estar planificada')->assertSee('Mario Gutiérrez')
+            ->assertSee('La entrega estará disponible cuando exista un relevo planificado.');
+        $this->assertDatabaseCount('pases_turno', 0);
+    }
+
+    public function test_relevo_inmediato_sin_receptor_no_se_salta_por_una_asignacion_posterior(): void
+    {
+        AsignacionResidenteJornada::where('cod_jornada', $this->jornadaEntrante->getKey())->update(['estado' => 'INACTIVA']);
+        $noche = Jornada::create(['cod_turno' => $this->turnoNoche->getKey(), 'fecha_jornada' => today(), 'estado' => 'PLANIFICADA']);
+        AsignacionPersonal::create(['cod_personal' => $this->personalEntrante1->getKey(), 'cod_jornada' => $noche->getKey(),
+            'cod_area' => $this->area->getKey(), 'estado' => 'ACTIVO']);
+        AsignacionResidenteJornada::create(['cod_residente' => $this->residente1->getKey(), 'cod_personal' => $this->personalEntrante1->getKey(),
+            'cod_jornada' => $noche->getKey(), 'estado' => 'ACTIVA']);
+        $service = app(PaseTurnoService::class);
+        $this->assertSame($this->jornadaEntrante->getKey(), $service->resolverJornadaEntrante($this->jornadaSaliente)->getKey());
+        $pase = $service->confirmarEntrega($this->userSaliente, ['cod_residente' => $this->residente1->getKey(), 'resumen' => 'Entrega al relevo inmediato sin receptor designado']);
+        $this->assertSame($this->jornadaEntrante->getKey(), $pase->cod_jornada_entrante);
+        $this->assertNull($pase->cod_personal_entrante);
+    }
+
+    public function test_anulacion_conserva_recepcion_y_la_muestra_en_el_detalle(): void
+    {
+        $service = app(PaseTurnoService::class);
+        $pase = $service->confirmarEntrega($this->userSaliente, ['cod_residente' => $this->residente1->getKey(), 'resumen' => 'Resumen que conserva su procedencia']);
+        $service->confirmarRecepcion($pase, 'Observación original de recepción', $this->userEntrante1);
+        $recepcion = $pase->fresh()->fecha_hora_recepcion;
+        $this->actingAs($this->userSaliente);
+        Livewire::test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PaseTurnoPanel::class)
+            ->call('abrirVer', $pase->getKey())->call('solicitarAnulacion')
+            ->set('motivoAnulacion', 'Corrección documentada del pase sintético')->call('confirmarAnulacion')
+            ->assertHasNoErrors()->call('abrirVer', $pase->getKey())
+            ->assertSee('Recibido por')->assertSee('Recepción confirmada')->assertSee($recepcion->format('d/m/Y H:i'))
+            ->assertSee('Observación original de recepción')->assertSee('Resumen que conserva su procedencia');
+        $pase->refresh();
+        $this->assertSame('ANULADO', $pase->estado);
+        $this->assertSame($this->personalEntrante1->getKey(), $pase->cod_personal_entrante);
+        $this->assertTrue($recepcion->equalTo($pase->fecha_hora_recepcion));
+        $this->assertSame('Corrección documentada del pase sintético', \Spatie\Activitylog\Models\Activity::where('subject_id', $pase->getKey())->latest('id')->firstOrFail()->properties['motivo']);
+        $this->assertDatabaseCount('pases_turno', 1);
+    }
+
+    public function test_fallo_de_auditoria_revierte_la_entrega_completa(): void
+    {
+        $auditoriasPrevias = \Spatie\Activitylog\Models\Activity::count();
+        \Illuminate\Support\Facades\Event::listen('eloquent.creating: '.\Spatie\Activitylog\Models\Activity::class, function () {
+            throw new \RuntimeException('Fallo sintético de auditoría');
+        });
+        try {
+            app(PaseTurnoService::class)->confirmarEntrega($this->userSaliente, ['cod_residente' => $this->residente1->getKey(), 'resumen' => 'Entrega que debe revertirse']);
+            $this->fail('No debe confirmar sin conservar la auditoría.');
+        } catch (\RuntimeException $exception) {
+            $this->assertSame('Fallo sintético de auditoría', $exception->getMessage());
+        }
+        $this->assertDatabaseCount('pases_turno', 0);
+        $this->assertDatabaseCount('activity_log', $auditoriasPrevias);
+    }
+
+    public function test_historial_pagina_y_reinicia_la_pagina_al_filtrar(): void
+    {
+        for ($numero = 1; $numero <= 13; $numero++) {
+            $historica = Jornada::create(['cod_turno' => $this->turnoManana->getKey(), 'fecha_jornada' => today()->subDays($numero), 'estado' => 'CERRADA']);
+            PaseTurno::create(['cod_residente' => $this->residente1->getKey(), 'cod_personal_saliente' => $this->personalSaliente->getKey(),
+                'cod_jornada_saliente' => $historica->getKey(), 'cod_jornada_entrante' => $this->jornadaEntrante->getKey(),
+                'fecha_hora' => now()->subDays($numero), 'resumen' => 'Resumen histórico sintético '.$numero, 'estado' => 'ENTREGADO']);
+        }
+        $this->actingAs($this->userSaliente);
+        Livewire::test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PaseTurnoPanel::class)
+            ->call('cambiarTab', 'historial')->call('limpiarHistorial')
+            ->assertSee('13 pases encontrados')->assertSee('Resumen histórico sintético 1')->assertDontSee('Resumen histórico sintético 13')
+            ->call('gotoPage', 2)->assertSee('Resumen histórico sintético 13')->assertDontSee('Resumen histórico sintético 12')
+            ->set('searchHistorial', 'sintético 2')->assertSet('paginators.page', 1)->assertSee('1 pases encontrados')
+            ->assertSee('Resumen histórico sintético 2')->assertDontSee('Resumen histórico sintético 13');
     }
 
     public function test_livewire_panel_flujo_completo(): void

@@ -19,7 +19,7 @@ final class GestionarUsuariosPanel
     public function guardarUsuario(User $actor, array $entrada, array $userData, string $estadoGuardado, string $accesoGuardado): array
     {
         abort_unless($actor->can($entrada['isEdit'] ? 'usuarios.editar' : 'usuarios.crear'), 403);
-        if ($entrada['isEdit'] && $entrada['usuarioId'] === 'USU_0001') {
+        if ($entrada['isEdit'] && User::find($entrada['usuarioId'])?->esCuentaPrincipal()) {
             $estadoGuardado = 'ACTIVO';
             $accesoGuardado = 'HABILITADO';
             $entrada['rol'] = 'admin';
@@ -103,7 +103,7 @@ final class GestionarUsuariosPanel
     public function toggleEstado(User $actor, User $usuario): string
     {
         abort_unless($actor->can('usuarios.cambiar_estado'), 403);
-        abort_if($usuario->cod_usuario === 'USU_0001' || $usuario->correo === 'admincasaamandita@gmail.com', 422, 'No puedes cambiar el estado del Administrador Principal.');
+        abort_if($usuario->esCuentaPrincipal(), 422, 'No puedes cambiar el estado del Administrador Principal.');
         abort_if($usuario->cod_usuario === $actor->getKey(), 422, 'No puedes cambiar tu propio estado.');
         if ($usuario->estado === 'ACTIVO' && $usuario->hasRole('SUPERADMINISTRADOR')) {
             abort_if(User::role('SUPERADMINISTRADOR')->where('estado', 'ACTIVO')->count() <= 1, 422, 'No puedes desactivar al único superadministrador activo.');
@@ -126,7 +126,7 @@ final class GestionarUsuariosPanel
     public function restablecerPasswordUsuario(User $actor, User $usuario): array
     {
         abort_unless($actor->can('usuarios.editar'), 403);
-        abort_if($usuario->cod_usuario === 'USU_0001' && $actor->getKey() !== 'USU_0001', 403, 'No tienes permisos para restablecer la contraseña del Administrador Principal.');
+        abort_if($usuario->esCuentaPrincipal() && ! $actor->esCuentaPrincipal(), 403, 'No tienes permisos para restablecer la contraseña del Administrador Principal.');
         $entrada = [];
         $passwordTemporal = $this->generarPasswordTemporal($actor, $entrada);
         $usuario->update([
@@ -164,7 +164,7 @@ final class GestionarUsuariosPanel
             $fam = Contacto::updateOrCreate(
                 ['cod_usuario' => $usuario->cod_usuario],
                 [
-                    'cod_contacto' => Contacto::where('cod_usuario', $usuario->cod_usuario)->value('cod_contacto') ?: ('CON_'.strtoupper(Str::random(10))),
+                    'cod_contacto' => Contacto::where('cod_usuario', $usuario->cod_usuario)->value('cod_contacto') ?: app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('contactos'),
                     'nombres' => $entrada['nombres'],
                     'apellido_paterno' => $entrada['ap_paterno'],
                     'apellido_materno' => $entrada['ap_materno'],
@@ -183,12 +183,13 @@ final class GestionarUsuariosPanel
             Personal::updateOrCreate(
                 ['cod_usuario' => $usuario->cod_usuario],
                 [
-                    'cod_personal' => Personal::where('cod_usuario', $usuario->cod_usuario)->value('cod_personal') ?: ('PER_'.strtoupper(Str::random(10))),
+                    'cod_personal' => Personal::where('cod_usuario', $usuario->cod_usuario)->value('cod_personal') ?: app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('personal'),
                     'nombres' => $entrada['nombres'],
                     'apellido_paterno' => $entrada['ap_paterno'],
                     'apellido_materno' => $entrada['ap_materno'],
                     'numero_documento' => $entrada['numero_documento'],
                     'profesion' => $entrada['rol'],
+                    'telefono' => $entrada['telefono'],
                     'fecha_ingreso' => $entrada['fecha_ingreso'],
                     'estado' => $usuario->estado,
                 ]
@@ -211,7 +212,7 @@ final class GestionarUsuariosPanel
                 'cod_contacto' => $contacto->cod_contacto,
                 'cod_residente' => $vinculo['cod_residente'] ?? null,
             ]);
-            $relacion->cod_residente_contacto ??= 'RCO_'.strtoupper(Str::random(10));
+            $relacion->cod_residente_contacto ??= app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('residentes_contactos');
             $relacion->fill([
                 'parentesco' => $vinculo['parentesco_vinculo'],
                 'responsable_principal' => ($vinculo['es_responsable'] ?? 'NO') === 'SI',

@@ -114,7 +114,7 @@ class IncidentesEnfermeriaTest extends TestCase
         $response = $this->actingAs($this->user)->get(route('admin.enfermeria.incidentes'));
         $response->assertStatus(200);
         $response->assertSee('Incidentes');
-        $response->assertSee('Registro y seguimiento de eventos');
+        $response->assertSee('Consulta lo ocurrido');
 
         // Las opciones del sidebar dependen de permisos; no exigir enlaces inaccesibles.
         $response->assertSee('id="sidebar-enfermeria"', false);
@@ -127,9 +127,9 @@ class IncidentesEnfermeriaTest extends TestCase
         Livewire::actingAs($this->user)
             ->test(IncidentesPanel::class)
             ->assertStatus(200)
-            ->assertSee('Listado')
+            ->assertSee('Activos')
             ->assertSee('Historial')
-            ->assertSee('+ Registrar incidencia');
+            ->assertSee('Registrar incidente');
     }
 
     public function test_registro_incidente_valida_campos_requeridos(): void
@@ -407,6 +407,105 @@ class IncidentesEnfermeriaTest extends TestCase
         $incidentesEnVista = $test->viewData('incidentes')->items();
 
         $this->assertEquals('INC_ORD03', $incidentesEnVista[0]->cod_incidente, 'El incidente crítico activo debe ordenarse en primer lugar.');
+    }
+
+    private function incidenteDePrueba(array $atributos = []): Incidente
+    {
+        return Incidente::create(array_merge([
+            'cod_incidente' => 'INC_UX_'.str_pad((string) (Incidente::count() + 1), 3, '0', STR_PAD_LEFT),
+            'cod_residente' => $this->residente->cod_residente,
+            'cod_personal' => $this->personal->cod_personal,
+            'tipo_incidente' => 'LESION',
+            'gravedad' => 'BAJA',
+            'fecha_hora' => now()->subMinutes(5),
+            'descripcion' => 'Evento sintético para verificar consulta y filtros.',
+            'requiere_medico' => false,
+            'requiere_derivacion' => false,
+            'estado' => 'ABIERTO',
+        ], $atributos));
+    }
+
+    public function test_activos_e_historial_separan_estados_y_limpian_estado_al_cambiar(): void
+    {
+        foreach (['ABIERTO', 'EN_SEGUIMIENTO', 'CERRADO', 'ANULADO'] as $estado) {
+            $this->incidenteDePrueba(['estado' => $estado]);
+        }
+        $panel = Livewire::actingAs($this->user)->test(IncidentesPanel::class);
+        $this->assertEquals(['listado' => 2, 'historial' => 2], $panel->viewData('conteos'));
+        $this->assertEqualsCanonicalizing(['ABIERTO', 'EN_SEGUIMIENTO'], $panel->viewData('incidentes')->pluck('estado')->all());
+        $panel->set('filtro_estado', 'ABIERTO')->call('setTab', 'historial')->assertSet('filtro_estado', '');
+        $this->assertEqualsCanonicalizing(['CERRADO', 'ANULADO'], $panel->viewData('incidentes')->pluck('estado')->all());
+        $panel->set('filtro_estado', 'ANULADO');
+        $this->assertSame('ANULADO', $panel->viewData('incidentes')->sole()->estado);
+    }
+
+    public function test_filtros_combinados_buscan_nombre_completo_y_tipos_ya_registrados(): void
+    {
+        $incidente = $this->incidenteDePrueba(['gravedad' => 'MEDIA', 'lugar' => 'Patio']);
+        $this->incidenteDePrueba(['tipo_incidente' => 'CAÍDA', 'gravedad' => 'ALTA']);
+        $panel = Livewire::actingAs($this->user)->test(IncidentesPanel::class);
+        $this->assertContains('LESION', $panel->viewData('tiposFiltro'));
+        $panel->set('search', ' Juan   Perez ')->set('filtro_tipo', 'LESION')->set('filtro_gravedad', 'MEDIA')
+            ->set('fecha_desde', today()->toDateString())->set('fecha_hasta', today()->toDateString());
+        $this->assertSame($incidente->cod_incidente, $panel->viewData('incidentes')->sole()->cod_incidente);
+        $panel->call('limpiarFiltro', 'search')->assertSet('search', '')->assertSet('filtro_tipo', 'LESION')
+            ->call('limpiarFiltro', 'tabActiva')->assertSet('tabActiva', 'listado')
+            ->call('limpiarFiltros')->assertSet('filtro_tipo', '')->assertSet('fecha_desde', '');
+        $this->assertSame(2, $panel->viewData('incidentes')->total());
+    }
+
+    public function test_fechas_invertidas_o_invalidas_muestran_error_y_no_consultan_intervalo_enganoso(): void
+    {
+        $this->incidenteDePrueba();
+        $panel = Livewire::actingAs($this->user)->test(IncidentesPanel::class)
+            ->call('toggleMasFiltros')->set('fecha_desde', '2026-10-15')->set('fecha_hasta', '2026-10-01')
+            ->assertSee('Hasta debe ser igual o posterior a Desde.');
+        $this->assertSame(0, $panel->viewData('incidentes')->total());
+        $panel->call('limpiarFiltros')->set('fecha_desde', 'fecha-invalida')->assertSee('Seleccione una fecha inicial válida.');
+        $this->assertSame(0, $panel->viewData('incidentes')->total());
+        $panel->call('limpiarFiltros');
+        $this->assertSame(1, $panel->viewData('incidentes')->total());
+    }
+
+    public function test_filtros_reinician_paginacion(): void
+    {
+        for ($i = 0; $i < 16; $i++) {
+            $this->incidenteDePrueba();
+        }
+        $panel = Livewire::actingAs($this->user)->test(IncidentesPanel::class)->call('gotoPage', 2);
+        $this->assertSame(2, $panel->viewData('incidentes')->currentPage());
+        $panel->set('search', 'Juan');
+        $this->assertSame(1, $panel->viewData('incidentes')->currentPage());
+    }
+
+    public function test_detalle_con_codigo_ajeno_no_expone_residente_ni_contactos(): void
+    {
+        $ajeno = Residente::crearDesdeAdmision(['cod_residente' => 'RES_INC_AJENO', 'nombres' => 'Otro', 'apellido_paterno' => 'Residente', 'fecha_nacimiento' => '1940-01-01', 'estado' => 'ADMITIDO']);
+        $incidente = $this->incidenteDePrueba(['cod_residente' => $ajeno->cod_residente, 'tipo_incidente' => 'TIPO PRIVADO']);
+        $panel = Livewire::actingAs($this->user)->test(IncidentesPanel::class)->assertDontSee('TIPO PRIVADO');
+        $this->assertSame(0, $panel->viewData('conteos')['listado']);
+        $this->assertNotContains('TIPO PRIVADO', $panel->viewData('tiposFiltro'));
+        $panel->call('verIncidente', $incidente->cod_incidente)->assertNotFound();
+        Livewire::actingAs($this->user)->test(IncidentesPanel::class)->call('abrirModalEstado', $incidente->cod_incidente)->assertNotFound();
+        Livewire::actingAs($this->user)->test(IncidentesPanel::class)->call('abrirModalDerivacion', $incidente->cod_incidente)->assertNotFound();
+    }
+
+    public function test_fuera_de_turno_consulta_propia_sin_acciones_de_escritura(): void
+    {
+        $this->travelTo(today()->setTime(12, 0));
+        Turno::where('cod_turno', 'TUR_INC_TEST')->update(['hora_inicio' => '18:00:00', 'hora_cierre' => '23:00:00']);
+        $incidente = $this->incidenteDePrueba();
+        Livewire::actingAs($this->user)->test(IncidentesPanel::class)
+            ->assertSee('Modo consulta')->assertDontSee('Acciones de seguimiento')->assertDontSee('Registrar incidente')
+            ->call('verIncidente', $incidente->cod_incidente)->assertSet('modalVer', true);
+        Livewire::actingAs($this->user)->test(IncidentesPanel::class)->call('abrirModalEstado', $incidente->cod_incidente)->assertForbidden();
+        $this->assertSame('ABIERTO', $incidente->fresh()->estado);
+    }
+
+    public function test_cuenta_inactiva_no_consulta_incidentes(): void
+    {
+        $this->user->update(['estado' => 'INACTIVO']);
+        Livewire::actingAs($this->user->fresh())->test(IncidentesPanel::class)->assertForbidden();
     }
 
     public function test_contacto_de_emergencia_se_muestra_en_modal_ver(): void

@@ -6,7 +6,7 @@
             @if($persona->foto)<img src="{{ asset('storage/'.$persona->foto) }}" alt="">@else{{ mb_strtoupper(mb_substr($persona->nombres, 0, 1).mb_substr($persona->apellido_paterno, 0, 1)) }}@endif
         </div>
         <div>
-            <p class="rm-caption">Residente · {{ $persona->cod_residente }}</p>
+            <p class="rm-caption">Residente</p>
             <h1 class="rm-heading-page">{{ trim($persona->nombres.' '.$persona->apellido_paterno.' '.$persona->apellido_materno) }}</h1>
             <p class="rm-body-sm">{{ $persona->fecha_nacimiento ? \Carbon\Carbon::parse($persona->fecha_nacimiento)->age.' años · ' : '' }}Documento: {{ $persona->numero_documento ?: 'Sin registrar' }}</p>
             <x-ui.status-badge :estado="$persona->estado" />

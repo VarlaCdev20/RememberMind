@@ -190,4 +190,52 @@ class AgendaMedicacionTest extends TestCase
 
         return $prescripcion;
     }
+
+    public function test_agenda_de_manana_conserva_el_reloj_real_y_el_dia_de_semana(): void
+    {
+        Carbon::setTestNow('2026-09-10 23:00:00');
+        $prescripcion = $this->crearMedicacion('06:00');
+        $prescripcion->horarios()->update(['dias_semana' => 'VIERNES']);
+        $agenda = app(AgendaMedicacionService::class)->paraAdulto($this->adulto->getKey(), now(), now()->addDay());
+        $this->assertCount(1, $agenda);
+        $this->assertSame('2026-09-11 06:00:00', $agenda->first()['programada']->toDateTimeString());
+        $this->assertSame('PENDIENTE', $agenda->first()['estado']);
+        $this->assertSame(420, $agenda->first()['minutos']);
+        $this->assertFalse($agenda->first()['se_paso']);
+        $prescripcion->update(['fecha_hora_prescripcion' => '2026-09-11 12:00:00']);
+        $this->assertCount(0, app(AgendaMedicacionService::class)->paraAdulto($this->adulto->getKey(), now(), now()->addDay()));
+        $this->assertDatabaseCount('administraciones_medicacion', 0);
+    }
+
+    public function test_administracion_anulada_no_oculta_la_dosis_pendiente(): void
+    {
+        Carbon::setTestNow('2026-09-10 09:00:00');
+        $medicacion=$this->crearMedicacion('08:00');
+        AdministracionMedicacion::create([
+            'cod_prescripcion'=>$medicacion->cod_prescripcion,'cod_horario_prescripcion'=>$medicacion->horarios()->value('cod_horario_prescripcion'),
+            'cod_residente'=>$this->adulto->cod_residente,'cod_jornada'=>$this->jornada->cod_jornada,'cod_personal'=>$this->usuario->personal->cod_personal,
+            'fecha_hora_programada'=>'2026-09-10 08:00:00','fecha_hora_administracion'=>'2026-09-10 08:00:00','resultado'=>'ADMINISTRADA','estado'=>'ANULADA',
+        ]);
+        $item=app(AgendaMedicacionService::class)->paraAdulto($this->adulto->cod_residente)->first();
+        $this->assertSame('VENCIDA',$item['estado']); $this->assertNull($item['registro']);
+        $this->assertDatabaseCount('administraciones_medicacion',1);
+        // Tampoco una omisión anulada debe originar una nueva alerta clínica.
+        AdministracionMedicacion::query()->sole()->update(['resultado' => 'OMITIDA']);
+        $this->usuario->assignRole('ADMINISTRADOR');
+        $this->usuario->givePermissionTo('alertas.gestionar');
+        $this->assertSame(0, app(\App\Modulos\Alertas\Aplicacion\Acciones\DeteccionAlertasService::class)->detectar($this->adulto->cod_residente));
+        $this->assertDatabaseCount('alertas', 0);
+    }
+
+    public function test_campana_anuncia_primera_dosis_y_su_paso_a_vencida(): void
+    {
+        Carbon::setTestNow('2026-09-10 06:00:00');
+        $this->crearMedicacion('08:00');
+        $campana=Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAbiertas',0);
+        Carbon::setTestNow('2026-09-10 07:30:00');
+        $campana->call('verificarAlertas')->assertDispatched('alerta-nueva',fn($name,$params)=>str_contains($params[0]['mensaje'],'PROXIMA'));
+        Carbon::setTestNow('2026-09-10 08:01:00');
+        $campana->call('verificarAlertas')->assertDispatched('alerta-nueva',fn($name,$params)=>str_contains($params[0]['mensaje'],'VENCIDA'));
+        $this->assertDatabaseCount('administraciones_medicacion',0);
+    }
 }

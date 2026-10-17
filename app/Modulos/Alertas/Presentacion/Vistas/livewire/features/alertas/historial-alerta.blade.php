@@ -52,7 +52,7 @@
   Motivo y Diagnóstico Clínico
   </span>
   <p class="text-xs text-[var(--rm-text-primary)] leading-relaxed">
-  <strong class="text-[var(--rm-accent-brown)]">{{ $alerta->tipo }}:</strong> {{ $alerta->descripcion }}
+  <strong class="text-[var(--rm-accent-brown)]">{{ $alerta->tipo }}:</strong> {{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($alerta->descripcion) }}
   </p>
  </div>
  </div>

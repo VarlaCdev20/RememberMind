@@ -12,6 +12,12 @@ use Illuminate\Support\Facades\Route;
 
 // Registered by routes/web.php; do not execute while loading this file.
 return [
+    'galeria' => static function (): void {
+        Route::get('/galeria', \App\Modulos\Institucion\Presentacion\Livewire\Paginas\GaleriaInstitucionalPanel::class)
+            ->middleware('permission:fotografias_institucionales.ver')->name('galeria.index');
+        Route::get('/galeria/fotografias/{fotografia}/{variante}', \App\Modulos\Institucion\Presentacion\Http\Controllers\FotografiaInstitucionalController::class)
+            ->middleware('permission:fotografias_institucionales.ver')->where('variante', 'imagen|miniatura')->name('galeria.archivo');
+    },
     'ruta_130' => static function (): void {
         Route::get('/', AsignacionTurnoPanel::class)->name('index');
     },

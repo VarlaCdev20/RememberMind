@@ -98,7 +98,7 @@
 .rm-dolor button:focus-visible { outline: var(--rm-focus-ring-width) solid var(--rm-focus-ring-color); outline-offset: var(--rm-focus-ring-offset); }
 .rm-dolor button:not(.rm-signos__graph-edge, .rm-signos__graph-move, .rm-signos__graph-resize):active { transform: translateY(1px); }
 @media (min-width: 1024px) {
-    .rm-resident-directory__register-modal--dolor:has(.rm-dolor[data-graph-open="true"]) .rm-modal-panel { width: calc(100vw - var(--rm-signos-graph-width, 560px) - 48px); max-width: calc(100vw - var(--rm-signos-graph-width, 560px) - 48px); margin-left: 0; margin-right: auto; }
+
     .rm-dolor[data-graph-open="true"] .rm-dolor__workspace { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 900px) { .rm-dolor__workspace { grid-template-columns: minmax(0,1fr); } }

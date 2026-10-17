@@ -15,7 +15,12 @@ related_modules: []
 
 # Base de datos de RememberMind
 
+**Extensión aprobada — 17/10/2026:** una tabla `fotografias_institucionales`; inventario vigente **72 operativas**, conservando las existentes. Véase [decisión Galería y 4FN](DECISION_GALERIA_INSTITUCIONAL_2026_10_17.md). Los conteos anteriores conservan el alcance de sus versiones.
+
+
 ## Inventario y evolución vigente
+
+Heridas / curaciones V2 — 11/10/2026: [extensión aprobada](DECISION_FOTOGRAFIAS_HERIDAS_V2.md). Añade únicamente dos FK opcionales e indexadas a `documentos_clinicos`; ninguna tabla nueva. [Resultado y aceptación pendiente](../frontend/FORMULARIO_HERIDAS_V2_RESULTADO.md).
 
 | Versión | Estado | Alcance | Fuente |
 |---|---|---|---|
@@ -72,3 +77,9 @@ Rutas descubiertas presentes; garantías de aplicación/SQL y motores se disting
 **HISTORICAL — DO NOT USE AS CURRENT SOURCE OF TRUTH.**
 
 [Diccionario V2.0](REMEMBERMIND_BDD_69_TABLAS.md), [inventario inicial](INVENTARIO_MIGRACION_APLICACION.md), [resultado inicial](RESULTADO_MIGRACION_APLICACION_V2.md). Se conservan rutas y contenido para trazabilidad.
+
+**Códigos correlativos — 13/10/2026:** valores `COD_<prefijo>_<correlativo>`
+ y renumeración de existentes autorizados, conservando columnas y PK/FK.
+ La tabla técnica `secuencias_codigos` está aprobada y queda fuera de las
+ 71 tablas operativas y las 23 del experto. Véase
+ [decisión de códigos](DECISION_CODIGOS_CORRELATIVOS.md).

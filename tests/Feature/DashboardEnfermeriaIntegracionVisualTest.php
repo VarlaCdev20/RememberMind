@@ -41,7 +41,8 @@ class DashboardEnfermeriaIntegracionVisualTest extends TestCase
         $this->assertStringContainsString('class="rm-dashboard-header__visual"', $html);
         $this->assertStringContainsString('489963938_1158744422930145_8442506970304201426_n.jpg', $html);
         $this->assertStringContainsString('rm-dashboard-divider', $html);
-        $this->assertSame(1, substr_count($html, 'ph-bell text-lg'));
+        $this->assertSame(1, preg_match_all('~<button\b[^>]*aria-label="Notificaciones y Alertas"~', $html));
+        $this->assertSame(1, substr_count($html, 'aria-label="Resumen visual del turno"'));
         $this->assertStringNotContainsString('nursing-welcome-search', $html);
         $this->assertStringNotContainsString('Buscar residente, habitación o diagnóstico...', $html);
         $this->assertStringNotContainsString('Indicadores de alertas existentes', $html);
@@ -63,8 +64,8 @@ class DashboardEnfermeriaIntegracionVisualTest extends TestCase
         $this->assertStringNotContainsString('Tendencia de ocupación', $html);
         $anterior = -1;
         foreach (['aria-label="Alertas prioritarias"', 'id="nursing-schedule-title"',
-            'id="nursing-tasks-title"', 'id="nursing-controls-title"', 'id="nursing-notes-title"',
-            'aria-label="Residentes del turno"'] as $seccion) {
+            'id="nursing-controls-title"', 'aria-label="Residentes del turno"',
+            'id="nursing-tasks-title"', 'id="nursing-notes-title"', 'aria-label="Evolución de incidentes"'] as $seccion) {
             $posicion = strpos($html, $seccion);
             $this->assertNotFalse($posicion, $seccion);
             $this->assertGreaterThan($anterior, $posicion, 'El orden de lectura sigue la prioridad operacional.');
@@ -84,5 +85,16 @@ class DashboardEnfermeriaIntegracionVisualTest extends TestCase
 
         $this->travelTo(Carbon::parse('2026-10-04 00:01:00'));
         $dashboard->call('refrescarTurno')->assertSet('filtroFecha', '2026-10-04');
+    }
+
+    public function test_alerta_oculta_solo_el_prefijo_tecnico_sin_alterar_la_descripcion(): void
+    {
+        $alerta = ['prioridad' => 'MEDIA', 'paciente' => 'Residente QA',
+            'descripcion' => '[heridas:COD_HER_000004] Herida cortante [observación de enfermería]'];
+        $html = \Illuminate\Support\Facades\Blade::render('<x-ui.priority-alert :alert="$alerta" />', compact('alerta'));
+        $this->assertStringNotContainsString('[heridas:COD_HER_000004]', $html);
+        $this->assertStringContainsString('Herida cortante [observación de enfermería]', $html);
+        $this->assertStringContainsString('Media', $html);
+        $this->assertSame('[heridas:COD_HER_000004] Herida cortante [observación de enfermería]', $alerta['descripcion']);
     }
 }

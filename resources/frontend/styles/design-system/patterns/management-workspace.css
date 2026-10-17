@@ -1,0 +1,56 @@
+/* Composición de Gerencia sobre las superficies y controles institucionales. */
+.rm-dashboard-composition--management { container: management-dashboard / inline-size; min-width: 0; gap: var(--rm-page-gap); }
+/* La cabecera usa el salvia de cuidado compartido, sin otra paleta por rol. */
+.rm-dashboard-composition--management > .rm-dashboard-header {
+    --rm-role-primary: var(--rm-primary);
+    --rm-role-primary-soft: var(--rm-primary-soft);
+    --rm-role-primary-alpha: color-mix(in srgb, var(--rm-primary) 14%, transparent);
+    --rm-role-ink: var(--rm-action-primary-ink);
+}
+.rm-dashboard-composition--management .rm-management-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@container management-dashboard (min-width: 960px) {
+    .rm-dashboard-composition--management .rm-management-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+.rm-dashboard-composition--management .rm-dashboard-data-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+.rm-dashboard-composition--management .rm-dashboard-data-panel { grid-column: auto; min-height: 0; max-height: none; }
+.rm-dashboard-composition--management .rm-dashboard-data-panel:nth-child(2) { grid-column: 2; grid-row: 1 / span 2; }
+.rm-dashboard-composition--management .rm-dashboard-data-panel:nth-child(3) { grid-column: 1; }
+.rm-workspace-access-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: var(--rm-space-3); }
+.rm-workspace-access-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--rm-space-3);
+    min-width: 0;
+    min-height: 100px;
+    padding: var(--rm-space-3);
+    border: 1px solid var(--rm-border-soft);
+    border-radius: var(--rm-radius-button);
+    background: color-mix(in srgb, var(--rm-surface) 86%, transparent);
+    box-shadow: var(--rm-shadow-sm);
+    color: var(--rm-text-primary);
+    text-decoration: none;
+    transition: transform var(--rm-duration-fast), background-color var(--rm-duration-fast), box-shadow var(--rm-duration-fast);
+}
+.rm-workspace-access-card__icon { display: grid; place-items: center; flex: 0 0 36px; height: 36px; border-radius: var(--rm-radius-button); background: var(--rm-sage-soft); color: var(--rm-action-primary-ink); font-size: 22px; }
+.rm-workspace-access-card:nth-child(3n + 2) .rm-workspace-access-card__icon { background: var(--rm-dashboard-clinical-100); color: var(--rm-dashboard-clinical-ink); }
+.rm-workspace-access-card:nth-child(3n) .rm-workspace-access-card__icon { background: var(--rm-dashboard-coral-100); color: var(--rm-text-primary); }
+.rm-workspace-access-card__copy { display: grid; gap: var(--rm-space-1); min-width: 0; }
+.rm-workspace-access-card__copy strong { font: 750 var(--rm-font-size-body)/1.3 var(--rm-font-friendly); overflow-wrap: anywhere; }
+.rm-workspace-access-card__copy small { font: 500 var(--rm-font-size-compact)/1.45 var(--rm-font-friendly); color: var(--rm-text-secondary); }
+.rm-workspace-access-card > .ph-arrow-up-right { margin-left: auto; color: var(--rm-text-secondary); }
+.rm-workspace-access-card:hover { transform: translateY(-2px); box-shadow: var(--rm-shadow-card); background: var(--rm-surface); }
+.rm-workspace-access-card:focus-visible { outline: 2px solid var(--rm-action-primary-ink); outline-offset: 3px; }
+@container management-dashboard (min-width: 640px) and (max-width: 959px) {
+    .rm-dashboard-composition--management .rm-workspace-access-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .rm-dashboard-composition--management .rm-workspace-access-card { grid-column: span 2; }
+    .rm-dashboard-composition--management .rm-workspace-access-card:nth-last-child(-n + 2) { grid-column: span 3; }
+}
+@container management-dashboard (max-width: 639px) {
+    .rm-workspace-access-card { min-height: 72px; }
+    .rm-dashboard-composition--management .rm-dashboard-data-grid { grid-template-columns: minmax(0, 1fr); }
+    .rm-dashboard-composition--management .rm-dashboard-data-panel:nth-child(n) { grid-column: auto; grid-row: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .rm-workspace-access-card { transition: none; }
+    .rm-workspace-access-card:hover { transform: none; }
+}

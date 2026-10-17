@@ -17,9 +17,14 @@ related_modules: []
 
 # RememberMind — Baseline Rector de la BDD Operativa
 
+**Extensión aprobada — 17/10/2026:** una tabla `fotografias_institucionales`; inventario vigente **72 operativas**, conservando las existentes. Véase [decisión Galería y 4FN](DECISION_GALERIA_INSTITUCIONAL_2026_10_17.md). Los conteos anteriores conservan el alcance de sus versiones.
+
+
 > **Extensión aprobada V2.2:** las 70 tablas V2.1 descritas aquí permanecen congeladas. La propietaria aprobó el 4 de octubre de 2026 una tabla adicional `objetivos_signos_vitales` sin alterar las existentes. El inventario vigente tiene **71 tablas operativas**. Véase [decisión V2.2](DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md).
 
 **Estado:** CONGELADO
+
+**Ampliación aprobada Heridas / Curaciones V2 — 11/10/2026:** dos FK opcionales e indexadas en `documentos_clinicos`, con borrado restrictivo hacia heridas o curaciones. Sin nuevas tablas ni columnas fotográficas en esas entidades. Alcance en [DECISION_FOTOGRAFIAS_HERIDAS_V2](DECISION_FOTOGRAFIAS_HERIDAS_V2.md); el núcleo histórico conserva su congelamiento.
 
 **Ampliación aprobada Dolor V2 — 09/10/2026:** tres columnas y self-FK con
 coherencia de residente en `valoraciones_dolor`; sin nuevas tablas. Alcance
@@ -34,6 +39,12 @@ baseline conserva su congelamiento.
 **Decisión arquitectónica:** [`DECISION_ARQUITECTURA_BDD_V2_1.md`](DECISION_ARQUITECTURA_BDD_V2_1.md)
 **Versión anterior:** BDD Operativa V2.0 — 69 tablas — HISTÓRICA
 **Documento técnico complementario:** [`docs/arquitectura/REMEMBERMIND_BASELINE_TECNICO.md`](../arquitectura/REMEMBERMIND_BASELINE_TECNICO.md)
+
+**Códigos correlativos — 13/10/2026:** valores `COD_<prefijo>_<correlativo>`
+ y renumeración de existentes autorizados, conservando columnas y PK/FK.
+ La tabla técnica `secuencias_codigos` está aprobada y queda fuera de las
+ 71 tablas operativas y las 23 del experto. Véase
+ [decisión de códigos](DECISION_CODIGOS_CORRELATIVOS.md).
 
 ---
 

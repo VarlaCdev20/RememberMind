@@ -181,8 +181,16 @@ class DashboardTurno extends Component
         $this->loadTurnoActual();
     }
 
+    private function autorizarLectura(): void
+    {
+        $usuario = Auth::user();
+        abort_unless($usuario?->fresh()?->estado === 'ACTIVO', 403, 'La cuenta de usuario no está activa.');
+        Gate::forUser($usuario)->authorize('enfermeria.ver_dashboard');
+    }
+
     public function loadTurnoActual()
     {
+        $this->autorizarLectura();
         $service = app(TurnoEnfermeriaService::class);
         $this->turnosActivos = Turno::activos()->orderBy('orden')->get();
         $this->turnoActual = $service->obtenerTurnoActivo(Auth::user(), $this->filtroFecha);
@@ -453,6 +461,7 @@ class DashboardTurno extends Component
 
     public function render()
     {
+        $this->autorizarLectura();
         $miTurnoService = app(MiTurnoService::class);
         $dashboard = $miTurnoService->obtenerDatosDashboard(Auth::user(), $this->filtroFecha);
         $incidentesTendencia = ($dashboard['estado'] ?? null) === 'SIN_JORNADA_ACTIVA'

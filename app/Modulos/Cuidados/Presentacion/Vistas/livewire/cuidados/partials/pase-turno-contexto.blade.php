@@ -1,0 +1,29 @@
+@php($legible = fn ($texto) => \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($texto))
+<p class="rm-help">Hechos de la jornada: {{ $contextoClinico['ventana'] ?? 'Ventana no disponible' }}. Los últimos registros guardados pueden ser anteriores; se indica su fecha.</p>
+@if(count($contextoClinico['alertas']) || count($contextoClinico['incidentes']))
+    <section class="rm-card rm-handoff__note"><h3>Alertas activas e incidentes relevantes</h3>
+        @foreach($contextoClinico['alertas'] as $alerta)<p><strong>{{ $alerta['prioridad'] }}</strong> · {{ $legible($alerta['titulo']) }}</p>@endforeach
+        @foreach($contextoClinico['incidentes'] as $incidente)<p><strong>{{ $incidente['tipo'] }} · {{ $incidente['gravedad'] }} · {{ $incidente['estado'] }}</strong><br>{{ $legible($incidente['descripcion']) }}</p>@endforeach
+    </section>
+@endif
+<section class="rm-card rm-handoff__note"><h3>Medicación de la jornada</h3><h4>Administraciones registradas</h4>
+    @forelse($contextoClinico['meds_administradas'] as $med)<p>{{ $med['hora'] }} · <strong>{{ $med['medicamento'] }}</strong> · Dosis: {{ $med['dosis'] }} {{ $med['unidad_dosis'] ?? 'Unidad no registrada' }} · {{ $med['via'] }}</p>@empty<p>Sin administraciones registradas en esta jornada.</p>@endforelse
+    <h4>Omisiones y dosis pendientes</h4>@forelse($contextoClinico['meds_pendientes'] as $med)<p>{{ $med['hora'] }} · <strong>{{ $med['medicamento'] }}</strong> · {{ $med['estado'] }}@if(!empty($med['motivo']))<br>Motivo: {{ $legible($med['motivo']) }}@endif</p>@empty<p>Sin omisiones ni dosis pendientes en esta ventana.</p>@endforelse
+</section>
+<section class="rm-card rm-handoff__note"><h3>Cuidados de enfermería</h3><h4>Realizados en la jornada</h4>@forelse($contextoClinico['cuidados_realizados'] as $cuidado)<p>{{ $cuidado['hora'] ?? 'Hora no registrada' }} · {{ $cuidado['intervencion'] }}</p>@empty<p>Sin cuidados registrados como realizados.</p>@endforelse
+    <h4>Pendientes comunicables</h4>@forelse($contextoClinico['cuidados_pendientes'] as $cuidado)<p>{{ $cuidado['intervencion'] }} · {{ $cuidado['estado'] }}</p>@empty<p>Sin cuidados pendientes registrados.</p>@endforelse
+</section>
+<section class="rm-card rm-handoff__note"><h3>Últimos signos vitales guardados</h3>
+    @if($sv = $contextoClinico['signos_vitales'])<time>{{ $sv->fecha_hora?->format('d/m/Y H:i') }}</time><dl class="rm-handoff__facts"><div><dt>Presión arterial</dt><dd>{{ $sv->presion_sistolica ?? 'Sin dato' }} / {{ $sv->presion_diastolica ?? 'Sin dato' }} mmHg</dd></div><div><dt>Pulso</dt><dd>{{ $sv->frecuencia_cardiaca ?? 'Sin dato' }} lpm</dd></div><div><dt>Temperatura</dt><dd>{{ $sv->temperatura ?? 'Sin dato' }} °C</dd></div><div><dt>Saturación</dt><dd>{{ $sv->saturacion_oxigeno ?? 'Sin dato' }} %</dd></div></dl>@else<p>Sin signos vitales guardados.</p>@endif
+</section>
+<section class="rm-card rm-handoff__note"><h3>Dolor · último registro</h3>@if($dolor = $contextoClinico['dolor'])<time>{{ $dolor->fecha_hora?->format('d/m/Y H:i') }}</time><p>Intensidad registrada: {{ $dolor->intensidad !== null ? $dolor->intensidad.'/10' : 'Sin dato' }} · {{ $dolor->ubicacion }}</p>@else<p>Sin valoración de dolor registrada.</p>@endif</section>
+<section class="rm-card rm-handoff__note"><h3>Heridas activas</h3>@forelse($contextoClinico['heridas'] as $herida)<p><strong>{{ $herida['tipo'] }}</strong> · {{ $herida['ubicacion'] }}<br>Última curación: {{ $herida['ultima_curacion'] ?? 'Sin registro' }}</p>@empty<p>Sin heridas activas registradas.</p>@endforelse</section>
+<section class="rm-card rm-handoff__note"><h3>Últimos registros guardados</h3>
+    @php($ingesta = $contextoClinico['ingesta'])<h4>Ingesta</h4>@if($ingesta)<time>{{ $ingesta->fecha_hora?->format('d/m/Y H:i') }}</time><p>{{ $ingesta->porcentaje_consumido !== null ? $ingesta->porcentaje_consumido.'%' : 'Sin porcentaje registrado' }} · {{ $legible($ingesta->observacion) }}</p>@else<p>Sin registro de ingesta.</p>@endif
+    @php($hidratacion = $contextoClinico['hidratacion'])<h4>Hidratación</h4>@if($hidratacion)<time>{{ $hidratacion->fecha_hora?->format('d/m/Y H:i') }}</time><p>{{ $hidratacion->cantidad_ml !== null ? $hidratacion->cantidad_ml.' ml' : 'Cantidad no registrada' }}</p>@else<p>Sin registro de hidratación.</p>@endif
+    @php($eliminacion = $contextoClinico['eliminacion'])<h4>Eliminación</h4>@if($eliminacion)<time>{{ $eliminacion->fecha_hora?->format('d/m/Y H:i') }}</time><p>{{ $eliminacion->resumenOperacional()['tipo_label'] }} · {{ $legible($eliminacion->observacion) }}</p>@else<p>Sin registro de eliminación.</p>@endif
+    @php($cognicion = $contextoClinico['cognicion'])<h4>Observación cognitiva</h4>@if($cognicion)<time>{{ $cognicion->fecha_hora?->format('d/m/Y H:i') }}</time><p>{{ $legible($cognicion->observacion) ?: 'Sin observación registrada' }}</p><p>Orientación: {{ $cognicion->orientacion_persona ?? 'Sin dato' }} / {{ $cognicion->orientacion_lugar ?? 'Sin dato' }} / {{ $cognicion->orientacion_tiempo ?? 'Sin dato' }}</p>@else<p>Sin observación cognitiva registrada.</p>@endif
+    @php($conducta = $contextoClinico['conducta'])<h4>Conducta</h4>@if($conducta)<time>{{ $conducta->fecha_hora?->format('d/m/Y H:i') }}</time><p>{{ $legible($conducta->descripcion) ?: 'Sin descripción registrada' }}</p>@else<p>Sin registro de conducta.</p>@endif
+    @php($sueno = $contextoClinico['sueno'])<h4>Sueño</h4>@if($sueno)<time>{{ $sueno->fecha?->format('d/m/Y') }}</time><p>{{ $sueno->calidad ?: 'Calidad no registrada' }}</p>@else<p>Sin registro de sueño.</p>@endif
+    @php($movilidad = $contextoClinico['movilidad'])<h4>Movilidad</h4>@if($movilidad)<time>{{ $movilidad->fecha_hora?->format('d/m/Y H:i') }}</time><p>{{ $movilidad->marcha ?: 'Marcha no registrada' }} · {{ $legible($movilidad->observacion) }}</p>@else<p>Sin registro de movilidad.</p>@endif
+</section>

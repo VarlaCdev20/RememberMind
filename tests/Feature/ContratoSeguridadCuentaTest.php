@@ -67,9 +67,11 @@ class ContratoSeguridadCuentaTest extends TestCase
 
     public function test_ultimo_superadministrador_y_cuenta_propia_no_se_bloquean(): void
     {
+        User::whereHas('roles', fn ($q) => $q->where('name', 'SUPERADMINISTRADOR'))->update(['estado'=>'INACTIVO']);
         $actor = $this->actor();
         $superadmin = User::factory()->create();
         $superadmin->assignRole('SUPERADMINISTRADOR');
+        $this->assertSame(1, User::where('estado','ACTIVO')->whereHas('roles', fn ($q) => $q->where('name','SUPERADMINISTRADOR'))->count());
         foreach ([$actor, $superadmin] as $usuario) {
             try {
                 app(GestionarSeguridadCuenta::class)->toggleAcceso($actor, $usuario);

@@ -47,9 +47,13 @@ final class PersistirEvaluacionTecnica
             }
             // Serializa reintentos del mismo residente/versión, también en PostgreSQL.
             $id = $m->contexto->evaluacion;
+            if (! preg_match('/^COD_EEX_[0-9]{6,12}$/D', $id)) {
+                throw new DomainException('Reserva una identidad correlativa de evaluación antes de construir el contexto.');
+            }
             if (DB::table('evaluaciones_expertas')->where('cod_evaluacion_experta', $id)->exists()) {
                 throw new DomainException('La evaluación ya fue conservada; una reejecución necesita identidad nueva.');
             }
+            app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->registrarExplicito('evaluaciones_expertas', $id);
             $this->validarFuentesYConocimiento($p, $m, $componentesInstrumentales);
             $resultado = $this->motor->evaluarCOGMEM($p, $m, $criterio, $contexto);
             $fecha = now()->format('Y-m-d H:i:s');
@@ -59,46 +63,48 @@ final class PersistirEvaluacionTecnica
                 'fecha_hora_inicio' => $inicio, 'fecha_hora_fin' => $fecha, 'estado_ejecucion' => 'PRUEBA_FINALIZADA',
                 'motivo_activacion' => 'Fixture técnico sin activación clínica.',
             ]);
+            $identidadesEvidencia = [];
             foreach ($m->todas() as $e) {
-                DB::table('evidencias_evaluacion')->insert(['cod_evidencia_evaluacion' => $e->id, 'cod_evaluacion_experta' => $id,
+                $identidadesEvidencia[$e->id] = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('evidencias_evaluacion');
+                DB::table('evidencias_evaluacion')->insert(['cod_evidencia_evaluacion' => $identidadesEvidencia[$e->id], 'cod_evaluacion_experta' => $id,
                     'cod_mapeo_variable_fuente' => $e->mapeoVariable, 'cod_registro_fuente' => $e->fuente->registro,
                     'estado_representacion' => $e->representacion, 'cod_valor_semantico' => $e->valor,
                     'estado_admisibilidad' => $e->admisibilidad, 'motivo_admisibilidad' => implode('; ', $e->motivos) ?: null,
                     'fecha_hora_incorporacion' => $fecha]);
             }
             foreach ($m->relaciones() as $r) {
-                DB::table('relaciones_evidencias_evaluacion')->insert(['cod_relacion_evidencia' => $this->codigo('REV', [$id, $r['origen'], $r['destino'], $r['tipo']]),
-                    'cod_evidencia_origen' => $r['origen'], 'cod_evidencia_destino' => $r['destino'], 'tipo_relacion' => $r['tipo'],
+                DB::table('relaciones_evidencias_evaluacion')->insert(['cod_relacion_evidencia' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('relaciones_evidencias_evaluacion'),
+                    'cod_evidencia_origen' => $identidadesEvidencia[$r['origen']], 'cod_evidencia_destino' => $identidadesEvidencia[$r['destino']], 'tipo_relacion' => $r['tipo'],
                     'estado' => 'PRUEBA_TECNICA', 'justificacion' => $r['justificacion'], 'fecha_hora_creacion' => $fecha]);
             }
-            $ec = $this->codigo('ECR', [$id, $criterio]);
+            $ec = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('evaluacion_criterios');
             $gate = $resultado['evaluabilidad'];
             DB::table('evaluacion_criterios')->insert(['cod_evaluacion_criterio' => $ec, 'cod_evaluacion_experta' => $id, 'cod_nodo_criterio' => $criterio,
                 'estado_evaluabilidad' => $gate['estado'], 'codigo_modificador_interpretacion' => $gate['modificador'],
                 'motivo_evaluabilidad' => implode('; ', $gate['contexto']['faltantes']) ?: null, 'fecha_hora_determinacion' => $fecha]);
             foreach ($m->participaciones()[$criterio] ?? [] as $evidencia => $rol) {
-                DB::table('evidencias_criterio_evaluacion')->insert(['cod_evidencia_criterio' => $this->codigo('EVC', [$ec, $evidencia]),
-                    'cod_evaluacion_criterio' => $ec, 'cod_evidencia_evaluacion' => $evidencia, 'rol_en_criterio' => $rol,
+                DB::table('evidencias_criterio_evaluacion')->insert(['cod_evidencia_criterio' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('evidencias_criterio_evaluacion'),
+                    'cod_evaluacion_criterio' => $ec, 'cod_evidencia_evaluacion' => $identidadesEvidencia[$evidencia], 'rol_en_criterio' => $rol,
                     'estado_participacion' => 'PRUEBA_TECNICA', 'fecha_hora_vinculacion' => $fecha]);
             }
             if ($resultado['resultado'] !== null) {
-                DB::table('resultados_criterio')->insert(['cod_resultado_criterio' => $this->codigo('RCR', [$ec]), 'cod_evaluacion_criterio' => $ec,
+                DB::table('resultados_criterio')->insert(['cod_resultado_criterio' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('resultados_criterio'), 'cod_evaluacion_criterio' => $ec,
                     'cod_valor_semantico' => $resultado['resultado']['valor'], 'fecha_hora_determinacion' => $fecha]);
             }
-            $traza = $this->codigo('TRZ', [$ec]);
+            $traza = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('trazas_inferencia');
             DB::table('trazas_inferencia')->insert(['cod_traza_inferencia' => $traza, 'cod_evaluacion_criterio' => $ec,
                 'estado_inferencia' => 'PRUEBA_FINALIZADA', 'fecha_hora_inicio' => $inicio, 'fecha_hora_fin' => $fecha]);
             foreach ($resultado['traza']['reglas'] as $r) {
-                $er = $this->codigo('ERG', [$traza, $r['regla']]);
+                $er = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('evaluaciones_reglas');
                 DB::table('evaluaciones_reglas')->insert(['cod_evaluacion_regla' => $er, 'cod_traza_inferencia' => $traza,
                     'cod_regla_experta' => $r['regla'], 'estado_regla' => $r['estado'], 'fecha_hora_evaluacion' => $fecha]);
                 foreach ($r['condiciones'] as $cond) {
-                    $ece = $this->codigo('ECN', [$er, $cond['condicion']]);
+                    $ece = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('evaluaciones_condiciones_regla');
                     DB::table('evaluaciones_condiciones_regla')->insert(['cod_evaluacion_condicion' => $ece, 'cod_evaluacion_regla' => $er,
                         'cod_condicion_regla' => $cond['condicion'], 'estado_condicion' => $cond['estado'], 'fecha_hora_evaluacion' => $fecha]);
                     foreach ($cond['soportes'] as $evidencia) {
-                        DB::table('evidencias_soporte_condicion')->insert(['cod_evidencia_soporte_condicion' => $this->codigo('ESC', [$ece, $evidencia]),
-                            'cod_evaluacion_condicion' => $ece, 'cod_evidencia_evaluacion' => $evidencia]);
+                        DB::table('evidencias_soporte_condicion')->insert(['cod_evidencia_soporte_condicion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('evidencias_soporte_condicion'),
+                            'cod_evaluacion_condicion' => $ece, 'cod_evidencia_evaluacion' => $identidadesEvidencia[$evidencia]]);
                     }
                 }
             }
@@ -107,10 +113,6 @@ final class PersistirEvaluacionTecnica
         });
     }
 
-    private function codigo(string $prefijo, array $partes): string
-    {
-        return $prefijo.'_'.substr(hash('sha256', serialize($partes)), 0, 16);
-    }
 
     private function validarFuentesYConocimiento(PaqueteConocimiento $p, MemoriaTrabajo $m, array $componentesInstrumentales): void
     {

@@ -20,7 +20,7 @@
                         <option value="">Seleccione un residente asistido</option>
                         @foreach($adultos as $ad)
                             <option value="{{ $ad->cod_residente }}">
-                                {{ $ad->ap_paterno }} {{ $ad->ap_materno }} {{ $ad->nombres }} ({{ $ad->ubicacion_texto }})
+                                {{ $ad->apellido_paterno }} {{ $ad->apellido_materno }} {{ $ad->nombres }} ({{ $ad->ubicacion_formateada }})
                             </option>
                         @endforeach
                     </select>

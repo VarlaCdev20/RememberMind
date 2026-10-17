@@ -18,13 +18,14 @@ final class CargarConocimientoOrion
     {
         $datos = $this->fuente->leer();
 
-        return DB::transaction(function () use ($autor, $datos): array {
+        return app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->serializar('versiones_modelo_experto', function () use ($autor, $datos): array {
             $usuario = User::query()->lockForUpdate()->findOrFail($autor->getKey());
             if ($usuario->estado !== 'ACTIVO' || ! $usuario->hasRole('SUPERADMINISTRADOR')
                 || ! $usuario->checkPermissionTo('auditoria.ver', 'web')) {
                 throw new DomainException('La carga documental requiere una cuenta de Superadministración activa e identificada.');
             }
-            $version = DB::table('versiones_modelo_experto')->where('cod_version_modelo', self::VERSION)->lockForUpdate()->first();
+            $version = DB::table('versiones_modelo_experto')->where('codigo_version', 'ORION-V1-20261008')->lockForUpdate()->first();
+            $versionReal = $version?->cod_version_modelo ?? app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('versiones_modelo_experto');
             $fecha = $version?->fecha_hora_creacion ?? now()->format('Y-m-d H:i:s');
             $creador = $version?->cod_usuario_creacion ?? $usuario->getKey();
             $sello = ['cod_version_modelo' => self::VERSION, 'estado' => 'INACTIVO',
@@ -52,11 +53,12 @@ final class CargarConocimientoOrion
                         .' · '.$relacion['codigo'].' · predicado documental: '.$relacion['relacion']
                         .' · estado documental: '.$relacion['estado_fuente'].'. '.$relacion['limites']];
             }
+            $filas = app(\App\Modulos\ApoyoDecision\Aplicacion\Contratos\IdentidadesConocimiento::class)->traducir($filas, self::VERSION, $versionReal, $version !== null);
             $claves = ['versiones_modelo_experto' => 'cod_version_modelo', 'nodos_semanticos' => 'cod_nodo_semantico',
                 'relaciones_semanticas' => 'cod_relacion_semantica'];
             if ($version) {
                 foreach ($filas as $tabla => $esperadas) {
-                    $guardadas = DB::table($tabla)->where('cod_version_modelo', self::VERSION)->get()->keyBy($claves[$tabla]);
+                    $guardadas = DB::table($tabla)->where('cod_version_modelo', $versionReal)->get()->keyBy($claves[$tabla]);
                     if ($guardadas->count() !== count($esperadas)) {
                         throw new DomainException('La versión documental conservada no coincide con la carga. No se sobrescribe.');
                     }
@@ -71,12 +73,12 @@ final class CargarConocimientoOrion
                     DB::table($tabla)->insert($contenido);
                 }
                 activity('sistema_experto')->causedBy($usuario)->event('conocimiento_documental_cargado')
-                    ->withProperties(['version' => self::VERSION, 'nodos' => count($datos['nodos']),
+                    ->withProperties(['version' => $versionReal, 'nodos' => count($datos['nodos']),
                         'relaciones' => count($datos['relaciones']), 'activacion_clinica' => false])
                     ->log('Carga documental de O.R.I.O.N. autorizada por la propietaria.');
             }
 
-            return ['version' => self::VERSION, 'nodos' => count($datos['nodos']), 'relaciones' => count($datos['relaciones']),
+            return ['version' => $versionReal, 'nodos' => count($datos['nodos']), 'relaciones' => count($datos['relaciones']),
                 'cargado_previamente' => $version !== null, 'activacion_clinica' => false];
         });
     }

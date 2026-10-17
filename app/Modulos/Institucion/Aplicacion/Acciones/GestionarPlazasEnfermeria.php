@@ -44,12 +44,18 @@ final class GestionarPlazasEnfermeria
             }
 
             $turnoCodigo = $entrada['turnoCodigo'];
-            $turnoId = match ($turnoCodigo) {
-                'MANANA' => 'TUR_0001', 'TARDE' => 'TUR_0002', 'NOCHE' => 'TUR_0003', default => 'TUR_0004',
+            $nombres = match ($turnoCodigo) {
+                'MANANA' => ['TURNO MAÑANA', 'MANANA'],
+                'TARDE' => ['TURNO TARDE', 'TARDE'],
+                'NOCHE' => ['TURNO NOCHE', 'NOCHE'],
+                default => ['GUARDIA CONTINUA 24H'],
             };
+            $turnos = \App\Models\Turno::query()->where('estado', 'ACTIVO')->whereIn('nombre', $nombres)->lockForUpdate()->get();
+            abort_unless($turnos->count() === 1, 422, 'Selecciona un turno vigente del catálogo; el tipo solicitado no tiene una definición única.');
+            $turnoId = $turnos->sole()->cod_turno;
             $jornada = Jornada::firstOrCreate(
                 ['cod_turno' => $turnoId, 'fecha_jornada' => $fecha],
-                ['cod_jornada' => 'JOR_'.Str::upper(Str::random(10)), 'estado' => 'ACTIVA']
+                ['cod_jornada' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('jornadas'), 'estado' => 'ACTIVA']
             );
 
             AsignacionPersonal::create([

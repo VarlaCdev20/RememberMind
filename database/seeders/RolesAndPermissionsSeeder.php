@@ -60,6 +60,7 @@ class RolesAndPermissionsSeeder extends Seeder
         ];
         $permisos = array_merge($permisos, [
             'auditoria.ver', 'usuarios.gestionar', 'personal.gestionar', 'areas.gestionar', 'turnos.gestionar',
+            'fotografias_institucionales.ver', 'fotografias_institucionales.gestionar',
             'jornadas.gestionar', 'asignaciones_personal.gestionar',
             'preadmisiones.crear', 'preadmisiones.revisar', 'admisiones.formalizar',
             'residentes.gestionar', 'residentes.actualizar_administrativo', 'residentes_contactos.gestionar',
@@ -95,7 +96,7 @@ class RolesAndPermissionsSeeder extends Seeder
         // Durante la construcción del sistema recibe todos los permisos web,
         // incluidos los que se hayan creado fuera de este seeder.
         $roles['SUPERADMINISTRADOR']->syncPermissions(
-            Permission::query()->where('guard_name', 'web')->get()
+            Permission::query()->where('guard_name', 'web')->where('name', '!=', 'fotografias_institucionales.gestionar')->get()
         );
 
         // Dirección institucional: personal, organización, planificación maestra
@@ -107,6 +108,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'reportes.ver', 'reportes.institucional',
         ]), [
             'personal_institucional.ver', 'areas.reportes', 'turnos.crear', 'turnos.editar',
+            'fotografias_institucionales.ver', 'fotografias_institucionales.gestionar',
             'turnos.cambiar_estado', 'asignacion_turno.ver', 'asignaciones.ver',
         ]))));
 
@@ -119,6 +121,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'incidentes.ver',
         ]), [
             'admisiones.ver_dashboard', 'admisiones.crear', 'asignacion_turno.ver', 'asignaciones.ver',
+            'fotografias_institucionales.ver', 'fotografias_institucionales.gestionar',
             'turnos.asignar', 'turnos.finalizar',
             'reportes.ver', 'reportes.institucional', 'reportes.exportar_pdf', 'reportes.individual',
             'documentos.subir', 'documentos.archivar',
@@ -148,6 +151,8 @@ class RolesAndPermissionsSeeder extends Seeder
             // Lecturas de cuidados aprobadas por la propietaria el 2026-10-07.
             'registros_conductuales.ver', 'registros_sueno.ver', 'registros_ingesta.ver',
             'registros_hidratacion.ver', 'registros_eliminacion.ver', 'registros_movilidad.ver',
+            // Creación contextual de episodios independientes aprobada el 2026-10-13.
+            'registros_conductuales.crear',
         ]))));
 
         $roles['PSICOLOGO/A']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'controles_cognitivos.ver', 'registros_conductuales', 'registros_sueno.ver', 'instrumentos.ver', 'preguntas_instrumento.ver', 'opciones_pregunta.ver', 'aplicaciones_instrumento', 'respuestas_instrumento.ver', 'valoraciones_psicologicas', 'planes_cuidado.ver', 'alertas.ver']));
