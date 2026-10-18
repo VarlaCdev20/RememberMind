@@ -13,6 +13,21 @@ use Illuminate\Support\Facades\Gate;
 
 class EvaluacionExpertaPolicy
 {
+    /** Guardado observacional autorizado solo a Medicina/Psicología, nunca por auditoría o rol de lectura. */
+    public function ejecutarObservaciones(User $user, Residente $residente): Response
+    {
+        $competente = false;
+        foreach (DisciplinaRevision::cases() as $disciplina) {
+            $competente = $competente || ($user->hasRole($disciplina->rol())
+                && $user->personal()->where('estado', 'ACTIVO')->where('profesion', $disciplina->value)->exists());
+        }
+
+        return $competente && $residente->estado === 'ADMITIDO'
+            && $user->checkPermissionTo('evaluaciones_expertas.ejecutar_observaciones', 'web')
+            && $this->consultarResultados($user, $residente)->allowed()
+            ? Response::allow() : Response::denyAsNotFound();
+    }
+
     /** Reutiliza el alcance técnico vigente; la lectura clínica no concede auditoría. */
     public function consultarTrazabilidad(User $user, Residente $residente): Response
     {

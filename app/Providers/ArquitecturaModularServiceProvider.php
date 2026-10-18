@@ -137,6 +137,10 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
         $this->app->bind(DocumentosUsuario::class, AlmacenamientoDocumentosUsuario::class);
         $this->app->bind(EnlacesAplicacion::class, EnlacesLaravel::class);
         $this->app->bind(ConocimientoVersionado::class, CargadorConocimiento::class);
+        $this->app->bind(\App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoObservacional::class,
+            \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\PaqueteObservacional::class);
+        $this->app->bind(\App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConservacionObservacional::class,
+            \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ConservarObservaciones::class);
         $this->app->bind(ExtraccionFuentesCOGMEM::class, AdaptadorFuentesCOGMEM::class);
         $this->app->bind(ContextoEjecucion::class, ContextoEjecucionLaravel::class);
         $this->app->bind(EstadoPrevisualizacion::class, PrevisualizacionEnSesion::class);
@@ -256,5 +260,6 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
         Livewire::component('app.frontend.livewire.superadministrador.identidad.roles-permisos-panel', RolesPermisosPanel::class);
         Livewire::component('app.frontend.livewire.superadministrador.reportes.reportes-institucionales-panel', ReportesInstitucionalesPanel::class);
         Livewire::component('app.frontend.livewire.superadministrador.sistema-experto.conocimiento-panel', ConocimientoPanel::class);
+        Livewire::component('apoyodecision.gobierno-reglas', \App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\GobiernoReglasPanel::class);
     }
 }

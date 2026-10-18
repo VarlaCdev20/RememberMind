@@ -48,9 +48,14 @@ final class IdentidadesConocimiento implements \App\Modulos\ApoyoDecision\Aplica
         foreach ($plantilla as $tabla => $filas) {
             $pk = C::clave($tabla);
             foreach ($filas as $fila) {
+                if ($tabla === 'reglas_expertas') {
+                    // Las plantillas anteriores y las reglas nuevas comparten el contrato nullable aprobado.
+                    $fila = array_replace(['cod_regla_anterior' => null, 'estado_revision' => null, 'cod_usuario_revision' => null,
+                        'fecha_hora_revision' => null, 'justificacion_revision' => null], $fila);
+                }
                 $anterior = $fila[$pk];
                 foreach ($referencias[$tabla] ?? [] as $campo => $destino) {
-                    if ($fila[$campo] !== null && isset($mapa[$destino][$fila[$campo]])) {
+                    if (($fila[$campo] ?? null) !== null && isset($mapa[$destino][$fila[$campo]])) {
                         $fila[$campo] = $mapa[$destino][$fila[$campo]];
                     }
                 }

@@ -87,8 +87,8 @@ class FrontendArchitectureTest extends TestCase
                 }
             }
         }
-        // Central de cuidados, conducta y observación cognitiva se incorporaron al módulo Cuidados.
-        $this->assertSame(75, $componentes);
+        // Incluye el nuevo panel de gobierno de reglas de ApoyoDecision.
+        $this->assertSame(76, $componentes);
     }
 
     /**

@@ -15,6 +15,10 @@ related_modules: []
 
 # Base de datos de RememberMind
 
+**Gobierno de reglas aprobado — 18/10/2026:** cinco columnas nullable en `reglas_expertas`, self-FK/FK restrictivas, índices y controles de firma e historia. Una antecesora y una decisión por revisión mantienen la 4FN; **cero tablas nuevas, 106 de negocio**. [Diccionario aprobado y límites](../sistema-experto/PROPUESTA_GOBIERNO_REGLAS_2026_10_18.md).
+
+**Origen observacional aprobado — 18/10/2026:** dos FK nullable e indexadas en `hechos_instantanea_experta`, hacia el control cognitivo y su autor original, con checks y borrado restrictivo. **Sin tablas nuevas: 33 expertas + 73 operativas = 106 tablas de negocio**. [Diccionario y autorización](../sistema-experto/PROPUESTA_CONSERVACION_OBSERVACIONAL_V1.md).
+
 **Revisiones profesionales aprobadas — 17/10/2026:** una tabla de dictámenes,
 con cadenas separadas para Psicología y Medicina. Inventario actual:
 **33 expertas + 73 operativas = 106 tablas de negocio**.

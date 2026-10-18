@@ -17,6 +17,10 @@ related_modules: []
 
 # RememberMind — Baseline Rector de la BDD Operativa
 
+**Gobierno de reglas aprobado — 18/10/2026:** cinco columnas nullable en `reglas_expertas`: antecesora, estado de revisión, usuario revisor, fecha y justificación. FK restrictivas, índices y checks; primera decisión y enlace histórico inmutables. Sin tablas nuevas; **33 expertas + 73 operativas = 106**. [Aprobación, diccionario y 4FN](../sistema-experto/PROPUESTA_GOBIERNO_REGLAS_2026_10_18.md).
+
+**Ampliación observacional aprobada — 18/10/2026:** dos FK nullable, índices y checks en `hechos_instantanea_experta` para conservar control cognitivo y autor originales. Sin tablas nuevas ni borrado de historia; se mantienen 33 expertas + 73 operativas. [Decisión y diccionario](../sistema-experto/PROPUESTA_CONSERVACION_OBSERVACIONAL_V1.md).
+
 **Revisiones profesionales aprobadas — 17/10/2026:** una tabla de dictámenes
 con Psicología y Medicina separadas; **33 expertas + 73 operativas = 106 tablas
 de negocio**. [Decisión aprobada](DECISION_REVISIONES_EXPERTAS_2026_10_17.md).

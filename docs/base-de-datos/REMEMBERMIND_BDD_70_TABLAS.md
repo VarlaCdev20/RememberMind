@@ -17,6 +17,10 @@ related_modules: []
 
 # RememberMind — BDD Operativa V2.1: 70 tablas
 
+**Gobierno de reglas aprobado — 18/10/2026:** `reglas_expertas` incorpora únicamente `cod_regla_anterior` (string20, self-FK), `estado_revision` (string20), `cod_usuario_revision` (string20, FK usuarios), `fecha_hora_revision` (datetime) y `justificacion_revision` (text), todas nullable. Firma coherente, primera decisión y antecedente inmutables; FK restrictivas e indexadas. [Diccionario, autorización y análisis de 4FN](../sistema-experto/PROPUESTA_GOBIERNO_REGLAS_2026_10_18.md). Inventario: **106 tablas de negocio**, sin tablas nuevas.
+
+**Origen observacional aprobado — 18/10/2026:** dos FK nullable, índices y checks en `hechos_instantanea_experta`, sin tablas nuevas. Inventario vigente: 33 expertas + 73 operativas = 106 de negocio. [Diccionario aprobado](../sistema-experto/PROPUESTA_CONSERVACION_OBSERVACIONAL_V1.md).
+
 **Revisiones profesionales aprobadas — 17/10/2026:** una tabla de dictámenes
 con Psicología y Medicina separadas; inventario vigente **33 expertas + 73
 operativas = 106 tablas de negocio**. [Diccionario aprobado](DECISION_REVISIONES_EXPERTAS_2026_10_17.md).

@@ -63,6 +63,10 @@ class AppServiceProvider extends ServiceProvider
         setlocale(LC_TIME, 'es_ES.utf8', 'es_ES', 'es');
 
         Permission::created(function (Permission $permission): void {
+            // La propietaria reservó esta ejecución a Medicina y Psicología, también al crear el permiso.
+            if (in_array($permission->name, ['evaluaciones_expertas.ejecutar_observaciones', 'reglas_expertas.gestionar', 'reglas_expertas.revisar'], true)) {
+                return;
+            }
             Role::query()
                 ->where('name', 'SUPERADMINISTRADOR')
                 ->where('guard_name', $permission->guard_name)

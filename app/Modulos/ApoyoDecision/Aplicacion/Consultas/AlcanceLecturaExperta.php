@@ -23,6 +23,8 @@ final class AlcanceLecturaExperta
     /** Excluye ejecuciones experimentales de la consulta asistencial sin cambiar su estado original. */
     public static function limitar(Builder $query): Builder
     {
+        // Los hallazgos observacionales tienen su propio lector; no sustituyen el perfil cognitivo histórico.
+        $query->where('origen_activacion', '<>', 'OBSERVACIONAL');
         foreach (['estado_ejecucion', 'origen_activacion'] as $campo) {
             foreach (['PRUEBA%', '%TEST%', '%EXPERIMENTAL%', '%SINTETIC%', '%ARTIFICIAL%', 'SIM-%', 'SIMUL%'] as $patron) {
                 $query->whereRaw('UPPER('.$campo.') NOT LIKE ?', [$patron]);

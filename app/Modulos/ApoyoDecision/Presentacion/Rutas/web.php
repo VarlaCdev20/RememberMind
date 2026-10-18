@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Route;
 // Registered by routes/web.php; do not execute while loading this file.
 return [
     'ruta_033' => static function (): void {
+        Route::get('/sistema-experto/reglas', \App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\GobiernoReglasPanel::class)
+            ->middleware('can:consultarGobierno,App\\Models\\VersionModeloExperto')
+            ->name('sistema-experto.reglas');
         Route::get('/sistema-experto', ConocimientoPanel::class)
             ->middleware(['role:SUPERADMINISTRADOR', 'can:consultar,App\Models\VersionModeloExperto'])
             ->name('sistema-experto.index');

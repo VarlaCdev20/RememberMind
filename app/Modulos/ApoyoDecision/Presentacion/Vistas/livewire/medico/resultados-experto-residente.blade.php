@@ -5,6 +5,7 @@
         <div class="min-w-0"><h1>Evaluación neurocognitiva</h1></div>
         <a class="rm-expert-back" href="{{ $psicologia ? route('admin.psicologia.dashboard') : ($enfermeria ? route('admin.enfermeria.pacientes', ['residente' => $codResidente]) : route('admin.medico.residente.ficha', ['adulto' => $codResidente])) }}"><i class="ph ph-arrow-left" aria-hidden="true"></i>{{ $psicologia ? 'Volver a Psicología' : ($enfermeria ? 'Volver a Mis residentes' : 'Volver a la ficha') }}</a>
     </header>
+    @can('consultarGobierno', \App\Models\VersionModeloExperto::class)<a href="{{ route('admin.sistema-experto.reglas') }}" class="rm-btn rm-btn-secondary">Consultar reglas</a>@endcan
     <p wire:loading role="status" class="text-sm">Consultando la valoración y sus fuentes…</p>
     @if($errorLectura)
         <x-ui.section-card title="No se pudo consultar la evaluación" icon="ph-warning-circle">
@@ -26,6 +27,9 @@
                 </dl>
             </div>
         </section>
+        @if($hallazgosObservacionales)
+            @include('apoyodecision::livewire.medico.resultados-experto.hallazgos-observacionales')
+        @endif
         @include('apoyodecision::livewire.medico.resultados-experto.informe-narrativo')
         @include('livewire.medico.resultados-experto.historial')
         @if(isset($revisiones['PSICOLOGIA']['estado'], $revisiones['MEDICINA']['estado']))

@@ -25,6 +25,10 @@ related_modules: []
 
 ## Modelo funcional
 
+**Gobierno de reglas — decisión expresa 18/10/2026:** Medicina y Psicología gestionan y aprueban con `reglas_expertas.ver`, `.gestionar` y `.revisar`, cuenta/personal activos y competencia real compatible. Superadministración consulta con `.ver`; los permisos de escritura no se conceden por su excepción técnica ni por el editor de roles. La firma del conocimiento es distinta de las dos revisiones de una evaluación. [Contrato y alcance aprobado](../sistema-experto/PROPUESTA_GOBIERNO_REGLAS_2026_10_18.md).
+
+**Decisión de la propietaria — 18/10/2026:** guardar ejecuciones observacionales corresponde únicamente a Medicina y Psicología, mediante `evaluaciones_expertas.ejecutar_observaciones`, profesión propia compatible, cuenta/personal activos y Policy contextual. Enfermería consulta; Superadministración no recibe este permiso por su excepción técnica general. [Alcance exacto](../sistema-experto/PROPUESTA_CONSERVACION_OBSERVACIONAL_V1.md). No habilita diagnóstico ni clasificación DCL.
+
 - `SUPERADMINISTRADOR` → máxima autoridad técnica y supervisión global del sistema.
 - `GERENTE` → dirección institucional y gestión del personal.
 - `ADMINISTRADOR` (nombre visual: **Administración**) → coordinación de la operación diaria.

@@ -48,6 +48,16 @@ final class HechoInstantaneaExperta extends ModeloExperto
         return $this->belongsTo(EvidenciaEvaluacion::class, 'cod_evidencia_evaluacion', 'cod_evidencia_evaluacion');
     }
 
+    public function controlOriginal(): BelongsTo
+    {
+        return $this->belongsTo(ControlCognitivo::class, 'cod_control_cognitivo', 'cod_control_cognitivo');
+    }
+
+    public function autorOriginal(): BelongsTo
+    {
+        return $this->belongsTo(Personal::class, 'cod_personal_autor', 'cod_personal');
+    }
+
     /** Sin parámetros: devuelve la relación Eloquent del contrato aprobado; la consulta diferida puede propagar errores SQL. */
     public function caracterizacionCognitiva(): HasOne
     {

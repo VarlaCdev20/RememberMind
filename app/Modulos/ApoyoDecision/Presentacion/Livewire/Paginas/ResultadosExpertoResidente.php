@@ -5,7 +5,10 @@ namespace App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas;
 use App\Models\EvaluacionExperta;
 use App\Models\Residente;
 use App\Models\User;
+use App\Modulos\ApoyoDecision\Aplicacion\Acciones\EjecutarObservaciones;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RevisarValoracionExperta;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarHallazgosObservacionales;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarObservacionesConservadas;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarRevisionesValoracionExperta;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaFuenteEvidencia;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaResultadosExperto;
@@ -16,11 +19,12 @@ use App\Modulos\ApoyoDecision\Dominio\Revision\DisciplinaRevision;
 use DomainException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-/** Coordina la consulta autorizada y su presentación; nunca ejecuta el motor experto. */
+/** Coordina lectura y solicitudes explícitas; el motor y la conservación permanecen en el backend. */
 class ResultadosExpertoResidente extends Component
 {
     use WithPagination;
@@ -65,6 +69,15 @@ class ResultadosExpertoResidente extends Component
     /** Procedencia derivada del resultado leído; no es un selector ni un parámetro de navegación. */
     #[Locked]
     public bool $simulacion = false;
+
+    #[Locked]
+    public ?string $evaluacionObservacional = null;
+
+    #[Locked]
+    public ?string $solicitudObservacional = null;
+
+    #[Locked]
+    public ?string $mensajeObservacional = null;
 
     /** Conserva el residente y el contexto de navegación sin ampliar las competencias del rol. */
     public function mount(Residente $residente): void
@@ -178,6 +191,35 @@ class ResultadosExpertoResidente extends Component
         $this->autorizar();
     }
 
+    /** El autor y los datos se obtienen de nuevo en backend; el cliente no elige profesional ni hechos. */
+    public function ejecutarObservaciones(): void
+    {
+        $residente = $this->autorizar();
+        Gate::authorize('ejecutarObservaciones', [EvaluacionExperta::class, $residente]);
+        $this->solicitudObservacional ??= (string) Str::uuid();
+        $this->mensajeObservacional = null;
+        $this->resetErrorBag('observaciones');
+        try {
+            $this->evaluacionObservacional = app(EjecutarObservaciones::class)->ejecutar(auth()->user(), $residente, $this->solicitudObservacional);
+            $this->mensajeObservacional = 'Evaluación observacional guardada con sus fuentes y decisiones originales.';
+            $this->resetPage('observaciones');
+        } catch (DomainException $e) {
+            report($e);
+            $this->addError('observaciones', 'No se pudo verificar y conservar la ejecución. No se ha confirmado el guardado.');
+        } catch (QueryException $e) {
+            report($e);
+            $this->addError('observaciones', 'Error técnico al conservar la ejecución. Vuelva a intentarlo; no se ha confirmado el guardado.');
+        }
+    }
+
+    public function seleccionarObservacion(string $id): void
+    {
+        $residente = $this->autorizar();
+        app(ConsultarObservacionesConservadas::class)->consultar(auth()->user(), $residente, $id);
+        $this->evaluacionObservacional = $id;
+        $this->resetPage('observaciones');
+    }
+
     /** Abre una revisión sobre la evaluación y cabeza exactas, obtenidas de nuevo del servidor. */
     public function prepararRevision(string $disciplina): void
     {
@@ -237,9 +279,14 @@ class ResultadosExpertoResidente extends Component
         $informe = null;
         $revisiones = null;
         $estadoRevision = null;
+        $hallazgosObservacionales = null;
         $puedeAuditar = Gate::allows('consultarTrazabilidad', [EvaluacionExperta::class, $residente]);
+        $puedeEjecutarObservaciones = Gate::allows('ejecutarObservaciones', [EvaluacionExperta::class, $residente]);
         abort_if($this->trazabilidadAbierta && ! $puedeAuditar, 404);
         try {
+            $hallazgosObservacionales = app(ConsultarObservacionesConservadas::class)->consultar(auth()->user(), $residente,
+                $this->evaluacionObservacional, $this->getPage('observaciones'), $this->getPage('historiaObservaciones'))
+                ?? app(ConsultarHallazgosObservacionales::class)->consultar(auth()->user(), $residente, $this->getPage('observaciones'));
             $datos = $this->leerResultados($residente, $this->evaluacion, $this->getPage('historia'));
             $presentador = app(PresentarInformeCognitivo::class);
             $informe = $this->simulacion ? $presentador->presentarSimulacion($datos, $this->criterio)
@@ -259,7 +306,7 @@ class ResultadosExpertoResidente extends Component
             $errorLectura = true;
         }
 
-        return view('livewire.medico.resultados-experto-residente', compact('datos', 'informe', 'fuente', 'errorLectura', 'residente', 'revisiones', 'estadoRevision', 'puedeAuditar'))
+        return view('livewire.medico.resultados-experto-residente', compact('datos', 'informe', 'fuente', 'errorLectura', 'residente', 'revisiones', 'estadoRevision', 'puedeAuditar', 'hallazgosObservacionales', 'puedeEjecutarObservaciones'))
             ->layout($this->enfermeria ? 'layouts.enfermeria' : 'layouts.sistema');
     }
 }
