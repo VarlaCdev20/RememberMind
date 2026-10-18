@@ -48,6 +48,51 @@
             @endif
         </section>
 
+        @if($observaciones)
+            <x-ui.section-card title="Hallazgos observacionales del seguimiento" subtitle="Primera versión de reglas descriptivas · solo lectura" icon="ph-clipboard-text">
+                <p class="text-sm text-rm-secondary leading-relaxed mb-3">
+                    Se analizaron los últimos {{ $observaciones['registros_consultados'] }} controles cognitivos vigentes del residente.
+                    Se muestran hechos registrados, no diagnósticos ni una evaluación objetiva de deterioro cognitivo.
+                </p>
+                @if($observaciones['muestra_limitada'])
+                    <p class="text-sm text-rm-secondary mb-3">La consulta está limitada a 30 controles recientes; no resume todo el historial.</p>
+                @endif
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                    @foreach($observaciones['reglas'] as $regla)
+                        <article class="rounded-xl border border-rm bg-rm-surface-soft p-4 min-w-0" wire:key="hallazgo-{{ $regla['codigo'] }}">
+                            <div class="flex flex-wrap items-start justify-between gap-2">
+                                <h3 class="font-semibold break-words">{{ $regla['nombre'] }}</h3>
+                                <span class="text-xs font-semibold px-2 py-1 rounded-md border border-rm">
+                                    {{ match ($regla['estado']) {
+                                        'CUMPLE' => 'Condición cumplida',
+                                        'NO_CUMPLE' => 'No se encontró',
+                                        default => 'Sin datos evaluables',
+                                    } }}
+                                </span>
+                            </div>
+                            <p class="text-sm leading-relaxed mt-3">{{ $regla['explicacion'] }}</p>
+                            <p class="text-xs text-rm-secondary mt-3">{{ $regla['registros_positivos'] }} marcados · {{ $regla['registros_evaluables'] }} registros con dato</p>
+                            <details class="mt-3">
+                                <summary class="cursor-pointer text-sm font-medium min-h-11">Ver condición y evidencias</summary>
+                                <p class="text-xs text-rm-secondary mt-2 break-words">{{ $regla['condicion'] }}</p>
+                                <p class="text-xs text-rm-secondary mt-2">Regla {{ $regla['codigo'] }}</p>
+                                @if($regla['soportes'])
+                                    <ul class="mt-2 space-y-2 text-xs">
+                                        @foreach($regla['soportes'] as $soporte)
+                                            <li class="break-words">Control {{ $soporte['registro'] }} · {{ $soporte['fecha'] }} · {{ $soporte['autor'] }}</li>
+                                        @endforeach
+                                    </ul>
+                                @else
+                                    <p class="text-xs text-rm-secondary mt-2">No existen evidencias positivas en esta muestra.</p>
+                                @endif
+                            </details>
+                        </article>
+                    @endforeach
+                </div>
+                <p class="text-xs text-rm-secondary leading-relaxed mt-4">{{ $observaciones['advertencia'] }} Versión {{ $observaciones['version'] }}. Esta consulta no escribe evaluaciones expertas ni modifica reglas.</p>
+            </x-ui.section-card>
+        @endif
+
         <div class="rm-expert-workspace">
             <x-ui.section-card title="Perfil cognitivo" subtitle="Seleccione un área" icon="ph-brain" class="rm-expert-profile min-w-0">
                 <nav class="rm-expert-criteria" aria-label="Áreas cognitivas">
