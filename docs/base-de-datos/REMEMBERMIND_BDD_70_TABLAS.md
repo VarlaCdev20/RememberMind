@@ -17,6 +17,15 @@ related_modules: []
 
 # RememberMind — BDD Operativa V2.1: 70 tablas
 
+**Revisiones profesionales aprobadas — 17/10/2026:** una tabla de dictámenes
+con Psicología y Medicina separadas; inventario vigente **33 expertas + 73
+operativas = 106 tablas de negocio**. [Diccionario aprobado](DECISION_REVISIONES_EXPERTAS_2026_10_17.md).
+El núcleo operativo mantiene sus columnas y relaciones.
+
+**Conservación experta V2 aprobada — 17/10/2026:** nueve tablas suplementarias y ampliaciones de D-137: **32 expertas + 73 operativas = 105 tablas de negocio**. [decisión aprobada](DECISION_CONSERVACION_EXPERTA_V2_2026_10_17.md). No activa uso asistencial; las tablas técnicas quedan fuera del conteo.
+
+**Extensión aprobada IADL — 17/10/2026:** el inventario vigente incorpora `controles_funcionales_iadl` y suma **73 operativas**. Su [diccionario aprobado](DECISION_IADL_FUENTE_EXPERTA_2026_10_17.md) se mantiene separado del núcleo de 70 y de las 23 tablas expertas.
+
 **Extensión aprobada — 17/10/2026:** una tabla `fotografias_institucionales`; inventario vigente **72 operativas**, conservando las existentes. Véase [decisión Galería y 4FN](DECISION_GALERIA_INSTITUCIONAL_2026_10_17.md). Los conteos anteriores conservan el alcance de sus versiones.
 
 

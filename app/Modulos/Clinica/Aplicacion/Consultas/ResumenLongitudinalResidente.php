@@ -8,6 +8,32 @@ use Carbon\Carbon;
 
 final class ResumenLongitudinalResidente
 {
+    /**
+     * Adapta originales de dos períodos ya filtrados a puntos de presión arterial.
+     * Conserva fechas reales, ausencias y clasificaciones. No calcula promedios,
+     * tendencias ni interpolaciones; el gráfico representa solo mediciones guardadas.
+     */
+    public function seriePresionComparada(array $actuales, array $anteriores): array
+    {
+        $puntos = [];
+        foreach (['anterior' => $anteriores, 'actual' => $actuales] as $periodo => $registros) {
+            foreach ($registros as $registro) {
+                $sis = $registro['campos']['Presión sistólica (mmHg)'];
+                $dia = $registro['campos']['Presión diastólica (mmHg)'];
+                if ($sis === null && $dia === null) {
+                    continue;
+                }
+                $clasificacion = collect($registro['clasificacion']['resultados'])
+                    ->filter(fn ($r) => in_array($r['variable'], InterpretacionSignosVitales::VARIABLES['PA'], true));
+                $puntos[] = ['codigo' => $registro['codigo'], 'fecha' => $registro['fecha_iso'],
+                    'periodo' => $periodo, 'zona' => config('app.timezone'), 'sistolica' => $sis, 'diastolica' => $dia,
+                    'clasificacion' => implode(' · ', $clasificacion->map(fn ($r) => $r['severidad'] ?? 'Sin clasificación automática')->unique()->all())];
+            }
+        }
+
+        return collect($puntos)->sortBy('fecha')->values()->all();
+    }
+
     public function consultar(Residente $residente, ?string $periodo = '7d', ?string $metricaSeleccionada = 'PA'): array
     {
         // 1. Alertas

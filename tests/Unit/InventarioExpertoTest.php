@@ -30,4 +30,21 @@ class InventarioExpertoTest extends TestCase
         $this->assertCount(70,
             InventarioExperto::excluirDelInventarioOperativo([...$operativas, ...InventarioExperto::TABLAS]));
     }
+
+    public function test_extension_aprobada_suma_32_expertas_sin_ocultar_tablas_desconocidas(): void
+    {
+        $this->assertCount(9, InventarioExperto::CONSERVACION);
+        $this->assertCount(32, [...InventarioExperto::TABLAS, ...InventarioExperto::CONSERVACION]);
+        $this->assertSame(['residentes', 'tabla_no_aprobada'], InventarioExperto::excluirDelInventarioOperativo([
+            'residentes', ...InventarioExperto::TABLAS, ...InventarioExperto::CONSERVACION, 'tabla_no_aprobada',
+        ]));
+    }
+
+    public function test_revision_profesional_aprobada_suma_33_expertas(): void
+    {
+        $this->assertCount(33, [...InventarioExperto::TABLAS, ...InventarioExperto::CONSERVACION, ...InventarioExperto::REVISION_PROFESIONAL]);
+        $this->assertSame(['residentes', 'no_aprobada'], InventarioExperto::excluirDelInventarioOperativo([
+            'residentes', 'revisiones_evaluacion_experta', 'no_aprobada',
+        ]));
+    }
 }

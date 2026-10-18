@@ -13,6 +13,7 @@ use App\Modulos\ApoyoDecision\Dominio\Reglas\BaseTecnicaDesechable;
 use App\SistemaExperto\Domain\ValueObjects\Cognicion\DominioCognitivoEnum;
 use App\SistemaExperto\Domain\ValueObjects\Cognicion\SubcomponenteCognitivoEnum;
 use App\SistemaExperto\Infrastructure\Adapters\FuentesOperativas\AdaptadorControlesCognitivos;
+use App\SistemaExperto\Infrastructure\Adapters\FuentesOperativas\AdaptadorIadlExperimental;
 use App\SistemaExperto\Infrastructure\Adapters\FuentesOperativas\AdaptadorInstrumentos;
 use App\SistemaExperto\Infrastructure\Adapters\FuentesOperativas\AdaptadorSeguimientosPedagogicos;
 use App\SistemaExperto\Infrastructure\Adapters\FuentesOperativas\AdaptadorValoracionesFuncionales;
@@ -153,7 +154,7 @@ final readonly class ExtractorVariableMapeada
      * @throws DomainException Por contexto, episodio, estado o fecha inválidos.
      * @throws RuntimeException Por base no autorizada u origen no disponible.
      */
-    public static function recuperarOperativos(AdaptadorControlesCognitivos|AdaptadorSeguimientosPedagogicos|AdaptadorValoracionesFuncionales|AdaptadorInstrumentos $adaptador,
+    public static function recuperarOperativos(AdaptadorControlesCognitivos|AdaptadorSeguimientosPedagogicos|AdaptadorValoracionesFuncionales|AdaptadorInstrumentos|AdaptadorIadlExperimental $adaptador,
         EvaluacionExperta $evaluacion, array $ids, DateTimeImmutable $corte, string $conexion, DateTimeZone $zona): Collection
     {
         self::conexionSegura($conexion);
@@ -215,6 +216,13 @@ final readonly class ExtractorVariableMapeada
                 }
             }
             $episodio = $completo->getRawOriginal($adaptador::EPISODIO);
+            // IADL admite una observación sin atención. No se fabrica un episodio
+            // para convertirla después en HechoExperto.
+            if ($adaptador instanceof AdaptadorIadlExperimental && $episodio === null) {
+                $originales[$indice] = $completo;
+
+                continue;
+            }
             if (! is_string($episodio) || $episodio === '') {
                 throw new DomainException('El registro no tiene su episodio original; no se fabrica uno.');
             }

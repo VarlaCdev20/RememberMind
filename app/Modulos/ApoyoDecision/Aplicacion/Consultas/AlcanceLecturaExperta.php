@@ -6,9 +6,10 @@ use App\Modulos\ApoyoDecision\Dominio\Reglas\BaseTecnicaDesechable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
-/** Publicación técnica aislada; nunca habilita conocimiento clínico. */
+/** Separa la consulta operativa del laboratorio y respeta el contrato de cada versión. */
 final class AlcanceLecturaExperta
 {
+    /** Habilita lectura técnica solo dentro del entorno y la base desechables aprobados. */
     public static function habilitada(): bool
     {
         if (! app()->environment('testing') || config('sistema_experto.lectura_tecnica_pruebas.habilitada') !== true) {
@@ -19,27 +20,30 @@ final class AlcanceLecturaExperta
         return BaseTecnicaDesechable::permite($c->getDriverName(), $c->getDatabaseName(), $c->getConfig('username'), $c->getConfig('host'));
     }
 
+    /** Excluye ejecuciones experimentales de la consulta asistencial sin cambiar su estado original. */
     public static function limitar(Builder $query): Builder
     {
-        if (self::habilitada()) {
-            return $query->where('cod_version_modelo', 'VER_TEST')
-                ->where('origen_activacion', 'PRUEBA_TECNICA')->where('estado_ejecucion', 'PRUEBA_FINALIZADA');
+        foreach (['estado_ejecucion', 'origen_activacion'] as $campo) {
+            foreach (['PRUEBA%', '%TEST%', '%EXPERIMENTAL%', '%SINTETIC%', '%ARTIFICIAL%', 'SIM-%', 'SIMUL%'] as $patron) {
+                $query->whereRaw('UPPER('.$campo.') NOT LIKE ?', [$patron]);
+            }
         }
+        $query->where(fn ($q) => $q->whereNull('id_evaluacion_dominio')->orWhereRaw('UPPER(id_evaluacion_dominio) NOT LIKE ?', ['SIM-%']));
 
-        return $query->whereNotLike('estado_ejecucion', 'PRUEBA%')->whereNotLike('origen_activacion', 'PRUEBA%');
+        return $query->whereHas('version', static function ($q): void {
+            foreach (['SIM-%', 'SIMUL%', '%TEST%', '%ARTIFICIAL%', '%SINTETIC%', '%EXPERIMENTAL%', 'G09-EXP%'] as $patron) {
+                $q->whereRaw('UPPER(codigo_version) NOT LIKE ?', [$patron]);
+            }
+        });
     }
 
+    /** Recupera el contrato de la versión histórica, sin adoptar el de otra versión. */
     public static function contrato(string $version): array
     {
-        if (self::habilitada() && $version === 'VER_TEST') {
-            return ['criterios' => ['COG-MEM'], 'estados_ejecucion' => ['PRUEBA_FINALIZADA'],
-                'componentes_memoria' => ['MAP_INS'], 'estados_inferencia' => ['PRUEBA_FINALIZADA'],
-                'roles_soporte' => ['INSTRUMENTAL'], 'estados_participacion_soporte' => ['PRUEBA_TECNICA']];
-        }
-
         return config('sistema_experto.lectura_clinica', [])[$version] ?? [];
     }
 
+    /** Limita el artefacto técnico a su residente, evaluación y versión artificiales. */
     public static function informe(?string $evaluacion, string $residente): ?array
     {
         if (! self::habilitada()) {

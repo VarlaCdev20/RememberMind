@@ -31,9 +31,24 @@ final class InventarioExperto
         'evidencias_soporte_condicion',
     ];
 
+    public const CONSERVACION = [
+        'hechos_instantanea_experta',
+        'evidencias_cognitivas_instantanea',
+        'soportes_sinteticos_criterio',
+        'funcionalidad_instantanea_experta',
+        'evidencias_iadl_instantanea',
+        'clasificaciones_dcl_instantanea',
+        'motivos_dcl_instantanea',
+        'reglas_aplicadas_dcl_instantanea',
+        'condiciones_regla_instantanea',
+    ];
+
+    /** Dictámenes humanos separados, extensión aprobada el 17/10/2026. */
+    public const REVISION_PROFESIONAL = ['revisiones_evaluacion_experta'];
+
     /** Excluye solamente nombres aprobados; las tablas inesperadas siguen visibles. */
     public static function excluirDelInventarioOperativo(array $tablas): array
     {
-        return array_values(array_diff($tablas, self::TABLAS));
+        return array_values(array_diff($tablas, self::TABLAS, self::CONSERVACION, self::REVISION_PROFESIONAL));
     }
 }

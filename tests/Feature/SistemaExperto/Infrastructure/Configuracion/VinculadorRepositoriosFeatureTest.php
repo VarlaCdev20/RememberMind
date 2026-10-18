@@ -184,7 +184,7 @@ final class VinculadorRepositoriosFeatureTest extends AdaptadoresTestCase
     }
 
     /** Las restricciones de escritura del puerto permanecen activas tras vincular; sin parámetros ni errores sin capturar. */
-    public function test_binding_no_habilita_escrituras_de_evaluaciones(): void
+    public function test_binding_no_crea_catalogos_de_conveniencia_para_guardar(): void
     {
         $perfil = EscenarioEntidades::perfil(['U', 'U', 'U', 'U', 'U']);
         $this->vinculador()->registrar($this->app);
@@ -193,10 +193,10 @@ final class VinculadorRepositoriosFeatureTest extends AdaptadoresTestCase
         try {
             $this->app->make(EvaluacionExpertaRepositoryInterface::class)->guardar($perfil->cognicion);
             self::fail('El binding no debe habilitar escrituras sin representación física.');
-        } catch (RuntimeException $error) {
-            self::assertStringContainsString('no habilitada', $error->getMessage());
+        } catch (DomainException $error) {
+            self::assertStringContainsString('DOMINIO:COG-MEM=U', $error->getMessage());
         }
-        self::assertSame([], DB::connection()->getQueryLog());
+        $this->exigirSoloLecturas();
         self::assertSame(0, DB::table('evaluaciones_expertas')->count());
     }
 

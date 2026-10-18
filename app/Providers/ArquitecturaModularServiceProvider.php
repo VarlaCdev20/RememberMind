@@ -124,6 +124,8 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(\App\Modulos\ApoyoDecision\Aplicacion\Contratos\LecturaSimulacionExperta::class,
+            \App\Modulos\ApoyoDecision\Infraestructura\Simulacion\LectorSimulacionLocal::class);
         $this->app->bind(\App\Modulos\Medicacion\Aplicacion\Contratos\ImagenesMedicamentos::class, \App\Modulos\Medicacion\Infraestructura\Archivos\ImagenMedicamento::class);
         $this->app->bind(\App\Modulos\Institucion\Aplicacion\Contratos\ArchivosFotografias::class, \App\Modulos\Institucion\Infraestructura\Fotografias\AlmacenamientoFotografias::class);
         $this->app->bind(\App\Modulos\Institucion\Aplicacion\Contratos\GestionFotografias::class, \App\Modulos\Institucion\Presentacion\Policies\FotografiaInstitucionalPolicy::class);
@@ -156,6 +158,9 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if ($this->app->runningInConsole()) {
+            $this->commands([\App\Modulos\ApoyoDecision\Presentacion\Consola\SimularExpertoLocal::class]);
+        }
         Gate::policy(\App\Models\FotografiaInstitucional::class, \App\Modulos\Institucion\Presentacion\Policies\FotografiaInstitucionalPolicy::class);
         Blade::component('ui.dashboard-welcome-header',
             DashboardWelcomeHeader::class);

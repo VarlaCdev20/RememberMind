@@ -97,23 +97,23 @@ final class MapeoFuentesTest extends AdaptadoresTestCase
         $this->resolver()->resolver('SIM-V1', 'SIM-CONTROLES');
     }
 
-    /** IADL ausente se informa explícitamente sin crear nada; sin parámetros ni excepciones esperadas. */
-    public function test_iadl_ausente_no_fabrica_fuente_ni_requisitos(): void
+    /** La extensión aprobada es disponible como fuente descriptiva, sin crear requisitos. */
+    public function test_iadl_aprobada_disponible_no_fabrica_requisitos(): void
     {
         $antes = DB::connection()->getSchemaBuilder()->getTableListing();
         $disponibilidad = (new AdaptadorIadlExperimental)->disponibilidad($this->conexionPruebas());
 
-        self::assertFalse($disponibilidad['disponible']);
-        self::assertStringContainsString('no está instalada', $disponibilidad['motivo']);
+        self::assertTrue($disponibilidad['disponible']);
+        self::assertStringContainsString('no acredita C03', $disponibilidad['motivo']);
         self::assertSame($antes, DB::connection()->getSchemaBuilder()->getTableListing());
     }
 
-    /** @throws RuntimeException La fuente IADL no habilitada no se suple con la funcionalidad básica. */
-    public function test_resolucion_iadl_no_disponible_es_explicita(): void
+    /** @throws DomainException Una fuente IADL con PK de otra tabla continúa siendo inválida. */
+    public function test_resolucion_iadl_rechaza_metadatos_incompatibles(): void
     {
         $this->prepararControl();
         DB::table('fuentes_datos_expertas')->update(['clave_adaptador' => 'SIM-IADL', 'tabla_raiz' => 'controles_funcionales_iadl']);
-        $this->expectException(RuntimeException::class);
+        $this->expectException(DomainException::class);
         $this->resolver()->resolver('SIM-V1', 'SIM-CONTROLES');
     }
 

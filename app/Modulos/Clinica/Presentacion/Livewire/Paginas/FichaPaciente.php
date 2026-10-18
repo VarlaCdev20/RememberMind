@@ -12,6 +12,9 @@ use App\Models\Residente;
 use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
 use App\Modulos\Alertas\Aplicacion\Acciones\RegistrarIncidenteEnFicha;
 use App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService;
+use App\Modulos\Clinica\Aplicacion\Consultas\ConsultarResumenIntegralResidente;
+use App\Modulos\Clinica\Aplicacion\Consultas\ConsultarResumenCognitivoResidente;
+use App\Modulos\Clinica\Aplicacion\Consultas\ConsultarEvolucionResidente;
 use App\Modulos\Clinica\Aplicacion\Consultas\EventosClinicosService;
 use App\Modulos\Clinica\Aplicacion\Consultas\PrepararFichaClinica;
 use App\Modulos\Clinica\Aplicacion\Consultas\ResultadosEstudiosService;
@@ -24,6 +27,8 @@ use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
 use App\Modulos\Residentes\Aplicacion\Acciones\IncorporarDocumentosExpediente;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -48,6 +53,41 @@ class FichaPaciente extends Component
     public Residente $adultoMayor;
 
     public string $tabActivo = 'resumen';
+
+    /** Período del relato clínico; solo cambia tras validación en el servidor. */
+    #[Locked]
+    public string $periodoEstado = '30d';
+
+    /** Valida la selección recibida; conserva el período anterior si la entrada es inválida. */
+    public function setPeriodoEstado(string $periodo): void
+    {
+        Validator::make(['periodoEstado' => $periodo], [
+            'periodoEstado' => 'required|in:7d,30d,90d',
+        ], ['periodoEstado.in' => 'Seleccione un período de 7, 30 o 90 días.'])->validate();
+        $this->periodoEstado = $periodo;
+        $this->resetValidation('periodoEstado');
+    }
+
+    /** Devuelve hechos y evidencia del período, reautorizados por la consulta coordinadora. */
+    public function getEstadoEvolucionProperty(): array
+    {
+        return app(ConsultarResumenIntegralResidente::class)->consultar($this->adultoMayor, $this->periodoEstado);
+    }
+
+    /** Solicita a Application dos ventanas equivalentes usando el mismo selector de Fase 1. */
+    public function getEvolucionComparadaProperty(): array
+    {
+        return app(ConsultarEvolucionResidente::class)->consultar($this->adultoMayor, $this->periodoEstado);
+    }
+
+    /** La ficha compartida distingue falta de acceso de ausencia de observaciones. */
+    public function getResumenCognitivoProperty(): ?array
+    {
+        $consulta = app(ConsultarResumenCognitivoResidente::class);
+
+        return $consulta->disponible($this->adultoMayor)
+            ? $consulta->consultar($this->adultoMayor, $this->periodoEstado) : null;
+    }
 
     public bool $modalHeridas = false;
 

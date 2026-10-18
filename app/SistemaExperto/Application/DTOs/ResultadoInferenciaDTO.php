@@ -7,6 +7,7 @@ namespace App\SistemaExperto\Application\DTOs;
 use App\SistemaExperto\Domain\Entities\Cognicion\ResultadoDominio;
 use App\SistemaExperto\Domain\Entities\Cognicion\VectorCognitivo;
 use App\SistemaExperto\Domain\Entities\Conocimiento\ReglaExperta;
+use App\SistemaExperto\Domain\Entities\Conocimiento\RelacionSemantica;
 use App\SistemaExperto\Domain\ValueObjects\Cognicion\DominioCognitivoEnum;
 use App\SistemaExperto\Domain\ValueObjects\Cognicion\EstadoDominioEnum;
 use DomainException;
@@ -40,8 +41,8 @@ use DomainException;
  * global. Los textos recibidos no acreditan por sí mismos una ejecución.
  *
  * RELACIÓN CON O.R.I.O.N.:
- * Es el contrato de salida de CU-03. El futuro caso de uso deberá proporcionar
- * resultados y trazas reales; este DTO no simula los servicios pendientes.
+ * Es el contrato de salida de CU-03. EjecutarInferenciaUseCase proporciona
+ * resultados y trazas del motor real; el DTO no sustituye su ejecución.
  */
 final readonly class ResultadoInferenciaDTO
 {
@@ -54,11 +55,20 @@ final readonly class ResultadoInferenciaDTO
     /** @var array<string, string> Textos originales de traza por identificador, en el orden recibido. */
     public array $trazas;
 
+    /** @var array<string, array> Evaluaciones originales estructuradas; no se reconstruyen leyendo textos. */
+    public array $evaluacionesReglas;
+
     /** @var array<string, string> Advertencias declaradas; no se crean advertencias clínicas. */
     public array $advertencias;
 
     /** @var array<string, string> Justificaciones originales de los dominios declarados como X. */
     public array $contradicciones;
+
+    /** @var list<RelacionSemantica> Aristas originales realmente consultadas por el motor. */
+    public array $relacionesUtilizadas;
+
+    /** @var array<string, string> Exclusiones originales; no se eliminan por producir U/I/X. */
+    public array $exclusiones;
 
     /**
      * Envuelve un perfil validado sin reconstruir ni modificar sus resultados.
@@ -69,6 +79,9 @@ final readonly class ResultadoInferenciaDTO
      * @param  array<string, list<ReglaExperta>>  $reglasPorDominio  Cinco listas explícitas, posiblemente vacías.
      * @param  array<string, string>  $trazas  Textos de ejecución recibidos; vacío conserva falta de trazas.
      * @param  array<string, string>  $advertencias  Limitaciones declaradas por el productor.
+     * @param  list<RelacionSemantica>  $relacionesUtilizadas  Aristas originales de esta versión.
+     * @param  array<string, string>  $exclusiones  Motivos originales por referencia excluida.
+     * @param  array<string, array>  $evaluacionesReglas  Resultados originales del evaluador y sus soportes.
      *
      * @throws DomainException Por contexto, versión, reglas o metadatos inválidos.
      */
@@ -79,8 +92,20 @@ final readonly class ResultadoInferenciaDTO
         array $reglasPorDominio,
         array $trazas,
         array $advertencias = [],
+        array $relacionesUtilizadas = [],
+        array $exclusiones = [],
+        array $evaluacionesReglas = [],
     ) {
         $solicitud->exigirContexto($perfilCognitivo->memoria);
+        foreach ($evaluacionesReglas as $id => $evaluacion) {
+            if (! is_array($evaluacion) || ! ($evaluacion['regla'] ?? null) instanceof ReglaExperta
+                || $evaluacion['regla']->id !== $id || $evaluacion['regla']->versionConocimiento !== $solicitud->versionConocimiento
+                || ($evaluacion['memoria'] ?? null) !== $perfilCognitivo->memoria
+                || ! ($evaluacion['estado'] ?? null) instanceof \App\SistemaExperto\Domain\ValueObjects\Conocimiento\EstadoReglaEnum) {
+                throw new DomainException('Evaluación estructurada ajena al resultado original.');
+            }
+        }
+        $this->evaluacionesReglas = $evaluacionesReglas;
         $codigos = array_column(DominioCognitivoEnum::cases(), 'value');
         if ($versionMotor === '' || preg_match('/[\x00-\x20\x7F]/', $versionMotor) === 1
             || count($reglasPorDominio) !== count($codigos) || array_diff(array_keys($reglasPorDominio), $codigos) !== []) {
@@ -115,6 +140,19 @@ final readonly class ResultadoInferenciaDTO
         $this->trazas = self::copiarTextos($trazas);
         $this->advertencias = self::copiarTextos($advertencias);
         $this->contradicciones = $contradicciones;
+        if (! array_is_list($relacionesUtilizadas)) {
+            throw new DomainException('Las relaciones utilizadas deben ser una lista.');
+        }
+        $relaciones = [];
+        foreach ($relacionesUtilizadas as $r) {
+            if (! $r instanceof RelacionSemantica || $r->versionConocimiento !== $solicitud->versionConocimiento
+                || isset($relaciones[$r->id])) {
+                throw new DomainException('Relación utilizada inválida, duplicada o de otra versión.');
+            }
+            $relaciones[$r->id] = $r;
+        }
+        $this->relacionesUtilizadas = array_values($relaciones);
+        $this->exclusiones = self::copiarTextos($exclusiones);
     }
 
     /**

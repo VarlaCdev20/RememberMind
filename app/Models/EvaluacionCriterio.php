@@ -44,4 +44,22 @@ class EvaluacionCriterio extends ModeloExperto
     {
         return $this->hasOne(TrazaInferencia::class, 'cod_evaluacion_criterio', 'cod_evaluacion_criterio');
     }
+
+    /** Relación original del contrato de conservación aprobado. */
+    public function padreConservacion(): BelongsTo
+    {
+        return $this->belongsTo(EvaluacionCriterio::class, 'cod_criterio_padre', 'cod_evaluacion_criterio');
+    }
+
+    /** Relación original del contrato de conservación aprobado. */
+    public function subcriteriosConservacion(): HasMany
+    {
+        return $this->hasMany(EvaluacionCriterio::class, 'cod_criterio_padre', 'cod_evaluacion_criterio');
+    }
+
+    /** Relación original del contrato de conservación aprobado. */
+    public function soportesSinteticos(): HasMany
+    {
+        return $this->hasMany(SoporteSinteticoCriterio::class, 'cod_evaluacion_criterio', 'cod_evaluacion_criterio');
+    }
 }

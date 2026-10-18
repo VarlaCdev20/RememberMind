@@ -159,11 +159,11 @@ final class EvidenciaEloquentRepositoryTest extends RepositoriosTestCase
             ->paraEvaluacion('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', self::corte());
     }
 
-    /** @throws DomainException La extensión IADL ausente no se consulta ni se sustituye por BADL. */
-    public function test_no_consulta_una_fuente_iadl_no_soportada(): void
+    /** @throws DomainException IADL aprobada no admite PK/metadatos de otra fuente ni sustitución BADL. */
+    public function test_no_consulta_una_fuente_iadl_con_metadatos_de_otra_tabla(): void
     {
         EscenarioRepositorios::evidencia();
-        self::assertFalse(Schema::hasTable('controles_funcionales_iadl'));
+        self::assertTrue(Schema::hasTable('controles_funcionales_iadl'));
         DB::table('fuentes_datos_expertas')->update(['tabla_raiz' => 'controles_funcionales_iadl']);
         $this->expectException(DomainException::class);
         $this->evidencias(static function (): never {

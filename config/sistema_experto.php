@@ -9,4 +9,9 @@ return [
     // Solo se configura explícitamente en el arranque de la BDD de QA.
     // APP_ENV=testing y nombre desechable siguen siendo obligatorios.
     'lectura_tecnica_pruebas' => ['habilitada' => false],
+    // Capacidad local para la cohorte ficticia autorizada; jamás habilita publicación clínica.
+    'simulacion_local' => [
+        'habilitada' => filter_var(env('SISTEMA_EXPERTO_SIMULACION_LOCAL', false), FILTER_VALIDATE_BOOL),
+        'base_permitida' => env('SISTEMA_EXPERTO_SIMULACION_BASE', ''),
+    ],
 ];

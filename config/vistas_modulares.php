@@ -139,6 +139,8 @@ return [
     'livewire.medicacion.salud-administracion-medicacion' => 'app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/salud-administracion-medicacion.blade.php',
     'livewire.medicacion.salud-medicacion' => 'app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/salud-medicacion.blade.php',
     'livewire.medico.resultados-experto.evidencias' => 'app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/evidencias.blade.php',
+    // Mantiene la información documental y los controles originales dentro de la misma pantalla de consulta.
+    'livewire.medico.resultados-experto.complemento' => 'app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/complemento.blade.php',
     'livewire.medico.resultados-experto.fundamento' => 'app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/fundamento.blade.php',
     'livewire.medico.resultados-experto.historial' => 'app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/historial.blade.php',
     'livewire.medico.resultados-experto.simulado' => 'app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/simulado.blade.php',

@@ -15,6 +15,15 @@ related_modules: []
 
 # Base de datos de RememberMind
 
+**Revisiones profesionales aprobadas — 17/10/2026:** una tabla de dictámenes,
+con cadenas separadas para Psicología y Medicina. Inventario actual:
+**33 expertas + 73 operativas = 106 tablas de negocio**.
+[Diccionario, aprobación y límites](DECISION_REVISIONES_EXPERTAS_2026_10_17.md).
+
+**Conservación experta V2 aprobada — 17/10/2026:** nueve tablas suplementarias y ampliaciones de D-137: **32 expertas + 73 operativas = 105 tablas de negocio**. [decisión aprobada](DECISION_CONSERVACION_EXPERTA_V2_2026_10_17.md). No activa uso asistencial; las tablas técnicas quedan fuera del conteo.
+
+**Extensión aprobada IADL — 17/10/2026:** `controles_funcionales_iadl`; inventario vigente **73 operativas**, sin alterar las anteriores ni las 23 expertas. [Diccionario y límites aprobados](DECISION_IADL_FUENTE_EXPERTA_2026_10_17.md). No autoriza pantallas, permisos ni clasificación clínica.
+
 **Extensión aprobada — 17/10/2026:** una tabla `fotografias_institucionales`; inventario vigente **72 operativas**, conservando las existentes. Véase [decisión Galería y 4FN](DECISION_GALERIA_INSTITUCIONAL_2026_10_17.md). Los conteos anteriores conservan el alcance de sus versiones.
 
 

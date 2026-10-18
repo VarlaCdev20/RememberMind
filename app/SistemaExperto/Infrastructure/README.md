@@ -2,7 +2,16 @@
 
 Alcance: PoC experimental con datos sintéticos. Las lecturas se restringen a
 `testing` y a destinos admitidos por `BaseTecnicaDesechable`. No hay registro
-automático en providers, acceso asistencial, inferencia clínica ni cambios de esquema.
+automático en providers, acceso asistencial ni inferencia clínica. La extensión
+IADL y la conservación V2 de nueve tablas fueron aprobadas explícitamente el
+17/10/2026. Ambas están implementadas sin activación asistencial.
+
+Excepción local autorizada posteriormente: la capacidad optativa
+`ContextoSimulacionLocal` conecta exclusivamente el paquete
+`SIM-ORION-LOCAL-1` y cinco residentes ficticios en `remembermind_dev`.
+Los adaptadores generales y repositorios sin esa capacidad mantienen su
+restricción a testing. Véase el [contrato de simulación local](../../../docs/sistema-experto/SIMULACION_LOCAL_2026_10_17.md).
+No modifica `lectura_clinica` ni activa versiones documentales pendientes.
 
 ## Componentes implementados
 
@@ -34,7 +43,7 @@ Infrastructure/
         └── ReglaExpertaEloquentRepository.php
 ```
 
-Las dieciséis clases incluyen `declare(strict_types=1);` y PHPDoc en español.
+Las clases nuevas incluyen `declare(strict_types=1);` y PHPDoc en español.
 Los modelos permanecen en `App\Models` y conservan sus PK `cod_*`.
 
 | Puerto de Domain | Implementación en Persistence/Repositories | Mapper |
@@ -57,7 +66,7 @@ Los puertos tienen prefijo `App\SistemaExperto\Domain\Repositories`.
 5. Registro `clave_adaptador => instancia conocida`. Los selectores instrumentales
    se entregan a `AdaptadorInstrumentos` agrupados por versión del conocimiento.
 6. `Closure(string $evaluacionId, string $residenteId, string $versionConocimiento,
-   DateTimeImmutable $fechaCorte): MemoriaTrabajo` que recupera la instantánea original.
+   DateTimeImmutable $fechaCorte): MemoriaTrabajo` opcional para recuperar memoria de evaluaciones anteriores; V2 no lo necesita.
 
 Después de construirlo, `registrar($contenedorLaravel)` comprueba `testing` y el
 destino desechable antes de registrar catorce bindings: cuatro interfaces,
@@ -85,7 +94,7 @@ Un registro futuro en el arranque institucional permanece fuera de esta entrega.
 | Seguimientos pedagógicos | `seguimientos_pedagogicos` | Campos explícitos y actividad original como episodio |
 | Valoraciones funcionales | `valoraciones_funcionales` | BADL como hechos; no sustituye IADL ni acredita C03 |
 | Instrumentos | `aplicaciones_instrumento`, `instrumentos`, `respuestas_instrumento`, `preguntas_instrumento`, `opciones_pregunta` | Totales brutos o respuestas mediante selector registrado y versión formal exacta |
-| IADL experimental | `controles_funcionales_iadl` | No habilitado: informa ausencia física o falta de contrato de lectura aprobado |
+| IADL experimental | `controles_funcionales_iadl` | Fuente aprobada, lectura descriptiva con columnas fijas; no acredita C03 |
 
 `NULL` permanece `NULL`. Una fila ausente es un error de disponibilidad y no
 un resultado normal. Un booleano `false` y un cero conocido no son ausencia.
@@ -93,22 +102,39 @@ Los accessors de presentación no se usan para completar valores.
 Los decimales se transportan como texto sin baremación; se respeta la
 materialización del motor SQL, sin declarar que SQLite preserve su escala como PostgreSQL.
 Las aplicaciones instrumentales deben conservar su estado original `COMPLETA`.
+IADL conserva `REGISTRADO`/`RECTIFICACION`, oportunidad, desempeño, causa y nivel
+previo originales. Una atención NULL sigue siendo NULL en lectura; incorporarla
+a Domain exige un episodio explícito, que el mapper no fabrica.
 
 Las fuentes posteriores al corte solo aportan metadatos para excluirlas;
 no se leen sus valores ni respuestas. Se contrastan residente, versión, estado,
 fecha, episodio y procedencia. Una misma fuente/episodio no se convierte en
 corroboración independiente.
 
-D-137 no conserva el corte clínico ni toda la memoria original de Domain.
-El vinculador exige un recuperador explícito y no fabrica un almacén ni una
-instantánea vacía para ocultar esa limitación. Los literales descriptivos G09
-no se convierten en A/P/U/I/X. Los resultados de Domain solo se recuperan si sus
-literales, soportes y memoria originales son representables y coherentes.
+## Conservación V2 aprobada
 
-`guardar`, `guardarClasificacion` y la recuperación DCL de una evaluación
-existente fallan explícitamente: el esquema no representa íntegramente la
-instantánea ni C01–C05 y su versión contractual. No hay escrituras parciales,
-diagnósticos persistidos ni confirmaciones ficticias de conservación.
+`CatalogoConservacionExperta::preparar(conexion, version, usuario)` instala
+explícitamente los catálogos técnicos de una versión y usuario existentes.
+Se restringe a testing/base desechable; sus valores son EXPERIMENTAL, separados
+de G09. El escritor nunca crea conocimiento o referencias como fallback.
+
+`EvaluacionExpertaEloquentRepository` acepta null como recuperador de memoria.
+Para ORION-SNAP-2 delega en `AlmacenInstantaneas`; el recuperador anterior solo
+se usa con cabeceras D-137 anteriores. `VinculadorRepositorios` lo conecta sin
+un provider global y configura el extractor original para fuentes institucionales.
+
+`guardar(vector)` conserva la memoria y resultados en una transacción.
+`guardarClasificacion(resultado)` exige cognición previa idéntica y conserva
+funcionalidad, IADL, C01–C05, motivos y reglas en otra transacción. Un reintento
+idéntico no escribe; contenido distinto con la misma identidad se rechaza.
+La lectura reconstruye hechos compartidos y verifica tipos, orden, fechas,
+procedencia y huellas sin consultar nuevamente valores operativos mutables.
+
+La [decisión aprobada](../../../docs/base-de-datos/DECISION_CONSERVACION_EXPERTA_V2_2026_10_17.md)
+contiene el diccionario físico de las nueve tablas, ampliaciones de criterios,
+catálogos y reversión protegida. El inventario es 73 operativas y 32 expertas,
+105 de negocio, con técnicas/framework fuera de ese contador. No incluye
+pantallas, permisos, informes clínicos o clasificación asistencial.
 
 ## Modelos existentes y traslado posterior
 

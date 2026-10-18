@@ -7,12 +7,18 @@ namespace Tests\Unit\SistemaExperto\Domain\Services;
 use App\SistemaExperto\Domain\Services\Compuertas\EvaluadorConfusoresService;
 use App\SistemaExperto\Domain\Services\Compuertas\EvaluadorEvaluabilidadService;
 use App\SistemaExperto\Domain\Services\Compuertas\VerificadorEvidenciaService;
+use App\SistemaExperto\Domain\Services\Dcl\ClasificadorPetersenService;
+use App\SistemaExperto\Domain\Services\Dcl\EvaluadorRequisitosDclService;
+use App\SistemaExperto\Domain\Services\Explicacion\GeneradorExplicacionService;
+use App\SistemaExperto\Domain\Services\Inferencia\EvaluadorReglasService;
+use App\SistemaExperto\Domain\Services\Inferencia\IntegradorDominiosService;
+use App\SistemaExperto\Domain\Services\Inferencia\MotorInferenciaService;
 use App\SistemaExperto\Domain\Services\Semantica\EvaluadorRedSemanticaService;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
 /**
- * TÍTULO: Documentación y frontera de los cuatro servicios solicitados.
+ * TÍTULO: Documentación y frontera de los diez servicios solicitados.
  *
  * CAPA: Domain (verificación unitaria).
  *
@@ -45,7 +51,9 @@ final class ContratoServiciosTest extends TestCase
     public function test_servicios_puros_tipados_y_documentados(): void
     {
         foreach ([VerificadorEvidenciaService::class, EvaluadorConfusoresService::class,
-            EvaluadorEvaluabilidadService::class, EvaluadorRedSemanticaService::class] as $clase) {
+            EvaluadorEvaluabilidadService::class, EvaluadorRedSemanticaService::class,
+            MotorInferenciaService::class, EvaluadorReglasService::class, IntegradorDominiosService::class,
+            ClasificadorPetersenService::class, EvaluadorRequisitosDclService::class, GeneradorExplicacionService::class] as $clase) {
             $r = new ReflectionClass($clase);
             self::assertTrue($r->isFinal());
             self::assertTrue($r->isReadOnly());
@@ -68,5 +76,4 @@ final class ContratoServiciosTest extends TestCase
             }
         }
     }
-
 }

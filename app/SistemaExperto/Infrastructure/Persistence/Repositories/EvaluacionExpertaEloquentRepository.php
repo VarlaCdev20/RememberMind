@@ -13,9 +13,11 @@ use App\SistemaExperto\Domain\Entities\Cognicion\VectorCognitivo;
 use App\SistemaExperto\Domain\Entities\Dcl\ResultadoClasificacionDcl;
 use App\SistemaExperto\Domain\Entities\Hechos\MemoriaTrabajo;
 use App\SistemaExperto\Domain\Repositories\Evaluaciones\EvaluacionExpertaRepositoryInterface;
+use App\SistemaExperto\Infrastructure\Persistence\Conservacion\AlmacenInstantaneas;
 use App\SistemaExperto\Infrastructure\Persistence\Mappers\MapeadorResultados;
 use Closure;
 use DateTimeImmutable;
+use DateTimeZone;
 use DomainException;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
@@ -24,49 +26,51 @@ use RuntimeException;
 
 /**
  * TÍTULO:
- * Lectura Eloquent de perfiles experimentales con memoria original.
+ * Conservación Eloquent de perfiles experimentales.
  *
  * CAPA:
  * Infrastructure - Persistence - Repositories.
  *
  * ¿PARA QUÉ SIRVE?
- * Implementa el puerto de evaluaciones en el alcance de lectura permitido.
+ * Implementa el puerto completo y preserva lecturas anteriores.
  *
  * ¿QUÉ INFORMACIÓN RECIBE?
- * Contexto exacto, mapper, conexión segregada y recuperador de la instantánea
- * original. D-137 no almacena su corte, valores brutos ni todas sus declaraciones.
+ * Contexto exacto, conexión segregada y extractores explícitos.
  *
  * ¿QUÉ HACE?
- * Consulta cabecera, criterios, resultados y soportes con relaciones precargadas.
- * Contrasta la memoria original y delega la conversión en MapeadorResultados.
+ * Delega instantáneas V2 al almacén y las anteriores al mapper D-137.
  *
  * ¿QUÉ DEVUELVE?
- * VectorCognitivo o null si la evaluación no existe.
+ * Memoria, perfil y clasificación originales o ausencia explícita.
  *
  * ¿QUÉ NO DEBE HACER?
- * No sustituye la memoria original por una extracción actual, interpreta G09
- * como A/P, crea C01–C05 ni inventa persistencia del contrato DCL.
- * Las escrituras del puerto quedan expresamente deshabilitadas: el esquema
- * no conserva la instantánea completa y esta etapa no autoriza modificarlo.
- * Una clasificación existente no representable provoca error, nunca falso null.
+ * No reinterpreta G09, crea fuentes, sobrescribe historia ni
+ * oculta una instantánea nueva incompleta mediante el recuperador anterior.
  */
 final readonly class EvaluacionExpertaEloquentRepository implements EvaluacionExpertaRepositoryInterface
 {
+    private AlmacenInstantaneas $almacen;
+
     /**
      * Recibe la recuperación de memoria, sin crear otra ni registrar bindings.
      *
      * @param  MapeadorResultados  $mapeador  Conversor de resultados existentes.
-     * @param  Closure(string, string, string, DateTimeImmutable): MemoriaTrabajo  $recuperarMemoria  Instantánea original del contexto y corte exactos.
+     * @param  Closure|null  $recuperarMemoria  Instantánea original del contexto y corte exactos.
      * @param  string  $conexionExperimental  Nombre de base técnica segregada.
+     * @param  Closure|null  $extraerOriginal  Extracción por lote para contrastar fuentes institucionales al guardar.
+     * @param  DateTimeZone|null  $zona  Zona explícita de las columnas operativas originales.
      *
      * @throws DomainException Por nombre de conexión inválido.
      */
     public function __construct(
         /** Conversor sin inferencia. */ private MapeadorResultados $mapeador,
-        /** Recuperador explícito; no representa un almacén nuevo ni un dato inventado. */ private Closure $recuperarMemoria,
+        /** Recuperador explícito; no representa un almacén nuevo ni un dato inventado. */ private ?Closure $recuperarMemoria,
         /** Destino técnico obligatorio. */ private string $conexionExperimental,
+        ?Closure $extraerOriginal = null,
+        ?DateTimeZone $zona = null,
     ) {
         self::validarIdentidades($conexionExperimental);
+        $this->almacen = new AlmacenInstantaneas($conexionExperimental, $extraerOriginal, $zona ?? new DateTimeZone('UTC'));
     }
 
     /**
@@ -84,9 +88,16 @@ final readonly class EvaluacionExpertaEloquentRepository implements EvaluacionEx
     public function obtener(string $evaluacionId, string $residenteId, string $versionConocimiento, DateTimeImmutable $fechaCorte): ?VectorCognitivo
     {
         self::validarContexto($evaluacionId, $residenteId, $versionConocimiento);
+        $cabeceraNueva = $this->almacen->cabecera($evaluacionId);
+        if ($cabeceraNueva !== null && $cabeceraNueva->version_conservacion !== null) {
+            return $this->almacen->obtener($evaluacionId, $residenteId, $versionConocimiento, $fechaCorte);
+        }
         $fila = $this->cabecera($evaluacionId, $residenteId, $versionConocimiento);
         if ($fila === null) {
             return null;
+        }
+        if ($this->recuperarMemoria === null) {
+            throw new RuntimeException('La evaluación anterior exige su recuperador de memoria explícito.');
         }
         $memoria = ($this->recuperarMemoria)($evaluacionId, $residenteId, $versionConocimiento, $fechaCorte);
         if (! $memoria instanceof MemoriaTrabajo) {
@@ -150,47 +161,51 @@ final readonly class EvaluacionExpertaEloquentRepository implements EvaluacionEx
     }
 
     /**
-     * Rechaza la escritura que el contrato físico actual no puede preservar.
+     * Conserva la memoria y los resultados originales de forma atómica.
      *
      * @param  VectorCognitivo  $evaluacion  Instantánea original que no será modificada.
-     * @return void No persiste ni confirma una conservación inexistente.
+     * @return void Conserva una vez; un reintento idéntico no escribe.
      *
-     * @throws RuntimeException Siempre: escritura completa no habilitada en esta etapa.
+     * @throws RuntimeException Por fallo técnico de escritura; la transacción revierte sus efectos.
      */
     public function guardar(VectorCognitivo $evaluacion): void
     {
-        throw new RuntimeException('Escritura no habilitada: D-137 no conserva la instantánea completa de Domain.');
+        $this->almacen->guardar($evaluacion);
     }
 
     /**
-     * Rechaza guardar una clasificación cuyo contrato no tiene representación física.
+     * Conserva clasificación, requisitos y soportes sobre la cognición ya guardada.
      *
      * @param  ResultadoClasificacionDcl  $resultado  Clasificación experimental original.
      * @return void No escribe diagnósticos ni resultados parciales.
      *
-     * @throws RuntimeException Siempre: conservación DCL no habilitada.
+     * @throws RuntimeException Por fallo técnico; no confirma una clasificación parcial.
      */
     public function guardarClasificacion(ResultadoClasificacionDcl $resultado): void
     {
-        throw new RuntimeException('Escritura DCL no habilitada: falta representación íntegra de C01–C05 y su contrato.');
+        $this->almacen->guardarClasificacion($resultado);
     }
 
     /**
-     * Distingue evaluación ausente de clasificación no recuperable con D-137.
+     * Recupera DCL V2 y distingue el contrato anterior no representable.
      *
      * @param  string  $evaluacionId  Identidad artificial exacta.
      * @param  string  $residenteId  Sujeto sintético exacto.
      * @param  string  $versionConocimiento  Versión propietaria.
      * @param  DateTimeImmutable  $fechaCorte  Corte original solicitado.
      * @param  string  $versionContrato  Contrato DCL solicitado, sin interpretación.
-     * @return ResultadoClasificacionDcl|null Null solo si la evaluación no existe.
+     * @return ResultadoClasificacionDcl|null Resultado conservado, evaluación ausente o clasificación V2 aún no registrada.
      *
      * @throws DomainException Por identidad o contexto incompatibles.
-     * @throws RuntimeException Si existe la evaluación: el esquema no permite reconstruir C01–C05 y contrato; también por fallos técnicos.
+     * @throws RuntimeException Por fallo técnico o por una evaluación anterior D-137 sin representación íntegra de C01–C05.
      */
     public function obtenerClasificacion(string $evaluacionId, string $residenteId, string $versionConocimiento, DateTimeImmutable $fechaCorte, string $versionContrato): ?ResultadoClasificacionDcl
     {
         self::validarContexto($evaluacionId, $residenteId, $versionConocimiento);
+        $cabeceraNueva = $this->almacen->cabecera($evaluacionId);
+        if ($cabeceraNueva !== null && $cabeceraNueva->version_conservacion !== null) {
+            return $this->almacen->obtenerClasificacion($evaluacionId, $residenteId, $versionConocimiento, $fechaCorte, $versionContrato);
+        }
         self::validarIdentidades($versionContrato);
         if ($this->cabecera($evaluacionId, $residenteId, $versionConocimiento) === null) {
             return null;

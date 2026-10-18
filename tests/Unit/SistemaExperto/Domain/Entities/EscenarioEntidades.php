@@ -64,8 +64,9 @@ final class EscenarioEntidades
     /**
      * Construye un hecho original con overrides explícitos para casos negativos.
      *
-     * @param array<string, mixed> $cambios Parámetros nombrados del constructor.
+     * @param  array<string, mixed>  $cambios  Parámetros nombrados del constructor.
      * @return HechoExperto Hecho artificial.
+     *
      * @throws \DomainException Cuando el override reproduce una entrada inválida.
      */
     public static function hecho(array $cambios = []): HechoExperto
@@ -80,12 +81,14 @@ final class EscenarioEntidades
     /**
      * Declara evidencia ficticia, con referencias externas solo para los dos SIM.
      *
-     * @param string $id Identidad del hecho.
-     * @param DominioCognitivoEnum $dominio Eje propietario.
-     * @param HallazgoInstrumentalEnum $hallazgo Descriptor explícito.
-     * @param SubcomponenteCognitivoEnum|null $subcomponente Alcance específico opcional.
-     * @param array<string, mixed> $cambiosHecho Overrides de procedencia y contexto.
+     * @param  string  $id  Identidad del hecho.
+     * @param  DominioCognitivoEnum  $dominio  Eje propietario.
+     * @param  HallazgoInstrumentalEnum  $hallazgo  Descriptor explícito.
+     * @param  SubcomponenteCognitivoEnum|null  $subcomponente  Alcance específico opcional.
+     * @param  array<string, mixed>  $cambiosHecho  Overrides de procedencia y contexto.
+     * @param  string  $justificacion  Motivo explícito de la evidencia ficticia, sin interpretación automática.
      * @return EvidenciaCognitiva Evidencia original.
+     *
      * @throws \DomainException Si el caso solicitado viola un invariante.
      */
     public static function evidencia(
@@ -94,6 +97,7 @@ final class EscenarioEntidades
         HallazgoInstrumentalEnum $hallazgo = HallazgoInstrumentalEnum::HALLAZGO_DESCRIPTIVO,
         ?SubcomponenteCognitivoEnum $subcomponente = null,
         array $cambiosHecho = [],
+        string $justificacion = 'Referencia completamente ficticia.',
     ): EvidenciaCognitiva {
         $sim = in_array($hallazgo, [HallazgoInstrumentalEnum::ALTERACION_OBJETIVA_SIMULADA, HallazgoInstrumentalEnum::RENDIMIENTO_ESPERADO_SIMULADO], true);
         $hecho = self::hecho(array_replace([
@@ -107,15 +111,16 @@ final class EscenarioEntidades
             'norma' => 'SIM-NORMA', 'idioma' => 'SIM-IDIOMA', 'poblacion' => 'SIM-POBLACION', 'revisor' => 'SIM-REVISOR',
         ] : [];
 
-        return new EvidenciaCognitiva($hecho, $dominio, $subcomponente, $hallazgo, $instrumento, 'Referencia completamente ficticia.', $referencia);
+        return new EvidenciaCognitiva($hecho, $dominio, $subcomponente, $hallazgo, $instrumento, $justificacion, $referencia);
     }
 
     /**
      * Construye una memoria del caso fijo con hechos adicionales explícitos.
      *
-     * @param list<EvidenciaCognitiva> $evidencias Evidencias originales.
-     * @param list<HechoExperto> $hechos Hechos adicionales sin duplicar los anteriores.
+     * @param  list<EvidenciaCognitiva>  $evidencias  Evidencias originales.
+     * @param  list<HechoExperto>  $hechos  Hechos adicionales sin duplicar los anteriores.
      * @return MemoriaTrabajo Instantánea real del Domain.
+     *
      * @throws \DomainException Por contexto o duplicación inválidos.
      */
     public static function memoria(array $evidencias = [], array $hechos = []): MemoriaTrabajo
@@ -127,8 +132,9 @@ final class EscenarioEntidades
     /**
      * Construye una IADL ficticiamente revisada, nunca una medición real.
      *
-     * @param array<string, mixed> $cambios Parámetros nombrados para escenarios negativos.
+     * @param  array<string, mixed>  $cambios  Parámetros nombrados para escenarios negativos.
      * @return EvidenciaIadl Evidencia contextual.
+     *
      * @throws \DomainException Si la variante viola oportunidad o revisión.
      */
     public static function iadl(array $cambios = []): EvidenciaIadl
@@ -147,11 +153,13 @@ final class EscenarioEntidades
      *
      * Los estados nunca se calculan a partir de puntuaciones o reglas G09.
      *
-     * @param list<string> $estados Cinco estados explícitos A/P/U/I/X.
-     * @param array<string, EstadoCriterioDclEnum> $cambiosCriterios Requisitos sobrescritos.
-     * @param EstadoDiferencialEnum $diferencial Revisión diferencial declarada.
-     * @param EstadoCriterioDclEnum $independencia Declaración funcional ficticia.
+     * @param  list<string>  $estados  Cinco estados explícitos A/P/U/I/X.
+     * @param  array<string, EstadoCriterioDclEnum>  $cambiosCriterios  Requisitos sobrescritos.
+     * @param  EstadoDiferencialEnum  $diferencial  Revisión diferencial declarada.
+     * @param  EstadoCriterioDclEnum  $independencia  Declaración funcional ficticia.
+     * @param  array<string, string>  $razonesEvidencia  Motivos originales por dominio para verificar su explicación.
      * @return PerfilRequisitosDcl Perfil completo con fuentes conservadas.
+     *
      * @throws \DomainException Por variante deliberadamente incoherente.
      */
     public static function perfil(
@@ -159,6 +167,7 @@ final class EscenarioEntidades
         array $cambiosCriterios = [],
         EstadoDiferencialEnum $diferencial = EstadoDiferencialEnum::COMPLETADO_SIN_IMPEDIMENTO,
         EstadoCriterioDclEnum $independencia = EstadoCriterioDclEnum::ACREDITADO,
+        array $razonesEvidencia = [],
     ): PerfilRequisitosDcl {
         $evidencias = $idsPorDominio = [];
         foreach (DominioCognitivoEnum::cases() as $i => $dominio) {
@@ -172,7 +181,8 @@ final class EscenarioEntidades
             };
             $idsPorDominio[$dominio->value] = [];
             foreach ($hallazgos as $n => $hallazgo) {
-                $e = self::evidencia('SIM-EV-'.$dominio->value.'-'.$n, $dominio, $hallazgo);
+                $e = self::evidencia('SIM-EV-'.$dominio->value.'-'.$n, $dominio, $hallazgo,
+                    justificacion: $razonesEvidencia[$dominio->value] ?? 'Referencia completamente ficticia.');
                 $evidencias[] = $e;
                 $idsPorDominio[$dominio->value][] = $e->hecho->id;
             }

@@ -58,8 +58,8 @@ use RuntimeException;
  * ¿QUÉ NO DEBE HACER?
  * No registra providers de arranque, consulta tablas, ejecuta inferencia ni habilita
  * atención clínica. No reconstruye una memoria desde datos incompletos ni guarda
- * resultados entre casos. La recuperación original continúa siendo explícita.
- * Las limitaciones de escritura y lectura DCL de la etapa C siguen vigentes.
+ * resultados entre casos. Las instantáneas V2 se recuperan desde SQL; el Closure
+ * original es opcional y se utiliza únicamente para evaluaciones anteriores.
  */
 final readonly class VinculadorRepositorios
 {
@@ -87,7 +87,7 @@ final readonly class VinculadorRepositorios
         string $tipoReglaResultado,
         array $rolesSoporte,
         array $adaptadores,
-        Closure $recuperarMemoria,
+        ?Closure $recuperarMemoria = null,
     ) {
         $reglas = new MapeadorReglas($tipoReglaResultado);
         $red = new MapeadorRedSemantica;
@@ -98,7 +98,7 @@ final readonly class VinculadorRepositorios
         $repositorioReglas = new ReglaExpertaEloquentRepository($reglas, $conexionExperimental);
         $repositorioRed = new RedSemanticaEloquentRepository($red, $conexionExperimental);
         $repositorioEvidencias = new EvidenciaEloquentRepository($evidencias, Closure::fromCallable($extraer), $zonaAlmacenamiento, $conexionExperimental);
-        $repositorioEvaluaciones = new EvaluacionExpertaEloquentRepository($resultados, $recuperarMemoria, $conexionExperimental);
+        $repositorioEvaluaciones = new EvaluacionExpertaEloquentRepository($resultados, $recuperarMemoria, $conexionExperimental, Closure::fromCallable($extraer), $zonaAlmacenamiento);
         $this->servicios = [
             MapeadorReglas::class => $reglas,
             MapeadorRedSemantica::class => $red,

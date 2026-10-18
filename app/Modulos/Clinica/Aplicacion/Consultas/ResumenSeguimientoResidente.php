@@ -3,9 +3,43 @@
 namespace App\Modulos\Clinica\Aplicacion\Consultas;
 
 use App\Models\Residente;
+use Carbon\CarbonImmutable;
 
 final class ResumenSeguimientoResidente
 {
+    /**
+     * Recupera evaluaciones sucesivas de una ventana explícita tras reautorizar la ficha.
+     * Respeta permisos de cada fuente y conserva valoraciones históricas legítimas.
+     * Devuelve modelos al coordinador de Application; ninguna relación se entrega a JS.
+     */
+    public function evaluacionesDelPeriodo(Residente $residente, CarbonImmutable $desde, CarbonImmutable $hasta, bool $incluirHasta = true): array
+    {
+        abort_unless($desde->lt($hasta) && $hasta->lte(now()), 422, 'El período consultado no es válido.');
+        app(PrepararFichaClinica::class)->preparar($residente);
+        // Ambas puertas existentes consultan valoraciones_funcionales; la segunda
+        // es la lectura institucional utilizada por Medicina y el panel de Barthel.
+        $funcionalAutorizada = auth()->user()?->canAny(['valoraciones_funcionales.ver', 'valoracion_enfermeria.ver']) ?? false;
+        $instrumentosAutorizados = auth()->user()?->can('aplicaciones_instrumento.ver') ?? false;
+        $final = $incluirHasta ? '<=' : '<';
+
+        return [
+            'funcional_autorizada' => $funcionalAutorizada,
+            'instrumentos_autorizados' => $instrumentosAutorizados,
+            'funcionales' => $funcionalAutorizada ? $residente->valoracionesFuncionales()
+                ->where('fecha_hora', '>=', $desde)->where('fecha_hora', $final, $hasta)
+                ->whereIn('estado', ['ACTIVA', 'VIGENTE', 'HISTORICA'])
+                ->whereHas('atencion', fn ($q) => $q->where('cod_residente', $residente->getKey())
+                    ->whereNotIn('estado', ['ANULADA', 'ANULADO', 'CANCELADA', 'CANCELADO']))
+                ->with('registradoPor')->orderByDesc('fecha_hora')->orderBy('cod_valoracion_funcional')->get() : collect(),
+            'instrumentos' => $instrumentosAutorizados ? $residente->evaluacionesGeriatricas()
+                ->where('fecha_hora', '>=', $desde)->where('fecha_hora', $final, $hasta)
+                ->whereIn('estado', ['ACTIVA', 'ACTIVO', 'COMPLETA', 'VIGENTE'])
+                ->where(fn ($q) => $q->whereNull('cod_atencion')->orWhereHas('atencion', fn ($a) => $a->where('cod_residente', $residente->getKey())
+                    ->whereNotIn('estado', ['ANULADA', 'ANULADO', 'CANCELADA', 'CANCELADO'])))
+                ->with(['instrumento', 'evaluador'])->orderByDesc('fecha_hora')->orderBy('cod_aplicacion')->get() : collect(),
+        ];
+    }
+
     public function consultar(Residente $residente): array
     {
         // 1. Ficha médica activa

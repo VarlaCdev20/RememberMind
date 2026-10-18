@@ -59,7 +59,7 @@
                 <div class="rm-data-tile">
                     <span class="text-[10px] font-bold text-[var(--rm-text-muted)] uppercase block">Estado cognitivo</span>
                     <span class="text-xs font-bold text-[var(--rm-text-title)] mt-0.5 block">
-                        {{ $ultControlCognitivo ? ($ultControlCognitivo->cambio_cognitivo ? 'Cambio observado' : 'Sin cambio observado') : 'No registrado' }}
+                        {{ $resumenCognitivo['estado'] ?? 'Consulta restringida' }}
                     </span>
                 </div>
 

@@ -577,6 +577,7 @@ Route::middleware([
             Route::prefix('psicologia')
                 ->name('psicologia.')
                 ->group(function () use ($rutas) {
+                    $rutas['ApoyoDecision']['revision_psicologia']();
                     $rutas['Valoraciones']['ruta_173']();
                     $rutas['Valoraciones']['ruta_174']();
                     $rutas['Valoraciones']['ruta_175']();

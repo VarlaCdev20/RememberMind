@@ -9,6 +9,7 @@ use App\SistemaExperto\Application\DTOs\ResultadoDclDTO;
 use App\SistemaExperto\Application\DTOs\ResultadoInferenciaDTO;
 use App\SistemaExperto\Application\DTOs\SolicitudInferenciaDTO;
 use App\SistemaExperto\Domain\Entities\Conocimiento\RelacionSemantica;
+use App\SistemaExperto\Domain\Services\Explicacion\GeneradorExplicacionService;
 use DomainException;
 
 /**
@@ -37,17 +38,51 @@ use DomainException;
  * Un InformeExpertoDTO con resumen, interpretación, fundamento y antecedentes.
  *
  * ¿QUÉ NO DEBE HACER?
- * No redacta explicaciones, genera diagnósticos, recalcula estados ni emite
- * PDF/HTML. Recibir textos no demuestra que exista un generador de Domain.
+ * No redacta explicaciones propias, genera diagnósticos, recalcula estados ni emite
+ * PDF/HTML. La redacción automática se delega al generador real de Domain.
  *
  * RELACIÓN CON O.R.I.O.N.:
  * Implementa la modalidad «recibe explicaciones» permitida por CU-05.
- * El productor debe proporcionar explicaciones respaldadas por las trazas;
- * invocar automáticamente GeneradorExplicacionService requiere su implementación
- * posterior en Domain y no se simula en este caso de uso.
+ * desdeResultados utiliza GeneradorExplicacionService y conserva sus trazas.
+ * ejecutar mantiene la modalidad de textos recibidos para los consumidores existentes.
  */
 final readonly class GenerarInformeUseCase
 {
+    /**
+     * Recibe el generador puro de Domain sin construir contenido al inicializar.
+     *
+     * @param  GeneradorExplicacionService  $explicacion  Productor de los tres niveles.
+     *                                                    No genera contenido ni lanza excepciones durante la construcción.
+     */
+    public function __construct(
+        /** Productor real de la explicación, independiente de Laravel. */
+        private GeneradorExplicacionService $explicacion = new GeneradorExplicacionService,
+    ) {}
+
+    /**
+     * Solicita a Domain los tres niveles desde resultados originales del mismo caso.
+     *
+     * @param  SolicitudInferenciaDTO  $solicitud  Petición original.
+     * @param  ResultadoInferenciaDTO  $inferencia  Perfil, trazas, relaciones y exclusiones reales.
+     * @param  ResultadoDclDTO|null  $dcl  Clasificación del mismo perfil cuando se solicitó.
+     * @return InformeExpertoDTO Informe con la advertencia experimental obligatoria.
+     *
+     * @throws DomainException Por mezcla de peticiones o antecedentes inválidos.
+     */
+    public function desdeResultados(SolicitudInferenciaDTO $solicitud, ResultadoInferenciaDTO $inferencia,
+        ?ResultadoDclDTO $dcl = null): InformeExpertoDTO
+    {
+        if ($inferencia->solicitud != $solicitud || ($dcl !== null && $dcl->solicitud != $solicitud)) {
+            throw new DomainException('Los resultados del informe pertenecen a otra solicitud.');
+        }
+        $textos = $this->explicacion->generar($inferencia->perfilCognitivo, $inferencia->reglasPorDominio,
+            $inferencia->trazas, $inferencia->advertencias, $dcl?->resultado,
+            $inferencia->relacionesUtilizadas, $inferencia->exclusiones);
+
+        return $this->ejecutar($solicitud, $inferencia, $dcl, $textos['resumen'], $textos['interpretacion'],
+            $textos['fundamento'], $inferencia->relacionesUtilizadas, $inferencia->exclusiones);
+    }
+
     /**
      * Ensambla explicaciones previamente elaboradas sin cambiar su contenido.
      *

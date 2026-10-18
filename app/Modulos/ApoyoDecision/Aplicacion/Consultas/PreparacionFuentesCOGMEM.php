@@ -23,12 +23,12 @@ final class PreparacionFuentesCOGMEM
             return null;
         }
         $corte = now();
-        $controles = ControlCognitivo::query()->where('cod_residente', $residente->getKey())
+        $controles = FuentesValoracionOperativa::limitar(ControlCognitivo::query())->where('cod_residente', $residente->getKey())
             ->where('estado', 'VIGENTE')->where('fecha_hora', '<=', $corte);
         $cantidadAplicaciones = null;
         $instrumentos = [];
         if ($usuario->checkPermissionTo('aplicaciones_instrumento.ver', 'web')) {
-            $aplicaciones = AplicacionInstrumento::query()->where('cod_residente', $residente->getKey())
+            $aplicaciones = FuentesValoracionOperativa::limitar(AplicacionInstrumento::query())->where('cod_residente', $residente->getKey())
                 ->where('estado', 'VIGENTE')->where('fecha_hora', '<=', $corte);
             $cantidadAplicaciones = $aplicaciones->count();
             $instrumentos = Instrumento::query()->whereIn('cod_instrumento', $aplicaciones->select('cod_instrumento'))

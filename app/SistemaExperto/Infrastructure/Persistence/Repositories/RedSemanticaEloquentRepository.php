@@ -6,6 +6,7 @@ namespace App\SistemaExperto\Infrastructure\Persistence\Repositories;
 
 use App\Models\VersionModeloExperto;
 use App\Modulos\ApoyoDecision\Dominio\Reglas\BaseTecnicaDesechable;
+use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\ContextoSimulacionLocal;
 use App\SistemaExperto\Domain\Entities\Conocimiento\RedSemantica;
 use App\SistemaExperto\Domain\Repositories\Conocimiento\RedSemanticaRepositoryInterface;
 use App\SistemaExperto\Infrastructure\Persistence\Mappers\MapeadorRedSemantica;
@@ -46,12 +47,14 @@ final readonly class RedSemanticaEloquentRepository implements RedSemanticaRepos
      *
      * @param  MapeadorRedSemantica  $mapeador  Conversor existente.
      * @param  string  $conexionExperimental  Conexión técnica explícita.
+     * @param  ContextoSimulacionLocal|null  $simulacionLocal  Capacidad explícita del lote ficticio autorizado; null conserva el cierre a testing.
      *
      * @throws DomainException Por nombre de conexión inválido.
      */
     public function __construct(
         /** Conversor del grafo. */ private MapeadorRedSemantica $mapeador,
         /** Destino experimental obligatorio. */ private string $conexionExperimental,
+        /** Capacidad optativa exclusiva del paquete local autorizado. */ private ?ContextoSimulacionLocal $simulacionLocal = null,
     ) {
         self::validarIdentidades($conexionExperimental);
     }
@@ -67,6 +70,7 @@ final readonly class RedSemanticaEloquentRepository implements RedSemanticaRepos
      */
     public function porVersion(string $versionConocimiento): ?RedSemantica
     {
+        $this->simulacionLocal?->validarVersion($versionConocimiento);
         self::validarIdentidades($versionConocimiento);
         $fila = VersionModeloExperto::on($this->conexion())->whereKey($versionConocimiento)->with([
             'nodosSemanticos' => static fn (HasMany $q): HasMany => $q->orderBy('cod_nodo_semantico'),
@@ -102,6 +106,11 @@ final readonly class RedSemanticaEloquentRepository implements RedSemanticaRepos
      */
     private function conexion(): string
     {
+        if ($this->simulacionLocal !== null) {
+            $this->simulacionLocal->db($this->conexionExperimental);
+
+            return $this->conexionExperimental;
+        }
         $contenedor = Container::getInstance();
         if (! $contenedor->bound('env') || $contenedor->make('env') !== 'testing') {
             throw new RuntimeException('El repositorio experimental solo está habilitado en testing.');

@@ -8,6 +8,16 @@ use InvalidArgumentException;
 final class CatalogoCodigos
 {
     public const ENTIDADES = [
+        'revisiones_evaluacion_experta' => ['cod_revision_experta', 'RVE'],
+        'hechos_instantanea_experta' => ['cod_hecho_instantanea', 'HIX'],
+        'evidencias_cognitivas_instantanea' => ['cod_evidencia_cognitiva_instantanea', 'ECX'],
+        'soportes_sinteticos_criterio' => ['cod_soporte_sintetico', 'SSX'],
+        'funcionalidad_instantanea_experta' => ['cod_funcionalidad_instantanea', 'FIX'],
+        'evidencias_iadl_instantanea' => ['cod_evidencia_iadl_instantanea', 'EIX'],
+        'clasificaciones_dcl_instantanea' => ['cod_clasificacion_dcl_instantanea', 'CIX'],
+        'motivos_dcl_instantanea' => ['cod_motivo_dcl_instantanea', 'MIX'],
+        'reglas_aplicadas_dcl_instantanea' => ['cod_regla_aplicada_dcl', 'RIX'],
+        'condiciones_regla_instantanea' => ['cod_condicion_instantanea', 'COX'],
         'actividades' => ['cod_actividad', 'ACT'],
         'administraciones_medicacion' => ['cod_administracion', 'AMED'],
         'admisiones' => ['cod_admision', 'ADM'],
@@ -26,6 +36,7 @@ final class CatalogoCodigos
         'consentimientos' => ['cod_consentimiento', 'CNS'],
         'contactos' => ['cod_contacto', 'CTO'],
         'controles_cognitivos' => ['cod_control_cognitivo', 'CCO'],
+        'controles_funcionales_iadl' => ['cod_control_iadl', 'IAD'],
         'criterios_dominios_resultado' => ['cod_criterio_dominio_resultado', 'CDR'],
         'curaciones_herida' => ['cod_curacion', 'CUR'],
         'derivaciones' => ['cod_derivacion', 'DER'],

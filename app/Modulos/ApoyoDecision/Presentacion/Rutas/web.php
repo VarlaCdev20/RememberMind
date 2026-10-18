@@ -21,4 +21,9 @@ return [
             ->middleware('can:consultarResultados,App\\Models\\EvaluacionExperta,residente')
             ->name('residente.resultados-experto');
     },
+    'revision_psicologia' => static function (): void {
+        Route::get('/residente/{residente}/resultados-experto', ResultadosExpertoResidente::class)
+            ->middleware(['permission:evaluaciones_expertas.revisar_psicologia', 'can:consultarResultados,App\\Models\\EvaluacionExperta,residente'])
+            ->name('residente.resultados-experto');
+    },
 ];

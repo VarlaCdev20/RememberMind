@@ -59,6 +59,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'roles.editar_permisos',
         ];
         $permisos = array_merge($permisos, [
+            'evaluaciones_expertas.revisar_medicina', 'evaluaciones_expertas.revisar_psicologia',
             'auditoria.ver', 'usuarios.gestionar', 'personal.gestionar', 'areas.gestionar', 'turnos.gestionar',
             'fotografias_institucionales.ver', 'fotografias_institucionales.gestionar',
             'jornadas.gestionar', 'asignaciones_personal.gestionar',
@@ -135,7 +136,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'registros_', 'heridas', 'curaciones_herida', 'planes_cuidado', 'prescripciones',
             'horarios_prescripcion.ver', 'administraciones_medicacion', 'aplicaciones_instrumento',
             'valoraciones_', 'alertas.ver',
-        ]), ['salud.ver', 'valoracion_medica.ver', 'valoracion_enfermeria.ver']))));
+        ]), ['salud.ver', 'valoracion_medica.ver', 'valoracion_enfermeria.ver', 'evaluaciones_expertas.revisar_medicina']))));
 
         $roles['ENFERMEROS']->syncPermissions(array_values(array_unique(array_merge($this->permitir($permisos, [
             'residentes.ver', 'ocupaciones_cama.ver', 'atenciones.ver', 'atenciones.crear', 'atenciones.editar', 'notas_clinicas', 'antecedentes_clinicos.ver',
@@ -156,6 +157,7 @@ class RolesAndPermissionsSeeder extends Seeder
         ]))));
 
         $roles['PSICOLOGO/A']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'controles_cognitivos.ver', 'registros_conductuales', 'registros_sueno.ver', 'instrumentos.ver', 'preguntas_instrumento.ver', 'opciones_pregunta.ver', 'aplicaciones_instrumento', 'respuestas_instrumento.ver', 'valoraciones_psicologicas', 'planes_cuidado.ver', 'alertas.ver']));
+        $roles['PSICOLOGO/A']->givePermissionTo('evaluaciones_expertas.revisar_psicologia');
         $roles['NUTRICIONISTA']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'diagnosticos.ver', 'alergias.ver', 'indicaciones_clinicas.ver', 'mediciones_antropometricas', 'registros_ingesta.ver', 'registros_hidratacion.ver', 'registros_eliminacion.ver', 'valoraciones_nutricionales', 'planes_cuidado']));
         $roles['FISIOTERAPEUTA']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'diagnosticos.ver', 'dispositivos_clinicos.ver', 'signos_vitales.ver', 'valoraciones_dolor', 'registros_movilidad', 'valoraciones_funcionales', 'planes_cuidado']));
         $roles['PEDAGOGO']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'indicaciones_clinicas.ver', 'controles_cognitivos.ver', 'registros_conductuales.ver', 'planes_cuidado', 'seguimientos_pedagogicos', 'actividades']));

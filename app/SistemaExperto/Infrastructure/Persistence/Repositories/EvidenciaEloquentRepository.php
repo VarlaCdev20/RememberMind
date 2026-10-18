@@ -6,6 +6,7 @@ namespace App\SistemaExperto\Infrastructure\Persistence\Repositories;
 
 use App\Models\AplicacionInstrumento;
 use App\Models\ControlCognitivo;
+use App\Models\ControlFuncionalIadl;
 use App\Models\EvaluacionExperta;
 use App\Models\EvidenciaEvaluacion;
 use App\Models\FuenteDatoExperta;
@@ -137,11 +138,15 @@ final readonly class EvidenciaEloquentRepository implements EvidenciaRepositoryI
                 }
                 $origen = $original['origen'];
                 if ((! $origen instanceof ControlCognitivo && ! $origen instanceof SeguimientoPedagogico
-                    && ! $origen instanceof ValoracionFuncional && ! $origen instanceof AplicacionInstrumento)
+                    && ! $origen instanceof ValoracionFuncional && ! $origen instanceof AplicacionInstrumento && ! $origen instanceof ControlFuncionalIadl)
                     || ! $origen->exists || $origen->getConnectionName() !== $conexion
                     || $origen->getRawOriginal('cod_residente') !== $residenteId
                     || $origen->getRawOriginal($origen->getKeyName()) !== $fila->getRawOriginal('cod_registro_fuente')
-                    || ! in_array($origen->getRawOriginal('estado'), $origen instanceof AplicacionInstrumento ? ['COMPLETA'] : ['VIGENTE', 'ACTIVA'], true)) {
+                    || ! in_array($origen->getRawOriginal('estado'), match (true) {
+                        $origen instanceof AplicacionInstrumento => ['COMPLETA'],
+                        $origen instanceof ControlFuncionalIadl => ['REGISTRADO', 'RECTIFICACION'],
+                        default => ['VIGENTE', 'ACTIVA'],
+                    }, true)) {
                     throw new DomainException('El registro original debe existir en la misma conexión y pertenecer al caso.');
                 }
                 // El instante es el del registro original. La incorporación técnica
@@ -197,7 +202,8 @@ final readonly class EvidenciaEloquentRepository implements EvidenciaRepositoryI
             }
         }
         $tablas = ['controles_cognitivos' => 'cod_control_cognitivo', 'seguimientos_pedagogicos' => 'cod_seguimiento_pedagogico',
-            'valoraciones_funcionales' => 'cod_valoracion_funcional', 'aplicaciones_instrumento' => 'cod_aplicacion'];
+            'valoraciones_funcionales' => 'cod_valoracion_funcional', 'aplicaciones_instrumento' => 'cod_aplicacion',
+            'controles_funcionales_iadl' => 'cod_control_iadl'];
         $tabla = $fuente->getRawOriginal('tabla_raiz');
         if (! is_string($tabla) || ! isset($tablas[$tabla])
             || $fuente->getRawOriginal('campo_pk_raiz') !== $tablas[$tabla]

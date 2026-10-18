@@ -160,7 +160,10 @@ final readonly class ResolutorFuenteExperta
             if ($datos['tabla_raiz'] !== 'controles_funcionales_iadl') {
                 throw new DomainException('El adaptador IADL no corresponde a la tabla declarada.');
             }
-            $adaptador->recuperar($this->conexionExperimental);
+            $disponibilidad = $adaptador->disponibilidad($this->conexionExperimental);
+            if (! $disponibilidad['disponible']) {
+                throw new RuntimeException($disponibilidad['motivo']);
+            }
         }
         if ($datos['tabla_raiz'] !== $adaptador::TABLA || $datos['campo_pk_raiz'] !== $adaptador::PK
             || ($datos['campo_residente'] ?? null) !== 'cod_residente' || ($datos['campo_temporal'] ?? null) !== 'fecha_hora'

@@ -168,6 +168,7 @@ import './modules/movilidad-registro.js';
 // Comportamiento de la ficha clínica, registrado una vez por el bundle.
 import './modules/ficha-signos.js';
 import './modules/ficha-eventos.js';
+import './modules/ficha-evolucion.js';
 import './modules/ficha-estudios.js';
 
 // Dashboard de Enfermería: ciclos de gráficas y navegación compartidos.

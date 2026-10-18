@@ -1,5 +1,10 @@
+@include('clinica::livewire.cuidados.ficha.resumen.estado-evolucion')
+@include('clinica::livewire.cuidados.ficha.resumen.evolucion-comparada')
+@include('clinica::livewire.cuidados.ficha.resumen.memoria-estado-cognitivo', ['resumenCognitivo' => $this->resumenCognitivo])
+
 {{-- RESUMEN CLÍNICO CONFORMADO EXACTAMENTE A LA IMAGEN DE REFERENCIA --}}
 @php
+    $resumenCognitivo = $this->resumenCognitivo;
     $resLong = $this->resumenLongitudinal ?? [];
     $grafica = $resLong['grafica_signos'] ?? [];
     $labels = $grafica['labels'] ?? [];
@@ -113,7 +118,6 @@
 
     // Relaciones clave
     $ultFunc = $adultoMayor->valoracionesFuncionales->sortByDesc('fecha_hora')->first();
-    $ultControlCognitivo = $adultoMayor->controlesCognitivos->sortByDesc('fecha_hora')->first();
     $ultDolor = $adultoMayor->valoracionesDolor->sortByDesc('fecha_hora')->first();
     $plan = $adultoMayor->planCuidadoActivo;
     $proxAdmin = $adultoMayor->administracionesMedicacion

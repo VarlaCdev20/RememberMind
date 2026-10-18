@@ -6,6 +6,7 @@ namespace App\SistemaExperto\Infrastructure\Persistence\Mappers;
 
 use App\Models\AplicacionInstrumento;
 use App\Models\ControlCognitivo;
+use App\Models\ControlFuncionalIadl;
 use App\Models\EvaluacionExperta;
 use App\Models\EvidenciaEvaluacion;
 use App\Models\FuenteDatoExperta;
@@ -78,7 +79,7 @@ final readonly class MapeadorEvidencias
      */
     public function aHecho(
         EvidenciaEvaluacion $fila,
-        ControlCognitivo|SeguimientoPedagogico|ValoracionFuncional|AplicacionInstrumento $origen,
+        ControlCognitivo|SeguimientoPedagogico|ValoracionFuncional|AplicacionInstrumento|ControlFuncionalIadl $origen,
         DateTimeImmutable $corte,
         string|int|float|bool|null $valorExtraido,
     ): HechoExperto {
@@ -116,7 +117,11 @@ final readonly class MapeadorEvidencias
             || self::texto($fuente, 'campo_temporal') !== 'fecha_hora'
             || self::texto($fila, 'cod_registro_fuente') !== self::texto($origen, $origen->getKeyName())
             || self::texto($origen, 'cod_residente') !== $residenteId
-            || ! in_array(self::texto($origen, 'estado'), $origen instanceof AplicacionInstrumento ? ['COMPLETA'] : ['VIGENTE', 'ACTIVA'], true)
+            || ! in_array(self::texto($origen, 'estado'), match (true) {
+                $origen instanceof AplicacionInstrumento => ['COMPLETA'],
+                $origen instanceof ControlFuncionalIadl => ['REGISTRADO', 'RECTIFICACION'],
+                default => ['VIGENTE', 'ACTIVA'],
+            }, true)
             || ! in_array(self::texto($fila, 'estado_admisibilidad'), ['ADMISIBLE', 'ADMISIBLE_CON_ADVERTENCIA'], true)) {
             throw new DomainException('Origen, sujeto o admisibilidad incompatibles con la fuente autorizada.');
         }
@@ -145,10 +150,13 @@ final readonly class MapeadorEvidencias
      */
     public function aDominio(
         EvidenciaEvaluacion $fila,
-        ControlCognitivo|SeguimientoPedagogico|ValoracionFuncional|AplicacionInstrumento $origen,
+        ControlCognitivo|SeguimientoPedagogico|ValoracionFuncional|AplicacionInstrumento|ControlFuncionalIadl $origen,
         DateTimeImmutable $corte,
         string|int|float|bool|null $valorExtraido,
     ): EvidenciaCognitiva {
+        if ($origen instanceof ControlFuncionalIadl) {
+            throw new DomainException('IADL solo aporta hechos descriptivos; no se transforma en evidencia cognitiva.');
+        }
         $hecho = $this->aHecho($fila, $origen, $corte, $valorExtraido);
         $mapeo = self::relacion($fila, 'mapeoVariableFuente', MapeoVariableFuente::class);
         $variable = self::relacion($mapeo, 'variable', VariableExperta::class);

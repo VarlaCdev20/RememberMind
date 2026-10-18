@@ -119,6 +119,14 @@ C. Mantener regla vigente, documentando límite, hasta decisión concreta.
 
 **Título:** Método, derechos y validación del experto cognitivo
 
+**Avance del 17/10/2026:** la propietaria aprobó Psicología y Medicina con
+revisiones separadas, más una tabla de dictámenes vinculada a la evaluación.
+El circuito de firma está implementado. Véase
+[decisión de revisiones](base-de-datos/DECISION_REVISIONES_EXPERTAS_2026_10_17.md).
+Continúan pendientes las interpretaciones operativas, instrumentos/métodos y
+su validación profesional: [matriz concreta](sistema-experto/MATRIZ_INTERPRETACION_OPERATIVA_PARA_REVISION.md).
+Esta decisión permanece OPEN respecto a la activación clínica del conocimiento.
+
 **Área:** Investigación / experto
 
 **Problema:** O.R.I.O.N. define la arquitectura cognitiva, el esquema D-123/D-137 y el contrato piloto D-131/D-143/D-144. El [núcleo técnico V1](sistema-experto/IMPLEMENTACION_V1.md) usa datos artificiales. Permanecen pendientes los contratos específicos de contenido, instrumentos/derechos, responsables y validación profesional para activación clínica. No se requieren ni se autorizan pesos, scores o agregación global por esta referencia.

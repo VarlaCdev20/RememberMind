@@ -142,7 +142,7 @@ final class EvaluacionExpertaEloquentRepositoryTest extends RepositoriosTestCase
     }
 
     /** Escrituras no soportadas fallan sin emitir SQL ni alterar el perfil; sin parámetros ni excepciones sin capturar. */
-    public function test_las_escrituras_no_habilitadas_no_generan_efectos_ni_exito_falso(): void
+    public function test_las_escrituras_sin_catalogo_no_generan_efectos_ni_exito_falso(): void
     {
         $perfil = D::perfil(['U', 'U', 'U', 'U', 'U']);
         $clasificacion = new ResultadoClasificacionDcl($perfil, null, [MotivoAbstencionEnum::SOLO_LABORATORIO_NO_EMITIR], 'Salida ficticia de prueba.');
@@ -153,11 +153,11 @@ final class EvaluacionExpertaEloquentRepositoryTest extends RepositoriosTestCase
             try {
                 $operacion();
                 self::fail('La escritura no debe confirmarse.');
-            } catch (RuntimeException $error) {
-                self::assertStringContainsString('no habilitada', $error->getMessage());
+            } catch (DomainException $error) {
+                self::assertNotSame('', $error->getMessage());
             }
         }
-        self::assertSame([], DB::connection()->getQueryLog());
+        $this->exigirSoloLecturas();
         self::assertSame(0, DB::table('evaluaciones_expertas')->count());
         self::assertSame(0, DB::table('resultados_criterio')->count());
     }

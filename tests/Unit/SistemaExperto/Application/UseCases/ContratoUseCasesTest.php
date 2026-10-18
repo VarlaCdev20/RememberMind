@@ -6,6 +6,11 @@ namespace Tests\Unit\SistemaExperto\Application\UseCases;
 
 use App\SistemaExperto\Application\DTOs\EvidenciasEntradaDTO;
 use App\SistemaExperto\Application\DTOs\InformeExpertoDTO;
+use App\SistemaExperto\Application\DTOs\ResultadoDclDTO;
+use App\SistemaExperto\Application\DTOs\ResultadoInferenciaDTO;
+use App\SistemaExperto\Application\UseCases\AnalizarCasoExperimentalUseCase;
+use App\SistemaExperto\Application\UseCases\ClasificarDclUseCase;
+use App\SistemaExperto\Application\UseCases\EjecutarInferenciaUseCase;
 use App\SistemaExperto\Application\UseCases\ExtraerHechosUseCase;
 use App\SistemaExperto\Application\UseCases\GenerarInformeUseCase;
 use App\SistemaExperto\Application\UseCases\PrepararMemoriaTrabajoUseCase;
@@ -31,7 +36,10 @@ final class ContratoUseCasesTest extends TestCase
     {
         foreach ([ExtraerHechosUseCase::class => EvidenciasEntradaDTO::class,
             PrepararMemoriaTrabajoUseCase::class => MemoriaTrabajo::class,
-            GenerarInformeUseCase::class => InformeExpertoDTO::class] as $clase => $retorno) {
+            GenerarInformeUseCase::class => InformeExpertoDTO::class,
+            EjecutarInferenciaUseCase::class => ResultadoInferenciaDTO::class,
+            ClasificarDclUseCase::class => ResultadoDclDTO::class,
+            AnalizarCasoExperimentalUseCase::class => InformeExpertoDTO::class] as $clase => $retorno) {
             $r = new ReflectionClass($clase);
             self::assertTrue($r->isFinal());
             self::assertTrue($r->isReadOnly());
@@ -61,7 +69,8 @@ final class ContratoUseCasesTest extends TestCase
     /** Revisa imports ejecutables sin tratar comentarios como dependencias; sin parámetros ni errores esperados. */
     public function test_orquestacion_depende_solo_de_dtos_y_domain(): void
     {
-        foreach ([ExtraerHechosUseCase::class, PrepararMemoriaTrabajoUseCase::class, GenerarInformeUseCase::class] as $clase) {
+        foreach ([ExtraerHechosUseCase::class, PrepararMemoriaTrabajoUseCase::class, GenerarInformeUseCase::class,
+            EjecutarInferenciaUseCase::class, ClasificarDclUseCase::class, AnalizarCasoExperimentalUseCase::class] as $clase) {
             foreach (token_get_all(file_get_contents((new ReflectionClass($clase))->getFileName())) as $token) {
                 if (is_array($token) && in_array($token[0], [T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED], true)) {
                     self::assertMatchesRegularExpression('/^\\\\?App\\\\SistemaExperto\\\\(Application\\\\DTOs|Application\\\\UseCases|Domain)(?:\\\\|$)/', $token[1]);
