@@ -10,6 +10,9 @@
                                         <p class="text-sm text-rm-secondary mt-3">Aplicaciones de instrumentos registradas: {{ $preparacion['aplicaciones'] }}. {{ $informe['complemento_textos']['instrumentos'] }}</p>
                                         @foreach($preparacion['instrumentos'] as $instrumento)<p class="text-sm mt-2 break-words">{{ $instrumento }}</p>@endforeach
                                     @endif
+                                    @if($preparacion['metodos_instrumentales'] ?? [])
+                                        <p class="text-sm mt-3">Método de normalización disponible: HVLT-R forma 5 en español, referencia boliviana de 2015, para aprendizaje total y recuerdo diferido libre. Requiere aciertos originales y condiciones de aplicación documentadas; no se aplica a etiquetas de desempeño.</p>
+                                    @endif
                                     <h3 class="font-semibold mt-4">Para completar la valoración</h3>
                                     <ul class="list-disc pl-5 space-y-2 text-sm mt-3">
                                         @foreach($preparacion['pendientes'] as $pendiente)<li>{{ $pendiente }}</li>@endforeach
