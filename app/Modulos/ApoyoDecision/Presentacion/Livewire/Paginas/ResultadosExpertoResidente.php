@@ -4,6 +4,7 @@ namespace App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas;
 
 use App\Models\EvaluacionExperta;
 use App\Models\Residente;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarHechosObservacionales;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaFuenteEvidencia;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaResultadosExperto;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto as L;
@@ -101,10 +102,12 @@ class ResultadosExpertoResidente extends Component
     {
         $residente = $this->autorizar();
         $datos = null;
+        $observaciones = null;
         $fuente = null;
         $errorLectura = false;
         try {
             $datos = app(LecturaResultadosExperto::class)->consultar(auth()->user(), $residente, $this->evaluacion, $this->criterio, $this->getPage('historia'));
+            $observaciones = app(ConsultarHechosObservacionales::class)->consultar(auth()->user(), $residente);
             if ($this->evidencia && isset($datos['detalle']['evidencias'][$this->evidencia])) {
                 $fuente = app(LecturaFuenteEvidencia::class)->consultar(auth()->user(), $residente, $datos['evaluacion']['id'], $this->evidencia);
             }
@@ -113,7 +116,7 @@ class ResultadosExpertoResidente extends Component
             $errorLectura = true;
         }
 
-        return view('livewire.medico.resultados-experto-residente', compact('datos', 'fuente', 'errorLectura', 'residente'))
+        return view('livewire.medico.resultados-experto-residente', compact('datos', 'fuente', 'errorLectura', 'residente', 'observaciones'))
             ->layout($this->enfermeria ? 'layouts.enfermeria' : 'layouts.sistema');
     }
 }
