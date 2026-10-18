@@ -28,7 +28,7 @@ final class ConsultarHechosObservacionales
             ->with('personal:cod_personal,nombres,apellido_paterno,apellido_materno')
             ->orderByDesc('fecha_hora')
             ->orderByDesc('cod_control_cognitivo')
-            ->limit(30)
+            ->limit(31)
             ->get(['cod_control_cognitivo', 'cod_personal', 'fecha_hora', 'repite_preguntas', 'olvida_indicaciones', 'cambio_cognitivo'])
             ->map(static function (ControlCognitivo $control): array {
                 $autor = $control->personal
@@ -48,6 +48,10 @@ final class ConsultarHechosObservacionales
                 ];
             })->all();
 
-        return (new EvaluadorHechosObservacionales)->evaluar($controles);
+        $muestraLimitada = count($controles) > 30;
+        $resultado = (new EvaluadorHechosObservacionales)->evaluar(array_slice($controles, 0, 30));
+        $resultado['muestra_limitada'] = $muestraLimitada;
+
+        return $resultado;
     }
 }
