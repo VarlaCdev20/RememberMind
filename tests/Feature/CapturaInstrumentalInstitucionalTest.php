@@ -25,7 +25,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
-use MotorExperto\dominio\instrumentos\ExtractorCapturaHvlt;
+use MotorExperto\dominio\instrumentos\NormalizadorBateriaBolivia2015;
 use MotorExperto\dominio\instrumentos\NormalizadorHvltBolivia2015 as Hvlt;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Permission\Models\Role;
@@ -65,7 +65,7 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         $this->instrumento = Instrumento::create(['codigo' => 'CAPTURA-SINTETICA', 'nombre' => 'Medidas sintéticas de integración',
             'tipo' => 'COGNITIVO', 'version' => 'TEST-1', 'estado' => 'ACTIVO']);
         $selectores = $this->respuestas = [];
-        foreach (ExtractorCapturaHvlt::ENTRADAS as $campo => $tipo) {
+        foreach (Hvlt::ENTRADAS as $campo => $tipo) {
             $pregunta = PreguntaInstrumento::create(['cod_instrumento' => $this->instrumento->getKey(), 'codigo' => 'MEDIDA-'.(count($selectores) + 1),
                 'enunciado' => 'Medida sintética '.$campo, 'tipo_respuesta' => $tipo === 'LOGICO' ? 'LOGICO' : 'NUMERICO',
                 'orden' => count($selectores) + 1, 'estado' => 'ACTIVA']);
@@ -269,5 +269,62 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         $r = $this->captura()['capturas'][0]['extraccion'];
         self::assertNull($r['captura']['ensayos'][0]);
         self::assertSame('NO_NORMALIZABLE', $r['normalizacion']['componentes']['MEM-S01']['estado']);
+    }
+
+    public function test_seis_perfiles_investigados_recuperan_respuestas_originales_y_se_presentan_sin_escribir_evaluaciones(): void
+    {
+        $valores = ['escolaridad_anios' => 4, 'forma_n_aciertos' => 6, 'forma_l_aciertos' => 7,
+            'segundos_parte_b' => 200, 'errores_observados' => 1, 'aciertos_espontaneos' => 40, 'aciertos_clave_semantica' => 5,
+            'puntaje_copia' => 22.5, 'elementos_revisados' => 18, 'f_validas' => 8, 'a_validas' => 9, 's_validas' => 10, 'animales_validas' => 12,
+            'f_segundos' => 60, 'a_segundos' => 60, 's_segundos' => 60, 'animales_segundos' => 60,
+            'palabras_correctas' => 60, 'colores_correctos' => 30, 'palabra_color_correctas' => 20,
+            'segundos_palabras' => 45, 'segundos_colores' => 45, 'segundos_palabra_color' => 45];
+        $perfiles = [];
+        foreach ((new NormalizadorBateriaBolivia2015)->metodos() as $metodo => $meta) {
+            $instrumento = Instrumento::create(['codigo' => 'BATERIA-TEST-'.count($perfiles), 'nombre' => 'Instrumento sintético '.count($perfiles),
+                'tipo' => 'COGNITIVO', 'version' => 'VERSION-TEST', 'estado' => 'ACTIVO']);
+            $selectores = $respuestas = [];
+            foreach ($meta['entradas'] as $campo => $tipo) {
+                $pregunta = PreguntaInstrumento::create(['cod_instrumento' => $instrumento->getKey(), 'codigo' => 'ENTRADA-'.count($selectores),
+                    'enunciado' => 'Entrada sintética '.$campo, 'tipo_respuesta' => $tipo === 'LOGICO' ? 'LOGICO' : 'NUMERICO',
+                    'orden' => count($selectores) + 1, 'estado' => 'ACTIVA']);
+                $columna = $tipo === 'LOGICO' ? 'valor_logico' : 'valor_numero';
+                $selectores[$campo] = ['cod_pregunta' => $pregunta->getKey(), 'campo' => $columna];
+                $respuestas[] = ['cod_pregunta' => $pregunta->getKey(), $columna => $valores[$campo] ?? ($tipo === 'LOGICO' ? true : throw new \LogicException('Falta medición sintética explícita.'))];
+            }
+            $perfiles[] = ['id' => 'BATERIA-TEST-'.count($perfiles), 'cod_instrumento' => $instrumento->getKey(), 'codigo_instrumento' => $instrumento->codigo,
+                'version_instrumento' => $instrumento->version, 'metodo' => $metodo, 'selectores' => $selectores];
+            $a = app(AplicarInstrumento::class)->aplicar($this->usuario, ['fecha_hora' => '2020-10-18 09:10:00', 'respuestas' => $respuestas], $instrumento, $this->residente);
+            self::assertNull($a->puntaje_total);
+            self::assertNull($a->clasificacion);
+        }
+        config(['sistema_experto.perfiles_instrumentales' => $perfiles]);
+        $r = $this->captura();
+        self::assertCount(6, $r['capturas']);
+        foreach ($r['capturas'] as $captura) {
+            self::assertSame([], $captura['motivos']);
+            self::assertSame([], $captura['extraccion']['motivos_captura']);
+            foreach ($captura['extraccion']['normalizacion']['componentes'] as $componente) {
+                foreach ($componente['medidas'] ?? [$componente] as $medida) {
+                    self::assertSame('NORMALIZADO', $medida['estado']);
+                    self::assertNull($medida['clasificacion_clinica']);
+                }
+            }
+            foreach ($captura['extraccion']['fuentes_entradas'] as $fuente) {
+                self::assertSame($captura['cod_aplicacion'], $fuente['aplicacion']);
+                self::assertNotEmpty($fuente['respuesta']);
+                self::assertNotNull($fuente['bruto']);
+            }
+        }
+        $perfil = app(ConsultarPerfilInstrumental::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now());
+        $fluidez = $perfil['dominios']['COG-LEN']['componentes']['LEN-S02'];
+        self::assertCount(4, $fluidez['mediciones']);
+        self::assertCount(1, array_unique(array_column($fluidez['mediciones'], 'aplicacion')));
+        self::assertNull($perfil['dominios']['COG-LEN']['resultado_clinico']);
+        Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
+            ->assertSee('Campos y método de evaluación')->assertSee('Intervalo percentilar aproximado')
+            ->assertSee('TMT_B_SEGUNDOS')->assertSee('Menor tiempo indica mejor rendimiento')
+            ->assertSee('FLUIDEZ_F')->assertSee('FLUIDEZ_ANIMALES');
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
     }
 }

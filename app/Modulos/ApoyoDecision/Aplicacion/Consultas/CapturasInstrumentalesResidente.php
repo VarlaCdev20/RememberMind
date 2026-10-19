@@ -13,7 +13,7 @@ use App\Models\User;
 use Carbon\CarbonImmutable;
 use DomainException;
 use Illuminate\Support\Facades\Gate;
-use MotorExperto\dominio\instrumentos\ExtractorCapturaHvlt;
+use MotorExperto\dominio\instrumentos\ExtractorCapturaInstrumental;
 
 /** Lectura institucional por lotes; captura originales sin escribir resultados ni identificar pruebas por similitud. */
 final class CapturasInstrumentalesResidente
@@ -80,7 +80,7 @@ final class CapturasInstrumentalesResidente
                 $nacimiento = $residente->fecha_nacimiento;
                 $fecha = CarbonImmutable::instance($a->fecha_hora);
                 $edad = $nacimiento && $nacimiento <= $fecha ? (int) $nacimiento->diffInYears($fecha) : null;
-                $salida['extraccion'] = (new ExtractorCapturaHvlt)->extraer($perfilesAplicables[0], $salida, $brutos, $edad);
+                $salida['extraccion'] = (new ExtractorCapturaInstrumental)->extraer($perfilesAplicables[0], $salida, $brutos, $edad);
                 $salida['fuente_edad'] = ['tabla' => 'residentes', 'campo' => 'fecha_nacimiento', 'registro' => $residente->getKey(),
                     'fecha_nacimiento' => $nacimiento?->format('Y-m-d'), 'fecha_aplicacion' => $salida['fecha_hora']];
             }

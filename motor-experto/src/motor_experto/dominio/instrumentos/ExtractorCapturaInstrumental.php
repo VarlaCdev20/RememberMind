@@ -8,21 +8,19 @@ use DomainException;
 
 /**
  * COMPONENTE DEL SISTEMA EXPERTO: Adquisición instrumental.
- * Traduce preguntas identificadas explícitamente a medidas del método HVLT-R.
+ * Traduce preguntas identificadas explícitamente a medidas de un método registrado.
  * Conserva cada bruto y su procedencia; una etiqueta nominal nunca se convierte en un ensayo.
  */
-final class ExtractorCapturaHvlt
+final class ExtractorCapturaInstrumental
 {
-    public const ENTRADAS = ['ensayo_1' => 'ENTERO', 'ensayo_2' => 'ENTERO', 'ensayo_3' => 'ENTERO',
-        'recuerdo_diferido' => 'ENTERO', 'demora_minutos' => 'NUMERO', 'escolaridad_anios' => 'ENTERO',
-        'espanol_nativo' => 'LOGICO', 'nacimiento_bolivia' => 'LOGICO', 'residencia_bolivia' => 'LOGICO',
-        'lectoescritura' => 'LOGICO', 'administracion_estandarizada' => 'LOGICO'];
-
     public function extraer(array $perfil, array $aplicacion, array $respuestas, ?int $edad): array
     {
-        if (($perfil['metodo'] ?? null) !== NormalizadorHvltBolivia2015::METODO
+        $registro = new RegistroMetodosInstrumentales;
+        $metodo = $perfil['metodo'] ?? null;
+        $meta = is_string($metodo) ? ($registro->metodos()[$metodo] ?? null) : null;
+        if ($meta === null
             || ! is_string($perfil['id'] ?? null) || $perfil['id'] === ''
-            || ! is_array($perfil['selectores'] ?? null) || array_diff(array_keys($perfil['selectores']), array_keys(self::ENTRADAS))) {
+            || ! is_array($perfil['selectores'] ?? null) || array_diff(array_keys($perfil['selectores']), array_keys($meta['entradas']))) {
             throw new DomainException('Perfil de captura instrumental fuera de contrato.');
         }
         foreach (['cod_instrumento', 'codigo_instrumento', 'version_instrumento'] as $campo) {
@@ -30,9 +28,9 @@ final class ExtractorCapturaHvlt
                 throw new DomainException('El perfil no identifica exactamente el instrumento y su versión.');
             }
         }
-        $captura = ['instrumento' => 'HVLT-R', 'forma' => 5, 'idioma' => 'es', 'protocolo' => $perfil['metodo'], 'edad_anios' => $edad];
+        $captura = $meta['identidad'] + ['protocolo' => $metodo, 'edad_anios' => $edad];
         $fuentes = $motivos = $medidas = $preguntas = [];
-        foreach (self::ENTRADAS as $entrada => $tipo) {
+        foreach ($meta['entradas'] as $entrada => $tipo) {
             $selector = $perfil['selectores'][$entrada] ?? null;
             $medidas[$entrada] = null;
             if ($selector === null) {
@@ -68,8 +66,10 @@ final class ExtractorCapturaHvlt
             }
         }
         $captura += $medidas;
-        $captura['ensayos'] = [$medidas['ensayo_1'], $medidas['ensayo_2'], $medidas['ensayo_3']];
-        $normalizacion = (new RegistroMetodosInstrumentales)->ejecutar($perfil['metodo'], $captura);
+        if ($metodo === NormalizadorHvltBolivia2015::METODO) {
+            $captura['ensayos'] = [$medidas['ensayo_1'], $medidas['ensayo_2'], $medidas['ensayo_3']];
+        }
+        $normalizacion = $registro->ejecutar($metodo, $captura);
 
         return ['perfil' => $perfil['id'], 'metodo' => $perfil['metodo'], 'captura' => $captura,
             'fuentes_entradas' => $fuentes, 'motivos_captura' => $motivos, 'normalizacion' => $normalizacion];

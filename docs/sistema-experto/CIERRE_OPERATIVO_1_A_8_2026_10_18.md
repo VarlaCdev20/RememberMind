@@ -20,7 +20,7 @@ La propietaria confirmó: Medicina y Psicología gestionan y aprueban reglas; Su
 | Entregable | Aceptación técnica | Estado inicial |
 | --- | --- | --- |
 | 1. Red operativa | Conceptos, variables, fuentes y reglas conectados; versiones y tipos validados; navegación desde conclusión a evidencia | Por completar |
-| 2. Perfiles instrumentales | Registro ejecutable por instrumento/edición/tarea/método; respuestas originales y motivos de no interpretación | Dos modelos HVLT-R forma 5/Bolivia 2015 implementados y probados, sin corte diagnóstico. Matriz de 19 componentes investigada; las mediciones originales y métodos restantes siguen pendientes |
+| 2. Perfiles instrumentales | Registro ejecutable por instrumento/edición/tarea/método; respuestas originales y motivos de no interpretación | [Ampliación V2](METODOS_Y_CAMPOS_INVESTIGADOS_V2_2026_10_18.md): siete perfiles, once medidas normativas y ocho componentes con cálculo; diccionario de los 19 componentes. Faltan mediciones/bindings originales, normalizadores compatibles de otros once componentes e integración clínica; sin corte diagnóstico automático |
 | 3. Cinco dominios | Ejecutor sobre fuentes institucionales, diecinueve componentes, desconocidos/contradicciones y reglas elegibles | Por completar |
 | 4. DCL | Cuatro patrones y abstenciones desde soportes originales de C01–C05, sin referencias de prueba | Por completar |
 | 5. Adquisición | Lotes autorizados, fecha/corte/autor/estado/contexto y pertenencia de respuestas; sin valores clínicos de relleno | Por completar |

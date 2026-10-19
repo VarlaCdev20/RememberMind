@@ -25,19 +25,23 @@ final class PerfilInstrumentalCognitivo
             }
             $e = $aplicacion['extraccion'];
             foreach ($e['normalizacion']['componentes'] as $componente => $resultado) {
-                $mediciones[$componente][] = ['aplicacion' => $aplicacion['cod_aplicacion'], 'fecha' => $aplicacion['fecha_hora'],
-                    'autor' => $aplicacion['cod_personal'], 'perfil' => $e['perfil'], 'metodo' => $e['metodo'], 'referencia' => $e['normalizacion']['referencia'],
-                    'fuentes_entradas' => $e['fuentes_entradas'], 'captura' => $e['captura'], 'resultado' => $resultado];
+                foreach ($resultado['medidas'] ?? [$resultado] as $medida) {
+                    $mediciones[$componente][] = ['aplicacion' => $aplicacion['cod_aplicacion'], 'fecha' => $aplicacion['fecha_hora'],
+                        'autor' => $aplicacion['cod_personal'], 'perfil' => $e['perfil'], 'metodo' => $e['metodo'], 'referencia' => $e['normalizacion']['referencia'],
+                        'fuentes_entradas' => $e['fuentes_entradas'], 'captura' => $e['captura'], 'resultado' => $medida];
+                }
             }
         }
         $dominios = [];
+        $diccionario = (new CatalogoCapturaCognitiva)->componentes();
         foreach ($red['dominios'] as $codigo => $dominio) {
             $componentes = [];
             foreach ($dominio['componentes'] as $id => $meta) {
                 $datos = $mediciones[$id] ?? [];
                 unset($mediciones[$id]);
                 $normalizadas = count(array_filter($datos, fn ($m) => $m['resultado']['estado'] === 'NORMALIZADO'));
-                $componentes[$id] = $meta + ['estado_medicion' => $normalizadas > 0 ? 'MEDICIONES_DISPONIBLES' : 'SIN_MEDICION_NORMALIZADA',
+                $componentes[$id] = $meta + ['captura_requerida' => $diccionario[$id],
+                    'estado_medicion' => $normalizadas > 0 ? 'MEDICIONES_DISPONIBLES' : 'SIN_MEDICION_NORMALIZADA',
                     'mediciones' => $datos, 'resultado_clinico' => null, 'motivos' => $datos === []
                         ? ['SIN_CAPTURA_VINCULADA_AL_COMPONENTE', 'SIN_CONTRATO_DE_INTERPRETACION_CLINICA']
                         : ['SIN_CONTRATO_DE_INTERPRETACION_CLINICA']];

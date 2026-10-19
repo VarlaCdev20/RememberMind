@@ -1,5 +1,7 @@
 # Protocolos y fichas de captura cognitiva — V1
 
+Ampliación vigente: [Métodos y campos investigados V2](METODOS_Y_CAMPOS_INVESTIGADOS_V2_2026_10_18.md), con diccionario de los 19 componentes y seis perfiles de cálculo adicionales. Esta ficha V1 conserva la cabecera y la primera captura HVLT-R; los espacios de medición requieren valores originales.
+
 Fecha: 18/10/2026. Elaborado por solicitud de la propietaria de crear los protocolos faltantes. Especificación de captura y trabajo; no contiene puntuaciones de residentes, firmas, diagnósticos ni una acreditación profesional. No modifica catálogos ni la estructura de la BDD.
 
 ## Uso

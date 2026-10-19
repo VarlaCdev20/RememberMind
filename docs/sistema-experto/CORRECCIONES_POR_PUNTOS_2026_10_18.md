@@ -17,7 +17,7 @@ Solicitud: corregir los seis puntos y entregar un resumen al cerrar cada uno. Es
 
 La edad se obtiene del nacimiento original a la fecha de aplicación. Los otros datos de aplicabilidad deben constar en respuestas de protocolo identificadas: escolaridad, español nativo, nacimiento y residencia en Bolivia, lectoescritura, administración estandarizada y demora. El motor conserva las respuestas y su procedencia, incluso cuando no puede normalizarlas.
 
-`PerfilConceptualCognitivo` usa la fuente documental existente y conserva definiciones, límites y procedencia. EJE-S03 tiene propietario primario ejecutivo. La consulta presenta todas las mediciones compatibles; no elige la última o la más favorable ni cuenta una aplicación como dos soportes independientes. Dos mediciones HVLT-R pueden normalizarse. La puntuación z no acredita automáticamente alteración de Memoria ni Petersen. Los 17 componentes restantes necesitan método y mediciones compatibles; dos componentes normalizados tampoco equivalen a Memoria interpretada.
+`PerfilConceptualCognitivo` usa la fuente documental existente y conserva definiciones, límites y procedencia. EJE-S03 tiene propietario primario ejecutivo. La consulta presenta todas las mediciones compatibles; no elige la última o la más favorable ni cuenta una aplicación como dos soportes independientes. En el primer corte se normalizaban dos mediciones HVLT-R. La ampliación V2 descrita al final añade seis componentes con cálculo. Los ocho componentes con normalización disponible no equivalen a cinco dominios clínicamente interpretados ni acreditan Petersen.
 
 ## Brecha concreta de conservación — punto 3
 
@@ -49,7 +49,7 @@ Cada disciplina mantiene su cadena: profesional y cuenta reales, fecha, decisió
 - SQLite y PostgreSQL desechable: verificación inicial instrumental/red 26 pruebas, 187 aserciones en cada motor.
 - Regresión de dominio y repositorios tras el traslado: 745 pruebas / 5535 aserciones. Comprobación posterior del codec/conservación/arquitectura: SQLite 83 / 6186; PostgreSQL 85 / 492. Incremento de captura, normalización, perfil y revisión: 47 / 338; última ampliación de metadatos y observaciones de captura: 19 / 82. Son corridas con solapamiento; no se suman como pruebas diferentes.
 - Sintaxis comprobada en los 170 archivos PHP del incremento; diff sin errores de espacios. Revisión independiente estática de consolidación: sin hallazgos P1/P2; 43 clases puras idénticas al corte anterior tras normalizar namespaces/imports. El AST anidado se añadió a las huellas de referencia tras la observación del revisor.
-- Build del incremento: PASS. Suite general de 2705 pruebas descubiertas, posterior al traslado del codec: en curso; no contabilizada como PASS hasta terminar.
+- Build del incremento: PASS. Suite general posterior al traslado del codec: 2705 pruebas, 49861 aserciones, 28 omitidas, sin fallos. Corresponde al corte anterior a la ampliación instrumental V2; no se atribuye a esa corrida la verificación de cambios posteriores.
 - Hubo acceso temporal al navegador: se comprobó el error que ocultaba fuentes por una traza técnica antigua y su recuperación tras corregir la compatibilidad de `SIM-TRACE-1`. Los cinco campos de gobierno nuevos no cambian su significado; se admiten las dos formas físicas conocidas comprobando su hash. No se reescribió una traza ni se admitió una definición semántica alterada. No se guardaron capturas con datos reales.
 - Navegador: el intento posterior volvió a ser rechazado por configuración de Work. No se afirma aceptación visual/responsive completa por un build o por Livewire.
 - No hay push ni modificaciones de estructura o permisos de este incremento.
@@ -71,3 +71,21 @@ La prueba combinada PostgreSQL detectó dos funciones de triggers ya existentes 
 ## Fichas solicitadas posteriormente
 
 La propietaria pidió crear los protocolos y mediciones faltantes. Se elaboró [el paquete de captura V1](PROTOCOLOS_CAPTURA_COGNITIVA_V1_2026_10_18.md): cabecera, ficha de entradas HVLT-R, matriz de diecinueve componentes, ficha C01–C05 y checklist. Son fichas vacías para aplicar o transcribir una evaluación documentada. No se generaron aciertos, tiempos ni firmas para residentes. No se crearon nuevos catálogos ni se presentaron candidatos bibliográficos como instrumentos administrados.
+
+## Investigación y campos completados — ampliación V2
+
+Solicitud posterior: investigar, documentar y completar los campos. Entregado [Métodos y campos investigados V2](METODOS_Y_CAMPOS_INVESTIGADOS_V2_2026_10_18.md), sin introducir valores de residentes.
+
+- [x] Diccionario de adquisición para 19 componentes: datos, tipos/unidades, fuente exacta y límites por edición.
+- [x] Seis perfiles nuevos en `NormalizadorBateriaBolivia2015`: BTA, Stroop, TMT-B, BNT, fluidez y ROCF copia; junto a HVLT-R, siete perfiles, once medidas en ocho componentes.
+- [x] Cuatro condiciones de fluidez independientes en cálculo y compartidas en procedencia; no se crea un promedio, total normativo ni episodios ficticios.
+- [x] Stroop A35: intervalos aproximados y extremos abiertos, sin z o interpolación. Discrepancia de denominador en la publicación localizada y contraste de Golden documentados.
+- [x] Extractor común para todos los métodos, manteniendo PK/versión, respuesta, tipo, bruto y contexto original. Sin alias del extractor anterior ni detección de instrumento por nombre.
+- [x] Diccionario visible por componente y cálculos instrumentales adaptados a z o intervalo percentilar, con dirección explícita del tiempo en TMT-B.
+- [x] Fichas documentales C01–C05 especificadas; no son afirmaciones clínicas ni columnas nuevas.
+- [ ] Mediciones originales e identidad de las aplicaciones: no se completan mediante investigación. La configuración de bindings reales permanece vacía.
+- [ ] Normalizadores compatibles de los otros once componentes, interpretación conjunta de dominios y conservación integral institucional siguen abiertos.
+
+Evidencia del incremento: SQLite 84 pruebas / 2615 aserciones, incluyendo los contratos de aplicación/presentación/frontend; PostgreSQL desechable 63 / 993 (corte previo a dos casos unitarios adicionales). Los últimos casos unitarios se verificaron en SQLite; no cambian consultas ni persistencia. Build PASS. Son corridas solapadas; no se suman. Revisión independiente de lectura del cálculo y sus publicaciones: PASS técnico sin hallazgos P1/P2; no acredita validez clínica ni disponibilidad de mediciones originales. La aceptación visual/responsive completa sigue pendiente; Livewire y build no la sustituyen.
+
+Trazabilidad: definiciones → `CatalogoCapturaCognitiva`; ecuaciones → `NormalizadorBateriaBolivia2015`; identidad/procedencia → `ExtractorCapturaInstrumental` y `CapturasInstrumentalesResidente`; integración → `PerfilInstrumentalCognitivo`; pruebas → `NormalizacionBateriaBolivia2015Test` y `CapturaInstrumentalInstitucionalTest`. Sin cambios de tablas, columnas, catálogos BDD, permisos, datos clínicos o V1. Commit local del incremento, sin push.

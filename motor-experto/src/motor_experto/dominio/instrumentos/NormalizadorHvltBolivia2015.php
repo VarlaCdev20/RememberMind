@@ -17,6 +17,11 @@ final class NormalizadorHvltBolivia2015
 
     public const FUENTE = 'https://doi.org/10.3233/NRE-151286';
 
+    public const ENTRADAS = ['ensayo_1' => 'ENTERO', 'ensayo_2' => 'ENTERO', 'ensayo_3' => 'ENTERO',
+        'recuerdo_diferido' => 'ENTERO', 'demora_minutos' => 'NUMERO', 'escolaridad_anios' => 'ENTERO',
+        'espanol_nativo' => 'LOGICO', 'nacimiento_bolivia' => 'LOGICO', 'residencia_bolivia' => 'LOGICO',
+        'lectoescritura' => 'LOGICO', 'administracion_estandarizada' => 'LOGICO'];
+
     /**
      * El llamador aporta mediciones y contexto documentados; nunca se deducen de una etiqueta nominal.
      * NULL o contexto no acreditado conserva el bruto y enumera las causas de no normalización.

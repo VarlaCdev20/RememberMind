@@ -16,6 +16,17 @@
                             <p class="text-sm break-words">{{ $componente['concepto']['definicion'] }}</p>
                             <p class="text-sm text-rm-secondary break-words mt-2">{{ $componente['concepto']['limites'] }}</p>
                         </details>
+                        <details class="mt-2"><summary class="cursor-pointer min-h-11 text-sm">Campos y método de evaluación</summary>
+                            <p class="text-sm mt-2 break-words">Referencia instrumental: {{ $componente['captura_requerida']['instrumento_referencia'] }}.</p>
+                            <p class="text-sm mt-2">{{ $componente['captura_requerida']['metodos_disponibles'] ? 'Hay un método de cálculo disponible cuando la aplicación cumple sus condiciones.' : 'Campos documentados; falta un método de normalización compatible.' }}</p>
+                            <dl class="mt-3 space-y-2">
+                                @foreach($componente['captura_requerida']['campos'] as $campo => $descripcion)
+                                    <div class="min-w-0"><dt class="text-sm font-semibold break-words">{{ str_replace('_', ' ', $campo) }}</dt><dd class="text-sm break-words">{{ $descripcion }}</dd></div>
+                                @endforeach
+                            </dl>
+                            <p class="text-sm text-rm-secondary mt-3 break-words">{{ $componente['captura_requerida']['limite'] }}</p>
+                            <a class="text-sm underline inline-flex items-center min-h-11 break-all" href="{{ $componente['captura_requerida']['fuente'] }}" target="_blank" rel="noopener noreferrer">Consultar la fuente del método (abre otra pestaña)</a>
+                        </details>
                     </div>
                 @endforeach
             </details>

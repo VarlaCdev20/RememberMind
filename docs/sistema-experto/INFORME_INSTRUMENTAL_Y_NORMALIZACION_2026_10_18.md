@@ -1,5 +1,7 @@
 # Evaluación cognitiva y métodos instrumentales para RememberMind
 
+Actualización de implementación: [Métodos y campos V2](METODOS_Y_CAMPOS_INVESTIGADOS_V2_2026_10_18.md). Amplía a siete perfiles, once medidas y ocho componentes. El cuerpo V1 siguiente conserva el alcance de la primera entrega HVLT-R; sus cifras no representan el registro actual.
+
 Informe técnico de evidencia para Medicina y Psicología. Versión 1.0, 18 de octubre de 2026.
 
 ## Decisión y aplicación

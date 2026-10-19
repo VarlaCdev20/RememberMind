@@ -1,7 +1,8 @@
 <?php
 
 return [
-    // Bindings explícitos a instrumentos/preguntas originales. Su ausencia no identifica las tareas nominales como HVLT-R.
+    // Bindings a PK/versión/preguntas originales; los métodos investigados no identifican una aplicación por su nombre.
+    // Véase docs/sistema-experto/METODOS_Y_CAMPOS_INVESTIGADOS_V2_2026_10_18.md.
     'perfiles_instrumentales' => [],
     // Registro de contratos de PUBLICACIÓN, nunca activación de inferencia.
     // Vacío hasta decisión institucional: ACTIVO por sí solo no acredita el paquete.
