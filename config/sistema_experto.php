@@ -4,6 +4,10 @@ return [
     // Contratos técnicos de predicados/modalidades y extracción por PK de versión raíz.
     // Las sucesoras heredan el contrato; no habilita clínica ni acepta definiciones del cliente.
     'contratos_conocimiento' => [],
+
+    // Contratos interpretativos identificados y versionados; nunca se deducen de observaciones.
+    // Cada contrato declara componente, instrumento/edición, método/fuente, predicados y mediciones originales requeridas.
+    'perfiles_interpretativos' => [],
     // PK exacta del conocimiento institucional a consultar; sin selección automática de paquetes de laboratorio.
     'version_cognitiva' => null,
     // Bindings a PK/versión/preguntas originales e identidad_instrumento (edición/forma/idioma cotejados).

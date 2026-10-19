@@ -6,6 +6,7 @@ namespace MotorExperto\adaptadores\entrada;
 
 use DateTimeImmutable;
 use DomainException;
+use MotorExperto\dominio\conocimiento\AdmisibilidadCognitivaInstitucional;
 use MotorExperto\dominio\conocimiento\AdmisibilidadFuenteCOGMEM;
 use MotorExperto\dominio\conocimiento\MapeadorSemantico;
 use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
@@ -16,7 +17,7 @@ use MotorExperto\dominio\objetos_valor\FuenteBrutaCOGMEM;
 /** Traduce respuestas originales identificadas a hechos; nunca usa z, clasificación ni texto libre como diagnóstico. */
 final class ConstructorMemoriaInstrumental
 {
-    public function construir(PaqueteConocimiento $p, ContextoEjecucion $contexto, array $capturas, array $vinculos): array
+    public function construir(PaqueteConocimiento $p, ContextoEjecucion $contexto, array $capturas, array $vinculos, bool $conservarEpisodios = false): array
     {
         if (($capturas['disponible'] ?? null) !== true || $contexto->version !== $p->version) {
             throw new DomainException('Se requieren fuentes autorizadas y la misma versión de conocimiento.');
@@ -24,7 +25,7 @@ final class ConstructorMemoriaInstrumental
         $m = new MemoriaTrabajo($contexto);
         $excluidas = [];
         foreach ($vinculos as $mapeo => $vinculo) {
-            if (! is_string($mapeo) || ! is_array($vinculo) || array_diff(array_keys($vinculo), ['cod_instrumento', 'codigo_instrumento', 'version_instrumento', 'cod_pregunta', 'campo'])) {
+            if (! is_string($mapeo) || ! is_array($vinculo) || array_diff(array_keys($vinculo), ['cod_instrumento', 'codigo_instrumento', 'version_instrumento', 'cod_pregunta', 'campo', 'componente', 'perfil_interpretativo'])) {
                 throw new DomainException('Vínculo instrumental fuera del contrato.');
             }
             foreach (['cod_instrumento', 'codigo_instrumento', 'version_instrumento', 'cod_pregunta', 'campo'] as $campo) {
@@ -108,18 +109,52 @@ final class ConstructorMemoriaInstrumental
                 } : (is_string($original) ? $original : null);
                 $variable = $p->fila('variables_expertas', $mapa['cod_variable_experta']);
                 $esMemoriaInstrumental = $p->red->nodo($variable['cod_nodo_semantico'])['codigo_semantico'] === 'VAR-MEM-INST-01';
+                $atencion = $conservarEpisodios ? ($a['aplicacion_actual']['cod_atencion'] ?? null) : null;
+                if ($atencion !== null && (! is_string($atencion) || $atencion === ''
+                    || ($a['atencion_original']['cod_atencion'] ?? null) !== $atencion
+                    || ($a['atencion_original']['cod_residente'] ?? null) !== $contexto->residente)) {
+                    throw new DomainException('La atención original no acredita el episodio del mismo residente.');
+                }
+                $unidad = $atencion === null ? $a['cod_aplicacion'] : 'atencion:'.$atencion;
+                $mediciones = [];
+                $perfil = $vinculo['perfil_interpretativo'] ?? null;
+                foreach (is_array($perfil) && is_array($perfil['mediciones_requeridas'] ?? null) ? $perfil['mediciones_requeridas'] : [] as $nombre => $selector) {
+                    if (! is_array($selector)) {
+                        continue;
+                    }
+                    $originales = array_values(array_filter($a['respuestas_originales'], static fn ($r) => $r['cod_pregunta'] === ($selector['cod_pregunta'] ?? null)));
+                    if (count($originales) !== 1) {
+                        continue;
+                    }
+                    $medida = $originales[0];
+                    if (($medida['coherente'] ?? false) !== true || $medida['cod_aplicacion'] !== $a['cod_aplicacion']
+                        || ($medida['pregunta_actual']['cod_instrumento'] ?? null) !== $a['cod_instrumento']
+                        || ($medida['pregunta_actual']['cod_pregunta'] ?? null) !== $medida['cod_pregunta']
+                        || ! in_array($medida['pregunta_actual']['tipo_respuesta'] ?? null, ['NUMERO', 'NUMERICO'], true)
+                        || $medida['tipo_respuesta'] !== $medida['pregunta_actual']['tipo_respuesta']
+                        || count(array_filter(['valor_logico', 'valor_texto', 'cod_opcion'], static fn ($campo) => ($medida[$campo] ?? null) !== null && $medida[$campo] !== '')) > 0
+                        || ($selector['campo'] ?? null) !== 'valor_numero') {
+                        continue;
+                    }
+                    $mediciones[$nombre] = ['cod_aplicacion' => $a['cod_aplicacion'], 'cod_pregunta' => $medida['cod_pregunta'],
+                        'cod_respuesta' => $medida['cod_respuesta'], 'campo' => 'valor_numero', 'valor_original' => $medida['valor_numero'] ?? null];
+                }
                 $f = new FuenteBrutaCOGMEM($fuente['cod_fuente_dato_experta'], 'aplicaciones_instrumento', $vinculo['cod_pregunta'],
                     $a['cod_aplicacion'], $a['cod_residente'], new DateTimeImmutable($a['fecha_hora']), $original, $tipado,
-                    $a['cod_personal'], true, $a['estado_original'] === 'COMPLETA', contexto: [
-                        'unidad_soporte' => $a['cod_aplicacion'], 'cod_respuesta' => $r['cod_respuesta'] ?? null,
+                    $a['cod_personal'], true, $a['estado_original'] === 'COMPLETA', atencion: $atencion, contexto: [
+                        'unidad_soporte' => $unidad, 'cod_respuesta' => $r['cod_respuesta'] ?? null,
                         'componente_instrumental_verificado' => $esMemoriaInstrumental && $r !== null
                             && ($a['instrumento_actual']['tipo'] ?? null) !== 'OBSERVACIONAL',
                         'cod_pregunta' => $vinculo['cod_pregunta'], 'campo_original' => $campo,
                         'procedencia' => $a['procedencia'], 'instrumento' => $a['instrumento_actual'],
                         'pregunta_original' => $pregunta, 'fuente_edad' => $a['fuente_edad'],
                     ] + ($esNominalObservacional ? ['naturaleza_fuente' => 'OBSERVACION_CLINICA',
-                        'opcion_original' => $r['opcion_actual'] ?? null] : []));
+                        'opcion_original' => $r['opcion_actual'] ?? null] : [])
+                        + ($conservarEpisodios ? ['unidad_conjuncion' => $a['cod_aplicacion'],
+                            'componente_declarado' => $vinculo['componente'] ?? null, 'perfil_interpretativo' => $perfil,
+                            'mediciones_interpretacion' => $mediciones] : []));
                 $e = (new MapeadorSemantico)->mapear($p, $contexto, $f, $mapeo);
+                $e = (new AdmisibilidadCognitivaInstitucional)->validar($p, $e);
                 $criterios = [];
                 foreach ($p->tabla('criterios_dominios_resultado') as $criterio) {
                     $id = $criterio['cod_nodo_criterio'];

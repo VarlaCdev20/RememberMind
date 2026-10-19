@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MotorExperto\aplicacion\casos_uso;
 
 use DomainException;
+use MotorExperto\dominio\conocimiento\AdmisibilidadCognitivaInstitucional;
 use MotorExperto\dominio\conocimiento\AdmisibilidadFuenteCOGMEM;
 use MotorExperto\dominio\conocimiento\CompiladorPerfilCognitivo;
 use MotorExperto\dominio\conocimiento\MapeadorSemantico;
@@ -32,6 +33,7 @@ final class EvaluarConocimientoCognitivo
         $instrumentalesMemoria = array_fill_keys(array_column($m->paraCriterio($memoria), 'id'), true);
         foreach ($m->todas() as $e) {
             $original = (new MapeadorSemantico)->mapear($p, $m->contexto, $e->fuente, $e->mapeoVariable);
+            $original = (new AdmisibilidadCognitivaInstitucional)->validar($p, $original);
             if (isset($instrumentalesMemoria[$e->id])) {
                 $original = (new AdmisibilidadFuenteCOGMEM)->validar($p, $original);
             }

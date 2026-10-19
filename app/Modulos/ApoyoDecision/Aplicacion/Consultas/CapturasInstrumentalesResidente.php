@@ -120,6 +120,7 @@ final class CapturasInstrumentalesResidente
                 'fecha_hora' => $a->fecha_hora->format('Y-m-d\TH:i:s.uP'), 'estado_original' => $a->estado,
                 'aplicacion_actual' => $a->getRawOriginal(), 'instrumento_actual' => $instrumento?->getRawOriginal(),
                 'documento_original' => $documentoOriginal,
+                'atencion_original' => $a->atencion?->only(['cod_atencion', 'cod_residente']),
                 'procedencia' => ['cod_personal_aplicador' => $a->cod_personal, 'cod_usuario_registro' => $a->cod_usuario_registro,
                     'registrado_en' => $a->registrado_en?->format('Y-m-d\TH:i:s.uP'), 'cod_documento_clinico' => $a->cod_documento_clinico,
                     'localizador_fuente' => $a->localizador_fuente, 'cod_aplicacion_anterior' => $a->cod_aplicacion_anterior,

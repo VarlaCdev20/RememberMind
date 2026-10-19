@@ -26,6 +26,14 @@ final readonly class ConsultarPerfilInstrumental
         $red = (new PerfilConceptualCognitivo)->construir($this->fuente->leer());
 
         $perfil = (new PerfilInstrumentalCognitivo)->construir($red, $captura);
+        foreach ($perfil['dominios'] as $codigo => &$dominio) {
+            $dominio['integracion'] = $consulta['resultado']['perfil'][$codigo] ?? null;
+            foreach ($dominio['componentes'] as $id => &$componente) {
+                $componente['observaciones'] = $consulta['resultado']['observaciones_por_componente'][$id] ?? [];
+            }
+            unset($componente);
+        }
+        unset($dominio);
         unset($consulta['capturas']);
         $perfil['inferencia_declarativa'] = $consulta;
 

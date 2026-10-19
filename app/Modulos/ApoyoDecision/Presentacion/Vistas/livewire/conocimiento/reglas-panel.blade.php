@@ -3,6 +3,12 @@
     @if($mensaje)<div class="rm-alert rm-alert-success" role="status">{{ $mensaje }}</div>@endif
     @error('gobierno')<div class="rm-alert rm-alert-danger" role="alert">{{ $message }}</div>@enderror
     <x-ui.section-card title="Versión del conocimiento">
+        @if($puedeRegistrar)
+            <div class="mb-4 space-y-2">
+                <button type="button" class="rm-btn rm-btn-secondary" wire:click="registrarInstitucional" wire:confirm="Registrar el contrato institucional A–D adoptado, sin modificar los registros de residentes ni firmar revisiones profesionales. Si ya existe, se abrirá su versión original." wire:loading.attr="disabled">Registrar base institucional adoptada</button>
+                <p class="text-sm text-rm-secondary">Las observaciones se conservan como tales. Las reglas instrumentales requieren sus antecedentes originales; no se completan puntuaciones ni resultados.</p>
+            </div>
+        @endif
         <label for="gob-version" class="block font-semibold mb-2">Versión que desea consultar</label>
         <select id="gob-version" wire:model.live="versionSeleccionada" class="rm-input w-full">
             <option value="">Seleccione una versión</option>

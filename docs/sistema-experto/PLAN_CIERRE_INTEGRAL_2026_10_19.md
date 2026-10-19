@@ -90,14 +90,15 @@ en sus propias actas y no se atribuyen a este cierre.
 - [x] Revisión independiente y corrección de captura duplicada/procedencia omitida; una captura compartida, preguntas sin respuesta y fechas completas. [Acta y fuentes verificadas](CIERRE_TRAZABILIDAD_Y_REPRODUCCION_2026_10_19.md).
 - [x] Compatibilidad del puente con parejas opción/texto observacionales concordantes; trazabilidad, NULL y rechazo de referencias incompatibles, sin normalización instrumental. Traducción de vínculos entre sucesoras, archivo y reproducción del resultado anterior. [Alcance, regresiones y pendientes](FASE_4_PUENTE_NOMINAL_Y_SUCESION_2026_10_19.md).
 
-**Pendiente de cierre institucional:** las fuentes observacionales ya están conciliadas en fase 2. Falta definir su contribución a los predicados y consecuencias del paquete institucional de Memoria/G09, y cerrar la conservación completa en fase 6. El conector de extracción/autorización y su sucesión se verifican con datos sintéticos; esto no activa las versiones institucionales ni convierte las observaciones en mediciones estandarizadas. Las casillas institucionales siguientes no se marcan por la sola aceptación técnica del conector.
+**Contrato institucional adoptado e implementado:** la propietaria aprobó A–D. El [acta del paquete institucional](FASE_4_CONTRATO_AD_INTEGRADO_2026_10_19.md) documenta su contenido, integración, pruebas y límites. Las observaciones mantienen su significado descriptivo; C1/C2/C3 requieren contrato interpretativo y fuentes suficientes. Las casillas siguientes corresponden al software del contrato adoptado, sin atribuir resultados instrumentales a las observaciones ni declarar completa la conservación de fase 6.
 
-- [ ] Conectar fuente → hecho → variable → componente → dominio → regla → resultado.
-- [ ] Validar tipos, referencias, versiones y cobertura de los 19 componentes.
-- [ ] Integrar Memoria y las quince reglas G09 mediante contratos institucionales verificables. Las referencias de laboratorio no se promueven a evidencia clínica.
-- [ ] Aplicar criterios documentados de combinación, contradicción, antigüedad y suficiencia; impedir doble conteo de aplicaciones o episodios compartidos.
-- [ ] Conectar el gobierno existente con todo el conocimiento ejecutable: probar, crear sucesora, sustituir y archivar preservando la evaluación anterior y el autor/revisor/motivo.
-- [ ] Producir trazas que permitan recorrer cada conclusión hasta las condiciones y fuentes originales.
+- [x] Conectar fuente → hecho → variable → componente → dominio → regla → resultado o no emisión explicada.
+- [x] Validar tipos, referencias, versiones y cobertura de los 19 componentes.
+- [x] Integrar Memoria y las quince reglas G09 mediante contratos institucionales verificables. Las referencias de laboratorio no se promueven a evidencia clínica.
+- [x] Aplicar criterios documentados de combinación, contradicción, corte temporal y suficiencia; impedir doble conteo de aplicaciones o episodios compartidos. No se inventa una caducidad clínica.
+- [x] Conectar el gobierno existente con todo el conocimiento ejecutable: probar, crear sucesora, sustituir y archivar preservando la ejecución anterior y el autor/revisor/motivo.
+- [x] Producir trazas que permitan recorrer cada conclusión hasta las condiciones, perfiles, medidas y fuentes originales.
+- [ ] Completar el registro del paquete en la instalación mediante sesión autorizada de Medicina/Psicología y comprobar visualmente el recorrido; el navegador sigue deshabilitado para la herramienta.
 
 **Entregable:** ejecutor institucional integrado y red navegable. **Cierre:** casos de cada dominio muestran por qué se activó o no una regla; retirar una regla afecta nuevas ejecuciones y conserva las anteriores.
 

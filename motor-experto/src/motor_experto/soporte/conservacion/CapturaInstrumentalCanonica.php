@@ -19,7 +19,7 @@ final class CapturaInstrumentalCanonica
 
     private const OPCION = ['cod_opcion', 'cod_pregunta', 'nombre', 'valor', 'puntaje', 'orden', 'estado'];
 
-    public function construir(array $fuentes): array
+    public function construir(array $fuentes, bool $conservarEpisodios = false): array
     {
         if (($fuentes['disponible'] ?? null) !== true) {
             throw new DomainException('La captura canónica requiere fuentes autorizadas.');
@@ -34,6 +34,9 @@ final class CapturaInstrumentalCanonica
                 'cod_usuario_registro', 'registrado_en', 'cod_documento_clinico', 'localizador_fuente', 'cod_aplicacion_anterior']);
             $fila['documento_original'] = $this->fila($a['documento_original'] ?? null,
                 ['cod_documento_clinico', 'cod_residente', 'cod_personal', 'hash_archivo', 'estado', 'fecha_hora']);
+            if ($conservarEpisodios) {
+                $fila['atencion_original'] = $this->fila($a['atencion_original'] ?? null, ['cod_atencion', 'cod_residente']);
+            }
             foreach ($fila['extraccion']['fuentes_entradas'] ?? [] as $entrada => $fuente) {
                 if (($fuente['bruto'] ?? null) !== null && $fuente['campo'] === 'valor_numero') {
                     $fila['extraccion']['fuentes_entradas'][$entrada]['bruto'] = self::decimal($fuente['bruto'], 4, 8);

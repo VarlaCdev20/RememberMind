@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\AplicacionInstrumento;
+use App\Models\Area;
+use App\Models\Atencion;
 use App\Models\DocumentoClinico;
 use App\Models\Instrumento;
 use App\Models\OpcionPregunta;
@@ -14,12 +16,15 @@ use App\Models\Residente;
 use App\Models\RespuestaInstrumento;
 use App\Models\User;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\GestionarReglasExpertas;
+use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoInstitucional;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\CapturasInstrumentalesResidente;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarConocimientoCognitivo;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarPerfilInstrumental;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\IdentidadesConocimiento;
 use App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratosConocimiento;
 use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoOrion;
+use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\GobiernoReglasPanel;
 use Carbon\CarbonImmutable;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use DomainException;
@@ -27,8 +32,11 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Livewire;
 use MotorExperto\adaptadores\entrada\ConstructorMemoriaInstrumental;
 use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\dominio\conocimiento\PerfilConceptualCognitivo;
+use MotorExperto\dominio\conocimiento\versiones\PaqueteCognitivoInstitucional as P;
 use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
 use MotorExperto\investigacion\dcl\PaqueteCincoDominiosExperimental;
 use MotorExperto\investigacion\g09\PaqueteSemanticoG09Experimental;
@@ -279,7 +287,7 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
     {
         $this->prepararObservacionesNominales();
         $r = $this->consultar();
-        $contrato = config('sistema_experto.contratos_conocimiento.'.$this->version);
+        $contrato = app(ContratosConocimiento::class)->porVersion($this->version);
         $tablas = app(ConocimientoVersionado::class)->instantanea($this->version);
         $p = new PaqueteConocimiento($this->version, $tablas, $contrato['relaciones'], false, $contrato['tipo_regla_resultado'], $contrato['extracciones']);
         $c = new ContextoEjecucion($r['resultado']['evaluacion'], $this->residente->getKey(), $this->version, CarbonImmutable::now()->toDateTimeImmutable());
@@ -390,6 +398,54 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         }
     }
 
+    public function test_atencion_compartida_unifica_soportes_sin_unificar_conjunciones_de_aplicaciones(): void
+    {
+        $atencion = $this->atencionOriginal();
+        DB::table('aplicaciones_instrumento')->where('cod_aplicacion', $this->aplicacion)->update(['cod_atencion' => $atencion->getKey()]);
+        $original = AplicacionInstrumento::query()->findOrFail($this->aplicacion);
+        $otra = AplicacionInstrumento::create(['cod_instrumento' => $original->cod_instrumento, 'cod_residente' => $original->cod_residente,
+            'cod_personal' => $original->cod_personal, 'cod_atencion' => $atencion->getKey(), 'fecha_hora' => '2026-10-18 10:00:00', 'estado' => 'COMPLETA']);
+        foreach ($original->respuestas as $respuesta) {
+            RespuestaInstrumento::create(['cod_aplicacion' => $otra->getKey(), 'cod_pregunta' => $respuesta->cod_pregunta, 'valor_logico' => true]);
+        }
+        $r = $this->consultar();
+        $conclusion = array_values($r['resultado']['perfil']['COG-ATE']['conclusiones_candidatas'])[0];
+        self::assertCount(6, $conclusion['evidencias']);
+        self::assertCount(1, $conclusion['soportes_efectivos']);
+        self::assertSame('INSTRUMENTAL-DECLARATIVO-2', $r['preparacion_conservacion']['contrato']);
+        foreach ($r['resultado']['perfil']['COG-ATE']['traza']['rutas'] as $ruta) {
+            self::assertSame($atencion->getKey(), $ruta['procedencia_instrumental']['episodio_original']['cod_atencion']);
+        }
+        DB::table('respuestas_instrumento')->where('cod_aplicacion', $this->aplicacion)->where('cod_pregunta', $this->primeraPregunta)->update(['valor_logico' => null]);
+        DB::table('respuestas_instrumento')->where('cod_aplicacion', $otra->getKey())->where('cod_pregunta', '!=', $this->primeraPregunta)->update(['valor_logico' => null]);
+        self::assertSame([], $this->consultar()['resultado']['perfil']['COG-ATE']['conclusiones_candidatas']);
+    }
+
+    public function test_atenciones_distintas_o_ausentes_no_se_fusionan_por_fecha(): void
+    {
+        $original = AplicacionInstrumento::query()->findOrFail($this->aplicacion);
+        $otra = AplicacionInstrumento::create(['cod_instrumento' => $original->cod_instrumento, 'cod_residente' => $original->cod_residente,
+            'cod_personal' => $original->cod_personal, 'fecha_hora' => $original->fecha_hora, 'estado' => 'COMPLETA']);
+        foreach ($original->respuestas as $respuesta) {
+            RespuestaInstrumento::create(['cod_aplicacion' => $otra->getKey(), 'cod_pregunta' => $respuesta->cod_pregunta, 'valor_logico' => true]);
+        }
+        $r = $this->consultar();
+        self::assertCount(2, array_values($r['resultado']['perfil']['COG-ATE']['conclusiones_candidatas'])[0]['soportes_efectivos']);
+        $a = $this->atencionOriginal();
+        $b = $this->atencionOriginal();
+        DB::table('aplicaciones_instrumento')->where('cod_aplicacion', $this->aplicacion)->update(['cod_atencion' => $a->getKey()]);
+        DB::table('aplicaciones_instrumento')->where('cod_aplicacion', $otra->getKey())->update(['cod_atencion' => $b->getKey()]);
+        self::assertCount(2, array_values($this->consultar()['resultado']['perfil']['COG-ATE']['conclusiones_candidatas'])[0]['soportes_efectivos']);
+    }
+
+    private function atencionOriginal(): Atencion
+    {
+        $area = Area::create(['nombre' => 'Área sintética de Psicología '.Atencion::count(), 'estado' => 'ACTIVA']);
+
+        return Atencion::create(['cod_residente' => $this->residente->getKey(), 'cod_personal' => $this->usuario->personal->getKey(),
+            'cod_area' => $area->getKey(), 'tipo_atencion' => 'VALORACION', 'fecha_hora' => '2026-10-18 08:00:00', 'estado' => 'FINALIZADA']);
+    }
+
     public function test_perfil_e_inferencia_usan_una_sola_captura_aunque_el_original_se_rectifique_despues(): void
     {
         $original = app(FuenteConocimientoOrion::class);
@@ -491,7 +547,7 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
 
     private function instantanea(array $r): InstantaneaInstrumental
     {
-        $contrato = config('sistema_experto.contratos_conocimiento.'.$this->version);
+        $contrato = app(ContratosConocimiento::class)->porVersion($this->version);
         $tablas = app(ConocimientoVersionado::class)->instantanea($this->version);
         $p = new PaqueteConocimiento($this->version, $tablas, $contrato['relaciones'], false, $contrato['tipo_regla_resultado'], $contrato['extracciones']);
         $c = new ContextoEjecucion($r['resultado']['evaluacion'], $this->residente->getKey(), $this->version, CarbonImmutable::now()->toDateTimeImmutable());
@@ -634,5 +690,221 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         DB::table('versiones_modelo_experto')->where('cod_version_modelo', $this->version)->update(['estado' => 'INACTIVO']);
         $this->expectException(DomainException::class);
         $this->consultar();
+    }
+
+    public function test_registro_adoptado_es_atomico_idempotente_y_ejecuta_cinco_dominios_sin_fabricar_fuentes(): void
+    {
+        config(['sistema_experto.version_cognitiva' => null]);
+        $id = app(RegistrarConocimientoInstitucional::class)->ejecutar($this->usuario);
+        self::assertSame($id, app(RegistrarConocimientoInstitucional::class)->ejecutar($this->usuario));
+        self::assertSame(17, DB::table('reglas_expertas')->where('cod_version_modelo', $id)->count());
+        self::assertSame(47, DB::table('condiciones_regla_experta')->whereIn('cod_regla_experta', DB::table('reglas_expertas')->where('cod_version_modelo', $id)->select('cod_regla_experta'))->count());
+        self::assertSame(17, DB::table('reglas_expertas')->where('cod_version_modelo', $id)->where('estado_revision', 'PENDIENTE')->whereNull('cod_usuario_revision')->count());
+        self::assertSame(1, DB::table('activity_log')->where('event', 'contrato_institucional_registrado')->count());
+        $r = $this->consultar();
+        self::assertTrue($r['disponible']);
+        self::assertSame('ORION-AD-20261019', $r['resultado']['contrato_institucional']);
+        self::assertCount(5, $r['resultado']['perfil']);
+        self::assertCount(19, $r['resultado']['red']['componentes']);
+        foreach ($r['resultado']['perfil'] as $dominio) {
+            self::assertSame([], $dominio['conclusiones_candidatas']);
+            self::assertNull($dominio['resultado_institucional']);
+        }
+        self::assertSame(0, DB::table('evaluaciones_expertas')->count());
+    }
+
+    public function test_observaciones_de_19_componentes_se_integran_sin_acreditar_las_15_reglas_g09(): void
+    {
+        $this->crearObservacionesInstitucionales();
+        config(['sistema_experto.version_cognitiva' => null]);
+        app(RegistrarConocimientoInstitucional::class)->ejecutar($this->usuario);
+        $r = $this->consultar();
+        self::assertCount(19, $r['resultado']['observaciones_por_componente']);
+        foreach ($r['resultado']['observaciones_por_componente'] as $codigo => $filas) {
+            self::assertCount(1, $filas);
+            self::assertSame('DIFICULTAD_DOCUMENTADA', $filas[0]['codigo']);
+            self::assertSame('SIM_DIFICULTAD', $filas[0]['literal_original']);
+            self::assertSame($this->usuario->personal->getKey(), $filas[0]['autor']);
+            self::assertSame([], $filas[0]['reglas_instrumentales_acreditadas']);
+        }
+        foreach ($r['resultado']['perfil'] as $dominio) {
+            self::assertSame([], $dominio['conclusiones_candidatas']);
+            foreach ($dominio['traza']['reglas'] as $regla) {
+                self::assertSame('NO_CUMPLE', $regla['estado']);
+            }
+        }
+        self::assertSame('EV-CM-1', $r['resultado']['perfil']['COG-MEM']['compuerta_institucional']['estado']);
+        $perfil = app(ConsultarPerfilInstrumental::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now());
+        self::assertCount(1, $perfil['dominios']['COG-MEM']['componentes']['MEM-S01']['observaciones']);
+        $html = view('apoyodecision::livewire.medico.resultados-experto.perfil-instrumental', ['perfilInstrumental' => $perfil])->render();
+        self::assertStringContainsString('Dificultad documentada', $html);
+        self::assertStringContainsString('R-ATE-S01-P01', $html);
+        self::assertStringContainsString('Sin soporte coincidente en una misma aplicación', $html);
+        self::assertSame(0, DB::table('resultados_criterio')->count());
+    }
+
+    public function test_superadmin_no_registra_conocimiento_aunque_tenga_permiso_aislado(): void
+    {
+        $this->usuario->syncRoles('SUPERADMINISTRADOR');
+        $this->usuario->givePermissionTo('reglas_expertas.gestionar');
+        try {
+            app(RegistrarConocimientoInstitucional::class)->ejecutar($this->usuario);
+            self::fail('La consulta administrativa no habilita gestión clínica.');
+        } catch (AuthorizationException) {
+            self::assertSame(0, DB::table('versiones_modelo_experto')->where('codigo_version', P::CODIGO)->count());
+            self::assertSame(0, DB::table('activity_log')->where('event', 'contrato_institucional_registrado')->count());
+        }
+    }
+
+    public function test_registro_desde_livewire_usa_actor_autorizado_y_conserva_revision_pendiente(): void
+    {
+        Livewire::test(GobiernoReglasPanel::class)
+            ->call('registrarInstitucional')->assertHasNoErrors()->assertSee('diecisiete reglas');
+        self::assertSame($this->usuario->getKey(), DB::table('versiones_modelo_experto')->where('codigo_version', P::CODIGO)->value('cod_usuario_creacion'));
+    }
+
+    public function test_cuenta_inactiva_o_profesion_incompatible_no_registran_aunque_tengan_permisos(): void
+    {
+        foreach (['CUENTA_INACTIVA', 'PROFESION_INCOMPATIBLE'] as $caso) {
+            DB::table('usuarios')->where('cod_usuario', $this->usuario->getKey())->update(['estado' => $caso === 'CUENTA_INACTIVA' ? 'INACTIVO' : 'ACTIVO']);
+            DB::table('personal')->where('cod_usuario', $this->usuario->getKey())->update(['profesion' => $caso === 'PROFESION_INCOMPATIBLE' ? 'ENFERMERIA' : 'PSICOLOGIA']);
+            try {
+                app(RegistrarConocimientoInstitucional::class)->ejecutar($this->usuario);
+                self::fail('No debe bastar un permiso sin cuenta y competencia válidas.');
+            } catch (AuthorizationException) {
+                self::assertSame(0, DB::table('versiones_modelo_experto')->where('codigo_version', P::CODIGO)->count());
+                self::assertSame(0, DB::table('activity_log')->where('event', 'contrato_institucional_registrado')->count());
+            }
+        }
+    }
+
+    public function test_medicina_registra_sin_atribuir_aprobaciones_profesionales(): void
+    {
+        $this->usuario->syncRoles('MEDICO GENERAL/GERIATRA');
+        DB::table('personal')->where('cod_usuario', $this->usuario->getKey())->update(['profesion' => 'MEDICINA']);
+        $id = app(RegistrarConocimientoInstitucional::class)->ejecutar($this->usuario);
+        self::assertSame(17, DB::table('reglas_expertas')->where('cod_version_modelo', $id)->whereNull('cod_usuario_revision')->count());
+    }
+
+    public function test_registro_fallido_no_deja_conocimiento_ni_auditoria_parciales(): void
+    {
+        DB::listen(static function ($q): void {
+            if (str_starts_with(strtolower($q->sql), 'insert into "reglas_expertas"')) {
+                throw new \RuntimeException('Interrupción sintética de persistencia.');
+            }
+        });
+        try {
+            app(RegistrarConocimientoInstitucional::class)->ejecutar($this->usuario);
+            self::fail('Debió propagarse el fallo de persistencia.');
+        } catch (\RuntimeException $e) {
+            self::assertSame('Interrupción sintética de persistencia.', $e->getMessage());
+            self::assertSame(0, DB::table('versiones_modelo_experto')->where('codigo_version', P::CODIGO)->count());
+            self::assertSame(0, DB::table('nodos_semanticos')->where('observacion', P::FUNDAMENTO)->count());
+            self::assertSame(0, DB::table('activity_log')->where('event', 'contrato_institucional_registrado')->count());
+        }
+    }
+
+    public function test_atencion_manipulada_en_captura_se_rechaza_aunque_figure_coherente(): void
+    {
+        $atencion = $this->atencionOriginal();
+        DB::table('aplicaciones_instrumento')->where('cod_aplicacion', $this->aplicacion)->update(['cod_atencion' => $atencion->getKey()]);
+        $r = $this->consultar();
+        $r['capturas']['capturas'][0]['atencion_original']['cod_residente'] = 'RES-AJENO';
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('atención original');
+        $this->instantanea($r);
+    }
+
+    public function test_reproduccion_v2_conserva_episodio_aunque_el_vinculo_sql_cambie(): void
+    {
+        $atencion = $this->atencionOriginal();
+        DB::table('aplicaciones_instrumento')->where('cod_aplicacion', $this->aplicacion)->update(['cod_atencion' => $atencion->getKey()]);
+        $dto = $this->instantanea($this->consultar());
+        DB::table('aplicaciones_instrumento')->where('cod_aplicacion', $this->aplicacion)->update(['cod_atencion' => null]);
+        $reproducida = InstantaneaInstrumental::verificar($dto->contenido, $dto->huella);
+        self::assertSame($dto->contenido, $reproducida->contenido);
+        self::assertSame($atencion->getKey(), $reproducida->contenido['salida']['resultado']['perfil']['COG-ATE']['traza']['rutas'][0]['procedencia_instrumental']['episodio_original']['cod_atencion']);
+    }
+
+    public function test_g09_sql_exige_perfil_definido_y_medida_bruta_de_la_misma_aplicacion(): void
+    {
+        $id = app(RegistrarConocimientoInstitucional::class)->ejecutar($this->usuario);
+        $contrato = P::contratos();
+        $fuente = 'FU-PREDICADOS-TEST';
+        InformeCognitivoFixture::insertar('fuentes_datos_expertas', ['cod_fuente_dato_experta' => $fuente, 'cod_version_modelo' => $id,
+            'codigo_fuente' => 'PREDICADOS-TEST', 'tabla_raiz' => 'aplicaciones_instrumento', 'campo_pk_raiz' => 'cod_aplicacion',
+            'campo_residente' => 'cod_residente', 'campo_temporal' => 'fecha_hora', 'campo_personal' => 'cod_personal', 'estado' => 'ACTIVO']);
+        $original = app(CapturasInstrumentalesResidente::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now());
+        $a = $original['capturas'][0];
+        $qMedida = PreguntaInstrumento::create(['cod_instrumento' => $a['cod_instrumento'], 'codigo' => 'MEDIDA-TEST', 'enunciado' => 'Cantidad sintética',
+            'tipo_respuesta' => 'NUMERO', 'orden' => 4, 'estado' => 'ACTIVA']);
+        RespuestaInstrumento::create(['cod_aplicacion' => $this->aplicacion, 'cod_pregunta' => $qMedida->getKey(), 'valor_numero' => 2]);
+        $valor = DB::table('valores_semanticos as s')->join('dominios_valores_expertos as d', 'd.cod_dominio_valores', '=', 's.cod_dominio_valores')
+            ->where('d.cod_version_modelo', $id)->where('s.codigo_valor', 'ACREDITADA')->value('s.cod_valor_semantico');
+        foreach ($a['respuestas_originales'] as $i => $r) {
+            $variable = DB::table('variables_expertas as v')->join('nodos_semanticos as n', 'n.cod_nodo_semantico', '=', 'v.cod_nodo_semantico')
+                ->where('v.cod_version_modelo', $id)->where('n.codigo_semantico', 'VAR-ATE-S01-C'.($i + 1))->value('v.cod_variable_experta');
+            $mapa = 'MAP-PRED-'.($i + 1);
+            InformeCognitivoFixture::insertar('mapeos_variables_fuente', ['cod_mapeo_variable_fuente' => $mapa, 'cod_version_modelo' => $id,
+                'cod_variable_experta' => $variable, 'cod_fuente_dato_experta' => $fuente, 'tipo_extraccion' => 'RESPUESTA_INSTITUCIONAL',
+                'clave_selector' => $r['cod_pregunta'], 'campo_valor' => null, 'estado' => 'ACTIVO']);
+            InformeCognitivoFixture::insertar('mapeos_valores_fuente', ['cod_mapeo_valor_fuente' => 'VAL-PRED-'.($i + 1), 'cod_mapeo_variable_fuente' => $mapa,
+                'cod_valor_semantico' => $valor, 'tipo_valor_fuente' => 'boolean', 'valor_fuente_exacto' => 'true', 'estado' => 'ACTIVO', 'estado_aprobacion' => 'APROBADO']);
+            $contrato['vinculos_instrumentales'][$mapa] = ['cod_instrumento' => $a['cod_instrumento'], 'codigo_instrumento' => $a['codigo_instrumento'],
+                'version_instrumento' => $a['version_instrumento'], 'cod_pregunta' => $r['cod_pregunta'], 'campo' => 'valor_logico',
+                'componente' => 'ATE-S01', 'perfil_interpretativo' => 'PERFIL-TEST'];
+        }
+        config(['sistema_experto.version_cognitiva' => $id, 'sistema_experto.contratos_conocimiento.'.$id => $contrato]);
+        self::assertSame([], $this->consultar()['resultado']['perfil']['COG-ATE']['conclusiones_candidatas']);
+        config(['sistema_experto.perfiles_interpretativos.PERFIL-TEST' => ['codigo' => 'PERFIL-SINTETICO', 'version' => '1', 'componente' => 'ATE-S01',
+            'instrumento' => ['codigo' => $a['codigo_instrumento'], 'version' => $a['version_instrumento']],
+            'metodo' => 'Método de ingeniería', 'fuente' => 'PROTOCOLO-TEST', 'predicados' => ['C1', 'C2', 'C3'],
+            'mediciones_requeridas' => ['aciertos' => ['cod_pregunta' => $qMedida->getKey(), 'campo' => 'valor_numero']]]]);
+        $r = $this->consultar();
+        self::assertSame(['ATE-R-SOSTENIMIENTO'], array_column($r['resultado']['perfil']['COG-ATE']['conclusiones_candidatas'], 'codigo'));
+        $ruta = $r['resultado']['perfil']['COG-ATE']['traza']['rutas'][0]['procedencia_instrumental'];
+        self::assertSame('PERFIL-SINTETICO', $ruta['perfil_interpretativo']['codigo']);
+        self::assertSame($qMedida->getKey(), $ruta['mediciones_interpretacion']['aciertos']['cod_pregunta']);
+        self::assertSame($this->aplicacion, $ruta['mediciones_interpretacion']['aciertos']['cod_aplicacion']);
+        $perfil = app(ConsultarPerfilInstrumental::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now());
+        $html = view('apoyodecision::livewire.medico.resultados-experto.perfil-instrumental', ['perfilInstrumental' => $perfil])->render();
+        self::assertStringContainsString('Método de ingeniería', $html);
+        self::assertStringContainsString('PERFIL-SINTETICO', $html);
+        self::assertStringContainsString($qMedida->getKey(), $html);
+        $this->version = $id;
+        $dto = $this->instantanea($r);
+        DB::table('respuestas_instrumento')->where('cod_aplicacion', $this->aplicacion)->where('cod_pregunta', $qMedida->getKey())->update(['valor_numero' => null]);
+        self::assertSame([], $this->consultar()['resultado']['perfil']['COG-ATE']['conclusiones_candidatas']);
+        DB::table('respuestas_instrumento')->where('cod_aplicacion', $this->aplicacion)->where('cod_pregunta', $qMedida->getKey())->update(['valor_numero' => 2, 'valor_logico' => true]);
+        self::assertSame([], $this->consultar()['resultado']['perfil']['COG-ATE']['conclusiones_candidatas']);
+        DB::table('respuestas_instrumento')->where('cod_aplicacion', $this->aplicacion)->where('cod_pregunta', $qMedida->getKey())->update(['valor_logico' => null]);
+        DB::table('preguntas_instrumento')->where('cod_pregunta', $qMedida->getKey())->update(['tipo_respuesta' => 'LOGICO']);
+        self::assertSame([], $this->consultar()['resultado']['perfil']['COG-ATE']['conclusiones_candidatas']);
+        DB::table('preguntas_instrumento')->where('cod_pregunta', $qMedida->getKey())->update(['tipo_respuesta' => 'NUMERO']);
+        $regla = DB::table('reglas_expertas')->where('cod_version_modelo', $id)->where('codigo_regla', 'R-ATE-S01-P01')->value('cod_regla_experta');
+        $sucesora = app(GestionarReglasExpertas::class)->crearRevision($this->usuario, $id, 'ORION-AD-ARCHIVO',
+            'Archivo de la regla de atención para regresión sintética de su historia.', retiradas: [$regla]);
+        config(['sistema_experto.version_cognitiva' => null]);
+        self::assertSame($sucesora, $this->consultar()['resultado']['version']);
+        self::assertSame([], $this->consultar()['resultado']['perfil']['COG-ATE']['conclusiones_candidatas']);
+        config(['sistema_experto.perfiles_interpretativos' => []]);
+        self::assertSame($dto->contenido, InstantaneaInstrumental::verificar($dto->contenido, $dto->huella)->contenido);
+    }
+
+    private function crearObservacionesInstitucionales(): void
+    {
+        foreach (PerfilConceptualCognitivo::CANTIDADES as $dominio => $cantidad) {
+            foreach (range(1, $cantidad) as $i) {
+                $codigo = substr($dominio, 4).'-S0'.$i;
+                $instrumento = Instrumento::create(['codigo' => 'TEST-'.$codigo, 'nombre' => 'Observación sintética '.$codigo,
+                    'tipo' => 'OBSERVACIONAL', 'version' => 'G08-TEST-v1', 'estado' => 'INACTIVO']);
+                $q = PreguntaInstrumento::create(['cod_instrumento' => $instrumento->getKey(), 'codigo' => 'ITEM-'.$codigo,
+                    'dominio' => substr($dominio, 4), 'enunciado' => 'Observación de ingeniería', 'tipo_respuesta' => 'OPCION', 'orden' => 1, 'estado' => 'ACTIVA']);
+                $o = OpcionPregunta::create(['cod_pregunta' => $q->getKey(), 'valor' => 'SIM_DIFICULTAD', 'nombre' => 'Literal de prueba', 'orden' => 1, 'estado' => 'ACTIVO']);
+                $a = AplicacionInstrumento::create(['cod_instrumento' => $instrumento->getKey(), 'cod_residente' => $this->residente->getKey(),
+                    'cod_personal' => $this->usuario->personal->getKey(), 'fecha_hora' => '2026-10-18 10:00:00', 'estado' => 'COMPLETA']);
+                RespuestaInstrumento::create(['cod_aplicacion' => $a->getKey(), 'cod_pregunta' => $q->getKey(), 'cod_opcion' => $o->getKey(), 'valor_texto' => 'SIM_DIFICULTAD']);
+            }
+        }
     }
 }

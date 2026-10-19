@@ -8,6 +8,7 @@ use App\Models\ReglaExperta;
 use App\Models\User;
 use App\Models\VersionModeloExperto;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\GestionarReglasExpertas;
+use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoInstitucional;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use DomainException;
 use Illuminate\Support\Facades\Auth;
@@ -56,6 +57,19 @@ final class GobiernoReglasPanel extends Component
     public function mount(): void
     {
         $this->autorizar();
+    }
+
+    public function registrarInstitucional(): void
+    {
+        $actor = $this->autorizar('gestionarReglas');
+        $this->resetErrorBag('gobierno');
+        try {
+            $this->versionSeleccionada = app(RegistrarConocimientoInstitucional::class)->ejecutar($actor);
+            $this->updatedVersionSeleccionada();
+            $this->mensaje = 'Base institucional registrada: cinco dominios, diecinueve componentes y diecisiete reglas. Las revisiones profesionales permanecen pendientes.';
+        } catch (DomainException $e) {
+            $this->addError('gobierno', $e->getMessage());
+        }
     }
 
     public function updatedVersionSeleccionada(): void
@@ -209,8 +223,9 @@ final class GobiernoReglasPanel extends Component
             && ! preg_match('/SIM|TEST|EXPERIMENTAL/i', $seleccionada->codigo_version);
         $puedeGestionar = $editable && Gate::forUser($actor)->allows('gestionarReglas', VersionModeloExperto::class);
         $puedeRevisar = $editable && Gate::forUser($actor)->allows('revisarReglas', VersionModeloExperto::class);
+        $puedeRegistrar = Gate::forUser($actor)->allows('gestionarReglas', VersionModeloExperto::class);
 
-        return view('apoyodecision::livewire.conocimiento.reglas-panel', compact('versiones', 'reglas', 'seleccionada', 'tablas', 'nombresNodos', 'variablesPrueba', 'puedeGestionar', 'puedeRevisar', 'contratoObservacional'))
+        return view('apoyodecision::livewire.conocimiento.reglas-panel', compact('versiones', 'reglas', 'seleccionada', 'tablas', 'nombresNodos', 'variablesPrueba', 'puedeGestionar', 'puedeRevisar', 'puedeRegistrar', 'contratoObservacional'))
             ->layout('layouts.sistema');
     }
 }

@@ -33,11 +33,17 @@ final class ExplorarConocimientoExperto
                 $c['valor_nombre'] = $val['nombre'] ?? $val['codigo_valor'] ?? $c['cod_valor_semantico'];
             }
             unset($c);
+            $propietarios = array_values(array_unique(array_filter(array_map(static function ($c) use ($variables, $nodos) {
+                $v = $variables[$c['cod_variable_experta']] ?? [];
+
+                return $nodos[$v['cod_nodo_propietario_primario'] ?? '']['codigo_semantico'] ?? null;
+            }, $condiciones))));
+            sort($propietarios, SORT_STRING);
             $consecuencias = array_values(array_filter($tablas['consecuencias_regla_experta'], static fn ($c) => $c['cod_regla_experta'] === $id));
             $criterioId = $criterios[$consecuencias[0]['cod_criterio_dominio_resultado'] ?? '']['cod_nodo_criterio'] ?? null;
             $dominio = $meta['criterio'] ?? ($nodos[$criterioId]['codigo_semantico'] ?? 'No disponible');
             $reglas[$id] = $r + ['id' => $id, 'codigo' => $r['codigo_regla'] ?? $id, 'dominio' => $dominio, 'fundamento' => $r['observacion'] ?? null,
-                'subcomponente' => $meta['componente'] ?? 'No disponible', 'condiciones' => $condiciones,
+                'subcomponente' => $meta['componente'] ?? ($propietarios === [] ? 'No disponible' : implode(', ', $propietarios)), 'condiciones' => $condiciones,
                 'consecuencias' => $consecuencias, 'version' => $version ?? CatalogoReglasG09Experimental::VERSION,
                 'restricciones' => $meta['confusores'] ?? ($r['observacion'] ?? 'Sin restricción declarada en este contrato.')];
         }

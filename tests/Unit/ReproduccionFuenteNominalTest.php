@@ -47,6 +47,6 @@ final class ReproduccionFuenteNominalTest extends TestCase
         $vinculos = ['MAP-AUSENCIA' => ['cod_instrumento' => 'INSTR-OBS', 'codigo_instrumento' => 'OBS-SINTETICA',
             'version_instrumento' => '1', 'cod_pregunta' => 'PREG-AUSENTE', 'campo' => 'valor_texto']];
 
-        return InstantaneaInstrumental::crear($p, $c, $capturas, $vinculos, 'USUARIO-SINTETICO', ['cod_version_modelo' => $p->version]);
+        return InstantaneaInstrumental::crear($p, $c, $capturas, $vinculos, 'USUARIO-SINTETICO', ['cod_version_modelo' => $p->version], 'INSTRUMENTAL-DECLARATIVO-1');
     }
 }

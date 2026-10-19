@@ -31,6 +31,9 @@ final class ConsultarConocimientoCognitivo
                 throw new DomainException('La fecha de corte no puede estar en el futuro.');
             }
             $version = config('sistema_experto.version_cognitiva');
+            if ($version === null || $version === '') {
+                $version = app(ContratosConocimiento::class)->versionInstitucionalVigente($corte);
+            }
             $sinVersion = ! is_string($version) || $version === '';
             $contrato = $p = null;
             $vinculos = [];
@@ -58,7 +61,7 @@ final class ConsultarConocimientoCognitivo
             if ($sinVersion) {
                 return ['disponible' => false, 'motivo' => 'SIN_VERSION_COGNITIVA_VINCULADA', 'persistido' => false, 'capturas' => $capturas];
             }
-            if ($vinculos === []) {
+            if ($vinculos === [] && ($contrato['admite_memoria_vacia'] ?? false) !== true) {
                 return ['disponible' => false, 'motivo' => 'SIN_VINCULOS_ORIGINALES_DEL_CONOCIMIENTO', 'version' => $version, 'persistido' => false, 'capturas' => $capturas];
             }
             $id = 'LECTURA-'.substr(hash('sha256', serialize([$usuario->getKey(), $residente->getKey(), $version, $corte->format('Y-m-d\TH:i:s.uP')])), 0, 12);

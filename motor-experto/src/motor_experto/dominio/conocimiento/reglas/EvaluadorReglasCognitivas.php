@@ -23,7 +23,7 @@ final class EvaluadorReglasCognitivas
         $reglas = $motor->evaluar($p, $m, $criterio);
         $unidades = [];
         foreach ($m->paraCriterio($criterio) as $e) {
-            $unidad = $e->fuente->contexto['unidad_soporte'] ?? $e->fuente->tabla.':'.$e->fuente->registro;
+            $unidad = $e->fuente->contexto['unidad_conjuncion'] ?? $e->fuente->contexto['unidad_soporte'] ?? $e->fuente->tabla.':'.$e->fuente->registro;
             if (! is_string($unidad) || trim($unidad) === '') {
                 throw new DomainException('La unidad de soporte debe identificar una aplicación/fuente original.');
             }

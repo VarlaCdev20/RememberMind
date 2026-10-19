@@ -110,7 +110,7 @@ php motor-experto/tests/orion_independencia.php
 - [x] Traducir vínculos entre revisiones y verificar dos generaciones, archivo y rechazo de identidad alterada/ambigua.
 - [x] Corregir el P2 de replay señalado por revisión independiente y comparar la huella anterior real.
 - [x] Registrar los resultados de la selección final SQLite/PostgreSQL y su evidencia.
-- [ ] Cerrar la versión institucional con predicados, mapeos literales y consecuencias explícitos de Memoria/G09; no copiar las fixtures como reglas clínicas.
+- [x] Implementar la versión institucional con predicados, mapeos literales y consecuencias explícitos de Memoria/G09, mediante el [contrato A–D adoptado e integrado posteriormente](FASE_4_CONTRATO_AD_INTEGRADO_2026_10_19.md); no se copian las fixtures como reglas clínicas.
 - [ ] Conservar relacionalmente toda la evaluación y vincular el release en fase 6.
 
-La configuración operativa conserva `version_cognitiva=null`, contratos vacíos y lectura clínica vacía. **No se declara toda la fase 4 cerrada.** La siguiente dependencia es el paquete institucional de conocimiento: definir qué significa cada predicado respecto a los registros disponibles y qué conclusión permite, manteniendo separadas las observaciones de las mediciones objetivas requeridas por otras fases.
+En el corte de este incremento, la configuración operativa conservaba `version_cognitiva=null`, contratos vacíos y lectura clínica vacía; no se declaraba toda la fase 4 cerrada. El [acta posterior del contrato A–D](FASE_4_CONTRATO_AD_INTEGRADO_2026_10_19.md) incorpora la familia institucional y su selección por linaje cuando no hay versión configurada, y explicita los pendientes de instalación, perfiles y fases posteriores.
