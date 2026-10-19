@@ -46,17 +46,26 @@ Estas verificaciones corresponden a sus respectivos alcances; no prueban que el 
 
 ### 3. Completar interpretación instrumental
 
-**Trabajo activo autorizado el 19/10/2026:** verificar ocho componentes con
+**Trabajo autorizado el 19/10/2026:** verificar ocho componentes con
 cálculo y resolver los once restantes. Objetivo, fuentes y seguimiento en
 [Fase 3: componentes](FASE_3_COMPONENTES_2026_10_19.md). No se marca cerrado
 por disponer únicamente de campos o motivos de abstención.
 
-- [ ] Verificar los siete perfiles implementados contra su edición y las fuentes originales que se vinculen.
-- [ ] Resolver once componentes sin normalizador: MEM-S03/S04, ATE-S01/S02, EJE-S03/S04/S05, LEN-S03/S04/S05 y VIS-S01.
-- [ ] Para cada uno, documentar instrumento, administración, población, rúbrica, entradas, cálculo, dirección y límites. Cotejar manuales y derechos de uso cuando correspondan.
-- [ ] Si una referencia no es aplicable, identificar una alternativa pertinente y la medición que requiere; no trasladar baremos de otra edición o población. Una sustitución de instrumento o nuevo criterio institucional debe quedar decidida y registrada.
-- [ ] Implementar los métodos aplicables con ejemplos numéricos independientes, límites y casos fuera de población.
-- [ ] Definir explícitamente cómo una medición contribuye a un hallazgo clínico y a su dominio. Un z aislado no determina automáticamente DCL ni un score global.
+- [x] Verificar los siete perfiles implementados contra su edición y las fuentes originales bibliográficas. El cotejo de aplicaciones de residentes permanece en fase 2.
+- [x] Resolver técnicamente los once componentes: MEM-S03/S04, ATE-S01/S02, EJE-S03/S04/S05, LEN-S03/S04/S05 y VIS-S01, con métodos de referencia y condiciones expresas.
+- [x] Documentar instrumento, administración conceptual, población, puntuación, entradas, cálculo, dirección, límites, acceso y derechos; sin reproducir materiales protegidos ni atribuir manuales no obtenidos.
+- [x] Identificar alternativas y su medición exacta, sin trasladar baremos entre ediciones o poblaciones. La elección técnica no impone una sustitución institucional.
+- [x] Implementar las comparaciones con ejemplos numéricos independientes, límites y casos fuera de población.
+- [ ] Decidir adopción institucional de las alternativas/materiales legítimos y validar explícitamente la contribución de una medición a un hallazgo clínico y su dominio. Se conserva como pendiente institucional y de integración de fases 4–5; un z aislado no determina DCL ni un score global.
+
+**Cierre técnico el 19/10/2026:** [acta, matriz completa, fuentes y pruebas](CIERRE_TECNICO_FASE_3_2026_10_19.md).
+Catálogo versión 8, **19/19 componentes** con comparación bajo condiciones;
+373 pruebas aprobadas tanto en SQLite como en PostgreSQL desechable. La revisión
+independiente de las tres últimas conversiones es PASS técnico. El alcance de
+cálculo/documentación solicitado queda cerrado; adopción y validación clínica
+continúan expresamente pendientes. No se cambia la historia ni se ejecuta
+Petersen para completar la cobertura. Los avances de otras fases se documentan
+en sus propias actas y no se atribuyen a este cierre.
 
 **Entregable:** matriz ejecutable de los 19 componentes con contratos de interpretación definidos para el alcance acordado. **Cierre:** todos los componentes comprometidos tienen un método aplicable y prueba de cálculo; una causa de abstención no se cuenta como normalizador completado.
 

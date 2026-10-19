@@ -4,6 +4,11 @@ Consulta e implementación: 19/10/2026, America/La_Paz. Población de interés:
 personas mayores de 60 años. Estado: **implementación matemática de referencia**,
 con adopción institucional sin configurar y revisión profesional pendiente.
 
+**Corte posterior vigente:** [cierre técnico de fase 3, catálogo versión 8](CIERRE_TECNICO_FASE_3_2026_10_19.md).
+SCAND y TB-A resuelven ATE-S02 y LEN-S04/S05, elevando la cobertura a **19 de 19**
+bajo condiciones. Este capítulo conserva el incremento de cinco referencias y
+sus cifras históricas; adopción institucional y validación clínica no se atribuyen.
+
 Continúa las [normalizaciones españolas](NORMALIZACIONES_REFERENCIA_2026_10_19.md),
 el [manual investigado](MANUAL_INVESTIGADO_MAYORES_60_2026_10_19.md) y el
 [objetivo de fase 3](FASE_3_COMPONENTES_2026_10_19.md). El catálogo versión 7
@@ -226,9 +231,10 @@ también devolvió HTML, por lo que no se declara un PDF completo obtenido.
 El original HTML sí contiene las tablas utilizadas. Los artefactos temporales
 permanecen fuera del repositorio y no contienen datos de residentes.
 
-## 10. Componentes pendientes y búsquedas de descarte
+## 10. Componentes pendientes en este corte y búsquedas de descarte
 
-Quedan sin conversión normativa completa **ATE-S02, LEN-S04 y LEN-S05**.
+En este corte quedaron sin conversión **ATE-S02, LEN-S04 y LEN-S05**;
+sus alternativas posteriores están en el acta de cierre técnico enlazada arriba.
 La WAB castellana ya tiene sus dos cálculos brutos; una suma o un porcentaje
 del máximo no constituye una normalización geriátrica.
 

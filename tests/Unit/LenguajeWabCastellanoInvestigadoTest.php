@@ -7,6 +7,7 @@ namespace Tests\Unit;
 use MotorExperto\dominio\instrumentos\CalculadorLenguajeWabCastellano2000 as Wab;
 use MotorExperto\dominio\instrumentos\CatalogoCapturaCognitiva;
 use MotorExperto\dominio\instrumentos\ExtractorCapturaInstrumental;
+use MotorExperto\dominio\instrumentos\NormalizadorReferenciaBarcelona2011;
 use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -111,7 +112,7 @@ final class LenguajeWabCastellanoInvestigadoTest extends TestCase
         self::assertSame(15, $r['componentes']['LEN-S05']['puntuacion_bruta']);
     }
 
-    public function test_cobertura_normativa_sigue_siendo_ocho_componentes(): void
+    public function test_wab_conserva_brutos_y_no_recibe_la_referencia_de_otro_instrumento(): void
     {
         $c = (new CatalogoCapturaCognitiva)->componentes();
         self::assertCount(19, $c);
@@ -119,7 +120,9 @@ final class LenguajeWabCastellanoInvestigadoTest extends TestCase
         foreach (['LEN-S04', 'LEN-S05'] as $id) {
             self::assertSame([], $c[$id]['metodos_disponibles']);
             self::assertSame([Wab::METODO], $c[$id]['calculos_descriptivos_disponibles']);
-            self::assertSame('CAPTURA_DOCUMENTADA_SIN_NORMALIZADOR', $c[$id]['estado_metodo']);
+            // La referencia TB-A identificada no convierte las puntuaciones de WAB.
+            self::assertSame('NORMALIZADOR_REFERENCIA_CON_CONTEXTO_EXPLICITO', $c[$id]['estado_metodo']);
+            self::assertSame([NormalizadorReferenciaBarcelona2011::METODO], $c[$id]['normalizadores_referencia_disponibles']);
         }
     }
 

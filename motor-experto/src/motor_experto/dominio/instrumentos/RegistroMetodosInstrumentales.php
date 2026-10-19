@@ -22,6 +22,8 @@ final class RegistroMetodosInstrumentales
             + (new NormalizadorReferenciaColombia2019)->metodos()
             + [NormalizadorReferenciaTolF2019::METODO => (new NormalizadorReferenciaTolF2019)->metadatos()]
             + [NormalizadorReferenciaTokenColombia2017::METODO => (new NormalizadorReferenciaTokenColombia2017)->metadatos()]
+            + [NormalizadorReferenciaCancelacionScand2023::METODO => (new NormalizadorReferenciaCancelacionScand2023)->metadatos(),
+                NormalizadorReferenciaBarcelona2011::METODO => (new NormalizadorReferenciaBarcelona2011)->metadatos()]
             + [CalculadorReconocimientoHvlt::METODO => (new CalculadorReconocimientoHvlt)->metadatos(),
                 CalculadorLenguajeWabCastellano2000::METODO => (new CalculadorLenguajeWabCastellano2000)->metadatos(),
                 CalculadorRecuerdoConClavesFcsrt::METODO => (new CalculadorRecuerdoConClavesFcsrt)->metadatos()];
@@ -34,6 +36,12 @@ final class RegistroMetodosInstrumentales
         }
 
         // Las referencias nuevas conservan identidad y contexto; no reemplazan los métodos previos.
+        if ($metodo === NormalizadorReferenciaCancelacionScand2023::METODO) {
+            return (new ExplicacionMatematicaInstrumental)->agregar((new NormalizadorReferenciaCancelacionScand2023)->normalizar($captura));
+        }
+        if ($metodo === NormalizadorReferenciaBarcelona2011::METODO) {
+            return (new ExplicacionMatematicaInstrumental)->agregar((new NormalizadorReferenciaBarcelona2011)->normalizar($captura));
+        }
         if (isset((new NormalizadorReferenciaColombia2019)->metodos()[$metodo])) {
             return (new ExplicacionMatematicaInstrumental)->agregar((new NormalizadorReferenciaColombia2019)->normalizar($metodo, $captura));
         }

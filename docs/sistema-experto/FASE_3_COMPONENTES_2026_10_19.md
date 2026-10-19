@@ -6,11 +6,12 @@ definir su interpretación. Criterio de cierre: cada componente comprometido
 tiene cálculo documentado y pruebas independientes. Este archivo conserva
 el objetivo y su seguimiento para continuar el trabajo entre sesiones.
 
-**Corte vigente:** [cinco referencias geriátricas adicionales](REFERENCIAS_GERIATRICAS_ADICIONALES_2026_10_19.md),
-catálogo versión 7. **16 de 19 componentes** con comparación matemática de
-referencia disponible bajo condiciones. ATE-S02 y LEN-S04/S05 siguen sin
-conversión normativa completa. La fase permanece EN CURSO; no se atribuye
-aplicabilidad institucional automática ni validación clínica a este contador.
+**Corte vigente:** [cierre técnico y matriz completa](CIERRE_TECNICO_FASE_3_2026_10_19.md),
+catálogo versión 8. **19 de 19 componentes** con comparación matemática
+disponible bajo condiciones. SCAND resuelve ATE-S02 y TB-A aporta conversiones
+con efecto techo para LEN-S04/S05. **CERRADO el alcance técnico de cálculo y
+documentación**; adopción institucional y validación clínica pendientes.
+Los apartados siguientes conservan los cortes históricos de la investigación.
 
 El resultado final perseguido es O.R.I.O.N. integrado: mediciones originales,
 cinco dominios, reglas versionadas, patrón candidato o abstención sustentada,
@@ -32,8 +33,8 @@ no activa Petersen clínico ni sustituye las fases de integración y conservaci�
 - Base: siete perfiles, once medidas normativas, ocho componentes.
 - Pendientes: MEM-S03/S04, ATE-S01/S02, EJE-S03/S04/S05,
   LEN-S03/S04/S05 y VIS-S01.
-- Estado: EN CURSO. No hay aprobación clínica integral ni fecha de cierre
-  atribuida por este registro. Se preservan fuera del alcance los cambios
+- Estado inicial: EN CURSO. El cierre técnico posterior consta en el acta
+  enlazada; no hay aprobación clínica integral. Se preservan fuera del alcance los cambios
   concurrentes de adquisición/fase 2, Residentes, Valoraciones, Institución,
   provider, permisos/migraciones y `work/`.
 
@@ -54,9 +55,9 @@ no activa Petersen clínico ni sustituye las fases de integración y conservaci�
 - [x] Objetivo y criterio de cierre guardados en el repositorio.
 - [x] Inventario inicial y consumidores localizados.
 - [x] Ocho componentes existentes contrastados con las fuentes y ejemplos independientes.
-- [ ] Once componentes pendientes resueltos con método aplicable.
+- [x] Once componentes resueltos técnicamente con métodos y condiciones expresas; adopción institucional pendiente.
 - [x] Alcance interpretativo de cada componente documentado con límites explícitos.
-- [ ] Pruebas y evidencia final consolidadas.
+- [x] Pruebas y evidencia técnica final consolidadas en el acta de cierre.
 
 ## Investigación profesional entregada
 
@@ -411,3 +412,25 @@ con el alcance correspondiente. **No se registra el cierre completo de fase 3.**
 Comprobación final: sintaxis de los once archivos PHP y Pint PASS; 66 enlaces
 locales verificados en seis documentos; `git diff --check` PASS. Aritmética
 externa Decimal cotejada desde las tablas API para los once ejemplos grupales.
+
+## Cierre técnico posterior — catálogo versión 8
+
+El [acta definitiva](CIERRE_TECNICO_FASE_3_2026_10_19.md) reúne la matriz de
+**19 componentes**, utilidad, uso, elección, fuentes, fórmulas, contratos,
+archivos y evidencia. SCAND aporta ATE-S02 y TB-A aporta LEN-S04/S05 con una
+conversión publicada cuyo efecto techo queda explícito. No se presenta como
+medición integral del discurso ni se promueve un escalar a diagnóstico.
+
+Suite relacionada: **373 pruebas / 9280 aserciones SQLite** y **373 / 9279
+PostgreSQL desechable**. Tras agregar la condición de español nativo SCAND,
+el revisor independiente repitió el circuito estrecho en SQLite: **75 / 1036**,
+PASS; reejecución PostgreSQL posterior **75 / 1036**, PASS. Sintaxis de diez PHP,
+Pint y 97 enlaces locales de ocho documentos verificados sin errores.
+Revisión experta: PASS técnico, validación clínica/adopción pendientes.
+
+**Se cierra el alcance técnico de cálculo y documentación de fase 3.** Los
+pendientes del corte versión 7 quedan sustituidos por los límites concretos
+del acta; la pertinencia institucional y el juicio profesional no se inventan.
+Las tareas concurrentes de otras fases, configuración y ApoyoDecision conservan
+su autoría y quedan fuera de este commit. Sin frontend, migraciones, datos reales,
+modificación de permisos o reglas y sin ejecución de Petersen/G09 sobre residentes.

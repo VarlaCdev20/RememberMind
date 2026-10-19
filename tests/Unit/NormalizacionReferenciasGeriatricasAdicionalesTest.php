@@ -195,7 +195,7 @@ final class NormalizacionReferenciasGeriatricasAdicionalesTest extends TestCase
     {
         $c = (new CatalogoCapturaCognitiva)->componentes();
         self::assertCount(19, $c);
-        self::assertCount(16, array_filter($c, fn ($v) => $v['metodos_disponibles'] !== [] || $v['normalizadores_referencia_disponibles'] !== []));
+        self::assertCount(19, array_filter($c, fn ($v) => $v['metodos_disponibles'] !== [] || $v['normalizadores_referencia_disponibles'] !== []));
         foreach (['EJE-S04' => Tol::METODO, 'EJE-S05' => Colombia::RAVEN,
             'MEM-S04' => Colombia::CERAD, 'ATE-S01' => Colombia::CANCELACION] as $componente => $metodo) {
             self::assertContains($metodo, $c[$componente]['normalizadores_referencia_disponibles']);

@@ -34,6 +34,8 @@ use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 use MotorExperto\dominio\instrumentos\NormalizadorBateriaBolivia2015;
 use MotorExperto\dominio\instrumentos\NormalizadorHvltBolivia2015 as Hvlt;
+use MotorExperto\dominio\instrumentos\NormalizadorReferenciaBarcelona2011;
+use MotorExperto\dominio\instrumentos\NormalizadorReferenciaCancelacionScand2023;
 use MotorExperto\dominio\instrumentos\NormalizadorReferenciaColombia2019;
 use MotorExperto\dominio\instrumentos\NormalizadorReferenciasEspana;
 use MotorExperto\dominio\instrumentos\NormalizadorReferenciaTokenColombia2017;
@@ -237,6 +239,74 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         self::assertFalse($r['persistido']);
         self::assertCount(1, $r['dominios']['COG-LEN']['componentes']['LEN-S03']['mediciones']);
         self::assertDatabaseCount('aplicaciones_instrumento', 5);
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
+    /** Dos aplicaciones originales aportan tres componentes, sin duplicar pruebas ni generar inferencia. */
+    public function test_cierre_de_componentes_conserva_dos_aplicaciones_y_tres_medidas_autorizadas(): void
+    {
+        $valores = ['repeticion_palabras_aciertos' => 9, 'repeticion_elementos_administrados' => 10, 'fluencia_gramatica' => 10,
+            'aciertos' => 20, 'omisiones_corregidas' => 5, 'comisiones' => 3, 'objetivos_del_protocolo' => 65,
+            'filas_del_protocolo' => 26, 'columnas_del_protocolo' => 30, 'segundos' => 60, 'nivel_educativo_scand' => 2];
+        $perfiles = [];
+        foreach ([NormalizadorReferenciaBarcelona2011::METODO => (new NormalizadorReferenciaBarcelona2011)->metadatos(),
+            NormalizadorReferenciaCancelacionScand2023::METODO => (new NormalizadorReferenciaCancelacionScand2023)->metadatos()] as $metodo => $meta) {
+            $instrumento = Instrumento::create(['codigo' => 'CIERRE-TEST-'.count($perfiles), 'nombre' => 'Referencia sintética de cierre',
+                'tipo' => 'COGNITIVO', 'version' => 'VERSION-TEST', 'estado' => 'ACTIVO']);
+            $selectores = $respuestas = [];
+            foreach ($meta['entradas'] as $campo => $tipo) {
+                $q = PreguntaInstrumento::create(['cod_instrumento' => $instrumento->getKey(),
+                    'codigo' => 'ENTRADA-'.count($selectores), 'enunciado' => 'Entrada sintética '.$campo,
+                    'tipo_respuesta' => $tipo === 'LOGICO' ? 'LOGICO' : 'NUMERICO',
+                    'orden' => count($selectores) + 1, 'estado' => 'ACTIVA']);
+                $columna = $tipo === 'LOGICO' ? 'valor_logico' : 'valor_numero';
+                $selectores[$campo] = ['cod_pregunta' => $q->getKey(), 'campo' => $columna];
+                $respuestas[] = ['cod_pregunta' => $q->getKey(),
+                    $columna => $valores[$campo] ?? ($tipo === 'LOGICO' ? true : throw new \LogicException('Falta valor sintético.'))];
+            }
+            $perfiles[] = ['id' => 'CIERRE-TEST-'.count($perfiles), 'cod_instrumento' => $instrumento->getKey(),
+                'codigo_instrumento' => $instrumento->codigo, 'version_instrumento' => $instrumento->version,
+                'metodo' => $metodo, 'identidad_instrumento' => $meta['identidad'], 'selectores' => $selectores];
+            $a = app(AplicarInstrumento::class)->aplicar($this->usuario,
+                ['fecha_hora' => '2020-10-18 09:10:00', 'respuestas' => $respuestas], $instrumento, $this->residente);
+            self::assertNull($a->puntaje_total);
+            self::assertNull($a->clasificacion);
+        }
+        config(['sistema_experto.perfiles_instrumentales' => $perfiles]);
+        $capturas = $this->captura()['capturas'];
+        self::assertCount(2, $capturas);
+        foreach ($capturas as $captura) {
+            $e = $captura['extraccion'];
+            self::assertSame([], $e['motivos_captura']);
+            self::assertSame(70, $e['captura']['edad_anios']);
+            self::assertSame('NO_CONFIGURADA', $e['normalizacion']['adopcion_institucional']);
+            foreach ($e['normalizacion']['componentes'] as $m) {
+                self::assertSame('NORMALIZADO', $m['estado']);
+                self::assertNull($m['z']);
+                self::assertNull($m['clasificacion_clinica']);
+            }
+            foreach ($e['fuentes_entradas'] as $fuente) {
+                self::assertSame($captura['cod_aplicacion'], $fuente['aplicacion']);
+                self::assertNotEmpty($fuente['respuesta']);
+            }
+        }
+        $r = app(ConsultarPerfilInstrumental::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now());
+        $repeticion = $r['dominios']['COG-LEN']['componentes']['LEN-S04']['mediciones'];
+        $discurso = $r['dominios']['COG-LEN']['componentes']['LEN-S05']['mediciones'];
+        self::assertCount(1, $repeticion);
+        self::assertCount(1, $discurso);
+        self::assertSame($repeticion[0]['aplicacion'], $discurso[0]['aplicacion']);
+        self::assertSame(2, $repeticion[0]['resultado']['escalar_publicado']);
+        self::assertSame(18, $discurso[0]['resultado']['escalar_publicado']);
+        $atencion = $r['dominios']['COG-ATE']['componentes']['ATE-S02']['mediciones'];
+        self::assertCount(1, $atencion);
+        self::assertSame(12, $atencion[0]['resultado']['puntuacion_bruta']);
+        self::assertSame(11, $atencion[0]['resultado']['escalar_ajustado']);
+        self::assertNotSame($repeticion[0]['aplicacion'], $atencion[0]['aplicacion']);
+        self::assertSame([], $r['dominios']['COG-ATE']['componentes']['ATE-S01']['mediciones']);
+        self::assertNull($r['diagnostico']);
+        self::assertFalse($r['persistido']);
+        self::assertDatabaseCount('aplicaciones_instrumento', 2);
         self::assertDatabaseCount('evaluaciones_expertas', 0);
     }
 

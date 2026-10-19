@@ -13,7 +13,7 @@ namespace MotorExperto\dominio\instrumentos;
  */
 final class CatalogoCapturaCognitiva
 {
-    public const VERSION = 'CAPTURA-COGNITIVA-7-20261019';
+    public const VERSION = 'CAPTURA-COGNITIVA-8-20261019';
 
     public function componentes(): array
     {
@@ -47,7 +47,7 @@ final class CatalogoCapturaCognitiva
             'ATE-S02' => ['Ruff 2 y 7, condiciones separadas', $ruff, [
                 'ensayos' => 'Mismos veinte registros originales de detección automática y búsqueda controlada',
                 'condicion' => 'Identidad de cada condición; no combinar sus puntuaciones brutas'],
-                'La aplicación compartida con atención sostenida no es un segundo soporte independiente. No se ha verificado una norma boliviana geriátrica.'],
+                'SCAND P/W dispone de referencia propia para eficiencia selectiva, 60–98 años. No normaliza Ruff ni comparte la aplicación de cancelación A como soporte independiente.'],
             'ATE-S03' => ['BTA, formas N y L de Schretlen 1997', 'https://doi.org/10.3233/NRE-151283', [
                 'forma_n_aciertos' => 'Entero, 0–10', 'forma_l_aciertos' => 'Entero, 0–10', 'audicion_compatible' => 'Lógico documentado'],
                 'El modelo boliviano compara el total N+L, 0–20. No lo convierte en una medida de atención sostenida.'],
@@ -89,13 +89,13 @@ final class CatalogoCapturaCognitiva
                 'forma' => 'Forma y edición exactas, sin intercambiar WAB y WAB-R', 'puntajes_por_elemento' => 'Mediciones originales según rúbrica',
                 'repeticion_total' => 'Entero 0–100 solo para WAB castellana Nau Llibres 2000', 'audicion_compatible' => 'Lógico documentado',
                 'administracion_estandarizada' => 'Lógico documentado'],
-                'WAB castellana Nau Llibres 2000: total de repetición 0–100 dividido por 10. No es WAB-R ni baremo boliviano; las formas no son intercambiables.'],
+                'WAB castellana conserva su bruto. TB-A NEURONORMA 2011 incorpora repetición de diez palabras con conversión categórica y efecto techo; no normaliza WAB ni determina DCL.'],
             'LEN-S05' => ['WAB, muestra de discurso en tarea definida', $wab, [
                 'tarea' => 'Identidad de conversación o descripción', 'referencia_muestra' => 'Referencia documental al original',
                 'contenido_informacion' => 'Entero 0–10 para WAB castellana 2000', 'fluidez' => 'Entero 0–10 separado, misma edición',
                 'muestra_discurso_documentada' => 'Lógico documentado; no sustituye la referencia al original',
                 'administracion_estandarizada' => 'Lógico documentado'],
-                'WAB castellana 2000: contenido y fluidez 0–10 cada uno; suma 0–20. Una nota de cuidados no equivale a la tarea. Sin norma boliviana verificada.'],
+                'WAB castellana conserva contenido y fluidez por separado. TB-A 2011 aporta fluencia/gramática en tareas de habla espontánea con fuerte efecto techo; no equivale a valorar todo el discurso ni a una nota de cuidados.'],
             'VIS-S01' => ['VOSP o JLO; instrumento y subprueba identificados', 'https://doi.org/10.1093/arclin/acp040', [
                 'subprueba_forma' => 'Identidad exacta, sin total VOSP genérico', 'administrados' => 'Entero de elementos puntuados',
                 'correctos' => 'Entero de aciertos', 'control_visual' => 'Condición y apoyos documentados'],

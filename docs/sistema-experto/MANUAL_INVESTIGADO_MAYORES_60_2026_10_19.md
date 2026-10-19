@@ -1,14 +1,22 @@
 # O.R.I.O.N. — Manual técnico investigado para población mayor de 60 años
 
-Fecha de consulta: **19/10/2026**, zona America/La_Paz. Versión 1.2.
+Fecha de consulta: **19/10/2026**, zona America/La_Paz. Versión 1.3.
 Población solicitada por la propietaria: **personas mayores de 60 años**, sin
 techo de edad institucional supuesto. Estado: investigación documentada, cálculos
-descriptivos y comparaciones de referencia implementadas; fase 3 en curso.
+descriptivos y comparaciones de referencia implementadas; alcance técnico de
+fase 3 cerrado con condiciones, adopción y validación clínica pendientes.
+
+**Capítulo final y corte vigente:** [SCAND y TB-A, matriz de 19 componentes y
+cierre técnico](CIERRE_TECNICO_FASE_3_2026_10_19.md). Documenta los tres componentes
+restantes, utilidad, administración conceptual, elección, conversiones, fuentes
+completas, huellas y pruebas. **19 de 19** cuentan con un método de comparación
+bajo condiciones expresas. Las edades máximas no se extienden por tratarse de
+una población mayor de 60. El efecto techo TB-A no se convierte en DCL.
 
 Actualización: [contrato y entrega de las normalizaciones](NORMALIZACIONES_REFERENCIA_2026_10_19.md).
 El [nuevo capítulo de referencias geriátricas](REFERENCIAS_GERIATRICAS_ADICIONALES_2026_10_19.md)
 documenta cinco perfiles adicionales: CERAD, Raven A, cancelación A, TOL-F y Token.
-Hay **16 componentes con algoritmo de comparación**, ocho de la base previa,
+En ese corte anterior había **16 componentes con algoritmo de comparación**, ocho de la base previa,
 tres nuevos de referencia española y cinco de este incremento. Su pertinencia
 institucional no se acredita por programarlos. Los apartados previos conservan
 el corte histórico; el nuevo capítulo precisa fuentes, calidad, uso, fórmulas,
@@ -342,7 +350,14 @@ de error o portada como PDF. No se ejecutaron calculadoras remotas ni macros.
 Se cotejaron visualmente las tablas 4–5 de S01 y las dos descripciones de
 autocorrección de S02 en sus páginas PDF, además de la extracción de texto.
 
-## 9. Criterios pendientes para cerrar la fase
+## 9. Criterios pendientes en el corte anterior
+
+**Actualización:** las conversiones pendientes señaladas abajo fueron
+implementadas y probadas en el [cierre técnico](CIERRE_TECNICO_FASE_3_2026_10_19.md).
+Los puntos 2–3 quedan resueltos para los métodos seleccionados; el conflicto
+Token chileno no se transforma en un algoritmo, se ofrece la alternativa UNAL
+expresamente identificada. Continúan la pertinencia/adopción institucional,
+materiales originales y validación clínica. Se conserva esta lista como historia.
 
 1. Para los tres componentes sin conversión normativa completa (ATE-S02,
    LEN-S04 y LEN-S05) y la adopción de las referencias nuevas:

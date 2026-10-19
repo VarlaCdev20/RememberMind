@@ -54,6 +54,14 @@ final class ExplicacionMatematicaInstrumental
                 'texto' => 'La interferencia se sitúa mediante los puntos percentilares publicados. Los límites abiertos no se extrapolan; no se asigna una categoría clínica.'];
         }
         // Una tabla percentilar no aporta una regresión ni permite reconstruir una z exacta.
+        if (($medida['tipo_comparacion'] ?? null) === 'TABLA_CON_EFECTO_TECHO') {
+            return $base + ['estado' => 'CONVERSION_PUBLICADA_CON_EFECTO_TECHO', 'posicion' => null,
+                'texto' => 'Se conservó la conversión publicada para esta tarea, con un fuerte efecto techo. El máximo fue frecuente en la muestra y no demuestra capacidad superior; un fallo requiere revisión contextual y no establece DCL.'];
+        }
+        if (isset($medida['escalar_ajustado'])) {
+            return $base + ['estado' => 'ESCALAR_AJUSTADO_TABULADO', 'posicion' => null,
+                'texto' => 'Se calculó la eficiencia a partir de aciertos y errores, se consultó su escalar y se añadió la corrección publicada por edad y nivel educativo. El rango percentilar previo al ajuste no es el percentil final.'];
+        }
         if (isset($medida['escalar_edad_escolaridad'])) {
             return $base + ['estado' => 'ESCALAR_TABULADO_EDAD_ESCOLARIDAD', 'posicion' => null,
                 'texto' => 'Se consultaron la tabla de edad y la corrección escolar publicadas. El rango percentilar conservado corresponde solo al ajuste por edad; no es el percentil de la puntuación corregida por escolaridad.'];

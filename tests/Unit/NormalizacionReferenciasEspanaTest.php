@@ -229,8 +229,8 @@ final class NormalizacionReferenciasEspanaTest extends TestCase
         $c = (new CatalogoCapturaCognitiva)->componentes();
         self::assertCount(19, $c);
         self::assertCount(8, array_filter($c, fn ($m) => $m['metodos_disponibles'] !== []));
-        // Las cinco referencias posteriores añaden componentes sin alterar los ocho de base.
-        self::assertCount(9, array_filter($c, fn ($m) => $m['normalizadores_referencia_disponibles'] !== []));
+        // Las referencias posteriores completan la cobertura sin alterar los ocho componentes de base.
+        self::assertCount(12, array_filter($c, fn ($m) => $m['normalizadores_referencia_disponibles'] !== []));
         self::assertSame([Norma::DSB, Norma::LN, Norma::SPAN], $c['EJE-S03']['normalizadores_referencia_disponibles']);
         self::assertSame([], $c['EJE-S03']['metodos_disponibles']);
         self::assertSame('NORMALIZADOR_REFERENCIA_CON_CONTEXTO_EXPLICITO', $c['EJE-S03']['estado_metodo']);

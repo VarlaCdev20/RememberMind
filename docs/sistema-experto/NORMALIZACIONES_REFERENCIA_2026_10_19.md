@@ -5,10 +5,14 @@ ecuaciones nuevas implementadas, con seis perfiles de selección y pruebas.
 Las referencias se calcularon bajo condiciones explícitas; no se habilitaron
 inferencias, clasificación clínica ni perfiles sobre residentes reales.
 
-**Actualización posterior:** el [capítulo de referencias geriátricas adicionales](REFERENCIAS_GERIATRICAS_ADICIONALES_2026_10_19.md)
+**Corte vigente:** [cierre técnico de los 19 componentes](CIERRE_TECNICO_FASE_3_2026_10_19.md),
+catálogo versión 8. SCAND y TB-A completan las tres comparaciones que faltaban;
+la adopción institucional y validación clínica permanecen pendientes.
+
+**Actualización intermedia:** el [capítulo de referencias geriátricas adicionales](REFERENCIAS_GERIATRICAS_ADICIONALES_2026_10_19.md)
 incorpora cinco perfiles más y eleva la cobertura a 16 de 19 componentes bajo
 condiciones. Este documento conserva el corte de las cinco ecuaciones españolas;
-sus ocho pendientes históricos se reducen ahora a ATE-S02 y LEN-S04/S05.
+sus ocho pendientes históricos se redujeron entonces a ATE-S02 y LEN-S04/S05.
 
 ## Alcance y fuentes de verdad
 

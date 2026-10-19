@@ -1,16 +1,20 @@
 # O.R.I.O.N. — Investigación de los 19 componentes cognitivos
 
-Fecha de corte: 19 de octubre de 2026. Versión documental 1.4.
+Fecha de corte: 19 de octubre de 2026. Versión documental 1.5.
 Destinatarios: Medicina, Psicología y equipo de desarrollo de RememberMind.
-Estado: investigación e implementación instrumental parcial; no validación clínica.
+Estado: investigación e implementación técnica de 19 componentes; no validación clínica.
 
-**Corte vigente:** las [cinco referencias geriátricas adicionales](REFERENCIAS_GERIATRICAS_ADICIONALES_2026_10_19.md)
-añaden comparaciones para reconocimiento CERAD, Raven A, cancelación A, TOL-F y
-Token abreviado. Hay **16 de 19 componentes con algoritmo de comparación** bajo
-condiciones explícitas; atención selectiva, repetición y discurso siguen sin
-conversión normativa completa. Las fuentes incluyen artículos originales y una
-tesis UNAL expresamente identificada. No se declara adopción boliviana ni cierre
-clínico de la fase. Los cortes anteriores conservan sus cifras históricas.
+**Corte vigente:** [cierre técnico de fase 3](CIERRE_TECNICO_FASE_3_2026_10_19.md),
+con **19 de 19 componentes con algoritmo de comparación** bajo condiciones
+explícitas, catálogo versión 8. SCAND y TB-A resuelven las tres brechas anteriores;
+el acta explica para qué sirven, cómo y por qué se usan, fórmulas, fuentes,
+efecto techo y pruebas. Las referencias no se adoptan automáticamente para la
+residencia. Se cierra cálculo/documentación, no validación clínica ni inferencia
+institucional. Los cortes anteriores conservan sus cifras históricas.
+
+**Corte anterior, versión 7:** las [cinco referencias geriátricas adicionales](REFERENCIAS_GERIATRICAS_ADICIONALES_2026_10_19.md)
+llevaron la cobertura a 16 de 19, con artículos originales y una tesis UNAL
+expresamente identificada. Sus tres brechas se resuelven en el acta vigente.
 
 **Normalizaciones posteriores implementadas:** el [contrato de referencia](NORMALIZACIONES_REFERENCIA_2026_10_19.md)
 registra cinco ecuaciones adicionales de SABIEX/pFCSRT y su integración. Hay once
