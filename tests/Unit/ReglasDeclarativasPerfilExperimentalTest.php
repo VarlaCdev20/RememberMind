@@ -148,7 +148,8 @@ final class ReglasDeclarativasPerfilExperimentalTest extends TestCase
         self::assertSame(['SIM-DOS-TAREAS'], $nuevo['subcomponentes']['ATE-S02']['reglas']);
         self::assertSame('CUMPLE', $nuevo['reglas_examinadas']['g09']['SIM-DOS-TAREAS']['estado']);
         self::assertArrayNotHasKey('R-ATE-S02-P01', $nuevo['reglas_examinadas']['g09']);
-        self::assertSame('SIM-G09-REV-2', $nuevo['manifiesto_versiones']['G09']);
+        self::assertSame('SIM-G09-REV-2', $nuevo['conocimiento_integrado']['fuentes']['G09']['version']);
+        self::assertSame($nuevo['manifiesto_versiones']['COG-MEM'], $nuevo['manifiesto_versiones']['G09']);
         self::assertSame($nuevo, (new EjecutarPerfilExperimental)->ejecutar(...$nuevo['instantanea_entrada']));
         $caso['capturas']['respuestas_instrumento'][2]['valor_texto'] = 'SIN_HALLAZGO_SIMULADO';
         $negativo = (new EjecutarPerfilExperimental)->ejecutar(...$caso);
@@ -156,5 +157,48 @@ final class ReglasDeclarativasPerfilExperimentalTest extends TestCase
         self::assertSame('NO_CUMPLE', $negativo['reglas_examinadas']['g09']['SIM-DOS-TAREAS']['estado']);
         self::assertSame('ACTIVO', $p->fila('reglas_expertas', 'R-ATE-S02-P01')['estado']);
         self::assertSame($base, (new EjecutarPerfilExperimental)->ejecutar(...$base['instantanea_entrada']));
+    }
+
+    public function test_condiciones_parciales_de_dos_aplicaciones_no_completan_una_conjuncion_de_tarea(): void
+    {
+        [$base, $original] = $this->fuente();
+        $a = $original['fuentes_examinadas'][0];
+        $b = array_replace($a, ['id' => 'SIM-E2', 'episodio' => 'SIM-EP2', 'dificultad_especifica_test_only' => false]);
+        $a['atribucion_test_only'] = false;
+        $resultado = (new EvaluadorG09Experimental)->evaluar($base + ['evidencias' => [$a, $b]]);
+        self::assertSame([], $resultado['consecuencias_candidatas']);
+        $r = (new EjecutorConocimientoG09Experimental)->evaluar(PaqueteSemanticoG09Experimental::crear(), $base, $resultado);
+        self::assertSame('EVALUABLE_SIN_SOPORTE', $r['estado_tecnico']);
+        self::assertSame([], $r['consecuencias']);
+        self::assertSame('NO_CUMPLE', $r['reglas']['R-ATE-S01-P01']['estado']);
+        self::assertCount(2, $r['reglas']['R-ATE-S01-P01']['evaluaciones_unidad']);
+        self::assertSame('COINCIDE', (new VerificadorNucleoG09Experimental)->cotejar($resultado, $base)['coincidencia']);
+    }
+
+    public function test_regla_multicomponente_no_mezcla_aplicaciones_parciales_del_mismo_componente(): void
+    {
+        [$base, $original] = $this->fuente();
+        $a = $original['fuentes_examinadas'][0];
+        $b = array_replace($a, ['id' => 'SIM-E2', 'episodio' => 'SIM-EP2', 'dificultad_especifica_test_only' => false]);
+        $c = array_replace($a, ['id' => 'SIM-E3', 'episodio' => 'SIM-EP3', 'regla' => 'R-ATE-S03-P01']);
+        $a['atribucion_test_only'] = false;
+        $p = (new EditorPaqueteExperimental)->revisar(PaqueteSemanticoG09Experimental::crear(), 'SIM-MULTI-2', [[
+            'id' => 'SIM-MULTI', 'codigo' => 'SIM-MULTI', 'nombre' => 'Dos componentes explícitos', 'descripcion' => 'Regresión de alcance.',
+            'fundamento' => 'No combinar condiciones de dos aplicaciones de una misma tarea.',
+            'condiciones' => [['variable' => 'VAR-R-ATE-S01-P01-C1', 'valor' => 'VAL-SIM-TRUE'],
+                ['variable' => 'VAR-R-ATE-S01-P01-C2', 'valor' => 'VAL-SIM-TRUE'],
+                ['variable' => 'VAR-R-ATE-S03-P01-C1', 'valor' => 'VAL-SIM-TRUE']],
+            'criterio_dominio' => 'CR-ATE', 'valor_consecuencia' => 'VAL-RES-R-ATE-S02-P01',
+        ]]);
+        $fuente = (new EvaluadorG09Experimental)->evaluar($base + ['evidencias' => [$a, $b, $c]]);
+        $r = (new EjecutorConocimientoG09Experimental)->evaluar($p, $base, $fuente);
+        self::assertSame('MULTICOMPONENTE_EXPLICITO', $r['reglas']['SIM-MULTI']['alcance']);
+        self::assertSame('NO_CUMPLE', $r['reglas']['SIM-MULTI']['estado']);
+        self::assertArrayNotHasKey('ATE-R-SELECCION', $r['consecuencias']);
+        $a['atribucion_test_only'] = true;
+        $fuente = (new EvaluadorG09Experimental)->evaluar($base + ['evidencias' => [$a, $b, $c]]);
+        $r = (new EjecutorConocimientoG09Experimental)->evaluar($p, $base, $fuente);
+        self::assertSame('CUMPLE', $r['reglas']['SIM-MULTI']['estado']);
+        self::assertArrayHasKey('ATE-R-SELECCION', $r['consecuencias']);
     }
 }

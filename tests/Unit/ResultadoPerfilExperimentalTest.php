@@ -71,7 +71,8 @@ final class ResultadoPerfilExperimentalTest extends TestCase
         $r = (new EjecutarPerfilExperimental)->ejecutar(...$caso);
         self::assertSame('TAREA_NO_SOLICITADA', $r['subcomponentes']['ATE-S01']['motivo_no_emision']);
         self::assertSame('COMPUERTA_NO_HABILITA', $r['subcomponentes']['LEN-S01']['motivo_no_emision']);
-        self::assertCount(15, $r['reglas_examinadas']['g09']);
+        self::assertCount(10, $r['reglas_examinadas']['g09']);
+        self::assertCount(15, $r['reglas_examinadas']['condiciones_fuente_g09']);
         self::assertContains('R-ATE-S01-P01', $r['evidencias_faltantes']['tareas_no_solicitadas']);
         self::assertSame('ABSTENCION_INFORMACION_INSUFICIENTE', $r['petersen']['estado']);
         self::assertSame('U', $r['requisitos_dcl']['DCL-C03']);

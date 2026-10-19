@@ -13,11 +13,11 @@ use App\Models\ReglaExperta as ReglaModelo;
 use App\Models\ValorSemantico;
 use App\Models\VariableExperta;
 use App\Models\VersionModeloExperto;
-use MotorExperto\dominio\orion\Entities\Conocimiento\ReglaExperta;
-use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
 use DomainException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use MotorExperto\dominio\orion\Entities\Conocimiento\ReglaExperta;
+use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
 
 /**
  * TÍTULO:
@@ -80,6 +80,7 @@ final readonly class MapeadorReglas
             'INACTIVO' => false,
             default => throw new DomainException('Estado de regla sin representación exacta en Domain.'),
         };
+        $habilitada = $habilitada && ($fila->getAttributes()['estado_revision'] ?? null) !== 'RECHAZADA';
         if (self::texto($modeloVersion, 'cod_version_modelo') !== $version
             || self::texto($fila, 'tipo_regla') !== $this->tipoReglaResultado
             || ($habilitada && self::texto($modeloVersion, 'estado') !== 'ACTIVO')) {

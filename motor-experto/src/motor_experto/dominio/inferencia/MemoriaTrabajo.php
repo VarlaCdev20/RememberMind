@@ -105,15 +105,20 @@ final class MemoriaTrabajo
     public function soportesEfectivos(array $ids): array
     {
         $grupos = [];
+        $unidades = [];
         foreach ($this->evidencias as $id => $e) {
-            $grupos[$id] = serialize([$e->fuente->tabla, $e->fuente->registro, $e->fuente->campo]);
-        }
-        foreach ($this->relaciones as $r) {
-            if ($r['tipo'] !== 'MISMO_EPISODIO_CLINICO') {
-                continue;
+            $unidad = $e->fuente->contexto['unidad_soporte'] ?? null;
+            if ($unidad !== null && (! is_string($unidad) || trim($unidad) === '')) {
+                throw new DomainException('Unidad de soporte original inválida.');
             }
-            $a = $grupos[$r['origen']];
-            $b = $grupos[$r['destino']];
+            $grupos[$id] = serialize([$e->fuente->tabla, $e->fuente->registro, $e->fuente->campo]);
+            if ($unidad !== null) {
+                $unidades[serialize([$e->fuente->tabla, $unidad])][] = $id;
+            }
+        }
+        $unir = static function (string $origen, string $destino) use (&$grupos): void {
+            $a = $grupos[$origen];
+            $b = $grupos[$destino];
             $canonico = strcmp($a, $b) <= 0 ? $a : $b;
             foreach ($grupos as &$g) {
                 if ($g === $a || $g === $b) {
@@ -121,6 +126,18 @@ final class MemoriaTrabajo
                 }
             }
             unset($g);
+        };
+        // Las declaraciones pueden unir originales, nunca separar dos mapeos del mismo original.
+        foreach ($unidades as $miembros) {
+            foreach ($miembros as $id) {
+                $unir($miembros[0], $id);
+            }
+        }
+        foreach ($this->relaciones as $r) {
+            if ($r['tipo'] !== 'MISMO_EPISODIO_CLINICO') {
+                continue;
+            }
+            $unir($r['origen'], $r['destino']);
         }
         $efectivos = [];
         foreach ($ids as $id) {

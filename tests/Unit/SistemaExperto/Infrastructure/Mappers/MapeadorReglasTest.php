@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Infrastructure\Mappers;
 
-use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorReglas;
 use DomainException;
 use Illuminate\Database\Eloquent\Collection;
+use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -22,6 +22,15 @@ use PHPUnit\Framework\TestCase;
  */
 final class MapeadorReglasTest extends TestCase
 {
+    public function test_una_regla_rechazada_no_se_rehabilita_al_mapearla(): void
+    {
+        $modelo = EscenarioMapeadores::regla();
+        $modelo->setRawAttributes(array_replace($modelo->getAttributes(), ['estado_revision' => 'RECHAZADA']));
+        self::assertFalse((new MapeadorReglas('RESULTADO'))->aDominio($modelo)->habilitada);
+        self::assertSame('ACTIVO', $modelo->getAttributes()['estado']);
+        self::assertSame('RECHAZADA', $modelo->getAttributes()['estado_revision']);
+    }
+
     /** Conserva PK, códigos y la cadena cero sin ejecutarlos; sin parámetros ni excepciones esperadas. */
     public function test_traduce_conjuncion_positiva_y_consecuencia_sin_coercion(): void
     {

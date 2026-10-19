@@ -62,6 +62,17 @@ por disponer únicamente de campos o motivos de abstención.
 
 ### 4. Cerrar red semántica y ejecutor de cinco dominios
 
+**Avance técnico del 19/10/2026:** [checklist, recorrido y evidencia de fase 4](FASE_4_RED_Y_REGLAS_2026_10_19.md).
+
+- [x] Compilador de la topología de cinco dominios/19 componentes y de las rutas de las reglas.
+- [x] Revisión integrada D-131/G09 con versiones y hashes de origen; reproducción tras archivo.
+- [x] Entrada declarativa desde fuentes originales remapeadas, sin generadores del laboratorio; cada conclusión conserva reglas/evidencias.
+- [x] Conjunciones por aplicación/componente, NULL explícito, contradicciones y agrupación conservadora de soportes.
+- [x] Gobierno de variables de subcomponentes y comprobación del contrato inferencial del servidor antes de publicar una regla.
+- [x] Verificación SQLite/PostgreSQL desechable, concurrencia, independencia del motor y build del candidato.
+
+**Pendiente de cierre institucional:** vincular el paquete y los contratos reales de las fuentes aún no cotejadas en fases 2/3; conectar la entrada declarativa con extracción/autorización y conservación completas en las fases siguientes. Las casillas de cierre institucional que siguen no se marcan por la sola aceptación técnica del laboratorio o de una clase pura.
+
 - [ ] Conectar fuente → hecho → variable → componente → dominio → regla → resultado.
 - [ ] Validar tipos, referencias, versiones y cobertura de los 19 componentes.
 - [ ] Integrar Memoria y las quince reglas G09 mediante contratos institucionales verificables. Las referencias de laboratorio no se promueven a evidencia clínica.

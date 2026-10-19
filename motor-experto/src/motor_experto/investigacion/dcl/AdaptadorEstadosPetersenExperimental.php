@@ -77,6 +77,8 @@ final class AdaptadorEstadosPetersenExperimental
             $versionMotor = $dominio === 'COG-MEM'
                 ? ($integrado['versiones']['COG-MEM'] ?? null)
                 : ($integrado['versiones']['G09'] ?? null);
+            $familia = $dominio === 'COG-MEM' ? 'COG-MEM' : 'G09';
+            $versionContrato = $integrado['versiones_fuente'][$familia] ?? $versionMotor;
             if (! is_string($versionMotor) || $versionMotor === '') {
                 throw new DomainException('Falta versión del motor de dominio.');
             }
@@ -84,7 +86,7 @@ final class AdaptadorEstadosPetersenExperimental
                 if (! is_array($ref)) {
                     throw new DomainException('Referencia documental no es objeto.');
                 }
-                $this->frontera($ref, $integrado, $dominio, $versionMotor);
+                $this->frontera($ref, $integrado, $dominio, $versionContrato);
                 $interpretacion = $ref['interpretacion'] ?? null;
                 if (! in_array($interpretacion, ['ALTERACION_OBJETIVA_SIMULADA', 'RENDIMIENTO_ESPERADO_SIMULADO'], true)
                     || ($ref['evaluabilidad'] ?? null) !== 'INTERPRETABLE'
@@ -132,6 +134,7 @@ final class AdaptadorEstadosPetersenExperimental
                 'referencias_admitidas' => array_values(array_map(fn ($r) => $r['id'], $validas)),
                 'rechazadas' => $rechazos,
                 'version_motor' => $versionMotor,
+                'version_contrato_fuente' => $versionContrato,
             ];
         }
 

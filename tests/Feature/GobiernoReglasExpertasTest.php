@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
 use Livewire\Livewire;
+use MotorExperto\adaptadores\entrada\EjemploTecnicoCOGMEM;
 use Tests\Support\InformeCognitivoFixture;
 use Tests\TestCase;
 
@@ -37,6 +38,9 @@ final class GobiernoReglasExpertasTest extends TestCase
         $this->medico = $this->profesional('MEDICO GENERAL/GERIATRA', 'MEDICINA');
         $this->actingAs($this->medico);
         InformeCognitivoFixture::conocimiento($this->medico);
+        $p = EjemploTecnicoCOGMEM::paquete();
+        config(['sistema_experto.contratos_conocimiento.VER_TEST' => ['relaciones' => $p->contratosRelaciones,
+            'extracciones' => $p->contratosExtraccion, 'tipo_regla_resultado' => $p->tipoReglaResultado]]);
     }
 
     private function profesional(string $role, string $profession): User
@@ -52,6 +56,62 @@ final class GobiernoReglasExpertasTest extends TestCase
     private function revision(): string
     {
         return app(Gestor::class)->crearRevision($this->medico, 'VER_TEST', 'ORION-GOB-1', 'Revisión explícita del conocimiento para ensayo de ingeniería.');
+    }
+
+    public function test_gobierno_admite_condicion_de_subcomponente_con_vinculo_explicito(): void
+    {
+        DB::table('variables_expertas')->where('cod_variable_experta', 'VAR_INS')->update(['cod_nodo_propietario_primario' => 'SUB']);
+        $original = app(ConocimientoVersionado::class)->instantanea('VER_TEST');
+        $nueva = ['codigo' => 'MEM-S01-REV', 'nombre' => 'Conjunción de componente', 'descripcion' => 'Condición estructural de ingeniería.',
+            'fundamento' => 'Caso sintético de pertenencia explícita.', 'condiciones' => [['variable' => 'VAR_INS', 'valor' => 'VAL_A']],
+            'criterio_dominio' => 'CR_DOM', 'valor_consecuencia' => 'RES_D'];
+        $id = app(Gestor::class)->crearRevision($this->medico, 'VER_TEST', 'ORION-SUBCOMPONENTE',
+            'Sustitución con variable de un subcomponente explícito.', $nueva, sustituye: 'RULE_A');
+        $r = ReglaExperta::query()->where('cod_version_modelo', $id)->where('codigo_regla', 'MEM-S01-REV')->sole();
+        self::assertSame('RULE_A', $r->cod_regla_anterior);
+        self::assertSame('PENDIENTE', $r->estado_revision);
+        self::assertSame($this->medico->getKey(), $r->cod_usuario_creacion);
+        self::assertSame($original, app(ConocimientoVersionado::class)->instantanea('VER_TEST'));
+        self::assertTrue(app(Gestor::class)->probar($this->medico, $r->getKey(), [
+            $r->condicionesReglaExperta()->sole()->cod_variable_experta => $r->condicionesReglaExperta()->sole()->cod_valor_semantico,
+        ])['cumple']);
+    }
+
+    public function test_pertenencia_sin_arista_de_variable_no_publica_sucesora(): void
+    {
+        DB::table('variables_expertas')->where('cod_variable_experta', 'VAR_INS')->update(['cod_nodo_propietario_primario' => 'SUB']);
+        DB::table('relaciones_semanticas')->where('cod_relacion_semantica', 'REL_INS')->update(['estado' => 'INACTIVO']);
+        $nueva = ['codigo' => 'MEM-S01-REV', 'nombre' => 'Conjunción inválida', 'descripcion' => 'Sin participación explícita.',
+            'fundamento' => 'Negativo sintético de pertenencia.', 'condiciones' => [['variable' => 'VAR_INS', 'valor' => 'VAL_A']],
+            'criterio_dominio' => 'CR_DOM', 'valor_consecuencia' => 'RES_D'];
+        try {
+            app(Gestor::class)->crearRevision($this->medico, 'VER_TEST', 'ORION-SUB-INVALIDA', 'Debe conservar la revisión original.', $nueva);
+            self::fail('La pertenencia activó una participación implícita.');
+        } catch (DomainException) {
+            self::assertSame(1, DB::table('versiones_modelo_experto')->count());
+            self::assertNull(DB::table('versiones_modelo_experto')->where('cod_version_modelo', 'VER_TEST')->value('fecha_hora_retiro'));
+        }
+    }
+
+    public function test_arista_decorativa_no_habilita_publicacion_y_contrato_no_se_inventa(): void
+    {
+        DB::table('variables_expertas')->where('cod_variable_experta', 'VAR_INS')->update(['cod_nodo_propietario_primario' => 'SUB']);
+        $contratos = config('sistema_experto.contratos_conocimiento.VER_TEST');
+        $contratos['relaciones'][1]['habilita_participacion'] = false;
+        config(['sistema_experto.contratos_conocimiento.VER_TEST' => $contratos]);
+        $nueva = ['codigo' => 'MEM-DECORATIVA', 'nombre' => 'Regla sin contrato inferencial', 'descripcion' => 'Negativo de publicación.',
+            'fundamento' => 'Caso de ingeniería sin vínculo habilitante.', 'condiciones' => [['variable' => 'VAR_INS', 'valor' => 'VAL_A']],
+            'criterio_dominio' => 'CR_DOM', 'valor_consecuencia' => 'RES_D'];
+        foreach ([$contratos, null] as $contrato) {
+            config(['sistema_experto.contratos_conocimiento.VER_TEST' => $contrato]);
+            try {
+                app(Gestor::class)->crearRevision($this->medico, 'VER_TEST', 'ORION-DECORATIVA', 'No publicar una participación decorativa.', $nueva);
+                self::fail('Se publicó conocimiento sin contrato inferencial.');
+            } catch (DomainException) {
+                self::assertSame(1, DB::table('versiones_modelo_experto')->count());
+                self::assertNull(DB::table('versiones_modelo_experto')->where('cod_version_modelo', 'VER_TEST')->value('fecha_hora_retiro'));
+            }
+        }
     }
 
     public function test_archivo_crea_sucesora_con_autor_y_pendientes_sin_cambiar_el_original(): void

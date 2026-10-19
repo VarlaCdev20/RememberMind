@@ -5,7 +5,7 @@ namespace MotorExperto\aplicacion\casos_uso;
 use DomainException;
 use MotorExperto\aplicacion\puertos\EvaluadorExperto;
 use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\dominio\conocimiento\reglas\EvaluadorReglas;
+use MotorExperto\dominio\conocimiento\reglas\EvaluadorReglasCognitivas;
 use MotorExperto\dominio\explicacion\ConstructorTraza;
 use MotorExperto\dominio\inferencia\EvaluadorEvaluabilidadCOGMEM;
 use MotorExperto\dominio\inferencia\MemoriaTrabajo;
@@ -33,11 +33,21 @@ final class MotorExperto implements EvaluadorExperto
             }
         }
         $gate = (new EvaluadorEvaluabilidadCOGMEM)->evaluar($p, $m, $criterio, $contexto);
-        $reglas = $gate['habilita_resultado'] ? (new EvaluadorReglas)->evaluar($p, $m, $criterio) : [];
-        $resultado = (new ResolvedorSoportesCOGMEM)->resolver($p, $m, $criterio, $gate, $reglas);
+        $reglas = $gate['habilita_resultado'] ? (new EvaluadorReglasCognitivas)->evaluar($p, $m, $criterio) : [];
+        $reglasRetiradas = array_filter($p->tabla('consecuencias_regla_experta'), static function ($salida) use ($p, $dominio): bool {
+            $r = $p->fila('reglas_expertas', $salida['cod_regla_experta']);
+
+            return $salida['cod_criterio_dominio_resultado'] === $dominio['cod_criterio_dominio_resultado']
+                && ($r['estado'] !== 'ACTIVO' || ($r['estado_revision'] ?? null) === 'RECHAZADA');
+        });
+        // El retiro explícito puede dejar el criterio sin regla aplicable; no significa rendimiento conservado.
+        // Sin un retiro, EV-CM-2 sin cobertura continúa siendo el error de integridad previsto por D-131.
+        $sinSoporte = $gate['habilita_resultado'] && $reglasRetiradas !== [] && ! in_array('CUMPLE', array_column($reglas, 'estado'), true);
+        $resultado = $sinSoporte ? null : (new ResolvedorSoportesCOGMEM)->resolver($p, $m, $criterio, $gate, $reglas);
         $traza = (new ConstructorTraza)->construir($p, $m, $criterio, $gate, $reglas, $resultado);
 
-        return ['criterio' => $criterio, 'evaluabilidad' => $gate, 'resultado' => $resultado, 'traza' => $traza, 'uso' => 'PRUEBA_TECNICA'];
+        return ['criterio' => $criterio, 'evaluabilidad' => $gate, 'resultado' => $resultado, 'traza' => $traza,
+            'abstencion' => $sinSoporte ? 'SIN_REGLA_CON_SOPORTE' : null, 'uso' => 'PRUEBA_TECNICA'];
     }
 
     /** Perfil sin agregación, sin puntuación global y con criterios separados. */

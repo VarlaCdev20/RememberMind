@@ -14,6 +14,8 @@ use DomainException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use MotorExperto\dominio\conocimiento\CompiladorObservacional;
+use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\dominio\conocimiento\PertenenciaVariableCognitiva;
 use MotorExperto\dominio\conocimiento\reglas\EvaluadorReglas;
 
 /** Gobierno institucional del conocimiento. Ninguna aprobación se inventa o se exige al crear. */
@@ -134,6 +136,25 @@ final class GestionarReglasExpertas
             $traducidas = app(IdentidadesConocimiento::class)->traducir(['versiones_modelo_experto' => [$header]] + $tablas, $id, $id, false);
             if ($observacional) {
                 (new CompiladorObservacional)->compilar($traducidas, $id, $codigo);
+            } elseif ($nueva !== []) {
+                $contrato = $this->contrato($anterior);
+                $p = new PaqueteConocimiento($id, array_intersect_key($traducidas, PaqueteConocimiento::CLAVES),
+                    $contrato['relaciones'], false, $contrato['tipo_regla_resultado'], $contrato['extracciones']);
+                $reglaNueva = array_values(array_filter($p->tabla('reglas_expertas'), static fn ($r) => $r['codigo_regla'] === $nueva['codigo']))[0];
+                if ($reglaNueva['tipo_regla'] !== $p->tipoReglaResultado) {
+                    throw new DomainException('El tipo de la nueva regla no corresponde al contrato de la familia.');
+                }
+                foreach ($p->tabla('consecuencias_regla_experta') as $salida) {
+                    if ($salida['cod_regla_experta'] !== $reglaNueva['cod_regla_experta']) {
+                        continue;
+                    }
+                    $criterio = $p->fila('criterios_dominios_resultado', $salida['cod_criterio_dominio_resultado'])['cod_nodo_criterio'];
+                    foreach ($p->tabla('condiciones_regla_experta') as $condicion) {
+                        if ($condicion['cod_regla_experta'] === $reglaNueva['cod_regla_experta'] && ! $p->variableParticipa($condicion['cod_variable_experta'], $criterio)) {
+                            throw new DomainException('La nueva regla carece de participación inferencial habilitante.');
+                        }
+                    }
+                }
             }
             foreach ($traducidas['reglas_expertas'] as &$rule) {
                 // Esta FK apunta a la historia existente, nunca a la PK regenerada de la copia.
@@ -221,6 +242,25 @@ final class GestionarReglasExpertas
             'cod_usuario_revision' => null, 'fecha_hora_revision' => null, 'justificacion_revision' => null]);
     }
 
+    /** Contrato del servidor por versión/linaje; el formulario no puede elegir predicados habilitantes. */
+    private function contrato(string $version): array
+    {
+        $vistos = [];
+        do {
+            if (isset($vistos[$version])) {
+                throw new DomainException('Ciclo en el linaje del contrato de conocimiento.');
+            }
+            $vistos[$version] = true;
+            $contrato = config('sistema_experto.contratos_conocimiento.'.$version);
+            if (is_array($contrato) && is_array($contrato['relaciones'] ?? null)
+                && is_array($contrato['extracciones'] ?? null) && is_string($contrato['tipo_regla_resultado'] ?? null)) {
+                return $contrato;
+            }
+            $version = VersionModeloExperto::query()->whereKey($version)->sole()->cod_version_anterior;
+        } while ($version !== null);
+        throw new DomainException('Falta el contrato semántico del servidor para esta familia de conocimiento. Puede archivar reglas sin inventar ese contrato.');
+    }
+
     private function agregar(array &$t, array $n, string $version, string $actor, string $fecha): void
     {
         $fields = ['codigo', 'nombre', 'descripcion', 'fundamento', 'condiciones', 'criterio_dominio', 'valor_consecuencia'];
@@ -270,13 +310,13 @@ final class GestionarReglasExpertas
             $v = $variables[$c['variable']] ?? throw new DomainException('Variable de otra versión.');
             $value = $values[$c['valor']] ?? throw new DomainException('Valor de otra versión.');
             if ($v['cod_dominio_valores'] !== $value['cod_dominio_valores'] || isset($seen[$c['variable']])
-                || $v['cod_nodo_propietario_primario'] !== $domain['cod_nodo_criterio']
                 || $v['estado'] !== 'ACTIVO' || $value['estado'] !== 'ACTIVO' || $value['estado_aprobacion'] !== 'APROBADO'
                 || ($domains[$value['cod_dominio_valores']]['estado'] ?? null) !== 'ACTIVO'
                 || ($nodes[$v['cod_nodo_semantico']]['tipo_nodo'] ?? null) !== 'VARIABLE'
                 || ($nodes[$v['cod_nodo_semantico']]['estado'] ?? null) !== 'ACTIVO') {
                 throw new DomainException('Condición incompatible o variable repetida.');
             }
+            (new PertenenciaVariableCognitiva)->verificar($t, $c['variable'], $domain['cod_nodo_criterio']);
             $seen[$c['variable']] = true;
             $t['condiciones_regla_experta'][] = ['cod_condicion_regla' => 'TMP-C-'.($i + 1), 'cod_regla_experta' => $id,
                 'cod_variable_experta' => $c['variable'], 'cod_valor_semantico' => $c['valor']];

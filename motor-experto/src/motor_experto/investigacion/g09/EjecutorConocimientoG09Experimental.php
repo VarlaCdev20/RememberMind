@@ -7,7 +7,7 @@ namespace MotorExperto\investigacion\g09;
 use DateTimeImmutable;
 use DomainException;
 use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\dominio\conocimiento\reglas\EvaluadorReglas;
+use MotorExperto\dominio\conocimiento\reglas\EvaluadorReglasCognitivas;
 use MotorExperto\dominio\inferencia\MemoriaTrabajo;
 use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
 use MotorExperto\dominio\objetos_valor\EvidenciaExperta;
@@ -50,7 +50,8 @@ final class EjecutorConocimientoG09Experimental
                 $variable = $variables[$codigoVariable] ?? throw new DomainException('La revisión no conserva una variable fuente G09.');
                 $id = 'SIM-D-'.substr(hash('sha256', serialize([$traza['evidencia'], $condicion])), 0, 14);
                 $fuente = new FuenteBrutaCOGMEM('SIM-G08', 'aplicaciones_instrumento', $condicion, $traza['evidencia'],
-                    $c->residente, new DateTimeImmutable($traza['fecha_fuente'].'-04:00'), true, true, null, true, true);
+                    $c->residente, new DateTimeImmutable($traza['fecha_fuente'].'-04:00'), true, true, null, true, true,
+                    contexto: ['unidad_soporte' => $traza['evidencia']]);
                 $m->incorporar(new EvidenciaExperta($id, $c, $fuente, 'SIM-MAP-'.$codigoVariable, null,
                     $variable, $valores[0]['cod_valor_semantico'], 'MAPEADO', 'ADMISIBLE', []));
                 $m->vincular($criterio, $id, 'INSTRUMENTAL_TEST_ONLY');
@@ -58,7 +59,7 @@ final class EjecutorConocimientoG09Experimental
                     'regla_fuente' => $traza['regla'], 'episodio_original' => $traza['episodio_fuente']];
             }
         }
-        $reglas = str_ends_with($resultadoFuente['evaluabilidad'], '-2') ? (new EvaluadorReglas)->evaluar($p, $m, $criterio) : [];
+        $reglas = str_ends_with($resultadoFuente['evaluabilidad'], '-2') ? (new EvaluadorReglasCognitivas)->evaluar($p, $m, $criterio) : [];
         $consecuencias = $detalles = $gruposConsecuencia = [];
         foreach ($reglas as $regla) {
             $definicion = $p->fila('reglas_expertas', $regla['regla']);
@@ -94,6 +95,8 @@ final class EjecutorConocimientoG09Experimental
                 'consecuencia' => $valorResultado['codigo_valor'], 'condiciones' => $regla['condiciones'],
                 'soportes_originales' => $soportes, 'soportes_efectivos' => $efectivos,
                 'unidad_soporte' => 'EPISODIO_Y_TAREA', 'grupos_soporte' => $grupos];
+            $detalles[$codigo]['alcance'] = $regla['alcance'];
+            $detalles[$codigo]['evaluaciones_unidad'] = $regla['evaluaciones_unidad'];
         }
         foreach ($gruposConsecuencia as $consecuencia => $grupos) {
             ksort($grupos);

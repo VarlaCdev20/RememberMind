@@ -147,11 +147,15 @@ final class ConstructorResultadoExperimental
             }
             $usaDeclaracion = true;
             foreach ($d['reglas'] as $codigo => $regla) {
+                $fuente = $reglasFuente[$codigo] ?? null;
+                $sinMedicion = $fuente !== null && (! $fuente['evaluada'] || $fuente['estado'] === 'NO_EVALUADA');
                 $declarativas[$codigo] = ['dominio' => $dominio, 'version' => $d['version_conocimiento'],
-                    'estado' => $regla['estado'], 'evaluada' => true, 'condiciones_y_soportes' => $regla['condiciones'],
+                    'estado' => $sinMedicion ? 'NO_EVALUADA' : $regla['estado'], 'estado_nucleo' => $regla['estado'],
+                    'evaluada' => ! $sinMedicion, 'condiciones_y_soportes' => $regla['condiciones'],
                     'soportes_originales' => $regla['soportes_originales'], 'consecuencia' => $regla['consecuencia'],
                     'soportes_efectivos' => $regla['soportes_efectivos'], 'grupos_soporte' => $regla['grupos_soporte'],
                     'unidad_soporte' => $regla['unidad_soporte'],
+                    'alcance' => $regla['alcance'], 'evaluaciones_unidad' => $regla['evaluaciones_unidad'],
                     'nombre' => $regla['nombre'], 'fundamento' => $regla['fundamento']];
             }
             foreach (Catalogo::todas() as $meta) {
@@ -163,9 +167,12 @@ final class ConstructorResultadoExperimental
                 $subcomponentes[$meta['componente']]['reglas'] = array_keys($coinciden);
                 $subcomponentes[$meta['componente']]['evaluado'] = (bool) $coinciden;
                 $noHabilitado = in_array($dominio, $contextosInsuficientes, true);
+                $motivoFuente = $subcomponentes[$meta['componente']]['motivo_no_emision'];
                 $subcomponentes[$meta['componente']]['motivo_no_emision'] = in_array($dominio, $contradicciones, true)
                     ? 'CONTRADICCION_DOCUMENTADA' : ($noHabilitado ? 'COMPUERTA_NO_HABILITA'
-                        : ($cumplen ? null : ($coinciden ? 'CONDICION_POSITIVA_NO_CUMPLIDA' : 'SIN_REGLA_ELEGIBLE')));
+                        : ($cumplen ? null : (! $coinciden ? 'SIN_REGLA_ELEGIBLE'
+                            : (in_array($motivoFuente, ['TAREA_NO_SOLICITADA', 'FUENTE_NO_ADMISIBLE', 'CONDICION_DESCONOCIDA'], true)
+                                ? $motivoFuente : 'CONDICION_POSITIVA_NO_CUMPLIDA'))));
             }
         }
         if ($usaDeclaracion) {

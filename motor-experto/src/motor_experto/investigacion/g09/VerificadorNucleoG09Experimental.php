@@ -6,7 +6,7 @@ namespace MotorExperto\investigacion\g09;
 
 use DateTimeImmutable;
 use DomainException;
-use MotorExperto\dominio\conocimiento\reglas\EvaluadorReglas;
+use MotorExperto\dominio\conocimiento\reglas\EvaluadorReglasCognitivas;
 use MotorExperto\dominio\inferencia\MemoriaTrabajo;
 use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
 use MotorExperto\dominio\objetos_valor\EvidenciaExperta;
@@ -69,7 +69,8 @@ final class VerificadorNucleoG09Experimental
                     'SIM-G08', 'aplicaciones_instrumento',
                     $cond, 'SIM-REG-'.$t['evidencia'].'-'.$cond,
                     $c->residente, $c->fechaCorte,
-                    'SIM_TRUE', 'SIM_TRUE', 'SIM-PERSONAL', true, true
+                    'SIM_TRUE', 'SIM_TRUE', 'SIM-PERSONAL', true, true,
+                    contexto: ['unidad_soporte' => $t['evidencia']]
                 );
                 $id = 'SIM-EV-'.substr(hash('sha256', serialize([$regla, $t['evidencia'], $cond])), 0, 20);
                 $e = new EvidenciaExperta(
@@ -86,7 +87,7 @@ final class VerificadorNucleoG09Experimental
             }
         }
 
-        $reglas = (new EvaluadorReglas)->evaluar($paquete, $memoria, $criterio);
+        $reglas = (new EvaluadorReglasCognitivas)->evaluar($paquete, $memoria, $criterio);
         $delNucleo = [];
         foreach ($reglas as $r) {
             if ($r['estado'] !== 'CUMPLE') {

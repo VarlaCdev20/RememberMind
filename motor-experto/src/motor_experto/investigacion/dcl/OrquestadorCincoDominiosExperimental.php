@@ -9,6 +9,7 @@ use DomainException;
 use MotorExperto\adaptadores\entrada\AdaptadorHechosCOGMEM;
 use MotorExperto\adaptadores\entrada\EjemploTecnicoCOGMEM;
 use MotorExperto\aplicacion\casos_uso\MotorExperto;
+use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
 use MotorExperto\dominio\inferencia\MemoriaTrabajo;
 use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
 use MotorExperto\dominio\objetos_valor\FuenteBrutaCOGMEM;
@@ -17,8 +18,8 @@ use MotorExperto\investigacion\g09\EjecutorPerfilG09Experimental;
 
 /**
  * Demostración sin uso clínico: mismo individuo/caso/corte para cinco dominios.
- * Memoria ejecuta D-131 sobre su versión VER_TEST; los demás G09-EXP mantienen
- * su versión propia. No se alteran paquetes/mapeos institucionales.
+ * El caso de uso integral proporciona una revisión única a Memoria y G09.
+ * La entrada histórica sin paquete conserva su contrato de laboratorio anterior.
  * Petersen recibe U en los cinco dominios: jamás infiere A/P de resultados
  * descriptivos, de una regla que no cumplió o de una respuesta sintética.
  */
@@ -26,7 +27,8 @@ final class OrquestadorCincoDominiosExperimental
 {
     public const VERSION_PERFIL = 'INTEGRA5-EXP-01';
 
-    public function __construct(private readonly EjecutorPerfilG09Experimental $g09) {}
+    public function __construct(private readonly EjecutorPerfilG09Experimental $g09, private readonly ?PaqueteConocimiento $conocimiento = null,
+        private readonly array $fuentesConocimiento = []) {}
 
     public function ejecutar(array $contexto, array $tareas, string $literalMemoria): array
     {
@@ -51,7 +53,10 @@ final class OrquestadorCincoDominiosExperimental
         }
 
         $perfilG09 = $this->g09->evaluar($contexto, $tareas);
-        $paqueteMem = EjemploTecnicoCOGMEM::paquete();
+        $paqueteMem = $this->conocimiento ?? EjemploTecnicoCOGMEM::paquete();
+        if ($this->conocimiento !== null && $perfilG09['version_conocimiento'] !== $paqueteMem->version) {
+            throw new DomainException('Memoria y G09 deben ejecutar la misma revisión integrada.');
+        }
         $memoriaTrabajo = new MemoriaTrabajo(new ContextoEjecucion($id, $residente, $paqueteMem->version, $fechaCorte));
         $fuentesMemoria = [];
 
@@ -63,7 +68,7 @@ final class OrquestadorCincoDominiosExperimental
                 new DateTimeImmutable($corte.'T09:00:00-04:00'),
                 $literalMemoria, $literalMemoria, 'SIM-PERSONAL',
                 true, true,
-                contexto: ['componente_instrumental_verificado' => true]
+                contexto: ['componente_instrumental_verificado' => true, 'unidad_soporte' => $registro]
             );
             $e = (new AdaptadorHechosCOGMEM)->adaptar($paqueteMem, $memoriaTrabajo, $fuente, 'MAP_INS');
             $memoriaTrabajo->vincular('MEM', $e->id, 'INSTRUMENTAL');
@@ -159,6 +164,8 @@ final class OrquestadorCincoDominiosExperimental
                 'G09' => $perfilG09['version_conocimiento'],
                 'DCL' => ClasificadorPetersenExperimental::VERSION,
             ],
+            'versiones_fuente' => ['COG-MEM' => $this->fuentesConocimiento['COG-MEM']['version'] ?? $paqueteMem->version,
+                'G09' => $this->fuentesConocimiento['G09']['version'] ?? $perfilG09['version_conocimiento']],
             'perfil' => $dominios,
             'fuentes_examinadas' => ['memoria' => $fuentesMemoria, 'g09' => $perfilG09['capturas_examinadas']],
             'clasificacion_dcl' => $petersen,

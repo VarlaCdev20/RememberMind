@@ -137,6 +137,7 @@ final class EjecutorPerfilG09Experimental
                 $resultado['consecuencias_candidatas'] = $declarativa['consecuencias'];
                 $resultado['estado_tecnico'] = $declarativa['estado_tecnico'];
                 $cotejo = ['coincidencia' => 'EJECUCION_DECLARATIVA_D130', 'version' => $this->conocimiento->version,
+                    ...array_intersect_key($cotejo, ['contexto_cotejo' => true]),
                     'cotejo_catalogo_fuente' => $cotejo, 'reglas_nucleo' => count($declarativa['reglas'])];
             }
             $perfil[$criterio] = [

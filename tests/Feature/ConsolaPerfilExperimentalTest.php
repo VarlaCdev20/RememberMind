@@ -67,7 +67,8 @@ final class ConsolaPerfilExperimentalTest extends TestCase
             file_put_contents($archivo, json_encode($p->declaracion(), JSON_THROW_ON_ERROR));
             self::assertSame(0, Artisan::call('experto:probar-perfil', ['--conocimiento-g09' => $archivo, '--json' => true]));
             $r = json_decode(Artisan::output(), true, flags: JSON_THROW_ON_ERROR);
-            self::assertSame('SIM-CLI-REV-2', $r['manifiesto_versiones']['G09']);
+            self::assertSame('SIM-CLI-REV-2', $r['conocimiento_integrado']['fuentes']['G09']['version']);
+            self::assertSame($r['manifiesto_versiones']['COG-MEM'], $r['manifiesto_versiones']['G09']);
             self::assertSame('SIN_REGLA_ELEGIBLE', $r['subcomponentes']['ATE-S01']['motivo_no_emision']);
             self::assertArrayNotHasKey('R-ATE-S01-P01', $r['reglas_examinadas']['g09']);
             file_put_contents($archivo, '{"solo_pruebas_tecnicas":true}');
