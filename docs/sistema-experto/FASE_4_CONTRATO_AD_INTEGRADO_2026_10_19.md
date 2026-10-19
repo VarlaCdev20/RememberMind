@@ -24,10 +24,10 @@ Esta entrega añade un paquete institucional independiente de las fixtures: `ORI
 - [x] Traza de regla, condición, variable, componente, dominio, fuente, método y medida.
 - [x] Archivo mediante sucesora con reproducción del resultado anterior independiente del SQL y configuración actuales.
 - [x] Consulta de observaciones y antecedentes en el perfil existente; registro del paquete desde el gobierno existente.
-- [ ] Registrar la base en la instalación operativa mediante una sesión autorizada de Medicina/Psicología. No se suplanta una cuenta para ejecutar la carga.
-- [ ] QA visual en navegador: la herramienta devolvió `Local browser use is disabled in Work settings`. El render de servidor y el build se verifican por separado.
+- [x] Registrar la base en la instalación mediante la sesión de Psicología iniciada por la propietaria: cinco dominios, 19 componentes, 17 reglas y 19 mapeos; revisiones pendientes. [Registro y evidencia posterior](FASE_4_REGISTRO_Y_VERIFICACION_UI_2026_10_19.md).
+- [x] Comprobar visual y funcionalmente el gobierno en navegador habilitado, corregir el recorte de selectores y verificar los cinco tamaños previstos. PASS acotado al recorrido documentado; el cierre global de interfaz permanece en fase 7.
 
-El checklist distingue el software del estado de una instalación concreta. No se afirma que se haya publicado esta base en la BDD operativa ni que sus residentes hayan obtenido nuevas clasificaciones.
+El checklist distingue el software del estado de una instalación concreta. La base quedó registrada el 19/10/2026 y ya se utiliza en la consulta autorizada. Esto no significa que sus residentes hayan obtenido nuevas clasificaciones instrumentales o Petersen.
 
 ## Observaciones de los diecinueve componentes
 
@@ -108,7 +108,7 @@ La selección ampliada se ejecuta sobre candidato aislado de `83a490f8` más los
 | PHP/Pint | Lint de 21 PHP propios y Pint PASS; `git diff --check` sin errores |
 | Candidato y workspace | SHA-256 coincidente de los 23 PHP/Blade del incremento |
 | Revisión independiente | PASS técnico y de seguridad acotados; sin P1/P2 pendientes identificados después de las correcciones |
-| Navegador | No verificado visualmente: herramienta deshabilitada en Work; no se presenta el render de servidor como QA visual |
+| Navegador | En este corte inicial estaba deshabilitado; el [registro y QA posteriores](FASE_4_REGISTRO_Y_VERIFICACION_UI_2026_10_19.md) documentan su habilitación, el ajuste visual y el PASS del alcance examinado |
 
 La revisión independiente corrigió los bloqueos por contexto, perfil inexistente y medida ambigua. Comprobó además la separación entre observaciones, predicados y DCL, la ausencia de suplantación de autoría y el aislamiento por residente/corte/permisos. No se ejecutó la suite global ni se operó la BDD clínica.
 

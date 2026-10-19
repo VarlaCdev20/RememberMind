@@ -10,7 +10,7 @@
             </div>
         @endif
         <label for="gob-version" class="block font-semibold mb-2">Versión que desea consultar</label>
-        <select id="gob-version" wire:model.live="versionSeleccionada" class="rm-input w-full">
+        <select id="gob-version" wire:model.live="versionSeleccionada" class="rm-select w-full !leading-normal !min-h-11">
             <option value="">Seleccione una versión</option>
             @foreach($versiones as $v)<option value="{{ $v->getKey() }}">{{ $v->codigo_version }} · {{ $v->fecha_hora_retiro ? 'Retirada' : $v->estado }}</option>@endforeach
         </select>
@@ -45,7 +45,7 @@
             <form wire:submit="probarCondiciones" class="space-y-3">
                 @foreach($variablesPrueba as $v)
                     <div><label for="gob-prueba-{{ $v['cod_variable_experta'] }}">{{ $nombresNodos[$v['cod_nodo_semantico']] ?? $v['cod_variable_experta'] }}</label>
-                        <select id="gob-prueba-{{ $v['cod_variable_experta'] }}" wire:model.live="entradaPrueba.{{ $v['cod_variable_experta'] }}" class="rm-input w-full">
+                        <select id="gob-prueba-{{ $v['cod_variable_experta'] }}" wire:model.live="entradaPrueba.{{ $v['cod_variable_experta'] }}" class="rm-select w-full !leading-normal !min-h-11">
                             <option value="">Sin dato</option>
                             @foreach($tablas['valores_semanticos'] ?? [] as $valor)@if($valor['cod_dominio_valores'] === $v['cod_dominio_valores'])<option value="{{ $valor['cod_valor_semantico'] }}">{{ $valor['nombre'] }}</option>@endif @endforeach
                         </select>
@@ -68,7 +68,7 @@
             <form wire:submit="crearSucesora" class="space-y-4">
                 @if($reglaArchivo)<p role="status">Regla seleccionada para archivo: {{ $reglaArchivo }}. Puede incorporar su sustituta en esta misma revisión.</p><button type="button" wire:click="cancelarSeleccion" class="rm-btn rm-btn-secondary">Cancelar selección</button>@endif
                 <div><label for="gob-codigo" class="block font-semibold">Código de nueva versión</label><input id="gob-codigo" wire:model="codigoVersion" class="rm-input w-full" maxlength="30" placeholder="ORION-REVISION-2" required>@error('codigoVersion')<p role="alert">{{ $message }}</p>@enderror</div>
-                <div><label for="gob-motivo" class="block font-semibold">Motivo de cambio o archivo</label><textarea id="gob-motivo" wire:model="motivoCambio" class="rm-input w-full" rows="3" minlength="10" maxlength="5000" required></textarea>@error('motivoCambio')<p role="alert">{{ $message }}</p>@enderror</div>
+                <div><label for="gob-motivo" class="block font-semibold">Motivo de cambio o archivo</label><textarea id="gob-motivo" wire:model="motivoCambio" class="rm-textarea w-full" rows="3" minlength="10" maxlength="5000" required></textarea>@error('motivoCambio')<p role="alert">{{ $message }}</p>@enderror</div>
                 <label class="flex items-center gap-2"><input type="checkbox" wire:model.live="agregarRegla">Incorporar una regla nueva o sustituta</label>
                 @if($agregarRegla)
                     @if($contratoObservacional)<p class="text-sm">Este ejecutor admite un indicador afirmativo por regla y conserva su consecuencia descriptiva. Seleccione el valor «SI» y el criterio correspondiente al indicador.</p>@endif
@@ -78,14 +78,14 @@
                         @endforeach
                         @foreach($nueva['condiciones'] as $i => $c)
                             <div class="grid gap-3 md:grid-cols-2" wire:key="gob-condicion-{{ $i }}">
-                                <div><label for="gob-var-{{ $i }}">Variable de condición {{ $i+1 }}</label><select id="gob-var-{{ $i }}" wire:model="nueva.condiciones.{{ $i }}.variable" class="rm-input w-full" required><option value="">Seleccione una variable</option>@foreach($tablas['variables_expertas'] ?? [] as $v)<option value="{{ $v['cod_variable_experta'] }}">{{ $nombresNodos[$v['cod_nodo_semantico']] ?? $v['cod_variable_experta'] }}</option>@endforeach</select></div>
-                                <div><label for="gob-val-{{ $i }}">Valor esperado {{ $i+1 }}</label><select id="gob-val-{{ $i }}" wire:model="nueva.condiciones.{{ $i }}.valor" class="rm-input w-full" required><option value="">Seleccione un valor</option>@foreach($tablas['valores_semanticos'] ?? [] as $v)<option value="{{ $v['cod_valor_semantico'] }}">{{ $v['nombre'] }}</option>@endforeach</select></div>
+                                <div><label for="gob-var-{{ $i }}">Variable de condición {{ $i+1 }}</label><select id="gob-var-{{ $i }}" wire:model="nueva.condiciones.{{ $i }}.variable" class="rm-select w-full !leading-normal !min-h-11" required><option value="">Seleccione una variable</option>@foreach($tablas['variables_expertas'] ?? [] as $v)<option value="{{ $v['cod_variable_experta'] }}">{{ $nombresNodos[$v['cod_nodo_semantico']] ?? $v['cod_variable_experta'] }}</option>@endforeach</select></div>
+                                <div><label for="gob-val-{{ $i }}">Valor esperado {{ $i+1 }}</label><select id="gob-val-{{ $i }}" wire:model="nueva.condiciones.{{ $i }}.valor" class="rm-select w-full !leading-normal !min-h-11" required><option value="">Seleccione un valor</option>@foreach($tablas['valores_semanticos'] ?? [] as $v)<option value="{{ $v['cod_valor_semantico'] }}">{{ $v['nombre'] }}</option>@endforeach</select></div>
                             </div>
                             @if(count($nueva['condiciones']) > 1)<button type="button" wire:click="quitarCondicion({{ $i }})" class="rm-btn rm-btn-secondary">Quitar condición {{ $i+1 }}</button>@endif
                         @endforeach
                         @unless($contratoObservacional)<button type="button" wire:click="agregarCondicion" class="rm-btn rm-btn-secondary">Añadir condición</button>@endunless
-                        <div><label for="gob-criterio">Criterio de la consecuencia</label><select id="gob-criterio" wire:model="nueva.criterio_dominio" class="rm-input w-full" required><option value="">Seleccione un criterio</option>@foreach($tablas['criterios_dominios_resultado'] ?? [] as $c)<option value="{{ $c['cod_criterio_dominio_resultado'] }}">{{ $nombresNodos[$c['cod_nodo_criterio']] ?? $c['cod_nodo_criterio'] }}</option>@endforeach</select></div>
-                        <div><label for="gob-consecuencia">Valor de la consecuencia</label><select id="gob-consecuencia" wire:model="nueva.valor_consecuencia" class="rm-input w-full" required><option value="">Seleccione un valor</option>@foreach($tablas['valores_semanticos'] ?? [] as $v)<option value="{{ $v['cod_valor_semantico'] }}">{{ $v['nombre'] }}</option>@endforeach</select></div>
+                        <div><label for="gob-criterio">Criterio de la consecuencia</label><select id="gob-criterio" wire:model="nueva.criterio_dominio" class="rm-select w-full !leading-normal !min-h-11" required><option value="">Seleccione un criterio</option>@foreach($tablas['criterios_dominios_resultado'] ?? [] as $c)<option value="{{ $c['cod_criterio_dominio_resultado'] }}">{{ $nombresNodos[$c['cod_nodo_criterio']] ?? $c['cod_nodo_criterio'] }}</option>@endforeach</select></div>
+                        <div><label for="gob-consecuencia">Valor de la consecuencia</label><select id="gob-consecuencia" wire:model="nueva.valor_consecuencia" class="rm-select w-full !leading-normal !min-h-11" required><option value="">Seleccione un valor</option>@foreach($tablas['valores_semanticos'] ?? [] as $v)<option value="{{ $v['cod_valor_semantico'] }}">{{ $v['nombre'] }}</option>@endforeach</select></div>
                     </fieldset>
                 @endif
                 <button type="submit" class="rm-btn rm-btn-primary" wire:loading.attr="disabled">Guardar versión sucesora</button>
@@ -97,8 +97,8 @@
         <x-ui.section-card title="Registrar revisión de regla">
             <form wire:submit="guardarRevision" class="space-y-3">
                 <p>Regla: {{ $reglaRevision }}. La decisión quedará vinculada a su cuenta.</p>
-                <div><label for="gob-decision">Decisión</label><select id="gob-decision" wire:model="decision" class="rm-input w-full"><option value="APROBADA">Aprobar regla</option><option value="RECHAZADA">Rechazar regla</option></select></div>
-                <div><label for="gob-justificacion">Justificación de la revisión</label><textarea id="gob-justificacion" wire:model="justificacion" class="rm-input w-full" rows="3" maxlength="5000" required></textarea>@error('justificacion')<p role="alert">{{ $message }}</p>@enderror</div>
+                <div><label for="gob-decision">Decisión</label><select id="gob-decision" wire:model="decision" class="rm-select w-full !leading-normal !min-h-11"><option value="APROBADA">Aprobar regla</option><option value="RECHAZADA">Rechazar regla</option></select></div>
+                <div><label for="gob-justificacion">Justificación de la revisión</label><textarea id="gob-justificacion" wire:model="justificacion" class="rm-textarea w-full" rows="3" maxlength="5000" required></textarea>@error('justificacion')<p role="alert">{{ $message }}</p>@enderror</div>
                 <button type="submit" class="rm-btn rm-btn-primary" wire:loading.attr="disabled">Registrar decisión</button>
                 <button type="button" wire:click="cancelarSeleccion" class="rm-btn rm-btn-secondary">Cancelar revisión</button>
             </form>

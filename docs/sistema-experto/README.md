@@ -3,6 +3,7 @@
 Documentación de lectura actualizada el 19/10/2026 para la arquitectura híbrida.
 No autoriza inferencia clínica ni nuevas reglas de O.R.I.O.N.
 
+- [Fase 4: base registrada y recorrido verificado en interfaz, 19/10](FASE_4_REGISTRO_Y_VERIFICACION_UI_2026_10_19.md): registro desde Psicología, 17 reglas activas con revisión pendiente, consulta de los 19 componentes, prueba de condiciones y corrección visual de selectores; QA acotado con evidencia de cinco tamaños.
 - [Fase 4: contrato institucional A–D integrado, 19/10](FASE_4_CONTRATO_AD_INTEGRADO_2026_10_19.md): adopción explícita, paquete independiente de las fixtures, observaciones de 19 componentes, quince G09 y Memoria con compuertas, gobierno, episodios y replay V1/V2. Distingue registro en la instalación, QA visual y dependencias de las fases 5/6.
 - [Fase 4: puente nominal y sucesión, 19/10](FASE_4_PUENTE_NOMINAL_Y_SUCESION_2026_10_19.md): corte previo de parejas opción/texto, trazas observacionales y vínculos traducidos entre revisiones, con archivo y replay; ampliado posteriormente por el contrato A–D.
 - [Cierre de fuentes observacionales de fase 2, 19/10](DICTAMEN_CIERRE_FASE_2_2026_10_19.md): aclaración de la propietaria, investigación primaria, conciliación de 648 filas con sus fuentes y auditorías, lector sin exigencia de normalización y corrección de atribución instrumental. QA visual aún pendiente.

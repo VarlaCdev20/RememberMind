@@ -98,7 +98,7 @@ en sus propias actas y no se atribuyen a este cierre.
 - [x] Aplicar criterios documentados de combinación, contradicción, corte temporal y suficiencia; impedir doble conteo de aplicaciones o episodios compartidos. No se inventa una caducidad clínica.
 - [x] Conectar el gobierno existente con todo el conocimiento ejecutable: probar, crear sucesora, sustituir y archivar preservando la ejecución anterior y el autor/revisor/motivo.
 - [x] Producir trazas que permitan recorrer cada conclusión hasta las condiciones, perfiles, medidas y fuentes originales.
-- [ ] Completar el registro del paquete en la instalación mediante sesión autorizada de Medicina/Psicología y comprobar visualmente el recorrido; el navegador sigue deshabilitado para la herramienta.
+- [x] Registrar el paquete desde la sesión de Psicología y comprobar el gobierno y la consulta de los cinco dominios en navegador habilitado. Se corrigió el recorte de selectores; [acta y alcance de QA](FASE_4_REGISTRO_Y_VERIFICACION_UI_2026_10_19.md). El cierre global de interfaz, historial y revisión permanece en fase 7.
 
 **Entregable:** ejecutor institucional integrado y red navegable. **Cierre:** casos de cada dominio muestran por qué se activó o no una regla; retirar una regla afecta nuevas ejecuciones y conserva las anteriores.
 
