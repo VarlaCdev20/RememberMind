@@ -13,7 +13,7 @@ namespace MotorExperto\dominio\instrumentos;
  */
 final class CatalogoCapturaCognitiva
 {
-    public const VERSION = 'CAPTURA-COGNITIVA-6-20261019';
+    public const VERSION = 'CAPTURA-COGNITIVA-7-20261019';
 
     public function componentes(): array
     {
@@ -40,10 +40,10 @@ final class CatalogoCapturaCognitiva
             'MEM-S04' => ['HVLT-R, fase de reconocimiento identificada', 'https://www.parinc.com/products/HVLT-R', [
                 'aciertos_reconocimiento' => 'Entero, 0–12 objetivos', 'falsas_alarmas_relacionadas' => 'Entero, 0–6',
                 'falsas_alarmas_no_relacionadas' => 'Entero, 0–6', 'demora_minutos' => 'Número de minutos efectivos'],
-                'Conservar aciertos y falsas alarmas por separado. La norma boliviana incorporada no cubre reconocimiento; no truncar ni normalizar un índice con ella.'],
+                'HVLT-R conserva su cálculo sin norma; CERAD-Col tiene una referencia separada con identidad y corrección propias. No intercambiar ambas tareas ni sus truncamientos.'],
             'ATE-S01' => ['Ruff 2 y 7', $ruff, [
                 'ensayos' => 'Veinte registros: condición, objetivos disponibles, aciertos, errores, omisiones y segundos efectivos'],
-                'Diez ensayos por condición. Rango editorial 16–70 años; no extrapolar a mayores de 70. Índices y máximos requieren el manual exacto.'],
+                'Ruff: diez ensayos por condición y rango editorial 16–70. La cancelación A colombiana tiene referencia propia, no normaliza Ruff ni mide por sí sola vigilancia prolongada.'],
             'ATE-S02' => ['Ruff 2 y 7, condiciones separadas', $ruff, [
                 'ensayos' => 'Mismos veinte registros originales de detección automática y búsqueda controlada',
                 'condicion' => 'Identidad de cada condición; no combinar sus puntuaciones brutas'],
@@ -66,10 +66,10 @@ final class CatalogoCapturaCognitiva
             'EJE-S04' => ['Torre de Londres, edición y forma identificadas', 'https://academic.oup.com/acn/article-abstract/24/4/413/3645', [
                 'movimientos_por_problema' => 'Enteros no negativos', 'resueltos' => 'Enteros según criterio de esa edición',
                 'violaciones_regla' => 'Enteros', 'violaciones_tiempo' => 'Enteros', 'tiempos_por_problema' => 'Segundos de inicio, ejecución y total'],
-                'NEURONORMA 2009 y TOL-DX segunda edición son referencias distintas. No se verificó una norma boliviana aplicable.'],
+                'TOL-F táctil de 24 problemas dispone de tabla alemana de referencia para 60–79 años. No sustituye TOL-DX ni acredita una norma boliviana.'],
             'EJE-S05' => ['Semejanzas o Matrices, subprueba y edición identificadas', $wais, [
                 'subprueba' => 'Identidad de una subprueba concreta', 'puntajes_por_elemento' => 'Mediciones originales según rúbrica', 'bruto_subprueba' => 'Puntuación original'],
-                'No sumar Semejanzas y Matrices ni atribuir razonamiento general a categorías de M-WCST. Falta norma aplicable y manual de la edición usada.'],
+                'La referencia Raven parte A de 12 elementos compara razonamiento no verbal en su contexto colombiano. No normaliza WAIS, Raven completo ni razonamiento general.'],
             'LEN-S01' => ['BNT estándar de 60 elementos, Kaplan 1983', 'https://doi.org/10.3233/NRE-151278', [
                 'aciertos_espontaneos' => 'Entero, 0–60', 'aciertos_clave_semantica' => 'Entero adicional; suma hasta 60',
                 'ayudas_fonemicas' => 'Registro separado; no se incluye en ese total'],
@@ -84,7 +84,7 @@ final class CatalogoCapturaCognitiva
             'LEN-S03' => ['Token Test, versión y rúbrica identificadas', 'https://doi.org/10.1093/arclin/acp039', [
                 'presentaciones_por_elemento' => 'Primera o segunda presentación', 'puntajes_por_elemento' => 'Decimales según rúbrica',
                 'puntaje_total' => 'Decimal; máximo 36 solo en versión abreviada correspondiente', 'audicion_vision' => 'Condiciones y apoyos documentados'],
-                'No obligar a enteros: algunas versiones admiten medios puntos. La referencia NEURONORMA es española.'],
+                'No obligar a enteros: se admiten medios puntos. La referencia tabulada UNAL 2017 es colombiana, con lagunas explícitas y nivel de evidencia de tesis; no sustituye NEURONORMA España.'],
             'LEN-S04' => ['WAB, repetición; edición y forma identificadas', $wab, [
                 'forma' => 'Forma y edición exactas, sin intercambiar WAB y WAB-R', 'puntajes_por_elemento' => 'Mediciones originales según rúbrica',
                 'repeticion_total' => 'Entero 0–100 solo para WAB castellana Nau Llibres 2000', 'audicion_compatible' => 'Lógico documentado',

@@ -19,6 +19,9 @@ final class RegistroMetodosInstrumentales
             'lectoescritura_requerida' => true, 'reproduce_reactivos' => false, 'revision_profesional' => 'PENDIENTE']]
             + (new NormalizadorBateriaBolivia2015)->metodos()
             + (new NormalizadorReferenciasEspana)->metodos()
+            + (new NormalizadorReferenciaColombia2019)->metodos()
+            + [NormalizadorReferenciaTolF2019::METODO => (new NormalizadorReferenciaTolF2019)->metadatos()]
+            + [NormalizadorReferenciaTokenColombia2017::METODO => (new NormalizadorReferenciaTokenColombia2017)->metadatos()]
             + [CalculadorReconocimientoHvlt::METODO => (new CalculadorReconocimientoHvlt)->metadatos(),
                 CalculadorLenguajeWabCastellano2000::METODO => (new CalculadorLenguajeWabCastellano2000)->metadatos(),
                 CalculadorRecuerdoConClavesFcsrt::METODO => (new CalculadorRecuerdoConClavesFcsrt)->metadatos()];
@@ -31,6 +34,15 @@ final class RegistroMetodosInstrumentales
         }
 
         // Las referencias nuevas conservan identidad y contexto; no reemplazan los métodos previos.
+        if (isset((new NormalizadorReferenciaColombia2019)->metodos()[$metodo])) {
+            return (new ExplicacionMatematicaInstrumental)->agregar((new NormalizadorReferenciaColombia2019)->normalizar($metodo, $captura));
+        }
+        if ($metodo === NormalizadorReferenciaTolF2019::METODO) {
+            return (new ExplicacionMatematicaInstrumental)->agregar((new NormalizadorReferenciaTolF2019)->normalizar($captura));
+        }
+        if ($metodo === NormalizadorReferenciaTokenColombia2017::METODO) {
+            return (new ExplicacionMatematicaInstrumental)->agregar((new NormalizadorReferenciaTokenColombia2017)->normalizar($captura));
+        }
         if (isset((new NormalizadorReferenciasEspana)->metodos()[$metodo])) {
             return (new ExplicacionMatematicaInstrumental)->agregar((new NormalizadorReferenciasEspana)->normalizar($metodo, $captura));
         }

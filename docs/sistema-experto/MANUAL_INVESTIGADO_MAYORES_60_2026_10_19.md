@@ -1,14 +1,18 @@
 # O.R.I.O.N. — Manual técnico investigado para población mayor de 60 años
 
-Fecha de consulta: **19/10/2026**, zona America/La_Paz. Versión 1.1.
+Fecha de consulta: **19/10/2026**, zona America/La_Paz. Versión 1.2.
 Población solicitada por la propietaria: **personas mayores de 60 años**, sin
 techo de edad institucional supuesto. Estado: investigación documentada, cálculos
-descriptivos y cinco ecuaciones normativas adicionales implementadas; fase 3 en curso.
+descriptivos y comparaciones de referencia implementadas; fase 3 en curso.
 
 Actualización: [contrato y entrega de las normalizaciones](NORMALIZACIONES_REFERENCIA_2026_10_19.md).
-Hay once componentes con algoritmo normativo disponible, ocho de la base previa
-y tres de referencia española; su pertinencia institucional no se acredita por
-programarlos. Los apartados de seguimiento descriptivo conservan el corte anterior.
+El [nuevo capítulo de referencias geriátricas](REFERENCIAS_GERIATRICAS_ADICIONALES_2026_10_19.md)
+documenta cinco perfiles adicionales: CERAD, Raven A, cancelación A, TOL-F y Token.
+Hay **16 componentes con algoritmo de comparación**, ocho de la base previa,
+tres nuevos de referencia española y cinco de este incremento. Su pertinencia
+institucional no se acredita por programarlos. Los apartados previos conservan
+el corte histórico; el nuevo capítulo precisa fuentes, calidad, uso, fórmulas,
+celdas ambiguas y pruebas de las cinco adiciones.
 
 Este documento reúne fuentes primarias consultadas en internet, distingue
 manuales de artículos y concreta su utilidad para RememberMind. Complementa las
@@ -340,8 +344,9 @@ autocorrección de S02 en sus páginas PDF, además de la extracción de texto.
 
 ## 9. Criterios pendientes para cerrar la fase
 
-1. Para los ocho componentes sin algoritmo y la adopción de las tres referencias
-   nuevas: referencia elegida, versión/material legítimo y
+1. Para los tres componentes sin conversión normativa completa (ATE-S02,
+   LEN-S04 y LEN-S05) y la adopción de las referencias nuevas:
+   referencia elegida, versión/material legítimo y
    pertinencia documentada para nuestra población, incluyendo los mayores
    fuera de los rangos encontrados. No exige que toda referencia sea boliviana;
    exige justificar su uso.
@@ -353,6 +358,6 @@ autocorrección de S02 en sus páginas PDF, además de la extracción de texto.
    La revisión profesional y la adopción institucional conservan su alcance propio.
 
 La investigación entrega fuentes utilizables y brechas concretas. No se registra
-el cierre funcional de los diecinueve mientras los ocho algoritmos pendientes y
+el cierre funcional de los diecinueve mientras las tres conversiones pendientes y
 la pertinencia de las referencias no estén resueltos. Tampoco se atribuye una aprobación médica a esta revisión
 técnica ni se cambia la historia de residentes para completar la cobertura.

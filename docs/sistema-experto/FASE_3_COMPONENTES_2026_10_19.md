@@ -6,6 +6,12 @@ definir su interpretación. Criterio de cierre: cada componente comprometido
 tiene cálculo documentado y pruebas independientes. Este archivo conserva
 el objetivo y su seguimiento para continuar el trabajo entre sesiones.
 
+**Corte vigente:** [cinco referencias geriátricas adicionales](REFERENCIAS_GERIATRICAS_ADICIONALES_2026_10_19.md),
+catálogo versión 7. **16 de 19 componentes** con comparación matemática de
+referencia disponible bajo condiciones. ATE-S02 y LEN-S04/S05 siguen sin
+conversión normativa completa. La fase permanece EN CURSO; no se atribuye
+aplicabilidad institucional automática ni validación clínica a este contador.
+
 El resultado final perseguido es O.R.I.O.N. integrado: mediciones originales,
 cinco dominios, reglas versionadas, patrón candidato o abstención sustentada,
 informe comprensible, conservación exacta y revisiones independientes de
@@ -316,3 +322,92 @@ algoritmos pendientes y la pertinencia institucional que falta acreditar.
 Auditoría final documental: PASS, cincuenta y siete enlaces locales existentes
 en los cinco documentos de este incremento. Revisión propia del código: sin
 dependencias V1, consultas SQL ni llamadas a clasificación en el nuevo normalizador.
+
+## Incremento posterior — cinco comparaciones geriátricas de referencia
+
+Se atendió «continúa con los otros», investigando originales y preservando
+el foco en mayores de 60. El [capítulo completo](REFERENCIAS_GERIATRICAS_ADICIONALES_2026_10_19.md)
+documenta utilidad, procedimiento, motivo de selección, interpretación matemática,
+población, calidad y acceso de cada fuente. No es un manual oficial reconstruido.
+
+Implementado:
+
+| Componente | Selector nuevo | Tipo de comparación |
+| --- | --- | --- |
+| MEM-S04 | `CERAD-RECONOCIMIENTO-CO-API-2019` | Bruto CERAD corregido y distancia a media/DE de grupo |
+| ATE-S01 | `CANCELACION-A-CO-API-2019` | Aciertos en cancelación A, no velocidad ni Ruff |
+| EJE-S04 | `TOL-F-DE-GHS-2019-24` | Percentil tabulado alemán, 60–79 años |
+| EJE-S05 | `RAVEN-A-CO-API-2019` | Parte A de doce elementos, no WAIS o Raven completo |
+| LEN-S03 | `TOKEN-CO-UNAL-2017-TABLAS` | Escalar por edad y consulta escolar de tesis original |
+
+Estado global: dieciséis componentes con algoritmo de comparación disponible,
+contando referencias extranjeras y la tesis expresamente identificada. Tres
+siguen sin conversión normativa completa: **ATE-S02, LEN-S04, LEN-S05**.
+El contador no acredita adopción institucional ni aplicación a todos los mayores.
+Hay once selectores de referencia, nueve componentes con referencia y un
+solapamiento con la base: ocho base + nueve referencia − uno común = dieciséis.
+Las tres familias de cálculos descriptivos continúan separadas.
+
+Integración: registro → extractor con fuentes → captura SQL autorizada → perfil
+existente. La explicación distingue media/DE grupales, predicción de regresión,
+percentil y escalar tabulados. Se conservan las causas reales de abstención:
+edad 65 solapada en API, cancelación mayor con escolaridad baja sin datos,
+TOL-F sin fila de cero y Token con celda ambigua o puntaje sin correspondencia.
+No se transfieren normas entre instrumentos o versiones.
+
+Seguridad y alcance: ninguna migración, permiso, regla experta, binding operativo,
+historia o dato real modificado por este incremento. No se ejecutan motores
+experimentales sobre residentes. La prueba utiliza solo originales sintéticos.
+Se conservan fuera de este commit los cambios concurrentes de Institución,
+provider, otras fases y `work/`.
+
+Pruebas específicas: **88 / 5725 aserciones**, incluyendo cinco aplicaciones
+SQL; cotejo externo de 384 percentiles TOL-F, dieciséis n y 323 celdas escolares
+Token. Sus tablas críticas se inspeccionaron visualmente en PDF.
+
+```powershell
+php artisan test --compact --filter='NormalizacionTokenColombiaInvestigadaTest|NormalizacionReferenciasGeriatricasAdicionalesTest|NormalizacionReferenciasEspanaTest|RecuerdoConClavesFcsrtInvestigadoTest|LenguajeWabCastellanoInvestigadoTest|InterpretacionInstrumentalFaseTresTest|NormalizacionInstrumentalInvestigadaTest|NormalizacionBateriaBolivia2015Test|PerfilInstrumentalInstitucionalTest|CapturaInstrumentalInstitucionalTest|PreparacionInstrumentalInvestigadaTest' --colors=never
+```
+
+PASS SQLite: **298 pruebas / 8248 aserciones**, 69.56 s.
+
+```powershell
+pwsh -NoProfile -File scripts/probar-postgres.ps1 -Filtro 'NormalizacionTokenColombiaInvestigadaTest|NormalizacionReferenciasGeriatricasAdicionalesTest|NormalizacionReferenciasEspanaTest|RecuerdoConClavesFcsrtInvestigadoTest|LenguajeWabCastellanoInvestigadoTest|InterpretacionInstrumentalFaseTresTest|NormalizacionInstrumentalInvestigadaTest|NormalizacionBateriaBolivia2015Test|PerfilInstrumentalInstitucionalTest|CapturaInstrumentalInstitucionalTest|PreparacionInstrumentalInvestigadaTest'
+```
+
+PASS PostgreSQL desechable: **298 pruebas / 8247 aserciones**, 84.071 s.
+Evidencia temporal JUnit/log `remembermind-pg-ec07c75726b54d2e807ae111f5cb314d`.
+Clúster propio detenido y eliminado; no se usó la BDD operativa. La diferencia
+de una aserción entre motores se conserva. Pint: PASS tras ordenar imports.
+Sin cambios frontend: build/QA visual no aplican. Las verificaciones matemáticas
+y sintéticas no constituyen una revisión experta independiente o validación clínica.
+
+Archivos propios del incremento:
+
+- `motor-experto/src/motor_experto/dominio/instrumentos/NormalizadorReferenciaColombia2019.php` (nuevo).
+- `motor-experto/src/motor_experto/dominio/instrumentos/NormalizadorReferenciaTolF2019.php` (nuevo).
+- `motor-experto/src/motor_experto/dominio/instrumentos/NormalizadorReferenciaTokenColombia2017.php` (nuevo).
+- `motor-experto/src/motor_experto/dominio/instrumentos/RegistroMetodosInstrumentales.php`.
+- `motor-experto/src/motor_experto/dominio/instrumentos/CatalogoCapturaCognitiva.php`.
+- `motor-experto/src/motor_experto/dominio/instrumentos/ExplicacionMatematicaInstrumental.php`.
+- `tests/Unit/NormalizacionReferenciasGeriatricasAdicionalesTest.php` (nuevo).
+- `tests/Unit/NormalizacionTokenColombiaInvestigadaTest.php` (nuevo).
+- `tests/Unit/NormalizacionReferenciasEspanaTest.php`.
+- `tests/Unit/InterpretacionInstrumentalFaseTresTest.php`.
+- `tests/Feature/CapturaInstrumentalInstitucionalTest.php`.
+- `docs/sistema-experto/REFERENCIAS_GERIATRICAS_ADICIONALES_2026_10_19.md` (nuevo).
+- `docs/sistema-experto/MANUAL_INVESTIGADO_MAYORES_60_2026_10_19.md`.
+- `docs/sistema-experto/INVESTIGACION_PROFESIONAL_19_COMPONENTES_2026_10_19.md`.
+- `docs/sistema-experto/NORMALIZACIONES_REFERENCIA_2026_10_19.md`.
+- `docs/sistema-experto/README.md`.
+- Este seguimiento.
+
+Legacy: los normalizadores nuevos son PHP del motor independiente; no incorporan
+dominios V1 ni consultas SQL. Commit local limitado a estos archivos; sin push.
+Pendiente: resolver los tres métodos restantes con fuente completa, comprobar
+la pertinencia institucional y realizar la revisión experta/validación clínica
+con el alcance correspondiente. **No se registra el cierre completo de fase 3.**
+
+Comprobación final: sintaxis de los once archivos PHP y Pint PASS; 66 enlaces
+locales verificados en seis documentos; `git diff --check` PASS. Aritmética
+externa Decimal cotejada desde las tablas API para los once ejemplos grupales.

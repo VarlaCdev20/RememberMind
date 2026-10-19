@@ -5,6 +5,11 @@ ecuaciones nuevas implementadas, con seis perfiles de selección y pruebas.
 Las referencias se calcularon bajo condiciones explícitas; no se habilitaron
 inferencias, clasificación clínica ni perfiles sobre residentes reales.
 
+**Actualización posterior:** el [capítulo de referencias geriátricas adicionales](REFERENCIAS_GERIATRICAS_ADICIONALES_2026_10_19.md)
+incorpora cinco perfiles más y eleva la cobertura a 16 de 19 componentes bajo
+condiciones. Este documento conserva el corte de las cinco ecuaciones españolas;
+sus ocho pendientes históricos se reducen ahora a ATE-S02 y LEN-S04/S05.
+
 ## Alcance y fuentes de verdad
 
 Se continúa el [manual investigado para mayores de 60](MANUAL_INVESTIGADO_MAYORES_60_2026_10_19.md)

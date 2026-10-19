@@ -1,6 +1,6 @@
 # Consulta cognitiva y sistema experto
 
-Documentación de lectura actualizada el 18/10/2026 para la arquitectura híbrida.
+Documentación de lectura actualizada el 19/10/2026 para la arquitectura híbrida.
 No autoriza inferencia clínica ni nuevas reglas de O.R.I.O.N.
 
 - [Fase 2: fuentes originales e investigación profesional](ORION_FUENTES_ORIGINALES_E_INVESTIGACION_2026_10_19.md): identidad de los métodos, campos originales, conciliación y límites de reconstrucción histórica; [ampliación aprobada](PROPUESTA_FUENTES_ORIGINALES_FASE_2_2026_10_19.md) y [acta, pruebas y pendientes](FASE_2_FUENTES_ORIGINALES_2026_10_19.md).
@@ -8,7 +8,8 @@ No autoriza inferencia clínica ni nuevas reglas de O.R.I.O.N.
 - [Matriz única de consolidación](CONSOLIDACION_PUNTO_1_2026_10_19.md) y [plan por fases](PLAN_CIERRE_INTEGRAL_2026_10_19.md).
 - [Investigación profesional de los 19 componentes, 19/10](INVESTIGACION_PROFESIONAL_19_COMPONENTES_2026_10_19.md): utilidad, uso, motivo, cálculo, interpretación, fuentes y brechas; [objetivo activo y pruebas de fase 3](FASE_3_COMPONENTES_2026_10_19.md).
 - [Manual técnico investigado para mayores de 60, 19/10](MANUAL_INVESTIGADO_MAYORES_60_2026_10_19.md): fuentes completas y manuales localizados, edades/escolaridad, fórmulas candidatas, conflictos, huellas y cálculo descriptivo FCSRT; no declara cerrado lo pendiente de normalización.
-- [Normalizaciones de referencia implementadas, 19/10](NORMALIZACIONES_REFERENCIA_2026_10_19.md): cinco ecuaciones, seis perfiles, condiciones, contrato de salida, pruebas y ocho componentes aún sin conversión completa.
+- [Normalizaciones españolas de referencia, 19/10](NORMALIZACIONES_REFERENCIA_2026_10_19.md): cinco ecuaciones, seis perfiles y su corte de verificación.
+- [Cinco referencias geriátricas adicionales, 19/10](REFERENCIAS_GERIATRICAS_ADICIONALES_2026_10_19.md): reconocimiento CERAD, Raven A, cancelación A, TOL-F y Token; utilidad, uso, datos originales, calidad y límites de fuentes, contratos y pruebas. Cobertura técnica actual: 16 de 19 componentes bajo condiciones; tres conversiones pendientes.
 
 - [Cierre operativo 1–8](CIERRE_OPERATIVO_1_A_8_2026_10_18.md): alcance vigente, revisión profesional posterior y checklist por evidencia.
 - [Gobierno de reglas aprobado](PROPUESTA_GOBIERNO_REGLAS_2026_10_18.md): cinco columnas, 4FN, Medicina/Psicología y consulta de Superadministración; sin nuevas tablas.

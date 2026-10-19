@@ -6,7 +6,9 @@ namespace Tests\Unit;
 
 use MotorExperto\dominio\instrumentos\CatalogoCapturaCognitiva;
 use MotorExperto\dominio\instrumentos\ExtractorCapturaInstrumental;
+use MotorExperto\dominio\instrumentos\NormalizadorReferenciaColombia2019;
 use MotorExperto\dominio\instrumentos\NormalizadorReferenciasEspana as Norma;
+use MotorExperto\dominio\instrumentos\NormalizadorReferenciaTokenColombia2017;
 use MotorExperto\dominio\instrumentos\PerfilInstrumentalCognitivo;
 use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -227,12 +229,13 @@ final class NormalizacionReferenciasEspanaTest extends TestCase
         $c = (new CatalogoCapturaCognitiva)->componentes();
         self::assertCount(19, $c);
         self::assertCount(8, array_filter($c, fn ($m) => $m['metodos_disponibles'] !== []));
-        self::assertCount(4, array_filter($c, fn ($m) => $m['normalizadores_referencia_disponibles'] !== []));
+        // Las cinco referencias posteriores añaden componentes sin alterar los ocho de base.
+        self::assertCount(9, array_filter($c, fn ($m) => $m['normalizadores_referencia_disponibles'] !== []));
         self::assertSame([Norma::DSB, Norma::LN, Norma::SPAN], $c['EJE-S03']['normalizadores_referencia_disponibles']);
         self::assertSame([], $c['EJE-S03']['metodos_disponibles']);
         self::assertSame('NORMALIZADOR_REFERENCIA_CON_CONTEXTO_EXPLICITO', $c['EJE-S03']['estado_metodo']);
-        self::assertSame([], $c['MEM-S04']['normalizadores_referencia_disponibles']);
-        self::assertSame([], $c['LEN-S03']['normalizadores_referencia_disponibles']);
+        self::assertSame([NormalizadorReferenciaColombia2019::CERAD], $c['MEM-S04']['normalizadores_referencia_disponibles']);
+        self::assertSame([NormalizadorReferenciaTokenColombia2017::METODO], $c['LEN-S03']['normalizadores_referencia_disponibles']);
         self::assertArrayNotHasKey('FCSRT-ES-SABIEX-2021-DIFERIDO', (new RegistroMetodosInstrumentales)->metodos());
     }
 

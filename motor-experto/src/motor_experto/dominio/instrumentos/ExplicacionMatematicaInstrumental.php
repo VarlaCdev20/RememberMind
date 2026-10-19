@@ -53,6 +53,15 @@ final class ExplicacionMatematicaInstrumental
             return $base + ['estado' => 'INTERVALO_PERCENTILAR', 'posicion' => null,
                 'texto' => 'La interferencia se sitúa mediante los puntos percentilares publicados. Los límites abiertos no se extrapolan; no se asigna una categoría clínica.'];
         }
+        // Una tabla percentilar no aporta una regresión ni permite reconstruir una z exacta.
+        if (isset($medida['escalar_edad_escolaridad'])) {
+            return $base + ['estado' => 'ESCALAR_TABULADO_EDAD_ESCOLARIDAD', 'posicion' => null,
+                'texto' => 'Se consultaron la tabla de edad y la corrección escolar publicadas. El rango percentilar conservado corresponde solo al ajuste por edad; no es el percentil de la puntuación corregida por escolaridad.'];
+        }
+        if (isset($medida['percentil_publicado'])) {
+            return $base + ['estado' => 'PERCENTIL_PUBLICADO', 'posicion' => null,
+                'texto' => 'La puntuación se consultó en la tabla correspondiente a edad, sexo y nivel educativo. El percentil publicado está redondeado y no determina una categoría clínica.'];
+        }
         $z = $medida['z'] ?? null;
         $direccion = $medida['direccion'] ?? null;
         if ((! is_int($z) && ! is_float($z)) || ! is_finite((float) $z)
@@ -61,6 +70,12 @@ final class ExplicacionMatematicaInstrumental
                 'texto' => 'Falta una puntuación estandarizada finita o la dirección documentada de esta medida.'];
         }
         $posicion = $z < 0 ? 'INFERIOR_AL_PREDICHO' : ($z > 0 ? 'SUPERIOR_AL_PREDICHO' : 'IGUAL_AL_PREDICHO');
+        // La DE de un grupo no es el error residual de una regresión: explicar la comparación real.
+        if (($medida['tipo_comparacion'] ?? null) === 'MEDIA_GRUPO') {
+            return $base + ['estado' => 'COMPARACION_CON_MEDIA',
+                'posicion' => $z < 0 ? 'INFERIOR_A_LA_MEDIA' : ($z > 0 ? 'SUPERIOR_A_LA_MEDIA' : 'IGUAL_A_LA_MEDIA'),
+                'texto' => 'Se expresa la distancia entre la puntuación y la media del grupo de referencia en desviaciones estándar de ese grupo. No se supone una distribución normal ni se calcula un percentil gaussiano.'];
+        }
         $texto = $direccion === 'MENOR_ES_MEJOR'
             ? match ($posicion) {
                 'INFERIOR_AL_PREDICHO' => 'El tiempo es menor que el predicho por la referencia: ejecución más rápida en esta tarea.',

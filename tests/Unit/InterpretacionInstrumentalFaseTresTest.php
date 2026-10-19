@@ -10,6 +10,7 @@ use MotorExperto\dominio\instrumentos\CalculadorReconocimientoHvlt;
 use MotorExperto\dominio\instrumentos\CatalogoCapturaCognitiva;
 use MotorExperto\dominio\instrumentos\ExplicacionMatematicaInstrumental;
 use MotorExperto\dominio\instrumentos\NormalizadorHvltBolivia2015;
+use MotorExperto\dominio\instrumentos\NormalizadorReferenciaColombia2019;
 use MotorExperto\dominio\instrumentos\PerfilInstrumentalCognitivo;
 use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -167,7 +168,9 @@ final class InterpretacionInstrumentalFaseTresTest extends TestCase
         self::assertCount(8, array_filter($c, fn ($m) => $m['metodos_disponibles'] !== []));
         self::assertSame([], $c['MEM-S04']['metodos_disponibles']);
         self::assertSame([CalculadorReconocimientoHvlt::METODO], $c['MEM-S04']['calculos_descriptivos_disponibles']);
-        self::assertSame('CAPTURA_DOCUMENTADA_SIN_NORMALIZADOR', $c['MEM-S04']['estado_metodo']);
+        // CERAD aporta otra referencia; el bruto HVLT sigue sin normalizarse con ella.
+        self::assertSame('NORMALIZADOR_REFERENCIA_CON_CONTEXTO_EXPLICITO', $c['MEM-S04']['estado_metodo']);
+        self::assertSame([NormalizadorReferenciaColombia2019::CERAD], $c['MEM-S04']['normalizadores_referencia_disponibles']);
     }
 
     public static function direcciones(): array

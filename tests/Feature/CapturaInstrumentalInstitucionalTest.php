@@ -34,7 +34,10 @@ use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 use MotorExperto\dominio\instrumentos\NormalizadorBateriaBolivia2015;
 use MotorExperto\dominio\instrumentos\NormalizadorHvltBolivia2015 as Hvlt;
+use MotorExperto\dominio\instrumentos\NormalizadorReferenciaColombia2019;
 use MotorExperto\dominio\instrumentos\NormalizadorReferenciasEspana;
+use MotorExperto\dominio\instrumentos\NormalizadorReferenciaTokenColombia2017;
+use MotorExperto\dominio\instrumentos\NormalizadorReferenciaTolF2019;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Permission\Models\Role;
@@ -158,6 +161,82 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         self::assertNull($r['diagnostico']);
         self::assertFalse($r['persistido']);
         self::assertDatabaseCount('aplicaciones_instrumento', 6);
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
+    /** Verifica las cinco referencias adicionales desde respuestas SQL, sin adopción ni inferencia. */
+    public function test_referencias_geriatricas_adicionales_recorrer_captura_y_perfil_autorizados(): void
+    {
+        $valores = ['escolaridad_anios' => 6, 'sexo_norma' => 1, 'nivel_educativo_ghs' => 4,
+            'aciertos_minimos_movimientos' => 12, 'problemas_del_protocolo' => 24,
+            'aciertos' => 7, 'elementos_puntuados' => 12, 'objetivos_presentados' => 10,
+            'distractores_presentados' => 10, 'aciertos_objetivos' => 9, 'falsas_alarmas' => 2,
+            'demora_minutos' => 7, 'tiempo_segundos' => 92.5, 'puntaje_total' => 33, 'instrucciones_del_protocolo' => 36];
+        $metodos = (new NormalizadorReferenciaColombia2019)->metodos()
+            + [NormalizadorReferenciaTolF2019::METODO => (new NormalizadorReferenciaTolF2019)->metadatos(),
+                NormalizadorReferenciaTokenColombia2017::METODO => (new NormalizadorReferenciaTokenColombia2017)->metadatos()];
+        $perfiles = [];
+        foreach ($metodos as $metodo => $meta) {
+            $instrumento = Instrumento::create(['codigo' => 'REF-ADICIONAL-TEST-'.count($perfiles),
+                'nombre' => 'Referencia sintética adicional', 'tipo' => 'COGNITIVO', 'version' => 'VERSION-TEST', 'estado' => 'ACTIVO']);
+            $selectores = $respuestas = [];
+            foreach ($meta['entradas'] as $campo => $tipo) {
+                $q = PreguntaInstrumento::create(['cod_instrumento' => $instrumento->getKey(),
+                    'codigo' => 'ENTRADA-'.count($selectores), 'enunciado' => 'Entrada sintética '.$campo,
+                    'tipo_respuesta' => $tipo === 'LOGICO' ? 'LOGICO' : 'NUMERICO',
+                    'orden' => count($selectores) + 1, 'estado' => 'ACTIVA']);
+                $columna = $tipo === 'LOGICO' ? 'valor_logico' : 'valor_numero';
+                $selectores[$campo] = ['cod_pregunta' => $q->getKey(), 'campo' => $columna];
+                $valor = $metodo === NormalizadorReferenciaColombia2019::CANCELACION && $campo === 'objetivos_presentados'
+                    ? 16 : ($valores[$campo] ?? ($tipo === 'LOGICO' ? true : throw new \LogicException('Falta valor sintético.')));
+                $respuestas[] = ['cod_pregunta' => $q->getKey(), $columna => $valor];
+            }
+            $perfiles[] = ['id' => 'REF-ADICIONAL-TEST-'.count($perfiles), 'cod_instrumento' => $instrumento->getKey(),
+                'codigo_instrumento' => $instrumento->codigo, 'version_instrumento' => $instrumento->version,
+                'metodo' => $metodo, 'identidad_instrumento' => $meta['identidad'], 'selectores' => $selectores];
+            $a = app(AplicarInstrumento::class)->aplicar($this->usuario,
+                ['fecha_hora' => '2020-10-18 09:10:00', 'respuestas' => $respuestas], $instrumento, $this->residente);
+            self::assertNull($a->puntaje_total);
+            self::assertNull($a->clasificacion);
+        }
+        config(['sistema_experto.perfiles_instrumentales' => $perfiles]);
+        $capturas = $this->captura()['capturas'];
+        self::assertCount(5, $capturas);
+        foreach ($capturas as $captura) {
+            $e = $captura['extraccion'];
+            self::assertSame([], $e['motivos_captura']);
+            self::assertSame(70, $e['captura']['edad_anios']);
+            self::assertSame('NO_CONFIGURADA', $e['normalizacion']['adopcion_institucional']);
+            foreach ($e['normalizacion']['componentes'] as $m) {
+                self::assertSame('NORMALIZADO', $m['estado']);
+                self::assertNull($m['clasificacion_clinica']);
+                if ($e['metodo'] === NormalizadorReferenciaTolF2019::METODO) {
+                    self::assertSame(52, $m['percentil_publicado']);
+                    self::assertNull($m['z']);
+                } elseif ($e['metodo'] === NormalizadorReferenciaTokenColombia2017::METODO) {
+                    self::assertSame(12, $m['escalar_edad_escolaridad']);
+                    self::assertNull($m['z']);
+                } else {
+                    self::assertTrue(is_finite($m['z']));
+                    self::assertNull($m['percentil']);
+                }
+            }
+            foreach ($e['fuentes_entradas'] as $fuente) {
+                self::assertSame($captura['cod_aplicacion'], $fuente['aplicacion']);
+                self::assertNotEmpty($fuente['respuesta']);
+            }
+        }
+        $r = app(ConsultarPerfilInstrumental::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now());
+        foreach (['COG-MEM' => 'MEM-S04', 'COG-ATE' => 'ATE-S01', 'COG-EJE' => 'EJE-S04'] as $dominio => $componente) {
+            self::assertCount(1, $r['dominios'][$dominio]['componentes'][$componente]['mediciones']);
+            self::assertNull($r['dominios'][$dominio]['componentes'][$componente]['resultado_clinico']);
+        }
+        self::assertCount(1, $r['dominios']['COG-EJE']['componentes']['EJE-S05']['mediciones']);
+        self::assertCount(0, $r['dominios']['COG-ATE']['componentes']['ATE-S02']['mediciones']);
+        self::assertNull($r['diagnostico']);
+        self::assertFalse($r['persistido']);
+        self::assertCount(1, $r['dominios']['COG-LEN']['componentes']['LEN-S03']['mediciones']);
+        self::assertDatabaseCount('aplicaciones_instrumento', 5);
         self::assertDatabaseCount('evaluaciones_expertas', 0);
     }
 
