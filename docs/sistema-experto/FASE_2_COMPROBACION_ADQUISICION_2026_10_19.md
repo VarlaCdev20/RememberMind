@@ -2,6 +2,8 @@
 
 Fecha: 19/10/2026. Incremento sobre `40219c13`. Alcance: completar el control técnico de faltantes desde las fuentes autorizadas, contrastar el paquete disponible y entregar el diccionario de adquisición de los 23 métodos. La fase 2 institucional sigue abierta hasta vincular los protocolos y mediciones originales que no constan en las fuentes aportadas.
 
+**Resolución posterior:** la propietaria aclaró que las 286 aplicaciones son observaciones clínicas por componente. Se conciliaron sus originales digitales y se implementó la versión 2 de esta comprobación: `OBSERVACIONAL` se conserva sin perfil ni normalización y se cuenta por separado. El [dictamen de cierre de fuentes](DICTAMEN_CIERRE_FASE_2_2026_10_19.md) sustituye para ese lote el pendiente de buscar pruebas no administradas; conserva la QA visual pendiente. Este documento recoge la evidencia histórica de la versión 1.
+
 ## Entregado y checklist
 
 - [x] Reexaminar los cuatro CSV instrumentales aportados, sin ejecutar sus scripts ni modificar registros.

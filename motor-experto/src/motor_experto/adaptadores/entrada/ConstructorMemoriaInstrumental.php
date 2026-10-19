@@ -95,7 +95,8 @@ final class ConstructorMemoriaInstrumental
                     $a['cod_aplicacion'], $a['cod_residente'], new DateTimeImmutable($a['fecha_hora']), $original, $tipado,
                     $a['cod_personal'], true, $a['estado_original'] === 'COMPLETA', contexto: [
                         'unidad_soporte' => $a['cod_aplicacion'], 'cod_respuesta' => $r['cod_respuesta'] ?? null,
-                        'componente_instrumental_verificado' => $esMemoriaInstrumental && $r !== null,
+                        'componente_instrumental_verificado' => $esMemoriaInstrumental && $r !== null
+                            && ($a['instrumento_actual']['tipo'] ?? null) !== 'OBSERVACIONAL',
                         'cod_pregunta' => $vinculo['cod_pregunta'], 'campo_original' => $campo,
                         'procedencia' => $a['procedencia'], 'instrumento' => $a['instrumento_actual'],
                         'pregunta_original' => $pregunta, 'fuente_edad' => $a['fuente_edad'],

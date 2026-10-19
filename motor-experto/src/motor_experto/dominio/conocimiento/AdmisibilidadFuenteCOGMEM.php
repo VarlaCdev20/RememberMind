@@ -46,6 +46,9 @@ final class AdmisibilidadFuenteCOGMEM
                 }
             }
         } elseif ($f->tabla === 'aplicaciones_instrumento') {
+            if (($f->contexto['instrumento']['tipo'] ?? null) === 'OBSERVACIONAL') {
+                $motivos[] = 'OBSERVACION_NO_ACREDITA_COMPONENTE_INSTRUMENTAL';
+            }
             if ($codigo !== 'VAR-MEM-INST-01' || ($f->contexto['componente_instrumental_verificado'] ?? false) !== true) {
                 $motivos[] = 'COMPONENTE_INSTRUMENTAL_NO_VERIFICADO';
             }

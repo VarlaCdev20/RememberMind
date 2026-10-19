@@ -23,7 +23,7 @@ final class ComprobacionAdquisicionInstrumental
 
         $metodos = (new RegistroMetodosInstrumentales)->metodos();
         $aplicaciones = $contadas = [];
-        $requeridas = $disponibles = $sinExtraccion60 = 0;
+        $requeridas = $disponibles = $sinExtraccion60 = $observacionales60 = 0;
         foreach ($capturas['capturas'] as $a) {
             $id = $a['cod_aplicacion'];
             if (isset($contadas[$id])) {
@@ -33,6 +33,10 @@ final class ComprobacionAdquisicionInstrumental
             $edad = $a['edad_en_aplicacion'] ?? $a['extraccion']['captura']['edad_anios'] ?? null;
             $es60 = is_int($edad) && $edad >= 60;
             $e = $a['extraccion'] ?? null;
+            $esObservacion = ($a['instrumento_actual']['tipo'] ?? null) === 'OBSERVACIONAL';
+            if ($esObservacion && $e !== null) {
+                throw new DomainException('Una observación clínica no acredita una aplicación de prueba estandarizada.');
+            }
             $meta = $e === null ? null : ($metodos[$e['metodo']] ?? null);
             if ($e !== null && $meta === null) {
                 throw new DomainException('La extracción refiere un método instrumental no registrado.');
@@ -68,12 +72,18 @@ final class ComprobacionAdquisicionInstrumental
                     }
                 }
             } elseif ($es60) {
-                $sinExtraccion60++;
+                if ($esObservacion) {
+                    $observacionales60++;
+                } else {
+                    $sinExtraccion60++;
+                }
             }
             $procedencia = $a['procedencia'] ?? [];
             $aplicaciones[] = ['cod_aplicacion' => $id, 'cod_instrumento' => $a['cod_instrumento'] ?? null,
                 'version_instrumento' => $a['version_instrumento'] ?? null, 'edad_en_aplicacion' => $edad,
                 'pertenece_a_poblacion_60_o_mas' => is_int($edad) && $edad >= 0 ? $es60 : null,
+                'naturaleza_fuente' => $esObservacion ? 'OBSERVACION_CLINICA' : 'REGISTRO_INSTRUMENTAL',
+                'estado_normalizacion' => $esObservacion ? 'NO_APLICA_A_OBSERVACION' : ($e === null ? 'SIN_EXTRACCION' : 'CONSULTAR_CALCULOS'),
                 'perfil' => $e['perfil'] ?? null, 'metodo' => $e['metodo'] ?? null, 'fuente_metodo' => $meta['fuente'] ?? null,
                 'motivos_lectura' => $a['motivos'] ?? [], 'identidad' => $identidad, 'entradas' => $entradas,
                 'motivos_captura' => $e['motivos_captura'] ?? [], 'aplicabilidad' => $e['aplicabilidad_geriatrica'] ?? null,
@@ -89,11 +99,12 @@ final class ComprobacionAdquisicionInstrumental
             ];
         }
 
-        return ['contrato' => 'COMPROBACION-ADQUISICION-1', 'aplicaciones' => $aplicaciones,
+        return ['contrato' => 'COMPROBACION-ADQUISICION-2', 'aplicaciones' => $aplicaciones,
             'metricas_entradas_60_o_mas' => ['entradas_requeridas' => $requeridas, 'entradas_con_dato_tipado' => $disponibles,
                 'entradas_faltantes_o_invalidas' => $requeridas - $disponibles,
                 'porcentaje_completitud' => $requeridas === 0 ? null : round(100 * $disponibles / $requeridas, 2),
                 'aplicaciones_sin_extraccion' => $sinExtraccion60,
+                'aplicaciones_observacionales_sin_normalizacion' => $observacionales60,
                 'denominador' => 'ENTRADAS_DE_EXTRACCIONES_DISPONIBLES_EN_APLICACIONES_60_O_MAS',
                 'limite' => 'No estima entradas de instrumentos sin perfil; un dato tipado puede ser inaplicable o estar fuera de rango.'],
             'autoriza_interpretacion_clinica' => false];

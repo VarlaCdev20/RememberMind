@@ -415,6 +415,32 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         self::assertDatabaseCount('respuestas_instrumento', 10);
     }
 
+    public function test_observaciones_originales_se_recuperan_sin_exigir_perfil_normativo(): void
+    {
+        $this->instrumento->update(['tipo' => 'OBSERVACIONAL']);
+        $pregunta = PreguntaInstrumento::create(['cod_instrumento' => $this->instrumento->getKey(), 'codigo' => 'OBS-SINTETICA',
+            'enunciado' => 'Observación sintética por componente', 'tipo_respuesta' => 'TEXTO', 'orden' => 20, 'estado' => 'ACTIVA']);
+        $a = $this->aplicar(['respuestas' => [['cod_pregunta' => $pregunta->getKey(), 'valor_texto' => 'Observación original sintética']]]);
+        $perfil = app(ConsultarPerfilInstrumental::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now());
+        $c = $perfil['comprobacion_adquisicion'];
+        self::assertSame('NO_APLICA_A_OBSERVACION', $c['aplicaciones'][0]['estado_normalizacion']);
+        self::assertSame($a->getKey(), $c['aplicaciones'][0]['cod_aplicacion']);
+        self::assertSame(0, $c['metricas_entradas_60_o_mas']['aplicaciones_sin_extraccion']);
+        self::assertSame(1, $c['metricas_entradas_60_o_mas']['aplicaciones_observacionales_sin_normalizacion']);
+        self::assertSame('Observación original sintética', $perfil['capturas_originales']['capturas'][0]['respuestas_originales'][0]['valor_texto']);
+        self::assertNull($a->fresh()->clasificacion);
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
+    public function test_no_admite_configurar_una_prueba_estandarizada_sobre_un_catalogo_observacional(): void
+    {
+        $this->instrumento->update(['tipo' => 'OBSERVACIONAL']);
+        $this->aplicar();
+        config(['sistema_experto.perfiles_instrumentales' => [$this->perfil]]);
+        $this->expectException(\DomainException::class);
+        $this->captura();
+    }
+
     public static function valoresInvalidos(): array
     {
         return [['fecha_hora', '2030-01-01 10:00:00'], ['fecha_hora', '2020-10-18'], ['numero', '1.00001'], ['numero', '100000000'],

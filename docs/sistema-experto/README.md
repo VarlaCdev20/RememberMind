@@ -3,6 +3,7 @@
 Documentación de lectura actualizada el 19/10/2026 para la arquitectura híbrida.
 No autoriza inferencia clínica ni nuevas reglas de O.R.I.O.N.
 
+- [Cierre de fuentes observacionales de fase 2, 19/10](DICTAMEN_CIERRE_FASE_2_2026_10_19.md): aclaración de la propietaria, investigación primaria, conciliación de 648 filas con sus fuentes y auditorías, lector sin exigencia de normalización y corrección de atribución instrumental. QA visual aún pendiente.
 - [Comprobación automática de adquisición y métricas 60+, 19/10](FASE_2_COMPROBACION_ADQUISICION_2026_10_19.md): cotejo agregado de las fuentes aportadas, faltantes por aplicación, identidad, procedencia y completitud; [diccionario exacto de 23 métodos / 19 componentes](DICCIONARIO_ADQUISICION_23_METODOS_2026_10_19.md).
 - [Fase 2: fuentes originales e investigación profesional](ORION_FUENTES_ORIGINALES_E_INVESTIGACION_2026_10_19.md): identidad de los métodos, campos originales, conciliación y límites de reconstrucción histórica; [ampliación aprobada](PROPUESTA_FUENTES_ORIGINALES_FASE_2_2026_10_19.md) y [acta, pruebas y pendientes](FASE_2_FUENTES_ORIGINALES_2026_10_19.md).
 - [Integración versionada del laboratorio, 19/10](INTEGRACION_LABORATORIO_2026_10_19.md): dependencias incorporadas como conjunto, candidato limpio, corrección de contexto G09 y evidencia por motor; conserva el alcance técnico y los pendientes institucionales.

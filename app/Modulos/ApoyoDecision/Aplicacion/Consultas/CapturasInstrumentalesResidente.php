@@ -100,7 +100,11 @@ final class CapturasInstrumentalesResidente
             if (count($perfilesAplicables) > 1) {
                 throw new DomainException('Hay más de un perfil para la misma identidad instrumental.');
             }
-            if ($perfilesAplicables === []) {
+            $esObservacion = $instrumento?->tipo === 'OBSERVACIONAL';
+            if ($esObservacion && $perfilesAplicables !== []) {
+                throw new DomainException('Una observación clínica no admite un perfil de prueba instrumental.');
+            }
+            if ($perfilesAplicables === [] && ! $esObservacion) {
                 $motivos[] = 'SIN_PERFIL_EXPLICITO';
             }
             $vinculos = [];
@@ -130,7 +134,7 @@ final class CapturasInstrumentalesResidente
             $salida['edad_en_aplicacion'] = $edad;
             $salida['fuente_edad'] = ['tabla' => 'residentes', 'campo' => 'fecha_nacimiento', 'registro' => $residente->getKey(),
                 'fecha_nacimiento' => $nacimiento?->format('Y-m-d'), 'fecha_aplicacion' => $salida['fecha_hora']];
-            if ($motivos === []) {
+            if ($motivos === [] && ! $esObservacion) {
                 $salida['extraccion'] = (new ExtractorCapturaInstrumental)->extraer($perfilesAplicables[0], $salida, $brutos, $edad);
             }
             $capturas[] = $salida;

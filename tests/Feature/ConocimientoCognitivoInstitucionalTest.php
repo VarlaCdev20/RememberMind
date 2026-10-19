@@ -250,6 +250,30 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
 
     public function test_memoria_usa_literal_textual_original_y_su_admisibilidad_especifica(): void
     {
+        $this->prepararMemoriaTextual();
+        $memoria = $this->consultar()['resultado']['perfil']['COG-MEM'];
+        self::assertSame(['DIFICULTAD_EVIDENCIADA'], array_column($memoria['conclusiones_candidatas'], 'codigo'));
+        self::assertCount(1, $memoria['traza']['rutas']);
+        self::assertSame('literal_A', $memoria['traza']['rutas'][0]['valor_original']);
+        self::assertSame('ADMISIBLE', $memoria['traza']['evidencias'][0]['admisibilidad']);
+    }
+
+    public function test_observacion_literal_no_acredita_instrumento_de_memoria_por_un_vinculo_configurado(): void
+    {
+        $this->prepararMemoriaTextual();
+        $instrumento = DB::table('aplicaciones_instrumento')->where('cod_aplicacion', $this->aplicacion)->value('cod_instrumento');
+        DB::table('instrumentos')->where('cod_instrumento', $instrumento)->update(['tipo' => 'OBSERVACIONAL']);
+        $r = $this->consultar();
+        $memoria = $r['resultado']['perfil']['COG-MEM'];
+        self::assertSame([], $memoria['conclusiones_candidatas']);
+        self::assertSame('NO_ADMISIBLE', $memoria['traza']['evidencias'][0]['admisibilidad']);
+        self::assertContains('OBSERVACION_NO_ACREDITA_COMPONENTE_INSTRUMENTAL', $memoria['traza']['evidencias'][0]['motivos']);
+        self::assertSame('literal_A', $r['capturas']['capturas'][0]['respuestas_originales'][0]['valor_texto']);
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
+    private function prepararMemoriaTextual(): void
+    {
         $mapa = DB::table('mapeos_variables_fuente')->where('cod_version_modelo', $this->version)
             ->where('clave_selector', $this->primeraPregunta)->sole();
         $variable = DB::table('variables_expertas as v')->join('nodos_semanticos as n', 'n.cod_nodo_semantico', '=', 'v.cod_nodo_semantico')
@@ -265,11 +289,6 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
             ->update(['cod_valor_semantico' => $valor->cod_valor_semantico, 'tipo_valor_fuente' => 'string', 'valor_fuente_exacto' => 'literal_A']);
         config(['sistema_experto.contratos_conocimiento.'.$this->version.'.vinculos_instrumentales.'.$mapa->cod_mapeo_variable_fuente.'.campo' => 'valor_texto']);
 
-        $memoria = $this->consultar()['resultado']['perfil']['COG-MEM'];
-        self::assertSame(['DIFICULTAD_EVIDENCIADA'], array_column($memoria['conclusiones_candidatas'], 'codigo'));
-        self::assertCount(1, $memoria['traza']['rutas']);
-        self::assertSame('literal_A', $memoria['traza']['rutas'][0]['valor_original']);
-        self::assertSame('ADMISIBLE', $memoria['traza']['evidencias'][0]['admisibilidad']);
     }
 
     public function test_fuente_sin_columna_original_de_autor_se_rechaza(): void

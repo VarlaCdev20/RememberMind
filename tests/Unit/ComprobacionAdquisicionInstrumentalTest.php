@@ -134,6 +134,27 @@ final class ComprobacionAdquisicionInstrumentalTest extends TestCase
         $this->comprobar([$a, $a]);
     }
 
+    public function test_observacion_declarada_no_exige_aciertos_tiempos_o_perfil_de_otra_prueba(): void
+    {
+        $a = ['cod_aplicacion' => 'OBS-SINTETICA', 'edad_en_aplicacion' => 70, 'extraccion' => null,
+            'instrumento_actual' => ['tipo' => 'OBSERVACIONAL'], 'motivos' => ['SIN_PERFIL_EXPLICITO']];
+        $r = $this->comprobar([$a]);
+        self::assertSame('OBSERVACION_CLINICA', $r['aplicaciones'][0]['naturaleza_fuente']);
+        self::assertSame('NO_APLICA_A_OBSERVACION', $r['aplicaciones'][0]['estado_normalizacion']);
+        self::assertSame([], $r['aplicaciones'][0]['entradas']);
+        self::assertSame(0, $r['metricas_entradas_60_o_mas']['aplicaciones_sin_extraccion']);
+        self::assertSame(1, $r['metricas_entradas_60_o_mas']['aplicaciones_observacionales_sin_normalizacion']);
+        self::assertNull($r['metricas_entradas_60_o_mas']['porcentaje_completitud']);
+    }
+
+    public function test_una_extraccion_no_puede_reclasificar_observacion_como_prueba_medida(): void
+    {
+        $a = $this->aplicacion();
+        $a['instrumento_actual']['tipo'] = 'OBSERVACIONAL';
+        $this->expectException(DomainException::class);
+        $this->comprobar([$a]);
+    }
+
     public function test_no_produce_comprobacion_si_las_fuentes_no_estan_autorizadas(): void
     {
         $this->expectException(DomainException::class);

@@ -1,6 +1,8 @@
 # Fase 2 — Adquisición y procedencia de fuentes originales
 
-Fecha: 19/10/2026. Alcance: captura propia, transcripción cotejada, conciliación y rectificación de aplicaciones instrumentales. La vía técnica está implementada y comprobada en SQLite/PostgreSQL. El cotejo de instrumentos históricos y las mediciones originales ausentes siguen pendientes; no se declara cerrada toda la fase por disponer de software.
+Fecha: 19/10/2026. Alcance: captura propia, transcripción cotejada, conciliación y rectificación. **Actualización de cierre:** la propietaria confirmó que las 286 aplicaciones aportadas son observaciones clínicas por componente. Se cerró la conciliación de sus 648 filas de fuentes, definiciones y respuestas; la lectura las conserva como observaciones sin exigirles una prueba no administrada. La QA visual del recorrido sigue pendiente por restricción de Work. Las secciones históricas siguientes conservan el estado y las verificaciones de cada incremento.
+
+**Revisión final de cierre solicitada:** [dictamen, aclaración de la propietaria, investigación y conciliación efectiva](DICTAMEN_CIERRE_FASE_2_2026_10_19.md). Se examinaron de nuevo la base local, siete documentos, Excel de 37 hojas y JSON. Hay 2010 valores numéricos de Barthel; las 286 respuestas del lote son observaciones. Las FK de documento/localizador continúan NULL, pero la procedencia digital original del lote se cotejó con CSV, hash de fila, plan y Activitylog único, sin otra carga ni atribución retrospectiva del transcriptor.
 
 ## Decisión y ejecución local
 
@@ -73,12 +75,12 @@ La evidencia detallada y el respaldo están en almacenamiento privado local, exc
 - [x] Controles backend, auditoría atómica y pruebas SQLite/PostgreSQL.
 - [x] Formularios y consultas conectados; build verificado.
 - [x] Puntuaciones/notas por respuesta y cabecera original disponibles desde el modal, con conciliación previa y protección de cambios.
-- [ ] Identificar/cotejar los protocolos realmente aplicados y sus mediciones/condiciones originales ausentes.
-- [ ] Activar solo perfiles cuyas PK, preguntas y edición/forma/idioma estén acreditados.
-- [ ] Ejecutar una nueva carga histórica desde esos originales, con conciliación previa.
+- [x] Identificar y cotejar la naturaleza/fuentes del lote: observaciones clínicas por componente, confirmadas por la propietaria y conciliadas fila a fila.
+- [x] Mantener los perfiles instrumentales sin activar para estas observaciones; comprobar que una configuración de prueba sobre su catálogo se rechaza. Una prueba futura conserva sus requisitos propios.
+- [x] Conciliar la carga ya incorporada con sus originales digitales y auditorías; no repetir aplicaciones ni fabricar otra transcripción.
 - [ ] Comprobar visualmente el recorrido, foco y reflow en los viewports institucionales.
 
-Los cuatro pendientes no se cierran creando datos ni convirtiendo bibliografía en autoría histórica. La trazabilidad exacta de una evaluación experta conservada, incluidos definiciones/selectores/versiones, mantiene el alcance de la fase 6.
+La aclaración de la propietaria y el cotejo efectivo resuelven los tres primeros puntos para el lote observacional; la QA visual continúa abierta. La trazabilidad exacta de una evaluación experta conservada, incluidos definiciones/selectores/versiones, mantiene el alcance de la fase 6. Este cierre de fuentes no convierte el lote en una batería estandarizada ni acredita originales del Barthel previo.
 
 ## Seguimiento de los pendientes del 19/10/2026
 

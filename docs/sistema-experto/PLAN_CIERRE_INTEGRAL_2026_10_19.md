@@ -34,14 +34,19 @@ Estas verificaciones corresponden a sus respectivos alcances; no prueban que el 
 
 ### 2. Cerrar adquisición y vinculación de fuentes originales
 
+**Cierre de fuentes del lote confirmado:** la propietaria aclaró «Son observaciones clínicas por componente». Se conciliaron sus 648 filas con CSV retenidos, huellas, plan autorizado y auditoría individual: 19 definiciones, 19 preguntas, 38 opciones, 286 aplicaciones y 286 respuestas. Las pruebas cognitivas estandarizadas no administradas no son mediciones históricas faltantes de ese lote. [Dictamen, decisión vigente, fuentes primarias y verificación](DICTAMEN_CIERRE_FASE_2_2026_10_19.md). La QA visual del recorrido permanece pendiente; no se afirma aceptación integral de la interfaz.
+
+- [x] Cotejo ampliado de la base, siete documentos privados, Excel de 37 hojas, JSON y metadatos auxiliares; listado privado de las 487 aplicaciones para vinculación y conciliación. Investigación primaria final y requisitos precisos para resolver los pendientes documentados.
 - [x] Contrastar el paquete instrumental disponible y completar la comprobación automática de identidad, entradas, procedencia y faltantes desde la captura autorizada; diccionario de los 23 métodos y métricas de completitud 60+. [Contrato y evidencia del incremento](FASE_2_COMPROBACION_ADQUISICION_2026_10_19.md).
-- [ ] Cotejar las aplicaciones realmente existentes: instrumento, edición, forma, idioma y condiciones; registrar los vínculos exactos de preguntas/columnas con cada entrada del método.
+- [x] Identificar el acto y cotejar las aplicaciones existentes del lote: observaciones por componente, con preguntas, respuestas, autor, fechas y referencias exactas. Edición/forma y medidas normativas no aplican a estas observaciones; la captura de pruebas futuras conserva su contrato instrumental.
 - [x] Distinguir profesional que aplicó una evaluación histórica de quien transcribe ahora: autor original cotejado, cuenta actual e instante técnico separados. Permiso específico de Medicina/Psicología y cinco columnas aprobadas instalados en desarrollo.
-- [ ] Completar la captura de contexto que exija cada método con soporte verificable: escolaridad, fechas, condiciones sensoriales/motoras y desviaciones.
+- [x] Conservar el contexto aportado y su procedencia sin convertir categorías escolares, horarios de agenda o condiciones genéricas en entradas de un método que no se aplicó. El diccionario completo queda preparado para futuras mediciones.
 - [x] Preparar importación controlada: API/Action de conciliación sin escrituras, conflictos, transacción y reintento por fuente; vinculación explícita de registros previos y rectificaciones enlazadas. No se ha ejecutado una nueva carga histórica sin originales identificables.
 - [x] Probar NULL, cero, «No», preguntas/opciones ajenas, fuentes anuladas/futuras, autor ausente, aplicaciones incompletas y revocación de acceso; concurrencia en PostgreSQL desechable.
 
 **Avance técnico del 19/10/2026:** [acta de fase 2 y matriz de evidencia](FASE_2_FUENTES_ORIGINALES_2026_10_19.md), con [investigación de los métodos y diccionario de procedencia](ORION_FUENTES_ORIGINALES_E_INVESTIGACION_2026_10_19.md). Se conservan íntegras 487 aplicaciones y 2296 respuestas locales. Permanecen abiertos el cotejo de instrumentos realmente aplicados y las mediciones/condiciones originales ausentes; la bibliografía no permite generarlas. QA visual pendiente por navegador deshabilitado en Work.
+
+**Resolución posterior del mismo día:** el pendiente anterior de identificar si las 286 entradas eran pruebas quedó resuelto por la propietaria: son observaciones. Su conciliación está completada; no se asignan perfiles normativos ni se repite la carga. Los 201 Barthel previos no se incluyen en el cierre documental de ese lote. Se mantiene el intento de QA visual como no verificado y el trabajo de interpretación de pruebas futuras en sus fases correspondientes.
 
 **Entregable:** catálogo de vínculos verificables y adquisición reproducible. **Cierre:** cada dato usado tiene residente, aplicación, origen, fecha y autor identificables; los datos no aportados siguen faltantes.
 

@@ -2,6 +2,8 @@
 
 Informe técnico con revisión de literatura primaria. Fecha de consulta: 19/10/2026. Destinatarios: Medicina, Psicología y responsables de digitalización. No contiene mediciones, firmas ni diagnósticos de residentes. Complementa la [matriz de 19 componentes](METODOS_Y_CAMPOS_INVESTIGADOS_V2_2026_10_18.md), sin cambiar su interpretación clínica.
 
+**Aclaración vigente del mismo día:** las 286 aplicaciones aportadas son observaciones clínicas por componente, según confirmó la propietaria. Su identidad y procedencia digital se conciliaron en el [cierre de fuentes de fase 2](DICTAMEN_CIERRE_FASE_2_2026_10_19.md). Las referencias instrumentales de este informe preparan la adquisición futura; no identifican una prueba administrada en esas observaciones ni obligan a completar retrospectivamente sus aciertos/tiempos.
+
 ## Resultado y alcance
 
 La investigación completa el contrato del **método de referencia**: identidad, entradas, unidades, condiciones y límites. La identidad **del instrumento realmente aplicado** se acredita con su protocolo/material y registro original. Ni el nombre de una tarea ni una categoría como «conservado» permiten reconstruir aciertos, duración, forma o edición.
