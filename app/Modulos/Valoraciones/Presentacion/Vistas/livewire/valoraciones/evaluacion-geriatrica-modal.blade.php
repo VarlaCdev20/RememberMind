@@ -1,171 +1,97 @@
 <div>
- @if($mostrar)
- {{-- Overlay"Indestructible" --}}
- <div class="fixed inset-0 z-[2147483646] flex items-center justify-center overflow-y-auto bg-slate-900/40 p-4 backdrop-blur-sm sm:p-6"
- x-data x-init="document.body.style.overflow = 'hidden'" x-on:destroy="document.body.style.overflow = 'auto'">
-
- {{-- Modal Container --}}
- <div class="relative w-full max-w-2xl rounded-3xl border border-borde-suave bg-fondo-app shadow-[0_32px_64px_-12px_rgba(0,0,0,0.5)] flex flex-col max-h-[90vh]">
-
- {{-- Header --}}
- <div class="flex items-center justify-between border-b border-borde-suave p-4 sm:px-8">
- <div class="flex items-center gap-3">
- <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-boton-acento/10 text-[var(--rm-action-primary)] shadow-inner">
- <i class="ph-fill ph-brain text-2xl"></i>
- </div>
- <div>
- <span class="text-[9px] font-bold uppercase tracking-widest text-[var(--rm-action-primary)]/70">Suite Geriátrica</span>
- <h2 class="text-lg font-extrabold text-titulo">Registrar Evaluación Geriátrica Integral</h2>
- </div>
- </div>
- <button type="button" wire:click="cerrar" class="flex h-9 w-9 items-center justify-center rounded-xl bg-fondo-card/50 text-titulo transition hover:bg-boton-acento hover:text-inverso active:scale-95 shadow-sm">
- <i class="ph-bold ph-x text-lg"></i>
- </button>
- </div>
-
- {{-- Form Content Scrollable --}}
- <form wire:submit.prevent="guardar" class="flex-1 overflow-y-auto p-6 sm:px-8 space-y-5 custom-scrollbar">
-
- <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
- {{-- Área --}}
- <div>
- <label class="block text-[10px] font-bold uppercase tracking-wider text-titulo/60 mb-1.5">Área de Evaluación</label>
- <select wire:model.live="cod_area" class="w-full rounded-xl border border-borde-suave bg-fondo-card/80 px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus">
- <option value="">-- Seleccionar Área --</option>
- @foreach($areas as $area)
- <option value="{{ $area->cod_area }}">{{ $area->nombre }}</option>
- @endforeach
- </select>
- @error('cod_area') <span class="text-[10px] font-bold text-red-600 mt-1 block">{{ $message }}</span> @enderror
- </div>
-
- {{-- Instrumento --}}
- <div>
- <label class="block text-[10px] font-bold uppercase tracking-wider text-titulo/60 mb-1.5">Instrumento / Escala</label>
- <select wire:model.live="cod_instrumento" @disabled(empty($cod_area)) class="w-full rounded-xl border border-borde-suave bg-fondo-card/80 px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus disabled:opacity-50">
- <option value="">-- Seleccionar Instrumento --</option>
- @foreach($instrumentos as $inst)
- <option value="{{ $inst->cod_instrumento }}">{{ $inst->nombre }} ({{ $inst->siglas }})</option>
- @endforeach
- </select>
- @error('cod_instrumento') <span class="text-[10px] font-bold text-red-600 mt-1 block">{{ $message }}</span> @enderror
- </div>
- </div>
-
- {{-- Contexto del Instrumento Seleccionado --}}
- @if($instrumentoSeleccionado)
- <div class="rounded-2xl border border-borde-suave bg-fondo-panel p-4 space-y-2 text-xs font-semibold text-titulo/80">
- <div class="flex items-center justify-between">
- <span class="font-black text-titulo text-sm">{{ $instrumentoSeleccionado->nombre }}</span>
- <span class="rounded-lg bg-boton-acento/10 px-2 py-0.5 text-[10px] font-bold text-[var(--rm-action-primary)] uppercase tracking-widest">{{ $instrumentoSeleccionado->tipo_resultado }}</span>
- </div>
- <p class="text-titulo/70 leading-relaxed text-[11px]">{{ $instrumentoSeleccionado->descripcion }}</p>
- <div class="flex flex-wrap gap-4 pt-2 border-t border-borde-suave">
- @if($instrumentoSeleccionado->puntaje_maximo)
- <div>
- <span class="text-[10px] font-bold uppercase text-titulo/50">Puntaje Máximo:</span>
- <span class="font-black text-titulo">{{ number_format($instrumentoSeleccionado->puntaje_maximo, 0) }}</span>
- </div>
- @endif
- @if($instrumentoSeleccionado->punto_corte_normal)
- <div>
- <span class="text-[10px] font-bold uppercase text-titulo/50">Punto de Corte Normal:</span>
- <span class="font-black text-parrafo">&ge; {{ number_format($instrumentoSeleccionado->punto_corte_normal, 0) }}</span>
- </div>
- @endif
- @if($instrumentoSeleccionado->punto_corte_riesgo)
- <div>
- <span class="text-[10px] font-bold uppercase text-titulo/50">Punto de Corte Riesgo:</span>
- <span class="font-black text-red-600">&le; {{ number_format($instrumentoSeleccionado->punto_corte_riesgo, 0) }}</span>
- </div>
- @endif
- </div>
- </div>
- @endif
-
- <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
- {{-- Fecha --}}
- <div>
- <label class="block text-[10px] font-bold uppercase tracking-wider text-titulo/60 mb-1.5">Fecha de Evaluación</label>
- <input type="date" wire:model="fecha_eval" class="w-full rounded-xl border border-borde-suave bg-fondo-card/80 px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus">
- @error('fecha_eval') <span class="text-[10px] font-bold text-red-600 mt-1 block">{{ $message }}</span> @enderror
- </div>
-
- {{-- Hora --}}
- <div>
- <label class="block text-[10px] font-bold uppercase tracking-wider text-titulo/60 mb-1.5">Hora (Opcional)</label>
- <input type="time" wire:model="hora_eval" class="w-full rounded-xl border border-borde-suave bg-fondo-card/80 px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus">
- @error('hora_eval') <span class="text-[10px] font-bold text-red-600 mt-1 block">{{ $message }}</span> @enderror
- </div>
- </div>
-
- <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
- {{-- Resultado Métrico o Puntaje --}}
- <div>
- <label class="block text-[10px] font-bold uppercase tracking-wider text-titulo/60 mb-1.5">
- @if($instrumentoSeleccionado && $instrumentoSeleccionado->tipo_resultado === 'TIEMPO')
- Tiempo Obtenido (Segundos)
- @else
- Puntaje / Valor Numérico
- @endif
- </label>
- <input type="number" step="0.01" wire:model="puntaje_total"
- @disabled($instrumentoSeleccionado && in_array($instrumentoSeleccionado->tipo_resultado, ['CUALITATIVO', 'FRACCION_VISUAL']))
- class="w-full rounded-xl border border-borde-suave bg-fondo-card/80 px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus disabled:opacity-50"
- placeholder="{{ ($instrumentoSeleccionado && in_array($instrumentoSeleccionado->tipo_resultado, ['CUALITATIVO', 'FRACCION_VISUAL'])) ? 'No aplica' : 'Ej: 24' }}">
- @error('puntaje_total') <span class="text-[10px] font-bold text-red-600 mt-1 block">{{ $message }}</span> @enderror
- </div>
-
- {{-- Categoría del Resultado --}}
- <div>
- <label class="block text-[10px] font-bold uppercase tracking-wider text-titulo/60 mb-1.5">Categoría / Resultado Clínico</label>
- <input type="text" wire:model="categoria_resultado" class="w-full rounded-xl border border-borde-suave bg-fondo-card/80 px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus"
- placeholder="Ej: Deterioro cognitivo leve, 20/40, Normal">
- @error('categoria_resultado') <span class="text-[10px] font-bold text-red-600 mt-1 block">{{ $message }}</span> @enderror
- </div>
- </div>
-
- <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
- {{-- Nivel de Alerta --}}
- <div>
- <label class="block text-[10px] font-bold uppercase tracking-wider text-titulo/60 mb-1.5">Nivel de Alerta</label>
- <select wire:model="nivel_alerta" class="w-full rounded-xl border border-borde-suave bg-fondo-card/80 px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus">
- <option value="NORMAL">Normal</option>
- <option value="PREVENTIVO">Preventivo</option>
- <option value="CRITICO">Crítico</option>
- </select>
- @error('nivel_alerta') <span class="text-[10px] font-bold text-red-600 mt-1 block">{{ $message }}</span> @enderror
- </div>
-
- {{-- Nivel de Riesgo (Opcional) --}}
- <div>
- <label class="block text-[10px] font-bold uppercase tracking-wider text-titulo/60 mb-1.5">Nivel de Riesgo (Opcional)</label>
- <input type="text" wire:model="nivel_riesgo" class="w-full rounded-xl border border-borde-suave bg-fondo-card/80 px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus"
- placeholder="Ej: Sin riesgo, Dependiente moderado">
- @error('nivel_riesgo') <span class="text-[10px] font-bold text-red-600 mt-1 block">{{ $message }}</span> @enderror
- </div>
- </div>
-
- {{-- Observaciones --}}
- <div>
- <label class="block text-[10px] font-bold uppercase tracking-wider text-titulo/60 mb-1.5">Observaciones Adicionales</label>
- <textarea wire:model="observaciones" rows="3" class="w-full rounded-xl border border-borde-suave bg-fondo-card/80 px-4 py-2.5 text-sm font-bold text-titulo outline-none transition focus:border-borde-focus resize-none" placeholder="Registrar hallazgos, aclaraciones o notas del evaluador..."></textarea>
- @error('observaciones') <span class="text-[10px] font-bold text-red-600 mt-1 block">{{ $message }}</span> @enderror
- </div>
-
- </form>
-
- {{-- Footer --}}
- <div class="flex items-center justify-end gap-3 border-t border-borde-suave p-4 sm:px-8 bg-fondo-panel">
- <button type="button" wire:click="cerrar" class="rounded-xl bg-fondo-card/80 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-titulo transition hover:bg-fondo-card active:scale-95 shadow-sm border border-borde-suave">
- Cancelar
- </button>
- <button type="button" wire:click="guardar" class="rounded-xl bg-boton-principal px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso transition hover:bg-fondo-panel active:scale-95 shadow-md flex items-center gap-2">
- <i class="ph-fill ph-floppy-disk text-base"></i> Guardar Evaluación
- </button>
- </div>
-
- </div>
- </div>
- @endif
+    @if($mostrar)
+        <x-ui.modal-livewire wire:model="mostrar" :id="'captura-instrumental-'.$this->getId()" title="Registrar mediciones instrumentales" max-width="lg" close-method="cerrar" subtitle="Respuestas originales, fecha de aplicación y profesional responsable">
+            <x-slot:context>
+                <div class="px-5 sm:px-6 py-3 text-sm break-words">
+                    <p><strong>Residente:</strong> {{ $contexto['residente'] ?? 'Selecciona un residente' }}</p>
+                    @if(isset($contexto['profesional']))<p class="mt-1"><strong>Profesional:</strong> {{ $contexto['profesional'] }}</p>@endif
+                </div>
+            </x-slot:context>
+            @error('registro')<p class="rm-error mb-3" role="alert">{{ $message }}</p>@enderror
+            @if($confirmarDescarte)
+                <div class="space-y-4" role="alert">
+                    <p>Hay cambios sin registrar. Puedes volver a revisarlos o descartarlos para cerrar.</p>
+                    <div class="flex flex-wrap gap-3">
+                        <button type="button" wire:click="volver" class="rm-btn rm-btn-secondary">Volver a revisar</button>
+                        <button type="button" wire:click="descartar" class="rm-btn rm-btn-danger">Descartar cambios</button>
+                    </div>
+                </div>
+            @else
+                <form wire:submit="revisar" class="space-y-4">
+                    @if($residenteFijo === null)
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <x-ui.field :for="'captura-buscar-'.$this->getId()" label="Buscar residente por nombre">
+                                <input id="captura-buscar-{{ $this->getId() }}" class="rm-input" type="search" wire:model.live.debounce.300ms="busquedaResidente" @disabled($confirmando)>
+                            </x-ui.field>
+                            <x-ui.field :for="'captura-residente-'.$this->getId()" label="Residente" error="cod_residente" required>
+                                <select id="captura-residente-{{ $this->getId() }}" class="rm-input" wire:model.live="cod_residente" aria-required="true" aria-invalid="{{ $errors->has('cod_residente') ? 'true' : 'false' }}" @if($errors->has('cod_residente')) aria-describedby="captura-residente-{{ $this->getId() }}-error" @endif @disabled($confirmando)>
+                                    <option value="">Selecciona un residente</option>
+                                    @foreach($residentes as $residente)<option value="{{ $residente->cod_residente }}">{{ $residente->nombres }} {{ $residente->apellido_paterno }} {{ $residente->apellido_materno }}</option>@endforeach
+                                </select>
+                            </x-ui.field>
+                        </div>
+                    @endif
+                    <x-ui.field :for="'captura-instrumento-'.$this->getId()" label="Instrumento y versión" error="cod_instrumento" required>
+                        <select id="captura-instrumento-{{ $this->getId() }}" class="rm-input" wire:model.live="cod_instrumento" aria-required="true" aria-invalid="{{ $errors->has('cod_instrumento') ? 'true' : 'false' }}" @if($errors->has('cod_instrumento')) aria-describedby="captura-instrumento-{{ $this->getId() }}-error" @endif @disabled(!$cod_residente || $confirmando)>
+                            <option value="">Selecciona el instrumento aplicado</option>
+                            @foreach($instrumentos as $instrumento)<option value="{{ $instrumento->cod_instrumento }}">{{ $instrumento->nombre }} · {{ $instrumento->version ?: 'Versión no registrada' }}</option>@endforeach
+                        </select>
+                    </x-ui.field>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <x-ui.field :for="'captura-fecha-'.$this->getId()" label="Fecha original" error="fecha_eval" required>
+                            <input id="captura-fecha-{{ $this->getId() }}" type="date" class="rm-input" wire:model="fecha_eval" aria-required="true" aria-invalid="{{ $errors->has('fecha_eval') ? 'true' : 'false' }}" @if($errors->has('fecha_eval')) aria-describedby="captura-fecha-{{ $this->getId() }}-error" @endif @disabled($confirmando)>
+                        </x-ui.field>
+                        <x-ui.field :for="'captura-hora-'.$this->getId()" label="Hora original" error="hora_eval" required :help="'Zona: '.config('app.timezone')">
+                            <input id="captura-hora-{{ $this->getId() }}" type="time" step="1" class="rm-input" wire:model="hora_eval" aria-required="true" aria-invalid="{{ $errors->has('hora_eval') ? 'true' : 'false' }}" aria-describedby="captura-hora-{{ $this->getId() }}-help{{ $errors->has('hora_eval') ? ' captura-hora-'.$this->getId().'-error' : '' }}" @disabled($confirmando)>
+                        </x-ui.field>
+                    </div>
+                    @if($confirmando)
+                        <p class="text-sm font-semibold" role="status">Revisa el residente, la fecha y las respuestas. Al confirmar se registrará la captura; su interpretación depende del método disponible.</p>
+                    @endif
+                    @if($cod_instrumento && $preguntas === [])
+                        <p class="text-sm" role="status">Este instrumento no tiene preguntas activas. Su catálogo debe completarse antes de registrar mediciones; no se guardará una aplicación vacía.</p>
+                    @endif
+                    <p class="text-sm text-rm-secondary">Deja sin responder lo que no se midió. Cero y «No» son respuestas; no equivalen a ausencia de dato.</p>
+                    <div class="space-y-4">
+                        @foreach($preguntas as $pregunta)
+                            <div wire:key="pregunta-captura-{{ $pregunta['codigo'] }}">
+                                <x-ui.field :for="'captura-valor-'.$this->getId().'-'.$pregunta['codigo']" :label="$pregunta['enunciado']" :error="'valores.'.$pregunta['codigo']">
+                                    @if($pregunta['campo'] === 'valor_logico')
+                                        <select id="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}" class="rm-input" wire:model="valores.{{ $pregunta['codigo'] }}" aria-invalid="{{ $errors->has('valores.'.$pregunta['codigo']) ? 'true' : 'false' }}" @if($errors->has('valores.'.$pregunta['codigo'])) aria-describedby="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}-error" @endif @disabled($confirmando)>
+                                            <option value="">Sin registrar</option><option value="1">Sí</option><option value="0">No</option>
+                                        </select>
+                                    @elseif($pregunta['campo'] === 'cod_opcion')
+                                        <select id="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}" class="rm-input" wire:model="valores.{{ $pregunta['codigo'] }}" aria-invalid="{{ $errors->has('valores.'.$pregunta['codigo']) ? 'true' : 'false' }}" @if($errors->has('valores.'.$pregunta['codigo'])) aria-describedby="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}-error" @endif @disabled($confirmando)>
+                                            <option value="">Sin registrar</option>
+                                            @foreach($pregunta['opciones'] as $opcion)<option value="{{ $opcion['codigo'] }}">{{ $opcion['nombre'] }}</option>@endforeach
+                                        </select>
+                                    @elseif($pregunta['campo'] === 'valor_numero')
+                                        <input id="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}" type="number" step="0.0001" class="rm-input" wire:model="valores.{{ $pregunta['codigo'] }}" aria-invalid="{{ $errors->has('valores.'.$pregunta['codigo']) ? 'true' : 'false' }}" @if($errors->has('valores.'.$pregunta['codigo'])) aria-describedby="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}-error" @endif @disabled($confirmando)>
+                                    @elseif($pregunta['campo'] === 'valor_texto')
+                                        <textarea id="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}" rows="2" class="rm-input" wire:model="valores.{{ $pregunta['codigo'] }}" aria-invalid="{{ $errors->has('valores.'.$pregunta['codigo']) ? 'true' : 'false' }}" @if($errors->has('valores.'.$pregunta['codigo'])) aria-describedby="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}-error" @endif @disabled($confirmando)></textarea>
+                                    @else
+                                        <p class="text-sm" role="status">El tipo de respuesta de esta pregunta requiere revisión del catálogo.</p>
+                                    @endif
+                                </x-ui.field>
+                            </div>
+                        @endforeach
+                    </div>
+                    <x-ui.field :for="'captura-observaciones-'.$this->getId()" label="Observaciones de la aplicación" error="observaciones">
+                        <textarea id="captura-observaciones-{{ $this->getId() }}" rows="3" class="rm-input" wire:model="observaciones" aria-invalid="{{ $errors->has('observaciones') ? 'true' : 'false' }}" @if($errors->has('observaciones')) aria-describedby="captura-observaciones-{{ $this->getId() }}-error" @endif @disabled($confirmando)></textarea>
+                    </x-ui.field>
+                    <div class="flex flex-wrap justify-end gap-3">
+                        <button type="button" wire:click="cerrar" class="rm-btn rm-btn-secondary" wire:loading.attr="disabled">Cerrar</button>
+                        @if($confirmando)
+                            <button type="button" wire:click="volver" class="rm-btn rm-btn-secondary" wire:loading.attr="disabled">Volver a editar</button>
+                            <button type="button" wire:click="guardar" class="rm-btn rm-btn-primary" wire:loading.attr="disabled" wire:target="guardar">
+                                <span wire:loading.remove wire:target="guardar">Confirmar y registrar</span><span wire:loading wire:target="guardar">Registrando…</span>
+                            </button>
+                        @else
+                            <button type="submit" class="rm-btn rm-btn-primary" wire:loading.attr="disabled" @disabled(!$cod_instrumento || $preguntas === [])>Revisar captura</button>
+                        @endif
+                    </div>
+                </form>
+            @endif
+        </x-ui.modal-livewire>
+    @endif
 </div>

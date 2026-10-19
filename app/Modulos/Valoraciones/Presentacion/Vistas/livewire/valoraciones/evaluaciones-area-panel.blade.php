@@ -151,7 +151,7 @@
    <th class="px-5 py-3">Instrumento</th>
    <th class="px-5 py-3">Puntaje</th>
    <th class="px-5 py-3">Resultado / Categoría</th>
-   <th class="px-5 py-3">Nivel Alerta</th>
+   <th class="px-5 py-3">Clasificación registrada</th>
    <th class="px-5 py-3">Evaluador</th>
    <th class="px-5 py-3">Fecha</th>
    @can('aplicaciones_instrumento.crear')<th class="px-5 py-3 text-center">Acción</th>@endcan
@@ -160,28 +160,29 @@
   <tbody class="divide-y divide-borde/50">
    @foreach($evaluaciones as $eval)
    @php
-   $alertaClass = match($eval->nivel_alerta) {
+   $alertaClass = match($eval->clasificacion) {
     'CRITICO' => 'bg-estado-peligro text-white',
     'PREVENTIVO' => 'bg-estado-advertencia text-white',
-    default => 'bg-estado-exitoBg text-estado-exito',
+    'NORMAL' => 'bg-estado-exitoBg text-estado-exito',
+    default => 'bg-fondo-panel text-parrafo',
    };
    @endphp
    <tr class="hover:bg-fondo-panel/50 transition-colors">
    <td class="px-5 py-3">
     <div class="flex items-center gap-2.5">
     <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full {{ $areaConfig['color_bg'] }} {{ $areaConfig['color_txt'] }} text-sm font-black">
-     {{ substr($eval->adulto?->nombres ?? '?', 0, 1) }}{{ substr($eval->adulto?->ap_paterno ?? '', 0, 1) }}
+     {{ mb_substr($eval->adulto?->nombres ?? '?', 0, 1) }}{{ mb_substr($eval->adulto?->apellido_paterno ?? '', 0, 1) }}
     </div>
     <div>
      <div class="font-bold text-titulo">
-     {{ $eval->adulto?->nombres ?? '—' }} {{ $eval->adulto?->ap_paterno ?? '' }}
+     {{ $eval->adulto?->nombres ?? '—' }} {{ $eval->adulto?->apellido_paterno ?? '' }}
      </div>
-     <div class="text-[10px] text-apoyo">CI: {{ $eval->adulto?->ci ?? '—' }}</div>
+     <div class="text-[10px] text-apoyo">Documento: {{ $eval->adulto?->numero_documento ?? '—' }}</div>
     </div>
     </div>
    </td>
    <td class="px-5 py-3">
-    <div class="font-bold text-titulo">{{ $eval->instrumento?->siglas ?? '—' }}</div>
+    <div class="font-bold text-titulo">{{ $eval->instrumento?->codigo ?? '—' }}</div>
     <div class="text-[10px] text-apoyo max-w-[160px] truncate">{{ $eval->instrumento?->nombre ?? '' }}</div>
    </td>
    <td class="px-5 py-3 font-black text-titulo">
@@ -191,19 +192,19 @@
     @endif
    </td>
    <td class="px-5 py-3 text-xs font-semibold text-parrafo max-w-[160px] truncate"
-    title="{{ $eval->categoria_resultado ?? '' }}">
-    {{ $eval->categoria_resultado ?? '—' }}
+    title="{{ $eval->interpretacion ?? '' }}">
+    {{ $eval->interpretacion ?? '—' }}
    </td>
    <td class="px-5 py-3">
     <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider {{ $alertaClass }}">
-    {{ $eval->nivel_alerta ?? 'NORMAL' }}
+    {{ $eval->clasificacion ?? 'Sin clasificación' }}
     </span>
    </td>
    <td class="px-5 py-3 text-xs text-apoyo">
-    {{ $eval->evaluador?->name ?? '—' }}
+    {{ $eval->evaluador?->nombres ?? '—' }} {{ $eval->evaluador?->apellido_paterno ?? '' }}
    </td>
    <td class="px-5 py-3 text-xs font-medium text-apoyo">
-    {{ $eval->fecha_eval ? \Carbon\Carbon::parse($eval->fecha_eval)->format('d/m/Y') : '—' }}
+    {{ $eval->fecha_hora?->format('d/m/Y H:i') ?? '—' }}
    </td>
    @can('aplicaciones_instrumento.crear')
    <td class="px-5 py-3 text-center">
@@ -237,7 +238,7 @@
   @if($busqueda || $filtroAlerta || $filtroInstrumento)
    Intenta modificar los filtros de búsqueda.
   @else
-   Registra la primera evaluación de <strong>{{ $nombreArea }}</strong> para un adulto mayor.
+   Registra la primera evaluación de <strong>{{ $nombreArea }}</strong> para un residente.
   @endif
   </p>
   @if(!$busqueda && !$filtroAlerta && !$filtroInstrumento && auth()->user()?->can('aplicaciones_instrumento.crear'))

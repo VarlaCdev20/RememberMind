@@ -73,12 +73,16 @@ class FrontendArchitectureTest extends TestCase
                 if ($archivo->getExtension() !== 'php') {
                     continue;
                 }
-                $componentes++;
                 $codigo = File::get($archivo->getPathname());
                 preg_match('/namespace ([^;]+);/', $codigo, $namespace);
                 preg_match('/class (\w+)/', $codigo, $clase);
-                $render = new \ReflectionMethod($namespace[1].'\\'.$clase[1], 'render');
-                $lineas = explode("\n", $codigo);
+                $reflexion = new \ReflectionClass($namespace[1].'\\'.$clase[1]);
+                if ($reflexion->isAbstract()) {
+                    continue;
+                }
+                $componentes++;
+                $render = $reflexion->getMethod('render');
+                $lineas = explode("\n", File::get($render->getFileName()));
                 $codigoRender = implode("\n", array_slice($lineas, $render->getStartLine() - 1, $render->getEndLine() - $render->getStartLine() + 1));
                 if (preg_match("/view\\(['\"]([^'\"]+)['\"]/", $codigoRender, $coincidencia)) {
                     $resuelta = view()->getFinder()->find($coincidencia[1]);

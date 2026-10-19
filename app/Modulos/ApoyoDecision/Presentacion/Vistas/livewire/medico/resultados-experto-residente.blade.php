@@ -6,6 +6,10 @@
         <a class="rm-expert-back" href="{{ $psicologia ? route('admin.psicologia.dashboard') : ($enfermeria ? route('admin.enfermeria.pacientes', ['residente' => $codResidente]) : route('admin.medico.residente.ficha', ['adulto' => $codResidente])) }}"><i class="ph ph-arrow-left" aria-hidden="true"></i>{{ $psicologia ? 'Volver a Psicología' : ($enfermeria ? 'Volver a Mis residentes' : 'Volver a la ficha') }}</a>
     </header>
     @can('consultarGobierno', \App\Models\VersionModeloExperto::class)<a href="{{ route('admin.sistema-experto.reglas') }}" class="rm-btn rm-btn-secondary">Consultar reglas</a>@endcan
+    @can('aplicaciones_instrumento.crear')
+        <button type="button" wire:click="abrirCapturaInstrumental" wire:loading.attr="disabled" class="rm-btn rm-btn-primary">Registrar mediciones</button>
+        @livewire('valoraciones.evaluacion-geriatrica-modal', ['cod_residente' => $codResidente], key('captura-resultados-'.$codResidente))
+    @endcan
     <p wire:loading role="status" class="text-sm">Consultando la valoración y sus fuentes…</p>
     <section class="rm-card rm-expert-context" aria-label="Contexto del residente">
         <div class="rm-expert-context-grid">

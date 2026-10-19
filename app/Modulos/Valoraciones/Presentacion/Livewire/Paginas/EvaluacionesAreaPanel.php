@@ -4,6 +4,8 @@ namespace App\Modulos\Valoraciones\Presentacion\Livewire\Paginas;
 
 use App\Models\AplicacionInstrumento;
 use App\Models\Instrumento;
+use App\Models\User;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -19,6 +21,7 @@ class EvaluacionesAreaPanel extends Component
 
     public array $areaConfig = [];
 
+    #[Locked]
     public array $instrumentosCodes = [];
 
     public string $busqueda = '';
@@ -41,9 +44,7 @@ class EvaluacionesAreaPanel extends Component
 
     public function mount(string $codArea = ''): void
     {
-        if (! auth()->user()->hasAnyRole(['SUPERADMINISTRADOR', 'PSICOLOGO/A'])) {
-            abort(403);
-        }
+        $this->autorizar();
 
         // Fallback: detectar área desde el nombre de la ruta actual
         if (! $codArea) {
@@ -82,9 +83,9 @@ class EvaluacionesAreaPanel extends Component
 
     public function nuevaEvaluacion(?string $codResidente = null): void
     {
-        abort_unless(auth()->user()?->estado === 'ACTIVO' && auth()->user()->can('aplicaciones_instrumento.crear'), 403);
+        $usuario = $this->autorizar();
+        abort_unless($usuario->can('aplicaciones_instrumento.crear'), 403);
         $this->dispatch('evaluacion-geriatrica-area-abrir', [
-            'cod_residente' => $codResidente,
             'cod_residente' => $codResidente,
             'cod_area' => $this->codArea,
         ]);
@@ -92,6 +93,7 @@ class EvaluacionesAreaPanel extends Component
 
     public function render()
     {
+        $this->autorizar();
         $query = AplicacionInstrumento::with(['adulto', 'instrumento', 'evaluador.usuario'])
             ->whereIn('cod_instrumento', $this->instrumentosCodes);
 
@@ -130,5 +132,18 @@ class EvaluacionesAreaPanel extends Component
             'alertasCriticas',
             'pacientesCubiertos'
         ))->layout('layouts.sistema');
+    }
+
+    private function autorizar(): User
+    {
+        $usuario = auth()->user() ? User::query()->find(auth()->id()) : null;
+        abort_unless($usuario?->estado === 'ACTIVO'
+            && $usuario->hasAnyRole(['SUPERADMINISTRADOR', 'PSICOLOGO/A'])
+            && ! $usuario->hasRole('FAMILIAR')
+            && $usuario->checkPermissionTo('aplicaciones_instrumento.ver', 'web')
+            && $usuario->checkPermissionTo('instrumentos.ver', 'web')
+            && ($usuario->hasRole('SUPERADMINISTRADOR') || $usuario->personal()->where('estado', 'ACTIVO')->exists()), 403);
+
+        return $usuario;
     }
 }

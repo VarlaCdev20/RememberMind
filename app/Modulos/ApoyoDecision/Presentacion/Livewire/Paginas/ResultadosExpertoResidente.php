@@ -17,12 +17,14 @@ use App\Modulos\ApoyoDecision\Aplicacion\Contratos\LecturaSimulacionExperta;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto as L;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\PresentarInformeCognitivo;
 use App\Modulos\ApoyoDecision\Dominio\Revision\DisciplinaRevision;
+use App\Modulos\Valoraciones\Aplicacion\Consultas\PrepararCapturaInstrumental;
 use Carbon\CarbonImmutable;
 use DomainException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -106,6 +108,19 @@ class ResultadosExpertoResidente extends Component
         Gate::authorize('consultarResultados', [EvaluacionExperta::class, $residente]);
 
         return $residente;
+    }
+
+    public function abrirCapturaInstrumental(): void
+    {
+        $residente = $this->autorizar();
+        app(PrepararCapturaInstrumental::class)->contexto(auth()->user(), $residente->getKey());
+        $this->dispatch('evaluacion-geriatrica-abrir', cod_residente: $residente->getKey());
+    }
+
+    #[On('evaluacion-geriatrica-guardada')]
+    public function actualizarCapturas(): void
+    {
+        $this->autorizar();
     }
 
     /** Muestra el resultado conservado disponible, sin selector de vista previa ni mezcla de fuentes. */

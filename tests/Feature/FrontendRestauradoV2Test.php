@@ -203,10 +203,10 @@ class FrontendRestauradoV2Test extends TestCase
         $this->assertSame([], $errores, 'Hay pestañas clínicas restauradas que aún consultan la BDD legacy.');
     }
 
-    public function test_modal_original_guarda_aplicacion_de_instrumento_v2(): void
+    public function test_modal_original_guarda_respuesta_de_instrumento_v2_con_contexto_clinico(): void
     {
         $usuario = $this->usuarioConRol('PSICOLOGO/A');
-        Personal::create([
+        $personal = Personal::create([
             'cod_personal' => 'PER_EVAL_V2',
             'cod_usuario' => $usuario->cod_usuario,
             'nombres' => 'Elena',
@@ -215,6 +215,11 @@ class FrontendRestauradoV2Test extends TestCase
             'profesion' => 'PSICOLOGA',
             'estado' => 'ACTIVO',
         ]);
+        $area = \App\Models\Area::create(['nombre' => 'Área de prueba', 'estado' => 'ACTIVA']);
+        $turno = \App\Models\Turno::create(['nombre' => 'Turno de prueba', 'hora_inicio' => '00:00', 'hora_cierre' => '23:59', 'orden' => 1, 'estado' => 'ACTIVO']);
+        $jornada = \App\Models\Jornada::create(['cod_turno' => $turno->getKey(), 'fecha_jornada' => today(), 'estado' => 'ABIERTA']);
+        \App\Models\AsignacionPersonal::create(['cod_personal' => $personal->getKey(), 'cod_jornada' => $jornada->getKey(),
+            'cod_area' => $area->getKey(), 'fecha_asignacion' => now(), 'estado' => 'ACTIVA']);
         $residente = Residente::crearDesdeAdmision([
             'cod_residente' => 'RES_EVAL_V2',
             'nombres' => 'Juana',
@@ -231,13 +236,14 @@ class FrontendRestauradoV2Test extends TestCase
             'estado' => 'ACTIVO',
         ]);
 
+        $pregunta = \App\Models\PreguntaInstrumento::create(['cod_instrumento' => 'INS_EVAL_V2', 'codigo' => 'MEDIDA-TEST',
+            'enunciado' => 'Medición sintética', 'tipo_respuesta' => 'NUMERICO', 'orden' => 1, 'estado' => 'ACTIVA']);
         $this->actingAs($usuario);
         Livewire::test(EvaluacionGeriatricaModal::class)
             ->call('abrir', $residente->cod_residente)
-            ->set('cod_area', 'INSTRUMENTOS_V2')
             ->set('cod_instrumento', 'INS_EVAL_V2')
-            ->set('puntaje_total', 24)
-            ->set('categoria_resultado', 'Seguimiento preventivo')
+            ->set('valores.'.$pregunta->getKey(), 24)
+            ->call('revisar')
             ->call('guardar')
             ->assertHasNoErrors();
 
@@ -245,8 +251,9 @@ class FrontendRestauradoV2Test extends TestCase
             'cod_residente' => $residente->cod_residente,
             'cod_instrumento' => 'INS_EVAL_V2',
             'cod_personal' => 'PER_EVAL_V2',
-            'puntaje_total' => 24,
+            'puntaje_total' => null,
         ]);
+        $this->assertDatabaseHas('respuestas_instrumento', ['cod_pregunta' => $pregunta->getKey(), 'valor_numero' => 24]);
     }
 
     public function test_ficha_original_guarda_documento_administrativo_v2(): void

@@ -13,6 +13,7 @@ use App\Models\Residente;
 use App\Models\RespuestaInstrumento;
 use App\Models\User;
 use App\Modulos\Clinica\Aplicacion\Acciones\AutorizacionClinicaService;
+use App\Modulos\Valoraciones\Aplicacion\DTOs\CatalogoPreguntasInstrumento;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -20,17 +21,20 @@ use Illuminate\Validation\ValidationException;
 
 final class AplicarInstrumento
 {
-    private const ROLES_APLICADORES = ['MEDICO GENERAL/GERIATRA', 'ENFERMEROS', 'PSICOLOGO/A', 'NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO'];
+    public const ROLES_APLICADORES = ['MEDICO GENERAL/GERIATRA', 'ENFERMEROS', 'PSICOLOGO/A', 'NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO'];
 
     public function __construct(private readonly AutorizacionClinicaService $autorizacion) {}
 
-    public function aplicar(User $usuario, array $entrada, Instrumento $instrumento, Residente $residente): AplicacionInstrumento
+    public function aplicar(User $usuario, array $entrada, Instrumento $instrumento, Residente $residente, ?string $codigoReservado = null, ?string $huellaCatalogo = null): AplicacionInstrumento
     {
-        return DB::transaction(function () use ($usuario, $entrada, $instrumento, $residente): AplicacionInstrumento {
+        return DB::transaction(function () use ($usuario, $entrada, $instrumento, $residente, $codigoReservado, $huellaCatalogo): AplicacionInstrumento {
             $usuario = User::query()->lockForUpdate()->findOrFail($usuario->getKey());
             $residente = Residente::query()->lockForUpdate()->findOrFail($residente->getKey());
             $instrumento = Instrumento::query()->lockForUpdate()->findOrFail($instrumento->getKey());
             $personal = $this->autorizacion->autorizarMutacion($usuario, $residente, 'aplicaciones_instrumento.crear', self::ROLES_APLICADORES);
+            if ($codigoReservado !== null && AplicacionInstrumento::query()->whereKey($codigoReservado)->exists()) {
+                throw ValidationException::withMessages(['solicitud' => 'Esta solicitud ya se registró. Consulta el historial antes de repetir la captura.']);
+            }
             abort_unless($instrumento->estado === 'ACTIVO', 409, 'El instrumento no se encuentra activo.');
             $datos = Validator::make($entrada, ['fecha_hora' => ['sometimes', 'required', 'date_format:Y-m-d H:i:s,Y-m-d\TH:i:sP,Y-m-d\TH:i:s\Z', 'before_or_equal:now'],
                 'cod_atencion' => ['nullable', 'exists:atenciones,cod_atencion'], 'clasificacion' => ['nullable', 'string', 'max:80'], 'interpretacion' => ['nullable', 'string'], 'observacion' => ['nullable', 'string'], 'respuestas' => ['required', 'array', 'min:1'],
@@ -44,6 +48,9 @@ final class AplicarInstrumento
             }
             $preguntas = PreguntaInstrumento::query()->where('cod_instrumento', $instrumento->cod_instrumento)->where('estado', 'ACTIVA')->lockForUpdate()
                 ->with(['opciones' => fn ($query) => $query->where('estado', 'ACTIVO')->lockForUpdate()])->get()->keyBy('cod_pregunta');
+            if ($huellaCatalogo !== null && ! hash_equals($huellaCatalogo, CatalogoPreguntasInstrumento::proyectar($instrumento, $preguntas)['huella'])) {
+                throw ValidationException::withMessages(['catalogo' => 'El catálogo cambió durante la captura. Revisa el instrumento actualizado antes de registrarlo.']);
+            }
             foreach ($respuestas as &$respuesta) {
                 $pregunta = $preguntas->get($respuesta['cod_pregunta']);
                 abort_unless($pregunta, 422, 'La pregunta no pertenece al instrumento activo.');
@@ -68,7 +75,7 @@ final class AplicarInstrumento
             $datos['puntaje_total'] = count($respuestas) === $preguntas->count()
                 ? $this->sumarPuntajes(array_map(fn ($r) => $r['puntaje'] ?? null, $respuestas)) : null;
             $datos['puntaje_maximo'] = $this->sumarPuntajes($preguntas->pluck('puntaje_maximo')->all());
-            $aplicacion = AplicacionInstrumento::query()->create(['cod_aplicacion' => app(CodigosEntidad::class)->siguiente('aplicaciones_instrumento'), 'cod_instrumento' => $instrumento->cod_instrumento, 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal,
+            $aplicacion = AplicacionInstrumento::query()->create(['cod_aplicacion' => $codigoReservado ?? app(CodigosEntidad::class)->siguiente('aplicaciones_instrumento'), 'cod_instrumento' => $instrumento->cod_instrumento, 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal,
                 'cod_atencion' => $datos['cod_atencion'] ?? null, 'puntaje_total' => $datos['puntaje_total'], 'puntaje_maximo' => $datos['puntaje_maximo'],
                 'clasificacion' => $datos['clasificacion'] ?? null, 'interpretacion' => $datos['interpretacion'] ?? null, 'observacion' => $datos['observacion'] ?? null,
                 'fecha_hora' => isset($datos['fecha_hora']) ? CarbonImmutable::parse($datos['fecha_hora'])->setTimezone(config('app.timezone')) : now(), 'estado' => 'COMPLETA']);

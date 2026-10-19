@@ -38,10 +38,10 @@
             @if($captura['aplicacion_actual']['observacion'])<p class="text-sm break-words whitespace-pre-line mt-3">Observación de la aplicación: {{ $captura['aplicacion_actual']['observacion'] }}</p>@endif
             <details class="mt-3"><summary class="cursor-pointer min-h-11 text-sm">Procedencia y condiciones de cálculo</summary>
                 <p class="text-xs break-words">Aplicación {{ $captura['cod_aplicacion'] }} · Instrumento {{ $captura['cod_instrumento'] }} · Autor {{ $captura['cod_personal'] }}</p>
-                @foreach(array_merge($captura['motivos'], $captura['extraccion']['motivos_captura'] ?? []) as $motivo)<p class="text-xs break-words mt-2">{{ $motivo }}</p>@endforeach
+                @foreach(array_merge($captura['motivos'], $captura['extraccion']['motivos_captura'] ?? []) as $motivo)<p class="text-sm break-words mt-2">{{ \App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto::condicionInstrumental($motivo) }}</p>@endforeach
                 @foreach($captura['extraccion']['normalizacion']['componentes'] ?? [] as $componente => $calculo)
                     @foreach($calculo['medidas'] ?? [$calculo] as $medida)
-                        @foreach($medida['motivos'] as $motivo)<p class="text-xs break-words mt-2">{{ $componente }} · {{ $medida['medida'] ?? '' }} · {{ $motivo }}</p>@endforeach
+                        @foreach($medida['motivos'] as $motivo)<p class="text-sm break-words mt-2">{{ $componente }} · {{ \App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto::condicionInstrumental($motivo) }}</p>@endforeach
                     @endforeach
                 @endforeach
             </details>
