@@ -66,6 +66,7 @@ final class PerfilInstrumentalCognitivo
         }
 
         return ['contrato' => 'PERFIL-INSTRUMENTAL-1', 'red' => $red, 'dominios' => $dominios,
+            'comprobacion_adquisicion' => (new ComprobacionAdquisicionInstrumental)->comprobar($captura),
             'metricas_60_o_mas' => ['aplicaciones_examinadas' => count($captura['capturas']), 'aplicaciones_60_o_mas' => $apps60,
                 'aplicaciones_menores_60' => $appsMenores60, 'aplicaciones_edad_desconocida' => $edadDesconocida,
                 'componentes_con_comparacion' => count($comparables60), 'componentes_del_perfil' => count($diccionario),

@@ -99,3 +99,7 @@ La comprobación adicional de fuentes fue de solo lectura. Los siete archivos co
 | Revisión de identidad aplicada y mediciones históricas | Fuentes disponibles no identifican los protocolos requeridos | Pendiente de originales, no de autorización profesional |
 
 Este seguimiento cierra la limitación técnica de captura detallada. No cambia a completas las casillas de fuentes, perfiles, nueva carga ni QA visual sin sus evidencias correspondientes.
+
+## Comprobación automática y diccionario completo
+
+El [incremento de adquisición del 19/10/2026](FASE_2_COMPROBACION_ADQUISICION_2026_10_19.md) añade comprobación por aplicación de identidad, selectores, respuestas, procedencia y causas del cálculo, con completitud de entradas para 60+ y denominadores explícitos. Se entrega el [diccionario exacto de los 23 métodos y 19 componentes](DICCIONARIO_ADQUISICION_23_METODOS_2026_10_19.md). Verificación: 182 pruebas tanto en SQLite como en PostgreSQL desechable, sin nuevas escrituras clínicas ni cambios de estructura/permisos. El cotejo agregado de los cuatro CSV confirma que sus 286 respuestas son nominales y no contienen las mediciones numéricas originales requeridas. Los pendientes de fuentes, vinculación real y QA anteriores permanecen abiertos.

@@ -34,6 +34,7 @@ Estas verificaciones corresponden a sus respectivos alcances; no prueban que el 
 
 ### 2. Cerrar adquisición y vinculación de fuentes originales
 
+- [x] Contrastar el paquete instrumental disponible y completar la comprobación automática de identidad, entradas, procedencia y faltantes desde la captura autorizada; diccionario de los 23 métodos y métricas de completitud 60+. [Contrato y evidencia del incremento](FASE_2_COMPROBACION_ADQUISICION_2026_10_19.md).
 - [ ] Cotejar las aplicaciones realmente existentes: instrumento, edición, forma, idioma y condiciones; registrar los vínculos exactos de preguntas/columnas con cada entrada del método.
 - [x] Distinguir profesional que aplicó una evaluación histórica de quien transcribe ahora: autor original cotejado, cuenta actual e instante técnico separados. Permiso específico de Medicina/Psicología y cinco columnas aprobadas instalados en desarrollo.
 - [ ] Completar la captura de contexto que exija cada método con soporte verificable: escolaridad, fechas, condiciones sensoriales/motoras y desviaciones.

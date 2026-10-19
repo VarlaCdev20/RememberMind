@@ -7,6 +7,7 @@ namespace Tests\Unit;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoOrion;
 use MotorExperto\dominio\conocimiento\PerfilConceptualCognitivo;
 use MotorExperto\dominio\instrumentos\AplicabilidadGeriatrica;
+use MotorExperto\dominio\instrumentos\NormalizadorHvltBolivia2015;
 use MotorExperto\dominio\instrumentos\PerfilInstrumentalCognitivo;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -42,7 +43,7 @@ final class AplicabilidadGeriatricaTest extends TestCase
     {
         $red = (new PerfilConceptualCognitivo)->construir((new ArchivoConocimientoOrion)->leer());
         $app = ['cod_aplicacion' => 'SIM-A', 'fecha_hora' => '2026-10-18', 'cod_personal' => 'SIM-P', 'edad_en_aplicacion' => 70,
-            'extraccion' => ['perfil' => 'SIM-PERFIL', 'metodo' => 'SIM-METODO', 'fuentes_entradas' => [], 'captura' => [],
+            'extraccion' => ['perfil' => 'SIM-PERFIL', 'metodo' => NormalizadorHvltBolivia2015::METODO, 'fuentes_entradas' => [], 'captura' => [],
                 'normalizacion' => ['referencia' => 'SIM-REFERENCIA', 'componentes' => ['MEM-S01' => ['estado' => 'NORMALIZADO'], 'MEM-S02' => ['estado' => 'NORMALIZADO']]]]];
         $repetida = array_replace($app, ['cod_aplicacion' => 'SIM-B']);
         $menor = array_replace($app, ['cod_aplicacion' => 'SIM-C', 'edad_en_aplicacion' => 59]);

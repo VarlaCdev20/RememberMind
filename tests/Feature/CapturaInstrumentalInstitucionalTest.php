@@ -376,7 +376,43 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         $r = $this->captura();
         self::assertFalse($r['disponible']);
         self::assertSame([], $r['capturas']);
+        self::assertNull(app(ConsultarPerfilInstrumental::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now()));
         self::assertSame([], $consultas);
+    }
+
+    public function test_comprobacion_desde_sql_detalla_faltante_y_fuentes_sin_escribir_historia(): void
+    {
+        $respuestas = $this->respuestas;
+        $respuestas[0]['valor_numero'] = 0;
+        $indiceLectura = array_search('lectoescritura', array_keys(Hvlt::ENTRADAS), true);
+        $respuestas[$indiceLectura]['valor_logico'] = false;
+        array_pop($respuestas);
+        $a = $this->aplicar(['respuestas' => $respuestas]);
+        config(['sistema_experto.perfiles_instrumentales' => [$this->perfil]]);
+        $escrituras = [];
+        DB::listen(function ($q) use (&$escrituras): void {
+            if (preg_match('/^\s*(insert|update|delete)\b/i', $q->sql)) {
+                $escrituras[] = $q->sql;
+            }
+        });
+        $perfil = app(ConsultarPerfilInstrumental::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now());
+        $informe = $perfil['comprobacion_adquisicion'];
+        $original = $informe['aplicaciones'][0];
+        self::assertSame($a->getKey(), $original['cod_aplicacion']);
+        self::assertSame(70, $original['edad_en_aplicacion']);
+        self::assertSame($a->cod_personal, $original['procedencia']['cod_personal_aplicador']);
+        self::assertSame('2020-10-18T09:10:00.000000-04:00', $original['procedencia']['fecha_hora_clinica']);
+        self::assertSame('DATO_TIPADO_DISPONIBLE', $original['entradas']['ensayo_1']['estado']);
+        self::assertSame('DATO_TIPADO_DISPONIBLE', $original['entradas']['lectoescritura']['estado']);
+        self::assertSame('SIN_RESPUESTA_COMPATIBLE', $original['entradas']['administracion_estandarizada']['estado']);
+        self::assertSame($this->perfil['selectores']['administracion_estandarizada']['cod_pregunta'], $original['entradas']['administracion_estandarizada']['cod_pregunta']);
+        self::assertSame(90.91, $informe['metricas_entradas_60_o_mas']['porcentaje_completitud']);
+        self::assertSame(0, $perfil['metricas_60_o_mas']['componentes_con_comparacion']);
+        self::assertFalse($informe['autoriza_interpretacion_clinica']);
+        self::assertSame([], $escrituras);
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+        self::assertDatabaseCount('aplicaciones_instrumento', 1);
+        self::assertDatabaseCount('respuestas_instrumento', 10);
     }
 
     public static function valoresInvalidos(): array
