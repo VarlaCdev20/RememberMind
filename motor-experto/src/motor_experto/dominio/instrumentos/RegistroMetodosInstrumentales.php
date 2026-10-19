@@ -18,6 +18,7 @@ final class RegistroMetodosInstrumentales
             'edad_minima' => 18, 'edad_maxima' => 95, 'escolaridad_minima' => 1,
             'lectoescritura_requerida' => true, 'reproduce_reactivos' => false, 'revision_profesional' => 'PENDIENTE']]
             + (new NormalizadorBateriaBolivia2015)->metodos()
+            + (new NormalizadorReferenciasEspana)->metodos()
             + [CalculadorReconocimientoHvlt::METODO => (new CalculadorReconocimientoHvlt)->metadatos(),
                 CalculadorLenguajeWabCastellano2000::METODO => (new CalculadorLenguajeWabCastellano2000)->metadatos(),
                 CalculadorRecuerdoConClavesFcsrt::METODO => (new CalculadorRecuerdoConClavesFcsrt)->metadatos()];
@@ -27,6 +28,11 @@ final class RegistroMetodosInstrumentales
     {
         if (! isset($this->metodos()[$metodo])) {
             throw new DomainException('No existe un método instrumental registrado con esa identidad.');
+        }
+
+        // Las referencias nuevas conservan identidad y contexto; no reemplazan los métodos previos.
+        if (isset((new NormalizadorReferenciasEspana)->metodos()[$metodo])) {
+            return (new ExplicacionMatematicaInstrumental)->agregar((new NormalizadorReferenciasEspana)->normalizar($metodo, $captura));
         }
 
         // El complemento descriptivo no usa normas de recuerdo para reconocimiento.

@@ -1,9 +1,14 @@
 # O.R.I.O.N. — Manual técnico investigado para población mayor de 60 años
 
-Fecha de consulta: **19/10/2026**, zona America/La_Paz. Versión 1.0.
+Fecha de consulta: **19/10/2026**, zona America/La_Paz. Versión 1.1.
 Población solicitada por la propietaria: **personas mayores de 60 años**, sin
-techo de edad institucional supuesto. Estado: investigación documentada y
-cálculo descriptivo adicional; fase 3 todavía en curso.
+techo de edad institucional supuesto. Estado: investigación documentada, cálculos
+descriptivos y cinco ecuaciones normativas adicionales implementadas; fase 3 en curso.
+
+Actualización: [contrato y entrega de las normalizaciones](NORMALIZACIONES_REFERENCIA_2026_10_19.md).
+Hay once componentes con algoritmo normativo disponible, ocho de la base previa
+y tres de referencia española; su pertinencia institucional no se acredita por
+programarlos. Los apartados de seguimiento descriptivo conservan el corte anterior.
 
 Este documento reúne fuentes primarias consultadas en internet, distingue
 manuales de artículos y concreta su utilidad para RememberMind. Complementa las
@@ -80,8 +85,8 @@ z = (libre observado − predicho) / raíz(varianza residual estimada)
 El denominador depende del predicho; no es una desviación constante. La norma
 del libre no normaliza las claves aisladamente. El total presenta techo y otro
 tratamiento estadístico. La autorización/materiales concedidos al estudio por
-Albert Einstein College no se transfieren a RememberMind. Candidato documentado,
-sin implementación normativa ni adopción institucional.
+Albert Einstein College no se transfieren a RememberMind. Regresión implementada
+con identidad de imágenes y contexto explícito; adopción institucional pendiente.
 
 ### S02 — Comprensión: Julio-Ramos y colaboradores, 2024
 
@@ -121,7 +126,7 @@ longitud letras/números predicha = 5.014 − 0.048 A
 
 El error estándar de un coeficiente no es la desviación residual para z.
 S09 permite verificar denominadores 0.854 para inverso y 1.075 para letras/números.
-Referencia candidata para EJE-S03; no norma adoptada para residentes bolivianos.
+Normalizaciones implementadas para EJE-S03; no norma adoptada para residentes bolivianos.
 La selección de estudiantes mayores limita la generalización.
 
 ### S04 — Recuerdo con claves y orientación de líneas: Calderón-Rubio y colaboradores, 2021
@@ -136,9 +141,9 @@ tres pares libre/adicional, total de aprendizaje 0–48 y diferido a 30 minutos
 Para JLO publica `predicho = 22.252 − 4.263 S + 0.014 (escolaridad−3)²`,
 `SEE = 4.446`. La selección sobrerrepresenta 60–70 y subrepresenta mayores de 75.
 
-Se implementan únicamente las sumas descriptivas de FCSRT, con identidad y
-condiciones explícitas. No se aplica esta regresión JLO ni un baremo SABIEX
-por defecto. La operación de sumar aciertos no acredita pertinencia normativa.
+Se implementan sumas descriptivas de FCSRT y normalizaciones de su aprendizaje
+total y de JLO, con identidad y condiciones explícitas. No se aplican baremos
+SABIEX por defecto. Programar la comparación no acredita pertinencia institucional.
 
 ### S05 — HVLT-R en población anciana: Duff, 2016
 
@@ -210,14 +215,14 @@ Las fichas ampliadas y límites matemáticos están en el
 | --- | --- | --- |
 | MEM-S01 Aprendizaje | Adquisición en ensayos, originales separados | HVLT-R Bolivia 2015: norma implementada con condiciones; serie 18–95 |
 | MEM-S02 Diferido libre | Evocación tras demora, distinta del aprendizaje | Misma versión, modelo propio implementado; 18–95 |
-| MEM-S03 Claves | Recuperación adicional tras ayuda; no volver a contar libres | S04: sumas implementadas; norma pendiente. S01 es otra versión y no sustituye palabras |
+| MEM-S03 Claves | Recuperación adicional tras ayuda; no volver a contar libres | S04: sumas y norma de total con claves implementadas. No es norma del adicional aislado; S01 no sustituye palabras |
 | MEM-S04 Reconocimiento | Identificación y falsas alarmas por separado | Bruto HVLT-R implementado. S05 geriátrico candidato; no transferencia de escala o idioma |
 | ATE-S01 Sostenida | Rendimiento a lo largo de la tarea, errores/omisiones/tiempos | Ruff: pendiente; S06 cubre mayores varones y no todas las residentes |
 | ATE-S02 Selectiva | Diferenciar búsqueda automática y controlada | Misma aplicación Ruff, sin duplicar soporte; mismas limitaciones de ATE-S01 |
 | ATE-S03 Dividida | Dos condiciones BTA con audición documentada | BTA Bolivia 2015 implementado; 18–95 |
 | EJE-S01 Inhibición | Interferencia Stroop con tiempos del procedimiento | Stroop Bolivia 2015 implementado, intervalo percentilar; 18–95 |
 | EJE-S02 Flexibilidad | TMT-B completado y tiempo exacto, errores separados | TMT Bolivia 2015 implementado; 18–95, censura no tratada como tiempo exacto |
-| EJE-S03 Trabajo | Manipular información; condición y longitud/total identificados | S03/S09 permiten reconstruir longitud y z en 55–87; falta adopción pertinente e implementación normativa |
+| EJE-S03 Trabajo | Manipular información; condición y longitud/total identificados | S03/S09: normalizaciones de longitud y z implementadas en 55–87; falta adopción pertinente |
 | EJE-S04 Planificación | Problemas resueltos, movimientos y tiempos, versión TOL | NEURONORMA acp043: referencia identificada, tablas completas pendientes; no intercambiar TOL-DX y segunda edición |
 | EJE-S05 Razonamiento | Subprueba exacta, corrección por elemento y bruto | S07: manuales localizados, no leídos completos; no sumar Semejanzas y Matrices ni asumir todas las subpruebas en todo el rango |
 | LEN-S01 Denominación | Respuesta espontánea y ayudas según BNT estándar 60 | BNT Bolivia 2015 implementado; 18–95 |
@@ -225,7 +230,7 @@ Las fichas ampliadas y límites matemáticos están en el
 | LEN-S03 Comprensión | Instrucciones, repeticiones, medios puntos y apoyos | S02: alternativa latinoamericana localizada; conflicto de rúbrica y pertinencia pendientes |
 | LEN-S04 Repetición | Total corregido en la edición aplicada | WAB castellana 2000: conversión descriptiva implementada; no baremo geriátrico confirmado |
 | LEN-S05 Discurso | Muestra de la tarea, contenido y fluidez originales | WAB castellana 2000: suma descriptiva implementada; no usar nota de cuidados como tarea |
-| VIS-S01 Percepción | JLO o subprueba VOSP, control visual y forma | S04: fórmula JLO localizada; no total VOSP genérico ni sustitución silenciosa; norma adoptada pendiente |
+| VIS-S01 Percepción | JLO o subprueba VOSP, control visual y forma | S04: fórmula JLO implementada; no total VOSP genérico ni sustitución silenciosa; adopción pendiente |
 | VIS-S02 Construcción | Copia ROCF y referencia a producción original | ROCF Bolivia 2015 implementada; 18–95; no confundir copia y recuerdo |
 
 La serie boliviana se consulta en los originales
@@ -279,7 +284,10 @@ PHP. Las pruebas PHPUnit usan resultados esperados literales y prueban también
 ausencia, cero, tipos, versión de imágenes incompatible, contradicción de pares,
 demora, procedencia y que el perfil no produzca normalización o DCL.
 
-## 7. Contrato implementado en este incremento
+## 7. Contrato descriptivo del corte previo
+
+Este apartado conserva el incremento de sumas. Las conversiones posteriores,
+condiciones y selección conjunta están en el [contrato normativo](NORMALIZACIONES_REFERENCIA_2026_10_19.md).
 
 `FCSRT-PALABRAS-NEURONORMA-BRUTO-1`, tipo `CALCULO_DESCRIPTIVO`, se incorpora al
 registro existente. La identidad exige FCSRT, idioma español y procedimiento
@@ -332,7 +340,8 @@ autocorrección de S02 en sus páginas PDF, además de la extracción de texto.
 
 ## 9. Criterios pendientes para cerrar la fase
 
-1. Para cada uno de los once: referencia elegida, versión/material legítimo y
+1. Para los ocho componentes sin algoritmo y la adopción de las tres referencias
+   nuevas: referencia elegida, versión/material legítimo y
    pertinencia documentada para nuestra población, incluyendo los mayores
    fuera de los rangos encontrados. No exige que toda referencia sea boliviana;
    exige justificar su uso.
@@ -344,6 +353,6 @@ autocorrección de S02 en sus páginas PDF, además de la extracción de texto.
    La revisión profesional y la adopción institucional conservan su alcance propio.
 
 La investigación entrega fuentes utilizables y brechas concretas. No se registra
-el cierre funcional de los diecinueve mientras once no tengan el método completo
-y aplicable verificado. Tampoco se atribuye una aprobación médica a esta revisión
+el cierre funcional de los diecinueve mientras los ocho algoritmos pendientes y
+la pertinencia de las referencias no estén resueltos. Tampoco se atribuye una aprobación médica a esta revisión
 técnica ni se cambia la historia de residentes para completar la cobertura.

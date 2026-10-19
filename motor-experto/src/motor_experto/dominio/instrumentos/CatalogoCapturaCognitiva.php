@@ -13,7 +13,7 @@ namespace MotorExperto\dominio\instrumentos;
  */
 final class CatalogoCapturaCognitiva
 {
-    public const VERSION = 'CAPTURA-COGNITIVA-5-20261019';
+    public const VERSION = 'CAPTURA-COGNITIVA-6-20261019';
 
     public function componentes(): array
     {
@@ -108,13 +108,16 @@ final class CatalogoCapturaCognitiva
         $registro = (new RegistroMetodosInstrumentales)->metodos();
         foreach ($datos as $codigo => [$instrumento, $fuente, $campos, $limite]) {
             $metodos = array_filter($registro, fn ($m) => in_array($codigo, $m['componentes'], true));
-            // Un cálculo bruto no aumenta la cobertura normativa de los ocho componentes.
+            // Separar cálculos brutos, base previa y referencias nuevas sin adopción automática.
             $descriptivos = array_filter($metodos, fn ($m) => ($m['tipo'] ?? null) === 'CALCULO_DESCRIPTIVO');
-            $metodos = array_diff_key($metodos, $descriptivos);
+            $referencias = array_filter($metodos, fn ($m) => ($m['tipo'] ?? null) === 'NORMALIZACION_REFERENCIA');
+            $metodos = array_diff_key($metodos, $descriptivos, $referencias);
             $resultado[$codigo] = ['version' => self::VERSION, 'instrumento_referencia' => $instrumento, 'fuente' => $fuente,
                 'campos' => $campos, 'limite' => $limite, 'metodos_disponibles' => array_keys($metodos),
                 'calculos_descriptivos_disponibles' => array_keys($descriptivos),
-                'estado_metodo' => $metodos === [] ? 'CAPTURA_DOCUMENTADA_SIN_NORMALIZADOR' : 'NORMALIZADOR_DISPONIBLE_CON_CONDICIONES',
+                'normalizadores_referencia_disponibles' => array_keys($referencias),
+                'estado_metodo' => $metodos !== [] ? 'NORMALIZADOR_DISPONIBLE_CON_CONDICIONES'
+                    : ($referencias !== [] ? 'NORMALIZADOR_REFERENCIA_CON_CONTEXTO_EXPLICITO' : 'CAPTURA_DOCUMENTADA_SIN_NORMALIZADOR'),
                 'instrumento_administrado' => null, 'mediciones_residente' => null];
         }
 

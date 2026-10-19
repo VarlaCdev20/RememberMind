@@ -239,3 +239,80 @@ Archivos propios: `CalculadorRecuerdoConClavesFcsrt.php` y
 instrumentales; manual nuevo, informe de investigación, índice y este seguimiento.
 Los cambios concurrentes de Valoraciones, Institución, provider, fase 2 y `work/`
 se mantienen fuera del incremento.
+
+## Normalizaciones implementadas tras la solicitud expresa
+
+Solicitud posterior: «realiza las normalizaciones». Se implementan cinco
+ecuaciones de referencia: dígitos inversos, letras/números, JLO, FCSRT de
+palabras/aprendizaje total y pFCSRT+IR de imágenes/recuerdo libre. Se añade un
+selector conjunto para las dos tareas WAIS-III, sin sumar sus puntuaciones ni
+necesitar dos perfiles para una misma aplicación. El
+[contrato completo](NORMALIZACIONES_REFERENCIA_2026_10_19.md) documenta fórmulas,
+entradas, condiciones y límites.
+
+La cobertura pasa a **once componentes con algoritmo normativo programado**,
+incluyendo las referencias españolas; no se afirma que las once referencias
+estén adoptadas o validadas para residentes bolivianos. Continúan ocho sin
+conversión completa: MEM-S04, ATE-S01/S02, EJE-S04/S05 y LEN-S03/S04/S05.
+El método conflictivo FCSRT-Del no se registra. Las nuevas referencias conservan
+identidad y contexto explícitos, no se seleccionan automáticamente para residentes.
+
+Hay siete perfiles de la base previa, seis selectores de referencia (cinco
+ecuaciones) y tres familias descriptivas. Catálogo versión 6, con clave separada
+`normalizadores_referencia_disponibles`. Los ejemplos calculan z sin redondeo
+previo; el modelo de imágenes usa su varianza dependiente del predicho.
+
+Prueba específica:
+
+```powershell
+php artisan test --compact --filter='NormalizacionReferenciasEspanaTest|referencias_espanolas_se_integran_desde_sql' --colors=never
+```
+
+PASS: **32 pruebas / 898 aserciones**. Incluye las cinco ecuaciones, contexto
+común y validez individual del perfil conjunto, tipado, fuentes, estado técnico,
+ausencia de clasificación y una prueba SQL de seis aplicaciones sintéticas.
+
+Suite relacionada:
+
+```powershell
+php artisan test --compact --filter='NormalizacionReferenciasEspanaTest|RecuerdoConClavesFcsrtInvestigadoTest|LenguajeWabCastellanoInvestigadoTest|InterpretacionInstrumentalFaseTresTest|NormalizacionInstrumentalInvestigadaTest|NormalizacionBateriaBolivia2015Test|PerfilInstrumentalInstitucionalTest|CapturaInstrumentalInstitucionalTest|PreparacionInstrumentalInvestigadaTest' --colors=never
+```
+
+PASS SQLite: **210 pruebas / 2522 aserciones**, 68.87 s.
+
+```powershell
+pwsh -NoProfile -File scripts/probar-postgres.ps1 -Filtro 'NormalizacionReferenciasEspanaTest|RecuerdoConClavesFcsrtInvestigadoTest|LenguajeWabCastellanoInvestigadoTest|InterpretacionInstrumentalFaseTresTest|NormalizacionInstrumentalInvestigadaTest|NormalizacionBateriaBolivia2015Test|PerfilInstrumentalInstitucionalTest|CapturaInstrumentalInstitucionalTest|PreparacionInstrumentalInvestigadaTest'
+```
+
+PASS PostgreSQL desechable: **210 pruebas / 2521 aserciones**, 91.205 s.
+Evidencia temporal `remembermind-pg-6f41560d8f6e4844948090986e19cba7.junit.xml`
+y `.log`; clúster propio detenido y eliminado. No se ejecutó contra la base
+operativa. Pint, sintaxis y revisión de espacios: PASS. Los resultados de pruebas
+no sustituyen revisión experta independiente ni validación clínica.
+
+Integración: se reutilizan registro, extractor, captura autorizada SQL, perfil y
+explicación. No hay nuevas tablas, permisos, reglas, datos reales o cambios de
+configuración institucional. No se ejecuta Petersen/G09 sobre residentes. Sin
+cambio frontend: build/QA visual no aplican.
+
+Archivos propios de este incremento:
+
+- `motor-experto/src/motor_experto/dominio/instrumentos/NormalizadorReferenciasEspana.php` (nuevo).
+- `motor-experto/src/motor_experto/dominio/instrumentos/RegistroMetodosInstrumentales.php`.
+- `motor-experto/src/motor_experto/dominio/instrumentos/CatalogoCapturaCognitiva.php`.
+- `tests/Unit/NormalizacionReferenciasEspanaTest.php` (nuevo).
+- `tests/Feature/CapturaInstrumentalInstitucionalTest.php`.
+- `docs/sistema-experto/NORMALIZACIONES_REFERENCIA_2026_10_19.md` (nuevo).
+- `docs/sistema-experto/MANUAL_INVESTIGADO_MAYORES_60_2026_10_19.md`.
+- `docs/sistema-experto/INVESTIGACION_PROFESIONAL_19_COMPONENTES_2026_10_19.md`.
+- `docs/sistema-experto/README.md`.
+- Este seguimiento.
+
+Se excluyen cambios concurrentes de reglas, compiladores, motor experimental,
+Institución, provider y sus pruebas. Dictamen: normalizaciones documentadas e
+implementadas dentro de su referencia; **fase 3 aún no cerrada** por los ocho
+algoritmos pendientes y la pertinencia institucional que falta acreditar.
+
+Auditoría final documental: PASS, cincuenta y siete enlaces locales existentes
+en los cinco documentos de este incremento. Revisión propia del código: sin
+dependencias V1, consultas SQL ni llamadas a clasificación en el nuevo normalizador.

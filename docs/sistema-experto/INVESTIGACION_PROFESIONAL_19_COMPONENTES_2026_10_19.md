@@ -1,8 +1,15 @@
 # O.R.I.O.N. — Investigación de los 19 componentes cognitivos
 
-Fecha de corte: 19 de octubre de 2026. Versión documental 1.2.
+Fecha de corte: 19 de octubre de 2026. Versión documental 1.3.
 Destinatarios: Medicina, Psicología y equipo de desarrollo de RememberMind.
 Estado: investigación e implementación instrumental parcial; no validación clínica.
+
+**Normalizaciones posteriores implementadas:** el [contrato de referencia](NORMALIZACIONES_REFERENCIA_2026_10_19.md)
+registra cinco ecuaciones adicionales de SABIEX/pFCSRT y su integración. Hay once
+componentes con algoritmo normativo disponible contando las referencias españolas;
+ocho componentes continúan sin conversión completa. Esta cobertura técnica no
+afirma adopción institucional o validación clínica. Los cortes siguientes conservan
+el recorrido previo y sus pendientes a esa fecha.
 
 **Ampliación geriátrica:** el [manual investigado para mayores de 60](MANUAL_INVESTIGADO_MAYORES_60_2026_10_19.md)
 documenta originales completos SABIEX, pFCSRT+IR de 2025, Token chileno y manuales
