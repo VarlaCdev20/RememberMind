@@ -7,6 +7,8 @@ namespace Tests\Feature;
 use App\Models\AplicacionInstrumento;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
+use App\Models\Atencion;
+use App\Models\DocumentoClinico;
 use App\Models\Instrumento;
 use App\Models\Jornada;
 use App\Models\OpcionPregunta;
@@ -28,6 +30,7 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -276,6 +279,96 @@ final class CapturaInstrumentalFormularioTest extends TestCase
         $this->usuario->syncRoles(['SUPERADMINISTRADOR']);
         Livewire::test(EvaluacionesAreaPanel::class, ['codArea' => 'ARE_COG'])->assertOk();
         Livewire::test(SaludEvaluacionesGeriatricasPanel::class, ['adulto' => $this->residente])->assertOk();
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+    }
+
+    private function abrirTranscripcion()
+    {
+        Storage::fake('local');
+        Storage::disk('local')->put('original.txt', 'Original sintético de captura completa.');
+        $doc = DocumentoClinico::create(['cod_residente' => $this->residente->getKey(), 'cod_personal' => $this->personal->getKey(),
+            'tipo_documento' => 'INFORME', 'titulo' => 'Original sintético', 'ruta_archivo' => 'original.txt', 'formato' => 'text/plain',
+            'hash_archivo' => hash('sha256', 'Original sintético de captura completa.'), 'fecha_hora' => now(), 'estado' => 'VIGENTE']);
+
+        return $this->abrir()->set('cod_instrumento', $this->instrumento->getKey())->set('transcripcion', true)
+            ->set('cod_documento_clinico', $doc->getKey())->set('cod_personal_original', $this->personal->getKey())
+            ->set('localizador_fuente', 'Página 1 / ficha 1')->set('original_cotejado', true)
+            ->set('fecha_eval', '2023-11-15')->set('hora_eval', '08:20:10');
+    }
+
+    public function test_transcripcion_completa_conserva_puntajes_cero_notas_y_cabecera_original_desde_formulario(): void
+    {
+        $this->preguntas['NUMERICO']->update(['puntaje_maximo' => 5]);
+        $this->preguntas['OPCION']->update(['puntaje_maximo' => 2]);
+        $opcion = OpcionPregunta::create(['cod_pregunta' => $this->preguntas['OPCION']->getKey(), 'nombre' => 'Opción sintética', 'puntaje' => 2, 'orden' => 1, 'estado' => 'ACTIVO']);
+        $atencion = Atencion::create(['cod_residente' => $this->residente->getKey(), 'cod_personal' => $this->personal->getKey(),
+            'cod_area' => AsignacionPersonal::sole()->cod_area, 'fecha_hora' => '2023-11-15 08:20:10', 'tipo_atencion' => 'SEGUIMIENTO_DIARIO', 'motivo' => 'Atención original sintética', 'estado' => 'FINALIZADA']);
+        $this->abrirTranscripcion()->assertSee('Datos adicionales que figuran en el original')
+            ->set('cod_atencion', $atencion->getKey())->set('clasificacion_original', 'Etiqueta original sintética')
+            ->set('interpretacion_original', 'Texto original sintético, no conclusión del motor.')
+            ->set('valores.'.$this->preguntas['NUMERICO']->getKey(), 0)->set('puntajesOriginales.'.$this->preguntas['NUMERICO']->getKey(), '0')
+            ->set('observacionesRespuesta.'.$this->preguntas['NUMERICO']->getKey(), 'Nota original sintética de la respuesta.')
+            ->set('valores.'.$this->preguntas['OPCION']->getKey(), $opcion->getKey())->set('puntajesOriginales.'.$this->preguntas['OPCION']->getKey(), '2')
+            ->call('revisar')->assertSet('estadoConciliacion', 'NUEVA')->assertSet('confirmando', true)->call('guardar')->assertHasNoErrors();
+        $a = AplicacionInstrumento::sole();
+        self::assertSame($atencion->getKey(), $a->cod_atencion);
+        self::assertSame('Etiqueta original sintética', $a->clasificacion);
+        self::assertSame('Texto original sintético, no conclusión del motor.', $a->interpretacion);
+        self::assertNull($a->puntaje_total);
+        self::assertDatabaseHas('respuestas_instrumento', ['cod_aplicacion' => $a->getKey(), 'cod_pregunta' => $this->preguntas['NUMERICO']->getKey(), 'valor_numero' => 0, 'puntaje' => 0, 'observacion' => 'Nota original sintética de la respuesta.']);
+        self::assertDatabaseHas('respuestas_instrumento', ['cod_aplicacion' => $a->getKey(), 'cod_opcion' => $opcion->getKey(), 'puntaje' => 2]);
+    }
+
+    public function test_cotejo_rechaza_puntuacion_incompatible_en_formulario_y_conserva_la_entrada(): void
+    {
+        $opcion = OpcionPregunta::create(['cod_pregunta' => $this->preguntas['OPCION']->getKey(), 'nombre' => 'Opción sintética', 'puntaje' => 2, 'orden' => 1, 'estado' => 'ACTIVO']);
+        $this->abrirTranscripcion()->set('valores.'.$this->preguntas['OPCION']->getKey(), $opcion->getKey())
+            ->set('puntajesOriginales.'.$this->preguntas['OPCION']->getKey(), 1)->call('revisar')
+            ->assertHasErrors('registro')->assertSet('confirmando', false)->assertSet('puntajesOriginales.'.$this->preguntas['OPCION']->getKey(), 1)
+            ->assertSee('La puntuación original no coincide');
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+        self::assertDatabaseCount('respuestas_instrumento', 0);
+    }
+
+    public function test_puntuacion_ausente_sigue_null_y_cambiarla_invalida_confirmacion(): void
+    {
+        $this->preguntas['NUMERICO']->update(['puntaje_maximo' => 5]);
+        $c = $this->abrirTranscripcion()->set('valores.'.$this->preguntas['NUMERICO']->getKey(), 0)->call('revisar')
+            ->assertSet('confirmando', true)->set('puntajesOriginales', [$this->preguntas['NUMERICO']->getKey() => 0])
+            ->assertSet('confirmando', false)->call('guardar')->assertHasErrors('registro');
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+        $c->set('puntajesOriginales', [])->call('revisar')->call('guardar')->assertHasNoErrors();
+        self::assertNull(RespuestaInstrumento::sole()->puntaje);
+    }
+
+    public function test_metadatos_sin_respuesta_se_conservan_al_cerrar_y_no_permiten_puntuar_una_pregunta_ajena(): void
+    {
+        $c = $this->abrirTranscripcion()->set('observacionesRespuesta.'.$this->preguntas['NUMERICO']->getKey(), 'Nota sintética')
+            ->call('cerrar')->assertSet('confirmarDescarte', true)->call('volver')
+            ->set('valores.'.$this->preguntas['LOGICO']->getKey(), false)->call('revisar')
+            ->assertHasErrors('observacionesRespuesta.'.$this->preguntas['NUMERICO']->getKey());
+        $c->set('observacionesRespuesta', [])->set('puntajesOriginales.PREGUNTA_AJENA', 0)->call('revisar')->assertHasErrors('puntajesOriginales.PREGUNTA_AJENA');
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+    }
+
+    public function test_datos_de_transcripcion_ocultos_no_se_incorporan_a_una_aplicacion_propia(): void
+    {
+        $this->abrir()->set('cod_instrumento', $this->instrumento->getKey())->set('valores.'.$this->preguntas['NUMERICO']->getKey(), 0)
+            ->set('puntajesOriginales.'.$this->preguntas['NUMERICO']->getKey(), 999)->set('clasificacion_original', 'No pertenece a captura propia')
+            ->set('observacionesRespuesta.'.$this->preguntas['NUMERICO']->getKey(), 'Tampoco pertenece a captura propia')
+            ->call('revisar')->call('guardar')->assertHasNoErrors();
+        self::assertNull(AplicacionInstrumento::sole()->clasificacion);
+        self::assertNull(RespuestaInstrumento::sole()->puntaje);
+        self::assertNull(RespuestaInstrumento::sole()->observacion);
+    }
+
+    public function test_se_puede_elegir_transcripcion_antes_del_primer_residente_sin_transferir_los_datos_a_otro(): void
+    {
+        $otro = Residente::factory()->create(['estado' => 'ADMITIDO']);
+        Livewire::test(EvaluacionGeriatricaAreaModal::class)->call('abrir', [])
+            ->set('transcripcion', true)->set('cod_residente', $this->residente->getKey())
+            ->assertHasNoErrors('cod_residente')->assertSet('cod_residente', $this->residente->getKey())
+            ->set('cod_residente', $otro->getKey())->assertHasErrors('cod_residente')->assertSet('cod_residente', $this->residente->getKey());
         self::assertDatabaseCount('aplicaciones_instrumento', 0);
     }
 }

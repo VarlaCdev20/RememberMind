@@ -32,7 +32,7 @@ POST /admin/instrumentos/{instrumento}/residentes/{residente}/transcripciones/co
 POST /admin/instrumentos/{instrumento}/residentes/{residente}/transcripciones
 ```
 
-La API permite aportar puntuaciones originales por respuesta y metadatos completos de cabecera. El modal conserva respuestas tipadas y procedencia; la captura detallada de puntuaciones originales por respuesta/campos adicionales de cabecera se realiza por ese contrato de conciliación. No se cargaron nuevos registros de residentes en esta entrega.
+La API y el modal permiten aportar puntuaciones y observaciones originales por respuesta, así como atención, clasificación e interpretación consignadas en el original. El modal muestra estos campos adicionales solo en transcripción, conserva NULL/cero y exige revisar de nuevo si cambian después de confirmar. Una puntuación incompatible con el catálogo no se sustituye: se informa el conflicto sin guardar. La clasificación transcrita se identifica como texto del original, no como una conclusión nueva de O.R.I.O.N. No se cargaron nuevos registros de residentes en esta entrega.
 
 ## Investigación y límites del dato
 
@@ -72,9 +72,30 @@ La evidencia detallada y el respaldo están en almacenamiento privado local, exc
 - [x] Conciliación, reintento, vinculación y rectificación sin duplicados ni pérdida de historia.
 - [x] Controles backend, auditoría atómica y pruebas SQLite/PostgreSQL.
 - [x] Formularios y consultas conectados; build verificado.
+- [x] Puntuaciones/notas por respuesta y cabecera original disponibles desde el modal, con conciliación previa y protección de cambios.
 - [ ] Identificar/cotejar los protocolos realmente aplicados y sus mediciones/condiciones originales ausentes.
 - [ ] Activar solo perfiles cuyas PK, preguntas y edición/forma/idioma estén acreditados.
 - [ ] Ejecutar una nueva carga histórica desde esos originales, con conciliación previa.
 - [ ] Comprobar visualmente el recorrido, foco y reflow en los viewports institucionales.
 
 Los cuatro pendientes no se cierran creando datos ni convirtiendo bibliografía en autoría histórica. La trazabilidad exacta de una evaluación experta conservada, incluidos definiciones/selectores/versiones, mantiene el alcance de la fase 6.
+
+## Seguimiento de los pendientes del 19/10/2026
+
+Se completó la parte de captura que antes solo estaba disponible por API. Se verificaron puntuación cero, puntuación ausente, incompatibilidad con la opción, nota original, cabecera, confirmación invalidada, datos ocultos excluidos de captura propia y dirty state. La revisión independiente detectó un bloqueo al elegir transcripción antes del primer residente: corregido y cubierto por regresión, conservando la protección al cambiar entre residentes.
+
+Evidencia del incremento, sobre el candidato aislado y sin datos operativos: **78 pruebas / 1845 aserciones SQLite PASS** (captura, transcripción, seguridad y límites de capas); **73 pruebas / 653 aserciones PostgreSQL PASS** (captura, transcripción y seguridad). PostgreSQL se creó con runner/base desechables y su parada fue confirmada. `npm run build`, Pint y revisión independiente del cierre: **PASS**. No se repitió la suite global ni se modificaron tablas, permisos o registros clínicos en este incremento.
+
+La comprobación adicional de fuentes fue de solo lectura. Los siete archivos conservados siguen íntegros. El catálogo contiene Barthel y diecinueve registros nominales de componentes; las respuestas nominales no aportan los ensayos/aciertos/tiempos requeridos por los métodos cognitivos investigados. Las versiones y condiciones genéricas del paquete no identifican una edición/forma realmente administrada. Las menciones textuales a pruebas se conservan como contenido de origen, junto a la declaración de la propietaria; no se usan para negar por sí solas que las observaciones sean reales. No se estableció una equivalencia instrumental no documentada ni se ejecutó una nueva carga.
+
+**Dictamen visual: FAIL por cobertura incompleta, sin defecto visual observado.** Después de la indicación de que Work estaba habilitado, se reinició la sesión CUA y se volvió a consultar su inventario. Continuó devolviendo `Local browser use is disabled in Work settings`, con cero navegadores disponibles. No se empleó otra vía para sortear esa restricción.
+
+| Criterio visual/funcional | Cobertura real | Estado |
+| --- | --- | --- |
+| Render del formulario, metadatos, validaciones y persistencia | Pruebas Livewire y backend con registros sintéticos | Verificado por pruebas; no acredita CSS ni interacción física |
+| 1440, 1280, 1024, 768 y 390 CSS px; tema y reflow | Sin superficie de navegador accesible | Pendiente |
+| Teclado, foco/trap/retorno, Escape y backdrop | Sin interacción real accesible | Pendiente |
+| Contraste, targets táctiles, textos visibles y estados de carga | Sin capturas actuales | Pendiente |
+| Revisión de identidad aplicada y mediciones históricas | Fuentes disponibles no identifican los protocolos requeridos | Pendiente de originales, no de autorización profesional |
+
+Este seguimiento cierra la limitación técnica de captura detallada. No cambia a completas las casillas de fuentes, perfiles, nueva carga ni QA visual sin sus evidencias correspondientes.

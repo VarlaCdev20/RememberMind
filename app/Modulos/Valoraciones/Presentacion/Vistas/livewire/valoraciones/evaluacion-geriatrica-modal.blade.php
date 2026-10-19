@@ -64,6 +64,18 @@
                         </label>
                         @error('original_cotejado')<p id="captura-cotejo-{{ $this->getId() }}-error" role="alert" class="rm-error">{{ $message }}</p>@enderror
                         <p class="text-sm text-rm-secondary">Conserva el autor y la hora que figuran en el original. Una rectificación añade otra aplicación; no reemplaza la anterior.</p>
+                        <details class="space-y-3" @if($errors->has('cod_atencion') || $errors->has('clasificacion_original') || $errors->has('interpretacion_original')) open @endif>
+                            <summary class="cursor-pointer font-semibold">Datos adicionales que figuran en el original</summary>
+                            <p class="text-sm text-rm-secondary">Copia estos datos solo si constan en el documento. No representan una conclusión nueva de O.R.I.O.N.</p>
+                            @foreach(['cod_atencion' => 'Código de la atención original, si consta', 'clasificacion_original' => 'Clasificación consignada en el original'] as $campo => $etiqueta)
+                                <x-ui.field :for="'captura-'.$campo.'-'.$this->getId()" :label="$etiqueta" :error="$campo">
+                                    <input id="captura-{{ $campo }}-{{ $this->getId() }}" class="rm-input" type="text" wire:model="{{ $campo }}" maxlength="{{ $campo === 'cod_atencion' ? 20 : 80 }}" aria-invalid="{{ $errors->has($campo) ? 'true' : 'false' }}" @if($errors->has($campo)) aria-describedby="captura-{{ $campo }}-{{ $this->getId() }}-error" @endif @disabled($confirmando)>
+                                </x-ui.field>
+                            @endforeach
+                            <x-ui.field :for="'captura-interpretacion-'.$this->getId()" label="Interpretación consignada en el original" error="interpretacion_original">
+                                <textarea id="captura-interpretacion-{{ $this->getId() }}" class="rm-input" rows="3" wire:model="interpretacion_original" maxlength="4000" aria-invalid="{{ $errors->has('interpretacion_original') ? 'true' : 'false' }}" @if($errors->has('interpretacion_original')) aria-describedby="captura-interpretacion-{{ $this->getId() }}-error" @endif @disabled($confirmando)></textarea>
+                            </x-ui.field>
+                        </details>
                     @endif
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <x-ui.field :for="'captura-fecha-'.$this->getId()" label="Fecha original" error="fecha_eval" required>
@@ -102,6 +114,17 @@
                                         <p class="text-sm" role="status">El tipo de respuesta de esta pregunta requiere revisión del catálogo.</p>
                                     @endif
                                 </x-ui.field>
+                                @if($transcripcion && $pregunta['campo'] !== null)
+                                    <details class="mt-2 space-y-3" @if($errors->has('puntajesOriginales.'.$pregunta['codigo']) || $errors->has('observacionesRespuesta.'.$pregunta['codigo'])) open @endif>
+                                        <summary class="cursor-pointer text-sm font-semibold">Puntuación y observación del original, si constan</summary>
+                                        <x-ui.field :for="'captura-puntaje-'.$this->getId().'-'.$pregunta['codigo']" label="Puntuación original de esta respuesta" :error="'puntajesOriginales.'.$pregunta['codigo']" help="Deja vacío si no consta. Cero debe escribirse como 0; no se completa desde el catálogo actual.">
+                                            <input id="captura-puntaje-{{ $this->getId() }}-{{ $pregunta['codigo'] }}" type="number" step="0.01" min="0" max="999999.99" class="rm-input" wire:model="puntajesOriginales.{{ $pregunta['codigo'] }}" aria-invalid="{{ $errors->has('puntajesOriginales.'.$pregunta['codigo']) ? 'true' : 'false' }}" aria-describedby="captura-puntaje-{{ $this->getId() }}-{{ $pregunta['codigo'] }}-help{{ $errors->has('puntajesOriginales.'.$pregunta['codigo']) ? ' captura-puntaje-'.$this->getId().'-'.$pregunta['codigo'].'-error' : '' }}" @disabled($confirmando)>
+                                        </x-ui.field>
+                                        <x-ui.field :for="'captura-nota-'.$this->getId().'-'.$pregunta['codigo']" label="Observación original de esta respuesta" :error="'observacionesRespuesta.'.$pregunta['codigo']">
+                                            <textarea id="captura-nota-{{ $this->getId() }}-{{ $pregunta['codigo'] }}" rows="2" maxlength="4000" class="rm-input" wire:model="observacionesRespuesta.{{ $pregunta['codigo'] }}" aria-invalid="{{ $errors->has('observacionesRespuesta.'.$pregunta['codigo']) ? 'true' : 'false' }}" @if($errors->has('observacionesRespuesta.'.$pregunta['codigo'])) aria-describedby="captura-nota-{{ $this->getId() }}-{{ $pregunta['codigo'] }}-error" @endif @disabled($confirmando)></textarea>
+                                        </x-ui.field>
+                                    </details>
+                                @endif
                             </div>
                         @endforeach
                     </div>

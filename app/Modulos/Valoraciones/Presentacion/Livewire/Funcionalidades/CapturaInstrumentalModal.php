@@ -76,6 +76,16 @@ abstract class CapturaInstrumentalModal extends Component
 
     public array $valores = [];
 
+    public array $puntajesOriginales = [];
+
+    public array $observacionesRespuesta = [];
+
+    public ?string $cod_atencion = null;
+
+    public string $clasificacion_original = '';
+
+    public string $interpretacion_original = '';
+
     #[Locked]
     public array $preguntas = [];
 
@@ -108,6 +118,7 @@ abstract class CapturaInstrumentalModal extends Component
         abort_if($this->residenteFijo !== null && $codigoResidente !== $this->residenteFijo, 403);
         $contexto = $codigoResidente !== null ? $consulta->contexto(auth()->user(), $codigoResidente) : [];
         $this->reset(['cod_instrumento', 'instrumentoSeleccionado', 'codigoReservado', 'aplicacionGuardada', 'valores', 'preguntas',
+            'puntajesOriginales', 'observacionesRespuesta', 'cod_atencion', 'clasificacion_original', 'interpretacion_original',
             'observaciones', 'confirmando', 'confirmarDescarte', 'busquedaResidente', 'huellaCatalogo', 'huellaConfirmacion',
             'transcripcion', 'cod_documento_clinico', 'cod_personal_original', 'localizador_fuente', 'original_cotejado', 'cod_aplicacion_anterior', 'cod_aplicacion_existente', 'motivo_rectificacion', 'estadoConciliacion']);
         $this->resetValidation();
@@ -121,7 +132,7 @@ abstract class CapturaInstrumentalModal extends Component
 
     public function updatedCodResidente(?string $value): void
     {
-        if ($this->hayRespuestas()) {
+        if ($this->residenteSeleccionado !== null && $this->tieneCambios()) {
             $this->cod_residente = $this->residenteSeleccionado;
             $this->addError('cod_residente', 'Descarta o registra las respuestas antes de cambiar de residente.');
 
@@ -156,8 +167,9 @@ abstract class CapturaInstrumentalModal extends Component
         if ($property === 'transcripcion' && $this->transcripcion) {
             $this->fecha_eval = $this->hora_eval = '';
         }
-        if (str_starts_with($property, 'valores.') || in_array($property, ['valores', 'cod_residente', 'cod_instrumento', 'observaciones', 'fecha_eval', 'hora_eval',
-            'transcripcion', 'cod_documento_clinico', 'cod_personal_original', 'localizador_fuente', 'original_cotejado', 'cod_aplicacion_anterior', 'cod_aplicacion_existente', 'motivo_rectificacion'], true)) {
+        if (str_starts_with($property, 'valores.') || str_starts_with($property, 'puntajesOriginales.') || str_starts_with($property, 'observacionesRespuesta.')
+            || in_array($property, ['valores', 'puntajesOriginales', 'observacionesRespuesta', 'cod_atencion', 'clasificacion_original', 'interpretacion_original', 'cod_residente', 'cod_instrumento', 'observaciones', 'fecha_eval', 'hora_eval',
+                'transcripcion', 'cod_documento_clinico', 'cod_personal_original', 'localizador_fuente', 'original_cotejado', 'cod_aplicacion_anterior', 'cod_aplicacion_existente', 'motivo_rectificacion'], true)) {
             $this->confirmando = false;
             $this->huellaConfirmacion = null;
         }
@@ -170,6 +182,10 @@ abstract class CapturaInstrumentalModal extends Component
             try {
                 $this->estadoConciliacion = app(AplicarInstrumento::class)->conciliar(auth()->user(), $entrada,
                     Instrumento::query()->findOrFail($this->cod_instrumento), Residente::query()->findOrFail($this->cod_residente))['estado'];
+            } catch (ValidationException $e) {
+                $this->mostrarErroresRegistro($e, $entrada);
+
+                return;
             } catch (HttpException $e) {
                 if (! in_array($e->getStatusCode(), [409, 422], true)) {
                     throw $e;
@@ -209,11 +225,7 @@ abstract class CapturaInstrumentalModal extends Component
             $aplicacion = $this->transcripcion ? $accion->transcribir(auth()->user(), $entrada, $instrumento, $residente, $this->huellaCatalogo)
                 : $accion->aplicar(auth()->user(), $entrada, $instrumento, $residente, $this->codigoReservado, $this->huellaCatalogo);
         } catch (ValidationException $e) {
-            foreach ($e->errors() as $campo => $mensajes) {
-                $destino = preg_match('/^respuestas\.(\d+)\./', $campo, $m)
-                    ? 'valores.'.$entrada['respuestas'][(int) $m[1]]['cod_pregunta'] : 'registro';
-                $this->addError($destino, implode(' ', $mensajes));
-            }
+            $this->mostrarErroresRegistro($e, $entrada);
 
             return;
         } catch (QueryException $e) {
@@ -232,6 +244,7 @@ abstract class CapturaInstrumentalModal extends Component
         $this->aplicacionGuardada = $aplicacion->getKey();
         $this->mostrar = $this->confirmando = false;
         $this->valores = [];
+        $this->puntajesOriginales = $this->observacionesRespuesta = [];
         $this->observaciones = '';
         $this->dispatch('evaluacion-geriatrica-guardada', codAplicacion: $aplicacion->getKey());
         $this->dispatch('swal:alert', ['type' => 'success', 'title' => 'Captura registrada',
@@ -249,11 +262,32 @@ abstract class CapturaInstrumentalModal extends Component
         return hash('sha256', json_encode([$this->cod_residente, $this->cod_instrumento, $this->huellaCatalogo, $entrada], JSON_THROW_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION));
     }
 
+    private function mostrarErroresRegistro(ValidationException $e, array $entrada): void
+    {
+        foreach ($e->errors() as $campo => $mensajes) {
+            $destino = 'registro';
+            if (preg_match('/^respuestas\.(\d+)\.(\w+)$/', $campo, $m) && isset($entrada['respuestas'][(int) $m[1]])) {
+                $destino = match ($m[2]) {
+                    'puntaje' => 'puntajesOriginales', 'observacion' => 'observacionesRespuesta', default => 'valores',
+                }.'.'.$entrada['respuestas'][(int) $m[1]]['cod_pregunta'];
+            } elseif (in_array($campo, ['cod_documento_clinico', 'cod_personal_original', 'localizador_fuente', 'original_cotejado',
+                'cod_aplicacion_anterior', 'cod_aplicacion_existente', 'motivo_rectificacion', 'cod_atencion'], true)) {
+                $destino = $campo;
+            }
+            $this->addError($destino, implode(' ', $mensajes));
+        }
+    }
+
     private function entrada(): array
     {
         $this->comprobarResidente();
         $this->validate(['cod_instrumento' => 'required|string', 'fecha_eval' => 'required|date_format:Y-m-d|before_or_equal:today',
             'hora_eval' => 'required|date_format:H:i:s,H:i', 'observaciones' => 'nullable|string|max:4000', 'valores' => 'array']);
+        if ($this->transcripcion) {
+            $this->validate(['puntajesOriginales' => 'array', 'puntajesOriginales.*' => 'nullable|numeric|min:0|max:999999.99|decimal:0,2',
+                'observacionesRespuesta' => 'array', 'observacionesRespuesta.*' => 'nullable|string|max:4000',
+                'cod_atencion' => 'nullable|string', 'clasificacion_original' => 'nullable|string|max:80', 'interpretacion_original' => 'nullable|string|max:4000']);
+        }
         $fechaOriginal = $this->fecha_eval.' '.$this->hora_eval.(strlen($this->hora_eval) === 5 ? ':00' : '');
         Validator::make(['hora_eval' => $fechaOriginal], ['hora_eval' => 'before_or_equal:now'],
             ['hora_eval.before_or_equal' => 'La fecha y hora originales no pueden ser futuras.'])->validate();
@@ -264,6 +298,15 @@ abstract class CapturaInstrumentalModal extends Component
         $preguntas = $catalogo['preguntas'];
         $porCodigo = array_column($preguntas, null, 'codigo');
         $respuestas = [];
+        if ($this->transcripcion) {
+            foreach (['puntajesOriginales', 'observacionesRespuesta'] as $grupo) {
+                foreach ($this->{$grupo} as $codigo => $valor) {
+                    if ($valor !== null && $valor !== '' && (! isset($porCodigo[$codigo]) || ($this->valores[$codigo] ?? null) === null || $this->valores[$codigo] === '')) {
+                        throw ValidationException::withMessages([$grupo.'.'.$codigo => 'Registra primero la respuesta original de esta pregunta.']);
+                    }
+                }
+            }
+        }
         foreach ($this->valores as $codigo => $valor) {
             if (! isset($porCodigo[$codigo]) || $porCodigo[$codigo]['campo'] === null) {
                 throw ValidationException::withMessages(['valores.'.$codigo => 'La pregunta no pertenece al instrumento activo.']);
@@ -277,7 +320,16 @@ abstract class CapturaInstrumentalModal extends Component
                 if ($campo === 'cod_opcion' && ! in_array($valor, array_column($porCodigo[$codigo]['opciones'], 'codigo'), true)) {
                     throw ValidationException::withMessages(['valores.'.$codigo => 'Selecciona una opción activa de esta pregunta.']);
                 }
-                $respuestas[] = ['cod_pregunta' => $codigo, $campo => $valor];
+                $respuesta = ['cod_pregunta' => $codigo, $campo => $valor];
+                if ($this->transcripcion) {
+                    foreach (['puntajesOriginales' => 'puntaje', 'observacionesRespuesta' => 'observacion'] as $grupo => $destino) {
+                        $dato = $this->{$grupo}[$codigo] ?? null;
+                        if ($dato !== null && $dato !== '') {
+                            $respuesta[$destino] = $dato;
+                        }
+                    }
+                }
+                $respuestas[] = $respuesta;
             }
         }
         if ($respuestas === []) {
@@ -287,6 +339,8 @@ abstract class CapturaInstrumentalModal extends Component
         return ['fecha_hora' => $fechaOriginal,
             'observacion' => $this->observaciones === '' ? null : $this->observaciones, 'respuestas' => $respuestas]
             + ($this->transcripcion ? ['cod_documento_clinico' => $this->cod_documento_clinico, 'cod_personal_original' => $this->cod_personal_original,
+                'cod_atencion' => $this->cod_atencion ?: null, 'clasificacion' => $this->clasificacion_original === '' ? null : $this->clasificacion_original,
+                'interpretacion' => $this->interpretacion_original === '' ? null : $this->interpretacion_original,
                 'localizador_fuente' => $this->localizador_fuente, 'original_cotejado' => $this->original_cotejado,
                 'cod_aplicacion_existente' => $this->cod_aplicacion_existente ?: null,
                 'cod_aplicacion_anterior' => $this->cod_aplicacion_anterior ?: null, 'motivo_rectificacion' => $this->motivo_rectificacion ?: null] : []);
@@ -300,7 +354,8 @@ abstract class CapturaInstrumentalModal extends Component
 
     private function hayRespuestas(): bool
     {
-        return $this->observaciones !== '' || count(array_filter($this->valores, fn ($v) => $v !== null && $v !== '')) > 0;
+        return $this->observaciones !== '' || $this->cod_atencion !== null || $this->clasificacion_original !== '' || $this->interpretacion_original !== ''
+            || count(array_filter([...array_values($this->valores), ...array_values($this->puntajesOriginales), ...array_values($this->observacionesRespuesta)], fn ($v) => $v !== null && $v !== '')) > 0;
     }
 
     public function cerrar(): void
@@ -317,6 +372,7 @@ abstract class CapturaInstrumentalModal extends Component
     {
         $this->mostrar = $this->confirmando = $this->confirmarDescarte = false;
         $this->valores = [];
+        $this->puntajesOriginales = $this->observacionesRespuesta = [];
         $this->observaciones = '';
         $this->resetValidation();
     }
