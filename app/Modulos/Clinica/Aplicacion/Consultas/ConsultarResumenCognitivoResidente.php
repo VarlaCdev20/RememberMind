@@ -3,6 +3,7 @@
 namespace App\Modulos\Clinica\Aplicacion\Consultas;
 
 use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
+use App\Compartido\Aplicacion\Contratos\EnlacesAplicacion;
 use App\Models\ControlCognitivo;
 use App\Models\EvaluacionExperta;
 use App\Models\Residente;
@@ -20,6 +21,7 @@ final class ConsultarResumenCognitivoResidente
     public function __construct(
         private readonly ContextoEjecucion $contexto,
         private readonly LecturaResultadosExperto $experto,
+        private readonly EnlacesAplicacion $enlaces,
     ) {}
 
     /** Permite distinguir consulta restringida de ausencia de registros en la ficha compartida. */
@@ -85,7 +87,7 @@ final class ConsultarResumenCognitivoResidente
             'contradicciones' => $contradicciones, 'registros' => $registros,
             // El resultado experto conserva su propio estado y fecha; no sustituye las observaciones operativas.
             'experto' => $resultado,
-            'analisis_url' => route($usuario->hasRole('ENFERMEROS') && ! $usuario->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'SUPERADMINISTRADOR'])
+            'analisis_url' => $this->enlaces->destino($usuario->hasRole('ENFERMEROS') && ! $usuario->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'SUPERADMINISTRADOR'])
                 ? 'admin.enfermeria.pacientes.resultados-experto' : 'admin.medico.residente.resultados-experto', ['residente' => $residente->getKey()])];
     }
 

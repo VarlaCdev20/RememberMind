@@ -65,6 +65,10 @@ jobs:
           RM_BROWSER_HEADFUL: '1'
       - name: Independent expert engine
         run: php motor-experto/tests/independencia.php
+      - name: Verify laboratory test discovery
+        run: |
+          php vendor/phpunit/phpunit/phpunit --list-tests-xml pruebas-laboratorio-sqlite.xml
+          php scripts/verificar-pruebas-laboratorio.php pruebas-laboratorio-sqlite.xml sqlite
       - name: Full SQLite suite
         run: composer test -- --log-junit=phpunit-sqlite.xml
       - name: Verification evidence
@@ -74,6 +78,7 @@ jobs:
           name: quality-evidence
           path: |
             phpunit-sqlite.xml
+            pruebas-laboratorio-sqlite.xml
             npm-audit-full.json
 
   postgres-integration:
@@ -110,7 +115,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: mbstring, pdo_pgsql, gd, exif
+          extensions: mbstring, pdo_pgsql, pdo_sqlite, gd, exif
           coverage: none
       - uses: actions/setup-node@v4
         with:
@@ -133,14 +138,20 @@ jobs:
       - run: composer install --no-interaction --prefer-dist --no-progress
       - run: npm ci
       - run: npm run build
+      - name: Verify PostgreSQL laboratory test discovery
+        run: |
+          php vendor/phpunit/phpunit/phpunit -c phpunit.postgres.xml --filter 'AdquisicionPerfilExperimentalTest|ArchivoPerfilExperimentalTest|GestionConocimientoExperimentalTest|ConsolaPerfilExperimentalTest' --list-tests-xml pruebas-laboratorio-postgres.xml
+          php scripts/verificar-pruebas-laboratorio.php pruebas-laboratorio-postgres.xml postgres
       - name: PostgreSQL contracts, role login and concurrency
         run: >-
           php vendor/phpunit/phpunit/phpunit -c phpunit.postgres.xml
-          --filter 'FotografiasHeridasTest|FotografiasHeridasMigrationTest|GaleriaInstitucionalTest|GaleriaInstitucionalConcurrenciaPostgresTest|GerenciaDashboardTest|PersonalInstitucionalResponsiveTest|CodigosCorrelativosTest|AsignacionesJornadaPlanificadaTest|AccesoDashboardPorRolTest|AuthenticationTest|BddOperativaV2Test|ContratoPersonalInstitucionalTest|ContratoDocumentacionUsuarioTest|ContratoSeguridadCuentaTest|FichaCuidadosTest|CargaConocimientoOrionTest|ConocimientoPanelTest|RolesVistasPermisosMatrixTest|Fase3AdmisionAtomicidadTest|AlojamientoBloqueoPostgresTest|Fase3ConcurrenciaCamaPostgresTest|PersistenciaExpertaTest|InformeCognitivoTest|InformeNeurocognitivoTest|ResumenCognitivoResidenteTest|DolorMigrationTest|DesacoplamientoContextoTest|PanelAlertaPreparadoTest|ConsultasPorCapaTest|ExploradorAdministrativoTest|ApplicationBoundaryTest|DesacoplamientoArchivosTest|ReportesPortabilidadTest|FrontendRestauradoV2Test|PantallasConectadasTest|VistasModularesTest|DashboardAdministracionIntegracionVisualTest|GobiernoReglasExpertasTest|GobiernoReglasConcurrenciaPostgresTest|SucesionObservacionalTest|HallazgosObservacionalesTest|PreparacionInstrumentalInvestigadaTest'
+          --filter 'FotografiasHeridasTest|FotografiasHeridasMigrationTest|GaleriaInstitucionalTest|GaleriaInstitucionalConcurrenciaPostgresTest|GerenciaDashboardTest|PersonalInstitucionalResponsiveTest|CodigosCorrelativosTest|AsignacionesJornadaPlanificadaTest|AccesoDashboardPorRolTest|AuthenticationTest|BddOperativaV2Test|ContratoPersonalInstitucionalTest|ContratoDocumentacionUsuarioTest|ContratoSeguridadCuentaTest|FichaCuidadosTest|CargaConocimientoOrionTest|ConocimientoPanelTest|RolesVistasPermisosMatrixTest|Fase3AdmisionAtomicidadTest|AlojamientoBloqueoPostgresTest|Fase3ConcurrenciaCamaPostgresTest|PersistenciaExpertaTest|InformeCognitivoTest|InformeNeurocognitivoTest|ResumenCognitivoResidenteTest|DolorMigrationTest|DesacoplamientoContextoTest|PanelAlertaPreparadoTest|ConsultasPorCapaTest|ExploradorAdministrativoTest|ApplicationBoundaryTest|DesacoplamientoArchivosTest|ReportesPortabilidadTest|FrontendRestauradoV2Test|PantallasConectadasTest|VistasModularesTest|DashboardAdministracionIntegracionVisualTest|AdquisicionPerfilExperimentalTest|ArchivoPerfilExperimentalTest|GestionConocimientoExperimentalTest|ConsolaPerfilExperimentalTest|GobiernoReglasExpertasTest|GobiernoReglasConcurrenciaPostgresTest|SucesionObservacionalTest|HallazgosObservacionalesTest|PreparacionInstrumentalInvestigadaTest'
           --log-junit=phpunit-postgres.xml
       - name: PostgreSQL evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: postgres-evidence
-          path: phpunit-postgres.xml
+          path: |
+            phpunit-postgres.xml
+            pruebas-laboratorio-postgres.xml

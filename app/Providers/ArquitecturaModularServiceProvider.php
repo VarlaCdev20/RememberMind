@@ -141,6 +141,8 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
             \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\PaqueteObservacional::class);
         $this->app->bind(\App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConservacionObservacional::class,
             \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ConservarObservaciones::class);
+        $this->app->bind(\App\Modulos\ApoyoDecision\Aplicacion\Contratos\AlmacenEjecucionesExperimentales::class,
+            \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoEjecucionesExperimentales::class);
         $this->app->bind(ExtraccionFuentesCOGMEM::class, AdaptadorFuentesCOGMEM::class);
         $this->app->bind(ContextoEjecucion::class, ContextoEjecucionLaravel::class);
         $this->app->bind(EstadoPrevisualizacion::class, PrevisualizacionEnSesion::class);
@@ -163,7 +165,10 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
-            $this->commands([\App\Modulos\ApoyoDecision\Presentacion\Consola\SimularExpertoLocal::class]);
+            $this->commands([\App\Modulos\ApoyoDecision\Presentacion\Consola\SimularExpertoLocal::class,
+                \App\Modulos\ApoyoDecision\Presentacion\Consola\ProbarPerfilExperimental::class,
+                \App\Modulos\ApoyoDecision\Presentacion\Consola\ArchivarPerfilExperimental::class,
+                \App\Modulos\ApoyoDecision\Presentacion\Consola\GestionarReglasExperimentales::class]);
         }
         Gate::policy(\App\Models\FotografiaInstitucional::class, \App\Modulos\Institucion\Presentacion\Policies\FotografiaInstitucionalPolicy::class);
         Blade::component('ui.dashboard-welcome-header',

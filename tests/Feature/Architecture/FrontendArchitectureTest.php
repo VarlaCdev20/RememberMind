@@ -326,7 +326,16 @@ class FrontendArchitectureTest extends TestCase
         $this->assertStringContainsString('rm-clinical-card', $resumenFicha, 'El resumen de ficha debe usar cards clínicas canónicas.');
         $this->assertStringContainsString('rm-data-tile', $resumenFicha, 'Los datos de la ficha deben usar subpaneles canónicos.');
         $this->assertDoesNotMatchRegularExpression('/#[0-9a-fA-F]{3,8}\b/', $resumenFicha, 'El resumen de ficha no debe contener colores HEX locales.');
-        $this->assertStringNotContainsString('</a>', $resumenFicha, 'El resumen de ficha no debe conservar cierres de enlace inválidos.');
+        // Los parciales de trazabilidad enlazan al control original y al análisis;
+        // se rechazan cierres huérfanos y anidamiento, no enlaces válidos.
+        preg_match_all('/<\/?a(?=\s|>)[^>]*>/i', $resumenFicha, $enlaces);
+        $abierto = false;
+        foreach ($enlaces[0] as $enlace) {
+            $cierre = str_starts_with(strtolower($enlace), '</a');
+            $this->assertSame($cierre, $abierto, 'El resumen no debe contener enlaces anidados ni cierres huérfanos.');
+            $abierto = ! $cierre;
+        }
+        $this->assertFalse($abierto, 'El resumen no debe contener un enlace sin cierre.');
         $this->assertStringContainsString('$diagnosticosActivos', $ficha, 'La ficha debe preparar diagnósticos legibles para presentación.');
         $this->assertStringContainsString('$alergiasTexto', $ficha, 'La ficha debe preparar alergias legibles para presentación.');
         $this->assertStringNotContainsString('{{ $adultoMayor->diagnosticos }}', $resumenFicha, 'La ficha no debe serializar relaciones clínicas en la interfaz.');

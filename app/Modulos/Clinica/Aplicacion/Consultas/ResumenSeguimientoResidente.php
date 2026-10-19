@@ -2,11 +2,14 @@
 
 namespace App\Modulos\Clinica\Aplicacion\Consultas;
 
+use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
 use App\Models\Residente;
 use Carbon\CarbonImmutable;
 
 final class ResumenSeguimientoResidente
 {
+    public function __construct(private readonly ContextoEjecucion $contexto) {}
+
     /**
      * Recupera evaluaciones sucesivas de una ventana explícita tras reautorizar la ficha.
      * Respeta permisos de cada fuente y conserva valoraciones históricas legítimas.
@@ -18,8 +21,9 @@ final class ResumenSeguimientoResidente
         app(PrepararFichaClinica::class)->preparar($residente);
         // Ambas puertas existentes consultan valoraciones_funcionales; la segunda
         // es la lectura institucional utilizada por Medicina y el panel de Barthel.
-        $funcionalAutorizada = auth()->user()?->canAny(['valoraciones_funcionales.ver', 'valoracion_enfermeria.ver']) ?? false;
-        $instrumentosAutorizados = auth()->user()?->can('aplicaciones_instrumento.ver') ?? false;
+        $usuario = $this->contexto->usuario();
+        $funcionalAutorizada = $usuario?->canAny(['valoraciones_funcionales.ver', 'valoracion_enfermeria.ver']) ?? false;
+        $instrumentosAutorizados = $usuario?->can('aplicaciones_instrumento.ver') ?? false;
         $final = $incluirHasta ? '<=' : '<';
 
         return [

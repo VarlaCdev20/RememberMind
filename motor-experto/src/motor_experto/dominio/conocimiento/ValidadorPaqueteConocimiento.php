@@ -9,6 +9,14 @@ final class ValidadorPaqueteConocimiento
 {
     public function validar(PaqueteConocimiento $p): void
     {
+        $codigosRegla = [];
+        foreach ($p->tabla('reglas_expertas') as $regla) {
+            $codigo = $regla['codigo_regla'] ?? $regla['cod_regla_experta'];
+            if (! is_string($codigo) || trim($codigo) === '' || isset($codigosRegla[$codigo])) {
+                throw new DomainException('Código efectivo de regla ausente o duplicado.');
+            }
+            $codigosRegla[$codigo] = true;
+        }
         foreach (PaqueteConocimiento::CLAVES as $tabla => $pk) {
             foreach ($p->tabla($tabla) as $r) {
                 if (isset($r['cod_version_modelo']) && $r['cod_version_modelo'] !== $p->version) {

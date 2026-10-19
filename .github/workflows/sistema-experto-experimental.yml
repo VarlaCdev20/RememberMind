@@ -1,0 +1,38 @@
+name: Sistema experto experimental
+
+on:
+  pull_request:
+    paths:
+      - 'motor-experto/**'
+      - '.github/workflows/sistema-experto-experimental.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  laboratorio:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_sqlite
+      - name: Sintaxis del motor independiente
+        run: find motor-experto -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Reglas, cinco dominios y Petersen con fuentes ficticias
+        run: |
+          php motor-experto/tests/independencia.php
+          php motor-experto/tests/orion_independencia.php
+          php motor-experto/tests/g08_captura_y_muestras.php
+          php motor-experto/tests/g08_auditoria_instrumental.php
+          php motor-experto/tests/g08_anexos_bolivia.php
+          php motor-experto/tests/g09_experimental.php
+          php motor-experto/tests/g08_g09_puente.php
+          php motor-experto/tests/g08_g09_integracion_sqlite.php
+          php motor-experto/tests/g09_nucleo_semantico.php
+          php motor-experto/tests/orion_cinco_dominios_experimental.php
+          php motor-experto/tests/dcl_petersen_experimental.php
+          php motor-experto/tests/dcl_puente_referencias_experimental.php
+          php motor-experto/tests/dcl_puente_integracion_cinco_dominios.php

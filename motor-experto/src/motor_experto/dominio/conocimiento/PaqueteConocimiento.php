@@ -45,6 +45,19 @@ final readonly class PaqueteConocimiento
         return array_values($this->filas[$tabla] ?? []);
     }
 
+    /** Datos declarativos exportables, sin código ejecutable ni pérdida de las FK del paquete. */
+    public function declaracion(): array
+    {
+        $tablas = [];
+        foreach (self::CLAVES as $tabla => $pk) {
+            $tablas[$tabla] = $this->tabla($tabla);
+        }
+
+        return ['version' => $this->version, 'tablas' => $tablas, 'contratos_relaciones' => $this->contratosRelaciones,
+            'solo_pruebas_tecnicas' => $this->soloPruebasTecnicas, 'tipo_regla_resultado' => $this->tipoReglaResultado,
+            'contratos_extraccion' => $this->contratosExtraccion];
+    }
+
     public function fila(string $tabla, string $id): array
     {
         return $this->filas[$tabla][$id] ?? throw new DomainException('Referencia ausente del paquete: '.$tabla);
