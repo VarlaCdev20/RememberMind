@@ -2430,6 +2430,8 @@ No cambia PK/FK, relaciones ni inventario de tablas. Las ramas URINARIA/INTESTIN
 
 ## 60. `aplicaciones_instrumento` — Transaccional
 
+**Extensión aprobada 19/10/2026:** `cod_usuario_registro string(20) NULL` FK restrictiva a `usuarios.cod_usuario`; `registrado_en datetime(6) NULL`; `cod_documento_clinico string(20) NULL` FK restrictiva a `documentos_clinicos.cod_documento_clinico`; `localizador_fuente string(120) NULL`; `cod_aplicacion_anterior string(20) NULL` self-FK restrictiva. FK indexadas; usuario/instante y documento/localizador forman pares completos; localizador no vacío y antecesora distinta de sí misma. UNIQUE parcial documento/localizador para la primera transcripción y UNIQUE parcial de antecesora para una sucesora directa. Filas anteriores permanecen sin metadatos inventados. [Decisión y detalle de conciliación/4FN](../sistema-experto/PROPUESTA_FUENTES_ORIGINALES_FASE_2_2026_10_19.md). Sin nuevas tablas ni alteración de los atributos base siguientes.
+
 **PK:** `cod_aplicacion string(20)`
 
 

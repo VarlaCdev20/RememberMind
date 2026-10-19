@@ -173,7 +173,7 @@ final class CapturaInstrumentalFormularioTest extends TestCase
         $this->preguntas['NUMERICO']->update(['enunciado' => 'Pregunta sintética modificada']);
         $c->call('guardar')->assertHasErrors('cod_instrumento')->assertSet('mostrar', true)->assertSet('valores.'.$this->preguntas['NUMERICO']->getKey(), 3);
         try {
-            app(AplicarInstrumento::class)->aplicar($this->usuario, ['respuestas' => [['cod_pregunta' => $this->preguntas['NUMERICO']->getKey(), 'valor_numero' => 3]]],
+            app(AplicarInstrumento::class)->aplicar($this->usuario, ['fecha_hora' => '2026-10-19 09:00:00', 'respuestas' => [['cod_pregunta' => $this->preguntas['NUMERICO']->getKey(), 'valor_numero' => 3]]],
                 $this->instrumento, $this->residente, $codigo, $huella);
             self::fail('Debe rechazar un catálogo distinto.');
         } catch (ValidationException $e) {

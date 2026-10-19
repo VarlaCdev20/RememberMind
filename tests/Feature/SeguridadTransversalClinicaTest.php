@@ -5,8 +5,8 @@ namespace Tests\Feature;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Atencion;
-use App\Models\Jornada;
 use App\Models\Instrumento;
+use App\Models\Jornada;
 use App\Models\OpcionPregunta;
 use App\Models\PreguntaInstrumento;
 use App\Models\Residente;
@@ -109,6 +109,7 @@ class SeguridadTransversalClinicaTest extends TestCase
         ]);
 
         $respuesta = $this->actingAs($psicologa)->postJson(route('admin.instrumentos.aplicar', [$instrumento, $residente]), [
+            'fecha_hora' => now()->format('Y-m-d H:i:s'),
             'cod_atencion' => $atencion->cod_atencion,
             'puntaje_total' => 999,
             'puntaje_maximo' => 999,

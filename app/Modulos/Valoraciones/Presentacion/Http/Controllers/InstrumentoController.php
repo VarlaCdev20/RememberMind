@@ -27,4 +27,14 @@ class InstrumentoController extends Controller
     {
         return response()->json(app(AplicarInstrumento::class)->aplicar($request->user(), $request->all(), $instrumento, $residente), 201);
     }
+
+    public function conciliar(Request $request, Instrumento $instrumento, Residente $residente): JsonResponse
+    {
+        return response()->json(app(AplicarInstrumento::class)->conciliar($request->user(), $request->all(), $instrumento, $residente));
+    }
+
+    public function transcribir(Request $request, Instrumento $instrumento, Residente $residente): JsonResponse
+    {
+        return response()->json(app(AplicarInstrumento::class)->transcribir($request->user(), $request->all(), $instrumento, $residente));
+    }
 }

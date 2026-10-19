@@ -7,8 +7,10 @@ namespace Tests\Feature;
 use App\Models\AplicacionInstrumento;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
+use App\Models\DocumentoClinico;
 use App\Models\Instrumento;
 use App\Models\Jornada;
+use App\Models\OpcionPregunta;
 use App\Models\Personal;
 use App\Models\PreguntaInstrumento;
 use App\Models\Residente;
@@ -18,16 +20,22 @@ use App\Models\User;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\CapturasInstrumentalesResidente;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarPerfilInstrumental;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
+use App\Modulos\Valoraciones\Aplicacion\Acciones\AnularAplicacionInstrumento;
 use App\Modulos\Valoraciones\Aplicacion\Acciones\AplicarInstrumento;
+use App\Modulos\Valoraciones\Aplicacion\Consultas\PrepararCapturaInstrumental;
+use App\Modulos\Valoraciones\Presentacion\Livewire\Funcionalidades\EvaluacionGeriatricaModal;
 use Carbon\CarbonImmutable;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 use MotorExperto\dominio\instrumentos\NormalizadorBateriaBolivia2015;
 use MotorExperto\dominio\instrumentos\NormalizadorHvltBolivia2015 as Hvlt;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
@@ -78,7 +86,8 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
             $this->respuestas[] = ['cod_pregunta' => $pregunta->getKey(), $columna => $valor];
         }
         $this->perfil = ['id' => 'CAPTURA-HVLT-TEST', 'cod_instrumento' => $this->instrumento->getKey(),
-            'codigo_instrumento' => $this->instrumento->codigo, 'version_instrumento' => 'TEST-1', 'metodo' => Hvlt::METODO, 'selectores' => $selectores];
+            'codigo_instrumento' => $this->instrumento->codigo, 'version_instrumento' => 'TEST-1', 'metodo' => Hvlt::METODO,
+            'identidad_instrumento' => ['instrumento' => 'HVLT-R', 'forma' => 5, 'idioma' => 'es'], 'selectores' => $selectores];
     }
 
     private function aplicar(array $cambios = []): AplicacionInstrumento
@@ -293,7 +302,7 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
                 $respuestas[] = ['cod_pregunta' => $pregunta->getKey(), $columna => $valores[$campo] ?? ($tipo === 'LOGICO' ? true : throw new \LogicException('Falta medición sintética explícita.'))];
             }
             $perfiles[] = ['id' => 'BATERIA-TEST-'.count($perfiles), 'cod_instrumento' => $instrumento->getKey(), 'codigo_instrumento' => $instrumento->codigo,
-                'version_instrumento' => $instrumento->version, 'metodo' => $metodo, 'selectores' => $selectores];
+                'version_instrumento' => $instrumento->version, 'metodo' => $metodo, 'identidad_instrumento' => $meta['identidad'], 'selectores' => $selectores];
             $a = app(AplicarInstrumento::class)->aplicar($this->usuario, ['fecha_hora' => '2020-10-18 09:10:00', 'respuestas' => $respuestas], $instrumento, $this->residente);
             self::assertNull($a->puntaje_total);
             self::assertNull($a->clasificacion);
@@ -326,5 +335,323 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
             ->assertSee('TMT_B_SEGUNDOS')->assertSee('Menor tiempo indica mejor rendimiento')
             ->assertSee('FLUIDEZ_F')->assertSee('FLUIDEZ_ANIMALES');
         self::assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
+    public function test_fecha_original_es_obligatoria_tambien_en_post_directo(): void
+    {
+        $this->postJson(route('admin.instrumentos.aplicar', [$this->instrumento, $this->residente]), ['respuestas' => $this->respuestas])
+            ->assertUnprocessable()->assertJsonValidationErrors('fecha_hora');
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+        self::assertDatabaseCount('respuestas_instrumento', 0);
+    }
+
+    public function test_metodo_no_aporta_identidad_aplicada_y_selector_sin_respuesta_conserva_definicion(): void
+    {
+        $respuestas = $this->respuestas;
+        array_pop($respuestas);
+        $this->aplicar(['respuestas' => $respuestas]);
+        unset($this->perfil['identidad_instrumento']);
+        config(['sistema_experto.perfiles_instrumentales' => [$this->perfil]]);
+        $r = $this->captura()['capturas'][0];
+        self::assertNull($r['extraccion']['captura']['forma']);
+        self::assertSame('NO_NORMALIZABLE', $r['extraccion']['normalizacion']['componentes']['MEM-S01']['estado']);
+        $v = $r['vinculos_preguntas_actuales']['administracion_estandarizada'];
+        self::assertNotNull($v['pregunta_actual']);
+        self::assertTrue($v['pertenece_al_instrumento']);
+        self::assertFalse($v['tiene_respuesta']);
+    }
+
+    private function entradaHistorica(): array
+    {
+        Storage::fake('local');
+        Storage::disk('local')->put('original-prueba.txt', 'Contenido original sintético para cotejo.');
+        $autor = Personal::create(['cod_usuario' => User::factory()->create(['estado' => 'INACTIVO'])->getKey(), 'nombres' => 'Aplicador', 'apellido_paterno' => 'Histórico',
+            'numero_documento' => 'AUTOR-TEST', 'profesion' => 'PSICOLOGIA', 'estado' => 'INACTIVO']);
+        $doc = DocumentoClinico::create(['cod_residente' => $this->residente->getKey(), 'cod_personal' => $autor->getKey(),
+            'tipo_documento' => 'INFORME', 'titulo' => 'Protocolo sintético', 'ruta_archivo' => 'original-prueba.txt', 'formato' => 'text/plain',
+            'hash_archivo' => hash('sha256', 'Contenido original sintético para cotejo.'), 'fecha_hora' => now(), 'estado' => 'VIGENTE']);
+        $this->usuario->givePermissionTo('documentos_clinicos.ver');
+
+        return ['cod_personal_original' => $autor->getKey(), 'cod_documento_clinico' => $doc->getKey(),
+            'localizador_fuente' => 'página 1 / aplicación 1', 'original_cotejado' => true,
+            'fecha_hora' => '2020-10-18 09:10:00', 'respuestas' => $this->respuestas];
+    }
+
+    public function test_transcripcion_concilia_sin_escritura_preserva_autor_y_reintento_es_identico(): void
+    {
+        $entrada = $this->entradaHistorica();
+        $accion = app(AplicarInstrumento::class);
+        self::assertSame('NUEVA', $accion->conciliar($this->usuario, $entrada, $this->instrumento, $this->residente)['estado']);
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+        $a = $accion->transcribir($this->usuario, $entrada, $this->instrumento, $this->residente);
+        self::assertSame($entrada['cod_personal_original'], $a->cod_personal);
+        self::assertSame($this->usuario->getKey(), $a->cod_usuario_registro);
+        self::assertSame('2020-10-18 09:10:00', $a->fecha_hora->format('Y-m-d H:i:s'));
+        self::assertTrue($a->registrado_en->equalTo(now()));
+        $b = $accion->transcribir($this->usuario, $entrada, $this->instrumento, $this->residente);
+        self::assertSame($a->getKey(), $b->getKey());
+        self::assertDatabaseCount('aplicaciones_instrumento', 1);
+        self::assertDatabaseCount('respuestas_instrumento', 11);
+        self::assertSame('IDENTICA', $accion->conciliar($this->usuario, $entrada, $this->instrumento, $this->residente)['estado']);
+    }
+
+    public function test_conflicto_no_sobrescribe_y_rectificacion_conserva_original_y_auditoria(): void
+    {
+        $entrada = $this->entradaHistorica();
+        $accion = app(AplicarInstrumento::class);
+        $original = $accion->transcribir($this->usuario, $entrada, $this->instrumento, $this->residente);
+        $entrada['respuestas'][0]['valor_numero'] = 0;
+        try {
+            $accion->transcribir($this->usuario, $entrada, $this->instrumento, $this->residente);
+            self::fail('Exige corrección explícita.');
+        } catch (HttpException $e) {
+            self::assertSame(409, $e->getStatusCode());
+        }
+        self::assertDatabaseCount('aplicaciones_instrumento', 1);
+        $entrada['cod_aplicacion_anterior'] = $original->getKey();
+        $entrada['motivo_rectificacion'] = 'Corrección de transcripción cotejada con el original.';
+        self::assertSame('RECTIFICACION', $accion->conciliar($this->usuario, $entrada, $this->instrumento, $this->residente)['estado']);
+        $nueva = $accion->transcribir($this->usuario, $entrada, $this->instrumento, $this->residente);
+        self::assertSame('ANULADA', $original->fresh()->estado);
+        self::assertEquals(6, $original->respuestas()->where('cod_pregunta', $this->respuestas[0]['cod_pregunta'])->sole()->valor_numero);
+        self::assertEquals(0, $nueva->respuestas()->where('cod_pregunta', $this->respuestas[0]['cod_pregunta'])->sole()->valor_numero);
+        self::assertSame($original->getKey(), $nueva->cod_aplicacion_anterior);
+        self::assertDatabaseCount('aplicaciones_instrumento', 2);
+        self::assertSame(1, Activity::query()->where('event', 'aplicacion_rectificada')->count());
+        self::assertSame($nueva->getKey(), $accion->transcribir($this->usuario, $entrada, $this->instrumento, $this->residente)->getKey());
+    }
+
+    public function test_transcripcion_rechaza_hash_ajeno_y_permiso_revocado_sin_escrituras(): void
+    {
+        $entrada = $this->entradaHistorica();
+        Storage::disk('local')->put('original-prueba.txt', 'Contenido alterado.');
+        try {
+            app(AplicarInstrumento::class)->transcribir($this->usuario, $entrada, $this->instrumento, $this->residente);
+            self::fail('Rechaza original alterado.');
+        } catch (HttpException $e) {
+            self::assertSame(422, $e->getStatusCode());
+        }
+        Role::findByName('PSICOLOGO/A')->revokePermissionTo('aplicaciones_instrumento.transcribir');
+        $this->postJson(route('admin.instrumentos.transcripciones.guardar', [$this->instrumento, $this->residente]), $entrada)->assertForbidden();
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+        self::assertDatabaseCount('respuestas_instrumento', 0);
+    }
+
+    public function test_ruta_anterior_exige_respuestas_y_no_deduce_dcl_de_un_total(): void
+    {
+        $this->postJson(route('admin.adultos-mayores.evaluaciones.store', $this->residente),
+            ['cod_tipo_eval' => $this->instrumento->getKey(), 'puntaje_total' => 5, 'fecha_eval' => '2020-10-18'])
+            ->assertUnprocessable();
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+    }
+
+    public function test_ruta_anterior_vincula_residente_y_anulacion_preserva_originales(): void
+    {
+        $this->post(route('admin.adultos-mayores.evaluaciones.store', $this->residente), ['cod_instrumento' => $this->instrumento->getKey(),
+            'fecha_hora' => '2020-10-18 09:10:00', 'respuestas' => $this->respuestas, 'observacion' => 'Original conservado.'])
+            ->assertRedirect(route('admin.salud-seguimiento.evaluaciones-geriatricas', ['adulto' => $this->residente->getKey()]));
+        $a = AplicacionInstrumento::query()->sole();
+        self::assertSame($this->residente->getKey(), $a->cod_residente);
+        $this->delete(route('admin.adultos-mayores.evaluaciones.destroy', [$this->residente, $a]), ['motivo_anulacion' => 'Aplicación registrada en expediente equivocado.'])->assertRedirect();
+        self::assertSame('ANULADA', $a->fresh()->estado);
+        self::assertSame('Original conservado.', $a->fresh()->observacion);
+        self::assertDatabaseCount('respuestas_instrumento', 11);
+        $this->patchJson(route('admin.adultos-mayores.evaluaciones.restore', [$this->residente, $a]))->assertConflict();
+        self::assertSame('ANULADA', $a->fresh()->estado);
+    }
+
+    public function test_fuente_anulada_no_se_rectifica_y_respuesta_persistida_no_se_edita(): void
+    {
+        $entrada = $this->entradaHistorica();
+        $accion = app(AplicarInstrumento::class);
+        $a = $accion->transcribir($this->usuario, $entrada, $this->instrumento, $this->residente);
+        try {
+            $a->respuestas->first()->update(['valor_numero' => 11]);
+            self::fail('No permite editar una respuesta original.');
+        } catch (ValidationException $e) {
+            self::assertArrayHasKey('respuesta', $e->errors());
+        }
+        app(AnularAplicacionInstrumento::class)->anular($this->usuario, $this->residente, $a->getKey(), ['motivo_anulacion' => 'Original no válido para continuar.']);
+        $entrada['cod_aplicacion_anterior'] = $a->getKey();
+        $entrada['motivo_rectificacion'] = 'Intento de volver a completar la fuente anulada.';
+        $entrada['respuestas'][0]['valor_numero'] = 0;
+        try {
+            $accion->transcribir($this->usuario, $entrada, $this->instrumento, $this->residente);
+            self::fail('No permite reactivar una cabeza anulada.');
+        } catch (HttpException $e) {
+            self::assertSame(409, $e->getStatusCode());
+        }
+        self::assertDatabaseCount('aplicaciones_instrumento', 1);
+        self::assertEquals(6, $a->respuestas()->orderBy('cod_respuesta')->first()->valor_numero);
+    }
+
+    public function test_opcion_historica_no_inventa_puntaje_y_rechaza_puntaje_incompatible(): void
+    {
+        $entrada = $this->entradaHistorica();
+        $q = PreguntaInstrumento::create(['cod_instrumento' => $this->instrumento->getKey(), 'codigo' => 'OPC-ORIGINAL',
+            'enunciado' => 'Respuesta sintética', 'tipo_respuesta' => 'OPCION', 'puntaje_maximo' => 2, 'orden' => 20, 'estado' => 'ACTIVA']);
+        $o = OpcionPregunta::create(['cod_pregunta' => $q->getKey(), 'nombre' => 'Opción sintética', 'valor' => 'OBSERVADO', 'puntaje' => 2, 'orden' => 1, 'estado' => 'ACTIVO']);
+        $entrada['respuestas'] = [['cod_pregunta' => $q->getKey(), 'cod_opcion' => $o->getKey(), 'puntaje' => 1]];
+        try {
+            app(AplicarInstrumento::class)->transcribir($this->usuario, $entrada, $this->instrumento, $this->residente);
+            self::fail('No sustituye silenciosamente una puntuación.');
+        } catch (ValidationException $e) {
+            self::assertArrayHasKey('respuestas', $e->errors());
+        }
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+        unset($entrada['respuestas'][0]['puntaje']);
+        $a = app(AplicarInstrumento::class)->transcribir($this->usuario, $entrada, $this->instrumento, $this->residente);
+        self::assertNull($a->respuestas->sole()->puntaje);
+        self::assertNull($a->puntaje_total);
+    }
+
+    public function test_precision_tecnica_y_vinculacion_de_registro_existente_sin_duplicar(): void
+    {
+        $this->travelTo(CarbonImmutable::parse('2026-10-18 12:00:00.123456'));
+        $a = $this->aplicar();
+        self::assertSame('123456', $a->fresh()->registrado_en->format('u'));
+        $a->update(['estado' => 'VIGENTE']);
+        $entrada = $this->entradaHistorica();
+        $entrada['cod_personal_original'] = $a->cod_personal;
+        DocumentoClinico::query()->findOrFail($entrada['cod_documento_clinico'])->update(['cod_personal' => $a->cod_personal]);
+        $entrada['cod_aplicacion_existente'] = $a->getKey();
+        $accion = app(AplicarInstrumento::class);
+        self::assertSame('VINCULACION', $accion->conciliar($this->usuario, $entrada, $this->instrumento, $this->residente)['estado']);
+        self::assertNull($a->fresh()->cod_documento_clinico);
+        $vinculada = $accion->transcribir($this->usuario, $entrada, $this->instrumento, $this->residente);
+        self::assertSame($a->getKey(), $vinculada->getKey());
+        self::assertSame($entrada['cod_documento_clinico'], $vinculada->cod_documento_clinico);
+        self::assertSame('VIGENTE', $vinculada->estado);
+        self::assertSame($a->getKey(), $accion->transcribir($this->usuario, $entrada, $this->instrumento, $this->residente)->getKey());
+        self::assertDatabaseCount('aplicaciones_instrumento', 1);
+        self::assertDatabaseCount('respuestas_instrumento', 11);
+    }
+
+    public function test_modal_concilia_transcripcion_y_muestra_procedencia_del_original(): void
+    {
+        $entrada = $this->entradaHistorica();
+        $c = Livewire::test(EvaluacionGeriatricaModal::class, ['cod_residente' => $this->residente->getKey()])->call('abrir', $this->residente->getKey())
+            ->set('cod_instrumento', $this->instrumento->getKey())->set('transcripcion', true)
+            ->assertSet('fecha_eval', '')->assertSet('hora_eval', '')
+            ->set('cod_documento_clinico', $entrada['cod_documento_clinico'])->set('cod_personal_original', $entrada['cod_personal_original'])
+            ->set('localizador_fuente', $entrada['localizador_fuente'])->set('original_cotejado', true)
+            ->set('fecha_eval', '2020-10-18')->set('hora_eval', '09:10:00');
+        foreach ($this->respuestas as $respuesta) {
+            $valor = $respuesta['valor_numero'] ?? ($respuesta['valor_logico'] ? '1' : '0');
+            $c->set('valores.'.$respuesta['cod_pregunta'], $valor);
+        }
+        $c->call('revisar')->assertSet('estadoConciliacion', 'NUEVA')->assertSet('confirmando', true);
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+        $c->call('guardar')->assertHasNoErrors()->assertSet('mostrar', false);
+        self::assertDatabaseCount('aplicaciones_instrumento', 1);
+        $r = $this->captura()['capturas'][0];
+        self::assertSame('VERIFICADO', $r['procedencia']['estado_documento']);
+        self::assertSame($entrada['cod_personal_original'], $r['procedencia']['cod_personal_aplicador']);
+        self::assertSame($this->usuario->getKey(), $r['procedencia']['cod_usuario_registro']);
+    }
+
+    public function test_fallo_de_auditoria_revierte_correccion_y_anulacion_del_original(): void
+    {
+        $entrada = $this->entradaHistorica();
+        $accion = app(AplicarInstrumento::class);
+        $a = $accion->transcribir($this->usuario, $entrada, $this->instrumento, $this->residente);
+        $entrada['respuestas'][0]['valor_numero'] = 0;
+        $entrada['cod_aplicacion_anterior'] = $a->getKey();
+        $entrada['motivo_rectificacion'] = 'Corrección sintética para verificar atomicidad.';
+        DB::connection()->beforeExecuting(static function (string $sql): void {
+            if (str_starts_with(strtolower($sql), 'insert into "activity_log"')) {
+                throw new \RuntimeException('Fallo sintético de auditoría.');
+            }
+        });
+        try {
+            $accion->transcribir($this->usuario, $entrada, $this->instrumento, $this->residente);
+            self::fail('Fallo de auditoría debe revertir la corrección.');
+        } catch (\RuntimeException $e) {
+            self::assertSame('Fallo sintético de auditoría.', $e->getMessage());
+        }
+        self::assertSame('COMPLETA', $a->fresh()->estado);
+        self::assertDatabaseCount('aplicaciones_instrumento', 1);
+        self::assertDatabaseCount('respuestas_instrumento', 11);
+    }
+
+    public function test_migracion_revierte_solo_sin_metadatos_y_conserva_historia_y_referencias(): void
+    {
+        $a = $this->aplicar();
+        $m = require database_path('migrations/2026_10_19_010000_add_procedencia_aplicaciones_instrumento.php');
+        try {
+            $m->down();
+            self::fail('No retira metadatos ya conservados.');
+        } catch (\LogicException $e) {
+            self::assertStringContainsString('No se retira procedencia', $e->getMessage());
+        }
+        // Simula una fila anterior a la ampliación, exclusivamente en esta BDD desechable.
+        DB::table('aplicaciones_instrumento')->where('cod_aplicacion', $a->getKey())->update(['cod_usuario_registro' => null, 'registrado_en' => null]);
+        $respuestas = DB::table('respuestas_instrumento')->orderBy('cod_respuesta')->get()->map(fn ($fila) => (array) $fila)->all();
+        $m->down();
+        self::assertFalse(Schema::hasColumn('aplicaciones_instrumento', 'cod_documento_clinico'));
+        self::assertSame($respuestas, DB::table('respuestas_instrumento')->orderBy('cod_respuesta')->get()->map(fn ($fila) => (array) $fila)->all());
+        $m->up();
+        self::assertNull(AplicacionInstrumento::query()->findOrFail($a->getKey())->cod_usuario_registro);
+        self::assertDatabaseCount('aplicaciones_instrumento', 1);
+        self::assertDatabaseCount('respuestas_instrumento', 11);
+        if (DB::getDriverName() === 'sqlite') {
+            self::assertSame([], DB::select('PRAGMA foreign_key_check'));
+        }
+    }
+
+    public function test_permiso_de_transcripcion_no_concede_descarga_general_y_superadmin_no_transcribe(): void
+    {
+        $entrada = $this->entradaHistorica();
+        $this->usuario->revokePermissionTo('documentos_clinicos.ver');
+        $fuentes = app(PrepararCapturaInstrumental::class)
+            ->fuentesTranscripcion($this->usuario, $this->residente->getKey());
+        self::assertSame(['cod_documento_clinico', 'titulo', 'fecha_hora'], array_keys($fuentes->sole()->getAttributes()));
+        $this->get(route('admin.documentos-clinicos.descargar', $entrada['cod_documento_clinico']))->assertForbidden();
+        $this->postJson(route('admin.instrumentos.transcripciones.conciliar', [$this->instrumento, $this->residente]), $entrada)
+            ->assertOk()->assertJsonPath('estado', 'NUEVA');
+        $super = User::factory()->create(['estado' => 'ACTIVO']);
+        $super->assignRole('SUPERADMINISTRADOR');
+        self::assertFalse($super->checkPermissionTo('aplicaciones_instrumento.transcribir', 'web'));
+        $this->actingAs($super)->postJson(route('admin.instrumentos.transcripciones.guardar', [$this->instrumento, $this->residente]), $entrada)->assertForbidden();
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+    }
+
+    public function test_vinculacion_no_declara_identicos_puntajes_distintos_del_registro_previo(): void
+    {
+        $a = $this->aplicar();
+        $entrada = $this->entradaHistorica();
+        $entrada['cod_personal_original'] = $a->cod_personal;
+        DocumentoClinico::query()->findOrFail($entrada['cod_documento_clinico'])->update(['cod_personal' => $a->cod_personal]);
+        $entrada['cod_aplicacion_existente'] = $a->getKey();
+        DB::table('aplicaciones_instrumento')->where('cod_aplicacion', $a->getKey())->update(['puntaje_total' => 0]);
+        try {
+            app(AplicarInstrumento::class)->conciliar($this->usuario, $entrada, $this->instrumento, $this->residente);
+            self::fail('No declara identidad de puntajes NULL y cero.');
+        } catch (HttpException $e) {
+            self::assertSame(409, $e->getStatusCode());
+        }
+        self::assertNull($a->fresh()->cod_documento_clinico);
+        self::assertDatabaseCount('aplicaciones_instrumento', 1);
+    }
+
+    public static function originalesIncompatibles(): array
+    {
+        return [['residente'], ['autor'], ['archivo'], ['cotejo']];
+    }
+
+    #[DataProvider('originalesIncompatibles')]
+    public function test_original_incompatible_no_produce_cabecera_respuestas_ni_exito(string $incompatible): void
+    {
+        $entrada = $this->entradaHistorica();
+        match ($incompatible) {
+            'residente' => DocumentoClinico::query()->findOrFail($entrada['cod_documento_clinico'])->update(['cod_residente' => Residente::factory()->create()->getKey()]),
+            'autor' => $entrada['cod_personal_original'] = $this->usuario->personal()->sole()->getKey(),
+            'archivo' => Storage::disk('local')->delete('original-prueba.txt'),
+            'cotejo' => $entrada['original_cotejado'] = false,
+        };
+        $this->postJson(route('admin.instrumentos.transcripciones.guardar', [$this->instrumento, $this->residente]), $entrada)->assertUnprocessable();
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+        self::assertDatabaseCount('respuestas_instrumento', 0);
+        self::assertSame(0, Activity::query()->where('event', 'aplicacion_registrada')->count());
     }
 }

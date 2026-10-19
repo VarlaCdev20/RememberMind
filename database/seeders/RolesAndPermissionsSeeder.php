@@ -80,7 +80,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'ejecuciones_cuidado.crear', 'prescripciones.crear', 'prescripciones.editar', 'prescripciones.suspender',
             'atenciones.editar', 'atenciones.anular', 'notas_clinicas.editar', 'notas_clinicas.anular',
             'signos_vitales.editar', 'signos_vitales.anular', 'administraciones_medicacion.crear',
-            'aplicaciones_instrumento.crear', 'aplicaciones_instrumento.editar', 'aplicaciones_instrumento.anular',
+            'aplicaciones_instrumento.crear', 'aplicaciones_instrumento.editar', 'aplicaciones_instrumento.anular', 'aplicaciones_instrumento.transcribir',
             'valoraciones_psicologicas.crear', 'valoraciones_nutricionales.crear',
             'valoraciones_funcionales.crear', 'valoraciones_funcionales.editar', 'seguimientos_pedagogicos.crear', 'actividades.gestionar',
             'visitas.gestionar', 'alertas.gestionar', 'alertas.reconocer', 'alertas.asignar',
@@ -98,7 +98,7 @@ class RolesAndPermissionsSeeder extends Seeder
         // Durante la construcción del sistema recibe todos los permisos web,
         // incluidos los que se hayan creado fuera de este seeder.
         $roles['SUPERADMINISTRADOR']->syncPermissions(
-            Permission::query()->where('guard_name', 'web')->whereNotIn('name', ['fotografias_institucionales.gestionar', 'evaluaciones_expertas.ejecutar_observaciones', 'reglas_expertas.gestionar', 'reglas_expertas.revisar'])->get()
+            Permission::query()->where('guard_name', 'web')->whereNotIn('name', ['fotografias_institucionales.gestionar', 'evaluaciones_expertas.ejecutar_observaciones', 'reglas_expertas.gestionar', 'reglas_expertas.revisar', 'aplicaciones_instrumento.transcribir'])->get()
         );
 
         // Dirección institucional: personal, organización, planificación maestra
@@ -163,6 +163,8 @@ class RolesAndPermissionsSeeder extends Seeder
         $roles['PSICOLOGO/A']->givePermissionTo(['reglas_expertas.ver', 'reglas_expertas.gestionar', 'reglas_expertas.revisar']);
         $roles['MEDICO GENERAL/GERIATRA']->givePermissionTo('evaluaciones_expertas.ejecutar_observaciones');
         $roles['PSICOLOGO/A']->givePermissionTo('evaluaciones_expertas.ejecutar_observaciones');
+        $roles['MEDICO GENERAL/GERIATRA']->givePermissionTo('aplicaciones_instrumento.transcribir');
+        $roles['PSICOLOGO/A']->givePermissionTo('aplicaciones_instrumento.transcribir');
         $roles['NUTRICIONISTA']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'diagnosticos.ver', 'alergias.ver', 'indicaciones_clinicas.ver', 'mediciones_antropometricas', 'registros_ingesta.ver', 'registros_hidratacion.ver', 'registros_eliminacion.ver', 'valoraciones_nutricionales', 'planes_cuidado']));
         $roles['FISIOTERAPEUTA']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'diagnosticos.ver', 'dispositivos_clinicos.ver', 'signos_vitales.ver', 'valoraciones_dolor', 'registros_movilidad', 'valoraciones_funcionales', 'planes_cuidado']));
         $roles['PEDAGOGO']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'indicaciones_clinicas.ver', 'controles_cognitivos.ver', 'registros_conductuales.ver', 'planes_cuidado', 'seguimientos_pedagogicos', 'actividades']));

@@ -207,19 +207,23 @@ final class NormalizacionBateriaBolivia2015Test extends TestCase
         $meta = (new RegistroMetodosInstrumentales)->metodos()[$m];
         $c = $this->captura($m);
         $a = ['cod_aplicacion' => 'AP-SINTETICA', 'cod_instrumento' => 'INST-SINTETICO', 'codigo_instrumento' => 'COD-SINTETICO', 'version_instrumento' => 'TEST-1'];
-        $perfil = ['id' => 'PERFIL-SINTETICO', 'metodo' => $m, 'selectores' => []] + $a;
+        $perfil = ['id' => 'PERFIL-SINTETICO', 'metodo' => $m, 'selectores' => [], 'identidad_instrumento' => $meta['identidad']] + $a;
         $respuestas = [];
         foreach ($meta['entradas'] as $campo => $tipo) {
             $id = 'Q-'.count($respuestas);
             $columna = $tipo === 'LOGICO' ? 'valor_logico' : 'valor_numero';
             $perfil['selectores'][$campo] = ['cod_pregunta' => $id, 'campo' => $columna];
-            $respuestas[] = ['cod_pregunta' => $id, 'cod_respuesta' => 'R-'.count($respuestas), 'coherente' => true,
+            $respuestas[] = ['cod_aplicacion' => $a['cod_aplicacion'], 'cod_pregunta' => $id, 'cod_respuesta' => 'R-'.count($respuestas), 'coherente' => true,
                 'tipo_respuesta' => $tipo === 'LOGICO' ? 'LOGICO' : 'NUMERICO', $columna => $campo === 'lectoescritura' ? 'Sí' : $c[$campo]];
         }
         $r = (new ExtractorCapturaInstrumental)->extraer($perfil, $a, $respuestas, 70);
         self::assertNull($r['captura']['lectoescritura']);
         self::assertSame('Sí', $r['fuentes_entradas']['lectoescritura']['bruto']);
         self::assertNull($r['normalizacion']['componentes']['ATE-S03']['z']);
+        $respuestas[0]['cod_aplicacion'] = 'AP-AJENA';
+        $ajena = (new ExtractorCapturaInstrumental)->extraer($perfil, $a, $respuestas, 70);
+        self::assertArrayNotHasKey('forma_n_aciertos', $ajena['fuentes_entradas']);
+        self::assertNull($ajena['normalizacion']['componentes']['ATE-S03']['z']);
         $perfil['selectores']['forma_l_aciertos'] = $perfil['selectores']['forma_n_aciertos'];
         $this->expectException(DomainException::class);
         (new ExtractorCapturaInstrumental)->extraer($perfil, $a, $respuestas, 70);

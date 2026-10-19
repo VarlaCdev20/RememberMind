@@ -1,7 +1,7 @@
 <?php
 
-use App\Modulos\Valoraciones\Presentacion\Http\Controllers\AdultoMayorEvaluacionController;
 use App\Modulos\Valoraciones\Presentacion\Http\Controllers\AdultoMayorValoracionFuncionalController;
+use App\Modulos\Valoraciones\Presentacion\Http\Controllers\EvaluacionInstrumentalController;
 use App\Modulos\Valoraciones\Presentacion\Http\Controllers\InstrumentoController;
 use App\Modulos\Valoraciones\Presentacion\Http\Controllers\ValoracionProfesionalController;
 use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\DashboardPsicologo;
@@ -15,19 +15,19 @@ use Illuminate\Support\Facades\Route;
 // Registered by routes/web.php; do not execute while loading this file.
 return [
     'ruta_067' => static function (): void {
-        Route::get('/evaluaciones', [AdultoMayorEvaluacionController::class, 'index'])->middleware('permission:aplicaciones_instrumento.ver')->name('evaluaciones.index');
+        Route::get('/evaluaciones', [EvaluacionInstrumentalController::class, 'index'])->middleware('permission:aplicaciones_instrumento.ver')->name('evaluaciones.index');
     },
     'ruta_068' => static function (): void {
-        Route::post('/evaluaciones', [AdultoMayorEvaluacionController::class, 'store'])->middleware('permission:aplicaciones_instrumento.crear')->name('evaluaciones.store');
+        Route::post('/evaluaciones', [EvaluacionInstrumentalController::class, 'store'])->middleware('permission:aplicaciones_instrumento.crear')->name('evaluaciones.store');
     },
     'ruta_069' => static function (): void {
-        Route::get('/evaluaciones/{evaluacion}', [AdultoMayorEvaluacionController::class, 'show'])->middleware('permission:aplicaciones_instrumento.ver')->name('evaluaciones.show');
+        Route::get('/evaluaciones/{evaluacion}', [EvaluacionInstrumentalController::class, 'show'])->middleware('permission:aplicaciones_instrumento.ver')->name('evaluaciones.show');
     },
     'ruta_070' => static function (): void {
-        Route::delete('/evaluaciones/{evaluacion}', [AdultoMayorEvaluacionController::class, 'destroy'])->middleware('permission:aplicaciones_instrumento.anular')->name('evaluaciones.destroy');
+        Route::delete('/evaluaciones/{evaluacion}', [EvaluacionInstrumentalController::class, 'destroy'])->middleware('permission:aplicaciones_instrumento.anular')->name('evaluaciones.destroy');
     },
     'ruta_071' => static function (): void {
-        Route::patch('/evaluaciones/{evaluacion}/restaurar', [AdultoMayorEvaluacionController::class, 'restore'])->middleware('permission:aplicaciones_instrumento.editar')->name('evaluaciones.restore');
+        Route::patch('/evaluaciones/{evaluacion}/restaurar', [EvaluacionInstrumentalController::class, 'restore'])->middleware('permission:aplicaciones_instrumento.editar')->name('evaluaciones.restore');
     },
     'ruta_097' => static function (): void {
         Route::post('/valoracion-funcional', [AdultoMayorValoracionFuncionalController::class, 'store'])->middleware('permission:valoraciones_funcionales.crear')->name('valoracion-funcional.store');
@@ -91,6 +91,10 @@ return [
     },
     'ruta_241' => static function (): void {
         Route::post('/instrumentos/{instrumento}/residentes/{residente}', [InstrumentoController::class, 'aplicar'])->middleware('permission:aplicaciones_instrumento.crear')->name('instrumentos.aplicar');
+        Route::post('/instrumentos/{instrumento}/residentes/{residente}/transcripciones/conciliar', [InstrumentoController::class, 'conciliar'])
+            ->middleware('permission:aplicaciones_instrumento.transcribir')->name('instrumentos.transcripciones.conciliar');
+        Route::post('/instrumentos/{instrumento}/residentes/{residente}/transcripciones', [InstrumentoController::class, 'transcribir'])
+            ->middleware('permission:aplicaciones_instrumento.transcribir')->name('instrumentos.transcripciones.guardar');
     },
     'ruta_242' => static function (): void {
         Route::post('/residentes/{residente}/valoraciones/{tipo}', [ValoracionProfesionalController::class, 'registrar'])

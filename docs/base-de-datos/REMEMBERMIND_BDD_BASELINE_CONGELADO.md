@@ -17,6 +17,8 @@ related_modules: []
 
 # RememberMind — Baseline Rector de la BDD Operativa
 
+**Fuentes originales aprobadas — 19/10/2026:** cinco columnas nullable en `aplicaciones_instrumento`: usuario de registro, instante técnico, documento clínico original, localizador y aplicación anterior. FK restrictivas, checks e índices únicos de fuente inicial/sucesora; sin tablas nuevas ni relleno de historia desconocida. Se conservan **73 operativas + 33 expertas = 106**. [Decisión, diccionario y 4FN](../sistema-experto/PROPUESTA_FUENTES_ORIGINALES_FASE_2_2026_10_19.md).
+
 **Gobierno de reglas aprobado — 18/10/2026:** cinco columnas nullable en `reglas_expertas`: antecesora, estado de revisión, usuario revisor, fecha y justificación. FK restrictivas, índices y checks; primera decisión y enlace histórico inmutables. Sin tablas nuevas; **33 expertas + 73 operativas = 106**. [Aprobación, diccionario y 4FN](../sistema-experto/PROPUESTA_GOBIERNO_REGLAS_2026_10_18.md).
 
 **Ampliación observacional aprobada — 18/10/2026:** dos FK nullable, índices y checks en `hechos_instantanea_experta` para conservar control cognitivo y autor originales. Sin tablas nuevas ni borrado de historia; se mantienen 33 expertas + 73 operativas. [Decisión y diccionario](../sistema-experto/PROPUESTA_CONSERVACION_OBSERVACIONAL_V1.md).

@@ -3,6 +3,7 @@
 Documentación de lectura actualizada el 18/10/2026 para la arquitectura híbrida.
 No autoriza inferencia clínica ni nuevas reglas de O.R.I.O.N.
 
+- [Fase 2: fuentes originales e investigación profesional](ORION_FUENTES_ORIGINALES_E_INVESTIGACION_2026_10_19.md): identidad de los métodos, campos originales, conciliación y límites de reconstrucción histórica; [ampliación aprobada](PROPUESTA_FUENTES_ORIGINALES_FASE_2_2026_10_19.md) y [acta, pruebas y pendientes](FASE_2_FUENTES_ORIGINALES_2026_10_19.md).
 - [Integración versionada del laboratorio, 19/10](INTEGRACION_LABORATORIO_2026_10_19.md): dependencias incorporadas como conjunto, candidato limpio, corrección de contexto G09 y evidencia por motor; conserva el alcance técnico y los pendientes institucionales.
 - [Matriz única de consolidación](CONSOLIDACION_PUNTO_1_2026_10_19.md) y [plan por fases](PLAN_CIERRE_INTEGRAL_2026_10_19.md).
 - [Investigación profesional de los 19 componentes, 19/10](INVESTIGACION_PROFESIONAL_19_COMPONENTES_2026_10_19.md): utilidad, uso, motivo, cálculo, interpretación, fuentes y brechas; [objetivo activo y pruebas de fase 3](FASE_3_COMPONENTES_2026_10_19.md).

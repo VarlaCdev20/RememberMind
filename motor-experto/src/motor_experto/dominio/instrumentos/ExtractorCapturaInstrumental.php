@@ -28,7 +28,16 @@ final class ExtractorCapturaInstrumental
                 throw new DomainException('El perfil no identifica exactamente el instrumento y su versión.');
             }
         }
-        $captura = $meta['identidad'] + ['protocolo' => $metodo, 'edad_anios' => $edad];
+        if (! is_string($aplicacion['cod_aplicacion'] ?? null) || $aplicacion['cod_aplicacion'] === '') {
+            throw new DomainException('Falta la identidad de la aplicación original.');
+        }
+        // La referencia identifica el método; no acredita la forma/edición/idioma administrados.
+        $identidad = $perfil['identidad_instrumento'] ?? [];
+        if (! is_array($identidad) || array_diff(array_keys($identidad), array_keys($meta['identidad']))) {
+            throw new DomainException('La identidad instrumental declarada está fuera del contrato del método.');
+        }
+        $captura = array_replace(array_fill_keys(array_keys($meta['identidad']), null), $identidad)
+            + ['protocolo' => $metodo, 'edad_anios' => $edad];
         $fuentes = $motivos = $medidas = $preguntas = [];
         foreach ($meta['entradas'] as $entrada => $tipo) {
             $selector = $perfil['selectores'][$entrada] ?? null;
@@ -46,7 +55,8 @@ final class ExtractorCapturaInstrumental
             }
             $preguntas[$selector['cod_pregunta']] = true;
             $filas = array_values(array_filter($respuestas, fn ($r) => $r['cod_pregunta'] === $selector['cod_pregunta']));
-            if (count($filas) !== 1 || ($filas[0]['coherente'] ?? false) !== true) {
+            if (count($filas) !== 1 || ($filas[0]['coherente'] ?? false) !== true
+                || ($filas[0]['cod_aplicacion'] ?? null) !== $aplicacion['cod_aplicacion']) {
                 $motivos[] = 'RESPUESTA_AUSENTE_O_INCOMPATIBLE:'.$entrada;
 
                 continue;
@@ -59,7 +69,7 @@ final class ExtractorCapturaInstrumental
             $ambiguo = count(array_filter($otrosValores, fn ($otro) => ($r[$otro] ?? null) !== null && ($r[$otro] ?? null) !== '')) > 0;
             $valor = $tipoPreguntaValido && ! $ambiguo ? $this->convertir($bruto, $tipo) : null;
             $medidas[$entrada] = $valor;
-            $fuentes[$entrada] = ['aplicacion' => $aplicacion['cod_aplicacion'], 'respuesta' => $r['cod_respuesta'],
+            $fuentes[$entrada] = ['aplicacion' => $r['cod_aplicacion'], 'respuesta' => $r['cod_respuesta'],
                 'pregunta' => $r['cod_pregunta'], 'campo' => $campo, 'bruto' => $bruto, 'valor' => $valor];
             if ($valor === null) {
                 $motivos[] = 'MEDICION_AUSENTE_O_TIPO_INVALIDO:'.$entrada;
@@ -72,6 +82,7 @@ final class ExtractorCapturaInstrumental
         $normalizacion = $registro->ejecutar($metodo, $captura);
 
         return ['perfil' => $perfil['id'], 'metodo' => $perfil['metodo'], 'captura' => $captura,
+            'identidad_declarada' => $identidad, 'identidad_requerida_metodo' => $meta['identidad'],
             'fuentes_entradas' => $fuentes, 'motivos_captura' => $motivos, 'normalizacion' => $normalizacion];
     }
 

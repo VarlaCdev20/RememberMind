@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modulos\ApoyoDecision\Aplicacion\Consultas;
 
+use App\Compartido\Aplicacion\Contratos\ArchivosAplicacion;
 use App\Models\AplicacionInstrumento;
 use App\Models\EvaluacionExperta;
 use App\Models\OpcionPregunta;
@@ -29,12 +30,22 @@ final class CapturasInstrumentalesResidente
             }
         }
         $aplicaciones = FuentesValoracionOperativa::limitar(AplicacionInstrumento::query())->where('cod_residente', $residente->getKey())
-            ->where('fecha_hora', '<=', $corte)->with(['instrumento', 'evaluador', 'atencion', 'respuestas'])->orderBy('fecha_hora')->orderBy('cod_aplicacion')->get();
+            ->where('fecha_hora', '<=', $corte)->with(['instrumento', 'evaluador', 'atencion', 'respuestas', 'documentoOriginal'])->orderBy('fecha_hora')->orderBy('cod_aplicacion')->get();
         $respuestas = $aplicaciones->flatMap(fn ($a) => $a->respuestas);
-        $preguntas = PreguntaInstrumento::query()->whereIn('cod_pregunta', $respuestas->pluck('cod_pregunta')->unique())->get()->keyBy('cod_pregunta');
-        $opciones = OpcionPregunta::query()->whereIn('cod_opcion', $respuestas->pluck('cod_opcion')->filter()->unique())->get()->keyBy('cod_opcion');
         $perfiles = config('sistema_experto.perfiles_instrumentales', []);
+        $preguntasSeleccionadas = [];
+        foreach ($perfiles as $perfil) {
+            foreach ($perfil['selectores'] ?? [] as $selector) {
+                if (is_array($selector) && is_string($selector['cod_pregunta'] ?? null)) {
+                    $preguntasSeleccionadas[] = $selector['cod_pregunta'];
+                }
+            }
+        }
+        $preguntas = PreguntaInstrumento::query()->whereIn('cod_pregunta', $respuestas->pluck('cod_pregunta')
+            ->merge($preguntasSeleccionadas)->unique())->get()->keyBy('cod_pregunta');
+        $opciones = OpcionPregunta::query()->whereIn('cod_opcion', $respuestas->pluck('cod_opcion')->filter()->unique())->get()->keyBy('cod_opcion');
         $capturas = [];
+        $documentosVerificados = [];
         foreach ($aplicaciones as $a) {
             $instrumento = $a->instrumento;
             $autor = $a->evaluador;
@@ -45,6 +56,20 @@ final class CapturasInstrumentalesResidente
             if (! $instrumento || $instrumento->getKey() !== $a->cod_instrumento || ! $autor || $autor->getKey() !== $a->cod_personal
                 || ($a->cod_atencion !== null && $a->atencion?->cod_residente !== $residente->getKey())) {
                 $motivos[] = 'PROCEDENCIA_INCOMPATIBLE';
+            }
+            $estadoDocumento = 'SIN_VINCULO_DOCUMENTAL';
+            if ($a->cod_documento_clinico !== null) {
+                $doc = $a->documentoOriginal;
+                if (! array_key_exists($a->cod_documento_clinico, $documentosVerificados)) {
+                    $archivos = app(ArchivosAplicacion::class);
+                    $hash = $doc && $archivos->existe('local', $doc->ruta_archivo) ? $archivos->hash('local', $doc->ruta_archivo) : false;
+                    $documentosVerificados[$a->cod_documento_clinico] = $doc !== null && $doc->estado === 'VIGENTE'
+                        && $doc->cod_residente === $residente->getKey() && is_string($hash) && hash_equals($doc->hash_archivo, $hash);
+                }
+                $estadoDocumento = $documentosVerificados[$a->cod_documento_clinico] ? 'VERIFICADO' : 'ORIGINAL_NO_VERIFICABLE';
+                if ($estadoDocumento !== 'VERIFICADO') {
+                    $motivos[] = $estadoDocumento;
+                }
             }
             $brutos = [];
             foreach ($a->respuestas->sortBy('cod_respuesta', SORT_STRING) as $r) {
@@ -70,12 +95,24 @@ final class CapturasInstrumentalesResidente
             if ($perfilesAplicables === []) {
                 $motivos[] = 'SIN_PERFIL_EXPLICITO';
             }
+            $vinculos = [];
+            foreach ($perfilesAplicables[0]['selectores'] ?? [] as $entrada => $selector) {
+                $pregunta = is_array($selector) ? $preguntas->get($selector['cod_pregunta'] ?? '') : null;
+                $vinculos[$entrada] = ['selector' => $selector, 'pregunta_actual' => $pregunta?->getRawOriginal(),
+                    'pertenece_al_instrumento' => $pregunta !== null && $pregunta->cod_instrumento === $a->cod_instrumento,
+                    'tiene_respuesta' => $pregunta !== null && $a->respuestas->contains('cod_pregunta', $pregunta->getKey())];
+            }
             $salida = ['cod_aplicacion' => $a->getKey(), 'cod_residente' => $a->cod_residente, 'cod_instrumento' => $a->cod_instrumento,
                 'codigo_instrumento' => $instrumento?->codigo, 'nombre_instrumento' => $instrumento?->nombre, 'version_instrumento' => $instrumento?->version,
                 'cod_personal' => $a->cod_personal, 'autor' => trim(implode(' ', [$autor?->nombres, $autor?->apellido_paterno, $autor?->apellido_materno])),
                 'fecha_hora' => $a->fecha_hora->format('Y-m-d\TH:i:s.uP'), 'estado_original' => $a->estado,
                 'aplicacion_actual' => $a->getRawOriginal(), 'instrumento_actual' => $instrumento?->getRawOriginal(),
-                'respuestas_originales' => $brutos, 'motivos' => array_values(array_unique($motivos)), 'extraccion' => null];
+                'procedencia' => ['cod_personal_aplicador' => $a->cod_personal, 'cod_usuario_registro' => $a->cod_usuario_registro,
+                    'registrado_en' => $a->registrado_en?->format('Y-m-d\TH:i:s.uP'), 'cod_documento_clinico' => $a->cod_documento_clinico,
+                    'localizador_fuente' => $a->localizador_fuente, 'cod_aplicacion_anterior' => $a->cod_aplicacion_anterior,
+                    'estado_documento' => $estadoDocumento],
+                'respuestas_originales' => $brutos, 'vinculos_preguntas_actuales' => $vinculos,
+                'motivos' => array_values(array_unique($motivos)), 'extraccion' => null];
             if ($motivos === []) {
                 $nacimiento = $residente->fecha_nacimiento;
                 $fecha = CarbonImmutable::instance($a->fecha_hora);

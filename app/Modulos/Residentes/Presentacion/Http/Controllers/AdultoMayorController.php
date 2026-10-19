@@ -15,7 +15,7 @@ use App\Modulos\Reportes\Aplicacion\Consultas\AdultoMayorBitacoraService;
 use App\Modulos\Residentes\Aplicacion\Acciones\AdultoMayorService;
 use App\Modulos\Residentes\Aplicacion\Acciones\CambiarEstadoResidenteHttp;
 use App\Modulos\Residentes\Presentacion\Http\Requests\UpdateAdultoMayorRequest;
-use App\Modulos\Valoraciones\Aplicacion\Acciones\AnularEvaluacionGeriatricaHttp;
+use App\Modulos\Valoraciones\Aplicacion\Acciones\AnularAplicacionInstrumento;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -293,14 +293,10 @@ class AdultoMayorController extends Controller
 
     public function anularEvaluacionGeriatrica(Request $request, Residente $adulto_mayor, $evaluacionId)
     {
-        $request->validate(['motivo_anulacion' => 'required|string|min:10'], ['motivo_anulacion.required' => 'El motivo de anulación es obligatorio.', 'motivo_anulacion.min' => 'El motivo de anulación debe tener al menos 10 caracteres.']);
-        try {
-            app(AnularEvaluacionGeriatricaHttp::class)->anularEvaluacionGeriatrica(auth()->user(), $request->all(), $adulto_mayor, $evaluacionId);
+        app(AnularAplicacionInstrumento::class)->anular($request->user(), $adulto_mayor, $evaluacionId,
+            $request->only('motivo_anulacion'));
 
-            return redirect()->back()->with('success', 'Evaluación geriátrica anulada correctamente.');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error al anular la evaluación: '.$e->getMessage());
-        }
+        return redirect()->back()->with('success', 'Aplicación anulada; sus registros se conservan.');
     }
 
     public function pdfEvaluacionGeriatrica(Residente $adulto_mayor, $evaluacionId)

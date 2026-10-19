@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modulos\Valoraciones\Aplicacion\Consultas;
 
+use App\Models\DocumentoClinico;
 use App\Models\Instrumento;
 use App\Models\Residente;
 use App\Models\User;
@@ -14,6 +15,7 @@ use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Valoraciones\Aplicacion\Acciones\AplicarInstrumento;
 use App\Modulos\Valoraciones\Aplicacion\DTOs\CatalogoPreguntasInstrumento;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Gate;
 use LogicException;
 
 /** Prepara fuentes de captura sin crear instrumentos, preguntas ni registros clínicos. */
@@ -81,5 +83,19 @@ final readonly class PrepararCapturaInstrumental
             ->get();
 
         return CatalogoPreguntasInstrumento::proyectar($instrumento, $preguntas);
+    }
+
+    /** El permiso específico permite metadatos de la fuente del residente; no concede descarga general de documentos. */
+    public function fuentesTranscripcion(?User $usuario, string $codigoResidente): Collection
+    {
+        $usuario = $this->usuario($usuario);
+        abort_unless($usuario->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A'])
+            && $usuario->checkPermissionTo('aplicaciones_instrumento.transcribir', 'web'), 403);
+        $residente = Residente::query()->findOrFail($codigoResidente);
+        $this->contexto($usuario, $codigoResidente);
+        Gate::forUser($usuario)->authorize('view', $residente);
+
+        return DocumentoClinico::query()->where('cod_residente', $codigoResidente)->where('estado', 'VIGENTE')
+            ->orderByDesc('fecha_hora')->limit(100)->get(['cod_documento_clinico', 'titulo', 'fecha_hora']);
     }
 }

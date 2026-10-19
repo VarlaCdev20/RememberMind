@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /** Interacción compartida por residente y área; AplicarInstrumento protege la operación institucional. */
 abstract class CapturaInstrumentalModal extends Component
@@ -54,6 +55,25 @@ abstract class CapturaInstrumentalModal extends Component
 
     public string $observaciones = '';
 
+    public bool $transcripcion = false;
+
+    public ?string $cod_documento_clinico = null;
+
+    public string $cod_personal_original = '';
+
+    public string $localizador_fuente = '';
+
+    public bool $original_cotejado = false;
+
+    public ?string $cod_aplicacion_anterior = null;
+
+    public ?string $cod_aplicacion_existente = null;
+
+    public string $motivo_rectificacion = '';
+
+    #[Locked]
+    public ?string $estadoConciliacion = null;
+
     public array $valores = [];
 
     #[Locked]
@@ -88,7 +108,8 @@ abstract class CapturaInstrumentalModal extends Component
         abort_if($this->residenteFijo !== null && $codigoResidente !== $this->residenteFijo, 403);
         $contexto = $codigoResidente !== null ? $consulta->contexto(auth()->user(), $codigoResidente) : [];
         $this->reset(['cod_instrumento', 'instrumentoSeleccionado', 'codigoReservado', 'aplicacionGuardada', 'valores', 'preguntas',
-            'observaciones', 'confirmando', 'confirmarDescarte', 'busquedaResidente', 'huellaCatalogo', 'huellaConfirmacion']);
+            'observaciones', 'confirmando', 'confirmarDescarte', 'busquedaResidente', 'huellaCatalogo', 'huellaConfirmacion',
+            'transcripcion', 'cod_documento_clinico', 'cod_personal_original', 'localizador_fuente', 'original_cotejado', 'cod_aplicacion_anterior', 'cod_aplicacion_existente', 'motivo_rectificacion', 'estadoConciliacion']);
         $this->resetValidation();
         $this->cod_residente = $this->residenteSeleccionado = $codigoResidente;
         $this->contexto = $contexto;
@@ -132,7 +153,11 @@ abstract class CapturaInstrumentalModal extends Component
 
     public function updated(string $property): void
     {
-        if (str_starts_with($property, 'valores.') || in_array($property, ['valores', 'cod_residente', 'cod_instrumento', 'observaciones', 'fecha_eval', 'hora_eval'], true)) {
+        if ($property === 'transcripcion' && $this->transcripcion) {
+            $this->fecha_eval = $this->hora_eval = '';
+        }
+        if (str_starts_with($property, 'valores.') || in_array($property, ['valores', 'cod_residente', 'cod_instrumento', 'observaciones', 'fecha_eval', 'hora_eval',
+            'transcripcion', 'cod_documento_clinico', 'cod_personal_original', 'localizador_fuente', 'original_cotejado', 'cod_aplicacion_anterior', 'cod_aplicacion_existente', 'motivo_rectificacion'], true)) {
             $this->confirmando = false;
             $this->huellaConfirmacion = null;
         }
@@ -141,6 +166,19 @@ abstract class CapturaInstrumentalModal extends Component
     public function revisar(): void
     {
         $entrada = $this->entrada();
+        if ($this->transcripcion) {
+            try {
+                $this->estadoConciliacion = app(AplicarInstrumento::class)->conciliar(auth()->user(), $entrada,
+                    Instrumento::query()->findOrFail($this->cod_instrumento), Residente::query()->findOrFail($this->cod_residente))['estado'];
+            } catch (HttpException $e) {
+                if (! in_array($e->getStatusCode(), [409, 422], true)) {
+                    throw $e;
+                }
+                $this->addError('registro', $e->getMessage());
+
+                return;
+            }
+        }
         // Reserva interna: la PK proporciona una identidad única para los reenvíos del formulario confirmado.
         $this->codigoReservado ??= app(CodigosEntidad::class)->siguiente('aplicaciones_instrumento');
         $this->huellaConfirmacion = $this->huellaEntrada($entrada);
@@ -165,8 +203,11 @@ abstract class CapturaInstrumentalModal extends Component
             return;
         }
         try {
-            $aplicacion = app(AplicarInstrumento::class)->aplicar(auth()->user(), $entrada,
-                Instrumento::query()->findOrFail($this->cod_instrumento), Residente::query()->findOrFail($this->cod_residente), $this->codigoReservado, $this->huellaCatalogo);
+            $accion = app(AplicarInstrumento::class);
+            $instrumento = Instrumento::query()->findOrFail($this->cod_instrumento);
+            $residente = Residente::query()->findOrFail($this->cod_residente);
+            $aplicacion = $this->transcripcion ? $accion->transcribir(auth()->user(), $entrada, $instrumento, $residente, $this->huellaCatalogo)
+                : $accion->aplicar(auth()->user(), $entrada, $instrumento, $residente, $this->codigoReservado, $this->huellaCatalogo);
         } catch (ValidationException $e) {
             foreach ($e->errors() as $campo => $mensajes) {
                 $destino = preg_match('/^respuestas\.(\d+)\./', $campo, $m)
@@ -178,6 +219,13 @@ abstract class CapturaInstrumentalModal extends Component
         } catch (QueryException $e) {
             report($e);
             $this->addError('registro', 'No se pudo registrar la captura. Conservamos tus respuestas para que puedas volver a intentarlo.');
+
+            return;
+        } catch (HttpException $e) {
+            if (! in_array($e->getStatusCode(), [409, 422], true)) {
+                throw $e;
+            }
+            $this->addError('registro', $e->getMessage());
 
             return;
         }
@@ -237,12 +285,17 @@ abstract class CapturaInstrumentalModal extends Component
         }
 
         return ['fecha_hora' => $fechaOriginal,
-            'observacion' => $this->observaciones === '' ? null : $this->observaciones, 'respuestas' => $respuestas];
+            'observacion' => $this->observaciones === '' ? null : $this->observaciones, 'respuestas' => $respuestas]
+            + ($this->transcripcion ? ['cod_documento_clinico' => $this->cod_documento_clinico, 'cod_personal_original' => $this->cod_personal_original,
+                'localizador_fuente' => $this->localizador_fuente, 'original_cotejado' => $this->original_cotejado,
+                'cod_aplicacion_existente' => $this->cod_aplicacion_existente ?: null,
+                'cod_aplicacion_anterior' => $this->cod_aplicacion_anterior ?: null, 'motivo_rectificacion' => $this->motivo_rectificacion ?: null] : []);
     }
 
     private function tieneCambios(): bool
     {
-        return $this->hayRespuestas() || $this->fechaInicial !== [$this->fecha_eval, $this->hora_eval];
+        return $this->hayRespuestas() || $this->fechaInicial !== [$this->fecha_eval, $this->hora_eval]
+            || $this->cod_documento_clinico !== null || $this->localizador_fuente !== '' || $this->cod_personal_original !== '' || $this->motivo_rectificacion !== '';
     }
 
     private function hayRespuestas(): bool
@@ -271,17 +324,20 @@ abstract class CapturaInstrumentalModal extends Component
     public function render()
     {
         $consulta = app(PrepararCapturaInstrumental::class);
-        $instrumentos = $residentes = collect();
+        $instrumentos = $residentes = $documentos = collect();
         if ($this->mostrar) {
             $instrumentos = $consulta->instrumentos(auth()->user());
             if ($this->cod_residente !== null) {
                 $this->comprobarResidente();
+                if ($this->transcripcion) {
+                    $documentos = $consulta->fuentesTranscripcion(auth()->user(), $this->cod_residente);
+                }
             }
             if ($this->residenteFijo === null) {
                 $residentes = $consulta->residentes(auth()->user(), mb_substr($this->busquedaResidente, 0, 100));
             }
         }
 
-        return view('livewire.valoraciones.evaluacion-geriatrica-modal', compact('instrumentos', 'residentes'));
+        return view('livewire.valoraciones.evaluacion-geriatrica-modal', compact('instrumentos', 'residentes', 'documentos'));
     }
 }

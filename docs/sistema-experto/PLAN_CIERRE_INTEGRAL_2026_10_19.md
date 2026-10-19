@@ -35,10 +35,12 @@ Estas verificaciones corresponden a sus respectivos alcances; no prueban que el 
 ### 2. Cerrar adquisición y vinculación de fuentes originales
 
 - [ ] Cotejar las aplicaciones realmente existentes: instrumento, edición, forma, idioma y condiciones; registrar los vínculos exactos de preguntas/columnas con cada entrada del método.
-- [ ] Distinguir profesional que aplicó una evaluación histórica de quien transcribe ahora. El formulario actual atribuye la escritura al profesional de sesión; no debe utilizarse para suplantar al autor original.
+- [x] Distinguir profesional que aplicó una evaluación histórica de quien transcribe ahora: autor original cotejado, cuenta actual e instante técnico separados. Permiso específico de Medicina/Psicología y cinco columnas aprobadas instalados en desarrollo.
 - [ ] Completar la captura de contexto que exija cada método con soporte verificable: escolaridad, fechas, condiciones sensoriales/motoras y desviaciones.
-- [ ] Preparar importación controlada: validación previa, informe de conflictos, transacción, reintento y conciliación por fuente. Una corrección preserva el registro anterior; no sustituye longitudinalidad por borrado.
-- [ ] Probar NULL, cero, «No», preguntas/opciones ajenas, fuentes anuladas/futuras, autor ausente, aplicaciones incompletas y revocación de acceso.
+- [x] Preparar importación controlada: API/Action de conciliación sin escrituras, conflictos, transacción y reintento por fuente; vinculación explícita de registros previos y rectificaciones enlazadas. No se ha ejecutado una nueva carga histórica sin originales identificables.
+- [x] Probar NULL, cero, «No», preguntas/opciones ajenas, fuentes anuladas/futuras, autor ausente, aplicaciones incompletas y revocación de acceso; concurrencia en PostgreSQL desechable.
+
+**Avance técnico del 19/10/2026:** [acta de fase 2 y matriz de evidencia](FASE_2_FUENTES_ORIGINALES_2026_10_19.md), con [investigación de los métodos y diccionario de procedencia](ORION_FUENTES_ORIGINALES_E_INVESTIGACION_2026_10_19.md). Se conservan íntegras 487 aplicaciones y 2296 respuestas locales. Permanecen abiertos el cotejo de instrumentos realmente aplicados y las mediciones/condiciones originales ausentes; la bibliografía no permite generarlas. QA visual pendiente por navegador deshabilitado en Work.
 
 **Entregable:** catálogo de vínculos verificables y adquisición reproducible. **Cierre:** cada dato usado tiene residente, aplicación, origen, fecha y autor identificables; los datos no aportados siguen faltantes.
 

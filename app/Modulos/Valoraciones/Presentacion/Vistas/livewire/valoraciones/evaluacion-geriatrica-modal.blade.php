@@ -4,7 +4,7 @@
             <x-slot:context>
                 <div class="px-5 sm:px-6 py-3 text-sm break-words">
                     <p><strong>Residente:</strong> {{ $contexto['residente'] ?? 'Selecciona un residente' }}</p>
-                    @if(isset($contexto['profesional']))<p class="mt-1"><strong>Profesional:</strong> {{ $contexto['profesional'] }}</p>@endif
+                    @if(isset($contexto['profesional']))<p class="mt-1"><strong>Profesional que registra:</strong> {{ $contexto['profesional'] }}</p>@endif
                 </div>
             </x-slot:context>
             @error('registro')<p class="rm-error mb-3" role="alert">{{ $message }}</p>@enderror
@@ -18,6 +18,13 @@
                 </div>
             @else
                 <form wire:submit="revisar" class="space-y-4">
+                    @can('aplicaciones_instrumento.transcribir')
+                        <x-ui.field :for="'captura-origen-'.$this->getId()" label="Origen del registro">
+                            <select id="captura-origen-{{ $this->getId() }}" class="rm-input" wire:model.live="transcripcion" @disabled($confirmando)>
+                                <option value="0">Aplicación propia</option><option value="1">Transcripción de un documento original</option>
+                            </select>
+                        </x-ui.field>
+                    @endcan
                     @if($residenteFijo === null)
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <x-ui.field :for="'captura-buscar-'.$this->getId()" label="Buscar residente por nombre">
@@ -37,6 +44,27 @@
                             @foreach($instrumentos as $instrumento)<option value="{{ $instrumento->cod_instrumento }}">{{ $instrumento->nombre }} · {{ $instrumento->version ?: 'Versión no registrada' }}</option>@endforeach
                         </select>
                     </x-ui.field>
+                    @if($transcripcion)
+                        <x-ui.field :for="'captura-documento-'.$this->getId()" label="Documento original del residente" required error="cod_documento_clinico">
+                            <select id="captura-documento-{{ $this->getId() }}" class="rm-input" wire:model="cod_documento_clinico" aria-invalid="{{ $errors->has('cod_documento_clinico') ? 'true' : 'false' }}" @if($errors->has('cod_documento_clinico')) aria-describedby="captura-documento-{{ $this->getId() }}-error" @endif @disabled($confirmando)>
+                                <option value="">Selecciona el documento cotejado</option>
+                                @foreach($documentos as $documento)<option value="{{ $documento->getKey() }}">{{ $documento->titulo }} · {{ $documento->getKey() }}</option>@endforeach
+                            </select>
+                        </x-ui.field>
+                        @foreach(['cod_personal_original' => 'Código del profesional aplicador original', 'localizador_fuente' => 'Página, ficha o fila del original',
+                            'cod_aplicacion_existente' => 'Aplicación ya registrada, solo para vincular su original',
+                            'cod_aplicacion_anterior' => 'Aplicación anterior, solo si rectifica', 'motivo_rectificacion' => 'Motivo de la rectificación'] as $campo => $etiqueta)
+                            <x-ui.field :for="'captura-'.$campo.'-'.$this->getId()" :label="$etiqueta" :error="$campo">
+                                <input id="captura-{{ $campo }}-{{ $this->getId() }}" class="rm-input" type="text" wire:model="{{ $campo }}" aria-invalid="{{ $errors->has($campo) ? 'true' : 'false' }}" @if($errors->has($campo)) aria-describedby="captura-{{ $campo }}-{{ $this->getId() }}-error" @endif @disabled($confirmando)>
+                            </x-ui.field>
+                        @endforeach
+                        <label class="flex items-start gap-3" for="captura-cotejo-{{ $this->getId() }}">
+                            <input id="captura-cotejo-{{ $this->getId() }}" type="checkbox" wire:model="original_cotejado" aria-invalid="{{ $errors->has('original_cotejado') ? 'true' : 'false' }}" @if($errors->has('original_cotejado')) aria-describedby="captura-cotejo-{{ $this->getId() }}-error" @endif @disabled($confirmando)>
+                            He cotejado la firma, la fecha, el instrumento y las respuestas con el documento original.
+                        </label>
+                        @error('original_cotejado')<p id="captura-cotejo-{{ $this->getId() }}-error" role="alert" class="rm-error">{{ $message }}</p>@enderror
+                        <p class="text-sm text-rm-secondary">Conserva el autor y la hora que figuran en el original. Una rectificación añade otra aplicación; no reemplaza la anterior.</p>
+                    @endif
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <x-ui.field :for="'captura-fecha-'.$this->getId()" label="Fecha original" error="fecha_eval" required>
                             <input id="captura-fecha-{{ $this->getId() }}" type="date" class="rm-input" wire:model="fecha_eval" aria-required="true" aria-invalid="{{ $errors->has('fecha_eval') ? 'true' : 'false' }}" @if($errors->has('fecha_eval')) aria-describedby="captura-fecha-{{ $this->getId() }}-error" @endif @disabled($confirmando)>
@@ -47,6 +75,7 @@
                     </div>
                     @if($confirmando)
                         <p class="text-sm font-semibold" role="status">Revisa el residente, la fecha y las respuestas. Al confirmar se registrará la captura; su interpretación depende del método disponible.</p>
+                        @if($transcripcion)<p class="text-sm" role="status">Conciliación: {{ match($estadoConciliacion) { 'IDENTICA' => 'Esta fuente ya está registrada con el mismo contenido. Se conservará sin duplicarla.', 'VINCULACION' => 'Se vinculará el original al registro existente sin modificar sus respuestas ni duplicarlo.', 'RECTIFICACION' => 'Se añadirá una rectificación y se conservará la aplicación anterior.', default => 'Fuente nueva, lista para registrar.' } }}</p>@endif
                     @endif
                     @if($cod_instrumento && $preguntas === [])
                         <p class="text-sm" role="status">Este instrumento no tiene preguntas activas. Su catálogo debe completarse antes de registrar mediciones; no se guardará una aplicación vacía.</p>

@@ -2191,7 +2191,7 @@
     ],
     "uri": "admin/adultos-mayores/{adulto_mayor}/evaluaciones",
     "name": "admin.adultos-mayores.evaluaciones.index",
-    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\AdultoMayorEvaluacionController@index",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\EvaluacionInstrumentalController@index",
     "middleware": [
       "web",
       "auth:sanctum",
@@ -2213,7 +2213,7 @@
     ],
     "uri": "admin/adultos-mayores/{adulto_mayor}/evaluaciones",
     "name": "admin.adultos-mayores.evaluaciones.store",
-    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\AdultoMayorEvaluacionController@store",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\EvaluacionInstrumentalController@store",
     "middleware": [
       "web",
       "auth:sanctum",
@@ -2236,7 +2236,7 @@
     ],
     "uri": "admin/adultos-mayores/{adulto_mayor}/evaluaciones/{evaluacion}",
     "name": "admin.adultos-mayores.evaluaciones.show",
-    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\AdultoMayorEvaluacionController@show",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\EvaluacionInstrumentalController@show",
     "middleware": [
       "web",
       "auth:sanctum",
@@ -2258,7 +2258,7 @@
     ],
     "uri": "admin/adultos-mayores/{adulto_mayor}/evaluaciones/{evaluacion}",
     "name": "admin.adultos-mayores.evaluaciones.destroy",
-    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\AdultoMayorEvaluacionController@destroy",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\EvaluacionInstrumentalController@destroy",
     "middleware": [
       "web",
       "auth:sanctum",
@@ -2280,7 +2280,7 @@
     ],
     "uri": "admin/adultos-mayores/{adulto_mayor}/evaluaciones/{evaluacion}/restaurar",
     "name": "admin.adultos-mayores.evaluaciones.restore",
-    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\AdultoMayorEvaluacionController@restore",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\EvaluacionInstrumentalController@restore",
     "middleware": [
       "web",
       "auth:sanctum",
@@ -5985,6 +5985,46 @@
       "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
       "verified",
       "permission:aplicaciones_instrumento.crear"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/instrumentos/{instrumento}/residentes/{residente}/transcripciones/conciliar",
+    "name": "admin.instrumentos.transcripciones.conciliar",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\InstrumentoController@conciliar",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:aplicaciones_instrumento.transcribir"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "admin/instrumentos/{instrumento}/residentes/{residente}/transcripciones",
+    "name": "admin.instrumentos.transcripciones.guardar",
+    "action": "App\\Modulos\\Valoraciones\\Presentacion\\Http\\Controllers\\InstrumentoController@transcribir",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "permission:aplicaciones_instrumento.transcribir"
     ],
     "domain": null,
     "defaults": [],
