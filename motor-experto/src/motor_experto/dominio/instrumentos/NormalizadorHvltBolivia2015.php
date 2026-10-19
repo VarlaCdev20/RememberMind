@@ -71,7 +71,7 @@ final class NormalizadorHvltBolivia2015
                 $faltantes[] = ! $libreValido ? 'RECUERDO_DIFERIDO_NO_MEDIDO_O_INVALIDO' : 'DEMORA_NO_ACREDITADA_ENTRE_20_Y_25_MINUTOS';
             }
             $resultado = ['estado' => 'NO_NORMALIZABLE', 'motivos' => $faltantes, 'puntuacion_bruta' => null,
-                'esperado' => null, 'z' => null, 'clasificacion_clinica' => null];
+                'esperado' => null, 'z' => null, 'direccion' => 'MAYOR_ES_MEJOR', 'clasificacion_clinica' => null];
             if ($faltantes === []) {
                 $puntuacion = $codigo === 'MEM-S01' ? array_sum($ensayos) : $libre;
                 $esperado = $codigo === 'MEM-S01' ? 24.553 - 0.112 * $edad + 3.264 * ($escolaridad > 12 ? 1 : 0)

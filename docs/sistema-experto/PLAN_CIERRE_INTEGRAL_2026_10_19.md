@@ -44,6 +44,11 @@ Estas verificaciones corresponden a sus respectivos alcances; no prueban que el 
 
 ### 3. Completar interpretación instrumental
 
+**Trabajo activo autorizado el 19/10/2026:** verificar ocho componentes con
+cálculo y resolver los once restantes. Objetivo, fuentes y seguimiento en
+[Fase 3: componentes](FASE_3_COMPONENTES_2026_10_19.md). No se marca cerrado
+por disponer únicamente de campos o motivos de abstención.
+
 - [ ] Verificar los siete perfiles implementados contra su edición y las fuentes originales que se vinculen.
 - [ ] Resolver once componentes sin normalizador: MEM-S03/S04, ATE-S01/S02, EJE-S03/S04/S05, LEN-S03/S04/S05 y VIS-S01.
 - [ ] Para cada uno, documentar instrumento, administración, población, rúbrica, entradas, cálculo, dirección y límites. Cotejar manuales y derechos de uso cuando correspondan.

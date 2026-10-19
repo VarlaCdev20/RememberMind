@@ -17,7 +17,8 @@ final class RegistroMetodosInstrumentales
             'componentes' => ['MEM-S01', 'MEM-S02'], 'fuente' => NormalizadorHvltBolivia2015::FUENTE,
             'edad_minima' => 18, 'edad_maxima' => 95, 'escolaridad_minima' => 1,
             'lectoescritura_requerida' => true, 'reproduce_reactivos' => false, 'revision_profesional' => 'PENDIENTE']]
-            + (new NormalizadorBateriaBolivia2015)->metodos();
+            + (new NormalizadorBateriaBolivia2015)->metodos()
+            + [CalculadorReconocimientoHvlt::METODO => (new CalculadorReconocimientoHvlt)->metadatos()];
     }
 
     public function ejecutar(string $metodo, array $captura): array
@@ -26,8 +27,13 @@ final class RegistroMetodosInstrumentales
             throw new DomainException('No existe un método instrumental registrado con esa identidad.');
         }
 
-        return $metodo === NormalizadorHvltBolivia2015::METODO
-            ? (new NormalizadorHvltBolivia2015)->normalizar($captura)
-            : (new NormalizadorBateriaBolivia2015)->normalizar($metodo, $captura);
+        // El complemento descriptivo no usa normas de recuerdo para reconocimiento.
+        $salida = match ($metodo) {
+            NormalizadorHvltBolivia2015::METODO => (new NormalizadorHvltBolivia2015)->normalizar($captura),
+            CalculadorReconocimientoHvlt::METODO => (new CalculadorReconocimientoHvlt)->calcular($captura),
+            default => (new NormalizadorBateriaBolivia2015)->normalizar($metodo, $captura),
+        };
+
+        return (new ExplicacionMatematicaInstrumental)->agregar($salida);
     }
 }

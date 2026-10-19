@@ -13,7 +13,7 @@ namespace MotorExperto\dominio\instrumentos;
  */
 final class CatalogoCapturaCognitiva
 {
-    public const VERSION = 'CAPTURA-COGNITIVA-2-20261018';
+    public const VERSION = 'CAPTURA-COGNITIVA-3-20261019';
 
     public function componentes(): array
     {
@@ -100,8 +100,12 @@ final class CatalogoCapturaCognitiva
         $registro = (new RegistroMetodosInstrumentales)->metodos();
         foreach ($datos as $codigo => [$instrumento, $fuente, $campos, $limite]) {
             $metodos = array_filter($registro, fn ($m) => in_array($codigo, $m['componentes'], true));
+            // Un cálculo bruto no aumenta la cobertura normativa de los ocho componentes.
+            $descriptivos = array_filter($metodos, fn ($m) => ($m['tipo'] ?? null) === 'CALCULO_DESCRIPTIVO');
+            $metodos = array_diff_key($metodos, $descriptivos);
             $resultado[$codigo] = ['version' => self::VERSION, 'instrumento_referencia' => $instrumento, 'fuente' => $fuente,
                 'campos' => $campos, 'limite' => $limite, 'metodos_disponibles' => array_keys($metodos),
+                'calculos_descriptivos_disponibles' => array_keys($descriptivos),
                 'estado_metodo' => $metodos === [] ? 'CAPTURA_DOCUMENTADA_SIN_NORMALIZADOR' : 'NORMALIZADOR_DISPONIBLE_CON_CONDICIONES',
                 'instrumento_administrado' => null, 'mediciones_residente' => null];
         }
