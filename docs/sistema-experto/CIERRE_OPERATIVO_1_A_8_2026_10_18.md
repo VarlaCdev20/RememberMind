@@ -17,18 +17,9 @@ La propietaria confirmó: Medicina y Psicología gestionan y aprueban reglas; Su
 
 ## Checklist de aceptación
 
-| Entregable | Aceptación técnica | Estado inicial |
-| --- | --- | --- |
-| 1. Red operativa | Conceptos, variables, fuentes y reglas conectados; versiones y tipos validados; navegación desde conclusión a evidencia | Por completar |
-| 2. Perfiles instrumentales | Registro ejecutable por instrumento/edición/tarea/método; respuestas originales y motivos de no interpretación | [Ampliación V2](METODOS_Y_CAMPOS_INVESTIGADOS_V2_2026_10_18.md): siete perfiles, once medidas normativas y ocho componentes con cálculo; diccionario de los 19 componentes. Faltan mediciones/bindings originales, normalizadores compatibles de otros once componentes e integración clínica; sin corte diagnóstico automático |
-| 3. Cinco dominios | Ejecutor sobre fuentes institucionales, diecinueve componentes, desconocidos/contradicciones y reglas elegibles | Por completar |
-| 4. DCL | Cuatro patrones y abstenciones desde soportes originales de C01–C05, sin referencias de prueba | Por completar |
-| 5. Adquisición | Lotes autorizados, fecha/corte/autor/estado/contexto y pertenencia de respuestas; sin valores clínicos de relleno | [Formulario conectado el 19/10](CAPTURA_INSTRUMENTAL_FORMULARIO_2026_10_19.md): captura por pregunta, fecha/hora original, autor propio, revisión, rollback y reenvío protegido; historial y resultados conectados. Faltan vínculos instrumentales y mediciones originales verificables; no se declara cerrado el conjunto de adquisición |
-| 6. Conservación | Guardar/recuperar exacto, reintento, rollback e historia inmutable, incluso fuentes rechazadas | Contrato por cerrar según matriz de fuentes |
-| 7. Gobierno de reglas | Crear, probar, sustituir, archivar, revisar; autor/revisor/motivo; administración MED/PSI y consulta técnica | Gestor institucional y pantalla implementados; ampliación aprobada. Sucesoras conectadas al ejecutor observacional `OBS-SNAP-2`, sin reinterpretar historia; pendiente QA visual y alcance integral de cinco dominios |
-| 8. Resultados y revisión | Informe desde instantánea, explicación y dos cadenas de revisión posteriores, sin firma ficticia | Por completar |
+La **[matriz única vigente de E1–E8](CONSOLIDACION_PUNTO_1_2026_10_19.md)** sustituye el resumen de estados anterior. Conserva los requisitos y detalla fuente, componente/archivo, prueba, evidencia, pendiente y aceptación restante. Este documento mantiene el contrato y la evidencia histórica de los incrementos.
 
-Las marcas se actualizarán únicamente con implementación y evidencia. No se declara cerrado un instrumento por registrar un perfil vacío ni una clasificación por ejecutar solo la abstención.
+Las marcas vigentes se actualizan en esa matriz y en el [plan por fases](PLAN_CIERRE_INTEGRAL_2026_10_19.md), con implementación y evidencia. No se declara cerrado un instrumento por registrar un perfil vacío ni una clasificación por ejecutar solo la abstención. La consolidación del punto 1 está cerrada; la red operativa E1 conserva su estado parcial.
 
 Incremento del 19/10: [captura instrumental y verificación](CAPTURA_INSTRUMENTAL_FORMULARIO_2026_10_19.md). Se reutilizan las cinco tablas operativas de instrumentos y las autorizaciones existentes, sin tablas ni permisos nuevos. El [análisis de conservación instrumental](CONSERVACION_INSTRUMENTAL_ANALISIS_2026_10_19.md) separa la brecha institucional de la RFC del laboratorio; sus alternativas son candidatas sin aprobación ni DDL.
 

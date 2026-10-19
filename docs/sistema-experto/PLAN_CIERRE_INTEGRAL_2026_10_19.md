@@ -23,12 +23,14 @@ Estas verificaciones corresponden a sus respectivos alcances; no prueban que el 
 
 ### 1. Consolidar el corte y la cobertura
 
-- [ ] Incorporar en una matriz única los ocho entregables, sus componentes existentes, pendientes y pruebas.
-- [ ] Revisar los cambios en curso relacionados antes de integrarlos, preservando trabajo ajeno e historia.
-- [ ] Fijar la revisión coherente de conocimiento, motor y contrato de captura que se entregará.
-- [ ] Mantener una lista explícita de decisiones de dominio o estructura aún no resueltas.
+- [x] Incorporar en una matriz única los ocho entregables, sus componentes existentes, pendientes y pruebas.
+- [x] Revisar los cambios en curso relacionados antes de integrarlos, preservando trabajo ajeno e historia.
+- [x] Fijar la revisión coherente de conocimiento, motor y contrato de captura que se entregará.
+- [x] Mantener una lista explícita de decisiones de dominio o estructura aún no resueltas.
 
 **Entregable:** matriz requisito → fuente → componente → archivo → prueba → evidencia. **Cierre:** cada pendiente tiene ubicación, dependencia y criterio verificable; lo ya entregado no se reimplementa.
+
+**Cerrado el 19/10/2026:** [acta, matriz única y registro de versiones](CONSOLIDACION_PUNTO_1_2026_10_19.md), con [manifiesto de archivos y cambios locales](CORTE_PUNTO_1_2026_10_19.csv). Se fija el código integrado `f3d56ed2`, se distingue el laboratorio pendiente de integración y se registran P01–P09. No existe todavía un paquete institucional integral; se conserva esa brecha sin crear una versión común ficticia. Este cierre corresponde a la consolidación, no a haber terminado la red operativa ni las fases 2–8.
 
 ### 2. Cerrar adquisición y vinculación de fuentes originales
 
