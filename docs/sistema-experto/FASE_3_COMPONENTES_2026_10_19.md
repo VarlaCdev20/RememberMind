@@ -117,3 +117,53 @@ pruebas. No se modifica frontend; build y QA visual no aplican a este incremento
 
 Sin cambios propios en BDD, permisos, historias de residentes o reglas expertas.
 No se han ejecutado motores clínicos sobre residentes ni generado mediciones.
+
+## Ampliación ante la solicitud de cierre
+
+La propietaria solicitó resolver las brechas con fuentes médicas válidas y cerrar
+la fase. Se amplió la investigación con la guía DETeCD-ADRD, NICE NG97, ITC y
+fuentes originales NEURONORMA, UAB y WAB castellana. El
+[informe actualizado](INVESTIGACION_PROFESIONAL_19_COMPONENTES_2026_10_19.md#ampliación-solicitada-fuentes-médicas-y-neuropsicológicas-para-el-cierre)
+identifica qué resuelve cada fuente y qué no acredita.
+
+Implementación adicional: `CalculadorLenguajeWabCastellano2000`, repetición y habla
+espontánea conforme a la tabla original de la edición castellana 2000, página
+impresa 18. Conversión de repetición por diez; suma de contenido y fluidez. Se
+reutilizan registro, extractor y perfil; no se intercambian WAB y WAB-R ni se
+introducen cocientes de afasia o diagnósticos. La explicación descriptiva ahora
+identifica la operación de cada medida; no describe lenguaje como reconocimiento.
+
+Cobertura actual: **siete perfiles normativos más dos descriptivos**. Ocho
+componentes con once medidas normativas; tres componentes adicionales con
+aritmética descriptiva. Continúan once componentes sin normalización aplicable
+verificada. No se cambia el criterio de aceptación para convertir un complemento
+bruto en normalizador completado.
+
+Verificación adicional SQLite:
+
+```powershell
+php artisan test --compact --filter='LenguajeWabCastellanoInvestigadoTest|InterpretacionInstrumentalFaseTresTest|NormalizacionInstrumentalInvestigadaTest|NormalizacionBateriaBolivia2015Test|PerfilInstrumentalInstitucionalTest|CapturaInstrumentalInstitucionalTest|PreparacionInstrumentalInvestigadaTest' --colors=never
+```
+
+PASS: **151 pruebas / 1498 aserciones** en el árbol compartido del momento.
+Incluye 28 casos nuevos WAB: aritmética independiente, límites, NULL/cero,
+tipos, ediciones incompatibles, condiciones ausentes, parcialidad, extracción
+tipada, fuentes compartidas y cobertura que no se infla a diecinueve.
+Pint y sintaxis de los archivos nuevos: PASS.
+
+Mismo filtro en PostgreSQL desechable mediante `scripts/probar-postgres.ps1`:
+**151 pruebas / 1497 aserciones, PASS**. Se conserva el conteo propio de cada
+motor; no se oculta su diferencia de una aserción. Evidencia local:
+`remembermind-pg-dcd9d136e3524b0bbb1d5ce142f67fbb.junit.xml` y `.log`, en el
+directorio temporal. El clúster propio se detuvo y eliminó al finalizar.
+Build/QA visual no aplican: no hay cambios propios en Presentation o frontend.
+
+Archivos adicionales propios: calculador WAB y su prueba
+`tests/Unit/LenguajeWabCastellanoInvestigadoTest.php`, registro, explicación,
+catálogo y los dos documentos de esta fase. Se conservan los demás cambios
+concurrentes fuera del incremento.
+
+**Dictamen:** investigación ampliada y aritmética verificable entregadas;
+cierre funcional de la fase 3 todavía no acreditado. No existe una guía médica
+que por sí sola proporcione las once conversiones ausentes. Tampoco se
+presenta el dictamen técnico propio como validación clínica independiente.

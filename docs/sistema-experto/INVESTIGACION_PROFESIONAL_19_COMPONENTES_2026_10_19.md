@@ -1,14 +1,21 @@
 # O.R.I.O.N. — Investigación de los 19 componentes cognitivos
 
-Fecha de corte: 19 de octubre de 2026. Versión documental 1.0.
+Fecha de corte: 19 de octubre de 2026. Versión documental 1.1.
 Destinatarios: Medicina, Psicología y equipo de desarrollo de RememberMind.
 Estado: investigación e implementación instrumental parcial; no validación clínica.
+
+**Actualización tras la petición de cierre:** se localizó y cotejó visualmente
+la WAB castellana de Nau Llibres de 2000, con dos cálculos descriptivos incorporados
+y probados. Se resolvió la identificación de esta alternativa española; no se
+la intercambió con WAB-R. Véase la ampliación al final. La cobertura normativa
+sigue siendo de ocho componentes y el cierre funcional de los diecinueve no
+está acreditado. El título de una guía clínica no proporciona sus once baremos.
 
 ## Resultado de esta revisión
 
 Se contrastaron los ocho componentes que ya tenían cálculo con las publicaciones
 originales. Se añaden ejemplos independientes para sus once medidas, explicación
-matemática y un cálculo descriptivo de reconocimiento HVLT-R. Los **once componentes
+matemática y cálculos descriptivos de reconocimiento HVLT-R y lenguaje WAB castellano. Los **once componentes
 pendientes de normalización siguen pendientes**: una resta descriptiva no cierra
 una norma, y una referencia española no se convierte en boliviana por programarla.
 
@@ -257,24 +264,25 @@ española. Un baremo pediátrico latinoamericano no resuelve esta evaluación ge
 ### 16. LEN-S04 — Repetición verbal
 
 **Para qué / por qué:** examinar reproducción del lenguaje escuchado, separada de
-la producción espontánea. **Uso candidato:** subprueba WAB-R, forma completa o
-bedside explícita, respuesta y puntuación original. **Cálculo:** total conforme
-a rúbrica de esa forma; sin máximo o factor importado de otra versión.
+la producción espontánea. **Uso documentado:** WAB castellana, Nau Llibres 2000,
+con corrección original de la subprueba. **Cálculo:** total original 0–100 dividido
+por 10; no reutilizar esa conversión para WAB-R o bedside de otra versión.
 **Interpretación:** una clasificación de afasia no equivale a DCL.
-**Pendiente:** ficha editorial consultada en inglés; no se verificó aquí edición
-española y norma compatible. La ficha comercial no proporciona la rúbrica completa.
-[Pearson, WAB-R](https://www.pearsonassessments.com/store/en/usd/p/100000194.html).
+**Cobertura:** conversión descriptiva implementada; falta comparación normativa
+aplicable. La puntuación original debe ser corregida con el material legítimo.
+[WAB castellana, fuente original, pp. 7 y 18](https://talkbank.org/aphasia/protocol/languages/Spanish/WAB.pdf).
 
 ### 17. LEN-S05 — Producción verbal y discurso
 
 **Para qué / por qué:** estudiar discurso obtenido en una tarea identificable.
-**Uso candidato:** muestra de habla de WAB-R con referencia al original, contenido
-y fluidez separados. **Cálculo:** puntuación mediante rúbrica; no análisis
+**Uso documentado:** muestra de habla de WAB castellana 2000 con referencia al original,
+contenido y fluidez separados. **Cálculo:** contenido 0–10 más fluidez 0–10,
+corregidos según rúbrica; no análisis
 automático de una nota de cuidados. **Interpretación:** describe la muestra y
 sus limitaciones; repetición conservada no demuestra discurso conservado.
-**Pendiente:** misma identificación de idioma, edición, rúbrica y norma que LEN-S04.
+**Cobertura:** suma descriptiva implementada; pendiente comparación normativa aplicable.
 No se duplicó la batería para fabricar evaluaciones independientes.
-[Pearson, WAB-R, forma y manuales](https://www.pearsonassessments.com/store/en/usd/p/100000194.html).
+[WAB castellana, fuente original, p. 18](https://talkbank.org/aphasia/protocol/languages/Spanish/WAB.pdf).
 
 ## Fichas visuoespaciales
 
@@ -339,7 +347,7 @@ validación por un segundo profesional.
 | EJE-S04 | TOL-DX / segunda edición, diferencias documentadas | Edición, índices, tablas y cobertura de mayores de 80 si corresponde |
 | EJE-S05 | Semejanzas/Matrices, versiones España/México | Subprueba y referencia aplicable; interpretación institucional acordada |
 | LEN-S03 | Token / acp039 | Versión/rúbrica, tablas verificadas y aplicabilidad |
-| LEN-S04/S05 | WAB-R, forma completa/bedside | Edición española legítima identificada o sustitución profesionalmente decidida |
+| LEN-S04/S05 | WAB castellana Nau Llibres 2000 y aritmética verificadas; distinta de WAB-R | Comparación poblacional aplicable y soporte institucional de edición/material/muestra originales |
 | VIS-S01 | VOSP/JLO / acp040 | Instrumento/subprueba, tablas íntegras y aplicabilidad |
 
 Investigar no permite decidir silenciosamente que una norma extranjera ya es
@@ -374,10 +382,10 @@ recuentos originales, demora 20–25 y administración documentada. Devuelve
 clasificación clínica nula. El rango algebraico de la diferencia es −12 a 12;
 no se presenta como rango normativo validado del manual.
 
-El catálogo `CAPTURA-COGNITIVA-3-20261019` separa
+El catálogo `CAPTURA-COGNITIVA-4-20261019` separa
 `metodos_disponibles` (normativos) de `calculos_descriptivos_disponibles`.
-Se mantienen ocho componentes con norma, once pendientes de normalización y un
-complemento bruto. `PerfilInstrumentalCognitivo` conserva ese complemento sin
+Se mantienen ocho componentes con norma, once pendientes de normalización y tres
+componentes con cálculo bruto mediante dos perfiles descriptivos. El perfil conserva los complementos sin
 contarlo como medición normalizada ni inferir un resultado de memoria.
 
 El extractor y la consulta siguen exigiendo selección e identidad explícitas de
@@ -398,3 +406,92 @@ No se declara cerrada la fase 3. Falta normalización aplicable de once componen
 la selección institucional de ediciones/referencias y la evaluación profesional
 con datos originales. No hay evidencia de sensibilidad/especificidad, acuerdo
 entre profesionales ni validación de DCL aportada por estas pruebas técnicas.
+
+## Ampliación solicitada: fuentes médicas y neuropsicológicas para el cierre
+
+### Fundamento clínico actualizado
+
+La guía DETeCD-ADRD de la Alzheimer's Association, recomendación 14, respalda
+evaluación neuropsicológica normada cuando la exploración de consulta no resulta
+suficientemente informativa. Incluye aprendizaje/memoria, atención, funciones
+ejecutivas, visuoespaciales y lenguaje. Esto respalda la cobertura por dominios;
+**no prescribe nuestros diecinueve componentes ni publica conversiones normativas
+para todos ellos**. [Guía original, DOI 10.1002/alz.14333](https://onlinelibrary.wiley.com/doi/pdfdirect/10.1002/alz.14333).
+
+NICE NG97, §1.2.3–1.2.11, recomienda instrumentos validados y considerar evaluación
+neuropsicológica cuando persiste incertidumbre. Una puntuación aparentemente
+normal no excluye demencia por sí sola. Se toma como referencia clínica británica,
+no como legislación boliviana ni baremo de DCL.
+[NICE, recomendaciones originales](https://www.nice.org.uk/guidance/ng97/chapter/Recommendations).
+
+La International Test Commission requiere evidencia de equivalencia y documentación
+de puntuación/interpretación al adaptar pruebas entre contextos. Una traducción
+o un idioma compartido no demuestran equivalencia normativa. Tampoco la identidad
+nacional por sí sola determina la pertinencia: hay que considerar escolaridad,
+cultura, edad, idioma y condiciones concretas. No se impone aquí una prohibición
+general de referencias extranjeras; falta acreditar su aplicación e identificar
+las conversiones exactas en los once casos pendientes.
+[ITC, segunda edición, C-2 y puntuación/interpretación](https://www.intestcom.org/files/guideline_test_adaptation_2ed.pdf).
+
+### Fuente original recuperada: WAB castellana de 2000
+
+El editor identifica castellano, fecha 10/01/2000 e ISBN 9788476426326. El ejemplar
+académico consultado contiene la tabla de puntuaciones en página impresa 18
+(página PDF 19/20): repetición 0–100 se divide por diez; contenido de información
+y fluidez se puntúan 0–10 cada uno y suman 0–20 para habla espontánea.
+Se cotejó también la sección III para confirmar el total de repetición.
+[Editor Nau Llibres](https://naullibres.com/libro/bateria-de-afasias-western/),
+[documento original alojado en AphasiaBank/TalkBank](https://talkbank.org/aphasia/protocol/languages/Spanish/WAB.pdf).
+
+Se incorpora `WAB-ES-2000-ORAL-BRUTO-1`, con identidad exacta y tipo
+`CALCULO_DESCRIPTIVO`. Ejemplos independientes: repetición 98 produce 9.8/10;
+contenido 8 y fluidez 7 producen 15/20, conservando ambos originales. No se corrigen
+respuestas literales mediante software ni se reproducen reactivos, láminas o
+rúbricas. La consulta del ejemplar no acredita derechos de digitalización o uso
+del material institucional.
+
+La nueva salida distingue LEN-S04 y LEN-S05, exige condiciones documentadas y
+conserva su invalidez por separado. Ausencia de la muestra invalida discurso;
+ausencia de audición compatible invalida repetición. No se calculan cocientes de
+afasia, umbrales de alteración, z o DCL. No se presenta la división por diez como
+normalización estadística. El catálogo pasa a `CAPTURA-COGNITIVA-4-20261019`.
+
+Queda corregida la limitación bibliográfica del corte anterior: **sí existe una edición
+castellana identificada**. Sigue sin verificarse en esta entrega un baremo de
+esa edición aplicable al contexto de la residencia; WAB 2000 no equivale a
+WAB-R ni demuestra deterioro leve. Las fichas LEN-S04/S05 recogen esta actualización.
+
+### Otras fuentes completas y alternativas cotejadas
+
+Se recuperó el artículo original de métodos NEURONORMA desde la biblioteca actual
+de sus autores. Identifica 356 participantes comunitarios en España y las versiones
+seleccionadas, incluidas TOL-DX, FCSRT y Token. Resuelve dónde consultar el protocolo,
+pero no sustituye las tablas de cada publicación ni valida su traslado directo a
+otra población. [Peña-Casanova et al., acp027, copia de los autores](https://test-barcelona.com/wp-content/uploads/2025/09/2009-Neuronorma-1-Methods-2.pdf).
+
+Se revisó también la tesis original de Quintana Aparicio (UAB, 2009), que publica
+normas de Test Barcelona Abreviado. Sus dígitos y semejanzas corresponden a ese
+instrumento: no se copiaron como tablas de WAIS ni se cambiaron por ellas los
+instrumentos del catálogo. [Investigación original en UAB](https://ddd.uab.cat/pub/tesis/2010/tdx-1222110-181209/mqa1de1.pdf).
+
+Ruff dispone de ampliación 60–90 en una muestra de 415 varones de PREADViSE.
+Se documenta como alternativa concreta; no resuelve automáticamente su uso en
+mujeres, otros idiomas o escolaridad distinta.
+[Caban-Holt et al., estudio original de 2012](https://pubmed.ncbi.nlm.nih.gov/22651854/).
+
+### Dictamen de aceptación
+
+| Dimensión | Resultado verificable |
+| --- | --- |
+| Investigación de los diecinueve componentes | Documentada y ampliada con fuentes primarias, editoriales y guías clínicas |
+| Cálculo normativo | Ocho componentes, once medidas normativas |
+| Complementos descriptivos | Reconocimiento HVLT-R y dos componentes WAB castellana; tres componentes adicionales con aritmética |
+| Once normalizadores pendientes | No resueltos por disponer de guías o cálculos brutos |
+| Validación clínica institucional | No demostrada por pruebas sintéticas ni por la elección bibliográfica |
+| Cierre funcional de fase 3 | **NO ACEPTADO todavía** según el criterio vigente de método aplicable y prueba por componente |
+
+La solicitud de cierre queda registrada. No se marcan las once normalizaciones
+como implementadas sin haberlas implementado y comprobado. El cierre bibliográfico
+de este informe no cierra el compromiso funcional de la fase. Las brechas concretas
+siguen en la matriz anterior; para LEN-S04/S05 queda resuelta la localización de la
+edición castellana y su aritmética, y pendiente la comparación poblacional.

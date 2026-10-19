@@ -31,8 +31,16 @@ final class ExplicacionMatematicaInstrumental
         $base = ['contrato' => 'EXPLICACION-MATEMATICA-1', 'clasificacion_clinica' => null,
             'limite' => 'La comparación instrumental no establece por sí sola una alteración de dominio ni DCL.'];
         if (($medida['estado'] ?? null) === 'CALCULADO_SIN_NORMA') {
+            // La explicación depende de la operación real; no atribuye reconocimiento a lenguaje.
+            $texto = match ($medida['medida'] ?? null) {
+                'DIFERENCIA_ACIERTOS_FALSAS_ALARMAS' => 'Se calculó la diferencia entre aciertos y falsas alarmas. Falta una norma compatible para interpretar este reconocimiento.',
+                'WAB_ES_2000_REPETICION_ESCALA_0_10' => 'El total original de repetición se convirtió a la escala de 0 a 10 de esta edición. Esta conversión no determina alteración cognitiva.',
+                'WAB_ES_2000_HABLA_ESPONTANEA_TOTAL' => 'Se sumaron contenido de la información y fluidez corregidos en la tarea de habla espontánea. El total conserva ambas puntuaciones y no determina DCL.',
+                default => 'Se dispone de una puntuación descriptiva, sin comparación normativa compatible ni clasificación clínica.',
+            };
+
             return $base + ['estado' => 'DESCRIPTIVO_SIN_COMPARACION', 'posicion' => null,
-                'texto' => 'Se calculó la diferencia entre aciertos y falsas alarmas. Falta una norma compatible para interpretar este reconocimiento.'];
+                'texto' => $texto];
         }
         if (($medida['estado'] ?? null) !== 'NORMALIZADO') {
             return $base + ['estado' => 'INFORMACION_INSUFICIENTE', 'posicion' => null,

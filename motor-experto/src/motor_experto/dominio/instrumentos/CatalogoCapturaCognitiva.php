@@ -13,14 +13,14 @@ namespace MotorExperto\dominio\instrumentos;
  */
 final class CatalogoCapturaCognitiva
 {
-    public const VERSION = 'CAPTURA-COGNITIVA-3-20261019';
+    public const VERSION = 'CAPTURA-COGNITIVA-4-20261019';
 
     public function componentes(): array
     {
         $hvlt = 'https://doi.org/10.3233/NRE-151286';
         $ruff = 'https://www.parinc.com/products/RUFF2AND7';
         $wais = 'https://www.pearsonclinical.es/portals/0/docproductos/13534059942.pdf';
-        $wab = 'https://www.pearsonassessments.com/store/en/usd/p/100000194.html';
+        $wab = 'https://naullibres.com/libro/bateria-de-afasias-western/';
         $datos = [
             'MEM-S01' => ['HVLT-R forma 5', $hvlt, [
                 'ensayo_1' => 'Entero de aciertos, 0–12', 'ensayo_2' => 'Entero de aciertos, 0–12', 'ensayo_3' => 'Entero de aciertos, 0–12'],
@@ -81,13 +81,17 @@ final class CatalogoCapturaCognitiva
                 'presentaciones_por_elemento' => 'Primera o segunda presentación', 'puntajes_por_elemento' => 'Decimales según rúbrica',
                 'puntaje_total' => 'Decimal; máximo 36 solo en versión abreviada correspondiente', 'audicion_vision' => 'Condiciones y apoyos documentados'],
                 'No obligar a enteros: algunas versiones admiten medios puntos. La referencia NEURONORMA es española.'],
-            'LEN-S04' => ['WAB, repetición; forma completa o bedside identificada', $wab, [
-                'forma' => 'Identidad completa o bedside', 'puntajes_por_elemento' => 'Mediciones originales según rúbrica', 'total_repeticion' => 'Puntuación original de esa forma'],
-                'No intercambiar formas ni imponer un máximo sin edición. Falta versión española y referencia poblacional compatible verificadas.'],
+            'LEN-S04' => ['WAB, repetición; edición y forma identificadas', $wab, [
+                'forma' => 'Forma y edición exactas, sin intercambiar WAB y WAB-R', 'puntajes_por_elemento' => 'Mediciones originales según rúbrica',
+                'repeticion_total' => 'Entero 0–100 solo para WAB castellana Nau Llibres 2000', 'audicion_compatible' => 'Lógico documentado',
+                'administracion_estandarizada' => 'Lógico documentado'],
+                'WAB castellana Nau Llibres 2000: total de repetición 0–100 dividido por 10. No es WAB-R ni baremo boliviano; las formas no son intercambiables.'],
             'LEN-S05' => ['WAB, muestra de discurso en tarea definida', $wab, [
                 'tarea' => 'Identidad de conversación o descripción', 'referencia_muestra' => 'Referencia documental al original',
-                'contenido' => 'Puntuación conforme a rúbrica identificada', 'fluidez' => 'Puntuación separada conforme a esa rúbrica'],
-                'Una nota narrativa de cuidados no equivale a la subprueba. No se verificó una norma boliviana para esta edición.'],
+                'contenido_informacion' => 'Entero 0–10 para WAB castellana 2000', 'fluidez' => 'Entero 0–10 separado, misma edición',
+                'muestra_discurso_documentada' => 'Lógico documentado; no sustituye la referencia al original',
+                'administracion_estandarizada' => 'Lógico documentado'],
+                'WAB castellana 2000: contenido y fluidez 0–10 cada uno; suma 0–20. Una nota de cuidados no equivale a la tarea. Sin norma boliviana verificada.'],
             'VIS-S01' => ['VOSP o JLO; instrumento y subprueba identificados', 'https://doi.org/10.1093/arclin/acp040', [
                 'subprueba_forma' => 'Identidad exacta, sin total VOSP genérico', 'administrados' => 'Entero de elementos puntuados',
                 'correctos' => 'Entero de aciertos', 'control_visual' => 'Condición y apoyos documentados'],

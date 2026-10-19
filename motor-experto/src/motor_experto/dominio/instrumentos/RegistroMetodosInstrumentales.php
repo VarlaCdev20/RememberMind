@@ -18,7 +18,8 @@ final class RegistroMetodosInstrumentales
             'edad_minima' => 18, 'edad_maxima' => 95, 'escolaridad_minima' => 1,
             'lectoescritura_requerida' => true, 'reproduce_reactivos' => false, 'revision_profesional' => 'PENDIENTE']]
             + (new NormalizadorBateriaBolivia2015)->metodos()
-            + [CalculadorReconocimientoHvlt::METODO => (new CalculadorReconocimientoHvlt)->metadatos()];
+            + [CalculadorReconocimientoHvlt::METODO => (new CalculadorReconocimientoHvlt)->metadatos(),
+                CalculadorLenguajeWabCastellano2000::METODO => (new CalculadorLenguajeWabCastellano2000)->metadatos()];
     }
 
     public function ejecutar(string $metodo, array $captura): array
@@ -31,6 +32,7 @@ final class RegistroMetodosInstrumentales
         $salida = match ($metodo) {
             NormalizadorHvltBolivia2015::METODO => (new NormalizadorHvltBolivia2015)->normalizar($captura),
             CalculadorReconocimientoHvlt::METODO => (new CalculadorReconocimientoHvlt)->calcular($captura),
+            CalculadorLenguajeWabCastellano2000::METODO => (new CalculadorLenguajeWabCastellano2000)->calcular($captura),
             default => (new NormalizadorBateriaBolivia2015)->normalizar($metodo, $captura),
         };
 
