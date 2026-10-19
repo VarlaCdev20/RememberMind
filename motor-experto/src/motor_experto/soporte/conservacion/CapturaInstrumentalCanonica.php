@@ -19,7 +19,7 @@ final class CapturaInstrumentalCanonica
 
     private const OPCION = ['cod_opcion', 'cod_pregunta', 'nombre', 'valor', 'puntaje', 'orden', 'estado'];
 
-    public function construir(array $fuentes, bool $conservarEpisodios = false): array
+    public function construir(array $fuentes, bool $conservarEpisodios = false, bool $conservarPerfil = false): array
     {
         if (($fuentes['disponible'] ?? null) !== true) {
             throw new DomainException('La captura canónica requiere fuentes autorizadas.');
@@ -36,6 +36,14 @@ final class CapturaInstrumentalCanonica
                 ['cod_documento_clinico', 'cod_residente', 'cod_personal', 'hash_archivo', 'estado', 'fecha_hora']);
             if ($conservarEpisodios) {
                 $fila['atencion_original'] = $this->fila($a['atencion_original'] ?? null, ['cod_atencion', 'cod_residente']);
+            }
+            if ($conservarPerfil) {
+                $perfil = $a['perfil_captura_original'] ?? null;
+                if ($perfil !== null && (! is_array($perfil) || array_diff(array_keys($perfil),
+                    ['id', 'metodo', 'cod_instrumento', 'codigo_instrumento', 'version_instrumento', 'identidad_instrumento', 'selectores']))) {
+                    throw new DomainException('El perfil conservado solo admite su contrato de captura explícito.');
+                }
+                $fila['perfil_captura_original'] = $perfil;
             }
             foreach ($fila['extraccion']['fuentes_entradas'] ?? [] as $entrada => $fuente) {
                 if (($fuente['bruto'] ?? null) !== null && $fuente['campo'] === 'valor_numero') {

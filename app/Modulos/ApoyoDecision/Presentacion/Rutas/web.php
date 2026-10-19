@@ -1,13 +1,18 @@
 <?php
 
+use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\CapturaPetersenPanel;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ConocimientoPanel;
+use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\GobiernoReglasPanel;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
 use Illuminate\Support\Facades\Route;
 
 // Registered by routes/web.php; do not execute while loading this file.
 return [
     'ruta_033' => static function (): void {
-        Route::get('/sistema-experto/reglas', \App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\GobiernoReglasPanel::class)
+        Route::get('/sistema-experto/residentes/{residente}/petersen', CapturaPetersenPanel::class)
+            ->middleware('can:consultarOriginales,App\\Models\\ValoracionPetersenOriginal,residente')
+            ->name('sistema-experto.petersen-original');
+        Route::get('/sistema-experto/reglas', GobiernoReglasPanel::class)
             ->middleware('can:consultarGobierno,App\\Models\\VersionModeloExperto')
             ->name('sistema-experto.reglas');
         Route::get('/sistema-experto', ConocimientoPanel::class)

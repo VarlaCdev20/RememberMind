@@ -8,6 +8,8 @@ use InvalidArgumentException;
 final class CatalogoCodigos
 {
     public const ENTIDADES = [
+        'valoraciones_petersen_originales' => ['cod_valoracion_petersen', 'VPO'],
+        'soportes_valoracion_petersen' => ['cod_soporte_petersen', 'SVP'],
         'revisiones_evaluacion_experta' => ['cod_revision_experta', 'RVE'],
         'hechos_instantanea_experta' => ['cod_hecho_instantanea', 'HIX'],
         'evidencias_cognitivas_instantanea' => ['cod_evidencia_cognitiva_instantanea', 'ECX'],

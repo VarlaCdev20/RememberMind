@@ -9,7 +9,7 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ZipArchive;
 
-/** Artefacto recuperable de código y dependencias; nunca incorpora capturas, historia, configuración local o .env. */
+/** Artefacto recuperable de código y red documental; nunca incorpora capturas, historia, configuración local o .env. */
 final class ReleaseMotorInstrumental
 {
     public function crear(string $raiz, string $destino, string $revisionBase): array
@@ -18,7 +18,8 @@ final class ReleaseMotorInstrumental
             throw new DomainException('Indique revisión Git completa y un archivo nuevo en una carpeta existente.');
         }
         $raiz = realpath($raiz) ?: throw new DomainException('Raíz de código inexistente.');
-        $archivos = ['motor-experto/composer.json', 'composer.lock', 'motor-experto/tests/independencia.php', 'motor-experto/tests/orion_independencia.php'];
+        $archivos = ['motor-experto/composer.json', 'composer.lock', 'motor-experto/tests/independencia.php', 'motor-experto/tests/orion_independencia.php',
+            'app/Modulos/ApoyoDecision/Infraestructura/Persistencia/datos/orion-v1-conceptos.json'];
         $directorio = $raiz.'/motor-experto/src';
         if (! is_dir($directorio)) {
             throw new DomainException('Falta el código del motor.');
@@ -41,7 +42,7 @@ final class ReleaseMotorInstrumental
             }
             $huellas[$relativo] = hash('sha256', $contenido[$relativo]);
         }
-        $manifiesto = ['contrato' => 'ARTEFACTO-MOTOR-1', 'revision_base' => $revisionBase,
+        $manifiesto = ['contrato' => 'ARTEFACTO-MOTOR-2', 'revision_base' => $revisionBase,
             'php_requerido' => '^8.3', 'incluye_datos_clinicos' => false, 'archivos' => $huellas];
         $manifiesto['huella'] = CodecInstantanea::huella(CapturaInstrumentalCanonica::ordenar($manifiesto));
         $zip = new ZipArchive;
@@ -76,7 +77,7 @@ final class ReleaseMotorInstrumental
         try {
             $texto = $zip->getFromName('MANIFIESTO-MOTOR.json');
             $m = $texto === false ? null : json_decode($texto, true, 512, JSON_THROW_ON_ERROR);
-            if (! is_array($m) || ($m['contrato'] ?? null) !== 'ARTEFACTO-MOTOR-1' || ($m['incluye_datos_clinicos'] ?? null) !== false) {
+            if (! is_array($m) || ! in_array($m['contrato'] ?? null, ['ARTEFACTO-MOTOR-1', 'ARTEFACTO-MOTOR-2'], true) || ($m['incluye_datos_clinicos'] ?? null) !== false) {
                 throw new DomainException('Manifiesto de software incompatible.');
             }
             $huella = $m['huella'] ?? '';

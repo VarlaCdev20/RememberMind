@@ -15,6 +15,13 @@ related_modules: []
 
 # Base de datos de RememberMind
 
+**Captura Petersen original aprobada — 19/10/2026:** dos relaciones clínicas
+`valoraciones_petersen_originales` y `soportes_valoracion_petersen`, con cadenas
+propias inmutables y soportes tipados. Inventario aprobado: **75 operativas + 33
+expertas = 108 de negocio**. [Diccionario, autorización y 4FN](../sistema-experto/PROPUESTA_CAPTURA_PETERSEN_ORIGINAL_2026_10_19.md).
+No equivale a aprobar las instantáneas instrumentales de fase 6. La instalación
+y sus pruebas se documentan por separado; los conteos siguientes son históricos.
+
 **Fuentes originales aprobadas — 19/10/2026:** cinco columnas nullable en `aplicaciones_instrumento` para autoría técnica, documento/localizador y rectificación enlazada. FK restrictivas, checks y unicidades; **cero tablas nuevas, 106 de negocio**. [Decisión, diccionario y 4FN](../sistema-experto/PROPUESTA_FUENTES_ORIGINALES_FASE_2_2026_10_19.md).
 
 **Gobierno de reglas aprobado — 18/10/2026:** cinco columnas nullable en `reglas_expertas`, self-FK/FK restrictivas, índices y controles de firma e historia. Una antecesora y una decisión por revisión mantienen la 4FN; **cero tablas nuevas, 106 de negocio**. [Diccionario aprobado y límites](../sistema-experto/PROPUESTA_GOBIERNO_REGLAS_2026_10_18.md).
@@ -78,7 +85,7 @@ Conflictos localizados en estados, catálogos y atribución de garantías no se 
 - [Autoría de valoraciones](../../database/migrations/2026_09_25_000100_add_cod_personal_valorador_to_valoraciones_enfermeria_preadmision.php).
 - [Talla](../../database/migrations/2026_09_26_000100_set_talla_canonical_centimeters.php).
 - [Objetivos V2.2](../../database/migrations/2026_10_04_000100_create_objetivos_signos_vitales_table.php).
-- [FormalizarAdmision](../../app/Backend/Modulos/Admisiones/Acciones/FormalizarAdmision.php).
+- [FormalizarAdmision](../../app/Modulos/Admisiones/Aplicacion/Acciones/FormalizarAdmision.php).
 - [Test baseline](../../tests/Feature/BddOperativaV2Test.php), [autoría](../../tests/Feature/ValoracionEnfermeriaAutoriaTest.php), [integridad física](../../tests/Feature/IntegridadFisicaBddV2Test.php), [objetivos](../../tests/Feature/ObjetivosSignosVitalesTest.php).
 
 Rutas descubiertas presentes; garantías de aplicación/SQL y motores se distinguen. PostgreSQL integrado; SQLite :memory: rápido. Test definido o lockForUpdate no prueban carrera PostgreSQL ejecutada.

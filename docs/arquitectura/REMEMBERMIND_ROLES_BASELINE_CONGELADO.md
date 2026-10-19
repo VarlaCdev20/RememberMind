@@ -25,6 +25,12 @@ related_modules: []
 
 ## Modelo funcional
 
+**Petersen original — decisión expresa 19/10/2026:** Medicina/Psicología
+registran y corrigen solo sus cadenas con `valoraciones_petersen.ver`, `.crear`
+y `.rectificar`; Superadministración consulta con `.ver`. No se concede acceso
+a otras fuentes por implicación ni se alteran las revisiones posteriores.
+[Contrato aprobado](../sistema-experto/PROPUESTA_CAPTURA_PETERSEN_ORIGINAL_2026_10_19.md).
+
 **Gobierno de reglas — decisión expresa 18/10/2026:** Medicina y Psicología gestionan y aprueban con `reglas_expertas.ver`, `.gestionar` y `.revisar`, cuenta/personal activos y competencia real compatible. Superadministración consulta con `.ver`; los permisos de escritura no se conceden por su excepción técnica ni por el editor de roles. La firma del conocimiento es distinta de las dos revisiones de una evaluación. [Contrato y alcance aprobado](../sistema-experto/PROPUESTA_GOBIERNO_REGLAS_2026_10_18.md).
 
 **Decisión de la propietaria — 18/10/2026:** guardar ejecuciones observacionales corresponde únicamente a Medicina y Psicología, mediante `evaluaciones_expertas.ejecutar_observaciones`, profesión propia compatible, cuenta/personal activos y Policy contextual. Enfermería consulta; Superadministración no recibe este permiso por su excepción técnica general. [Alcance exacto](../sistema-experto/PROPUESTA_CONSERVACION_OBSERVACIONAL_V1.md). No habilita diagnóstico ni clasificación DCL.

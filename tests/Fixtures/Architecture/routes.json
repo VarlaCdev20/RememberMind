@@ -1362,6 +1362,27 @@
       "GET",
       "HEAD"
     ],
+    "uri": "admin/sistema-experto/residentes/{residente}/petersen",
+    "name": "admin.sistema-experto.petersen-original",
+    "action": "App\\Modulos\\ApoyoDecision\\Presentacion\\Livewire\\Paginas\\CapturaPetersenPanel",
+    "middleware": [
+      "web",
+      "auth:sanctum",
+      "cuenta.activa",
+      "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
+      "verified",
+      "can:consultarOriginales,App\\Models\\ValoracionPetersenOriginal,residente"
+    ],
+    "domain": null,
+    "defaults": [],
+    "wheres": [],
+    "bindingFields": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
     "uri": "admin/sistema-experto/reglas",
     "name": "admin.sistema-experto.reglas",
     "action": "App\\Modulos\\ApoyoDecision\\Presentacion\\Livewire\\Paginas\\GobiernoReglasPanel",

@@ -15,13 +15,15 @@ use App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\PresentarInformeCognitivo;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\PresentarPatronExperimental;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
-use MotorExperto\dominio\orion\Services\Dcl\ClasificadorPetersenService;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum as C;
-use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum as D;
+use Carbon\CarbonImmutable;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
+use MotorExperto\dominio\orion\Services\Dcl\ClasificadorPetersenService;
+use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum as C;
+use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum as D;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -198,6 +200,45 @@ final class InformeNeurocognitivoTest extends TestCase
         self::assertCount(2, $a['variantes']);
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
             ->assertSee('Descripción A')->assertSee('Descripción B')->assertSee('Necesita recordatorios')->assertSee('Otra persona realiza la actividad');
+    }
+
+    public function test_captura_iadl_al_corte_conserva_originales_y_rectificaciones_sin_escoger_solo_la_ultima(): void
+    {
+        $this->permitirIadl();
+        $original = $this->iadl(['registrado_en' => now()->subDays(2), 'fecha_hora' => now()->subDays(2)]);
+        $corte = CarbonImmutable::now()->subDay();
+        $servicio = app(ConsultarAutonomiaDescriptiva::class);
+        $antes = $servicio->capturar($this->medico, $this->residente, $corte);
+        $this->iadl(['cod_control_anterior' => $original->getKey(), 'estado' => 'RECTIFICACION',
+            'fecha_hora' => now()->subHour(), 'registrado_en' => now()->subMinute()]);
+        self::assertSame($antes, $servicio->capturar($this->medico, $this->residente, $corte));
+        self::assertCount(1, $antes['registros']);
+        self::assertTrue($antes['registros'][0]['admisible_como_fuente_descriptiva']);
+        $ahora = $servicio->capturar($this->medico, $this->residente, CarbonImmutable::now());
+        self::assertCount(2, $ahora['registros']);
+        self::assertFalse($ahora['registros'][0]['admisible_como_fuente_descriptiva']);
+        self::assertSame(['ORIGINAL_RECTIFICADO_AL_CORTE'], $ahora['registros'][0]['motivos']);
+        self::assertTrue($ahora['registros'][1]['admisible_como_fuente_descriptiva']);
+        self::assertFalse($ahora['acredita_independencia']);
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
+    public function test_captura_iadl_no_lee_datos_sin_permiso_y_revalida_la_cuenta_obsoleta(): void
+    {
+        $this->iadl();
+        $consultasIadl = 0;
+        DB::listen(static function ($q) use (&$consultasIadl): void {
+            if (str_contains($q->sql, 'controles_funcionales_iadl')) {
+                $consultasIadl++;
+            }
+        });
+        $r = app(ConsultarAutonomiaDescriptiva::class)->capturar($this->medico, $this->residente, CarbonImmutable::now());
+        self::assertFalse($r['disponible']);
+        self::assertSame(0, $consultasIadl);
+        $this->permitirIadl();
+        DB::table('usuarios')->where('cod_usuario', $this->medico->getKey())->update(['estado' => 'INACTIVO']);
+        $this->expectException(AuthorizationException::class);
+        app(ConsultarAutonomiaDescriptiva::class)->capturar($this->medico, $this->residente, CarbonImmutable::now());
     }
 
     public function test_fuente_excluida_explica_motivo_y_soportes_se_agrupan_por_episodio(): void

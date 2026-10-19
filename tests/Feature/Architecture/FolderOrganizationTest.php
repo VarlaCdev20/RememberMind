@@ -86,8 +86,8 @@ class FolderOrganizationTest extends TestCase
                 'wheres' => $ruta->wheres, 'bindingFields' => $ruta->bindingFields()];
         }
         $esperadas = json_decode(File::get(base_path('tests/Fixtures/Architecture/routes.json')), true, 512, JSON_THROW_ON_ERROR);
-        // Incluye consulta/gobierno y los dos puertos aprobados de conciliación/transcripción.
-        $this->assertCount(304, $actuales);
+        // Incluye consulta/gobierno, conciliación/transcripción y captura original Petersen aprobada.
+        $this->assertCount(305, $actuales);
         $this->assertSame(
             $this->normalizarPrefijosLivewire($esperadas),
             $this->normalizarPrefijosLivewire($actuales, ltrim(EndpointResolver::prefix(), '/')),

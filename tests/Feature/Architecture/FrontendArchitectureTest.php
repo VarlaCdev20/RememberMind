@@ -91,8 +91,8 @@ class FrontendArchitectureTest extends TestCase
                 }
             }
         }
-        // Incluye el nuevo panel de gobierno de reglas de ApoyoDecision.
-        $this->assertSame(76, $componentes);
+        // Incluye gobierno de reglas y captura original Petersen de ApoyoDecision.
+        $this->assertSame(77, $componentes);
     }
 
     /**

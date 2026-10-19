@@ -9,7 +9,10 @@ use MotorExperto\adaptadores\entrada\ConstructorMemoriaInstrumental;
 use MotorExperto\aplicacion\casos_uso\EvaluarConocimientoCognitivo;
 use MotorExperto\aplicacion\casos_uso\EvaluarPerfilInstitucional;
 use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\dominio\conocimiento\PerfilConceptualCognitivo;
 use MotorExperto\dominio\conocimiento\versiones\PaqueteCognitivoInstitucional;
+use MotorExperto\dominio\instrumentos\ExtractorCapturaInstrumental;
+use MotorExperto\dominio\instrumentos\PerfilInstrumentalCognitivo;
 use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
 
 /**
@@ -22,9 +25,9 @@ final readonly class InstantaneaInstrumental
     private function __construct(public array $contenido, public string $huella) {}
 
     public static function crear(PaqueteConocimiento $p, ContextoEjecucion $c, array $capturas, array $vinculos, string $usuarioEjecucion, array $versionOriginal,
-        string $contrato = 'INSTRUMENTAL-DECLARATIVO-2'): self
+        string $contrato = 'INSTRUMENTAL-DECLARATIVO-2', ?array $fuenteConceptual = null): self
     {
-        if (! in_array($contrato, ['INSTRUMENTAL-DECLARATIVO-1', 'INSTRUMENTAL-DECLARATIVO-2'], true)) {
+        if (! in_array($contrato, ['INSTRUMENTAL-DECLARATIVO-1', 'INSTRUMENTAL-DECLARATIVO-2', 'INSTRUMENTAL-DECLARATIVO-3'], true)) {
             throw new DomainException('Contrato de preparación desconocido.');
         }
         if ($usuarioEjecucion === '' || strlen($usuarioEjecucion) > 20) {
@@ -33,7 +36,14 @@ final readonly class InstantaneaInstrumental
         if (($versionOriginal['cod_version_modelo'] ?? null) !== $p->version) {
             throw new DomainException('La cabecera histórica no identifica la revisión del conocimiento.');
         }
-        $fuentes = (new CapturaInstrumentalCanonica)->construir($capturas, $contrato === 'INSTRUMENTAL-DECLARATIVO-2');
+        $completo = $contrato === 'INSTRUMENTAL-DECLARATIVO-3';
+        if ($completo !== ($fuenteConceptual !== null)) {
+            throw new DomainException('Solo V3 conserva y exige la fuente conceptual completa.');
+        }
+        $fuentes = (new CapturaInstrumentalCanonica)->construir($capturas, $contrato !== 'INSTRUMENTAL-DECLARATIVO-1', $completo);
+        if ($completo) {
+            $fuentes = self::reextraer($fuentes, false);
+        }
         if ($fuentes['fecha_corte'] !== $c->fechaCorte->format('Y-m-d\TH:i:s.uP')) {
             throw new DomainException('El corte de las fuentes no coincide con el de la instantánea.');
         }
@@ -48,6 +58,9 @@ final readonly class InstantaneaInstrumental
                 'nombre', 'descripcion', 'estado', 'fecha_hora_creacion', 'fecha_hora_vigencia', 'fecha_hora_retiro', 'motivo_cambio',
                 'cod_version_anterior', 'cod_usuario_creacion', 'observacion'], true)),
             'conocimiento' => $declaracion, 'capturas' => $fuentes, 'vinculos' => $vinculos]);
+        if ($completo) {
+            $datos['fuente_conceptual'] = CapturaInstrumentalCanonica::ordenar($fuenteConceptual);
+        }
         $datos['salida'] = self::ejecutar($datos);
         $datos = CapturaInstrumentalCanonica::ordenar($datos);
 
@@ -57,7 +70,7 @@ final readonly class InstantaneaInstrumental
     public static function verificar(array $contenido, string $huella): self
     {
         $contenido = CapturaInstrumentalCanonica::ordenar($contenido);
-        if (! in_array($contenido['contrato'] ?? null, ['INSTRUMENTAL-DECLARATIVO-1', 'INSTRUMENTAL-DECLARATIVO-2'], true)
+        if (! in_array($contenido['contrato'] ?? null, ['INSTRUMENTAL-DECLARATIVO-1', 'INSTRUMENTAL-DECLARATIVO-2', 'INSTRUMENTAL-DECLARATIVO-3'], true)
             || ! hash_equals(CodecInstantanea::huella($contenido), $huella)) {
             throw new DomainException('Contrato o huella de instantánea incompatible.');
         }
@@ -77,12 +90,47 @@ final readonly class InstantaneaInstrumental
             $k['tipo_regla_resultado'], $k['contratos_extraccion']);
         $fecha = CodecInstantanea::leerFecha('corte', (object) $d['contexto']['fecha_corte']);
         $c = new ContextoEjecucion($d['contexto']['evaluacion'], $d['contexto']['residente'], $d['contexto']['version'], $fecha);
-        $entrada = (new ConstructorMemoriaInstrumental)->construir($p, $c, $d['capturas'], $d['vinculos'], $d['contrato'] === 'INSTRUMENTAL-DECLARATIVO-2');
+        $completo = $d['contrato'] === 'INSTRUMENTAL-DECLARATIVO-3';
+        $capturas = $completo ? self::reextraer($d['capturas'], true) : $d['capturas'];
+        $entrada = (new ConstructorMemoriaInstrumental)->construir($p, $c, $capturas, $d['vinculos'], $d['contrato'] !== 'INSTRUMENTAL-DECLARATIVO-1');
 
-        $ejecutor = $d['contrato'] === 'INSTRUMENTAL-DECLARATIVO-2' && PaqueteCognitivoInstitucional::reconoce($p)
+        $ejecutor = $d['contrato'] !== 'INSTRUMENTAL-DECLARATIVO-1' && PaqueteCognitivoInstitucional::reconoce($p)
             ? new EvaluarPerfilInstitucional : new EvaluarConocimientoCognitivo;
 
-        return CapturaInstrumentalCanonica::ordenar(['resultado' => $ejecutor->ejecutar($p, $entrada['memoria']),
-            'fuentes_excluidas' => $entrada['fuentes_excluidas']]);
+        $resultado = $ejecutor->ejecutar($p, $entrada['memoria']);
+        $salida = ['resultado' => $resultado, 'fuentes_excluidas' => $entrada['fuentes_excluidas']];
+        if ($completo) {
+            if (! is_array($d['fuente_conceptual'] ?? null)) {
+                throw new DomainException('La reproducción V3 exige su fuente conceptual conservada.');
+            }
+            $red = (new PerfilConceptualCognitivo)->construir($d['fuente_conceptual']);
+            $salida['perfil_instrumental'] = (new PerfilInstrumentalCognitivo)->construir($red, $capturas, $resultado);
+        }
+
+        return CapturaInstrumentalCanonica::ordenar($salida);
+    }
+
+    /** Recalcula cada método desde los brutos; los cálculos anteriores no son entradas del replay. */
+    private static function reextraer(array $fuentes, bool $verificar): array
+    {
+        foreach ($fuentes['capturas'] as &$a) {
+            $elegible = $a['motivos'] === [] && ($a['instrumento_actual']['tipo'] ?? null) !== 'OBSERVACIONAL';
+            $calculada = null;
+            if ($elegible) {
+                if (! is_array($a['perfil_captura_original'] ?? null)) {
+                    throw new DomainException('La reproducción requiere el perfil de captura utilizado, no la configuración actual.');
+                }
+                $calculada = (new ExtractorCapturaInstrumental)->extraer($a['perfil_captura_original'], $a,
+                    $a['respuestas_originales'], $a['edad_en_aplicacion']);
+            }
+            if ($verificar && CodecInstantanea::huella(CapturaInstrumentalCanonica::ordenar($calculada))
+                !== CodecInstantanea::huella(CapturaInstrumentalCanonica::ordenar($a['extraccion']))) {
+                throw new DomainException('La normalización conservada no corresponde a sus mediciones originales.');
+            }
+            $a['extraccion'] = $calculada;
+        }
+        unset($a);
+
+        return CapturaInstrumentalCanonica::ordenar($fuentes);
     }
 }

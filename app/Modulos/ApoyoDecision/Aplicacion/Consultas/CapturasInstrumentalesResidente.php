@@ -33,7 +33,7 @@ final class CapturasInstrumentalesResidente
             throw new DomainException('Las preguntas declarativas requieren identidades explícitas.');
         }
         $aplicaciones = FuentesValoracionOperativa::limitar(AplicacionInstrumento::query())->where('cod_residente', $residente->getKey())
-            ->where('fecha_hora', '<=', $corte)->with(['instrumento', 'evaluador', 'atencion', 'respuestas', 'documentoOriginal'])->orderBy('fecha_hora')->orderBy('cod_aplicacion')->get();
+            ->where('fecha_hora', '<=', $corte->format('Y-m-d H:i:s.u'))->with(['instrumento', 'evaluador', 'atencion', 'respuestas', 'documentoOriginal'])->orderBy('fecha_hora')->orderBy('cod_aplicacion')->get();
         $respuestas = $aplicaciones->flatMap(fn ($a) => $a->respuestas);
         $perfiles = config('sistema_experto.perfiles_instrumentales', []);
         $preguntasSeleccionadas = [];
@@ -129,6 +129,8 @@ final class CapturasInstrumentalesResidente
                 'preguntas_declarativas_originales' => array_combine($preguntasDeclarativas,
                     array_map(static fn ($id) => $preguntas->get($id)?->getRawOriginal(), $preguntasDeclarativas)),
                 'motivos' => array_values(array_unique($motivos)), 'extraccion' => null];
+            // Solo el contrato instrumental aplicado; no se conserva configuración local completa.
+            $salida['perfil_captura_original'] = $perfilesAplicables[0] ?? null;
             $nacimiento = $residente->fecha_nacimiento;
             $fecha = CarbonImmutable::instance($a->fecha_hora);
             $edad = $nacimiento && $nacimiento <= $fecha ? (int) $nacimiento->diffInYears($fecha) : null;

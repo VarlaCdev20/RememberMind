@@ -3,6 +3,7 @@
 Documentación de lectura actualizada el 19/10/2026 para la arquitectura híbrida.
 No autoriza inferencia clínica ni nuevas reglas de O.R.I.O.N.
 
+- [Petersen institucional: captura original y reproducción instrumental V3, 19/10](FASE_5_CAPTURA_PETERSEN_Y_REPRODUCCION_2026_10_19.md): contrato E–H adoptado, dos tablas/tres permisos aprobados, cuatro patrones desde originales, rectificación y anulación sin sobrescritura; conserva pendientes de lectura IADL, gobierno Petersen, conservación íntegra y QA visual.
 - [Fase 4: base registrada y recorrido verificado en interfaz, 19/10](FASE_4_REGISTRO_Y_VERIFICACION_UI_2026_10_19.md): registro desde Psicología, 17 reglas activas con revisión pendiente, consulta de los 19 componentes, prueba de condiciones y corrección visual de selectores; QA acotado con evidencia de cinco tamaños.
 - [Fase 4: contrato institucional A–D integrado, 19/10](FASE_4_CONTRATO_AD_INTEGRADO_2026_10_19.md): adopción explícita, paquete independiente de las fixtures, observaciones de 19 componentes, quince G09 y Memoria con compuertas, gobierno, episodios y replay V1/V2. Distingue registro en la instalación, QA visual y dependencias de las fases 5/6.
 - [Fase 4: puente nominal y sucesión, 19/10](FASE_4_PUENTE_NOMINAL_Y_SUCESION_2026_10_19.md): corte previo de parejas opción/texto, trazas observacionales y vínculos traducidos entre revisiones, con archivo y replay; ampliado posteriormente por el contrato A–D.
@@ -55,11 +56,13 @@ No autoriza inferencia clínica ni nuevas reglas de O.R.I.O.N.
 - [Arquitectura vigente](../arquitectura/README.md).
 
 El conocimiento documental o conservado no equivale a publicación autorizada.
-`config/sistema_experto.php:lectura_clinica` permanece vacío. Las pruebas de esta
-fase son sintéticas; no activan G09, Petersen ni motores TEST_ONLY sobre residentes.
-La Fase 4 está implementada como lectura. La revisión profesional separada fue
-autorizada posteriormente por la propietaria e implementada según su decisión
-específica. La integración operativa de los cinco dominios requiere métodos
-aplicables, mediciones originales y conservación completa. La decisión vigente
-sitúa la revisión profesional después del resultado; no exige una firma previa
-para desarrollar y probar el cálculo ni permite completar mediciones ausentes.
+El laboratorio TEST_ONLY conserva su segregación. El paquete institucional A–D
+adoptado está registrado y se consulta desde fuentes autorizadas; el contrato
+E–H adoptado añade captura original y cálculo de Petersen bajo sus requisitos.
+Las pruebas automatizadas utilizan datos sintéticos y no generan mediciones
+en historias reales. `config/sistema_experto.php:lectura_clinica` pertenece a la
+vía anterior y permanece vacío; no describe por sí solo todo el recorrido actual.
+La conservación institucional completa y la aceptación de interfaz/revisión
+siguen abiertas según el plan. La revisión profesional se registra después del
+resultado; no exige una firma previa para desarrollar ni permite completar
+mediciones ausentes con valores inventados.

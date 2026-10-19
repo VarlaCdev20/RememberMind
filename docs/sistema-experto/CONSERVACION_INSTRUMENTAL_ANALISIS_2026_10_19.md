@@ -4,6 +4,15 @@ Fecha: 19/10/2026. Estado: **diseño candidato no aprobado; sin DDL, migraciones
 
 **Avance técnico posterior:** el [contrato canónico y artefacto de software](CIERRE_TRAZABILIDAD_Y_REPRODUCCION_2026_10_19.md) ya están implementados en memoria con pruebas de reproducción, tipos y precisión. Las nueve relaciones de este análisis continúan como alternativa no aprobada, no como mínimo. La reproducción en memoria y el ZIP de software no se presentan como guardado institucional.
 
+**Corte posterior de fase 5:** la propietaria aprobó dos tablas de captura
+original de Petersen y tres permisos; el inventario aprobado pasa a **108**.
+El [incremento V3/Petersen](FASE_5_CAPTURA_PETERSEN_Y_REPRODUCCION_2026_10_19.md)
+añade perfiles exactos, fuente conceptual conservada y juicios originales que
+este análisis inicial no cubría íntegramente. Los conteos 106/114/115 siguientes
+describen aquel corte anterior; no son el inventario actual ni autorizan una
+ampliación. Antes de un diccionario de fase 6 debe cotejarse el contrato final,
+incluidos los soportes Petersen; las nueve relaciones no son un mínimo probado.
+
 ## Contrato que falta representar
 
 `CapturasInstrumentalesResidente` obtiene aplicaciones, instrumentos, autor, respuestas, preguntas y opciones originales al corte, incluidos datos rechazados. `PerfilInstrumentalCognitivo` añade método, entradas utilizadas, normalización, motivos y la red de cinco dominios y diecinueve componentes. Ambos declaran `persistido=false` para este contrato.
@@ -69,5 +78,40 @@ La candidata completa llevaría a **115 tablas de negocio**; cualquiera de las v
 ## Aceptación antes de declarar conservación
 
 Guardar → recuperar → comparar entrada y salida completas; cambiar todas las fuentes actuales y comprobar que el histórico permanece igual; reintento idéntico y conflicto bajo la misma identidad; rollback intermedio; cruce de residente y versión; concurrencia; retirada de conocimiento conservando lectura y revisión posterior MED/PSI. Verificar en SQLite y PostgreSQL desechables.
+
+## Cotejo posterior: V3 y originales Petersen
+
+La revisión independiente de persistencia del 19/10/2026 identificó estas brechas
+sin proponer ni aprobar un conteo adicional:
+
+| Conjunto | Reutilización compatible | Información todavía no retenida por ejecución |
+|---|---|---|
+| Ejecución | `evaluaciones_expertas` y sus revisiones MED/PSI | Ejecutor real, contrato compuesto, release y conjunto completo de entradas; solicitante no equivale a ejecutor |
+| Instrumentos | FK originales; una copia compartida para el perfil y los soportes MEDICION | Metadatos observados, respuestas incluidas/rechazadas, preguntas sin respuesta, opciones, nacimiento y autor nominal usados |
+| Perfiles | Método y hash originales de los soportes | Perfil completo y selectores exactos; el hash detecta cambios, pero no recupera el contenido |
+| Petersen | Las dos tablas originales inmutables, incluida C05 → juicios revisados | Pertenencia ejecución → juicio/soporte, orden, decisión de adquisición y exclusiones; no volver a escoger cabezas actuales |
+| Contexto Petersen | FK reales a controles, Psicología, IADL, antecedentes, diagnósticos y documentos | Autor, fecha, episodio, vigencia y contenido efectivamente consumidos; contexto IADL y comprobación documental |
+| Conocimiento | Paquete versionado y relaciones con significado compatible | Sellado/retención íntegros, estados observados, contratos y perfiles resueltos desde configuración |
+| Resultado | Categorías, reglas, trazas y evidencias compatibles existentes | Salida instrumental/Petersen completa o capacidad probada de regenerarla exactamente desde lo retenido |
+| Software | ZIP verificable de código y red documental | Registro/retención institucional y enlace inmutable; hoy no incluye perfiles locales ni el paquete SQL observado |
+
+Para reducir relaciones sin perder 4FN, el diccionario siguiente estudiará
+conservar **entradas completas + release recuperable + huella de salida** y
+regenerar medidas, métricas y motivos puramente derivados. Esto puede evitar las
+candidatas de medidas y motivos; no evita conservar las fuentes mutables ni
+autoriza meter el contenido en JSON/EAV. Si se exige consultar cada medida en
+SQL sin ejecutar el release, ese alcance debe representarse aparte.
+
+No se duplican los juicios/soportes originales inmutables de Petersen ni una
+misma aplicación instrumental por cada consumidor. Las colecciones de
+respuestas, selectores y soportes mantienen sus granos separados. Una relación
+cerrada de fuentes contextuales con FK alternativas y columnas comunes podría
+estudiarse; no se convierte en un depósito universal campo/valor.
+
+Antes de DDL falta fijar el contrato compuesto V3 + Petersen y su igualdad
+exacta, el diccionario físico mínimo, las garantías de sellado y la política de
+retención. El almacén sintético `ORION-SNAP-2` no recibe el nuevo contrato por
+cambiar un string ni retirar sus guardas. Este mapa es preparación técnica de
+fase 6, no una ampliación estructural aprobada.
 
 Este diseño no resuelve IADL, los soportes C01–C05 ni la falta de mediciones originales. Los once componentes inicialmente pendientes de cálculo se cerraron técnicamente en el [cierre de fase 3](CIERRE_TECNICO_FASE_3_2026_10_19.md); eso no completa su vinculación a originales ni su interpretación clínica. No se pide una aprobación profesional previa para desarrollar; sí se mantiene la decisión explícita de la propietaria antes de una nueva ampliación estructural congelada.

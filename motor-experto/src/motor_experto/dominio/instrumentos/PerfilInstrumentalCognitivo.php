@@ -13,7 +13,7 @@ use DomainException;
  */
 final class PerfilInstrumentalCognitivo
 {
-    public function construir(array $red, array $captura): array
+    public function construir(array $red, array $captura, ?array $inferencia = null): array
     {
         if (($captura['disponible'] ?? false) !== true) {
             throw new DomainException('El perfil instrumental requiere acceso autorizado a sus fuentes.');
@@ -57,9 +57,15 @@ final class PerfilInstrumentalCognitivo
                     'mediciones' => $datos, 'resultado_clinico' => null, 'motivos' => $datos === []
                         ? ['SIN_CAPTURA_VINCULADA_AL_COMPONENTE', 'SIN_CONTRATO_DE_INTERPRETACION_CLINICA']
                         : ['SIN_CONTRATO_DE_INTERPRETACION_CLINICA']];
+                if ($inferencia !== null) {
+                    $componentes[$id]['observaciones'] = $inferencia['observaciones_por_componente'][$id] ?? [];
+                }
             }
             $dominios[$codigo] = ['nombre' => $dominio['nombre'], 'componentes' => $componentes, 'resultado_clinico' => null,
                 'estado' => 'NO_INTERPRETADO', 'motivos' => ['SIN_CONTRATO_DE_INTEGRACION_CLINICA']];
+            if ($inferencia !== null) {
+                $dominios[$codigo]['integracion'] = $inferencia['perfil'][$codigo] ?? null;
+            }
         }
         if ($mediciones !== []) {
             throw new DomainException('Una medición pretende contribuir a un componente ajeno a la red.');

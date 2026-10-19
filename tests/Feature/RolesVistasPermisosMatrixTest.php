@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Personal;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -110,11 +111,21 @@ class RolesVistasPermisosMatrixTest extends TestCase
     public function test_psicologo_tiene_permisos_para_sus_vistas_de_evaluacion(): void
     {
         $psicologo = $this->crearUsuarioConRol('PSICOLOGO/A');
+        Personal::create(['cod_usuario' => $psicologo->getKey(), 'nombres' => 'Psicóloga', 'apellido_paterno' => 'Sintética',
+            'numero_documento' => 'PSI-MATRIX-TEST', 'profesion' => 'PSICOLOGIA', 'estado' => 'ACTIVO']);
         $this->actingAs($psicologo);
 
         $this->get(route('admin.psicologia.dashboard'))->assertOk();
         $this->get(route('admin.psicologia.evaluacion.cognitiva'))->assertOk();
         $this->get(route('admin.psicologia.evaluacion.afectiva'))->assertOk();
+    }
+
+    public function test_cuenta_psicologica_sin_personal_activo_no_accede_a_evaluaciones(): void
+    {
+        $psicologo = $this->crearUsuarioConRol('PSICOLOGO/A');
+        $this->actingAs($psicologo);
+        $this->get(route('admin.psicologia.evaluacion.cognitiva'))->assertForbidden();
+        $this->get(route('admin.psicologia.evaluacion.afectiva'))->assertForbidden();
     }
 
     public function test_seguridad_clinica_enfermero_no_puede_prescribir_medicacion(): void

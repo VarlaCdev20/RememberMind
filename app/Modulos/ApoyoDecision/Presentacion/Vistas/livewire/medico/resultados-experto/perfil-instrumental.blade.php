@@ -1,3 +1,4 @@
+@if(isset($perfilInstrumental['petersen_institucional']))@include('apoyodecision::livewire.medico.resultados-experto.petersen-institucional')@endif
 <x-ui.section-card title="Observaciones y mediciones por dominio" subtitle="Cinco dominios y diecinueve componentes de la red cognitiva" icon="ph-tree-structure">
     <p class="text-sm text-rm-secondary">Cada observación conserva su fuente, fecha y autor. Los hallazgos instrumentales requieren interpretación específica, atribución de tarea y contexto suficiente.</p>
     <div class="space-y-3 mt-4">

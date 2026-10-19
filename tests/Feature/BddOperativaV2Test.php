@@ -68,7 +68,7 @@ class BddOperativaV2Test extends TestCase
         sort($esperadas);
         sort($reales);
 
-        $this->assertCount(73, $reales);
+        $this->assertCount(75, $reales);
         $this->assertSame($esperadas, $reales);
         foreach ($esperadas as $tabla) {
             $this->assertTrue(Schema::hasTable($tabla), "Falta la tabla operativa {$tabla}");
@@ -389,6 +389,7 @@ class BddOperativaV2Test extends TestCase
     private function tablasOperativas(): array
     {
         return [
+            'valoraciones_petersen_originales', 'soportes_valoracion_petersen',
             'fotografias_institucionales',
             'controles_funcionales_iadl',
             'usuarios', 'personal', 'areas', 'turnos', 'contactos', 'residentes', 'habitaciones', 'camas', 'tipos_estudio_clinico', 'medicamentos', 'instrumentos',

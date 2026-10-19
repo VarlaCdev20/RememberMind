@@ -59,6 +59,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'roles.editar_permisos',
         ];
         $permisos = array_merge($permisos, [
+            'valoraciones_petersen.ver', 'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar',
             'reglas_expertas.ver', 'reglas_expertas.gestionar', 'reglas_expertas.revisar',
             'evaluaciones_expertas.revisar_medicina', 'evaluaciones_expertas.revisar_psicologia', 'evaluaciones_expertas.ejecutar_observaciones',
             'auditoria.ver', 'usuarios.gestionar', 'personal.gestionar', 'areas.gestionar', 'turnos.gestionar',
@@ -98,7 +99,7 @@ class RolesAndPermissionsSeeder extends Seeder
         // Durante la construcción del sistema recibe todos los permisos web,
         // incluidos los que se hayan creado fuera de este seeder.
         $roles['SUPERADMINISTRADOR']->syncPermissions(
-            Permission::query()->where('guard_name', 'web')->whereNotIn('name', ['fotografias_institucionales.gestionar', 'evaluaciones_expertas.ejecutar_observaciones', 'reglas_expertas.gestionar', 'reglas_expertas.revisar', 'aplicaciones_instrumento.transcribir'])->get()
+            Permission::query()->where('guard_name', 'web')->whereNotIn('name', ['fotografias_institucionales.gestionar', 'evaluaciones_expertas.ejecutar_observaciones', 'reglas_expertas.gestionar', 'reglas_expertas.revisar', 'aplicaciones_instrumento.transcribir', 'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar'])->get()
         );
 
         // Dirección institucional: personal, organización, planificación maestra
@@ -165,6 +166,8 @@ class RolesAndPermissionsSeeder extends Seeder
         $roles['PSICOLOGO/A']->givePermissionTo('evaluaciones_expertas.ejecutar_observaciones');
         $roles['MEDICO GENERAL/GERIATRA']->givePermissionTo('aplicaciones_instrumento.transcribir');
         $roles['PSICOLOGO/A']->givePermissionTo('aplicaciones_instrumento.transcribir');
+        $roles['MEDICO GENERAL/GERIATRA']->givePermissionTo(['valoraciones_petersen.ver', 'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar']);
+        $roles['PSICOLOGO/A']->givePermissionTo(['valoraciones_petersen.ver', 'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar']);
         $roles['NUTRICIONISTA']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'diagnosticos.ver', 'alergias.ver', 'indicaciones_clinicas.ver', 'mediciones_antropometricas', 'registros_ingesta.ver', 'registros_hidratacion.ver', 'registros_eliminacion.ver', 'valoraciones_nutricionales', 'planes_cuidado']));
         $roles['FISIOTERAPEUTA']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'diagnosticos.ver', 'dispositivos_clinicos.ver', 'signos_vitales.ver', 'valoraciones_dolor', 'registros_movilidad', 'valoraciones_funcionales', 'planes_cuidado']));
         $roles['PEDAGOGO']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'indicaciones_clinicas.ver', 'controles_cognitivos.ver', 'registros_conductuales.ver', 'planes_cuidado', 'seguimientos_pedagogicos', 'actividades']));

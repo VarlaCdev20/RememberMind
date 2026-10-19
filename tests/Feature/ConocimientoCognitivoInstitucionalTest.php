@@ -412,7 +412,7 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         $conclusion = array_values($r['resultado']['perfil']['COG-ATE']['conclusiones_candidatas'])[0];
         self::assertCount(6, $conclusion['evidencias']);
         self::assertCount(1, $conclusion['soportes_efectivos']);
-        self::assertSame('INSTRUMENTAL-DECLARATIVO-2', $r['preparacion_conservacion']['contrato']);
+        self::assertSame('INSTRUMENTAL-DECLARATIVO-3', $r['preparacion_conservacion']['contrato']);
         foreach ($r['resultado']['perfil']['COG-ATE']['traza']['rutas'] as $ruta) {
             self::assertSame($atencion->getKey(), $ruta['procedencia_instrumental']['episodio_original']['cod_atencion']);
         }
@@ -553,7 +553,8 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         $c = new ContextoEjecucion($r['resultado']['evaluacion'], $this->residente->getKey(), $this->version, CarbonImmutable::now()->toDateTimeImmutable());
         $cabecera = (array) DB::table('versiones_modelo_experto')->where('cod_version_modelo', $this->version)->sole();
 
-        return InstantaneaInstrumental::crear($p, $c, $r['capturas'], $contrato['vinculos_instrumentales'], $this->usuario->getKey(), $cabecera);
+        return InstantaneaInstrumental::crear($p, $c, $r['capturas'], $contrato['vinculos_instrumentales'], $this->usuario->getKey(), $cabecera,
+            'INSTRUMENTAL-DECLARATIVO-3', app(FuenteConocimientoOrion::class)->leer());
     }
 
     public function test_memoria_usa_literal_textual_original_y_su_admisibilidad_especifica(): void
@@ -815,7 +816,7 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         $this->instantanea($r);
     }
 
-    public function test_reproduccion_v2_conserva_episodio_aunque_el_vinculo_sql_cambie(): void
+    public function test_reproduccion_conserva_episodio_aunque_el_vinculo_sql_cambie(): void
     {
         $atencion = $this->atencionOriginal();
         DB::table('aplicaciones_instrumento')->where('cod_aplicacion', $this->aplicacion)->update(['cod_atencion' => $atencion->getKey()]);

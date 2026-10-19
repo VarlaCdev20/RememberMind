@@ -17,6 +17,14 @@ related_modules: []
 
 # RememberMind — Baseline Rector de la BDD Operativa
 
+**Extensión aprobada — 19/10/2026:** dos relaciones de valoración original y
+soportes de Petersen; **75 operativas + 33 expertas = 108 tablas de negocio**.
+Conservan 4FN, autoría propia, cadenas inmutables y FK originales restrictivas.
+[Diccionario aprobado](../sistema-experto/PROPUESTA_CAPTURA_PETERSEN_ORIGINAL_2026_10_19.md).
+La conservación íntegra de las ejecuciones sigue fuera de esta extensión.
+Aplicada en PostgreSQL local `remembermind_dev`; [acta de instalación y límites](../sistema-experto/FASE_5_CAPTURA_PETERSEN_Y_REPRODUCCION_2026_10_19.md).
+Los conteos posteriores conservan el alcance de sus decisiones anteriores.
+
 **Fuentes originales aprobadas — 19/10/2026:** cinco columnas nullable en `aplicaciones_instrumento`: usuario de registro, instante técnico, documento clínico original, localizador y aplicación anterior. FK restrictivas, checks e índices únicos de fuente inicial/sucesora; sin tablas nuevas ni relleno de historia desconocida. Se conservan **73 operativas + 33 expertas = 106**. [Decisión, diccionario y 4FN](../sistema-experto/PROPUESTA_FUENTES_ORIGINALES_FASE_2_2026_10_19.md).
 
 **Gobierno de reglas aprobado — 18/10/2026:** cinco columnas nullable en `reglas_expertas`: antecesora, estado de revisión, usuario revisor, fecha y justificación. FK restrictivas, índices y checks; primera decisión y enlace histórico inmutables. Sin tablas nuevas; **33 expertas + 73 operativas = 106**. [Aprobación, diccionario y 4FN](../sistema-experto/PROPUESTA_GOBIERNO_REGLAS_2026_10_18.md).
