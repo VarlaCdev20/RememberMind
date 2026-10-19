@@ -95,6 +95,8 @@ La primera corrida del candidato carecía de `public/build/manifest.json`: fall�
 
 ## Límites y siguientes fases
 
+**Incremento posterior:** [fuentes profesionales, métricas 60+ y puente autorizado de capturas](FASE_4_FUENTES_Y_METRICAS_60_MAS_2026_10_19.md). `ConsultarPerfilInstrumental` ya conecta la entrada declarativa con fuentes SQL autorizadas, usando el contrato del servidor y mapeos exactos de pregunta. La vinculación de los IDs originales de la versión real continúa separada de la implementación del puente. La conservación institucional completa permanece en fase 6.
+
 La verificación técnica no convierte los paquetes de laboratorio en conocimiento clínico. La interpretación de datos de residentes requiere los instrumentos/ediciones/preguntas/mediciones originales y sus mapeos identificados. Se conserva esa falta de información; no se rellenan mediciones para alcanzar una conclusión esperada.
 
 La conservación institucional completa del perfil integral pertenece al cierre de persistencia. Esta fase no añade tablas, columnas, permisos ni catálogos a la base congelada; no altera la 4FN. La documentación final de operación se consolidará después de completar las fases, conforme a lo acordado.

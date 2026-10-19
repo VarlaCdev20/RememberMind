@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\VersionModeloExperto;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\IdentidadesConocimiento;
+use App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratosConocimiento;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -137,7 +138,7 @@ final class GestionarReglasExpertas
             if ($observacional) {
                 (new CompiladorObservacional)->compilar($traducidas, $id, $codigo);
             } elseif ($nueva !== []) {
-                $contrato = $this->contrato($anterior);
+                $contrato = app(ContratosConocimiento::class)->porVersion($anterior);
                 $p = new PaqueteConocimiento($id, array_intersect_key($traducidas, PaqueteConocimiento::CLAVES),
                     $contrato['relaciones'], false, $contrato['tipo_regla_resultado'], $contrato['extracciones']);
                 $reglaNueva = array_values(array_filter($p->tabla('reglas_expertas'), static fn ($r) => $r['codigo_regla'] === $nueva['codigo']))[0];
@@ -240,25 +241,6 @@ final class GestionarReglasExpertas
     {
         return array_replace($row, ['cod_regla_anterior' => null, 'estado_revision' => 'PENDIENTE',
             'cod_usuario_revision' => null, 'fecha_hora_revision' => null, 'justificacion_revision' => null]);
-    }
-
-    /** Contrato del servidor por versión/linaje; el formulario no puede elegir predicados habilitantes. */
-    private function contrato(string $version): array
-    {
-        $vistos = [];
-        do {
-            if (isset($vistos[$version])) {
-                throw new DomainException('Ciclo en el linaje del contrato de conocimiento.');
-            }
-            $vistos[$version] = true;
-            $contrato = config('sistema_experto.contratos_conocimiento.'.$version);
-            if (is_array($contrato) && is_array($contrato['relaciones'] ?? null)
-                && is_array($contrato['extracciones'] ?? null) && is_string($contrato['tipo_regla_resultado'] ?? null)) {
-                return $contrato;
-            }
-            $version = VersionModeloExperto::query()->whereKey($version)->sole()->cod_version_anterior;
-        } while ($version !== null);
-        throw new DomainException('Falta el contrato semántico del servidor para esta familia de conocimiento. Puede archivar reglas sin inventar ese contrato.');
     }
 
     private function agregar(array &$t, array $n, string $version, string $actor, string $fecha): void

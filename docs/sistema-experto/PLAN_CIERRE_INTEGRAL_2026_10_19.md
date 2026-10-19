@@ -79,8 +79,10 @@ en sus propias actas y no se atribuyen a este cierre.
 - [x] Conjunciones por aplicación/componente, NULL explícito, contradicciones y agrupación conservadora de soportes.
 - [x] Gobierno de variables de subcomponentes y comprobación del contrato inferencial del servidor antes de publicar una regla.
 - [x] Verificación SQLite/PostgreSQL desechable, concurrencia, independencia del motor y build del candidato.
+- [x] Conector de lectura SQL autorizada hacia hechos y reglas, con instrumento/versión/pregunta exactos, fecha de corte, autor original y soporte compartido por aplicación.
+- [x] Aplicabilidad por edad en la aplicación y métricas de cobertura 60+, sin duplicar componentes ni convertir cobertura en exactitud diagnóstica. [Fuentes y contrato del incremento](FASE_4_FUENTES_Y_METRICAS_60_MAS_2026_10_19.md).
 
-**Pendiente de cierre institucional:** vincular el paquete y los contratos reales de las fuentes aún no cotejadas en fases 2/3; conectar la entrada declarativa con extracción/autorización y conservación completas en las fases siguientes. Las casillas de cierre institucional que siguen no se marcan por la sola aceptación técnica del laboratorio o de una clase pura.
+**Pendiente de cierre institucional:** conservar y vincular el paquete real con sus reglas y preguntas originales aún no cotejadas en fases 2/3; cerrar la conservación completa en fase 6. El conector de extracción/autorización está implementado y se verifica con datos sintéticos. El catálogo local conserva dos versiones no experimentales inactivas y sin reglas; la única activa pertenece al laboratorio. Las casillas institucionales siguientes no se marcan por la sola aceptación técnica del conector.
 
 - [ ] Conectar fuente → hecho → variable → componente → dominio → regla → resultado.
 - [ ] Validar tipos, referencias, versiones y cobertura de los 19 componentes.

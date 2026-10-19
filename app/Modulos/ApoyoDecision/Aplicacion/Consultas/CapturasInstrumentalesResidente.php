@@ -113,13 +113,14 @@ final class CapturasInstrumentalesResidente
                     'estado_documento' => $estadoDocumento],
                 'respuestas_originales' => $brutos, 'vinculos_preguntas_actuales' => $vinculos,
                 'motivos' => array_values(array_unique($motivos)), 'extraccion' => null];
+            $nacimiento = $residente->fecha_nacimiento;
+            $fecha = CarbonImmutable::instance($a->fecha_hora);
+            $edad = $nacimiento && $nacimiento <= $fecha ? (int) $nacimiento->diffInYears($fecha) : null;
+            $salida['edad_en_aplicacion'] = $edad;
+            $salida['fuente_edad'] = ['tabla' => 'residentes', 'campo' => 'fecha_nacimiento', 'registro' => $residente->getKey(),
+                'fecha_nacimiento' => $nacimiento?->format('Y-m-d'), 'fecha_aplicacion' => $salida['fecha_hora']];
             if ($motivos === []) {
-                $nacimiento = $residente->fecha_nacimiento;
-                $fecha = CarbonImmutable::instance($a->fecha_hora);
-                $edad = $nacimiento && $nacimiento <= $fecha ? (int) $nacimiento->diffInYears($fecha) : null;
                 $salida['extraccion'] = (new ExtractorCapturaInstrumental)->extraer($perfilesAplicables[0], $salida, $brutos, $edad);
-                $salida['fuente_edad'] = ['tabla' => 'residentes', 'campo' => 'fecha_nacimiento', 'registro' => $residente->getKey(),
-                    'fecha_nacimiento' => $nacimiento?->format('Y-m-d'), 'fecha_aplicacion' => $salida['fecha_hora']];
             }
             $capturas[] = $salida;
         }

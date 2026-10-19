@@ -18,14 +18,26 @@ final class PerfilInstrumentalCognitivo
         if (($captura['disponible'] ?? false) !== true) {
             throw new DomainException('El perfil instrumental requiere acceso autorizado a sus fuentes.');
         }
-        $mediciones = [];
+        $mediciones = $comparables60 = [];
+        $apps60 = $edadDesconocida = $appsMenores60 = 0;
         foreach ($captura['capturas'] as $aplicacion) {
+            $edad = $aplicacion['edad_en_aplicacion'] ?? $aplicacion['extraccion']['captura']['edad_anios'] ?? null;
+            if (! is_int($edad) || $edad < 0) {
+                $edadDesconocida++;
+            } elseif ($edad >= 60) {
+                $apps60++;
+            } else {
+                $appsMenores60++;
+            }
             if ($aplicacion['extraccion'] === null) {
                 continue;
             }
             $e = $aplicacion['extraccion'];
             foreach ($e['normalizacion']['componentes'] as $componente => $resultado) {
                 foreach ($resultado['medidas'] ?? [$resultado] as $medida) {
+                    if (is_int($edad) && $edad >= 60 && $medida['estado'] === 'NORMALIZADO') {
+                        $comparables60[$componente] = true;
+                    }
                     $mediciones[$componente][] = ['aplicacion' => $aplicacion['cod_aplicacion'], 'fecha' => $aplicacion['fecha_hora'],
                         'autor' => $aplicacion['cod_personal'], 'perfil' => $e['perfil'], 'metodo' => $e['metodo'], 'referencia' => $e['normalizacion']['referencia'],
                         'fuentes_entradas' => $e['fuentes_entradas'], 'captura' => $e['captura'], 'resultado' => $medida];
@@ -54,6 +66,11 @@ final class PerfilInstrumentalCognitivo
         }
 
         return ['contrato' => 'PERFIL-INSTRUMENTAL-1', 'red' => $red, 'dominios' => $dominios,
+            'metricas_60_o_mas' => ['aplicaciones_examinadas' => count($captura['capturas']), 'aplicaciones_60_o_mas' => $apps60,
+                'aplicaciones_menores_60' => $appsMenores60, 'aplicaciones_edad_desconocida' => $edadDesconocida,
+                'componentes_con_comparacion' => count($comparables60), 'componentes_del_perfil' => count($diccionario),
+                'porcentaje_cobertura_comparacion' => round(100 * count($comparables60) / count($diccionario), 2),
+                'denominador' => 'COMPONENTES_DEL_PERFIL', 'tipo_metrica' => 'COBERTURA_DE_DATOS_NO_VALIDEZ_DIAGNOSTICA'],
             'capturas_originales' => $captura, 'persistido' => false, 'diagnostico' => null, 'revision_profesional' => 'PENDIENTE'];
     }
 }

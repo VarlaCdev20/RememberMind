@@ -4,6 +4,8 @@ return [
     // Contratos técnicos de predicados/modalidades y extracción por PK de versión raíz.
     // Las sucesoras heredan el contrato; no habilita clínica ni acepta definiciones del cliente.
     'contratos_conocimiento' => [],
+    // PK exacta del conocimiento institucional a consultar; sin selección automática de paquetes de laboratorio.
+    'version_cognitiva' => null,
     // Bindings a PK/versión/preguntas originales e identidad_instrumento (edición/forma/idioma cotejados).
     // El extractor no completa esa identidad desde la bibliografía del método ni por parecido de nombre.
     // Véase docs/sistema-experto/METODOS_Y_CAMPOS_INVESTIGADOS_V2_2026_10_18.md.

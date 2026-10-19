@@ -82,6 +82,7 @@ final class ExtractorCapturaInstrumental
         $normalizacion = $registro->ejecutar($metodo, $captura);
 
         return ['perfil' => $perfil['id'], 'metodo' => $perfil['metodo'], 'captura' => $captura,
+            'aplicabilidad_geriatrica' => (new AplicabilidadGeriatrica)->evaluar($meta, $captura),
             'identidad_declarada' => $identidad, 'identidad_requerida_metodo' => $meta['identidad'],
             'fuentes_entradas' => $fuentes, 'motivos_captura' => $motivos, 'normalizacion' => $normalizacion];
     }

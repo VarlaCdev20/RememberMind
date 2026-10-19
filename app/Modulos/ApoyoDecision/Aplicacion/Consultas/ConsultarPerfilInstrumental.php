@@ -24,6 +24,9 @@ final readonly class ConsultarPerfilInstrumental
         }
         $red = (new PerfilConceptualCognitivo)->construir($this->fuente->leer());
 
-        return (new PerfilInstrumentalCognitivo)->construir($red, $captura);
+        $perfil = (new PerfilInstrumentalCognitivo)->construir($red, $captura);
+        $perfil['inferencia_declarativa'] = app(ConsultarConocimientoCognitivo::class)->consultar($usuario, $residente, $corte);
+
+        return $perfil;
     }
 }
