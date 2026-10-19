@@ -1,8 +1,14 @@
 # O.R.I.O.N. — Investigación de los 19 componentes cognitivos
 
-Fecha de corte: 19 de octubre de 2026. Versión documental 1.1.
+Fecha de corte: 19 de octubre de 2026. Versión documental 1.2.
 Destinatarios: Medicina, Psicología y equipo de desarrollo de RememberMind.
 Estado: investigación e implementación instrumental parcial; no validación clínica.
+
+**Ampliación geriátrica:** el [manual investigado para mayores de 60](MANUAL_INVESTIGADO_MAYORES_60_2026_10_19.md)
+documenta originales completos SABIEX, pFCSRT+IR de 2025, Token chileno y manuales
+oficiales localizados, sus edades, fórmulas, conflictos y acceso. Añade las sumas
+descriptivas de FCSRT de palabras; la cobertura normativa permanece en ocho
+componentes. Los apartados siguientes conservan el recorrido y sus cortes previos.
 
 **Actualización tras la petición de cierre:** se localizó y cotejó visualmente
 la WAB castellana de Nau Llibres de 2000, con dos cálculos descriptivos incorporados
@@ -101,12 +107,15 @@ implementada; una demora incompatible impide normalizar el diferido.
 libre, controlando cómo se adquirió el material. **Uso candidato:** FCSRT, versión
 exacta identificada; conservar codificación, libre y recuperación adicional con
 claves por ensayo, diferido y demora. Una clave no permite contar nuevamente un
-elemento ya recuperado libremente. **Cálculo propuesto:** totales separados de
-libre y libre más adicional, solo tras cotejar rúbrica y máximos de la versión.
+elemento ya recuperado libremente. **Cálculo implementado tras ampliar la investigación:**
+adicionales con claves de aprendizaje, total de aprendizaje y total
+diferido a treinta minutos, para el procedimiento de palabras NEURONORMA.
+Se cotejó el original completo de [Calderón-Rubio et al., 2021, §2.2.1](https://doi.org/10.3390/ijerph182412977).
 **Interpretación:** la diferencia entre condiciones no demuestra por sí sola una
-etiología ni un déficit de almacenamiento. **Pendiente:** el estudio NEURONORMA
-es español; faltan tablas íntegras verificadas y decisión de aplicabilidad a la
-población institucional. No se programaron ajustes de memoria de otra prueba.
+etiología ni un déficit de almacenamiento. **Pendiente:** la normalización y su
+aplicabilidad a la población institucional. Se localizaron también los modelos
+SABIEX y de imágenes; no se transfieren entre variantes ni se aplican por defecto.
+No se programaron ajustes de memoria de otra prueba.
 [Peña-Casanova et al., 2009, DOI acp041](https://pubmed.ncbi.nlm.nih.gov/19661107/).
 
 ### 4. MEM-S04 — Reconocimiento

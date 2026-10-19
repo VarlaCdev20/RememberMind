@@ -7,6 +7,7 @@ No autoriza inferencia clínica ni nuevas reglas de O.R.I.O.N.
 - [Integración versionada del laboratorio, 19/10](INTEGRACION_LABORATORIO_2026_10_19.md): dependencias incorporadas como conjunto, candidato limpio, corrección de contexto G09 y evidencia por motor; conserva el alcance técnico y los pendientes institucionales.
 - [Matriz única de consolidación](CONSOLIDACION_PUNTO_1_2026_10_19.md) y [plan por fases](PLAN_CIERRE_INTEGRAL_2026_10_19.md).
 - [Investigación profesional de los 19 componentes, 19/10](INVESTIGACION_PROFESIONAL_19_COMPONENTES_2026_10_19.md): utilidad, uso, motivo, cálculo, interpretación, fuentes y brechas; [objetivo activo y pruebas de fase 3](FASE_3_COMPONENTES_2026_10_19.md).
+- [Manual técnico investigado para mayores de 60, 19/10](MANUAL_INVESTIGADO_MAYORES_60_2026_10_19.md): fuentes completas y manuales localizados, edades/escolaridad, fórmulas candidatas, conflictos, huellas y cálculo descriptivo FCSRT; no declara cerrado lo pendiente de normalización.
 
 - [Cierre operativo 1–8](CIERRE_OPERATIVO_1_A_8_2026_10_18.md): alcance vigente, revisión profesional posterior y checklist por evidencia.
 - [Gobierno de reglas aprobado](PROPUESTA_GOBIERNO_REGLAS_2026_10_18.md): cinco columnas, 4FN, Medicina/Psicología y consulta de Superadministración; sin nuevas tablas.

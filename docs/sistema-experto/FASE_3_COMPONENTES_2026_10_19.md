@@ -167,3 +167,75 @@ concurrentes fuera del incremento.
 cierre funcional de la fase 3 todavía no acreditado. No existe una guía médica
 que por sí sola proporcione las once conversiones ausentes. Tampoco se
 presenta el dictamen técnico propio como validación clínica independiente.
+
+## Ampliación: manuales investigados para mayores de 60
+
+La propietaria confirmó que las fuentes deben obtenerse mediante investigación
+profunda en internet, para población **mayor de 60 años**, y pidió documentarlo
+todo. Se entrega el [manual técnico geriátrico](MANUAL_INVESTIGADO_MAYORES_60_2026_10_19.md),
+con nueve grupos de fuentes, acceso efectivo, localizadores, edades, escolaridad,
+versiones, fórmulas candidatas, ejemplos independientes y huellas de cinco
+originales. Incluye el acceso comercial legítimo a los manuales WAIS identificados;
+no afirma que se hayan consultado íntegros.
+
+Hallazgos que cambian el siguiente trabajo: SABIEX publica métodos de longitud
+inversa, letras/números y JLO, con límites de selección de la muestra; pFCSRT+IR
+2025 publica una varianza residual dependiente del predicho. Se documentan
+contradicciones en la autocorrección del Token chileno y entre la tabla de
+FCSRT-Del y la celda C16 de la calculadora pública de SABIEX. No se transfieren
+normas entre palabras e imágenes ni se copia una fórmula conflictiva a producción.
+
+Implementado `FCSRT-PALABRAS-NEURONORMA-BRUTO-1`, únicamente descriptivo:
+adicionales con claves, total de aprendizaje y total diferido, sin duplicar
+aciertos libres. Integra registro, extractor, perfil y explicación ya existentes.
+Catálogo `CAPTURA-COGNITIVA-5-20261019`; el enlace WAIS sustituye la antigua ruta
+que actualmente devuelve portada. No modifica configuración institucional,
+permisos, estructura, reglas ni datos. No ejecuta Petersen o G09.
+
+Cobertura actual: **siete perfiles normativos y tres descriptivos**. Ocho
+componentes normativos con once medidas; cuatro componentes adicionales con
+cálculo descriptivo. Continúan once normalizaciones sin método aplicable adoptado
+y verificado. El compromiso de los diecinueve permanece abierto.
+
+Verificación del incremento:
+
+```powershell
+php artisan test --compact --filter='RecuerdoConClavesFcsrtInvestigadoTest|LenguajeWabCastellanoInvestigadoTest|InterpretacionInstrumentalFaseTresTest' --colors=never
+```
+
+PASS: **94 pruebas / 507 aserciones**.
+
+```powershell
+php artisan test --compact --filter='RecuerdoConClavesFcsrtInvestigadoTest|LenguajeWabCastellanoInvestigadoTest|InterpretacionInstrumentalFaseTresTest|NormalizacionInstrumentalInvestigadaTest|NormalizacionBateriaBolivia2015Test|PerfilInstrumentalInstitucionalTest|CapturaInstrumentalInstitucionalTest|PreparacionInstrumentalInvestigadaTest' --colors=never
+```
+
+PASS SQLite: **178 pruebas / 1624 aserciones**, duración 66.61 s. Veintisiete
+casos FCSRT nuevos cubren aritmética independiente, cero/ausencia, tipos, pares
+contradictorios, condiciones, versiones, demora y procedencia hasta el perfil;
+este conserva ausencia de normalización y de resultado clínico.
+
+```powershell
+pwsh -NoProfile -File scripts/probar-postgres.ps1 -Filtro 'RecuerdoConClavesFcsrtInvestigadoTest|LenguajeWabCastellanoInvestigadoTest|InterpretacionInstrumentalFaseTresTest|NormalizacionInstrumentalInvestigadaTest|NormalizacionBateriaBolivia2015Test|PerfilInstrumentalInstitucionalTest|CapturaInstrumentalInstitucionalTest|PreparacionInstrumentalInvestigadaTest'
+```
+
+PASS PostgreSQL desechable: **178 pruebas / 1623 aserciones**, duración 84.186 s.
+Evidencia local: `remembermind-pg-604fb7dfaab04da79d28cb9a42dd30e9.junit.xml` y
+`.log`, en el directorio temporal. El script detuvo y eliminó su clúster; no usó
+la base operativa. Se conserva la diferencia de una aserción entre motores.
+
+Se mantiene la separación entre pruebas puras de FCSRT y pruebas de integración
+existentes de captura/preparación y acceso. No se afirma que se haya configurado
+o administrado una nueva prueba en residentes. Sintaxis y Pint: PASS; build/QA
+visual no aplican al no cambiar Presentation/frontend. La revisión técnica propia
+no sustituye un gate experto independiente o validación clínica.
+
+Auditoría documental: PASS, diecinueve componentes únicos, nueve grupos de fuentes
+y cincuenta enlaces locales existentes en los cuatro documentos revisados.
+Se verificaron huellas, fórmulas XML y las dos páginas PDF críticas; las fuentes
+de acceso parcial se identifican como tales. Revisión de diff y espacios: PASS.
+
+Archivos propios: `CalculadorRecuerdoConClavesFcsrt.php` y
+`RecuerdoConClavesFcsrtInvestigadoTest.php` nuevos; registro, catálogo y explicación
+instrumentales; manual nuevo, informe de investigación, índice y este seguimiento.
+Los cambios concurrentes de Valoraciones, Institución, provider, fase 2 y `work/`
+se mantienen fuera del incremento.

@@ -36,6 +36,9 @@ final class ExplicacionMatematicaInstrumental
                 'DIFERENCIA_ACIERTOS_FALSAS_ALARMAS' => 'Se calculó la diferencia entre aciertos y falsas alarmas. Falta una norma compatible para interpretar este reconocimiento.',
                 'WAB_ES_2000_REPETICION_ESCALA_0_10' => 'El total original de repetición se convirtió a la escala de 0 a 10 de esta edición. Esta conversión no determina alteración cognitiva.',
                 'WAB_ES_2000_HABLA_ESPONTANEA_TOTAL' => 'Se sumaron contenido de la información y fluidez corregidos en la tarea de habla espontánea. El total conserva ambas puntuaciones y no determina DCL.',
+                'FCSRT_PALABRAS_ADICIONALES_CON_CLAVES' => 'Se sumaron los aciertos adicionales con claves de los tres ensayos. Este recuento no incluye los aciertos libres y no establece un déficit de almacenamiento.',
+                'FCSRT_PALABRAS_TOTAL_APRENDIZAJE' => 'Se sumaron los aciertos libres y adicionales con claves de los tres ensayos, sin contarlos de nuevo. Falta una comparación normativa adoptada para interpretar este total.',
+                'FCSRT_PALABRAS_TOTAL_DIFERIDO' => 'Se sumaron los aciertos libres y adicionales con claves del diferido a treinta minutos. Este total no demuestra por sí solo una alteración de memoria ni DCL.',
                 default => 'Se dispone de una puntuación descriptiva, sin comparación normativa compatible ni clasificación clínica.',
             };
 

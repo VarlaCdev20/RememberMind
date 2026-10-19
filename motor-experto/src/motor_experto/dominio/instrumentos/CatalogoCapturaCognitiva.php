@@ -13,13 +13,14 @@ namespace MotorExperto\dominio\instrumentos;
  */
 final class CatalogoCapturaCognitiva
 {
-    public const VERSION = 'CAPTURA-COGNITIVA-4-20261019';
+    public const VERSION = 'CAPTURA-COGNITIVA-5-20261019';
 
     public function componentes(): array
     {
         $hvlt = 'https://doi.org/10.3233/NRE-151286';
         $ruff = 'https://www.parinc.com/products/RUFF2AND7';
-        $wais = 'https://www.pearsonclinical.es/portals/0/docproductos/13534059942.pdf';
+        // La antigua ruta PDF redirige a portada; enlazar la edición identificada por el editor.
+        $wais = 'https://www.pearsonclinical.es/es-es/Tienda/Evaluaciones-Profesionales/p/P100200036';
         $wab = 'https://naullibres.com/libro/bateria-de-afasias-western/';
         $datos = [
             'MEM-S01' => ['HVLT-R forma 5', $hvlt, [
@@ -28,11 +29,14 @@ final class CatalogoCapturaCognitiva
             'MEM-S02' => ['HVLT-R forma 5', $hvlt, [
                 'recuerdo_diferido' => 'Entero de aciertos, 0–12', 'demora_minutos' => 'Número de minutos efectivos, referencia 20–25'],
                 'Recuerdo libre diferido; no aplicar la regresión del total de aprendizaje.'],
-            'MEM-S03' => ['FCSRT, versión española de 16 elementos', 'https://doi.org/10.1093/arclin/acp041', [
-                'libres_por_ensayo' => 'Tres enteros de aciertos', 'adicionales_con_claves_por_ensayo' => 'Tres enteros, excluyendo los ya recuperados libremente',
-                'libre_diferido' => 'Entero de aciertos', 'adicional_con_claves_diferido' => 'Entero de aciertos', 'demora_minutos' => 'Número de minutos efectivos',
-                'codificacion_verificada' => 'Lógico con soporte de la aplicación'],
-                'En esa versión, libre más adicional con claves no excede 16 por ensayo. La referencia española no es una norma boliviana.'],
+            'MEM-S03' => ['FCSRT de palabras, procedimiento NEURONORMA', CalculadorRecuerdoConClavesFcsrt::FUENTE, [
+                'libre_1' => 'Entero, 0–16', 'adicional_claves_1' => 'Entero adicional, sin repetir los libres',
+                'libre_2' => 'Entero, 0–16', 'adicional_claves_2' => 'Entero adicional, sin repetir los libres',
+                'libre_3' => 'Entero, 0–16', 'adicional_claves_3' => 'Entero adicional, sin repetir los libres',
+                'libre_diferido' => 'Entero, 0–16', 'adicional_claves_diferido' => 'Entero adicional, sin repetir los libres',
+                'demora_minutos' => 'Número; diferido de referencia a 30 minutos',
+                'codificacion_verificada' => 'Lógico con soporte de la aplicación', 'administracion_estandarizada' => 'Lógico documentado'],
+                'Libre más adicional no excede 16 por ensayo. Totales descriptivos; no intercambiar palabras e imágenes ni adoptar baremos españoles por esta suma.'],
             'MEM-S04' => ['HVLT-R, fase de reconocimiento identificada', 'https://www.parinc.com/products/HVLT-R', [
                 'aciertos_reconocimiento' => 'Entero, 0–12 objetivos', 'falsas_alarmas_relacionadas' => 'Entero, 0–6',
                 'falsas_alarmas_no_relacionadas' => 'Entero, 0–6', 'demora_minutos' => 'Número de minutos efectivos'],
