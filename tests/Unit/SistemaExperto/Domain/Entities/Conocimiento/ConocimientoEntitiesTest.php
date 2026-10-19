@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Entities\Conocimiento;
 
-use App\SistemaExperto\Domain\Entities\Conocimiento\NodoSemantico;
-use App\SistemaExperto\Domain\Entities\Conocimiento\RedSemantica;
-use App\SistemaExperto\Domain\Entities\Conocimiento\ReglaExperta;
-use App\SistemaExperto\Domain\Entities\Conocimiento\RelacionSemantica;
-use App\SistemaExperto\Domain\ValueObjects\Conocimiento\OperadorCondicionEnum;
-use App\SistemaExperto\Domain\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
+use MotorExperto\dominio\orion\Entities\Conocimiento\NodoSemantico;
+use MotorExperto\dominio\orion\Entities\Conocimiento\RedSemantica;
+use MotorExperto\dominio\orion\Entities\Conocimiento\ReglaExperta;
+use MotorExperto\dominio\orion\Entities\Conocimiento\RelacionSemantica;
+use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
+use MotorExperto\dominio\orion\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
 use DomainException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

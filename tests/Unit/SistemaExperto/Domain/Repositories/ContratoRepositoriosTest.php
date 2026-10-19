@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Repositories;
 
-use App\SistemaExperto\Domain\Entities\Cognicion\VectorCognitivo;
-use App\SistemaExperto\Domain\Entities\Conocimiento\RedSemantica;
-use App\SistemaExperto\Domain\Entities\Conocimiento\ReglaExperta;
-use App\SistemaExperto\Domain\Entities\Dcl\ResultadoClasificacionDcl;
-use App\SistemaExperto\Domain\Entities\Hechos\MemoriaTrabajo;
-use App\SistemaExperto\Domain\Repositories\Conocimiento\RedSemanticaRepositoryInterface;
-use App\SistemaExperto\Domain\Repositories\Conocimiento\ReglaExpertaRepositoryInterface;
-use App\SistemaExperto\Domain\Repositories\Evaluaciones\EvaluacionExpertaRepositoryInterface;
-use App\SistemaExperto\Domain\Repositories\Hechos\EvidenciaRepositoryInterface;
+use MotorExperto\dominio\orion\Entities\Cognicion\VectorCognitivo;
+use MotorExperto\dominio\orion\Entities\Conocimiento\RedSemantica;
+use MotorExperto\dominio\orion\Entities\Conocimiento\ReglaExperta;
+use MotorExperto\dominio\orion\Entities\Dcl\ResultadoClasificacionDcl;
+use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\orion\Repositories\Conocimiento\RedSemanticaRepositoryInterface;
+use MotorExperto\dominio\orion\Repositories\Conocimiento\ReglaExpertaRepositoryInterface;
+use MotorExperto\dominio\orion\Repositories\Evaluaciones\EvaluacionExpertaRepositoryInterface;
+use MotorExperto\dominio\orion\Repositories\Hechos\EvidenciaRepositoryInterface;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -55,7 +55,7 @@ final class ContratoRepositoriosTest extends TestCase
         foreach ($interfaces as $interfaz) {
             $r = new ReflectionClass($interfaz);
             self::assertTrue($r->isInterface());
-            self::assertStringStartsWith('App\\SistemaExperto\\Domain\\Repositories\\', $r->getName());
+            self::assertStringStartsWith('MotorExperto\\dominio\\orion\\Repositories\\', $r->getName());
             foreach (['TÍTULO:', 'CAPA:', 'SUBSISTEMA:', 'RESPONSABILIDAD:', 'ENTRADAS:', 'SALIDAS:', 'RESTRICCIONES:', 'TRAZABILIDAD:'] as $campo) {
                 self::assertStringContainsString($campo, $r->getDocComment());
             }

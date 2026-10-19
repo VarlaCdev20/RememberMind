@@ -35,7 +35,7 @@ return new class extends Migration
             DB::statement('ALTER TABLE reglas_expertas ADD CONSTRAINT re_revision_firma_ck CHECK ('.$check.')');
             DB::statement('ALTER TABLE reglas_expertas ADD CONSTRAINT re_revision_anterior_ck CHECK '.$previous);
             DB::unprepared(<<<'SQL'
-CREATE FUNCTION conservar_revision_regla() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION conservar_revision_regla() RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
     IF OLD.cod_regla_anterior IS DISTINCT FROM NEW.cod_regla_anterior
        OR OLD.cod_regla_experta IS DISTINCT FROM NEW.cod_regla_experta

@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Tests\Feature\SistemaExperto\Infrastructure\Flujo;
 
-use App\SistemaExperto\Application\DTOs\InformeExpertoDTO;
-use App\SistemaExperto\Application\DTOs\SolicitudInferenciaDTO;
-use App\SistemaExperto\Application\UseCases\AnalizarCasoExperimentalUseCase;
-use App\SistemaExperto\Application\UseCases\ClasificarDclUseCase;
-use App\SistemaExperto\Application\UseCases\EjecutarInferenciaUseCase;
-use App\SistemaExperto\Application\UseCases\ExtraerHechosUseCase;
-use App\SistemaExperto\Application\UseCases\GenerarInformeUseCase;
-use App\SistemaExperto\Application\UseCases\PrepararMemoriaTrabajoUseCase;
-use App\SistemaExperto\Domain\ValueObjects\Dcl\EstadoCriterioDclEnum;
-use App\SistemaExperto\Domain\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
-use App\SistemaExperto\Infrastructure\Persistence\Mappers\MapeadorRedSemantica;
-use App\SistemaExperto\Infrastructure\Persistence\Repositories\RedSemanticaEloquentRepository;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\InformeExpertoDTO;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\SolicitudInferenciaDTO;
+use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\AnalizarCasoExperimentalUseCase;
+use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\ClasificarDclUseCase;
+use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\EjecutarInferenciaUseCase;
+use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\ExtraerHechosUseCase;
+use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\GenerarInformeUseCase;
+use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\PrepararMemoriaTrabajoUseCase;
+use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum;
+use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorRedSemantica;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\RedSemanticaEloquentRepository;
 use Illuminate\Support\Facades\DB;
 use Tests\Feature\SistemaExperto\Infrastructure\Adapters\AdaptadoresTestCase;
 

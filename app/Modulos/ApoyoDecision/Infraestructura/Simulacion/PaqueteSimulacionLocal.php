@@ -7,9 +7,9 @@ namespace App\Modulos\ApoyoDecision\Infraestructura\Simulacion;
 use App\Compartido\Infraestructura\Persistencia\CatalogoCodigos;
 use App\Compartido\Infraestructura\Persistencia\GeneradorCodigo;
 use App\Models\User;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\DominioCognitivoEnum as Dominio;
-use App\SistemaExperto\Domain\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
-use App\SistemaExperto\Infrastructure\Persistence\Conservacion\CatalogoConservacionExperta;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum as Dominio;
+use MotorExperto\dominio\orion\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\CatalogoConservacionExperta;
 use DomainException;
 
 /**

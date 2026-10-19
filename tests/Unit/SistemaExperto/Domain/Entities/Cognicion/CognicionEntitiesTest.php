@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Entities\Cognicion;
 
-use App\SistemaExperto\Domain\Entities\Cognicion\ResultadoDominio;
-use App\SistemaExperto\Domain\Entities\Cognicion\ResultadoSubcomponente;
-use App\SistemaExperto\Domain\Entities\Cognicion\VectorCognitivo;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\DominioCognitivoEnum as D;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\EstadoDominioEnum as E;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\EvaluabilidadEnum as V;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\HallazgoInstrumentalEnum as H;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\SubcomponenteCognitivoEnum as S;
+use MotorExperto\dominio\orion\Entities\Cognicion\ResultadoDominio;
+use MotorExperto\dominio\orion\Entities\Cognicion\ResultadoSubcomponente;
+use MotorExperto\dominio\orion\Entities\Cognicion\VectorCognitivo;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum as D;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum as E;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\EvaluabilidadEnum as V;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum as H;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\SubcomponenteCognitivoEnum as S;
 use DomainException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Services\Dcl;
 
-use App\SistemaExperto\Domain\Services\Dcl\ClasificadorPetersenService;
-use App\SistemaExperto\Domain\Services\Dcl\EvaluadorRequisitosDclService;
-use App\SistemaExperto\Domain\ValueObjects\Dcl\EstadoCriterioDclEnum as C;
-use App\SistemaExperto\Domain\ValueObjects\Dcl\MotivoAbstencionEnum as M;
-use App\SistemaExperto\Domain\ValueObjects\Funcionalidad\EstadoDiferencialEnum as D;
+use MotorExperto\dominio\orion\Services\Dcl\ClasificadorPetersenService;
+use MotorExperto\dominio\orion\Services\Dcl\EvaluadorRequisitosDclService;
+use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum as C;
+use MotorExperto\dominio\orion\ValueObjects\Dcl\MotivoAbstencionEnum as M;
+use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum as D;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;

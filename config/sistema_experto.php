@@ -1,6 +1,8 @@
 <?php
 
 return [
+    // Bindings explícitos a instrumentos/preguntas originales. Su ausencia no identifica las tareas nominales como HVLT-R.
+    'perfiles_instrumentales' => [],
     // Registro de contratos de PUBLICACIÓN, nunca activación de inferencia.
     // Vacío hasta decisión institucional: ACTIVO por sí solo no acredita el paquete.
     // Cada versión histórica requerirá criterios y catálogos de ejecución/traza

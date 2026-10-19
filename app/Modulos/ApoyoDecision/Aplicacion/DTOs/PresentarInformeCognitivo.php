@@ -3,7 +3,7 @@
 namespace App\Modulos\ApoyoDecision\Aplicacion\DTOs;
 
 use App\Modulos\ApoyoDecision\Dominio\Reglas\BaseTecnicaDesechable;
-use App\SistemaExperto\Application\DTOs\InformeExpertoDTO;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\InformeExpertoDTO;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 

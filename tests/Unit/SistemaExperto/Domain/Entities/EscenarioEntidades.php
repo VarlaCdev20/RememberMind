@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Entities;
 
-use App\SistemaExperto\Domain\Entities\Cognicion\ResultadoDominio;
-use App\SistemaExperto\Domain\Entities\Cognicion\VectorCognitivo;
-use App\SistemaExperto\Domain\Entities\Dcl\PerfilRequisitosDcl;
-use App\SistemaExperto\Domain\Entities\Funcionalidad\EvidenciaIadl;
-use App\SistemaExperto\Domain\Entities\Funcionalidad\VectorFuncionalidad;
-use App\SistemaExperto\Domain\Entities\Hechos\EvidenciaCognitiva;
-use App\SistemaExperto\Domain\Entities\Hechos\HechoExperto;
-use App\SistemaExperto\Domain\Entities\Hechos\MemoriaTrabajo;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\DominioCognitivoEnum;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\EstadoDominioEnum;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\EvaluabilidadEnum;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\SubcomponenteCognitivoEnum;
-use App\SistemaExperto\Domain\ValueObjects\Dcl\CriterioDclEnum;
-use App\SistemaExperto\Domain\ValueObjects\Dcl\EstadoCriterioDclEnum;
-use App\SistemaExperto\Domain\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
-use App\SistemaExperto\Domain\ValueObjects\Funcionalidad\EstadoIadlEnum;
-use App\SistemaExperto\Domain\ValueObjects\Funcionalidad\OportunidadIadlEnum;
+use MotorExperto\dominio\orion\Entities\Cognicion\ResultadoDominio;
+use MotorExperto\dominio\orion\Entities\Cognicion\VectorCognitivo;
+use MotorExperto\dominio\orion\Entities\Dcl\PerfilRequisitosDcl;
+use MotorExperto\dominio\orion\Entities\Funcionalidad\EvidenciaIadl;
+use MotorExperto\dominio\orion\Entities\Funcionalidad\VectorFuncionalidad;
+use MotorExperto\dominio\orion\Entities\Hechos\EvidenciaCognitiva;
+use MotorExperto\dominio\orion\Entities\Hechos\HechoExperto;
+use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\EvaluabilidadEnum;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\SubcomponenteCognitivoEnum;
+use MotorExperto\dominio\orion\ValueObjects\Dcl\CriterioDclEnum;
+use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum;
+use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
+use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoIadlEnum;
+use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\OportunidadIadlEnum;
 use DateTimeImmutable;
 
 /**

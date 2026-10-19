@@ -10,7 +10,7 @@ use App\Models\Residente;
 use App\Models\User;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoObservacional;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConservacionObservacional;
-use App\SistemaExperto\Infrastructure\Persistence\Conservacion\CodecInstantanea as Codec;
+use MotorExperto\soporte\conservacion\CodecInstantanea as Codec;
 use DomainException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;

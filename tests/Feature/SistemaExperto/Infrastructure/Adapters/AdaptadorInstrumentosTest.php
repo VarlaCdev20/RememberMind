@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\SistemaExperto\Infrastructure\Adapters;
 
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
-use App\SistemaExperto\Infrastructure\Adapters\FuentesOperativas\AdaptadorInstrumentos;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\AdaptadorInstrumentos;
 use DateTimeZone;
 use DomainException;
 use Illuminate\Support\Facades\DB;

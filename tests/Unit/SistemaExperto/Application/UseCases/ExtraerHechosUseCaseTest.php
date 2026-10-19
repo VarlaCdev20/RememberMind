@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Application\UseCases;
 
-use App\SistemaExperto\Application\DTOs\SolicitudInferenciaDTO;
-use App\SistemaExperto\Application\UseCases\ExtraerHechosUseCase;
-use App\SistemaExperto\Domain\Entities\Hechos\MemoriaTrabajo;
-use App\SistemaExperto\Domain\Repositories\Hechos\EvidenciaRepositoryInterface;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\SolicitudInferenciaDTO;
+use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\ExtraerHechosUseCase;
+use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\orion\Repositories\Hechos\EvidenciaRepositoryInterface;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
 use DateTimeImmutable;
 use DomainException;
 use PHPUnit\Framework\Attributes\DataProvider;

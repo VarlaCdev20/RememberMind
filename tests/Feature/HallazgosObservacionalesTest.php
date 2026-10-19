@@ -17,7 +17,7 @@ use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaResultadosExperto;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\PaqueteObservacional;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
 use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
-use App\SistemaExperto\Infrastructure\Persistence\Conservacion\CodecInstantanea;
+use MotorExperto\soporte\conservacion\CodecInstantanea;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use DateTimeImmutable;
 use DomainException;
@@ -171,7 +171,7 @@ final class HallazgosObservacionalesTest extends TestCase
         $id = app(EjecutarObservaciones::class)->ejecutar($this->medico, $this->residente, (string) Str::uuid());
         DB::table('hechos_instantanea_experta')->where('cod_evaluacion_experta', $id)->where('concepto_dominio', 'repite_preguntas')->update(['valor_logico' => false]);
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
-            ->assertSee('No se pudo consultar la evaluación')->assertDontSee('Se documentó un episodio de repetición de preguntas.');
+            ->assertSee('No se pudieron consultar los hallazgos observacionales')->assertDontSee('Se documentó un episodio de repetición de preguntas.');
     }
 
     public function test_fallo_intermedio_revierte_conocimiento_ejecucion_hechos_traza_y_auditoria(): void

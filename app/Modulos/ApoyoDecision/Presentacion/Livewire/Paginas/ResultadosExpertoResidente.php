@@ -9,6 +9,7 @@ use App\Modulos\ApoyoDecision\Aplicacion\Acciones\EjecutarObservaciones;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RevisarValoracionExperta;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarHallazgosObservacionales;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarObservacionesConservadas;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarPerfilInstrumental;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarRevisionesValoracionExperta;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaFuenteEvidencia;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaResultadosExperto;
@@ -16,6 +17,7 @@ use App\Modulos\ApoyoDecision\Aplicacion\Contratos\LecturaSimulacionExperta;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto as L;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\PresentarInformeCognitivo;
 use App\Modulos\ApoyoDecision\Dominio\Revision\DisciplinaRevision;
+use Carbon\CarbonImmutable;
 use DomainException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Gate;
@@ -55,6 +57,9 @@ class ResultadosExpertoResidente extends Component
 
     #[Locked]
     public ?string $disciplinaRevision = null;
+
+    #[Locked]
+    public bool $revisionObservacional = false;
 
     public string $decisionRevision = '';
 
@@ -196,6 +201,11 @@ class ResultadosExpertoResidente extends Component
     {
         $residente = $this->autorizar();
         Gate::authorize('ejecutarObservaciones', [EvaluacionExperta::class, $residente]);
+        if ($this->disciplinaRevision !== null) {
+            $this->addError('revision', 'Guarde o cancele la revisión abierta antes de ejecutar otra evaluación.');
+
+            return;
+        }
         $this->solicitudObservacional ??= (string) Str::uuid();
         $this->mensajeObservacional = null;
         $this->resetErrorBag('observaciones');
@@ -215,6 +225,11 @@ class ResultadosExpertoResidente extends Component
     public function seleccionarObservacion(string $id): void
     {
         $residente = $this->autorizar();
+        if ($this->disciplinaRevision !== null) {
+            $this->addError('revision', 'Guarde o cancele la revisión abierta antes de cambiar de evaluación.');
+
+            return;
+        }
         app(ConsultarObservacionesConservadas::class)->consultar(auth()->user(), $residente, $id);
         $this->evaluacionObservacional = $id;
         $this->resetPage('observaciones');
@@ -224,6 +239,11 @@ class ResultadosExpertoResidente extends Component
     public function prepararRevision(string $disciplina): void
     {
         $r = $this->autorizar();
+        if ($this->disciplinaRevision !== null) {
+            $this->addError('revision', 'Guarde o cancele la revisión abierta antes de preparar otra.');
+
+            return;
+        }
         // Una simulación nunca admite firmas profesionales sobre una valoración operativa.
         abort_if($this->simulacion, 404);
         $d = DisciplinaRevision::tryFrom($disciplina);
@@ -233,8 +253,35 @@ class ResultadosExpertoResidente extends Component
         $revisiones = app(ConsultarRevisionesValoracionExperta::class)->consultar(auth()->user(), $datos['evaluacion']['id']);
         abort_unless($revisiones && $revisiones[$d->value]['puede_firmar'], 403);
         $this->revisionEvaluacion = $datos['evaluacion']['id'];
+        $this->evaluacion = $this->revisionEvaluacion;
+        $this->revisionObservacional = false;
         $this->revisionAnterior = $revisiones[$d->value]['cabeza'];
         $this->disciplinaRevision = $d->value;
+        $this->decisionRevision = $this->justificacionRevision = '';
+        $this->mensajeRevision = null;
+        $this->resetValidation();
+    }
+
+    /** La firma observacional refiere a la instantánea seleccionada, sin sustituir una valoración cognitiva. */
+    public function prepararRevisionObservacional(string $disciplina): void
+    {
+        $r = $this->autorizar();
+        if ($this->disciplinaRevision !== null) {
+            $this->addError('revision', 'Guarde o cancele la revisión abierta antes de preparar otra.');
+
+            return;
+        }
+        $d = DisciplinaRevision::tryFrom($disciplina);
+        abort_unless($d, 422);
+        $resultado = app(ConsultarObservacionesConservadas::class)->consultar(auth()->user(), $r, $this->evaluacionObservacional);
+        abort_unless($resultado && $resultado['persistido'], 422);
+        $revisiones = app(ConsultarRevisionesValoracionExperta::class)->consultar(auth()->user(), $resultado['id']);
+        abort_unless($revisiones && $revisiones[$d->value]['puede_firmar'], 403);
+        $this->revisionEvaluacion = $resultado['id'];
+        $this->evaluacionObservacional = $this->revisionEvaluacion;
+        $this->revisionAnterior = $revisiones[$d->value]['cabeza'];
+        $this->disciplinaRevision = $d->value;
+        $this->revisionObservacional = true;
         $this->decisionRevision = $this->justificacionRevision = '';
         $this->mensajeRevision = null;
         $this->resetValidation();
@@ -244,6 +291,7 @@ class ResultadosExpertoResidente extends Component
     {
         $this->autorizar();
         $this->revisionEvaluacion = $this->revisionAnterior = $this->disciplinaRevision = null;
+        $this->revisionObservacional = false;
         $this->decisionRevision = $this->justificacionRevision = '';
         $this->resetValidation();
     }
@@ -276,17 +324,38 @@ class ResultadosExpertoResidente extends Component
         $datos = null;
         $fuente = null;
         $errorLectura = false;
+        $errorInstrumental = false;
+        $errorObservacional = false;
         $informe = null;
         $revisiones = null;
+        $revisionesObservacionales = null;
         $estadoRevision = null;
         $hallazgosObservacionales = null;
+        $capturaInstrumental = null;
+        $perfilInstrumental = null;
         $puedeAuditar = Gate::allows('consultarTrazabilidad', [EvaluacionExperta::class, $residente]);
         $puedeEjecutarObservaciones = Gate::allows('ejecutarObservaciones', [EvaluacionExperta::class, $residente]);
         abort_if($this->trazabilidadAbierta && ! $puedeAuditar, 404);
         try {
+            $perfilInstrumental = app(ConsultarPerfilInstrumental::class)->consultar(auth()->user(), $residente, CarbonImmutable::now());
+            $capturaInstrumental = $perfilInstrumental['capturas_originales'] ?? null;
+        } catch (QueryException|DomainException $e) {
+            report($e);
+            $errorInstrumental = true;
+        }
+        try {
             $hallazgosObservacionales = app(ConsultarObservacionesConservadas::class)->consultar(auth()->user(), $residente,
                 $this->evaluacionObservacional, $this->getPage('observaciones'), $this->getPage('historiaObservaciones'))
                 ?? app(ConsultarHallazgosObservacionales::class)->consultar(auth()->user(), $residente, $this->getPage('observaciones'));
+            if ($hallazgosObservacionales && $hallazgosObservacionales['persistido']) {
+                $revisionesObservacionales = app(ConsultarRevisionesValoracionExperta::class)->consultar(auth()->user(), $hallazgosObservacionales['id']);
+            }
+        } catch (QueryException|DomainException $e) {
+            report($e);
+            $hallazgosObservacionales = $revisionesObservacionales = null;
+            $errorObservacional = true;
+        }
+        try {
             $datos = $this->leerResultados($residente, $this->evaluacion, $this->getPage('historia'));
             $presentador = app(PresentarInformeCognitivo::class);
             $informe = $this->simulacion ? $presentador->presentarSimulacion($datos, $this->criterio)
@@ -298,15 +367,13 @@ class ResultadosExpertoResidente extends Component
             if ($this->evidencia && isset($datos['detalle']['evidencias'][$this->evidencia])) {
                 $fuente = app(LecturaFuenteEvidencia::class)->consultar(auth()->user(), $residente, $datos['evaluacion']['id'], $this->evidencia);
             }
-        } catch (QueryException $e) {
+        } catch (QueryException|DomainException $e) {
             report($e);
-            $errorLectura = true;
-        } catch (DomainException $e) {
-            report($e);
+            $datos = $informe = $revisiones = $fuente = $estadoRevision = null;
             $errorLectura = true;
         }
 
-        return view('livewire.medico.resultados-experto-residente', compact('datos', 'informe', 'fuente', 'errorLectura', 'residente', 'revisiones', 'estadoRevision', 'puedeAuditar', 'hallazgosObservacionales', 'puedeEjecutarObservaciones'))
+        return view('livewire.medico.resultados-experto-residente', compact('datos', 'informe', 'fuente', 'errorLectura', 'residente', 'revisiones', 'estadoRevision', 'puedeAuditar', 'hallazgosObservacionales', 'puedeEjecutarObservaciones', 'capturaInstrumental', 'perfilInstrumental', 'revisionesObservacionales', 'errorInstrumental', 'errorObservacional'))
             ->layout($this->enfermeria ? 'layouts.enfermeria' : 'layouts.sistema');
     }
 }

@@ -6,8 +6,8 @@ namespace App\Modulos\ApoyoDecision\Infraestructura\Simulacion;
 
 use App\Compartido\Infraestructura\Persistencia\CatalogoCodigos;
 use App\Compartido\Infraestructura\Persistencia\GeneradorCodigo;
-use App\SistemaExperto\Application\DTOs\ResultadoInferenciaDTO;
-use App\SistemaExperto\Infrastructure\Persistence\Conservacion\CodecInstantanea;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\ResultadoInferenciaDTO;
+use MotorExperto\soporte\conservacion\CodecInstantanea;
 use DomainException;
 
 /**
@@ -22,6 +22,8 @@ use DomainException;
  */
 final readonly class TrazaSimulacionLocal
 {
+    /** Columnas administrativas incorporadas después de SIM-TRACE-1; no cambian una condición o consecuencia. */
+    private const GOBIERNO = ['cod_regla_anterior', 'estado_revision', 'cod_usuario_revision', 'fecha_hora_revision', 'justificacion_revision'];
     public function __construct(private ContextoSimulacionLocal $contexto) {}
 
     public function guardar(string $evaluacion, ResultadoInferenciaDTO $inferencia): void
@@ -100,7 +102,18 @@ final readonly class TrazaSimulacionLocal
             $payload[] = [$r->cod_regla_experta, $r->estado_regla, $condiciones, $this->definicion($r->cod_regla_experta)];
             $vista[] = ['codigo' => $r->codigo_regla, 'nombre' => $r->nombre, 'estado' => $r->estado_regla, 'condiciones' => $condiciones];
         }
-        if (! hash_equals($m[1], CodecInstantanea::huella($payload))) {
+        // SIM-TRACE-1 se creó antes de las cinco columnas. Se verifican únicamente las dos formas físicas conocidas.
+        $integra = hash_equals($m[1], CodecInstantanea::huella($payload));
+        if (! $integra) {
+            $originales = $db->table('reglas_expertas')->whereIn('cod_regla_experta', array_column($payload, 0))->get()->keyBy('cod_regla_experta');
+            $conGobierno = array_map(static function ($r) use ($originales): array {
+                $r[3][0] = (array) $originales->get($r[0]);
+
+                return $r;
+            }, $payload);
+            $integra = hash_equals($m[1], CodecInstantanea::huella($conGobierno));
+        }
+        if (! $integra) {
             throw new DomainException('Traza local incompleta o alterada.');
         }
 
@@ -113,7 +126,7 @@ final readonly class TrazaSimulacionLocal
     {
         $db = $this->contexto->db();
 
-        return [(array) $db->table('reglas_expertas')->where('cod_regla_experta', $regla)->sole(),
+        return [array_diff_key((array) $db->table('reglas_expertas')->where('cod_regla_experta', $regla)->sole(), array_flip(self::GOBIERNO)),
             $db->table('condiciones_regla_experta')->where('cod_regla_experta', $regla)->orderBy('cod_condicion_regla')->get()->map(fn ($r) => (array) $r)->all(),
             $db->table('consecuencias_regla_experta')->where('cod_regla_experta', $regla)->orderBy('cod_consecuencia_regla')->get()->map(fn ($r) => (array) $r)->all()];
     }

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Application\DTOs;
 
-use App\SistemaExperto\Application\DTOs\EvidenciasEntradaDTO;
-use App\SistemaExperto\Application\DTOs\SolicitudInferenciaDTO;
-use App\SistemaExperto\Domain\Entities\Hechos\MemoriaTrabajo;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\EvidenciasEntradaDTO;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\SolicitudInferenciaDTO;
+use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
 use DomainException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

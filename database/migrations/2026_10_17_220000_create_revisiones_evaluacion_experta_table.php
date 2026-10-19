@@ -39,7 +39,7 @@ return new class extends Migration
         $condicion = "disciplina IN ('MEDICINA','PSICOLOGIA') AND decision IN ('CONFIRMADA','RECHAZADA') AND length(trim(justificacion)) > 0 AND (cod_revision_anterior IS NULL OR cod_revision_anterior <> cod_revision_experta)";
         if (DB::getDriverName() === 'pgsql') {
             DB::statement('ALTER TABLE revisiones_evaluacion_experta ADD CONSTRAINT rev_contrato_ck CHECK ('.$condicion.')');
-            DB::unprepared("CREATE FUNCTION rev_impedir_mutacion() RETURNS trigger LANGUAGE plpgsql AS \$\$ BEGIN RAISE EXCEPTION 'Las revisiones profesionales son inmutables'; END; \$\$");
+            DB::unprepared("CREATE OR REPLACE FUNCTION rev_impedir_mutacion() RETURNS trigger LANGUAGE plpgsql AS \$\$ BEGIN RAISE EXCEPTION 'Las revisiones profesionales son inmutables'; END; \$\$");
             DB::unprepared('CREATE TRIGGER rev_inmutable BEFORE UPDATE OR DELETE ON revisiones_evaluacion_experta FOR EACH ROW EXECUTE FUNCTION rev_impedir_mutacion()');
         } elseif (DB::getDriverName() === 'sqlite') {
             foreach (['INSERT', 'UPDATE'] as $evento) {

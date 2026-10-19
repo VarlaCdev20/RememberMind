@@ -1,5 +1,7 @@
 # O.R.I.O.N. — módulo experimental aislado
 
+> Antecedente histórico. Desde el 18/10/2026 esta carpeta no contiene PHP ejecutable. El dominio está en `motor-experto/src/motor_experto/dominio/orion`, el codec en `motor-experto/src/motor_experto/soporte/conservacion`, y Application/Infrastructure en `app/Modulos/ApoyoDecision/Aplicacion` e `Infraestructura`. El contenido siguiente describe el corte anterior; no define otra implementación vigente. Véase `docs/sistema-experto/CORRECCIONES_POR_PUNTOS_2026_10_18.md`.
+
 Domain contiene los 15 Value Objects, 14 Entities, 4 interfaces y 10 servicios.
 Application contiene 5 DTOs y los 6 casos de uso del reglamento. Domain y
 Application no dependen de Illuminate, SQL, HTTP ni servicios externos.

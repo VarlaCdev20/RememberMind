@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\SistemaExperto\Infrastructure\Repositories;
 
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;

@@ -22,7 +22,7 @@ use App\Models\ResultadoCriterio;
 use App\Models\ValorSemantico;
 use App\Models\VariableExperta;
 use App\Models\VersionModeloExperto;
-use App\SistemaExperto\Domain\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;

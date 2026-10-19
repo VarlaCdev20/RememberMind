@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Feature\SistemaExperto\Infrastructure\Repositories;
 
-use App\SistemaExperto\Infrastructure\Persistence\Mappers\MapeadorEvidencias;
-use App\SistemaExperto\Infrastructure\Persistence\Mappers\MapeadorRedSemantica;
-use App\SistemaExperto\Infrastructure\Persistence\Mappers\MapeadorReglas;
-use App\SistemaExperto\Infrastructure\Persistence\Mappers\MapeadorResultados;
-use App\SistemaExperto\Infrastructure\Persistence\Repositories\EvaluacionExpertaEloquentRepository;
-use App\SistemaExperto\Infrastructure\Persistence\Repositories\EvidenciaEloquentRepository;
-use App\SistemaExperto\Infrastructure\Persistence\Repositories\RedSemanticaEloquentRepository;
-use App\SistemaExperto\Infrastructure\Persistence\Repositories\ReglaExpertaEloquentRepository;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorEvidencias;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorRedSemantica;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorReglas;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorResultados;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\EvaluacionExpertaEloquentRepository;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\EvidenciaEloquentRepository;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\RedSemanticaEloquentRepository;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\ReglaExpertaEloquentRepository;
 use DateTimeZone;
 use DomainException;
 use Illuminate\Support\Facades\DB;

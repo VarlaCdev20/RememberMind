@@ -1,5 +1,7 @@
-<section class="rm-card rm-expert-clinical-block" aria-labelledby="revision-experta-titulo">
-    <h2 id="revision-experta-titulo" class="rm-expert-section-title">Valoración del sistema experto · Confirmación profesional</h2>
+@php($claveRevision = ($esRevisionObservacional ?? false) ? 'observacional' : 'cognitiva')
+<section class="rm-card rm-expert-clinical-block" aria-labelledby="revision-{{ $claveRevision }}-titulo">
+    <h2 id="revision-{{ $claveRevision }}-titulo" class="rm-expert-section-title">{{ ($esRevisionObservacional ?? false) ? 'Hallazgos observacionales · Confirmación profesional' : 'Valoración del sistema experto · Confirmación profesional' }}</h2>
+    @if($esRevisionObservacional ?? false)<p class="text-sm mt-2">Esta revisión confirma o rechaza los hallazgos descriptivos de la evaluación observacional conservada.</p>@endif
     <p class="text-sm mt-2">Psicología y Medicina revisan esta valoración por separado. Cada decisión conserva al profesional, la fecha y su justificación.</p>
     @if($mensajeRevision)<p class="text-sm mt-3" role="status">{{ $mensajeRevision }}</p>@endif
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -8,7 +10,7 @@
                 <h3 class="font-semibold">{{ $revision['nombre'] }}</h3>
                 <p class="text-sm mt-2">{{ ['PENDIENTE' => 'Pendiente de revisión profesional', 'CONFIRMADA' => 'Valoración confirmada', 'RECHAZADA' => 'Valoración rechazada'][$revision['estado']] }}</p>
                 @if($revision['puede_firmar'] && !$disciplinaRevision)
-                    <button type="button" wire:click="prepararRevision(@js($disciplina))" wire:loading.attr="disabled" class="rm-btn rm-btn-secondary mt-3">{{ $revision['cabeza'] ? 'Registrar rectificación' : 'Revisar valoración' }}</button>
+                    <button type="button" wire:click="{{ ($esRevisionObservacional ?? false) ? 'prepararRevisionObservacional' : 'prepararRevision' }}(@js($disciplina))" wire:loading.attr="disabled" class="rm-btn rm-btn-secondary mt-3">{{ $revision['cabeza'] ? 'Registrar rectificación' : 'Revisar valoración' }}</button>
                 @endif
                 @if($revision['historial'])
                     <details class="rm-expert-supplement mt-3"><summary>Consultar decisiones conservadas</summary>
@@ -21,7 +23,7 @@
             </div>
         @endforeach
     </div>
-    @if($disciplinaRevision)
+    @if($disciplinaRevision && $revisionObservacional === ($esRevisionObservacional ?? false))
         <form wire:submit="guardarRevision" class="space-y-3 mt-5">
             <p class="font-semibold">Revisión de {{ $revisiones[$disciplinaRevision]['nombre'] }}</p>
             <label for="decision-revision" class="block text-sm">Decisión</label>

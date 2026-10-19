@@ -9,6 +9,7 @@ class AplicacionInstrumento extends ModeloOperativo {
     public function adulto(): BelongsTo{return $this->belongsTo(Residente::class,'cod_residente','cod_residente');}
     public function evaluador(): BelongsTo{return $this->belongsTo(Personal::class,'cod_personal','cod_personal');}
     public function respuestas(): HasMany{return $this->hasMany(RespuestaInstrumento::class,'cod_aplicacion','cod_aplicacion');}
+    public function atencion(): BelongsTo{return $this->belongsTo(Atencion::class,'cod_atencion','cod_atencion');}
     public function getCodEvalGerAttribute(): string{return (string) $this->cod_aplicacion;}
     public function getFechaEvalAttribute(): mixed{return $this->fecha_hora;}
     public function getNivelAlertaAttribute(): ?string{return $this->clasificacion;}

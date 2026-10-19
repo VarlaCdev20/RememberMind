@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Application\DTOs;
 
-use App\SistemaExperto\Application\DTOs\SolicitudInferenciaDTO;
-use App\SistemaExperto\Domain\Entities\Hechos\MemoriaTrabajo;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\SolicitudInferenciaDTO;
+use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
 use DateTime;
 use DateTimeImmutable;
 use DomainException;

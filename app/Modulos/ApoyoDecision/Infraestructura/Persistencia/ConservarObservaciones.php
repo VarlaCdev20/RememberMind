@@ -7,7 +7,7 @@ namespace App\Modulos\ApoyoDecision\Infraestructura\Persistencia;
 use App\Compartido\Aplicacion\Contratos\CodigosEntidad;
 use App\Compartido\Infraestructura\Persistencia\CatalogoCodigos;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConservacionObservacional;
-use App\SistemaExperto\Infrastructure\Persistence\Conservacion\CodecInstantanea as Codec;
+use MotorExperto\soporte\conservacion\CodecInstantanea as Codec;
 use DateTimeImmutable;
 use Illuminate\Support\Facades\DB;
 use MotorExperto\dominio\conocimiento\reglas\EvaluadorObservaciones;

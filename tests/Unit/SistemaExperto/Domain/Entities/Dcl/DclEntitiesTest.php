@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Entities\Dcl;
 
-use App\SistemaExperto\Domain\Entities\Conocimiento\ReglaExperta;
-use App\SistemaExperto\Domain\Entities\Dcl\PerfilRequisitosDcl;
-use App\SistemaExperto\Domain\Entities\Dcl\ResultadoClasificacionDcl;
-use App\SistemaExperto\Domain\ValueObjects\Conocimiento\OperadorCondicionEnum;
-use App\SistemaExperto\Domain\ValueObjects\Dcl\EstadoCriterioDclEnum as C;
-use App\SistemaExperto\Domain\ValueObjects\Dcl\MotivoAbstencionEnum as M;
-use App\SistemaExperto\Domain\ValueObjects\Dcl\SubtipoDclEnum as P;
-use App\SistemaExperto\Domain\ValueObjects\Funcionalidad\EstadoDiferencialEnum as D;
+use MotorExperto\dominio\orion\Entities\Conocimiento\ReglaExperta;
+use MotorExperto\dominio\orion\Entities\Dcl\PerfilRequisitosDcl;
+use MotorExperto\dominio\orion\Entities\Dcl\ResultadoClasificacionDcl;
+use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
+use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum as C;
+use MotorExperto\dominio\orion\ValueObjects\Dcl\MotivoAbstencionEnum as M;
+use MotorExperto\dominio\orion\ValueObjects\Dcl\SubtipoDclEnum as P;
+use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum as D;
 use DomainException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;

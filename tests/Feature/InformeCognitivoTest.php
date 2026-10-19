@@ -312,7 +312,7 @@ class InformeCognitivoTest extends TestCase
     {
         $fallar = true;
         DB::connection()->beforeExecuting(static function (string $consulta, array $bindings, $conexion) use (&$fallar): void {
-            if ($fallar && str_contains($consulta, 'evaluaciones_expertas')) {
+            if ($fallar && str_contains($consulta, 'evaluaciones_expertas') && in_array('D137', $bindings, true)) {
                 $fallar = false;
                 throw new QueryException($conexion->getName(), $consulta, $bindings, new \RuntimeException('Detalle SQL privado de prueba'));
             }

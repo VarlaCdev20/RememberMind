@@ -1,5 +1,7 @@
 # Verificación de las fases — 17/10/2026
 
+> Rutas históricas: el 18/10/2026 las 43 clases Domain se trasladaron a `motor-experto/src/motor_experto/dominio/orion` y las 30 clases de Application/Infrastructure a `ApoyoDecision`. Esta evidencia anterior no acredita por sí sola el traslado; el nuevo corte está en `docs/sistema-experto/CORRECCIONES_POR_PUNTOS_2026_10_18.md`.
+
 La evidencia inicial de este documento se conserva como antecedente. La
 incorporación aprobada posterior se describe en el apartado de conservación V2.
 

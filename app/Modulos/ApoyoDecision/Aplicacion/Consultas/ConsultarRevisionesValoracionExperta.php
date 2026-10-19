@@ -14,15 +14,14 @@ use Illuminate\Support\Facades\Gate;
 /** Presenta las dos cadenas de dictámenes conservados, sin fabricar una aprobación conjunta. */
 final class ConsultarRevisionesValoracionExperta
 {
+    public function __construct(private readonly ValoracionRevisable $contratos) {}
+
     public function consultar(User $usuario, string $evaluacionId): ?array
     {
         $usuario = User::query()->findOrFail($usuario->getKey());
         $e = EvaluacionExperta::with('residente', 'version')->findOrFail($evaluacionId);
         Gate::forUser($usuario)->authorize('consultarResultados', [EvaluacionExperta::class, $e->residente]);
-        $c = config('sistema_experto.lectura_clinica', [])[$e->cod_version_modelo] ?? [];
-        if (($c['revision_profesional'] ?? false) !== true
-            || ! in_array($e->estado_ejecucion, $c['estados_ejecucion'] ?? [], true)
-            || preg_match('/SIM|SINTETIC|ARTIFICIAL|PRUEBA|TEST|EXPERIMENTAL|G09-EXP/i', $e->version->codigo_version.' '.$e->origen_activacion.' '.$e->estado_ejecucion)) {
+        if ($this->contratos->verificar($usuario, $e) === null) {
             return null;
         }
         $revisiones = RevisionEvaluacionExperta::with('personal')->where('cod_evaluacion_experta', $evaluacionId)

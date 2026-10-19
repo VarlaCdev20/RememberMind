@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Infrastructure\Repositories;
 
-use App\SistemaExperto\Domain\Repositories\Conocimiento\RedSemanticaRepositoryInterface;
-use App\SistemaExperto\Domain\Repositories\Conocimiento\ReglaExpertaRepositoryInterface;
-use App\SistemaExperto\Domain\Repositories\Evaluaciones\EvaluacionExpertaRepositoryInterface;
-use App\SistemaExperto\Domain\Repositories\Hechos\EvidenciaRepositoryInterface;
-use App\SistemaExperto\Infrastructure\Persistence\Repositories\EvaluacionExpertaEloquentRepository;
-use App\SistemaExperto\Infrastructure\Persistence\Repositories\EvidenciaEloquentRepository;
-use App\SistemaExperto\Infrastructure\Persistence\Repositories\RedSemanticaEloquentRepository;
-use App\SistemaExperto\Infrastructure\Persistence\Repositories\ReglaExpertaEloquentRepository;
+use MotorExperto\dominio\orion\Repositories\Conocimiento\RedSemanticaRepositoryInterface;
+use MotorExperto\dominio\orion\Repositories\Conocimiento\ReglaExpertaRepositoryInterface;
+use MotorExperto\dominio\orion\Repositories\Evaluaciones\EvaluacionExpertaRepositoryInterface;
+use MotorExperto\dominio\orion\Repositories\Hechos\EvidenciaRepositoryInterface;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\EvaluacionExpertaEloquentRepository;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\EvidenciaEloquentRepository;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\RedSemanticaEloquentRepository;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\ReglaExpertaEloquentRepository;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
@@ -42,7 +42,7 @@ final class ContratoRepositoriosEloquentTest extends TestCase
             self::assertTrue($reflexion->implementsInterface($puerto));
             self::assertTrue($reflexion->isFinal());
             self::assertTrue($reflexion->isReadOnly());
-            self::assertSame('App\\SistemaExperto\\Infrastructure\\Persistence\\Repositories', $reflexion->getNamespaceName());
+            self::assertSame('App\\Modulos\\ApoyoDecision\\Infraestructura\\Persistencia\\Repositorios', $reflexion->getNamespaceName());
             $archivo = $reflexion->getFileName();
             $archivos[] = basename($archivo);
             self::assertStringStartsWith("<?php\n\ndeclare(strict_types=1);", str_replace("\r\n", "\n", file_get_contents($archivo)));

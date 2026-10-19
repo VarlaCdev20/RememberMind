@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Tests\Feature\SistemaExperto\Infrastructure\Repositories;
 
 use App\Models\ControlCognitivo;
-use App\SistemaExperto\Infrastructure\Persistence\Mappers\MapeadorEvidencias;
-use App\SistemaExperto\Infrastructure\Persistence\Mappers\MapeadorReglas;
-use App\SistemaExperto\Infrastructure\Persistence\Repositories\EvidenciaEloquentRepository;
-use App\SistemaExperto\Infrastructure\Persistence\Repositories\ReglaExpertaEloquentRepository;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorEvidencias;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorReglas;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\EvidenciaEloquentRepository;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\ReglaExpertaEloquentRepository;
 use Closure;
 use DateTimeImmutable;
 use DateTimeZone;

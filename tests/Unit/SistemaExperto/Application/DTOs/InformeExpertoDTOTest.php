@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Application\DTOs;
 
-use App\SistemaExperto\Application\DTOs\InformeExpertoDTO;
-use App\SistemaExperto\Application\DTOs\ResultadoDclDTO;
-use App\SistemaExperto\Application\DTOs\ResultadoInferenciaDTO;
-use App\SistemaExperto\Application\DTOs\SolicitudInferenciaDTO;
-use App\SistemaExperto\Domain\Entities\Cognicion\VectorCognitivo;
-use App\SistemaExperto\Domain\Entities\Conocimiento\NodoSemantico;
-use App\SistemaExperto\Domain\Entities\Conocimiento\RelacionSemantica;
-use App\SistemaExperto\Domain\Entities\Dcl\ResultadoClasificacionDcl;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\DominioCognitivoEnum;
-use App\SistemaExperto\Domain\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
-use App\SistemaExperto\Domain\ValueObjects\Dcl\MotivoAbstencionEnum;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\InformeExpertoDTO;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\ResultadoDclDTO;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\ResultadoInferenciaDTO;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\SolicitudInferenciaDTO;
+use MotorExperto\dominio\orion\Entities\Cognicion\VectorCognitivo;
+use MotorExperto\dominio\orion\Entities\Conocimiento\NodoSemantico;
+use MotorExperto\dominio\orion\Entities\Conocimiento\RelacionSemantica;
+use MotorExperto\dominio\orion\Entities\Dcl\ResultadoClasificacionDcl;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
+use MotorExperto\dominio\orion\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
+use MotorExperto\dominio\orion\ValueObjects\Dcl\MotivoAbstencionEnum;
 use DomainException;
 use Error;
 use PHPUnit\Framework\Attributes\DataProvider;

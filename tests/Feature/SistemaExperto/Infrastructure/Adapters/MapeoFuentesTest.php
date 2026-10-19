@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature\SistemaExperto\Infrastructure\Adapters;
 
 use App\Models\EvidenciaEvaluacion;
-use App\SistemaExperto\Infrastructure\Adapters\FuentesOperativas\AdaptadorIadlExperimental;
-use App\SistemaExperto\Infrastructure\Adapters\MapeoFuentes\ExtractorVariableMapeada;
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\AdaptadorIadlExperimental;
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\MapeoFuentes\ExtractorVariableMapeada;
 use DateTimeZone;
 use DomainException;
 use Illuminate\Database\Eloquent\Collection;

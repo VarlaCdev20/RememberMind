@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\SistemaExperto\Infrastructure\Repositories;
 
-use App\SistemaExperto\Infrastructure\Persistence\Mappers\MapeadorRedSemantica;
-use App\SistemaExperto\Infrastructure\Persistence\Repositories\RedSemanticaEloquentRepository;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorRedSemantica;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\RedSemanticaEloquentRepository;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 use Tests\Unit\SistemaExperto\Infrastructure\Mappers\EscenarioMapeadores as F;

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\ValueObjects\Funcionalidad;
 
-use App\SistemaExperto\Domain\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
-use App\SistemaExperto\Domain\ValueObjects\Funcionalidad\EstadoIadlEnum;
-use App\SistemaExperto\Domain\ValueObjects\Funcionalidad\OportunidadIadlEnum;
+use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
+use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoIadlEnum;
+use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\OportunidadIadlEnum;
 use PHPUnit\Framework\TestCase;
 
 /**

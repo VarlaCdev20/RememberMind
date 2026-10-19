@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Infrastructure\Mappers;
 
-use App\SistemaExperto\Domain\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
-use App\SistemaExperto\Infrastructure\Persistence\Mappers\MapeadorRedSemantica;
+use MotorExperto\dominio\orion\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorRedSemantica;
 use DomainException;
 use Illuminate\Database\Eloquent\Collection;
 use PHPUnit\Framework\Attributes\DataProvider;

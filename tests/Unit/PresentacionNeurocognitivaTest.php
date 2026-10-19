@@ -6,10 +6,10 @@ namespace Tests\Unit;
 
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\PresentarInformeCognitivo;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\PresentarPatronExperimental;
-use App\SistemaExperto\Application\DTOs\InformeExpertoDTO;
-use App\SistemaExperto\Domain\Services\Dcl\ClasificadorPetersenService;
-use App\SistemaExperto\Domain\ValueObjects\Dcl\EstadoCriterioDclEnum as C;
-use App\SistemaExperto\Domain\ValueObjects\Funcionalidad\EstadoDiferencialEnum as D;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\InformeExpertoDTO;
+use MotorExperto\dominio\orion\Services\Dcl\ClasificadorPetersenService;
+use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum as C;
+use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum as D;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;

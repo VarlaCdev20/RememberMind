@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Services\Compuertas;
 
-use App\SistemaExperto\Domain\Entities\Hechos\EvidenciaCognitiva;
-use App\SistemaExperto\Domain\Entities\Hechos\HechoExperto;
-use App\SistemaExperto\Domain\Entities\Hechos\MemoriaTrabajo;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\DominioCognitivoEnum;
+use MotorExperto\dominio\orion\Entities\Hechos\EvidenciaCognitiva;
+use MotorExperto\dominio\orion\Entities\Hechos\HechoExperto;
+use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades;
 
 /**

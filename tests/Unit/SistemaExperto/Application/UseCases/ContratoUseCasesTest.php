@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Application\UseCases;
 
-use App\SistemaExperto\Application\DTOs\EvidenciasEntradaDTO;
-use App\SistemaExperto\Application\DTOs\InformeExpertoDTO;
-use App\SistemaExperto\Application\DTOs\ResultadoDclDTO;
-use App\SistemaExperto\Application\DTOs\ResultadoInferenciaDTO;
-use App\SistemaExperto\Application\UseCases\AnalizarCasoExperimentalUseCase;
-use App\SistemaExperto\Application\UseCases\ClasificarDclUseCase;
-use App\SistemaExperto\Application\UseCases\EjecutarInferenciaUseCase;
-use App\SistemaExperto\Application\UseCases\ExtraerHechosUseCase;
-use App\SistemaExperto\Application\UseCases\GenerarInformeUseCase;
-use App\SistemaExperto\Application\UseCases\PrepararMemoriaTrabajoUseCase;
-use App\SistemaExperto\Domain\Entities\Hechos\MemoriaTrabajo;
-use App\SistemaExperto\Domain\Repositories\Hechos\EvidenciaRepositoryInterface;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\EvidenciasEntradaDTO;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\InformeExpertoDTO;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\ResultadoDclDTO;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\ResultadoInferenciaDTO;
+use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\AnalizarCasoExperimentalUseCase;
+use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\ClasificarDclUseCase;
+use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\EjecutarInferenciaUseCase;
+use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\ExtraerHechosUseCase;
+use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\GenerarInformeUseCase;
+use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\PrepararMemoriaTrabajoUseCase;
+use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\orion\Repositories\Hechos\EvidenciaRepositoryInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -43,7 +43,7 @@ final class ContratoUseCasesTest extends TestCase
             $r = new ReflectionClass($clase);
             self::assertTrue($r->isFinal());
             self::assertTrue($r->isReadOnly());
-            self::assertSame('App\\SistemaExperto\\Application\\UseCases', $r->getNamespaceName());
+            self::assertSame('App\\Modulos\\ApoyoDecision\\Aplicacion\\CasosDeUso', $r->getNamespaceName());
             self::assertSame($retorno, $r->getMethod('ejecutar')->getReturnType()->getName());
             self::assertStringStartsWith("<?php\n\ndeclare(strict_types=1);", file_get_contents($r->getFileName()));
             $doc = $r->getDocComment();
@@ -73,7 +73,11 @@ final class ContratoUseCasesTest extends TestCase
             EjecutarInferenciaUseCase::class, ClasificarDclUseCase::class, AnalizarCasoExperimentalUseCase::class] as $clase) {
             foreach (token_get_all(file_get_contents((new ReflectionClass($clase))->getFileName())) as $token) {
                 if (is_array($token) && in_array($token[0], [T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED], true)) {
-                    self::assertMatchesRegularExpression('/^\\\\?App\\\\SistemaExperto\\\\(Application\\\\DTOs|Application\\\\UseCases|Domain)(?:\\\\|$)/', $token[1]);
+                    $nombre = ltrim($token[1], '\\');
+                    self::assertTrue(str_starts_with($nombre, 'MotorExperto\\dominio\\orion\\')
+                        || $nombre === 'App\\Modulos\\ApoyoDecision\\Aplicacion\\CasosDeUso'
+                        || str_starts_with($nombre, 'App\\Modulos\\ApoyoDecision\\Aplicacion\\CasosDeUso\\')
+                        || str_starts_with($nombre, 'App\\Modulos\\ApoyoDecision\\Aplicacion\\DTOs\\'), $nombre);
                 }
             }
         }

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Entities\Funcionalidad;
 
-use App\SistemaExperto\Domain\Entities\Funcionalidad\VectorFuncionalidad;
-use App\SistemaExperto\Domain\ValueObjects\Dcl\EstadoCriterioDclEnum as C;
-use App\SistemaExperto\Domain\ValueObjects\Funcionalidad\EstadoIadlEnum as I;
-use App\SistemaExperto\Domain\ValueObjects\Funcionalidad\OportunidadIadlEnum as O;
+use MotorExperto\dominio\orion\Entities\Funcionalidad\VectorFuncionalidad;
+use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum as C;
+use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoIadlEnum as I;
+use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\OportunidadIadlEnum as O;
 use DomainException;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 use PHPUnit\Framework\TestCase;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\SistemaExperto\Infrastructure\Adapters;
 
 use App\Models\ControlFuncionalIadl;
-use App\SistemaExperto\Infrastructure\Adapters\FuentesOperativas\AdaptadorIadlExperimental;
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\AdaptadorIadlExperimental;
 use DateTimeZone;
 use DomainException;
 use Illuminate\Database\QueryException;

@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Modulos\ApoyoDecision\Aplicacion\DTOs;
 
 use App\Modulos\Cuidados\Dominio\ObservacionCognitiva;
-use App\SistemaExperto\Application\DTOs\InformeExpertoDTO;
-use App\SistemaExperto\Domain\Entities\Dcl\ResultadoClasificacionDcl;
-use App\SistemaExperto\Domain\Entities\Hechos\EvidenciaCognitiva;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\EstadoDominioEnum as Estado;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\HallazgoInstrumentalEnum as Hallazgo;
-use App\SistemaExperto\Domain\ValueObjects\Dcl\EstadoCriterioDclEnum as Criterio;
-use App\SistemaExperto\Domain\ValueObjects\Dcl\MotivoAbstencionEnum;
-use App\SistemaExperto\Domain\ValueObjects\Funcionalidad\EstadoDiferencialEnum as Diferencial;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\InformeExpertoDTO;
+use MotorExperto\dominio\orion\Entities\Dcl\ResultadoClasificacionDcl;
+use MotorExperto\dominio\orion\Entities\Hechos\EvidenciaCognitiva;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum as Estado;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum as Hallazgo;
+use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum as Criterio;
+use MotorExperto\dominio\orion\ValueObjects\Dcl\MotivoAbstencionEnum;
+use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum as Diferencial;
 use DomainException;
 
 /** Presenta el patrón experimental conservado; mantiene su aviso de simulación y no emite diagnósticos. */

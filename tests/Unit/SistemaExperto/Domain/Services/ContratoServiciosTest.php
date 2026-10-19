@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Services;
 
-use App\SistemaExperto\Domain\Services\Compuertas\EvaluadorConfusoresService;
-use App\SistemaExperto\Domain\Services\Compuertas\EvaluadorEvaluabilidadService;
-use App\SistemaExperto\Domain\Services\Compuertas\VerificadorEvidenciaService;
-use App\SistemaExperto\Domain\Services\Dcl\ClasificadorPetersenService;
-use App\SistemaExperto\Domain\Services\Dcl\EvaluadorRequisitosDclService;
-use App\SistemaExperto\Domain\Services\Explicacion\GeneradorExplicacionService;
-use App\SistemaExperto\Domain\Services\Inferencia\EvaluadorReglasService;
-use App\SistemaExperto\Domain\Services\Inferencia\IntegradorDominiosService;
-use App\SistemaExperto\Domain\Services\Inferencia\MotorInferenciaService;
-use App\SistemaExperto\Domain\Services\Semantica\EvaluadorRedSemanticaService;
+use MotorExperto\dominio\orion\Services\Compuertas\EvaluadorConfusoresService;
+use MotorExperto\dominio\orion\Services\Compuertas\EvaluadorEvaluabilidadService;
+use MotorExperto\dominio\orion\Services\Compuertas\VerificadorEvidenciaService;
+use MotorExperto\dominio\orion\Services\Dcl\ClasificadorPetersenService;
+use MotorExperto\dominio\orion\Services\Dcl\EvaluadorRequisitosDclService;
+use MotorExperto\dominio\orion\Services\Explicacion\GeneradorExplicacionService;
+use MotorExperto\dominio\orion\Services\Inferencia\EvaluadorReglasService;
+use MotorExperto\dominio\orion\Services\Inferencia\IntegradorDominiosService;
+use MotorExperto\dominio\orion\Services\Inferencia\MotorInferenciaService;
+use MotorExperto\dominio\orion\Services\Semantica\EvaluadorRedSemanticaService;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 

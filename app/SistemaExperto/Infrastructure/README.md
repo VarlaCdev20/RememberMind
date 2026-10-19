@@ -1,5 +1,7 @@
 # Infrastructure de O.R.I.O.N.
 
+> Ubicación histórica de documentación. Las clases fueron trasladadas a `app/Modulos/ApoyoDecision/Infraestructura` el 18/10/2026 y no quedan clases ni alias aquí. El codec puro reside en `motor-experto/src/motor_experto/soporte/conservacion`. Las restricciones y contratos que se describen abajo conservan su alcance experimental; el traslado no activa uso clínico.
+
 Alcance: PoC experimental con datos sintéticos. Las lecturas se restringen a
 `testing` y a destinos admitidos por `BaseTecnicaDesechable`. No hay registro
 automático en providers, acceso asistencial ni inferencia clínica. La extensión

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Services\Compuertas;
 
-use App\SistemaExperto\Domain\Services\Compuertas\EvaluadorEvaluabilidadService;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\DominioCognitivoEnum as D;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\EvaluabilidadEnum as V;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\HallazgoInstrumentalEnum as H;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\SubcomponenteCognitivoEnum as S;
+use MotorExperto\dominio\orion\Services\Compuertas\EvaluadorEvaluabilidadService;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum as D;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\EvaluabilidadEnum as V;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum as H;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\SubcomponenteCognitivoEnum as S;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 use PHPUnit\Framework\TestCase;
@@ -288,7 +288,7 @@ final class EvaluadorEvaluabilidadServiceTest extends TestCase
     /**
      * Ejecuta los colaboradores reales del servicio sobre un escenario artificial.
      *
-     * @param array{memoria: \App\SistemaExperto\Domain\Entities\Hechos\MemoriaTrabajo, candidatas: array, contexto: array, procedencias: array} $escenario Entradas explícitas.
+     * @param array{memoria: \MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo, candidatas: array, contexto: array, procedencias: array} $escenario Entradas explícitas.
      * @param D $dominio Eje solicitado.
      * @return array Informe puro de evaluabilidad.
      * @throws \DomainException Si el escenario viola el contrato.

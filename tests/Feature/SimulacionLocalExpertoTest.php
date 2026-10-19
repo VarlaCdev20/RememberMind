@@ -14,18 +14,18 @@ use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\FuenteCasoSimulado;
 use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\LectorSimulacionLocal;
 use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\PaqueteSimulacionLocal;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
-use App\SistemaExperto\Application\DTOs\InformeExpertoDTO;
-use App\SistemaExperto\Application\DTOs\SolicitudInferenciaDTO;
-use App\SistemaExperto\Application\UseCases\ClasificarDclUseCase;
-use App\SistemaExperto\Application\UseCases\EjecutarInferenciaUseCase;
-use App\SistemaExperto\Domain\Entities\Dcl\PerfilRequisitosDcl;
-use App\SistemaExperto\Domain\Entities\Hechos\MemoriaTrabajo;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\DominioCognitivoEnum;
-use App\SistemaExperto\Infrastructure\Persistence\Conservacion\AlmacenInstantaneas;
-use App\SistemaExperto\Infrastructure\Persistence\Mappers\MapeadorRedSemantica;
-use App\SistemaExperto\Infrastructure\Persistence\Mappers\MapeadorReglas;
-use App\SistemaExperto\Infrastructure\Persistence\Repositories\RedSemanticaEloquentRepository;
-use App\SistemaExperto\Infrastructure\Persistence\Repositories\ReglaExpertaEloquentRepository;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\InformeExpertoDTO;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\SolicitudInferenciaDTO;
+use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\ClasificarDclUseCase;
+use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\EjecutarInferenciaUseCase;
+use MotorExperto\dominio\orion\Entities\Dcl\PerfilRequisitosDcl;
+use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\AlmacenInstantaneas;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorRedSemantica;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorReglas;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\RedSemanticaEloquentRepository;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\ReglaExpertaEloquentRepository;
 use DateTimeImmutable;
 use DateTimeZone;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -245,6 +245,27 @@ final class SimulacionLocalExpertoTest extends TestCase
         foreach ($l['perfil'] as $area) {
             self::assertNull($area['resultado']);
         }
+    }
+
+    public function test_traza_conservada_antes_de_ampliar_gobierno_se_recupera_sin_reescribirla(): void
+    {
+        [$d, $scope] = $this->cargar();
+        $criterio = DB::table('evaluacion_criterios')->where('motivo_evaluabilidad', 'like', 'SIM-TRACE-1%')->value('cod_evaluacion_criterio');
+        $traza = new \App\Modulos\ApoyoDecision\Infraestructura\Simulacion\TrazaSimulacionLocal($scope);
+        $payload = $traza->leer($criterio)['payload'];
+        foreach ($payload as &$fila) {
+            $fila[3][0] = (array) DB::table('reglas_expertas')->where('cod_regla_experta', $fila[0])->sole();
+        }
+        unset($fila);
+        DB::table('evaluacion_criterios')->where('cod_evaluacion_criterio', $criterio)->update(['motivo_evaluabilidad' => 'SIM-TRACE-1 sha256='.
+            \MotorExperto\soporte\conservacion\CodecInstantanea::huella($payload).'; forma posterior a la ampliación estructural.']);
+        $huellas = DB::table('evaluacion_criterios')->orderBy('cod_evaluacion_criterio')->pluck('motivo_evaluabilidad')->all();
+        $l = app(LectorSimulacionLocal::class)->consultar($d['nurse'], $d['residentes']['CAS-08'], null, 'COG-MEM');
+        self::assertTrue($l['simulacion_local']['conservacion_completa']);
+        self::assertSame($huellas, DB::table('evaluacion_criterios')->orderBy('cod_evaluacion_criterio')->pluck('motivo_evaluabilidad')->all());
+        DB::table('reglas_expertas')->where('codigo_regla', 'SIM-MEM-01')->update(['descripcion' => 'Cambio semántico no conservado.']);
+        $l = app(LectorSimulacionLocal::class)->consultar($d['nurse'], $d['residentes']['CAS-08'], null, 'COG-MEM');
+        self::assertFalse($l['simulacion_local']['conservacion_completa']);
     }
 
     public function test_cabecera_o_significado_de_regla_alterados_impiden_publicar_la_simulacion(): void

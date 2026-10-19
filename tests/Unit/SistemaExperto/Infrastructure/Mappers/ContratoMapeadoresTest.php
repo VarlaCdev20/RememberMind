@@ -6,10 +6,10 @@ namespace Tests\Unit\SistemaExperto\Infrastructure\Mappers;
 
 use App\Models;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\InventarioExperto;
-use App\SistemaExperto\Infrastructure\Persistence\Mappers\MapeadorEvidencias;
-use App\SistemaExperto\Infrastructure\Persistence\Mappers\MapeadorRedSemantica;
-use App\SistemaExperto\Infrastructure\Persistence\Mappers\MapeadorReglas;
-use App\SistemaExperto\Infrastructure\Persistence\Mappers\MapeadorResultados;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorEvidencias;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorRedSemantica;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorReglas;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorResultados;
 use DateTimeZone;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Model;
@@ -37,7 +37,7 @@ final class ContratoMapeadoresTest extends TestCase
             $r = new ReflectionClass($tipo);
             self::assertTrue($r->isFinal());
             self::assertTrue($r->isReadOnly());
-            self::assertSame('App\\SistemaExperto\\Infrastructure\\Persistence\\Mappers', $r->getNamespaceName());
+            self::assertSame('App\\Modulos\\ApoyoDecision\\Infraestructura\\Persistencia\\Mapeadores', $r->getNamespaceName());
             self::assertStringStartsWith("<?php\n\ndeclare(strict_types=1);", file_get_contents($r->getFileName()));
             $archivos[] = basename($r->getFileName());
             $doc = $r->getDocComment();

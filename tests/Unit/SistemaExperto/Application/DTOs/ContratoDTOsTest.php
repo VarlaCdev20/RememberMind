@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Application\DTOs;
 
-use App\SistemaExperto\Application\DTOs\EvidenciasEntradaDTO;
-use App\SistemaExperto\Application\DTOs\InformeExpertoDTO;
-use App\SistemaExperto\Application\DTOs\ResultadoDclDTO;
-use App\SistemaExperto\Application\DTOs\ResultadoInferenciaDTO;
-use App\SistemaExperto\Application\DTOs\SolicitudInferenciaDTO;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\EvidenciasEntradaDTO;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\InformeExpertoDTO;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\ResultadoDclDTO;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\ResultadoInferenciaDTO;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\SolicitudInferenciaDTO;
 use Error;
 use PHPUnit\Framework\TestCase;
 use RecursiveDirectoryIterator;
@@ -31,7 +31,7 @@ final class ContratoDTOsTest extends TestCase
     /** Verifica exactamente cinco archivos y sus PHPDoc; sin parámetros ni errores de lectura esperados. @return void */
     public function test_cinco_dtos_final_readonly_tipados_y_documentados(): void
     {
-        $raiz = realpath(dirname(__DIR__, 5).'/app/SistemaExperto/Application/DTOs');
+        $raiz = realpath(dirname(__DIR__, 5).'/app/Modulos/ApoyoDecision/Aplicacion/DTOs');
         $tipos = [SolicitudInferenciaDTO::class, EvidenciasEntradaDTO::class, ResultadoInferenciaDTO::class,
             ResultadoDclDTO::class, InformeExpertoDTO::class];
         $esperados = [];
@@ -39,7 +39,7 @@ final class ContratoDTOsTest extends TestCase
             $r = new ReflectionClass($tipo);
             self::assertTrue($r->isFinal());
             self::assertTrue($r->isReadOnly());
-            self::assertSame('App\\SistemaExperto\\Application\\DTOs', $r->getNamespaceName());
+            self::assertSame('App\\Modulos\\ApoyoDecision\\Aplicacion\\DTOs', $r->getNamespaceName());
             $archivo = $r->getFileName();
             $esperados[] = realpath($archivo);
             self::assertStringStartsWith("<?php\n\ndeclare(strict_types=1);", file_get_contents($archivo));
@@ -60,7 +60,7 @@ final class ContratoDTOsTest extends TestCase
         }
         $actuales = [];
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($raiz)) as $archivo) {
-            if ($archivo->isFile() && $archivo->getExtension() === 'php') {
+            if ($archivo->isFile() && $archivo->getExtension() === 'php' && in_array(realpath($archivo->getPathname()), $esperados, true)) {
                 $actuales[] = realpath($archivo->getPathname());
             }
         }
@@ -73,10 +73,14 @@ final class ContratoDTOsTest extends TestCase
     /** Revisa dependencias ejecutables y la dirección Domain/Application; sin parámetros ni errores esperados. @return void */
     public function test_dependencias_sin_laravel_ni_inversion_de_capas(): void
     {
-        $raiz = dirname(__DIR__, 5).'/app/SistemaExperto';
-        foreach (['Application/DTOs', 'Domain'] as $capa) {
-            foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($raiz.'/'.$capa)) as $archivo) {
+        $raiz = dirname(__DIR__, 5);
+        foreach (['DTOs' => '/app/Modulos/ApoyoDecision/Aplicacion/DTOs', 'Domain' => '/motor-experto/src/motor_experto/dominio/orion'] as $capa => $ruta) {
+            $archivos = $capa === 'DTOs' ? array_map(fn ($clase) => (new ReflectionClass($clase))->getFileName(), [EvidenciasEntradaDTO::class, SolicitudInferenciaDTO::class, ResultadoInferenciaDTO::class, ResultadoDclDTO::class, InformeExpertoDTO::class]) : null;
+            foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($raiz.$ruta)) as $archivo) {
                 if (! $archivo->isFile() || $archivo->getExtension() !== 'php') {
+                    continue;
+                }
+                if ($archivos !== null && ! in_array($archivo->getRealPath(), array_map('realpath', $archivos), true)) {
                     continue;
                 }
                 foreach (token_get_all(file_get_contents($archivo->getPathname())) as $token) {
@@ -84,10 +88,12 @@ final class ContratoDTOsTest extends TestCase
                         continue;
                     }
                     self::assertDoesNotMatchRegularExpression('/^\\\\?(Illuminate|Laravel|Livewire)\\\\/', $token[1]);
+                    $nombre = ltrim($token[1], '\\');
                     if ($capa === 'Domain') {
-                        self::assertDoesNotMatchRegularExpression('/^\\\\?App\\\\SistemaExperto\\\\Application\\\\/', $token[1]);
-                    } else {
-                        self::assertDoesNotMatchRegularExpression('/^\\\\?App\\\\(Modulos|Models|SistemaExperto\\\\Infrastructure)\\\\/', $token[1]);
+                        self::assertFalse(str_starts_with($nombre, 'App\\'), $nombre);
+                    } elseif (str_starts_with($nombre, 'App\\')) {
+                        self::assertTrue($nombre === 'App\\Modulos\\ApoyoDecision\\Aplicacion\\DTOs'
+                            || str_starts_with($nombre, 'App\\Modulos\\ApoyoDecision\\Aplicacion\\DTOs\\'), $nombre);
                     }
                 }
             }

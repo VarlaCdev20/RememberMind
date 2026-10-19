@@ -7,7 +7,7 @@ namespace App\Modulos\ApoyoDecision\Aplicacion\Acciones;
 use App\Models\EvaluacionExperta;
 use App\Models\RevisionEvaluacionExperta;
 use App\Models\User;
-use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaResultadosExperto;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ValoracionRevisable;
 use App\Modulos\ApoyoDecision\Dominio\Revision\CadenaRevisiones;
 use App\Modulos\ApoyoDecision\Dominio\Revision\DisciplinaRevision;
 use DomainException;
@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Gate;
 /** Registra un dictamen de una disciplina sobre la valoración exacta, sin confirmar automáticamente otra. */
 final readonly class RevisarValoracionExperta
 {
-    public function __construct(private LecturaResultadosExperto $lector) {}
+    public function __construct(private ValoracionRevisable $contratos) {}
 
     /**
      * @param  User  $usuario  Cuenta de la sesión; su personal se obtiene de nuevo dentro de la transacción.
@@ -42,21 +42,8 @@ final readonly class RevisarValoracionExperta
             Gate::forUser($cuenta)->authorize('revisarValoracion', [$evaluacion, $disciplina]);
             $personal = $cuenta->personal()->where('estado', 'ACTIVO')->where('profesion', $disciplina->value)->lockForUpdate()->sole();
             // La lectura verifica el soporte original; jamás acepta firmas de fixtures o de resultados corruptos.
-            $contrato = config('sistema_experto.lectura_clinica', [])[$evaluacion->cod_version_modelo] ?? [];
-            if (($contrato['revision_profesional'] ?? false) !== true || ! in_array($evaluacion->estado_ejecucion, $contrato['estados_ejecucion'] ?? [], true)
-                || preg_match('/SIM|SINTETIC|ARTIFICIAL|PRUEBA|TEST|EXPERIMENTAL|G09-EXP/i', $evaluacion->version->codigo_version.' '.$evaluacion->origen_activacion.' '.$evaluacion->estado_ejecucion)) {
+            if ($this->contratos->verificar($cuenta, $evaluacion) === null) {
                 throw new DomainException('Esta evaluación no tiene un contrato operativo aprobado para revisión profesional.');
-            }
-            $areas = $contrato['criterios'] ?? [];
-            if ($areas === []) {
-                throw new DomainException('La valoración no declara áreas revisables.');
-            }
-            foreach ($areas as $area) {
-                $l = $this->lector->consultar($cuenta, $evaluacion->residente, $evaluacionId, $area);
-                if ($l['prueba_tecnica'] || isset($l['simulacion_local']) || ! $l['detalle']['autorizado'] || $l['detalle']['integridad']
-                    || ! $l['detalle']['criterio_registrado']) {
-                    throw new DomainException('La valoración original no está íntegra o no tiene autorización de revisión.');
-                }
             }
             $base = RevisionEvaluacionExperta::query()->where('cod_evaluacion_experta', $evaluacionId)->where('disciplina', $disciplina->value);
             $filas = (clone $base)->lockForUpdate()->get();

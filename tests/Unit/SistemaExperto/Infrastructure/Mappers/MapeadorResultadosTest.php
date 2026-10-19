@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Infrastructure\Mappers;
 
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\DominioCognitivoEnum;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\EstadoDominioEnum;
-use App\SistemaExperto\Infrastructure\Persistence\Mappers\MapeadorResultados;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorResultados;
 use DateTimeZone;
 use DomainException;
 use Illuminate\Database\Eloquent\Collection;

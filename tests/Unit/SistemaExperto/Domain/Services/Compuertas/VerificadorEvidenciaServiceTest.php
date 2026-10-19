@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Services\Compuertas;
 
-use App\SistemaExperto\Domain\Services\Compuertas\VerificadorEvidenciaService;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\DominioCognitivoEnum as D;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\HallazgoInstrumentalEnum as H;
+use MotorExperto\dominio\orion\Services\Compuertas\VerificadorEvidenciaService;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum as D;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum as H;
 use DomainException;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 use PHPUnit\Framework\TestCase;

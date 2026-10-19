@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\ValueObjects;
 
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\DominioCognitivoEnum;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\EstadoDominioEnum;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\EvaluabilidadEnum;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
-use App\SistemaExperto\Domain\ValueObjects\Cognicion\SubcomponenteCognitivoEnum;
-use App\SistemaExperto\Domain\ValueObjects\Conocimiento\EstadoReglaEnum;
-use App\SistemaExperto\Domain\ValueObjects\Conocimiento\OperadorCondicionEnum;
-use App\SistemaExperto\Domain\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
-use App\SistemaExperto\Domain\ValueObjects\Dcl\CriterioDclEnum;
-use App\SistemaExperto\Domain\ValueObjects\Dcl\EstadoCriterioDclEnum;
-use App\SistemaExperto\Domain\ValueObjects\Dcl\MotivoAbstencionEnum;
-use App\SistemaExperto\Domain\ValueObjects\Dcl\SubtipoDclEnum;
-use App\SistemaExperto\Domain\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
-use App\SistemaExperto\Domain\ValueObjects\Funcionalidad\EstadoIadlEnum;
-use App\SistemaExperto\Domain\ValueObjects\Funcionalidad\OportunidadIadlEnum;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\EvaluabilidadEnum;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
+use MotorExperto\dominio\orion\ValueObjects\Cognicion\SubcomponenteCognitivoEnum;
+use MotorExperto\dominio\orion\ValueObjects\Conocimiento\EstadoReglaEnum;
+use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
+use MotorExperto\dominio\orion\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
+use MotorExperto\dominio\orion\ValueObjects\Dcl\CriterioDclEnum;
+use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum;
+use MotorExperto\dominio\orion\ValueObjects\Dcl\MotivoAbstencionEnum;
+use MotorExperto\dominio\orion\ValueObjects\Dcl\SubtipoDclEnum;
+use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
+use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoIadlEnum;
+use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\OportunidadIadlEnum;
 use BackedEnum;
 use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionEnum;
@@ -116,7 +116,7 @@ final class ContratoValueObjectsTest extends TestCase
      */
     public function test_estructura_y_documentacion_completas(): void
     {
-        $root = dirname(__DIR__, 5).'/app/SistemaExperto/Domain/ValueObjects';
+        $root = dirname(__DIR__, 5).'/motor-experto/src/motor_experto/dominio/orion/ValueObjects';
         $actual = [];
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root)) as $file) {
             if ($file->isFile() && $file->getExtension() === 'php') {
@@ -131,7 +131,7 @@ final class ContratoValueObjectsTest extends TestCase
             $expected[] = realpath($path);
             $relative = str_replace('\\', '/', substr($path, strlen(realpath($root)) + 1));
             self::assertSame(
-                'App\\SistemaExperto\\Domain\\ValueObjects\\'.str_replace('/', '\\', substr($relative, 0, -4)),
+                'MotorExperto\\dominio\\orion\\ValueObjects\\'.str_replace('/', '\\', substr($relative, 0, -4)),
                 $reflection->getName(),
             );
             self::assertStringStartsWith("<?php\n\ndeclare(strict_types=1);", file_get_contents($path));
@@ -168,7 +168,7 @@ final class ContratoValueObjectsTest extends TestCase
      */
     public function test_domain_no_depende_de_laravel(): void
     {
-        $root = dirname(__DIR__, 5).'/app/SistemaExperto/Domain';
+        $root = dirname(__DIR__, 5).'/motor-experto/src/motor_experto/dominio/orion';
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root)) as $file) {
             if (! $file->isFile() || $file->getExtension() !== 'php') {
                 continue;

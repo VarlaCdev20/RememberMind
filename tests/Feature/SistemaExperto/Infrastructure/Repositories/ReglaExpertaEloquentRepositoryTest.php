@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\SistemaExperto\Infrastructure\Repositories;
 
-use App\SistemaExperto\Domain\ValueObjects\Conocimiento\OperadorCondicionEnum;
-use App\SistemaExperto\Infrastructure\Persistence\Mappers\MapeadorReglas;
-use App\SistemaExperto\Infrastructure\Persistence\Repositories\ReglaExpertaEloquentRepository;
+use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorReglas;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\ReglaExpertaEloquentRepository;
 use DomainException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;

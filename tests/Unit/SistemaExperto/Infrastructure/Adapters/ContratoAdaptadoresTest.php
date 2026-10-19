@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Infrastructure\Adapters;
 
-use App\SistemaExperto\Infrastructure\Adapters\FuentesOperativas\AdaptadorControlesCognitivos;
-use App\SistemaExperto\Infrastructure\Adapters\FuentesOperativas\AdaptadorIadlExperimental;
-use App\SistemaExperto\Infrastructure\Adapters\FuentesOperativas\AdaptadorInstrumentos;
-use App\SistemaExperto\Infrastructure\Adapters\FuentesOperativas\AdaptadorSeguimientosPedagogicos;
-use App\SistemaExperto\Infrastructure\Adapters\FuentesOperativas\AdaptadorValoracionesFuncionales;
-use App\SistemaExperto\Infrastructure\Adapters\MapeoFuentes\ExtractorVariableMapeada;
-use App\SistemaExperto\Infrastructure\Adapters\MapeoFuentes\ResolutorFuenteExperta;
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\AdaptadorControlesCognitivos;
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\AdaptadorIadlExperimental;
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\AdaptadorInstrumentos;
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\AdaptadorSeguimientosPedagogicos;
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\AdaptadorValoracionesFuncionales;
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\MapeoFuentes\ExtractorVariableMapeada;
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\MapeoFuentes\ResolutorFuenteExperta;
 use DomainException;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -50,7 +50,7 @@ final class ContratoAdaptadoresTest extends TestCase
             $r = new ReflectionClass($clase);
             self::assertTrue($r->isFinal());
             self::assertTrue($r->isReadOnly());
-            self::assertStringStartsWith('App\\SistemaExperto\\Infrastructure\\Adapters\\', $r->getNamespaceName());
+            self::assertStringStartsWith('App\\Modulos\\ApoyoDecision\\Infraestructura\\Adaptadores\\', $r->getNamespaceName());
             self::assertStringStartsWith("<?php\n\ndeclare(strict_types=1);", str_replace("\r\n", "\n", file_get_contents($r->getFileName())));
             $doc = $r->getDocComment();
             self::assertNotFalse($doc);

@@ -80,4 +80,12 @@ Verificación general local terminada: `php vendor/phpunit/phpunit/phpunit --log
 
 ## Pruebas requeridas
 
+### Corte posterior: correcciones por puntos
+
+El [registro de correcciones](CORRECCIONES_POR_PUNTOS_2026_10_18.md) contiene el estado posterior verificable y la [ficha de protocolos solicitada](PROTOCOLOS_CAPTURA_COGNITIVA_V1_2026_10_18.md). Se implementaron adquisición instrumental autorizada con precisión y fecha originales, red documental institucional de cinco dominios y 19 componentes, perfil de mediciones sin interpretación inventada y revisión MED/PSI de instantáneas observacionales.
+
+Se consolidaron las 43 clases puras en `motor-experto/src/motor_experto/dominio/orion`; Application e Infrastructure quedaron en `ApoyoDecision`. No queda PHP ejecutable en `app/SistemaExperto`. Se preservaron las huellas históricas mediante identidad canónica del formato, sin alias, reescritura de datos ni activación clínica.
+
+No se marcan cerradas la interpretación clínica de los diecinueve componentes, Petersen institucional ni la conservación integral del perfil nuevo. Las fichas creadas permiten recoger o transcribir mediciones originales; no contienen aciertos, tiempos o firmas generados para residentes. Los resultados observacionales representables sí se conservan y admiten revisión posterior independiente por disciplina.
+
 Positivos y negativos de permisos/competencia/estado, archivo y sustitución conservando historia, revisión una vez e idempotencia, rollback y aislamiento de residentes, fuentes futuras/anuladas/NULL/contradictorias, preguntas/opciones ajenas, cuatro patrones y abstenciones DCL, replay exacto tras cambiar fuentes y conocimiento. SQLite para pruebas rápidas y PostgreSQL desechable para integración. Build y QA de los controles UI modificados.

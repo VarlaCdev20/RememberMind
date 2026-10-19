@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\ValueObjects\Conocimiento;
 
-use App\SistemaExperto\Domain\ValueObjects\Conocimiento\EstadoReglaEnum;
-use App\SistemaExperto\Domain\ValueObjects\Conocimiento\OperadorCondicionEnum;
-use App\SistemaExperto\Domain\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
+use MotorExperto\dominio\orion\ValueObjects\Conocimiento\EstadoReglaEnum;
+use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
+use MotorExperto\dominio\orion\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
 use PHPUnit\Framework\TestCase;
 
 /**
