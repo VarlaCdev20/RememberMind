@@ -77,9 +77,26 @@ final class ConstructorMemoriaInstrumental
                 }
                 $campo = $vinculo['campo'];
                 $original = $r[$campo] ?? null;
+                // La pareja opción/literal conserva el registro nominal; no representa dos mediciones.
+                $esNominalObservacional = $r !== null && $campo === 'valor_texto' && ($a['instrumento_actual']['tipo'] ?? null) === 'OBSERVACIONAL'
+                    && in_array($pregunta['tipo_respuesta'] ?? null, ['OPCION', 'OPCION_UNICA'], true);
                 $tipoCorrecto = $r === null || ($campo === 'valor_logico' ? in_array($r['tipo_respuesta'], ['LOGICO', 'BOOLEANO'], true)
-                    : in_array($r['tipo_respuesta'], ['TEXTO', 'TEXTO_CORTO', 'TEXTO_LARGO'], true));
+                    : (in_array($r['tipo_respuesta'], ['TEXTO', 'TEXTO_CORTO', 'TEXTO_LARGO'], true)
+                        || ($esNominalObservacional && $r['tipo_respuesta'] === $pregunta['tipo_respuesta'])));
                 $otros = array_diff(['cod_opcion', 'valor_numero', 'valor_logico', 'valor_texto'], [$campo]);
+                if ($esNominalObservacional) {
+                    $otros = array_diff($otros, ['cod_opcion']);
+                    $opcion = $r['opcion_actual'] ?? null;
+                    if ($r !== null && (! is_array($opcion) || ! is_string($r['cod_opcion'] ?? null)
+                        || ($opcion['cod_opcion'] ?? null) !== $r['cod_opcion']
+                        || ($r['cod_pregunta'] ?? null) !== $vinculo['cod_pregunta']
+                        || ($pregunta['cod_pregunta'] ?? null) !== $vinculo['cod_pregunta']
+                        || ($opcion['cod_pregunta'] ?? null) !== $vinculo['cod_pregunta']
+                        || ! is_string($opcion['valor'] ?? null)
+                        || ($original !== null && $original !== $opcion['valor']))) {
+                        throw new DomainException('La opción original y el literal observacional son incompatibles.');
+                    }
+                }
                 $ambiguo = $r !== null && count(array_filter($otros, static fn ($c) => ($r[$c] ?? null) !== null && $r[$c] !== '')) > 0;
                 if (! $tipoCorrecto || $ambiguo || ($r !== null && (! $r['coherente'] || $r['cod_aplicacion'] !== $a['cod_aplicacion']))) {
                     throw new DomainException('Respuesta incompatible con su pregunta, campo o aplicación.');
@@ -100,7 +117,8 @@ final class ConstructorMemoriaInstrumental
                         'cod_pregunta' => $vinculo['cod_pregunta'], 'campo_original' => $campo,
                         'procedencia' => $a['procedencia'], 'instrumento' => $a['instrumento_actual'],
                         'pregunta_original' => $pregunta, 'fuente_edad' => $a['fuente_edad'],
-                    ]);
+                    ] + ($esNominalObservacional ? ['naturaleza_fuente' => 'OBSERVACION_CLINICA',
+                        'opcion_original' => $r['opcion_actual'] ?? null] : []));
                 $e = (new MapeadorSemantico)->mapear($p, $contexto, $f, $mapeo);
                 $criterios = [];
                 foreach ($p->tabla('criterios_dominios_resultado') as $criterio) {
@@ -114,7 +132,7 @@ final class ConstructorMemoriaInstrumental
                 }
                 $m->incorporar($e);
                 foreach ($criterios as $criterio) {
-                    $m->vincular($criterio, $e->id, 'RESPUESTA_INSTRUMENTAL_ORIGINAL');
+                    $m->vincular($criterio, $e->id, $esNominalObservacional ? 'OBSERVACION_NOMINAL_ORIGINAL' : 'RESPUESTA_INSTRUMENTAL_ORIGINAL');
                 }
             }
         }

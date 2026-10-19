@@ -7,15 +7,18 @@ namespace Tests\Feature;
 use App\Models\AplicacionInstrumento;
 use App\Models\DocumentoClinico;
 use App\Models\Instrumento;
+use App\Models\OpcionPregunta;
 use App\Models\Personal;
 use App\Models\PreguntaInstrumento;
 use App\Models\Residente;
 use App\Models\RespuestaInstrumento;
 use App\Models\User;
+use App\Modulos\ApoyoDecision\Aplicacion\Acciones\GestionarReglasExpertas;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarConocimientoCognitivo;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarPerfilInstrumental;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\IdentidadesConocimiento;
+use App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratosConocimiento;
 use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoOrion;
 use Carbon\CarbonImmutable;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -24,6 +27,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use MotorExperto\adaptadores\entrada\ConstructorMemoriaInstrumental;
 use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
 use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
 use MotorExperto\investigacion\dcl\PaqueteCincoDominiosExperimental;
@@ -144,6 +148,248 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         self::assertCount(1, $r['traza']['sin_emision']);
     }
 
+    public function test_observaciones_nominales_recorran_fuente_regla_componente_dominio_y_traza_sin_normalizar(): void
+    {
+        $this->prepararObservacionesNominales();
+        $r = $this->consultar();
+        $dominio = $r['resultado']['perfil']['COG-ATE'];
+        self::assertCount(1, $dominio['conclusiones_candidatas']);
+        $conclusion = array_values($dominio['conclusiones_candidatas'])[0];
+        self::assertCount(1, $conclusion['reglas']);
+        self::assertCount(3, $conclusion['evidencias']);
+        self::assertCount(1, $conclusion['soportes_efectivos']);
+        self::assertSame('COG-ATE', $r['resultado']['red']['componentes']['ATE-S01']['dominio']);
+        self::assertCount(3, $r['resultado']['red']['rutas_reglas'][$conclusion['reglas'][0]]);
+        foreach ($dominio['traza']['rutas'] as $ruta) {
+            $original = $ruta['procedencia_instrumental'];
+            self::assertSame('OBSERVACION_CLINICA', $original['naturaleza_fuente']);
+            self::assertSame('valor_texto', $original['campo_original']);
+            self::assertSame('OBSERVACIONAL', $original['instrumento']['tipo']);
+            self::assertSame($original['cod_pregunta'], $original['opcion_original']['cod_pregunta']);
+            self::assertSame($ruta['valor_original'], $original['opcion_original']['valor']);
+            self::assertSame($this->aplicacion, $original['cod_aplicacion']);
+            self::assertSame($this->usuario->personal->getKey(), $original['cod_personal_original']);
+        }
+        self::assertNull($r['capturas']['capturas'][0]['extraccion']);
+        self::assertNull($r['resultado']['clasificacion_dcl']);
+        self::assertFalse($r['persistido']);
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
+    public function test_observacion_nominal_sin_texto_no_reconstruye_literal_desde_opcion(): void
+    {
+        $this->prepararObservacionesNominales();
+        DB::table('respuestas_instrumento')->where('cod_aplicacion', $this->aplicacion)
+            ->where('cod_pregunta', $this->primeraPregunta)->update(['valor_texto' => null]);
+        $r = $this->consultar()['resultado']['perfil']['COG-ATE'];
+        self::assertSame([], $r['conclusiones_candidatas']);
+        $e = array_values(array_filter($r['traza']['evidencias'], fn ($e) => $e['procedencia_instrumental']['cod_pregunta'] === $this->primeraPregunta))[0];
+        self::assertSame('NO_DISPONIBLE', $e['representacion']);
+        self::assertNull($e['valor_original']);
+        self::assertNotNull($e['procedencia_instrumental']['opcion_original']);
+    }
+
+    public function test_ausencia_de_respuesta_nominal_conserva_el_formato_historico_de_traza(): void
+    {
+        $instrumento = DB::table('aplicaciones_instrumento')->where('cod_aplicacion', $this->aplicacion)->value('cod_instrumento');
+        DB::table('instrumentos')->where('cod_instrumento', $instrumento)->update(['tipo' => 'OBSERVACIONAL']);
+        DB::table('preguntas_instrumento')->where('cod_pregunta', $this->primeraPregunta)->update(['tipo_respuesta' => 'OPCION']);
+        DB::table('respuestas_instrumento')->where('cod_aplicacion', $this->aplicacion)->where('cod_pregunta', $this->primeraPregunta)->delete();
+        $mapa = DB::table('mapeos_variables_fuente')->where('cod_version_modelo', $this->version)->where('clave_selector', $this->primeraPregunta)
+            ->value('cod_mapeo_variable_fuente');
+        config(['sistema_experto.contratos_conocimiento.'.$this->version.'.vinculos_instrumentales.'.$mapa.'.campo' => 'valor_texto']);
+        $r = $this->consultar()['resultado']['perfil']['COG-ATE'];
+        self::assertSame([], $r['conclusiones_candidatas']);
+        $e = array_values(array_filter($r['traza']['evidencias'], fn ($e) => $e['procedencia_instrumental']['cod_pregunta'] === $this->primeraPregunta))[0];
+        self::assertSame('NO_DISPONIBLE', $e['representacion']);
+        self::assertArrayNotHasKey('naturaleza_fuente', $e['procedencia_instrumental']);
+        self::assertArrayNotHasKey('opcion_original', $e['procedencia_instrumental']);
+        self::assertNull($e['procedencia_instrumental']['cod_respuesta']);
+    }
+
+    public function test_observacion_nominal_desconocida_conserva_literal_sin_inferir_por_etiqueta_o_puntaje(): void
+    {
+        $this->prepararObservacionesNominales();
+        $opcion = DB::table('respuestas_instrumento')->where('cod_aplicacion', $this->aplicacion)
+            ->where('cod_pregunta', $this->primeraPregunta)->value('cod_opcion');
+        DB::table('opciones_pregunta')->where('cod_opcion', $opcion)->update(['valor' => 'otro_literal', 'puntaje' => 0]);
+        DB::table('respuestas_instrumento')->where('cod_aplicacion', $this->aplicacion)
+            ->where('cod_pregunta', $this->primeraPregunta)->update(['valor_texto' => 'otro_literal']);
+        $r = $this->consultar()['resultado']['perfil']['COG-ATE'];
+        self::assertSame([], $r['conclusiones_candidatas']);
+        $e = array_values(array_filter($r['traza']['evidencias'], fn ($e) => $e['procedencia_instrumental']['cod_pregunta'] === $this->primeraPregunta))[0];
+        self::assertSame('VALOR_NO_RECONOCIDO', $e['representacion']);
+        self::assertSame('otro_literal', $e['valor_original']);
+    }
+
+    public function test_opcion_y_texto_discordantes_no_se_eligen_arbitrariamente(): void
+    {
+        $this->prepararObservacionesNominales();
+        DB::table('respuestas_instrumento')->where('cod_aplicacion', $this->aplicacion)
+            ->where('cod_pregunta', $this->primeraPregunta)->update(['valor_texto' => ' Literal sintético 1 ']);
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('La opción original y el literal observacional son incompatibles.');
+        $this->consultar();
+    }
+
+    public function test_pregunta_opcion_no_observacional_no_adopta_el_contrato_nominal(): void
+    {
+        $this->prepararObservacionesNominales();
+        $instrumento = DB::table('aplicaciones_instrumento')->where('cod_aplicacion', $this->aplicacion)->value('cod_instrumento');
+        DB::table('instrumentos')->where('cod_instrumento', $instrumento)->update(['tipo' => 'COGNITIVO']);
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('Respuesta incompatible');
+        $this->consultar();
+    }
+
+    public function test_observacion_nominal_con_numero_simultaneo_se_rechaza(): void
+    {
+        $this->prepararObservacionesNominales();
+        DB::table('respuestas_instrumento')->where('cod_aplicacion', $this->aplicacion)
+            ->where('cod_pregunta', $this->primeraPregunta)->update(['valor_numero' => 0]);
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('Respuesta incompatible');
+        $this->consultar();
+    }
+
+    public function test_observacion_nominal_sin_opcion_no_infiere_por_texto(): void
+    {
+        $this->prepararObservacionesNominales();
+        DB::table('respuestas_instrumento')->where('cod_aplicacion', $this->aplicacion)
+            ->where('cod_pregunta', $this->primeraPregunta)->update(['cod_opcion' => null]);
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('La opción original y el literal observacional son incompatibles.');
+        $this->consultar();
+    }
+
+    public function test_opcion_cruzada_excluye_fuente_y_no_genera_resultado(): void
+    {
+        $this->prepararObservacionesNominales();
+        $opcionAjena = DB::table('respuestas_instrumento')->where('cod_aplicacion', $this->aplicacion)
+            ->where('cod_pregunta', '!=', $this->primeraPregunta)->value('cod_opcion');
+        DB::table('respuestas_instrumento')->where('cod_aplicacion', $this->aplicacion)
+            ->where('cod_pregunta', $this->primeraPregunta)->update(['cod_opcion' => $opcionAjena]);
+        $r = $this->consultar();
+        self::assertSame([], $r['resultado']['perfil']['COG-ATE']['conclusiones_candidatas']);
+        self::assertContains('RESPUESTA_CON_REFERENCIAS_INCOMPATIBLES', $r['fuentes_excluidas'][0]['motivos']);
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
+    public function test_motor_verifica_las_pk_nominales_aunque_el_adaptador_marque_coherente(): void
+    {
+        $this->prepararObservacionesNominales();
+        $r = $this->consultar();
+        $contrato = config('sistema_experto.contratos_conocimiento.'.$this->version);
+        $tablas = app(ConocimientoVersionado::class)->instantanea($this->version);
+        $p = new PaqueteConocimiento($this->version, $tablas, $contrato['relaciones'], false, $contrato['tipo_regla_resultado'], $contrato['extracciones']);
+        $c = new ContextoEjecucion($r['resultado']['evaluacion'], $this->residente->getKey(), $this->version, CarbonImmutable::now()->toDateTimeImmutable());
+        foreach ([['opcion_actual', 'cod_opcion'], ['opcion_actual', 'cod_pregunta'], ['pregunta_actual', 'cod_pregunta']] as [$fila, $campo]) {
+            $capturas = $r['capturas'];
+            $capturas['capturas'][0]['respuestas_originales'][0][$fila][$campo] = 'IDENTIDAD-AJENA';
+            self::assertTrue($capturas['capturas'][0]['respuestas_originales'][0]['coherente']);
+            try {
+                (new ConstructorMemoriaInstrumental)->construir($p, $c, $capturas, $contrato['vinculos_instrumentales']);
+                self::fail('El motor confió en la etiqueta coherente sin cotejar las PK.');
+            } catch (DomainException $e) {
+                self::assertSame('La opción original y el literal observacional son incompatibles.', $e->getMessage());
+            }
+        }
+    }
+
+    public function test_observacion_nominal_tampoco_acredita_medicion_instrumental_de_memoria(): void
+    {
+        $this->prepararMemoriaTextual();
+        $this->prepararObservacionesNominales();
+        $r = $this->consultar();
+        $memoria = $r['resultado']['perfil']['COG-MEM'];
+        self::assertSame([], $memoria['conclusiones_candidatas']);
+        self::assertSame('NO_ADMISIBLE', $memoria['traza']['evidencias'][0]['admisibilidad']);
+        self::assertContains('OBSERVACION_NO_ACREDITA_COMPONENTE_INSTRUMENTAL', $memoria['traza']['evidencias'][0]['motivos']);
+        self::assertSame('OBSERVACION_CLINICA', $memoria['traza']['evidencias'][0]['procedencia_instrumental']['naturaleza_fuente']);
+        self::assertNull($r['resultado']['clasificacion_dcl']);
+    }
+
+    public function test_opcion_unica_de_catalogo_retirado_conserva_la_observacion_historica(): void
+    {
+        $this->prepararObservacionesNominales();
+        $instrumento = DB::table('aplicaciones_instrumento')->where('cod_aplicacion', $this->aplicacion)->value('cod_instrumento');
+        DB::table('instrumentos')->where('cod_instrumento', $instrumento)->update(['estado' => 'INACTIVO']);
+        DB::table('preguntas_instrumento')->where('cod_instrumento', $instrumento)->update(['tipo_respuesta' => 'OPCION_UNICA', 'estado' => 'INACTIVA']);
+        DB::table('opciones_pregunta')->update(['estado' => 'INACTIVA']);
+        self::assertCount(1, $this->consultar()['resultado']['perfil']['COG-ATE']['conclusiones_candidatas']);
+    }
+
+    public function test_sucesoras_heredan_vinculos_traducidos_y_archivar_conserva_la_reproduccion_original(): void
+    {
+        $this->prepararObservacionesNominales();
+        $antes = $this->consultar();
+        $dto = $this->instantanea($antes);
+        $original = app(ConocimientoVersionado::class)->instantanea($this->version);
+        $vinculosOriginales = config('sistema_experto.contratos_conocimiento.'.$this->version.'.vinculos_instrumentales');
+        $sucesora = app(GestionarReglasExpertas::class)->crearRevision($this->usuario, $this->version,
+            'ORION-NOMINAL-1', 'Revisar el conocimiento conservando las fuentes nominales originales.');
+        config(['sistema_experto.version_cognitiva' => $sucesora]);
+        $r = $this->consultar();
+        self::assertCount(1, $r['resultado']['perfil']['COG-ATE']['conclusiones_candidatas']);
+        $heredados = app(ContratosConocimiento::class)->porVersion($sucesora)['vinculos_instrumentales'];
+        self::assertCount(3, $heredados);
+        self::assertSame([], array_intersect(array_keys($heredados), array_keys($vinculosOriginales)));
+        self::assertSame(array_values($vinculosOriginales), array_values($heredados));
+        self::assertSame($original, app(ConocimientoVersionado::class)->instantanea($this->version));
+        $regla = array_values($r['resultado']['perfil']['COG-ATE']['conclusiones_candidatas'])[0]['reglas'][0];
+        $archivo = app(GestionarReglasExpertas::class)->crearRevision($this->usuario, $sucesora,
+            'ORION-NOMINAL-2', 'Archivar la regla sin modificar sus evidencias ni resultados previos.', retiradas: [$regla]);
+        config(['sistema_experto.version_cognitiva' => $archivo]);
+        self::assertSame([], $this->consultar()['resultado']['perfil']['COG-ATE']['conclusiones_candidatas']);
+        self::assertSame($dto->contenido, InstantaneaInstrumental::verificar($dto->contenido, $dto->huella)->contenido);
+        self::assertSame($vinculosOriginales, config('sistema_experto.contratos_conocimiento.'.$this->version.'.vinculos_instrumentales'));
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
+    public function test_sucesora_no_hereda_un_vinculo_cuya_identidad_semantica_cambio(): void
+    {
+        $sucesora = app(GestionarReglasExpertas::class)->crearRevision($this->usuario, $this->version,
+            'ORION-VINCULO-INVALIDO', 'Negativo de extracción alterada entre revisiones de conocimiento.');
+        DB::table('mapeos_variables_fuente')->where('cod_version_modelo', $sucesora)
+            ->where('clave_selector', $this->primeraPregunta)->update(['clave_selector' => 'OTRA-PREGUNTA']);
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('El vínculo heredado no tiene un mapeo semántico único en la sucesora.');
+        app(ContratosConocimiento::class)->porVersion($sucesora);
+    }
+
+    public function test_sucesora_con_dos_mapeos_equivalentes_no_elige_uno_por_su_estado(): void
+    {
+        $sucesora = app(GestionarReglasExpertas::class)->crearRevision($this->usuario, $this->version,
+            'ORION-VINCULO-AMBIGUO', 'Negativo de identidad semántica duplicada en una sucesora.');
+        $duplicado = (array) DB::table('mapeos_variables_fuente')->where('cod_version_modelo', $sucesora)
+            ->where('clave_selector', $this->primeraPregunta)->sole();
+        $duplicado['cod_mapeo_variable_fuente'] = 'MAPEO-AMBIGUO';
+        $duplicado['estado'] = 'INACTIVO';
+        DB::table('mapeos_variables_fuente')->insert($duplicado);
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('El vínculo heredado no tiene un mapeo semántico único en la sucesora.');
+        app(ContratosConocimiento::class)->porVersion($sucesora);
+    }
+
+    private function prepararObservacionesNominales(): void
+    {
+        $instrumento = DB::table('aplicaciones_instrumento')->where('cod_aplicacion', $this->aplicacion)->value('cod_instrumento');
+        DB::table('instrumentos')->where('cod_instrumento', $instrumento)->update(['tipo' => 'OBSERVACIONAL']);
+        foreach (DB::table('preguntas_instrumento')->where('cod_instrumento', $instrumento)->get() as $q) {
+            $literal = 'literal_observado_'.$q->codigo;
+            DB::table('preguntas_instrumento')->where('cod_pregunta', $q->cod_pregunta)->update(['tipo_respuesta' => 'OPCION']);
+            $opcion = OpcionPregunta::create(['cod_pregunta' => $q->cod_pregunta, 'nombre' => 'Etiqueta sin interpretación',
+                'valor' => $literal, 'puntaje' => null, 'orden' => 1, 'estado' => 'ACTIVA']);
+            DB::table('respuestas_instrumento')->where('cod_aplicacion', $this->aplicacion)->where('cod_pregunta', $q->cod_pregunta)
+                ->update(['valor_logico' => null, 'valor_texto' => $literal, 'cod_opcion' => $opcion->getKey()]);
+            $mapa = DB::table('mapeos_variables_fuente')->where('cod_version_modelo', $this->version)->where('clave_selector', $q->cod_pregunta)
+                ->value('cod_mapeo_variable_fuente');
+            DB::table('mapeos_valores_fuente')->where('cod_mapeo_variable_fuente', $mapa)
+                ->update(['tipo_valor_fuente' => 'string', 'valor_fuente_exacto' => $literal]);
+            config(['sistema_experto.contratos_conocimiento.'.$this->version.'.vinculos_instrumentales.'.$mapa.'.campo' => 'valor_texto']);
+        }
+    }
+
     public function test_perfil_e_inferencia_usan_una_sola_captura_aunque_el_original_se_rectifique_despues(): void
     {
         $original = app(FuenteConocimientoOrion::class);
@@ -221,12 +467,7 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
     public function test_instantanea_reproduce_sin_sql_configuracion_o_reglas_actuales(): void
     {
         $r = $this->consultar();
-        $contrato = config('sistema_experto.contratos_conocimiento.'.$this->version);
-        $tablas = app(ConocimientoVersionado::class)->instantanea($this->version);
-        $p = new PaqueteConocimiento($this->version, $tablas, $contrato['relaciones'], false, $contrato['tipo_regla_resultado'], $contrato['extracciones']);
-        $c = new ContextoEjecucion($r['resultado']['evaluacion'], $this->residente->getKey(), $this->version, CarbonImmutable::now()->toDateTimeImmutable());
-        $cabecera = (array) DB::table('versiones_modelo_experto')->where('cod_version_modelo', $this->version)->sole();
-        $dto = InstantaneaInstrumental::crear($p, $c, $r['capturas'], $contrato['vinculos_instrumentales'], $this->usuario->getKey(), $cabecera);
+        $dto = $this->instantanea($r);
         self::assertSame($dto->huella, $r['preparacion_conservacion']['huella']);
         self::assertFalse($r['preparacion_conservacion']['persistido']);
         DB::table('respuestas_instrumento')->where('cod_aplicacion', $this->aplicacion)->update(['valor_logico' => null]);
@@ -246,6 +487,17 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         $corrupta['capturas']['capturas'][0]['respuestas_originales'][0]['valor_logico'] = null;
         $this->expectException(DomainException::class);
         InstantaneaInstrumental::verificar($corrupta, $dto->huella);
+    }
+
+    private function instantanea(array $r): InstantaneaInstrumental
+    {
+        $contrato = config('sistema_experto.contratos_conocimiento.'.$this->version);
+        $tablas = app(ConocimientoVersionado::class)->instantanea($this->version);
+        $p = new PaqueteConocimiento($this->version, $tablas, $contrato['relaciones'], false, $contrato['tipo_regla_resultado'], $contrato['extracciones']);
+        $c = new ContextoEjecucion($r['resultado']['evaluacion'], $this->residente->getKey(), $this->version, CarbonImmutable::now()->toDateTimeImmutable());
+        $cabecera = (array) DB::table('versiones_modelo_experto')->where('cod_version_modelo', $this->version)->sole();
+
+        return InstantaneaInstrumental::crear($p, $c, $r['capturas'], $contrato['vinculos_instrumentales'], $this->usuario->getKey(), $cabecera);
     }
 
     public function test_memoria_usa_literal_textual_original_y_su_admisibilidad_especifica(): void

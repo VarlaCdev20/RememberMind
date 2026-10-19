@@ -8,6 +8,8 @@ verification_scope: SOFTWARE_INTEGRATION
 
 # Fase 4: integración técnica de red y reglas
 
+**Incremento posterior del mismo día:** [compatibilidad nominal, sucesión y replay](FASE_4_PUENTE_NOMINAL_Y_SUCESION_2026_10_19.md). La aclaración y conciliación de fase 2 identifican observaciones clínicas por componente. El puente ya conserva sus parejas opción/texto concordantes y traduce las PK de vínculos al heredar contratos; esto no activa un paquete institucional ni interpreta esas observaciones como mediciones instrumentales.
+
 Esta entrega integra el conocimiento existente. No define nuevos umbrales, pesos ni equivalencias entre puntuaciones instrumentales, hallazgos descriptivos y estados Petersen. La carga y el cotejo de documentos originales de la fase 2 permanecen separados de esta verificación de software.
 
 ## Checklist

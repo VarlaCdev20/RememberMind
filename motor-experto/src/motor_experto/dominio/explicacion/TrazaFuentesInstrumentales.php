@@ -48,7 +48,10 @@ final class TrazaFuentesInstrumentales
                 ['cod_pregunta', 'cod_instrumento', 'codigo', 'enunciado', 'dominio', 'tipo_respuesta', 'puntaje_maximo', 'orden', 'estado']),
             'registro_original' => $this->columnas($c['procedencia'] ?? null,
                 ['cod_personal_aplicador', 'cod_usuario_registro', 'registrado_en', 'cod_documento_clinico', 'localizador_fuente', 'cod_aplicacion_anterior', 'estado_documento']),
-            'fuente_edad' => $this->columnas($c['fuente_edad'] ?? null, ['tabla', 'campo', 'registro', 'fecha_nacimiento', 'fecha_aplicacion'])];
+            'fuente_edad' => $this->columnas($c['fuente_edad'] ?? null, ['tabla', 'campo', 'registro', 'fecha_nacimiento', 'fecha_aplicacion'])]
+            + (($c['naturaleza_fuente'] ?? null) === 'OBSERVACION_CLINICA' ? ['naturaleza_fuente' => 'OBSERVACION_CLINICA',
+                'opcion_original' => $this->columnas($c['opcion_original'] ?? null,
+                    ['cod_opcion', 'cod_pregunta', 'nombre', 'valor', 'puntaje', 'orden', 'estado'])] : []);
     }
 
     private function columnas(?array $original, array $columnas): ?array
