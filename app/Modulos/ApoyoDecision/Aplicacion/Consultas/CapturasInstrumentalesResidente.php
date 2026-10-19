@@ -19,7 +19,7 @@ use MotorExperto\dominio\instrumentos\ExtractorCapturaInstrumental;
 /** Lectura institucional por lotes; captura originales sin escribir resultados ni identificar pruebas por similitud. */
 final class CapturasInstrumentalesResidente
 {
-    public function consultar(User $usuario, Residente $residente, CarbonImmutable $corte): array
+    public function consultar(User $usuario, Residente $residente, CarbonImmutable $corte, array $preguntasDeclarativas = []): array
     {
         $usuario = User::query()->findOrFail($usuario->getKey());
         $residente = Residente::query()->findOrFail($residente->getKey());
@@ -28,6 +28,9 @@ final class CapturasInstrumentalesResidente
             if (! $usuario->checkPermissionTo($permiso, 'web')) {
                 return ['disponible' => false, 'motivo' => 'ACCESO_A_FUENTES_NO_DISPONIBLE', 'capturas' => []];
             }
+        }
+        if (! array_is_list($preguntasDeclarativas) || array_filter($preguntasDeclarativas, static fn ($p) => ! is_string($p) || $p === '')) {
+            throw new DomainException('Las preguntas declarativas requieren identidades explícitas.');
         }
         $aplicaciones = FuentesValoracionOperativa::limitar(AplicacionInstrumento::query())->where('cod_residente', $residente->getKey())
             ->where('fecha_hora', '<=', $corte)->with(['instrumento', 'evaluador', 'atencion', 'respuestas', 'documentoOriginal'])->orderBy('fecha_hora')->orderBy('cod_aplicacion')->get();
@@ -42,7 +45,7 @@ final class CapturasInstrumentalesResidente
             }
         }
         $preguntas = PreguntaInstrumento::query()->whereIn('cod_pregunta', $respuestas->pluck('cod_pregunta')
-            ->merge($preguntasSeleccionadas)->unique())->get()->keyBy('cod_pregunta');
+            ->merge($preguntasSeleccionadas)->merge($preguntasDeclarativas)->unique())->get()->keyBy('cod_pregunta');
         $opciones = OpcionPregunta::query()->whereIn('cod_opcion', $respuestas->pluck('cod_opcion')->filter()->unique())->get()->keyBy('cod_opcion');
         $capturas = [];
         $documentosVerificados = [];
@@ -58,8 +61,13 @@ final class CapturasInstrumentalesResidente
                 $motivos[] = 'PROCEDENCIA_INCOMPATIBLE';
             }
             $estadoDocumento = 'SIN_VINCULO_DOCUMENTAL';
+            $documentoOriginal = null;
             if ($a->cod_documento_clinico !== null) {
                 $doc = $a->documentoOriginal;
+                if ($doc && $doc->cod_residente === $residente->getKey()) {
+                    $documentoOriginal = $doc->only(['cod_documento_clinico', 'cod_residente', 'cod_personal', 'hash_archivo', 'estado']);
+                    $documentoOriginal['fecha_hora'] = $doc->fecha_hora?->format('Y-m-d\TH:i:s.uP');
+                }
                 if (! array_key_exists($a->cod_documento_clinico, $documentosVerificados)) {
                     $archivos = app(ArchivosAplicacion::class);
                     $hash = $doc && $archivos->existe('local', $doc->ruta_archivo) ? $archivos->hash('local', $doc->ruta_archivo) : false;
@@ -107,11 +115,14 @@ final class CapturasInstrumentalesResidente
                 'cod_personal' => $a->cod_personal, 'autor' => trim(implode(' ', [$autor?->nombres, $autor?->apellido_paterno, $autor?->apellido_materno])),
                 'fecha_hora' => $a->fecha_hora->format('Y-m-d\TH:i:s.uP'), 'estado_original' => $a->estado,
                 'aplicacion_actual' => $a->getRawOriginal(), 'instrumento_actual' => $instrumento?->getRawOriginal(),
+                'documento_original' => $documentoOriginal,
                 'procedencia' => ['cod_personal_aplicador' => $a->cod_personal, 'cod_usuario_registro' => $a->cod_usuario_registro,
                     'registrado_en' => $a->registrado_en?->format('Y-m-d\TH:i:s.uP'), 'cod_documento_clinico' => $a->cod_documento_clinico,
                     'localizador_fuente' => $a->localizador_fuente, 'cod_aplicacion_anterior' => $a->cod_aplicacion_anterior,
                     'estado_documento' => $estadoDocumento],
                 'respuestas_originales' => $brutos, 'vinculos_preguntas_actuales' => $vinculos,
+                'preguntas_declarativas_originales' => array_combine($preguntasDeclarativas,
+                    array_map(static fn ($id) => $preguntas->get($id)?->getRawOriginal(), $preguntasDeclarativas)),
                 'motivos' => array_values(array_unique($motivos)), 'extraccion' => null];
             $nacimiento = $residente->fecha_nacimiento;
             $fecha = CarbonImmutable::instance($a->fecha_hora);

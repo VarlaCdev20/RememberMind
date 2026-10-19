@@ -9,6 +9,8 @@ No autoriza inferencia clínica ni nuevas reglas de O.R.I.O.N.
 - [Investigación profesional de los 19 componentes, 19/10](INVESTIGACION_PROFESIONAL_19_COMPONENTES_2026_10_19.md): utilidad, uso, motivo, cálculo, interpretación, fuentes y brechas; [objetivo activo y pruebas de fase 3](FASE_3_COMPONENTES_2026_10_19.md).
 - [Cierre técnico de fase 3: 19 componentes, 19/10](CIERRE_TECNICO_FASE_3_2026_10_19.md): matriz completa, SCAND y TB-A, fuentes, utilidad, uso, interpretación, contratos y pruebas en SQLite/PostgreSQL. Cálculo/documentación cerrados bajo condiciones; adopción institucional y validación clínica pendientes.
 - [Manual técnico investigado para mayores de 60, 19/10](MANUAL_INVESTIGADO_MAYORES_60_2026_10_19.md): fuentes completas y manuales localizados, edades/escolaridad, fórmulas, conflictos, huellas y enlaces al cierre técnico.
+- [Red semántica y reglas, fase 4](FASE_4_RED_Y_REGLAS_2026_10_19.md) y [fuentes/métricas 60+](FASE_4_FUENTES_Y_METRICAS_60_MAS_2026_10_19.md).
+- [Cierre de trazabilidad y reproducción, 19/10](CIERRE_TRAZABILIDAD_Y_REPRODUCCION_2026_10_19.md): fuentes oficiales contrastadas, dos defectos corregidos, revisión independiente, DTO canónico y artefacto recuperable del motor; vinculación institucional y guardado relacional pendientes.
 - [Normalizaciones españolas de referencia, 19/10](NORMALIZACIONES_REFERENCIA_2026_10_19.md): cinco ecuaciones, seis perfiles y su corte de verificación.
 - [Cinco referencias geriátricas adicionales, 19/10](REFERENCIAS_GERIATRICAS_ADICIONALES_2026_10_19.md): reconocimiento CERAD, Raven A, cancelación A, TOL-F y Token; utilidad, uso, datos originales, calidad y límites de fuentes, contratos y pruebas. Corte anterior de 16 componentes, ampliado a 19 en el cierre técnico.
 

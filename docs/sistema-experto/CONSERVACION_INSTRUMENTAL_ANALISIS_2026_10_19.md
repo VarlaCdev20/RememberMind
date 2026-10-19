@@ -2,6 +2,8 @@
 
 Fecha: 19/10/2026. Estado: **diseño candidato no aprobado; sin DDL, migraciones ni cambios del inventario**. Complementa el cierre de adquisición. No sustituye decisiones aprobadas de conservación ni habilita interpretación clínica.
 
+**Avance técnico posterior:** el [contrato canónico y artefacto de software](CIERRE_TRAZABILIDAD_Y_REPRODUCCION_2026_10_19.md) ya están implementados en memoria con pruebas de reproducción, tipos y precisión. Las nueve relaciones de este análisis continúan como alternativa no aprobada, no como mínimo. La reproducción en memoria y el ZIP de software no se presentan como guardado institucional.
+
 ## Contrato que falta representar
 
 `CapturasInstrumentalesResidente` obtiene aplicaciones, instrumentos, autor, respuestas, preguntas y opciones originales al corte, incluidos datos rechazados. `PerfilInstrumentalCognitivo` añade método, entradas utilizadas, normalización, motivos y la red de cinco dominios y diecinueve componentes. Ambos declaran `persistido=false` para este contrato.
@@ -68,4 +70,4 @@ La candidata completa llevaría a **115 tablas de negocio**; cualquiera de las v
 
 Guardar → recuperar → comparar entrada y salida completas; cambiar todas las fuentes actuales y comprobar que el histórico permanece igual; reintento idéntico y conflicto bajo la misma identidad; rollback intermedio; cruce de residente y versión; concurrencia; retirada de conocimiento conservando lectura y revisión posterior MED/PSI. Verificar en SQLite y PostgreSQL desechables.
 
-Este diseño no resuelve IADL, los soportes C01–C05, la falta de mediciones originales ni los once componentes pendientes. No se pide una aprobación profesional previa para desarrollar; sí se mantiene la decisión explícita de la propietaria antes de una nueva ampliación estructural congelada.
+Este diseño no resuelve IADL, los soportes C01–C05 ni la falta de mediciones originales. Los once componentes inicialmente pendientes de cálculo se cerraron técnicamente en el [cierre de fase 3](CIERRE_TECNICO_FASE_3_2026_10_19.md); eso no completa su vinculación a originales ni su interpretación clínica. No se pide una aprobación profesional previa para desarrollar; sí se mantiene la decisión explícita de la propietaria antes de una nueva ampliación estructural congelada.

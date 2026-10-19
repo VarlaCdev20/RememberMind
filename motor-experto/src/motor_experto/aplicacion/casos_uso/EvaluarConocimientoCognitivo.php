@@ -11,6 +11,7 @@ use MotorExperto\dominio\conocimiento\MapeadorSemantico;
 use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
 use MotorExperto\dominio\conocimiento\reglas\EvaluadorReglasCognitivas;
 use MotorExperto\dominio\explicacion\ConstructorTraza;
+use MotorExperto\dominio\explicacion\TrazaFuentesInstrumentales;
 use MotorExperto\dominio\inferencia\MemoriaTrabajo;
 
 /**
@@ -78,12 +79,12 @@ final class EvaluarConocimientoCognitivo
             ksort($conclusiones, SORT_STRING);
             $perfil[$codigo] = ['criterio' => $criterio, 'conclusiones_candidatas' => $conclusiones,
                 'contradicciones' => $contradicciones,
-                'traza' => (new ConstructorTraza)->construir($p, $m, $criterio,
-                    ['alcance' => 'CONJUNCIONES_DECLARATIVAS', 'sin_interpretacion_A_P' => true], $reglas, null)];
+                'traza' => (new TrazaFuentesInstrumentales)->completar((new ConstructorTraza)->construir($p, $m, $criterio,
+                    ['alcance' => 'CONJUNCIONES_DECLARATIVAS', 'sin_interpretacion_A_P' => true], $reglas, null), $m)];
         }
 
         return ['version' => $p->version, 'evaluacion' => $m->contexto->evaluacion, 'residente' => $m->contexto->residente,
-            'fecha_corte' => $m->contexto->fechaCorte->format(DATE_ATOM), 'red' => $red, 'perfil' => $perfil,
+            'fecha_corte' => $m->contexto->fechaCorte->format('Y-m-d\TH:i:s.uP'), 'red' => $red, 'perfil' => $perfil,
             'alcance' => 'CONSECUENCIAS_DECLARATIVAS', 'clasificacion_dcl' => null, 'persistido' => false];
     }
 }

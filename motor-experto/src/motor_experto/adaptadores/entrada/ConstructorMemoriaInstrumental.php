@@ -71,6 +71,10 @@ final class ConstructorMemoriaInstrumental
                     throw new DomainException('Más de una respuesta original para la misma pregunta y aplicación.');
                 }
                 $r = $filas[0] ?? null;
+                $pregunta = $r['pregunta_actual'] ?? $a['preguntas_declarativas_originales'][$vinculo['cod_pregunta']] ?? null;
+                if ($pregunta !== null && ($pregunta['cod_instrumento'] ?? null) !== $a['cod_instrumento']) {
+                    throw new DomainException('La pregunta declarada pertenece a otro instrumento.');
+                }
                 $campo = $vinculo['campo'];
                 $original = $r[$campo] ?? null;
                 $tipoCorrecto = $r === null || ($campo === 'valor_logico' ? in_array($r['tipo_respuesta'], ['LOGICO', 'BOOLEANO'], true)
@@ -94,6 +98,7 @@ final class ConstructorMemoriaInstrumental
                         'componente_instrumental_verificado' => $esMemoriaInstrumental && $r !== null,
                         'cod_pregunta' => $vinculo['cod_pregunta'], 'campo_original' => $campo,
                         'procedencia' => $a['procedencia'], 'instrumento' => $a['instrumento_actual'],
+                        'pregunta_original' => $pregunta, 'fuente_edad' => $a['fuente_edad'],
                     ]);
                 $e = (new MapeadorSemantico)->mapear($p, $contexto, $f, $mapeo);
                 $criterios = [];

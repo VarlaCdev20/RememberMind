@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\AplicacionInstrumento;
+use App\Models\DocumentoClinico;
 use App\Models\Instrumento;
 use App\Models\Personal;
 use App\Models\PreguntaInstrumento;
@@ -13,15 +14,21 @@ use App\Models\RespuestaInstrumento;
 use App\Models\User;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarConocimientoCognitivo;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarPerfilInstrumental;
+use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\IdentidadesConocimiento;
+use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoOrion;
 use Carbon\CarbonImmutable;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use DomainException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
 use MotorExperto\investigacion\dcl\PaqueteCincoDominiosExperimental;
 use MotorExperto\investigacion\g09\PaqueteSemanticoG09Experimental;
+use MotorExperto\soporte\conservacion\InstantaneaInstrumental;
 use Tests\Support\InformeCognitivoFixture;
 use Tests\TestCase;
 
@@ -135,6 +142,110 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         $r = $this->consultar()['resultado']['perfil']['COG-ATE'];
         self::assertSame([], $r['conclusiones_candidatas']);
         self::assertCount(1, $r['traza']['sin_emision']);
+    }
+
+    public function test_perfil_e_inferencia_usan_una_sola_captura_aunque_el_original_se_rectifique_despues(): void
+    {
+        $original = app(FuenteConocimientoOrion::class);
+        app()->instance(FuenteConocimientoOrion::class, new class($original, $this->aplicacion, $this->primeraPregunta) implements FuenteConocimientoOrion
+        {
+            public function __construct(private FuenteConocimientoOrion $original, private string $aplicacion, private string $pregunta) {}
+
+            public function leer(): array
+            {
+                // Simula una rectificación después de extraer, antes de construir el perfil.
+                DB::table('respuestas_instrumento')->where('cod_aplicacion', $this->aplicacion)
+                    ->where('cod_pregunta', $this->pregunta)->update(['valor_logico' => null]);
+
+                return $this->original->leer();
+            }
+        });
+        $lecturas = 0;
+        DB::listen(static function ($q) use (&$lecturas): void {
+            if (str_starts_with(strtolower($q->sql), 'select * from "aplicaciones_instrumento"')) {
+                $lecturas++;
+            }
+        });
+        $perfil = app(ConsultarPerfilInstrumental::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now());
+        self::assertSame(1, $lecturas);
+        self::assertNotNull($perfil['capturas_originales']['capturas'][0]['respuestas_originales'][0]['valor_logico']);
+        self::assertCount(1, $perfil['inferencia_declarativa']['resultado']['perfil']['COG-ATE']['conclusiones_candidatas']);
+        self::assertNull(DB::table('respuestas_instrumento')->where('cod_aplicacion', $this->aplicacion)
+            ->where('cod_pregunta', $this->primeraPregunta)->value('valor_logico'));
+        self::assertArrayNotHasKey('capturas', $perfil['inferencia_declarativa']);
+    }
+
+    public function test_traza_conserva_respuesta_documento_edad_y_precision_del_corte(): void
+    {
+        Storage::fake('local');
+        Storage::disk('local')->put('original-sintetico.txt', 'Protocolo original sintético.');
+        $documento = DocumentoClinico::create(['cod_residente' => $this->residente->getKey(), 'cod_personal' => $this->usuario->personal->getKey(),
+            'tipo_documento' => 'INFORME', 'titulo' => 'Original de prueba', 'ruta_archivo' => 'original-sintetico.txt', 'formato' => 'text/plain',
+            'hash_archivo' => hash('sha256', 'Protocolo original sintético.'), 'fecha_hora' => now(), 'estado' => 'VIGENTE']);
+        DB::table('aplicaciones_instrumento')->where('cod_aplicacion', $this->aplicacion)
+            ->update(['cod_documento_clinico' => $documento->getKey(), 'localizador_fuente' => 'Página 1 / C1']);
+        $corte = CarbonImmutable::parse('2026-10-19T11:59:59.123456-04:00');
+        $r = app(ConsultarConocimientoCognitivo::class)->consultar($this->usuario, $this->residente, $corte);
+        $traza = $r['resultado']['perfil']['COG-ATE']['traza'];
+        self::assertSame($corte->format('Y-m-d\TH:i:s.uP'), $r['resultado']['fecha_corte']);
+        self::assertSame($r['resultado']['fecha_corte'], $traza['fecha_corte']);
+        $ruta = array_values(array_filter($traza['rutas'], fn ($r) => $r['procedencia_instrumental']['cod_pregunta'] === $this->primeraPregunta))[0];
+        $p = $ruta['procedencia_instrumental'];
+        self::assertSame($this->primeraPregunta, $p['cod_pregunta']);
+        self::assertSame('valor_logico', $p['campo_original']);
+        self::assertSame(DB::table('respuestas_instrumento')->where('cod_aplicacion', $this->aplicacion)
+            ->where('cod_pregunta', $this->primeraPregunta)->value('cod_respuesta'), $p['cod_respuesta']);
+        self::assertSame('FIXTURE-1', $p['instrumento']['version']);
+        self::assertSame('C1', $p['pregunta_original']['codigo']);
+        self::assertSame($documento->getKey(), $p['registro_original']['cod_documento_clinico']);
+        self::assertSame('VERIFICADO', $p['registro_original']['estado_documento']);
+        self::assertSame('1950-10-18', $p['fuente_edad']['fecha_nacimiento']);
+        $evidencia = array_values(array_filter($traza['evidencias'], fn ($e) => $e['id'] === $ruta['evidencia']))[0];
+        self::assertSame($p, $evidencia['procedencia_instrumental']);
+        self::assertStringNotContainsString('ruta_archivo', serialize($p));
+    }
+
+    public function test_pregunta_declarativa_sin_respuesta_conserva_definicion_y_ausencia(): void
+    {
+        DB::table('respuestas_instrumento')->where('cod_aplicacion', $this->aplicacion)->where('cod_pregunta', $this->primeraPregunta)->delete();
+        $r = $this->consultar();
+        $e = array_values(array_filter($r['resultado']['perfil']['COG-ATE']['traza']['evidencias'],
+            fn ($e) => $e['procedencia_instrumental']['cod_pregunta'] === $this->primeraPregunta))[0];
+        self::assertSame('NO_DISPONIBLE', $e['representacion']);
+        self::assertNull($e['procedencia_instrumental']['cod_respuesta']);
+        self::assertSame('C1', $e['procedencia_instrumental']['pregunta_original']['codigo']);
+        self::assertSame('Literal sintético 1', $e['procedencia_instrumental']['pregunta_original']['enunciado']);
+        self::assertSame([], $r['resultado']['perfil']['COG-ATE']['conclusiones_candidatas']);
+    }
+
+    public function test_instantanea_reproduce_sin_sql_configuracion_o_reglas_actuales(): void
+    {
+        $r = $this->consultar();
+        $contrato = config('sistema_experto.contratos_conocimiento.'.$this->version);
+        $tablas = app(ConocimientoVersionado::class)->instantanea($this->version);
+        $p = new PaqueteConocimiento($this->version, $tablas, $contrato['relaciones'], false, $contrato['tipo_regla_resultado'], $contrato['extracciones']);
+        $c = new ContextoEjecucion($r['resultado']['evaluacion'], $this->residente->getKey(), $this->version, CarbonImmutable::now()->toDateTimeImmutable());
+        $cabecera = (array) DB::table('versiones_modelo_experto')->where('cod_version_modelo', $this->version)->sole();
+        $dto = InstantaneaInstrumental::crear($p, $c, $r['capturas'], $contrato['vinculos_instrumentales'], $this->usuario->getKey(), $cabecera);
+        self::assertSame($dto->huella, $r['preparacion_conservacion']['huella']);
+        self::assertFalse($r['preparacion_conservacion']['persistido']);
+        DB::table('respuestas_instrumento')->where('cod_aplicacion', $this->aplicacion)->update(['valor_logico' => null]);
+        DB::table('reglas_expertas')->where('cod_version_modelo', $this->version)->update(['estado' => 'INACTIVO']);
+        DB::table('versiones_modelo_experto')->where('cod_version_modelo', $this->version)->update(['estado' => 'INACTIVO']);
+        config(['sistema_experto.contratos_conocimiento' => [], 'sistema_experto.perfiles_instrumentales' => []]);
+        $consultas = 0;
+        DB::listen(static function () use (&$consultas): void {
+            $consultas++;
+        });
+        $restaurada = InstantaneaInstrumental::verificar($dto->contenido, $dto->huella);
+        self::assertSame(0, $consultas);
+        self::assertSame($dto->contenido, $restaurada->contenido);
+        self::assertSame('ACTIVO', $restaurada->contenido['cabecera_conocimiento']['estado']);
+        self::assertCount(1, $restaurada->contenido['salida']['resultado']['perfil']['COG-ATE']['conclusiones_candidatas']);
+        $corrupta = $dto->contenido;
+        $corrupta['capturas']['capturas'][0]['respuestas_originales'][0]['valor_logico'] = null;
+        $this->expectException(DomainException::class);
+        InstantaneaInstrumental::verificar($corrupta, $dto->huella);
     }
 
     public function test_memoria_usa_literal_textual_original_y_su_admisibilidad_especifica(): void

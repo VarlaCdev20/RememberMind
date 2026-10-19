@@ -107,7 +107,7 @@ No se añadieron tablas, columnas, catálogos o permisos. Se conserva el inventa
 - [x] Verificar integración y negativos en SQLite y PostgreSQL desechables, independencia del motor, formato, sintaxis y build.
 - [ ] Cotejar y registrar los IDs/ediciones/preguntas de la versión operativa y sus originales. Dependencia de adquisición, no de una firma profesional previa para desarrollar.
 - [ ] Cerrar conservación institucional íntegra y su reproducción desde BDD en la fase 6.
-- [ ] Completar una revisión independiente específica de este incremento; las revisiones de la entrega anterior no se atribuyen al código nuevo.
+- [x] Revisión independiente específica y corrección posterior de los dos P2 de trazabilidad. [Acta, fuentes verificadas y preparación reproducible](CIERRE_TRAZABILIDAD_Y_REPRODUCCION_2026_10_19.md).
 
 ## 7. Verificación reproducible
 
@@ -139,3 +139,5 @@ Las negativas comprueban cuenta inactiva, Familiar, permisos fuente retirados, c
 Una corrida previa detectó metadatos incompletos en la fixture de fuente. Se completó la declaración explícita de sus columnas y se conservó la validación de procedencia; los resultados de la tabla corresponden a la repetición corregida. No se debilitó esa validación para obtener verde.
 
 La revisión estática del implementador está realizada. Los revisores independientes disponibles terminaron por límite de uso sin cerrar el gate de este incremento; queda pendiente y no se informa PASS independiente. No se modificó UI, no se acredita QA visual ni se usan estas pruebas sintéticas para afirmar sensibilidad, especificidad, exactitud diagnóstica o validación profesional.
+
+**Actualización posterior del 19/10/2026:** se completó la revisión independiente en el siguiente incremento; detectó dos P2 de captura/procedencia, corregidos y reauditados. El [acta de cierre técnico](CIERRE_TRAZABILIDAD_Y_REPRODUCCION_2026_10_19.md) sustituye únicamente ese pendiente, documenta el DTO/release implementado y conserva abiertos la vinculación institucional y el guardado relacional completo. Los resultados históricos de pruebas anteriores no se cambian.

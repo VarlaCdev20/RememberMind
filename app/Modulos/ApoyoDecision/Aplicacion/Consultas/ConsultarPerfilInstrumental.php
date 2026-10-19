@@ -14,18 +14,20 @@ use MotorExperto\dominio\instrumentos\PerfilInstrumentalCognitivo;
 /** Orquesta fuentes institucionales autorizadas y la red documental; no usa casos del laboratorio. */
 final readonly class ConsultarPerfilInstrumental
 {
-    public function __construct(private CapturasInstrumentalesResidente $capturas, private FuenteConocimientoOrion $fuente) {}
+    public function __construct(private ConsultarConocimientoCognitivo $conocimiento, private FuenteConocimientoOrion $fuente) {}
 
     public function consultar(User $usuario, Residente $residente, CarbonImmutable $corte): ?array
     {
-        $captura = $this->capturas->consultar($usuario, $residente, $corte);
+        $consulta = $this->conocimiento->consultar($usuario, $residente, $corte);
+        $captura = $consulta['capturas'];
         if (! $captura['disponible']) {
             return null;
         }
         $red = (new PerfilConceptualCognitivo)->construir($this->fuente->leer());
 
         $perfil = (new PerfilInstrumentalCognitivo)->construir($red, $captura);
-        $perfil['inferencia_declarativa'] = app(ConsultarConocimientoCognitivo::class)->consultar($usuario, $residente, $corte);
+        unset($consulta['capturas']);
+        $perfil['inferencia_declarativa'] = $consulta;
 
         return $perfil;
     }

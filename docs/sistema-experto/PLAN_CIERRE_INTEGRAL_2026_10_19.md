@@ -81,6 +81,7 @@ en sus propias actas y no se atribuyen a este cierre.
 - [x] Verificación SQLite/PostgreSQL desechable, concurrencia, independencia del motor y build del candidato.
 - [x] Conector de lectura SQL autorizada hacia hechos y reglas, con instrumento/versión/pregunta exactos, fecha de corte, autor original y soporte compartido por aplicación.
 - [x] Aplicabilidad por edad en la aplicación y métricas de cobertura 60+, sin duplicar componentes ni convertir cobertura en exactitud diagnóstica. [Fuentes y contrato del incremento](FASE_4_FUENTES_Y_METRICAS_60_MAS_2026_10_19.md).
+- [x] Revisión independiente y corrección de captura duplicada/procedencia omitida; una captura compartida, preguntas sin respuesta y fechas completas. [Acta y fuentes verificadas](CIERRE_TRAZABILIDAD_Y_REPRODUCCION_2026_10_19.md).
 
 **Pendiente de cierre institucional:** conservar y vincular el paquete real con sus reglas y preguntas originales aún no cotejadas en fases 2/3; cerrar la conservación completa en fase 6. El conector de extracción/autorización está implementado y se verifica con datos sintéticos. El catálogo local conserva dos versiones no experimentales inactivas y sin reglas; la única activa pertenece al laboratorio. Las casillas institucionales siguientes no se marcan por la sola aceptación técnica del conector.
 
@@ -105,6 +106,9 @@ en sus propias actas y no se atribuyen a este cierre.
 
 ### 6. Completar conservación exacta
 
+- [x] Preparar DTO canónico en memoria del alcance instrumental/declarativo y reproducción sin SQL/configuración actuales, con metadatos de preparación sin declarar guardado.
+- [x] Implementar ZIP recuperable del software del motor, manifiesto por archivo y verificación de alteración/ausencia/no reemplazo, sin historia clínica.
+- [ ] Vincular la evaluación a un release retenido y representar relacionalmente el DTO completo; los avances previos no equivalen a persistencia institucional.
 - [ ] Empezar el diseño durante la fase 1; cerrar el contrato definitivo con las entradas/salidas de las fases 2–5.
 - [ ] Reutilizar cabecera, conocimiento, hechos, trazas, soportes y revisiones existentes cuando su significado sea compatible.
 - [ ] Definir DTO canónico, precisión, fechas, versiones y fuentes admitidas y descartadas; conservar también selectores sin respuesta y artefactos de release recuperables.
