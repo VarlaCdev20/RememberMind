@@ -56,6 +56,11 @@ final class ConsultarPetersenInstitucional
                 foreach (CapturasInstrumentalesResidente::PERMISOS_LECTURA as $permiso) {
                     abort_unless($usuario->checkPermissionTo($permiso, 'web'), 403);
                 }
+                if (collect($instrumental->contenido['capturas']['capturas'])->contains(
+                    fn ($captura) => $captura['procedencia']['cod_documento_clinico'] !== null
+                )) {
+                    abort_unless($usuario->checkPermissionTo('documentos_clinicos.ver', 'web'), 403);
+                }
             }
             if ($corte->greaterThan(CarbonImmutable::now())) {
                 throw new DomainException('El corte de Petersen no puede ser futuro.');

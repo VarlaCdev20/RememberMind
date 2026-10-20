@@ -44,6 +44,9 @@ La captura también exige el permiso documental existente antes de cargar un
 original enlazado. Si falta, esa preparación se declara indisponible sin
 consultar `documentos_clinicos`; las aplicaciones sin documento siguen
 accesibles con los permisos instrumentales. No se amplió ningún permiso.
+Si Petersen reutiliza una captura que ya contiene un documento, vuelve a
+comprobar ese permiso antes de consumirla; revocarlo entre ambas preparaciones
+produce 403 y no guarda evaluación.
 
 ## Brecha relacional exacta de fase 6
 
@@ -141,6 +144,9 @@ verde no demuestra sensibilidad, especificidad ni validez diagnóstica.
   tests/Feature/ConocimientoCognitivoInstitucionalTest.php --compact`:
   **101 PASS / 1255 aserciones** en SQLite sintético. Incluye el corte técnico,
   acceso documental autorizado/denegado y reconstrucción de 19 vínculos.
+- Tras el cierre de la reutilización documental, el filtro de captura
+  compartida y preparación backend: **7 PASS / 21 aserciones**, incluida la
+  revocación del permiso documental entre pasos.
 
 No hubo DDL, escritura clínica, cambio de permisos ni publicación de una
 evaluación institucional nueva.

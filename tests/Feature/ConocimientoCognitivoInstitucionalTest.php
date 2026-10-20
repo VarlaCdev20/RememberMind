@@ -944,6 +944,31 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         self::assertDatabaseCount('valoraciones_petersen_originales', 0);
     }
 
+    public function test_captura_compartida_documentada_no_elude_revocacion_del_permiso_documental(): void
+    {
+        Storage::fake('local');
+        Storage::disk('local')->put('original-revocacion.txt', 'Documento sintético para autorización.');
+        $documento = DocumentoClinico::create(['cod_residente' => $this->residente->getKey(),
+            'cod_personal' => $this->usuario->personal->getKey(), 'tipo_documento' => 'INFORME',
+            'titulo' => 'Original sintético', 'ruta_archivo' => 'original-revocacion.txt', 'formato' => 'text/plain',
+            'hash_archivo' => hash('sha256', 'Documento sintético para autorización.'), 'fecha_hora' => now(), 'estado' => 'VIGENTE']);
+        DB::table('aplicaciones_instrumento')->where('cod_aplicacion', $this->aplicacion)
+            ->update(['cod_documento_clinico' => $documento->getKey(), 'localizador_fuente' => 'Página 1']);
+        $this->usuario->givePermissionTo('documentos_clinicos.ver');
+
+        $dto = app(ConsultarConocimientoCognitivo::class)->preparar($this->usuario, $this->residente, CarbonImmutable::now());
+        self::assertSame('VERIFICADO', $dto->contenido['capturas']['capturas'][0]['procedencia']['estado_documento']);
+        $this->usuario->revokePermissionTo('documentos_clinicos.ver');
+
+        try {
+            app(ConsultarPetersenInstitucional::class)->preparar($this->usuario, $this->residente, CarbonImmutable::now(), $this->version, $dto);
+            self::fail('La preparación compartida requiere el permiso documental actual.');
+        } catch (HttpException $e) {
+            self::assertSame(403, $e->getStatusCode());
+        }
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
     public function test_preparacion_backend_no_se_expone_en_la_consulta_ordinaria_y_rechaza_otro_contexto(): void
     {
         self::assertArrayNotHasKey('_instantanea', $this->consultar());
