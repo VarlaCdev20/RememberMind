@@ -82,7 +82,7 @@ Queda una limitación temporal adicional: `aplicaciones_instrumento.estado` se
 actualiza al anular o rectificar, y las respuestas no tienen un instante técnico
 individual. Por ello, un corte anterior a esa mutación no puede reconstruir
 con certeza el estado y la colección **que se veían entonces** desde las filas
-actuales. El candidato de 14 relaciones podría conservar exactamente lo
+actuales. El candidato de 15 relaciones podría conservar exactamente lo
 observado en una evaluación nueva, pero su sellado no reconstruye estados
 anteriores al primer sello. Antes de declarar una evaluación retrospectiva
 «al corte», el contrato de guardado debe distinguir fecha clínica del instante
@@ -99,22 +99,28 @@ columnas exactos** a la propietaria. Hasta aprobarla, no se crean migraciones
 para este guardado.
 
 El [ensayo reducido](ENSAYO_CONSERVACION_REDUCIDA_FASE_6_2026_10_20.md)
-explora catorce granos nuevos frente a los veinticinco rechazados: copia
-menos definiciones y brutos a cambio de sellar originales en SQL y limitarse
-al contrato institucional actual. Es candidato no validado; su número no se
-presenta como mínimo ni como autorización de DDL.
+explora quince granos nuevos frente a los veinticinco rechazados: copia
+menos definiciones y brutos a cambio de sellar contenido original en SQL y
+limitarse al contrato institucional actual. Es candidato no validado; su
+número no se presenta como mínimo ni como autorización de DDL.
 
 Se corrigió una premisa del ensayo: el contrato institucional registra hasta
 19 vínculos observacionales al encontrar sus fuentes exactas. Una prueba
 sintética reconstruye los 19 desde mapeos, preguntas e instrumentos y compara
-el mapa con el contrato adquirido. La prueba no cubre aún sellado físico ni
-vínculos instrumentales interpretativos; estos últimos quedan fuera del
-candidato hasta que se representen explícitamente.
-La prueba G09 de perfil y medición originales demuestra que ese camino
-interpretativo existe en el motor actual. Por ello, las 14 relaciones no
-cierran su conservación integral. El ensayo documenta un decimoquinto grano
-posible para vínculos declarativos; su suficiencia e inventario eventual de
-119 tablas siguen sin prueba de round-trip ni aprobación estructural.
+el mapa con el contrato adquirido. La prueba G09 de perfil y medición
+originales demuestra además el camino interpretativo. Por ello, las 14
+relaciones no cierran su conservación integral. La decimoquinta candidata
+guarda cada vínculo observado, de ambos tipos, para que un replay no dependa
+de configuración o mapeos regenerados después. Su suficiencia e inventario
+eventual de 119 tablas siguen sin prueba de round-trip ni aprobación.
+
+Un ensayo de captura antes y después de una anulación confirmó que los dos
+campos de estado del V3 cambian mientras las respuestas originales quedan
+intactas. Además, `AplicarInstrumento::transcribir` puede vincular documento y
+localizador a una aplicación anterior durante conciliación. El candidato
+ahora copia esos tres valores observados en la membresía de aplicación y
+propone sellar los brutos/colección sin bloquear esas operaciones actuales.
+Falta probar triggers y concurrencia; este ajuste del diccionario no es DDL.
 
 ## Estado de fases 7 y 8
 
@@ -152,6 +158,10 @@ verde no demuestra sensibilidad, especificidad ni validez diagnóstica.
 - Tras el cierre de la reutilización documental, el filtro de captura
   compartida y preparación backend: **7 PASS / 21 aserciones**, incluida la
   revocación del permiso documental entre pasos.
+- La suite de captura instrumental con el contraste de estado adquirido antes
+  y después de anular: **48 PASS / 881 aserciones** en SQLite sintético. El
+  ensayo confirma por qué el estado observado debe conservarse por evaluación;
+  no prueba aún el guardado relacional propuesto.
 
 No hubo DDL, escritura clínica, cambio de permisos ni publicación de una
 evaluación institucional nueva.

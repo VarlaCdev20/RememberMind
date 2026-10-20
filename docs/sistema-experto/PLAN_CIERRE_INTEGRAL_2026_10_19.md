@@ -130,10 +130,11 @@ e instaladas en desarrollo: **104 tablas de negocio**, con
 [pruebas y comparación local](../base-de-datos/DECISION_REDUCCION_EXPERTA_2026_10_20.md).
 Los incrementos ya verificados conservan su alcance; el guardado íntegro sigue abierto.
 El [ensayo de conservación reducida](ENSAYO_CONSERVACION_REDUCIDA_FASE_6_2026_10_20.md)
-contrasta catorce relaciones candidatas con originales sellados. No está
+contrasta quince relaciones candidatas con originales sellados y vínculos
+declarativos adquiridos. No está
 aprobado ni probado por round-trip; no modifica el inventario.
 
-**Incremento del 20/10:** [preparación compuesta y reproducción](FASE_6_PREPARACION_COMPUESTA_2026_10_20.md). El backend reúne V3 y Petersen con una captura compartida, gobierno separado, procedencia, exclusiones y constancias; verifica ambas ramas sin SQL y puede cotejar un release real con el ejecutor capturado. Conserva `persistido=false` y `release_retenido=false`. El [diccionario candidato](PROPUESTA_CONSERVACION_COMPUESTA_FASE_6_2026_10_20.md) no modifica el inventario aprobado de 108 ni autoriza DDL.
+**Incremento del 20/10:** [preparación compuesta y reproducción](FASE_6_PREPARACION_COMPUESTA_2026_10_20.md). El backend reúne V3 y Petersen con una captura compartida, gobierno separado, procedencia, exclusiones y constancias; verifica ambas ramas sin SQL y puede cotejar un release real con el ejecutor capturado. Conserva `persistido=false` y `release_retenido=false`. El [diccionario de 25 relaciones rechazado](PROPUESTA_CONSERVACION_COMPUESTA_FASE_6_2026_10_20.md) no modifica el inventario instalado de 104 ni autoriza DDL.
 
 - [x] Preparar DTO canónico en memoria del alcance instrumental/declarativo y reproducción sin SQL/configuración actuales, con metadatos de preparación sin declarar guardado.
 - [x] Preparar y reproducir el contrato compuesto instrumental/Petersen con contexto común, mediciones canónicas iguales y constancias de adquisición, sin atribuirle persistencia institucional.
@@ -143,8 +144,8 @@ aprobado ni probado por round-trip; no modifica el inventario.
 - [ ] Empezar el diseño durante la fase 1; cerrar el contrato definitivo con las entradas/salidas de las fases 2–5.
 - [ ] Reutilizar cabecera, conocimiento, hechos, trazas, soportes y revisiones existentes cuando su significado sea compatible.
 - [ ] Definir DTO canónico, precisión, fechas, versiones y fuentes admitidas y descartadas; conservar también selectores sin respuesta y artefactos de release recuperables.
-- [ ] Reducir y justificar cualquier extensión mínima, preservando 4FN. El análisis de nueve relaciones es candidato, no una obligación ni una autorización nueva.
-- [ ] Presentar el diccionario concreto de conservación antes de modificar la estructura congelada. El inventario aprobado es ahora 108 por las dos tablas de captura original de fase 5; esa decisión no aprueba tablas adicionales de instantáneas.
+- [ ] Reducir y justificar cualquier extensión mínima, preservando 4FN. El ensayo actual de quince relaciones sigue siendo candidato, no una obligación ni una autorización nueva.
+- [ ] Presentar el diccionario concreto de conservación antes de modificar la estructura congelada. El inventario instalado es 104 tras la reducción aprobada; esa decisión no aprueba tablas adicionales de instantáneas.
 - [ ] Implementar guardar/recuperar íntegro, atomicidad, identidad idempotente e inmutabilidad; fallo explícito si hay información no representable.
 - [ ] Verificar replay tras modificar fuentes y conocimiento, corrupción, cruce de residente/versión y carreras concurrentes en PostgreSQL desechable.
 

@@ -515,8 +515,14 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         self::assertSame([], $antes['capturas']);
         $otro = Residente::factory()->create(['estado' => 'ADMITIDO']);
         self::assertSame([], app(CapturasInstrumentalesResidente::class)->consultar($this->usuario, $otro, CarbonImmutable::now())['capturas']);
+        $estadoAdquirido = $this->captura()['capturas'][0];
+        self::assertSame('COMPLETA', $estadoAdquirido['estado_original']);
+        self::assertSame('COMPLETA', $estadoAdquirido['aplicacion_actual']['estado']);
         DB::table('aplicaciones_instrumento')->where('cod_aplicacion', $a->getKey())->update(['estado' => 'ANULADA']);
         $r = $this->captura()['capturas'][0];
+        self::assertSame('ANULADA', $r['estado_original']);
+        self::assertSame('ANULADA', $r['aplicacion_actual']['estado']);
+        self::assertSame($estadoAdquirido['respuestas_originales'], $r['respuestas_originales']);
         self::assertCount(11, $r['respuestas_originales']);
         self::assertNull($r['extraccion']);
         self::assertContains('APLICACION_NO_COMPLETA', $r['motivos']);

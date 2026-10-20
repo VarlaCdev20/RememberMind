@@ -8,15 +8,13 @@ negocio. No se ha creado ninguna de las relaciones de este ensayo.
 el contrato G09 cuando una regla usa un vínculo instrumental con perfil
 interpretativo. `ConocimientoCognitivoInstitucionalTest::test_g09_sql_exige_perfil_definido_y_medida_bruta_de_la_misma_aplicacion`
 ejecuta precisamente ese camino. El candidato de 14 solo cubre la variante
-observacional fija que puede derivarse de mapeos y originales sellados.
-Cerrar el G09 completo exige representar además cada vínculo declarativo
-adquirido, con su mapeo, selector, instrumento, campo, componente y perfil
-interpretativo resuelto. El antecedente de 25 relaciones lo hacía en su
-relación 18, pero fue rechazado como conjunto; una alternativa de **15 granos
-en total** reutilizaría los 14 aquí descritos y añadiría solo ese grano de
-vínculo, elevando el inventario candidato a 119 tablas de negocio, sujeto
-todavía a round-trip y aprobación. No es un nuevo inventario
-aprobado ni una autorización para crear tablas.
+observacional fija derivable de mapeos y originales sellados. El diseño reducido
+que merece ensayo completo usa **15 granos en total**: la relación adicional
+conserva **todos** los vínculos adquiridos, tanto observacionales como
+interpretativos. Así la recuperación no depende de volver a ejecutar
+`ContratosConocimiento::porVersion()` ni de la configuración futura. El
+inventario candidato sería 119 tablas de negocio, sujeto todavía a round-trip
+y aprobación. No es un nuevo inventario aprobado ni autorización para DDL.
 
 ## Alcance conservado
 
@@ -31,28 +29,29 @@ Este ensayo se limita al contrato institucional A–D/E–H actual. La plantilla
 `PaqueteCognitivoInstitucional::contratos()` inicia con vínculos vacíos, pero
 `ContratosConocimiento::porVersion()` incorpora los vínculos observacionales
 que identifica en mapeos y preguntas originales. En el caso sintético completo
-son **19 vínculos**, no cero. Una prueba de integración verificó que se
-reconstruyen exactamente desde mapeo, pregunta e instrumento. Esa derivación
-solo es segura si quedan sellados el conjunto de mapeos y los originales; antes
-de guardar se debe comparar el mapa reconstruido con el V3 adquirido.
-Vínculos interpretativos, configuraciones personalizadas o discrepancias fallan
-como no representables. Los contratos de relaciones/extracción deben coincidir
-exactamente con los del release retenido.
+son **19 vínculos**, no cero. Una prueba de integración verificó que se derivan
+exactamente desde mapeo, pregunta e instrumento. Para conservar la evaluación,
+la relación 15 propuesta guardaría el mapa **efectivamente adquirido** y lo
+cotejaría con el V3 antes de finalizar. La misma relación representa perfiles
+interpretativos, configuraciones explícitas, mapa vacío y sucesoras sin
+regenerar claves desde la versión actual. Los contratos de relaciones y
+extracción aún deben coincidir con los del release retenido.
 
 El diseño anterior de 25 relaciones fue rechazado. Se utiliza como
 [antecedente analítico de columnas y granos](PROPUESTA_CONSERVACION_COMPUESTA_FASE_6_2026_10_20.md),
 sin reactivar su autorización ni su número.
 
 **Condición temporal todavía no resuelta:** `registrado_en` de la aplicación
-puede ser NULL en historia anterior a la ampliación; `estado` puede cambiar
-después por anulación o rectificación; las respuestas carecen de fecha técnica
-individual. Una transcripción con `registrado_en` posterior al corte se excluye
-ahora de la captura, pero una fila anterior mutada después del corte no revela
-por sí sola su estado pasado. El sello propuesto protege el estado al preparar
-una evaluación nueva, no certifica cómo estaba la base en un corte antiguo.
-El guardado debe registrar el instante de adquisición y fallar si se pretende
-afirmar una reconstrucción histórica no demostrable. Esta condición debe
-formar parte del ensayo de round-trip y de la aceptación del contrato.
+puede ser NULL en historia anterior a la ampliación; `estado` cambia por
+anulación o rectificación y una conciliación posterior puede vincular
+`cod_documento_clinico` y `localizador_fuente` a la misma aplicación. Las
+respuestas carecen de fecha técnica individual. Una transcripción con
+`registrado_en` posterior al corte se excluye ahora de la captura, pero una
+fila anterior mutada después del corte no revela por sí sola su estado pasado.
+El sello de contenido no puede bloquear esas transiciones operativas actuales:
+el guardado debe copiar los tres valores mutables observados, registrar el
+instante de adquisición y fallar si pretende afirmar una reconstrucción
+histórica anterior no demostrable.
 
 ## Reutilización y costo del sellado
 
@@ -60,7 +59,7 @@ formar parte del ensayo de round-trip y de la aceptación del contrato.
 |---|---|---|
 | Doce relaciones de conocimiento y cabecera de versión | Definición exacta por versión | Sello SQL del conjunto completo. La primera firma y el retiro admitidos se registran por evaluación sin reescribir el pasado. |
 | Instrumentos, preguntas y opciones | Metadata original incluso para selector sin respuesta | Sellar instrumento y sus hijos; bloquear inserción, actualización y borrado posteriores. Nueva edición: nuevo instrumento enlazado con antecesor. |
-| Aplicaciones y respuestas | Brutos y procedencia | Sellar aplicación y toda la colección de respuestas, incluido INSERT tardío. Rectificar por aplicación sucesora. |
+| Aplicaciones y respuestas | Brutos y procedencia | Sellar contenido y colección completa de respuestas, incluido INSERT tardío. Permitir las transiciones autorizadas de estado y la vinculación documental tardía; copiar su valor observado en la membresía de evaluación. Rectificar el contenido por aplicación sucesora. |
 | Juicios y soportes Petersen | Contenido ya inmutable | Guardar membresía y orden observados por evaluación. |
 | Residente, personal, atenciones y contexto médico/IADL/documental | Identidades originales | Copiar solo los atributos consumidos que pueden cambiar. No congelar personas. |
 
@@ -69,10 +68,10 @@ PostgreSQL y SQLite, con bloqueo transaccional al sellar. El primer sello
 captura el estado cotejado en ese momento, sin atribuirlo a fechas anteriores.
 Estas garantías modifican estructura y reglas físicas; requieren aprobación.
 
-## Inventario candidato de catorce relaciones para el alcance observacional
+## Inventario candidato de quince relaciones para el alcance institucional
 
-De aprobarse y superar todas las pruebas, el inventario sería **118 tablas
-de negocio: 75 operativas y 43 expertas**. Es una reducción frente al
+De aprobarse y superar todas las pruebas, el inventario sería **119 tablas
+de negocio: 75 operativas y 44 expertas**. Es una reducción frente al
 antecedente de 25 relaciones, pero aumenta el costo de triggers y gobierno
 de originales; menos tablas no equivale por sí solo a menos mantenimiento.
 
@@ -97,12 +96,12 @@ aprobación. Las cuatro entradas cambiadas se precisan después de la tabla.
 | 12 | exclusiones_adquisicion_petersen | Evaluación y exclusión ordenada | Relación 23, mismo detalle |
 | 13 | motivos_adquisicion_instrumental | Aplicación y motivo ordenado | Relación 24, FK a relación 4 |
 | 14 | constancias_documentales_evaluacion | Evaluación y comprobación ordenada | Relación 25, FK de soporte a relación 10 |
+| 15 | vinculos_declarativos_instantanea | Conocimiento adquirido y mapeo vinculado | Ambos tipos de vínculo; detalle cerrado abajo, reutiliza la relación 18 del antecedente solo como análisis |
 
-Quedarían fuera las tablas candidatas 1, 4–6, 8–10, 12, 14, 15, 17 y 18
+Quedarían fuera las tablas candidatas 1, 4–6, 8–10, 12, 14, 15 y 17
 del diseño rechazado: release por huella y archivo privado, contratos
 estáticos del release, originales sellados, unión de perfiles sin producto
-cartesiano y vínculos observacionales reconstruidos y cotejados desde
-mapeos/preguntas originales. No se elimina
+cartesiano y vínculos conservados por su mapeo adquirido. No se elimina
 ninguna tabla o fila instalada.
 
 ### Ampliaciones de tablas existentes
@@ -136,6 +135,11 @@ no negativo. FK obligatoria cod_autor_instantanea a relación 3;
 FK nullable cod_atencion_instantanea a relación 11; FK nullable
 cod_fuente_documento_instantanea a relación 9, rama DOCUMENTO;
 FK nullable cod_perfil_instrumental a relación 5, tipo CAPTURA.
+estado_original_observado string(20), que reconstruye tanto
+`estado_original` como `aplicacion_actual.estado` del V3;
+cod_documento_clinico_observado string(20) NULL, FK al documento original,
+y localizador_fuente_observado string(120) NULL, que reconstruyen
+`aplicacion_actual` y `procedencia`. Sus NULL se conservan explícitamente.
 Fecha clínica observada: fecha_clinica_utc datetime(6),
 fecha_clinica_zona string(80), fecha_clinica_offset integer y
 fecha_hora_sql_texto text. Registro técnico observado:
@@ -144,8 +148,18 @@ string(80) NULL, registro_tecnico_offset integer NULL y
 registrado_en_sql_texto text NULL. estado_documento string(40).
 UNIQUE evaluación+aplicación y evaluación+orden. Trigger comprueba
 que autor, atención, documento y perfil pertenecen a la misma
-evaluación. Las proyecciones de aplicación y respuestas se recuperan
-de originales sellados; los motivos de adquisición vienen de 13.
+evaluación, y que los tres valores observados coinciden con la fila original
+durante la adquisición. La FK documental de la membresía debe coincidir con
+la de la fuente documental 9 cuando exista; la ausencia de un documento
+recuperable no se inventa. Las demás columnas de aplicación y respuestas se
+recuperan de originales sellados; los motivos de adquisición vienen de 13.
+El trigger de la aplicación debe limitar las actualizaciones a las formas
+de transición de `estado` y vinculación posterior de documento/localizador
+admitidas. La autorización contextual sigue en las acciones institucionales;
+Eloquent por sí solo no protege las escrituras directas de SQL.
+No se permite cambiar brutos, autor, fecha ni colección
+de respuestas después del sello. El sello tampoco prueba estados anteriores
+a su primera instalación.
 
 ### Relaciones 5–7: perfiles de dos variantes cerradas
 
@@ -181,6 +195,32 @@ tipo INTERPRETACION; orden integer no negativo, predicado
 string(30), UNIQUE perfil+orden. Repeticiones y orden se
 conservan; no hay producto cartesiano con los selectores.
 
+### Relación 15: vínculo declarativo adquirido
+
+PK cod_vinculo_declarativo string(20); FK obligatoria
+cod_conocimiento_evaluacion a relación 1; FK obligatoria
+cod_mapeo_variable_fuente a mapeos_variables_fuente; FK obligatoria
+cod_instrumento a instrumentos. codigo_instrumento string(30),
+version_instrumento string(30), identificador_pregunta_declarado text
+y cod_pregunta string(20) NULL FK a preguntas_instrumento.
+campo string(30), cerrado a valor_logico/valor_texto;
+declara_componente boolean y componente string(30) NULL;
+declara_perfil_interpretativo boolean y cod_perfil_instrumental
+string(20) NULL FK a relación 5, tipo INTERPRETACION.
+UNIQUE conocimiento adquirido+mapeo. Los flags conservan exactamente
+la diferencia entre clave omitida y clave presente con NULL en el DTO.
+La pregunta inexistente conserva el identificador declarado y FK NULL;
+una pregunta existente exige que la FK corresponda a ese identificador
+y al instrumento. El perfil compartido se guarda una sola vez en 5–7
+y se referencia desde varios vínculos sin duplicar sus predicados.
+El mapeo y la relación 1 deben pertenecer a la misma versión, comprobado
+en la misma transacción; el vínculo de una sucesora usa el mapeo de esa
+sucesora, no un alias resuelto desde configuración actual. El escritor
+rechaza claves o tipos fuera del mapa cerrado de
+`ConstructorMemoriaInstrumental` y coteja cardinalidad, claves y valores
+reconstruidos con los vínculos de la instantánea V3 antes de confirmar.
+Una colección vacía se representa por cero filas, no por una fila nula.
+
 ## Prueba de suficiencia pendiente
 
 1. Proyectar un DTO sintético completo a estas relaciones en memoria,
@@ -196,16 +236,13 @@ conservan; no hay producto cartesiano con los selectores.
    respuesta insertada después de una consulta. Exigir que el escritor solo
    declare fiel el estado realmente adquirido y no presente ese estado como
    una vista temporal histórica que no puede reconstruirse.
-5. Antes del guardado, reconstruir desde conocimiento y originales sellados
-   cada vínculo observacional y compararlo con el mapa del DTO. Rechazar un
-   perfil interpretativo o vínculo no derivable. La comparación de 19 vínculos
-   en SQLite sintético ya pasó; falta probar mutaciones concurrentes y el
-   round-trip íntegro.
-6. Ensayar una relación específica de vínculo declarativo para G09
-   interpretativo con el mismo grano y restricciones de la relación 18 del
-   antecedente rechazado. Probar que cero/uno/múltiples vínculos, NULL,
-   perfiles compartidos y sucesión de versiones se reconstruyen sin consultar
-   configuración actual. No mezclar ese grano con entradas de perfil.
+5. Proyectar a la relación 15 todos los vínculos adquiridos, reconstruirlos
+   sin `ContratosConocimiento` ni configuración actual y comparar el mapa
+   exacto con el V3. La derivación sintética de los 19 vínculos observacionales
+   ya pasó, pero **no** prueba esta nueva proyección ni su round-trip.
+6. Probar cero/uno/múltiples vínculos, NULL frente a clave ausente,
+   perfiles compartidos y sucesión de versiones. No mezclar este grano
+   con entradas de perfil ni usar una configuración posterior para replay.
 7. Solo con esa evidencia convertir este ensayo en diccionario
    estructural final para aprobación específica de la propietaria.
 
