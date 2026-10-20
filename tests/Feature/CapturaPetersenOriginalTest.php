@@ -267,7 +267,6 @@ final class CapturaPetersenOriginalTest extends TestCase
     #[DataProviderExternal(PetersenInstitucionalTest::class, 'patrones')]
     public function test_caso_completo_se_clasifica_desde_mediciones_y_soportes_originales(array $alterados, string $patron): void
     {
-        $this->usuario->givePermissionTo(Permission::findOrCreate('controles_funcionales_iadl.ver', 'web'));
         $area = Area::create(['nombre' => 'Área de ensayo sintético', 'estado' => 'ACTIVA']);
         $atenciones = [];
         foreach (range(0, 9) as $i) {
@@ -364,8 +363,6 @@ final class CapturaPetersenOriginalTest extends TestCase
 
     public function test_rectificacion_iadl_respeta_el_corte_y_se_consulta_en_lote(): void
     {
-        Permission::findOrCreate('controles_funcionales_iadl.ver', 'web');
-        $this->usuario->givePermissionTo('controles_funcionales_iadl.ver');
         $comunes = ['cod_residente' => $this->residente->getKey(), 'cod_personal' => $this->usuario->personal->getKey(),
             'cod_usuario_registro' => $this->usuario->getKey(), 'fecha_hora' => '2026-10-15 09:00:00', 'registrado_en' => '2026-10-15 10:00:00',
             'oportunidad' => 'OBSERVADA', 'desempeno' => 'INDEPENDIENTE', 'tipo_ayuda' => 'NINGUNA', 'causa_ayuda' => 'NINGUNA',

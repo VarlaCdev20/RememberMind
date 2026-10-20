@@ -135,8 +135,9 @@ colección completa de soportes frente a INSERT directo**: la vía institucional
 es la Action atómica, no una escritura SQL manual.
 
 El acceso contextual `controles_funcionales_iadl.ver` de Medicina/Psicología
-continúa como [propuesta separada pendiente](PROPUESTA_LECTURA_IADL_PETERSEN_2026_10_19.md).
-No se concede por inferencia a partir de los tres permisos de Petersen.
+se [aprobó e instaló después de este incremento](PROPUESTA_LECTURA_IADL_PETERSEN_2026_10_19.md).
+La Policy mantiene la autorización por residente y competencia; los tres
+permisos de Petersen no sustituyen el permiso propio de la fuente IADL.
 
 ## Reproducción instrumental V3
 
@@ -246,8 +247,16 @@ php artisan db:seed --class=PermisosPetersenOriginalSeeder
 PostgreSQL y host loopback antes de aplicar únicamente esa migración y el seeder
 acotado. Ambos finalizaron correctamente en `remembermind_dev`. El catálogo
 contiene 108 entidades y no falta ninguna tabla. Medicina/Psicología tienen los
-tres permisos; Superadministración tiene solo lectura. Ninguno de esos tres
-roles recibió el permiso IADL pendiente.
+tres permisos; Superadministración tiene solo lectura. En ese primer corte
+ninguno de esos tres roles recibió el permiso IADL, todavía pendiente entonces.
+
+**Actualización posterior, 19/10/2026:** se ejecutó únicamente
+`PermisosLecturaIadlPetersenSeeder` en el PostgreSQL local `remembermind_dev`,
+tras confirmar entorno, motor, host y roles. La matriz comprobada concede
+`controles_funcionales_iadl.ver` a Medicina, Psicología y Superadministración;
+Enfermería, Gerencia y Administración permanecen sin ese permiso. La lectura
+continúa condicionada por la Policy del residente. No se crearon controles IADL
+ni valoraciones Petersen mediante el seeder.
 
 Las tablas nuevas están vacías tras la instalación: no se cargaron juicios
 clínicos sintéticos. La consulta backend con una cuenta activa de Psicología y
@@ -266,7 +275,7 @@ no acredita un patrón clínico del residente ni QA visual.
 - [x] Replay instrumental/declarativo V3 y artefacto de software verificable.
 - [x] Instalación acotada y consulta backend en PostgreSQL local verificadas.
 - [x] Verificaciones dinámicas del incremento consignadas, con suite global interrumpida explícita.
-- [ ] Decisión del permiso específico de lectura IADL.
+- [x] Decisión del permiso específico de lectura IADL y aprovisionamiento acotado.
 - [ ] Gobierno SQL del contrato Petersen.
 - [ ] Conservación relacional completa y vínculo evaluación → release de fase 6.
 - [ ] QA visual y recorrido completo de revisión de fases 7–8.

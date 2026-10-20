@@ -25,6 +25,13 @@ related_modules: []
 
 ## Modelo funcional
 
+**Lectura IADL para Petersen — decisión expresa 19/10/2026:** Medicina y
+Psicología reciben `controles_funcionales_iadl.ver` para los residentes de su
+alcance; Superadministración conserva consulta técnica. La Policy exige cuenta
+activa, permiso y competencia profesional donde corresponde. No concede
+escritura IADL ni acredita C03 sin valoración original y soportes aptos.
+[Decisión y despliegue](../sistema-experto/PROPUESTA_LECTURA_IADL_PETERSEN_2026_10_19.md).
+
 **Petersen original — decisión expresa 19/10/2026:** Medicina/Psicología
 registran y corrigen solo sus cadenas con `valoraciones_petersen.ver`, `.crear`
 y `.rectificar`; Superadministración consulta con `.ver`. No se concede acceso

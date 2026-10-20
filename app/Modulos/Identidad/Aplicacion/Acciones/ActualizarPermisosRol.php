@@ -21,8 +21,12 @@ final class ActualizarPermisosRol
             'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar'];
         abort_if($seleccion->whereIn('name', $permisosExpertosReservados)->isNotEmpty()
             && ! in_array($rol->name, ['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A'], true), 403);
+        abort_if($seleccion->contains('name', 'controles_funcionales_iadl.ver')
+            && ! in_array($rol->name, ['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'SUPERADMINISTRADOR'], true), 403);
+        $permisosSuperadminExcluidos = [...$permisosExpertosReservados,
+            'fotografias_institucionales.gestionar', 'aplicaciones_instrumento.transcribir'];
         $rol->syncPermissions($rol->name === 'SUPERADMINISTRADOR'
-            ? Permission::query()->where('guard_name', $rol->guard_name)->whereNotIn('name', $permisosExpertosReservados)->get()
+            ? Permission::query()->where('guard_name', $rol->guard_name)->whereNotIn('name', $permisosSuperadminExcluidos)->get()
             : $seleccion);
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 

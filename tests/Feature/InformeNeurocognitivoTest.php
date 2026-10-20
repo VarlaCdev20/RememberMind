@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Models\ControlCognitivo;
 use App\Models\ControlFuncionalIadl;
+use App\Models\EvaluacionExperta;
 use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\User;
@@ -20,12 +21,12 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Livewire;
 use MotorExperto\dominio\orion\Services\Dcl\ClasificadorPetersenService;
 use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum as C;
 use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum as D;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\Support\InformeCognitivoFixture as F;
 use Tests\TestCase;
@@ -72,13 +73,6 @@ final class InformeNeurocognitivoTest extends TestCase
             'oportunidad' => 'OBSERVADA', 'desempeno' => 'CON_APOYO', 'tipo_ayuda' => 'SUSTITUCION',
             'causa_ayuda' => 'INSTITUCIONAL', 'nivel_previo' => 'DESCONOCIDO', 'fuente' => 'EQUIPO_CUIDADOS',
             'estado' => 'REGISTRADO'], $cambios));
-    }
-
-    private function permitirIadl(): void
-    {
-        // Permiso exclusivo de esta fixture: la tarea no instala ni concede permisos en la base local.
-        Permission::findOrCreate('controles_funcionales_iadl.ver', 'web');
-        $this->medico->givePermissionTo('controles_funcionales_iadl.ver');
     }
 
     public function test_estado_vacio_explica_faltantes_sin_inventar_normalidad(): void
@@ -138,6 +132,7 @@ final class InformeNeurocognitivoTest extends TestCase
 
     public function test_iadl_requiere_permiso_especifico_y_no_consulta_filas_sin_el(): void
     {
+        Role::findByName('MEDICO GENERAL/GERIATRA', 'web')->revokePermissionTo('controles_funcionales_iadl.ver');
         $this->iadl(['observacion' => 'Contenido funcional reservado']);
         $consultas = [];
         DB::listen(static function ($q) use (&$consultas): void {
@@ -150,9 +145,32 @@ final class InformeNeurocognitivoTest extends TestCase
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])->assertDontSee('Contenido funcional reservado');
     }
 
+    public function test_iadl_aplica_competencia_profesional_y_no_se_abre_por_un_permiso_aislado(): void
+    {
+        self::assertTrue(Gate::forUser($this->medico)->allows('consultarFuncionalidad', [EvaluacionExperta::class, $this->residente]));
+
+        $psicologia = User::factory()->create(['estado' => 'ACTIVO']);
+        $psicologia->assignRole('PSICOLOGO/A');
+        Personal::create(['cod_usuario' => $psicologia->getKey(), 'nombres' => 'Profesional',
+            'apellido_paterno' => 'Psicología', 'numero_documento' => 'IADL-PSI-TEST',
+            'profesion' => 'PSICOLOGIA', 'estado' => 'ACTIVO']);
+        self::assertTrue(Gate::forUser($psicologia)->allows('consultarFuncionalidad', [EvaluacionExperta::class, $this->residente]));
+
+        $superadministracion = User::factory()->create(['estado' => 'ACTIVO']);
+        $superadministracion->assignRole('SUPERADMINISTRADOR');
+        self::assertTrue(Gate::forUser($superadministracion)->allows('consultarFuncionalidad', [EvaluacionExperta::class, $this->residente]));
+
+        $enfermeria = User::factory()->create(['estado' => 'ACTIVO']);
+        $enfermeria->assignRole('ENFERMEROS');
+        $enfermeria->givePermissionTo('controles_funcionales_iadl.ver');
+        self::assertFalse(Gate::forUser($enfermeria)->allows('consultarFuncionalidad', [EvaluacionExperta::class, $this->residente]));
+
+        $this->personal->update(['profesion' => 'PSICOLOGIA']);
+        self::assertFalse(Gate::forUser($this->medico->fresh())->allows('consultarFuncionalidad', [EvaluacionExperta::class, $this->residente]));
+    }
+
     public function test_iadl_describe_ayuda_institucional_sin_acreditar_independencia(): void
     {
-        $this->permitirIadl();
         $this->iadl();
         $n = $this->informe();
         self::assertCount(1, $n['autonomia']['actividades']);
@@ -164,7 +182,6 @@ final class InformeNeurocognitivoTest extends TestCase
 
     public function test_iadl_rectificacion_futuro_ajenos_y_lotes_no_alteran_sintesis(): void
     {
-        $this->permitirIadl();
         $original = $this->iadl(['observacion' => 'Original rectificado']);
         $this->iadl(['cod_control_anterior' => $original->getKey(), 'estado' => 'RECTIFICACION', 'observacion' => 'Corrección vigente',
             'fecha_hora' => now()->subHour(), 'registrado_en' => now()->subMinute()]);
@@ -180,7 +197,6 @@ final class InformeNeurocognitivoTest extends TestCase
 
     public function test_iadl_posterior_no_completa_una_evaluacion_historica(): void
     {
-        $this->permitirIadl();
         F::evaluacion($this->residente, $this->personal, 'HIST');
         $antes = $this->informe();
         $this->iadl(['fecha_hora' => now()->subMinute(), 'observacion' => 'Observación funcional posterior']);
@@ -191,7 +207,6 @@ final class InformeNeurocognitivoTest extends TestCase
 
     public function test_iadl_simultanea_discrepante_conserva_ambas_descripciones_sin_elegir_por_pk(): void
     {
-        $this->permitirIadl();
         $this->iadl(['tipo_ayuda' => 'RECORDATORIO', 'causa_ayuda' => 'COGNITIVA', 'observacion' => 'Descripción A']);
         $this->iadl(['tipo_ayuda' => 'SUSTITUCION', 'causa_ayuda' => 'COGNITIVA', 'nivel_previo' => 'INDEPENDIENTE', 'observacion' => 'Descripción B']);
         $a = $this->informe()['autonomia']['actividades'][0];
@@ -204,7 +219,6 @@ final class InformeNeurocognitivoTest extends TestCase
 
     public function test_captura_iadl_al_corte_conserva_originales_y_rectificaciones_sin_escoger_solo_la_ultima(): void
     {
-        $this->permitirIadl();
         $original = $this->iadl(['registrado_en' => now()->subDays(2), 'fecha_hora' => now()->subDays(2)]);
         $corte = CarbonImmutable::now()->subDay();
         $servicio = app(ConsultarAutonomiaDescriptiva::class);
@@ -225,6 +239,8 @@ final class InformeNeurocognitivoTest extends TestCase
 
     public function test_captura_iadl_no_lee_datos_sin_permiso_y_revalida_la_cuenta_obsoleta(): void
     {
+        $rol = Role::findByName('MEDICO GENERAL/GERIATRA', 'web');
+        $rol->revokePermissionTo('controles_funcionales_iadl.ver');
         $this->iadl();
         $consultasIadl = 0;
         DB::listen(static function ($q) use (&$consultasIadl): void {
@@ -235,7 +251,7 @@ final class InformeNeurocognitivoTest extends TestCase
         $r = app(ConsultarAutonomiaDescriptiva::class)->capturar($this->medico, $this->residente, CarbonImmutable::now());
         self::assertFalse($r['disponible']);
         self::assertSame(0, $consultasIadl);
-        $this->permitirIadl();
+        $rol->givePermissionTo('controles_funcionales_iadl.ver');
         DB::table('usuarios')->where('cod_usuario', $this->medico->getKey())->update(['estado' => 'INACTIVO']);
         $this->expectException(AuthorizationException::class);
         app(ConsultarAutonomiaDescriptiva::class)->capturar($this->medico, $this->residente, CarbonImmutable::now());

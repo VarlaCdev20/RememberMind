@@ -19,6 +19,16 @@ class RolesBaselineCongeladoTest extends TestCase
 {
     use RefreshDatabase;
 
+    private const PERMISOS_EXCLUIDOS_SUPERADMIN = [
+        'fotografias_institucionales.gestionar',
+        'evaluaciones_expertas.ejecutar_observaciones',
+        'reglas_expertas.gestionar',
+        'reglas_expertas.revisar',
+        'aplicaciones_instrumento.transcribir',
+        'valoraciones_petersen.crear',
+        'valoraciones_petersen.rectificar',
+    ];
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -52,9 +62,12 @@ class RolesBaselineCongeladoTest extends TestCase
         $this->assertTrue($user->can('admisiones.formalizar'));
         $this->assertTrue(app(PrescripcionPolicy::class)->create($user));
         $this->assertEqualsCanonicalizing(
-            Permission::query()->where('guard_name', 'web')->whereNotIn('name', ['fotografias_institucionales.gestionar', 'evaluaciones_expertas.ejecutar_observaciones', 'reglas_expertas.gestionar', 'reglas_expertas.revisar'])->pluck('name')->all(),
+            Permission::query()->where('guard_name', 'web')->whereNotIn('name', self::PERMISOS_EXCLUIDOS_SUPERADMIN)->pluck('name')->all(),
             $user->getAllPermissions()->pluck('name')->all()
         );
+        $this->assertTrue($user->can('controles_funcionales_iadl.ver'));
+        $this->assertFalse($user->can('valoraciones_petersen.crear'));
+        $this->assertFalse($user->can('valoraciones_petersen.rectificar'));
         $this->assertFalse($user->can('fotografias_institucionales.gestionar'));
         // Decisión explícita de la propietaria: el guardado observacional pertenece solo a Medicina/Psicología.
         $this->assertFalse($user->can('evaluaciones_expertas.ejecutar_observaciones'));
@@ -85,12 +98,13 @@ class RolesBaselineCongeladoTest extends TestCase
             ->call('guardarPermisos');
 
         $this->assertSame(
-            Permission::query()->where('guard_name', 'web')->whereNotIn('name', ['evaluaciones_expertas.ejecutar_observaciones', 'reglas_expertas.gestionar', 'reglas_expertas.revisar'])->count(),
+            Permission::query()->where('guard_name', 'web')->whereNotIn('name', self::PERMISOS_EXCLUIDOS_SUPERADMIN)->count(),
             $rol->fresh()->permissions()->count()
         );
         $this->assertFalse($rol->fresh()->hasPermissionTo('evaluaciones_expertas.ejecutar_observaciones'));
         $this->assertFalse($rol->fresh()->hasPermissionTo('reglas_expertas.gestionar'));
         $this->assertFalse($rol->fresh()->hasPermissionTo('reglas_expertas.revisar'));
+        $this->assertTrue($rol->fresh()->hasPermissionTo('controles_funcionales_iadl.ver'));
     }
 
     public function test_crear_el_permiso_observacional_no_lo_concede_automaticamente_a_superadministracion(): void
@@ -116,6 +130,22 @@ class RolesBaselineCongeladoTest extends TestCase
         } catch (HttpException $e) {
             $this->assertSame(403, $e->getStatusCode());
         }
+        $this->assertEqualsCanonicalizing($antes, $rol->fresh()->permissions()->pluck('name')->all());
+    }
+
+    public function test_editor_no_concede_lectura_iadl_a_enfermeria(): void
+    {
+        $actor = $this->usuarioConRol('SUPERADMINISTRADOR');
+        $rol = Role::findByName('ENFERMEROS', 'web');
+        $antes = $rol->permissions()->pluck('name')->all();
+
+        try {
+            app(ActualizarPermisosRol::class)->guardar($actor, $rol, [...$antes, 'controles_funcionales_iadl.ver']);
+            $this->fail('Se concedió la fuente IADL a un rol fuera del contrato aprobado.');
+        } catch (HttpException $e) {
+            $this->assertSame(403, $e->getStatusCode());
+        }
+
         $this->assertEqualsCanonicalizing($antes, $rol->fresh()->permissions()->pluck('name')->all());
     }
 
