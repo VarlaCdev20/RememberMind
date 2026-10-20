@@ -1,26 +1,26 @@
 <div class="space-y-6">
  <section class="overflow-hidden rounded-[1.6rem] border border-borde/65 bg-fondo-panel shadow-sm backdrop-blur-xl">
- <div class="h-1.5 w-full bg-gradient-to-r from-[#E27D60] via-[var(--rm-warning)] to-[#8DA280]"></div>
+ <div class="h-1.5 w-full bg-[var(--rm-action-primary)]"></div>
  <div class="grid gap-4 p-5 lg:grid-cols-[1fr_auto] lg:items-end">
  <div>
- <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-boton-acento">Monitoreo preventivo</span>
- <h2 class="mt-1 text-xl font-extrabold tracking-tight text-parrafo">Alertas de salud</h2>
+ <span class="text-[11px] font-bold uppercase tracking-[0.2em] text-boton-acento">Consulta de registros</span>
+ <h2 class="mt-1 text-xl font-extrabold tracking-tight text-parrafo">Avisos de seguimiento</h2>
  <p class="mt-1 max-w-2xl text-xs font-bold leading-relaxed text-parrafo/62">
- Priorización cálida de registros pendientes, controles fuera de rango y seguimiento funcional.
+ Avisos calculados a partir de los registros que puedes consultar. Abre el proceso correspondiente para revisar cada caso; estos avisos no sustituyen las alertas registradas.
  </p>
  </div>
 
  <div class="grid grid-cols-3 gap-2 sm:min-w-[360px]">
  <div class="rounded-2xl border border-borde/45 bg-fondo-panel p-3 text-center">
- <p class="text-[8px] font-black uppercase tracking-wider text-parrafo/45">Total</p>
+ <p class="text-[11px] font-black uppercase tracking-wider text-parrafo/45">Total</p>
  <p class="mt-1 text-xl font-extrabold text-parrafo">{{ $conteos['total'] ?? count($alertas) }}</p>
  </div>
  <div class="rounded-2xl border border-borde-focus bg-estado-peligroBg p-3 text-center">
- <p class="text-[8px] font-black uppercase tracking-wider text-parrafo/45">Críticas</p>
+ <p class="text-[11px] font-black uppercase tracking-wider text-parrafo/45">Críticas</p>
  <p class="mt-1 text-xl font-extrabold text-boton-acento">{{ $conteos['criticas'] ?? 0 }}</p>
  </div>
  <div class="rounded-2xl border border-estado-advertenciaBorde bg-estado-advertenciaBg p-3 text-center">
- <p class="text-[8px] font-black uppercase tracking-wider text-parrafo/45">Preventivas</p>
+ <p class="text-[11px] font-black uppercase tracking-wider text-parrafo/45">Preventivas</p>
  <p class="mt-1 text-xl font-extrabold text-parrafo">{{ $conteos['preventivas'] ?? 0 }}</p>
  </div>
  </div>
@@ -31,14 +31,14 @@
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
             {{-- Filtro Tipo de alerta --}}
             <div class="lg:col-span-6">
-                <select wire:model.live="filtroTipo"
-                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
-                    <option value="">Todos los tipos de alerta</option>
+                <label for="avisos-tipo" class="rm-label">Tipo de aviso</label>
+                <x-ui.selector id="avisos-tipo" label="Tipo de aviso" wire:model.live="filtroTipo" teleport="body">
+                    <option value="">Todos los tipos de aviso</option>
                     <option value="Ficha Médica">Ficha médica</option>
                     <option value="Medicación">Medicación</option>
-                    <option value="Signos Vitales">Signos vitales</option>
+
                     <option value="Valoración">Valoración funcional</option>
-                </select>
+                </x-ui.selector>
             </div>
         </div>
 
@@ -85,13 +85,13 @@
  </span>
  <div class="min-w-0 flex-1">
  <div class="flex flex-wrap items-center gap-2">
- <span class="rounded-full bg-fondo-panel px-2.5 py-1 text-[8px] font-black uppercase tracking-wider text-apoyo">{{ $tipo }}</span>
- <span class="rounded-full px-2.5 py-1 text-[8px] font-black uppercase tracking-wider {{ $panel['iconBg'] }} {{ $panel['text'] }}">{{ $panel['badge'] }}</span>
+ <span class="rounded-full bg-fondo-panel px-2.5 py-1 text-[11px] font-black uppercase tracking-wider text-apoyo">{{ $tipo }}</span>
+ <span class="rounded-full px-2.5 py-1 text-[11px] font-black uppercase tracking-wider {{ $panel['iconBg'] }} {{ $panel['text'] }}">{{ $panel['badge'] }}</span>
  </div>
  <h3 class="mt-2 truncate text-base font-extrabold text-parrafo">
  {{ $alerta['adulto']->nombres }} {{ $alerta['adulto']->ap_paterno }}
  </h3>
- <p class="mt-0.5 text-[10px] font-bold uppercase tracking-wider text-parrafo/42">{{ $alerta['adulto']->edad ?? 'Edad no registrada' }}{{ $alerta['adulto']->edad ? ' años' : '' }}</p>
+ <p class="mt-0.5 text-[11px] font-bold uppercase tracking-wider text-parrafo/42">{{ $alerta['adulto']->edad ?? 'Edad no registrada' }}{{ $alerta['adulto']->edad ? ' años' : '' }}</p>
  </div>
  </div>
 
@@ -101,7 +101,7 @@
  <p class="text-[9px] font-bold uppercase tracking-widestá text-parrafo/45">Acción sugerida</p>
  <p class="mt-1 text-xs font-bold uppercase text-parrafo">{{ $alerta['accion'] }}</p>
  </div>
- <a href="{{ $alerta['ruta'] }}" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-boton-principal px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider text-inverso shadow-[0_8px_18px_rgba(47,62,92,0.18)] transition hover:bg-fondo-panel active:scale-95">
+ <a href="{{ $alerta['ruta'] }}" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-boton-principal px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-inverso shadow-[0_8px_18px_rgba(47,62,92,0.18)] transition hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold ph-arrow-right"></i>
  Atender alerta
  </a>

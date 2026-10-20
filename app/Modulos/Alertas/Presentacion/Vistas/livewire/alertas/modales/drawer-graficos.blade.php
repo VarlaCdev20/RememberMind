@@ -11,7 +11,7 @@
     $spo2Data = $puntos->map(fn($s) => $s->saturacion !== null ? (float)$s->saturacion : null)->values()->toArray();
     $tempData = $puntos->map(fn($s) => $s->temperatura !== null ? (float)$s->temperatura : null)->values()->toArray();
 
-    $alergiasTexto = collect($adultoDrawer->alergias ?? [])
+    $alergiasTexto = collect($adultoDrawer->getRelation('alergias') ?? [])
         ->map(function ($alergia) {
             if (is_string($alergia)) {
                 return trim($alergia);
@@ -23,7 +23,7 @@
         ->filter()
         ->implode(', ');
 
-    $diagnosticosTexto = collect($adultoDrawer->diagnosticos ?? [])
+    $diagnosticosTexto = collect($adultoDrawer->getRelation('diagnosticos') ?? [])
         ->map(fn($diagnostico) => trim((string) ($diagnostico->diagnostico ?? $diagnostico->nombre ?? $diagnostico->descripcion ?? '')))
         ->filter()
         ->implode(', ');
@@ -344,18 +344,18 @@
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-[var(--rm-text-secondary)]">Nivel de cuidado:</span>
-                        <span class="text-[var(--rm-text-primary)] font-medium">{{ $adultoDrawer->planCuidadoActivo?->nivel_cuidado ?: 'Sin nivel registrado' }}</span>
+                        <span class="text-[var(--rm-text-primary)] font-medium">{{ auth()->user()->can('planes_cuidado.ver') ? ($adultoDrawer->planCuidadoActivo?->nivel_cuidado ?: 'Sin nivel registrado') : 'Consulta no autorizada' }}</span>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-[var(--rm-text-secondary)]">Diagnóstico ppal:</span>
-                        <span class="text-[var(--rm-text-primary)] font-semibold truncate max-w-[170px]" title="{{ $diagnosticosTexto ?: 'Sin diagnóstico principal' }}">
-                            {{ $diagnosticosTexto ?: 'Sin diagnóstico principal' }}
+                        <span class="text-[var(--rm-text-primary)] font-semibold truncate max-w-[170px]" title="{{ auth()->user()->can('diagnosticos.ver') ? ($diagnosticosTexto ?: 'Sin diagnóstico principal') : 'Consulta no autorizada' }}">
+                            {{ auth()->user()->can('diagnosticos.ver') ? ($diagnosticosTexto ?: 'Sin diagnóstico principal') : 'Consulta no autorizada' }}
                         </span>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-[var(--rm-text-secondary)]">Alergias:</span>
-                        <span class="text-[var(--rm-danger)] font-bold truncate max-w-[170px]" title="{{ $alergiasTexto ?: 'Sin alergias' }}">
-                            {{ $alergiasTexto ?: 'Sin alergias conocidas' }}
+                        <span class="text-[var(--rm-danger)] font-bold truncate max-w-[170px]" title="{{ auth()->user()->can('alergias.ver') ? ($alergiasTexto ?: 'Sin alergias registradas') : 'Consulta no autorizada' }}">
+                            {{ auth()->user()->can('alergias.ver') ? ($alergiasTexto ?: 'Sin alergias registradas') : 'Consulta no autorizada' }}
                         </span>
                     </div>
                 </div>

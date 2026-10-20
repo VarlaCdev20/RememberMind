@@ -24,7 +24,7 @@
     $drawerId = 'drawer-'.\Illuminate\Support\Str::slug((string) ($attributes->wire('model')->value() ?: $title));
 @endphp
 
-<div x-data="{ show: @entangle($attributes->wire('model')) }" x-show="show" x-trap.noscroll="show" x-cloak
+<div id="{{ $drawerId }}-shell" x-data="{ show: @entangle($attributes->wire('model')) }" x-show="show" x-trap.noscroll="show" x-cloak
      :class="{ 'is-open': show }" x-on:keydown.escape.window="if (show && @js($dismissOnEscape)) { $event.stopPropagation(); {{ $alpineClose ?: '$wire.'.$closeMethod.'()' }} }" class="rm-drawer-shell fixed inset-0 overflow-hidden font-sans {{ $attributes->get('class') }}">
     {{-- Backdrop estándar del Design System --}}
     <div class="rm-drawer-backdrop" @if($dismissOnBackdrop) @click="{{ $alpineClose ?: '$wire.'.$closeMethod.'()' }}" @endif aria-hidden="true"></div>

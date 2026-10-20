@@ -3,14 +3,20 @@
 namespace Tests\Feature;
 
 use App\Models\Alerta;
+use App\Models\Area;
+use App\Models\AsignacionPersonal;
+use App\Models\AsignacionResidenteJornada;
 use App\Models\EventoAlerta;
+use App\Models\Jornada;
 use App\Models\Residente;
 use App\Models\SignoVital;
+use App\Models\Turno;
 use App\Models\User;
 use App\Modulos\Alertas\Aplicacion\Acciones\DeteccionAlertasService;
 use App\Modulos\Alertas\Aplicacion\Acciones\GestionarAtencionAlerta;
 use App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades\CampanaNotificaciones;
 use App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPanel;
+use Carbon\Carbon;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -22,18 +28,28 @@ class AlertasFlujoTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function preparar(array $permisos): array
+    private function preparar(array $permisos, bool $clinico = false): array
     {
         $this->seed(RolesAndPermissionsSeeder::class);
         $user = User::factory()->create(['nombres' => 'Ana', 'ap_paterno' => 'Profesional']);
-        $user->assignRole('ADMINISTRADOR');
+        $user->assignRole($clinico ? 'ENFERMEROS' : 'ADMINISTRADOR');
         $user->roles->each(fn ($role) => $role->syncPermissions([]));
         foreach ($permisos as $p) {
             $user->givePermissionTo(Permission::findOrCreate($p, 'web'));
         }
         $this->actingAs($user);
 
-        return [$user, Residente::factory()->create(['cod_est_adul' => 'EST_001'])];
+        $residente = Residente::factory()->create(['cod_est_adul' => 'EST_001']);
+        if ($clinico) {
+            $this->travelTo(Carbon::parse('2026-10-20 10:00:00'));
+            $area = Area::create(['nombre' => 'Enfermería sintética', 'estado' => 'ACTIVA']);
+            $turno = Turno::create(['nombre' => 'Turno sintético', 'hora_inicio' => '07:00:00', 'hora_cierre' => '15:00:00', 'estado' => 'ACTIVO', 'orden' => 1]);
+            $jornada = Jornada::create(['cod_turno' => $turno->getKey(), 'fecha_jornada' => today(), 'estado' => 'ABIERTA']);
+            AsignacionPersonal::create(['cod_personal' => $user->personal->getKey(), 'cod_area' => $area->getKey(), 'cod_jornada' => $jornada->getKey(), 'tipo_asignacion' => 'RESPONSABLE', 'fecha_asignacion' => now(), 'estado' => 'ACTIVA']);
+            AsignacionResidenteJornada::create(['cod_residente' => $residente->getKey(), 'cod_personal' => $user->personal->getKey(), 'cod_jornada' => $jornada->getKey(), 'nivel_supervision' => 'DIRECTA', 'fecha_hora' => now(), 'estado' => 'ACTIVA']);
+        }
+
+        return [$user, $residente];
     }
 
     public function test_referencias_internas_no_son_texto_visible_y_se_conservan_en_la_historia(): void
@@ -72,14 +88,14 @@ class AlertasFlujoTest extends TestCase
 
     public function test_registrar_asignar_atender_agregar_accion_cerrar_y_consultar_historial(): void
     {
-        [$user, $adulto] = $this->preparar(['alertas.ver', 'alertas.gestionar']);
+        [$user, $adulto] = $this->preparar(['alertas.ver', 'alertas.gestionar'], true);
         $this->get(route('admin.enfermeria.alertas'))->assertOk()->assertSee('Detectar pendientes');
         $panel = Livewire::test(AlertasPanel::class)->call('abrirCrear')
             ->set('codResidente', $adulto->cod_residente)->set('tipoAlerta', 'Revisión requerida')
             ->set('motivo', 'Se solicita seguimiento del residente.')->call('guardarAlerta')->assertHasNoErrors();
         $alerta = Alerta::sole();
         $this->get(route('admin.enfermeria.alertas', ['adulto' => $adulto->cod_residente, 'alerta' => $alerta->cod_alerta]))
-            ->assertOk()->assertSee('Detalle de la alerta');
+            ->assertOk()->assertSee('Alerta registrada');
         $panel->call('verDetalle', $alerta->cod_alerta)->set('responsableId', $user->cod_usuario)
             ->call('asignarResponsable')->assertHasNoErrors()
             ->call('atenderAlerta', $alerta->cod_alerta)->set('accionTomada', 'Se inicia revisión presencial.')
@@ -113,7 +129,7 @@ class AlertasFlujoTest extends TestCase
 
     public function test_primera_nota_abierta_registra_intervencion_y_el_cierre_exige_resultado(): void
     {
-        [, $residente] = $this->preparar(['alertas.ver', 'alertas.seguimiento', 'alertas.cerrar']);
+        [, $residente] = $this->preparar(['alertas.ver', 'alertas.seguimiento', 'alertas.cerrar'], true);
         $alerta = Alerta::create([
             'cod_residente' => $residente->cod_residente,
             'modulo' => 'SIGNOS',
@@ -123,9 +139,10 @@ class AlertasFlujoTest extends TestCase
         ]);
 
         $panel = Livewire::test(AlertasPanel::class)->call('verDetalle', $alerta->cod_alerta)
-            ->assertSee('La alerta todavía no tiene una intervención registrada.')
-            ->set('accion', 'Se realizó revisión presencial y nueva toma.')
-            ->call('guardarAccion')->assertHasNoErrors();
+            ->assertSee('Registrar intervención')
+            ->call('atenderAlerta', $alerta->cod_alerta)
+            ->set('accionTomada', 'Se realizó revisión presencial y nueva toma.')
+            ->call('guardarAtencion')->assertHasNoErrors();
         $this->assertSame('EN_ATENCION', $alerta->fresh()->estado);
         $this->assertDatabaseHas('eventos_alerta', [
             'cod_alerta' => $alerta->cod_alerta,
@@ -276,7 +293,7 @@ class AlertasFlujoTest extends TestCase
 
     public function test_drawers_de_graficos_y_ubicacion_no_modifican_datos(): void
     {
-        [, $adulto] = $this->preparar(['alertas.ver']);
+        [, $adulto] = $this->preparar(['alertas.ver', 'signos_vitales.ver'], true);
         $nombreOriginal = $adulto->nombres;
         $estadoOriginal = $adulto->cod_est_adul;
 
@@ -297,7 +314,7 @@ class AlertasFlujoTest extends TestCase
 
     public function test_campana_conserva_atencion_cierre_e_historial(): void
     {
-        [$usuario, $residente] = $this->preparar(['alertas.ver', 'alertas.seguimiento', 'alertas.cerrar']);
+        [$usuario, $residente] = $this->preparar(['alertas.ver', 'alertas.seguimiento', 'alertas.cerrar'], true);
         $alerta = Alerta::create(['cod_residente' => $residente->cod_residente, 'modulo' => 'MANUAL', 'tipo' => 'Seguimiento sintético', 'descripcion' => 'Revisión sintética', 'estado' => 'ABIERTA']);
         Livewire::test(CampanaNotificaciones::class)
             ->call('atenderAlerta', $alerta->cod_alerta, 'Atención sintética')
@@ -305,7 +322,7 @@ class AlertasFlujoTest extends TestCase
             ->call('cerrarAlerta', $alerta->cod_alerta, 'Cierre sintético')
             ->assertDispatched('alerta-cerrada');
         $this->assertSame('CERRADA', $alerta->fresh()->estado);
-        $this->assertSame(['INTERVENCION', 'CIERRE'], $alerta->eventos()->orderBy('created_at')->pluck('tipo_evento')->all());
+        $this->assertSame(['INTERVENCION', 'CIERRE'], $alerta->eventos()->orderBy('fecha_hora')->orderBy('cod_evento_alerta')->pluck('tipo_evento')->all());
         $this->assertSame([$usuario->cod_usuario], $alerta->eventos()->pluck('cod_usuario')->unique()->values()->all());
         try {
             app(GestionarAtencionAlerta::class)->cerrarAlerta($usuario, $alerta->cod_alerta, 'Reintento');
@@ -332,7 +349,7 @@ class AlertasFlujoTest extends TestCase
 
     public function test_campana_revierte_estado_si_falla_el_evento(): void
     {
-        [$usuario, $residente] = $this->preparar(['alertas.seguimiento']);
+        [$usuario, $residente] = $this->preparar(['alertas.seguimiento'], true);
         $alerta = Alerta::create(['cod_residente' => $residente->cod_residente, 'modulo' => 'MANUAL', 'tipo' => 'Seguimiento sintético', 'descripcion' => 'Revisión sintética', 'estado' => 'ABIERTA']);
         EventoAlerta::creating(fn () => throw new \RuntimeException('Fallo sintético de historial'));
         try {
@@ -348,36 +365,45 @@ class AlertasFlujoTest extends TestCase
     public function test_critica_antigua_aparece_antes_de_bajas_nuevas_y_fuera_del_filtro(): void
     {
         [, $residente] = $this->preparar(['alertas.ver']);
-        $critica = Alerta::create(['cod_residente'=>$residente->cod_residente,'modulo'=>'MANUAL','tipo'=>'Crítica sintética','descripcion'=>'Revisión prioritaria de prueba','estado'=>'EN_ATENCION','prioridad'=>'CRITICA','fecha_hora'=>now()->subDays(2)]);
-        for ($i=0;$i<18;$i++) { Alerta::create(['cod_residente'=>$residente->cod_residente,'modulo'=>'MANUAL','tipo'=>'Baja sintética '.$i,'descripcion'=>'Aviso de prueba','estado'=>'ABIERTA','prioridad'=>'BAJO','fecha_hora'=>now()]); }
-        Livewire::test(AlertasPanel::class)->set('filtroEstado','')->assertViewHas('alertas',fn($items)=>$items->first()->getKey()===$critica->getKey())
-            ->set('filtroEstado','CERRADA')->assertViewHas('prioritarias',fn($items)=>$items->contains('cod_alerta',$critica->cod_alerta));
+        $critica = Alerta::create(['cod_residente' => $residente->cod_residente, 'modulo' => 'MANUAL', 'tipo' => 'Crítica sintética', 'descripcion' => 'Revisión prioritaria de prueba', 'estado' => 'EN_ATENCION', 'prioridad' => 'CRITICA', 'fecha_hora' => now()->subDays(2)]);
+        for ($i = 0; $i < 18; $i++) {
+            Alerta::create(['cod_residente' => $residente->cod_residente, 'modulo' => 'MANUAL', 'tipo' => 'Baja sintética '.$i, 'descripcion' => 'Aviso de prueba', 'estado' => 'ABIERTA', 'prioridad' => 'BAJO', 'fecha_hora' => now()]);
+        }
+        Livewire::test(AlertasPanel::class)->set('filtroEstado', '')->assertViewHas('alertas', fn ($items) => $items->first()->getKey() === $critica->getKey())
+            ->set('filtroEstado', 'CERRADA')->assertViewHas('prioritarias', fn ($items) => $items->contains('cod_alerta', $critica->cod_alerta));
     }
 
     public function test_primera_novedad_desde_lista_vacia_y_varias_alertas_se_anuncian_agrupadas(): void
     {
         [, $residente] = $this->preparar(['alertas.ver']);
         $campana = Livewire::test(CampanaNotificaciones::class)->assertNotDispatched('alerta-nueva');
-        foreach (['BAJO','CRITICO'] as $nivel) { Alerta::create(['cod_residente'=>$residente->cod_residente,'modulo'=>'MANUAL','tipo'=>'Revisión sintética','descripcion'=>'Aviso de prueba','estado'=>'ABIERTA','prioridad'=>$nivel,'fecha_hora'=>now()]); }
-        $campana->call('verificarAlertas')->assertSet('conteoAbiertas',2)->assertDispatched('alerta-nueva',fn($name,$params)=>$params[0]['nivel']==='CRITICO' && str_contains($params[0]['titulo'],'2 aviso'));
-        $campana->call('verificarAlertas')->assertCount('alertaIdsConocidos',2)->assertNotDispatched('alerta-nueva');
+        foreach (['BAJO', 'CRITICO'] as $nivel) {
+            Alerta::create(['cod_residente' => $residente->cod_residente, 'modulo' => 'MANUAL', 'tipo' => 'Revisión sintética', 'descripcion' => 'Aviso de prueba', 'estado' => 'ABIERTA', 'prioridad' => $nivel, 'fecha_hora' => now()]);
+        }
+        $campana->call('verificarAlertas')->assertSet('conteoAbiertas', 2)->assertDispatched('alerta-nueva', fn ($name, $params) => $params[0]['nivel'] === 'CRITICO' && str_contains($params[0]['titulo'], '2 aviso'));
+        $campana->call('verificarAlertas')->assertCount('alertaIdsConocidos', 2)->assertNotDispatched('alerta-nueva');
     }
 
     public function test_campana_no_expone_residentes_a_familiar_con_permiso_generico(): void
     {
-        [$usuario,$residente] = $this->preparar(['alertas.ver','administraciones_medicacion.ver']);
+        [$usuario,$residente] = $this->preparar(['alertas.ver', 'administraciones_medicacion.ver']);
         $usuario->syncRoles(['FAMILIAR']);
-        Alerta::create(['cod_residente'=>$residente->cod_residente,'modulo'=>'MANUAL','tipo'=>'Aviso reservado de prueba','descripcion'=>'No debe verse','estado'=>'ABIERTA','prioridad'=>'CRITICO']);
-        Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAbiertas',0)->assertDontSee('Aviso reservado de prueba');
+        Alerta::create(['cod_residente' => $residente->cod_residente, 'modulo' => 'MANUAL', 'tipo' => 'Aviso reservado de prueba', 'descripcion' => 'No debe verse', 'estado' => 'ABIERTA', 'prioridad' => 'CRITICO']);
+        Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAbiertas', 0)->assertDontSee('Aviso reservado de prueba');
     }
 
     public function test_accion_de_campana_rechaza_cuenta_inactiva_sin_eventos(): void
     {
         [$usuario,$residente] = $this->preparar(['alertas.gestionar']);
-        $alerta=Alerta::create(['cod_residente'=>$residente->cod_residente,'modulo'=>'MANUAL','tipo'=>'Revisión','descripcion'=>'Prueba','estado'=>'ABIERTA']);
-        User::whereKey($usuario->getKey())->update(['estado'=>'INACTIVO']);
-        try { app(GestionarAtencionAlerta::class)->atenderAlerta($usuario,$alerta->cod_alerta,'Revisión documentada'); $this->fail('Debe rechazar cuenta revocada'); }
-        catch (HttpException $e) { $this->assertSame(403,$e->getStatusCode()); }
-        $this->assertSame('ABIERTA',$alerta->fresh()->estado); $this->assertSame(0,$alerta->eventos()->count());
+        $alerta = Alerta::create(['cod_residente' => $residente->cod_residente, 'modulo' => 'MANUAL', 'tipo' => 'Revisión', 'descripcion' => 'Prueba', 'estado' => 'ABIERTA']);
+        User::whereKey($usuario->getKey())->update(['estado' => 'INACTIVO']);
+        try {
+            app(GestionarAtencionAlerta::class)->atenderAlerta($usuario, $alerta->cod_alerta, 'Revisión documentada');
+            $this->fail('Debe rechazar cuenta revocada');
+        } catch (HttpException $e) {
+            $this->assertSame(403, $e->getStatusCode());
+        }
+        $this->assertSame('ABIERTA', $alerta->fresh()->estado);
+        $this->assertSame(0, $alerta->eventos()->count());
     }
 }

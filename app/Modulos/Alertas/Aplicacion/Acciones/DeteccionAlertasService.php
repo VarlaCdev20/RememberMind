@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Alertas\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\CodigosEntidad;
 use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
 use App\Models\AdministracionMedicacion;
 use App\Models\Alerta;
@@ -11,7 +12,6 @@ use App\Models\Residente;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class DeteccionAlertasService
 {
@@ -36,13 +36,12 @@ class DeteccionAlertasService
             }
         });
 
-        EjecucionCuidado::whereIn('estado', ['PENDIENTE', 'EN_PROCESO', 'OMITIDA'])
+        EjecucionCuidado::with('intervencion')->whereIn('estado', ['PENDIENTE', 'EN_PROCESO', 'OMITIDA'])
             ->whereIn('cod_residente', $ids)
             ->when($codResidente, fn ($q) => $q->where('cod_residente', $codResidente))
             ->whereDate('fecha_hora_programada', '<=', today())->orderBy('cod_ejecucion')->chunk(100, function ($registros) use (&$creadas) {
                 foreach ($registros as $r) {
-                    if ($r->estado !== 'OMITIDA' && $r->fecha_programada->isToday()
-                        && (! $r->hora_programada || $r->hora_programada > now()->format('H:i:s'))) {
+                    if (! $r->fecha_hora_programada || ($r->estado !== 'OMITIDA' && $r->fecha_hora_programada->greaterThan(now()))) {
                         continue;
                     }
                     $creadas += $this->registrar(
@@ -50,21 +49,21 @@ class DeteccionAlertasService
                         'PLAN',
                         'TAREA PENDIENTE U OMITIDA',
                         'MEDIO',
-                        'Cuidado pendiente: '.$r->titulo.' (Fecha: '.$r->fecha_programada->format('d/m/Y').' '.$r->hora_programada.'). Requiere cumplimiento.'
+                        'Cuidado pendiente: '.$r->titulo.' (Fecha: '.$r->fecha_hora_programada->format('d/m/Y H:i').'). Requiere cumplimiento.'
                     );
                 }
             });
 
         Atencion::query()->whereIn('cod_residente', $ids)
-            ->where(fn ($q) => $q->where('motivo', 'like', '%incidente%')->orWhere('motivo', 'like', '%medico%'))
+            ->where(fn ($q) => $q->whereLike('motivo', '%incidente%')->orWhereLike('motivo', '%medico%'))
             ->orderBy('cod_atencion')->chunk(100, function ($registros) use (&$creadas) {
                 foreach ($registros as $r) {
                     $creadas += $this->registrar(
                         $r,
-                        $r->requiere_medico ? 'SOLICITUD_MEDICA' : 'INCIDENTE',
-                        $r->requiere_medico ? 'REQUIERE REVISIÓN MÉDICA' : 'INCIDENTE EN SEGUIMIENTO',
+                        str_contains(mb_strtolower((string) $r->motivo), 'medico') ? 'SOLICITUD_MEDICA' : 'INCIDENTE',
+                        str_contains(mb_strtolower((string) $r->motivo), 'medico') ? 'REQUIERE REVISIÓN MÉDICA' : 'INCIDENTE EN SEGUIMIENTO',
                         'ALTO',
-                        $r->requiere_medico
+                        str_contains(mb_strtolower((string) $r->motivo), 'medico')
                             ? ('Evaluación médica requerida: '.($r->observacion ?: 'Solicitud de valoración médica en turno.'))
                             : ('Incidente registrado en turno: '.($r->observacion ?: 'Seguimiento de enfermería.'))
                     );
@@ -189,7 +188,7 @@ class DeteccionAlertasService
             $existe = Alerta::where('cod_residente', $codResidente)
                 ->where('modulo', $origen)
                 ->where('tipo', $tipoAlerta)
-                ->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])
+                ->abiertas()
                 ->exists();
 
             if ($existe) {
@@ -197,7 +196,7 @@ class DeteccionAlertasService
             }
 
             $alerta = Alerta::create([
-                'cod_alerta' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('alertas'),
+                'cod_alerta' => app(CodigosEntidad::class)->siguiente('alertas'),
                 'cod_residente' => $codResidente,
                 'tipo' => $tipoAlerta,
                 'prioridad' => $nivel,
@@ -232,7 +231,7 @@ class DeteccionAlertasService
             $alertaEquivalente = Alerta::where('cod_residente', $registro->cod_residente)
                 ->where('modulo', $origen)
                 ->where('tipo', $tipo)
-                ->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])
+                ->abiertas()
                 ->where(function ($q) use ($referencia, $texto) {
                     $q->where('descripcion', 'like', $referencia.'%')
                         ->orWhere('descripcion', 'like', '%'.$texto.'%');
@@ -243,11 +242,12 @@ class DeteccionAlertasService
                 return 0;
             }
             $alerta = Alerta::create([
-                'cod_alerta' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('alertas'),
+                'cod_alerta' => app(CodigosEntidad::class)->siguiente('alertas'),
                 'cod_residente' => $registro->cod_residente,
                 'tipo' => $tipo,
                 'prioridad' => $nivel,
                 'modulo' => $origen,
+                'cod_registro' => $registro->getKey(),
                 'titulo' => mb_substr($texto, 0, 100),
                 'descripcion' => $motivo,
                 'fecha_hora' => now(),

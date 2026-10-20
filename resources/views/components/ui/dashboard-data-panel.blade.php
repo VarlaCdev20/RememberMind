@@ -36,12 +36,12 @@
     </div>
 
     @if(!$items || (in_array($type, ['bars', 'segments', 'donut'], true) && $total === 0))
-        <x-ui.empty-state compact :icono="$panel['icon'] ?? 'ph-chart-bar'" titulo="Sin datos por mostrar" :texto="$panel['empty'] ?? 'Aún no hay registros para este bloque.'" />
+        <x-ui.empty-state compact :icono="$panel['icon'] ?? 'ph-chart-bar'" :titulo="$panel['emptyTitle'] ?? 'Sin datos por mostrar'" :texto="$panel['empty'] ?? 'Aún no hay registros para este bloque.'" />
     @elseif(in_array($type, ['list', 'timeline'], true))
         <ul class="rm-dashboard-data-panel__list {{ $type === 'timeline' ? 'rm-dashboard-data-panel__list--timeline' : '' }}">
             @foreach($items as $item)
                 <li>
-                    <span class="rm-dashboard-data-panel__row-copy"><strong>{{ $item['label'] }}</strong>@if(!empty($item['detail']))<small>{{ $item['detail'] }}</small>@endif</span>
+                    <span class="rm-dashboard-data-panel__row-copy"><strong>@if(!empty($item['url']))<a href="{{ $item['url'] }}">{{ $item['label'] }}</a>@else{{ $item['label'] }}@endif</strong>@if(!empty($item['detail']))<small>{{ $item['detail'] }}</small>@endif</span>
                     @if(isset($item['value']))<b>{{ $item['value'] }}</b>@endif
                 </li>
             @endforeach

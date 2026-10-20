@@ -21,6 +21,7 @@
     'alpineClose' => null,
     'alpineBack' => null,
     'autoFocus' => true,
+    'alpineBusy' => null,
 ])
 
 @php
@@ -38,6 +39,7 @@ $modalId = $id ?: 'modal-'.\Illuminate\Support\Str::slug((string) ($attributes->
 @endphp
 
 <div
+    id="{{ $modalId }}"
     x-data="{
         @if($alpineModel)
         get show() { return {{ $alpineModel }} },
@@ -143,7 +145,7 @@ $modalId = $id ?: 'modal-'.\Illuminate\Support\Str::slug((string) ($attributes->
                         <i class="ph-bold {{ $dragIcon }}" aria-hidden="true"></i><span aria-hidden="true">Mover</span>
                     </button>
                 @endif
-                <button type="button" @click="{{ $alpineClose ?: '$wire.'.$closeMethod.'()' }}" class="rm-btn-icon rm-modal-panel__close text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)]" aria-label="Cerrar">
+                <button type="button" @if($alpineBusy) :disabled="{{ $alpineBusy }}" @endif @click="{{ $alpineClose ?: '$wire.'.$closeMethod.'()' }}" class="rm-btn-icon rm-modal-panel__close text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)]" aria-label="Cerrar">
                     <i class="ph-bold ph-x text-base" aria-hidden="true"></i>
                 </button>
             </div>

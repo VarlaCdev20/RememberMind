@@ -12,9 +12,9 @@ use App\Models\Residente;
 use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
 use App\Modulos\Alertas\Aplicacion\Acciones\RegistrarIncidenteEnFicha;
 use App\Modulos\Clinica\Aplicacion\Acciones\SignosVitalesService;
-use App\Modulos\Clinica\Aplicacion\Consultas\ConsultarResumenIntegralResidente;
-use App\Modulos\Clinica\Aplicacion\Consultas\ConsultarResumenCognitivoResidente;
 use App\Modulos\Clinica\Aplicacion\Consultas\ConsultarEvolucionResidente;
+use App\Modulos\Clinica\Aplicacion\Consultas\ConsultarResumenCognitivoResidente;
+use App\Modulos\Clinica\Aplicacion\Consultas\ConsultarResumenIntegralResidente;
 use App\Modulos\Clinica\Aplicacion\Consultas\EventosClinicosService;
 use App\Modulos\Clinica\Aplicacion\Consultas\PrepararFichaClinica;
 use App\Modulos\Clinica\Aplicacion\Consultas\ResultadosEstudiosService;
@@ -1381,7 +1381,7 @@ class FichaPaciente extends Component
                 'hora' => $alerta->fecha_hora ? $alerta->fecha_hora->format('H:i') : '',
                 'timestamp' => $alerta->fecha_hora,
                 'responsable' => $alerta->responsable?->usuario?->name ?? 'No registrado',
-                'estado_badge' => $alerta->estado === 'CERRADA' ? 'CERRADA' : ($alerta->estado === 'EN_ATENCION' ? 'EN ATENCIÓN' : 'ABIERTA'),
+                'estado_badge' => str_replace('_', ' ', $alerta->estado),
                 'badge' => $alerta->estado,
                 'badge_color' => $alerta->estado === 'CERRADA' ? 'zinc' : ($alerta->prioridad === 'CRITICO' ? 'red' : 'amber'),
                 'icon' => 'ph-bell-ringing',

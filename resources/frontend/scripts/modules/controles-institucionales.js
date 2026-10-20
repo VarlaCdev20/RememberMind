@@ -13,7 +13,7 @@ export function diasDelMes(year, month) {
     })];
 }
 
-export function rmSelector(value = null, { native = false, autoSubmit = false } = {}) {
+export function rmSelector(value = null, { native = false, autoSubmit = false, searchThreshold = 15 } = {}) {
     return {
         open: false, search: '', options: [], active: 0, popupStyle: '', value,
         init() {
@@ -44,7 +44,7 @@ export function rmSelector(value = null, { native = false, autoSubmit = false } 
             for (const option of this.$refs.native.options) option.selected = this.selected(option.value);
         },
         get filtered() { return this.options.filter(o => normalizar(o.label).includes(normalizar(this.search))); },
-        get hasSearch() { return this.options.length > 10; },
+        get hasSearch() { return this.options.filter(option => option.value !== '' && !option.disabled).length >= Math.max(2, Number(searchThreshold) || 15); },
         get multiple() { return this.$refs.native?.multiple || false; },
         selected(value) { return this.multiple ? (Array.isArray(this.value) && this.value.includes(value)) : String(this.value ?? '') === value; },
         get label() {

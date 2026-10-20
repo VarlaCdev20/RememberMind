@@ -22,6 +22,7 @@ return [
     'livewire.alertas.modales.atender' => 'app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/atender.blade.php',
     'livewire.alertas.modales.cerrar' => 'app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/cerrar.blade.php',
     'livewire.alertas.modales.crear' => 'app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/crear.blade.php',
+    'livewire.alertas.modales.confirmar-descarte' => 'app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/confirmar-descarte.blade.php',
     'livewire.alertas.modales.detalle' => 'app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/detalle.blade.php',
     'livewire.alertas.modales.drawer-graficos' => 'app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/drawer-graficos.blade.php',
     'livewire.alertas.modales.drawer-ubicacion' => 'app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/modales/drawer-ubicacion.blade.php',

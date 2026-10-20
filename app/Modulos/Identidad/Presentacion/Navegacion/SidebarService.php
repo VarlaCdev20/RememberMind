@@ -576,7 +576,7 @@ class SidebarService
 
             return [
                 'preadmisiones' => $badge(DB::table('preadmisiones')->where('estado', 'PENDIENTE')->count()),
-                'alertas' => $badge(DB::table('alertas')->whereNotIn('estado', ['CERRADA', 'ANULADA'])->count()),
+                'alertas' => $badge(DB::table('alertas')->whereIn('estado', Alerta::ESTADOS_ACTIVOS)->count()),
                 'incidentes' => $badge(DB::table('incidentes')->whereNotIn('estado', ['CERRADO', 'CERRADA', 'ANULADO', 'ANULADA'])->count()),
             ];
         });
@@ -593,7 +593,7 @@ class SidebarService
                     ->whereNotExists(fn ($query) => $query->selectRaw('1')->from('admisiones as ad')
                         ->whereColumn('ad.cod_preadmision', 'pre.cod_preadmision'))->count()),
                 'documentacion' => $badge(DB::table('documentos')->whereIn('estado', ['PENDIENTE', 'POR_VALIDAR'])->count()),
-                'alertas' => $badge(DB::table('alertas')->whereNotIn('estado', ['CERRADA', 'ANULADA'])->count()),
+                'alertas' => $badge(DB::table('alertas')->whereIn('estado', Alerta::ESTADOS_ACTIVOS)->count()),
             ];
         });
     }

@@ -2,7 +2,7 @@
 
 namespace App\Modulos\Alertas\Presentacion\Livewire\Paginas;
 
-use App\Models\Alerta;
+use App\Modulos\Alertas\Aplicacion\Consultas\BandejaAlertas;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 
@@ -14,6 +14,6 @@ class PanelAlertas extends Component
     {
         abort_unless(auth()->user()?->can('alertas.ver'), 403);
 
-        return view('livewire.alertas.panel-alertas', ['alertas' => Alerta::query()->with(['residente', 'eventos'])->whereNotIn('estado', ['CERRADA', 'ANULADA'])->latest('fecha_hora')->limit(30)->get()]);
+        return view('livewire.alertas.panel-alertas', ['alertas' => app(BandejaAlertas::class)->pendientes(auth()->user())->with(['residente', 'eventos'])->latest('fecha_hora')->limit(30)->get()]);
     }
 }

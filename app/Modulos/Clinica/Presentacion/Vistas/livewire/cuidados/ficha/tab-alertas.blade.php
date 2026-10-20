@@ -2,8 +2,8 @@
 <div class="space-y-6">
     {{-- 1. ALERTAS ACTIVAS (ABIERTA / EN_ATENCION) --}}
     @php
-        $alertasActivas = $adultoMayor->alertas->whereIn('estado', ['ABIERTA', 'EN_ATENCION']);
-        $alertasCerradas = $adultoMayor->alertas->where('estado', 'CERRADA');
+        $alertasActivas = $adultoMayor->alertas->whereIn('estado', \App\Models\Alerta::ESTADOS_ACTIVOS);
+        $alertasCerradas = $adultoMayor->alertas->whereIn('estado', ['ATENDIDA','CERRADA','ANULADA']);
     @endphp
 
     <div class="rounded-3xl border border-[var(--rm-border)]  bg-[var(--rm-surface)] p-5 shadow-sm space-y-4">
@@ -99,7 +99,7 @@
             <div class="rounded-2xl bg-[var(--rm-success-soft)] p-6 border border-[var(--rm-success-strong)] text-center">
                 <i class="ph-bold ph-shield-check text-2xl text-[var(--rm-success-strong)] mb-1 block"></i>
                 <p class="text-xs font-bold text-[var(--rm-success-strong)]">Sin alertas clínicas activas</p>
-                <p class="text-[11px] text-[var(--rm-success-strong)] mt-0.5">El residente se encuentra hemodinámicamente estable y sin condiciones críticas abiertas.</p>
+                <p class="text-[11px] text-[var(--rm-success-strong)] mt-0.5">No hay alertas activas registradas en esta consulta. Este dato no determina el estado clínico del residente.</p>
             </div>
         @endif
     </div>

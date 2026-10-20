@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Alertas\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\CodigosEntidad;
 use App\Models\Alerta;
 use App\Models\Derivacion;
 use App\Models\EventoAlerta;
@@ -161,12 +162,16 @@ final class GestionarIncidentesPanel
     public function solicitarValoracionMedica(User $usuario, Incidente $incidente): Alerta
     {
         $this->autorizarMutacionIncidente($usuario, $incidente);
-        $existente = Alerta::where('modulo', 'INCIDENTES')->where('cod_registro', $incidente->cod_incidente)->whereIn('estado', ['ACTIVA', 'PENDIENTE'])->first();
-        if ($existente) {
-            return $existente;
-        }
         DB::beginTransaction();
         try {
+            Incidente::whereKey($incidente->getKey())->lockForUpdate()->firstOrFail();
+            $existente = Alerta::where('modulo', 'INCIDENTES')->where('cod_registro', $incidente->getKey())
+                ->whereIn('estado', [...Alerta::ESTADOS_ACTIVOS, 'ACTIVA'])->first();
+            if ($existente) {
+                DB::commit();
+
+                return $existente;
+            }
             $user = $usuario;
             $codUsuario = $user->cod_usuario;
             $personal = Personal::query()
@@ -185,7 +190,7 @@ final class GestionarIncidentesPanel
             }
 
             $alerta = new Alerta;
-            $alerta->cod_alerta = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('alertas');
+            $alerta->cod_alerta = app(CodigosEntidad::class)->siguiente('alertas');
             $alerta->cod_residente = $incidente->cod_residente;
             $alerta->cod_personal_responsable = $codPersonal;
             $alerta->tipo = 'CLINICA';
@@ -197,17 +202,17 @@ final class GestionarIncidentesPanel
             $alerta->fecha_hora = Carbon::now();
             $alerta->fecha_hora_limite = Carbon::now()->addHours(2);
             $alerta->generacion = 'MANUAL';
-            $alerta->estado = 'ACTIVA';
+            $alerta->estado = 'ABIERTA';
             $alerta->save();
 
             // Evento de alerta para trazabilidad
             $evento = new EventoAlerta;
-            $evento->cod_evento_alerta = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('eventos_alerta');
+            $evento->cod_evento_alerta = app(CodigosEntidad::class)->siguiente('eventos_alerta');
             $evento->cod_alerta = $alerta->cod_alerta;
             $evento->cod_usuario = $codUsuario;
             $evento->tipo_evento = 'CREACION';
             $evento->estado_anterior = null;
-            $evento->estado_nuevo = 'ACTIVA';
+            $evento->estado_nuevo = 'ABIERTA';
             $evento->fecha_hora = Carbon::now();
             $evento->descripcion = "Alerta médica solicitada por enfermería a partir de la incidencia {$incidente->cod_incidente}.";
             $evento->save();
@@ -268,7 +273,7 @@ final class GestionarIncidentesPanel
         DB::beginTransaction();
         try {
             $derivacion = new Derivacion;
-            $derivacion->cod_derivacion = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('derivaciones');
+            $derivacion->cod_derivacion = app(CodigosEntidad::class)->siguiente('derivaciones');
             $derivacion->cod_residente = $incidente->cod_residente;
             $derivacion->cod_area_solicitante = $codAreaSolicitante;
             $derivacion->cod_area_receptora = $entrada['derivacion_area_receptora'];

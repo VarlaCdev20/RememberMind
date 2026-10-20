@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades;
 
+use App\Compartido\Aplicacion\Formato\TextoVisible;
 use App\Models\Alerta;
 use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
 use Livewire\Attributes\Locked;
@@ -41,7 +42,7 @@ class HistorialAlerta extends Component
 
         $this->accion = '';
         $this->dispatch('evento-alerta-registrado', alertaId: $this->alertaId);
-        session()->flash('mensaje', 'Intervención registrada en el historial.');
+        session()->flash('mensaje', 'Seguimiento registrado en el historial.');
     }
 
     public function render()
@@ -49,7 +50,7 @@ class HistorialAlerta extends Component
         $alerta = Alerta::findOrFail($this->alertaId);
         app(AlertasService::class)->autorizarLectura($alerta, auth()->user());
         $alerta->load([
-            'adultoMayor',
+            'residente',
             'responsable.usuario',
             'eventos.usuario',
         ]);
@@ -59,7 +60,7 @@ class HistorialAlerta extends Component
             ->sortBy('fecha_hora')
             ->values()
             ->map(function ($ev) {
-                $nombreActor = $ev->usuario ? ($ev->usuario->nombres.' '.$ev->usuario->ap_paterno) : 'Profesional / Sistema';
+                $nombreActor = $ev->usuario ? $ev->usuario->name : 'Autor no disponible';
                 $fechaFormat = $ev->fecha_hora ? $ev->fecha_hora->translatedFormat('d M Y, H:i') : 'Sin fecha';
                 $cambioEstado = ($ev->estado_anterior && $ev->estado_nuevo && $ev->estado_anterior !== $ev->estado_nuevo)
                     ? "{$ev->estado_anterior} → {$ev->estado_nuevo}"
@@ -78,7 +79,7 @@ class HistorialAlerta extends Component
                     'tipo' => $ev->tipo_evento,
                     'estado' => $cambioEstado,
                     'fecha' => $fechaFormat,
-                    'descripcion' => \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($ev->descripcion),
+                    'descripcion' => TextoVisible::sinCodigosInternos($ev->descripcion),
                     'variant' => $variant,
                     'icon' => match ($ev->tipo_evento) {
                         'CREACION' => 'ph ph-plus-circle',

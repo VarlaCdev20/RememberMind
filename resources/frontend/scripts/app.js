@@ -174,3 +174,4 @@ import './modules/ficha-estudios.js';
 // Dashboard de Enfermería: ciclos de gráficas y navegación compartidos.
 import './modules/nursing-dashboard.js';
 import './modules/livewire-access-feedback.js';
+import './modules/alertas-interaccion.js';

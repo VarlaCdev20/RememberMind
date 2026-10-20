@@ -5,23 +5,29 @@ namespace App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades;
 use App\Models\Alerta;
 use App\Models\Residente;
 use App\Modulos\Alertas\Aplicacion\Acciones\GestionarAtencionAlerta;
+use App\Modulos\Alertas\Aplicacion\Consultas\BandejaAlertas;
 use App\Modulos\Alertas\Aplicacion\Consultas\ConsultarPanelResidenteAlerta;
+use App\Modulos\Alertas\Aplicacion\Consultas\OrdenAlertas;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
+use Livewire\Attributes\Locked;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class CampanaNotificaciones extends Component
 {
     public int $conteoAbiertas = 0;
 
-    #[\Livewire\Attributes\Locked]
+    public int $conteoAlertas = 0;
+
+    public int $conteoRecordatorios = 0;
+
+    #[Locked]
     public array $alertaIdsConocidos = [];
 
-    #[\Livewire\Attributes\Locked]
+    #[Locked]
     public array $recordatorioIdsConocidos = [];
 
     public bool $panelAbierto = false;
@@ -74,6 +80,11 @@ class CampanaNotificaciones extends Component
         $this->panelAbierto = false;
     }
 
+    #[On('alerta-creada')]
+    #[On('alerta-atendida')]
+    #[On('alerta-cerrada')]
+    #[On('alerta-actualizada')]
+    #[On('evento-alerta-registrado')]
     public function verificarAlertas(): void
     {
         if (! $this->puedeVer()) {
@@ -85,10 +96,16 @@ class CampanaNotificaciones extends Component
 
     public function actualizarConteoYLista(bool $detectarNuevas = true): void
     {
-        if (! $this->puedeVer()) { $this->conteoAbiertas = 0; return; }
+        if (! $this->puedeVer()) {
+            $this->conteoAbiertas = 0;
+
+            return;
+        }
         $pendientes = $this->consultaPendientes()->with('residente')->get();
         $recordatorios = $this->recordatoriosMedicacion();
-        $this->conteoAbiertas = $pendientes->count() + $recordatorios->count();
+        $this->conteoAlertas = $pendientes->count();
+        $this->conteoRecordatorios = $recordatorios->count();
+        $this->conteoAbiertas = $this->conteoAlertas + $this->conteoRecordatorios;
         $nuevas = $pendientes->reject(fn ($a) => in_array($a->cod_alerta.'|'.$a->prioridad, $this->alertaIdsConocidos, true));
         if ($detectarNuevas && $nuevas->isNotEmpty()) {
             $primera = $nuevas->first();
@@ -198,6 +215,7 @@ class CampanaNotificaciones extends Component
     {
         $user = auth()->user();
         abort_unless($user, 401);
+        abort_unless($user->fresh()?->estado === 'ACTIVO' && ! $user->hasRole('FAMILIAR'), 403);
 
         $permiso = match ($accion) {
             'ver' => 'alertas.ver',
@@ -221,7 +239,7 @@ class CampanaNotificaciones extends Component
         }
 
         $alertas = $this->consultaPendientes()->with(['residente.cama.habitacion', 'responsable'])
-            ->tap(fn ($q) => \App\Modulos\Alertas\Aplicacion\Consultas\OrdenAlertas::aplicar($q))
+            ->tap(fn ($q) => OrdenAlertas::aplicar($q))
             ->take(15)
             ->get();
 
@@ -232,36 +250,22 @@ class CampanaNotificaciones extends Component
         return view('livewire.alertas.campana-notificaciones', [
             'alertas' => $alertas,
             'recordatoriosMedicacion' => $this->recordatoriosMedicacion(),
-            'puedeAtender' => $puedeAtender,
+            'puedeAtender' => $puedeAtender && $user->hasRole('ENFERMEROS'),
+            'puedeConsultarAlertas' => $user->can('alertas.ver'),
             'puedeCerrar' => $puedeCerrar,
         ]);
     }
 
     private function consultaPendientes(): Builder
     {
-        $query = Alerta::query()->whereIn('estado', ['ABIERTA', 'EN_ATENCION', 'RECONOCIDA', 'ASIGNADA', 'PENDIENTE']);
-        \App\Modulos\Alertas\Aplicacion\Consultas\OrdenAlertas::aplicar($query);
-        $user = auth()->user();
-
-        if (! $this->puedeVer() || ! $user?->canAny(['alertas.ver', 'alertas.gestionar', 'alertas.seguimiento', 'alertas.cerrar'])) {
-            return $query->whereRaw('1 = 0');
-        }
-
-        if (! $user?->hasAnyRole(['SUPERADMINISTRADOR','GERENTE','ADMINISTRADOR'])) {
-            $query->whereIn('cod_residente', app(TurnoEnfermeriaService::class)->obtenerPacientesAsignadosIds($user));
-        }
-
-        return $query;
+        return app(BandejaAlertas::class)->pendientes(auth()->user())
+            ->tap(fn ($query) => OrdenAlertas::aplicar($query));
     }
 
     private function autorizarAlerta(string $id): void
     {
-        $user = auth()->user();
-
-        if ($user?->hasRole('ENFERMEROS')) {
-            $pacientes = app(TurnoEnfermeriaService::class)->obtenerPacientesAsignadosIds($user);
-            abort_unless(Alerta::whereKey($id)->whereIn('cod_residente', $pacientes)->exists(), 403);
-        }
+        abort_unless(app(BandejaAlertas::class)
+            ->consulta(auth()->user())->whereKey($id)->exists(), 403);
     }
 
     private function recordatoriosMedicacion()
@@ -276,7 +280,7 @@ class CampanaNotificaciones extends Component
             return collect();
         }
 
-        $codigos = ! $user->hasAnyRole(['SUPERADMINISTRADOR','GERENTE','ADMINISTRADOR'])
+        $codigos = ! $user->hasAnyRole(['SUPERADMINISTRADOR', 'GERENTE', 'ADMINISTRADOR'])
             ? app(TurnoEnfermeriaService::class)->obtenerPacientesAsignadosIds($user)
             : Residente::query()->pluck('cod_residente')->all();
 

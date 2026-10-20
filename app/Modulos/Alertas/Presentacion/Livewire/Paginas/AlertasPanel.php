@@ -5,13 +5,15 @@ namespace App\Modulos\Alertas\Presentacion\Livewire\Paginas;
 use App\Models\Alerta;
 use App\Models\Residente;
 use App\Models\SignoVital;
-use App\Models\Turno;
 use App\Models\User;
 use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
 use App\Modulos\Alertas\Aplicacion\Acciones\DeteccionAlertasService;
+use App\Modulos\Alertas\Aplicacion\Consultas\BandejaAlertas;
 use App\Modulos\Alertas\Aplicacion\Consultas\ConsultarPanelResidenteAlerta;
+use App\Modulos\Alertas\Aplicacion\Consultas\ExperienciaAlertas;
+use App\Modulos\Alertas\Aplicacion\Consultas\OrdenAlertas;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
-use Illuminate\Support\Facades\DB;
+use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -28,11 +30,20 @@ class AlertasPanel extends Component
 
     public string $search = '';
 
-    public string $filtroEstado = 'ABIERTA';
+    #[Url]
+    public string $filtroEstado = 'ACTIVAS';
+
+    public string $filtroResponsabilidad = '';
+
+    public string $fechaDesde = '';
+
+    public string $fechaHasta = '';
 
     public string $filtroNivel = '';
 
     public string $filtroOrigen = '';
+
+    public bool $confirmarDescarte = false;
 
     public bool $modalCrear = false;
 
@@ -87,6 +98,14 @@ class AlertasPanel extends Component
     public function mount(): void
     {
         $this->comprobarPermiso('ver');
+        // Si solo hay registros anteriores, la entrada debe mostrarlos sin reclasificarlos.
+        if (! request()->has('filtroEstado') && $this->filtroEstado === 'ACTIVAS') {
+            $base = app(BandejaAlertas::class)->consulta(auth()->user())
+                ->when($this->filtroAdulto, fn ($q) => $q->where('cod_residente', $this->filtroAdulto));
+            if (! (clone $base)->abiertas()->exists() && (clone $base)->exists()) {
+                $this->filtroEstado = '';
+            }
+        }
         $alerta = request()->query('alerta');
         if (is_string($alerta) && $alerta !== '') {
             $this->verDetalle($alerta);
@@ -97,10 +116,11 @@ class AlertasPanel extends Component
     {
         $user = auth()->user();
         abort_unless($user, 401);
-        abort_unless($user->estado === 'ACTIVO' && ! $user->hasRole('FAMILIAR'), 403);
+        abort_unless($user->fresh()?->estado === 'ACTIVO' && ! $user->hasRole('FAMILIAR'), 403);
         $permiso = match ($accion) {
             'ver' => 'alertas.ver',
             'asignar' => 'alertas.asignar',
+            'reconocer' => 'alertas.reconocer',
             'atender' => 'alertas.seguimiento',
             'cerrar' => 'alertas.cerrar',
             default => 'alertas.gestionar',
@@ -110,7 +130,13 @@ class AlertasPanel extends Component
 
     public function updated($campo): void
     {
-        if (in_array($campo, ['search', 'filtroEstado', 'filtroNivel', 'filtroOrigen', 'filtroAdulto', 'perPage'])) {
+        if (in_array($campo, ['fechaDesde', 'fechaHasta'], true)) {
+            $this->validate([
+                'fechaDesde' => 'nullable|date_format:Y-m-d',
+                'fechaHasta' => 'nullable|date_format:Y-m-d'.($this->fechaDesde !== '' ? '|after_or_equal:fechaDesde' : ''),
+            ], ['fechaHasta.after_or_equal' => 'La fecha hasta debe ser igual o posterior a la fecha desde.']);
+        }
+        if (in_array($campo, ['search', 'filtroEstado', 'filtroNivel', 'filtroOrigen', 'filtroAdulto', 'perPage', 'filtroResponsabilidad', 'fechaDesde', 'fechaHasta'])) {
             $this->resetPage();
         }
     }
@@ -118,17 +144,19 @@ class AlertasPanel extends Component
     public function limpiarFiltros(): void
     {
         $this->search = '';
-        $this->filtroEstado = 'ABIERTA';
+        $this->filtroEstado = '';
         $this->filtroNivel = '';
         $this->filtroOrigen = '';
         $this->filtroAdulto = '';
+        $this->filtroResponsabilidad = $this->fechaDesde = $this->fechaHasta = '';
+        $this->resetValidation(['fechaDesde', 'fechaHasta']);
         $this->resetPage();
     }
 
     public function limpiarFiltro(string $campo): void
     {
         if ($campo === 'filtroEstado') {
-            $this->filtroEstado = 'ABIERTA';
+            $this->filtroEstado = 'ACTIVAS';
             $this->resetPage();
         } elseif (in_array($campo, ['search', 'filtroNivel', 'filtroOrigen', 'filtroAdulto'])) {
             $this->$campo = '';
@@ -138,7 +166,7 @@ class AlertasPanel extends Component
 
     public function setFiltroRapido(string $campo, string $valor): void
     {
-        if (property_exists($this, $campo)) {
+        if (in_array($campo, ['filtroEstado', 'filtroNivel', 'filtroOrigen', 'filtroResponsabilidad'], true)) {
             if ($this->{$campo} === $valor) {
                 $this->{$campo} = '';
             } else {
@@ -150,7 +178,9 @@ class AlertasPanel extends Component
 
     public function verPrioritarias(): void
     {
-        $this->filtroNivel = 'PRIORITARIAS'; $this->filtroEstado = ''; $this->resetPage();
+        $this->filtroNivel = 'PRIORITARIAS';
+        $this->filtroEstado = '';
+        $this->resetPage();
     }
 
     public function detectarAlertas(): void
@@ -181,19 +211,19 @@ class AlertasPanel extends Component
         $this->validate([
             'codResidente' => 'required|string|exists:residentes,cod_residente',
             'origen' => 'required|in:SIGNOS,MEDICACION,SEGUIMIENTO,PLAN,INCIDENTE,SOLICITUD_MEDICA,MANUAL,FICHA,VALORACION',
-            'tipoAlerta' => 'required|string|min:3|max:80',
+            'tipoAlerta' => 'required|string|min:3|max:60',
             'nivel' => 'required|in:BAJO,MEDIO,ALTO,CRITICO',
             'motivo' => 'required|string|min:10|max:10000',
         ], [
-            'codResidente.required' => 'Debe seleccionar un residente asignado.',
+            'codResidente.required' => 'Debe seleccionar un residente disponible en su ámbito.',
             'codResidente.exists' => 'El residente seleccionado no es válido.',
-            'origen.required' => 'Debe seleccionar el origen clínico de la alerta.',
-            'tipoAlerta.required' => 'El tipo o diagnóstico clínico es obligatorio.',
+            'origen.required' => 'Debe seleccionar el origen registrado de la alerta.',
+            'tipoAlerta.required' => 'El tipo de alerta es obligatorio.',
             'tipoAlerta.min' => 'El tipo de alerta debe tener al menos 3 caracteres.',
-            'tipoAlerta.max' => 'El tipo de alerta no puede superar los 80 caracteres.',
-            'nivel.required' => 'Debe seleccionar el nivel de severidad.',
-            'motivo.required' => 'Debe detallar el motivo clínico de la alerta.',
-            'motivo.min' => 'El motivo clínico debe contener al menos 10 caracteres explicativos.',
+            'tipoAlerta.max' => 'El tipo de alerta no puede superar los 60 caracteres.',
+            'nivel.required' => 'Debe seleccionar la prioridad de la alerta.',
+            'motivo.required' => 'Describe la situación que requiere seguimiento.',
+            'motivo.min' => 'La descripción debe contener al menos 10 caracteres.',
         ]);
 
         $alerta = app(AlertasService::class)->crearDesdePanel($this->codResidente, [
@@ -203,7 +233,7 @@ class AlertasPanel extends Component
 
         $this->dispatch('alerta-creada', alertaId: $alerta->cod_alerta);
         $this->cerrarModales();
-        session()->flash('mensaje', 'Alerta clínica registrada exitosamente.');
+        session()->flash('mensaje', 'Alerta registrada correctamente.');
     }
 
     public function verDetalle(string $id): void
@@ -226,19 +256,21 @@ class AlertasPanel extends Component
         ]);
         app(AlertasService::class)->asignarResponsable(
             Alerta::findOrFail($this->alertaId), User::findOrFail($this->responsableId), auth()->user(), coordinacion: true);
+        $this->dispatch('alerta-actualizada');
         session()->flash('mensaje', 'Responsable asignado.');
     }
 
     public function guardarAccion(): void
     {
         $this->comprobarPermiso('atender');
-        $this->validate(['accion' => 'required|string|min:3|max:10000'], [
-            'accion.required' => 'Debe ingresar el detalle de la intervención asistencial.',
-            'accion.min' => 'La nota de intervención debe contener al menos 3 caracteres.',
-            'accion.max' => 'La nota de intervención no puede superar los 10.000 caracteres.',
+        $this->validate(['accion' => 'required|string|min:5|max:10000'], [
+            'accion.required' => 'Describe la actuación o el seguimiento de coordinación realizado.',
+            'accion.min' => 'La nota de seguimiento debe contener al menos 5 caracteres.',
+            'accion.max' => 'La nota de seguimiento no puede superar los 10.000 caracteres.',
         ]);
         app(AlertasService::class)->registrarDesdePanel(
             Alerta::findOrFail($this->alertaId), $this->accion, auth()->user());
+        $this->dispatch('evento-alerta-registrado');
         $this->accion = '';
         session()->flash('mensaje', 'Registro de la alerta añadido.');
     }
@@ -246,7 +278,8 @@ class AlertasPanel extends Component
     public function atenderAlerta(string $id): void
     {
         $this->comprobarPermiso('atender');
-        $this->obtenerAlertaAutorizada($id);
+        $alerta = $this->obtenerAlertaAutorizada($id);
+        app(AlertasService::class)->autorizarAtencion($alerta, auth()->user());
         $this->cerrarModales();
         $this->alertaId = $id;
         $this->accionTomada = '';
@@ -276,7 +309,9 @@ class AlertasPanel extends Component
     public function cerrarAlerta(string $id): void
     {
         $this->comprobarPermiso('cerrar');
-        $this->obtenerAlertaAutorizada($id);
+        $alerta = $this->obtenerAlertaAutorizada($id);
+        app(AlertasService::class)->autorizarCoordinacion($alerta->cod_residente, 'alertas.cerrar', auth()->user());
+        abort_unless($alerta->puedeCerrarse(), 409, 'Esta alerta ya no admite cierre.');
         $this->cerrarModales();
         $this->alertaId = $id;
         $this->observacionCierre = '';
@@ -290,19 +325,19 @@ class AlertasPanel extends Component
         $this->validate([
             'observacionCierre' => 'required|string|min:5|max:10000',
         ], [
-            'observacionCierre.required' => 'Debe ingresar la justificación clínica del cierre.',
-            'observacionCierre.min' => 'La justificación clínica debe contener al menos 5 caracteres explicativos.',
-            'observacionCierre.max' => 'La justificación clínica no puede superar los 10.000 caracteres.',
+            'observacionCierre.required' => 'Debe ingresar la justificación del cierre.',
+            'observacionCierre.min' => 'La justificación debe contener al menos 5 caracteres explicativos.',
+            'observacionCierre.max' => 'La justificación no puede superar los 10.000 caracteres.',
         ]);
 
         app(AlertasService::class)->cerrar(
-            Alerta::findOrFail($this->alertaId), 'Cierre: '.$this->observacionCierre, auth()->user(), coordinacion: true);
+            Alerta::findOrFail($this->alertaId), $this->observacionCierre, auth()->user(), coordinacion: true);
 
-        $alertaCerrada = Alerta::with('adultoMayor')->findOrFail($this->alertaId);
+        $alertaCerrada = Alerta::with('residente')->findOrFail($this->alertaId);
         $this->dispatch('alerta-cerrada', alertaId: $this->alertaId);
         $this->cerrarModales();
         $this->resultadoCierre = [
-            'residente' => trim(($alertaCerrada->adultoMayor?->nombres ?? '').' '.($alertaCerrada->adultoMayor?->ap_paterno ?? '')),
+            'residente' => $alertaCerrada->residente?->nombre_completo,
             'cod_residente' => $alertaCerrada->cod_residente,
             'fecha_hora' => now()->format('d/m/Y H:i'),
         ];
@@ -328,7 +363,7 @@ class AlertasPanel extends Component
         $usuario = auth()->user();
         $turnos = app(TurnoEnfermeriaService::class);
         if ($usuario?->hasRole('ENFERMEROS')) {
-            $turnos->autorizarAccionPaciente($codResidente, $usuario);
+            $turnos->autorizarConsultaResidente($codResidente, $usuario);
 
             return;
         }
@@ -370,8 +405,34 @@ class AlertasPanel extends Component
         $this->signosDrawer = [];
     }
 
+    public function solicitarCerrarModales(): void
+    {
+        $hayCaptura = ($this->modalCrear && (trim($this->tipoAlerta) !== '' || trim($this->motivo) !== '' || $this->codResidente !== '' || $this->origen !== 'MANUAL' || $this->nivel !== 'MEDIO'))
+            || ($this->modalAtender && trim($this->accionTomada) !== '')
+            || ($this->modalCerrar && trim($this->observacionCierre) !== '')
+            || ($this->modalDetalle && (trim($this->accion) !== '' || $this->responsableId !== (Alerta::find($this->alertaId)?->responsable?->cod_usuario ?? '')));
+        if ($hayCaptura) {
+            $this->confirmarDescarte = true;
+
+            return;
+        }
+        $this->cerrarModales();
+    }
+
+    public function continuarCaptura(): void
+    {
+        $this->confirmarDescarte = false;
+    }
+
+    public function descartarCaptura(): void
+    {
+        $this->cerrarModales();
+        $this->reset('codResidente', 'tipoAlerta', 'motivo', 'origen', 'nivel');
+    }
+
     public function cerrarModales(): void
     {
+        $this->confirmarDescarte = false;
         $this->modalCrear = false;
         $this->modalAtender = false;
         $this->modalCerrar = false;
@@ -386,147 +447,97 @@ class AlertasPanel extends Component
         $this->resetValidation();
     }
 
+    public function reconocer(string $id): void
+    {
+        $this->comprobarPermiso('reconocer');
+        $alerta = $this->obtenerAlertaAutorizada($id);
+        app(AlertasService::class)->cambiarEstado($alerta, 'RECONOCIDA', 'Reconocimiento del aviso; no registra atención clínica.', auth()->user());
+        $this->dispatch('alerta-actualizada');
+        session()->flash('mensaje', 'Alerta reconocida. Permanece visible hasta su atención y cierre.');
+    }
+
     public function render()
     {
+        $this->comprobarPermiso('ver');
         if (($this->drawerGrafico || $this->drawerUbicacion) && $this->adultoDrawerId) {
             $this->adultoDrawer = app(ConsultarPanelResidenteAlerta::class)->consultar(auth()->user(), $this->adultoDrawerId, $this->drawerGrafico ? 'graficos' : 'ubicacion');
-            if ($this->drawerGrafico) {
-                $this->signosDrawer = $this->adultoDrawer->signosVitales;
-            }
+            $this->signosDrawer = $this->drawerGrafico ? $this->adultoDrawer->signosVitales : [];
         }
-
-        $this->comprobarPermiso('ver');
-        $turnoService = app(TurnoEnfermeriaService::class);
-        $alertasQuery = Alerta::query()
-            ->when($this->filtroAdulto, fn ($q) => $q->where('cod_residente', $this->filtroAdulto))
-            ->with(['residente.cama.habitacion', 'responsable']);
-
-        if (! auth()->user()?->hasAnyRole(['SUPERADMINISTRADOR', 'GERENTE', 'ADMINISTRADOR'])) {
-            $alertasQuery = $turnoService->acotarAlertasQuery($alertasQuery, auth()->user());
-        }
-
-        // Consultas para tarjetas KPI y gráficos sin filtros de paginación
-        $baseStatsQuery = clone $alertasQuery;
-
-        $conteos = [
-            'total' => (clone $baseStatsQuery)->count(),
-            'criticas' => (clone $baseStatsQuery)->whereIn('prioridad', ['CRITICO', 'CRITICA'])->whereIn('estado', ['ABIERTA', 'EN_ATENCION', 'RECONOCIDA', 'ASIGNADA', 'PENDIENTE'])->count(),
-            'altas' => (clone $baseStatsQuery)->whereIn('prioridad', ['ALTO', 'ALTA'])->whereIn('estado', ['ABIERTA', 'EN_ATENCION', 'RECONOCIDA', 'ASIGNADA', 'PENDIENTE'])->count(),
-            'abiertas' => (clone $baseStatsQuery)->where('estado', 'ABIERTA')->count(),
-            'en_atencion' => (clone $baseStatsQuery)->where('estado', 'EN_ATENCION')->count(),
-            'cerradas' => (clone $baseStatsQuery)->where('estado', 'CERRADA')->count(),
-        ];
-
-        // Datos para los gráficos dinámicos con Chart.js
-        $statsNivel = (clone $baseStatsQuery)
-            ->select('prioridad', DB::raw('count(*) as total'))
-            ->groupBy('prioridad')
-            ->pluck('total', 'prioridad')
-            ->toArray();
-
-        $statsOrigen = (clone $baseStatsQuery)
-            ->select('modulo', DB::raw('count(*) as total'))
-            ->groupBy('modulo')
-            ->pluck('total', 'modulo')
-            ->toArray();
-
-        $statsEstado = (clone $baseStatsQuery)
-            ->select('estado', DB::raw('count(*) as total'))
-            ->groupBy('estado')
-            ->pluck('total', 'estado')
-            ->toArray();
-
-        $jerarquiaOrigenes = [
-            'SIGNOS' => 0,
-            'INCIDENTE' => 0,
-            'MEDICACION' => 0,
-            'SOLICITUD_MEDICA' => 0,
-            'PLAN' => 0,
-            'SEGUIMIENTO' => 0,
-            'VALORACION' => 0,
-            'FICHA' => 0,
-            'MANUAL' => 0,
-        ];
-        foreach ($statsOrigen as $k => $v) {
-            $jerarquiaOrigenes[$k] = (int) $v;
-        }
-
-        $chartData = [
-            'niveles' => [
-                'CRITICO' => (int) (($statsNivel['CRITICO'] ?? 0) + ($statsNivel['CRITICA'] ?? 0)),
-                'ALTO' => (int) (($statsNivel['ALTO'] ?? 0) + ($statsNivel['ALTA'] ?? 0)),
-                'MEDIO' => (int) (($statsNivel['MEDIO'] ?? 0) + ($statsNivel['MEDIA'] ?? 0)),
-                'BAJO' => (int) (($statsNivel['BAJO'] ?? 0) + ($statsNivel['BAJA'] ?? 0)),
-            ],
-            'origenes' => $jerarquiaOrigenes,
-            'estados' => [
-                'ABIERTA' => (int) ($statsEstado['ABIERTA'] ?? 0),
-                'EN_ATENCION' => (int) ($statsEstado['EN_ATENCION'] ?? 0),
-                'CERRADA' => (int) ($statsEstado['CERRADA'] ?? 0),
-            ],
-        ];
-
-        $alertas = $alertasQuery
-            ->when($this->search, fn ($q) => $q->where(fn ($q) => $q->whereHas('residente', fn ($sq) => $sq->whereLike('nombres', '%'.$this->search.'%')
-                ->orWhereLike('apellido_paterno', '%'.$this->search.'%'))
-                ->orWhereLike('tipo', '%'.$this->search.'%')
-                ->orWhereLike('titulo', '%'.$this->search.'%')
-                ->orWhereLike('descripcion', '%'.$this->search.'%')
-            ))
-            ->when($this->filtroEstado, fn ($q) => $q->where('estado', $this->filtroEstado))
-            ->when($this->filtroNivel === 'PRIORITARIAS', fn ($q) => $q->whereIn('prioridad', ['CRITICO','CRITICA','ALTO','ALTA'])->whereIn('estado', ['ABIERTA','EN_ATENCION','RECONOCIDA','ASIGNADA','PENDIENTE']))
-            ->when($this->filtroNivel && $this->filtroNivel !== 'PRIORITARIAS', fn ($q) => $q->whereIn('prioridad', match ($this->filtroNivel) { 'CRITICO', 'CRITICA' => ['CRITICO','CRITICA'], 'ALTO', 'ALTA' => ['ALTO','ALTA'], 'MEDIO', 'MEDIA' => ['MEDIO','MEDIA'], 'BAJO', 'BAJA' => ['BAJO','BAJA'], default => [$this->filtroNivel] }))
-            ->when($this->filtroOrigen, fn ($q) => $q->where('modulo', $this->filtroOrigen))
-            ->tap(fn ($q) => \App\Modulos\Alertas\Aplicacion\Consultas\OrdenAlertas::aplicar($q))
-            ->paginate(min(100, max(5, $this->perPage)));
-
-        $adultosQuery = $turnoService->obtenerPacientesAsignadosQuery(auth()->user())
-            ->orderBy('apellido_paterno');
-
-        $this->conteos = $conteos;
-        $this->chartData = $chartData;
-
-        $detalle = $this->alertaId ? Alerta::with([
-            'residente.cama.habitacion',
-            'responsable.usuario',
-            'eventos' => fn ($q) => $q->with('usuario')->orderByDesc('fecha_hora'),
-        ])->find($this->alertaId) : null;
-        if ($detalle) {
-            $this->autorizarLecturaResidente($detalle->cod_residente);
-        }
-        $signoOrigen = $detalle?->modulo === 'SIGNOS' && filled($detalle->cod_registro)
-            ? SignoVital::query()->where('cod_residente', $detalle->cod_residente)->find($detalle->cod_registro)
-            : null;
-        $evolucionSignos = $signoOrigen ? SignoVital::query()
-            ->where('cod_residente', $detalle->cod_residente)
-            ->whereIn('estado', ['VIGENTE', 'ACTIVO'])
-            ->where('fecha_hora', '>=', $signoOrigen->fecha_hora)
-            ->orderBy('fecha_hora')
-            ->orderBy('cod_signo')
-            ->limit(6)
-            ->get() : collect();
         $usuario = auth()->user();
-        $turnoActivo = $detalle && $usuario?->hasRole('ENFERMEROS')
-            ? $turnoService->obtenerTurnoActivo($usuario) : null;
-        $puedeRegistrarNuevaMedicion = $detalle?->estado === 'EN_ATENCION'
-            && $turnoActivo !== null
-            && $usuario?->can('signos_vitales.crear')
-            && $usuario?->can('enfermeria.ver_pacientes_asignados')
-            && $turnoService->esPacienteAsignado($detalle->cod_residente, $usuario, $turnoActivo->cod_turno);
+        $bandeja = app(BandejaAlertas::class);
+        $turnoService = app(TurnoEnfermeriaService::class);
+        $base = $bandeja->consulta($usuario)
+            ->when($this->filtroAdulto, fn ($q) => $q->where('cod_residente', $this->filtroAdulto));
+        $statsEstado = (clone $base)->select('estado')->selectRaw('COUNT(*) as total')->groupBy('estado')->pluck('total', 'estado')->map(fn ($n) => (int) $n)->all();
+        $estadosHistoricos = array_diff_key($statsEstado, array_flip([...Alerta::ESTADOS_ACTIVOS, 'ATENDIDA', ...Alerta::ESTADOS_TERMINALES]));
+        $statsNivel = (clone $base)->abiertas()->select('prioridad')->selectRaw('COUNT(*) as total')->groupBy('prioridad')->pluck('total', 'prioridad')->all();
+        $origenesDisponibles = (clone $base)->whereNotNull('modulo')->where('modulo', '!=', '')->distinct()->orderBy('modulo')->pluck('modulo')->all();
+        $conteos = [
+            'total' => array_sum($statsEstado),
+            'criticas' => (int) (($statsNivel['CRITICO'] ?? 0) + ($statsNivel['CRITICA'] ?? 0)),
+            'altas' => (int) (($statsNivel['ALTO'] ?? 0) + ($statsNivel['ALTA'] ?? 0)),
+            'abiertas' => (int) ($statsEstado['ABIERTA'] ?? 0),
+            'pendientes' => array_sum(array_intersect_key($statsEstado, array_flip(Alerta::ESTADOS_ACTIVOS))),
+            'en_atencion' => (int) ($statsEstado['EN_ATENCION'] ?? 0),
+            'atendidas' => (int) ($statsEstado['ATENDIDA'] ?? 0),
+            'cerradas' => (int) ($statsEstado['CERRADA'] ?? 0),
+            'sin_responsable' => (clone $base)->abiertas()->whereNull('cod_personal_responsable')->count(),
+            'vencidas' => (clone $base)->abiertas()->whereNotNull('fecha_hora_limite')->where('fecha_hora_limite', '<', now())->count(),
+        ];
+        $this->conteos = $conteos;
+        $query = (clone $base)
+            ->when($this->search !== '', fn ($q) => $q->where(fn ($q) => $q
+                ->whereHas('residente', fn ($r) => $r->whereLike('nombres', '%'.$this->search.'%')->orWhereLike('apellido_paterno', '%'.$this->search.'%')->orWhereLike('apellido_materno', '%'.$this->search.'%'))
+                ->orWhereLike('cod_residente', '%'.$this->search.'%')->orWhereLike('cod_alerta', '%'.$this->search.'%')
+                ->orWhereLike('tipo', '%'.$this->search.'%')->orWhereLike('titulo', '%'.$this->search.'%')->orWhereLike('descripcion', '%'.$this->search.'%')))
+            ->when($this->filtroEstado === 'ACTIVAS', fn ($q) => $q->abiertas())
+            ->when($this->filtroEstado !== '' && $this->filtroEstado !== 'ACTIVAS', fn ($q) => $q->where('estado', $this->filtroEstado))
+            ->when($this->filtroNivel === 'PRIORITARIAS', fn ($q) => $q->abiertas()->whereIn('prioridad', Alerta::PRIORIDADES_ALTAS))
+            ->when($this->filtroNivel !== '' && $this->filtroNivel !== 'PRIORITARIAS', fn ($q) => $q->whereIn('prioridad', match ($this->filtroNivel) {
+                'CRITICO' => ['CRITICO', 'CRITICA'], 'ALTO' => ['ALTO', 'ALTA'], 'MEDIO' => ['MEDIO', 'MEDIA'], 'BAJO' => ['BAJO', 'BAJA'], default => [$this->filtroNivel],
+            }))
+            ->when($this->filtroOrigen !== '', fn ($q) => $q->where('modulo', $this->filtroOrigen))
+            ->when($this->filtroResponsabilidad === 'SIN_RESPONSABLE', fn ($q) => $q->whereNull('cod_personal_responsable'))
+            ->when($this->filtroResponsabilidad === 'PROPIAS', fn ($q) => $q->where('cod_personal_responsable', $usuario->personal?->cod_personal ?? '__SIN_PERSONAL__'))
+            ->when(validator(['fecha' => $this->fechaDesde], ['fecha' => 'required|date_format:Y-m-d'])->passes(), fn ($q) => $q->whereDate('fecha_hora', '>=', $this->fechaDesde))
+            ->when(validator(['fecha' => $this->fechaHasta], ['fecha' => 'required|date_format:Y-m-d'])->passes(), fn ($q) => $q->whereDate('fecha_hora', '<=', $this->fechaHasta));
+        $agrupar = fn (string $campo) => (clone $query)->select($campo)->selectRaw('COUNT(*) as total')
+            ->groupBy($campo)->pluck('total', $campo)->map(fn ($n) => (int) $n)->all();
+        $chartData = $this->chartData = ['estados' => $agrupar('estado'), 'origenes' => $agrupar('modulo'), 'niveles' => $agrupar('prioridad')];
+        $sinResponsableConsulta = (clone $query)->whereNull('cod_personal_responsable')->count();
+        $alertas = OrdenAlertas::aplicar($query)
+            ->with(['residente.cama.habitacion', 'responsable'])->paginate(min(100, max(5, $this->perPage)));
+        $prioritarias = OrdenAlertas::aplicar((clone $base)->abiertas()->whereIn('prioridad', Alerta::PRIORIDADES_ALTAS))
+            ->with('residente')->limit(3)->get();
+        $detalle = $this->alertaId ? (clone $base)->with(['residente.cama.habitacion', 'responsable.usuario', 'eventos.usuario'])->findOrFail($this->alertaId) : null;
+        $signoOrigen = $detalle?->modulo === 'SIGNOS' && $usuario->can('signos_vitales.ver') && filled($detalle->cod_registro)
+            ? SignoVital::query()->where('cod_residente', $detalle->cod_residente)->find($detalle->cod_registro) : null;
+        $evolucionSignos = $signoOrigen ? SignoVital::query()->where('cod_residente', $detalle->cod_residente)
+            ->whereIn('estado', ['VIGENTE', 'ACTIVO'])->where('fecha_hora', '>=', $signoOrigen->fecha_hora)
+            ->orderBy('fecha_hora')->limit(6)->get() : collect();
+        $preview = app(RolePreviewService::class)->isActive($usuario);
+        $puedeIntervenir = ! $preview && $usuario->hasRole('ENFERMEROS') && $usuario->canAny(['alertas.gestionar', 'alertas.seguimiento'])
+            && $usuario->personal?->estado === 'ACTIVO' && $turnoService->obtenerTurnoActivo($usuario) !== null
+            && (! $detalle || $turnoService->esPacienteAsignado($detalle->cod_residente, $usuario));
+        $contextoOperativo = ! $preview && ($usuario->hasRole('ENFERMEROS') ? $puedeIntervenir : $usuario->hasAnyRole(['ADMINISTRADOR', 'GERENTE', 'SUPERADMINISTRADOR']));
+        $puedeReconocer = $contextoOperativo && $usuario->canAny(['alertas.reconocer', 'alertas.gestionar']);
+        $puedeAsignar = $contextoOperativo && $usuario->canAny(['alertas.asignar', 'alertas.gestionar']);
+        $puedeCoordinar = ! $preview && $usuario->hasAnyRole(['ADMINISTRADOR', 'SUPERADMINISTRADOR']) && $usuario->canAny(['alertas.gestionar', 'alertas.seguimiento']);
+        $puedeCerrar = ! $preview && $usuario->canAny(['alertas.gestionar', 'alertas.cerrar'])
+            && ($puedeIntervenir || $puedeCoordinar);
+        $puedeRegistrarNuevaMedicion = $detalle?->estado === 'EN_ATENCION' && $puedeIntervenir && $usuario->can('signos_vitales.crear')
+            && $turnoService->esPacienteAsignado($detalle->cod_residente, $usuario);
+        $perfil = app(ExperienciaAlertas::class)->paraUsuario($usuario);
+        $adultos = $this->modalCrear ? $turnoService->obtenerPacientesAsignadosQuery($usuario)->orderBy('apellido_paterno')->get() : collect();
+        $personalConAcceso = $this->modalDetalle && $detalle && $puedeAsignar ? $turnoService->personalConAccesoConsultaResidente($detalle->cod_residente) : [];
+        $usuarios = $this->modalDetalle && $puedeAsignar
+            ? User::query()->where('estado', 'ACTIVO')->whereHas('personal', fn ($q) => $q->where('estado', 'ACTIVO'))
+                ->role(['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO'])
+                ->with(['personal', 'roles.permissions', 'permissions'])->get()->filter(fn ($u) => $u->can('alertas.ver')
+                    && ($turnoService->tieneLecturaClinicaGlobal($u) || in_array($u->personal->cod_personal, $personalConAcceso, true))) : collect();
 
-        return view('livewire.alertas.alertas-panel', [
-            'alertas' => $alertas,
-            'prioritarias' => \App\Modulos\Alertas\Aplicacion\Consultas\OrdenAlertas::aplicar((clone $baseStatsQuery)->whereIn('estado', ['ABIERTA','EN_ATENCION','RECONOCIDA','ASIGNADA','PENDIENTE'])->whereIn('prioridad', ['CRITICO','CRITICA','ALTO','ALTA']))->limit(3)->get(),
-            'conteos' => $conteos,
-            'chartData' => $chartData,
-            'alertaActiva' => $detalle,
-            'detalle' => $detalle,
-            'signoOrigen' => $signoOrigen,
-            'evolucionSignos' => $evolucionSignos,
-            'puedeRegistrarNuevaMedicion' => $puedeRegistrarNuevaMedicion,
-            'adultos' => $adultosQuery->get(),
-            'turnos' => Turno::activos()->orderBy('orden')->get(),
-            'usuarios' => User::query()->leftJoin('personal', 'usuarios.cod_usuario', '=', 'personal.cod_usuario')->where('usuarios.estado', 'ACTIVO')->orderBy('personal.apellido_paterno')->select('usuarios.*')->with('personal')->get(),
-        ])->layout(request()->routeIs('admin.enfermeria.*') ? 'layouts.enfermeria' : 'layouts.sistema');
+        return view('livewire.alertas.alertas-panel', compact('alertas', 'prioritarias', 'conteos', 'chartData', 'detalle', 'signoOrigen', 'evolucionSignos',
+            'puedeRegistrarNuevaMedicion', 'puedeIntervenir', 'puedeCoordinar', 'puedeCerrar', 'puedeReconocer', 'puedeAsignar', 'origenesDisponibles', 'sinResponsableConsulta', 'perfil', 'adultos', 'usuarios', 'preview', 'estadosHistoricos'))
+            ->layout(request()->routeIs('admin.enfermeria.*') ? 'layouts.enfermeria' : 'layouts.sistema');
     }
 }
