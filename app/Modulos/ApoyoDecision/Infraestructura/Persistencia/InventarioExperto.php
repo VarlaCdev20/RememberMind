@@ -36,10 +36,6 @@ final class InventarioExperto
 
     public const CONSERVACION = [
         'hechos_instantanea_experta',
-        'evidencias_cognitivas_instantanea',
-        'soportes_sinteticos_criterio',
-        'funcionalidad_instantanea_experta',
-        'evidencias_iadl_instantanea',
         'clasificaciones_dcl_instantanea',
         'motivos_dcl_instantanea',
         'reglas_aplicadas_dcl_instantanea',

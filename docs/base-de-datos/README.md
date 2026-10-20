@@ -15,6 +15,12 @@ related_modules: []
 
 # Base de datos de RememberMind
 
+**Reducción experta aprobada — 20/10/2026:** cuatro consolidaciones hacia tres
+tablas existentes, 29 columnas y cero tablas nuevas. Implementada e instalada
+en `remembermind_dev`: **75 operativas + 29 expertas = 104 de negocio**,
+comprobadas tras la transición, con igualdad de las filas originales y cinco
+DTO simulados. [Decisión, alcance y evidencia](DECISION_REDUCCION_EXPERTA_2026_10_20.md).
+
 **Captura Petersen original aprobada — 19/10/2026:** dos relaciones clínicas
 `valoraciones_petersen_originales` y `soportes_valoracion_petersen`, con cadenas
 propias inmutables y soportes tipados. Inventario aprobado: **75 operativas + 33

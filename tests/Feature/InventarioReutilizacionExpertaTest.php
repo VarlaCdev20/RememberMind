@@ -23,7 +23,7 @@ final class InventarioReutilizacionExpertaTest extends TestCase
         });
         $sinConteos = InventarioExperto::diagnosticar(DB::connection());
         $conConteos = InventarioExperto::diagnosticar(DB::connection(), true);
-        self::assertSame(33, $conConteos['expertas_presentes']);
+        self::assertSame(29, $conConteos['expertas_presentes']);
         self::assertSame([], $conConteos['expertas_ausentes']);
         self::assertContains('residentes', $conConteos['otras_tablas_fisicas']);
         self::assertContains('migrations', $conConteos['otras_tablas_fisicas']);
@@ -41,7 +41,7 @@ final class InventarioReutilizacionExpertaTest extends TestCase
     public function test_comando_existente_informa_el_alcance_sin_declarar_tablas_prescindibles(): void
     {
         $this->artisan('app:auditar-base-datos-remember-mind', ['--contar-filas' => true])
-            ->expectsOutputToContain('Expertas presentes: 33 / 33')
+            ->expectsOutputToContain('Expertas presentes: 29 / 29')
             ->expectsOutputToContain('Un conteo cero no demuestra desuso.')
             ->assertSuccessful();
     }

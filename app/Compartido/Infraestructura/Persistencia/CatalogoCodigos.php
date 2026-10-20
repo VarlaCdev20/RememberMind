@@ -12,10 +12,6 @@ final class CatalogoCodigos
         'soportes_valoracion_petersen' => ['cod_soporte_petersen', 'SVP'],
         'revisiones_evaluacion_experta' => ['cod_revision_experta', 'RVE'],
         'hechos_instantanea_experta' => ['cod_hecho_instantanea', 'HIX'],
-        'evidencias_cognitivas_instantanea' => ['cod_evidencia_cognitiva_instantanea', 'ECX'],
-        'soportes_sinteticos_criterio' => ['cod_soporte_sintetico', 'SSX'],
-        'funcionalidad_instantanea_experta' => ['cod_funcionalidad_instantanea', 'FIX'],
-        'evidencias_iadl_instantanea' => ['cod_evidencia_iadl_instantanea', 'EIX'],
         'clasificaciones_dcl_instantanea' => ['cod_clasificacion_dcl_instantanea', 'CIX'],
         'motivos_dcl_instantanea' => ['cod_motivo_dcl_instantanea', 'MIX'],
         'reglas_aplicadas_dcl_instantanea' => ['cod_regla_aplicada_dcl', 'RIX'],
@@ -118,6 +114,14 @@ final class CatalogoCodigos
         'visitas' => ['cod_visita', 'VIS'],
     ];
 
+    /** Identidades alternativas de bloques consolidados; no son tablas físicas. */
+    public const ALIASES = [
+        'evidencias_cognitivas_instantanea' => ['cod_evidencia_cognitiva_instantanea', 'ECX'],
+        'soportes_sinteticos_criterio' => ['cod_soporte_sintetico', 'SSX'],
+        'funcionalidad_instantanea_experta' => ['cod_funcionalidad_instantanea', 'FIX'],
+        'evidencias_iadl_instantanea' => ['cod_evidencia_iadl_instantanea', 'EIX'],
+    ];
+
     public static function clave(string $tabla): string
     {
         return self::definicion($tabla)[0];
@@ -138,6 +142,6 @@ final class CatalogoCodigos
 
     private static function definicion(string $tabla): array
     {
-        return self::ENTIDADES[$tabla] ?? throw new InvalidArgumentException('Entidad sin contrato de código: '.$tabla);
+        return self::ENTIDADES[$tabla] ?? self::ALIASES[$tabla] ?? throw new InvalidArgumentException('Entidad sin contrato de código: '.$tabla);
     }
 }

@@ -27,4 +27,9 @@ class EvidenciaCriterioEvaluacion extends ModeloExperto
     {
         return $this->belongsTo(EvidenciaEvaluacion::class, 'cod_evidencia_evaluacion', 'cod_evidencia_evaluacion');
     }
+
+    public function hecho(): BelongsTo
+    {
+        return $this->belongsTo(HechoInstantaneaExperta::class, 'cod_hecho_instantanea', 'cod_hecho_instantanea');
+    }
 }

@@ -42,16 +42,16 @@ class CodigosCorrelativosTest extends TestCase
         $this->assertSame(CatalogoCodigos::formatear('usuarios', $u + 2), $g->siguiente('usuarios'));
     }
 
-    public function test_catalogo_cubre_108_entidades_con_prefijos_unicos_y_claves_reales(): void
+    public function test_catalogo_cubre_104_entidades_con_prefijos_unicos_y_claves_reales(): void
     {
-        $this->assertCount(108, CatalogoCodigos::ENTIDADES);
+        $this->assertCount(104, CatalogoCodigos::ENTIDADES);
         $prefijos = [];
         foreach (CatalogoCodigos::ENTIDADES as $tabla => [$pk, $prefijo]) {
             $this->assertTrue(DB::getSchemaBuilder()->hasColumn($tabla, $pk), $tabla);
             $this->assertLessThanOrEqual(20, strlen(CatalogoCodigos::formatear($tabla, 1000000)));
             $prefijos[] = $prefijo;
         }
-        $this->assertCount(108, array_unique($prefijos));
+        $this->assertCount(104, array_unique($prefijos));
     }
 
     public function test_entidad_desconocida_no_reserva_ningun_codigo(): void

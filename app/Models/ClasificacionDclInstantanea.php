@@ -42,10 +42,15 @@ final class ClasificacionDclInstantanea extends ModeloExperto
         return $this->belongsTo(EvaluacionExperta::class, 'cod_evaluacion_experta', 'cod_evaluacion_experta');
     }
 
-    /** Sin parámetros: devuelve una relación BelongsTo con la FK original, sin ejecutar SQL ni crear registros. */
-    public function funcionalidad(): BelongsTo
+    /** Devuelve el bloque funcional conservado en esta fila, sin consulta adicional. */
+    public function funcionalidad(): array
     {
-        return $this->belongsTo(FuncionalidadInstantaneaExperta::class, 'cod_funcionalidad_instantanea', 'cod_funcionalidad_instantanea');
+        return $this->only(['cod_funcionalidad_instantanea', 'funcionalidad_independencia_relativa', 'funcionalidad_revisor_sintetico_id', 'funcionalidad_justificacion']);
+    }
+
+    public function evidenciasIadl(): HasMany
+    {
+        return $this->hasMany(HechoInstantaneaExperta::class, 'iadl_cod_funcionalidad_instantanea', 'cod_funcionalidad_instantanea')->whereNotNull('cod_evidencia_iadl_instantanea');
     }
 
     /** Sin parámetros: devuelve la relación Eloquent del contrato aprobado; la consulta diferida puede propagar errores SQL. */

@@ -14,10 +14,10 @@ use App\Modulos\ApoyoDecision\Aplicacion\Acciones\EjecutarObservaciones;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarHallazgosObservacionales;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarObservacionesConservadas;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaResultadosExperto;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionReduccionConservacion;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\PaqueteObservacional;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
 use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
-use MotorExperto\soporte\conservacion\CodecInstantanea;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use DateTimeImmutable;
 use DomainException;
@@ -28,13 +28,16 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
 use MotorExperto\dominio\conocimiento\reglas\EvaluadorObservaciones;
+use MotorExperto\soporte\conservacion\CodecInstantanea;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Permission\Models\Role;
+use Tests\Support\CorromperConservacionParaPrueba;
 use Tests\Support\InformeCognitivoFixture;
 use Tests\TestCase;
 
 final class HallazgosObservacionalesTest extends TestCase
 {
+    use CorromperConservacionParaPrueba;
     use RefreshDatabase;
 
     private User $medico;
@@ -169,7 +172,7 @@ final class HallazgosObservacionalesTest extends TestCase
     {
         $this->control();
         $id = app(EjecutarObservaciones::class)->ejecutar($this->medico, $this->residente, (string) Str::uuid());
-        DB::table('hechos_instantanea_experta')->where('cod_evaluacion_experta', $id)->where('concepto_dominio', 'repite_preguntas')->update(['valor_logico' => false]);
+        $this->corromperConservacion(fn () => DB::table('hechos_instantanea_experta')->where('cod_evaluacion_experta', $id)->where('concepto_dominio', 'repite_preguntas')->update(['valor_logico' => false]));
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
             ->assertSee('No se pudieron consultar los hallazgos observacionales')->assertDontSee('Se documentó un episodio de repetición de preguntas.');
     }
@@ -210,6 +213,9 @@ final class HallazgosObservacionalesTest extends TestCase
 
     public function test_migracion_reversible_conserva_una_fila_historica_y_sus_valores_tipados(): void
     {
+        // Las migraciones históricas se revierten en orden: primero la consolidación posterior.
+        $reduccion = new TransicionReduccionConservacion;
+        $reduccion->bajar();
         $paquete = app(PaqueteObservacional::class)->preparar($this->medico);
         InformeCognitivoFixture::insertar('evaluaciones_expertas', ['cod_evaluacion_experta' => 'LEGACY-OBS-EVAL',
             'cod_version_modelo' => $paquete['version'], 'cod_residente' => $this->residente->getKey(), 'origen_activacion' => 'PRUEBA_TECNICA']);
@@ -275,12 +281,12 @@ final class HallazgosObservacionalesTest extends TestCase
             $otraEvaluacion = app(EjecutarObservaciones::class)->ejecutar($this->medico, $otro, (string) Str::uuid());
             $otraEvidencia = DB::table('evidencias_evaluacion')->where('cod_evaluacion_experta', $otraEvaluacion)->value('cod_evidencia_evaluacion');
         }
-        match ($caso) {
+        $this->corromperConservacion(fn () => match ($caso) {
             'eliminar' => $q->delete(),
             'estado' => $q->update(['estado_participacion' => 'NO_EVALUABLE']),
             'rol' => $q->update(['rol_en_criterio' => 'OTRO']),
             'ajena' => $q->update(['cod_evidencia_evaluacion' => $otraEvidencia]),
-        };
+        });
         $this->expectException(DomainException::class);
         app(ConsultarObservacionesConservadas::class)->consultar($this->medico, $this->residente, $id);
     }
@@ -289,7 +295,7 @@ final class HallazgosObservacionalesTest extends TestCase
     {
         $this->control(['estado' => 'ANULADO']);
         $id = app(EjecutarObservaciones::class)->ejecutar($this->medico, $this->residente, (string) Str::uuid());
-        DB::table('hechos_instantanea_experta')->where('cod_evaluacion_experta', $id)->where('concepto_dominio', 'estado')->update(['valor_texto' => 'RECTIFICADO']);
+        $this->corromperConservacion(fn () => DB::table('hechos_instantanea_experta')->where('cod_evaluacion_experta', $id)->where('concepto_dominio', 'estado')->update(['valor_texto' => 'RECTIFICADO']));
         $this->expectException(DomainException::class);
         app(ConsultarObservacionesConservadas::class)->consultar($this->medico, $this->residente, $id);
     }

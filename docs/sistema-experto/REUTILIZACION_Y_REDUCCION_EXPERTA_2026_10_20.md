@@ -1,12 +1,13 @@
 # Reutilización y reducción del sistema experto
 
-Fecha: 20/10/2026. Estado: **análisis de reducción y dirección de diseño;
-sin migración ni cambio de estructura aprobado**.
+Fecha: 20/10/2026. Estado: **primera reducción aprobada, implementada e
+instalada; diseño de conservación institucional íntegra todavía abierto**.
 
 **Primer resultado concreto:** [diccionario de cuatro consolidaciones](PROPUESTA_REDUCCION_CUATRO_TABLAS_2026_10_20.md).
-Propone pasar de 108 a 104 sin nuevas tablas en esa transición. El ensayo
-reversible de filas está implementado y comprobado; la migración, lectores
-sobre esquema reducido y guardado del recálculo íntegro siguen pendientes.
+Pasó de 108 a 104 sin nuevas tablas en esa transición. La migración reversible,
+los lectores reducidos y la recuperación se comprobaron en ambos motores y en
+la [instalación local](../base-de-datos/DECISION_REDUCCION_EXPERTA_2026_10_20.md).
+El guardado del recálculo institucional íntegro sigue pendiente.
 
 ## Decisión vigente de la propietaria
 
@@ -17,7 +18,7 @@ buscar una estructura menor».
 
 Por tanto, no se implementa el diseño de 133 tablas y no se sustituye el
 recálculo íntegro por un informe categórico. El inventario aprobado e instalado
-sigue siendo **108 tablas de negocio: 75 operativas y 33 expertas**. Las 25
+es ahora **104 tablas de negocio: 75 operativas y 29 expertas**. Las 25
 candidatas nunca se crearon. La preparación compuesta del commit `8695cb64`
 sigue siendo en memoria; el guardado histórico completo permanece abierto.
 
@@ -160,20 +161,22 @@ Ausencia o corrupción del release produce error explícito. El hash no prueba
 existencia o respaldo: la retención y restauración reales deben verificarse.
 No se recalcula con el checkout actual para simular recuperación histórica.
 
-## Estado y siguiente decisión estructural
+## Estado del ensayo y decisión posterior
 
-Implementado ahora: auditor de lectura reutilizando código existente,
+Implementado en el corte del ensayo: auditor de lectura reutilizando código existente,
 ensayo reversible de las cuatro consolidaciones, verificación local y
 diccionario concreto de transición/reversión. No hay
 guardado nuevo, consolidación física, migración o borrado de datos.
 
 El [diccionario de cuatro consolidaciones](PROPUESTA_REDUCCION_CUATRO_TABLAS_2026_10_20.md)
 ya fija columnas, constraints, consumidores y mapa reversible para la primera
-reducción. Queda aprobar esa transición e implementarla con comprobación sobre
-esquema nuevo. El diccionario del guardado de recálculo íntegro todavía debe
+reducción. La propietaria aprobó posteriormente esa transición; su
+[decisión y estado de implementación](../base-de-datos/DECISION_REDUCCION_EXPERTA_2026_10_20.md)
+se registran por separado. El diccionario del guardado de recálculo íntegro todavía debe
 cerrarse sin trasladar el diseño rechazado. La instrucción de reducir fija la
 dirección; no autoriza pérdida de historia.
-Mientras tanto, se mantienen las 108 tablas y sus consumidores operativos.
+El ensayo se ejecutó sobre 108 tablas de negocio; no acredita por sí solo la
+instalación posterior del modelo reducido.
 
 ## Evidencia de este incremento
 

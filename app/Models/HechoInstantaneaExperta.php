@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\ProyeccionReduccionExperta;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * TÍTULO:
@@ -58,9 +58,14 @@ final class HechoInstantaneaExperta extends ModeloExperto
         return $this->belongsTo(Personal::class, 'cod_personal_autor', 'cod_personal');
     }
 
-    /** Sin parámetros: devuelve la relación Eloquent del contrato aprobado; la consulta diferida puede propagar errores SQL. */
-    public function caracterizacionCognitiva(): HasOne
+    /** Devuelve las columnas del bloque cognitivo presente en esta fila, sin consulta adicional. */
+    public function caracterizacionCognitiva(): ?array
     {
-        return $this->hasOne(EvidenciaCognitivaInstantanea::class, 'cod_hecho_instantanea', 'cod_hecho_instantanea');
+        return $this->cod_evidencia_cognitiva_instantanea === null ? null : $this->only(array_values(ProyeccionReduccionExperta::COG));
+    }
+
+    public function funcionalidad(): BelongsTo
+    {
+        return $this->belongsTo(ClasificacionDclInstantanea::class, 'iadl_cod_funcionalidad_instantanea', 'cod_funcionalidad_instantanea');
     }
 }

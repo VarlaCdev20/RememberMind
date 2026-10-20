@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\EvaluarReduccionConservacion;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\ProyeccionReduccionExperta as P;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionReduccionConservacion;
 use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\ContextoSimulacionLocal;
 use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\EjecutorSimulacionLocal;
 use DateTimeImmutable;
@@ -78,11 +79,12 @@ final class PreflightReduccionExpertaTest extends TestCase
             self::assertDoesNotMatchRegularExpression('/^\s*(insert|update|delete|alter|create|drop|truncate)\b/i', $sql);
         }
         $this->artisan('app:auditar-base-datos-remember-mind', ['--evaluar-reduccion' => true])
-            ->expectsOutputToContain('PASS_PROYECCION_EN_MEMORIA')
+            ->expectsOutputToContain('PASS_RECONSTRUCCION_MODELO_REDUCIDO')
             ->expectsOutputToContain('Sin DDL; no acredita migración ni recálculo institucional completo.')
             ->assertSuccessful();
         // La base anterior no tiene UNIQUE por evaluación/orden cognitivo.
         // La transición debe detectar una colección alterada, no normalizarla al copiar.
+        (new TransicionReduccionConservacion)->bajar();
         $id = DB::table(P::COGNITIVAS)->value('cod_evidencia_cognitiva_instantanea');
         DB::table(P::COGNITIVAS)->where('cod_evidencia_cognitiva_instantanea', $id)->update(['orden' => 999]);
         $this->expectException(DomainException::class);
@@ -92,6 +94,7 @@ final class PreflightReduccionExpertaTest extends TestCase
 
     public function test_referencia_entrante_fuera_del_mapa_bloquea_el_plan(): void
     {
+        (new TransicionReduccionConservacion)->bajar();
         Schema::create('prueba_fk_consolidacion', function (Blueprint $t): void {
             $t->string('cod_cognitiva', 20)->nullable();
             $t->foreign('cod_cognitiva')->references('cod_evidencia_cognitiva_instantanea')->on(P::COGNITIVAS);
@@ -122,6 +125,7 @@ final class PreflightReduccionExpertaTest extends TestCase
         if (DB::getDriverName() !== 'pgsql') {
             $this->markTestSkipped('El caso de esquemas separados requiere PostgreSQL.');
         }
+        (new TransicionReduccionConservacion)->bajar();
         DB::statement('CREATE SCHEMA prueba_fk_externa');
         try {
             DB::statement('CREATE TABLE prueba_fk_externa.origen (cod_cognitiva varchar(20) REFERENCES public.evidencias_cognitivas_instantanea(cod_evidencia_cognitiva_instantanea))');

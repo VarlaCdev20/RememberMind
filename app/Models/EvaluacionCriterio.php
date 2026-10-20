@@ -60,6 +60,6 @@ class EvaluacionCriterio extends ModeloExperto
     /** Relación original del contrato de conservación aprobado. */
     public function soportesSinteticos(): HasMany
     {
-        return $this->hasMany(SoporteSinteticoCriterio::class, 'cod_evaluacion_criterio', 'cod_evaluacion_criterio');
+        return $this->hasMany(EvidenciaCriterioEvaluacion::class, 'cod_evaluacion_criterio', 'cod_evaluacion_criterio')->whereNotNull('cod_hecho_instantanea');
     }
 }

@@ -1,9 +1,12 @@
 # Propuesta concreta: consolidar cuatro tablas expertas
 
-Fecha: 20/10/2026. Estado: **PROPUESTA DE TRANSICIÓN NO APROBADA; SIN DDL**.
-La propietaria indicó reducir y reutilizar, manteniendo recálculo íntegro.
-Este documento concreta la primera reducción física posible. No autoriza ni
-implementa por sí mismo la transición del modelo congelado.
+Fecha: 20/10/2026. Estado: **APROBADA, IMPLEMENTADA E INSTALADA LOCALMENTE**.
+La propietaria indicó reducir y reutilizar, manteniendo recálculo íntegro, y
+respondió «listo que fslta» a la solicitud concreta de aprobar estas cuatro
+consolidaciones, sus 29 columnas y el plan de transición/reversión. Esta
+respuesta se registra como aprobación de ese alcance. La instalación y su
+evidencia se documentan en la [decisión de instalación](../base-de-datos/DECISION_REDUCCION_EXPERTA_2026_10_20.md).
+El ensayo previo de este documento conserva su alcance histórico.
 
 ## Alcance y conteo
 
@@ -17,7 +20,7 @@ Consolidar cuatro relaciones existentes en tres destinos que ya existen,
 | `funcionalidad_instantanea_experta` | `clasificaciones_dcl_instantanea`, bloque funcional fijo |
 | `soportes_sinteticos_criterio` | `evidencias_criterio_evaluacion`, alternativa de soporte por hecho |
 
-Resultado de esta transición, si se aprueba y se ejecuta satisfactoriamente:
+Resultado autorizado, condicionado a ejecutar satisfactoriamente la transición:
 **75 operativas + 29 expertas = 104 tablas de negocio**, frente a las 108
 vigentes. La propuesta anterior de 25 tablas fue rechazada y nunca instalada.
 No se cuenta como retirada una tabla vaciada o simplemente oculta del catálogo.
@@ -273,10 +276,14 @@ correctamente rechaza eliminar historia; y limpiar las funciones PostgreSQL
 del esquema exclusivo de pruebas. Las ejecuciones finales son posteriores.
 Nada de esa preparación de tests se ejecuta sobre `remembermind_dev`.
 
-## Decisión concreta pendiente
+## Decisión concreta registrada
 
-Aprobar o ajustar **estas cuatro consolidaciones, sus 29 columnas, cambios de
-nulabilidad/FK/constraints y el plan de transición/reversión**, sin tablas
-nuevas en este incremento. La ejecución posterior tendrá sus gates y pruebas.
-No se solicita aprobar las tres candidatas de perfiles ni se atribuye a esta
+La respuesta de la propietaria del 20/10/2026 aprueba **estas cuatro
+consolidaciones, sus 29 columnas, cambios de nulabilidad/FK/constraints y el
+plan de transición/reversión**, sin tablas nuevas en este incremento. La
+implementación debe pasar sus gates y pruebas antes de instalarse en la base
+local. No se aprueban las tres candidatas de perfiles ni se atribuye a esta
 decisión la conservación institucional completa todavía pendiente.
+
+La [decisión de implementación](../base-de-datos/DECISION_REDUCCION_EXPERTA_2026_10_20.md)
+separa el objetivo aprobado del estado físico comprobado.

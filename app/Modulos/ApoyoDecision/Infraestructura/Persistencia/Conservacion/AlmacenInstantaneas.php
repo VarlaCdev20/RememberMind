@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion;
 
+use App\Compartido\Aplicacion\Contratos\CodigosEntidad;
 use App\Compartido\Infraestructura\Persistencia\CatalogoCodigos;
 use App\Compartido\Infraestructura\Persistencia\GeneradorCodigo;
 use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\MapeoFuentes\ExtractorVariableMapeada;
@@ -210,6 +211,17 @@ final readonly class AlmacenInstantaneas
         }
         $meta = $this->metadatosOrigen($e);
         $mapa = [];
+        $caracterizaciones = [];
+        foreach (array_values($m->evidencias) as $orden => $c) {
+            $datos = ['cod_evidencia_cognitiva_instantanea' => app(CodigosEntidad::class)->siguiente('evidencias_cognitivas_instantanea', $this->conexion),
+                'cognitiva_dominio' => $c->dominio->value, 'cognitiva_subcomponente' => $c->subcomponente?->value,
+                'cognitiva_hallazgo' => $c->hallazgo->value, 'cognitiva_instrumento_id_dominio' => $c->instrumentoId,
+                'cognitiva_justificacion' => $c->justificacion, 'cognitiva_orden' => $orden];
+            foreach (['instrumento', 'edicion', 'subprueba', 'norma', 'idioma', 'poblacion', 'revisor'] as $campo) {
+                $datos['cognitiva_referencia_'.$campo] = $c->referenciaSintetica[$campo] ?? null;
+            }
+            $caracterizaciones[$c->hecho->id] = $datos;
+        }
         foreach (array_values($m->hechos) as $i => $h) {
             $original = in_array($h->id, $originales, true) ? $h->id : null;
             if ($original !== null) {
@@ -226,17 +238,8 @@ final readonly class AlmacenInstantaneas
                 'concepto_dominio' => $h->concepto, 'orden' => $i, 'tipo_origen' => $tipo, 'cod_evidencia_evaluacion' => $original,
                 'cod_actividad' => $actividad ? $h->episodioId : null,
                 'cod_atencion' => $original !== null && ! $actividad ? $h->episodioId : null]
-                + CodecInstantanea::fecha('fecha_hecho', $h->fecha) + CodecInstantanea::escalar('valor', $h->valor));
+                + CodecInstantanea::fecha('fecha_hecho', $h->fecha) + CodecInstantanea::escalar('valor', $h->valor) + ($caracterizaciones[$h->id] ?? []));
             $mapa[$h->id] = ['id' => $id, 'original' => $original];
-        }
-        foreach (array_values($m->evidencias) as $i => $c) {
-            $datos = ['cod_hecho_instantanea' => $mapa[$c->hecho->id]['id'], 'dominio' => $c->dominio->value,
-                'subcomponente' => $c->subcomponente?->value, 'hallazgo' => $c->hallazgo->value, 'instrumento_id_dominio' => $c->instrumentoId,
-                'justificacion' => $c->justificacion, 'orden' => $i];
-            foreach (['instrumento', 'edicion', 'subprueba', 'norma', 'idioma', 'poblacion', 'revisor'] as $campo) {
-                $datos['referencia_'.$campo] = $c->referenciaSintetica[$campo] ?? null;
-            }
-            $this->insertar('evidencias_cognitivas_instantanea', $datos);
         }
 
         return $mapa;
@@ -302,8 +305,11 @@ final readonly class AlmacenInstantaneas
                     'cod_evidencia_evaluacion' => $dato['original'], 'rol_en_criterio' => 'SOPORTE_EXPERIMENTAL',
                     'estado_participacion' => 'PRUEBA_TECNICA', 'orden_conservacion' => $orden, 'fecha_hora_vinculacion' => now()->format('Y-m-d H:i:s')]);
             } else {
-                $this->insertar('soportes_sinteticos_criterio', ['cod_evaluacion_criterio' => $criterio,
-                    'cod_hecho_instantanea' => $dato['id'], 'orden' => $orden]);
+                $this->insertar('evidencias_criterio_evaluacion', ['cod_evaluacion_criterio' => $criterio,
+                    'cod_hecho_instantanea' => $dato['id'], 'cod_evidencia_evaluacion' => null,
+                    'cod_soporte_sintetico' => app(CodigosEntidad::class)->siguiente('soportes_sinteticos_criterio', $this->conexion),
+                    'rol_en_criterio' => 'SOPORTE_EXPERIMENTAL', 'estado_participacion' => 'PRUEBA_TECNICA',
+                    'orden_conservacion' => $orden, 'fecha_hora_vinculacion' => null]);
             }
         }
     }
@@ -354,7 +360,7 @@ final readonly class AlmacenInstantaneas
             $hechos[$h->id] = $h;
             $porPk[$f->cod_hecho_instantanea] = $h;
         }
-        $cognitivas = $this->db()->table('evidencias_cognitivas_instantanea')->whereIn('cod_hecho_instantanea', array_keys($porPk))->orderBy('orden')->get()->all();
+        $cognitivas = $this->db()->table('hechos_instantanea_experta')->whereIn('cod_hecho_instantanea', array_keys($porPk))->whereNotNull('cod_evidencia_cognitiva_instantanea')->orderBy('cognitiva_orden')->get()->map(fn ($h) => (object) $this->bloque((array) $h, ProyeccionReduccionExperta::COG))->all();
         $this->validarOrden($cognitivas, 'orden');
         $evidencias = [];
         foreach ($cognitivas as $f) {
@@ -442,13 +448,6 @@ final readonly class AlmacenInstantaneas
     private function cargarSoportes(string $e, array $porPk): array
     {
         $todos = [];
-        $sinteticos = $this->db()->table('soportes_sinteticos_criterio as s')
-            ->join('evaluacion_criterios as c', 'c.cod_evaluacion_criterio', '=', 's.cod_evaluacion_criterio')
-            ->where('c.cod_evaluacion_experta', $e)->where('c.tipo_registro', '<>', 'D137')->select('s.*')->get();
-        foreach ($sinteticos as $f) {
-            $h = $porPk[$f->cod_hecho_instantanea] ?? throw new DomainException('Soporte de otra evaluación.');
-            $todos[$f->cod_evaluacion_criterio][] = [$f->orden, $h->id];
-        }
         $originales = $this->db()->table('hechos_instantanea_experta')->where('cod_evaluacion_experta', $e)
             ->whereNotNull('cod_evidencia_evaluacion')->pluck('id_hecho_dominio', 'cod_evidencia_evaluacion')->all();
         $vinculos = $this->db()->table('evidencias_criterio_evaluacion as s')
@@ -459,7 +458,7 @@ final readonly class AlmacenInstantaneas
                 throw new DomainException('Rol o participación original incompatible.');
             }
             $todos[$f->cod_evaluacion_criterio][] = [$f->orden_conservacion,
-                $originales[$f->cod_evidencia_evaluacion] ?? throw new DomainException('Soporte sin hecho original.')];
+                $f->cod_hecho_instantanea !== null ? ($porPk[$f->cod_hecho_instantanea]->id ?? throw new DomainException('Soporte de otra evaluación.')) : ($originales[$f->cod_evidencia_evaluacion] ?? throw new DomainException('Soporte sin hecho original.'))];
         }
         $salida = [];
         foreach ($todos as $criterio => $lista) {
@@ -531,19 +530,24 @@ final readonly class AlmacenInstantaneas
                 $mapa[$h->id_hecho_dominio] = ['id' => $h->cod_hecho_instantanea, 'original' => $h->cod_evidencia_evaluacion];
             }
             $f = $r->perfil->funcionalidad;
-            $funcion = $this->insertar('funcionalidad_instantanea_experta', ['cod_evaluacion_experta' => $e,
-                'independencia_relativa' => $f->independenciaRelativa->value, 'revisor_sintetico_id' => $f->revisorSinteticoId, 'justificacion' => $f->justificacion]);
-            foreach ($f->evidencias as $i => $v) {
-                $this->insertar('evidencias_iadl_instantanea', ['cod_funcionalidad_instantanea' => $funcion,
-                    'cod_hecho_instantanea' => $mapa[$v->hecho->id]['id'], 'actividad_id_dominio' => $v->actividadId,
-                    'estado' => $v->estado->value, 'oportunidad' => $v->oportunidad->value, 'nivel_previo' => $v->nivelPrevio?->value,
-                    'causa_ayuda' => $v->causaAyuda, 'atribucion_cognitiva_simulada' => $v->atribucionCognitivaSimulada,
-                    'revisor_sintetico_id' => $v->revisorSinteticoId, 'orden' => $i]);
-            }
+            $funcion = app(CodigosEntidad::class)->siguiente('funcionalidad_instantanea_experta', $this->conexion);
             $clasificacion = $this->insertar('clasificaciones_dcl_instantanea', ['cod_evaluacion_experta' => $e,
                 'cod_funcionalidad_instantanea' => $funcion, 'version_contrato' => $r->perfil->versionContrato,
+                'funcionalidad_independencia_relativa' => $f->independenciaRelativa->value,
+                'funcionalidad_revisor_sintetico_id' => $f->revisorSinteticoId, 'funcionalidad_justificacion' => $f->justificacion,
                 'diferencial' => $r->perfil->diferencial->value, 'patron_candidato' => $r->patronCandidato?->value,
                 'justificacion' => $r->justificacion, 'uso' => $r::USO, 'huella_clasificacion' => $hash]);
+            foreach ($f->evidencias as $i => $v) {
+                $cambio = ['cod_evidencia_iadl_instantanea' => app(CodigosEntidad::class)->siguiente('evidencias_iadl_instantanea', $this->conexion),
+                    'iadl_cod_funcionalidad_instantanea' => $funcion, 'iadl_actividad_id_dominio' => $v->actividadId,
+                    'iadl_estado' => $v->estado->value, 'iadl_oportunidad' => $v->oportunidad->value, 'iadl_nivel_previo' => $v->nivelPrevio?->value,
+                    'iadl_causa_ayuda' => $v->causaAyuda, 'iadl_atribucion_cognitiva_simulada' => $v->atribucionCognitivaSimulada,
+                    'iadl_revisor_sintetico_id' => $v->revisorSinteticoId, 'iadl_orden' => $i];
+                if ($db->table('hechos_instantanea_experta')->where('cod_hecho_instantanea', $mapa[$v->hecho->id]['id'])
+                    ->whereNull('cod_evidencia_iadl_instantanea')->update($cambio) !== 1) {
+                    throw new DomainException('La caracterización IADL ya fue conservada.');
+                }
+            }
             $cat = CatalogoConservacionExperta::leer($this->conexion, $m->versionConocimiento, $this->simulacionLocal);
             foreach (array_keys($r->perfil->criterios) as $i => $codigo) {
                 $c = $this->guardarCriterio($e, $cat, 'DCL', $codigo, $r->perfil->criterios[$codigo]->value,
@@ -610,7 +614,7 @@ final readonly class AlmacenInstantaneas
         $c = $db->table('clasificaciones_dcl_instantanea')->where('cod_evaluacion_experta', $e)->first();
         if ($c === null) {
             if ($db->table('evaluacion_criterios')->where('cod_evaluacion_experta', $e)->where('tipo_registro', 'DCL')->exists()
-                || $db->table('funcionalidad_instantanea_experta')->where('cod_evaluacion_experta', $e)->exists()) {
+                || $db->table('hechos_instantanea_experta')->where('cod_evaluacion_experta', $e)->whereNotNull('cod_evidencia_iadl_instantanea')->exists()) {
                 throw new DomainException('Clasificación incompleta.');
             }
 
@@ -619,15 +623,17 @@ final readonly class AlmacenInstantaneas
         if ($c->version_contrato !== $contrato || $c->uso !== ResultadoClasificacionDcl::USO) {
             throw new DomainException('Contrato o alcance DCL incompatible.');
         }
-        $f = $db->table('funcionalidad_instantanea_experta')->where('cod_funcionalidad_instantanea', $c->cod_funcionalidad_instantanea)
-            ->where('cod_evaluacion_experta', $e)->first() ?? throw new DomainException('Perfil funcional ausente o ajeno.');
+        $f = (object) $this->bloque((array) $c, ProyeccionReduccionExperta::FUN);
+        $f->cod_funcionalidad_instantanea = $c->cod_funcionalidad_instantanea;
         $m = $vector->memoria;
         $porPk = [];
         foreach ($db->table('hechos_instantanea_experta')->where('cod_evaluacion_experta', $e)->get() as $h) {
             $porPk[$h->cod_hecho_instantanea] = $m->hechos[$h->id_hecho_dominio];
         }
         $iadl = [];
-        foreach ($this->ordenadas('evidencias_iadl_instantanea', 'cod_funcionalidad_instantanea', $f->cod_funcionalidad_instantanea) as $v) {
+        $filasIadl = $this->db()->table('hechos_instantanea_experta')->where('iadl_cod_funcionalidad_instantanea', $f->cod_funcionalidad_instantanea)->orderBy('iadl_orden')->get()->all();
+        $this->validarOrden($filasIadl, 'iadl_orden');
+        foreach (array_map(fn ($h) => (object) $this->bloque((array) $h, ProyeccionReduccionExperta::IAD), $filasIadl) as $v) {
             $iadl[] = new EvidenciaIadl($porPk[$v->cod_hecho_instantanea] ?? throw new DomainException('IADL sin hecho propio.'),
                 $v->actividad_id_dominio, EstadoIadl::from($v->estado), Oportunidad::from($v->oportunidad),
                 $v->nivel_previo === null ? null : EstadoIadl::from($v->nivel_previo), $v->causa_ayuda,
@@ -707,5 +713,19 @@ final readonly class AlmacenInstantaneas
         }
 
         return $padre === null ? $r[0] : $r;
+    }
+
+    /** Proyección cerrada del bloque fijo; no consulta tablas retiradas. */
+    private function bloque(array $fila, array $mapa): array
+    {
+        $r = [];
+        foreach ($mapa as $columna => $destino) {
+            $r[$columna] = $fila[$destino];
+        }
+        if (isset($fila['cod_hecho_instantanea'])) {
+            $r['cod_hecho_instantanea'] = $fila['cod_hecho_instantanea'];
+        }
+
+        return $r;
     }
 }

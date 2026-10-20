@@ -4,11 +4,14 @@
 eligió mantener recálculo íntegro con una estructura menor. El código de
 preparación y sus pruebas conservan su alcance; el diseño de guardado continúa
 en [reutilización y reducción](REUTILIZACION_Y_REDUCCION_EXPERTA_2026_10_20.md).
+La primera reducción posterior se aprobó e instaló: **104 tablas de negocio**,
+con [evidencia independiente de este corte](../base-de-datos/DECISION_REDUCCION_EXPERTA_2026_10_20.md).
 
 Fecha: 20/10/2026. Estado: incremento técnico de preparación en memoria.
 **La conservación institucional completa sigue abierta.** No se ha añadido
 estructura ni historia clínica a `remembermind_dev` y no se ha ejecutado DDL.
-El inventario aprobado continúa en **108 = 75 operativas + 33 expertas**.
+El inventario de ese corte era **108 = 75 operativas + 33 expertas**; la
+reducción posterior no completa el guardado institucional pendiente.
 
 ## Implementación e integración
 

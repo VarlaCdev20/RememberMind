@@ -9,7 +9,7 @@ final class GeneradorCodigo implements CodigosEntidad
 {
     public function registrarExplicito(string $tabla, string $codigo, ?string $conexion = null): void
     {
-        $prefijo = CatalogoCodigos::ENTIDADES[$tabla][1] ?? throw new \InvalidArgumentException('Entidad desconocida.');
+        $prefijo = CatalogoCodigos::ENTIDADES[$tabla][1] ?? CatalogoCodigos::ALIASES[$tabla][1] ?? throw new \InvalidArgumentException('Entidad desconocida.');
         if (! preg_match('/^COD_'.preg_quote($prefijo, '/').'_([0-9]{6,12})$/D', $codigo, $m)) {
             if (! app()->environment('testing')) {
                 throw new \InvalidArgumentException('La identidad nueva debe usar el código correlativo de su entidad.');

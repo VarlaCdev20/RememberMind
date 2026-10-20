@@ -6,6 +6,16 @@ namespace Tests\Feature\SistemaExperto\Infrastructure\Repositories;
 
 use App\Models\EvaluacionExperta;
 use App\Models\HechoInstantaneaExperta;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\CatalogoConservacionExperta as Catalogo;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionReduccionConservacion;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorResultados;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\EvaluacionExpertaEloquentRepository;
+use DateTimeImmutable;
+use DateTimeZone;
+use DomainException;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
+use LogicException;
 use MotorExperto\dominio\orion\Entities\Cognicion\ResultadoDominio;
 use MotorExperto\dominio\orion\Entities\Cognicion\ResultadoSubcomponente;
 use MotorExperto\dominio\orion\Entities\Cognicion\VectorCognitivo;
@@ -23,16 +33,7 @@ use MotorExperto\dominio\orion\ValueObjects\Cognicion\EvaluabilidadEnum as V;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum as H;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\SubcomponenteCognitivoEnum as Sub;
 use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum as Op;
-use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\CatalogoConservacionExperta as Catalogo;
 use MotorExperto\soporte\conservacion\CodecInstantanea as Codec;
-use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorResultados;
-use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\EvaluacionExpertaEloquentRepository;
-use DateTimeImmutable;
-use DateTimeZone;
-use DomainException;
-use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\DB;
-use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;
@@ -226,6 +227,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
         EscenarioRepositorios::guardarGrafo($modelo);
         $antes = DB::table('resultados_criterio')->orderBy('cod_resultado_criterio')->get()->all();
         $migracion = require base_path('database/migrations/2026_10_17_200000_incorporate_conservacion_experta_v2.php');
+        (new TransicionReduccionConservacion)->bajar();
         $migracion->down();
         self::assertFalse(DB::getSchemaBuilder()->hasTable('hechos_instantanea_experta'));
         $migracion->up();
@@ -293,8 +295,8 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
             self::assertSame('Fallo DCL simulado.', $e->getMessage());
         }
         self::assertTrue($disparado);
-        self::assertSame(0, DB::table('funcionalidad_instantanea_experta')->count());
-        self::assertSame(0, DB::table('evidencias_iadl_instantanea')->count());
+        self::assertSame(0, DB::table('clasificaciones_dcl_instantanea')->count());
+        self::assertSame(0, DB::table('hechos_instantanea_experta')->whereNotNull('cod_evidencia_iadl_instantanea')->count());
         self::assertSame(0, DB::table('clasificaciones_dcl_instantanea')->count());
         self::assertSame(0, DB::table('evaluacion_criterios')->where('tipo_registro', 'DCL')->count());
         self::assertNotNull($this->repo()->obtener('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha()));
@@ -356,11 +358,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
 
     public function test_entero_corrupto_no_se_convierte_a_cero_en_sqlite(): void
     {
-        if (DB::getDriverName() === 'pgsql') {
-            $this->expectException(QueryException::class);
-        } else {
-            $this->expectException(DomainException::class);
-        }
+        $this->expectException(QueryException::class);
         $h = E::hecho(['fuenteId' => 'REFERENCIA_IADL_SINTETICA', 'valor' => 0]);
         $m = E::memoria([], [$h]);
         $v = new VectorCognitivo(array_map(fn ($d) => new ResultadoDominio($d, S::DESCONOCIDO, V::NO_EVALUABLE, $m, [], [], 'Sin conclusión.'), D::cases()));
@@ -383,7 +381,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
             $this->repo()->guardarClasificacion(new ResultadoClasificacionDcl($perfil, $base->patronCandidato, [], $base->justificacion, [$regla]));
             self::fail('Una PK real no acredita contenido inventado.');
         } catch (DomainException) {
-            self::assertSame(0, DB::table('funcionalidad_instantanea_experta')->count());
+            self::assertSame(0, DB::table('clasificaciones_dcl_instantanea')->count());
             self::assertSame(0, DB::table('clasificaciones_dcl_instantanea')->count());
             self::assertSame(0, DB::table('evaluacion_criterios')->where('tipo_registro', 'DCL')->count());
         }
@@ -405,8 +403,8 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
         $evidencia['cod_evidencia_evaluacion'] = 'SIM-OTRA-EVID';
         $evidencia['cod_evaluacion_experta'] = 'SIM-OTRA';
         DB::table('evidencias_evaluacion')->insert($evidencia);
+        $this->expectException(QueryException::class);
         DB::table('hechos_instantanea_experta')->update(['cod_evidencia_evaluacion' => 'SIM-OTRA-EVID']);
-        $this->expectException(DomainException::class);
         $this->repo()->obtener('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha());
     }
 
@@ -454,7 +452,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
     public function test_orden_corrupto_no_se_convierte_a_cero(): void
     {
         $this->repo()->guardar(E::perfil()->cognicion);
-        $this->expectException(DB::getDriverName() === 'pgsql' ? QueryException::class : DomainException::class);
+        $this->expectException(QueryException::class);
         DB::transaction(fn () => DB::table('hechos_instantanea_experta')->where('orden', 0)->update(['orden' => 'garbage']));
         $this->repo()->obtener('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha());
     }
