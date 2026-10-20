@@ -129,6 +129,9 @@ sustituye esa propuesta como trabajo activo. Posteriormente se aprobaron las
 e instaladas en desarrollo: **104 tablas de negocio**, con
 [pruebas y comparación local](../base-de-datos/DECISION_REDUCCION_EXPERTA_2026_10_20.md).
 Los incrementos ya verificados conservan su alcance; el guardado íntegro sigue abierto.
+El [ensayo de conservación reducida](ENSAYO_CONSERVACION_REDUCIDA_FASE_6_2026_10_20.md)
+contrasta catorce relaciones candidatas con originales sellados. No está
+aprobado ni probado por round-trip; no modifica el inventario.
 
 **Incremento del 20/10:** [preparación compuesta y reproducción](FASE_6_PREPARACION_COMPUESTA_2026_10_20.md). El backend reúne V3 y Petersen con una captura compartida, gobierno separado, procedencia, exclusiones y constancias; verifica ambas ramas sin SQL y puede cotejar un release real con el ejecutor capturado. Conserva `persistido=false` y `release_retenido=false`. El [diccionario candidato](PROPUESTA_CONSERVACION_COMPUESTA_FASE_6_2026_10_20.md) no modifica el inventario aprobado de 108 ni autoriza DDL.
 

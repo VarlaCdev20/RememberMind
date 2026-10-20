@@ -74,6 +74,12 @@ DTO canónico puede presentarse una ampliación estructural **con número y
 columnas exactos** a la propietaria. Hasta aprobarla, no se crean migraciones
 para este guardado.
 
+El [ensayo reducido](ENSAYO_CONSERVACION_REDUCIDA_FASE_6_2026_10_20.md)
+explora catorce granos nuevos frente a los veinticinco rechazados: copia
+menos definiciones y brutos a cambio de sellar originales en SQL y limitarse
+al contrato institucional actual. Es candidato no validado; su número no se
+presenta como mínimo ni como autorización de DDL.
+
 ## Estado de fases 7 y 8
 
 La entrada por residente, la captura original, las observaciones, el cálculo
