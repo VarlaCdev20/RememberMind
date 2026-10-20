@@ -34,8 +34,18 @@ final class CapturasInstrumentalesResidente
         if (! array_is_list($preguntasDeclarativas) || array_filter($preguntasDeclarativas, static fn ($p) => ! is_string($p) || $p === '')) {
             throw new DomainException('Las preguntas declarativas requieren identidades explícitas.');
         }
+        $puedeConsultarDocumentos = $usuario->checkPermissionTo('documentos_clinicos.ver', 'web');
+        $relaciones = ['instrumento', 'evaluador', 'atencion', 'respuestas'];
+        if ($puedeConsultarDocumentos) {
+            $relaciones[] = 'documentoOriginal';
+        }
         $aplicaciones = FuentesValoracionOperativa::limitar(AplicacionInstrumento::query())->where('cod_residente', $residente->getKey())
-            ->where('fecha_hora', '<=', $corte->format('Y-m-d H:i:s.u'))->with(['instrumento', 'evaluador', 'atencion', 'respuestas', 'documentoOriginal'])->orderBy('fecha_hora')->orderBy('cod_aplicacion')->get();
+            ->where('fecha_hora', '<=', $corte->format('Y-m-d H:i:s.u'))
+            ->where(fn ($q) => $q->whereNull('registrado_en')->orWhere('registrado_en', '<=', $corte->format('Y-m-d H:i:s.u')))
+            ->with($relaciones)->orderBy('fecha_hora')->orderBy('cod_aplicacion')->get();
+        if (! $puedeConsultarDocumentos && $aplicaciones->contains(fn ($a) => $a->cod_documento_clinico !== null)) {
+            return ['disponible' => false, 'motivo' => 'ACCESO_A_FUENTES_NO_DISPONIBLE', 'capturas' => []];
+        }
         $respuestas = $aplicaciones->flatMap(fn ($a) => $a->respuestas);
         $perfiles = config('sistema_experto.perfiles_instrumentales', []);
         $preguntasSeleccionadas = [];

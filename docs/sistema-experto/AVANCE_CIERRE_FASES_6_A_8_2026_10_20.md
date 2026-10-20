@@ -34,6 +34,17 @@ residentes**. Esta capacidad aún no está enlazada a una evaluación guardada;
 `persistido=false` y `release_retenido=false` siguen describiendo fielmente
 los DTO preparados.
 
+La lectura instrumental ahora exige que una aplicación con `registrado_en`
+conocido tenga tanto fecha clínica como registro técnico anteriores o iguales
+al corte. Una transcripción posterior de un hecho antiguo ya no entra en un
+corte anterior a su registro. Los originales legados con `registrado_en=NULL`
+siguen visibles con esa ausencia explícita: no existe evidencia para fechar su
+ingreso técnico retrospectivamente. La prueba sintética del caso tardío pasa.
+La captura también exige el permiso documental existente antes de cargar un
+original enlazado. Si falta, esa preparación se declara indisponible sin
+consultar `documentos_clinicos`; las aplicaciones sin documento siguen
+accesibles con los permisos instrumentales. No se amplió ningún permiso.
+
 ## Brecha relacional exacta de fase 6
 
 La cabecera `evaluaciones_expertas` identifica una versión cognitiva; la
@@ -64,6 +75,16 @@ triggers ni nuevas tablas; tampoco supone que un sellado aplicado hoy pruebe el
 contenido de fechas anteriores. Una reducción de tablas solo es válida después
 de un round-trip de todos los grupos, incluidos valores NULL y listas vacías.
 
+Queda una limitación temporal adicional: `aplicaciones_instrumento.estado` se
+actualiza al anular o rectificar, y las respuestas no tienen un instante técnico
+individual. Por ello, un corte anterior a esa mutación no puede reconstruir
+con certeza el estado y la colección **que se veían entonces** desde las filas
+actuales. El candidato de 14 relaciones podría conservar exactamente lo
+observado en una evaluación nueva, pero su sellado no reconstruye estados
+anteriores al primer sello. Antes de declarar una evaluación retrospectiva
+«al corte», el contrato de guardado debe distinguir fecha clínica del instante
+de adquisición y rechazar una reconstrucción histórica que no pueda probar.
+
 El siguiente diccionario reducido debe probar, conjunto por conjunto, qué
 originales pueden sellarse y referenciarse, qué proyecciones mutables deben
 copiarse de forma escalar tipada, qué relaciones existentes admiten el mismo
@@ -79,6 +100,13 @@ explora catorce granos nuevos frente a los veinticinco rechazados: copia
 menos definiciones y brutos a cambio de sellar originales en SQL y limitarse
 al contrato institucional actual. Es candidato no validado; su número no se
 presenta como mínimo ni como autorización de DDL.
+
+Se corrigió una premisa del ensayo: el contrato institucional registra hasta
+19 vínculos observacionales al encontrar sus fuentes exactas. Una prueba
+sintética reconstruye los 19 desde mapeos, preguntas e instrumentos y compara
+el mapa con el contrato adquirido. La prueba no cubre aún sellado físico ni
+vínculos instrumentales interpretativos; estos últimos quedan fuera del
+candidato hasta que se representen explícitamente.
 
 ## Estado de fases 7 y 8
 
@@ -109,6 +137,10 @@ verde no demuestra sensibilidad, especificidad ni validez diagnóstica.
   separación de disciplinas, rectificación y revocación, solo para resultados
   que el contrato actual sabe guardar. No acredita un informe compuesto
   histórico ni QA visual de los cinco tamaños.
+- `php artisan test tests/Feature/CapturaInstrumentalInstitucionalTest.php
+  tests/Feature/ConocimientoCognitivoInstitucionalTest.php --compact`:
+  **101 PASS / 1255 aserciones** en SQLite sintético. Incluye el corte técnico,
+  acceso documental autorizado/denegado y reconstrucción de 19 vínculos.
 
 No hubo DDL, escritura clínica, cambio de permisos ni publicación de una
 evaluación institucional nueva.

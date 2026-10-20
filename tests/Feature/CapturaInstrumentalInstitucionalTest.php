@@ -522,6 +522,51 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         self::assertContains('APLICACION_NO_COMPLETA', $r['motivos']);
     }
 
+    public function test_un_registro_transcrito_despues_del_corte_no_ingresa_en_la_captura_historica(): void
+    {
+        $a = $this->aplicar();
+        DB::table('aplicaciones_instrumento')->where('cod_aplicacion', $a->getKey())
+            ->update(['registrado_en' => '2026-10-18 12:01:00.000000']);
+
+        $consulta = app(CapturasInstrumentalesResidente::class);
+        $antes = $consulta->consultar($this->usuario, $this->residente, CarbonImmutable::parse('2026-10-18 12:00:00'));
+        self::assertSame([], $antes['capturas']);
+
+        $despues = $consulta->consultar($this->usuario, $this->residente, CarbonImmutable::parse('2026-10-18 12:02:00'));
+        self::assertSame([$a->getKey()], array_column($despues['capturas'], 'cod_aplicacion'));
+        self::assertSame('2026-10-18T12:01:00.000000-04:00', $despues['capturas'][0]['procedencia']['registrado_en']);
+    }
+
+    public function test_sin_permiso_documental_no_lee_una_aplicacion_vinculada_a_documento(): void
+    {
+        $entrada = $this->entradaHistorica();
+        app(AplicarInstrumento::class)->transcribir($this->usuario, $entrada, $this->instrumento, $this->residente);
+        $this->usuario->revokePermissionTo('documentos_clinicos.ver');
+
+        $lecturasDocumentales = 0;
+        DB::listen(static function ($consulta) use (&$lecturasDocumentales): void {
+            if (str_contains($consulta->sql, 'documentos_clinicos')) {
+                $lecturasDocumentales++;
+            }
+        });
+        $r = $this->captura();
+        self::assertFalse($r['disponible']);
+        self::assertSame('ACCESO_A_FUENTES_NO_DISPONIBLE', $r['motivo']);
+        self::assertSame([], $r['capturas']);
+        self::assertSame(0, $lecturasDocumentales);
+    }
+
+    public function test_sin_permiso_documental_conserva_lectura_de_aplicacion_sin_documento(): void
+    {
+        $a = $this->aplicar();
+        $this->usuario->revokePermissionTo('documentos_clinicos.ver');
+
+        $r = $this->captura();
+        self::assertTrue($r['disponible']);
+        self::assertSame([$a->getKey()], array_column($r['capturas'], 'cod_aplicacion'));
+        self::assertNull($r['capturas'][0]['documento_original']);
+    }
+
     public function test_offset_original_se_convierte_a_la_zona_institucional_sin_cambiar_el_instante(): void
     {
         $a = $this->aplicar(['fecha_hora' => '2020-10-18T09:10:00Z']);

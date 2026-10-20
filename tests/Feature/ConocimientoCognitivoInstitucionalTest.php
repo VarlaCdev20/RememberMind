@@ -483,6 +483,7 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
 
     public function test_traza_conserva_respuesta_documento_edad_y_precision_del_corte(): void
     {
+        $this->usuario->givePermissionTo('documentos_clinicos.ver');
         Storage::fake('local');
         Storage::disk('local')->put('original-sintetico.txt', 'Protocolo original sintético.');
         $documento = DocumentoClinico::create(['cod_residente' => $this->residente->getKey(), 'cod_personal' => $this->usuario->personal->getKey(),
@@ -746,6 +747,33 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         self::assertStringContainsString('R-ATE-S01-P01', $html);
         self::assertStringContainsString('Sin soporte coincidente en una misma aplicación', $html);
         self::assertSame(0, DB::table('resultados_criterio')->count());
+    }
+
+    public function test_vinculos_observacionales_del_contrato_adoptado_se_reconstruyen_desde_mapeos_y_originales(): void
+    {
+        $this->crearObservacionesInstitucionales();
+        $version = app(RegistrarConocimientoInstitucional::class)->ejecutar($this->usuario);
+        $vinculos = app(ContratosConocimiento::class)->porVersion($version)['vinculos_instrumentales'];
+        $mapeos = DB::table('mapeos_variables_fuente')->where('cod_version_modelo', $version)
+            ->where('tipo_extraccion', 'RESPUESTA_INSTITUCIONAL')->get();
+
+        self::assertCount(19, $vinculos);
+        self::assertCount(19, $mapeos);
+        $reconstruidos = [];
+        foreach ($mapeos as $mapeo) {
+            $pregunta = PreguntaInstrumento::query()->with('instrumento')->findOrFail($mapeo->clave_selector);
+            self::assertNotNull($pregunta->instrumento);
+            $reconstruidos[$mapeo->cod_mapeo_variable_fuente] = [
+                'cod_instrumento' => $pregunta->cod_instrumento,
+                'codigo_instrumento' => $pregunta->instrumento->codigo,
+                'version_instrumento' => $pregunta->instrumento->version,
+                'cod_pregunta' => $pregunta->getKey(),
+                'campo' => 'valor_texto',
+            ];
+        }
+        ksort($vinculos);
+        ksort($reconstruidos);
+        self::assertSame($vinculos, $reconstruidos);
     }
 
     public function test_superadmin_no_registra_conocimiento_aunque_tenga_permiso_aislado(): void

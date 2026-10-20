@@ -13,15 +13,32 @@ perfiles, estado de reglas observado, membresías, fuentes, exclusiones,
 constancias y orden. Los resultados calculados son salida del replay, nunca
 reemplazo de esas entradas.
 
-Este ensayo se limita al contrato institucional A–D/E–H actual: los vínculos
-declarativos V3 son vacíos y los contratos de relaciones/extracción son los
-cerrados en el release. Antes de guardar se debe comparar exactamente esas
-entradas con las del motor retenido. Un paquete futuro con vínculos o
-contratos distintos falla como no representable hasta aprobar su extensión.
+Este ensayo se limita al contrato institucional A–D/E–H actual. La plantilla
+`PaqueteCognitivoInstitucional::contratos()` inicia con vínculos vacíos, pero
+`ContratosConocimiento::porVersion()` incorpora los vínculos observacionales
+que identifica en mapeos y preguntas originales. En el caso sintético completo
+son **19 vínculos**, no cero. Una prueba de integración verificó que se
+reconstruyen exactamente desde mapeo, pregunta e instrumento. Esa derivación
+solo es segura si quedan sellados el conjunto de mapeos y los originales; antes
+de guardar se debe comparar el mapa reconstruido con el V3 adquirido.
+Vínculos interpretativos, configuraciones personalizadas o discrepancias fallan
+como no representables. Los contratos de relaciones/extracción deben coincidir
+exactamente con los del release retenido.
 
 El diseño anterior de 25 relaciones fue rechazado. Se utiliza como
 [antecedente analítico de columnas y granos](PROPUESTA_CONSERVACION_COMPUESTA_FASE_6_2026_10_20.md),
 sin reactivar su autorización ni su número.
+
+**Condición temporal todavía no resuelta:** `registrado_en` de la aplicación
+puede ser NULL en historia anterior a la ampliación; `estado` puede cambiar
+después por anulación o rectificación; las respuestas carecen de fecha técnica
+individual. Una transcripción con `registrado_en` posterior al corte se excluye
+ahora de la captura, pero una fila anterior mutada después del corte no revela
+por sí sola su estado pasado. El sello propuesto protege el estado al preparar
+una evaluación nueva, no certifica cómo estaba la base en un corte antiguo.
+El guardado debe registrar el instante de adquisición y fallar si se pretende
+afirmar una reconstrucción histórica no demostrable. Esta condición debe
+formar parte del ensayo de round-trip y de la aceptación del contrato.
 
 ## Reutilización y costo del sellado
 
@@ -70,7 +87,8 @@ aprobación. Las cuatro entradas cambiadas se precisan después de la tabla.
 Quedarían fuera las tablas candidatas 1, 4–6, 8–10, 12, 14, 15, 17 y 18
 del diseño rechazado: release por huella y archivo privado, contratos
 estáticos del release, originales sellados, unión de perfiles sin producto
-cartesiano y vínculos institucionales vacíos comprobados. No se elimina
+cartesiano y vínculos observacionales reconstruidos y cotejados desde
+mapeos/preguntas originales. No se elimina
 ninguna tabla o fila instalada.
 
 ### Ampliaciones de tablas existentes
@@ -160,7 +178,16 @@ conservan; no hay producto cartesiano con los selectores.
    mutación de un original.
 3. Auditar 4FN, FK cruzadas de evaluación/residente, transición
    poblada, rollback y restauración real del ZIP privado.
-4. Solo con esa evidencia convertir este ensayo en diccionario
+4. Simular transcripción tardía, anulación/rectificación posterior al corte y
+   respuesta insertada después de una consulta. Exigir que el escritor solo
+   declare fiel el estado realmente adquirido y no presente ese estado como
+   una vista temporal histórica que no puede reconstruirse.
+5. Antes del guardado, reconstruir desde conocimiento y originales sellados
+   cada vínculo observacional y compararlo con el mapa del DTO. Rechazar un
+   perfil interpretativo o vínculo no derivable. La comparación de 19 vínculos
+   en SQLite sintético ya pasó; falta probar mutaciones concurrentes y el
+   round-trip íntegro.
+6. Solo con esa evidencia convertir este ensayo en diccionario
    estructural final para aprobación específica de la propietaria.
 
 No se afirma todavía que catorce sea el mínimo suficiente.
