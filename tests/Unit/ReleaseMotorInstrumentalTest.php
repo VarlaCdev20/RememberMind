@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use DomainException;
+use MotorExperto\soporte\conservacion\CapturaInstrumentalCanonica;
+use MotorExperto\soporte\conservacion\CodecInstantanea;
 use MotorExperto\soporte\conservacion\ReleaseMotorInstrumental;
 use PHPUnit\Framework\TestCase;
 use ZipArchive;
@@ -60,6 +62,36 @@ final class ReleaseMotorInstrumentalTest extends TestCase
         $this->crear();
         $this->expectException(DomainException::class);
         $this->crear();
+    }
+
+    public function test_rechaza_un_archivo_ajeno_aunque_el_manifiesto_tenga_huellas_consistentes(): void
+    {
+        $manifiesto = $this->crear();
+        $zip = new ZipArchive;
+        self::assertTrue($zip->open($this->archivo));
+        $manifiesto['archivos']['datos-clinicos.txt'] = hash('sha256', 'dato sintético');
+        unset($manifiesto['huella']);
+        $manifiesto['huella'] = CodecInstantanea::huella(CapturaInstrumentalCanonica::ordenar($manifiesto));
+        self::assertTrue($zip->addFromString('datos-clinicos.txt', 'dato sintético'));
+        self::assertTrue($zip->addFromString('MANIFIESTO-MOTOR.json', json_encode($manifiesto, JSON_THROW_ON_ERROR)));
+        self::assertTrue($zip->close());
+
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('fuera del contrato');
+        (new ReleaseMotorInstrumental)->verificar($this->archivo, $manifiesto['huella']);
+    }
+
+    public function test_un_manifiesto_ilegible_produce_un_error_de_dominio(): void
+    {
+        $manifiesto = $this->crear();
+        $zip = new ZipArchive;
+        self::assertTrue($zip->open($this->archivo));
+        self::assertTrue($zip->addFromString('MANIFIESTO-MOTOR.json', '{incompleto'));
+        self::assertTrue($zip->close());
+
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('ilegible');
+        (new ReleaseMotorInstrumental)->verificar($this->archivo, $manifiesto['huella']);
     }
 
     public function test_release_ausente_no_se_sustituye_por_codigo_actual(): void

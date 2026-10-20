@@ -116,6 +116,11 @@ en sus propias actas y no se atribuyen a este cierre.
 
 ### 6. Completar conservación exacta
 
+**Avance posterior del 20/10:** [retención privada del release y brecha relacional
+precisa](AVANCE_CIERRE_FASES_6_A_8_2026_10_20.md). La copia de software se
+verifica sin incorporar historia clínica; sigue sin enlazarse a una evaluación
+persistida. No se reactivó la propuesta rechazada de 25 tablas.
+
 **Dirección vigente posterior:** la propietaria rechazó la propuesta de 25
 tablas adicionales y eligió mantener el recálculo íntegro con menor estructura.
 El [análisis de reutilización y reducción](REUTILIZACION_Y_REDUCCION_EXPERTA_2026_10_20.md)

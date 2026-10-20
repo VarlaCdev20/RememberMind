@@ -76,9 +76,16 @@ final class ReleaseMotorInstrumental
         }
         try {
             $texto = $zip->getFromName('MANIFIESTO-MOTOR.json');
-            $m = $texto === false ? null : json_decode($texto, true, 512, JSON_THROW_ON_ERROR);
+            try {
+                $m = $texto === false ? null : json_decode($texto, true, 512, JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                throw new DomainException('Manifiesto de software ilegible.', previous: $e);
+            }
             if (! is_array($m) || ! in_array($m['contrato'] ?? null, ['ARTEFACTO-MOTOR-1', 'ARTEFACTO-MOTOR-2'], true) || ($m['incluye_datos_clinicos'] ?? null) !== false) {
                 throw new DomainException('Manifiesto de software incompatible.');
+            }
+            if (! is_array($m['archivos'] ?? null) || $m['archivos'] === []) {
+                throw new DomainException('El manifiesto no enumera archivos de software.');
             }
             $huella = $m['huella'] ?? '';
             unset($m['huella']);
@@ -87,7 +94,26 @@ final class ReleaseMotorInstrumental
                 || $zip->numFiles !== count($m['archivos']) + 1) {
                 throw new DomainException('Huella o conjunto de archivos del release incompatible.');
             }
+            if ($m['contrato'] === 'ARTEFACTO-MOTOR-2') {
+                $fijos = ['motor-experto/composer.json', 'composer.lock', 'motor-experto/tests/independencia.php',
+                    'motor-experto/tests/orion_independencia.php',
+                    'app/Modulos/ApoyoDecision/Infraestructura/Persistencia/datos/orion-v1-conceptos.json'];
+                foreach ($fijos as $nombre) {
+                    if (! array_key_exists($nombre, $m['archivos'])) {
+                        throw new DomainException('Falta un archivo obligatorio del release.');
+                    }
+                }
+                foreach (array_keys($m['archivos']) as $nombre) {
+                    if (! in_array($nombre, $fijos, true)
+                        && ! preg_match('~^motor-experto/src/(?:[A-Za-z0-9_]+/)*[A-Za-z0-9_]+\.php$~D', $nombre)) {
+                        throw new DomainException('El release contiene una ruta fuera del contrato de software.');
+                    }
+                }
+            }
             foreach ($m['archivos'] as $nombre => $esperada) {
+                if (! is_string($nombre) || ! is_string($esperada) || ! preg_match('/^[a-f0-9]{64}$/D', $esperada)) {
+                    throw new DomainException('Una entrada del manifiesto de software es inválida.');
+                }
                 $bytes = $zip->getFromName($nombre);
                 if ($bytes === false || ! hash_equals($esperada, hash('sha256', $bytes))) {
                     throw new DomainException('El código conservado fue alterado o está incompleto.');
