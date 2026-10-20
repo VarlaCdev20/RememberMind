@@ -3,8 +3,8 @@
 namespace App\Modulos\Valoraciones\Presentacion\Livewire\Paginas;
 
 use App\Models\AplicacionInstrumento;
-use App\Models\Instrumento;
 use App\Models\User;
+use App\Modulos\Valoraciones\Aplicacion\Consultas\InstrumentosDelArea;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -70,8 +70,7 @@ class EvaluacionesAreaPanel extends Component
         $this->areaConfig = self::AREA_CONFIGS[$codArea]
             ?? ['icono' => 'ph-list', 'color_bg' => 'bg-fondo-panel', 'color_txt' => 'text-titulo'];
 
-        $this->instrumentosCodes = Instrumento::query()
-            ->where('estado', 'ACTIVO')
+        $this->instrumentosCodes = app(InstrumentosDelArea::class)->catalogados($codArea)
             ->pluck('cod_instrumento')
             ->toArray();
     }
@@ -85,6 +84,7 @@ class EvaluacionesAreaPanel extends Component
     {
         $usuario = $this->autorizar();
         abort_unless($usuario->can('aplicaciones_instrumento.crear'), 403);
+        abort_unless(app(InstrumentosDelArea::class)->activos($this->codArea)->exists(), 422, 'No hay instrumentos habilitados para esta área.');
         $this->dispatch('evaluacion-geriatrica-area-abrir', [
             'cod_residente' => $codResidente,
             'cod_area' => $this->codArea,
@@ -115,9 +115,9 @@ class EvaluacionesAreaPanel extends Component
 
         $evaluaciones = $query->orderByDesc('fecha_hora')->paginate(15);
 
-        $instrumentos = Instrumento::query()
-            ->where('estado', 'ACTIVO')
+        $instrumentos = app(InstrumentosDelArea::class)->catalogados($this->codArea)
             ->get();
+        $instrumentosActivos = $instrumentos->where('estado', 'ACTIVO');
 
         $totalEvaluaciones = AplicacionInstrumento::whereIn('cod_instrumento', $this->instrumentosCodes)->count();
         $alertasCriticas = AplicacionInstrumento::whereIn('cod_instrumento', $this->instrumentosCodes)
@@ -128,6 +128,7 @@ class EvaluacionesAreaPanel extends Component
         return view('livewire.valoraciones.evaluaciones-area-panel', compact(
             'evaluaciones',
             'instrumentos',
+            'instrumentosActivos',
             'totalEvaluaciones',
             'alertasCriticas',
             'pacientesCubiertos'

@@ -20,6 +20,14 @@
 
     <x-ui.dashboard-divider />
 
+    @if(auth()->user()?->can('viewAny', \App\Models\Residente::class)
+        && auth()->user()?->hasRole('PSICOLOGO/A')
+        && auth()->user()?->personal()->where('estado', 'ACTIVO')->where('profesion', 'PSICOLOGIA')->exists())
+        <x-ui.section-card title="Sistema experto" subtitle="Consulte los hallazgos de cada residente y registre las valoraciones originales que realizó" icon="ph-brain">
+            <a href="{{ route('admin.sistema-experto.residentes') }}" class="rm-btn rm-btn-primary">Abrir sistema experto</a>
+        </x-ui.section-card>
+    @endif
+
     @if($metrics)
         <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Indicadores de psicología">
             @foreach($metrics as $metric)

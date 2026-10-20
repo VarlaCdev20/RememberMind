@@ -3,12 +3,16 @@
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\CapturaPetersenPanel;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ConocimientoPanel;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\GobiernoReglasPanel;
+use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResidentesSistemaExperto;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
 use Illuminate\Support\Facades\Route;
 
 // Registered by routes/web.php; do not execute while loading this file.
 return [
     'ruta_033' => static function (): void {
+        Route::get('/sistema-experto/residentes', ResidentesSistemaExperto::class)
+            ->middleware(['role:MEDICO GENERAL/GERIATRA|PSICOLOGO/A', 'can:viewAny,App\\Models\\Residente'])
+            ->name('sistema-experto.residentes');
         Route::get('/sistema-experto/residentes/{residente}/petersen', CapturaPetersenPanel::class)
             ->middleware('can:consultarOriginales,App\\Models\\ValoracionPetersenOriginal,residente')
             ->name('sistema-experto.petersen-original');

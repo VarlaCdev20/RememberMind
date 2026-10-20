@@ -20,14 +20,20 @@
   class="inline-flex items-center gap-2 rounded-xl border border-borde bg-fondo-card px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-panel">
   <i class="ph-bold ph-arrow-left"></i> Volver
   </a>
-  @can('aplicaciones_instrumento.crear')
+  @if($instrumentosActivos->isNotEmpty() && auth()->user()?->can('aplicaciones_instrumento.crear'))
   <button wire:click="nuevaEvaluacion()"
    class="inline-flex items-center gap-2 rounded-xl bg-boton-principal px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-sm transition hover:-translate-y-0.5 hover:shadow-md active:scale-95">
   <i class="ph-bold ph-plus-circle text-sm"></i> Nueva Evaluación
   </button>
-  @endcan
+  @endif
  </x-slot:actions>
  </x-ui.collection-header>
+
+ @if($codArea === 'ARE_COG' && auth()->user()?->hasRole('PSICOLOGO/A'))
+ <x-ui.section-card title="Valoración del sistema experto" subtitle="Los registros observacionales se muestran aquí; la valoración original de Petersen se registra por residente" icon="ph-brain">
+  <a href="{{ route('admin.sistema-experto.residentes') }}" class="rm-btn rm-btn-primary">Elegir residente para el sistema experto</a>
+ </x-ui.section-card>
+ @endif
 
  {{-- Stats del área --}}
  <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -36,22 +42,23 @@
  <x-ui.metric-card icon="ph-warning-circle" :value="$alertasCriticas" label="Alertas críticas" :variant="$alertasCriticas > 0 ? 'coral' : 'neutral'" />
  </div>
 
- {{-- Instrumentos disponibles --}}
+ {{-- Instrumentos del área --}}
  @if($instrumentos->count() > 0)
- <div class="rounded-2xl border border-borde bg-fondo-panel p-4">
- <p class="mb-3 text-[10px] font-bold uppercase tracking-widest text-apoyo">Instrumentos disponibles en esta área</p>
- <div class="flex flex-wrap gap-2">
+ <details class="rounded-2xl border border-borde bg-fondo-panel p-4" @if($instrumentos->count() <= 3) open @endif>
+ <summary class="cursor-pointer text-sm font-semibold text-parrafo">Instrumentos del área · {{ $instrumentos->count() }} registros de catálogo</summary>
+ <div class="mt-3 flex flex-wrap gap-2">
   @foreach($instrumentos as $inst)
   <span class="inline-flex items-center gap-1.5 rounded-full border border-borde bg-fondo-card px-3 py-1 text-[11px] font-bold text-parrafo">
   <span class="{{ $areaConfig['color_txt'] }} font-black">{{ $inst->siglas }}</span>
   {{ $inst->nombre }}
+  @if($inst->estado !== 'ACTIVO')<span class="text-apoyo">Histórico · no disponible para nueva aplicación</span>@endif
   @if($inst->puntaje_maximo)
   <span class="text-apoyo">/ {{ number_format($inst->puntaje_maximo, 0) }} pts</span>
   @endif
   </span>
   @endforeach
  </div>
- </div>
+ </details>
  @endif
 
      {{-- Filtros --}}
@@ -140,6 +147,12 @@
         @endif
     </x-ui.filter-bar>
 
+ @if($instrumentos->isEmpty())
+ <p class="text-sm text-rm-secondary" role="status">El catálogo actual no tiene instrumentos asociados a esta área. Consulte los registros existentes desde la ficha del residente; aquí no se puede iniciar una aplicación de esta área.</p>
+ @elseif($instrumentosActivos->isEmpty())
+ <p class="text-sm text-rm-secondary" role="status">Las aplicaciones históricas de esta área siguen visibles. Sus instrumentos están inactivos para nuevas aplicaciones.</p>
+ @endif
+
  {{-- Tabla de evaluaciones --}}
  <div class="rm-table-container rounded-3xl border border-borde bg-fondo-card shadow-sm overflow-hidden">
  @if($evaluaciones->count() > 0)
@@ -154,7 +167,7 @@
    <th class="px-5 py-3">Clasificación registrada</th>
    <th class="px-5 py-3">Evaluador</th>
    <th class="px-5 py-3">Fecha</th>
-   @can('aplicaciones_instrumento.crear')<th class="px-5 py-3 text-center">Acción</th>@endcan
+   @if($instrumentosActivos->isNotEmpty() && auth()->user()?->can('aplicaciones_instrumento.crear'))<th class="px-5 py-3 text-center">Acción</th>@endif
    </tr>
   </thead>
   <tbody class="divide-y divide-borde/50">
@@ -206,7 +219,7 @@
    <td class="px-5 py-3 text-xs font-medium text-apoyo">
     {{ $eval->fecha_hora?->format('d/m/Y H:i') ?? '—' }}
    </td>
-   @can('aplicaciones_instrumento.crear')
+   @if($instrumentosActivos->isNotEmpty() && auth()->user()?->can('aplicaciones_instrumento.crear'))
    <td class="px-5 py-3 text-center">
     <button wire:click="nuevaEvaluacion('{{ $eval->adulto?->cod_residente }}')"
      title="Nueva evaluación para este residente"
@@ -214,7 +227,7 @@
     <i class="ph-bold ph-plus text-sm"></i>
     </button>
    </td>
-   @endcan
+   @endif
    </tr>
    @endforeach
   </tbody>
@@ -238,10 +251,12 @@
   @if($busqueda || $filtroAlerta || $filtroInstrumento)
    Intenta modificar los filtros de búsqueda.
   @else
-   Registra la primera evaluación de <strong>{{ $nombreArea }}</strong> para un residente.
+   @if($instrumentosActivos->isNotEmpty())Registre la primera aplicación vigente de <strong>{{ $nombreArea }}</strong> para un residente.
+   @elseif($instrumentos->isNotEmpty())No hay aplicaciones de esta área en el período consultado. Sus instrumentos históricos no admiten nuevas aplicaciones.
+   @else No hay instrumentos asociados a esta área en el catálogo actual.@endif
   @endif
   </p>
-  @if(!$busqueda && !$filtroAlerta && !$filtroInstrumento && auth()->user()?->can('aplicaciones_instrumento.crear'))
+  @if($instrumentosActivos->isNotEmpty() && !$busqueda && !$filtroAlerta && !$filtroInstrumento && auth()->user()?->can('aplicaciones_instrumento.crear'))
   <button wire:click="nuevaEvaluacion()"
    class="mt-5 inline-flex items-center gap-2 rounded-xl bg-boton-principal px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-md transition hover:-translate-y-0.5 active:scale-95">
   <i class="ph-bold ph-plus-circle text-sm"></i> Nueva Evaluación
@@ -258,28 +273,23 @@
   <i class="ph-bold ph-info text-base"></i>
   </div>
   <div>
-  <p class="text-xs font-black uppercase tracking-wider text-titulo mb-1">
-   Guía de Interpretación — Área {{ $nombreArea }}
-  </p>
+  <p class="text-xs font-black uppercase tracking-wider text-titulo mb-1">Sobre los registros de {{ $nombreArea }}</p>
   @php
    $guias = [
-   'ARE_COG' => 'Evalúa memoria, orientación, lenguaje y funciones ejecutivas. Instrumentos: MMSE (≥24 normal), MoCA (≥26 normal), Mini-Cog (0-2 riesgo). Puntajes bajos indican deterioro cognitivo que requiere seguimiento especializado.',
-   'ARE_AFE' => 'Detecta síntomas depresivos y estado emocional. GDS-15: 0-4 normal, 5-8 depresión leve, ≥9 depresión severa. CESD-7: ≥6 sugiere sintomatología depresiva. Requiere intervención psicológica inmediata si es crítico.',
-   'ARE_FUN' => 'Mide la capacidad funcional y autonomía. Katz (0-6 pts): evalúa actividades básicas. Lawton (0-8 pts): actividades instrumentales. SPPB ≤9 indica fragilidad. TUG >12 seg indica riesgo de caída.',
-   'ARE_NUT' => 'Detecta riesgo de malnutrición. MNA-SF (≥12 normal, 8-11 riesgo, ≤7 malnutrido). MUST: 0 bajo riesgo, ≥2 alto riesgo. SARC-F: ≥4 sugiere sarcopenia.',
-   'ARE_SOC' => 'Evalúa recursos sociales, familiares y entorno físico. Detecta riesgo de maltrato, aislamiento y barreras arquitectónicas. Escala de maltrato: ≥6 indica riesgo significativo.',
+   'ARE_COG' => 'Las tareas observacionales del catálogo describen componentes cognitivos. No equivalen por sí mismas a una prueba estandarizada ni acreditan un patrón DCL.',
+   'ARE_FUN' => 'El Índice de Barthel describe actividades básicas. La independencia instrumental para Petersen requiere una valoración IADL original y contextual.',
    ];
   @endphp
   <p class="text-xs font-semibold text-parrafo leading-relaxed">
-   {{ $guias[$codArea] ?? 'Consultar los criterios específicos del instrumento utilizado.' }}
+   {{ $guias[$codArea] ?? 'No hay un instrumento asociado a esta área en el catálogo actual. Consulte las fuentes originales y el método del instrumento antes de registrar una aplicación.' }}
   </p>
   </div>
  </div>
  </div>
 
  {{-- Modal de nueva evaluación --}}
- @can('aplicaciones_instrumento.crear')
+ @if($instrumentosActivos->isNotEmpty() && auth()->user()?->can('aplicaciones_instrumento.crear'))
  @livewire('valoraciones.evaluacion-geriatrica-area-modal')
- @endcan
+ @endif
 
 </div>

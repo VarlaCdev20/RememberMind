@@ -77,8 +77,34 @@ final class CapturaInstrumentalFormularioTest extends TestCase
 
     private function abrir(bool $area = false)
     {
-        return $area ? Livewire::test(EvaluacionGeriatricaAreaModal::class)->call('abrir', ['cod_residente' => $this->residente->getKey()])
+        return $area ? Livewire::test(EvaluacionGeriatricaAreaModal::class)->call('abrir', ['cod_residente' => $this->residente->getKey(), 'cod_area' => 'ARE_COG'])
             : Livewire::test(EvaluacionGeriatricaModal::class, ['cod_residente' => $this->residente->getKey()])->call('abrir', $this->residente->getKey());
+    }
+
+    public function test_areas_no_mezclan_catalogos_y_un_instrumento_historico_no_se_ofrece_para_aplicar(): void
+    {
+        Instrumento::create(['codigo' => 'BARTHEL_100', 'nombre' => 'Barthel sintético', 'tipo' => 'FUNCIONAL', 'estado' => 'ACTIVO']);
+
+        Livewire::test(EvaluacionesAreaPanel::class, ['codArea' => 'ARE_COG'])
+            ->assertSee('FORM-TEST')->assertDontSee('BARTHEL_100');
+        Livewire::test(EvaluacionesAreaPanel::class, ['codArea' => 'ARE_FUN'])
+            ->assertSee('BARTHEL_100')->assertDontSee('FORM-TEST');
+        Livewire::test(EvaluacionesAreaPanel::class, ['codArea' => 'ARE_AFE'])
+            ->assertDontSee('BARTHEL_100')->assertDontSee('Nueva Evaluación');
+
+        $this->instrumento->update(['estado' => 'INACTIVO']);
+        Livewire::test(EvaluacionesAreaPanel::class, ['codArea' => 'ARE_COG'])
+            ->assertSee('FORM-TEST')->assertSee('Histórico')->assertDontSee('Nueva Evaluación');
+    }
+
+    public function test_modal_de_area_rechaza_un_instrumento_activo_de_otra_area(): void
+    {
+        $otro = Instrumento::create(['codigo' => 'BARTHEL_100', 'nombre' => 'Barthel sintético', 'tipo' => 'FUNCIONAL', 'estado' => 'ACTIVO']);
+
+        Livewire::test(EvaluacionGeriatricaAreaModal::class)
+            ->call('abrir', ['cod_residente' => $this->residente->getKey(), 'cod_area' => 'ARE_COG'])
+            ->set('cod_instrumento', $otro->getKey())
+            ->assertStatus(422);
     }
 
     public function test_ambas_entradas_registran_respuestas_con_null_distinto_de_cero_y_autoria_propia(): void
@@ -365,7 +391,7 @@ final class CapturaInstrumentalFormularioTest extends TestCase
     public function test_se_puede_elegir_transcripcion_antes_del_primer_residente_sin_transferir_los_datos_a_otro(): void
     {
         $otro = Residente::factory()->create(['estado' => 'ADMITIDO']);
-        Livewire::test(EvaluacionGeriatricaAreaModal::class)->call('abrir', [])
+        Livewire::test(EvaluacionGeriatricaAreaModal::class)->call('abrir', ['cod_area' => 'ARE_COG'])
             ->set('transcripcion', true)->set('cod_residente', $this->residente->getKey())
             ->assertHasNoErrors('cod_residente')->assertSet('cod_residente', $this->residente->getKey())
             ->set('cod_residente', $otro->getKey())->assertHasErrors('cod_residente')->assertSet('cod_residente', $this->residente->getKey());
