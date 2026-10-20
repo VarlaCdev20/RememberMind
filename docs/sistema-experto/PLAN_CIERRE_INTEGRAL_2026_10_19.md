@@ -135,6 +135,7 @@ Los incrementos ya verificados conservan su alcance; el guardado íntegro sigue 
 - [x] Preparar DTO canónico en memoria del alcance instrumental/declarativo y reproducción sin SQL/configuración actuales, con metadatos de preparación sin declarar guardado.
 - [x] Preparar y reproducir el contrato compuesto instrumental/Petersen con contexto común, mediciones canónicas iguales y constancias de adquisición, sin atribuirle persistencia institucional.
 - [x] Implementar ZIP recuperable del software del motor, manifiesto por archivo y verificación de alteración/ausencia/no reemplazo, sin historia clínica.
+- [x] Retener una copia privada verificada del release por huella, con reintento idempotente y rechazo de archivos ajenos al software. Aún no se vincula a una evaluación persistida.
 - [ ] Vincular la evaluación a un release retenido y representar relacionalmente el DTO completo; los avances previos no equivalen a persistencia institucional.
 - [ ] Empezar el diseño durante la fase 1; cerrar el contrato definitivo con las entradas/salidas de las fases 2–5.
 - [ ] Reutilizar cabecera, conocimiento, hechos, trazas, soportes y revisiones existentes cuando su significado sea compatible.
@@ -148,6 +149,8 @@ Los incrementos ya verificados conservan su alcance; el guardado íntegro sigue 
 
 ### 7. Terminar resultados, revisión y experiencia operativa
 
+- [x] Verificar la navegación actual de Medicina/Psicología hacia residente, captura e informe, y denegar la captura a visitante, cuenta inactiva y Superadministración sin competencia clínica (`NavegacionSistemaExpertoTest`).
+- [x] Verificar las dos revisiones posteriores separadas, rectificación y autoría real, incluidos revocación de permiso, firma cruzada y rollback de auditoría (`RevisionValoracionExpertaTest`). Estas pruebas cubren los resultados hoy conservables, no el futuro compuesto histórico.
 - [ ] Mostrar conclusión, cinco dominios, mediciones, fuentes, reglas, contradicciones y faltantes desde la evaluación íntegra conservada.
 - [ ] Diferenciar estados de captura, cálculo, resultado y revisión; quitar textos o acciones que no correspondan al contrato real mostrado.
 - [ ] Conectar las dos cadenas posteriores de Medicina y Psicología con decisiones, justificación, fecha y profesional; conservar rectificaciones.

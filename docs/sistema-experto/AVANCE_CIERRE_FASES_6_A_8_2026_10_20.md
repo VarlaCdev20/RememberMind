@@ -49,6 +49,21 @@ contenido, mezclar granos o reutilizar campos experimentales con otro
 significado. Una FK al original o una huella sola no reconstruye una fila
 mutable ni impide inserciones posteriores en sus colecciones.
 
+| Contenido del DTO preparado | Reutilización comprobada | Garantía que falta para `guardar → recuperar → replay` |
+|---|---|---|
+| Identidad, residente, corte y solicitante | `evaluaciones_expertas` | Vincular las dos versiones reales, actor de ejecución, huella compuesta y release retenido; separar evaluaciones históricas anteriores. |
+| Definiciones de la red y reglas | Doce relaciones de conocimiento y `versiones_modelo_experto` | Sellar una versión exacta, recuperar la revisión observada de cada regla y las entradas de contratos semánticos/extracción sin consultar definiciones actuales. |
+| Instrumentos, preguntas, opciones, aplicaciones y respuestas | Cinco relaciones operativas con FK; rectificación de aplicaciones | Inmutabilidad SQL desde el sello, cierre exacto de las colecciones, identidad de los originales adquiridos y conservación de metadata consumida que siga mutable. Una pregunta seleccionada sin respuesta también debe sobrevivir. |
+| Perfiles de captura, interpretación y vínculos declarativos | Métodos en el release y configuración actual | Guardar únicamente las entradas/versiones efectivamente usadas, sus selectores y predicados ordenados; el código futuro no puede sustituir la configuración histórica. |
+| Juicios y soportes Petersen | `valoraciones_petersen_originales` y `soportes_valoracion_petersen` inmutables | Fijar qué juicios y soportes se adquirieron e incluyeron, su orden y exclusiones al corte; una nueva fila original no puede ingresar a una ejecución antigua. |
+| Contexto IADL, cognitivo, psicológico, médico y documental | FK y originales operativos | Conservar escalarmente la proyección mutable usada, con fecha, autor, estado y NULL exactos; la referencia por sí sola no basta. |
+| Decisiones, trazas y revisiones | Tablas expertas actuales, con contrato experimental anterior | Demostrar correspondencia de granos y vocabulario antes de ampliar su uso institucional; las dos revisiones profesionales siguen siendo cadenas posteriores, no insumos del cálculo. |
+
+Esta matriz es un control de pérdida de información. No aprueba columnas,
+triggers ni nuevas tablas; tampoco supone que un sellado aplicado hoy pruebe el
+contenido de fechas anteriores. Una reducción de tablas solo es válida después
+de un round-trip de todos los grupos, incluidos valores NULL y listas vacías.
+
 El siguiente diccionario reducido debe probar, conjunto por conjunto, qué
 originales pueden sellarse y referenciarse, qué proyecciones mutables deben
 copiarse de forma escalar tipada, qué relaciones existentes admiten el mismo
@@ -83,6 +98,11 @@ verde no demuestra sensibilidad, especificidad ni validez diagnóstica.
   `php artisan test --filter='InstantaneaEvaluacionInstitucionalTest|PetersenInstitucionalTest|CapturaPetersenOriginalTest|GobiernoPetersenInstitucionalTest|ConocimientoCognitivoInstitucionalTest|InstantaneaInstrumentalCompletaTest|ReleaseMotorInstrumentalTest|AlmacenReleasesMotorTest|RevisionValoracionExpertaTest|RevisionObservacionalExpertaTest' --quiet`: PASS.
 - `vendor/bin/pint --test` para los cuatro PHP modificados y `git diff --check`:
   PASS. No corresponde build frontend porque este incremento no cambia la UI.
+- Lectura del recorrido actual: `php artisan test tests/Feature/NavegacionSistemaExpertoTest.php tests/Feature/RevisionValoracionExpertaTest.php --compact`:
+  **20 PASS / 69 aserciones** en SQLite de pruebas. Cubre rutas, denegaciones,
+  separación de disciplinas, rectificación y revocación, solo para resultados
+  que el contrato actual sabe guardar. No acredita un informe compuesto
+  histórico ni QA visual de los cinco tamaños.
 
 No hubo DDL, escritura clínica, cambio de permisos ni publicación de una
 evaluación institucional nueva.
