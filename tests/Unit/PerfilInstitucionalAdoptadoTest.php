@@ -100,6 +100,10 @@ final class PerfilInstitucionalAdoptadoTest extends TestCase
                 $d = (new EvaluarPerfilInstitucional)->ejecutar($p, $m)['perfil']['COG-'.substr($componente, 0, 3)];
                 if ($ausente !== null) {
                     self::assertSame([], $d['conclusiones_candidatas'], $componente.' sin '.$ausente);
+                    self::assertSame([], $d['traza']['rutas_hallazgos'], $componente.' sin '.$ausente);
+                    $pendientes = array_values(array_filter($d['condiciones_pendientes'],
+                        static fn ($fila) => $fila['codigo_regla'] === 'R-'.$componente.'-P01'));
+                    self::assertSame(['VAR-'.$componente.'-'.$ausente], array_column($pendientes, 'variable_codigo'));
                 } else {
                     self::assertCount(1, $d['conclusiones_candidatas']);
                     $r = array_values($d['conclusiones_candidatas'])[0];
@@ -107,6 +111,17 @@ final class PerfilInstitucionalAdoptadoTest extends TestCase
                     self::assertCount(3, $r['evidencias']);
                     self::assertCount(1, $r['soportes_efectivos']);
                     self::assertCount(3, $d['traza']['rutas']);
+                    self::assertSame([], array_values(array_filter($d['condiciones_pendientes'],
+                        static fn ($fila) => $fila['codigo_regla'] === 'R-'.$componente.'-P01')));
+                    self::assertCount(3, $d['traza']['rutas_hallazgos']);
+                    foreach ($d['traza']['rutas_hallazgos'] as $ruta) {
+                        self::assertSame(P::id('G', 'R-'.$componente.'-P01'), $ruta['regla']);
+                        self::assertSame(P::id('V', $consecuencia), $ruta['consecuencia']);
+                        self::assertSame($consecuencia, $ruta['codigo_consecuencia']);
+                        self::assertSame('aplicaciones_instrumento', $ruta['tabla']);
+                        self::assertSame('APP-1', $ruta['registro']);
+                        self::assertContains($ruta['evidencia'], $r['evidencias']);
+                    }
                 }
             }
         }
@@ -122,6 +137,12 @@ final class PerfilInstitucionalAdoptadoTest extends TestCase
             }
             $d = (new EvaluarPerfilInstitucional)->ejecutar($p, $m)['perfil']['COG-ATE'];
             self::assertSame([], $d['conclusiones_candidatas']);
+            if ($i === 3) {
+                self::assertSame([['codigo_regla' => 'R-ATE-S01-P01',
+                    'motivo' => 'SIN_CONJUNCION_EN_UNA_MISMA_APLICACION']], $d['motivos_no_emision']);
+                self::assertNotEmpty(array_values(array_filter($d['condiciones_pendientes'],
+                    static fn ($fila) => $fila['codigo_regla'] === 'R-ATE-S01-P01')));
+            }
         }
     }
 
@@ -155,6 +176,7 @@ final class PerfilInstitucionalAdoptadoTest extends TestCase
         $d = (new EvaluarPerfilInstitucional)->ejecutar($p, $m)['perfil']['COG-MEM'];
         self::assertSame('EV-CM-2', $d['compuerta_institucional']['estado']);
         self::assertSame('DIFICULTAD_EVIDENCIADA', $d['resultado_institucional']['codigo']);
+        self::assertCount(1, $d['traza']['rutas_hallazgos']);
         self::assertCount(1, $d['antecedentes_descartados_por_contexto']);
         self::assertSame('APP-INCOMPLETA', $d['antecedentes_descartados_por_contexto'][0]['aplicacion']);
     }
@@ -173,5 +195,6 @@ final class PerfilInstitucionalAdoptadoTest extends TestCase
         self::assertSame('EVIDENCIA_CONTRADICTORIA', $d['estado_institucional']);
         self::assertNull($d['resultado_institucional']);
         self::assertSame([], $d['conclusiones_candidatas']);
+        self::assertSame([], $d['traza']['rutas_hallazgos']);
     }
 }

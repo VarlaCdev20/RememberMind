@@ -103,12 +103,54 @@ final class EvaluarPerfilInstitucional
                 unset($condicion);
             }
             unset($regla);
+            $dominio['condiciones_pendientes'] = [];
+            $dominio['motivos_no_emision'] = [];
+            foreach ($dominio['traza']['reglas'] as $regla) {
+                if ($regla['estado'] === 'NO_CUMPLE' && count($regla['evaluaciones_unidad']) > 1) {
+                    $acreditadas = [];
+                    foreach ($regla['evaluaciones_unidad'] as $evaluacion) {
+                        foreach ($evaluacion['condiciones'] as $condicionUnidad) {
+                            if ($condicionUnidad['estado'] === 'CUMPLE') {
+                                $acreditadas[$condicionUnidad['condicion']] = true;
+                            }
+                        }
+                    }
+                    if (count($acreditadas) === count($regla['condiciones'])) {
+                        $dominio['motivos_no_emision'][] = ['codigo_regla' => $regla['codigo_regla'],
+                            'motivo' => 'SIN_CONJUNCION_EN_UNA_MISMA_APLICACION'];
+                    }
+                }
+                foreach ($regla['condiciones'] as $condicion) {
+                    if ($condicion['estado'] === 'CUMPLE') {
+                        continue;
+                    }
+                    $dominio['condiciones_pendientes'][] = ['regla' => $regla['regla'],
+                        'codigo_regla' => $regla['codigo_regla'], 'condicion' => $condicion['condicion'],
+                        'variable' => $condicion['variable'], 'variable_codigo' => $condicion['variable_codigo'],
+                        'valor' => $condicion['valor'], 'valor_codigo' => $condicion['valor_codigo']];
+                }
+            }
             $dominio['estado_institucional'] = $dominio['contradicciones'] !== [] ? 'EVIDENCIA_CONTRADICTORIA'
                 : ($dominio['conclusiones_candidatas'] === [] ? 'SIN_ANTECEDENTES_INSTRUMENTALES_SUFICIENTES' : 'HALLAZGOS_CANDIDATOS_CON_SOPORTE');
             if ($codigo !== 'COG-MEM') {
                 $dominio['resultado_institucional'] = null;
             } elseif (! $dominio['compuerta_institucional']['habilita_resultado']) {
                 $dominio['estado_institucional'] = 'SIN_ANTECEDENTES_INSTRUMENTALES_SUFICIENTES';
+            }
+            $dominio['traza']['rutas_hallazgos'] = [];
+            foreach ($dominio['conclusiones_candidatas'] as $consecuencia => $hallazgo) {
+                if ($dominio['contradicciones'] !== [] || ($codigo === 'COG-MEM'
+                    && ($dominio['resultado_institucional']['codigo'] ?? null) !== $hallazgo['codigo'])) {
+                    continue;
+                }
+                foreach ($dominio['traza']['rutas'] as $ruta) {
+                    if ($ruta['estado_regla'] !== 'CUMPLE' || ! in_array($ruta['regla'], $hallazgo['reglas'], true)
+                        || ! in_array($ruta['evidencia'], $hallazgo['evidencias'], true)) {
+                        continue;
+                    }
+                    $dominio['traza']['rutas_hallazgos'][] = $ruta + ['consecuencia' => $consecuencia,
+                        'codigo_consecuencia' => $hallazgo['codigo']];
+                }
             }
         }
         unset($dominio);
