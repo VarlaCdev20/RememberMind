@@ -43,7 +43,8 @@
 .rm-collection-header h1 { margin: 0; color: var(--rm-text-primary); font: 800 var(--rm-font-size-page)/1.2 var(--rm-font-friendly); overflow-wrap: anywhere; }
 
 /* El centro de cuidados conserva la escala canónica frente al shell heredado. */
-.rm-nursing-shell main .rm-care-center .rm-collection-header h1 {
+.rm-nursing-shell main .rm-care-center .rm-collection-header h1,
+.rm-nursing-shell main .rm-emergency-workspace .rm-collection-header h1 {
     font-family: var(--rm-font-friendly);
     font-size: var(--rm-font-size-page);
 }
