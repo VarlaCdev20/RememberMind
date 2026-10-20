@@ -1,5 +1,10 @@
 # Fase 6: preparación compuesta y reproducción
 
+**Decisión posterior:** la propietaria rechazó la ampliación de 25 tablas y
+eligió mantener recálculo íntegro con una estructura menor. El código de
+preparación y sus pruebas conservan su alcance; el diseño de guardado continúa
+en [reutilización y reducción](REUTILIZACION_Y_REDUCCION_EXPERTA_2026_10_20.md).
+
 Fecha: 20/10/2026. Estado: incremento técnico de preparación en memoria.
 **La conservación institucional completa sigue abierta.** No se ha añadido
 estructura ni historia clínica a `remembermind_dev` y no se ha ejecutado DDL.

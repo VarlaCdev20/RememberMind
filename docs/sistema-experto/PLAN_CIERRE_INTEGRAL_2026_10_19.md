@@ -116,6 +116,12 @@ en sus propias actas y no se atribuyen a este cierre.
 
 ### 6. Completar conservación exacta
 
+**Dirección vigente posterior:** la propietaria rechazó la propuesta de 25
+tablas adicionales y eligió mantener el recálculo íntegro con menor estructura.
+El [análisis de reutilización y reducción](REUTILIZACION_Y_REDUCCION_EXPERTA_2026_10_20.md)
+sustituye esa propuesta como trabajo activo; no se aprobó DDL y el inventario
+permanece en 108. Los incrementos de código ya verificados conservan su alcance.
+
 **Incremento del 20/10:** [preparación compuesta y reproducción](FASE_6_PREPARACION_COMPUESTA_2026_10_20.md). El backend reúne V3 y Petersen con una captura compartida, gobierno separado, procedencia, exclusiones y constancias; verifica ambas ramas sin SQL y puede cotejar un release real con el ejecutor capturado. Conserva `persistido=false` y `release_retenido=false`. El [diccionario candidato](PROPUESTA_CONSERVACION_COMPUESTA_FASE_6_2026_10_20.md) no modifica el inventario aprobado de 108 ni autoriza DDL.
 
 - [x] Preparar DTO canónico en memoria del alcance instrumental/declarativo y reproducción sin SQL/configuración actuales, con metadatos de preparación sin declarar guardado.

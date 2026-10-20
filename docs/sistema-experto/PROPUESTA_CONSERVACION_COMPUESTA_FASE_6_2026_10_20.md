@@ -1,5 +1,11 @@
 # Propuesta de conservación compuesta — fase 6
 
+**RECHAZADA POR LA PROPIETARIA — 20/10/2026.** La instrucción posterior exige
+reducir y reutilizar la estructura existente manteniendo recálculo íntegro.
+Este documento queda como antecedente; ninguna de sus 25 tablas está aprobada
+o creada y su solicitud de aprobación final ya no está vigente. Continúa en
+[reutilización y reducción](REUTILIZACION_Y_REDUCCION_EXPERTA_2026_10_20.md).
+
 Fecha: 20/10/2026. Estado: **PROPUESTA NO APROBADA. Sin DDL, migración,
 instalación ni modificación del inventario vigente.** Esta es una propuesta de
 diseño; su autor no emite un PASS de auditoría sobre su propio diseño.
