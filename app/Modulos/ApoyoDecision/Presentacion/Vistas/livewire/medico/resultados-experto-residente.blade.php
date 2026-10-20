@@ -4,8 +4,9 @@
     <header class="rm-expert-heading">
         <div class="min-w-0">
             <a class="rm-expert-back" href="{{ $enfermeria ? route('admin.enfermeria.pacientes', ['residente' => $codResidente]) : route('admin.medico.residente.ficha', ['adulto' => $codResidente]) }}"><i class="ph ph-arrow-left" aria-hidden="true"></i> {{ $enfermeria ? 'Volver a Mis residentes' : 'Volver a la ficha' }}</a>
-            <h1>Resultados del sistema experto</h1>
-            <p class="text-rm-secondary">Expediente del residente / Evaluación cognitiva</p>
+            <p class="rm-expert-eyebrow">O.R.I.O.N. · Resultados del sistema experto</p>
+            <h1>Evaluación neurocognitiva</h1>
+            <p class="text-rm-secondary">Expediente del residente · Informe de consulta y explicación</p>
         </div>
         <div class="rm-expert-actions">
             <button type="button" x-ref="traceTrigger" wire:click="verTrazabilidad" wire:loading.attr="disabled" @disabled(!$datos || !$datos['detalle']['traza']) class="rm-btn rm-btn-secondary"><i class="ph ph-tree-structure" aria-hidden="true"></i> Ver trazabilidad completa</button>
@@ -30,6 +31,8 @@
             <button type="button" wire:click="reintentar" wire:loading.attr="disabled" class="rm-btn rm-btn-secondary mt-4">Reintentar</button>
         </x-ui.section-card>
     @elseif($datos)
+        @php($detalle = $datos['detalle'])
+        @php($presentacion = \App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto::presentacion($detalle['resultado']['codigo'] ?? null))
         @if(!$datos['evaluacion'])
             <div class="rm-alert rm-alert-info" role="status"><div><strong>Sin evaluación experta disponible</strong><p>Este residente todavía no cuenta con una evaluación generada para consulta mediante conocimiento autorizado.@if($datos['conocimiento_documental']) Las definiciones de O.R.I.O.N. ya están cargadas; la carga no genera por sí sola una conclusión clínica.@endif</p></div></div>
         @endif
@@ -43,13 +46,32 @@
                 <dl><dt class="text-sm text-rm-secondary"><i class="ph ph-calendar-blank" aria-hidden="true"></i> Fecha de evaluación</dt><dd class="font-semibold">{{ $datos['evaluacion']['fecha'] ?? 'Sin evaluación disponible' }}</dd></dl>
                 <dl class="min-w-0"><dt class="text-sm text-rm-secondary"><i class="ph ph-gear" aria-hidden="true"></i> Versión del conocimiento</dt><dd class="font-semibold break-words">{{ $datos['evaluacion']['version'] ?? 'Sin versión utilizada' }}</dd></dl>
             </div>
-            @if($datos['evaluacion'])
-                <p class="text-xs text-rm-secondary mt-2 break-words">Estado de ejecución registrado: {{ $datos['evaluacion']['estado'] }}@if($datos['evaluacion']['solicitante']) · Solicitante: {{ $datos['evaluacion']['solicitante'] }}@endif</p>
-            @endif
+            <div class="rm-expert-context-meta">
+                <span><i class="ph ph-user-circle" aria-hidden="true"></i> Profesional solicitante: {{ $datos['evaluacion']['solicitante'] ?? 'No registrado' }}</span>
+                <span><i class="ph ph-list-checks" aria-hidden="true"></i> Estado de ejecución: {{ $datos['evaluacion']['estado'] ?? 'Sin evaluación disponible' }}</span>
+                <span><i class="ph ph-lock-simple" aria-hidden="true"></i> Revisión profesional: no habilitada</span>
+            </div>
         </section>
 
+
         <div class="rm-expert-workspace">
-            <x-ui.section-card title="Perfil cognitivo" subtitle="Seleccione un área" icon="ph-brain" class="rm-expert-profile min-w-0">
+            <section class="rm-expert-overview" aria-label="Resultado del área cognitiva seleccionada" aria-live="polite">
+                <div class="rm-expert-step">01 · Resultado del área seleccionada: {{ $detalle['nombre'] }}</div>
+                <p class="rm-expert-overview-note">Los resultados corresponden al criterio seleccionado; no constituyen por sí solos una conclusión global ni un diagnóstico.</p>
+                @if($detalle['integridad'])
+                    <div class="rm-alert rm-alert-danger" role="alert"><div><strong>No se publica el resultado: integridad pendiente</strong><p>El fundamento conservado está incompleto o contiene datos incompatibles. Consulte los avisos de esta evaluación.</p></div></div>
+                @endif
+                    <x-ui.section-card title="Resultado del sistema experto" icon="ph-list-checks" class="rm-expert-result rm-expert-tone-{{ $presentacion['tono'] }}">
+                        <p class="rm-expert-conclusion">{{ $presentacion['resumen'] ?? $detalle['estado'] }}</p>
+                        <p class="text-sm text-rm-secondary mt-3">{{ $detalle['evaluabilidad'] ?? 'No hay una evaluación guardada para esta área.' }}</p>
+                        @if($detalle['modificador'])<p class="text-sm mt-3">{{ $detalle['modificador'] }}</p>@endif
+                    </x-ui.section-card>
+
+                @if(!$detalle['autorizado'])
+                    <p class="rm-expert-overview-disclaimer"><i class="ph ph-info" aria-hidden="true"></i> Publicación clínica no habilitada para esta área y versión. El conocimiento documental no equivale a una conclusión clínica.</p>
+                @endif
+            </section>
+            <x-ui.section-card title="02 · Cinco áreas cognitivas" subtitle="Seleccione un área para conocer su estado real, las evidencias y sus limitaciones" icon="ph-brain" class="rm-expert-profile min-w-0">
                 <nav class="rm-expert-criteria" aria-label="Áreas cognitivas">
                     @foreach($datos['perfil'] as $codigo => $area)
                         <button type="button" wire:key="criterio-{{ $codigo }}" wire:click="seleccionarCriterio(@js($codigo))" wire:loading.attr="disabled" aria-pressed="{{ $criterio === $codigo ? 'true' : 'false' }}" aria-controls="detalle-cognitivo"
@@ -62,9 +84,53 @@
                 </nav>
             </x-ui.section-card>
 
-            <section id="detalle-cognitivo" class="rm-card rm-expert-detail space-y-4 min-w-0" aria-labelledby="titulo-cognitivo" aria-live="polite" aria-atomic="false">
-                @php($detalle = $datos['detalle'])
-                @php($presentacion = \App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto::presentacion($detalle['resultado']['codigo'] ?? null))
+
+            <section id="detalle-cognitivo" class="rm-expert-detail space-y-4 min-w-0" aria-labelledby="titulo-cognitivo" aria-live="polite" aria-atomic="false">
+                <div class="rm-expert-detail-heading rm-expert-tone-{{ $presentacion['tono'] }}"><span class="rm-expert-area-icon"><i class="ph {{ $detalle['icono'] }}" aria-hidden="true"></i></span><div class="min-w-0"><h2 id="titulo-cognitivo">{{ $detalle['nombre'] }}</h2><p class="text-sm text-rm-secondary">{{ $criterio }} · {{ $detalle['activacion'] }}</p></div><span class="rm-expert-review-state"><i class="ph ph-lock-simple" aria-hidden="true"></i> Revisión profesional aún no habilitada</span></div>
+
+                <div id="seccion-significado" class="rm-expert-clinical-flow">
+                    <p class="rm-expert-step">03 · Interpretación del área</p>
+                    <x-ui.section-card title="Interpretación del sistema experto" icon="ph-file-text" class="rm-expert-interpretation">
+                        <p class="text-sm leading-relaxed">{{ $detalle['interpretacion'] }}</p>
+                        @if(!$detalle['autorizado'])<p class="text-sm text-rm-secondary mt-3">La publicación del conocimiento de esta versión requiere un contrato institucional aprobado.</p>@endif
+                    </x-ui.section-card>
+                    <x-ui.section-card title="¿Qué sustenta este resultado?" icon="ph-lightbulb" class="rm-expert-foundation-summary">
+                        <ul class="text-sm space-y-2">
+                            @forelse(array_filter($detalle['evidencias'], fn ($e) => $e['papel'] === 'Soporte de inferencia') as $e)
+                                <li class="flex gap-2"><span aria-hidden="true">•</span><span>{{ $e['nombre'] }} · {{ $e['fuente'] }}</span></li>
+                            @empty
+                                <li>No se conserva soporte directo de un resultado integrado para esta área.</li>
+                            @endforelse
+                        </ul>
+                        <p class="text-xs text-rm-secondary mt-3">El contexto y la compuerta de evaluabilidad no se presentan como hallazgos clínicos.</p>
+                    </x-ui.section-card>
+
+                </div>
+
+                <div id="seccion-evidencias" class="rm-expert-clinical-flow">
+                    <p class="rm-expert-step">04 · Evidencias y procedencia</p>
+                    @include('livewire.medico.resultados-experto.evidencias')
+                </div>
+
+                <div id="seccion-pendientes" class="rm-expert-clinical-flow">
+                    <p class="rm-expert-step">05 · Información pendiente</p>
+                    <x-ui.section-card title="Avisos y observaciones" icon="ph-warning" class="rm-expert-notices">
+                        <ul class="text-sm space-y-2 list-disc pl-4">
+                            @if(!$datos['evaluacion'])<li>No hay evaluaciones clínicas guardadas para este residente.</li>@endif
+                            @if($detalle['motivo'])<li>{{ $detalle['motivo'] }}</li>@endif
+                            @foreach($detalle['integridad'] as $aviso)<li>{{ $aviso }}</li>@endforeach
+                            @if(!$detalle['autorizado'])<li>Conocimiento sin publicación clínica habilitada para esta área y versión.</li>@endif
+                            <li>La revisión profesional no tiene un contrato de persistencia aprobado.</li>
+                        </ul>
+                    </x-ui.section-card>
+
+                </div>
+
+                @if($datos['preparacion_memoria'] || $datos['conocimiento_documental'] || $datos['registros_cognitivos'])
+                    <details class="rm-card rm-expert-records" open>
+                        <summary class="rm-expert-records-summary"><span><i class="ph ph-folder-open" aria-hidden="true"></i> Datos disponibles y preparación de la valoración</span><i class="ph ph-caret-down" aria-hidden="true"></i></summary>
+                        <p class="text-sm text-rm-secondary mb-4">Son registros originales o definiciones documentales; por sí solos no generan una evaluación experta autorizada.</p>
+                        <div class="space-y-4">
                 @if($datos['preparacion_memoria'])
                     @php($preparacion = $datos['preparacion_memoria'])
                     <x-ui.section-card title="Preparación de la valoración de memoria" subtitle="Datos disponibles y requisitos pendientes" icon="ph-list-checks">
@@ -107,41 +173,33 @@
                         </div>
                     </x-ui.section-card>
                 @endif
-                @if($detalle['integridad'])
-                    <div class="rm-alert rm-alert-danger" role="alert"><div><strong>No se publica el resultado: integridad pendiente</strong><p>El fundamento conservado está incompleto o contiene datos incompatibles. Consulte los avisos de esta evaluación.</p></div></div>
+
+                        </div>
+                    </details>
                 @endif
-                <div class="rm-expert-detail-heading rm-expert-tone-{{ $presentacion['tono'] }}"><span class="rm-expert-area-icon"><i class="ph {{ $detalle['icono'] }}" aria-hidden="true"></i></span><div class="min-w-0"><h2 id="titulo-cognitivo">{{ $detalle['nombre'] }}</h2><p class="text-sm text-rm-secondary">{{ $criterio }} · {{ $detalle['activacion'] }}</p></div><span class="rm-expert-review-state"><i class="ph ph-lock-simple" aria-hidden="true"></i> Revisión profesional aún no habilitada</span></div>
-                <div class="rm-expert-panels">
-                    <x-ui.section-card title="Resultado del sistema experto" icon="ph-list-checks" class="rm-expert-result rm-expert-tone-{{ $presentacion['tono'] }}">
-                        <p class="rm-expert-conclusion">{{ $presentacion['resumen'] ?? $detalle['estado'] }}</p>
-                        <p class="text-sm text-rm-secondary mt-3">{{ $detalle['evaluabilidad'] ?? 'No hay una evaluación guardada para esta área.' }}</p>
-                        @if($detalle['modificador'])<p class="text-sm mt-3">{{ $detalle['modificador'] }}</p>@endif
-                    </x-ui.section-card>
-                    <x-ui.section-card title="Interpretación del sistema experto" icon="ph-file-text" class="rm-expert-interpretation">
-                        <p class="text-sm leading-relaxed">{{ $detalle['interpretacion'] }}</p>
-                        @if(!$detalle['autorizado'])<p class="text-sm text-rm-secondary mt-3">La publicación del conocimiento de esta versión requiere un contrato institucional aprobado.</p>@endif
-                    </x-ui.section-card>
-                    <x-ui.section-card title="¿Qué sustenta este resultado?" icon="ph-lightbulb" class="rm-expert-foundation-summary">
-                        <ul class="text-sm space-y-2">
-                            @forelse(array_filter($detalle['evidencias'], fn ($e) => $e['papel'] === 'Soporte de inferencia') as $e)
-                                <li class="flex gap-2"><span aria-hidden="true">•</span><span>{{ $e['nombre'] }} · {{ $e['fuente'] }}</span></li>
-                            @empty
-                                <li>No se conserva soporte directo de un resultado integrado para esta área.</li>
-                            @endforelse
-                        </ul>
-                        <p class="text-xs text-rm-secondary mt-3">El contexto y la compuerta de evaluabilidad no se presentan como hallazgos clínicos.</p>
-                    </x-ui.section-card>
-                    <x-ui.section-card title="Avisos y observaciones" icon="ph-warning" class="rm-expert-notices">
-                        <ul class="text-sm space-y-2 list-disc pl-4">
-                            @if(!$datos['evaluacion'])<li>No hay evaluaciones clínicas guardadas para este residente.</li>@endif
-                            @if($detalle['motivo'])<li>{{ $detalle['motivo'] }}</li>@endif
-                            @foreach($detalle['integridad'] as $aviso)<li>{{ $aviso }}</li>@endforeach
-                            @if(!$detalle['autorizado'])<li>Conocimiento sin publicación clínica habilitada para esta área y versión.</li>@endif
-                            <li>La revisión profesional no tiene un contrato de persistencia aprobado.</li>
-                        </ul>
-                    </x-ui.section-card>
+
+                <div id="seccion-historial" class="rm-expert-clinical-flow">
+                    <p class="rm-expert-step">06 · Historial y revisión</p>
+                    @include('livewire.medico.resultados-experto.historial')
+                @unless($enfermeria)
+                <x-ui.section-card title="Revisión profesional" icon="ph-user-circle">
+                    <p id="revision-no-disponible" class="text-sm text-rm-secondary mb-4">Estas acciones están pendientes de un contrato institucional de registro. No se guardan revisiones ni observaciones desde esta pantalla.</p>
+                    <details class="rm-expert-review-details mt-3"><summary class="min-h-11 cursor-pointer font-semibold">Consultar acciones previstas (no habilitadas)</summary><div class="flex flex-wrap gap-2 mt-3">
+                        @foreach(['Confirmar concordancia' => 'ph-check', 'Registrar discrepancia' => 'ph-x', 'Solicitar más evidencia' => 'ph-magnifying-glass', 'Solicitar reevaluación' => 'ph-arrow-clockwise', 'Agregar observación' => 'ph-chat-text'] as $accion => $icono)
+                            <button type="button" disabled class="rm-btn {{ $loop->first ? 'rm-btn-primary' : 'rm-btn-secondary' }} min-h-11 whitespace-normal" aria-describedby="revision-no-disponible"><i class="ph {{ $icono }}" aria-hidden="true"></i>{{ $accion }}</button>
+                        @endforeach
+                    </div>
+                    <label for="observacion-profesional" class="block text-sm font-medium mt-4 mb-2">Comentario del profesional · registro no habilitado</label>
+                    <textarea id="observacion-profesional" disabled rows="2" class="rm-input w-full" placeholder="Escriba aquí sus observaciones clínicas, el motivo de una discrepancia o la información que considera necesaria" aria-describedby="revision-no-disponible"></textarea>
+                    </details>
+                </x-ui.section-card>
+                @endunless
+
                 </div>
-                @include('livewire.medico.resultados-experto.evidencias')
+                <div id="seccion-fundamento" class="rm-expert-clinical-flow rm-expert-technical">
+                    <p class="rm-expert-step">07 · Fundamento técnico (consulta opcional)</p>
+                    @include('livewire.medico.resultados-experto.fundamento')
+                </div>
                 @if($datos['informe_tecnico'])
                     @php($informe = $datos['informe_tecnico'])
                     <x-ui.section-card title="Verificación de la prueba técnica" subtitle="Informe generado al ejecutar el caso sintético de QA" icon="ph-check-circle">
@@ -165,22 +223,9 @@
                         </details>
                     </x-ui.section-card>
                 @endif
-                @include('livewire.medico.resultados-experto.fundamento')
-                @unless($enfermeria)
-                <x-ui.section-card title="Revisión profesional" icon="ph-user-circle">
-                    <p id="revision-no-disponible" class="text-sm text-rm-secondary mb-4">Estas acciones están pendientes de un contrato institucional de registro. No se guardan revisiones ni observaciones desde esta pantalla.</p>
-                    <div class="flex flex-wrap gap-2">
-                        @foreach(['Confirmar concordancia' => 'ph-check', 'Registrar discrepancia' => 'ph-x', 'Solicitar más evidencia' => 'ph-magnifying-glass', 'Solicitar reevaluación' => 'ph-arrow-clockwise', 'Agregar observación' => 'ph-chat-text'] as $accion => $icono)
-                            <button type="button" disabled class="rm-btn {{ $loop->first ? 'rm-btn-primary' : 'rm-btn-secondary' }} min-h-11 whitespace-normal" aria-describedby="revision-no-disponible"><i class="ph {{ $icono }}" aria-hidden="true"></i>{{ $accion }}</button>
-                        @endforeach
-                    </div>
-                    <label for="observacion-profesional" class="block text-sm font-medium mt-4 mb-2">Comentario del profesional · registro no habilitado</label>
-                    <textarea id="observacion-profesional" disabled rows="2" class="rm-input w-full" placeholder="Escriba aquí sus observaciones clínicas, el motivo de una discrepancia o la información que considera necesaria" aria-describedby="revision-no-disponible"></textarea>
-                </x-ui.section-card>
-                @endunless
+
             </section>
         </div>
-        @include('livewire.medico.resultados-experto.historial')
     @endif
 
     @if($datos)

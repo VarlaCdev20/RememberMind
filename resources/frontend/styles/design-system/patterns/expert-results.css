@@ -79,8 +79,8 @@
 @media (min-width: 1024px) {
     .rm-expert-context-grid { grid-template-columns: minmax(0, 1.6fr) minmax(0, .55fr) minmax(0, 1fr) minmax(0, .85fr); }
     .rm-expert-context-grid dl { border-left: 1px solid var(--rm-border); padding-left: 1rem; }
-    .rm-expert-workspace { grid-template-columns: minmax(230px, .36fr) minmax(0, 1fr); }
-    .rm-expert-criteria { grid-template-columns: minmax(0, 1fr); }
+    .rm-expert-workspace { grid-template-columns: minmax(0, 1fr); }
+    .rm-expert-criteria { grid-template-columns: repeat(5, minmax(0, 1fr)); }
     .rm-expert-panels { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (min-width: 768px) and (max-width: 1023px) {
@@ -99,4 +99,46 @@
 }
 @media (prefers-reduced-motion: reduce) {
     .rm-expert-results .rm-expert-criterion { transition: none; }
+}
+
+/* O.R.I.O.N.: lectura clínica progresiva. Consume tokens oficiales; no define paletas por rol. */
+.rm-expert-results .rm-expert-eyebrow,
+.rm-expert-results .rm-expert-step { font-size: var(--rm-font-size-meta); font-weight: 700; color: var(--rm-primary-ink); letter-spacing: .015em; }
+.rm-expert-results .rm-expert-eyebrow { margin-top: .25rem; }
+.rm-expert-results .rm-expert-context-meta { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; border-top: 1px solid var(--rm-border); margin-top: .9rem; padding-top: .75rem; font-size: var(--rm-font-size-meta); color: var(--rm-text-secondary); }
+.rm-expert-results .rm-expert-context-meta span { display: inline-flex; align-items: center; gap: .45rem; overflow-wrap: anywhere; }
+.rm-expert-results .rm-expert-overview { border: 1px solid var(--rm-border); border-radius: var(--rm-radius-xl, 1rem); background: var(--rm-surface); padding: clamp(1rem, 2.2vw, 1.5rem); display: grid; gap: .75rem; }
+.rm-expert-results .rm-expert-overview-note { color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); }
+.rm-expert-results .rm-expert-overview > .rm-card { box-shadow: none; background: var(--rm-surface-soft); }
+.rm-expert-results .rm-expert-overview-disclaimer { display: flex; align-items: flex-start; gap: .5rem; border-top: 1px solid var(--rm-border); padding-top: .75rem; color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); }
+.rm-expert-results .rm-expert-profile .rm-card__section-header { margin-bottom: .9rem; }
+.rm-expert-results .rm-expert-criteria { gap: .625rem; }
+.rm-expert-results .rm-expert-criterion { padding: .85rem; min-height: 150px; display: flex; flex-direction: column; align-items: stretch; }
+.rm-expert-results .rm-expert-criterion-heading { gap: .5rem; align-items: flex-start; }
+.rm-expert-results .rm-expert-criterion .rm-expert-area-icon { width: 38px; height: 38px; font-size: 1.35rem; }
+.rm-expert-results .rm-expert-criterion .rm-expert-status { margin-top: auto; align-self: flex-start; }
+.rm-expert-results .rm-expert-criterion .rm-expert-criterion-heading > .ph-caret-right { margin-top: .45rem; }
+.rm-expert-results .rm-expert-detail { padding: 0; border: 0; background: transparent; box-shadow: none; }
+.rm-expert-results .rm-expert-detail-heading { padding: .75rem 0; }
+.rm-expert-results .rm-expert-detail-heading h2 { font-size: var(--rm-font-size-section); }
+.rm-expert-results .rm-expert-clinical-flow { min-width: 0; }
+.rm-expert-results .rm-expert-clinical-flow > .rm-expert-step { margin: 0 0 .5rem .125rem; }
+.rm-expert-results .rm-expert-clinical-flow > .rm-card { margin-top: .5rem; }
+.rm-expert-results .rm-expert-clinical-flow .rm-expert-interpretation { background: var(--rm-surface); }
+.rm-expert-results .rm-expert-records { padding: 1rem; }
+.rm-expert-results .rm-expert-records-summary { display: flex; justify-content: space-between; align-items: center; gap: .75rem; cursor: pointer; min-height: 44px; font-weight: 700; }
+.rm-expert-results .rm-expert-records-summary::-webkit-details-marker { display: none; }
+.rm-expert-results .rm-expert-records-summary > span { display: inline-flex; align-items: center; gap: .5rem; }
+.rm-expert-results .rm-expert-review-details > summary { color: var(--rm-primary-ink); }
+.rm-expert-results .rm-expert-loading { padding: .75rem; border-radius: var(--rm-radius-lg); background: var(--rm-surface-soft); }
+@media (max-width: 1279px) and (min-width: 1024px) {
+    .rm-expert-results .rm-expert-criteria { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 1023px) and (min-width: 640px) {
+    .rm-expert-results .rm-expert-criteria { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 639px) {
+    .rm-expert-results .rm-expert-criteria { grid-template-columns: minmax(0, 1fr); }
+    .rm-expert-results .rm-expert-criterion { min-height: 0; }
+    .rm-expert-results .rm-expert-context-meta { flex-direction: column; }
 }
