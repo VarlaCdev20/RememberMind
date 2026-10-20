@@ -105,12 +105,12 @@ en sus propias actas y no se atribuyen a este cierre.
 ### 5. Integrar Petersen institucional
 
 - [x] Especificar la derivación de C01–C05 desde soportes originales: cambio corroborado, alteración objetiva, independencia instrumental relativa, evaluación diferencial y calidad/interpretabilidad.
-- [ ] Utilizar IADL descriptiva con oportunidad, ayuda y contexto; actividades básicas no sustituyen la independencia instrumental.
+- [x] Utilizar IADL descriptiva con oportunidad, ayuda y contexto; actividades básicas no sustituyen la independencia instrumental. Lectura contextual aprobada e instalada; no acredita C03 por sí sola.
 - [x] Comprobar independencia de soportes, fechas, corte y residente; conservar la versión de contexto y el contrato. La ausencia de un diagnóstico no constituye una revisión diferencial. La retención histórica de versión/release sigue en fase 6.
 - [x] Integrar los cuatro patrones y abstenciones con los resultados sustentados de los dominios.
 - [x] Probar patrones completos, criterios ausentes, contradicciones y fuentes incompatibles sin incorporar la respuesta esperada como entrada.
 
-**Incremento E–H aprobado e implementado:** [acta, componentes y matriz de pruebas](FASE_5_CAPTURA_PETERSEN_Y_REPRODUCCION_2026_10_19.md). Dos tablas originales y tres permisos aprobados llevan el inventario a 108, preservando 4FN. El adaptador IADL está implementado; el permiso específico de lectura de fuente para Medicina/Psicología sigue pendiente de decisión separada. Los patrones se calculan en el núcleo; su gobierno SQL todavía no se incorpora al gestor de las 17 reglas A–D. La conservación íntegra y el recorrido de revisión permanecen abiertos.
+**Incremento E–H aprobado e implementado:** [acta, componentes y matriz de pruebas](FASE_5_CAPTURA_PETERSEN_Y_REPRODUCCION_2026_10_19.md). Dos tablas originales y tres permisos aprobados llevan el inventario a 108, preservando 4FN. La lectura IADL de Medicina/Psicología fue aprobada e instalada posteriormente. El [incremento del 20/10](GOBIERNO_PETERSEN_Y_QA_CAPTURA_2026_10_20.md) conecta los cuatro patrones a una familia SQL separada mediante el gestor existente, preserva las 17 reglas A–D y verifica la captura en navegador. La conservación íntegra y el recorrido de revisión permanecen abiertos.
 
 **Entregable:** clasificación orientativa o abstención explicada, con soportes individualizados. **Cierre:** el motor obtiene el resultado desde la evidencia y permite reconstruirlo; no depende de declaraciones sintéticas del laboratorio.
 

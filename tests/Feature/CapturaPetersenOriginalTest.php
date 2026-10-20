@@ -13,11 +13,14 @@ use App\Models\DocumentoClinico;
 use App\Models\Instrumento;
 use App\Models\Personal;
 use App\Models\PreguntaInstrumento;
+use App\Models\ReglaExperta;
 use App\Models\Residente;
 use App\Models\RespuestaInstrumento;
 use App\Models\User;
 use App\Models\ValoracionPetersenOriginal;
 use App\Models\ValoracionPsicologica;
+use App\Modulos\ApoyoDecision\Aplicacion\Acciones\GestionarReglasExpertas;
+use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoPetersen;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarValoracionPetersenOriginal;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarPetersenInstitucional;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\CapturaPetersenPanel;
@@ -267,6 +270,7 @@ final class CapturaPetersenOriginalTest extends TestCase
     #[DataProviderExternal(PetersenInstitucionalTest::class, 'patrones')]
     public function test_caso_completo_se_clasifica_desde_mediciones_y_soportes_originales(array $alterados, string $patron): void
     {
+        $versionGobierno = app(RegistrarConocimientoPetersen::class)->ejecutar($this->usuario);
         $area = Area::create(['nombre' => 'Área de ensayo sintético', 'estado' => 'ACTIVA']);
         $atenciones = [];
         foreach (range(0, 9) as $i) {
@@ -335,6 +339,14 @@ final class CapturaPetersenOriginalTest extends TestCase
         self::assertSame($patron, $r['patron'], json_encode(['dominios' => array_column($r['dominios'], 'estado'),
             'requisitos' => array_column($r['requisitos'], 'estado'), 'adquisicion' => $r['adquisicion']], JSON_UNESCAPED_UNICODE));
         self::assertSame([], $r['impedimentos']);
+        self::assertSame($versionGobierno, $r['gobierno']['version']);
+        self::assertCount(4, $r['gobierno']['reglas']);
+        self::assertCount(8, $r['gobierno']['reglas'][0]['condiciones']);
+        $regla = ReglaExperta::query()->where('cod_version_modelo', $versionGobierno)->where('codigo_regla', $patron)->sole();
+        app(GestionarReglasExpertas::class)->revisar($this->usuario, $regla->getKey(), 'RECHAZADA', 'Ensayo de rechazo sin modificar las fuentes originales.');
+        $rechazado = app(ConsultarPetersenInstitucional::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+        self::assertNull($rechazado['patron']);
+        self::assertContains('ABSTENCION_SIN_REGLA_PETERSEN_HABILITADA', $rechazado['impedimentos']);
         self::assertDatabaseCount('valoraciones_petersen_originales', 9);
         self::assertDatabaseCount('evaluaciones_expertas', 0);
         config(['sistema_experto.perfiles_instrumentales' => []]);
@@ -395,6 +407,57 @@ final class CapturaPetersenOriginalTest extends TestCase
     public static function metadatosManipulados(): array
     {
         return [['solicitud_uuid', '00000000-0000-4000-8000-000000000000'], ['tipo_registro', 'ANULACION'], ['cod_valoracion_anterior', 'CADENA-AJENA']];
+    }
+
+    public static function precisionClinica(): array
+    {
+        return [['000000'], ['123456']];
+    }
+
+    #[DataProvider('precisionClinica')]
+    public function test_rectificar_y_anular_desde_formulario_preserva_microsegundos_sin_fecha_html_invalida(string $microsegundos): void
+    {
+        $original = $this->registrar($this->entrada(['fecha_hora' => '2026-10-18T10:00:00.'.$microsegundos.'-04:00']));
+        $panel = Livewire::test(CapturaPetersenPanel::class, ['residente' => $this->residente])
+            ->call('corregir', $original->getKey())->assertSet('form.fecha_hora', '2026-10-18T10:00:00.'.substr($microsegundos, 0, 3))
+            ->set('form.error_fecha_original', 'Se revisó la fecha original; la representación visible permanece igual.')
+            ->set('form.justificacion', 'Rectificación sintética sin modificación del instante clínico.')->call('guardar')->assertHasNoErrors();
+        $sucesora = ValoracionPetersenOriginal::query()->where('cod_valoracion_anterior', $original->getKey())->sole();
+        self::assertSame($microsegundos, $sucesora->fecha_hora->format('u'));
+        $panel->assertSee('Registro histórico. Sucesora:')->call('corregir', $original->getKey())->assertHasErrors('historial');
+        $panel->call('corregir', $sucesora->getKey(), true)->set('form.justificacion', 'Anulación explícita conservando precisión del acto original.')
+            ->call('guardar')->assertHasNoErrors();
+        $anulacion = ValoracionPetersenOriginal::query()->where('cod_valoracion_anterior', $sucesora->getKey())->sole();
+        self::assertSame('ANULACION', $anulacion->tipo_registro);
+        self::assertSame($microsegundos, $anulacion->fecha_hora->format('u'));
+        self::assertDatabaseCount('valoraciones_petersen_originales', 3);
+    }
+
+    public function test_iadl_exige_competencia_contextual_en_selector_y_lector_antes_de_consultar(): void
+    {
+        $iadl = ControlFuncionalIadl::create(['cod_residente' => $this->residente->getKey(), 'cod_personal' => $this->usuario->personal->getKey(),
+            'cod_usuario_registro' => $this->usuario->getKey(), 'fecha_hora' => '2026-10-15 09:00:00', 'registrado_en' => '2026-10-15 10:00:00',
+            'actividad' => 'MEDICACION', 'oportunidad' => 'OBSERVADA', 'desempeno' => 'INDEPENDIENTE', 'tipo_ayuda' => 'NINGUNA',
+            'causa_ayuda' => 'NINGUNA', 'nivel_previo' => 'INDEPENDIENTE', 'fuente' => 'OBSERVACION_DIRECTA', 'estado' => 'REGISTRADO']);
+        $this->registrar($this->entrada(['elemento' => 'C03', 'estado_original' => 'S', 'revision_integrada' => true,
+            'oportunidad_adecuada' => true, 'atribucion_revisada' => true,
+            'soportes' => [['tipo_soporte' => 'IADL', 'cod_control_iadl' => $iadl->getKey()]]]));
+        $incompatible = $this->profesional('MEDICO GENERAL/GERIATRA');
+        $incompatible->personal->update(['profesion' => 'ENFERMERIA']);
+        self::assertTrue($incompatible->checkPermissionTo('controles_funcionales_iadl.ver', 'web'));
+        $consultasIadl = 0;
+        DB::listen(static function ($consulta) use (&$consultasIadl): void {
+            if (preg_match('/^select .*from ["`]?controles_funcionales_iadl["`]?/s', $consulta->sql)) {
+                $consultasIadl++;
+            }
+        });
+        Livewire::actingAs($incompatible)->test(CapturaPetersenPanel::class, ['residente' => $this->residente])
+            ->set('form', ['elemento' => 'C03', 'soportes' => []])->set('tipoSoporte', 'IADL')->set('campoFuente', 'cod_control_iadl')
+            ->assertViewHas('fuentes', fn ($fuentes) => ! in_array('cod_control_iadl', $fuentes, true))->assertViewHas('opciones', []);
+        $r = app(ConsultarPetersenInstitucional::class)->consultar($incompatible, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+        self::assertSame('U', $r['requisitos']['C03']['estado']);
+        self::assertSame(0, $consultasIadl);
+        self::assertNull($r['patron']);
     }
 
     #[DataProvider('metadatosManipulados')]

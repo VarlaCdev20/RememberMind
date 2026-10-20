@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas;
 
+use App\Models\EvaluacionExperta;
 use App\Models\Residente;
 use App\Models\User;
 use App\Models\ValoracionPetersenOriginal;
@@ -33,6 +34,9 @@ final class CapturaPetersenPanel extends Component
 
     #[Locked]
     public string $tipoRegistro = 'REGISTRO';
+
+    #[Locked]
+    public ?string $fechaOriginal = null;
 
     #[Locked]
     public ?string $mensaje = null;
@@ -86,16 +90,21 @@ final class CapturaPetersenPanel extends Component
         [$usuario, $residente] = $this->autorizar();
         $original = ValoracionPetersenOriginal::query()->with('soportes')->where('cod_residente', $residente->getKey())->findOrFail($id);
         Gate::forUser($usuario)->authorize('rectificarOriginal', $original);
-        abort_if($original->tipo_registro === 'ANULACION'
-            || ValoracionPetersenOriginal::query()->where('cod_valoracion_anterior', $id)->exists(), 409, 'La cadena cambió. Recargue el historial.');
+        if ($original->tipo_registro === 'ANULACION'
+            || ValoracionPetersenOriginal::query()->where('cod_valoracion_anterior', $id)->exists()) {
+            $this->addError('historial', 'Este registro ya tiene una sucesora o fue anulado. Consulte la cadena actualizada antes de corregir.');
+
+            return;
+        }
         $this->limpiar();
         $this->solicitud = (string) Str::uuid();
         $this->anterior = $id;
         $this->tipoRegistro = $anular ? 'ANULACION' : 'RECTIFICACION';
+        $this->fechaOriginal = $original->fecha_hora->format('Y-m-d\TH:i:s.u');
         $this->form = ['elemento' => $original->elemento, 'estado_original' => $anular ? null : $original->estado_original,
             'cod_atencion' => $original->cod_atencion, 'cod_documento_clinico' => $original->cod_documento_clinico,
             'localizador_fuente' => $original->localizador_fuente,
-            'justificacion' => '', 'fecha_hora' => $original->fecha_hora->format('Y-m-d\TH:i:s.u'), 'soportes' => $anular ? [] : $original->soportes
+            'justificacion' => '', 'fecha_hora' => $original->fecha_hora->format('Y-m-d\TH:i:s.v'), 'soportes' => $anular ? [] : $original->soportes
                 ->map(fn ($s) => array_filter($s->only(['tipo_soporte', ...array_keys(F::FUENTES)]), fn ($v) => $v !== null))->all()];
         if (! $anular) {
             foreach (V::COMPROBACIONES[str_starts_with($original->elemento, 'COG-') ? 'DOMINIO' : $original->elemento] as $campo) {
@@ -130,6 +139,13 @@ final class CapturaPetersenPanel extends Component
         [$usuario, $residente] = $this->autorizar();
         abort_unless($this->solicitud !== null, 409);
         $entrada = $this->form;
+        // datetime-local admite milisegundos. La representación sin editar conserva el instante original completo.
+        if ($this->fechaOriginal !== null && ($this->tipoRegistro === 'ANULACION'
+            || (is_string($entrada['fecha_hora'] ?? null)
+                && preg_match('/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})(?::(\d{2})(?:\.(\d{1,3}))?)?$/D', $entrada['fecha_hora'], $partes)
+                && substr($this->fechaOriginal, 0, 23) === $partes[1].':'.($partes[2] ?? '00').'.'.str_pad($partes[3] ?? '', 3, '0')))) {
+            $entrada['fecha_hora'] = $this->fechaOriginal;
+        }
         if (array_intersect(array_keys($entrada), ['solicitud_uuid', 'tipo_registro', 'cod_valoracion_anterior'])) {
             $this->addError('registro', 'La identidad de la captura cambió. Recargue antes de registrar la valoración.');
 
@@ -167,9 +183,21 @@ final class CapturaPetersenPanel extends Component
         $this->dispatch('petersen-captura-cerrada');
     }
 
+    public function mostrarRegistro(string $id): void
+    {
+        [, $residente] = $this->autorizar();
+        $registro = ValoracionPetersenOriginal::query()->where('cod_residente', $residente->getKey())->findOrFail($id);
+        $anteriores = ValoracionPetersenOriginal::query()->where('cod_residente', $residente->getKey())
+            ->where(fn ($q) => $q->where('registrado_en', '>', $registro->getRawOriginal('registrado_en'))
+                ->orWhere(fn ($q) => $q->where('registrado_en', $registro->getRawOriginal('registrado_en'))->where('cod_valoracion_petersen', '>', $id)))->count();
+        $this->setPage(intdiv($anteriores, 15) + 1);
+        $this->mensaje = 'Registro consultado: '.$id.'.';
+        $this->dispatch('petersen-registro-mostrado', registro: $id);
+    }
+
     private function limpiar(): void
     {
-        $this->reset('form', 'solicitud', 'anterior', 'tipoRegistro', 'tipoSoporte', 'campoFuente', 'registroFuente', 'busquedaFuente');
+        $this->reset('form', 'solicitud', 'anterior', 'tipoRegistro', 'fechaOriginal', 'tipoSoporte', 'campoFuente', 'registroFuente', 'busquedaFuente');
         $this->resetErrorBag();
     }
 
@@ -177,10 +205,11 @@ final class CapturaPetersenPanel extends Component
     {
         [$usuario, $residente] = $this->autorizar();
         abort_unless($this->form === [] || isset(self::ELEMENTOS[$this->form['elemento'] ?? '']), 422);
-        $registros = ValoracionPetersenOriginal::query()->where('cod_residente', $residente->getKey())->with('personal')
+        $registros = ValoracionPetersenOriginal::query()->where('cod_residente', $residente->getKey())->with(['personal', 'sucesora'])
             ->orderByDesc('registrado_en')->orderByDesc('cod_valoracion_petersen')->paginate(15);
         $tipos = array_filter(self::TIPOS, fn ($nombre, $tipo) => F::admitidas($this->form['elemento'] ?? '', $tipo) !== [], ARRAY_FILTER_USE_BOTH);
-        $fuentes = array_values(array_filter(F::admitidas($this->form['elemento'] ?? '', $this->tipoSoporte), fn ($fk) => $usuario->checkPermissionTo(F::FUENTES[$fk][1], 'web')));
+        $fuentes = array_values(array_filter(F::admitidas($this->form['elemento'] ?? '', $this->tipoSoporte), fn ($fk) => $usuario->checkPermissionTo(F::FUENTES[$fk][1], 'web')
+            && ($fk !== 'cod_control_iadl' || Gate::forUser($usuario)->allows('consultarFuncionalidad', [EvaluacionExperta::class, $residente]))));
         $opciones = [];
         if (in_array($this->campoFuente, $fuentes, true)) {
             [$modelo] = F::FUENTES[$this->campoFuente];
@@ -195,8 +224,20 @@ final class CapturaPetersenPanel extends Component
         $comprobaciones = $this->form === [] ? [] : V::COMPROBACIONES[str_starts_with($this->form['elemento'], 'COG-') ? 'DOMINIO' : $this->form['elemento']];
         $puedeCrear = Gate::forUser($usuario)->allows('crearOriginal', [ValoracionPetersenOriginal::class, $residente]);
         $profesional = $usuario->personal()->first();
+        $rutaInforme = $usuario->hasRole('PSICOLOGO/A') ? 'admin.psicologia.residente.resultados-experto' : 'admin.medico.residente.resultados-experto';
+        $labelsFuentes = ['cod_aplicacion' => 'Aplicación de instrumento', 'cod_control_cognitivo' => 'Control cognitivo',
+            'cod_control_iadl' => 'Control de actividad instrumental (IADL)', 'cod_valoracion_psicologica' => 'Valoración psicológica',
+            'cod_antecedente' => 'Antecedente clínico', 'cod_diagnostico' => 'Diagnóstico', 'cod_documento_clinico' => 'Documento clínico original',
+            'cod_valoracion_revisada' => 'Valoración de dominio revisada'];
+        $labelsComprobaciones = ['alcance_dominio' => 'Alcance suficiente del dominio', 'contexto_interpretado' => 'Contexto interpretado',
+            'cambio_respecto_previo' => 'Cambio respecto al funcionamiento previo', 'corroboracion_independiente' => 'Corroboración independiente',
+            'revision_integrada' => 'Revisión integrada de actividades instrumentales', 'oportunidad_adecuada' => 'Oportunidad adecuada para la actividad',
+            'atribucion_revisada' => 'Causa de la ayuda revisada', 'revision_explicita' => 'Revisión diferencial explícita',
+            'factores_pertinentes_revisados' => 'Factores pertinentes revisados', 'impedimento_no_resuelto' => 'Impedimento aún sin resolver',
+            'suficiencia_conjunto' => 'Suficiencia del conjunto de valoraciones', 'condiciones_revisadas' => 'Condiciones de aplicación revisadas',
+            'exclusiones_revisadas' => 'Exclusiones revisadas'];
 
-        return view('apoyodecision::livewire.petersen.captura-original', compact('residente', 'registros', 'tipos', 'fuentes', 'opciones', 'comprobaciones', 'puedeCrear', 'profesional'))
+        return view('apoyodecision::livewire.petersen.captura-original', compact('residente', 'registros', 'tipos', 'fuentes', 'opciones', 'comprobaciones', 'puedeCrear', 'profesional', 'rutaInforme', 'labelsFuentes', 'labelsComprobaciones'))
             ->layout('layouts.sistema');
     }
 }

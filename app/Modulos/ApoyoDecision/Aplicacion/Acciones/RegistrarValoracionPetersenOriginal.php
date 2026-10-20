@@ -6,6 +6,7 @@ namespace App\Modulos\ApoyoDecision\Aplicacion\Acciones;
 
 use App\Models\Atencion;
 use App\Models\DocumentoClinico;
+use App\Models\EvaluacionExperta;
 use App\Models\Residente;
 use App\Models\SoporteValoracionPetersen;
 use App\Models\User;
@@ -56,7 +57,9 @@ final class RegistrarValoracionPetersenOriginal
             foreach ($campos as $campo) {
                 $reglas[$campo] = ['nullable', 'boolean'];
             }
-            $datos = Validator::make($entrada, $reglas)->validate();
+            $datos = Validator::make($entrada, $reglas, [
+                'fecha_hora.before_or_equal' => 'La fecha y hora del acto original no pueden ser futuras.',
+            ], ['fecha_hora' => 'fecha y hora del acto original', 'justificacion' => 'fundamento de la valoración'])->validate();
             $datos['justificacion'] = trim($datos['justificacion']);
             $fecha = CarbonImmutable::parse($datos['fecha_hora'])->setTimezone(config('app.timezone'));
             $tipo = $datos['tipo_registro'];
@@ -112,6 +115,9 @@ final class RegistrarValoracionPetersenOriginal
                 }
                 [$modelo, $permiso] = F::FUENTES[$fk];
                 abort_unless($usuario->checkPermissionTo($permiso, 'web'), 403, 'No dispone de autorización para una fuente original.');
+                if ($fk === 'cod_control_iadl') {
+                    Gate::forUser($usuario)->authorize('consultarFuncionalidad', [EvaluacionExperta::class, $residente]);
+                }
                 $fuente = $modelo::query()->where('cod_residente', $residente->getKey())->whereKey($s[$fk])->lockForUpdate()->firstOrFail();
                 $identidad = $fuente->getTable().':'.$fuente->getKey();
                 if (isset($vistos[$identidad])) {
@@ -196,6 +202,9 @@ final class RegistrarValoracionPetersenOriginal
             }
             $fk = reset($fks);
             abort_unless($usuario->checkPermissionTo(F::FUENTES[$fk][1], 'web'), 403);
+            if ($fk === 'cod_control_iadl') {
+                Gate::forUser($usuario)->authorize('consultarFuncionalidad', [EvaluacionExperta::class, $residente]);
+            }
             $enlaces[] = ['tipo_soporte' => $s['tipo_soporte'] ?? '', 'orden' => $orden, $fk => $s[$fk]];
         }
         unset($datos['soportes']);

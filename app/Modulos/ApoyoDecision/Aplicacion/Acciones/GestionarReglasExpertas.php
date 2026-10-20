@@ -18,6 +18,7 @@ use MotorExperto\dominio\conocimiento\CompiladorObservacional;
 use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
 use MotorExperto\dominio\conocimiento\PertenenciaVariableCognitiva;
 use MotorExperto\dominio\conocimiento\reglas\EvaluadorReglas;
+use MotorExperto\dominio\conocimiento\versiones\PaquetePetersenInstitucional;
 
 /** Gobierno institucional del conocimiento. Ninguna aprobación se inventa o se exige al crear. */
 final class GestionarReglasExpertas
@@ -83,6 +84,10 @@ final class GestionarReglasExpertas
                 throw new DomainException('Ese código de versión ya existe; no se sobrescribe.');
             }
             $tablas = app(ConocimientoVersionado::class)->instantanea($anterior);
+            $petersen = app(ContratosConocimiento::class)->esFamiliaPetersen($anterior);
+            if ($petersen && $nueva !== []) {
+                throw new DomainException('Petersen conserva las cuatro definiciones adoptadas. Puede probar, revisar, archivar o crear una sucesora; otra semántica requiere decisión institucional.');
+            }
             $reglas = array_column($tablas['reglas_expertas'], null, 'cod_regla_experta');
             if ($sustituye !== null) {
                 if ($nueva === [] || ! isset($reglas[$sustituye])) {
@@ -156,6 +161,11 @@ final class GestionarReglasExpertas
                         }
                     }
                 }
+            }
+            if ($petersen) {
+                $c = PaquetePetersenInstitucional::contratos();
+                (new PaquetePetersenInstitucional)->validar(new PaqueteConocimiento($id,
+                    array_intersect_key($traducidas, PaqueteConocimiento::CLAVES), $c['relaciones'], false, $c['tipo_regla_resultado'], []));
             }
             foreach ($traducidas['reglas_expertas'] as &$rule) {
                 // Esta FK apunta a la historia existente, nunca a la PK regenerada de la copia.

@@ -40,7 +40,7 @@ final class ConsultarConocimientoCognitivo
             $vinculos = [];
             if (! $sinVersion) {
                 $v = VersionModeloExperto::query()->whereKey($version)->lockForUpdate()->sole();
-                if ($v->estado !== 'ACTIVO' || $v->fecha_hora_retiro !== null || $v->fecha_hora_vigencia === null
+                if ($v->estado !== 'ACTIVO' || ($v->fecha_hora_retiro !== null && CarbonImmutable::parse($v->getRawOriginal('fecha_hora_retiro'))->lessThanOrEqualTo($corte)) || $v->fecha_hora_vigencia === null
                     || CarbonImmutable::parse($v->getRawOriginal('fecha_hora_vigencia'))->greaterThan($corte)
                     || preg_match('/SIM|TEST|EXPERIMENTAL/i', $v->codigo_version)) {
                     throw new DomainException('La versión declarativa no está vigente o pertenece al laboratorio.');

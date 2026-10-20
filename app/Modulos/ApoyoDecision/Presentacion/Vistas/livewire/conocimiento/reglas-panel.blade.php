@@ -6,6 +6,7 @@
         @if($puedeRegistrar)
             <div class="mb-4 space-y-2">
                 <button type="button" class="rm-btn rm-btn-secondary" wire:click="registrarInstitucional" wire:confirm="Registrar el contrato institucional A–D adoptado, sin modificar los registros de residentes ni firmar revisiones profesionales. Si ya existe, se abrirá su versión original." wire:loading.attr="disabled">Registrar base institucional adoptada</button>
+                <button type="button" class="rm-btn rm-btn-secondary" wire:click="registrarPetersen" wire:loading.attr="disabled">Registrar patrones de Petersen adoptados</button>
                 <p class="text-sm text-rm-secondary">Las observaciones se conservan como tales. Las reglas instrumentales requieren sus antecedentes originales; no se completan puntuaciones ni resultados.</p>
             </div>
         @endif
@@ -30,7 +31,7 @@
                         <td class="p-3">{{ $r->estado }}<p>Anterior: {{ $r->reglaAnterior?->codigo_regla ?? 'Sin antecesora' }}</p>@foreach($r->reglasSucesoras as $s)<p>Sucesora: {{ $s->codigo_regla }} · {{ $s->estado }}</p>@endforeach</td>
                         <td class="p-3 space-y-2">
                             @if($puedeGestionar)<button type="button" class="rm-btn rm-btn-secondary" wire:click="prepararPrueba(@js($r->getKey()))">Probar condiciones<span class="sr-only"> {{ $r->codigo_regla }}</span></button>@endif
-                            @if($puedeGestionar && $r->estado === 'ACTIVO')<button type="button" class="rm-btn rm-btn-secondary" wire:click="prepararArchivo(@js($r->getKey()))">Archivar o sustituir<span class="sr-only"> {{ $r->codigo_regla }}</span></button>@endif
+                            @if($puedeGestionar && $r->estado === 'ACTIVO')<button type="button" class="rm-btn rm-btn-secondary" wire:click="prepararArchivo(@js($r->getKey()))">{{ $contratoPetersen ? 'Archivar regla' : 'Archivar o sustituir' }}<span class="sr-only"> {{ $r->codigo_regla }}</span></button>@endif
                             @if($puedeRevisar && $r->estado === 'ACTIVO' && !in_array($r->estado_revision, ['APROBADA','RECHAZADA'], true))<button type="button" class="rm-btn rm-btn-secondary" wire:click="prepararRevision(@js($r->getKey()))">Revisar regla<span class="sr-only"> {{ $r->codigo_regla }}</span></button>@endif
                         </td>
                     </tr>
@@ -41,11 +42,11 @@
     </x-ui.section-card>
 
     @if($puedeGestionar && $reglaPrueba)
-        <x-ui.section-card title="Prueba de condiciones" subtitle="Las entradas de esta prueba no se guardan como datos de un residente ni aprueban la regla.">
+        <x-ui.section-card title="Prueba de condiciones" subtitle="Las entradas de esta prueba no se guardan como datos de un residente ni aprueban la regla." x-data="{ entradaCambiada: false }" x-on:change="entradaCambiada = true" x-on:reglas-prueba-actualizada.window="entradaCambiada = false">
             <form wire:submit="probarCondiciones" class="space-y-3">
                 @foreach($variablesPrueba as $v)
                     <div><label for="gob-prueba-{{ $v['cod_variable_experta'] }}">{{ $nombresNodos[$v['cod_nodo_semantico']] ?? $v['cod_variable_experta'] }}</label>
-                        <select id="gob-prueba-{{ $v['cod_variable_experta'] }}" wire:model.live="entradaPrueba.{{ $v['cod_variable_experta'] }}" class="rm-select w-full !leading-normal !min-h-11">
+                        <select id="gob-prueba-{{ $v['cod_variable_experta'] }}" wire:model="entradaPrueba.{{ $v['cod_variable_experta'] }}" class="rm-select w-full !leading-normal !min-h-11">
                             <option value="">Sin dato</option>
                             @foreach($tablas['valores_semanticos'] ?? [] as $valor)@if($valor['cod_dominio_valores'] === $v['cod_dominio_valores'])<option value="{{ $valor['cod_valor_semantico'] }}">{{ $valor['nombre'] }}</option>@endif @endforeach
                         </select>
@@ -55,7 +56,7 @@
                 <button type="button" wire:click="cancelarSeleccion" class="rm-btn rm-btn-secondary">Cerrar prueba</button>
             </form>
             @if($resultadoPrueba)
-                <div role="status" class="mt-4"><strong>{{ $resultadoPrueba['estado'] === 'NO_EVALUABLE' ? 'Faltan datos para evaluar estas condiciones.' : ($resultadoPrueba['cumple'] ? 'Se cumplen todas las condiciones con estas entradas.' : 'Estas entradas no cumplen todas las condiciones.') }}</strong>
+                <div role="status" class="mt-4" x-show="!entradaCambiada"><strong>{{ $resultadoPrueba['estado'] === 'NO_EVALUABLE' ? 'Faltan datos para evaluar estas condiciones.' : ($resultadoPrueba['cumple'] ? 'Se cumplen todas las condiciones con estas entradas.' : 'Estas entradas no cumplen todas las condiciones.') }}</strong>
                     <ul class="list-disc pl-5 mt-2">@foreach($resultadoPrueba['condiciones'] as $c)<li>{{ $c['condicion'] }}: {{ ['CUMPLE' => 'Cumple', 'NO_CUMPLE' => 'Sin soporte coincidente', 'NO_EVALUABLE' => 'Sin dato'] [$c['estado']] }}</li>@endforeach</ul>
                     <p class="text-sm mt-2">No se ha creado una evaluación ni una decisión de revisión.</p>
                 </div>
@@ -66,11 +67,11 @@
     @if($puedeGestionar)
         <x-ui.section-card title="Crear versión sucesora" subtitle="La versión anterior se retirará de nuevas ejecuciones y conservará su historia.">
             <form wire:submit="crearSucesora" class="space-y-4">
-                @if($reglaArchivo)<p role="status">Regla seleccionada para archivo: {{ $reglaArchivo }}. Puede incorporar su sustituta en esta misma revisión.</p><button type="button" wire:click="cancelarSeleccion" class="rm-btn rm-btn-secondary">Cancelar selección</button>@endif
+                @if($reglaArchivo)<p role="status">Regla seleccionada para archivo: {{ $reglaArchivo }}. {{ $contratoPetersen ? 'Su definición se conservará en la historia.' : 'Puede incorporar su sustituta en esta misma revisión.' }}</p><button type="button" wire:click="cancelarSeleccion" class="rm-btn rm-btn-secondary">Cancelar selección</button>@endif
                 <div><label for="gob-codigo" class="block font-semibold">Código de nueva versión</label><input id="gob-codigo" wire:model="codigoVersion" class="rm-input w-full" maxlength="30" placeholder="ORION-REVISION-2" required>@error('codigoVersion')<p role="alert">{{ $message }}</p>@enderror</div>
                 <div><label for="gob-motivo" class="block font-semibold">Motivo de cambio o archivo</label><textarea id="gob-motivo" wire:model="motivoCambio" class="rm-textarea w-full" rows="3" minlength="10" maxlength="5000" required></textarea>@error('motivoCambio')<p role="alert">{{ $message }}</p>@enderror</div>
-                <label class="flex items-center gap-2"><input type="checkbox" wire:model.live="agregarRegla">Incorporar una regla nueva o sustituta</label>
-                @if($agregarRegla)
+                @if($contratoPetersen)<p class="text-sm">Esta familia conserva las cuatro definiciones del contrato Petersen adoptado. Puede probarlas, revisarlas, crear una sucesora o archivarlas. Cambiar los criterios requiere una decisión institucional.</p>@else<label class="flex items-center gap-2"><input type="checkbox" wire:model.live="agregarRegla">Incorporar una regla nueva o sustituta</label>@endif
+                @if($agregarRegla && !$contratoPetersen)
                     @if($contratoObservacional)<p class="text-sm">Este ejecutor admite un indicador afirmativo por regla y conserva su consecuencia descriptiva. Seleccione el valor «SI» y el criterio correspondiente al indicador.</p>@endif
                     <fieldset class="space-y-3"><legend class="font-semibold">Definición de regla</legend>
                         @foreach(['codigo' => 'Código de regla', 'nombre' => 'Nombre', 'descripcion' => 'Descripción', 'fundamento' => 'Fundamento y fuente'] as $key => $label)

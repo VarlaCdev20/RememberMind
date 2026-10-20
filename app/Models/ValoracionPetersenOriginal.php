@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Modulos\ApoyoDecision\Presentacion\Policies\ValoracionPetersenPolicy;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use LogicException;
 use MotorExperto\dominio\petersen\ValoracionOriginalPetersen;
 
@@ -29,6 +30,11 @@ final class ValoracionPetersenOriginal extends ModeloOperativo
     public function soportes(): HasMany
     {
         return $this->hasMany(SoporteValoracionPetersen::class, 'cod_valoracion_petersen', 'cod_valoracion_petersen')->orderBy('orden');
+    }
+
+    public function sucesora(): HasOne
+    {
+        return $this->hasOne(self::class, 'cod_valoracion_anterior', 'cod_valoracion_petersen');
     }
 
     protected static function booted(): void

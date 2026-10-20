@@ -10,6 +10,7 @@ use DomainException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use MotorExperto\dominio\conocimiento\versiones\PaqueteCognitivoInstitucional;
+use MotorExperto\dominio\conocimiento\versiones\PaquetePetersenInstitucional;
 
 /** Contratos del servidor heredados por linaje; no recibe predicados ni mapeos del cliente. */
 final class ContratosConocimiento
@@ -17,11 +18,21 @@ final class ContratosConocimiento
     /** Selecciona exclusivamente la familia adoptada; una ambigüedad nunca elige una fila arbitraria. */
     public function versionInstitucionalVigente(CarbonImmutable $corte): ?string
     {
-        $raices = VersionModeloExperto::query()->where('codigo_version', PaqueteCognitivoInstitucional::CODIGO)->get();
+        return $this->versionFamiliaVigente($corte, PaqueteCognitivoInstitucional::CODIGO, PaqueteCognitivoInstitucional::FUNDAMENTO);
+    }
+
+    public function versionPetersenVigente(CarbonImmutable $corte): ?string
+    {
+        return $this->versionFamiliaVigente($corte, PaquetePetersenInstitucional::CODIGO, PaquetePetersenInstitucional::FUNDAMENTO);
+    }
+
+    private function versionFamiliaVigente(CarbonImmutable $corte, string $codigo, string $fundamento): ?string
+    {
+        $raices = VersionModeloExperto::query()->where('codigo_version', $codigo)->get();
         if ($raices->isEmpty()) {
             return null;
         }
-        if ($raices->count() !== 1 || $raices->sole()->observacion !== PaqueteCognitivoInstitucional::FUNDAMENTO) {
+        if ($raices->count() !== 1 || $raices->sole()->observacion !== $fundamento) {
             throw new DomainException('La familia institucional no tiene una raíz adoptada inequívoca.');
         }
         $pendientes = $raices;
@@ -34,8 +45,9 @@ final class ContratosConocimiento
                 }
                 $vistos[$v->getKey()] = true;
                 $ids[] = $v->getKey();
-                if ($v->estado === 'ACTIVO' && $v->fecha_hora_retiro === null && $v->fecha_hora_vigencia !== null
-                    && CarbonImmutable::parse($v->getRawOriginal('fecha_hora_vigencia'))->lessThanOrEqualTo($corte)) {
+                if ($v->estado === 'ACTIVO' && $v->fecha_hora_vigencia !== null
+                    && CarbonImmutable::parse($v->getRawOriginal('fecha_hora_vigencia'))->lessThanOrEqualTo($corte)
+                    && ($v->fecha_hora_retiro === null || CarbonImmutable::parse($v->getRawOriginal('fecha_hora_retiro'))->greaterThan($corte))) {
                     $vigentes[] = $v->getKey();
                 }
             }
@@ -46,6 +58,28 @@ final class ContratosConocimiento
         }
 
         return $vigentes[0] ?? null;
+    }
+
+    public function esFamiliaPetersen(string $version): bool
+    {
+        $vistos = [];
+        do {
+            if (isset($vistos[$version])) {
+                throw new DomainException('Ciclo en la familia de conocimiento.');
+            }
+            $vistos[$version] = true;
+            $cabecera = VersionModeloExperto::query()->whereKey($version)->sole();
+            if ($cabecera->codigo_version === PaquetePetersenInstitucional::CODIGO) {
+                if ($cabecera->observacion !== PaquetePetersenInstitucional::FUNDAMENTO) {
+                    throw new DomainException('La raíz Petersen no identifica el contrato adoptado.');
+                }
+
+                return true;
+            }
+            $version = $cabecera->cod_version_anterior;
+        } while ($version !== null);
+
+        return false;
     }
 
     public function porVersion(string $version): array
@@ -72,6 +106,10 @@ final class ContratosConocimiento
                         $contrato['vinculos_instrumentales'][$mapa->cod_mapeo_variable_fuente] = $fuentes[$componente];
                     }
                 }
+            }
+            if ($cabecera->codigo_version === PaquetePetersenInstitucional::CODIGO
+                && $cabecera->observacion === PaquetePetersenInstitucional::FUNDAMENTO) {
+                $contrato = PaquetePetersenInstitucional::contratos() + ['petersen' => true];
             }
             if (is_array($contrato) && is_array($contrato['relaciones'] ?? null)
                 && is_array($contrato['extracciones'] ?? null) && is_string($contrato['tipo_regla_resultado'] ?? null)) {

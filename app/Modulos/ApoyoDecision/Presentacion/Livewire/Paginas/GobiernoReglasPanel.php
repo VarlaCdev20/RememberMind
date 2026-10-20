@@ -9,7 +9,9 @@ use App\Models\User;
 use App\Models\VersionModeloExperto;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\GestionarReglasExpertas;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoInstitucional;
+use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoPetersen;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
+use App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratosConocimiento;
 use DomainException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -78,7 +80,21 @@ final class GobiernoReglasPanel extends Component
         $this->seleccion();
         $this->reglaArchivo = $this->reglaRevision = null;
         $this->reglaPrueba = $this->resultadoPrueba = null;
+        $this->agregarRegla = false;
         $this->resetPage();
+    }
+
+    public function registrarPetersen(): void
+    {
+        $actor = $this->autorizar('gestionarReglas');
+        $this->resetErrorBag('gobierno');
+        try {
+            $this->versionSeleccionada = app(RegistrarConocimientoPetersen::class)->ejecutar($actor);
+            $this->updatedVersionSeleccionada();
+            $this->mensaje = 'Cuatro patrones de Petersen registrados en su familia de conocimiento. Las revisiones profesionales permanecen pendientes.';
+        } catch (DomainException $e) {
+            $this->addError('gobierno', $e->getMessage());
+        }
     }
 
     public function prepararArchivo(string $id): void
@@ -122,6 +138,7 @@ final class GobiernoReglasPanel extends Component
         $this->resetErrorBag('gobierno');
         try {
             $this->resultadoPrueba = app(GestionarReglasExpertas::class)->probar($actor, $this->reglaPrueba, $this->entradaPrueba);
+            $this->dispatch('reglas-prueba-actualizada');
         } catch (DomainException $e) {
             $this->addError('gobierno', $e->getMessage());
         }
@@ -215,6 +232,7 @@ final class GobiernoReglasPanel extends Component
             ->orderBy('codigo_regla')->paginate(15);
         $tablas = $seleccionada ? app(ConocimientoVersionado::class)->instantanea($seleccionada->getKey()) : [];
         $contratoObservacional = count(array_filter($tablas['fuentes_datos_expertas'] ?? [], fn ($f) => $f['clave_adaptador'] === 'OBS_LITERAL')) > 0;
+        $contratoPetersen = $seleccionada && app(ContratosConocimiento::class)->esFamiliaPetersen($seleccionada->getKey());
         $nombresNodos = array_column($tablas['nodos_semanticos'] ?? [], 'nombre', 'cod_nodo_semantico');
         $variablesDePrueba = array_column(array_filter($tablas['condiciones_regla_experta'] ?? [],
             fn ($c) => $c['cod_regla_experta'] === $this->reglaPrueba), 'cod_variable_experta');
@@ -225,7 +243,7 @@ final class GobiernoReglasPanel extends Component
         $puedeRevisar = $editable && Gate::forUser($actor)->allows('revisarReglas', VersionModeloExperto::class);
         $puedeRegistrar = Gate::forUser($actor)->allows('gestionarReglas', VersionModeloExperto::class);
 
-        return view('apoyodecision::livewire.conocimiento.reglas-panel', compact('versiones', 'reglas', 'seleccionada', 'tablas', 'nombresNodos', 'variablesPrueba', 'puedeGestionar', 'puedeRevisar', 'puedeRegistrar', 'contratoObservacional'))
+        return view('apoyodecision::livewire.conocimiento.reglas-panel', compact('versiones', 'reglas', 'seleccionada', 'tablas', 'nombresNodos', 'variablesPrueba', 'puedeGestionar', 'puedeRevisar', 'puedeRegistrar', 'contratoObservacional', 'contratoPetersen'))
             ->layout('layouts.sistema');
     }
 }

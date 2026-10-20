@@ -7,8 +7,16 @@
     <p class="text-sm mt-2">Revisión del resultado: pendiente, por Medicina y Psicología de forma separada.</p>
     <p class="text-sm mt-2">Esta consulta se calcula con las fuentes disponibles. La evaluación completa todavía no se ha conservado como resultado histórico.</p>
     @foreach($petersen['impedimentos'] as $motivo)
-        <p class="text-sm mt-2">{{ ['ABSTENCION_CONTRADICCION' => 'Hay interpretaciones contradictorias que deben aclararse.', 'ABSTENCION_EVALUACION_DIFERENCIAL' => 'La revisión diferencial contiene un impedimento o no acredita el requisito.', 'ABSTENCION_INFORMACION_INSUFICIENTE' => 'Faltan valoraciones originales o condiciones de interpretación suficientes.', 'SIN_PATRON_CLASIFICABLE_POR_REQUISITO' => 'Un requisito no está acreditado; no se establece un patrón DCL.'][$motivo] }}</p>
+        <p class="text-sm mt-2">{{ ['ABSTENCION_CONTRADICCION' => 'Hay interpretaciones contradictorias que deben aclararse.', 'ABSTENCION_EVALUACION_DIFERENCIAL' => 'La revisión diferencial contiene un impedimento o no acredita el requisito.', 'ABSTENCION_INFORMACION_INSUFICIENTE' => 'Faltan valoraciones originales o condiciones de interpretación suficientes.', 'ABSTENCION_SIN_GOBIERNO_PETERSEN_VIGENTE' => 'Los patrones de Petersen aún no tienen una versión de conocimiento vigente. Medicina o Psicología pueden registrarla o revisar su gobierno.', 'ABSTENCION_SIN_REGLA_PETERSEN_HABILITADA' => 'La regla que corresponde a este perfil está archivada o rechazada. Consulte su gobierno antes de emitir un patrón.', 'SIN_PATRON_CLASIFICABLE_POR_REQUISITO' => 'Un requisito no está acreditado; no se establece un patrón DCL.'][$motivo] }}</p>
     @endforeach
+    @if($petersen['gobierno']['disponible'] ?? false)
+        <details class="mt-4"><summary class="cursor-pointer min-h-11">Reglas de Petersen aplicadas</summary>
+            <p class="text-sm">Versión: {{ $petersen['gobierno']['codigo_version'] }}. Esta traza corresponde al cálculo actual; su conservación íntegra continúa pendiente.</p>
+            @foreach($petersen['gobierno']['reglas'] as $regla)
+                <p class="text-sm mt-2">{{ $patrones[$regla['codigo']] }}: {{ !$regla['habilitada'] ? ($regla['estado'] !== 'ACTIVO' ? 'Archivada' : 'Rechazada') : ($regla['cumple'] ? 'Condiciones cumplidas' : 'Condiciones sin cumplir') }}. Revisión: {{ $regla['estado_revision'] ?? 'Sin revisión registrada' }}.</p>
+            @endforeach
+        </details>
+    @endif
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         <div><h2 class="font-semibold">Cinco dominios</h2><dl class="space-y-2 mt-2">@foreach($petersen['dominios'] as $codigo => $d)<div><dt class="text-sm font-semibold">{{ $nombresDominios[$codigo] }}</dt><dd class="text-sm">{{ ['A' => 'Alteración objetiva interpretada con soporte', 'P' => 'Rendimiento esperado con soporte', 'U' => 'Información original insuficiente', 'I' => 'No interpretable', 'X' => 'Interpretaciones contradictorias'][$d['estado']] }}</dd></div>@endforeach</dl></div>
         <div><h2 class="font-semibold">Requisitos</h2><dl class="space-y-2 mt-2">@foreach($nombresRequisitos as $codigo => $nombre)<div><dt class="text-sm font-semibold">{{ $nombre }}</dt><dd class="text-sm">{{ ['S' => 'Acreditado con soporte', 'N' => 'No acreditado con soporte explícito', 'U' => 'Información original insuficiente', 'X' => 'Información contradictoria'][$petersen['requisitos'][$codigo]['estado']] }}</dd></div>@endforeach</dl></div>

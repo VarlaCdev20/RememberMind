@@ -6,15 +6,20 @@ namespace App\Modulos\ApoyoDecision\Aplicacion\Consultas;
 
 use App\Models\ControlFuncionalIadl;
 use App\Models\DocumentoClinico;
+use App\Models\EvaluacionExperta;
 use App\Models\Residente;
 use App\Models\User;
 use App\Models\ValoracionPetersenOriginal;
+use App\Models\VersionModeloExperto;
+use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratoFuentesPetersen as F;
+use App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratosConocimiento;
 use App\Modulos\ApoyoDecision\Aplicacion\Servicios\VerificarOriginalDocumentalPetersen;
 use Carbon\CarbonImmutable;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
 use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
 use MotorExperto\dominio\petersen\EvaluarPetersenInstitucional as E;
 use MotorExperto\dominio\petersen\FuentePetersenInstitucional as Fuente;
@@ -46,7 +51,8 @@ final class ConsultarPetersenInstitucional
             // Una consulta por tipo de fuente; no una por soporte o residente ajeno.
             foreach (F::FUENTES as $fk => [$modelo, $permiso]) {
                 $ids = $solicitudes->pluck($fk)->filter()->unique();
-                if ($ids->isEmpty() || ! $usuario->checkPermissionTo($permiso, 'web')) {
+                if ($ids->isEmpty() || ! $usuario->checkPermissionTo($permiso, 'web')
+                    || ($fk === 'cod_control_iadl' && ! Gate::forUser($usuario)->allows('consultarFuncionalidad', [EvaluacionExperta::class, $residente]))) {
                     continue;
                 }
                 $originales[$fk] = $modelo::query()->where('cod_residente', $residente->getKey())->whereKey($ids)->with('atencion')->get()->keyBy(fn ($m) => $m->getKey());
@@ -147,7 +153,20 @@ final class ConsultarPetersenInstitucional
                 $condiciones = array_intersect_key($f->only($campos), array_flip(V::COMPROBACIONES[str_starts_with($f->elemento, 'COG-') ? 'DOMINIO' : $f->elemento]));
                 $valores[] = new V($f->elemento, $f->estado_original, $f->justificacion, $origen, $soportes, $condiciones, $revisados);
             }
-            $resultado = (new E)->evaluar($contexto, $valores);
+            $familia = app(ContratosConocimiento::class);
+            $versionPetersen = $familia->versionPetersenVigente($corte);
+            $paquete = null;
+            if ($versionPetersen !== null) {
+                $cabecera = VersionModeloExperto::query()->whereKey($versionPetersen)->lockForUpdate()->sole();
+                if ($cabecera->fecha_hora_retiro !== null && CarbonImmutable::parse($cabecera->getRawOriginal('fecha_hora_retiro'))->lessThanOrEqualTo($corte)) {
+                    throw new DomainException('El gobierno Petersen cambió durante la consulta. Actualice el informe.');
+                }
+                $contrato = $familia->porVersion($versionPetersen);
+                $paquete = new PaqueteConocimiento($versionPetersen, app(ConocimientoVersionado::class)->instantanea($versionPetersen),
+                    $contrato['relaciones'], false, $contrato['tipo_regla_resultado'], []);
+            }
+            $resultado = (new E)->evaluar($contexto, $valores, $paquete, exigirGobierno: true);
+            $resultado['gobierno']['codigo_version'] = $versionPetersen === null ? null : VersionModeloExperto::query()->whereKey($versionPetersen)->value('codigo_version');
             $resultado['adquisicion'] = ['valoraciones_al_corte' => $filas->count(), 'exclusiones' => $excluidos,
                 'fuentes_originales_mutables' => true, 'conservacion_completa' => false];
 

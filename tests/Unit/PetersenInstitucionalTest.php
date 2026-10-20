@@ -6,6 +6,8 @@ namespace Tests\Unit;
 
 use DateTimeImmutable;
 use DomainException;
+use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\dominio\conocimiento\versiones\PaquetePetersenInstitucional as P;
 use MotorExperto\dominio\instrumentos\NormalizadorHvltBolivia2015 as Hvlt;
 use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
 use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
@@ -293,5 +295,51 @@ final class PetersenInstitucionalTest extends TestCase
         self::assertNull($r['patron']);
         self::assertSame('U', $r['requisitos']['C05']['estado']);
         self::assertContains('C05_NO_IDENTIFICA_VALORACION_REVISADA:COG-MEM', $r['requisitos']['C05']['motivos']);
+    }
+
+    #[DataProvider('patrones')]
+    public function test_gobierno_ejecuta_las_cuatro_conjunciones_sin_precargar_el_patron(array $alterados, string $esperado): void
+    {
+        $p = (new P)->construir('GOBIERNO-TEST', 'AUTOR-TEST', '2026-10-19 10:00:00');
+        $r = (new E)->evaluar($this->contexto(), $this->caso($alterados), $p, exigirGobierno: true);
+        self::assertSame($esperado, $r['patron']);
+        self::assertSame('GOBIERNO-TEST', $r['gobierno']['version']);
+        self::assertCount(4, $r['gobierno']['reglas']);
+        self::assertCount(1, array_filter($r['gobierno']['reglas'], fn ($r) => $r['cumple']));
+        self::assertCount(8, $r['gobierno']['reglas'][0]['condiciones']);
+        $sinOriginal = $this->caso($alterados);
+        unset($sinOriginal[6]); // C03 no se sustituye con el patrón ni con los otros antecedentes.
+        self::assertNull((new E)->evaluar($this->contexto(), array_values($sinOriginal), $p, exigirGobierno: true)['patron']);
+    }
+
+    public function test_consulta_que_exige_gobierno_no_cae_al_clasificador_fijo(): void
+    {
+        $r = (new E)->evaluar($this->contexto(), $this->caso(), exigirGobierno: true);
+        self::assertNull($r['patron']);
+        self::assertContains('ABSTENCION_SIN_GOBIERNO_PETERSEN_VIGENTE', $r['impedimentos']);
+    }
+
+    public static function dependenciasGobiernoAlteradas(): array
+    {
+        return [['nodo'], ['criterio'], ['dominio'], ['valor'], ['consecuencia'], ['condicion'], ['regla_duplicada']];
+    }
+
+    #[DataProvider('dependenciasGobiernoAlteradas')]
+    public function test_rechaza_gobierno_con_dependencia_inactiva_o_semantica_alterada(string $cambio): void
+    {
+        $p = (new P)->construir('GOBIERNO-TEST', 'AUTOR-TEST', '2026-10-19 10:00:00');
+        $t = $p->declaracion()['tablas'];
+        match ($cambio) {
+            'nodo' => $t['nodos_semanticos'][0]['estado'] = 'INACTIVO',
+            'criterio' => $t['criterios_dominios_resultado'][0]['estado'] = 'INACTIVO',
+            'dominio' => $t['dominios_valores_expertos'][0]['estado'] = 'INACTIVO',
+            'valor' => $t['valores_semanticos'][0]['estado_aprobacion'] = 'PENDIENTE',
+            'consecuencia' => $t['consecuencias_regla_experta'][0]['cod_valor_semantico'] = $t['consecuencias_regla_experta'][1]['cod_valor_semantico'],
+            'condicion' => array_pop($t['condiciones_regla_experta']),
+            'regla_duplicada' => $t['reglas_expertas'][0]['codigo_regla'] = $t['reglas_expertas'][1]['codigo_regla'],
+        };
+        $this->expectException(DomainException::class);
+        $alterado = new PaqueteConocimiento($p->version, $t, $p->contratosRelaciones, false, $p->tipoReglaResultado, []);
+        (new E)->evaluar($this->contexto(), $this->caso(), $alterado, exigirGobierno: true);
     }
 }

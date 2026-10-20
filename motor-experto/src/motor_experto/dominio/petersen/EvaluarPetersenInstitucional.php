@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace MotorExperto\dominio\petersen;
 
 use DomainException;
+use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\dominio\conocimiento\versiones\PaquetePetersenInstitucional;
 use MotorExperto\dominio\instrumentos\ExtractorCapturaInstrumental;
 use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
 
@@ -22,7 +24,7 @@ final class EvaluarPetersenInstitucional
     public const DOMINIOS = ['COG-MEM', 'COG-ATE', 'COG-EJE', 'COG-LEN', 'COG-VIS'];
 
     /** @param list<ValoracionOriginalPetersen> $valoraciones Adquisición original autorizada por el adaptador. */
-    public function evaluar(ContextoEjecucion $contexto, array $valoraciones): array
+    public function evaluar(ContextoEjecucion $contexto, array $valoraciones, ?PaqueteConocimiento $paquete = null, bool $exigirGobierno = false): array
     {
         if (! array_is_list($valoraciones)) {
             throw new DomainException('Petersen requiere una lista de valoraciones originales.');
@@ -130,9 +132,33 @@ final class EvaluarPetersenInstitucional
             $motivos[] = 'SIN_PATRON_CLASIFICABLE_POR_REQUISITO';
         }
         $patron = null;
-        if ($motivos === []) {
-            $memoria = $dominios['COG-MEM']['estado'] === 'A';
-            $patron = $memoria ? (count($a) === 1 ? 'PET-01' : 'PET-02') : (count($a) === 1 ? 'PET-03' : 'PET-04');
+        $gobierno = ['disponible' => false, 'version' => null, 'reglas' => [], 'persistido' => false];
+        $contratoPuro = $paquete === null && ! $exigirGobierno;
+        if ($contratoPuro) {
+            // Ensayos aislados reutilizan exactamente las mismas definiciones; la ruta institucional exige SQL.
+            $paquete = (new PaquetePetersenInstitucional)->construir($contexto->version, 'CONTRATO-PURO', $contexto->fechaCorte->format('Y-m-d H:i:s'));
+        }
+        if ($paquete !== null) {
+            $derivados = [];
+            foreach (['C01', 'C02', 'C03', 'C04', 'C05'] as $codigo) {
+                $derivados[$codigo] = $estados[$codigo]['estado'];
+            }
+            $derivados += ['PERFIL' => $completo ? 'INTERPRETABLE' : 'INCOMPLETO', 'MEMORIA' => $dominios['COG-MEM']['estado'],
+                'CANTIDAD' => count($a) === 0 ? 'NINGUNO' : (count($a) === 1 ? 'UNICO' : 'MULTIPLE')];
+            $gobierno = ['disponible' => true, 'origen' => $contratoPuro ? 'CONTRATO_PURO' : 'PAQUETE_PROPORCIONADO']
+                + (new PaquetePetersenInstitucional)->evaluar($paquete, $derivados);
+            if ($motivos !== []) {
+                $gobierno['patron'] = null;
+                $gobierno['bloqueada_por'] = $motivos;
+            }
+            if ($motivos === []) {
+                $patron = $gobierno['patron'];
+                if ($patron === null) {
+                    $motivos[] = 'ABSTENCION_SIN_REGLA_PETERSEN_HABILITADA';
+                }
+            }
+        } elseif ($exigirGobierno) {
+            $motivos[] = 'ABSTENCION_SIN_GOBIERNO_PETERSEN_VIGENTE';
         }
 
         return ['contrato' => self::CONTRATO, 'evaluacion' => $contexto->evaluacion, 'residente' => $contexto->residente,
@@ -140,6 +166,7 @@ final class EvaluarPetersenInstitucional
             'patron' => $patron, 'estado' => $patron === null ? $motivos[0] : 'PATRON_ORIENTATIVO_CON_SOPORTE',
             'impedimentos' => $motivos, 'dominios' => $dominios,
             'requisitos' => array_intersect_key($estados, array_flip(['C01', 'C02', 'C03', 'C04', 'C05'])),
+            'gobierno' => $gobierno,
             'valoraciones_excluidas' => $excluidas, 'revision_profesional' => 'PENDIENTE', 'persistido' => false];
     }
 

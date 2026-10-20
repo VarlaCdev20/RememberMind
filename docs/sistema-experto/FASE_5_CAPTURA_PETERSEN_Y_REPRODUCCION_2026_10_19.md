@@ -98,9 +98,10 @@ flowchart LR
 - Las interpretaciones competidoras y los negativos explícitos se conservan.
   Compartir soportes no transforma una contradicción en simple ausencia.
 
-Los cuatro patrones se implementan en `PETERSEN-INSTITUCIONAL-1`. No son todavía
-cuatro reglas SQL administrables por el gestor de las 17 reglas A–D. Extender
-ese gobierno al nuevo contrato sigue siendo un pendiente explícito.
+Los cuatro patrones se implementan en `PETERSEN-INSTITUCIONAL-1`. En el corte
+inicial no eran reglas SQL administrables. El [incremento del 20/10](GOBIERNO_PETERSEN_Y_QA_CAPTURA_2026_10_20.md)
+los conecta al gestor mediante la familia `ORION-PETERSEN-1`, separada de las
+17 reglas A–D y sin alterar el contrato clínico adoptado.
 
 ## Integridad, 4FN y seguridad
 
@@ -276,6 +277,6 @@ no acredita un patrón clínico del residente ni QA visual.
 - [x] Instalación acotada y consulta backend en PostgreSQL local verificadas.
 - [x] Verificaciones dinámicas del incremento consignadas, con suite global interrumpida explícita.
 - [x] Decisión del permiso específico de lectura IADL y aprovisionamiento acotado.
-- [ ] Gobierno SQL del contrato Petersen.
+- [x] Gobierno SQL del contrato Petersen, incorporado en el incremento del 20/10 sin ampliación estructural.
 - [ ] Conservación relacional completa y vínculo evaluación → release de fase 6.
 - [ ] QA visual y recorrido completo de revisión de fases 7–8.
