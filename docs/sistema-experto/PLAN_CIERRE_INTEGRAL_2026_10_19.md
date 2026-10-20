@@ -116,7 +116,10 @@ en sus propias actas y no se atribuyen a este cierre.
 
 ### 6. Completar conservación exacta
 
+**Incremento del 20/10:** [preparación compuesta y reproducción](FASE_6_PREPARACION_COMPUESTA_2026_10_20.md). El backend reúne V3 y Petersen con una captura compartida, gobierno separado, procedencia, exclusiones y constancias; verifica ambas ramas sin SQL y puede cotejar un release real con el ejecutor capturado. Conserva `persistido=false` y `release_retenido=false`. El [diccionario candidato](PROPUESTA_CONSERVACION_COMPUESTA_FASE_6_2026_10_20.md) no modifica el inventario aprobado de 108 ni autoriza DDL.
+
 - [x] Preparar DTO canónico en memoria del alcance instrumental/declarativo y reproducción sin SQL/configuración actuales, con metadatos de preparación sin declarar guardado.
+- [x] Preparar y reproducir el contrato compuesto instrumental/Petersen con contexto común, mediciones canónicas iguales y constancias de adquisición, sin atribuirle persistencia institucional.
 - [x] Implementar ZIP recuperable del software del motor, manifiesto por archivo y verificación de alteración/ausencia/no reemplazo, sin historia clínica.
 - [ ] Vincular la evaluación a un release retenido y representar relacionalmente el DTO completo; los avances previos no equivalen a persistencia institucional.
 - [ ] Empezar el diseño durante la fase 1; cerrar el contrato definitivo con las entradas/salidas de las fases 2–5.

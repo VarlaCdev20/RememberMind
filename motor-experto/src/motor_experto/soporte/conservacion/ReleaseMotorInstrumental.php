@@ -99,4 +99,40 @@ final class ReleaseMotorInstrumental
             $zip->close();
         }
     }
+
+    /** Vincular una preparación recién calculada exige los mismos bytes de motor que la ejecutaron. */
+    public function verificarEjecutorActual(string $ruta, string $huellaEsperada): array
+    {
+        $manifiesto = $this->verificar($ruta, $huellaEsperada);
+        if ($manifiesto['contrato'] !== 'ARTEFACTO-MOTOR-2') {
+            throw new DomainException('La preparación compuesta exige un release completo del ejecutor utilizado.');
+        }
+        if ($this->identidadEjecutorActual() !== self::identidadEjecutor($manifiesto['archivos'])) {
+            throw new DomainException('El release no contiene el mismo ejecutor completo que calculó la preparación.');
+        }
+
+        return $manifiesto;
+    }
+
+    /** Identidad de software capturada al crear el DTO; nunca lee fuentes clínicas. */
+    public function identidadEjecutorActual(): array
+    {
+        $raiz = dirname(__DIR__, 5);
+        $actuales = [];
+        foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($raiz.'/motor-experto/src', \FilesystemIterator::SKIP_DOTS)) as $archivo) {
+            if ($archivo->isFile() && $archivo->getExtension() === 'php') {
+                $nombre = str_replace('\\', '/', substr($archivo->getPathname(), strlen($raiz) + 1));
+                $actuales[$nombre] = hash_file('sha256', $archivo->getPathname());
+            }
+        }
+
+        return self::identidadEjecutor($actuales);
+    }
+
+    public static function identidadEjecutor(array $archivos): array
+    {
+        $fuentes = array_filter($archivos, static fn ($nombre) => str_starts_with($nombre, 'motor-experto/src/'), ARRAY_FILTER_USE_KEY);
+
+        return ['cantidad_archivos' => count($fuentes), 'huella_src' => CodecInstantanea::huella(CapturaInstrumentalCanonica::ordenar($fuentes))];
+    }
 }

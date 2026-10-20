@@ -20,6 +20,7 @@ use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoInstituci
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\CapturasInstrumentalesResidente;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarConocimientoCognitivo;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarPerfilInstrumental;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarPetersenInstitucional;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\IdentidadesConocimiento;
 use App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratosConocimiento;
@@ -41,6 +42,9 @@ use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
 use MotorExperto\investigacion\dcl\PaqueteCincoDominiosExperimental;
 use MotorExperto\investigacion\g09\PaqueteSemanticoG09Experimental;
 use MotorExperto\soporte\conservacion\InstantaneaInstrumental;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Spatie\Permission\Models\Role;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\Support\InformeCognitivoFixture;
 use Tests\TestCase;
 
@@ -890,6 +894,36 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         self::assertSame([], $this->consultar()['resultado']['perfil']['COG-ATE']['conclusiones_candidatas']);
         config(['sistema_experto.perfiles_interpretativos' => []]);
         self::assertSame($dto->contenido, InstantaneaInstrumental::verificar($dto->contenido, $dto->huella)->contenido);
+    }
+
+    public static function permisosCaptura(): array
+    {
+        return array_map(fn ($p) => [$p], CapturasInstrumentalesResidente::PERMISOS_LECTURA);
+    }
+
+    #[DataProvider('permisosCaptura')]
+    public function test_captura_compartida_no_elude_revocacion_actual_de_permisos(string $permiso): void
+    {
+        $dto = app(ConsultarConocimientoCognitivo::class)->preparar($this->usuario, $this->residente, CarbonImmutable::now());
+        Role::findByName('PSICOLOGO/A')->revokePermissionTo($permiso);
+        try {
+            app(ConsultarPetersenInstitucional::class)->preparar($this->usuario, $this->residente, CarbonImmutable::now(), $this->version, $dto);
+            self::fail('La captura anterior no conserva permisos revocados.');
+        } catch (HttpException $e) {
+            self::assertSame(403, $e->getStatusCode());
+        }
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+        self::assertDatabaseCount('valoraciones_petersen_originales', 0);
+    }
+
+    public function test_preparacion_backend_no_se_expone_en_la_consulta_ordinaria_y_rechaza_otro_contexto(): void
+    {
+        self::assertArrayNotHasKey('_instantanea', $this->consultar());
+        $dto = app(ConsultarConocimientoCognitivo::class)->preparar($this->usuario, $this->residente, CarbonImmutable::now());
+        $otro = Residente::factory()->create(['estado' => 'ADMITIDO']);
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('otro contexto');
+        app(ConsultarPetersenInstitucional::class)->preparar($this->usuario, $otro, CarbonImmutable::now(), $this->version, $dto);
     }
 
     private function crearObservacionesInstitucionales(): void

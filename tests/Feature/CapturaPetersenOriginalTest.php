@@ -20,9 +20,11 @@ use App\Models\User;
 use App\Models\ValoracionPetersenOriginal;
 use App\Models\ValoracionPsicologica;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\GestionarReglasExpertas;
+use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoInstitucional;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoPetersen;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarValoracionPetersenOriginal;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarPetersenInstitucional;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\PrepararEvaluacionInstitucional;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\CapturaPetersenPanel;
 use Carbon\CarbonImmutable;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -36,6 +38,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
 use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
+use MotorExperto\soporte\conservacion\InstantaneaEvaluacionInstitucional;
+use MotorExperto\soporte\conservacion\InstantaneaPetersen;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Spatie\Permission\Models\Permission;
@@ -264,6 +268,36 @@ final class CapturaPetersenOriginalTest extends TestCase
         $r = $consulta->consultar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
         self::assertSame('U', $r['requisitos']['C04']['estado']);
         self::assertSame('DOCUMENTO_ORIGINAL_NO_VERIFICABLE', $r['adquisicion']['exclusiones'][0]['motivo']);
+        $dto = $consulta->preparar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+        self::assertFalse($dto->contenido['constancias_documentales'][0]['verificado']);
+        self::assertSame('SOPORTE', $dto->contenido['constancias_documentales'][0]['papel']);
+        self::assertNull($dto->contenido['constancias_documentales'][0]['localizador_fuente']);
+        self::assertStringNotContainsString('ruta_archivo', serialize($dto->contenido));
+    }
+
+    public function test_documento_de_cabecera_conserva_constancia_y_no_admite_alteracion_o_fecha_futura(): void
+    {
+        $this->usuario->givePermissionTo(Permission::findOrCreate('documentos_clinicos.ver', 'web'));
+        Storage::fake('local');
+        Storage::disk('local')->put('cabecera-petersen.txt', 'original');
+        $doc = DocumentoClinico::create(['cod_residente' => $this->residente->getKey(), 'cod_personal' => $this->usuario->personal->getKey(),
+            'fecha_hora' => '2026-10-17 09:00:00', 'tipo_documento' => 'INFORME', 'titulo' => 'Original de ingeniería',
+            'ruta_archivo' => 'cabecera-petersen.txt', 'formato' => 'text/plain', 'hash_archivo' => hash('sha256', 'original'), 'estado' => 'VIGENTE']);
+        $original = $this->registrar($this->entrada(['cod_documento_clinico' => $doc->getKey(), 'localizador_fuente' => 'Página 1']));
+        $lector = app(ConsultarPetersenInstitucional::class);
+        $dto = $lector->preparar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+        self::assertTrue($dto->contenido['constancias_documentales'][0]['verificado']);
+        self::assertSame('Página 1', $dto->contenido['constancias_documentales'][0]['localizador_fuente']);
+        self::assertSame($original->cod_usuario_registro, $dto->contenido['procedencia_valoraciones'][0]['cod_usuario_registro']);
+        $doc->update(['fecha_hora' => '2027-01-01 09:00:00']);
+        $fuera = $lector->preparar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+        self::assertSame('DOCUMENTO_ORIGINAL_FUERA_DE_CORTE', $fuera->contenido['salida']['adquisicion']['exclusiones'][0]['motivo']);
+        self::assertTrue($fuera->contenido['constancias_documentales'][0]['verificado']);
+        self::assertSame([], $fuera->contenido['valoraciones']);
+        Storage::disk('local')->put('cabecera-petersen.txt', 'alterado');
+        $alterado = $lector->preparar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+        self::assertFalse($alterado->contenido['constancias_documentales'][0]['verificado']);
+        self::assertSame($dto->contenido, InstantaneaPetersen::verificar($dto->contenido, $dto->huella)->contenido);
     }
 
     /** Recorre SQL → captura → juicios → cuatro patrones; sin sembrar una clasificación esperada. */
@@ -342,6 +376,10 @@ final class CapturaPetersenOriginalTest extends TestCase
         self::assertSame($versionGobierno, $r['gobierno']['version']);
         self::assertCount(4, $r['gobierno']['reglas']);
         self::assertCount(8, $r['gobierno']['reglas'][0]['condiciones']);
+        app(RegistrarConocimientoInstitucional::class)->ejecutar($this->usuario);
+        $dto = app(PrepararEvaluacionInstitucional::class)->preparar($this->usuario, $this->residente, CarbonImmutable::now());
+        self::assertSame($patron, $dto->contenido['petersen']['contenido']['salida']['patron']);
+        self::assertCount(5, $dto->contenido['instrumental']['contenido']['capturas']['capturas']);
         $regla = ReglaExperta::query()->where('cod_version_modelo', $versionGobierno)->where('codigo_regla', $patron)->sole();
         app(GestionarReglasExpertas::class)->revisar($this->usuario, $regla->getKey(), 'RECHAZADA', 'Ensayo de rechazo sin modificar las fuentes originales.');
         $rechazado = app(ConsultarPetersenInstitucional::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
@@ -353,6 +391,15 @@ final class CapturaPetersenOriginalTest extends TestCase
         $sinPerfil = app(ConsultarPetersenInstitucional::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
         self::assertNull($sinPerfil['patron']);
         self::assertSame('U', $sinPerfil['dominios']['COG-MEM']['estado']);
+        DB::table('respuestas_instrumento')->where('cod_aplicacion', reset($mediciones))->update(['valor_numero' => 0]);
+        $consultas = 0;
+        DB::listen(static function () use (&$consultas): void {
+            $consultas++;
+        });
+        $replay = InstantaneaEvaluacionInstitucional::verificar($dto->contenido, $dto->huella);
+        self::assertSame(0, $consultas);
+        self::assertSame($dto->contenido, $replay->contenido);
+        self::assertSame($patron, $replay->contenido['petersen']['contenido']['salida']['patron']);
     }
 
     public function test_formulario_conectado_guarda_y_conserva_errores_sin_fingir_exito(): void

@@ -3,6 +3,7 @@
 Documentación de lectura actualizada el 19/10/2026 para la arquitectura híbrida.
 No autoriza inferencia clínica ni nuevas reglas de O.R.I.O.N.
 
+- [Fase 6: preparación compuesta y reproducción, 20/10](FASE_6_PREPARACION_COMPUESTA_2026_10_20.md): captura V3 compartida con Petersen, procedencia y constancias documentales, replay de ambas ramas y vínculo verificable al ejecutor. Guardado/recuperación siguen pendientes de la [propuesta estructural no aprobada](PROPUESTA_CONSERVACION_COMPUESTA_FASE_6_2026_10_20.md).
 - [Gobierno Petersen y QA de captura, 20/10](GOBIERNO_PETERSEN_Y_QA_CAPTURA_2026_10_20.md): cuatro patrones en familia SQL separada, revisión/archivo/sucesión, Policy IADL y confirmación accesible; conservación íntegra y revisión del resultado aún pendientes.
 - [Petersen institucional: captura original y reproducción instrumental V3, 19/10](FASE_5_CAPTURA_PETERSEN_Y_REPRODUCCION_2026_10_19.md): contrato E–H adoptado, dos tablas/tres permisos aprobados, cuatro patrones desde originales, rectificación y anulación sin sobrescritura; lectura IADL y gobierno incorporados en incrementos posteriores.
 - [Fase 4: base registrada y recorrido verificado en interfaz, 19/10](FASE_4_REGISTRO_Y_VERIFICACION_UI_2026_10_19.md): registro desde Psicología, 17 reglas activas con revisión pendiente, consulta de los 19 componentes, prueba de condiciones y corrección visual de selectores; QA acotado con evidencia de cinco tamaños.

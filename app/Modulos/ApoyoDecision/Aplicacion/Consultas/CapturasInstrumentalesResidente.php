@@ -19,12 +19,14 @@ use MotorExperto\dominio\instrumentos\ExtractorCapturaInstrumental;
 /** Lectura institucional por lotes; captura originales sin escribir resultados ni identificar pruebas por similitud. */
 final class CapturasInstrumentalesResidente
 {
+    public const PERMISOS_LECTURA = ['aplicaciones_instrumento.ver', 'respuestas_instrumento.ver', 'instrumentos.ver', 'preguntas_instrumento.ver', 'opciones_pregunta.ver'];
+
     public function consultar(User $usuario, Residente $residente, CarbonImmutable $corte, array $preguntasDeclarativas = []): array
     {
         $usuario = User::query()->findOrFail($usuario->getKey());
         $residente = Residente::query()->findOrFail($residente->getKey());
         Gate::forUser($usuario)->authorize('consultarResultados', [EvaluacionExperta::class, $residente]);
-        foreach (['aplicaciones_instrumento.ver', 'respuestas_instrumento.ver', 'instrumentos.ver', 'preguntas_instrumento.ver', 'opciones_pregunta.ver'] as $permiso) {
+        foreach (self::PERMISOS_LECTURA as $permiso) {
             if (! $usuario->checkPermissionTo($permiso, 'web')) {
                 return ['disponible' => false, 'motivo' => 'ACCESO_A_FUENTES_NO_DISPONIBLE', 'capturas' => []];
             }

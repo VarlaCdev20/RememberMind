@@ -26,16 +26,37 @@ use MotorExperto\dominio\petersen\FuentePetersenInstitucional as Fuente;
 use MotorExperto\dominio\petersen\ValoracionOriginalPetersen as V;
 use MotorExperto\soporte\conservacion\CapturaInstrumentalCanonica;
 use MotorExperto\soporte\conservacion\CodecInstantanea;
+use MotorExperto\soporte\conservacion\InstantaneaInstrumental;
+use MotorExperto\soporte\conservacion\InstantaneaPetersen;
 
 /** Adquiere juicios originales autorizados al corte y orquesta el motor; no guarda ni atribuye resultados al laboratorio. */
 final class ConsultarPetersenInstitucional
 {
     public function consultar(User $usuario, Residente $residente, CarbonImmutable $corte, string $version): array
     {
-        return DB::transaction(function () use ($usuario, $residente, $corte, $version): array {
+        return $this->preparar($usuario, $residente, $corte, $version)->contenido['salida'];
+    }
+
+    /** La captura compartida solo puede proceder del DTO instrumental autorizado y verificado del backend. */
+    public function preparar(User $usuario, Residente $residente, CarbonImmutable $corte, string $version,
+        ?InstantaneaInstrumental $instrumental = null): InstantaneaPetersen
+    {
+        return DB::transaction(function () use ($usuario, $residente, $corte, $version, $instrumental): InstantaneaPetersen {
             $usuario = User::query()->findOrFail($usuario->getKey());
             $residente = Residente::query()->findOrFail($residente->getKey());
             Gate::forUser($usuario)->authorize('consultarOriginales', [ValoracionPetersenOriginal::class, $residente]);
+            if ($instrumental !== null && ($instrumental->contenido['contexto']['residente'] !== $residente->getKey()
+                || $instrumental->contenido['contexto']['version'] !== $version
+                || $instrumental->contenido['contexto']['usuario_ejecucion'] !== $usuario->getKey()
+                || $instrumental->contenido['capturas']['fecha_corte'] !== $corte->format('Y-m-d\TH:i:s.uP'))) {
+                throw new DomainException('La captura compartida pertenece a otro contexto de evaluación.');
+            }
+            if ($instrumental !== null) {
+                Gate::forUser($usuario)->authorize('consultarResultados', [EvaluacionExperta::class, $residente]);
+                foreach (CapturasInstrumentalesResidente::PERMISOS_LECTURA as $permiso) {
+                    abort_unless($usuario->checkPermissionTo($permiso, 'web'), 403);
+                }
+            }
             if ($corte->greaterThan(CarbonImmutable::now())) {
                 throw new DomainException('El corte de Petersen no puede ser futuro.');
             }
@@ -45,7 +66,7 @@ final class ConsultarPetersenInstitucional
             $rectificados = $filas->pluck('cod_valoracion_anterior')->filter()->all();
             $contexto = new ContextoEjecucion('PET-'.substr(hash('sha256', $residente->getKey().$corte->format('c.u').$version), 0, 12),
                 $residente->getKey(), $version, $corte->toDateTimeImmutable());
-            $capturas = null;
+            $capturas = $instrumental?->contenido['capturas'];
             $originales = [];
             $solicitudes = $filas->flatMap(fn ($f) => $f->soportes);
             // Una consulta por tipo de fuente; no una por soporte o residente ajeno.
@@ -57,19 +78,38 @@ final class ConsultarPetersenInstitucional
                 }
                 $originales[$fk] = $modelo::query()->where('cod_residente', $residente->getKey())->whereKey($ids)->with('atencion')->get()->keyBy(fn ($m) => $m->getKey());
             }
+            $documentosOriginales = $usuario->checkPermissionTo('documentos_clinicos.ver', 'web')
+                ? DocumentoClinico::query()->where('cod_residente', $residente->getKey())->whereKey($filas->pluck('cod_documento_clinico')->filter()->unique())->get()->keyBy(fn ($m) => $m->getKey())
+                : collect();
             $idsIadl = ($originales['cod_control_iadl'] ?? collect())->keys();
             $iadlRectificadas = $idsIadl->isEmpty() ? [] : array_fill_keys(ControlFuncionalIadl::query()
                 ->where('cod_residente', $residente->getKey())->whereIn('cod_control_anterior', $idsIadl)
                 ->where('fecha_hora', '<=', $corte->format('Y-m-d H:i:s.u'))->where('registrado_en', '<=', $corte->format('Y-m-d H:i:s.u'))
                 ->pluck('cod_control_anterior')->all(), true);
-            $valores = $excluidos = [];
+            $valores = $excluidos = $documentos = $procedencia = $membresias = [];
             $campos = array_merge(...array_values(V::COMPROBACIONES));
             foreach ($filas as $f) {
+                $membresias[] = ['valoracion' => $f->getKey(), 'soportes' => $f->soportes->modelKeys()];
+                $procedencia[] = $f->only(['cod_valoracion_petersen', 'cod_residente', 'cod_personal', 'cod_usuario_registro', 'elemento', 'tipo_registro',
+                    'cod_valoracion_anterior', 'cod_documento_clinico', 'localizador_fuente']) + ['registrado_en' => $f->registrado_en->format('Y-m-d\TH:i:s.uP'),
+                        'fecha_hora' => $f->fecha_hora->format('Y-m-d\TH:i:s.uP')];
                 if (in_array($f->getKey(), $rectificados, true) || $f->tipo_registro === 'ANULACION') {
                     $excluidos[] = ['valoracion' => $f->getKey(), 'elemento' => $f->elemento,
                         'motivo' => $f->tipo_registro === 'ANULACION' ? 'ANULACION_ORIGINAL' : 'RECTIFICADA_AL_CORTE'];
 
                     continue;
+                }
+                if ($f->cod_documento_clinico !== null) {
+                    $doc = $documentosOriginales->get($f->cod_documento_clinico);
+                    $verificado = $doc !== null && app(VerificarOriginalDocumentalPetersen::class)->verificar($doc);
+                    $documentos[] = $this->constancia($f->getKey(), 'ORIGINAL', $f->cod_documento_clinico, $doc, $verificado, $f->localizador_fuente);
+                    if (! $verificado || $doc->fecha_hora === null || $doc->fecha_hora->greaterThan($corte)) {
+                        $excluidos[] = ['valoracion' => $f->getKey(), 'elemento' => $f->elemento,
+                            'motivo' => ! $verificado ? 'DOCUMENTO_ORIGINAL_NO_VERIFICABLE'
+                                : ($doc->fecha_hora === null ? 'FUENTE_SIN_INSTANTE_CLINICO_IDENTIFICABLE' : 'DOCUMENTO_ORIGINAL_FUERA_DE_CORTE')];
+
+                        continue;
+                    }
                 }
                 $origen = new Fuente($f->getTable(), $f->getKey(), $residente->getKey(), $f->cod_personal,
                     $f->fecha_hora->toDateTimeImmutable(), $f->cod_atencion === null ? null : 'ATENCION:'.$f->cod_atencion, 'VALORACION_ORIGINAL', true);
@@ -82,6 +122,10 @@ final class ConsultarPetersenInstitucional
                     }
                     $fk = reset($fks);
                     $o = ($originales[$fk] ?? collect())->get($s->$fk);
+                    if ($fk === 'cod_documento_clinico') {
+                        $verificado = $o !== null && app(VerificarOriginalDocumentalPetersen::class)->verificar($o);
+                        $documentos[] = $this->constancia($f->getKey(), 'SOPORTE', $s->$fk, $o, $verificado, null);
+                    }
                     if (! $o || ! in_array($fk, F::admitidas($f->elemento, $s->tipo_soporte), true)) {
                         $incompatible = true;
                         $excluidos[] = ['valoracion' => $f->getKey(), 'elemento' => $f->elemento, 'motivo' => 'SOPORTE_NO_DISPONIBLE_O_INCOMPATIBLE'];
@@ -116,9 +160,15 @@ final class ConsultarPetersenInstitucional
 
                         continue;
                     }
-                    if ($o instanceof DocumentoClinico && ! app(VerificarOriginalDocumentalPetersen::class)->verificar($o)) {
+                    if ($o instanceof DocumentoClinico && ! $verificado) {
                         $incompatible = true;
                         $excluidos[] = ['valoracion' => $f->getKey(), 'elemento' => $f->elemento, 'motivo' => 'DOCUMENTO_ORIGINAL_NO_VERIFICABLE'];
+
+                        continue;
+                    }
+                    if ($o instanceof DocumentoClinico && $fecha->greaterThan($corte)) {
+                        $incompatible = true;
+                        $excluidos[] = ['valoracion' => $f->getKey(), 'elemento' => $f->elemento, 'motivo' => 'DOCUMENTO_ORIGINAL_FUERA_DE_CORTE'];
 
                         continue;
                     }
@@ -155,7 +205,7 @@ final class ConsultarPetersenInstitucional
             }
             $familia = app(ContratosConocimiento::class);
             $versionPetersen = $familia->versionPetersenVigente($corte);
-            $paquete = null;
+            $paquete = $cabeceraOriginal = null;
             if ($versionPetersen !== null) {
                 $cabecera = VersionModeloExperto::query()->whereKey($versionPetersen)->lockForUpdate()->sole();
                 if ($cabecera->fecha_hora_retiro !== null && CarbonImmutable::parse($cabecera->getRawOriginal('fecha_hora_retiro'))->lessThanOrEqualTo($corte)) {
@@ -164,13 +214,23 @@ final class ConsultarPetersenInstitucional
                 $contrato = $familia->porVersion($versionPetersen);
                 $paquete = new PaqueteConocimiento($versionPetersen, app(ConocimientoVersionado::class)->instantanea($versionPetersen),
                     $contrato['relaciones'], false, $contrato['tipo_regla_resultado'], []);
+                $cabeceraOriginal = $cabecera->getAttributes();
+                foreach (['fecha_hora_creacion', 'fecha_hora_vigencia', 'fecha_hora_retiro'] as $campo) {
+                    $cabeceraOriginal[$campo] = $cabecera->$campo?->format('Y-m-d\TH:i:s.uP');
+                }
             }
-            $resultado = (new E)->evaluar($contexto, $valores, $paquete, exigirGobierno: true);
-            $resultado['gobierno']['codigo_version'] = $versionPetersen === null ? null : VersionModeloExperto::query()->whereKey($versionPetersen)->value('codigo_version');
-            $resultado['adquisicion'] = ['valoraciones_al_corte' => $filas->count(), 'exclusiones' => $excluidos,
+            $adquisicion = ['valoraciones_al_corte' => $filas->count(), 'exclusiones' => $excluidos,
                 'fuentes_originales_mutables' => true, 'conservacion_completa' => false];
 
-            return $resultado;
+            return InstantaneaPetersen::crear($contexto, $valores, $paquete, $cabeceraOriginal, $usuario->getKey(), $adquisicion, $documentos, $procedencia, $membresias);
         });
+    }
+
+    private function constancia(string $valoracion, string $papel, string $codigo, ?DocumentoClinico $documento, bool $verificado, ?string $localizador): array
+    {
+        return ['valoracion' => $valoracion, 'papel' => $papel, 'cod_documento_clinico' => $codigo,
+            'cod_residente' => $documento?->cod_residente, 'cod_personal' => $documento?->cod_personal,
+            'hash_archivo' => $documento?->hash_archivo, 'fecha_hora' => $documento?->fecha_hora?->format('Y-m-d\TH:i:s.uP'),
+            'estado' => $documento?->estado, 'localizador_fuente' => $localizador, 'verificado' => $verificado];
     }
 }

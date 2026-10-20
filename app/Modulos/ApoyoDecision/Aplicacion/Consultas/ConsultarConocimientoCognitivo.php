@@ -24,6 +24,22 @@ final class ConsultarConocimientoCognitivo
 {
     public function consultar(User $usuario, Residente $residente, CarbonImmutable $corte): array
     {
+        $consulta = $this->adquirir($usuario, $residente, $corte);
+        unset($consulta['_instantanea']);
+
+        return $consulta;
+    }
+
+    /** Solo backend: conserva el DTO autorizado en memoria, sin enviarlo al estado de Livewire. */
+    public function preparar(User $usuario, Residente $residente, CarbonImmutable $corte): InstantaneaInstrumental
+    {
+        $consulta = $this->adquirir($usuario, $residente, $corte);
+
+        return $consulta['_instantanea'] ?? throw new DomainException('No se puede preparar la evaluación: '.$consulta['motivo']);
+    }
+
+    private function adquirir(User $usuario, Residente $residente, CarbonImmutable $corte): array
+    {
         return DB::transaction(function () use ($usuario, $residente, $corte): array {
             $usuario = User::query()->findOrFail($usuario->getKey());
             $residente = Residente::query()->findOrFail($residente->getKey());
@@ -71,7 +87,7 @@ final class ConsultarConocimientoCognitivo
                 'INSTRUMENTAL-DECLARATIVO-3', app(FuenteConocimientoOrion::class)->leer());
             $salida = $instantanea->contenido['salida'];
 
-            return ['disponible' => true, 'resultado' => $salida['resultado'], 'fuentes_excluidas' => $salida['fuentes_excluidas'],
+            return ['_instantanea' => $instantanea, 'disponible' => true, 'resultado' => $salida['resultado'], 'fuentes_excluidas' => $salida['fuentes_excluidas'],
                 'perfil_instrumental' => $salida['perfil_instrumental'],
                 'preparacion_conservacion' => ['contrato' => $instantanea->contenido['contrato'], 'huella' => $instantanea->huella,
                     'persistido' => false, 'release_recuperable' => false],
