@@ -17,6 +17,14 @@ related_modules: []
 
 # RememberMind — Baseline Rector de la BDD Operativa
 
+**Inventario vigente — 20/10/2026:** la reducción experta aprobada e instalada
+dejó **75 tablas operativas + 29 expertas = 104 tablas de negocio**. Se
+retiraron cuatro relaciones expertas redundantes preservando las historias y
+FK afectadas; el núcleo operativo V2.1 de 70 tablas sigue congelado. Véase la
+[decisión y evidencia de instalación](DECISION_REDUCCION_EXPERTA_2026_10_20.md).
+Los inventarios de 108, 106 y 105 citados más abajo describen el momento de
+cada extensión anterior, no el inventario actual.
+
 **Extensión aprobada — 19/10/2026:** dos relaciones de valoración original y
 soportes de Petersen; **75 operativas + 33 expertas = 108 tablas de negocio**.
 Conservan 4FN, autoría propia, cadenas inmutables y FK originales restrictivas.

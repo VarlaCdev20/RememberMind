@@ -4,6 +4,20 @@ Fecha: 20/10/2026. Estado: **candidato técnico sin aprobación estructural ni
 prueba de round-trip**. El inventario instalado permanece en 104 tablas de
 negocio. No se ha creado ninguna de las relaciones de este ensayo.
 
+**Límite de alcance comprobado:** catorce relaciones no bastan para conservar
+el contrato G09 cuando una regla usa un vínculo instrumental con perfil
+interpretativo. `ConocimientoCognitivoInstitucionalTest::test_g09_sql_exige_perfil_definido_y_medida_bruta_de_la_misma_aplicacion`
+ejecuta precisamente ese camino. El candidato de 14 solo cubre la variante
+observacional fija que puede derivarse de mapeos y originales sellados.
+Cerrar el G09 completo exige representar además cada vínculo declarativo
+adquirido, con su mapeo, selector, instrumento, campo, componente y perfil
+interpretativo resuelto. El antecedente de 25 relaciones lo hacía en su
+relación 18, pero fue rechazado como conjunto; una alternativa de **15 granos
+en total** reutilizaría los 14 aquí descritos y añadiría solo ese grano de
+vínculo, elevando el inventario candidato a 119 tablas de negocio, sujeto
+todavía a round-trip y aprobación. No es un nuevo inventario
+aprobado ni una autorización para crear tablas.
+
 ## Alcance conservado
 
 El objetivo es recuperar y recalcular exactamente INSTRUMENTAL-DECLARATIVO-3,
@@ -55,7 +69,7 @@ PostgreSQL y SQLite, con bloqueo transaccional al sellar. El primer sello
 captura el estado cotejado en ese momento, sin atribuirlo a fechas anteriores.
 Estas garantías modifican estructura y reglas físicas; requieren aprobación.
 
-## Inventario candidato de catorce relaciones
+## Inventario candidato de catorce relaciones para el alcance observacional
 
 De aprobarse y superar todas las pruebas, el inventario sería **118 tablas
 de negocio: 75 operativas y 43 expertas**. Es una reducción frente al
@@ -187,8 +201,13 @@ conservan; no hay producto cartesiano con los selectores.
    perfil interpretativo o vínculo no derivable. La comparación de 19 vínculos
    en SQLite sintético ya pasó; falta probar mutaciones concurrentes y el
    round-trip íntegro.
-6. Solo con esa evidencia convertir este ensayo en diccionario
+6. Ensayar una relación específica de vínculo declarativo para G09
+   interpretativo con el mismo grano y restricciones de la relación 18 del
+   antecedente rechazado. Probar que cero/uno/múltiples vínculos, NULL,
+   perfiles compartidos y sucesión de versiones se reconstruyen sin consultar
+   configuración actual. No mezclar ese grano con entradas de perfil.
+7. Solo con esa evidencia convertir este ensayo en diccionario
    estructural final para aprobación específica de la propietaria.
 
-No se afirma todavía que catorce sea el mínimo suficiente.
+No se afirma todavía que catorce ni quince sean el mínimo suficiente.
 Fase 6 y el informe histórico/aceptación dependientes siguen abiertos.

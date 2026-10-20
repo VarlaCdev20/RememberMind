@@ -110,6 +110,11 @@ sintética reconstruye los 19 desde mapeos, preguntas e instrumentos y compara
 el mapa con el contrato adquirido. La prueba no cubre aún sellado físico ni
 vínculos instrumentales interpretativos; estos últimos quedan fuera del
 candidato hasta que se representen explícitamente.
+La prueba G09 de perfil y medición originales demuestra que ese camino
+interpretativo existe en el motor actual. Por ello, las 14 relaciones no
+cierran su conservación integral. El ensayo documenta un decimoquinto grano
+posible para vínculos declarativos; su suficiencia e inventario eventual de
+119 tablas siguen sin prueba de round-trip ni aprobación estructural.
 
 ## Estado de fases 7 y 8
 
