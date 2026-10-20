@@ -200,18 +200,21 @@ conservan; no hay producto cartesiano con los selectores.
 PK cod_vinculo_declarativo string(20); FK obligatoria
 cod_conocimiento_evaluacion a relación 1; FK obligatoria
 cod_mapeo_variable_fuente a mapeos_variables_fuente; FK obligatoria
-cod_instrumento a instrumentos. codigo_instrumento string(30),
-version_instrumento string(30), identificador_pregunta_declarado text
-y cod_pregunta string(20) NULL FK a preguntas_instrumento.
+cod_instrumento a instrumentos; cod_pregunta string(20) NULL FK a
+preguntas_instrumento.
 campo string(30), cerrado a valor_logico/valor_texto;
 declara_componente boolean y componente string(30) NULL;
 declara_perfil_interpretativo boolean y cod_perfil_instrumental
 string(20) NULL FK a relación 5, tipo INTERPRETACION.
 UNIQUE conocimiento adquirido+mapeo. Los flags conservan exactamente
 la diferencia entre clave omitida y clave presente con NULL en el DTO.
-La pregunta inexistente conserva el identificador declarado y FK NULL;
-una pregunta existente exige que la FK corresponda a ese identificador
-y al instrumento. El perfil compartido se guarda una sola vez en 5–7
+La pregunta inexistente conserva FK NULL; su identificador declarado se
+recupera de `mapeos_variables_fuente.clave_selector` sellada. Una pregunta
+existente exige que la FK coincida con ese selector y con el instrumento.
+`codigo_instrumento` y `version_instrumento` se recuperan del instrumento
+sellado, no se repiten en cada vínculo; el escritor coteja ambos con el V3.
+Esto evita dependencias funcionales redundantes en el grano de vínculo.
+El perfil compartido se guarda una sola vez en 5–7
 y se referencia desde varios vínculos sin duplicar sus predicados.
 El mapeo y la relación 1 deben pertenecer a la misma versión, comprobado
 en la misma transacción; el vínculo de una sucesora usa el mapeo de esa
