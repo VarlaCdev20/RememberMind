@@ -172,6 +172,7 @@ Separación de cambios para revisión y reversión:
 
 1. `fix(alertas): unificar estados, permisos y operacion por rol`: correcciones del núcleo y consumidores, formularios y controles funcionales, protección de captura y pruebas. Incluye el marcado necesario para los campos, permisos, datos reales y feedback; no es un commit exclusivamente de backend.
 2. `fix(alertas): ordenar estilos y distribucion responsive`: estilos de tarjetas, filtros, cabecera, resumen, foco y estados de carga. Se puede revertir este commit de estilos conservando lógica, autorizaciones, datos, controles y recuperación de errores. Revertir estilos no recupera el marcado anterior de la pantalla, que estaba mezclado con defectos funcionales.
+3. `test(alertas): comprobar filtros sin ocultar el historial`: alineación de una expectativa de prueba con la entrada acordada cuando existen registros y no hay pendientes; conserva la denegación de escritura y comprueba filtros explícitos de activas y cerradas. Sin cambios del producto.
 
 Para retirar solamente los estilos, identificar el segundo commit con `git log --oneline --grep='ordenar estilos y distribucion responsive'` y ejecutar `git revert <hash-del-commit-de-estilos>` en una rama de trabajo. Después ejecutar `npm run build` y verificar la pantalla. No usar reset ni force push. La reversión completa del flujo requiere revisar conjuntamente los commits funcional y visual y sus consumidores.
 
@@ -213,3 +214,9 @@ La revisión detectó y corrigió Escape desde body durante el guardado y un spi
 - `alertas-build-interaccion.log`: build PASS.
 
 No hay cambios de permisos, reglas clínicas, esquema ni datos institucionales en este ajuste. Las pruebas usan la copia privada sintética; no se presentan como registros reales ni sustituyen la página institucional. La inspección directa de la pestaña institucional sigue limitada por la herramienta de navegador local deshabilitada. La nueva interacción requiere cargar la compilación actual mediante recarga completa de la página.
+
+## Comprobación para publicación de la rama
+
+`php artisan test --compact --filter='AlertasExperienciaVisualTest|AlertasRolesConsistenciaTest|AlertasFlujoTest|PanelAlertaPreparadoTest'`: 46 pruebas, 45 aprobadas y una expectativa anterior fallida (355 aserciones, 274,61 s). El caso esperaba que la entrada sin filtro ocultara cerradas aunque ya se acordó mostrar los registros existentes cuando no hay pendientes. Se corrigió únicamente la prueba: entrada con registro visible, filtro ACTIVAS que lo excluye, filtro CERRADA que lo incluye y creación denegada al lector. Repetición del caso: **PASS, 1 prueba / 4 aserciones**, `alertas-prepublicacion-filtros.xml`. No se presenta la tanda inicial como completamente aprobada ni se alteran permisos para satisfacerla.
+
+Revisión de cierre: sintaxis correcta en 51 archivos PHP; 11 pruebas de frontend aprobadas; `git diff --check` limpio. Sin cambios funcionales posteriores al build y QA documentados. Respaldos, BD, capturas, secretos y archivos de entorno quedan fuera de los commits.
