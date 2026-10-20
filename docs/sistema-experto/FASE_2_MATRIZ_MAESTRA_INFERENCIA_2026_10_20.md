@@ -66,6 +66,8 @@ La señal descriptiva sustentada hoy es **dificultad observada en un componente 
 - `ConocimientoCognitivoInstitucionalTest`: consulta Laravel, fuentes SQL, permisos, versiones, 19 observaciones y exclusiones.
 - `PetersenInstitucionalTest`, `GobiernoPetersenInstitucionalTest` e `InstantaneaEvaluacionInstitucionalTest`: cuatro patrones sintéticos, abstenciones, originalidad, gobierno, autorización y preparación compuesta. Las pruebas sintéticas verifican software, no validez clínica.
 
+Verificación de este corte: filtro de las siete clases anteriores, **146 pruebas / 1.450 aserciones PASS** en SQLite `:memory:` y **146 / 1.450 PASS** en PostgreSQL desechable. Los dos programas de independencia del motor finalizaron PASS. Sintaxis PHP, Pint de los dos PHP modificados y `git diff --check` de esos archivos finalizaron PASS. No se alteró la BDD operativa. Esta batería no constituye la ejecución de los «104 escenarios» no localizados ni la validación clínica frente a evaluaciones independientes.
+
 ## Fundamento científico y límite de transferencia
 
 - [Petersen et al., *Mild cognitive impairment: clinical characterization and outcome*, 1999](https://pubmed.ncbi.nlm.nih.gov/10190820/): caracterización original de DCL; no define un umbral universal aplicable a estas observaciones.
