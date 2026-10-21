@@ -46,6 +46,14 @@ Un [tercer script SQLite desechable](../../prototipos/orion-consolidacion-104/en
 
 Con **cuatro consolidaciones candidatas** y cuatro relaciones nuevas, la aritmética sería `104 − 4 + 4 = 104`. Es solo una cuenta: el mapa de cuatro relaciones aún pierde B01–B03, por lo que **no existe todavía un diccionario instalable de conservación completa**. Ninguna de estas consolidaciones se ejecutó en el esquema institucional.
 
+### Quinto ensayo candidato, 21/10/2026
+
+[`ensayar-variable-nodo-sqlite.php`](../../prototipos/orion-consolidacion-104/ensayar-variable-nodo-sqlite.php) comprobó en SQLite `:memory:` la unión opcional 0..1 de `variables_expertas` con su `nodos_semanticos`. Retiene `cod_variable_experta` como alias único, las fechas y autores propios de la variable, los NULL de propietario/dominio/observación y dos referencias hijas al alias. Reconstruyó exactamente tres nodos, dos variables, un mapeo y dos condiciones sintéticas; probó rollback, FK y checks negativos. El script no usa ni modifica datos institucionales.
+
+El cotejo de solo lectura `php prototipos/orion-reduccion-100/ensayar-uno-a-uno.php` volvió a reconstruir las filas actuales de **205 nodos y 87 variables** sin pérdida en la proyección 0..1. No ejecutó escrituras.
+
+Este resultado **no libera una tabla** ni convierte el candidato en migración. El ensayo usa un subconjunto del esquema: faltan todas las FK entrantes, los consumidores Eloquent, PostgreSQL, concurrencia, reversión poblada y revisión independiente de 4FN. Aun si la quinta consolidación resultara viable, `104 − 5 + 5 = 104` solo permitiría una quinta relación nueva; todavía hay que demostrar que B01–B03 y todos los granos existentes caben en un diccionario completo sin mezclas incompatibles. La decisión concreta sobre BDD continúa pendiente.
+
 ## Próxima prueba exigida antes de pedir DDL
 
 1. Resolver B01–B03 con relaciones tipadas y nominales, reutilizando una tabla solo si conserva exactamente su grano. Publicar diccionario de columnas, PK/FK, índices, checks, cierre de colecciones y la lista de tablas que se consolidarían para no superar 104.
