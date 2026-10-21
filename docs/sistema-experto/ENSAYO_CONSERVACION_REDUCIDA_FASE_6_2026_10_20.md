@@ -1,8 +1,45 @@
 # Ensayo de conservación institucional reducida
 
 Fecha: 20/10/2026. Estado: **candidato técnico sin aprobación estructural ni
-prueba de round-trip**. El inventario instalado permanece en 104 tablas de
+prueba de round-trip de las quince relaciones propuestas**. El inventario instalado permanece en 104 tablas de
 negocio. No se ha creado ninguna de las relaciones de este ensayo.
+
+**Decisión posterior de la propietaria (20/10/2026):** «no podemos pasar de las
+90–100 tablas». El límite de diseño es **100 tablas de negocio**. Por tanto,
+el candidato de quince relaciones, que llevaría el total a 119, queda
+**rechazado** y no se convierte en migración. El inventario físico actual ya
+es 104; reducirlo exige otro diccionario, prueba de conservación exacta y
+aprobación de cambios a la BDD congelada. La prueba aislada siguiente sólo
+sirve para estudiar el contrato de datos; no cambia esta decisión.
+
+### Ensayo aislado de representación, 20/10/2026
+
+`prototipos/orion-conservacion-0_2` contiene una proyección tipada del DTO
+compuesto en un esquema PostgreSQL **desechable**. Sus tablas de ensayo son un banco
+deliberadamente exhaustivo, no el diccionario institucional de quince
+relaciones ni una alternativa aprobada. No se instala en Laravel ni en la BDD
+operativa. El generador de DDL se corrigió para resolver las FK del conocimiento
+cognitivo y Petersen a sus tablas respectivas; la primera instalación fallaba
+al apuntar a nombres inexistentes.
+
+Una revisión transitoria del prototipo pasó en un cluster PostgreSQL
+desechable: **1 prueba, 13 aserciones**. Verificó rollback de una escritura
+interrumpida, guardado, lectura relacional, igualdad canónica de entradas,
+replay de la misma huella compuesta, reintento idempotente y rechazo de borrado
+después del cierre. El caso sintético conservaba NULL, colección vacía y una
+pregunta definida sin respuesta. El prototipo cambió posteriormente durante
+trabajo simultáneo y aquella prueba dejó de corresponder al esquema actual;
+se retiró el test transitorio. **La revisión actual del prototipo no tiene aún
+esa prueba reproducible aprobada.**
+
+El ensayo transitorio indica que el contrato puede representarse sin serializar
+la historia clínica en JSON/EAV; requiere repetición contra un esquema estable.
+**No prueba** que las quince relaciones
+propuestas, sus sellos sobre tablas operativas y la retención del ZIP sean
+suficientes. Tampoco prueba concurrencia, restauración años después, ni estados
+operativos históricos anteriores al primer sello. El diccionario reducido y
+su migración permanecen bloqueados hasta un round-trip con sus granos exactos,
+revisión de 4FN, transición y aprobación explícita de la propietaria.
 
 **Límite de alcance comprobado:** catorce relaciones no bastan para conservar
 el contrato G09 cuando una regla usa un vínculo instrumental con perfil
@@ -125,6 +162,31 @@ Toda FK nueva lleva índice, DELETE RESTRICT y UPDATE NO ACTION. Las
 evaluaciones previas conservan NULL; no se rellenan retrospectivamente.
 La política de retención y respaldo del release aún requiere decisión
 institucional: un hash no garantiza que el ZIP exista años después.
+
+### Impacto, transición y reversión del candidato (sin autorizarlo)
+
+El costo estructural sería **15 relaciones expertas, diez columnas en cuatro
+tablas existentes** (4 en `evaluaciones_expertas`, 3 en
+`versiones_modelo_experto`, 2 en `instrumentos`, 1 en
+`aplicaciones_instrumento`) y triggers de sellado/colecciones para
+instrumentos, preguntas, opciones, aplicaciones y respuestas. El total
+candidato sería 119 tablas de negocio; no se tocan ni rellenan evaluaciones
+históricas anteriores. La activación exige que el escritor y lector nuevos
+sean compatibles con PostgreSQL y SQLite y que los sellos no bloqueen
+anulación, rectificación o conciliación documental autorizadas.
+
+La transición propuesta es aditiva: crear estructura nullable y restricciones,
+verificar originales y release, instalar el lector histórico, probar en base
+desechable y solo entonces habilitar el escritor transaccional. Una ejecución
+cerrada nunca se «repara» reescribiendo sus originales; se registra una nueva
+evaluación. Si todavía no existen ejecuciones nuevas, la reversión puede
+desactivar el escritor y retirar únicamente las estructuras vacías mediante
+una migración inversa verificada. Una vez conservada historia, el `down`
+destructivo debe fallar: se revierte comportamiento, se mantiene lectura y
+respaldo de las tablas, y cualquier retiro físico requiere un plan de
+preservación/traslado aprobado. El ZIP de software debe ser recuperable por
+huella y estar incluido en el respaldo institucional; la política concreta de
+retención, restauración periódica y custodia continúa sin decidirse.
 
 ### Relación 4: aplicación incluida
 
