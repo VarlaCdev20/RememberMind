@@ -39,7 +39,7 @@ reversión y aprobación verificadas.
 Se ensayó además, por separado y sin DDL, una **sexta candidata**:
 `evidencias_soporte_condicion` como una variante tipada de
 `evidencias_criterio_evaluacion`. El
-[`ensayo de vínculos`](../../prototipos/orion-reduccion-100/ensayar-vinculos-evidencia.php)
+[`ensayo y diccionario candidato`](ENSAYO_UNION_VINCULOS_EVIDENCIA_2026_10_20.md)
 reconstruyó exactamente 225 participaciones de criterio y 150 soportes de
 condición. De las participaciones, 150 referencian una evidencia y 75 un hecho
 de instantánea; ambas alternativas y el alias del soporte se conservan como
