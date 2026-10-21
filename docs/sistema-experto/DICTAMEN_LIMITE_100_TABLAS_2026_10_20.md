@@ -18,6 +18,7 @@ no se añade ninguna.
 | `trazas_inferencia` | `evaluacion_criterios` | `UNIQUE(cod_evaluacion_criterio)` | estados y tiempos, FK entrante de evaluaciones de reglas, historia incompleta y concurrencia |
 | `criterios_dominios_resultado` | `nodos_semanticos` | `UNIQUE(cod_nodo_criterio)` | nodos sin criterio, gobierno por versión, FK entrante de consecuencias y 4FN |
 | `clasificaciones_dcl_instantanea` | `evaluaciones_expertas` | `UNIQUE(cod_evaluacion_experta)` | contrato experimental segregado, identidad alternativa y FK de motivos/reglas sin perder historia |
+| `variables_expertas` | `nodos_semanticos` | `UNIQUE(cod_nodo_semantico)` | nodos sin variable, identidad alternativa, FK entrantes de condiciones/mapeos, versión y 4FN |
 
 Los UNIQUE solo identifican una posibilidad 0..1; no demuestran que el
 traslado sea correcto. Un ensayo debe cotejar todas las filas y valores NULL,
@@ -34,8 +35,12 @@ bloques destino deben admitir ausencia, sin inventar una fila faltante. Los
 conteos pueden cambiar y no sustituyen la comparación de identidades y datos.
 
 Estas cuatro candidatas llevarían 104 a 100 **si** todas fueran viables y
-aprobadas. Aún no reservarían una sola relación nueva para las colecciones
-independientes de la evaluación histórica: membresía de aplicaciones,
+aprobadas. Una quinta posibilidad 0..1 es `variables_expertas`, con 87 filas
+frente a 205 nodos; aun si también resultara viable, el total bajaría a 99
+y solo dejaría una plaza para relaciones nuevas. Ninguna de las cinco está
+aprobada o probada. Las primeras cuatro no reservarían ninguna relación nueva
+para las colecciones independientes de la evaluación histórica: membresía de
+aplicaciones,
 perfiles/entradas/predicados, dos ramas de conocimiento y reglas observadas,
 soportes Petersen, exclusiones y constancias. Convertirlas en columnas
 repetidas, texto/JSON o un depósito genérico de atributos rompería los
