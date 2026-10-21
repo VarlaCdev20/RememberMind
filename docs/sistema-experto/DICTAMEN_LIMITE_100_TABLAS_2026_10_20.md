@@ -36,6 +36,22 @@ ocho columnas y una FK entrante. Para las otras tres falta incluso ese
 diccionario. Ninguna cuenta con transición, restricciones, concurrencia,
 reversión y aprobación verificadas.
 
+Se ensayó además, por separado y sin DDL, una **sexta candidata**:
+`evidencias_soporte_condicion` como una variante tipada de
+`evidencias_criterio_evaluacion`. El
+[`ensayo de vínculos`](../../prototipos/orion-reduccion-100/ensayar-vinculos-evidencia.php)
+reconstruyó exactamente 225 participaciones de criterio y 150 soportes de
+condición. De las participaciones, 150 referencian una evidencia y 75 un hecho
+de instantánea; ambas alternativas y el alias del soporte se conservan como
+campos nominales distintos. Cada vínculo seguiría siendo una fila independiente
+con su propio destino. El ensayo comprueba las FK existentes y compara las
+filas actuales; aún faltan la restricción física de exactamente una rama, la
+transición con códigos nuevos, 4FN en el esquema final, escritores concurrentes
+y reversión poblada. **No se aprueba retirar esa tabla** por esta comprobación.
+Incluso seis consolidaciones factibles reducirían 104 a 98 y dejarían solo
+dos relaciones nuevas bajo el límite de 100; el candidato de cuatro relaciones
+nuevas requeriría al menos ocho consolidaciones aprobadas y comprobadas.
+
 El conteo agregado local de esta lectura, sin consultar contenido clínico,
 fue: 148 filas en `evaluacion_criterios`, 147 en `resultados_criterio` y
 18 en `trazas_inferencia`; 205 nodos y 44 criterios de resultado; seis
