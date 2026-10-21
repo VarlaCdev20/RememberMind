@@ -51,6 +51,7 @@ Jerarquía: instrucción actual de propietaria → baseline/diccionario y decisi
 
 ## Documentación vigente
 
+- [Historiales con Superadministrador: acceso a las 73 fichas, conexiones y límites del visor](sistema/HISTORIALES_SUPERADMINISTRADOR_2026_10_20.md).
 - [Eliminación V2: implementación, gates y límites de QA](frontend/FORMULARIO_ELIMINACION_V2_RESULTADO.md), [extensión aprobada](base-de-datos/DECISION_ELIMINACION_V2.md).
 - [Administrador: etapas, funcionamiento y mejoras](administrador/README.md)
 - [Estado actual](ESTADO_ACTUAL.md), [Glosario](GLOSARIO_DOMINIO.md), [Gobernanza](GOBERNANZA_DOCUMENTAL.md).
