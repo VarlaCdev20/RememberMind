@@ -428,6 +428,10 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         self::assertSame(0, $c['metricas_entradas_60_o_mas']['aplicaciones_sin_extraccion']);
         self::assertSame(1, $c['metricas_entradas_60_o_mas']['aplicaciones_observacionales_sin_normalizacion']);
         self::assertSame('Observación original sintética', $perfil['capturas_originales']['capturas'][0]['respuestas_originales'][0]['valor_texto']);
+        Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
+            ->assertSee('Observación clínica')
+            ->assertSee('Esta observación clínica se presenta sin puntuación instrumental.')
+            ->assertSee('Observación original sintética');
         self::assertNull($a->fresh()->clasificacion);
         self::assertDatabaseCount('evaluaciones_expertas', 0);
     }
@@ -487,7 +491,7 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         $this->aplicar();
         config(['sistema_experto.perfiles_instrumentales' => [$this->perfil]]);
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
-            ->assertSee('Mediciones instrumentales del expediente')->assertSee('Medidas sintéticas de integración')
+            ->assertSee('Aplicaciones y observaciones del expediente')->assertSee('Medidas sintéticas de integración')
             ->assertSee('2020-10-18')->assertSee('NORMALIZADO')->assertSee('Medición: 21');
         self::assertDatabaseCount('evaluaciones_expertas', 0);
     }
@@ -502,7 +506,7 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         });
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
             ->assertSee('No se pudo consultar la evaluación')->assertDontSee('Detalle interno de integridad.')
-            ->assertSee('Mediciones instrumentales del expediente')->assertSee('Medidas sintéticas de integración')
+            ->assertSee('Aplicaciones y observaciones del expediente')->assertSee('Medidas sintéticas de integración')
             ->assertSee('Hallazgos observacionales del seguimiento');
         self::assertDatabaseCount('evaluaciones_expertas', 0);
     }

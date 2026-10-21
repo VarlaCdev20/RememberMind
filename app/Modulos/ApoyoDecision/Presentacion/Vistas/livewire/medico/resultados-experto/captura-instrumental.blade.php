@@ -1,8 +1,8 @@
-<x-ui.section-card title="Mediciones instrumentales del expediente" subtitle="Consulta de las fuentes actuales del expediente" icon="ph-clipboard-text">
+<x-ui.section-card title="Aplicaciones y observaciones del expediente" subtitle="Fuentes registradas para este residente" icon="ph-clipboard-text">
     <p class="text-sm text-rm-secondary">Fecha de consulta: {{ $capturaInstrumental['fecha_corte'] }}. Las evidencias de una evaluación histórica se consultan en su informe conservado.</p>
     @forelse($capturaInstrumental['capturas'] as $captura)
         <details class="rounded-xl border border-rm bg-rm-surface-soft p-4 mt-3 min-w-0" wire:key="captura-{{ $captura['cod_aplicacion'] }}">
-            <summary class="cursor-pointer min-h-11 font-semibold break-words">{{ $captura['nombre_instrumento'] }} · {{ $captura['version_instrumento'] ?: 'Versión no registrada' }}</summary>
+            <summary class="cursor-pointer min-h-11 font-semibold break-words">{{ ($captura['instrumento_actual']['tipo'] ?? null) === 'OBSERVACIONAL' ? 'Observación clínica' : 'Aplicación instrumental' }} · {{ $captura['nombre_instrumento'] }} · {{ $captura['version_instrumento'] ?: 'Versión no registrada' }}</summary>
             <p class="text-sm mt-3 break-words">Fecha original: {{ $captura['fecha_hora'] }} · Profesional: {{ $captura['autor'] }} · Estado registrado: {{ $captura['estado_original'] }}</p>
             @if($captura['extraccion'])
                 @foreach($captura['extraccion']['normalizacion']['componentes'] as $componente => $calculo)
@@ -24,8 +24,10 @@
                     @endforeach
                 @endforeach
                 <p class="text-sm text-rm-secondary mt-3">La normalización compara la medición con su referencia publicada. La interpretación del dominio requiere sus condiciones y soportes.</p>
+            @elseif(($captura['instrumento_actual']['tipo'] ?? null) === 'OBSERVACIONAL')
+                <p class="text-sm text-rm-secondary mt-3">Esta observación clínica se presenta sin puntuación instrumental. Sus respuestas registradas figuran a continuación.</p>
             @else
-                <p class="text-sm text-rm-secondary mt-3">No hay cálculo instrumental disponible para esta aplicación. Se conservan sus respuestas originales.</p>
+                <p class="text-sm text-rm-secondary mt-3">Esta aplicación no tiene un cálculo instrumental admisible. Consulte los motivos y las respuestas registradas.</p>
             @endif
             <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
                 @foreach($captura['respuestas_originales'] as $respuesta)
@@ -56,6 +58,6 @@
             </details>
         </details>
     @empty
-        <p class="text-sm text-rm-secondary">No hay aplicaciones instrumentales registradas hasta la fecha de consulta.</p>
+        <p class="text-sm text-rm-secondary">No hay aplicaciones ni observaciones de instrumento registradas para este residente hasta la fecha de consulta.</p>
     @endforelse
 </x-ui.section-card>
