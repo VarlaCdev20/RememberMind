@@ -260,6 +260,29 @@ final class GobiernoReglasExpertasTest extends TestCase
         $this->get(route('admin.sistema-experto.reglas'))->assertRedirect(route('login'));
     }
 
+    public function test_guia_interdisciplinaria_se_consulta_sin_publicar_perfiles_ni_cambiar_historia(): void
+    {
+        $antes = DB::table('versiones_modelo_experto')->count();
+        $this->get(route('admin.sistema-experto.reglas'))
+            ->assertOk()->assertSee('Guía interdisciplinaria de adquisición')
+            ->assertSee('MEM-S01')->assertSee('HVLT-R-BO-2015-F5')
+            ->assertSee('Barthel describe actividades básicas')
+            ->assertSee('Abrir residentes y fuentes autorizadas');
+        self::assertSame($antes, DB::table('versiones_modelo_experto')->count());
+
+        $psicologia = $this->profesional('PSICOLOGO/A', 'PSICOLOGIA');
+        $this->actingAs($psicologia);
+        $this->get(route('admin.sistema-experto.reglas'))
+            ->assertOk()->assertSee('LEN-S05')->assertSee('MMSE-2');
+
+        $super = User::factory()->create(['estado' => 'ACTIVO']);
+        $super->assignRole('SUPERADMINISTRADOR');
+        $this->actingAs($super);
+        $this->get(route('admin.sistema-experto.reglas'))
+            ->assertOk()->assertSee('Guía interdisciplinaria de adquisición')
+            ->assertDontSee('Abrir residentes y fuentes autorizadas');
+    }
+
     public function test_interfaz_rechaza_regla_ajena_a_la_version_seleccionada(): void
     {
         $id = $this->revision();

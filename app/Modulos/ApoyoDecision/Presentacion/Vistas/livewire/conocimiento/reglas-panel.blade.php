@@ -19,6 +19,48 @@
         <p class="text-sm text-rm-secondary mt-3">Una regla pendiente puede probarse cuando sus entradas y método estén definidos. La revisión del conocimiento se registra por separado de la revisión del resultado de un residente.</p>
     </x-ui.section-card>
 
+    <x-ui.section-card title="Guía interdisciplinaria de adquisición" subtitle="Propuesta del 20/10/2026 para completar fuentes originales; no registra una aplicación ni habilita una regla.">
+        <div class="space-y-4 text-sm">
+            <p>Las observaciones clínicas ya registradas siguen siendo hechos observacionales. Barthel describe actividades básicas; los controles IADL requieren revisar desempeño anterior y actual, oportunidad y motivo de la ayuda. Ninguna de estas fuentes se convierte por su nombre en una puntuación cognitiva.</p>
+            <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                <div><h3 class="font-semibold">Psicología</h3><p>Identificar instrumento, edición, forma, idioma, derechos de uso, profesional y condiciones. Conservar respuestas y mediciones originales por tarea. Interpretar cada componente solo con un método y una referencia aplicables.</p></div>
+                <div><h3 class="font-semibold">Medicina</h3><p>Revisar cronología, cambios cognitivos, antecedentes, medicamentos y posibles causas alternativas. Distinguir factores presentes, ausentes evaluados y pendientes; registrar su juicio profesional posterior.</p></div>
+                <div><h3 class="font-semibold">Enfermería</h3><p>Conservar episodios con fecha, autor, turno, oportunidad y contexto. Distinguir lo observado, lo que no ocurrió durante una observación suficiente y lo no evaluado, sin inventar mediciones.</p></div>
+                <div><h3 class="font-semibold">Funcionalidad</h3><p>Comparar autonomía previa y actual en cada actividad instrumental, oportunidad real de realizarla y causa de la ayuda. La rutina de la residencia no demuestra por sí misma pérdida de capacidad.</p></div>
+            </div>
+            <p>Perfiles de captura instrumental configurados: <strong>{{ $perfilesInstrumentalesConfigurados }}</strong>. Perfiles interpretativos configurados: <strong>{{ $perfilesInterpretativosConfigurados }}</strong>. Estos conteos no prueban que exista una aplicación admisible para un residente.</p>
+            <p>MoCA Full 8.1 en español, SPMSQ-VE y MMSE-2 son opciones de tamizaje a verificar, no equivalencias automáticas con los 19 componentes. La referencia publicada de SPMSQ-VE estudió personas desde los 65 años; su pertinencia para residentes de 60–64 requiere otra fuente. No se reproducen reactivos en esta pantalla. La <a class="underline" href="https://www.mocacognition.com/paper" target="_blank" rel="noopener noreferrer">política oficial de MoCA<span class="sr-only"> (abre en otra pestaña)</span></a> exige certificación para interpretar tareas o dominios; integrar contenido en el software requiere verificar los <a class="underline" href="https://mocacognition.com/terms-of-use" target="_blank" rel="noopener noreferrer">derechos de uso<span class="sr-only"> (abre en otra pestaña)</span></a>.</p>
+            @if($puedeAbrirResidentes)
+                <a class="rm-btn rm-btn-secondary inline-flex" href="{{ route('admin.sistema-experto.residentes') }}">Abrir residentes y fuentes autorizadas</a>
+            @endif
+            <details>
+                <summary class="cursor-pointer font-semibold">Consultar los 19 componentes y métodos candidatos</summary>
+                <p class="mt-2 text-rm-secondary">Cada método procede del registro técnico versionado; su presencia aquí no acredita licencia, adopción institucional, aplicación, norma transferible ni resultado clínico. Deben cotejarse la forma original, edad, escolaridad, idioma, condiciones y fuente antes de cualquier interpretación.</p>
+                <div class="mt-3 overflow-x-auto">
+                    <table class="w-full text-sm"><caption class="sr-only">Métodos de adquisición candidatos por componente cognitivo</caption>
+                        <thead><tr><th scope="col" class="text-left p-3">Componente</th><th scope="col" class="text-left p-3">Método candidato</th><th scope="col" class="text-left p-3">Identidad y entradas a cotejar</th><th scope="col" class="text-left p-3">Referencia</th></tr></thead>
+                        <tbody>
+                            @foreach($guiaAdquisicion as $fila)
+                                <tr class="border-t" wire:key="guia-{{ $fila['componente'] }}">
+                                    <th scope="row" class="p-3 text-left align-top">{{ $fila['componente'] }}</th>
+                                    <td class="p-3 align-top"><strong>{{ $fila['instrumento'] }}</strong><br><span class="break-all">{{ $fila['metodo'] }}</span></td>
+                                    <td class="p-3 align-top">
+                                        @foreach($fila['identidad'] as $nombre => $valor)@if(is_scalar($valor))<span class="block">{{ str_replace('_', ' ', $nombre) }}: {{ $valor }}</span>@endif @endforeach
+                                        <span class="block mt-1">Entradas: {{ implode(', ', $fila['entradas']) ?: 'Según protocolo original' }}</span>
+                                        @if($fila['edad_minima'] !== null || $fila['edad_maxima'] !== null)<span class="block">Edad de la referencia: {{ $fila['edad_minima'] ?? 'sin mínimo declarado' }}–{{ $fila['edad_maxima'] ?? 'sin máximo declarado' }} años</span>@endif
+                                        @if($fila['escolaridad_minima'] !== null || $fila['escolaridad_maxima'] !== null)<span class="block">Escolaridad de la referencia: {{ $fila['escolaridad_minima'] ?? 'sin mínimo declarado' }}–{{ $fila['escolaridad_maxima'] ?? 'sin máximo declarado' }} años</span>@endif
+                                        @if($fila['edades_excluidas'] !== [])<span class="block">Hay edades excluidas por conflicto en la referencia; revisar el registro técnico.</span>@endif
+                                    </td>
+                                    <td class="p-3 align-top"><a class="underline break-all" href="{{ $fila['fuente'] }}" target="_blank" rel="noopener noreferrer">Fuente del método<span class="sr-only"> {{ $fila['metodo'] }} (abre en otra pestaña)</span></a></td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+        </div>
+    </x-ui.section-card>
+
     <x-ui.section-card title="Reglas de la versión" subtitle="El archivo y la sustitución conservan una versión nueva; las definiciones anteriores siguen consultables.">
         <div class="overflow-x-auto">
             <table class="w-full text-sm"><caption class="sr-only">Reglas, decisiones y sucesoras</caption>

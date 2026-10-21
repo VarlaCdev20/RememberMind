@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas;
 
 use App\Models\ReglaExperta;
+use App\Models\Residente;
 use App\Models\User;
 use App\Models\VersionModeloExperto;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\GestionarReglasExpertas;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoInstitucional;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoPetersen;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\GuiaAdquisicionInterdisciplinaria;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratosConocimiento;
 use DomainException;
@@ -242,8 +244,13 @@ final class GobiernoReglasPanel extends Component
         $puedeGestionar = $editable && Gate::forUser($actor)->allows('gestionarReglas', VersionModeloExperto::class);
         $puedeRevisar = $editable && Gate::forUser($actor)->allows('revisarReglas', VersionModeloExperto::class);
         $puedeRegistrar = Gate::forUser($actor)->allows('gestionarReglas', VersionModeloExperto::class);
+        $guiaAdquisicion = app(GuiaAdquisicionInterdisciplinaria::class)->componentes();
+        $perfilesInstrumentalesConfigurados = count(config('sistema_experto.perfiles_instrumentales', []));
+        $perfilesInterpretativosConfigurados = count(config('sistema_experto.perfiles_interpretativos', []));
+        $puedeAbrirResidentes = $actor->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A'])
+            && Gate::forUser($actor)->allows('viewAny', Residente::class);
 
-        return view('apoyodecision::livewire.conocimiento.reglas-panel', compact('versiones', 'reglas', 'seleccionada', 'tablas', 'nombresNodos', 'variablesPrueba', 'puedeGestionar', 'puedeRevisar', 'puedeRegistrar', 'contratoObservacional', 'contratoPetersen'))
+        return view('apoyodecision::livewire.conocimiento.reglas-panel', compact('versiones', 'reglas', 'seleccionada', 'tablas', 'nombresNodos', 'variablesPrueba', 'puedeGestionar', 'puedeRevisar', 'puedeRegistrar', 'contratoObservacional', 'contratoPetersen', 'guiaAdquisicion', 'perfilesInstrumentalesConfigurados', 'perfilesInterpretativosConfigurados', 'puedeAbrirResidentes'))
             ->layout('layouts.sistema');
     }
 }
