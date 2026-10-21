@@ -25,7 +25,13 @@ traslado sea correcto. Un ensayo debe cotejar todas las filas y valores NULL,
 mantener los códigos históricos como alias únicos, probar FK entrantes y
 reversión poblada en SQLite y PostgreSQL desechables. El [precedente aprobado
 de cuatro consolidaciones](../base-de-datos/DECISION_REDUCCION_EXPERTA_2026_10_20.md)
-no autoriza estas cuatro nuevas.
+no autoriza ninguna de estas cinco nuevas.
+
+Las dos primeras cuentan ya con un [ensayo de proyección y reconstrucción
+de solo lectura](ENSAYO_CONSOLIDACION_RESULTADO_TRAZA_2026_10_20.md): 148
+criterios, 147 resultados y 18 trazas coinciden exactamente con sus filas
+originales. Su diccionario de ocho columnas y FK entrante es **candidato**;
+faltan transición, restricciones, concurrencia, reversión y aprobación.
 
 El conteo agregado local de esta lectura, sin consultar contenido clínico,
 fue: 148 filas en `evaluacion_criterios`, 147 en `resultados_criterio` y
