@@ -40,7 +40,24 @@ class LaPazSeedIntegrityTest extends TestCase
         $this->seed(RolesAndPermissionsSeeder::class);
         $previa = User::factory()->create(['correo' => 'cuenta.conservada@example.invalid']);
         $original = $previa->getRawOriginal();
+        // Una instalación poblada ya puede tener estos catálogos con otras PK.
+        DB::table('turnos')->insert([
+            ['cod_turno' => 'TUR_PRE_0', 'nombre' => 'Guardia de madrugada y mañana', 'hora_inicio' => '00:00:00', 'hora_cierre' => '12:00:00', 'orden' => 1, 'estado' => 'ACTIVO', 'observacion' => 'Texto previo que se conserva.'],
+            ['cod_turno' => 'TUR_PRE_1', 'nombre' => 'Guardia de tarde y noche', 'hora_inicio' => '12:00:00', 'hora_cierre' => '00:00:00', 'orden' => 2, 'estado' => 'ACTIVO', 'observacion' => null],
+        ]);
+        DB::table('tipos_estudio_clinico')->insert(['cod_tipo_estudio' => 'TEC_PRE', 'nombre' => 'Glucemia de laboratorio',
+            'categoria' => 'LABORATORIO', 'descripcion' => 'Descripción anterior conservada.', 'requiere_componentes' => true, 'requiere_informe' => true, 'estado' => 'ACTIVO']);
+        DB::table('secuencias_codigos')->insert(['entidad' => 'residentes', 'ultimo_valor' => 25]);
+        $conservacion = new ConservacionDatos;
+        $conservacion->capturar();
         $this->seed(HistoriaResidencialSeeder::class);
+        $this->assertGreaterThan(0, $conservacion->comprobar());
+        $this->assertDatabaseCount('turnos', 2);
+        $this->assertDatabaseCount('tipos_estudio_clinico', 1);
+        $this->assertFalse(DB::table('jornadas')->whereNotIn('cod_turno', ['TUR_PRE_0', 'TUR_PRE_1'])->exists());
+        $this->assertFalse(DB::table('programaciones_cuidado')->whereNotIn('cod_turno', ['TUR_PRE_0', 'TUR_PRE_1'])->exists());
+        $this->assertFalse(DB::table('estudios_clinicos')->where('cod_tipo_estudio', '<>', 'TEC_PRE')->exists());
+        $this->assertDatabaseHas('secuencias_codigos', ['entidad' => 'residentes', 'ultimo_valor' => 73]);
         $this->assertDatabaseCount('residentes', 48);
         $this->assertDatabaseCount('camas', 48);
         $this->assertSame(48, DB::table('residentes')->distinct()->count('fecha_nacimiento'));
@@ -78,6 +95,45 @@ class LaPazSeedIntegrityTest extends TestCase
             $this->assertStringContainsString('prohibido', $e->getMessage());
             $this->assertDatabaseCount('usuarios', 0);
             $this->assertDatabaseCount('residentes', 0);
+        }
+    }
+
+    public function test_rechaza_avance_de_contador_sin_codigos_nuevos(): void
+    {
+        DB::table('secuencias_codigos')->insert(['entidad' => 'residentes', 'ultimo_valor' => 25]);
+        $control = new ConservacionDatos;
+        $control->capturar();
+        DB::table('secuencias_codigos')->where('entidad', 'residentes')->update(['ultimo_valor' => 26]);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Avance de secuencia sin registros nuevos');
+        $control->comprobar();
+    }
+
+    public function test_rechaza_retroceso_de_contador(): void
+    {
+        DB::table('secuencias_codigos')->insert(['entidad' => 'residentes', 'ultimo_valor' => 25]);
+        $control = new ConservacionDatos;
+        $control->capturar();
+        DB::table('secuencias_codigos')->where('entidad', 'residentes')->update(['ultimo_valor' => 24]);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Cambio no permitido en una secuencia');
+        $control->comprobar();
+    }
+
+    public function test_turno_de_mismo_nombre_con_horario_distinto_rechaza_y_revierte(): void
+    {
+        Storage::fake('local');
+        $this->seed(RolesAndPermissionsSeeder::class);
+        DB::table('turnos')->insert(['cod_turno' => 'TUR_INCOMPATIBLE', 'nombre' => 'Guardia de madrugada y mañana',
+            'hora_inicio' => '07:00:00', 'hora_cierre' => '15:00:00', 'orden' => 1, 'estado' => 'ACTIVO']);
+        try {
+            $this->seed(HistoriaResidencialSeeder::class);
+            $this->fail('No debe elegir un turno por parecido ni modificarlo.');
+        } catch (RuntimeException $e) {
+            $this->assertStringContainsString('turno existente no coincide', $e->getMessage());
+            $this->assertDatabaseHas('turnos', ['cod_turno' => 'TUR_INCOMPATIBLE', 'hora_inicio' => '07:00:00']);
+            $this->assertDatabaseCount('residentes', 0);
+            $this->assertDatabaseCount('usuarios', 0);
         }
     }
 

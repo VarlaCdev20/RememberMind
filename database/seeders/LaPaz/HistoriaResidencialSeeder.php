@@ -42,6 +42,10 @@ class HistoriaResidencialSeeder extends Seeder
 
     private array $medications = [];
 
+    private array $turnos = [];
+
+    private string $tipoGlucemia = 'LP_TEC_GLU';
+
     private array $archivosNuevos = [];
 
     public ?\Closure $avance = null;
@@ -114,6 +118,7 @@ class HistoriaResidencialSeeder extends Seeder
             'resultados_estudio',
             'seguimientos_pedagogicos',
             'seguros_residente',
+            'secuencias_codigos',
             'signos_vitales',
             'tipos_estudio_clinico',
             'turnos',
@@ -263,6 +268,12 @@ class HistoriaResidencialSeeder extends Seeder
 
     private function put(string $table, string $id, array $data, bool $buffer = false): void
     {
+        if (isset($data['cod_turno'], $this->turnos[$data['cod_turno']])) {
+            $data['cod_turno'] = $this->turnos[$data['cod_turno']];
+        }
+        if (($data['cod_tipo_estudio'] ?? null) === 'LP_TEC_GLU') {
+            $data['cod_tipo_estudio'] = $this->tipoGlucemia;
+        }
         // Solo resuelve la PK del esquema aprobado; los atributos se mapean explícitamente debajo.
         $pk = $this->keys[$table] ??= collect(DB::getSchemaBuilder()->getIndexes($table))->firstWhere('primary', true)['columns'][0];
         $row = [$pk => $id] + $data;
@@ -343,7 +354,20 @@ class HistoriaResidencialSeeder extends Seeder
             $this->put('areas', 'LP_ARE_'.$code, ['nombre' => $name.' residencial La Paz', 'descripcion' => 'Atención institucional del área de '.$name.' en residencia de La Paz.', 'estado' => 'ACTIVA']);
         }
         foreach ([['00:00:00', '12:00:00', 'Guardia de madrugada y mañana'], ['12:00:00', '00:00:00', 'Guardia de tarde y noche']] as $s => [$start, $end, $name]) {
-            $this->put('turnos', 'LP_TUR_'.$s, ['nombre' => $name, 'hora_inicio' => $start, 'hora_cierre' => $end, 'orden' => $s + 1, 'estado' => 'ACTIVO']);
+            $datos = ['nombre' => $name, 'hora_inicio' => $start, 'hora_cierre' => $end, 'orden' => $s + 1, 'estado' => 'ACTIVO'];
+            $coincidencias = DB::table('turnos')->where('nombre', $name)->get();
+            if ($coincidencias->isEmpty()) {
+                $this->put('turnos', 'LP_TUR_'.$s, $datos);
+                $this->turnos['LP_TUR_'.$s] = 'LP_TUR_'.$s;
+            } else {
+                $existente = $coincidencias->sole();
+                foreach ($datos as $campo => $valor) {
+                    if ((string) $existente->$campo !== (string) $valor) {
+                        throw new RuntimeException('El turno existente no coincide con la cohorte; no se modifica ni sustituye.');
+                    }
+                }
+                $this->turnos['LP_TUR_'.$s] = $existente->cod_turno;
+            }
         }
         for ($i = 1; $i <= 48; $i++) {
             $this->put('habitaciones', sprintf('LP_HAB_%02d', $i), [
@@ -377,9 +401,24 @@ class HistoriaResidencialSeeder extends Seeder
     private function catalogs(): void
     {
         // Autorización expresa de la propietaria: glucemia y Barthel 10 actividades, sin clasificación nueva.
-        $this->put('tipos_estudio_clinico', 'LP_TEC_GLU', ['nombre' => 'Glucemia de laboratorio', 'categoria' => 'LABORATORIO',
+        $datosTipo = ['nombre' => 'Glucemia de laboratorio', 'categoria' => 'LABORATORIO',
             'descripcion' => 'Determinación de glucosa en sangre; condiciones de obtención consignadas en el informe.',
-            'requiere_componentes' => true, 'requiere_informe' => true, 'estado' => 'ACTIVO']);
+            'requiere_componentes' => true, 'requiere_informe' => true, 'estado' => 'ACTIVO'];
+        $coincidencias = DB::table('tipos_estudio_clinico')->where('nombre', $datosTipo['nombre'])->get();
+        if ($coincidencias->isEmpty()) {
+            $this->put('tipos_estudio_clinico', 'LP_TEC_GLU', $datosTipo);
+        } else {
+            $existente = $coincidencias->sole();
+            foreach (['categoria', 'estado'] as $campo) {
+                if ($datosTipo[$campo] !== $existente->$campo) {
+                    throw new RuntimeException('El tipo de estudio existente no coincide con la cohorte; no se modifica ni sustituye.');
+                }
+            }
+            if (! $existente->requiere_componentes || ! $existente->requiere_informe) {
+                throw new RuntimeException('El tipo de estudio existente no admite los componentes e informes requeridos.');
+            }
+            $this->tipoGlucemia = $existente->cod_tipo_estudio;
+        }
         $this->put('componentes_estudio', 'LP_COM_GLU', ['cod_tipo_estudio' => 'LP_TEC_GLU', 'nombre' => 'Glucosa',
             'unidad_referencia' => 'mg/dL', 'tipo_resultado' => 'NUMERICO', 'orden' => 1, 'estado' => 'ACTIVO']);
         $this->put('instrumentos', 'LP_INS_BARTHEL', ['codigo' => 'BARTHEL_LP_100', 'nombre' => 'Índice de Barthel',
