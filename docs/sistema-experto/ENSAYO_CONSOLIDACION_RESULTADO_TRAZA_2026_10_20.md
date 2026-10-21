@@ -1,7 +1,9 @@
 # Ensayo de consolidación de resultado y traza por criterio
 
+> El máximo posterior de **104** tablas sustituye el límite de 100 citado en este análisis. Un [ensayo físico posterior en SQLite desechable](../../prototipos/orion-consolidacion-104/ensayar-criterio-sqlite.php) comprobó esta unión con historia sintética, FK redirigida, checks, reconstrucción y rollback. Sigue sin autorización de DDL ni prueba PostgreSQL de esta transición.
+
 Fecha: 20/10/2026. Estado: **propuesta técnica parcial; no autoriza DDL**.
-El límite vigente es 100 tablas de negocio; la instalación actual contiene
+El límite vigente al redactar este ensayo era 100 tablas de negocio; la instalación contenía
 104. Este ensayo examina dos de las consolidaciones posibles, sin convertir
 ese ahorro en permiso para añadir otras relaciones.
 

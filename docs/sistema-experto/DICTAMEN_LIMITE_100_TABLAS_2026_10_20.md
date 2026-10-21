@@ -1,5 +1,7 @@
 # O.R.I.O.N.: límite de 100 tablas de negocio
 
+> **Histórico:** la propietaria fijó después un máximo de **104** tablas de negocio. Véase la [decisión vigente y el ensayo físico inicial](DECISION_MAXIMO_104_TABLAS_2026_10_20.md). Los cálculos de reducción a 100 que siguen documentan el análisis anterior; ya no son el límite aplicable ni autorizan DDL.
+
 Fecha: 20/10/2026. Estado: análisis de factibilidad; **no autoriza DDL**.
 
 La propietaria fijó un máximo de 90–100 tablas de negocio y rechazó el
