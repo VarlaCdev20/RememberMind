@@ -28,7 +28,7 @@ function debeRechazarIdentidad(PDO $pdo, string $sql): void
 }
 
 $test = new \Tests\Unit\InstantaneaEvaluacionInstitucionalTest('test_ausencias_no_se_rellenan_durante_el_replay');
-$dto = (new ReflectionMethod($test, 'crear'))->invoke($test);
+$dto = (new ReflectionMethod($test, 'crear'))->invoke($test, ['COG-MEM'], false, false, true);
 $instrumental = $dto->contenido['instrumental']['contenido'];
 $petersen = $dto->contenido['petersen']['contenido'];
 
@@ -59,6 +59,13 @@ foreach ($petersen['valoraciones'] as $valoracion) {
     }
 }
 exigirIdentidad($referenciasPetersen !== [], 'El DTO compuesto ya no comparte aplicaciones originales.');
+foreach ($aplicaciones as $captura) {
+    exigirIdentidad(count($captura['preguntas_declarativas_originales']) === 1,
+        'El DTO compuesto ya no incluye una pregunta sin respuesta por aplicación.');
+    $codPregunta = array_values($captura['preguntas_declarativas_originales'])[0]['cod_pregunta'];
+    exigirIdentidad(! in_array($codPregunta, array_column($captura['respuestas_originales'], 'cod_pregunta'), true),
+        'La pregunta declarativa ya tiene una respuesta.');
+}
 
 $pdo = new PDO('sqlite::memory:', options: [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 $pdo->exec('PRAGMA foreign_keys=ON');
@@ -141,29 +148,34 @@ try {
         $guardarReferencia->execute([$evaluacion,$residente,'PETERSEN',$juicio,$aplicacion]);
     }
 
-    // Preguntas sintéticas sin respuesta asociadas a una aplicación efectivamente compartida.
-    // El DTO de prueba vigente no incluye preguntas originales; aquí se prueba solo identidad B02.
+    // Preguntas sin respuesta del DTO compuesto verificado, no inyectadas tras su emisión.
     $aplicacionComun = $referenciasPetersen[0][1];
     $instrumentoComun = $aplicaciones[$aplicacionComun]['cod_instrumento'];
-    $preguntas = [
-        'ALIAS-Q1' => ['pregunta'=>'Q-1','enunciado'=>null,'tipo_respuesta'=>'TEXTO'],
-        0 => ['pregunta'=>'Q-2','tipo_respuesta'=>'OPCION'],
-    ];
     $guardarOriginal = $pdo->prepare('INSERT INTO originales_pregunta VALUES (?,?)');
     $guardarPregunta = $pdo->prepare('INSERT INTO entradas_perfil_instrumental VALUES (?,?,?,?,?,?,?,?,?,?,?)');
-    foreach ($preguntas as $orden => $pregunta) {
-        $guardarOriginal->execute([$pregunta['pregunta'],$instrumentoComun]);
-        $mascara = (array_key_exists('enunciado',$pregunta) ? 1 : 0)
-            | (array_key_exists('tipo_respuesta',$pregunta) ? 2 : 0)
-            | (array_key_exists('estado',$pregunta) ? 4 : 0);
-        $guardarPregunta->execute([$evaluacion,$aplicacionComun,$instrumentoComun,
-            $orden === 'ALIAS-Q1' ? 0 : 1,is_int($orden) ? 'ENTERO' : 'TEXTO',(string)$orden,
-            $pregunta['pregunta'],$mascara,$pregunta['enunciado'] ?? null,$pregunta['tipo_respuesta'] ?? null,
-            $pregunta['estado'] ?? null]);
+    foreach ($aplicaciones as $aplicacion => $captura) {
+        $orden = 0;
+        foreach ($captura['preguntas_declarativas_originales'] as $clave => $pregunta) {
+            exigirIdentidad(array_diff(array_keys($pregunta),
+                ['cod_pregunta','cod_instrumento','enunciado','tipo_respuesta','estado']) === [],
+                'El fixture incluye metadatos que este ensayo aún no representa.');
+            $guardarOriginal->execute([$pregunta['cod_pregunta'],$pregunta['cod_instrumento']]);
+            $mascara = (array_key_exists('enunciado',$pregunta) ? 1 : 0)
+                | (array_key_exists('tipo_respuesta',$pregunta) ? 2 : 0)
+                | (array_key_exists('estado',$pregunta) ? 4 : 0);
+            $guardarPregunta->execute([$evaluacion,$aplicacion,$captura['cod_instrumento'],$orden,
+                is_int($clave) ? 'ENTERO' : 'TEXTO',(string)$clave,
+                $pregunta['cod_pregunta'],$mascara,$pregunta['enunciado'] ?? null,$pregunta['tipo_respuesta'] ?? null,
+                $pregunta['estado'] ?? null]);
+            $orden++;
+        }
     }
+    $primera = array_values($aplicaciones[$aplicacionComun]['preguntas_declarativas_originales'])[0];
+    $clavePrimera = array_key_first($aplicaciones[$aplicacionComun]['preguntas_declarativas_originales']);
+    $preguntaComun = $primera['cod_pregunta'];
     debeRechazarIdentidad($pdo, "INSERT INTO referencias_rama VALUES ('$evaluacion','OTRO','PETERSEN','AJENO','$aplicacionComun')");
-    debeRechazarIdentidad($pdo, "INSERT INTO entradas_perfil_instrumental VALUES ('$evaluacion','$aplicacionComun','OTRO',9,'TEXTO','AJENA','Q-1',0,NULL,NULL,NULL)");
-    debeRechazarIdentidad($pdo, "INSERT INTO entradas_perfil_instrumental VALUES ('$evaluacion','$aplicacionComun','$instrumentoComun',9,'TEXTO','ALIAS-Q1','Q-1',2,NULL,'TEXTO',NULL)");
+    debeRechazarIdentidad($pdo, "INSERT INTO entradas_perfil_instrumental VALUES ('$evaluacion','$aplicacionComun','OTRO',9,'TEXTO','AJENA','$preguntaComun',0,NULL,NULL,NULL)");
+    debeRechazarIdentidad($pdo, "INSERT INTO entradas_perfil_instrumental VALUES ('$evaluacion','$aplicacionComun','$instrumentoComun',9,'TEXTO','$clavePrimera','$preguntaComun',2,NULL,'TEXTO',NULL)");
     $pdo->prepare('UPDATE evaluaciones SET cerrada=1 WHERE codigo=?')->execute([$evaluacion]);
     $pdo->commit();
 } catch (Throwable $error) {
@@ -173,35 +185,37 @@ try {
     throw $error;
 }
 
-$leer = $pdo->prepare('SELECT q.* FROM entradas_perfil_instrumental q
+$leer = $pdo->prepare('SELECT DISTINCT q.* FROM entradas_perfil_instrumental q
  JOIN referencias_rama r ON r.evaluacion=q.evaluacion AND r.aplicacion=q.aplicacion
  WHERE r.evaluacion=? AND r.rama=? AND r.aplicacion=? ORDER BY q.orden');
-foreach (['INSTRUMENTAL','PETERSEN'] as $rama) {
-    $leer->execute([$evaluacion,$rama,$aplicacionComun]);
-    $recuperadas = [];
-    foreach ($leer->fetchAll(PDO::FETCH_ASSOC) as $fila) {
-        $pregunta = ['pregunta'=>$fila['pregunta']];
-        foreach (['enunciado'=>1,'tipo_respuesta'=>2,'estado'=>4] as $campo=>$bit) {
-            if (((int)$fila['mascara'] & $bit) !== 0) {
-                $pregunta[$campo] = $fila[$campo];
+foreach ($aplicaciones as $aplicacion => $captura) {
+    foreach (['INSTRUMENTAL','PETERSEN'] as $rama) {
+        $leer->execute([$evaluacion,$rama,$aplicacion]);
+        $recuperadas = [];
+        foreach ($leer->fetchAll(PDO::FETCH_ASSOC) as $fila) {
+            $pregunta = ['cod_pregunta'=>$fila['pregunta'],'cod_instrumento'=>$fila['instrumento']];
+            foreach (['enunciado'=>1,'tipo_respuesta'=>2,'estado'=>4] as $campo=>$bit) {
+                if (((int)$fila['mascara'] & $bit) !== 0) {
+                    $pregunta[$campo] = $fila[$campo];
+                }
             }
+            $clave = $fila['tipo_clave']==='ENTERO' ? (int)$fila['clave'] : $fila['clave'];
+            $recuperadas[$clave] = $pregunta;
         }
-        $clave = $fila['tipo_clave']==='ENTERO' ? (int)$fila['clave'] : $fila['clave'];
-        $recuperadas[$clave] = $pregunta;
+        exigirIdentidad(Canonica::ordenar($recuperadas)===Canonica::ordenar($captura['preguntas_declarativas_originales']),
+            'Preguntas distintas en '.$rama.' / '.$aplicacion);
     }
-    exigirIdentidad(Canonica::ordenar($recuperadas)===Canonica::ordenar($preguntas), 'Preguntas distintas en '.$rama);
 }
-exigirIdentidad((int)$pdo->query("SELECT count(*) FROM entradas_perfil_instrumental")->fetchColumn()===2,
+exigirIdentidad((int)$pdo->query("SELECT count(*) FROM entradas_perfil_instrumental")->fetchColumn()===5,
     'Las dos ramas duplicaron las preguntas adquiridas.');
-debeRechazarIdentidad($pdo, "INSERT INTO entradas_perfil_instrumental VALUES ('$evaluacion','$aplicacionComun','$instrumentoComun',10,'TEXTO','TARDE','Q-1',0,NULL,NULL,NULL)");
+debeRechazarIdentidad($pdo, "INSERT INTO entradas_perfil_instrumental VALUES ('$evaluacion','$aplicacionComun','$instrumentoComun',10,'TEXTO','TARDE','$preguntaComun',0,NULL,NULL,NULL)");
 debeRechazarIdentidad($pdo, "INSERT INTO referencias_rama VALUES ('$evaluacion','$residente','PETERSEN','TARDIO','$aplicacionComun')");
-debeRechazarIdentidad($pdo, "UPDATE entradas_perfil_instrumental SET enunciado='ALTERADO' WHERE clave='ALIAS-Q1'");
-debeRechazarIdentidad($pdo, "DELETE FROM entradas_perfil_instrumental WHERE clave='ALIAS-Q1'");
+debeRechazarIdentidad($pdo, "UPDATE entradas_perfil_instrumental SET enunciado='ALTERADO' WHERE clave='$clavePrimera'");
+debeRechazarIdentidad($pdo, "DELETE FROM entradas_perfil_instrumental WHERE clave='$clavePrimera'");
 debeRechazarIdentidad($pdo, "UPDATE aplicaciones_adquiridas SET instrumento='ALTERADO' WHERE aplicacion='$aplicacionComun'");
 debeRechazarIdentidad($pdo, "DELETE FROM referencias_rama WHERE aplicacion='$aplicacionComun'");
 
 echo 'PASS B02 compartido: '.count($aplicaciones).' aplicaciones originales; '.count($referenciasPetersen)
-    .' referencias Petersen; una copia de dos preguntas sin respuesta recuperada por ambas ramas, '
+    .' referencias Petersen; cinco preguntas sin respuesta del DTO válido recuperadas por ambas ramas, '
     .'con NULL/ausencia, tipo de clave, FK, deduplicación y cierre.'.PHP_EOL;
-echo 'LÍMITE: las preguntas añadidas son sintéticas y no forman parte del DTO compuesto verificado; '
-    .'este ensayo no prueba el roundtrip integral de 51 colecciones ni la migración.'.PHP_EOL;
+echo 'LÍMITE: el SQL solo representa B02 del DTO compuesto; no prueba las otras 50 colecciones ni la migración.'.PHP_EOL;

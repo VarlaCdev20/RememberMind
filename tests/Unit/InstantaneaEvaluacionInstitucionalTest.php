@@ -29,7 +29,8 @@ final class InstantaneaEvaluacionInstitucionalTest extends TestCase
 {
     use ConstruyeCasoPetersen;
 
-    private function crear(array $alterados = ['COG-MEM'], bool $sinC03 = false, bool $sinGobierno = false): Compuesta
+    private function crear(array $alterados = ['COG-MEM'], bool $sinC03 = false, bool $sinGobierno = false,
+        bool $conPreguntasSinRespuesta = false): Compuesta
     {
         $c = $this->contexto();
         $v = $this->caso($alterados);
@@ -40,6 +41,18 @@ final class InstantaneaEvaluacionInstitucionalTest extends TestCase
             }
             $s = $valoracion->soportes[0];
             $a = $s->datos['captura_original'] + ['vinculos_preguntas_actuales' => [], 'preguntas_declarativas_originales' => []];
+            if ($conPreguntasSinRespuesta) {
+                $codigoPregunta = 'Q-SIN-RESPUESTA-'.$valoracion->elemento;
+                $clavePregunta = $valoracion->elemento === 'COG-ATE' ? 7 : 'MAP-'.$valoracion->elemento;
+                $pregunta = [
+                    'cod_pregunta' => $codigoPregunta, 'cod_instrumento' => $a['cod_instrumento'],
+                    'tipo_respuesta' => 'TEXTO',
+                ];
+                if ($valoracion->elemento === 'COG-MEM') {
+                    $pregunta['enunciado'] = null;
+                }
+                $a['preguntas_declarativas_originales'] = [$clavePregunta => $pregunta];
+            }
             foreach ($a['respuestas_originales'] as &$r) {
                 $r += ['pregunta_actual' => null, 'opcion_actual' => null];
             }
@@ -98,6 +111,49 @@ final class InstantaneaEvaluacionInstitucionalTest extends TestCase
             self::assertNull($r->contenido['petersen']['contenido']['salida']['patron']);
             self::assertNotEmpty($r->contenido['petersen']['contenido']['salida']['impedimentos']);
         }
+    }
+
+    public function test_preguntas_originales_sin_respuesta_se_conservan_en_ambas_ramas(): void
+    {
+        $dto = $this->crear(conPreguntasSinRespuesta: true);
+        $recuperada = Compuesta::verificar($dto->contenido, $dto->huella);
+        self::assertSame($dto->contenido, $recuperada->contenido);
+        $capturas = $dto->contenido['instrumental']['contenido']['capturas']['capturas'];
+        $porAplicacion = array_column($capturas, null, 'cod_aplicacion');
+        self::assertCount(5, $porAplicacion);
+        foreach ($dto->contenido['petersen']['contenido']['valoraciones'] as $valoracion) {
+            foreach ($valoracion['soportes'] as $soporte) {
+                $original = $soporte['datos_originales']['captura_original'] ?? null;
+                if ($original === null) {
+                    continue;
+                }
+                $captura = $porAplicacion[$original['cod_aplicacion']];
+                self::assertCount(1, $captura['preguntas_declarativas_originales']);
+                self::assertSame($captura['preguntas_declarativas_originales'], $original['preguntas_declarativas_originales']);
+                $pregunta = array_values($original['preguntas_declarativas_originales'])[0];
+                if ($valoracion['elemento'] === 'COG-MEM') {
+                    self::assertArrayHasKey('enunciado', $pregunta);
+                    self::assertNull($pregunta['enunciado']);
+                } else {
+                    self::assertArrayNotHasKey('enunciado', $pregunta);
+                }
+                if ($valoracion['elemento'] === 'COG-ATE') {
+                    self::assertArrayHasKey(7, $original['preguntas_declarativas_originales']);
+                }
+                self::assertNotContains($pregunta['cod_pregunta'], array_column($captura['respuestas_originales'], 'cod_pregunta'));
+            }
+        }
+    }
+
+    public function test_rechaza_pregunta_sin_respuesta_discrepante_entre_ramas(): void
+    {
+        $d = $this->crear(conPreguntasSinRespuesta: true)->contenido;
+        $p = &$d['petersen']['contenido'];
+        $p['valoraciones'][0]['soportes'][0]['datos_originales']['captura_original']
+            ['preguntas_declarativas_originales']['MAP-COG-MEM']['enunciado'] = 'Texto sintético alterado';
+        $d['petersen']['huella'] = Codec::huella(C::ordenar($p));
+        $this->expectException(DomainException::class);
+        Compuesta::verificar($d, Codec::huella(C::ordenar($d)));
     }
 
     public static function corrupciones(): array

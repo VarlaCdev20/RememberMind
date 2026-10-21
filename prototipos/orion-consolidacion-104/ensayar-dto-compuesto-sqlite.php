@@ -17,7 +17,7 @@ function exigir(bool $condicion, string $mensaje): void
 }
 
 $test = new \Tests\Unit\InstantaneaEvaluacionInstitucionalTest('test_ausencias_no_se_rellenan_durante_el_replay');
-$dto = (new ReflectionMethod($test, 'crear'))->invoke($test);
+$dto = (new ReflectionMethod($test, 'crear'))->invoke($test, ['COG-MEM'], false, false, true);
 $instrumental = $dto->contenido['instrumental']['contenido'];
 $petersen = $dto->contenido['petersen']['contenido'];
 $contratos = [
@@ -203,4 +203,4 @@ foreach ([
 echo 'PASS DTO compuesto sintético: '.count($contratos['INSTRUMENTAL']).' contratos instrumentales, '
     .count($contratos['PETERSEN']).' Petersen y '.count($membresias).' juicios con soportes recuperados exactamente;'
     .' ausencia/false, orden, ramas y cierre.'.PHP_EOL;
-echo 'LÍMITE: este ensayo representa B01 y B03 del DTO; B02 no tiene preguntas en la muestra. No prueba la proyección íntegra ni PostgreSQL.'.PHP_EOL;
+echo 'LÍMITE: el DTO contiene preguntas B02, pero este SQL solo representa B01 y B03. No prueba la proyección íntegra ni PostgreSQL.'.PHP_EOL;

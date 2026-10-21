@@ -27,9 +27,8 @@ function rechazarRespuestas(PDO $pdo, string $sql): void
     throw new RuntimeException('Se aceptó una operación inválida.');
 }
 
-$dto = (new ReflectionMethod(new \Tests\Unit\InstantaneaEvaluacionInstitucionalTest(
-    'test_ausencias_no_se_rellenan_durante_el_replay'), 'crear'))->invoke(
-        new \Tests\Unit\InstantaneaEvaluacionInstitucionalTest('test_ausencias_no_se_rellenan_durante_el_replay'));
+$test = new \Tests\Unit\InstantaneaEvaluacionInstitucionalTest('test_ausencias_no_se_rellenan_durante_el_replay');
+$dto = (new ReflectionMethod($test, 'crear'))->invoke($test, ['COG-MEM'], false, false, true);
 $instrumental = $dto->contenido['instrumental']['contenido']['capturas']['capturas'];
 $valoraciones = $dto->contenido['petersen']['contenido']['valoraciones'];
 $capturas = [];
