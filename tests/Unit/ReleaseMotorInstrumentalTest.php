@@ -57,6 +57,27 @@ final class ReleaseMotorInstrumentalTest extends TestCase
         (new ReleaseMotorInstrumental)->verificar($this->archivo, $m['huella']);
     }
 
+    public function test_release_reempaquetado_con_dependencias_distintas_no_coincide_con_el_ejecutor_actual(): void
+    {
+        $manifiesto = $this->crear();
+        $nombre = 'composer.lock';
+        $contenido = '{"paquetes":"alterados para la prueba"}';
+        $manifiesto['archivos'][$nombre] = hash('sha256', $contenido);
+        unset($manifiesto['huella']);
+        $manifiesto['huella'] = CodecInstantanea::huella(CapturaInstrumentalCanonica::ordenar($manifiesto));
+        $zip = new ZipArchive;
+        self::assertTrue($zip->open($this->archivo));
+        self::assertTrue($zip->addFromString($nombre, $contenido));
+        self::assertTrue($zip->addFromString('MANIFIESTO-MOTOR.json', json_encode($manifiesto, JSON_THROW_ON_ERROR)));
+        self::assertTrue($zip->close());
+
+        $release = new ReleaseMotorInstrumental;
+        self::assertSame($manifiesto, $release->verificar($this->archivo, $manifiesto['huella']));
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('mismo ejecutor completo');
+        $release->verificarEjecutorActual($this->archivo, $manifiesto['huella']);
+    }
+
     public function test_no_reemplaza_un_release_existente(): void
     {
         $this->crear();

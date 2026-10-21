@@ -60,12 +60,21 @@ añade al estado de Livewire, una descarga de historia ni un nuevo endpoint.
 
 ## Release y reproducción
 
-La preparación compuesta captura cantidad y huella del conjunto de archivos
-`motor-experto/src`. `vincularRelease()` verifica el ZIP real y exige que su
+La preparación compuesta captura la cantidad de archivos de
+`motor-experto/src` y una huella que incluye ese código, `composer.lock`,
+`motor-experto/composer.json`, las pruebas de independencia y el catálogo
+conceptual incorporado al release. El campo histórico `huella_src` conserva su
+nombre por compatibilidad con el DTO, pero cubre todos esos archivos fijos.
+`vincularRelease()` verifica el ZIP real y exige que su
 conjunto/bytes corresponda tanto al ejecutor actual como a la identidad
 capturada al preparar. Un ZIP internamente íntegro de otro ejecutor no puede
 sustituirlo. La verificación histórica del ZIP mantiene su independencia del
 checkout actual.
+
+La comprobación adicional del 21/10/2026 rechaza también un ZIP cuyo
+`composer.lock` fue sustituido y cuyo manifiesto se volvió a firmar con una
+huella coherente. `ReleaseMotorInstrumentalTest` ejercita ese caso sin modificar
+archivos reales. El guardado relacional compuesto continúa pendiente.
 
 El ZIP contiene software, lock y red conceptual; no contiene DTO clínico,
 configuración local, paquetes SQL ni `.env`. Una prueba sintética extrae el

@@ -12,14 +12,17 @@ use ZipArchive;
 /** Artefacto recuperable de código y red documental; nunca incorpora capturas, historia, configuración local o .env. */
 final class ReleaseMotorInstrumental
 {
+    private const ARCHIVOS_FIJOS = ['motor-experto/composer.json', 'composer.lock', 'motor-experto/tests/independencia.php',
+        'motor-experto/tests/orion_independencia.php',
+        'app/Modulos/ApoyoDecision/Infraestructura/Persistencia/datos/orion-v1-conceptos.json'];
+
     public function crear(string $raiz, string $destino, string $revisionBase): array
     {
         if (! preg_match('/^[a-f0-9]{40}$/D', $revisionBase) || file_exists($destino) || ! is_dir(dirname($destino))) {
             throw new DomainException('Indique revisión Git completa y un archivo nuevo en una carpeta existente.');
         }
         $raiz = realpath($raiz) ?: throw new DomainException('Raíz de código inexistente.');
-        $archivos = ['motor-experto/composer.json', 'composer.lock', 'motor-experto/tests/independencia.php', 'motor-experto/tests/orion_independencia.php',
-            'app/Modulos/ApoyoDecision/Infraestructura/Persistencia/datos/orion-v1-conceptos.json'];
+        $archivos = self::ARCHIVOS_FIJOS;
         $directorio = $raiz.'/motor-experto/src';
         if (! is_dir($directorio)) {
             throw new DomainException('Falta el código del motor.');
@@ -95,16 +98,13 @@ final class ReleaseMotorInstrumental
                 throw new DomainException('Huella o conjunto de archivos del release incompatible.');
             }
             if ($m['contrato'] === 'ARTEFACTO-MOTOR-2') {
-                $fijos = ['motor-experto/composer.json', 'composer.lock', 'motor-experto/tests/independencia.php',
-                    'motor-experto/tests/orion_independencia.php',
-                    'app/Modulos/ApoyoDecision/Infraestructura/Persistencia/datos/orion-v1-conceptos.json'];
-                foreach ($fijos as $nombre) {
+                foreach (self::ARCHIVOS_FIJOS as $nombre) {
                     if (! array_key_exists($nombre, $m['archivos'])) {
                         throw new DomainException('Falta un archivo obligatorio del release.');
                     }
                 }
                 foreach (array_keys($m['archivos']) as $nombre) {
-                    if (! in_array($nombre, $fijos, true)
+                    if (! in_array($nombre, self::ARCHIVOS_FIJOS, true)
                         && ! preg_match('~^motor-experto/src/(?:[A-Za-z0-9_]+/)*[A-Za-z0-9_]+\.php$~D', $nombre)) {
                         throw new DomainException('El release contiene una ruta fuera del contrato de software.');
                     }
@@ -145,10 +145,28 @@ final class ReleaseMotorInstrumental
     {
         $raiz = dirname(__DIR__, 5);
         $actuales = [];
+        foreach (self::ARCHIVOS_FIJOS as $nombre) {
+            $ruta = $raiz.'/'.$nombre;
+            if (! is_file($ruta) || ! is_readable($ruta)) {
+                throw new DomainException('Falta un archivo fijo del ejecutor actual.');
+            }
+            $huella = hash_file('sha256', $ruta);
+            if ($huella === false) {
+                throw new DomainException('Falta un archivo fijo del ejecutor actual.');
+            }
+            $actuales[$nombre] = $huella;
+        }
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($raiz.'/motor-experto/src', \FilesystemIterator::SKIP_DOTS)) as $archivo) {
             if ($archivo->isFile() && $archivo->getExtension() === 'php') {
                 $nombre = str_replace('\\', '/', substr($archivo->getPathname(), strlen($raiz) + 1));
-                $actuales[$nombre] = hash_file('sha256', $archivo->getPathname());
+                if (! $archivo->isReadable()) {
+                    throw new DomainException('No se pudo identificar un archivo del ejecutor actual.');
+                }
+                $huella = hash_file('sha256', $archivo->getPathname());
+                if ($huella === false) {
+                    throw new DomainException('No se pudo identificar un archivo del ejecutor actual.');
+                }
+                $actuales[$nombre] = $huella;
             }
         }
 
@@ -158,7 +176,9 @@ final class ReleaseMotorInstrumental
     public static function identidadEjecutor(array $archivos): array
     {
         $fuentes = array_filter($archivos, static fn ($nombre) => str_starts_with($nombre, 'motor-experto/src/'), ARRAY_FILTER_USE_KEY);
+        $identidad = array_intersect_key($archivos, array_fill_keys(self::ARCHIVOS_FIJOS, true)) + $fuentes;
 
-        return ['cantidad_archivos' => count($fuentes), 'huella_src' => CodecInstantanea::huella(CapturaInstrumentalCanonica::ordenar($fuentes))];
+        // huella_src conserva el nombre del contrato V1; incluye también los archivos fijos del release.
+        return ['cantidad_archivos' => count($fuentes), 'huella_src' => CodecInstantanea::huella(CapturaInstrumentalCanonica::ordenar($identidad))];
     }
 }
