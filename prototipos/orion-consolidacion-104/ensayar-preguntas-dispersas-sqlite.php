@@ -6,6 +6,7 @@ declare(strict_types=1);
 // Usa un DTO sintético vigente de tests; SQLite vive solo en memoria.
 require dirname(__DIR__, 2).'/vendor/autoload.php';
 require dirname(__DIR__, 2).'/tests/Unit/ReproduccionFuenteNominalTest.php';
+require dirname(__DIR__, 2).'/tests/Unit/InstantaneaInstrumentalCompletaTest.php';
 
 use MotorExperto\soporte\conservacion\CapturaInstrumentalCanonica as Canonica;
 
@@ -24,6 +25,14 @@ $ampliadas = $historicas + [
         'tipo_respuesta' => 'TEXTO', 'enunciado' => null],
     0 => ['cod_pregunta' => 'PREG-3', 'cod_instrumento' => 'INSTR-OBS', 'tipo_respuesta' => 'OPCION'],
 ];
+$testV3 = new \Tests\Unit\InstantaneaInstrumentalCompletaTest('test_recalcula_brutos_normalizacion_red_y_cinco_dominios_desde_un_solo_dto');
+$dtoV3 = (new ReflectionMethod($testV3, 'crear'))->invoke($testV3, [
+    'preguntas_declarativas_originales' => ['MAP-Q' => [
+        'cod_pregunta' => 'Q-UNANSWERED', 'cod_instrumento' => 'INSTR-NUMERICO', 'tipo_respuesta' => 'OPCION',
+    ]],
+]);
+$preguntasV3 = $dtoV3->contenido['capturas']['capturas'][1]['preguntas_declarativas_originales'];
+exigirDispersa(count($preguntasV3) === 1, 'La muestra institucional V3 cambió.');
 $campos = ['cod_pregunta','cod_instrumento','codigo','enunciado','dominio',
     'tipo_respuesta','puntaje_maximo','orden','estado'];
 
@@ -73,33 +82,41 @@ CREATE TRIGGER entrada_inmutable BEFORE UPDATE ON entradas_perfil_instrumental
 BEGIN SELECT RAISE(ABORT,'entrada inmutable'); END;
 CREATE TRIGGER entrada_no_borrable BEFORE DELETE ON entradas_perfil_instrumental
 BEGIN SELECT RAISE(ABORT,'entrada inmutable'); END;
-INSERT INTO evaluaciones(codigo) VALUES ('E-SINTETICA');
-INSERT INTO aplicaciones(evaluacion,codigo) VALUES ('E-SINTETICA','APP-AUSENCIA');
+INSERT INTO evaluaciones(codigo) VALUES ('E-SINTETICA'),('E-V3');
+INSERT INTO aplicaciones(evaluacion,codigo) VALUES ('E-SINTETICA','APP-AUSENCIA'),('E-V3','APP-NUMERICA');
 INSERT INTO originales(cod_pregunta,cod_instrumento) VALUES
- ('PREG-AUSENTE','INSTR-OBS'),('PREG-2','INSTR-OBS'),('PREG-3','INSTR-OBS');
+ ('PREG-AUSENTE','INSTR-OBS'),('PREG-2','INSTR-OBS'),('PREG-3','INSTR-OBS'),
+ ('Q-UNANSWERED','INSTR-NUMERICO');
 SQL);
 
 $insertar = $pdo->prepare('INSERT INTO entradas_perfil_instrumental VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
 // La clave del mapa puede diferir del código de pregunta; el orden se conserva aparte.
-$orden = 0;
-foreach ($ampliadas as $clave => $pregunta) {
-    $mascara = 0;
-    foreach ($campos as $bit => $campo) {
-        if (array_key_exists($campo, $pregunta)) {
-            $mascara |= 1 << $bit;
+foreach ([
+    ['E-SINTETICA','APP-AUSENCIA',$ampliadas],
+    ['E-V3','APP-NUMERICA',$preguntasV3],
+] as [$evaluacion,$aplicacion,$preguntas]) {
+    $orden = 0;
+    foreach ($preguntas as $clave => $pregunta) {
+        $mascara = 0;
+        foreach ($campos as $bit => $campo) {
+            if (array_key_exists($campo, $pregunta)) {
+                $mascara |= 1 << $bit;
+            }
         }
+        $insertar->execute([$evaluacion.'-Q-'.$orden,$evaluacion,$aplicacion,'PREGUNTA_DECLARATIVA',
+            is_int($clave) ? 'ENTERO' : 'TEXTO',(string) $clave,$mascara,$orden,$pregunta['cod_pregunta'],$pregunta['cod_instrumento'],
+            $pregunta['codigo'] ?? null,$pregunta['enunciado'] ?? null,$pregunta['dominio'] ?? null,
+            $pregunta['tipo_respuesta'] ?? null,$pregunta['puntaje_maximo'] ?? null,
+            $pregunta['orden'] ?? null,$pregunta['estado'] ?? null]);
+        $orden++;
     }
-    $insertar->execute(['Q-'.$orden,'E-SINTETICA','APP-AUSENCIA','PREGUNTA_DECLARATIVA',
-        is_int($clave) ? 'ENTERO' : 'TEXTO',(string) $clave,$mascara,$orden,$pregunta['cod_pregunta'],$pregunta['cod_instrumento'],
-        $pregunta['codigo'] ?? null,$pregunta['enunciado'] ?? null,$pregunta['dominio'] ?? null,
-        $pregunta['tipo_respuesta'] ?? null,$pregunta['puntaje_maximo'] ?? null,
-        $pregunta['orden'] ?? null,$pregunta['estado'] ?? null]);
-    $orden++;
 }
 
-$leer = static function (PDO $pdo, array $campos): array {
+$leer = static function (PDO $pdo, array $campos, string $evaluacion): array {
     $r = [];
-    foreach ($pdo->query("SELECT * FROM entradas_perfil_instrumental ORDER BY orden_conservacion")->fetchAll(PDO::FETCH_ASSOC) as $fila) {
+    $consulta = $pdo->prepare('SELECT * FROM entradas_perfil_instrumental WHERE evaluacion=? ORDER BY orden_conservacion');
+    $consulta->execute([$evaluacion]);
+    foreach ($consulta->fetchAll(PDO::FETCH_ASSOC) as $fila) {
         $q = [];
         $valores = [$fila['cod_pregunta'],$fila['cod_instrumento'],$fila['codigo_pregunta'],
             $fila['enunciado'],$fila['dominio'],$fila['tipo_respuesta'],$fila['puntaje_maximo'],
@@ -115,19 +132,20 @@ $leer = static function (PDO $pdo, array $campos): array {
 
     return $r;
 };
-exigirDispersa(Canonica::ordenar($leer($pdo,$campos)) === Canonica::ordenar($ampliadas), 'Se perdió una clave, ausencia, NULL o tipo.');
-exigirDispersa(Canonica::ordenar($leer($pdo,$campos)['PREG-AUSENTE']) === Canonica::ordenar($historicas['PREG-AUSENTE']),
+exigirDispersa(Canonica::ordenar($leer($pdo,$campos,'E-SINTETICA')) === Canonica::ordenar($ampliadas), 'Se perdió una clave, ausencia, NULL o tipo.');
+exigirDispersa(Canonica::ordenar($leer($pdo,$campos,'E-V3')) === Canonica::ordenar($preguntasV3), 'La pregunta V3 no se recuperó.');
+exigirDispersa(Canonica::ordenar($leer($pdo,$campos,'E-SINTETICA')['PREG-AUSENTE']) === Canonica::ordenar($historicas['PREG-AUSENTE']),
     'El DTO histórico real no se reconstruyó.');
 exigirDispersa(! array_key_exists('enunciado',$historicas['PREG-AUSENTE'])
     && array_key_exists('enunciado',$ampliadas['ALIAS-Q2']) && $ampliadas['ALIAS-Q2']['enunciado'] === null,
     'La prueba no distingue ausencia y NULL.');
-exigirDispersa(array_key_exists(0,$leer($pdo,$campos)), 'Se perdió la clave entera.');
+exigirDispersa(array_key_exists(0,$leer($pdo,$campos,'E-SINTETICA')), 'Se perdió la clave entera.');
 
 $pdo->exec("UPDATE evaluaciones SET cerrada=1 WHERE codigo='E-SINTETICA'");
 foreach ([
     "INSERT INTO entradas_perfil_instrumental(codigo,evaluacion,cod_aplicacion,tipo_entrada,tipo_clave,clave_mapa,mascara_presencia,orden_conservacion,cod_pregunta,cod_instrumento) VALUES ('Q-TARDE','E-SINTETICA','APP-AUSENCIA','PREGUNTA_DECLARATIVA','TEXTO','TARDE',3,9,'PREG-2','INSTR-OBS')",
-    "UPDATE entradas_perfil_instrumental SET enunciado='CAMBIO' WHERE codigo='Q-0'",
-    "DELETE FROM entradas_perfil_instrumental WHERE codigo='Q-0'",
+    "UPDATE entradas_perfil_instrumental SET enunciado='CAMBIO' WHERE codigo='E-SINTETICA-Q-0'",
+    "DELETE FROM entradas_perfil_instrumental WHERE codigo='E-SINTETICA-Q-0'",
 ] as $sql) {
     try {
         $pdo->exec($sql);
@@ -137,5 +155,5 @@ foreach ([
     }
 }
 
-echo "PASS B02 disperso SQLite: pregunta histórica de tres campos, claves de texto/entera, ausente/NULL y cierre.\n";
+echo "PASS B02 disperso SQLite: preguntas V1/V3 sin respuesta, claves de texto/entera, ausente/NULL y cierre.\n";
 echo "LÍMITE: no demuestra el DTO institucional completo, PostgreSQL ni la migración de 104 tablas.\n";
