@@ -18,6 +18,33 @@ php database/seeders/LaPaz/ejecutar.php --base=RememberMind
 
 Sustituir `RememberMind` por el nombre **exacto** de la conexión local en otra instalación. El comando comprueba esa identidad, exige conexión local y utiliza `pg_dump` de PostgreSQL 18 para crear un respaldo antes de insertar. Deben existir los roles y permisos de la instalación normal. No crea cuentas de reemplazo ni sincroniza permisos existentes.
 
+En esta instalación la base es `remembermind_dev`. La comparación de huellas
+de una base poblada puede superar los 128 MB de PHP; se permite ampliar la
+memoria únicamente para el proceso de carga, sin cambiar `php.ini`:
+
+```powershell
+php -d memory_limit=1024M database/seeders/LaPaz/ejecutar.php --base=remembermind_dev
+```
+
+Si ya existen los dos turnos por su nombre exacto, se reutilizan únicamente
+cuando horario, orden y estado coinciden. El tipo de estudio «Glucemia de
+laboratorio» se reutiliza por nombre exacto, categoría, estado y requisitos de
+componentes/informe; su descripción se conserva. Se mantienen sus PK reales
+en las nuevas referencias. Una incompatibilidad revierte la carga; no se
+renombra ni actualiza el catálogo existente para forzarla.
+
+Los contadores técnicos `secuencias_codigos` sí deben avanzar al admitir
+residentes mediante la Action institucional. El control de conservación
+comprueba separadamente que no desaparezcan ni retrocedan y que cada avance
+de las entidades permitidas corresponda a códigos nuevos realmente insertados.
+No se exceptúan las filas clínicas, administrativas, de permisos o de conocimiento
+de la comparación estricta de sus huellas.
+
+La [instalación en `remembermind_dev` del 21/10/2026](../../../docs/sistema/CARGA_LA_PAZ_LOCAL_2026_10_21.md)
+documenta la integración, adaptación de catálogos existentes, respaldo y
+verificación de esta base. La evidencia de `VERIFICACION.md` corresponde a
+la instalación original de la rama `SEEDERS`.
+
 Para revisar una cohorte ya cargada:
 
 ```powershell

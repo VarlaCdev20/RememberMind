@@ -2,16 +2,23 @@
 
 namespace Database\Seeders\LaPaz;
 
+use App\Compartido\Infraestructura\Persistencia\CatalogoCodigos;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 /** Huellas efímeras: nunca guarda el contenido ni las identidades de la instalación en Git. */
 final class ConservacionDatos
 {
+    private const GENERADAS = ['residentes', 'admisiones', 'residentes_contactos', 'ocupaciones_cama',
+        'historial_estados_residente', 'consentimientos', 'seguros_residente', 'medicamentos'];
+
     private array $originales = [];
+
+    private array $secuencias = [];
 
     public function capturar(): array
     {
+        $this->secuencias = DB::table('secuencias_codigos')->pluck('ultimo_valor', 'entidad')->all();
         $conteos = [];
         foreach (DB::getSchemaBuilder()->getTables() as $tabla) {
             $nombre = $tabla['name'];
@@ -45,6 +52,11 @@ final class ConservacionDatos
     {
         $conservadas = 0;
         foreach ($this->originales as $tabla => $filas) {
+            if ($tabla === 'secuencias_codigos') {
+                $this->comprobarSecuencias();
+
+                continue;
+            }
             foreach (array_chunk($filas, 150) as $grupo) {
                 $actuales = DB::table($tabla)->where(function ($q) use ($grupo) {
                     foreach ($grupo as $fila) {
@@ -66,6 +78,34 @@ final class ConservacionDatos
         }
 
         return $conservadas;
+    }
+
+    /** El contador técnico puede avanzar solo por códigos nuevos existentes; nunca retroceder. */
+    private function comprobarSecuencias(): void
+    {
+        $actuales = DB::table('secuencias_codigos')->pluck('ultimo_valor', 'entidad')->all();
+        if (array_diff_key($this->secuencias, $actuales)) {
+            throw new RuntimeException('Una secuencia preexistente desapareció.');
+        }
+        foreach ($actuales as $entidad => $valor) {
+            $antes = (int) ($this->secuencias[$entidad] ?? 0);
+            $despues = (int) $valor;
+            if ($despues === $antes && array_key_exists($entidad, $this->secuencias)) {
+                continue;
+            }
+            if (! in_array($entidad, self::GENERADAS, true) || $despues <= $antes) {
+                throw new RuntimeException('Cambio no permitido en una secuencia de códigos.');
+            }
+            [$pk] = CatalogoCodigos::ENTIDADES[$entidad];
+            $previas = array_fill_keys(array_column(array_column($this->originales[$entidad] ?? [], 'clave'), $pk), true);
+            for ($inicio = $antes + 1; $inicio <= $despues; $inicio += 150) {
+                $codigos = array_map(fn ($n) => CatalogoCodigos::formatear($entidad, $n), range($inicio, min($inicio + 149, $despues)));
+                if (array_intersect_key($previas, array_fill_keys($codigos, true))
+                    || DB::table($entidad)->whereIn($pk, $codigos)->count() !== count($codigos)) {
+                    throw new RuntimeException('Avance de secuencia sin registros nuevos que lo justifiquen.');
+                }
+            }
+        }
     }
 
     private static function huella(array $fila): string
