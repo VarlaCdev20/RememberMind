@@ -27,11 +27,14 @@ reversión poblada en SQLite y PostgreSQL desechables. El [precedente aprobado
 de cuatro consolidaciones](../base-de-datos/DECISION_REDUCCION_EXPERTA_2026_10_20.md)
 no autoriza ninguna de estas cinco nuevas.
 
-Las dos primeras cuentan ya con un [ensayo de proyección y reconstrucción
-de solo lectura](ENSAYO_CONSOLIDACION_RESULTADO_TRAZA_2026_10_20.md): 148
-criterios, 147 resultados y 18 trazas coinciden exactamente con sus filas
-originales. Su diccionario de ocho columnas y FK entrante es **candidato**;
-faltan transición, restricciones, concurrencia, reversión y aprobación.
+Las cinco cuentan ya con un [ensayo de proyección y reconstrucción de solo
+lectura](ENSAYO_CONSOLIDACION_RESULTADO_TRAZA_2026_10_20.md): coinciden todas
+las columnas de 148 criterios, 147 resultados, 18 trazas, 205 nodos, 87
+variables, 44 criterios de resultado, seis evaluaciones y cinco
+clasificaciones. Para las dos primeras existe un diccionario candidato de
+ocho columnas y una FK entrante. Para las otras tres falta incluso ese
+diccionario. Ninguna cuenta con transición, restricciones, concurrencia,
+reversión y aprobación verificadas.
 
 El conteo agregado local de esta lectura, sin consultar contenido clínico,
 fue: 148 filas en `evaluacion_criterios`, 147 en `resultados_criterio` y

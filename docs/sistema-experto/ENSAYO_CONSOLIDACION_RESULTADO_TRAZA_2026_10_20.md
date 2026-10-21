@@ -14,7 +14,7 @@ ausencia, nunca una fila inventada con valores NULL. Las fechas de resultado,
 traza y criterio son distintas y deben permanecer distintas.
 
 El ensayo de solo lectura
-[`ensayar-criterios.php`](../../prototipos/orion-reduccion-100/ensayar-criterios.php)
+[`ensayar-uno-a-uno.php`](../../prototipos/orion-reduccion-100/ensayar-uno-a-uno.php)
 proyecta ambas hijas a columnas nominales en memoria y reconstruye las tres
 relaciones, con comparación estricta de todas las columnas actuales. La base
 local de desarrollo produjo **PASS: 148 criterios, 147 resultados y 18 trazas**.
@@ -24,6 +24,12 @@ base que no sea la de desarrollo o una prueba desechable y no ejecuta SQL de
 escritura. El control negativo con `APP_ENV=production` terminó con código 1
 antes de leer filas. Es evidencia de representación de filas existentes, **no** prueba
 una migración ni futuros estados.
+
+El mismo ensayo también reconstruyó los otros tres candidatos 0..1 del
+[dictamen de 100 tablas](DICTAMEN_LIMITE_100_TABLAS_2026_10_20.md): **205 nodos,
+87 variables, 44 criterios de resultado, seis evaluaciones y cinco
+clasificaciones DCL**. Esa coincidencia de filas no demuestra que sus
+identidades, FK entrantes y gobierno puedan trasladarse sin pérdida.
 
 ## Diccionario mínimo candidato
 
