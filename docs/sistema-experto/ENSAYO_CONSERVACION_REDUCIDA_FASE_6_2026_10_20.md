@@ -4,13 +4,18 @@ Fecha: 20/10/2026. Estado: **candidato técnico sin aprobación estructural ni
 prueba de round-trip de las quince relaciones propuestas**. El inventario instalado permanece en 104 tablas de
 negocio. No se ha creado ninguna de las relaciones de este ensayo.
 
-**Decisión posterior de la propietaria (20/10/2026):** «no podemos pasar de las
-90–100 tablas». El límite de diseño es **100 tablas de negocio**. Por tanto,
-el candidato de quince relaciones, que llevaría el total a 119, queda
-**rechazado** y no se convierte en migración. El inventario físico actual ya
-es 104; reducirlo exige otro diccionario, prueba de conservación exacta y
-aprobación de cambios a la BDD congelada. La prueba aislada siguiente sólo
-sirve para estudiar el contrato de datos; no cambia esta decisión.
+**Decisión vigente de la propietaria (20/10/2026):** el máximo es
+**104 tablas de negocio**, conforme a
+[DECISION_MAXIMO_104_TABLAS_2026_10_20.md](DECISION_MAXIMO_104_TABLAS_2026_10_20.md).
+Sustituye el límite previo de 90–100. El candidato de quince relaciones
+llevaría el total a 119, por lo que sigue **rechazado** y no se convierte en
+migración. El inventario físico actual ya es 104; cualquier alternativa exige
+consolidaciones verificadas, diccionario exacto y aprobación estructural
+específica. La prueba aislada siguiente solo estudia el contrato de datos.
+El [cotejo posterior de factibilidad](DICTAMEN_FACTIBILIDAD_CONSERVACION_104_2026_10_21.md)
+aclara además que esta lista de quince granos no resuelve todavía las
+preguntas declarativas sin respuesta, los contratos adquiridos ni todas las
+membresías Petersen. No constituye un esquema completo pendiente solo de cupo.
 
 ### Ensayo aislado de representación, 20/10/2026
 
