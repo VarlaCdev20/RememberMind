@@ -15,6 +15,12 @@ related_modules: []
 
 # Changelog documental
 
+## 2026-10-20 — Historiales con Superadministrador
+
+- [Análisis de acceso y conexiones](sistema/HISTORIALES_SUPERADMINISTRADOR_2026_10_20.md): 73 fichas abiertas, inventario privado por residente y límites de las proyecciones clínicas.
+- Correcciones de fechas documentales V2 y observación institucional; pruebas dirigidas SQLite/PostgreSQL y build ejecutados. La completitud del visor longitudinal conserva hallazgos pendientes.
+- Información individual conservada en almacenamiento privado, excluida del repositorio; sin modificación de historias, cuentas, permisos ni resultados expertos.
+
 ## 2026-10-11 — Desacoplamiento posterior a la preparación
 
 - [Informe por etapas](arquitectura/DESACOPLAMIENTO_2026_10_11.md): contexto autenticado, sesión de previsualización, archivos, correo, PDF, enlaces y adaptadores expertos detrás de contratos.
