@@ -94,10 +94,12 @@ final class ConservacionB02PostgresTest extends TestCase
                   CHECK(enunciado_presente OR enunciado IS NULL)
                 ) ON COMMIT DROP;
                 CREATE FUNCTION pg_temp.orion_b02_cierre() RETURNS trigger LANGUAGE plpgsql AS $$
+                DECLARE estado boolean;
                 BEGIN
                   IF TG_OP <> 'INSERT' THEN RAISE EXCEPTION 'historia inmutable'; END IF;
-                  IF EXISTS(SELECT 1 FROM orion_b02_evaluaciones
-                    WHERE codigo=NEW.evaluacion AND cerrada) THEN
+                  SELECT cerrada INTO estado FROM orion_b02_evaluaciones
+                    WHERE codigo=NEW.evaluacion FOR UPDATE;
+                  IF estado THEN
                     RAISE EXCEPTION 'evaluacion cerrada';
                   END IF;
                   RETURN NEW;
