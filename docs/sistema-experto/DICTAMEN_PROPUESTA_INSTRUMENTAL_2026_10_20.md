@@ -36,10 +36,10 @@ La información oficial actual de MoCA sobre certificación para el puntaje tota
 
 ## Información y decisiones aún necesarias
 
-- Confirmación institucional del instrumento que se aplicará realmente, forma/edición/idioma y material oficial disponible. La propuesta de MoCA Full 8.1 y Mini-Cog todavía no acredita una aplicación a residente alguno.
+- Confirmación institucional del instrumento aplicado o que se aplicará, forma/edición/idioma y material oficial disponible. La propuesta de MoCA Full 8.1 y Mini-Cog no individualiza aplicaciones de esos instrumentos; esto no niega las aplicaciones observacionales y funcionales reales ya registradas en RememberMind.
 - Derecho concreto para el uso previsto en RememberMind y, si se pretende interpretación de tareas MoCA, capacitación/certificación de quien la realice. No basta el permiso de aplicación en papel para replicar reactivos en software.
 - Adopción de responsabilidades profesionales y de los formularios propuestos; los permisos actuales no se amplían por este documento.
-- Mediciones originales futuras por tarea, condiciones e informantes. La investigación puede aportar métodos y límites, pero no generar respuestas, tiempos o autores de un paciente.
+- Mediciones originales identificables por tarea, condiciones e informantes, existentes en papel si las hubiera o registradas en aplicaciones futuras. La investigación puede aportar métodos y límites, pero no generar respuestas, tiempos o autores de un paciente.
 - Mapeos y perfiles interpretativos fundamentados para cada subcomponente que se quiera activar. Mini-Cog por sí solo no cubre la matriz de 19.
 
 No se han creado catálogos, tablas, permisos, reglas clínicas, perfiles activos ni datos de residentes a partir de esta propuesta.
