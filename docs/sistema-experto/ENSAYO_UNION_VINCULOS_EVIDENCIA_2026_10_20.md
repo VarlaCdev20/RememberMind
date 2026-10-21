@@ -1,5 +1,7 @@
 # Ensayo de unión tipada de vínculos de evidencia
 
+> El máximo vigente posterior es **104** tablas de negocio. Un [ensayo físico en SQLite desechable](../../prototipos/orion-consolidacion-104/ensayar-vinculos-sqlite.php) añadió evidencia sintética de transición, reconstrucción, FK/checks y rollback. No acredita migración poblada PostgreSQL ni autoriza alterar la BDD.
+
 Fecha: 20/10/2026. Estado: **candidato de solo lectura; no aprobado para DDL**.
 
 ## Grano y motivo

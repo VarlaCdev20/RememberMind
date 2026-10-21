@@ -29,7 +29,18 @@ php prototipos/orion-consolidacion-104/ensayar-criterio-sqlite.php
 PASS SQLite desechable: rollback, 4 criterios, 2 resultados, 2 trazas, 2 reglas, reconstrucción exacta y FK/checks.
 ```
 
-Este ensayo aporta evidencia para **dos consolidaciones candidatas**, no para un cambio de inventario instalado. No acredita PostgreSQL, datos históricos poblados de la instalación, concurrencia, 4FN independiente, reversión operativa ni el escritor/lector compuesto. Las otras dos consolidaciones mínimas de un diseño de cuatro tablas tampoco tienen transición física probada. No se ha pedido autorización de DDL para una propuesta aún incompleta.
+Este ensayo aporta evidencia para **dos consolidaciones candidatas**, no para un cambio de inventario instalado. No acredita PostgreSQL, datos históricos poblados de la instalación, concurrencia, 4FN independiente, reversión operativa ni el escritor/lector compuesto. Las demás consolidaciones y el diseño completo tampoco tienen transición física probada. No se ha pedido autorización de DDL para una propuesta aún incompleta.
+
+El segundo [ensayo físico desechable de vínculos](../../prototipos/orion-consolidacion-104/ensayar-vinculos-sqlite.php) conserva cada participación y cada soporte de condición como **fila independiente** en dos variantes cerradas de `evidencias_criterio_evaluacion`. Retiene el código histórico del soporte como alias único; asigna una PK nueva de 20 caracteres, preserva FK originales y rechaza destinos mixtos, alias duplicado o condición inexistente. Dos participaciones y dos soportes sintéticos reconstruyeron exactamente las tablas de origen, incluido un mismo origen que soporta dos condiciones. Probó rollback antes de retirar la fuente. El ensayo de solo lectura sobre la base local actual confirmó 225 participaciones y 150 soportes, sin escribirlas. Comandos:
+
+```text
+php prototipos/orion-consolidacion-104/ensayar-vinculos-sqlite.php
+PASS SQLite desechable: rollback, 2 participaciones, 2 soportes independientes, reconstrucción exacta y FK/checks.
+php prototipos/orion-reduccion-100/ensayar-vinculos-evidencia.php
+PASS participaciones=225, soportes=150, filas_union_tipadas=375
+```
+
+También esta **tercera consolidación candidata** requiere prueba física PostgreSQL, transición poblada, concurrencia, reversión y 4FN independiente; no está instalada ni autorizada. Tres posibilidades demostradas con sintéticos no equivalen a las cuatro consolidaciones mínimas de un candidato de cuatro tablas, cuyo propio mapa conserva B01–B03 sin resolver.
 
 ## Próxima prueba exigida antes de pedir DDL
 
