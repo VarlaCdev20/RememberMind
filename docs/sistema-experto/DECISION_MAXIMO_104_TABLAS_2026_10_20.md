@@ -42,6 +42,10 @@ PASS participaciones=225, soportes=150, filas_union_tipadas=375
 
 También esta **tercera consolidación candidata** requiere prueba física PostgreSQL, transición poblada, concurrencia, reversión y 4FN independiente; no está instalada ni autorizada. Tres posibilidades demostradas con sintéticos no equivalen a las cuatro consolidaciones mínimas de un candidato de cuatro tablas, cuyo propio mapa conserva B01–B03 sin resolver.
 
+Un [tercer script SQLite desechable](../../prototipos/orion-consolidacion-104/ensayar-clasificacion-sqlite.php) ensaya la **cuarta consolidación candidata**: una clasificación DCL 0..1 se representa como bloque opcional de `evaluaciones_expertas`, con código histórico único y la FK de motivos y reglas aplicada al alias. Reconstruyó tres evaluaciones, dos clasificaciones —una con patrón NULL— y sus dos colecciones hijas, además de probar rollback, checks y FK negativas. Resultado: `PASS SQLite desechable: rollback, 3 evaluaciones, 2 clasificaciones, motivos/reglas, reconstrucción exacta y FK/checks.` Quedan sin probar todas las demás FK entrantes, historia poblada, PostgreSQL, concurrencia, reversión operativa y 4FN independiente.
+
+Con **cuatro consolidaciones candidatas** y cuatro relaciones nuevas, la aritmética sería `104 − 4 + 4 = 104`. Es solo una cuenta: el mapa de cuatro relaciones aún pierde B01–B03, por lo que **no existe todavía un diccionario instalable de conservación completa**. Ninguna de estas consolidaciones se ejecutó en el esquema institucional.
+
 ## Próxima prueba exigida antes de pedir DDL
 
 1. Resolver B01–B03 con relaciones tipadas y nominales, reutilizando una tabla solo si conserva exactamente su grano. Publicar diccionario de columnas, PK/FK, índices, checks, cierre de colecciones y la lista de tablas que se consolidarían para no superar 104.
