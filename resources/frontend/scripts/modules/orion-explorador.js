@@ -69,6 +69,41 @@ export function exploradorGrafo(datos) {
     };
 }
 
+/** Interacción del conocimiento: reutiliza el visor histórico, sin compartir contratos clínicos. */
+export function knowledgeGraph(datos, seleccionado = null) {
+    return {
+        ...exploradorGrafo(datos), seleccionado, arrastreNodo: null,
+        get vecinos() {
+            const ids = new Set(this.aristas.filter(a => this.vinculada(a)).flatMap(a => [a.origen, a.destino]));
+            return ids;
+        },
+        get numeroConexiones() { return this.aristas.filter(a => this.vinculada(a)).length; },
+        esVecino(id) { return !this.seleccionado || id === this.seleccionado || this.vecinos.has(id); },
+        iniciarNodo(evento, id) {
+            if (evento.button !== 0) return;
+            const nodo = this.punto(id);
+            if (!nodo) return;
+            this.arrastreNodo = { id, x: evento.clientX, y: evento.clientY, nx: nodo.x, ny: nodo.y };
+            evento.currentTarget?.setPointerCapture(evento.pointerId);
+        },
+        mover(evento) {
+            if (this.arrastreNodo) {
+                const n = this.punto(this.arrastreNodo.id);
+                n.x = this.arrastreNodo.nx + (evento.clientX - this.arrastreNodo.x) / this.escala;
+                n.y = this.arrastreNodo.ny + (evento.clientY - this.arrastreNodo.y) / this.escala;
+            } else if (this.arrastre) {
+                this.dx = evento.clientX - this.arrastre.x;
+                this.dy = evento.clientY - this.arrastre.y;
+            }
+        },
+        terminar() { this.arrastre = this.arrastreNodo = null; },
+        etiqueta(a) {
+            const o = this.punto(a.origen), d = this.punto(a.destino);
+            return o && d ? { x: (o.x + d.x) / 2 + 95, y: (o.y + d.y) / 2 + 36 } : { x: 0, y: 0 };
+        },
+    };
+}
+
 export function graficaCobertura(datos, clave) {
     return {
         datos, clave,
@@ -88,6 +123,7 @@ export function graficaCobertura(datos, clave) {
 
 if (typeof window !== 'undefined') {
     window.rmOrionGraph = exploradorGrafo;
+    window.rmExpertKnowledgeGraph = knowledgeGraph;
     window.rmOrionCoverage = graficaCobertura;
     window.rmCognitiveTimeline = cognitiveTimeline;
 }

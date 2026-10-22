@@ -1,5 +1,10 @@
 @if($datos && $informe)
-    @php($narrativa = $informe['narrativa'])
+@php($narrativa = $informe['narrativa'])
+@unless($enfermeria)
+    <x-ui.modal-livewire wire:model="detalleAreaAbierto" :title="'Detalle de '.$informe['actual']['nombre']" :subtitle="$residente->nombre_completo" maxWidth="lg" surface="reading" closeMethod="cerrarDetalleArea" :showValidation="false">
+        <div class="space-y-4"><p class="rm-orion-state">{{ $informe['actual']['estado'] }}</p><p>{{ $informe['actual']['conclusion'] }}</p><p>{{ $informe['actual']['significado'] }}</p><ul class="list-disc pl-5">@foreach($informe['actual']['limites'] as $limite)<li>{{ $limite }}</li>@endforeach</ul><button type="button" class="rm-btn rm-btn-secondary" wire:click="abrirConsulta('registro')">Consultar registros del área</button></div>
+    </x-ui.modal-livewire>
+@endunless
     <x-ui.modal-livewire wire:model="significadoAbierto" title="¿Qué significa este resultado?" :subtitle="$residente->nombre_completo.' · '.$informe['actual']['nombre']" maxWidth="md" surface="reading" class="rm-orion-significado" closeMethod="cerrarSignificado" :showValidation="false">
         <x-slot:icon><span class="rm-orion-area-icon"><i class="ph ph-book-open" aria-hidden="true"></i></span></x-slot:icon>
         <div class="rm-orion-reading">

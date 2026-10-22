@@ -98,7 +98,7 @@ class InformeCognitivoTest extends TestCase
         $this->assertSame('Sin evaluación disponible', $informe['areas']['COG-ATE']['estado']);
         $componente = Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
             ->assertSee('Evaluación cognitiva y funcional')->assertSee('Ver evidencias')->assertSee('Ver historial')->assertSee('Resultado principal')->assertSee('Valoración de las funciones cognitivas')
-            ->assertSee('Cobertura de las cinco áreas cognitivas')
+            ->assertSee('Disponibilidad por dominio')->assertSee('Áreas cognitivas')
             ->assertSee('Cómo llega la información a la evaluación')
             ->assertSee('Hechos observados')
             ->assertSee('0 aplicaciones registradas')

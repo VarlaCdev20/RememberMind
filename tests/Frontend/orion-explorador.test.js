@@ -1,6 +1,25 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { distribuirGrafo, exploradorGrafo, graficaCobertura, cognitiveTimeline } from '../../resources/frontend/scripts/modules/orion-explorador.js';
+import { distribuirGrafo, exploradorGrafo, graficaCobertura, cognitiveTimeline, knowledgeGraph } from '../../resources/frontend/scripts/modules/orion-explorador.js';
+
+test('grafo de conocimiento arrastra posiciones sin modificar relaciones ni datos originales', () => {
+    const datos = { nodos: [{ id: 'a', columna: 0 }, { id: 'b', columna: 1 }], aristas: [{ origen: 'a', destino: 'b', relacion: 'DECLARA' }] };
+    const original = structuredClone(datos);
+    const g = knowledgeGraph(datos);
+    g.$refs = { area: { querySelector: () => ({ setPointerCapture() {} }) } };
+    g.iniciarNodo({ button: 0, clientX: 10, clientY: 20, pointerId: 1 }, 'a');
+    const x = g.punto('a').x;
+    g.mover({ clientX: 40, clientY: 20 });
+    assert.equal(g.punto('a').x, x + 30);
+    assert.ok(Number.isFinite(g.etiqueta(datos.aristas[0]).x));
+    g.seleccionar('a');
+    assert.equal(g.numeroConexiones, 1);
+    assert.equal(g.esVecino('b'), true);
+    assert.equal(g.esVecino('ajeno'), false);
+    g.terminar();
+    assert.equal(g.arrastreNodo, null);
+    assert.deepEqual(datos, original);
+});
 
 test('distribución estable sin añadir nodos ni inferir conexiones', () => {
     const datos = { nodos: [{ id: 'a', columna: 0 }, { id: 'b', columna: 3 }], aristas: [{ origen: 'a', destino: 'b', relacion: 'soporte' }] };

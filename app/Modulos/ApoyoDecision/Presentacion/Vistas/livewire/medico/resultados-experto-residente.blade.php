@@ -1,4 +1,4 @@
-<div class="rm-expert-results text-rm-primary {{ $psicologia ? 'rm-expert-results--psychology' : '' }}" x-data="{ consultaVisible: @entangle('consultaAbierta') }" :class="{ 'has-consulta': consultaVisible && !@js($enfermeria) }"
+<div class="rm-expert-results text-rm-primary {{ $psicologia ? 'rm-expert-results--psychology' : ($enfermeria ? 'rm-expert-results--nursing' : 'rm-expert-results--medicine') }}" x-data="{ consultaVisible: @entangle('consultaAbierta') }" :class="{ 'has-consulta': consultaVisible && !@js($enfermeria) }"
     x-on:orion-navigate.window="$nextTick(() => { const section = document.getElementById($event.detail.seccion); if (section) { if (section.tagName === 'DETAILS') section.open = true; let parent = section.parentElement?.closest('details'); while (parent) { parent.open = true; parent = parent.parentElement?.closest('details'); } section.scrollIntoView({ block: 'start' }); section.querySelector('summary, h2')?.focus({ preventScroll: true }); } })"
     x-on:expert-trace-opened.window="$nextTick(() => document.getElementById('drawer-trazabilidadabierta-title')?.focus())"
     x-on:expert-trace-closed.window="$nextTick(() => $refs.traceTrigger?.focus())">
@@ -18,7 +18,7 @@
         <span aria-current="page">{{ $residente->nombre_completo }}</span>
     </nav>
     <header class="rm-expert-heading rm-expert-page-heading">
-        <div class="min-w-0"><h1>Evaluación cognitiva y funcional</h1><p class="rm-expert-subtitle">Resultados y evidencias disponibles</p></div>
+        <div class="min-w-0"><p class="rm-expert-eyebrow">Sistema experto · Consulta del residente</p><h1>Evaluación cognitiva y funcional</h1><p class="rm-expert-subtitle">Resultados y evidencias disponibles</p></div>
         <div class="rm-expert-heading-actions">
             @if($psicologia)
                 <button type="button" wire:click="irASeccion('fuentes-disponibles')" wire:loading.attr="disabled" class="rm-btn rm-btn-primary"><i class="ph ph-folder-open" aria-hidden="true"></i>Ver registros y evidencias</button>
@@ -43,13 +43,19 @@
     </header>
     <p wire:loading role="status" class="text-sm">Consultando la valoración y sus fuentes…</p>
 
+    <nav class="rm-expert-reading-nav" aria-label="Secciones de la consulta cognitiva">
+        @if(auth()->user()->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A']))<a class="rm-btn rm-btn-secondary" href="{{ route('admin.sistema-experto.residentes') }}"><i class="ph ph-users-three" aria-hidden="true"></i>Residentes</a>@endif
+        <button type="button" wire:click="abrirDetalleArea" class="rm-btn rm-btn-secondary">Área seleccionada</button>
+        @if($datos && $informe)<button type="button" wire:click="abrirConsulta('registro')" class="rm-btn rm-btn-secondary">Evidencias y fuentes</button>@endif
+        @if($datos['evaluacion'] ?? null)<button type="button" wire:click="irASeccion('orion-evolucion')" class="rm-btn rm-btn-secondary">Historial conservado</button>@endif
+    </nav>
     <div class="rm-orion-workspace mt-3">
         {{-- Columna Principal: Informe Cognitivo --}}
         <div class="space-y-4 min-w-0">
             @unless($psicologia && isset($perfilInstrumental['petersen_institucional']))
             <section class="rm-card rm-expert-context" aria-label="Contexto del residente">
                 <div class="rm-expert-context-grid">
-                    <div class="rm-expert-person min-w-0"><span class="rm-expert-avatar" aria-hidden="true">@if($residente->foto)<img src="{{ \Illuminate\Support\Facades\Storage::url($residente->foto) }}" alt="" loading="lazy" decoding="async">@else<i class="ph ph-user" aria-hidden="true"></i>@endif</span><div class="min-w-0"><h2 class="rm-expert-resident-name">{{ $residente->nombre_completo }}</h2><p class="text-sm">{{ $residente->edad !== null ? $residente->edad.' años' : 'Edad no disponible' }}</p></div></div>
+                    <div class="rm-expert-person min-w-0"><span class="rm-expert-avatar" aria-hidden="true">@if($residente->foto)<img src="{{ \Illuminate\Support\Facades\Storage::url($residente->foto) }}" alt="" loading="lazy" decoding="async">@else<i class="ph ph-user" aria-hidden="true"></i>@endif</span><div class="min-w-0"><h2 class="rm-expert-resident-name">{{ $residente->nombre_completo }}</h2><p class="text-sm">{{ $residente->edad !== null ? $residente->edad.' años' : 'Edad no disponible' }} · {{ $residente->ubicacion_formateada }}</p><small>{{ $residente->cod_residente }}</small></div></div>
                     @if($datos['evaluacion'] ?? null)
                         <dl><dt>Fecha de la evaluación histórica</dt><dd>{{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($datos['evaluacion']['fecha']) }}</dd></dl>
                         <dl><dt>Profesional solicitante</dt><dd>{{ $datos['evaluacion']['solicitante'] ?? 'No disponible' }}</dd></dl>
@@ -63,9 +69,13 @@
             </section>
             @endunless
 
+            @if($datos && $informe && ! $psicologia)
+                @if(! ($datos['evaluacion'] ?? null))<aside class="rm-expert-disclosure" role="note"><i class="ph ph-info" aria-hidden="true"></i><div><strong>Disponibilidad de conocimiento</strong><p>No hay una evaluación histórica publicable en esta consulta. Los controles y registros disponibles conservan su propio alcance.</p></div></aside>@endif
+                @include('apoyodecision::livewire.medico.resultados-experto.dominios')
+            @endif
             @if(isset($perfilInstrumental['petersen_institucional']))
                 @include('apoyodecision::livewire.medico.resultados-experto.petersen-institucional')
-            @elseif($informe)
+            @elseif($informe && $psicologia)
                 @php($areasGrafico = collect($informe['areas'])->map(fn ($area) => ['nombre' => $area['nombre'], 'estado' => $area['estado'], 'grupo' => $area['evaluada'] ? 'disponible' : 'sin_resultado'])->values()->all())
                 @include('apoyodecision::livewire.medico.resultados-experto.grafico-areas', [
                     'graficoId' => 'medicina-cobertura-dominios',

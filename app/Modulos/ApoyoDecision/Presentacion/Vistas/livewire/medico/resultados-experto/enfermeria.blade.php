@@ -20,70 +20,15 @@
         <dl class="rm-cognitive-meta"><div><dt>Fecha de evaluación</dt><dd>{{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($datos['evaluacion']['fecha'] ?? null, 'Sin evaluación disponible') }}</dd></div><div><dt>Tipo de consulta</dt><dd>{{ $simulacion ? 'Demostración técnica' : 'Resultados disponibles del expediente' }}</dd></div><div><dt>Acceso</dt><dd>Lectura de Enfermería</dd></div></dl>
     </section>
     <div class="rm-cognitive-context" x-show="contextoFuera" x-cloak aria-label="Residente activo durante la consulta"><strong>{{ $residente->nombre_completo }}</strong><span>Solo lectura · Enfermería</span></div>
+    @unless($errorLectura)
+        @include('apoyodecision::livewire.medico.resultados-experto.enfermeria-resumen')
+    @endunless
     @if($errorLectura)
         <section class="rm-card rm-orion-panel" role="alert"><h2>No fue posible consultar la información en este momento.</h2><button type="button" class="rm-btn rm-btn-secondary" wire:click="reintentar">Reintentar</button></section>
     @elseif(! $consultaEnfermeria)
-        <section class="rm-card rm-orion-panel space-y-4" aria-labelledby="sin-evaluacion-titulo">
-            <div class="flex items-start gap-3">
-                <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] shrink-0">
-                    <i class="ph ph-brain text-xl"></i>
-                </span>
-                <div class="space-y-1">
-                    <h2 id="sin-evaluacion-titulo" class="text-base font-bold text-[var(--rm-text-primary)]">Sin evaluación neurocognitiva formal registrada</h2>
-                    <p class="text-xs text-[var(--rm-text-secondary)] leading-relaxed">
-                        Medicina y Psicología no han emitido aún una evaluación neurocognitiva formal para este residente. El equipo de Enfermería debe mantener la observación de orientación, conducta y autonomía durante las actividades de la vida diaria.
-                    </p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
-                <div class="p-3.5 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] space-y-1">
-                    <div class="flex items-center gap-2 font-semibold text-xs text-[var(--rm-text-primary)]">
-                        <i class="ph ph-compass text-sm text-[var(--rm-action-primary)]"></i>
-                        <span>Orientación y Rutina</span>
-                    </div>
-                    <p class="text-xs text-[var(--rm-text-secondary)]">Reforzar amablemente el día, la hora y el nombre de los cuidadores durante el aseo y la comida.</p>
-                </div>
-                <div class="p-3.5 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] space-y-1">
-                    <div class="flex items-center gap-2 font-semibold text-xs text-[var(--rm-text-primary)]">
-                        <i class="ph ph-hand-heart text-sm text-[var(--rm-action-primary)]"></i>
-                        <span>Preservar Autonomía</span>
-                    </div>
-                    <p class="text-xs text-[var(--rm-text-secondary)]">Fomentar la realización de tareas sencillas según sus capacidades sin apresurar sus tiempos.</p>
-                </div>
-                <div class="p-3.5 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] space-y-1">
-                    <div class="flex items-center gap-2 font-semibold text-xs text-[var(--rm-text-primary)]">
-                        <i class="ph ph-warning text-sm text-amber-600"></i>
-                        <span>Cambios a Reportar</span>
-                    </div>
-                    <p class="text-xs text-[var(--rm-text-secondary)]">Notificar a Medicina cualquier desorientación súbita, agitación inusual o somnolencia diurna excesiva.</p>
-                </div>
-            </div>
-
-            @if(isset($cuidadosPendientesHoy) && $cuidadosPendientesHoy->isNotEmpty())
-                <div class="mt-4 pt-3 border-t border-[var(--rm-border)] space-y-2">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-[var(--rm-text-secondary)]">Cuidados prioritarios del turno hoy</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        @foreach($cuidadosPendientesHoy->take(4) as $cuidado)
-                            <div class="p-2.5 rounded-lg border border-[var(--rm-border)] bg-[var(--rm-surface)] flex items-center justify-between text-xs">
-                                <span class="font-medium text-[var(--rm-text-primary)] truncate">{{ $cuidado['nombre'] ?? $cuidado['descripcion'] ?? 'Cuidado programado' }}</span>
-                                <span class="text-[10px] px-2 py-0.5 rounded bg-amber-50 text-amber-700 font-semibold border border-amber-200 shrink-0">Pendiente</span>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
-
-            <div class="pt-2 flex flex-wrap gap-2">
-                <a href="{{ route('admin.enfermeria.agenda') }}" class="rm-btn rm-btn-primary text-xs">
-                    <i class="ph ph-calendar-check mr-1.5"></i>Ir a la Agenda de Cuidados
-                </a>
-                <a href="{{ route('admin.enfermeria.pacientes', ['residente' => $codResidente]) }}" class="rm-btn rm-btn-secondary text-xs">
-                    <i class="ph ph-arrow-left mr-1.5"></i>Volver a Mis residentes
-                </a>
-            </div>
-        </section>
+        <x-ui.empty-state title="Sin evaluación experta disponible" description="No hay un resultado verificable en esta consulta. Consulte la ficha autorizada para revisar los registros disponibles." icon="ph-brain" />
     @else
+        <details class="rm-expert-supplement"><summary>Áreas cognitivas, resultado y fundamento disponibles</summary>
         @php($narrativa = $informe['narrativa'])
         @php($fuentesArea = array_values(array_filter($narrativa['fuentes'] ?? [], fn ($f) => $f['area'] === $criterio)))
         @php($fuentesResultado = array_values(array_filter($narrativa['fuentes'] ?? [], fn ($f) => $f['area'] === 'COG-MEM')))
@@ -132,6 +77,7 @@
             </section>
             <aside class="rm-card rm-orion-panel" aria-label="Consulta del residente"><h2 class="rm-expert-section-title">Consulta del residente</h2><p>Explora el contexto y continúa hacia los cuidados de tu turno.</p><div class="rm-cognitive-accesses"><button type="button" class="rm-btn rm-btn-secondary" wire:click="abrirConsulta('interpretacion')"><i class="ph ph-book-open" aria-hidden="true"></i>Interpretación</button><button type="button" class="rm-btn rm-btn-secondary" wire:click="abrirConsulta('registro')"><i class="ph ph-files" aria-hidden="true"></i>Registros</button><button type="button" class="rm-btn rm-btn-secondary" wire:click="abrirConsulta('cuidados')"><i class="ph ph-heart" aria-hidden="true"></i>Cuidados</button></div><p class="rm-orion-note">{{ $texto($narrativa['autonomia']['resumen']) }}</p></aside>
         </div>
+        </details>
         @include('apoyodecision::livewire.medico.resultados-experto.enfermeria-ventanas')
     @endif
 </div>

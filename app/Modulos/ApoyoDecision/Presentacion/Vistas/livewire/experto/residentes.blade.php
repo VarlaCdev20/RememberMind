@@ -1,4 +1,4 @@
-<div class="space-y-6 text-rm-primary" x-data="{ vista: 'tarjetas' }">
+<div class="rm-expert-residents space-y-6 text-rm-primary" x-data="{ vista: 'tarjetas' }">
     <x-ui.section-card title="Sistema experto" subtitle="Seleccione un residente para consultar sus resultados e historial" icon="ph-brain">
         <p class="text-sm text-rm-secondary">Consulte los hallazgos, evidencias y límites de cada evaluación. Las valoraciones originales se registran desde el área de Valoraciones o la ficha clínica.</p>
     </x-ui.section-card>
@@ -55,8 +55,8 @@
                 @endforeach
             </div>
 
-            <div x-cloak x-show="vista === 'tabla'" class="overflow-x-auto rounded-xl border border-rm">
-                <table class="rm-data-table rm-table min-w-[800px] w-full text-left text-sm">
+            <div x-cloak x-show="vista === 'tabla'" class="rm-expert-resident-table rounded-xl border border-rm">
+                <table class="rm-data-table rm-table w-full text-left text-sm">
                     <caption class="sr-only">Residentes admitidos y acciones disponibles del sistema experto</caption>
                     <thead>
                         <tr>
@@ -71,9 +71,9 @@
                             @if($acceso['consultar'])
                                 <tr wire:key="experto-fila-{{ $residente->getKey() }}" class="border-t border-rm">
                                     <th scope="row" class="p-3 font-semibold">{{ $residente->nombre_completo }}</th>
-                                    <td class="p-3 text-rm-secondary">{{ $residente->edad !== null ? $residente->edad.' años' : 'No registrada' }}</td>
-                                    <td class="p-3">
-                                        <div class="flex flex-nowrap gap-2">
+                                    <td data-label="Edad" class="p-3 text-rm-secondary">{{ $residente->edad !== null ? $residente->edad.' años' : 'No registrada' }}</td>
+                                    <td data-label="Acciones" class="p-3">
+                                        <div class="flex flex-wrap gap-2">
                                             @if(auth()->user()->hasRole('PSICOLOGO/A'))
                                                 <a href="{{ route('admin.psicologia.residente.ficha', $residente) }}" class="rm-btn rm-btn-primary">Ficha psicológica<span class="sr-only"> de {{ $residente->nombre_completo }}</span></a>
                                             @endif

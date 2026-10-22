@@ -1,4 +1,30 @@
 /* Consulta cognitiva: superficies y selección del sistema compartido. */
+.rm-expert-reading-nav { display: flex; flex-wrap: wrap; gap: var(--rm-space-2); padding: var(--rm-space-3); background: var(--rm-surface); border: 1px solid var(--rm-border); border-radius: var(--rm-radius-card); }
+.rm-expert-reading-nav .rm-btn { min-height: 44px; white-space: normal; }
+.rm-expert-domain-matrix { padding: var(--rm-space-4); min-width: 0; }
+.rm-expert-domain-options { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--rm-space-3); margin-top: var(--rm-space-4); }
+.rm-expert-domain-options .rm-orion-domain { min-height: 44px; }
+.rm-expert-domain-current { display: flex; align-items: center; flex-wrap: wrap; gap: var(--rm-space-3); margin-top: var(--rm-space-4); padding-top: var(--rm-space-3); border-top: 1px solid var(--rm-border); }
+.rm-expert-domain-current p { flex: 1 1 20rem; }
+.rm-expert-nursing-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr); gap: var(--rm-space-4); align-items: start; }
+.rm-expert-nursing-grid > * { min-width: 0; scroll-margin-top: var(--rm-space-5); }
+.rm-expert-operational-record { border-bottom: 1px solid var(--rm-border-soft); padding-block: var(--rm-space-3); overflow-wrap: anywhere; }
+.rm-expert-operational-record small { display: block; color: var(--rm-text-secondary); margin-top: var(--rm-space-2); }
+.rm-expert-results--medicine .rm-expert-person { flex: 1 1 20rem; }
+.rm-expert-results--medicine .rm-expert-avatar { border-radius: var(--rm-radius-card); }
+.rm-expert-residents { min-width: 0; }
+@media (max-width: 1279px) { .rm-expert-domain-options { grid-template-columns: repeat(3, minmax(0, 1fr)); } .rm-expert-nursing-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .rm-expert-nursing-grid > :first-child { grid-column: 1 / -1; } }
+@media (max-width: 767px) {
+    .rm-expert-domain-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .rm-expert-nursing-grid { grid-template-columns: 1fr; }
+    .rm-expert-reading-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .rm-expert-reading-nav .rm-btn { padding-inline: var(--rm-space-2); font-size: var(--rm-font-size-compact); }
+    .rm-expert-resident-table table { table-layout: fixed; min-width: 0; }
+    .rm-expert-resident-table thead { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
+    .rm-expert-resident-table :is(tbody, tr, td, th[scope="row"]) { display: block; width: 100%; overflow-wrap: anywhere; }
+    .rm-expert-resident-table td[data-label]::before { content: attr(data-label); display: block; font-weight: 700; }
+}
+@media (prefers-reduced-motion: reduce) { .rm-expert-results--nursing *, .rm-knowledge-workspace * { scroll-behavior: auto; } }
 .rm-cognitive-reading { display: grid; gap: var(--rm-space-5); min-width: 0; container-type: inline-size; }
 .rm-cognitive-context { position: sticky; top: var(--rm-space-2); z-index: var(--rm-z-sticky); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--rm-space-2); min-height: 44px; padding: var(--rm-space-2) var(--rm-space-3); background: var(--rm-surface); border: 1px solid var(--rm-border); border-radius: var(--rm-radius-card); box-shadow: var(--rm-shadow-sm); font-size: var(--rm-font-size-compact); }
 .rm-cognitive-reading .rm-card { border-radius: var(--rm-radius-lg); }
