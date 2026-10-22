@@ -155,6 +155,35 @@ test('consultar el historial abandona pantalla completa antes de abrir el modal 
     } finally {globalThis.document=anterior;}
 });
 
+test('los accesos del área consultan el inspector recibido sin modificar campos ni aceptar elementos ajenos', () => {
+    const datos = {modoInicial:'area',nodos:[{id:'alerta',grupo:'caso'},{id:'campo',grupo:'profesional'}],aristas:[]};
+    const original = JSON.stringify(datos), mapa = rmTrazaAlerta(datos); mapa.init();
+    assert.equal(mapa.modo, 'area');
+    let consultas = 0;
+    mapa.$refs = {inspector:{focus(){consultas++;},scrollIntoView(){}}};
+    mapa.cambiarCapa('caso'); mapa.consultarElemento('campo');
+    assert.equal(mapa.nodo.id, 'campo'); assert.equal(mapa.capa, 'todas'); assert.equal(consultas, 1);
+    mapa.consultarElemento('ajeno'); assert.equal(consultas, 1); assert.equal(mapa.nodo.id, 'campo');
+    mapa.cambiarModo('mapa'); assert.equal(mapa.modo, 'mapa');
+    mapa.cambiarModo('edicion'); assert.equal(mapa.modo, 'mapa');
+    assert.equal(JSON.stringify(datos), original);
+});
+
+test('el siguiente paso abre el formulario existente de especialidad y evita doble apertura', async () => {
+    const anterior=globalThis.document, mapa=rmTrazaAlerta({codigo:'caso-aislado',nodos:[{id:'alerta'}],aristas:[]});
+    globalThis.document={fullscreenElement:null}; mapa.init();
+    let aperturas=0, terminar;
+    mapa.$wire={abrirRegistroEspecialidad:codigo=>{assert.equal(codigo,'caso-aislado'); aperturas++; return new Promise(resolve=>{terminar=resolve;});}};
+    try {
+        const apertura=mapa.abrirContinuacion(true);
+        assert.equal(mapa.abriendoDetalle,true);
+        await mapa.abrirContinuacion(true); assert.equal(aperturas,1);
+        terminar(); await apertura; assert.equal(mapa.abriendoDetalle,false);
+        mapa.$wire.abrirRegistroEspecialidad=async()=>{throw new Error('Sin permiso');};
+        await mapa.abrirContinuacion(true); assert.match(mapa.aviso,/No se pudo abrir/); assert.equal(mapa.abriendoDetalle,false);
+    } finally {globalThis.document=anterior;}
+});
+
 test('las expresiones de la vista son válidas y el movimiento reducido elimina la transición de lectura', () => {
     const vista=readFileSync(new URL('../../resources/views/components/ui/alerta-trazabilidad.blade.php',import.meta.url),'utf8');
     for (const atributo of vista.matchAll(/\s(?:x-[\w.:-]+|@[\w.:-]+|:[\w.:-]+)="([^"]*)"/g)) {

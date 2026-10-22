@@ -122,6 +122,12 @@ class AlertasEspecialidadesTest extends TestCase
         $panel = Livewire::actingAs($admin)->test(CompararAlertasRoles::class)->assertSee('Comparación sin datos de residentes');
         foreach (['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO', 'GERENTE', 'ADMINISTRADOR', 'SUPERADMINISTRADOR', 'FAMILIAR'] as $rol) {
             $panel->call('seleccionarRol', $rol)->assertSet('rol', $rol)->assertDispatched('alertas-rol-seleccionado');
+            if ($rol === 'FAMILIAR') {
+                $panel->assertDontSee('data-case-view=', false);
+            } else {
+                $tipo = ['ENFERMEROS' => 'cronologia', 'MEDICO GENERAL/GERIATRA' => 'contraste', 'PSICOLOGO/A' => 'red', 'NUTRICIONISTA' => 'panel-nutricional', 'FISIOTERAPEUTA' => 'matriz', 'PEDAGOGO' => 'recorrido', 'GERENTE' => 'arbol', 'ADMINISTRADOR' => 'tablero', 'SUPERADMINISTRADOR' => 'procedencia'][$rol];
+                $panel->assertSee('data-case-view="'.$tipo.'"', false)->assertSee('sin caso seleccionado');
+            }
         }
         $panel->assertSee('No accede al centro de alertas clínicas');
         $r = Residente::factory()->create();

@@ -116,7 +116,7 @@
     </div>
     <aside class="rm-alert-workspace-grid__aside" x-ref="contextoCaso" tabindex="-1" aria-label="Contexto de trabajo del caso seleccionado">
         @include('livewire.alertas.puesto-profesional')
-        <x-ui.alerta-trazabilidad :traza="$traza" :titulo="$perfil['seleccionar']" :icono="$perfil['icono']" />
+        <x-ui.alerta-trazabilidad :traza="$traza" :titulo="$perfil['seleccionar']" :icono="$perfil['icono']" :foco="$perfil['foco']" :registro-especialidad="(bool)$definicionEspecialidad" />
         @if($traza && in_array($perfil['foco'],['auditoria','supervision'],true))
         <section class="rm-alert-trace"><h3>Movimiento del registro</h3><p>Eventos guardados de la alerta seleccionada.</p>
             @forelse(array_slice($traza['movimientos'],0,3) as $movimiento)<article class="rm-alert-recent-event"><strong>{{ $movimiento['tipo'] }}</strong><p>{{ $movimiento['texto'] }}</p></article>@empty<p>No hay eventos guardados para esta alerta.</p>@endforelse

@@ -7,6 +7,7 @@ export function rmTrazaAlerta(datos) {
         coordenadas: {}, altura: 440, organizar: false, arrastre: null, observador: null, aspecto: 1,
         marco: { x: 0, y: 0, ancho: 900, alto: 900 }, pantallaCompleta: false, cambiandoPantalla: false, abriendoDetalle: false, aviso: '',
         init() {
+            this.modo = ['area', 'mapa', 'tarjetas'].includes(this.datos.modoInicial) ? this.datos.modoInicial : 'mapa';
             this.coordenadas = Object.fromEntries(Object.entries(this.datos.posiciones || distribuirTraza(this.datos)).map(([id, p]) => [id, { ...p }]));
             const inicial = this.datos.inicio || 'alerta';
             this.seleccionado = this.datos.nodos.some(n => n.id === inicial) ? inicial : this.datos.nodos[0]?.id;
@@ -53,6 +54,13 @@ export function rmTrazaAlerta(datos) {
             this.centrar();
         },
         seleccionar(id) { if (this.nodoVisible(this.datos.nodos.find(n => n.id === id))) this.seleccionado = id; },
+        cambiarModo(modo) { if (['area', 'mapa', 'tarjetas'].includes(modo)) this.modo = modo; },
+        consultarElemento(id) {
+            const nodo = this.datos.nodos.find(n => n.id === id);
+            if (!nodo) return;
+            if (!this.nodoVisible(nodo)) this.capa = 'todas';
+            this.seleccionar(id); this.consultarSeleccion();
+        },
         conectado(arista) { const id = this.destacado || this.seleccionado; return arista.desde === id || arista.hasta === id; },
         ampliar(delta) { this.zoom = Math.min(4, Math.max(0.6, Math.round((this.zoom + delta) * 10) / 10)); },
         centrar() {
@@ -115,11 +123,15 @@ export function rmTrazaAlerta(datos) {
             } finally { this.cambiandoPantalla = false; }
         },
         async consultarDetalle() {
+            await this.abrirContinuacion(false);
+        },
+        async abrirContinuacion(especialidad) {
             if (this.abriendoDetalle) return;
             this.abriendoDetalle = true;
             try {
                 if (document.fullscreenElement === this.$root) await document.exitFullscreen();
-                await this.$wire.verDetalle(this.datos.codigo);
+                if (especialidad) await this.$wire.abrirRegistroEspecialidad(this.datos.codigo);
+                else await this.$wire.verDetalle(this.datos.codigo);
             } catch {
                 this.aviso = 'No se pudo abrir el detalle. Conserva esta vista y vuelve a intentarlo.';
             } finally { this.abriendoDetalle = false; }

@@ -119,7 +119,7 @@ final class ConsultarTrazaAlerta
         }
 
         return ['codigo' => $alerta->getKey(), 'residente' => $alerta->residente?->nombre_completo,
-            'foco' => $perfil['foco'], 'origenModulo' => mb_strtoupper(trim((string) $alerta->modulo)),
+            'foco' => $perfil['foco'], 'origenModulo' => mb_strtoupper(trim((string) $alerta->modulo)), 'estadoCodigo' => $alerta->estado,
             'titulo' => $titulo, 'proposito' => $proposito, 'inicio' => $origenOperativo['disponible'] ? 'origen-operativo' : ($contextoProfesional && $contextoProfesional['autorizado'] && $contextoProfesional['hayRegistro'] ? 'contexto-profesional' : ($signo ? 'origen' : 'alerta')),
             'nodos' => $nodos, 'aristas' => $aristas, 'movimientos' => array_reverse($movimientos),
             'especialidades' => $vinculos,

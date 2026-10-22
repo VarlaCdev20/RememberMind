@@ -18,6 +18,7 @@
                 <p><strong>Recorrido:</strong> {{ $perfil['bandeja'] }} → {{ $perfil['seleccionar'] }}@if($formulario) → {{ $formulario['titulo'] }}@endif.</p>
                 <div class="rm-alert-roles__priorities">@foreach($perfil['claves'] as $clave)<span><i class="ph-bold ph-check" aria-hidden="true"></i>{{ $clave }}</span>@endforeach</div>
             </header>
+            @if($rol !== 'FAMILIAR')<x-ui.alerta-vista-profesional :vista="app(\App\Modulos\Alertas\Presentacion\Soporte\ComponerVistaCasoAlerta::class)->componer(null, $perfil['foco'])" />@endif
             <div class="rm-alert-roles__section-heading"><div><p class="rm-alert-roles__eyebrow">Qué se registra</p><h3>{{ $formulario['titulo'] ?? match($rol) { 'ENFERMEROS'=>'Intervención y seguimiento de Enfermería', 'FAMILIAR'=>'Información familiar autorizada', 'GERENTE'=>'Supervisión institucional', 'ADMINISTRADOR'=>'Aviso y coordinación operativa', default=>'Supervisión y trazabilidad' } }}</h3></div>@if($formulario)<span class="rm-alert-roles__count">{{ count($formulario['campos']) }} campos · {{ count($formulario['secciones']) }} {{ count($formulario['secciones']) === 1 ? 'sección' : 'secciones' }}</span>@endif</div>
             @if($formulario)
                 @if($formulario['requiereAtencion'])<p class="rm-alert-roles__context"><i class="ph-bold ph-folder-user" aria-hidden="true"></i> Vinculado a una atención propia del residente, con fecha, autor y área de la jornada.</p>@endif

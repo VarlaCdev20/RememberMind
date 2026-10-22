@@ -1,7 +1,10 @@
-@props(['traza', 'titulo' => 'Relaciones del caso', 'icono' => 'ph-link'])
+@props(['traza', 'titulo' => 'Relaciones del caso', 'icono' => 'ph-link', 'foco' => 'auditoria', 'registroEspecialidad' => false])
+@php
+    $vistaProfesional = app(\App\Modulos\Alertas\Presentacion\Soporte\ComponerVistaCasoAlerta::class)->componer($traza, $traza['foco'] ?? $foco);
+@endphp
 @if($traza)
     @php
-        $datosMapa = $traza;
+        $datosMapa = $traza + ['modoInicial' => $vistaProfesional['tipo'] === 'red' ? 'mapa' : 'area'];
         $gruposMapa = ['todas'=>'Vista completa','caso'=>'Persona y responsabilidad'];
         $gruposPresentes = collect($traza['nodos'])->pluck('grupo')->all();
         if(in_array('profesional', $gruposPresentes, true)) $gruposMapa['profesional'] = 'Contexto de la especialidad';
@@ -14,16 +17,19 @@
     <p>{{ $traza['proposito'] ?? 'Relaciones guardadas de la alerta seleccionada.' }}</p>
     <p class="rm-alert-map__resident"><i class="ph-bold ph-user" aria-hidden="true"></i>Residente: {{ $traza['residente'] }}</p>
     <nav class="rm-alert-trace__tabs" aria-label="Cómo consultar el caso">
-        <button type="button" class="rm-btn rm-btn-secondary" @click="modo = 'mapa'" :aria-pressed="modo === 'mapa'" aria-controls="mapa-{{ $traza['codigo'] }}"><i class="ph-bold" :class="presentacion.icono" aria-hidden="true"></i>Vista de relaciones</button>
-        <button type="button" class="rm-btn rm-btn-secondary" @click="modo = 'tarjetas'" :aria-pressed="modo === 'tarjetas'" aria-controls="relaciones-{{ $traza['codigo'] }}"><i class="ph-bold ph-cards" aria-hidden="true"></i>Fichas de consulta</button>
+        @if($vistaProfesional['tipo'] !== 'red')<button type="button" class="rm-btn rm-btn-secondary" @click="cambiarModo('area')" :aria-pressed="modo === 'area'" aria-controls="vista-area-{{ $traza['codigo'] }}"><i class="ph-bold" :class="presentacion.icono" aria-hidden="true"></i>{{ $vistaProfesional['titulo'] }}</button>@endif
+        <button type="button" class="rm-btn rm-btn-secondary" @click="cambiarModo('mapa')" :aria-pressed="modo === 'mapa'" aria-controls="mapa-{{ $traza['codigo'] }}"><i class="ph-bold ph-share-network" aria-hidden="true"></i>{{ $vistaProfesional['tipo'] === 'red' ? 'Red de bienestar' : 'Explorar vínculos completos' }}</button>
+        <button type="button" class="rm-btn rm-btn-secondary" @click="cambiarModo('tarjetas')" :aria-pressed="modo === 'tarjetas'" aria-controls="relaciones-{{ $traza['codigo'] }}"><i class="ph-bold ph-cards" aria-hidden="true"></i>Fichas de consulta</button>
+        <button type="button" class="rm-btn rm-btn-secondary" @click="alternarPantallaCompleta" :disabled="cambiandoPantalla" :aria-pressed="pantallaCompleta"><i class="ph-bold ph-corners-out" aria-hidden="true"></i><span x-text="pantallaCompleta ? 'Salir de pantalla completa' : 'Pantalla completa'"></span></button>
     </nav>
     <p class="rm-help" role="status" x-text="aviso" x-show="aviso" x-cloak></p>
-    <nav class="rm-alert-trace__layers" aria-label="Información que deseas explorar">@foreach($gruposMapa as $capa=>$etiqueta)<button type="button" class="rm-btn rm-btn-secondary" @click="cambiarCapa('{{ $capa }}')" :aria-pressed="capa === '{{ $capa }}'">{{ $etiqueta }}</button>@endforeach</nav>
+    <div id="vista-area-{{ $traza['codigo'] }}" @if($vistaProfesional['tipo'] !== 'red') x-show="modo === 'area'" @else x-show="modo === 'mapa'" @endif><x-ui.alerta-vista-profesional :vista="$vistaProfesional" /></div>
+    <div class="rm-case-view__next"><p class="rm-help">Continuar según tu responsabilidad; el formulario conserva sus permisos y bloqueos.</p><button type="button" class="rm-btn rm-btn-primary" @click="abrirContinuacion(@js($registroEspecialidad))" :disabled="abriendoDetalle || cambiandoPantalla"><i class="ph-bold" :class="presentacion.icono" aria-hidden="true"></i>{{ $vistaProfesional['accion'] }}</button></div>
+    <nav class="rm-alert-trace__layers" x-show="modo !== 'area'" aria-label="Información que deseas explorar">@foreach($gruposMapa as $capa=>$etiqueta)<button type="button" class="rm-btn rm-btn-secondary" @click="cambiarCapa('{{ $capa }}')" :aria-pressed="capa === '{{ $capa }}'">{{ $etiqueta }}</button>@endforeach</nav>
     <div id="mapa-{{ $traza['codigo'] }}" x-show="modo === 'mapa'">
         <div class="rm-alert-map__settings">
             <label for="altura-mapa-{{ $traza['codigo'] }}">Altura de la vista <output x-text="altura + ' px'"></output></label>
             <input id="altura-mapa-{{ $traza['codigo'] }}" type="range" min="280" max="680" step="20" x-model.number="altura" aria-label="Altura de la vista de relaciones">
-            <button type="button" class="rm-btn rm-btn-secondary" @click="alternarPantallaCompleta" :disabled="cambiandoPantalla" :aria-pressed="pantallaCompleta"><i class="ph-bold ph-corners-out" aria-hidden="true"></i><span x-text="pantallaCompleta ? 'Salir de pantalla completa' : 'Pantalla completa'"></span></button>
         </div>
         <p class="rm-help" x-text="presentacion.guia"></p>
         <div class="rm-alert-map__canvas" x-ref="lienzo" :style="{ '--rm-map-height': altura + 'px' }">
@@ -60,5 +66,5 @@
     <p class="rm-help"><i class="ph-bold ph-lock-simple" aria-hidden="true"></i> Explorar y organizar esta vista no edita registros. {{ count($traza['movimientos']) }} de {{ $traza['totalEventos'] }} eventos en la lista reciente; hasta 3 en la vista de relaciones. El historial completo está en el detalle.</p>
 </section>
 @else
-<section class="rm-alert-trace rm-alert-map"><header class="rm-alert-map__heading"><span class="rm-alert-map__emblem"><i class="ph-bold {{ $icono }}" aria-hidden="true"></i></span><h3>{{ $titulo }}</h3></header><p>Selecciona una alerta vinculada para consultar sus relaciones y ajustar la vista. Solo se muestran elementos respaldados por registros guardados.</p></section>
+<section class="rm-alert-trace rm-alert-map"><header class="rm-alert-map__heading"><span class="rm-alert-map__emblem"><i class="ph-bold {{ $icono }}" aria-hidden="true"></i></span><h3>{{ $titulo }}</h3></header><x-ui.alerta-vista-profesional :vista="$vistaProfesional" /><p>Selecciona una alerta vinculada para consultar sus datos y continuar en el formulario autorizado.</p></section>
 @endif

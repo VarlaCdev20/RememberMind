@@ -79,6 +79,9 @@ class AlertasFlujosPorRolTest extends TestCase
                 ->assertDontSee('Contenido anulado de prueba')->assertDontSee('<select ', false);
             $traza = $panel->viewData('traza');
             $this->assertSame($panel->viewData('perfil')['foco'], $traza['foco']);
+            $tipo = ['clinico' => 'contraste', 'psicologia' => 'red', 'nutricion' => 'panel-nutricional', 'funcional' => 'matriz', 'pedagogia' => 'recorrido'][$traza['foco']];
+            $panel->assertSee('data-case-view="'.$tipo.'"', false);
+            $this->assertSame('ABIERTA', $traza['estadoCodigo']);
             $panel->assertSee('data-map-theme="'.$traza['foco'].'"', false)->assertDontSee('Grafo de');
             $this->assertNotEmpty(array_filter($traza['nodos'], fn ($nodo) => isset($nodo['seccion'])));
             $ids = array_column($traza['nodos'], 'id');
