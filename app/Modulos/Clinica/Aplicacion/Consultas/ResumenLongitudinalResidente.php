@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Clinica\Aplicacion\Consultas;
 
+use App\Models\Alerta;
 use App\Models\EjecucionCuidado;
 use App\Models\Residente;
 use Carbon\Carbon;
@@ -38,7 +39,7 @@ final class ResumenLongitudinalResidente
     {
         // 1. Alertas
         $alertasTotal = $residente->alertas->count();
-        $alertasActivas = $residente->alertas->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])->count();
+        $alertasActivas = $residente->alertas->whereIn('estado', Alerta::ESTADOS_ACTIVOS)->count();
         $alertasCerradas = $residente->alertas->where('estado', 'CERRADA')->count();
 
         // 2. Adherencia medicación

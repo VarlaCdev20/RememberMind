@@ -24,7 +24,7 @@ class PanelAlertaPreparadoTest extends TestCase
     {
         $this->seed(RolesAndPermissionsSeeder::class);
         $actor = User::factory()->create(['nombres' => 'Ana', 'ap_paterno' => 'Prueba']);
-        $actor->assignRole('ADMINISTRADOR');
+        $actor->assignRole('SUPERADMINISTRADOR');
         $this->actingAs($actor);
         $residente = Residente::factory()->create();
         $area = Area::create(['cod_area' => 'ARE_PANEL_TEST', 'nombre' => 'Área de prueba', 'estado' => 'ACTIVA']);
@@ -34,7 +34,7 @@ class PanelAlertaPreparadoTest extends TestCase
         SignoVital::create(['cod_signo' => 'SIG_PANEL_TEST', 'cod_residente' => $residente->getKey(),
             'cod_personal' => $actor->personal->getKey(), 'fecha_hora' => now(), 'estado' => 'REGISTRADO', 'temperatura' => 36.5]);
         foreach ([AlertasPanel::class, CampanaNotificaciones::class] as $clase) {
-            $panel = Livewire::test($clase)->call('verGraficos', $residente->getKey());
+            $panel = Livewire::test($clase)->call('verGraficos', $residente->getKey())->assertStatus(200);
             // Segunda petición: repone la preparación después de hidratación Livewire.
             $panel->set('drawerGrafico', true)->assertSet('drawerGrafico', true);
             $instancia = $panel->instance();

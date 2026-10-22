@@ -961,10 +961,10 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         Alerta::create([
             'cod_alerta' => 'ALE_CRIT_'.strtoupper(Str::random(4)),
             'cod_residente' => $this->residenteCarlos->cod_residente,
-            'tipo_alerta' => 'CLINICA',
+            'tipo' => 'CLINICA',
             'prioridad' => 'CRITICA',
             'descripcion' => 'Desaturacion severa',
-            'fecha_hora_alerta' => Carbon::now()->subMinutes(15),
+            'fecha_hora' => Carbon::now()->subMinutes(15),
             'estado' => 'ABIERTA',
         ]);
 

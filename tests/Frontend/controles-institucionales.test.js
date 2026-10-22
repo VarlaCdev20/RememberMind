@@ -46,6 +46,23 @@ test('selector busca sin acentos y mantiene selección múltiple', () => {
     assert.equal(selector.label, 'Admisión');
 });
 
+test('selector omite búsqueda con menos de 15 opciones y permite parametrizar el umbral', () => {
+    const selector = rmSelector();
+    for (const count of [2, 10, 14, 15, 16]) {
+        selector.options = Array.from({ length: count }, (_, i) => ({ value: String(i), label: `Opción ${i}` }));
+        assert.equal(selector.hasSearch, count >= 15);
+    }
+    const personalizado = rmSelector(null, { searchThreshold: 20 });
+    personalizado.options = selector.options;
+    assert.equal(personalizado.hasSearch, false);
+    personalizado.options = Array.from({ length: 20 }, (_, i) => ({ value: String(i), label: `Opción ${i}` }));
+    assert.equal(personalizado.hasSearch, true);
+    selector.options = [{ value: '', label: 'Seleccionar' }, ...Array.from({ length: 14 }, (_, i) => ({ value: String(i), label: `Opción ${i}` }))];
+    assert.equal(selector.hasSearch, false);
+    selector.options.push({ value: 'extra', label: 'Quince' });
+    assert.equal(selector.hasSearch, true);
+});
+
 function selectorNativoFixture({ value = null, autoSubmit = false, multiple = false } = {}) {
     const options = [{ value: '10', textContent: 'Diez', selected: false }, { value: '20', textContent: 'Veinte', selected: true }, { value: '50', textContent: 'Cincuenta', selected: false }];
     const events = [], listeners = new Map();

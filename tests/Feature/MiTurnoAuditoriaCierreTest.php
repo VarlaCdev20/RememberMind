@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\AdministracionMedicacion;
+use App\Models\Admision;
 use App\Models\Alerta;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
@@ -19,15 +21,17 @@ use App\Models\OcupacionCama;
 use App\Models\Personal;
 use App\Models\PlanCuidado;
 use App\Models\Prescripcion;
-use App\Models\AdministracionMedicacion;
 use App\Models\ProgramacionCuidado;
 use App\Models\Residente;
 use App\Models\Turno;
 use App\Models\User;
 use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
 use Carbon\Carbon;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -36,14 +40,23 @@ class MiTurnoAuditoriaCierreTest extends TestCase
     use RefreshDatabase;
 
     protected User $enfermeraUser;
+
     protected Personal $enfermeraPersonal;
+
     protected Turno $turnoManana;
+
     protected Turno $turnoNoche;
+
     protected Jornada $jornadaManana;
+
     protected Jornada $jornadaNoche;
+
     protected Area $area;
+
     protected Residente $residente1;
+
     protected Residente $residente2;
+
     protected MiTurnoService $service;
 
     protected function setUp(): void
@@ -54,13 +67,13 @@ class MiTurnoAuditoriaCierreTest extends TestCase
         Role::firstOrCreate(['name' => 'ENFERMEROS', 'guard_name' => 'web']);
 
         $this->area = Area::create([
-            'cod_area' => 'ARE_' . strtoupper(Str::random(6)),
+            'cod_area' => 'ARE_'.strtoupper(Str::random(6)),
             'nombre' => 'Enfermería General',
             'estado' => 'ACTIVA',
         ]);
 
         $this->turnoManana = Turno::create([
-            'cod_turno' => 'TUR_MAN_' . strtoupper(Str::random(4)),
+            'cod_turno' => 'TUR_MAN_'.strtoupper(Str::random(4)),
             'nombre' => 'Mañana',
             'hora_inicio' => '07:00:00',
             'hora_cierre' => '15:00:00',
@@ -69,7 +82,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
         ]);
 
         $this->turnoNoche = Turno::create([
-            'cod_turno' => 'TUR_NOC_' . strtoupper(Str::random(4)),
+            'cod_turno' => 'TUR_NOC_'.strtoupper(Str::random(4)),
             'nombre' => 'Noche',
             'hora_inicio' => '20:00:00',
             'hora_cierre' => '08:00:00',
@@ -78,7 +91,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
         ]);
 
         $this->enfermeraUser = User::create([
-            'cod_usuario' => 'USU_' . strtoupper(Str::random(6)),
+            'cod_usuario' => 'USU_'.strtoupper(Str::random(6)),
             'correo' => 'auditoria.enfermera@remembermind.test',
             'contrasena' => bcrypt('password'),
             'estado' => 'ACTIVO',
@@ -86,7 +99,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
         $this->enfermeraUser->assignRole('ENFERMEROS');
 
         $this->enfermeraPersonal = Personal::create([
-            'cod_personal' => 'PER_' . strtoupper(Str::random(6)),
+            'cod_personal' => 'PER_'.strtoupper(Str::random(6)),
             'cod_usuario' => $this->enfermeraUser->cod_usuario,
             'nombres' => 'Clara',
             'apellido_paterno' => 'Rojas',
@@ -97,14 +110,14 @@ class MiTurnoAuditoriaCierreTest extends TestCase
         ]);
 
         $this->jornadaManana = Jornada::create([
-            'cod_jornada' => 'JOR_MAN_' . strtoupper(Str::random(4)),
+            'cod_jornada' => 'JOR_MAN_'.strtoupper(Str::random(4)),
             'cod_turno' => $this->turnoManana->cod_turno,
             'fecha_jornada' => Carbon::today()->toDateString(),
             'estado' => 'ACTIVA',
         ]);
 
         AsignacionPersonal::create([
-            'cod_asignacion_personal' => 'ASP_MAN_' . strtoupper(Str::random(4)),
+            'cod_asignacion_personal' => 'ASP_MAN_'.strtoupper(Str::random(4)),
             'cod_jornada' => $this->jornadaManana->cod_jornada,
             'cod_personal' => $this->enfermeraPersonal->cod_personal,
             'cod_area' => $this->area->cod_area,
@@ -136,7 +149,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // Asignación de Carlos (residente1) a Clara desde el inicio
         AsignacionResidenteJornada::create([
-            'cod_asignacion' => 'ARJ_01_' . strtoupper(Str::random(4)),
+            'cod_asignacion' => 'ARJ_01_'.strtoupper(Str::random(4)),
             'cod_jornada' => $this->jornadaManana->cod_jornada,
             'cod_personal' => $this->enfermeraPersonal->cod_personal,
             'cod_residente' => $this->residente1->cod_residente,
@@ -157,10 +170,10 @@ class MiTurnoAuditoriaCierreTest extends TestCase
     {
         // Alerta con múltiples eventos
         $alertaMulti = Alerta::create([
-            'cod_alerta' => 'ALE_MUL_' . strtoupper(Str::random(4)),
+            'cod_alerta' => 'ALE_MUL_'.strtoupper(Str::random(4)),
             'cod_residente' => $this->residente1->cod_residente,
             'cod_personal' => $this->enfermeraPersonal->cod_personal,
-            'tipo_alerta' => 'CLINICA',
+            'tipo' => 'CLINICA',
             'prioridad' => 'ALTA',
             'titulo' => 'Riesgo de hipotensión postural',
             'fecha_hora' => Carbon::today()->setTime(7, 30, 0),
@@ -169,7 +182,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         for ($i = 1; $i <= 4; $i++) {
             EventoAlerta::create([
-                'cod_evento_alerta' => 'EVA_' . $i . '_' . strtoupper(Str::random(4)),
+                'cod_evento_alerta' => 'EVA_'.$i.'_'.strtoupper(Str::random(4)),
                 'cod_alerta' => $alertaMulti->cod_alerta,
                 'cod_usuario' => $this->enfermeraUser->cod_usuario,
                 'tipo_evento' => 'INTERVENCION',
@@ -181,10 +194,10 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // Alerta anterior al inicio del turno con estado RECONOCIDA / PENDIENTE
         $alertaPrevia = Alerta::create([
-            'cod_alerta' => 'ALE_PRE_' . strtoupper(Str::random(4)),
+            'cod_alerta' => 'ALE_PRE_'.strtoupper(Str::random(4)),
             'cod_residente' => $this->residente1->cod_residente,
             'cod_personal' => $this->enfermeraPersonal->cod_personal,
-            'tipo_alerta' => 'CLINICA',
+            'tipo' => 'CLINICA',
             'prioridad' => 'MEDIA',
             'titulo' => 'Control de glicemia preexistente',
             'fecha_hora' => Carbon::yesterday()->setTime(23, 0, 0),
@@ -221,7 +234,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
     public function test_punto_2_medicacion_reglas_exhaustivas(): void
     {
         $atencion = Atencion::create([
-            'cod_atencion' => 'ATN_' . strtoupper(Str::random(6)),
+            'cod_atencion' => 'ATN_'.strtoupper(Str::random(6)),
             'cod_residente' => $this->residente1->cod_residente,
             'cod_area' => $this->area->cod_area,
             'cod_personal' => $this->enfermeraPersonal->cod_personal,
@@ -232,7 +245,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
         ]);
 
         $med = Medicamento::create([
-            'cod_medicamento' => 'MED_' . strtoupper(Str::random(6)),
+            'cod_medicamento' => 'MED_'.strtoupper(Str::random(6)),
             'nombre_generico' => 'Enalapril',
             'nombre_comercial' => 'Vasotec',
             'forma_farmaceutica' => 'Tableta',
@@ -243,7 +256,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // A. Prescripción todavía no iniciada (fecha futura) -> no genera tarea
         $pFutura = Prescripcion::create([
-            'cod_prescripcion' => 'PRE_FUT_' . strtoupper(Str::random(4)),
+            'cod_prescripcion' => 'PRE_FUT_'.strtoupper(Str::random(4)),
             'cod_residente' => $this->residente1->cod_residente,
             'cod_atencion' => $atencion->cod_atencion,
             'cod_medicamento' => $med->cod_medicamento,
@@ -257,7 +270,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
             'estado' => 'ACTIVA',
         ]);
         HorarioPrescripcion::create([
-            'cod_horario_prescripcion' => 'HPR_FUT_' . strtoupper(Str::random(4)),
+            'cod_horario_prescripcion' => 'HPR_FUT_'.strtoupper(Str::random(4)),
             'cod_prescripcion' => $pFutura->cod_prescripcion,
             'hora_programada' => '08:00:00',
             'estado' => 'ACTIVO',
@@ -265,7 +278,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // B. Prescripción suspendida antes del horario (ej. suspendida a las 07:30 para tarea de las 08:00) -> no genera tarea
         $pSuspendida = Prescripcion::create([
-            'cod_prescripcion' => 'PRE_SUS_' . strtoupper(Str::random(4)),
+            'cod_prescripcion' => 'PRE_SUS_'.strtoupper(Str::random(4)),
             'cod_residente' => $this->residente1->cod_residente,
             'cod_atencion' => $atencion->cod_atencion,
             'cod_medicamento' => $med->cod_medicamento,
@@ -280,7 +293,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
             'estado' => 'ACTIVA',
         ]);
         HorarioPrescripcion::create([
-            'cod_horario_prescripcion' => 'HPR_SUS_' . strtoupper(Str::random(4)),
+            'cod_horario_prescripcion' => 'HPR_SUS_'.strtoupper(Str::random(4)),
             'cod_prescripcion' => $pSuspendida->cod_prescripcion,
             'hora_programada' => '08:00:00',
             'estado' => 'ACTIVO',
@@ -288,7 +301,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // C. Horario inactivo -> no genera tarea
         $pHorarioInactivo = Prescripcion::create([
-            'cod_prescripcion' => 'PRE_INA_' . strtoupper(Str::random(4)),
+            'cod_prescripcion' => 'PRE_INA_'.strtoupper(Str::random(4)),
             'cod_residente' => $this->residente1->cod_residente,
             'cod_atencion' => $atencion->cod_atencion,
             'cod_medicamento' => $med->cod_medicamento,
@@ -302,7 +315,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
             'estado' => 'ACTIVA',
         ]);
         HorarioPrescripcion::create([
-            'cod_horario_prescripcion' => 'HPR_INA_' . strtoupper(Str::random(4)),
+            'cod_horario_prescripcion' => 'HPR_INA_'.strtoupper(Str::random(4)),
             'cod_prescripcion' => $pHorarioInactivo->cod_prescripcion,
             'hora_programada' => '08:00:00',
             'estado' => 'INACTIVO',
@@ -311,7 +324,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
         // D. dias_semana incorrecto -> no genera tarea
         $diaInvalido = Carbon::now()->addDays(2)->format('l'); // Día diferente de hoy
         $pDiaIncorrecto = Prescripcion::create([
-            'cod_prescripcion' => 'PRE_DIA_' . strtoupper(Str::random(4)),
+            'cod_prescripcion' => 'PRE_DIA_'.strtoupper(Str::random(4)),
             'cod_residente' => $this->residente1->cod_residente,
             'cod_atencion' => $atencion->cod_atencion,
             'cod_medicamento' => $med->cod_medicamento,
@@ -325,7 +338,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
             'estado' => 'ACTIVA',
         ]);
         HorarioPrescripcion::create([
-            'cod_horario_prescripcion' => 'HPR_DIA_' . strtoupper(Str::random(4)),
+            'cod_horario_prescripcion' => 'HPR_DIA_'.strtoupper(Str::random(4)),
             'cod_prescripcion' => $pDiaIncorrecto->cod_prescripcion,
             'hora_programada' => '08:00:00',
             'dias_semana' => $diaInvalido,
@@ -334,7 +347,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // E. segun_necesidad = true no crea pendiente automático
         $pPRN = Prescripcion::create([
-            'cod_prescripcion' => 'PRE_PRN_' . strtoupper(Str::random(4)),
+            'cod_prescripcion' => 'PRE_PRN_'.strtoupper(Str::random(4)),
             'cod_residente' => $this->residente1->cod_residente,
             'cod_atencion' => $atencion->cod_atencion,
             'cod_medicamento' => $med->cod_medicamento,
@@ -348,7 +361,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
             'estado' => 'ACTIVA',
         ]);
         HorarioPrescripcion::create([
-            'cod_horario_prescripcion' => 'HPR_PRN_' . strtoupper(Str::random(4)),
+            'cod_horario_prescripcion' => 'HPR_PRN_'.strtoupper(Str::random(4)),
             'cod_prescripcion' => $pPRN->cod_prescripcion,
             'hora_programada' => '08:00:00',
             'estado' => 'ACTIVO',
@@ -356,7 +369,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // F. Dos horarios de una misma prescripción son dos ocurrencias diferentes; administrar una no completa la otra
         $pDobleHorario = Prescripcion::create([
-            'cod_prescripcion' => 'PRE_DOB_' . strtoupper(Str::random(4)),
+            'cod_prescripcion' => 'PRE_DOB_'.strtoupper(Str::random(4)),
             'cod_residente' => $this->residente1->cod_residente,
             'cod_atencion' => $atencion->cod_atencion,
             'cod_medicamento' => $med->cod_medicamento,
@@ -370,13 +383,13 @@ class MiTurnoAuditoriaCierreTest extends TestCase
             'estado' => 'ACTIVA',
         ]);
         $h1 = HorarioPrescripcion::create([
-            'cod_horario_prescripcion' => 'HPR_08_' . strtoupper(Str::random(4)),
+            'cod_horario_prescripcion' => 'HPR_08_'.strtoupper(Str::random(4)),
             'cod_prescripcion' => $pDobleHorario->cod_prescripcion,
             'hora_programada' => '08:00:00',
             'estado' => 'ACTIVO',
         ]);
         $h2 = HorarioPrescripcion::create([
-            'cod_horario_prescripcion' => 'HPR_12_' . strtoupper(Str::random(4)),
+            'cod_horario_prescripcion' => 'HPR_12_'.strtoupper(Str::random(4)),
             'cod_prescripcion' => $pDobleHorario->cod_prescripcion,
             'hora_programada' => '12:00:00',
             'estado' => 'ACTIVO',
@@ -384,7 +397,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // Administrar SOLAMENTE el horario h1 (08:00)
         AdministracionMedicacion::create([
-            'cod_administracion' => 'ADM_08_' . strtoupper(Str::random(4)),
+            'cod_administracion' => 'ADM_08_'.strtoupper(Str::random(4)),
             'cod_prescripcion' => $pDobleHorario->cod_prescripcion,
             'cod_horario_prescripcion' => $h1->cod_horario_prescripcion,
             'cod_residente' => $this->residente1->cod_residente,
@@ -401,7 +414,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
         $exceptionLanzada = false;
         try {
             AdministracionMedicacion::create([
-                'cod_administracion' => 'ADM_ERR_' . strtoupper(Str::random(4)),
+                'cod_administracion' => 'ADM_ERR_'.strtoupper(Str::random(4)),
                 'cod_prescripcion' => $pDobleHorario->cod_prescripcion,
                 'cod_horario_prescripcion' => $h2->cod_horario_prescripcion,
                 'cod_residente' => $this->residente2->cod_residente, // Mismatched!
@@ -412,7 +425,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
                 'resultado' => 'ADMINISTRADA',
                 'estado' => 'REGISTRADA',
             ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             $exceptionLanzada = true;
             $this->assertStringContainsString('no corresponde al residente', $e->getMessage());
         }
@@ -446,7 +459,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
     {
         // Creamos otro enfermero Roberto
         $otroUser = User::create([
-            'cod_usuario' => 'USU_ROB_' . strtoupper(Str::random(4)),
+            'cod_usuario' => 'USU_ROB_'.strtoupper(Str::random(4)),
             'correo' => 'roberto.turno@remembermind.test',
             'contrasena' => bcrypt('password'),
             'estado' => 'ACTIVO',
@@ -454,7 +467,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
         $otroUser->assignRole('ENFERMEROS');
 
         $otroPersonal = Personal::create([
-            'cod_personal' => 'PER_ROB_' . strtoupper(Str::random(4)),
+            'cod_personal' => 'PER_ROB_'.strtoupper(Str::random(4)),
             'cod_usuario' => $otroUser->cod_usuario,
             'nombres' => 'Roberto',
             'apellido_paterno' => 'Díaz',
@@ -464,7 +477,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
         ]);
 
         AsignacionPersonal::create([
-            'cod_asignacion_personal' => 'ASP_ROB_' . strtoupper(Str::random(4)),
+            'cod_asignacion_personal' => 'ASP_ROB_'.strtoupper(Str::random(4)),
             'cod_jornada' => $this->jornadaManana->cod_jornada,
             'cod_personal' => $otroPersonal->cod_personal,
             'cod_area' => $this->area->cod_area,
@@ -476,7 +489,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // Residente 2 estuvo con Clara al inicio a las 07:00
         AsignacionResidenteJornada::create([
-            'cod_asignacion' => 'ARJ_R2_INI_' . strtoupper(Str::random(4)),
+            'cod_asignacion' => 'ARJ_R2_INI_'.strtoupper(Str::random(4)),
             'cod_jornada' => $this->jornadaManana->cod_jornada,
             'cod_personal' => $this->enfermeraPersonal->cod_personal,
             'cod_residente' => $this->residente2->cod_residente,
@@ -486,7 +499,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // A las 11:00 AM (a mitad de turno), se reasigna a Roberto
         AsignacionResidenteJornada::create([
-            'cod_asignacion' => 'ARJ_R2_MID_' . strtoupper(Str::random(4)),
+            'cod_asignacion' => 'ARJ_R2_MID_'.strtoupper(Str::random(4)),
             'cod_jornada' => $this->jornadaManana->cod_jornada,
             'cod_personal' => $otroPersonal->cod_personal,
             'cod_residente' => $this->residente2->cod_residente,
@@ -496,7 +509,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
         ]);
 
         $plan = PlanCuidado::create([
-            'cod_plan' => 'PLC_MID_' . strtoupper(Str::random(4)),
+            'cod_plan' => 'PLC_MID_'.strtoupper(Str::random(4)),
             'cod_residente' => $this->residente2->cod_residente,
             'cod_area' => $this->area->cod_area,
             'cod_personal' => $this->enfermeraPersonal->cod_personal,
@@ -505,7 +518,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
             'estado' => 'ACTIVO',
         ]);
         $intervencion = IntervencionCuidado::create([
-            'cod_intervencion' => 'INT_MID_' . strtoupper(Str::random(4)),
+            'cod_intervencion' => 'INT_MID_'.strtoupper(Str::random(4)),
             'cod_plan' => $plan->cod_plan,
             'nombre' => 'Control Matutino',
             'descripcion' => 'Descripción de control',
@@ -515,7 +528,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // Tarea 1: a las 08:00 AM (ANTES de la asignación a Roberto)
         ProgramacionCuidado::create([
-            'cod_programacion' => 'PRG_08_' . strtoupper(Str::random(4)),
+            'cod_programacion' => 'PRG_08_'.strtoupper(Str::random(4)),
             'cod_intervencion' => $intervencion->cod_intervencion,
             'hora_programada' => '08:00:00',
             'frecuencia' => 'Mañana',
@@ -525,7 +538,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // Tarea 2: a las 12:00 PM (DESPUÉS de la asignación a Roberto)
         ProgramacionCuidado::create([
-            'cod_programacion' => 'PRG_12_' . strtoupper(Str::random(4)),
+            'cod_programacion' => 'PRG_12_'.strtoupper(Str::random(4)),
             'cod_intervencion' => $intervencion->cod_intervencion,
             'hora_programada' => '12:00:00',
             'frecuencia' => 'Mediodía',
@@ -534,7 +547,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
         ]);
 
         // Consultamos el dashboard de Roberto a las 11:30 tras su asignación
-        \Carbon\Carbon::setTestNow(\Carbon\Carbon::today()->setTime(11, 30, 0));
+        Carbon::setTestNow(Carbon::today()->setTime(11, 30, 0));
         $datosRoberto = $this->service->obtenerDatosDashboard($otroUser);
         $horasTareas = collect($datosRoberto['agenda'])->pluck('hora')->all();
 
@@ -579,10 +592,10 @@ class MiTurnoAuditoriaCierreTest extends TestCase
             'estado' => 'OCUPADA',
         ]);
 
-        $admision = \App\Models\Admision::create([
-            'cod_admision' => 'ADM_INC_' . strtoupper(\Illuminate\Support\Str::random(4)),
+        $admision = Admision::create([
+            'cod_admision' => 'ADM_INC_'.strtoupper(Str::random(4)),
             'cod_residente' => $this->residente1->cod_residente,
-            'fecha_hora_admision' => \Carbon\Carbon::now()->subMonths(2),
+            'fecha_hora_admision' => Carbon::now()->subMonths(2),
             'tipo_ingreso' => 'ORDINARIO',
             'motivo_ingreso' => 'Admisión para cuidados asistenciales',
             'cod_usuario_registro' => $this->enfermeraUser->cod_usuario,
@@ -594,19 +607,19 @@ class MiTurnoAuditoriaCierreTest extends TestCase
             'cod_ocupacion' => 'OCU_INC_1',
             'cod_admision' => $admision->cod_admision,
             'cod_usuario_registro' => $this->enfermeraUser->cod_usuario,
-            'fecha_hora_asignacion' => \Carbon\Carbon::now()->subDays(5),
+            'fecha_hora_asignacion' => Carbon::now()->subDays(5),
             'cod_residente' => $this->residente1->cod_residente,
             'cod_cama' => $cama1->cod_cama,
             'estado' => 'ACTIVA',
         ]);
 
         // La garantía física evita que incluso un INSERT directo cree la inconsistencia.
-        $this->expectException(\Illuminate\Database\QueryException::class);
-        \Illuminate\Support\Facades\DB::table('ocupaciones_cama')->insert([
+        $this->expectException(QueryException::class);
+        DB::table('ocupaciones_cama')->insert([
             'cod_ocupacion' => 'OCU_INC_2',
             'cod_admision' => $admision->cod_admision,
             'cod_usuario_registro' => $this->enfermeraUser->cod_usuario,
-            'fecha_hora_asignacion' => \Carbon\Carbon::now()->subDays(2)->toDateTimeString(),
+            'fecha_hora_asignacion' => Carbon::now()->subDays(2)->toDateTimeString(),
             'cod_residente' => $this->residente1->cod_residente,
             'cod_cama' => $cama2->cod_cama,
             'estado' => 'ACTIVA',
@@ -629,7 +642,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
     {
         // A. Plan inactivo no genera tarea
         $planInactivo = PlanCuidado::create([
-            'cod_plan' => 'PLC_INA_' . strtoupper(Str::random(4)),
+            'cod_plan' => 'PLC_INA_'.strtoupper(Str::random(4)),
             'cod_residente' => $this->residente1->cod_residente,
             'cod_area' => $this->area->cod_area,
             'cod_personal' => $this->enfermeraPersonal->cod_personal,
@@ -638,7 +651,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
             'estado' => 'INACTIVO',
         ]);
         $int1 = IntervencionCuidado::create([
-            'cod_intervencion' => 'INT_INA_' . strtoupper(Str::random(4)),
+            'cod_intervencion' => 'INT_INA_'.strtoupper(Str::random(4)),
             'cod_plan' => $planInactivo->cod_plan,
             'nombre' => 'Intervencion en Plan Inactivo',
             'descripcion' => 'Descripción de cuidado',
@@ -646,7 +659,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
             'estado' => 'ACTIVO',
         ]);
         ProgramacionCuidado::create([
-            'cod_programacion' => 'PRG_INA1_' . strtoupper(Str::random(4)),
+            'cod_programacion' => 'PRG_INA1_'.strtoupper(Str::random(4)),
             'cod_intervencion' => $int1->cod_intervencion,
             'hora_programada' => '08:00:00',
             'frecuencia' => 'Diario',
@@ -656,7 +669,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // Plan activo
         $planActivo = PlanCuidado::create([
-            'cod_plan' => 'PLC_ACT_' . strtoupper(Str::random(4)),
+            'cod_plan' => 'PLC_ACT_'.strtoupper(Str::random(4)),
             'cod_residente' => $this->residente1->cod_residente,
             'cod_area' => $this->area->cod_area,
             'cod_personal' => $this->enfermeraPersonal->cod_personal,
@@ -667,7 +680,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // B. Intervención inactiva no genera tarea
         $intInactiva = IntervencionCuidado::create([
-            'cod_intervencion' => 'INT_INACTIVA_' . strtoupper(Str::random(4)),
+            'cod_intervencion' => 'INT_INACTIVA_'.strtoupper(Str::random(4)),
             'cod_plan' => $planActivo->cod_plan,
             'nombre' => 'Intervencion Inactiva',
             'descripcion' => 'Descripción de cuidado',
@@ -675,7 +688,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
             'estado' => 'INACTIVO',
         ]);
         ProgramacionCuidado::create([
-            'cod_programacion' => 'PRG_INA2_' . strtoupper(Str::random(4)),
+            'cod_programacion' => 'PRG_INA2_'.strtoupper(Str::random(4)),
             'cod_intervencion' => $intInactiva->cod_intervencion,
             'hora_programada' => '08:30:00',
             'frecuencia' => 'Diario',
@@ -685,7 +698,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // Intervención activa
         $intActiva = IntervencionCuidado::create([
-            'cod_intervencion' => 'INT_ACTIVA_' . strtoupper(Str::random(4)),
+            'cod_intervencion' => 'INT_ACTIVA_'.strtoupper(Str::random(4)),
             'cod_plan' => $planActivo->cod_plan,
             'nombre' => 'Intervención Activa',
             'descripcion' => 'Descripción de cuidado',
@@ -695,7 +708,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // C. Programación inactiva no genera tarea
         ProgramacionCuidado::create([
-            'cod_programacion' => 'PRG_INA3_' . strtoupper(Str::random(4)),
+            'cod_programacion' => 'PRG_INA3_'.strtoupper(Str::random(4)),
             'cod_intervencion' => $intActiva->cod_intervencion,
             'hora_programada' => '09:00:00',
             'frecuencia' => 'Diario',
@@ -705,7 +718,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // D. fecha < fecha_activacion (activación futura) no genera tarea
         ProgramacionCuidado::create([
-            'cod_programacion' => 'PRG_FUT_' . strtoupper(Str::random(4)),
+            'cod_programacion' => 'PRG_FUT_'.strtoupper(Str::random(4)),
             'cod_intervencion' => $intActiva->cod_intervencion,
             'hora_programada' => '09:30:00',
             'frecuencia' => 'Diario',
@@ -715,7 +728,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // E. fecha > fecha_desactivacion (desactivada ayer) no genera tarea
         ProgramacionCuidado::create([
-            'cod_programacion' => 'PRG_PAS_' . strtoupper(Str::random(4)),
+            'cod_programacion' => 'PRG_PAS_'.strtoupper(Str::random(4)),
             'cod_intervencion' => $intActiva->cod_intervencion,
             'hora_programada' => '10:00:00',
             'frecuencia' => 'Diario',
@@ -727,7 +740,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
         // F. dias_semana incorrecto no genera tarea
         $diaInvalido = Carbon::now()->addDays(2)->format('l');
         ProgramacionCuidado::create([
-            'cod_programacion' => 'PRG_DIA_' . strtoupper(Str::random(4)),
+            'cod_programacion' => 'PRG_DIA_'.strtoupper(Str::random(4)),
             'cod_intervencion' => $intActiva->cod_intervencion,
             'hora_programada' => '10:30:00',
             'frecuencia' => 'Días específicos',
@@ -738,7 +751,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // G. cod_turno distinto (asignada al turno noche, estando en turno mañana) no genera tarea
         ProgramacionCuidado::create([
-            'cod_programacion' => 'PRG_TURNO_' . strtoupper(Str::random(4)),
+            'cod_programacion' => 'PRG_TURNO_'.strtoupper(Str::random(4)),
             'cod_intervencion' => $intActiva->cod_intervencion,
             'cod_turno' => $this->turnoNoche->cod_turno,
             'hora_programada' => '11:00:00',
@@ -749,7 +762,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // H. No inventar horario por texto: hora_programada = null no genera tarea
         ProgramacionCuidado::create([
-            'cod_programacion' => 'PRG_SNHORA_' . strtoupper(Str::random(4)),
+            'cod_programacion' => 'PRG_SNHORA_'.strtoupper(Str::random(4)),
             'cod_intervencion' => $intActiva->cod_intervencion,
             'hora_programada' => null,
             'frecuencia' => 'Cada 4 horas según necesidad',
@@ -759,7 +772,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // I. Programación válida que cumple TODOS los requisitos
         ProgramacionCuidado::create([
-            'cod_programacion' => 'PRG_VALIDA_' . strtoupper(Str::random(4)),
+            'cod_programacion' => 'PRG_VALIDA_'.strtoupper(Str::random(4)),
             'cod_intervencion' => $intActiva->cod_intervencion,
             'cod_turno' => $this->turnoManana->cod_turno,
             'hora_programada' => '11:30:00',
@@ -791,7 +804,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // 2. Turno nocturno (20:00:00 a 08:00:00 del día siguiente)
         $jornadaNoc = Jornada::create([
-            'cod_jornada' => 'JOR_NOC_TEST_' . strtoupper(Str::random(4)),
+            'cod_jornada' => 'JOR_NOC_TEST_'.strtoupper(Str::random(4)),
             'cod_turno' => $this->turnoNoche->cod_turno,
             'fecha_jornada' => '2026-09-20',
             'estado' => 'ACTIVA',
@@ -820,7 +833,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
     public function test_punto_7_orden_agenda_determinista_ante_misma_hora(): void
     {
         $plan = PlanCuidado::create([
-            'cod_plan' => 'PLC_ORD_' . strtoupper(Str::random(4)),
+            'cod_plan' => 'PLC_ORD_'.strtoupper(Str::random(4)),
             'cod_residente' => $this->residente1->cod_residente,
             'cod_area' => $this->area->cod_area,
             'cod_personal' => $this->enfermeraPersonal->cod_personal,
@@ -830,7 +843,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
         ]);
 
         $intB = IntervencionCuidado::create([
-            'cod_intervencion' => 'INT_B_' . strtoupper(Str::random(4)),
+            'cod_intervencion' => 'INT_B_'.strtoupper(Str::random(4)),
             'cod_plan' => $plan->cod_plan,
             'nombre' => 'B. Curación de herida',
             'descripcion' => 'Descripción de herida',
@@ -839,7 +852,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
         ]);
 
         $intA = IntervencionCuidado::create([
-            'cod_intervencion' => 'INT_A_' . strtoupper(Str::random(4)),
+            'cod_intervencion' => 'INT_A_'.strtoupper(Str::random(4)),
             'cod_plan' => $plan->cod_plan,
             'nombre' => 'A. Aspiración de secreciones',
             'descripcion' => 'Descripción de aspiración',
@@ -849,7 +862,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
 
         // Ambas programadas exactamente a las 09:00
         ProgramacionCuidado::create([
-            'cod_programacion' => 'PRG_B_' . strtoupper(Str::random(4)),
+            'cod_programacion' => 'PRG_B_'.strtoupper(Str::random(4)),
             'cod_intervencion' => $intB->cod_intervencion,
             'hora_programada' => '09:00:00',
             'frecuencia' => 'Mañana',
@@ -858,7 +871,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
         ]);
 
         ProgramacionCuidado::create([
-            'cod_programacion' => 'PRG_A_' . strtoupper(Str::random(4)),
+            'cod_programacion' => 'PRG_A_'.strtoupper(Str::random(4)),
             'cod_intervencion' => $intA->cod_intervencion,
             'hora_programada' => '09:00:00',
             'frecuencia' => 'Mañana',

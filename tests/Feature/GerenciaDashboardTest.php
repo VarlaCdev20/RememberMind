@@ -8,6 +8,7 @@ use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use App\Modulos\Reportes\Aplicacion\Consultas\RoleDashboardDataService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -74,7 +75,7 @@ class GerenciaDashboardTest extends TestCase
     #[DataProvider('horariosSaludo')]
     public function test_gerencia_muestra_saludo_y_nombre_sin_etiqueta_generica_de_permisos(string $hora, string $saludo): void
     {
-        $this->travelTo(\Illuminate\Support\Carbon::parse('2026-10-17 '.$hora, config('app.timezone')));
+        $this->travelTo(Carbon::parse('2026-10-17 '.$hora, config('app.timezone')));
         $this->seed(RolesAndPermissionsSeeder::class);
         $gerente = User::factory()->create([
             'estado' => 'ACTIVO', 'nombres' => 'ALICIA ELENA',
@@ -103,10 +104,10 @@ class GerenciaDashboardTest extends TestCase
         $superadmin = User::factory()->create(['estado' => 'ACTIVO']);
         $superadmin->assignRole('SUPERADMINISTRADOR');
         $this->actingAs($superadmin)->get(route('dashboard'))->assertOk()
-            ->assertSee('wire:poll.12s="verificarAlertas"', false);
+            ->assertSee('wire:poll.visible.60s="verificarAlertas"', false);
         $this->withSession([RolePreviewService::SESSION_KEY => 'GERENTE'])
             ->get(route('dashboard'))->assertOk()->assertSee('Modo previsualización')
-            ->assertDontSee('wire:poll.12s="verificarAlertas"', false);
+            ->assertDontSee('wire:poll.visible.60s="verificarAlertas"', false);
         $this->postJson(Livewire::getUpdateUri(), ['components' => []])->assertForbidden();
         $this->assertSame(['SUPERADMINISTRADOR'], $superadmin->fresh()->getRoleNames()->all());
     }

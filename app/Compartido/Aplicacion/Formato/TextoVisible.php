@@ -9,7 +9,7 @@ final class TextoVisible
     {
         $texto = preg_replace('/\[heridas:[A-Za-z0-9_-]+\]\h*/u', '', $texto ?? '');
 
-        $codigo = '\bCOD_[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b';
+        $codigo = '\b(?:COD|LP)_[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b';
         $texto = preg_replace('/\h*\('.$codigo.'\)/u', '', $texto);
 
         return trim(preg_replace('/'.$codigo.'\h*/u', '', $texto));

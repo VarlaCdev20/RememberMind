@@ -138,7 +138,7 @@
     $hidratacionHoyMl = $hidratacionHoy->sum(fn ($r) => (float) $r->cantidad_ml);
     $movilidadHoy = $adultoMayor->registrosMovilidad->first(fn ($r) => $r->fecha_hora?->isToday());
     $asignacionActiva = $adultoMayor->asignacionesJornada->first(fn ($a) => in_array($a->estado, ['ACTIVA', 'ACTIVO'], true));
-    $alertasAct = $adultoMayor->alertas->whereIn('estado', ['ABIERTA', 'EN_ATENCION']);
+    $alertasAct = $adultoMayor->alertas->whereIn('estado', \App\Models\Alerta::ESTADOS_ACTIVOS);
 @endphp
 
 {{-- GRID DE 3 COLUMNAS EXACTO COMO LA IMAGEN --}}

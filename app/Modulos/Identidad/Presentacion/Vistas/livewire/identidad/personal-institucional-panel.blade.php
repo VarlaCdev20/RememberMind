@@ -485,7 +485,7 @@
 
      <div>
       <dt>Turno</dt>
-      <dd>{{ $asignacionActiva?->turno?->nombre ?? 'Sin turno asignado' }}</dd>
+      <dd>{{ $asignacionActiva?->jornada?->turno?->nombre ?? 'Sin turno asignado' }}</dd>
      </div>
      </dl>
 
@@ -576,7 +576,7 @@
         <dl class="rm-staff-list__facts">
          <div><dt>Rol / Tipo</dt><dd>{{ $tipo }}</dd></div>
          <div><dt>Área</dt><dd>{{ $area }}</dd></div>
-         <div><dt>Turno</dt><dd>{{ $asignacionActiva?->turno?->nombre ?? 'Sin turno asignado' }}</dd></div>
+         <div><dt>Turno</dt><dd>{{ $asignacionActiva?->jornada?->turno?->nombre ?? 'Sin turno asignado' }}</dd></div>
         </dl>
        </div>
        <div class="rm-staff-list__actions">

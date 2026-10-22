@@ -317,7 +317,7 @@ class DashboardTurno extends Component
         $alerta = Alerta::findOrFail($codAlerta);
         $this->asegurarModoOperativo($alerta->cod_residente, 'alertas.gestionar');
         app(TurnoEnfermeriaService::class)->autorizarAccionPaciente($alerta->cod_residente, Auth::user());
-        abort_unless($alerta->estado === 'ABIERTA', 409, 'La alerta ya fue atendida o cerrada.');
+        abort_unless(in_array($alerta->estado, Alerta::ESTADOS_ACTIVOS, true), 409, 'El estado actual de la alerta no admite iniciar atención.');
         $this->alertaAccionId = $codAlerta;
         $this->accionTomadaAlerta = '';
         $this->modalAtenderAlerta = true;

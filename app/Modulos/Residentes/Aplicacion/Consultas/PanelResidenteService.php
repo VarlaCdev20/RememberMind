@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Residentes\Aplicacion\Consultas;
 
+use App\Models\Alerta;
 use App\Models\Residente;
 use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use Illuminate\Support\Facades\DB;
@@ -50,7 +51,7 @@ class PanelResidenteService
             'observacion_breve' => $observacion !== '' ? Str::limit($observacion, 145) : null,
             'alertas_activas' => $tab === 'salud'
                 ? DB::table('alertas')->where('cod_residente', $codigo)
-                    ->whereNotIn('estado', ['CERRADA', 'ANULADA'])->count()
+                    ->whereIn('estado', Alerta::ESTADOS_ACTIVOS)->count()
                 : null,
             'documentos' => $tab === 'documentos'
                 ? DB::table('documentos')->where('cod_residente', $codigo)

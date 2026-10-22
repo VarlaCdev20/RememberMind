@@ -2,8 +2,11 @@
 
 namespace App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades;
 
+use App\Compartido\Aplicacion\Formato\TextoVisible;
 use App\Models\Alerta;
 use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
+use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 
@@ -41,7 +44,7 @@ class HistorialAlerta extends Component
 
         $this->accion = '';
         $this->dispatch('evento-alerta-registrado', alertaId: $this->alertaId);
-        session()->flash('mensaje', 'Intervención registrada en el historial.');
+        session()->flash('mensaje', 'Seguimiento registrado en el historial.');
     }
 
     public function render()
@@ -49,7 +52,7 @@ class HistorialAlerta extends Component
         $alerta = Alerta::findOrFail($this->alertaId);
         app(AlertasService::class)->autorizarLectura($alerta, auth()->user());
         $alerta->load([
-            'adultoMayor',
+            'residente',
             'responsable.usuario',
             'eventos.usuario',
         ]);
@@ -59,7 +62,7 @@ class HistorialAlerta extends Component
             ->sortBy('fecha_hora')
             ->values()
             ->map(function ($ev) {
-                $nombreActor = $ev->usuario ? ($ev->usuario->nombres.' '.$ev->usuario->ap_paterno) : 'Profesional / Sistema';
+                $nombreActor = $ev->usuario ? $ev->usuario->name : 'Autor no disponible';
                 $fechaFormat = $ev->fecha_hora ? $ev->fecha_hora->translatedFormat('d M Y, H:i') : 'Sin fecha';
                 $cambioEstado = ($ev->estado_anterior && $ev->estado_nuevo && $ev->estado_anterior !== $ev->estado_nuevo)
                     ? "{$ev->estado_anterior} → {$ev->estado_nuevo}"
@@ -78,7 +81,7 @@ class HistorialAlerta extends Component
                     'tipo' => $ev->tipo_evento,
                     'estado' => $cambioEstado,
                     'fecha' => $fechaFormat,
-                    'descripcion' => \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($ev->descripcion),
+                    'descripcion' => TextoVisible::sinCodigosInternos($ev->descripcion),
                     'variant' => $variant,
                     'icon' => match ($ev->tipo_evento) {
                         'CREACION' => 'ph ph-plus-circle',
@@ -90,8 +93,18 @@ class HistorialAlerta extends Component
             })
             ->toArray();
 
+        $usuario = auth()->user();
+        $turnos = app(TurnoEnfermeriaService::class);
+        $puedeSeguir = in_array($alerta->estado, Alerta::ESTADOS_ACTIVOS, true)
+            && ! app(RolePreviewService::class)->isActive($usuario)
+            && ($usuario->hasRole('ENFERMEROS')
+                ? $usuario->can('alertas.gestionar') && $usuario->personal?->estado === 'ACTIVO'
+                    && $turnos->obtenerTurnoActivo($usuario) !== null && $turnos->esPacienteAsignado($alerta->cod_residente, $usuario)
+                : $usuario->hasAnyRole(['ADMINISTRADOR', 'GERENTE', 'SUPERADMINISTRADOR']) && $usuario->canAny(['alertas.gestionar', 'alertas.seguimiento']));
+
         return view('livewire.features.alertas.historial-alerta', [
             'alerta' => $alerta,
+            'puedeSeguir' => $puedeSeguir,
             'timelineItems' => $timelineItems,
         ]);
     }
