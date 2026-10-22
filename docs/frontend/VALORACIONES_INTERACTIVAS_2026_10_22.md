@@ -200,3 +200,11 @@ Los artefactos permanecen locales y se excluyen del commit de código.
 - Sin instrumentos cognitivos instalados no se fabrican tarjetas clínicas. Su
   incorporación o licencia requiere decisión explícita del responsable.
 - Revisión de PR e integración a develop pendientes. No se publica ni modifica main.
+
+
+## Consolidación solicitada posteriormente
+
+El propietario solicitó reunir estos cambios en `feature/apoyo-decision-informe-neurocognitivo`
+y publicarlos para el equipo. El registro conjunto y las instrucciones de actualización
+están en `docs/sistema/PUBLICACION_CONJUNTA_2026_10_22.md`. Esta solicitud posterior
+no modifica los límites de QA visual ni supone validación clínica.
