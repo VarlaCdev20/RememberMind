@@ -15,9 +15,9 @@
     <div class="rm-nursing-module__content" wire:loading.remove>
         @forelse($alertasPendientes as $alerta)
             <x-ui.priority-alert :alert="$alerta"
-                :href="$puedeVerAlertas ? route('admin.enfermeria.alertas') : null" />
+                :href="$puedeVerAlertas ? route('admin.enfermeria.alertas', ['alerta'=>$alerta['cod_alerta']]) : null" />
         @empty
-            <x-ui.empty-state compact :icono="($dashboard['estado'] ?? '') === 'SIN_JORNADA_ACTIVA' ? 'ph-warning-circle' : 'ph-check-circle'" :titulo="($dashboard['estado'] ?? '') === 'SIN_JORNADA_ACTIVA' ? 'Sin contexto del turno' : 'Sin alertas prioritarias'" :texto="($dashboard['estado'] ?? '') === 'SIN_JORNADA_ACTIVA' ? 'Consulta Alertas para revisar los registros disponibles.' : 'No hay situaciones que requieran atención inmediata.'" />
+            <x-ui.empty-state compact :icono="($dashboard['estado'] ?? '') === 'SIN_JORNADA_ACTIVA' ? 'ph-warning-circle' : 'ph-check-circle'" :titulo="($dashboard['estado'] ?? '') === 'SIN_JORNADA_ACTIVA' ? 'Sin contexto del turno' : 'Sin alertas prioritarias'" :texto="($dashboard['estado'] ?? '') === 'SIN_JORNADA_ACTIVA' ? 'Consulta Alertas para revisar los registros disponibles.' : 'No hay alertas prioritarias registradas en esta consulta.'" />
         @endforelse
     </div>
 </x-ui.card>

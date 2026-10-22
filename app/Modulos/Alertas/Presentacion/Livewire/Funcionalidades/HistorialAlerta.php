@@ -5,6 +5,8 @@ namespace App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades;
 use App\Compartido\Aplicacion\Formato\TextoVisible;
 use App\Models\Alerta;
 use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
+use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
+use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 
@@ -91,8 +93,18 @@ class HistorialAlerta extends Component
             })
             ->toArray();
 
+        $usuario = auth()->user();
+        $turnos = app(TurnoEnfermeriaService::class);
+        $puedeSeguir = in_array($alerta->estado, Alerta::ESTADOS_ACTIVOS, true)
+            && ! app(RolePreviewService::class)->isActive($usuario)
+            && ($usuario->hasRole('ENFERMEROS')
+                ? $usuario->can('alertas.gestionar') && $usuario->personal?->estado === 'ACTIVO'
+                    && $turnos->obtenerTurnoActivo($usuario) !== null && $turnos->esPacienteAsignado($alerta->cod_residente, $usuario)
+                : $usuario->hasAnyRole(['ADMINISTRADOR', 'GERENTE', 'SUPERADMINISTRADOR']) && $usuario->canAny(['alertas.gestionar', 'alertas.seguimiento']));
+
         return view('livewire.features.alertas.historial-alerta', [
             'alerta' => $alerta,
+            'puedeSeguir' => $puedeSeguir,
             'timelineItems' => $timelineItems,
         ]);
     }

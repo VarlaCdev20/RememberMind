@@ -1,5 +1,5 @@
 // Feedback de transporte: nunca confirma persistencia ni reenvía una escritura.
-const escrituras = new Set(['guardarAlerta', 'guardarAtencion', 'guardarAccion', 'confirmarCierre', 'asignarResponsable', 'reconocer', 'detectarAlertas']);
+const escrituras = new Set(['guardarAlerta', 'guardarRegistroEspecialidad', 'guardarAtencion', 'guardarAccion', 'confirmarCierre', 'asignarResponsable', 'reconocer', 'detectarAlertas']);
 let registrado = false;
 
 export function mensajeErrorAlerta(status) {

@@ -130,7 +130,11 @@ $modalId = $id ?: 'modal-'.\Illuminate\Support\Str::slug((string) ($attributes->
                 @endif
                 <h3 id="{{ $modalId }}-titulo" class="rm-modal-panel__title flex items-center gap-2.5 leading-tight">
                     @if(isset($icon) && $icon)
-                        {{ $icon }}
+                        @if(is_string($icon) && preg_match('/^ph-[a-z0-9-]+$/', $icon))
+                            <i class="ph-bold {{ $icon }}" aria-hidden="true"></i>
+                        @else
+                            {{ $icon }}
+                        @endif
                     @endif
                     {{ $title }}
                 </h3>

@@ -10,6 +10,7 @@ use App\Models\Jornada;
 use App\Models\Residente;
 use App\Models\Turno;
 use App\Models\User;
+use App\Modulos\Alertas\Aplicacion\Consultas\ExperienciaAlertas;
 use App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPanel;
 use Carbon\Carbon;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -60,8 +61,21 @@ class AlertasExperienciaVisualTest extends TestCase
             if ($actor->can('alertas.ver') && $rol !== 'FAMILIAR') {
                 Livewire::flushState();
                 $response = $this->get(route($rol === 'ENFERMEROS' ? 'admin.enfermeria.alertas' : 'admin.alertas-clinicas.index'))->assertOk();
+                $response->assertSee('<h1>'.app(ExperienciaAlertas::class)->paraRol($rol)['titulo'].'</h1>', false);
+                $response->assertSeeText('Especialidad vinculada')->assertSeeText('Buscar alertas');
                 $this->exportar($slug, $response->getContent());
                 $panel = Livewire::test(AlertasPanel::class)->call('verDetalle', $alertas->first()->getKey())->assertHasNoErrors();
+                $panel->assertViewHas('puedeIntervenir', $rol === 'ENFERMEROS')
+                    ->assertViewHas('puedeCoordinar', in_array($rol, ['ADMINISTRADOR', 'SUPERADMINISTRADOR'], true));
+                if ($rol === 'ENFERMEROS') {
+                    $panel->call('atenderAlerta', $alertas->first()->getKey())->assertSee('Nota de intervención')
+                        ->call('guardarAtencion')->assertHasErrors('accionTomada')->call('cerrarModales');
+                }
+                if ($actor->can('alertas.gestionar')) {
+                    $panel->call('abrirCrear')->assertSee('Tipo de alerta')->assertSee('Origen del evento')
+                        ->assertSee('Prioridad registrada')->call('guardarAlerta')
+                        ->assertHasErrors(['codResidente', 'tipoAlerta', 'motivo'])->call('cerrarModales');
+                }
                 Livewire::flushState();
                 $detalle = $this->get(route($rol === 'ENFERMEROS' ? 'admin.enfermeria.alertas' : 'admin.alertas-clinicas.index', ['alerta' => $alertas->first()->getKey()]))->assertOk();
                 $this->exportar($slug.'-detalle', $detalle->getContent());

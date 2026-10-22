@@ -123,10 +123,10 @@ class AlertasFlujoTest extends TestCase
     {
         [, $adulto] = $this->preparar(['alertas.ver']);
         Alerta::create(['cod_residente' => $adulto->cod_residente, 'modulo' => 'MANUAL', 'tipo' => 'CERRADA ESPECIAL', 'descripcion' => 'Seguimiento concluido', 'estado' => 'CERRADA']);
-        Livewire::test(AlertasPanel::class)->set('search', $adulto->nombres)
-            ->assertSee('CERRADA ESPECIAL')
-            ->set('filtroEstado', 'ACTIVAS')->assertDontSee('CERRADA ESPECIAL')
-            ->set('filtroEstado', 'CERRADA')->assertSee('CERRADA ESPECIAL')
+        Livewire::test(AlertasPanel::class)->set('filtroEspecialidad', '')->set('search', $adulto->nombres)
+            ->assertSee('Cerrada especial')
+            ->set('filtroEstado', 'ACTIVAS')->assertDontSee('Cerrada especial')
+            ->set('filtroEstado', 'CERRADA')->assertSee('Cerrada especial')
             ->call('abrirCrear')->assertForbidden();
     }
 

@@ -1,5 +1,5 @@
 @if($modalResultadoCierre && $resultadoCierre !== [])
-    <x-ui.modal-livewire id="modalResultadoCierreAlerta" wire:model="modalResultadoCierre" maxWidth="md" closeMethod="cerrarResultadoCierre">
+    <x-ui.modal-livewire class="rm-alert-dialog" id="modalResultadoCierreAlerta" wire:model="modalResultadoCierre" maxWidth="md" closeMethod="cerrarResultadoCierre">
         <x-slot name="title">Resultado del cierre</x-slot>
 
         <x-ui.resultado-operacion-clinica

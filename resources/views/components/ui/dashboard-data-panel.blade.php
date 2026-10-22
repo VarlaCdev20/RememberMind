@@ -9,9 +9,12 @@
     $maximum = max(array_merge([1], array_map(fn ($item) => max(0, (int) ($item['value'] ?? 0)), $items)));
     $cursor = 0;
     $stops = [];
+    $semanticColors = ['danger'=>'--rm-danger-strong', 'warning'=>'--rm-warning-strong', 'info'=>'--rm-info-strong', 'success'=>'--rm-success-strong', 'neutral'=>'--rm-text-secondary'];
+    $itemColors = [];
     foreach ($items as $index => $item) {
         $next = $total > 0 ? $cursor + max(0, (int) ($item['value'] ?? 0)) * 100 / $total : $cursor;
-        $token = '--rm-chart-'.(($index % 6) + 1);
+        $token = $semanticColors[$item['tone'] ?? ''] ?? '--rm-chart-'.(($index % 6) + 1);
+        $itemColors[$index] = $token;
         if ($next > $cursor) {
             $edge = min(0.45, ($next - $cursor) / 4);
             $fillStart = $cursor + $edge;
@@ -63,7 +66,7 @@
         <div class="rm-dashboard-data-panel__donut-layout">
             <div class="rm-dashboard-data-panel__donut" style="background: conic-gradient({{ $gradient }})" role="img" aria-label="{{ collect($items)->map(fn ($item) => $item['label'].': '.$item['value'])->implode(', ') }}"><span><strong>{{ $total }}</strong><small>total</small></span></div>
             <ul class="rm-dashboard-data-panel__legend">
-                @foreach($items as $item)<li><span>{{ $item['label'] }}</span><strong>{{ $item['value'] }}</strong></li>@endforeach
+                @foreach($items as $index => $item)<li class="rm-chart-colored-item" style="--rm-chart-item-color: var({{ $itemColors[$index] }})"><span>{{ $item['label'] }}</span><strong>{{ $item['value'] }}</strong></li>@endforeach
             </ul>
         </div>
     @endif

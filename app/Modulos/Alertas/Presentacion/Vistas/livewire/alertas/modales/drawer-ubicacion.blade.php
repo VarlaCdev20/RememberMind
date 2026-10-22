@@ -1,5 +1,5 @@
 @if($drawerUbicacion && $adultoDrawer)
-<x-ui.drawer-livewire wire:model="drawerUbicacion" title="Ubicación actual del residente" :subtitle="$adultoDrawer->nombre_completo" badge="Habitación y cama asignadas" icon="ph-map-pin" size="lg" close-method="cerrarDrawer">
+<x-ui.drawer-livewire class="rm-alert-dialog" wire:model="drawerUbicacion" title="Ubicación actual del residente" :subtitle="$adultoDrawer->nombre_completo" badge="Habitación y cama asignadas" icon="ph-map-pin" size="lg" close-method="cerrarDrawer">
     <div class="space-y-5">
         <p class="rm-help">Consulta la ubicación de la ocupación vigente del residente.</p>
         <dl class="rm-alert-case__facts">

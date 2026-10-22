@@ -9,6 +9,7 @@ use App\Models\Residente;
 use App\Models\User;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -63,9 +64,33 @@ class AlertasService
             'El estado actual de la alerta no admite una intervención.');
     }
 
-    public function crearDesdePanel(string $codResidente, array $datos, User $usuario): Alerta
+    public function crearDesdePanel(string $codResidente, array $datos, User $usuario, ?string $solicitud = null): Alerta
     {
         $this->autorizarCoordinacion($codResidente, 'alertas.gestionar', $usuario);
+
+        if ($solicitud !== null) {
+            $clave = 'alertas:alta:'.hash('sha256', $usuario->getKey().'|'.$solicitud);
+
+            return Cache::lock($clave.':lock', 15)->block(3, function () use ($clave, $codResidente, $datos, $usuario) {
+                if ($codigo = Cache::get($clave)) {
+                    $existente = Alerta::query()->find($codigo);
+                    if ($existente) {
+                        abort_unless($existente->cod_residente === $codResidente, 409, 'Esta solicitud ya corresponde a otro residente.');
+
+                        return $existente;
+                    }
+                    // Un commit fallido no deja un identificador inexistente bloqueando el reintento.
+                    Cache::forget($clave);
+                }
+
+                return DB::transaction(function () use ($clave, $codResidente, $datos, $usuario) {
+                    $alerta = $this->crear($codResidente, $datos, $usuario, coordinacion: true, deduplicar: false);
+                    Cache::put($clave, $alerta->getKey(), now()->addHour());
+
+                    return $alerta;
+                });
+            });
+        }
 
         return $this->crear($codResidente, $datos, $usuario, coordinacion: true, deduplicar: false);
     }

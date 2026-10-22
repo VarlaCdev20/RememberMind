@@ -320,7 +320,7 @@ class SidebarService
             $sidebar[] = $this->buildSection('Sistema experto', 'ph-brain', 'admin.sistema-experto.residentes', [], false, 'residentes.ver');
         }
         $sidebar[] = $this->buildSection('Medicación', 'ph-pill', 'admin.salud-seguimiento.medicacion.index');
-        $sidebar[] = $this->buildSection('Alertas clínicas', 'ph-bell-ringing', 'admin.salud-seguimiento.alertas');
+        $sidebar[] = $this->buildSection('Alertas clínicas', 'ph-bell-ringing', 'admin.alertas-clinicas.index', [], false, 'alertas.ver');
         $sidebar[] = $this->buildSection('Reportes', 'ph-chart-bar', 'admin.salud-seguimiento.reportes');
 
         return array_values(array_filter($sidebar));
@@ -339,6 +339,7 @@ class SidebarService
         }
 
         $sidebar[] = $this->buildSection('Inicio', 'ph-house', 'admin.psicologia.dashboard');
+        $sidebar[] = $this->buildSection('Alertas de Psicología', 'ph-bell-ringing', 'admin.alertas-clinicas.index', [], false, 'alertas.ver');
         $sidebar[] = $this->buildSection('Mis pacientes', 'ph-users-three', 'admin.psicologia.evaluaciones');
         if ($user->personal()->where('estado', 'ACTIVO')->where('profesion', 'PSICOLOGIA')->exists()) {
             $sidebar[] = $this->buildSection('Sistema experto', 'ph-brain', 'admin.sistema-experto.residentes', [], false, 'residentes.ver');
@@ -361,6 +362,7 @@ class SidebarService
     {
         $sidebar = [
             $this->buildSection('Inicio', 'ph-house', 'dashboard'),
+            $this->buildSection('Alertas de mi especialidad', 'ph-bell-ringing', 'admin.alertas-clinicas.index', [], false, 'alertas.ver'),
             $this->buildSection('Residentes', 'ph-users-four', 'admin.adultos-mayores.index'),
             $this->buildSection('Reportes', 'ph-chart-bar', 'admin.reportes.adultos.preview'),
         ];
@@ -369,24 +371,26 @@ class SidebarService
     }
 
     // =========================================================
-    //  FISIOTERAPEUTA (todas las rutas son placeholder)
+    //  FISIOTERAPEUTA
     // =========================================================
     private function getFisioterapeutaSidebar(): array
     {
         $sidebar = [
             $this->buildSection('Inicio', 'ph-house', 'dashboard'),
+            $this->buildSection('Alertas de mi especialidad', 'ph-bell-ringing', 'admin.alertas-clinicas.index', [], false, 'alertas.ver'),
         ];
 
         return array_values(array_filter($sidebar));
     }
 
     // =========================================================
-    //  NUTRICIONISTA (sin módulo navegable activo en esta fase)
+    //  NUTRICIONISTA
     // =========================================================
     private function getNutricionistaSidebar(): array
     {
         $sidebar = [
             $this->buildSection('Inicio', 'ph-house', 'dashboard'),
+            $this->buildSection('Alertas de mi especialidad', 'ph-bell-ringing', 'admin.alertas-clinicas.index', [], false, 'alertas.ver'),
         ];
 
         return array_values(array_filter($sidebar));

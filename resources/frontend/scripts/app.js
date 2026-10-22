@@ -1,5 +1,7 @@
 import './utilities/bootstrap.js';
 import './modules/operaciones-interactivas.js';
+import './modules/alertas-signos.js';
+import './modules/alertas-trazabilidad.js';
 import './modules/medicacion-registro.js';
 import './modules/medicacion-agenda-graficas.js';
 

@@ -1,17 +1,11 @@
 @if($modalCerrar && $alertaActiva)
-    <x-ui.modal-livewire id="modalCerrarAlerta" wire:model="modalCerrar" maxWidth="md" closeMethod="solicitarCerrarModales" alpineBusy="guardados > 0">
+    <x-ui.modal-livewire class="rm-alert-dialog" :title="$puedeIntervenir ? 'Cerrar y archivar alerta' : 'Cerrar coordinación de la alerta'" subtitle="Resultado y justificación con trazabilidad completa" id="modalCerrarAlerta" wire:model="modalCerrar" maxWidth="md" badge="Alertas · cierre justificado" closeMethod="solicitarCerrarModales" alpineBusy="guardados > 0">
         <x-slot name="icon">
-            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--rm-success-soft)] text-[var(--rm-success)]">
+            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary-ink)]">
                 <i class="ph-bold ph-check-circle text-lg" aria-hidden="true"></i>
             </span>
         </x-slot>
 
-        <x-slot name="title">
-            <div>
-                <span class="block">{{ $puedeIntervenir ? 'Cerrar y archivar alerta' : 'Cerrar coordinación de la alerta' }}</span>
-                <span class="mt-0.5 block text-xs font-medium text-[var(--rm-text-secondary)]">Resultado y justificación con trazabilidad completa</span>
-            </div>
-        </x-slot>
 
         <div class="space-y-4">
             <x-ui.section-card class="shadow-none" title="Resumen de la alerta" icon="ph-bell-ringing">
@@ -20,17 +14,25 @@
                         <h4 class="text-sm font-bold text-[var(--rm-text-primary)]">
                             {{ $alertaActiva->residente?->apellido_paterno }} {{ $alertaActiva->residente?->apellido_materno }} {{ $alertaActiva->residente?->nombres }}
                         </h4>
-                        <p class="mt-0.5 font-mono text-xs text-[var(--rm-text-secondary)]">{{ $alertaActiva->residente?->ubicacion_formateada ?? 'Sin ubicación asignada' }}</p>
+                        <p class="mt-0.5 text-xs text-[var(--rm-text-secondary)]">{{ $alertaActiva->residente?->ubicacion_formateada ?? 'Sin ubicación asignada' }}</p>
                     </div>
                     <x-ui.status-badge :estado="$alertaActiva->estado" />
                 </div>
                 <div class="mt-3 border-t border-[var(--rm-border-soft)] pt-3 text-xs">
                     <p class="font-semibold text-[var(--rm-text-body)]"><strong class="text-[var(--rm-text-primary)]">Alerta:</strong> {{ $alertaActiva->tipo }}</p>
-                    <p class="mt-1 line-clamp-2 text-[var(--rm-text-secondary)]">{{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($alertaActiva->descripcion) }}</p>
+                    <p class="mt-1 text-[var(--rm-text-secondary)]">{{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($alertaActiva->descripcion) }}</p>
                 </div>
             </x-ui.section-card>
 
-            <x-ui.callout variant="success" title="Conservación del historial de la alerta" icon="ph-shield-check">
+            @if($alertaActiva->eventos->where('tipo_evento', 'INTERVENCION')->isNotEmpty())
+                <section class="rm-alert-detail__description"><h3>Atención registrada</h3>
+                    @foreach($alertaActiva->eventos->where('tipo_evento', 'INTERVENCION')->sortByDesc('fecha_hora')->take(3) as $intervencion)
+                        <p>{{ $intervencion->fecha_hora?->format('d/m/Y H:i') }} · {{ $intervencion->usuario?->name ?: 'Autor no disponible' }}</p><p>{{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($intervencion->descripcion) }}</p>
+                    @endforeach
+                </section>
+            @endif
+
+            <x-ui.callout variant="info" title="Conservación del historial de la alerta" icon="ph-shield-check">
                 El cierre cambia el estado a CERRADA. La alerta y sus eventos permanecen disponibles. Un cierre de coordinación no acredita resolución clínica.
             </x-ui.callout>
 

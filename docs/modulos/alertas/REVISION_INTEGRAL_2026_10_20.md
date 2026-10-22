@@ -220,3 +220,56 @@ No hay cambios de permisos, reglas clínicas, esquema ni datos institucionales e
 `php artisan test --compact --filter='AlertasExperienciaVisualTest|AlertasRolesConsistenciaTest|AlertasFlujoTest|PanelAlertaPreparadoTest'`: 46 pruebas, 45 aprobadas y una expectativa anterior fallida (355 aserciones, 274,61 s). El caso esperaba que la entrada sin filtro ocultara cerradas aunque ya se acordó mostrar los registros existentes cuando no hay pendientes. Se corrigió únicamente la prueba: entrada con registro visible, filtro ACTIVAS que lo excluye, filtro CERRADA que lo incluye y creación denegada al lector. Repetición del caso: **PASS, 1 prueba / 4 aserciones**, `alertas-prepublicacion-filtros.xml`. No se presenta la tanda inicial como completamente aprobada ni se alteran permisos para satisfacerla.
 
 Revisión de cierre: sintaxis correcta en 51 archivos PHP; 11 pruebas de frontend aprobadas; `git diff --check` limpio. Sin cambios funcionales posteriores al build y QA documentados. Respaldos, BD, capturas, secretos y archivos de entorno quedan fuera de los commits.
+
+## Segunda revisión de identidad de Alertas y ventanas
+
+Solicitud posterior: publicar el avance y corregir ventanas demasiado planas, haciendo reconocible el campo Alertas en los roles que tienen acceso. Se conserva `feature/alertas-operacion-roles` y los tres commits anteriores; los ajustes siguientes permanecen separados de ese corte.
+
+**Antes:** título principal diluido en la descripción de responsabilidad; prioridad y estado mezclados con metadatos; tarjetas sin señal clara de alerta; detalle con escasa jerarquía del residente. El modal común imprimía como texto los iconos enviados mediante un nombre `ph-*` (los slots HTML sí funcionaban).
+
+**Dirección e implementación:** título principal «Alertas» con responsabilidad del rol en el encabezado; campana, etiqueta y acento de la prioridad ya registrada en cada tarjeta; nombre del residente, tipo y situación en niveles diferenciados. El detalle agrupa identificación, prioridad, estado y residente en una superficie contextual. Diálogos de creación/intervención/cierre y consulta comparten cabecera cálida, profundidad y acciones de tamaño institucional. Se usan los tokens y componentes existentes, sin nueva paleta ni sistema de ventanas. Los iconos nominales del modal se dibujan como iconos; los slots anteriores se conservan. Crear o preparar un cierre no se presenta como un éxito ya confirmado.
+
+Sin cambios de permisos, estados, esquema, datos ni competencias. No se concede acceso a Nutrición/Fisioterapia/Pedagogía/Familiar: «todos los roles» se verifica conforme a su ámbito vigente y los cuatro accesos denegados permanecen denegados.
+
+**Verificación técnica:** `alertas-identidad-ventanas.xml`: PASS, 6 pruebas / 97 aserciones (render de diez roles, componentes de overlay, captura y cierre de coordinación). Build de los ajustes: `alertas-identidad-build.log`. `git diff --check` limpio.
+
+**Dictamen visual: FAIL por evidencia incompleta**, sin atribuir un defecto observado: la herramienta del navegador integrado primero agotó el tiempo de navegación y luego devolvió que el uso local estaba deshabilitado en Work. No se declara inspección actual de cinco anchos, contraste, teclado ni resultado visible de la sesión institucional. Queda pendiente esa aceptación y un commit visual separado del corte anterior.
+
+**Publicación:** los intentos de `git push -u origin feature/alertas-operacion-roles` siguen fallando por conectividad HTTPS/TLS (conexión reiniciada o sin respuesta). El conector GitHub confirmó que `8934fc877d2c6926b71ba2e79105d096f0bc5927` aún no está disponible remotamente; no se informa push aprobado. El respaldo verificado de los tres commits está fuera del repositorio, en `alertas-tres-commits.bundle` del directorio privado de evidencia. No se desactiva la validación de certificados ni se publican datos de la BD.
+
+## Gráficas y revisión de campos por rol
+
+Solicitud siguiente: incorporar gráficas y revisar campos/presentación en cada rol. La fuente de las tres distribuciones es `chartData`, agregada en backend desde la misma consulta autorizada y filtrada antes de paginar. Unidad: número de alertas; denominador: alertas de la consulta; período: el intervalo seleccionado, o todo el ámbito filtrado si no se eligen fechas. Estado histórico, origen ausente y prioridad ausente conservan su significado; no se reclasifican registros.
+
+| Roles | Gráficas y campos revisados |
+|---|---|
+| Enfermería | Prioridad, estado y origen de sus alertas; residente asignado y descripción completa; intervención y seguimiento con validación. Mediciones con permiso específico y ámbito de lectura vigente; fuera de turno la consulta no habilita actuaciones. |
+| Medicina/Geriatría | Distribuciones de alertas autorizadas; consulta, contexto, unidades y continuidad clínica. No se habilita intervención de Enfermería por ser médico. |
+| Psicología | Distribuciones de alertas autorizadas y seguimiento propio; no se infiere diagnóstico ni nueva facultad clínica desde una alerta. |
+| Gerencia | Tres distribuciones de gestión; sin apertura del historial de signos por el permiso genérico de Alertas. |
+| Administración | Tres distribuciones, campos de coordinación y cierre operativo; no aparecen campos de intervención clínica. |
+| Superadministración | Tres distribuciones y trazabilidad; formularios operativos según contrato; sin intervención de Enfermería por el rol técnico. |
+| Nutrición/Fisioterapia/Pedagogía/Familiar | Entradas propias conservadas; centro de Alertas denegado según matriz ordinaria. No se añaden conteos, gráficas ni contenido clínico no autorizado. |
+
+Se reutiliza `ui/dashboard-data-panel`: anillo con leyenda para prioridad y barras con valores para estado/origen. Se añadió tono semántico opcional al anillo: crítica conserva tinta danger tanto en gráfico como en leyenda; los consumidores sin tono mantienen la paleta existente. Composición prevista de tres/dos/una columnas según ancho del contenedor, sin nuevos paquetes ni gráficos de ejemplo.
+
+La gráfica clínica anterior usaba ejes fijos (incluidos presión 40–190 y temperatura 34,5–40,5), referencias heredadas y un panel de información heterogénea. Se sustituyó por una consulta enfocada en los diez últimos signos preparados por el backend: puntos con fecha real, unidad, sistólica/diastólica diferenciadas por marcador y leyenda, sin interpolación, límites clínicos fijos ni banda inventada. Respiración y glucemia se representan si existen. La primera variable con datos se selecciona inicialmente. Ausencia de una variable no se convierte en cero; el historial textual conserva todos los campos y valores ausentes. Se reutiliza `RMCharts`, con limpieza de instancia, cambio de tema y fallback a la tabla de valores si falla la gráfica.
+
+El panel lateral de consulta usa `autorizarConsultaResidente` para Enfermería, en coherencia con el ámbito de lectura ya utilizado por el detalle y la bandeja. Continúa exigiendo cuenta ACTIVO, permiso de Alertas y permiso específico de signos; se conserva la denegación de residentes ajenos. No se modifica la autorización de escrituras ni la matriz de permisos.
+
+Campos: título/ayuda de modal separados para que el nombre accesible y la descripción correspondan al diálogo; error asociado a Tipo de alerta; descripciones sin recorte al intervenir/cerrar; origen, responsable, ubicación y fecha con etiquetas e iconos. Selectores/calendario institucionales y umbral 15 conservados.
+
+| Evidencia técnica | Resultado |
+|---|---|
+| `alertas-graficas-roles.xml` | PASS, 4 pruebas / 95 aserciones: distribución autorizada por rol, resumen filtrado, coordinación y rechazo de intervención. |
+| `alertas-graficas-clinicas.xml` | PASS, 6 pruebas / 110 aserciones: diez entradas, paneles de consulta preparados sin SQL en Blade, lectura y denegaciones. |
+| `alertas-graficas-extremos.xml` | PASS, 3 pruebas / 18 aserciones: anillo con una categoría, cero sin gráfica inválida y guardia de lectura/actuación. |
+| `alertas-graficas-permisos.xml` | PASS, 3 pruebas / 38 aserciones: consulta fuera de turno, residente ajeno y signos denegados a roles operativos, sin eventos nuevos. |
+| `alertas-graficas-campos-final.xml` | PASS, 3 pruebas / 138 aserciones: campos por rol, validación sin persistencia, captura y cierre operativo con el marcado final. |
+| `alertas-graficas-final-pg.xml` | PASS, 27 pruebas / 226 aserciones, 2 min 39 s: regresión de estados, campos, scopes, lector fuera de turno, resumen filtrado y panel preparado sin SQL en Blade en PostgreSQL nuevo y desechable. Servidor detenido al finalizar; BD institucional sin cambios por esta ejecución. |
+| Frontend | PASS, 13 pruebas: dos nuevas de signos (dos presiones, cero real frente a ausencia, dato inválido, extremo fuera de rangos anteriores, variable sin valores) y regresión de interacción/selector/calendario/tema. |
+| `alertas-graficas-build.log` | Build PASS, 109 módulos, 9,50 s. |
+
+La revisión de seguridad de este corte se hizo como fase de lectura por el mismo implementador: conserva fronteras y negativos anteriores; no se presenta como un nuevo dictamen independiente. No se declara aceptación visual de cinco tamaños ni contraste/teclado: la herramienta del navegador integrado sigue deshabilitada en Work. Dictamen visual pendiente por falta de evidencia actual. Los tests HTTP y de datos no sustituyen esa inspección.
+
+Pint PASS en los cuatro archivos PHP de consultas/pruebas verificados. Los ajustes gráficos y de ventanas permanecen locales, separados del corte `8934fc87`, hasta completar la aceptación visual pendiente. El nuevo intento de push del corte anterior volvió a fallar por conexión HTTPS con GitHub; no se declara publicación ni integración a develop/main.
