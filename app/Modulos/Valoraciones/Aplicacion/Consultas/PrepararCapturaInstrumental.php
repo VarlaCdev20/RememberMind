@@ -31,6 +31,7 @@ final readonly class PrepararCapturaInstrumental
         foreach (['aplicaciones_instrumento.crear', 'instrumentos.ver', 'preguntas_instrumento.ver', 'opciones_pregunta.ver'] as $permiso) {
             abort_unless($usuario->checkPermissionTo($permiso, 'web'), 403);
         }
+        Gate::forUser($usuario)->authorize('viewAny', Residente::class);
         try {
             $personal = app(ContextoClinicoService::class)->personalActivo($usuario);
             if (! app(AccesoClinicoTemporalService::class)->sustituyeRol($usuario)) {
@@ -60,6 +61,7 @@ final readonly class PrepararCapturaInstrumental
     {
         $usuario = $this->usuario($usuario);
         $residente = Residente::query()->findOrFail($codigoResidente);
+        Gate::forUser($usuario)->authorize('view', $residente);
         $personal = app(AutorizacionClinicaService::class)->autorizarMutacion($usuario, $residente,
             'aplicaciones_instrumento.crear', AplicarInstrumento::ROLES_APLICADORES);
 

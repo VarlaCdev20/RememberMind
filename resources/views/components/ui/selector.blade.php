@@ -5,10 +5,10 @@
 @endphp
 <div {{ $attributes->only('class')->merge(['class' => 'rm-choice']) }} x-data="rmSelector(@if($model) @entangle($model) @else @js($value) @endif, { native: @js(!$model), autoSubmit: @js((bool) $autoSubmit), searchThreshold: @js((int) $searchThreshold) })" @if($model) wire:key="{{ $controlId }}" @endif>
     <select x-ref="native" {{ $attributes->except(['class', 'aria-label'])->merge(['id' => $controlId.'-source']) }} tabindex="-1" aria-hidden="true" hidden>{{ $slot }}</select>
-    <button type="button" id="{{ $controlId }}" x-ref="trigger" class="rm-choice__trigger" aria-label="{{ $attributes->get('aria-label', $label) }}" aria-invalid="{{ $attributes->get('aria-invalid', 'false') }}" @if($attributes->has('aria-describedby')) aria-describedby="{{ $attributes->get('aria-describedby') }}" @endif aria-haspopup="listbox" :aria-expanded="open" aria-controls="{{ $controlId }}-list" :disabled="$refs.native?.disabled" @click="open ? close() : show()" @keydown.arrow-down.prevent="show()">
+    <button type="button" id="{{ $controlId }}" x-ref="trigger" class="rm-choice__trigger" aria-label="{{ $attributes->get('aria-label', $label) }}" aria-invalid="{{ $attributes->get('aria-invalid', 'false') }}" @if($attributes->has('aria-describedby')) aria-describedby="{{ $attributes->get('aria-describedby') }}" @endif aria-haspopup="listbox" :aria-expanded="open" aria-controls="{{ $controlId }}-list" :disabled="bloqueado" @click="open ? close() : show()" @keydown.arrow-down.prevent="show()">
         <span x-text="label"></span><i class="ph-bold ph-caret-down" aria-hidden="true" :class="{ 'is-open': open }"></i>
     </button>
-    <template x-teleport="{{ $teleport }}">
+    @if($teleport)<template x-teleport="{{ $teleport }}">@endif
         <div x-show="open" x-cloak x-transition.opacity.duration.150ms class="rm-control-popover rm-choice__popover" :style="popupStyle" @click.outside="if (!$refs.trigger.contains($event.target)) open = false" @keydown="key($event)" @resize.window="open = false" @scroll.window="if (!$el.contains($event.target)) open = false">
             <div class="rm-choice__search" x-show="hasSearch"><i class="ph-bold ph-magnifying-glass" aria-hidden="true"></i><input x-ref="search" x-model="search" @input="active = 0" aria-label="Buscar {{ mb_strtolower($label) }}" placeholder="Buscar opción…" role="combobox" aria-autocomplete="list" aria-controls="{{ $controlId }}-list" :aria-expanded="open" :aria-activedescendant="filtered.length ? '{{ $controlId }}-op-' + active : null"></div>
             <div id="{{ $controlId }}-list" x-ref="list" class="rm-choice__options" :class="{ 'is-long': hasSearch }" role="listbox" aria-label="{{ $label }}" :aria-multiselectable="multiple">
@@ -20,5 +20,5 @@
             <p class="rm-control-help" x-show="options.length > 10">Desliza para ver más opciones</p>
             <button type="button" x-show="multiple" class="rm-btn-secondary" @click="close()">Listo</button>
         </div>
-    </template>
+    @if($teleport)</template>@endif
 </div>

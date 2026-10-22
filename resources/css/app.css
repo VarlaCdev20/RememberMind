@@ -1,4 +1,8 @@
 /* Fuentes locales y contrato tipográfico global. */
+@import '@phosphor-icons/web/regular';
+@import '@phosphor-icons/web/bold';
+@import '@phosphor-icons/web/fill';
+@import '@phosphor-icons/web/duotone';
 @import '@fontsource/nunito-sans/latin-400.css';
 @import '@fontsource/nunito-sans/latin-500.css';
 @import '@fontsource/nunito-sans/latin-600.css';

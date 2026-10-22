@@ -109,12 +109,12 @@ abstract class CapturaInstrumentalModal extends Component
         $this->residenteFijo = $cod_residente;
     }
 
-    protected function preparar(?string $codigoResidente): void
+    protected function preparar(?string $codigoResidente): bool
     {
         if ($this->mostrar && $this->tieneCambios()) {
             $this->addError('registro', 'Conserva o descarta la captura actual antes de abrir otra.');
 
-            return;
+            return false;
         }
         $consulta = app(PrepararCapturaInstrumental::class);
         $consulta->usuario(auth()->user());
@@ -131,6 +131,8 @@ abstract class CapturaInstrumentalModal extends Component
         $this->hora_eval = now()->format('H:i:s');
         $this->fechaInicial = [$this->fecha_eval, $this->hora_eval];
         $this->mostrar = true;
+
+        return true;
     }
 
     public function updatedCodResidente(?string $value): void

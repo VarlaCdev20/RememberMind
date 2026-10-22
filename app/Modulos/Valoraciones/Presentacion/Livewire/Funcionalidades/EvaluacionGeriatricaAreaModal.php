@@ -14,11 +14,36 @@ final class EvaluacionGeriatricaAreaModal extends CapturaInstrumentalModal
     #[Locked]
     public ?string $codArea = null;
 
+    #[Locked]
+    public ?string $instrumentoSolicitado = null;
+
     public function abrir(array $data): void
     {
         abort_unless(in_array($data['cod_area'] ?? null, ['ARE_COG', 'ARE_AFE', 'ARE_FUN', 'ARE_NUT', 'ARE_SOC'], true), 422);
-        $this->codArea = $data['cod_area'];
-        $this->preparar($data['cod_residente'] ?? null);
+        $area = $data['cod_area'];
+        $codigo = $data['cod_instrumento'] ?? null;
+        if ($codigo !== null) {
+            abort_unless(is_string($codigo) && app(InstrumentosDelArea::class)->activos($area)->whereKey($codigo)
+                ->whereHas('preguntas', fn ($q) => $q->where('estado', 'ACTIVA'))->exists(), 422, 'El instrumento no está habilitado para esta área.');
+        }
+        if (! $this->preparar($data['cod_residente'] ?? null)) {
+            return;
+        }
+        $this->codArea = $area;
+        $this->instrumentoSolicitado = $codigo;
+        if ($codigo !== null && $this->cod_residente !== null) {
+            $this->cod_instrumento = $codigo;
+            $this->updatedCodInstrumento($codigo);
+        }
+    }
+
+    public function updatedCodResidente(?string $value): void
+    {
+        parent::updatedCodResidente($value);
+        if ($value !== null && $this->cod_residente === $value && ! $this->getErrorBag()->has('cod_residente') && $this->instrumentoSolicitado !== null) {
+            $this->cod_instrumento = $this->instrumentoSolicitado;
+            $this->updatedCodInstrumento($this->instrumentoSolicitado);
+        }
     }
 
     public function updatedCodInstrumento(?string $value): void

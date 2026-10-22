@@ -4,7 +4,7 @@
         <div class="min-w-0">
             <p class="rm-expert-eyebrow">Psicología / Residentes / {{ $residente->nombre_completo }}</p>
             <h1 class="text-xl font-bold tracking-tight">Ficha psicológica del residente</h1>
-            <p class="text-xs text-[var(--rm-text-secondary)] mt-0.5">Seguimiento psicométrico, afectivo, funcional y articulación con el sistema experto O.R.I.O.N.</p>
+            <p class="text-xs text-[var(--rm-text-secondary)] mt-0.5">Seguimiento psicométrico, afectivo, funcional y articulación con el sistema experto Apoyo a la decisión</p>
         </div>
         <div class="flex items-center gap-2">
             <a href="{{ route('admin.psicologia.evaluaciones') }}" class="rm-btn rm-btn-secondary text-xs">
@@ -48,7 +48,7 @@
 
             <div class="flex flex-wrap items-center gap-2 shrink-0">
                 <a href="{{ route('admin.psicologia.residente.resultados-experto', $residente) }}" class="rm-btn rm-btn-primary text-xs shadow-2xs">
-                    <i class="ph ph-brain mr-1.5 text-sm" aria-hidden="true"></i>Informe O.R.I.O.N.
+                    <i class="ph ph-brain mr-1.5 text-sm" aria-hidden="true"></i>Informe Apoyo a la decisión
                 </a>
                 @if($puedeValorarPetersen)
                     <a href="{{ route('admin.sistema-experto.petersen-original', $residente) }}" class="rm-btn rm-btn-secondary text-xs">
@@ -70,7 +70,7 @@
                 ['id' => 'entorno', 'label' => 'Entorno y red social', 'icono' => 'ph-users-four'],
                 ['id' => 'seguimiento', 'label' => 'Sesiones y seguimiento', 'icono' => 'ph-calendar-check'],
                 ['id' => 'informes', 'label' => 'Informes y resultados', 'icono' => 'ph-file-text'],
-                ['id' => 'orion', 'label' => 'Resultados O.R.I.O.N.', 'icono' => 'ph-sparkle'],
+                ['id' => 'orion', 'label' => 'Resultados Apoyo a la decisión', 'icono' => 'ph-sparkle'],
             ];
         @endphp
 
@@ -103,7 +103,7 @@
                 </div>
                 <div class="p-3.5 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] space-y-1">
                     <p class="text-[11px] font-medium text-[var(--rm-text-secondary)]">Controles IADL</p>
-                    <p class="text-xl font-bold text-[var(--rm-text-primary)]">{{ $totalIadl }}</p>
+                    <p class="text-xl font-bold text-[var(--rm-text-primary)]">{{ $puedeConsultarIadl ? $totalIadl : 'Sin acceso' }}</p>
                     <p class="text-[10px] text-[var(--rm-text-secondary)]">Actividades observadas</p>
                 </div>
                 <div class="p-3.5 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] space-y-1">
@@ -155,6 +155,9 @@
                         </div>
                     </div>
 
+                    @if($datosTendencia === null)
+                        <p class="rm-explorador__nota" role="status">No tienes permiso para consultar esta fuente de información. Selecciona otra dimensión.</p>
+                    @else
                     {{-- Síntesis Clínica del Período --}}
                     <div class="p-3.5 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                         <div class="space-y-1">
@@ -205,9 +208,9 @@
                                 No se registran evaluaciones para esta dimensión en el intervalo seleccionado.
                             </p>
                             @if($metricaTendencia === 'cognitivo')
-                                <button type="button" wire:click="abrirEvaluacion('ARE_COG')" class="rm-btn rm-btn-secondary text-xs mt-2">
+                                <a href="{{ route('admin.psicologia.evaluacion.cognitiva') }}" class="rm-btn rm-btn-secondary text-xs mt-2">
                                     <i class="ph ph-plus mr-1"></i>Aplicar prueba cognitiva
-                                </button>
+                                </a>
                             @elseif($metricaTendencia === 'afectivo')
                                 <button type="button" wire:click="cambiarTab('afectiva')" class="rm-btn rm-btn-secondary text-xs mt-2">
                                     <i class="ph ph-plus mr-1"></i>Registrar valoración afectiva
@@ -325,6 +328,7 @@
                             </table>
                         </div>
                     @endif
+                    @endif
                 </div>
             </x-ui.section-card>
 
@@ -399,14 +403,14 @@
                     <div class="space-y-1">
                         <strong class="font-bold text-[var(--rm-text-primary)] flex items-center gap-2">
                             <i class="ph ph-brain text-base text-[var(--rm-action-primary)]"></i>
-                            Baterías cognitivas y vinculación con O.R.I.O.N.
+                            Baterías cognitivas y vinculación con Apoyo a la decisión
                         </strong>
                         <p class="text-[var(--rm-text-secondary)] max-w-2xl">
                             Las pruebas aplicadas en esta sección alimentan los 5 dominios neurocognitivos (Memoria, Atención, Ejecutivas, Lenguaje, Visuoespacial) y los juicios originales de Petersen.
                         </p>
                     </div>
                     <button type="button" wire:click="abrirEvaluacion('ARE_COG')" class="rm-btn rm-btn-primary text-xs shrink-0">
-                        <i class="ph ph-plus mr-1"></i>Aplicar instrumento cognitivo
+                        <i class="ph ph-plus mr-1"></i>Explorar instrumentos cognitivos
                     </button>
                 </div>
 
@@ -521,21 +525,24 @@
                             Evaluación afectiva, del ánimo y descarte diferencial (C04)
                         </strong>
                         <p class="text-[var(--rm-text-secondary)] max-w-2xl">
-                            Documenta síntomas depresivos, ansiedad, apatía y alteraciones conductuales. Esta información aporta contexto clínico y respalda la evaluación diferencial ante O.R.I.O.N.
+                            Documenta síntomas depresivos, ansiedad, apatía y alteraciones conductuales. Esta información aporta contexto clínico y respalda la evaluación diferencial ante Apoyo a la decisión
                         </p>
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
-                        <button type="button" wire:click="$toggle('mostrarFormAfectiva')" class="rm-btn rm-btn-primary text-xs">
+                        @if(auth()->user()?->hasRole('PSICOLOGO/A') && auth()->user()?->checkPermissionTo('valoraciones_psicologicas.crear', 'web'))
+                        <button type="button" wire:click="alternarFormularioAfectivo" class="rm-btn rm-btn-primary text-xs">
                             <i class="ph {{ $mostrarFormAfectiva ? 'ph-x' : 'ph-plus' }} mr-1"></i>
                             {{ $mostrarFormAfectiva ? 'Cancelar formulario' : 'Nueva valoración afectiva' }}
                         </button>
-                        <button type="button" wire:click="abrirEvaluacion('ARE_AFE')" class="rm-btn rm-btn-secondary text-xs">
-                            <i class="ph ph-clipboard mr-1"></i>Aplicar escala afectiva
-                        </button>
+                        @endif
+                        <a href="{{ route('admin.psicologia.evaluacion.afectiva') }}" class="rm-btn rm-btn-secondary text-xs"><i class="ph ph-book-open mr-1" aria-hidden="true"></i>Consultar recursos del área</a>
                     </div>
                 </div>
 
                 {{-- Formulario Desplegable de Valoración Afectiva --}}
+                @if($confirmarDescarteAfectiva)
+                <div role="alert" class="rm-explorador__nota"><div><p>Hay una valoración afectiva sin registrar. Puedes seguir completándola o descartar los cambios.</p><div class="flex flex-wrap gap-3 mt-3"><button type="button" wire:click="conservarValoracionAfectiva" class="rm-btn rm-btn-secondary">Seguir completando</button><button type="button" wire:click="descartarValoracionAfectiva" class="rm-btn rm-btn-danger">Descartar cambios</button></div></div></div>
+                @endif
                 @if($mostrarFormAfectiva)
                     <div class="p-5 rounded-2xl border border-[var(--rm-action-primary)]/40 bg-[var(--rm-surface)] shadow-sm space-y-4 text-xs">
                         <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-2.5">
@@ -543,72 +550,76 @@
                                 <i class="ph ph-pencil-line text-[var(--rm-action-primary)]"></i>
                                 Formulación clínica del estado afectivo
                             </h3>
-                            <span class="text-[11px] text-[var(--rm-text-secondary)]">Persistencia en <code>valoraciones_psicologicas</code></span>
+                            <span class="text-[11px] text-[var(--rm-text-secondary)]">Registro vinculado a la atención profesional</span>
                         </div>
 
                         <form wire:submit.prevent="guardarValoracionAfectiva" class="space-y-4">
                             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                                 <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Estado de ánimo *</label>
-                                    <select wire:model="formAfectiva.estado_animo" class="rm-select w-full">
+                                    <label for="afectiva-estado_animo" class="block font-semibold text-[var(--rm-text-primary)] mb-1">Estado de ánimo *</label>
+                                    <x-ui.selector id="afectiva-estado_animo" label="Estado de ánimo" wire:model="formAfectiva.estado_animo"><option value="">Selecciona lo observado</option>
                                         <option value="EUTIMICO">Eutímico / Estable</option>
                                         <option value="DEPRESIVO">Depresivo / Triste</option>
                                         <option value="ANSIOSO">Ansioso / Inquieto</option>
                                         <option value="LABIL">Lábil / Cambiante</option>
                                         <option value="IRRITABLE">Irritable / Hostil</option>
-                                    </select>
+                                    </x-ui.selector>
+@error('formAfectiva.estado_animo')<p class="rm-error" role="alert">{{ $message }}</p>@enderror
                                 </div>
 
                                 <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Afecto *</label>
-                                    <select wire:model="formAfectiva.afecto" class="rm-select w-full">
+                                    <label for="afectiva-afecto" class="block font-semibold text-[var(--rm-text-primary)] mb-1">Afecto *</label>
+                                    <x-ui.selector id="afectiva-afecto" label="Afecto" wire:model="formAfectiva.afecto"><option value="">Selecciona lo observado</option>
                                         <option value="ADECUADO">Adecuado al contexto</option>
                                         <option value="APLANADO">Aplanado</option>
                                         <option value="EMBOTADO">Embotado / Restringido</option>
                                         <option value="INCONGRUENTE">Incongruente</option>
-                                    </select>
+                                    </x-ui.selector>
+@error('formAfectiva.afecto')<p class="rm-error" role="alert">{{ $message }}</p>@enderror
                                 </div>
 
                                 <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Ansiedad *</label>
-                                    <select wire:model="formAfectiva.ansiedad" class="rm-select w-full">
+                                    <label for="afectiva-ansiedad" class="block font-semibold text-[var(--rm-text-primary)] mb-1">Ansiedad *</label>
+                                    <x-ui.selector id="afectiva-ansiedad" label="Ansiedad" wire:model="formAfectiva.ansiedad"><option value="">Selecciona lo observado</option>
                                         <option value="AUSENTE">Ausente</option>
                                         <option value="LEVE">Leve</option>
                                         <option value="MODERADA">Moderada</option>
                                         <option value="SEVERA">Severa</option>
-                                    </select>
+                                    </x-ui.selector>
+@error('formAfectiva.ansiedad')<p class="rm-error" role="alert">{{ $message }}</p>@enderror
                                 </div>
 
                                 <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Apatía *</label>
-                                    <select wire:model="formAfectiva.apatia" class="rm-select w-full">
+                                    <label for="afectiva-apatia" class="block font-semibold text-[var(--rm-text-primary)] mb-1">Apatía *</label>
+                                    <x-ui.selector id="afectiva-apatia" label="Apatía" wire:model="formAfectiva.apatia"><option value="">Selecciona lo observado</option>
                                         <option value="AUSENTE">Ausente</option>
                                         <option value="LEVE">Leve</option>
                                         <option value="MODERADA">Moderada</option>
                                         <option value="SEVERA">Severa</option>
-                                    </select>
+                                    </x-ui.selector>
+@error('formAfectiva.apatia')<p class="rm-error" role="alert">{{ $message }}</p>@enderror
                                 </div>
                             </div>
 
                             <div>
-                                <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Conducta observada</label>
-                                <input type="text" wire:model="formAfectiva.conducta" placeholder="Ej: Colaboradora, tranquila durante la entrevista, sin inquietud motora." class="rm-input w-full">
+                                <label for="afectiva-conducta" class="block font-semibold text-[var(--rm-text-primary)] mb-1">Conducta observada</label>
+                                <input type="text" id="afectiva-conducta" wire:model="formAfectiva.conducta" placeholder="Describe la conducta observada durante la atención." class="rm-input w-full">
                             </div>
 
                             <div>
-                                <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Conclusión e interpretación clínica * (Sustento C04)</label>
-                                <textarea wire:model="formAfectiva.conclusion" rows="3" placeholder="Detalle si el estado anímico interfiere con el rendimiento cognitivo o si se descarta depresión mayor..." class="rm-textarea w-full" required></textarea>
+                                <label for="afectiva-conclusion" class="block font-semibold text-[var(--rm-text-primary)] mb-1">Conclusión e interpretación clínica * (Sustento C04)</label>
+                                <textarea id="afectiva-conclusion" wire:model="formAfectiva.conclusion" rows="3" placeholder="Documenta tu conclusión y las limitaciones de la valoración." class="rm-textarea w-full" required></textarea>
                                 @error('formAfectiva.conclusion') <span class="text-red-600 text-[11px]">{{ $message }}</span> @enderror
                             </div>
 
                             <div>
-                                <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Recomendaciones o plan de apoyo</label>
-                                <input type="text" wire:model="formAfectiva.recomendacion" placeholder="Ej: Mantener acompañamiento en actividades grupales, reevaluar en 30 días." class="rm-input w-full">
+                                <label for="afectiva-recomendacion" class="block font-semibold text-[var(--rm-text-primary)] mb-1">Recomendaciones o plan de apoyo</label>
+                                <input type="text" id="afectiva-recomendacion" wire:model="formAfectiva.recomendacion" placeholder="Documenta el seguimiento indicado por el profesional." class="rm-input w-full">
                             </div>
 
                             <div class="flex items-center justify-end gap-2 pt-2 border-t border-[var(--rm-border)]">
-                                <button type="button" wire:click="$set('mostrarFormAfectiva', false)" class="rm-btn rm-btn-secondary text-xs">Cancelar</button>
-                                <button type="submit" class="rm-btn rm-btn-primary text-xs">Guardar valoración afectiva</button>
+                                <button type="button" wire:click="alternarFormularioAfectivo" class="rm-btn rm-btn-secondary text-xs">Cancelar</button>
+                                <button type="submit" wire:target="guardarValoracionAfectiva" class="rm-btn rm-btn-primary text-xs">Guardar valoración afectiva</button>
                             </div>
                         </form>
                     </div>
@@ -714,102 +725,15 @@
                         </p>
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
-                        <button type="button" wire:click="$toggle('mostrarFormIadl')" class="rm-btn rm-btn-primary text-xs">
-                            <i class="ph {{ $mostrarFormIadl ? 'ph-x' : 'ph-plus' }} mr-1"></i>
-                            {{ $mostrarFormIadl ? 'Cancelar formulario' : 'Nueva observación IADL' }}
-                        </button>
-                        <button type="button" wire:click="abrirEvaluacion('ARE_FUN')" class="rm-btn rm-btn-secondary text-xs">
-                            <i class="ph ph-clipboard mr-1"></i>Escala Barthel/Lawton
-                        </button>
+<p class="text-sm text-rm-secondary">Consulta de IADL. El registro se realiza en su circuito profesional autorizado.</p>
+                        <a href="{{ route('admin.psicologia.evaluacion.funcionamiento') }}" class="rm-btn rm-btn-secondary text-xs">
+                            <i class="ph ph-clipboard mr-1"></i>Explorar instrumentos funcionales
+                        </a>
                     </div>
                 </div>
 
-                {{-- Formulario Desplegable de Observación IADL --}}
-                @if($mostrarFormIadl)
-                    <div class="p-5 rounded-2xl border border-[var(--rm-action-primary)]/40 bg-[var(--rm-surface)] shadow-sm space-y-4 text-xs">
-                        <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-2.5">
-                            <h3 class="font-bold text-sm text-[var(--rm-text-primary)] flex items-center gap-2">
-                                <i class="ph ph-pencil-line text-[var(--rm-action-primary)]"></i>
-                                Registro de Actividad Instrumental (IADL)
-                            </h3>
-                            <span class="text-[11px] text-[var(--rm-text-secondary)]">Persistencia en <code>controles_funcionales_iadl</code></span>
-                        </div>
+                {{-- Consulta del circuito IADL --}}
 
-                        <form wire:submit.prevent="guardarControlIadl" class="space-y-4">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                                <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Actividad evaluada *</label>
-                                    <select wire:model="formIadl.actividad" class="rm-select w-full">
-                                        @foreach(\App\Models\ControlFuncionalIadl::ACTIVIDADES as $act)
-                                            <option value="{{ $act }}">{{ $act }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Oportunidad en residencia *</label>
-                                    <select wire:model="formIadl.oportunidad" class="rm-select w-full">
-                                        @foreach(\App\Models\ControlFuncionalIadl::OPORTUNIDADES as $op)
-                                            <option value="{{ $op }}">{{ $op }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Desempeño actual *</label>
-                                    <select wire:model="formIadl.desempeno" class="rm-select w-full">
-                                        @foreach(\App\Models\ControlFuncionalIadl::DESEMPENOS as $des)
-                                            <option value="{{ $des }}">{{ $des }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Tipo de ayuda recibida *</label>
-                                    <select wire:model="formIadl.tipo_ayuda" class="rm-select w-full">
-                                        @foreach(\App\Models\ControlFuncionalIadl::AYUDAS as $ay)
-                                            <option value="{{ $ay }}">{{ $ay }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Causa principal de la ayuda *</label>
-                                    <select wire:model="formIadl.causa_ayuda" class="rm-select w-full">
-                                        @foreach(\App\Models\ControlFuncionalIadl::CAUSAS as $ca)
-                                            <option value="{{ $ca }}">{{ $ca }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Nivel previo basal *</label>
-                                    <select wire:model="formIadl.nivel_previo" class="rm-select w-full">
-                                        @foreach(\App\Models\ControlFuncionalIadl::NIVELES_PREVIOS as $np)
-                                            <option value="{{ $np }}">{{ $np }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Fuente de información *</label>
-                                    <select wire:model="formIadl.fuente" class="rm-select w-full">
-                                        @foreach(\App\Models\ControlFuncionalIadl::FUENTES as $fu)
-                                            <option value="{{ $fu }}">{{ $fu }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center justify-end gap-2 pt-2 border-t border-[var(--rm-border)]">
-                                <button type="button" wire:click="$set('mostrarFormIadl', false)" class="rm-btn rm-btn-secondary text-xs">Cancelar</button>
-                                <button type="submit" class="rm-btn rm-btn-primary text-xs">Guardar observación IADL</button>
-                            </div>
-                        </form>
-                    </div>
-                @endif
 
                 <x-ui.section-card title="Observaciones IADL registradas" subtitle="Actividades complejas de la vida diaria" icon="ph-list-checks">
                     @if($controlesIadl->isEmpty())
@@ -834,47 +758,7 @@
                     @endif
                 </x-ui.section-card>
 
-                @if(!empty($chartIadl) && $chartIadl['tieneDatos'])
-                    <x-ui.section-card title="Perfil de autonomía instrumental (Lawton & Brody)" subtitle="Desempeño actual por actividad observada" icon="ph-chart-bar">
-                        <div wire:ignore
-                             x-data="{
-                                chartKey: 'residente-chart-iadl-{{ $residente->getKey() }}',
-                                init() {
-                                    this.render();
-                                    window.RMCharts?.onThemeChange(() => this.render(), this.chartKey, this.$el);
-                                },
-                                render() {
-                                    if (typeof Chart === 'undefined' || !window.RMCharts?.presets) {
-                                        setTimeout(() => this.render(), 80);
-                                        return;
-                                    }
-                                    const canvas = this.$refs.chartIadl;
-                                    if (!canvas) return;
-                                    const labels = @js($chartIadl['labels']);
-                                    const valores = @js($chartIadl['valores']);
-                                    const colores = @js($chartIadl['colores']);
-                                    const datasets = [
-                                        {
-                                            label: 'Nivel de autonomía (%)',
-                                            data: valores,
-                                            backgroundColor: colores,
-                                            borderColor: colores,
-                                            borderRadius: 8,
-                                        }
-                                    ];
-                                    const config = window.RMCharts.presets.bar(labels, datasets, {
-                                        scales: {
-                                            y: { min: 0, max: 100, ticks: { stepSize: 50, callback: (v) => v === 100 ? 'Independiente' : (v === 50 ? 'Con apoyo' : (v === 0 ? 'Sin dato' : '')) } }
-                                        }
-                                    });
-                                    window.RMCharts.init(this.chartKey, canvas, config, () => this.render());
-                                }
-                             }"
-                             class="relative w-full h-64 p-2">
-                            <canvas x-ref="chartIadl" role="img" aria-label="Perfil de actividades instrumentales IADL"></canvas>
-                        </div>
-                    </x-ui.section-card>
-                @endif
+                <p class="rm-explorador__nota">Se conservan los desempeños observados originales. No se convierten en porcentajes ni se presentan como una escala aplicada.</p>
             </div>
 
         {{-- ==========================================
@@ -893,7 +777,9 @@
                 </div>
 
                 <x-ui.section-card title="Contactos familiares y de referencia" subtitle="Personas de apoyo autorizadas" icon="ph-address-book">
-                    @if($contactosFamiliares->isEmpty())
+                    @if(!$puedeConsultarContactos)
+                        <p class="text-xs text-[var(--rm-text-secondary)]" role="status">Tu cuenta no tiene permiso para consultar contactos y sus vínculos. Las notas de contexto autorizadas se conservan por separado.</p>
+                    @elseif($contactosFamiliares->isEmpty())
                         <p class="text-xs text-[var(--rm-text-secondary)] italic py-2">No hay contactos familiares vinculados para este residente.</p>
                     @else
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -933,10 +819,12 @@
                             Registro de intervenciones, entrevistas de seguimiento y acompañamiento psicológico formal en el expediente.
                         </p>
                     </div>
+                    @if(auth()->user()?->hasRole('PSICOLOGO/A') && auth()->user()?->checkPermissionTo('atenciones.crear', 'web'))
                     <button type="button" wire:click="$toggle('mostrarFormSesion')" class="rm-btn rm-btn-primary text-xs shrink-0">
                         <i class="ph {{ $mostrarFormSesion ? 'ph-x' : 'ph-plus' }} mr-1"></i>
                         {{ $mostrarFormSesion ? 'Cancelar sesión' : 'Registrar nueva sesión' }}
                     </button>
+                    @endif
                 </div>
 
                 {{-- Formulario Desplegable de Sesión --}}
@@ -1078,17 +966,17 @@
             </div>
 
         {{-- ==========================================
-             PESTAÑA 8: RESULTADOS O.R.I.O.N.
+             PESTAÑA 8: RESULTADOS Apoyo a la decisión
              ========================================== --}}
         @elseif($tab === 'orion')
             <div class="space-y-4">
-                {{-- Banner Contextual O.R.I.O.N. --}}
+                {{-- Banner Contextual Apoyo a la decisión --}}
                 <div class="p-5 rounded-2xl bg-gradient-to-r from-[var(--rm-action-primary-soft)] via-[var(--rm-surface)] to-[var(--rm-surface-soft)] border border-[var(--rm-action-primary)]/20 shadow-xs space-y-3">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div class="space-y-1">
                             <div class="flex items-center gap-2">
                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[var(--rm-action-primary)] text-white shadow-2xs">
-                                    Motor Experto O.R.I.O.N.
+                                    Motor Experto Apoyo a la decisión
                                 </span>
                                 <span class="text-[11px] font-semibold text-[var(--rm-text-secondary)]">Criterios diagnósticos Petersen</span>
                             </div>
@@ -1192,7 +1080,7 @@
                     </div>
                 </x-ui.section-card>
 
-                {{-- Baterías instrumentales que alimentan O.R.I.O.N. --}}
+                {{-- Baterías instrumentales que alimentan Apoyo a la decisión --}}
                 <x-ui.section-card title="Baterías e instrumentos aportantes al perfil neurocognitivo" subtitle="Pruebas psicométricas recientes del expediente del residente" icon="ph-clipboard-text">
                     @if($instrumentosCognitivosOrion->isEmpty())
                         <div class="py-6 text-center text-xs text-[var(--rm-text-secondary)] italic">
@@ -1208,7 +1096,7 @@
                                         <th class="py-2.5 px-3">Instrumento</th>
                                         <th class="py-2.5 px-3">Puntuación / Resultado</th>
                                         <th class="py-2.5 px-3">Evaluador</th>
-                                        <th class="py-2.5 px-3">Aporte O.R.I.O.N.</th>
+                                        <th class="py-2.5 px-3">Aporte Apoyo a la decisión</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-[var(--rm-border)]">
@@ -1248,7 +1136,7 @@
                     <div class="space-y-1">
                         <strong class="font-bold text-[var(--rm-text-primary)]">Gobernanza clínica y apoyo a la decisión</strong>
                         <p class="leading-relaxed">
-                            O.R.I.O.N. es un motor de apoyo a la decisión clínica (CDSS) que procesa evidencia objetiva e inmutable según protocolos institucionales aprobados. Toda conclusión diagnóstica y terapéutica es de exclusiva responsabilidad del profesional tratante y del equipo interdisciplinario de RememberMind.
+                            Apoyo a la decisión es un motor de apoyo a la decisión clínica (CDSS) que procesa evidencia objetiva e inmutable según protocolos institucionales aprobados. Toda conclusión diagnóstica y terapéutica es de exclusiva responsabilidad del profesional tratante y del equipo interdisciplinario de RememberMind.
                         </p>
                     </div>
                 </div>

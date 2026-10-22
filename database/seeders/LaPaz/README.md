@@ -79,6 +79,25 @@ Las columnas no aplicables conservan `NULL`: por ejemplo, glucemia no medida, un
 
 ## Sistema experto
 
+### Compatibilidad con el explorador de valoraciones (22/10/2026)
+
+El explorador, sus filtros, las guías y el avatar son presentación y lectura de
+las fuentes existentes. No necesitan nuevas columnas, permisos, áreas ni
+instrumentos en esta carga. `ARE_COG`, `ARE_AFE`, `ARE_FUN` y `ARE_SOC`
+identifican las secciones de navegación; no se insertan como áreas maestras
+para satisfacer una FK. Las atenciones usan el área real de la asignación
+vigente del profesional.
+
+Barthel aparece únicamente cuando su instrumento existe en el catálogo;
+la captura requiere estado ACTIVO y preguntas ACTIVA. La valoración afectiva
+continúa en `valoraciones_psicologicas`, vinculada a su atención y autor.
+La red de apoyo conserva sus fuentes actuales. La biblioteca de métodos
+investigados no se convierte en instrumentos de esta carga ni activa reglas.
+
+Esta actualización documental no ejecuta el seeder, altera la cohorte ya
+instalada, genera aplicaciones nuevas ni cambia sus credenciales. El runner
+guardado y las comprobaciones de conservación siguen siendo obligatorios.
+
 La carga genera **fuentes operativas**, no salidas del experto: no incorpora versiones, reglas, pesos, criterios, evaluaciones, trazas, resultados ni etiquetas de deterioro cognitivo/demencia. Conserva intacto cualquier conocimiento ya instalado. Las clasificaciones e interpretaciones automáticas de las aplicaciones y resultados de estudio quedan vacías; la suma aritmética de Barthel conserva sus respuestas originales.
 
 Sirve para recorrer el sistema, revisar consultas, relaciones, volumen y adquisición de evidencia. No constituye un estudio epidemiológico representativo ni datos de entrenamiento clínicamente validados. Una evaluación predictiva posterior debe separar residentes completos entre conjuntos, conservar el orden temporal y obtener etiquetas independientes de profesionales; dividir filas del mismo residente entre entrenamiento y evaluación produciría fuga de información.

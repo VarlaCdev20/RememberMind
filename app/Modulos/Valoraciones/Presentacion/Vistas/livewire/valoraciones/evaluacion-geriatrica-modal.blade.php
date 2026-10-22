@@ -1,4 +1,4 @@
-<div>
+<div class="rm-captura-instrumental" x-data="{ errorSolicitud: '' }" @rm-valoraciones-error="errorSolicitud = $event.detail.message" @rm-valoraciones-inicio="errorSolicitud = ''">
     @if($mostrar)
         <x-ui.modal-livewire wire:model="mostrar" :id="'captura-instrumental-'.$this->getId()" title="Registrar aplicación y respuestas" max-width="lg" close-method="cerrar" subtitle="Tareas originales, fecha de aplicación y profesional responsable">
             <x-slot:context>
@@ -8,6 +8,7 @@
                 </div>
             </x-slot:context>
             @error('registro')<p class="rm-error mb-3" role="alert">{{ $message }}</p>@enderror
+            <p x-show="errorSolicitud" x-cloak x-text="errorSolicitud" role="alert" class="rm-error"></p>
             @if($confirmarDescarte)
                 <div class="space-y-4" role="alert">
                     <p>Hay cambios sin registrar. Puedes volver a revisarlos o descartarlos para cerrar.</p>
@@ -17,12 +18,14 @@
                     </div>
                 </div>
             @else
-                <form wire:submit="revisar" class="space-y-4">
+                <div class="rm-captura__etapas" aria-label="Etapas de registro"><span class="is-current">1 · Contexto y respuestas</span><span class="{{ $confirmando ? 'is-current' : '' }}">2 · Revisión</span><span>3 · Confirmación del servidor</span></div>
+<x-ui.avatar-guia :estado="$errors->any() ? 'aviso' : ($confirmando ? 'atencion' : 'explicacion')" :mensaje="$errors->any() ? 'Revisa los errores indicados. Tus respuestas se conservan mientras corriges la captura.' : ($confirmando ? 'Confirma el residente, la fecha y los datos originales antes de guardar.' : 'Completa solo lo observado. Los datos sin medir deben quedar sin respuesta.')" />
+<form wire:submit="revisar" class="space-y-4">
                     @can('aplicaciones_instrumento.transcribir')
                         <x-ui.field :for="'captura-origen-'.$this->getId()" label="Origen del registro">
-                            <select id="captura-origen-{{ $this->getId() }}" class="rm-input" wire:model.live="transcripcion" @disabled($confirmando)>
+<x-ui.selector :id="'captura-origen-'.$this->getId()" label="Origen del registro" wire:model.live="transcripcion" :disabled="$confirmando" :aria-invalid="$errors->has('transcripcion') ? 'true' : 'false'" :aria-describedby="$errors->has('transcripcion') ? 'captura-origen-'.$this->getId().'-error' : null" teleport="">
                                 <option value="0">Aplicación propia</option><option value="1">Transcripción de un documento original</option>
-                            </select>
+                            </x-ui.selector>
                         </x-ui.field>
                     @endcan
                     @if($residenteFijo === null)
@@ -31,18 +34,18 @@
                                 <input id="captura-buscar-{{ $this->getId() }}" class="rm-input" type="search" wire:model.live.debounce.300ms="busquedaResidente" @disabled($confirmando)>
                             </x-ui.field>
                             <x-ui.field :for="'captura-residente-'.$this->getId()" label="Residente" error="cod_residente" required>
-                                <select id="captura-residente-{{ $this->getId() }}" class="rm-input" wire:model.live="cod_residente" aria-required="true" aria-invalid="{{ $errors->has('cod_residente') ? 'true' : 'false' }}" @if($errors->has('cod_residente')) aria-describedby="captura-residente-{{ $this->getId() }}-error" @endif @disabled($confirmando)>
+<x-ui.selector :id="'captura-residente-'.$this->getId()" label="Residente" wire:model.live="cod_residente" :disabled="$confirmando" :aria-invalid="$errors->has('cod_residente') ? 'true' : 'false'" :aria-describedby="$errors->has('cod_residente') ? 'captura-residente-'.$this->getId().'-error' : null" teleport="">
                                     <option value="">Selecciona un residente</option>
                                     @foreach($residentes as $residente)<option value="{{ $residente->cod_residente }}">{{ $residente->nombres }} {{ $residente->apellido_paterno }} {{ $residente->apellido_materno }}</option>@endforeach
-                                </select>
+                                </x-ui.selector>
                             </x-ui.field>
                         </div>
                     @endif
                     <x-ui.field :for="'captura-instrumento-'.$this->getId()" label="Instrumento y versión" error="cod_instrumento" required>
-                        <select id="captura-instrumento-{{ $this->getId() }}" class="rm-input" wire:model.live="cod_instrumento" aria-required="true" aria-invalid="{{ $errors->has('cod_instrumento') ? 'true' : 'false' }}" @if($errors->has('cod_instrumento')) aria-describedby="captura-instrumento-{{ $this->getId() }}-error" @endif @disabled(!$cod_residente || $confirmando)>
+<x-ui.selector :id="'captura-instrumento-'.$this->getId()" label="Instrumento y versión" wire:model.live="cod_instrumento" :disabled="!$cod_residente || $confirmando" :aria-invalid="$errors->has('cod_instrumento') ? 'true' : 'false'" :aria-describedby="$errors->has('cod_instrumento') ? 'captura-instrumento-'.$this->getId().'-error' : null" teleport="">
                             <option value="">Selecciona el instrumento aplicado</option>
                             @foreach($instrumentos as $instrumento)<option value="{{ $instrumento->cod_instrumento }}">{{ $instrumento->nombre }} · {{ $instrumento->version ?: 'Versión no registrada' }}</option>@endforeach
-                        </select>
+                        </x-ui.selector>
                     </x-ui.field>
                     @if($cod_instrumento && $vinculoMetodo !== [])
                         <section class="rounded-lg border p-4 space-y-2" aria-label="Vinculación del método de captura">
@@ -60,7 +63,7 @@
                                 <p class="text-sm text-rm-secondary">Registra solo resultados originales. Las entradas de escolaridad y condiciones se capturan como preguntas del protocolo cuando están definidas.</p>
                             @else
                                 <p class="font-semibold">Sin método de interpretación listo</p>
-                                <p class="text-sm text-rm-secondary">Puedes conservar las respuestas originales. O.R.I.O.N. se abstendrá de interpretarlas hasta que exista un vínculo único, exacto y completo con el método aplicable.</p>
+                                <p class="text-sm text-rm-secondary">Puedes conservar las respuestas originales. La interpretación automatizada se abstendrá de interpretarlas hasta que exista un vínculo único, exacto y completo con el método aplicable.</p>
                             @endif
                             @if(($vinculoMetodo['entradas'] ?? []) !== [])
                                 <details>
@@ -76,10 +79,10 @@
                     @endif
                     @if($transcripcion)
                         <x-ui.field :for="'captura-documento-'.$this->getId()" label="Documento original del residente" required error="cod_documento_clinico">
-                            <select id="captura-documento-{{ $this->getId() }}" class="rm-input" wire:model="cod_documento_clinico" aria-invalid="{{ $errors->has('cod_documento_clinico') ? 'true' : 'false' }}" @if($errors->has('cod_documento_clinico')) aria-describedby="captura-documento-{{ $this->getId() }}-error" @endif @disabled($confirmando)>
+<x-ui.selector :id="'captura-documento-'.$this->getId()" label="Documento original del residente" wire:model.live="cod_documento_clinico" :disabled="$confirmando" :aria-invalid="$errors->has('cod_documento_clinico') ? 'true' : 'false'" :aria-describedby="$errors->has('cod_documento_clinico') ? 'captura-documento-'.$this->getId().'-error' : null" teleport="">
                                 <option value="">Selecciona el documento cotejado</option>
                                 @foreach($documentos as $documento)<option value="{{ $documento->getKey() }}">{{ $documento->titulo }} · {{ $documento->getKey() }}</option>@endforeach
-                            </select>
+                            </x-ui.selector>
                         </x-ui.field>
                         @foreach(['cod_personal_original' => 'Código del profesional aplicador original', 'localizador_fuente' => 'Página, ficha o fila del original',
                             'cod_aplicacion_existente' => 'Aplicación ya registrada, solo para vincular su original',
@@ -96,7 +99,7 @@
                         <p class="text-sm text-rm-secondary">Conserva el autor y la hora que figuran en el original. Una rectificación añade otra aplicación; no reemplaza la anterior.</p>
                         <details class="space-y-3" @if($errors->has('cod_atencion') || $errors->has('clasificacion_original') || $errors->has('interpretacion_original')) open @endif>
                             <summary class="cursor-pointer font-semibold">Datos adicionales que figuran en el original</summary>
-                            <p class="text-sm text-rm-secondary">Copia estos datos solo si constan en el documento. No representan una conclusión nueva de O.R.I.O.N.</p>
+                            <p class="text-sm text-rm-secondary">Copia estos datos solo si constan en el documento. No representan una conclusión nueva de La interpretación automatizada</p>
                             @foreach(['cod_atencion' => 'Código de la atención original, si consta', 'clasificacion_original' => 'Clasificación consignada en el original'] as $campo => $etiqueta)
                                 <x-ui.field :for="'captura-'.$campo.'-'.$this->getId()" :label="$etiqueta" :error="$campo">
                                     <input id="captura-{{ $campo }}-{{ $this->getId() }}" class="rm-input" type="text" wire:model="{{ $campo }}" maxlength="{{ $campo === 'cod_atencion' ? 20 : 80 }}" aria-invalid="{{ $errors->has($campo) ? 'true' : 'false' }}" @if($errors->has($campo)) aria-describedby="captura-{{ $campo }}-{{ $this->getId() }}-error" @endif @disabled($confirmando)>
@@ -109,7 +112,7 @@
                     @endif
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <x-ui.field :for="'captura-fecha-'.$this->getId()" label="Fecha original" error="fecha_eval" required>
-                            <input id="captura-fecha-{{ $this->getId() }}" type="date" class="rm-input" wire:model="fecha_eval" aria-required="true" aria-invalid="{{ $errors->has('fecha_eval') ? 'true' : 'false' }}" @if($errors->has('fecha_eval')) aria-describedby="captura-fecha-{{ $this->getId() }}-error" @endif @disabled($confirmando)>
+<x-ui.calendario :id="'captura-fecha-'.$this->getId()" label="Fecha original" wire:model.live="fecha_eval" :max="now()->format('Y-m-d')" :disabled="$confirmando" :aria-invalid="$errors->has('fecha_eval') ? 'true' : 'false'" :aria-describedby="$errors->has('fecha_eval') ? 'captura-fecha-'.$this->getId().'-error' : null" teleport="" />
                         </x-ui.field>
                         <x-ui.field :for="'captura-hora-'.$this->getId()" label="Hora original" error="hora_eval" required :help="'Zona: '.config('app.timezone')">
                             <input id="captura-hora-{{ $this->getId() }}" type="time" step="1" class="rm-input" wire:model="hora_eval" aria-required="true" aria-invalid="{{ $errors->has('hora_eval') ? 'true' : 'false' }}" aria-describedby="captura-hora-{{ $this->getId() }}-help{{ $errors->has('hora_eval') ? ' captura-hora-'.$this->getId().'-error' : '' }}" @disabled($confirmando)>
@@ -129,14 +132,14 @@
                                 <p class="text-xs text-rm-secondary">Tarea {{ $pregunta['codigo_catalogo'] }}@if($pregunta['dominio']) · {{ $pregunta['dominio'] }}@endif · {{ $pregunta['tipo'] }}</p>
                                 <x-ui.field :for="'captura-valor-'.$this->getId().'-'.$pregunta['codigo']" :label="$pregunta['enunciado']" :error="'valores.'.$pregunta['codigo']">
                                     @if($pregunta['campo'] === 'valor_logico')
-                                        <select id="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}" class="rm-input" wire:model="valores.{{ $pregunta['codigo'] }}" aria-invalid="{{ $errors->has('valores.'.$pregunta['codigo']) ? 'true' : 'false' }}" @if($errors->has('valores.'.$pregunta['codigo'])) aria-describedby="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}-error" @endif @disabled($confirmando)>
+<x-ui.selector :id="'captura-valor-'.$this->getId().'-'.$pregunta['codigo']" :label="$pregunta['enunciado']" wire:model="valores.{{ $pregunta['codigo'] }}" :disabled="$confirmando" :aria-invalid="$errors->has('valores.'.$pregunta['codigo']) ? 'true' : 'false'" :aria-describedby="$errors->has('valores.'.$pregunta['codigo']) ? 'captura-valor-'.$this->getId().'-'.$pregunta['codigo'].'-error' : null" teleport="">
                                             <option value="">Sin registrar</option><option value="1">Sí</option><option value="0">No</option>
-                                        </select>
+                                        </x-ui.selector>
                                     @elseif($pregunta['campo'] === 'cod_opcion')
-                                        <select id="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}" class="rm-input" wire:model="valores.{{ $pregunta['codigo'] }}" aria-invalid="{{ $errors->has('valores.'.$pregunta['codigo']) ? 'true' : 'false' }}" @if($errors->has('valores.'.$pregunta['codigo'])) aria-describedby="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}-error" @endif @disabled($confirmando)>
+<x-ui.selector :id="'captura-valor-'.$this->getId().'-'.$pregunta['codigo']" :label="$pregunta['enunciado']" wire:model="valores.{{ $pregunta['codigo'] }}" :disabled="$confirmando" :aria-invalid="$errors->has('valores.'.$pregunta['codigo']) ? 'true' : 'false'" :aria-describedby="$errors->has('valores.'.$pregunta['codigo']) ? 'captura-valor-'.$this->getId().'-'.$pregunta['codigo'].'-error' : null" teleport="">
                                             <option value="">Sin registrar</option>
                                             @foreach($pregunta['opciones'] as $opcion)<option value="{{ $opcion['codigo'] }}">{{ $opcion['nombre'] }}</option>@endforeach
-                                        </select>
+                                        </x-ui.selector>
                                     @elseif($pregunta['campo'] === 'valor_numero')
                                         <input id="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}" type="number" step="0.0001" class="rm-input" wire:model="valores.{{ $pregunta['codigo'] }}" aria-invalid="{{ $errors->has('valores.'.$pregunta['codigo']) ? 'true' : 'false' }}" @if($errors->has('valores.'.$pregunta['codigo'])) aria-describedby="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}-error" @endif @disabled($confirmando)>
                                     @elseif($pregunta['campo'] === 'valor_texto')
@@ -170,7 +173,7 @@
                                 <span wire:loading.remove wire:target="guardar">Confirmar y registrar</span><span wire:loading wire:target="guardar">Registrando…</span>
                             </button>
                         @else
-                            <button type="submit" class="rm-btn rm-btn-primary" wire:loading.attr="disabled" @disabled(!$cod_instrumento || $preguntas === [])>Revisar captura</button>
+                            <button type="submit" class="rm-btn rm-btn-primary" @disabled(!$cod_instrumento || $preguntas === [])>Revisar captura</button>
                         @endif
                     </div>
                 </form>

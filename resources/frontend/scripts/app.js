@@ -1,4 +1,6 @@
 import './utilities/bootstrap.js';
+import Swal from 'sweetalert2';
+window.Swal = Swal;
 import './modules/operaciones-interactivas.js';
 import './modules/alertas-signos.js';
 import './modules/alertas-trazabilidad.js';
@@ -178,3 +180,5 @@ import './modules/ficha-estudios.js';
 import './modules/nursing-dashboard.js';
 import './modules/livewire-access-feedback.js';
 import './modules/alertas-interaccion.js';
+
+import './modules/valoraciones-explorador.js';
