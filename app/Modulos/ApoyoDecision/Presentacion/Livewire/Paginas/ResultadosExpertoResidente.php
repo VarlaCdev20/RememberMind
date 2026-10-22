@@ -7,26 +7,33 @@ use App\Models\Residente;
 use App\Models\User;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\EjecutarObservaciones;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RevisarValoracionExperta;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\CapturasInstrumentalesResidente;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarActividadCognitiva;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarContinuidadAsistencialExperta;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarExploracionOrion;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarHallazgosObservacionales;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarObservacionesConservadas;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarPerfilInstrumental;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarRevisionesValoracionExperta;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaFuenteEvidencia;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaResultadosExperto;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\PrepararEvaluacionInstitucional;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\LecturaSimulacionExperta;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\ConsultaCognitivaEnfermeria;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto as L;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\PresentarInformeCognitivo;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\ResumirFuentesCognitivas;
 use App\Modulos\ApoyoDecision\Dominio\Revision\DisciplinaRevision;
-use App\Modulos\Valoraciones\Aplicacion\Consultas\PrepararCapturaInstrumental;
 use Carbon\CarbonImmutable;
 use DomainException;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Locked;
-use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /** Coordina lectura y solicitudes explícitas; el motor y la conservación permanecen en el backend. */
 class ResultadosExpertoResidente extends Component
@@ -86,6 +93,312 @@ class ResultadosExpertoResidente extends Component
     #[Locked]
     public ?string $mensajeObservacional = null;
 
+    #[Locked]
+    public bool $significadoAbierto = false;
+
+    #[Locked]
+    public bool $informeCompletoAbierto = false;
+
+    #[Locked]
+    public bool $consultaAbierta = false;
+
+    #[Locked]
+    public string $pestanaConsulta = 'interpretacion';
+
+    #[Locked]
+    public ?string $nodoGrafo = null;
+
+    #[Locked]
+    public string $tipoGrafo = 'inferencia';
+
+    #[Locked]
+    public bool $detalleAreaAbierto = false;
+
+    #[Locked]
+    public bool $evolucionAbierta = false;
+
+    #[Locked]
+    public ?string $cuidadoSeleccionado = null;
+
+    #[Locked]
+    public ?string $comparacionInicial = null;
+
+    #[Locked]
+    public ?string $comparacionReciente = null;
+
+    #[Locked]
+    public ?string $serieComparacion = null;
+
+    #[Locked]
+    public ?string $puntoMedicion = null;
+
+    #[Locked]
+    public ?string $componenteRegistro = null;
+
+    #[Locked]
+    public bool $analisisEjecutado = false;
+
+    #[Locked]
+    public ?string $fechaAnalisis = null;
+
+    /** Caché de esta petición: el resultado ejecutado se presenta sin una segunda adquisición. */
+    private ?array $perfilAnalizado = null;
+
+    private bool $analisisSolicitado = false;
+
+    public ?string $mensajeAnalisis = null;
+
+    public bool $procesandoAnalisis = false;
+
+    public function hydrate(): void
+    {
+        // Sin conservación SQL, una petición posterior es una nueva consulta de fuentes mutables.
+        $this->analisisEjecutado = false;
+        $this->fechaAnalisis = null;
+        $this->mensajeAnalisis = null;
+        $this->perfilAnalizado = null;
+        $this->analisisSolicitado = false;
+    }
+
+    public function analizarEvidencia(): void
+    {
+        $residente = $this->autorizar();
+        abort_if($this->enfermeria, 403, 'El análisis del sistema experto está reservado a Medicina y Psicología.');
+
+        $this->procesandoAnalisis = true;
+        $this->analisisEjecutado = false;
+        $this->fechaAnalisis = null;
+        $this->perfilAnalizado = null;
+        $this->analisisSolicitado = true;
+        $this->mensajeAnalisis = null;
+        $this->resetValidation();
+
+        try {
+            $corte = CarbonImmutable::now();
+            $evaluacion = app(PrepararEvaluacionInstitucional::class)->preparar(auth()->user(), $residente, $corte);
+            $perfil = app(ConsultarPerfilInstrumental::class)->desdePreparacion($evaluacion);
+            $this->perfilAnalizado = $perfil;
+            $this->fechaAnalisis = $corte->format('Y-m-d\TH:i:s.uP');
+            $this->analisisEjecutado = true;
+            $this->mensajeAnalisis = 'Análisis completado con la información disponible en la fecha indicada.';
+        } catch (DomainException $e) {
+            report($e);
+            $this->addError('analisis', 'No se pudo verificar toda la información necesaria para el análisis. Actualiza la consulta y vuelve a intentarlo.');
+        } catch (AuthorizationException|HttpException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            report($e);
+            $this->addError('analisis', 'No se pudo completar el análisis de evidencia disponible.');
+        } finally {
+            $this->procesandoAnalisis = false;
+        }
+    }
+
+    private function cerrarVentanasConsulta(): void
+    {
+        $this->significadoAbierto = $this->informeCompletoAbierto = $this->detalleAreaAbierto = $this->evolucionAbierta = $this->consultaAbierta = $this->trazabilidadAbierta = false;
+        $this->cuidadoSeleccionado = $this->puntoMedicion = null;
+        $this->componenteRegistro = null;
+    }
+
+    public function abrirDetalleArea(): void
+    {
+        $this->autorizar();
+        $this->cerrarVentanasConsulta();
+        $this->detalleAreaAbierto = true;
+    }
+
+    public function cerrarDetalleArea(): void
+    {
+        $this->autorizar();
+        $this->detalleAreaAbierto = false;
+    }
+
+    public function abrirEvolucion(): void
+    {
+        $residente = $this->autorizar();
+        $datos = $this->leerResultados($residente, $this->evaluacion, $this->getPage('historia'));
+        $this->cerrarVentanasConsulta();
+        $historia = collect($datos['historial']->items());
+        $this->comparacionInicial = $historia->last()['id'] ?? null;
+        $this->comparacionReciente = $historia->count() > 1 ? $historia->first()['id'] : null;
+        $this->serieComparacion = null;
+        $this->evolucionAbierta = true;
+    }
+
+    public function cerrarEvolucion(): void
+    {
+        $this->autorizar();
+        $this->evolucionAbierta = false;
+        $this->puntoMedicion = null;
+    }
+
+    public function cambiarComparacion(string $campo, string $valor): void
+    {
+        $residente = $this->autorizar();
+        abort_unless(in_array($campo, ['inicial', 'reciente', 'area', 'serie'], true), 422);
+        if ($campo === 'area') {
+            abort_unless(isset(L::CRITERIOS[$valor]), 422);
+            $this->criterio = $valor;
+            $this->serieComparacion = $this->puntoMedicion = null;
+        } elseif ($campo === 'serie') {
+            $perfil = app(CapturasInstrumentalesResidente::class)->consultar(auth()->user(), $residente, CarbonImmutable::now());
+            $series = (new ConsultaCognitivaEnfermeria)->series($perfil, $this->criterio);
+            abort_unless(collect($series)->contains('id', $valor), 404);
+            $this->serieComparacion = $valor;
+        } else {
+            $simulacionOriginal = $this->simulacion;
+            try {
+                $nueva = $this->leerResultados($residente, $valor);
+            } finally {
+                $this->simulacion = $simulacionOriginal;
+            }
+            $otra = $campo === 'inicial' ? $this->comparacionReciente : $this->comparacionInicial;
+            if ($valor === $otra) {
+                $this->addError('comparacion', 'Selecciona dos evaluaciones distintas.');
+
+                return;
+            }
+            if ($otra) {
+                try {
+                    $previa = $this->leerResultados($residente, $otra);
+                } finally {
+                    $this->simulacion = $simulacionOriginal;
+                }
+                $fechaNueva = $this->fechaEvaluacion($nueva['evaluacion']['fecha'] ?? null);
+                $fechaOtra = $this->fechaEvaluacion($previa['evaluacion']['fecha'] ?? null);
+                if (! $fechaNueva || ! $fechaOtra) {
+                    $this->addError('comparacion', 'No se puede ordenar la comparación: falta una fecha de evaluación válida.');
+
+                    return;
+                }
+                if (($campo === 'inicial' && $fechaNueva->gt($fechaOtra)) || ($campo === 'reciente' && $fechaNueva->lt($fechaOtra))) {
+                    $this->addError('comparacion', 'La evaluación inicial debe ser anterior o de la misma fecha que la reciente.');
+
+                    return;
+                }
+            }
+            $this->{$campo === 'inicial' ? 'comparacionInicial' : 'comparacionReciente'} = $valor;
+        }
+        $this->resetErrorBag('comparacion');
+        $this->dispatch('comparacion-actualizada');
+    }
+
+    public function verMedicion(string $id): void
+    {
+        $residente = $this->autorizar();
+        $capturas = app(CapturasInstrumentalesResidente::class)->consultar(auth()->user(), $residente, CarbonImmutable::now());
+        $series = (new ConsultaCognitivaEnfermeria)->series($capturas, $this->criterio);
+        abort_unless(collect($series)->flatMap(fn ($s) => $s['puntos'])->contains('id', $id), 404);
+        $this->puntoMedicion = $id;
+    }
+
+    private function fechaEvaluacion(?string $valor): ?CarbonImmutable
+    {
+        if ($valor === null) {
+            return null;
+        }
+        $fecha = \DateTimeImmutable::createFromFormat('!d/m/Y H:i', $valor);
+        $errores = \DateTimeImmutable::getLastErrors();
+
+        return $fecha && ($errores === false || ($errores['warning_count'] === 0 && $errores['error_count'] === 0))
+            ? CarbonImmutable::instance($fecha) : null;
+    }
+
+    public function verCuidado(string $clave): void
+    {
+        $residente = $this->autorizar();
+        $continuidad = app(ConsultarContinuidadAsistencialExperta::class)->consultar(auth()->user(), $residente, now());
+        abort_unless($this->enfermeria && $continuidad['puedeVerCuidados'] && $continuidad['cuidadosPendientesHoy']->concat($continuidad['otrosCuidadosVigentes'])->contains('clave', $clave), 404);
+        $this->cerrarVentanasConsulta();
+        $this->cuidadoSeleccionado = $clave;
+    }
+
+    public function cerrarCuidado(): void
+    {
+        $this->autorizar();
+        $this->cuidadoSeleccionado = null;
+        $this->abrirConsulta('cuidados');
+    }
+
+    public function abrirRegistroComponente(string $codigo): void
+    {
+        $residente = $this->autorizar();
+        $perfil = app(ConsultarPerfilInstrumental::class)->consultarMediciones(auth()->user(), $residente, CarbonImmutable::now());
+        abort_unless(! empty($perfil['dominios'][$this->criterio]['componentes'][$codigo]['mediciones']), 404);
+        $this->abrirConsulta('registro');
+        $this->componenteRegistro = $codigo;
+    }
+
+    public function abrirNodoGrafo(string $tipo, string $id): void
+    {
+        $residente = $this->autorizar();
+        abort_unless(in_array($tipo, ['inferencia', 'semantico'], true), 422);
+        abort_if($this->simulacion, 404);
+        $lectura = app(LecturaResultadosExperto::class)->consultar(auth()->user(), $residente, $this->evaluacion, $this->criterio);
+        $grafos = app(ConsultarExploracionOrion::class)->consultar(auth()->user(), $residente, $lectura, $this->criterio);
+        abort_unless(collect($grafos[$tipo]['nodos'])->contains('id', $id), 404);
+        $this->abrirConsulta('reglas');
+        $this->tipoGrafo = $tipo;
+        $this->nodoGrafo = $id;
+    }
+
+    public function abrirSignificado(): void
+    {
+        $this->autorizar();
+        $this->cerrarVentanasConsulta();
+        $this->significadoAbierto = true;
+    }
+
+    public function abrirInformeCompleto(): void
+    {
+        $this->autorizar();
+        abort_if($this->enfermeria, 403);
+        $this->cerrarVentanasConsulta();
+        $this->informeCompletoAbierto = true;
+    }
+
+    public function cerrarInformeCompleto(): void
+    {
+        $this->autorizar();
+        $this->informeCompletoAbierto = false;
+    }
+
+    public function cerrarSignificado(): void
+    {
+        $this->autorizar();
+        $this->significadoAbierto = false;
+    }
+
+    public function irASeccion(string $seccion): void
+    {
+        $this->autorizar();
+        abort_unless(in_array($seccion, ['orion-desglose', 'orion-evolucion', 'hallazgos-observacionales', 'fuentes-disponibles', 'aplicaciones-instrumentales', 'orion-petersen-criterios', 'orion-revision-profesional'], true), 422);
+        $this->cerrarVentanasConsulta();
+        $this->dispatch('orion-navigate', seccion: $seccion);
+    }
+
+    public function abrirConsulta(string $pestana = 'interpretacion'): void
+    {
+        $residente = $this->autorizar();
+        $permitidas = $this->enfermeria ? ['interpretacion', 'registro', 'cuidados'] : ['interpretacion', 'registro', 'reglas'];
+        abort_unless(in_array($pestana, $permitidas, true), 422);
+        if ($pestana === 'reglas') {
+            Gate::authorize('consultarTrazabilidad', [EvaluacionExperta::class, $residente]);
+        }
+        $this->cerrarVentanasConsulta();
+        $this->pestanaConsulta = $pestana;
+        $this->nodoGrafo = null;
+        $this->consultaAbierta = true;
+    }
+
+    public function cerrarConsulta(): void
+    {
+        $this->autorizar();
+        $this->consultaAbierta = false;
+        $this->evidencia = null;
+    }
+
     /** Conserva el residente y el contexto de navegación sin ampliar las competencias del rol. */
     public function mount(Residente $residente): void
     {
@@ -94,6 +407,10 @@ class ResultadosExpertoResidente extends Component
             || (auth()->user()?->hasRole('ENFERMEROS') && ! auth()->user()?->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'SUPERADMINISTRADOR']));
         $this->psicologia = request()->routeIs('admin.psicologia.*')
             || (auth()->user()?->hasRole('PSICOLOGO/A') && ! auth()->user()?->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'SUPERADMINISTRADOR', 'ENFERMEROS']));
+        // La consulta clínica ordinaria nunca selecciona una demostración por ausencia de resultados.
+        $this->simulacion = request()->query('simulacion') === '1'
+            && app()->environment(['local', 'testing'])
+            && config('sistema_experto.simulacion_local.habilitada') === true;
         $this->autorizar();
     }
 
@@ -110,23 +427,10 @@ class ResultadosExpertoResidente extends Component
         return $residente;
     }
 
-    public function abrirCapturaInstrumental(): void
-    {
-        $residente = $this->autorizar();
-        app(PrepararCapturaInstrumental::class)->contexto(auth()->user(), $residente->getKey());
-        $this->dispatch('evaluacion-geriatrica-abrir', cod_residente: $residente->getKey());
-    }
-
-    #[On('evaluacion-geriatrica-guardada')]
-    public function actualizarCapturas(): void
-    {
-        $this->autorizar();
-    }
-
     /** Muestra el resultado conservado disponible, sin selector de vista previa ni mezcla de fuentes. */
     private function leerResultados(Residente $residente, ?string $id, int $pagina = 1): array
     {
-        if ($id !== null || $this->simulacion) {
+        if ($this->simulacion) {
             $datos = app(LecturaSimulacionExperta::class)->consultar(auth()->user(), $residente, $id, $this->criterio, $pagina);
             if ($datos !== null) {
                 $this->simulacion = true;
@@ -138,14 +442,6 @@ class ResultadosExpertoResidente extends Component
         }
 
         $datos = app(LecturaResultadosExperto::class)->consultar(auth()->user(), $residente, $id, $this->criterio, $pagina);
-        if ($datos['evaluacion'] === null && $id === null) {
-            $instantanea = app(LecturaSimulacionExperta::class)->consultar(auth()->user(), $residente, null, $this->criterio, $pagina);
-            if ($instantanea !== null) {
-                $this->simulacion = true;
-
-                return $instantanea;
-            }
-        }
         $this->simulacion = false;
 
         return $datos;
@@ -159,6 +455,7 @@ class ResultadosExpertoResidente extends Component
         $this->criterio = $codigo;
         $this->evidencia = null;
         $this->trazabilidadAbierta = false;
+        $this->cerrarVentanasConsulta();
     }
 
     /** Valida acceso a la evaluación exacta antes de seleccionarla, sin reconstruir resultados. */
@@ -172,6 +469,7 @@ class ResultadosExpertoResidente extends Component
         }
         $this->leerResultados($residente, $id);
         $this->evaluacion = $id;
+        $this->cerrarVentanasConsulta();
         $this->cerrarRevision();
         $this->evidencia = null;
         $this->trazabilidadAbierta = false;
@@ -182,6 +480,7 @@ class ResultadosExpertoResidente extends Component
     {
         $residente = $this->autorizar();
         Gate::authorize('consultarTrazabilidad', [EvaluacionExperta::class, $residente]);
+        $this->cerrarVentanasConsulta();
         $this->trazabilidadAbierta = true;
         $this->dispatch('expert-trace-opened');
     }
@@ -203,6 +502,28 @@ class ResultadosExpertoResidente extends Component
         $datos = app(LecturaResultadosExperto::class)->consultar(auth()->user(), $residente, $this->evaluacion, $this->criterio);
         abort_unless(isset($datos['detalle']['evidencias'][$id]), 404);
         $this->evidencia = $this->evidencia === $id ? null : $id;
+    }
+
+    public function abrirRegistro(string $id, ?string $area = null): void
+    {
+        if ($area !== null && $area !== $this->criterio) {
+            $residente = $this->autorizar();
+            abort_if($this->simulacion, 404);
+            abort_unless(isset(L::CRITERIOS[$area]), 422);
+            $lectura = app(LecturaResultadosExperto::class)->consultar(auth()->user(), $residente, $this->evaluacion, $area);
+            abort_unless(isset($lectura['detalle']['evidencias'][$id]), 404);
+            $this->seleccionarCriterio($area);
+        }
+        $this->abrirConsulta('registro');
+        $this->verEvidencia($id);
+    }
+
+    /** El resultado conservado publicable del lector D-137 corresponde a aprendizaje y memoria. */
+    public function abrirConsultaResultado(string $pestana): void
+    {
+        abort_unless(in_array($pestana, ['interpretacion', 'registro'], true), 422);
+        $this->seleccionarCriterio('COG-MEM');
+        $this->abrirConsulta($pestana);
     }
 
     /** Reautoriza el reintento; render vuelve a realizar únicamente la lectura. */
@@ -336,6 +657,8 @@ class ResultadosExpertoResidente extends Component
     public function render()
     {
         $residente = $this->autorizar();
+        $cohorteEntrenamiento = \App\Modulos\ApoyoDecision\Infraestructura\Simulacion\CohorteCognitivaLocal::esResidente($residente);
+        $residente->loadMissing('cama.habitacion');
         $datos = null;
         $fuente = null;
         $errorLectura = false;
@@ -348,37 +671,63 @@ class ResultadosExpertoResidente extends Component
         $hallazgosObservacionales = null;
         $capturaInstrumental = null;
         $perfilInstrumental = null;
+        $exploracion = null;
         $puedeAuditar = Gate::allows('consultarTrazabilidad', [EvaluacionExperta::class, $residente]);
         $puedeEjecutarObservaciones = Gate::allows('ejecutarObservaciones', [EvaluacionExperta::class, $residente]);
         abort_if($this->trazabilidadAbierta && ! $puedeAuditar, 404);
+        abort_if($this->consultaAbierta && $this->pestanaConsulta === 'reglas' && ! $puedeAuditar, 404);
         try {
-            $perfilInstrumental = app(ConsultarPerfilInstrumental::class)->consultar(auth()->user(), $residente, CarbonImmutable::now());
+            $consultaPerfil = app(ConsultarPerfilInstrumental::class);
+            if ($this->analisisSolicitado) {
+                $perfilInstrumental = $this->perfilAnalizado;
+                $errorInstrumental = ! $this->analisisEjecutado;
+            } else {
+                $corte = $this->fechaAnalisis ? CarbonImmutable::parse($this->fechaAnalisis) : CarbonImmutable::now();
+                $perfilInstrumental = $this->enfermeria
+                    ? $consultaPerfil->consultarMediciones(auth()->user(), $residente, $corte)
+                    : $consultaPerfil->consultar(auth()->user(), $residente, $corte);
+            }
             $capturaInstrumental = $perfilInstrumental['capturas_originales'] ?? null;
         } catch (QueryException|DomainException $e) {
             report($e);
             $errorInstrumental = true;
+            $this->analisisEjecutado = false;
+            $this->fechaAnalisis = null;
+            $this->mensajeAnalisis = null;
         }
-        try {
-            $hallazgosObservacionales = app(ConsultarObservacionesConservadas::class)->consultar(auth()->user(), $residente,
-                $this->evaluacionObservacional, $this->getPage('observaciones'), $this->getPage('historiaObservaciones'))
-                ?? app(ConsultarHallazgosObservacionales::class)->consultar(auth()->user(), $residente, $this->getPage('observaciones'));
-            if ($hallazgosObservacionales && $hallazgosObservacionales['persistido']) {
-                $revisionesObservacionales = app(ConsultarRevisionesValoracionExperta::class)->consultar(auth()->user(), $hallazgosObservacionales['id']);
+        if (! $this->enfermeria) {
+            try {
+                $hallazgosObservacionales = app(ConsultarObservacionesConservadas::class)->consultar(auth()->user(), $residente,
+                    $this->evaluacionObservacional, $this->getPage('observaciones'), $this->getPage('historiaObservaciones'))
+                    ?? app(ConsultarHallazgosObservacionales::class)->consultar(auth()->user(), $residente, $this->getPage('observaciones'));
+                if ($hallazgosObservacionales && $hallazgosObservacionales['persistido']) {
+                    $revisionesObservacionales = app(ConsultarRevisionesValoracionExperta::class)->consultar(auth()->user(), $hallazgosObservacionales['id']);
+                }
+            } catch (QueryException|DomainException $e) {
+                report($e);
+                $hallazgosObservacionales = $revisionesObservacionales = null;
+                $errorObservacional = true;
             }
-        } catch (QueryException|DomainException $e) {
-            report($e);
-            $hallazgosObservacionales = $revisionesObservacionales = null;
-            $errorObservacional = true;
         }
         try {
             $datos = $this->leerResultados($residente, $this->evaluacion, $this->getPage('historia'));
             $presentador = app(PresentarInformeCognitivo::class);
             $informe = $this->simulacion ? $presentador->presentarSimulacion($datos, $this->criterio)
                 : $presentador->presentar($datos, $this->criterio);
+            if ($this->enfermeria) {
+                foreach ($informe['areas'] as $codigo => &$area) {
+                    $area['nombre'] = L::CRITERIOS[$codigo]['nombre'];
+                }
+                unset($area);
+                $informe['actual'] = $informe['areas'][$this->criterio];
+            }
             if ($datos['evaluacion'] && ! $datos['prueba_tecnica'] && ! isset($datos['simulacion_local'])) {
                 $revisiones = app(ConsultarRevisionesValoracionExperta::class)->consultar(auth()->user(), $datos['evaluacion']['id']);
             }
             $estadoRevision = $presentador->resumirRevision($revisiones, $datos['evaluacion'] !== null, $this->simulacion);
+            if ($puedeAuditar && ! $this->simulacion && ! $datos['prueba_tecnica']) {
+                $exploracion = app(ConsultarExploracionOrion::class)->consultar(auth()->user(), $residente, $datos, $this->criterio);
+            }
             if ($this->evidencia && isset($datos['detalle']['evidencias'][$this->evidencia])) {
                 $fuente = app(LecturaFuenteEvidencia::class)->consultar(auth()->user(), $residente, $datos['evaluacion']['id'], $this->evidencia);
             }
@@ -388,7 +737,66 @@ class ResultadosExpertoResidente extends Component
             $errorLectura = true;
         }
 
-        return view('livewire.medico.resultados-experto-residente', compact('datos', 'informe', 'fuente', 'errorLectura', 'residente', 'revisiones', 'estadoRevision', 'puedeAuditar', 'hallazgosObservacionales', 'puedeEjecutarObservaciones', 'capturaInstrumental', 'perfilInstrumental', 'revisionesObservacionales', 'errorInstrumental', 'errorObservacional'))
+        $continuidad = $this->enfermeria
+            ? app(ConsultarContinuidadAsistencialExperta::class)
+                ->consultar(auth()->user(), $residente, now())
+            : ['puedeVerDiagnosticos' => false, 'puedeVerCuidados' => false, 'diagnosticosMedicos' => collect(),
+                'cuidadosPendientesHoy' => collect(), 'otrosCuidadosVigentes' => collect()];
+
+        $consultaEnfermeria = $datos && $informe ? (new ConsultaCognitivaEnfermeria)->presentar($datos, $informe, $perfilInstrumental) : null;
+        $resumenFuentes = ! $this->enfermeria && ! $errorInstrumental
+            ? (new ResumirFuentesCognitivas)->presentar($capturaInstrumental, $perfilInstrumental, $hallazgosObservacionales)
+            : null;
+        $registroComponente = collect($consultaEnfermeria['componentes'][$this->criterio] ?? [])->firstWhere('id', $this->componenteRegistro);
+        abort_if($this->componenteRegistro && ! $errorInstrumental && ! $registroComponente, 404);
+        $seriesEvolucion = $actividadCognitiva = $comparaciones = [];
+        $errorEvolucion = false;
+        if ($this->psicologia && ! $this->evolucionAbierta) {
+            try {
+                $actividadCognitiva = app(ConsultarActividadCognitiva::class)->consultar(auth()->user(), $residente);
+            } catch (QueryException|DomainException $e) {
+                report($e);
+                $errorEvolucion = true;
+            }
+        }
+        if ($this->evolucionAbierta) {
+            $simulacionActual = $this->simulacion;
+            try {
+                if ($errorInstrumental) {
+                    throw new DomainException('Las mediciones instrumentales no pudieron verificarse.');
+                }
+                $seriesEvolucion = (new ConsultaCognitivaEnfermeria)->series($capturaInstrumental, $this->criterio, $perfilInstrumental['dominios'][$this->criterio]['componentes'] ?? []);
+                $actividadCognitiva = app(ConsultarActividadCognitiva::class)->consultar(auth()->user(), $residente);
+                foreach (['inicial' => $this->comparacionInicial, 'reciente' => $this->comparacionReciente] as $lado => $id) {
+                    if ($id) {
+                        $lectura = $this->leerResultados($residente, $id);
+                        $comparaciones[$lado] = ['evaluacion' => $lectura['evaluacion'], 'areas' => array_map(fn ($d) => ['nombre' => $d['nombre'], 'estado' => $d['estado']], $lectura['perfil'])];
+                    }
+                }
+                if (isset($comparaciones['inicial'], $comparaciones['reciente'])) {
+                    $desde = $this->fechaEvaluacion($comparaciones['inicial']['evaluacion']['fecha'] ?? null);
+                    $hasta = $this->fechaEvaluacion($comparaciones['reciente']['evaluacion']['fecha'] ?? null);
+                    if (! $desde || ! $hasta || $desde->gt($hasta)) {
+                        throw new DomainException('Las evaluaciones seleccionadas no tienen un intervalo temporal verificable.');
+                    }
+                    foreach ($seriesEvolucion as &$serie) {
+                        $serie['puntos'] = array_values(array_filter($serie['puntos'], fn ($p) => CarbonImmutable::parse($p['fecha'])->betweenIncluded($desde->startOfMinute(), $hasta->endOfMinute())));
+                    }
+                    unset($serie);
+                }
+            } catch (QueryException|DomainException $e) {
+                report($e);
+                $errorEvolucion = true;
+                $seriesEvolucion = $actividadCognitiva = $comparaciones = [];
+            } finally {
+                $this->simulacion = $simulacionActual;
+            }
+        }
+        $cuidadoDetalle = $this->cuidadoSeleccionado ? $continuidad['cuidadosPendientesHoy']->concat($continuidad['otrosCuidadosVigentes'])->firstWhere('clave', $this->cuidadoSeleccionado) : null;
+        abort_if($this->cuidadoSeleccionado && ! $cuidadoDetalle, 404);
+
+        return view('livewire.medico.resultados-experto-residente', compact('datos', 'informe', 'fuente', 'errorLectura', 'residente', 'revisiones', 'estadoRevision', 'puedeAuditar', 'hallazgosObservacionales', 'puedeEjecutarObservaciones', 'capturaInstrumental', 'perfilInstrumental', 'revisionesObservacionales', 'errorInstrumental', 'errorObservacional', 'exploracion', 'consultaEnfermeria', 'resumenFuentes', 'seriesEvolucion', 'actividadCognitiva', 'comparaciones', 'errorEvolucion', 'cuidadoDetalle', 'registroComponente'), $continuidad)
+            ->with('cohorteEntrenamiento', $cohorteEntrenamiento)
             ->layout($this->enfermeria ? 'layouts.enfermeria' : 'layouts.sistema');
     }
 }

@@ -76,3 +76,10 @@ La conservación institucional completa y la aceptación de interfaz/revisión
 siguen abiertas según el plan. La revisión profesional se registra después del
 resultado; no exige una firma previa para desarrollar ni permite completar
 mediciones ausentes con valores inventados.
+
+## Entrega local del 22/10/2026
+
+- [Publicación integrada y verificación](PUBLICACION_INTEGRADA_2026_10_22.md).
+- [Cohorte investigada y seeder optativo](COHORTE_INVESTIGACION_SEEDER_2026_10_22.md).
+- [Disponibilidad y nombres en la aplicación local](COHORTE_VISIBLE_APLICACION_2026_10_22.md).
+- [Consolidación experta ya autorizada](CIERRE_REFACTOR_BLOQUES_2026_10_22.md).

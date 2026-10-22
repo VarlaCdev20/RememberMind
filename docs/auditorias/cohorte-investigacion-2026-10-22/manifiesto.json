@@ -1,0 +1,899 @@
+{
+    "version": "INVESTIGACION-COGNITIVA-30-20261022-V1",
+    "fecha_revision_bibliografica": "2026-10-22",
+    "procedencia": "CASOS_SINTETICOS_DE_INGENIERIA_CON_BIBLIOGRAFIA",
+    "datos_individuales_importados": false,
+    "aprobacion_clinica": false,
+    "referencias": {
+        "PETERSEN-2004": {
+            "titulo": "Mild cognitive impairment as a diagnostic entity",
+            "autor": "Petersen RC",
+            "anio": 2004,
+            "doi": "10.1111\/j.1365-2796.2004.01388.x",
+            "url": "https:\/\/doi.org\/10.1111\/j.1365-2796.2004.01388.x",
+            "uso": "Fundamento conceptual de los cuatro perfiles; no aporta historias individuales ni un umbral universal."
+        },
+        "NIA-AA-2011": {
+            "titulo": "The diagnosis of mild cognitive impairment due to Alzheimer’s disease: Recommendations from the NIA-AA workgroups",
+            "autor": "Albert MS et al.",
+            "anio": 2011,
+            "doi": "10.1016\/j.jalz.2011.03.008",
+            "url": "https:\/\/pmc.ncbi.nlm.nih.gov\/articles\/PMC3312027\/",
+            "uso": "Cambio, evidencia cognitiva, independencia relativa y revisión clínica; no demuestra etiología de los casos."
+        },
+        "HVLT-2015": {
+            "titulo": "Hopkins Verbal Learning Test–Revised: Normative data for the Latin American Spanish speaking adult population",
+            "autor": "Arango-Lasprilla JC et al.",
+            "anio": 2015,
+            "doi": "10.3233\/NRE-151286",
+            "url": "https:\/\/journals.sagepub.com\/doi\/10.3233\/NRE-151286"
+        },
+        "BTA-2015": {
+            "titulo": "Brief Test of Attention: Normative data for the Latin American Spanish speaking adult population",
+            "autor": "Rivera D et al.",
+            "anio": 2015,
+            "doi": "10.3233\/NRE-151283",
+            "url": "https:\/\/journals.sagepub.com\/doi\/10.3233\/NRE-151283"
+        },
+        "TMT-2015": {
+            "titulo": "Trail Making Test: Normative data for the Latin American Spanish speaking adult population",
+            "autor": "Arango-Lasprilla JC et al.",
+            "anio": 2015,
+            "doi": "10.3233\/NRE-151284",
+            "url": "https:\/\/pubmed.ncbi.nlm.nih.gov\/26639932\/"
+        },
+        "BNT-2015": {
+            "titulo": "Standard form of the Boston Naming Test: Normative data for the Latin American Spanish speaking adult population",
+            "autor": "Olabarrieta-Landa L et al.",
+            "anio": 2015,
+            "doi": "10.3233\/NRE-151278",
+            "url": "https:\/\/pubmed.ncbi.nlm.nih.gov\/26639925\/"
+        },
+        "ROCF-2015": {
+            "titulo": "Rey–Osterrieth Complex Figure – copy and immediate recall: Normative data for the Latin American Spanish speaking adult population",
+            "autor": "Rivera D et al.",
+            "anio": 2015,
+            "doi": "10.3233\/NRE-151285",
+            "url": "https:\/\/journals.sagepub.com\/doi\/10.3233\/NRE-151285"
+        }
+    },
+    "datasets_revisados_no_importados": {
+        "ADNI": {
+            "fuente": "https:\/\/adni.loni.usc.edu\/wp-content\/themes\/adni_2023\/documents\/ADNI_Data_Use_Agreement.pdf",
+            "estado": "SIN_ACCESO_A_DATOS_INDIVIDUALES",
+            "limite": "Acceso y uso sujetos al DUA; restricciones sobre redistribución y recursos de IA. No atribuir sus participantes a residentes."
+        },
+        "OASIS": {
+            "fuente": "https:\/\/bpb-us-e2.wpmucdn.com\/sites.wustl.edu\/dist\/6\/4383\/files\/2025\/07\/Data-Use-Agreement_July2025.pdf",
+            "version_condiciones": "2025-07",
+            "estado": "SIN_ACCESO_A_DATOS_INDIVIDUALES",
+            "limite": "Requiere solicitud\/DUA según proyecto. Un CDR o una etiqueta de demencia no equivale a los cuatro perfiles del contrato local."
+        }
+    },
+    "poblacion_ensayo": {
+        "edad_minima": 61,
+        "edad_maxima": 89,
+        "escolaridad_anios": [
+            4,
+            8,
+            12
+        ],
+        "pais_normativo": "BO",
+        "idioma": "es",
+        "lectoescritura": true,
+        "limite": "Casos seleccionados para cubrir contratos; no son una muestra representativa ni estiman prevalencia."
+    },
+    "metodos": [
+        {
+            "dominio": "COG-MEM",
+            "metodo": "HVLT-R-BO-2015-F5",
+            "referencia": "HVLT-2015",
+            "reactivos_reproducidos": false,
+            "limite": "Normalización numérica independiente del juicio original A\/P\/I; sin umbral clínico nuevo."
+        },
+        {
+            "dominio": "COG-ATE",
+            "metodo": "BTA-BO-2015-NL",
+            "referencia": "BTA-2015",
+            "reactivos_reproducidos": false,
+            "limite": "Normalización numérica independiente del juicio original A\/P\/I; sin umbral clínico nuevo."
+        },
+        {
+            "dominio": "COG-EJE",
+            "metodo": "TMT-B-BO-2015",
+            "referencia": "TMT-2015",
+            "reactivos_reproducidos": false,
+            "limite": "Normalización numérica independiente del juicio original A\/P\/I; sin umbral clínico nuevo."
+        },
+        {
+            "dominio": "COG-LEN",
+            "metodo": "BNT-BO-2015-60",
+            "referencia": "BNT-2015",
+            "reactivos_reproducidos": false,
+            "limite": "Normalización numérica independiente del juicio original A\/P\/I; sin umbral clínico nuevo."
+        },
+        {
+            "dominio": "COG-VIS",
+            "metodo": "ROCF-BO-2015-COPIA-A",
+            "referencia": "ROCF-2015",
+            "reactivos_reproducidos": false,
+            "limite": "Normalización numérica independiente del juicio original A\/P\/I; sin umbral clínico nuevo."
+        }
+    ],
+    "aceptacion": {
+        "S01": {
+            "patron_esperado": "PET-01",
+            "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "c02_esperado": "S",
+            "variante": "completo",
+            "dominios_esperados": {
+                "COG-MEM": "A",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-MEM"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S02": {
+            "patron_esperado": "PET-01",
+            "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "c02_esperado": "S",
+            "variante": "completo",
+            "dominios_esperados": {
+                "COG-MEM": "A",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-MEM"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S03": {
+            "patron_esperado": "PET-01",
+            "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "c02_esperado": "S",
+            "variante": "completo",
+            "dominios_esperados": {
+                "COG-MEM": "A",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-MEM"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S04": {
+            "patron_esperado": "PET-02",
+            "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "c02_esperado": "S",
+            "variante": "completo",
+            "dominios_esperados": {
+                "COG-MEM": "A",
+                "COG-ATE": "A",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-MEM",
+                "COG-ATE"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S05": {
+            "patron_esperado": "PET-02",
+            "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "c02_esperado": "S",
+            "variante": "completo",
+            "dominios_esperados": {
+                "COG-MEM": "A",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "A",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-MEM",
+                "COG-LEN"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S06": {
+            "patron_esperado": "PET-02",
+            "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "c02_esperado": "S",
+            "variante": "completo",
+            "dominios_esperados": {
+                "COG-MEM": "A",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "A"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-MEM",
+                "COG-VIS"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S07": {
+            "patron_esperado": "PET-03",
+            "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "c02_esperado": "S",
+            "variante": "completo",
+            "dominios_esperados": {
+                "COG-MEM": "P",
+                "COG-ATE": "A",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-ATE"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S08": {
+            "patron_esperado": "PET-03",
+            "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "c02_esperado": "S",
+            "variante": "completo",
+            "dominios_esperados": {
+                "COG-MEM": "P",
+                "COG-ATE": "P",
+                "COG-EJE": "A",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-EJE"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S09": {
+            "patron_esperado": "PET-03",
+            "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "c02_esperado": "S",
+            "variante": "completo",
+            "dominios_esperados": {
+                "COG-MEM": "P",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "A",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-LEN"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S10": {
+            "patron_esperado": "PET-04",
+            "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "c02_esperado": "S",
+            "variante": "completo",
+            "dominios_esperados": {
+                "COG-MEM": "P",
+                "COG-ATE": "A",
+                "COG-EJE": "A",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-ATE",
+                "COG-EJE"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S11": {
+            "patron_esperado": "PET-04",
+            "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "c02_esperado": "S",
+            "variante": "completo",
+            "dominios_esperados": {
+                "COG-MEM": "P",
+                "COG-ATE": "P",
+                "COG-EJE": "A",
+                "COG-LEN": "P",
+                "COG-VIS": "A"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-EJE",
+                "COG-VIS"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S12": {
+            "patron_esperado": "PET-04",
+            "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "c02_esperado": "S",
+            "variante": "completo",
+            "dominios_esperados": {
+                "COG-MEM": "P",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "A",
+                "COG-VIS": "A"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-LEN",
+                "COG-VIS"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S13": {
+            "patron_esperado": null,
+            "estado_esperado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "c02_esperado": "N",
+            "variante": "completo",
+            "dominios_esperados": {
+                "COG-MEM": "P",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S14": {
+            "patron_esperado": null,
+            "estado_esperado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "c02_esperado": "N",
+            "variante": "completo",
+            "dominios_esperados": {
+                "COG-MEM": "P",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S15": {
+            "patron_esperado": null,
+            "estado_esperado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "c02_esperado": "N",
+            "variante": "completo",
+            "dominios_esperados": {
+                "COG-MEM": "P",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S16": {
+            "patron_esperado": null,
+            "estado_esperado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "c02_esperado": "N",
+            "variante": "completo",
+            "dominios_esperados": {
+                "COG-MEM": "P",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S17": {
+            "patron_esperado": null,
+            "estado_esperado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "c02_esperado": "N",
+            "variante": "completo",
+            "dominios_esperados": {
+                "COG-MEM": "P",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S18": {
+            "patron_esperado": null,
+            "estado_esperado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "c02_esperado": "N",
+            "variante": "completo",
+            "dominios_esperados": {
+                "COG-MEM": "P",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S19": {
+            "patron_esperado": null,
+            "estado_esperado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "c02_esperado": "S",
+            "variante": "c01_negativo",
+            "dominios_esperados": {
+                "COG-MEM": "A",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-MEM"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S20": {
+            "patron_esperado": null,
+            "estado_esperado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "c02_esperado": "S",
+            "variante": "c03_negativo",
+            "dominios_esperados": {
+                "COG-MEM": "A",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-MEM"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S21": {
+            "patron_esperado": null,
+            "estado_esperado": "ABSTENCION_EVALUACION_DIFERENCIAL",
+            "c02_esperado": "S",
+            "variante": "c04_negativo",
+            "dominios_esperados": {
+                "COG-MEM": "A",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-MEM"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S22": {
+            "patron_esperado": null,
+            "estado_esperado": "ABSTENCION_EVALUACION_DIFERENCIAL",
+            "c02_esperado": "S",
+            "variante": "impedimento_diferencial",
+            "dominios_esperados": {
+                "COG-MEM": "A",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-MEM"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S23": {
+            "patron_esperado": null,
+            "estado_esperado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "c02_esperado": "S",
+            "variante": "c05_negativo",
+            "dominios_esperados": {
+                "COG-MEM": "A",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-MEM"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S24": {
+            "patron_esperado": null,
+            "estado_esperado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "c02_esperado": "S",
+            "variante": "sin_visuoespacial",
+            "dominios_esperados": {
+                "COG-MEM": "A",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "U"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-MEM"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S25": {
+            "patron_esperado": null,
+            "estado_esperado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "c02_esperado": "S",
+            "variante": "visuoespacial_no_interpretable",
+            "dominios_esperados": {
+                "COG-MEM": "A",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "I"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-MEM"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S26": {
+            "patron_esperado": null,
+            "estado_esperado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "c02_esperado": "U",
+            "variante": "contexto_no_interpretado",
+            "dominios_esperados": {
+                "COG-MEM": "U",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-MEM"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S27": {
+            "patron_esperado": null,
+            "estado_esperado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "c02_esperado": "S",
+            "variante": "sin_corroboracion",
+            "dominios_esperados": {
+                "COG-MEM": "A",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-MEM"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S28": {
+            "patron_esperado": null,
+            "estado_esperado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "c02_esperado": "S",
+            "variante": "sin_oportunidad_iadl",
+            "dominios_esperados": {
+                "COG-MEM": "A",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-MEM"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S29": {
+            "patron_esperado": null,
+            "estado_esperado": "ABSTENCION_CONTRADICCION",
+            "c02_esperado": "X",
+            "variante": "contradiccion_memoria",
+            "dominios_esperados": {
+                "COG-MEM": "X",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-MEM"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        },
+        "S30": {
+            "patron_esperado": null,
+            "estado_esperado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "c02_esperado": "S",
+            "variante": "revision_calidad_desactualizada",
+            "dominios_esperados": {
+                "COG-MEM": "A",
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-VIS": "P"
+            },
+            "dominios_alterados_de_entrada": [
+                "COG-MEM"
+            ],
+            "referencias": [
+                "PETERSEN-2004",
+                "NIA-AA-2011",
+                "HVLT-2015",
+                "BTA-2015",
+                "TMT-2015",
+                "BNT-2015",
+                "ROCF-2015"
+            ],
+            "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+        }
+    }
+}

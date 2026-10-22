@@ -60,7 +60,7 @@ final class GestionarConocimientoExperimental
             $traducidas = app(IdentidadesConocimiento::class)->traducir($tablas, $p->version, $version, false);
             foreach ($traducidas as $tabla => $filas) {
                 if ($filas) {
-                    DB::table($tabla)->insert($filas);
+                    \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::insertar($tabla, $filas);
                 }
             }
             $this->leer($usuario, $version, $p);

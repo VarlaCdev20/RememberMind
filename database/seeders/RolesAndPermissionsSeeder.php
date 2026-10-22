@@ -139,6 +139,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'documentos_clinicos', 'derivaciones', 'incidentes', 'indicaciones_clinicas', 'controles_cognitivos',
             'registros_', 'heridas', 'curaciones_herida', 'planes_cuidado', 'prescripciones',
             'horarios_prescripcion.ver', 'administraciones_medicacion', 'aplicaciones_instrumento',
+            'respuestas_instrumento.ver', 'instrumentos.ver', 'preguntas_instrumento.ver', 'opciones_pregunta.ver',
             'valoraciones_', 'alertas.ver',
         ]), ['salud.ver', 'valoracion_medica.ver', 'valoracion_enfermeria.ver', 'evaluaciones_expertas.revisar_medicina']))));
 

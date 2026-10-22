@@ -78,7 +78,7 @@ final readonly class TrazaSimulacionLocal
     public function leer(string $criterio): ?array
     {
         $db = $this->contexto->db();
-        $traza = $db->table('trazas_inferencia')->where('cod_evaluacion_criterio', $criterio)->first();
+        $traza = \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('trazas_inferencia', $this->contexto->conexion)->where('cod_evaluacion_criterio', $criterio)->first();
         if ($traza === null) {
             return null;
         }
@@ -133,9 +133,9 @@ final readonly class TrazaSimulacionLocal
 
     private function insertar(string $tabla, array $datos): string
     {
-        $pk = CatalogoCodigos::ENTIDADES[$tabla][0];
+        $pk = CatalogoCodigos::clave($tabla);
         $id = (new GeneradorCodigo)->siguiente($tabla, $this->contexto->conexion);
-        $this->contexto->db()->table($tabla)->insert([$pk => $id] + $datos);
+        \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::insertar($tabla, [$pk => $id] + $datos, $this->contexto->conexion);
 
         return $id;
     }

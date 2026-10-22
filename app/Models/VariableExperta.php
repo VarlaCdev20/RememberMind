@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 // O.R.I.O.N. 4.16.4; restricciones físicas D-137.
-class VariableExperta extends ModeloExperto
+class VariableExperta extends ModeloBloqueExperto
 {
-    protected $table = 'variables_expertas';
+    protected const BLOQUE = 'variables_expertas';
+
+    protected $table = 'nodos_semanticos';
 
     protected $primaryKey = 'cod_variable_experta';
 

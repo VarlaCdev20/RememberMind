@@ -37,7 +37,18 @@ final readonly class InstantaneaEvaluacionInstitucional
 
     public static function verificar(array $d, string $huella): self
     {
-        $d = CapturaInstrumentalCanonica::ordenar($d);
+        return self::reconstruir($d, $huella, true);
+    }
+
+    /** Lee ambas salidas originales sin ejecutar reglas. No convierte una preparación en evaluación persistida. */
+    public static function verificarIntegridad(array $d, string $huella): self
+    {
+        return self::reconstruir($d, $huella, false);
+    }
+
+    private static function reconstruir(array $d, string $huella, bool $replay): self
+    {
+        $d = IntegridadPreparacion::comprobar($d, $huella);
         $campos = ['contrato', 'instrumental', 'petersen', 'release', 'persistido', 'release_retenido', 'ejecutor'];
         if (array_diff(array_keys($d), $campos) || array_diff($campos, array_keys($d))
             || ($d['contrato'] ?? null) !== self::CONTRATO || ($d['persistido'] ?? null) !== false || ($d['release_retenido'] ?? null) !== false
@@ -50,12 +61,15 @@ final readonly class InstantaneaEvaluacionInstitucional
             throw new DomainException('La preparación requiere la identidad del ejecutor capturada al crearla.');
         }
         foreach (['instrumental', 'petersen'] as $rama) {
-            if (! is_array($d[$rama]) || array_keys($d[$rama]) !== ['contenido', 'huella']) {
+            if (! is_array($d[$rama]) || array_keys($d[$rama]) !== ['contenido', 'huella']
+                || ! is_array($d[$rama]['contenido']) || ! is_string($d[$rama]['huella'])) {
                 throw new DomainException('La evaluación necesita ambas preparaciones completas.');
             }
         }
-        $i = InstantaneaInstrumental::verificar($d['instrumental']['contenido'], $d['instrumental']['huella']);
-        $p = InstantaneaPetersen::verificar($d['petersen']['contenido'], $d['petersen']['huella']);
+        $i = $replay ? InstantaneaInstrumental::verificar($d['instrumental']['contenido'], $d['instrumental']['huella'])
+            : InstantaneaInstrumental::verificarIntegridad($d['instrumental']['contenido'], $d['instrumental']['huella']);
+        $p = $replay ? InstantaneaPetersen::verificar($d['petersen']['contenido'], $d['petersen']['huella'])
+            : InstantaneaPetersen::verificarIntegridad($d['petersen']['contenido'], $d['petersen']['huella']);
         if ($i->contenido['contrato'] !== 'INSTRUMENTAL-DECLARATIVO-3') {
             throw new DomainException('La preparación compuesta exige el contrato instrumental completo V3.');
         }
@@ -90,6 +104,9 @@ final readonly class InstantaneaEvaluacionInstitucional
         }
         if ($d['release'] !== null) {
             $m = $d['release'];
+            if (! is_array($m)) {
+                throw new DomainException('El manifiesto del release tiene una forma incompatible.');
+            }
             $sello = $m['huella'] ?? null;
             unset($m['huella']);
             if (($m['incluye_datos_clinicos'] ?? null) !== false || ($m['contrato'] ?? null) !== 'ARTEFACTO-MOTOR-2'

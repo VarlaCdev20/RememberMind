@@ -20,11 +20,21 @@ trait CorromperConservacionParaPrueba
             throw new RuntimeException('La corrupción sintética requiere la base desechable del runner.');
         }
         $guardas = new GuardasReduccionConservacion;
+        $sqlite = $db->getDriverName() === 'sqlite';
+        $bloques = $sqlite
+            ? DB::select("SELECT name, tbl_name, sql FROM sqlite_master WHERE type='trigger' AND name LIKE 'b4_%'")
+            : DB::select("SELECT t.tgname AS name,c.relname AS tbl_name,pg_get_triggerdef(t.oid) AS sql FROM pg_trigger t JOIN pg_class c ON c.oid=t.tgrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE NOT t.tgisinternal AND n.nspname='public' AND t.tgname LIKE 'b4_%'");
+        foreach ($bloques as $trigger) {
+            DB::unprepared('DROP TRIGGER "'.$trigger->name.'"'.($sqlite ? '' : ' ON "'.$trigger->tbl_name.'"'));
+        }
         $guardas->retirar();
         try {
             $operacion();
         } finally {
             $guardas->instalar();
+            foreach ($bloques as $trigger) {
+                DB::unprepared($trigger->sql);
+            }
         }
     }
 }

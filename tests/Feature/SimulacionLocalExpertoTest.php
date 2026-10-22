@@ -40,6 +40,7 @@ use Tests\TestCase;
 final class SimulacionLocalExpertoTest extends TestCase
 {
     use CohorteSimulacionLocal, RefreshDatabase;
+    use \Tests\Support\CorromperConservacionParaPrueba;
 
     public function test_cinco_casos_reales_guardan_y_recuperan_sin_instancia_previa(): void
     {
@@ -77,8 +78,8 @@ final class SimulacionLocalExpertoTest extends TestCase
         self::assertTrue($lectura['simulacion_local']['conservacion_completa']);
         self::assertSame('PET-02', $lectura['simulacion_local']['patron']);
         $this->actingAs($datos['nurse']);
-        Livewire::test(ResultadosExpertoResidente::class, ['residente' => $r])
-            ->assertSee('Evaluación neurocognitiva')
+        Livewire::withQueryParams(['simulacion' => '1'])->test(ResultadosExpertoResidente::class, ['residente' => $r])
+            ->assertSee('Evaluación cognitiva y cuidados')
             ->assertSee('amnésico multidominio')->assertSee('Entorno de pruebas · Resultado de demostración · Sin uso asistencial.')
             ->assertDontSee('PET-02')->assertDontSee('RAW:memoria_reciente')
             ->call('seleccionarCriterio', 'COG-ATE')->assertDontSee('SIM-ATE-01')
@@ -89,7 +90,7 @@ final class SimulacionLocalExpertoTest extends TestCase
         self::assertCount(0, $operativa['historial']);
         self::assertSame([], $operativa['registros_cognitivos']);
         self::assertArrayNotHasKey('simulacion_local', $operativa);
-        Livewire::test(ResultadosExpertoResidente::class, ['residente' => $r])
+        Livewire::withQueryParams(['simulacion' => '1'])->test(ResultadosExpertoResidente::class, ['residente' => $r])
             ->call('seleccionarEvaluacion', $lectura['evaluacion']['id'])->assertSee('amnésico multidominio');
     }
 
@@ -136,7 +137,7 @@ final class SimulacionLocalExpertoTest extends TestCase
     {
         $d = $this->prepararCohorte();
         DB::listen(static function ($q): void {
-            if (preg_match('/^insert into ["`]?trazas_inferencia/i', $q->sql)) {
+            if (str_starts_with($q->sql, 'update "evaluacion_criterios" set "cod_traza_inferencia"')) {
                 throw new \DomainException('Fallo tardío de prueba.');
             }
         });
@@ -149,7 +150,7 @@ final class SimulacionLocalExpertoTest extends TestCase
         }
         foreach (['versiones_modelo_experto', 'reglas_expertas', 'controles_funcionales_iadl', 'evaluaciones_expertas',
             'clasificaciones_dcl_instantanea', 'hechos_instantanea_experta', 'trazas_inferencia'] as $tabla) {
-            self::assertSame(0, DB::table($tabla)->count(), $tabla);
+            self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta($tabla)->count(), $tabla);
         }
     }
 
@@ -272,11 +273,11 @@ final class SimulacionLocalExpertoTest extends TestCase
     {
         [$d] = $this->cargar();
         $lector = app(LectorSimulacionLocal::class);
-        DB::table('trazas_inferencia')->update(['estado_inferencia' => 'ERROR']);
+        $this->corromperConservacion(fn () => DB::table('evaluacion_criterios')->whereNotNull('cod_traza_inferencia')->update(['traza_estado_inferencia' => 'ERROR']));
         $l = $lector->consultar($d['nurse'], $d['residentes']['CAS-08'], null, 'COG-MEM');
         self::assertFalse($l['simulacion_local']['conservacion_completa']);
         self::assertNull($l['simulacion_local']['patron']);
-        DB::table('trazas_inferencia')->update(['estado_inferencia' => 'PRUEBA_FINALIZADA']);
+        $this->corromperConservacion(fn () => DB::table('evaluacion_criterios')->whereNotNull('cod_traza_inferencia')->update(['traza_estado_inferencia' => 'PRUEBA_FINALIZADA']));
         DB::table('reglas_expertas')->where('codigo_regla', 'SIM-MEM-01')->update(['descripcion' => 'Definición sustituida.']);
         $l = $lector->consultar($d['nurse'], $d['residentes']['CAS-08'], null, 'COG-MEM');
         self::assertFalse($l['simulacion_local']['conservacion_completa']);
@@ -376,7 +377,8 @@ final class SimulacionLocalExpertoTest extends TestCase
         self::assertCount(3, $fuentes[0]['datos']);
         self::assertSame('Control cognitivo', $fuentes[0]['titulo']);
         $this->actingAs($d['nurse']);
-        $componente = Livewire::test(ResultadosExpertoResidente::class, ['residente' => $residente])
+        $componente = Livewire::withQueryParams(['simulacion' => '1'])->test(ResultadosExpertoResidente::class, ['residente' => $residente])
+            ->call('abrirConsulta', 'registro')
             ->assertSee('Información utilizada')->assertSee('Memoria reciente: Alteración leve')
             ->assertSee('Repite preguntas: Sí')->assertSee('Olvida indicaciones: Sí')
             ->assertSee('Control cognitivo')->assertSee('16/10/2026 a las 09:40')
@@ -384,6 +386,8 @@ final class SimulacionLocalExpertoTest extends TestCase
             ->assertSee('No corresponde a un examen aplicado al residente.')
             ->assertDontSee('Referencia de memoria del')->assertDontSee('17/10/2026 11:59');
         $visible = html_entity_decode(strip_tags($componente->html()), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        // La cabecera solicitada muestra ubicación y versión históricas exactas; no son códigos del razonamiento.
+        $visible = str_replace([$residente->ubicacion_formateada, 'SIM-ORION-LOCAL-1'], '', $visible);
         self::assertDoesNotMatchRegularExpression('/COG-|COD_|SIM-|RAW:|controles_cognitivos|representacion_literal|Edición:/', $visible);
         if ($directorio = getenv('RM_REFERENCIAS_EXPERTO_QA_DIR')) {
             if (! is_dir($directorio)) {
@@ -415,7 +419,8 @@ final class SimulacionLocalExpertoTest extends TestCase
         self::assertContains('Memoria reciente: LITERAL_HISTORICO', array_column(
             $segundo['simulacion_local']['narrativa']['funciones']['COG-MEM']['referencias'], 'dato'));
         $this->actingAs($d['nurse']);
-        Livewire::test(ResultadosExpertoResidente::class, ['residente' => $d['residentes']['CAS-02']])
+        Livewire::withQueryParams(['simulacion' => '1'])->test(ResultadosExpertoResidente::class, ['residente' => $d['residentes']['CAS-02']])
+            ->call('abrirConsulta', 'registro')
             ->assertDontSee('LITERAL_HISTORICO')->assertSee('El dato guardado necesita revisión para disponer de una descripción comprensible.');
     }
 
@@ -512,7 +517,7 @@ final class SimulacionLocalExpertoTest extends TestCase
         $this->actingAs($d['nurse']);
         Livewire::withQueryParams(['simulacion' => '1'])
             ->test(ResultadosExpertoResidente::class, ['residente' => $d['residentes']['CAS-01']])
-            ->assertSee('No se pudo consultar la evaluación')
+            ->assertSee('No fue posible consultar la información en este momento.')
             ->assertDontSee('amnésico de dominio único');
     }
 
@@ -530,8 +535,8 @@ final class SimulacionLocalExpertoTest extends TestCase
         $componente->call('reintentar')->assertNotFound();
     }
 
-    /** La ruta habitual muestra la valoración conservada del laboratorio y un único aviso de origen. */
-    public function test_vista_previa_predeterminada_muestra_valoracion_y_por_que_sin_estado_vacio(): void
+    /** La ruta clínica ordinaria no toma un caso técnico como resultado del residente. */
+    public function test_vista_ordinaria_no_mezcla_demostracion_con_consulta_actual(): void
     {
         [$d] = $this->cargar();
         $this->actingAs($d['nurse']);
@@ -542,27 +547,24 @@ final class SimulacionLocalExpertoTest extends TestCase
             }
         });
         $respuesta = $this->get(route('admin.enfermeria.pacientes.resultados-experto', ['residente' => $d['residentes']['CAS-01']]))
-            ->assertOk()->assertSee('Evaluación neurocognitiva')
+            ->assertOk()->assertSee('Evaluación cognitiva y cuidados')
             ->assertDontSee('Consulta de Enfermería · Residente asignado.')
-            ->assertDontSee('rm-expert-test-note')->assertSee('Se identifican dificultades en memoria.')
-            ->assertSee('patrón candidato de DCL amnésico de dominio único')
-            ->assertSee('¿Por qué llegamos a este resultado?')->assertSee('Autonomía cotidiana')
-            ->assertSee('Resultado conservado')->assertSee('Entorno de pruebas · Resultado de demostración · Sin uso asistencial.')
-            ->assertDontSee('Sin evaluación disponible')->assertDontSee('Pendiente de una valoración disponible')
-            ->assertDontSee('ficticio')->assertDontSee('ficticia');
-        self::assertSame(1, substr_count($respuesta->getContent(), 'Entorno de pruebas · Resultado de demostración · Sin uso asistencial.'));
-        $texto = html_entity_decode(strip_tags($respuesta->getContent()));
-        self::assertStringNotContainsString('SIMULACIÓN ACADÉMICA', $texto);
-        self::assertStringNotContainsString('Las simulaciones', $texto);
+            ->assertDontSee('rm-expert-test-note')
+            ->assertDontSee('Se identifican dificultades en memoria.')
+            ->assertDontSee('patrón candidato de DCL amnésico de dominio único')
+            ->assertDontSee('Entorno de pruebas · Resultado de demostración · Sin uso asistencial.')
+            ->assertDontSee('Evaluación histórica de demostración')
+            ->assertDontSee('Ver historial');
         self::assertSame([], $escrituras);
         Livewire::withQueryParams(['simulacion' => '0'])
             ->test(ResultadosExpertoResidente::class, ['residente' => $d['residentes']['CAS-01']])
-            ->assertSet('simulacion', true)->assertDontSee('Sin evaluación disponible')
-            ->assertSee('patrón candidato de DCL amnésico de dominio único')
-            ->assertDontSee('Salir de la vista previa');
+            ->assertSet('simulacion', false)
+            ->assertDontSee('patrón candidato de DCL amnésico de dominio único');
         $this->get(route('admin.enfermeria.pacientes.resultados-experto', ['residente' => $d['residentes']['CAS-01'], 'simulacion' => 0]))
-            ->assertOk()->assertSee('patrón candidato de DCL amnésico de dominio único')
-            ->assertSee('Requisitos considerados en la evaluación')->assertDontSee('Salir de la vista previa');
+            ->assertOk()->assertDontSee('patrón candidato de DCL amnésico de dominio único');
+        $this->get(route('admin.enfermeria.pacientes.resultados-experto', ['residente' => $d['residentes']['CAS-01'], 'simulacion' => 1]))
+            ->assertOk()->assertSee('Entorno de pruebas · Resultado de demostración · Sin uso asistencial.')
+            ->assertSee('patrón candidato de DCL amnésico de dominio único');
     }
 
     /** Deshabilitar el laboratorio o usar producción impide mostrar sus resultados por defecto. */

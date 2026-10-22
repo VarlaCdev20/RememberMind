@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\CARLAENCINAS\Desktop\RememberMind\phpunit.xml" tests="15" assertions="2444" errors="0" failures="0" skipped="0" time="72.546015">
+    <testsuite name="Unit" tests="2" assertions="188" errors="0" failures="0" skipped="0" time="0.011555">
+      <testsuite name="Tests\Unit\ManifiestoCognitivo30Test" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Unit\ManifiestoCognitivo30Test.php" tests="2" assertions="188" errors="0" failures="0" skipped="0" time="0.011555">
+        <testcase name="test_cobertura_versionada_y_metodos_existentes_sin_afirmar_datos_individuales_importados" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Unit\ManifiestoCognitivo30Test.php" line="14" class="Tests\Unit\ManifiestoCognitivo30Test" classname="Tests.Unit.ManifiestoCognitivo30Test" assertions="178" time="0.010169"/>
+        <testcase name="test_retroalimentacion_detecta_discrepancia_dominio_salida_omitida_duplicacion_y_caso_no_ejecutado" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Unit\ManifiestoCognitivo30Test.php" line="41" class="Tests\Unit\ManifiestoCognitivo30Test" classname="Tests.Unit.ManifiestoCognitivo30Test" assertions="10" time="0.001386"/>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Feature" tests="13" assertions="2256" errors="0" failures="0" skipped="0" time="72.534461">
+      <testsuite name="Tests\Feature\CohorteInferencia30Test" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CohorteInferencia30Test.php" tests="4" assertions="2199" errors="0" failures="0" skipped="0" time="50.921000">
+        <testcase name="test_treinta_admisiones_fuentes_originales_dos_ramas_y_cuatro_perfiles_reproducibles" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CohorteInferencia30Test.php" line="40" class="Tests\Feature\CohorteInferencia30Test" classname="Tests.Feature.CohorteInferencia30Test" assertions="2174" time="32.953962"/>
+        <testcase name="test_rechaza_entorno_local_antes_de_escribir" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CohorteInferencia30Test.php" line="287" class="Tests\Feature\CohorteInferencia30Test" classname="Tests.Feature.CohorteInferencia30Test" assertions="3" time="0.781425"/>
+        <testcase name="test_seeder_artisan_rechaza_destino_no_confirmado_sin_escrituras" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CohorteInferencia30Test.php" line="302" class="Tests\Feature\CohorteInferencia30Test" classname="Tests.Feature.CohorteInferencia30Test" assertions="4" time="0.700165"/>
+        <testcase name="test_fallo_parcial_revierte_admision_fuentes_auditoria_y_correlativos" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CohorteInferencia30Test.php" line="324" class="Tests\Feature\CohorteInferencia30Test" classname="Tests.Feature.CohorteInferencia30Test" assertions="18" time="16.485448"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\MisResidentesPsicologiaTest" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\MisResidentesPsicologiaTest.php" tests="5" assertions="21" errors="0" failures="0" skipped="0" time="12.011346">
+        <testcase name="test_lista_residentes_admitidos_y_abre_la_ficha_sin_mostrar_codigos" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\MisResidentesPsicologiaTest.php" line="42" class="Tests\Feature\MisResidentesPsicologiaTest" classname="Tests.Feature.MisResidentesPsicologiaTest" assertions="6" time="2.990190"/>
+        <testcase name="test_busqueda_por_nombre_compuesto_y_cambio_de_vista" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\MisResidentesPsicologiaTest.php" line="68" class="Tests\Feature\MisResidentesPsicologiaTest" classname="Tests.Feature.MisResidentesPsicologiaTest" assertions="4" time="2.292918"/>
+        <testcase name="test_buscador_compartido_envia_la_busqueda_a_mis_residentes" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\MisResidentesPsicologiaTest.php" line="83" class="Tests\Feature\MisResidentesPsicologiaTest" classname="Tests.Feature.MisResidentesPsicologiaTest" assertions="7" time="2.308139"/>
+        <testcase name="test_rol_ajeno_y_personal_inactivo_no_pueden_consultar_el_listado" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\MisResidentesPsicologiaTest.php" line="101" class="Tests\Feature\MisResidentesPsicologiaTest" classname="Tests.Feature.MisResidentesPsicologiaTest" assertions="2" time="2.168036"/>
+        <testcase name="test_permiso_revocado_impide_actualizar_una_vista_livewire_abierta" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\MisResidentesPsicologiaTest.php" line="113" class="Tests\Feature\MisResidentesPsicologiaTest" classname="Tests.Feature.MisResidentesPsicologiaTest" assertions="2" time="2.252063"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\NavegacionSistemaExpertoTest" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\NavegacionSistemaExpertoTest.php" tests="4" assertions="36" errors="0" failures="0" skipped="0" time="9.602115">
+        <testcase name="test_psicologia_consulta_resultados_y_abre_valoracion_desde_area_cognitiva" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\NavegacionSistemaExpertoTest.php" line="44" class="Tests\Feature\NavegacionSistemaExpertoTest" classname="Tests.Feature.NavegacionSistemaExpertoTest" assertions="26" time="2.594911"/>
+        <testcase name="test_medicina_consulta_resultados_y_abre_valoracion_desde_ficha" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\NavegacionSistemaExpertoTest.php" line="87" class="Tests\Feature\NavegacionSistemaExpertoTest" classname="Tests.Feature.NavegacionSistemaExpertoTest" assertions="6" time="2.588470"/>
+        <testcase name="test_visitante_y_superadministracion_no_acceden_a_entrada_de_captura_clinica" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\NavegacionSistemaExpertoTest.php" line="102" class="Tests\Feature\NavegacionSistemaExpertoTest" classname="Tests.Feature.NavegacionSistemaExpertoTest" assertions="2" time="2.239036"/>
+        <testcase name="test_cuenta_inactiva_o_sin_personal_competente_no_recibe_el_listado" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\NavegacionSistemaExpertoTest.php" line="111" class="Tests\Feature\NavegacionSistemaExpertoTest" classname="Tests.Feature.NavegacionSistemaExpertoTest" assertions="2" time="2.179698"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

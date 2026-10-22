@@ -1,5 +1,5 @@
 <x-ui.section-card title="Aplicaciones y observaciones del expediente" subtitle="Fuentes registradas para este residente" icon="ph-clipboard-text">
-    <p class="text-sm text-rm-secondary">Fecha de consulta: {{ $capturaInstrumental['fecha_corte'] }}. Las evidencias de una evaluación histórica se consultan en su informe conservado.</p>
+    <p class="text-sm text-rm-secondary">Información consultada hasta el {{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($capturaInstrumental['fecha_corte'] ?? null) }}. Las evidencias de una evaluación histórica se consultan en su informe conservado.</p>
     @forelse($capturaInstrumental['capturas'] as $captura)
         <details class="rounded-xl border border-rm bg-rm-surface-soft p-4 mt-3 min-w-0" wire:key="captura-{{ $captura['cod_aplicacion'] }}">
             <summary class="cursor-pointer min-h-11 font-semibold break-words">{{ ($captura['instrumento_actual']['tipo'] ?? null) === 'OBSERVACIONAL' ? 'Observación clínica' : 'Aplicación instrumental' }} · {{ $captura['nombre_instrumento'] }} · {{ $captura['version_instrumento'] ?: 'Versión no registrada' }}</summary>

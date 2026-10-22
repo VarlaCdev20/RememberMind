@@ -8,6 +8,7 @@ use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\User;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResidentesSistemaExperto;
+use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\EvaluacionesAreaPanel;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -40,24 +41,50 @@ final class NavegacionSistemaExpertoTest extends TestCase
         return $usuario;
     }
 
-    public function test_psicologia_encuentra_residente_sin_aplicaciones_y_accede_a_informe_y_captura(): void
+    public function test_psicologia_consulta_resultados_y_abre_valoracion_desde_area_cognitiva(): void
     {
         $this->actingAs($this->profesional());
-        $residente = Residente::factory()->create(['estado' => 'ADMITIDO', 'nombres' => 'Elena']);
+        $residente = Residente::factory()->create(['estado' => 'ADMITIDO', 'nombres' => 'Elena', 'apellido_paterno' => 'Vargas']);
 
         $this->get(route('admin.psicologia.dashboard'))
-            ->assertOk()->assertSee('Abrir sistema experto');
+            ->assertOk()->assertSee('Mis residentes')
+            ->assertSee(route('admin.psicologia.evaluaciones'), false);
         $this->get(route('admin.sistema-experto.residentes'))
             ->assertOk()
-            ->assertSee($residente->getKey())
+            ->assertSee($residente->nombre_completo)
+            ->assertSee('Tarjetas')
+            ->assertSee('Tabla')
+            ->assertSee('<table', false)
+            ->assertDontSee('>'.$residente->getKey().'<', false)
+            ->assertDontSee('Buscar residente por nombre o código')
             ->assertSee(route('admin.psicologia.residente.resultados-experto', $residente), false)
+            ->assertDontSee(route('admin.sistema-experto.petersen-original', $residente), false)
+            ->assertDontSee('Registrar valoración original');
+        $this->get(route('admin.sistema-experto.residentes', ['buscar' => 'Nombre inexistente']))
+            ->assertOk()->assertDontSee($residente->nombre_completo);
+        $this->get(route('admin.sistema-experto.residentes', ['buscar' => 'elena vargas']))
+            ->assertOk()->assertSee($residente->nombre_completo);
+        $this->get(route('admin.psicologia.evaluacion.cognitiva'))
+            ->assertOk()
+            ->assertSee('Valoración cognitiva y funcional')
+            ->assertSee(route('admin.sistema-experto.petersen-original', $residente), false);
+        Livewire::test(EvaluacionesAreaPanel::class, ['codArea' => 'ARE_COG'])
+            ->set('busquedaValoracion', 'Nombre inexistente')
+            ->assertDontSee(route('admin.sistema-experto.petersen-original', $residente), false)
+            ->set('busquedaValoracion', 'Elena')
             ->assertSee(route('admin.sistema-experto.petersen-original', $residente), false);
         Livewire::test(ResidentesSistemaExperto::class)
             ->set('busqueda', $residente->getKey())
-            ->assertSee($residente->getKey());
+            ->assertSee($residente->nombre_completo)
+            ->set('busqueda', 'elena')
+            ->assertSee($residente->nombre_completo)
+            ->set('busqueda', 'elena vargas')
+            ->assertSee($residente->nombre_completo)
+            ->set('busqueda', 'nombre inexistente')
+            ->assertDontSee($residente->nombre_completo);
     }
 
-    public function test_medicina_encuentra_su_ruta_de_resultados_y_captura(): void
+    public function test_medicina_consulta_resultados_y_abre_valoracion_desde_ficha(): void
     {
         $this->actingAs($this->profesional('MEDICO GENERAL/GERIATRA'));
         $residente = Residente::factory()->create(['estado' => 'ADMITIDO']);
@@ -65,6 +92,10 @@ final class NavegacionSistemaExpertoTest extends TestCase
         $this->get(route('admin.sistema-experto.residentes'))
             ->assertOk()
             ->assertSee(route('admin.medico.residente.resultados-experto', $residente), false)
+            ->assertDontSee(route('admin.sistema-experto.petersen-original', $residente), false);
+        $this->get(route('admin.medico.residente.ficha', ['adulto' => $residente]))
+            ->assertOk()
+            ->assertSee('Valoración cognitiva y funcional')
             ->assertSee(route('admin.sistema-experto.petersen-original', $residente), false);
     }
 

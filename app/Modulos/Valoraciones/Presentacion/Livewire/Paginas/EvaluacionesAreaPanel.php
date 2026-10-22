@@ -3,8 +3,11 @@
 namespace App\Modulos\Valoraciones\Presentacion\Livewire\Paginas;
 
 use App\Models\AplicacionInstrumento;
+use App\Models\Residente;
 use App\Models\User;
+use App\Models\ValoracionPetersenOriginal;
 use App\Modulos\Valoraciones\Aplicacion\Consultas\InstrumentosDelArea;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -25,6 +28,8 @@ class EvaluacionesAreaPanel extends Component
     public array $instrumentosCodes = [];
 
     public string $busqueda = '';
+
+    public string $busquedaValoracion = '';
 
     public string $filtroAlerta = '';
 
@@ -93,7 +98,7 @@ class EvaluacionesAreaPanel extends Component
 
     public function render()
     {
-        $this->autorizar();
+        $usuario = $this->autorizar();
         $query = AplicacionInstrumento::with(['adulto', 'instrumento', 'evaluador.usuario'])
             ->whereIn('cod_instrumento', $this->instrumentosCodes);
 
@@ -125,13 +130,30 @@ class EvaluacionesAreaPanel extends Component
         $pacientesCubiertos = AplicacionInstrumento::whereIn('cod_instrumento', $this->instrumentosCodes)
             ->distinct('cod_residente')->count('cod_residente');
 
+        $residentesValoracion = collect();
+        if ($this->codArea === 'ARE_COG' && $usuario->hasRole('PSICOLOGO/A')
+            && $usuario->checkPermissionTo('valoraciones_petersen.crear', 'web')) {
+            $busquedaValoracion = trim(mb_substr($this->busquedaValoracion, 0, 80));
+            $residentesValoracion = Residente::query()->where('estado', 'ADMITIDO')
+                ->when($busquedaValoracion !== '', static fn ($query) => $query->where(static function ($q) use ($busquedaValoracion): void {
+                    $q->where('nombres', 'like', "%{$busquedaValoracion}%")
+                        ->orWhere('apellido_paterno', 'like', "%{$busquedaValoracion}%")
+                        ->orWhere('apellido_materno', 'like', "%{$busquedaValoracion}%");
+                }))
+                ->orderBy('apellido_paterno')->orderBy('apellido_materno')->orderBy('nombres')
+                ->limit(8)->get()
+                ->filter(static fn (Residente $residente) => Gate::forUser($usuario)
+                    ->allows('crearOriginal', [ValoracionPetersenOriginal::class, $residente]));
+        }
+
         return view('livewire.valoraciones.evaluaciones-area-panel', compact(
             'evaluaciones',
             'instrumentos',
             'instrumentosActivos',
             'totalEvaluaciones',
             'alertasCriticas',
-            'pacientesCubiertos'
+            'pacientesCubiertos',
+            'residentesValoracion'
         ))->layout('layouts.sistema');
     }
 

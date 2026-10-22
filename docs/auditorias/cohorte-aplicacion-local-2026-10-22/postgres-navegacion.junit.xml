@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\CARLAENCINAS\Desktop\RememberMind\phpunit.postgres.xml" tests="4" assertions="36" errors="0" failures="0" skipped="0" time="14.060523">
+    <testsuite name="Feature" tests="4" assertions="36" errors="0" failures="0" skipped="0" time="14.060523">
+      <testsuite name="Tests\Feature\NavegacionSistemaExpertoTest" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\NavegacionSistemaExpertoTest.php" tests="4" assertions="36" errors="0" failures="0" skipped="0" time="14.060523">
+        <testcase name="test_psicologia_consulta_resultados_y_abre_valoracion_desde_area_cognitiva" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\NavegacionSistemaExpertoTest.php" line="44" class="Tests\Feature\NavegacionSistemaExpertoTest" classname="Tests.Feature.NavegacionSistemaExpertoTest" assertions="26" time="6.331623"/>
+        <testcase name="test_medicina_consulta_resultados_y_abre_valoracion_desde_ficha" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\NavegacionSistemaExpertoTest.php" line="87" class="Tests\Feature\NavegacionSistemaExpertoTest" classname="Tests.Feature.NavegacionSistemaExpertoTest" assertions="6" time="3.154137"/>
+        <testcase name="test_visitante_y_superadministracion_no_acceden_a_entrada_de_captura_clinica" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\NavegacionSistemaExpertoTest.php" line="102" class="Tests\Feature\NavegacionSistemaExpertoTest" classname="Tests.Feature.NavegacionSistemaExpertoTest" assertions="2" time="2.273116"/>
+        <testcase name="test_cuenta_inactiva_o_sin_personal_competente_no_recibe_el_listado" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\NavegacionSistemaExpertoTest.php" line="111" class="Tests\Feature\NavegacionSistemaExpertoTest" classname="Tests.Feature.NavegacionSistemaExpertoTest" assertions="2" time="2.301646"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

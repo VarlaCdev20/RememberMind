@@ -110,7 +110,7 @@ final readonly class AlmacenInstantaneas
     private function insertar(string $tabla, array $datos): string
     {
         $id = (new GeneradorCodigo)->siguiente($tabla, $this->conexion);
-        $this->db()->table($tabla)->insert([CatalogoCodigos::clave($tabla) => $id] + $datos);
+        BloquesExpertos::insertar($tabla, [CatalogoCodigos::clave($tabla) => $id] + $datos, $this->conexion);
 
         return $id;
     }
@@ -423,7 +423,7 @@ final readonly class AlmacenInstantaneas
     private function criterios(string $e, string $version): array
     {
         $filas = $this->db()->table('evaluacion_criterios as c')->join('nodos_semanticos as n', 'n.cod_nodo_semantico', '=', 'c.cod_nodo_criterio')
-            ->leftJoin('resultados_criterio as r', 'r.cod_evaluacion_criterio', '=', 'c.cod_evaluacion_criterio')
+            ->leftJoinSub(BloquesExpertos::consulta('resultados_criterio', $this->conexion), 'r', 'r.cod_evaluacion_criterio', '=', 'c.cod_evaluacion_criterio')
             ->leftJoin('valores_semanticos as v', 'v.cod_valor_semantico', '=', 'r.cod_valor_semantico')
             ->where('c.cod_evaluacion_experta', $e)->where('c.tipo_registro', '<>', 'D137')->orderBy('c.orden_conservacion')
             ->select(['c.*', 'n.codigo_semantico', 'n.cod_version_modelo', 'v.codigo_valor as valor', 'r.cod_valor_semantico', 'r.justificacion_original'])->get()->all();
@@ -516,7 +516,7 @@ final readonly class AlmacenInstantaneas
                 throw new DomainException('La clasificación debe conservar la misma cognición original.');
             }
             $e = $cab->cod_evaluacion_experta;
-            $existente = $db->table('clasificaciones_dcl_instantanea')->where('cod_evaluacion_experta', $e)->first();
+            $existente = BloquesExpertos::consulta('clasificaciones_dcl_instantanea', $this->conexion)->where('cod_evaluacion_experta', $e)->first();
             if ($existente !== null) {
                 $original = $this->obtenerClasificacion($m->evaluacionId, $m->residenteId, $m->versionConocimiento, $m->fechaCorte, $r->perfil->versionContrato);
                 if (CodecInstantanea::huella($original) !== $hash) {
@@ -611,7 +611,7 @@ final readonly class AlmacenInstantaneas
         }
         $e = $this->cabecera($id)->cod_evaluacion_experta;
         $db = $this->db();
-        $c = $db->table('clasificaciones_dcl_instantanea')->where('cod_evaluacion_experta', $e)->first();
+        $c = BloquesExpertos::consulta('clasificaciones_dcl_instantanea', $this->conexion)->where('cod_evaluacion_experta', $e)->first();
         if ($c === null) {
             if ($db->table('evaluacion_criterios')->where('cod_evaluacion_experta', $e)->where('tipo_registro', 'DCL')->exists()
                 || $db->table('hechos_instantanea_experta')->where('cod_evaluacion_experta', $e)->whereNotNull('cod_evidencia_iadl_instantanea')->exists()) {

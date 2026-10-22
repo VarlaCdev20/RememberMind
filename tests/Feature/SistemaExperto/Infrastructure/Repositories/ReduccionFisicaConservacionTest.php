@@ -35,6 +35,8 @@ final class ReduccionFisicaConservacionTest extends RepositoriosTestCase
         $r = (new ClasificadorPetersenService)->clasificar($perfil);
         $this->almacen()->guardar($perfil->cognicion);
         $this->almacen()->guardarClasificacion($r);
+        // Este contrato prueba la migración histórica del 20/10 sobre su esquema de entrada de 104.
+        (new \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionBloquesExpertos)->bajar();
 
         return $r;
     }
@@ -66,6 +68,7 @@ final class ReduccionFisicaConservacionTest extends RepositoriosTestCase
             self::assertFalse(Schema::hasTable($tabla));
         }
         self::assertSame($p->canonizar($antes), $p->canonizar($p->restaurar($this->filas([P::HECHOS, P::CLASIFICACIONES, P::VINCULOS]))));
+        (new \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionBloquesExpertos)->subir();
         $consultas = [];
         DB::listen(static function ($q) use (&$consultas) {
             $consultas[] = $q->sql;

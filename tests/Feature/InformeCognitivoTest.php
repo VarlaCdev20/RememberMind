@@ -31,6 +31,7 @@ use Tests\TestCase;
 class InformeCognitivoTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Support\CorromperConservacionParaPrueba;
 
     private User $medico;
 
@@ -87,22 +88,64 @@ class InformeCognitivoTest extends TestCase
     public function test_resultados_de_memoria_conservan_codigo_y_alcance(string $valor, string $codigo): void
     {
         F::evaluacion($this->residente, $this->personal, 'M', valor: $valor);
-        $antes = DB::table('resultados_criterio')->get()->toJson();
+        $antes = \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('resultados_criterio')->get()->toJson();
         [$informe, $lectura] = $this->informe();
         $this->assertSame($codigo, $lectura['detalle']['resultado']['codigo']);
         $this->assertSame(LenguajeResultadosExperto::conclusionMemoria($codigo), $informe['actual']['conclusion']);
+        $this->assertSame(LenguajeResultadosExperto::RESULTADOS[$codigo]['interpretacion'], $informe['actual']['significado']);
         $this->assertTrue($informe['actual']['evaluada']);
         $this->assertFalse($informe['areas']['COG-ATE']['evaluada']);
         $this->assertSame('Sin evaluación disponible', $informe['areas']['COG-ATE']['estado']);
         $componente = Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
-            ->assertSee('Evaluación neurocognitiva')->assertSee('Resultado principal')->assertSee('Valoración de las funciones cognitivas')
+            ->assertSee('Evaluación cognitiva y funcional')->assertSee('Ver evidencias')->assertSee('Ver historial')->assertSee('Resultado principal')->assertSee('Valoración de las funciones cognitivas')
+            ->assertSee('Cobertura de las cinco áreas cognitivas')
+            ->assertSee('Cómo llega la información a la evaluación')
+            ->assertSee('Hechos observados')
+            ->assertSee('0 aplicaciones registradas')
+            ->assertSee('Aún no hay una aplicación instrumental cognitiva en esta consulta')
+            ->assertSee('Ver hallazgos y reglas')
+            ->assertSee('Ver aplicaciones y respuestas')
+            ->assertSee('Ver desglose cognitivo')
+            ->assertSee('Autonomía y contexto funcional')
+            ->assertSee('Ver inventario por instrumento y edición')
+            ->assertSee('Resumen de fuentes registradas por instrumento y edición')
+            ->assertSee('Cambios en mediciones comparables')
             ->assertSee('¿Qué significa el resultado?')->assertSee('¿Por qué llegamos a este resultado?')->assertSee('Historial de valoraciones')
             ->assertSee(LenguajeResultadosExperto::conclusionMemoria($codigo))
-            ->assertDontSee('Nueva evaluación')->assertDontSee('Exportar reporte')->assertDontSee('Confirmar concordancia');
-        $this->assertSame($antes, DB::table('resultados_criterio')->get()->toJson());
+            ->assertSee('¿Cómo se obtuvo este resultado?')
+            ->assertDontSee('¿Cómo razonó O.R.I.O.N.?')->assertDontSee('Fecha y versión')
+            ->assertDontSee('Nueva evaluación')->assertDontSee('Exportar reporte')->assertDontSee('Confirmar concordancia')
+            ->call('irASeccion', 'fuentes-disponibles')
+            ->assertDispatched('orion-navigate', seccion: 'fuentes-disponibles')
+            ->call('irASeccion', 'hallazgos-observacionales')
+            ->assertDispatched('orion-navigate', seccion: 'hallazgos-observacionales')
+            ->call('irASeccion', 'aplicaciones-instrumentales')
+            ->assertDispatched('orion-navigate', seccion: 'aplicaciones-instrumentales')
+            ->call('irASeccion', 'orion-desglose')
+            ->assertDispatched('orion-navigate', seccion: 'orion-desglose');
+        $this->assertSame($antes, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('resultados_criterio')->get()->toJson());
         $this->assertDatabaseCount('diagnosticos', 0);
         $this->assertDatabaseCount('alertas', 0);
         $this->exportar($codigo, $componente);
+    }
+
+    public function test_informe_extenso_se_abre_y_cierra_sin_modificar_el_resultado(): void
+    {
+        F::evaluacion($this->residente, $this->personal, 'INFORME');
+        $antes = \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('resultados_criterio')->get()->toJson();
+
+        Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
+            ->assertSee('Lectura clínica y fundamentos')
+            ->assertSee('Leer informe completo')
+            ->assertSet('informeCompletoAbierto', false)
+            ->call('abrirInformeCompleto')
+            ->assertSet('informeCompletoAbierto', true)
+            ->assertSee('Informe clínico completo')
+            ->assertSee('¿Por qué llegamos a este resultado?')
+            ->call('cerrarInformeCompleto')
+            ->assertSet('informeCompletoAbierto', false);
+
+        $this->assertSame($antes, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('resultados_criterio')->get()->toJson());
     }
 
     /** No se transforma una observación operativa en evaluación integrada. */
@@ -161,9 +204,9 @@ class InformeCognitivoTest extends TestCase
         F::evaluacion($this->residente, $this->personal, 'X');
         match ($caso) {
             'contextual' => DB::table('evidencias_criterio_evaluacion')->update(['rol_en_criterio' => 'CONTEXTUAL']),
-            'valor ajeno' => DB::table('resultados_criterio')->update(['cod_valor_semantico' => 'VAL_A']),
+            'valor ajeno' => $this->corromperConservacion(fn () => DB::table('evaluacion_criterios')->whereNotNull('cod_resultado_criterio')->update(['resultado_cod_valor_semantico' => 'VAL_A'])),
             'sin resultado' => DB::table('evaluacion_criterios')->update(['estado_evaluabilidad' => 'EV-CM-0']),
-            'sin traza' => DB::table('trazas_inferencia')->update(['estado_inferencia' => 'INCOMPATIBLE']),
+            'sin traza' => $this->corromperConservacion(fn () => DB::table('evaluacion_criterios')->whereNotNull('cod_traza_inferencia')->update(['traza_estado_inferencia' => 'INCOMPATIBLE'])),
             'version incompatible' => config(['sistema_experto.lectura_clinica.VER_TEST.estados_inferencia' => []]),
         };
         [$informe, $lectura] = $this->informe();
@@ -223,7 +266,7 @@ class InformeCognitivoTest extends TestCase
     public function test_ruta_medica_y_enfermeria_sin_asignacion_y_familiar_denegados(): void
     {
         $ruta = route('admin.medico.residente.resultados-experto', ['residente' => $this->residente->getKey()]);
-        $this->get($ruta)->assertOk()->assertSee('Evaluación neurocognitiva');
+        $this->get($ruta)->assertOk()->assertSee('Evaluación cognitiva y funcional');
         foreach (['ENFERMEROS', 'FAMILIAR'] as $rol) {
             $usuario = User::factory()->create(['estado' => 'ACTIVO']);
             $usuario->assignRole($rol);
@@ -259,10 +302,14 @@ class InformeCognitivoTest extends TestCase
         $this->actingAs($enfermera);
         // La cabecera compartida conserva el contexto de navegación sin la franja retirada.
         $componente = Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
-            ->assertSee('Evaluación neurocognitiva')->assertDontSee('Consulta de Enfermería')
-            ->assertSee('Volver a Mis residentes')->assertSet('enfermeria', true);
+            ->assertSee('Evaluación cognitiva y cuidados')->assertDontSee('Consulta de Enfermería')
+            ->assertSee('Volver a Mis residentes')
+            ->assertSee('Cobertura del resultado publicado')
+            ->assertSee('Sin resultado publicado')
+            ->assertDontSee('Versión utilizada')
+            ->assertSet('enfermeria', true);
         $ruta = route('admin.enfermeria.pacientes.resultados-experto', ['residente' => $this->residente->getKey()]);
-        $this->get($ruta)->assertOk()->assertSee('Evaluación neurocognitiva');
+        $this->get($ruta)->assertOk()->assertSee('Evaluación cognitiva y cuidados');
         $this->exportar('ENFERMERIA', $componente);
         $jornada->update(['estado' => 'CERRADA']);
         $componente->call('seleccionarCriterio', 'COG-ATE')->assertNotFound();
@@ -286,7 +333,7 @@ class InformeCognitivoTest extends TestCase
     {
         F::evaluacion($this->residente, $this->personal, 'T');
         DB::table('evaluaciones_expertas')->update(['origen_activacion' => 'PRUEBA_TECNICA', 'estado_ejecucion' => 'PRUEBA_FINALIZADA']);
-        DB::table('trazas_inferencia')->update(['estado_inferencia' => 'PRUEBA_FINALIZADA']);
+        $this->corromperConservacion(fn () => DB::table('evaluacion_criterios')->whereNotNull('cod_traza_inferencia')->update(['traza_estado_inferencia' => 'PRUEBA_FINALIZADA']));
         DB::table('evidencias_criterio_evaluacion')->update(['estado_participacion' => 'PRUEBA_TECNICA']);
         config(['sistema_experto.lectura_tecnica_pruebas.habilitada' => true]);
         [$informe, $lectura] = $this->informe();
@@ -294,7 +341,7 @@ class InformeCognitivoTest extends TestCase
         $this->assertNull($lectura['evaluacion']);
         $this->assertSame([], $informe['historial']);
         $componente = Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
-            ->assertSee('Evaluación neurocognitiva')
+            ->assertSee('Evaluación cognitiva y funcional')
             ->assertDontSee('resultados artificiales')->assertDontSee('Prueba técnica')
             ->assertDontSee(LenguajeResultadosExperto::conclusionMemoria('DIFICULTAD_EVIDENCIADA'));
         $this->exportar('TECNICA', $componente);
@@ -334,7 +381,7 @@ class InformeCognitivoTest extends TestCase
         $this->assertNull($lectura['evaluacion']);
         $this->assertCount(0, $lectura['historial']);
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
-            ->assertSee('Evaluación neurocognitiva')->assertDontSee('Simulación')->assertDontSee('simulado')
+            ->assertSee('Evaluación cognitiva y funcional')->assertDontSee('Simulación')->assertDontSee('simulado')
             ->call('seleccionarEvaluacion', 'E_LAB')->assertNotFound();
         $this->assertDatabaseCount('evaluaciones_expertas', 1);
     }

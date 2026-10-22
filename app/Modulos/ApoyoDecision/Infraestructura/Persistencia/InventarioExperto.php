@@ -14,7 +14,6 @@ final class InventarioExperto
         'relaciones_semanticas',
         'dominios_valores_expertos',
         'valores_semanticos',
-        'variables_expertas',
         'fuentes_datos_expertas',
         'mapeos_variables_fuente',
         'mapeos_valores_fuente',
@@ -27,8 +26,6 @@ final class InventarioExperto
         'relaciones_evidencias_evaluacion',
         'evaluacion_criterios',
         'evidencias_criterio_evaluacion',
-        'resultados_criterio',
-        'trazas_inferencia',
         'evaluaciones_reglas',
         'evaluaciones_condiciones_regla',
         'evidencias_soporte_condicion',
@@ -36,7 +33,6 @@ final class InventarioExperto
 
     public const CONSERVACION = [
         'hechos_instantanea_experta',
-        'clasificaciones_dcl_instantanea',
         'motivos_dcl_instantanea',
         'reglas_aplicadas_dcl_instantanea',
         'condiciones_regla_instantanea',

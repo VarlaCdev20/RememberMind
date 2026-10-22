@@ -21,6 +21,7 @@ use App\Models\User;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\CapturasInstrumentalesResidente;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
 use App\Modulos\Valoraciones\Aplicacion\Acciones\AplicarInstrumento;
+use App\Modulos\Valoraciones\Aplicacion\Consultas\PrepararCapturaInstrumental;
 use App\Modulos\Valoraciones\Presentacion\Livewire\Funcionalidades\EvaluacionGeriatricaAreaModal;
 use App\Modulos\Valoraciones\Presentacion\Livewire\Funcionalidades\EvaluacionGeriatricaModal;
 use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\EvaluacionesAreaPanel;
@@ -33,6 +34,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
+use MotorExperto\dominio\instrumentos\NormalizadorHvltBolivia2015;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -255,11 +257,14 @@ final class CapturaInstrumentalFormularioTest extends TestCase
         self::assertDatabaseCount('aplicaciones_instrumento', 0);
     }
 
-    public function test_resultados_abre_captura_para_residente_actual_sin_cambiar_evaluaciones(): void
+    public function test_resultados_es_solo_consulta_y_area_cognitiva_conserva_captura_instrumental(): void
     {
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
-            ->assertSee('Registrar mediciones')->call('abrirCapturaInstrumental')
-            ->assertDispatched('evaluacion-geriatrica-abrir', cod_residente: $this->residente->getKey());
+            ->assertDontSee('Registrar mediciones');
+        Livewire::test(EvaluacionesAreaPanel::class, ['codArea' => 'ARE_COG'])
+            ->assertSee('Nueva Evaluación')
+            ->call('nuevaEvaluacion', $this->residente->getKey())
+            ->assertDispatched('evaluacion-geriatrica-area-abrir');
         self::assertDatabaseCount('evaluaciones_expertas', 0);
         self::assertDatabaseCount('aplicaciones_instrumento', 0);
     }
@@ -396,5 +401,44 @@ final class CapturaInstrumentalFormularioTest extends TestCase
             ->assertHasNoErrors('cod_residente')->assertSet('cod_residente', $this->residente->getKey())
             ->set('cod_residente', $otro->getKey())->assertHasErrors('cod_residente')->assertSet('cod_residente', $this->residente->getKey());
         self::assertDatabaseCount('aplicaciones_instrumento', 0);
+    }
+
+    public function test_formulario_distingue_observacion_y_muestra_tareas_de_un_metodo_vinculado_por_identidad_exacta(): void
+    {
+        $this->abrir()->set('cod_instrumento', $this->instrumento->getKey())
+            ->assertSee('Sin método de interpretación listo');
+
+        $selectores = [];
+        foreach (NormalizadorHvltBolivia2015::ENTRADAS as $entrada => $tipo) {
+            $pregunta = PreguntaInstrumento::create(['cod_instrumento' => $this->instrumento->getKey(),
+                'codigo' => 'PROTOCOLO-'.count($selectores), 'enunciado' => 'Campo sintético '.$entrada,
+                'tipo_respuesta' => $tipo === 'LOGICO' ? 'LOGICO' : 'NUMERICO',
+                'dominio' => 'MEMORIA', 'orden' => count($selectores) + 10, 'estado' => 'ACTIVA']);
+            $selectores[$entrada] = ['cod_pregunta' => $pregunta->getKey(),
+                'campo' => $tipo === 'LOGICO' ? 'valor_logico' : 'valor_numero'];
+        }
+        config(['sistema_experto.perfiles_instrumentales' => [[
+            'id' => 'PERFIL-SINTETICO', 'cod_instrumento' => $this->instrumento->getKey(),
+            'codigo_instrumento' => $this->instrumento->codigo, 'version_instrumento' => $this->instrumento->version,
+            'metodo' => NormalizadorHvltBolivia2015::METODO,
+            'identidad_instrumento' => ['instrumento' => 'HVLT-R', 'forma' => 5, 'idioma' => 'es'],
+            'selectores' => $selectores,
+        ]]]);
+        $catalogo = app(PrepararCapturaInstrumental::class)->catalogo($this->usuario, $this->residente->getKey(), $this->instrumento->getKey());
+        self::assertSame('VINCULADO', $catalogo['vinculo_metodo']['estado']);
+        self::assertCount(count(NormalizadorHvltBolivia2015::ENTRADAS), $catalogo['vinculo_metodo']['entradas']);
+        $this->abrir()->set('cod_instrumento', $this->instrumento->getKey())
+            ->assertSee('Método vinculado')->assertSee('Tarea PROTOCOLO-0')->assertSee('MEMORIA');
+
+        $incompleto = config('sistema_experto.perfiles_instrumentales.0');
+        unset($incompleto['selectores']['escolaridad_anios']);
+        config(['sistema_experto.perfiles_instrumentales' => [$incompleto]]);
+        self::assertSame('VINCULO_INCOMPLETO', app(PrepararCapturaInstrumental::class)
+            ->catalogo($this->usuario, $this->residente->getKey(), $this->instrumento->getKey())['vinculo_metodo']['estado']);
+
+        $observacional = Instrumento::create(['codigo' => 'OBS-SINTETICO', 'nombre' => 'Observación sintética',
+            'tipo' => 'OBSERVACIONAL', 'version' => '1', 'estado' => 'ACTIVO']);
+        $this->abrir()->set('cod_instrumento', $observacional->getKey())
+            ->assertSee('Registro observacional')->assertDontSee('Método vinculado');
     }
 }

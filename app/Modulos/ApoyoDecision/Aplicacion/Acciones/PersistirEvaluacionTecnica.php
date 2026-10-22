@@ -88,11 +88,11 @@ final class PersistirEvaluacionTecnica
                     'estado_participacion' => 'PRUEBA_TECNICA', 'fecha_hora_vinculacion' => $fecha]);
             }
             if ($resultado['resultado'] !== null) {
-                DB::table('resultados_criterio')->insert(['cod_resultado_criterio' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('resultados_criterio'), 'cod_evaluacion_criterio' => $ec,
+                \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::insertar('resultados_criterio', ['cod_resultado_criterio' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('resultados_criterio'), 'cod_evaluacion_criterio' => $ec,
                     'cod_valor_semantico' => $resultado['resultado']['valor'], 'fecha_hora_determinacion' => $fecha]);
             }
             $traza = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('trazas_inferencia');
-            DB::table('trazas_inferencia')->insert(['cod_traza_inferencia' => $traza, 'cod_evaluacion_criterio' => $ec,
+            \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::insertar('trazas_inferencia', ['cod_traza_inferencia' => $traza, 'cod_evaluacion_criterio' => $ec,
                 'estado_inferencia' => 'PRUEBA_FINALIZADA', 'fecha_hora_inicio' => $inicio, 'fecha_hora_fin' => $fecha]);
             foreach ($resultado['traza']['reglas'] as $r) {
                 $er = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('evaluaciones_reglas');
@@ -118,7 +118,7 @@ final class PersistirEvaluacionTecnica
     {
         foreach (PaqueteConocimiento::CLAVES as $tabla => $pk) {
             foreach ($p->tabla($tabla) as $fila) {
-                $guardada = DB::table($tabla)->where($pk, $fila[$pk])->lockForUpdate()->first();
+                $guardada = \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta($tabla)->where($pk, $fila[$pk])->lockForUpdate()->first();
                 if ($guardada === null) {
                     throw new DomainException('Conocimiento no persistido: '.$tabla);
                 }

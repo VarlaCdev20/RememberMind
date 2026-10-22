@@ -27,6 +27,7 @@ use Tests\TestCase;
 final class RevisionValoracionExpertaTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Support\CorromperConservacionParaPrueba;
 
     private User $medico;
 
@@ -47,7 +48,6 @@ final class RevisionValoracionExpertaTest extends TestCase
         // Solo este test define un contrato de revisión; la aplicación conserva lectura_clinica vacía.
         DB::table('versiones_modelo_experto')->where('cod_version_modelo', 'VER_TEST')->update(['codigo_version' => 'VAL-REVISION-01', 'estado' => 'ACTIVO']);
         DB::table('evaluaciones_expertas')->where('cod_evaluacion_experta', 'E_REV')->update(['origen_activacion' => 'MANUAL', 'estado_ejecucion' => 'FINALIZADA']);
-        DB::table('trazas_inferencia')->where('cod_traza_inferencia', 'TR_REV')->update(['estado_inferencia' => 'FINALIZADA']);
         DB::table('evidencias_criterio_evaluacion')->update(['estado_participacion' => 'UTILIZADA']);
         $contrato = config('sistema_experto.lectura_clinica.VER_TEST');
         $contrato['estados_ejecucion'] = $contrato['estados_inferencia'] = ['FINALIZADA'];
@@ -68,7 +68,7 @@ final class RevisionValoracionExpertaTest extends TestCase
 
     public function test_dos_firmas_separadas_reintento_identico_y_rectificacion_sin_sobrescritura(): void
     {
-        $motor = DB::table('resultados_criterio')->get()->toJson();
+        $motor = \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('resultados_criterio')->get()->toJson();
         $a = app(RevisarValoracionExperta::class);
         $p = $a->ejecutar($this->psicologo, 'E_REV', D::PSICOLOGIA, 'CONFIRMADA', 'Conforme con la valoración de este caso.');
         self::assertSame($this->psicologo->personal->getKey(), $p->cod_personal);
@@ -82,7 +82,7 @@ final class RevisionValoracionExpertaTest extends TestCase
         self::assertSame('RECHAZADA', $m->fresh()->decision);
         self::assertSame('CONFIRMADA', $p->fresh()->decision);
         self::assertSame(3, RevisionEvaluacionExperta::count());
-        self::assertSame($motor, DB::table('resultados_criterio')->get()->toJson());
+        self::assertSame($motor, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('resultados_criterio')->get()->toJson());
         self::assertSame(3, DB::table('activity_log')->where('log_name', 'SistemaExperto')->count());
     }
 
@@ -141,7 +141,7 @@ final class RevisionValoracionExpertaTest extends TestCase
 
     public function test_integridad_y_justificacion_obligatorias(): void
     {
-        DB::table('resultados_criterio')->where('cod_resultado_criterio', 'RC_REV')->update(['cod_valor_semantico' => 'RES_S']);
+        $this->corromperConservacion(fn () => DB::table('evaluacion_criterios')->where('cod_resultado_criterio', 'RC_REV')->update(['resultado_cod_valor_semantico' => 'RES_S']));
         $this->expectException(\DomainException::class);
         try {
             app(RevisarValoracionExperta::class)->ejecutar($this->medico, 'E_REV', D::MEDICINA, 'CONFIRMADA', 'Con soporte alterado.');
@@ -301,6 +301,16 @@ final class RevisionValoracionExpertaTest extends TestCase
             ->set('justificacionRevision', 'Justificación todavía sin guardar.')
             ->call('seleccionarEvaluacion', 'E_OTRA')->assertHasErrors('revision')
             ->assertSet('evaluacion', 'E_REV')->assertSet('justificacionRevision', 'Justificación todavía sin guardar.');
+        self::assertSame(0, RevisionEvaluacionExperta::count());
+    }
+
+    public function test_ruta_medica_exige_lectura_instrumental_completa_y_respeta_revocacion(): void
+    {
+        $ruta = route('admin.medico.residente.resultados-experto', $this->residente);
+        $this->get($ruta)->assertOk();
+
+        Role::findByName('MEDICO GENERAL/GERIATRA', 'web')->revokePermissionTo('preguntas_instrumento.ver');
+        $this->get($ruta)->assertForbidden();
         self::assertSame(0, RevisionEvaluacionExperta::count());
     }
 }

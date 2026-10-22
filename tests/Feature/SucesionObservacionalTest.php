@@ -85,7 +85,7 @@ final class SucesionObservacionalTest extends TestCase
         self::assertSame('CUMPLE', $despues['resumen']['OBS-MEM-02']['estado']);
         self::assertCount(2, $despues['resumen']);
         self::assertSame('ORION-OBS-ARCHIVO', app(ConsultarHallazgosObservacionales::class)->consultar($this->actor, $this->residente)['version']);
-        self::assertDatabaseCount('clasificaciones_dcl_instantanea', 0);
+        self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
     }
 
     public function test_rechazo_posterior_no_reinterpreta_la_ejecucion_anterior(): void
@@ -106,7 +106,7 @@ final class SucesionObservacionalTest extends TestCase
         self::assertDatabaseCount('hechos_instantanea_experta', 4);
         self::assertDatabaseCount('evidencias_evaluacion', 3);
         self::assertDatabaseCount('evaluacion_criterios', 3);
-        self::assertDatabaseCount('resultados_criterio', 1);
+        self::assertSame(1, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('resultados_criterio')->count());
         self::assertDatabaseCount('evaluaciones_reglas', 4);
         self::assertDatabaseCount('evidencias_soporte_condicion', 4);
         self::assertSame('OBSERVACIONAL', DB::table('reglas_expertas')->where('codigo_regla', 'OBS-MEM-NUEVA')->value('tipo_regla'));
@@ -133,7 +133,7 @@ final class SucesionObservacionalTest extends TestCase
         self::assertDatabaseCount('hechos_instantanea_experta', 4);
         self::assertDatabaseCount('evidencias_evaluacion', 3);
         self::assertDatabaseCount('evaluaciones_reglas', 0);
-        self::assertDatabaseCount('resultados_criterio', 0);
+        self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('resultados_criterio')->count());
     }
 
     public function test_no_publica_una_condicion_negativa_como_hallazgo_afirmativo(): void
@@ -178,11 +178,11 @@ final class SucesionObservacionalTest extends TestCase
         app(Gestor::class)->crearRevision($this->actor, $this->paquete['version'], 'ORION-OBS-PANTALLA', 'Conectar la regla sustituta a la consulta autorizada.',
             nueva: $this->nuevaRegla(), sustituye: $this->paquete['reglas']['OBS-MEM-01']['regla']);
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
-            ->assertSee('Nueva revisión de la observación')->assertSee('ORION-OBS-PANTALLA')
+            ->assertSee('Nueva revisión de la observación')->assertDontSee('ORION-OBS-PANTALLA')
             ->call('ejecutarObservaciones')->assertHasNoErrors()->assertSee('Evaluación observacional guardada')
             ->assertSee('Nueva revisión de la observación')->assertDontSee('No se pudo consultar la evaluación');
         self::assertDatabaseCount('evaluaciones_expertas', 1);
-        self::assertDatabaseCount('clasificaciones_dcl_instantanea', 0);
+        self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
     }
 
     public function test_sucesion_ambigua_se_rechaza_sin_crear_evaluacion(): void

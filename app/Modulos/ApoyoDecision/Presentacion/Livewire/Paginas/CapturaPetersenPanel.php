@@ -207,6 +207,14 @@ final class CapturaPetersenPanel extends Component
         abort_unless($this->form === [] || isset(self::ELEMENTOS[$this->form['elemento'] ?? '']), 422);
         $registros = ValoracionPetersenOriginal::query()->where('cod_residente', $residente->getKey())->with(['personal', 'sucesora'])
             ->orderByDesc('registrado_en')->orderByDesc('cod_valoracion_petersen')->paginate(15);
+        $vigentes = ValoracionPetersenOriginal::query()->where('cod_residente', $residente->getKey())
+            ->where('tipo_registro', '!=', 'ANULACION')->whereDoesntHave('sucesora')
+            ->get(['elemento', 'estado_original'])->groupBy('elemento');
+        $cobertura = collect(array_keys(self::ELEMENTOS))->mapWithKeys(static fn (string $elemento) => [$elemento => [
+            'cantidad' => $vigentes->get($elemento, collect())->count(),
+            'estados' => $vigentes->get($elemento, collect())->pluck('estado_original')->unique()->values()->all(),
+        ]])->all();
+        $registrados = count(array_filter($cobertura, static fn (array $estado) => $estado['cantidad'] > 0));
         $tipos = array_filter(self::TIPOS, fn ($nombre, $tipo) => F::admitidas($this->form['elemento'] ?? '', $tipo) !== [], ARRAY_FILTER_USE_BOTH);
         $fuentes = array_values(array_filter(F::admitidas($this->form['elemento'] ?? '', $this->tipoSoporte), fn ($fk) => $usuario->checkPermissionTo(F::FUENTES[$fk][1], 'web')
             && ($fk !== 'cod_control_iadl' || Gate::forUser($usuario)->allows('consultarFuncionalidad', [EvaluacionExperta::class, $residente]))));
@@ -219,12 +227,24 @@ final class CapturaPetersenPanel extends Component
             }
             $opciones = $q->orderByDesc((new $modelo)->getKeyName())->limit(50)->get()->map(fn ($r) => ['id' => $r->getKey(),
                 'etiqueta' => $r->getKey().' · '.($r->fecha_hora?->format('d/m/Y H:i') ?? $r->fecha_referencia?->format('d/m/Y') ?? 'Fecha no identificada')
+                    .' · Autor: '.($r->cod_personal ?? 'No identificado')
+                    .' · Episodio: '.($r->cod_atencion ?? 'No identificado')
+                    .' · Estado: '.($r->estado ?? 'No identificado')
                     .($r->elemento ? ' · '.(self::ELEMENTOS[$r->elemento] ?? $r->elemento) : '')])->all();
         }
         $comprobaciones = $this->form === [] ? [] : V::COMPROBACIONES[str_starts_with($this->form['elemento'], 'COG-') ? 'DOMINIO' : $this->form['elemento']];
         $puedeCrear = Gate::forUser($usuario)->allows('crearOriginal', [ValoracionPetersenOriginal::class, $residente]);
         $profesional = $usuario->personal()->first();
-        $rutaInforme = $usuario->hasRole('PSICOLOGO/A') ? 'admin.psicologia.residente.resultados-experto' : 'admin.medico.residente.resultados-experto';
+        $urlRetorno = match (true) {
+            $usuario->hasRole('PSICOLOGO/A') => route('admin.psicologia.evaluacion.cognitiva'),
+            $usuario->hasRole('MEDICO GENERAL/GERIATRA') => route('admin.medico.residente.ficha', ['adulto' => $residente]),
+            default => route('admin.sistema-experto.index'),
+        };
+        $textoRetorno = match (true) {
+            $usuario->hasRole('PSICOLOGO/A') => 'Volver a Valoraciones cognitivas',
+            $usuario->hasRole('MEDICO GENERAL/GERIATRA') => 'Volver a la ficha clínica',
+            default => 'Volver al sistema experto',
+        };
         $labelsFuentes = ['cod_aplicacion' => 'Aplicación de instrumento', 'cod_control_cognitivo' => 'Control cognitivo',
             'cod_control_iadl' => 'Control de actividad instrumental (IADL)', 'cod_valoracion_psicologica' => 'Valoración psicológica',
             'cod_antecedente' => 'Antecedente clínico', 'cod_diagnostico' => 'Diagnóstico', 'cod_documento_clinico' => 'Documento clínico original',
@@ -237,7 +257,7 @@ final class CapturaPetersenPanel extends Component
             'suficiencia_conjunto' => 'Suficiencia del conjunto de valoraciones', 'condiciones_revisadas' => 'Condiciones de aplicación revisadas',
             'exclusiones_revisadas' => 'Exclusiones revisadas'];
 
-        return view('apoyodecision::livewire.petersen.captura-original', compact('residente', 'registros', 'tipos', 'fuentes', 'opciones', 'comprobaciones', 'puedeCrear', 'profesional', 'rutaInforme', 'labelsFuentes', 'labelsComprobaciones'))
+        return view('apoyodecision::livewire.petersen.captura-original', compact('residente', 'registros', 'tipos', 'fuentes', 'opciones', 'comprobaciones', 'puedeCrear', 'profesional', 'urlRetorno', 'textoRetorno', 'labelsFuentes', 'labelsComprobaciones', 'cobertura', 'registrados'))
             ->layout('layouts.sistema');
     }
 }

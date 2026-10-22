@@ -29,9 +29,26 @@
  </x-slot:actions>
  </x-ui.collection-header>
 
- @if($codArea === 'ARE_COG' && auth()->user()?->hasRole('PSICOLOGO/A'))
- <x-ui.section-card title="Valoración del sistema experto" subtitle="Los registros observacionales se muestran aquí; la valoración original de Petersen se registra por residente" icon="ph-brain">
-  <a href="{{ route('admin.sistema-experto.residentes') }}" class="rm-btn rm-btn-primary">Elegir residente para el sistema experto</a>
+ @if($codArea === 'ARE_COG' && auth()->user()?->hasRole('PSICOLOGO/A') && auth()->user()?->can('valoraciones_petersen.crear'))
+ <x-ui.section-card title="Valoración cognitiva y funcional" subtitle="Seleccione al residente para documentar su valoración profesional y los registros que la sustentan" icon="ph-brain">
+  <p class="text-sm text-rm-secondary">Aquí se documentan los cinco dominios cognitivos y los requisitos originales de Petersen. C02 se obtiene de los dominios; no se registra manualmente.</p>
+  <div class="mt-4 max-w-lg">
+   <label for="buscar-residente-valoracion" class="block text-sm font-semibold">Buscar residente por nombre</label>
+   <input id="buscar-residente-valoracion" type="search" wire:model.live.debounce.300ms="busquedaValoracion" maxlength="80" autocomplete="off" placeholder="Nombre o apellido" class="rm-input w-full">
+  </div>
+  @if($residentesValoracion->isEmpty())
+   <p class="mt-4 text-sm text-rm-secondary" role="status">No se encontraron residentes admitidos disponibles. Revise el nombre buscado.</p>
+  @else
+   <ul class="mt-4 grid gap-3 md:grid-cols-2" aria-label="Residentes para valoración cognitiva y funcional">
+    @foreach($residentesValoracion as $residenteValoracion)
+     <li wire:key="valoracion-cognitiva-{{ $residenteValoracion->getKey() }}" class="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-xl border border-rm p-3">
+      <div class="min-w-0"><p class="break-words font-semibold">{{ $residenteValoracion->nombre_completo }}</p><p class="text-sm text-rm-secondary">{{ $residenteValoracion->edad !== null ? $residenteValoracion->edad.' años' : 'Edad no registrada' }}</p></div>
+      <a href="{{ route('admin.sistema-experto.petersen-original', $residenteValoracion) }}" class="rm-btn rm-btn-primary">Abrir valoración<span class="sr-only"> cognitiva y funcional de {{ $residenteValoracion->nombre_completo }}</span></a>
+     </li>
+    @endforeach
+   </ul>
+   <p class="mt-3 text-sm text-rm-secondary">Se muestran hasta ocho residentes. Busque por nombre para encontrar otro.</p>
+  @endif
  </x-ui.section-card>
  @endif
 

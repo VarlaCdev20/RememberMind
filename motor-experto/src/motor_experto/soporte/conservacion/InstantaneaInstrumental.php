@@ -11,6 +11,7 @@ use MotorExperto\aplicacion\casos_uso\EvaluarPerfilInstitucional;
 use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
 use MotorExperto\dominio\conocimiento\PerfilConceptualCognitivo;
 use MotorExperto\dominio\conocimiento\versiones\PaqueteCognitivoInstitucional;
+use MotorExperto\dominio\instrumentos\CorteDocumentoInstrumental;
 use MotorExperto\dominio\instrumentos\ExtractorCapturaInstrumental;
 use MotorExperto\dominio\instrumentos\PerfilInstrumentalCognitivo;
 use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
@@ -69,14 +70,66 @@ final readonly class InstantaneaInstrumental
 
     public static function verificar(array $contenido, string $huella): self
     {
-        $contenido = CapturaInstrumentalCanonica::ordenar($contenido);
-        if (! in_array($contenido['contrato'] ?? null, ['INSTRUMENTAL-DECLARATIVO-1', 'INSTRUMENTAL-DECLARATIVO-2', 'INSTRUMENTAL-DECLARATIVO-3'], true)
-            || ! hash_equals(CodecInstantanea::huella($contenido), $huella)) {
-            throw new DomainException('Contrato o huella de instantánea incompatible.');
-        }
+        $original = self::verificarIntegridad($contenido, $huella);
+        $contenido = $original->contenido;
         $recalculada = self::ejecutar($contenido);
         if (CodecInstantanea::huella($recalculada) !== CodecInstantanea::huella($contenido['salida'])) {
             throw new DomainException('La salida no se reproduce con las fuentes y el conocimiento conservados.');
+        }
+
+        return $original;
+    }
+
+    /**
+     * Comprueba contenido recuperado contra una huella confiable sin recalcular la salida.
+     * No acredita almacenamiento, autenticidad de una huella aportada por cliente ni validez clínica.
+     */
+    public static function verificarIntegridad(array $contenido, string $huella): self
+    {
+        $contenido = IntegridadPreparacion::comprobar($contenido, $huella);
+        if (! in_array($contenido['contrato'] ?? null, ['INSTRUMENTAL-DECLARATIVO-1', 'INSTRUMENTAL-DECLARATIVO-2', 'INSTRUMENTAL-DECLARATIVO-3'], true)) {
+            throw new DomainException('Contrato de instantánea instrumental incompatible.');
+        }
+        $completo = $contenido['contrato'] === 'INSTRUMENTAL-DECLARATIVO-3';
+        IntegridadPreparacion::campos($contenido, ['contrato', 'contexto', 'cabecera_conocimiento', 'conocimiento', 'capturas', 'vinculos', 'salida', ...($completo ? ['fuente_conceptual'] : [])]);
+        IntegridadPreparacion::contexto($contenido['contexto']);
+        foreach (['cabecera_conocimiento', 'conocimiento', 'capturas', 'vinculos', 'salida', ...($completo ? ['fuente_conceptual'] : [])] as $campo) {
+            if (! is_array($contenido[$campo])) {
+                throw new DomainException('La preparación instrumental necesita sus datos y salida originales.');
+            }
+        }
+        $k = $contenido['conocimiento'];
+        IntegridadPreparacion::campos($k, ['version', 'tablas', 'contratos_relaciones', 'solo_pruebas_tecnicas', 'tipo_regla_resultado', 'contratos_extraccion']);
+        if (($contenido['cabecera_conocimiento']['cod_version_modelo'] ?? null) !== $contenido['contexto']['version']
+            || $k['version'] !== $contenido['contexto']['version'] || ! is_array($k['tablas']) || ! is_array($k['contratos_relaciones'])
+            || ! is_bool($k['solo_pruebas_tecnicas']) || ! is_string($k['tipo_regla_resultado']) || ! is_array($k['contratos_extraccion'])) {
+            throw new DomainException('El conocimiento instrumental pertenece a otro contexto o tiene forma incompatible.');
+        }
+        IntegridadPreparacion::campos($contenido['capturas'], ['disponible', 'fecha_corte', 'capturas', 'persistido']);
+        IntegridadPreparacion::campos($contenido['salida'], ['resultado', 'fuentes_excluidas', ...($completo ? ['perfil_instrumental'] : [])]);
+        foreach ($contenido['salida'] as $seccion) {
+            if (! is_array($seccion)) {
+                throw new DomainException('La salida instrumental conservada está incompleta.');
+            }
+        }
+        foreach (['evaluacion', 'residente', 'version'] as $campo) {
+            if (($contenido['salida']['resultado'][$campo] ?? null) !== $contenido['contexto'][$campo]) {
+                throw new DomainException('La salida instrumental conservada pertenece a otro contexto.');
+            }
+        }
+        if (($contenido['salida']['resultado']['persistido'] ?? null) !== false) {
+            throw new DomainException('La preparación instrumental no acredita conservación institucional.');
+        }
+        $corte = CodecInstantanea::leerFecha('corte', (object) $contenido['contexto']['fecha_corte']);
+        if ($contenido['capturas']['disponible'] !== true || $contenido['capturas']['persistido'] !== false
+            || $contenido['capturas']['fecha_corte'] !== $corte->format('Y-m-d\TH:i:s.uP')
+            || ! is_array($contenido['capturas']['capturas']) || ! array_is_list($contenido['capturas']['capturas'])) {
+            throw new DomainException('La captura instrumental no corresponde a su contrato y corte originales.');
+        }
+        foreach ($contenido['capturas']['capturas'] as $captura) {
+            if (! is_array($captura) || ! is_string($captura['cod_aplicacion'] ?? null) || $captura['cod_aplicacion'] === '') {
+                throw new DomainException('Una captura instrumental carece de identidad original.');
+            }
         }
 
         return new self($contenido, $huella);
@@ -115,6 +168,10 @@ final readonly class InstantaneaInstrumental
     {
         foreach ($fuentes['capturas'] as &$a) {
             $elegible = $a['motivos'] === [] && ($a['instrumento_actual']['tipo'] ?? null) !== 'OBSERVACIONAL';
+            if (($a['procedencia']['cod_documento_clinico'] ?? null) !== null
+                && ! CorteDocumentoInstrumental::admite($a['documento_original'] ?? null, new \DateTimeImmutable($fuentes['fecha_corte']))) {
+                $elegible = false;
+            }
             $calculada = null;
             if ($elegible) {
                 if (! is_array($a['perfil_captura_original'] ?? null)) {

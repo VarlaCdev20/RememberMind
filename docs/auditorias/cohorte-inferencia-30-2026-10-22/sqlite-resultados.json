@@ -1,0 +1,940 @@
+{
+    "version": "COHORTE-INFERENCIA-30-V1",
+    "sintetico": true,
+    "motor": "sqlite",
+    "captura": "Actions institucionales, SQL y métodos existentes",
+    "consulta_sin_escrituras": true,
+    "validacion_clinica": false,
+    "tablas": {
+        "residentes": 30,
+        "admisiones": 30,
+        "ocupaciones_cama": 30,
+        "atenciones": 749,
+        "diagnosticos": 30,
+        "antecedentes_clinicos": 30,
+        "incidentes": 15,
+        "signos_vitales": 90,
+        "notas_clinicas": 30,
+        "valoraciones_dolor": 30,
+        "instrumentos": 5,
+        "preguntas_instrumento": 48,
+        "aplicaciones_instrumento": 149,
+        "respuestas_instrumento": 1431,
+        "controles_cognitivos": 480,
+        "controles_funcionales_iadl": 30,
+        "valoraciones_psicologicas": 60,
+        "valoraciones_petersen_originales": 271,
+        "soportes_valoracion_petersen": 449,
+        "evaluaciones_expertas": 0
+    },
+    "casos": [
+        {
+            "caso": "S01",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 64,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Hipertensión arterial",
+            "patron_calculado": "PET-01",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "fd1cc595b07a8f933f7c8d1b2c91c45e71d4033838efb8214c29c08a52d82048",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S02",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 67,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Diabetes mellitus tipo 2",
+            "patron_calculado": "PET-01",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "53fdbed111c9cd5a5f032974546e0893f14a61cb6596041b621986b0b6f5d8b8",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S03",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 70,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Artrosis",
+            "patron_calculado": "PET-01",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "b973b20deba34ec6110dfb357d45de2724249bef381f95fb74a3e31348434af2",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S04",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 73,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Hipoacusia",
+            "patron_calculado": "PET-02",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "A",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "193f1ef5e17b54c40607b8fcef4e05de670132866a364a48eadf8637e69f1a89",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S05",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 76,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Catarata",
+            "patron_calculado": "PET-02",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "A",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "80b9cf1df4401fd2b951ae685362ee71cd611e863e66679d22cc5bb1de5d49fe",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S06",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 79,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Hipotiroidismo",
+            "patron_calculado": "PET-02",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "A"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "ecf0f1e062d36fd3ac06f2df49d90ce8ffd0068170541d3524fb86d1d5f1137e",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S07",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 82,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Hipertensión arterial",
+            "patron_calculado": "PET-03",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "A",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "32275c7586883ae0be47834b216e21501821a35e4e0bf6065415aaa45fa8cced",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S08",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 85,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Diabetes mellitus tipo 2",
+            "patron_calculado": "PET-03",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "A",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "554ed08d23018da3ca595adb7432f9854f7836ae15221d2bc8ccdba4eda0c55a",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S09",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 88,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Artrosis",
+            "patron_calculado": "PET-03",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "A",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "cf95890bb1e6f681208857e56b6e5d8ae916cff8700e15eb9986b89fe0793b11",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S10",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 62,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Hipoacusia",
+            "patron_calculado": "PET-04",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "A",
+                "COG-EJE": "A",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "745de0c8e227369146a8b29061163f256d60e4a65b2998addd9fc30b49123771",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S11",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 65,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Catarata",
+            "patron_calculado": "PET-04",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "A",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "A"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "812fd6c67d24c4954510b7e84b1fd61a1169aeb4bba2479d035ae97bae83e214",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S12",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 68,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Hipotiroidismo",
+            "patron_calculado": "PET-04",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "A",
+                "COG-MEM": "P",
+                "COG-VIS": "A"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "a7d90137c58d2a3f269d55cba6801910351c76d904eb081f71d694e2286abf63",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S13",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 71,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Hipertensión arterial",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "SIN_PATRON_CLASIFICABLE_POR_REQUISITO"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "36ee66c5e189fa783e50e3354b69e9699970eebdbb072678ec9202c757e07c05",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S14",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 74,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Diabetes mellitus tipo 2",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "SIN_PATRON_CLASIFICABLE_POR_REQUISITO"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "75485927fd86e5af5d2c14ddce19d9a3c8eaeaaf339dae1b345d20de551e9024",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S15",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 77,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Artrosis",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "SIN_PATRON_CLASIFICABLE_POR_REQUISITO"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "80397989c42b3e35ab94c455c373b428f485aec968a82aa53061caaee40b7de0",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S16",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 80,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Hipoacusia",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "SIN_PATRON_CLASIFICABLE_POR_REQUISITO"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "2c0fae5b7bb5d778a9725a60b91804ac70ad3f4164fca679834a5fad9f2a5e58",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S17",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 83,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Catarata",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "SIN_PATRON_CLASIFICABLE_POR_REQUISITO"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "ef965509e0c1a916c7dc4883e49ba347c024b9dc3655e554b5bc81c779340a47",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S18",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 86,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Hipotiroidismo",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "SIN_PATRON_CLASIFICABLE_POR_REQUISITO"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "71609f71345f6a3593ef57de798b1fbcf2330d98230417bffbd5f6bbb043aa90",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S19",
+            "sintetico": true,
+            "variante": "c01_negativo",
+            "edad": 89,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Hipertensión arterial",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "N",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "SIN_PATRON_CLASIFICABLE_POR_REQUISITO"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "8b70189d7c7c1d01656f14e4d4c8b86e73ce8fba20af4d05a0895da7ffe08e9a",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S20",
+            "sintetico": true,
+            "variante": "c03_negativo",
+            "edad": 63,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Diabetes mellitus tipo 2",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "N",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "SIN_PATRON_CLASIFICABLE_POR_REQUISITO"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "3c640445bb03f0c502faa6ed5bd91bba02fd79891268313557bfc88f5de78ffa",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S21",
+            "sintetico": true,
+            "variante": "c04_negativo",
+            "edad": 66,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Artrosis",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_EVALUACION_DIFERENCIAL",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "N",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "ABSTENCION_EVALUACION_DIFERENCIAL",
+                "SIN_PATRON_CLASIFICABLE_POR_REQUISITO"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "89a2b24c91fdf0985a51b5637a634b733797cef6d9c2f872a345f7b6d0355418",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S22",
+            "sintetico": true,
+            "variante": "impedimento_diferencial",
+            "edad": 69,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Hipoacusia",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_EVALUACION_DIFERENCIAL",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "ABSTENCION_EVALUACION_DIFERENCIAL"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "539256058cc87d232c50d683965edb5fd8b7a7feac64433d119e7fd2b66156de",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S23",
+            "sintetico": true,
+            "variante": "c05_negativo",
+            "edad": 72,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Catarata",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "N"
+            },
+            "impedimentos": [
+                "SIN_PATRON_CLASIFICABLE_POR_REQUISITO"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "efe078e6caa417d42fcc31e64b0b617bb8404f1c38d893e6483adc81c09507a3",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S24",
+            "sintetico": true,
+            "variante": "sin_visuoespacial",
+            "edad": 75,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Hipotiroidismo",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "U"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "U"
+            },
+            "impedimentos": [
+                "ABSTENCION_INFORMACION_INSUFICIENTE"
+            ],
+            "capturas_sql": 4,
+            "huella_dto": "57256386436da2d0bae930dc682bf8291e16e177b5839e9102131dfac39d5f37",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S25",
+            "sintetico": true,
+            "variante": "visuoespacial_no_interpretable",
+            "edad": 78,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Hipertensión arterial",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "I"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "U"
+            },
+            "impedimentos": [
+                "ABSTENCION_INFORMACION_INSUFICIENTE"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "2af4da858f9f8f360c81d48bf5d695737623684d044f93cd061e28a85a5ed389",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S26",
+            "sintetico": true,
+            "variante": "contexto_no_interpretado",
+            "edad": 81,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Diabetes mellitus tipo 2",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "U",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "U",
+                "C03": "S",
+                "C04": "S",
+                "C05": "U"
+            },
+            "impedimentos": [
+                "ABSTENCION_INFORMACION_INSUFICIENTE"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "4f1d2e83459a10e5a0cd1faf67bd2c367253db9b9040d548314132917d31a592",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S27",
+            "sintetico": true,
+            "variante": "sin_corroboracion",
+            "edad": 84,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Artrosis",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "U",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "ABSTENCION_INFORMACION_INSUFICIENTE"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "a7c7173835961c1b01d76a7e31b3c925b7e4a117d851594821a06d4ab89505c6",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S28",
+            "sintetico": true,
+            "variante": "sin_oportunidad_iadl",
+            "edad": 87,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Hipoacusia",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "U",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "ABSTENCION_INFORMACION_INSUFICIENTE"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "f1c6eea01ad7e114bd1c4ce41b85a6876044dd41425bbe1b3aa3b0d9756e8f16",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S29",
+            "sintetico": true,
+            "variante": "contradiccion_memoria",
+            "edad": 61,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Catarata",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_CONTRADICCION",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "X",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "X",
+                "C03": "S",
+                "C04": "S",
+                "C05": "U"
+            },
+            "impedimentos": [
+                "ABSTENCION_CONTRADICCION",
+                "ABSTENCION_INFORMACION_INSUFICIENTE"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "def2c6695a8a64aa88b0065dc0eabcdafc4e4b45281c1488e2c0fcba18f8e5ce",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S30",
+            "sintetico": true,
+            "variante": "revision_calidad_desactualizada",
+            "edad": 64,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Hipotiroidismo",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "U"
+            },
+            "impedimentos": [
+                "ABSTENCION_INFORMACION_INSUFICIENTE"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "9394f8166ad6923d6bb530154464ede5e2ab79c8b314d91b6b828b36f6b07a6d",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        }
+    ]
+}

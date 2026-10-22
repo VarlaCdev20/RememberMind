@@ -177,7 +177,7 @@ final class GestionarReglasExpertas
             unset($rule);
             foreach ($traducidas as $table => $rows) {
                 if ($rows !== []) {
-                    DB::table($table)->insert($rows);
+                    \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::insertar($table, $rows);
                 }
             }
             // Una sucesora publicada retira la anterior de futuras ejecuciones; conserva su contenido.

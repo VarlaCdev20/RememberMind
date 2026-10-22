@@ -28,8 +28,17 @@ final class IdentidadesConocimiento implements \App\Modulos\ApoyoDecision\Aplica
         $mapa = ['versiones_modelo_experto' => [$versionPlantilla => $versionReal]];
         $referencias = [];
         foreach ($plantilla as $tabla => $filas) {
+            if ($tabla === 'variables_expertas') {
+                $referencias[$tabla] = ['cod_version_modelo' => 'versiones_modelo_experto', 'cod_nodo_semantico' => 'nodos_semanticos',
+                    'cod_nodo_propietario_primario' => 'nodos_semanticos', 'cod_dominio_valores' => 'dominios_valores_expertos', 'cod_usuario_creacion' => 'usuarios'];
+                continue;
+            }
             foreach (DB::getSchemaBuilder()->getForeignKeys($tabla) as $fk) {
                 foreach ($fk['columns'] as $i => $campo) {
+                    if ($fk['foreign_table'] === 'nodos_semanticos' && $fk['foreign_columns'][$i] === 'cod_variable_experta') {
+                        $referencias[$tabla][$campo] = 'variables_expertas';
+                        continue;
+                    }
                     if ((C::ENTIDADES[$fk['foreign_table']][0] ?? null) === $fk['foreign_columns'][$i]) {
                         $referencias[$tabla][$campo] = $fk['foreign_table'];
                     }
@@ -60,7 +69,7 @@ final class IdentidadesConocimiento implements \App\Modulos\ApoyoDecision\Aplica
                     }
                 }
                 if ($existente && $tabla !== 'versiones_modelo_experto') {
-                    $q = DB::table($tabla);
+                    $q = Conservacion\BloquesExpertos::consulta($tabla);
                     if (array_key_exists('cod_version_modelo', $fila)) {
                         $q->where('cod_version_modelo', $versionReal);
                     }

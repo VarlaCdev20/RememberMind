@@ -331,7 +331,6 @@ class SidebarService
     // =========================================================
     private function getPsicologoSidebar($user = null, bool $isSuperadminSupervising = false): array
     {
-        $user ??= auth()->user();
         $sidebar = [];
 
         if ($isSuperadminSupervising) {
@@ -340,18 +339,26 @@ class SidebarService
 
         $sidebar[] = $this->buildSection('Inicio', 'ph-house', 'admin.psicologia.dashboard');
         $sidebar[] = $this->buildSection('Alertas de Psicología', 'ph-bell-ringing', 'admin.alertas-clinicas.index', [], false, 'alertas.ver');
-        $sidebar[] = $this->buildSection('Mis pacientes', 'ph-users-three', 'admin.psicologia.evaluaciones');
-        if ($user->personal()->where('estado', 'ACTIVO')->where('profesion', 'PSICOLOGIA')->exists()) {
-            $sidebar[] = $this->buildSection('Sistema experto', 'ph-brain', 'admin.sistema-experto.residentes', [], false, 'residentes.ver');
+        $misResidentes = $this->buildSection('Mis residentes', 'ph-users-three', 'admin.psicologia.evaluaciones');
+        if ($misResidentes !== null) {
+            $misResidentes['active_routes'] = [
+                'admin.psicologia.residente.ficha',
+                'admin.psicologia.residente.resultados-experto',
+            ];
+            $sidebar[] = $misResidentes;
         }
+
+        $sidebar[] = $this->buildSection('Agenda y sesiones', 'ph-calendar-check', 'admin.psicologia.agenda', [], false, 'atenciones.ver');
 
         $sidebar[] = $this->buildSection('Valoraciones', 'ph-list-magnifying-glass', null, [
             $this->buildItem('Cognitiva', 'admin.psicologia.evaluacion.cognitiva'),
-            $this->buildItem('Afectiva', 'admin.psicologia.evaluacion.afectiva'),
+            $this->buildItem('Afectiva y emocional', 'admin.psicologia.evaluacion.afectiva'),
             $this->buildItem('Funcionamiento', 'admin.psicologia.evaluacion.funcionamiento'),
             $this->buildItem('Entorno y red social', 'admin.psicologia.evaluacion.entorno'),
         ]);
 
+        $sidebar[] = $this->buildSection('Seguimiento psicológico', 'ph-heartbeat', 'admin.psicologia.seguimiento', [], false, 'atenciones.ver');
+        $sidebar[] = $this->buildSection('Informes psicológicos', 'ph-file-text', 'admin.psicologia.informes', [], false, 'valoraciones_psicologicas.ver');
         return array_values(array_filter($sidebar));
     }
 

@@ -30,6 +30,7 @@ use Tests\Unit\SistemaExperto\Infrastructure\Mappers\EscenarioMapeadores as F;
  */
 final class EvaluacionExpertaEloquentRepositoryTest extends RepositoriosTestCase
 {
+    use \Tests\Support\CorromperConservacionParaPrueba;
     /** Conserva la memoria original y los cinco U explícitos; sin parámetros ni excepciones esperadas. */
     public function test_recupera_el_vector_con_los_cinco_dominios_originales(): void
     {
@@ -134,7 +135,8 @@ final class EvaluacionExpertaEloquentRepositoryTest extends RepositoriosTestCase
     {
         [$modelo, $memoria] = F::resultados(['U', 'U', 'U', 'U', 'U']);
         EscenarioRepositorios::guardarGrafo($modelo);
-        DB::table('resultados_criterio')->where('cod_resultado_criterio', 'SIM-RES-COG-MEM')->delete();
+        $this->corromperConservacion(fn () => DB::table('evaluacion_criterios')->where('cod_resultado_criterio', 'SIM-RES-COG-MEM')
+            ->update(['cod_resultado_criterio' => null, 'resultado_cod_valor_semantico' => null, 'resultado_fecha_hora_determinacion' => null, 'resultado_justificacion_original' => null]));
 
         $this->expectException(DomainException::class);
         $this->repositorio(static fn (): MemoriaTrabajo => $memoria)
@@ -159,7 +161,7 @@ final class EvaluacionExpertaEloquentRepositoryTest extends RepositoriosTestCase
         }
         $this->exigirSoloLecturas();
         self::assertSame(0, DB::table('evaluaciones_expertas')->count());
-        self::assertSame(0, DB::table('resultados_criterio')->count());
+        self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('resultados_criterio')->count());
     }
 
     /** @throws RuntimeException Una evaluación existente no implica que su contrato DCL sea reconstruible. */

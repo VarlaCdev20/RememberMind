@@ -1,0 +1,679 @@
+{
+    "fecha": "2026-10-22T11:54:26-04:00",
+    "base_local": "remembermind_dev",
+    "sintetico": true,
+    "carga_nueva": false,
+    "residentes_anteriores": 80,
+    "residentes_actuales": 110,
+    "comparacion": {
+        "version": "INVESTIGACION-COGNITIVA-30-20261022-V1",
+        "satisfactorio": true,
+        "casos_esperados": 30,
+        "casos_ejecutados": 30,
+        "discrepancias": [],
+        "validez_clinica_demostrada": false,
+        "reglas_modificadas": false
+    },
+    "casos": [
+        {
+            "caso": "S01",
+            "cod_residente": "COD_RES_000081",
+            "nombre": "Residente de entrenamiento 01",
+            "patron_calculado": "PET-01",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000081\/resultados-experto"
+        },
+        {
+            "caso": "S02",
+            "cod_residente": "COD_RES_000082",
+            "nombre": "Residente de entrenamiento 02",
+            "patron_calculado": "PET-01",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000082\/resultados-experto"
+        },
+        {
+            "caso": "S03",
+            "cod_residente": "COD_RES_000083",
+            "nombre": "Residente de entrenamiento 03",
+            "patron_calculado": "PET-01",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000083\/resultados-experto"
+        },
+        {
+            "caso": "S04",
+            "cod_residente": "COD_RES_000084",
+            "nombre": "Residente de entrenamiento 04",
+            "patron_calculado": "PET-02",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "A",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000084\/resultados-experto"
+        },
+        {
+            "caso": "S05",
+            "cod_residente": "COD_RES_000085",
+            "nombre": "Residente de entrenamiento 05",
+            "patron_calculado": "PET-02",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "A",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000085\/resultados-experto"
+        },
+        {
+            "caso": "S06",
+            "cod_residente": "COD_RES_000086",
+            "nombre": "Residente de entrenamiento 06",
+            "patron_calculado": "PET-02",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "A"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000086\/resultados-experto"
+        },
+        {
+            "caso": "S07",
+            "cod_residente": "COD_RES_000087",
+            "nombre": "Residente de entrenamiento 07",
+            "patron_calculado": "PET-03",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "A",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000087\/resultados-experto"
+        },
+        {
+            "caso": "S08",
+            "cod_residente": "COD_RES_000088",
+            "nombre": "Residente de entrenamiento 08",
+            "patron_calculado": "PET-03",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "A",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000088\/resultados-experto"
+        },
+        {
+            "caso": "S09",
+            "cod_residente": "COD_RES_000089",
+            "nombre": "Residente de entrenamiento 09",
+            "patron_calculado": "PET-03",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "A",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000089\/resultados-experto"
+        },
+        {
+            "caso": "S10",
+            "cod_residente": "COD_RES_000090",
+            "nombre": "Residente de entrenamiento 10",
+            "patron_calculado": "PET-04",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "A",
+                "COG-EJE": "A",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000090\/resultados-experto"
+        },
+        {
+            "caso": "S11",
+            "cod_residente": "COD_RES_000091",
+            "nombre": "Residente de entrenamiento 11",
+            "patron_calculado": "PET-04",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "A",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "A"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000091\/resultados-experto"
+        },
+        {
+            "caso": "S12",
+            "cod_residente": "COD_RES_000092",
+            "nombre": "Residente de entrenamiento 12",
+            "patron_calculado": "PET-04",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "A",
+                "COG-MEM": "P",
+                "COG-VIS": "A"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000092\/resultados-experto"
+        },
+        {
+            "caso": "S13",
+            "cod_residente": "COD_RES_000093",
+            "nombre": "Residente de entrenamiento 13",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000093\/resultados-experto"
+        },
+        {
+            "caso": "S14",
+            "cod_residente": "COD_RES_000094",
+            "nombre": "Residente de entrenamiento 14",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000094\/resultados-experto"
+        },
+        {
+            "caso": "S15",
+            "cod_residente": "COD_RES_000095",
+            "nombre": "Residente de entrenamiento 15",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000095\/resultados-experto"
+        },
+        {
+            "caso": "S16",
+            "cod_residente": "COD_RES_000096",
+            "nombre": "Residente de entrenamiento 16",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000096\/resultados-experto"
+        },
+        {
+            "caso": "S17",
+            "cod_residente": "COD_RES_000097",
+            "nombre": "Residente de entrenamiento 17",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000097\/resultados-experto"
+        },
+        {
+            "caso": "S18",
+            "cod_residente": "COD_RES_000098",
+            "nombre": "Residente de entrenamiento 18",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000098\/resultados-experto"
+        },
+        {
+            "caso": "S19",
+            "cod_residente": "COD_RES_000099",
+            "nombre": "Residente de entrenamiento 19",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "N",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000099\/resultados-experto"
+        },
+        {
+            "caso": "S20",
+            "cod_residente": "COD_RES_000100",
+            "nombre": "Residente de entrenamiento 20",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "N",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000100\/resultados-experto"
+        },
+        {
+            "caso": "S21",
+            "cod_residente": "COD_RES_000101",
+            "nombre": "Residente de entrenamiento 21",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_EVALUACION_DIFERENCIAL",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "N",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000101\/resultados-experto"
+        },
+        {
+            "caso": "S22",
+            "cod_residente": "COD_RES_000102",
+            "nombre": "Residente de entrenamiento 22",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_EVALUACION_DIFERENCIAL",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000102\/resultados-experto"
+        },
+        {
+            "caso": "S23",
+            "cod_residente": "COD_RES_000103",
+            "nombre": "Residente de entrenamiento 23",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "N"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000103\/resultados-experto"
+        },
+        {
+            "caso": "S24",
+            "cod_residente": "COD_RES_000104",
+            "nombre": "Residente de entrenamiento 24",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "U"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "U"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000104\/resultados-experto"
+        },
+        {
+            "caso": "S25",
+            "cod_residente": "COD_RES_000105",
+            "nombre": "Residente de entrenamiento 25",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "I"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "U"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000105\/resultados-experto"
+        },
+        {
+            "caso": "S26",
+            "cod_residente": "COD_RES_000106",
+            "nombre": "Residente de entrenamiento 26",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "U",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "U",
+                "C03": "S",
+                "C04": "S",
+                "C05": "U"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000106\/resultados-experto"
+        },
+        {
+            "caso": "S27",
+            "cod_residente": "COD_RES_000107",
+            "nombre": "Residente de entrenamiento 27",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "U",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000107\/resultados-experto"
+        },
+        {
+            "caso": "S28",
+            "cod_residente": "COD_RES_000108",
+            "nombre": "Residente de entrenamiento 28",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "U",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000108\/resultados-experto"
+        },
+        {
+            "caso": "S29",
+            "cod_residente": "COD_RES_000109",
+            "nombre": "Residente de entrenamiento 29",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_CONTRADICCION",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "X",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "X",
+                "C03": "S",
+                "C04": "S",
+                "C05": "U"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000109\/resultados-experto"
+        },
+        {
+            "caso": "S30",
+            "cod_residente": "COD_RES_000110",
+            "nombre": "Residente de entrenamiento 30",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "U"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000110\/resultados-experto"
+        }
+    ]
+}

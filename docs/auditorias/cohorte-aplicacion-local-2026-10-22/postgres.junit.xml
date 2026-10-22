@@ -1,0 +1,1219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\CARLAENCINAS\Desktop\RememberMind\phpunit.postgres.xml" tests="74" assertions="3355" errors="0" failures="1" skipped="0" time="261.353583">
+    <testsuite name="Unit" tests="2" assertions="186" errors="0" failures="0" skipped="0" time="0.007971">
+      <testsuite name="Tests\Unit\ManifiestoCognitivo30Test" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Unit\ManifiestoCognitivo30Test.php" tests="2" assertions="186" errors="0" failures="0" skipped="0" time="0.007971">
+        <testcase name="test_cobertura_versionada_y_metodos_existentes_sin_afirmar_datos_individuales_importados" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Unit\ManifiestoCognitivo30Test.php" line="14" class="Tests\Unit\ManifiestoCognitivo30Test" classname="Tests.Unit.ManifiestoCognitivo30Test" assertions="176" time="0.006794"/>
+        <testcase name="test_retroalimentacion_detecta_discrepancia_dominio_salida_omitida_duplicacion_y_caso_no_ejecutado" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Unit\ManifiestoCognitivo30Test.php" line="39" class="Tests\Unit\ManifiestoCognitivo30Test" classname="Tests.Unit.ManifiestoCognitivo30Test" assertions="10" time="0.001177"/>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Feature" tests="72" assertions="3169" errors="0" failures="1" skipped="0" time="261.345612">
+      <testsuite name="Tests\Feature\CapturaInstrumentalInstitucionalTest" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" tests="49" assertions="887" errors="0" failures="0" skipped="0" time="124.051392">
+        <testcase name="test_referencias_espanolas_se_integran_desde_sql_sin_escribir_resultados_clinicos" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="111" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="176" time="5.725408"/>
+        <testcase name="test_referencias_geriatricas_adicionales_recorrer_captura_y_perfil_autorizados" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="171" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="149" time="2.408304"/>
+        <testcase name="test_cierre_de_componentes_conserva_dos_aplicaciones_y_tres_medidas_autorizadas" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="247" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="80" time="2.272640"/>
+        <testcase name="test_originales_sin_puntuacion_conservan_null_fecha_y_autoria" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="314" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="11" time="2.295639"/>
+        <testcase name="test_normaliza_desde_preguntas_exactas_y_edad_de_la_aplicacion_sin_escribir_resultados" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="330" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="13" time="2.281548"/>
+        <testcase name="test_consulta_de_mediciones_sin_inferencia_conserva_captura_y_fuente_por_componente" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="351" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="7" time="2.289254"/>
+        <testcase name="test_faltantes_no_se_llenan_y_cero_original_se_conserva" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="366" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="4" time="2.296699"/>
+        <testcase name="test_sin_permiso_de_respuestas_no_consulta_ni_expone_las_fuentes" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="380" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="3" time="2.386592"/>
+        <testcase name="test_comprobacion_desde_sql_detalla_faltante_y_fuentes_sin_escribir_historia" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="404" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="15" time="2.224488"/>
+        <testcase name="test_observaciones_originales_se_recuperan_sin_exigir_perfil_normativo" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="439" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="10" time="2.451315"/>
+        <testcase name="test_no_admite_configurar_una_prueba_estandarizada_sobre_un_catalogo_observacional" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="460" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="1" time="2.301393"/>
+        <testsuite name="Tests\Feature\CapturaInstrumentalInstitucionalTest::test_rechaza_fecha_tipo_puntaje_o_identidad_incompatible_sin_escrituras" tests="8" assertions="24" errors="0" failures="0" skipped="0" time="17.920508">
+          <testcase name="test_rechaza_fecha_tipo_puntaje_o_identidad_incompatible_sin_escrituras with data set #0" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="476" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="3" time="2.307948"/>
+          <testcase name="test_rechaza_fecha_tipo_puntaje_o_identidad_incompatible_sin_escrituras with data set #1" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="476" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="3" time="2.319721"/>
+          <testcase name="test_rechaza_fecha_tipo_puntaje_o_identidad_incompatible_sin_escrituras with data set #2" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="476" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="3" time="2.358771"/>
+          <testcase name="test_rechaza_fecha_tipo_puntaje_o_identidad_incompatible_sin_escrituras with data set #3" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="476" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="3" time="2.144369"/>
+          <testcase name="test_rechaza_fecha_tipo_puntaje_o_identidad_incompatible_sin_escrituras with data set #4" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="476" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="3" time="2.149176"/>
+          <testcase name="test_rechaza_fecha_tipo_puntaje_o_identidad_incompatible_sin_escrituras with data set #5" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="476" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="3" time="2.185877"/>
+          <testcase name="test_rechaza_fecha_tipo_puntaje_o_identidad_incompatible_sin_escrituras with data set #6" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="476" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="3" time="2.237124"/>
+          <testcase name="test_rechaza_fecha_tipo_puntaje_o_identidad_incompatible_sin_escrituras with data set #7" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="476" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="3" time="2.217522"/>
+        </testsuite>
+        <testcase name="test_fallo_al_guardar_una_respuesta_revierte_la_aplicacion" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="497" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="3" time="2.329286"/>
+        <testcase name="test_pantalla_consulta_capturas_sin_depender_de_una_version_investigada" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="510" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="6" time="2.279042"/>
+        <testcase name="test_error_del_informe_historico_se_informa_y_permite_consultar_fuentes_independientes" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="520" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="6" time="2.329319"/>
+        <testcase name="test_corte_y_residente_aislan_fuentes_y_anulada_no_se_normaliza" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="535" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="10" time="2.321385"/>
+        <testcase name="test_un_registro_transcrito_despues_del_corte_no_ingresa_en_la_captura_historica" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="556" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="3" time="2.197202"/>
+        <testcase name="test_sin_permiso_documental_no_lee_una_aplicacion_vinculada_a_documento" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="571" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="2" time="2.454887"/>
+        <testcase name="test_sin_permiso_documental_conserva_lectura_de_aplicacion_sin_documento" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="592" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="3" time="3.277493"/>
+        <testcase name="test_offset_original_se_convierte_a_la_zona_institucional_sin_cambiar_el_instante" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="603" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="2" time="3.121382"/>
+        <testcase name="test_identidad_ambigua_de_perfiles_se_rechaza" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="610" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="1" time="2.734396"/>
+        <testcase name="test_etiqueta_nominal_no_reemplaza_medicion_original_y_perfil_no_se_adivina_por_nombre" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="618" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="4" time="2.470210"/>
+        <testcase name="test_seis_perfiles_investigados_recuperan_respuestas_originales_y_se_presentan_sin_escribir_evaluaciones" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="633" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="245" time="2.859540"/>
+        <testcase name="test_fecha_original_es_obligatoria_tambien_en_post_directo" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="690" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="5" time="2.445254"/>
+        <testcase name="test_metodo_no_aporta_identidad_aplicada_y_selector_sin_respuesta_conserva_definicion" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="698" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="5" time="2.386676"/>
+        <testcase name="test_transcripcion_concilia_sin_escritura_preserva_autor_y_reintento_es_identico" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="730" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="10" time="2.467451"/>
+        <testcase name="test_conflicto_no_sobrescribe_y_rectificacion_conserva_original_y_auditoria" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="748" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="10" time="2.495534"/>
+        <testcase name="test_transcripcion_rechaza_hash_ajeno_y_permiso_revocado_sin_escrituras" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="774" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="4" time="2.744013"/>
+        <testcase name="test_ruta_anterior_exige_respuestas_y_no_deduce_dcl_de_un_total" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="790" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="2" time="2.424292"/>
+        <testcase name="test_ruta_anterior_vincula_residente_y_anulacion_preserva_originales" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="798" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="9" time="2.380611"/>
+        <testcase name="test_fuente_anulada_no_se_rectifica_y_respuesta_persistida_no_se_edita" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="813" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="4" time="2.367979"/>
+        <testcase name="test_opcion_historica_no_inventa_puntaje_y_rechaza_puntaje_incompatible" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="838" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="4" time="2.393013"/>
+        <testcase name="test_precision_tecnica_y_vinculacion_de_registro_existente_sin_duplicar" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="858" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="9" time="2.523016"/>
+        <testcase name="test_modal_concilia_transcripcion_y_muestra_procedencia_del_original" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="880" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="11" time="3.600324"/>
+        <testcase name="test_fallo_de_auditoria_revierte_correccion_y_anulacion_del_original" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="903" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="4" time="2.382497"/>
+        <testcase name="test_migracion_revierte_solo_sin_metadatos_y_conserva_historia_y_referencias" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="927" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="6" time="2.818008"/>
+        <testcase name="test_permiso_de_transcripcion_no_concede_descarga_general_y_superadmin_no_transcribe" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="952" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="7" time="3.027827"/>
+        <testcase name="test_vinculacion_no_declara_identicos_puntajes_distintos_del_registro_previo" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="969" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="3" time="2.682025"/>
+        <testsuite name="Tests\Feature\CapturaInstrumentalInstitucionalTest::test_original_incompatible_no_produce_cabecera_respuestas_ni_exito" tests="4" assertions="16" errors="0" failures="0" skipped="0" time="9.684940">
+          <testcase name="test_original_incompatible_no_produce_cabecera_respuestas_ni_exito with data set #0" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="993" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="4" time="2.288377"/>
+          <testcase name="test_original_incompatible_no_produce_cabecera_respuestas_ni_exito with data set #1" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="993" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="4" time="2.395661"/>
+          <testcase name="test_original_incompatible_no_produce_cabecera_respuestas_ni_exito with data set #2" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="993" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="4" time="2.604057"/>
+          <testcase name="test_original_incompatible_no_produce_cabecera_respuestas_ni_exito with data set #3" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaInstrumentalInstitucionalTest.php" line="993" class="Tests\Feature\CapturaInstrumentalInstitucionalTest" classname="Tests.Feature.CapturaInstrumentalInstitucionalTest" assertions="4" time="2.396844"/>
+        </testsuite>
+      </testsuite>
+      <testsuite name="Tests\Feature\CohorteInferencia30Test" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CohorteInferencia30Test.php" tests="4" assertions="2198" errors="0" failures="0" skipped="0" time="80.575306">
+        <testcase name="test_treinta_admisiones_fuentes_originales_dos_ramas_y_cuatro_perfiles_reproducibles" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CohorteInferencia30Test.php" line="40" class="Tests\Feature\CohorteInferencia30Test" classname="Tests.Feature.CohorteInferencia30Test" assertions="2173" time="44.292288"/>
+        <testcase name="test_rechaza_entorno_local_antes_de_escribir" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CohorteInferencia30Test.php" line="284" class="Tests\Feature\CohorteInferencia30Test" classname="Tests.Feature.CohorteInferencia30Test" assertions="3" time="3.323539"/>
+        <testcase name="test_seeder_artisan_rechaza_destino_no_confirmado_sin_escrituras" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CohorteInferencia30Test.php" line="299" class="Tests\Feature\CohorteInferencia30Test" classname="Tests.Feature.CohorteInferencia30Test" assertions="4" time="3.204801"/>
+        <testcase name="test_fallo_parcial_revierte_admision_fuentes_auditoria_y_correlativos" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CohorteInferencia30Test.php" line="321" class="Tests\Feature\CohorteInferencia30Test" classname="Tests.Feature.CohorteInferencia30Test" assertions="18" time="29.754677"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\FichaPsicologicaResidenteTest" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\FichaPsicologicaResidenteTest.php" tests="10" assertions="51" errors="0" failures="0" skipped="0" time="33.386629">
+        <testcase name="test_psicologo_activo_puede_ver_ficha_psicologica_del_residente" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\FichaPsicologicaResidenteTest.php" line="78" class="Tests\Feature\FichaPsicologicaResidenteTest" classname="Tests.Feature.FichaPsicologicaResidenteTest" assertions="4" time="8.324453"/>
+        <testcase name="test_enfermero_o_usuario_no_autorizado_es_rechazado_con_403" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\FichaPsicologicaResidenteTest.php" line="89" class="Tests\Feature\FichaPsicologicaResidenteTest" classname="Tests.Feature.FichaPsicologicaResidenteTest" assertions="1" time="3.557957"/>
+        <testcase name="test_componente_livewire_muestra_pestanas_didacticas_y_permite_navegar_entre_ellas" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\FichaPsicologicaResidenteTest.php" line="97" class="Tests\Feature\FichaPsicologicaResidenteTest" classname="Tests.Feature.FichaPsicologicaResidenteTest" assertions="18" time="2.489496"/>
+        <testcase name="test_disparar_abrir_evaluacion_emite_evento_hacia_modal_de_area" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\FichaPsicologicaResidenteTest.php" line="130" class="Tests\Feature\FichaPsicologicaResidenteTest" classname="Tests.Feature.FichaPsicologicaResidenteTest" assertions="1" time="2.479112"/>
+        <testcase name="test_psicologo_puede_guardar_valoracion_afectiva_vinculada_a_atencion_y_soporte_c04" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\FichaPsicologicaResidenteTest.php" line="142" class="Tests\Feature\FichaPsicologicaResidenteTest" classname="Tests.Feature.FichaPsicologicaResidenteTest" assertions="4" time="2.560081"/>
+        <testcase name="test_psicologo_puede_guardar_control_funcional_iadl_soporte_c03" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\FichaPsicologicaResidenteTest.php" line="172" class="Tests\Feature\FichaPsicologicaResidenteTest" classname="Tests.Feature.FichaPsicologicaResidenteTest" assertions="3" time="2.605532"/>
+        <testcase name="test_psicologo_puede_registrar_sesion_de_atencion" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\FichaPsicologicaResidenteTest.php" line="197" class="Tests\Feature\FichaPsicologicaResidenteTest" classname="Tests.Feature.FichaPsicologicaResidenteTest" assertions="3" time="2.503172"/>
+        <testcase name="test_cambiar_periodo_y_metrica_de_tendencia_longitudinal" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\FichaPsicologicaResidenteTest.php" line="218" class="Tests\Feature\FichaPsicologicaResidenteTest" classname="Tests.Feature.FichaPsicologicaResidenteTest" assertions="4" time="2.438636"/>
+        <testcase name="test_tendencia_cognitiva_con_multiples_puntos_calcula_resumen_y_datasets" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\FichaPsicologicaResidenteTest.php" line="232" class="Tests\Feature\FichaPsicologicaResidenteTest" classname="Tests.Feature.FichaPsicologicaResidenteTest" assertions="3" time="2.914119"/>
+        <testcase name="test_psicologo_puede_navegar_a_pestana_orion_y_consultar_criterios_petersen" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\FichaPsicologicaResidenteTest.php" line="298" class="Tests\Feature\FichaPsicologicaResidenteTest" classname="Tests.Feature.FichaPsicologicaResidenteTest" assertions="10" time="3.514072"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\MisResidentesPsicologiaTest" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\MisResidentesPsicologiaTest.php" tests="5" assertions="21" errors="0" failures="0" skipped="0" time="12.789430">
+        <testcase name="test_lista_residentes_admitidos_y_abre_la_ficha_sin_mostrar_codigos" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\MisResidentesPsicologiaTest.php" line="42" class="Tests\Feature\MisResidentesPsicologiaTest" classname="Tests.Feature.MisResidentesPsicologiaTest" assertions="6" time="2.740838"/>
+        <testcase name="test_busqueda_por_nombre_compuesto_y_cambio_de_vista" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\MisResidentesPsicologiaTest.php" line="68" class="Tests\Feature\MisResidentesPsicologiaTest" classname="Tests.Feature.MisResidentesPsicologiaTest" assertions="4" time="2.529096"/>
+        <testcase name="test_buscador_compartido_envia_la_busqueda_a_mis_residentes" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\MisResidentesPsicologiaTest.php" line="83" class="Tests\Feature\MisResidentesPsicologiaTest" classname="Tests.Feature.MisResidentesPsicologiaTest" assertions="7" time="2.590755"/>
+        <testcase name="test_rol_ajeno_y_personal_inactivo_no_pueden_consultar_el_listado" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\MisResidentesPsicologiaTest.php" line="101" class="Tests\Feature\MisResidentesPsicologiaTest" classname="Tests.Feature.MisResidentesPsicologiaTest" assertions="2" time="2.475074"/>
+        <testcase name="test_permiso_revocado_impide_actualizar_una_vista_livewire_abierta" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\MisResidentesPsicologiaTest.php" line="113" class="Tests\Feature\MisResidentesPsicologiaTest" classname="Tests.Feature.MisResidentesPsicologiaTest" assertions="2" time="2.453667"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\NavegacionSistemaExpertoTest" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\NavegacionSistemaExpertoTest.php" tests="4" assertions="12" errors="0" failures="1" skipped="0" time="10.542854">
+        <testcase name="test_psicologia_consulta_resultados_y_abre_valoracion_desde_area_cognitiva" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\NavegacionSistemaExpertoTest.php" line="44" class="Tests\Feature\NavegacionSistemaExpertoTest" classname="Tests.Feature.NavegacionSistemaExpertoTest" assertions="2" time="2.483474">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\NavegacionSistemaExpertoTest::test_psicologia_consulta_resultados_y_abre_valoracion_desde_area_cognitiva&#13;
+Failed asserting that '&lt;!DOCTYPE html&gt;\n
+&lt;html lang="es" class="h-full"&gt;\n
+\n
+&lt;head&gt;\n
+    &lt;meta charset="utf-8"&gt;\n
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;\n
+    &lt;meta name="csrf-token" content="O6KUFDPYoldjmvPJ7G2c21U23GmjrcmIWnq5IhuF"&gt;\n
+\n
+    &lt;title&gt;Laravel&lt;/title&gt;\n
+\n
+    \n
+    &lt;script&gt;\n
+        (function() {\n
+            const saved = localStorage.getItem('remembermind-theme');\n
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;\n
+            const isDark = saved === 'dark' || ((!saved || saved === 'system') &amp;&amp; prefersDark);\n
+            if (isDark) {\n
+                document.documentElement.classList.add('dark');\n
+                document.documentElement.setAttribute('data-theme', 'dark');\n
+                document.documentElement.style.colorScheme = 'dark';\n
+            } else {\n
+                document.documentElement.classList.remove('dark');\n
+                document.documentElement.setAttribute('data-theme', 'light');\n
+                document.documentElement.style.colorScheme = 'light';\n
+            }\n
+        })();\n
+    &lt;/script&gt;\n
+\n
+    \n
+\n
+    \n
+    &lt;script defer src="https://unpkg.com/@phosphor-icons/web"&gt;&lt;/script&gt;\n
+\n
+    \n
+    &lt;script src="https://cdn.jsdelivr.net/npm/chart.js"&gt;&lt;/script&gt;\n
+\n
+    &lt;script type="module" src="http://127.0.0.1:5173/@vite/client" data-navigate-track="reload"&gt;&lt;/script&gt;&lt;link rel="stylesheet" href="http://127.0.0.1:5173/resources/frontend/styles/app.css" data-navigate-track="reload" /&gt;&lt;script type="module" src="http://127.0.0.1:5173/resources/frontend/scripts/app.js" data-navigate-track="reload"&gt;&lt;/script&gt;\n
+        &lt;!-- Livewire Styles --&gt;&lt;style &gt;[wire\:loading][wire\:loading], [wire\:loading\.delay][wire\:loading\.delay], [wire\:loading\.list-item][wire\:loading\.list-item], [wire\:loading\.inline-block][wire\:loading\.inline-block], [wire\:loading\.inline][wire\:loading\.inline], [wire\:loading\.block][wire\:loading\.block], [wire\:loading\.flex][wire\:loading\.flex], [wire\:loading\.table][wire\:loading\.table], [wire\:loading\.grid][wire\:loading\.grid], [wire\:loading\.inline-flex][wire\:loading\.inline-flex] {display: none;}[wire\:loading\.delay\.none][wire\:loading\.delay\.none], [wire\:loading\.delay\.shortest][wire\:loading\.delay\.shortest], [wire\:loading\.delay\.shorter][wire\:loading\.delay\.shorter], [wire\:loading\.delay\.short][wire\:loading\.delay\.short], [wire\:loading\.delay\.default][wire\:loading\.delay\.default], [wire\:loading\.delay\.long][wire\:loading\.delay\.long], [wire\:loading\.delay\.longer][wire\:loading\.delay\.longer], [wire\:loading\.delay\.longest][wire\:loading\.delay\.longest] {display: none;}[wire\:offline][wire\:offline] {display: none;}[wire\:dirty]:not(textarea):not(input):not(select) {display: none;}:root {--livewire-progress-bar-color: #2299dd;}[x-cloak="x-cloak"],[x-cloak=""] {display: none !important;}[wire\:cloak="wire:cloak"],[wire\:cloak=""] {display: none !important;}dialog#livewire-error::backdrop {background-color: rgba(0, 0, 0, .6);}&lt;/style&gt;\n
+\n
+    &lt;style&gt;\n
+        body {\n
+            font-family: 'Nunito Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;\n
+            -webkit-font-smoothing: antialiased;\n
+            -moz-osx-font-smoothing: grayscale;\n
+        }\n
+\n
+        :root {\n
+            --glow-primary: rgba(113, 135, 106, 0.08);\n
+            --glow-warm: rgba(163, 90, 68, 0.04);\n
+        }\n
+\n
+        /* Utilidad para barra de scroll estilizada */\n
+        .custom-scrollbar::-webkit-scrollbar {\n
+            width: 5px;\n
+            height: 5px;\n
+        }\n
+\n
+        .custom-scrollbar::-webkit-scrollbar-track {\n
+            background: transparent;\n
+        }\n
+\n
+        .custom-scrollbar::-webkit-scrollbar-thumb {\n
+            background: var(--rm-border);\n
+            border-radius: 9999px;\n
+        }\n
+\n
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {\n
+            background: var(--rm-surface-raised);\n
+        }\n
+\n
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {\n
+            background: var(--rm-border-hover);\n
+        }\n
+\n
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {\n
+            background: var(--rm-border-strong);\n
+        }\n
+\n
+        /* Animación suave de entrada */\n
+        @keyframes rm-fade-in-up {\n
+            from {\n
+                opacity: 0;\n
+            }\n
+            to {\n
+                opacity: 1;\n
+            }\n
+        }\n
+\n
+        .animate-fade-in-up {\n
+            animation: rm-fade-in-up 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;\n
+        }\n
+\n
+        @media (prefers-reduced-motion: reduce) {\n
+            .animate-fade-in-up {\n
+                animation: none !important;\n
+            }\n
+            * {\n
+                transition-duration: 0.01ms !important;\n
+                animation-duration: 0.01ms !important;\n
+            }\n
+        }\n
+    &lt;/style&gt;\n
+&lt;/head&gt;\n
+\n
+\n
+&lt;body class="rm-shell  h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"\n
+      data-role="psychology"\n
+      x-data="{\n
+          sidebarOpen: false,\r\n
+sidebarCollapsed: false,\r\n
+sidebarRange: null,\r\n
+sidebarTemporaryExpanded: false,\r\n
+initSidebar() {\r\n
+    document.body.removeAttribute('data-rm-sidebar-ready');\r\n
+    this.syncSidebarViewport();\r\n
+    this.$nextTick(() =&gt; requestAnimationFrame(() =&gt; requestAnimationFrame(() =&gt; document.body.setAttribute('data-rm-sidebar-ready', ''))));\r\n
+    this.$watch('sidebarOpen', () =&gt; this.syncSidebarScrollLock());\r\n
+},\r\n
+syncSidebarViewport() {\r\n
+    const range = window.innerWidth &gt;= 1280 ? 'desktop' : (window.innerWidth &gt;= 768 ? 'laptop' : 'drawer');\r\n
+    if (range === this.sidebarRange) return;\r\n
+    this.sidebarRange = range;\r\n
+    this.sidebarOpen = false;\r\n
+    this.sidebarTemporaryExpanded = false;\r\n
+    this.sidebarCollapsed = range === 'laptop';\r\n
+    if (range === 'desktop') {\r\n
+        try { this.sidebarCollapsed = localStorage.getItem('remembermind-sidebar-collapsed') === 'true'; }\r\n
+        catch (error) { this.sidebarCollapsed = false; }\r\n
+    }\r\n
+    this.syncSidebarScrollLock();\r\n
+},\r\n
+toggleSidebarCollapse() {\r\n
+    if (this.sidebarRange === 'drawer') { this.sidebarOpen = !this.sidebarOpen; return; }\r\n
+    this.sidebarCollapsed = !this.sidebarCollapsed;\r\n
+    if (this.sidebarRange === 'desktop') {\r\n
+        try { localStorage.setItem('remembermind-sidebar-collapsed', String(this.sidebarCollapsed)); }\r\n
+        catch (error) { this.sidebarTemporaryExpanded = !this.sidebarCollapsed; }\r\n
+    } else this.sidebarTemporaryExpanded = !this.sidebarCollapsed;\r\n
+},\r\n
+syncSidebarScrollLock() {\r\n
+    document.documentElement.classList.toggle('rm-sidebar-scroll-locked', this.sidebarOpen &amp;&amp; this.sidebarRange === 'drawer');\r\n
+},\r\n
+closeSidebarForNavigation() {\r\n
+    this.sidebarOpen = false;\r\n
+    if (this.sidebarRange === 'laptop') { this.sidebarCollapsed = true; this.sidebarTemporaryExpanded = false; }\r\n
+    this.syncSidebarScrollLock();\r\n
+},\r\n
+          userDropdown: false,\n
+          darkMode: document.documentElement.classList.contains('dark'),\n
+          toggleDarkMode() {\n
+              if (window.RememberMindTheme) { window.RememberMindTheme.toggle(); return; }\n
+              const nextDark = !this.darkMode;\n
+              this.darkMode = nextDark;\n
+              document.documentElement.classList.toggle('dark', nextDark);\n
+              document.documentElement.setAttribute('data-theme', nextDark ? 'dark' : 'light');\n
+              document.documentElement.style.colorScheme = nextDark ? 'dark' : 'light';\n
+              localStorage.setItem('remembermind-theme', nextDark ? 'dark' : 'light');\n
+\n
+              window.dispatchEvent(\n
+                  new CustomEvent('remembermind:theme-changed', {\n
+                      detail: {\n
+                          theme: nextDark ? 'dark' : 'light',\n
+                          resolvedTheme: nextDark ? 'dark' : 'light',\n
+                          isDark: nextDark,\n
+                      },\n
+                  })\n
+              );\n
+          }\n
+      }"\n
+      x-init="initSidebar()"\n
+      @resize.window.debounce.150ms="syncSidebarViewport()"\n
+      @remembermind:theme-changed.window="darkMode = $event.detail.isDark"\n
+      :class="{ 'is-sidebar-collapsed': sidebarCollapsed }"&gt;\n
+\n
+    &lt;div x-data="{&amp;quot;show&amp;quot;:true,&amp;quot;style&amp;quot;:&amp;quot;success&amp;quot;,&amp;quot;message&amp;quot;:null}"\n
+ :class="{ 'bg-indigo-500': style == 'success', 'bg-red-700': style == 'danger', 'bg-[var(--rm-warning)]': style == 'warning', 'bg-fondo-panel': style != 'success' &amp;&amp; style != 'danger' &amp;&amp; style != 'warning'}"\n
+ style="display: none;"\n
+ x-show="show &amp;&amp; message"\n
+ x-on:banner-message.window="\n
+ style = event.detail.style;\n
+ message = event.detail.message;\n
+ show = true;"&gt;\n
+ &lt;div class="max-w-screen-xl mx-auto py-2 px-3 sm:px-6 lg:px-8"&gt;\n
+ &lt;div class="flex items-center justify-between flex-wrap"&gt;\n
+ &lt;div class="w-0 flex-1 flex items-center min-w-0"&gt;\n
+ &lt;span class="flex p-2 rounded-lg" :class="{ 'bg-[var(--rm-success)]': style == 'success', 'bg-red-600': style == 'danger', 'bg-[var(--rm-warning)]': style == 'warning' }"&gt;\n
+ &lt;svg x-show="style == 'success'" class="size-5 text-inverso" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"&gt;\n
+ &lt;path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /&gt;\n
+ &lt;/svg&gt;\n
+ &lt;svg x-show="style == 'danger'" class="size-5 text-inverso" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"&gt;\n
+ &lt;path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /&gt;\n
+ &lt;/svg&gt;\n
+ &lt;svg x-show="style != 'success' &amp;&amp; style != 'danger' &amp;&amp; style != 'warning'" class="size-5 text-inverso" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"&gt;\n
+ &lt;path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /&gt;\n
+ &lt;/svg&gt;\n
+ &lt;svg x-show="style == 'warning'" class="size-5 text-inverso" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"&gt;\n
+ &lt;circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none" /&gt;\n
+ &lt;path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4v.01 0 0" /&gt;\n
+ &lt;/svg&gt;\n
+ &lt;/span&gt;\n
+\n
+ &lt;p class="ms-3 font-medium text-sm text-inverso truncate" x-text="message"&gt;&lt;/p&gt;\n
+ &lt;/div&gt;\n
+\n
+ &lt;div class="shrink-0 sm:ms-3"&gt;\n
+ &lt;button\n
+ type="button"\n
+ class="-me-1 flex p-2 rounded-md focus:outline-none sm:-me-2 transition"\n
+ :class="{ 'hover:bg-[var(--rm-success-hover)] focus:bg-[var(--rm-success-hover)]': style == 'success', 'hover:bg-red-600 focus:bg-red-600': style == 'danger', 'hover:bg-[var(--rm-warning)] focus:bg-[var(--rm-warning)]': style == 'warning'}"\n
+ aria-label="Dismiss"\n
+ x-on:click="show = false"&gt;\n
+ &lt;svg class="size-5 text-inverso" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"&gt;\n
+ &lt;path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /&gt;\n
+ &lt;/svg&gt;\n
+ &lt;/button&gt;\n
+ &lt;/div&gt;\n
+ &lt;/div&gt;\n
+ &lt;/div&gt;\n
+&lt;/div&gt;\n
+\n
+    &lt;div class="rm-app-frame relative min-h-screen bg-transparent transition-colors duration-200"&gt;\n
+        \n
+\n
+        \n
+        &lt;div x-show="sidebarOpen"\n
+             x-transition:enter="transition-opacity ease-out duration-200"\n
+             x-transition:enter-start="opacity-0"\n
+             x-transition:enter-end="opacity-100"\n
+             x-transition:leave="transition-opacity ease-out duration-200"\n
+             x-transition:leave-start="opacity-100"\n
+             x-transition:leave-end="opacity-0"\n
+             @click="sidebarOpen = false"\n
+             class="rm-sidebar-overlay lg:hidden"\n
+             style="display:none;"\n
+             aria-hidden="true"&gt;&lt;/div&gt;\n
+\n
+        \n
+        &lt;aside id="sidebar" class="rm-sidebar" wire:transition="rm-sidebar" aria-label="Navegación principal"\n
+        :class="{ 'is-mobile-open': sidebarOpen }"\n
+    :inert="sidebarRange === 'drawer' &amp;&amp; !sidebarOpen"\n
+    @toggle-sidebar.window="sidebarOpen = !sidebarOpen"\n
+    x-data="{\n
+        storageKey: 'remembermind-sidebar-view-53c959ae41725b1a54fe38f9c462777843e820cae8ff0d1076643b3a035262c5',\n
+        sectionKeys: JSON.parse('[\u0022Inicio\u0022,\u0022Mis residentes\u0022,\u0022Agenda y sesiones\u0022,\u0022Valoraciones\u0022,\u0022Seguimiento psicológico\u0022,\u0022Informes psicológicos\u0022]'),\n
+        activeSectionKey: null,\n
+        saveSidebarView() {\n
+            const view = { path: window.location.pathname, open: this.openSection === null ? null : this.sectionKeys[this.openSection], scroll: this.$refs.navigation.scrollTop };\n
+            try { sessionStorage.setItem(this.storageKey, JSON.stringify(view)); }\n
+            catch (error) { this.savedView = view; }\n
+        },\n
+        restoreSidebarView() {\n
+            let view = null;\n
+            try { view = JSON.parse(sessionStorage.getItem(this.storageKey) || 'null'); }\n
+            catch (error) { view = null; }\n
+            if (view) {\n
+                if (this.activeSectionKey) {\n
+                    this.openSection = this.sectionKeys.indexOf(this.activeSectionKey);\n
+                } else if (view.path === window.location.pathname || this.openSection === null) {\n
+                    const index = this.sectionKeys.indexOf(view.open);\n
+                    this.openSection = index &gt;= 0 ? index : null;\n
+                }\n
+                this.$nextTick(() =&gt; { this.$refs.navigation.scrollTop = Number(view.scroll) || 0; });\n
+            }\n
+        },\n
+        openSection: null,\n
+        flyoutIndex: null,\n
+        flyoutTop: 0,\n
+        tooltipLabel: null,\n
+        tooltipTop: 0,\n
+        showTooltip(label, element) {\n
+            if (!sidebarCollapsed || window.innerWidth &lt; 768) return;\n
+            this.tooltipLabel = label;\n
+            this.tooltipTop = element.getBoundingClientRect().top + 10;\n
+        },\n
+        hoverFlyout(index, element) {\n
+            if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;\n
+            this.showFlyout(index, element);\n
+        },\n
+        showFlyout(index, element, focusFirst = false) {\n
+            if (!sidebarCollapsed || window.innerWidth &lt; 768) return;\n
+            this.flyoutIndex = index;\n
+            this.$nextTick(() =&gt; {\n
+                const flyout = document.getElementById('rm-sidebar-flyout-' + index);\n
+                const height = flyout?.getBoundingClientRect().height ?? 280;\n
+                this.flyoutTop = Math.max(12, Math.min(element.getBoundingClientRect().top, window.innerHeight - height - 12));\n
+                if (focusFirst) {\n
+                    requestAnimationFrame(() =&gt; requestAnimationFrame(() =&gt; {\n
+                        if (this.flyoutIndex === index) flyout?.querySelector('a[href]')?.focus();\n
+                    }));\n
+                }\n
+            });\n
+        }\n
+    }"\n
+    x-on:livewire:navigating.window="saveSidebarView(); closeSidebarForNavigation()"\n
+    x-init="restoreSidebarView(); $watch('openSection', () =&gt; saveSidebarView()); $watch('sidebarOpen', open =&gt; { if (window.innerWidth &gt;= 768) return; if (open) $nextTick(() =&gt; $refs.mobileClose.focus()); else if ($el.contains(document.activeElement)) document.getElementById('sidebar-mobile-trigger')?.focus(); })"\n
+    @keydown.tab="if (sidebarOpen &amp;&amp; window.innerWidth &lt; 768) { const controls = [...$el.querySelectorAll('a[href], button:not([disabled]), summary')].filter(control =&gt; control.getClientRects().length); const first = controls[0], last = controls[controls.length - 1]; if ($event.shiftKey &amp;&amp; document.activeElement === first) { $event.preventDefault(); last.focus(); } else if (!$event.shiftKey &amp;&amp; document.activeElement === last) { $event.preventDefault(); first.focus(); } }"\n
+    @keydown.escape.window="if (flyoutIndex !== null &amp;&amp; document.activeElement?.closest('.rm-sidebar__flyout')) document.getElementById('rm-sidebar-trigger-' + flyoutIndex)?.focus(); flyoutIndex = null; tooltipLabel = null; if (sidebarOpen) sidebarOpen = false"&gt;\n
+    &lt;div class="rm-sidebar__header"&gt;\n
+        &lt;a href="http://127.0.0.1:8000/dashboard" class="rm-sidebar__brand" wire:navigate @click="sidebarOpen = false" aria-label="RememberMind, inicio"&gt;\n
+            &lt;img src="http://127.0.0.1:8000/storage/imagenes/LOGO.png" alt="" class="rm-sidebar__logo"&gt;\n
+            &lt;span class="rm-sidebar__brand-copy"&gt;\n
+                &lt;strong class="rm-brand"&gt;RememberMind&lt;/strong&gt;\n
+                &lt;small&gt;Cuidado geriátrico&lt;/small&gt;\n
+            &lt;/span&gt;\n
+        &lt;/a&gt;\n
+        &lt;button type="button" class="rm-sidebar__header-toggle" @click="toggleSidebarCollapse(); flyoutIndex = null; tooltipLabel = null"\n
+            :aria-label="sidebarCollapsed ? 'Expandir menú lateral' : 'Contraer menú lateral'"\n
+            :title="sidebarCollapsed ? 'Expandir menú lateral' : 'Contraer menú lateral'"\n
+            :aria-expanded="sidebarCollapsed ? 'false' : 'true'"\n
+            aria-controls="sidebar-nav"&gt;\n
+            &lt;i class="ph-bold ph-caret-double-left" aria-hidden="true" :class="{ 'is-collapsed': sidebarCollapsed }"&gt;&lt;/i&gt;\n
+        &lt;/button&gt;\n
+        &lt;button type="button" class="rm-sidebar__mobile-close" x-ref="mobileClose" @click="sidebarOpen = false" aria-label="Cerrar menú lateral"&gt;\n
+            &lt;i class="ph-bold ph-x" aria-hidden="true"&gt;&lt;/i&gt;\n
+        &lt;/button&gt;\n
+    &lt;/div&gt;\n
+\n
+    &lt;nav id="sidebar-nav" class="rm-sidebar__nav" x-ref="navigation" @scroll.debounce.100ms="saveSidebarView()" aria-label="Secciones del sistema" @mouseleave="if (!$event.relatedTarget?.closest('.rm-sidebar__flyout')) flyoutIndex = null; tooltipLabel = null"&gt;\n
+                                            &lt;div class="rm-sidebar__entry"&gt;\n
+                                    &lt;a href="http://127.0.0.1:8000/admin/psicologia/dashboard" wire:navigate @click="sidebarOpen = false; flyoutIndex = null; tooltipLabel = null"\n
+                        class="rm-sidebar__item is-active" title="Inicio" aria-label="Inicio" data-label="INICIO"\n
+                        @mouseenter="showTooltip('Inicio', $el)" @focus="showTooltip('Inicio', $el)" @mouseleave="tooltipLabel = null" @blur="tooltipLabel = null"\n
+                         aria-current="page" &gt;\n
+                        &lt;span class="rm-sidebar__indicator" aria-hidden="true"&gt;&lt;/span&gt;\n
+                        &lt;i class="ph-bold ph-house rm-sidebar__icon" aria-hidden="true"&gt;&lt;/i&gt;\n
+                        &lt;span class="rm-sidebar__label rm-nav-group"&gt;Inicio&lt;/span&gt;\n
+                                            &lt;/a&gt;\n
+                            &lt;/div&gt;\n
+                                            &lt;div class="rm-sidebar__entry"&gt;\n
+                                    &lt;a href="http://127.0.0.1:8000/admin/psicologia/evaluaciones-asignadas" wire:navigate @click="sidebarOpen = false; flyoutIndex = null; tooltipLabel = null"\n
+                        class="rm-sidebar__item " title="Mis residentes" aria-label="Mis residentes" data-label="MIS RESIDENTES"\n
+                        @mouseenter="showTooltip('Mis residentes', $el)" @focus="showTooltip('Mis residentes', $el)" @mouseleave="tooltipLabel = null" @blur="tooltipLabel = null"\n
+                        &gt;\n
+                        &lt;span class="rm-sidebar__indicator" aria-hidden="true"&gt;&lt;/span&gt;\n
+                        &lt;i class="ph-bold ph-users-three rm-sidebar__icon" aria-hidden="true"&gt;&lt;/i&gt;\n
+                        &lt;span class="rm-sidebar__label rm-nav-group"&gt;Mis residentes&lt;/span&gt;\n
+                                            &lt;/a&gt;\n
+                            &lt;/div&gt;\n
+                                            &lt;div class="rm-sidebar__entry"&gt;\n
+                                    &lt;a href="http://127.0.0.1:8000/admin/psicologia/agenda" wire:navigate @click="sidebarOpen = false; flyoutIndex = null; tooltipLabel = null"\n
+                        class="rm-sidebar__item " title="Agenda y sesiones" aria-label="Agenda y sesiones" data-label="AGENDA Y SESIONES"\n
+                        @mouseenter="showTooltip('Agenda y sesiones', $el)" @focus="showTooltip('Agenda y sesiones', $el)" @mouseleave="tooltipLabel = null" @blur="tooltipLabel = null"\n
+                        &gt;\n
+                        &lt;span class="rm-sidebar__indicator" aria-hidden="true"&gt;&lt;/span&gt;\n
+                        &lt;i class="ph-bold ph-calendar-check rm-sidebar__icon" aria-hidden="true"&gt;&lt;/i&gt;\n
+                        &lt;span class="rm-sidebar__label rm-nav-group"&gt;Agenda y sesiones&lt;/span&gt;\n
+                                            &lt;/a&gt;\n
+                            &lt;/div&gt;\n
+                                            &lt;div class="rm-sidebar__entry"&gt;\n
+                                    &lt;button type="button" id="rm-sidebar-trigger-3" class="rm-sidebar__item "\n
+                        title="Valoraciones" aria-label="Valoraciones" data-label="VALORACIONES"\n
+                        :aria-expanded="((!sidebarCollapsed || window.innerWidth &lt; 768) &amp;&amp; openSection === 3) || (sidebarCollapsed &amp;&amp; flyoutIndex === 3) ? 'true' : 'false'"\n
+                        :aria-controls="sidebarCollapsed &amp;&amp; window.innerWidth &gt;= 768 ? 'rm-sidebar-flyout-3' : 'rm-sidebar-submenu-3'"\n
+                        @click="if (sidebarCollapsed &amp;&amp; window.innerWidth &gt;= 768) { showFlyout(3, $el, $event.detail === 0); } else openSection = openSection === 3 ? null : 3"\n
+                        @mouseenter="showTooltip('Valoraciones', $el); hoverFlyout(3, $el)" @focus="showTooltip('Valoraciones', $el)" @blur="tooltipLabel = null"\n
+                        @mouseleave="if (!$event.relatedTarget?.closest('.rm-sidebar__flyout')) flyoutIndex = null"&gt;\n
+                        &lt;span class="rm-sidebar__indicator" aria-hidden="true"&gt;&lt;/span&gt;\n
+                        &lt;i class="ph-bold ph-list-magnifying-glass rm-sidebar__icon" aria-hidden="true"&gt;&lt;/i&gt;\n
+                        &lt;span class="rm-sidebar__label rm-nav-group"&gt;Valoraciones&lt;/span&gt;\n
+                                                &lt;i class="ph-bold ph-caret-down rm-sidebar__chevron" aria-hidden="true" :class="{ 'is-open': openSection === 3 }"&gt;&lt;/i&gt;\n
+                    &lt;/button&gt;\n
+                    &lt;div id="rm-sidebar-submenu-3" class="rm-sidebar__submenu"\n
+                        x-show="openSection === 3 &amp;&amp; (!sidebarCollapsed || window.innerWidth &lt; 768)"\n
+                        x-collapse.duration.200ms\n
+                        style="display: none;"&gt;\n
+                        &lt;div class="rm-sidebar__submenu-content" :class="{ 'is-visible': openSection === 3 }"&gt;\n
+                                                                                                                &lt;a href="http://127.0.0.1:8000/admin/psicologia/evaluacion/cognitiva" wire:navigate @click="sidebarOpen = false"\n
+                                    class="rm-sidebar__subitem rm-nav-item " data-label="COGNITIVA"\n
+                                    &gt;\n
+                                    &lt;span class="rm-sidebar__subindicator" aria-hidden="true"&gt;&lt;/span&gt;\n
+                                    &lt;span&gt;Cognitiva&lt;/span&gt;\n
+                                                                    &lt;/a&gt;\n
+                                                                                                                                            &lt;a href="http://127.0.0.1:8000/admin/psicologia/evaluacion/afectiva" wire:navigate @click="sidebarOpen = false"\n
+                                    class="rm-sidebar__subitem rm-nav-item " data-label="AFECTIVA Y EMOCIONAL"\n
+                                    &gt;\n
+                                    &lt;span class="rm-sidebar__subindicator" aria-hidden="true"&gt;&lt;/span&gt;\n
+                                    &lt;span&gt;Afectiva y emocional&lt;/span&gt;\n
+                                                                    &lt;/a&gt;\n
+                                                                                                                                            &lt;a href="http://127.0.0.1:8000/admin/psicologia/evaluacion/funcionamiento" wire:navigate @click="sidebarOpen = false"\n
+                                    class="rm-sidebar__subitem rm-nav-item " data-label="FUNCIONAMIENTO"\n
+                                    &gt;\n
+                                    &lt;span class="rm-sidebar__subindicator" aria-hidden="true"&gt;&lt;/span&gt;\n
+                                    &lt;span&gt;Funcionamiento&lt;/span&gt;\n
+                                                                    &lt;/a&gt;\n
+                                                                                                                                            &lt;a href="http://127.0.0.1:8000/admin/psicologia/evaluacion/entorno" wire:navigate @click="sidebarOpen = false"\n
+                                    class="rm-sidebar__subitem rm-nav-item " data-label="ENTORNO Y RED SOCIAL"\n
+                                    &gt;\n
+                                    &lt;span class="rm-sidebar__subindicator" aria-hidden="true"&gt;&lt;/span&gt;\n
+                                    &lt;span&gt;Entorno y red social&lt;/span&gt;\n
+                                                                    &lt;/a&gt;\n
+                                                                            &lt;/div&gt;\n
+                    &lt;/div&gt;\n
+                            &lt;/div&gt;\n
+                                            &lt;div class="rm-sidebar__entry"&gt;\n
+                                    &lt;a href="http://127.0.0.1:8000/admin/psicologia/seguimiento" wire:navigate @click="sidebarOpen = false; flyoutIndex = null; tooltipLabel = null"\n
+                        class="rm-sidebar__item " title="Seguimiento psicológico" aria-label="Seguimiento psicológico" data-label="SEGUIMIENTO PSICOLÓGICO"\n
+                        @mouseenter="showTooltip('Seguimiento psicológico', $el)" @focus="showTooltip('Seguimiento psicológico', $el)" @mouseleave="tooltipLabel = null" @blur="tooltipLabel = null"\n
+                        &gt;\n
+                        &lt;span class="rm-sidebar__indicator" aria-hidden="true"&gt;&lt;/span&gt;\n
+                        &lt;i class="ph-bold ph-heartbeat rm-sidebar__icon" aria-hidden="true"&gt;&lt;/i&gt;\n
+                        &lt;span class="rm-sidebar__label rm-nav-group"&gt;Seguimiento psicológico&lt;/span&gt;\n
+                                            &lt;/a&gt;\n
+                            &lt;/div&gt;\n
+                                            &lt;div class="rm-sidebar__entry"&gt;\n
+                                    &lt;a href="http://127.0.0.1:8000/admin/psicologia/informes" wire:navigate @click="sidebarOpen = false; flyoutIndex = null; tooltipLabel = null"\n
+                        class="rm-sidebar__item " title="Informes psicológicos" aria-label="Informes psicológicos" data-label="INFORMES PSICOLÓGICOS"\n
+                        @mouseenter="showTooltip('Informes psicológicos', $el)" @focus="showTooltip('Informes psicológicos', $el)" @mouseleave="tooltipLabel = null" @blur="tooltipLabel = null"\n
+                        &gt;\n
+                        &lt;span class="rm-sidebar__indicator" aria-hidden="true"&gt;&lt;/span&gt;\n
+                        &lt;i class="ph-bold ph-file-text rm-sidebar__icon" aria-hidden="true"&gt;&lt;/i&gt;\n
+                        &lt;span class="rm-sidebar__label rm-nav-group"&gt;Informes psicológicos&lt;/span&gt;\n
+                                            &lt;/a&gt;\n
+                            &lt;/div&gt;\n
+            &lt;/nav&gt;\n
+\n
+    &lt;div class="rm-sidebar__tooltip" x-show="sidebarCollapsed &amp;&amp; tooltipLabel &amp;&amp; window.innerWidth &gt;= 768"\n
+        x-transition:enter="rm-sidebar__tooltip-enter" x-transition:enter-start="rm-sidebar__tooltip-start" x-transition:enter-end="rm-sidebar__tooltip-end"\n
+        :style="{ top: tooltipTop + 'px' }" x-text="tooltipLabel" role="tooltip" x-cloak&gt;&lt;/div&gt;\n
+\n
+                                                            &lt;div id="rm-sidebar-flyout-3" class="rm-sidebar__flyout" x-show="sidebarCollapsed &amp;&amp; flyoutIndex === 3 &amp;&amp; window.innerWidth &gt;= 768"\n
+                :style="{ top: flyoutTop + 'px' }" @mouseenter="flyoutIndex = 3" @mouseleave="flyoutIndex = null"\n
+                x-transition:enter="rm-sidebar__flyout-enter" x-transition:enter-start="rm-sidebar__flyout-start" x-transition:enter-end="rm-sidebar__flyout-end"\n
+                x-transition:leave="rm-sidebar__flyout-leave" x-transition:leave-start="rm-sidebar__flyout-end" x-transition:leave-end="rm-sidebar__flyout-start" x-cloak&gt;\n
+                &lt;strong class="rm-sidebar__flyout-title rm-nav-group"&gt;Valoraciones&lt;/strong&gt;\n
+                                                                                &lt;a href="http://127.0.0.1:8000/admin/psicologia/evaluacion/cognitiva" wire:navigate @click="flyoutIndex = null; sidebarOpen = false"\n
+                            class="rm-sidebar__flyout-link rm-nav-item "\n
+                            &gt;Cognitiva&lt;/a&gt;\n
+                                                                                                    &lt;a href="http://127.0.0.1:8000/admin/psicologia/evaluacion/afectiva" wire:navigate @click="flyoutIndex = null; sidebarOpen = false"\n
+                            class="rm-sidebar__flyout-link rm-nav-item "\n
+                            &gt;Afectiva y emocional&lt;/a&gt;\n
+                                                                                                    &lt;a href="http://127.0.0.1:8000/admin/psicologia/evaluacion/funcionamiento" wire:navigate @click="flyoutIndex = null; sidebarOpen = false"\n
+                            class="rm-sidebar__flyout-link rm-nav-item "\n
+                            &gt;Funcionamiento&lt;/a&gt;\n
+                                                                                                    &lt;a href="http://127.0.0.1:8000/admin/psicologia/evaluacion/entorno" wire:navigate @click="flyoutIndex = null; sidebarOpen = false"\n
+                            class="rm-sidebar__flyout-link rm-nav-item "\n
+                            &gt;Entorno y red social&lt;/a&gt;\n
+                                                &lt;/div&gt;\n
+                                    \n
+    &lt;div class="rm-sidebar__footer"&gt;\n
+        &lt;details class="rm-sidebar__account" @click.outside="$el.removeAttribute('open')"\n
+            @keydown.escape="if ($el.open) { $event.stopPropagation(); $el.open = false; $el.querySelector('summary').focus(); }"&gt;\n
+            &lt;summary class="rm-sidebar__account-trigger" aria-label="Información de la cuenta de Profesional"\n
+                @mouseenter="showTooltip('Profesional', $el)" @focus="showTooltip('Profesional', $el)"\n
+                @mouseleave="tooltipLabel = null" @blur="tooltipLabel = null"&gt;\n
+                &lt;span class="rm-sidebar__avatar" aria-hidden="true"&gt;\n
+                    P\n
+                    &lt;span class="rm-sidebar__presence"&gt;&lt;/span&gt;                &lt;/span&gt;\n
+                &lt;span class="rm-sidebar__account-copy"&gt;\n
+                    &lt;strong&gt;Profesional&lt;/strong&gt;\n
+                    &lt;small&gt;Psicologo/A&lt;/small&gt;\n
+                &lt;/span&gt;\n
+                &lt;i class="ph-bold ph-dots-three-vertical rm-sidebar__account-more" aria-hidden="true"&gt;&lt;/i&gt;\n
+            &lt;/summary&gt;\n
+            &lt;div class="rm-sidebar__account-panel"&gt;\n
+                &lt;p class="rm-sidebar__account-name"&gt;Profesional&lt;/p&gt;\n
+                &lt;p class="rm-sidebar__account-role"&gt;Psicologo/A&lt;/p&gt;\n
+                            &lt;/div&gt;\n
+        &lt;/details&gt;\n
+    &lt;/div&gt;\n
+&lt;/aside&gt;\n
+\n
+        \n
+        &lt;header\n
+    id="topbar-sistema" data-rm-topbar="system"\n
+    class="rm-topbar"\n
+&gt;\n
+    \n
+    &lt;div class="rm-topbar__identity"&gt;\n
+        \n
+        &lt;button type="button" id="sidebar-mobile-trigger"\n
+                @click="sidebarOpen = true"\n
+                class="rm-topbar__action rm-topbar__hamburger"\n
+                aria-label="Abrir menú lateral" aria-controls="sidebar" :aria-expanded="sidebarOpen.toString()"&gt;\n
+            &lt;i class="ph-bold ph-list text-xl"&gt;&lt;/i&gt;\n
+        &lt;/button&gt;\n
+\n
+\n
+    &lt;/div&gt;\n
+\n
+    \n
+        &lt;div class="rm-topbar__search-slot"&gt;\n
+        &lt;div class="rm-topbar-search" x-data="{ searchOpen: false }" @click.outside="searchOpen = false" @keydown.escape.window="if (searchOpen) { searchOpen = false; $refs.searchToggle.focus() }" x-on:livewire:navigating.window="searchOpen = false"&gt;\n
+            &lt;button type="button" class="rm-topbar-search__toggle" x-ref="searchToggle" @click="searchOpen = !searchOpen; if (searchOpen) $nextTick(() =&gt; $refs.topbarSearch.focus())"\n
+                    :aria-expanded="searchOpen.toString()" aria-controls="topbar-system-search-form" aria-label="Buscar residentes"&gt;\n
+                &lt;i class="ph-bold ph-magnifying-glass" aria-hidden="true"&gt;&lt;/i&gt;\n
+            &lt;/button&gt;\n
+            &lt;form id="topbar-system-search-form" action="http://127.0.0.1:8000/admin/psicologia/evaluaciones-asignadas" method="GET"\n
+                  class="rm-topbar-search__form" :class="{ 'is-open': searchOpen }" role="search"&gt;\n
+                &lt;label for="topbar-system-search" class="sr-only"&gt;Buscar residentes&lt;/label&gt;\n
+                &lt;i class="ph-bold ph-magnifying-glass rm-topbar-search__icon" aria-hidden="true"&gt;&lt;/i&gt;\n
+                &lt;input id="topbar-system-search" x-ref="topbarSearch" type="search" name="buscar"\n
+                       value="" maxlength="100"\n
+                       placeholder="Buscar residente por nombre o habitación…" autocomplete="off"&gt;\n
+                &lt;button type="submit" class="rm-topbar-search__submit" aria-label="Enviar búsqueda"&gt;\n
+                    &lt;i class="ph-bold ph-arrow-right" aria-hidden="true"&gt;&lt;/i&gt;\n
+                &lt;/button&gt;\n
+            &lt;/form&gt;\n
+        &lt;/div&gt;\n
+    &lt;/div&gt;\n
+    \n
+    \n
+    &lt;div class="rm-topbar__actions"&gt;\n
+        &lt;div x-data="{\n
+    month: new Date(new Date().getFullYear(), new Date().getMonth(), 1),\n
+    selected: new Date(),\n
+    key(date) { return [date.getFullYear(), date.getMonth(), date.getDate()].join('-') },\n
+    get title() { return this.month.toLocaleDateString('es-BO', { month: 'long', year: 'numeric' }) },\n
+    get days() {\n
+        const offset = (this.month.getDay() + 6) % 7;\n
+        return Array.from({ length: 42 }, (_, index) =&gt; new Date(this.month.getFullYear(), this.month.getMonth(), index - offset + 1));\n
+    },\n
+    moveMonth(step) { this.month = new Date(this.month.getFullYear(), this.month.getMonth() + step, 1) },\n
+    today() { this.selected = new Date(); this.month = new Date(this.selected.getFullYear(), this.selected.getMonth(), 1) },\n
+    close() { this.$refs.calendar.close(); this.$refs.trigger.focus() }\n
+}" x-on:livewire:navigating.window="$refs.calendar.close()"&gt;\n
+    &lt;button type="button" class="rm-topbar__action" x-ref="trigger" @click="$refs.calendar.showModal()" aria-label="Abrir calendario" aria-haspopup="dialog"&gt;\n
+        &lt;i class="ph-bold ph-calendar-blank text-xl" aria-hidden="true"&gt;&lt;/i&gt;\n
+    &lt;/button&gt;\n
+    &lt;dialog class="rm-calendar" x-ref="calendar" aria-label="Calendario" @click="if ($event.target === $el) close()" @cancel.prevent="close()"&gt;\n
+        &lt;div class="rm-calendar__panel"&gt;\n
+            &lt;header class="rm-calendar__header"&gt;\n
+                &lt;h2 class="rm-section-title"&gt;Calendario&lt;/h2&gt;\n
+                &lt;button type="button" class="rm-topbar__action" @click="close()" aria-label="Cerrar calendario" autofocus&gt;&lt;i class="ph-bold ph-x" aria-hidden="true"&gt;&lt;/i&gt;&lt;/button&gt;\n
+            &lt;/header&gt;\n
+            &lt;div class="rm-calendar__header"&gt;\n
+                &lt;button type="button" class="rm-topbar__action" @click="moveMonth(-1)" aria-label="Mes anterior"&gt;&lt;i class="ph-bold ph-caret-left" aria-hidden="true"&gt;&lt;/i&gt;&lt;/button&gt;\n
+                &lt;p class="rm-card-title" aria-live="polite" x-text="title"&gt;&lt;/p&gt;\n
+                &lt;button type="button" class="rm-topbar__action" @click="moveMonth(1)" aria-label="Mes siguiente"&gt;&lt;i class="ph-bold ph-caret-right" aria-hidden="true"&gt;&lt;/i&gt;&lt;/button&gt;\n
+            &lt;/div&gt;\n
+            &lt;div class="rm-calendar__week" aria-hidden="true"&gt;&lt;span&gt;L&lt;/span&gt;&lt;span&gt;M&lt;/span&gt;&lt;span&gt;X&lt;/span&gt;&lt;span&gt;J&lt;/span&gt;&lt;span&gt;V&lt;/span&gt;&lt;span&gt;S&lt;/span&gt;&lt;span&gt;D&lt;/span&gt;&lt;/div&gt;\n
+            &lt;div class="rm-calendar__days"&gt;\n
+                &lt;template x-for="day in days" :key="key(day)"&gt;\n
+                    &lt;button type="button" class="rm-calendar__day"\n
+                        :class="{ 'is-outside': day.getMonth() !== month.getMonth(), 'is-selected': key(day) === key(selected), 'is-today': key(day) === key(new Date()) }"\n
+                        :aria-label="day.toLocaleDateString('es-BO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })"\n
+                        :aria-pressed="(key(day) === key(selected)).toString()" :aria-current="key(day) === key(new Date()) ? 'date' : null"\n
+                        @click="selected = day" x-text="day.getDate()"&gt;&lt;/button&gt;\n
+                &lt;/template&gt;\n
+            &lt;/div&gt;\n
+            &lt;footer class="rm-calendar__footer"&gt;\n
+                &lt;p class="rm-body" aria-live="polite" x-text="selected.toLocaleDateString('es-BO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })"&gt;&lt;/p&gt;\n
+                &lt;button type="button" class="rm-calendar__today" @click="today()"&gt;Hoy&lt;/button&gt;\n
+            &lt;/footer&gt;\n
+        &lt;/div&gt;\n
+    &lt;/dialog&gt;\n
+&lt;/div&gt;\n
+        \n
+        &lt;button type="button" data-theme-toggle\n
+        @click.stop="toggleDarkMode()"\n
+        :aria-pressed="darkMode.toString()"\n
+        :title="darkMode ? 'Activar modo claro' : 'Activar modo oscuro'"\n
+        :aria-label="darkMode ? 'Activar modo claro' : 'Activar modo oscuro'"\n
+        class="rm-topbar__action rm-topbar__theme-toggle"&gt;\n
+    &lt;i class="ph-bold ph-moon text-lg rm-topbar__theme-icon--moon" aria-hidden="true"&gt;&lt;/i&gt;\n
+    &lt;i class="ph-bold ph-sun text-lg rm-topbar__theme-icon--sun" aria-hidden="true"&gt;&lt;/i&gt;\n
+&lt;/button&gt;\n
+\n
+\n
+        \n
+                    &lt;div wire:key="lw-1929148652-0-4" wire:snapshot="{&amp;quot;data&amp;quot;:{&amp;quot;conteoAbiertas&amp;quot;:0,&amp;quot;alertaIdsConocidos&amp;quot;:[[],{&amp;quot;s&amp;quot;:&amp;quot;arr&amp;quot;}],&amp;quot;recordatorioIdsConocidos&amp;quot;:[[],{&amp;quot;s&amp;quot;:&amp;quot;arr&amp;quot;}],&amp;quot;panelAbierto&amp;quot;:false,&amp;quot;alertaIdAccion&amp;quot;:null,&amp;quot;accionTomada&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;observacionCierre&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;modalAtencion&amp;quot;:false,&amp;quot;modalCierre&amp;quot;:false,&amp;quot;drawerGrafico&amp;quot;:false,&amp;quot;drawerUbicacion&amp;quot;:false,&amp;quot;adultoDrawerId&amp;quot;:null,&amp;quot;adultoDrawer&amp;quot;:null,&amp;quot;signosDrawer&amp;quot;:[[],{&amp;quot;s&amp;quot;:&amp;quot;arr&amp;quot;}]},&amp;quot;memo&amp;quot;:{&amp;quot;id&amp;quot;:&amp;quot;JPwX7BfRFeZrRmz4TKjd&amp;quot;,&amp;quot;name&amp;quot;:&amp;quot;alertas.campana-notificaciones&amp;quot;,&amp;quot;path&amp;quot;:&amp;quot;admin\/psicologia\/dashboard&amp;quot;,&amp;quot;method&amp;quot;:&amp;quot;GET&amp;quot;,&amp;quot;release&amp;quot;:&amp;quot;a-a-a&amp;quot;,&amp;quot;children&amp;quot;:[],&amp;quot;scripts&amp;quot;:[],&amp;quot;assets&amp;quot;:[],&amp;quot;errors&amp;quot;:[],&amp;quot;locale&amp;quot;:&amp;quot;es&amp;quot;,&amp;quot;islands&amp;quot;:[]},&amp;quot;checksum&amp;quot;:&amp;quot;d745fc1a7421f97d361131c289677d545268ef9b734c19cc530ee94f6d9471df&amp;quot;}" wire:effects="[]" wire:id="JPwX7BfRFeZrRmz4TKjd" wire:name="alertas.campana-notificaciones" class="rm-notification-center"  wire:poll.12s="verificarAlertas"  x-data="{ abierto: false, avisos: Array() }" @click.outside="abierto = false" @keydown.escape.window="abierto = false" @alerta-nueva.window="avisos.push(Array.isArray($event.detail) ? $event.detail[0] : $event.detail); avisos.sort((a, b) =&gt; (['CRITICO', 'CRITICA'].includes(a?.nivel) ? 0 : 1) - (['CRITICO', 'CRITICA'].includes(b?.nivel) ? 0 : 1))"&gt;\n
+    &lt;button type="button" class="rm-topbar__action rm-topbar__notification" @click="abierto = !abierto" :aria-expanded="abierto" aria-controls="notification-list-JPwX7BfRFeZrRmz4TKjd" aria-label="Notificaciones y Alertas"&gt;&lt;i class="ph-bold ph-bell" aria-hidden="true"&gt;&lt;/i&gt;&lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/button&gt;\n
+    &lt;aside x-cloak x-show="avisos.length &gt; 0" class="rm-notification-popup" :class="{ 'is-critical': ['CRITICO','CRITICA'].includes(avisos[0]?.nivel) }" role="status" aria-live="polite"&gt;&lt;strong x-text="avisos[0]?.titulo"&gt;&lt;/strong&gt;&lt;p x-text="avisos[0]?.mensaje"&gt;&lt;/p&gt;&lt;span x-show="avisos.length &gt; 1" x-text="(avisos.length - 1) + ' aviso(s) más'"&gt;&lt;/span&gt;&lt;div&gt;&lt;button type="button" class="rm-btn rm-btn-primary" @click="abierto = true; avisos.shift()"&gt;Revisar avisos&lt;/button&gt;&lt;button type="button" class="rm-btn rm-btn-secondary" @click="avisos.shift()"&gt;Ocultar aviso&lt;/button&gt;&lt;/div&gt;&lt;small&gt;Ocultar no atiende ni cierra el registro.&lt;/small&gt;&lt;/aside&gt;\n
+    &lt;section x-cloak x-show="abierto" id="notification-list-JPwX7BfRFeZrRmz4TKjd" class="rm-notification-list" aria-label="Avisos clínicos y de medicación"&gt;\n
+        &lt;header&gt;&lt;h2&gt;Avisos del cuidado&lt;/h2&gt;&lt;p&gt;Actualizado 22/10/2026 11:46:00 -04 · Revisión cada 12 s mientras esta pantalla permanece activa.&lt;/p&gt;&lt;/header&gt;\n
+        &lt;h3&gt;Alertas clínicas · Prioridad primero&lt;/h3&gt;\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;p&gt;Sin alertas pendientes en tu ámbito.&lt;/p&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;        &lt;p&gt;Se muestran hasta 15 alertas, ordenadas por prioridad.&lt;/p&gt;\n
+        &lt;a class="rm-notification-item" href="http://127.0.0.1:8000/admin/alertas-clinicas"&gt;Ver todas las alertas&lt;/a&gt;\n
+        &lt;h3&gt;Medicación · Programación de hoy&lt;/h3&gt;&lt;p&gt;Un horario vencido no indica por sí solo una emergencia clínica.&lt;/p&gt;\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;p&gt;Sin recordatorios de medicación en esta consulta.&lt;/p&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;        &lt;p&gt;Revisar avisos no documenta atención ni administración. Confirma cada intervención en su módulo.&lt;/p&gt;\n
+    &lt;/section&gt;\n
+&lt;/div&gt;\n
+        \n
+        &lt;div class="rm-topbar__settings" x-data="{ settingsOpen: false }"\n
+     @click.outside="settingsOpen = false"\n
+     @keydown.escape.stop="settingsOpen = false; $refs.settingsToggle.focus()"\n
+     x-on:livewire:navigating.window="settingsOpen = false"&gt;\n
+    &lt;button type="button" class="rm-topbar__action" x-ref="settingsToggle"\n
+            @click="settingsOpen = !settingsOpen" :aria-expanded="settingsOpen.toString()"\n
+            aria-label="Configuración de apariencia" aria-controls="topbar-appearance-panel"&gt;\n
+        &lt;i class="ph-bold ph-gear text-xl" aria-hidden="true"&gt;&lt;/i&gt;\n
+    &lt;/button&gt;\n
+    &lt;div id="topbar-appearance-panel" class="rm-topbar__settings-panel"\n
+         x-show="settingsOpen" x-transition.opacity.duration.180ms x-cloak&gt;\n
+        &lt;span class="rm-label"&gt;Apariencia&lt;/span&gt;\n
+        &lt;button type="button" data-theme-toggle\n
+        @click.stop="toggleDarkMode()"\n
+        :aria-pressed="darkMode.toString()"\n
+        :title="darkMode ? 'Activar modo claro' : 'Activar modo oscuro'"\n
+        :aria-label="darkMode ? 'Activar modo claro' : 'Activar modo oscuro'"\n
+        class="rm-topbar__action"&gt;\n
+    &lt;i class="ph-bold ph-moon text-lg rm-topbar__theme-icon--moon" aria-hidden="true"&gt;&lt;/i&gt;\n
+    &lt;i class="ph-bold ph-sun text-lg rm-topbar__theme-icon--sun" aria-hidden="true"&gt;&lt;/i&gt;\n
+&lt;/button&gt;\n
+    &lt;/div&gt;\n
+&lt;/div&gt;\n
+\n
+        \n
+        &lt;div x-data="{ abierto: false }" @click.outside="abierto = false" @keydown.escape.window="if (abierto) { abierto = false; $refs.perfil.focus() }" x-on:livewire:navigating.window="abierto = false" class="relative"&gt;\n
+            &lt;button\n
+                type="button"\n
+                x-ref="perfil"\n
+                @click="abierto = !abierto"\n
+                :aria-expanded="abierto.toString()"\n
+                aria-controls="menu-perfil-sistema"\n
+                class="rm-topbar__profile"\n
+                aria-label="Abrir menú de usuario"&gt;\n
+\n
+                \n
+                &lt;div class="rm-topbar__avatar"&gt;\n
+                    P\n
+                &lt;/div&gt;\n
+\n
+                \n
+                &lt;div class="rm-topbar__profile-copy"&gt;\n
+                    &lt;p class="rm-topbar-user-name max-w-[140px] truncate text-[12px] font-bold text-[var(--rm-text-primary)]"&gt;\n
+                        Profesional\n
+                    &lt;/p&gt;\n
+                    &lt;p class="text-[10px] font-[700] tracking-wider text-[var(--rm-action-primary-ink)] dark:text-[var(--rm-action-primary)] uppercase font-sans"&gt;\n
+                        PSICOLOGO/A\n
+                    &lt;/p&gt;\n
+                &lt;/div&gt;\n
+\n
+                &lt;i class="hidden ph-bold ph-caret-down text-xs text-[var(--rm-text-secondary)] transition-transform duration-200 sm:block"\n
+                   :class="abierto ? 'rotate-180' : ''"&gt;&lt;/i&gt;\n
+            &lt;/button&gt;\n
+\n
+            \n
+            &lt;div\n
+                id="menu-perfil-sistema"\n
+                x-show="abierto"\n
+                x-transition:enter="transition ease-out duration-150"\n
+                x-transition:enter-start="opacity-0 -translate-y-1"\n
+                x-transition:enter-end="opacity-100 translate-y-0"\n
+                x-transition:leave="transition ease-in duration-100"\n
+                x-transition:leave-start="opacity-100 translate-y-0"\n
+                x-transition:leave-end="opacity-0 -translate-y-1"\n
+                x-cloak\n
+                class="absolute right-0 mt-2 w-56 rounded-[var(--rm-radius-lg)] border border-[var(--rm-border-soft)] bg-[var(--rm-surface-main)] p-2 shadow-[var(--rm-shadow-floating)] z-50"&gt;\n
+\n
+        \n
+                                    &lt;a href="http://127.0.0.1:8000/user/profile"\n
+                       class="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-[600] text-[var(--rm-text-primary)] transition hover:bg-[var(--rm-surface-soft)]"&gt;\n
+                        &lt;i class="ph-bold ph-user-circle text-base text-[var(--rm-action-primary)]"&gt;&lt;/i&gt;\n
+                        &lt;span&gt;Mi perfil&lt;/span&gt;\n
+                    &lt;/a&gt;\n
+                \n
+                &lt;form method="POST" action="http://127.0.0.1:8000/logout"&gt;\n
+                    &lt;input type="hidden" name="_token" value="O6KUFDPYoldjmvPJ7G2c21U23GmjrcmIWnq5IhuF" autocomplete="off"&gt;                    &lt;button type="submit"\n
+                            class="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-[700] text-[var(--rm-danger)] transition hover:bg-[var(--rm-danger-soft)] cursor-pointer"&gt;\n
+                        &lt;i class="ph-bold ph-sign-out text-base"&gt;&lt;/i&gt;\n
+                        &lt;span&gt;Cerrar sesión&lt;/span&gt;\n
+                    &lt;/button&gt;\n
+                &lt;/form&gt;\n
+            &lt;/div&gt;\n
+        &lt;/div&gt;\n
+    &lt;/div&gt;\n
+&lt;/header&gt;\n
+\n
+        \n
+                \n
+        \n
+        &lt;main data-rm-main  class="rm-depth-canvas relative min-w-0 min-h-[calc(100vh-60px)] pb-4 pt-4"&gt;\n
+            &lt;div class="mx-auto min-w-0 max-w-[1360px] space-y-4 px-4 pb-4 sm:px-5 animate-fade-in-up"&gt;\n
+                &lt;div wire:snapshot="{&amp;quot;data&amp;quot;:[],&amp;quot;memo&amp;quot;:{&amp;quot;id&amp;quot;:&amp;quot;tcGyvq5u91gJ1nkPrenm&amp;quot;,&amp;quot;name&amp;quot;:&amp;quot;app.frontend.livewire.psicologia.dashboard-psicologo&amp;quot;,&amp;quot;path&amp;quot;:&amp;quot;admin\/psicologia\/dashboard&amp;quot;,&amp;quot;method&amp;quot;:&amp;quot;GET&amp;quot;,&amp;quot;release&amp;quot;:&amp;quot;a-a-a&amp;quot;,&amp;quot;children&amp;quot;:[],&amp;quot;scripts&amp;quot;:[],&amp;quot;assets&amp;quot;:[],&amp;quot;errors&amp;quot;:[],&amp;quot;locale&amp;quot;:&amp;quot;es&amp;quot;,&amp;quot;islands&amp;quot;:[]},&amp;quot;checksum&amp;quot;:&amp;quot;95addec53ffe0b923545d603d95f477594ceab02f73d72b503bb293d272ff8cf&amp;quot;}" wire:effects="{&amp;quot;listeners&amp;quot;:[&amp;quot;evaluacion-geriatrica-guardada&amp;quot;]}" wire:id="tcGyvq5u91gJ1nkPrenm" wire:name="app.frontend.livewire.psicologia.dashboard-psicologo" class="rm-dashboard-composition rm-psychology-dashboard"&gt;\n
+    &lt;header class="rm-dashboard-header" data-accent="psychology"&gt;\n
+    &lt;div class="rm-dashboard-header__content"&gt;\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;        &lt;div class="rm-dashboard-header__ornaments" aria-hidden="true"&gt;\n
+            &lt;span class="rm-dashboard-header__ornament rm-dashboard-header__ornament--care"&gt;\n
+                &lt;svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"&gt;\n
+                    &lt;circle cx="12" cy="6" r="2.5" /&gt;\n
+                    &lt;path d="m12 10-2 8 6 3 3 7M11 14l7 2 4-3M10 18l-4 9M24 17v11m0-11 3-2" /&gt;\n
+                &lt;/svg&gt;\n
+            &lt;/span&gt;\n
+            &lt;span class="rm-dashboard-header__ornament rm-dashboard-header__ornament--medical"&gt;\n
+                &lt;svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"&gt;\n
+                    &lt;path d="M7 5v10a7 7 0 0 0 14 0V5M5 5h4m10 0h4M14 22v1a5 5 0 0 0 10 0v-3" /&gt;\n
+                    &lt;circle cx="25" cy="17" r="2" /&gt;\n
+                &lt;/svg&gt;\n
+            &lt;/span&gt;\n
+        &lt;/div&gt;\n
+        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;        &lt;p class="rm-dashboard-header__eyebrow"&gt;Área de Psicología&lt;/p&gt;\n
+        &lt;div class="rm-dashboard-header__heading"&gt;\n
+            &lt;h1 class="rm-dashboard-header__title"&gt;Buenos días, Profesional&lt;/h1&gt;\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;span class="rm-dashboard-header__role"&gt;&lt;span aria-hidden="true"&gt;&lt;/span&gt;Psicología&lt;/span&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;        &lt;/div&gt;\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;p class="rm-dashboard-header__subtitle"&gt;Consulta tus registros, próximas atenciones y alertas a tu cargo.&lt;/p&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;        &lt;div class="rm-dashboard-header__metadata"&gt;\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;span class="rm-dashboard-header__date"&gt;22 oct. 2026&lt;/span&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;            &lt;span class="rm-dashboard-header__clock" data-time-zone="America/La_Paz"\n
+                x-data="{\n
+                    time: '', timer: null, zone: 'America\/La_Paz',\n
+                    update() { this.time = new Intl.DateTimeFormat('es-BO', { timeZone: this.zone, hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date()) },\n
+                    schedule() { this.timer = setTimeout(() =&gt; { this.update(); this.schedule() }, 60000 - Date.now() % 60000) },\n
+                    init() { this.update(); this.schedule() },\n
+                    destroy() { clearTimeout(this.timer) }\n
+                }"&gt;\n
+                &lt;i class="ph-bold ph-clock" aria-hidden="true"&gt;&lt;/i&gt;\n
+                &lt;span class="sr-only"&gt;Hora actual:&lt;/span&gt;\n
+                &lt;time x-text="time"&gt;11:46&lt;/time&gt;\n
+            &lt;/span&gt;\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;span class="rm-dashboard-header__scope"&gt;Atenciones y valoraciones propias&lt;/span&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;        &lt;/div&gt;\n
+    &lt;/div&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;        &lt;div class="rm-dashboard-header__visual"&gt;\n
+            &lt;img src="http://127.0.0.1:8000/images/FOTOS CENTRO DE ADULTOS MAYORES/558487013_1337134818424437_2282337776297854403_n.jpg" alt="Actividades y acompañamiento de residentes en Los Almendros" decoding="async" loading="eager"&gt;\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;span class="rm-dashboard-header__image-label"&gt;Bienestar emocional&lt;/span&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;        &lt;/div&gt;\n
+    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/header&gt;\n
+&lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;        &lt;section aria-labelledby="psychology-activity-title"&gt;\n
+            &lt;div class="rm-psychology-dashboard__section-heading"&gt;\n
+                &lt;h2 id="psychology-activity-title"&gt;Tu actividad&lt;/h2&gt;\n
+            &lt;/div&gt;\n
+            &lt;div class="rm-dashboard-overview rm-psychology-dashboard__metrics"&gt;\n
+                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;    &lt;section class="rm-card rm-surface--default rm-metric-card rm-metric-card--sky" aria-labelledby="metric-aplicaciones-registradas-5f732a8d"&gt;\r\n
+&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    &lt;div class="rm-metric-card__top"&gt;\r\n
+        &lt;span class="rm-metric-card__icon" aria-hidden="true"&gt;&lt;i class="ph-bold ph-clipboard-text"&gt;&lt;/i&gt;&lt;/span&gt;\r\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    &lt;/div&gt;\r\n
+    &lt;div class="rm-metric-card__body" &gt;\r\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;            &lt;strong class="rm-metric rm-metric-card__value "&gt;0&lt;/strong&gt;\r\n
+            &lt;h2 id="metric-aplicaciones-registradas-5f732a8d" class="rm-card-title rm-metric-card__label"&gt;Aplicaciones registradas&lt;/h2&gt;\r\n
+            &lt;p class="rm-body rm-metric-card__description"&gt;Completas o vigentes · 30 días&lt;/p&gt;\r\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    &lt;/div&gt;\r\n
+&lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;    &lt;/section&gt;\r\n
+&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;    &lt;section class="rm-card rm-surface--default rm-metric-card rm-metric-card--neutral" aria-labelledby="metric-atenciones-de-hoy-afb88e46"&gt;\r\n
+&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    &lt;div class="rm-metric-card__top"&gt;\r\n
+        &lt;span class="rm-metric-card__icon" aria-hidden="true"&gt;&lt;i class="ph-bold ph-calendar-check"&gt;&lt;/i&gt;&lt;/span&gt;\r\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    &lt;/div&gt;\r\n
+    &lt;div class="rm-metric-card__body" &gt;\r\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;            &lt;strong class="rm-metric rm-metric-card__value "&gt;0&lt;/strong&gt;\r\n
+            &lt;h2 id="metric-atenciones-de-hoy-afb88e46" class="rm-card-title rm-metric-card__label"&gt;Atenciones de hoy&lt;/h2&gt;\r\n
+            &lt;p class="rm-body rm-metric-card__description"&gt;Registradas a tu nombre&lt;/p&gt;\r\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    &lt;/div&gt;\r\n
+&lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;    &lt;/section&gt;\r\n
+&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;    &lt;section class="rm-card rm-surface--default rm-metric-card rm-metric-card--neutral" aria-labelledby="metric-alertas-a-tu-cargo-79954ee1"&gt;\r\n
+&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    &lt;div class="rm-metric-card__top"&gt;\r\n
+        &lt;span class="rm-metric-card__icon" aria-hidden="true"&gt;&lt;i class="ph-bold ph-warning-circle"&gt;&lt;/i&gt;&lt;/span&gt;\r\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    &lt;/div&gt;\r\n
+    &lt;div class="rm-metric-card__body" &gt;\r\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;            &lt;strong class="rm-metric rm-metric-card__value "&gt;0&lt;/strong&gt;\r\n
+            &lt;h2 id="metric-alertas-a-tu-cargo-79954ee1" class="rm-card-title rm-metric-card__label"&gt;Alertas a tu cargo&lt;/h2&gt;\r\n
+            &lt;p class="rm-body rm-metric-card__description"&gt;Abiertas o en atención&lt;/p&gt;\r\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    &lt;/div&gt;\r\n
+&lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;    &lt;/section&gt;\r\n
+&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;            &lt;/div&gt;\n
+        &lt;/section&gt;\n
+\n
+        &lt;section aria-labelledby="psychology-analytics-title"&gt;\n
+            &lt;div class="rm-psychology-dashboard__section-heading"&gt;\n
+                &lt;h2 id="psychology-analytics-title"&gt;Actividad de Psicología&lt;/h2&gt;\n
+            &lt;/div&gt;\n
+            &lt;div class="rm-psychology-dashboard__charts"&gt;\n
+                &lt;article class="rm-chart-card rm-psychology-chart" aria-labelledby="psychology-monthly-title"&gt;\n
+                    &lt;header class="rm-chart-header"&gt;\n
+                        &lt;div class="rm-chart-heading"&gt;\n
+                            &lt;h3 id="psychology-monthly-title" class="rm-chart-title"&gt;Seguimiento mensual&lt;/h3&gt;\n
+                            &lt;p class="rm-chart-subtitle"&gt;Últimos seis meses · registros propios&lt;/p&gt;\n
+                        &lt;/div&gt;\n
+                    &lt;/header&gt;\n
+                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                        &lt;div class="rm-empty-state rm-empty-state--compact" role="status"&gt;\n
+    &lt;div class="rm-empty-state-icon"&gt;\n
+        &lt;i class="ph-bold ph-chart-line-up text-3xl " aria-hidden="true"&gt;&lt;/i&gt;\n
+    &lt;/div&gt;\n
+    &lt;h3 class="rm-empty-state-title"&gt;Sin actividad registrada en este período&lt;/h3&gt;\n
+    &lt;p class="rm-empty-state-text"&gt;Aquí aparecerán las atenciones finalizadas y aplicaciones completas o vigentes.&lt;/p&gt;\n
+\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/div&gt;\r\n
+                    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                    &lt;details class="rm-psychology-chart__data"&gt;\n
+                        &lt;summary&gt;Ver cifras por mes&lt;/summary&gt;\n
+                        &lt;table&gt;&lt;caption class="sr-only"&gt;Actividad mensual propia de Psicología&lt;/caption&gt;\n
+                            &lt;thead&gt;&lt;tr&gt;&lt;th scope="col"&gt;Mes&lt;/th&gt;&lt;th scope="col"&gt;Atenciones&lt;/th&gt;&lt;th scope="col"&gt;Aplicaciones&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;\n
+                            &lt;tbody&gt;&lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                &lt;tr&gt;&lt;th scope="row"&gt;May. 2026&lt;/th&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;\n
+                                                            &lt;tr&gt;&lt;th scope="row"&gt;Jun. 2026&lt;/th&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;\n
+                                                            &lt;tr&gt;&lt;th scope="row"&gt;Jul. 2026&lt;/th&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;\n
+                                                            &lt;tr&gt;&lt;th scope="row"&gt;Ago. 2026&lt;/th&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;\n
+                                                            &lt;tr&gt;&lt;th scope="row"&gt;Sep. 2026&lt;/th&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;\n
+                                                            &lt;tr&gt;&lt;th scope="row"&gt;Oct. 2026&lt;/th&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;\n
+                            &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/tbody&gt;\n
+                        &lt;/table&gt;\n
+                    &lt;/details&gt;\n
+                &lt;/article&gt;\n
+\n
+                &lt;article class="rm-chart-card rm-psychology-chart" aria-labelledby="psychology-instruments-title"&gt;\n
+                    &lt;header class="rm-chart-header"&gt;\n
+                        &lt;div class="rm-chart-heading"&gt;\n
+                            &lt;h3 id="psychology-instruments-title" class="rm-chart-title"&gt;Instrumentos utilizados&lt;/h3&gt;\n
+                            &lt;p class="rm-chart-subtitle"&gt;Últimos seis meses · aplicaciones completas o vigentes&lt;/p&gt;\n
+                        &lt;/div&gt;\n
+                    &lt;/header&gt;\n
+                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                        &lt;div class="rm-empty-state rm-empty-state--compact" role="status"&gt;\n
+    &lt;div class="rm-empty-state-icon"&gt;\n
+        &lt;i class="ph-bold ph-chart-donut text-3xl " aria-hidden="true"&gt;&lt;/i&gt;\n
+    &lt;/div&gt;\n
+    &lt;h3 class="rm-empty-state-title"&gt;Aún no hay aplicaciones completas o vigentes&lt;/h3&gt;\n
+    &lt;p class="rm-empty-state-text"&gt;Cuando se registren, aquí verás qué instrumentos se han utilizado.&lt;/p&gt;\n
+\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/div&gt;\r\n
+                    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                    &lt;details class="rm-psychology-chart__data"&gt;\n
+                        &lt;summary&gt;Ver cantidades por instrumento&lt;/summary&gt;\n
+                        &lt;table&gt;&lt;caption class="sr-only"&gt;Aplicaciones completas o vigentes por instrumento&lt;/caption&gt;\n
+                            &lt;thead&gt;&lt;tr&gt;&lt;th scope="col"&gt;Instrumento&lt;/th&gt;&lt;th scope="col"&gt;Aplicaciones&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;\n
+                            &lt;tbody&gt;&lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/tbody&gt;\n
+                        &lt;/table&gt;\n
+                    &lt;/details&gt;\n
+                &lt;/article&gt;\n
+            &lt;/div&gt;\n
+        &lt;/section&gt;\n
+\n
+        &lt;section aria-labelledby="psychology-followup-title"&gt;\n
+            &lt;div class="rm-psychology-dashboard__section-heading"&gt;\n
+                &lt;h2 id="psychology-followup-title"&gt;Pendientes y registros recientes&lt;/h2&gt;\n
+            &lt;/div&gt;\n
+            &lt;div class="rm-dashboard-data-grid rm-psychology-dashboard__panels"&gt;\n
+                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                    &lt;section class="rm-dashboard-data-panel rm-dashboard-data-panel--normal" aria-label="Próximas atenciones"&gt;\n
+    &lt;div class="rm-dashboard-data-panel__heading"&gt;\n
+        &lt;span class="rm-dashboard-data-panel__icon" aria-hidden="true"&gt;&lt;i class="ph-bold ph-calendar-check"&gt;&lt;/i&gt;&lt;/span&gt;\n
+        &lt;div class="rm-dashboard-data-panel__heading-copy"&gt;\n
+            &lt;h2&gt;Próximas atenciones&lt;/h2&gt;\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;        &lt;/div&gt;\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    &lt;/div&gt;\n
+\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;        &lt;div class="rm-empty-state rm-empty-state--compact" role="status"&gt;\n
+    &lt;div class="rm-empty-state-icon"&gt;\n
+        &lt;i class="ph-bold ph-calendar-check text-3xl " aria-hidden="true"&gt;&lt;/i&gt;\n
+    &lt;/div&gt;\n
+    &lt;h3 class="rm-empty-state-title"&gt;Sin datos por mostrar&lt;/h3&gt;\n
+    &lt;p class="rm-empty-state-text"&gt;No hay atenciones futuras registradas a tu nombre.&lt;/p&gt;\n
+\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/div&gt;\r\n
+    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/section&gt;\n
+                &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                &lt;section class="rm-dashboard-data-panel rm-psychology-recent" aria-labelledby="psychology-recent-title"&gt;\n
+                    &lt;div class="rm-dashboard-data-panel__heading"&gt;\n
+                        &lt;span class="rm-dashboard-data-panel__icon" aria-hidden="true"&gt;&lt;i class="ph-bold ph-clipboard-text"&gt;&lt;/i&gt;&lt;/span&gt;\n
+                        &lt;div class="rm-dashboard-data-panel__heading-copy"&gt;&lt;h2 id="psychology-recent-title"&gt;Aplicaciones recientes&lt;/h2&gt;&lt;/div&gt;\n
+                    &lt;/div&gt;\n
+                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                        &lt;div class="rm-empty-state rm-empty-state--compact" role="status"&gt;\n
+    &lt;div class="rm-empty-state-icon"&gt;\n
+        &lt;i class="ph-bold ph-clipboard-text text-3xl " aria-hidden="true"&gt;&lt;/i&gt;\n
+    &lt;/div&gt;\n
+    &lt;h3 class="rm-empty-state-title"&gt;Sin aplicaciones recientes&lt;/h3&gt;\n
+    &lt;p class="rm-empty-state-text"&gt;Aún no hay aplicaciones completas o vigentes a tu nombre.&lt;/p&gt;\n
+\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/div&gt;\r\n
+                    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                &lt;/section&gt;\n
+            &lt;/div&gt;\n
+        &lt;/section&gt;\n
+\n
+        &lt;section class="rm-psychology-areas" aria-labelledby="psychology-areas-title"&gt;\n
+            &lt;h2 id="psychology-areas-title"&gt;Áreas de valoración&lt;/h2&gt;\n
+            &lt;div class="rm-psychology-areas__links rm-psychology-areas__links--four"&gt;\n
+                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                    &lt;a href="http://127.0.0.1:8000/admin/psicologia/evaluacion/cognitiva" wire:navigate&gt;&lt;i class="ph-bold ph-brain" aria-hidden="true"&gt;&lt;/i&gt;&lt;span&gt;Cognitiva&lt;/span&gt;&lt;i class="ph-bold ph-arrow-up-right" aria-hidden="true"&gt;&lt;/i&gt;&lt;/a&gt;\n
+                                    &lt;a href="http://127.0.0.1:8000/admin/psicologia/evaluacion/afectiva" wire:navigate&gt;&lt;i class="ph-bold ph-heart" aria-hidden="true"&gt;&lt;/i&gt;&lt;span&gt;Afectiva y emocional&lt;/span&gt;&lt;i class="ph-bold ph-arrow-up-right" aria-hidden="true"&gt;&lt;/i&gt;&lt;/a&gt;\n
+                                    &lt;a href="http://127.0.0.1:8000/admin/psicologia/evaluacion/funcionamiento" wire:navigate&gt;&lt;i class="ph-bold ph-person-simple-walk" aria-hidden="true"&gt;&lt;/i&gt;&lt;span&gt;Funcionamiento&lt;/span&gt;&lt;i class="ph-bold ph-arrow-up-right" aria-hidden="true"&gt;&lt;/i&gt;&lt;/a&gt;\n
+                                    &lt;a href="http://127.0.0.1:8000/admin/psicologia/evaluacion/entorno" wire:navigate&gt;&lt;i class="ph-bold ph-users-four" aria-hidden="true"&gt;&lt;/i&gt;&lt;span&gt;Entorno y red social&lt;/span&gt;&lt;i class="ph-bold ph-arrow-up-right" aria-hidden="true"&gt;&lt;/i&gt;&lt;/a&gt;\n
+                &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;            &lt;/div&gt;\n
+        &lt;/section&gt;\n
+\n
+    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/div&gt;\n
+            &lt;/div&gt;\n
+        &lt;/main&gt;\n
+    &lt;/div&gt;\n
+\n
+    &lt;div class="rm-cursor-glow" aria-hidden="true"&gt;&lt;/div&gt;\n
+    &lt;script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"&gt;&lt;/script&gt;\n
+&lt;script&gt;\n
+document.addEventListener('DOMContentLoaded', function () {\n
+ const Toast = Swal.mixin({\n
+ toast: true,\n
+ position: 'top-end',\n
+ showConfirmButton: false,\n
+ showCloseButton: true,\n
+ closeButtonAriaLabel: 'Cerrar notificación',\n
+ customClass: { popup: 'rm-toast' },\n
+ showClass: { popup: 'rm-toast-show' },\n
+ hideClass: { popup: 'rm-toast-hide' },\n
+ timer: 4000,\n
+ timerProgressBar: false,\n
+ didOpen: (toast) =&gt; {\n
+ toast.setAttribute('role', 'status');\n
+ toast.setAttribute('aria-live', toast.querySelector('.swal2-icon.swal2-error') ? 'assertive' : 'polite');\n
+ toast.addEventListener('mouseenter', Swal.stopTimer)\n
+ toast.addEventListener('mouseleave', Swal.resumeTimer)\n
+ toast.addEventListener('focusin', Swal.stopTimer)\n
+ toast.addEventListener('focusout', Swal.resumeTimer)\n
+ }\n
+ });\n
+\n
+ // Tema de CENTRO GERIÁTRICO JARDÍN DE LOS RECUERDOS para alertas (botones color #BC6C25)\n
+ const swalAmandita = Swal.mixin({\n
+ confirmButtonColor: '#8FA17F',\n
+ cancelButtonColor: '#C6B5A5',\n
+ iconColor: '#8FA17F',\n
+ focusConfirm: false,\n
+ });\n
+\n
+ window.SwalToast = {\n
+ fire(options) {\n
+ const icon = options?.icon || 'info';\n
+ const duration = { success: 4000, info: 4000, warning: 5500, error: 6000 };\n
+ return Toast.fire({ ...options, timer: options?.timer ?? duration[icon] ?? 4000 });\n
+ }\n
+ };\n
+ window.SwalAmandita = swalAmandita;\n
+\n
+ \n
+ \n
+ \n
+ \n
+ \n
+ // Escuchar eventos de Livewire 3\n
+ window.addEventListener('rm-toast', function(event) {\n
+ const data = event.detail?.[0] || event.detail || {};\n
+ window.SwalToast.fire({ icon: data.icon || 'info', title: data.title || data.message || '' });\n
+ });\n
+\n
+ window.addEventListener('swal', function(event) {\n
+ const data = event.detail[0] || event.detail; // Livewire 3 a veces pasa los datos como el primer elemento del array\n
+ window.SwalAmandita.fire({\n
+ icon: data.icon || 'success',\n
+ title: data.title || 'Éxito',\n
+ text: data.text || '',\n
+ });\n
+ });\n
+\n
+ // Escuchar el evento de post-registro interactivo\n
+ window.addEventListener('mostrar-post-registro', function(event) {\n
+ const data = event.detail[0] || event.detail;\n
+\n
+ let credentialsHtml = '';\n
+ if (data.credenciales_enviadas) {\n
+ credentialsHtml = `\n
+ &lt;div class="mt-2 text-xs rm-badge-success text-left flex items-start gap-2 p-3 rounded-xl border border-borde-suave"&gt;\n
+ &lt;i class="ph-bold ph-check-circle text-base mt-0.5 flex-shrink-0"&gt;&lt;/i&gt;\n
+ &lt;div&gt;\n
+ &lt;strong&gt;Credenciales enviadas:&lt;/strong&gt; Las credenciales de acceso se enviaron correctamente a &lt;span class="font-black"&gt;${data.email}&lt;/span&gt;.\n
+ &lt;/div&gt;\n
+ &lt;/div&gt;\n
+ `;\n
+ } else {\n
+ credentialsHtml = `\n
+ &lt;div class="mt-2 text-xs rm-badge-danger text-left flex flex-col gap-2 p-3 rounded-xl border border-borde-suave"&gt;\n
+ &lt;div class="flex items-start gap-2"&gt;\n
+ &lt;i class="ph-bold ph-warning-circle text-base mt-0.5 flex-shrink-0"&gt;&lt;/i&gt;\n
+ &lt;div&gt;\n
+ &lt;strong&gt;Error de entrega:&lt;/strong&gt; No se pudo enviar el correo de credenciales.\n
+ &lt;/div&gt;\n
+ &lt;/div&gt;\n
+ &lt;div class="bg-fondo-panel border border-borde-suave rounded-lg p-2 flex items-center justify-between"&gt;\n
+ &lt;span class="font-bold text-titulo"&gt;Clave Temporal:&lt;/span&gt;\n
+ &lt;code class="bg-fondo-input border border-borde-suave px-2 py-0.5 rounded text-xs font-bold select-all text-boton-acento"&gt;${data.password_temporal}&lt;/code&gt;\n
+ &lt;/div&gt;\n
+ &lt;/div&gt;\n
+ `;\n
+ }\n
+\n
+ const htmlContent = `\n
+ &lt;div class="text-left"&gt;\n
+ &lt;div class="bg-fondo-panel border border-borde-suave rounded-xl p-3.5 mb-3 text-left"&gt;\n
+ &lt;span class="text-xs text-meta font-black uppercase tracking-wide block mb-0.5"&gt;Colaborador&lt;/span&gt;\n
+ &lt;strong class="text-sm text-titulo"&gt;${data.nombre}&lt;/strong&gt;\n
+ &lt;/div&gt;\n
+\n
+ ${credentialsHtml}\n
+\n
+ &lt;div class="mt-4 border-t border-borde pt-3"&gt;\n
+ &lt;span class="text-xs text-meta font-black uppercase tracking-wide block mb-2"&gt;Acciones Sugeridas Post-Registro&lt;/span&gt;\n
+ &lt;div class="grid grid-cols-2 gap-2"&gt;\n
+ &lt;a href="/admin/usuarios/${data.usuario_id}?tab=documentacion" class="flex flex-col justify-between gap-1.5 rounded-xl border border-borde-suave bg-fondo-card p-2.5 text-left transition hover:border-borde-focus hover:bg-fondo-hover group"&gt;\n
+ &lt;span class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-titulo"&gt;\n
+ &lt;i class="ph-bold ph-folder-lock text-boton-acento text-sm"&gt;&lt;/i&gt; Documentos\n
+ &lt;/span&gt;\n
+ &lt;span class="text-xs text-apoyo font-bold leading-tight"&gt;Expediente y requisitos del rol&lt;/span&gt;\n
+ &lt;/a&gt;\n
+\n
+ &lt;a href="/admin/usuarios/${data.usuario_id}?tab=horarios" class="flex flex-col justify-between gap-1.5 rounded-xl border border-borde-suave bg-fondo-card p-2.5 text-left transition hover:border-borde-focus hover:bg-fondo-hover group"&gt;\n
+ &lt;span class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-titulo"&gt;\n
+ &lt;i class="ph-bold ph-calendar-check text-boton-acento text-sm"&gt;&lt;/i&gt; Horarios\n
+ &lt;/span&gt;\n
+ &lt;span class="text-xs text-apoyo font-bold leading-tight"&gt;Planificar turnos y jornada&lt;/span&gt;\n
+ &lt;/a&gt;\n
+\n
+ &lt;a href="/admin/usuarios/${data.usuario_id}" class="flex flex-col justify-between gap-1.5 rounded-xl border border-borde-suave bg-fondo-card p-2.5 text-left transition hover:border-borde-focus hover:bg-fondo-hover group"&gt;\n
+ &lt;span class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-titulo"&gt;\n
+ &lt;i class="ph-bold ph-user-focus text-boton-acento text-sm"&gt;&lt;/i&gt; Ver Ficha\n
+ &lt;/span&gt;\n
+ &lt;span class="text-xs text-apoyo font-bold leading-tight"&gt;Perfil general e institucional&lt;/span&gt;\n
+ &lt;/a&gt;\n
+\n
+ &lt;a href="/admin/usuarios/${data.usuario_id}/ficha/pdf" target="_blank" class="flex flex-col justify-between gap-1.5 rounded-xl border border-borde-suave bg-fondo-card p-2.5 text-left transition hover:border-borde-focus hover:bg-fondo-hover group"&gt;\n
+ &lt;span class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-titulo"&gt;\n
+ &lt;i class="ph-bold ph-file-pdf text-boton-acento text-sm"&gt;&lt;/i&gt; Imprimir Ficha\n
+ &lt;/span&gt;\n
+ &lt;span class="text-xs text-apoyo font-bold leading-tight"&gt;Descargar PDF del expediente&lt;/span&gt;\n
+ &lt;/a&gt;\n
+\n
+ &lt;button onclick="window.enviarFichaEmail('${data.usuario_id}')" class="col-span-2 flex items-center justify-center gap-2 rounded-xl border border-borde-suave bg-fondo-card p-2.5 text-center transition hover:border-borde-focus hover:bg-fondo-hover group"&gt;\n
+ &lt;i class="ph-bold ph-paper-plane-tilt text-boton-acento text-base group-hover:scale-110 transition-transform"&gt;&lt;/i&gt;\n
+ &lt;div class="text-left"&gt;\n
+ &lt;span class="block text-xs font-bold uppercase tracking-wide text-titulo"&gt;Enviar Ficha por Correo&lt;/span&gt;\n
+ &lt;span class="block text-xs text-apoyo font-bold leading-none"&gt;Envía expediente firmado en PDF al colaborador&lt;/span&gt;\n
+ &lt;/div&gt;\n
+ &lt;/button&gt;\n
+ &lt;/div&gt;\n
+ &lt;/div&gt;\n
+ &lt;/div&gt;\n
+ `;\n
+\n
+ window.SwalAmandita.fire({\n
+ title: '¡Usuario Registrado Exitosamente!',\n
+ html: htmlContent,\n
+ icon: 'success',\n
+ showConfirmButton: true,\n
+ confirmButtonText: '&lt;i class="ph-bold ph-arrow-left mr-1"&gt;&lt;/i&gt; Volver a Usuarios',\n
+ confirmButtonColor: '#2F3E5C',\n
+ customClass: {\n
+ title: 'text-lg font-extrabold text-titulo pt-4',\n
+ popup: 'rounded-2xl border border-borde-suave bg-fondo-panel shadow-modal'\n
+ }\n
+ });\n
+ });\n
+\n
+ // Función global para enviar ficha por correo\n
+ window.enviarFichaEmail = function(usuarioId) {\n
+ window.SwalToast.fire({\n
+ icon: 'info',\n
+ title: 'Encolando solicitud de envío...'\n
+ });\n
+\n
+ fetch(`/admin/usuarios/${usuarioId}/ficha/enviar-correo`, {\n
+ method: 'POST',\n
+ headers: {\n
+ 'Content-Type': 'application/json',\n
+ 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')\n
+ }\n
+ })\n
+ .then(response =&gt; response.json())\n
+ .then(data =&gt; {\n
+ if (data.success) {\n
+ window.SwalToast.fire({\n
+ icon: 'success',\n
+ title: data.message\n
+ });\n
+ } else {\n
+ window.SwalToast.fire({\n
+ icon: 'error',\n
+ title: data.message || 'Error al procesar la solicitud'\n
+ });\n
+ }\n
+ })\n
+ .catch(error =&gt; {\n
+ console.error('Error:', error);\n
+ window.SwalToast.fire({\n
+ icon: 'error',\n
+ title: 'Error de conexión con el servidor.'\n
+ });\n
+ });\n
+ };\n
+ });\n
+\n
+ // Función global para confirmaciones con SweetAlert2\n
+ window.confirmarAccion = function(event, titulo, texto = 'Esta acción quedará registrada en el historial institucional.', confirmText = 'Sí, confirmar') {\n
+ event.preventDefault();\n
+ const form = event.target || event.currentTarget;\n
+\n
+ window.SwalAmandita.fire({\n
+ title: titulo,\n
+ text: texto,\n
+ icon: 'warning',\n
+ showCancelButton: true,\n
+ confirmButtonText: confirmText,\n
+ cancelButtonText: 'Cancelar'\n
+ }).then((result) =&gt; {\n
+ if (result.isConfirmed) {\n
+ // Evitar doble submit\n
+ const submitBtn = form.querySelector('button[type="submit"]');\n
+ if (submitBtn) {\n
+ const originalContent = submitBtn.innerHTML;\n
+ submitBtn.disabled = true;\n
+ submitBtn.innerHTML = '&lt;i class="ph-bold ph-spinner animate-spin mr-1"&gt;&lt;/i&gt; Procesando...';\n
+ submitBtn.classList.add('opacity-75', 'cursor-not-allowed');\n
+ }\n
+ form.submit();\n
+ }\n
+ });\n
+ };\n
+\n
+ // Función para prevenir doble envío en formularios estándar\n
+ window.procesarFormulario = function(event) {\n
+ const form = event.target || event.currentTarget;\n
+ const submitBtns = document.querySelectorAll('button[type="submit"][form="' + form.id + '"], ' + '#' + form.id + ' button[type="submit"]');\n
+\n
+ submitBtns.forEach(btn =&gt; {\n
+ btn.disabled = true;\n
+ btn.innerHTML = '&lt;i class="ph-bold ph-spinner animate-spin mr-1"&gt;&lt;/i&gt; Guardando...';\n
+ btn.classList.add('opacity-75', 'cursor-not-allowed');\n
+ });\n
+ };\n
+\n
+&lt;/script&gt;\n
+\n
+    \n
+    &lt;script src="http://127.0.0.1:8000/livewire-11c23b56/livewire.min.js?rm_ui=20261003&amp;id=0ae8dee3"   data-csrf="O6KUFDPYoldjmvPJ7G2c21U23GmjrcmIWnq5IhuF" data-module-url="http://127.0.0.1:8000/livewire-11c23b56" data-update-uri="http://127.0.0.1:8000/livewire-11c23b56/update" data-navigate-once="true"&gt;&lt;/script&gt;\n
+&lt;div data-rm-access-rejection hidden class="fixed inset-x-4 top-4 z-[var(--rm-z-toast)] mx-auto max-w-xl shadow-[var(--rm-shadow-lg)]"&gt;\n
+    &lt;div class="rm-alert rm-alert-warning" role="alert"&gt;\r\n
+    &lt;i class="ph-bold ph-warning rm-alert-icon" aria-hidden="true"&gt;&lt;/i&gt;\r\n
+    &lt;div class="rm-alert-content"&gt;\r\n
+                    &lt;p class="rm-alert-title"&gt;Solicitud rechazada&lt;/p&gt;\r\n
+                &lt;div class="rm-alert-desc rm-alert-description"&gt;&lt;p&gt;El servidor no autorizó esta solicitud. Si estabas guardando, el resultado no está confirmado. Revisa tu acceso antes de intentarlo de nuevo.&lt;/p&gt;\n
+        &lt;p class="mt-2 text-xs"&gt;Al volver al inicio perderás los cambios sin guardar.&lt;/p&gt;\n
+        &lt;a data-rm-access-home href="http://127.0.0.1:8000/dashboard" class="rm-btn-secondary mt-3 inline-flex min-h-10 items-center px-3"&gt;\n
+            Volver a mi inicio\n
+        &lt;/a&gt;&lt;/div&gt;\r\n
+    &lt;/div&gt;\r\n
+&lt;/div&gt;\r\n
+&lt;/div&gt;\n
+        &lt;/body&gt;\n
+\n
+&lt;/html&gt;\n
+' [UTF-8](length: 72439) contains "Abrir sistema experto" [ASCII](length: 21).
+&#13;
+C:\Users\CARLAENCINAS\Desktop\RememberMind\vendor\laravel\framework\src\Illuminate\Testing\TestResponseAssert.php:46
+C:\Users\CARLAENCINAS\Desktop\RememberMind\vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:720
+C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\NavegacionSistemaExpertoTest.php:50</failure>
+        </testcase>
+        <testcase name="test_medicina_consulta_resultados_y_abre_valoracion_desde_ficha" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\NavegacionSistemaExpertoTest.php" line="82" class="Tests\Feature\NavegacionSistemaExpertoTest" classname="Tests.Feature.NavegacionSistemaExpertoTest" assertions="6" time="2.850012"/>
+        <testcase name="test_visitante_y_superadministracion_no_acceden_a_entrada_de_captura_clinica" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\NavegacionSistemaExpertoTest.php" line="97" class="Tests\Feature\NavegacionSistemaExpertoTest" classname="Tests.Feature.NavegacionSistemaExpertoTest" assertions="2" time="2.630556"/>
+        <testcase name="test_cuenta_inactiva_o_sin_personal_competente_no_recibe_el_listado" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\NavegacionSistemaExpertoTest.php" line="106" class="Tests\Feature\NavegacionSistemaExpertoTest" classname="Tests.Feature.NavegacionSistemaExpertoTest" assertions="2" time="2.578812"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -157,7 +157,7 @@ final class PaqueteObservacional implements ConocimientoObservacional
     private function fila(string $tabla, array $clave, array $datos, bool $crear): string
     {
         $pk = CatalogoCodigos::clave($tabla);
-        $filas = DB::table($tabla)->where($clave)->get();
+        $filas = \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta($tabla)->where($clave)->get();
         if ($filas->count() > 1) {
             throw new DomainException('Identidad observacional ambigua.');
         }
@@ -175,7 +175,7 @@ final class PaqueteObservacional implements ConocimientoObservacional
             throw new DomainException('Conocimiento observacional incompleto.');
         }
         $id = app(CodigosEntidad::class)->siguiente($tabla);
-        DB::table($tabla)->insert([$pk => $id] + $clave + $datos);
+        \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::insertar($tabla, [$pk => $id] + $clave + $datos);
 
         return $id;
     }

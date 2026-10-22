@@ -10,7 +10,7 @@
 <section class="rm-card rm-expert-clinical-block" aria-labelledby="requisitos-conservados-titulo">
     <h2 id="requisitos-conservados-titulo" class="rm-expert-section-title">Requisitos considerados en la evaluación</h2>
     @if(isset($narrativa['fecha_corte']))
-        <p class="text-sm mt-2">Información considerada hasta: {{ $narrativa['fecha_corte'] }}</p>
+        <p class="text-sm mt-2">Información considerada hasta el {{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($narrativa['fecha_corte']) }}.</p>
     @endif
     <dl class="space-y-4 mt-4">
         @foreach($narrativa['requisitos'] as $requisito)

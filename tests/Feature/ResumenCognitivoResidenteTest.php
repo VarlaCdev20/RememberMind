@@ -297,7 +297,8 @@ class ResumenCognitivoResidenteTest extends TestCase
             'cod_mapeo_variable_fuente' => 'MAP_INS', 'cod_registro_fuente' => 'APP_SINTETICA', 'estado_representacion' => 'MAPEADO',
             'cod_valor_semantico' => 'VAL_A', 'estado_admisibilidad' => 'ADMISIBLE']);
         $this->insertar('evidencias_criterio_evaluacion', ['cod_evidencia_criterio' => 'EP_F3', 'cod_evaluacion_criterio' => 'EC_F3',
-            'cod_evidencia_evaluacion' => 'EV_F3', 'rol_en_criterio' => 'INSTRUMENTAL', 'estado_participacion' => 'UTILIZADA']);
+            'cod_evidencia_evaluacion' => 'EV_F3', 'rol_en_criterio' => 'INSTRUMENTAL', 'estado_participacion' => 'UTILIZADA',
+            'fecha_hora_vinculacion' => now()->subDay()->format('Y-m-d H:i:s')]);
         $this->insertar('evaluaciones_reglas', ['cod_evaluacion_regla' => 'ER_F3', 'cod_traza_inferencia' => 'TR_F3', 'cod_regla_experta' => 'RULE_A', 'estado_regla' => 'CUMPLE']);
         $this->insertar('evaluaciones_condiciones_regla', ['cod_evaluacion_condicion' => 'CV_F3', 'cod_evaluacion_regla' => 'ER_F3', 'cod_condicion_regla' => 'COND_A', 'estado_condicion' => 'CUMPLE']);
         $this->insertar('evidencias_soporte_condicion', ['cod_evidencia_soporte_condicion' => 'SUP_F3', 'cod_evaluacion_condicion' => 'CV_F3', 'cod_evidencia_evaluacion' => 'EV_F3']);

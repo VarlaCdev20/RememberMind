@@ -5,7 +5,7 @@ namespace Tests\Support;
 use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos;
 use Illuminate\Support\Facades\Schema;
 use MotorExperto\adaptadores\entrada\EjemploTecnicoCOGMEM;
 
@@ -71,7 +71,19 @@ final class InformeCognitivoFixture
         if (! app()->environment('testing')) {
             throw new \LogicException('La fixture no se utiliza fuera de testing.');
         }
-        foreach (Schema::getColumns($tabla) as $columna) {
+        $bloque = BloquesExpertos::DEFINICIONES[$tabla] ?? null;
+        $columnas = Schema::getColumns($bloque['tabla'] ?? $tabla);
+        if ($bloque !== null) {
+            $porNombre = array_column($columnas, null, 'name');
+            $columnas = [];
+            foreach ($bloque['campos'] as $logico => $fisico) {
+                $columna = $porNombre[$fisico];
+                $columna['name'] = $logico;
+                $columna['nullable'] = in_array($logico, ['observacion', 'cod_nodo_propietario_primario', 'cod_dominio_valores', 'justificacion_original', 'fecha_hora_fin', 'patron_candidato', 'funcionalidad_revisor_sintetico_id'], true);
+                $columnas[] = $columna;
+            }
+        }
+        foreach ($columnas as $columna) {
             $nombre = $columna['name'];
             if (array_key_exists($nombre, $fila) || $columna['default'] !== null) {
                 continue;
@@ -80,6 +92,6 @@ final class InformeCognitivoFixture
                 : (str_contains($columna['type_name'], 'time') || str_contains($columna['type_name'], 'date')
                     ? now()->subDay()->format('Y-m-d H:i:s') : 'F4_'.reset($fila)));
         }
-        DB::table($tabla)->insert($fila);
+        BloquesExpertos::insertar($tabla, $fila);
     }
 }

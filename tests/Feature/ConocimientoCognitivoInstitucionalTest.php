@@ -488,7 +488,7 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         Storage::disk('local')->put('original-sintetico.txt', 'Protocolo original sintético.');
         $documento = DocumentoClinico::create(['cod_residente' => $this->residente->getKey(), 'cod_personal' => $this->usuario->personal->getKey(),
             'tipo_documento' => 'INFORME', 'titulo' => 'Original de prueba', 'ruta_archivo' => 'original-sintetico.txt', 'formato' => 'text/plain',
-            'hash_archivo' => hash('sha256', 'Protocolo original sintético.'), 'fecha_hora' => now(), 'estado' => 'VIGENTE']);
+            'hash_archivo' => hash('sha256', 'Protocolo original sintético.'), 'fecha_hora' => now()->subSecond(), 'estado' => 'VIGENTE']);
         DB::table('aplicaciones_instrumento')->where('cod_aplicacion', $this->aplicacion)
             ->update(['cod_documento_clinico' => $documento->getKey(), 'localizador_fuente' => 'Página 1 / C1']);
         $corte = CarbonImmutable::parse('2026-10-19T11:59:59.123456-04:00');
@@ -510,6 +510,26 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         $evidencia = array_values(array_filter($traza['evidencias'], fn ($e) => $e['id'] === $ruta['evidencia']))[0];
         self::assertSame($p, $evidencia['procedencia_instrumental']);
         self::assertStringNotContainsString('ruta_archivo', serialize($p));
+    }
+
+    public function test_documento_posterior_al_corte_no_respalda_inferencia_ni_replay(): void
+    {
+        $this->usuario->givePermissionTo('documentos_clinicos.ver');
+        Storage::fake('local');
+        Storage::disk('local')->put('posterior.txt', 'Original sintético posterior.');
+        $documento = DocumentoClinico::create(['cod_residente' => $this->residente->getKey(), 'cod_personal' => $this->usuario->personal->getKey(),
+            'tipo_documento' => 'INFORME', 'titulo' => 'Original posterior', 'ruta_archivo' => 'posterior.txt', 'formato' => 'text/plain',
+            'hash_archivo' => hash('sha256', 'Original sintético posterior.'), 'fecha_hora' => now(), 'estado' => 'VIGENTE']);
+        DB::table('aplicaciones_instrumento')->where('cod_aplicacion', $this->aplicacion)
+            ->update(['cod_documento_clinico' => $documento->getKey(), 'localizador_fuente' => 'Página 1']);
+        $corte = CarbonImmutable::now()->subMicrosecond();
+        $capturas = app(CapturasInstrumentalesResidente::class)->consultar($this->usuario, $this->residente, $corte);
+        self::assertSame('ORIGINAL_NO_VERIFICABLE', $capturas['capturas'][0]['procedencia']['estado_documento']);
+        self::assertContains('ORIGINAL_NO_VERIFICABLE', $capturas['capturas'][0]['motivos']);
+        $r = app(ConsultarConocimientoCognitivo::class)->consultar($this->usuario, $this->residente, $corte);
+        self::assertSame([], $r['resultado']['perfil']['COG-ATE']['conclusiones_candidatas']);
+        self::assertFalse($r['persistido']);
+        self::assertSame(0, DB::table('evaluaciones_expertas')->count());
     }
 
     public function test_pregunta_declarativa_sin_respuesta_conserva_definicion_y_ausencia(): void
@@ -590,7 +610,7 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
     {
         $mapa = DB::table('mapeos_variables_fuente')->where('cod_version_modelo', $this->version)
             ->where('clave_selector', $this->primeraPregunta)->sole();
-        $variable = DB::table('variables_expertas as v')->join('nodos_semanticos as n', 'n.cod_nodo_semantico', '=', 'v.cod_nodo_semantico')
+        $variable = DB::table('nodos_semanticos as v')->join('nodos_semanticos as n', 'n.cod_nodo_semantico', '=', 'v.cod_nodo_semantico')
             ->where('v.cod_version_modelo', $this->version)->where('n.codigo_semantico', 'VAR-MEM-INST-01')->sole();
         $valor = DB::table('valores_semanticos as v')->join('dominios_valores_expertos as d', 'd.cod_dominio_valores', '=', 'v.cod_dominio_valores')
             ->where('d.cod_version_modelo', $this->version)->where('v.codigo_valor', 'TEST_A')->sole();
@@ -685,10 +705,12 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
     public function test_permiso_fuente_retirado_no_devuelve_datos(): void
     {
         $this->usuario->roles()->sole()->revokePermissionTo('respuestas_instrumento.ver');
-        $r = $this->consultar();
-        self::assertFalse($r['disponible']);
-        self::assertSame('ACCESO_A_FUENTES_NO_DISPONIBLE', $r['motivo']);
-        self::assertArrayNotHasKey('resultado', $r);
+        try {
+            $this->consultar();
+            self::fail('No debe responder con una evaluación parcial tras revocar la fuente.');
+        } catch (HttpException $e) {
+            self::assertSame(403, $e->getStatusCode());
+        }
     }
 
     public function test_version_sin_vigencia_no_usa_fallback_al_laboratorio(): void
@@ -746,7 +768,7 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         self::assertStringContainsString('Dificultad documentada', $html);
         self::assertStringContainsString('R-ATE-S01-P01', $html);
         self::assertStringContainsString('Sin soporte coincidente en una misma aplicación', $html);
-        self::assertSame(0, DB::table('resultados_criterio')->count());
+        self::assertSame(0, DB::table('evaluacion_criterios')->whereNotNull('cod_resultado_criterio')->count());
     }
 
     public function test_vinculos_observacionales_del_contrato_adoptado_se_reconstruyen_desde_mapeos_y_originales(): void
@@ -875,7 +897,7 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         $valor = DB::table('valores_semanticos as s')->join('dominios_valores_expertos as d', 'd.cod_dominio_valores', '=', 's.cod_dominio_valores')
             ->where('d.cod_version_modelo', $id)->where('s.codigo_valor', 'ACREDITADA')->value('s.cod_valor_semantico');
         foreach ($a['respuestas_originales'] as $i => $r) {
-            $variable = DB::table('variables_expertas as v')->join('nodos_semanticos as n', 'n.cod_nodo_semantico', '=', 'v.cod_nodo_semantico')
+            $variable = DB::table('nodos_semanticos as v')->join('nodos_semanticos as n', 'n.cod_nodo_semantico', '=', 'v.cod_nodo_semantico')
                 ->where('v.cod_version_modelo', $id)->where('n.codigo_semantico', 'VAR-ATE-S01-C'.($i + 1))->value('v.cod_variable_experta');
             $mapa = 'MAP-PRED-'.($i + 1);
             InformeCognitivoFixture::insertar('mapeos_variables_fuente', ['cod_mapeo_variable_fuente' => $mapa, 'cod_version_modelo' => $id,

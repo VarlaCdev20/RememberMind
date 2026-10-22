@@ -4,17 +4,26 @@
     x-on:beforeunload.window="if (sucio) { $event.preventDefault(); $event.returnValue = ''; }">
     @php($elementos = \App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\CapturaPetersenPanel::ELEMENTOS)
     @php($tiposTodos = \App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\CapturaPetersenPanel::TIPOS)
-    <x-ui.section-card title="Valoraciones originales para Petersen" subtitle="Captura de juicios clínicos y sus fuentes; la clasificación se obtiene después" icon="ph-notebook">
-        <p class="font-semibold">{{ $residente->nombre_completo }}</p>
-        @if(\Illuminate\Support\Facades\Route::has($rutaInforme))<a href="{{ route($rutaInforme, $residente) }}" class="rm-btn rm-btn-secondary mt-3">Volver al informe del residente</a>@endif
+    <x-ui.section-card title="Valoración cognitiva y funcional" subtitle="Registro de información original para la evaluación cognitiva." icon="ph-notebook">
+        <p class="text-sm">Valoraciones originales para Petersen</p>
+        <div class="flex flex-wrap items-start justify-between gap-4">
+            <div><p class="font-semibold">{{ $residente->nombre_completo }} · {{ $residente->edad !== null ? $residente->edad.' años' : 'Edad no disponible' }}</p>
+                <p class="text-sm mt-1">Profesional de la sesión: {{ $profesional ? trim($profesional->nombres.' '.$profesional->apellido_paterno.' '.$profesional->apellido_materno) : 'No identificado' }} · {{ $profesional->profesion ?? 'Área no disponible' }}</p></div>
+            <p class="text-sm" role="status">{{ $registrados }} de 9 elementos con algún registro original vigente. Este avance describe captura, no validez clínica ni probabilidad de DCL.</p>
+        </div>
+        <a href="{{ $urlRetorno }}" class="rm-btn rm-btn-secondary mt-3">{{ $textoRetorno }}</a>
         @error('historial')<p role="alert" class="mt-3">{{ $message }}</p>@enderror
-        @if($profesional)<p class="text-sm">Profesional de la sesión: {{ $profesional->nombres }} {{ $profesional->apellido_paterno }} {{ $profesional->apellido_materno }}.</p>@endif
         <p class="text-sm mt-2">Registre lo que valoró y sus soportes originales. El estado del dominio es una interpretación clínica documentada; el sistema calcula C02 y el patrón. La información que no esté acreditada permanece pendiente.</p>
         @if($mensaje)<p role="status" class="mt-3">{{ $mensaje }}</p>@endif
         @if($puedeCrear && $solicitud === null)
-            <div class="flex flex-wrap gap-2 mt-4">@foreach($elementos as $codigo => $nombre)
-                <button type="button" wire:click="nuevo('{{ $codigo }}')" class="rm-btn rm-btn-secondary">Registrar {{ $nombre }}</button>
-            @endforeach</div>
+            <ol class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 mt-4" aria-label="Etapas de la valoración">
+                @foreach($elementos as $codigo => $nombre)<li class="rounded-xl border border-rm p-3 min-w-0">
+                    <p class="font-semibold">{{ $loop->iteration }}. {{ $nombre }} <span class="text-sm">({{ $codigo }})</span></p>
+                    <p class="text-sm mt-1">{{ $cobertura[$codigo]['cantidad'] ? $cobertura[$codigo]['cantidad'].' registro(s) original(es) vigente(s) · '.implode(', ', $cobertura[$codigo]['estados']) : 'Sin valoración original vigente' }}</p>
+                    <button type="button" wire:click="nuevo('{{ $codigo }}')" wire:loading.attr="disabled" class="rm-btn rm-btn-secondary mt-3">Registrar {{ $nombre }}</button>
+                </li>@endforeach
+            </ol>
+            <p class="text-sm mt-3">C02 se calcula automáticamente a partir de los cinco dominios. No requiere ni admite un registro manual.</p>
         @endif
     </x-ui.section-card>
     @if($solicitud !== null)
@@ -22,6 +31,7 @@
             <form x-on:submit.prevent="confirmarGuardado = true" class="space-y-4">
                 @if($errors->any())<div role="alert" class="text-sm"><p>Revise la información antes de guardar:</p><ul class="list-disc pl-5">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
                 @if($anterior)<p>Registro anterior: {{ $anterior }}. La corrección conservará ese original.</p>@endif
+                <p class="text-sm">Estado de esta captura: {{ $tipoRegistro === 'ANULACION' ? 'anulación documentada' : ($tipoRegistro === 'RECTIFICACION' ? 'rectificación del original' : 'nuevo juicio original') }}. Fecha clínica: {{ $form['fecha_hora'] ?: 'pendiente' }}.</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div><label for="pet-fecha" class="block text-sm font-semibold">Fecha y hora del acto original</label><input id="pet-fecha" type="datetime-local" step="0.000001" wire:model="form.fecha_hora" class="rm-input w-full" @readonly($tipoRegistro === 'ANULACION') required><p class="text-sm">Indique cuándo se realizó la valoración.</p></div>
                     @if($tipoRegistro !== 'ANULACION')<div><label for="pet-estado" class="block text-sm font-semibold">Conclusión original del elemento</label><select id="pet-estado" wire:model="form.estado_original" class="rm-select w-full !leading-normal !min-h-11" required><option value="">Seleccione</option>
@@ -50,8 +60,9 @@
                             <div><label for="pet-tipo-fuente" class="block text-sm">Tipo de soporte</label><select id="pet-tipo-fuente" wire:model.live="tipoSoporte" class="rm-select w-full !leading-normal !min-h-11"><option value="">Seleccione</option>@foreach($tipos as $codigo => $nombre)<option value="{{ $codigo }}">{{ $nombre }}</option>@endforeach</select></div>
                             <div><label for="pet-fuente" class="block text-sm">Fuente original autorizada</label><select id="pet-fuente" wire:model.live="campoFuente" class="rm-select w-full !leading-normal !min-h-11"><option value="">Seleccione</option>@foreach($fuentes as $campo)<option value="{{ $campo }}">{{ $labelsFuentes[$campo] }}</option>@endforeach</select></div>
                             <div><label for="pet-buscar" class="block text-sm">Buscar por código de registro</label><input id="pet-buscar" wire:model.live.debounce.300ms="busquedaFuente" class="rm-input w-full"><p class="text-sm">Se muestran hasta 50 coincidencias.</p></div>
-                            <div><label for="pet-registro" class="block text-sm">Registro original</label><select id="pet-registro" wire:model="registroFuente" class="rm-select w-full !leading-normal !min-h-11"><option value="">Seleccione</option>@foreach($opciones as $opcion)<option value="{{ $opcion['id'] }}">{{ $opcion['etiqueta'] }}</option>@endforeach</select></div>
+                            <div><label for="pet-registro" class="block text-sm">Registro original · fecha, autor, episodio y estado</label><select id="pet-registro" wire:model="registroFuente" class="rm-select w-full !leading-normal !min-h-11"><option value="">Seleccione</option>@foreach($opciones as $opcion)<option value="{{ $opcion['id'] }}">{{ $opcion['etiqueta'] }}</option>@endforeach</select></div>
                         </div>
+                        <p class="text-sm mt-2">Antes de vincular, compruebe que el registro tiene fecha clínica, autor, estado vigente y corresponde al episodio. El servidor verificará estos datos otra vez al guardar.</p>
                         <button type="button" wire:click="agregarSoporte" class="rm-btn rm-btn-secondary mt-3">Vincular soporte</button>
                         <ul class="space-y-2 mt-3">@foreach($form['soportes'] as $orden => $soporte)<li class="flex flex-wrap items-center gap-2 break-all" wire:key="pet-soporte-{{ $orden }}"><span>{{ $tiposTodos[$soporte['tipo_soporte']] ?? $soporte['tipo_soporte'] }} · {{ implode(' · ', array_values(array_diff_key($soporte, ['tipo_soporte' => true]))) }}</span><button type="button" wire:click="quitarSoporte({{ $orden }})" class="rm-btn rm-btn-ghost" aria-label="Quitar soporte {{ $orden + 1 }}">Quitar</button></li>@endforeach</ul>
                     </fieldset>

@@ -172,6 +172,7 @@ return [
     'livewire.valoraciones.evaluacion-geriatrica-area-modal' => 'app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/evaluacion-geriatrica-area-modal.blade.php',
     'livewire.valoraciones.evaluacion-geriatrica-modal' => 'app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/evaluacion-geriatrica-modal.blade.php',
     'livewire.valoraciones.evaluaciones-area-panel' => 'app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/evaluaciones-area-panel.blade.php',
+    'livewire.valoraciones.ficha-psicologica-residente' => 'app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/ficha-psicologica-residente.blade.php',
     'livewire.valoraciones.salud-evaluaciones-geriatricas-panel' => 'app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/salud-evaluaciones-geriatricas-panel.blade.php',
     'livewire.valoraciones.salud-valoracion-funcional' => 'app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/salud-valoracion-funcional.blade.php',
     'livewire.valoraciones.valoracion-barthel-modal' => 'app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/valoracion-barthel-modal.blade.php',
