@@ -99,13 +99,14 @@ final class NavegacionSistemaExpertoTest extends TestCase
             ->assertSee(route('admin.sistema-experto.petersen-original', $residente), false);
     }
 
-    public function test_visitante_y_superadministracion_no_acceden_a_entrada_de_captura_clinica(): void
+    public function test_visitante_no_accede_y_superadministracion_consulta_sin_captura_clinica(): void
     {
         $this->get(route('admin.sistema-experto.residentes'))->assertRedirect();
 
         $superadmin = User::factory()->create(['estado' => 'ACTIVO']);
         $superadmin->assignRole('SUPERADMINISTRADOR');
-        $this->actingAs($superadmin)->get(route('admin.sistema-experto.residentes'))->assertForbidden();
+        $this->actingAs($superadmin)->get(route('admin.sistema-experto.residentes'))->assertOk()
+            ->assertSee('Sistema experto por residente')->assertDontSee('Registrar valoración');
     }
 
     public function test_cuenta_inactiva_o_sin_personal_competente_no_recibe_el_listado(): void

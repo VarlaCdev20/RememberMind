@@ -38,7 +38,7 @@
 .rm-knowledge-canvas .rm-orion-node[data-type="CRITERIO"] rect { fill: var(--rm-primary-soft); stroke: var(--rm-primary); }
 .rm-knowledge-canvas .rm-orion-node[data-type="SUBCOMPONENTE"] rect { fill: color-mix(in srgb, var(--rm-info) 8%, var(--rm-surface)); stroke: var(--rm-info); }
 .rm-knowledge-canvas .rm-orion-node[data-type="VARIABLE"] rect { fill: color-mix(in srgb, var(--rm-chart-cognitive-500) 8%, var(--rm-surface)); stroke: var(--rm-chart-cognitive-500); }
-.rm-knowledge-workspace select.rm-input { height: auto; padding-block: var(--rm-space-2); line-height: 1.5; }
+.rm-knowledge-workspace select:is(.rm-input, .rm-select) { height: auto; min-height: 44px; padding-block: var(--rm-space-2); line-height: 1.5; }
 .rm-knowledge-canvas .rm-orion-node:focus-visible rect { stroke: var(--rm-primary-ink); stroke-width: 4px; }
 .rm-knowledge-edge-label { fill: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); text-anchor: middle; pointer-events: none; paint-order: stroke; stroke: var(--rm-surface-soft); stroke-width: 4px; stroke-linejoin: round; }
 .rm-knowledge-edge-label.is-connected { fill: var(--rm-primary-ink); font-weight: 700; }
@@ -93,3 +93,18 @@
 .rm-knowledge-distribution .rm-btn[aria-pressed="true"] { color: var(--rm-primary-ink); background: var(--rm-primary-soft); border-color: var(--rm-primary-ink); }
 .rm-knowledge-distribution > span { color: var(--rm-text-secondary); font-size: var(--rm-font-size-compact); }
 @media (max-width: 640px) { .rm-knowledge-distribution > .rm-btn { flex: 1 1 100%; } }
+
+/* Lienzo compartido: cada plantilla repetida pertenece a HTML, no a SVG. */
+.rm-expert-graph-canvas { position: relative; overflow: hidden; touch-action: none; background-color: var(--rm-surface); background-image: radial-gradient(var(--rm-border-strong) .7px, transparent .7px); background-size: 18px 18px; }
+.rm-expert-graph-stage { position: absolute; top: 0; left: 0; width: 1px; height: 1px; transform-origin: 0 0; }
+.rm-expert-graph-canvas svg.rm-expert-graph-edge-svg { position: absolute; top: 0; left: 0; width: 1px; height: 1px; overflow: visible; pointer-events: none; }
+.rm-expert-graph-canvas svg.rm-expert-graph-node-svg { position: absolute; width: 190px; height: 86px; overflow: visible; }
+.rm-expert-graph-canvas .rm-orion-node rect { fill: var(--rm-surface); stroke: var(--rm-border-strong); stroke-width: 1.5; }
+.rm-expert-graph-canvas .rm-orion-node text { fill: var(--rm-text-primary); font-family: var(--rm-font-body); font-size: 12px; }
+.rm-expert-graph-canvas .rm-orion-node .rm-orion-node-type, .rm-expert-graph-canvas .rm-orion-node .rm-orion-node-state { font-size: 10px; fill: var(--rm-text-secondary); }
+.rm-expert-graph-canvas .rm-orion-node:is(.is-selected, :focus-visible) rect { fill: var(--rm-primary-soft); stroke: var(--rm-primary-ink); stroke-width: 3; }
+.rm-expert-graph-canvas .rm-orion-node:focus-visible { outline: none; }
+.rm-expert-graph-canvas .rm-orion-edge { fill: none; stroke: var(--rm-border-strong); stroke-width: 1.5; }
+.rm-expert-graph-canvas .rm-orion-edge.is-connected { stroke: var(--rm-primary-ink); stroke-width: 2; }
+.rm-expert-graph-canvas .rm-orion-arrow { fill: var(--rm-primary-ink); }
+.rm-expert-graph-canvas .rm-knowledge-edge-label { font-size: 10px; }

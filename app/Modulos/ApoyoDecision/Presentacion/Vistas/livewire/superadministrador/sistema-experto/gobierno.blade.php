@@ -12,6 +12,7 @@
         </ol>
         <button type="button" class="rm-btn rm-btn-primary mt-4" wire:click="ir('conocimiento')">Explorar conocimiento<i class="ph ph-arrow-right" aria-hidden="true"></i></button>
         <button type="button" class="rm-btn rm-btn-secondary mt-3" wire:click="explorarRed"><i class="ph ph-graph" aria-hidden="true"></i>Abrir grafo semántico</button>
+        <button type="button" class="rm-btn rm-btn-secondary mt-3" wire:click="ir('residentes')"><i class="ph ph-users-three" aria-hidden="true"></i>Consultar residentes y sus fuentes</button>
     </x-ui.section-card>
     <x-ui.section-card title="Versiones y procedencia" subtitle="Elija el contenido que desea inspeccionar." icon="ph-stack">
         @forelse($versiones as $v)

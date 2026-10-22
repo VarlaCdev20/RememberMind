@@ -10,6 +10,7 @@ use App\Modulos\ApoyoDecision\Aplicacion\DTOs\PresentarResultadoLaboratorio;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\ProyectarRedConocimiento;
 use App\Modulos\ApoyoDecision\Aplicacion\Servicios\EscenariosPerfilExperimental;
 use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\SesionLaboratorioExperimental;
+use App\Modulos\ApoyoDecision\Presentacion\Soporte\DatosConocimientoVisible;
 use DomainException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -87,15 +88,30 @@ final class ConocimientoPanel extends Component
     #[Locked]
     public ?string $registroCatalogo = null;
 
+    #[Locked]
+    public array $recorridoDatos = [];
+
     public function mount(): void
     {
         $this->autorizar();
+        $version = request()->query('version');
+        if ($version !== null) {
+            abort_unless(is_string($version), 422);
+            $this->seleccionarVersion($version);
+        }
+        $dato = request()->query('dato');
+        if ($dato !== null) {
+            $categoria = request()->query('categoria', 'reglas_expertas');
+            abort_unless(is_string($dato) && is_string($categoria), 422);
+            $this->explorarCategoria($categoria);
+            $this->abrirDato($categoria, $dato);
+        }
     }
 
     public function ir(string $seccion): void
     {
         $this->autorizar();
-        abort_unless(in_array($seccion, ['gobierno', 'laboratorio', 'casos', 'resultados', 'conocimiento', 'verificacion'], true), 422);
+        abort_unless(in_array($seccion, ['gobierno', 'laboratorio', 'casos', 'resultados', 'conocimiento', 'residentes', 'verificacion'], true), 422);
         $this->seccion = $seccion;
     }
 
@@ -108,6 +124,7 @@ final class ConocimientoPanel extends Component
         $this->tablaCatalogo = $tabla;
         $this->buscarCatalogo = '';
         $this->registroCatalogo = null;
+        $this->recorridoDatos = [];
         $this->detalleAbierto = false;
         $this->resetPage('catalogoPage');
     }
@@ -125,6 +142,7 @@ final class ConocimientoPanel extends Component
         $this->autorizar();
         abort_unless($id === '' || app(ConsultarConocimientoAdministrativo::class)->existeVersion($id), 404);
         $this->version = $id === '' ? null : $id;
+        $this->recorridoDatos = [];
         $this->regla = $this->nodo = null;
         $this->detalleAbierto = false;
         $this->registroCatalogo = null;
@@ -171,6 +189,7 @@ final class ConocimientoPanel extends Component
         $this->regla = $id;
         $this->nodo = $this->registroCatalogo = null;
         $this->detalleAbierto = true;
+        $this->registrarPaso('reglas_expertas', $id);
     }
 
     public function abrirNodo(string $id): void
@@ -197,6 +216,41 @@ final class ConocimientoPanel extends Component
         $this->registroCatalogo = $id;
         $this->regla = $this->nodo = null;
         $this->detalleAbierto = true;
+        $this->registrarPaso($this->tablaCatalogo, $id);
+    }
+
+    public function abrirDato(string $tabla, string $id): void
+    {
+        $this->autorizar();
+        abort_unless(isset(DatosConocimientoVisible::CATEGORIAS[$tabla]), 422);
+        $conocimiento = app(ExplorarConocimientoExperto::class)->obtener($this->version);
+        $pk = PaqueteConocimiento::CLAVES[$tabla];
+        abort_unless(collect($conocimiento['tablas'][$tabla] ?? [])->contains($pk, $id), 404);
+        $this->tablaCatalogo = $tabla;
+        $this->registroCatalogo = $id;
+        $this->regla = null;
+        $this->detalleAbierto = true;
+        $this->registrarPaso($tabla, $id);
+    }
+
+    public function volverDato(): void
+    {
+        $this->autorizar();
+        if (count($this->recorridoDatos) < 2) {
+            return;
+        }
+        array_pop($this->recorridoDatos);
+        $paso = array_pop($this->recorridoDatos);
+        $this->abrirDato($paso['tabla'], $paso['id']);
+    }
+
+    private function registrarPaso(string $tabla, string $id): void
+    {
+        $paso = compact('tabla', 'id');
+        if (end($this->recorridoDatos) !== $paso) {
+            $this->recorridoDatos[] = $paso;
+            $this->recorridoDatos = array_slice($this->recorridoDatos, -12);
+        }
     }
 
     public function cambiarPaginaRed(int $pagina): void
@@ -288,11 +342,18 @@ final class ConocimientoPanel extends Component
         $pkCatalogo = PaqueteConocimiento::CLAVES[$this->tablaCatalogo] ?? null;
         $filasCatalogo = collect($pkCatalogo ? ($conocimiento['tablas'][$this->tablaCatalogo] ?? []) : [])
             ->filter(fn ($r) => str_contains(mb_strtolower(implode(' ', array_filter($r, 'is_scalar'))), mb_strtolower(mb_substr($this->buscarCatalogo, 0, 120))));
-        $detalleRegistro = $this->registroCatalogo && $pkCatalogo ? $filasCatalogo->firstWhere($pkCatalogo, $this->registroCatalogo) : null;
+        $detalleRegistro = $this->registroCatalogo && $pkCatalogo ? collect($conocimiento['tablas'][$this->tablaCatalogo] ?? [])->firstWhere($pkCatalogo, $this->registroCatalogo) : null;
+        $presentadorDatos = new DatosConocimientoVisible;
+        $categoriasDatos = $presentadorDatos->categorias($conocimiento['tablas'] ?? []);
+        $fichaDato = null;
+        if ($conocimiento && ($this->regla || $detalleRegistro)) {
+            $fichaDato = $presentadorDatos->detalle($conocimiento['tablas'], $this->regla ? 'reglas_expertas' : $this->tablaCatalogo,
+                $this->regla ?? $this->registroCatalogo);
+        }
         $fuentesNodo = $conocimiento && $this->nodo ? (new ProyectarRedConocimiento)->fuentesNodo($conocimiento, $this->nodo) : [];
         $filasCatalogo = $this->paginar($filasCatalogo->values()->all(), 'catalogoPage');
 
-        return view('livewire.superadministrador.sistema-experto.conocimiento-panel', compact('versiones', 'laboratorioDisponible', 'historial', 'informe', 'casos', 'conocimiento', 'errorConocimiento', 'reglas', 'dominios', 'escenariosPerfil', 'comparacion', 'red', 'filasCatalogo', 'pkCatalogo', 'detalleRegistro', 'fuentesNodo'))
+        return view('livewire.superadministrador.sistema-experto.conocimiento-panel', compact('versiones', 'laboratorioDisponible', 'historial', 'informe', 'casos', 'conocimiento', 'errorConocimiento', 'reglas', 'dominios', 'escenariosPerfil', 'comparacion', 'red', 'filasCatalogo', 'pkCatalogo', 'detalleRegistro', 'fuentesNodo', 'categoriasDatos', 'fichaDato'))
             ->layout('layouts.sistema');
     }
 

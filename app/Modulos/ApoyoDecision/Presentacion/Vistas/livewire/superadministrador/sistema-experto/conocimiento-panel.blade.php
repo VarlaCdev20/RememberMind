@@ -1,12 +1,12 @@
 <div class="rm-lab rm-knowledge-workspace space-y-5 text-rm-primary" x-data="{ ultimoDetalle: null }" x-on:click.capture="if ($event.target.closest('[data-expert-detail]')) ultimoDetalle = $event.target.closest('[data-expert-detail]')" x-on:expert-detail-closed.window="$nextTick(() => ultimoDetalle?.focus())">
-    <x-ui.page-header title="Sistema experto" subtitle="Conocimiento que acompaña. Explore sus fuentes, relaciones y versiones." icon="ph-graph" eyebrow="RememberMind · Superadministración" context="Consulta de conocimiento" />
+    <header class="rm-card rm-expert-admin-header"><div class="rm-expert-admin-header__title"><span><i class="ph ph-graph" aria-hidden="true"></i></span><div><p class="rm-expert-eyebrow">RememberMind · Superadministración</p><h1>Sistema experto</h1><p>Conocimiento que acompaña. Decisiones que cuidan.</p></div></div><div class="rm-expert-admin-header__route" aria-label="Recorrido del sistema experto"><span><i class="ph ph-books" aria-hidden="true"></i>Conocimiento</span><i class="ph ph-arrow-right" aria-hidden="true"></i><span><i class="ph ph-link" aria-hidden="true"></i>Fuentes</span><i class="ph ph-arrow-right" aria-hidden="true"></i><span><i class="ph ph-users" aria-hidden="true"></i>Residentes</span></div></header>
     <div class="rm-expert-disclosure" role="note"><i class="ph ph-shield-check" aria-hidden="true"></i><div><strong>Consulta de conocimiento · activación clínica pendiente</strong><p>Un estado técnico activo no acredita por sí mismo aprobación ni publicación clínica. La consulta conserva las versiones originales.</p></div></div>
     @if(in_array($seccion, ['laboratorio', 'casos', 'resultados'], true))
         <div class="rm-alert rm-alert-info" role="note"><div><strong>SIMULACIÓN TÉCNICA — NO VÁLIDA PARA DECISIONES ASISTENCIALES</strong><p>Los casos son ficticios. Los hallazgos descriptivos y los estados experimentales Petersen son contratos diferentes; no representan un diagnóstico.</p></div></div>
     @endif
     <nav class="rm-lab-nav" aria-label="Secciones del sistema experto">
         @can('consultarGobierno', \App\Models\VersionModeloExperto::class)<a href="{{ route('admin.sistema-experto.reglas') }}" class="rm-btn rm-btn-secondary">Gobierno de reglas</a>@endcan
-        @foreach(['gobierno' => 'Resumen', 'conocimiento' => 'Conocimiento', 'laboratorio' => 'Laboratorio', 'casos' => 'Casos sintéticos', 'resultados' => 'Resultados', 'verificacion' => 'Verificación y auditoría'] as $id => $nombre)
+        @foreach(['gobierno' => 'Resumen', 'conocimiento' => 'Conocimiento', 'residentes' => 'Residentes y fuentes', 'laboratorio' => 'Laboratorio', 'casos' => 'Casos sintéticos', 'resultados' => 'Resultados', 'verificacion' => 'Verificación y auditoría'] as $id => $nombre)
             <button type="button" wire:click="ir('{{ $id }}')" class="rm-btn {{ $seccion === $id ? 'rm-btn-primary' : 'rm-btn-secondary' }}" @if($seccion === $id) aria-current="page" @endif>{{ $nombre }}</button>
         @endforeach
     </nav>
@@ -48,6 +48,8 @@
         @endif
     @elseif($seccion === 'conocimiento')
         @include('livewire.superadministrador.sistema-experto.explorador')
+    @elseif($seccion === 'residentes')
+        @livewire(\App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResidentesConocimientoPanel::class, [], key('superadmin-residentes'))
     @elseif($seccion === 'verificacion')
         <x-ui.section-card title="Pruebas y verificación técnica" subtitle="Las ejecuciones de laboratorio no son una validación profesional independiente.">
             <x-ui.empty-state compact title="No hay informes de pruebas publicados" description="El backend no ofrece resultados de suites, commit, fecha ni fallos de CI para esta pantalla. No se calculan porcentajes a partir de demostraciones." />
@@ -65,13 +67,9 @@
     @endif
     </div>
     @if($detalleAbierto && ($regla || $detalleRegistro))
-        <x-ui.drawer-livewire wire:model="detalleAbierto" title="Detalle de conocimiento" subtitle="Consulta de la versión seleccionada" close-method="cerrarDetalle" size="lg" badge="SOLO CONSULTA" icon="ph-book-open">
-            @if($regla && isset($conocimiento['reglas'][$regla]))
-                <h3 class="rm-expert-section-title">Detalle de regla · {{ $conocimiento['reglas'][$regla]['nombre'] ?? $conocimiento['reglas'][$regla]['codigo'] }}</h3>
-                @include('livewire.superadministrador.sistema-experto.datos', ['datos' => $conocimiento['reglas'][$regla]])
-            @elseif($detalleRegistro)
-                <h3 class="rm-expert-section-title">{{ $detalleRegistro['nombre'] ?? $detalleRegistro[$pkCatalogo] }}</h3>
-                @include('livewire.superadministrador.sistema-experto.datos', ['datos' => $detalleRegistro])
+        <x-ui.drawer-livewire wire:model="detalleAbierto" :title="$regla ? 'Detalle de regla' : 'Detalle de conocimiento'" subtitle="Consulta de la versión seleccionada" close-method="cerrarDetalle" size="xl" badge="SOLO CONSULTA" icon="ph-book-open">
+            @if($fichaDato)
+                @include('apoyodecision::livewire.superadministrador.sistema-experto.ficha-conectada')
             @endif
         </x-ui.drawer-livewire>
     @endif

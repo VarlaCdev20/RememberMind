@@ -1,7 +1,34 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { residentWorkspace, residentGraph } from '../../resources/frontend/scripts/modules/expert-resident-workspace.js';
 import { knowledgeGraph, distribuirRedCompacta } from '../../resources/frontend/scripts/modules/orion-explorador.js';
+
+test('las clases del lienzo forman expresiones Alpine válidas con y sin recorrido', () => {
+    const vista = readFileSync(new URL('../../resources/views/components/ui/expert-graph-canvas.blade.php', import.meta.url), 'utf8');
+    const expresiones = [...vista.matchAll(/:class="([^"]+)"/g)].map(match => match[1]);
+    assert.ok(expresiones.length > 0);
+    for (const recorrido of [false, true]) {
+        for (const expresion of expresiones) {
+            const resuelta = expresion.replace(/\{\{\s*\$pathAware[^}]+\}\}/g, recorrido ? 'enRecorrido(arista)' : 'false');
+            assert.doesNotThrow(() => new Function(`return (${resuelta});`));
+        }
+    }
+});
+
+test('fuentes numerosas: pagina sin perder registros y sigue conexiones fuera de página', () => {
+    const fuente = { nodos: [{id:'grupo', nombre:'Aplicaciones', tipo:'Conjunto de registros', columna:2},
+        ...Array.from({length:15}, (_,i) => ({id:`s${i}`, nombre:`Fuente ${i}`, tipo:'Registro', columna:0}))],
+        aristas:Array.from({length:15}, (_,i) => ({origen:`s${i}`, destino:'grupo', relacion:'Pertenece'})) };
+    const antes = structuredClone(fuente);
+    const c = residentGraph(fuente);
+    c.cambiarPaginaFuente(1);
+    assert.equal(c.paginasFuentes,3); assert.equal(c.cantidadVisible,7);
+    assert.equal(c.esVisible('s14'),false);
+    c.seguirConexion('s14'); assert.equal(c.paginaFuentes,3); assert.equal(c.actual.id,'s14');
+    assert.equal(c.esVisible('s14'),true); assert.equal(c.nodos.length,16);
+    assert.deepEqual(fuente,antes);
+});
 
 test('selección por residente no mezcla áreas con requisitos ni modifica la fuente', () => {
     const elementos = [{ id: 'COG-MEM', grupo: 'areas' }, { id: 'C01', grupo: 'requisitos' }];
@@ -11,6 +38,25 @@ test('selección por residente no mezcla áreas con requisitos ni modifica la fu
     c.cambiarGrupo('requisitos'); assert.equal(c.seleccionado, 'C01');
     c.cambiarGrupo('otro'); assert.equal(c.grupo, 'requisitos');
     assert.deepEqual(elementos, anterior);
+});
+
+test('retorno y selección entre páginas recuperan la fuente y redistribuyen el mapa', () => {
+    const fuente = { nodos: [{ id: 'grupo', tipo: 'Conjunto de registros', columna: 2 },
+        ...Array.from({ length: 15 }, (_, i) => ({ id: `s${i}`, tipo: 'Registro', columna: 0 }))],
+        aristas: [{ origen: 's0', destino: 's14', relacion: 'Referencia' }] };
+    const c = residentGraph(fuente);
+    c.seleccionar('s0');
+    c.seguirConexion('s14');
+    assert.equal(c.paginaFuentes, 3);
+    c.volverPaso('s0');
+    assert.equal(c.paginaFuentes, 1);
+    assert.equal(c.esVisible(c.actual.id), true);
+    assert.ok(c.actual.y < c.alto);
+    c.seleccionar('s14');
+    assert.equal(c.paginaFuentes, 3);
+    assert.equal(c.esVisible(c.actual.id), true);
+    assert.ok(c.actual.y < c.alto);
+    assert.equal(c.cantidadVisible, 4);
 });
 
 const datos = () => ({ nodos: [
