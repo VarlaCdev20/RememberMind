@@ -39,8 +39,8 @@ class AgendaMedicacionService
             ->get();
 
         $administraciones = AdministracionMedicacion::query()
-            ->whereNotIn('estado', ['ANULADA','ANULADO'])
-            ->whereIn('resultado', ['ADMINISTRADA','OMITIDA','RECHAZADA'])
+            ->whereNotIn('estado', ['ANULADA', 'ANULADO'])
+            ->whereIn('resultado', ['ADMINISTRADA', 'OMITIDA', 'RECHAZADA'])
             ->whereIn('cod_residente', $codigosResidente)
             ->whereDate('fecha_hora_programada', $fecha)
             ->get()
@@ -55,6 +55,12 @@ class AgendaMedicacionService
                 ->filter(fn (HorarioPrescripcion $horario) => ! filled($horario->dias_semana)
                     || strtoupper(trim($horario->dias_semana)) === 'TODOS'
                     || app(MiTurnoService::class)->correspondeDiaSemana($horario->dias_semana, $dia))
+                ->filter(function (HorarioPrescripcion $horario) use ($prescripcion, $fecha, $ahora) {
+                    $programada = Carbon::parse($fecha.' '.$this->normalizarHora($horario->hora_programada), $ahora->timezone);
+
+                    return $programada->gte($prescripcion->fecha_hora_prescripcion)
+                        && (! $prescripcion->fecha_hora_suspension || $programada->lt($prescripcion->fecha_hora_suspension));
+                })
                 ->map(function (HorarioPrescripcion $horario) use ($prescripcion, $administraciones, $ahora, $fecha) {
                     $hora = $this->normalizarHora($horario->hora_programada);
                     $programada = Carbon::parse("{$fecha} {$hora}", $ahora->timezone);

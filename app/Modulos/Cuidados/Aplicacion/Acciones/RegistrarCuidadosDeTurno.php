@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Cuidados\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\CodigosEntidad;
 use App\Models\Alerta;
 use App\Models\CuracionHerida;
 use App\Models\EjecucionCuidado;
@@ -11,11 +12,11 @@ use App\Models\RegistroIngesta;
 use App\Models\RegistroSueno;
 use App\Models\User;
 use App\Models\ValoracionDolor;
+use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
 use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 final class RegistrarCuidadosDeTurno
@@ -36,7 +37,7 @@ final class RegistrarCuidadosDeTurno
             $bloqueada = Herida::query()->lockForUpdate()->findOrFail($herida->getKey());
             abort_unless($bloqueada->estado === 'ACTIVA', 409, 'La herida ya no admite curaciones.');
 
-            return CuracionHerida::create(['cod_curacion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('curaciones_herida'), 'cod_herida' => $bloqueada->cod_herida, 'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada, 'fecha_hora' => now(), 'longitud' => $entrada['largoLesion'], 'ancho' => $entrada['anchoLesion'], 'profundidad' => $entrada['profundidadLesion'], 'tejido' => $entrada['aspectoLesion'], 'exudado' => $entrada['exudadoLesion'] ?: null, 'olor' => ($entrada['olorLesion'] ?? '') ?: null, 'dolor' => $entrada['dolorLesion'] !== null ? (string) $entrada['dolorLesion'] : null, 'procedimiento' => $entrada['accionLesion'], 'materiales' => ($entrada['materialesLesion'] ?? '') ?: null, 'respuesta' => ($entrada['respuestaLesion'] ?? '') ?: null, 'observacion' => $entrada['observacionLesion'] ?: null]);
+            return CuracionHerida::create(['cod_curacion' => app(CodigosEntidad::class)->siguiente('curaciones_herida'), 'cod_herida' => $bloqueada->cod_herida, 'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada, 'fecha_hora' => now(), 'longitud' => $entrada['largoLesion'], 'ancho' => $entrada['anchoLesion'], 'profundidad' => $entrada['profundidadLesion'], 'tejido' => $entrada['aspectoLesion'], 'exudado' => $entrada['exudadoLesion'] ?: null, 'olor' => ($entrada['olorLesion'] ?? '') ?: null, 'dolor' => $entrada['dolorLesion'] !== null ? (string) $entrada['dolorLesion'] : null, 'procedimiento' => $entrada['accionLesion'], 'materiales' => ($entrada['materialesLesion'] ?? '') ?: null, 'respuesta' => ($entrada['respuestaLesion'] ?? '') ?: null, 'observacion' => $entrada['observacionLesion'] ?: null]);
         });
     }
 
@@ -91,11 +92,11 @@ final class RegistrarCuidadosDeTurno
             throw ValidationException::withMessages(['jornada' => 'No existe una jornada activa asignada al personal clínico.']);
         }
         $tipoNorm = strtoupper(trim($entrada['tipo']));
-        DB::transaction(function () use ($personal, $jornada, $tipoNorm, $entrada) {
+        DB::transaction(function () use ($usuario, $personal, $jornada, $tipoNorm, $entrada) {
             if ($tipoNorm === 'ALIMENTACION') {
-                RegistroIngesta::create(['cod_ingesta' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('registros_ingesta'), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada, 'tipo_comida' => $entrada['subtipo'], 'porcentaje_consumido' => $entrada['porcentaje'] !== null ? (float) $entrada['porcentaje'] : null, 'apetito' => $entrada['estadoGeneral'] ?: null, 'tolerancia' => $entrada['tolerancia'] ?: null, 'dificultad_deglucion' => (bool) $entrada['presentaDificultad'], 'fecha_hora' => now(), 'estado' => 'VIGENTE', 'observacion' => ($entrada['observacion'] ?: $entrada['motivo']) ?: null]);
+                RegistroIngesta::create(['cod_ingesta' => app(CodigosEntidad::class)->siguiente('registros_ingesta'), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada, 'tipo_comida' => $entrada['subtipo'], 'porcentaje_consumido' => $entrada['porcentaje'] !== null ? (float) $entrada['porcentaje'] : null, 'apetito' => $entrada['estadoGeneral'] ?: null, 'tolerancia' => $entrada['tolerancia'] ?: null, 'dificultad_deglucion' => (bool) $entrada['presentaDificultad'], 'fecha_hora' => now(), 'estado' => 'VIGENTE', 'observacion' => ($entrada['observacion'] ?: $entrada['motivo']) ?: null]);
             } elseif ($tipoNorm === 'SUENO') {
-                RegistroSueno::create(['cod_registro_sueno' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('registros_sueno'), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada, 'fecha' => today()->toDateString(), 'despertares' => $entrada['cantidadDespertares'] !== null ? (int) $entrada['cantidadDespertares'] : null, 'insomnio' => (bool) $entrada['agitacion'], 'calidad' => $entrada['calidad'] ?: null, 'estado' => 'VIGENTE', 'observacion' => ($entrada['observacion'] ?: $entrada['motivo']) ?: null]);
+                RegistroSueno::create(['cod_registro_sueno' => app(CodigosEntidad::class)->siguiente('registros_sueno'), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada, 'fecha' => today()->toDateString(), 'despertares' => $entrada['cantidadDespertares'] !== null ? (int) $entrada['cantidadDespertares'] : null, 'insomnio' => (bool) $entrada['agitacion'], 'calidad' => $entrada['calidad'] ?: null, 'estado' => 'VIGENTE', 'observacion' => ($entrada['observacion'] ?: $entrada['motivo']) ?: null]);
             } else {
                 // HIGIENE, PROCEDIMIENTO y cuidados generales
                 // Validar: intervencion -> plan -> plan.cod_residente == residente actual
@@ -111,13 +112,14 @@ final class RegistrarCuidadosDeTurno
                     abort(422, 'Intervención de cuidado no válida o no activa.');
                 }
                 $codIntervencion = $intervencion->cod_intervencion;
-                EjecucionCuidado::create(['cod_intervencion' => $codIntervencion, 'cod_ejecucion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('ejecuciones_cuidado'), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada, 'fecha_hora_programada' => now(), 'fecha_hora_ejecucion' => now(), 'resultado' => $entrada['resultado'] ?: 'REALIZADA', 'estado' => 'REALIZADA', 'observacion' => trim(($entrada['subtipo'] ? $entrada['subtipo'].': ' : '').(($entrada['observacion'] ?: $entrada['motivo']) ?: 'Cuidado firmado en turno.'))]);
+                EjecucionCuidado::create(['cod_intervencion' => $codIntervencion, 'cod_ejecucion' => app(CodigosEntidad::class)->siguiente('ejecuciones_cuidado'), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada, 'fecha_hora_programada' => now(), 'fecha_hora_ejecucion' => now(), 'resultado' => $entrada['resultado'] ?: 'REALIZADA', 'estado' => 'REALIZADA', 'observacion' => trim(($entrada['subtipo'] ? $entrada['subtipo'].': ' : '').(($entrada['observacion'] ?: $entrada['motivo']) ?: 'Cuidado firmado en turno.'))]);
             }
             if ($entrada['dolor'] !== null) {
-                ValoracionDolor::create(['cod_valoracion_dolor' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('valoraciones_dolor'), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'fecha_hora' => now(), 'intensidad' => (int) $entrada['dolor'], 'ubicacion' => null, 'tipo_dolor' => null, 'estado' => 'ACTIVA', 'observacion' => null]);
+                ValoracionDolor::create(['cod_valoracion_dolor' => app(CodigosEntidad::class)->siguiente('valoraciones_dolor'), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'fecha_hora' => now(), 'intensidad' => (int) $entrada['dolor'], 'ubicacion' => null, 'tipo_dolor' => null, 'estado' => 'ACTIVA', 'observacion' => null]);
             }
             if ($entrada['cambioBasal'] === 'PEOR' || $tipoNorm === 'ALIMENTACION' && $entrada['porcentaje'] !== null && $entrada['porcentaje'] < 50) {
-                Alerta::create(['cod_alerta' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('alertas'), 'cod_residente' => $entrada['codResidente'], 'cod_personal_responsable' => $personal->cod_personal, 'origen' => 'CUIDADO', 'tipo' => $entrada['cambioBasal'] === 'PEOR' ? 'CAMBIO RESPECTO AL ESTADO BASAL' : 'BAJA INGESTA', 'prioridad' => 'MEDIA', 'titulo' => 'Alerta clínica generada desde cuidado', 'descripcion' => $entrada['motivo'] ?: 'Alerta automática por registro de cuidado.', 'fecha_hora' => now(), 'generacion' => 'AUTOMATICA', 'estado' => 'ABIERTA']);
+                $alerta = Alerta::create(['cod_alerta' => app(CodigosEntidad::class)->siguiente('alertas'), 'cod_residente' => $entrada['codResidente'], 'cod_personal_responsable' => $personal->cod_personal, 'modulo' => 'CUIDADO', 'tipo' => $entrada['cambioBasal'] === 'PEOR' ? 'CAMBIO RESPECTO AL ESTADO BASAL' : 'BAJA INGESTA', 'prioridad' => 'MEDIA', 'titulo' => 'Alerta clínica generada desde cuidado', 'descripcion' => $entrada['motivo'] ?: 'Alerta automática por registro de cuidado.', 'fecha_hora' => now(), 'generacion' => 'AUTOMATICA', 'estado' => 'ABIERTA']);
+                app(AlertasService::class)->registrarEventoOrigen($alerta, $usuario);
             }
         });
     }

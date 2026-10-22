@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Modulos\Alertas\Aplicacion\Consultas\ConsultaAlertasPrevia;
 use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use Closure;
 use Illuminate\Http\Request;
@@ -9,9 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PreventWritesDuringRolePreview
 {
-    public function __construct(private readonly RolePreviewService $preview)
-    {
-    }
+    public function __construct(private readonly RolePreviewService $preview) {}
 
     public function handle(Request $request, Closure $next): Response
     {
@@ -20,6 +19,10 @@ class PreventWritesDuringRolePreview
         }
 
         if ($request->isMethodSafe() || $request->routeIs('role-preview.store', 'role-preview.destroy', 'logout')) {
+            return $next($request);
+        }
+
+        if (app(ConsultaAlertasPrevia::class)->admite($request)) {
             return $next($request);
         }
 

@@ -1,14 +1,16 @@
 @if($modalResultadoCierre && $resultadoCierre !== [])
-    <x-ui.modal-livewire id="modalResultadoCierreAlerta" wire:model="modalResultadoCierre" maxWidth="md" closeMethod="cerrarResultadoCierre">
+    <x-ui.modal-livewire class="rm-alert-dialog" id="modalResultadoCierreAlerta" wire:model="modalResultadoCierre" maxWidth="md" closeMethod="cerrarResultadoCierre">
         <x-slot name="title">Resultado del cierre</x-slot>
 
         <x-ui.resultado-operacion-clinica
             variant="success"
             :resident="$resultadoCierre['residente']"
             title="Alerta cerrada"
-            :message="'La alerta de '.$resultadoCierre['residente'].' fue cerrada. El historial de atención permanece registrado.'"
+            :message="'La alerta de '.$resultadoCierre['residente'].' fue cerrada. La alerta, sus eventos y el seguimiento permanecen registrados.'"
             :date-time="$resultadoCierre['fecha_hora']"
         />
+
+        @unless($puedeIntervenir)<x-ui.callout variant="info" title="Cierre de coordinación">Este cierre no acredita resolución clínica.</x-ui.callout>@endunless
 
         <x-slot name="footer">
             <x-ui.action-button variant="ghost" size="sm" wire:click="cerrarResultadoCierre">Volver a alertas</x-ui.action-button>

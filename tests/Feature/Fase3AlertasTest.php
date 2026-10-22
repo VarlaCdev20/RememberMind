@@ -2,11 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
-use App\Modulos\Alertas\Aplicacion\Acciones\DeteccionAlertasService;
-use App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPanel;
-use App\Modulos\Alertas\Presentacion\Livewire\Paginas\SaludAlertasPanel;
-use App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades\HistorialAlerta;
 use App\Models\Alerta;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
@@ -17,6 +12,11 @@ use App\Models\Jornada;
 use App\Models\Residente;
 use App\Models\Turno;
 use App\Models\User;
+use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
+use App\Modulos\Alertas\Aplicacion\Acciones\DeteccionAlertasService;
+use App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades\HistorialAlerta;
+use App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPanel;
+use App\Modulos\Alertas\Presentacion\Livewire\Paginas\SaludAlertasPanel;
 use Carbon\Carbon;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -179,7 +179,7 @@ class Fase3AlertasTest extends TestCase
 
     public function test_critica_admite_cierre_directo_con_resultado_segun_contrato_actual(): void
     {
-        [$usuario, $residente] = $this->contexto();
+        [$usuario, $residente] = $this->contexto(true);
         $alerta = Alerta::create(['cod_residente' => $residente->cod_residente, 'tipo' => 'SEGUIMIENTO', 'prioridad' => 'CRITICO', 'estado' => 'ABIERTA']);
         app(AlertasService::class)->cerrar($alerta, 'Resultado registrado del seguimiento.', $usuario, coordinacion: true);
         $evento = $alerta->eventos()->sole();

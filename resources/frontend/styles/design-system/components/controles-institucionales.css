@@ -6,6 +6,7 @@
 .rm-choice__trigger > .is-open { transform: rotate(180deg); }
 .rm-choice__trigger:is(:hover, [aria-expanded="true"]) { border-color: var(--rm-primary); background: var(--rm-selected-bg); box-shadow: var(--rm-shadow-sm); }
 .rm-choice__trigger:disabled { opacity: .65; cursor: not-allowed; }
+.rm-choice__trigger[aria-invalid="true"] { border-color: var(--rm-danger); }
 .rm-choice__trigger:focus-visible, .rm-control-popover :is(button,input):focus-visible { outline: 2px solid var(--rm-focus); outline-offset: 3px; }
 .rm-control-popover { position: fixed; z-index: 110; padding: 10px; overflow: auto; border: 1px solid var(--rm-border-strong); border-radius: var(--rm-radius-xl); background: var(--rm-surface); color: var(--rm-text-primary); box-shadow: var(--rm-shadow-overlay); font-family: var(--rm-font-body); }
 .rm-choice__search { display: flex; align-items: center; gap: 8px; padding: 4px 9px; margin-bottom: 8px; border: 1px solid var(--rm-border); border-radius: var(--rm-radius-lg); background: var(--rm-input-bg); color: var(--rm-primary-ink); }

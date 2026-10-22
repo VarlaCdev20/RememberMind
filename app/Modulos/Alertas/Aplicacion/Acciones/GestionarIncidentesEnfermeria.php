@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Alertas\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\CodigosEntidad;
 use App\Models\Alerta;
 use App\Models\Herida;
 use App\Models\Incidente;
@@ -10,7 +11,6 @@ use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
 final class GestionarIncidentesEnfermeria
 {
@@ -38,12 +38,13 @@ final class GestionarIncidentesEnfermeria
             $obs[] = 'Familiar informado';
         }
         $observacionTexto = ! empty($obs) ? implode('. ', $obs) : null;
-        DB::transaction(function () use ($entrada, $personal, $jornada, $medida, $observacionTexto): void {
-            Incidente::create(['cod_incidente' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('incidentes'), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada, 'tipo_incidente' => mb_strtoupper(trim($entrada['tipoIncidente'])), 'gravedad' => $entrada['dolorIncidente'] === null ? null : ($entrada['dolorIncidente'] >= 7 ? 'GRAVE' : ($entrada['dolorIncidente'] >= 4 ? 'MODERADA' : 'LEVE')), 'lugar' => $entrada['lugarIncidente'], 'fecha_hora' => now(), 'descripcion' => $entrada['descripcionIncidente'], 'medida_inmediata' => $medida, 'requiere_medico' => (bool) $entrada['medicoInformado'], 'requiere_derivacion' => false, 'estado' => $entrada['requiereSeguimiento'] ? 'EN_SEGUIMIENTO' : 'ABIERTO', 'observacion' => $observacionTexto]);
+        DB::transaction(function () use ($usuario, $entrada, $personal, $jornada, $medida, $observacionTexto): void {
+            $incidente = Incidente::create(['cod_incidente' => app(CodigosEntidad::class)->siguiente('incidentes'), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'cod_jornada' => $jornada->cod_jornada, 'tipo_incidente' => mb_strtoupper(trim($entrada['tipoIncidente'])), 'gravedad' => $entrada['dolorIncidente'] === null ? null : ($entrada['dolorIncidente'] >= 7 ? 'GRAVE' : ($entrada['dolorIncidente'] >= 4 ? 'MODERADA' : 'LEVE')), 'lugar' => $entrada['lugarIncidente'], 'fecha_hora' => now(), 'descripcion' => $entrada['descripcionIncidente'], 'medida_inmediata' => $medida, 'requiere_medico' => (bool) $entrada['medicoInformado'], 'requiere_derivacion' => false, 'estado' => $entrada['requiereSeguimiento'] ? 'EN_SEGUIMIENTO' : 'ABIERTO', 'observacion' => $observacionTexto]);
             if ($entrada['hayLesion'] && $entrada['tipoLesion']) {
-                Herida::create(['cod_herida' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('heridas'), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'tipo_herida' => mb_strtoupper(trim($entrada['tipoLesion'])), 'ubicacion' => $entrada['zonaLesion'], 'causa' => 'Incidente: '.mb_strtoupper(trim($entrada['tipoIncidente'])), 'fecha_hora_identificacion' => now(), 'estado' => 'ACTIVA']);
+                Herida::create(['cod_herida' => app(CodigosEntidad::class)->siguiente('heridas'), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'tipo_herida' => mb_strtoupper(trim($entrada['tipoLesion'])), 'ubicacion' => $entrada['zonaLesion'], 'causa' => 'Incidente: '.mb_strtoupper(trim($entrada['tipoIncidente'])), 'fecha_hora_identificacion' => now(), 'estado' => 'ACTIVA']);
             }
-            Alerta::create(['cod_alerta' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('alertas'), 'cod_residente' => $entrada['codResidente'], 'cod_personal_responsable' => $personal->cod_personal, 'origen' => 'INCIDENTE', 'tipo' => mb_strtoupper(trim($entrada['tipoIncidente'])), 'generacion' => 'AUTOMATICA', 'prioridad' => mb_strtoupper(trim($entrada['tipoIncidente'])) === 'CAIDA' ? 'ALTA' : 'MEDIA', 'titulo' => 'Incidente reportado: '.mb_strtoupper(trim($entrada['tipoIncidente'])), 'descripcion' => $entrada['descripcionIncidente'], 'fecha_hora' => now(), 'estado' => 'ABIERTA']);
+            $alerta = Alerta::create(['cod_alerta' => app(CodigosEntidad::class)->siguiente('alertas'), 'cod_residente' => $entrada['codResidente'], 'cod_personal_responsable' => $personal->cod_personal, 'modulo' => 'INCIDENTE', 'cod_registro' => $incidente->getKey(), 'tipo' => mb_strtoupper(trim($entrada['tipoIncidente'])), 'generacion' => 'AUTOMATICA', 'prioridad' => mb_strtoupper(trim($entrada['tipoIncidente'])) === 'CAIDA' ? 'ALTA' : 'MEDIA', 'titulo' => 'Incidente reportado: '.mb_strtoupper(trim($entrada['tipoIncidente'])), 'descripcion' => $entrada['descripcionIncidente'], 'fecha_hora' => now(), 'estado' => 'ABIERTA']);
+            app(AlertasService::class)->registrarEventoOrigen($alerta, $usuario);
         });
     }
 

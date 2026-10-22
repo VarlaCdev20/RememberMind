@@ -8,7 +8,10 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Testing\TestResponse;
 use Livewire\Mechanisms\HandleRequests\HandleRequests;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class RechazoLivewireTest extends TestCase
@@ -35,7 +38,7 @@ class RechazoLivewireTest extends TestCase
         $this->fail('Falta el snapshot del dashboard en la respuesta HTTP.');
     }
 
-    private function refrescarPorHttp(string $snapshot): \Illuminate\Testing\TestResponse
+    private function refrescarPorHttp(string $snapshot): TestResponse
     {
         return $this->withHeader('X-Livewire', '1')->postJson(app(HandleRequests::class)->getUpdateUri(), [
             'components' => [['snapshot' => $snapshot, 'updates' => [],
@@ -75,8 +78,8 @@ class RechazoLivewireTest extends TestCase
         $usuario->assignRole('ENFERMEROS');
         $this->actingAs($usuario);
         $snapshot = $this->snapshotDashboard();
-        \Spatie\Permission\Models\Role::findByName('ENFERMEROS', 'web')->revokePermissionTo('enfermeria.ver_dashboard');
-        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        Role::findByName('ENFERMEROS', 'web')->revokePermissionTo('enfermeria.ver_dashboard');
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
         $usuario->unsetRelation('roles')->unsetRelation('permissions');
         $this->refrescarPorHttp($snapshot)->assertForbidden();
         $this->assertDatabaseCount('administraciones_medicacion', 0);
@@ -98,7 +101,7 @@ class RechazoLivewireTest extends TestCase
         $usuario->assignRole('ENFERMEROS');
         $this->actingAs($usuario)->get(route('admin.enfermeria.dashboard'))->assertOk()
             ->assertSee('wire:poll.60s="refrescarTurno"', false);
-        $this->get(route('admin.enfermeria.alertas'))->assertOk()->assertSee('wire:poll.30s', false);
+        $this->get(route('admin.enfermeria.alertas'))->assertOk()->assertSee('wire:poll.visible.60s', false);
     }
 
     public function test_el_rechazo_asincrono_sigue_siendo_403_y_su_log_no_contiene_datos_del_formulario(): void

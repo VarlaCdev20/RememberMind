@@ -2,6 +2,8 @@
 
 namespace App\Modulos\Valoraciones\Presentacion\Livewire\Paginas;
 
+use App\Models\Alerta;
+use App\Modulos\Alertas\Aplicacion\Consultas\BandejaAlertas;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -26,8 +28,7 @@ class DashboardPsicologo extends Component
             $code = $personal->cod_personal;
             $care = DB::table('atenciones')->where('cod_personal', $code);
             $applications = DB::table('aplicaciones_instrumento')->where('cod_personal', $code);
-            $alerts = DB::table('alertas')->where('cod_personal_responsable', $code)
-                ->whereIn('estado', ['ABIERTA', 'EN_ATENCION']);
+            $alerts = app(BandejaAlertas::class)->pendientes(auth()->user())->where('cod_personal_responsable', $code);
 
             $metrics = [
                 ['label' => 'Residentes atendidos', 'value' => (clone $care)->where('fecha_hora', '>=', now()->subDays(90))->distinct('cod_residente')->count('cod_residente'), 'description' => 'Atenciones propias · 90 días', 'icon' => 'ph-users-three', 'variant' => 'mint'],
@@ -47,7 +48,7 @@ class DashboardPsicologo extends Component
                 ->orderBy('atenciones.fecha_hora')->limit(6)
                 ->get(['r.nombres', 'r.apellido_paterno', 'atenciones.tipo_atencion', 'atenciones.fecha_hora'])
                 ->map(fn ($row) => ['label' => trim($row->nombres.' '.$row->apellido_paterno), 'detail' => $row->tipo_atencion.' · '.date('d/m H:i', strtotime($row->fecha_hora))])->all();
-            $priority = (clone $alerts)->whereIn('prioridad', ['CRITICO', 'CRITICA', 'ALTA'])
+            $priority = (clone $alerts)->whereIn('prioridad', Alerta::PRIORIDADES_ALTAS)
                 ->orderByDesc('fecha_hora')->limit(6)->get(['titulo', 'prioridad', 'fecha_hora'])
                 ->map(fn ($row) => ['label' => $row->titulo, 'detail' => $row->prioridad.' · '.date('d/m H:i', strtotime($row->fecha_hora))])->all();
             $instruments = (clone $applications)->join('instrumentos as i', 'i.cod_instrumento', '=', 'aplicaciones_instrumento.cod_instrumento')

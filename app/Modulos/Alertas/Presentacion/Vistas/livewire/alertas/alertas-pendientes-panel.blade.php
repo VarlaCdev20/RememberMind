@@ -1,4 +1,4 @@
-<div class="relative mx-auto max-w-7xl space-y-6 py-6 px-4 sm:px-6 lg:px-8">
+<div class="rm-emergency-workspace relative mx-auto max-w-7xl space-y-6 py-6 px-4 sm:px-6 lg:px-8">
  {{-- ENCABEZADO --}}
  <x-ui.page-header
   title="Alertas y Pendientes"
@@ -28,7 +28,7 @@
         <div class="w-full flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             {{-- Filtros Rápidos Desplazables (Categorías) --}}
             <div class="flex items-center gap-2 min-w-0 flex-1">
-                <span class="text-[10px] font-extrabold uppercase tracking-widest text-[var(--rm-text-secondary)] shrink-0 flex items-center gap-1">
+                <span class="text-xs font-extrabold uppercase tracking-widest text-[var(--rm-text-secondary)] shrink-0 flex items-center gap-1">
                     <i class="ph-bold ph-funnel text-xs text-[var(--rm-primary)]"></i> Filtrar:
                 </span>
                 @php
@@ -43,12 +43,12 @@
                     ];
                 @endphp
 
-                <div class="rm-filter-pills flex-1">
+                <div class="rm-alert-shortcuts flex-1">
                     @foreach($filtros as $f)
                         <button
                             type="button"
                             wire:click="$set('filtroCategoria', '{{ $f['valor'] }}')"
-                            class="rm-filter-pill {{ $filtroCategoria === $f['valor'] ? 'is-active' : '' }}"
+                            aria-pressed="{{ $filtroCategoria === $f['valor'] ? 'true' : 'false' }}" class="rm-btn rm-btn-secondary {{ $filtroCategoria === $f['valor'] ? 'is-active' : '' }}"
                         >
                             <i class="ph-bold {{ $f['icon'] }} text-xs"></i>
                             <span>{{ $f['label'] }}</span>
@@ -58,15 +58,15 @@
             </div>
 
             {{-- Buscador reactivo para escribir --}}
-            <div class="relative flex items-center w-full md:w-72 shrink-0">
+            <div class="w-full md:w-72 shrink-0"><label class="rm-label" for="pendientes-buscar">Buscar pendientes</label><div class="relative flex items-center">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
                     <i class="ph-bold ph-magnifying-glass text-base"></i>
                 </span>
                 <input
-                    type="text"
+                    type="search" id="pendientes-buscar"
                     wire:model.live.debounce.300ms="buscar"
                     placeholder="Escriba para buscar..."
-                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] transition"
+                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none min-h-[44px] transition"
                 />
                 @if(!empty($buscar))
                     <button type="button"
@@ -76,7 +76,7 @@
                         <i class="ph-bold ph-x-circle text-base"></i>
                     </button>
                 @endif
-            </div>
+            </div></div>
         </div>
 
         @php
@@ -120,7 +120,7 @@
  </div>
  <h3 class="text-base font-extrabold text-titulo">Sin alertas pendientes</h3>
  <p class="mt-1 text-xs font-semibold text-apoyo max-w-md mx-auto">
- Los registros principales se encuentran completos según los criterios actuales.
+ {{ $buscar || $filtroCategoria !== 'todas' ? 'No hay coincidencias para estos filtros. Restablece la búsqueda para revisar los registros disponibles.' : 'No hay pendientes detectados por los criterios actuales en tu ámbito autorizado.' }}
  </p>
  </div>
  @else
@@ -169,7 +169,7 @@
 			<div class="mt-3 border-t border-borde pt-2.5 flex justify-end">
 				<a
 					href="{{ route('admin.adultos-mayores.show', $alerta['adulto_id']) }}"
-					class="inline-flex items-center gap-1 rm-alert-action"
+					class="rm-btn rm-btn-secondary"
 				>
 					<i class="ph-bold ph-eye"></i> Revisar en ficha
 				</a>

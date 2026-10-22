@@ -2,9 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Modulos\Clinica\Presentacion\Livewire\Paginas\FichaPaciente;
 use App\Models\Admision;
-use App\Models\Residente;
 use App\Models\Alerta;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
@@ -19,8 +17,10 @@ use App\Models\Medicamento;
 use App\Models\OcupacionCama;
 use App\Models\PlanCuidado;
 use App\Models\Prescripcion;
+use App\Models\Residente;
 use App\Models\Turno;
 use App\Models\User;
+use App\Modulos\Clinica\Presentacion\Livewire\Paginas\FichaPaciente;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -322,10 +322,10 @@ class FichaPacienteBotonesTest extends TestCase
 
         $alerta = Alerta::create([
             'cod_residente' => $this->adulto->cod_residente,
-            'origen' => 'ENFERMERIA',
-            'tipo_alerta' => 'CLINICA',
-            'nivel' => 'ALTO',
-            'motivo' => 'Fiebre persistente 38.5°C',
+            'modulo' => 'ENFERMERIA',
+            'tipo' => 'CLINICA',
+            'prioridad' => 'ALTO',
+            'descripcion' => 'Fiebre persistente 38.5°C',
             'estado' => 'ABIERTA',
             'registrado_por' => $this->enfermero->cod_usuario,
         ]);

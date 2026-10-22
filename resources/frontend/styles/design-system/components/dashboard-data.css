@@ -80,6 +80,7 @@
 .rm-dashboard-data-panel__legend li:nth-child(6n + 4) > span::before { background: var(--rm-chart-4); }
 .rm-dashboard-data-panel__legend li:nth-child(6n + 5) > span::before { background: var(--rm-chart-5); }
 .rm-dashboard-data-panel__legend li:nth-child(6n + 6) > span::before { background: var(--rm-chart-6); }
+.rm-dashboard-data-panel__legend > .rm-chart-colored-item > span::before { background: var(--rm-chart-item-color); }
 .rm-dashboard-data-panel__donut-layout { display: flex; align-items: center; gap: 18px; }
 .rm-dashboard-data-panel__donut { position: relative; display: grid; flex: 0 0 124px; width: 124px; height: 124px; place-items: center; border-radius: 50%; outline: 1px solid color-mix(in srgb, var(--rm-chart-sage) 68%, transparent); outline-offset: -1px; box-shadow: 0 0 0 5px color-mix(in srgb, var(--rm-chart-sage) 7%, transparent); }
 .rm-dashboard-data-panel__donut::before { content: ''; position: absolute; inset: var(--rm-donut-ring-width); border-radius: 50%; background: var(--rm-surface-raised); box-shadow: 0 0 0 1px color-mix(in srgb, var(--rm-chart-sage) 68%, transparent); }

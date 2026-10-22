@@ -3,8 +3,7 @@
 namespace App\Modulos\Institucion\Presentacion\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Alerta;
-use App\Models\AlertaClinica;
+use App\Modulos\Alertas\Aplicacion\Consultas\BandejaAlertas;
 use App\Models\Residente;
 use App\Models\Turno;
 use App\Models\User;
@@ -21,16 +20,7 @@ class AreasAtencionController extends Controller
         $totalResidentes = Residente::count();
         $totalUsuarios = User::where('estado', 'ACTIVO')->count();
 
-        $alertasActivas = 0;
-        try {
-            $alertasActivas = AlertaClinica::where('estado', 'ABIERTA')->count();
-        } catch (\Throwable $e) {
-            try {
-                $alertasActivas = Alerta::whereIn('estado', ['ABIERTA', 'EN_ATENCION'])->count();
-            } catch (\Throwable $e2) {
-                $alertasActivas = 0;
-            }
-        }
+        $alertasActivas = app(BandejaAlertas::class)->pendientes($request->user())->count();
 
         $turnosEnfermeriaCount = 0;
         try {

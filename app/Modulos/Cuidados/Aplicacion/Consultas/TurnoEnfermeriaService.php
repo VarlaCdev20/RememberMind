@@ -112,6 +112,20 @@ class TurnoEnfermeriaService
     /** Asignaciones propias de hoy; incluye la guardia nocturna anterior mientras sigue en curso. */
     public function obtenerAsignacionesConsulta(?User $user): Builder
     {
+        return $this->asignacionesVigentesParaConsulta()
+            ->whereHas('personal', fn (Builder $personal) => $personal->where('cod_usuario', $user?->cod_usuario))
+            ->when(! $user || $user->estado !== 'ACTIVO', fn (Builder $q) => $q->whereRaw('1 = 0'));
+    }
+
+    /** Misma ventana de lectura, resuelta en bloque para los selectores de responsables. */
+    public function personalConAccesoConsultaResidente(string $codResidente): array
+    {
+        return $this->asignacionesVigentesParaConsulta()->where('cod_residente', $codResidente)
+            ->distinct()->pluck('cod_personal')->all();
+    }
+
+    private function asignacionesVigentesParaConsulta(): Builder
+    {
         $ahora = Carbon::now();
         $jornadas = Jornada::query()
             ->whereDate('fecha_jornada', '>=', $ahora->copy()->subDay()->toDateString())
@@ -125,10 +139,7 @@ class TurnoEnfermeriaService
         return AsignacionResidenteJornada::query()
             ->whereIn('estado', ['ACTIVA', 'ACTIVO', 'ASIGNADO'])
             ->whereIn('cod_jornada', $jornadas)
-            ->whereHas('personal', fn (Builder $personal) => $personal
-                ->where('cod_usuario', $user?->cod_usuario)
-                ->whereIn('estado', ['ACTIVO', 'ACTIVA']))
-            ->when(! $user || $user->estado !== 'ACTIVO', fn (Builder $q) => $q->whereRaw('1 = 0'));
+            ->whereHas('personal', fn (Builder $personal) => $personal->whereIn('estado', ['ACTIVO', 'ACTIVA']));
     }
 
     private function jornadaEnCurso(?Jornada $jornada): bool

@@ -2,6 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\Area;
+use App\Models\AsignacionPersonal;
+use App\Models\Jornada;
+use App\Models\Turno;
 use App\Models\User;
 use App\Modulos\Identidad\Presentacion\Livewire\Paginas\PersonalInstitucionalPanel;
 use App\Modulos\Institucion\Presentacion\Livewire\Funcionalidades\PersonalInstitucionalHorarios;
@@ -13,6 +17,25 @@ use Tests\TestCase;
 class PersonalInstitucionalResponsiveTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_personal_con_asignacion_consulta_el_turno_mediante_su_jornada_sin_mutar_datos(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $actor = User::factory()->create();
+        $actor->assignRole('SUPERADMINISTRADOR');
+        $personal = User::factory()->create(['nombres' => 'Profesional de prueba', 'apellido_paterno' => 'Institucional']);
+        $personal->assignRole('ENFERMEROS');
+        $area = Area::create(['nombre' => 'Área sintética', 'estado' => 'ACTIVA']);
+        $turno = Turno::create(['nombre' => 'Turno de prueba con jornada', 'hora_inicio' => '07:00:00', 'hora_cierre' => '15:00:00', 'estado' => 'ACTIVO', 'orden' => 1]);
+        $jornada = Jornada::create(['cod_turno' => $turno->getKey(), 'fecha_jornada' => today(), 'estado' => 'ABIERTA']);
+        $asignacion = AsignacionPersonal::create(['cod_personal' => $personal->personal->getKey(), 'cod_area' => $area->getKey(), 'cod_jornada' => $jornada->getKey(), 'estado' => 'ACTIVA']);
+        $antes = $asignacion->fresh()->getAttributes();
+        $this->actingAs($actor)->get('/admin/personal-institucional')->assertOk()->assertSeeText($turno->nombre);
+        Livewire::test(PersonalInstitucionalPanel::class)->assertSee($personal->correo)->assertSee($turno->nombre)
+            ->call('cambiarVistaListadoResumen', 'tarjetas')->assertSee($turno->nombre);
+        $this->assertSame($antes, $asignacion->fresh()->getAttributes());
+        $this->assertDatabaseCount('asignaciones_personal', 1);
+    }
 
     public function test_secciones_conservan_personal_filtros_y_acciones_al_renderizar(): void
     {

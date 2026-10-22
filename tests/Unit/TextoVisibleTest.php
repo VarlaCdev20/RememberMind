@@ -14,6 +14,7 @@ class TextoVisibleTest extends TestCase
         $this->assertSame('Herida cortante en Pierna derecha [observación de enfermería]', TextoVisible::sinCodigosInternos($original));
         $this->assertSame('Derivación creada hacia área receptora.', TextoVisible::sinCodigosInternos('Derivación creada (COD_DER_000001) hacia área receptora.'));
         $this->assertSame('Consultar el registro.', TextoVisible::sinCodigosInternos('Consultar COD_HER_000004 el registro.'));
+        $this->assertSame('Incidente registrado.', TextoVisible::sinCodigosInternos('Incidente (LP_AL_11) registrado.'));
         $this->assertSame('[heridas:COD_HER_000004] Herida cortante en Pierna derecha [observación de enfermería]', $original);
     }
 

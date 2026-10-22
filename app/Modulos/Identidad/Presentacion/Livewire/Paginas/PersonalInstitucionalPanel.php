@@ -286,7 +286,7 @@ class PersonalInstitucionalPanel extends Component
                 'roles',
                 'horariosSalud',
                 'horariosAdmin',
-                'asignacionesTurno.turno',
+                'asignacionesTurno.jornada.turno',
                 'areaInstitucional',
             ]);
 
