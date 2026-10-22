@@ -64,6 +64,7 @@
 @import './patterns/unified-data-tables.css';
 @import './patterns/collection-workspace.css';
 @import './patterns/expert-results.css';
+@import './patterns/expert-resident-workspace.css';
 
 /* Navegación lateral compartida: después de los ajustes históricos por módulo. */
 @import './components/sidebar.css';

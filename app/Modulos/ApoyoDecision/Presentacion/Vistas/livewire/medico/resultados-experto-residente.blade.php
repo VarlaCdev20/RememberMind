@@ -49,10 +49,13 @@
         @if($datos && $informe)<button type="button" wire:click="abrirConsulta('registro')" class="rm-btn rm-btn-secondary">Evidencias y fuentes</button>@endif
         @if($datos['evaluacion'] ?? null)<button type="button" wire:click="irASeccion('orion-evolucion')" class="rm-btn rm-btn-secondary">Historial conservado</button>@endif
     </nav>
+    @unless($psicologia)
+        @include('apoyodecision::livewire.medico.resultados-experto.conexiones-residente')
+    @endunless
     <div class="rm-orion-workspace mt-3">
         {{-- Columna Principal: Informe Cognitivo --}}
         <div class="space-y-4 min-w-0">
-            @unless($psicologia && isset($perfilInstrumental['petersen_institucional']))
+            @if($psicologia && ! isset($perfilInstrumental['petersen_institucional']))
             <section class="rm-card rm-expert-context" aria-label="Contexto del residente">
                 <div class="rm-expert-context-grid">
                     <div class="rm-expert-person min-w-0"><span class="rm-expert-avatar" aria-hidden="true">@if($residente->foto)<img src="{{ \Illuminate\Support\Facades\Storage::url($residente->foto) }}" alt="" loading="lazy" decoding="async">@else<i class="ph ph-user" aria-hidden="true"></i>@endif</span><div class="min-w-0"><h2 class="rm-expert-resident-name">{{ $residente->nombre_completo }}</h2><p class="text-sm">{{ $residente->edad !== null ? $residente->edad.' años' : 'Edad no disponible' }} · {{ $residente->ubicacion_formateada }}</p><small>{{ $residente->cod_residente }}</small></div></div>
@@ -67,7 +70,7 @@
                     @endif
                 </div>
             </section>
-            @endunless
+            @endif
 
             @if($datos && $informe && ! $psicologia)
                 @if(! ($datos['evaluacion'] ?? null))<aside class="rm-expert-disclosure" role="note"><i class="ph ph-info" aria-hidden="true"></i><div><strong>Disponibilidad de conocimiento</strong><p>No hay una evaluación histórica publicable en esta consulta. Los controles y registros disponibles conservan su propio alcance.</p></div></aside>@endif

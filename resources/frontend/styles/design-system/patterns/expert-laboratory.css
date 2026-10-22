@@ -89,3 +89,7 @@
     .rm-lab-table td::before { content: attr(data-label); display: block; font-weight: var(--rm-font-weight-semibold); color: var(--rm-text-secondary); margin-bottom: var(--rm-space-2); }
     .rm-lab-nav .rm-btn { flex: 1 1 9rem; }
 }
+.rm-knowledge-distribution { display: flex; flex-wrap: wrap; align-items: center; gap: var(--rm-space-2); padding: var(--rm-space-3); margin-bottom: var(--rm-space-3); border: 1px solid var(--rm-border); border-radius: var(--rm-radius-card); background: var(--rm-surface-soft); }
+.rm-knowledge-distribution .rm-btn[aria-pressed="true"] { color: var(--rm-primary-ink); background: var(--rm-primary-soft); border-color: var(--rm-primary-ink); }
+.rm-knowledge-distribution > span { color: var(--rm-text-secondary); font-size: var(--rm-font-size-compact); }
+@media (max-width: 640px) { .rm-knowledge-distribution > .rm-btn { flex: 1 1 100%; } }

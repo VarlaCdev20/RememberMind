@@ -24,6 +24,7 @@ use App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto as L;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\PresentarInformeCognitivo;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\ResumirFuentesCognitivas;
 use App\Modulos\ApoyoDecision\Dominio\Revision\DisciplinaRevision;
+use App\Modulos\ApoyoDecision\Presentacion\Soporte\ConexionesResidenteVisible;
 use Carbon\CarbonImmutable;
 use DomainException;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -671,6 +672,7 @@ class ResultadosExpertoResidente extends Component
         $hallazgosObservacionales = null;
         $capturaInstrumental = null;
         $perfilInstrumental = null;
+        $conexionesResidente = null;
         $exploracion = null;
         $puedeAuditar = Gate::allows('consultarTrazabilidad', [EvaluacionExperta::class, $residente]);
         $puedeEjecutarObservaciones = Gate::allows('ejecutarObservaciones', [EvaluacionExperta::class, $residente]);
@@ -688,6 +690,9 @@ class ResultadosExpertoResidente extends Component
                     : $consultaPerfil->consultar(auth()->user(), $residente, $corte);
             }
             $capturaInstrumental = $perfilInstrumental['capturas_originales'] ?? null;
+            if (! $this->enfermeria) {
+                $conexionesResidente = (new ConexionesResidenteVisible)->presentar($residente->getKey(), $perfilInstrumental['petersen_institucional'] ?? null, $capturaInstrumental);
+            }
         } catch (QueryException|DomainException $e) {
             report($e);
             $errorInstrumental = true;
@@ -797,6 +802,7 @@ class ResultadosExpertoResidente extends Component
 
         return view('livewire.medico.resultados-experto-residente', compact('datos', 'informe', 'fuente', 'errorLectura', 'residente', 'revisiones', 'estadoRevision', 'puedeAuditar', 'hallazgosObservacionales', 'puedeEjecutarObservaciones', 'capturaInstrumental', 'perfilInstrumental', 'revisionesObservacionales', 'errorInstrumental', 'errorObservacional', 'exploracion', 'consultaEnfermeria', 'resumenFuentes', 'seriesEvolucion', 'actividadCognitiva', 'comparaciones', 'errorEvolucion', 'cuidadoDetalle', 'registroComponente'), $continuidad)
             ->with('cohorteEntrenamiento', $cohorteEntrenamiento)
+            ->with('conexionesResidente', $conexionesResidente)
             ->layout($this->enfermeria ? 'layouts.enfermeria' : 'layouts.sistema');
     }
 }

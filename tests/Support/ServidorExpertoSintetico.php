@@ -8,16 +8,19 @@ use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\Turno;
 use App\Models\User;
+use Database\Seeders\CohorteCognitivaInvestigacionSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 // Router privado E2E. Nunca se carga desde public/ ni acepta una base instalada.
 $archivo = getenv('RM_EXPERTO_DB') ?: '';
 $token = getenv('RM_EXPERTO_TOKEN') ?: '';
 $preparar = PHP_SAPI === 'cli' && ($argv[1] ?? '') === '--preparar';
+$conCohorte = getenv('RM_EXPERTO_COHORTE') === '1';
 if (getenv('APP_ENV') !== 'testing' || strlen($token) !== 48
     || ! preg_match('/^remembermind-experto-[a-f0-9]{16}_testing\.sqlite$/D', basename($archivo))
     || realpath(dirname($archivo)) !== realpath(sys_get_temp_dir()) || ! is_file($archivo)
@@ -35,7 +38,7 @@ if (! $preparar) {
 foreach (['APP_ENV' => 'testing', 'APP_DEBUG' => 'false',
     'APP_KEY' => 'base64:ABEiM0RVZneImaq7zN3u/wARIjNEVWZ3iJmqu8zd7v8=',
     'APP_CONFIG_CACHE' => $archivo.'.config.php', 'APP_ROUTES_CACHE' => $archivo.'.routes.php',
-    'DB_CONNECTION' => 'sqlite', 'DB_DATABASE' => $archivo, 'DB_URL' => '',
+    'DB_CONNECTION' => 'sqlite', 'DB_DATABASE' => $preparar && $conCohorte ? ':memory:' : $archivo, 'DB_URL' => '',
     'SESSION_DRIVER' => 'file', 'CACHE_STORE' => 'array', 'QUEUE_CONNECTION' => 'sync',
     'SUPERADMIN_CLINICAL_WRITE' => 'false', 'SISTEMA_EXPERTO_SIMULACION_LOCAL' => 'false'] as $clave => $valor) {
     putenv($clave.'='.$valor);
@@ -68,6 +71,15 @@ if ($preparar) {
         'cod_jornada' => $jornada->getKey(), 'fecha_hora' => now(), 'estado' => 'ACTIVA']);
     ControlCognitivo::create(['cod_residente' => $r->getKey(), 'cod_personal' => $personal['MED']->getKey(),
         'fecha_hora' => now()->subHour(), 'estado' => 'VIGENTE', 'observacion' => 'Registro sintético para comprobar procedencia y lectura.']);
+    if ($conCohorte) {
+        // La cohorte solo permite SQLite :memory:. Se exporta después a este archivo temporal vacío.
+        $cohorte = new CohorteCognitivaInvestigacionSeeder;
+        $residentesCohorte = $cohorte->cargar();
+        file_put_contents($archivo.'.cohorte.json', json_encode(['medico' => $cohorte->medicina->getKey(),
+            'residente' => $residentesCohorte['S01']->getKey(), 'perfiles' => $cohorte->perfiles], JSON_THROW_ON_ERROR));
+        $pdo = DB::connection()->getPdo();
+        $pdo->exec('VACUUM INTO '.$pdo->quote($archivo));
+    }
     echo 'PREPARADO';
     exit;
 }
@@ -77,7 +89,12 @@ final class AutenticarExpertoSintetico
     {
         $actor = $_SERVER['HTTP_X_RM_ACTOR'] ?? 'SA';
         abort_unless(in_array($actor, ['SA', 'MED', 'ENF'], true), 403);
-        Auth::onceUsingId('QA_EXP_'.$actor);
+        $metadata = getenv('RM_EXPERTO_COHORTE') === '1'
+            ? json_decode(file_get_contents(getenv('RM_EXPERTO_DB').'.cohorte.json'), true, 512, JSON_THROW_ON_ERROR) : null;
+        if ($metadata) {
+            config(['sistema_experto.perfiles_instrumentales' => $metadata['perfiles']]);
+        }
+        Auth::onceUsingId($actor === 'MED' && $metadata ? $metadata['medico'] : 'QA_EXP_'.$actor);
 
         return $next($request);
     }

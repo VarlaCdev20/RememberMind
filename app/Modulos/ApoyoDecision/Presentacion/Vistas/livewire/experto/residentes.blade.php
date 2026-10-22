@@ -1,7 +1,10 @@
-<div class="rm-expert-residents space-y-6 text-rm-primary" x-data="{ vista: 'tarjetas' }">
-    <x-ui.section-card title="Sistema experto" subtitle="Seleccione un residente para consultar sus resultados e historial" icon="ph-brain">
-        <p class="text-sm text-rm-secondary">Consulte los hallazgos, evidencias y límites de cada evaluación. Las valoraciones originales se registran desde el área de Valoraciones o la ficha clínica.</p>
-    </x-ui.section-card>
+<div class="rm-expert-residents rm-expert-resident-directory space-y-6 text-rm-primary" x-data="{ vista: 'tarjetas' }">
+    <header class="rm-card rm-resident-expert">
+        <p class="rm-expert-eyebrow">Apoyo a la valoración profesional</p>
+        <h1 class="rm-expert-section-title">Sistema experto por residente</h1>
+        <p class="rm-expert-prose mt-2">Abra la consulta de una persona para explorar sus registros, valoraciones y conexiones. Cada expediente conserva sus propias fuentes y límites.</p>
+        <ol class="rm-expert-resident-directory__journey" aria-label="Cómo recorrer la consulta"><li><span>1</span>Seleccione un residente</li><li><span>2</span>Explore sus conexiones</li><li><span>3</span>Consulte la evidencia original</li></ol>
+    </header>
 
     <x-ui.filter-bar as="div" aria-label="Buscar residentes y elegir vista">
         <div class="flex w-full flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">

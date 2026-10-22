@@ -54,7 +54,7 @@ export function exploradorGrafo(datos) {
         },
         zoom(paso) { this.escala = Math.min(2.5, Math.max(0.5, this.escala + paso)); },
         centrar() {
-            this.escala = Math.max(0.5, Math.min(1, this.viewportAncho / this.ancho, this.viewportAlto / this.alto));
+            this.escala = Math.min(1, this.viewportAncho / this.ancho, this.viewportAlto / this.alto);
             this.dx = (this.viewportAncho - this.ancho * this.escala) / 2;
             this.dy = (this.viewportAlto - this.alto * this.escala) / 2;
         },
@@ -70,15 +70,51 @@ export function exploradorGrafo(datos) {
 }
 
 /** Interacción del conocimiento: reutiliza el visor histórico, sin compartir contratos clínicos. */
+export function distribuirRedCompacta(datos, ancho = 960) {
+    const columnas = Math.max(1, Math.min(6, Math.floor(ancho / 220)));
+    const nodos = datos.nodos.map((n, i) => ({ ...n, x: 24 + (i % columnas) * 220, y: 24 + Math.floor(i / columnas) * 120 }));
+    return { nodos, vertical: false, ancho: Math.min(columnas, Math.max(1, nodos.length)) * 220 + 24,
+        alto: Math.max(220, Math.ceil(nodos.length / columnas) * 120 + 24) };
+}
+
 export function knowledgeGraph(datos, seleccionado = null) {
-    return {
-        ...exploradorGrafo(datos), seleccionado, arrastreNodo: null,
+    const visor = exploradorGrafo(datos);
+    return Object.defineProperties(visor, Object.getOwnPropertyDescriptors({
+        seleccionado, arrastreNodo: null,
+        distribucion: datos.nodos.length > 12 ? 'compacta' : 'niveles', focoVecindario: false,
         get vecinos() {
             const ids = new Set(this.aristas.filter(a => this.vinculada(a)).flatMap(a => [a.origen, a.destino]));
             return ids;
         },
         get numeroConexiones() { return this.aristas.filter(a => this.vinculada(a)).length; },
         esVecino(id) { return !this.seleccionado || id === this.seleccionado || this.vecinos.has(id); },
+        esVisible(id) { return !this.focoVecindario || this.esVecino(id); },
+        aristaVisible(a) { return this.esVisible(a.origen) && this.esVisible(a.destino); },
+        get cantidadVisible() { return this.nodos.filter(n => this.esVisible(n.id)).length; },
+        distribuir(modo = this.distribucion) {
+            if (!['compacta', 'niveles'].includes(modo)) return;
+            this.distribucion = modo;
+            const entrada = { nodos: datos.nodos.filter(n => this.esVisible(n.id)) };
+            const layout = modo === 'compacta' ? distribuirRedCompacta(entrada, this.viewportAncho) : distribuirGrafo(entrada, this.viewportAncho < 640);
+            const posiciones = new Map(layout.nodos.map(n => [n.id, n]));
+            this.nodos = this.nodos.map(n => posiciones.get(n.id) ?? n);
+            this.ancho = layout.ancho; this.alto = layout.alto; this.vertical = layout.vertical;
+            this.centrar();
+        },
+        restablecer() { this.distribuir(); },
+        enfocarConexiones() {
+            if (!this.seleccionado) return;
+            this.focoVecindario = !this.focoVecindario;
+            this.distribuir();
+        },
+        limpiarSeleccion() { this.seleccionado = null; this.focoVecindario = false; this.distribuir(); },
+        seleccionar(id) {
+            if (!this.punto(id)) return;
+            this.seleccionado = id;
+            if (this.focoVecindario) this.distribuir();
+            this.escala = Math.max(.65, this.escala);
+            this.enfocar(id);
+        },
         iniciarNodo(evento, id) {
             if (evento.button !== 0) return;
             const nodo = this.punto(id);
@@ -101,7 +137,7 @@ export function knowledgeGraph(datos, seleccionado = null) {
             const o = this.punto(a.origen), d = this.punto(a.destino);
             return o && d ? { x: (o.x + d.x) / 2 + 95, y: (o.y + d.y) / 2 + 36 } : { x: 0, y: 0 };
         },
-    };
+    }));
 }
 
 export function graficaCobertura(datos, clave) {
