@@ -189,7 +189,7 @@
 
       <div class="mt-1 flex items-center gap-1 text-[11px] font-medium text-apoyo">
       <i class="ph-fill ph-clock"></i>
-      {{ $asignacionActiva?->turno?->nombre ?? 'Sin turno asignado' }}
+      {{ $asignacionActiva?->jornada?->turno?->nombre ?? 'Sin turno asignado' }}
       </div>
      </td>
 

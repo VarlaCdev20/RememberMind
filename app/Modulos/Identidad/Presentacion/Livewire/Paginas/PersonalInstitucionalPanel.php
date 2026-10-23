@@ -286,7 +286,8 @@ class PersonalInstitucionalPanel extends Component
                 'roles',
                 'horariosSalud',
                 'horariosAdmin',
-                'asignacionesTurno.turno',
+                // En V2 el turno pertenece a la jornada, no directamente a la asignación.
+                'asignacionesTurno.jornada.turno',
                 'areaInstitucional',
             ]);
 
