@@ -130,7 +130,7 @@ class SidebarService
                 $this->buildItem('Medicación', 'admin.salud-seguimiento.medicacion.index', 'prescripciones.ver'),
                 $this->buildItem('Seguimiento', 'admin.salud-seguimiento.index', 'atenciones.ver'),
                 $this->buildItem('Valoraciones', 'admin.salud-seguimiento.valoracion.index', 'valoraciones_funcionales.ver'),
-                $this->buildItem('Instrumentos', 'admin.instrumentos.index', 'instrumentos.ver'),
+                $this->buildItem('Instrumentos y guías', 'admin.psicologia.evaluacion.cognitiva', 'instrumentos.ver', null, [], ['admin.psicologia.evaluacion.*']),
             ], false, null, null, 'ÁREA CLÍNICA'),
             $this->buildSection('Reportes', 'ph-chart-bar', 'admin.reportes.institucional.preview', [], false, 'reportes.institucional', null, 'INFORMACIÓN'),
             $this->buildSection('Mi perfil', 'ph-user-circle', 'profile.show', [], false, null, null, 'CUENTA'),

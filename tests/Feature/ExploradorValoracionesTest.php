@@ -14,11 +14,13 @@ use App\Models\PreguntaInstrumento;
 use App\Models\Residente;
 use App\Models\Turno;
 use App\Models\User;
+use App\Modulos\Identidad\Presentacion\Navegacion\SidebarService;
 use App\Modulos\Valoraciones\Aplicacion\Consultas\ExploradorInstrumentos;
 use App\Modulos\Valoraciones\Presentacion\Livewire\Funcionalidades\EvaluacionGeriatricaAreaModal;
 use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\EvaluacionesAreaPanel;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Blade;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -125,6 +127,25 @@ final class ExploradorValoracionesTest extends TestCase
         }
         Livewire::test(EvaluacionesAreaPanel::class, ['codArea' => 'ARE_NUT'])->assertForbidden();
         self::assertDatabaseCount('instrumentos', 1);
+    }
+
+    public function test_superadmin_encuentra_el_avatar_desde_su_entrada_habitual_y_el_menu(): void
+    {
+        $this->usuario->syncRoles(['SUPERADMINISTRADOR']);
+        $this->get(route('admin.salud-seguimiento.valoracion.index'))
+            ->assertOk()->assertSee('Explorar instrumentos y guías')
+            ->assertSee('Guía de RememberMind')->assertSee(route('admin.psicologia.evaluacion.cognitiva'));
+        $enlaces = collect(app(SidebarService::class)->getSidebar())->flatMap(fn ($seccion) => $seccion['items'] ?? []);
+        self::assertSame('admin.psicologia.evaluacion.cognitiva', $enlaces->firstWhere('label', 'Instrumentos y guías')['route']);
+        $this->getJson(route('admin.instrumentos.index'))->assertOk()->assertJsonFragment(['codigo' => 'EXP-OBS']);
+    }
+
+    public function test_acceso_visual_no_ofrece_el_flujo_de_psicologia_a_otros_roles(): void
+    {
+        foreach (['MEDICO GENERAL/GERIATRA', 'NUTRICIONISTA', 'FAMILIAR'] as $rol) {
+            $this->usuario->syncRoles([$rol]);
+            self::assertStringNotContainsString('Explorar instrumentos y guías', Blade::render('<x-ui.acceso-valoraciones />'));
+        }
     }
 
     public function test_dominios_proceden_de_preguntas_vigentes_y_no_del_nombre(): void
