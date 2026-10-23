@@ -83,6 +83,17 @@ final class InstantaneaInstrumentalCompletaTest extends TestCase
         InstantaneaInstrumental::verificar($d, CodecInstantanea::huella(CapturaInstrumentalCanonica::ordenar($d)));
     }
 
+    public function test_documento_posterior_no_puede_respaldar_una_normalizacion_en_replay(): void
+    {
+        $d = $this->crear()->contenido;
+        $d['capturas']['capturas'][1]['procedencia']['cod_documento_clinico'] = 'DOC-TEST';
+        $d['capturas']['capturas'][1]['procedencia']['estado_documento'] = 'VERIFICADO';
+        $d['capturas']['capturas'][1]['documento_original'] = ['fecha_hora' => '2026-10-20T12:00:00.000000-04:00'];
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('normalización');
+        InstantaneaInstrumental::verificar($d, CodecInstantanea::huella(CapturaInstrumentalCanonica::ordenar($d)));
+    }
+
     public function test_rechaza_salida_de_red_alterada_aunque_se_recalcule_su_huella(): void
     {
         $d = $this->crear()->contenido;

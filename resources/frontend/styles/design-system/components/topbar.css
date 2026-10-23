@@ -4,7 +4,7 @@
     --rm-app-bg: var(--rm-palette-page);
     --rm-bg-app: var(--rm-app-bg);
     --rm-bg-shell: var(--rm-shell-chrome-bg);
-    --rm-shell-bar-height: 76px;
+    --rm-shell-bar-height: 88px;
     background: var(--rm-app-bg);
 }
 .rm-shell:has(.rm-app-frame) { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
@@ -174,8 +174,8 @@
     .rm-shell .rm-topbar .rm-topbar__profile > i { display: none; }
     .rm-shell .rm-topbar .rm-topbar__avatar { width: 36px; height: 36px; }
 }
-@media (min-width: 1024px) and (max-width: 1279px) { .rm-shell .rm-topbar__brand-copy { display: none; } }
-@media (max-width: 1023px) {
+@media (min-width: 768px) and (max-width: 1279px) { .rm-shell .rm-topbar__brand-copy { display: none; } }
+@media (max-width: 767px) {
     .rm-shell { --rm-shell-bar-height: 68px; }
     .rm-shell .rm-topbar { --rm-topbar-search-width: clamp(210px, 31vw, 320px); width: 100%; margin-left: 0; padding-inline: var(--rm-space-3); }
     .rm-shell .rm-topbar .rm-topbar__hamburger { display: inline-flex; }

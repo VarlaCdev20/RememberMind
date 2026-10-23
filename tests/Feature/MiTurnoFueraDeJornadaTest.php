@@ -445,7 +445,31 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         Carbon::setTestNow(today()->setTime(6, 1));
         $this->assertNull($cuidados->obtenerTurnoActivo($this->elenaUser));
         $this->assertFalse($cuidados->esPacienteAsignado($this->residenteCarlos, $this->elenaUser));
+        $this->assertTrue($cuidados->obtenerPacientesAsignadosQuery($this->elenaUser)
+            ->whereKey($this->residenteCarlos->cod_residente)->exists());
         $this->assertDatabaseCount('signos_vitales', 0);
+    }
+
+    public function test_jornada_finalizada_permanece_consultable_en_mi_turno_sin_habilitar_escritura(): void
+    {
+        $this->jornadaManana->update(['estado' => 'FINALIZADA']);
+        $this->actingAs($this->elenaUser);
+
+        $cuidados = app(TurnoEnfermeriaService::class);
+        $datos = app(MiTurnoService::class)->obtenerDatosDashboard($this->elenaUser);
+
+        $this->assertSame('FUERA_DE_TURNO', $datos['modo']);
+        $this->assertTrue($datos['es_modo_consulta']);
+        $this->assertContains($this->residenteCarlos->cod_residente, array_column($datos['residentes'], 'cod_residente'));
+        $this->assertNull($cuidados->obtenerTurnoActivo($this->elenaUser));
+        $this->assertFalse($cuidados->esPacienteAsignado($this->residenteCarlos, $this->elenaUser));
+
+        try {
+            $cuidados->autorizarMutacionEnfermeria($this->residenteCarlos, 'signos_vitales.crear', $this->elenaUser);
+            $this->fail('Una jornada finalizada no debe autorizar nuevos registros.');
+        } catch (HttpException $error) {
+            $this->assertSame(403, $error->getStatusCode());
+        }
     }
 
     public function test_enfermero_fuera_de_turno_entra_en_modo_consulta(): void

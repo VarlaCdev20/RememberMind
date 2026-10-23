@@ -7,8 +7,10 @@ namespace Tests\Feature\SistemaExperto\Infrastructure\Repositories;
 use App\Models\ControlCognitivo;
 use App\Models\EvaluacionExperta;
 use App\Models\EvidenciaCriterioEvaluacion;
+use App\Models\ModeloBloqueExperto;
 use App\Models\VersionModeloExperto;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\InventarioExperto;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos;
 use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
@@ -71,7 +73,10 @@ final class EscenarioRepositorios
     {
         $filas = $visitados = [];
         self::reunir($raiz, $filas, $visitados);
-        foreach (InventarioExperto::TABLAS as $tabla) {
+        $orden = InventarioExperto::TABLAS;
+        array_splice($orden, array_search('fuentes_datos_expertas', $orden, true), 0, ['variables_expertas']);
+        array_splice($orden, array_search('evaluaciones_reglas', $orden, true), 0, ['resultados_criterio', 'trazas_inferencia']);
+        foreach ($orden as $tabla) {
             foreach ($filas[$tabla] ?? [] as $fila) {
                 self::insertar($fila);
             }
@@ -146,7 +151,8 @@ final class EscenarioRepositorios
             return;
         }
         $visitados[spl_object_id($modelo)] = true;
-        $filas[$modelo->getTable()][$modelo->getAttributes()[$modelo->getKeyName()]] = $modelo;
+        $tabla = $modelo instanceof ModeloBloqueExperto ? $modelo->entidadLogica() : $modelo->getTable();
+        $filas[$tabla][$modelo->getAttributes()[$modelo->getKeyName()]] = $modelo;
         foreach ($modelo->getRelations() as $relacion) {
             if ($relacion instanceof Model) {
                 self::reunir($relacion, $filas, $visitados);
@@ -168,9 +174,9 @@ final class EscenarioRepositorios
      */
     private static function insertar(Model $modelo): void
     {
-        $tabla = $modelo->getTable();
+        $tabla = $modelo instanceof ModeloBloqueExperto ? $modelo->entidadLogica() : $modelo->getTable();
         $id = $modelo->getAttributes()[$modelo->getKeyName()];
-        if (DB::table($tabla)->where($modelo->getKeyName(), $id)->exists()) {
+        if (BloquesExpertos::consulta($tabla)->where($modelo->getKeyName(), $id)->exists()) {
             return;
         }
         $comunes = ['cod_usuario_creacion' => 'SIM-USU', 'fecha_hora_creacion' => '2026-10-16 12:00:00',
@@ -193,7 +199,7 @@ final class EscenarioRepositorios
         // Solo se completan metadatos de fixtures, nunca valores clínicos faltantes.
         // El filtro evita añadir timestamps u otras columnas ajenas al esquema.
         $datos = array_intersect_key(array_replace($comunes, $extras, $modelo->getAttributes()),
-            array_flip(Schema::getColumnListing($tabla)));
-        DB::table($tabla)->insert($datos);
+            array_flip(isset(BloquesExpertos::DEFINICIONES[$tabla]) ? array_keys(BloquesExpertos::DEFINICIONES[$tabla]['campos']) : Schema::getColumnListing($tabla)));
+        BloquesExpertos::insertar($tabla, $datos);
     }
 }

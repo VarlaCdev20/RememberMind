@@ -1,0 +1,59 @@
+{
+    "solicitud": "ROSA-72H-20261019",
+    "nombre": "ROSA MAMANI",
+    "area": "Enfermería integral",
+    "inicio": "2026-10-19T01:04:00-04:00",
+    "fin": "2026-10-22T01:04:00-04:00",
+    "horas_verificadas": 72,
+    "tramos": [
+        {
+            "asignacion": "COD_ASP_003475",
+            "jornada": "COD_JOR_000651",
+            "turno": "COD_TUR_000013",
+            "inicio": "2026-10-19T01:04:00-04:00",
+            "fin": "2026-10-19T13:04:00-04:00",
+            "estado": "ACTIVA"
+        },
+        {
+            "asignacion": "COD_ASP_003476",
+            "jornada": "COD_JOR_000652",
+            "turno": "COD_TUR_000014",
+            "inicio": "2026-10-19T13:04:00-04:00",
+            "fin": "2026-10-20T01:04:00-04:00",
+            "estado": "ACTIVA"
+        },
+        {
+            "asignacion": "COD_ASP_003477",
+            "jornada": "COD_JOR_000653",
+            "turno": "COD_TUR_000013",
+            "inicio": "2026-10-20T01:04:00-04:00",
+            "fin": "2026-10-20T13:04:00-04:00",
+            "estado": "ACTIVA"
+        },
+        {
+            "asignacion": "COD_ASP_003478",
+            "jornada": "COD_JOR_000654",
+            "turno": "COD_TUR_000014",
+            "inicio": "2026-10-20T13:04:00-04:00",
+            "fin": "2026-10-21T01:04:00-04:00",
+            "estado": "ACTIVA"
+        },
+        {
+            "asignacion": "COD_ASP_003479",
+            "jornada": "COD_JOR_000655",
+            "turno": "COD_TUR_000013",
+            "inicio": "2026-10-21T01:04:00-04:00",
+            "fin": "2026-10-21T13:04:00-04:00",
+            "estado": "ACTIVA"
+        },
+        {
+            "asignacion": "COD_ASP_003480",
+            "jornada": "COD_JOR_000656",
+            "turno": "COD_TUR_000014",
+            "inicio": "2026-10-21T13:04:00-04:00",
+            "fin": "2026-10-22T01:04:00-04:00",
+            "estado": "ACTIVA"
+        }
+    ],
+    "auditoria": "Activitylog, seis asignaciones y dos horarios de tramo; actor explícito."
+}

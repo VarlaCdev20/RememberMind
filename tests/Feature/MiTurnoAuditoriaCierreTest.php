@@ -826,6 +826,7 @@ class MiTurnoAuditoriaCierreTest extends TestCase
             'cod_personal' => $this->enfermeraPersonal->cod_personal,
             'tipo_plan' => 'ENFERMERIA',
             'nombre' => 'Plan Orden',
+            'fecha_hora_apertura' => Carbon::today()->startOfDay(),
             'estado' => 'ACTIVO',
         ]);
 

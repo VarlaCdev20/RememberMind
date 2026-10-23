@@ -110,7 +110,7 @@
     .rm-sidebar__flyout-link.is-active { font-weight: 700; border-left: 3px solid var(--rm-mint-300); }
     .rm-sidebar [x-cloak] { display: none !important; }
 
-    @media (min-width: 1024px) {
+    @media (min-width: 768px) {
         .rm-shell.is-sidebar-collapsed .rm-sidebar { width: var(--rm-sidebar-collapsed); }
         .rm-shell.is-sidebar-collapsed .rm-sidebar__header { flex-direction: column; justify-content: center; gap: 2px; padding: 3px 8px; }
         .rm-shell.is-sidebar-collapsed .rm-sidebar__logo { width: 27px; height: 27px; flex-basis: 27px; }
@@ -127,7 +127,7 @@
         .rm-shell.is-sidebar-collapsed [data-rm-topbar], .rm-shell.is-sidebar-collapsed [data-role-preview-banner] { width: calc(100% - var(--rm-sidebar-collapsed)); }
     }
 
-    @media (max-width: 1023px) {
+    @media (max-width: 767px) {
         .rm-sidebar { width: min(280px, 85vw); visibility: hidden; transform: translateX(-100%); transition: transform var(--rm-duration-slow) var(--rm-ease-standard), visibility 0s linear var(--rm-duration-slow); }
         .rm-sidebar.is-mobile-open { visibility: visible; transform: translateX(0); transition: transform var(--rm-duration-slow) var(--rm-ease-standard), visibility 0s; }
         .rm-sidebar__header-toggle { display: none; }

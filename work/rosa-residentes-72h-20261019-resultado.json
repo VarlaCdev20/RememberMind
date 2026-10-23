@@ -1,0 +1,15 @@
+{
+    "creadas": 30,
+    "residentes": [
+        "Hugo Romero Torrico",
+        "Gloria Sánchez Condori",
+        "Teresa Aguilar Rojas",
+        "Elena Vargas Mamani",
+        "Mercedes Choque Rivera"
+    ],
+    "jornadas_cubiertas": 6,
+    "visibles_en_turno_actual": 5,
+    "inicio": "2026-10-19T01:04:00-04:00",
+    "fin": "2026-10-22T01:04:00-04:00",
+    "auditoria": "Activitylog, actor explícito"
+}

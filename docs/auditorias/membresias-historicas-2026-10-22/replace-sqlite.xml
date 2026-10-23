@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\CARLAENCINAS\Desktop\RememberMind\phpunit.xml" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="3.149199">
+    <testsuite name="Feature" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="3.149199">
+      <testsuite name="Tests\Feature\CapturaPetersenOriginalTest" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaPetersenOriginalTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="3.149199">
+        <testcase name="test_sqlite_membresias_vacias_no_se_borran_mediante_replace_sin_triggers_recursivos" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CapturaPetersenOriginalTest.php" line="365" class="Tests\Feature\CapturaPetersenOriginalTest" classname="Tests.Feature.CapturaPetersenOriginalTest" assertions="5" time="3.149199"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

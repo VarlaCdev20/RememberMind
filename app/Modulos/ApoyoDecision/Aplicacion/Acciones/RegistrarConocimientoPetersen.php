@@ -39,7 +39,7 @@ final class RegistrarConocimientoPetersen
             $tablas = app(IdentidadesConocimiento::class)->traducir(['versiones_modelo_experto' => [$cabecera]] + $p->declaracion()['tablas'], $id, $id, false);
             foreach ($tablas as $tabla => $filas) {
                 if ($filas !== []) {
-                    DB::table($tabla)->insert($filas);
+                    \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::insertar($tabla, $filas);
                 }
             }
             $auditoria = activity('conocimiento_experto')->causedBy($actor)->event('contrato_petersen_registrado')

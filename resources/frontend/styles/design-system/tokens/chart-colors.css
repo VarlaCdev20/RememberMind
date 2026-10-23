@@ -33,6 +33,7 @@
     --rm-chart-neutral-alpha: color-mix(in srgb, var(--rm-palette-gold) 82%, transparent);
     --rm-chart-neutral-soft: color-mix(in srgb, var(--rm-palette-gold) 18%, transparent);
     --rm-chart-cognitive-500: var(--rm-palette-psychology);
+    --rm-chart-cognitive-strong: color-mix(in srgb, var(--rm-chart-cognitive-500) 92%, var(--rm-chart-text-title));
     --rm-chart-cognitive-100: var(--rm-palette-psychology-soft);
     --rm-chart-cognitive-alpha: color-mix(in srgb, var(--rm-palette-psychology) 82%, transparent);
     --rm-chart-cognitive-soft: color-mix(in srgb, var(--rm-palette-psychology) 18%, transparent);

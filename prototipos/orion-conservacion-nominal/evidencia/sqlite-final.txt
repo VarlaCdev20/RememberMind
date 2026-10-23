@@ -1,0 +1,53 @@
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Unit\ContratoNominalTest[39m
+  [32;1m✓[39;22m[90m [39m[90mel ddl y la cobertura de 783 rutas coinciden con el codigo[39m[90m                                                  [39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90msqlite distingue texto precision tipo cero negativo null y ausencia[39m
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Unit\MotivoPetersenVisibleTest[39m
+  [32;1m✓[39;22m[90m [39m[90mtraduce motivos sin exponer identificadores de fuente o campos internos[39m[90m                                     [39m [90m0.01s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Unit\ResumenPetersenVisibleTest[39m
+  [32;1m✓[39;22m[90m [39m[90mun requisito negativo no se presenta como falta de medicion[39m
+  [32;1m✓[39;22m[90m [39m[90muna revision diferencial negativa no inventa un impedimento clinico[39m
+  [32;1m✓[39;22m[90m [39m[90mno atribuye otros bloqueos a falta de mediciones with data set #0[39m
+  [32;1m✓[39;22m[90m [39m[90mno atribuye otros bloqueos a falta de mediciones with data set #1[39m
+  [32;1m✓[39;22m[90m [39m[90mno atribuye otros bloqueos a falta de mediciones with data set #2[39m
+  [32;1m✓[39;22m[90m [39m[90mno atribuye otros bloqueos a falta de mediciones with data set #3[39m
+  [32;1m✓[39;22m[90m [39m[90mfaltantes y observaciones no se convierten en patron[39m
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\CicloObservacionalConservadoTest[39m
+  [32;1m✓[39;22m[90m [39m[90mguardar recuperar y revisar por ambas disciplinas sin alterar el resultado with data set "medicina primero"[39m[90m [39m [90m5.41s[39m  
+  [32;1m✓[39;22m[90m [39m[90mguardar recuperar y revisar por ambas disciplinas sin alterar el resultado with data set "psicologia primer[39m[90m…[39m [90m4.41s[39m  
+
+  [30;43;1m WARN [39;49;22m[39m Tests\Feature\ConservacionNominalCompuestaTest[39m
+  [32;1m✓[39;22m[90m [39m[90mdiez casos recuperan todas las entradas y reproducen el dto con ejecutor retenido[39m[90m                          [39m [90m40.14s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfallo parcial no deja filas y una historia cerrada es inmutable[39m[90m                                            [39m [90m12.95s[39m  
+  [33;1m-[39;22m[90m [39m[90mpostgres solapa cierre insercion tardia y reintento idempotente[39m[90m [39m[33m→ Bloqueos entre tres conexiones PostgreSQL[39m[90m…[39m [90m0.58s[39m  
+  [32;1m✓[39;22m[90m [39m[90mrechaza identidad ajena propietario cruzado y cierre incompleto[39m[90m                                            [39m [90m12.77s[39m  
+  [32;1m✓[39;22m[90m [39m[90mensayo poblado se retira y restauran las dos ramas sin cambiar tablas instaladas[39m[90m                           [39m [90m16.72s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\EjecucionConsultaCognitivaTest[39m
+  [32;1m✓[39;22m[90m [39m[90mpetersen recibe la instantanea instrumental de la misma consulta[39m[90m                                            [39m [90m3.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90manalizar presenta la adquisicion ejecutada una sola vez[39m[90m                                                     [39m [90m3.33s[39m  
+  [32;1m✓[39;22m[90m [39m[90mla presentacion conserva ambas salidas y la huella sin consultar datos actuales[39m[90m                             [39m [90m2.81s[39m  
+  [32;1m✓[39;22m[90m [39m[90mun fallo petersen no anuncia exito y no expone el error interno[39m[90m                                             [39m [90m2.65s[39m  
+  [32;1m✓[39;22m[90m [39m[90mun segundo intento fallido retira el aviso de exito anterior[39m[90m                                                [39m [90m3.16s[39m  
+  [32;1m✓[39;22m[90m [39m[90muna revocacion de fuente no se convierte en confirmacion de analisis[39m[90m                                        [39m [90m2.92s[39m  
+  [32;1m✓[39;22m[90m [39m[90motra peticion no presenta una nueva lectura como el analisis previo[39m[90m                                         [39m [90m3.68s[39m  
+  [32;1m✓[39;22m[90m [39m[90msin version de conocimiento no afirma una ejecucion completa[39m[90m                                                [39m [90m3.85s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\SistemaExpertoOrionNivel1Test[39m
+  [32;1m✓[39;22m[90m [39m[90mmedico y psicologo pueden ejecutar analizar evidencia y muestra aviso en memoria[39m[90m                            [39m [90m5.67s[39m  
+  [32;1m✓[39;22m[90m [39m[90menfermero o usuario no autorizado es rechazado al intentar acceder o analizar[39m[90m                               [39m [90m3.95s[39m  
+  [32;1m✓[39;22m[90m [39m[90mresidente sin datos muestra cobertura 19 componentes y abstencion sin romper[39m[90m                                [39m [90m3.60s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcaso sintetico amnesico unico clasifica pet 01[39m[90m                                                              [39m [90m3.80s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcaso sintetico amnesico multidominio clasifica pet 02[39m[90m                                                       [39m [90m3.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcaso sintetico no amnesico unico clasifica pet 03[39m[90m                                                           [39m [90m3.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcaso sintetico no amnesico multidominio clasifica pet 04[39m[90m                                                    [39m [90m3.23s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcaso sintetico sin alteracion objetiva emite sin patron dcl[39m[90m                                                 [39m [90m3.00s[39m  
+  [32;1m✓[39;22m[90m [39m[90mabstencion fundamentada cuando falta iadl c03[39m[90m                                                               [39m [90m2.98s[39m  
+  [32;1m✓[39;22m[90m [39m[90mabstencion fundamentada cuando hay impedimento diferencial c04[39m[90m                                              [39m [90m3.00s[39m  
+
+  [90mTests:[39m    [33;1m1 skipped[39;22m[90m,[39m[39m [39m[32;1m34 passed[39;22m[90m (317 assertions)[39m
+  [90mDuration:[39m [39m155.23s[39m
+

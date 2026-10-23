@@ -7,6 +7,7 @@ import { rmDestroyAllCharts, rmInitChart } from '../../resources/frontend/styles
 
 const css = readFileSync(new URL('../../resources/frontend/styles/design-system/tokens/chart-colors.css', import.meta.url), 'utf8');
 const values = {
+    '--rm-chart-cognitive-strong': '#876FAD',
     '--rm-chart-care-500': '#7FA883',
     '--rm-chart-clinical-500': '#7FAFD8',
     '--rm-chart-reference-500': '#B6ACA2',
@@ -34,6 +35,10 @@ globalThis.document = { documentElement: { classList: { contains: () => false },
 globalThis.getComputedStyle = () => ({ getPropertyValue: name => values[name] ?? '' });
 
 afterEach(() => { values['--rm-chart-care-500'] = '#7FA883'; });
+
+test('la línea cognitiva dispone de una variante contrastada del token compartido', () => {
+    assert.equal(rmChartColor('cognitive', 'strong'), '#876FAD');
+});
 
 test('rellenos sólidos conservan series y no dependen de degradados ni tamaño del canvas', () => {
     const ctx = { createLinearGradient() { throw new Error('No debe crear un degradado'); } };

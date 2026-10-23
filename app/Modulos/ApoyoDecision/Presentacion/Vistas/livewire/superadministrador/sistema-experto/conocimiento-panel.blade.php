@@ -1,9 +1,12 @@
-<div class="rm-lab space-y-5 text-rm-primary">
-    <x-ui.page-header title="Laboratorio del sistema experto" subtitle="Entorno experimental para evaluar casos sintéticos, verificar reglas y analizar resultados explicables. No habilitado para decisiones asistenciales." icon="ph-graph" eyebrow="Sistema experto" context="Investigación experimental" />
-    <div class="rm-alert rm-alert-info" role="note"><div><strong>SIMULACIÓN TÉCNICA — NO VÁLIDA PARA DECISIONES ASISTENCIALES</strong><p>Los casos son ficticios. Los hallazgos descriptivos y los estados experimentales Petersen son contratos diferentes; no representan un diagnóstico.</p></div></div>
+<div class="rm-lab rm-knowledge-workspace space-y-5 text-rm-primary" x-data="{ ultimoDetalle: null }" x-on:click.capture="if ($event.target.closest('[data-expert-detail]')) ultimoDetalle = $event.target.closest('[data-expert-detail]')" x-on:expert-detail-closed.window="$nextTick(() => ultimoDetalle?.focus())">
+    <x-ui.page-header title="Sistema experto" subtitle="Conocimiento que acompaña. Explore sus fuentes, relaciones y versiones." icon="ph-graph" eyebrow="RememberMind · Superadministración" context="Consulta de conocimiento" />
+    <div class="rm-expert-disclosure" role="note"><i class="ph ph-shield-check" aria-hidden="true"></i><div><strong>Consulta de conocimiento · activación clínica pendiente</strong><p>Un estado técnico activo no acredita por sí mismo aprobación ni publicación clínica. La consulta conserva las versiones originales.</p></div></div>
+    @if(in_array($seccion, ['laboratorio', 'casos', 'resultados'], true))
+        <div class="rm-alert rm-alert-info" role="note"><div><strong>SIMULACIÓN TÉCNICA — NO VÁLIDA PARA DECISIONES ASISTENCIALES</strong><p>Los casos son ficticios. Los hallazgos descriptivos y los estados experimentales Petersen son contratos diferentes; no representan un diagnóstico.</p></div></div>
+    @endif
     <nav class="rm-lab-nav" aria-label="Secciones del sistema experto">
         @can('consultarGobierno', \App\Models\VersionModeloExperto::class)<a href="{{ route('admin.sistema-experto.reglas') }}" class="rm-btn rm-btn-secondary">Gobierno de reglas</a>@endcan
-        @foreach(['laboratorio' => 'Laboratorio', 'casos' => 'Casos sintéticos', 'resultados' => 'Resultados', 'conocimiento' => 'Conocimiento', 'verificacion' => 'Verificación y auditoría'] as $id => $nombre)
+        @foreach(['gobierno' => 'Resumen', 'conocimiento' => 'Conocimiento', 'laboratorio' => 'Laboratorio', 'casos' => 'Casos sintéticos', 'resultados' => 'Resultados', 'verificacion' => 'Verificación y auditoría'] as $id => $nombre)
             <button type="button" wire:click="ir('{{ $id }}')" class="rm-btn {{ $seccion === $id ? 'rm-btn-primary' : 'rm-btn-secondary' }}" @if($seccion === $id) aria-current="page" @endif>{{ $nombre }}</button>
         @endforeach
     </nav>
@@ -13,7 +16,11 @@
         <div class="rm-alert rm-alert-warning" role="status"><div><strong>Ejecución experimental deshabilitada en este entorno.</strong><p>La ejecución web de casos artificiales solo está disponible en local y testing. La consulta autorizada del conocimiento sigue disponible.</p></div></div>
     @endif
 
-    @if($seccion === 'laboratorio')
+    <div class="rm-knowledge-surface space-y-5" wire:key="expert-section-{{ $seccion }}">
+    @if($seccion === 'gobierno')
+        @include('apoyodecision::livewire.superadministrador.sistema-experto.gobierno')
+    @elseif($seccion === 'laboratorio')
+        <h2 class="rm-expert-section-title">Laboratorio del sistema experto</h2>
         <div class="rm-lab-grid">
             <x-ui.section-card title="Ejecutar un caso sintético" subtitle="La evaluación usa las versiones declaradas por el motor experimental.">
                 @include('livewire.superadministrador.sistema-experto.ejecutar')
@@ -55,5 +62,17 @@
             </ul>
         </x-ui.section-card>
         @include('livewire.superadministrador.sistema-experto.historial-sesion')
+    @endif
+    </div>
+    @if($detalleAbierto && ($regla || $detalleRegistro))
+        <x-ui.drawer-livewire wire:model="detalleAbierto" title="Detalle de conocimiento" subtitle="Consulta de la versión seleccionada" close-method="cerrarDetalle" size="lg" badge="SOLO CONSULTA" icon="ph-book-open">
+            @if($regla && isset($conocimiento['reglas'][$regla]))
+                <h3 class="rm-expert-section-title">Detalle de regla · {{ $conocimiento['reglas'][$regla]['nombre'] ?? $conocimiento['reglas'][$regla]['codigo'] }}</h3>
+                @include('livewire.superadministrador.sistema-experto.datos', ['datos' => $conocimiento['reglas'][$regla]])
+            @elseif($detalleRegistro)
+                <h3 class="rm-expert-section-title">{{ $detalleRegistro['nombre'] ?? $detalleRegistro[$pkCatalogo] }}</h3>
+                @include('livewire.superadministrador.sistema-experto.datos', ['datos' => $detalleRegistro])
+            @endif
+        </x-ui.drawer-livewire>
     @endif
 </div>

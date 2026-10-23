@@ -24,14 +24,14 @@ const browserPath = [process.env.PUPPETEER_EXECUTABLE_PATH, await puppeteer.exec
 assert.ok(browserPath, 'Se necesita Chrome para verificar la interacción real del sidebar.');
 const fixture = path => `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/build/${css}"><style>${read('resources/frontend/styles/modules/pages-welcome.css')}</style><script>document.addEventListener('alpine:init',()=>Alpine.data('shell',()=>({${shell}})));</script><script src="/livewire.js" data-csrf="test" data-update-uri="/update" defer></script></head>
 <body class="rm-shell" x-data="shell" x-init="initSidebar()" :class="{'is-sidebar-collapsed':sidebarCollapsed}" @resize.window.debounce.150ms="syncSidebarViewport()">
-<button id="sidebar-mobile-trigger" @click="sidebarOpen=true">Abrir</button><div class="rm-sidebar-overlay" x-show="sidebarOpen" @click="sidebarOpen=false" style="display:none"></div>
+<div class="rm-sidebar-overlay" x-show="sidebarOpen" @click="sidebarOpen=false" style="display:none"></div>
 <aside class="rm-sidebar" wire:transition="rm-sidebar" :class="{'is-mobile-open':sidebarOpen}" :inert="sidebarRange === 'drawer' && !sidebarOpen" x-data="${sidebarData}" @livewire:navigating.window="saveSidebarView();closeSidebarForNavigation()" x-init="${sidebarInit}" @keydown.escape.window="${sidebarEscape}">
-<header class="rm-sidebar__header"><span class="rm-sidebar__brand-copy"><strong class="rm-brand">RememberMind</strong></span><button id="collapse" class="rm-sidebar__header-toggle" @click="toggleSidebarCollapse()">‹</button><button class="rm-sidebar__mobile-close" x-ref="mobileClose" @click="sidebarOpen=false">Cerrar</button></header>
+<header class="rm-sidebar__header"><a href="/first" class="rm-sidebar__brand" aria-label="RememberMind, inicio"><span class="rm-sidebar__logo" aria-hidden="true"></span><span class="rm-sidebar__brand-copy"><strong class="rm-brand">RememberMind</strong></span></a><button id="collapse" class="rm-sidebar__header-toggle" @click="toggleSidebarCollapse()">‹</button><button class="rm-sidebar__mobile-close" x-ref="mobileClose" @click="sidebarOpen=false">Cerrar</button></header>
 <nav class="rm-sidebar__nav" x-ref="navigation" @scroll.debounce.100ms="saveSidebarView()">
 <p class="rm-sidebar__group rm-nav-section">SISTEMA</p><div class="rm-sidebar__entry"><button id="group" class="rm-sidebar__item" aria-label="Seguimiento, 12345" :aria-expanded="openSection===0" @click="openSection=openSection===0?null:0"><i class="rm-sidebar__icon" aria-hidden="true">◉</i><span class="rm-sidebar__label rm-nav-group">Seguimiento</span><span class="rm-sidebar__badge" aria-hidden="true"><span class="rm-sidebar__badge-value">12345</span><span class="rm-sidebar__badge-compact">99+</span></span><i class="rm-sidebar__chevron" aria-hidden="true">⌄</i></button>
 <div class="rm-sidebar__submenu" x-show="openSection===0" x-collapse.duration.200ms><div class="rm-sidebar__submenu-content" :class="{'is-visible':openSection===0}"><a href="/second" wire:navigate @click="sidebarOpen=false" class="rm-sidebar__subitem is-active" aria-current="page"><span class="rm-sidebar__subindicator"></span>Usuarios</a></div></div></div>
 ${Array.from({length:30},(_,i)=>`<a class="rm-sidebar__item" href="/second" wire:navigate @click="sidebarOpen=false">Sección de ejemplo ${i}</a>`).join('')}
-</nav><footer class="rm-sidebar__footer"><div class="rm-sidebar__account-trigger">Cuenta de ejemplo</div></footer></aside><main data-rm-main style="min-height:1800px;padding:24px"><h1>${path}</h1><div style="position:fixed;left:-10000px;top:0;width:320px;pointer-events:none"><div id="theme-card" class="rm-card">Card de referencia</div><input id="theme-input" class="rm-input" aria-label="Dato de referencia" value="Ejemplo"><table class="rm-table"><thead id="theme-table-head"><tr><th>Columna</th></tr></thead><tbody><tr><td>Ejemplo</td></tr></tbody></table><div id="theme-modal" class="rm-modal-panel">Modal de referencia</div><div id="theme-topbar" style="background:var(--rm-topbar-bg)">Encabezado de referencia</div><div class="welcome-page"><section id="theme-public-hero" class="welcome-hero">Inicio</section><section id="theme-public-services" class="welcome-services-detail">Servicios</section><footer id="theme-public-footer" class="welcome-footer">Pie público</footer></div></div></main></body></html>`;
+</nav><footer class="rm-sidebar__footer"><div class="rm-sidebar__account-trigger">Cuenta de ejemplo</div></footer></aside><header data-rm-topbar class="rm-topbar"><div class="rm-topbar__identity"><button id="sidebar-mobile-trigger" class="rm-topbar__action rm-topbar__hamburger" @click="sidebarOpen=true">Abrir</button></div><div class="rm-topbar__search-slot"><div class="rm-topbar-search"><form class="rm-topbar-search__form" role="search"><label for="shell-search" class="sr-only">Buscar residentes</label><input id="shell-search" placeholder="Buscar residentes"><button class="rm-topbar-search__submit" type="submit">Ir</button></form></div></div><div class="rm-topbar__actions">${Array.from({length:4},(_,i)=>`<button class="rm-topbar__action" aria-label="Acción ${i+1}">${i+1}</button>`).join('')}<div><button class="rm-topbar__profile"><span class="rm-topbar__avatar">L</span></button></div></div></header><main data-rm-main style="min-height:1800px;padding:24px"><h1>${path}</h1><div style="position:fixed;left:-10000px;top:0;width:320px;pointer-events:none"><div id="theme-card" class="rm-card">Card de referencia</div><input id="theme-input" class="rm-input" aria-label="Dato de referencia" value="Ejemplo"><table class="rm-table"><thead id="theme-table-head"><tr><th>Columna</th></tr></thead><tbody><tr><td>Ejemplo</td></tr></tbody></table><div id="theme-modal" class="rm-modal-panel">Modal de referencia</div><div id="theme-topbar" style="background:var(--rm-topbar-bg)">Encabezado de referencia</div><div class="welcome-page"><section id="theme-public-hero" class="welcome-hero">Inicio</section><section id="theme-public-services" class="welcome-services-detail">Servicios</section><footer id="theme-public-footer" class="welcome-footer">Pie público</footer></div></div></main></body></html>`;
 const server = createServer((req,res) => {
     try {
         if (req.url.startsWith('/build/')) {
@@ -57,28 +57,61 @@ test('sidebar adaptativo: preferencia desktop, laptop temporal, drawer y persist
         await page.waitForFunction(()=>document.body.hasAttribute('data-rm-sidebar-ready'));
         assert.deepEqual(errors, [], 'Alpine debe iniciar sin errores antes de probar la interacción.');
         assert.equal((await state(page)).width,224);
+        const headerAligned=()=>page.evaluate(()=>{const sidebar=document.querySelector('.rm-sidebar__header').getBoundingClientRect();const topbar=document.querySelector('[data-rm-topbar]').getBoundingClientRect();return {sidebarHeight:sidebar.height,topbarHeight:topbar.height,edgeDifference:Math.abs(sidebar.bottom-topbar.bottom)};});
+        assert.deepEqual(await headerAligned(),{sidebarHeight:88,topbarHeight:88,edgeDifference:0},'La cabecera expandida comparte altura con la barra superior');
         const navigationType=await page.evaluate(()=>['.rm-nav-section','#group','.rm-sidebar__subitem'].map(selector=>{const style=getComputedStyle(document.querySelector(selector));return {family:style.fontFamily,size:style.fontSize,weight:style.fontWeight,tracking:style.letterSpacing,case:style.textTransform};}));
         assert.match(navigationType[0].family,/Nunito Sans/);assert.equal(navigationType[0].size,'11px');assert.equal(navigationType[0].weight,'600');assert.equal(navigationType[0].tracking,'1.1px');assert.equal(navigationType[0].case,'lowercase');
         assert.match(navigationType[1].family,/Plus Jakarta Sans/);assert.equal(navigationType[1].size,'14px');assert.equal(navigationType[1].weight,'600');assert.equal(navigationType[1].case,'uppercase');
         assert.match(navigationType[2].family,/Inter/);assert.equal(navigationType[2].size,'13.5px');assert.equal(navigationType[2].weight,'600');
         await page.click('#collapse');await page.waitForFunction(()=>document.querySelector('aside').getBoundingClientRect().width===80);
+        assert.deepEqual(await headerAligned(),{sidebarHeight:88,topbarHeight:88,edgeDifference:0},'La cabecera compacta no deja un bloque sobrante sobre la navegación');
+        const headerTargets=await page.evaluate(()=>['.rm-sidebar__brand','#collapse'].map(selector=>document.querySelector(selector).getBoundingClientRect().height));
+        assert.ok(headerTargets.every(height=>height>=44),'Logo y expansión mantienen objetivos táctiles de 44 px');
         assert.equal((await state(page)).preference,'true');
         await page.reload();await settle(page);await page.waitForFunction(()=>document.querySelector('aside').getBoundingClientRect().width===80);
+        await page.setViewport({width:1280,height:900});
+        await page.waitForFunction(()=>Alpine.$data(document.body).sidebarRange==='desktop');
+        assert.equal((await state(page)).width,80,'La preferencia se conserva en escritorio');
         await page.setViewport({width:1100,height:900});await page.waitForFunction(()=>Alpine.$data(document.body).sidebarRange==='laptop');
         await page.click('#collapse');await page.waitForFunction(()=>document.querySelector('aside').getBoundingClientRect().width===224);
         assert.equal((await state(page)).preference,'true','La expansión laptop no cambia la preferencia desktop');
         await page.evaluate(()=>Alpine.$data(document.body).closeSidebarForNavigation());
         await page.waitForFunction(()=>document.querySelector('aside').getBoundingClientRect().width===80);
-        await page.setViewport({width:900,height:900});await page.waitForFunction(()=>Alpine.$data(document.body).sidebarRange==='drawer');await page.waitForFunction(()=>document.querySelector('aside').getBoundingClientRect().right<=0);
-        await page.click('#sidebar-mobile-trigger');await page.waitForFunction(()=>document.documentElement.classList.contains('rm-sidebar-scroll-locked'));
-        assert.equal((await state(page)).width,300);
-        await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.documentElement.classList.contains('rm-sidebar-scroll-locked'));await page.waitForFunction(()=>document.querySelector('aside').getBoundingClientRect().right<=0);
-        assert.equal(await page.evaluate(()=>document.activeElement.id), 'sidebar-mobile-trigger', 'Escape devuelve el foco al botón visible de apertura');
-        assert.equal(await page.evaluate(()=>document.querySelector('aside').inert), true, 'El menú cerrado queda fuera del recorrido de teclado');
-        await page.click('#sidebar-mobile-trigger');await page.waitForFunction(()=>document.documentElement.classList.contains('rm-sidebar-scroll-locked'));
-        await page.waitForFunction(()=>getComputedStyle(document.querySelector('.rm-sidebar-overlay')).display!=='none');await page.mouse.click(700,300);await page.waitForFunction(()=>!document.documentElement.classList.contains('rm-sidebar-scroll-locked'));
-        await page.setViewport({width:390,height:844,isMobile:true,hasTouch:true});await settle(page);await page.click('#sidebar-mobile-trigger');await page.waitForFunction(()=>document.querySelector('.rm-sidebar').classList.contains('is-mobile-open'));
+        for (const width of [1024, 900, 768]) {
+            await page.setViewport({width,height:900});
+            await page.waitForFunction(()=>Alpine.$data(document.body).sidebarRange==='laptop');
+            await page.waitForFunction(()=>document.querySelector('aside').getBoundingClientRect().width===80);
+            assert.equal(await page.evaluate(()=>document.querySelector('aside').getBoundingClientRect().left),0,'La barra compacta permanece visible');
+            await page.waitForFunction(()=>Math.abs(document.querySelector('[data-rm-main]').getBoundingClientRect().left-80)<.1);
+            await page.waitForFunction(()=>Math.abs(document.querySelector('[data-rm-topbar]').getBoundingClientRect().left-80)<.1);
+            assert.deepEqual(await headerAligned(),{sidebarHeight:88,topbarHeight:88,edgeDifference:0},'La cabecera compacta coincide con la barra superior en tablet');
+            assert.equal(await page.evaluate(()=>getComputedStyle(document.querySelector('.rm-sidebar__mobile-close')).display),'none','La X móvil no sustituye el botón de expansión');
+            assert.notEqual(await page.evaluate(()=>getComputedStyle(document.querySelector('#collapse')).display),'none','El control de expansión queda visible');
+            assert.equal(await page.evaluate(()=>getComputedStyle(document.querySelector('#sidebar-mobile-trigger')).display),'none','El botón móvil no duplica el control de expansión');
+            await page.click('#collapse');
+            await page.waitForFunction(()=>document.querySelector('aside').getBoundingClientRect().width===224);
+            await page.waitForFunction(()=>Math.abs(document.querySelector('[data-rm-main]').getBoundingClientRect().left-224)<.1);
+            await page.waitForFunction(()=>Math.abs(document.querySelector('[data-rm-topbar]').getBoundingClientRect().left-224)<.1);
+            assert.deepEqual(await headerAligned(),{sidebarHeight:88,topbarHeight:88,edgeDifference:0},'La cabecera ampliada también coincide con la barra superior');
+            const topbarFits=await page.evaluate(()=>document.querySelector('.rm-topbar__actions').getBoundingClientRect().right<=window.innerWidth+1);
+            assert.equal(topbarFits,true,'Las acciones de la barra superior no salen de la pantalla al expandir');
+            const searchFits=await page.evaluate(()=>{const search=document.querySelector('.rm-topbar__search-slot').getBoundingClientRect();const actions=document.querySelector('.rm-topbar__actions').getBoundingClientRect();return search.width>=100 && search.right<=actions.left+1;});
+            assert.equal(searchFits,true,'La búsqueda conserva espacio útil sin solaparse con las acciones');
+            await page.click('#collapse');
+            await page.waitForFunction(()=>document.querySelector('aside').getBoundingClientRect().width===80);
+            assert.equal((await state(page)).locked,false,'La barra de escritorio no bloquea el desplazamiento');
+        }
+        await page.setViewport({width:390,height:844,isMobile:true,hasTouch:true});
+        await page.waitForFunction(()=>Alpine.$data(document.body).sidebarRange==='drawer');
+        await page.waitForFunction(()=>document.querySelector('aside').getBoundingClientRect().right<=0);
+        assert.equal(await page.evaluate(()=>document.querySelector('aside').inert), true, 'El menú móvil cerrado queda fuera del teclado');
+        await page.click('#sidebar-mobile-trigger');await page.waitForFunction(()=>document.querySelector('.rm-sidebar').classList.contains('is-mobile-open'));
+        await page.waitForFunction(()=>document.documentElement.classList.contains('rm-sidebar-scroll-locked'));
         assert.equal((await state(page)).width,320);await page.waitForFunction(()=>document.querySelector('aside').getBoundingClientRect().left===0);
+        assert.deepEqual(await headerAligned(),{sidebarHeight:108,topbarHeight:108,edgeDifference:0},'La cabecera del menú móvil conserva la proporción de su barra superior');
+        await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.documentElement.classList.contains('rm-sidebar-scroll-locked'));
+        assert.equal(await page.evaluate(()=>document.activeElement.id), 'sidebar-mobile-trigger', 'Escape devuelve el foco al botón de apertura móvil');
+        await page.click('#sidebar-mobile-trigger');await page.waitForFunction(()=>document.querySelector('.rm-sidebar').classList.contains('is-mobile-open'));
         await page.click('#group');await page.waitForFunction(()=>Alpine.$data(document.querySelector('aside')).openSection===null);
         await page.waitForFunction(()=>getComputedStyle(document.querySelector('.rm-sidebar__submenu')).display==='none');await page.evaluate(()=>document.querySelector('nav').scrollTop=240);
         await page.waitForFunction(()=>JSON.parse(sessionStorage.getItem('sidebar-test-context'))?.scroll===240);
@@ -91,7 +124,7 @@ test('sidebar adaptativo: preferencia desktop, laptop temporal, drawer y persist
         const snapshots = await page.evaluate(()=>['old','new'].map(kind=>{const style=getComputedStyle(document.documentElement,'::view-transition-'+kind+'(rm-sidebar)');return {opacity:style.opacity,animation:style.animationName};}));
         assert.deepEqual(snapshots,[{opacity:'0',animation:'none'},{opacity:'1',animation:'none'}],'La página anterior no se superpone con el nuevo sidebar');
         const palette = await page.evaluate(()=>({bg:getComputedStyle(document.querySelector('aside')).backgroundColor,link:getComputedStyle(document.querySelector('nav > a')).color,button:getComputedStyle(document.querySelector('#group')).appearance}));
-        assert.deepEqual(palette,{bg:'rgb(216, 210, 205)',link:'rgb(79, 71, 66)',button:'none'},'La navegación conserva el shell y la tinta cálida de la paleta final aprobada');
+        assert.deepEqual(palette,{bg:'rgb(221, 214, 207)',link:'rgb(74, 70, 66)',button:'none'},'La navegación conserva el shell y la tinta cálida de la paleta aprobada el 20 de octubre');
         assert.equal((await state(page)).locked,false);assert.equal((await state(page)).open,0,'La ruta nueva abre automáticamente su grupo activo');
         await page.evaluate(()=>Alpine.$data(document.body).sidebarOpen=true);
         await page.waitForFunction(()=>document.querySelector('nav').scrollTop===240);

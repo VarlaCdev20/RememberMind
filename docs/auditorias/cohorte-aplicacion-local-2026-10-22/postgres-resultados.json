@@ -1,0 +1,1848 @@
+{
+    "version": "COHORTE-INFERENCIA-30-V1",
+    "sintetico": true,
+    "motor": "pgsql",
+    "captura": "Actions institucionales, SQL y métodos existentes",
+    "consulta_sin_escrituras": true,
+    "validacion_clinica": false,
+    "tablas": {
+        "residentes": 30,
+        "admisiones": 30,
+        "ocupaciones_cama": 30,
+        "atenciones": 749,
+        "diagnosticos": 30,
+        "antecedentes_clinicos": 30,
+        "incidentes": 15,
+        "signos_vitales": 90,
+        "notas_clinicas": 30,
+        "valoraciones_dolor": 30,
+        "instrumentos": 5,
+        "preguntas_instrumento": 48,
+        "aplicaciones_instrumento": 149,
+        "respuestas_instrumento": 1431,
+        "controles_cognitivos": 480,
+        "controles_funcionales_iadl": 30,
+        "valoraciones_psicologicas": 60,
+        "valoraciones_petersen_originales": 271,
+        "soportes_valoracion_petersen": 449,
+        "evaluaciones_expertas": 0
+    },
+    "manifiesto": {
+        "version": "INVESTIGACION-COGNITIVA-30-20261022-V1",
+        "fecha_revision_bibliografica": "2026-10-22",
+        "procedencia": "CASOS_SINTETICOS_DE_INGENIERIA_CON_BIBLIOGRAFIA",
+        "datos_individuales_importados": false,
+        "aprobacion_clinica": false,
+        "referencias": {
+            "PETERSEN-2004": {
+                "titulo": "Mild cognitive impairment as a diagnostic entity",
+                "autor": "Petersen RC",
+                "anio": 2004,
+                "doi": "10.1111\/j.1365-2796.2004.01388.x",
+                "url": "https:\/\/doi.org\/10.1111\/j.1365-2796.2004.01388.x",
+                "uso": "Fundamento conceptual de los cuatro perfiles; no aporta historias individuales ni un umbral universal."
+            },
+            "NIA-AA-2011": {
+                "titulo": "The diagnosis of mild cognitive impairment due to Alzheimer’s disease: Recommendations from the NIA-AA workgroups",
+                "autor": "Albert MS et al.",
+                "anio": 2011,
+                "doi": "10.1016\/j.jalz.2011.03.008",
+                "url": "https:\/\/pmc.ncbi.nlm.nih.gov\/articles\/PMC3312027\/",
+                "uso": "Cambio, evidencia cognitiva, independencia relativa y revisión clínica; no demuestra etiología de los casos."
+            },
+            "HVLT-2015": {
+                "titulo": "Hopkins Verbal Learning Test–Revised: Normative data for the Latin American Spanish speaking adult population",
+                "autor": "Arango-Lasprilla JC et al.",
+                "anio": 2015,
+                "doi": "10.3233\/NRE-151286",
+                "url": "https:\/\/journals.sagepub.com\/doi\/10.3233\/NRE-151286"
+            },
+            "BTA-2015": {
+                "titulo": "Brief Test of Attention: Normative data for the Latin American Spanish speaking adult population",
+                "autor": "Rivera D et al.",
+                "anio": 2015,
+                "doi": "10.3233\/NRE-151283",
+                "url": "https:\/\/journals.sagepub.com\/doi\/10.3233\/NRE-151283"
+            },
+            "TMT-2015": {
+                "titulo": "Trail Making Test: Normative data for the Latin American Spanish speaking adult population",
+                "autor": "Arango-Lasprilla JC et al.",
+                "anio": 2015,
+                "doi": "10.3233\/NRE-151284",
+                "url": "https:\/\/pubmed.ncbi.nlm.nih.gov\/26639932\/"
+            },
+            "BNT-2015": {
+                "titulo": "Standard form of the Boston Naming Test: Normative data for the Latin American Spanish speaking adult population",
+                "autor": "Olabarrieta-Landa L et al.",
+                "anio": 2015,
+                "doi": "10.3233\/NRE-151278",
+                "url": "https:\/\/pubmed.ncbi.nlm.nih.gov\/26639925\/"
+            },
+            "ROCF-2015": {
+                "titulo": "Rey–Osterrieth Complex Figure – copy and immediate recall: Normative data for the Latin American Spanish speaking adult population",
+                "autor": "Rivera D et al.",
+                "anio": 2015,
+                "doi": "10.3233\/NRE-151285",
+                "url": "https:\/\/journals.sagepub.com\/doi\/10.3233\/NRE-151285"
+            }
+        },
+        "datasets_revisados_no_importados": {
+            "ADNI": {
+                "fuente": "https:\/\/adni.loni.usc.edu\/wp-content\/themes\/adni_2023\/documents\/ADNI_Data_Use_Agreement.pdf",
+                "estado": "SIN_ACCESO_A_DATOS_INDIVIDUALES",
+                "limite": "Acceso y uso sujetos al DUA; restricciones sobre redistribución y recursos de IA. No atribuir sus participantes a residentes."
+            },
+            "OASIS": {
+                "fuente": "https:\/\/bpb-us-e2.wpmucdn.com\/sites.wustl.edu\/dist\/6\/4383\/files\/2025\/07\/Data-Use-Agreement_July2025.pdf",
+                "version_condiciones": "2025-07",
+                "estado": "SIN_ACCESO_A_DATOS_INDIVIDUALES",
+                "limite": "Requiere solicitud\/DUA según proyecto. Un CDR o una etiqueta de demencia no equivale a los cuatro perfiles del contrato local."
+            }
+        },
+        "poblacion_ensayo": {
+            "edad_minima": 61,
+            "edad_maxima": 89,
+            "escolaridad_anios": [
+                4,
+                8,
+                12
+            ],
+            "pais_normativo": "BO",
+            "idioma": "es",
+            "lectoescritura": true,
+            "limite": "Casos seleccionados para cubrir contratos; no son una muestra representativa ni estiman prevalencia."
+        },
+        "metodos": [
+            {
+                "dominio": "COG-MEM",
+                "metodo": "HVLT-R-BO-2015-F5",
+                "referencia": "HVLT-2015",
+                "reactivos_reproducidos": false,
+                "limite": "Normalización numérica independiente del juicio original A\/P\/I; sin umbral clínico nuevo."
+            },
+            {
+                "dominio": "COG-ATE",
+                "metodo": "BTA-BO-2015-NL",
+                "referencia": "BTA-2015",
+                "reactivos_reproducidos": false,
+                "limite": "Normalización numérica independiente del juicio original A\/P\/I; sin umbral clínico nuevo."
+            },
+            {
+                "dominio": "COG-EJE",
+                "metodo": "TMT-B-BO-2015",
+                "referencia": "TMT-2015",
+                "reactivos_reproducidos": false,
+                "limite": "Normalización numérica independiente del juicio original A\/P\/I; sin umbral clínico nuevo."
+            },
+            {
+                "dominio": "COG-LEN",
+                "metodo": "BNT-BO-2015-60",
+                "referencia": "BNT-2015",
+                "reactivos_reproducidos": false,
+                "limite": "Normalización numérica independiente del juicio original A\/P\/I; sin umbral clínico nuevo."
+            },
+            {
+                "dominio": "COG-VIS",
+                "metodo": "ROCF-BO-2015-COPIA-A",
+                "referencia": "ROCF-2015",
+                "reactivos_reproducidos": false,
+                "limite": "Normalización numérica independiente del juicio original A\/P\/I; sin umbral clínico nuevo."
+            }
+        ],
+        "aceptacion": {
+            "S01": {
+                "patron_esperado": "PET-01",
+                "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+                "c02_esperado": "S",
+                "variante": "completo",
+                "dominios_esperados": {
+                    "COG-MEM": "A",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-MEM"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S02": {
+                "patron_esperado": "PET-01",
+                "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+                "c02_esperado": "S",
+                "variante": "completo",
+                "dominios_esperados": {
+                    "COG-MEM": "A",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-MEM"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S03": {
+                "patron_esperado": "PET-01",
+                "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+                "c02_esperado": "S",
+                "variante": "completo",
+                "dominios_esperados": {
+                    "COG-MEM": "A",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-MEM"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S04": {
+                "patron_esperado": "PET-02",
+                "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+                "c02_esperado": "S",
+                "variante": "completo",
+                "dominios_esperados": {
+                    "COG-MEM": "A",
+                    "COG-ATE": "A",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-MEM",
+                    "COG-ATE"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S05": {
+                "patron_esperado": "PET-02",
+                "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+                "c02_esperado": "S",
+                "variante": "completo",
+                "dominios_esperados": {
+                    "COG-MEM": "A",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "A",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-MEM",
+                    "COG-LEN"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S06": {
+                "patron_esperado": "PET-02",
+                "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+                "c02_esperado": "S",
+                "variante": "completo",
+                "dominios_esperados": {
+                    "COG-MEM": "A",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "A"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-MEM",
+                    "COG-VIS"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S07": {
+                "patron_esperado": "PET-03",
+                "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+                "c02_esperado": "S",
+                "variante": "completo",
+                "dominios_esperados": {
+                    "COG-MEM": "P",
+                    "COG-ATE": "A",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-ATE"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S08": {
+                "patron_esperado": "PET-03",
+                "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+                "c02_esperado": "S",
+                "variante": "completo",
+                "dominios_esperados": {
+                    "COG-MEM": "P",
+                    "COG-ATE": "P",
+                    "COG-EJE": "A",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-EJE"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S09": {
+                "patron_esperado": "PET-03",
+                "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+                "c02_esperado": "S",
+                "variante": "completo",
+                "dominios_esperados": {
+                    "COG-MEM": "P",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "A",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-LEN"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S10": {
+                "patron_esperado": "PET-04",
+                "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+                "c02_esperado": "S",
+                "variante": "completo",
+                "dominios_esperados": {
+                    "COG-MEM": "P",
+                    "COG-ATE": "A",
+                    "COG-EJE": "A",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-ATE",
+                    "COG-EJE"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S11": {
+                "patron_esperado": "PET-04",
+                "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+                "c02_esperado": "S",
+                "variante": "completo",
+                "dominios_esperados": {
+                    "COG-MEM": "P",
+                    "COG-ATE": "P",
+                    "COG-EJE": "A",
+                    "COG-LEN": "P",
+                    "COG-VIS": "A"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-EJE",
+                    "COG-VIS"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S12": {
+                "patron_esperado": "PET-04",
+                "estado_esperado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+                "c02_esperado": "S",
+                "variante": "completo",
+                "dominios_esperados": {
+                    "COG-MEM": "P",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "A",
+                    "COG-VIS": "A"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-LEN",
+                    "COG-VIS"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S13": {
+                "patron_esperado": null,
+                "estado_esperado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+                "c02_esperado": "N",
+                "variante": "completo",
+                "dominios_esperados": {
+                    "COG-MEM": "P",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S14": {
+                "patron_esperado": null,
+                "estado_esperado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+                "c02_esperado": "N",
+                "variante": "completo",
+                "dominios_esperados": {
+                    "COG-MEM": "P",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S15": {
+                "patron_esperado": null,
+                "estado_esperado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+                "c02_esperado": "N",
+                "variante": "completo",
+                "dominios_esperados": {
+                    "COG-MEM": "P",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S16": {
+                "patron_esperado": null,
+                "estado_esperado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+                "c02_esperado": "N",
+                "variante": "completo",
+                "dominios_esperados": {
+                    "COG-MEM": "P",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S17": {
+                "patron_esperado": null,
+                "estado_esperado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+                "c02_esperado": "N",
+                "variante": "completo",
+                "dominios_esperados": {
+                    "COG-MEM": "P",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S18": {
+                "patron_esperado": null,
+                "estado_esperado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+                "c02_esperado": "N",
+                "variante": "completo",
+                "dominios_esperados": {
+                    "COG-MEM": "P",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S19": {
+                "patron_esperado": null,
+                "estado_esperado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+                "c02_esperado": "S",
+                "variante": "c01_negativo",
+                "dominios_esperados": {
+                    "COG-MEM": "A",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-MEM"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S20": {
+                "patron_esperado": null,
+                "estado_esperado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+                "c02_esperado": "S",
+                "variante": "c03_negativo",
+                "dominios_esperados": {
+                    "COG-MEM": "A",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-MEM"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S21": {
+                "patron_esperado": null,
+                "estado_esperado": "ABSTENCION_EVALUACION_DIFERENCIAL",
+                "c02_esperado": "S",
+                "variante": "c04_negativo",
+                "dominios_esperados": {
+                    "COG-MEM": "A",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-MEM"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S22": {
+                "patron_esperado": null,
+                "estado_esperado": "ABSTENCION_EVALUACION_DIFERENCIAL",
+                "c02_esperado": "S",
+                "variante": "impedimento_diferencial",
+                "dominios_esperados": {
+                    "COG-MEM": "A",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-MEM"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S23": {
+                "patron_esperado": null,
+                "estado_esperado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+                "c02_esperado": "S",
+                "variante": "c05_negativo",
+                "dominios_esperados": {
+                    "COG-MEM": "A",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-MEM"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S24": {
+                "patron_esperado": null,
+                "estado_esperado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+                "c02_esperado": "S",
+                "variante": "sin_visuoespacial",
+                "dominios_esperados": {
+                    "COG-MEM": "A",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "U"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-MEM"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S25": {
+                "patron_esperado": null,
+                "estado_esperado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+                "c02_esperado": "S",
+                "variante": "visuoespacial_no_interpretable",
+                "dominios_esperados": {
+                    "COG-MEM": "A",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "I"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-MEM"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S26": {
+                "patron_esperado": null,
+                "estado_esperado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+                "c02_esperado": "U",
+                "variante": "contexto_no_interpretado",
+                "dominios_esperados": {
+                    "COG-MEM": "U",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-MEM"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S27": {
+                "patron_esperado": null,
+                "estado_esperado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+                "c02_esperado": "S",
+                "variante": "sin_corroboracion",
+                "dominios_esperados": {
+                    "COG-MEM": "A",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-MEM"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S28": {
+                "patron_esperado": null,
+                "estado_esperado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+                "c02_esperado": "S",
+                "variante": "sin_oportunidad_iadl",
+                "dominios_esperados": {
+                    "COG-MEM": "A",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-MEM"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S29": {
+                "patron_esperado": null,
+                "estado_esperado": "ABSTENCION_CONTRADICCION",
+                "c02_esperado": "X",
+                "variante": "contradiccion_memoria",
+                "dominios_esperados": {
+                    "COG-MEM": "X",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-MEM"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            },
+            "S30": {
+                "patron_esperado": null,
+                "estado_esperado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+                "c02_esperado": "S",
+                "variante": "revision_calidad_desactualizada",
+                "dominios_esperados": {
+                    "COG-MEM": "A",
+                    "COG-ATE": "P",
+                    "COG-EJE": "P",
+                    "COG-LEN": "P",
+                    "COG-VIS": "P"
+                },
+                "dominios_alterados_de_entrada": [
+                    "COG-MEM"
+                ],
+                "referencias": [
+                    "PETERSEN-2004",
+                    "NIA-AA-2011",
+                    "HVLT-2015",
+                    "BTA-2015",
+                    "TMT-2015",
+                    "BNT-2015",
+                    "ROCF-2015"
+                ],
+                "contrato": "CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md"
+            }
+        }
+    },
+    "retroalimentacion": {
+        "version": "INVESTIGACION-COGNITIVA-30-20261022-V1",
+        "satisfactorio": true,
+        "casos_esperados": 30,
+        "casos_ejecutados": 30,
+        "discrepancias": [],
+        "validez_clinica_demostrada": false,
+        "reglas_modificadas": false
+    },
+    "casos": [
+        {
+            "caso": "S01",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 64,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Hipertensión arterial",
+            "patron_calculado": "PET-01",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "8cf93b9b909e35f4fde0c3f40cbaa15d63817570f97c50d95a56971fe21b7de8",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S02",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 67,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Diabetes mellitus tipo 2",
+            "patron_calculado": "PET-01",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "083206727c768546bb55b1af6ebeff9f92757ace517a81cffd4b865544335664",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S03",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 70,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Artrosis",
+            "patron_calculado": "PET-01",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "66c56ad23d3a594f4c297801aa2566e1904e9f86a32afbc084461f56049443d7",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S04",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 73,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Hipoacusia",
+            "patron_calculado": "PET-02",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "A",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "cfb15ec31725b3fa61c3930a9c4fbb259901de762ff57a5d1080a086391f0202",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S05",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 76,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Catarata",
+            "patron_calculado": "PET-02",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "A",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "9b5dd6b766c34f35023548efe89c2166c65e20177af343ec9bbf2ec0d1186624",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S06",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 79,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Hipotiroidismo",
+            "patron_calculado": "PET-02",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "A"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "33379c58369237bc68e0214ebb9006db37bd2af05aa4e2df93e7dce214d8d8a6",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S07",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 82,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Hipertensión arterial",
+            "patron_calculado": "PET-03",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "A",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "a9425d2277622f6c2cd2d7a51ff95fc8756f20cd3186a10fff1bdcdc91d0338e",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S08",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 85,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Diabetes mellitus tipo 2",
+            "patron_calculado": "PET-03",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "A",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "6cb0315f9c1e6c5ab6bc012bb60e51480bb27d382becd7f2abcc3ac7ecbc994d",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S09",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 88,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Artrosis",
+            "patron_calculado": "PET-03",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "A",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "847aca9148f8ebc624973fa35ffa58f72cde12555fcb1d742c5218381e65141a",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S10",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 62,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Hipoacusia",
+            "patron_calculado": "PET-04",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "A",
+                "COG-EJE": "A",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "b9087b7e274ad35f2883460543ea5434cd084ab698f0027f83d7caad7dc86d28",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S11",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 65,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Catarata",
+            "patron_calculado": "PET-04",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "A",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "A"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "a5cc6ae3f03b6e8ffb6208d39cde729cfc15a8b12220042c8229fc732cd736c5",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S12",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 68,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Hipotiroidismo",
+            "patron_calculado": "PET-04",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "A",
+                "COG-MEM": "P",
+                "COG-VIS": "A"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [],
+            "capturas_sql": 5,
+            "huella_dto": "74a6635bb02b782afe8f89d9aa1bd30a44477bed66e7bf12067df59d0cdfac37",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S13",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 71,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Hipertensión arterial",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "SIN_PATRON_CLASIFICABLE_POR_REQUISITO"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "15f61788cb46de16d79b8fd6c0c728ac4ac25ef02ed37c9e5bc08ed33782d17e",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S14",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 74,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Diabetes mellitus tipo 2",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "SIN_PATRON_CLASIFICABLE_POR_REQUISITO"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "10be22411e5c3bcdd2402a98523a64968c4bcffa699222eb8fb8f1e088c75f07",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S15",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 77,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Artrosis",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "SIN_PATRON_CLASIFICABLE_POR_REQUISITO"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "72bd459c23b67045bf1139d05364812c4337dc81d6847476b30cef8f3a1cbc2b",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S16",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 80,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Hipoacusia",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "SIN_PATRON_CLASIFICABLE_POR_REQUISITO"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "68472e94ace918c37806b65269ac66c4350dfb8058863193456c61e796c8e0ee",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S17",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 83,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Catarata",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "SIN_PATRON_CLASIFICABLE_POR_REQUISITO"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "ce1f721244be10e76a3c730fec1c627b58b938cbae5679097fc1440c43c324d4",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S18",
+            "sintetico": true,
+            "variante": "completo",
+            "edad": 86,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Hipotiroidismo",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "SIN_PATRON_CLASIFICABLE_POR_REQUISITO"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "4da344cac92668f695679877fb6bc2aaa83b84dfa9d0c34366e25c2d87d6c9ab",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S19",
+            "sintetico": true,
+            "variante": "c01_negativo",
+            "edad": 89,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Hipertensión arterial",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "N",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "SIN_PATRON_CLASIFICABLE_POR_REQUISITO"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "e185bedd99eda6f121a81817949c255c227bdac028576054e86e32a1147a9036",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S20",
+            "sintetico": true,
+            "variante": "c03_negativo",
+            "edad": 63,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Diabetes mellitus tipo 2",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "N",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "SIN_PATRON_CLASIFICABLE_POR_REQUISITO"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "4cf2ce8b9758b305c3b03bf33208f09a96dc551298b3003cfaf3efa691ce152a",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S21",
+            "sintetico": true,
+            "variante": "c04_negativo",
+            "edad": 66,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Artrosis",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_EVALUACION_DIFERENCIAL",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "N",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "ABSTENCION_EVALUACION_DIFERENCIAL",
+                "SIN_PATRON_CLASIFICABLE_POR_REQUISITO"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "da88f4a4892e8a65ffdb36aa0d7fb7b168d18a49aa1d8e1aaaf2661d5be7c049",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S22",
+            "sintetico": true,
+            "variante": "impedimento_diferencial",
+            "edad": 69,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Hipoacusia",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_EVALUACION_DIFERENCIAL",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "ABSTENCION_EVALUACION_DIFERENCIAL"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "e6e7defec97c8d92d520ff8e51b421903bef77e938555e837c30c8ead3c51ced",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S23",
+            "sintetico": true,
+            "variante": "c05_negativo",
+            "edad": 72,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Catarata",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "N"
+            },
+            "impedimentos": [
+                "SIN_PATRON_CLASIFICABLE_POR_REQUISITO"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "2381fead2d7937beec559295e8f5484732c8f335989dc1955742c973e1e2134a",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S24",
+            "sintetico": true,
+            "variante": "sin_visuoespacial",
+            "edad": 75,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Hipotiroidismo",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "U"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "U"
+            },
+            "impedimentos": [
+                "ABSTENCION_INFORMACION_INSUFICIENTE"
+            ],
+            "capturas_sql": 4,
+            "huella_dto": "3adacf61528166d5d172406ddb01ab7dc40b1a79a9245ec4328b0108e01ab782",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S25",
+            "sintetico": true,
+            "variante": "visuoespacial_no_interpretable",
+            "edad": 78,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Hipertensión arterial",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "I"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "U"
+            },
+            "impedimentos": [
+                "ABSTENCION_INFORMACION_INSUFICIENTE"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "815a79b8894ed0b6853c4d18f50e254b4222afe3c09f29f09adbb430ca7db2a5",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S26",
+            "sintetico": true,
+            "variante": "contexto_no_interpretado",
+            "edad": 81,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Diabetes mellitus tipo 2",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "U",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "U",
+                "C03": "S",
+                "C04": "S",
+                "C05": "U"
+            },
+            "impedimentos": [
+                "ABSTENCION_INFORMACION_INSUFICIENTE"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "52632c312fef922f10b64c3f70385b9cacf1bd0def73d1fe6a1a48cacc8d91d7",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S27",
+            "sintetico": true,
+            "variante": "sin_corroboracion",
+            "edad": 84,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Artrosis",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "U",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "ABSTENCION_INFORMACION_INSUFICIENTE"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "9ba7991dad56f2fca02f5f5dfdaa040dfff08154411ba71e25a80311164a0d2d",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S28",
+            "sintetico": true,
+            "variante": "sin_oportunidad_iadl",
+            "edad": 87,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Hipoacusia",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "U",
+                "C04": "S",
+                "C05": "S"
+            },
+            "impedimentos": [
+                "ABSTENCION_INFORMACION_INSUFICIENTE"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "b608d19b9b4fa8b262220a429b64380bf949c1a46fd5265e8a862764d0f95425",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S29",
+            "sintetico": true,
+            "variante": "contradiccion_memoria",
+            "edad": 61,
+            "caida_contextual": false,
+            "diagnostico_contextual": "Catarata",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_CONTRADICCION",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "X",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "X",
+                "C03": "S",
+                "C04": "S",
+                "C05": "U"
+            },
+            "impedimentos": [
+                "ABSTENCION_CONTRADICCION",
+                "ABSTENCION_INFORMACION_INSUFICIENTE"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "b35abdbc3afc2eb8f5ca00848d9106a55ef40d425d32616231670866c6d318a4",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        },
+        {
+            "caso": "S30",
+            "sintetico": true,
+            "variante": "revision_calidad_desactualizada",
+            "edad": 64,
+            "caida_contextual": true,
+            "diagnostico_contextual": "Hipotiroidismo",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "U"
+            },
+            "impedimentos": [
+                "ABSTENCION_INFORMACION_INSUFICIENTE"
+            ],
+            "capturas_sql": 5,
+            "huella_dto": "a73cbff46bb33776a7fa48847a44988864d2f35faee448eac34ca9e91c87b415",
+            "replay_memoria_identico": true,
+            "conservacion_conjunta_sql": false
+        }
+    ]
+}

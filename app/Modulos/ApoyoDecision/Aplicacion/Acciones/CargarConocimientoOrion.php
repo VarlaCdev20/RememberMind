@@ -58,7 +58,7 @@ final class CargarConocimientoOrion
                 'relaciones_semanticas' => 'cod_relacion_semantica'];
             if ($version) {
                 foreach ($filas as $tabla => $esperadas) {
-                    $guardadas = DB::table($tabla)->where('cod_version_modelo', $versionReal)->get()->keyBy($claves[$tabla]);
+                    $guardadas = \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta($tabla)->where('cod_version_modelo', $versionReal)->get()->keyBy($claves[$tabla]);
                     if ($guardadas->count() !== count($esperadas)) {
                         throw new DomainException('La versión documental conservada no coincide con la carga. No se sobrescribe.');
                     }
@@ -70,7 +70,7 @@ final class CargarConocimientoOrion
                 }
             } else {
                 foreach ($filas as $tabla => $contenido) {
-                    DB::table($tabla)->insert($contenido);
+                    \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::insertar($tabla, $contenido);
                 }
                 activity('sistema_experto')->causedBy($usuario)->event('conocimiento_documental_cargado')
                     ->withProperties(['version' => $versionReal, 'nodos' => count($datos['nodos']),

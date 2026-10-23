@@ -528,17 +528,24 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertDontSee('Luisa Morales');
     }
 
-    public function test_sin_turno_activo_no_muestra_residentes_ni_badge_de_turno(): void
+    public function test_jornada_cerrada_conserva_residentes_para_consulta_sin_permitir_registro(): void
     {
         Jornada::query()->where('cod_jornada', 'JOR_MIS_PACIENTES')->update(['estado' => 'CERRADA']);
         $this->actingAs($this->enfermero);
 
-        Livewire::test(MisPacientes::class)
+        $vista = Livewire::test(MisPacientes::class)
             ->assertSet('esModoConsulta', true)
-            ->assertSee('No tienes residentes asignados')
             ->assertDontSee('Mi turno activo')
-            ->assertDontSee('Pedro Gomez')
-            ->assertDontSee('Luisa Morales');
+            ->assertSee('Pedro Gomez')
+            ->assertSee('Luisa Morales');
+
+        $vista->call('seleccionarResidente', $this->residenteEstable->cod_residente)
+            ->assertStatus(200)
+            ->assertSet('mostrarPanelDetalle', true)
+            ->assertSee('Resumen del residente');
+        $this->assertFalse($vista->instance()->puedeRegistrar());
+        $vista->call('mostrarSelectorRegistro')->assertStatus(403);
+        $this->assertDatabaseCount('signos_vitales', 1);
     }
 
     public function test_resumen_del_directorio_sigue_disponible_al_terminar_el_horario_sin_habilitar_registro(): void

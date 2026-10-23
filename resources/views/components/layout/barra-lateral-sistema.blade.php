@@ -82,7 +82,7 @@
         tooltipLabel: null,
         tooltipTop: 0,
         showTooltip(label, element) {
-            if (!sidebarCollapsed || window.innerWidth < 1024) return;
+            if (!sidebarCollapsed || window.innerWidth < 768) return;
             this.tooltipLabel = label;
             this.tooltipTop = element.getBoundingClientRect().top + 10;
         },
@@ -91,7 +91,7 @@
             this.showFlyout(index, element);
         },
         showFlyout(index, element, focusFirst = false) {
-            if (!sidebarCollapsed || window.innerWidth < 1024) return;
+            if (!sidebarCollapsed || window.innerWidth < 768) return;
             this.flyoutIndex = index;
             this.$nextTick(() => {
                 const flyout = document.getElementById('rm-sidebar-flyout-' + index);
@@ -106,8 +106,8 @@
         }
     }"
     x-on:livewire:navigating.window="saveSidebarView(); closeSidebarForNavigation()"
-    x-init="restoreSidebarView(); $watch('openSection', () => saveSidebarView()); $watch('sidebarOpen', open => { if (window.innerWidth >= 1024) return; if (open) $nextTick(() => $refs.mobileClose.focus()); else if ($el.contains(document.activeElement)) document.getElementById('sidebar-mobile-trigger')?.focus(); })"
-    @keydown.tab="if (sidebarOpen && window.innerWidth < 1024) { const controls = [...$el.querySelectorAll('a[href], button:not([disabled]), summary')].filter(control => control.getClientRects().length); const first = controls[0], last = controls[controls.length - 1]; if ($event.shiftKey && document.activeElement === first) { $event.preventDefault(); last.focus(); } else if (!$event.shiftKey && document.activeElement === last) { $event.preventDefault(); first.focus(); } }"
+    x-init="restoreSidebarView(); $watch('openSection', () => saveSidebarView()); $watch('sidebarOpen', open => { if (window.innerWidth >= 768) return; if (open) $nextTick(() => $refs.mobileClose.focus()); else if ($el.contains(document.activeElement)) document.getElementById('sidebar-mobile-trigger')?.focus(); })"
+    @keydown.tab="if (sidebarOpen && window.innerWidth < 768) { const controls = [...$el.querySelectorAll('a[href], button:not([disabled]), summary')].filter(control => control.getClientRects().length); const first = controls[0], last = controls[controls.length - 1]; if ($event.shiftKey && document.activeElement === first) { $event.preventDefault(); last.focus(); } else if (!$event.shiftKey && document.activeElement === last) { $event.preventDefault(); first.focus(); } }"
     @keydown.escape.window="if (flyoutIndex !== null && document.activeElement?.closest('.rm-sidebar__flyout')) document.getElementById('rm-sidebar-trigger-' + flyoutIndex)?.focus(); flyoutIndex = null; tooltipLabel = null; if (sidebarOpen) sidebarOpen = false">
     <div class="rm-sidebar__header">
         <a href="{{ route($brandRoute) }}" class="rm-sidebar__brand" wire:navigate @click="sidebarOpen = false" aria-label="RememberMind, inicio">
@@ -146,9 +146,9 @@
                 @if($hasChildren)
                     <button type="button" id="rm-sidebar-trigger-{{ $index }}" class="rm-sidebar__item {{ $currentSection ? 'is-current-section' : '' }}"
                         title="{{ $section['title'] }}" aria-label="{{ $section['title'] }}{{ !empty($section['badge']) ? ', '.$section['badge'] : '' }}" data-label="{{ mb_strtoupper($section['title']) }}"
-                        :aria-expanded="((!sidebarCollapsed || window.innerWidth < 1024) && openSection === {{ $index }}) || (sidebarCollapsed && flyoutIndex === {{ $index }}) ? 'true' : 'false'"
-                        :aria-controls="sidebarCollapsed && window.innerWidth >= 1024 ? 'rm-sidebar-flyout-{{ $index }}' : 'rm-sidebar-submenu-{{ $index }}'"
-                        @click="if (sidebarCollapsed && window.innerWidth >= 1024) { showFlyout({{ $index }}, $el, $event.detail === 0); } else openSection = openSection === {{ $index }} ? null : {{ $index }}"
+                        :aria-expanded="((!sidebarCollapsed || window.innerWidth < 768) && openSection === {{ $index }}) || (sidebarCollapsed && flyoutIndex === {{ $index }}) ? 'true' : 'false'"
+                        :aria-controls="sidebarCollapsed && window.innerWidth >= 768 ? 'rm-sidebar-flyout-{{ $index }}' : 'rm-sidebar-submenu-{{ $index }}'"
+                        @click="if (sidebarCollapsed && window.innerWidth >= 768) { showFlyout({{ $index }}, $el, $event.detail === 0); } else openSection = openSection === {{ $index }} ? null : {{ $index }}"
                         @mouseenter="showTooltip(@js($section['title']), $el); hoverFlyout({{ $index }}, $el)" @focus="showTooltip(@js($section['title']), $el)" @blur="tooltipLabel = null"
                         @mouseleave="if (!$event.relatedTarget?.closest('.rm-sidebar__flyout')) flyoutIndex = null">
                         <span class="rm-sidebar__indicator" aria-hidden="true"></span>
@@ -163,7 +163,7 @@
                         <i class="ph-bold ph-caret-down rm-sidebar__chevron" aria-hidden="true" :class="{ 'is-open': openSection === {{ $index }} }"></i>
                     </button>
                     <div id="rm-sidebar-submenu-{{ $index }}" class="rm-sidebar__submenu"
-                        x-show="openSection === {{ $index }} && (!sidebarCollapsed || window.innerWidth < 1024)"
+                        x-show="openSection === {{ $index }} && (!sidebarCollapsed || window.innerWidth < 768)"
                         x-collapse.duration.200ms
                         style="display: none;">
                         <div class="rm-sidebar__submenu-content" :class="{ 'is-visible': openSection === {{ $index }} }">
@@ -206,13 +206,13 @@
         @endforeach
     </nav>
 
-    <div class="rm-sidebar__tooltip" x-show="sidebarCollapsed && tooltipLabel && window.innerWidth >= 1024"
+    <div class="rm-sidebar__tooltip" x-show="sidebarCollapsed && tooltipLabel && window.innerWidth >= 768"
         x-transition:enter="rm-sidebar__tooltip-enter" x-transition:enter-start="rm-sidebar__tooltip-start" x-transition:enter-end="rm-sidebar__tooltip-end"
         :style="{ top: tooltipTop + 'px' }" x-text="tooltipLabel" role="tooltip" x-cloak></div>
 
     @foreach ($sections as $index => $section)
         @if(!empty($section['items']))
-            <div id="rm-sidebar-flyout-{{ $index }}" class="rm-sidebar__flyout" x-show="sidebarCollapsed && flyoutIndex === {{ $index }} && window.innerWidth >= 1024"
+            <div id="rm-sidebar-flyout-{{ $index }}" class="rm-sidebar__flyout" x-show="sidebarCollapsed && flyoutIndex === {{ $index }} && window.innerWidth >= 768"
                 :style="{ top: flyoutTop + 'px' }" @mouseenter="flyoutIndex = {{ $index }}" @mouseleave="flyoutIndex = null"
                 x-transition:enter="rm-sidebar__flyout-enter" x-transition:enter-start="rm-sidebar__flyout-start" x-transition:enter-end="rm-sidebar__flyout-end"
                 x-transition:leave="rm-sidebar__flyout-leave" x-transition:leave-start="rm-sidebar__flyout-end" x-transition:leave-end="rm-sidebar__flyout-start" x-cloak>

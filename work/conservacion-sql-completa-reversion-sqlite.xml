@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\CARLAENCINAS\Desktop\RememberMind\phpunit.xml" tests="1" assertions="8" errors="0" failures="0" skipped="0" time="10.711558">
+    <testsuite name="Feature" tests="1" assertions="8" errors="0" failures="0" skipped="0" time="10.711558">
+      <testsuite name="Tests\Feature\ConservacionCompletaSQLTest" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\ConservacionCompletaSQLTest.php" tests="1" assertions="8" errors="0" failures="0" skipped="0" time="10.711558">
+        <testcase name="test_reversion_poblada_del_candidato_conserva_la_base_y_permite_restaurar_el_dto" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\ConservacionCompletaSQLTest.php" line="163" class="Tests\Feature\ConservacionCompletaSQLTest" classname="Tests.Feature.ConservacionCompletaSQLTest" assertions="8" time="10.711558"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

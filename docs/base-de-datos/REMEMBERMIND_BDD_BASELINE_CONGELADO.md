@@ -17,13 +17,23 @@ related_modules: []
 
 # RememberMind — Baseline Rector de la BDD Operativa
 
-**Inventario vigente — 20/10/2026:** la reducción experta aprobada e instalada
+**Inventario vigente — 22/10/2026:** la consolidación de cuatro bloques singulares
+aprobada por la propietaria quedó instalada en PostgreSQL local: **75 operativas
++ 25 expertas = 100 tablas de negocio**, además de 16 técnicas. Conserva las
+257 filas trasladadas, las siete FK entrantes y las identidades históricas.
+[Decisión, diccionario nominal y transición](DECISION_CONSOLIDACION_BLOQUES_EXPERTOS_2026_10_22.md).
+El máximo de diseño sigue en 110. La conservación compuesta completa continúa
+pendiente; esta reducción no la acredita ni activa conocimiento clínico.
+
+**Inventario histórico — 20/10/2026:** la reducción experta aprobada e instalada
 dejó **75 tablas operativas + 29 expertas = 104 tablas de negocio**. Se
 retiraron cuatro relaciones expertas redundantes preservando las historias y
 FK afectadas; el núcleo operativo V2.1 de 70 tablas sigue congelado. Véase la
 [decisión y evidencia de instalación](DECISION_REDUCCION_EXPERTA_2026_10_20.md).
 Los inventarios de 108, 106 y 105 citados más abajo describen el momento de
-cada extensión anterior, no el inventario actual.
+cada extensión anterior. La [decisión del 21/10/2026](../sistema-experto/DECISION_MAXIMO_110_TABLAS_2026_10_21.md)
+fija un máximo de **110 tablas de negocio para diseño**; no aprueba migraciones
+ni altera el núcleo congelado o las extensiones instaladas.
 
 **Extensión aprobada — 19/10/2026:** dos relaciones de valoración original y
 soportes de Petersen; **75 operativas + 33 expertas = 108 tablas de negocio**.
@@ -51,7 +61,7 @@ No convierte las ejecuciones de prueba en valoraciones clínicas.
 **Extensión aprobada — 17/10/2026:** una tabla `fotografias_institucionales`; inventario vigente **72 operativas**, conservando las existentes. Véase [decisión Galería y 4FN](DECISION_GALERIA_INSTITUCIONAL_2026_10_17.md). Los conteos anteriores conservan el alcance de sus versiones.
 
 
-> **Extensión aprobada V2.2:** las 70 tablas V2.1 descritas aquí permanecen congeladas. La propietaria aprobó el 4 de octubre de 2026 una tabla adicional `objetivos_signos_vitales` sin alterar las existentes. El inventario vigente tiene **71 tablas operativas**. Véase [decisión V2.2](DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md).
+> **Extensión aprobada V2.2 — estado al 04/10/2026:** las 70 tablas V2.1 descritas aquí permanecen congeladas. La propietaria aprobó entonces una tabla adicional `objetivos_signos_vitales` sin alterar las existentes, elevando el inventario de esa fecha a **71 tablas operativas**. Véase [decisión V2.2](DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md); el inventario actual figura al inicio de este documento.
 
 **Estado:** CONGELADO
 

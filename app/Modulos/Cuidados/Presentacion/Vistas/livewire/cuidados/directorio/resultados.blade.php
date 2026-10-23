@@ -31,8 +31,8 @@
         <div class="rm-resident-directory__empty" wire:loading.remove wire:target="search,filtroEstado,filtroRapido,filtroAlertas,filtroMedicacion,filtroCuidados,filtroHabitacion,orden,vistaModo,aplicarFiltro,removerFiltro,limpiarFiltrosActivos,limpiarFiltros">
             <span class="rm-resident-directory__empty-icon" aria-hidden="true"><i class="ph-bold ph-users-three"></i></span>
             @if($stats['total'] === 0)
-                <h3>{{ $esSuperAdmin ? 'No hay residentes disponibles' : 'No tienes residentes asignados en esta jornada.' }}</h3>
-                <p>{{ $esSuperAdmin ? 'No se encontraron residentes en el alcance de esta consulta.' : 'No hay residentes asociados a tu turno actual.' }}</p>
+                <h3>{{ $esSuperAdmin ? 'No hay residentes disponibles' : 'No tienes residentes asignados para consultar hoy.' }}</h3>
+                <p>{{ $esSuperAdmin ? 'No se encontraron residentes en el alcance de esta consulta.' : 'Si terminaste tu turno, tus residentes de hoy seguirán aquí para consulta.' }}</p>
                 @unless($esSuperAdmin)<a href="{{ route('admin.enfermeria.dashboard') }}" class="rm-btn-secondary">Consultar información de mi turno <i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a>@endunless
             @else
                 <h3>No encontramos residentes con estos filtros.</h3>

@@ -73,13 +73,13 @@ html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-sidebar :is(.rm-sidebar__
     background: transparent;
 }
 html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-topbar {
-    background: var(--rm-bg-shell);
+    background: var(--rm-header-bg);
     border-bottom: 1px solid var(--rm-topbar-glass-border);
     -webkit-backdrop-filter: blur(var(--rm-capture-glass-blur, 14px));
     backdrop-filter: blur(var(--rm-capture-glass-blur, 14px));
 }
 @supports (backdrop-filter: blur(14px)) {
-    html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-topbar { background: var(--rm-bg-shell); }
+    html:not(.dark):not([data-theme="dark"]) .rm-shell .rm-topbar { background: var(--rm-header-bg); }
 }
 
 html:not(.dark):not([data-theme="dark"]) :is(.rm-shell, .rm-ficha-detalles) :is(
@@ -116,9 +116,9 @@ html:not(.dark):not([data-theme="dark"]) :is(.rm-shell, .rm-ficha-detalles) .rm-
     color: var(--rm-capture-action-ink);
     border-color: var(--rm-palette-button-primary-border);
 }
-html:not(.dark):not([data-theme="dark"]) :is(.rm-shell, .rm-ficha-detalles) .rm-btn-primary:hover:not(:disabled) {
+html:not(.dark):not([data-theme="dark"]) :is(.rm-shell, .rm-ficha-detalles) .rm-btn-primary:is(:hover, :active):not(:disabled) {
     background: var(--rm-capture-action-hover);
-    color: var(--rm-capture-action-ink);
+    color: var(--rm-button-primary-hover-text);
 }
 html:not(.dark):not([data-theme="dark"]) :is(.rm-shell, .rm-ficha-detalles) .rm-btn-secondary {
     background: color-mix(in srgb, var(--rm-surface-soft) 70%, transparent);
@@ -183,7 +183,7 @@ html:is(:not(.dark):not([data-theme="dark"]), .dark, [data-theme="dark"]) .rm-sh
 
 /* Fondo aclarado; navbar y sidebar conservan su base. Trama solo en el lienzo. */
 html:is(:not(.dark):not([data-theme="dark"]), .dark, [data-theme="dark"]) .rm-shell .rm-topbar {
-    background: var(--rm-bg-shell);
+    background: var(--rm-header-bg);
 }
 html:is(:not(.dark):not([data-theme="dark"]), .dark, [data-theme="dark"]) :is(.rm-shell [data-rm-main], .rm-shell .rm-app-frame > [data-rm-main].rm-depth-canvas) {
     background-color: var(--rm-app-bg);

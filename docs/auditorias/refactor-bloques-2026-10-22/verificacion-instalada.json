@@ -1,0 +1,19 @@
+{
+    "expertas_presentes": 25,
+    "tablas_fisicas": 116,
+    "columnas_propietarios": {
+        "evaluacion_criterios": 19,
+        "nodos_semanticos": 19,
+        "evaluaciones_expertas": 27
+    },
+    "filas_recuperadas_eloquent": {
+        "variables_expertas": 87,
+        "resultados_criterio": 147,
+        "trazas_inferencia": 18,
+        "clasificaciones_dcl_instantanea": 5
+    },
+    "versiones_conocimiento_leidas": 6,
+    "fk_entrantes_verificadas": 7,
+    "clasificaciones_sinteticas_recuperadas": 5,
+    "solo_lectura": true
+}

@@ -11,6 +11,7 @@ use MotorExperto\dominio\conocimiento\AdmisibilidadFuenteCOGMEM;
 use MotorExperto\dominio\conocimiento\MapeadorSemantico;
 use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
 use MotorExperto\dominio\inferencia\MemoriaTrabajo;
+use MotorExperto\dominio\instrumentos\CorteDocumentoInstrumental;
 use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
 use MotorExperto\dominio\objetos_valor\FuenteBrutaCOGMEM;
 
@@ -62,6 +63,10 @@ final class ConstructorMemoriaInstrumental
                 }
                 // La falta de perfil numérico no invalida un literal original. Ningún otro rechazo se omite.
                 $motivos = array_values(array_diff($a['motivos'], ['SIN_PERFIL_EXPLICITO']));
+                if (($a['procedencia']['cod_documento_clinico'] ?? null) !== null
+                    && ! CorteDocumentoInstrumental::admite($a['documento_original'] ?? null, $contexto->fechaCorte)) {
+                    $motivos[] = 'DOCUMENTO_FUERA_DEL_CORTE_O_SIN_FECHA';
+                }
                 if ($motivos !== []) {
                     $excluidas[] = ['aplicacion' => $a['cod_aplicacion'], 'mapeo' => $mapeo, 'motivos' => $motivos];
 

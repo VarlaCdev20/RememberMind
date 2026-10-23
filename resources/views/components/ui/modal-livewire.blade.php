@@ -21,6 +21,7 @@
     'alpineClose' => null,
     'alpineBack' => null,
     'autoFocus' => true,
+    'surface' => 'standard',
 ])
 
 @php
@@ -77,11 +78,11 @@ $modalId = $id ?: 'modal-'.\Illuminate\Support\Str::slug((string) ($attributes->
     }"
     x-show="show"
     :class="{ 'is-open': show }"
-    @if($autoFocus) x-trap.noscroll="show" @else x-trap.noscroll.noautofocus="show" @endif
+    @if($autoFocus) x-trap.inert.noscroll="show" @else x-trap.inert.noscroll.noautofocus="show" @endif
     x-cloak
     @if($draggable) x-init="$watch('show', value => { if (value) { dragX = 0; dragY = 0 } })" x-on:resize.window="if (show) { if (window.innerWidth <= 640) { dragX = 0; dragY = 0 } else { moveBy(0, 0) } }" @endif
     x-on:keydown.escape.window="if (show && @js($dismissOnEscape)) { $event.stopPropagation(); {{ $alpineClose ?: '$wire.'.$closeMethod.'()' }} }"
-    class="rm-modal-shell fixed inset-0 flex items-center justify-center overflow-y-auto overflow-x-hidden p-4 font-sans {{ $attributes->get('class') }}"
+    class="rm-modal-shell {{ $surface === 'reading' ? 'rm-modal-shell--reading' : '' }} fixed inset-0 flex items-center justify-center overflow-y-auto overflow-x-hidden p-4 font-sans {{ $attributes->get('class') }}"
 >
     <!-- Overlay Accesible Cálido -->
     <div

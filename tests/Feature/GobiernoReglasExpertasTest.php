@@ -27,6 +27,7 @@ use Tests\TestCase;
 final class GobiernoReglasExpertasTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Support\CorromperConservacionParaPrueba;
 
     private User $medico;
 
@@ -60,7 +61,7 @@ final class GobiernoReglasExpertasTest extends TestCase
 
     public function test_gobierno_admite_condicion_de_subcomponente_con_vinculo_explicito(): void
     {
-        DB::table('variables_expertas')->where('cod_variable_experta', 'VAR_INS')->update(['cod_nodo_propietario_primario' => 'SUB']);
+        $this->corromperConservacion(fn () => DB::table('nodos_semanticos')->where('cod_variable_experta', 'VAR_INS')->update(['cod_nodo_propietario_primario' => 'SUB']));
         $original = app(ConocimientoVersionado::class)->instantanea('VER_TEST');
         $nueva = ['codigo' => 'MEM-S01-REV', 'nombre' => 'Conjunción de componente', 'descripcion' => 'Condición estructural de ingeniería.',
             'fundamento' => 'Caso sintético de pertenencia explícita.', 'condiciones' => [['variable' => 'VAR_INS', 'valor' => 'VAL_A']],
@@ -79,7 +80,7 @@ final class GobiernoReglasExpertasTest extends TestCase
 
     public function test_pertenencia_sin_arista_de_variable_no_publica_sucesora(): void
     {
-        DB::table('variables_expertas')->where('cod_variable_experta', 'VAR_INS')->update(['cod_nodo_propietario_primario' => 'SUB']);
+        $this->corromperConservacion(fn () => DB::table('nodos_semanticos')->where('cod_variable_experta', 'VAR_INS')->update(['cod_nodo_propietario_primario' => 'SUB']));
         DB::table('relaciones_semanticas')->where('cod_relacion_semantica', 'REL_INS')->update(['estado' => 'INACTIVO']);
         $nueva = ['codigo' => 'MEM-S01-REV', 'nombre' => 'Conjunción inválida', 'descripcion' => 'Sin participación explícita.',
             'fundamento' => 'Negativo sintético de pertenencia.', 'condiciones' => [['variable' => 'VAR_INS', 'valor' => 'VAL_A']],
@@ -95,7 +96,7 @@ final class GobiernoReglasExpertasTest extends TestCase
 
     public function test_arista_decorativa_no_habilita_publicacion_y_contrato_no_se_inventa(): void
     {
-        DB::table('variables_expertas')->where('cod_variable_experta', 'VAR_INS')->update(['cod_nodo_propietario_primario' => 'SUB']);
+        $this->corromperConservacion(fn () => DB::table('nodos_semanticos')->where('cod_variable_experta', 'VAR_INS')->update(['cod_nodo_propietario_primario' => 'SUB']));
         $contratos = config('sistema_experto.contratos_conocimiento.VER_TEST');
         $contratos['relaciones'][1]['habilita_participacion'] = false;
         config(['sistema_experto.contratos_conocimiento.VER_TEST' => $contratos]);

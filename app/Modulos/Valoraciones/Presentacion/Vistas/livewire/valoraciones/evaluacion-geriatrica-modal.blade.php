@@ -1,6 +1,6 @@
 <div>
     @if($mostrar)
-        <x-ui.modal-livewire wire:model="mostrar" :id="'captura-instrumental-'.$this->getId()" title="Registrar mediciones instrumentales" max-width="lg" close-method="cerrar" subtitle="Respuestas originales, fecha de aplicación y profesional responsable">
+        <x-ui.modal-livewire wire:model="mostrar" :id="'captura-instrumental-'.$this->getId()" title="Registrar aplicación y respuestas" max-width="lg" close-method="cerrar" subtitle="Tareas originales, fecha de aplicación y profesional responsable">
             <x-slot:context>
                 <div class="px-5 sm:px-6 py-3 text-sm break-words">
                     <p><strong>Residente:</strong> {{ $contexto['residente'] ?? 'Selecciona un residente' }}</p>
@@ -44,6 +44,36 @@
                             @foreach($instrumentos as $instrumento)<option value="{{ $instrumento->cod_instrumento }}">{{ $instrumento->nombre }} · {{ $instrumento->version ?: 'Versión no registrada' }}</option>@endforeach
                         </select>
                     </x-ui.field>
+                    @if($cod_instrumento && $vinculoMetodo !== [])
+                        <section class="rounded-lg border p-4 space-y-2" aria-label="Vinculación del método de captura">
+                            @if(($vinculoMetodo['estado'] ?? null) === 'OBSERVACIONAL')
+                                <p class="font-semibold">Registro observacional</p>
+                                <p class="text-sm text-rm-secondary">Estas respuestas conservan observaciones clínicas. No se interpretan como medidas de una prueba cognitiva.</p>
+                            @elseif(($vinculoMetodo['estado'] ?? null) === 'VINCULADO')
+                                <p class="font-semibold">Método vinculado: {{ $vinculoMetodo['metodo'] }}</p>
+                                <p class="text-sm text-rm-secondary">Componentes: {{ implode(', ', $vinculoMetodo['componentes']) }}. La identidad configurada debe coincidir con el protocolo realmente aplicado; esta vinculación no certifica la aplicación.</p>
+                                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                                    @foreach($vinculoMetodo['identidad'] as $nombre => $valor)
+                                        <div><dt class="inline font-semibold">{{ str_replace('_', ' ', $nombre) }}:</dt> <dd class="inline">{{ is_scalar($valor) ? $valor : 'Sin identificar' }}</dd></div>
+                                    @endforeach
+                                </dl>
+                                <p class="text-sm text-rm-secondary">Registra solo resultados originales. Las entradas de escolaridad y condiciones se capturan como preguntas del protocolo cuando están definidas.</p>
+                            @else
+                                <p class="font-semibold">Sin método de interpretación listo</p>
+                                <p class="text-sm text-rm-secondary">Puedes conservar las respuestas originales. O.R.I.O.N. se abstendrá de interpretarlas hasta que exista un vínculo único, exacto y completo con el método aplicable.</p>
+                            @endif
+                            @if(($vinculoMetodo['entradas'] ?? []) !== [])
+                                <details>
+                                    <summary class="cursor-pointer font-semibold">Entradas requeridas y vínculo con tareas</summary>
+                                    <ul class="mt-2 space-y-1 text-sm">
+                                        @foreach($vinculoMetodo['entradas'] as $entrada)
+                                            <li>{{ str_replace('_', ' ', $entrada['nombre']) }} ({{ $entrada['tipo'] }}): {{ $entrada['disponible'] ? 'tarea '.$entrada['codigo_tarea'] : 'falta tarea compatible' }}</li>
+                                        @endforeach
+                                    </ul>
+                                </details>
+                            @endif
+                        </section>
+                    @endif
                     @if($transcripcion)
                         <x-ui.field :for="'captura-documento-'.$this->getId()" label="Documento original del residente" required error="cod_documento_clinico">
                             <select id="captura-documento-{{ $this->getId() }}" class="rm-input" wire:model="cod_documento_clinico" aria-invalid="{{ $errors->has('cod_documento_clinico') ? 'true' : 'false' }}" @if($errors->has('cod_documento_clinico')) aria-describedby="captura-documento-{{ $this->getId() }}-error" @endif @disabled($confirmando)>
@@ -96,6 +126,7 @@
                     <div class="space-y-4">
                         @foreach($preguntas as $pregunta)
                             <div wire:key="pregunta-captura-{{ $pregunta['codigo'] }}">
+                                <p class="text-xs text-rm-secondary">Tarea {{ $pregunta['codigo_catalogo'] }}@if($pregunta['dominio']) · {{ $pregunta['dominio'] }}@endif · {{ $pregunta['tipo'] }}</p>
                                 <x-ui.field :for="'captura-valor-'.$this->getId().'-'.$pregunta['codigo']" :label="$pregunta['enunciado']" :error="'valores.'.$pregunta['codigo']">
                                     @if($pregunta['campo'] === 'valor_logico')
                                         <select id="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}" class="rm-input" wire:model="valores.{{ $pregunta['codigo'] }}" aria-invalid="{{ $errors->has('valores.'.$pregunta['codigo']) ? 'true' : 'false' }}" @if($errors->has('valores.'.$pregunta['codigo'])) aria-describedby="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}-error" @endif @disabled($confirmando)>

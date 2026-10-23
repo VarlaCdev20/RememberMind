@@ -97,7 +97,7 @@ final class ContratosConocimiento
                 && $cabecera->observacion === PaqueteCognitivoInstitucional::FUNDAMENTO) {
                 $contrato = PaqueteCognitivoInstitucional::contratos();
                 $fuentes = app(FuentesObservacionalesCognitivas::class)->vinculos();
-                $mapas = DB::table('mapeos_variables_fuente as m')->join('variables_expertas as v', 'v.cod_variable_experta', '=', 'm.cod_variable_experta')
+                $mapas = DB::table('mapeos_variables_fuente as m')->join('nodos_semanticos as v', 'v.cod_variable_experta', '=', 'm.cod_variable_experta')
                     ->join('nodos_semanticos as n', 'n.cod_nodo_semantico', '=', 'v.cod_nodo_semantico')
                     ->where('m.cod_version_modelo', $version)->get(['m.cod_mapeo_variable_fuente', 'm.clave_selector', 'n.codigo_semantico']);
                 foreach ($mapas as $mapa) {
@@ -159,7 +159,7 @@ final class ContratosConocimiento
     private function mapeos(string $version): Collection
     {
         return DB::table('mapeos_variables_fuente as m')
-            ->join('variables_expertas as v', 'v.cod_variable_experta', '=', 'm.cod_variable_experta')
+            ->join('nodos_semanticos as v', 'v.cod_variable_experta', '=', 'm.cod_variable_experta')
             ->join('nodos_semanticos as n', 'n.cod_nodo_semantico', '=', 'v.cod_nodo_semantico')
             ->join('fuentes_datos_expertas as f', 'f.cod_fuente_dato_experta', '=', 'm.cod_fuente_dato_experta')
             ->where('m.cod_version_modelo', $version)->where('v.cod_version_modelo', $version)

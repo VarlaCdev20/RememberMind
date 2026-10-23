@@ -11,15 +11,14 @@
             @empty
                 <p class="text-rm-secondary">No hay versiones almacenadas. Puede consultar el paquete experimental en memoria; no está publicado ni clínicamente aprobado.</p>
             @endforelse
-            {{ $versiones->links() }}
+            @if($versiones->hasPages()){{ $versiones->links() }}@endif
         </div>
         <div class="space-y-3">
             <label for="lab-modo" class="block font-semibold">Vista del conocimiento</label>
             <select id="lab-modo" wire:model.live="modoConocimiento" class="rm-input w-full"><option value="reglas">Catálogo de reglas</option><option value="catalogo">Conceptos, variables, fuentes y mapeos</option><option value="red">Red semántica</option><option value="versiones">Comparación de versiones</option></select>
             <p><strong>Origen:</strong> {{ $version ?? 'Paquete G09 experimental incorporado al motor' }}.</p>
             <p class="text-sm text-rm-secondary">Los estados activos y los literales de aprobación del paquete de ingeniería son sintéticos. No representan autorización clínica. Una versión retirada conserva su contenido histórico para lectura.</p>
-            <div class="rm-lab-actions"><button type="button" class="rm-btn rm-btn-secondary" disabled aria-describedby="lab-escritura">Crear regla</button><button type="button" class="rm-btn rm-btn-secondary" disabled aria-describedby="lab-escritura">Crear nueva versión</button><button type="button" class="rm-btn rm-btn-secondary" disabled aria-describedby="lab-escritura">Archivar</button></div>
-            <p id="lab-escritura" class="text-sm">Operaciones restringidas: el gestor actual exige consola/testing y base desechable. No existe autorización de escritura web. No se permite editar directamente una regla histórica ni borrarla.</p>
+            <p class="rm-expert-disclosure">Esta pantalla es de consulta. Las operaciones institucionales existentes se consultan en Gobierno de reglas y conservan sus permisos propios.</p>
         </div>
     </div>
 </x-ui.section-card>
@@ -36,26 +35,29 @@
             </div>
             <table class="rm-lab-table mt-4"><caption class="sr-only">Reglas de la versión seleccionada</caption><thead><tr><th scope="col">Código y nombre</th><th scope="col">Dominio y subcomponente</th><th scope="col">Versión y estado</th><th scope="col">Fundamento y modificación</th><th scope="col">Acciones</th></tr></thead><tbody>
                 @forelse($reglas as $r)
-                    <tr><td data-label="Código y nombre"><strong>{{ $r['nombre'] ?? $r['codigo'] }}</strong><p class="text-sm">{{ $r['codigo'] }}</p></td><td data-label="Dominio y subcomponente">{{ $dominios[$r['dominio']] ?? $r['dominio'] }}<p class="text-sm">{{ $r['subcomponente'] }}</p></td><td data-label="Versión y estado">{{ $r['version'] }}<p>{{ $r['estado'] }}</p></td><td data-label="Fundamento y modificación">{{ $r['fundamento'] ?? 'Fundamento no disponible en este contrato' }}<p class="text-sm text-rm-secondary">Última modificación: {{ $r['updated_at'] ?? 'No disponible' }}</p></td><td data-label="Acciones"><button type="button" wire:click="abrirRegla(@js($r['id']))" class="rm-btn rm-btn-secondary">Consultar detalle<span class="sr-only"> de {{ $r['codigo'] }}</span></button></td></tr>
+                    <tr><td data-label="Código y nombre"><strong>{{ $r['nombre'] ?? $r['codigo'] }}</strong><p class="text-sm">{{ $r['codigo'] }}</p></td><td data-label="Dominio y subcomponente">{{ $dominios[$r['dominio']] ?? $r['dominio'] }}<p class="text-sm">{{ $r['subcomponente'] }}</p></td><td data-label="Versión y estado">{{ $r['version'] }}<p>{{ $r['estado'] }}</p></td><td data-label="Fundamento y modificación">{{ $r['fundamento'] ?? 'Fundamento no disponible en este contrato' }}<p class="text-sm text-rm-secondary">Última modificación: {{ $r['updated_at'] ?? 'No disponible' }}</p></td><td data-label="Acciones"><button type="button" data-expert-detail wire:click="abrirRegla(@js($r['id']))" class="rm-btn rm-btn-secondary">Consultar detalle<span class="sr-only"> de {{ $r['codigo'] }}</span></button></td></tr>
                 @empty
                     <tr><td colspan="5"><x-ui.empty-state compact title="Sin reglas que coincidan" description="Revise los filtros o seleccione otra versión del conocimiento." /></td></tr>
                 @endforelse
             </tbody></table>
             {{ $reglas->links() }}
         </x-ui.section-card>
-        @if($regla && isset($conocimiento['reglas'][$regla]))
-            <x-ui.section-card title="Detalle de regla" :subtitle="$conocimiento['reglas'][$regla]['codigo']">
-                @include('livewire.superadministrador.sistema-experto.datos', ['datos' => $conocimiento['reglas'][$regla]])
-                <p class="mt-4">Pruebas, dependencias históricas y sucesora: no disponibles como consulta web en este contrato. Las condiciones se consultan en su versión original.</p>
-            </x-ui.section-card>
-        @endif
     @elseif($modoConocimiento === 'catalogo')
         <x-ui.section-card title="Catálogo del conocimiento" subtitle="Filas originales de conceptos, dominios, variables, fuentes, relaciones y mapeos de esta versión.">
-            @foreach($conocimiento['tablas'] as $tabla => $filas)
-                <details class="rm-expert-source mb-3"><summary>{{ ucfirst(str_replace('_', ' ', $tabla)) }} · {{ count($filas) }} registros</summary>
-                    @include('livewire.superadministrador.sistema-experto.datos', ['datos' => $filas])
-                </details>
-            @endforeach
+            <nav class="rm-knowledge-categories" aria-label="Categorías de conocimiento">
+                @foreach(['nodos_semanticos' => 'Conceptos', 'relaciones_semanticas' => 'Relaciones', 'variables_expertas' => 'Variables', 'fuentes_datos_expertas' => 'Fuentes', 'mapeos_variables_fuente' => 'Mapeos de variables', 'mapeos_valores_fuente' => 'Mapeos de valores', 'reglas_expertas' => 'Reglas', 'condiciones_regla_experta' => 'Condiciones', 'consecuencias_regla_experta' => 'Consecuencias', 'dominios_valores_expertos' => 'Dominios de valores', 'valores_semanticos' => 'Valores', 'criterios_dominios_resultado' => 'Criterios'] as $tabla => $nombre)
+                    <button type="button" wire:click="$set('tablaCatalogo', '{{ $tabla }}')" class="rm-btn {{ $tablaCatalogo === $tabla ? 'rm-btn-primary' : 'rm-btn-secondary' }}" aria-pressed="{{ $tablaCatalogo === $tabla ? 'true' : 'false' }}">{{ $nombre }} <span>{{ count($conocimiento['tablas'][$tabla] ?? []) }}</span></button>
+                @endforeach
+            </nav>
+            <div class="mt-4"><label for="expert-catalog-search" class="block font-semibold">Buscar en la categoría seleccionada</label><input id="expert-catalog-search" class="rm-input w-full" type="search" maxlength="120" wire:model.live.debounce.300ms="buscarCatalogo"></div>
+            <div class="rm-knowledge-records mt-4">
+                @forelse($filasCatalogo as $fila)
+                    <article class="rm-knowledge-version"><div><h3 class="font-semibold">{{ $fila['nombre'] ?? $fila['codigo_semantico'] ?? $fila['codigo_regla'] ?? $fila['tipo_relacion'] ?? $fila[$pkCatalogo] }}</h3><p>{{ $fila['definicion'] ?? $fila['descripcion'] ?? $fila['estado'] ?? 'Registro declarado en la versión seleccionada' }}</p><small>{{ $fila[$pkCatalogo] }}</small></div><button type="button" data-expert-detail wire:click="abrirRegistro(@js($fila[$pkCatalogo]))" class="rm-btn rm-btn-secondary">Ver detalle<span class="sr-only"> de {{ $fila[$pkCatalogo] }}</span></button></article>
+                @empty
+                    <x-ui.empty-state compact title="Sin registros en esta categoría" description="Revise la búsqueda o seleccione otra categoría del conocimiento." />
+                @endforelse
+            </div>
+            {{ $filasCatalogo->links() }}
         </x-ui.section-card>
     @elseif($modoConocimiento === 'red')
         @include('livewire.superadministrador.sistema-experto.red-semantica')

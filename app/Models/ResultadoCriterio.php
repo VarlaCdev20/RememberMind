@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 // O.R.I.O.N. 4.16.16; restricciones físicas D-137.
-class ResultadoCriterio extends ModeloExperto
+class ResultadoCriterio extends ModeloBloqueExperto
 {
-    protected $table = 'resultados_criterio';
+    protected const BLOQUE = 'resultados_criterio';
+
+    protected $table = 'evaluacion_criterios';
 
     protected $primaryKey = 'cod_resultado_criterio';
 

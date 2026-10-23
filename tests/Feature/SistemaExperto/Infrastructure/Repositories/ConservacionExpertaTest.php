@@ -51,6 +51,7 @@ use Tests\Unit\SistemaExperto\Infrastructure\Mappers\EscenarioMapeadores;
  */
 final class ConservacionExpertaTest extends RepositoriosTestCase
 {
+    use \Tests\Support\CorromperConservacionParaPrueba;
     protected function setUp(): void
     {
         parent::setUp();
@@ -147,7 +148,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
         $antes = DB::table('secuencias_codigos')->orderBy('entidad')->get()->all();
         $disparado = false;
         DB::listen(function ($consulta) use (&$disparado): void {
-            if (! $disparado && str_contains($consulta->sql, 'insert into "resultados_criterio"')) {
+            if (! $disparado && str_starts_with($consulta->sql, 'update "evaluacion_criterios" set "cod_resultado_criterio"')) {
                 $disparado = true;
                 throw new RuntimeException('Fallo de almacenamiento simulado.');
             }
@@ -191,7 +192,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
     public function test_detecta_snapshot_alterada_sin_fallback(): void
     {
         $this->repo()->guardar(E::perfil()->cognicion);
-        DB::table('resultados_criterio')->update(['justificacion_original' => 'Cambio físico indebido.']);
+        $this->corromperConservacion(fn () => DB::table('evaluacion_criterios')->whereNotNull('cod_resultado_criterio')->update(['resultado_justificacion_original' => 'Cambio físico indebido.']));
         $this->expectException(DomainException::class);
         $this->repo()->obtener('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha());
     }
@@ -225,6 +226,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
     {
         [$modelo] = EscenarioMapeadores::resultados(['U', 'U', 'U', 'U', 'U']);
         EscenarioRepositorios::guardarGrafo($modelo);
+        (new \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionBloquesExpertos)->bajar();
         $antes = DB::table('resultados_criterio')->orderBy('cod_resultado_criterio')->get()->all();
         $migracion = require base_path('database/migrations/2026_10_17_200000_incorporate_conservacion_experta_v2.php');
         (new TransicionReduccionConservacion)->bajar();
@@ -283,7 +285,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
         $this->repo()->guardar($perfil->cognicion);
         $disparado = false;
         DB::listen(function ($q) use (&$disparado): void {
-            if (! $disparado && str_contains($q->sql, 'insert into "resultados_criterio"')) {
+            if (! $disparado && str_starts_with($q->sql, 'update "evaluacion_criterios" set "cod_resultado_criterio"')) {
                 $disparado = true;
                 throw new RuntimeException('Fallo DCL simulado.');
             }
@@ -295,9 +297,9 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
             self::assertSame('Fallo DCL simulado.', $e->getMessage());
         }
         self::assertTrue($disparado);
-        self::assertSame(0, DB::table('clasificaciones_dcl_instantanea')->count());
+        self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
         self::assertSame(0, DB::table('hechos_instantanea_experta')->whereNotNull('cod_evidencia_iadl_instantanea')->count());
-        self::assertSame(0, DB::table('clasificaciones_dcl_instantanea')->count());
+        self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
         self::assertSame(0, DB::table('evaluacion_criterios')->where('tipo_registro', 'DCL')->count());
         self::assertNotNull($this->repo()->obtener('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha()));
     }
@@ -351,7 +353,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
         EscenarioRepositorios::version('SIM-V2');
         Catalogo::preparar($this->conexionPruebas(), 'SIM-V2', 'SIM-USU');
         $otro = Catalogo::leer($this->conexionPruebas(), 'SIM-V2')['SNAP:DOMINIO:COG-MEM']['valores']['U'];
-        DB::table('resultados_criterio')->update(['cod_valor_semantico' => $otro]);
+        $this->corromperConservacion(fn () => DB::table('evaluacion_criterios')->whereNotNull('cod_resultado_criterio')->update(['resultado_cod_valor_semantico' => $otro]));
         $this->expectException(DomainException::class);
         $this->repo()->obtener('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha());
     }
@@ -381,8 +383,8 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
             $this->repo()->guardarClasificacion(new ResultadoClasificacionDcl($perfil, $base->patronCandidato, [], $base->justificacion, [$regla]));
             self::fail('Una PK real no acredita contenido inventado.');
         } catch (DomainException) {
-            self::assertSame(0, DB::table('clasificaciones_dcl_instantanea')->count());
-            self::assertSame(0, DB::table('clasificaciones_dcl_instantanea')->count());
+            self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
+            self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
             self::assertSame(0, DB::table('evaluacion_criterios')->where('tipo_registro', 'DCL')->count());
         }
     }

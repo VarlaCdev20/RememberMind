@@ -61,7 +61,7 @@ final class RevisionObservacionalExpertaTest extends TestCase
     public function test_revisiones_separadas_sobre_instantanea_conservada_sin_preaprobacion_ni_modificar_resultado(): void
     {
         $id = $this->ejecutar();
-        $resultado = DB::table('resultados_criterio')->get()->toJson();
+        $resultado = \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('resultados_criterio')->get()->toJson();
         $this->control->update(['repite_preguntas' => false]);
         self::assertSame([], config('sistema_experto.lectura_clinica'));
         $accion = app(RevisarValoracionExperta::class);
@@ -75,9 +75,9 @@ final class RevisionObservacionalExpertaTest extends TestCase
         $nueva = $accion->ejecutar($this->medico, $id, D::MEDICINA, 'CONFIRMADA', 'Rectificación documentada.', $m->getKey());
         self::assertSame($m->getKey(), $nueva->cod_revision_anterior);
         self::assertSame('RECHAZADA', $m->fresh()->decision);
-        self::assertSame($resultado, DB::table('resultados_criterio')->get()->toJson());
+        self::assertSame($resultado, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('resultados_criterio')->get()->toJson());
         self::assertDatabaseCount('revisiones_evaluacion_experta', 3);
-        self::assertDatabaseCount('clasificaciones_dcl_instantanea', 0);
+        self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
     }
 
     public function test_traza_alterada_impide_consultar_y_firmar_sin_escrituras(): void

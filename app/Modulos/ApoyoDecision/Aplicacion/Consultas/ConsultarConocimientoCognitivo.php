@@ -38,7 +38,8 @@ final class ConsultarConocimientoCognitivo
         return $consulta['_instantanea'] ?? throw new DomainException('No se puede preparar la evaluación: '.$consulta['motivo']);
     }
 
-    private function adquirir(User $usuario, Residente $residente, CarbonImmutable $corte): array
+    /** Solo backend: permite compartir la captura verificada sin releer sus mediciones en Petersen. */
+    public function adquirir(User $usuario, Residente $residente, CarbonImmutable $corte): array
     {
         return DB::transaction(function () use ($usuario, $residente, $corte): array {
             $usuario = User::query()->findOrFail($usuario->getKey());

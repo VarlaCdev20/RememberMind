@@ -45,8 +45,17 @@ class EvaluacionExpertaPolicy
             || ($user->hasRole('PSICOLOGO/A')
                 && $user->personal()->where('estado', 'ACTIVO')->where('profesion', 'PSICOLOGIA')->exists());
 
-        return $competente && $this->consultarResultados($user, $residente)->allowed()
-            && $user->checkPermissionTo('controles_funcionales_iadl.ver', 'web')
+        return ($competente && $this->consultarResultados($user, $residente)->allowed()
+            && $user->checkPermissionTo('controles_funcionales_iadl.ver', 'web'))
+            || $this->consultarFuentesParaResultado($user, $residente)->allowed()
+            ? Response::allow() : Response::denyAsNotFound();
+    }
+
+    /** Lectura original de Enfermería limitada al residente asignado y al resultado experto. */
+    public function consultarFuentesParaResultado(User $user, Residente $residente): Response
+    {
+        return $user->hasRole('ENFERMEROS')
+            && $this->consultarResultados($user, $residente)->allowed()
             ? Response::allow() : Response::denyAsNotFound();
     }
 

@@ -1,5 +1,5 @@
 @php($claveRevision = ($esRevisionObservacional ?? false) ? 'observacional' : 'cognitiva')
-<section class="rm-card rm-expert-clinical-block" aria-labelledby="revision-{{ $claveRevision }}-titulo">
+<section class="rm-card rm-expert-clinical-block" @if(! ($esRevisionObservacional ?? false)) id="orion-revision-profesional" @endif aria-labelledby="revision-{{ $claveRevision }}-titulo">
     <h2 id="revision-{{ $claveRevision }}-titulo" class="rm-expert-section-title">{{ ($esRevisionObservacional ?? false) ? 'Hallazgos observacionales · Confirmación profesional' : 'Valoración del sistema experto · Confirmación profesional' }}</h2>
     @if($esRevisionObservacional ?? false)<p class="text-sm mt-2">Esta revisión confirma o rechaza los hallazgos descriptivos de la evaluación observacional conservada.</p>@endif
     <p class="text-sm mt-2">Psicología y Medicina revisan esta valoración por separado. Cada decisión conserva al profesional, la fecha y su justificación.</p>

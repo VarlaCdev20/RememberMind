@@ -26,7 +26,7 @@ $listenerPrueba.Stop()
 if (!$Informe) { $Informe = Join-Path $baseTemporal "remembermind-pg-$idPrueba.junit.xml" }
 if (!$Log) { $Log = Join-Path $baseTemporal "remembermind-pg-$idPrueba.log" }
 $variablesAnteriores = @{}
-foreach ($nombre in @('DB_DATABASE','DB_USERNAME','DB_PASSWORD','DB_HOST','DB_PORT')) {
+foreach ($nombre in @('DB_DATABASE','DB_USERNAME','DB_PASSWORD','DB_HOST','DB_PORT','LARAVEL_STORAGE_PATH')) {
     $variablesAnteriores[$nombre] = [Environment]::GetEnvironmentVariable($nombre, 'Process')
 }
 $iniciado = $false
@@ -49,9 +49,13 @@ GRANT CONNECT ON DATABASE $dbPrueba TO $runnerPrueba;
     $env:DB_PASSWORD = $passwordPrueba
     $env:DB_HOST = '127.0.0.1'
     $env:DB_PORT = [string]$puertoPrueba
+    $env:LARAVEL_STORAGE_PATH = Join-Path $cluster 'storage'
+    foreach ($subcarpeta in @('app/private','app/public','framework/cache/data','framework/sessions','framework/views','logs')) {
+        New-Item -ItemType Directory -Force -Path (Join-Path $env:LARAVEL_STORAGE_PATH $subcarpeta) | Out-Null
+    }
     Push-Location -LiteralPath $repo
     try {
-        & php vendor/phpunit/phpunit/phpunit -c phpunit.postgres.xml --filter $Filtro --log-junit $Informe *> $Log
+        & php vendor/phpunit/phpunit/phpunit --do-not-cache-result --colors=never -c phpunit.postgres.xml --filter $Filtro --log-junit $Informe *> $Log
         $resultadoPruebas = $LASTEXITCODE
         Get-Content -LiteralPath $Log -Tail 30
     } finally { Pop-Location }

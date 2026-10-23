@@ -17,6 +17,7 @@ use App\Modulos\Valoraciones\Aplicacion\DTOs\CatalogoPreguntasInstrumento;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use LogicException;
+use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
 
 /** Prepara fuentes de captura sin crear instrumentos, preguntas ni registros clínicos. */
 final readonly class PrepararCapturaInstrumental
@@ -82,7 +83,62 @@ final readonly class PrepararCapturaInstrumental
             ->with(['opciones' => fn ($q) => $q->where('estado', 'ACTIVO')->orderBy('orden')->orderBy('cod_opcion')])
             ->get();
 
-        return CatalogoPreguntasInstrumento::proyectar($instrumento, $preguntas);
+        $catalogo = CatalogoPreguntasInstrumento::proyectar($instrumento, $preguntas);
+        $catalogo['vinculo_metodo'] = $this->vinculoMetodo($instrumento, $catalogo['preguntas']);
+
+        return $catalogo;
+    }
+
+    /** Presenta el contrato explícito; nunca identifica una prueba por semejanza de nombre. */
+    private function vinculoMetodo(Instrumento $instrumento, array $preguntas): array
+    {
+        if ($instrumento->tipo === 'OBSERVACIONAL') {
+            return ['estado' => 'OBSERVACIONAL'];
+        }
+        $perfiles = array_values(array_filter(config('sistema_experto.perfiles_instrumentales', []),
+            static fn ($perfil): bool => is_array($perfil)
+                && ($perfil['cod_instrumento'] ?? null) === $instrumento->getKey()
+                && ($perfil['version_instrumento'] ?? null) === $instrumento->version));
+        if (count($perfiles) !== 1) {
+            return ['estado' => count($perfiles) > 1 ? 'VINCULO_AMBIGUO' : 'SIN_VINCULO'];
+        }
+        $perfil = $perfiles[0];
+        $meta = (new RegistroMetodosInstrumentales)->metodos()[$perfil['metodo'] ?? ''] ?? null;
+        $identidad = $perfil['identidad_instrumento'] ?? null;
+        $identidadMetodo = $meta['identidad'] ?? null;
+        if (is_array($identidad) && is_array($identidadMetodo)) {
+            ksort($identidad);
+            ksort($identidadMetodo);
+        }
+        if (! is_array($meta) || ! is_array($perfil['selectores'] ?? null)
+            || ! is_string($perfil['id'] ?? null) || $perfil['id'] === ''
+            || ($perfil['codigo_instrumento'] ?? null) !== $instrumento->codigo
+            || ! is_array($identidad) || $identidad !== $identidadMetodo) {
+            return ['estado' => 'VINCULO_INCOMPLETO'];
+        }
+        $porCodigo = array_column($preguntas, null, 'codigo');
+        $entradas = [];
+        $preguntasUsadas = [];
+        foreach ($meta['entradas'] as $nombre => $tipo) {
+            $selector = $perfil['selectores'][$nombre] ?? null;
+            $pregunta = is_array($selector) ? ($porCodigo[$selector['cod_pregunta'] ?? ''] ?? null) : null;
+            $campo = $tipo === 'LOGICO' ? 'valor_logico' : 'valor_numero';
+            $codigo = $pregunta['codigo'] ?? null;
+            $disponible = $pregunta !== null && $pregunta['campo'] === $campo && ($selector['campo'] ?? null) === $campo
+                && ! isset($preguntasUsadas[$codigo]);
+            if ($codigo !== null) {
+                $preguntasUsadas[$codigo] = true;
+            }
+            $entradas[] = ['nombre' => $nombre, 'tipo' => $tipo, 'pregunta' => $codigo,
+                'codigo_tarea' => $pregunta['codigo_catalogo'] ?? null, 'disponible' => $disponible];
+        }
+
+        $incompleto = array_diff(array_keys($perfil['selectores']), array_keys($meta['entradas'])) !== []
+            || count(array_filter($entradas, static fn ($e) => ! $e['disponible'])) > 0;
+
+        return ['estado' => $incompleto ? 'VINCULO_INCOMPLETO' : 'VINCULADO',
+            'metodo' => $perfil['metodo'], 'componentes' => $meta['componentes'] ?? [], 'fuente' => $meta['fuente'] ?? null,
+            'identidad' => $perfil['identidad_instrumento'] ?? [], 'entradas' => $entradas];
     }
 
     /** El permiso específico permite metadatos de la fuente del residente; no concede descarga general de documentos. */

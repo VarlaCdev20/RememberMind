@@ -5,7 +5,10 @@ use App\Modulos\Valoraciones\Presentacion\Http\Controllers\EvaluacionInstrumenta
 use App\Modulos\Valoraciones\Presentacion\Http\Controllers\InstrumentoController;
 use App\Modulos\Valoraciones\Presentacion\Http\Controllers\ValoracionProfesionalController;
 use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\DashboardPsicologo;
+use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\ActividadPsicologicaGeneral;
 use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\EvaluacionesAreaPanel;
+use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\FichaPsicologicaResidente;
+use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\MisResidentesPsicologia;
 use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\SaludEvaluacionesGeriatricasPanel;
 use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\SaludValoracionPanel;
 use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\ValoracionEnfermeriaPanel;
@@ -59,7 +62,9 @@ return [
         Route::get('/dashboard', DashboardPsicologo::class)->name('dashboard');
     },
     'ruta_174' => static function (): void {
-        Route::get('/evaluaciones-asignadas', DashboardPsicologo::class)->name('evaluaciones');
+        Route::get('/evaluaciones-asignadas', MisResidentesPsicologia::class)
+            ->middleware('can:viewAny,App\Models\Residente')
+            ->name('evaluaciones');
     },
     'ruta_175' => static function (): void {
         Route::get('/evaluacion/cognitiva', EvaluacionesAreaPanel::class)
@@ -85,6 +90,18 @@ return [
         Route::get('/evaluacion/entorno', EvaluacionesAreaPanel::class)
             ->defaults('codArea', 'ARE_SOC')
             ->name('evaluacion.entorno');
+    },
+    'ruta_psicologia_ficha' => static function (): void {
+        Route::get('/residente/{residente}/ficha', FichaPsicologicaResidente::class)
+            ->middleware('can:viewAny,App\Models\Residente')
+            ->name('residente.ficha');
+    },
+    'ruta_psicologia_actividad_general' => static function (): void {
+        foreach (['agenda', 'seguimiento', 'informes'] as $seccion) {
+            Route::get('/'.$seccion, ActividadPsicologicaGeneral::class)
+                ->middleware(['role:PSICOLOGO/A|SUPERADMINISTRADOR', 'can:viewAny,App\Models\Residente'])
+                ->name($seccion);
+        }
     },
     'ruta_240' => static function (): void {
         Route::get('/instrumentos', [InstrumentoController::class, 'index'])->middleware('permission:instrumentos.ver')->name('instrumentos.index');

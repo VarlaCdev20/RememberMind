@@ -39,6 +39,7 @@
 @import './patterns/module-page.css';
 @import './patterns/clinical-dashboard.css';
 @import './patterns/resident-summary.css';
+@import './patterns/resident-file.css';
 @import './patterns/clinical-table.css';
 @import './patterns/clinical-detail.css';
 @import './patterns/clinical-timeline.css';
@@ -64,6 +65,7 @@
 @import './patterns/unified-data-tables.css';
 @import './patterns/collection-workspace.css';
 @import './patterns/expert-results.css';
+@import './patterns/expert-resident-workspace.css';
 
 /* Navegación lateral compartida: después de los ajustes históricos por módulo. */
 @import './components/sidebar.css';

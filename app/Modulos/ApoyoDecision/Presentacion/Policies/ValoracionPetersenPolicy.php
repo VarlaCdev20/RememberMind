@@ -15,9 +15,10 @@ final class ValoracionPetersenPolicy
 {
     public function consultarOriginales(User $user, Residente $residente): bool
     {
-        return $user->checkPermissionTo('valoraciones_petersen.ver', 'web')
+        return Gate::forUser($user)->allows('consultarFuentesParaResultado', [EvaluacionExperta::class, $residente])
+            || ($user->checkPermissionTo('valoraciones_petersen.ver', 'web')
             && $user->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'SUPERADMINISTRADOR'])
-            && Gate::forUser($user)->allows('consultarResultados', [EvaluacionExperta::class, $residente]);
+            && Gate::forUser($user)->allows('consultarResultados', [EvaluacionExperta::class, $residente]));
     }
 
     public function crearOriginal(User $user, Residente $residente): bool

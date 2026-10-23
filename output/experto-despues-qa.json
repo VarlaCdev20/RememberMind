@@ -1,0 +1,218 @@
+{
+  "phase": "despues",
+  "matrix": [
+    {
+      "role": "superadmin",
+      "width": 1440,
+      "overflow": 0,
+      "sidebar": {
+        "width": 185.265625,
+        "cssWidth": "185.266px",
+        "position": "fixed",
+        "classes": "rm-sidebar",
+        "shell": "rm-shell  h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
+      }
+    },
+    {
+      "role": "superadmin",
+      "width": 1280,
+      "overflow": 0,
+      "sidebar": {
+        "width": 201.4375,
+        "cssWidth": "201.438px",
+        "position": "fixed",
+        "classes": "rm-sidebar",
+        "shell": "rm-shell  h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
+      }
+    },
+    {
+      "role": "superadmin",
+      "width": 1024,
+      "overflow": 0,
+      "sidebar": {
+        "width": 201.671875,
+        "cssWidth": "201.672px",
+        "position": "fixed",
+        "classes": "rm-sidebar",
+        "shell": "rm-shell  h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
+      }
+    },
+    {
+      "role": "superadmin",
+      "width": 768,
+      "overflow": 0,
+      "sidebar": {
+        "width": 166.5625,
+        "cssWidth": "166.562px",
+        "position": "fixed",
+        "classes": "rm-sidebar",
+        "shell": "rm-shell  h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
+      }
+    },
+    {
+      "role": "superadmin",
+      "width": 390,
+      "overflow": 0,
+      "sidebar": {
+        "width": 320,
+        "cssWidth": "320px",
+        "position": "fixed",
+        "classes": "rm-sidebar",
+        "shell": "rm-shell  h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
+      }
+    },
+    {
+      "role": "medicina",
+      "width": 1440,
+      "overflow": 0,
+      "sidebar": {
+        "width": 201.609375,
+        "cssWidth": "201.609px",
+        "position": "fixed",
+        "classes": "rm-sidebar",
+        "shell": "rm-shell  h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
+      }
+    },
+    {
+      "role": "medicina",
+      "width": 1280,
+      "overflow": 0,
+      "sidebar": {
+        "width": 224,
+        "cssWidth": "224px",
+        "position": "fixed",
+        "classes": "rm-sidebar",
+        "shell": "rm-shell  h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
+      }
+    },
+    {
+      "role": "medicina",
+      "width": 1024,
+      "overflow": 0,
+      "sidebar": {
+        "width": 221.828125,
+        "cssWidth": "221.828px",
+        "position": "fixed",
+        "classes": "rm-sidebar",
+        "shell": "rm-shell  h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
+      }
+    },
+    {
+      "role": "medicina",
+      "width": 768,
+      "overflow": 0,
+      "sidebar": {
+        "width": 201.75,
+        "cssWidth": "201.75px",
+        "position": "fixed",
+        "classes": "rm-sidebar",
+        "shell": "rm-shell  h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
+      }
+    },
+    {
+      "role": "medicina",
+      "width": 390,
+      "overflow": 0,
+      "sidebar": {
+        "width": 320,
+        "cssWidth": "320px",
+        "position": "fixed",
+        "classes": "rm-sidebar",
+        "shell": "rm-shell  h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
+      }
+    },
+    {
+      "role": "enfermeria",
+      "width": 1440,
+      "overflow": 0,
+      "sidebar": {
+        "width": 201.78125,
+        "cssWidth": "201.781px",
+        "position": "fixed",
+        "classes": "rm-sidebar",
+        "shell": "rm-shell rm-nursing-shell h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
+      }
+    },
+    {
+      "role": "enfermeria",
+      "width": 1280,
+      "overflow": 0,
+      "sidebar": {
+        "width": 214.0625,
+        "cssWidth": "214.062px",
+        "position": "fixed",
+        "classes": "rm-sidebar",
+        "shell": "rm-shell rm-nursing-shell h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
+      }
+    },
+    {
+      "role": "enfermeria",
+      "width": 1024,
+      "overflow": 0,
+      "sidebar": {
+        "width": 201.640625,
+        "cssWidth": "201.641px",
+        "position": "fixed",
+        "classes": "rm-sidebar",
+        "shell": "rm-shell rm-nursing-shell h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
+      }
+    },
+    {
+      "role": "enfermeria",
+      "width": 768,
+      "overflow": 0,
+      "sidebar": {
+        "width": 185.734375,
+        "cssWidth": "185.734px",
+        "position": "fixed",
+        "classes": "rm-sidebar",
+        "shell": "rm-shell rm-nursing-shell h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
+      }
+    },
+    {
+      "role": "enfermeria",
+      "width": 390,
+      "overflow": 0,
+      "sidebar": {
+        "width": 320,
+        "cssWidth": "320px",
+        "position": "fixed",
+        "classes": "rm-sidebar",
+        "shell": "rm-shell rm-nursing-shell h-full bg-[var(--rm-bg-app)] text-[var(--rm-text-primary)] antialiased selection:bg-[var(--rm-action-primary)] selection:text-[var(--rm-text-on-primary)] transition-colors duration-200"
+      }
+    },
+    {
+      "role": "medicina-conexiones",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "role": "medicina-conexiones",
+      "width": 1280,
+      "overflow": 0
+    },
+    {
+      "role": "medicina-conexiones",
+      "width": 1024,
+      "overflow": 0
+    },
+    {
+      "role": "medicina-conexiones",
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "role": "medicina-conexiones",
+      "width": 390,
+      "overflow": 0
+    }
+  ],
+  "errors": [
+    "Swal is not defined",
+    "Swal is not defined",
+    "Swal is not defined",
+    "Swal is not defined",
+    "Swal is not defined",
+    "Swal is not defined"
+  ]
+}

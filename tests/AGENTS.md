@@ -149,7 +149,7 @@ Do not include copyrighted clinical instrument content merely to test infrastruc
 ## DB baseline
 
 Maintain tests that validate:
-- exactly 70 V2.1 baseline operational tables plus the owner-approved V2.2 `objetivos_signos_vitales` extension (71 current);
+- the 70-table V2.1 operational core and each later owner-approved extension; the installed 2026-10-21 inventory is 75 operational + 29 expert = 104 business tables, with 16 technical tables and a design ceiling of 110 business tables (not approval of a specific DDL);
 - technical package/framework tables excluded from the count;
 - key V2 names/columns exist;
 - important V1 tables/columns are absent;

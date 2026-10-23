@@ -121,8 +121,8 @@ final readonly class PaqueteSimulacionLocal
     private function fila(string $tabla, array $clave, array $datos): string
     {
         $db = $this->contexto->db();
-        $pk = CatalogoCodigos::ENTIDADES[$tabla][0];
-        $fila = $db->table($tabla)->where($clave)->lockForUpdate()->first();
+        $pk = CatalogoCodigos::clave($tabla);
+        $fila = \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta($tabla, $this->contexto->conexion)->where($clave)->lockForUpdate()->first();
         $esperados = $clave + $datos;
         if ($fila !== null) {
             foreach ($esperados as $campo => $valor) {
@@ -134,7 +134,7 @@ final readonly class PaqueteSimulacionLocal
             return $fila->$pk;
         }
         $id = (new GeneradorCodigo)->siguiente($tabla, $this->contexto->conexion);
-        $db->table($tabla)->insert([$pk => $id] + $esperados);
+        \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::insertar($tabla, [$pk => $id] + $esperados, $this->contexto->conexion);
 
         return $id;
     }

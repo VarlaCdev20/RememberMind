@@ -54,6 +54,18 @@ class RolesVistasPermisosMatrixTest extends TestCase
         $response->assertRedirect(route('admin.medico.dashboard'));
     }
 
+    public function test_navbar_medico_busca_en_su_listado_de_pacientes(): void
+    {
+        $medico = $this->crearUsuarioConRol('MEDICO GENERAL/GERIATRA');
+
+        $this->actingAs($medico)
+            ->get(route('admin.medico.dashboard'))
+            ->assertOk()
+            ->assertSee('action="'.route('admin.medico.pacientes.observacion').'"', false)
+            ->assertSee('name="busqueda"', false)
+            ->assertSee('Buscar pacientes');
+    }
+
     public function test_enfermero_se_redirige_a_dashboard_enfermeria(): void
     {
         $enfermero = $this->crearUsuarioConRol('ENFERMEROS');

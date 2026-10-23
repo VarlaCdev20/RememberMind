@@ -27,7 +27,11 @@ final class PresentarInformeCognitivo
         }
         $areas = [];
         foreach ($lectura['perfil'] as $codigo => $detalle) {
-            $areas[$codigo] = ['nombre' => self::NOMBRES[$codigo], 'icono' => $detalle['icono']];
+            $areas[$codigo] = ['nombre' => self::NOMBRES[$codigo], 'icono' => $detalle['icono'],
+                'estado' => $detalle['estado'], 'conclusion' => $narrativa['funciones'][$codigo]['frase'] ?? $detalle['interpretacion'],
+                'significado' => $detalle['interpretacion'], 'por_que' => 'Lectura de la instantánea de simulación verificada; sin uso asistencial.',
+                'limites' => ['Resultado de demostración. No es una valoración clínica institucional.'],
+                'respaldo' => ['Instantánea local de simulación conservada y verificada.'], 'evaluada' => false, 'tono' => 'neutral'];
         }
 
         return ['titulo' => 'Evaluación neurocognitiva', 'narrativa' => $narrativa, 'areas' => $areas, 'actual' => $areas[$criterio],
@@ -35,6 +39,7 @@ final class PresentarInformeCognitivo
             // Cambia solo la etiqueta visible; la advertencia original sigue verificada en la instantánea.
             'procedencia_visible' => 'Entorno de pruebas · Resultado de demostración · Sin uso asistencial.',
             'limite_global' => 'El patrón conservado es candidato para revisión; no constituye un diagnóstico clínico.',
+            'limite_fuente' => 'Los datos de simulación no se consultan como fuentes clínicas actuales.',
             'limite_revision' => 'Los resultados de demostración no admiten confirmación ni rechazo profesional en el expediente.'];
     }
 
@@ -107,7 +112,7 @@ final class PresentarInformeCognitivo
             $limites = $d['integridad'];
         } elseif ($publicable) {
             $tono = LenguajeResultadosExperto::presentacion($valor)['tono'];
-            $significado = $d['interpretacion'];
+            $significado = LenguajeResultadosExperto::RESULTADOS[$valor]['interpretacion'];
             $limites[] = 'El resultado se limita a los componentes evaluados; no equivale a normalidad global ni a diagnóstico.';
         } elseif (! $d['criterio_registrado']) {
             $estado = $observaciones ? 'Observaciones generales disponibles' : 'Sin evaluación disponible';

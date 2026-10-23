@@ -1,0 +1,17 @@
+tabla,columna,tipo,obligatoria,pk,alcance
+evaluaciones_expertas,membresias_petersen_estado,VARCHAR(7),0,0,COLUMNA_PROPUESTA
+evaluaciones_expertas,membresias_petersen_huella,CHAR(64),0,0,COLUMNA_PROPUESTA
+evaluaciones_expertas,membresias_petersen_juicios,BIGINT,0,0,COLUMNA_PROPUESTA
+evaluaciones_expertas,membresias_petersen_soportes,BIGINT,0,0,COLUMNA_PROPUESTA
+juicios_petersen_adquiridos,cod_juicio_adquirido,VARCHAR(20),0,1,TABLA_PROPUESTA
+juicios_petersen_adquiridos,cod_evaluacion_experta,VARCHAR(20),1,0,TABLA_PROPUESTA
+juicios_petersen_adquiridos,cod_valoracion_petersen,VARCHAR(20),1,0,TABLA_PROPUESTA
+juicios_petersen_adquiridos,fecha_hora_iso,TEXT,1,0,TABLA_PROPUESTA
+juicios_petersen_adquiridos,registrado_en_iso,TEXT,1,0,TABLA_PROPUESTA
+juicios_petersen_adquiridos,orden_procedencia,BIGINT,1,0,TABLA_PROPUESTA
+juicios_petersen_adquiridos,orden_membresia,BIGINT,1,0,TABLA_PROPUESTA
+juicios_petersen_adquiridos,cantidad_soportes,BIGINT,1,0,TABLA_PROPUESTA
+soportes_petersen_adquiridos,cod_soporte_adquirido,VARCHAR(20),0,1,TABLA_PROPUESTA
+soportes_petersen_adquiridos,cod_juicio_adquirido,VARCHAR(20),1,0,TABLA_PROPUESTA
+soportes_petersen_adquiridos,cod_soporte_petersen,VARCHAR(20),1,0,TABLA_PROPUESTA
+soportes_petersen_adquiridos,orden_membresia,BIGINT,1,0,TABLA_PROPUESTA

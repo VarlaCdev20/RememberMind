@@ -19,6 +19,7 @@ use App\Models\Turno;
 use App\Models\User;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\CapturasInstrumentalesResidente;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarPerfilInstrumental;
+use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
 use App\Modulos\Valoraciones\Aplicacion\Acciones\AnularAplicacionInstrumento;
 use App\Modulos\Valoraciones\Aplicacion\Acciones\AplicarInstrumento;
@@ -347,6 +348,21 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         self::assertNull($perfil['dominios']['COG-MEM']['resultado_clinico']);
     }
 
+    public function test_consulta_de_mediciones_sin_inferencia_conserva_captura_y_fuente_por_componente(): void
+    {
+        $aplicacion = $this->aplicar();
+        config(['sistema_experto.perfiles_instrumentales' => [$this->perfil]]);
+        $this->mock(ConocimientoVersionado::class)->shouldNotReceive('instantanea');
+        $perfil = app(ConsultarPerfilInstrumental::class)->consultarMediciones($this->usuario, $this->residente, CarbonImmutable::now());
+        $componente = $perfil['dominios']['COG-MEM']['componentes']['MEM-S01'];
+        self::assertSame('MEDICIONES_DISPONIBLES', $componente['estado_medicion']);
+        self::assertSame($aplicacion->getKey(), $componente['mediciones'][0]['aplicacion']);
+        self::assertArrayNotHasKey('inferencia_declarativa', $perfil);
+        self::assertNull($perfil['diagnostico']);
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+        self::assertNull($aplicacion->fresh()->puntaje_total);
+    }
+
     public function test_faltantes_no_se_llenan_y_cero_original_se_conserva(): void
     {
         $respuestas = $this->respuestas;
@@ -373,10 +389,15 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
                 $consultas[] = $q->sql;
             }
         });
-        $r = $this->captura();
-        self::assertFalse($r['disponible']);
-        self::assertSame([], $r['capturas']);
-        self::assertNull(app(ConsultarPerfilInstrumental::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now()));
+        foreach ([fn () => $this->captura(),
+            fn () => app(ConsultarPerfilInstrumental::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now())] as $consulta) {
+            try {
+                $consulta();
+                self::fail('No debe entregar fuentes ni perfil parcial sin permiso de respuestas.');
+            } catch (HttpException $e) {
+                self::assertSame(403, $e->getStatusCode());
+            }
+        }
         self::assertSame([], $consultas);
     }
 
@@ -559,10 +580,12 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
                 $lecturasDocumentales++;
             }
         });
-        $r = $this->captura();
-        self::assertFalse($r['disponible']);
-        self::assertSame('ACCESO_A_FUENTES_NO_DISPONIBLE', $r['motivo']);
-        self::assertSame([], $r['capturas']);
+        try {
+            $this->captura();
+            self::fail('No debe entregar una captura parcial sin permiso documental.');
+        } catch (HttpException $e) {
+            self::assertSame(403, $e->getStatusCode());
+        }
         self::assertSame(0, $lecturasDocumentales);
     }
 

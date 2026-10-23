@@ -6,6 +6,7 @@ namespace Tests\Unit\SistemaExperto\Infrastructure\Mappers;
 
 use App\Models;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\InventarioExperto;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorEvidencias;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorRedSemantica;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorReglas;
@@ -95,10 +96,11 @@ final class ContratoMapeadoresTest extends TestCase
             'evaluaciones_condiciones_regla' => [Models\EvaluacionCondicionRegla::class, 'cod_evaluacion_condicion'],
             'evidencias_soporte_condicion' => [Models\EvidenciaSoporteCondicion::class, 'cod_evidencia_soporte_condicion'],
         ];
-        self::assertSame(InventarioExperto::TABLAS, array_keys($modelos));
+        $fisicas = array_map(static fn ($t) => BloquesExpertos::DEFINICIONES[$t]['tabla'] ?? $t, array_keys($modelos));
+        self::assertSame(InventarioExperto::TABLAS, array_values(array_unique($fisicas)));
         foreach ($modelos as $tabla => [$tipo, $pk]) {
             $modelo = new $tipo;
-            self::assertSame($tabla, $modelo->getTable());
+            self::assertSame(BloquesExpertos::DEFINICIONES[$tabla]['tabla'] ?? $tabla, $modelo->getTable());
             self::assertSame($pk, $modelo->getKeyName());
             self::assertSame('string', $modelo->getKeyType());
             self::assertFalse($modelo->getIncrementing());

@@ -47,6 +47,9 @@ const RM_CHART_TONES = new Set(['care', 'clinical', 'alert', 'neutral', 'cogniti
 const RM_CHART_DOMAINS = new Set(['residents', 'beds', 'alerts', 'medication', 'cognitive', 'rehab', 'staff', 'activities']);
 
 export function rmChartColor(tone, variant = 'primary') {
+    if (tone === 'cognitive' && variant === 'strong') {
+        return rmGetCss('--rm-chart-cognitive-strong');
+    }
     if (variant === 'soft' && RM_CHART_TONES.has(tone)) {
         return rmGetCss(`--rm-chart-${tone}-100`);
     }

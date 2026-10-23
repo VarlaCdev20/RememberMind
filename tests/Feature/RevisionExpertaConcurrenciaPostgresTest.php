@@ -52,7 +52,6 @@ final class RevisionExpertaConcurrenciaPostgresTest extends TestCase
         F::evaluacion($residente, $usuarios[1]->personal, 'REV');
         DB::table('versiones_modelo_experto')->where('cod_version_modelo', 'VER_TEST')->update(['codigo_version' => 'VAL-REVISION-01', 'estado' => 'ACTIVO']);
         DB::table('evaluaciones_expertas')->where('cod_evaluacion_experta', 'E_REV')->update(['origen_activacion' => 'MANUAL', 'estado_ejecucion' => 'FINALIZADA']);
-        DB::table('trazas_inferencia')->where('cod_traza_inferencia', 'TR_REV')->update(['estado_inferencia' => 'FINALIZADA']);
         DB::table('evidencias_criterio_evaluacion')->update(['estado_participacion' => 'UTILIZADA']);
         $c = config('sistema_experto.lectura_clinica.VER_TEST');
         $c['estados_ejecucion'] = $c['estados_inferencia'] = ['FINALIZADA'];

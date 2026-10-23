@@ -32,7 +32,6 @@ use DomainException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -40,16 +39,21 @@ use Livewire\Livewire;
 use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
 use MotorExperto\soporte\conservacion\InstantaneaEvaluacionInstitucional;
 use MotorExperto\soporte\conservacion\InstantaneaPetersen;
+use OrionNominal\MembresiasSQL;
+use PDO;
+use PDOException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Spatie\Permission\Models\Permission;
+use Symfony\Component\Process\Process;
+use Tests\Support\EsquemaSinTransaccion;
 use Tests\TestCase;
 use Tests\Unit\PetersenInstitucionalTest;
 
 /** Todas las filas son sintéticas y efímeras; se comprueban persistencia, autoría e historia reales. */
 final class CapturaPetersenOriginalTest extends TestCase
 {
-    use RefreshDatabase;
+    use EsquemaSinTransaccion;
 
     private User $usuario;
 
@@ -114,6 +118,348 @@ final class CapturaPetersenOriginalTest extends TestCase
             self::assertStringContainsString('otro contenido', $ex->getMessage());
         }
         self::assertDatabaseCount('valoraciones_petersen_originales', 1);
+    }
+
+    public function test_captura_vinculos_originales_incluso_de_juicios_rectificados_sin_leer_datos_actuales_al_verificar(): void
+    {
+        $control = ControlCognitivo::create(['cod_residente' => $this->residente->getKey(),
+            'cod_personal' => $this->usuario->personal->getKey(), 'fecha_hora' => '2026-10-17 09:00:00',
+            'estado' => 'VIGENTE', 'observacion' => 'Fuente sintética para comprobar la identidad histórica.']);
+        $original = $this->registrar($this->entrada(['elemento' => 'C01', 'estado_original' => 'S',
+            'soportes' => [['tipo_soporte' => 'HISTORIA_PREVIA', 'cod_control_cognitivo' => $control->getKey()]]]));
+        $this->registrar($this->entrada(['elemento' => 'C01', 'estado_original' => 'N', 'tipo_registro' => 'RECTIFICACION',
+            'cod_valoracion_anterior' => $original->getKey(), 'justificacion' => 'Rectificación sintética posterior.']));
+        $dto = app(ConsultarPetersenInstitucional::class)->preparar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+        self::assertSame(InstantaneaPetersen::CONTRATO_MEMBRESIAS, $dto->contenido['contrato']);
+        $soporte = $original->soportes()->sole();
+        self::assertCount(1, $dto->contenido['soportes_originales']);
+        self::assertSame($soporte->getKey(), $dto->contenido['soportes_originales'][0]['cod_soporte_petersen']);
+        self::assertSame($original->getKey(), $dto->contenido['soportes_originales'][0]['cod_valoracion_petersen']);
+        self::assertSame($control->getKey(), $dto->contenido['soportes_originales'][0]['cod_control_cognitivo']);
+        self::assertNull($dto->contenido['soportes_originales'][0]['cod_aplicacion']);
+        self::assertSame(0, $dto->contenido['soportes_originales'][0]['orden']);
+        self::assertSame('RECTIFICADA_AL_CORTE', $dto->contenido['adquisicion']['exclusiones'][0]['motivo']);
+        self::assertNotContains($original->getKey(), array_column(array_column($dto->contenido['valoraciones'], 'origen'), 'registro'));
+        $control->update(['observacion' => 'Cambio posterior que no debe completar la captura histórica.']);
+        DB::enableQueryLog();
+        DB::flushQueryLog();
+        try {
+            self::assertSame($dto->contenido, InstantaneaPetersen::verificar($dto->contenido, $dto->huella)->contenido);
+            self::assertSame([], DB::getQueryLog());
+        } finally {
+            DB::disableQueryLog();
+        }
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
+    /** Dos relaciones de ensayo; ningún cambio se registra como migración instalable. */
+    private function prepararMembresiasSQL(bool $dosSoportes = false): array
+    {
+        require_once base_path('prototipos/orion-conservacion-0_2/GuardiaDesechable.php');
+        require_once base_path('prototipos/orion-conservacion-nominal/RepositorioNominal.php');
+        require_once base_path('prototipos/orion-conservacion-nominal/MembresiasSQL.php');
+        $control = ControlCognitivo::create(['cod_residente' => $this->residente->getKey(),
+            'cod_personal' => $this->usuario->personal->getKey(), 'fecha_hora' => '2026-10-17 09:00:00',
+            'estado' => 'VIGENTE', 'observacion' => 'Fuente efímera para ensayo de membresías.']);
+        $soportes = [['tipo_soporte' => 'HISTORIA_PREVIA', 'cod_control_cognitivo' => $control->getKey()]];
+        if ($dosSoportes) {
+            $otro = ControlCognitivo::create(['cod_residente' => $this->residente->getKey(),
+                'cod_personal' => $this->usuario->personal->getKey(), 'fecha_hora' => '2026-10-17 10:00:00', 'estado' => 'VIGENTE']);
+            $soportes[] = ['tipo_soporte' => 'CORROBORACION', 'cod_control_cognitivo' => $otro->getKey()];
+        }
+        $original = $this->registrar($this->entrada(['elemento' => 'C01', 'estado_original' => 'S', 'soportes' => $soportes]));
+        $vacia = $this->registrar($this->entrada());
+        $version = app(RegistrarConocimientoInstitucional::class)->ejecutar($this->usuario);
+        $dto = app(ConsultarPetersenInstitucional::class)->preparar($this->usuario, $this->residente, CarbonImmutable::now(), $version);
+        DB::table('evaluaciones_expertas')->insert(['cod_evaluacion_experta' => 'MEMBRESIAS-TEST',
+            'cod_residente' => $this->residente->getKey(), 'cod_version_modelo' => $version,
+            'origen_activacion' => 'PRUEBA_TECNICA', 'estado_ejecucion' => 'PRUEBA_FINALIZADA', 'fecha_hora_inicio' => '2026-10-19 12:00:00']);
+        $repo = new MembresiasSQL(DB::getPdo(), new \DateTimeZone(config('app.timezone')));
+        $repo->instalar();
+
+        return [$repo, $dto, $original, $vacia];
+    }
+
+    public function test_sql_membresias_recupera_identidades_orden_y_vacios_sin_agregar_miembros_posteriores(): void
+    {
+        [$repo, $dto, $original] = $this->prepararMembresiasSQL();
+        self::assertTrue($repo->guardar('MEMBRESIAS-TEST', $dto));
+        self::assertFalse($repo->guardar('MEMBRESIAS-TEST', $dto));
+        self::assertSame(MembresiasSQL::proyectar($dto), $repo->recuperar('MEMBRESIAS-TEST'));
+        self::assertDatabaseCount('juicios_petersen_adquiridos', 2);
+        self::assertDatabaseCount('soportes_petersen_adquiridos', 1);
+        $otro = ControlCognitivo::create(['cod_residente' => $this->residente->getKey(),
+            'cod_personal' => $this->usuario->personal->getKey(), 'fecha_hora' => '2026-10-17 10:00:00', 'estado' => 'VIGENTE']);
+        $original->soportes()->create(['tipo_soporte' => 'CORROBORACION', 'orden' => 1, 'cod_control_cognitivo' => $otro->getKey()]);
+        self::assertSame(2, $original->soportes()->count());
+        self::assertCount(1, $repo->recuperar('MEMBRESIAS-TEST')['soportes_originales']);
+        self::assertSame(MembresiasSQL::proyectar($dto), $repo->recuperar('MEMBRESIAS-TEST'));
+        self::assertFalse($repo->guardar('MEMBRESIAS-TEST', $dto));
+        // El bloque no sustituye el resultado, no acredita DTO completo ni crea revisión profesional.
+        self::assertSame('PRUEBA_FINALIZADA', DB::table('evaluaciones_expertas')->value('estado_ejecucion'));
+        self::assertDatabaseCount('revisiones_evaluacion_experta', 0);
+        $this->expectException(PDOException::class);
+        DB::getPdo()->exec('UPDATE soportes_petersen_adquiridos SET orden_membresia=orden_membresia');
+    }
+
+    public function test_sql_membresias_revierte_fallo_parcial_sin_tocar_los_originales(): void
+    {
+        [$repo, $dto] = $this->prepararMembresiasSQL();
+        try {
+            $repo->guardar('MEMBRESIAS-TEST', $dto, static fn () => throw new \RuntimeException('Fallo de adquisición sintético.'));
+            self::fail('La escritura incompleta debe fallar.');
+        } catch (\RuntimeException $e) {
+            self::assertSame('Fallo de adquisición sintético.', $e->getMessage());
+        }
+        self::assertDatabaseCount('juicios_petersen_adquiridos', 0);
+        self::assertDatabaseCount('soportes_petersen_adquiridos', 0);
+        self::assertDatabaseCount('valoraciones_petersen_originales', 2);
+        self::assertDatabaseCount('soportes_valoracion_petersen', 1);
+        self::assertNull(DB::table('evaluaciones_expertas')->value('membresias_petersen_estado'));
+        self::assertTrue($repo->guardar('MEMBRESIAS-TEST', $dto));
+    }
+
+    public function test_sql_membresias_fk_impide_atribuir_un_soporte_a_otro_juicio(): void
+    {
+        [$repo, $dto, $original, $vacia] = $this->prepararMembresiasSQL();
+        try {
+            $repo->guardar('MEMBRESIAS-TEST', $dto, static function (PDO $db) use ($vacia): void {
+                $q = $db->prepare('UPDATE soportes_petersen_adquiridos SET cod_juicio_adquirido=(SELECT cod_juicio_adquirido FROM juicios_petersen_adquiridos WHERE cod_valoracion_petersen=?)');
+                $q->execute([$vacia->getKey()]);
+            });
+            self::fail('La FK terminal debe impedir cambiar el juicio propietario.');
+        } catch (PDOException $e) {
+            self::assertContains($e->getCode(), ['23000', '23503']);
+        }
+        self::assertDatabaseCount('juicios_petersen_adquiridos', 0);
+        self::assertDatabaseCount('soportes_petersen_adquiridos', 0);
+        self::assertSame(1, $original->soportes()->count());
+        self::assertNull(DB::table('evaluaciones_expertas')->value('membresias_petersen_estado'));
+    }
+
+    public function test_sql_membresias_cierre_rechaza_orden_discontinuo_y_reversion_del_ensayo_preserva_base_poblada(): void
+    {
+        [$repo, $dto] = $this->prepararMembresiasSQL();
+        try {
+            $repo->guardar('MEMBRESIAS-TEST', $dto, static fn (PDO $db) => $db->exec('UPDATE soportes_petersen_adquiridos SET orden_membresia=9'));
+            self::fail('El cierre SQL debe rechazar el orden discontinuo.');
+        } catch (PDOException $e) {
+            self::assertContains($e->getCode(), ['23000', '23514']);
+        }
+        self::assertTrue($repo->guardar('MEMBRESIAS-TEST', $dto));
+        $repo->retirarEnsayo();
+        self::assertFalse(DB::getSchemaBuilder()->hasTable('juicios_petersen_adquiridos'));
+        self::assertFalse(DB::getSchemaBuilder()->hasTable('soportes_petersen_adquiridos'));
+        self::assertFalse(DB::getSchemaBuilder()->hasColumn('evaluaciones_expertas', 'membresias_petersen_estado'));
+        self::assertDatabaseCount('valoraciones_petersen_originales', 2);
+        self::assertDatabaseCount('soportes_valoracion_petersen', 1);
+        self::assertDatabaseCount('evaluaciones_expertas', 1);
+    }
+
+    public function test_sql_membresias_no_confunde_orden_global_con_orden_de_la_membresia(): void
+    {
+        [$repo, $dto] = $this->prepararMembresiasSQL(dosSoportes: true);
+        try {
+            $repo->guardar('MEMBRESIAS-TEST', $dto, static function (PDO $db): void {
+                // Evita una violación UNIQUE intermedia; ambos órdenes finales son continuos pero opuestos.
+                $db->exec('UPDATE soportes_petersen_adquiridos SET orden_membresia=orden_membresia+10');
+                $db->exec('UPDATE soportes_petersen_adquiridos SET orden_membresia=11-orden_membresia');
+            });
+            self::fail('Dos ordenaciones distintas no pueden conservar la misma membresía.');
+        } catch (DomainException $e) {
+            self::assertStringContainsString('no coincide', $e->getMessage());
+        }
+        self::assertDatabaseCount('juicios_petersen_adquiridos', 0);
+        self::assertDatabaseCount('soportes_petersen_adquiridos', 0);
+        self::assertTrue($repo->guardar('MEMBRESIAS-TEST', $dto));
+        self::assertSame(MembresiasSQL::proyectar($dto), $repo->recuperar('MEMBRESIAS-TEST'));
+    }
+
+    public function test_sql_membresias_compara_los_instantes_con_el_juicio_inmutable(): void
+    {
+        [$repo, $dto] = $this->prepararMembresiasSQL();
+        $d = $dto->contenido;
+        $d['procedencia_valoraciones'][0]['registrado_en'] = '2026-10-19T11:59:59.999999-04:00';
+        // La inferencia y las FK nominales no bastan para detectar esta fecha histórica falsa.
+        $alterada = InstantaneaPetersen::verificar($d, \MotorExperto\soporte\conservacion\CodecInstantanea::huella(
+            \MotorExperto\soporte\conservacion\CapturaInstrumentalCanonica::ordenar($d)));
+        try {
+            $repo->guardar('MEMBRESIAS-TEST', $alterada);
+            self::fail('La fecha debe coincidir con el registro SQL original.');
+        } catch (DomainException $e) {
+            self::assertStringContainsString('instante adquirido', $e->getMessage());
+        }
+        self::assertDatabaseCount('juicios_petersen_adquiridos', 0);
+        self::assertDatabaseCount('soportes_petersen_adquiridos', 0);
+        self::assertTrue($repo->guardar('MEMBRESIAS-TEST', $dto));
+    }
+
+    public function test_sql_membresias_no_permite_cambiar_el_original_del_padre_con_soportes_adquiridos(): void
+    {
+        [$repo, $dto, $original, $vacia] = $this->prepararMembresiasSQL();
+        try {
+            $repo->guardar('MEMBRESIAS-TEST', $dto, static function (PDO $db) use ($original, $vacia): void {
+                $q = $db->prepare('DELETE FROM juicios_petersen_adquiridos WHERE cod_valoracion_petersen=?');
+                $q->execute([$vacia->getKey()]);
+                $q = $db->prepare('UPDATE juicios_petersen_adquiridos SET cod_valoracion_petersen=? WHERE cod_valoracion_petersen=?');
+                $q->execute([$vacia->getKey(), $original->getKey()]);
+            });
+            self::fail('El padre no puede trasladar sus soportes a otra valoración original.');
+        } catch (PDOException $e) {
+            self::assertContains($e->getCode(), ['23000', '23514']);
+        }
+        self::assertDatabaseCount('juicios_petersen_adquiridos', 0);
+        self::assertDatabaseCount('soportes_petersen_adquiridos', 0);
+        self::assertTrue($repo->guardar('MEMBRESIAS-TEST', $dto));
+    }
+
+    public function test_sql_membresias_no_admite_un_juicio_original_de_otro_residente(): void
+    {
+        [$repo, $dto, $original] = $this->prepararMembresiasSQL();
+        $ajeno = $original->getAttributes();
+        $ajeno['cod_valoracion_petersen'] = 'JUICIO-AJENO-TEST';
+        $ajeno['solicitud_uuid'] = (string) Str::uuid();
+        $ajeno['cod_residente'] = Residente::factory()->create(['estado' => 'ADMITIDO'])->getKey();
+        DB::table('valoraciones_petersen_originales')->insert($ajeno);
+        try {
+            $repo->guardar('MEMBRESIAS-TEST', $dto, static function (PDO $db): void {
+                $q = $db->prepare('INSERT INTO juicios_petersen_adquiridos(cod_juicio_adquirido,cod_evaluacion_experta,cod_valoracion_petersen,
+                    fecha_hora_iso,registrado_en_iso,orden_procedencia,orden_membresia,cantidad_soportes) VALUES (?,?,?,?,?,?,?,?)');
+                $q->execute(['MIEMBRO-AJENO', 'MEMBRESIAS-TEST', 'JUICIO-AJENO-TEST', '2026-10-18T10:00:00-04:00',
+                    '2026-10-19T12:00:00-04:00', 2, 2, 0]);
+            });
+            self::fail('Una FK existente no autoriza un juicio de otro residente.');
+        } catch (PDOException $e) {
+            self::assertContains($e->getCode(), ['23000', '23514']);
+        }
+        self::assertDatabaseCount('juicios_petersen_adquiridos', 0);
+        self::assertDatabaseCount('soportes_petersen_adquiridos', 0);
+        self::assertDatabaseCount('valoraciones_petersen_originales', 3);
+    }
+
+    public function test_postgres_membresias_no_confirma_una_adquisicion_abierta_por_sql_directo(): void
+    {
+        if (DB::getDriverName() !== 'pgsql') {
+            $this->markTestSkipped('La restricción de cierre diferida requiere PostgreSQL.');
+        }
+        $this->prepararMembresiasSQL();
+        $db = DB::getPdo();
+        $db->beginTransaction();
+        try {
+            $q = $db->prepare("UPDATE evaluaciones_expertas SET membresias_petersen_estado='ABIERTA',membresias_petersen_huella=?,
+                membresias_petersen_juicios=0,membresias_petersen_soportes=0 WHERE cod_evaluacion_experta='MEMBRESIAS-TEST'");
+            $q->execute([str_repeat('a', 64)]);
+            $db->commit();
+            self::fail('No debe confirmarse una adquisición parcial.');
+        } catch (PDOException $e) {
+            self::assertSame('23514', $e->getCode());
+        } finally {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+        }
+        self::assertNull(DB::table('evaluaciones_expertas')->value('membresias_petersen_estado'));
+        self::assertDatabaseCount('juicios_petersen_adquiridos', 0);
+    }
+
+    public function test_sqlite_membresias_vacias_no_se_borran_mediante_replace_sin_triggers_recursivos(): void
+    {
+        if (DB::getDriverName() !== 'sqlite') {
+            $this->markTestSkipped('INSERT OR REPLACE es una operación específica de SQLite.');
+        }
+        [$repo, $dto] = $this->prepararMembresiasSQL();
+        $d = $dto->contenido;
+        $d['valoraciones'] = $d['procedencia_valoraciones'] = $d['membresias_soportes'] = $d['soportes_originales'] = [];
+        $d['adquisicion']['valoraciones_al_corte'] = 0;
+        // Crear una captura vacía legítima ejecuta el motor con cero juicios; no altera una salida ya emitida.
+        $vacia = InstantaneaPetersen::crear(new \MotorExperto\dominio\objetos_valor\ContextoEjecucion(
+            $d['contexto']['evaluacion'], $d['contexto']['residente'], $d['contexto']['version'],
+            \MotorExperto\soporte\conservacion\CodecInstantanea::leerFecha('corte', (object) $d['contexto']['fecha_corte'])),
+            [], null, null, $this->usuario->getKey(), $d['adquisicion'], soportesOriginales: []);
+        self::assertTrue($repo->guardar('MEMBRESIAS-TEST', $vacia));
+        $fila = (array) DB::table('evaluaciones_expertas')->where('cod_evaluacion_experta', 'MEMBRESIAS-TEST')->sole();
+        foreach (['estado', 'huella', 'juicios', 'soportes'] as $campo) {
+            unset($fila['membresias_petersen_'.$campo]);
+        }
+        DB::getPdo()->exec('PRAGMA recursive_triggers=OFF');
+        try {
+            $q = DB::getPdo()->prepare('INSERT OR REPLACE INTO evaluaciones_expertas('.implode(',', array_keys($fila)).') VALUES ('.implode(',', array_fill(0, count($fila), '?')).')');
+            $q->execute(array_values($fila));
+            self::fail('REPLACE no debe borrar una adquisición cerrada vacía.');
+        } catch (PDOException $e) {
+            self::assertSame('23000', $e->getCode());
+        }
+        self::assertSame(MembresiasSQL::proyectar($vacia), $repo->recuperar('MEMBRESIAS-TEST'));
+        self::assertSame('CERRADA', DB::table('evaluaciones_expertas')->value('membresias_petersen_estado'));
+    }
+
+    public function test_postgres_membresias_cierre_reintento_e_insercion_tardia_compiten_en_tres_conexiones(): void
+    {
+        if (DB::getDriverName() !== 'pgsql') {
+            $this->markTestSkipped('La carrera exige PostgreSQL con tres conexiones independientes.');
+        }
+        [$repo, $dto, $original] = $this->prepararMembresiasSQL();
+        // Existe en el original, pero no pertenecía a la captura adquirida: la carrera no usa un duplicado UNIQUE.
+        $extra = ControlCognitivo::create(['cod_residente' => $this->residente->getKey(),
+            'cod_personal' => $this->usuario->personal->getKey(), 'fecha_hora' => '2026-10-17 10:00:00', 'estado' => 'VIGENTE']);
+        $tardio = $original->soportes()->create(['tipo_soporte' => 'CORROBORACION', 'orden' => 1, 'cod_control_cognitivo' => $extra->getKey()]);
+        $servidor = stream_socket_server('tcp://127.0.0.1:0', $errno, $error);
+        self::assertNotFalse($servidor);
+        $procesos = $sockets = [];
+        try {
+            self::assertTrue($repo->guardar('MEMBRESIAS-TEST', $dto, function (PDO $db) use ($dto, $original, $tardio, $servidor, &$procesos, &$sockets): void {
+                $pids = [];
+                foreach (['INSERTAR', 'REINTENTAR'] as $modo) {
+                    $p = new Process([PHP_BINARY, base_path('prototipos/orion-conservacion-nominal/worker-membresias.php'),
+                        stream_socket_get_name($servidor, false), $modo], base_path(), timeout: 30);
+                    $p->start();
+                    $procesos[] = $p;
+                    $s = stream_socket_accept($servidor, 10);
+                    self::assertNotFalse($s, $p->getErrorOutput());
+                    stream_set_timeout($s, 25);
+                    $sockets[] = $s;
+                    $pids[] = json_decode((string) fgets($s), true, flags: JSON_THROW_ON_ERROR)['pid'];
+                }
+                self::assertNotSame($pids[0], $pids[1]);
+                $q = $db->prepare('SELECT cod_juicio_adquirido FROM juicios_petersen_adquiridos WHERE cod_valoracion_petersen=?');
+                $q->execute([$original->getKey()]);
+                $padre = $q->fetchColumn();
+                foreach ($sockets as $i => $s) {
+                    $payload = ['evaluacion' => 'MEMBRESIAS-TEST', 'contenido' => $dto->contenido, 'huella' => $dto->huella,
+                        'zona_original' => config('app.timezone'),
+                        'fila' => ['cod_soporte_adquirido' => 'INSERCION-TARDIA', 'cod_juicio_adquirido' => $padre,
+                            'cod_soporte_petersen' => $tardio->getKey(), 'orden_membresia' => 99]];
+                    fwrite($s, json_encode($payload, JSON_THROW_ON_ERROR)."\n");
+                }
+                $q = $db->prepare("SELECT count(*) FROM pg_stat_activity WHERE pid IN (?,?) AND wait_event_type='Lock' AND cardinality(pg_blocking_pids(pid))>0");
+                $limite = hrtime(true) + 8_000_000_000;
+                do {
+                    $db->query('SELECT pg_stat_clear_snapshot()');
+                    $q->execute($pids);
+                    $esperando = (int) $q->fetchColumn();
+                } while ($esperando !== 2 && hrtime(true) < $limite);
+                self::assertSame(2, $esperando, 'Ambas conexiones deben esperar al cierre real no confirmado.');
+            }));
+            $resultados = [];
+            foreach ($sockets as $i => $s) {
+                $resultados[] = json_decode((string) fgets($s), true, flags: JSON_THROW_ON_ERROR);
+                self::assertSame(0, $procesos[$i]->wait(), $procesos[$i]->getErrorOutput());
+            }
+            self::assertSame(['sqlstate' => '55000'], $resultados[0]);
+            self::assertSame(['nuevo' => false], $resultados[1]);
+            self::assertSame(MembresiasSQL::proyectar($dto), $repo->recuperar('MEMBRESIAS-TEST'));
+            self::assertDatabaseCount('soportes_petersen_adquiridos', 1);
+        } finally {
+            foreach ($sockets as $s) {
+                fclose($s);
+            }
+            fclose($servidor);
+            foreach ($procesos as $p) {
+                if ($p->isRunning()) {
+                    $p->stop();
+                }
+            }
+        }
     }
 
     public function test_precision_de_microsegundos_conserva_reintento_y_corte_tecnico(): void
@@ -501,10 +847,13 @@ final class CapturaPetersenOriginalTest extends TestCase
         Livewire::actingAs($incompatible)->test(CapturaPetersenPanel::class, ['residente' => $this->residente])
             ->set('form', ['elemento' => 'C03', 'soportes' => []])->set('tipoSoporte', 'IADL')->set('campoFuente', 'cod_control_iadl')
             ->assertViewHas('fuentes', fn ($fuentes) => ! in_array('cod_control_iadl', $fuentes, true))->assertViewHas('opciones', []);
-        $r = app(ConsultarPetersenInstitucional::class)->consultar($incompatible, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
-        self::assertSame('U', $r['requisitos']['C03']['estado']);
+        try {
+            app(ConsultarPetersenInstitucional::class)->consultar($incompatible, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+            self::fail('No debe entregar una evaluación Petersen parcial sin competencia IADL.');
+        } catch (AuthorizationException $e) {
+            self::assertSame('This action is unauthorized.', $e->getMessage());
+        }
         self::assertSame(0, $consultasIadl);
-        self::assertNull($r['patron']);
     }
 
     #[DataProvider('metadatosManipulados')]

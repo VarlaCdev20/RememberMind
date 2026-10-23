@@ -16,6 +16,7 @@ test('fondos sólidos conservan relieve, foco y degradado exclusivo de las letra
             await page.setViewport({ width, height: 900 });
             await page.setContent(`<html class="${theme === 'dark' ? 'dark' : ''}" data-theme="${theme}"><head><style>${css}</style></head><body class="rm-shell" data-role="nursing"><div class="rm-app-frame"><main data-rm-main class="rm-depth-canvas"><section class="rm-dashboard-composition rm-nursing-dashboard"><header class="rm-dashboard-header"><h1 class="rm-dashboard-header__title">Título de prueba</h1></header><div class="rm-card">Contenido de prueba</div><button class="rm-btn rm-btn-primary">Acción</button><button class="rm-btn rm-btn-info">Información</button><button class="rm-btn rm-btn-danger">Peligro</button><div class="rm-resident-directory"><header class="rm-collection-header rm-resident-directory__header">Cabecera de prueba</header><div class="rm-filter-bar rm-collection-toolbar rm-resident-directory__filters">Filtros de prueba</div><div class="rm-panel">Panel</div><div class="rm-modal-panel">Modal</div><div class="bg-white">Superficie heredada</div><div class="bg-gray-50">Superficie auxiliar</div></div><label for="paleta-input">Campo de prueba</label><input id="paleta-input" class="rm-input"><section class="rm-resident-directory__results" aria-label="Residentes de prueba"><header class="rm-resident-directory__results-header">1 residente de prueba</header><div class="rm-resident-directory__cards"><article class="rm-person-entity-card rm-resident-directory__item rm-resident-directory__item--card rm-resident-compact-card">Residente de prueba</article></div></section></section></main></div></body></html>`);
             await page.focus('#paleta-input');
+            await page.$eval('#paleta-input', element => Promise.all(element.getAnimations().map(animation => animation.finished)));
             const result = await page.evaluate(() => ({
                 canvas: getComputedStyle(document.querySelector('main')).backgroundColor,
                 pattern: getComputedStyle(document.querySelector('main')).backgroundImage,
@@ -31,16 +32,16 @@ test('fondos sólidos conservan relieve, foco y degradado exclusivo de las letra
                 focused: document.activeElement.id,
                 outline: getComputedStyle(document.activeElement).outlineStyle,
             }));
-            assert.equal(result.canvas, theme === 'light' ? 'rgb(216, 210, 205)' : 'rgb(10, 24, 33)');
+            assert.equal(result.canvas, theme === 'light' ? 'rgb(243, 238, 232)' : 'rgb(10, 24, 33)');
             assert.match(result.pattern, /^radial-gradient\(circle/, 'puntos menudos');
             assert.match(result.pattern, /0\.6px/, 'radio menor que un píxel');
             assert.doesNotMatch(result.pattern, /url\(|repeating-linear-gradient/, 'trama de puntos sin corrugado');
             assert.equal(result.patternSize, '16px 16px');
             assert.equal(result.patternBlend, 'normal');
             if (theme === 'light') {
-                assert.ok(result.warmSurfaces.every(color => ['rgb(236, 233, 230)', 'rgb(240, 237, 234)', 'color(srgb 0.92549 0.913725 0.901961 / 0.84)'].includes(color)), 'superficies cálidas con jerarquía de elevación');
+                assert.ok(result.warmSurfaces.every(color => ['rgb(247, 243, 239)', 'color(srgb 0.968627 0.952941 0.937255 / 0.84)'].includes(color)), 'superficies de la paleta aprobada el 20 de octubre');
                 assert.ok(new Set(result.warmSurfaces).size >= 2, 'panel elevado distinguible de la tarjeta');
-                assert.equal(result.inputBackground, 'rgb(231, 226, 222)', 'campos con superficie cálida');
+                assert.equal(result.inputBackground, 'rgb(247, 243, 239)', 'el campo enfocado utiliza la superficie cálida aprobada');
             } else {
                 assert.ok(result.warmSurfaces.every(color => color !== 'rgb(255, 255, 255)'), 'sin blanco en tema oscuro');
             }
@@ -55,6 +56,25 @@ test('fondos sólidos conservan relieve, foco y degradado exclusivo de las letra
             assert.notEqual(result.shadow, 'none', `${theme} ${width}px: relieve visible`);
             assert.equal(result.focused, 'paleta-input');
             assert.equal(result.outline, 'solid');
+            const contrast = await page.evaluate(() => {
+                const context = document.createElement('canvas').getContext('2d');
+                const pixel = () => [...context.getImageData(0, 0, 1, 1).data].slice(0, 3);
+                const luminance = rgb => rgb.map(channel => channel / 255).map(channel => channel <= .04045 ? channel / 12.92 : ((channel + .055) / 1.055) ** 2.4).reduce((sum, value, index) => sum + value * [.2126, .7152, .0722][index], 0);
+                return ['.rm-card', '.rm-btn-primary', '#paleta-input'].map(selector => {
+                    const element = document.querySelector(selector);
+                    const ancestors = [];
+                    for (let node = element; node; node = node.parentElement) ancestors.unshift(node);
+                    context.fillStyle = '#fff';
+                    context.fillRect(0, 0, 1, 1);
+                    for (const node of ancestors) { context.fillStyle = getComputedStyle(node).backgroundColor; context.fillRect(0, 0, 1, 1); }
+                    const background = luminance(pixel());
+                    context.fillStyle = getComputedStyle(element).color;
+                    context.fillRect(0, 0, 1, 1);
+                    const foreground = luminance(pixel());
+                    return { selector, ratio: (Math.max(foreground, background) + .05) / (Math.min(foreground, background) + .05) };
+                });
+            });
+            for (const item of contrast) assert.ok(item.ratio >= 4.5, `${theme} ${width}px ${item.selector}: contraste ${item.ratio.toFixed(2)}:1`);
         }
     } finally { await browser.close(); }
 });
@@ -133,14 +153,13 @@ test('los shells por rol conservan fondo y controles completos en claro, oscuro 
                     });
                     const context = `${variant || 'sistema'} ${theme} ${width}px`;
                     if (theme === 'light') {
-                        assert.equal(result.main, 'rgb(216, 210, 205)', `${context}: lienzo aprobado`);
-                        assert.equal(result.sidebar, 'rgb(216, 210, 205)', `${context}: shell aprobado`);
-                        assert.equal(result.topbar, result.main, `${context}: navbar y fondo del mismo color claro`);
-                        assert.equal(result.topbar, result.sidebar, `${context}: cabecera del mismo color que el sidebar`);
+                        assert.equal(result.main, 'rgb(243, 238, 232)', `${context}: lienzo aprobado el 20 de octubre`);
+                        assert.equal(result.sidebar, 'rgb(221, 214, 207)', `${context}: sidebar aprobado`);
+                        assert.equal(result.topbar, 'rgb(230, 224, 217)', `${context}: cabecera diferenciada aprobada`);
                     } else {
                         assert.equal(result.main, result.sidebar, `${context}: base oscura compartida`);
+                        assert.equal(result.topbar, result.sidebar, `${context}: shell oscuro compartido`);
                     }
-                    assert.equal(result.topbar, result.sidebar, `${context}: base compartida en ambos temas`);
                     assert.match(result.pattern, /^radial-gradient\(circle/, `${context}: puntos menudos`);
                     assert.doesNotMatch(result.pattern, /repeating-linear-gradient|url\(/, `${context}: sin franjas ni imágenes`);
                     assert.equal(result.sidebarImage, 'none', `${context}: sidebar sólido`);

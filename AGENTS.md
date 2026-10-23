@@ -13,7 +13,7 @@ Use project sources contextually. Do not design RememberMind from memory when th
 Priority when sources conflict:
 
 1. Current explicit instruction from the project owner.
-2. `docs/base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md` and `docs/base-de-datos/REMEMBERMIND_BDD_70_TABLAS.md` for DB structure, persistence terminology, PK/FK, relationships and structural invariants.
+2. `docs/base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md`, `docs/base-de-datos/REMEMBERMIND_BDD_70_TABLAS.md` and later owner-approved, scope-specific DB decisions for structure, persistence terminology, PK/FK, relationships and structural invariants. Their original 70-table core and later inventories describe different dates; use the latest applicable decision for the current count.
 3. Current functional documentation for the module.
 4. Current V2 code as implementation evidence, not automatic functional truth.
 5. Tests as executable evidence; they may be outdated.
@@ -24,7 +24,7 @@ Never silently blend contradictory sources. Follow the higher-authority source a
 
 ## Frozen DB governance
 
-The Operational DB V2.1 baseline is frozen and contains exactly 70 operational tables. The owner approved the V2.2 `objetivos_signos_vitales` extension on 2026-10-04, bringing the current inventory to 71; see `docs/base-de-datos/DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md`. `residentes` is the central entity. Always consult `docs/base-de-datos/` before DB analysis or changes; the 69-table V2.0 document is historical only.
+The frozen Operational DB V2.1 **core** contains 70 operational tables. Later owner-approved extensions are cumulative; the installed inventory recorded on 2026-10-21 is **75 operational + 29 expert = 104 business tables**, plus 16 technical tables. The owner set a **maximum of 110 business tables for design**, not approval of any specific DDL; see `docs/sistema-experto/DECISION_MAXIMO_110_TABLAS_2026_10_21.md`. The original 70-table dictionary and intermediate counts of 71–108 remain historical snapshots, not today's inventory. `residentes` is the central entity. Consult the baseline, dictionary and subsequent scope-specific decisions before DB analysis or changes.
 
 Without explicit owner approval, do not add/delete/merge/split/rename/modify:
 - tables or columns;

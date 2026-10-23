@@ -11,6 +11,7 @@ use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\User;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\EjecutarObservaciones;
+use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoPetersen;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarHallazgosObservacionales;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarObservacionesConservadas;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaResultadosExperto;
@@ -98,6 +99,25 @@ final class HallazgosObservacionalesTest extends TestCase
             ->assertDontSee('patrón candidato de DCL');
     }
 
+    public function test_senales_observadas_se_vinculan_al_detalle_sin_clasificar_petersen(): void
+    {
+        $this->control();
+        app(RegistrarConocimientoPetersen::class)->ejecutar($this->medico);
+
+        Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
+            ->assertSee('Señales observadas en el seguimiento')
+            ->assertSee('Se documentó un episodio de repetición de preguntas.')
+            ->assertSee('Ver controles y reglas de seguimiento')
+            ->assertSee('Perfil pendiente de valoración')
+            ->assertDontSee('Mapa radial interactivo de cinco áreas')
+            ->assertDontSee('Patrón orientativo')
+            ->call('irASeccion', 'hallazgos-observacionales')
+            ->assertDispatched('orion-navigate', seccion: 'hallazgos-observacionales');
+
+        self::assertDatabaseCount('valoraciones_petersen_originales', 0);
+        self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
+    }
+
     public function test_guardar_es_atomico_idempotente_y_reconstruye_valores_y_autor_originales(): void
     {
         $control = $this->control();
@@ -118,7 +138,7 @@ final class HallazgosObservacionalesTest extends TestCase
         $despues = app(ConsultarObservacionesConservadas::class)->consultar($this->medico, $this->residente, $id);
         self::assertSame($r['informe_completo'], $despues['informe_completo']);
         self::assertSame([], config('sistema_experto.lectura_clinica'));
-        self::assertDatabaseCount('clasificaciones_dcl_instantanea', 0);
+        self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
     }
 
     public function test_guardado_incluye_todas_las_paginas_y_distingue_ausencia_de_datos(): void
@@ -181,10 +201,10 @@ final class HallazgosObservacionalesTest extends TestCase
     {
         $this->control();
         if (DB::getDriverName() === 'sqlite') {
-            DB::unprepared("CREATE TRIGGER obs_fallo_traza BEFORE INSERT ON trazas_inferencia BEGIN SELECT RAISE(ABORT, 'Fallo de prueba'); END");
+            DB::unprepared("CREATE TRIGGER obs_fallo_traza BEFORE UPDATE OF cod_traza_inferencia ON evaluacion_criterios WHEN NEW.cod_traza_inferencia IS NOT NULL BEGIN SELECT RAISE(ABORT, 'Fallo de prueba'); END");
         } else {
             DB::unprepared("CREATE FUNCTION obs_fallo_traza_fn() RETURNS trigger LANGUAGE plpgsql AS \$\$ BEGIN RAISE EXCEPTION 'Fallo de prueba'; END; \$\$");
-            DB::unprepared('CREATE TRIGGER obs_fallo_traza BEFORE INSERT ON trazas_inferencia FOR EACH ROW EXECUTE FUNCTION obs_fallo_traza_fn()');
+            DB::unprepared('CREATE TRIGGER obs_fallo_traza BEFORE UPDATE OF cod_traza_inferencia ON evaluacion_criterios FOR EACH ROW WHEN (NEW.cod_traza_inferencia IS NOT NULL) EXECUTE FUNCTION obs_fallo_traza_fn()');
         }
         try {
             app(EjecutarObservaciones::class)->ejecutar($this->medico, $this->residente, (string) Str::uuid());
@@ -214,9 +234,10 @@ final class HallazgosObservacionalesTest extends TestCase
     public function test_migracion_reversible_conserva_una_fila_historica_y_sus_valores_tipados(): void
     {
         // Las migraciones históricas se revierten en orden: primero la consolidación posterior.
+        $paquete = app(PaqueteObservacional::class)->preparar($this->medico);
+        (new \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionBloquesExpertos)->bajar();
         $reduccion = new TransicionReduccionConservacion;
         $reduccion->bajar();
-        $paquete = app(PaqueteObservacional::class)->preparar($this->medico);
         InformeCognitivoFixture::insertar('evaluaciones_expertas', ['cod_evaluacion_experta' => 'LEGACY-OBS-EVAL',
             'cod_version_modelo' => $paquete['version'], 'cod_residente' => $this->residente->getKey(), 'origen_activacion' => 'PRUEBA_TECNICA']);
         DB::table('hechos_instantanea_experta')->insert(['cod_hecho_instantanea' => 'LEGACY-OBS-HECHO', 'cod_evaluacion_experta' => 'LEGACY-OBS-EVAL',

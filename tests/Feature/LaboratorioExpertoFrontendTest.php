@@ -43,8 +43,8 @@ final class LaboratorioExpertoFrontendTest extends TestCase
     public function test_ruta_real_sin_ejecutar_automaticamente_ni_publicar_metricas(): void
     {
         $this->get(route('admin.sistema-experto.index'))->assertOk()
-            ->assertSee('Laboratorio del sistema experto')->assertSee('No disponible')
-            ->assertSee('SIMULACIÓN TÉCNICA');
+            ->assertSee('Conocimiento bajo control')->assertSee('No hay versiones cargadas')
+            ->assertSee('activación clínica pendiente')->assertDontSee('Ejecutar evaluación');
         self::assertSame([], app(SesionLaboratorioExperimental::class)->historial($this->autor));
     }
 
@@ -101,6 +101,26 @@ final class LaboratorioExpertoFrontendTest extends TestCase
             ->call('abrirRegla', 'R-ATE-S01-P01')->assertSee('Detalle de regla')->assertSee('Condiciones');
         $c->set('modoConocimiento', 'red')->call('abrirNodo', 'CRIT-ATE')
             ->assertSee('Nodo seleccionado')->assertSee('Explorar nodo relacionado');
+    }
+
+    public function test_red_filtra_sin_fabricar_nodos_y_catalogo_abre_detalle(): void
+    {
+        Livewire::test(ConocimientoPanel::class)->call('ir', 'conocimiento')->set('modoConocimiento', 'red')
+            ->assertSee('Explorador semántico')->set('buscarRed', 'no-existe')
+            ->assertSee('Sin nodos que coincidan')->call('limpiarRed')
+            ->set('tipoRed', 'CRITERIO')->assertSee('Lista accesible de nodos')
+            ->set('modoConocimiento', 'catalogo')->set('tablaCatalogo', 'nodos_semanticos')
+            ->call('abrirRegistro', 'CRIT-ATE')->assertSet('detalleAbierto', true)
+            ->assertSee('Detalle de conocimiento')->call('cerrarDetalle')->assertSet('detalleAbierto', false);
+    }
+
+    public function test_resumen_abre_catalogos_y_red_con_estado_controlado(): void
+    {
+        Livewire::test(ConocimientoPanel::class)->call('explorarCategoria', 'fuentes_datos_expertas')
+            ->assertSet('seccion', 'conocimiento')->assertSet('modoConocimiento', 'catalogo')
+            ->assertSet('tablaCatalogo', 'fuentes_datos_expertas')->assertSee('Sin registros en esta categoría')
+            ->call('explorarRed')->assertSet('modoConocimiento', 'red')->assertSee('Explorador semántico');
+        Livewire::test(ConocimientoPanel::class)->call('explorarCategoria', 'usuarios')->assertStatus(422);
     }
 
     public function test_comparacion_de_version_almacenada_conserva_contenido(): void

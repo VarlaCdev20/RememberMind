@@ -44,4 +44,11 @@
             </details>
         @endforeach
     @endif
+    @can('crearOriginal', [\App\Models\ValoracionPetersenOriginal::class, $adultoMayor])
+        <div class="border-t border-[var(--rm-border)] pt-4">
+            <h3 class="font-semibold">Valoración cognitiva y funcional</h3>
+            <p class="mt-1 text-sm text-rm-secondary">Documente su valoración y vincule los registros originales del residente.</p>
+            <a href="{{ route('admin.sistema-experto.petersen-original', $adultoMayor) }}" class="rm-btn rm-btn-primary mt-3">Abrir valoración cognitiva y funcional</a>
+        </div>
+    @endcan
 </section>

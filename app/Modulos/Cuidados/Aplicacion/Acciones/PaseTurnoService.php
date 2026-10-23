@@ -429,16 +429,36 @@ class PaseTurnoService
             ])->all();
 
         // 4. Cuidados pendientes / omitidos
-        $cuidadosPendientes = EjecucionCuidado::where('cod_residente', $codResidente)
+        $ejecucionesPendientesQuery = EjecucionCuidado::where('cod_residente', $codResidente)
             ->where(fn ($q) => $q->where('cod_jornada', $codJornada)
                 ->orWhere('fecha_hora_programada', '<=', Carbon::parse($fecha)->endOfDay()))
             ->whereIn('estado', ['PENDIENTE', 'NO_REALIZADA', 'OMITIDA'])
-            ->with('intervencion')
-            ->get()
+            ->with(['intervencion', 'personal'])
+            ->get();
+
+        $cuidadosPendientes = $ejecucionesPendientesQuery->map(fn ($c) => [
+            'intervencion' => $c->intervencion?->nombre ?? 'Cuidado asistencial',
+            'estado' => $c->estado,
+            'resultado' => $c->resultado,
+            'motivo_omision' => $c->motivo_omision,
+            'observacion' => $c->observacion,
+            'personal' => $c->personal ? trim("{$c->personal->nombres} {$c->personal->apellido_paterno}") : null,
+            'hora' => $c->fecha_hora_programada ? Carbon::parse($c->fecha_hora_programada)->format('H:i') : null,
+            'fecha' => $c->fecha_hora_programada ? Carbon::parse($c->fecha_hora_programada)->format('d/m/Y') : ($c->fecha_hora_ejecucion ? Carbon::parse($c->fecha_hora_ejecucion)->format('d/m/Y') : null),
+        ])->all();
+
+        $cuidadosOmitidos = $ejecucionesPendientesQuery
+            ->filter(fn ($c) => $c->estado === 'NO_REALIZADA' || in_array(strtolower((string) $c->resultado), ['no realizada', 'omitida', 'no realizada / omitida']))
             ->map(fn ($c) => [
                 'intervencion' => $c->intervencion?->nombre ?? 'Cuidado asistencial',
                 'estado' => $c->estado,
-            ])->all();
+                'resultado' => $c->resultado,
+                'motivo_omision' => $c->motivo_omision,
+                'observacion' => $c->observacion,
+                'personal' => $c->personal ? trim("{$c->personal->nombres} {$c->personal->apellido_paterno}") : null,
+                'hora' => $c->fecha_hora_programada ? Carbon::parse($c->fecha_hora_programada)->format('H:i') : null,
+                'fecha' => $c->fecha_hora_programada ? Carbon::parse($c->fecha_hora_programada)->format('d/m/Y') : ($c->fecha_hora_ejecucion ? Carbon::parse($c->fecha_hora_ejecucion)->format('d/m/Y') : null),
+            ])->values()->all();
 
         // 5. Incidentes
         $incidentes = Incidente::where('cod_residente', $codResidente)
@@ -517,6 +537,7 @@ class PaseTurnoService
             'meds_omitidas' => $medsOmitidas,
             'cuidados_realizados' => $cuidadosRealizados,
             'cuidados_pendientes' => $cuidadosPendientes,
+            'cuidados_omitidos' => $cuidadosOmitidos,
             'incidentes' => $incidentes,
             'alertas' => $alertas,
             'signos_vitales' => $signos,

@@ -10,6 +10,7 @@ use App\Models\Residente;
 use App\Models\User;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoObservacional;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConservacionObservacional;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos;
 use MotorExperto\soporte\conservacion\CodecInstantanea as Codec;
 use DomainException;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -35,7 +36,7 @@ final class ConsultarObservacionesConservadas
         }
         $versionada = $cabecera->version_conservacion === 'OBS-SNAP-2';
         $idsReglas = $versionada ? DB::table('evaluaciones_reglas as r')
-            ->join('trazas_inferencia as t', 't.cod_traza_inferencia', '=', 'r.cod_traza_inferencia')
+            ->joinSub(BloquesExpertos::consulta('trazas_inferencia'), 't', 't.cod_traza_inferencia', '=', 'r.cod_traza_inferencia')
             ->join('evaluacion_criterios as c', 'c.cod_evaluacion_criterio', '=', 't.cod_evaluacion_criterio')
             ->where('c.cod_evaluacion_experta', $cabecera->getKey())->pluck('r.cod_regla_experta')->all() : [];
         $paquete = $versionada ? app(ConocimientoObservacional::class)->historico($cabecera->cod_version_modelo, $idsReglas)
@@ -126,12 +127,12 @@ final class ConsultarObservacionesConservadas
     private function verificarTrazaVersionada(string $id, array $p, array $informe, array $registros): void
     {
         $criterios = DB::table('evaluacion_criterios')->where('cod_evaluacion_experta', $id)->get();
-        $trazas = DB::table('trazas_inferencia')->whereIn('cod_evaluacion_criterio', $criterios->pluck('cod_evaluacion_criterio'))->get();
+        $trazas = BloquesExpertos::consulta('trazas_inferencia')->whereIn('cod_evaluacion_criterio', $criterios->pluck('cod_evaluacion_criterio'))->get();
         $reglas = DB::table('evaluaciones_reglas')->whereIn('cod_traza_inferencia', $trazas->pluck('cod_traza_inferencia'))->get();
         $condiciones = DB::table('evaluaciones_condiciones_regla')->whereIn('cod_evaluacion_regla', $reglas->pluck('cod_evaluacion_regla'))->get();
         $soportes = DB::table('evidencias_soporte_condicion')->whereIn('cod_evaluacion_condicion', $condiciones->pluck('cod_evaluacion_condicion'))->get();
         $participaciones = DB::table('evidencias_criterio_evaluacion')->whereIn('cod_evaluacion_criterio', $criterios->pluck('cod_evaluacion_criterio'))->get();
-        $resultados = DB::table('resultados_criterio')->whereIn('cod_evaluacion_criterio', $criterios->pluck('cod_evaluacion_criterio'))->get();
+        $resultados = BloquesExpertos::consulta('resultados_criterio')->whereIn('cod_evaluacion_criterio', $criterios->pluck('cod_evaluacion_criterio'))->get();
         $evidencias = DB::table('evidencias_evaluacion')->where('cod_evaluacion_experta', $id)->get();
         if ($criterios->count() !== count($p['criterios']) || $trazas->count() !== count($p['criterios'])
             || $reglas->count() !== count($p['reglas']) || $condiciones->count() !== count($p['reglas'])
@@ -214,10 +215,10 @@ final class ConsultarObservacionesConservadas
 
     private function verificarTraza(string $id, array $paquete, array $informe, array $registros): void
     {
-        $trazas = DB::table('evaluacion_criterios as c')->join('trazas_inferencia as t', 't.cod_evaluacion_criterio', '=', 'c.cod_evaluacion_criterio')
+        $trazas = DB::table('evaluacion_criterios as c')->joinSub(BloquesExpertos::consulta('trazas_inferencia'), 't', 't.cod_evaluacion_criterio', '=', 'c.cod_evaluacion_criterio')
             ->join('evaluaciones_reglas as r', 'r.cod_traza_inferencia', '=', 't.cod_traza_inferencia')
             ->join('evaluaciones_condiciones_regla as d', 'd.cod_evaluacion_regla', '=', 'r.cod_evaluacion_regla')
-            ->leftJoin('resultados_criterio as s', 's.cod_evaluacion_criterio', '=', 'c.cod_evaluacion_criterio')
+            ->leftJoinSub(BloquesExpertos::consulta('resultados_criterio'), 's', 's.cod_evaluacion_criterio', '=', 'c.cod_evaluacion_criterio')
             ->where('c.cod_evaluacion_experta', $id)->get(['c.cod_evaluacion_criterio', 'c.cod_nodo_criterio', 'c.tipo_registro', 'c.estado_evaluabilidad', 't.estado_inferencia',
                 'r.cod_regla_experta', 'r.estado_regla', 'd.cod_condicion_regla', 'd.estado_condicion', 'd.cod_evaluacion_condicion',
                 's.cod_valor_semantico', 's.justificacion_original']);

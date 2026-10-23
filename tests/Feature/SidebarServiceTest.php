@@ -154,13 +154,15 @@ class SidebarServiceTest extends TestCase
         $this->assertSame(count($routes), count(array_unique($routes)));
         $this->assertContains('admin.psicologia.dashboard', $routes);
         $this->assertContains('admin.psicologia.evaluaciones', $routes);
+        $this->assertContains('admin.psicologia.agenda', $routes);
         $this->assertContains('admin.psicologia.evaluacion.cognitiva', $routes);
         $this->assertContains('admin.psicologia.evaluacion.afectiva', $routes);
         $this->assertContains('admin.psicologia.evaluacion.funcionamiento', $routes);
         $this->assertContains('admin.psicologia.evaluacion.entorno', $routes);
+        $this->assertContains('admin.psicologia.seguimiento', $routes);
+        $this->assertContains('admin.psicologia.informes', $routes);
 
         // Placeholders deben estar ocultos
-        $this->assertNotContains('admin.psicologia.seguimiento', $routes);
         $this->assertNotContains('admin.psicologia.alertas', $routes);
         $this->assertNotContains('admin.psicologia.reportes', $routes);
         $this->assertNotContains('admin.psicologia.pacientes.derivados', $routes);

@@ -11,9 +11,11 @@ use App\Models\OpcionPregunta;
 use App\Models\PreguntaInstrumento;
 use App\Models\Residente;
 use App\Models\User;
+use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\CohorteCognitivaLocal;
 use Carbon\CarbonImmutable;
 use DomainException;
 use Illuminate\Support\Facades\Gate;
+use MotorExperto\dominio\instrumentos\CorteDocumentoInstrumental;
 use MotorExperto\dominio\instrumentos\ExtractorCapturaInstrumental;
 
 /** Lectura institucional por lotes; captura originales sin escribir resultados ni identificar pruebas por similitud. */
@@ -26,15 +28,14 @@ final class CapturasInstrumentalesResidente
         $usuario = User::query()->findOrFail($usuario->getKey());
         $residente = Residente::query()->findOrFail($residente->getKey());
         Gate::forUser($usuario)->authorize('consultarResultados', [EvaluacionExperta::class, $residente]);
+        $lecturaEnfermeria = Gate::forUser($usuario)->allows('consultarFuentesParaResultado', [EvaluacionExperta::class, $residente]);
         foreach (self::PERMISOS_LECTURA as $permiso) {
-            if (! $usuario->checkPermissionTo($permiso, 'web')) {
-                return ['disponible' => false, 'motivo' => 'ACCESO_A_FUENTES_NO_DISPONIBLE', 'capturas' => []];
-            }
+            abort_unless($lecturaEnfermeria || $usuario->checkPermissionTo($permiso, 'web'), 403);
         }
         if (! array_is_list($preguntasDeclarativas) || array_filter($preguntasDeclarativas, static fn ($p) => ! is_string($p) || $p === '')) {
             throw new DomainException('Las preguntas declarativas requieren identidades explícitas.');
         }
-        $puedeConsultarDocumentos = $usuario->checkPermissionTo('documentos_clinicos.ver', 'web');
+        $puedeConsultarDocumentos = $lecturaEnfermeria || $usuario->checkPermissionTo('documentos_clinicos.ver', 'web');
         $relaciones = ['instrumento', 'evaluador', 'atencion', 'respuestas'];
         if ($puedeConsultarDocumentos) {
             $relaciones[] = 'documentoOriginal';
@@ -44,10 +45,15 @@ final class CapturasInstrumentalesResidente
             ->where(fn ($q) => $q->whereNull('registrado_en')->orWhere('registrado_en', '<=', $corte->format('Y-m-d H:i:s.u')))
             ->with($relaciones)->orderBy('fecha_hora')->orderBy('cod_aplicacion')->get();
         if (! $puedeConsultarDocumentos && $aplicaciones->contains(fn ($a) => $a->cod_documento_clinico !== null)) {
-            return ['disponible' => false, 'motivo' => 'ACCESO_A_FUENTES_NO_DISPONIBLE', 'capturas' => []];
+            abort(403);
         }
         $respuestas = $aplicaciones->flatMap(fn ($a) => $a->respuestas);
         $perfiles = config('sistema_experto.perfiles_instrumentales', []);
+        foreach (app(CohorteCognitivaLocal::class)->perfiles($residente) as $perfilLocal) {
+            if (! array_filter($perfiles, fn ($p) => ($p['cod_instrumento'] ?? null) === $perfilLocal['cod_instrumento'])) {
+                $perfiles[] = $perfilLocal;
+            }
+        }
         $preguntasSeleccionadas = [];
         foreach ($perfiles as $perfil) {
             foreach ($perfil['selectores'] ?? [] as $selector) {
@@ -84,7 +90,8 @@ final class CapturasInstrumentalesResidente
                     $archivos = app(ArchivosAplicacion::class);
                     $hash = $doc && $archivos->existe('local', $doc->ruta_archivo) ? $archivos->hash('local', $doc->ruta_archivo) : false;
                     $documentosVerificados[$a->cod_documento_clinico] = $doc !== null && $doc->estado === 'VIGENTE'
-                        && $doc->cod_residente === $residente->getKey() && is_string($hash) && hash_equals($doc->hash_archivo, $hash);
+                        && $doc->cod_residente === $residente->getKey() && is_string($hash) && hash_equals($doc->hash_archivo, $hash)
+                        && CorteDocumentoInstrumental::admite($documentoOriginal, $corte);
                 }
                 $estadoDocumento = $documentosVerificados[$a->cod_documento_clinico] ? 'VERIFICADO' : 'ORIGINAL_NO_VERIFICABLE';
                 if ($estadoDocumento !== 'VERIFICADO') {

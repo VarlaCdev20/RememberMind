@@ -1,0 +1,19 @@
+{
+    "tablas_fisicas_migradas_en_memoria": 120,
+    "tablas_negocio": 104,
+    "tablas_operativas": 75,
+    "tablas_expertas": 29,
+    "tablas_tecnicas": 16,
+    "modelos_distintos": 39,
+    "rutas_coleccion": 51,
+    "rutas_campo": 783,
+    "rutas_sin_destino_instalado": 9,
+    "rutas_con_brechas": 46,
+    "estados_originales": {
+        "CANDIDATO": 20,
+        "BRECHA_B02": 2,
+        "BRECHA_B01": 4,
+        "CANDIDATO_ALIASES": 24,
+        "BRECHA_B03": 1
+    }
+}

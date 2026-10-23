@@ -17,12 +17,22 @@ related_modules: []
 
 # RememberMind — BDD Operativa V2.1: 70 tablas
 
-**Inventario vigente — 20/10/2026:** la reducción experta aprobada e instalada
+**Inventario vigente — 22/10/2026:** cuatro consolidaciones expertas singulares
+aprobadas e instaladas dejan **75 operativas + 25 expertas = 100 tablas de
+negocio**, más 16 técnicas. El núcleo operativo de 70 no cambia.
+[Diccionario nominal, FK, guardas y reversión](DECISION_CONSOLIDACION_BLOQUES_EXPERTOS_2026_10_22.md).
+Esta reducción conserva los datos existentes; no resuelve por sí sola el DTO
+institucional compuesto ni autoriza conocimiento clínico.
+
+**Inventario histórico — 20/10/2026:** la reducción experta aprobada e instalada
 dejó **75 operativas + 29 expertas = 104 tablas de negocio**. Este documento
 sigue definiendo las 70 tablas del núcleo congelado; las extensiones y la
 reducción están en sus decisiones separadas. Véase la
 [decisión de reducción y verificación](DECISION_REDUCCION_EXPERTA_2026_10_20.md).
-Los inventarios anteriores que siguen abajo corresponden a sus fechas.
+Los inventarios anteriores que siguen abajo corresponden a sus fechas. La
+[decisión del 21/10/2026](../sistema-experto/DECISION_MAXIMO_110_TABLAS_2026_10_21.md)
+permite diseñar hasta **110 tablas de negocio**, pero no aprueba un cambio
+estructural concreto ni modifica este diccionario del núcleo congelado.
 
 **Petersen original aprobado — 19/10/2026:** dos relaciones clínicas,
 `valoraciones_petersen_originales` y `soportes_valoracion_petersen`. Inventario

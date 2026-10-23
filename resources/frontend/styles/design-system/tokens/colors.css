@@ -64,15 +64,15 @@
    --rm-palette-brown-300: var(--rm-earth-300);
 
    /* Las superficies aclaran esta escala para conservar contraste. */
-   --rm-palette-page: #D8D2CD;
-   --rm-palette-capuchino: var(--rm-palette-page);
-   --rm-palette-header: var(--rm-palette-surface);
+   --rm-palette-page: #F3EEE8;
+   --rm-palette-capuchino: #DDD6CF;
+   --rm-palette-header: #E6E0D9;
    --rm-palette-sidebar: var(--rm-palette-capuchino);
-   --rm-palette-surface: #ECE9E6;
-   --rm-palette-surface-soft: #DFD9D4;
+   --rm-palette-surface: #F7F3EF;
+   --rm-palette-surface-soft: #EFEAE4;
    --rm-palette-surface-muted: #B8ADA1;
-   --rm-palette-ink: #4F4742;
-   --rm-palette-ink-secondary: #7D6F65;
+   --rm-palette-ink: #4A4642;
+   --rm-palette-ink-secondary: #67615B;
    /* Salvia complementaria: se conservan los mentas existentes. */
    --rm-palette-sage-900: var(--rm-palette-primary-strong);
    --rm-palette-sage-800: #858E7C;
@@ -87,17 +87,18 @@
    --rm-contrast-ink: color-mix(in srgb, var(--rm-palette-brown-900) 85%, black);
    --rm-sage-deep: var(--rm-palette-sage-900);
    --rm-palette-mint: #6FB89A;
-   --rm-palette-primary: #7D9282;
+   --rm-palette-primary: #78826E;
    --rm-palette-primary-ink: #354C3D;
    --rm-palette-primary-soft: #C4D3C7;
-   --rm-palette-sage: #7D9282;
+   --rm-palette-sage: #78826E;
    --rm-palette-sage-soft: #DCE7DF;
    --rm-palette-info: #7D94A8;
    --rm-palette-info-soft: #E7E6E3;
    --rm-palette-psychology: #9B83BF;
    --rm-palette-nutrition: var(--rm-palette-gold);
-   --rm-palette-warning: #C7A56B;
-   --rm-palette-danger: #C97C73;
+   --rm-palette-warning: #C69245;
+   --rm-palette-danger: #B85C58;
+   --rm-care-accent: #3F8F76;
 
    /* Tokens de uso: los componentes consumen esta capa. */
    --rm-bg-app: var(--rm-palette-page);
@@ -311,7 +312,7 @@
    /* Paleta final aprobada 14/10/2026: aliases y tintas de componentes. */
    --rm-relief-card-shadow: var(--rm-shadow-card);
    --rm-relief-panel-shadow: var(--rm-shadow-raised);
-   --rm-palette-surface-elevated: #F0EDEA;
+   --rm-palette-surface-elevated: var(--rm-palette-surface);
    --rm-palette-border-soft: #CBBFB2;
    --rm-palette-border-medium: #B7AAA0;
    --rm-palette-border-strong: #8F8075;
@@ -358,11 +359,12 @@
    --rm-palette-button-danger-border: #B8615C;
    --rm-palette-button-danger-ink: #FFF8F7;
    --rm-surface-elevated: var(--rm-palette-surface-elevated);
-   --rm-text-secondary-readable: color-mix(in srgb, var(--rm-palette-ink-secondary) 40%, var(--rm-palette-ink));
+   --rm-text-secondary-readable: var(--rm-palette-ink-secondary);
    --rm-text-muted-readable: var(--rm-text-secondary-readable);
    --rm-primary-strong: var(--rm-palette-primary-strong);
    --rm-primary-text: var(--rm-palette-primary-ink);
    --rm-primary-action-text: var(--rm-palette-petroleum-950);
+   --rm-button-primary-hover-text: var(--rm-palette-on-dark);
    --rm-info-text: var(--rm-palette-info-text);
    --rm-accent-coral: var(--rm-palette-coral);
    --rm-accent-coral-soft: var(--rm-palette-coral-soft);
@@ -399,6 +401,7 @@
 /* Modo oscuro petróleo global. Los componentes mantienen sus contratos semánticos. */
 .dark,
 [data-theme="dark"] {
+   --rm-header-bg: var(--rm-bg-sidebar);
    --rm-text-secondary-readable: var(--rm-text-secondary);
    --rm-success-soft: color-mix(in srgb, var(--rm-palette-success) 20%, var(--rm-surface));
    --rm-surface-main: var(--rm-surface);

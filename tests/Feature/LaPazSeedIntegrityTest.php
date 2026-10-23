@@ -67,7 +67,7 @@ class LaPazSeedIntegrityTest extends TestCase
         $this->assertSame($original, $previa->fresh()->getRawOriginal());
         $this->assertDatabaseCount('evaluaciones_expertas', 0);
         $this->assertDatabaseCount('reglas_expertas', 0);
-        $this->assertDatabaseCount('resultados_criterio', 0);
+        self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('resultados_criterio')->count());
         $this->assertFalse(DB::table('aplicaciones_instrumento')->whereNotNull('clasificacion')->exists());
         $this->assertFalse(DB::table('aplicaciones_instrumento')->whereNotNull('interpretacion')->exists());
         $this->assertFalse(User::findOrFail('LP_USU_N01')->can('prescripciones.crear'));

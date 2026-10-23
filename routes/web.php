@@ -589,7 +589,8 @@ Route::middleware([
                     $rutas['Valoraciones']['ruta_178']();
 
                     $rutas['Valoraciones']['ruta_179']();
-
+                    $rutas['Valoraciones']['ruta_psicologia_ficha']();
+                    $rutas['Valoraciones']['ruta_psicologia_actividad_general']();
                 });
 
             /*

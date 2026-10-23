@@ -69,6 +69,8 @@ final class LecturaResultadosExperto
             'evaluacionCriterios.traza.evaluacionesReglas.regla.consecuenciasReglaExperta.criterioDominioResultado',
             'evaluacionCriterios.traza.evaluacionesReglas.regla.consecuenciasReglaExperta.valor',
             'evaluacionCriterios.traza.evaluacionesReglas.evaluacionesCondicionesRegla.condicion',
+            'evaluacionCriterios.traza.evaluacionesReglas.evaluacionesCondicionesRegla.condicion.variable.nodo',
+            'evaluacionCriterios.traza.evaluacionesReglas.evaluacionesCondicionesRegla.condicion.valor',
             'evaluacionCriterios.traza.evaluacionesReglas.evaluacionesCondicionesRegla.evidenciasSoporteCondicion',
         ];
         $historial->getCollection()->load($relaciones);
@@ -199,7 +201,18 @@ final class LecturaResultadosExperto
                 'valor' => $e->valor?->codigo_valor, 'fecha' => $e->fecha_hora_incorporacion?->format('d/m/Y H:i'),
                 'admisibilidad' => $e->estado_admisibilidad, 'motivo' => $e->motivo_admisibilidad, 'representacion' => $e->estado_representacion,
                 'rol' => $participacion->rol_en_criterio, 'participacion' => $participacion->estado_participacion, 'justificacion' => $participacion->justificacion,
+                'relaciones' => $e->relacionesEvidenciasEvaluacionPorEvidenciaOrigen->map(fn ($r) => [
+                    'origen' => $r->cod_evidencia_origen, 'destino' => $r->cod_evidencia_destino, 'tipo' => $r->tipo_relacion,
+                ])->all(),
                 'papel' => $participacion->rol_en_criterio === 'CONTEXTUAL' ? 'Contexto' : 'No utilizada como soporte del resultado'];
+        }
+        $idsEvaluacion = $evaluacion->evidenciasEvaluacion->modelKeys();
+        foreach ($d['evidencias'] as $evidencia) {
+            foreach ($evidencia['relaciones'] as $relacion) {
+                if (! in_array($relacion['origen'], $idsEvaluacion, true) || ! in_array($relacion['destino'], $idsEvaluacion, true)) {
+                    $d['integridad'][] = 'Una relación de evidencia no pertenece a la evaluación conservada.';
+                }
+            }
         }
         if ($traza) {
             $d['traza'] = ['id' => $traza->getKey(), 'estado' => $traza->estado_inferencia, 'inicio' => $traza->fecha_hora_inicio?->format('d/m/Y H:i'), 'fin' => $traza->fecha_hora_fin?->format('d/m/Y H:i')];
@@ -254,9 +267,15 @@ final class LecturaResultadosExperto
                         $d['integridad'][] = 'Una regla satisfecha contiene condiciones no satisfechas.';
                     }
                     $soportesRegla = array_merge($soportesRegla, $soportes);
-                    $condiciones[] = ['id' => $c->getKey(), 'estado' => $condicionEvaluada->estado_condicion, 'variable' => $c->cod_variable_experta, 'valor' => $c->cod_valor_semantico, 'soportes' => $soportes];
+                    $condiciones[] = ['id' => $c->getKey(), 'estado' => $condicionEvaluada->estado_condicion,
+                        'variable' => $c->cod_variable_experta, 'variable_nombre' => $c->variable?->nodo?->nombre ?? $c->cod_variable_experta,
+                        'valor' => $c->cod_valor_semantico, 'valor_nombre' => $c->valor?->codigo_valor ?? $c->cod_valor_semantico,
+                        'soportes' => $soportes];
                 }
-                if (count($condiciones) !== $regla->condicionesReglaExperta->count() || ! $condiciones) {
+                $identidadesCondiciones = array_column($condiciones, 'id');
+                if (count($condiciones) !== $regla->condicionesReglaExperta->count() || ! $condiciones
+                    || count(array_unique($identidadesCondiciones)) !== count($identidadesCondiciones)
+                    || $regla->condicionesReglaExperta->pluck('cod_condicion_regla')->diff($identidadesCondiciones)->isNotEmpty()) {
                     $d['integridad'][] = 'La traza no conserva todas las condiciones de una regla evaluada.';
                 } elseif (($er->estado_regla === 'CUMPLE') !== collect($condiciones)->every(fn ($c) => $c['estado'] === 'CUMPLE')) {
                     $d['integridad'][] = 'El estado de una regla no coincide con sus condiciones conservadas.';
@@ -285,7 +304,10 @@ final class LecturaResultadosExperto
                         $d['evidencias'][$eid]['papel'] = 'Soporte de inferencia';
                     }
                 }
-                $d['reglas'][] = ['id' => $regla->getKey(), 'nombre' => $regla->nombre ?? 'Regla registrada', 'estado' => $er->estado_regla, 'condiciones' => $condiciones, 'consecuencias' => $cs];
+                $d['reglas'][] = ['id' => $regla->getKey(), 'nombre' => $regla->nombre ?? 'Regla registrada',
+                    'codigo' => $regla->codigo_regla, 'version' => $evaluacion->version?->codigo_version,
+                    'tipo' => $regla->tipo_regla, 'descripcion' => $regla->descripcion,
+                    'estado' => $er->estado_regla, 'condiciones' => $condiciones, 'consecuencias' => $cs];
             }
             if ($autorizado && ! in_array($traza->estado_inferencia, $contrato['estados_inferencia'] ?? [], true)) {
                 $d['integridad'][] = 'El estado de la traza no tiene un contrato de publicación autorizado.';

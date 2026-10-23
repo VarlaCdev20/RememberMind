@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 // O.R.I.O.N. 4.16.20; restricciones físicas D-137.
-class TrazaInferencia extends ModeloExperto
+class TrazaInferencia extends ModeloBloqueExperto
 {
-    protected $table = 'trazas_inferencia';
+    protected const BLOQUE = 'trazas_inferencia';
+
+    protected $table = 'evaluacion_criterios';
 
     protected $primaryKey = 'cod_traza_inferencia';
 

@@ -30,9 +30,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * No emite diagnóstico ni autoriza decisiones asistenciales.
  * Hereda la prohibición de sobrescritura y borrado ordinario de ModeloExperto.
  */
-final class ClasificacionDclInstantanea extends ModeloExperto
+final class ClasificacionDclInstantanea extends ModeloBloqueExperto
 {
-    protected $table = 'clasificaciones_dcl_instantanea';
+    protected const BLOQUE = 'clasificaciones_dcl_instantanea';
+
+    protected $table = 'evaluaciones_expertas';
 
     protected $primaryKey = 'cod_clasificacion_dcl_instantanea';
 

@@ -522,7 +522,7 @@ class PersonalInstitucionalHorarios extends Component
                     'fecha_inicio_raw' => $fechas->min()?->format('Y-m-d'),
                     'fecha_fin' => $fechas->max()?->format('d/m/Y'),
                     'fecha_fin_raw' => null,
-                    'estado' => $primero->estado === 'ACTIVO' ? 'ACTIVA' : 'FINALIZADA',
+                    'estado' => in_array($primero->estado, ['ACTIVO', 'ACTIVA'], true) ? 'ACTIVA' : 'FINALIZADA',
                     'tipo_asignacion' => $primero->tipo_asignacion,
                     'observaciones' => $meta['observaciones'] ?? '',
                     'hora_inicio' => $turnoV2?->hora_inicio ? Carbon::parse($turnoV2->hora_inicio)->format('H:i') : '—',

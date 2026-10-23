@@ -17,10 +17,13 @@ final readonly class InstantaneaPetersen
 {
     public const CONTRATO = 'PETERSEN-ORIGINALES-1';
 
+    public const CONTRATO_MEMBRESIAS = 'PETERSEN-ORIGINALES-2';
+
     private function __construct(public array $contenido, public string $huella) {}
 
     public static function crear(ContextoEjecucion $contexto, array $valoraciones, ?PaqueteConocimiento $paquete,
-        ?array $cabecera, string $usuario, array $adquisicion, array $documentos = [], array $procedencia = [], array $membresias = []): self
+        ?array $cabecera, string $usuario, array $adquisicion, array $documentos = [], array $procedencia = [], array $membresias = [],
+        ?array $soportesOriginales = null): self
     {
         $juicios = [];
         foreach ($valoraciones as $v) {
@@ -34,7 +37,7 @@ final readonly class InstantaneaPetersen
         if (($paquete === null) !== ($cabecera === null) || $usuario === '' || strlen($usuario) > 20) {
             throw new DomainException('La preparación requiere actor y cabecera del gobierno utilizado, o su ausencia explícita.');
         }
-        $datos = ['contrato' => self::CONTRATO,
+        $datos = ['contrato' => $soportesOriginales === null ? self::CONTRATO : self::CONTRATO_MEMBRESIAS,
             'contexto' => ['evaluacion' => $contexto->evaluacion, 'residente' => $contexto->residente, 'version' => $contexto->version,
                 'usuario_ejecucion' => $usuario, 'fecha_corte' => CodecInstantanea::fecha('corte', $contexto->fechaCorte)],
             'valoraciones' => $juicios, 'gobierno' => $paquete === null ? null : ['cabecera' => $cabecera, 'conocimiento' => $paquete->declaracion()],
@@ -42,6 +45,9 @@ final readonly class InstantaneaPetersen
             'membresias_soportes' => $membresias,
             'limites' => ['revalida_permisos_historicos' => false, 'revalida_bytes_documentales' => false,
                 'reproduce_adquisicion_sql' => false, 'persistido' => false]];
+        if ($soportesOriginales !== null) {
+            $datos['soportes_originales'] = $soportesOriginales;
+        }
         $datos['salida'] = self::ejecutar($datos);
         $datos = CapturaInstrumentalCanonica::ordenar($datos);
 
@@ -50,10 +56,79 @@ final readonly class InstantaneaPetersen
 
     public static function verificar(array $contenido, string $huella): self
     {
-        $contenido = CapturaInstrumentalCanonica::ordenar($contenido);
-        if (! hash_equals(CodecInstantanea::huella($contenido), $huella)
-            || CodecInstantanea::huella(self::ejecutar($contenido)) !== CodecInstantanea::huella($contenido['salida'] ?? null)) {
+        $original = self::verificarIntegridad($contenido, $huella);
+        $contenido = $original->contenido;
+        if (CodecInstantanea::huella(self::ejecutar($contenido)) !== CodecInstantanea::huella($contenido['salida'])) {
             throw new DomainException('La salida Petersen no se reproduce con sus originales y gobierno capturados.');
+        }
+
+        return $original;
+    }
+
+    /** Forma y huella del original, sin inferencia; la huella esperada debe proceder de conservación confiable. */
+    public static function verificarIntegridad(array $contenido, string $huella): self
+    {
+        $contenido = IntegridadPreparacion::comprobar($contenido, $huella);
+        self::campos($contenido, self::camposContenido($contenido, true));
+        IntegridadPreparacion::contexto($contenido['contexto']);
+        if (! in_array($contenido['contrato'], [self::CONTRATO, self::CONTRATO_MEMBRESIAS], true) || ! is_array($contenido['salida']) || ! is_array($contenido['adquisicion'])
+            || ! is_array($contenido['limites']) || ($contenido['gobierno'] !== null && ! is_array($contenido['gobierno']))) {
+            throw new DomainException('La preparación Petersen requiere su contrato, datos y salida originales.');
+        }
+        foreach (['valoraciones', 'constancias_documentales', 'procedencia_valoraciones', 'membresias_soportes'] as $coleccion) {
+            if (! is_array($contenido[$coleccion]) || ! array_is_list($contenido[$coleccion])) {
+                throw new DomainException('La preparación Petersen requiere sus colecciones originales ordenadas.');
+            }
+        }
+        foreach ($contenido['valoraciones'] as $valoracion) {
+            if (! is_array($valoracion)) {
+                throw new DomainException('La valoración Petersen conservada tiene una forma incompatible.');
+            }
+            self::campos($valoracion, ['elemento', 'estado', 'justificacion', 'origen', 'soportes', 'comprobaciones', 'dominios_revisados']);
+            if (! is_array($valoracion['origen']) || ! is_array($valoracion['soportes']) || ! array_is_list($valoracion['soportes'])
+                || ! is_array($valoracion['comprobaciones']) || ! is_array($valoracion['dominios_revisados'])) {
+                throw new DomainException('La valoración Petersen requiere sus referencias y colecciones originales.');
+            }
+            foreach ($valoracion['soportes'] as $soporte) {
+                if (! is_array($soporte) || ! is_string($soporte['tipo'] ?? null) || ! is_string($soporte['registro'] ?? null)
+                    || ! is_array($soporte['datos_originales'] ?? null)) {
+                    throw new DomainException('El soporte Petersen conservado tiene una forma incompatible.');
+                }
+            }
+        }
+        if ($contenido['contrato'] === self::CONTRATO_MEMBRESIAS) {
+            MembresiasOriginalesPetersen::comprobar($contenido);
+        }
+        self::campos($contenido['salida'], ['contrato', 'evaluacion', 'residente', 'version', 'fecha_corte', 'patron', 'estado', 'impedimentos',
+            'dominios', 'requisitos', 'gobierno', 'valoraciones_excluidas', 'revision_profesional', 'persistido', 'adquisicion']);
+        foreach (['evaluacion', 'residente', 'version'] as $campo) {
+            if ($contenido['salida'][$campo] !== $contenido['contexto'][$campo]) {
+                throw new DomainException('La salida Petersen conservada pertenece a otro contexto.');
+            }
+        }
+        if ($contenido['salida']['persistido'] !== false) {
+            throw new DomainException('La preparación Petersen no acredita conservación institucional.');
+        }
+        self::campos($contenido['adquisicion'], ['valoraciones_al_corte', 'exclusiones', 'fuentes_originales_mutables', 'conservacion_completa']);
+        if (! is_int($contenido['adquisicion']['valoraciones_al_corte']) || $contenido['adquisicion']['valoraciones_al_corte'] < 0
+            || ! is_array($contenido['adquisicion']['exclusiones']) || ! array_is_list($contenido['adquisicion']['exclusiones'])
+            || $contenido['adquisicion']['fuentes_originales_mutables'] !== true || $contenido['adquisicion']['conservacion_completa'] !== false
+            || $contenido['limites'] !== CapturaInstrumentalCanonica::ordenar(['revalida_permisos_historicos' => false,
+                'revalida_bytes_documentales' => false, 'reproduce_adquisicion_sql' => false, 'persistido' => false])) {
+            throw new DomainException('La preparación Petersen no conserva sus límites de adquisición originales.');
+        }
+        if ($contenido['gobierno'] !== null) {
+            self::campos($contenido['gobierno'], ['cabecera', 'conocimiento']);
+            if (! is_array($contenido['gobierno']['cabecera']) || ! is_array($contenido['gobierno']['conocimiento'])) {
+                throw new DomainException('El gobierno Petersen requiere sus originales completos.');
+            }
+            $k = $contenido['gobierno']['conocimiento'];
+            self::campos($k, ['version', 'tablas', 'contratos_relaciones', 'solo_pruebas_tecnicas', 'tipo_regla_resultado', 'contratos_extraccion']);
+            if (($contenido['gobierno']['cabecera']['cod_version_modelo'] ?? null) !== $k['version']
+                || ! is_string($k['version']) || ! is_array($k['tablas']) || ! is_array($k['contratos_relaciones'])
+                || ! is_bool($k['solo_pruebas_tecnicas']) || ! is_string($k['tipo_regla_resultado']) || ! is_array($k['contratos_extraccion'])) {
+                throw new DomainException('El gobierno Petersen conservado no corresponde a su versión original.');
+            }
         }
 
         return new self($contenido, $huella);
@@ -61,12 +136,15 @@ final readonly class InstantaneaPetersen
 
     private static function ejecutar(array $d): array
     {
-        self::campos($d, ['contrato', 'contexto', 'valoraciones', 'gobierno', 'adquisicion', 'constancias_documentales', 'procedencia_valoraciones', 'membresias_soportes', 'limites'], ['salida']);
-        if ($d['contrato'] !== self::CONTRATO || ! array_is_list($d['valoraciones']) || ! array_is_list($d['constancias_documentales'])
+        self::campos($d, self::camposContenido($d, false), ['salida']);
+        if (! in_array($d['contrato'], [self::CONTRATO, self::CONTRATO_MEMBRESIAS], true) || ! array_is_list($d['valoraciones']) || ! array_is_list($d['constancias_documentales'])
             || ! array_is_list($d['procedencia_valoraciones'])
             || CapturaInstrumentalCanonica::ordenar($d['limites']) !== CapturaInstrumentalCanonica::ordenar([
                 'revalida_permisos_historicos' => false, 'revalida_bytes_documentales' => false, 'reproduce_adquisicion_sql' => false, 'persistido' => false])) {
             throw new DomainException('Contrato o límites de preparación Petersen incompatibles.');
+        }
+        if ($d['contrato'] === self::CONTRATO_MEMBRESIAS) {
+            MembresiasOriginalesPetersen::comprobar($d);
         }
         self::campos($d['contexto'], ['evaluacion', 'residente', 'version', 'usuario_ejecucion', 'fecha_corte']);
         if (! is_string($d['contexto']['usuario_ejecucion']) || $d['contexto']['usuario_ejecucion'] === '' || strlen($d['contexto']['usuario_ejecucion']) > 20) {
@@ -175,6 +253,15 @@ final readonly class InstantaneaPetersen
         $salida['adquisicion'] = $d['adquisicion'];
 
         return CapturaInstrumentalCanonica::ordenar($salida);
+    }
+
+    /** La V1 histórica no se completa con datos que nunca adquirió. */
+    private static function camposContenido(array $d, bool $salida): array
+    {
+        return ['contrato', 'contexto', 'valoraciones', 'gobierno', 'adquisicion', 'constancias_documentales',
+            'procedencia_valoraciones', 'membresias_soportes', 'limites',
+            ...(($d['contrato'] ?? null) === self::CONTRATO_MEMBRESIAS ? ['soportes_originales'] : []),
+            ...($salida ? ['salida'] : [])];
     }
 
     private static function fuente(array $f): FuentePetersenInstitucional

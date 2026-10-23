@@ -58,7 +58,8 @@ final class CargadorConocimiento implements ConocimientoVersionado
                 } else {
                     $q->whereHas($relacion, fn ($r) => $r->where('cod_version_modelo', $version));
                 }
-                $tablas[$tabla] = $q->orderBy((new $clase)->getKeyName())->get()->map(fn ($modelo) => $modelo->getAttributes())->all();
+                $tablas[$tabla] = $q->orderBy((new $clase)->getKeyName())->get()->map(fn ($modelo) => $tabla === 'nodos_semanticos'
+                    ? \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::nodoOriginal($modelo->getAttributes()) : $modelo->getAttributes())->all();
             }
 
             return $tablas;

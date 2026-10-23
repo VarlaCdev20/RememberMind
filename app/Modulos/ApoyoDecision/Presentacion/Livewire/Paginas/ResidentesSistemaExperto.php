@@ -7,13 +7,13 @@ namespace App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas;
 use App\Models\EvaluacionExperta;
 use App\Models\Residente;
 use App\Models\User;
-use App\Models\ValoracionPetersenOriginal;
+use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\CohorteCognitivaLocal;
 use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-/** Entrada por residente a la consulta y captura ya autorizadas del sistema experto. */
+/** Entrada por residente a la consulta autorizada de resultados del sistema experto. */
 final class ResidentesSistemaExperto extends Component
 {
     use WithPagination;
@@ -23,6 +23,8 @@ final class ResidentesSistemaExperto extends Component
     public function mount(): void
     {
         $this->autorizar();
+        $buscar = request()->query('buscar', '');
+        $this->busqueda = is_string($buscar) ? mb_substr(trim($buscar), 0, 100) : '';
     }
 
     public function updatingBusqueda(): void
@@ -49,22 +51,31 @@ final class ResidentesSistemaExperto extends Component
     {
         $usuario = $this->autorizar();
         $busqueda = trim($this->busqueda);
+        $terminos = preg_split('/\s+/u', $busqueda, -1, PREG_SPLIT_NO_EMPTY) ?: [];
         $residentes = Residente::query()->where('estado', 'ADMITIDO')
-            ->when($busqueda !== '', static fn ($query) => $query->where(static function ($q) use ($busqueda): void {
-                $q->where('cod_residente', 'like', "%{$busqueda}%")
-                    ->orWhere('nombres', 'like', "%{$busqueda}%")
-                    ->orWhere('apellido_paterno', 'like', "%{$busqueda}%")
-                    ->orWhere('apellido_materno', 'like', "%{$busqueda}%");
-            }))
+            ->when($terminos !== [], static function ($query) use ($terminos): void {
+                foreach ($terminos as $termino) {
+                    if (mb_strtolower($termino) === 'entrenamiento' && CohorteCognitivaLocal::habilitada()) {
+                        CohorteCognitivaLocal::limitarLote($query);
+
+                        continue;
+                    }
+                    $query->where(static function ($q) use ($termino): void {
+                        $patron = "%{$termino}%";
+                        $q->whereLike('cod_residente', $patron)
+                            ->orWhereLike('nombres', $patron)
+                            ->orWhereLike('apellido_paterno', $patron)
+                            ->orWhereLike('apellido_materno', $patron);
+                    });
+                }
+            })
             ->orderBy('apellido_paterno')->orderBy('apellido_materno')->orderBy('nombres')
             ->paginate(12);
 
         $accesos = [];
         foreach ($residentes as $residente) {
-            $puedeConsultar = Gate::forUser($usuario)->allows('consultarResultados', [EvaluacionExperta::class, $residente]);
             $accesos[$residente->getKey()] = [
-                'consultar' => $puedeConsultar,
-                'valorar' => $puedeConsultar && Gate::forUser($usuario)->allows('crearOriginal', [ValoracionPetersenOriginal::class, $residente]),
+                'consultar' => Gate::forUser($usuario)->allows('consultarResultados', [EvaluacionExperta::class, $residente]),
             ];
         }
 

@@ -12,6 +12,8 @@
     'backMethod' => null,
     'backLabel' => 'Volver',
     'alpineClose' => null,
+    'docked' => false,
+    'surface' => 'standard',
 ])
 
 @php
@@ -24,8 +26,25 @@
     $drawerId = 'drawer-'.\Illuminate\Support\Str::slug((string) ($attributes->wire('model')->value() ?: $title));
 @endphp
 
-<div x-data="{ show: @entangle($attributes->wire('model')) }" x-show="show" x-trap.noscroll="show" x-cloak
-     :class="{ 'is-open': show }" x-on:keydown.escape.window="if (show && @js($dismissOnEscape)) { $event.stopPropagation(); {{ $alpineClose ?: '$wire.'.$closeMethod.'()' }} }" class="rm-drawer-shell fixed inset-0 overflow-hidden font-sans {{ $attributes->get('class') }}">
+<div x-data="{
+        show: @entangle($attributes->wire('model')), docked: @js($docked), compact: true,
+        media: null, mediaChanged: null, returnFocus: null,
+        init() {
+            if (!this.docked) return;
+            this.media = window.matchMedia('(max-width: 1279px)');
+            this.compact = this.media.matches;
+            this.mediaChanged = e => { this.compact = e.matches; };
+            this.media.addEventListener('change', this.mediaChanged);
+            this.$watch('show', value => {
+                if (value) {
+                    this.returnFocus = document.activeElement;
+                    if (!this.compact) this.$nextTick(() => this.$refs.panel?.focus());
+                } else if (this.returnFocus?.isConnected) this.returnFocus.focus();
+            });
+        },
+        destroy() { if (this.media) this.media.removeEventListener('change', this.mediaChanged); }
+     }" x-show="show" x-trap.inert.noscroll="show && (!docked || compact)" x-cloak
+     :class="{ 'is-open': show }" x-on:keydown.escape.window="if (show && @js($dismissOnEscape)) { $event.stopPropagation(); {{ $alpineClose ?: '$wire.'.$closeMethod.'()' }} }" class="rm-drawer-shell {{ $docked ? 'rm-drawer-shell--docked' : '' }} {{ $surface === 'reading' ? 'rm-drawer-shell--reading' : '' }} fixed inset-0 overflow-hidden font-sans {{ $attributes->get('class') }}">
     {{-- Backdrop estándar del Design System --}}
     <div class="rm-drawer-backdrop" @if($dismissOnBackdrop) @click="{{ $alpineClose ?: '$wire.'.$closeMethod.'()' }}" @endif aria-hidden="true"></div>
 
@@ -39,9 +58,10 @@
                x-transition:leave-end="translate-x-full"
                id="{{ $drawerId }}"
                role="dialog"
-               aria-modal="true"
+               :aria-modal="(!docked || compact) ? 'true' : 'false'"
                aria-labelledby="{{ $drawerId }}-title"
                tabindex="-1"
+               x-ref="panel"
                class="pointer-events-auto rm-drawer rm-drawer--{{ in_array($size, ['sm', 'lg', 'xl']) ? $size : 'md' }} flex h-full {{ $resolvedWidth }} flex-col overflow-hidden">
 
             {{-- Header Fijo con Badge de Consulta --}}

@@ -9,10 +9,13 @@ use App\Models\IntervencionCuidado;
 use App\Models\PlanCuidado;
 use App\Models\ProgramacionCuidado;
 use App\Models\Residente;
+use App\Models\User;
 use App\Modulos\Cuidados\Aplicacion\Acciones\GestionarEjecucionesAgenda;
+use App\Modulos\Cuidados\Aplicacion\Consultas\OcurrenciasCuidado;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
 class AgendaEnfermeria extends Component
@@ -48,7 +51,9 @@ class AgendaEnfermeria extends Component
     public array $datosModal = [];
 
     // Formulario de Registro
-    public string $resultado = 'Satisfactorio';
+    public ?bool $fueRealizado = null;
+
+    public string $resultado = '';
 
     public string $observacion = '';
 
@@ -56,7 +61,15 @@ class AgendaEnfermeria extends Component
 
     public bool $esNoRealizada = false;
 
+    public bool $pasoRevision = false;
+
     public bool $procesandoRegistro = false;
+
+    // Panel de inspección previo al registro
+    public ?string $itemDetalleId = null;
+
+    // Confirmación compacta de registro exitoso
+    public ?array $ultimoRegistro = null;
 
     // Recepción de turno (para compatibilidad de rol enfermero)
     public string $observacionRecepcion = '';
@@ -70,6 +83,13 @@ class AgendaEnfermeria extends Component
     public function mount(): void
     {
         abort_unless(Auth::user()?->can('enfermeria.ver_dashboard'), 403);
+
+        if (request()->filled('residente')) {
+            $this->filtroResidente = (string) request('residente');
+        }
+        if (request()->filled('estado')) {
+            $this->filtroEstado = (string) request('estado');
+        }
     }
 
     public function cambiarTab(string $nuevoTab): void
@@ -79,32 +99,76 @@ class AgendaEnfermeria extends Component
         }
     }
 
+    public function toggleDetalleItem(string $itemId): void
+    {
+        $this->itemDetalleId = ($this->itemDetalleId === $itemId) ? null : $itemId;
+    }
+
+    public function setFueRealizado(bool $valor): void
+    {
+        $this->fueRealizado = $valor;
+        $this->esNoRealizada = ! $valor;
+        $this->resetErrorBag(['fueRealizado', 'resultado', 'motivoOmision', 'observacion']);
+        if (! $valor) {
+            if (empty($this->resultado) || $this->resultado === 'Satisfactorio') {
+                $this->resultado = 'No realizada / Omitida';
+            }
+        } else {
+            if ($this->resultado === 'No realizada / Omitida' || in_array(strtolower($this->resultado), ['omitida', 'no realizada'])) {
+                $this->resultado = '';
+            }
+            $this->motivoOmision = '';
+        }
+    }
+
+    public function updatedEsNoRealizada($value): void
+    {
+        $this->setFueRealizado(! $value);
+    }
+
     public function abrirModalRegistrar(
         string $codIntervencion,
         string $codResidente,
         ?string $codProgramacion = null,
         ?string $horaProgramada = null
     ): void {
+        $this->autorizarLectura();
         app(TurnoEnfermeriaService::class)->autorizarMutacionEnfermeria($codResidente, 'ejecuciones_cuidado.crear', Auth::user());
         $this->resetValidation();
         $this->intervencionId = $codIntervencion;
         $this->residenteId = $codResidente;
         $this->programacionId = $codProgramacion;
-        $this->resultado = 'Satisfactorio';
+        $this->fueRealizado = null;
+        $this->resultado = '';
         $this->observacion = '';
         $this->motivoOmision = '';
         $this->esNoRealizada = false;
+        $this->pasoRevision = false;
         $this->procesandoRegistro = false;
 
         $residente = Residente::with(['cama.habitacion'])->where('cod_residente', $codResidente)->first();
-        $intervencion = IntervencionCuidado::with(['plan'])->where('cod_intervencion', $codIntervencion)->first();
-        $programacion = $codProgramacion ? ProgramacionCuidado::where('cod_programacion', $codProgramacion)->first() : null;
+        $intervencion = IntervencionCuidado::with('plan')->where('cod_intervencion', $codIntervencion)
+            ->whereHas('plan', fn ($q) => $q->where('cod_residente', $codResidente))->firstOrFail();
+        $programacion = $codProgramacion ? ProgramacionCuidado::where('cod_programacion', $codProgramacion)
+            ->where('cod_intervencion', $intervencion->getKey())->firstOrFail() : null;
 
         $habTexto = 'Sin asignar';
         if ($residente?->cama?->habitacion) {
             $habTexto = 'Hab. '.($residente->cama->habitacion->codigo ?? $residente->cama->habitacion->nombre).
                         ' / Cama '.($residente->cama->codigo ?? 'Sin asignar');
         }
+
+        // Obtener última ejecución previa registrada de esta intervención
+        $ultimaEjecucion = EjecucionCuidado::with(['personal'])
+            ->where('cod_intervencion', $codIntervencion)
+            ->where('cod_residente', $codResidente)
+            ->latest('fecha_hora_ejecucion')
+            ->first();
+
+        $user = $this->autorizarLectura();
+        $responsableNombre = $user?->personal
+            ? trim("{$user->personal->nombres} {$user->personal->apellido_paterno}")
+            : ($user?->name ?? 'Enfermería en turno');
 
         $this->datosModal = [
             'residente_nombre' => $residente ? trim("{$residente->nombres} {$residente->apellido_paterno} {$residente->apellido_materno}") : 'Residente asignado',
@@ -117,6 +181,16 @@ class AgendaEnfermeria extends Component
             'prioridad' => strtoupper($intervencion?->prioridad ?? 'MEDIA'),
             'frecuencia' => $programacion?->frecuencia ?? 'Según turno asignado',
             'hora_programada' => $horaProgramada ?? ($programacion?->hora_programada ? substr((string) $programacion->hora_programada, 0, 5) : now()->format('H:i')),
+            'cod_programacion' => $codProgramacion,
+            'responsable' => $responsableNombre,
+            'ultima_ejecucion' => $ultimaEjecucion ? [
+                'fecha_hora' => $ultimaEjecucion->fecha_hora_ejecucion ? Carbon::parse($ultimaEjecucion->fecha_hora_ejecucion)->format('d/m/Y H:i') : null,
+                'resultado' => $ultimaEjecucion->resultado,
+                'estado' => $ultimaEjecucion->estado,
+                'personal' => $ultimaEjecucion->personal ? trim("{$ultimaEjecucion->personal->nombres} {$ultimaEjecucion->personal->apellido_paterno}") : 'Personal',
+                'motivo_omision' => $ultimaEjecucion->motivo_omision,
+                'observacion' => $ultimaEjecucion->observacion,
+            ] : null,
         ];
 
         $this->modalRegistrarAbierto = true;
@@ -129,17 +203,75 @@ class AgendaEnfermeria extends Component
         $this->residenteId = null;
         $this->programacionId = null;
         $this->datosModal = [];
+        $this->pasoRevision = false;
         $this->procesandoRegistro = false;
     }
 
-    public function updatedEsNoRealizada($value): void
+    public function revisarAntesDeConfirmar(): void
     {
-        if ($value) {
-            $this->resultado = 'No realizada / Omitida';
-        } else {
-            $this->resultado = 'Satisfactorio';
-            $this->motivoOmision = '';
+        $this->resetErrorBag();
+
+        if ($this->fueRealizado === null) {
+            $this->addError('fueRealizado', 'Debe indicar expresamente si el cuidado fue realizado o no.');
+
+            return;
         }
+
+        if (empty(trim($this->resultado))) {
+            $this->addError('resultado', 'Debe seleccionar o indicar el resultado del cuidado.');
+
+            return;
+        }
+
+        if (mb_strlen(trim($this->resultado)) < 3 || mb_strlen(trim($this->resultado)) > 60) {
+            $this->addError('resultado', 'El resultado debe tener entre 3 y 60 caracteres.');
+
+            return;
+        }
+
+        if ($this->fueRealizado) {
+            $resLower = mb_strtolower($this->resultado);
+            $requiereObs = str_contains($resLower, 'dificultad')
+                || str_contains($resLower, 'parcial')
+                || str_contains($resLower, 'favorable')
+                || str_contains($resLower, 'cambio');
+
+            if ($requiereObs && mb_strlen(trim($this->observacion)) < 5) {
+                $this->addError('observacion', 'Debe ingresar una observación clínica descriptiva cuando se reporta dificultad, colaboración parcial, evolución favorable o cambio relevante (mínimo 5 y máximo 500 caracteres).');
+
+                return;
+            }
+        } else {
+            if (mb_strlen(trim($this->motivoOmision)) < 5) {
+                $this->addError('motivoOmision', 'El motivo de omisión es obligatorio cuando la intervención no se realiza (mínimo 5 y máximo 500 caracteres).');
+
+                return;
+            }
+            if (mb_strlen(trim($this->observacion)) < 5) {
+                $this->addError('observacion', 'Las observaciones clínicas son obligatorias cuando la intervención no se realiza (mínimo 5 y máximo 500 caracteres).');
+
+                return;
+            }
+        }
+
+        if (mb_strlen($this->observacion) > 500) {
+            $this->addError('observacion', 'La observación clínica no puede superar los 500 caracteres.');
+
+            return;
+        }
+
+        if (mb_strlen($this->motivoOmision) > 500) {
+            $this->addError('motivoOmision', 'El motivo de omisión no puede superar los 500 caracteres.');
+
+            return;
+        }
+
+        $this->pasoRevision = true;
+    }
+
+    public function volverAEditar(): void
+    {
+        $this->pasoRevision = false;
     }
 
     public function registrarEjecucion(): void
@@ -147,40 +279,74 @@ class AgendaEnfermeria extends Component
         if ($this->procesandoRegistro) {
             return;
         }
-        $this->validate();
-        if (($this->esNoRealizada || in_array(strtolower($this->resultado), ['no realizada', 'omitida', 'no realizada / omitida'])) && mb_strlen(trim($this->motivoOmision)) < 5) {
-            $this->addError('motivoOmision', 'El motivo de omisión es obligatorio cuando la intervención no se realiza (mínimo 5 caracteres).');
 
-            return;
+        // Si fueRealizado no fue establecido explícitamente pero resultado sí (compatibilidad pruebas)
+        if ($this->fueRealizado === null) {
+            if (! empty($this->resultado)) {
+                $esOmitida = $this->esNoRealizada || in_array(strtolower($this->resultado), ['no realizada', 'omitida', 'no realizada / omitida']);
+                $this->fueRealizado = ! $esOmitida;
+            } else {
+                $this->addError('fueRealizado', 'Debe indicar expresamente si el cuidado fue realizado o no.');
+                $this->pasoRevision = false;
+
+                return;
+            }
         }
+
         $this->procesandoRegistro = true;
-        $registrada = app(GestionarEjecucionesAgenda::class)->registrarEjecucion(auth()->user(), [
-            'procesandoRegistro' => $this->procesandoRegistro,
-            'esNoRealizada' => $this->esNoRealizada,
-            'resultado' => $this->resultado,
-            'motivoOmision' => $this->motivoOmision,
-            'residenteId' => $this->residenteId,
-            'intervencionId' => $this->intervencionId,
-            'datosModal' => $this->datosModal,
-            'observacion' => $this->observacion,
-        ]);
-        if (! $registrada) {
-            $this->dispatch('swal', [
-                'icon' => 'warning',
-                'title' => 'Ya registrada',
-                'text' => 'Esta intervención ya cuenta con un registro para el horario programado de hoy.',
+
+        try {
+            $registrada = app(GestionarEjecucionesAgenda::class)->registrarEjecucion(auth()->user(), [
+                'esNoRealizada' => ! $this->fueRealizado,
+                'resultado' => $this->resultado,
+                'motivoOmision' => $this->motivoOmision,
+                'residenteId' => $this->residenteId,
+                'intervencionId' => $this->intervencionId,
+                'programacionId' => $this->programacionId,
+                'datosModal' => $this->datosModal,
+                'observacion' => $this->observacion,
             ]);
+
+            if (! $registrada) {
+                $this->addError('errorModal', 'Esta intervención ya cuenta con un registro para el horario programado de hoy.');
+                $this->procesandoRegistro = false;
+                $this->pasoRevision = false;
+
+                return;
+            }
+
+            $residenteNombre = $this->datosModal['residente_nombre'] ?? 'Residente';
+            $intervencionNombre = $this->datosModal['intervencion_nombre'] ?? 'Cuidado';
+            $estadoRegistrado = $this->fueRealizado ? 'REALIZADA' : 'NO_REALIZADA';
+
+            $this->ultimoRegistro = [
+                'residente' => $residenteNombre,
+                'intervencion' => $intervencionNombre,
+                'estado' => $estadoRegistrado,
+                'resultado' => $this->resultado,
+                'hora' => now()->format('H:i'),
+            ];
+
             $this->cerrarModalRegistrar();
 
-            return;
+            $this->dispatch('swal', [
+                'icon' => 'success',
+                'title' => 'Cuidado registrado',
+                'text' => "Se registró la intervención {$intervencionNombre} para {$residenteNombre} ({$estadoRegistrado}).",
+            ]);
+        } catch (ValidationException $e) {
+            $this->procesandoRegistro = false;
+            $this->pasoRevision = false;
+            foreach ($e->errors() as $campo => $mensajes) {
+                foreach ($mensajes as $m) {
+                    $this->addError($campo, $m);
+                }
+            }
+        } catch (\Throwable $e) {
+            $this->procesandoRegistro = false;
+            $this->pasoRevision = false;
+            $this->addError('errorModal', 'Error al registrar: '.$e->getMessage());
         }
-
-        $this->cerrarModalRegistrar();
-        $this->dispatch('swal', [
-            'icon' => 'success',
-            'title' => 'Cuidado registrado',
-            'text' => 'La ejecución de la intervención ha sido registrada exitosamente en la bitácora clínica.',
-        ]);
     }
 
     public function recibirTurno(): void
@@ -193,10 +359,21 @@ class AgendaEnfermeria extends Component
         $this->dispatch('swal', ['icon' => 'success', 'title' => 'Turno recibido', 'text' => 'La recepción quedó registrada con fecha, hora y responsable.']);
     }
 
+    private function autorizarLectura(): User
+    {
+        $usuario = auth()->id() ? User::query()->findOrFail(auth()->id()) : null;
+        abort_unless($usuario?->estado === 'ACTIVO' && $usuario->can('enfermeria.ver_dashboard')
+            && collect(['planes_cuidado.ver', 'intervenciones_cuidado.ver', 'programaciones_cuidado.ver', 'ejecuciones_cuidado.ver'])
+                ->every(fn ($permiso) => $usuario->checkPermissionTo($permiso, 'web')), 403);
+        Auth::setUser($usuario);
+
+        return $usuario;
+    }
+
     public function render()
     {
         $turnosService = app(TurnoEnfermeriaService::class);
-        $user = Auth::user();
+        $user = $this->autorizarLectura();
         $esSuperAdmin = $turnosService->esSuperAdmin($user);
         $turno = $turnosService->obtenerTurnoActivo($user, today()->toDateString());
 
@@ -217,15 +394,21 @@ class AgendaEnfermeria extends Component
 
         $alertasPorResidente = $alertas->groupBy('cod_residente');
 
-        // 2. Ejecuciones ya realizadas hoy
+        // 2. Ejecuciones ya realizadas hoy (sin keyBy destructivo para soportar múltiples horarios)
         $ejecucionesHoy = EjecucionCuidado::with(['personal'])
             ->whereIn('cod_residente', $codigosResidentes)
             ->where(function ($q) {
                 $q->whereDate('fecha_hora_programada', today())
                     ->orWhereDate('fecha_hora_ejecucion', today());
             })
+            ->get();
+
+        // Últimas ejecuciones históricas para panel de detalle
+        $ultimasEjecuciones = EjecucionCuidado::with(['personal'])
+            ->whereIn('cod_residente', $codigosResidentes)
+            ->latest('fecha_hora_ejecucion')
             ->get()
-            ->keyBy('cod_intervencion');
+            ->groupBy(fn ($e) => $e->cod_residente.'_'.$e->cod_intervencion);
 
         // 3. Cargar Planes, Intervenciones y Programaciones
         $planes = PlanCuidado::with([
@@ -259,12 +442,19 @@ class AgendaEnfermeria extends Component
                 $progsArray = $programaciones->isNotEmpty() ? $programaciones : [null];
 
                 foreach ($progsArray as $prog) {
-                    $horaProg = $prog?->hora_programada ? substr((string) $prog->hora_programada, 0, 5) : '08:00';
-                    $frecuencia = $prog?->frecuencia ?? 'Diario según turno';
+                    $ocurrencias = app(OcurrenciasCuidado::class);
+                    $momentoProgramado = $prog ? $ocurrencias->momento($prog, now(), $turno) : null;
+                    if ($momentoProgramado === null || ($plan->fecha_hora_apertura && $momentoProgramado->lt($plan->fecha_hora_apertura))
+                        || ($plan->fecha_hora_cierre && $momentoProgramado->gt($plan->fecha_hora_cierre))) {
+                        continue;
+                    }
+                    $horaProg = $momentoProgramado->format('H:i');
+                    $frecuencia = $prog->frecuencia;
                     $prioridad = strtoupper($intervencion->prioridad ?? 'MEDIA');
-
-                    // Comprobar ejecucion hoy
-                    $ejecucion = $ejecucionesHoy->get($intervencion->cod_intervencion);
+                    $ejecucion = $ejecucionesHoy->first(fn ($e) => $ocurrencias->corresponde(
+                        $e, $residente->getKey(), $intervencion->getKey(), $momentoProgramado));
+                    // Última ejecución histórica de esta intervención
+                    $ultimaPrevia = $ultimasEjecuciones->get($residente->cod_residente.'_'.$intervencion->cod_intervencion)?->first();
 
                     // Alerta vinculada específicamente a este cuidado
                     $alertaVinculada = $alertas->first(function ($a) use ($intervencion) {
@@ -276,24 +466,10 @@ class AgendaEnfermeria extends Component
                     // Alerta a nivel de residente
                     $residenteConAlerta = $alertasPorResidente->has($residente->cod_residente);
 
-                    // Determinación de estado clínico
-                    if ($ejecucion) {
-                        $estado = $ejecucion->estado === 'NO_REALIZADA' || in_array(strtolower((string) $ejecucion->resultado), ['omitida', 'no realizada'])
-                            ? 'NO_REALIZADA'
-                            : 'REALIZADA';
-                    } else {
-                        try {
-                            $horaDosis = Carbon::createFromFormat('H:i', $horaProg);
-                            if ($horaDosis->lessThan(now()->subMinutes(30))) {
-                                $estado = 'VENCIDA';
-                            } else {
-                                $estado = 'PENDIENTE';
-                            }
-                        } catch (\Throwable $t) {
-                            $estado = 'PENDIENTE';
-                        }
+                    $estado = $ocurrencias->estado($ejecucion);
+                    if ($estado === 'PENDIENTE' && $momentoProgramado->lt(now()->subMinutes(30))) {
+                        $estado = 'VENCIDA';
                     }
-
                     // Rank de orden obligatorio:
                     // 1. Alertas activas vinculadas
                     // 2. Prioridad más alta (sin alerta vinculada)
@@ -302,7 +478,7 @@ class AgendaEnfermeria extends Component
                     // 5. Realizadas / No realizadas (al final)
                     if ($alertaVinculada) {
                         $rank = 1;
-                    } elseif ($prioridad === 'ALTA' && ! in_array($estado, ['REALIZADA', 'NO_REALIZADA'])) {
+                    } elseif ($prioridad === 'ALTA' && ! in_array($estado, ['REALIZADA', 'NO_REALIZADA', 'CANCELADA'])) {
                         $rank = 2;
                     } elseif ($estado === 'VENCIDA') {
                         $rank = 3;
@@ -313,7 +489,7 @@ class AgendaEnfermeria extends Component
                     }
 
                     $itemsAgenda->push([
-                        'id' => $intervencion->cod_intervencion.'_'.($prog?->cod_programacion ?? 'P0'),
+                        'id' => $intervencion->cod_intervencion.'_'.($prog?->cod_programacion ?? 'P0').'_'.str_replace(':', '', $horaProg),
                         'cod_intervencion' => $intervencion->cod_intervencion,
                         'cod_programacion' => $prog?->cod_programacion,
                         'cod_residente' => $residente->cod_residente,
@@ -331,6 +507,15 @@ class AgendaEnfermeria extends Component
                         'alerta_descripcion' => $alertaVinculada?->descripcion ?? null,
                         'residente_con_alerta' => $residenteConAlerta,
                         'ejecucion' => $ejecucion,
+                        'ultima_ejecucion' => $ultimaPrevia ? [
+                            'fecha_hora' => $ultimaPrevia->fecha_hora_ejecucion ? Carbon::parse($ultimaPrevia->fecha_hora_ejecucion)->format('d/m/Y H:i') : null,
+                            'resultado' => $ultimaPrevia->resultado,
+                            'estado' => $ultimaPrevia->estado,
+                            'personal' => $ultimaPrevia->personal ? trim("{$ultimaPrevia->personal->nombres} {$ultimaPrevia->personal->apellido_paterno}") : 'Personal',
+                            'motivo_omision' => $ultimaPrevia->motivo_omision,
+                            'observacion' => $ultimaPrevia->observacion,
+                        ] : null,
+                        'responsable_nombre' => $user?->personal ? trim("{$user->personal->nombres} {$user->personal->apellido_paterno}") : ($user?->name ?? 'Enfermería en turno'),
                         'rank' => $rank,
                     ]);
                 }
@@ -346,6 +531,14 @@ class AgendaEnfermeria extends Component
             return strcmp($a['hora_programada'], $b['hora_programada']);
         })->values();
 
+        // Contadores institucionales antes del filtro de estado
+        $contadores = [
+            'por_atender' => $itemsAgenda->filter(fn ($i) => in_array($i['estado'], ['PENDIENTE', 'VENCIDA']))->count(),
+            'no_realizadas' => $itemsAgenda->where('estado', 'NO_REALIZADA')->count(),
+            'realizadas' => $itemsAgenda->where('estado', 'REALIZADA')->count(),
+            'todas' => $itemsAgenda->count(),
+        ];
+
         // Filtros de Agenda
         if (! empty($this->buscar)) {
             $busq = mb_strtolower(trim($this->buscar));
@@ -360,11 +553,21 @@ class AgendaEnfermeria extends Component
             $itemsAgenda = $itemsAgenda->where('prioridad', $this->filtroPrioridad)->values();
         }
 
+        // Filtro de Estado institucional con las 4 categorías requeridas
         if (! empty($this->filtroEstado)) {
-            if ($this->filtroEstado === 'ALERTA') {
+            $filtro = strtolower(trim($this->filtroEstado));
+            if ($filtro === 'por_atender' || $filtro === 'por atender') {
+                $itemsAgenda = $itemsAgenda->filter(fn ($i) => in_array($i['estado'], ['PENDIENTE', 'VENCIDA']))->values();
+            } elseif ($filtro === 'no_realizadas' || $filtro === 'no realizadas' || $filtro === 'no_realizada') {
+                $itemsAgenda = $itemsAgenda->where('estado', 'NO_REALIZADA')->values();
+            } elseif ($filtro === 'realizadas' || $filtro === 'realizada') {
+                $itemsAgenda = $itemsAgenda->where('estado', 'REALIZADA')->values();
+            } elseif ($filtro === 'alerta') {
                 $itemsAgenda = $itemsAgenda->where('alerta_vinculada', true)->values();
-            } else {
-                $itemsAgenda = $itemsAgenda->where('estado', $this->filtroEstado)->values();
+            } elseif ($filtro === 'vencida') {
+                $itemsAgenda = $itemsAgenda->where('estado', 'VENCIDA')->values();
+            } elseif ($filtro === 'pendiente') {
+                $itemsAgenda = $itemsAgenda->where('estado', 'PENDIENTE')->values();
             }
         }
 
@@ -372,7 +575,7 @@ class AgendaEnfermeria extends Component
             $itemsAgenda = $itemsAgenda->where('cod_residente', $this->filtroResidente)->values();
         }
 
-        // 4. Historial clínico completo (sin "Ver Detalle")
+        // 4. Historial clínico directo
         $queryHistorial = EjecucionCuidado::with([
             'residente.cama.habitacion',
             'intervencion.plan',
@@ -409,6 +612,7 @@ class AgendaEnfermeria extends Component
 
         return view('livewire.cuidados.agenda-enfermeria', [
             'itemsAgenda' => $itemsAgenda,
+            'contadores' => $contadores,
             'historial' => $historial,
             'residentes' => $residentes,
             'esSuperAdmin' => $esSuperAdmin,

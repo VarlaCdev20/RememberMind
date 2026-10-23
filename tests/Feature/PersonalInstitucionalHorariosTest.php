@@ -89,6 +89,33 @@ class PersonalInstitucionalHorariosTest extends TestCase
         ]);
     }
 
+    public function test_displays_both_active_assignment_states_and_preserves_finalized_state(): void
+    {
+        $user = $this->crearUsuarioConRol('ENFERMEROS');
+        $area = $this->crearArea('ARE_0004', 'AREA DE ATENCION MEDICA', 'Salud');
+        $turno = $this->crearTurno('COD_TUR_000001', 'MANANA', '08:00:00', '16:00:00');
+
+        Livewire::test(PersonalInstitucionalHorarios::class, ['usuarioId' => $user->cod_usuario])
+            ->set('f_cod_area', $area->cod_area)
+            ->set('f_cod_turno', $turno->cod_turno)
+            ->set('f_dias_semana', ['LUNES'])
+            ->set('f_fecha_inicio', '2026-06-08')
+            ->set('f_tipo_asignacion', 'ROTATIVO')
+            ->call('guardar')
+            ->assertHasNoErrors();
+
+        $asignacion = AsignacionPersonal::where('cod_personal', $user->personal->cod_personal)->sole();
+
+        foreach (['ACTIVO' => 'ACTIVA', 'ACTIVA' => 'ACTIVA', 'INACTIVO' => 'FINALIZADA'] as $guardado => $visible) {
+            $asignacion->update(['estado' => $guardado]);
+
+            Livewire::test(PersonalInstitucionalHorarios::class, ['usuarioId' => $user->cod_usuario])
+                ->assertSet('asignaciones.0.estado', $visible);
+
+            $this->assertSame($guardado, $asignacion->fresh()->estado);
+        }
+    }
+
     private function crearUsuarioConRol(string $rol): User
     {
         Role::findOrCreate($rol, 'web');

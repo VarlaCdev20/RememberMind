@@ -90,6 +90,9 @@ abstract class CapturaInstrumentalModal extends Component
     public array $preguntas = [];
 
     #[Locked]
+    public array $vinculoMetodo = [];
+
+    #[Locked]
     public array $contexto = [];
 
     #[Locked]
@@ -117,7 +120,7 @@ abstract class CapturaInstrumentalModal extends Component
         $consulta->usuario(auth()->user());
         abort_if($this->residenteFijo !== null && $codigoResidente !== $this->residenteFijo, 403);
         $contexto = $codigoResidente !== null ? $consulta->contexto(auth()->user(), $codigoResidente) : [];
-        $this->reset(['cod_instrumento', 'instrumentoSeleccionado', 'codigoReservado', 'aplicacionGuardada', 'valores', 'preguntas',
+        $this->reset(['cod_instrumento', 'instrumentoSeleccionado', 'codigoReservado', 'aplicacionGuardada', 'valores', 'preguntas', 'vinculoMetodo',
             'puntajesOriginales', 'observacionesRespuesta', 'cod_atencion', 'clasificacion_original', 'interpretacion_original',
             'observaciones', 'confirmando', 'confirmarDescarte', 'busquedaResidente', 'huellaCatalogo', 'huellaConfirmacion',
             'transcripcion', 'cod_documento_clinico', 'cod_personal_original', 'localizador_fuente', 'original_cotejado', 'cod_aplicacion_anterior', 'cod_aplicacion_existente', 'motivo_rectificacion', 'estadoConciliacion']);
@@ -142,7 +145,7 @@ abstract class CapturaInstrumentalModal extends Component
         app(PrepararCapturaInstrumental::class)->usuario(auth()->user());
         $this->contexto = $value ? app(PrepararCapturaInstrumental::class)->contexto(auth()->user(), $value) : [];
         $this->residenteSeleccionado = $value;
-        $this->reset(['cod_instrumento', 'instrumentoSeleccionado', 'preguntas', 'confirmando']);
+        $this->reset(['cod_instrumento', 'instrumentoSeleccionado', 'preguntas', 'vinculoMetodo', 'confirmando']);
     }
 
     public function updatedCodInstrumento(?string $value): void
@@ -156,6 +159,7 @@ abstract class CapturaInstrumentalModal extends Component
         $this->comprobarResidente();
         $catalogo = $value ? app(PrepararCapturaInstrumental::class)->catalogo(auth()->user(), $this->cod_residente, $value) : [];
         $this->preguntas = $catalogo['preguntas'] ?? [];
+        $this->vinculoMetodo = $catalogo['vinculo_metodo'] ?? [];
         $this->huellaCatalogo = $catalogo['huella'] ?? null;
         $this->instrumentoSeleccionado = $value;
         $this->confirmando = false;

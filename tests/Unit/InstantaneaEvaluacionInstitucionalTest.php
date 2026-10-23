@@ -21,6 +21,7 @@ use MotorExperto\soporte\conservacion\ReleaseMotorInstrumental;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 use Tests\Support\ConstruyeCasoPetersen;
 use ZipArchive;
 
@@ -113,6 +114,110 @@ final class InstantaneaEvaluacionInstitucionalTest extends TestCase
         }
     }
 
+    public function test_lectura_integra_no_necesita_el_motor_ni_recalcula_las_salidas(): void
+    {
+        $dto = $this->crear(conPreguntasSinRespuesta: true);
+        $leer = $this->procesoSinInferencia($dto->contenido, $dto->huella);
+        self::assertSame(0, $leer->getExitCode(), $leer->getErrorOutput());
+        self::assertSame(['contenido_identico' => true, 'huella' => $dto->huella,
+            'persistido' => false, 'intentos_inferencia' => []], json_decode($leer->getOutput(), true, flags: JSON_THROW_ON_ERROR));
+
+        $replay = $this->procesoSinInferencia($dto->contenido, $dto->huella, 'REPLAY');
+        self::assertSame(12, $replay->getExitCode());
+        $error = json_decode($replay->getOutput(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertSame(\RuntimeException::class, $error['error']);
+        self::assertNotEmpty($error['intentos_inferencia']);
+    }
+
+    public function test_lectura_rechaza_salida_alterada_con_la_huella_confiable_original(): void
+    {
+        $dto = $this->crear();
+        $contenido = $dto->contenido;
+        $contenido['petersen']['contenido']['salida']['patron'] = 'PET-04';
+        $proceso = $this->procesoSinInferencia($contenido, $dto->huella);
+        self::assertSame(12, $proceso->getExitCode());
+        self::assertSame(['error' => DomainException::class, 'intentos_inferencia' => []],
+            json_decode($proceso->getOutput(), true, flags: JSON_THROW_ON_ERROR));
+    }
+
+    public function test_integridad_no_equivale_a_replay_si_se_aporta_una_huella_distinta(): void
+    {
+        $contenido = $this->crear()->contenido;
+        $contenido['petersen']['contenido']['salida']['patron'] = 'PET-04';
+        $contenido['petersen']['huella'] = Codec::huella(C::ordenar($contenido['petersen']['contenido']));
+        $huella = Codec::huella(C::ordenar($contenido));
+        // Una huella de cliente no es autenticidad. El lector sólo acredita la igualdad de bytes tipados.
+        self::assertSame('PET-04', Compuesta::verificarIntegridad($contenido, $huella)->contenido['petersen']['contenido']['salida']['patron']);
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('no se reproduce');
+        Compuesta::verificar($contenido, $huella);
+    }
+
+    private function procesoSinInferencia(array $contenido, string $huella, string $modo = 'INTEGRIDAD'): Process
+    {
+        $p = new Process([PHP_BINARY, dirname(__DIR__).'/Support/leer_preparacion_sin_inferencia.php'], dirname(__DIR__, 2), timeout: 20);
+        $p->setInput(serialize(compact('contenido', 'huella', 'modo')));
+        $p->run();
+
+        return $p;
+    }
+
+    public static function integridadesInvalidas(): array
+    {
+        return array_map(static fn ($cambio) => [$cambio], ['SALIDA_AUSENTE', 'SALIDA_VACIA', 'HUELLA_RAMA', 'RESIDENTE_RAMA',
+            'ACTOR_RAMA', 'VERSION_RAMA', 'FECHA_RAMA', 'FECHA_TIPO', 'PERSISTIDO', 'CAMPO_AJENO', 'OBJETO', 'IDENTIDAD_LARGA',
+            'RAMA_ESCALAR', 'RELEASE_ESCALAR', 'CAPTURA_ESCALAR', 'VALORACION_ESCALAR', 'SOPORTE_ESCALAR']);
+    }
+
+    #[DataProvider('integridadesInvalidas')]
+    public function test_integridad_rechaza_forma_incompleta_y_contextos_cruzados_sin_inferencia(string $cambio): void
+    {
+        $d = $this->crear()->contenido;
+        switch ($cambio) {
+            case 'SALIDA_AUSENTE': unset($d['petersen']['contenido']['salida']);
+                break;
+            case 'SALIDA_VACIA': $d['instrumental']['contenido']['salida'] = [];
+                break;
+            case 'HUELLA_RAMA': $d['petersen']['huella'] = str_repeat('a', 64);
+                break;
+            case 'RESIDENTE_RAMA': $d['petersen']['contenido']['contexto']['residente'] = 'OTRO-RESIDENTE';
+                break;
+            case 'ACTOR_RAMA': $d['petersen']['contenido']['contexto']['usuario_ejecucion'] = 'OTRO-USUARIO';
+                break;
+            case 'VERSION_RAMA': $d['petersen']['contenido']['contexto']['version'] = 'OTRA-VERSION';
+                break;
+            case 'IDENTIDAD_LARGA': $d['petersen']['contenido']['contexto']['version'] = str_repeat('a', 21);
+                break;
+            case 'FECHA_RAMA': $d['petersen']['contenido']['contexto']['fecha_corte']['corte_utc'] = '2026-10-19 00:00:00.000000';
+                break;
+            case 'FECHA_TIPO': $d['petersen']['contenido']['contexto']['fecha_corte']['corte_offset'] = '-14400';
+                break;
+            case 'PERSISTIDO': $d['persistido'] = true;
+                break;
+            case 'CAMPO_AJENO': $d['instrumental']['contenido']['campo_ajeno'] = 'No es parte del contrato';
+                break;
+            case 'OBJETO': $d['instrumental']['contenido']['salida']['resultado']['objeto'] = new \stdClass;
+                break;
+            case 'RAMA_ESCALAR': $d['instrumental']['contenido'] = 'Sin datos estructurados';
+                break;
+            case 'RELEASE_ESCALAR': $d['release'] = true;
+                break;
+            case 'CAPTURA_ESCALAR': $d['instrumental']['contenido']['capturas']['capturas'][0] = 'Sin captura estructurada';
+                break;
+            case 'VALORACION_ESCALAR': $d['petersen']['contenido']['valoraciones'][0] = 'Sin valoración estructurada';
+                break;
+            case 'SOPORTE_ESCALAR': $d['petersen']['contenido']['valoraciones'][0]['soportes'][0] = 'Sin soporte estructurado';
+                break;
+        }
+        foreach (['instrumental', 'petersen'] as $rama) {
+            if (! in_array($cambio, ['HUELLA_RAMA', 'OBJETO'], true)) {
+                $d[$rama]['huella'] = Codec::huella(C::ordenar($d[$rama]['contenido']));
+            }
+        }
+        $this->expectException(DomainException::class);
+        Compuesta::verificarIntegridad($d, $cambio === 'OBJETO' ? str_repeat('0', 64) : Codec::huella(C::ordenar($d)));
+    }
+
     public function test_preguntas_originales_sin_respuesta_se_conservan_en_ambas_ramas(): void
     {
         $dto = $this->crear(conPreguntasSinRespuesta: true);
@@ -149,8 +254,7 @@ final class InstantaneaEvaluacionInstitucionalTest extends TestCase
     {
         $d = $this->crear(conPreguntasSinRespuesta: true)->contenido;
         $p = &$d['petersen']['contenido'];
-        $p['valoraciones'][0]['soportes'][0]['datos_originales']['captura_original']
-            ['preguntas_declarativas_originales']['MAP-COG-MEM']['enunciado'] = 'Texto sintético alterado';
+        $p['valoraciones'][0]['soportes'][0]['datos_originales']['captura_original']['preguntas_declarativas_originales']['MAP-COG-MEM']['enunciado'] = 'Texto sintético alterado';
         $d['petersen']['huella'] = Codec::huella(C::ordenar($p));
         $this->expectException(DomainException::class);
         Compuesta::verificar($d, Codec::huella(C::ordenar($d)));

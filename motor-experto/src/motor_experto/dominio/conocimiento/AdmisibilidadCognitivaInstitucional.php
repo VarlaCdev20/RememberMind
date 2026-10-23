@@ -17,6 +17,7 @@ final class AdmisibilidadCognitivaInstitucional
         if (! PaqueteCognitivoInstitucional::reconoce($p)) {
             return $e;
         }
+        $coincidencias = [];
         $memoria = $codigo === 'VAR-MEM-INST-01';
         if (! $memoria && ! preg_match('/^VAR-((?:ATE|EJE|LEN|VIS)-S0[1-5])-(C[123])$/D', $codigo, $coincidencias)) {
             return $e;

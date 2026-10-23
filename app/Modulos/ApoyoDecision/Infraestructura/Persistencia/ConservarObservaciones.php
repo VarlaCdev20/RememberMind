@@ -41,7 +41,7 @@ final class ConservarObservaciones implements ConservacionObservacional
     private function insertar(string $tabla, array $datos): string
     {
         $id = app(CodigosEntidad::class)->siguiente($tabla);
-        DB::table($tabla)->insert([CatalogoCodigos::clave($tabla) => $id] + $datos);
+        Conservacion\BloquesExpertos::insertar($tabla, [CatalogoCodigos::clave($tabla) => $id] + $datos);
 
         return $id;
     }

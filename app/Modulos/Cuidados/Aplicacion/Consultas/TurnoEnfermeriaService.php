@@ -109,17 +109,18 @@ class TurnoEnfermeriaService
         return $query->whereIn('cod_residente', $asignaciones->select('cod_residente'));
     }
 
-    /** Asignaciones propias de hoy; incluye la guardia nocturna anterior mientras sigue en curso. */
+    /** Lectura de asignaciones propias de hoy o de la guardia nocturna que terminó hoy. */
     public function obtenerAsignacionesConsulta(?User $user): Builder
     {
         $ahora = Carbon::now();
         $jornadas = Jornada::query()
             ->whereDate('fecha_jornada', '>=', $ahora->copy()->subDay()->toDateString())
             ->whereDate('fecha_jornada', '<=', $ahora->toDateString())
-            ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO', 'ACTIVO'])
+            ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO', 'ACTIVO', 'CERRADA', 'FINALIZADA'])
             ->with('turno')->get()
             ->filter(fn ($jornada) => $jornada->turno && (
-                Carbon::parse($jornada->fecha_jornada)->isSameDay($ahora) || $this->jornadaEnCurso($jornada)
+                Carbon::parse($jornada->fecha_jornada)->isSameDay($ahora)
+                || app(MiTurnoService::class)->calcularVentanaTurno($jornada)[1]->isSameDay($ahora)
             ))->pluck('cod_jornada');
 
         return AsignacionResidenteJornada::query()
@@ -133,7 +134,7 @@ class TurnoEnfermeriaService
 
     private function jornadaEnCurso(?Jornada $jornada): bool
     {
-        if (! $jornada?->turno) {
+        if (! $jornada?->turno || ! in_array($jornada->estado, ['ABIERTA', 'ACTIVA', 'EN_CURSO', 'ACTIVO'], true)) {
             return false;
         }
         [$inicio, $fin] = app(MiTurnoService::class)->calcularVentanaTurno($jornada);

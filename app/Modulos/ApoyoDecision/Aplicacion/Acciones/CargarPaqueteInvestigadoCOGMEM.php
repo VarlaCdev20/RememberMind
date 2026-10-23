@@ -55,7 +55,7 @@ final class CargarPaqueteInvestigadoCOGMEM
                 DB::table('versiones_modelo_experto')->insert($version);
                 foreach ($tablas as $tabla => $filas) {
                     if ($filas) {
-                        DB::table($tabla)->insert($filas);
+                        \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::insertar($tabla, $filas);
                     }
                 }
                 activity('sistema_experto')->causedBy($usuario)->event('paquete_investigado_registrado')
