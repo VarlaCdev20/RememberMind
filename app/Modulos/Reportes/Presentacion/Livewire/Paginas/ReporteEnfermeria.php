@@ -65,7 +65,7 @@ class ReporteEnfermeria extends Component
             'dosis' => $medicaciones->filter(fn ($m) => $m->esAdministrada())->count(),
             'omisiones' => $medicaciones->filter(fn ($m) => $m->esOmitida())->count(),
             'incidentes' => $incidentes->count(),
-            'alertas_abiertas' => $alertas->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])->count(),
+            'alertas_abiertas' => $alertas->whereIn('estado', Alerta::ESTADOS_ACTIVOS)->count(),
         ];
 
         $tendencia = collect();

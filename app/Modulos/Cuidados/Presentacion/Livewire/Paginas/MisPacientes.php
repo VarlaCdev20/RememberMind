@@ -6,6 +6,7 @@ use App\Models\AdministracionMedicacion;
 use App\Models\Alerta;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Atencion;
+use App\Models\ControlCognitivo;
 use App\Models\EjecucionCuidado;
 use App\Models\EvaluacionExperta;
 use App\Models\Habitacion;
@@ -13,6 +14,7 @@ use App\Models\IndicacionClinica;
 use App\Models\ObjetivoSignoVital;
 use App\Models\PaseTurno;
 use App\Models\Prescripcion;
+use App\Models\RegistroConductual;
 use App\Models\RegistroEliminacion;
 use App\Models\RegistroHidratacion;
 use App\Models\RegistroIngesta;
@@ -947,6 +949,7 @@ class MisPacientes extends Component
             $this->registroTipo = 'medicacion';
             $this->mostrarSelectorModal = false;
             $this->dispatch('abrirModalAdministracion', cod_residente: $codResidente, origen: 'selector');
+
             return;
         }
 
@@ -1099,10 +1102,14 @@ class MisPacientes extends Component
     #[On('medicacion-formulario-cerrado')]
     public function cerrarPopupMedicacion(bool $volver = false, ?string $residente = null): void
     {
-        if ($this->registroTipo !== 'medicacion' || !$this->detalleResidente || $residente !== $this->detalleResidente['cod_residente']) return;
+        if ($this->registroTipo !== 'medicacion' || ! $this->detalleResidente || $residente !== $this->detalleResidente['cod_residente']) {
+            return;
+        }
         $this->getTurnoService()->autorizarConsultaResidente($residente, Auth::user());
         $this->seleccionarResidente($residente);
-        if ($volver) $this->mostrarSelectorRegistro();
+        if ($volver) {
+            $this->mostrarSelectorRegistro();
+        }
     }
 
     public function cancelarDescarte(): void
@@ -1262,7 +1269,7 @@ class MisPacientes extends Component
             ->orderByDesc('fecha_hora')
             ->get();
 
-        $alertasCriticasCount = $alertasActivas->whereIn('prioridad', ['CRITICO', 'ALTO', 'CRITICA'])->count();
+        $alertasCriticasCount = $alertasActivas->whereIn('prioridad', Alerta::PRIORIDADES_ALTAS)->count();
 
         $estadoSeguimiento = 'SIN_ALERTAS';
         $estadoColor = 'slate';
@@ -1487,7 +1494,7 @@ class MisPacientes extends Component
 
         $seguimientoReciente = collect();
         if ($usuario?->can('controles_cognitivos.ver')) {
-            \App\Models\ControlCognitivo::query()->where('cod_residente', $codResidente)->where('estado', 'VIGENTE')
+            ControlCognitivo::query()->where('cod_residente', $codResidente)->where('estado', 'VIGENTE')
                 ->orderByDesc('fecha_hora')->limit(3)->get(['fecha_hora', 'observacion'])
                 ->each(fn ($item) => $seguimientoReciente->push([
                     'fecha_hora' => Carbon::parse($item->fecha_hora),
@@ -1496,7 +1503,7 @@ class MisPacientes extends Component
                 ]));
         }
         if ($usuario?->can('registros_conductuales.ver')) {
-            \App\Models\RegistroConductual::query()->where('cod_residente', $codResidente)->where('estado', 'VIGENTE')
+            RegistroConductual::query()->where('cod_residente', $codResidente)->where('estado', 'VIGENTE')
                 ->orderByDesc('fecha_hora')->limit(3)->get(['fecha_hora', 'descripcion', 'estado_animo'])
                 ->each(fn ($item) => $seguimientoReciente->push([
                     'fecha_hora' => Carbon::parse($item->fecha_hora),
@@ -2923,10 +2930,10 @@ class MisPacientes extends Component
                 'planCuidadoActivo',
             ])->withCount([
                 'alertas as alertas_activas_count' => function ($q) {
-                    $q->whereIn('estado', ['ABIERTA', 'EN_ATENCION']);
+                    $q->whereIn('estado', Alerta::ESTADOS_ACTIVOS);
                 },
                 'alertas as alertas_criticas_count' => function ($q) {
-                    $q->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])->whereIn('prioridad', ['CRITICO', 'ALTO', 'CRITICA']);
+                    $q->whereIn('estado', Alerta::ESTADOS_ACTIVOS)->whereIn('prioridad', Alerta::PRIORIDADES_ALTAS);
                 },
                 'tareasActuales as tareas_pendientes_count' => function ($q) use ($fechaHoy) {
                     $q->whereIn('estado', ['PENDIENTE', 'EN_PROCESO'])
@@ -2969,11 +2976,11 @@ class MisPacientes extends Component
             // Filtro Alertas estructurado
             $filtroAlertas = $this->filtroAlertas ?: ($this->filtroRapido === 'CON_ALERTAS' ? 'CON_ALERTAS' : '');
             if ($filtroAlertas === 'CON_ALERTAS') {
-                $pacientesQuery->whereHas('alertas', fn ($q) => $q->whereIn('estado', ['ABIERTA', 'EN_ATENCION']));
+                $pacientesQuery->whereHas('alertas', fn ($q) => $q->whereIn('estado', Alerta::ESTADOS_ACTIVOS));
             } elseif ($filtroAlertas === 'SIN_ALERTAS') {
-                $pacientesQuery->whereDoesntHave('alertas', fn ($q) => $q->whereIn('estado', ['ABIERTA', 'EN_ATENCION']));
+                $pacientesQuery->whereDoesntHave('alertas', fn ($q) => $q->whereIn('estado', Alerta::ESTADOS_ACTIVOS));
             } elseif (in_array($filtroAlertas, ['CON_ALERTAS_PRIORITARIAS', 'CRITICAS'], true)) {
-                $pacientesQuery->whereHas('alertas', fn ($q) => $q->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])->whereIn('prioridad', ['CRITICO', 'ALTO', 'CRITICA']));
+                $pacientesQuery->whereHas('alertas', fn ($q) => $q->whereIn('estado', Alerta::ESTADOS_ACTIVOS)->whereIn('prioridad', Alerta::PRIORIDADES_ALTAS));
             }
 
             // Filtro Medicación estructurado
@@ -3011,22 +3018,22 @@ class MisPacientes extends Component
             if ($this->filtroEstado === 'REQUIERE_ATENCION') {
                 $pacientesQuery->where(function ($q) {
                     $q->whereHas('alertas', function ($aq) {
-                        $aq->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])
-                            ->whereIn('prioridad', ['CRITICO', 'ALTO', 'CRITICA']);
+                        $aq->whereIn('estado', Alerta::ESTADOS_ACTIVOS)
+                            ->whereIn('prioridad', Alerta::PRIORIDADES_ALTAS);
                     });
                 });
             } elseif ($this->filtroEstado === 'VIGILANCIA') {
                 $pacientesQuery->whereDoesntHave('alertas', function ($aq) {
-                    $aq->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])
-                        ->whereIn('prioridad', ['CRITICO', 'ALTO', 'CRITICA']);
+                    $aq->whereIn('estado', Alerta::ESTADOS_ACTIVOS)
+                        ->whereIn('prioridad', Alerta::PRIORIDADES_ALTAS);
                 })->where(function ($q) use ($fechaHoy) {
-                    $q->whereHas('alertas', fn ($aq) => $aq->whereIn('estado', ['ABIERTA', 'EN_ATENCION']))
+                    $q->whereHas('alertas', fn ($aq) => $aq->whereIn('estado', Alerta::ESTADOS_ACTIVOS))
                         ->orWhereHas('tareasActuales', fn ($tq) => $tq->whereIn('estado', ['PENDIENTE', 'EN_PROCESO'])->whereDate('fecha_hora_programada', '<', $fechaHoy))
                         ->orWhereDoesntHave('signosVitales', fn ($vq) => $vq->whereDate('fecha_hora', $fechaHoy))
                         ->orWhereDoesntHave('seguimientosDiarios', fn ($sq) => $sq->whereDate('fecha_hora', $fechaHoy));
                 });
             } elseif ($this->filtroEstado === 'ESTABLE') {
-                $pacientesQuery->whereDoesntHave('alertas', fn ($aq) => $aq->whereIn('estado', ['ABIERTA', 'EN_ATENCION']))
+                $pacientesQuery->whereDoesntHave('alertas', fn ($aq) => $aq->whereIn('estado', Alerta::ESTADOS_ACTIVOS))
                     ->whereDoesntHave('tareasActuales', fn ($tq) => $tq->whereIn('estado', ['PENDIENTE', 'EN_PROCESO'])->whereDate('fecha_hora_programada', '<', $fechaHoy))
                     ->whereHas('signosVitales', fn ($vq) => $vq->whereDate('fecha_hora', $fechaHoy))
                     ->whereHas('seguimientosDiarios', fn ($sq) => $sq->whereDate('fecha_hora', $fechaHoy));
@@ -3210,8 +3217,8 @@ class MisPacientes extends Component
                 $turnoEfectivo,
                 $enfermeroEfectivo ?: null
             ))->with('cama.habitacion')->withCount([
-                'alertas as alertas_activas_count' => fn ($q) => $q->whereIn('estado', ['ABIERTA', 'EN_ATENCION']),
-                'alertas as alertas_criticas_count' => fn ($q) => $q->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])->whereIn('prioridad', ['CRITICO', 'ALTO', 'CRITICA']),
+                'alertas as alertas_activas_count' => fn ($q) => $q->whereIn('estado', Alerta::ESTADOS_ACTIVOS),
+                'alertas as alertas_criticas_count' => fn ($q) => $q->whereIn('estado', Alerta::ESTADOS_ACTIVOS)->whereIn('prioridad', Alerta::PRIORIDADES_ALTAS),
                 'tareasActuales as tareas_pendientes_count' => function ($q) use ($fechaHoy) {
                     $q->whereIn('estado', ['PENDIENTE', 'EN_PROCESO'])->whereDate('fecha_hora_programada', $fechaHoy);
                 },

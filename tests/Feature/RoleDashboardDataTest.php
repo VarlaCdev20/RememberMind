@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Modulos\Reportes\Aplicacion\Consultas\RoleDashboardDataService;
-use App\Models\Residente;
 use App\Models\Personal;
+use App\Models\Residente;
 use App\Models\User;
+use App\Modulos\Reportes\Aplicacion\Consultas\RoleDashboardDataService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -148,8 +148,10 @@ class RoleDashboardDataTest extends TestCase
 
         foreach (['NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO'] as $role) {
             $data = $service->forRole($usuario, $role);
-            $this->assertCount(4, $data['metrics']);
-            $this->assertSame([0, 0, 0, 0], array_column($data['metrics'], 'value'));
+            $cantidad = in_array($role, ['NUTRICIONISTA', 'FISIOTERAPEUTA'], true) ? 3 : 4;
+            $this->assertCount($cantidad, $data['metrics']);
+            $this->assertSame(array_fill(0, $cantidad, 0), array_column($data['metrics'], 'value'));
+            $this->assertNotContains('Alertas activas', array_column($data['metrics'], 'label'));
             $this->assertNotEmpty($data['panels']);
         }
     }

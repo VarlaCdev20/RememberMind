@@ -24,7 +24,7 @@ class ReporteInstitucionalController extends Controller
             'salud' => $this->service->obtenerResumenSalud(),
             'redFamiliar' => $this->service->obtenerRedFamiliar(),
             'equipo' => $this->service->obtenerEquipoInstitucional(),
-            'alertas' => $this->service->obtenerAlertasEstructuradas(),
+            'alertas' => $this->service->obtenerAlertasEstructuradas(auth()->user()),
             'bitacora' => array_slice($this->service->obtenerBitacoraAuditoria(), 0, 5),
         ];
     }

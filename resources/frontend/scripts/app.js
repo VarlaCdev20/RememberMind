@@ -1,5 +1,9 @@
 import './utilities/bootstrap.js';
+import Swal from 'sweetalert2';
+window.Swal = Swal;
 import './modules/operaciones-interactivas.js';
+import './modules/alertas-signos.js';
+import './modules/alertas-trazabilidad.js';
 import './modules/medicacion-registro.js';
 import './modules/medicacion-agenda-graficas.js';
 import './modules/orion-explorador.js';
@@ -176,3 +180,6 @@ import './modules/ficha-estudios.js';
 // Dashboard de Enfermería: ciclos de gráficas y navegación compartidos.
 import './modules/nursing-dashboard.js';
 import './modules/livewire-access-feedback.js';
+import './modules/alertas-interaccion.js';
+
+import './modules/valoraciones-explorador.js';

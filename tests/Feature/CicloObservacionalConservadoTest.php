@@ -5,11 +5,16 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\ControlCognitivo;
+<<<<<<< HEAD
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Jornada;
 use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\Turno;
+=======
+use App\Models\Personal;
+use App\Models\Residente;
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 use App\Models\User;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarObservacionesConservadas;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarRevisionesValoracionExperta;
@@ -58,6 +63,7 @@ final class CicloObservacionalConservadoTest extends TestCase
 
         // Cambio sintético posterior: la consulta histórica debe seguir leyendo lo guardado.
         $control->update(['repite_preguntas' => false, 'olvida_indicaciones' => true]);
+<<<<<<< HEAD
         $enfermera = User::factory()->create(['estado' => 'ACTIVO']);
         $enfermera->assignRole('ENFERMEROS');
         $personalEnfermeria = Personal::create(['cod_usuario' => $enfermera->getKey(), 'nombres' => 'Enfermera',
@@ -71,6 +77,8 @@ final class CicloObservacionalConservadoTest extends TestCase
             ->assertSee('Evaluación observacional guardada con 1 control.')
             ->assertSee('Se documentó un episodio de repetición de preguntas.')
             ->assertDontSee('Consulta actual de 1 de 1 control');
+=======
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         $revisadas = [];
         foreach ($orden as $disciplina) {
             $actor = $actores[$disciplina];

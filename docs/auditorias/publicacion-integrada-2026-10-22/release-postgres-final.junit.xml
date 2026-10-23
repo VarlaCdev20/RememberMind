@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\phpunit.postgres.xml" tests="14" assertions="89" errors="0" failures="1" skipped="0" time="42.490072">
+    <testsuite name="Feature" tests="14" assertions="89" errors="0" failures="1" skipped="0" time="42.490072">
+      <testsuite name="Tests\Feature\SidebarServiceTest" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" tests="14" assertions="89" errors="0" failures="1" skipped="0" time="42.490072">
+        <testcase name="test_superadministrador_sidebar_estructura_y_sin_duplicados" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="39" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="9" time="5.860675"/>
+        <testcase name="test_superadmin_conserva_sidebar_global_en_cualquier_contexto" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="62" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="5" time="2.347545"/>
+        <testcase name="test_administrador_sidebar_estructura_y_sin_duplicados" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="77" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="23" time="2.291188"/>
+        <testcase name="test_medico_sidebar_estructura" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="122" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="2" time="2.587309"/>
+        <testcase name="test_psicologo_sidebar_muestra_valoraciones_y_oculta_placeholders" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="145" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="14" time="2.522917"/>
+        <testcase name="test_fisioterapeuta_sidebar_muestra_inicio_y_alertas_de_especialidad" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="172" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="1" time="2.344768"/>
+        <testcase name="test_nutricionista_sidebar_muestra_inicio_y_alertas_de_especialidad" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="184" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="8" time="2.117185"/>
+        <testcase name="test_pedagogo_sidebar_estructura" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="205" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="2" time="2.144403">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SidebarServiceTest::test_pedagogo_sidebar_estructura&#13;
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+     0 =&gt; 'dashboard',
+-    1 =&gt; 'admin.adultos-mayores.index',
++    1 =&gt; 'admin.alertas-clinicas.index',
++    2 =&gt; 'admin.adultos-mayores.index',
+ ]
+&#13;
+C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php:215</failure>
+        </testcase>
+        <testcase name="test_familiar_sidebar_muestra_solo_inicio" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="221" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="1" time="2.261757"/>
+        <testcase name="test_layout_desktop_sidebar_fixed_y_accordion_en_superadmin_usuarios" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="233" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="10" time="5.078871"/>
+        <testcase name="test_layout_superadmin_en_consulta_de_residentes_conserva_sidebar_tecnico" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="255" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="5" time="4.173139"/>
+        <testcase name="test_layout_desktop_en_administrador" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="269" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="3" time="2.721670"/>
+        <testcase name="test_layout_desktop_en_enfermero" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="281" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="4" time="2.960532"/>
+        <testcase name="test_superadmin_puede_consultar_dashboard_operativo_de_administracion" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="293" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="2" time="3.078113"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

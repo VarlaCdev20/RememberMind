@@ -1,5 +1,8 @@
 <div class="rm-page-layout relative mx-auto max-w-7xl space-y-5 text-[var(--rm-text-primary)]">
  <div class="relative z-10 space-y-5">
+ @if($seccionActiva === 'valoracion')
+ <x-ui.acceso-valoraciones />
+ @endif
  @if($seccionActiva === 'resumen')
  {{-- ENCABEZADO PRINCIPAL --}}
  <x-ui.page-header

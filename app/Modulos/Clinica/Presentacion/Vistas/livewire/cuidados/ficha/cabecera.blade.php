@@ -126,7 +126,7 @@
                         </span>
 
                         {{-- Contador de alertas activas --}}
-                        @php $totalAlertasAct = $adultoMayor->alertas->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])->count(); @endphp
+                        @php $totalAlertasAct = $adultoMayor->alertas->whereIn('estado', \App\Models\Alerta::ESTADOS_ACTIVOS)->count(); @endphp
                         @if($totalAlertasAct > 0)
                             <span class="inline-flex items-center gap-1 rounded-lg bg-[var(--rm-danger-soft)] dark:bg-[var(--rm-danger-soft)] px-2.5 py-0.5 text-xs font-bold text-[var(--rm-danger-strong)] dark:text-[var(--rm-danger-strong)] border border-[var(--rm-danger-strong)] dark:border-[var(--rm-danger-strong)]">
                                 <i class="ph-bold ph-warning"></i>

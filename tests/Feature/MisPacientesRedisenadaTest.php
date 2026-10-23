@@ -207,11 +207,10 @@ class MisPacientesRedisenadaTest extends TestCase
 
         Alerta::create([
             'cod_residente' => $this->residenteCritico->cod_residente,
-            'cod_turno' => $this->turno->cod_turno,
-            'tipo_alerta' => 'SIGNOS',
-            'nivel' => 'CRITICO',
-            'origen' => 'SIGNOS',
-            'motivo' => 'Presión arterial descompensada severa.',
+            'tipo' => 'SIGNOS',
+            'prioridad' => 'CRITICO',
+            'modulo' => 'SIGNOS',
+            'descripcion' => 'Presión arterial descompensada severa.',
             'estado' => 'ABIERTA',
             'cod_personal_responsable' => $this->personal->cod_personal,
         ]);
@@ -628,6 +627,7 @@ class MisPacientesRedisenadaTest extends TestCase
             if (isset($opcion['form'])) {
                 $this->assertSame('button', $acciones[$label]['tag']);
                 $this->assertStringContainsString("abrirFormularioRegistro('".$opcion['form']."')", $acciones[$label]['attributes']);
+
                 continue;
             }
             $url = route($opcion['route'], array_merge($opcion['parameters'] ?? [], ['adulto' => $this->residenteEstable->cod_residente, 'cuidado' => $clave]));
@@ -1649,7 +1649,7 @@ class MisPacientesRedisenadaTest extends TestCase
             'cod_personal' => $this->personal->cod_personal,
             'tipo_atencion' => 'MEDICA',
             'motivo' => 'Orden programada de prueba',
-            'fecha_hora' => now(),
+            'fecha_hora' => today()->setTime(7, 0),
             'estado' => 'REALIZADA',
         ]);
         $prescripcion = Prescripcion::create([
@@ -1663,7 +1663,7 @@ class MisPacientesRedisenadaTest extends TestCase
             'via_administracion' => 'ORAL',
             'frecuencia' => 'Cada 24 horas',
             'segun_necesidad' => false,
-            'fecha_hora_prescripcion' => now()->subMinute(),
+            'fecha_hora_prescripcion' => today()->setTime(7, 0),
             'estado' => $estado,
         ]);
         $horario = HorarioPrescripcion::create([
@@ -3285,6 +3285,9 @@ class MisPacientesRedisenadaTest extends TestCase
         }
         $anulado = $service->registrarHidratacion($this->residenteEstable->cod_residente, ['cantidad_ml' => 500], $this->enfermero);
         $anulado->update(['estado' => 'ANULADO']);
+        app(AlertasService::class)->registrarIntervencion(
+            Alerta::where('cod_residente', $this->residenteCritico->getKey())->sole(),
+            'Intervención sintética documentada antes de continuar los cuidados.', $this->enfermero);
         $service->registrarHidratacion($this->residenteCritico->cod_residente, ['cantidad_ml' => 500], $this->enfermero);
         $vista->call('cerrarSelectorRegistro')->call('mostrarSelectorRegistro')->call('abrirFormularioRegistro', 'hidratacion')
             ->assertSet('hidratacionContinuidad', ['aportes' => 4, 'acumulado' => 950.0])
@@ -3877,6 +3880,9 @@ class MisPacientesRedisenadaTest extends TestCase
         $older = $service->registrarMovilidad($this->residenteEstable->cod_residente, ['marcha' => 'ASISTIDA', 'fatiga' => 'LEVE'], $this->enfermero);
         $this->travel(1)->minutes();
         $latest = $service->registrarMovilidad($this->residenteEstable->cod_residente, ['marcha' => 'INDEPENDIENTE', 'actividad_realizada' => 'CAMINAR_HABITACION', 'distancia_metros' => 5], $this->enfermero);
+        app(AlertasService::class)->registrarIntervencion(
+            Alerta::where('cod_residente', $this->residenteCritico->getKey())->sole(),
+            'Intervención sintética documentada antes de continuar los cuidados.', $this->enfermero);
         $service->registrarMovilidad($this->residenteCritico->cod_residente, ['marcha' => 'ENCAMADO'], $this->enfermero);
         $ui = $this->formularioMovilidad()->assertSet('movContinuidad', ['registros' => 2, 'deambulacion' => 1, 'fatiga' => 1]);
         $this->assertSame([$latest->cod_movilidad, $older->cod_movilidad], array_column($ui->get('movHistorial'), 'codigo'));
@@ -3949,17 +3955,17 @@ class MisPacientesRedisenadaTest extends TestCase
         if (DB::getDriverName() !== 'sqlite') {
             $this->markTestSkipped('El trigger sintético está escrito para SQLite. PostgreSQL se verifica en QA aislado con timeout de bloqueo.');
         }
-        $this->travelTo(today()->setTime(10,0));
+        $this->travelTo(today()->setTime(10, 0));
         $this->actingAs($this->enfermero);
         DB::unprepared("CREATE TRIGGER movilidad_qa_failure BEFORE INSERT ON registros_movilidad BEGIN SELECT RAISE(ABORT, 'qa insert failure'); END");
         try {
-            $this->formularioMovilidad()->set('movMarcha','ASISTIDA')->set('movDatos.dispositivo','ANDADOR')
-                ->set('movObservacion','Captura que debe conservarse')->call('guardarCuidado')
-                ->assertHasErrors('movilidad_guardado')->assertSet('drawerPaso','register-form')
-                ->assertSet('mostrarSelectorModal',true)->assertSet('movMarcha','ASISTIDA')
-                ->assertSet('movDatos.dispositivo','ANDADOR')->assertSet('movObservacion','Captura que debe conservarse')
-                ->assertSet('movResultado',[])->assertSee('Conservamos los datos')->assertDontSee('qa insert failure');
-            $this->assertDatabaseCount('registros_movilidad',0);
+            $this->formularioMovilidad()->set('movMarcha', 'ASISTIDA')->set('movDatos.dispositivo', 'ANDADOR')
+                ->set('movObservacion', 'Captura que debe conservarse')->call('guardarCuidado')
+                ->assertHasErrors('movilidad_guardado')->assertSet('drawerPaso', 'register-form')
+                ->assertSet('mostrarSelectorModal', true)->assertSet('movMarcha', 'ASISTIDA')
+                ->assertSet('movDatos.dispositivo', 'ANDADOR')->assertSet('movObservacion', 'Captura que debe conservarse')
+                ->assertSet('movResultado', [])->assertSee('Conservamos los datos')->assertDontSee('qa insert failure');
+            $this->assertDatabaseCount('registros_movilidad', 0);
         } finally {
             DB::unprepared('DROP TRIGGER movilidad_qa_failure');
         }

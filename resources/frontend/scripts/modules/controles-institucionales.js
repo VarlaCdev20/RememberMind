@@ -13,9 +13,9 @@ export function diasDelMes(year, month) {
     })];
 }
 
-export function rmSelector(value = null, { native = false, autoSubmit = false } = {}) {
+export function rmSelector(value = null, { native = false, autoSubmit = false, searchThreshold = 15 } = {}) {
     return {
-        open: false, search: '', options: [], active: 0, popupStyle: '', value,
+        open: false, search: '', options: [], active: 0, popupStyle: '', value, bloqueado: false,
         init() {
             this.$nextTick(() => {
                 this.readOptions();
@@ -33,6 +33,7 @@ export function rmSelector(value = null, { native = false, autoSubmit = false } 
             this.$refs.native.removeEventListener('change', this.nativeChange);
         },
         readOptions() {
+            this.bloqueado = Boolean(this.$refs.native.disabled);
             this.options = Array.from(this.$refs.native.options, o => ({ value: o.value, label: o.textContent.trim(), disabled: o.disabled }));
         },
         readNativeValue() {
@@ -44,7 +45,7 @@ export function rmSelector(value = null, { native = false, autoSubmit = false } 
             for (const option of this.$refs.native.options) option.selected = this.selected(option.value);
         },
         get filtered() { return this.options.filter(o => normalizar(o.label).includes(normalizar(this.search))); },
-        get hasSearch() { return this.options.length > 10; },
+        get hasSearch() { return this.options.filter(option => option.value !== '' && !option.disabled).length >= Math.max(2, Number(searchThreshold) || 15); },
         get multiple() { return this.$refs.native?.multiple || false; },
         selected(value) { return this.multiple ? (Array.isArray(this.value) && this.value.includes(value)) : String(this.value ?? '') === value; },
         get label() {
@@ -71,7 +72,7 @@ export function rmSelector(value = null, { native = false, autoSubmit = false } 
         },
         close() { this.open = false; this.$refs.trigger.focus({ preventScroll: true }); },
         choose(option) {
-            if (option.disabled) return;
+            if (option.disabled || this.$refs.native.disabled) return;
             this.value = this.multiple
                 ? (this.selected(option.value) ? this.value.filter(v => v !== option.value) : [...(this.value || []), option.value])
                 : option.value;
@@ -105,12 +106,22 @@ export function rmSelector(value = null, { native = false, autoSubmit = false } 
 
 export function rmCalendario({ min = '', max = '', value = '' } = {}) {
     return {
-        open: false, value, year: new Date().getFullYear(), month: new Date().getMonth(), popupStyle: '', min, max,
+        open: false, value, year: new Date().getFullYear(), month: new Date().getMonth(), popupStyle: '', min, max, bloqueado: false,
+        init() {
+            this.$nextTick(() => {
+                const actualizar = () => { this.bloqueado = Boolean(this.$refs.native.disabled || this.$refs.native.readOnly); };
+                actualizar();
+                this.observer = new MutationObserver(actualizar);
+                this.observer.observe(this.$refs.native, { attributes: true, attributeFilter: ['disabled', 'readonly'] });
+            });
+        },
+        destroy() { this.observer?.disconnect(); },
         get days() { return diasDelMes(this.year, this.month); },
         get monthLabel() { const date = new Date(0); date.setFullYear(this.year, this.month, 1); return date.toLocaleDateString('es-BO', { month: 'long' }); },
         get label() { return this.value ? new Date(`${this.value}T12:00:00`).toLocaleDateString('es-BO') : 'Elegir fecha'; },
         allowed(day) { return !!day && (!this.min || day >= this.min) && (!this.max || day <= this.max); },
         show() {
+            if (this.$refs.native.disabled || this.$refs.native.readOnly) return;
             this.min = this.$refs.native.dataset.min || '';
             this.max = this.$refs.native.dataset.max || '';
             const base = this.value || (this.max && this.max < fechaLocal(new Date()) ? this.max : fechaLocal(new Date()));
@@ -130,6 +141,7 @@ export function rmCalendario({ min = '', max = '', value = '' } = {}) {
         },
         changeYear(value) { const year = Number(value); if (Number.isInteger(year) && year >= 1 && year <= 9999) this.year = year; },
         choose(day) {
+            if (this.$refs.native.disabled || this.$refs.native.readOnly) return;
             if (day && !this.allowed(day)) return;
             this.value = day;
             this.$nextTick(() => {

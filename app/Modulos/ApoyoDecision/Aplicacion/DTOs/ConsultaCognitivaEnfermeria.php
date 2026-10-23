@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Modulos\ApoyoDecision\Aplicacion\DTOs;
 
+<<<<<<< HEAD
 use MotorExperto\dominio\conocimiento\reglas\EvaluadorObservaciones;
 
+=======
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 /** Contrato de lectura: no normaliza, interpreta ni reconstruye inferencias. */
 final class ConsultaCognitivaEnfermeria
 {
@@ -20,9 +23,15 @@ final class ConsultaCognitivaEnfermeria
         $principal = $informe['areas']['COG-MEM'] ?? $actual;
         $sin = $datos['evaluacion'] === null;
         $integridad = ! empty($datos['perfil']['COG-MEM']['integridad'] ?? $datos['detalle']['integridad'] ?? []);
+<<<<<<< HEAD
         $titulo = $integridad ? 'No se puede mostrar el resultado' : ($sin ? 'Sin evaluación clínica conservada' : self::texto($informe['narrativa']['conclusion']));
         $resumen = $integridad ? 'La evaluación presenta información inconsistente. No se puede mostrar una conclusión verificada.'
             : ($sin ? 'Todavía no hay un resultado clínico publicable para este residente. Debajo puede consultar los hallazgos del seguimiento cognitivo y los controles originales disponibles.' : self::texto($informe['narrativa']['resumen']));
+=======
+        $titulo = $integridad ? 'No se puede mostrar el resultado' : ($sin ? 'Sin conclusión experta disponible' : self::texto($informe['narrativa']['conclusion']));
+        $resumen = $integridad ? 'La evaluación presenta información inconsistente. No se puede mostrar una conclusión verificada.'
+            : ($sin ? 'Todavía no se dispone de una conclusión experta para este residente. Puedes consultar los controles cognitivos registrados.' : self::texto($informe['narrativa']['resumen']));
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         if (! $sin && ! $integridad && str_contains(mb_strtolower($principal['estado']), 'insuficiente')) {
             $titulo = 'Información insuficiente para concluir';
             $resumen = 'La información disponible no permite determinar un resultado para el área seleccionada.';
@@ -49,6 +58,7 @@ final class ConsultaCognitivaEnfermeria
             'estado_principal' => isset($datos['simulacion_local']) ? 'Resultado conservado' : $principal['estado']];
     }
 
+<<<<<<< HEAD
     /** Expone la lectura observacional con su alcance; no la convierte en resultado DCL. */
     public function presentarObservaciones(?array $lectura): ?array
     {
@@ -86,6 +96,8 @@ final class ConsultaCognitivaEnfermeria
         ];
     }
 
+=======
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
     /** Solo agrupa medidas ya normalizadas de idéntica procedencia instrumental y referencia. */
     public function series(?array $capturas, string $area, array $componentes = []): array
     {

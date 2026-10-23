@@ -137,7 +137,7 @@ class SidebarServiceTest extends TestCase
             'admin.medico.signos-vitales',
             'admin.salud-seguimiento.ficha.index',
             'admin.salud-seguimiento.medicacion.index',
-            'admin.salud-seguimiento.alertas',
+            'admin.alertas-clinicas.index',
             'admin.salud-seguimiento.reportes',
         ], $routes);
     }
@@ -169,7 +169,7 @@ class SidebarServiceTest extends TestCase
         $this->assertNotContains('admin.psicologia.pacientes.historial', $routes);
     }
 
-    public function test_fisioterapeuta_sidebar_muestra_solo_inicio(): void
+    public function test_fisioterapeuta_sidebar_muestra_inicio_y_alertas_de_especialidad(): void
     {
         $user = User::factory()->create(['estado' => 'ACTIVO']);
         $user->assignRole('FISIOTERAPEUTA');
@@ -178,10 +178,10 @@ class SidebarServiceTest extends TestCase
         $sidebar = app(SidebarService::class)->getSidebar();
         $routes = $this->extractAllRoutes($sidebar);
 
-        $this->assertSame(['dashboard'], $routes);
+        $this->assertSame(['dashboard', 'admin.alertas-clinicas.index'], $routes);
     }
 
-    public function test_nutricionista_sidebar_muestra_solo_inicio(): void
+    public function test_nutricionista_sidebar_muestra_inicio_y_alertas_de_especialidad(): void
     {
         $user = User::factory()->create(['estado' => 'ACTIVO']);
         $user->assignRole('NUTRICIONISTA');
@@ -190,7 +190,7 @@ class SidebarServiceTest extends TestCase
         $sidebar = app(SidebarService::class)->getSidebar();
         $routes = $this->extractAllRoutes($sidebar);
 
-        $this->assertSame(['dashboard'], $routes);
+        $this->assertSame(['dashboard', 'admin.alertas-clinicas.index'], $routes);
 
         // Placeholders de nutrición no deben estar presentes
         $this->assertNotContains('admin.nutricion.dashboard', $routes);
@@ -214,6 +214,7 @@ class SidebarServiceTest extends TestCase
         $this->assertSame(count($routes), count(array_unique($routes)));
         $this->assertSame([
             'dashboard',
+            'admin.alertas-clinicas.index',
             'admin.adultos-mayores.index',
         ], $routes);
     }

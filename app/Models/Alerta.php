@@ -2,13 +2,20 @@
 
 namespace App\Models;
 
+use App\Compartido\Infraestructura\Persistencia\GeneradorCodigo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Str;
 use LogicException;
 
 class Alerta extends ModeloOperativo
 {
+    /** Estados operativos observados. No constituyen un nuevo catálogo físico. */
+    public const ESTADOS_ACTIVOS = ['ABIERTA', 'RECONOCIDA', 'ASIGNADA', 'EN_ATENCION', 'PENDIENTE'];
+
+    public const ESTADOS_TERMINALES = ['CERRADA', 'ANULADA'];
+
+    public const PRIORIDADES_ALTAS = ['ALTO', 'ALTA', 'CRITICO', 'CRITICA'];
+
     protected $table = 'alertas';
 
     protected $primaryKey = 'cod_alerta';
@@ -33,11 +40,6 @@ class Alerta extends ModeloOperativo
         'fecha_hora_limite',
         'generacion',
         'estado',
-                'nivel',
-        'motivo',
-        'responsable_id',
-        'tipo_alerta',
-        'cod_turno',
     ];
 
     protected function casts(): array
@@ -53,11 +55,6 @@ class Alerta extends ModeloOperativo
         return $this->hasMany(EventoAlerta::class, 'cod_alerta', 'cod_alerta');
     }
 
-    public function adultoMayor(): BelongsTo
-    {
-        return $this->belongsTo(Residente::class, 'cod_residente', 'cod_residente');
-    }
-
     public function residente(): BelongsTo
     {
         return $this->belongsTo(Residente::class, 'cod_residente', 'cod_residente');
@@ -71,31 +68,31 @@ class Alerta extends ModeloOperativo
     // Scopes
     public function scopeAbiertas($query)
     {
-        return $query->whereIn('estado', ['ABIERTA', 'EN_ATENCION']);
+        return $query->whereIn('estado', self::ESTADOS_ACTIVOS);
     }
 
     public function scopeCriticas($query)
     {
-        return $query->where('prioridad', 'CRITICO');
+        return $query->whereIn('prioridad', ['CRITICO', 'CRITICA']);
     }
 
-    public function scopePorAdulto($query, string $codResidente)
+    public function scopePorResidente($query, string $codResidente)
     {
         return $query->where('cod_residente', $codResidente);
     }
 
     public function puedeCerrarse(): bool
     {
-        return in_array($this->estado, ['ABIERTA', 'EN_ATENCION'], true);
+        return in_array($this->estado, [...self::ESTADOS_ACTIVOS, 'ATENDIDA'], true);
     }
 
     public static function coloresPorNivel(): array
     {
         return [
-            'BAJO'   => 'text-estado-exito border-estado-exitoBorde bg-estado-exitoBg',
-            'MEDIO'  => 'text-estado-advertencia border-estado-advertenciaBorde bg-estado-advertenciaBg',
-            'ALTO'   => 'text-boton-acento border-borde-focus bg-estado-peligroBg',
-            'CRITICO'=> 'text-white border-red-700 bg-red-600',
+            'BAJO' => 'text-estado-exito border-estado-exitoBorde bg-estado-exitoBg',
+            'MEDIO' => 'text-estado-advertencia border-estado-advertenciaBorde bg-estado-advertenciaBg',
+            'ALTO' => 'text-boton-acento border-borde-focus bg-estado-peligroBg',
+            'CRITICO' => 'text-white border-red-700 bg-red-600',
         ];
     }
 
@@ -105,25 +102,7 @@ class Alerta extends ModeloOperativo
 
         static::creating(function (self $model) {
             if (empty($model->cod_alerta)) {
-                $model->cod_alerta = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('alertas', $model->getConnectionName());
-            }
-
-
-
-            if (isset($model->attributes['nivel']) && empty($model->attributes['prioridad'])) {
-                $model->prioridad = $model->attributes['nivel'];
-            }
-
-            if (isset($model->attributes['motivo']) && empty($model->attributes['descripcion'])) {
-                $model->descripcion = $model->attributes['motivo'];
-            }
-
-            if (isset($model->attributes['tipo_alerta']) && empty($model->attributes['tipo'])) {
-                $model->tipo = $model->attributes['tipo_alerta'];
-            }
-
-            if (isset($model->attributes['responsable_id']) && empty($model->attributes['cod_personal_responsable'])) {
-                $model->cod_personal_responsable = $model->attributes['responsable_id'];
+                $model->cod_alerta = app(GeneradorCodigo::class)->siguiente('alertas', $model->getConnectionName());
             }
 
             if (empty($model->fecha_hora)) {
@@ -135,7 +114,7 @@ class Alerta extends ModeloOperativo
             }
 
             if (empty($model->prioridad)) {
-                $model->prioridad = 'MEDIA';
+                $model->prioridad = 'MEDIO';
             }
 
             if (empty($model->generacion)) {
@@ -147,7 +126,7 @@ class Alerta extends ModeloOperativo
             }
 
             if (empty($model->titulo)) {
-                $model->titulo = !empty($model->descripcion) ? mb_substr((string)$model->descripcion, 0, 100) : 'Alerta clínica';
+                $model->titulo = ! empty($model->descripcion) ? mb_substr((string) $model->descripcion, 0, 100) : 'Alerta clínica';
             }
 
             if (empty($model->descripcion)) {
@@ -158,17 +137,13 @@ class Alerta extends ModeloOperativo
                 throw new LogicException('La alerta requiere un residente explícito.');
             }
 
-            if (isset($model->attributes['nivel']) && empty($model->prioridad)) {
-                $model->prioridad = $model->attributes['nivel'];
-            }
-
             $validCols = [
                 'cod_alerta', 'cod_residente', 'cod_personal_responsable',
                 'tipo', 'prioridad', 'generacion', 'titulo', 'descripcion',
-                'fecha_hora', 'fecha_hora_limite', 'modulo', 'cod_registro', 'estado'
+                'fecha_hora', 'fecha_hora_limite', 'modulo', 'cod_registro', 'estado',
             ];
             foreach (array_keys($model->attributes) as $key) {
-                if (!in_array($key, $validCols, true)) {
+                if (! in_array($key, $validCols, true)) {
                     unset($model->attributes[$key]);
                 }
             }

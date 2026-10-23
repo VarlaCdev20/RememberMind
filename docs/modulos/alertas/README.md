@@ -18,6 +18,8 @@ related_modules: [alertas]
 
 # Alertas
 
+Implementación de presentación por especialidad, 22 de octubre de 2026: [representaciones funcionales, campos, integración y verificación](REPRESENTACIONES_FUNCIONALES_2026_10_22.md). Este informe acotado no sustituye el contrato ni aprueba nuevas reglas clínicas.
+
 Compilación vigente, no aprobación de reglas nuevas. **APPROVED CONTRACT**: [AGENTS](../../../AGENTS.md), [baseline](../../../docs/base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md), [diccionario](../../../docs/base-de-datos/REMEMBERMIND_BDD_70_TABLAS.md), [roles](../../../docs/arquitectura/REMEMBERMIND_ROLES_BASELINE_CONGELADO.md). Descripciones de entradas, estados, clases y efectos son **OBSERVED IMPLEMENTATION**, sin certificar cumplimiento en todas las variantes. **CONFLICT** y **TECHNICAL DEBT** señalan discrepancias; **OPEN DECISION** no autoriza cambiar contrato.
 
 Fase 2 documentó evidencia estática. Fase 3 ejecutó pruebas acotadas en PostgreSQL aislado: [trazabilidad](../../TRAZABILIDAD.md). runtime_verified: false conserva ausencia de certificación global; verified_against_commit identifica la base, no un commit de estas correcciones.

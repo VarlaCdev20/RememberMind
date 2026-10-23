@@ -48,12 +48,18 @@ final class NavegacionSistemaExpertoTest extends TestCase
 
         $this->get(route('admin.psicologia.dashboard'))
             ->assertOk()->assertSee('Mis residentes')
+<<<<<<< HEAD
             ->assertSee('Abrir sistema experto')
             ->assertSee(route('admin.sistema-experto.residentes'), false)
             ->assertSee(route('admin.psicologia.evaluaciones'), false);
         $this->get(route('admin.sistema-experto.residentes'))
             ->assertOk()
             ->assertSee('Sistema experto por residente')
+=======
+            ->assertSee(route('admin.psicologia.evaluaciones'), false);
+        $this->get(route('admin.sistema-experto.residentes'))
+            ->assertOk()
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
             ->assertSee($residente->nombre_completo)
             ->assertSee('Tarjetas')
             ->assertSee('Tabla')
@@ -87,6 +93,7 @@ final class NavegacionSistemaExpertoTest extends TestCase
             ->assertDontSee($residente->nombre_completo);
     }
 
+<<<<<<< HEAD
     public function test_acceso_del_inicio_y_menu_requiere_personal_activo_y_permiso_existente(): void
     {
         $usuario = $this->profesional();
@@ -109,6 +116,8 @@ final class NavegacionSistemaExpertoTest extends TestCase
         $this->get($ruta)->assertForbidden();
     }
 
+=======
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
     public function test_medicina_consulta_resultados_y_abre_valoracion_desde_ficha(): void
     {
         $this->actingAs($this->profesional('MEDICO GENERAL/GERIATRA'));
@@ -124,13 +133,14 @@ final class NavegacionSistemaExpertoTest extends TestCase
             ->assertSee(route('admin.sistema-experto.petersen-original', $residente), false);
     }
 
-    public function test_visitante_y_superadministracion_no_acceden_a_entrada_de_captura_clinica(): void
+    public function test_visitante_no_accede_y_superadministracion_consulta_sin_captura_clinica(): void
     {
         $this->get(route('admin.sistema-experto.residentes'))->assertRedirect();
 
         $superadmin = User::factory()->create(['estado' => 'ACTIVO']);
         $superadmin->assignRole('SUPERADMINISTRADOR');
-        $this->actingAs($superadmin)->get(route('admin.sistema-experto.residentes'))->assertForbidden();
+        $this->actingAs($superadmin)->get(route('admin.sistema-experto.residentes'))->assertOk()
+            ->assertSee('Sistema experto por residente')->assertDontSee('Registrar valoración');
     }
 
     public function test_cuenta_inactiva_o_sin_personal_competente_no_recibe_el_listado(): void

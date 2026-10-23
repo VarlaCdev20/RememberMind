@@ -1,5 +1,8 @@
 <div class="space-y-6 text-rm-primary">
     <x-ui.page-header title="Conocimiento y reglas" subtitle="Versiones, autoría, archivo, sustitución y revisión del conocimiento." icon="ph-graph" />
+    @can('consultar', \App\Models\VersionModeloExperto::class)
+        <nav class="rm-expert-local-tabs" aria-label="Consulta conectada del sistema experto"><a href="{{ route('admin.sistema-experto.index') }}"><i class="ph ph-graph" aria-hidden="true"></i>Abrir explorador conectado</a><a href="{{ route('admin.sistema-experto.residentes') }}"><i class="ph ph-users-three" aria-hidden="true"></i>Consultar residentes</a><span class="rm-expert-origin">Superadministración · consulta completa</span></nav>
+    @endcan
     @if($mensaje)<div class="rm-alert rm-alert-success" role="status">{{ $mensaje }}</div>@endif
     @error('gobierno')<div class="rm-alert rm-alert-danger" role="alert">{{ $message }}</div>@enderror
     <x-ui.section-card title="Versión del conocimiento">
@@ -62,16 +65,18 @@
     </x-ui.section-card>
 
     <x-ui.section-card title="Reglas de la versión" subtitle="El archivo y la sustitución conservan una versión nueva; las definiciones anteriores siguen consultables.">
+        <div class="rm-expert-scopebar"><div><label for="expert-government-search">Buscar regla por código o nombre</label><input id="expert-government-search" type="search" maxlength="100" wire:model.live.debounce.300ms="buscarRegla" class="rm-input w-full"></div><p role="status">{{ $reglas->total() }} reglas encontradas</p></div>
         <div class="overflow-x-auto">
-            <table class="w-full text-sm"><caption class="sr-only">Reglas, decisiones y sucesoras</caption>
+            <table class="rm-lab-table"><caption class="sr-only">Reglas, decisiones y sucesoras</caption>
                 <thead><tr><th scope="col" class="text-left p-3">Regla</th><th scope="col" class="text-left p-3">Autoría y revisión</th><th scope="col" class="text-left p-3">Estado e historia</th><th scope="col" class="text-left p-3">Acciones</th></tr></thead>
                 <tbody>@forelse($reglas as $r)
-                    <tr class="border-t"><td class="p-3"><strong>{{ $r->nombre }}</strong><p>{{ $r->codigo_regla }}</p><p>{{ $r->descripcion }}</p></td>
-                        <td class="p-3">Propuesta: {{ $r->usuarioCreacion?->correo ?? $r->cod_usuario_creacion }}<p>{{ $r->fecha_hora_creacion }}</p><p>Revisión: {{ $r->estado_revision ?? 'Sin revisión registrada' }}</p>
+                    <tr class="border-t"><td class="p-3" data-label="Regla"><strong>{{ $r->nombre }}</strong><p>{{ $r->codigo_regla }}</p><p>{{ $r->descripcion }}</p></td>
+                        <td class="p-3" data-label="Autoría y revisión">Propuesta: {{ $r->usuarioCreacion?->correo ?? $r->cod_usuario_creacion }}<p>{{ $r->fecha_hora_creacion }}</p><p>Revisión: {{ $r->estado_revision ?? 'Sin revisión registrada' }}</p>
                             @if($r->cod_usuario_revision)<p>{{ $r->usuarioRevision?->correo ?? $r->cod_usuario_revision }} · {{ $r->fecha_hora_revision }}</p><p>{{ $r->justificacion_revision }}</p>@endif
                         </td>
-                        <td class="p-3">{{ $r->estado }}<p>Anterior: {{ $r->reglaAnterior?->codigo_regla ?? 'Sin antecesora' }}</p>@foreach($r->reglasSucesoras as $s)<p>Sucesora: {{ $s->codigo_regla }} · {{ $s->estado }}</p>@endforeach</td>
-                        <td class="p-3 space-y-2">
+                        <td class="p-3" data-label="Estado e historia">{{ $r->estado }}<p>Anterior: {{ $r->reglaAnterior?->codigo_regla ?? 'Sin antecesora' }}</p>@foreach($r->reglasSucesoras as $s)<p>Sucesora: {{ $s->codigo_regla }} · {{ $s->estado }}</p>@endforeach</td>
+                        <td class="p-3 space-y-2" data-label="Acciones">
+                            @can('consultar', \App\Models\VersionModeloExperto::class)<a class="rm-btn rm-btn-secondary" href="{{ route('admin.sistema-experto.index', ['version' => $versionSeleccionada, 'categoria' => 'reglas_expertas', 'dato' => $r->getKey()]) }}">Ver definición y conexiones<span class="sr-only"> de {{ $r->codigo_regla }}</span></a>@endcan
                             @if($puedeGestionar)<button type="button" class="rm-btn rm-btn-secondary" wire:click="prepararPrueba(@js($r->getKey()))">Probar condiciones<span class="sr-only"> {{ $r->codigo_regla }}</span></button>@endif
                             @if($puedeGestionar && $r->estado === 'ACTIVO')<button type="button" class="rm-btn rm-btn-secondary" wire:click="prepararArchivo(@js($r->getKey()))">{{ $contratoPetersen ? 'Archivar regla' : 'Archivar o sustituir' }}<span class="sr-only"> {{ $r->codigo_regla }}</span></button>@endif
                             @if($puedeRevisar && $r->estado === 'ACTIVO' && !in_array($r->estado_revision, ['APROBADA','RECHAZADA'], true))<button type="button" class="rm-btn rm-btn-secondary" wire:click="prepararRevision(@js($r->getKey()))">Revisar regla<span class="sr-only"> {{ $r->codigo_regla }}</span></button>@endif

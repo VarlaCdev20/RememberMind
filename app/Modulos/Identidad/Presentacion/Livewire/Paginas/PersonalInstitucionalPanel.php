@@ -286,7 +286,10 @@ class PersonalInstitucionalPanel extends Component
                 'roles',
                 'horariosSalud',
                 'horariosAdmin',
+<<<<<<< HEAD
                 // En V2 el turno pertenece a la jornada, no directamente a la asignación.
+=======
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                 'asignacionesTurno.jornada.turno',
                 'areaInstitucional',
             ]);

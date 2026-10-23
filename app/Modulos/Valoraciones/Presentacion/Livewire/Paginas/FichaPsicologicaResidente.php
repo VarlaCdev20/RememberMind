@@ -6,7 +6,10 @@ namespace App\Modulos\Valoraciones\Presentacion\Livewire\Paginas;
 
 use App\Compartido\Aplicacion\Contratos\CodigosEntidad;
 use App\Models\AplicacionInstrumento;
+<<<<<<< HEAD
 use App\Models\Area;
+=======
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 use App\Models\Atencion;
 use App\Models\ControlCognitivo;
 use App\Models\ControlFuncionalIadl;
@@ -14,6 +17,11 @@ use App\Models\Residente;
 use App\Models\User;
 use App\Models\ValoracionPetersenOriginal;
 use App\Models\ValoracionPsicologica;
+<<<<<<< HEAD
+=======
+use App\Modulos\Clinica\Aplicacion\Acciones\AutorizacionClinicaService;
+use App\Modulos\Valoraciones\Aplicacion\Acciones\RegistrarValoracionProfesional;
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 use App\Modulos\Valoraciones\Aplicacion\Consultas\ConsultarTendenciaResidente;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -44,16 +52,28 @@ final class FichaPsicologicaResidente extends Component
     // Formulario Afectivo
     public bool $mostrarFormAfectiva = false;
 
+<<<<<<< HEAD
     public array $formAfectiva = [
         'estado_animo' => 'EUTIMICO',
         'afecto' => 'ADECUADO',
         'ansiedad' => 'AUSENTE',
         'apatia' => 'AUSENTE',
+=======
+    #[Locked]
+    public bool $confirmarDescarteAfectiva = false;
+
+    public array $formAfectiva = [
+        'estado_animo' => '',
+        'afecto' => '',
+        'ansiedad' => '',
+        'apatia' => '',
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         'conducta' => '',
         'conclusion' => '',
         'recomendacion' => '',
     ];
 
+<<<<<<< HEAD
     // Formulario IADL
     public bool $mostrarFormIadl = false;
 
@@ -67,6 +87,8 @@ final class FichaPsicologicaResidente extends Component
         'fuente' => 'OBSERVACION_DIRECTA',
     ];
 
+=======
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
     // Formulario Sesión
     public bool $mostrarFormSesion = false;
 
@@ -85,8 +107,13 @@ final class FichaPsicologicaResidente extends Component
 
     public function mount(Residente $residente): void
     {
+<<<<<<< HEAD
         $this->autorizar();
         $this->residente = $residente;
+=======
+        $this->residente = $residente;
+        $this->autorizar();
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         $validTabs = ['resumen', 'cognitiva', 'afectiva', 'funcionamiento', 'entorno', 'seguimiento', 'sesiones', 'informes', 'orion'];
         if (! in_array($this->tab, $validTabs, true)) {
             $this->tab = 'resumen';
@@ -117,9 +144,17 @@ final class FichaPsicologicaResidente extends Component
     public function guardarValoracionAfectiva(): void
     {
         $usuario = $this->autorizar();
+<<<<<<< HEAD
         abort_unless($usuario->can('valoraciones_psicologicas.crear') || $usuario->hasRole('PSICOLOGO/A'), 403);
 
         $this->validate([
+=======
+        abort_unless($usuario->hasRole('PSICOLOGO/A') && $usuario->checkPermissionTo('valoraciones_psicologicas.crear', 'web'), 403);
+        Gate::forUser($usuario)->authorize('view', $this->residente);
+        $personal = app(AutorizacionClinicaService::class)->autorizarMutacion($usuario, $this->residente, 'valoraciones_psicologicas.crear', ['PSICOLOGO/A']);
+
+        $validados = $this->validate([
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
             'formAfectiva.estado_animo' => ['required', 'string', 'max:50'],
             'formAfectiva.afecto' => ['required', 'string', 'max:50'],
             'formAfectiva.ansiedad' => ['required', 'string', 'max:50'],
@@ -129,6 +164,7 @@ final class FichaPsicologicaResidente extends Component
             'formAfectiva.recomendacion' => ['nullable', 'string', 'max:1000'],
         ]);
 
+<<<<<<< HEAD
         $personal = $usuario->personal;
         abort_unless($personal, 403, 'El usuario no tiene personal activo asociado.');
 
@@ -137,6 +173,12 @@ final class FichaPsicologicaResidente extends Component
             ?? Area::firstOrCreate(['cod_area' => 'ARE_AFE'], ['nombre' => 'Afectivo y Emocional', 'estado' => 'ACTIVA'])->getKey();
 
         DB::transaction(function () use ($codigos, $personal, $codArea): void {
+=======
+        $codigos = app(CodigosEntidad::class);
+        $codArea = app(AutorizacionClinicaService::class)->areaActiva($personal)->getKey();
+
+        DB::transaction(function () use ($codigos, $personal, $codArea, $usuario, $validados): void {
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
             $atencion = Atencion::create([
                 'cod_atencion' => $codigos->siguiente('atenciones'),
                 'cod_residente' => $this->residente->getKey(),
@@ -149,6 +191,7 @@ final class FichaPsicologicaResidente extends Component
                 'observacion' => $this->formAfectiva['conclusion'],
             ]);
 
+<<<<<<< HEAD
             ValoracionPsicologica::create([
                 'cod_valoracion_psicologica' => $codigos->siguiente('valoraciones_psicologicas'),
                 'cod_residente' => $this->residente->getKey(),
@@ -173,10 +216,27 @@ final class FichaPsicologicaResidente extends Component
             'afecto' => 'ADECUADO',
             'ansiedad' => 'AUSENTE',
             'apatia' => 'AUSENTE',
+=======
+            $registro = app(RegistrarValoracionProfesional::class)->registrar($usuario,
+                [...$validados['formAfectiva'], 'cod_atencion' => $atencion->getKey()], $this->residente, 'psicologia');
+            activity('valoraciones')->causedBy($usuario)->performedOn($registro)->event('valoracion_psicologica_registrada')
+                ->log('Valoración psicológica registrada por su profesional responsable.');
+        });
+
+        $this->mostrarFormAfectiva = false;
+        $this->confirmarDescarteAfectiva = false;
+        $this->reset('formAfectiva');
+        $this->formAfectiva = [
+            'estado_animo' => '',
+            'afecto' => '',
+            'ansiedad' => '',
+            'apatia' => '',
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
             'conducta' => '',
             'conclusion' => '',
             'recomendacion' => '',
         ];
+<<<<<<< HEAD
         $this->mensajeExito = 'Valoración afectiva registrada correctamente. Queda vinculada como soporte diferencial (C04) para O.R.I.O.N.';
     }
 
@@ -226,13 +286,45 @@ final class FichaPsicologicaResidente extends Component
             'fuente' => 'OBSERVACION_DIRECTA',
         ];
         $this->mensajeExito = 'Observación funcional IADL guardada. Queda disponible como evidencia de autonomía (C03) para O.R.I.O.N.';
+=======
+        $this->mensajeExito = 'Valoración afectiva registrada correctamente. Se conservaron la atención y su autoría profesional.';
+    }
+
+    public function alternarFormularioAfectivo(): void
+    {
+        $this->autorizar();
+        if ($this->mostrarFormAfectiva && collect($this->formAfectiva)->contains(fn ($valor) => $valor !== '' && $valor !== null)) {
+            $this->confirmarDescarteAfectiva = true;
+
+            return;
+        }
+        $this->mostrarFormAfectiva = ! $this->mostrarFormAfectiva;
+    }
+
+    public function descartarValoracionAfectiva(): void
+    {
+        $this->autorizar();
+        $this->reset('formAfectiva');
+        $this->mostrarFormAfectiva = $this->confirmarDescarteAfectiva = false;
+        $this->resetValidation();
+    }
+
+    public function conservarValoracionAfectiva(): void
+    {
+        $this->autorizar();
+        $this->confirmarDescarteAfectiva = false;
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
     }
 
     public function guardarSesion(): void
     {
         $usuario = $this->autorizar();
+<<<<<<< HEAD
         $personal = $usuario->personal;
         abort_unless($personal, 403, 'El usuario no tiene personal activo asociado.');
+=======
+        $personal = app(AutorizacionClinicaService::class)->autorizarMutacion($usuario, $this->residente, 'atenciones.crear', ['PSICOLOGO/A']);
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 
         $this->validate([
             'formSesion.tipo_atencion' => ['required', 'string', 'max:60'],
@@ -241,8 +333,12 @@ final class FichaPsicologicaResidente extends Component
         ]);
 
         $codigos = app(CodigosEntidad::class);
+<<<<<<< HEAD
         $codArea = Area::where('cod_area', 'ARE_PSI')->value('cod_area')
             ?? Area::firstOrCreate(['cod_area' => 'ARE_PSI'], ['nombre' => 'Psicología', 'estado' => 'ACTIVA'])->getKey();
+=======
+        $codArea = app(AutorizacionClinicaService::class)->areaActiva($personal)->getKey();
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 
         Atencion::create([
             'cod_atencion' => $codigos->siguiente('atenciones'),
@@ -284,11 +380,21 @@ final class FichaPsicologicaResidente extends Component
     {
         $usuario = $this->autorizar();
         $codResidente = $this->residente->getKey();
+<<<<<<< HEAD
+=======
+        $puedeConsultarIadl = $usuario->checkPermissionTo('controles_funcionales_iadl.ver', 'web');
+        $puedeConsultarContactos = $usuario->checkPermissionTo('contactos.ver', 'web')
+            && $usuario->checkPermissionTo('residentes_contactos.ver', 'web');
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 
         // 1. Datos del Resumen
         $totalInstrumentos = AplicacionInstrumento::where('cod_residente', $codResidente)->count();
         $totalValoraciones = ValoracionPsicologica::where('cod_residente', $codResidente)->count();
+<<<<<<< HEAD
         $totalIadl = ControlFuncionalIadl::where('cod_residente', $codResidente)->count();
+=======
+        $totalIadl = $puedeConsultarIadl ? ControlFuncionalIadl::where('cod_residente', $codResidente)->count() : null;
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         $totalSesiones = Atencion::where('cod_residente', $codResidente)
             ->whereHas('personal', fn ($q) => $q->where('profesion', 'PSICOLOGIA'))
             ->count();
@@ -325,6 +431,10 @@ final class FichaPsicologicaResidente extends Component
                 ->orderByDesc('fecha_hora')
                 ->get();
             $controlesCognitivos = ControlCognitivo::where('cod_residente', $codResidente)
+<<<<<<< HEAD
+=======
+                ->when(! $usuario->checkPermissionTo('controles_cognitivos.ver', 'web'), fn ($q) => $q->whereRaw('1 = 0'))
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                 ->orderByDesc('fecha_hora')
                 ->get();
         } elseif ($this->tab === 'afectiva') {
@@ -339,6 +449,10 @@ final class FichaPsicologicaResidente extends Component
                 ->get();
         } elseif ($this->tab === 'funcionamiento') {
             $controlesIadl = ControlFuncionalIadl::where('cod_residente', $codResidente)
+<<<<<<< HEAD
+=======
+                ->when(! $usuario->checkPermissionTo('controles_funcionales_iadl.ver', 'web'), fn ($q) => $q->whereRaw('1 = 0'))
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                 ->orderByDesc('fecha_hora')
                 ->get();
             $instrumentosFuncionales = AplicacionInstrumento::where('cod_residente', $codResidente)
@@ -347,7 +461,13 @@ final class FichaPsicologicaResidente extends Component
                 ->orderByDesc('fecha_hora')
                 ->get();
         } elseif ($this->tab === 'entorno') {
+<<<<<<< HEAD
             $contactosFamiliares = $this->residente->familiares()->get();
+=======
+            if ($puedeConsultarContactos) {
+                $contactosFamiliares = $this->residente->familiares()->wherePivot('estado', 'ACTIVO')->where('contactos.estado', 'ACTIVO')->get();
+            }
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
             $notasEntorno = ValoracionPsicologica::where('cod_residente', $codResidente)
                 ->where(fn ($q) => $q->whereNotNull('comunicacion')->orWhereNotNull('interaccion_social'))
                 ->with('personal')
@@ -366,6 +486,10 @@ final class FichaPsicologicaResidente extends Component
                 ->get();
         } elseif ($this->tab === 'orion') {
             $juiciosPetersen = ValoracionPetersenOriginal::query()
+<<<<<<< HEAD
+=======
+                ->when(! $usuario->checkPermissionTo('valoraciones_petersen.ver', 'web'), fn ($q) => $q->whereRaw('1 = 0'))
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                 ->where('cod_residente', $codResidente)
                 ->whereDoesntHave('sucesora')
                 ->with(['personal.usuario', 'soportes'])
@@ -384,11 +508,20 @@ final class FichaPsicologicaResidente extends Component
         $puedeValorarPetersen = Gate::forUser($usuario)
             ->allows('crearOriginal', [ValoracionPetersenOriginal::class, $this->residente]);
 
+<<<<<<< HEAD
         $datosTendencia = app(ConsultarTendenciaResidente::class)->ejecutar(
             $this->residente,
             $this->metricaTendencia,
             $this->periodoMeses
         );
+=======
+        $puedeConsultarTendencia = $this->metricaTendencia !== 'iadl' || $puedeConsultarIadl;
+        $datosTendencia = $puedeConsultarTendencia ? app(ConsultarTendenciaResidente::class)->ejecutar(
+            $this->residente,
+            $this->metricaTendencia,
+            $this->periodoMeses
+        ) : null;
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 
         // Gráfica de baterías cognitivas aplicadas
         $chartCognitiva = null;
@@ -398,8 +531,13 @@ final class FichaPsicologicaResidente extends Component
             $maximosCog = [];
             foreach ($evaluacionesCognitivas->take(6) as $ev) {
                 $labelsCog[] = $ev->instrumento?->nombre ?: 'Batería';
+<<<<<<< HEAD
                 $puntajesCog[] = (float) ($ev->puntaje_total ?? 0);
                 $maximosCog[] = (float) ($ev->puntaje_maximo ?? 30);
+=======
+                $puntajesCog[] = $ev->puntaje_total !== null ? (float) $ev->puntaje_total : null;
+                $maximosCog[] = $ev->puntaje_maximo !== null ? (float) $ev->puntaje_maximo : null;
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
             }
             $chartCognitiva = [
                 'labels' => $labelsCog,
@@ -411,6 +549,7 @@ final class FichaPsicologicaResidente extends Component
         // Gráfica de distribución afectiva y emocional
         $chartAfectiva = null;
         if ($this->tab === 'afectiva' && $evaluacionesAfectivas->isNotEmpty()) {
+<<<<<<< HEAD
             $conteoAf = ['Estable / Eutímico' => 0, 'Ansiedad' => 0, 'Tristeza / Depresivo' => 0, 'Apatía' => 0];
             foreach ($evaluacionesAfectivas as $va) {
                 $st = strtoupper(trim((string) $va->estado_animo));
@@ -430,10 +569,20 @@ final class FichaPsicologicaResidente extends Component
                 'labels' => array_keys($conteoAf),
                 'data' => array_values($conteoAf),
                 'colors' => ['#4a7054', '#9476b0', '#cb6f60', '#ba9c74'],
+=======
+            $conteoAf = $evaluacionesAfectivas->groupBy(fn ($valoracion) => filled($valoracion->estado_animo)
+                ? $valoracion->estado_animo : 'No documentado')->map->count()->all();
+            $paletaAfectiva = ['#4a7054', '#9476b0', '#cb6f60', '#ba9c74'];
+            $chartAfectiva = [
+                'labels' => array_keys($conteoAf),
+                'data' => array_values($conteoAf),
+                'colors' => array_map(fn ($indice) => $paletaAfectiva[$indice % count($paletaAfectiva)], array_keys(array_values($conteoAf))),
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                 'total' => array_sum($conteoAf),
             ];
         }
 
+<<<<<<< HEAD
         // Gráfica de autonomía en actividades cotidianas IADL
         $chartIadl = null;
         if ($this->tab === 'funcionamiento') {
@@ -475,6 +624,8 @@ final class FichaPsicologicaResidente extends Component
             ];
         }
 
+=======
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         // Gráfica de sesiones por mes
         $chartSeguimiento = null;
         if (($this->tab === 'seguimiento' || $this->tab === 'sesiones') && $sesionesPsicologia->isNotEmpty()) {
@@ -493,6 +644,11 @@ final class FichaPsicologicaResidente extends Component
             'totalInstrumentos',
             'totalValoraciones',
             'totalIadl',
+<<<<<<< HEAD
+=======
+            'puedeConsultarIadl',
+            'puedeConsultarContactos',
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
             'totalSesiones',
             'ultimaValoracionPsicologica',
             'ultimaEvaluacionCognitiva',
@@ -512,7 +668,10 @@ final class FichaPsicologicaResidente extends Component
             'datosTendencia',
             'chartCognitiva',
             'chartAfectiva',
+<<<<<<< HEAD
             'chartIadl',
+=======
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
             'chartSeguimiento'
         ))->layout('layouts.sistema');
     }
@@ -523,7 +682,18 @@ final class FichaPsicologicaResidente extends Component
         abort_unless($usuario?->estado === 'ACTIVO'
             && $usuario->hasAnyRole(['SUPERADMINISTRADOR', 'PSICOLOGO/A'])
             && ! $usuario->hasRole('FAMILIAR')
+<<<<<<< HEAD
             && ($usuario->hasRole('SUPERADMINISTRADOR') || $usuario->personal()->where('estado', 'ACTIVO')->exists()), 403);
+=======
+            && $usuario->checkPermissionTo('aplicaciones_instrumento.ver', 'web')
+            && $usuario->checkPermissionTo('valoraciones_psicologicas.ver', 'web')
+            && $usuario->checkPermissionTo('atenciones.ver', 'web')
+            && Gate::forUser($usuario)->allows('viewAny', Residente::class)
+            && ($usuario->hasRole('SUPERADMINISTRADOR') || $usuario->personal()->where('estado', 'ACTIVO')->where('profesion', 'PSICOLOGIA')->exists()), 403);
+        if (isset($this->residente)) {
+            Gate::forUser($usuario)->authorize('view', $this->residente);
+        }
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 
         return $usuario;
     }

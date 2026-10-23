@@ -374,7 +374,11 @@ class ResultadosExpertoResidente extends Component
     public function irASeccion(string $seccion): void
     {
         $this->autorizar();
+<<<<<<< HEAD
         abort_unless(in_array($seccion, ['orion-desglose', 'orion-evolucion', 'hallazgos-observacionales', 'fuentes-disponibles', 'aplicaciones-instrumentales', 'orion-petersen-criterios', 'orion-petersen-detalle', 'orion-revision-profesional'], true), 422);
+=======
+        abort_unless(in_array($seccion, ['orion-desglose', 'orion-evolucion', 'hallazgos-observacionales', 'fuentes-disponibles', 'aplicaciones-instrumentales', 'orion-petersen-criterios', 'orion-revision-profesional'], true), 422);
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         $this->cerrarVentanasConsulta();
         $this->dispatch('orion-navigate', seccion: $seccion);
     }
@@ -685,11 +689,18 @@ class ResultadosExpertoResidente extends Component
                 $errorInstrumental = ! $this->analisisEjecutado;
             } else {
                 $corte = $this->fechaAnalisis ? CarbonImmutable::parse($this->fechaAnalisis) : CarbonImmutable::now();
+<<<<<<< HEAD
                 $perfilInstrumental = $consultaPerfil->consultar(auth()->user(), $residente, $corte);
+=======
+                $perfilInstrumental = $this->enfermeria
+                    ? $consultaPerfil->consultarMediciones(auth()->user(), $residente, $corte)
+                    : $consultaPerfil->consultar(auth()->user(), $residente, $corte);
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
             }
             $capturaInstrumental = $perfilInstrumental['capturas_originales'] ?? null;
             if (! $this->enfermeria) {
                 $conexionesResidente = (new ConexionesResidenteVisible)->presentar($residente->getKey(), $perfilInstrumental['petersen_institucional'] ?? null, $capturaInstrumental);
+<<<<<<< HEAD
             }
         } catch (QueryException|DomainException $e) {
             report($e);
@@ -704,11 +715,29 @@ class ResultadosExpertoResidente extends Component
                 ?? app(ConsultarHallazgosObservacionales::class)->consultar(auth()->user(), $residente, $this->getPage('observaciones'));
             if (! $this->enfermeria && $hallazgosObservacionales && $hallazgosObservacionales['persistido']) {
                 $revisionesObservacionales = app(ConsultarRevisionesValoracionExperta::class)->consultar(auth()->user(), $hallazgosObservacionales['id']);
+=======
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
             }
         } catch (QueryException|DomainException $e) {
             report($e);
-            $hallazgosObservacionales = $revisionesObservacionales = null;
-            $errorObservacional = true;
+            $errorInstrumental = true;
+            $this->analisisEjecutado = false;
+            $this->fechaAnalisis = null;
+            $this->mensajeAnalisis = null;
+        }
+        if (! $this->enfermeria) {
+            try {
+                $hallazgosObservacionales = app(ConsultarObservacionesConservadas::class)->consultar(auth()->user(), $residente,
+                    $this->evaluacionObservacional, $this->getPage('observaciones'), $this->getPage('historiaObservaciones'))
+                    ?? app(ConsultarHallazgosObservacionales::class)->consultar(auth()->user(), $residente, $this->getPage('observaciones'));
+                if ($hallazgosObservacionales && $hallazgosObservacionales['persistido']) {
+                    $revisionesObservacionales = app(ConsultarRevisionesValoracionExperta::class)->consultar(auth()->user(), $hallazgosObservacionales['id']);
+                }
+            } catch (QueryException|DomainException $e) {
+                report($e);
+                $hallazgosObservacionales = $revisionesObservacionales = null;
+                $errorObservacional = true;
+            }
         }
         try {
             $datos = $this->leerResultados($residente, $this->evaluacion, $this->getPage('historia'));
@@ -745,9 +774,12 @@ class ResultadosExpertoResidente extends Component
                 'cuidadosPendientesHoy' => collect(), 'otrosCuidadosVigentes' => collect()];
 
         $consultaEnfermeria = $datos && $informe ? (new ConsultaCognitivaEnfermeria)->presentar($datos, $informe, $perfilInstrumental) : null;
+<<<<<<< HEAD
         $observacionesEnfermeria = $this->enfermeria && ! $errorObservacional
             ? (new ConsultaCognitivaEnfermeria)->presentarObservaciones($hallazgosObservacionales)
             : null;
+=======
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         $resumenFuentes = ! $this->enfermeria && ! $errorInstrumental
             ? (new ResumirFuentesCognitivas)->presentar($capturaInstrumental, $perfilInstrumental, $hallazgosObservacionales)
             : null;
@@ -799,7 +831,11 @@ class ResultadosExpertoResidente extends Component
         $cuidadoDetalle = $this->cuidadoSeleccionado ? $continuidad['cuidadosPendientesHoy']->concat($continuidad['otrosCuidadosVigentes'])->firstWhere('clave', $this->cuidadoSeleccionado) : null;
         abort_if($this->cuidadoSeleccionado && ! $cuidadoDetalle, 404);
 
+<<<<<<< HEAD
         return view('livewire.medico.resultados-experto-residente', compact('datos', 'informe', 'fuente', 'errorLectura', 'residente', 'revisiones', 'estadoRevision', 'puedeAuditar', 'hallazgosObservacionales', 'puedeEjecutarObservaciones', 'capturaInstrumental', 'perfilInstrumental', 'revisionesObservacionales', 'errorInstrumental', 'errorObservacional', 'exploracion', 'consultaEnfermeria', 'observacionesEnfermeria', 'resumenFuentes', 'seriesEvolucion', 'actividadCognitiva', 'comparaciones', 'errorEvolucion', 'cuidadoDetalle', 'registroComponente'), $continuidad)
+=======
+        return view('livewire.medico.resultados-experto-residente', compact('datos', 'informe', 'fuente', 'errorLectura', 'residente', 'revisiones', 'estadoRevision', 'puedeAuditar', 'hallazgosObservacionales', 'puedeEjecutarObservaciones', 'capturaInstrumental', 'perfilInstrumental', 'revisionesObservacionales', 'errorInstrumental', 'errorObservacional', 'exploracion', 'consultaEnfermeria', 'resumenFuentes', 'seriesEvolucion', 'actividadCognitiva', 'comparaciones', 'errorEvolucion', 'cuidadoDetalle', 'registroComponente'), $continuidad)
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
             ->with('cohorteEntrenamiento', $cohorteEntrenamiento)
             ->with('conexionesResidente', $conexionesResidente)
             ->layout($this->enfermeria ? 'layouts.enfermeria' : 'layouts.sistema');

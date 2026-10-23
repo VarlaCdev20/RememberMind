@@ -36,6 +36,7 @@ test('sistema experto real: roles, grafo, teclado y cinco anchos', { skip: proce
     t.after(async () => { await browser.close(); server.kill(); });
     await page.evaluateOnNewDocument(() => localStorage.setItem('remembermind-theme', 'light'));
     const go = async (actor, url) => {
+<<<<<<< HEAD
         // Cada rol es una sesión clínica independiente. AuthenticateSession
         // rechaza reutilizar la cookie que dejó el actor anterior.
         await page.deleteCookie(...await page.cookies(base));
@@ -43,6 +44,11 @@ test('sistema experto real: roles, grafo, teclado y cinco anchos', { skip: proce
         const r = await page.goto(base + url, { waitUntil: 'networkidle0' });
         assert.equal(r.status(), 200, `${url}: ${(await page.$eval('body', el => el.innerText)).slice(0, 250)}`);
         assert.equal(new URL(page.url()).pathname, url, `La ruta ${url} no debe redirigir a otra pantalla`);
+=======
+        await page.setExtraHTTPHeaders({ 'X-RM-Experto': env.RM_EXPERTO_TOKEN, 'X-RM-Actor': actor });
+        const r = await page.goto(base + url, { waitUntil: 'networkidle0' });
+        assert.equal(r.status(), 200, url);
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         await page.waitForFunction(() => window.Livewire);
     };
     const click = async text => {
@@ -63,9 +69,13 @@ test('sistema experto real: roles, grafo, teclado y cinco anchos', { skip: proce
             if (width !== 1440) await page.screenshot({ path: evidence(`${role}-${width}.png`), fullPage: true });
         }
         if (phase !== 'antes') {
+<<<<<<< HEAD
             // El catálogo de superadministración conserva identificadores de
             // versión técnicos; aquí se detectan únicamente errores de render.
             assert.doesNotMatch(await page.$eval('body', el => el.innerText), /\bNaN\b|\bundefined\b|\[object Object\]/);
+=======
+            assert.doesNotMatch(await page.$eval('body', el => el.innerText), /O\.R\.I\.O\.N\.|\bORION\b|\bNaN\b|\bundefined\b|\[object Object\]/);
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
             await page.setViewport({ width: 640, height: 500 });
             assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${role} zoom/reflow`);
         }
@@ -110,6 +120,7 @@ test('sistema experto real: roles, grafo, teclado y cinco anchos', { skip: proce
 
         const cohorte = JSON.parse(await readFile(db + '.cohorte.json', 'utf8'));
         await go('MED', `/admin/medico/residente/${cohorte.residente}/evaluacion-cognitiva/resultados-experto`);
+<<<<<<< HEAD
         await page.screenshot({ path: evidence('residente-previo-1440.png'), fullPage: true });
         assert.ok(await page.evaluate(() => document.querySelectorAll('[data-resident-node]').length), 'El mapa del residente debe contener nodos');
         await click('Mapa');
@@ -123,6 +134,18 @@ test('sistema experto real: roles, grafo, teclado y cinco anchos', { skip: proce
         await click('Lista');
         await page.waitForFunction(() => [...document.querySelectorAll('.rm-resident-expert__node-list')].some(n => n.getClientRects().length));
         assert.ok(await page.evaluate(() => [...document.querySelectorAll('.rm-resident-expert__node-list')].find(n => n.getClientRects().length)?.innerText.includes('Memoria')));
+=======
+        await page.waitForSelector('[data-resident-node]', { visible: true });
+        await page.evaluate(() => [...document.querySelectorAll('.rm-resident-expert__steps button')].find(n => n.innerText.includes('Fuentes originales')).click());
+        await page.waitForFunction(() => document.querySelector('.rm-resident-expert__inspector').innerText.includes('Soporte seleccionado'));
+        await click('Requisitos de valoración');
+        await page.waitForFunction(() => [...document.querySelectorAll('.rm-resident-expert__choices strong')].some(n => n.innerText === 'Cambio corroborado'));
+        await page.evaluate(() => [...document.querySelectorAll('.rm-resident-expert__choices button')].find(n => n.innerText.includes('Alteración objetiva')).click());
+        await page.waitForFunction(() => document.querySelector('.rm-resident-expert__graph-heading h3')?.innerText === 'Alteración objetiva');
+        await click('Lista');
+        await page.waitForSelector('.rm-resident-expert__node-list', { visible: true });
+        assert.ok(await page.$eval('.rm-resident-expert__node-list', el => el.innerText.includes('Memoria')));
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         await click('Cinco áreas cognitivas');
         for (const width of [1440, 1280, 1024, 768, 390]) {
             await page.setViewport({ width, height: 1000 });
@@ -134,6 +157,7 @@ test('sistema experto real: roles, grafo, teclado y cinco anchos', { skip: proce
         await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
         await page.setViewport({ width: 1440, height: 1000 });
         await click('Mapa');
+<<<<<<< HEAD
         await page.evaluate(() => [...document.querySelectorAll('[data-resident-node]')].find(el => el.getClientRects().length)?.focus()); await page.keyboard.press('Enter');
         assert.ok(await page.evaluate(() => [...document.querySelectorAll('.rm-resident-expert__inspector')].find(el => el.getClientRects().length)?.innerText.includes('Conexiones documentadas')));
         assert.doesNotMatch(await page.$eval('.rm-resident-expert', el => el.innerText), /\b(?:null|NaN|undefined|Infinity)\b|\[object Object\]/);
@@ -142,4 +166,12 @@ test('sistema experto real: roles, grafo, teclado y cinco anchos', { skip: proce
     // El router sintético bloquea recursos externos del shell, incluido SweetAlert;
     // esos avisos no proceden del explorador que se verifica aquí.
     assert.deepEqual(errors.filter(error => error !== 'Swal is not defined'), []);
+=======
+        await page.$eval('[data-resident-node]', el => el.focus()); await page.keyboard.press('Enter');
+        assert.ok(await page.$eval('.rm-resident-expert__inspector', el => el.innerText.includes('Conexiones documentadas')));
+        assert.doesNotMatch(await page.$eval('.rm-resident-expert', el => el.innerText), /\b(?:null|NaN|undefined|Infinity)\b|\[object Object\]/);
+    }
+    await writeFile(evidence('qa.json'), JSON.stringify({ phase, matrix, errors }, null, 2));
+    assert.deepEqual(errors, []);
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 });

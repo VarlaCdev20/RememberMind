@@ -389,7 +389,7 @@ class AgendaEnfermeria extends Component
 
         // 1. Alertas clínicas activas
         $alertas = Alerta::whereIn('cod_residente', $codigosResidentes)
-            ->whereIn('estado', ['ABIERTA', 'EN_ATENCION', 'ACTIVA'])
+            ->whereIn('estado', Alerta::ESTADOS_ACTIVOS)
             ->get();
 
         $alertasPorResidente = $alertas->groupBy('cod_residente');

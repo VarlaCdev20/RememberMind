@@ -83,7 +83,11 @@ final class ConsultarPetersenInstitucional
                     continue;
                 }
                 // Un soporte visible sin permiso sobre su fuente no puede producir una evaluación recortada.
+<<<<<<< HEAD
                 abort_unless($lecturaEnfermeria || $usuario->checkPermissionTo($permiso, 'web'), 403);
+=======
+                abort_unless($usuario->checkPermissionTo($permiso, 'web'), 403);
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                 if ($fk === 'cod_control_iadl') {
                     Gate::forUser($usuario)->authorize('consultarFuncionalidad', [EvaluacionExperta::class, $residente]);
                 }
@@ -91,7 +95,11 @@ final class ConsultarPetersenInstitucional
             }
             $idsDocumentos = $filas->pluck('cod_documento_clinico')->filter()->unique();
             if ($idsDocumentos->isNotEmpty()) {
+<<<<<<< HEAD
                 abort_unless($lecturaEnfermeria || $usuario->checkPermissionTo('documentos_clinicos.ver', 'web'), 403);
+=======
+                abort_unless($usuario->checkPermissionTo('documentos_clinicos.ver', 'web'), 403);
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
             }
             $documentosOriginales = $idsDocumentos->isEmpty() ? collect() : DocumentoClinico::query()
                 ->where('cod_residente', $residente->getKey())->whereKey($idsDocumentos)->get()->keyBy(fn ($m) => $m->getKey());

@@ -172,9 +172,11 @@ class RolesAndPermissionsSeeder extends Seeder
         $roles['PSICOLOGO/A']->givePermissionTo(['valoraciones_petersen.ver', 'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar']);
         $roles['MEDICO GENERAL/GERIATRA']->givePermissionTo('controles_funcionales_iadl.ver');
         $roles['PSICOLOGO/A']->givePermissionTo('controles_funcionales_iadl.ver');
-        $roles['NUTRICIONISTA']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'diagnosticos.ver', 'alergias.ver', 'indicaciones_clinicas.ver', 'mediciones_antropometricas', 'registros_ingesta.ver', 'registros_hidratacion.ver', 'registros_eliminacion.ver', 'valoraciones_nutricionales', 'planes_cuidado']));
-        $roles['FISIOTERAPEUTA']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'diagnosticos.ver', 'dispositivos_clinicos.ver', 'signos_vitales.ver', 'valoraciones_dolor', 'registros_movilidad', 'valoraciones_funcionales', 'planes_cuidado']));
-        $roles['PEDAGOGO']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'indicaciones_clinicas.ver', 'controles_cognitivos.ver', 'registros_conductuales.ver', 'planes_cuidado', 'seguimientos_pedagogicos', 'actividades']));
+        // Consulta de Alertas aprobada por la propietaria (21/10/2026).
+        // Cada especialidad conserva su ámbito; no se concede gestión del aviso.
+        $roles['NUTRICIONISTA']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'alertas.ver', 'atenciones', 'notas_clinicas', 'diagnosticos.ver', 'alergias.ver', 'indicaciones_clinicas.ver', 'mediciones_antropometricas', 'registros_ingesta.ver', 'registros_hidratacion.ver', 'registros_eliminacion.ver', 'valoraciones_nutricionales', 'planes_cuidado']));
+        $roles['FISIOTERAPEUTA']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'alertas.ver', 'atenciones', 'notas_clinicas', 'diagnosticos.ver', 'dispositivos_clinicos.ver', 'signos_vitales.ver', 'valoraciones_dolor', 'registros_movilidad', 'valoraciones_funcionales', 'planes_cuidado']));
+        $roles['PEDAGOGO']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'alertas.ver', 'atenciones', 'notas_clinicas', 'indicaciones_clinicas.ver', 'controles_cognitivos.ver', 'registros_conductuales.ver', 'planes_cuidado', 'seguimientos_pedagogicos', 'actividades']));
         $roles['FAMILIAR']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'residentes_contactos.ver', 'documentos.ver', 'consentimientos.ver', 'actividades.ver', 'participantes_actividad.ver', 'visitas.ver']));
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();

@@ -17,6 +17,7 @@ class OverlayComponentsTest extends TestCase
         $this->assertStringContainsString('aria-modal="true"', $html);
         $this->assertStringContainsString('x-trap.noscroll="show"', $html);
         $this->assertStringContainsString('rm-modal-shell__overlay', $html);
+        $this->assertStringContainsString('<i class="ph-bold ph-bell-ringing" aria-hidden="true"></i>', $html);
         preg_match('/<div[^>]*class="rm-modal-shell__overlay"[^>]*>/', $html, $overlay);
         $this->assertNotEmpty($overlay);
         $this->assertStringNotContainsString('@click=', $overlay[0]);
@@ -54,7 +55,7 @@ class OverlayModalFixture extends Component
 
     public function render(): string
     {
-        return '<div><x-ui.modal-livewire wire:model="abierto" title="Registrar observación" :show-validation="false">Contenido</x-ui.modal-livewire></div>';
+        return '<div><x-ui.modal-livewire wire:model="abierto" title="Registrar observación" icon="ph-bell-ringing" :show-validation="false">Contenido</x-ui.modal-livewire></div>';
     }
 }
 

@@ -1,9 +1,13 @@
+<<<<<<< HEAD
 @php($petersenActual = $perfilInstrumental['petersen_institucional'] ?? null)
 @php($resumenPetersenActual = $petersenActual ? \App\Modulos\ApoyoDecision\Presentacion\Soporte\ResumenPetersenVisible::presentar($petersenActual, false) : null)
 <x-ui.modal-livewire wire:model="significadoAbierto" title="¿Qué significa este resultado?" subtitle="Explicación de la evaluación cognitiva" icon="ph-book-open" maxWidth="md" surface="reading" closeMethod="cerrarSignificado" :showValidation="false">
     @if($petersenActual)
     <div class="rm-orion-reading"><h3>{{ $resumenPetersenActual['titulo'] }}</h3><p>{{ $resumenPetersenActual['explicacion'] }}</p><p>Es un cálculo orientativo con las fuentes disponibles en esta consulta. No constituye un diagnóstico ni una evaluación histórica guardada.</p></div>
     @else
+=======
+<x-ui.modal-livewire wire:model="significadoAbierto" title="¿Qué significa este resultado?" subtitle="Explicación de la evaluación cognitiva" icon="ph-book-open" maxWidth="md" surface="reading" closeMethod="cerrarSignificado" :showValidation="false">
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
     <p class="rm-orion-note">{{ $residente->nombre_completo }} · Resultado disponible de {{ mb_strtolower($consultaEnfermeria['area_principal']) }}</p>
     <div class="rm-orion-reading"><section class="rm-orion-reading-summary"><h3>En palabras sencillas</h3><p>{{ $consultaEnfermeria['titulo'] }}</p><p>{{ $consultaEnfermeria['resumen'] }}</p></section>
         <section class="rm-orion-reading-support"><h3>Qué información lo respalda</h3>
@@ -16,7 +20,10 @@
         @endif
         <section><h3>Información de la evaluación</h3><dl class="rm-cognitive-meta"><div><dt>Área cognitiva</dt><dd>{{ $consultaEnfermeria['area_principal'] }}</dd></div><div><dt>Fecha</dt><dd>{{ $datos['evaluacion']['fecha'] ?? 'Sin evaluación' }}</dd></div><div><dt>Versión</dt><dd>{{ $datos['evaluacion']['version'] ?? 'No disponible' }}</dd></div><div><dt>Estado</dt><dd>{{ $consultaEnfermeria['estado_principal'] }}</dd></div><div><dt>Cobertura</dt><dd>{{ count($fuentesResultado) }} fuentes conservadas en el área</dd></div></dl></section>
     </div>
+<<<<<<< HEAD
     @endif
+=======
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
     <x-slot:footer><button type="button" class="rm-btn rm-btn-secondary" wire:click="abrirConsultaResultado('registro')">Ver evidencias</button><button type="button" class="rm-btn rm-btn-primary" wire:click="cerrarSignificado">Entendido</button></x-slot:footer>
 </x-ui.modal-livewire>
 
@@ -40,11 +47,17 @@
 @include('apoyodecision::livewire.medico.resultados-experto.enfermeria-evolucion')
 
 <x-ui.drawer-livewire wire:model="consultaAbierta" title="Registros y evidencias" subtitle="Información disponible para el área seleccionada" :badge="false" icon="ph-notebook" size="lg" surface="reading" closeMethod="cerrarConsulta">
+<<<<<<< HEAD
     <p class="rm-orion-note">{{ $residente->nombre_completo }} · {{ $petersenActual ? 'Consulta cognitiva actual' : $informe['actual']['nombre'] }} · {{ $datos['evaluacion']['fecha'] ?? 'Sin evaluación histórica guardada' }}</p>
     <div class="rm-orion-tabs" role="group" aria-label="Secciones de consulta">@foreach(['interpretacion' => 'Interpretación', 'registro' => 'Registros', 'cuidados' => 'Cuidados'] as $clave => $label)<button type="button" class="rm-btn rm-btn-secondary" wire:click="abrirConsulta(@js($clave))" aria-pressed="{{ $pestanaConsulta === $clave ? 'true' : 'false' }}">{{ $label }}</button>@endforeach</div>
     @if($pestanaConsulta === 'interpretacion')
         @if($petersenActual)<div class="rm-orion-reading"><h3>{{ $resumenPetersenActual['titulo'] }}</h3><p>{{ $resumenPetersenActual['explicacion'] }}</p><p class="rm-orion-note">Resultado orientativo de la consulta actual. No es un diagnóstico ni una evaluación histórica guardada.</p></div>
         @else<div class="rm-orion-reading"><h3>{{ $informe['actual']['estado'] }}</h3><p>{{ $texto($informe['actual']['significado']) }}</p><p>{{ $texto($informe['actual']['por_que']) }}</p><p class="rm-orion-note">{{ $texto($informe['limite_global']) }}</p></div>@endif
+=======
+    <p class="rm-orion-note">{{ $residente->nombre_completo }} · {{ $informe['actual']['nombre'] }} · {{ $datos['evaluacion']['fecha'] ?? 'Sin evaluación histórica' }}</p>
+    <div class="rm-orion-tabs" role="group" aria-label="Secciones de consulta">@foreach(['interpretacion' => 'Interpretación', 'registro' => 'Registros', 'cuidados' => 'Cuidados'] as $clave => $label)<button type="button" class="rm-btn rm-btn-secondary" wire:click="abrirConsulta(@js($clave))" aria-pressed="{{ $pestanaConsulta === $clave ? 'true' : 'false' }}">{{ $label }}</button>@endforeach</div>
+    @if($pestanaConsulta === 'interpretacion')<div class="rm-orion-reading"><h3>{{ $informe['actual']['estado'] }}</h3><p>{{ $texto($informe['actual']['significado']) }}</p><p>{{ $texto($informe['actual']['por_que']) }}</p><p class="rm-orion-note">{{ $texto($informe['limite_global']) }}</p></div>
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
     @elseif($pestanaConsulta === 'registro')
         @if($errorInstrumental)<p role="alert">No fue posible consultar las mediciones instrumentales. No se confirma su ausencia.</p>
         @elseif($registroComponente)<section class="rm-expert-source"><h3 class="rm-expert-section-title">{{ $registroComponente['nombre'] }}</h3><p>Dato fuente actual. No sustituye el valor original de una inferencia histórica.</p>
@@ -53,7 +66,10 @@
         @if($simulacion)<p class="rm-orion-note">Resultado de demostración. Sus referencias no se abren como registros clínicos actuales.</p>
             <h3 class="rm-expert-section-title">Información utilizada</h3>
             @forelse($narrativa['funciones'][$criterio]['fuentes_legibles'] ?? [] as $f)<article class="rm-expert-source"><h4>{{ $f['titulo'] }}</h4><p>{{ $f['fecha'] }}</p><ul>@foreach($f['datos'] as $dato)<li>{{ $dato }}</li>@endforeach</ul><p>{{ $texto($f['uso']) }}</p></article>@empty<p>No hay referencias conservadas para el área de esta demostración.</p>@endforelse
+<<<<<<< HEAD
         @elseif($petersenActual)<p class="rm-orion-note">Las valoraciones originales de esta consulta se resumen en «Fundamento de las áreas y criterios». La consulta actual todavía no está guardada como resultado histórico.</p>
+=======
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         @else @include('apoyodecision::livewire.medico.resultados-experto.evidencias') @endif
         <section class="rm-expert-source mt-4"><h3 class="rm-expert-section-title">Diagnóstico médico registrado</h3><p>Se presenta separado del resultado de la evaluación.</p>
             @if($puedeVerDiagnosticos)@forelse($diagnosticosMedicos as $diagnostico)<article><strong>{{ $diagnostico->nombre }}</strong><p>{{ $diagnostico->fecha_hora?->format('d/m/Y H:i') }} · {{ trim(($diagnostico->personal?->nombres ?? '').' '.($diagnostico->personal?->apellido_paterno ?? '')) }}</p></article>@empty<p>No hay diagnósticos médicos registrados.</p>@endforelse @else<p>No dispone de permiso para consultar diagnósticos médicos.</p>@endif

@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Institucion\Aplicacion\Consultas;
 
+use App\Models\Alerta;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
@@ -56,7 +57,7 @@ class CentroCoordinacionService
             ])->values()->all();
         }
 
-        $alertas = DB::table('alertas')->whereNotIn('estado', ['CERRADA', 'ANULADA']);
+        $alertas = DB::table('alertas')->whereIn('estado', Alerta::ESTADOS_ACTIVOS);
         $alertasPorPrioridad = (clone $alertas)->select('prioridad')->get()->countBy(fn ($fila) => strtoupper((string) $fila->prioridad));
         $jornada = DB::table('jornadas')->whereDate('fecha_jornada', $hoy)->whereIn('estado', ['ABIERTA', 'ACTIVA'])
             ->orderBy('cod_jornada')->first();

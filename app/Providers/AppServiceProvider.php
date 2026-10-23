@@ -131,6 +131,7 @@ class AppServiceProvider extends ServiceProvider
         Livewire::component('alertas.campana-notificaciones', CampanaNotificaciones::class);
         Livewire::component('alertas.salud-alertas-panel', SaludAlertasPanel::class);
         Livewire::component('alertas.alertas-panel', AlertasPanel::class);
+        Livewire::component('alertas.comparar-roles', \App\Modulos\Alertas\Presentacion\Livewire\Paginas\CompararAlertasRoles::class);
         Livewire::component('features.alertas.historial-alerta', HistorialAlerta::class);
         Livewire::component('medicacion.medicacion-adulto-modal', MedicacionAdultoModal::class);
         Livewire::component('medicacion.salud-medicacion-panel', SaludMedicacionPanel::class);

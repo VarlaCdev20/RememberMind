@@ -80,6 +80,7 @@
 .rm-dashboard-data-panel__legend li:nth-child(6n + 4) > span::before { background: var(--rm-chart-4); }
 .rm-dashboard-data-panel__legend li:nth-child(6n + 5) > span::before { background: var(--rm-chart-5); }
 .rm-dashboard-data-panel__legend li:nth-child(6n + 6) > span::before { background: var(--rm-chart-6); }
+.rm-dashboard-data-panel__legend > .rm-chart-colored-item > span::before { background: var(--rm-chart-item-color); }
 .rm-dashboard-data-panel__donut-layout { display: flex; align-items: center; gap: 18px; }
 .rm-dashboard-data-panel__donut { position: relative; display: grid; flex: 0 0 124px; width: 124px; height: 124px; place-items: center; border-radius: 50%; outline: 1px solid color-mix(in srgb, var(--rm-chart-sage) 68%, transparent); outline-offset: -1px; box-shadow: 0 0 0 5px color-mix(in srgb, var(--rm-chart-sage) 7%, transparent); }
 .rm-dashboard-data-panel__donut::before { content: ''; position: absolute; inset: var(--rm-donut-ring-width); border-radius: 50%; background: var(--rm-surface-raised); box-shadow: 0 0 0 1px color-mix(in srgb, var(--rm-chart-sage) 68%, transparent); }
@@ -131,6 +132,7 @@
 .rm-psychology-recent__list strong { font: 700 var(--rm-font-size-body)/1.3 var(--rm-font-friendly); }
 .rm-psychology-recent__list span { color: var(--rm-text-secondary); font: 500 var(--rm-font-size-compact)/1.35 var(--rm-font-body); overflow-wrap: anywhere; }
 .rm-psychology-recent__list time { color: var(--rm-text-secondary); font: 600 var(--rm-font-size-meta)/1.3 var(--rm-font-body); white-space: nowrap; font-variant-numeric: tabular-nums; }
+<<<<<<< HEAD
 .rm-psychology-dashboard__charts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--rm-grid-gap); align-items: start; }
 .rm-psychology-chart { display: flex; flex-direction: column; gap: var(--rm-space-2); height: auto; min-width: 0; padding: 12px 14px; background: var(--rm-chart-card-bg); }
 .rm-depth-canvas .rm-psychologist-dashboard .rm-psychology-chart { height: auto; max-height: none; }
@@ -141,6 +143,14 @@
 .rm-psychology-chart__series { display: flex; flex-wrap: wrap; gap: 2px 12px; color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); line-height: 1.3; }
 .rm-psychology-chart__series span { display: inline-flex; align-items: center; gap: 5px; }
 .rm-psychology-chart__series .rm-psychology-chart__swatch { flex: 0 0 9px; width: 9px; height: 9px; }
+=======
+.rm-psychology-dashboard__charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--rm-grid-gap); align-items: start; }
+.rm-psychology-chart { display: flex; flex-direction: column; gap: var(--rm-space-2); height: auto; min-width: 0; padding: 14px; background: var(--rm-chart-card-bg); }
+.rm-psychology-chart .rm-chart-header { min-height: 0; }
+.rm-psychology-chart__plot { position: relative; width: 100%; height: clamp(160px, 14vw, 190px); margin-top: 0; }
+.rm-psychology-chart__composition { display: grid; grid-template-columns: clamp(110px, 13vw, 150px) minmax(0, 1fr); align-items: center; gap: var(--rm-space-3); }
+.rm-psychology-chart__plot--donut { height: clamp(135px, 12vw, 155px); }
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 .rm-psychology-chart__breakdown { min-width: 0; }
 .rm-psychology-chart__total { margin: 0 0 var(--rm-space-2); color: var(--rm-text-primary); font-weight: 700; }
 .rm-psychology-chart__breakdown ul { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
@@ -161,6 +171,7 @@
 .rm-psychology-areas__links--four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .rm-psychologist-dashboard .rm-psychology-areas__links a { min-width: 0; min-height: 52px; font-size: var(--rm-font-size-body); }
 
+<<<<<<< HEAD
 /* Apilar solo cuando las dos tarjetas ya no conservan espacio legible. */
 @container psychology-dashboard (max-width: 700px) {
     .rm-psychology-dashboard__charts { grid-template-columns: minmax(0, 1fr); }
@@ -168,6 +179,13 @@
     .rm-psychology-chart__plot--donut { height: 128px; }
 }
 @container psychology-dashboard (max-width: 800px) {
+=======
+/* La barra lateral reduce el espacio útil incluso en ventanas de escritorio. */
+@container psychology-dashboard (max-width: 800px) {
+    .rm-psychology-dashboard__charts { grid-template-columns: minmax(0, 1fr); }
+    .rm-psychology-chart__plot { height: 185px; }
+    .rm-psychology-chart__plot--donut { height: 150px; }
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
     .rm-psychology-dashboard__followup { grid-template-columns: minmax(0, 1fr); }
     .rm-psychology-dashboard__followup > :is(.rm-psychology-recent, .rm-psychology-areas) { grid-column: auto; grid-row: auto; }
     .rm-psychology-areas__links--four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -183,8 +201,13 @@
 @container psychology-dashboard (max-width: 520px) {
     .rm-psychology-areas__links--four { grid-template-columns: minmax(0, 1fr); }
     .rm-psychology-dashboard__followup .rm-psychology-areas__links--four { grid-template-columns: minmax(0, 1fr); }
+<<<<<<< HEAD
     .rm-psychology-chart__composition { grid-template-columns: minmax(88px, .28fr) minmax(0, 1fr); }
     .rm-psychology-chart__plot--donut { width: 100%; margin-inline: 0; }
+=======
+    .rm-psychology-chart__composition { grid-template-columns: minmax(0, 1fr); }
+    .rm-psychology-chart__plot--donut { width: min(180px, 100%); margin-inline: auto; }
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
     .rm-psychology-chart__breakdown li { overflow-wrap: anywhere; }
     .rm-psychology-recent__list li { grid-template-columns: minmax(0, 1fr); }
 }
@@ -203,8 +226,13 @@
     .rm-psychology-dashboard__charts { grid-template-columns: 1fr; }
 }
 @media (max-width: 639px) {
+<<<<<<< HEAD
     .rm-psychology-chart__plot { height: 145px; }
     .rm-psychology-chart__plot--donut { height: 124px; }
+=======
+    .rm-psychology-chart__plot { height: 175px; }
+    .rm-psychology-chart__plot--donut { height: 150px; }
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
     .rm-dashboard-data-grid { grid-template-columns: 1fr; gap: 14px; }
     .rm-dashboard-data-panel { padding: 16px; }
     .rm-dashboard-data-panel__heading { flex-wrap: wrap; }
@@ -214,12 +242,18 @@
     .rm-medical-queue li { align-items: flex-start; flex-direction: column; }
 }
 @media (max-width: 479px) {
+<<<<<<< HEAD
     .rm-psychology-recent__list li { grid-template-columns: 1fr; }
 }
 @container psychology-dashboard (max-width: 340px) {
     .rm-psychology-chart__composition { grid-template-columns: minmax(0, 1fr); }
     .rm-psychology-chart__plot--donut { width: min(130px, 100%); margin-inline: auto; }
 }
+=======
+    .rm-psychology-chart__composition { grid-template-columns: 1fr; }
+    .rm-psychology-recent__list li { grid-template-columns: 1fr; }
+}
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 @media (max-width: 380px) {
     .rm-dashboard-data-panel__donut-layout { align-items: flex-start; flex-direction: column; }
     .rm-dashboard-data-panel__donut-layout .rm-dashboard-data-panel__legend { width: 100%; }

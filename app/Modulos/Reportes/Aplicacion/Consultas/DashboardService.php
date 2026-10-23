@@ -5,6 +5,7 @@ namespace App\Modulos\Reportes\Aplicacion\Consultas;
 use App\Compartido\Aplicacion\Contratos\EnlacesAplicacion;
 use App\Models\Personal;
 use App\Models\User;
+use App\Modulos\Alertas\Aplicacion\Consultas\BandejaAlertas;
 use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -428,23 +429,23 @@ class DashboardService
         );
     }
 
-    public function obtenerAlertasEstructuradas(): array
+    public function obtenerAlertasEstructuradas(User $usuario): array
     {
         $alertas = [];
 
-        $alertasDB = DB::table('alertas')
-            ->whereIn('estado', ['ABIERTA', 'PENDIENTE', 'EN_PROCESO'])
+        $alertasDB = app(BandejaAlertas::class)->pendientes($usuario)
             ->orderByDesc('fecha_hora')
             ->limit(4)
             ->get();
 
         foreach ($alertasDB as $a) {
             $alertas[] = [
-                'nivel' => $a->nivel_gravedad ?? 'URGENTE',
+                'nivel' => $a->prioridad,
                 'descripcion' => $a->descripcion,
                 'icono' => 'ph-warning-octagon',
                 'accion' => 'Revisar en módulo de alertas',
-                'url' => $this->enlaces->destino('admin.alertas.index'),
+                'url' => $this->enlaces->destino('admin.alertas-clinicas.index'),
+                'fuente' => 'Alerta persistida',
             ];
         }
 
@@ -459,8 +460,8 @@ class DashboardService
                 ? '1 residente no tiene atención clínica activa'
                 : "{$sinFicha} residentes no tienen atención clínica activa";
             $alertas[] = [
-                'nivel' => 'URGENTE',
-                'descripcion' => "{$etiqueta} — requiere revisión.",
+                'nivel' => 'INFORMATIVA',
+                'descripcion' => "Aviso orientativo: {$etiqueta}. La ausencia de registro no acredita una urgencia.",
                 'icono' => 'ph-warning-circle',
                 'accion' => 'Ir a Residentes',
                 'url' => $this->enlaces->destino('admin.residentes.index'),
@@ -473,7 +474,7 @@ class DashboardService
                 ? '1 residente requiere'
                 : "{$seguimiento} residentes requieren";
             $alertas[] = [
-                'nivel' => 'URGENTE',
+                'nivel' => 'INFORMATIVA',
                 'descripcion' => "{$etiqueta} seguimiento especial — alerta orientativa.",
                 'icono' => 'ph-eye',
                 'accion' => 'Ver residentes',

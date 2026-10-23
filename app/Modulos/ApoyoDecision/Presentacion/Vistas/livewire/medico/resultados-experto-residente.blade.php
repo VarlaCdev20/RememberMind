@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 <div class="rm-expert-results text-rm-primary {{ $psicologia ? 'rm-expert-results--psychology' : ($enfermeria ? 'rm-expert-results--nursing' : 'rm-expert-results--medicine') }}" x-data="{ consultaVisible: @entangle('consultaAbierta') }" :class="{ 'has-consulta': consultaVisible && !@js($enfermeria) }"
     x-on:orion-navigate.window="$nextTick(() => { const section = document.getElementById($event.detail.seccion); if (section) { if (section.tagName === 'DETAILS') section.open = true; let parent = section.parentElement?.closest('details'); while (parent) { parent.open = true; parent = parent.parentElement?.closest('details'); } section.scrollIntoView({ block: 'start' }); section.querySelector('summary, h2')?.focus({ preventScroll: true }); } })"
+=======
+<div class="rm-expert-results text-rm-primary {{ $psicologia ? 'rm-expert-results--psychology' : ($enfermeria ? 'rm-expert-results--nursing' : 'rm-expert-results--medicine') }}" x-data="{ consultaVisible: @entangle('consultaAbierta'), vistaClinica: @js($psicologia ? 'resumen' : 'mapa') }" :class="{ 'has-consulta': consultaVisible && !@js($enfermeria) }"
+    x-on:orion-navigate.window="vistaClinica = 'resumen'; $nextTick(() => { const section = document.getElementById($event.detail.seccion); if (section) { if (section.tagName === 'DETAILS') section.open = true; let parent = section.parentElement?.closest('details'); while (parent) { parent.open = true; parent = parent.parentElement?.closest('details'); } section.scrollIntoView({ block: 'start' }); section.querySelector('summary, h2')?.focus({ preventScroll: true }); } })"
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
     x-on:expert-trace-opened.window="$nextTick(() => document.getElementById('drawer-trazabilidadabierta-title')?.focus())"
     x-on:expert-trace-closed.window="$nextTick(() => $refs.traceTrigger?.focus())">
     @if($cohorteEntrenamiento ?? false)
@@ -18,7 +23,11 @@
         <span aria-current="page">{{ $residente->nombre_completo }}</span>
     </nav>
     <header class="rm-expert-heading rm-expert-page-heading">
+<<<<<<< HEAD
         <div class="min-w-0"><p class="rm-expert-eyebrow">Sistema experto · Consulta del residente</p><h1>Evaluación cognitiva y funcional</h1><p class="rm-expert-subtitle">Resultados y evidencias disponibles</p></div>
+=======
+        <div class="min-w-0"><p class="rm-expert-eyebrow">Sistema experto · Consulta del residente</p><h1>{{ $psicologia ? 'Evaluación cognitiva y funcional' : $residente->nombre_completo }}</h1><p class="rm-expert-subtitle">{{ $psicologia ? 'Resultados y evidencias disponibles' : (($residente->edad !== null ? $residente->edad.' años · ' : '').$residente->ubicacion_formateada) }}</p></div>
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         <div class="rm-expert-heading-actions">
             @if($psicologia)
                 <button type="button" wire:click="irASeccion('fuentes-disponibles')" wire:loading.attr="disabled" class="rm-btn rm-btn-primary"><i class="ph ph-folder-open" aria-hidden="true"></i>Ver registros y evidencias</button>
@@ -43,6 +52,7 @@
     </header>
     <p wire:loading role="status" class="text-sm">Consultando la valoración y sus fuentes…</p>
 
+<<<<<<< HEAD
     <nav class="rm-expert-reading-nav" aria-label="Secciones de la consulta cognitiva">
         @if(auth()->user()->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A']))<a class="rm-btn rm-btn-secondary" href="{{ route('admin.sistema-experto.residentes') }}"><i class="ph ph-users-three" aria-hidden="true"></i>Residentes</a>@endif
         <button type="button" wire:click="abrirDetalleArea" class="rm-btn rm-btn-secondary">Área seleccionada</button>
@@ -53,6 +63,23 @@
         @include('apoyodecision::livewire.medico.resultados-experto.conexiones-residente')
     @endunless
     <div class="rm-orion-workspace mt-3">
+=======
+    @if($psicologia)
+    <nav class="rm-expert-reading-nav" aria-label="Secciones de la consulta cognitiva"><a class="rm-btn rm-btn-secondary" href="{{ route('admin.sistema-experto.residentes') }}">Residentes</a><button type="button" wire:click="abrirDetalleArea" class="rm-btn rm-btn-secondary">Área seleccionada</button><button type="button" wire:click="irASeccion('fuentes-disponibles')" class="rm-btn rm-btn-secondary">Evidencias y fuentes</button></nav>
+    @else
+    <nav class="rm-expert-local-tabs rm-expert-clinical-tabs" aria-label="Secciones de la consulta cognitiva">
+        <button type="button" @click="vistaClinica = 'mapa'" :aria-pressed="vistaClinica === 'mapa'"><i class="ph ph-graph" aria-hidden="true"></i>Conexiones</button>
+        <button type="button" @click="vistaClinica = 'resumen'" :aria-pressed="vistaClinica === 'resumen'"><i class="ph ph-brain" aria-hidden="true"></i>Resumen y análisis</button>
+        <button type="button" wire:click="irASeccion('fuentes-disponibles')"><i class="ph ph-files" aria-hidden="true"></i>Fuentes originales</button>
+        @if($datos['evaluacion'] ?? null)<button type="button" wire:click="irASeccion('orion-evolucion')"><i class="ph ph-clock-counter-clockwise" aria-hidden="true"></i>Historial conservado</button>@endif
+        @if(auth()->user()->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A']))<a href="{{ route('admin.sistema-experto.residentes') }}"><i class="ph ph-users-three" aria-hidden="true"></i>Cambiar residente</a>@endif
+    </nav>
+    <div x-show="vistaClinica === 'mapa'">
+        @include('apoyodecision::livewire.medico.resultados-experto.conexiones-residente')
+    </div>
+    @endif
+    <div class="rm-orion-workspace mt-3" x-show="vistaClinica === 'resumen'" x-cloak>
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         {{-- Columna Principal: Informe Cognitivo --}}
         <div class="space-y-4 min-w-0">
             @if($psicologia && ! isset($perfilInstrumental['petersen_institucional']))

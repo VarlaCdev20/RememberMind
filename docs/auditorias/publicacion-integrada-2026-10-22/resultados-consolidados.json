@@ -1,0 +1,2459 @@
+{
+  "casos": [
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\CohorteInferencia30Test::test_fallo_parcial_revierte_admision_fuentes_auditoria_y_correlativos",
+      "estado": "PASS",
+      "assertions": 18
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\CohorteInferencia30Test::test_rechaza_entorno_local_antes_de_escribir",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\CohorteInferencia30Test::test_seeder_artisan_rechaza_destino_no_confirmado_sin_escrituras",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\CohorteInferencia30Test::test_treinta_admisiones_fuentes_originales_dos_ramas_y_cuatro_perfiles_reproducibles",
+      "estado": "PASS",
+      "assertions": 2174
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_atencion_compartida_unifica_soportes_sin_unificar_conjunciones_de_aplicaciones",
+      "estado": "PASS",
+      "assertions": 10
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_atencion_manipulada_en_captura_se_rechaza_aunque_figure_coherente",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_atenciones_distintas_o_ausentes_no_se_fusionan_por_fecha",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_ausencia_de_respuesta_nominal_conserva_el_formato_historico_de_traza",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_captura_compartida_documentada_no_elude_revocacion_del_permiso_documental",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_captura_compartida_no_elude_revocacion_actual_de_permisos with data set #0",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_captura_compartida_no_elude_revocacion_actual_de_permisos with data set #1",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_captura_compartida_no_elude_revocacion_actual_de_permisos with data set #2",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_captura_compartida_no_elude_revocacion_actual_de_permisos with data set #3",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_captura_compartida_no_elude_revocacion_actual_de_permisos with data set #4",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_corte_anterior_no_incluye_la_aplicacion_y_futuro_es_invalido",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_cuenta_inactiva_no_accede",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_cuenta_inactiva_o_profesion_incompatible_no_registran_aunque_tengan_permisos",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_documento_posterior_al_corte_no_respalda_inferencia_ni_replay",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_edad_historica_se_calcula_en_aplicacion_y_menor_60_se_excluye",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_familiar_no_consulta_inferencia_con_permisos_aislados",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_fuente_anulada_no_se_reutiliza",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_fuente_sin_columna_original_de_autor_se_rechaza",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_g09_sql_exige_perfil_definido_y_medida_bruta_de_la_misma_aplicacion",
+      "estado": "PASS",
+      "assertions": 14
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_instantanea_reproduce_sin_sql_configuracion_o_reglas_actuales",
+      "estado": "PASS",
+      "assertions": 7
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_medicina_registra_sin_atribuir_aprobaciones_profesionales",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_memoria_usa_literal_textual_original_y_su_admisibilidad_especifica",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_motor_verifica_las_pk_nominales_aunque_el_adaptador_marque_coherente",
+      "estado": "PASS",
+      "assertions": 6
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_no_lee_aplicaciones_de_otro_residente",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_null_no_activa_regla_y_no_se_traduce_en_false",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_observacion_literal_no_acredita_instrumento_de_memoria_por_un_vinculo_configurado",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_observacion_nominal_con_numero_simultaneo_se_rechaza",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_observacion_nominal_desconocida_conserva_literal_sin_inferir_por_etiqueta_o_puntaje",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_observacion_nominal_sin_opcion_no_infiere_por_texto",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_observacion_nominal_sin_texto_no_reconstruye_literal_desde_opcion",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_observacion_nominal_tampoco_acredita_medicion_instrumental_de_memoria",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_observaciones_de_19_componentes_se_integran_sin_acreditar_las_15_reglas_g09",
+      "estado": "PASS",
+      "assertions": 124
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_observaciones_nominales_recorran_fuente_regla_componente_dominio_y_traza_sin_normalizar",
+      "estado": "PASS",
+      "assertions": 31
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_opcion_cruzada_excluye_fuente_y_no_genera_resultado",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_opcion_unica_de_catalogo_retirado_conserva_la_observacion_historica",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_opcion_y_texto_discordantes_no_se_eligen_arbitrariamente",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_perfil_e_inferencia_usan_una_sola_captura_aunque_el_original_se_rectifique_despues",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_permiso_fuente_retirado_no_devuelve_datos",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_pregunta_declarativa_sin_respuesta_conserva_definicion_y_ausencia",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_pregunta_opcion_no_observacional_no_adopta_el_contrato_nominal",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_preparacion_backend_no_se_expone_en_la_consulta_ordinaria_y_rechaza_otro_contexto",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_recorrido_sql_fuente_original_regla_conclusion_y_perfil_sin_guardado_implicitamente",
+      "estado": "PASS",
+      "assertions": 10
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_registro_adoptado_es_atomico_idempotente_y_ejecuta_cinco_dominios_sin_fabricar_fuentes",
+      "estado": "PASS",
+      "assertions": 20
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_registro_desde_livewire_usa_actor_autorizado_y_conserva_revision_pendiente",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_registro_fallido_no_deja_conocimiento_ni_auditoria_parciales",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_reproduccion_conserva_episodio_aunque_el_vinculo_sql_cambie",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_respuesta_con_dos_valores_originales_no_se_interpreta",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_sin_configuracion_y_sin_vinculos_se_declara_ausencia",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_sucesora_con_dos_mapeos_equivalentes_no_elige_uno_por_su_estado",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_sucesora_no_hereda_un_vinculo_cuya_identidad_semantica_cambio",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_sucesoras_heredan_vinculos_traducidos_y_archivar_conserva_la_reproduccion_original",
+      "estado": "PASS",
+      "assertions": 9
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_superadmin_no_registra_conocimiento_aunque_tenga_permiso_aislado",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_traza_conserva_respuesta_documento_edad_y_precision_del_corte",
+      "estado": "PASS",
+      "assertions": 12
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_version_sin_vigencia_no_usa_fallback_al_laboratorio",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_vinculos_observacionales_del_contrato_adoptado_se_reconstruyen_desde_mapeos_y_originales",
+      "estado": "PASS",
+      "assertions": 22
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\FichaPsicologicaResidenteTest::test_cambiar_periodo_y_metrica_de_tendencia_longitudinal",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\FichaPsicologicaResidenteTest::test_componente_livewire_muestra_pestanas_didacticas_y_permite_navegar_entre_ellas",
+      "estado": "PASS",
+      "assertions": 18
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\FichaPsicologicaResidenteTest::test_disparar_abrir_evaluacion_emite_evento_hacia_modal_de_area",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\FichaPsicologicaResidenteTest::test_enfermero_o_usuario_no_autorizado_es_rechazado_con_403",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\FichaPsicologicaResidenteTest::test_psicologo_activo_puede_ver_ficha_psicologica_del_residente",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\FichaPsicologicaResidenteTest::test_psicologo_puede_guardar_control_funcional_iadl_soporte_c03",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\FichaPsicologicaResidenteTest::test_psicologo_puede_guardar_valoracion_afectiva_vinculada_a_atencion_y_soporte_c04",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\FichaPsicologicaResidenteTest::test_psicologo_puede_navegar_a_pestana_orion_y_consultar_criterios_petersen",
+      "estado": "PASS",
+      "assertions": 10
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\FichaPsicologicaResidenteTest::test_psicologo_puede_registrar_sesion_de_atencion",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\FichaPsicologicaResidenteTest::test_tendencia_cognitiva_con_multiples_puntos_calcula_resumen_y_datasets",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_archivo_crea_sucesora_con_autor_y_pendientes_sin_cambiar_el_original",
+      "estado": "PASS",
+      "assertions": 6
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_arista_decorativa_no_habilita_publicacion_y_contrato_no_se_inventa",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_check_fisico_rechaza_firma_con_estado_nulo_y_autorreferencia",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_codigo_de_version_demasiado_largo_falla_antes_de_insertar",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_consecuencia_reservada_se_rechaza_sin_publicar_ni_retirar_la_anterior",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_cuenta_desactivada_no_muta_desde_una_interfaz_ya_abierta",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_fallo_de_traduccion_revierte_version_y_auditoria",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_gobierno_admite_condicion_de_subcomponente_con_vinculo_explicito",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_guia_interdisciplinaria_se_consulta_sin_publicar_perfiles_ni_cambiar_historia",
+      "estado": "PASS",
+      "assertions": 13
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_interfaz_crea_sucesora_y_registra_revision_con_identidad_de_sesion",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_interfaz_muestra_definicion_nueva_y_conserva_sustitucion",
+      "estado": "PASS",
+      "assertions": 6
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_interfaz_rechaza_regla_ajena_a_la_version_seleccionada",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_la_ruta_exige_sesion_y_competencia_profesional",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_migracion_revierte_sin_historia_y_reinstala_sin_perder_definiciones",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_payload_no_puede_imponer_autor_ni_revisor",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_permiso_retirado_impide_escritura",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_pertenencia_sin_arista_de_variable_no_publica_sucesora",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_propiedades_locked_rechazan_atribuir_una_regla_desde_cliente",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_prueba_desde_interfaz_usa_condiciones_guardadas_sin_crear_resultados_ni_aprobar",
+      "estado": "PASS",
+      "assertions": 11
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_psicologia_registra_decision_una_vez_y_el_reintento_no_duplica_auditoria",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_rechazo_no_se_sobrescribe_con_otra_decision",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_rol_ajeno_personal_inactivo_o_ausente_y_preview_no_crean_conocimiento",
+      "estado": "PASS",
+      "assertions": 12
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_rollback_de_migracion_con_historia_se_rechaza_sin_perder_columnas",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_sql_conserva_la_firma_y_el_enlace_historico",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_superadministracion_consulta_sin_formularios_de_escritura",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_superadministracion_no_escribe_aunque_tenga_permiso_aislado",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_una_sucesora_no_rehabilita_la_definicion_rechazada",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres-rerun.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\MisResidentesPsicologiaTest::test_buscador_compartido_envia_la_busqueda_a_mis_residentes",
+      "estado": "PASS",
+      "assertions": 7
+    },
+    {
+      "report": "release-postgres-rerun.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\MisResidentesPsicologiaTest::test_busqueda_por_nombre_compuesto_y_cambio_de_vista",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-postgres-rerun.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\MisResidentesPsicologiaTest::test_lista_residentes_admitidos_y_abre_la_ficha_sin_mostrar_codigos",
+      "estado": "PASS",
+      "assertions": 6
+    },
+    {
+      "report": "release-postgres-rerun.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\MisResidentesPsicologiaTest::test_permiso_revocado_impide_actualizar_una_vista_livewire_abierta",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres-rerun.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\MisResidentesPsicologiaTest::test_rol_ajeno_y_personal_inactivo_no_pueden_consultar_el_listado",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres-rerun.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\NavegacionSistemaExpertoTest::test_cuenta_inactiva_o_sin_personal_competente_no_recibe_el_listado",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres-rerun.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\NavegacionSistemaExpertoTest::test_medicina_consulta_resultados_y_abre_valoracion_desde_ficha",
+      "estado": "PASS",
+      "assertions": 6
+    },
+    {
+      "report": "release-postgres-rerun.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\NavegacionSistemaExpertoTest::test_psicologia_consulta_resultados_y_abre_valoracion_desde_area_cognitiva",
+      "estado": "PASS",
+      "assertions": 26
+    },
+    {
+      "report": "release-postgres-rerun.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\NavegacionSistemaExpertoTest::test_visitante_y_superadministracion_no_acceden_a_entrada_de_captura_clinica",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres-rerun.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\PsychologyDashboardDataTest::test_graficas_omiten_registros_anulados_y_muestran_vacio_sin_datos",
+      "estado": "PASS",
+      "assertions": 7
+    },
+    {
+      "report": "release-postgres-rerun.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\PsychologyDashboardDataTest::test_panel_muestra_instrumentos_propios_sin_exponer_los_de_otro_profesional",
+      "estado": "PASS",
+      "assertions": 18
+    },
+    {
+      "report": "release-postgres-rerun.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\PsychologyDashboardDataTest::test_panel_sin_personal_activo_no_muestra_totales_institucionales",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-postgres-final.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_administrador_sidebar_estructura_y_sin_duplicados",
+      "estado": "PASS",
+      "assertions": 23
+    },
+    {
+      "report": "release-postgres-sidebar-final.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_familiar_sidebar_muestra_solo_inicio",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-postgres-final.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_fisioterapeuta_sidebar_muestra_inicio_y_alertas_de_especialidad",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-postgres-final.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_layout_desktop_en_administrador",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-postgres-final.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_layout_desktop_en_enfermero",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-postgres-final.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_layout_desktop_sidebar_fixed_y_accordion_en_superadmin_usuarios",
+      "estado": "PASS",
+      "assertions": 10
+    },
+    {
+      "report": "release-postgres-final.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_layout_superadmin_en_consulta_de_residentes_conserva_sidebar_tecnico",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-postgres-final.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_medico_sidebar_estructura",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres-final.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_nutricionista_sidebar_muestra_inicio_y_alertas_de_especialidad",
+      "estado": "PASS",
+      "assertions": 8
+    },
+    {
+      "report": "release-postgres-sidebar-final.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_pedagogo_sidebar_estructura",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres-final.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_psicologo_sidebar_muestra_valoraciones_y_oculta_placeholders",
+      "estado": "PASS",
+      "assertions": 14
+    },
+    {
+      "report": "release-postgres-final.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_superadmin_conserva_sidebar_global_en_cualquier_contexto",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-postgres-final.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_superadmin_puede_consultar_dashboard_operativo_de_administracion",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres-final.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_superadministrador_sidebar_estructura_y_sin_duplicados",
+      "estado": "PASS",
+      "assertions": 9
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SistemaExperto\\Infrastructure\\Repositories\\ConsolidacionBloquesExpertosTest::test_columna_no_prevista_impide_retirar_incluso_una_tabla_vacia",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SistemaExperto\\Infrastructure\\Repositories\\ConsolidacionBloquesExpertosTest::test_fallo_intermedio_revierte_ddl_y_copia_sin_dejar_tablas_parciales",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SistemaExperto\\Infrastructure\\Repositories\\ConsolidacionBloquesExpertosTest::test_fk_entrante_no_prevista_impide_retiro_sin_perder_datos",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SistemaExperto\\Infrastructure\\Repositories\\ConsolidacionBloquesExpertosTest::test_resultado_y_traza_conservan_su_ausencia_independientemente",
+      "estado": "PASS",
+      "assertions": 12
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SistemaExperto\\Infrastructure\\Repositories\\ConsolidacionBloquesExpertosTest::test_sql_rechaza_bloque_parcial_y_sobrescritura_de_resultado",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SistemaExperto\\Infrastructure\\Repositories\\ConsolidacionBloquesExpertosTest::test_transicion_poblada_reversible_conserva_campos_identidades_y_clasificacion",
+      "estado": "PASS",
+      "assertions": 35
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Feature\\SistemaExperto\\Infrastructure\\Repositories\\ConsolidacionBloquesExpertosTest::test_variable_rechaza_dominio_de_otra_version_aunque_la_identidad_exista",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Unit\\ManifiestoCognitivo30Test::test_cobertura_versionada_y_metodos_existentes_sin_afirmar_datos_individuales_importados",
+      "estado": "PASS",
+      "assertions": 178
+    },
+    {
+      "report": "release-postgres.junit.xml",
+      "entorno": "PostgreSQL",
+      "key": "Tests\\Unit\\ManifiestoCognitivo30Test::test_retroalimentacion_detecta_discrepancia_dominio_salida_omitida_duplicacion_y_caso_no_ejecutado",
+      "estado": "PASS",
+      "assertions": 10
+    },
+    {
+      "report": "release-sqlite-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\CohorteInferencia30Test::test_fallo_parcial_revierte_admision_fuentes_auditoria_y_correlativos",
+      "estado": "PASS",
+      "assertions": 18
+    },
+    {
+      "report": "release-sqlite-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\CohorteInferencia30Test::test_rechaza_entorno_local_antes_de_escribir",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-sqlite-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\CohorteInferencia30Test::test_seeder_artisan_rechaza_destino_no_confirmado_sin_escrituras",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-sqlite-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\CohorteInferencia30Test::test_treinta_admisiones_fuentes_originales_dos_ramas_y_cuatro_perfiles_reproducibles",
+      "estado": "PASS",
+      "assertions": 2174
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_atencion_compartida_unifica_soportes_sin_unificar_conjunciones_de_aplicaciones",
+      "estado": "PASS",
+      "assertions": 10
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_atencion_manipulada_en_captura_se_rechaza_aunque_figure_coherente",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_atenciones_distintas_o_ausentes_no_se_fusionan_por_fecha",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_ausencia_de_respuesta_nominal_conserva_el_formato_historico_de_traza",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_captura_compartida_documentada_no_elude_revocacion_del_permiso_documental",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_captura_compartida_no_elude_revocacion_actual_de_permisos with data set #0",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_captura_compartida_no_elude_revocacion_actual_de_permisos with data set #1",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_captura_compartida_no_elude_revocacion_actual_de_permisos with data set #2",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_captura_compartida_no_elude_revocacion_actual_de_permisos with data set #3",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_captura_compartida_no_elude_revocacion_actual_de_permisos with data set #4",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_corte_anterior_no_incluye_la_aplicacion_y_futuro_es_invalido",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_cuenta_inactiva_no_accede",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_cuenta_inactiva_o_profesion_incompatible_no_registran_aunque_tengan_permisos",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_documento_posterior_al_corte_no_respalda_inferencia_ni_replay",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_edad_historica_se_calcula_en_aplicacion_y_menor_60_se_excluye",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_familiar_no_consulta_inferencia_con_permisos_aislados",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_fuente_anulada_no_se_reutiliza",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_fuente_sin_columna_original_de_autor_se_rechaza",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_g09_sql_exige_perfil_definido_y_medida_bruta_de_la_misma_aplicacion",
+      "estado": "PASS",
+      "assertions": 14
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_instantanea_reproduce_sin_sql_configuracion_o_reglas_actuales",
+      "estado": "PASS",
+      "assertions": 7
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_medicina_registra_sin_atribuir_aprobaciones_profesionales",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_memoria_usa_literal_textual_original_y_su_admisibilidad_especifica",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_motor_verifica_las_pk_nominales_aunque_el_adaptador_marque_coherente",
+      "estado": "PASS",
+      "assertions": 6
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_no_lee_aplicaciones_de_otro_residente",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_null_no_activa_regla_y_no_se_traduce_en_false",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_observacion_literal_no_acredita_instrumento_de_memoria_por_un_vinculo_configurado",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_observacion_nominal_con_numero_simultaneo_se_rechaza",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_observacion_nominal_desconocida_conserva_literal_sin_inferir_por_etiqueta_o_puntaje",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_observacion_nominal_sin_opcion_no_infiere_por_texto",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_observacion_nominal_sin_texto_no_reconstruye_literal_desde_opcion",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_observacion_nominal_tampoco_acredita_medicion_instrumental_de_memoria",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_observaciones_de_19_componentes_se_integran_sin_acreditar_las_15_reglas_g09",
+      "estado": "PASS",
+      "assertions": 124
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_observaciones_nominales_recorran_fuente_regla_componente_dominio_y_traza_sin_normalizar",
+      "estado": "PASS",
+      "assertions": 31
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_opcion_cruzada_excluye_fuente_y_no_genera_resultado",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_opcion_unica_de_catalogo_retirado_conserva_la_observacion_historica",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_opcion_y_texto_discordantes_no_se_eligen_arbitrariamente",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_perfil_e_inferencia_usan_una_sola_captura_aunque_el_original_se_rectifique_despues",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_permiso_fuente_retirado_no_devuelve_datos",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_pregunta_declarativa_sin_respuesta_conserva_definicion_y_ausencia",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_pregunta_opcion_no_observacional_no_adopta_el_contrato_nominal",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_preparacion_backend_no_se_expone_en_la_consulta_ordinaria_y_rechaza_otro_contexto",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_recorrido_sql_fuente_original_regla_conclusion_y_perfil_sin_guardado_implicitamente",
+      "estado": "PASS",
+      "assertions": 10
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_registro_adoptado_es_atomico_idempotente_y_ejecuta_cinco_dominios_sin_fabricar_fuentes",
+      "estado": "PASS",
+      "assertions": 20
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_registro_desde_livewire_usa_actor_autorizado_y_conserva_revision_pendiente",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_registro_fallido_no_deja_conocimiento_ni_auditoria_parciales",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_reproduccion_conserva_episodio_aunque_el_vinculo_sql_cambie",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_respuesta_con_dos_valores_originales_no_se_interpreta",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_sin_configuracion_y_sin_vinculos_se_declara_ausencia",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_sucesora_con_dos_mapeos_equivalentes_no_elige_uno_por_su_estado",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_sucesora_no_hereda_un_vinculo_cuya_identidad_semantica_cambio",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_sucesoras_heredan_vinculos_traducidos_y_archivar_conserva_la_reproduccion_original",
+      "estado": "PASS",
+      "assertions": 9
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_superadmin_no_registra_conocimiento_aunque_tenga_permiso_aislado",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_traza_conserva_respuesta_documento_edad_y_precision_del_corte",
+      "estado": "PASS",
+      "assertions": 12
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_version_sin_vigencia_no_usa_fallback_al_laboratorio",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\ConocimientoCognitivoInstitucionalTest::test_vinculos_observacionales_del_contrato_adoptado_se_reconstruyen_desde_mapeos_y_originales",
+      "estado": "PASS",
+      "assertions": 22
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\FichaPsicologicaResidenteTest::test_cambiar_periodo_y_metrica_de_tendencia_longitudinal",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\FichaPsicologicaResidenteTest::test_componente_livewire_muestra_pestanas_didacticas_y_permite_navegar_entre_ellas",
+      "estado": "PASS",
+      "assertions": 18
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\FichaPsicologicaResidenteTest::test_disparar_abrir_evaluacion_emite_evento_hacia_modal_de_area",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\FichaPsicologicaResidenteTest::test_enfermero_o_usuario_no_autorizado_es_rechazado_con_403",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\FichaPsicologicaResidenteTest::test_psicologo_activo_puede_ver_ficha_psicologica_del_residente",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\FichaPsicologicaResidenteTest::test_psicologo_puede_guardar_control_funcional_iadl_soporte_c03",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\FichaPsicologicaResidenteTest::test_psicologo_puede_guardar_valoracion_afectiva_vinculada_a_atencion_y_soporte_c04",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\FichaPsicologicaResidenteTest::test_psicologo_puede_navegar_a_pestana_orion_y_consultar_criterios_petersen",
+      "estado": "PASS",
+      "assertions": 10
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\FichaPsicologicaResidenteTest::test_psicologo_puede_registrar_sesion_de_atencion",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\FichaPsicologicaResidenteTest::test_tendencia_cognitiva_con_multiples_puntos_calcula_resumen_y_datasets",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_archivo_crea_sucesora_con_autor_y_pendientes_sin_cambiar_el_original",
+      "estado": "PASS",
+      "assertions": 6
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_arista_decorativa_no_habilita_publicacion_y_contrato_no_se_inventa",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_check_fisico_rechaza_firma_con_estado_nulo_y_autorreferencia",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_codigo_de_version_demasiado_largo_falla_antes_de_insertar",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_consecuencia_reservada_se_rechaza_sin_publicar_ni_retirar_la_anterior",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_cuenta_desactivada_no_muta_desde_una_interfaz_ya_abierta",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_fallo_de_traduccion_revierte_version_y_auditoria",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_gobierno_admite_condicion_de_subcomponente_con_vinculo_explicito",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_guia_interdisciplinaria_se_consulta_sin_publicar_perfiles_ni_cambiar_historia",
+      "estado": "PASS",
+      "assertions": 13
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_interfaz_crea_sucesora_y_registra_revision_con_identidad_de_sesion",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_interfaz_muestra_definicion_nueva_y_conserva_sustitucion",
+      "estado": "PASS",
+      "assertions": 6
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_interfaz_rechaza_regla_ajena_a_la_version_seleccionada",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_la_ruta_exige_sesion_y_competencia_profesional",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_migracion_revierte_sin_historia_y_reinstala_sin_perder_definiciones",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_payload_no_puede_imponer_autor_ni_revisor",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_permiso_retirado_impide_escritura",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_pertenencia_sin_arista_de_variable_no_publica_sucesora",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_propiedades_locked_rechazan_atribuir_una_regla_desde_cliente",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_prueba_desde_interfaz_usa_condiciones_guardadas_sin_crear_resultados_ni_aprobar",
+      "estado": "PASS",
+      "assertions": 11
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_psicologia_registra_decision_una_vez_y_el_reintento_no_duplica_auditoria",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_rechazo_no_se_sobrescribe_con_otra_decision",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_rol_ajeno_personal_inactivo_o_ausente_y_preview_no_crean_conocimiento",
+      "estado": "PASS",
+      "assertions": 12
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_rollback_de_migracion_con_historia_se_rechaza_sin_perder_columnas",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_sql_conserva_la_firma_y_el_enlace_historico",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_superadministracion_consulta_sin_formularios_de_escritura",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_superadministracion_no_escribe_aunque_tenga_permiso_aislado",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\GobiernoReglasExpertasTest::test_una_sucesora_no_rehabilita_la_definicion_rechazada",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\MisResidentesPsicologiaTest::test_buscador_compartido_envia_la_busqueda_a_mis_residentes",
+      "estado": "PASS",
+      "assertions": 7
+    },
+    {
+      "report": "release-sqlite-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\MisResidentesPsicologiaTest::test_busqueda_por_nombre_compuesto_y_cambio_de_vista",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-sqlite-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\MisResidentesPsicologiaTest::test_lista_residentes_admitidos_y_abre_la_ficha_sin_mostrar_codigos",
+      "estado": "PASS",
+      "assertions": 6
+    },
+    {
+      "report": "release-sqlite-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\MisResidentesPsicologiaTest::test_permiso_revocado_impide_actualizar_una_vista_livewire_abierta",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\MisResidentesPsicologiaTest::test_rol_ajeno_y_personal_inactivo_no_pueden_consultar_el_listado",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\NavegacionSistemaExpertoTest::test_cuenta_inactiva_o_sin_personal_competente_no_recibe_el_listado",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\NavegacionSistemaExpertoTest::test_medicina_consulta_resultados_y_abre_valoracion_desde_ficha",
+      "estado": "PASS",
+      "assertions": 6
+    },
+    {
+      "report": "release-sqlite-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\NavegacionSistemaExpertoTest::test_psicologia_consulta_resultados_y_abre_valoracion_desde_area_cognitiva",
+      "estado": "PASS",
+      "assertions": 26
+    },
+    {
+      "report": "release-sqlite-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\NavegacionSistemaExpertoTest::test_visitante_y_superadministracion_no_acceden_a_entrada_de_captura_clinica",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\PsychologyDashboardDataTest::test_graficas_omiten_registros_anulados_y_muestran_vacio_sin_datos",
+      "estado": "PASS",
+      "assertions": 7
+    },
+    {
+      "report": "release-sqlite-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\PsychologyDashboardDataTest::test_panel_muestra_instrumentos_propios_sin_exponer_los_de_otro_profesional",
+      "estado": "PASS",
+      "assertions": 18
+    },
+    {
+      "report": "release-sqlite-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\PsychologyDashboardDataTest::test_panel_sin_personal_activo_no_muestra_totales_institucionales",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_administrador_sidebar_estructura_y_sin_duplicados",
+      "estado": "PASS",
+      "assertions": 23
+    },
+    {
+      "report": "release-sidebar-final.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_familiar_sidebar_muestra_solo_inicio",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_fisioterapeuta_sidebar_muestra_inicio_y_alertas_de_especialidad",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_layout_desktop_en_administrador",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_layout_desktop_en_enfermero",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_layout_desktop_sidebar_fixed_y_accordion_en_superadmin_usuarios",
+      "estado": "PASS",
+      "assertions": 10
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_layout_superadmin_en_consulta_de_residentes_conserva_sidebar_tecnico",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_medico_sidebar_estructura",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_nutricionista_sidebar_muestra_inicio_y_alertas_de_especialidad",
+      "estado": "PASS",
+      "assertions": 8
+    },
+    {
+      "report": "release-sidebar-final.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_pedagogo_sidebar_estructura",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_psicologo_sidebar_muestra_valoraciones_y_oculta_placeholders",
+      "estado": "PASS",
+      "assertions": 14
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_superadmin_conserva_sidebar_global_en_cualquier_contexto",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_superadmin_puede_consultar_dashboard_operativo_de_administracion",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SidebarServiceTest::test_superadministrador_sidebar_estructura_y_sin_duplicados",
+      "estado": "PASS",
+      "assertions": 9
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SistemaExperto\\Infrastructure\\Repositories\\ConsolidacionBloquesExpertosTest::test_columna_no_prevista_impide_retirar_incluso_una_tabla_vacia",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SistemaExperto\\Infrastructure\\Repositories\\ConsolidacionBloquesExpertosTest::test_fallo_intermedio_revierte_ddl_y_copia_sin_dejar_tablas_parciales",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SistemaExperto\\Infrastructure\\Repositories\\ConsolidacionBloquesExpertosTest::test_fk_entrante_no_prevista_impide_retiro_sin_perder_datos",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SistemaExperto\\Infrastructure\\Repositories\\ConsolidacionBloquesExpertosTest::test_resultado_y_traza_conservan_su_ausencia_independientemente",
+      "estado": "PASS",
+      "assertions": 12
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SistemaExperto\\Infrastructure\\Repositories\\ConsolidacionBloquesExpertosTest::test_sql_rechaza_bloque_parcial_y_sobrescritura_de_resultado",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SistemaExperto\\Infrastructure\\Repositories\\ConsolidacionBloquesExpertosTest::test_transicion_poblada_reversible_conserva_campos_identidades_y_clasificacion",
+      "estado": "PASS",
+      "assertions": 143
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Feature\\SistemaExperto\\Infrastructure\\Repositories\\ConsolidacionBloquesExpertosTest::test_variable_rechaza_dominio_de_otra_version_aunque_la_identidad_exista",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\ConsultaCognitivaEnfermeriaTest::test_detalle_conserva_procedencia_actual_sin_publicar_identificadores_internos",
+      "estado": "PASS",
+      "assertions": 6
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\ConsultaCognitivaEnfermeriaTest::test_series_no_mezclan_versiones_ni_fabrican_valores_ausentes",
+      "estado": "PASS",
+      "assertions": 6
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\ConsultaCognitivaEnfermeriaTest::test_series_solo_admiten_fuentes_validas_y_referencia_identica",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\CorteDocumentoInstrumentalTest::test_solo_admite_fecha_valida_conocida_anterior_o_igual_al_corte",
+      "estado": "PASS",
+      "assertions": 9
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\FechaVisibleTest::test_muestra_fechas_historicas_locales_e_iso_sin_exponer_microsegundos_ni_zona",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_ausencias_no_se_rellenan_durante_el_replay",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_corrupcion_y_cruces_se_rechazan_aunque_se_recalculen_las_huellas with data set #0",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_corrupcion_y_cruces_se_rechazan_aunque_se_recalculen_las_huellas with data set #1",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_corrupcion_y_cruces_se_rechazan_aunque_se_recalculen_las_huellas with data set #10",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_corrupcion_y_cruces_se_rechazan_aunque_se_recalculen_las_huellas with data set #11",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_corrupcion_y_cruces_se_rechazan_aunque_se_recalculen_las_huellas with data set #2",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_corrupcion_y_cruces_se_rechazan_aunque_se_recalculen_las_huellas with data set #3",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_corrupcion_y_cruces_se_rechazan_aunque_se_recalculen_las_huellas with data set #4",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_corrupcion_y_cruces_se_rechazan_aunque_se_recalculen_las_huellas with data set #5",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_corrupcion_y_cruces_se_rechazan_aunque_se_recalculen_las_huellas with data set #6",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_corrupcion_y_cruces_se_rechazan_aunque_se_recalculen_las_huellas with data set #7",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_corrupcion_y_cruces_se_rechazan_aunque_se_recalculen_las_huellas with data set #8",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_corrupcion_y_cruces_se_rechazan_aunque_se_recalculen_las_huellas with data set #9",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_integridad_no_equivale_a_replay_si_se_aporta_una_huella_distinta",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_integridad_rechaza_forma_incompleta_y_contextos_cruzados_sin_inferencia with data set #0",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_integridad_rechaza_forma_incompleta_y_contextos_cruzados_sin_inferencia with data set #1",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_integridad_rechaza_forma_incompleta_y_contextos_cruzados_sin_inferencia with data set #10",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_integridad_rechaza_forma_incompleta_y_contextos_cruzados_sin_inferencia with data set #11",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_integridad_rechaza_forma_incompleta_y_contextos_cruzados_sin_inferencia with data set #12",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_integridad_rechaza_forma_incompleta_y_contextos_cruzados_sin_inferencia with data set #13",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_integridad_rechaza_forma_incompleta_y_contextos_cruzados_sin_inferencia with data set #14",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_integridad_rechaza_forma_incompleta_y_contextos_cruzados_sin_inferencia with data set #15",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_integridad_rechaza_forma_incompleta_y_contextos_cruzados_sin_inferencia with data set #16",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_integridad_rechaza_forma_incompleta_y_contextos_cruzados_sin_inferencia with data set #2",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_integridad_rechaza_forma_incompleta_y_contextos_cruzados_sin_inferencia with data set #3",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_integridad_rechaza_forma_incompleta_y_contextos_cruzados_sin_inferencia with data set #4",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_integridad_rechaza_forma_incompleta_y_contextos_cruzados_sin_inferencia with data set #5",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_integridad_rechaza_forma_incompleta_y_contextos_cruzados_sin_inferencia with data set #6",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_integridad_rechaza_forma_incompleta_y_contextos_cruzados_sin_inferencia with data set #7",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_integridad_rechaza_forma_incompleta_y_contextos_cruzados_sin_inferencia with data set #8",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_integridad_rechaza_forma_incompleta_y_contextos_cruzados_sin_inferencia with data set #9",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_lectura_integra_no_necesita_el_motor_ni_recalcula_las_salidas",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_lectura_rechaza_salida_alterada_con_la_huella_confiable_original",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_manifiesto_v1_no_se_acepta_en_compuesto_aunque_huellas_y_codigo_coincidan",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_preguntas_originales_sin_respuesta_se_conservan_en_ambas_ramas",
+      "estado": "PASS",
+      "assertions": 24
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_ramas_validas_con_medicion_discrepante_no_se_pueden_componer",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_rechaza_pregunta_sin_respuesta_discrepante_entre_ramas",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_release_ausente_no_se_sustituye_por_el_ejecutor_actual",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_release_vinculado_reproduce_ambas_ramas_en_otro_proceso_sin_laravel",
+      "estado": "PASS",
+      "assertions": 17
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_reproduce_los_cuatro_patrones_desde_un_contrato_compuesto with data set \"amnesico_multiple\"",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_reproduce_los_cuatro_patrones_desde_un_contrato_compuesto with data set \"amnesico_unico\"",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_reproduce_los_cuatro_patrones_desde_un_contrato_compuesto with data set \"no_amnesico_multiple\"",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-final-rerun.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaEvaluacionInstitucionalTest::test_reproduce_los_cuatro_patrones_desde_un_contrato_compuesto with data set \"no_amnesico_unico\"",
+      "estado": "PASS",
+      "assertions": 5
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaInstrumentalCompletaTest::test_contrato_v2_sigue_reproduciendo_episodios_sin_exigir_la_fuente_v3",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaInstrumentalCompletaTest::test_documento_posterior_no_puede_respaldar_una_normalizacion_en_replay",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaInstrumentalCompletaTest::test_metadatos_locales_ajenos_no_entran_en_el_contrato_conservado",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaInstrumentalCompletaTest::test_no_reconstruye_un_perfil_ausente_desde_la_configuracion_actual",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaInstrumentalCompletaTest::test_recalcula_brutos_normalizacion_red_y_cinco_dominios_desde_un_solo_dto",
+      "estado": "PASS",
+      "assertions": 9
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaInstrumentalCompletaTest::test_rechaza_normalizacion_alterada_aunque_se_recalcule_la_huella_del_contenedor",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaInstrumentalCompletaTest::test_rechaza_salida_de_red_alterada_aunque_se_recalcule_su_huella",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\InstantaneaInstrumentalCompletaTest::test_replay_completo_se_ejecuta_en_otro_proceso_usando_solo_el_codigo_del_zip",
+      "estado": "PASS",
+      "assertions": 8
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\ManifiestoCognitivo30Test::test_cobertura_versionada_y_metodos_existentes_sin_afirmar_datos_individuales_importados",
+      "estado": "PASS",
+      "assertions": 178
+    },
+    {
+      "report": "release-sqlite.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\ManifiestoCognitivo30Test::test_retroalimentacion_detecta_discrepancia_dominio_salida_omitida_duplicacion_y_caso_no_ejecutado",
+      "estado": "PASS",
+      "assertions": 10
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MembresiasOriginalesPetersenTest::test_medicion_exige_el_metodo_y_la_huella_del_perfil_original with data set #0",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MembresiasOriginalesPetersenTest::test_medicion_exige_el_metodo_y_la_huella_del_perfil_original with data set #1",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MembresiasOriginalesPetersenTest::test_no_acepta_vinculos_incompletos_aunque_se_recalcule_la_huella with data set \"campo desconocido\"",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MembresiasOriginalesPetersenTest::test_no_acepta_vinculos_incompletos_aunque_se_recalcule_la_huella with data set \"código truncado\"",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MembresiasOriginalesPetersenTest::test_no_acepta_vinculos_incompletos_aunque_se_recalcule_la_huella with data set \"colección omitida\"",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MembresiasOriginalesPetersenTest::test_no_acepta_vinculos_incompletos_aunque_se_recalcule_la_huella with data set \"dominio revisado sin FK\"",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MembresiasOriginalesPetersenTest::test_no_acepta_vinculos_incompletos_aunque_se_recalcule_la_huella with data set \"fuente con dos FK\"",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MembresiasOriginalesPetersenTest::test_no_acepta_vinculos_incompletos_aunque_se_recalcule_la_huella with data set \"fuente intercambiada\"",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MembresiasOriginalesPetersenTest::test_no_acepta_vinculos_incompletos_aunque_se_recalcule_la_huella with data set \"fuente sin FK\"",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MembresiasOriginalesPetersenTest::test_no_acepta_vinculos_incompletos_aunque_se_recalcule_la_huella with data set \"huella sin medición\"",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MembresiasOriginalesPetersenTest::test_no_acepta_vinculos_incompletos_aunque_se_recalcule_la_huella with data set \"método sin medición\"",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MembresiasOriginalesPetersenTest::test_no_acepta_vinculos_incompletos_aunque_se_recalcule_la_huella with data set \"orden de lista alterado\"",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MembresiasOriginalesPetersenTest::test_no_acepta_vinculos_incompletos_aunque_se_recalcule_la_huella with data set \"orden original repetido\"",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MembresiasOriginalesPetersenTest::test_no_acepta_vinculos_incompletos_aunque_se_recalcule_la_huella with data set \"orden textual\"",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MembresiasOriginalesPetersenTest::test_no_acepta_vinculos_incompletos_aunque_se_recalcule_la_huella with data set \"propietario ajeno\"",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MembresiasOriginalesPetersenTest::test_no_acepta_vinculos_incompletos_aunque_se_recalcule_la_huella with data set \"residente ajeno\"",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MembresiasOriginalesPetersenTest::test_no_acepta_vinculos_incompletos_aunque_se_recalcule_la_huella with data set \"soporte omitido\"",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MembresiasOriginalesPetersenTest::test_no_acepta_vinculos_incompletos_aunque_se_recalcule_la_huella with data set \"soporte repetido\"",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MembresiasOriginalesPetersenTest::test_no_acepta_vinculos_incompletos_aunque_se_recalcule_la_huella with data set \"tipo intercambiado\"",
+      "estado": "PASS",
+      "assertions": 1
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MembresiasOriginalesPetersenTest::test_v2_conserva_vinculos_y_v1_historica_no_se_completa_ni_cambia_sus_salidas",
+      "estado": "PASS",
+      "assertions": 9
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\MotivoPetersenVisibleTest::test_traduce_motivos_sin_exponer_identificadores_de_fuente_o_campos_internos",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\ResumenPetersenVisibleTest::test_faltantes_y_observaciones_no_se_convierten_en_patron",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\ResumenPetersenVisibleTest::test_no_atribuye_otros_bloqueos_a_falta_de_mediciones with data set #0",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\ResumenPetersenVisibleTest::test_no_atribuye_otros_bloqueos_a_falta_de_mediciones with data set #1",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\ResumenPetersenVisibleTest::test_no_atribuye_otros_bloqueos_a_falta_de_mediciones with data set #2",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\ResumenPetersenVisibleTest::test_no_atribuye_otros_bloqueos_a_falta_de_mediciones with data set #3",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\ResumenPetersenVisibleTest::test_un_requisito_negativo_no_se_presenta_como_falta_de_medicion",
+      "estado": "PASS",
+      "assertions": 3
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\ResumenPetersenVisibleTest::test_una_revision_diferencial_negativa_no_inventa_un_impedimento_clinico",
+      "estado": "PASS",
+      "assertions": 2
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\ResumirFuentesCognitivasTest::test_separa_aplicacion_funcional_de_medicion_cognitiva",
+      "estado": "PASS",
+      "assertions": 4
+    },
+    {
+      "report": "release-unit.junit.xml",
+      "entorno": "SQLite/unit",
+      "key": "Tests\\Unit\\ResumirFuentesCognitivasTest::test_solo_grafica_medidas_de_la_misma_fuente_en_dias_distintos",
+      "estado": "PASS",
+      "assertions": 8
+    }
+  ],
+  "resumen": [
+    {
+      "entorno": "PostgreSQL",
+      "casos": 131,
+      "pass": 131,
+      "fail": 0,
+      "skip": 0,
+      "assertions": 3165.0
+    },
+    {
+      "entorno": "SQLite/unit",
+      "casos": 217,
+      "pass": 217,
+      "fail": 0,
+      "skip": 0,
+      "assertions": 3499.0
+    }
+  ],
+  "criterio": "Último resultado de cada caso por entorno; consolida ejecuciones y reejecuciones, no representa una sola ejecución completa."
+}

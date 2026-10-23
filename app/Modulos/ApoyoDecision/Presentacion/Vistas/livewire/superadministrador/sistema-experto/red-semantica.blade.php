@@ -39,6 +39,10 @@
                     @if($nodo && isset($conocimiento['nodos'][$nodo]))
                         @php($actual = $conocimiento['nodos'][$nodo])
                         <p class="rm-expert-eyebrow">Nodo seleccionado</p><h3 class="rm-expert-section-title">{{ $actual['nombre'] }}</h3><p>{{ $actual['tipo_nodo'] }} · {{ $actual['estado'] }}</p>
+<<<<<<< HEAD
+=======
+                        <button type="button" data-expert-detail wire:click="abrirDato('nodos_semanticos', @js($nodo))" class="rm-btn rm-btn-primary mt-3"><i class="ph ph-arrows-out" aria-hidden="true"></i>Ver ficha y todas sus conexiones</button>
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                         <dl class="rm-lab-data"><div><dt>Código</dt><dd>{{ $actual['codigo_semantico'] }}</dd></div><div><dt>Descripción</dt><dd>{{ $actual['definicion'] ?? 'No declarada' }}</dd></div><div><dt>Versión</dt><dd>{{ $actual['cod_version_modelo'] }}</dd></div><div><dt>Fuentes declaradas</dt><dd>@forelse($fuentesNodo as $fuenteNodo)<p>{{ $fuenteNodo['fuente'] }} · {{ $fuenteNodo['codigo'] }}<small class="block">Mapeo: {{ $fuenteNodo['mapeo'] }}</small></p>@empty Sin vínculo directo de fuente declarado. @endforelse</dd></div></dl>
                         <h4 class="font-semibold mt-3">Relaciones de entrada y salida</h4><ul class="rm-knowledge-neighbors">
                             @forelse(array_filter($conocimiento['relaciones'], fn ($r) => $r['cod_nodo_origen'] === $nodo || $r['cod_nodo_destino'] === $nodo) as $r)

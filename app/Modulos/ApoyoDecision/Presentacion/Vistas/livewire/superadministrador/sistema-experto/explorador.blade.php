@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <x-ui.section-card title="Base de conocimiento" subtitle="Lectura del paquete experimental o de una versión almacenada. La consulta no activa conocimiento.">
     <div class="rm-lab-grid">
         <div>
@@ -22,6 +23,14 @@
         </div>
     </div>
 </x-ui.section-card>
+=======
+<section class="rm-card rm-expert-scopebar" aria-label="Procedencia del conocimiento">
+    <div><label for="expert-version-scope"><i class="ph ph-stack" aria-hidden="true"></i>Versión que desea consultar</label><select id="expert-version-scope" wire:change="seleccionarVersion($event.target.value)" class="rm-select w-full"><option value="" @selected($version === null)>Paquete experimental G09 en memoria</option>@foreach($versiones as $v)<option value="{{ $v->cod_version_modelo }}" @selected($version === $v->cod_version_modelo)>{{ $v->codigo_version }} · {{ $v->fecha_hora_retiro ? 'Retirada' : $v->estado }}</option>@endforeach</select></div>
+    <div><label for="lab-modo">Vista del conocimiento</label><select id="lab-modo" wire:model.live="modoConocimiento" class="rm-select w-full"><option value="reglas">Catálogo de reglas</option><option value="catalogo">Todos los datos y sus conexiones</option><option value="red">Red semántica</option><option value="versiones">Comparación de versiones</option></select></div>
+    <div class="rm-expert-origin"><i class="ph ph-eye" aria-hidden="true"></i><span>{{ $version ? 'Instantánea almacenada · solo consulta' : 'Paquete experimental · sin publicación clínica' }}</span></div>
+</section>
+<nav class="rm-expert-local-tabs" aria-label="Explorar el conocimiento"><button type="button" wire:click="explorarRed" aria-pressed="{{ $modoConocimiento === 'red' ? 'true' : 'false' }}"><i class="ph ph-graph" aria-hidden="true"></i>Mapa semántico</button><button type="button" wire:click="explorarCategoria('reglas_expertas')" aria-pressed="{{ $modoConocimiento === 'catalogo' && $tablaCatalogo === 'reglas_expertas' ? 'true' : 'false' }}"><i class="ph ph-gear" aria-hidden="true"></i>Reglas y condiciones</button><button type="button" wire:click="explorarCategoria('fuentes_datos_expertas')"><i class="ph ph-books" aria-hidden="true"></i>Fuentes y mapeos</button><button type="button" wire:click="explorarCategoria('nodos_semanticos')"><i class="ph ph-squares-four" aria-hidden="true"></i>Todos los datos</button></nav>
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 @if($errorConocimiento)
     <div class="rm-alert rm-alert-danger" role="alert"><div><strong>Error de integridad del conocimiento</strong><p>{{ $errorConocimiento }}</p></div></div>
 @elseif($conocimiento)

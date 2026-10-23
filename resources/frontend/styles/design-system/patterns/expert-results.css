@@ -6,11 +6,16 @@
 .rm-expert-domain-options .rm-orion-domain { min-height: 44px; }
 .rm-expert-domain-current { display: flex; align-items: center; flex-wrap: wrap; gap: var(--rm-space-3); margin-top: var(--rm-space-4); padding-top: var(--rm-space-3); border-top: 1px solid var(--rm-border); }
 .rm-expert-domain-current p { flex: 1 1 20rem; }
+<<<<<<< HEAD
 .rm-expert-nursing-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--rm-space-4); align-items: start; }
 .rm-expert-nursing-grid > * { min-width: 0; scroll-margin-top: var(--rm-space-5); }
 .rm-expert-nursing-grid > .rm-expert-nursing-result { grid-column: 1 / -1; }
 .rm-expert-nursing-grid > .rm-expert-nursing-observations { grid-column: 1 / -1; }
 .rm-expert-nursing-result h2 { font-family: var(--rm-font-title); font-size: var(--rm-font-size-page); font-weight: var(--rm-font-weight-extrabold); line-height: var(--rm-line-height-title); overflow-wrap: anywhere; }
+=======
+.rm-expert-nursing-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr); gap: var(--rm-space-4); align-items: start; }
+.rm-expert-nursing-grid > * { min-width: 0; scroll-margin-top: var(--rm-space-5); }
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 .rm-expert-operational-record { border-bottom: 1px solid var(--rm-border-soft); padding-block: var(--rm-space-3); overflow-wrap: anywhere; }
 .rm-expert-operational-record small { display: block; color: var(--rm-text-secondary); margin-top: var(--rm-space-2); }
 .rm-expert-results--medicine .rm-expert-person { flex: 1 1 20rem; }
@@ -721,6 +726,7 @@
 @media (prefers-reduced-motion: reduce) { .rm-expert-heading-actions .rm-btn, .rm-orion-petersen-list > details { transition: none; } }
 
 /* Lectura compacta de Psicología: conclusión visible, detalle bajo demanda. */
+<<<<<<< HEAD
 /* La lectura del perfil comparte geometría entre Psicología y Enfermería; los permisos y acciones siguen separados. */
 :is(.rm-expert-results--psychology, .rm-expert-results--nursing) { gap: var(--rm-space-2); }
 :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-expert-page-heading { gap: var(--rm-space-2) var(--rm-space-4); }
@@ -748,6 +754,34 @@
 :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-expert-analysis-card { padding: var(--rm-space-3) var(--rm-space-4); box-shadow: none; }
 :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-expert-analysis-card > div:first-child { gap: var(--rm-space-2); }
 :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-expert-analysis-card h2 { font-size: var(--rm-font-size-card-title); }
+=======
+.rm-expert-results--psychology { gap: var(--rm-space-2); }
+.rm-expert-results--psychology .rm-expert-page-heading { gap: var(--rm-space-2) var(--rm-space-4); }
+.rm-expert-results--psychology .rm-expert-page-heading h1 { font-size: clamp(1.45rem, 2.5vw, 2rem); line-height: 1.18; }
+.rm-expert-results--psychology .rm-expert-subtitle { font-size: var(--rm-font-size-compact); }
+.rm-expert-results--psychology .rm-expert-heading-actions { gap: var(--rm-space-2); }
+.rm-expert-results--psychology .rm-expert-heading-actions .rm-btn { min-height: 44px; padding: var(--rm-space-2) var(--rm-space-3); font-size: var(--rm-font-size-compact); }
+.rm-expert-results--psychology .rm-psychology-overview { gap: var(--rm-space-3); }
+.rm-expert-results--psychology :is(.rm-psychology-resident, .rm-psychology-panel, .rm-psychology-warning) { padding: var(--rm-space-3) var(--rm-space-4); }
+.rm-expert-results--psychology .rm-expert-avatar { width: 52px; height: 52px; font-size: 1.45rem; flex: none; }
+.rm-expert-results--psychology .rm-psychology-pending { padding: var(--rm-space-3) var(--rm-space-4); gap: var(--rm-space-3); }
+.rm-expert-results--psychology .rm-psychology-pending h2 { max-width: none; font-size: clamp(1.25rem, 2vw, 1.7rem); }
+.rm-expert-results--psychology .rm-psychology-pending__main > p { font-size: var(--rm-font-size-compact); }
+.rm-expert-results--psychology .rm-psychology-pending.is-expected { border-color: var(--rm-success-strong); background: color-mix(in srgb, var(--rm-success-soft) 30%, var(--rm-surface)); }
+.rm-expert-results--psychology .rm-psychology-pending.is-expected .rm-psychology-pending__status { color: var(--rm-success-strong); background: var(--rm-success-soft); }
+.rm-expert-results--psychology .rm-psychology-pending__needs { gap: var(--rm-space-1); padding-inline-start: var(--rm-space-3); }
+.rm-expert-results--psychology .rm-psychology-dashboard { grid-template-columns: minmax(0, 1.35fr) minmax(260px, .9fr); }
+.rm-expert-results--psychology .rm-psychology-panel > header { align-items: flex-start; margin-bottom: var(--rm-space-2); }
+.rm-expert-results--psychology .rm-psychology-panel > header h2 { font-size: var(--rm-font-size-card-title); }
+.rm-expert-results--psychology .rm-psychology-status-list li { gap: var(--rm-space-2); padding: var(--rm-space-1) var(--rm-space-2); }
+.rm-expert-results--psychology .rm-psychology-status-list li > span { min-width: 0; overflow-wrap: anywhere; }
+.rm-expert-results--psychology .rm-psychology-status-list strong { min-width: 0; max-width: 15rem; overflow-wrap: anywhere; }
+.rm-expert-results--psychology .rm-psychology-month-chart { height: 125px; }
+.rm-expert-results--psychology .rm-psychology-count-list > div { padding: var(--rm-space-1) var(--rm-space-2); }
+.rm-expert-results--psychology .rm-expert-analysis-card { padding: var(--rm-space-3) var(--rm-space-4); box-shadow: none; }
+.rm-expert-results--psychology .rm-expert-analysis-card > div:first-child { gap: var(--rm-space-2); }
+.rm-expert-results--psychology .rm-expert-analysis-card h2 { font-size: var(--rm-font-size-card-title); }
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 .rm-psychology-help { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 44px; height: 44px; border: 1px solid var(--rm-border); border-radius: var(--rm-radius-pill); background: var(--rm-surface-soft); color: var(--rm-primary-ink); font-size: 1.2rem; cursor: pointer; }
 .rm-psychology-help:is(:hover, :focus-visible) { border-color: var(--rm-primary-ink); background: var(--rm-primary-soft); }
 .rm-psychology-help:focus-visible, .rm-psychology-help-link:focus-visible { outline: 3px solid var(--rm-primary-ink); outline-offset: 2px; }
@@ -762,6 +796,7 @@
 .rm-psychology-observation-list li { display: grid; gap: var(--rm-space-1); padding: var(--rm-space-2); border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-card); background: var(--rm-surface-soft); overflow-wrap: anywhere; }
 .rm-psychology-observation-list span, .rm-psychology-panel-note { color: var(--rm-text-secondary); font-size: var(--rm-font-size-compact); line-height: 1.5; }
 .rm-psychology-panel-note { margin-top: var(--rm-space-3); }
+<<<<<<< HEAD
 @container (max-width: 900px) { :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-dashboard { grid-template-columns: 1fr; } :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-dashboard__aside { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @container (max-width: 700px) { :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-profile-head, :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-pending { grid-template-columns: 1fr; } :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-dashboard__aside { grid-template-columns: 1fr; } :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-resident { grid-template-columns: 1fr; } :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-resident__date { padding: 0; border: 0; } :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-pending__needs { padding: var(--rm-space-3) 0 0; border: 0; border-top: 1px solid var(--rm-border); } }
 @container (max-width: 440px) { :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-status-list li { align-items: flex-start; flex-direction: column; } :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-status-list strong { max-width: 100%; } :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-pending__needs .rm-btn { width: 100%; } :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-month-chart > div > span:last-child { font-size: var(--rm-font-size-meta); overflow-wrap: anywhere; text-align: center; } }
@@ -788,11 +823,40 @@
 :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-process.is-incomplete li i { background: var(--rm-surface-soft); color: var(--rm-text-secondary); }
 :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-process > p { color: var(--rm-text-secondary); font-size: var(--rm-font-size-compact); }
 :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-process > .rm-btn { margin-top: auto; justify-content: space-between; }
+=======
+@container (max-width: 900px) { .rm-expert-results--psychology .rm-psychology-dashboard { grid-template-columns: 1fr; } .rm-expert-results--psychology .rm-psychology-dashboard__aside { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container (max-width: 700px) { .rm-expert-results--psychology .rm-psychology-profile-head, .rm-expert-results--psychology .rm-psychology-pending { grid-template-columns: 1fr; } .rm-expert-results--psychology .rm-psychology-dashboard__aside { grid-template-columns: 1fr; } .rm-expert-results--psychology .rm-psychology-resident { grid-template-columns: 1fr; } .rm-expert-results--psychology .rm-psychology-resident__date { padding: 0; border: 0; } .rm-expert-results--psychology .rm-psychology-pending__needs { padding: var(--rm-space-3) 0 0; border: 0; border-top: 1px solid var(--rm-border); } }
+@container (max-width: 440px) { .rm-expert-results--psychology .rm-psychology-status-list li { align-items: flex-start; flex-direction: column; } .rm-expert-results--psychology .rm-psychology-status-list strong { max-width: 100%; } .rm-expert-results--psychology .rm-psychology-pending__needs .rm-btn { width: 100%; } .rm-expert-results--psychology .rm-psychology-month-chart > div > span:last-child { font-size: var(--rm-font-size-meta); overflow-wrap: anywhere; text-align: center; } }
+@media (max-width: 767px) { .rm-expert-results--psychology .rm-expert-heading-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } .rm-expert-results--psychology .rm-expert-heading-actions .rm-btn:first-child { grid-column: 1 / -1; } }
+@media (max-width: 390px) { .rm-expert-results--psychology .rm-expert-heading-actions { grid-template-columns: 1fr; } .rm-expert-results--psychology .rm-expert-heading-actions .rm-btn:first-child { grid-column: auto; } }
+
+/* Composición aprobada para resultados de Psicología: perfil, dominios, criterios y fuentes. */
+.rm-expert-results--psychology .rm-psychology-profile-head--single { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(220px, .8fr); }
+.rm-expert-results--psychology .rm-psychology-profile-head--single .rm-psychology-resident { grid-template-columns: 1fr; }
+.rm-expert-results--psychology .rm-psychology-profile-head--single .rm-psychology-resident__date { align-self: center; }
+.rm-expert-results--psychology .rm-psychology-pending--pattern { grid-template-columns: minmax(0, 1fr) minmax(210px, .3fr); border-color: var(--rm-warning); background: color-mix(in srgb, var(--rm-warning-soft) 36%, var(--rm-surface)); }
+.rm-expert-results--psychology .rm-psychology-pending--pattern .rm-psychology-pending__status { color: var(--rm-warning-strong); }
+.rm-expert-results--psychology .rm-psychology-pending--pattern .rm-psychology-pending__needs { border: 0; padding: 0; }
+.rm-expert-results--psychology .rm-psychology-pending--pattern .rm-psychology-pending__needs .rm-btn { width: 100%; min-height: 44px; }
+.rm-expert-results--psychology .rm-psychology-inline-warning { display: inline-flex; align-items: center; margin-top: var(--rm-space-2); padding: var(--rm-space-1) var(--rm-space-2); border-radius: var(--rm-radius-sm); background: var(--rm-warning-soft); color: var(--rm-warning-strong) !important; font-weight: 700; }
+.rm-expert-results--psychology .rm-psychology-interpretation { display: flex; flex-direction: column; gap: var(--rm-space-2); background: color-mix(in srgb, var(--rm-success-soft) 32%, var(--rm-surface)); }
+.rm-expert-results--psychology .rm-psychology-interpretation > p { color: var(--rm-text-primary); line-height: 1.5; }
+.rm-expert-results--psychology .rm-psychology-interpretation > p + p { padding-top: var(--rm-space-2); border-top: 1px solid var(--rm-border); }
+.rm-expert-results--psychology .rm-psychology-interpretation > .rm-btn { margin-top: auto; justify-content: space-between; }
+.rm-expert-results--psychology .rm-psychology-process { display: flex; flex-direction: column; }
+.rm-expert-results--psychology .rm-psychology-process ol { display: flex; justify-content: space-around; gap: var(--rm-space-1); margin: var(--rm-space-3) 0; padding: 0; list-style: none; }
+.rm-expert-results--psychology .rm-psychology-process li { display: grid; justify-items: center; gap: var(--rm-space-1); min-width: 0; color: var(--rm-text-secondary); text-align: center; font-size: var(--rm-font-size-meta); }
+.rm-expert-results--psychology .rm-psychology-process li i { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--rm-border); border-radius: 50%; background: var(--rm-success-soft); color: var(--rm-success-strong); font-size: 1.35rem; }
+.rm-expert-results--psychology .rm-psychology-process.is-incomplete li i { background: var(--rm-surface-soft); color: var(--rm-text-secondary); }
+.rm-expert-results--psychology .rm-psychology-process > p { color: var(--rm-text-secondary); font-size: var(--rm-font-size-compact); }
+.rm-expert-results--psychology .rm-psychology-process > .rm-btn { margin-top: auto; justify-content: space-between; }
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 .rm-psychology-evidence-table-wrap { min-width: 0; overflow-x: auto; }
 .rm-psychology-evidence-table { width: 100%; border-collapse: collapse; color: var(--rm-text-primary); font-size: var(--rm-font-size-compact); }
 .rm-psychology-evidence-table th, .rm-psychology-evidence-table td { padding: var(--rm-space-1) var(--rm-space-2); border-bottom: 1px solid var(--rm-border-soft); text-align: left; }
 .rm-psychology-evidence-table th { background: var(--rm-surface-soft); font-weight: 700; }
 .rm-psychology-evidence-table td:last-child { font-weight: 800; font-variant-numeric: tabular-nums; }
+<<<<<<< HEAD
 :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-dashboard--compact.has-pattern .rm-psychology-status-list li { min-height: 40px; }
 :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-dashboard--compact.has-pattern .rm-psychology-status-list li[data-state="A"] { background: var(--rm-warning-soft); }
 :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-dashboard--multidomain .rm-cognitive-status-chart__heading { display: none; }
@@ -828,4 +892,36 @@
 @container (max-width: 720px) {
     :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-dashboard, :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-profile-head--single, :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-pending--pattern { grid-template-columns: 1fr; }
     :is(.rm-expert-results--psychology, .rm-expert-results--nursing) .rm-psychology-profile-head--single .rm-psychology-resident__date { padding: var(--rm-space-2) 0 0; border: 0; }
+=======
+.rm-expert-results--psychology .rm-psychology-dashboard--compact.has-pattern .rm-psychology-status-list li { min-height: 40px; }
+.rm-expert-results--psychology .rm-psychology-dashboard--compact.has-pattern .rm-psychology-status-list li[data-state="A"] { background: var(--rm-warning-soft); }
+.rm-expert-results--psychology .rm-psychology-dashboard--multidomain .rm-cognitive-status-chart__heading { display: none; }
+.rm-expert-results--psychology .rm-psychology-dashboard--multidomain .rm-cognitive-status-chart__layout { gap: var(--rm-space-2); }
+.rm-expert-results--psychology .rm-psychology-dashboard--multidomain .rm-cognitive-status-chart__selection { margin-top: var(--rm-space-2); }
+
+@container (min-width: 1040px) {
+    .rm-expert-results--psychology .rm-psychology-dashboard { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .9fr) minmax(0, .9fr); gap: var(--rm-space-3); }
+    .rm-expert-results--psychology .rm-psychology-dashboard__main, .rm-expert-results--psychology .rm-psychology-dashboard__aside { display: contents; }
+    .rm-expert-results--psychology .rm-psychology-dashboard--compact .rm-psychology-dashboard__main > section:first-child { grid-column: 1; grid-row: 1; }
+    .rm-expert-results--psychology .rm-psychology-dashboard--compact .rm-psychology-dashboard__aside > section:last-child { grid-column: 2; grid-row: 1; }
+    .rm-expert-results--psychology .rm-psychology-dashboard--compact .rm-psychology-process { grid-column: 3; grid-row: 1; }
+    .rm-expert-results--psychology .rm-psychology-dashboard--compact .rm-psychology-dashboard__main > section:nth-child(2) { grid-column: 1 / 3; grid-row: 2; }
+    .rm-expert-results--psychology .rm-psychology-dashboard--compact .rm-psychology-dashboard__aside > section:nth-last-child(2) { grid-column: 3; grid-row: 2; }
+    .rm-expert-results--psychology .rm-psychology-dashboard--multidomain .rm-psychology-dashboard__main > section:first-child { grid-column: 1 / 3; grid-row: 1; }
+    .rm-expert-results--psychology .rm-psychology-dashboard--multidomain .rm-psychology-interpretation { grid-column: 3; grid-row: 1; }
+    .rm-expert-results--psychology .rm-psychology-dashboard--multidomain .rm-psychology-dashboard__main > section:nth-child(2) { grid-column: 1 / 3; grid-row: 2; }
+    .rm-expert-results--psychology .rm-psychology-dashboard--multidomain .rm-psychology-dashboard__aside > section:nth-child(2) { grid-column: 3; grid-row: 2; }
+    .rm-expert-results--psychology .rm-psychology-dashboard--multidomain .rm-psychology-dashboard__aside > section:last-child { grid-column: 1 / -1; grid-row: 3; }
+}
+@container (max-width: 1039px) {
+    .rm-expert-results--psychology .rm-psychology-dashboard { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .rm-expert-results--psychology .rm-psychology-dashboard__aside { grid-template-columns: 1fr; }
+}
+@container (max-width: 900px) {
+    .rm-expert-results--psychology .rm-psychology-dashboard { grid-template-columns: 1fr; }
+}
+@container (max-width: 720px) {
+    .rm-expert-results--psychology .rm-psychology-dashboard, .rm-expert-results--psychology .rm-psychology-profile-head--single, .rm-expert-results--psychology .rm-psychology-pending--pattern { grid-template-columns: 1fr; }
+    .rm-expert-results--psychology .rm-psychology-profile-head--single .rm-psychology-resident__date { padding: var(--rm-space-2) 0 0; border: 0; }
+>>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 }

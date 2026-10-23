@@ -28,6 +28,14 @@ final class GobiernoReglasPanel extends Component
 
     public string $versionSeleccionada = '';
 
+    public string $buscarRegla = '';
+
+    public function updatedBuscarRegla(): void
+    {
+        $this->autorizar();
+        $this->resetPage();
+    }
+
     public string $codigoVersion = '';
 
     public string $motivoCambio = '';
@@ -230,6 +238,10 @@ final class GobiernoReglasPanel extends Component
         $seleccionada = $this->seleccion();
         $versiones = VersionModeloExperto::query()->orderByDesc('fecha_hora_creacion')->get();
         $reglas = ReglaExperta::query()->where('cod_version_modelo', $this->versionSeleccionada)
+            ->when(trim($this->buscarRegla) !== '', function ($query): void {
+                $patron = '%'.mb_substr(trim($this->buscarRegla), 0, 100).'%';
+                $query->where(fn ($q) => $q->whereLike('codigo_regla', $patron)->orWhereLike('nombre', $patron));
+            })
             ->with(['usuarioCreacion:cod_usuario,correo', 'usuarioRevision:cod_usuario,correo', 'reglaAnterior', 'reglasSucesoras'])
             ->orderBy('codigo_regla')->paginate(15);
         $tablas = $seleccionada ? app(ConocimientoVersionado::class)->instantanea($seleccionada->getKey()) : [];

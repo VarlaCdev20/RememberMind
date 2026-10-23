@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 return [
     'ruta_033' => static function (): void {
         Route::get('/sistema-experto/residentes', ResidentesSistemaExperto::class)
-            ->middleware(['role:MEDICO GENERAL/GERIATRA|PSICOLOGO/A', 'can:viewAny,App\\Models\\Residente'])
+            ->middleware(['role:MEDICO GENERAL/GERIATRA|PSICOLOGO/A|SUPERADMINISTRADOR', 'can:viewAny,App\\Models\\Residente'])
             ->name('sistema-experto.residentes');
         Route::get('/sistema-experto/residentes/{residente}/petersen', CapturaPetersenPanel::class)
             ->middleware('can:consultarOriginales,App\\Models\\ValoracionPetersenOriginal,residente')

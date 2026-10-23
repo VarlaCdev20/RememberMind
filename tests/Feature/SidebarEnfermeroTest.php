@@ -2,14 +2,15 @@
 
 namespace Tests\Feature;
 
-use App\Modulos\Identidad\Presentacion\Navegacion\SidebarService;
-use App\Models\Residente;
 use App\Models\Alerta;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Jornada;
 use App\Models\Personal;
+use App\Models\Residente;
 use App\Models\Turno;
 use App\Models\User;
+use App\Modulos\Cuidados\Aplicacion\Consultas\ConsultaCentralCuidados;
+use App\Modulos\Identidad\Presentacion\Navegacion\SidebarService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -123,23 +124,21 @@ class SidebarEnfermeroTest extends TestCase
         // Crear 2 alertas activas con personal válido (una con columna canónica y otra vía adaptador)
         Alerta::create([
             'cod_residente' => $adulto->cod_residente,
-            'cod_turno' => $turno->cod_turno,
-            'origen' => 'MANUAL',
-            'tipo_alerta' => 'CLINICA',
-            'nivel' => 'ALTA',
-            'motivo' => 'Presión arterial elevada',
+            'modulo' => 'MANUAL',
+            'tipo' => 'CLINICA',
+            'prioridad' => 'ALTA',
+            'descripcion' => 'Presión arterial elevada',
             'cod_personal_responsable' => $personal->cod_personal,
             'estado' => 'ABIERTA',
         ]);
 
         Alerta::create([
             'cod_residente' => $adulto->cod_residente,
-            'cod_turno' => $turno->cod_turno,
-            'origen' => 'MANUAL',
-            'tipo_alerta' => 'CONDUCTUAL',
-            'nivel' => 'MEDIA',
-            'motivo' => 'Desorientación temporoespacial',
-            'responsable_id' => $personal->cod_personal,
+            'modulo' => 'MANUAL',
+            'tipo' => 'CONDUCTUAL',
+            'prioridad' => 'MEDIA',
+            'descripcion' => 'Desorientación temporoespacial',
+            'cod_personal_responsable' => $personal->cod_personal,
             'estado' => 'EN_ATENCION',
         ]);
 
@@ -150,11 +149,10 @@ class SidebarEnfermeroTest extends TestCase
         // Alerta cerrada del mismo residente no debe sumarse al badge activo
         Alerta::create([
             'cod_residente' => $adulto->cod_residente,
-            'cod_turno' => $turno->cod_turno,
-            'origen' => 'MANUAL',
-            'tipo_alerta' => 'CLINICA',
-            'nivel' => 'BAJA',
-            'motivo' => 'Alerta ya resuelta',
+            'modulo' => 'MANUAL',
+            'tipo' => 'CLINICA',
+            'prioridad' => 'BAJA',
+            'descripcion' => 'Alerta ya resuelta',
             'cod_personal_responsable' => $personal->cod_personal,
             'estado' => 'CERRADA',
         ]);
@@ -163,11 +161,10 @@ class SidebarEnfermeroTest extends TestCase
         $otroAdulto = Residente::factory()->create(['cod_est_adul' => 'EST_001']);
         Alerta::create([
             'cod_residente' => $otroAdulto->cod_residente,
-            'cod_turno' => $turno->cod_turno,
-            'origen' => 'MANUAL',
-            'tipo_alerta' => 'CLINICA',
-            'nivel' => 'ALTA',
-            'motivo' => 'Alerta de paciente no asignado',
+            'modulo' => 'MANUAL',
+            'tipo' => 'CLINICA',
+            'prioridad' => 'ALTA',
+            'descripcion' => 'Alerta de paciente no asignado',
             'cod_personal_responsable' => $personal->cod_personal,
             'estado' => 'ABIERTA',
         ]);
@@ -190,7 +187,7 @@ class SidebarEnfermeroTest extends TestCase
         $cuidado = collect(app(SidebarService::class)->getSidebar())->firstWhere('title', 'Cuidados');
 
         $this->assertSame([], $cuidado['items']);
-        $tipos = app(\App\Modulos\Cuidados\Aplicacion\Consultas\ConsultaCentralCuidados::class)->tiposDisponibles($enfermero);
+        $tipos = app(ConsultaCentralCuidados::class)->tiposDisponibles($enfermero);
         $this->assertArrayNotHasKey('heridas', $tipos);
         $this->assertCount(9, $tipos);
     }

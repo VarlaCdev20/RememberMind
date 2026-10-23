@@ -37,11 +37,11 @@ final class ResidentesSistemaExperto extends Component
         $usuario = auth()->user() ? User::query()->findOrFail(auth()->id()) : null;
         abort_unless($usuario?->estado === 'ACTIVO'
             && session(RolePreviewService::SESSION_KEY) === null
-            && $usuario->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A'])
+            && ($usuario->hasRole('SUPERADMINISTRADOR') || ($usuario->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A'])
             && $usuario->personal()->where('estado', 'ACTIVO')->whereIn('profesion', array_filter([
                 $usuario->hasRole('MEDICO GENERAL/GERIATRA') ? 'MEDICINA' : null,
                 $usuario->hasRole('PSICOLOGO/A') ? 'PSICOLOGIA' : null,
-            ]))->exists(), 403);
+            ]))->exists())), 403);
         Gate::forUser($usuario)->authorize('viewAny', Residente::class);
 
         return $usuario;
