@@ -13,6 +13,7 @@ use App\Models\ValoracionPetersenOriginal;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoInstitucional;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoPetersen;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarValoracionPetersenOriginal;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\PanoramaResidentes;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\PrepararEvaluacionInstitucional;
 use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\CohorteCognitivaLocal;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResidentesSistemaExperto;
@@ -36,6 +37,74 @@ use Tests\TestCase;
 final class CohorteInferencia30Test extends TestCase
 {
     use EsquemaSinTransaccion;
+
+    public function test_preparacion_local_explicita_es_atomica_y_preserva_roles_e_historia_anterior(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $anterior = Residente::factory()->create(['estado' => 'ADMITIDO']);
+        $datosAnteriores = $anterior->fresh()->getRawOriginal();
+        $permisos = fn () => hash('sha256', json_encode(DB::table('role_has_permissions')->orderBy('role_id')->orderBy('permission_id')->get()->all(), JSON_THROW_ON_ERROR));
+        $huella = $permisos();
+        $simulacion = config('sistema_experto.simulacion_local');
+        $variables = [];
+        foreach (['RM_COHORTE30_DESTINO', 'RM_COHORTE30_CARGA_LOCAL'] as $variable) {
+            $variables[$variable] = getenv($variable);
+        }
+        try {
+            $this->app->detectEnvironment(fn () => 'local');
+            config(['sistema_experto.simulacion_local' => ['habilitada' => true, 'base_permitida' => DB::connection()->getDatabaseName()]]);
+            putenv('RM_COHORTE30_DESTINO='.DB::connection()->getDatabaseName());
+            putenv('RM_COHORTE30_CARGA_LOCAL=1');
+            try {
+                (new CohorteInferencia30)->cargar();
+                self::fail('La carga ordinaria no debe instalar conocimiento faltante.');
+            } catch (LogicException $e) {
+                self::assertStringContainsString('Falta el conocimiento', $e->getMessage());
+            }
+            $fallar = true;
+            DB::listen(static function ($q) use (&$fallar): void {
+                if ($fallar && preg_match('/^insert into ["`]?respuestas_instrumento/i', $q->sql)) {
+                    $fallar = false;
+                    throw new LogicException('Fallo deliberado de preparación local');
+                }
+            });
+            try {
+                (new CohorteInferencia30)->cargar(true);
+                self::fail('Debe revertirse la preparación incompleta.');
+            } catch (LogicException $e) {
+                self::assertSame('Fallo deliberado de preparación local', $e->getMessage());
+            }
+            self::assertSame(1, Residente::count());
+            self::assertSame(0, DB::table('versiones_modelo_experto')->count());
+            self::assertSame(0, User::count());
+            $carga = new CohorteInferencia30;
+            self::assertCount(30, $carga->cargar(true));
+            self::assertSame(31, Residente::count());
+            self::assertSame(2, DB::table('versiones_modelo_experto')->count());
+            self::assertSame($datosAnteriores, $anterior->fresh()->getRawOriginal());
+            self::assertSame($huella, $permisos());
+            $superadmin = User::factory()->create(['estado' => 'ACTIVO']);
+            $superadmin->assignRole('SUPERADMINISTRADOR');
+            $panorama = app(PanoramaResidentes::class);
+            self::assertSame(1, $panorama->consultar($superadmin, '', 'diagnosticos', null)['total']);
+            self::assertSame(30, $panorama->consultar($superadmin, '', 'diagnosticos', null, 1, true)['total']);
+            config(['sistema_experto.simulacion_local.habilitada' => false]);
+            self::assertSame(1, $panorama->consultar($superadmin, '', 'diagnosticos', null)['total']);
+            config(['sistema_experto.simulacion_local.habilitada' => true]);
+            config(['sistema_experto.perfiles_instrumentales' => []]);
+            $salida = app(PrepararEvaluacionInstitucional::class)->preparar($carga->psicologia,
+                Residente::query()->where('numero_documento', 'COH30-S01')->sole(), CarbonImmutable::now())->contenido['petersen']['contenido']['salida'];
+            self::assertSame('PET-01', $salida['patron']);
+            self::assertFalse($salida['persistido']);
+            self::assertSame(0, DB::table('revisiones_evaluacion_experta')->count());
+        } finally {
+            $this->app->detectEnvironment(fn () => 'testing');
+            config(['sistema_experto.simulacion_local' => $simulacion]);
+            foreach ($variables as $variable => $valor) {
+                putenv($valor === false ? $variable : $variable.'='.$valor);
+            }
+        }
+    }
 
     public function test_treinta_admisiones_fuentes_originales_dos_ramas_y_cuatro_perfiles_reproducibles(): void
     {

@@ -6,6 +6,11 @@
         <ol class="rm-expert-resident-directory__journey" aria-label="Cómo recorrer la consulta"><li><span>1</span>Seleccione un residente</li><li><span>2</span>Explore sus conexiones</li><li><span>3</span>Consulte la evidencia original</li></ol>
     </header>
 
+    @if($investigacionDisponible)
+        <div class="rm-expert-local-tabs" role="group" aria-label="Procedencia de los expedientes"><button type="button" wire:click="mostrarInvestigacion(false)" aria-pressed="{{ !$soloInvestigacion ? 'true' : 'false' }}">Todos los expedientes autorizados</button><button type="button" wire:click="mostrarInvestigacion(true)" aria-pressed="{{ $soloInvestigacion ? 'true' : 'false' }}">Casos de investigación cargados</button></div>
+        @if($soloInvestigacion)<p class="rm-expert-origin" role="status">Casos sintéticos ya cargados. Cada resultado se calcula desde sus fuentes; las salidas esperadas de investigación no completan un expediente clínico.</p>@endif
+    @endif
+
     <x-ui.filter-bar as="div" aria-label="Buscar residentes y elegir vista">
         <div class="flex w-full flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div class="w-full min-w-0 sm:max-w-lg">
@@ -45,6 +50,7 @@
                                 <div class="min-w-0">
                                     <h3 class="break-words font-semibold">{{ $residente->nombre_completo }}</h3>
                                     <p class="text-sm text-rm-secondary">{{ $residente->edad !== null ? $residente->edad.' años' : 'Edad no registrada' }}</p>
+                                    @if(in_array($residente->getKey(), $casosInvestigacion, true))<small class="rm-expert-origin">Caso de investigación · sintético</small>@endif
                                 </div>
                             </div>
                             <div class="flex flex-wrap gap-2">
@@ -73,7 +79,7 @@
                             @php($acceso = $accesos[$residente->getKey()])
                             @if($acceso['consultar'])
                                 <tr wire:key="experto-fila-{{ $residente->getKey() }}" class="border-t border-rm">
-                                    <th scope="row" class="p-3 font-semibold">{{ $residente->nombre_completo }}</th>
+                                    <th scope="row" class="p-3 font-semibold">{{ $residente->nombre_completo }}@if(in_array($residente->getKey(), $casosInvestigacion, true))<small class="block">Caso de investigación · sintético</small>@endif</th>
                                     <td data-label="Edad" class="p-3 text-rm-secondary">{{ $residente->edad !== null ? $residente->edad.' años' : 'No registrada' }}</td>
                                     <td data-label="Acciones" class="p-3">
                                         <div class="flex flex-wrap gap-2">

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { residentWorkspace, residentGraph } from '../../resources/frontend/scripts/modules/expert-resident-workspace.js';
+import { residentWorkspace, residentGraph, clinicalExpert } from '../../resources/frontend/scripts/modules/expert-resident-workspace.js';
 import { knowledgeGraph, distribuirRedCompacta } from '../../resources/frontend/scripts/modules/orion-explorador.js';
 
 test('las clases del lienzo forman expresiones Alpine válidas con y sin recorrido', () => {
@@ -65,6 +65,34 @@ const datos = () => ({ nodos: [
     { id: 'a', nombre: 'Memoria', tipo: 'Área', columna: 2 },
     { id: 'b', nombre: 'Otra área', tipo: 'Área', columna: 2 },
 ], aristas: [{ origen: 's', destino: 'v', relacion: 'Sustenta' }, { origen: 'v', destino: 'a', relacion: 'Valora' }] });
+
+test('el panel clínico explora factores, requisitos y documentos sin modificar resultados', () => {
+    const dto = { areas: [{ id: 'memoria', estado: 'Información insuficiente' }], requisitos: [{ id: 'c01' }], fuentes: [] };
+    const antes = structuredClone(dto), c = clinicalExpert(dto);
+    c.seleccionar('c01'); assert.equal(c.actual.id, 'memoria');
+    c.cambiarModulo('requisitos'); assert.equal(c.actual.id, 'c01');
+    c.cambiarModulo('fuentes'); assert.equal(c.actual, null);
+    c.cambiarModulo('inventado'); assert.equal(c.modulo, 'fuentes');
+    c.cambiarModulo('areas'); assert.equal(c.actual.estado, 'Información insuficiente');
+    assert.deepEqual(dto, antes);
+    const otro = { areas: [{id:'memoria'}, {id:'atencion'}], requisitos:[], fuentes:[] };
+    assert.equal(clinicalExpert(otro, 'atencion').actual.id, 'atencion');
+    assert.equal(clinicalExpert(otro, 'ajeno').actual.id, 'memoria');
+});
+
+test('el mapa del residente conserva texto legible con conexiones numerosas y enfoca la selección', () => {
+    const c = residentGraph({ nodos: [{id:'centro', columna:2}, ...Array.from({length:60}, (_,i) => ({id:`n${i}`, columna:0}))],
+        aristas:Array.from({length:60}, (_,i) => ({origen:`n${i}`, destino:'centro'})) });
+    c.viewportAncho = 300; c.viewportAlto = 240;
+    c.seleccionar('centro'); c.enfocarConexiones(); c.centrar();
+    assert.ok(c.escala >= 1);
+    c.seleccionar('n59'); assert.equal(c.cantidadVisible, 2);
+    c.centrar(); assert.ok(c.escala >= 1);
+    assert.equal(c.nodos.length, 61);
+    const n = c.actual;
+    assert.ok(n.x * c.escala + c.dx >= 0);
+    assert.ok((n.x + 190) * c.escala + c.dx <= c.viewportAncho);
+});
 
 test('el recorrido selecciona registros reales y conserva las direcciones de relación', () => {
     const c = residentGraph(datos());

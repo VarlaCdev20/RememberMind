@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\CohorteCognitivaLocal;
 use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use Illuminate\Support\Facades\Gate;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -19,6 +20,18 @@ final class ResidentesSistemaExperto extends Component
     use WithPagination;
 
     public string $busqueda = '';
+
+    #[Locked]
+    public bool $soloInvestigacion = false;
+
+    public function mostrarInvestigacion(bool $mostrar): void
+    {
+        $this->autorizar();
+        abort_if($mostrar && ! CohorteCognitivaLocal::habilitada(), 404);
+        $this->soloInvestigacion = $mostrar;
+        $this->busqueda = '';
+        $this->resetPage();
+    }
 
     public function mount(): void
     {
@@ -53,6 +66,7 @@ final class ResidentesSistemaExperto extends Component
         $busqueda = trim($this->busqueda);
         $terminos = preg_split('/\s+/u', $busqueda, -1, PREG_SPLIT_NO_EMPTY) ?: [];
         $residentes = Residente::query()->where('estado', 'ADMITIDO')
+            ->when($this->soloInvestigacion, fn ($q) => CohorteCognitivaLocal::limitarLote($q))
             ->when($terminos !== [], static function ($query) use ($terminos): void {
                 foreach ($terminos as $termino) {
                     if (mb_strtolower($termino) === 'entrenamiento' && CohorteCognitivaLocal::habilitada()) {
@@ -79,7 +93,11 @@ final class ResidentesSistemaExperto extends Component
             ];
         }
 
-        return view('apoyodecision::livewire.experto.residentes', compact('residentes', 'accesos'))
+        $investigacionDisponible = CohorteCognitivaLocal::habilitada();
+        $casosInvestigacion = $investigacionDisponible ? CohorteCognitivaLocal::limitarLote(Residente::query())
+            ->whereKey($residentes->modelKeys())->pluck('cod_residente')->all() : [];
+
+        return view('apoyodecision::livewire.experto.residentes', compact('residentes', 'accesos', 'investigacionDisponible', 'casosInvestigacion'))
             ->layout('layouts.sistema');
     }
 }

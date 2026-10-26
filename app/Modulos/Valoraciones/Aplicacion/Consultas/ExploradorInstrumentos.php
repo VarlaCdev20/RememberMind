@@ -12,7 +12,7 @@ use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
 /** Proyección de lectura. Nunca instala instrumentos ni ejecuta métodos investigados. */
 final class ExploradorInstrumentos
 {
-    public const VERSION = 'GUIAS-2026-10-22.1';
+    public const VERSION = 'GUIAS-2026-10-22.2';
 
     public const DOMINIOS = ['MEM' => 'Memoria', 'ATE' => 'Atención', 'EJE' => 'Funciones ejecutivas', 'LEN' => 'Lenguaje', 'VIS' => 'Visuoespacial'];
 
@@ -93,6 +93,24 @@ final class ExploradorInstrumentos
         return $tarjeta + ['version_guia' => self::VERSION, 'validacion' => 'REFERENCIA_NO_CLINICA',
             'precaucion' => 'Guía pendiente de validación clínica. Esta orientación de registro no sustituye el manual autorizado de la edición real ni habilita su aplicación.',
             'materiales' => 'Manual y materiales autorizados de la edición aplicada; fuente original identificable. Verifica disponibilidad y derechos con el responsable clínico.',
+            'campos_preview' => [
+                ['id' => 'contexto', 'nombre' => 'Residente y fecha clínica', 'icono' => 'ph-identification-card',
+                    'campos' => 'cod_residente · fecha_eval · hora_eval', 'origen' => 'Selección autorizada del residente y fecha de la aplicación.',
+                    'ayuda' => 'Comprueba para quién y cuándo se registra. La guía no selecciona residentes ni propone fechas clínicas.',
+                    'limite' => 'La autorización se vuelve a comprobar en el servidor.'],
+                ['id' => 'fuente', 'nombre' => 'Instrumento y fuente', 'icono' => 'ph-book-open',
+                    'campos' => 'cod_instrumento · transcripcion · localizador_fuente · original_cotejado', 'origen' => $tarjeta['fuente'],
+                    'ayuda' => 'La ficha muestra '. $tarjeta['nombre'].', versión '.$tarjeta['version'].'. En transcripción se exige la fuente original y su cotejo.',
+                    'limite' => $tarjeta['estado'] === 'CANDIDATO_INVESTIGADO' ? 'Este candidato no está habilitado para capturar desde la biblioteca.' : 'La captura utiliza únicamente el catálogo vigente y sus preguntas autorizadas.'],
+                ['id' => 'respuestas', 'nombre' => 'Respuestas y observaciones', 'icono' => 'ph-pencil-line',
+                    'campos' => 'valores · puntajesOriginales · observacionesRespuesta · observaciones', 'origen' => 'Preguntas y tipos del catálogo vigente; valores originales documentados.',
+                    'ayuda' => 'Conserva la respuesta original. Cero y No son respuestas; la ausencia de medición permanece sin respuesta.',
+                    'limite' => 'Esta vista previa no incluye ítems, estímulos, respuestas ni puntuaciones de ejemplo.'],
+                ['id' => 'revision', 'nombre' => 'Autoría y revisión', 'icono' => 'ph-clipboard-text',
+                    'campos' => 'Profesional de la sesión · revisión · motivo_rectificacion cuando corresponde', 'origen' => 'Cuenta y personal activos, revisión previa y confirmación real del servidor.',
+                    'ayuda' => 'El profesional responsable procede de la sesión. La confirmación aparece cuando el servidor registra la aplicación.',
+                    'limite' => 'Marcar un paso de esta guía no guarda datos ni sustituye la revisión clínica.'],
+            ],
             'limite' => $limite,
             'relacion' => 'La interpretación requiere fuentes autorizadas, método y versión, condiciones, episodio, autor y medidas originales. La condición conceptual instrumental exige C1 ∧ C2 ∧ C3 de la misma aplicación. Si faltan datos o hay discrepancias, corresponde abstención con razones. Petersen conserva cinco dominios y C01/C03/C04/C05 originales; C02 se deriva. Medicina y Psicología revisan por separado.',
             'pasos' => [

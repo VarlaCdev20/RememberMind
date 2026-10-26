@@ -1,5 +1,20 @@
 import { knowledgeGraph } from './orion-explorador.js';
 
+/** Navega una proyección clínica autorizada; la UI nunca calcula el resultado. */
+export function clinicalExpert(datos, seleccionInicial = null) {
+    return {
+        datos, modulo: 'areas', seleccionado: datos.areas.some(a => a.id === seleccionInicial) ? seleccionInicial : (datos.areas[0]?.id ?? null),
+        get opciones() { return datos[this.modulo] ?? []; },
+        get actual() { return this.opciones.find(n => n.id === this.seleccionado) ?? null; },
+        cambiarModulo(modulo) {
+            if (!['areas', 'requisitos', 'fuentes'].includes(modulo)) return;
+            this.modulo = modulo;
+            this.seleccionado = this.opciones[0]?.id ?? null;
+        },
+        seleccionar(id) { if (this.opciones.some(n => n.id === id)) this.seleccionado = id; },
+    };
+}
+
 /** Local navigation only: all relationships and clinical states arrive from PHP. */
 export function residentWorkspace(elementos) {
     return {
@@ -40,14 +55,22 @@ export function residentGraph(datos) {
             this.paginaFuentes = pagina;
             this.seleccionado = this.nodos.find(n => n.columna === 2)?.id ?? null;
             this.recorrido = this.seleccionado ? [this.seleccionado] : [];
-            this.focoVecindario = false;
+            this.focoVecindario = true;
             this.distribuir();
         },
         init() {
             this.vista = window.matchMedia('(max-width: 640px)').matches ? 'lista' : 'mapa';
-            iniciarVisor.call(this);
             this.seleccionado = datos.nodos.find(n => n.columna === 2)?.id ?? null;
+            this.focoVecindario = true;
             this.recorrido = this.seleccionado ? [this.seleccionado] : [];
+            iniciarVisor.call(this);
+        },
+        centrar() {
+            // Mantiene el texto legible; los mapas extensos conservan desplazamiento.
+            this.escala = 1;
+            this.dx = (this.viewportAncho - this.ancho * this.escala) / 2;
+            this.dy = (this.viewportAlto - this.alto * this.escala) / 2;
+            if (this.seleccionado) this.enfocar(this.seleccionado);
         },
         restablecer() { this.distribuir(); },
         get conexionesActuales() {
@@ -64,7 +87,7 @@ export function residentGraph(datos) {
             this.recorrido = [id];
             this.etapa = null;
             if (this.focoVecindario || paginaPrevia !== this.paginaFuentes) this.distribuir();
-            this.escala = Math.max(.65, this.escala);
+            this.escala = Math.max(1, this.escala);
             this.enfocar(id);
         },
         seguirConexion(id) {
@@ -76,6 +99,7 @@ export function residentGraph(datos) {
             this.seleccionado = id;
             this.etapa = null;
             if (this.focoVecindario || paginaPrevia !== this.paginaFuentes) this.distribuir();
+            this.escala = Math.max(1, this.escala);
             this.enfocar(id);
         },
         volverPaso(id) {
@@ -86,6 +110,7 @@ export function residentGraph(datos) {
             this.recorrido = this.recorrido.slice(0, indice + 1);
             this.seleccionado = id;
             if (this.focoVecindario || paginaPrevia !== this.paginaFuentes) this.distribuir();
+            this.escala = Math.max(1, this.escala);
             this.enfocar(id);
         },
         enRecorrido(a) {
@@ -107,6 +132,7 @@ export function residentGraph(datos) {
 }
 
 if (typeof window !== 'undefined') {
+    window.rmClinicalExpert = clinicalExpert;
     window.rmExpertResidentWorkspace = residentWorkspace;
     window.rmExpertResidentGraph = residentGraph;
 }

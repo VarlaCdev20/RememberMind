@@ -17,13 +17,25 @@ use Symfony\Component\Process\Process;
 require dirname(__DIR__).'/vendor/autoload.php';
 $app = require dirname(__DIR__).'/bootstrap/app.php';
 $app->make(Kernel::class)->bootstrap();
+set_exception_handler(static function (Throwable $error): never {
+    report($error);
+    fwrite(STDERR, "Carga no confirmada. Consulte el diagnóstico privado de Laravel; no repita sin revisar.\n");
+    exit(1);
+});
 $base = $argv[1] ?? '';
 $verificar = ($argv[2] ?? '') === '--verificar';
 $nombrar = ($argv[2] ?? '') === '--nombrar';
+$prepararConocimiento = ($argv[2] ?? '') === '--instalar-conocimiento';
 $db = DB::connection();
 if (PHP_SAPI !== 'cli' || ! CohorteCognitivaLocal::habilitada() || $db->getDriverName() !== 'pgsql'
-    || $base === '' || $base !== $db->getDatabaseName() || ($argc > 2 && ! $verificar && ! $nombrar) || $argc > 3) {
-    throw new RuntimeException('Uso local optativo: php scripts/cargar-cohorte-local.php nombre-exacto-base [--verificar|--nombrar]. Requiere simulación local autorizada para esa base.');
+    || $base === '' || $base !== $db->getDatabaseName() || ($argc > 2 && ! $verificar && ! $nombrar && ! $prepararConocimiento) || $argc > 3) {
+    throw new RuntimeException('Uso local optativo: php scripts/cargar-cohorte-local.php nombre-exacto-base [--verificar|--nombrar|--instalar-conocimiento]. Requiere simulación local autorizada para esa base.');
+}
+$gobiernoAnterior = [];
+if ($prepararConocimiento) {
+    foreach (['versiones_modelo_experto' => 'cod_version_modelo', 'reglas_expertas' => 'cod_regla_experta'] as $tabla => $pk) {
+        $gobiernoAnterior[$tabla] = ['pk' => $pk, 'ids' => DB::table($tabla)->pluck($pk)->all()];
+    }
 }
 $privado = storage_path('app/private/auditorias-locales/cohorte30');
 if (! is_dir($privado) && ! mkdir($privado, 0770, true) && ! is_dir($privado)) {
@@ -31,7 +43,7 @@ if (! is_dir($privado) && ! mkdir($privado, 0770, true) && ! is_dir($privado)) {
 }
 
 /** Huellas de filas anteriores: no vuelca datos personales, respuestas ni textos clínicos. */
-$huellas = static function (array $residentes): array {
+$huellas = static function (array $residentes) use ($gobiernoAnterior): array {
     $tablas = DB::table('information_schema.columns')->where('table_schema', 'public')->where('column_name', 'cod_residente')
         ->orderBy('table_name')->pluck('table_name')->all();
     $consultas = [];
@@ -45,6 +57,9 @@ $huellas = static function (array $residentes): array {
     $consultas['respuestas_instrumento'] = DB::table('respuestas_instrumento')->whereIn('cod_aplicacion', $aplicaciones);
     foreach (['versiones_modelo_experto', 'reglas_expertas', 'roles', 'permissions', 'role_has_permissions', 'migrations'] as $tabla) {
         $consultas[$tabla] = DB::table($tabla);
+        if (isset($gobiernoAnterior[$tabla])) {
+            $consultas[$tabla]->whereIn($gobiernoAnterior[$tabla]['pk'], $gobiernoAnterior[$tabla]['ids']);
+        }
     }
     $resultados = [];
     foreach ($consultas as $tabla => $query) {
@@ -62,6 +77,7 @@ if (! filter_var($bloqueo->obtenido, FILTER_VALIDATE_BOOL)) {
 }
 $destinoAnterior = getenv('RM_COHORTE30_DESTINO');
 $localAnterior = getenv('RM_COHORTE30_CARGA_LOCAL');
+$preparacionAnterior = getenv('RM_COHORTE30_PREPARAR_CONOCIMIENTO');
 $perfilesAnteriores = config('sistema_experto.perfiles_instrumentales');
 try {
     $anteriores = Residente::query()->where(fn ($q) => $q->whereNull('numero_documento')->orWhere('numero_documento', 'not like', 'COH30-%'))
@@ -93,6 +109,7 @@ try {
         }
         putenv('RM_COHORTE30_DESTINO='.$base);
         putenv('RM_COHORTE30_CARGA_LOCAL=1');
+        putenv('RM_COHORTE30_PREPARAR_CONOCIMIENTO='.($prepararConocimiento ? '1' : '0'));
         DB::transaction(function () use ($huellas, $anteriores, &$huellasAntes): void {
             DB::statement('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ');
             $huellasAntes = $huellas($anteriores);
@@ -103,6 +120,7 @@ try {
         });
         $auditoria = ['fecha' => now()->toIso8601String(), 'version' => CohorteCognitivaInvestigacionSeeder::VERSION,
             'residentes_anteriores' => count($anteriores), 'residentes_agregados' => 30, 'esquema_modificado' => false,
+            'preparacion_conocimiento_explicita' => $prepararConocimiento,
             'huellas_anteriores_preservadas' => $huellasAntes, 'respaldo' => basename($respaldo), 'respaldo_sha256' => hash_file('sha256', $respaldo)];
         if (file_put_contents($privado.'/carga.json', json_encode($auditoria, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR).PHP_EOL) === false) {
             throw new RuntimeException('La carga se confirmó, pero falló el informe privado; no repita la carga. Ejecute --verificar.');
@@ -195,5 +213,6 @@ try {
     config(['sistema_experto.perfiles_instrumentales' => $perfilesAnteriores]);
     putenv($destinoAnterior === false ? 'RM_COHORTE30_DESTINO' : 'RM_COHORTE30_DESTINO='.$destinoAnterior);
     putenv($localAnterior === false ? 'RM_COHORTE30_CARGA_LOCAL' : 'RM_COHORTE30_CARGA_LOCAL='.$localAnterior);
+    putenv($preparacionAnterior === false ? 'RM_COHORTE30_PREPARAR_CONOCIMIENTO' : 'RM_COHORTE30_PREPARAR_CONOCIMIENTO='.$preparacionAnterior);
     DB::select("select pg_advisory_unlock(hashtext('remembermind:cohorte30'))");
 }

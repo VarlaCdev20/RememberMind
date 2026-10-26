@@ -10,6 +10,8 @@ use App\Models\User;
 use App\Models\VersionModeloExperto;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\CapturasInstrumentalesResidente;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaResultadosExperto;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\PanoramaResidentes;
+use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\CohorteCognitivaLocal;
 use App\Modulos\ApoyoDecision\Presentacion\Soporte\ConexionesResidenteVisible;
 use Carbon\CarbonImmutable;
 use DomainException;
@@ -32,6 +34,45 @@ final class ResidentesConocimientoPanel extends Component
     #[Locked]
     public ?string $fuente = null;
 
+    #[Locked]
+    public string $campoPanorama = 'diagnosticos';
+
+    #[Locked]
+    public ?string $patronPanorama = null;
+
+    #[Locked]
+    public bool $soloInvestigacion = false;
+
+    public function cambiarPoblacion(bool $investigacion): void
+    {
+        $this->autorizar();
+        abort_if($investigacion && ! CohorteCognitivaLocal::habilitada(), 404);
+        $this->soloInvestigacion = $investigacion;
+        $this->buscar = '';
+        $this->patronPanorama = $this->seleccionado = $this->fuente = null;
+        $this->resetPage('residentesConocimiento');
+    }
+
+    public function cambiarCampoPanorama(string $campo): void
+    {
+        $usuario = $this->autorizar();
+        abort_unless(isset(PanoramaResidentes::CAMPOS[$campo]), 422);
+        abort_unless($usuario->checkPermissionTo($campo.'.ver', 'web'), 403);
+        $this->campoPanorama = $campo;
+        $this->patronPanorama = null;
+        $this->resetPage('residentesConocimiento');
+    }
+
+    public function filtrarPatron(?string $patron = null): void
+    {
+        $usuario = $this->autorizar();
+        $panorama = app(PanoramaResidentes::class)->consultar($usuario, $this->buscar, $this->campoPanorama, $patron, 1, $this->soloInvestigacion);
+        abort_unless($patron === null || $patron === 'sin-registro' || $panorama['activa'] !== null, 404);
+        $this->patronPanorama = $patron;
+        $this->seleccionado = $this->fuente = null;
+        $this->resetPage('residentesConocimiento');
+    }
+
     public function mount(): void
     {
         $this->autorizar();
@@ -49,6 +90,8 @@ final class ResidentesConocimientoPanel extends Component
     public function updatedBuscar(): void
     {
         $this->autorizar();
+        $this->patronPanorama = null;
+        $this->seleccionado = $this->fuente = null;
         $this->resetPage('residentesConocimiento');
     }
 
@@ -79,14 +122,32 @@ final class ResidentesConocimientoPanel extends Component
     public function render()
     {
         $usuario = $this->autorizar();
-        $query = Residente::query()->where('estado', 'ADMITIDO')->with('cama.habitacion');
-        foreach (preg_split('/\s+/u', mb_substr(trim($this->buscar), 0, 100), -1, PREG_SPLIT_NO_EMPTY) ?: [] as $termino) {
-            $query->where(fn ($q) => $q->whereLike('nombres', "%{$termino}%")
-                ->orWhereLike('apellido_paterno', "%{$termino}%")->orWhereLike('apellido_materno', "%{$termino}%")
-                ->orWhereLike('cod_residente', "%{$termino}%"));
+        $panorama = null;
+        $detallePanorama = [];
+        $errorPanorama = false;
+        $puedePanorama = collect(['residentes.ver', 'valoracion_medica.ver', 'controles_cognitivos.ver', $this->campoPanorama.'.ver'])
+            ->every(fn ($permiso) => $usuario->checkPermissionTo($permiso, 'web'));
+        if ($puedePanorama) {
+            try {
+                $panorama = app(PanoramaResidentes::class)->consultar($usuario, $this->buscar, $this->campoPanorama, $this->patronPanorama, $this->getPage('residentesConocimiento'), $this->soloInvestigacion);
+            } catch (QueryException $e) {
+                report($e);
+                $errorPanorama = true;
+            }
         }
-        $residentes = $query->orderBy('apellido_paterno')->orderBy('nombres')->orderBy('cod_residente')
-            ->paginate(8, ['*'], 'residentesConocimiento');
+        if ($panorama) {
+            $residentes = $panorama['residentes'];
+        } else {
+            // El acceso al directorio no depende del permiso del campo estadístico.
+            $query = PanoramaResidentes::limitarPoblacion(Residente::query()->where('estado', 'ADMITIDO')->with('cama.habitacion'), $this->soloInvestigacion);
+            foreach (preg_split('/\s+/u', mb_substr(trim($this->buscar), 0, 100), -1, PREG_SPLIT_NO_EMPTY) ?: [] as $termino) {
+                $query->where(fn ($q) => $q->whereLike('nombres', "%{$termino}%")
+                    ->orWhereLike('apellido_paterno', "%{$termino}%")->orWhereLike('apellido_materno', "%{$termino}%")
+                    ->orWhereLike('cod_residente', "%{$termino}%"));
+            }
+            $residentes = $query->orderBy('apellido_paterno')->orderBy('nombres')->orderBy('cod_residente')
+                ->paginate(8, ['*'], 'residentesConocimiento');
+        }
         $residente = $lectura = $capturas = $detalleFuente = null;
         $conexionesResidente = ['disponible' => false];
         $errorLectura = $errorFuentes = false;
@@ -95,6 +156,14 @@ final class ResidentesConocimientoPanel extends Component
         if ($this->seleccionado) {
             $residente = Residente::query()->with('cama.habitacion')->where('estado', 'ADMITIDO')->findOrFail($this->seleccionado);
             Gate::forUser($usuario)->authorize('consultarResultados', [EvaluacionExperta::class, $residente]);
+            if ($puedePanorama && ! $errorPanorama) {
+                try {
+                    $detallePanorama = app(PanoramaResidentes::class)->detalle($usuario, $residente, $this->campoPanorama);
+                } catch (QueryException $e) {
+                    report($e);
+                    $errorPanorama = true;
+                }
+            }
             try {
                 $lectura = app(LecturaResultadosExperto::class)->consultar($usuario, $residente, null, 'COG-MEM', $this->getPage('historia'));
             } catch (QueryException|DomainException $e) {
@@ -114,6 +183,6 @@ final class ResidentesConocimientoPanel extends Component
         }
 
         return view('apoyodecision::livewire.superadministrador.sistema-experto.residentes-conocimiento',
-            compact('residentes', 'residente', 'lectura', 'capturas', 'detalleFuente', 'conexionesResidente', 'puedeFuentes', 'errorLectura', 'errorFuentes'));
+            compact('residentes', 'residente', 'lectura', 'capturas', 'detalleFuente', 'conexionesResidente', 'puedeFuentes', 'errorLectura', 'errorFuentes', 'panorama', 'detallePanorama', 'errorPanorama', 'puedePanorama'));
     }
 }

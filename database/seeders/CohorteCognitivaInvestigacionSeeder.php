@@ -71,7 +71,7 @@ final class CohorteCognitivaInvestigacionSeeder extends Seeder
             throw new LogicException('Confirme la base exacta mediante RM_COHORTE30_DESTINO antes de ejecutar este seeder.');
         }
 
-        $this->residentes = $this->cargar();
+        $this->residentes = $this->cargar(getenv('RM_COHORTE30_PREPARAR_CONOCIMIENTO') === '1');
         $this->command?->info('Cohorte sintética cargada: 30 residentes; no se han guardado diagnósticos DCL ni resultados esperados.');
     }
 
@@ -119,9 +119,14 @@ final class CohorteCognitivaInvestigacionSeeder extends Seeder
     }
 
     /** Confirma todas las fuentes antes de consultar el coordinador, que abre su propia transacción. */
-    public function cargar(): array
+    public function cargar(bool $prepararConocimientoLocal = false): array
     {
         self::verificarDestino();
+        if ($prepararConocimientoLocal && (! app()->environment('local')
+            || ! CohorteCognitivaLocal::habilitada() || getenv('RM_COHORTE30_CARGA_LOCAL') !== '1'
+            || getenv('RM_COHORTE30_DESTINO') !== DB::connection()->getDatabaseName())) {
+            throw new LogicException('Preparar conocimiento exige la carga local explícita y la base exacta.');
+        }
         if (Residente::query()->where('numero_documento', 'like', 'COH30-%')->exists()) {
             throw new LogicException('La cohorte ya existe. No se repite ni se sobreescribe historia; use otra base desechable.');
         }
@@ -131,17 +136,19 @@ final class CohorteCognitivaInvestigacionSeeder extends Seeder
         $anteriorInmutable = CarbonImmutable::getTestNow();
         $perfilesAnteriores = config('sistema_experto.perfiles_instrumentales');
         try {
-            return DB::transaction(function (): array {
+            return DB::transaction(function () use ($prepararConocimientoLocal): array {
                 $this->reloj('2026-10-15 09:00:00');
                 if (! app()->environment('local')) {
                     app(RolesAndPermissionsSeeder::class)->run();
                 } else {
-                    // La carga local reutiliza gobierno y permisos instalados; jamás los sincroniza ni activa.
+                    // Por defecto reutiliza gobierno instalado; la preparación requiere opt-in independiente.
                     foreach ([PaqueteCognitivoInstitucional::class,
                         PaquetePetersenInstitucional::class] as $paquete) {
                         if (! VersionModeloExperto::query()->where('codigo_version', $paquete::CODIGO)
                             ->where('observacion', $paquete::FUNDAMENTO)->where('estado', 'ACTIVO')->exists()) {
-                            throw new LogicException('Falta el conocimiento institucional vigente; el seeder no lo activará.');
+                            if (! $prepararConocimientoLocal) {
+                                throw new LogicException('Falta el conocimiento institucional vigente; el seeder no lo activará.');
+                            }
                         }
                     }
                 }
@@ -150,9 +157,15 @@ final class CohorteCognitivaInvestigacionSeeder extends Seeder
                 $admin->givePermissionTo(['preadmisiones.revisar', 'admisiones.formalizar']);
                 $this->psicologia = $this->profesional('PSICOLOGO/A', 'PSICOLOGIA');
                 $this->medicina = $this->profesional('MEDICO GENERAL/GERIATRA', 'MEDICINA');
-                if (! app()->environment('local')) {
+                if (! app()->environment('local') || $prepararConocimientoLocal) {
                     app(RegistrarConocimientoPetersen::class)->ejecutar($this->psicologia);
                     app(RegistrarConocimientoInstitucional::class)->ejecutar($this->psicologia);
+                    foreach ([PaqueteCognitivoInstitucional::class, PaquetePetersenInstitucional::class] as $paquete) {
+                        if (! VersionModeloExperto::query()->where('codigo_version', $paquete::CODIGO)
+                            ->where('observacion', $paquete::FUNDAMENTO)->where('estado', 'ACTIVO')->exists()) {
+                            throw new LogicException('El paquete existente no está vigente; no se activa ni sobrescribe automáticamente.');
+                        }
+                    }
                 }
                 $this->catalogo();
                 config(['sistema_experto.perfiles_instrumentales' => $this->perfiles]);

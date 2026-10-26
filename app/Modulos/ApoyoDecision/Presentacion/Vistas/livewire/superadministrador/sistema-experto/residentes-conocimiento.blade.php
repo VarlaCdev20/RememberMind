@@ -1,4 +1,31 @@
 <div class="rm-expert-admin-residents" x-data="{ pestana: 'fuentes' }">
+    <section class="rm-card rm-expert-panorama" aria-label="Frecuencias entre residentes admitidos" wire:loading.class="opacity-60" wire:target="filtrarPatron,cambiarCampoPanorama,buscar">
+        <header><p class="rm-expert-eyebrow">Panorama de residentes admitidos</p><h2>¿Qué datos se repiten?</h2><p>Seleccione un campo y una barra para consultar a los residentes que coinciden.</p></header>
+        @if(\App\Modulos\ApoyoDecision\Infraestructura\Simulacion\CohorteCognitivaLocal::habilitada())
+            <div class="rm-expert-local-tabs" role="group" aria-label="Población de la consulta">
+                <button type="button" wire:click="cambiarPoblacion(false)" wire:loading.attr="disabled" aria-pressed="{{ !$soloInvestigacion ? 'true' : 'false' }}">Residentes · sin lote de investigación</button>
+                <button type="button" wire:click="cambiarPoblacion(true)" wire:loading.attr="disabled" aria-pressed="{{ $soloInvestigacion ? 'true' : 'false' }}">30 casos sintéticos de investigación</button>
+            </div>
+        @endif
+        <p class="rm-caption" role="status">{{ $soloInvestigacion ? 'Consulta de ingeniería: datos sintéticos, sin validez clínica. Las cifras corresponden únicamente a este lote.' : 'El lote sintético COH30 está excluido de estas cifras y de este listado.' }}</p>
+        <div class="rm-expert-local-tabs" role="group" aria-label="Campo para comparar">@foreach(\App\Modulos\ApoyoDecision\Aplicacion\Consultas\PanoramaResidentes::CAMPOS as $campo => $nombre)@if(auth()->user()->checkPermissionTo($campo.'.ver', 'web'))<button type="button" wire:click="cambiarCampoPanorama(@js($campo))" wire:loading.attr="disabled" aria-pressed="{{ $campoPanorama === $campo ? 'true' : 'false' }}">{{ $nombre }}</button>@endif@endforeach</div>
+        @if(!$puedePanorama)<p class="rm-alert rm-alert-warning" role="status">Su cuenta no tiene las lecturas requeridas para comparar este campo.</p>
+        @elseif($errorPanorama)<div class="rm-alert rm-alert-danger" role="alert">No se pudo verificar el panorama. <button type="button" wire:click="reintentar" class="rm-btn rm-btn-secondary">Reintentar consulta</button></div>
+        @elseif($panorama)
+            <p role="status">{{ $panorama['total'] }} residentes en la búsqueda · {{ $panorama['con_datos'] }} con registro activo · {{ $panorama['sin_datos'] }} sin registro activo de este campo.</p>
+            <div class="rm-expert-panorama__layout">
+                <div><h3>{{ $panorama['campo'] }}</h3><div class="rm-expert-panorama__bars" role="group" aria-label="Frecuencias seleccionables">
+                    @forelse($panorama['filas'] as $fila)<button type="button" wire:key="patron-{{ $campoPanorama }}-{{ $fila['id'] }}" wire:click="filtrarPatron(@js($fila['id']))" wire:loading.attr="disabled" aria-pressed="{{ $patronPanorama === $fila['id'] ? 'true' : 'false' }}"><span><strong>{{ $fila['etiqueta'] }}</strong><span>{{ $fila['cantidad'] }} de {{ $panorama['total'] }} · {{ $fila['porcentaje'] }}%</span></span><span class="rm-expert-panorama__track" aria-hidden="true"><span style="width: {{ $fila['porcentaje'] }}%"></span></span>@if($fila['porcentaje'] > 50)<small>Registrado en más de la mitad de esta selección</small>@endif</button>@empty<p>No hay registros activos de este campo. La ausencia no permite concluir que no exista la condición.</p>@endforelse
+                </div><div class="rm-lab-actions"><button type="button" class="rm-btn rm-btn-secondary" wire:click="filtrarPatron('sin-registro')" aria-pressed="{{ $patronPanorama === 'sin-registro' ? 'true' : 'false' }}">Sin registro activo ({{ $panorama['sin_datos'] }})</button>@if($patronPanorama)<button type="button" class="rm-btn rm-btn-secondary" wire:click="filtrarPatron">Quitar selección</button>@endif</div></div>
+                <aside class="rm-expert-panorama__fields" aria-label="Campos del residente junto a la gráfica"><h3>{{ $residente?->nombre_completo ?? 'Del conjunto al residente' }}</h3>
+                    @if(!$residente)<p>Seleccione una barra y después una persona del listado inferior. Aquí verá sus campos y su procedencia junto a la gráfica.</p>
+                    @else<p>{{ $residente->ubicacion_formateada }} · {{ $residente->edad !== null ? $residente->edad.' años' : 'Edad no disponible' }}</p><h4>{{ $panorama['campo'] }}</h4>@forelse($detallePanorama as $dato)<details class="rm-expert-source-detail"><summary>{{ $dato['nombre'] }}</summary>@include('livewire.superadministrador.sistema-experto.datos', ['datos' => $dato['datos']])</details>@empty<p>No hay registros activos de este campo para esta persona.</p>@endforelse@endif
+                </aside>
+            </div>
+            <p class="rm-caption">Cada residente cuenta una vez por etiqueta exacta; puede aparecer en varias barras. Los porcentajes usan todos los residentes de la búsqueda, antes de paginar. Los registros futuros o inactivos no se incluyen. Corte: {{ $panorama['fecha_corte'] }}.</p>
+            @if($patronPanorama)<p class="rm-expert-origin" role="status">Lista filtrada: {{ $panorama['activa']['etiqueta'] ?? 'La selección ya no está disponible; quite el filtro' }}</p>@endif
+        @endif
+    </section>
     <div class="rm-expert-admin-residents__directory rm-card">
         <header><p class="rm-expert-eyebrow">Expedientes admitidos</p><h2>Residentes</h2><p>Seleccione una persona para consultar sus propias fuentes.</p></header>
         <label for="expert-admin-resident-search">Buscar nombre o código</label>

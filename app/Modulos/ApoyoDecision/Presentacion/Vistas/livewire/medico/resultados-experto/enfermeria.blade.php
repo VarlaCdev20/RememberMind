@@ -20,6 +20,7 @@
         <dl class="rm-cognitive-meta"><div><dt>Fecha de evaluación</dt><dd>{{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($datos['evaluacion']['fecha'] ?? null, 'Sin evaluación disponible') }}</dd></div><div><dt>Tipo de consulta</dt><dd>{{ $simulacion ? 'Demostración técnica' : 'Resultados disponibles del expediente' }}</dd></div><div><dt>Acceso</dt><dd>Lectura de Enfermería</dd></div></dl>
     </section>
     <div class="rm-cognitive-context" x-show="contextoFuera" x-cloak aria-label="Residente activo durante la consulta"><strong>{{ $residente->nombre_completo }}</strong><span>Solo lectura · Enfermería</span></div>
+    @include('apoyodecision::livewire.medico.resultados-experto.exploracion-clinica')
     @unless($errorLectura)
         @include('apoyodecision::livewire.medico.resultados-experto.enfermeria-resumen')
     @endunless
