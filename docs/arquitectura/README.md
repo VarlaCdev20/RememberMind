@@ -16,6 +16,8 @@ related_modules: []
 
 # Arquitectura vigente de RememberMind
 
+Revisión de navegación del 25/10/2026: la organización híbrida sigue vigente. Los conteos y verificaciones de migración enlazados describen sus cortes originales; el [estado actual](../ESTADO_ACTUAL.md) y el [índice de módulos](../modulos/README.md) localizan la implementación y brechas posteriores.
+
 Verificación posterior: [límites comprobados el 11/10/2026](LIMITES_VERIFICADOS_2026_10_11.md) y [preparación para desarrollo](../sistema/PREPARACION_DESARROLLO_2026_10_11.md). Incluyen pruebas de dependencias entre capas y del núcleo experto independiente, con excepciones pendientes explícitas.
 
 La [decisión híbrida aprobada del 10 de octubre](ADR_ARQUITECTURA_HIBRIDA.md) gobierna las ubicaciones del código. Sustituye la organización anterior Backend/Frontend. Laravel permanece en la raíz; las responsabilidades funcionales pertenecen a doce módulos.
@@ -57,7 +59,7 @@ Propietarios: **Identidad, Institucion, Residentes, Admisiones, Clinica, Medicac
 
 ## Motor experto
 
-El [motor técnico](../../motor-experto/README.md) contiene 22 PHP sin dependencia de Laravel/Eloquent. [ApoyoDecision](../../app/Modulos/ApoyoDecision/README.md) adapta la consulta y persistencia técnica existente. El contrato y el evento tras commit están preparados; no existe consumidor clínico asíncrono activado. Se conservan las decisiones pendientes de conocimiento, transporte durable, validación y revisión profesional.
+El [motor técnico](../../motor-experto/README.md) mantiene independencia de Laravel/Eloquent. [ApoyoDecision](../../app/Modulos/ApoyoDecision/README.md) adapta fuentes, evaluación, consulta y conservación en el alcance existente. Los contratos institucionales adoptados y los límites de persistencia se localizan en el [índice experto vigente](../sistema-experto/README.md). La conservación observacional y la conjunta instrumental/Petersen no tienen el mismo estado de implementación. Activación asíncrona, transporte durable y validación requieren su contrato/evidencia propios; una carpeta o un evento preparado no los acredita.
 
 ## Evidencia
 

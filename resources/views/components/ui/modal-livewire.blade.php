@@ -21,11 +21,8 @@
     'alpineClose' => null,
     'alpineBack' => null,
     'autoFocus' => true,
-<<<<<<< HEAD
     'surface' => 'standard',
-=======
     'alpineBusy' => null,
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 ])
 
 @php

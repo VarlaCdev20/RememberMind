@@ -189,42 +189,9 @@
 
  // Función global para enviar ficha por correo
  window.enviarFichaEmail = function(usuarioId) {
- window.SwalToast.fire({
- icon: 'info',
- title: 'Encolando solicitud de envío...'
- });
-
- fetch(`/admin/usuarios/${usuarioId}/ficha/enviar-correo`, {
- method: 'POST',
- headers: {
- 'Content-Type': 'application/json',
- 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
- }
- })
- .then(response => response.json())
- .then(data => {
- if (data.success) {
- window.SwalToast.fire({
- icon: 'success',
- title: data.message
- });
- } else {
- window.SwalToast.fire({
- icon: 'error',
- title: data.message || 'Error al procesar la solicitud'
- });
- }
- })
- .catch(error => {
- console.error('Error:', error);
- window.SwalToast.fire({
- icon: 'error',
- title: 'Error de conexión con el servidor.'
- });
- });
+ return window.RMCorreo.enviar(`/admin/usuarios/${encodeURIComponent(usuarioId)}/ficha/enviar-correo`);
  };
  });
-
  // Función global para confirmaciones con SweetAlert2
  window.confirmarAccion = function(event, titulo, texto = 'Esta acción quedará registrada en el historial institucional.', confirmText = 'Sí, confirmar') {
  event.preventDefault();

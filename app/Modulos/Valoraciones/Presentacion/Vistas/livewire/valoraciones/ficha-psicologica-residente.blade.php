@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-<div class="rm-resident-file text-rm-primary" x-data>
-    @include('valoraciones::livewire.valoraciones.ficha-psicologica.cabecera')
-
-    {{-- 4. Contenido por Pestaña --}}
-    <div id="ficha-psicologica-contenido" class="rm-resident-file__content">
-=======
 <div class="space-y-6 text-rm-primary" x-data="{ tabActiva: @entangle('tab') }">
     {{-- 1. Cabecera Institucional --}}
     <header class="rm-expert-heading">
@@ -93,14 +86,10 @@
 
     {{-- 4. Contenido por Pestaña --}}
     <div class="space-y-4">
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         {{-- ==========================================
              PESTAÑA 1: RESUMEN PSICOLÓGICO
              ========================================== --}}
         @if($tab === 'resumen')
-<<<<<<< HEAD
-            @include('valoraciones::livewire.valoraciones.ficha-psicologica.resumen')
-=======
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div class="p-3.5 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] space-y-1">
                     <p class="text-[11px] font-medium text-[var(--rm-text-secondary)]">Pruebas instrumentales</p>
@@ -123,7 +112,6 @@
                     <p class="text-[10px] text-[var(--rm-text-secondary)]">Intervenciones registradas</p>
                 </div>
             </div>
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 
             {{-- ==========================================
                  SECCIÓN: TRAYECTORIA Y TENDENCIAS LONGITUDINALES
@@ -134,31 +122,19 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[var(--rm-border)]">
                         {{-- Selector de Dimensión Clínica --}}
                         <div class="flex items-center gap-1.5 p-1 rounded-xl bg-[var(--rm-surface-soft)] border border-[var(--rm-border)] text-xs overflow-x-auto">
-<<<<<<< HEAD
-                            <button type="button" 
-=======
                             <button type="button"
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                                     wire:click="cambiarMetricaTendencia('cognitivo')"
                                     class="px-2.5 py-1 rounded-lg font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap {{ $metricaTendencia === 'cognitivo' ? 'bg-[var(--rm-surface)] text-[var(--rm-action-primary)] shadow-2xs border border-[var(--rm-border)]' : 'text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)]' }}">
                                 <i class="ph ph-brain"></i>
                                 <span>Rendimiento cognitivo</span>
                             </button>
-<<<<<<< HEAD
-                            <button type="button" 
-=======
                             <button type="button"
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                                     wire:click="cambiarMetricaTendencia('afectivo')"
                                     class="px-2.5 py-1 rounded-lg font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap {{ $metricaTendencia === 'afectivo' ? 'bg-[var(--rm-surface)] text-[var(--rm-action-primary)] shadow-2xs border border-[var(--rm-border)]' : 'text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)]' }}">
                                 <i class="ph ph-heart"></i>
                                 <span>Estado afectivo</span>
                             </button>
-<<<<<<< HEAD
-                            <button type="button" 
-=======
                             <button type="button"
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                                     wire:click="cambiarMetricaTendencia('iadl')"
                                     class="px-2.5 py-1 rounded-lg font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap {{ $metricaTendencia === 'iadl' ? 'bg-[var(--rm-surface)] text-[var(--rm-action-primary)] shadow-2xs border border-[var(--rm-border)]' : 'text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)]' }}">
                                 <i class="ph ph-person-simple-walk"></i>
@@ -170,11 +146,7 @@
                         <div class="flex items-center gap-1 text-xs self-end sm:self-auto">
                             <span class="text-[11px] text-[var(--rm-text-secondary)] mr-1">Período:</span>
                             @foreach([3 => '3M', 6 => '6M', 12 => '1A', 0 => 'Todo'] as $meses => $etiqueta)
-<<<<<<< HEAD
-                                <button type="button" 
-=======
                                 <button type="button"
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                                         wire:click="cambiarPeriodoTendencia({{ $meses }})"
                                         class="px-2 py-0.5 rounded-md font-mono text-[11px] font-bold transition {{ $periodoMeses === $meses ? 'bg-[var(--rm-action-primary)] text-white shadow-2xs' : 'bg-[var(--rm-surface-soft)] text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)] border border-[var(--rm-border)]' }}">
                                     {{ $etiqueta }}
@@ -183,21 +155,14 @@
                         </div>
                     </div>
 
-<<<<<<< HEAD
-=======
                     @if($datosTendencia === null)
                         <p class="rm-explorador__nota" role="status">No tienes permiso para consultar esta fuente de información. Selecciona otra dimensión.</p>
                     @else
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                     {{-- Síntesis Clínica del Período --}}
                     <div class="p-3.5 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-soft)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                         <div class="space-y-1">
                             <div class="flex items-center gap-2">
-<<<<<<< HEAD
-                                <span class="font-bold text-[var(--rm-text-primary)]">Resumen del intervalo:</span>
-=======
                                 <span class="font-bold text-[var(--rm-text-primary)]">Interpretación clínica del intervalo:</span>
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                                 @if($datosTendencia['resumen']['direccion'] === 'MEJORIA' || $datosTendencia['resumen']['direccion'] === 'REDUCCION_SINTOMAS')
                                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                         Evolución favorable
@@ -226,11 +191,7 @@
                         </div>
 
                         <div class="flex items-center gap-2 shrink-0">
-<<<<<<< HEAD
-                            <button type="button" 
-=======
                             <button type="button"
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                                     wire:click="toggleTablaTendencia"
                                     class="rm-btn rm-btn-secondary text-xs">
                                 <i class="ph {{ $mostrarTablaTendencia ? 'ph-chart-line' : 'ph-table' }} mr-1"></i>
@@ -247,15 +208,9 @@
                                 No se registran evaluaciones para esta dimensión en el intervalo seleccionado.
                             </p>
                             @if($metricaTendencia === 'cognitivo')
-<<<<<<< HEAD
-                                <button type="button" wire:click="abrirEvaluacion('ARE_COG')" class="rm-btn rm-btn-secondary text-xs mt-2">
-                                    <i class="ph ph-plus mr-1"></i>Aplicar prueba cognitiva
-                                </button>
-=======
                                 <a href="{{ route('admin.psicologia.evaluacion.cognitiva') }}" class="rm-btn rm-btn-secondary text-xs mt-2">
                                     <i class="ph ph-plus mr-1"></i>Aplicar prueba cognitiva
                                 </a>
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                             @elseif($metricaTendencia === 'afectivo')
                                 <button type="button" wire:click="cambiarTab('afectiva')" class="rm-btn rm-btn-secondary text-xs mt-2">
                                     <i class="ph ph-plus mr-1"></i>Registrar valoración afectiva
@@ -269,15 +224,9 @@
                     @elseif(!$datosTendencia['suficienteParaTendencia'])
                         <div class="p-6 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] space-y-2 text-center">
                             <i class="ph ph-clock-countdown text-3xl text-[var(--rm-action-primary)]"></i>
-<<<<<<< HEAD
-                            <h4 class="font-bold text-sm text-[var(--rm-text-primary)]">Un registro disponible</h4>
-                            <p class="text-xs text-[var(--rm-text-secondary)] max-w-lg mx-auto">
-                                Se cuenta con 1 registro formal ({{ $datosTendencia['resumen']['primerFecha'] }}). Para comparar cambios se necesitan más registros de la misma medida y condiciones comparables.
-=======
                             <h4 class="font-bold text-sm text-[var(--rm-text-primary)]">Medición Basal Registrada</h4>
                             <p class="text-xs text-[var(--rm-text-secondary)] max-w-lg mx-auto">
                                 Se cuenta con 1 registro formal ({{ $datosTendencia['resumen']['primerFecha'] }}). Para trazar una trayectoria temporal continua y calcular pendiente clínica se requieren al menos dos puntos de medición.
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                             </p>
                         </div>
                     @else
@@ -298,11 +247,7 @@
                                     }
                                     const canvas = this.$refs.chartCanvas;
                                     if (!canvas || !this.datos.tieneDatos || !this.datos.suficienteParaTendencia) return;
-<<<<<<< HEAD
-                                    
-=======
 
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                                     const tone = this.datos.datasets[0]?.tone || 'cognitive';
                                     const customOptions = {
                                         responsive: true,
@@ -383,11 +328,6 @@
                             </table>
                         </div>
                     @endif
-<<<<<<< HEAD
-                </div>
-            </x-ui.section-card>
-
-=======
                     @endif
                 </div>
             </x-ui.section-card>
@@ -454,7 +394,6 @@
                 </x-ui.section-card>
             </div>
 
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         {{-- ==========================================
              PESTAÑA 2: ÁREA COGNITIVA
              ========================================== --}}
@@ -464,22 +403,14 @@
                     <div class="space-y-1">
                         <strong class="font-bold text-[var(--rm-text-primary)] flex items-center gap-2">
                             <i class="ph ph-brain text-base text-[var(--rm-action-primary)]"></i>
-<<<<<<< HEAD
-                            Evaluación y seguimiento cognitivo
-=======
                             Baterías cognitivas y vinculación con Apoyo a la decisión
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                         </strong>
                         <p class="text-[var(--rm-text-secondary)] max-w-2xl">
                             Las pruebas aplicadas en esta sección alimentan los 5 dominios neurocognitivos (Memoria, Atención, Ejecutivas, Lenguaje, Visuoespacial) y los juicios originales de Petersen.
                         </p>
                     </div>
                     <button type="button" wire:click="abrirEvaluacion('ARE_COG')" class="rm-btn rm-btn-primary text-xs shrink-0">
-<<<<<<< HEAD
-                        <i class="ph ph-plus mr-1"></i>Aplicar instrumento cognitivo
-=======
                         <i class="ph ph-plus mr-1"></i>Explorar instrumentos cognitivos
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                     </button>
                 </div>
 
@@ -594,19 +525,6 @@
                             Evaluación afectiva, del ánimo y descarte diferencial (C04)
                         </strong>
                         <p class="text-[var(--rm-text-secondary)] max-w-2xl">
-<<<<<<< HEAD
-                            Documenta síntomas depresivos, ansiedad, apatía y alteraciones conductuales. Esta información aporta contexto clínico y respalda la evaluación diferencial ante la evaluación cognitiva.
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-2 shrink-0">
-                        <button type="button" wire:click="$toggle('mostrarFormAfectiva')" class="rm-btn rm-btn-primary text-xs">
-                            <i class="ph {{ $mostrarFormAfectiva ? 'ph-x' : 'ph-plus' }} mr-1"></i>
-                            {{ $mostrarFormAfectiva ? 'Cancelar formulario' : 'Nueva valoración afectiva' }}
-                        </button>
-                        <button type="button" wire:click="abrirEvaluacion('ARE_AFE')" class="rm-btn rm-btn-secondary text-xs">
-                            <i class="ph ph-clipboard mr-1"></i>Aplicar escala afectiva
-                        </button>
-=======
                             Documenta síntomas depresivos, ansiedad, apatía y alteraciones conductuales. Esta información aporta contexto clínico y respalda la evaluación diferencial ante Apoyo a la decisión
                         </p>
                     </div>
@@ -618,17 +536,13 @@
                         </button>
                         @endif
                         <a href="{{ route('admin.psicologia.evaluacion.afectiva') }}" class="rm-btn rm-btn-secondary text-xs"><i class="ph ph-book-open mr-1" aria-hidden="true"></i>Consultar recursos del área</a>
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                     </div>
                 </div>
 
                 {{-- Formulario Desplegable de Valoración Afectiva --}}
-<<<<<<< HEAD
-=======
                 @if($confirmarDescarteAfectiva)
                 <div role="alert" class="rm-explorador__nota"><div><p>Hay una valoración afectiva sin registrar. Puedes seguir completándola o descartar los cambios.</p><div class="flex flex-wrap gap-3 mt-3"><button type="button" wire:click="conservarValoracionAfectiva" class="rm-btn rm-btn-secondary">Seguir completando</button><button type="button" wire:click="descartarValoracionAfectiva" class="rm-btn rm-btn-danger">Descartar cambios</button></div></div></div>
                 @endif
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                 @if($mostrarFormAfectiva)
                     <div class="p-5 rounded-2xl border border-[var(--rm-action-primary)]/40 bg-[var(--rm-surface)] shadow-sm space-y-4 text-xs">
                         <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-2.5">
@@ -636,36 +550,19 @@
                                 <i class="ph ph-pencil-line text-[var(--rm-action-primary)]"></i>
                                 Formulación clínica del estado afectivo
                             </h3>
-<<<<<<< HEAD
-                            <span class="text-[11px] text-[var(--rm-text-secondary)]">Persistencia en <code>valoraciones_psicologicas</code></span>
-=======
                             <span class="text-[11px] text-[var(--rm-text-secondary)]">Registro vinculado a la atención profesional</span>
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                         </div>
 
                         <form wire:submit.prevent="guardarValoracionAfectiva" class="space-y-4">
                             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                                 <div>
-<<<<<<< HEAD
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Estado de ánimo *</label>
-                                    <select wire:model="formAfectiva.estado_animo" class="rm-select w-full">
-=======
                                     <label for="afectiva-estado_animo" class="block font-semibold text-[var(--rm-text-primary)] mb-1">Estado de ánimo *</label>
                                     <x-ui.selector id="afectiva-estado_animo" label="Estado de ánimo" wire:model="formAfectiva.estado_animo"><option value="">Selecciona lo observado</option>
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                                         <option value="EUTIMICO">Eutímico / Estable</option>
                                         <option value="DEPRESIVO">Depresivo / Triste</option>
                                         <option value="ANSIOSO">Ansioso / Inquieto</option>
                                         <option value="LABIL">Lábil / Cambiante</option>
                                         <option value="IRRITABLE">Irritable / Hostil</option>
-<<<<<<< HEAD
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Afecto *</label>
-                                    <select wire:model="formAfectiva.afecto" class="rm-select w-full">
-=======
                                     </x-ui.selector>
 @error('formAfectiva.estado_animo')<p class="rm-error" role="alert">{{ $message }}</p>@enderror
                                 </div>
@@ -673,19 +570,10 @@
                                 <div>
                                     <label for="afectiva-afecto" class="block font-semibold text-[var(--rm-text-primary)] mb-1">Afecto *</label>
                                     <x-ui.selector id="afectiva-afecto" label="Afecto" wire:model="formAfectiva.afecto"><option value="">Selecciona lo observado</option>
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                                         <option value="ADECUADO">Adecuado al contexto</option>
                                         <option value="APLANADO">Aplanado</option>
                                         <option value="EMBOTADO">Embotado / Restringido</option>
                                         <option value="INCONGRUENTE">Incongruente</option>
-<<<<<<< HEAD
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Ansiedad *</label>
-                                    <select wire:model="formAfectiva.ansiedad" class="rm-select w-full">
-=======
                                     </x-ui.selector>
 @error('formAfectiva.afecto')<p class="rm-error" role="alert">{{ $message }}</p>@enderror
                                 </div>
@@ -693,19 +581,10 @@
                                 <div>
                                     <label for="afectiva-ansiedad" class="block font-semibold text-[var(--rm-text-primary)] mb-1">Ansiedad *</label>
                                     <x-ui.selector id="afectiva-ansiedad" label="Ansiedad" wire:model="formAfectiva.ansiedad"><option value="">Selecciona lo observado</option>
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                                         <option value="AUSENTE">Ausente</option>
                                         <option value="LEVE">Leve</option>
                                         <option value="MODERADA">Moderada</option>
                                         <option value="SEVERA">Severa</option>
-<<<<<<< HEAD
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Apatía *</label>
-                                    <select wire:model="formAfectiva.apatia" class="rm-select w-full">
-=======
                                     </x-ui.selector>
 @error('formAfectiva.ansiedad')<p class="rm-error" role="alert">{{ $message }}</p>@enderror
                                 </div>
@@ -713,30 +592,16 @@
                                 <div>
                                     <label for="afectiva-apatia" class="block font-semibold text-[var(--rm-text-primary)] mb-1">Apatía *</label>
                                     <x-ui.selector id="afectiva-apatia" label="Apatía" wire:model="formAfectiva.apatia"><option value="">Selecciona lo observado</option>
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                                         <option value="AUSENTE">Ausente</option>
                                         <option value="LEVE">Leve</option>
                                         <option value="MODERADA">Moderada</option>
                                         <option value="SEVERA">Severa</option>
-<<<<<<< HEAD
-                                    </select>
-=======
                                     </x-ui.selector>
 @error('formAfectiva.apatia')<p class="rm-error" role="alert">{{ $message }}</p>@enderror
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                                 </div>
                             </div>
 
                             <div>
-<<<<<<< HEAD
-                                <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Conducta observada</label>
-                                <input type="text" wire:model="formAfectiva.conducta" placeholder="Ej: Colaboradora, tranquila durante la entrevista, sin inquietud motora." class="rm-input w-full">
-                            </div>
-
-                            <div>
-                                <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Conclusión e interpretación clínica * (Sustento C04)</label>
-                                <textarea wire:model="formAfectiva.conclusion" rows="3" placeholder="Detalle si el estado anímico interfiere con el rendimiento cognitivo o si se descarta depresión mayor..." class="rm-textarea w-full" required></textarea>
-=======
                                 <label for="afectiva-conducta" class="block font-semibold text-[var(--rm-text-primary)] mb-1">Conducta observada</label>
                                 <input type="text" id="afectiva-conducta" wire:model="formAfectiva.conducta" placeholder="Describe la conducta observada durante la atención." class="rm-input w-full">
                             </div>
@@ -744,20 +609,10 @@
                             <div>
                                 <label for="afectiva-conclusion" class="block font-semibold text-[var(--rm-text-primary)] mb-1">Conclusión e interpretación clínica * (Sustento C04)</label>
                                 <textarea id="afectiva-conclusion" wire:model="formAfectiva.conclusion" rows="3" placeholder="Documenta tu conclusión y las limitaciones de la valoración." class="rm-textarea w-full" required></textarea>
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                                 @error('formAfectiva.conclusion') <span class="text-red-600 text-[11px]">{{ $message }}</span> @enderror
                             </div>
 
                             <div>
-<<<<<<< HEAD
-                                <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Recomendaciones o plan de apoyo</label>
-                                <input type="text" wire:model="formAfectiva.recomendacion" placeholder="Ej: Mantener acompañamiento en actividades grupales, reevaluar en 30 días." class="rm-input w-full">
-                            </div>
-
-                            <div class="flex items-center justify-end gap-2 pt-2 border-t border-[var(--rm-border)]">
-                                <button type="button" wire:click="$set('mostrarFormAfectiva', false)" class="rm-btn rm-btn-secondary text-xs">Cancelar</button>
-                                <button type="submit" class="rm-btn rm-btn-primary text-xs">Guardar valoración afectiva</button>
-=======
                                 <label for="afectiva-recomendacion" class="block font-semibold text-[var(--rm-text-primary)] mb-1">Recomendaciones o plan de apoyo</label>
                                 <input type="text" id="afectiva-recomendacion" wire:model="formAfectiva.recomendacion" placeholder="Documenta el seguimiento indicado por el profesional." class="rm-input w-full">
                             </div>
@@ -765,7 +620,6 @@
                             <div class="flex items-center justify-end gap-2 pt-2 border-t border-[var(--rm-border)]">
                                 <button type="button" wire:click="alternarFormularioAfectivo" class="rm-btn rm-btn-secondary text-xs">Cancelar</button>
                                 <button type="submit" wire:target="guardarValoracionAfectiva" class="rm-btn rm-btn-primary text-xs">Guardar valoración afectiva</button>
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                             </div>
                         </form>
                     </div>
@@ -871,104 +725,6 @@
                         </p>
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
-<<<<<<< HEAD
-                        <button type="button" wire:click="$toggle('mostrarFormIadl')" class="rm-btn rm-btn-primary text-xs">
-                            <i class="ph {{ $mostrarFormIadl ? 'ph-x' : 'ph-plus' }} mr-1"></i>
-                            {{ $mostrarFormIadl ? 'Cancelar formulario' : 'Nueva observación IADL' }}
-                        </button>
-                        <button type="button" wire:click="abrirEvaluacion('ARE_FUN')" class="rm-btn rm-btn-secondary text-xs">
-                            <i class="ph ph-clipboard mr-1"></i>Escala Barthel/Lawton
-                        </button>
-                    </div>
-                </div>
-
-                {{-- Formulario Desplegable de Observación IADL --}}
-                @if($mostrarFormIadl)
-                    <div class="p-5 rounded-2xl border border-[var(--rm-action-primary)]/40 bg-[var(--rm-surface)] shadow-sm space-y-4 text-xs">
-                        <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-2.5">
-                            <h3 class="font-bold text-sm text-[var(--rm-text-primary)] flex items-center gap-2">
-                                <i class="ph ph-pencil-line text-[var(--rm-action-primary)]"></i>
-                                Registro de Actividad Instrumental (IADL)
-                            </h3>
-                            <span class="text-[11px] text-[var(--rm-text-secondary)]">Persistencia en <code>controles_funcionales_iadl</code></span>
-                        </div>
-
-                        <form wire:submit.prevent="guardarControlIadl" class="space-y-4">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                                <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Actividad evaluada *</label>
-                                    <select wire:model="formIadl.actividad" class="rm-select w-full">
-                                        @foreach(\App\Models\ControlFuncionalIadl::ACTIVIDADES as $act)
-                                            <option value="{{ $act }}">{{ $act }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Oportunidad en residencia *</label>
-                                    <select wire:model="formIadl.oportunidad" class="rm-select w-full">
-                                        @foreach(\App\Models\ControlFuncionalIadl::OPORTUNIDADES as $op)
-                                            <option value="{{ $op }}">{{ $op }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Desempeño actual *</label>
-                                    <select wire:model="formIadl.desempeno" class="rm-select w-full">
-                                        @foreach(\App\Models\ControlFuncionalIadl::DESEMPENOS as $des)
-                                            <option value="{{ $des }}">{{ $des }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Tipo de ayuda recibida *</label>
-                                    <select wire:model="formIadl.tipo_ayuda" class="rm-select w-full">
-                                        @foreach(\App\Models\ControlFuncionalIadl::AYUDAS as $ay)
-                                            <option value="{{ $ay }}">{{ $ay }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Causa principal de la ayuda *</label>
-                                    <select wire:model="formIadl.causa_ayuda" class="rm-select w-full">
-                                        @foreach(\App\Models\ControlFuncionalIadl::CAUSAS as $ca)
-                                            <option value="{{ $ca }}">{{ $ca }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Nivel previo basal *</label>
-                                    <select wire:model="formIadl.nivel_previo" class="rm-select w-full">
-                                        @foreach(\App\Models\ControlFuncionalIadl::NIVELES_PREVIOS as $np)
-                                            <option value="{{ $np }}">{{ $np }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Fuente de información *</label>
-                                    <select wire:model="formIadl.fuente" class="rm-select w-full">
-                                        @foreach(\App\Models\ControlFuncionalIadl::FUENTES as $fu)
-                                            <option value="{{ $fu }}">{{ $fu }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center justify-end gap-2 pt-2 border-t border-[var(--rm-border)]">
-                                <button type="button" wire:click="$set('mostrarFormIadl', false)" class="rm-btn rm-btn-secondary text-xs">Cancelar</button>
-                                <button type="submit" class="rm-btn rm-btn-primary text-xs">Guardar observación IADL</button>
-                            </div>
-                        </form>
-                    </div>
-                @endif
-=======
 <p class="text-sm text-rm-secondary">Consulta de IADL. El registro se realiza en su circuito profesional autorizado.</p>
                         <a href="{{ route('admin.psicologia.evaluacion.funcionamiento') }}" class="rm-btn rm-btn-secondary text-xs">
                             <i class="ph ph-clipboard mr-1"></i>Explorar instrumentos funcionales
@@ -978,7 +734,6 @@
 
                 {{-- Consulta del circuito IADL --}}
 
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 
                 <x-ui.section-card title="Observaciones IADL registradas" subtitle="Actividades complejas de la vida diaria" icon="ph-list-checks">
                     @if($controlesIadl->isEmpty())
@@ -1003,51 +758,7 @@
                     @endif
                 </x-ui.section-card>
 
-<<<<<<< HEAD
-                @if(!empty($chartIadl) && $chartIadl['tieneDatos'])
-                    <x-ui.section-card title="Perfil de autonomía instrumental (Lawton & Brody)" subtitle="Desempeño actual por actividad observada" icon="ph-chart-bar">
-                        <div wire:ignore
-                             x-data="{
-                                chartKey: 'residente-chart-iadl-{{ $residente->getKey() }}',
-                                init() {
-                                    this.render();
-                                    window.RMCharts?.onThemeChange(() => this.render(), this.chartKey, this.$el);
-                                },
-                                render() {
-                                    if (typeof Chart === 'undefined' || !window.RMCharts?.presets) {
-                                        setTimeout(() => this.render(), 80);
-                                        return;
-                                    }
-                                    const canvas = this.$refs.chartIadl;
-                                    if (!canvas) return;
-                                    const labels = @js($chartIadl['labels']);
-                                    const valores = @js($chartIadl['valores']);
-                                    const colores = @js($chartIadl['colores']);
-                                    const datasets = [
-                                        {
-                                            label: 'Nivel de autonomía (%)',
-                                            data: valores,
-                                            backgroundColor: colores,
-                                            borderColor: colores,
-                                            borderRadius: 8,
-                                        }
-                                    ];
-                                    const config = window.RMCharts.presets.bar(labels, datasets, {
-                                        scales: {
-                                            y: { min: 0, max: 100, ticks: { stepSize: 50, callback: (v) => v === 100 ? 'Independiente' : (v === 50 ? 'Con apoyo' : (v === 0 ? 'Sin dato' : '')) } }
-                                        }
-                                    });
-                                    window.RMCharts.init(this.chartKey, canvas, config, () => this.render());
-                                }
-                             }"
-                             class="relative w-full h-64 p-2">
-                            <canvas x-ref="chartIadl" role="img" aria-label="Perfil de actividades instrumentales IADL"></canvas>
-                        </div>
-                    </x-ui.section-card>
-                @endif
-=======
                 <p class="rm-explorador__nota">Se conservan los desempeños observados originales. No se convierten en porcentajes ni se presentan como una escala aplicada.</p>
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
             </div>
 
         {{-- ==========================================
@@ -1066,13 +777,9 @@
                 </div>
 
                 <x-ui.section-card title="Contactos familiares y de referencia" subtitle="Personas de apoyo autorizadas" icon="ph-address-book">
-<<<<<<< HEAD
-                    @if($contactosFamiliares->isEmpty())
-=======
                     @if(!$puedeConsultarContactos)
                         <p class="text-xs text-[var(--rm-text-secondary)]" role="status">Tu cuenta no tiene permiso para consultar contactos y sus vínculos. Las notas de contexto autorizadas se conservan por separado.</p>
                     @elseif($contactosFamiliares->isEmpty())
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                         <p class="text-xs text-[var(--rm-text-secondary)] italic py-2">No hay contactos familiares vinculados para este residente.</p>
                     @else
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1112,18 +819,12 @@
                             Registro de intervenciones, entrevistas de seguimiento y acompañamiento psicológico formal en el expediente.
                         </p>
                     </div>
-<<<<<<< HEAD
-=======
                     @if(auth()->user()?->hasRole('PSICOLOGO/A') && auth()->user()?->checkPermissionTo('atenciones.crear', 'web'))
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                     <button type="button" wire:click="$toggle('mostrarFormSesion')" class="rm-btn rm-btn-primary text-xs shrink-0">
                         <i class="ph {{ $mostrarFormSesion ? 'ph-x' : 'ph-plus' }} mr-1"></i>
                         {{ $mostrarFormSesion ? 'Cancelar sesión' : 'Registrar nueva sesión' }}
                     </button>
-<<<<<<< HEAD
-=======
                     @endif
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                 </div>
 
                 {{-- Formulario Desplegable de Sesión --}}
@@ -1265,39 +966,23 @@
             </div>
 
         {{-- ==========================================
-<<<<<<< HEAD
-             PESTAÑA 8: RESULTADOS O.R.I.O.N.
-             ========================================== --}}
-        @elseif($tab === 'orion')
-            <div class="space-y-4">
-                {{-- Banner Contextual O.R.I.O.N. --}}
-=======
              PESTAÑA 8: RESULTADOS Apoyo a la decisión
              ========================================== --}}
         @elseif($tab === 'orion')
             <div class="space-y-4">
                 {{-- Banner Contextual Apoyo a la decisión --}}
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                 <div class="p-5 rounded-2xl bg-gradient-to-r from-[var(--rm-action-primary-soft)] via-[var(--rm-surface)] to-[var(--rm-surface-soft)] border border-[var(--rm-action-primary)]/20 shadow-xs space-y-3">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div class="space-y-1">
                             <div class="flex items-center gap-2">
                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[var(--rm-action-primary)] text-white shadow-2xs">
-<<<<<<< HEAD
-                                    Resultados del sistema experto
-=======
                                     Motor Experto Apoyo a la decisión
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                                 </span>
                                 <span class="text-[11px] font-semibold text-[var(--rm-text-secondary)]">Criterios diagnósticos Petersen</span>
                             </div>
                             <h2 class="text-base font-bold text-[var(--rm-text-primary)]">Articulación neurocognitiva y juicios clínicos originales</h2>
                             <p class="text-xs text-[var(--rm-text-secondary)] max-w-2xl leading-relaxed">
-<<<<<<< HEAD
-                                Consulta los resultados orientativos y las evidencias disponibles. El cálculo actual todavía no se guarda como una evaluación histórica completa.
-=======
                                 El sistema experto cognitivo de RememberMind evalúa en memoria (Nivel 1, <span class="font-mono">persistido = false</span>) la concurrencia de deterioro neurocognitivo y criterios Petersen, integrando baterías psicométricas, observación conductual e historia afectiva.
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                             </p>
                         </div>
                         <div class="flex flex-wrap items-center gap-2 shrink-0">
@@ -1395,11 +1080,7 @@
                     </div>
                 </x-ui.section-card>
 
-<<<<<<< HEAD
-                {{-- Baterías instrumentales que alimentan O.R.I.O.N. --}}
-=======
                 {{-- Baterías instrumentales que alimentan Apoyo a la decisión --}}
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                 <x-ui.section-card title="Baterías e instrumentos aportantes al perfil neurocognitivo" subtitle="Pruebas psicométricas recientes del expediente del residente" icon="ph-clipboard-text">
                     @if($instrumentosCognitivosOrion->isEmpty())
                         <div class="py-6 text-center text-xs text-[var(--rm-text-secondary)] italic">
@@ -1415,11 +1096,7 @@
                                         <th class="py-2.5 px-3">Instrumento</th>
                                         <th class="py-2.5 px-3">Puntuación / Resultado</th>
                                         <th class="py-2.5 px-3">Evaluador</th>
-<<<<<<< HEAD
-                                        <th class="py-2.5 px-3">Uso en la evaluación</th>
-=======
                                         <th class="py-2.5 px-3">Aporte Apoyo a la decisión</th>
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-[var(--rm-border)]">
@@ -1459,11 +1136,7 @@
                     <div class="space-y-1">
                         <strong class="font-bold text-[var(--rm-text-primary)]">Gobernanza clínica y apoyo a la decisión</strong>
                         <p class="leading-relaxed">
-<<<<<<< HEAD
-                            El sistema experto es una herramienta de apoyo a la decisión clínica que procesa evidencia objetiva e inmutable según protocolos institucionales aprobados. Toda conclusión diagnóstica y terapéutica es de exclusiva responsabilidad del profesional tratante y del equipo interdisciplinario de RememberMind.
-=======
                             Apoyo a la decisión es un motor de apoyo a la decisión clínica (CDSS) que procesa evidencia objetiva e inmutable según protocolos institucionales aprobados. Toda conclusión diagnóstica y terapéutica es de exclusiva responsabilidad del profesional tratante y del equipo interdisciplinario de RememberMind.
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                         </p>
                     </div>
                 </div>

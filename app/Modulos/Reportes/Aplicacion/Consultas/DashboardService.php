@@ -24,7 +24,7 @@ class DashboardService
         $perfil = $rolEfectivo ?? $usuario->getRoleNames()->sort()->implode('|');
         $claveCache = 'dashboard_roles_v2_'.$usuario->cod_usuario.'_'.md5($perfil);
 
-        return Cache::remember($claveCache, 60, function () use ($usuario, $rolEfectivo) {
+        $cargar = function () use ($usuario, $rolEfectivo) {
             $rol = $rolEfectivo ?? $usuario->getRoleNames()->first();
             $esSalud = in_array($rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA'], true);
 
@@ -32,6 +32,9 @@ class DashboardService
             $datosPorRol = $this->roleDashboardData->forRole($usuario, $rol ?? 'USUARIO');
             $perfil['indicadores'] = $datosPorRol['metrics'];
             $perfil['panels'] = $datosPorRol['panels'];
+            if ($rol === 'GERENTE') {
+                $perfil['gerencia'] = $datosPorRol['gerencia'];
+            }
             if ($rol === 'SUPERADMINISTRADOR') {
                 $perfil['jornada'] = $datosPorRol['activeShift'] ?? null;
             }
@@ -44,7 +47,11 @@ class DashboardService
                     'nombre_rol' => $rol ?? 'Usuario',
                 ],
             ];
-        });
+        };
+
+        // El resumen gerencial revalida permisos y fuentes en cada petición.
+        return ($rolEfectivo === 'GERENTE' || (! $rolEfectivo && $usuario->hasRole('GERENTE')))
+            ? $cargar() : Cache::remember($claveCache, 60, $cargar);
     }
 
     public function obtenerSaludoUsuario($usuario, ?string $rolEfectivo = null): array
@@ -142,9 +149,9 @@ class DashboardService
                 ],
                 'accesos' => [
                     ['route' => 'admin.personal-institucional', 'permission' => 'personal_institucional.ver', 'icon' => 'ph-identification-badge', 'label' => 'Personal', 'description' => 'Perfiles y documentación laboral.'],
-                    ['route' => 'admin.areas-institucionales.index', 'permission' => 'areas.ver', 'icon' => 'ph-buildings', 'label' => 'Áreas', 'description' => 'Organización del equipo por área.'],
+                    ['route' => 'admin.areas-institucionales.index', 'permission' => 'areas.ver', 'icon' => 'ph-buildings', 'label' => 'Áreas y equipo', 'description' => 'Organización del equipo por área.'],
                     ['route' => 'admin.turnos-asignaciones.index', 'permission' => 'turnos.ver', 'icon' => 'ph-calendar-check', 'label' => 'Planificación', 'description' => 'Turnos y horarios del personal.'],
-                    ['route' => 'admin.turnos-enfermeria.index', 'permission' => 'jornadas.ver', 'icon' => 'ph-users-three', 'label' => 'Cobertura', 'description' => 'Consulta de jornadas y asignaciones.'],
+                    ['route' => 'admin.cobertura-equipo.index', 'permission' => 'jornadas.ver', 'icon' => 'ph-users-three', 'label' => 'Cobertura', 'description' => 'Asignaciones guardadas por fecha, área y turno.'],
                     ['route' => 'admin.reportes.institucional.preview', 'permission' => 'reportes.institucional', 'icon' => 'ph-chart-bar', 'label' => 'Reportes gerenciales', 'description' => 'Información institucional consolidada.'],
                 ],
             ],

@@ -39,12 +39,7 @@ class DashboardPsicologo extends Component
             $atenciones = DB::table('atenciones')->where('cod_personal', $codigo);
             $aplicaciones = DB::table('aplicaciones_instrumento')->where('cod_personal', $codigo);
             $aplicacionesValidas = (clone $aplicaciones)->whereIn('aplicaciones_instrumento.estado', ['COMPLETA', 'COMPLETADA', 'VIGENTE']);
-<<<<<<< HEAD
-            $alertas = DB::table('alertas')->where('cod_personal_responsable', $codigo)
-                ->whereIn('estado', ['ABIERTA', 'EN_ATENCION']);
-=======
             $alertas = app(BandejaAlertas::class)->pendientes($usuario)->where('cod_personal_responsable', $codigo);
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
             $alertasAbiertas = (clone $alertas)->count();
 
             $metrics = [
@@ -63,11 +58,7 @@ class DashboardPsicologo extends Component
                     'detail' => trim((string) $fila->tipo_atencion).' · '.date('d/m/Y H:i', strtotime($fila->fecha_hora)),
                 ])->all();
 
-<<<<<<< HEAD
-            $prioritarias = (clone $alertas)->whereIn('prioridad', ['CRITICO', 'CRITICA', 'ALTO', 'ALTA'])
-=======
             $prioritarias = (clone $alertas)->whereIn('prioridad', Alerta::PRIORIDADES_ALTAS)
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                 ->orderByDesc('fecha_hora')->limit(5)->get(['titulo', 'prioridad', 'fecha_hora'])
                 ->map(fn ($fila) => [
                     'label' => $fila->titulo ?: 'Alerta pendiente de revisión',

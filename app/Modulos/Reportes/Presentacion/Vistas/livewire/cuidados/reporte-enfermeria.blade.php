@@ -1,119 +1,30 @@
-﻿<div class="rm-page-layout font-sans space-y-6">
-    <x-ui.collection-header title="Reportes de Enfermería" :subtitle="$esSuperAdmin ? 'Actividad institucional y evolución individual por período.' : 'Actividad real del turno y evolución individual por período.'" icon="ph-chart-donut" eyebrow="Continuidad asistencial">
-        <x-slot:actions>
-            <a href="{{ route('admin.enfermeria.dashboard') }}" class="rm-btn-secondary inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold">
-                <i class="ph-bold ph-arrow-left text-sm"></i>
-                <span>{{ $esSuperAdmin ? 'Volver al resumen global' : 'Volver a Mi turno' }}</span>
-            </a>
-        </x-slot:actions>
+<div class="rm-page-layout rm-nursing-report text-rm-primary">
+    <x-ui.collection-header title="Reportes de Enfermería" subtitle="Consulta los registros por período y residente." icon="ph-chart-bar">
+        <x-slot:actions><a href="{{ route('admin.enfermeria.dashboard') }}" class="rm-btn rm-btn-secondary"><i class="ph ph-arrow-left" aria-hidden="true"></i> Volver</a></x-slot:actions>
     </x-ui.collection-header>
-
-    <x-ui.filter-bar class="mb-4">
-      <div class="grid w-full gap-3 md:grid-cols-3">
-        <label class="text-xs font-bold text-[var(--rm-text-secondary)]">Desde
-            <input wire:model.live="desde" type="date" class="mt-1 rm-input w-full text-xs">
-        </label>
-        <label class="text-xs font-bold text-[var(--rm-text-secondary)]">Hasta
-            <input wire:model.live="hasta" type="date" class="mt-1 rm-input w-full text-xs">
-        </label>
-        <label class="text-xs font-bold text-[var(--rm-text-secondary)]">Residente
-            <select wire:model.live="codResidente" class="mt-1 rm-select w-full text-xs">
-                <option value="">{{ $esSuperAdmin ? 'Todos los residentes' : 'Todos los asignados' }}</option>
-                @foreach($pacientes as $p)
-                    <option value="{{ $p->cod_residente }}">{{ $p->ap_paterno }}, {{ $p->nombres }}</option>
-                @endforeach
-            </select>
-        </label>
-      </div>
-    </x-ui.filter-bar>
-
-    <section class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
-        @foreach(['cuidados'=>'Cuidados','signos'=>'Controles','dosis'=>'Dosis administradas','omisiones'=>'Omisiones','incidentes'=>'Incidentes','alertas_abiertas'=>'Alertas abiertas'] as $k=>$e)
-            <x-ui.metric-card :value="$indicadores[$k]" :label="$e" :icon="match ($k) { 'cuidados' => 'ph-heartbeat', 'signos' => 'ph-pulse', 'dosis' => 'ph-pill', 'omisiones' => 'ph-warning-circle', 'incidentes' => 'ph-first-aid', default => 'ph-bell-ringing' }" :variant="in_array($k, ['omisiones', 'incidentes', 'alertas_abiertas'], true) && $indicadores[$k] > 0 ? 'coral' : 'neutral'" />
-        @endforeach
+    <form wire:submit="aplicar" class="rm-card p-4 space-y-3" aria-label="Filtros del reporte">
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div><label for="reporte-desde" class="rm-label">Desde</label><input id="reporte-desde" wire:model="desde" type="date" class="rm-input w-full" aria-describedby="reporte-desde-error">@error('desde')<p id="reporte-desde-error" class="rm-error" role="alert">{{ $message }}</p>@enderror</div>
+            <div><label for="reporte-hasta" class="rm-label">Hasta</label><input id="reporte-hasta" wire:model="hasta" type="date" max="{{ today()->toDateString() }}" class="rm-input w-full" aria-describedby="reporte-hasta-error">@error('hasta')<p id="reporte-hasta-error" class="rm-error" role="alert">{{ $message }}</p>@enderror</div>
+            <div><label for="reporte-residente" class="rm-label">Residente</label><select id="reporte-residente" wire:model="codResidente" class="rm-select w-full"><option value="">Todos los autorizados</option>@foreach($reporte['residentes'] as $residente)<option value="{{ $residente->cod_residente }}">{{ $residente->nombres }} {{ $residente->apellido_paterno }} {{ $residente->apellido_materno }}</option>@endforeach</select>@error('codResidente')<p class="rm-error" role="alert">{{ $message }}</p>@enderror</div>
+            <div><label for="reporte-tipo" class="rm-label">Registros</label><select id="reporte-tipo" wire:model="tipo" class="rm-select w-full">@foreach(\App\Modulos\Reportes\Aplicacion\Consultas\ConsultarReporteEnfermeria::TIPOS as $valor => $nombre)<option value="{{ $valor }}">{{ $nombre }}</option>@endforeach</select>@error('tipo')<p class="rm-error" role="alert">{{ $message }}</p>@enderror</div>
+        </div>
+        <div class="flex flex-wrap gap-3 items-center"><button type="submit" class="rm-btn rm-btn-primary" wire:loading.attr="disabled"><span wire:loading.remove wire:target="aplicar">Aplicar filtros</span><span wire:loading wire:target="aplicar">Consultando…</span></button><p class="text-sm text-rm-secondary">Aplica los cambios para actualizar el resumen y el PDF.</p></div>
+    </form>
+    <section class="rm-card p-4 space-y-4" aria-labelledby="resumen-reporte-titulo" wire:loading.class="opacity-60">
+        <div class="flex flex-wrap gap-4 items-start justify-between">
+            <div><h2 id="resumen-reporte-titulo" class="text-lg font-bold">{{ $reporte['alcance'] }}</h2><p class="text-sm text-rm-secondary">{{ \Carbon\Carbon::parse($reporte['filtros']['desde'])->format('d/m/Y') }} al {{ \Carbon\Carbon::parse($reporte['filtros']['hasta'])->format('d/m/Y') }} · {{ $reporte['filas']->count() }} registros</p></div>
+            <div class="flex flex-wrap gap-2"><a href="{{ route('admin.enfermeria.reportes.preview', $reporte['filtros']) }}" target="_blank" rel="noopener" class="rm-btn rm-btn-secondary">Vista previa <span class="sr-only">(abre otra pestaña)</span></a>@can('enfermeria.ver_ficha_paciente')<a href="{{ route('admin.enfermeria.reportes.pdf', $reporte['filtros']) }}" class="rm-btn rm-btn-primary"><i class="ph ph-download-simple" aria-hidden="true"></i> Descargar PDF</a>@endcan</div>
+        </div>
+        <div class="grid grid-cols-2 gap-3 lg:grid-cols-5">@foreach($reporte['totales'] as $total)<div class="rounded-xl border border-rm-border-soft p-3"><p class="rm-nursing-report__count">{{ $total['cantidad'] }}</p><p class="text-sm text-rm-secondary">{{ $total['nombre'] }}</p></div>@endforeach</div>
+        <p class="text-sm text-rm-secondary">Datos disponibles al consultar. Se excluyen registros anulados; una actividad pendiente no se considera realizada.</p>
     </section>
-
-    <section class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-                <h2 class="text-base sm:text-lg font-bold text-[var(--rm-text-primary)]">Evolución de cuidados</h2>
-                <p class="text-xs text-[var(--rm-text-secondary)]">Ingesta, hidratación y dolor calculados desde registros firmados.</p>
-            </div>
-            @if($codResidente)
-                <a href="{{ route('admin.enfermeria.pacientes.ficha', ['adulto' => $codResidente, 'tab' => 'historial']) }}" class="text-xs font-bold text-[var(--rm-action-primary-ink)] hover:underline">Abrir registros originales &rarr;</a>
-            @endif
-        </div>
-        <div class="mt-5 grid min-h-48 grid-cols-7 items-end gap-3 overflow-x-auto md:grid-cols-14 py-2">
-            @forelse($tendencia as $dia)
-                <div class="flex min-w-12 flex-col items-center gap-1" title="{{ $dia['fecha'] }} · Alimentación {{ $dia['alimentacion'] ?? 'S/D' }}% · Hidratación {{ $dia['hidratacion'] }} ml · Dolor {{ $dia['dolor'] ?? 'S/D' }}">
-                    <span class="text-[10px] font-bold text-[var(--rm-text-secondary)]">{{ $dia['alimentacion'] !== null ? $dia['alimentacion'].'%' : 'S/D' }}</span>
-                    <div class="flex h-32 w-full items-end rounded-lg bg-[var(--rm-surface-soft)] p-1">
-                        <div class="w-full rounded-md bg-[var(--rm-action-primary)] transition-all duration-300" style="height: {{ max(3, (int) ($dia['alimentacion'] ?? 0)) }}%"></div>
-                    </div>
-                    <span class="text-[10px] font-semibold text-[var(--rm-text-muted)]">{{ \Carbon\Carbon::parse($dia['fecha'])->format('d/m') }}</span>
-                </div>
-            @empty
-                <p class="col-span-full self-center text-center text-sm text-[var(--rm-text-muted)] py-8">Registre cuidados para visualizar la tendencia.</p>
-            @endforelse
-        </div>
-        @if($tendencia->isNotEmpty())
-            <div class="mt-4 rm-table-container overflow-x-auto rounded-xl border border-[var(--rm-border-soft)]">
-                <table class="rm-data-table rm-table w-full text-left text-xs">
-                    <thead class="bg-[var(--rm-surface-soft)] font-bold text-[var(--rm-text-primary)]">
-                        <tr>
-                            <th class="p-3">Fecha</th>
-                            <th class="p-3">Alimentación</th>
-                            <th class="p-3">Hidratación</th>
-                            <th class="p-3">Dolor medio</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-[var(--rm-border-soft)]">
-                        @foreach($tendencia as $dia)
-                            <tr class="hover:bg-[var(--rm-surface-soft)]/50 transition">
-                                <td class="p-3 font-medium text-[var(--rm-text-primary)]">{{ \Carbon\Carbon::parse($dia['fecha'])->format('d/m/Y') }}</td>
-                                <td class="p-3 text-[var(--rm-text-secondary)]">{{ $dia['alimentacion'] !== null ? $dia['alimentacion'].'%' : 'Sin dato' }}</td>
-                                <td class="p-3 text-[var(--rm-text-secondary)]">{{ $dia['hidratacion'] }} ml</td>
-                                <td class="p-3 text-[var(--rm-text-secondary)]">{{ $dia['dolor'] ?? 'Sin dato' }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+    @if($reporte['residentes']->isEmpty())<div class="rm-card p-5" role="status">No tienes residentes disponibles para consulta. Revisa tus asignaciones con la persona responsable.</div>@endif
+    <section class="rm-card p-4 space-y-3" aria-labelledby="actividad-diaria-titulo">
+        <h2 id="actividad-diaria-titulo" class="text-lg font-bold">Registros por día</h2><p class="text-sm text-rm-secondary">Cantidad de registros, no gravedad ni evolución clínica. Solo se muestran días con registros.</p>
+        @if($reporte['dias']->isEmpty())<p class="py-3 text-rm-secondary">No hay registros en este período para los filtros aplicados.</p>@else
+        <details><summary class="min-h-11 flex items-center cursor-pointer font-semibold">Ver distribución por día</summary><div class="max-h-72 overflow-y-auto space-y-2 py-3" role="list" aria-label="Cantidad de registros por fecha">@foreach($reporte['dias'] as $dia)<div class="flex gap-3 items-center text-sm" role="listitem"><time class="shrink-0 w-24" datetime="{{ $dia['fecha'] }}">{{ \Carbon\Carbon::parse($dia['fecha'])->format('d/m/Y') }}</time><div class="flex-1 h-3 rounded bg-rm-surface-soft" aria-hidden="true"><div class="h-3 rounded bg-rm-primary-action" style="width: {{ 100 * $dia['cantidad'] / $reporte['dias']->max('cantidad') }}%"></div></div><span class="shrink-0">{{ $dia['cantidad'] }} registros</span></div>@endforeach</div></details>
         @endif
     </section>
-
-    <div class="grid gap-5 lg:grid-cols-2">
-        <section class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
-            <h2 class="text-base sm:text-lg font-bold text-[var(--rm-text-primary)]">Cuidados registrados</h2>
-            <div class="mt-4 max-h-[32rem] space-y-2 overflow-y-auto pr-1">
-                @forelse($cuidados as $r)
-                    <article class="rounded-xl bg-[var(--rm-surface-soft)] p-3 border border-[var(--rm-border-soft)]">
-                        <div class="flex justify-between gap-3">
-                            <p class="text-xs font-black text-[var(--rm-text-primary)]">{{ $r->adultoMayor?->nombres }} {{ $r->adultoMayor?->apellido_paterno }} · {{ $r->intervencion?->nombre ?? 'Cuidado' }}</p>
-                            <time class="text-[11px] text-[var(--rm-text-muted)] shrink-0">{{ ($r->fecha_hora_ejecucion ?? $r->fecha_hora_programada)?->format('d/m H:i') }}</time>
-                        </div>
-                        <p class="mt-1 text-xs text-[var(--rm-text-secondary)]">{{ $r->observacion ?: ($r->intervencion?->descripcion ?? 'Sin observación') }}</p>
-                    </article>
-                @empty
-                    <p class="text-sm text-[var(--rm-text-muted)] py-6 text-center">Sin actividad en el periodo.</p>
-                @endforelse
-            </div>
-        </section>
-        <section class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5 shadow-sm">
-            <h2 class="text-base sm:text-lg font-bold text-[var(--rm-text-primary)]">Incidentes y seguimiento</h2>
-            <div class="mt-4 max-h-[32rem] space-y-2 overflow-y-auto pr-1">
-                @forelse($incidentes as $i)
-                    <article class="rounded-xl border border-[var(--rm-warning)]/30 bg-[var(--rm-warning-soft)] p-3">
-                        <div class="flex justify-between gap-3">
-                            <p class="text-xs font-black text-[var(--rm-text-primary)]">{{ $i->adultoMayor?->nombres }} · {{ str_replace('_',' ',$i->tipo) }}</p>
-                            <time class="text-[11px] text-[var(--rm-text-muted)] shrink-0">{{ $i->fecha_hora->format('d/m H:i') }}</time>
-                        </div>
-                        <p class="mt-1 text-xs text-[var(--rm-text-secondary)]">{{ $i->descripcion }}</p>
-                    </article>
-                @empty
-                    <p class="text-sm text-[var(--rm-text-muted)] py-6 text-center">Sin incidentes en el periodo.</p>
-                @endforelse
-            </div>
-        </section>
-    </div>
+    <section class="rm-card p-4 space-y-3" aria-labelledby="detalle-reporte-titulo"><h2 id="detalle-reporte-titulo" class="text-lg font-bold">Registros del período</h2><p class="text-sm text-rm-secondary">Cuidados y medicación: fecha efectiva o, si falta, programada. Incidentes y alertas son registros distintos.</p><div class="rm-table-container overflow-x-auto" tabindex="0" role="region" aria-label="Tabla de registros, desplazable horizontalmente">@include('reportes::reportes.enfermeria-registros', ['filas' => $registros])</div>{{ $registros->links() }}</section>
 </div>

@@ -55,6 +55,9 @@ class User extends Authenticatable
             if ($user->isDirty($user->getKeyName())) {
                 throw new \LogicException('La identidad de una cuenta no se modifica mediante una edición.');
             }
+            if (config('auth.remember_enabled') && $user->isDirty(['contrasena', 'estado'])) {
+                $user->setRememberToken(\Illuminate\Support\Str::random(60));
+            }
         });
     }
 
@@ -67,12 +70,12 @@ class User extends Authenticatable
     public $timestamps = false;
 
     protected $fillable = ['cod_usuario', 'correo', 'contrasena', 'password', 'foto', 'estado'];
-    protected $hidden = ['contrasena'];
+    protected $hidden = ['contrasena', 'remember_token'];
     protected $appends = ['nombres', 'ap_paterno', 'ap_materno'];
 
     protected function casts(): array
     {
-        return [];
+        return ['fecha_hora_alta'=>'datetime','cambio_password_pendiente'=>'boolean'];
     }
 
     public function getAuthIdentifierName(): string
@@ -102,12 +105,14 @@ class User extends Authenticatable
 
     public function getRememberToken(): ?string
     {
-        return null;
+        return config('auth.remember_enabled') ? ($this->attributes['remember_token'] ?? null) : null;
     }
 
     public function setRememberToken($value): void
     {
-        // El baseline congelado no incluye remember_token.
+        if (config('auth.remember_enabled')) {
+            parent::setRememberToken($value);
+        }
     }
 
     public function getRouteKeyName(): string

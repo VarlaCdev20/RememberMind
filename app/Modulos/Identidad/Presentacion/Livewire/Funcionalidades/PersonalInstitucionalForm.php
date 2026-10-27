@@ -16,6 +16,8 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
+use Livewire\Attributes\Locked;
+use App\Modulos\Identidad\Aplicacion\Acciones\AutorizarGestionPersonal;
 use Livewire\WithFileUploads;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -24,7 +26,7 @@ class PersonalInstitucionalForm extends Component
 {
     use WithFileUploads;
 
-    public $usuarioId;
+    #[Locked] public $usuarioId;
 
     public $esEdicion = false;
 
@@ -141,7 +143,7 @@ class PersonalInstitucionalForm extends Component
     // Wizard state
     public int $pasoActual = 1;
 
-    public int $totalPasos = 7;
+    #[Locked] public int $totalPasos = 4;
 
     // Modo y Opciones Step 1
     public $fecha_registro;
@@ -159,6 +161,7 @@ class PersonalInstitucionalForm extends Component
 
     public function mount($usuarioId = null)
     {
+        app(AutorizarGestionPersonal::class)->autorizar(auth()->user(), $usuarioId ? User::findOrFail($usuarioId) : null);
         $this->usuarioId = $usuarioId;
         $this->estado = 'ACTIVO';
         $this->fecha_registro = now()->format('Y-m-d');
@@ -184,6 +187,7 @@ class PersonalInstitucionalForm extends Component
 
     public function cargarDatos()
     {
+        app(AutorizarGestionPersonal::class)->autorizar(auth()->user(), User::findOrFail($this->usuarioId));
         $usuario = User::with(['roles', 'personal', 'documentos'])->find($this->usuarioId);
         if (! $usuario) {
             return;
@@ -611,218 +615,19 @@ class PersonalInstitucionalForm extends Component
 
     public function validarPasoActual(): void
     {
-        if ($this->pasoActual === 1) {
-            $this->correo = trim(mb_strtolower($this->correo));
-            $this->validate([
-                'correo' => 'required|email|max:255|unique:usuarios,correo'.($this->usuarioId ? ','.$this->usuarioId.',cod_usuario' : ''),
-                'estado' => 'required|in:ACTIVO,PENDIENTE,BLOQUEADO',
-                'fecha_registro' => 'required|date|before_or_equal:today',
-                'hora_registro' => 'required|date_format:H:i',
-            ], [
-                'correo.required' => 'El correo es obligatorio.',
-                'correo.email' => 'El formato del correo es inválido.',
-                'correo.unique' => 'Este correo ya está registrado.',
-                'estado.required' => 'El estado de acceso es obligatorio.',
-                'fecha_registro.required' => 'La fecha de registro es obligatoria.',
-                'fecha_registro.before_or_equal' => 'La fecha no puede ser futura.',
-                'hora_registro.required' => 'La hora es obligatoria.',
-            ]);
-        } elseif ($this->pasoActual === 2) {
-            $this->validate([
-                'nombres' => 'required|string|max:100|regex:/^[\pL\s]+$/u',
-                'ap_paterno' => 'required|string|max:80|regex:/^[\pL\s]+$/u',
-                'ap_materno' => 'nullable|string|max:80|regex:/^[\pL\s]+$/u',
-                'numero_documento' => ['required', 'regex:/^[0-9]{5,10}$/', Rule::unique('personal', 'numero_documento')->ignore(Personal::where('cod_usuario', $this->usuarioId)->value('cod_personal'), 'cod_personal')],
-                'expedido' => 'required|string|max:10',
-                'genero' => 'required|in:M,F',
-                'fecha_nacimiento' => 'required|date|before_or_equal:'.now()->subYears(18)->format('Y-m-d').'|after_or_equal:'.now()->subYears(100)->format('Y-m-d'),
-                'foto_perfil' => is_string($this->foto_perfil) ? 'nullable|string' : 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            ], [
-                'nombres.required' => 'El nombre es obligatorio.',
-                'nombres.regex' => 'El nombre no debe contener números.',
-                'ap_paterno.required_without' => 'Debe ingresar el apellido paterno o materno.',
-                'ap_paterno.regex' => 'El apellido paterno no debe contener números.',
-                'ap_materno.required_without' => 'Debe ingresar el apellido paterno o materno.',
-                'ap_materno.regex' => 'El apellido materno no debe contener números.',
-                'numero_documento.required' => 'El CI es obligatorio.',
-                'numero_documento.regex' => 'El documento de identidad debe contener solo números.',
-                'numero_documento.unique' => 'Este CI ya se encuentra registrado.',
-                'expedido.required' => 'El departamento de expedición es obligatorio.',
-                'genero.required' => 'El género es obligatorio.',
-                'genero.in' => 'El género seleccionado no es válido.',
-                'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
-                'fecha_nacimiento.before_or_equal' => 'El usuario debe ser mayor de 18 años.',
-                'fecha_nacimiento.after_or_equal' => 'La edad excede el límite permitido (100 años).',
-                'foto_perfil.image' => 'El archivo debe ser una imagen válida.',
-                'foto_perfil.mimes' => 'La foto debe ser en formato JPG, JPEG, PNG o WEBP.',
-                'foto_perfil.max' => 'La fotografía no debe superar los 2MB de peso.',
-            ]);
-
-        } elseif ($this->pasoActual === 3) {
-            // Normalizar quitando espacios y guiones antes de validar
-            if ($this->telefono) {
-                $this->telefono = preg_replace('/[\s\-]/', '', $this->telefono);
-            }
-            if ($this->telefono_alternativo) {
-                $this->telefono_alternativo = preg_replace('/[\s\-]/', '', $this->telefono_alternativo);
-            }
-
-            $this->validate([
-                'telefono' => ['required', 'regex:/^[67][0-9]{7}$/'],
-                'telefono_alternativo' => ['nullable', 'regex:/^[0-9]{7,8}$/'],
-                'ciudad_id' => 'required',
-                'municipio_id' => 'required',
-                'zona_id' => 'required',
-                'otra_zona' => 'required_if:zona_id,OTRA|nullable|string|max:100',
-                'calle_id' => 'required',
-                'otra_calle' => 'required_if:calle_id,OTRA|nullable|string|max:100',
-                'nro_casa' => 'required|string|max:50',
-            ], [
-                'telefono.required' => 'El número de celular es obligatorio.',
-                'telefono.regex' => 'El celular debe tener 8 dígitos y comenzar con 6 o 7.',
-                'telefono_alternativo.regex' => 'El teléfono alternativo debe contener solo números y tener entre 7 y 8 dígitos.',
-                'ciudad_id.required' => 'El departamento/ciudad es obligatorio.',
-                'municipio_id.required' => 'El municipio es obligatorio.',
-                'zona_id.required' => 'La zona/barrio es obligatoria.',
-                'otra_zona.required_if' => 'Debe escribir el nombre de la otra zona.',
-                'calle_id.required' => 'La calle o avenida es obligatoria.',
-                'otra_calle.required_if' => 'Debe escribir el nombre de la otra calle o avenida.',
-                'nro_casa.required' => 'El número de casa es obligatorio.',
-            ]);
-
-            // Formatear dirección para guardar en variables locales antes de la persistencia
-            $dept = collect($this->getDepartamentosCatalogo())->firstWhere('id', $this->ciudad_id);
-            $mun = collect($this->getMunicipiosCatalogo($this->ciudad_id))->firstWhere('id', $this->municipio_id);
-
-            $zonaNombre = '';
-            if ($this->zona_id === 'OTRA') {
-                $zonaNombre = mb_strtoupper($this->otra_zona);
-            } else {
-                $zonaModel = collect($this->getZonasCatalogo($this->municipio_id))->firstWhere('id', $this->zona_id);
-                $zonaNombre = $zonaModel ? $zonaModel->nombre : '';
-            }
-
-            $calleNombre = '';
-            if ($this->calle_id === 'OTRA') {
-                $calleNombre = mb_strtoupper($this->otra_calle);
-            } else {
-                $calleModel = collect($this->getCallesCatalogo($this->zona_id))->firstWhere('id', $this->calle_id);
-                $calleNombre = $calleModel ? $calleModel->nombre : '';
-            }
-
-            $this->ciudad = $dept ? $dept->nombre : '';
-            $this->zona = $zonaNombre;
-            $this->direccion = 'DEPARTAMENTO: '.$this->ciudad.' | MUNICIPIO: '.($mun ? $mun->nombre : '').' | ZONA: '.$zonaNombre.' | CALLE: '.$calleNombre.' | NRO: '.mb_strtoupper($this->nro_casa);
-
-        } elseif ($this->pasoActual === 4) {
-            // Validar rol seleccionado
-            $this->validate([
-                'roles_seleccionados' => 'required|array|size:1',
-                'roles_seleccionados.*' => 'exists:roles,name',
-            ], [
-                'roles_seleccionados.required' => 'Debe seleccionar un rol de sistema.',
-                'roles_seleccionados.size' => 'Debe seleccionar únicamente un rol institucional.',
-            ]);
-
-            // Derivar clasificación
-            $this->sincronizarClasificacionDesdeRoles();
-
-            // Ya no se validan campos específicos de especialidad/cargo aquí.
-            // Se manejan como documentos en el Paso 5.
-
-        } elseif ($this->pasoActual === 5) {
-            // Paso 5: Documentos del trabajador
-            $this->validate([
-                'archivos_temporales.*' => 'nullable|mimes:pdf,jpg,jpeg,png,webp|max:5120',
-            ]);
-
-            if (! $this->esEdicion) {
-                $docsFaltantes = [];
-                foreach ($this->documentos_configurados as $doc) {
-                    if ($doc['tipo'] === 'ingresante' && $doc['obligatorio_inmediato']) {
-                        if (! isset($this->archivos_temporales[$doc['id']])) {
-                            $docsFaltantes[] = $doc['nombre'];
-                        }
-                    }
-                }
-                if (! empty($docsFaltantes)) {
-                    $this->addError('archivos_temporales', 'Faltan documentos obligatorios: '.implode(', ', $docsFaltantes));
-
-                    return;
-                }
-            }
-
-        } elseif ($this->pasoActual === 6) {
-            // Paso 6: Documentación institucional — sincroniazr estado
-            $this->faltan_documentos = false;
-            $this->faltan_recomendados = false;
-
-            foreach ($this->documentos_configurados as $doc) {
-                $estadoDoc = $this->estado_documentos[$doc['id']] ?? 'PENDIENTE';
-                if ($estadoDoc === 'PENDIENTE') {
-                    $this->faltan_documentos = true;
-                    if (! ($doc['obligatorio_inmediato'] ?? false)) {
-                        $this->faltan_recomendados = true;
-                    }
-                }
-            }
-
-            if ($this->faltan_documentos && $this->estado === 'ACTIVO') {
-
-                $this->dispatch('mostrarAlerta', [
-                    'type' => 'warning',
-                    'title' => 'Documentos pendientes',
-                    'message' => 'Hay documentos pendientes de regularización en 48 horas.',
-                ]);
-            }
-        }
-    }
-
-    public function sincronizarSessionTemporal()
-    {
-        $clasificacion = $this->clasificacionDesdeRoles();
-
-        $documentosSession = [];
-        foreach ($this->documentos_configurados as $doc) {
-            $estado = isset($this->archivos_temporales[$doc['id']])
-                ? 'CARGADO'
-                : ($this->estado_documentos[$doc['id']] ?? 'PENDIENTE');
-            $obs = $this->observacion_documentos[$doc['id']]
-                ?? ($estado === 'PENDIENTE' ? 'Pendiente (plazo: 48 horas)' : '');
-
-            $documentosSession[] = [
-                'id' => $doc['id'],
-                'nombre' => $doc['nombre'],
-                'obligatorio_inmediato' => $doc['obligatorio_inmediato'] ?? false,
-                'tipo' => $doc['tipo'] === 'ingresante' ? 'Ingresante' : 'Institucional',
-                'estado' => $estado,
-                'observacion' => $obs,
-            ];
-        }
-
-        $sessionData = [
-            'nombres' => $this->nombres,
-            'ap_paterno' => $this->ap_paterno,
-            'ap_materno' => $this->ap_materno,
-            'nro_documento' => $this->numero_documento,
-            'expedido' => $this->expedido,
-            'fecha_nacimiento' => $this->fecha_nacimiento,
-            'genero' => $this->genero,
-            'celular' => $this->telefono,
-            'telefono_alternativo' => $this->telefono_alternativo,
-            'direccion' => $this->direccion,
-            'tipo_personal' => $clasificacion['tipo_personal'] ?? $this->tipo_personal,
-            'rol_operativo' => $clasificacion['rol_operativo'] ?? $this->rol_operativo,
-            'rol_label' => $clasificacion['rol_label'] ?? 'Personal',
-            'area_nombre' => $clasificacion['area_nombre'] ?? 'Área Operativa',
-            'responsable_nombre' => auth()->user() ? (auth()->user()->nombres.' '.auth()->user()->ap_paterno) : 'Sistema',
-            'responsable_cod' => auth()->user() ? auth()->user()->cod_usuario : null,
-            'fecha_registro' => $this->fecha_registro,
-            'estado_general' => $this->estado,
-            'documentos' => $documentosSession,
-            'observaciones_registro' => $this->observaciones,
-        ];
-        session(['personal_registro_temp' => $sessionData]);
+        app(AutorizarGestionPersonal::class)->autorizar(auth()->user(), $this->usuarioId ? User::findOrFail($this->usuarioId) : null, $this->roles_seleccionados);
+        $reglas = match ($this->pasoActual) {
+            1 => ['nombres'=>'required|string|max:100','ap_paterno'=>'required|string|max:80','ap_materno'=>'nullable|string|max:80',
+                'numero_documento'=>['required','regex:/^[0-9]{5,10}$/',Rule::unique('personal','numero_documento')->ignore(Personal::where('cod_usuario',$this->usuarioId)->value('cod_personal'),'cod_personal')],
+                'expedido'=>'required|string|max:20','genero'=>'required|in:M,F','fecha_nacimiento'=>'required|date|before_or_equal:'.now()->subYears(18)->toDateString(),
+                'telefono'=>['required','regex:/^[67][0-9]{7}$/'],'direccion'=>'required|string|max:255'],
+            2 => ['roles_seleccionados'=>'required|array|size:1','roles_seleccionados.*'=>'exists:roles,name','fecha_ingreso'=>'nullable|date','matricula_prof'=>'nullable|string|max:50'],
+            3 => ['correo'=>['required','email','max:120',Rule::unique('usuarios','correo')->ignore($this->usuarioId,'cod_usuario')],
+                'contrasena_temporal'=>($this->esEdicion ? 'nullable' : 'required').'|string|min:12|max:72'],
+            4 => ['archivos_temporales'=>'array','archivos_temporales.*'=>'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:5120'],
+            default => ['pasoActual'=>'in:1,2,3,4'],
+        };
+        $this->validate($reglas);
     }
 
     public function avanzarPaso(): void
@@ -832,7 +637,7 @@ class PersonalInstitucionalForm extends Component
 
             if ($this->pasoActual < $this->totalPasos) {
                 $this->pasoActual++;
-                if ($this->pasoActual === 7) {
+                if ($this->pasoActual === 4) {
                     // El resumen documental no modifica el estado de acceso de la cuenta.
                     $this->sincronizarSessionTemporal();
                 }
@@ -947,6 +752,7 @@ class PersonalInstitucionalForm extends Component
 
     public function guardar()
     {
+        app(AutorizarGestionPersonal::class)->autorizar(auth()->user(), $this->usuarioId ? User::findOrFail($this->usuarioId) : null, $this->roles_seleccionados);
         $clasificacion = $this->sincronizarClasificacionDesdeRoles();
 
         $this->validate();
@@ -959,6 +765,19 @@ class PersonalInstitucionalForm extends Component
         try {
             $resultado = app(GuardarPersonalInstitucional::class)->guardar(auth()->user(), ['esEdicion' => $this->esEdicion, 'usuarioId' => $this->usuarioId, 'contrasena_temporal' => $this->contrasena_temporal, 'forzar_cambio_password' => $this->forzar_cambio_password, 'fecha_registro' => $this->fecha_registro, 'hora_registro' => $this->hora_registro, 'fecha_ingreso' => $this->fecha_ingreso, 'nombres' => $this->nombres, 'ap_paterno' => $this->ap_paterno, 'ap_materno' => $this->ap_materno, 'correo' => $this->correo, 'telefono' => $this->telefono, 'numero_documento' => $this->numero_documento, 'expedido' => $this->expedido, 'fecha_nacimiento' => $this->fecha_nacimiento, 'genero' => $this->genero, 'estado' => $this->estado, 'observaciones' => $this->observaciones, 'direccion' => $this->direccion, 'zona' => $this->zona, 'ciudad' => $this->ciudad, 'cod_area' => $this->cod_area, 'foto_perfil' => $this->foto_perfil, 'roles_seleccionados' => $this->roles_seleccionados, 'documentos_configurados' => $this->documentos_configurados, 'estado_documentos' => $this->estado_documentos, 'archivos_temporales' => $this->archivos_temporales, 'observacion_documentos' => $this->observacion_documentos, 'tempId' => $this->tempId, 'institucion_formacion' => $this->institucion_formacion, 'matricula_prof' => $this->matricula_prof, 'anios_exp' => $this->anios_exp, 'subtipo_enfermeria' => $this->subtipo_enfermeria, 'nivel_responsabilidad' => $this->nivel_responsabilidad]);
             $usuario = $resultado['usuario'];
+
+            if (app(AutorizarGestionPersonal::class)->esGerencia(auth()->user())) {
+                $falloCorreo = !$this->esEdicion && $resultado['correo_enviado'] === false;
+                $this->dispatch('swal', [
+                    'icon' => $falloCorreo ? 'warning' : 'success',
+                    'title' => $this->esEdicion ? 'Datos actualizados' : 'Trabajador registrado',
+                    'text' => $falloCorreo ? 'El registro quedó guardado, pero la bienvenida no pudo enviarse. Revisa la entrega del acceso.' : 'Los datos del trabajador quedaron guardados.',
+                ]);
+                $this->contrasena_temporal = '';
+                $this->dispatch('actualizarTablaPersonal');
+                $this->dispatch('cerrar-modal-gestion-personal');
+                return;
+            }
 
             if (! $this->esEdicion) {
                 $correoTexto = match ($resultado['correo_enviado']) {
@@ -991,6 +810,7 @@ class PersonalInstitucionalForm extends Component
             throw $e;
         } catch (\Throwable $e) {
             report($e);
+            $this->addError('guardado', 'No se pudo completar el registro. Los datos siguen disponibles para revisar e intentar de nuevo.');
             $this->dispatch('mostrarAlerta', [
                 'type' => 'error',
                 'title' => 'Error al guardar',
@@ -1001,12 +821,13 @@ class PersonalInstitucionalForm extends Component
 
     public function render()
     {
+        app(AutorizarGestionPersonal::class)->autorizar(auth()->user(), $this->usuarioId ? User::findOrFail($this->usuarioId) : null);
         $rolesPermitidos = ClasificacionRolInstitucional::ROLES;
 
         $rolesQuery = Role::query()->whereIn('name', $rolesPermitidos);
 
         if (auth()->check() && ! auth()->user()->hasRole('SUPERADMINISTRADOR')) {
-            $rolesQuery->where('name', '!=', 'SUPERADMINISTRADOR');
+            $rolesQuery->whereIn('name', AutorizarGestionPersonal::ROLES_TRABAJADOR);
         }
 
         return view('livewire.identidad.personal-institucional-form', [

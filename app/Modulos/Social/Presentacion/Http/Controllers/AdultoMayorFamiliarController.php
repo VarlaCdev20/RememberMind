@@ -32,20 +32,20 @@ class AdultoMayorFamiliarController extends Controller
 
     public function destroy(Residente $adulto_mayor, string $familiar): RedirectResponse
     {
-        app(GestionarVinculoFamiliarHttp::class)->destroy(auth()->user(), [], $adulto_mayor, $familiar);
+        app(GestionarVinculoFamiliarHttp::class)->destroy(auth()->user(), request()->only('motivo'), $adulto_mayor, $familiar);
 
         return $this->volver($adulto_mayor)->with('success', 'Vínculo desactivado correctamente.');
     }
 
     public function restore(Residente $adulto_mayor, string $familiar): RedirectResponse
     {
-        app(GestionarVinculoFamiliarHttp::class)->restore(auth()->user(), [], $adulto_mayor, $familiar);
+        app(GestionarVinculoFamiliarHttp::class)->restore(auth()->user(), request()->only('motivo'), $adulto_mayor, $familiar);
 
         return $this->volver($adulto_mayor)->with('success', 'Vínculo restaurado correctamente.');
     }
 
     private function volver(Residente $adulto): RedirectResponse
     {
-        return new RedirectResponse(route('admin.adultos-mayores.show', ['adulto_mayor' => $adulto->cod_residente, 'tab' => 'familiares']));
+        return new RedirectResponse(route('admin.familia-social.red-apoyo', ['residente' => $adulto->getKey()]));
     }
 }

@@ -17,7 +17,19 @@ related_modules: []
 
 # RememberMind — Baseline Rector de la BDD Operativa
 
-**Inventario vigente — 22/10/2026:** la consolidación de cuatro bloques singulares
+**Inventario vigente — 27/10/2026:** la instalación expresamente autorizada
+de Gerencia35/37 añade seis relaciones operativas y ocho columnas nullable:
+**81 operativas +25 expertas =106 de negocio**, más16 técnicas.
+[Decisión, diccionarios, instalación y reversión](DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md).
+Se verificó contenido previo conservado; no se completaron fechas o autorías
+históricas desconocidas. El máximo de diseño sigue en110. Los conteos de las
+decisiones anteriores conservan su fecha y alcance.
+
+**Extensión aprobada — 26/10/2026:** `usuarios.remember_token VARCHAR(100) NULL`
+para Recordarme, con cookie de 30 días. No añade tablas ni modifica PK/FK.
+Véase la [decisión específica](DECISION_RECORDARME_2026_10_26.md).
+
+**Inventario anterior — 22/10/2026:** la consolidación de cuatro bloques singulares
 aprobada por la propietaria quedó instalada en PostgreSQL local: **75 operativas
 + 25 expertas = 100 tablas de negocio**, además de 16 técnicas. Conserva las
 257 filas trasladadas, las siete FK entrantes y las identidades históricas.

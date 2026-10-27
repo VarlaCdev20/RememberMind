@@ -97,14 +97,15 @@
                 @endif
 
                 @if(count($documentos_pendientes) > 0)
-                    <p style="margin-top: 0; font-weight: bold; color: #9b1c1c;">Documentos Pendientes (Plazo 48h):</p>
+                    <p style="margin-top: 0; font-weight: bold; color: #9b1c1c;">Documentos requeridos pendientes:</p>
                     <ul style="margin-bottom: 15px; color: #723b13;">
                         @foreach($documentos_pendientes as $doc)
                             <li>{{ $doc }}</li>
                         @endforeach
                     </ul>
                     <div style="background-color: #fdf6b2; padding: 10px; border-radius: 4px; font-size: 12px; color: #723b13;">
-                        <strong>Importante:</strong> Tienes plazo hasta el <strong>{{ $fecha_limite }}</strong> para subir la documentación restante a través de la plataforma. El incumplimiento suspenderá temporalmente tu acceso.
+                        @if($fecha_limite)<strong>Fecha límite de la solicitud:</strong> {{ $fecha_limite }}.@endif
+                        Consulta con Gerencia los documentos solicitados. El seguimiento documental no suspende automáticamente tu acceso.
                     </div>
                 @else
                     <p style="margin: 0; color: #31c48d;"><strong>¡Excelente!</strong> No tienes documentación personal pendiente.</p>

@@ -17,7 +17,13 @@ related_modules: []
 
 # RememberMind — BDD Operativa V2.1: 70 tablas
 
-**Inventario vigente — 22/10/2026:** cuatro consolidaciones expertas singulares
+**Inventario vigente — 27/10/2026:** extensión de Gerencia35/37 aprobada e
+instalada: **81 operativas +25 expertas =106 de negocio**, más16 técnicas.
+El núcleo de70 no cambia. [Diccionarios nominales y evidencia](DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md).
+Ocho columnas nuevas permanecen NULL en la historia previa; seis relaciones
+conservan los hechos nuevos sin inventar registros retroactivos.
+
+**Inventario anterior — 22/10/2026:** cuatro consolidaciones expertas singulares
 aprobadas e instaladas dejan **75 operativas + 25 expertas = 100 tablas de
 negocio**, más 16 técnicas. El núcleo operativo de 70 no cambia.
 [Diccionario nominal, FK, guardas y reversión](DECISION_CONSOLIDACION_BLOQUES_EXPERTOS_2026_10_22.md).
@@ -106,6 +112,9 @@ Todas las PK `cod_*` usan `string(20)` salvo decisión futura explícitamente ap
 - `correo string(120) UNIQUE NOT NULL`
 
 - `contrasena string(255) NOT NULL`
+
+- `remember_token string(100) NULL` — extensión aprobada del 26/10/2026;
+  [decisión Recordarme](DECISION_RECORDARME_2026_10_26.md), sin nuevas tablas.
 
 - `foto string(255) NULL`
 

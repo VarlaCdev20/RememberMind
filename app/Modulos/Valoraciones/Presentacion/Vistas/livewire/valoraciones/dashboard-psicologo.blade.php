@@ -16,7 +16,6 @@
             <p role="status">No hay una vinculación de personal activo de Psicología para consultar registros propios.</p>
         </x-ui.section-card>
     @else
-<<<<<<< HEAD
         @if(auth()->user()->hasRole('PSICOLOGO/A') && session(\App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService::SESSION_KEY) === null)
             @can('viewAny', \App\Models\Residente::class)
                 <section class="rm-card rm-orion-panel" aria-labelledby="psychology-expert-access-title">
@@ -32,8 +31,6 @@
                 </section>
             @endcan
         @endif
-=======
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         <section aria-labelledby="psychology-activity-title">
             <div class="rm-psychology-dashboard__section-heading">
                 <h2 id="psychology-activity-title">Tu actividad</h2>
@@ -80,13 +77,10 @@
                     @else
                         <x-ui.empty-state compact icono="ph-chart-line-up" titulo="Sin actividad registrada en este período" texto="Aquí aparecerán las atenciones finalizadas y aplicaciones completas o vigentes." />
                     @endif
-<<<<<<< HEAD
                     <div class="rm-psychology-chart__series" aria-label="Series del seguimiento mensual">
                         <span><i class="rm-psychology-chart__swatch rm-psychology-chart__swatch--1" aria-hidden="true"></i>Atenciones finalizadas</span>
                         <span><i class="rm-psychology-chart__swatch rm-psychology-chart__swatch--2" aria-hidden="true"></i>Aplicaciones completas o vigentes</span>
                     </div>
-=======
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                     <details class="rm-psychology-chart__data">
                         <summary>Ver cifras por mes</summary>
                         <table><caption class="sr-only">Actividad mensual propia de Psicología</caption>
@@ -150,19 +144,12 @@
             <div class="rm-psychology-dashboard__section-heading">
                 <h2 id="psychology-followup-title">Pendientes y registros recientes</h2>
             </div>
-<<<<<<< HEAD
             <div class="rm-psychology-dashboard__followup">
                 <div class="rm-psychology-dashboard__pending">
                     @foreach($panels as $panel)
                         <x-ui.dashboard-data-panel :panel="$panel" />
                     @endforeach
                 </div>
-=======
-            <div class="rm-dashboard-data-grid rm-psychology-dashboard__panels">
-                @foreach($panels as $panel)
-                    <x-ui.dashboard-data-panel :panel="$panel" />
-                @endforeach
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                 <section class="rm-dashboard-data-panel rm-psychology-recent" aria-labelledby="psychology-recent-title">
                     <div class="rm-dashboard-data-panel__heading">
                         <span class="rm-dashboard-data-panel__icon" aria-hidden="true"><i class="ph-bold ph-clipboard-text"></i></span>
@@ -181,7 +168,6 @@
                         </ul>
                     @endif
                 </section>
-<<<<<<< HEAD
                 <section class="rm-psychology-areas" aria-labelledby="psychology-areas-title">
                     <h2 id="psychology-areas-title">Áreas de valoración</h2>
                     <div class="rm-psychology-areas__links rm-psychology-areas__links--four">
@@ -195,22 +181,6 @@
                         @endforeach
                     </div>
                 </section>
-=======
-            </div>
-        </section>
-
-        <section class="rm-psychology-areas" aria-labelledby="psychology-areas-title">
-            <h2 id="psychology-areas-title">Áreas de valoración</h2>
-            <div class="rm-psychology-areas__links rm-psychology-areas__links--four">
-                @foreach([
-                    ['route' => 'admin.psicologia.evaluacion.cognitiva', 'label' => 'Cognitiva', 'icon' => 'ph-brain'],
-                    ['route' => 'admin.psicologia.evaluacion.afectiva', 'label' => 'Afectiva y emocional', 'icon' => 'ph-heart'],
-                    ['route' => 'admin.psicologia.evaluacion.funcionamiento', 'label' => 'Funcionamiento', 'icon' => 'ph-person-simple-walk'],
-                    ['route' => 'admin.psicologia.evaluacion.entorno', 'label' => 'Entorno y red social', 'icon' => 'ph-users-four'],
-                ] as $area)
-                    <a href="{{ route($area['route']) }}" wire:navigate><i class="ph-bold {{ $area['icon'] }}" aria-hidden="true"></i><span>{{ $area['label'] }}</span><i class="ph-bold ph-arrow-up-right" aria-hidden="true"></i></a>
-                @endforeach
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
             </div>
         </section>
 

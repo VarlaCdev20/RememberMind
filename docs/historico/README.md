@@ -26,3 +26,11 @@ Fuente vigente: [portal](../README.md), [estado](../ESTADO_ACTUAL.md), [BDD](../
 No se mueven masivamente documentos en Fase 1. Una futura migración a docs/historico requiere revisar enlaces entrantes desde README/AGENTS/skills y conservar trazabilidad.
 
 [Solicitud del stack de skills de sistema preservada íntegramente](SOLICITUD_STACK_SKILLS_SISTEMA.md). Su contenido es un encargo previo, no norma clínica.
+
+## Catálogo y regla de lectura vigente — 25/10/2026
+
+- [Cortes de estado hasta el 11/10/2026](ESTADO_CORTES_HASTA_2026_10_11.md).
+- [Análisis de arquitectura anterior](../architecture-audit/README.md) y [planes de refactor anteriores](../refactorizacion-total/README.md): se mantienen sus rutas para conservar referencias; no gobiernan carpetas o estructura actuales.
+- [Estado vigente](../ESTADO_ACTUAL.md) y [contratos funcionales por propietario](../modulos/README.md).
+
+El archivo conserva decisiones y evidencia única. La limpieza retira instrucciones obsoletas de entradas vigentes, pero no borra historias ni pruebas históricas útiles para simular un cierre. La limitación de no mover archivos de la Fase 1 describía aquella ejecución y no es una prohibición global para tareas posteriores autorizadas.

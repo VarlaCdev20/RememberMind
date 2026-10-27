@@ -8,10 +8,7 @@ use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\Turno;
 use App\Models\User;
-<<<<<<< HEAD
 use App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratoFuentesPetersen;
-=======
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 use Database\Seeders\CohorteCognitivaInvestigacionSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Contracts\Console\Kernel;
@@ -19,10 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-<<<<<<< HEAD
 use Illuminate\Support\Facades\Vite;
-=======
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 
 // Router privado E2E. Nunca se carga desde public/ ni acepta una base instalada.
 $archivo = getenv('RM_EXPERTO_DB') ?: '';
@@ -64,14 +58,11 @@ if ($preparar) {
     foreach (['SA' => 'SUPERADMINISTRADOR', 'MED' => 'MEDICO GENERAL/GERIATRA', 'ENF' => 'ENFERMEROS'] as $id => $rol) {
         $u = User::factory()->create(['cod_usuario' => 'QA_EXP_'.$id, 'estado' => 'ACTIVO']);
         $u->assignRole($rol);
-<<<<<<< HEAD
         if ($id === 'MED' && $conCohorte) {
             // El médico de este ensayo necesita leer todas las fuentes de la
             // cohorte; el permiso existe solo en esta base desechable.
             $u->givePermissionTo(array_values(array_unique(array_column(ContratoFuentesPetersen::FUENTES, 1))));
         }
-=======
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         if ($id !== 'SA') {
             $personal[$id] = Personal::create(['cod_usuario' => $u->getKey(), 'nombres' => 'Profesional',
                 'apellido_paterno' => 'Sintético', 'numero_documento' => 'QA-EXP-'.$id,
@@ -110,23 +101,16 @@ final class AutenticarExpertoSintetico
         if ($metadata) {
             config(['sistema_experto.perfiles_instrumentales' => $metadata['perfiles']]);
         }
-<<<<<<< HEAD
-        Auth::onceUsingId('QA_EXP_'.$actor);
-=======
         Auth::onceUsingId($actor === 'MED' && $metadata ? $metadata['medico'] : 'QA_EXP_'.$actor);
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 
         return $next($request);
     }
 }
 $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
-<<<<<<< HEAD
 $kernel->bootstrap();
 // La prueba sirve los assets compilados desde el mismo host sintético, aunque
 // el proyecto local tenga un servidor Vite activo para la sesión de desarrollo.
 Vite::useHotFile($archivo.'.hot');
-=======
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 $kernel->pushMiddleware(AutenticarExpertoSintetico::class);
 $request = Request::capture();
 $response = $kernel->handle($request);

@@ -98,6 +98,7 @@ class SidebarService
             $this->buildSection('Dashboard', 'ph-house', 'dashboard', [], false, null, null, 'INICIO'),
             $this->buildSection('Gestión del sistema', 'ph-shield-check', null, [
                 $this->buildItem('Usuarios', 'admin.usuarios.index', 'usuarios.ver'),
+                $this->buildItem('Mis envíos de correo', 'admin.usuarios.correos.index', 'usuarios.ver'),
                 $this->buildItem('Roles y permisos', 'admin.roles-permisos.index', 'roles.ver'),
                 $this->buildItem('Auditoría', 'admin.bitacora.index', 'bitacora.ver'),
                 $this->buildItem('Sistema experto · revisión', 'admin.sistema-experto.index', 'auditoria.ver'),
@@ -148,20 +149,21 @@ class SidebarService
             $this->buildSection('Inicio', 'ph-house', 'dashboard'),
             $this->buildSection('Personal', 'ph-identification-badge', null, [
                 $this->buildItem('Personal institucional', 'admin.personal-institucional', 'personal_institucional.ver'),
-                $this->buildItem('Personal por área', 'admin.areas-institucionales.index', 'areas.ver'),
+                $this->buildItem('Documentación laboral', 'admin.personal.documentacion', 'personal_institucional.ver'),
+                $this->buildItem('Familiares y contactos', 'admin.familia-social.red-apoyo', 'residentes_contactos.ver'),
             ]),
             $this->buildSection('Organización', 'ph-buildings', null, [
-                $this->buildItem('Galería del centro', 'admin.galeria.index', 'fotografias_institucionales.ver'),
-                $this->buildItem('Áreas', 'admin.areas-institucionales.index', 'areas.ver'),
-                $this->buildItem('Turnos y planificación', 'admin.turnos-asignaciones.index', 'turnos.ver'),
-                $this->buildItem('Cobertura', 'admin.turnos-enfermeria.index', 'jornadas.ver'),
+                $this->buildItem('Áreas y equipo', 'admin.areas-institucionales.index', 'areas.ver'),
+                $this->buildItem('Planificación del equipo', 'admin.turnos-asignaciones.index', 'turnos.ver'),
+                $this->buildItem('Cobertura del equipo', 'admin.cobertura-equipo.index', 'jornadas.ver'),
             ]),
             $this->buildSection('Consulta institucional', 'ph-chart-line-up', null, [
-                $this->buildItem('Residentes', 'admin.adultos-mayores.index', 'residentes.ver'),
+                $this->buildItem('Residentes', 'admin.residentes.index', 'residentes.ver'),
                 $this->buildItem('Ocupación', 'admin.habitaciones.index', 'habitaciones.ver'),
-                $this->buildItem('Alertas relevantes', 'admin.alertas-clinicas.index', 'alertas.ver'),
+                $this->buildItem('Alertas', 'admin.alertas-clinicas.index', 'alertas.ver'),
                 $this->buildItem('Reportes gerenciales', 'admin.reportes.institucional.preview', 'reportes.institucional'),
             ]),
+            $this->buildSection('Galería', 'ph-images', 'admin.galeria.index', [], false, 'fotografias_institucionales.ver'),
         ]));
     }
 
@@ -193,6 +195,7 @@ class SidebarService
                 $this->buildItem('Visitas', 'admin.administracion.visitas', 'visitas.ver'),
             ]),
             $this->buildAdministradorGroup('Documentación', 'ph-files', [
+                $this->buildItem('Mis envíos de correo', 'admin.usuarios.correos.index', 'usuarios.ver'),
                 $this->buildItem('Contactos y responsables', 'admin.administracion.contactos', 'contactos.ver'),
                 $this->buildItem('Documentos', 'admin.administracion.documentacion', 'documentos.ver', $badges['documentacion']),
                 $this->buildItem('Consentimientos', 'admin.administracion.consentimientos', 'consentimientos.ver'),
@@ -338,10 +341,7 @@ class SidebarService
         }
 
         $sidebar[] = $this->buildSection('Inicio', 'ph-house', 'admin.psicologia.dashboard');
-<<<<<<< HEAD
-=======
         $sidebar[] = $this->buildSection('Alertas de Psicología', 'ph-bell-ringing', 'admin.alertas-clinicas.index', [], false, 'alertas.ver');
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         $misResidentes = $this->buildSection('Mis residentes', 'ph-users-three', 'admin.psicologia.evaluaciones');
         if ($misResidentes !== null) {
             $misResidentes['active_routes'] = [
@@ -349,15 +349,12 @@ class SidebarService
                 'admin.psicologia.residente.resultados-experto',
             ];
             $sidebar[] = $misResidentes;
-<<<<<<< HEAD
         }
 
         $user ??= auth()->user();
         if ($user?->hasRole('PSICOLOGO/A')
             && $user->personal()->where('estado', 'ACTIVO')->where('profesion', 'PSICOLOGIA')->exists()) {
             $sidebar[] = $this->buildSection('Sistema experto', 'ph-brain', 'admin.sistema-experto.residentes', [], false, 'residentes.ver');
-=======
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         }
 
         $sidebar[] = $this->buildSection('Agenda y sesiones', 'ph-calendar-check', 'admin.psicologia.agenda', [], false, 'atenciones.ver');

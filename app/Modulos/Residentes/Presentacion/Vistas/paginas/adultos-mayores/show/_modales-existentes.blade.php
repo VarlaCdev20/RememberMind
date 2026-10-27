@@ -236,14 +236,17 @@
  <input type="hidden" name="_method" :value="isEditing ? 'PATCH' : 'POST'">
  <input type="hidden" name="estado" value="ACTIVO">
  <div class="md:col-span-2">
- <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">Nombre completo del Familiar</label>
- <input name="nombre_nuevo" :value="recordData.usuario?.name || recordData.nombres || ''" :disabled="isViewing" required class="w-full rounded-xl border {{ $errors->has('nombre_nuevo') ? 'border-[var(--rm-action-primary)] bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="Ej. Juan Pérez">
- @error('nombre_nuevo') <span class="mt-1 block text-xs font-bold text-[var(--rm-action-primary)]">{{ $message }}</span> @enderror
- </div>
+ <label for="contacto-modal-nombres" class="rm-label">Nombres</label>
+ <input id="contacto-modal-nombres" name="nombres" :value="recordData.nombres || ''" :disabled="isViewing || isEditing" required maxlength="100" class="rm-input">
+ <label for="contacto-modal-paterno" class="rm-label">Apellido paterno</label>
+ <input id="contacto-modal-paterno" name="apellido_paterno" :value="recordData.apellido_paterno || ''" :disabled="isViewing || isEditing" required maxlength="80" class="rm-input">
+ <label for="contacto-modal-materno" class="rm-label">Apellido materno</label>
+ <input id="contacto-modal-materno" name="apellido_materno" :value="recordData.apellido_materno || ''" :disabled="isViewing || isEditing" maxlength="80" class="rm-input">
+ <p class="rm-help">La corrección de identidad compartida se realiza en Familiares y contactos, por separado del vínculo.</p> </div>
  <div class="md:col-span-2">
  <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">Correo Electrónico (Opcional)</label>
- <input name="email_nuevo" type="email" :value="recordData.usuario?.email || recordData.email || ''" :disabled="isViewing" class="w-full rounded-xl border {{ $errors->has('email_nuevo') ? 'border-[var(--rm-action-primary)] bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="ejemplo@correo.com">
- @error('email_nuevo') <span class="mt-1 block text-xs font-bold text-[var(--rm-action-primary)]">{{ $message }}</span> @enderror
+ <input name="correo" type="email" :value="recordData.usuario?.email || recordData.email || ''" :disabled="isViewing" class="w-full rounded-xl border {{ $errors->has('correo') ? 'border-[var(--rm-action-primary)] bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="ejemplo@correo.com">
+ @error('correo') <span class="mt-1 block text-xs font-bold text-[var(--rm-action-primary)]">{{ $message }}</span> @enderror
  </div>
  <div>
  <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">Parentesco</label>

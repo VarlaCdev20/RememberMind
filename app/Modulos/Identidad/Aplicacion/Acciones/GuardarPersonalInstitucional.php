@@ -4,11 +4,13 @@ namespace App\Modulos\Identidad\Aplicacion\Acciones;
 
 use App\Compartido\Aplicacion\Contratos\DocumentosUsuario;
 use App\Compartido\Aplicacion\Contratos\NotificacionesRegistro;
+use App\Compartido\Infraestructura\Persistencia\GeneradorCodigo;
 use App\Models\Documento;
 use App\Models\Personal;
 use App\Models\User;
 use App\Modulos\Identidad\Dominio\Reglas\ClasificacionRolInstitucional;
 use App\Modulos\Identidad\Dominio\Reglas\DocumentosPersonalInstitucional;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -31,8 +33,10 @@ final class GuardarPersonalInstitucional
         if ($edicion !== (bool) ($entrada['esEdicion'] ?? false)) {
             throw ValidationException::withMessages(['usuarioId' => 'La operación no coincide con la cuenta seleccionada.']);
         }
-        abort_unless($edicion || $actor->can('usuarios.crear'), 403);
         $usuario = $edicion ? User::with(['personal', 'roles'])->findOrFail($entrada['usuarioId']) : new User;
+        $alcance = app(AutorizarGestionPersonal::class);
+        $alcance->autorizar($actor, $edicion ? $usuario : null, $entrada['roles_seleccionados']);
+        abort_unless($edicion || $actor->can('usuarios.crear') || $alcance->esGerencia($actor), 403);
         $personal = $usuario->personal;
         $entrada['correo'] = mb_strtolower(trim((string) ($entrada['correo'] ?? '')));
         $roles = array_values($entrada['roles_seleccionados'] ?? []);
@@ -44,11 +48,14 @@ final class GuardarPersonalInstitucional
         $cambiaRoles = $ordenados !== $actualesOrdenados;
         $cambiaCuenta = $edicion && ($entrada['correo'] !== mb_strtolower(trim($usuario->correo)) || $cambiaRoles
             || $this->archivos->esArchivo($entrada['foto_perfil'] ?? null));
-        abort_if($cambiaCuenta && ! $actor->can('usuarios.editar'), 403);
+        abort_if($cambiaCuenta && ! $actor->can('usuarios.editar') && ! $alcance->esGerencia($actor), 403);
         abort_if($edicion && $usuario->esCuentaPrincipal() && $cambiaCuenta && ! $actor->esCuentaPrincipal(), 403);
         abort_if($cambiaRoles && in_array('SUPERADMINISTRADOR', $roles, true) && ! $actor->hasRole('SUPERADMINISTRADOR'), 403);
         if ($edicion && isset($entrada['estado']) && $entrada['estado'] !== $usuario->estado) {
             throw ValidationException::withMessages(['estado' => 'El acceso se cambia desde la gestión de cuentas.']);
+        }
+        if ($edicion && isset($entrada['estado_personal']) && $entrada['estado_personal'] !== $personal?->estado) {
+            throw ValidationException::withMessages(['estado_personal'=>'Usa Cambiar situación laboral para conservar motivo y fecha de la transición.']);
         }
         foreach (['forzar_cambio_password', 'telefono_alternativo', 'institucion_formacion', 'anios_exp', 'subtipo_enfermeria', 'nivel_responsabilidad'] as $campo) {
             if (! empty($entrada[$campo])) {
@@ -79,7 +86,7 @@ final class GuardarPersonalInstitucional
         $catalogo = DocumentosPersonalInstitucional::paraRol($roles[0]);
         $catalogoPorCodigo = array_column($catalogo, null, 'id');
         $uploads = array_filter($datos['archivos_temporales'] ?? []);
-        abort_if($uploads && ! $actor->can('documentos.subir') && ! $actor->can('documentos.gestionar'), 403);
+        abort_if($uploads && ! $actor->can('documentos.subir') && ! $actor->can('documentos.gestionar') && ! $alcance->esGerencia($actor), 403);
         foreach (array_keys($uploads) as $codigo) {
             if (! isset($catalogoPorCodigo[$codigo])) {
                 throw ValidationException::withMessages(['archivos_temporales' => 'El documento no corresponde al registro seleccionado.']);
@@ -100,9 +107,23 @@ final class GuardarPersonalInstitucional
         $correoEnviado = null;
         try {
             $guardado = DB::transaction(function () use ($actor, $usuario, $personal, $edicion, $datos, $roles, $cambiaRoles, $clasificacion, $uploads, $catalogoPorCodigo, &$nuevosArchivos, &$correoEnviado) {
+                if (! $edicion) {
+                    // El coordinador queda bloqueado hasta el commit exterior. La
+                    // parte reintentable solo valida: no guarda archivos ni modelos.
+                    $actor = app(GeneradorCodigo::class)->serializar('usuarios', function () use ($actor, $datos, $roles, $uploads) {
+                        $alcance = app(AutorizarGestionPersonal::class);
+                        $actual = $alcance->autorizar($actor, null, $roles);
+                        abort_unless($actual->can('usuarios.crear') || $alcance->esGerencia($actual), 403);
+                        abort_if($uploads && ! $actual->can('documentos.subir') && ! $actual->can('documentos.gestionar') && ! $alcance->esGerencia($actual), 403);
+                        $this->validarUnicidad($datos);
+
+                        return $actual;
+                    });
+                }
                 if ($edicion) {
                     $superadmins = User::whereHas('roles', fn ($query) => $query->where('name', 'SUPERADMINISTRADOR')->where('guard_name', 'web'))->where('estado', 'ACTIVO')->orderBy('cod_usuario')->lockForUpdate()->get();
                     $usuario = User::query()->lockForUpdate()->findOrFail($usuario->getKey());
+                    $actor = app(AutorizarGestionPersonal::class)->autorizar($actor, $usuario, $roles);
                     if ($cambiaRoles && $usuario->hasRole('SUPERADMINISTRADOR') && ! in_array('SUPERADMINISTRADOR', $roles, true)
                         && $superadmins->count() <= 1) {
                         throw ValidationException::withMessages(['roles_seleccionados' => 'No puedes quitar el rol al único superadministrador activo.']);
@@ -110,8 +131,11 @@ final class GuardarPersonalInstitucional
                 } else {
                     $usuario->password = $datos['contrasena_temporal'];
                     $usuario->estado = 'ACTIVO';
+                    if (app(\App\Modulos\Identidad\Aplicacion\Consultas\CapacidadDocumentalPersonal::class)->disponible()) {
+                        $usuario->forceFill(['fecha_hora_alta'=>now(),'cambio_password_pendiente'=>true]);
+                    }
                 }
-                if (! $edicion || $actor->can('usuarios.editar')) {
+                if (! $edicion || $actor->can('usuarios.editar') || app(AutorizarGestionPersonal::class)->esGerencia($actor)) {
                     $usuario->correo = $datos['correo'];
                 }
                 $usuario->save();
@@ -137,12 +161,23 @@ final class GuardarPersonalInstitucional
                 }
                 $adjuntos = [];
                 foreach ($uploads as $codigo => $archivo) {
-                    $almacenado = $this->archivos->guardar($usuario->getKey(), $archivo, 'documentos_personal');
+                    $capacidadDocumental=app(\App\Modulos\Identidad\Aplicacion\Consultas\CapacidadDocumentalPersonal::class)->disponible();
+                    $previos = Documento::query()->where('cod_usuario', $usuario->getKey())
+                        ->whereIn('tipo_documento', in_array($codigo, ['FOTO', 'FOTO_DOC'], true) ? ['FOTO', 'FOTO_DOC'] : [$codigo])
+                        ->whereNull('cod_residente')->whereNull('cod_contacto')->whereNull('cod_preadmision')
+                        ->whereNotIn('estado', ['ANULADO', 'ANULADA', 'REEMPLAZADO'])->lockForUpdate()->get();
+                    if ($previos->count() > 1 || ($previos->first() && $previos->first()->tipo_documento !== $codigo)) {
+                        throw ValidationException::withMessages(['archivos_temporales.'.$codigo => 'Actualiza la ficha y corrige el archivo de origen; hay otro registro vigente para este requisito.']);
+                    }
+                    $anterior = $previos->first();
+                    $privado = $capacidadDocumental || str_starts_with($anterior?->ruta_archivo ?? '', 'documentos_personal_privados/');
+                    $almacenado = $this->archivos->guardar($usuario->getKey(), $archivo, $privado ? 'documentos_personal_privados' : 'documentos_personal');
                     $nuevosArchivos[] = $almacenado['ruta_archivo'];
-                    $anterior = Documento::query()->where('cod_usuario', $usuario->getKey())->where('tipo_documento', $codigo)->whereNotIn('estado', ['ANULADO', 'ANULADA', 'REEMPLAZADO'])->lockForUpdate()->first();
+                    $procedencia = $capacidadDocumental
+                        ? ['cod_usuario_carga'=>$actor->getKey(),'fecha_hora_carga'=>now()] : [];
                     Documento::create(['cod_documento' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('documentos'), 'cod_usuario' => $usuario->getKey(),
                         'cod_documento_anterior' => $anterior?->getKey(), 'tipo_documento' => $codigo, 'nombre' => $catalogoPorCodigo[$codigo]['nombre'],
-                        ...$almacenado, 'estado' => 'CARGADO', 'observacion' => 'Subido por: '.$actor->getKey()]);
+                        ...$almacenado, ...$procedencia, 'estado' => 'CARGADO', 'observacion' => $procedencia ? null : 'Subido por: '.$actor->getKey()]);
                     $anterior?->update(['estado' => 'REEMPLAZADO']);
                     if ($catalogoPorCodigo[$codigo]['tipo'] === 'institucional') {
                         $adjuntos[$codigo.'.'.strtolower($archivo->getClientOriginalExtension())] = $this->archivos->rutaAbsoluta($almacenado['ruta_archivo']);
@@ -152,15 +187,13 @@ final class GuardarPersonalInstitucional
                 $guardado = $usuario->fresh(['personal', 'roles']);
                 if (! $edicion) {
                     $cargados = Documento::query()->where('cod_usuario', $usuario->getKey())->whereNotIn('estado', ['ANULADO', 'ANULADA', 'REEMPLAZADO'])->pluck('tipo_documento')->all();
-                    $pendientes = array_column(array_filter($catalogoPorCodigo, fn ($doc) => ! in_array($doc['id'], $cargados, true)), 'nombre');
+                    // R01A: el catálogo de respaldos opcionales no es una solicitud pendiente.
+                    $pendientes = array_column(array_filter($catalogoPorCodigo, fn ($doc) => $doc['obligatorio_inmediato'] && ! in_array($doc['id'], $cargados, true)), 'nombre');
                     $subidos = array_column(array_filter($catalogoPorCodigo, fn ($doc) => in_array($doc['id'], $cargados, true)), 'nombre');
-                    if (array_diff(['CONTRATO', 'CONFIDENCIALIDAD'], $cargados)) {
-                        activity('AlertaSeguimiento')->causedBy($actor)->performedOn($usuario)->event('documentacion')->log('Documentación institucional pendiente de regularización en 48 horas.');
-                    }
                     DB::afterCommit(function () use ($guardado, $clasificacion, $pendientes, $subidos, $adjuntos, $datos, &$correoEnviado) {
                         try {
                             $this->notificaciones->bienvenidaPersonal($guardado, $clasificacion['rol_label'], 'Sin asignación operativa',
-                                $guardado->estado, $pendientes, now()->addHours(48)->toDateString(), $adjuntos, $datos['contrasena_temporal'], $subidos);
+                                $guardado->estado, $pendientes, '', $adjuntos, $datos['contrasena_temporal'], $subidos);
                             $correoEnviado = true;
                         } catch (\Throwable $error) {
                             $correoEnviado = false;
@@ -175,9 +208,23 @@ final class GuardarPersonalInstitucional
             foreach (array_reverse($nuevosArchivos) as $ruta) {
                 $this->archivos->compensar($ruta);
             }
+            if ($error instanceof UniqueConstraintViolationException) {
+                // Tras rollback, traducir únicamente una colisión de identidad.
+                // Un User nuevo revertido ya puede tener PK: no se ignora esa PK.
+                $this->validarUnicidad($datos, $edicion ? $usuario->getKey() : null, $edicion ? $personal?->getKey() : null);
+            }
             throw $error;
         }
 
         return ['usuario' => $guardado, 'correo_enviado' => $correoEnviado];
+    }
+
+    private function validarUnicidad(array $datos, ?string $usuario = null, ?string $personal = null): void
+    {
+        Validator::make($datos, [
+            'correo' => [Rule::unique('usuarios', 'correo')->ignore($usuario, 'cod_usuario')],
+            'numero_documento' => [Rule::unique('personal', 'numero_documento')->ignore($personal, 'cod_personal')],
+        ], ['correo.unique' => 'El correo ya fue registrado. Actualiza la consulta antes de continuar.',
+            'numero_documento.unique' => 'El documento de identidad ya fue registrado. Actualiza la consulta antes de continuar.'])->validate();
     }
 }

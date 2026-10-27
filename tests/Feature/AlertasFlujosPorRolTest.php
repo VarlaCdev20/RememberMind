@@ -165,7 +165,7 @@ class AlertasFlujosPorRolTest extends TestCase
         Livewire::flushState();
         $grupos = app(ConsultarResumenEquipoAlertas::class)->consultar($gerente)['responsables'];
         $this->assertSame(2, array_sum(array_column($grupos, 'total')));
-        $panel = Livewire::test(AlertasPanel::class)->assertSee('Responsabilidad de las alertas activas')
+        $panel = Livewire::test(AlertasPanel::class)->assertSee('Supervisión de pendientes y seguimiento del equipo')
             ->set('search', 'sin coincidencias')->set('filtroEstado', 'CERRADA')
             ->call('filtrarEquipo', 'PERSONAL:'.$coordinador->personal->getKey())->assertSet('search', '')->assertSet('filtroEstado', 'ACTIVAS');
         $this->assertSame([$conResponsable->getKey()], $panel->viewData('alertas')->pluck('cod_alerta')->all());

@@ -2,18 +2,24 @@
 
 namespace App\Modulos\Institucion\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\CodigosEntidad;
+use App\Models\Jornada;
 use App\Models\Turno;
 use App\Models\User;
+use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 final class GestionarTurnosInstitucionales
 {
     public function guardar(User $usuario, array $entrada): mixed
     {
 
-        abort_unless($usuario?->can('turnos.gestionar'), 403);
+        $usuario = $usuario->fresh();
+        abort_unless($usuario?->estado === 'ACTIVO' && ! $usuario->hasRole('FAMILIAR') && $usuario->can('turnos.gestionar'), 403);
+        abort_if(app(RolePreviewService::class)->isActive($usuario), 403);
         Validator::make($entrada, [
             'nombre' => ['required', 'string', 'max:50', Rule::unique('turnos', 'nombre')->ignore($entrada['editandoId'], 'cod_turno')],
             'horaInicio' => 'required|date_format:H:i',
@@ -40,14 +46,22 @@ final class GestionarTurnosInstitucionales
             'observacion' => $entrada['observacion'] ?: null,
         ];
 
-        if ($entrada['editandoId']) {
-            Turno::findOrFail($entrada['editandoId'])->update($datos);
-            $msg = 'Turno actualizado correctamente.';
-        } else {
-            Turno::create($datos + ['cod_turno' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('turnos')]);
-            $msg = 'Turno registrado correctamente.';
-        }
+        return DB::transaction(function () use ($entrada, $datos, $usuario) {
+            if ($entrada['editandoId']) {
+                $turno = Turno::lockForUpdate()->findOrFail($entrada['editandoId']);
+                if (($turno->hora_inicio !== $datos['hora_inicio'] || $turno->hora_cierre !== $datos['hora_cierre']) && Jornada::where('cod_turno', $turno->getKey())->exists()) {
+                    throw ValidationException::withMessages(['horaInicio' => 'Este turno ya tiene jornadas registradas. Crea otro turno para conservar los horarios anteriores.']);
+                }
+                $turno->update($datos);
+                $msg = 'Turno actualizado correctamente.';
+            } else {
+                $turno = Turno::create($datos + ['cod_turno' => app(CodigosEntidad::class)->siguiente('turnos')]);
+                $msg = 'Turno registrado correctamente.';
+            }
 
-        return $msg;
+            activity('Turnos')->causedBy($usuario)->performedOn($turno)->event('turno_guardado')->log($msg);
+
+            return $msg;
+        });
     }
 }

@@ -1,8 +1,10 @@
 # Mapa de fuentes y conflictos
 
-Fecha de revisión: 2026-10-08. Catálogo de descubrimiento, no copia de los contratos. Verificar estado/alcance y decisiones posteriores antes de cada tarea.
+Fecha de revisión: 2026-10-25. Catálogo de descubrimiento, no copia de los contratos. Verificar estado/alcance y decisiones posteriores antes de cada tarea.
 
 ## Resolución
+
+Decisión estructural posterior vigente: [Gerencia35/37 instalada el27/10/2026](../../../../docs/base-de-datos/DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md),106 tablas de negocio +16 técnicas. Las referencias a100 corresponden al corte anterior; el núcleo de pruebas sin las dos rutas explícitas conserva ese inventario anterior.
 
 1. Leer instrucción actual de la propietaria y [AGENTS raíz](../../../../AGENTS.md), más AGENTS de carpetas afectadas.
 2. Consultar [índice general](../../../../docs/README.md), [índice BDD](../../../../docs/base-de-datos/README.md) y [arquitectura](../../../../docs/arquitectura/README.md).
@@ -16,13 +18,13 @@ Fecha de revisión: 2026-10-08. Catálogo de descubrimiento, no copia de los con
 | Fuente o familia | Estado revisado | Alcance y cautela |
 |---|---|---|
 | AGENTS raíz/app/database/resources/tests | VIGENTE | Contratos del proyecto por ámbito. |
-| docs/README.md y arquitectura/README.md | VIGENTE | Navegación y organización canónica. Índices también pueden contener enlaces obsoletos. |
+| docs/README.md, docs/modulos/README.md y arquitectura/README.md | VIGENTE | Entradas de documentación, doce propietarios y organización canónica. Estado comprobado en docs/ESTADO_ACTUAL.md; informes fechados conservan el alcance de su corte. |
 | REMEMBERMIND_BASELINE_TECNICO.md | VIGENTE | Stack y motores soportados; contrastar locks para versión realmente instalada. PostgreSQL integrado; SQLite rápido; MySQL/MariaDB fuera del baseline. |
 | REMEMBERMIND_ROLES_BASELINE_CONGELADO.md | VIGENTE | Competencias y límites por rol; no otorgar permisos desde una lista conceptual. |
 | PERMISOS_TEMPORALES_SUPERADMIN.md | VIGENTE, excepción acotada | Solo entorno/flag/identidad y condiciones allí definidos; no autorización clínica permanente. |
 | DASHBOARDS_POR_ROL.md | VIGENTE para contrato específico | Algunas propuestas/expectativas necesitan contraste con límites actuales y código. |
 | REMEMBERMIND_ARQUITECTURA_FRONTEND.md | DEPRECADA como norma | Fase 1 marcó sustitución por arquitectura canónica/resources/contrato visual; se conserva como antecedente. Features/Pages y prescripciones divergentes no gobiernan implementación. |
-| Baseline congelado y diccionario físico | VIGENTE con extensiones aprobadas | Autoridad de estructura y terminología. Los valores físicos de estado requieren resolver divergencias puntuales. |
+| Baseline congelado y diccionario físico | VIGENTE con extensiones aprobadas | 100 tablas de negocio (75 operativas + 25 expertas) y 16 técnicas tras la consolidación del 22/10; máximo de diseño 110. El diccionario de 70 describe el núcleo. No sustituir decisiones por conteos copiados de informes anteriores. |
 | DECISION_ARQUITECTURA_BDD_V2_1.md | VIGENTE aprobada | Normalización y autor clínico frente a actor técnico. |
 | DECISION_UNIDAD_TALLA_CM.md | VIGENTE aprobada | Unidad y migración de talla; no convertir silenciosamente datos ambiguos. |
 | DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md | VIGENTE aprobada | Extensión versionada de objetivos; validación PostgreSQL pendiente según documento. |
@@ -37,7 +39,7 @@ Fecha de revisión: 2026-10-08. Catálogo de descubrimiento, no copia de los con
 | PLAN_UNIFICACION_VISUAL.md y FASE_9*, FASE_11* | HISTÓRICA como evidencia de entregas; contratos puntuales a contrastar | Fotografías de implementación y limitaciones, no nuevas reglas clínicas. |
 | PENDIENTE_BADGES_ESTADO_RESIDENTE.md | NO RESUELTA la clasificación clínica; VIGENTE su restricción | No inferir estabilidad por ausencia de alertas. |
 | docs/produccion/DESPLIEGUE_SEGURO.md | VIGENTE como procedimiento | Núcleo y extensiones vigentes enlazados; despliegue/backup/restauración no acreditados por presencia de guía. No ejecutar producción por leerla. |
-| docs/sistema-experto/README.md e IMPLEMENTACION_V1.md | VIGENTE para routing y evidencia técnica | O.R.I.O.N. gobierna el contrato experto aprobado. Núcleo y 23 tablas verificados con datos artificiales; ORION-V1 documental cargado e inactivo y MEM-INV observacional propuesto. Activación clínica pendiente de paquete ejecutable validado y datos admisibles. Los diseños locales siguen propuestos. |
+| docs/sistema-experto/README.md, contratos A–D/E–H y C01–C05 | VIGENTES por alcance | Motor PHP independiente y ApoyoDecision; reglas y captura adoptadas. Conservación observacional comprobada, conjunta instrumental/Petersen pendiente. IMPLEMENTACION_V1.md no está en el árbol; no pedir leerlo ni reconstruir su contenido. La validación clínica sigue separada de la ejecución técnica. |
 | Tres diseños en docs/sistema-experto/ | PROPUESTA; CONFLICTIVA ubicación/arquitectura vieja | Árboles/arquitectura futura, no reglas ejecutables aprobadas. |
 | RM-EXPERT-001 en baseline | PROPUESTA para aprobación formal / DOCUMENTAL | No fingir aprobación del sistema experto por estar en el baseline. |
 | Pesos, umbrales, catálogos abiertos, PRN/reintentos, licencias de instrumentos | NO RESUELTA donde no haya decisión concreta | Aislar requisito, ofrecer opciones; continuar trabajo técnico independiente. |

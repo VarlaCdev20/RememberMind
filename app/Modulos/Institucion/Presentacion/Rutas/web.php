@@ -93,8 +93,11 @@ return [
         Route::view('/turnos-asignaciones', 'pages.turnos-asignaciones.index')
             ->middleware('permission:turnos.ver')
             ->name('turnos-asignaciones.index');
+        Route::get('/cobertura-equipo', \App\Modulos\Institucion\Presentacion\Http\Controllers\CoberturaEquipoController::class)
+            ->middleware(['permission:jornadas.ver', 'permission:asignaciones_personal.ver'])->name('cobertura-equipo.index');
     },
     'ruta_126' => static function (): void {
-        Route::get('/', fn () => redirect()->route('admin.administracion.habitaciones'))->name('index');
+        Route::get('/', [OperacionController::class, 'index'])
+            ->defaults('modulo', 'habitaciones')->name('index');
     },
 ];

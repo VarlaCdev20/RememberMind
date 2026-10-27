@@ -19,14 +19,29 @@ class AuthenticationTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Entrar al Portal');
         $this->assertMatchesRegularExpression('/src="[^"\s]*\/livewire(?:\.min)?\.js\?rm_ui=20261003&id=[^"\s]+"/', $response->getContent());
-        $response->assertSee("correo: ''", false);
-        $response->assertSee("recoverCorreo: ''", false);
-        $this->assertMatchesRegularExpression('/<div x-show="\s*panel === \'login\'/u', $response->getContent());
+        $response->assertSee('data-auth-access', false)->assertSee('x-data="rmAcceso(', false);
+        $response->assertSee('name="correo"', false)->assertSee('autocomplete="current-password"', false);
+        $response->assertSee('id="panel-login"', false)->assertSee('aria-labelledby="acceso-titulo"', false);
     }
 
     public function test_route_source_does_not_prefix_script_responses_with_a_bom(): void
     {
         $this->assertStringStartsWith('<?php', file_get_contents(base_path('routes/web.php')));
+    }
+
+    public function test_foto_del_acceso_rota_por_recarga_y_solo_usa_la_coleccion_publica(): void
+    {
+        $fotos = [];
+        for ($i = 0; $i < 4; $i++) {
+            $respuesta = $this->get('/login')->assertOk();
+            $this->assertSame(1, preg_match('/<img src="([^"]+)"[^>]+data-auth-photo/u', $respuesta->getContent(), $coincidencia));
+            $fotos[] = $coincidencia[1];
+            $this->assertStringContainsString('/images/FOTOS CENTRO DE ADULTOS MAYORES/', $coincidencia[1]);
+            $this->assertFileExists(public_path(rawurldecode(parse_url($coincidencia[1], PHP_URL_PATH))));
+            $respuesta->assertDontSee('/admin/galeria/')->assertDontSee('role="tablist"', false);
+        }
+        $this->assertCount(3, array_unique($fotos));
+        $this->assertSame($fotos[0], $fotos[3]);
     }
 
     public function test_users_can_authenticate_using_the_login_screen(): void

@@ -2,17 +2,16 @@
 
 namespace App\Modulos\Reportes\Presentacion\Livewire\Paginas;
 
-use App\Models\AdministracionMedicacion;
-use App\Models\Alerta;
-use App\Models\EjecucionCuidado;
-use App\Models\Residente;
-use App\Models\SignoVital;
-use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
-use Illuminate\Support\Facades\Auth;
+use App\Modulos\Reportes\Aplicacion\Consultas\ConsultarReporteEnfermeria;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class ReporteEnfermeria extends Component
 {
+    use WithPagination;
+
     public string $desde = '';
 
     public string $hasta = '';
@@ -21,56 +20,31 @@ class ReporteEnfermeria extends Component
 
     public string $tipo = 'TODOS';
 
+    #[Locked]
+    public array $aplicados = [];
+
     public function mount(): void
     {
-        abort_unless(Auth::user()?->can('enfermeria.ver_dashboard'), 403);
-        $this->desde = now()->subDays(7)->toDateString();
+        $this->desde = now()->subDays(6)->toDateString();
         $this->hasta = today()->toDateString();
+        $this->aplicar();
+    }
+
+    public function aplicar(): void
+    {
+        $this->aplicados = app(ConsultarReporteEnfermeria::class)->validar(auth()->user(), [
+            'desde' => $this->desde, 'hasta' => $this->hasta, 'codResidente' => $this->codResidente, 'tipo' => $this->tipo,
+        ]);
+        $this->resetPage();
     }
 
     public function render()
     {
-        $turnos = app(TurnoEnfermeriaService::class);
-        $esSuperAdmin = $turnos->esSuperAdmin(Auth::user());
-        $ids = $turnos->obtenerPacientesAsignadosIds(Auth::user());
-        $targetId = $this->codResidente;
-        if ($targetId && in_array($targetId, $ids, true)) {
-            $ids = [$targetId];
-        }
-        $cuidados = EjecucionCuidado::with(['residente', 'intervencion'])
-            ->whereIn('cod_residente', $ids)
-            ->whereBetween('fecha_hora_programada', [$this->desde, $this->hasta.' 23:59:59'])
-            ->latest('fecha_hora_programada')
-            ->get();
-        $incidentes = Alerta::with('residente')
-            ->whereIn('cod_residente', $ids)
-            ->whereIn('tipo', ['INCIDENTE', 'CAIDA', 'EVENTO_ADVERSO'])
-            ->whereBetween('fecha_hora', [$this->desde, $this->hasta.' 23:59:59'])
-            ->latest('fecha_hora')
-            ->get();
-        $alertas = Alerta::query()
-            ->whereIn('cod_residente', $ids)
-            ->whereBetween('fecha_hora', [$this->desde, $this->hasta.' 23:59:59'])
-            ->latest('fecha_hora')
-            ->get();
-        $medicaciones = AdministracionMedicacion::whereIn('cod_residente', $ids)
-            ->whereBetween('fecha_hora_programada', [$this->desde, $this->hasta.' 23:59:59'])
-            ->get();
-        $signos = SignoVital::whereIn('cod_residente', $ids)->whereBetween('fecha_hora', [$this->desde, $this->hasta.' 23:59:59'])->get();
-        $pacientes = Residente::whereIn('cod_residente', $turnos->obtenerPacientesAsignadosIds(Auth::user()))->orderBy('apellido_paterno')->get();
+        $reporte = app(ConsultarReporteEnfermeria::class)->consultar(auth()->user(), $this->aplicados);
+        $pagina = $this->getPage();
+        $registros = new LengthAwarePaginator($reporte['filas']->forPage($pagina, 20)->values(), $reporte['filas']->count(), 20, $pagina);
 
-        $indicadores = [
-            'cuidados' => $cuidados->count(),
-            'signos' => $signos->count(),
-            'dosis' => $medicaciones->filter(fn ($m) => $m->esAdministrada())->count(),
-            'omisiones' => $medicaciones->filter(fn ($m) => $m->esOmitida())->count(),
-            'incidentes' => $incidentes->count(),
-            'alertas_abiertas' => $alertas->whereIn('estado', Alerta::ESTADOS_ACTIVOS)->count(),
-        ];
-
-        $tendencia = collect();
-
-        return view('livewire.cuidados.reporte-enfermeria', compact('pacientes', 'cuidados', 'incidentes', 'indicadores', 'tendencia', 'esSuperAdmin'))
+        return view('livewire.cuidados.reporte-enfermeria', compact('reporte', 'registros'))
             ->layout(request()->routeIs('admin.enfermeria.*') ? 'layouts.enfermeria' : 'layouts.sistema');
     }
 }

@@ -194,7 +194,7 @@ class DocumentosUsuarioService
             'rol' => mb_strtoupper(str_replace('_', ' ', $rol), 'UTF-8'),
             'rol_raw' => $rol,
             'estado_acceso' => $user->acceso_sistema ?? 'HABILITADO',
-            'fecha_registro' => $user->created_at ? $user->created_at->format('d/m/Y') : now()->format('d/m/Y'),
+            'fecha_registro' => $user->created_at ? $user->created_at->format('d/m/Y') : 'No registrada',
             'requisitos' => $this->documentosRequeridosPorRol($rol),
             'documentos_institucionales' => $this->documentosGeneradosPorRol($rol),
             'area_cargo' => mb_strtoupper($this->obtenerAreaCargo($user, $rol), 'UTF-8'),

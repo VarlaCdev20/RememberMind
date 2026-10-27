@@ -163,15 +163,15 @@ operativa ni de una sesión real de Superadministración.
 
 | Área/estado | Captura |
 |---|---|
-| Cognitiva, escritorio | [1440 px](../../output/valoraciones-20261022/cognitiva-1440.png) |
-| Afectiva | [1440 px](../../output/valoraciones-20261022/afectiva-1440.png) |
-| Funcionamiento | [1440 px](../../output/valoraciones-20261022/funcionamiento-1440.png) |
-| Entorno | [1440 px](../../output/valoraciones-20261022/entorno-1440.png) |
-| Tablet | [768 px](../../output/valoraciones-20261022/cognitiva-768.png) |
-| Móvil | [390 px](../../output/valoraciones-20261022/cognitiva-390.png) |
-| Guía y modal móvil | [Guía escritorio](../../output/valoraciones-20261022/guia-desktop.png), [390 px](../../output/valoraciones-20261022/guia-390.png) |
-| Captura instrumental | [1280 px](../../output/valoraciones-20261022/captura-1280.png) |
-| Aviso de transporte | [HTTP 503 sintético](../../output/valoraciones-20261022/error-conexion.png) |
+| Cognitiva, escritorio | 1440 px — referencia local no disponible: `../../output/valoraciones-20261022/cognitiva-1440.png` |
+| Afectiva | 1440 px — referencia local no disponible: `../../output/valoraciones-20261022/afectiva-1440.png` |
+| Funcionamiento | 1440 px — referencia local no disponible: `../../output/valoraciones-20261022/funcionamiento-1440.png` |
+| Entorno | 1440 px — referencia local no disponible: `../../output/valoraciones-20261022/entorno-1440.png` |
+| Tablet | 768 px — referencia local no disponible: `../../output/valoraciones-20261022/cognitiva-768.png` |
+| Móvil | 390 px — referencia local no disponible: `../../output/valoraciones-20261022/cognitiva-390.png` |
+| Guía y modal móvil | Guía escritorio — referencia local no disponible: `../../output/valoraciones-20261022/guia-desktop.png`, 390 px — referencia local no disponible: `../../output/valoraciones-20261022/guia-390.png` |
+| Captura instrumental | 1280 px — referencia local no disponible: `../../output/valoraciones-20261022/captura-1280.png` |
+| Aviso de transporte | HTTP 503 sintético — referencia local no disponible: `../../output/valoraciones-20261022/error-conexion.png` |
 
 Las cuatro áreas muestran historial sin registros en estas capturas sintéticas.
 No hay captura final de validación de formulario ni de éxito: quedan pendientes.

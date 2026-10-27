@@ -48,18 +48,12 @@ final class NavegacionSistemaExpertoTest extends TestCase
 
         $this->get(route('admin.psicologia.dashboard'))
             ->assertOk()->assertSee('Mis residentes')
-<<<<<<< HEAD
             ->assertSee('Abrir sistema experto')
             ->assertSee(route('admin.sistema-experto.residentes'), false)
             ->assertSee(route('admin.psicologia.evaluaciones'), false);
         $this->get(route('admin.sistema-experto.residentes'))
             ->assertOk()
             ->assertSee('Sistema experto por residente')
-=======
-            ->assertSee(route('admin.psicologia.evaluaciones'), false);
-        $this->get(route('admin.sistema-experto.residentes'))
-            ->assertOk()
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
             ->assertSee($residente->nombre_completo)
             ->assertSee('Tarjetas')
             ->assertSee('Tabla')
@@ -93,7 +87,6 @@ final class NavegacionSistemaExpertoTest extends TestCase
             ->assertDontSee($residente->nombre_completo);
     }
 
-<<<<<<< HEAD
     public function test_acceso_del_inicio_y_menu_requiere_personal_activo_y_permiso_existente(): void
     {
         $usuario = $this->profesional();
@@ -116,8 +109,6 @@ final class NavegacionSistemaExpertoTest extends TestCase
         $this->get($ruta)->assertForbidden();
     }
 
-=======
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
     public function test_medicina_consulta_resultados_y_abre_valoracion_desde_ficha(): void
     {
         $this->actingAs($this->profesional('MEDICO GENERAL/GERIATRA'));

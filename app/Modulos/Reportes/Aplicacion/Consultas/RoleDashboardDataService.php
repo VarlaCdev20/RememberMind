@@ -14,7 +14,7 @@ final class RoleDashboardDataService
     {
         return match ($role) {
             'SUPERADMINISTRADOR' => $this->institutional($user),
-            'GERENTE' => $this->management(),
+            'GERENTE' => $this->management($user),
             'MEDICO GENERAL/GERIATRA' => $this->medical($user),
             'NUTRICIONISTA' => $this->professional($user, 'nutricion'),
             'FISIOTERAPEUTA' => $this->professional($user, 'fisioterapia'),
@@ -146,8 +146,9 @@ final class RoleDashboardDataService
         ];
     }
 
-    private function management(): array
+    private function management(User $user): array
     {
+        $gerencia = app(ConsultarIndicadoresGerencia::class)->consultar($user);
         $today = today();
         $assignments = DB::table('asignaciones_personal as ap')
             ->join('jornadas as j', 'j.cod_jornada', '=', 'ap.cod_jornada')
@@ -160,23 +161,29 @@ final class RoleDashboardDataService
             ->where('p.estado', 'ACTIVO')
             ->whereIn('a.estado', ['ACTIVO', 'ACTIVA'])
             ->whereIn('t.estado', ['ACTIVO', 'ACTIVA']);
+        $verCobertura = $user->can('asignaciones_personal.ver') && $user->can('jornadas.ver');
+        if (! $verCobertura) {
+            $assignments->whereRaw('1 = 0');
+        }
         $coverage = (clone $assignments)
             ->select('a.nombre as label')->selectRaw('COUNT(DISTINCT ap.cod_personal) as total')
             ->groupBy('a.cod_area', 'a.nombre')->orderByDesc('total')->orderBy('a.nombre')->get();
-        $professions = DB::table('personal')->where('estado', 'ACTIVO')->select('profesion as label')
-            ->selectRaw('COUNT(*) as total')->groupBy('profesion')->orderByDesc('total')->get();
+        $professions = $user->can('personal_institucional.ver')
+            ? DB::table('personal')->where('estado', 'ACTIVO')->select('profesion as label')
+                ->selectRaw('COUNT(*) as total')->groupBy('profesion')->orderByDesc('total')->get() : collect();
 
         return [
             'metrics' => [
-                $this->metric('Personal activo', DB::table('personal')->where('estado', 'ACTIVO')->count(), 'Plantilla vigente', 'ph-identification-badge', 'mint'),
-                $this->metric('Personal asignado hoy', (clone $assignments)->distinct('ap.cod_personal')->count('ap.cod_personal'), 'Personas únicas · jornadas de hoy', 'ph-calendar-check', 'sky'),
-                $this->metric('Áreas cubiertas hoy', $coverage->count(), 'Con personal activo asignado', 'ph-buildings', 'neutral'),
-                $this->metric('Actividades próximas', DB::table('actividades')->where('estado', 'PROGRAMADA')->whereBetween('fecha_hora', [now(), now()->addDays(7)])->count(), 'Próximos siete días', 'ph-calendar-blank', 'coral'),
+                $this->metric('Personal activo', $gerencia['personal'], 'Trabajadores, no cuentas', 'ph-identification-badge', 'neutral'),
+                $this->metric('Camas ocupadas', $gerencia['ocupadas'], 'Ocupaciones vigentes', 'ph-bed', 'neutral'),
+                $this->metric('Alertas activas', $gerencia['alertas'], 'Avisos persistidos', 'ph-bell', 'neutral'),
             ],
+            'gerencia' => $gerencia,
+            'coverage' => ['personas' => $verCobertura ? (clone $assignments)->distinct('ap.cod_personal')->count('ap.cod_personal') : null, 'areas' => $verCobertura ? $coverage->count() : null],
             'panels' => [
-                $this->panel('Cobertura por área hoy', 'bars', $this->countItems($coverage), 'No hay asignaciones laborales activas para hoy. Revisa la planificación y la cobertura.', 'ph-buildings', 'wide', 'Personal único por área · no acredita presencia física', 'Hoy'),
-                $this->panel('Equipo por profesión', 'bars', $this->countItems($professions), 'No hay personal activo registrado.', 'ph-users-three', subtitle: 'Distribución del personal activo', period: 'Actual'),
-                $this->panel('Próximas actividades', 'timeline', $this->upcomingActivities(), 'No hay actividades programadas.', 'ph-calendar-check'),
+                ...($verCobertura ? [$this->panel('Cobertura por área hoy', 'bars', $this->countItems($coverage), 'No hay asignaciones laborales activas para hoy. Revisa la planificación y la cobertura.', 'ph-buildings', 'wide', 'Personal único por área · no acredita presencia física', 'Hoy')] : []),
+                ...($user->can('personal_institucional.ver') ? [$this->panel('Equipo por profesión', 'bars', $this->countItems($professions), 'No hay personal activo registrado.', 'ph-users-three', subtitle: 'Distribución del personal activo', period: 'Actual')] : []),
+                ...($user->can('actividades.ver') ? [$this->panel('Próximas actividades', 'timeline', $this->upcomingActivities(), 'No hay actividades programadas.', 'ph-calendar-check')] : []),
             ],
         ];
     }
@@ -344,7 +351,7 @@ final class RoleDashboardDataService
         ])->all();
     }
 
-    private function metric(string $label, int $value, string $description, string $icon, string $variant): array
+    private function metric(string $label, ?int $value, string $description, string $icon, string $variant): array
     {
         return compact('label', 'value', 'description', 'icon', 'variant');
     }

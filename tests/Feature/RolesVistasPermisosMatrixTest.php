@@ -99,9 +99,9 @@ class RolesVistasPermisosMatrixTest extends TestCase
 
         // Rutas clave del administrador
         $this->get(route('admin.adultos-mayores.index'))->assertOk();
-        // El directorio antiguo redirige al explorador administrativo vigente.
+        // La consulta compartida abre directamente sin exigir el dashboard administrativo.
         $this->get(route('admin.habitaciones.index'))
-            ->assertRedirect(route('admin.administracion.habitaciones'));
+            ->assertOk()->assertSee('Mapa de alojamiento');
         $this->get(route('admin.administracion.habitaciones'))->assertOk();
         $this->get(route('admin.turnos-enfermeria.index'))->assertOk();
         $this->get(route('admin.actividades.index'))->assertOk();

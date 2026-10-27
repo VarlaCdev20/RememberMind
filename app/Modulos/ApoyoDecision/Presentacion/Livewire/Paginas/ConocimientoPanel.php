@@ -88,12 +88,9 @@ final class ConocimientoPanel extends Component
     #[Locked]
     public ?string $registroCatalogo = null;
 
-<<<<<<< HEAD
-=======
     #[Locked]
     public array $recorridoDatos = [];
 
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
     public function mount(): void
     {
         $this->autorizar();
@@ -114,11 +111,7 @@ final class ConocimientoPanel extends Component
     public function ir(string $seccion): void
     {
         $this->autorizar();
-<<<<<<< HEAD
-        abort_unless(in_array($seccion, ['gobierno', 'laboratorio', 'casos', 'resultados', 'conocimiento', 'verificacion'], true), 422);
-=======
         abort_unless(in_array($seccion, ['gobierno', 'laboratorio', 'casos', 'resultados', 'conocimiento', 'residentes', 'verificacion'], true), 422);
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         $this->seccion = $seccion;
     }
 
@@ -131,10 +124,7 @@ final class ConocimientoPanel extends Component
         $this->tablaCatalogo = $tabla;
         $this->buscarCatalogo = '';
         $this->registroCatalogo = null;
-<<<<<<< HEAD
-=======
         $this->recorridoDatos = [];
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         $this->detalleAbierto = false;
         $this->resetPage('catalogoPage');
     }
@@ -199,10 +189,7 @@ final class ConocimientoPanel extends Component
         $this->regla = $id;
         $this->nodo = $this->registroCatalogo = null;
         $this->detalleAbierto = true;
-<<<<<<< HEAD
-=======
         $this->registrarPaso('reglas_expertas', $id);
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
     }
 
     public function abrirNodo(string $id): void
@@ -229,8 +216,6 @@ final class ConocimientoPanel extends Component
         $this->registroCatalogo = $id;
         $this->regla = $this->nodo = null;
         $this->detalleAbierto = true;
-<<<<<<< HEAD
-=======
         $this->registrarPaso($this->tablaCatalogo, $id);
     }
 
@@ -266,7 +251,6 @@ final class ConocimientoPanel extends Component
             $this->recorridoDatos[] = $paso;
             $this->recorridoDatos = array_slice($this->recorridoDatos, -12);
         }
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
     }
 
     public function cambiarPaginaRed(int $pagina): void
@@ -358,13 +342,6 @@ final class ConocimientoPanel extends Component
         $pkCatalogo = PaqueteConocimiento::CLAVES[$this->tablaCatalogo] ?? null;
         $filasCatalogo = collect($pkCatalogo ? ($conocimiento['tablas'][$this->tablaCatalogo] ?? []) : [])
             ->filter(fn ($r) => str_contains(mb_strtolower(implode(' ', array_filter($r, 'is_scalar'))), mb_strtolower(mb_substr($this->buscarCatalogo, 0, 120))));
-<<<<<<< HEAD
-        $detalleRegistro = $this->registroCatalogo && $pkCatalogo ? $filasCatalogo->firstWhere($pkCatalogo, $this->registroCatalogo) : null;
-        $fuentesNodo = $conocimiento && $this->nodo ? (new ProyectarRedConocimiento)->fuentesNodo($conocimiento, $this->nodo) : [];
-        $filasCatalogo = $this->paginar($filasCatalogo->values()->all(), 'catalogoPage');
-
-        return view('livewire.superadministrador.sistema-experto.conocimiento-panel', compact('versiones', 'laboratorioDisponible', 'historial', 'informe', 'casos', 'conocimiento', 'errorConocimiento', 'reglas', 'dominios', 'escenariosPerfil', 'comparacion', 'red', 'filasCatalogo', 'pkCatalogo', 'detalleRegistro', 'fuentesNodo'))
-=======
         $detalleRegistro = $this->registroCatalogo && $pkCatalogo ? collect($conocimiento['tablas'][$this->tablaCatalogo] ?? [])->firstWhere($pkCatalogo, $this->registroCatalogo) : null;
         $presentadorDatos = new DatosConocimientoVisible;
         $categoriasDatos = $presentadorDatos->categorias($conocimiento['tablas'] ?? []);
@@ -377,7 +354,6 @@ final class ConocimientoPanel extends Component
         $filasCatalogo = $this->paginar($filasCatalogo->values()->all(), 'catalogoPage');
 
         return view('livewire.superadministrador.sistema-experto.conocimiento-panel', compact('versiones', 'laboratorioDisponible', 'historial', 'informe', 'casos', 'conocimiento', 'errorConocimiento', 'reglas', 'dominios', 'escenariosPerfil', 'comparacion', 'red', 'filasCatalogo', 'pkCatalogo', 'detalleRegistro', 'fuentesNodo', 'categoriasDatos', 'fichaDato'))
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
             ->layout('layouts.sistema');
     }
 

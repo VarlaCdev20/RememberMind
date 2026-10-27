@@ -5,6 +5,10 @@ namespace App\Modulos\Institucion\Aplicacion\Consultas;
 use App\Models\Cama;
 use App\Models\Residente;
 use App\Models\User;
+use App\Models\OcupacionCama;
+use App\Models\Admision;
+use Spatie\Activitylog\Models\Activity;
+use Carbon\Carbon;
 use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
@@ -65,18 +69,16 @@ class MapaHabitacionesService
             if ($verPersonas) {
                 if ($detalle->cod_residente) {
                     Gate::forUser($usuario)->authorize('view', Residente::findOrFail($detalle->cod_residente));
-                    $previa = DB::table('ocupaciones_cama')->where('cod_admision', $detalle->cod_admision)
-                        ->where('cod_residente', $detalle->cod_residente)->where('cod_cama', '<>', $detalle->cod_cama)
-                        ->whereNotNull('fecha_hora_liberacion')->where('fecha_hora_liberacion', '<=', $detalle->fecha_hora_asignacion)
-                        ->orderByDesc('fecha_hora_liberacion')->first(['motivo_liberacion']);
-                    $origenOcupacion = $previa
-                        ? 'Cambio de alojamiento'.($previa->motivo_liberacion ? ': '.$previa->motivo_liberacion : ' · Motivo sin registrar.')
-                        : 'Asignación registrada en la admisión formal.';
+                    $ocupacionActual=OcupacionCama::findOrFail($detalle->cod_ocupacion);
+                    $origenOcupacion=$this->origenes(collect([$ocupacionActual]))[$ocupacionActual->getKey()];
                 }
                 $historial = DB::table('ocupaciones_cama as oc')->join('residentes as r', 'r.cod_residente', '=', 'oc.cod_residente')
                     ->where('oc.cod_cama', $detalle->cod_cama)->orderByDesc('oc.fecha_hora_asignacion')->orderByDesc('oc.cod_ocupacion')
-                    ->limit(12)->get(['oc.estado', 'oc.fecha_hora_asignacion', 'oc.fecha_hora_liberacion', 'oc.motivo_liberacion', 'oc.cod_admision'])
-                    ->each(fn ($evento) => $evento->origen = 'Ocupación registrada en la admisión formal.');
+                    ->limit(12)->get(['oc.cod_ocupacion','oc.cod_residente','oc.estado', 'oc.fecha_hora_asignacion', 'oc.fecha_hora_liberacion', 'oc.motivo_liberacion', 'oc.cod_admision']);
+                $residentesHistoria=Residente::whereIn('cod_residente',$historial->pluck('cod_residente')->unique())->get()->keyBy('cod_residente');
+                foreach($historial as $evento) Gate::forUser($usuario)->authorize('view',$residentesHistoria->get($evento->cod_residente));
+                $origenes=$this->origenes($historial);
+                $historial->each(fn ($evento) => $evento->origen=$origenes[$evento->cod_ocupacion]);
             }
         }
 
@@ -87,12 +89,31 @@ class MapaHabitacionesService
         ];
     }
 
+    private function origenes(\Illuminate\Support\Collection $eventos): array
+    {
+        $auditoria=Activity::where('subject_type',(new OcupacionCama)->getMorphClass())->whereIn('subject_id',$eventos->pluck('cod_ocupacion'))
+            ->whereIn('description',['Traslado interno de alojamiento registrado.','Alojamiento asignado dentro de la admisión vigente.'])->orderBy('id')->get()->keyBy('subject_id');
+        $admisiones=Admision::whereIn('cod_admision',$eventos->pluck('cod_admision'))->get()->keyBy('cod_admision');
+        return $eventos->mapWithKeys(function ($evento) use ($auditoria,$admisiones) {
+            $origen='Origen no documentado.';
+            if ($acto=$auditoria->get($evento->cod_ocupacion)) {
+                $origen=$acto->properties->get('cod_ocupacion_anterior') ? 'Cambio de alojamiento' : 'Asignación dentro de una admisión vigente';
+                if ($motivo=$acto->properties->get('motivo')) $origen.=': '.$motivo;
+            } elseif (($admision=$admisiones->get($evento->cod_admision)) && $admision->cod_residente===$evento->cod_residente
+                && $admision->fecha_hora_admision?->equalTo(Carbon::parse($evento->fecha_hora_asignacion))) {
+                $origen='Ocupación registrada en la admisión formal.';
+            }
+            return [$evento->cod_ocupacion=>$origen];
+        })->all();
+    }
+
     private function consulta(bool $verPersonas): Builder
     {
         $disponibles = FormalizarAdmision::filtrarCamasDisponibles(Cama::query())->select('cod_cama');
         $fisica = DB::table('camas as b')->join('habitaciones as h', 'h.cod_habitacion', '=', 'b.cod_habitacion')
             ->leftJoin('ocupaciones_cama as oc', fn ($join) => $join->on('oc.cod_cama', '=', 'b.cod_cama')->whereIn('oc.estado', FormalizarAdmision::ESTADOS_OCUPACION_ACTIVA))
             ->select('b.cod_cama', 'b.codigo', 'b.tipo', 'b.estado', 'b.observacion', 'h.cod_habitacion', 'h.codigo as habitacion', 'h.nombre as nombre_habitacion', 'h.piso', 'h.capacidad', 'h.estado as estado_habitacion', 'h.observacion as observacion_habitacion', 'oc.fecha_hora_asignacion', 'oc.cod_admision')
+            ->addSelect('oc.cod_ocupacion')
             ->selectRaw("CASE WHEN oc.cod_ocupacion IS NOT NULL THEN 'ocupado' WHEN b.cod_cama IN (".$disponibles->toSql().") THEN 'disponible' ELSE 'no_habilitado' END as estado_mapa", $disponibles->getBindings());
         if ($verPersonas) {
             $fisica->leftJoin('residentes as r', 'r.cod_residente', '=', 'oc.cod_residente')

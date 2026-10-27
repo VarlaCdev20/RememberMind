@@ -56,10 +56,6 @@ class ConsultaCognitivaEnfermeriaTest extends TestCase
         self::assertSame(10, $medicion['valor_bruto']);
         self::assertSame(0, $medicion['valor']);
         self::assertArrayNotHasKey('aplicacion', $medicion);
-<<<<<<< HEAD
         self::assertSame('Sin evaluación clínica conservada', $dato['titulo']);
-=======
-        self::assertSame('Sin conclusión experta disponible', $dato['titulo']);
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
     }
 }

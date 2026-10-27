@@ -2,11 +2,15 @@
 
 namespace App\Modulos\Institucion\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\CodigosEntidad;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Jornada;
 use App\Models\Personal;
+use App\Models\Turno;
 use App\Models\User;
+use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -14,6 +18,7 @@ final class GestionarPlazasEnfermeria
 {
     public function guardarAsignacionPlaza(User $actor, array $entrada): void
     {
+        $actor = $this->autorizar($actor);
         abort_unless($actor->estado === 'ACTIVO' && $actor->can('turnos.asignar'), 403);
         $plaza = $entrada['plazaSeleccionada'];
         $codUsuario = $entrada['enfermeroSeleccionado'] ?: null;
@@ -34,10 +39,29 @@ final class GestionarPlazasEnfermeria
             $areaId = $this->resolverAreaAsignacionEnfermeria($actor, $entrada, $personal);
         }
 
-        DB::transaction(function () use ($plaza, $fecha, $tipo, $personal, $areaId, $motivo, $entrada): void {
-            AsignacionPersonal::where('funcion', 'PLAZA:'.$plaza)->where('estado', 'ACTIVA')
+        DB::transaction(function () use ($actor, $plaza, $fecha, $tipo, $personal, $areaId, $motivo, $entrada): void {
+            $this->autorizar($actor);
+            if ($areaId) {
+                $area = Area::whereKey($areaId)->lockForUpdate()->firstOrFail();
+                abort_unless(in_array($area->estado, ['ACTIVO', 'ACTIVA'], true), 422, 'El área ya no está activa.');
+            }
+            if ($personal) {
+                $personal = Personal::whereKey($personal->getKey())->lockForUpdate()->firstOrFail();
+                abort_unless($personal->estado === 'ACTIVO' && $personal->usuario?->estado === 'ACTIVO', 422, 'El trabajador ya no está activo.');
+                $otraPlaza = AsignacionPersonal::where('cod_personal', $personal->getKey())->whereIn('estado', ['ACTIVA', 'ACTIVO'])->where('funcion', 'like', 'PLAZA:%')->where('funcion', '!=', 'PLAZA:'.$plaza)->whereHas('jornada', fn ($q) => $q->whereDate('fecha_jornada', $fecha))->exists();
+                abort_if($otraPlaza, 422, 'El profesional ya tiene otra plaza activa para esa fecha.');
+            }
+            $previas = AsignacionPersonal::where('funcion', 'PLAZA:'.$plaza)->whereIn('estado', ['ACTIVA', 'ACTIVO'])
                 ->whereHas('jornada', fn ($q) => $q->whereDate('fecha_jornada', $fecha))
-                ->update(['estado' => 'ANULADA']);
+                ->lockForUpdate()->get();
+            if ($previas->isNotEmpty()) {
+                app(ConservarEventoAsignacion::class)->exigir();
+            }
+            foreach ($previas as $previa) {
+                $antes = $previa->estado;
+                $previa->update(['estado' => 'ANULADA']);
+                app(ConservarEventoAsignacion::class)->conservar($previa, $actor, 'CANCELACION', $antes, now(), $motivo ?: 'Reasignación explícita de plaza.');
+            }
 
             if ($tipo === 'DESCANSO' || ! $personal || ! $areaId) {
                 return;
@@ -50,32 +74,68 @@ final class GestionarPlazasEnfermeria
                 'NOCHE' => ['TURNO NOCHE', 'NOCHE'],
                 default => ['GUARDIA CONTINUA 24H'],
             };
-            $turnos = \App\Models\Turno::query()->where('estado', 'ACTIVO')->whereIn('nombre', $nombres)->lockForUpdate()->get();
+            $turnos = Turno::query()->where('estado', 'ACTIVO')->whereIn('nombre', $nombres)->lockForUpdate()->get();
             abort_unless($turnos->count() === 1, 422, 'Selecciona un turno vigente del catálogo; el tipo solicitado no tiene una definición única.');
             $turnoId = $turnos->sole()->cod_turno;
-            $jornada = Jornada::firstOrCreate(
-                ['cod_turno' => $turnoId, 'fecha_jornada' => $fecha],
-                ['cod_jornada' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('jornadas'), 'estado' => 'ACTIVA']
-            );
+            $inicio = Carbon::parse($fecha)->setTimeFromTimeString($turnos->sole()->hora_inicio);
+            $fin = Carbon::parse($fecha)->setTimeFromTimeString($turnos->sole()->hora_cierre);
+            if ($fin->lte($inicio)) {
+                $fin->addDay();
+            }
+            $vigentes = AsignacionPersonal::where('cod_personal', $personal->getKey())->whereIn('estado', ['ACTIVO', 'ACTIVA'])->with('jornada.turno')
+                ->whereHas('jornada', fn ($q) => $q->whereBetween('fecha_jornada', [$inicio->copy()->subDay()->toDateString(), $inicio->copy()->addDay()->toDateString()]))->get();
+            foreach ($vigentes as $vigente) {
+                $desde = Carbon::parse($vigente->jornada->fecha_jornada)->setTimeFromTimeString($vigente->jornada->turno->hora_inicio);
+                $hasta = Carbon::parse($vigente->jornada->fecha_jornada)->setTimeFromTimeString($vigente->jornada->turno->hora_cierre);
+                if ($hasta->lte($desde)) {
+                    $hasta->addDay();
+                }
+                abort_if($inicio->lt($hasta) && $fin->gt($desde), 422, 'La asignación se superpone con otra jornada del profesional.');
+            }
+            $jornada = Jornada::where('cod_turno', $turnoId)->whereDate('fecha_jornada', $fecha)->first();
+            if (! $jornada) {
+                $jornada = Jornada::create([
+                    'cod_jornada' => app(CodigosEntidad::class)->siguiente('jornadas'),
+                    'cod_turno' => $turnoId, 'fecha_jornada' => $fecha, 'estado' => 'ACTIVA',
+                ]);
+            }
+            $jornada = Jornada::whereKey($jornada->getKey())->lockForUpdate()->firstOrFail();
+            abort_unless(in_array($jornada->estado, ['PLANIFICADA', 'ABIERTA', 'ACTIVA', 'EN_CURSO'], true), 422, 'La jornada está cerrada y no admite nuevas asignaciones.');
 
-            AsignacionPersonal::create([
+            $nueva = AsignacionPersonal::create([
                 'cod_jornada' => $jornada->cod_jornada, 'cod_personal' => $personal->cod_personal, 'cod_area' => $areaId,
                 'funcion' => 'PLAZA:'.$plaza, 'tipo_asignacion' => $tipo, 'fecha_asignacion' => now(),
                 'estado' => 'ACTIVA', 'observacion' => $motivo,
             ]);
+            app(ConservarEventoAsignacion::class)->conservar($nueva, $actor, 'ALTA', null, Carbon::parse($fecha)->setTimeFromTimeString($turnos->sole()->hora_inicio), $motivo ?: 'Asignación explícita de plaza.');
         });
 
     }
 
     public function desvincularPlaza(User $actor, string $plaza, string $fecha): void
     {
+        $actor = $this->autorizar($actor);
+        app(ConservarEventoAsignacion::class)->exigir();
         abort_unless($actor->estado === 'ACTIVO' && $actor->can('turnos.asignar'), 403);
-        $asignaciones = AsignacionPersonal::where('funcion', 'PLAZA:'.$plaza)->where('estado', 'ACTIVA')
-            ->whereHas('jornada', fn ($q) => $q->whereDate('fecha_jornada', $fecha))->get();
-        foreach ($asignaciones as $asignacion) {
-            $asignacion->update(['estado' => 'ANULADA', 'observacion' => trim(($asignacion->observacion ?? '').' | Desvinculada manualmente')]);
-        }
+        DB::transaction(function () use ($actor, $plaza, $fecha) {
+            $asignaciones = AsignacionPersonal::where('funcion', 'PLAZA:'.$plaza)->whereIn('estado', ['ACTIVA', 'ACTIVO'])
+                ->whereHas('jornada', fn ($q) => $q->whereDate('fecha_jornada', $fecha))->lockForUpdate()->get();
+            foreach ($asignaciones as $asignacion) {
+                $antes = $asignacion->estado;
+                $asignacion->update(['estado' => 'ANULADA']);
+                app(ConservarEventoAsignacion::class)->conservar($asignacion, $actor, 'CANCELACION', $antes, now(), 'Desvinculación explícita de plaza.');
+            }
+        });
 
+    }
+
+    private function autorizar(User $actor): User
+    {
+        $actor = $actor->fresh();
+        abort_unless($actor?->estado === 'ACTIVO' && ! $actor->hasRole('FAMILIAR') && $actor->can('turnos.asignar'), 403);
+        abort_if(app(RolePreviewService::class)->isActive($actor), 403);
+
+        return $actor;
     }
 
     private function resolverAreaAsignacionEnfermeria(User $actor, array $entrada, Personal $personal): string

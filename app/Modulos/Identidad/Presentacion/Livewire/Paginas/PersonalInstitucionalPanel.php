@@ -5,10 +5,12 @@ namespace App\Modulos\Identidad\Presentacion\Livewire\Paginas;
 use App\Models\AsignacionPersonal;
 use App\Models\User;
 use App\Modulos\Identidad\Aplicacion\Acciones\CambiarEstadoPersonal;
+use App\Modulos\Identidad\Aplicacion\Acciones\AutorizarGestionPersonal;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Locked;
 
 class PersonalInstitucionalPanel extends Component
 {
@@ -46,8 +48,17 @@ class PersonalInstitucionalPanel extends Component
 
     public bool $abrirFormularioHorarioInicial = false;
 
+    public bool $modalLaboral = false;
+    #[Locked] public ?string $personalLaboral = null;
+    #[Locked] public string $estadoLaboralEsperado = '';
+    #[Locked] public string $nombreLaboral = '';
+    public string $nuevoEstadoLaboral = '';
+    public string $fechaEfectoLaboral = '';
+    public string $motivoLaboral = '';
+
     protected $listeners = [
         'cerrarModalGestion' => 'cerrarModal',
+        'cerrar-modal-gestion-personal' => 'cerrarModal',
         'actualizarTablaPersonal' => '$refresh',
         'asignacionActualizada' => '$refresh',
         'abrirHorariosPersonal' => 'abrirHorariosPersonal',
@@ -56,6 +67,14 @@ class PersonalInstitucionalPanel extends Component
 
     public function render()
     {
+        abort_unless(auth()->user()?->fresh()?->estado === 'ACTIVO' && !auth()->user()->hasRole('FAMILIAR') && auth()->user()->can('personal_institucional.ver'), 403);
+        if (app(AutorizarGestionPersonal::class)->esGerencia(auth()->user())) {
+            $payload = $this->obtenerPersonalResumenPayload();
+            return view('livewire.identidad.personal-institucional-panel', [
+                'personalResumen' => $payload['items'], 'personalResumenTotal' => $payload['total'],
+                'ampliacionDisponible' => app(\App\Modulos\Identidad\Aplicacion\Consultas\CapacidadDocumentalPersonal::class)->disponible(),
+            ])->layout('layouts.sistema');
+        }
         $estadisticas = $this->obtenerEstadisticas();
         $resumenInstitucional = $this->obtenerResumenInstitucional();
 
@@ -156,6 +175,7 @@ class PersonalInstitucionalPanel extends Component
 
     public function abrirModalNuevo(): void
     {
+        app(AutorizarGestionPersonal::class)->autorizar(auth()->user());
         $this->usuarioSeleccionadoId = null;
         $this->modalTabInicial = 'informacion';
         $this->abrirFormularioHorarioInicial = false;
@@ -164,6 +184,7 @@ class PersonalInstitucionalPanel extends Component
 
     public function abrirModalEdicion(string $usuarioId): void
     {
+        app(AutorizarGestionPersonal::class)->autorizar(auth()->user(), User::findOrFail($usuarioId));
         if (! $this->existeUsuarioInstitucional($usuarioId)) {
             $this->dispatch('swal', [
                 'icon' => 'warning',
@@ -182,6 +203,7 @@ class PersonalInstitucionalPanel extends Component
 
     public function abrirHorariosPersonal(string $usuarioId): void
     {
+        app(\App\Modulos\Institucion\Aplicacion\Acciones\GestionarHorariosPersonal::class)->autorizar(false);
         if (! $this->existeUsuarioInstitucional($usuarioId)) {
             $this->dispatch('swal', [
                 'icon' => 'warning',
@@ -221,10 +243,8 @@ class PersonalInstitucionalPanel extends Component
         $this->abrirFormularioHorarioInicial = false;
     }
 
-    public function toggleEstado(string $usuarioId): void
+    public function toggleEstado(string $usuarioId, ?string $estadoEsperado = null): void
     {
-        abort_unless(auth()->user()?->can('usuarios.cambiar_estado'), 403);
-
         $usuario = $this->baseUsuariosInstitucionales()
             ->where('cod_usuario', $usuarioId)
             ->first();
@@ -239,15 +259,57 @@ class PersonalInstitucionalPanel extends Component
             return;
         }
 
-        app(CambiarEstadoPersonal::class)->ejecutar(auth()->user(), $usuario);
+        abort_unless(auth()->user(), 403);
+        app(CambiarEstadoPersonal::class)->ejecutar(auth()->user(), $usuario, $estadoEsperado);
 
         $this->dispatch('swal', [
             'icon' => 'success',
-            'title' => 'Estado actualizado',
-            'text' => 'El estado del personal fue actualizado correctamente.',
+            'title' => 'Acceso actualizado',
+            'text' => 'Se actualizó el acceso de la cuenta. El estado laboral y las asignaciones se conservan.',
         ]);
 
         $this->dispatch('actualizarTablaPersonal');
+    }
+
+    public function enviarRecuperacion(string $usuarioId): void
+    {
+        $this->resetValidation('recuperacion');
+        try {
+            app(\App\Modulos\Identidad\Aplicacion\Acciones\EnviarRecuperacionAccesoPersonal::class)->ejecutar(auth()->user(), $usuarioId);
+        } catch (\App\Compartido\Infraestructura\Notificaciones\CorreoNoConfigurado $error) {
+            $this->addError('recuperacion', \App\Compartido\Infraestructura\Notificaciones\CorreoNoConfigurado::AVISO);
+            return;
+        }
+        $this->dispatch('swal', [
+            'icon' => 'success', 'title' => 'Enlace solicitado',
+            'text' => 'El servicio de correo recibió la solicitud para el trabajador. Su contraseña y su acceso no se han cambiado.',
+        ]);
+    }
+
+    public function abrirEstadoLaboral(string $usuarioId): void
+    {
+        app(\App\Modulos\Identidad\Aplicacion\Consultas\CapacidadDocumentalPersonal::class)->exigir();
+        $usuario=User::with('personal')->findOrFail($usuarioId);
+        app(AutorizarGestionPersonal::class)->autorizar(auth()->user(),$usuario);
+        abort_unless($usuario->personal,422,'El trabajador no tiene ficha laboral.');
+        $this->personalLaboral=$usuario->personal->getKey();
+        $this->estadoLaboralEsperado=$usuario->personal->estado;
+        $this->nombreLaboral=$usuario->name;
+        $this->nuevoEstadoLaboral=$this->estadoLaboralEsperado==='ACTIVO' ? 'INACTIVO' : 'ACTIVO';
+        $this->fechaEfectoLaboral=now()->format('Y-m-d\TH:i');
+        $this->motivoLaboral=''; $this->modalLaboral=true; $this->resetValidation();
+    }
+
+    public function cerrarEstadoLaboral(): void { $this->modalLaboral=false; $this->personalLaboral=null; $this->resetValidation(); }
+
+    public function guardarEstadoLaboral(): void
+    {
+        app(\App\Modulos\Identidad\Aplicacion\Acciones\RegistrarMovimientoLaboral::class)->ejecutar(auth()->user(),$this->personalLaboral ?? '',[
+            'estado_esperado'=>$this->estadoLaboralEsperado,'estado_nuevo'=>$this->nuevoEstadoLaboral,
+            'fecha_hora_efecto'=>$this->fechaEfectoLaboral,'motivo'=>$this->motivoLaboral]);
+        $this->cerrarEstadoLaboral();
+        $this->dispatch('swal',['icon'=>'success','title'=>'Situación laboral registrada',
+            'text'=>'La cuenta conserva su acceso. Administración debe revisar las asignaciones del trabajador.']);
     }
 
     private function obtenerUsuarios(): Collection
@@ -274,7 +336,7 @@ class PersonalInstitucionalPanel extends Component
 
     private function obtenerPersonalResumenPayload(): array
     {
-        if ($this->tabActiva !== 'resumen') {
+        if ($this->tabActiva !== 'resumen' && !app(AutorizarGestionPersonal::class)->esGerencia(auth()->user())) {
             return [
                 'items' => collect(),
                 'total' => 0,
@@ -282,14 +344,11 @@ class PersonalInstitucionalPanel extends Component
         }
 
         $query = $this->baseUsuariosInstitucionales()
-            ->with([
+            ->with(app(AutorizarGestionPersonal::class)->esGerencia(auth()->user()) ? ['personal', 'roles'] : [
                 'roles',
                 'horariosSalud',
                 'horariosAdmin',
-<<<<<<< HEAD
                 // En V2 el turno pertenece a la jornada, no directamente a la asignación.
-=======
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                 'asignacionesTurno.jornada.turno',
                 'areaInstitucional',
             ]);

@@ -108,15 +108,15 @@ Residente y ocupación habilitan contexto posterior; no se crean jornadas/asigna
 
 ## 22. Entrada UI
 
-[resources/views/livewire/admisiones/preadmisiones-panel.blade.php](../../../resources/views/livewire/admisiones/preadmisiones-panel.blade.php)
+[resources/views/livewire/admisiones/preadmisiones-panel.blade.php](../../../app/Modulos/Admisiones/Presentacion/Vistas/livewire/admisiones/preadmisiones-panel.blade.php)
 
 ## 23. Livewire / Controllers
 
-[app/Frontend/Livewire/Admisiones/PreadmisionesPanel.php](../../../app/Frontend/Livewire/Admisiones/PreadmisionesPanel.php), [app/Http/Controllers/Admisiones/PreadmisionController.php](../../../app/Http/Controllers/Admisiones/PreadmisionController.php), [app/Http/Controllers/Admisiones/AdmisionController.php](../../../app/Http/Controllers/Admisiones/AdmisionController.php), [app/Frontend/Livewire/Admisiones/DecisionAdmisionModal.php](../../../app/Frontend/Livewire/Admisiones/DecisionAdmisionModal.php)
+[app/Frontend/Livewire/Admisiones/PreadmisionesPanel.php](../../../app/Modulos/Admisiones/Presentacion/Livewire/Paginas/PreadmisionesPanel.php), [app/Http/Controllers/Admisiones/PreadmisionController.php](../../../app/Modulos/Admisiones/Presentacion/Http/Controllers/PreadmisionController.php), [app/Http/Controllers/Admisiones/AdmisionController.php](../../../app/Modulos/Admisiones/Presentacion/Http/Controllers/AdmisionController.php), [app/Frontend/Livewire/Admisiones/DecisionAdmisionModal.php](../../../app/Modulos/Admisiones/Presentacion/Livewire/Funcionalidades/DecisionAdmisionModal.php)
 
 ## 24. Actions
 
-[app/Backend/Modulos/Admisiones/Acciones/FormalizarAdmision.php](../../../app/Backend/Modulos/Admisiones/Acciones/FormalizarAdmision.php)
+[app/Backend/Modulos/Admisiones/Acciones/FormalizarAdmision.php](../../../app/Modulos/Admisiones/Aplicacion/Acciones/FormalizarAdmision.php)
 
 ## 25. Services
 
@@ -124,7 +124,7 @@ NONE OBSERVED en el recorrido investigado; no se exige una clase vacía por sime
 
 ## 26. Policies
 
-[app/Policies/ResidentePolicy.php](../../../app/Policies/ResidentePolicy.php) ResidentePolicy protege lectura/niega CRUD; no es Policy de formalización.
+[app/Policies/ResidentePolicy.php](../../../app/Modulos/Residentes/Presentacion/Policies/ResidentePolicy.php) ResidentePolicy protege lectura/niega CRUD; no es Policy de formalización.
 
 ## 27. Models
 

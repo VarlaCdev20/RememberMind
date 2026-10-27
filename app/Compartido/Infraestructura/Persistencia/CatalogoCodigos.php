@@ -7,6 +7,15 @@ use InvalidArgumentException;
 /** Identidad de almacenamiento; no sustituye códigos clínicos o semánticos. */
 final class CatalogoCodigos
 {
+    /** Diseño 35 aprobado para bases desechables; no forma parte del inventario instalado. */
+    public const EXTENSIONES_GERENCIA = [
+        'solicitudes_documentales_personal' => ['cod_solicitud_documental', 'SDP'],
+        'destinatarios_solicitud_documental' => ['cod_destinatario_documental', 'DSD'],
+        'entregas_solicitud_documental' => ['cod_entrega_documental', 'ESD'],
+        'movimientos_laborales_personal' => ['cod_movimiento_laboral', 'MLP'],
+        'versiones_vinculo_contacto' => ['cod_version_vinculo', 'VVC'],
+        'eventos_asignacion_personal' => ['cod_evento_asignacion', 'EAP'],
+    ];
     public const ENTIDADES = [
         'valoraciones_petersen_originales' => ['cod_valoracion_petersen', 'VPO'],
         'soportes_valoracion_petersen' => ['cod_soporte_petersen', 'SVP'],
@@ -140,8 +149,8 @@ final class CatalogoCodigos
         return $codigo;
     }
 
-    private static function definicion(string $tabla): array
+    public static function definicion(string $tabla): array
     {
-        return self::ENTIDADES[$tabla] ?? self::ALIASES[$tabla] ?? throw new InvalidArgumentException('Entidad sin contrato de código: '.$tabla);
+        return self::ENTIDADES[$tabla] ?? self::ALIASES[$tabla] ?? self::EXTENSIONES_GERENCIA[$tabla] ?? throw new InvalidArgumentException('Entidad sin contrato de código: '.$tabla);
     }
 }

@@ -17,6 +17,7 @@ final class GestionarUsuariosHttp
 
     public function store(User $actor, array $entrada): mixed
     {
+        if (($entrada['rol'] ?? '')==='FAMILIAR') throw \Illuminate\Validation\ValidationException::withMessages(['rol'=>'Crea la cuenta desde Familiares y contactos con su vínculo original autorizado.']);
         abort_unless($actor->can('usuarios.crear'), 403);
         try {
             DB::beginTransaction();

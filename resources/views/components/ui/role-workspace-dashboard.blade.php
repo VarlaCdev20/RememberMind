@@ -7,7 +7,7 @@
     $esSuperadministracion = ($perfil['rol'] ?? '') === 'SUPERADMINISTRADOR';
     $esGerencia = ($perfil['rol'] ?? '') === 'GERENTE';
     $nombreSaludo = $saludo['nombre'] ?? 'Usuario';
-    if ($esSuperadministracion || $esGerencia) {
+    if ($esSuperadministracion) {
         $nombreSaludo = mb_convert_case(mb_strtolower($nombreSaludo, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
     }
     $accesos = collect($perfil['accesos'] ?? [])->filter(
@@ -28,12 +28,15 @@
     };
 @endphp
 
-<div @class(['rm-dashboard-composition', 'rm-dashboard-composition--superadmin' => $esSuperadministracion, 'rm-dashboard-composition--management' => $esGerencia])>
+@if($esGerencia)
+    @include('reportes::paginas.gerencia.inicio')
+@else
+<div @class(['rm-dashboard-composition', 'rm-dashboard-composition--superadmin' => $esSuperadministracion])>
     <x-ui.role-dashboard-hero
         personal-greeting
         :eyebrow="$perfil['eyebrow'] ?? 'CENTRO GERIÁTRICO LOS ALMENDROS'"
         :title="($saludo['saludo'] ?? 'Bienvenido') . ', ' . $nombreSaludo"
-        :highlight="($esSuperadministracion || $esGerencia) ? null : ($perfil['highlight'] ?? 'Tu espacio de trabajo')"
+        :highlight="($esSuperadministracion) ? null : ($perfil['highlight'] ?? 'Tu espacio de trabajo')"
         :description="$esSuperadministracion ? '' : ($perfil['description'] ?? '')"
         :scope="$esSuperadministracion ? (empty($perfil['jornada']) ? '' : 'Jornada actual: '.$perfil['jornada']) : null"
         :image-label="$esSuperadministracion ? false : null"
@@ -43,10 +46,10 @@
         :meta="[
             ['icon' => 'ph-calendar-blank', 'label' => $saludo['fecha'] ?? now()->format('d/m/Y')],
             ['icon' => 'ph-identification-badge', 'label' => $saludo['rolLegible'] ?? 'Perfil institucional'],
-            ['icon' => 'ph-shield-check', 'label' => ($esSuperadministracion || $esGerencia) ? '' : 'Acceso según permisos'],
+            ['icon' => 'ph-shield-check', 'label' => ($esSuperadministracion) ? '' : 'Acceso según permisos'],
         ]"
     >
-        @unless($esSuperadministracion || $esGerencia)
+        @unless($esSuperadministracion)
             @foreach($accesos->take(3) as $acceso)
                 <a href="{{ route($acceso['route']) }}" wire:navigate class="{{ $loop->first ? 'rm-btn-primary' : 'rm-btn-secondary' }} min-h-9 px-3.5 text-xs">
                     <i class="ph-bold {{ $acceso['icon'] }}"></i><span>{{ $acceso['label'] }}</span>
@@ -55,10 +58,10 @@
         @endunless
     </x-ui.role-dashboard-hero>
 
-    @unless($esGerencia)<x-ui.dashboard-divider />@endunless
+    <x-ui.dashboard-divider />
 
     @if(!empty($indicadores))
-        <section @class(['grid gap-4 sm:grid-cols-2 xl:grid-cols-4', 'rm-superadmin-metrics' => $esSuperadministracion, 'rm-management-metrics rm-dashboard-overview' => $esGerencia]) aria-label="Indicadores del perfil">
+        <section @class(['grid gap-4 sm:grid-cols-2 xl:grid-cols-4', 'rm-superadmin-metrics' => $esSuperadministracion]) aria-label="Indicadores del perfil">
             @foreach($indicadores as $indicador)
                 @php($sinAlertas = $esSuperadministracion && ($indicador['label'] ?? '') === 'Alertas prioritarias' && (int) ($indicador['value'] ?? 0) === 0)
                 <x-ui.metric-card
@@ -72,22 +75,6 @@
         </section>
     @endif
 
-    @if($esGerencia)
-        <x-ui.section-card title="Organización y planificación" subtitle="Empieza por el personal y continúa con sus áreas y horarios." icon="ph-path" class="rm-workspace-access">
-            <nav class="rm-workspace-access-grid" aria-label="Gestión de Gerencia">
-                @forelse($accesos as $acceso)
-                    <a href="{{ route($acceso['route']) }}" wire:navigate class="rm-workspace-access-card">
-                        <span class="rm-workspace-access-card__icon" aria-hidden="true"><i class="ph-bold {{ $acceso['icon'] }}"></i></span>
-                        <span class="rm-workspace-access-card__copy"><strong>{{ $acceso['label'] }}</strong><small>{{ $acceso['description'] ?? '' }}</small></span>
-                        <i class="ph-bold ph-arrow-up-right" aria-hidden="true"></i>
-                    </a>
-                @empty
-                    <p class="rm-role-access__empty">No hay accesos habilitados para tu cuenta. Solicita revisar tus permisos.</p>
-                @endforelse
-            </nav>
-        </x-ui.section-card>
-    @endif
-
     @if($panels)
         <div class="rm-dashboard-data-grid" aria-label="Información de tu panel">
             @foreach($panels as $panel)
@@ -96,7 +83,7 @@
         </div>
     @endif
 
-    @unless($esSuperadministracion || $esGerencia)
+    @unless($esSuperadministracion)
         <section class="rm-role-access" aria-labelledby="role-access-title">
             <div>
                 <p class="rm-dashboard-kicker">NAVEGACIÓN SEGURA</p>
@@ -117,3 +104,4 @@
         </section>
     @endunless
 </div>
+@endif

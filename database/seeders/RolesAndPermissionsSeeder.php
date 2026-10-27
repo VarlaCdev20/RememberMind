@@ -107,6 +107,7 @@ class RolesAndPermissionsSeeder extends Seeder
         // y lectura de los indicadores necesarios para conducir la residencia.
         $roles['GERENTE']->syncPermissions(array_values(array_unique(array_merge($this->permitir($permisos, [
             'personal', 'areas', 'turnos', 'jornadas.ver', 'asignaciones_personal.ver',
+            'contactos.ver', 'contactos.gestionar', 'residentes_contactos.ver', 'residentes_contactos.gestionar',
             'residentes.ver', 'habitaciones.ver', 'camas.ver', 'ocupaciones_cama.ver',
             'preadmisiones.ver', 'admisiones.ver', 'alertas.ver', 'incidentes.ver',
             'reportes.ver', 'reportes.institucional',

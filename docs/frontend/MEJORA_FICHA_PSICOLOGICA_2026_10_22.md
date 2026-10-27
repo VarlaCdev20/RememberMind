@@ -2,6 +2,8 @@
 
 Fecha: 22/10/2026. Superficie: `/admin/psicologia/residente/{residente}/ficha`.
 
+> **Estado de integración comprobado el 25/10/2026:** este informe conserva la entrega del 22/10. La ficha activa del árbol auditado no incluye los parciales `ficha-psicologica/cabecera` y `resumen` ni utiliza la raíz `.rm-resident-file`. No acredita que la mejora siga conectada hoy. Véanse H21/H32 de la [auditoría actual](../auditorias/2026-10-25/INFORME_AUDITORIA_INTEGRAL.md). Los resultados y capturas que siguen son históricos; la reintegración y nueva QA están pendientes.
+
 ## Flujo y jerarquía
 
 La ficha existente tenía ocho pestañas en una fila desplazable, texto pequeño

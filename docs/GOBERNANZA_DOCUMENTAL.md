@@ -1,12 +1,12 @@
 ---
 title: "Gobernanza documental de RememberMind"
 status: CURRENT
-version: "1.0"
-last_reviewed: 2026-10-06
+version: "2.0"
+last_reviewed: 2026-10-25
 owner: RememberMind
 source_of_truth: true
-verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
-verification_scope: STATIC_REPOSITORY_REVIEW
+verified_against_commit: 6d7b8c6d6bc03eecd2ee35add04677f2778272cd
+verification_scope: DOCUMENTATION_RECONCILIATION_WITH_LOCAL_AUDIT
 runtime_verified: false
 supersedes: []
 related_docs: []
@@ -78,6 +78,16 @@ Mantener rutas históricas durante Fase 1. Avisar en carpeta y documentos que po
 
 Cuando cambian locks, extensión BDD, contrato institucional o entrega con evidencia, revisar documentos afectados. No fijar fechas de entrega ficticias ni afirmar validación clínica de una skill. Para futuros agentes empezar en [el portal](README.md).
 
-## Límites de esta fase
+## Alcance de la Fase 1 histórica
 
-Solo Markdown/documentación. Sin producto, BDD, migraciones, permisos, configuración funcional, UX, reglas clínicas ni commit. La revisión final independiente y la verificación se registran en [el informe](VERIFICACION_DOCUMENTAL_FASE_1.md).
+La restricción «solo Markdown, sin producto ni commit» describe exclusivamente el corte documental original del 06/10/2026 y su [verificación](VERIFICACION_DOCUMENTAL_FASE_1.md). No limita tareas posteriores de implementación autorizadas por la propietaria.
+
+## Mantenimiento vigente
+
+- Estado actual apunta al último corte comprobado; los informes fechados conservan sus resultados originales.
+- Separar requisito aprobado, implementación observada, pruebas ejecutadas y validación clínica. No inventar una aprobación para resolver un conflicto de nombres.
+- Una aprobación vigente del mismo alcance se reutiliza: no pedirla otra vez por el nombre PROPUESTA de un archivo.
+- La investigación, una skill y una prueba sintética no sustituyen datos originales ni aprobación estructural. Las correcciones técnicas independientes continúan.
+- Antes de retirar un documento comprobar enlaces entrantes, decisiones únicas y consumidores. Sin duplicados exactos no eliminar evidencia solo para reducir un contador.
+- Enlaces a clases movidas se actualizan a su ubicación real. Si el artefacto no existe y no hay sustituto comprobado, retirar el enlace roto y conservar el aviso de ausencia con la ruta original.
+- Las especificaciones de módulos se localizan en [el índice funcional](modulos/README.md); las instrucciones de AGENTS orientan el trabajo y no reemplazan esos contratos.

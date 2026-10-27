@@ -8,7 +8,6 @@
     }); },
     destroy() { this.contextoObserver?.disconnect(); }
 }">
-<<<<<<< HEAD
     <header class="rm-expert-heading rm-expert-page-heading">
         <div><p class="rm-expert-eyebrow">Mis residentes / {{ $residente->nombre_completo }} / Evaluación cognitiva</p><h1>Evaluación cognitiva y cuidados</h1><p class="rm-expert-subtitle">Resultados y evidencias disponibles</p></div>
         <div class="rm-expert-heading-actions">
@@ -18,28 +17,16 @@
         </div>
     </header>
     @unless(isset($perfilInstrumental['petersen_institucional']))
-=======
-    <header class="rm-expert-heading">
-        <div><p class="rm-expert-eyebrow">Mis residentes / {{ $residente->nombre_completo }} / Evaluación cognitiva</p><h1>Evaluación cognitiva y cuidados</h1><p>Consulta de resultados, evidencias y seguimiento del residente.</p></div>
-        <a class="rm-expert-back" href="{{ route('admin.enfermeria.pacientes', ['residente' => $codResidente]) }}"><i class="ph ph-arrow-left" aria-hidden="true"></i>Volver a Mis residentes</a>
-    </header>
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
     <section class="rm-card rm-cognitive-identity" aria-label="Contexto del residente" x-ref="residenteContexto">
         <div class="rm-cognitive-identity-header">
             <div class="rm-cognitive-person"><span class="rm-cognitive-avatar" aria-hidden="true">{{ mb_substr($residente->nombres, 0, 1).mb_substr($residente->apellido_paterno ?? '', 0, 1) }}</span><div><p class="rm-cognitive-person-label">Residente en consulta</p><h2>{{ $residente->nombre_completo }}</h2><p>{{ $residente->edad !== null ? $residente->edad.' años' : 'Edad no disponible' }} · {{ $residente->ubicacion_formateada }}</p></div></div>
             <span class="rm-orion-state"><i class="ph ph-eye" aria-hidden="true"></i>Solo lectura · Enfermería</span>
         </div>
-<<<<<<< HEAD
         <dl class="rm-cognitive-meta"><div><dt>{{ isset($perfilInstrumental['petersen_institucional']) ? 'Fecha de la consulta' : 'Fecha de evaluación' }}</dt><dd>{{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($perfilInstrumental['petersen_institucional']['fecha_corte'] ?? $datos['evaluacion']['fecha'] ?? null, 'Sin evaluación disponible') }}</dd></div><div><dt>Tipo de consulta</dt><dd>{{ isset($perfilInstrumental['petersen_institucional']) ? 'Resultado orientativo actual, aún no guardado' : ($simulacion ? 'Demostración técnica' : 'Resultados disponibles del expediente') }}</dd></div><div><dt>Acceso</dt><dd>Lectura de Enfermería</dd></div></dl>
     </section>
     @endunless
     <div class="rm-cognitive-context" x-show="contextoFuera" x-cloak aria-label="Residente activo durante la consulta"><strong>{{ $residente->nombre_completo }}</strong><span>Solo lectura · Enfermería</span></div>
     @if($errorInstrumental)<section class="rm-orion-note" role="alert"><strong>No fue posible consultar las mediciones instrumentales.</strong><p>La información no pudo verificarse. Esto no significa que no existan registros.</p><button type="button" class="rm-btn rm-btn-secondary" wire:click="reintentar">Reintentar</button></section>@endif
-=======
-        <dl class="rm-cognitive-meta"><div><dt>Fecha de evaluación</dt><dd>{{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($datos['evaluacion']['fecha'] ?? null, 'Sin evaluación disponible') }}</dd></div><div><dt>Tipo de consulta</dt><dd>{{ $simulacion ? 'Demostración técnica' : 'Resultados disponibles del expediente' }}</dd></div><div><dt>Acceso</dt><dd>Lectura de Enfermería</dd></div></dl>
-    </section>
-    <div class="rm-cognitive-context" x-show="contextoFuera" x-cloak aria-label="Residente activo durante la consulta"><strong>{{ $residente->nombre_completo }}</strong><span>Solo lectura · Enfermería</span></div>
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
     @unless($errorLectura)
         @include('apoyodecision::livewire.medico.resultados-experto.enfermeria-resumen')
     @endunless
@@ -48,19 +35,11 @@
     @elseif(! $consultaEnfermeria)
         <x-ui.empty-state title="Sin evaluación experta disponible" description="No hay un resultado verificable en esta consulta. Consulte la ficha autorizada para revisar los registros disponibles." icon="ph-brain" />
     @else
-<<<<<<< HEAD
         @php($narrativa = $informe['narrativa'])
         @php($fuentesArea = array_values(array_filter($narrativa['fuentes'] ?? [], fn ($f) => $f['area'] === $criterio)))
         @php($fuentesResultado = array_values(array_filter($narrativa['fuentes'] ?? [], fn ($f) => $f['area'] === 'COG-MEM')))
         @if(! isset($perfilInstrumental['petersen_institucional']) || ($datos['evaluacion'] ?? null))
         <details class="rm-expert-supplement"><summary>{{ isset($perfilInstrumental['petersen_institucional']) ? 'Evaluación histórica adicional' : 'Áreas cognitivas, resultado y fundamento disponibles' }}</summary>
-=======
-        <details class="rm-expert-supplement"><summary>Áreas cognitivas, resultado y fundamento disponibles</summary>
-        @php($narrativa = $informe['narrativa'])
-        @php($fuentesArea = array_values(array_filter($narrativa['fuentes'] ?? [], fn ($f) => $f['area'] === $criterio)))
-        @php($fuentesResultado = array_values(array_filter($narrativa['fuentes'] ?? [], fn ($f) => $f['area'] === 'COG-MEM')))
-        @if($errorInstrumental)<section class="rm-orion-note" role="alert"><strong>No fue posible consultar las mediciones instrumentales.</strong><p>La información no pudo verificarse. Esto no significa que no existan registros.</p><button type="button" class="rm-btn rm-btn-secondary" wire:click="reintentar">Reintentar</button></section>@endif
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         @if($simulacion)<p class="rm-orion-note" role="note"><strong>Entorno de pruebas · Resultado de demostración · Sin uso asistencial.</strong></p>@endif
         <section class="rm-card rm-orion-result" aria-labelledby="orion-resultado-titulo">
             <div class="rm-orion-section-heading"><h2 class="rm-expert-section-title">¿Qué encontró el sistema?</h2><span class="rm-orion-state">{{ $consultaEnfermeria['estado_principal'] }}</span></div>
@@ -106,10 +85,7 @@
             <aside class="rm-card rm-orion-panel" aria-label="Consulta del residente"><h2 class="rm-expert-section-title">Consulta del residente</h2><p>Explora el contexto y continúa hacia los cuidados de tu turno.</p><div class="rm-cognitive-accesses"><button type="button" class="rm-btn rm-btn-secondary" wire:click="abrirConsulta('interpretacion')"><i class="ph ph-book-open" aria-hidden="true"></i>Interpretación</button><button type="button" class="rm-btn rm-btn-secondary" wire:click="abrirConsulta('registro')"><i class="ph ph-files" aria-hidden="true"></i>Registros</button><button type="button" class="rm-btn rm-btn-secondary" wire:click="abrirConsulta('cuidados')"><i class="ph ph-heart" aria-hidden="true"></i>Cuidados</button></div><p class="rm-orion-note">{{ $texto($narrativa['autonomia']['resumen']) }}</p></aside>
         </div>
         </details>
-<<<<<<< HEAD
         @endif
-=======
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         @include('apoyodecision::livewire.medico.resultados-experto.enfermeria-ventanas')
     @endif
 </div>

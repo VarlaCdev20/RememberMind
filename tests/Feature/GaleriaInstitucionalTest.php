@@ -4,16 +4,23 @@ namespace Tests\Feature;
 
 use App\Models\FotografiaInstitucional;
 use App\Models\User;
+use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use App\Modulos\Institucion\Aplicacion\Acciones\GestionarFotografiasInstitucionales;
 use App\Modulos\Institucion\Presentacion\Livewire\Paginas\GaleriaInstitucionalPanel;
 use App\Modulos\Reportes\Presentacion\DashboardPhotoRotation;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 use Spatie\Activitylog\Models\Activity;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 
 class GaleriaInstitucionalTest extends TestCase
@@ -35,6 +42,7 @@ class GaleriaInstitucionalTest extends TestCase
     {
         $usuario = User::factory()->create(['nombres' => 'Gestora', 'ap_paterno' => 'Sintética', 'estado' => 'ACTIVO']);
         $usuario->assignRole($rol);
+
         return $usuario;
     }
 
@@ -106,8 +114,12 @@ class GaleriaInstitucionalTest extends TestCase
         $inactivo->update(['estado' => 'INACTIVO']);
         foreach ([$this->usuario('FAMILIAR'), $this->usuario('ENFERMEROS'), $sinPermiso, $inactivo] as $actor) {
             $this->actingAs($actor)->get(route('admin.galeria.archivo', [$foto->getKey(), 'imagen']))->assertForbidden();
-            try { $this->subir($actor); $this->fail('Debe rechazar al actor.'); }
-            catch (\Symfony\Component\HttpKernel\Exception\HttpException $error) { $this->assertSame(403, $error->getStatusCode()); }
+            try {
+                $this->subir($actor);
+                $this->fail('Debe rechazar al actor.');
+            } catch (HttpException $error) {
+                $this->assertSame(403, $error->getStatusCode());
+            }
         }
         $this->assertDatabaseCount('fotografias_institucionales', 1);
         $this->assertCount(2, Storage::disk('local')->allFiles());
@@ -118,12 +130,16 @@ class GaleriaInstitucionalTest extends TestCase
     public function test_el_rol_sin_permiso_explicito_no_autoriza_gestion_ni_descarga(): void
     {
         $foto = $this->subir()['foto'];
-        $rol = \Spatie\Permission\Models\Role::findByName('GERENTE', 'web');
+        $rol = Role::findByName('GERENTE', 'web');
         $rol->revokePermissionTo('fotografias_institucionales.gestionar');
         $this->gerente->unsetRelation('roles')->unsetRelation('permissions');
         $this->get(route('admin.galeria.index'))->assertOk()->assertDontSee('wire:click="nuevo"', false);
-        try { $this->subir(); $this->fail('El rol por sí solo no autoriza una carga.'); }
-        catch (\Symfony\Component\HttpKernel\Exception\HttpException $error) { $this->assertSame(403, $error->getStatusCode()); }
+        try {
+            $this->subir();
+            $this->fail('El rol por sí solo no autoriza una carga.');
+        } catch (HttpException $error) {
+            $this->assertSame(403, $error->getStatusCode());
+        }
         $rol->revokePermissionTo('fotografias_institucionales.ver');
         $this->gerente->unsetRelation('roles')->unsetRelation('permissions');
         $this->get(route('admin.galeria.index'))->assertForbidden();
@@ -137,12 +153,16 @@ class GaleriaInstitucionalTest extends TestCase
     {
         $foto = $this->subir()['foto'];
         Activity::creating(function ($actividad) {
-            if ($actividad->log_name === 'Galería institucional') throw new \RuntimeException('Fallo sintético de auditoría');
+            if ($actividad->log_name === 'Galería institucional') {
+                throw new \RuntimeException('Fallo sintético de auditoría');
+            }
         });
         try {
             app(GestionarFotografiasInstitucionales::class)->subir($this->gerente, UploadedFile::fake()->image('otra.png', 77, 55), $this->datos());
             $this->fail('Debe propagar el fallo.');
-        } catch (\RuntimeException $error) { $this->assertSame('Fallo sintético de auditoría', $error->getMessage()); }
+        } catch (\RuntimeException $error) {
+            $this->assertSame('Fallo sintético de auditoría', $error->getMessage());
+        }
         $this->assertDatabaseCount('fotografias_institucionales', 1);
         $this->assertCount(2, Storage::disk('local')->allFiles());
         Storage::disk('local')->assertExists($foto->ruta_archivo);
@@ -151,8 +171,12 @@ class GaleriaInstitucionalTest extends TestCase
     public function test_archivo_falso_y_limite_excedido_no_generan_persistencia(): void
     {
         foreach ([UploadedFile::fake()->create('falso.jpg', 10, 'image/jpeg'), UploadedFile::fake()->image('grande.jpg')->size(2049)] as $archivo) {
-            try { app(GestionarFotografiasInstitucionales::class)->subir($this->gerente, $archivo, $this->datos()); $this->fail('Debe rechazar el archivo.'); }
-            catch (\Illuminate\Validation\ValidationException $error) { $this->assertArrayHasKey('archivo', $error->errors()); }
+            try {
+                app(GestionarFotografiasInstitucionales::class)->subir($this->gerente, $archivo, $this->datos());
+                $this->fail('Debe rechazar el archivo.');
+            } catch (ValidationException $error) {
+                $this->assertArrayHasKey('archivo', $error->errors());
+            }
         }
         $this->assertDatabaseCount('fotografias_institucionales', 0);
         $this->assertCount(0, Storage::disk('local')->allFiles());
@@ -173,6 +197,41 @@ class GaleriaInstitucionalTest extends TestCase
         $this->assertFalse($this->gerente->can('usuarios.editar'));
     }
 
+    public function test_dos_editores_del_mismo_instante_no_sobrescriben_cambios_y_conservan_entrada_obsoleta(): void
+    {
+        $this->freezeTime();
+        $foto = $this->subir()['foto'];
+        $identidad = \Illuminate\Support\Arr::only($foto->fresh()->getRawOriginal(), ['cod_usuario', 'ruta_archivo', 'ruta_miniatura', 'hash_archivo', 'fecha_registro']);
+        $primero = Livewire::test(GaleriaInstitucionalPanel::class)->call('editar', $foto->getKey());
+        $segundo = Livewire::test(GaleriaInstitucionalPanel::class)->call('editar', $foto->getKey());
+        $primero->set('titulo', 'Título confirmado primero')->call('guardar')->assertHasNoErrors()->assertSet('formularioAbierto', false);
+        $auditorias = Activity::where('event', 'fotografia_editada')->count();
+        $segundo->set('titulo', 'Cambios del formulario anterior')->call('guardar')
+            ->assertHasErrors('guardado')->assertSee('La fotografía cambió')
+            ->assertSet('formularioAbierto', true)->assertSet('titulo', 'Cambios del formulario anterior');
+        $this->assertSame('Título confirmado primero', $foto->fresh()->titulo);
+        $this->assertSame($identidad, \Illuminate\Support\Arr::only($foto->fresh()->getRawOriginal(), array_keys($identidad)));
+        $this->assertSame($auditorias, Activity::where('event', 'fotografia_editada')->count());
+        Storage::disk('local')->assertExists([$foto->ruta_archivo, $foto->ruta_miniatura]);
+        $segundo->call('editar', $foto->getKey())->set('titulo', 'Versión actual revisada')->call('guardar')->assertHasNoErrors();
+        $this->assertSame('Versión actual revisada', $foto->fresh()->titulo);
+    }
+
+    public function test_editar_foto_con_campos_vacios_no_inventa_conflicto_ni_pierde_texto_cero(): void
+    {
+        $foto = $this->subir(datos: ['descripcion' => '', 'texto_alternativo' => ''])['foto'];
+        $panel = Livewire::test(GaleriaInstitucionalPanel::class)->call('editar', $foto->getKey());
+        // Abrir conserva la fila original: la equivalencia NULL/vacío solo se usa al comparar.
+        $this->assertSame('', $foto->fresh()->descripcion);
+        $this->assertSame('', $foto->fresh()->texto_alternativo);
+        $panel->set('titulo', 'Título corregido')->set('descripcion', '0')->set('texto_alternativo', '0')
+            ->call('guardar')->assertHasNoErrors()->assertSet('formularioAbierto', false);
+        $this->assertSame('Título corregido', $foto->fresh()->titulo);
+        $this->assertSame('0', $foto->fresh()->descripcion);
+        $this->assertSame('0', $foto->fresh()->texto_alternativo);
+        $this->assertSame(1, Activity::where('event', 'fotografia_editada')->count());
+    }
+
     public function test_constraints_sql_rechazan_datos_incoherentes(): void
     {
         $foto = $this->subir()['foto'];
@@ -180,7 +239,9 @@ class GaleriaInstitucionalTest extends TestCase
             try {
                 DB::transaction(fn () => DB::table('fotografias_institucionales')->where('cod_fotografia', $foto->getKey())->update($cambio));
                 $this->fail('SQL debe rechazar '.array_key_first($cambio));
-            } catch (\Illuminate\Database\QueryException $error) { $this->assertNotEmpty($error->getMessage()); }
+            } catch (QueryException $error) {
+                $this->assertNotEmpty($error->getMessage());
+            }
         }
         $this->assertSame('ACTIVA', $foto->fresh()->estado);
     }
@@ -212,8 +273,12 @@ class GaleriaInstitucionalTest extends TestCase
             return ++$escrituras === 1 ? $real->put($ruta, $bytes) : false;
         });
         Storage::shouldReceive('disk')->with('local')->andReturn($proxy);
-        try { $this->subir(); $this->fail('Debe fallar la segunda escritura.'); }
-        catch (\RuntimeException $error) { $this->assertSame('No se pudo almacenar la fotografía.', $error->getMessage()); }
+        try {
+            $this->subir();
+            $this->fail('Debe fallar la segunda escritura.');
+        } catch (\RuntimeException $error) {
+            $this->assertSame('No se pudo almacenar la fotografía.', $error->getMessage());
+        }
         $this->assertCount(0, $real->allFiles());
         $this->assertDatabaseCount('fotografias_institucionales', 0);
     }
@@ -225,9 +290,13 @@ class GaleriaInstitucionalTest extends TestCase
         $this->get(route('admin.galeria.index'))->assertOk()->assertDontSee('wire:click="nuevo"', false);
         $this->assertFalse($super->hasPermissionTo('fotografias_institucionales.gestionar'));
         $super->assignRole('GERENTE');
-        app(\App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService::class)->activate($super, 'GERENTE');
-        try { $this->subir($super); $this->fail('Preview no puede escribir.'); }
-        catch (\Symfony\Component\HttpKernel\Exception\HttpException $error) { $this->assertSame(403, $error->getStatusCode()); }
+        app(RolePreviewService::class)->activate($super, 'GERENTE');
+        try {
+            $this->subir($super);
+            $this->fail('Preview no puede escribir.');
+        } catch (HttpException $error) {
+            $this->assertSame(403, $error->getStatusCode());
+        }
         $this->assertDatabaseCount('fotografias_institucionales', 0);
     }
 
@@ -246,8 +315,8 @@ class GaleriaInstitucionalTest extends TestCase
 
     public function test_migracion_con_roles_existentes_concede_solo_los_permisos_aprobados(): void
     {
-        \Illuminate\Support\Facades\Schema::drop('fotografias_institucionales');
-        \Spatie\Permission\Models\Permission::where('name', 'like', 'fotografias_institucionales.%')->get()->each->delete();
+        Schema::drop('fotografias_institucionales');
+        Permission::where('name', 'like', 'fotografias_institucionales.%')->get()->each->delete();
         $migracion = require database_path('migrations/2026_10_17_150000_create_fotografias_institucionales_table.php');
         $migracion->up();
         $asignaciones = DB::table('role_has_permissions as rp')->join('permissions as p', 'p.id', '=', 'rp.permission_id')
@@ -263,7 +332,7 @@ class GaleriaInstitucionalTest extends TestCase
         $this->assertEqualsCanonicalizing(['cod_fotografia', 'cod_usuario', 'titulo', 'descripcion', 'fecha_fotografia',
             'texto_alternativo', 'ruta_archivo', 'ruta_miniatura', 'tipo_archivo', 'tamanio_bytes', 'ancho', 'alto',
             'hash_archivo', 'estado', 'usar_en_bienvenida', 'fecha_registro', 'fecha_actualizacion'],
-            \Illuminate\Support\Facades\Schema::getColumnListing('fotografias_institucionales'));
+            Schema::getColumnListing('fotografias_institucionales'));
     }
 
     public function test_estados_visuales_de_galeria_con_datos_sinteticos(): void
@@ -299,8 +368,12 @@ class GaleriaInstitucionalTest extends TestCase
     private function exportar(string $estado, string $html, ?string $preview = null): void
     {
         $dir = getenv('RM_GALLERY_QA_DIR');
-        if (! $dir) return;
-        if (! is_dir($dir)) mkdir($dir, 0700, true);
+        if (! $dir) {
+            return;
+        }
+        if (! is_dir($dir)) {
+            mkdir($dir, 0700, true);
+        }
         $foto = FotografiaInstitucional::first();
         if ($foto) {
             $data = 'data:image/webp;base64,'.base64_encode(Storage::disk('local')->get($foto->ruta_archivo));

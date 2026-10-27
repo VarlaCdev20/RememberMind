@@ -10,6 +10,8 @@ Every sensitive operation must be correct even when called without the intended 
 
 Backend protects the institution; UI only assists the user.
 
+Module responsibilities and approved process sources are indexed in `docs/modulos/README.md`. A module README documents its current responsibility and known gaps; it is not evidence of clinical acceptance. Historical migration-only restrictions do not block ordinary approved development.
+
 ## Existing architecture
 
 Before creating code, inspect related:

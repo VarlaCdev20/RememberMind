@@ -1,5 +1,8 @@
 <div class="rm-pilot-alertas rm-emergency-workspace rm-page-layout" data-alert-workspace="{{ $perfil['foco'] }}" x-data="rmAlertasInteraccion()" @alertas-caso-seleccionado.window="$refs.contextoCaso.focus({ preventScroll: true }); $refs.contextoCaso.scrollIntoView({ block: 'nearest', behavior: 'instant' });" @rm-alertas-request="estado($event.detail)" @rm-alertas-error="errorSolicitud = $event.detail.message" :aria-busy="solicitudes > 0" @click.capture="proteger($event)" @keydown.escape.window.capture="proteger($event)" @unless($preview || $modalCrear || $modalAtender || $modalCerrar || $modalDetalle || $modalEspecialidad || $drawerGrafico || $drawerUbicacion) wire:poll.visible.60s @endunless>
     @use('App\Modulos\Alertas\Aplicacion\Formato\LenguajeAlerta')
+    @if($perfil['foco'] === 'supervision')
+        @include('alertas::livewire.alertas.gerencia')
+    @else
     <x-ui.page-header :title="$perfil['titulo']" :subtitle="$perfil['descripcion']" overline="Alertas · espacio de trabajo" :icon="$perfil['icono']" class="rm-alert-workspace-heading">
         @if(auth()->user()->hasAnyRole(['SUPERADMINISTRADOR','ADMINISTRADOR']))<a href="{{ route('admin.alertas-clinicas.por-rol') }}" class="rm-btn rm-btn-secondary"><i class="ph-bold ph-users-three" aria-hidden="true"></i>Vistas por rol</a>@endif
         @if($preview && in_array($perfil['foco'],['turno','coordinacion','auditoria'],true) && auth()->user()->can('alertas.gestionar'))<x-ui.action-button variant="secondary" wire:click="abrirCrear" loading="abrirCrear" icono="ph-eye">Consultar formulario de aviso</x-ui.action-button>@endif
@@ -150,4 +153,5 @@
     @include('livewire.alertas.modales.resultado-cierre')
     @include('livewire.alertas.modales.drawer-graficos')
     @include('livewire.alertas.modales.drawer-ubicacion')
+    @endif
 </div>

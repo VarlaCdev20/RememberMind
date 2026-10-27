@@ -2,7 +2,7 @@
 title: "RememberMind"
 status: CURRENT
 version: "1.0"
-last_reviewed: 2026-10-11
+last_reviewed: 2026-10-25
 owner: RememberMind
 source_of_truth: false
 verified_against_commit: null
@@ -28,7 +28,7 @@ Entrada oficial: [RememberMind Documentation](docs/README.md).
 - [Migración híbrida ejecutada](docs/arquitectura/INFORME_MIGRACION_HIBRIDA.md) y [auditoría/limpieza posterior](docs/arquitectura/AUDITORIA_LIMPIEZA_2026_10_10.md).
 - [Gobernanza/changelog documental](docs/CHANGELOG.md).
 
-Desacoplamiento de fronteras verificado el 11/10/2026 en `PODEMOS-SEGUIR`: suite SQLite completa sin fallos (1.094 pruebas, 32.023 aserciones, 15 omisiones), cohorte PostgreSQL aislada (183/3.035), frontend (151) y build aprobados. [Informe vigente y límites](docs/arquitectura/DESACOPLAMIENTO_2026_10_11.md); [preparación anterior](docs/sistema/PREPARACION_DESARROLLO_2026_10_11.md). No acredita producción ni validación clínica.
+Estado auditado al 25/10/2026: [informe integral](docs/auditorias/2026-10-25/INFORME_AUDITORIA_INTEGRAL.md), con fallos técnicos pendientes y cobertura visual incompleta. El [desacoplamiento del 11/10](docs/arquitectura/DESACOPLAMIENTO_2026_10_11.md) conserva su evidencia histórica, sin certificar el árbol actual. [Responsabilidades y recorridos de los doce módulos](docs/modulos/README.md).
 
 ## Dominio y flujo institucional
 
@@ -36,7 +36,7 @@ Postulante ≠ residente ≠ usuario ≠ personal ≠ contacto.
 
 Preadmisión → revisión → APROBADA/RECHAZADA → admisión formal con cama → residente admitido. Aprobación no crea residente; formalización es transaccional. Fuente: [AGENTS](AGENTS.md) y [baseline](docs/base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md); valores físicos divergentes están en DEC-OPEN-001.
 
-Áreas: institucional/alojamiento, clínica, cuidado continuo, medicación, trabajo interdisciplinario, actividades/visitas, documentación, alertas, reportes, seguridad/auditoría, UX/testing. El [sistema experto](docs/sistema-experto/README.md) tiene núcleo técnico, esquema y revisión administrativa implementados; su conocimiento institucional y activación clínica siguen pendientes.
+Áreas: institucional/alojamiento, clínica, cuidado continuo, medicación, trabajo interdisciplinario, actividades/visitas, documentación, alertas, reportes, seguridad/auditoría, UX/testing. El [sistema experto](docs/sistema-experto/README.md) reutiliza el motor simbólico y los contratos institucionales adoptados; conserva la rama observacional, mientras la conservación conjunta instrumental/Petersen y la aceptación integral siguen pendientes.
 
 ## Stack y requisitos
 

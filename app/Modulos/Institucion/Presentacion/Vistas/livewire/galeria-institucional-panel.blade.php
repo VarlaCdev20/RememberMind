@@ -45,6 +45,7 @@
 <x-ui.filter-bar class="rm-gallery-filters">
         <div><label for="gallery-search">Buscar fotografías</label><input id="gallery-search" type="search" wire:model.live.debounce.300ms="busqueda" maxlength="160" placeholder="Título o descripción"></div>
         <div><label for="gallery-state">Mostrar</label><select id="gallery-state" wire:model.live="estado"><option value="ACTIVA">Activas</option><option value="ARCHIVADA">Archivadas</option></select></div>
+        <button type="button" class="rm-btn-secondary" wire:click="limpiarFiltros" wire:loading.attr="disabled">Limpiar</button>
     </x-ui.filter-bar>
     <p class="rm-body" aria-live="polite">{{ trans_choice($estado === 'ACTIVA' ? ':count fotografía activa|:count fotografías activas' : ':count fotografía archivada|:count fotografías archivadas', $fotografias->total()) }}</p>
     <ul class="rm-gallery-grid" aria-label="Fotografías del centro">
@@ -52,12 +53,12 @@
             <li wire:key="gallery-{{ $foto->cod_fotografia }}"><article class="rm-card rm-gallery-photo">
                 @if($foto->estado === 'ACTIVA')<a href="{{ route('admin.galeria.archivo', [$foto->getKey(), 'imagen']) }}" target="_blank" rel="noopener" aria-label="Ver fotografía: {{ $foto->titulo }}"><img src="{{ route('admin.galeria.archivo', [$foto->getKey(), 'miniatura']) }}" alt="{{ $foto->texto_alternativo ?: $foto->titulo }}" loading="lazy" width="480" height="360"></a>@else<div class="rm-gallery-archived"><i class="ph-bold ph-archive" aria-hidden="true"></i><span>Fotografía archivada</span></div>
 @endif
-<div class="rm-gallery-photo__body"><h2>{{ $foto->titulo }}</h2>@if($foto->descripcion)<p>{{ $foto->descripcion }}</p>
+<div class="rm-gallery-photo__body"><h2>{{ $foto->titulo }}</h2>@if($foto->descripcion)<details><summary class="rm-help">Ver descripción</summary><p>{{ $foto->descripcion }}</p></details>
 @endif
 <p class="rm-gallery-meta">{{ $foto->fecha_fotografia?->format('d/m/Y') ?? 'Fecha de fotografía sin registrar' }}</p>
                     @if($foto->usar_en_bienvenida && $foto->estado === 'ACTIVA')<span class="rm-badge">Disponible en bienvenida</span>
 @endif
-@if($puedeGestionar)<div class="rm-gallery-actions"><button type="button" class="rm-btn-secondary" wire:click="editar('{{ $foto->getKey() }}')" x-on:click.capture="if (editorDirty &amp;&amp; !confirm('¿Descartar los cambios sin guardar?')) { $event.preventDefault(); $event.stopImmediatePropagation(); }" >Editar datos</button><button type="button" class="rm-btn-secondary" wire:click="cambiarEstado('{{ $foto->getKey() }}', '{{ $foto->estado === 'ACTIVA' ? 'ARCHIVADA' : 'ACTIVA' }}')" wire:loading.attr="disabled">{{ $foto->estado === 'ACTIVA' ? 'Archivar' : 'Reactivar' }}</button></div>
+@if($puedeGestionar)<div class="rm-gallery-actions"><button type="button" class="rm-btn-secondary" wire:click="editar('{{ $foto->getKey() }}')" x-on:click.capture="if (editorDirty &amp;&amp; !confirm('¿Descartar los cambios sin guardar?')) { $event.preventDefault(); $event.stopImmediatePropagation(); }" >Editar datos</button><button type="button" class="rm-btn-secondary" wire:click="cambiarEstado('{{ $foto->getKey() }}', '{{ $foto->estado === 'ACTIVA' ? 'ARCHIVADA' : 'ACTIVA' }}')" wire:confirm="{{ $foto->estado === 'ACTIVA' ? '¿Archivar esta fotografía? Se conserva el archivo y dejará de mostrarse en la bienvenida.' : '¿Reactivar esta fotografía para que vuelva a estar disponible en la galería?' }}" wire:loading.attr="disabled">{{ $foto->estado === 'ACTIVA' ? 'Archivar' : 'Reactivar' }}</button></div>
 @endif
 </div>
             </article></li>

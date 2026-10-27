@@ -7,6 +7,7 @@ return [
     'before' => 'El campo :attribute debe ser una fecha anterior a :date.',
     'before_or_equal' => 'El campo :attribute debe ser una fecha anterior o igual a :date.',
     'boolean' => 'El campo :attribute debe ser verdadero o falso.',
+    'confirmed' => 'La confirmación de :attribute no coincide. Repite la misma contraseña en ambos campos.',
     'date' => 'El campo :attribute debe contener una fecha válida.',
     'date_format' => 'El campo :attribute debe tener el formato :format.',
     'different' => 'Los campos :attribute y :other deben ser diferentes.',
@@ -43,6 +44,9 @@ return [
     'url' => 'El campo :attribute debe contener una dirección válida.',
 
     'attributes' => [
+        'correo' => 'correo de tu cuenta',
+        'password' => 'la nueva contraseña',
+        'password_confirmation' => 'confirmación de la contraseña',
         'codResidente' => 'residente',
         'tipoComida' => 'comida observada',
         'tipoLiquido' => 'tipo de líquido',

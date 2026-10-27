@@ -2,7 +2,7 @@
 title: "Decisiones pendientes de RememberMind"
 status: CURRENT
 version: "1.0"
-last_reviewed: 2026-10-08
+last_reviewed: 2026-10-25
 owner: RememberMind
 source_of_truth: false
 verified_against_commit: null
@@ -117,35 +117,25 @@ C. Mantener regla vigente, documentando límite, hasta decisión concreta.
 
 ## DEC-OPEN-005
 
-**Título:** Método, derechos y validación del experto cognitivo
+**Título:** Medición original, derechos y validación clínica del experto.
 
-**Avance del 17/10/2026:** la propietaria aprobó Psicología y Medicina con
-revisiones separadas, más una tabla de dictámenes vinculada a la evaluación.
-El circuito de firma está implementado. Véase
-[decisión de revisiones](base-de-datos/DECISION_REVISIONES_EXPERTAS_2026_10_17.md).
-Continúan pendientes las interpretaciones operativas, instrumentos/métodos y
-su validación profesional: [matriz concreta](sistema-experto/MATRIZ_INTERPRETACION_OPERATIVA_PARA_REVISION.md).
-Esta decisión permanece OPEN respecto a la activación clínica del conocimiento.
+**Estado al 25/10/2026: PARCIALMENTE RESUELTA por decisiones específicas; siguen abiertos los alcances enumerados.**
 
-**Área:** Investigación / experto
+| Alcance | Estado y fuente |
+|---|---|
+| Contenido institucional A–D | Adoptado el 19/10: [contrato](sistema-experto/PROPUESTA_CONTRATO_INSTITUCIONAL_FASE_4_2026_10_19.md) |
+| Petersen E–H | Adoptado el 19/10 y concretado por [C01–C05](sistema-experto/CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md) |
+| Captura original y gobierno | Aprobaciones específicas registradas; [captura](sistema-experto/PROPUESTA_CAPTURA_PETERSEN_ORIGINAL_2026_10_19.md) y [gobierno](sistema-experto/PROPUESTA_GOBIERNO_REGLAS_2026_10_18.md) |
+| Revisión posterior | Medicina y Psicología por separado; el alcance conjunto depende de conservación real |
+| Conservación conjunta | Diseño institucional y guardado SQL íntegro pendientes; no se equiparan al prototipo |
+| Aplicaciones originales, método y licencias | Requeridos por evidencia/instrumento concreto; no completados por una aprobación documental |
+| Validación clínica de desempeño | Pendiente de casos y revisión profesional independiente |
 
-**Problema:** O.R.I.O.N. define la arquitectura cognitiva, el esquema D-123/D-137 y el contrato piloto D-131/D-143/D-144. El [núcleo técnico V1](sistema-experto/IMPLEMENTACION_V1.md) usa datos artificiales. Permanecen pendientes los contratos específicos de contenido, instrumentos/derechos, responsables y validación profesional para activación clínica. No se requieren ni se autorizan pesos, scores o agregación global por esta referencia.
+No reabrir A–D/E–H como si faltara su adopción. No exigir firma previa para desarrollar, probar o ejecutar técnicamente los contratos aprobados; conservar estado, límites y abstenciones. Tampoco convertir una investigación o consentimiento de desarrollo en medición, certificación o validación profesional inexistente.
 
-**Por qué requiere decisión:** Crear skill Buchanan/multicriterio no aprueba método clínico, licencias, algoritmo, datos o persistencia.
+**Bloquea exclusivamente:** contenido clínico nuevo no aprobado, uso no autorizado de instrumentos, instalación de DDL no autorizada y declaración de validación clínica sin evidencia. No bloquea correcciones técnicas compatibles, pruebas desechables ni implementación del alcance ya aprobado.
 
-**Opciones conocidas:**
-
-A. Aprobar protocolo y responsabilidades con fuentes/versiones/casos de referencia.
-B. Mantener diseño y fixtures sintéticas sin activación clínica.
-C. Acotar una etapa/piloto con decisiones específicas previas.
-
-**Impacto:** Resultado cognitivo, explicaciones, recomendaciones, validación, posibles alertas y modelo futuro.
-
-**Bloquea:** Activación clínica, copia de reactivos y aceptación clínica del motor; no diseño documental independiente.
-
-**Evidencia:** [Índice experto](sistema-experto/README.md), [implementación técnica y fuentes O.R.I.O.N.](sistema-experto/IMPLEMENTACION_V1.md). Los tres diseños de árboles siguen PROPOSED y no sustituyen la red semántica aprobada. La autorización técnica de migraciones y pruebas no es aprobación clínica.
-
-**Estado:** OPEN
+**Evidencia actual:** [índice experto](sistema-experto/README.md) y [auditoría del 25/10](auditorias/2026-10-25/INFORME_AUDITORIA_INTEGRAL.md), H07–H13. Las opciones generales anteriores se sustituyen por esta separación de alcances; no se crean nuevas reglas.
 
 ## DEC-OPEN-006
 

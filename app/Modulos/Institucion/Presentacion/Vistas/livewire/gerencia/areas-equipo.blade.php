@@ -1,0 +1,29 @@
+<div class="rm-management-workspace space-y-4">
+    @error('estado')<p class="rm-alert rm-alert-danger" role="alert">{{ $message }}</p>@enderror
+    <x-ui.collection-header title="Áreas y equipo" subtitle="Organización institucional y asignaciones registradas por jornada" icon="ph-buildings"><x-slot:actions>@can('areas.crear')<button class="rm-btn-primary" type="button" wire:click="crearArea" wire:loading.attr="disabled">Registrar área</button>@endcan</x-slot:actions></x-ui.collection-header>
+    <x-ui.filter-bar><div class="rm-management-tabs"><x-ui.field label="Buscar área" for="gerencia-area-buscar"><input id="gerencia-area-buscar" class="rm-input" type="search" wire:model.live.debounce.300ms="search" placeholder="Nombre del área"></x-ui.field><x-ui.field label="Estado del área" for="gerencia-area-estado"><select id="gerencia-area-estado" class="rm-input" wire:model.live="filtroEstado"><option value="">Todos</option><option value="ACTIVO">Activa</option><option value="INACTIVO">Inactiva</option></select></x-ui.field><button class="rm-btn-secondary" type="button" wire:click="limpiarFiltros">Limpiar</button></div></x-ui.filter-bar>
+    <x-ui.section-card title="Áreas de la consulta" icon="ph-table">
+    @if($areas->isEmpty())<x-ui.empty-state title="No hay áreas en esta consulta" description="Prueba otro nombre o estado." />@else<div class="rm-table-scroll"><table class="rm-table"><caption class="sr-only">Organización y acceso al equipo registrado</caption><thead><tr><th scope="col">Área</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead><tbody>@foreach($areas as $area)<tr><th scope="row">{{ $area->nombre }}</th><td>{{ in_array($area->estado,['ACTIVO','ACTIVA'],true) ? 'Activa' : 'Inactiva' }}</td><td><div class="rm-management-actions"><button type="button" class="rm-btn-secondary" wire:click="verArea('{{ $area->getKey() }}')" wire:loading.attr="disabled">Ver área y equipo</button>@can('areas.editar')<button type="button" class="rm-btn-secondary" wire:click="editarArea('{{ $area->getKey() }}')" wire:loading.attr="disabled">Editar datos</button>@endcan</div>@can('areas.cambiar_estado')<button class="rm-btn-secondary" type="button" wire:click="toggleEstado('{{ $area->getKey() }}')" wire:loading.attr="disabled" wire:confirm="¿Cambiar el estado del área? Si tiene asignaciones o planes activos, primero debes resolverlos.">{{ in_array($area->estado,['ACTIVO','ACTIVA'],true) ? 'Desactivar área' : 'Activar área' }}</button>@endcan</td></tr>@endforeach</tbody></table></div>@endif
+    </x-ui.section-card>
+    @if($mostrarFicha && $areaActual)
+    <x-ui.modal-livewire id="gerencia-area-equipo" wire:model="mostrarFicha" :title="$areaActual->nombre" subtitle="Equipo por jornada; no es una plantilla permanente ni acredita asistencia" icon="ph-users-three" max-width="lg" close-method="cerrarFicha">
+        <p>{{ $areaActual->descripcion ?: 'Sin descripción registrada.' }}</p>
+        <x-ui.field label="Fecha del equipo" for="gerencia-area-fecha"><input id="gerencia-area-fecha" class="rm-input" type="date" wire:model.live="fechaEquipo"></x-ui.field>
+        @if($equipo === null)<x-ui.callout title="Consulta de equipo restringida" variant="info">Necesitas los permisos de jornadas y asignaciones para consultar el equipo.</x-ui.callout>
+        @elseif(!$equipo['filas'])<x-ui.empty-state title="Sin asignaciones para esta fecha" description="No demuestra por sí solo falta de personal o necesidad de cobertura." />
+        @else<div class="rm-table-scroll"><table class="rm-table"><caption class="sr-only">Asignaciones de la fecha seleccionada</caption><thead><tr><th scope="col">Persona y función</th><th scope="col">Jornada y turno</th><th scope="col">Situación</th></tr></thead><tbody>@foreach($equipo['filas'] as $fila)<tr><th scope="row">{{ $fila['persona'] }}<small class="block">{{ $fila['funcion'] }}</small></th><td>{{ $fila['turno'] }}<small class="block">{{ $fila['inicio'] }} → {{ $fila['fin'] }}</small></td><td>{{ $fila['situacion'] }}</td></tr>@endforeach</tbody></table></div>@endif
+        <x-slot:footer><div class="rm-management-actions"><a class="rm-btn-secondary" href="{{ route('admin.cobertura-equipo.index', ['area'=>$areaActual->getKey(),'fecha'=>$fechaEquipo]) }}">Ver cobertura completa</a><button type="button" class="rm-btn-secondary" wire:click="cerrarFicha">Volver a áreas</button></div></x-slot:footer>
+    </x-ui.modal-livewire>
+    @endif
+    @if($mostrarFormulario)
+    <x-ui.modal-livewire id="gerencia-area-formulario" wire:model="mostrarFormulario" :title="$isEdit ? 'Editar datos del área' : 'Registrar área'" max-width="md" close-method="cerrarFormulario" :dismiss-on-escape="false">
+        <form wire:submit="guardarArea" class="space-y-4">
+            <x-ui.field label="Nombre del área" for="gerencia-area-nombre"><input id="gerencia-area-nombre" class="rm-input" wire:model="nombre" maxlength="80" required>@error('nombre')<p role="alert">{{ $message }}</p>@enderror</x-ui.field>
+            <x-ui.field label="Descripción funcional (opcional)" for="gerencia-area-descripcion"><textarea id="gerencia-area-descripcion" class="rm-input" wire:model="descripcion" rows="3"></textarea>@error('descripcion')<p role="alert">{{ $message }}</p>@enderror</x-ui.field>
+            <p class="rm-help">Estado actual: {{ in_array($estado,['ACTIVO','ACTIVA'],true) ? 'Activa' : 'Inactiva' }}. La edición de datos conserva la situación del área.</p>
+            <div class="rm-management-actions"><button type="submit" class="rm-btn-primary" wire:loading.attr="disabled">Guardar datos</button><button type="button" class="rm-btn-secondary" wire:click="cerrarFormulario" wire:confirm="¿Descartar los cambios sin guardar?">Cancelar</button></div>
+            <p wire:loading wire:target="guardarArea" role="status">Guardando el área…</p>
+        </form>
+    </x-ui.modal-livewire>
+    @endif
+</div>

@@ -1,10 +1,5 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-<<<<<<< HEAD
-import { residentWorkspace, residentGraph } from '../../resources/frontend/scripts/modules/expert-resident-workspace.js';
-import { knowledgeGraph, distribuirRedCompacta } from '../../resources/frontend/scripts/modules/orion-explorador.js';
-
-=======
 import { readFileSync } from 'node:fs';
 import { residentWorkspace, residentGraph } from '../../resources/frontend/scripts/modules/expert-resident-workspace.js';
 import { knowledgeGraph, distribuirRedCompacta } from '../../resources/frontend/scripts/modules/orion-explorador.js';
@@ -35,7 +30,6 @@ test('fuentes numerosas: pagina sin perder registros y sigue conexiones fuera de
     assert.deepEqual(fuente,antes);
 });
 
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 test('selección por residente no mezcla áreas con requisitos ni modifica la fuente', () => {
     const elementos = [{ id: 'COG-MEM', grupo: 'areas' }, { id: 'C01', grupo: 'requisitos' }];
     const anterior = structuredClone(elementos);
@@ -46,8 +40,6 @@ test('selección por residente no mezcla áreas con requisitos ni modifica la fu
     assert.deepEqual(elementos, anterior);
 });
 
-<<<<<<< HEAD
-=======
 test('retorno y selección entre páginas recuperan la fuente y redistribuyen el mapa', () => {
     const fuente = { nodos: [{ id: 'grupo', tipo: 'Conjunto de registros', columna: 2 },
         ...Array.from({ length: 15 }, (_, i) => ({ id: `s${i}`, tipo: 'Registro', columna: 0 }))],
@@ -67,7 +59,6 @@ test('retorno y selección entre páginas recuperan la fuente y redistribuyen el
     assert.equal(c.cantidadVisible, 4);
 });
 
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 const datos = () => ({ nodos: [
     { id: 's', nombre: 'Soporte original', tipo: 'Soporte', columna: 0 },
     { id: 'v', nombre: 'Valoración original', tipo: 'Valoración', columna: 1 },

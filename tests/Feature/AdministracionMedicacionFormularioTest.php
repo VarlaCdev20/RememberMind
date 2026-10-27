@@ -136,7 +136,8 @@ class AdministracionMedicacionFormularioTest extends TestCase
                 'frecuencia' => 'Cada 12 horas',
                 'indicacion' => 'Antihipertensivo post-desayuno',
                 'segun_necesidad' => false,
-                'fecha_hora_prescripcion' => now(),
+                // La orden debe existir antes de su primera dosis de las 08:00.
+                'fecha_hora_prescripcion' => today()->setTime(7, 0),
                 'estado' => 'ACTIVA',
             ]
         );

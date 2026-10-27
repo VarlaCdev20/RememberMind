@@ -115,7 +115,6 @@ Dictamen visual: **FAIL por verificación incompleta**, no por un defecto visual
 observado de esta versión. Los fallos detectados mediante pruebas se corrigieron
 en implementación: pérdida de getters al componer el visor e inicialización
 recursiva del mapa derivado; las regresiones locales cubren ambos.
-<<<<<<< HEAD
 
 ## Integración local posterior del commit f9128b2
 
@@ -146,5 +145,3 @@ se documentaron seis avisos `Swal is not defined` ajenos al explorador. La
 revisión manual en la sesión real de la propietaria y PostgreSQL siguen
 pendientes. Este cierre de QA no sustituye la validación clínica ni aprueba
 activación de conocimiento.
-=======
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo

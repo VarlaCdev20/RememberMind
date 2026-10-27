@@ -60,6 +60,8 @@ final class DashboardPhotoRotation
     ];
 
     private const HERO_PHOTOS = [
+        // Fotografías ya publicadas en la página de bienvenida; nunca la galería privada.
+        'login' => ['community', 'nutrition', 'family'],
         'medico' => ['medical', 'care', 'music'],
         'psicologia' => ['cognitive', 'craft', 'activity'],
         'superadmin' => ['community', 'cooking', 'music'],

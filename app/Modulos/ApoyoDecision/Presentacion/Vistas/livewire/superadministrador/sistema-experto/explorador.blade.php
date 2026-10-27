@@ -1,36 +1,9 @@
-<<<<<<< HEAD
-<x-ui.section-card title="Base de conocimiento" subtitle="Lectura del paquete experimental o de una versión almacenada. La consulta no activa conocimiento.">
-    <div class="rm-lab-grid">
-        <div>
-            <h3 class="font-semibold mb-3">Versión que desea consultar</h3>
-            <button type="button" wire:click="seleccionarVersion('')" class="rm-btn rm-btn-secondary mb-3" aria-pressed="{{ $version === null ? 'true' : 'false' }}">Paquete experimental G09 en memoria</button>
-            @forelse($versiones as $v)
-                <div class="rm-lab-history mb-3">
-                    <div class="min-w-0"><strong>{{ $v->nombre ?? $v->codigo_version }}</strong><p class="text-sm">{{ $v->codigo_version }} · {{ $v->estado }}{{ $v->fecha_hora_retiro ? ' · Retirada' : '' }}</p><p class="text-sm text-rm-secondary">{{ $v->fecha_hora_creacion }} · {{ $v->cod_usuario_creacion }}</p><p class="text-sm">Antecesora: {{ $v->cod_version_anterior ?? 'Sin antecesora declarada' }}</p></div>
-                    <button type="button" class="rm-btn rm-btn-secondary" wire:click="seleccionarVersion(@js($v->cod_version_modelo))" aria-pressed="{{ $version === $v->cod_version_modelo ? 'true' : 'false' }}">Consultar</button>
-                </div>
-            @empty
-                <p class="text-rm-secondary">No hay versiones almacenadas. Puede consultar el paquete experimental en memoria; no está publicado ni clínicamente aprobado.</p>
-            @endforelse
-            @if($versiones->hasPages()){{ $versiones->links() }}@endif
-        </div>
-        <div class="space-y-3">
-            <label for="lab-modo" class="block font-semibold">Vista del conocimiento</label>
-            <select id="lab-modo" wire:model.live="modoConocimiento" class="rm-input w-full"><option value="reglas">Catálogo de reglas</option><option value="catalogo">Conceptos, variables, fuentes y mapeos</option><option value="red">Red semántica</option><option value="versiones">Comparación de versiones</option></select>
-            <p><strong>Origen:</strong> {{ $version ?? 'Paquete G09 experimental incorporado al motor' }}.</p>
-            <p class="text-sm text-rm-secondary">Los estados activos y los literales de aprobación del paquete de ingeniería son sintéticos. No representan autorización clínica. Una versión retirada conserva su contenido histórico para lectura.</p>
-            <p class="rm-expert-disclosure">Esta pantalla es de consulta. Las operaciones institucionales existentes se consultan en Gobierno de reglas y conservan sus permisos propios.</p>
-        </div>
-    </div>
-</x-ui.section-card>
-=======
 <section class="rm-card rm-expert-scopebar" aria-label="Procedencia del conocimiento">
     <div><label for="expert-version-scope"><i class="ph ph-stack" aria-hidden="true"></i>Versión que desea consultar</label><select id="expert-version-scope" wire:change="seleccionarVersion($event.target.value)" class="rm-select w-full"><option value="" @selected($version === null)>Paquete experimental G09 en memoria</option>@foreach($versiones as $v)<option value="{{ $v->cod_version_modelo }}" @selected($version === $v->cod_version_modelo)>{{ $v->codigo_version }} · {{ $v->fecha_hora_retiro ? 'Retirada' : $v->estado }}</option>@endforeach</select></div>
     <div><label for="lab-modo">Vista del conocimiento</label><select id="lab-modo" wire:model.live="modoConocimiento" class="rm-select w-full"><option value="reglas">Catálogo de reglas</option><option value="catalogo">Todos los datos y sus conexiones</option><option value="red">Red semántica</option><option value="versiones">Comparación de versiones</option></select></div>
     <div class="rm-expert-origin"><i class="ph ph-eye" aria-hidden="true"></i><span>{{ $version ? 'Instantánea almacenada · solo consulta' : 'Paquete experimental · sin publicación clínica' }}</span></div>
 </section>
 <nav class="rm-expert-local-tabs" aria-label="Explorar el conocimiento"><button type="button" wire:click="explorarRed" aria-pressed="{{ $modoConocimiento === 'red' ? 'true' : 'false' }}"><i class="ph ph-graph" aria-hidden="true"></i>Mapa semántico</button><button type="button" wire:click="explorarCategoria('reglas_expertas')" aria-pressed="{{ $modoConocimiento === 'catalogo' && $tablaCatalogo === 'reglas_expertas' ? 'true' : 'false' }}"><i class="ph ph-gear" aria-hidden="true"></i>Reglas y condiciones</button><button type="button" wire:click="explorarCategoria('fuentes_datos_expertas')"><i class="ph ph-books" aria-hidden="true"></i>Fuentes y mapeos</button><button type="button" wire:click="explorarCategoria('nodos_semanticos')"><i class="ph ph-squares-four" aria-hidden="true"></i>Todos los datos</button></nav>
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 @if($errorConocimiento)
     <div class="rm-alert rm-alert-danger" role="alert"><div><strong>Error de integridad del conocimiento</strong><p>{{ $errorConocimiento }}</p></div></div>
 @elseif($conocimiento)

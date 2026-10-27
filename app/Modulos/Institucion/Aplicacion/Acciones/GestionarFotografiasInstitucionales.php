@@ -9,6 +9,7 @@ use App\Modulos\Institucion\Aplicacion\Contratos\GestionFotografias;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class GestionarFotografiasInstitucionales
 {
@@ -18,12 +19,14 @@ class GestionarFotografiasInstitucionales
     {
         $actor = $usuario ? User::find($usuario->getKey()) : null;
         abort_unless($this->policy->manage($actor), 403);
+
         return $actor;
     }
 
     private function metadatos(array $entrada): array
     {
         $entrada['titulo'] = trim((string) ($entrada['titulo'] ?? ''));
+
         return Validator::make($entrada, ['titulo' => ['required', 'string', 'max:160'],
             'descripcion' => ['nullable', 'string', 'max:2000'], 'fecha_fotografia' => ['nullable', 'date_format:Y-m-d'],
             'texto_alternativo' => ['nullable', 'string', 'max:255'], 'usar_en_bienvenida' => ['required', 'boolean']])->validate();
@@ -41,6 +44,7 @@ class GestionarFotografiasInstitucionales
             $existente = FotografiaInstitucional::where('hash_archivo', $preparada['hash_archivo'])->first();
             if ($existente) {
                 $this->archivos->compensar($rutas);
+
                 return ['foto' => $existente, 'nueva' => false];
             }
             $foto = DB::transaction(function () use ($actor, $datos, $preparada) {
@@ -49,29 +53,54 @@ class GestionarFotografiasInstitucionales
                     'estado' => 'ACTIVA', 'fecha_registro' => now(), 'fecha_actualizacion' => now()]);
                 activity('Galería institucional')->causedBy($actor)->performedOn($foto)->event('fotografia_subida')
                     ->withProperties(['hash' => $foto->hash_archivo])->log('Guardó una fotografía institucional');
+
                 return $foto;
             });
+
             return ['foto' => $foto, 'nueva' => true];
         } catch (\Throwable $error) {
-            try { $this->archivos->compensar($rutas); } catch (\Throwable $limpieza) { report($limpieza); }
+            try {
+                $this->archivos->compensar($rutas);
+            } catch (\Throwable $limpieza) {
+                report($limpieza);
+            }
             if ($error instanceof UniqueConstraintViolationException) {
                 $existente = FotografiaInstitucional::where('hash_archivo', $preparada['hash_archivo'])->first();
-                if ($existente) return ['foto' => $existente, 'nueva' => false];
+                if ($existente) {
+                    return ['foto' => $existente, 'nueva' => false];
+                }
             }
             throw $error;
         }
     }
 
-    public function editar(?User $usuario, string $codigo, array $entrada): FotografiaInstitucional
+    public function editar(?User $usuario, string $codigo, array $entrada, array $original): FotografiaInstitucional
     {
         $actor = $this->autorizar($usuario);
         $datos = $this->metadatos($entrada);
-        return DB::transaction(function () use ($actor, $codigo, $datos) {
+        $esperados = $this->metadatos($original);
+        foreach (['descripcion', 'texto_alternativo'] as $campo) {
+            $esperados[$campo] = ($esperados[$campo] ?? null) === '' ? null : ($esperados[$campo] ?? null);
+        }
+        $esperados['usar_en_bienvenida'] = (bool) $esperados['usar_en_bienvenida'];
+
+        return DB::transaction(function () use ($actor, $codigo, $datos, $esperados) {
+            $this->autorizar($actor);
             $foto = FotografiaInstitucional::whereKey($codigo)->lockForUpdate()->firstOrFail();
+            $actuales = ['titulo' => $foto->titulo, 'descripcion' => $foto->descripcion,
+                'fecha_fotografia' => $foto->fecha_fotografia?->format('Y-m-d'), 'texto_alternativo' => $foto->texto_alternativo,
+                'usar_en_bienvenida' => (bool) $foto->usar_en_bienvenida];
+            foreach (['descripcion', 'texto_alternativo'] as $campo) {
+                $actuales[$campo] = $actuales[$campo] === '' ? null : $actuales[$campo];
+            }
+            if ($actuales !== $esperados) {
+                throw ValidationException::withMessages(['guardado' => 'La fotografía cambió desde que abriste el formulario. Revisa la versión actual antes de guardar; tus cambios siguen aquí.']);
+            }
             $antes = $foto->only(array_keys($datos));
             $foto->update([...$datos, 'fecha_actualizacion' => now()]);
             activity('Galería institucional')->causedBy($actor)->performedOn($foto)->event('fotografia_editada')
                 ->withProperties(['antes' => $antes, 'despues' => $datos])->log('Editó los datos de una fotografía');
+
             return $foto;
         });
     }
@@ -82,7 +111,9 @@ class GestionarFotografiasInstitucionales
         Validator::make(['estado' => $estado], ['estado' => ['required', 'in:ACTIVA,ARCHIVADA']])->validate();
         DB::transaction(function () use ($actor, $codigo, $estado) {
             $foto = FotografiaInstitucional::whereKey($codigo)->lockForUpdate()->firstOrFail();
-            if ($foto->estado === $estado) return;
+            if ($foto->estado === $estado) {
+                return;
+            }
             $anterior = $foto->estado;
             $foto->update(['estado' => $estado, 'fecha_actualizacion' => now()]);
             activity('Galería institucional')->causedBy($actor)->performedOn($foto)->event('fotografia_estado')

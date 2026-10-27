@@ -51,6 +51,10 @@ return [
             ->name('pacientes.ficha.pdf');
     },
     'ruta_155' => static function (): void {
+        Route::get('/reportes/vista-previa', [\App\Modulos\Reportes\Presentacion\Http\Controllers\ReporteEnfermeriaController::class, 'mostrar'])
+            ->middleware('permission:enfermeria.ver_dashboard')->name('reportes.preview');
+        Route::get('/reportes/pdf', [\App\Modulos\Reportes\Presentacion\Http\Controllers\ReporteEnfermeriaController::class, 'pdf'])
+            ->middleware('permission:enfermeria.ver_ficha_paciente')->name('reportes.pdf');
         Route::get('/reportes', ReporteEnfermeria::class)
             ->middleware('permission:enfermeria.ver_dashboard')
             ->name('reportes');
@@ -59,6 +63,10 @@ return [
         Route::get('/institucional', [ReporteInstitucionalController::class, 'preview'])
             ->middleware('permission:reportes.institucional')
             ->name('institucional.preview');
+        Route::get('/institucional/preparar', [ReporteInstitucionalController::class, 'prepararGerencia'])
+            ->middleware('permission:reportes.institucional')->name('institucional.preparar');
+        Route::get('/institucional/csv', [ReporteInstitucionalController::class, 'csvGerencia'])
+            ->middleware('permission:reportes.institucional')->name('institucional.csv');
     },
     'ruta_181' => static function (): void {
         Route::get('/institucional/pdf', [ReporteInstitucionalController::class, 'pdf'])

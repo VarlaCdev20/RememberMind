@@ -37,11 +37,11 @@ class PersonalInstitucionalResponsiveTest extends TestCase
         $this->assertDatabaseCount('asignaciones_personal', 1);
     }
 
-    public function test_secciones_conservan_personal_filtros_y_acciones_al_renderizar(): void
+    public function test_secciones_de_superadministracion_conservan_filtros_y_acciones_al_renderizar(): void
     {
         $this->seed(RolesAndPermissionsSeeder::class);
         $gerente = User::factory()->create(['nombres' => 'Alicia', 'ap_paterno' => 'Prueba']);
-        $gerente->assignRole('GERENTE');
+        $gerente->assignRole('SUPERADMINISTRADOR');
         $personal = User::factory()->create([
             'nombres' => 'Elena Patricia de los Ángeles', 'ap_paterno' => 'Prueba de Nombre Extenso',
             'ap_materno' => 'Ejemplo', 'correo' => 'nombre.muy.extenso.de.personal@remembermind.test',
@@ -91,20 +91,18 @@ class PersonalInstitucionalResponsiveTest extends TestCase
             ->assertSee('staff-schedule-f_cod_area', false)->assertSee('Días laborales');
         $this->exportar('formulario-horario', $horarios->html());
 
-        // Presentation-only populated table; this payload is never saved to the DB.
-        $horarios->call('cancelarFormulario')->set('asignaciones', [[
-            'cod_asignacion' => 'ASP_QA_0001', 'turno_color' => null,
-            'turno_nombre' => 'Turno institucional de prueba con nombre extenso',
-            'area_nombre' => 'Área institucional sintética de acompañamiento',
-            'dias_semana' => ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES'],
-            'tipo_asignacion' => 'ROTATIVO', 'fecha_inicio' => '2026-10-17',
-            'fecha_fin' => null, 'estado' => 'ACTIVA',
-        ]])->assertSee('data-label="Días"', false)->assertSee('Ver detalle');
+        // La colección está bloqueada contra payloads del cliente: poblarla desde SQL sintético.
+        $area = Area::create(['nombre' => 'Área institucional sintética de acompañamiento', 'estado' => 'ACTIVO']);
+        $turno = Turno::create(['nombre' => 'Turno institucional de prueba con nombre extenso', 'hora_inicio' => '08:00:00', 'hora_cierre' => '16:00:00', 'estado' => 'ACTIVO']);
+        $jornada = Jornada::create(['cod_turno' => $turno->getKey(), 'fecha_jornada' => '2026-10-17', 'estado' => 'ABIERTA']);
+        AsignacionPersonal::create(['cod_personal' => $personal->personal->getKey(), 'cod_area' => $area->getKey(), 'cod_jornada' => $jornada->getKey(), 'tipo_asignacion' => 'ROTATIVO', 'estado' => 'ACTIVA']);
+        $horarios->call('cancelarFormulario')->call('cargarDatos')
+            ->assertSee('data-label="Días"', false)->assertSee('Ver detalle');
         $this->exportar('asignaciones', $horarios->html());
 
         $panel->call('cerrarModal')->assertSet('modalGestionAbierto', false);
-        $this->assertDatabaseCount('asignaciones_personal', 0);
-        $this->assertFalse($gerente->can('usuarios.crear'));
+        $this->assertDatabaseCount('asignaciones_personal', 1);
+        $this->assertTrue($gerente->can('usuarios.crear'));
     }
 
     public function test_directorio_permite_recorrer_todo_el_personal_y_reinicia_pagina_al_filtrar(): void

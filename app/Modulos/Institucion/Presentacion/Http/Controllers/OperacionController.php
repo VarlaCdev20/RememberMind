@@ -73,8 +73,13 @@ class OperacionController extends Controller
                 ->with(compact('filtros', 'definicion'));
         }
         if ($modulo === 'habitaciones' || ($modulo === 'ocupacion' && ($filtros['tab'] ?? '') !== 'historial' && $request->user()->can('habitaciones.ver'))) {
+            $consultaInstitucional = $request->routeIs('admin.habitaciones.index');
+            $rutaExplorador = $consultaInstitucional ? 'admin.habitaciones.index'
+                : ($modulo === 'ocupacion' ? 'admin.administracion.ocupacion' : 'admin.administracion.habitaciones');
+
             return view('pages.admin.administracion.habitaciones', app(MapaHabitacionesService::class)->datos($filtros, $request->user()))
-                ->with(compact('filtros'))->with('esOcupacion', $modulo === 'ocupacion');
+                ->with(compact('filtros', 'rutaExplorador'))
+                ->with('esOcupacion', $consultaInstitucional || $modulo === 'ocupacion');
         }
         if ($modulo === 'ocupacion') {
             $this->authorize('viewAny', Residente::class);

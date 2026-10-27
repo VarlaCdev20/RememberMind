@@ -11,24 +11,39 @@ use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class GaleriaInstitucionalPanel extends Component
 {
     use WithFileUploads, WithPagination;
 
     public string $busqueda = '';
+
     public string $estado = 'ACTIVA';
+
     public bool $formularioAbierto = false;
+
     public array $archivos = [];
+
     public string $titulo = '';
+
     public string $descripcion = '';
+
     public string $fecha_fotografia = '';
+
     public string $texto_alternativo = '';
+
     public bool $usar_en_bienvenida = false;
+
     public array $resultados = [];
+
     public string $mensaje = '';
-    #[Locked] public ?string $editando = null;
-    #[Locked] public array $original = [];
+
+    #[Locked]
+    public ?string $editando = null;
+
+    #[Locked]
+    public array $original = [];
 
     private function actor(): ?User
     {
@@ -41,17 +56,29 @@ class GaleriaInstitucionalPanel extends Component
         abort_unless($escritura ? $policy->manage($this->actor()) : $policy->viewAny($this->actor()), 403);
     }
 
-    public function mount(): void { $this->autorizar(); }
+    public function mount(): void
+    {
+        $this->autorizar();
+    }
 
     public function updated(string $nombre): void
     {
-        if (in_array($nombre, ['busqueda', 'estado'], true)) $this->resetPage();
+        if (in_array($nombre, ['busqueda', 'estado'], true)) {
+            $this->resetPage();
+        }
+    }
+
+    public function limpiarFiltros(): void
+    {
+        $this->autorizar();
+        $this->reset('busqueda', 'estado');
+        $this->resetPage();
     }
 
     private function datos(): array
     {
-        return ['titulo' => $this->titulo, 'descripcion' => $this->descripcion ?: null,
-            'fecha_fotografia' => $this->fecha_fotografia ?: null, 'texto_alternativo' => $this->texto_alternativo ?: null,
+        return ['titulo' => $this->titulo, 'descripcion' => $this->descripcion !== '' ? $this->descripcion : null,
+            'fecha_fotografia' => $this->fecha_fotografia ?: null, 'texto_alternativo' => $this->texto_alternativo !== '' ? $this->texto_alternativo : null,
             'usar_en_bienvenida' => $this->usar_en_bienvenida];
     }
 
@@ -104,11 +131,19 @@ class GaleriaInstitucionalPanel extends Component
         $this->resultados = [];
         $this->mensaje = '';
         if ($this->editando) {
-            try { $accion->editar($this->actor(), $this->editando, $this->datos()); }
-            catch (ValidationException $error) { throw $error; }
-            catch (\Throwable $error) { report($error); $this->addError('guardado', 'No se pudieron guardar los cambios. Tu información sigue aquí para volver a intentar.'); return; }
+            try {
+                $accion->editar($this->actor(), $this->editando, $this->datos(), $this->original);
+            } catch (ValidationException|HttpException $error) {
+                throw $error;
+            } catch (\Throwable $error) {
+                report($error);
+                $this->addError('guardado', 'No se pudieron guardar los cambios. Tu información sigue aquí para volver a intentar.');
+
+                return;
+            }
             $this->cerrar();
             $this->mensaje = 'Datos de la fotografía actualizados.';
+
             return;
         }
         $fallidas = [];
@@ -121,7 +156,7 @@ class GaleriaInstitucionalPanel extends Component
             } catch (ValidationException $error) {
                 $fallidas[] = $archivo;
                 $this->resultados[] = ['nombre' => $archivo->getClientOriginalName(), 'estado' => collect($error->errors())->flatten()->first()];
-            } catch (\Symfony\Component\HttpKernel\Exception\HttpException $error) {
+            } catch (HttpException $error) {
                 throw $error;
             } catch (\Throwable $error) {
                 report($error);
@@ -131,16 +166,25 @@ class GaleriaInstitucionalPanel extends Component
         }
         $this->archivos = $fallidas;
         $this->mensaje = $guardadas.' guardadas · '.$existentes.' ya existentes · '.count($fallidas).' pendientes de guardar.';
-        if (! $fallidas) $this->cerrar();
+        if (! $fallidas) {
+            $this->cerrar();
+        }
         $this->resetPage();
     }
 
     public function cambiarEstado(string $codigo, string $estado, GestionarFotografiasInstitucionales $accion): void
     {
         $this->autorizar(true);
-        try { $accion->estado($this->actor(), $codigo, $estado); }
-        catch (ValidationException $error) { throw $error; }
-        catch (\Throwable $error) { report($error); $this->addError('guardado', 'No se pudo cambiar el estado. Vuelve a intentar.'); return; }
+        try {
+            $accion->estado($this->actor(), $codigo, $estado);
+        } catch (ValidationException|HttpException $error) {
+            throw $error;
+        } catch (\Throwable $error) {
+            report($error);
+            $this->addError('guardado', 'No se pudo cambiar el estado. Vuelve a intentar.');
+
+            return;
+        }
         $this->mensaje = $estado === 'ARCHIVADA' ? 'Fotografía archivada; su archivo se conserva.' : 'Fotografía reactivada.';
         $this->resetPage();
     }
@@ -153,6 +197,7 @@ class GaleriaInstitucionalPanel extends Component
             ->when(trim($this->busqueda) !== '', fn ($query) => $query->where(function ($query) {
                 $query->where('titulo', 'like', '%'.trim($this->busqueda).'%')->orWhere('descripcion', 'like', '%'.trim($this->busqueda).'%');
             }))->orderByDesc('fecha_registro')->orderByDesc('cod_fotografia')->paginate(12);
+
         return view('institucion::livewire.galeria-institucional-panel', ['fotografias' => $fotos,
             'puedeGestionar' => app(FotografiaInstitucionalPolicy::class)->manage($this->actor())])->layout('layouts.sistema');
     }

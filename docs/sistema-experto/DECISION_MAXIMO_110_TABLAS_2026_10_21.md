@@ -2,6 +2,8 @@
 
 **Fecha:** 21/10/2026. **Estado:** decisión explícita de la propietaria sobre el límite máximo, no aprobación de DDL.
 
+> Aclaración de inventario del 25/10: el presupuesto de seis relaciones de esta decisión se calculó al inicio sobre 104 tablas. La [consolidación aprobada del 22/10](../base-de-datos/DECISION_CONSOLIDACION_BLOQUES_EXPERTOS_2026_10_22.md) dejó 100 instaladas. Se conserva el máximo de 110 y el alcance original de la decisión; no se aprueban nuevas relaciones por diferencia aritmética.
+
 La propietaria sustituyó el [máximo anterior de 104 tablas](DECISION_MAXIMO_104_TABLAS_2026_10_20.md) por un máximo de **110 tablas de negocio**. El inventario instalado comprobado en `remembermind_dev` al iniciar este trabajo sigue siendo **75 operativas + 29 expertas = 104 tablas de negocio**, además de **16 técnicas** de Laravel y paquetes: 120 tablas físicas. Por tanto existe capacidad numérica para **hasta seis relaciones de negocio adicionales**. No hay obligación de crearlas.
 
 Esta decisión autoriza estudiar y proponer un diseño dentro de 110. **No aprueba** nombres, tablas, columnas, FK, índices, checks, triggers, cambios de cardinalidad, consolidaciones, retiros, migraciones, permisos nuevos ni activación clínica. Cada modificación del esquema congelado requiere una propuesta nominal, un ensayo relacional en bases desechables y autorización estructural específica conforme a `database/AGENTS.md`.

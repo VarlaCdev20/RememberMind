@@ -2,65 +2,103 @@
 
 namespace App\Modulos\Institucion\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\CodigosEntidad;
 use App\Models\Area;
 use App\Models\User;
+use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 final class GestionarAreasInstitucionales
 {
     public function guardarArea(User $actor, array $entrada): string
     {
-        abort_unless(strtoupper((string) $actor->estado) === 'ACTIVO' && $actor->can($entrada['isEdit'] ? 'areas.editar' : 'areas.crear'), 403);
-        Validator::make($entrada, ['nombre' => 'required|string|max:80|unique:areas,nombre,'.($entrada['areaId'] ?? 'NULL').',cod_area', 'descripcion' => 'nullable|string', 'estado' => 'required|in:ACTIVO,INACTIVO'])->validate();
+        $actor = $this->autorizar($actor, ! empty($entrada['isEdit']) ? 'areas.editar' : 'areas.crear');
+        $area = ! empty($entrada['isEdit']) ? Area::findOrFail($entrada['areaId'] ?? '') : null;
+        $entrada['nombre'] = mb_strtoupper(trim((string) ($entrada['nombre'] ?? '')), 'UTF-8');
+        Validator::make($entrada, ['nombre' => ['required', 'string', 'max:80', Rule::unique('areas', 'nombre')->ignore($area?->getKey(), 'cod_area')], 'descripcion' => 'nullable|string', 'estado' => 'required|in:ACTIVO,INACTIVO'])->validate();
         $datos = [
             'nombre' => mb_strtoupper(trim($entrada['nombre']), 'UTF-8'),
-            'descripcion' => $entrada['descripcion'] ?: null,
+            'descripcion' => ($entrada['descripcion'] ?? '') ?: null,
             'estado' => $entrada['estado'],
         ];
 
-        if ($entrada['isEdit']) {
-            $area = Area::findOrFail($entrada['areaId']);
-            $area->update($datos);
+        return DB::transaction(function () use ($actor, $datos, $area) {
+            if ($area) {
+                $area = Area::query()->lockForUpdate()->findOrFail($area->getKey());
+                if ($actor->hasRole('GERENTE') && ! $actor->hasRole('SUPERADMINISTRADOR')) {
+                    // La edición gerencial no ejecuta una transición de estado oculta.
+                    $datos['estado'] = $area->estado;
+                }
+                if ($datos['estado'] === 'INACTIVO' && in_array($area->estado, ['ACTIVO', 'ACTIVA'], true)) {
+                    $this->exigirSinCompromisos($area);
+                }
+                $area->update($datos);
 
-            // Log de actividad
-            activity('AreasInstitucionales')
-                ->performedOn($area)
-                ->causedBy($actor)
-                ->log("El usuario editó el área institucional {$area->nombre}.");
+                // Log de actividad
+                activity('AreasInstitucionales')
+                    ->performedOn($area)
+                    ->causedBy($actor)
+                    ->log("El usuario editó el área institucional {$area->nombre}.");
 
-            $mensaje = 'Área institucional actualizada correctamente.';
-        } else {
-            $area = Area::create($datos + [
-                'cod_area' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('areas'),
-            ]);
+                $mensaje = 'Área institucional actualizada correctamente.';
+            } else {
+                $area = Area::create($datos + [
+                    'cod_area' => app(CodigosEntidad::class)->siguiente('areas'),
+                ]);
 
-            // Log de actividad
-            activity('AreasInstitucionales')
-                ->performedOn($area)
-                ->causedBy($actor)
-                ->log("El usuario creó la área institucional {$area->nombre}.");
+                // Log de actividad
+                activity('AreasInstitucionales')
+                    ->performedOn($area)
+                    ->causedBy($actor)
+                    ->log("El usuario creó la área institucional {$area->nombre}.");
 
-            $mensaje = 'Área institucional registrada correctamente.';
-        }
+                $mensaje = 'Área institucional registrada correctamente.';
+            }
 
-        return $mensaje;
+            return $mensaje;
+        });
     }
 
     public function toggleEstado(User $actor, string $codArea): array
     {
-        abort_unless(strtoupper((string) $actor->estado) === 'ACTIVO' && $actor->can('areas.cambiar_estado'), 403);
-        $area = Area::findOrFail($codArea);
-        $nuevoEstado = in_array($area->estado, ['ACTIVO', 'ACTIVA'], true) ? 'INACTIVO' : 'ACTIVO';
-        $area->estado = $nuevoEstado;
-        $area->save();
+        $actor = $this->autorizar($actor, 'areas.cambiar_estado');
 
-        // Registrar acción en log
-        activity('AreasInstitucionales')
-            ->performedOn($area)
-            ->causedBy($actor)
-            ->log("Se cambió el estado del área {$area->nombre} a {$nuevoEstado}.");
+        return DB::transaction(function () use ($actor, $codArea) {
+            $area = Area::query()->lockForUpdate()->findOrFail($codArea);
+            $nuevoEstado = in_array($area->estado, ['ACTIVO', 'ACTIVA'], true) ? 'INACTIVO' : 'ACTIVO';
+            if ($nuevoEstado === 'INACTIVO') {
+                $this->exigirSinCompromisos($area);
+            }
+            $area->estado = $nuevoEstado;
+            $area->save();
 
-        return [$area, $nuevoEstado];
+            // Registrar acción en log
+            activity('AreasInstitucionales')
+                ->performedOn($area)
+                ->causedBy($actor)
+                ->log("Se cambió el estado del área {$area->nombre} a {$nuevoEstado}.");
+
+            return [$area, $nuevoEstado];
+        });
+    }
+
+    private function autorizar(User $actor, string $permiso): User
+    {
+        $actor = User::findOrFail($actor->getKey());
+        abort_unless($actor->estado === 'ACTIVO' && ! $actor->hasRole('FAMILIAR') && $actor->can($permiso), 403);
+        abort_if(app(RolePreviewService::class)->isActive($actor), 403);
+
+        return $actor;
+    }
+
+    private function exigirSinCompromisos(Area $area): void
+    {
+        if ($area->asignaciones()->whereIn('estado', ['ACTIVO', 'ACTIVA'])->exists()
+            || $area->planesCuidado()->whereIn('estado', ['ACTIVO', 'ACTIVA', 'VIGENTE', 'ABIERTO', 'EN_CURSO'])->exists()) {
+            throw ValidationException::withMessages(['estado' => 'Antes de desactivar el área, traslada o cierra sus asignaciones y planes activos. No se modificó ningún compromiso.']);
+        }
     }
 }

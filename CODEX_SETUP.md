@@ -2,7 +2,7 @@
 title: "Codex en RememberMind"
 status: CURRENT
 version: "1.0"
-last_reviewed: 2026-10-10
+last_reviewed: 2026-10-25
 owner: RememberMind
 source_of_truth: false
 verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
@@ -15,7 +15,7 @@ related_modules: []
 
 # Codex en RememberMind
 
-Entrada documental: [docs/README](docs/README.md). Instrucciones por alcance y skills locales en .agents/skills; inventario/selección actuales en [stack sistema](docs/sistema/STACK_SKILLS_SISTEMA.md) y [stack UX](docs/frontend/STACK_SKILLS_UX_UI.md). No limitar el catálogo al pack original de cinco entradas.
+Entrada documental: [docs/README](docs/README.md) y [responsabilidades de los doce módulos](docs/modulos/README.md). Instrucciones por alcance y skills locales en .agents/skills; inventario/selección en [stack sistema](docs/sistema/STACK_SKILLS_SISTEMA.md) y [stack UX](docs/frontend/STACK_SKILLS_UX_UI.md). Los conteos de entregas anteriores describen su corte; no limitan el catálogo actual.
 
 ## Autoridad y estructura
 
@@ -55,4 +55,4 @@ Datos sintéticos; no reset de DB desconocida ni uso de datos clínicos reales p
 
 ## Historia
 
-El pack inicial estaba preparado para REFAC_BDD y V2.0. Sus conteos/ejemplos son antecedentes; [historia](docs/README.md#documentación-histórica) no gobierna cambios nuevos.
+El pack inicial estaba preparado para REFAC_BDD y V2.0. Sus conteos/ejemplos son antecedentes; el [archivo histórico](docs/historico/README.md) no gobierna cambios nuevos. Las restricciones de una fase anterior no bloquean implementación ya autorizada; la aprobación estructural y clínica mantiene su alcance específico.

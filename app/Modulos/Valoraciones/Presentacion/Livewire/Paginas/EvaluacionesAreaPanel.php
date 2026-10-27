@@ -6,14 +6,10 @@ use App\Models\AplicacionInstrumento;
 use App\Models\Residente;
 use App\Models\User;
 use App\Models\ValoracionPetersenOriginal;
-<<<<<<< HEAD
-use App\Modulos\Valoraciones\Aplicacion\Consultas\InstrumentosDelArea;
-=======
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Valoraciones\Aplicacion\Consultas\ExploradorInstrumentos;
 use App\Modulos\Valoraciones\Aplicacion\Consultas\InstrumentosDelArea;
 use App\Modulos\Valoraciones\Aplicacion\Consultas\PrepararCapturaInstrumental;
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -165,10 +161,6 @@ class EvaluacionesAreaPanel extends Component
     public function render()
     {
         $usuario = $this->autorizar();
-<<<<<<< HEAD
-        $query = AplicacionInstrumento::with(['adulto', 'instrumento', 'evaluador.usuario'])
-            ->whereIn('cod_instrumento', $this->instrumentosCodes);
-=======
         $this->instrumentosCodes = app(InstrumentosDelArea::class)->catalogados($this->codArea)->pluck('cod_instrumento')->all();
         $residentesPermitidos = app(TurnoEnfermeriaService::class)->obtenerPacientesAsignadosQuery($usuario);
         if (! Gate::forUser($usuario)->allows('viewAny', Residente::class)) {
@@ -177,7 +169,6 @@ class EvaluacionesAreaPanel extends Component
         $base = AplicacionInstrumento::query()->whereIn('cod_instrumento', $this->instrumentosCodes)
             ->whereIn('cod_residente', (clone $residentesPermitidos)->select('cod_residente'));
         $query = (clone $base)->with(['adulto', 'instrumento', 'evaluador']);
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 
         if ($this->busqueda) {
             $busq = $this->busqueda;
@@ -259,11 +250,7 @@ class EvaluacionesAreaPanel extends Component
             'totalEvaluaciones',
             'alertasCriticas',
             'pacientesCubiertos',
-<<<<<<< HEAD
-            'residentesValoracion'
-=======
             'residentesValoracion', 'tarjetas', 'todasTarjetas', 'puedeCapturar', 'tiposExplorador', 'modalidadesExplorador', 'residentesContinuidad'
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         ))->layout('layouts.sistema');
     }
 

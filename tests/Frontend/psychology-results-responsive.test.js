@@ -47,7 +47,6 @@ test('resultado de Psicología conserva contenido y controles sin desbordar en s
         await browser.close();
     }
 });
-<<<<<<< HEAD
 
 test('la composición compartida conserva tres columnas en escritorio y una en móvil para Enfermería', { skip: !executablePath }, async () => {
     const browser = await puppeteer.launch({ headless: true, executablePath });
@@ -86,5 +85,3 @@ test('el perfil multidominio de Enfermería distribuye gráfica y criterios sin 
         await browser.close();
     }
 });
-=======
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo

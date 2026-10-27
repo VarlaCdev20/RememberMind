@@ -108,15 +108,15 @@ Ubicación alimenta directorio/ficha; lectura debe respetar ámbito y contenido.
 
 ## 22. Entrada UI
 
-[resources/views/livewire/admisiones/habitaciones-panel.blade.php](../../../resources/views/livewire/admisiones/habitaciones-panel.blade.php)
+[resources/views/livewire/admisiones/habitaciones-panel.blade.php](../../../app/Modulos/Institucion/Presentacion/Vistas/livewire/admisiones/habitaciones-panel.blade.php)
 
 ## 23. Livewire / Controllers
 
-[app/Frontend/Livewire/Admisiones/HabitacionesPanel.php](../../../app/Frontend/Livewire/Admisiones/HabitacionesPanel.php), [app/Frontend/Livewire/Compartido/Residentes/AdultosMayoresPanel.php](../../../app/Frontend/Livewire/Compartido/Residentes/AdultosMayoresPanel.php), [app/Http/Controllers/Residentes/ResidenteController.php](../../../app/Http/Controllers/Residentes/ResidenteController.php)
+[app/Frontend/Livewire/Admisiones/HabitacionesPanel.php](../../../app/Modulos/Institucion/Presentacion/Livewire/Paginas/HabitacionesPanel.php), [app/Frontend/Livewire/Compartido/Residentes/AdultosMayoresPanel.php](../../../app/Modulos/Residentes/Presentacion/Livewire/Paginas/AdultosMayoresPanel.php), [app/Http/Controllers/Residentes/ResidenteController.php](../../../app/Modulos/Residentes/Presentacion/Http/Controllers/ResidenteController.php)
 
 ## 24. Actions
 
-[app/Backend/Modulos/Admisiones/Acciones/FormalizarAdmision.php](../../../app/Backend/Modulos/Admisiones/Acciones/FormalizarAdmision.php)
+[app/Backend/Modulos/Admisiones/Acciones/FormalizarAdmision.php](../../../app/Modulos/Admisiones/Aplicacion/Acciones/FormalizarAdmision.php)
 
 ## 25. Services
 
@@ -124,7 +124,7 @@ NONE OBSERVED en el recorrido investigado; no se exige una clase vacía por sime
 
 ## 26. Policies
 
-[app/Policies/ResidentePolicy.php](../../../app/Policies/ResidentePolicy.php)
+[app/Policies/ResidentePolicy.php](../../../app/Modulos/Residentes/Presentacion/Policies/ResidentePolicy.php)
 
 ## 27. Models
 

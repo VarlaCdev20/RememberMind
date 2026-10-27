@@ -1,102 +1,56 @@
+---
+title: "Sistema experto: fuentes, funcionamiento y límites"
+status: CURRENT
+version: "2.0"
+last_reviewed: 2026-10-25
+owner: RememberMind
+source_of_truth: false
+source_of_truth_scope: [expert_contract_routing]
+verified_against_commit: 6d7b8c6d6bc03eecd2ee35add04677f2778272cd
+verification_scope: DOCUMENTATION_RECONCILIATION_WITH_LOCAL_AUDIT
+runtime_verified: false
+---
+
 # Consulta cognitiva y sistema experto
 
-- [Nombres de la cohorte y preservación de resultados, 22/10/2026](../auditorias/cohorte-nombres-2026-10-22/README.md): treinta nombres ficticios naturales en la aplicación, pertenencia independiente del nombre visible, búsqueda del lote conservada y recálculo sin discrepancias.
-- [Cohorte visible en la aplicación local, 22/10/2026](COHORTE_VISIBLE_APLICACION_2026_10_22.md): carga optativa de los 30 residentes de entrenamiento en la base local por nueva autorización de la propietaria, con respaldo, preservación de datos anteriores, bindings SQL por petición y acceso desde las vistas existentes.
-- [Seeder cognitivo investigado y retroalimentación, 22/10/2026](COHORTE_INVESTIGACION_SEEDER_2026_10_22.md): cohorte optativa de 30 residentes sintéticos, siete referencias primarias verificadas, matriz y comparación de resultados por caso; reutiliza el motor y la carga existentes, sin introducir datos generados en expedientes reales.
-- [Cohorte de 30 casos e inventario del piloto, 22/10/2026](COHORTE_INFERENCIA_30_Y_PILOTO_2026_10_22.md): carga aislada con admisiones, fuentes SQL, 12 perfiles orientativos en cuatro categorías y 18 contrastes; ambas ramas, replay y pruebas SQLite/PostgreSQL. Auditoría privada del expediente existente sin convertir observaciones en mediciones. Guardado conjunto pendiente por decisión de alcance.
-- [Membresías históricas SQL, 22/10/2026](MEMBRESIAS_HISTORICAS_SQL_2026_10_22.md): adquisición V2 de vínculos originales y submodelo de dos tablas probado en SQLite/PostgreSQL, con cierre concurrente y FK terminales. No instalado ni suficiente todavía para conservar el DTO conjunto bajo 110.
-- [Referencia SQL completa, 22/10/2026](RECUPERACION_SQL_COMPLETA_REFERENCIA_2026_10_22.md): escritor/lector del DTO completo del corpus, salidas/trazas/membresías y replay separados; lectura PostgreSQL en otro proceso con inferencia bloqueada. **No instalable**: excede110 y no cierra todas las FK históricas. El modelo institucional sigue pendiente.
-- [Lectura íntegra y replay separados, 22/10/2026](CONSERVACION_LECTURA_Y_REPLAY_2026_10_22.md): API del motor comprobada sin ejecutar inferencia al leer; 52 pruebas unitarias y 57 en PostgreSQL. Inventario reproducible de las salidas que faltaban en el mapa de entradas. **La conservación SQL compuesta sigue pendiente**, con 100 tablas instaladas y máximo 110.
-- [Refactorización instalada, 22/10/2026](CIERRE_REFACTOR_BLOQUES_2026_10_22.md): cuatro consolidaciones singulares, **104 → 100 tablas de negocio**, 257 filas preservadas, siete FK trasladadas y escritores/lectores reales integrados. [Decisión y diccionario físico](../base-de-datos/DECISION_CONSOLIDACION_BLOQUES_EXPERTOS_2026_10_22.md). La conservación compuesta completa sigue pendiente.
-- [Análisis previo de reducción mantenible, 22/10/2026](ANALISIS_REFACTOR_REDUCCION_MANTENIBLE_2026_10_22.md): fundamento de las cuatro consolidaciones adoptadas; la quinta unión opcional no se implementó.
-- [Ensayo nominal de conservación, 22/10/2026](ENSAYO_NOMINAL_CONSERVACION_2026_10_22.md): escritor/lector SQL de entradas, replay de ambas ramas, diccionario y cobertura de las 783 rutas; pruebas desechables de concurrencia y reversión. El candidato daría 138 tablas y mantiene brechas semánticas y de lectura directa; no es instalable bajo el máximo 110.
-- [Evidencia bibliográfica y aceptación técnica, 22/10/2026](EVIDENCIA_BIBLIOGRAFICA_Y_ACEPTACION_TECNICA_2026_10_22.md): fuentes oficiales verificadas y distinción entre desarrollo, aceptación técnica y validación clínica; recorrido observacional conservado y revisiones independientes.
-- [Ejecución compuesta integrada, 22/10/2026](EJECUCION_COMPUESTA_INTEGRADA_2026_10_22.md): análisis desde el DTO común, captura compartida, tratamiento de errores y cabeceras fieles al resultado; pruebas SQLite/PostgreSQL y límites de conservación pendientes.
-- [Punto 1: evidencia cognitiva original, 21/10/2026](PUNTO_1_EVIDENCIA_COGNITIVA_ORIGINAL_2026_10_21.md): captura por tarea, vínculo exacto, pruebas, ficha para Psicología y límites de cierre clínico.
-- [Máximo actual de 110 tablas, 21/10](DECISION_MAXIMO_110_TABLAS_2026_10_21.md): sustituye el límite de 104 como capacidad de diseño. El esquema instalado está en 100 desde la consolidación específicamente aprobada el 22/10; el límite no autoriza otros DDL por sí solo.
-- [Gate de conservación institucional bajo 110, 21/10](DICTAMEN_CONSERVACION_INSTITUCIONAL_110_2026_10_21.md): inventario, 39 modelos/51 rutas/783 campos, ensayos desechables y brechas que impiden proponer DDL exacta todavía.
-- [Aceptación integral, 21/10](ACEPTACION_INTEGRAL_ORION_2026_10_21.md): distingue lo implementado y probado, lo pendiente de conservación relacional y lo pendiente de validación clínica. La preparación `EVALUACION-INSTITUCIONAL-1` conserva `persistido=false` hasta superar el gate de ida y vuelta bajo el esquema autorizado.
+## Recorrido vigente
 
-Índice actualizado el 22/10/2026 para la arquitectura híbrida y el inventario vigente.
-La documentación no autoriza inferencia clínica, nuevas reglas ni cambios estructurales concretos.
+Fuentes originales autorizadas → adaptadores de ApoyoDecision → motor simbólico PHP → cinco dominios/19 componentes → perfil orientativo Petersen o abstención → explicación. La rama observacional tiene conservación y revisión posterior comprobadas. **La conservación institucional conjunta instrumental/Petersen sigue pendiente.**
 
-- [Máximo histórico de 104 tablas, 20/10](DECISION_MAXIMO_104_TABLAS_2026_10_20.md): sustituyó el máximo previo de 100 y fue reemplazado el 21/10 por el de 110; la auditoría de tres brechas del candidato de conservación compuesta permanece vigente como evidencia técnica.
-- [Ensayo de cinco relaciones bajo 104, 21/10](ENSAYO_CINCO_RELACIONES_104_2026_10_21.md): prototipos aislados para las tres brechas restantes, presupuesto de tablas y pruebas aún necesarias antes de proponer DDL; no instalado.
-- [Dictamen de factibilidad de conservación bajo 104, 21/10](DICTAMEN_FACTIBILIDAD_CONSERVACION_104_2026_10_21.md): ensayo completo en PostgreSQL del esquema amplio, conflictos concretos del mapa reducido y condiciones faltantes antes de cualquier aprobación estructural.
+La implementación usa `motor-experto/` y `app/Modulos/ApoyoDecision/`; no existe un segundo motor que deba reconstruirse. [Estado actual](../ESTADO_ACTUAL.md) y [auditoría del 25/10](../auditorias/2026-10-25/INFORME_AUDITORIA_INTEGRAL.md) delimitan los defectos abiertos.
 
-- [Aporte interdisciplinario general, 20/10](APORTE_INTERDISCIPLINARIO_GENERAL_2026_10_20.md): selección instrumental candidata y contratos de revisión para Psicología, Medicina, Enfermería y funcionalidad, cotejados con las fuentes reales de la instalación; sin atribuir aplicaciones, firmas o aprobaciones inexistentes.
-- [Reutilización y reducción, 20/10](REUTILIZACION_Y_REDUCCION_EXPERTA_2026_10_20.md): instrucción de reducir manteniendo recálculo íntegro. Las 25 tablas anteriores fueron rechazadas y nunca creadas. Las [cuatro consolidaciones de aquel corte](PROPUESTA_REDUCCION_CUATRO_TABLAS_2026_10_20.md) dejaron **104 tablas de negocio**; [pruebas y comparación local](../base-de-datos/DECISION_REDUCCION_EXPERTA_2026_10_20.md). Las cuatro adicionales del 22/10 dejaron el inventario actual en 100. El guardado del recálculo institucional íntegro sigue pendiente.
-- [Análisis histórico del límite de 100 tablas, 20/10](DICTAMEN_LIMITE_100_TABLAS_2026_10_20.md): ensayos preliminares de consolidación y rechazo del candidato de 15 tablas. Su límite fue sustituido primero por 104 y luego por el máximo actual de 110; sus conclusiones se leen con el alcance y fecha de ese ensayo.
-- [Matriz maestra de inferencia, 20/10](FASE_2_MATRIZ_MAESTRA_INFERENCIA_2026_10_20.md): cinco criterios, 19 componentes, 17 reglas existentes, antecedentes C1–C3, abstenciones, traza, Petersen y límites de señales de riesgo.
-- [Fase 6: preparación compuesta y reproducción, 20/10](FASE_6_PREPARACION_COMPUESTA_2026_10_20.md): captura V3 compartida con Petersen, procedencia y constancias documentales, replay de ambas ramas y vínculo verificable al ejecutor. Guardado/recuperación pendientes del diseño reducido.
-- [Gobierno Petersen y QA de captura, 20/10](GOBIERNO_PETERSEN_Y_QA_CAPTURA_2026_10_20.md): cuatro patrones en familia SQL separada, revisión/archivo/sucesión, Policy IADL y confirmación accesible; conservación íntegra y revisión del resultado aún pendientes.
-- [Petersen institucional: captura original y reproducción instrumental V3, 19/10](FASE_5_CAPTURA_PETERSEN_Y_REPRODUCCION_2026_10_19.md): contrato E–H adoptado, dos tablas/tres permisos aprobados, cuatro patrones desde originales, rectificación y anulación sin sobrescritura; lectura IADL y gobierno incorporados en incrementos posteriores.
-- [Fase 4: base registrada y recorrido verificado en interfaz, 19/10](FASE_4_REGISTRO_Y_VERIFICACION_UI_2026_10_19.md): registro desde Psicología, 17 reglas activas con revisión pendiente, consulta de los 19 componentes, prueba de condiciones y corrección visual de selectores; QA acotado con evidencia de cinco tamaños.
-- [Fase 4: contrato institucional A–D integrado, 19/10](FASE_4_CONTRATO_AD_INTEGRADO_2026_10_19.md): adopción explícita, paquete independiente de las fixtures, observaciones de 19 componentes, quince G09 y Memoria con compuertas, gobierno, episodios y replay V1/V2. Distingue registro en la instalación, QA visual y dependencias de las fases 5/6.
-- [Fase 4: puente nominal y sucesión, 19/10](FASE_4_PUENTE_NOMINAL_Y_SUCESION_2026_10_19.md): corte previo de parejas opción/texto, trazas observacionales y vínculos traducidos entre revisiones, con archivo y replay; ampliado posteriormente por el contrato A–D.
-- [Cierre de fuentes observacionales de fase 2, 19/10](DICTAMEN_CIERRE_FASE_2_2026_10_19.md): aclaración de la propietaria, investigación primaria, conciliación de 648 filas con sus fuentes y auditorías, lector sin exigencia de normalización y corrección de atribución instrumental. QA visual aún pendiente.
-- [Comprobación automática de adquisición y métricas 60+, 19/10](FASE_2_COMPROBACION_ADQUISICION_2026_10_19.md): cotejo agregado de las fuentes aportadas, faltantes por aplicación, identidad, procedencia y completitud; [diccionario exacto de 23 métodos / 19 componentes](DICCIONARIO_ADQUISICION_23_METODOS_2026_10_19.md).
-- [Fase 2: fuentes originales e investigación profesional](ORION_FUENTES_ORIGINALES_E_INVESTIGACION_2026_10_19.md): identidad de los métodos, campos originales, conciliación y límites de reconstrucción histórica; [ampliación aprobada](PROPUESTA_FUENTES_ORIGINALES_FASE_2_2026_10_19.md) y [acta, pruebas y pendientes](FASE_2_FUENTES_ORIGINALES_2026_10_19.md).
-- [Integración versionada del laboratorio, 19/10](INTEGRACION_LABORATORIO_2026_10_19.md): dependencias incorporadas como conjunto, candidato limpio, corrección de contexto G09 y evidencia por motor; conserva el alcance técnico y los pendientes institucionales.
-- [Matriz única de consolidación](CONSOLIDACION_PUNTO_1_2026_10_19.md) y [plan por fases](PLAN_CIERRE_INTEGRAL_2026_10_19.md).
-- [Investigación profesional de los 19 componentes, 19/10](INVESTIGACION_PROFESIONAL_19_COMPONENTES_2026_10_19.md): utilidad, uso, motivo, cálculo, interpretación, fuentes y brechas; [objetivo activo y pruebas de fase 3](FASE_3_COMPONENTES_2026_10_19.md).
-- [Cierre técnico de fase 3: 19 componentes, 19/10](CIERRE_TECNICO_FASE_3_2026_10_19.md): matriz completa, SCAND y TB-A, fuentes, utilidad, uso, interpretación, contratos y pruebas en SQLite/PostgreSQL. Cálculo/documentación cerrados bajo condiciones; adopción institucional y validación clínica pendientes.
-- [Manual técnico investigado para mayores de 60, 19/10](MANUAL_INVESTIGADO_MAYORES_60_2026_10_19.md): fuentes completas y manuales localizados, edades/escolaridad, fórmulas, conflictos, huellas y enlaces al cierre técnico.
-- [Red semántica y reglas, fase 4](FASE_4_RED_Y_REGLAS_2026_10_19.md) y [fuentes/métricas 60+](FASE_4_FUENTES_Y_METRICAS_60_MAS_2026_10_19.md).
-- [Cierre de trazabilidad y reproducción, 19/10](CIERRE_TRAZABILIDAD_Y_REPRODUCCION_2026_10_19.md): fuentes oficiales contrastadas, dos defectos corregidos, revisión independiente, DTO canónico y artefacto recuperable del motor; vinculación institucional y guardado relacional pendientes.
-- [Normalizaciones españolas de referencia, 19/10](NORMALIZACIONES_REFERENCIA_2026_10_19.md): cinco ecuaciones, seis perfiles y su corte de verificación.
-- [Cinco referencias geriátricas adicionales, 19/10](REFERENCIAS_GERIATRICAS_ADICIONALES_2026_10_19.md): reconocimiento CERAD, Raven A, cancelación A, TOL-F y Token; utilidad, uso, datos originales, calidad y límites de fuentes, contratos y pruebas. Corte anterior de 16 componentes, ampliado a 19 en el cierre técnico.
+## Contratos y decisiones aplicables
 
-- [Cierre operativo 1–8](CIERRE_OPERATIVO_1_A_8_2026_10_18.md): alcance vigente, revisión profesional posterior y checklist por evidencia.
-- [Gobierno de reglas aprobado](PROPUESTA_GOBIERNO_REGLAS_2026_10_18.md): cinco columnas, 4FN, Medicina/Psicología y consulta de Superadministración; sin nuevas tablas.
-- [Ejecución observacional versionada](CONTRATO_OBSERVACIONAL_VERSIONADO_2026_10_18.md): sucesoras SQL, captura compartida, selección histórica de reglas y preservación de SNAP-1, sin tablas nuevas ni interpretación instrumental.
-- [Informe instrumental y normalización](INFORME_INSTRUMENTAL_Y_NORMALIZACION_2026_10_18.md): matriz de 19 componentes, 25 referencias y dos regresiones bolivianas HVLT-R implementadas con controles de aplicabilidad; sin atribuir mediciones inexistentes.
+| Alcance | Fuente |
+|---|---|
+| Institucional A–D / reglas G09 | [Contenido adoptado](PROPUESTA_CONTRATO_INSTITUCIONAL_FASE_4_2026_10_19.md) |
+| Petersen E–H | [Adopción institucional](PROPUESTA_PETERSEN_INSTITUCIONAL_FASE_5_2026_10_19.md) |
+| Requisitos C01–C05 y cinco dominios | [Contrato funcional exacto](CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md) |
+| Captura Petersen y soportes | [Estructura y permisos aprobados](PROPUESTA_CAPTURA_PETERSEN_ORIGINAL_2026_10_19.md) |
+| Procedencia instrumental | [Extensión aprobada de fuentes](PROPUESTA_FUENTES_ORIGINALES_FASE_2_2026_10_19.md) |
+| Gobierno y sustitución de reglas | [Decisión aprobada](PROPUESTA_GOBIERNO_REGLAS_2026_10_18.md) |
+| Informe y evidencias | [Contrato del informe](CONTRATO_INFORME_COGNITIVO.md) y [fuentes y límites](EVIDENCIAS_COGNITIVAS.md) |
+| Inventario y consolidaciones instaladas | [100 tablas de negocio + 16 técnicas](../base-de-datos/README.md) |
+| Revisión posterior independiente | [Decisión de revisiones](../base-de-datos/DECISION_REVISIONES_EXPERTAS_2026_10_17.md) |
 
-- [Fase 01: memoria de alcance, entregables y checklist](PROMPT_MAESTRO_01_CHECKLIST_2026_10_18.md): prototipo técnico verificado, 53 comprobaciones cerradas y conservación institucional reservada; alternativa experimental del §14 implementada.
-- [Fase 01: auditoría y evidencia](FASE01_AUDITORIA_Y_EVIDENCIA_2026_10_18.md): referencia inicial, fuentes, brechas, reutilización y pruebas.
-- [Fase 01: manual y trazabilidad](FASE01_MANUAL_Y_TRAZABILIDAD_2026_10_18.md): laboratorio de cinco dominios, gestión declarativa de pruebas, diagrama y límites de persistencia/gobierno.
-- [Fase 01: catálogo de fuentes y hechos](FASE01_CATALOGO_FUENTES_Y_HECHOS_2026_10_18.md): extractores reutilizables, contrato de salida, cobertura por fuente y límites de interpretación.
-- [Fase 01: catálogo de reglas y controles](FASE01_CATALOGO_REGLAS_2026_10_18.md): quince reglas G09, Memoria, red conceptual y admisibilidad A01–A14.
-- [Fase 01: aceptación A–M y 24 grupos de prueba](FASE01_ACEPTACION_INTEGRAL_2026_10_18.md): recorrido SQL/reglas/perfil/archivo/historia, trazabilidad y restricciones.
-- [Fase 01: cotejo documental y VT01–VT15](FASE01_COTEJO_DOCUMENTAL_Y_VT_2026_10_18.md): acceso resuelto, contratos G06–G13, correcciones y matriz ejecutada de las quince reglas.
-- [RFC de conservación del perfil experimental](RFC_CONSERVACION_PERFIL_EXPERIMENTAL_2026_10_18.md): alternativas y diccionario candidato del manifiesto; pendiente de decisión, sin migración aplicada.
-- [Prompt Maestro 01 completo](PROMPT_MAESTRO_01_FUENTE_2026_10_18.md): fuente conservada sin modificación, para el prototipo integral con datos sintéticos.
+El nombre PROPUESTA de un documento no invalida una adopción posterior escrita en él. La adopción tiene alcance concreto; no concede una firma profesional, mediciones originales ni aprobación de DDL adicional.
 
-- [Formalización funcional incremental v0.1](FORMALIZACION_FUNCIONAL_V0_1_2026_10_17.md): registro del primer corte de lectura; su situación inicial de conservación fue sustituida por la decisión aprobada posterior.
-- [Conservación observacional V1](PROPUESTA_CONSERVACION_OBSERVACIONAL_V1.md): dos FK aprobadas el 18/10/2026, implementadas y aplicadas en desarrollo; sin tablas nuevas ni borrado de historia.
-- [Investigación de recurrencia](INVESTIGACION_RECURRENCIA_OBSERVACIONAL_2026_10_18.md): fuentes y parámetros descriptivos propuestos, sin activación de reglas.
+## Comportamiento y límites que deben preservarse
 
-- [Interfaz médica y de Enfermería](INTERFAZ_MEDICA_RESULTADOS.md): ficha, acceso,
-  resultados conservados, publicación y procedencia de la documentación recuperada.
-- [Evidencias cognitivas](EVIDENCIAS_COGNITIVAS.md): observaciones operativas,
-  interpretación instrumental, resultados expertos y límites de cada estado.
-- [Contrato del informe cognitivo](CONTRATO_INFORME_COGNITIVO.md): resultados médicos,
-  estados experimentales segregados y responsabilidades de Application/Presentation.
-- [Entrega de Fase 4](../frontend/FASE_4_INFORME_COGNITIVO.md): rediseño de la misma pantalla y evidencia de pruebas.
-- [Entrega de Fase 3](../frontend/FASE_3_RESUMEN_COGNITIVO.md): archivos, mensajes,
-  pruebas, QA y pendientes.
-- [Motor técnico independiente](../../motor-experto/README.md).
-- [Rediseño del informe neurocognitivo](REDISENO_INFORME_NEUROCOGNITIVO_2026_10_17.md): conclusión, fundamento, faltantes, autonomía y revisión en lenguaje natural; auditoría restringida.
-- [Consulta operativa sin simulaciones](CONSULTA_OPERATIVA_SIN_SIMULACIONES_2026_10_17.md): aislamiento de las pruebas respecto a la pantalla normal y al historial del residente.
-- [Revisión profesional aprobada](../base-de-datos/DECISION_REVISIONES_EXPERTAS_2026_10_17.md): firmas separadas de Psicología y Medicina, sin sobrescritura.
-- [Matriz de interpretación operativa](MATRIZ_INTERPRETACION_OPERATIVA_PARA_REVISION.md): propuesta anterior de mapeos. El cierre 1–8 recoge la decisión vigente de desarrollar el cálculo y registrar después la revisión profesional; los métodos y datos originales siguen siendo necesarios.
-- [Arquitectura vigente](../arquitectura/README.md).
+- Cada dominio mantiene evaluabilidad independiente; A/P requieren sustento. NULL, negación, ausencia y contradicción no se convierten en normalidad.
+- C1 ∧ C2 ∧ C3 de G09 pertenecen a la misma aplicación. Observación nominal no equivale a medición instrumental.
+- C02 se deriva de los cinco dominios; no se captura como juicio original. C01/C03/C04/C05 siguen sus soportes y compuertas.
+- Los cuatro perfiles son orientativos de posible DCL. Una abstención fundada no se sustituye por un resultado deseado.
+- Medicina y Psicología revisan después y por separado. No se exige su firma antes de desarrollar o ejecutar técnicamente el contrato aprobado.
+- La evaluación conjunta conserva `persistido=false` mientras no exista guardado y recuperación institucional íntegros. No vincular su revisión a un DTO transitorio.
+- La cohorte de 30 casos es sintética y optativa. Sus nombres naturales no la convierten en historias clínicas originales ni entrenamiento estadístico automático.
 
-El conocimiento documental o conservado no equivale a publicación autorizada.
-El laboratorio TEST_ONLY conserva su segregación. El paquete institucional A–D
-adoptado está registrado y se consulta desde fuentes autorizadas; el contrato
-E–H adoptado añade captura original y cálculo de Petersen bajo sus requisitos.
-Las pruebas automatizadas utilizan datos sintéticos y no generan mediciones
-en historias reales. `config/sistema_experto.php:lectura_clinica` pertenece a la
-vía anterior y permanece vacío; no describe por sí solo todo el recorrido actual.
-La conservación institucional completa y la aceptación de interfaz/revisión
-siguen abiertas según el plan. La revisión profesional se registra después del
-resultado; no exige una firma previa para desarrollar ni permite completar
-mediciones ausentes con valores inventados.
+## Conservación: evidencia y brecha
 
-## Entrega local del 22/10/2026
+[La referencia SQL completa](RECUPERACION_SQL_COMPLETA_REFERENCIA_2026_10_22.md) demuestra igualdad del corpus con sus límites, pero no es instalable: 229 tablas hipotéticas, problemas de anchura y FK históricas incompletas. No sustituye el diseño institucional. [Las cuatro consolidaciones ya instaladas](CIERRE_REFACTOR_BLOQUES_2026_10_22.md) sí redujeron 104 → 100 en su alcance; no cierran el DTO conjunto.
 
-- [Publicación integrada y verificación](PUBLICACION_INTEGRADA_2026_10_22.md).
-- [Cohorte investigada y seeder optativo](COHORTE_INVESTIGACION_SEEDER_2026_10_22.md).
-- [Disponibilidad y nombres en la aplicación local](COHORTE_VISIBLE_APLICACION_2026_10_22.md).
-- [Consolidación experta ya autorizada](CIERRE_REFACTOR_BLOQUES_2026_10_22.md).
+## Investigación y entregas anteriores
+
+[Catálogo completo de contratos, decisiones, investigación y cortes](INDICE_DOCUMENTAL.md). Las fuentes bibliográficas no crean mediciones; las pruebas de prototipos no certifican el producto institucional. Los 104 escenarios citados históricamente no tienen manifiesto local identificado; no se atribuye su ejecución.
+
+`IMPLEMENTACION_V1.md` no existe en este árbol. No se recrea su contenido ni se usa como requisito de lectura; las entradas anteriores que lo mencionaban se concilian con las fuentes presentes.

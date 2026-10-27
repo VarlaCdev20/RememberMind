@@ -1,149 +1,71 @@
 ---
 title: "Estado actual de RememberMind"
 status: CURRENT
-version: "1.0"
-last_reviewed: 2026-10-11
+version: "2.1"
+last_reviewed: 2026-10-27
 owner: RememberMind
-source_of_truth: true
-verified_against_commit: 2818ff44e9325754dd3d42ea84d19ec7902baf71
-verification_scope: FULL_SQLITE_AND_SCOPED_POSTGRES_FRONTEND_BUILD
+source_of_truth: false
+source_of_truth_scope: [observed_state]
+verified_against_commit: 6d7b8c6d6bc03eecd2ee35add04677f2778272cd
+verification_scope: DOCUMENTATION_RECONCILIATION_WITH_LOCAL_AUDIT
 runtime_verified: false
-runtime_evidence_status: PARTIAL
-runtime_evidence_scope: FULL_SQLITE_SCOPED_POSTGRES_FRONTEND_BUILD_2026_10_11
-automated_global_gate_status: PASS_SQLITE_WITH_15_SKIPS
-supersedes: []
-related_docs: ["README.md","ROADMAP.md","DEUDA_TECNICA.md","DECISIONES_PENDIENTES.md"]
-related_modules: []
 ---
 
 # Estado actual de RememberMind
 
-## Flujo Git y alcance aceptado — 11/10/2026
+**Corte: 25/10/2026, America/La_Paz.** Rama observada: `feature/apoyo-decision-informe-neurocognitivo`; HEAD `6d7b8c6d`, con cambios locales concurrentes. Este documento describe el árbol auditado; no certifica producción ni validación clínica. La limpieza posterior de Markdown no reejecuta ni transforma esas pruebas.
 
-El propietario conserva los doce módulos como base técnica y mantiene visibles sus capacidades pendientes. El trabajo nuevo parte de `develop` en `feature/*`; las entregas llegan a `main` mediante `release/*` y las urgencias mediante `hotfix/*`. `PODEMOS-SEGUIR` conserva el checkpoint publicado del desacoplamiento. [Procedimiento, controles y respaldos](sistema/GIT_FLOW.md).
+## Dictamen y prioridades
 
-Los cortes de pruebas siguientes corresponden a los commits y entornos indicados; el resultado actual de integración se consulta en [GitHub Actions](https://github.com/VarlaCdev20/RememberMind/actions). La aceptación de esta base no implica producción ni validación institucional o clínica. Siguen vigentes los pendientes de [deuda técnica](DEUDA_TECNICA.md) y [decisiones](DECISIONES_PENDIENTES.md).
+**Revisión para publicación — 27/10/2026:** se conserva el trabajo acumulado
+de la rama y se actualiza su [informe de revisión](sistema/REVISION_PUBLICACION_2026_10_27.md).
+Frontend final: 276 correctos y 4 omitidos; build correcto. La suite general
+detecta fallos y no se presenta como aprobada. El informe distingue las
+repeticiones correctas de Reportes, Medicación y acceso/correo, los artefactos
+locales excluidos y la publicación de la rama frente a integración o despliegue.
 
-## Corte de desacoplamiento — 11/10/2026
+**Cierre de concurrencia P03/P17 — 27/10/2026:** el [informe41](especificacion-funcional/vistas/gerencia/41-ALTAS-Y-SUSTITUCIONES-CONCURRENTES.md) implementa y verifica altas y sustituciones documentales concurrentes. Un único registro ante correo/CI repetidos; formulario documental obsoleto rechazado antes de guardar bytes; permisos revalidados después de esperar. Pasan62/446 SQLite,52/425 PostgreSQL (nueve carreras),15/121 de último ajuste de formulario, navegador de dos pestañas y build. Sin DDL ni datos institucionales nuevos; permanecen106 de negocio. PC14/PC15, reportes, RO18 y aceptación restante siguen pendientes. No se declara culminado todo Gerencia o el experto.
 
-Desacoplamiento posterior terminado en `2818ff4`: contexto autenticado, sesión, archivos, correo, PDF, enlaces y adaptadores expertos detrás de contratos; consultas de ficha y paneles preparadas y reautorizadas tras hidratación Livewire. SQLite completa: **1.094 pruebas / 32.023 aserciones, cero fallos, 15 omisiones**, 17m25.825s. PostgreSQL desechable: **183 / 3.035, sin omisiones**. Frontend 151 y build aprobados; motor independiente cinco casos; 50 archivos protegidos sin cambios. [Informe por etapas y límites](arquitectura/DESACOPLAMIENTO_2026_10_11.md). Se conserva arquitectura híbrida, excepciones Laravel/Eloquent y deuda de archivos; en ese corte no hubo activación clínica ni push.
+**Instalación autorizada de Gerencia — 27/10/2026:** el [informe40](especificacion-funcional/vistas/gerencia/40-INSTALACION-AUTORIZADA-Y-PRORROGA-EXPEDIENTE.md) acredita la decisión «autorizo», respaldo e instalación local de35/37: **106 de negocio +16 técnicas =122 físicas**. Contenido previo conservado, historia desconocida sin rellenar,90 restricciones validadas y cuatro triggers históricos habilitados. P19 usa una sola concesión por expediente sin duplicar actos; pasan30/229 SQLite,36/265 PostgreSQL, pruebas atómicas y navegador. Quedan los casos de aceptación expresamente listados; no se declara culminado todo Gerencia o el experto. Las entradas siguientes conservan su corte anterior de100 tablas y pendientes entonces vigentes.
 
-## Preparación anterior del mismo día
+**Aceptación adicional de Gerencia — 26/10/2026:** el [informe39](especificacion-funcional/vistas/gerencia/39-ACEPTACION-REGRESIONES-Y-CASOS.md) corrige mora documental retrospectiva, fotografía/sucesión/privacidad y edición obsoleta de Galería. Añade negativos de autorización, archivos inválidos, rollback, concurrencia y teclado real. Existe inventario reproducible de212 casos; el grupo ampliado309/2041 no equivale a aceptarlos todos. Inventario institucional y estado de aprobación35/37 permanecen sin cambios; la prórroga por alta frente a destinatario sigue pendiente de conciliación.
 
-La copia canónica local está en `C:\Users\CARLAENCINAS\Desktop\RememberMind`, rama `PODEMOS-SEGUIR`. Se completaron seis etapas de preparación: acceso y aislamiento, contratos V2, dependencias, límites de arquitectura, PostgreSQL/roles/CI y limpieza final. [Entrega, comandos y deuda pendiente](sistema/PREPARACION_DESARROLLO_2026_10_11.md).
+**Continuación acotada — 26/10/2026:** el [informe38 de Gerencia](especificacion-funcional/vistas/gerencia/38-INTEGRACION-CONTACTOS-PLANIFICACION-Y-ACEPTACION.md) integra contactos, cuenta Familiar por enlace y DA01; añade pruebas de historia/concurrencia y revisión independiente. Los cuatro permisos existentes de contactos de17B se aplicaron al rol GERENTE. Diseños35/37 siguen fuera de la base institucional:100 tablas de negocio, sin cambio estructural en este corte. La aceptación parcial ejecutada no acredita los212 escenarios ni modifica el dictamen clínico del experto.
 
-Suite SQLite completa en el commit indicado: **1.079 pruebas, 31.452 aserciones, cero fallos/errores y 15 omisiones**, 16m27.333s. Dos omisiones necesitan PostgreSQL y se ejecutaron en la cohorte aislada; trece corresponden a funciones Jetstream/Fortify deshabilitadas. Cohorte PostgreSQL: **143 pruebas / 2.489 aserciones, sin omisiones**. Frontend: **151 pruebas**; build aprobado; motor independiente: cinco casos aprobados. Los grupos dirigidos se solapan y no se suman a la suite global.
+**Actualización acotada — 26/10/2026:** la [renovación de Gerencia](especificacion-funcional/vistas/gerencia/36-RENOVACION-GERENCIA-IMPLEMENTACION-Y-PRUEBAS.md) implementa nuevos recorridos y corrige H02/H03 de horarios, además del H04 de Ocupación. La extensión aprobada de Personal suma cuatro tablas únicamente en bases desechables; el inventario institucional no se modificó. El informe enlaza pruebas SQLite/PostgreSQL, navegador y build, con Familiares/contactos y otras brechas aún abiertas. La tabla y los resultados siguientes conservan el corte de auditoría del 25/10; no se reafirman como fallos actuales los que el informe posterior demuestra corregidos.
 
-La arquitectura administrativa conserva doce propietarios y cuatro capas, con excepciones Eloquent explícitas; el núcleo experto verifica independencia de Laravel y adaptadores. No se afirma separación absoluta de todo el legado. Composer y auditoría npm runtime sin avisos; npm completo mantiene un advisory alto de desarrollo (`braces`), controlado temporalmente hasta 11/11/2026. Documentos de usuario en disco público requieren un trabajo específico de privacidad. Los 50 archivos protegidos conservan hash y tamaño; no se modificó el esquema congelado ni la base instalada.
+[Auditoría integral: 32 hallazgos y brechas](auditorias/2026-10-25/INFORME_AUDITORIA_INTEGRAL.md). No está aceptada la culminación institucional. Deben corregirse primero autorización, interpretación paralela en la ficha y coherencia de navegación.
 
-En ese corte los commits eran locales; CI remoto, QA visual integral, producción y validación clínica quedaban fuera de esa evidencia. `runtime_verified: false` conserva el límite de certificación integral, aunque las suites indicadas sí fueron ejecutadas. Las secciones siguientes son históricas y no sustituyen este corte.
-
-## Actualización arquitectónica — 10/10/2026
-
-El código está en ARQUI-NUEVA, organizado en doce módulos con cuatro capas; Backend/Frontend dejaron de ser raíces ejecutables. El motor técnico vive en motor-experto y su integración Laravel en ApoyoDecision. El [informe de migración](arquitectura/INFORME_MIGRACION_HIBRIDA.md) conserva la ejecución completa (1006 pasaron, 15 omitidas y un falso positivo) y la reejecución corregida (21/21); su métrica consolidada por identidad fue 1007/1022, sin fallos pendientes. No es una única suite completa verde.
-
-La [auditoría posterior](arquitectura/AUDITORIA_LIMPIEZA_2026_10_10.md) registra la limpieza, la corrección de atomicidad del incidente y sus pruebas dirigidas. No se repitió la suite completa después de este corte; las cifras de fases anteriores se conservan como historia y no certifican el árbol actual. Eloquent, autorización directa de algunos casos y capacidades clínicas futuras mantienen excepciones explícitas.
-
-## Resumen ejecutivo histórico — fases anteriores
-
-RememberMind es un sistema residencial geriátrico con seguimiento clínico, cognitivo, funcional e interdisciplinario. Hay implementación Laravel de admisión, residentes/camas, identidad, cuidados, medicación, alertas, documentación, consultas y reportes, con tests asociados.
-
-Fases 1–2 describen el commit base y cambios previos sin commit mediante revisión estática. Fase 3 ejecutó migraciones/seed, pruebas PostgreSQL aisladas y build; evidencia acotada en [TRAZABILIDAD](TRAZABILIDAD.md). Baseline inicial: 613 tests, 14 fallos, 1 error y 13 omitidos; build PASS. Lote A acredita casos dirigidos de acceso familiar, competencia, pase y errores; B acredita TECH-011 (14/59); C eventos (24/109); D continuidad (46/203). E acredita rollback9puntos y carrera de cama PostgreSQL con dos procesos/locks reales; correcciones acotadas 12/126 PASS. Suite final: 670 tests / 12.068 aserciones, 0 errores, 15 fallos y 13 omitidos; conserva 14 fallos previos y una expectativa Familiar alineada y revalidada después (22/91 PASS). Cohorte núcleo 70/374 PASS. Build y reset/seed final PASS; 71 tablas operativas instaladas en la base aislada. Gate global FAIL; no repetir el resultado acotado como PASS global. `runtime_verified: false` expresa ausencia de certificación global; no invalida esos resultados acotados. No se acredita QA visual ni producción. Ningún área se declara globalmente ESTABLE.
-
-Fase 4 posterior: PHP oficial 8.3.33 habilitado con autorización «habilita php», sin alterar política de seguridad. Baseline repetida antes de cambiar código: 670 tests, 12.082 aserciones, 14 fallos, 0 errores, 13 omitidos. Se clasificaron y repararon esos catorce fallos PHP y dos JS con parches acotados. Suite global final: 686 tests, 12.219 aserciones, 0 fallos, 0 errores y los mismos 13 omitidos justificados; 900,178 s reloj. npm test 30/30, build y migrate:fresh --seed aislado 71/71 PASS. Las seis cohortes F3 se reejecutaron dentro de la suite final sin fallos ni omisiones. **Gate global automatizado F4: PASS**; el FAIL histórico F3 se conserva. Esto no certifica operación clínica integral, producción ni cierre de TECH. runtime_verified=false expresa ese límite de certificación, no ausencia de ejecución de suites. Pint mantiene siete archivos con fixers preexistentes, sin hallazgos de formato nuevos. Inventario individual de skips y evidencia en [TRAZABILIDAD](TRAZABILIDAD.md).
-
-Verificación posterior del 2026-10-08 para sistema experto V1: unitarias 66/1973, feature SQLite 23/1275, feature PostgreSQL desechable 23/1414 e inventario operativo 19/223 PASS; build PASS. Se instalaron con autorización 23 tablas expertas vacías en `remembermind_dev`, preservando las 71 operativas y sus datos. La suite global de ese árbol de trabajo terminó con 888 tests, 18.077 aserciones, cinco fallos, un error y 15 omitidos. El error de una fixture experta fue corregido y su batería específica revalidada en ambos motores; los cinco fallos restantes corresponden a expectativas de vistas, copy, decimales y redirección ajenas al experto. **Gate global de aquel corte experto V1: FAIL**; el PASS histórico de Fase 4 no certifica el árbol actual. [Implementación y límites](sistema-experto/IMPLEMENTACION_V1.md). No hay conocimiento clínico cargado ni activado.
-
-Versión del producto: no se encontraron tags locales; una release global no fue verificada. El contrato BDD operativo vigente es V2.1 congelado con extensión V2.2 aprobada; las 23 tablas expertas aprobadas se inventarían separadamente. No equiparar esas versiones a una release de todo RememberMind.
-
-## Stack verificado
-
-Versiones bloqueadas en archivos del repositorio; las ejecuciones aisladas de Fases 3–4 acreditan PHP y los comandos descritos en TRAZABILIDAD, no todos los componentes en producción:
-
-| Componente | Versión en repo | Fuente |
+| Área | Evidencia actual | Límite pendiente |
 |---|---|---|
-| PHP | requisito ^8.3; platform 8.3.0 | composer.json; F3 PHP 8.4.24 histórico, F4 PHP 8.3.33 habilitado |
-| Laravel | 13.33.0 | composer.lock |
-| Jetstream / Sanctum | 5.5.3 / 4.3.3 | composer.lock |
-| Livewire | 4.4.6 | composer.lock |
-| Permission / Activitylog | 7.4.2 / 4.12.3 | composer.lock |
-| PHPUnit | 12.5.36 | composer.lock |
-| DomPDF / Laravel PDF / Excel | 3.1.2 / 2.13.1 / 3.1.70 | composer.lock |
-| Tailwind / Vite | 3.4.19 / 8.3.1 | package-lock.json |
-| Chart.js / GSAP / AOS | 4.5.1 / 3.15.0 / 2.3.4 | package-lock.json |
-| Alpine | Integrada por Livewire; versión independiente no acreditada por package-lock | No copiar versión desde guía antigua |
-| Node | >=22.12.0 para satisfacer el lock completo, incluido Puppeteer 25.12.0 | engines en package-lock.json; runtime aislado Node v26.7.0 |
-| PostgreSQL / SQLite | PostgreSQL integrado/staging/producción; SQLite :memory: pruebas rápidas | baseline técnico y phpunit.xml |
+| Arquitectura | Doce módulos, cuatro capas y motor PHP independiente | No implica aceptación de todos los procesos |
+| BDD | 75 operativas + 25 expertas = **100 de negocio**; 16 técnicas | Máximo de diseño 110; cualquier DDL concreto sigue su decisión específica |
+| Seguridad | Dos defectos reproducidos: lectura revocada y asignación de horarios sin permiso | H01/H02 abiertos; sin corrección de producto en la auditoría o limpieza documental |
+| Inferencia | Cinco dominios/19 componentes, reglas G09 y Petersen con abstención | Datos originales, métodos aplicables y trazabilidad condicionan cada resultado |
+| Historia experta | Conservación observacional y revisión posterior comprobadas | La evaluación conjunta instrumental/Petersen continúa transitoria |
+| Frontend | Componentes y pruebas parciales existentes | Ficha con integración divergente; revisión visual actual no ejecutada por bloqueo del navegador |
 
-No se habilita MySQL/MariaDB por aparecer en configuración Laravel. CI configura PostgreSQL 18; su presencia no demuestra ejecución exitosa ni versión desplegada.
+## Pruebas realmente ejecutadas en la auditoría del 25/10
 
-## Base de Datos
+| Grupo | Resultado |
+|---|---|
+| Unit completa | 1.616 casos, 19.845 aserciones; 1 fallo, 4 omitidos |
+| Operación seleccionada | 109 casos, 1.047 aserciones; 1 error |
+| Experto seleccionado | 146 casos, 1.967 aserciones; 0 fallos/errores, 5 omitidos |
+| Navegación/HTTP | 11 pruebas, 14 aserciones; 89 enlaces observados, uno termina en 403 |
+| Reproducción de defectos | 3 pruebas, 11 aserciones; pasan porque demuestran los fallos |
+| PostgreSQL temporal | 8 casos, 114 aserciones; un error del arnés concurrente de medicación |
+| JavaScript sin navegador | 234 pruebas satisfactorias en 31 archivos |
+| Build Vite | Satisfactorio; advertencia de tamaño de chunks |
 
-- **Baseline vigente:** núcleo congelado BDD Operativa V2.1, más extensión aprobada V2.2 de objetivos individuales.
-- **Versión:** V2.1 + V2.2 en el alcance aprobado; no se reemplaza el núcleo.
-- **Número actual de tablas operativas declarado:** 71, excluyendo técnicas Laravel/Jetstream/Sanctum/Spatie y migrations.
-- **Documento fuente:** [índice y secuencia BDD](base-de-datos/README.md), [baseline](base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md), [diccionario núcleo](base-de-datos/REMEMBERMIND_BDD_70_TABLAS.md), [decisión V2.2](base-de-datos/DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md).
-- **Evidencia de código:** 69 creaciones individuales del núcleo inicial + valoraciones normalizadas + objetivos; 71 nombres operativos únicos.
-- **Evidencia de tests:** BddOperativaV2Test define assertCount(71); ejecutado en PostgreSQL desechable en Fase 3. Resultado del gate final en TRAZABILIDAD.
-- **BDD física instalada y concurrencia PostgreSQL:** migración/seed y carrera real de la Action de admisión ejecutadas en base desechable; no certificación de producción ni de otras operaciones concurrentes.
-- **Histórico:** diccionario V2.0 de 69 tablas. Su nombre/fecha no gobierna trabajo nuevo.
+No sumar filtros solapados como cobertura única. No convertir omisiones en PASS. [Resultados locales JUnit](../output/auditoria-integral-20261025/RESUMEN_PRUEBAS.md) y [comandos exactos](../output/auditoria-integral-20261025/COMANDOS.md) acompañan el informe; esos archivos de output son evidencia local, no garantía de disponibilidad en otra copia.
 
-La discrepancia de cifras anteriores queda conciliada por decisiones aprobadas. Persisten conflictos específicos de estados/catálogos en [decisiones](DECISIONES_PENDIENTES.md); no se corrigen reglas sensibles por inferencia.
+## Fuentes vigentes y continuidad
 
-## Estado por área
+- [Responsabilidades y recorrido por los doce módulos](modulos/README.md).
+- [Inventario y decisiones estructurales](base-de-datos/README.md).
+- [Contrato experto, integración y conservación](sistema-experto/README.md).
+- [Modelo de autorización](seguridad/MODELO_AUTORIZACION.md); [contrato visual](frontend/CONTRATO_VISUAL_UX_UI.md).
+- [Cortes anteriores hasta el 11/10](historico/ESTADO_CORTES_HASTA_2026_10_11.md): historia conservada, sin aceptar nuevamente el árbol actual por sus pruebas.
 
-Leyenda: ✅ ESTABLE (exige evidencia suficiente vigente); 🟡 EN DESARROLLO; 🟠 PARCIAL; 🔵 DISEÑO; 🔴 BLOQUEADO para alcance concreto; ⚪ PENDIENTE. Clasificación conservadora por capa; Fase 2 solo mapeó tests. Fases 3–4 ejecutan los alcances descritos en TRAZABILIDAD; PASS de suites no declara estabilidad integral del producto.
-
-| Área | Estado | Evidencia presente | Límite |
-|---|---|---|---|
-| Institucional | 🟠 PARCIAL | Identidad, roles/Policies, jornadas/asignaciones; RolesBaselineCongeladoTest | No aprobación global de todos los procesos |
-| Administración | 🟠 PARCIAL | CentroCoordinacionService, UI/rutas y DashboardAdministracionIntegracionVisualTest | Operación diaria; RRHH Gerente |
-| Residentes | 🟠 PARCIAL | Residente, controlador, relaciones; BddOperativaV2Test | Lectura Familiar restringida en Fase 3; otras entradas/legacy no quedan certificadas globalmente |
-| Admisión | 🟠 PARCIAL | FormalizarAdmision, revisión/preadmisión, CasosPreadmisionTest | Rollback/carrera de admisión acreditados Fase 3; estados físicos siguen DEC-OPEN-001 |
-| Camas | 🟠 PARCIAL | Locks e índices/Model de ocupación; OcupacionCamaIntegrityTest | Carrera de misma cama y rollback admisión acreditados Fase 3; otras operaciones no certificadas |
-| Enfermería | 🟡 EN DESARROLLO | TurnoEnfermeriaService/PaseTurnoPanel y tests; cambios previos sin commit | Validación integral/QA pendientes |
-| Médico | 🟠 PARCIAL | Prescripción/administración, atenciones, objetivos y tests | No certificación clínica o end-to-end actual |
-| Psicología | 🟠 PARCIAL | DashboardPsicologo, valoración transversal, instrumentos, tests | Metodología/licencias de escalas no acreditadas |
-| Nutrición | 🟠 PARCIAL | RoleDashboardDataService y valoración transversal | No módulo independiente completo demostrado |
-| Fisioterapia | 🟠 PARCIAL | Dashboard/valoración transversal | Continuidad y QA integral no demostradas |
-| Pedagogía | 🟠 PARCIAL | Dashboard/valoración transversal | Toda planificación/ejecución no acreditada |
-| Familiar | 🟠 PARCIAL | Dashboard por vínculo y ResidentePolicy; RoleDashboardDataTest | Fase 3 bloquea clínica/documentos no publicados y acredita identidad/visitas propias; DEC-OPEN-006 sigue OPEN |
-| Alertas | 🟠 PARCIAL | AlertaController, AlertasService y tests de ciclo | Fase 3 centraliza creación/mutación con eventos atómicos; no certifica todos los orígenes concurrentes |
-| Reportes | 🟠 PARCIAL | Rutas, servicios, exports y ReporteV2Controller; F4 corrige cierre Blade y verifica tres exports de áreas | Permiso/cuenta/error/auditoría ejercitados; bytes/formato Excel y entrega real no acreditados por mocks |
-| UX/Design System | 🟡 EN DESARROLLO | Tokens/componentes, contrato visual y stack UX; F4 shell/sidebar y equivalencia computada de filtros | No QA visual/funcional integral de todas las pantallas ni rediseño |
-| Sistema experto | 🟠 TÉCNICO SIN ACTIVACIÓN | [Implementación V1](sistema-experto/IMPLEMENTACION_V1.md): 23 tablas, núcleo COG-MEM, trazabilidad y consulta administrativa; pruebas sintéticas SQLite/PostgreSQL | Conocimiento institucional vacío; contratos de contenido, validación profesional y activación clínica pendientes |
-| Producción | ⚪ PENDIENTE de verificación | Guía de despliegue/reversión y configuración CI | Despliegue, HTTPS, backups, colas y restauración NO VERIFICADOS |
-
-Mapas y localizadores: [dominio funcional](sistema/MAPA_DOMINIO_FUNCIONAL.md), [arquitectura](arquitectura/README.md), [roles](arquitectura/REMEMBERMIND_ROLES_BASELINE_CONGELADO.md). Estos son enlaces de descubrimiento; no certificación de completitud.
-
-## Flujo institucional
-
-Preadmisión → revisión → APROBADA/RECHAZADA → admisión formal con cama → residente admitido. Aprobación por sí sola no crea residente. Fuente: AGENTS y baseline, con Action FormalizarAdmision como evidencia de implementación. No introducir CRUD directo para sortear ese límite.
-
-## Problemas conocidos
-
-[TECH-001..TECH-011](DEUDA_TECNICA.md) conserva hallazgos históricos y estados actuales: 001/002/004/008/011 VERIFIED_RUNTIME acotado; 005/009/010 PARTIAL; 003/006/007 OPEN. Suite global y límites de prueba en TRAZABILIDAD.
-
-## Decisiones abiertas
-
-[DEC-OPEN-001..006](DECISIONES_PENDIENTES.md): estados institucionales, catálogos, etiquetas clínicas, PRN/reintentos, método/derechos/validación experta y publicación clínica a familiares. La separación contador BDD histórico/actual está resuelta; no abrir otra aprobación sobre la extensión existente.
-
-## Trabajo actual
-
-09/10/2026 — Dolor V2 incorpora la extensión aprobada de tres columnas,
-inicial/reevaluación y popup longitudinal de Mis residentes. Inventario de 71
-operativas sin cambios; los resultados exactos se mantienen en
-[informe Dolor V2](frontend/FORMULARIO_DOLOR_V2_RESULTADO.md), incluida la QA
-pendiente. Dolor dirigido y regresión Signos PASS; JS104/build PASS.
-PHP global:935 PASS,15 omitidas,5 fallos previos (19.028 aserciones), gate FAIL.
-No equivale a una release global; sin commit.
-
-Histórico: Fase 2 documental entregada con PASS de revisión estática independiente. Existen [arquitectura contrastada](arquitectura/ARQUITECTURA_VIGENTE.md), siete contratos núcleo y [trazabilidad/cobertura estática](TRAZABILIDAD.md): 22 dominios, siete flujos, 20 invariantes y 22 métodos de test mapeados. Esto no acredita ejecución ni completitud del producto. El alcance y evidencia del PASS documental están en TRAZABILIDAD; runtime_verified=false.
-
-Fase 3 implementó hardening A–E y obtuvo evidencia runtime aislada: mínimo de signos, eventos de alerta, proyección de continuidad, controles contextuales y respuestas públicas de error en entradas afectadas. Fase 4 completa la estabilización global automatizada autorizada, con baseline, clasificación causal, pruebas dirigidas/de módulo y cuatro gates finales PASS. [Deuda](DEUDA_TECNICA.md) mantiene VERIFIED_RUNTIME acotado, PARTIAL y OPEN; no certifica el sistema completo. Fase 2 no modificó código funcional; Fases 3–4 sí, con evidencia registrada en TRAZABILIDAD.
-
-Se conservan cambios previos de limpieza legacy/áreas/cuidados/reportes/tests sin commit. Las skills existentes orientan investigación; su presencia o validación de instrucciones no prueba producto.
-
-## Próximo objetivo
-
-Fase 4 termina con PASS de los cuatro gates automatizados y preservación del hardening F3. Continuar con un lote aprobado y acotado de deuda pendiente, comenzando por fronteras de excepción/autorización no ejercitadas y garantías que hoy son solo de aplicación. TECH-005/009/010 siguen PARTIAL; TECH-003/006/007 y DEC-OPEN-001..006 siguen OPEN. Ningún PASS concede autorización para decisiones clínicas/BDD ni publicación Familiar. No se inicia ese lote en esta tarea. [Roadmap](ROADMAP.md) mantiene ideas y tareas futuras separadas.
+Las correcciones de software compatibles con contratos aprobados continúan sin exigir una nueva firma clínica para programar. No se fabrican mediciones ni aprobaciones. Producción y validación clínica requieren evidencias propias.

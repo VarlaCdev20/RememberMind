@@ -45,7 +45,8 @@ return [
             'port' => env('MAIL_PORT', 2525),
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
-            'timeout' => null,
+            'timeout' => 20,
+            'require_tls' => env('MAIL_REQUIRE_TLS', env('MAIL_HOST') === 'smtp.gmail.com'),
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
 
@@ -111,7 +112,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
+        // Decisión de la propietaria: no permitir sustitución mediante MAIL_FROM_ADDRESS.
+        'address' => \App\Compartido\Infraestructura\Notificaciones\ExigirTransporteCorreoReal::REMITENTE_INSTITUCIONAL,
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 

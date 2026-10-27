@@ -110,11 +110,11 @@ Pase incluye RECONOCIDA/ASIGNADA además de las alertas activas ya leídas; TECH
 
 ## 22. Entrada UI
 
-[resources/views/livewire/alertas/alertas-panel.blade.php](../../../resources/views/livewire/alertas/alertas-panel.blade.php)
+[resources/views/livewire/alertas/alertas-panel.blade.php](../../../app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/alertas-panel.blade.php)
 
 ## 23. Livewire / Controllers
 
-[app/Frontend/Livewire/Compartido/Alertas/AlertasPanel.php](../../../app/Frontend/Livewire/Compartido/Alertas/AlertasPanel.php), [app/Http/Controllers/Alertas/AlertaController.php](../../../app/Http/Controllers/Alertas/AlertaController.php)
+[app/Frontend/Livewire/Compartido/Alertas/AlertasPanel.php](../../../app/Modulos/Alertas/Presentacion/Livewire/Paginas/AlertasPanel.php), [app/Http/Controllers/Alertas/AlertaController.php](../../../app/Modulos/Alertas/Presentacion/Http/Controllers/AlertaController.php)
 
 ## 24. Actions
 
@@ -122,7 +122,7 @@ NONE OBSERVED en el recorrido investigado; no se exige una clase vacía por sime
 
 ## 25. Services
 
-[app/Backend/Modulos/Alertas/Servicios/AlertasService.php](../../../app/Backend/Modulos/Alertas/Servicios/AlertasService.php), [app/Backend/Modulos/Alertas/Servicios/DeteccionAlertasService.php](../../../app/Backend/Modulos/Alertas/Servicios/DeteccionAlertasService.php), [app/Backend/Modulos/Clinica/SignosVitales/ServicioDecisionAlertaClinica.php](../../../app/Backend/Modulos/Clinica/SignosVitales/ServicioDecisionAlertaClinica.php)
+[app/Backend/Modulos/Alertas/Servicios/AlertasService.php](../../../app/Modulos/Alertas/Aplicacion/Acciones/AlertasService.php), [app/Backend/Modulos/Alertas/Servicios/DeteccionAlertasService.php](../../../app/Modulos/Alertas/Aplicacion/Acciones/DeteccionAlertasService.php), [app/Backend/Modulos/Clinica/SignosVitales/ServicioDecisionAlertaClinica.php](../../../app/Modulos/Alertas/Aplicacion/Acciones/ServicioDecisionAlertaClinica.php)
 
 ## 26. Policies
 

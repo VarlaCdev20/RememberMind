@@ -27,6 +27,12 @@ $rutas['Cuidados'] = require base_path('app/Modulos/Cuidados/Presentacion/Rutas/
 
 $rutas['Compartido']['ruta_001']();
 
+Route::middleware(['auth:sanctum','cuenta.activa'])->group(function () {
+    Route::get('/cambiar-contrasena-inicial', [\App\Modulos\Identidad\Presentacion\Http\Controllers\CambiarPasswordInicialController::class,'show'])->name('password.inicial');
+    Route::post('/cambiar-contrasena-inicial', [\App\Modulos\Identidad\Presentacion\Http\Controllers\CambiarPasswordInicialController::class,'guardar'])
+        ->middleware('throttle:6,1')->name('password.inicial.guardar');
+});
+
 /*
 |--------------------------------------------------------------------------
 | RUTAS AUTENTICADAS

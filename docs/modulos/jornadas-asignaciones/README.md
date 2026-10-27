@@ -191,11 +191,11 @@ Contexto conecta cuidados y emisor/receptor de pase; responsable de área se mue
 
 ## 22. Entrada UI
 
-[resources/views/livewire/identidad/turnos-asignaciones-panel.blade.php](../../../resources/views/livewire/identidad/turnos-asignaciones-panel.blade.php)
+[resources/views/livewire/identidad/turnos-asignaciones-panel.blade.php](../../../app/Modulos/Institucion/Presentacion/Vistas/livewire/identidad/turnos-asignaciones-panel.blade.php)
 
 ## 23. Livewire / Controllers
 
-[app/Frontend/Livewire/Administracion/Identidad/TurnosAsignacionesPanel.php](../../../app/Frontend/Livewire/Administracion/Identidad/TurnosAsignacionesPanel.php), [app/Http/Controllers/Identidad/InstitucionalController.php](../../../app/Http/Controllers/Identidad/InstitucionalController.php), [app/Http/Controllers/Cuidados/CuidadoController.php](../../../app/Http/Controllers/Cuidados/CuidadoController.php)
+[app/Frontend/Livewire/Administracion/Identidad/TurnosAsignacionesPanel.php](../../../app/Modulos/Institucion/Presentacion/Livewire/Paginas/TurnosAsignacionesPanel.php), [app/Http/Controllers/Identidad/InstitucionalController.php](../../../app/Modulos/Institucion/Presentacion/Http/Controllers/InstitucionalController.php), [app/Http/Controllers/Cuidados/CuidadoController.php](../../../app/Modulos/Cuidados/Presentacion/Http/Controllers/CuidadoController.php)
 
 ## 24. Actions
 
@@ -203,7 +203,7 @@ NONE OBSERVED en el recorrido investigado; no se exige una clase vacía por sime
 
 ## 25. Services
 
-[app/Backend/Modulos/Enfermeria/Servicios/TurnoEnfermeriaService.php](../../../app/Backend/Modulos/Enfermeria/Servicios/TurnoEnfermeriaService.php), [app/Backend/Modulos/Enfermeria/Servicios/MiTurnoService.php](../../../app/Backend/Modulos/Enfermeria/Servicios/MiTurnoService.php)
+[app/Backend/Modulos/Enfermeria/Servicios/TurnoEnfermeriaService.php](../../../app/Modulos/Cuidados/Aplicacion/Consultas/TurnoEnfermeriaService.php), [app/Backend/Modulos/Enfermeria/Servicios/MiTurnoService.php](../../../app/Modulos/Cuidados/Aplicacion/Consultas/MiTurnoService.php)
 
 ## 26. Policies
 

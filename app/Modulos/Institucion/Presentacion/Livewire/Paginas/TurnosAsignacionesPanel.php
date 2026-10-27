@@ -171,6 +171,11 @@ class TurnosAsignacionesPanel extends Component
         $this->fechaInicioPlanilla = now()->startOfWeek(Carbon::MONDAY)->format('Y-m-d');
         $this->usarUsuariosReales = true;
 
+        if (auth()->user()?->hasRole('GERENTE') && !auth()->user()->hasRole('SUPERADMINISTRADOR')) {
+            $this->tipoPlanilla='general';
+            return;
+        }
+
         $this->generarPlanillaEnfermeria(silencioso: true);
     }
 
@@ -258,16 +263,22 @@ class TurnosAsignacionesPanel extends Component
 
     public function cambiarTipoPlanilla(string $tipo): void
     {
-        if (! in_array($tipo, ['enfermeria', 'salud', 'administrativo'], true)) {
+        if (! in_array($tipo, ['general','enfermeria', 'salud', 'administrativo'], true)) {
             return;
         }
 
         $this->tipoPlanilla = $tipo;
 
+        if ($tipo==='general') {
+            $this->filtroTipo=''; $this->filtroRol='';
+            return;
+        }
+
         if ($tipo === 'enfermeria') {
             $this->filtroTipo = 'salud';
             $this->filtroRol = 'ENFERMEROS';
             $this->vistaPlanilla = 'semanal';
+            if (auth()->user()?->hasRole('GERENTE') && !auth()->user()->hasRole('SUPERADMINISTRADOR')) return;
 
             if ($this->planillaEnfermeria === []) {
                 $this->generarPlanillaEnfermeria(silencioso: true);
@@ -301,6 +312,7 @@ class TurnosAsignacionesPanel extends Component
 
     public function generarPlanillaEnfermeria(bool $silencioso = false): void
     {
+        abort_if(auth()->user()?->hasRole('GERENTE') && !auth()->user()->hasRole('SUPERADMINISTRADOR'),403,'La consulta gerencial utiliza asignaciones registradas, no una rotación de demostración.');
         try {
             $resultado = app(GeneradorPlanillaEnfermeriaService::class)->generar([
                 'fecha_inicio' => $this->fechaInicioPlanilla ?: now()->startOfWeek(Carbon::MONDAY)->format('Y-m-d'),
@@ -434,6 +446,10 @@ class TurnosAsignacionesPanel extends Component
 
     public function render(): View
     {
+        $actor=auth()->user()?->fresh();
+        abort_unless($actor?->estado==='ACTIVO' && !$actor->hasRole('FAMILIAR') && $actor->can('turnos.ver')
+            && $actor->can('jornadas.ver') && $actor->can('asignaciones_personal.ver'),403);
+        $this->validate(['fechaSeleccionada'=>'required|date_format:Y-m-d']);
         $fecha = Carbon::parse($this->fechaSeleccionada);
 
         $areas = $this->areasInstitucionales();
@@ -441,7 +457,7 @@ class TurnosAsignacionesPanel extends Component
         $roles = Role::orderBy('name')->pluck('name');
         $personal = $this->personalFiltrado()->get();
         $asignaciones = $this->asignacionesFiltradas();
-        $asignacionesActivas = $asignaciones->where('estado', 'ACTIVA')->values();
+        $asignacionesActivas = $asignaciones->whereIn('estado', ['ACTIVO', 'ACTIVA'])->values();
         $conflictos = $this->detectarConflictos($asignacionesActivas);
 
         $datosCalendario = match ($this->vistaCalendario) {
@@ -455,7 +471,9 @@ class TurnosAsignacionesPanel extends Component
             ? User::with(['roles'])->where('cod_usuario', $this->usuarioSeleccionado)->first()
             : null;
 
-        return view('livewire.identidad.turnos-asignaciones-panel', [
+        $vista=$actor->hasRole('GERENTE') && !$actor->hasRole('SUPERADMINISTRADOR')
+            ? 'institucion::livewire.gerencia.planificacion-equipo' : 'livewire.identidad.turnos-asignaciones-panel';
+        return view($vista, [
             'areas' => $areas,
             'turnos' => $turnos,
             'roles' => $roles,
@@ -485,12 +503,12 @@ class TurnosAsignacionesPanel extends Component
 
     private function areasInstitucionales(): Collection
     {
-        return Area::query()->where('estado', 'ACTIVO')->orderBy('nombre')->get();
+        return Area::query()->whereIn('estado', ['ACTIVO','ACTIVA'])->orderBy('nombre')->get();
     }
 
     private function personalFiltrado(): Builder
     {
-        $query = User::with(['roles'])
+        $query = User::with(['roles','personal'])
             ->whereHas('roles', fn (Builder $query) => $query->whereIn('name', [
                 ...self::ROLES_ADMINISTRATIVOS,
                 ...self::ROLES_SALUD,
@@ -555,11 +573,13 @@ class TurnosAsignacionesPanel extends Component
             ->map(function (AsignacionPersonal $asignacion): object {
                 $fecha = $asignacion->jornada?->fecha_jornada;
                 $turno = $asignacion->jornada?->turno;
+                $usuario=$asignacion->personal?->usuario;
+                $usuario?->setRelation('personal',$asignacion->personal);
 
                 return (object) [
                     'cod_asignacion' => $asignacion->cod_asignacion_personal,
                     'cod_usuario' => $asignacion->personal?->cod_usuario,
-                    'usuario' => $asignacion->personal?->usuario,
+                    'usuario' => $usuario,
                     'estado' => $asignacion->estado,
                     'dias_semana' => [$this->normalizarDiaSemana($fecha?->locale('es')->isoFormat('dddd'))],
                     'fecha_inicio' => $fecha?->copy()->startOfDay(),
@@ -572,8 +592,8 @@ class TurnosAsignacionesPanel extends Component
                         'hora_fin' => $turno->hora_cierre,
                     ] : null,
                     'area' => $asignacion->area,
-                    'creador' => (object) ['name' => 'Sistema'],
-                    'editor' => (object) ['name' => 'Sistema'],
+                    'creador' => (object) ['name' => 'Autor no registrado'],
+                    'editor' => (object) ['name' => 'Autor no registrado'],
                 ];
             });
     }
@@ -618,7 +638,7 @@ class TurnosAsignacionesPanel extends Component
         if ($this->filtroEstado === 'finalizado') {
             $all = $all->filter(fn ($asig) => $asig->estado === 'FINALIZADA');
         } else {
-            $all = $all->filter(fn ($asig) => $asig->estado === 'ACTIVA');
+            $all = $all->filter(fn ($asig) => in_array($asig->estado,['ACTIVO','ACTIVA'],true));
         }
 
         return $all->values();
@@ -803,7 +823,7 @@ class TurnosAsignacionesPanel extends Component
         $dia = self::DIAS[$fecha->dayOfWeekIso - 1];
 
         return $asignaciones->filter(function (object $asignacion) use ($fecha, $dia) {
-            return $asignacion->estado === 'ACTIVA'
+            return in_array($asignacion->estado,['ACTIVO','ACTIVA'],true)
                 && in_array($dia, $asignacion->dias_semana ?: [], true)
                 && (! $asignacion->fecha_inicio || $asignacion->fecha_inicio->lte($fecha))
                 && (! $asignacion->fecha_fin || $asignacion->fecha_fin->gte($fecha));
@@ -812,7 +832,17 @@ class TurnosAsignacionesPanel extends Component
 
     private function mapEvento(object $asignacion, Carbon $fecha, array $conflictos): array
     {
+        $horario='Horario incompleto';
+        if ($asignacion->turno?->hora_inicio && $asignacion->turno?->hora_fin) {
+            $inicio=Carbon::parse($fecha->toDateString().' '.$asignacion->turno->hora_inicio);
+            $fin=Carbon::parse($fecha->toDateString().' '.$asignacion->turno->hora_fin);
+            if($fin->lte($inicio))$fin->addDay();
+            $horario=$inicio->format('d/m H:i').' → '.$fin->format('d/m H:i');
+        }
         return [
+            'titulo'=>$asignacion->usuario?->name ?: 'Trabajador sin identificar',
+            'subtitulo'=>($asignacion->turno?->nombre ?: 'Sin turno registrado').' · '.($asignacion->area?->nombre ?: 'Sin área registrada'),
+            'hora'=>$horario,
             'asignacion' => $asignacion,
             'rol' => $this->rolVisual($asignacion->usuario),
             'estado' => ! $this->usuarioActivo($asignacion->usuario)
@@ -864,7 +894,7 @@ class TurnosAsignacionesPanel extends Component
             return 'OCUPADO';
         }
 
-        return $asignacionesUsuario->where('estado', 'ACTIVA')->isEmpty() ? 'SIN HORARIO' : 'DISPONIBLE';
+        return $asignacionesUsuario->whereIn('estado', ['ACTIVO', 'ACTIVA'])->isEmpty() ? 'SIN HORARIO' : 'DISPONIBLE';
     }
 
     private function detectarConflictos(Collection $asignaciones): array

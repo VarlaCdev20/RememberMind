@@ -18,6 +18,8 @@ related_modules: []
 
 # Estados y ciclos de vida
 
+> **Conciliación del 25/10/2026:** los conteos 70+1=71 y las pruebas/estados observados más abajo pertenecen al corte original indicado. El inventario instalado vigente es 100 tablas de negocio + 16 técnicas, según [BDD](../base-de-datos/README.md). Las fuentes y requisitos siguen su alcance; la actualización de enlaces no reejecuta pruebas ni cierra deuda. [Estado actual](../ESTADO_ACTUAL.md).
+
 Contraste estático del commit base y árbol con cambios previos sin commit. No se ejecutaron migraciones, seed, suites, build ni BDD real. CURRENT no aprueba reglas nuevas. `verified_against_commit` identifica base de lectura; no certifica runtime.
 
 Fuentes rectoras: [AGENTS](../../AGENTS.md), [baseline](../../docs/base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md), [diccionario](../../docs/base-de-datos/REMEMBERMIND_BDD_70_TABLAS.md), [extensión aprobada V2.2](../../docs/base-de-datos/DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md), [roles](../../docs/arquitectura/REMEMBERMIND_ROLES_BASELINE_CONGELADO.md). Inventario 70+1=71 es evidencia estática del repositorio, no BDD instalada comprobada.

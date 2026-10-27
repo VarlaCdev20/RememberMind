@@ -21,6 +21,12 @@ Ubicación: `.agents/skills/`. Diez especialidades y un punto de entrada existen
 
 ## Pipeline y selección
 
+Tipografía: consultar el [stack por función y alcance](STACK_TIPOGRAFIA.md).
+La ampliación del 26/10/2026 contempla títulos redondeados, lectura, cursiva
+editorial, pincel y mayúsculas pequeñas con fuentes locales. La corrección
+posterior unifica el lema del acceso, retirando su acento pincel, sin modificar
+por extensión las pantallas clínicas.
+
 Mantener este orden para las etapas que apliquen. No cargar diez skills para una corrección puntual. Registrar «no aplica» y motivo cuando se omite una etapa. Referencia visual se analiza solo si existe; no bloquear esperando una imagen que la tarea no requiere. Responsive y writing pueden aportar restricciones desde el principio; su revisión final ocupa su posición en el pipeline.
 
 | Orden | Skill y ubicación | Objetivo | Description exacta |

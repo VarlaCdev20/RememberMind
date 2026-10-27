@@ -20,6 +20,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
+use Livewire\Attributes\Locked;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Spatie\Permission\Models\Role;
@@ -254,6 +255,9 @@ class UsuariosPanel extends Component
     public $archivoTemporal;
 
     public $tipoDocSeleccionado;
+
+    #[Locked]
+    public ?array $referenciaDocumento = null;
 
     public $tipoDocNombre;
 
@@ -2187,6 +2191,7 @@ class UsuariosPanel extends Component
         $usuario = $this->usuarioDetalle;
         abort_unless($usuario, 404);
         $tipo = app(DocumentacionUsuarioService::class)->tipoDisponible($usuario, $codTipoDoc);
+        $this->referenciaDocumento = app(DocumentacionUsuarioService::class)->referenciaVigente($usuario, $codTipoDoc, auth()->user());
         $this->tipoDocSeleccionado = $codTipoDoc;
         $this->tipoDocNombre = $tipo->nombre;
         $this->archivoTemporal = null;
@@ -2200,6 +2205,7 @@ class UsuariosPanel extends Component
     {
         $this->mostrarModalSubirDoc = false;
         $this->tipoDocSeleccionado = null;
+        $this->referenciaDocumento = null;
         $this->tipoDocNombre = null;
         $this->archivoTemporal = null;
         $this->fechaEmisionDoc = null;
@@ -2237,20 +2243,25 @@ class UsuariosPanel extends Component
         $service = app(DocumentacionUsuarioService::class);
 
         try {
+            if ($this->referenciaDocumento === null) {
+                throw ValidationException::withMessages(['file' => 'Abre la carga desde el documento que deseas actualizar.']);
+            }
             $service->subirDocumento(
                 $usuario,
                 $this->tipoDocSeleccionado,
                 $this->archivoTemporal,
                 $this->fechaEmisionDoc,
                 $this->fechaVencimientoDoc,
-                $this->observacionesDoc
+                $this->observacionesDoc,
+                auth()->user(),
+                $this->referenciaDocumento
             );
 
             // Refrescar el usuario para reflejar el estado cargado
             $this->usuarioDetalle = User::with([
                 'roles',
                 'documentos',
-                'contactos.adultosMayores',
+                'contactos.residentes',
             ])->findOrFail($usuario->cod_usuario);
 
             $this->cerrarModalSubirDoc();

@@ -30,7 +30,6 @@
  </x-slot:actions>
  </x-ui.collection-header>
 
-<<<<<<< HEAD
  @if($codArea === 'ARE_COG' && auth()->user()?->hasRole('PSICOLOGO/A') && auth()->user()?->can('valoraciones_petersen.crear'))
  <x-ui.section-card title="Valoración cognitiva y funcional" subtitle="Seleccione al residente para documentar su valoración profesional y los registros que la sustentan" icon="ph-brain">
   <p class="text-sm text-rm-secondary">Aquí se documentan los cinco dominios cognitivos y los requisitos originales de Petersen. C02 se obtiene de los dominios; no se registra manualmente.</p>
@@ -53,13 +52,11 @@
   @endif
  </x-ui.section-card>
  @endif
-=======
  <nav class="rm-valoraciones-areas" aria-label="Áreas de valoración">
  @foreach(['cognitiva' => ['ARE_COG', 'Cognitiva', 'ph-brain'], 'afectiva' => ['ARE_AFE', 'Afectiva', 'ph-heart'], 'funcionamiento' => ['ARE_FUN', 'Funcionamiento', 'ph-person-simple-walk'], 'entorno' => ['ARE_SOC', 'Entorno y red social', 'ph-users-four']] as $rutaArea => [$codigoArea, $tituloArea, $iconoArea])
  <a href="{{ route('admin.psicologia.evaluacion.'.$rutaArea) }}" @if($codArea === $codigoArea) aria-current="page" @endif><i class="ph-bold {{ $iconoArea }}" aria-hidden="true"></i>{{ $tituloArea }}</a>
  @endforeach
  </nav>
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
 
  {{-- Stats del área --}}
  <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">

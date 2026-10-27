@@ -110,19 +110,19 @@ Historial/basal/último signo alimentan cuidado/pase; ausencia no estabilidad. F
 
 ## 22. Entrada UI
 
-[resources/views/livewire/cuidados/mis-residentes-directorio.blade.php](../../../resources/views/livewire/cuidados/mis-residentes-directorio.blade.php)
+[resources/views/livewire/cuidados/mis-residentes-directorio.blade.php](../../../app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/mis-residentes-directorio.blade.php)
 
 ## 23. Livewire / Controllers
 
-[app/Frontend/Livewire/Enfermeria/Cuidados/MisPacientes.php](../../../app/Frontend/Livewire/Enfermeria/Cuidados/MisPacientes.php), [app/Frontend/Livewire/Medico/Clinica/ObjetivosSignosVitalesPanel.php](../../../app/Frontend/Livewire/Medico/Clinica/ObjetivosSignosVitalesPanel.php), [app/Http/Controllers/Clinica/AdultoMayorSignosVitalesController.php](../../../app/Http/Controllers/Clinica/AdultoMayorSignosVitalesController.php)
+[app/Frontend/Livewire/Enfermeria/Cuidados/MisPacientes.php](../../../app/Modulos/Cuidados/Presentacion/Livewire/Paginas/MisPacientes.php), [app/Frontend/Livewire/Medico/Clinica/ObjetivosSignosVitalesPanel.php](../../../app/Modulos/Clinica/Presentacion/Livewire/Paginas/ObjetivosSignosVitalesPanel.php), [app/Http/Controllers/Clinica/AdultoMayorSignosVitalesController.php](../../../app/Modulos/Clinica/Presentacion/Http/Controllers/AdultoMayorSignosVitalesController.php)
 
 ## 24. Actions
 
-[app/Backend/Modulos/Clinica/Acciones/RegistrarSignosVitalesAction.php](../../../app/Backend/Modulos/Clinica/Acciones/RegistrarSignosVitalesAction.php), [app/Backend/Modulos/Clinica/Acciones/DefinirObjetivoSignoVitalAction.php](../../../app/Backend/Modulos/Clinica/Acciones/DefinirObjetivoSignoVitalAction.php)
+[app/Backend/Modulos/Clinica/Acciones/RegistrarSignosVitalesAction.php](../../../app/Modulos/Clinica/Aplicacion/Acciones/RegistrarSignosVitalesAction.php), [app/Backend/Modulos/Clinica/Acciones/DefinirObjetivoSignoVitalAction.php](../../../app/Modulos/Clinica/Aplicacion/Acciones/DefinirObjetivoSignoVitalAction.php)
 
 ## 25. Services
 
-[app/Backend/Modulos/Clinica/Servicios/SignosVitalesService.php](../../../app/Backend/Modulos/Clinica/Servicios/SignosVitalesService.php), [app/Backend/Modulos/Clinica/SignosVitales/EvaluadorSignosVitales.php](../../../app/Backend/Modulos/Clinica/SignosVitales/EvaluadorSignosVitales.php), [app/Backend/Modulos/Clinica/SignosVitales/ServicioDecisionAlertaClinica.php](../../../app/Backend/Modulos/Clinica/SignosVitales/ServicioDecisionAlertaClinica.php), [app/Backend/Modulos/Clinica/SignosVitales/ServicioBasalSignosVitales.php](../../../app/Backend/Modulos/Clinica/SignosVitales/ServicioBasalSignosVitales.php)
+[app/Backend/Modulos/Clinica/Servicios/SignosVitalesService.php](../../../app/Modulos/Clinica/Aplicacion/Acciones/SignosVitalesService.php), [app/Backend/Modulos/Clinica/SignosVitales/EvaluadorSignosVitales.php](../../../app/Modulos/Clinica/Aplicacion/Acciones/EvaluadorSignosVitales.php), [app/Backend/Modulos/Clinica/SignosVitales/ServicioDecisionAlertaClinica.php](../../../app/Modulos/Alertas/Aplicacion/Acciones/ServicioDecisionAlertaClinica.php), [app/Backend/Modulos/Clinica/SignosVitales/ServicioBasalSignosVitales.php](../../../app/Modulos/Clinica/Aplicacion/Consultas/ServicioBasalSignosVitales.php)
 
 ## 26. Policies
 

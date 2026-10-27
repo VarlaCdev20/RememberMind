@@ -63,11 +63,7 @@
                                 <p class="text-sm text-rm-secondary">Registra solo resultados originales. Las entradas de escolaridad y condiciones se capturan como preguntas del protocolo cuando están definidas.</p>
                             @else
                                 <p class="font-semibold">Sin método de interpretación listo</p>
-<<<<<<< HEAD
-                                <p class="text-sm text-rm-secondary">Puedes conservar las respuestas originales. O.R.I.O.N. se abstendrá de interpretarlas hasta que exista un vínculo único, exacto y completo con el método aplicable.</p>
-=======
                                 <p class="text-sm text-rm-secondary">Puedes conservar las respuestas originales. La interpretación automatizada se abstendrá de interpretarlas hasta que exista un vínculo único, exacto y completo con el método aplicable.</p>
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                             @endif
                             @if(($vinculoMetodo['entradas'] ?? []) !== [])
                                 <details>

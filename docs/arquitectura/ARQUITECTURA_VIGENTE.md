@@ -16,6 +16,8 @@ related_modules: []
 
 # Mapa de arquitectura vigente
 
+> Lectura vigente del 25/10/2026: este documento conserva las decisiones de organización y la evidencia de migración del 10/10. Sus cifras de modelos, vistas, rutas y tablas pertenecen a ese corte; el [estado actual](../ESTADO_ACTUAL.md) y [los doce propietarios funcionales](../modulos/README.md) recogen la evolución posterior. No restaurar conteos, clases o tablas solo para reproducir aquel inventario.
+
 La organización canónica y sus excepciones están en el [índice](README.md) y en el [ADR aprobado](ADR_ARQUITECTURA_HIBRIDA.md). Este mapa describe el código posterior a la migración, sin redefinir reglas clínicas, permisos ni estructura de PostgreSQL. El contenido anterior de esta ruta describía el corte de Fase 2; su historial permanece en Git.
 
 La [limpieza de carpetas posterior](LIMPIEZA_CARPETAS_2026_10_10.md) conserva los doce módulos y sus cuatro capas; solo reserva con `.gitkeep` las capas principales vacías. No mantiene subdirectorios anticipados sin implementación.

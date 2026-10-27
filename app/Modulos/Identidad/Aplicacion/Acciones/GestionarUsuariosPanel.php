@@ -18,6 +18,7 @@ final class GestionarUsuariosPanel
 
     public function guardarUsuario(User $actor, array $entrada, array $userData, string $estadoGuardado, string $accesoGuardado): array
     {
+        if (($entrada['rol'] ?? '')==='FAMILIAR') throw \Illuminate\Validation\ValidationException::withMessages(['rol'=>'Gestiona la cuenta desde Familiares y contactos, sobre la identidad y el vínculo existentes.']);
         abort_unless($actor->can($entrada['isEdit'] ? 'usuarios.editar' : 'usuarios.crear'), 403);
         if ($entrada['isEdit'] && User::find($entrada['usuarioId'])?->esCuentaPrincipal()) {
             $estadoGuardado = 'ACTIVO';
@@ -160,71 +161,21 @@ final class GestionarUsuariosPanel
 
     private function guardarSubModelos(User $actor, array $entrada, User $usuario)
     {
-        if ($entrada['rol'] === 'FAMILIAR') {
-            $fam = Contacto::updateOrCreate(
-                ['cod_usuario' => $usuario->cod_usuario],
-                [
-                    'cod_contacto' => Contacto::where('cod_usuario', $usuario->cod_usuario)->value('cod_contacto') ?: app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('contactos'),
-                    'nombres' => $entrada['nombres'],
-                    'apellido_paterno' => $entrada['ap_paterno'],
-                    'apellido_materno' => $entrada['ap_materno'],
-                    'numero_documento' => $entrada['numero_documento'],
-                    'telefono' => $entrada['telefono'],
-                    'celular' => $entrada['telefono'],
-                    'correo' => $entrada['correo'],
-                    'direccion' => $entrada['direccion'],
-                    'estado' => 'ACTIVO',
-                    'observacion' => trim(($entrada['parentesco_emergencia'] ?? 'Familiar').' | '.($entrada['observacion_vinculo'] ?? '')),
-                ]
-            );
-
-            $this->guardarVinculosFamiliar($actor, $entrada, $fam);
-        } else {
-            Personal::updateOrCreate(
-                ['cod_usuario' => $usuario->cod_usuario],
-                [
-                    'cod_personal' => Personal::where('cod_usuario', $usuario->cod_usuario)->value('cod_personal') ?: app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('personal'),
-                    'nombres' => $entrada['nombres'],
-                    'apellido_paterno' => $entrada['ap_paterno'],
-                    'apellido_materno' => $entrada['ap_materno'],
-                    'numero_documento' => $entrada['numero_documento'],
-                    'profesion' => $entrada['rol'],
-                    'telefono' => $entrada['telefono'],
-                    'fecha_ingreso' => $entrada['fecha_ingreso'],
-                    'estado' => $usuario->estado,
-                ]
-            );
-        }
+        Personal::updateOrCreate(
+            ['cod_usuario' => $usuario->cod_usuario],
+            [
+                'cod_personal' => Personal::where('cod_usuario', $usuario->cod_usuario)->value('cod_personal') ?: app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('personal'),
+                'nombres' => $entrada['nombres'],
+                'apellido_paterno' => $entrada['ap_paterno'],
+                'apellido_materno' => $entrada['ap_materno'],
+                'numero_documento' => $entrada['numero_documento'],
+                'profesion' => $entrada['rol'],
+                'telefono' => $entrada['telefono'],
+                'fecha_ingreso' => $entrada['fecha_ingreso'],
+                'estado' => $usuario->estado,
+            ]
+        );
     }
-
-    // ══════════════════════════════════════════════
-    // VISTA COMPLETA (modal/panel expandido)
-    // ══════════════════════════════════════════════
-
-    private function guardarVinculosFamiliar(User $actor, array $entrada, Contacto $contacto): void
-    {
-        foreach ($entrada['vinculosFamiliar'] as $vinculo) {
-            $obsSerialized = 'Salud: '.($vinculo['responsable_salud'] ?? 'NO')
-                .' | Económico: '.($vinculo['responsable_economico'] ?? 'NO')
-                .' | Obs: '.($vinculo['observaciones'] ?? '');
-
-            $relacion = ResidenteContacto::firstOrNew([
-                'cod_contacto' => $contacto->cod_contacto,
-                'cod_residente' => $vinculo['cod_residente'] ?? null,
-            ]);
-            $relacion->cod_residente_contacto ??= app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('residentes_contactos');
-            $relacion->fill([
-                'parentesco' => $vinculo['parentesco_vinculo'],
-                'responsable_principal' => ($vinculo['es_responsable'] ?? 'NO') === 'SI',
-                'contacto_emergencia' => true,
-                'autoriza_informacion' => true,
-                'autoriza_salida' => false,
-                'estado' => 'ACTIVO',
-                'observacion' => $obsSerialized,
-            ])->save();
-        }
-    }
-
     private function generarPasswordTemporal(User $actor, array $entrada): string
     {
         return Str::password(16, letters: true, numbers: true, symbols: true, spaces: false);

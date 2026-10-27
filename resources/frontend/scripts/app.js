@@ -2,6 +2,7 @@ import './utilities/bootstrap.js';
 import Swal from 'sweetalert2';
 window.Swal = Swal;
 import './modules/operaciones-interactivas.js';
+import './modules/correo-envios.js';
 import './modules/alertas-signos.js';
 import './modules/alertas-trazabilidad.js';
 import './modules/medicacion-registro.js';
@@ -162,7 +163,7 @@ import './modules/admisiones-interactivas.js';
 import './modules/residentes-interactivos.js';
 import './modules/habitaciones-interactivas.js';
 
-import './modules/auth-login-parallax.js';
+import './modules/auth-access.js';
 import './modules/app-depth-motion.js';
 
 import './modules/hidratacion-registro.js';

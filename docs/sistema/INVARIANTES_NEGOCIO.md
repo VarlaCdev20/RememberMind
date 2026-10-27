@@ -20,6 +20,8 @@ related_modules: [ingreso, alojamiento, jornadas, medicacion, signos, alertas, p
 
 # Invariantes de negocio
 
+> **Conciliación del 25/10/2026:** los conteos 70+1=71 y las pruebas/estados observados más abajo pertenecen al corte original indicado. El inventario instalado vigente es 100 tablas de negocio + 16 técnicas, según [BDD](../base-de-datos/README.md). Las fuentes y requisitos siguen su alcance; la actualización de enlaces no reejecuta pruebas ni cierra deuda. [Estado actual](../ESTADO_ACTUAL.md).
+
 Fuentes rectoras: [AGENTS.md](../../AGENTS.md), [baseline](../../docs/base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md), [diccionario](../../docs/base-de-datos/REMEMBERMIND_BDD_70_TABLAS.md), [decisión V2.2](../../docs/base-de-datos/DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md) y [roles](../../docs/arquitectura/REMEMBERMIND_ROLES_BASELINE_CONGELADO.md). Snapshot del commit base + árbol con cambios previos sin commit. El mapeo original de Fase 2 fue estático. Fase 3 ejecuta migraciones/seed, pruebas PostgreSQL aisladas y build; resultados y límites en TRAZABILIDAD. Inventario normativo 70+1=71; su comprobación instalada se registra separadamente, sin cambiar el esquema.
 
 ## Alcance de los estados

@@ -61,7 +61,11 @@ class AlertasExperienciaVisualTest extends TestCase
             if ($actor->can('alertas.ver') && $rol !== 'FAMILIAR') {
                 Livewire::flushState();
                 $response = $this->get(route($rol === 'ENFERMEROS' ? 'admin.enfermeria.alertas' : 'admin.alertas-clinicas.index'))->assertOk();
-                $response->assertSee('<h1>'.app(ExperienciaAlertas::class)->paraRol($rol)['titulo'].'</h1>', false);
+                if ($rol === 'GERENTE') {
+                    $response->assertSeeText('Supervisión de pendientes y seguimiento del equipo')->assertSeeText('Alertas de la consulta');
+                } else {
+                    $response->assertSee('<h1>'.app(ExperienciaAlertas::class)->paraRol($rol)['titulo'].'</h1>', false);
+                }
                 $response->assertSeeText('Especialidad vinculada')->assertSeeText('Buscar alertas');
                 $this->exportar($slug, $response->getContent());
                 $panel = Livewire::test(AlertasPanel::class)->call('verDetalle', $alertas->first()->getKey())->assertHasNoErrors();

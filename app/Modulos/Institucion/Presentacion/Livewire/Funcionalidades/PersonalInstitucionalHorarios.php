@@ -6,11 +6,14 @@ use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Turno;
 use App\Models\User;
+use App\Modulos\Institucion\Aplicacion\Acciones\ConservarEventoAsignacion;
 use App\Modulos\Institucion\Aplicacion\Acciones\GestionarHorariosPersonal;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 class PersonalInstitucionalHorarios extends Component
@@ -43,6 +46,7 @@ class PersonalInstitucionalHorarios extends Component
         'actualizarTablaPersonal' => 'cargarDatos',
     ];
 
+    #[Locked]
     public string $usuarioId = '';
 
     public bool $abrirFormularioInicial = false;
@@ -59,6 +63,7 @@ class PersonalInstitucionalHorarios extends Component
 
     public bool $esEnfermeria = false;
 
+    #[Locked]
     public array $asignaciones = [];
 
     public array $areas = [];
@@ -113,6 +118,7 @@ class PersonalInstitucionalHorarios extends Component
 
     public function cargarDatos(): void
     {
+        app(GestionarHorariosPersonal::class)->autorizar(false);
         $usuario = $this->usuario();
 
         if (! $usuario) {
@@ -131,6 +137,7 @@ class PersonalInstitucionalHorarios extends Component
 
     public function abrirFormNuevo(): void
     {
+        app(GestionarHorariosPersonal::class)->autorizar();
         if ($this->sinRol) {
             $this->dispatch('mostrarAlerta', [
                 'type' => 'warning',
@@ -159,6 +166,7 @@ class PersonalInstitucionalHorarios extends Component
 
     public function editarAsignacion(string $cod): void
     {
+        app(GestionarHorariosPersonal::class)->autorizar();
         if ($this->sinRol || $this->usuarioBloqueado()) {
             $this->dispatch('mostrarAlerta', [
                 'type' => 'warning',
@@ -205,6 +213,7 @@ class PersonalInstitucionalHorarios extends Component
 
     public function guardar(): void
     {
+        app(GestionarHorariosPersonal::class)->autorizar();
         if ($this->sinRol) {
             $this->addError('f_cod_area', 'El usuario no tiene un rol institucional asignado.');
 
@@ -243,14 +252,6 @@ class PersonalInstitucionalHorarios extends Component
 
         if (! $turno) {
             $this->addError('f_cod_turno', 'El turno seleccionado no está disponible.');
-
-            return;
-        }
-
-        $mensajeSolapamiento = $this->verificarSolapamiento($turno);
-
-        if ($mensajeSolapamiento) {
-            $this->addError('f_dias_semana', $mensajeSolapamiento);
 
             return;
         }
@@ -307,6 +308,7 @@ class PersonalInstitucionalHorarios extends Component
 
     public function prepararFinalizar(string $cod): void
     {
+        app(GestionarHorariosPersonal::class)->autorizar();
         $asignacion = collect($this->asignaciones)->firstWhere('cod_asignacion', $cod);
 
         if (! $asignacion || ($asignacion['estado'] ?? null) !== 'ACTIVA') {
@@ -321,6 +323,7 @@ class PersonalInstitucionalHorarios extends Component
 
     public function confirmarFinalizar(): void
     {
+        app(GestionarHorariosPersonal::class)->autorizar();
         $this->validate([
             'f_fecha_fin_finalizar' => 'required|date',
         ], [
@@ -335,6 +338,12 @@ class PersonalInstitucionalHorarios extends Component
 
         try {
             app(GestionarHorariosPersonal::class)->confirmarFinalizar(['codAsignacionFinalizar' => $this->codAsignacionFinalizar, 'asignaciones' => $this->asignaciones, 'usuarioId' => $this->usuarioId, 'f_tipo_asignacion' => $this->f_tipo_asignacion, 'f_observaciones' => $this->f_observaciones, 'f_fecha_fin_finalizar' => $this->f_fecha_fin_finalizar]);
+        } catch (ValidationException $e) {
+            foreach ($e->errors() as $campo => $mensajes) {
+                $this->addError($campo, $mensajes[0]);
+            }
+
+            return;
         } catch (\Throwable $e) {
             report($e);
 
@@ -368,6 +377,8 @@ class PersonalInstitucionalHorarios extends Component
 
     public function verDetalle(string $cod): void
     {
+        app(GestionarHorariosPersonal::class)->autorizar(false);
+        $this->cargarDatos();
         $asignacion = collect($this->asignaciones)->firstWhere('cod_asignacion', $cod);
 
         if (! $asignacion) {
@@ -388,9 +399,23 @@ class PersonalInstitucionalHorarios extends Component
             'estado' => $asignacion['estado'] ?? '—',
             'tipo_asignacion' => $asignacion['tipo_asignacion'] ?? 'FIJO',
             'observaciones' => $asignacion['observaciones'] !== '' ? $asignacion['observaciones'] : '—',
-            'creado_por' => 'Sistema',
-            'created_at' => $asignacion['fecha_inicio'] ?? '—',
+            'creado_por' => null,
+            'created_at' => null,
         ];
+        $this->detalleAsignacion['historia'] = [];
+        if (app(ConservarEventoAsignacion::class)->disponible()) {
+            $this->detalleAsignacion['historia'] = DB::table('eventos_asignacion_personal as e')
+                ->join('asignaciones_personal as a', 'a.cod_asignacion_personal', '=', 'e.cod_asignacion_personal')
+                ->join('personal as titular', 'titular.cod_personal', '=', 'a.cod_personal')
+                ->leftJoin('personal as autor', 'autor.cod_usuario', '=', 'e.cod_usuario_registro')
+                ->where('titular.cod_usuario', $this->usuarioId)->where('a.cod_asignacion_personal', $cod)->orderBy('e.numero_evento')
+                ->get(['e.tipo_evento', 'e.fecha_hora_efecto', 'e.fecha_hora_registro', 'e.motivo', 'autor.nombres', 'autor.apellido_paterno'])->map(fn ($e) => (array) $e)->all();
+        }
+        $alta = collect($this->detalleAsignacion['historia'])->firstWhere('tipo_evento', 'ALTA');
+        if ($alta) {
+            $this->detalleAsignacion['creado_por'] = trim(($alta['nombres'] ?? '').' '.($alta['apellido_paterno'] ?? '')) ?: null;
+            $this->detalleAsignacion['created_at'] = Carbon::parse($alta['fecha_hora_registro'])->format('d/m/Y H:i');
+        }
 
         $this->modalDetalleAbierto = true;
     }
@@ -409,6 +434,7 @@ class PersonalInstitucionalHorarios extends Component
 
     public function solicitarGuardar(): void
     {
+        app(GestionarHorariosPersonal::class)->autorizar();
         $this->dispatch('confirmarGuardadoAsignacion', [
             'title' => $this->modoEdicion ? 'Guardar nueva versión del horario' : 'Crear asignación',
             'message' => $this->modoEdicion
@@ -419,11 +445,14 @@ class PersonalInstitucionalHorarios extends Component
 
     public function solicitarFinalizar(): void
     {
+        app(GestionarHorariosPersonal::class)->autorizar();
         $this->dispatch('confirmarFinalizacionAsignacion');
     }
 
     public function render(): View
     {
+        app(GestionarHorariosPersonal::class)->autorizar(false);
+
         return view('livewire.identidad.personal-institucional-horarios');
     }
 
@@ -524,7 +553,7 @@ class PersonalInstitucionalHorarios extends Component
                     'fecha_fin_raw' => null,
                     'estado' => in_array($primero->estado, ['ACTIVO', 'ACTIVA'], true) ? 'ACTIVA' : 'FINALIZADA',
                     'tipo_asignacion' => $primero->tipo_asignacion,
-                    'observaciones' => $meta['observaciones'] ?? '',
+                    'observaciones' => $meta['observaciones'] ?? ($primero->observacion ?? ''),
                     'hora_inicio' => $turnoV2?->hora_inicio ? Carbon::parse($turnoV2->hora_inicio)->format('H:i') : '—',
                     'hora_fin' => $turnoV2?->hora_cierre ? Carbon::parse($turnoV2->hora_cierre)->format('H:i') : '—',
                     'hora_inicio_raw' => $turnoV2?->hora_inicio,
@@ -577,53 +606,6 @@ class PersonalInstitucionalHorarios extends Component
             'observaciones' => trim($valor),
             'grupo' => null,
         ];
-    }
-
-    private function observacionesSerializadas(string $grupo): string
-    {
-        $payload = [
-            'grupo' => $grupo,
-            'tipo_asignacion' => $this->f_tipo_asignacion,
-            'observaciones' => trim($this->f_observaciones),
-        ];
-
-        return json_encode($payload, JSON_UNESCAPED_UNICODE);
-    }
-
-    private function verificarSolapamiento(Turno $turno): ?string
-    {
-        $idsExcluir = $this->modoEdicion && $this->codAsignacionEditar
-            ? collect(collect($this->asignaciones)->firstWhere('cod_asignacion', $this->codAsignacionEditar)['codigos_registro'] ?? [])->all()
-            : [];
-
-        $fechaBase = Carbon::parse($this->f_fecha_inicio)->startOfDay();
-        $fechas = collect($this->f_dias_semana)
-            ->map(fn (string $dia) => $this->fechaParaDia($fechaBase, $dia)->toDateString())
-            ->all();
-        $existentes = $this->queryHorarios()
-            ->with('jornada.turno')
-            ->where('estado', 'ACTIVO')
-            ->whereHas('jornada', fn ($query) => $query->whereIn('fecha_jornada', $fechas))
-            ->when($idsExcluir !== [], function ($query) use ($idsExcluir) {
-                $query->whereNotIn($this->primaryKeyHorario(), $idsExcluir);
-            })
-            ->get();
-
-        foreach ($existentes as $existente) {
-            $turnoExistente = $existente->jornada?->turno;
-            if ($this->rangosHoraSeCruzan(
-                (string) $turno->hora_inicio,
-                (string) $turno->hora_fin,
-                (string) $turnoExistente?->hora_inicio,
-                (string) $turnoExistente?->hora_cierre
-            )) {
-                $dia = $this->diaDesdeFecha($existente->jornada->fecha_jornada);
-
-                return "Ya existe un horario activo que se cruza el día {$dia} con el turno {$turnoExistente?->nombre}.";
-            }
-        }
-
-        return null;
     }
 
     private function rangosHoraSeCruzan(string $inicioA, string $finA, string $inicioB, string $finB): bool

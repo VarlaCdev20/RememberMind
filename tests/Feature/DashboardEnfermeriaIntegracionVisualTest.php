@@ -39,7 +39,7 @@ class DashboardEnfermeriaIntegracionVisualTest extends TestCase
         $this->assertMatchesRegularExpression('~<header[^>]*class="[^"]*rm-nursing-dashboard__welcome[^\"]*"~', $html);
         $this->assertStringNotContainsString('rm-dashboard-header--compact', $html);
         $this->assertStringContainsString('class="rm-dashboard-header__visual"', $html);
-        $this->assertStringContainsString('489963938_1158744422930145_8442506970304201426_n.jpg', $html);
+        $this->assertStringContainsString('images/dashboard/enfermera-manos.webp', $html);
         $this->assertStringContainsString('rm-dashboard-divider', $html);
         $this->assertSame(1, preg_match_all('~<button\b[^>]*aria-label="Notificaciones y Alertas"~', $html));
         $this->assertSame(1, substr_count($html, 'aria-label="Resumen visual del turno"'));

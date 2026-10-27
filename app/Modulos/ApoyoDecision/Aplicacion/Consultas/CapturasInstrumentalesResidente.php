@@ -30,11 +30,7 @@ final class CapturasInstrumentalesResidente
         Gate::forUser($usuario)->authorize('consultarResultados', [EvaluacionExperta::class, $residente]);
         $lecturaEnfermeria = Gate::forUser($usuario)->allows('consultarFuentesParaResultado', [EvaluacionExperta::class, $residente]);
         foreach (self::PERMISOS_LECTURA as $permiso) {
-<<<<<<< HEAD
             abort_unless($lecturaEnfermeria || $usuario->checkPermissionTo($permiso, 'web'), 403);
-=======
-            abort_unless($usuario->checkPermissionTo($permiso, 'web'), 403);
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
         }
         if (! array_is_list($preguntasDeclarativas) || array_filter($preguntasDeclarativas, static fn ($p) => ! is_string($p) || $p === '')) {
             throw new DomainException('Las preguntas declarativas requieren identidades explícitas.');

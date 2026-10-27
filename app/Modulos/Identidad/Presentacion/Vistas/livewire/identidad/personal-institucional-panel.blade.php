@@ -1,3 +1,7 @@
+<div class="rm-personal-institucional">
+@if(auth()->user()->hasRole('GERENTE') && !auth()->user()->hasRole('SUPERADMINISTRADOR'))
+    @include('identidad::livewire.identidad.personal-institucional-panel.gerencia')
+@else
 @php
  $estadisticas = array_merge([
  'total' => 0,
@@ -941,3 +945,7 @@
 {!! file_get_contents(resource_path('frontend/scripts/modules/livewire-identidad-personal-institucional-panel.js')) !!}
 </script>
 @endscript
+
+@endif
+
+</div>

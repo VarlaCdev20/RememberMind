@@ -19,7 +19,10 @@ class UpdateUserPassword implements UpdatesUserPasswords
             throw ValidationException::withMessages(['current_password' => 'La contraseña actual no es correcta.']);
         } if (Hash::check($input['password'], $user->getAuthPassword())) {
             throw ValidationException::withMessages(['password' => 'La nueva contraseña debe ser diferente.']);
-        } $user->forceFill(['contrasena' => $input['password']])->save();
+        }
+        $datos=['contrasena'=>$input['password']];
+        if (array_key_exists('cambio_password_pendiente',$user->getAttributes())) $datos['cambio_password_pendiente']=false;
+        $user->forceFill($datos)->save();
         activity('Seguridad')->causedBy($user)->log('Contraseña actualizada.');
     }
 }

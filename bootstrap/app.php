@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web(append: [
             PreventWritesDuringRolePreview::class,
+            \App\Modulos\Identidad\Presentacion\Http\Middleware\ExigirCambioInicialPassword::class,
         ]);
 
         $middleware->alias([

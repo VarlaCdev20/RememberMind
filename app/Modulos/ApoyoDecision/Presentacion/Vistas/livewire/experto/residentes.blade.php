@@ -48,14 +48,8 @@
                                 </div>
                             </div>
                             <div class="flex flex-wrap gap-2">
-<<<<<<< HEAD
-                                <a href="{{ route(auth()->user()->hasRole('PSICOLOGO/A') ? 'admin.psicologia.residente.resultados-experto' : 'admin.medico.residente.resultados-experto', $residente) }}" class="rm-btn rm-btn-primary">Ver resultados<span class="sr-only"> de {{ $residente->nombre_completo }}</span></a>
-                                @if(auth()->user()->hasRole('PSICOLOGO/A'))
-                                    <a href="{{ route('admin.psicologia.residente.ficha', $residente) }}" class="rm-btn rm-btn-secondary">Ficha psicológica<span class="sr-only"> de {{ $residente->nombre_completo }}</span></a>
-=======
                                 @if(auth()->user()->hasRole('PSICOLOGO/A'))
                                     <a href="{{ route('admin.psicologia.residente.ficha', $residente) }}" class="rm-btn rm-btn-primary">Ficha psicológica<span class="sr-only"> de {{ $residente->nombre_completo }}</span></a>
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                                 @endif
                                 <a href="{{ route(auth()->user()->hasRole('PSICOLOGO/A') ? 'admin.psicologia.residente.resultados-experto' : 'admin.medico.residente.resultados-experto', $residente) }}" class="rm-btn rm-btn-secondary">Ver resultados<span class="sr-only"> de {{ $residente->nombre_completo }}</span></a>
                             </div>
@@ -83,17 +77,10 @@
                                     <td data-label="Edad" class="p-3 text-rm-secondary">{{ $residente->edad !== null ? $residente->edad.' años' : 'No registrada' }}</td>
                                     <td data-label="Acciones" class="p-3">
                                         <div class="flex flex-wrap gap-2">
-<<<<<<< HEAD
-                                            <a href="{{ route(auth()->user()->hasRole('PSICOLOGO/A') ? 'admin.psicologia.residente.resultados-experto' : 'admin.medico.residente.resultados-experto', $residente) }}" class="rm-btn rm-btn-primary">Ver resultados<span class="sr-only"> de {{ $residente->nombre_completo }}</span></a>
-                                            @if(auth()->user()->hasRole('PSICOLOGO/A'))
-                                                <a href="{{ route('admin.psicologia.residente.ficha', $residente) }}" class="rm-btn rm-btn-secondary">Ficha psicológica<span class="sr-only"> de {{ $residente->nombre_completo }}</span></a>
-                                            @endif
-=======
                                             @if(auth()->user()->hasRole('PSICOLOGO/A'))
                                                 <a href="{{ route('admin.psicologia.residente.ficha', $residente) }}" class="rm-btn rm-btn-primary">Ficha psicológica<span class="sr-only"> de {{ $residente->nombre_completo }}</span></a>
                                             @endif
                                             <a href="{{ route(auth()->user()->hasRole('PSICOLOGO/A') ? 'admin.psicologia.residente.resultados-experto' : 'admin.medico.residente.resultados-experto', $residente) }}" class="rm-btn rm-btn-secondary">Ver resultados<span class="sr-only"> de {{ $residente->nombre_completo }}</span></a>
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
                                         </div>
                                     </td>
                                 </tr>

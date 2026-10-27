@@ -306,7 +306,6 @@ class InformeCognitivoTest extends TestCase
         $componente = Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
             ->assertSee('Evaluación cognitiva y cuidados')->assertDontSee('Consulta de Enfermería')
             ->assertSee('Volver a Mis residentes')
-<<<<<<< HEAD
             ->assertSee('Consulta del residente asignado')
             ->assertSee('Últimos registros cognitivos')
             ->assertSee('Continuidad de cuidados')
@@ -317,8 +316,6 @@ class InformeCognitivoTest extends TestCase
             ->assertSee('Áreas cognitivas, resultado y fundamento disponibles')
             ->assertSee('expert-nursing-today', false)
             ->assertSee('Consultar fuentes y fundamento')
-=======
->>>>>>> origin/feature/apoyo-decision-informe-neurocognitivo
             ->assertSee('Cobertura del resultado publicado')
             ->assertSee('Sin resultado publicado')
             ->assertDontSee('Versión utilizada')

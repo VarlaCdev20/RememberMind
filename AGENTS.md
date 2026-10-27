@@ -8,6 +8,16 @@ A feature is complete only when the applicable process, actors, states, business
 
 ## Sources of truth
 
+### Remitente institucional protegido
+
+Decisión expresa de la propietaria del 2026-10-26: el correo saliente de
+RememberMind debe usar exclusivamente `remembermind.health@gmail.com`.
+No sustituir esa dirección, la cuenta SMTP de Gmail ni la protección del
+remitente sin una nueva autorización expresa de la propietaria. Las claves de
+aplicación se mantienen exclusivamente en la configuración local secreta;
+nunca en código, documentación, logs ni commits. Los destinatarios de cada
+notificación conservan su flujo y permisos propios.
+
 Use project sources contextually. Do not design RememberMind from memory when the repository already defines the behavior.
 
 Priority when sources conflict:
@@ -24,7 +34,9 @@ Never silently blend contradictory sources. Follow the higher-authority source a
 
 ## Frozen DB governance
 
-The frozen Operational DB V2.1 **core** contains 70 operational tables. Later owner-approved extensions are cumulative; the installed inventory recorded on 2026-10-21 is **75 operational + 29 expert = 104 business tables**, plus 16 technical tables. The owner set a **maximum of 110 business tables for design**, not approval of any specific DDL; see `docs/sistema-experto/DECISION_MAXIMO_110_TABLAS_2026_10_21.md`. The original 70-table dictionary and intermediate counts of 71–108 remain historical snapshots, not today's inventory. `residentes` is the central entity. Consult the baseline, dictionary and subsequent scope-specific decisions before DB analysis or changes.
+Current installed extension, owner-authorized on 2026-10-27: Gerencia designs35/37 add six operational relations and eight nullable columns. The verified local inventory is now **81 operational +25 expert =106 business tables**, plus **16 technical tables**. See `docs/base-de-datos/DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md`. The100-table count below is the preceding 2026-10-22 cut; do not treat it as today's count. The110-table design ceiling remains unchanged and does not approve other DDL.
+
+The frozen Operational DB V2.1 **core** contains 70 operational tables. Later owner-approved extensions are cumulative; the four owner-approved expert consolidations installed on 2026-10-22 leave **75 operational + 25 expert = 100 business tables**, plus **16 technical tables**. See `docs/base-de-datos/DECISION_CONSOLIDACION_BLOQUES_EXPERTOS_2026_10_22.md`. The 104-business-table inventory describes 2026-10-21, before that transition. The owner set a **maximum of 110 business tables for design**, not approval of any specific DDL; see `docs/sistema-experto/DECISION_MAXIMO_110_TABLAS_2026_10_21.md`. The original 70-table dictionary and intermediate counts of 71–108 remain historical snapshots, not today's inventory. `residentes` is the central entity. Consult the baseline, dictionary and subsequent scope-specific decisions before DB analysis or changes.
 
 Without explicit owner approval, do not add/delete/merge/split/rename/modify:
 - tables or columns;
@@ -97,6 +109,12 @@ Ask before decisions that create or change:
 - real-data destruction or exposure.
 
 Technical autonomy means Codex decides **how** to implement. It does not mean Codex invents **what** the institution should require.
+
+## Documentation and approved work
+
+Start at `docs/README.md`; use `docs/modulos/README.md` to locate the twelve owners and process contracts. `docs/ESTADO_ACTUAL.md` summarizes the latest local evidence; dated delivery reports remain evidence of their own cut. A historical scope restriction such as "documentation only", "during the move", or a previous phase ceiling does not govern unrelated later work. Do not repeat an approval already recorded for the same scope. Existing clinical/structural boundaries still apply.
+
+Develop and test already-authorized behavior without requiring a professional signature before each execution. Keep technical implementation, original measurements, structural approval and clinical validation separate. Missing measurements cause a justified limitation or abstention, not a blanket development freeze.
 
 ## Responsible scope
 

@@ -14,6 +14,8 @@ The current code is not authority over the frozen baseline.
 
 ## Frozen schema
 
+Owner-authorized Gerencia designs35/37 were installed locally on2026-10-27: **81 operational +25 expert =106 business tables**, plus16 technical tables. Eight nullable columns and six relations are specified in `docs/base-de-datos/DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md`. The100-table inventory below describes the preceding2026-10-22 cut. Explicit extension paths remain outside automatic migration discovery; a fresh test core without those paths still has100 business tables. Do not infer approval of unrelated changes from this installation.
+
 The frozen V2.1 **core** has 70 operational tables. The `objetivos_signos_vitales` V2.2 extension raised that count to 71 on 2026-10-04; subsequent approved extensions are recorded at the start of the baseline and dictionary. The owner-approved four singular expert consolidations installed on 2026-10-22 leave **75 operational + 25 expert = 100 business tables**, plus **16 technical tables**; see `docs/base-de-datos/DECISION_CONSOLIDACION_BLOQUES_EXPERTOS_2026_10_22.md`. The previous installed count was 104. `docs/sistema-experto/DECISION_MAXIMO_110_TABLAS_2026_10_21.md` permits designing up to 110 business tables; it does **not** approve other specific tables, columns, FK, migrations or clinical activation. The full compound institutional DTO remains outside these four consolidations. Do not use the historical 71-table count to judge today's installed schema. Verify actual migrations and the latest applicable decisions before any change.
 
 Without explicit owner approval, do not:

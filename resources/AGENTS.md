@@ -2,6 +2,8 @@
 
 Applies to `resources/` and visible frontend behavior. Inherit root rules.
 
+Use `docs/ESTADO_ACTUAL.md` and the latest applicable audit to distinguish an approved visual target from a composition actually connected to the current route. An earlier screenshot or delivery report does not prove current integration. Keep missing-data, restricted-access, error and non-interpretable states distinct.
+
 ## Visual objective
 
 RememberMind must feel:

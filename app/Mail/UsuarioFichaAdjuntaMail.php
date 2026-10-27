@@ -15,13 +15,13 @@ class UsuarioFichaAdjuntaMail extends Mailable
     use Queueable, SerializesModels;
 
     public User $usuario;
-    public string $pdfPath;
+    public string $pdfContent;
     public string $filename;
 
-    public function __construct(User $usuario, string $pdfPath, string $filename)
+    public function __construct(User $usuario, string $pdfContent, string $filename)
     {
         $this->usuario = $usuario;
-        $this->pdfPath = $pdfPath;
+        $this->pdfContent = $pdfContent;
         $this->filename = $filename;
     }
 
@@ -42,8 +42,7 @@ class UsuarioFichaAdjuntaMail extends Mailable
     public function attachments(): array
     {
         return [
-            Attachment::fromPath($this->pdfPath)
-                ->as($this->filename)
+            Attachment::fromData(fn () => $this->pdfContent, $this->filename)
                 ->withMime('application/pdf'),
         ];
     }

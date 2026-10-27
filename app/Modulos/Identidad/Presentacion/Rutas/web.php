@@ -15,6 +15,8 @@ return [
         Route::delete('/ver-como-rol', [RolePreviewController::class, 'destroy'])->name('role-preview.destroy');
     },
     'ruta_011' => static function (): void {
+        Route::get('/correos/historial', \App\Modulos\Identidad\Presentacion\Livewire\Paginas\CorreosPanel::class)
+            ->middleware('permission:usuarios.ver|usuarios.editar|usuarios.crear')->name('correos.index');
         Route::get('/', [UsuarioController::class, 'index'])
             ->middleware('permission:usuarios.ver')
             ->name('index');
@@ -81,8 +83,10 @@ return [
     },
     'ruta_024' => static function (): void {
         Route::post('/{usuario}/ficha/enviar-correo', [UsuarioController::class, 'enviarFichaCorreo'])
-            ->middleware('permission:usuarios.ver')
+            ->middleware(['permission:usuarios.ver', 'throttle:10,1'])
             ->name('ficha.enviar-correo');
+        Route::get('/{usuario}/correo/{solicitud}/estado', [UsuarioController::class, 'estadoCorreo'])
+            ->middleware('throttle:60,1')->whereUuid('solicitud')->name('correo.estado');
     },
     'ruta_025' => static function (): void {
         Route::get('/', [DocumentosUsuarioController::class, 'preview'])->name('preview');
@@ -92,7 +96,7 @@ return [
     },
     'ruta_027' => static function (): void {
         Route::post('/enviar', [DocumentosUsuarioController::class, 'enviarPaqueteCorreo'])
-            ->middleware('permission:usuarios.editar|usuarios.crear')->name('enviar');
+            ->middleware(['permission:usuarios.editar|usuarios.crear', 'throttle:10,1'])->name('enviar');
     },
     'ruta_028' => static function (): void {
         Route::get('/{documento}/ver', [DocumentosUsuarioController::class, 'verDocumento'])->name('ver');
@@ -104,6 +108,10 @@ return [
         Route::get('/{documento}/imprimir', [DocumentosUsuarioController::class, 'imprimirDocumento'])->name('imprimir');
     },
     'ruta_031' => static function (): void {
+        Route::get('/personal-documentacion', \App\Modulos\Identidad\Presentacion\Livewire\Paginas\DocumentacionPersonalPanel::class)
+            ->name('personal.documentacion');
+        Route::get('/personal-documentacion/archivos/{documento}', \App\Modulos\Identidad\Presentacion\Http\Controllers\ArchivoDocumentalPersonalController::class)
+            ->name('personal.documento.archivo');
         Route::get('/personal-institucional', PersonalInstitucionalPanel::class)
             ->middleware('permission:personal_institucional.ver')
             ->name('personal-institucional');

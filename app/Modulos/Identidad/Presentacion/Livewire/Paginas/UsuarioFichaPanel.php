@@ -7,13 +7,14 @@ use App\Models\User;
 use App\Modulos\Identidad\Aplicacion\Acciones\DocumentacionUsuarioService;
 use App\Modulos\Identidad\Aplicacion\Acciones\GestionarSeguridadCuenta;
 use App\Modulos\Identidad\Aplicacion\Consultas\UsuarioFichaService;
+use App\Modulos\Identidad\Presentacion\Policies\DocumentoLaboralPolicy;
 use App\Modulos\Reportes\Infraestructura\Exportaciones\ReportExportService;
 use App\Modulos\Reportes\Infraestructura\Exportaciones\ReportFileNameService;
 use App\Modulos\Reportes\Infraestructura\Exportaciones\UsuarioExpedienteExport;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
+use Livewire\Attributes\Locked;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -28,6 +29,9 @@ class UsuarioFichaPanel extends Component
 
     // ── Documentación ──
     public $selectedTipoDoc = null;
+
+    #[Locked]
+    public ?array $referenciaDocumento = null;
 
     public $archivoSubida;
 
@@ -80,6 +84,7 @@ class UsuarioFichaPanel extends Component
         );
 
         $tipo = app(DocumentacionUsuarioService::class)->tipoDisponible($this->usuario, $codTipoDoc);
+        $this->referenciaDocumento = app(DocumentacionUsuarioService::class)->referenciaVigente($this->usuario, $codTipoDoc, auth()->user());
         $this->selectedTipoDoc = $tipo;
         $this->archivoSubida = null;
         $this->fechaEmision = null;
@@ -116,6 +121,9 @@ class UsuarioFichaPanel extends Component
         ]);
 
         try {
+            if ($this->referenciaDocumento === null) {
+                throw ValidationException::withMessages(['file' => 'Abre la carga desde el documento que deseas actualizar.']);
+            }
             $service = app(DocumentacionUsuarioService::class);
             $service->subirDocumento(
                 $this->usuario,
@@ -124,11 +132,12 @@ class UsuarioFichaPanel extends Component
                 $this->fechaEmision,
                 $this->fechaVencimiento,
                 $this->observacionesArchivo,
-                auth()->user()
+                auth()->user(),
+                $this->referenciaDocumento
             );
 
             $this->mostrarSubidaModal = false;
-            $this->reset(['selectedTipoDoc', 'archivoSubida', 'fechaEmision', 'fechaVencimiento', 'observacionesArchivo']);
+            $this->reset(['selectedTipoDoc', 'referenciaDocumento', 'archivoSubida', 'fechaEmision', 'fechaVencimiento', 'observacionesArchivo']);
 
             $this->dispatch('swal', [
                 'icon' => 'success',
@@ -252,18 +261,10 @@ class UsuarioFichaPanel extends Component
         abort_unless(auth()->user()?->can('documentos.ver'), 403);
 
         $documento = Documento::where('cod_usuario', $this->usuario->cod_usuario)->findOrFail($codDoc);
+        abort_unless(app(DocumentoLaboralPolicy::class)->view(auth()->user(), $documento), 403);
 
-        if (! Storage::disk('public')->exists($documento->archivo)) {
-            $this->dispatch('swal', [
-                'icon' => 'error',
-                'title' => 'Archivo no encontrado',
-                'text' => 'El archivo no existe físicamente en el servidor.',
-            ]);
-
-            return null;
-        }
-
-        return Storage::disk('public')->download($documento->archivo, $documento->nombre_documento.'.'.$documento->extension);
+        // La ruta vuelve a autorizar y resuelve el disco privado/público del archivo original.
+        return redirect()->route('admin.personal.documento.archivo', $documento);
     }
 
     // ══════════════════════════════════════════════

@@ -5,7 +5,7 @@
         :usuario="Auth::user()"
         :estado="$dashboard['estado'] ?? null"
         :modo="$dashboard['modo'] ?? null"
-        image="images/FOTOS CENTRO DE ADULTOS MAYORES/489963938_1158744422930145_8442506970304201426_n.jpg"
+        image="images/dashboard/enfermera-manos.webp"
         :scope="isset($dashboard['jornada']['nombre']) ? implode(' · ', array_filter([$dashboard['jornada']['nombre'], $dashboard['jornada']['hora_inicio'] ?? null, $dashboard['jornada']['hora_fin'] ?? null, ($dashboard['modo'] ?? '') === 'FUERA_DE_TURNO' ? 'Solo consulta' : null])) : 'Sin jornada activa'"
     />
     <x-ui.dashboard-divider />

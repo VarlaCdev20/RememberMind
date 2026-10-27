@@ -159,14 +159,17 @@ class DocumentosUsuarioController extends Controller
                 ], 422);
             }
 
-            app(EnviarPaqueteDocumental::class)->ejecutar(auth()->user(), $user);
+            $estado = app(EnviarPaqueteDocumental::class)->ejecutar(auth()->user(), $user);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Paquete documental enviado exitosamente al correo: '.$user->correo,
-            ]);
+                ...$estado,
+                'estado_url' => route('admin.usuarios.correo.estado', [$user, $estado['solicitud']]),
+            ], 202);
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e) {
+            throw $e;
         } catch (\Exception $e) {
-            Log::error('Error al enviar paquete documental: '.$e->getMessage());
+            report($e);
 
             return response()->json([
                 'success' => false,

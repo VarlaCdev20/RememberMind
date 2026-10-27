@@ -1,8 +1,8 @@
 ---
 title: "Modelo de autorización"
 status: CURRENT
-version: "2.0"
-last_reviewed: 2026-10-06
+version: "2.1"
+last_reviewed: 2026-10-25
 owner: RememberMind
 source_of_truth: false
 source_of_truth_scope: [authorization_description]
@@ -24,6 +24,10 @@ Fuentes rectoras: [AGENTS](../../AGENTS.md), [baseline](../../docs/base-de-datos
 
 ## Contrato compuesto
 
+**R01–R03 de Gerencia adoptadas el 25/10/2026:** solicitudes documentales por rol laboral, anulación de documento laboral erróneo con motivo/historia y cambio de estado laboral ACTIVO/INACTIVO con motivo/fecha. Scope de personal aprobado; no anulación clínica, borrado o suspensión/reactivación automática de cuentas. Las asignaciones afectadas requieren continuidad con Administración, sin eliminar pasado. [Constancia](../especificacion-funcional/vistas/gerencia/07-DECISIONES-RESIDUALES-PERSONAL.md#respuestas-adoptadas-el-25102026). Permisos concretos, soporte de datos y pruebas pendientes; no reinterpretar el permiso genérico observado como cobertura ya verificada.
+
+**Extensión funcional aprobada — Gerencia, 25/10/2026:** las decisiones 16B, 17B, 18A y 26B/C autorizan recuperación por enlace para cuentas de su alcance, registro/corrección trazable de vínculos familiares, Familiar activo con vínculo autorizado y exportación PDF/CSV de indicadores agregados. No conceden cambio de roles, publicación clínica, reactivación mediante recuperación o exportación nominal/clinicolaboral. El primer ingreso laboral exige contraseña temporal y cambio obligatorio (15A); los cambios de planificación confirmados generan avisos internos a Administración/afectados (23A). [Constancia completa](../especificacion-funcional/roles/GERENCIA_CUESTIONARIO_PENDIENTE.md#registro-y-próximos-pasos). Esta nota modifica el contrato funcional, no afirma implementación ni verificación de las entradas históricas descritas abajo.
+
 **APPROVED CONTRACT:** sesión autenticada + cuenta ACTIVO + permiso explícito + Policy aplicable + regla de negocio + scope/relación/competencia. Policy aplicable no significa que cada módulo tenga una clase Policy; una operación debe protegerse en backend por el mecanismo existente adecuado.
 
 | Nivel | Significado y evidencia observada |
@@ -32,7 +36,7 @@ Fuentes rectoras: [AGENTS](../../AGENTS.md), [baseline](../../docs/base-de-datos
 | AUTHORIZATION | Decisión completa para acción/recurso/contexto; no se demuestra ocultando un botón |
 | ROLE | Agrupación Spatie; 10 roles activos en [seed](../../database/seeders/RolesAndPermissionsSeeder.php) |
 | PERMISSION | Capacidad explícita recurso.acción; asignación en seed no prueba grants en BDD desplegada |
-| POLICY | [Residente](../../app/Policies/ResidentePolicy.php), [Prescripción](../../app/Policies/PrescripcionPolicy.php), [Administración](../../app/Policies/AdministracionMedicacionPolicy.php), [Valoración preadmisión](../../app/Policies/ValoracionEnfermeriaPreadmisionPolicy.php); no Policy de pase/signos/admisión localizada |
+| POLICY | [Residente](../../app/Modulos/Residentes/Presentacion/Policies/ResidentePolicy.php), [Prescripción](../../app/Modulos/Medicacion/Presentacion/Policies/PrescripcionPolicy.php), [Administración](../../app/Modulos/Medicacion/Presentacion/Policies/AdministracionMedicacionPolicy.php), [Valoración preadmisión](../../app/Modulos/Valoraciones/Presentacion/Policies/ValoracionEnfermeriaPreadmisionPolicy.php); no Policy de pase/signos/admisión localizada |
 | SCOPE | Residente accesible en esa jornada/vínculo, no cualquier código enviado |
 | OWNERSHIP | Registro pertenece al residente y el autor es personal de la cuenta autenticada; no personal del input |
 | PROFESSIONAL COMPETENCE | Profesión autorizada para acto; administrar cuidado no habilita prescribir |
@@ -47,13 +51,13 @@ Las mutaciones Livewire deben revalidar al invocarse; mount/read permiso no equi
 
 **APPROVED CONTRACT:** lectura global ≠ competencia clínica global. [Gate::before](../../app/Providers/AppServiceProvider.php) bypass solo view/viewAny/.ver. [Seed](../../database/seeders/RolesAndPermissionsSeeder.php) asigna todos los permisos web al rol; **OBSERVED IMPLEMENTATION:** [User::checkPermissionTo](../../app/Models/User.php) veta escritura clínica por nombre cuando solo Superadmin y sin sustitución temporal. No interpretar grants de seed aislados como autorización efectiva.
 
-[Excepción](../../docs/arquitectura/PERMISOS_TEMPORALES_SUPERADMIN.md) restringe propósito a local/testing. [Service](../../app/Backend/Modulos/Clinica/Servicios/AccesoClinicoTemporalService.php) exige local/testing + cuenta/personal activos + flag + ausencia de preview. TECH-004 corregido: test con production y flag true deniega sustitución. Usuario con rol profesional adicional se evalúa por esa competencia; no por Superadmin automático. Configuración y explotación en producción **NOT VERIFIED**.
+[Excepción](../../docs/arquitectura/PERMISOS_TEMPORALES_SUPERADMIN.md) restringe propósito a local/testing. [Service](../../app/Modulos/Clinica/Aplicacion/Acciones/AccesoClinicoTemporalService.php) exige local/testing + cuenta/personal activos + flag + ausencia de preview. TECH-004 corregido: test con production y flag true deniega sustitución. Usuario con rol profesional adicional se evalúa por esa competencia; no por Superadmin automático. Configuración y explotación en producción **NOT VERIFIED**.
 
 ## Enfermería y jornada
 
-[autorizarMutacionPaciente](../../app/Backend/Modulos/Enfermeria/Servicios/TurnoEnfermeriaService.php) comprueba cuenta activa, rol admitido, permiso, personal activo, residente admitido y asignación en contexto de turno. Ventana de turno y fecha, incluidas jornadas que cruzan medianoche, son reglas de operación leídas; fixtures/testing no demuestran ventana real.
+[autorizarMutacionPaciente](../../app/Modulos/Cuidados/Aplicacion/Consultas/TurnoEnfermeriaService.php) comprueba cuenta activa, rol admitido, permiso, personal activo, residente admitido y asignación en contexto de turno. Ventana de turno y fecha, incluidas jornadas que cruzan medianoche, son reglas de operación leídas; fixtures/testing no demuestran ventana real.
 
-[Autorización clínica](../../app/Backend/Modulos/Clinica/Servicios/AutorizacionClinicaService.php) delega a contexto de enfermería cuando corresponde y resuelve personal/área propios. No imponer jornada de Enfermería a todo acto médico por extrapolación.
+[Autorización clínica](../../app/Modulos/Clinica/Aplicacion/Acciones/AutorizacionClinicaService.php) delega a contexto de enfermería cuando corresponde y resuelve personal/área propios. No imponer jornada de Enfermería a todo acto médico por extrapolación.
 
 ## Familiar
 

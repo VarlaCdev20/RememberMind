@@ -24,6 +24,9 @@ class CampanaNotificaciones extends Component
 
     public int $conteoRecordatorios = 0;
 
+    public int $conteoDocumentales = 0;
+    public int $conteoLaborales = 0;
+
     #[Locked]
     public array $alertaIdsConocidos = [];
 
@@ -65,9 +68,12 @@ class CampanaNotificaciones extends Component
     {
         $user = auth()->user();
 
-        return $user && $user->fresh()?->estado === 'ACTIVO' && ! $user->hasRole('FAMILIAR') && (bool) $user->canAny([
-            'alertas.ver', 'alertas.gestionar', 'prescripciones.ver', 'administraciones_medicacion.ver',
-        ]);
+        if (!$user || $user->fresh()?->estado !== 'ACTIVO' || $user->hasRole('FAMILIAR')) {
+            return false;
+        }
+        return $user->canAny(['alertas.ver', 'alertas.gestionar', 'prescripciones.ver', 'administraciones_medicacion.ver'])
+            || (app(\App\Modulos\Identidad\Aplicacion\Consultas\CapacidadDocumentalPersonal::class)->disponible()
+                && ($user->personal || app(\App\Modulos\Identidad\Aplicacion\Consultas\ConsultarDocumentacionPersonal::class)->esGestor($user)));
     }
 
     public function togglePanel(): void
@@ -85,6 +91,7 @@ class CampanaNotificaciones extends Component
     #[On('alerta-cerrada')]
     #[On('alerta-actualizada')]
     #[On('evento-alerta-registrado')]
+    #[On('documentacion-personal-actualizada')]
     public function verificarAlertas(): void
     {
         if (! $this->puedeVer()) {
@@ -246,6 +253,11 @@ class CampanaNotificaciones extends Component
         $user = auth()->user();
         $puedeAtender = (bool) $user?->canAny(['alertas.gestionar', 'alertas.seguimiento']);
         $puedeCerrar = (bool) $user?->canAny(['alertas.gestionar', 'alertas.cerrar']);
+        $avisosDocumentales=app(\App\Modulos\Identidad\Aplicacion\Consultas\ConsultarDocumentacionPersonal::class)->avisos($user);
+        $cambiosLaborales=app(\App\Modulos\Identidad\Aplicacion\Consultas\ConsultarCambiosLaboralesPendientes::class)->consultar($user);
+        $this->conteoDocumentales=count($avisosDocumentales);
+        $this->conteoLaborales=count($cambiosLaborales);
+        $this->conteoAbiertas=$this->conteoAlertas+$this->conteoRecordatorios+$this->conteoDocumentales+$this->conteoLaborales;
 
         return view('livewire.alertas.campana-notificaciones', [
             'alertas' => $alertas,
@@ -253,6 +265,8 @@ class CampanaNotificaciones extends Component
             'puedeAtender' => $puedeAtender && $user->hasRole('ENFERMEROS'),
             'puedeConsultarAlertas' => $user->can('alertas.ver'),
             'puedeCerrar' => $puedeCerrar,
+            'avisosDocumentales'=>$avisosDocumentales,
+            'cambiosLaborales'=>$cambiosLaborales,
         ]);
     }
 

@@ -400,7 +400,7 @@ class FrontendArchitectureTest extends TestCase
         foreach ([$encabezadoAdmin, $medicina, $psicologia] as $dashboard) {
             $this->assertStringContainsString('images/FOTOS CENTRO DE ADULTOS MAYORES/', $dashboard);
         }
-        $this->assertStringContainsString('image="images/FOTOS CENTRO DE ADULTOS MAYORES/489963938_1158744422930145_8442506970304201426_n.jpg"', $enfermeria);
+        $this->assertStringContainsString('image="images/dashboard/enfermera-manos.webp"', $enfermeria);
         $this->assertStringContainsString('rotation-context=', $medicina);
         $this->assertStringContainsString('rotation-context=', $psicologia);
         $this->assertStringContainsString('rotation-context=', $workspaceRol);

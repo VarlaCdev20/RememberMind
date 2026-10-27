@@ -73,7 +73,7 @@
   @if($modoEdicion)
   <div class="p-3 bg-estado-advertenciaBg border border-estado-advertenciaBorde rounded-xl flex gap-2 text-xs text-estado-advertencia font-semibold">
   <i class="ph-bold ph-warning-circle text-base flex-shrink-0 mt-0.5"></i>
-  <span>Al guardar, la asignación actual quedará como <strong>FINALIZADA</strong> y se creará una nueva asignación con los datos modificados.</span>
+  <span>Al guardar, la asignación actual quedará como <strong>inactivas</strong> y se creará una nueva asignación con los datos modificados.</span>
   </div>
   @endif
 
@@ -147,15 +147,8 @@
    <input id="staff-schedule-f_fecha_inicio" type="date" wire:model="f_fecha_inicio" class="w-full rounded-xl border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
    @error('f_fecha_inicio') <span class="text-xs text-estado-peligro mt-1 block">{{ $message }}</span> @enderror
   </div>
+<p class="rm-help">Se guardará una jornada concreta por cada día seleccionado dentro de los próximos siete días desde el inicio. No se crea una recurrencia indefinida.</p>
 
-  {{-- Fecha fin (opcional) --}}
-  <div>
-   <label for="staff-schedule-f_fecha_fin" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">
-   Fecha Fin <span class="text-xs text-apoyo font-normal">(opcional)</span>
-   </label>
-   <input id="staff-schedule-f_fecha_fin" type="date" wire:model="f_fecha_fin" class="w-full rounded-xl border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
-   @error('f_fecha_fin') <span class="text-xs text-estado-peligro mt-1 block">{{ $message }}</span> @enderror
-  </div>
 
   {{-- Observaciones --}}
   <div>
@@ -336,9 +329,9 @@
   </div>
   </div>
   <div class="p-5 space-y-4">
-  <p class="text-sm text-parrafo">Ingrese la fecha en que finaliza esta asignación. El registro quedará en estado <strong>FINALIZADA</strong>.</p>
+  <p class="text-sm text-parrafo">Indica desde qué fecha cancelar las ocurrencias seleccionadas. Las jornadas anteriores se conservan; las posteriores quedarán <strong>inactivas</strong>.</p>
   <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">Fecha de Fin <span class="text-estado-peligro">*</span></label>
+   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">Cancelar desde la fecha <span class="text-estado-peligro">*</span></label>
    <input type="date" wire:model="f_fecha_fin_finalizar" class="w-full rounded-xl border-input-borde bg-input-bg text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
    @error('f_fecha_fin_finalizar') <span class="text-xs text-estado-peligro mt-1 block">{{ $message }}</span> @enderror
   </div>
@@ -434,7 +427,12 @@
   @endif
 
   <div class="text-[10px] text-apoyo pt-1 border-t border-borde">
-   Registrado por <strong>{{ $detalleAsignacion['creado_por'] }}</strong> el {{ $detalleAsignacion['created_at'] }}
+   @if($detalleAsignacion['created_at'])
+   Registrado por <strong>{{ $detalleAsignacion['creado_por'] ?: 'Autor no disponible' }}</strong> el {{ $detalleAsignacion['created_at'] }}
+   @else
+   Autor y fecha original de registro no constan.
+   @endif
+   <details><summary>Historia conservada de esta ocurrencia</summary>@forelse($detalleAsignacion['historia'] ?? [] as $acto)<article class="rm-card p-3 mt-2"><strong>{{ ['ALTA'=>'Registro de asignación','FINALIZACION'=>'Finalización registrada','CANCELACION'=>'Cancelación registrada','RECTIFICACION'=>'Corrección registrada'][$acto['tipo_evento']] ?? 'Acto registrado' }}</strong><p>{{ $acto['motivo'] }}</p><p class="rm-help">Efecto: {{ \Carbon\Carbon::parse($acto['fecha_hora_efecto'])->format('d/m/Y H:i') }}. Registrado: {{ \Carbon\Carbon::parse($acto['fecha_hora_registro'])->format('d/m/Y H:i') }}. {{ trim(($acto['nombres'] ?? '').' '.($acto['apellido_paterno'] ?? '')) ?: 'Nombre del autor no disponible' }}.</p></article>@empty<p class="rm-help">No consta historia nominal anterior. No se infiere fecha o autor desde observaciones.</p>@endforelse</details>
   </div>
   </div>
  </div>
