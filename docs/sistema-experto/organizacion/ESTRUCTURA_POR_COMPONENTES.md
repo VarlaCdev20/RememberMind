@@ -1,7 +1,7 @@
 ---
 title: "Estructura adoptada por componentes del sistema experto"
 status: CURRENT
-version: "1.3"
+version: "1.4"
 last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: true
@@ -16,6 +16,8 @@ runtime_verified: false
 La propietaria indicó el 27/10/2026 que el experto se estructure siguiendo el diagrama adjunto `mermaid-diagram.png`. Se adoptan sus ocho componentes principales y sus conexiones. La red semántica y las reglas versionadas pertenecen a la base de conocimiento.
 
 Esta decisión organiza responsabilidades. No selecciona una batería, añade reglas clínicas o umbrales, activa diagnósticos, amplía permisos ni modifica la estructura de la base de datos. La [matriz de datos](../MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md) conserva los aspectos que requieren completar y revisar. La [arquitectura híbrida](../../arquitectura/ADR_ARQUITECTURA_HIBRIDA.md) sigue definiendo dónde vive el código.
+
+Decisión posterior del 28/10/2026: [selección instrumental escalonada adoptada](../instrumentos/SELECCION_ADOPTADA_2026_10_28.md), con prioridad entrevista e informante + MoCA o RUDAS + FAQ. Quedan por cerrar las versiones, aplicabilidad, derechos y perfiles correspondientes; la selección no certifica implementación ni validación clínica.
 
 ## 1. Diagrama adoptado
 
@@ -44,7 +46,7 @@ La explicación corresponde a la misma ejecución que el resultado, incluso cuan
 
 | Componente | Responsabilidad y salida | Entrada existente de código | Estado y trabajo pendiente |
 |---|---|---|---|
-| **1. Registros originales** | Mantener mediciones, respuestas, observaciones y documentos con residente, fecha clínica y autor. Son las fuentes del caso. | Captura en [Valoraciones](../../../app/Modulos/Valoraciones/README.md), [Cuidados](../../../app/Modulos/Cuidados/README.md) y [Clinica](../../../app/Modulos/Clinica/README.md); adquisición mediante [CapturasInstrumentalesResidente](../../../app/Modulos/ApoyoDecision/Aplicacion/Consultas/CapturasInstrumentalesResidente.php). | Existe la capacidad de captura; los registros reales se incorporarán al operar. Falta cerrar la batería y la cobertura de datos de la matriz; no se presupone que cada residente ya tenga todas las mediciones. |
+| **1. Registros originales** | Mantener mediciones, respuestas, observaciones y documentos con residente, fecha clínica y autor. Son las fuentes del caso. | Captura en [Valoraciones](../../../app/Modulos/Valoraciones/README.md), [Cuidados](../../../app/Modulos/Cuidados/README.md) y [Clinica](../../../app/Modulos/Clinica/README.md); adquisición mediante [CapturasInstrumentalesResidente](../../../app/Modulos/ApoyoDecision/Aplicacion/Consultas/CapturasInstrumentalesResidente.php). | Existe la capacidad de captura; los registros reales se incorporarán al operar. Las familias ya están seleccionadas; faltan ediciones, condiciones de incorporación y cobertura de datos de la matriz. No se presupone que cada residente ya tenga todas las mediciones. |
 | **2. Validación** | Comprobar permiso, competencia, pertenencia al residente, identidad instrumental, calidad y fecha de corte; conservar los motivos de exclusión. | [AplicarInstrumento](../../../app/Modulos/Valoraciones/Aplicacion/Acciones/AplicarInstrumento.php), [ExtractorCapturaInstrumental](../../../motor-experto/src/motor_experto/dominio/instrumentos/ExtractorCapturaInstrumental.php) y [FuentesValoracionOperativa](../../../app/Modulos/ApoyoDecision/Aplicacion/Consultas/FuentesValoracionOperativa.php). | Hay controles implementados. Cada instrumento que se adopte debe tener identidad y condiciones aplicables; un dato técnicamente válido no acredita por sí solo interpretación clínica. |
 | **3. Hechos del caso — base de hechos** | Construir la evidencia de una evaluación concreta, con procedencia, corte, literal original y representación válida. Mantener ausencia y contradicción. | [ConstructorMemoriaInstrumental](../../../motor-experto/src/motor_experto/adaptadores/entrada/ConstructorMemoriaInstrumental.php) y [MemoriaTrabajo institucional](../../../motor-experto/src/motor_experto/dominio/inferencia/MemoriaTrabajo.php). | Existe construcción de hechos. Es memoria de una ejecución, no una copia editable de la historia ni una nueva tabla de residentes. |
 | **4. Base de conocimiento** | Reunir una versión concreta de conceptos, relaciones, reglas, condiciones, consecuencias y referencias. | [CargadorConocimiento](../../../app/Modulos/ApoyoDecision/Infraestructura/Persistencia/Eloquent/CargadorConocimiento.php), [PaqueteConocimiento](../../../motor-experto/src/motor_experto/dominio/conocimiento/PaqueteConocimiento.php) y [gobierno de reglas](../../../app/Modulos/ApoyoDecision/Presentacion/Livewire/Paginas/GobiernoReglasPanel.php). | Existe conocimiento versionado. La fuente registrada se mantiene en la BDD existente; revisar alcance, procedencia y aprobación sin confundir estado ACTIVO con validación clínica. |
@@ -76,13 +78,13 @@ El [mapa de archivos](MAPA_COMPONENTES.md) es el índice técnico complementario
 
 ## 4. Orden de desarrollo y criterio de cierre
 
-Primera entrega de los componentes 1 y 2: [registros originales y validación](REGISTROS_ORIGINALES_Y_VALIDACION.md), con contrato de captura, mapa físico de entradas y comprobación sin residentes, además de las pruebas de acceso directo. No cierra todavía la selección de instrumentos ni todos los datos de la matriz.
+Primera entrega de los componentes 1 y 2: [registros originales y validación](REGISTROS_ORIGINALES_Y_VALIDACION.md), con contrato de captura, mapa físico de entradas y comprobación sin residentes, además de las pruebas de acceso directo. La selección de familias se cerró posteriormente mediante la decisión enlazada; sus condiciones de incorporación y los datos faltantes de la matriz mantienen su alcance pendiente.
 
 Preparación del componente 3: [mapa de fuentes a hechos](MAPA_FUENTES_A_HECHOS.md), compartido por el contrato de soportes, el formulario y el inventario de entradas. Todavía no configura la batería instrumental ni crea hechos de personas.
 
 1. **Registros originales y validación:** cerrar dato, instrumento/fuente, autor, fecha y condición de uso; comprobar cobertura sin inventar mediciones.
 2. **Hechos del caso:** definir y verificar el paso de cada fuente a evidencia, manteniendo procedencia, ausencia y contradicción.
-3. **Base de conocimiento:** revisar conceptos, relaciones y reglas versionadas contra los contratos y referencias aplicables. La elección de instrumentos y reglas nuevas sigue siendo una decisión específica.
+3. **Base de conocimiento:** revisar conceptos, relaciones y reglas versionadas contra los contratos y referencias aplicables. Aplicar la selección instrumental adoptada; nuevas reglas, umbrales o sustituciones conservan su decisión específica.
 4. **Motor, resultado y explicación:** comprobar conjuntamente que la misma entrada y versión producen la salida y sus motivos correspondientes, incluida la abstención.
 5. **Conservación y revisión:** completar guardado, recuperación íntegra y revisión vinculada al resultado conservado con las relaciones existentes.
 

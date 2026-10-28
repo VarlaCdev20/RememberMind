@@ -1,7 +1,7 @@
 ---
 title: "Primer bloque: registros originales y validación"
 status: CURRENT
-version: "1.1"
+version: "1.2"
 last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: false
@@ -71,11 +71,11 @@ Los permisos y competencias son los existentes; esta entrega no concede otros. L
 
 La exclusión del lote requiere conjuntamente su documento técnico y la marca exacta de admisión. Una coincidencia aislada no bloquea una persona ordinaria. Las pruebas verifican ambos lados de esa frontera.
 
-## 5. Disponibilidad y decisión clínica pendiente
+## 5. Disponibilidad y condiciones de incorporación pendientes
 
 El inventario de metadatos se repitió el 27/10/2026 mediante [inventariar-experto.php](../../../scripts/inventariar-experto.php), en PostgreSQL con transacción de solo lectura y rollback. Confirmó 26 instrumentos físicos y seis versiones; la configuración efectiva sigue con cero perfiles instrumentales. No se consultaron historias de residentes ni se modificaron catálogos. El [inventario anterior](../inventarios/README.md) clasifica esas entradas, incluidas las técnicas ya excluidas.
 
-**Pendiente para avanzar en interpretación:** elegir los instrumentos concretos y su edición, idioma, condiciones de aplicación, normas aplicables, derechos y capacitación. El [catálogo de candidatos](../instrumentos/CATALOGO_CANDIDATOS.md) y la [matriz D01–D27](../MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md) sirven de base; no son una batería aprobada.
+**Selección aprobada el 28/10/2026:** [familias y niveles adoptados](../instrumentos/SELECCION_ADOPTADA_2026_10_28.md), con prioridad entrevista e informante + MoCA o RUDAS + FAQ. **Pendiente para avanzar en interpretación:** cerrar edición, idioma, condiciones de aplicación, normas aplicables, derechos, capacitación y perfiles. El [catálogo de candidatos](../instrumentos/CATALOGO_CANDIDATOS.md) y la [matriz D01–D27](../MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md) conservan su función de investigación e inventario; no acreditan activación instrumental.
 
 Las brechas de escolaridad, idioma, informante y contexto documentadas en la matriz siguen abiertas en su alcance. Esta entrega no las declara resueltas ni introduce un nuevo formulario paralelo para ellas.
 
@@ -87,13 +87,13 @@ Las brechas de escolaridad, idioma, informante y contexto documentadas en la mat
 - Las ocho regresiones de este bloque pasaron también en PostgreSQL desechable propio, con 52 aserciones; su evidencia local queda en `output/experto-fase1-postgres*`.
 - No cambió Blade/CSS/JS ni el esquema. Esta entrega no acredita un nuevo diseño visual, un motor clínicamente validado o el cierre de conservación conjunta instrumental/Petersen.
 
-La evidencia local de captura, reproducción e inventario queda en `output/experto-fase1-*`; no se incorpora al commit junto a datos o secretos. La siguiente entrega debe concretar la batería y el mapeo de cada medición a hechos, reutilizando este contrato de entrada.
+La evidencia local de captura, reproducción e inventario queda en `output/experto-fase1-*`; no se incorpora al commit junto a datos o secretos. Tras la selección adoptada, debe concretarse la identidad y condiciones de cada instrumento y el mapeo de cada medición a hechos, reutilizando este contrato de entrada.
 
 ## 7. Preparación antes de tener residentes — 28/10/2026
 
 La propietaria indicó que todavía no tiene residentes reales. El componente 1 se prepara sobre las fuentes, formularios y relaciones existentes. **Capacidad de captura disponible y registros clínicos reales disponibles son estados diferentes.** Esta entrega no crea personas, admisiones, aplicaciones, respuestas ni mediciones de ejemplo; tampoco consulta historias para comprobar esa afirmación.
 
-El estado de este bloque es **estructura de entrada comprobada; datos reales pendientes de operación; batería y perfiles por concretar**. El ingreso de un residente mantiene el flujo institucional de preadmisión y admisión formal. No se habilita un alta directa desde el experto.
+El estado de este bloque es **estructura de entrada comprobada; datos reales pendientes de operación; familias seleccionadas; versiones, condiciones y perfiles por concretar**. El ingreso de un residente mantiene el flujo institucional de preadmisión y admisión formal. No se habilita un alta directa desde el experto.
 
 ### Mapa de datos y captura existente
 
@@ -130,7 +130,7 @@ Comando local de solo lectura:
 php scripts/inventariar-experto.php
 ```
 
-El resultado añade `contrato_entradas` al inventario previo. La [evidencia de estructura del 28/10](ENTRADAS_ESTRUCTURA_2026_10_28.json) contiene únicamente metadatos: ocho fuentes de soporte y seis estructuras complementarias, **14/14 verificadas**. No contiene identidades, historias ni valores clínicos. No es un archivo para editar reglas ni activar permisos. Los campos ausentes de la matriz, la selección de instrumentos y la conservación conjunta siguen pendientes.
+El resultado añade `contrato_entradas` al inventario previo. La [evidencia de estructura del 28/10](ENTRADAS_ESTRUCTURA_2026_10_28.json) contiene únicamente metadatos: ocho fuentes de soporte y seis estructuras complementarias, **14/14 verificadas**. No contiene identidades, historias ni valores clínicos. No es un archivo para editar reglas ni activar permisos. Los campos ausentes de la matriz, las condiciones de incorporación de los instrumentos seleccionados y la conservación conjunta siguen pendientes.
 
 Las pruebas `ContratoEntradasSinResidentesTest` verifican una base operativa vacía, SQLite en modo de solo lectura, una base sin esquema y el rechazo de motores no verificados. Inspeccionan las consultas para impedir escrituras y lecturas de filas clínicas. No utilizan factories de residentes, seeders clínicos ni casos simulados. La evidencia técnica de estas pruebas no certifica desempeño diagnóstico.
 

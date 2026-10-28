@@ -1,7 +1,7 @@
 ---
 title: "Sistema experto: fuentes, funcionamiento y límites"
 status: CURRENT
-version: "3.6"
+version: "3.7"
 last_reviewed: 2026-10-28
 owner: RememberMind
 source_of_truth: false
@@ -15,7 +15,7 @@ runtime_verified: false
 
 ## Entrada única: dónde encontrar cada parte
 
-Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años, con evidencias explicables y revisión profesional. Esta organización conserva los contratos adoptados y no selecciona todavía una batería nueva.
+Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años, con evidencias explicables y revisión profesional. La propietaria aprobó el 28/10/2026 una selección escalonada: entrevista e informante + MoCA o RUDAS + FAQ como prioridad inicial; apoyos y evaluación ampliada según el caso. Las versiones, condiciones y derechos de incorporación permanecen por cerrar en su alcance.
 
 | Necesito encontrar… | Abrir |
 |---|---|
@@ -25,7 +25,7 @@ Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años,
 | El código de hechos, red semántica, reglas e inferencia | [Mapa único de componentes y recorridos](organizacion/MAPA_COMPONENTES.md) |
 | Qué datos existen y qué falta capturar | [Ficha y matriz D01–D27](MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md) |
 | Los 45 instrumentos y evaluaciones candidatos | [Catálogo de investigación por finalidad](instrumentos/CATALOGO_CANDIDATOS.md) |
-| Qué instrumentos proponemos seleccionar primero | [Siete iniciales/de apoyo y cinco familias ampliadas; decisión pendiente](instrumentos/SELECCION_PROPUESTA_2026_10_28.md) |
+| Qué instrumentos se seleccionaron y qué integramos primero | [Selección escalonada adoptada y pendientes de activación](instrumentos/SELECCION_ADOPTADA_2026_10_28.md) |
 | Qué está realmente catalogado en la base local | [Inventario PostgreSQL del 27/10/2026](inventarios/README.md) y [metadatos](inventarios/2026-10-27.json) |
 | Reglas institucionales: fuente y gestión | [Mapa de reglas/versiones](organizacion/MAPA_COMPONENTES.md#3-reglas-en-un-solo-lugar-fuente-y-responsabilidades) y ruta existente `/admin/sistema-experto/reglas`, sujeta a autorización |
 | Retirada de simulaciones y laboratorio | [Alcance, conservación y verificación](RETIRADA_LABORATORIO_2026_10_27.md) |
@@ -42,6 +42,8 @@ La implementación usa `motor-experto/` y `app/Modulos/ApoyoDecision/`; no exist
 ## Contratos y decisiones aplicables
 
 Preparación actual para detección temprana en personas mayores de 60 años: [ficha y matriz de datos del 27/10/2026](MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md). Es un inventario estático para revisión: separa capacidades, fuentes parciales y conservación pendiente; no selecciona una batería ni cambia reglas o permisos.
+
+La [decisión de selección del 28/10/2026](instrumentos/SELECCION_ADOPTADA_2026_10_28.md) complementa ese corte: cierra las familias y niveles, sin declarar perfiles instalados, derechos obtenidos o validación clínica.
 
 | Alcance | Fuente |
 |---|---|

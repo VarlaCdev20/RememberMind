@@ -1,7 +1,7 @@
 ---
 title: "Catálogo de candidatos para evaluación cognitiva y apoyo"
 status: DRAFT
-version: "0.2"
+version: "0.3"
 last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: false
@@ -15,7 +15,7 @@ runtime_verified: false
 
 Inventario de investigación solicitado por la propietaria para personas mayores de 60 años. No es exhaustivo ni una batería obligatoria; no implica licencia, traducción autorizada, norma local, aplicabilidad a todas las edades o selección institucional. Cada instrumento tiene alcance y versiones propios. Las tareas pueden solaparse o integrar baterías: no contar sus puntuaciones como evidencias independientes por duplicado.
 
-La [selección propuesta del 28/10/2026](SELECCION_PROPUESTA_2026_10_28.md) reduce esta investigación a siete instrumentos iniciales/de apoyo y cinco familias ampliadas para decisión institucional. Mantiene alternativas, límites y derechos pendientes; no activa los 45 candidatos ni declara una batería aprobada.
+La [selección escalonada adoptada el 28/10/2026](SELECCION_ADOPTADA_2026_10_28.md) cierra doce familias: circuito inicial de entrevista e informante + MoCA o RUDAS + FAQ; apoyos, AD8 complementario y evaluación ampliada según el caso. La [propuesta anterior](SELECCION_PROPUESTA_2026_10_28.md) conserva la investigación y las fuentes. La aprobación no activa los 45 candidatos ni acredita versiones, perfiles o derechos resueltos.
 
 ## A. Detección y evaluación cognitiva general
 
@@ -113,6 +113,6 @@ GDS aquí significa escala de depresión de Yesavage, no escala de deterioro glo
 
 ## Antes de incorporar cualquiera
 
-Precisar identidad, edición, forma, idioma, población/rango de edad, escolaridad y normas; derechos de administración, digitalización y almacenamiento; capacitación, fuentes de puntuación y ámbito profesional. La selección y los umbrales requieren la decisión clínica/institucional correspondiente. No se copian reactivos ni baremos a la aplicación por aparecer en este catálogo.
+Precisar identidad, edición, forma, idioma, población/rango de edad, escolaridad y normas; derechos de administración, digitalización y almacenamiento; capacitación, fuentes de puntuación y ámbito profesional. La selección de familias ya tiene decisión institucional en el documento adoptado; los umbrales nuevos mantienen su aprobación específica. No se copian reactivos ni baremos a la aplicación por aparecer en este catálogo.
 
-Los candidatos mantienen su estado de investigación; doce familias tienen una propuesta específica de selección en el documento enlazado, todavía pendiente de decisión institucional. Barthel figura ya en el catálogo instalado como apoyo funcional; eso no acredita adopción del resto ni administración de pruebas. Cerrar la selección y sus fichas de edición, aplicabilidad y derechos precede a activar formularios.
+Doce familias tienen selección institucional aprobada en su alcance escalonado; los demás candidatos quedan como reserva. Barthel figura ya en el catálogo instalado como apoyo funcional; eso no acredita instalación del resto ni administración de pruebas. Las fichas de edición, aplicabilidad, derechos y conexión deben cerrarse antes de activar cada instrumento.

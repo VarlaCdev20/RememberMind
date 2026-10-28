@@ -1,7 +1,7 @@
 ---
 title: "Selección propuesta de instrumentos para detección temprana de DCL"
-status: DRAFT
-version: "0.1"
+status: HISTORICAL
+version: "0.2"
 last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: false
@@ -10,6 +10,8 @@ runtime_verified: false
 ---
 
 # Selección propuesta para cerrar los instrumentos
+
+**Antecedente de la selección, no decisión vigente.** La propietaria aprobó el 28/10/2026 la organización escalonada con ajustes posteriores a esta propuesta. Consultar la [selección adoptada](SELECCION_ADOPTADA_2026_10_28.md): AD8 complementario, circuito inicial prioritario y evaluación ampliada según el caso. El contenido siguiente conserva la propuesta y las fuentes anteriores a esa aprobación; sus frases de decisión pendiente describen ese momento.
 
 [Portal](../README.md) · [45 candidatos](CATALOGO_CANDIDATOS.md) · [Matriz de datos](../MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md) · [Mapa de fuentes](../organizacion/MAPA_FUENTES_A_HECHOS.md).
 

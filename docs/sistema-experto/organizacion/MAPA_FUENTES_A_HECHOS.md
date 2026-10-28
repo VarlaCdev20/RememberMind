@@ -1,7 +1,7 @@
 ---
 title: "De fuentes originales a hechos del caso"
 status: CURRENT
-version: "1.0"
+version: "1.1"
 last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: false
@@ -88,6 +88,6 @@ El resultado puede consultarse antes de tener residentes. No crea ni activa fuen
 
 Se verifica que formulario e inventario comparten los mismos tipos, que solo se enumeran cinco áreas y C01–C05, que C02 permanece derivado y que los tipos de soporte conservan exactamente las fuentes admitidas. La prueba de base vacía comprueba además que el mapa se obtiene sin filas clínicas ni escrituras. Las regresiones del formulario contrastan los soportes originales y el rechazo de fuentes de otra persona o campos manipulados.
 
-Este trabajo prepara el contrato fuente–hecho. El siguiente paso dependiente es concretar los instrumentos y sus perfiles aplicables para conectar mediciones reales; no se configura un instrumento por parecido de nombre ni se reemplaza ese pendiente con simulaciones. La base de conocimiento, la conservación y la validación clínica mantienen sus propios criterios de cierre.
+Este trabajo prepara el contrato fuente–hecho. La [selección escalonada adoptada el 28/10/2026](../instrumentos/SELECCION_ADOPTADA_2026_10_28.md) cierra las familias y prioriza entrevista e informante + MoCA o RUDAS + FAQ. El siguiente paso dependiente es cerrar sus versiones, condiciones, derechos y perfiles aplicables para conectar mediciones reales; no se configura un instrumento por parecido de nombre ni se reemplaza ese pendiente con simulaciones. La base de conocimiento, la conservación y la validación clínica mantienen sus propios criterios de cierre.
 
 Verificación del corte: seis pruebas del mapa/inventario aprobadas en SQLite (366 aserciones); cinco aprobadas en PostgreSQL desechable (336 aserciones) y una omitida por verificar `PRAGMA query_only` exclusivo de SQLite. Ocho regresiones específicas de captura aprobadas (89 aserciones). Sin cambios de Blade/CSS/JS; build y QA de diseño nuevo no aplican.
