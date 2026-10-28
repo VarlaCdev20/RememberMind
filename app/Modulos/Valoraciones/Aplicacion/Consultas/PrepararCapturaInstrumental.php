@@ -8,6 +8,7 @@ use App\Models\DocumentoClinico;
 use App\Models\Instrumento;
 use App\Models\Residente;
 use App\Models\User;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\FuentesValoracionOperativa;
 use App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService;
 use App\Modulos\Clinica\Aplicacion\Acciones\AutorizacionClinicaService;
 use App\Modulos\Clinica\Aplicacion\Consultas\ContextoClinicoService;
@@ -60,7 +61,7 @@ final readonly class PrepararCapturaInstrumental
     public function contexto(?User $usuario, string $codigoResidente): array
     {
         $usuario = $this->usuario($usuario);
-        $residente = Residente::query()->findOrFail($codigoResidente);
+        $residente = FuentesValoracionOperativa::residentes(Residente::query())->findOrFail($codigoResidente);
         Gate::forUser($usuario)->authorize('view', $residente);
         $personal = app(AutorizacionClinicaService::class)->autorizarMutacion($usuario, $residente,
             'aplicaciones_instrumento.crear', AplicarInstrumento::ROLES_APLICADORES);
@@ -73,13 +74,13 @@ final readonly class PrepararCapturaInstrumental
     {
         $this->usuario($usuario);
 
-        return \App\Modulos\ApoyoDecision\Aplicacion\Consultas\FuentesValoracionOperativa::instrumentoInstitucional(Instrumento::query())->where('estado', 'ACTIVO')->orderBy('nombre')->get(['cod_instrumento', 'codigo', 'nombre', 'version']);
+        return FuentesValoracionOperativa::instrumentoInstitucional(Instrumento::query())->where('estado', 'ACTIVO')->orderBy('nombre')->get(['cod_instrumento', 'codigo', 'nombre', 'version']);
     }
 
     public function catalogo(?User $usuario, string $codigoResidente, string $codigoInstrumento): array
     {
         $this->contexto($usuario, $codigoResidente);
-        $instrumento = \App\Modulos\ApoyoDecision\Aplicacion\Consultas\FuentesValoracionOperativa::instrumentoInstitucional(Instrumento::query())->whereKey($codigoInstrumento)->where('estado', 'ACTIVO')->firstOrFail();
+        $instrumento = FuentesValoracionOperativa::instrumentoInstitucional(Instrumento::query())->whereKey($codigoInstrumento)->where('estado', 'ACTIVO')->firstOrFail();
 
         $preguntas = $instrumento->preguntas()->where('estado', 'ACTIVA')->orderBy('orden')->orderBy('cod_pregunta')
             ->with(['opciones' => fn ($q) => $q->where('estado', 'ACTIVO')->orderBy('orden')->orderBy('cod_opcion')])
@@ -149,7 +150,7 @@ final readonly class PrepararCapturaInstrumental
         $usuario = $this->usuario($usuario);
         abort_unless($usuario->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A'])
             && $usuario->checkPermissionTo('aplicaciones_instrumento.transcribir', 'web'), 403);
-        $residente = Residente::query()->findOrFail($codigoResidente);
+        $residente = FuentesValoracionOperativa::residentes(Residente::query())->findOrFail($codigoResidente);
         $this->contexto($usuario, $codigoResidente);
         Gate::forUser($usuario)->authorize('view', $residente);
 

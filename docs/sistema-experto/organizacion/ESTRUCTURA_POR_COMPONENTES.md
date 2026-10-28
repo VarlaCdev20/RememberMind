@@ -1,7 +1,7 @@
 ---
 title: "Estructura adoptada por componentes del sistema experto"
 status: CURRENT
-version: "1.0"
+version: "1.1"
 last_reviewed: 2026-10-27
 owner: ApoyoDecision
 source_of_truth: true
@@ -75,6 +75,8 @@ Los ocho componentes son responsabilidades del experto; no son ocho módulos Lar
 El [mapa de archivos](MAPA_COMPONENTES.md) es el índice técnico complementario. Esta entrega no traslada ni renombra clases: establece el orden funcional por el que se organizarán y completarán los componentes, conservando sus consumidores y contratos.
 
 ## 4. Orden de desarrollo y criterio de cierre
+
+Primera entrega de los componentes 1 y 2: [registros originales y validación](REGISTROS_ORIGINALES_Y_VALIDACION.md), con contrato de captura y pruebas de acceso directo. No cierra todavía la selección de instrumentos ni todos los datos de la matriz.
 
 1. **Registros originales y validación:** cerrar dato, instrumento/fuente, autor, fecha y condición de uso; comprobar cobertura sin inventar mediciones.
 2. **Hechos del caso:** definir y verificar el paso de cada fuente a evidencia, manteniendo procedencia, ausencia y contradicción.

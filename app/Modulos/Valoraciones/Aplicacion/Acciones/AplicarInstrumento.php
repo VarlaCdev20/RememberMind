@@ -14,6 +14,7 @@ use App\Models\PreguntaInstrumento;
 use App\Models\Residente;
 use App\Models\RespuestaInstrumento;
 use App\Models\User;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\FuentesValoracionOperativa;
 use App\Modulos\Clinica\Aplicacion\Acciones\AutorizacionClinicaService;
 use App\Modulos\Valoraciones\Aplicacion\DTOs\CatalogoPreguntasInstrumento;
 use Carbon\CarbonImmutable;
@@ -49,8 +50,8 @@ final class AplicarInstrumento
     {
         return DB::transaction(function () use ($usuario, $entrada, $instrumento, $residente, $codigoReservado, $huellaCatalogo, $historica, $guardar): AplicacionInstrumento|array {
             $usuario = User::query()->lockForUpdate()->findOrFail($usuario->getKey());
-            $residente = Residente::query()->lockForUpdate()->findOrFail($residente->getKey());
-            $instrumento = \App\Modulos\ApoyoDecision\Aplicacion\Consultas\FuentesValoracionOperativa::instrumentoInstitucional(Instrumento::query())->lockForUpdate()->findOrFail($instrumento->getKey());
+            $residente = FuentesValoracionOperativa::residentes(Residente::query())->lockForUpdate()->findOrFail($residente->getKey());
+            $instrumento = FuentesValoracionOperativa::instrumentoInstitucional(Instrumento::query())->lockForUpdate()->findOrFail($instrumento->getKey());
             $personal = $this->autorizacion->autorizarMutacion($usuario, $residente,
                 $historica ? 'aplicaciones_instrumento.transcribir' : 'aplicaciones_instrumento.crear',
                 $historica ? ['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A'] : self::ROLES_APLICADORES);

@@ -441,4 +441,71 @@ final class CapturaInstrumentalFormularioTest extends TestCase
         $this->abrir()->set('cod_instrumento', $observacional->getKey())
             ->assertSee('Registro observacional')->assertDontSee('Método vinculado');
     }
+
+    public static function entradasLoteTecnico(): array
+    {
+        return array_combine(['contexto', 'catalogo', 'aplicar', 'conciliar', 'transcribir'],
+            array_map(static fn ($operacion) => [$operacion], ['contexto', 'catalogo', 'aplicar', 'conciliar', 'transcribir']));
+    }
+
+    private function registrarMarcaAdmision(?string $observacion): void
+    {
+        \App\Models\Admision::create(['cod_residente' => $this->residente->getKey(),
+            'cod_usuario_registro' => $this->usuario->getKey(), 'fecha_hora_admision' => now(),
+            'motivo_ingreso' => 'Fixture de validación de origen.', 'estado' => 'VIGENTE', 'observacion' => $observacion]);
+    }
+
+    #[DataProvider('entradasLoteTecnico')]
+    public function test_lote_tecnico_no_admite_contexto_ni_captura_directa(string $operacion): void
+    {
+        $this->residente->update(['numero_documento' => 'COH30-S01']);
+        $this->registrarMarcaAdmision('COHORTE-INFERENCIA-30-V1 · DATOS SINTÉTICOS, USO EXCLUSIVO DE PRUEBAS.');
+        $entrada = ['fecha_hora' => now()->subMinute()->format('Y-m-d H:i:s'),
+            'respuestas' => [['cod_pregunta' => $this->preguntas['NUMERICO']->getKey(), 'valor_numero' => 0]]];
+        $auditoriaAntes = DB::table('activity_log')->count();
+        try {
+            match ($operacion) {
+                'contexto' => app(PrepararCapturaInstrumental::class)->contexto($this->usuario, $this->residente->getKey()),
+                'catalogo' => app(PrepararCapturaInstrumental::class)->catalogo($this->usuario, $this->residente->getKey(), $this->instrumento->getKey()),
+                default => app(AplicarInstrumento::class)->{$operacion}($this->usuario, $entrada, $this->instrumento, $this->residente),
+            };
+            self::fail('El lote retirado no debe admitir captura ni exposición por petición directa.');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+            self::assertDatabaseCount('aplicaciones_instrumento', 0);
+            self::assertDatabaseCount('respuestas_instrumento', 0);
+            self::assertSame($auditoriaAntes, DB::table('activity_log')->count());
+            self::assertDatabaseCount('residentes', 1);
+            self::assertDatabaseCount('admisiones', 1);
+        }
+    }
+
+    public static function marcasNoConcluyentes(): array
+    {
+        return ['solo_documento' => ['COH30-S02', null],
+            'solo_observacion' => ['DOCUMENTO-ORDINARIO', 'COHORTE-INFERENCIA-30-V1 · DATOS SINTÉTICOS, USO EXCLUSIVO DE PRUEBAS.'],
+            'ninguna' => ['DOCUMENTO-ORDINARIO', null]];
+    }
+
+    #[DataProvider('marcasNoConcluyentes')]
+    public function test_un_registro_original_valido_no_se_rechaza_por_una_marca_aislada(string $documento, ?string $observacion): void
+    {
+        $this->residente->update(['numero_documento' => $documento]);
+        $this->registrarMarcaAdmision($observacion);
+        $preparador = app(PrepararCapturaInstrumental::class);
+        self::assertNotEmpty($preparador->contexto($this->usuario, $this->residente->getKey())['profesional']);
+        self::assertSame('SIN_VINCULO', $preparador->catalogo($this->usuario, $this->residente->getKey(), $this->instrumento->getKey())['vinculo_metodo']['estado']);
+        $a = app(AplicarInstrumento::class)->aplicar($this->usuario,
+            ['fecha_hora' => now()->subMinute()->format('Y-m-d H:i:s'), 'respuestas' => [
+                ['cod_pregunta' => $this->preguntas['NUMERICO']->getKey(), 'valor_numero' => 0],
+                ['cod_pregunta' => $this->preguntas['LOGICO']->getKey(), 'valor_logico' => false],
+            ]], $this->instrumento, $this->residente);
+        self::assertSame($this->personal->getKey(), $a->cod_personal);
+        self::assertNull($a->puntaje_total);
+        self::assertEquals(0, $a->respuestas->firstWhere('cod_pregunta', $this->preguntas['NUMERICO']->getKey())->valor_numero);
+        self::assertFalse($a->respuestas->firstWhere('cod_pregunta', $this->preguntas['LOGICO']->getKey())->valor_logico);
+        self::assertDatabaseCount('aplicaciones_instrumento', 1);
+        self::assertDatabaseCount('respuestas_instrumento', 2);
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
 }
