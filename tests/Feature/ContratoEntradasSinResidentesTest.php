@@ -50,6 +50,7 @@ final class ContratoEntradasSinResidentesTest extends TestCase
         self::assertSame('fecha_referencia', $r['soportes_admitidos']['cod_antecedente']['campo_fecha']);
         $tablas = array_column([...array_values($r['soportes_admitidos']), ...array_values($r['captura_original'])], 'tabla');
         $tablas[] = 'evaluaciones_expertas';
+        array_push($tablas, 'atenciones', 'residentes_contactos', 'contactos', 'notas_clinicas');
         foreach ($consultas as $sql) {
             self::assertDoesNotMatchRegularExpression('/^\s*(insert|update|delete|alter|create|drop|truncate)\b/i', $sql);
             self::assertDoesNotMatchRegularExpression('/\b(?:from|join)\s+(?:["`]?\w+["`]?\.)?["`]?(?:'.implode('|', $tablas).')["`]?(?=\s|$)/i', $sql);
@@ -58,6 +59,48 @@ final class ContratoEntradasSinResidentesTest extends TestCase
         self::assertDatabaseCount('aplicaciones_instrumento', 0);
         self::assertDatabaseCount('respuestas_instrumento', 0);
         self::assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
+    public function test_contexto_distingue_escolaridad_estructural_de_idioma_e_informantes_del_caso(): void
+    {
+        $contexto = InventarioExperto::entradas(DB::connection())['contexto_evaluacion'];
+        self::assertFalse($contexto['datos_clinicos_consultados']);
+        self::assertFalse($contexto['certifica_4fn_global']);
+        self::assertTrue($contexto['escolaridad']['estructura_de_referencia_verificada']);
+        self::assertSame('atenciones', $contexto['escolaridad']['fuente_por_episodio']['tabla']);
+        foreach (['escolaridad_anios', 'puede_leer', 'puede_escribir'] as $campo) {
+            self::assertContains($campo, $contexto['escolaridad']['fuente_por_episodio']['campos_existentes']);
+        }
+        self::assertTrue($contexto['escolaridad']['vinculo_con_aplicacion']['estructura_verificada']);
+        self::assertFalse($contexto['escolaridad']['se_copia_a_respuestas']);
+        self::assertFalse($contexto['escolaridad']['acredita_aplicabilidad_instrumental']);
+        self::assertFalse($contexto['idioma']['contrato_de_captura_episodica_definido']);
+        self::assertFalse($contexto['idioma']['idioma_del_material_acredita_idioma_del_caso']);
+        self::assertTrue($contexto['informantes']['vinculo_residente_contacto']['estructura_verificada']);
+        self::assertFalse($contexto['informantes']['vinculo_maestro_acredita_participacion']);
+        self::assertFalse($contexto['informantes']['vinculo_maestro_acredita_conocimiento_previo']);
+        self::assertFalse($contexto['informantes']['responsable_principal_se_elige_por_defecto']);
+        self::assertDatabaseCount('residentes', 0);
+        self::assertDatabaseCount('atenciones', 0);
+        self::assertDatabaseCount('residentes_contactos', 0);
+    }
+
+    public function test_una_atencion_sin_la_extension_no_se_presenta_como_contexto_disponible(): void
+    {
+        $migracion = require base_path('database/migrations/2026_10_28_010000_add_contexto_escolaridad_atenciones.php');
+        $migracion->down();
+        try {
+            $contexto = InventarioExperto::entradas(DB::connection())['contexto_evaluacion'];
+            self::assertTrue($contexto['escolaridad']['fuente_por_episodio']['tabla_presente']);
+            self::assertFalse($contexto['escolaridad']['estructura_de_referencia_verificada']);
+            self::assertSame(['escolaridad_anios', 'puede_leer', 'puede_escribir'],
+                $contexto['escolaridad']['fuente_por_episodio']['campos_base_faltantes']);
+            self::assertTrue($contexto['escolaridad']['vinculo_con_aplicacion']['estructura_verificada']);
+            self::assertFalse(DB::getSchemaBuilder()->hasColumn('atenciones', 'escolaridad_anios'));
+            self::assertFalse($contexto['informantes']['vinculo_maestro_acredita_participacion']);
+        } finally {
+            $migracion->up();
+        }
     }
 
     public function test_sigue_funcionando_con_conexion_sqlite_de_solo_lectura(): void
@@ -87,6 +130,11 @@ final class ContratoEntradasSinResidentesTest extends TestCase
                 self::assertNotEmpty($fuente['campos_base_faltantes']);
                 self::assertSame([], $fuente['campos_existentes']);
             }
+            $contexto = $r['contexto_evaluacion'];
+            self::assertFalse($contexto['escolaridad']['estructura_de_referencia_verificada']);
+            self::assertFalse($contexto['informantes']['vinculo_residente_contacto']['estructura_verificada']);
+            self::assertFalse($contexto['idioma']['contrato_de_captura_episodica_definido']);
+            self::assertFalse($contexto['informantes']['vinculo_maestro_acredita_participacion']);
             self::assertSame([], $db->getSchemaBuilder()->getTableListing());
         } finally {
             DB::purge('entradas_vacia');

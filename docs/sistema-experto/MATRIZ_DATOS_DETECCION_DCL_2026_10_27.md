@@ -1,7 +1,7 @@
 ---
 title: "Detección temprana de DCL: ficha y matriz de datos"
 status: DRAFT
-version: "0.4"
+version: "0.5"
 last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: false
@@ -54,6 +54,8 @@ Los estados pertenecen a esta matriz de auditoría; no son nuevos catálogos de 
 **Instrucción siguiente del mismo día:** «amplia los campos de ser necesario pero no rompas 4fn». La [extensión acotada por atención](../base-de-datos/DECISION_CONTEXTO_ESCOLARIDAD_4FN_2026_10_28.md) incorpora años de escolaridad y capacidad referida de lectura/escritura, con desconocidos explícitos e historia conservada. No se transfieren automáticamente a una aplicación instrumental ni se reutilizan como si fueran de otra fecha. D02 continúa parcial hasta resolver las fuentes/perfiles de cada método; D03/D06 no se cierran.
 
 **Continuidad implementada:** [selección explícita de la atención de la aplicación](ENLACE_ATENCION_APLICACION_2026_10_28.md), en ambas entradas. El contexto se consulta como referencia autorizada de su episodio mediante la FK ya existente; no se copia a respuestas ni cierra la aplicabilidad de D02.
+
+**Revisión de D03/D06:** el [informe de idioma e informantes](CONTEXTO_IDIOMA_INFORMANTES_2026_10_28.md) distingue vínculo maestro, participación episódica e idioma de material. El inventario verifica la estructura sin consultar pacientes y conserva pendientes explícitos; las preguntas de cardinalidad no autorizan nuevas tablas.
 
 | ID / dato necesario | Captura y fuente localizada | Conservación y consumidor | Estado | Trabajo siguiente |
 |---|---|---|---|---|

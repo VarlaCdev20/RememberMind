@@ -1,7 +1,7 @@
 ---
 title: "Inventario instalado del sistema experto"
 status: CURRENT
-last_reviewed: 2026-10-27
+last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: false
 verification_scope: POSTGRESQL_READ_ONLY_CATALOG_METADATA
@@ -73,3 +73,9 @@ Pendientes: disponibilidad real de instrumentos en cada formulario/rol, licencia
 - Motor no admitido, forzando MySQL únicamente en el proceso hijo: rechazo esperado con código de salida 1, antes de consultar catálogo; no se intentó migración o reinicio de base.
 - 45 IDs de candidatos consecutivos y únicos; 198 enlaces relativos de los seis documentos revisados resueltos. Comprobación de los dos enlaces nuevos a secciones del mapa.
 - Sin cambio de interfaz: build y QA visual no aplican. No se reejecutaron suites clínicas por esta organización documental/herramienta de lectura. No se declara aceptación del experto completo.
+
+## Actualización del contrato de contexto —28/10/2026
+
+La herramienta mantiene su corte de catálogo separado de la [revisión de idioma e informantes](../CONTEXTO_IDIOMA_INFORMANTES_2026_10_28.md). `contrato_entradas.contexto_evaluacion` verifica columnas/FK de escolaridad por atención, distingue el vínculo de contacto de la participación clínica y no deduce idioma desde el material. No necesita residentes ni consulta sus filas. Las cifras del27/10 conservadas arriba no se actualizan por esta ampliación del contrato.
+
+El nuevo alcance se comprobó en SQLite (12 pruebas/435 aserciones), PostgreSQL desechable (11 correctas/399 aserciones y1 omitida específica de SQLite) y lectura protegida de metadatos en la base local. No se crean tablas, campos, catálogos o permisos ni se activan instrumentos o reglas.

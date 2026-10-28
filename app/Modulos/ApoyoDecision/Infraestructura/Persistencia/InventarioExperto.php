@@ -2,10 +2,13 @@
 
 namespace App\Modulos\ApoyoDecision\Infraestructura\Persistencia;
 
+use App\Models\AplicacionInstrumento;
+use App\Models\Atencion;
 use App\Models\Instrumento;
 use App\Models\OpcionPregunta;
 use App\Models\PreguntaInstrumento;
 use App\Models\Residente;
+use App\Models\ResidenteContacto;
 use App\Models\RespuestaInstrumento;
 use App\Models\SoporteValoracionPetersen;
 use App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratoFuentesPetersen;
@@ -92,7 +95,37 @@ final class InventarioExperto
         }
 
         return ['alcance' => 'ESTRUCTURA_DE_ENTRADAS_SIN_DATOS_CLINICOS', 'requiere_residentes' => false,
-            'certifica_preparacion_clinica' => false, 'mapa_fuente_a_criterio' => ContratoFuentesPetersen::mapa(), 'soportes_admitidos' => $soportes, 'captura_original' => $captura];
+            'certifica_preparacion_clinica' => false, 'mapa_fuente_a_criterio' => ContratoFuentesPetersen::mapa(),
+            'contexto_evaluacion' => self::contextoEvaluacion($esquema), 'soportes_admitidos' => $soportes, 'captura_original' => $captura];
+    }
+
+    /** Contratos de contexto separados de la existencia física y de los datos de cada caso. */
+    private static function contextoEvaluacion(Builder $esquema): array
+    {
+        $atencion = self::describirEntrada($esquema, new Atencion,
+            ['cod_residente', 'cod_personal', 'fecha_hora', ...Atencion::CONTEXTO_ESCOLARIDAD],
+            [['cod_residente', 'residentes', 'cod_residente'], ['cod_personal', 'personal', 'cod_personal']]);
+        $aplicacion = self::describirEntrada($esquema, new AplicacionInstrumento,
+            ['cod_residente', 'cod_atencion'], [['cod_residente', 'residentes', 'cod_residente'], ['cod_atencion', 'atenciones', 'cod_atencion']]);
+        $vinculo = self::describirEntrada($esquema, new ResidenteContacto,
+            ['cod_residente', 'cod_contacto', 'parentesco', 'estado'],
+            [['cod_residente', 'residentes', 'cod_residente'], ['cod_contacto', 'contactos', 'cod_contacto']]);
+
+        return ['alcance' => 'ESTRUCTURA_Y_CONTRATO_DE_CONTEXTO_SIN_DATOS_DEL_CASO',
+            'datos_clinicos_consultados' => false, 'certifica_4fn_global' => false,
+            'escolaridad' => ['fuente_por_episodio' => $atencion, 'vinculo_con_aplicacion' => $aplicacion,
+                'estructura_de_referencia_verificada' => $atencion['estructura_verificada'] && $aplicacion['estructura_verificada'],
+                'permiso_lectura_fuente' => 'atenciones.ver', 'se_copia_a_respuestas' => false, 'acredita_aplicabilidad_instrumental' => false],
+            'idioma' => ['contrato_de_captura_episodica_definido' => false,
+                'idioma_del_material_acredita_idioma_del_caso' => false,
+                'pendiente' => 'Definir cardinalidad y procedencia del idioma utilizado en la evaluación; una edición o referencia bibliográfica no acredita el idioma del caso.'],
+            'informantes' => ['vinculo_residente_contacto' => $vinculo, 'vinculo_maestro_acredita_participacion' => false,
+                'vinculo_maestro_acredita_conocimiento_previo' => false, 'responsable_principal_se_elige_por_defecto' => false,
+                'pendiente' => 'El vínculo de contacto no identifica quién informó en una atención ni cuánto conoce el nivel previo.'],
+            'limites' => ['La presencia de columnas no demuestra datos registrados ni preparación clínica.',
+                'No se infiere idioma, alfabetización, informante o normalidad desde categorías, parentesco o notas.',
+                'No se convierten listas de idiomas o informantes en columnas repetidas, JSON/EAV ni valores de una FK.',
+                'Las notas y soportes clínicos conservan su propio grano y contrato; no sustituyen una relación de participantes.']];
     }
 
     /** Informa faltantes sin intentar crear, migrar o completar la estructura. */
