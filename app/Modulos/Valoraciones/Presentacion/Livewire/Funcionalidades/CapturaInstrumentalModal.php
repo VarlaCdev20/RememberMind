@@ -400,6 +400,31 @@ abstract class CapturaInstrumentalModal extends Component
             }
         }
 
-        return view('livewire.valoraciones.evaluacion-geriatrica-modal', compact('instrumentos', 'residentes', 'documentos'));
+        $respuestasVista = [];
+        foreach ($this->preguntas as $pregunta) {
+            $valor = $this->valores[$pregunta['codigo']] ?? null;
+            $registrada = $valor !== null && $valor !== '';
+            $texto = 'Sin registrar';
+            if ($registrada) {
+                $texto = match ($pregunta['campo']) {
+                    'valor_logico' => match (true) {
+                        in_array($valor, [true, 1, '1'], true) => 'Sí',
+                        in_array($valor, [false, 0, '0'], true) => 'No',
+                        default => 'Respuesta por revisar',
+                    },
+                    'cod_opcion' => collect($pregunta['opciones'])->firstWhere('codigo', $valor)['nombre'] ?? 'Opción por revisar',
+                    default => is_scalar($valor) ? (string) $valor : 'Respuesta por revisar',
+                };
+            }
+            $respuestasVista[] = ['pregunta' => $pregunta['enunciado'], 'valor' => $texto, 'registrada' => $registrada,
+                'puntaje' => $this->transcripcion ? ($this->puntajesOriginales[$pregunta['codigo']] ?? null) : null,
+                'observacion' => $this->transcripcion ? ($this->observacionesRespuesta[$pregunta['codigo']] ?? null) : null];
+        }
+        $instrumentoVista = $instrumentos->firstWhere('cod_instrumento', $this->cod_instrumento);
+        $resumenCaptura = ['instrumento' => $instrumentoVista?->nombre, 'version' => $instrumentoVista?->version,
+            'total' => count($respuestasVista), 'respondidas' => count(array_filter($respuestasVista, fn ($r) => $r['registrada'])),
+            'respuestas' => $respuestasVista];
+
+        return view('livewire.valoraciones.evaluacion-geriatrica-modal', compact('instrumentos', 'residentes', 'documentos', 'resumenCaptura'));
     }
 }

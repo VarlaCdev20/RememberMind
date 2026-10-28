@@ -59,3 +59,8 @@ No se han enviado solicitudes a titulares, aceptado acuerdos, creado cuentas ext
 ## 5. Verificación de la entrega
 
 Fichas enlazadas, selección I01/I02/I04 coherente, fuentes primarias citadas y pendientes identificados sin copiar reactivos o baremos. Cambio documental: sin migraciones, consultas de historias, cambios de permisos, configuración, motor o UI. Build y pruebas de aplicación no acreditan el cierre de una licencia o la validez clínica y no se ejecutan para este cambio.
+
+
+## 6. Formularios propios de captura (entrega posterior del 28/10)
+
+Tras confirmar que los materiales aún deben obtenerse, la propietaria autorizó **formularios propios de captura**. Se reorganizaron el registro de aplicaciones y la entrevista/atención psicológica existentes, con guía médica opcional y revisión de originales. El [informe de implementación y verificación](../../frontend/FORMULARIOS_CAPTURA_COGNITIVA_2026_10_28.md) delimita sus consumidores, pruebas y límites. Esta entrega posterior no activa las ediciones de MoCA/RUDAS/FAQ ni cambia las condiciones de incorporación descritas arriba. Las secciones 1–5 conservan el alcance documental de su entrega original.

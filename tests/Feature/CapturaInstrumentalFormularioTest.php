@@ -340,7 +340,10 @@ final class CapturaInstrumentalFormularioTest extends TestCase
             ->set('valores.'.$this->preguntas['NUMERICO']->getKey(), 0)->set('puntajesOriginales.'.$this->preguntas['NUMERICO']->getKey(), '0')
             ->set('observacionesRespuesta.'.$this->preguntas['NUMERICO']->getKey(), 'Nota original sintética de la respuesta.')
             ->set('valores.'.$this->preguntas['OPCION']->getKey(), $opcion->getKey())->set('puntajesOriginales.'.$this->preguntas['OPCION']->getKey(), '2')
-            ->call('revisar')->assertSet('estadoConciliacion', 'NUEVA')->assertSet('confirmando', true)->call('guardar')->assertHasNoErrors();
+            ->call('revisar')->assertSet('estadoConciliacion', 'NUEVA')->assertSet('confirmando', true)
+            ->assertSee('Documento cotejado')->assertSee('Original sintético')->assertSee('Página 1 / ficha 1')
+            ->assertSee('Etiqueta original sintética')->assertSee('Texto original sintético, no conclusión del motor.')
+            ->assertSee('Nota original sintética de la respuesta.')->call('guardar')->assertHasNoErrors();
         $a = AplicacionInstrumento::sole();
         self::assertSame($atencion->getKey(), $a->cod_atencion);
         self::assertSame('Etiqueta original sintética', $a->clasificacion);
@@ -428,7 +431,8 @@ final class CapturaInstrumentalFormularioTest extends TestCase
         self::assertSame('VINCULADO', $catalogo['vinculo_metodo']['estado']);
         self::assertCount(count(NormalizadorHvltBolivia2015::ENTRADAS), $catalogo['vinculo_metodo']['entradas']);
         $this->abrir()->set('cod_instrumento', $this->instrumento->getKey())
-            ->assertSee('Método vinculado')->assertSee('Tarea PROTOCOLO-0')->assertSee('MEMORIA');
+            ->assertSee('Método vinculado')->assertSee('Campo sintético')->assertSee('MEMORIA')
+            ->assertDontSee('Tarea PROTOCOLO-0');
 
         $incompleto = config('sistema_experto.perfiles_instrumentales.0');
         unset($incompleto['selectores']['escolaridad_anios']);
@@ -440,6 +444,47 @@ final class CapturaInstrumentalFormularioTest extends TestCase
             'tipo' => 'OBSERVACIONAL', 'version' => '1', 'estado' => 'ACTIVO']);
         $this->abrir()->set('cod_instrumento', $observacional->getKey())
             ->assertSee('Registro observacional')->assertDontSee('Método vinculado');
+    }
+
+    public function test_revision_presenta_cero_no_y_ausencia_sin_inventar_puntuacion(): void
+    {
+        $componente = $this->abrir()->set('cod_instrumento', $this->instrumento->getKey())
+            ->set('valores.'.$this->preguntas['NUMERICO']->getKey(), '0')
+            ->set('valores.'.$this->preguntas['LOGICO']->getKey(), '0')
+            ->call('revisar')->assertSet('confirmando', true)
+            ->assertSee('Revisión de la captura')->assertSee('2 de 4')->assertSee('2 sin registrar')
+            ->assertSee('Sin registrar')->assertSee('No')->assertDontSee('Pregunta sintética NUMERICO · 0 puntos');
+
+        $resumen = $componente->instance()->render()->getData()['resumenCaptura'];
+        self::assertSame(2, $resumen['respondidas']);
+        self::assertSame('0', $resumen['respuestas'][0]['valor']);
+        self::assertSame('No', $resumen['respuestas'][1]['valor']);
+        self::assertSame('Sin registrar', $resumen['respuestas'][2]['valor']);
+        self::assertNull($resumen['respuestas'][0]['puntaje']);
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+
+        $componente->call('volver')->assertSet('confirmando', false)
+            ->assertSet('valores.'.$this->preguntas['NUMERICO']->getKey(), '0')
+            ->assertSet('valores.'.$this->preguntas['LOGICO']->getKey(), '0');
+    }
+
+    public function test_revision_muestra_nombre_de_opcion_y_conserva_texto_original(): void
+    {
+        $opcion = OpcionPregunta::create(['cod_pregunta' => $this->preguntas['OPCION']->getKey(),
+            'nombre' => 'Respuesta elegida sintética', 'puntaje' => 2, 'orden' => 1, 'estado' => 'ACTIVO']);
+        $componente = $this->abrir(true)->set('cod_instrumento', $this->instrumento->getKey())
+            ->set('valores.'.$this->preguntas['OPCION']->getKey(), $opcion->getKey())
+            ->set('valores.'.$this->preguntas['TEXTO']->getKey(), 'Relato original del informante sintético.')
+            ->call('revisar')->assertSet('confirmando', true)->assertSee('Respuesta elegida sintética')
+            ->assertSee('Relato original del informante sintético.');
+
+        $resumen = $componente->instance()->render()->getData()['resumenCaptura'];
+        self::assertSame('Respuesta elegida sintética', $resumen['respuestas'][2]['valor']);
+        self::assertSame('Relato original del informante sintético.', $resumen['respuestas'][3]['valor']);
+        self::assertDatabaseCount('respuestas_instrumento', 0);
+        $componente->call('guardar')->assertHasNoErrors()->assertSet('mostrar', false);
+        self::assertDatabaseHas('respuestas_instrumento', ['cod_pregunta' => $this->preguntas['TEXTO']->getKey(),
+            'valor_texto' => 'Relato original del informante sintético.']);
     }
 
     public static function entradasLoteTecnico(): array

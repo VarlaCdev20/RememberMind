@@ -18,6 +18,8 @@ export function rmSelector(value = null, { native = false, autoSubmit = false, s
         open: false, search: '', options: [], active: 0, popupStyle: '', value, bloqueado: false,
         init() {
             this.$nextTick(() => {
+                if (!this.$refs.native) return;
+                this.nativeControl = this.$refs.native;
                 this.readOptions();
                 if (native && this.value === null) this.readNativeValue();
                 this.syncNativeSelection();
@@ -30,11 +32,13 @@ export function rmSelector(value = null, { native = false, autoSubmit = false, s
         },
         destroy() {
             this.observer?.disconnect();
-            this.$refs.native.removeEventListener('change', this.nativeChange);
+            this.nativeControl?.removeEventListener('change', this.nativeChange);
         },
         readOptions() {
-            this.bloqueado = Boolean(this.$refs.native.disabled);
-            this.options = Array.from(this.$refs.native.options, o => ({ value: o.value, label: o.textContent.trim(), disabled: o.disabled }));
+            const control = this.$refs.native;
+            if (!control) return;
+            this.bloqueado = Boolean(control.disabled);
+            this.options = Array.from(control.options, o => ({ value: o.value, label: o.textContent.trim(), disabled: o.disabled }));
         },
         readNativeValue() {
             this.value = this.multiple
@@ -42,7 +46,7 @@ export function rmSelector(value = null, { native = false, autoSubmit = false, s
                 : this.$refs.native.value;
         },
         syncNativeSelection() {
-            for (const option of this.$refs.native.options) option.selected = this.selected(option.value);
+            for (const option of this.$refs.native?.options ?? []) option.selected = this.selected(option.value);
         },
         get filtered() { return this.options.filter(o => normalizar(o.label).includes(normalizar(this.search))); },
         get hasSearch() { return this.options.filter(option => option.value !== '' && !option.disabled).length >= Math.max(2, Number(searchThreshold) || 15); },
@@ -109,10 +113,12 @@ export function rmCalendario({ min = '', max = '', value = '' } = {}) {
         open: false, value, year: new Date().getFullYear(), month: new Date().getMonth(), popupStyle: '', min, max, bloqueado: false,
         init() {
             this.$nextTick(() => {
-                const actualizar = () => { this.bloqueado = Boolean(this.$refs.native.disabled || this.$refs.native.readOnly); };
+                const control = this.$refs.native;
+                if (!control) return;
+                const actualizar = () => { this.bloqueado = Boolean(control.disabled || control.readOnly); };
                 actualizar();
                 this.observer = new MutationObserver(actualizar);
-                this.observer.observe(this.$refs.native, { attributes: true, attributeFilter: ['disabled', 'readonly'] });
+                this.observer.observe(control, { attributes: true, attributeFilter: ['disabled', 'readonly'] });
             });
         },
         destroy() { this.observer?.disconnect(); },

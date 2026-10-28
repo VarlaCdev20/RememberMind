@@ -84,7 +84,7 @@ if ($preparar) {
     AsignacionPersonal::create(['cod_personal' => $personal->getKey(), 'cod_jornada' => $jornada->getKey(), 'cod_area' => 'ARE_COG', 'fecha_asignacion' => now(), 'estado' => 'ACTIVA']);
     Residente::factory()->create(['cod_residente' => 'RES_E2E_GUIA', 'nombres' => 'Residente sintético', 'apellido_paterno' => 'Explorador', 'apellido_materno' => 'Verificación', 'estado' => 'ADMITIDO']);
     foreach (['OBS' => ['OBSERVACIONAL', 'ACTIVO'], 'FUN' => ['FUNCIONAL', 'ACTIVO'], 'HIS' => ['COGNITIVO', 'INACTIVO']] as $codigo => [$tipo, $estado]) {
-        $instrumento = Instrumento::create(['cod_instrumento' => 'E2E_'.$codigo, 'codigo' => 'SINTETICO-'.$codigo, 'nombre' => $codigo === 'FUN' ? 'Registro funcional sintético' : 'Registro de observación sintético '.$codigo, 'version' => 'TEST-1', 'descripcion' => 'Contenido artificial para comprobar la interfaz. No es una escala clínica.', 'tipo' => $tipo, 'estado' => $estado]);
+        $instrumento = Instrumento::create(['cod_instrumento' => 'E2E_'.$codigo, 'codigo' => 'SINTETICO-'.$codigo, 'nombre' => $codigo === 'FUN' ? 'Registro funcional sintético' : 'Registro de observación sintético '.$codigo, 'version' => 'QA-UI-1', 'descripcion' => 'Contenido artificial para comprobar la interfaz. No es una escala clínica.', 'tipo' => $tipo, 'estado' => $estado]);
         if ($estado === 'ACTIVO') {
             PreguntaInstrumento::create(['cod_pregunta' => 'E2E_Q_'.$codigo, 'cod_instrumento' => $instrumento->getKey(), 'codigo' => 'SINTETICA', 'enunciado' => 'Dato original sintético', 'tipo_respuesta' => 'LOGICO', 'orden' => 1, 'estado' => 'ACTIVA']);
         }

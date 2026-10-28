@@ -827,47 +827,37 @@
                     @endif
                 </div>
 
-                {{-- Formulario Desplegable de Sesión --}}
+                {{-- Captura propia de entrevista y sesión; conserva el flujo de atenciones existente. --}}
                 @if($mostrarFormSesion)
-                    <div class="p-5 rounded-2xl border border-[var(--rm-action-primary)]/40 bg-[var(--rm-surface)] shadow-sm space-y-4 text-xs">
-                        <div class="flex items-center justify-between border-b border-[var(--rm-border)] pb-2.5">
-                            <h3 class="font-bold text-sm text-[var(--rm-text-primary)] flex items-center gap-2">
-                                <i class="ph ph-pencil-line text-[var(--rm-action-primary)]"></i>
-                                Documentar sesión de atención psicológica
-                            </h3>
-                            <span class="text-[11px] text-[var(--rm-text-secondary)]">Persistencia en <code>atenciones</code></span>
-                        </div>
-
-                        <form wire:submit.prevent="guardarSesion" class="space-y-4">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Tipo de atención *</label>
-                                    <select wire:model="formSesion.tipo_atencion" class="rm-select w-full">
+                    <x-ui.section-card title="Entrevista y atención psicológica" subtitle="Documenta el motivo, las fuentes y lo observado durante la sesión." icon="ph-notebook">
+                        <p class="rm-captura__ayuda mb-4">Residente: <strong>{{ $residente->nombre_completo }}</strong>. El registro conservará al profesional de la sesión y la fecha y hora del guardado.</p>
+                        <form wire:submit.prevent="guardarSesion" class="rm-captura__formulario">
+                            <x-ui.form-section title="Motivo y contexto" description="Identifica qué atención realizaste y qué motivó la consulta." step="1" icon="ph-chat-circle-text">
+                                <x-ui.field for="sesion-tipo" label="Tipo de atención" error="formSesion.tipo_atencion" required>
+                                    <x-ui.selector id="sesion-tipo" label="Tipo de atención" wire:model="formSesion.tipo_atencion" aria-required="true" :aria-invalid="$errors->has('formSesion.tipo_atencion') ? 'true' : 'false'" :aria-describedby="$errors->has('formSesion.tipo_atencion') ? 'sesion-tipo-error' : null">
                                         <option value="SEGUIMIENTO">Seguimiento psicológico individual</option>
                                         <option value="VALORACION_INICIAL">Primera evaluación / Ingreso</option>
                                         <option value="INTERVENCION_CRISIS">Intervención en crisis / Conductual</option>
                                         <option value="ENTREVISTA_FAMILIAR">Entrevista con informante familiar</option>
                                         <option value="ESTIMULACION_COGNITIVA">Sesión de estimulación cognitiva</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Motivo de la sesión *</label>
-                                    <input type="text" wire:model="formSesion.motivo" placeholder="Ej: Duelo familiar reciente / Acompañamiento conductual" class="rm-input w-full" required>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block font-semibold text-[var(--rm-text-primary)] mb-1">Observaciones y notas de la sesión</label>
-                                <textarea wire:model="formSesion.observacion" rows="3" placeholder="Detalle las intervenciones realizadas, respuesta del residente y pautas acordadas..." class="rm-textarea w-full"></textarea>
-                            </div>
-
-                            <div class="flex items-center justify-end gap-2 pt-2 border-t border-[var(--rm-border)]">
-                                <button type="button" wire:click="$set('mostrarFormSesion', false)" class="rm-btn rm-btn-secondary text-xs">Cancelar</button>
-                                <button type="submit" class="rm-btn rm-btn-primary text-xs">Guardar sesión</button>
+                                    </x-ui.selector>
+                                </x-ui.field>
+                                <x-ui.field for="sesion-motivo" label="Motivo de la sesión" error="formSesion.motivo" required help="Describe la preocupación o necesidad que originó esta atención.">
+                                    <input id="sesion-motivo" type="text" wire:model="formSesion.motivo" class="rm-input w-full" maxlength="255" required aria-describedby="sesion-motivo-help{{ $errors->has('formSesion.motivo') ? ' sesion-motivo-error' : '' }}" aria-invalid="{{ $errors->has('formSesion.motivo') ? 'true' : 'false' }}">
+                                </x-ui.field>
+                            </x-ui.form-section>
+                            <x-ui.form-section title="Relato, observaciones y actuación" description="Diferencia la información referida de lo observado y de la intervención realizada." step="2" icon="ph-note-pencil" :columns="1">
+                                <x-ui.field for="sesion-notas" label="Notas de la entrevista o sesión" error="formSesion.observacion" help="Hasta 1000 caracteres. Puedes incluir la fuente del relato, cambios descritos, respuesta del residente y acuerdos.">
+                                    <textarea id="sesion-notas" wire:model="formSesion.observacion" rows="5" maxlength="1000" class="rm-textarea w-full" aria-describedby="sesion-notas-help{{ $errors->has('formSesion.observacion') ? ' sesion-notas-error' : '' }}" aria-invalid="{{ $errors->has('formSesion.observacion') ? 'true' : 'false' }}"></textarea>
+                                </x-ui.field>
+                                <x-ui.cognitive-context-guide id="sesion-guia-contexto" />
+                            </x-ui.form-section>
+                            <div class="rm-captura__acciones">
+                                <button type="button" wire:click="$set('mostrarFormSesion', false)" class="rm-btn rm-btn-secondary" wire:loading.attr="disabled" wire:target="guardarSesion">Cerrar formulario</button>
+                                <button type="submit" class="rm-btn rm-btn-primary" wire:loading.attr="disabled" wire:target="guardarSesion"><span wire:loading.remove wire:target="guardarSesion">Guardar sesión</span><span wire:loading wire:target="guardarSesion">Registrando…</span></button>
                             </div>
                         </form>
-                    </div>
+                    </x-ui.section-card>
                 @endif
 
                 @if(!empty($chartSeguimiento))

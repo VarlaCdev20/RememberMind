@@ -34,3 +34,27 @@ test('controles institucionales no cambian datos mientras están bloqueados', ()
     calendario.choose('2026-10-21'); assert.equal(calendario.value, '2026-10-22');
     calendario.show(); assert.equal(calendario.open, false);
 });
+
+test('controles desmontados limpian listeners y toleran callbacks de cambio de etapa', () => {
+    const selector = rmSelector('0');
+    let removed = 0;
+    let disconnected = 0;
+    selector.nativeControl = { removeEventListener: () => removed++ };
+    selector.observer = { disconnect: () => disconnected++ };
+    selector.$refs = {};
+    assert.doesNotThrow(() => selector.readOptions());
+    assert.doesNotThrow(() => selector.syncNativeSelection());
+    assert.doesNotThrow(() => selector.destroy());
+    assert.equal(selector.value, '0');
+    assert.equal(removed, 1);
+    assert.equal(disconnected, 1);
+
+    const calendar = rmCalendario({ value: '2026-10-28' });
+    let initialize;
+    calendar.$nextTick = callback => initialize = callback;
+    calendar.$refs = {};
+    calendar.init();
+    assert.doesNotThrow(() => initialize());
+    assert.doesNotThrow(() => calendar.destroy());
+    assert.equal(calendar.value, '2026-10-28');
+});
