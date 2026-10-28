@@ -1,7 +1,7 @@
 ---
 title: "Fichas y preparación del circuito instrumental inicial"
 status: CURRENT
-version: "1.1"
+version: "1.2"
 last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: false
@@ -69,3 +69,8 @@ Tras confirmar que los materiales aún deben obtenerse, la propietaria autorizó
 ## 7. Obtención documental posterior: originales y restricción NACC
 
 Se obtuvieron **seis documentos públicos** de consulta con [identidad, SHA-256 y páginas](METADATOS_MATERIALES_2026_10_28.json). El [cotejo](COTEJO_MATERIALES_2026_10_28.md) concreta cuáles se recuperaron y cuáles no: originales ingleses RUDAS y FAQ español histórico B7S disponibles; paquete oficial español MoCA y suplemento RUDAS-PE todavía pendientes. El formulario de permisos NACC excluye uso clínico diagnóstico y limita su trámite a investigación; no se presupone una autorización asistencial. Tres consultas `.eml` concretas están preparadas localmente, sin enviar. Este avance no adopta ediciones, puntuaciones, licencias ni perfiles ejecutables; las secciones anteriores conservan sus respectivos cortes.
+
+
+## 8. Continuidad acordada sin correos externos
+
+La propietaria rechazó contactar a terceros y confirmó continuar con **fuentes públicas y formularios propios de captura**. Los borradores de consultas quedan suspendidos; no se envió ninguno. La [decisión vigente](COTEJO_MATERIALES_2026_10_28.md#decisión-posterior-de-la-propietaria-sin-contacto-externo) prevalece sobre las propuestas anteriores de gestión. Se mantienen la entrevista/atención psicológica y la captura compartida de evaluación implementadas; sus guías de contexto no se presentan como instrumentos validados. Las ediciones y derechos pendientes siguen sin activarse, sin impedir desarrollar la captura propia ya autorizada.

@@ -1,7 +1,7 @@
 ---
 title: "Obtención de materiales y condiciones de uso del circuito inicial"
 status: CURRENT
-version: "1.1"
+version: "1.2"
 last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: false
@@ -14,6 +14,10 @@ runtime_verified: false
 La propietaria confirmó el **28/10/2026**: **«Aún hay que obtenerlos»**, en respuesta sobre formularios oficiales y autorizaciones. La [selección institucional](SELECCION_ADOPTADA_2026_10_28.md) ya está aprobada; faltan los materiales y condiciones concretos del [circuito inicial](CIRCUITO_INICIAL.md).
 
 **Estado de gestión: SEIS DOCUMENTOS PÚBLICOS OBTENIDOS; AUTORIZACIONES NO SOLICITADAS.** Véase el [cotejo posterior, hashes y límites](COTEJO_MATERIALES_2026_10_28.md). Los borradores iniciales de este documento conservan su corte; tres `.eml` locales posteriores concretan canales y consultas tras ese cotejo. No se enviaron mensajes, formularios o datos clínicos; no se crearon cuentas, aceptaron acuerdos o compraron servicios. Los textos siguientes son borradores locales listos para revisión, no comunicaciones realizadas ni permisos obtenidos.
+
+## Decisión vigente: no contactar a terceros
+
+La propietaria rechazó enviar correos externos después de revisar los destinatarios y confirmó continuar con fuentes públicas y formularios propios. **Los borradores de este documento y los `.eml` posteriores quedan suspendidos: NO ENVIAR.** Se conservan como antecedentes; no se enviaron mensajes ni se aceptaron acuerdos. La [decisión está registrada en el cotejo](COTEJO_MATERIALES_2026_10_28.md#decisión-posterior-de-la-propietaria-sin-contacto-externo). No afecta las notificaciones institucionales autorizadas del producto ni cambia su remitente protegido.
 
 ## 1. Rutas verificadas y qué obtener
 

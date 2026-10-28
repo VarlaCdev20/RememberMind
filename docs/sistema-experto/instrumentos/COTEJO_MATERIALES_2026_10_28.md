@@ -1,7 +1,7 @@
 ---
 title: "Cotejo y obtención documental del circuito inicial"
 status: CURRENT
-version: "1.0"
+version: "1.1"
 last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: false
@@ -12,6 +12,12 @@ runtime_verified: false
 # Materiales obtenidos y condiciones comprobadas
 
 Continuación autorizada por la propietaria el **28/10/2026** («HAGAMOSLO»), después de los [formularios propios de captura](../../frontend/FORMULARIOS_CAPTURA_COGNITIVA_2026_10_28.md). Se obtuvieron y cotejaron seis documentos públicos; no se concedió una licencia, se eligió una edición operativa ni se activó un instrumento. La [selección por familias](SELECCION_ADOPTADA_2026_10_28.md) permanece vigente.
+
+## Decisión posterior de la propietaria: sin contacto externo
+
+Después del cotejo, la propietaria indicó **«NO MANDES CORREO AJENOS»** y confirmó continuar con fuentes públicas y formularios propios de captura. **No contactar a terceros para esta gestión; los tres borradores quedan suspendidos y no se enviarán.** No se envió ningún correo. No se volverá a proponer su envío como requisito para continuar la captura propia.
+
+Esta decisión se refiere a consultas externas sobre instrumentos; no desactiva notificaciones institucionales autorizadas a sus destinatarios ni cambia el remitente protegido. No concede derechos sobre pruebas de terceros, aprueba baremos o adopta una edición pendiente. Se puede continuar con entrevista, observación y conservación de originales ya autorizadas, sin inventar una escala o equivalencias diagnósticas.
 
 ## 1. Originales disponibles para consulta
 
@@ -48,7 +54,7 @@ El alcance de NACC indicado en la tabla impide presumir una autorización asiste
 
 Como vía alternativa de identificación, [BiblioPRO](https://bibliopro.org/buscador/349/cuestionario-de-actividad-funcional) remite a autores para la adaptación española y aclara que no gestiona su sublicencia; contacto publicado `javier@mariawolff.es`, referencia Neurología 2005;20(8):395-401. Es una vía de consulta, no prueba de que ese contacto sea titular de todos los derechos ni de que una edición ya sea adecuada para Bolivia. Se solicitará material e identidad exactos antes de adoptar una adaptación.
 
-## 3. Consultas concretas preparadas, sin enviar
+## 3. Borradores anteriores suspendidos: no enviar
 
 Tres archivos `.eml` locales en `output/materiales-instrumentos-20261028/borradores-sin-enviar/`, con `X-Unsent: 1` y remitente institucional protegido `remembermind.health@gmail.com`:
 
@@ -58,16 +64,16 @@ Tres archivos `.eml` locales en `output/materiales-instrumentos-20261028/borrado
 | `02-rudas-pe.eml` | `ncustodio@ipn.pe` | Recuperar SM1 español final, cotejar identidad, autoría/derechos y alcance de uso. |
 | `03-faq-es.eml` | `javier@mariawolff.es` | Identificar edición española aplicable, material/instrucciones y titular o canal de autorización asistencial/digital. |
 
-No incluyen datos de residentes, identidad legal inventada, compromisos de pago ni aceptación de acuerdos. Piden qué datos institucionales exige una solicitud formal. No se enviaron mensajes, formularios ni solicitudes, no se crearon cuentas externas y no se modificó correo/configuración del sistema. Su envío requiere instrucción expresa para contactar a terceros.
+No incluyen datos de residentes, identidad legal inventada, compromisos de pago ni aceptación de acuerdos. Piden qué datos institucionales exige una solicitud formal. No se enviaron mensajes, formularios ni solicitudes, no se crearon cuentas externas y no se modificó correo/configuración del sistema. La propietaria rechazó el contacto externo: no enviarlos. Se conservan únicamente como antecedente local.
 
-## 4. Condición concreta para continuar la implementación
+## 4. Pendientes de pruebas estandarizadas y continuidad de la captura propia
 
 1. MoCA: acceso del profesional autorizado al paquete oficial y aclaración del uso en software.
 2. RUDAS: archivo español final e identificación de sus condiciones reales de reutilización.
 3. FAQ: material español y vía de autorización compatible con atención asistencial; NACC no se presupone válido para ese uso.
 4. Después: cotejar edición, aplicación, ausencias/puntuación y adecuación clínica; adoptar el contrato pertinente antes de convertirlo en reglas/catálogo ejecutables. Las autorizaciones de estructura, competencias y conocimiento clínico conservan su alcance.
 
-Mientras tanto, los formularios propios de captura ya implementados conservan su función existente. No se fabrican respuestas, normalidad, baremos o permisos para cerrar estos pendientes.
+Los pendientes anteriores no convierten el contacto externo en una tarea autorizada. Se continúa con fuentes públicas y los formularios propios de captura ya implementados, que conservan su función existente. No se fabrican respuestas, normalidad, baremos o permisos para cerrar estos pendientes.
 
 ## 5. Verificación y alcance
 
