@@ -22,7 +22,7 @@
             <div class="rm-cognitive-person"><span class="rm-cognitive-avatar" aria-hidden="true">{{ mb_substr($residente->nombres, 0, 1).mb_substr($residente->apellido_paterno ?? '', 0, 1) }}</span><div><p class="rm-cognitive-person-label">Residente en consulta</p><h2>{{ $residente->nombre_completo }}</h2><p>{{ $residente->edad !== null ? $residente->edad.' años' : 'Edad no disponible' }} · {{ $residente->ubicacion_formateada }}</p></div></div>
             <span class="rm-orion-state"><i class="ph ph-eye" aria-hidden="true"></i>Solo lectura · Enfermería</span>
         </div>
-        <dl class="rm-cognitive-meta"><div><dt>{{ isset($perfilInstrumental['petersen_institucional']) ? 'Fecha de la consulta' : 'Fecha de evaluación' }}</dt><dd>{{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($perfilInstrumental['petersen_institucional']['fecha_corte'] ?? $datos['evaluacion']['fecha'] ?? null, 'Sin evaluación disponible') }}</dd></div><div><dt>Tipo de consulta</dt><dd>{{ isset($perfilInstrumental['petersen_institucional']) ? 'Resultado orientativo actual, aún no guardado' : ($simulacion ? 'Demostración técnica' : 'Resultados disponibles del expediente') }}</dd></div><div><dt>Acceso</dt><dd>Lectura de Enfermería</dd></div></dl>
+        <dl class="rm-cognitive-meta"><div><dt>{{ isset($perfilInstrumental['petersen_institucional']) ? 'Fecha de la consulta' : 'Fecha de evaluación' }}</dt><dd>{{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($perfilInstrumental['petersen_institucional']['fecha_corte'] ?? $datos['evaluacion']['fecha'] ?? null, 'Sin evaluación disponible') }}</dd></div><div><dt>Tipo de consulta</dt><dd>{{ isset($perfilInstrumental['petersen_institucional']) ? 'Resultado orientativo actual, aún no guardado' : 'Resultados disponibles del expediente' }}</dd></div><div><dt>Acceso</dt><dd>Lectura de Enfermería</dd></div></dl>
     </section>
     @endunless
     <div class="rm-cognitive-context" x-show="contextoFuera" x-cloak aria-label="Residente activo durante la consulta"><strong>{{ $residente->nombre_completo }}</strong><span>Solo lectura · Enfermería</span></div>
@@ -40,24 +40,20 @@
         @php($fuentesResultado = array_values(array_filter($narrativa['fuentes'] ?? [], fn ($f) => $f['area'] === 'COG-MEM')))
         @if(! isset($perfilInstrumental['petersen_institucional']) || ($datos['evaluacion'] ?? null))
         <details class="rm-expert-supplement"><summary>{{ isset($perfilInstrumental['petersen_institucional']) ? 'Evaluación histórica adicional' : 'Áreas cognitivas, resultado y fundamento disponibles' }}</summary>
-        @if($simulacion)<p class="rm-orion-note" role="note"><strong>Entorno de pruebas · Resultado de demostración · Sin uso asistencial.</strong></p>@endif
+
         <section class="rm-card rm-orion-result" aria-labelledby="orion-resultado-titulo">
             <div class="rm-orion-section-heading"><h2 class="rm-expert-section-title">¿Qué encontró el sistema?</h2><span class="rm-orion-state">{{ $consultaEnfermeria['estado_principal'] }}</span></div>
             <h3 id="orion-resultado-titulo">{{ $consultaEnfermeria['titulo'] }}</h3><p class="text-sm">Alcance del resultado disponible: {{ mb_strtolower($consultaEnfermeria['area_principal']) }}.</p><p class="rm-expert-prose" @if($consultaEnfermeria['integridad']) role="alert" @endif>{{ $consultaEnfermeria['resumen'] }}</p>
             <dl class="rm-cognitive-summary">
                 <div><dt><i class="ph ph-files" aria-hidden="true"></i>Datos utilizados</dt><dd>
-                    @if($simulacion)
-                        Referencias de la demostración conservada; consulta su detalle en Registros.
-                    @else
+
                         {{ count(array_filter($fuentesResultado, fn ($f) => $f['utilizada'])) }} evidencias de soporte del resultado · {{ count($fuentesResultado) }} fuentes conservadas
-                    @endif
+
                 </dd></div>
                 <div><dt><i class="ph ph-brain" aria-hidden="true"></i>Cobertura evaluada</dt><dd>
-                    @if($simulacion)
-                        Perfil de demostración; no acredita evaluación clínica.
-                    @else
+
                         {{ count(array_filter($informe['areas'], fn ($a) => $a['evaluada'])) }} de 5 áreas con resultado disponible
-                    @endif
+
                 </dd></div>
                 <div><dt><i class="ph ph-info" aria-hidden="true"></i>Límites de interpretación</dt><dd>{{ $texto($informe['limite_global']) }}</dd></div>
             </dl>

@@ -7,21 +7,17 @@ namespace Tests\Feature;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\EvaluarReduccionConservacion;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\ProyeccionReduccionExperta as P;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionReduccionConservacion;
-use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\ContextoSimulacionLocal;
-use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\EjecutorSimulacionLocal;
 use DateTimeImmutable;
 use DomainException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Tests\Support\CohorteSimulacionLocal;
 use Tests\Support\EntornoPruebas;
 use Tests\TestCase;
 
 final class PreflightReduccionExpertaTest extends TestCase
 {
-    use CohorteSimulacionLocal;
 
     private bool $basePostgresPropia = false;
 
@@ -53,43 +49,6 @@ final class PreflightReduccionExpertaTest extends TestCase
         }
         RefreshDatabaseState::$migrated = false;
         parent::tearDown();
-    }
-
-    public function test_cinco_casos_con_datos_reales_sinteticos_se_proyectan_y_reconstruyen_sin_escribir(): void
-    {
-        $datos = $this->prepararCohorte();
-        (new EjecutorSimulacionLocal(new ContextoSimulacionLocal(config('database.default'))))->ejecutar(
-            $datos['autor']->getKey(), $datos['personal']->getKey(), new DateTimeImmutable('2026-10-17T12:00:00-04:00'));
-        $antes = DB::table('secuencias_codigos')->orderBy('entidad')->get()->map(static fn ($f) => (array) $f)->all();
-        $consultas = [];
-        DB::listen(static function ($q) use (&$consultas): void {
-            $consultas[] = $q->sql;
-        });
-        $r = (new EvaluarReduccionConservacion)->evaluar(DB::connection());
-        self::assertTrue($r['igualdad_filas']);
-        self::assertFalse($r['ddl_ejecutado']);
-        self::assertFalse($r['dto_tras_migracion_verificado']);
-        self::assertFalse($r['recalculo_institucional_completo_verificado']);
-        self::assertSame(5, $r['filas_por_tabla'][P::FUNCIONALIDAD]);
-        self::assertGreaterThan(0, $r['filas_por_tabla'][P::COGNITIVAS]);
-        self::assertGreaterThan(0, $r['filas_por_tabla'][P::IADL]);
-        self::assertGreaterThan(0, $r['filas_por_tabla'][P::SINTETICOS]);
-        self::assertSame($antes, DB::table('secuencias_codigos')->orderBy('entidad')->get()->map(static fn ($f) => (array) $f)->all());
-        foreach ($consultas as $sql) {
-            self::assertDoesNotMatchRegularExpression('/^\s*(insert|update|delete|alter|create|drop|truncate)\b/i', $sql);
-        }
-        $this->artisan('app:auditar-base-datos-remember-mind', ['--evaluar-reduccion' => true])
-            ->expectsOutputToContain('PASS_RECONSTRUCCION_MODELO_REDUCIDO')
-            ->expectsOutputToContain('Sin DDL; no acredita migración ni recálculo institucional completo.')
-            ->assertSuccessful();
-        // La base anterior no tiene UNIQUE por evaluación/orden cognitivo.
-        // La transición debe detectar una colección alterada, no normalizarla al copiar.
-        (new TransicionReduccionConservacion)->bajar();
-        $id = DB::table(P::COGNITIVAS)->value('cod_evidencia_cognitiva_instantanea');
-        DB::table(P::COGNITIVAS)->where('cod_evidencia_cognitiva_instantanea', $id)->update(['orden' => 999]);
-        $this->expectException(DomainException::class);
-        $this->expectExceptionMessage('saltos o duplicados');
-        (new EvaluarReduccionConservacion)->evaluar(DB::connection());
     }
 
     public function test_referencia_entrante_fuera_del_mapa_bloquea_el_plan(): void

@@ -425,7 +425,7 @@ class InformeCognitivoTest extends TestCase
         [, $lectura] = $this->informe();
         $this->assertCount(2, $lectura['registros_cognitivos']);
         $this->assertContains(null, array_column($lectura['registros_cognitivos'], 'observacion'));
-        $this->assertSame(2, $lectura['preparacion_memoria']['controles']);
+        $this->assertNull($lectura['preparacion_memoria'], 'La preparación piloto ya no se carga.');
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
             ->assertSee('Control registrado en el expediente.')->assertDontSee('SIM-SE')->assertDontSee('SIM-IADL');
         $this->assertDatabaseCount('controles_cognitivos', 6);

@@ -18,7 +18,6 @@ use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarRevisionesValoracion
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaFuenteEvidencia;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaResultadosExperto;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\PrepararEvaluacionInstitucional;
-use App\Modulos\ApoyoDecision\Aplicacion\Contratos\LecturaSimulacionExperta;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\ConsultaCognitivaEnfermeria;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto as L;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\PresentarInformeCognitivo;
@@ -82,9 +81,6 @@ class ResultadosExpertoResidente extends Component
     public bool $trazabilidadAbierta = false;
 
     /** Procedencia derivada del resultado leído; no es un selector ni un parámetro de navegación. */
-    #[Locked]
-    public bool $simulacion = false;
-
     #[Locked]
     public ?string $evaluacionObservacional = null;
 
@@ -248,12 +244,7 @@ class ResultadosExpertoResidente extends Component
             abort_unless(collect($series)->contains('id', $valor), 404);
             $this->serieComparacion = $valor;
         } else {
-            $simulacionOriginal = $this->simulacion;
-            try {
-                $nueva = $this->leerResultados($residente, $valor);
-            } finally {
-                $this->simulacion = $simulacionOriginal;
-            }
+            $nueva = $this->leerResultados($residente, $valor);
             $otra = $campo === 'inicial' ? $this->comparacionReciente : $this->comparacionInicial;
             if ($valor === $otra) {
                 $this->addError('comparacion', 'Selecciona dos evaluaciones distintas.');
@@ -261,11 +252,7 @@ class ResultadosExpertoResidente extends Component
                 return;
             }
             if ($otra) {
-                try {
-                    $previa = $this->leerResultados($residente, $otra);
-                } finally {
-                    $this->simulacion = $simulacionOriginal;
-                }
+                $previa = $this->leerResultados($residente, $otra);
                 $fechaNueva = $this->fechaEvaluacion($nueva['evaluacion']['fecha'] ?? null);
                 $fechaOtra = $this->fechaEvaluacion($previa['evaluacion']['fecha'] ?? null);
                 if (! $fechaNueva || ! $fechaOtra) {
@@ -335,7 +322,6 @@ class ResultadosExpertoResidente extends Component
     {
         $residente = $this->autorizar();
         abort_unless(in_array($tipo, ['inferencia', 'semantico'], true), 422);
-        abort_if($this->simulacion, 404);
         $lectura = app(LecturaResultadosExperto::class)->consultar(auth()->user(), $residente, $this->evaluacion, $this->criterio);
         $grafos = app(ConsultarExploracionOrion::class)->consultar(auth()->user(), $residente, $lectura, $this->criterio);
         abort_unless(collect($grafos[$tipo]['nodos'])->contains('id', $id), 404);
@@ -408,10 +394,7 @@ class ResultadosExpertoResidente extends Component
             || (auth()->user()?->hasRole('ENFERMEROS') && ! auth()->user()?->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'SUPERADMINISTRADOR']));
         $this->psicologia = request()->routeIs('admin.psicologia.*')
             || (auth()->user()?->hasRole('PSICOLOGO/A') && ! auth()->user()?->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'SUPERADMINISTRADOR', 'ENFERMEROS']));
-        // La consulta clínica ordinaria nunca selecciona una demostración por ausencia de resultados.
-        $this->simulacion = request()->query('simulacion') === '1'
-            && app()->environment(['local', 'testing'])
-            && config('sistema_experto.simulacion_local.habilitada') === true;
+        abort_if(request()->query('simulacion') !== null, 404);
         $this->autorizar();
     }
 
@@ -422,7 +405,7 @@ class ResultadosExpertoResidente extends Component
         $usuario = $usuario ? User::query()->find($usuario->getKey()) : null;
         abort_unless($usuario, 403);
         auth()->setUser($usuario);
-        $residente = Residente::query()->findOrFail($this->codResidente);
+        $residente = \App\Modulos\ApoyoDecision\Aplicacion\Consultas\FuentesValoracionOperativa::residentes(Residente::query())->findOrFail($this->codResidente);
         Gate::authorize('consultarResultados', [EvaluacionExperta::class, $residente]);
 
         return $residente;
@@ -431,19 +414,7 @@ class ResultadosExpertoResidente extends Component
     /** Muestra el resultado conservado disponible, sin selector de vista previa ni mezcla de fuentes. */
     private function leerResultados(Residente $residente, ?string $id, int $pagina = 1): array
     {
-        if ($this->simulacion) {
-            $datos = app(LecturaSimulacionExperta::class)->consultar(auth()->user(), $residente, $id, $this->criterio, $pagina);
-            if ($datos !== null) {
-                $this->simulacion = true;
-
-                return $datos;
-            }
-            // Una capacidad revocada no convierte una instantánea abierta en otro resultado.
-            abort_if($id === null && $this->simulacion, 404);
-        }
-
         $datos = app(LecturaResultadosExperto::class)->consultar(auth()->user(), $residente, $id, $this->criterio, $pagina);
-        $this->simulacion = false;
 
         return $datos;
     }
@@ -499,7 +470,6 @@ class ResultadosExpertoResidente extends Component
     {
         $residente = $this->autorizar();
         // Las referencias artificiales se consultan en su instantánea; no son fuentes clínicas actuales.
-        abort_if($this->simulacion, 404);
         $datos = app(LecturaResultadosExperto::class)->consultar(auth()->user(), $residente, $this->evaluacion, $this->criterio);
         abort_unless(isset($datos['detalle']['evidencias'][$id]), 404);
         $this->evidencia = $this->evidencia === $id ? null : $id;
@@ -509,7 +479,6 @@ class ResultadosExpertoResidente extends Component
     {
         if ($area !== null && $area !== $this->criterio) {
             $residente = $this->autorizar();
-            abort_if($this->simulacion, 404);
             abort_unless(isset(L::CRITERIOS[$area]), 422);
             $lectura = app(LecturaResultadosExperto::class)->consultar(auth()->user(), $residente, $this->evaluacion, $area);
             abort_unless(isset($lectura['detalle']['evidencias'][$id]), 404);
@@ -581,8 +550,7 @@ class ResultadosExpertoResidente extends Component
 
             return;
         }
-        // Una simulación nunca admite firmas profesionales sobre una valoración operativa.
-        abort_if($this->simulacion, 404);
+        // Las revisiones requieren una evaluación institucional conservada.
         $d = DisciplinaRevision::tryFrom($disciplina);
         abort_unless($d, 422);
         $datos = app(LecturaResultadosExperto::class)->consultar(auth()->user(), $r, $this->evaluacion, $this->criterio);
@@ -658,7 +626,6 @@ class ResultadosExpertoResidente extends Component
     public function render()
     {
         $residente = $this->autorizar();
-        $cohorteEntrenamiento = \App\Modulos\ApoyoDecision\Infraestructura\Simulacion\CohorteCognitivaLocal::esResidente($residente);
         $residente->loadMissing('cama.habitacion');
         $datos = null;
         $fuente = null;
@@ -729,8 +696,7 @@ class ResultadosExpertoResidente extends Component
         try {
             $datos = $this->leerResultados($residente, $this->evaluacion, $this->getPage('historia'));
             $presentador = app(PresentarInformeCognitivo::class);
-            $informe = $this->simulacion ? $presentador->presentarSimulacion($datos, $this->criterio)
-                : $presentador->presentar($datos, $this->criterio);
+            $informe = $presentador->presentar($datos, $this->criterio);
             if ($this->enfermeria) {
                 foreach ($informe['areas'] as $codigo => &$area) {
                     $area['nombre'] = L::CRITERIOS[$codigo]['nombre'];
@@ -741,8 +707,8 @@ class ResultadosExpertoResidente extends Component
             if ($datos['evaluacion'] && ! $datos['prueba_tecnica'] && ! isset($datos['simulacion_local'])) {
                 $revisiones = app(ConsultarRevisionesValoracionExperta::class)->consultar(auth()->user(), $datos['evaluacion']['id']);
             }
-            $estadoRevision = $presentador->resumirRevision($revisiones, $datos['evaluacion'] !== null, $this->simulacion);
-            if ($puedeAuditar && ! $this->simulacion && ! $datos['prueba_tecnica']) {
+            $estadoRevision = $presentador->resumirRevision($revisiones, $datos['evaluacion'] !== null);
+            if ($puedeAuditar && ! $datos['prueba_tecnica']) {
                 $exploracion = app(ConsultarExploracionOrion::class)->consultar(auth()->user(), $residente, $datos, $this->criterio);
             }
             if ($this->evidencia && isset($datos['detalle']['evidencias'][$this->evidencia])) {
@@ -780,7 +746,6 @@ class ResultadosExpertoResidente extends Component
             }
         }
         if ($this->evolucionAbierta) {
-            $simulacionActual = $this->simulacion;
             try {
                 if ($errorInstrumental) {
                     throw new DomainException('Las mediciones instrumentales no pudieron verificarse.');
@@ -808,15 +773,12 @@ class ResultadosExpertoResidente extends Component
                 report($e);
                 $errorEvolucion = true;
                 $seriesEvolucion = $actividadCognitiva = $comparaciones = [];
-            } finally {
-                $this->simulacion = $simulacionActual;
             }
         }
         $cuidadoDetalle = $this->cuidadoSeleccionado ? $continuidad['cuidadosPendientesHoy']->concat($continuidad['otrosCuidadosVigentes'])->firstWhere('clave', $this->cuidadoSeleccionado) : null;
         abort_if($this->cuidadoSeleccionado && ! $cuidadoDetalle, 404);
 
         return view('livewire.medico.resultados-experto-residente', compact('datos', 'informe', 'fuente', 'errorLectura', 'residente', 'revisiones', 'estadoRevision', 'puedeAuditar', 'hallazgosObservacionales', 'puedeEjecutarObservaciones', 'capturaInstrumental', 'perfilInstrumental', 'revisionesObservacionales', 'errorInstrumental', 'errorObservacional', 'exploracion', 'consultaEnfermeria', 'observacionesEnfermeria', 'resumenFuentes', 'seriesEvolucion', 'actividadCognitiva', 'comparaciones', 'errorEvolucion', 'cuidadoDetalle', 'registroComponente'), $continuidad)
-            ->with('cohorteEntrenamiento', $cohorteEntrenamiento)
             ->with('conexionesResidente', $conexionesResidente)
             ->layout($this->enfermeria ? 'layouts.enfermeria' : 'layouts.sistema');
     }

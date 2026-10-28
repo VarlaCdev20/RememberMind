@@ -6,7 +6,6 @@ namespace App\Modulos\Valoraciones\Presentacion\Livewire\Paginas;
 
 use App\Models\Residente;
 use App\Models\User;
-use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\CohorteCognitivaLocal;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -42,17 +41,13 @@ final class MisResidentesPsicologia extends Component
     {
         $this->autorizar();
 
-        $query = Residente::query()->where('estado', 'ADMITIDO');
+        $query = \App\Modulos\ApoyoDecision\Aplicacion\Consultas\FuentesValoracionOperativa::residentes(Residente::query())->where('estado', 'ADMITIDO');
         $total = (clone $query)->count();
 
         $terms = preg_split('/\s+/u', trim($this->search), -1, PREG_SPLIT_NO_EMPTY) ?: [];
         foreach (array_slice($terms, 0, 5) as $term) {
             $term = mb_strtolower($term);
-            if ($term === 'entrenamiento' && CohorteCognitivaLocal::habilitada()) {
-                CohorteCognitivaLocal::limitarLote($query);
 
-                continue;
-            }
             $query->where(static function ($residentes) use ($term): void {
                 $residentes->whereRaw('LOWER(nombres) LIKE ?', ['%'.$term.'%'])
                     ->orWhereRaw('LOWER(apellido_paterno) LIKE ?', ['%'.$term.'%'])

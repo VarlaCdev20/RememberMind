@@ -1,9 +1,9 @@
-<div class="rm-expert-record" wire:key="dato-{{ $version ?? 'experimental' }}-{{ $fichaDato['tabla'] }}-{{ $fichaDato['id'] }}" x-data="{ pestana: 'relaciones' }">
+<div class="rm-expert-record" wire:key="dato-{{ $version ?? 'sin-version' }}-{{ $fichaDato['tabla'] }}-{{ $fichaDato['id'] }}" x-data="{ pestana: 'relaciones' }">
     <div class="rm-expert-record__identity">
         <span class="rm-expert-record__icon"><i class="ph {{ $fichaDato['icono'] }}" aria-hidden="true"></i></span>
         <div><p class="rm-expert-eyebrow">{{ $fichaDato['categoria'] }}</p><h3>{{ $fichaDato['nombre'] }}</h3><p>{{ $fichaDato['id'] }}</p></div>
     </div>
-    <div class="rm-expert-record__origin"><i class="ph ph-stack" aria-hidden="true"></i><span>{{ $version ? 'Versión almacenada: '.$version : 'Paquete experimental · sin publicación clínica' }}</span></div>
+    <div class="rm-expert-record__origin"><i class="ph ph-stack" aria-hidden="true"></i><span>{{ $version ? 'Versión almacenada: '.$version : 'Seleccione una versión institucional' }}</span></div>
     <nav class="rm-expert-record__trail" aria-label="Recorrido de consulta del conocimiento">
         <button type="button" wire:click="volverDato" @disabled(count($recorridoDatos) < 2) class="rm-btn rm-btn-secondary"><i class="ph ph-arrow-left" aria-hidden="true"></i>Volver al dato anterior</button>
         <span>Paso {{ count($recorridoDatos) }} · {{ count($fichaDato['enlaces']) }} referencias documentadas</span>

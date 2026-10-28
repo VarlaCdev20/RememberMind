@@ -6,7 +6,6 @@ namespace App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios;
 
 use App\Models\ReglaExperta as ReglaModelo;
 use App\Modulos\ApoyoDecision\Dominio\Reglas\BaseTecnicaDesechable;
-use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\ContextoSimulacionLocal;
 use MotorExperto\dominio\orion\Entities\Conocimiento\ReglaExperta;
 use MotorExperto\dominio\orion\Repositories\Conocimiento\ReglaExpertaRepositoryInterface;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorReglas;
@@ -48,14 +47,12 @@ final readonly class ReglaExpertaEloquentRepository implements ReglaExpertaRepos
      *
      * @param  MapeadorReglas  $mapeador  Conversor del contrato versionado.
      * @param  string  $conexionExperimental  Nombre de conexión segregada.
-     * @param  ContextoSimulacionLocal|null  $simulacionLocal  Capacidad explícita del lote ficticio autorizado; null conserva el cierre a testing.
      *
      * @throws DomainException Si el nombre de conexión es inválido.
      */
     public function __construct(
         /** Conversión sin inferencia. */ private MapeadorReglas $mapeador,
         /** Destino obligatorio; no hereda la conexión institucional. */ private string $conexionExperimental,
-        /** Capacidad optativa exclusiva del paquete local autorizado. */ private ?ContextoSimulacionLocal $simulacionLocal = null,
     ) {
         self::validarIdentidades($conexionExperimental);
     }
@@ -110,7 +107,6 @@ final readonly class ReglaExpertaEloquentRepository implements ReglaExpertaRepos
      */
     private function consulta(string $versionConocimiento): Builder
     {
-        $this->simulacionLocal?->validarVersion($versionConocimiento);
         return ReglaModelo::on($this->conexion())->where('cod_version_modelo', $versionConocimiento)->with([
             'version',
             'condicionesReglaExperta' => static fn (HasMany $q): HasMany => $q->orderBy('cod_condicion_regla'),
@@ -148,11 +144,6 @@ final readonly class ReglaExpertaEloquentRepository implements ReglaExpertaRepos
      */
     private function conexion(): string
     {
-        if ($this->simulacionLocal !== null) {
-            $this->simulacionLocal->db($this->conexionExperimental);
-
-            return $this->conexionExperimental;
-        }
         $contenedor = Container::getInstance();
         if (! $contenedor->bound('env') || $contenedor->make('env') !== 'testing') {
             throw new RuntimeException('El repositorio experimental solo está habilitado en testing.');

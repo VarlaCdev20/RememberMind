@@ -44,7 +44,7 @@ final class ConsultarPetersenInstitucional
     {
         return DB::transaction(function () use ($usuario, $residente, $corte, $version, $instrumental): InstantaneaPetersen {
             $usuario = User::query()->findOrFail($usuario->getKey());
-            $residente = Residente::query()->findOrFail($residente->getKey());
+            $residente = \App\Modulos\ApoyoDecision\Aplicacion\Consultas\FuentesValoracionOperativa::residentes(Residente::query())->findOrFail($residente->getKey());
             Gate::forUser($usuario)->authorize('consultarOriginales', [ValoracionPetersenOriginal::class, $residente]);
             $lecturaEnfermeria = Gate::forUser($usuario)->allows('consultarFuentesParaResultado', [EvaluacionExperta::class, $residente]);
             if ($instrumental !== null && ($instrumental->contenido['contexto']['residente'] !== $residente->getKey()

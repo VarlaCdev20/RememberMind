@@ -2,11 +2,6 @@
     x-on:orion-navigate.window="vistaClinica = 'resumen'; $nextTick(() => { const section = document.getElementById($event.detail.seccion); if (section) { if (section.tagName === 'DETAILS') section.open = true; let parent = section.parentElement?.closest('details'); while (parent) { parent.open = true; parent = parent.parentElement?.closest('details'); } section.scrollIntoView({ block: 'start' }); section.querySelector('summary, h2')?.focus({ preventScroll: true }); } })"
     x-on:expert-trace-opened.window="$nextTick(() => document.getElementById('drawer-trazabilidadabierta-title')?.focus())"
     x-on:expert-trace-closed.window="$nextTick(() => $refs.traceTrigger?.focus())">
-    @if($cohorteEntrenamiento ?? false)
-        <aside class="rm-orion-note mb-3" aria-label="Procedencia de los datos">
-            <strong>Residente de entrenamiento.</strong> Datos generados para verificar el funcionamiento del sistema. Puede consultar sus fuentes y ejecutar el análisis; los resultados no pertenecen a una persona real.
-        </aside>
-    @endif
     @if($enfermeria)
         @include('apoyodecision::livewire.medico.resultados-experto.enfermeria')
     @else
@@ -67,7 +62,7 @@
                     @if($datos['evaluacion'] ?? null)
                         <dl><dt>Fecha de la evaluación histórica</dt><dd>{{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($datos['evaluacion']['fecha']) }}</dd></dl>
                         <dl><dt>Profesional solicitante</dt><dd>{{ $datos['evaluacion']['solicitante'] ?? 'No disponible' }}</dd></dl>
-                        <dl><dt>{{ $simulacion ? 'Estado del resultado técnico' : 'Revisión profesional' }}</dt><dd>{{ $estadoRevision ?? 'Sin valoración cognitiva disponible para revisión' }}</dd></dl>
+                        <dl><dt>Revisión profesional</dt><dd>{{ $estadoRevision ?? 'Sin valoración cognitiva disponible para revisión' }}</dd></dl>
                     @else
                         <dl><dt>Fecha de la consulta actual</dt><dd>{{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($perfilInstrumental['petersen_institucional']['fecha_corte'] ?? null, 'No disponible') }}</dd></dl>
                         <dl><dt>Evaluación histórica</dt><dd>No hay una evaluación clínica conservada para esta consulta.</dd></dl>
@@ -254,9 +249,6 @@
                 @endif
                 @if($puedeAuditar && $datos['evaluacion'])<div><button type="button" x-ref="traceTrigger" wire:click="verTrazabilidad" wire:loading.attr="disabled" class="rm-btn rm-btn-secondary">Consultar auditoría técnica</button></div>@endif
                 <p class="text-sm text-rm-secondary">{{ $informe['limite_global'] }} {{ $informe['limite_revision'] }}</p>
-                @if($simulacion)
-                    <p class="text-sm text-rm-secondary" role="note">{{ $informe['procedencia_visible'] }}</p>
-                @endif
             @endif
         </div>
 
@@ -269,12 +261,8 @@
         <x-ui.drawer-livewire wire:model="trazabilidadAbierta" title="Auditoría técnica de la evaluación" size="xl" closeMethod="cerrarTrazabilidad">
             <p class="text-sm break-words">Evaluación {{ $datos['evaluacion']['id'] ?? 'No disponible' }} · Versión {{ $datos['evaluacion']['version'] ?? 'No disponible' }}</p>
             @php($detalle = $datos['detalle'])
-            @if($simulacion)
-                @include('apoyodecision::livewire.medico.resultados-experto.traza-simulacion', ['abierto' => true])
-                @include('apoyodecision::livewire.medico.resultados-experto.instantanea-simulacion')
-            @else
                 @include('livewire.medico.resultados-experto.fundamento', ['abierto' => true])
-            @endif
+
         </x-ui.drawer-livewire>
     @endif
     @endif

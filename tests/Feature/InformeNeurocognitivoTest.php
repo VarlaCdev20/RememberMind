@@ -88,8 +88,7 @@ final class InformeNeurocognitivoTest extends TestCase
             ->assertDontSee('función normal')->assertDontSee('PET-')->assertDontSee('SIM-ORION');
         Livewire::withQueryParams(['simulacion' => '0'])
             ->test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
-            ->assertSee('Pendiente de una valoración disponible')
-            ->assertDontSee('Salir de la vista previa');
+            ->assertNotFound();
         self::assertDatabaseCount('evaluaciones_expertas', 0);
     }
 

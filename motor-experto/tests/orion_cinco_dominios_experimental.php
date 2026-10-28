@@ -6,6 +6,8 @@ declare(strict_types=1);
  * Reutiliza el contrato de tablas instrumentales en SQLite :memory:.
  * DCL debe abstenerse ante cualquier combinación de salidas sintéticas.
  */
+require_once __DIR__.'/bootstrap.php';
+
 spl_autoload_register(static function (string $clase): void {
     $prefix = 'MotorExperto\\';
     if (str_starts_with($clase, $prefix)) {

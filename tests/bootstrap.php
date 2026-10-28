@@ -34,3 +34,5 @@ register_shutdown_function(static function () use ($views): void {
 });
 
 require dirname(__DIR__).'/vendor/autoload.php';
+require dirname(__DIR__).'/motor-experto/tests/bootstrap.php';
+require __DIR__.'/Support/Fixtures/bootstrap.php';

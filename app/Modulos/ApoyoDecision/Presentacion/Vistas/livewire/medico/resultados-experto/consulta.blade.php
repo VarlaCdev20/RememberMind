@@ -40,15 +40,13 @@
             @elseif($puedeAuditar)<button type="button" wire:click="abrirConsulta('reglas')" aria-pressed="{{ $pestanaConsulta === 'reglas' ? 'true' : 'false' }}" class="rm-btn rm-btn-secondary">Reglas aplicadas</button>@endif
         </div>
         @if($pestanaConsulta === 'interpretacion')
-            <div class="rm-orion-reading"><h3>{{ $informe['actual']['estado'] }}</h3><p>{{ $simulacion ? 'Esta lectura procede de un caso de prueba y no representa una valoración clínica del residente.' : $informe['actual']['significado'] }}</p><p>{{ $informe['actual']['por_que'] }}</p>
+            <div class="rm-orion-reading"><h3>{{ $informe['actual']['estado'] }}</h3><p>{{ $informe['actual']['significado'] }}</p><p>{{ $informe['actual']['por_que'] }}</p>
                 @foreach($informe['actual']['limites'] as $texto)<p class="rm-orion-note">{{ $texto }}</p>@endforeach
             </div>
         @elseif($pestanaConsulta === 'registro')
-            @if($simulacion)
-                <p class="rm-orion-note">Instantánea de simulación. Las referencias artificiales no se abren como fuentes clínicas actuales.</p>
-            @else
+
                 @include('livewire.medico.resultados-experto.evidencias')
-            @endif
+
             <p class="rm-orion-note">{{ $informe['limite_fuente'] }}</p>
             @if($enfermeria)
                 <h3 class="rm-expert-section-title mt-4">Diagnóstico médico registrado</h3>

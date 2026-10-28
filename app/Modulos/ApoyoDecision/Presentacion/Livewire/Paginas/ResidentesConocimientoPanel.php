@@ -55,7 +55,7 @@ final class ResidentesConocimientoPanel extends Component
     public function seleccionar(string $id): void
     {
         $usuario = $this->autorizar();
-        $residente = Residente::query()->where('estado', 'ADMITIDO')->findOrFail($id);
+        $residente = \App\Modulos\ApoyoDecision\Aplicacion\Consultas\FuentesValoracionOperativa::residentes(Residente::query())->where('estado', 'ADMITIDO')->findOrFail($id);
         Gate::forUser($usuario)->authorize('consultarResultados', [EvaluacionExperta::class, $residente]);
         $this->seleccionado = $id;
         $this->fuente = null;
@@ -65,7 +65,7 @@ final class ResidentesConocimientoPanel extends Component
     public function abrirFuente(string $id): void
     {
         $usuario = $this->autorizar();
-        $residente = Residente::query()->where('estado', 'ADMITIDO')->findOrFail($this->seleccionado);
+        $residente = \App\Modulos\ApoyoDecision\Aplicacion\Consultas\FuentesValoracionOperativa::residentes(Residente::query())->where('estado', 'ADMITIDO')->findOrFail($this->seleccionado);
         $capturas = app(CapturasInstrumentalesResidente::class)->consultar($usuario, $residente, CarbonImmutable::now());
         abort_unless(collect($capturas['capturas'])->contains('cod_aplicacion', $id), 404);
         $this->fuente = $id;
@@ -79,7 +79,7 @@ final class ResidentesConocimientoPanel extends Component
     public function render()
     {
         $usuario = $this->autorizar();
-        $query = Residente::query()->where('estado', 'ADMITIDO')->with('cama.habitacion');
+        $query = \App\Modulos\ApoyoDecision\Aplicacion\Consultas\FuentesValoracionOperativa::residentes(Residente::query())->where('estado', 'ADMITIDO')->with('cama.habitacion');
         foreach (preg_split('/\s+/u', mb_substr(trim($this->buscar), 0, 100), -1, PREG_SPLIT_NO_EMPTY) ?: [] as $termino) {
             $query->where(fn ($q) => $q->whereLike('nombres', "%{$termino}%")
                 ->orWhereLike('apellido_paterno', "%{$termino}%")->orWhereLike('apellido_materno', "%{$termino}%")
@@ -93,7 +93,7 @@ final class ResidentesConocimientoPanel extends Component
         $puedeFuentes = collect(CapturasInstrumentalesResidente::PERMISOS_LECTURA)
             ->every(fn ($permiso) => $usuario->checkPermissionTo($permiso, 'web'));
         if ($this->seleccionado) {
-            $residente = Residente::query()->with('cama.habitacion')->where('estado', 'ADMITIDO')->findOrFail($this->seleccionado);
+            $residente = \App\Modulos\ApoyoDecision\Aplicacion\Consultas\FuentesValoracionOperativa::residentes(Residente::query())->with('cama.habitacion')->where('estado', 'ADMITIDO')->findOrFail($this->seleccionado);
             Gate::forUser($usuario)->authorize('consultarResultados', [EvaluacionExperta::class, $residente]);
             try {
                 $lectura = app(LecturaResultadosExperto::class)->consultar($usuario, $residente, null, 'COG-MEM', $this->getPage('historia'));

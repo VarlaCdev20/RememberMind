@@ -6,8 +6,7 @@ namespace App\Modulos\ApoyoDecision\Aplicacion\Consultas;
 
 use App\Models\VersionModeloExperto;
 use Illuminate\Support\Facades\Gate;
-use MotorExperto\investigacion\g09\CatalogoReglasG09Experimental;
-use MotorExperto\investigacion\g09\PaqueteSemanticoG09Experimental;
+use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
 
 /** Proyección del paquete real, sin inferencias ni escrituras. */
 final class ExplorarConocimientoExperto
@@ -15,7 +14,7 @@ final class ExplorarConocimientoExperto
     public function obtener(?string $version): array
     {
         Gate::authorize('consultar', VersionModeloExperto::class);
-        $tablas = $version === null ? PaqueteSemanticoG09Experimental::paraConservacion()->declaracion()['tablas']
+        $tablas = $version === null ? array_fill_keys(array_keys(PaqueteConocimiento::CLAVES), [])
             : app(ConsultarConocimientoAdministrativo::class)->instantanea($version);
         $nodos = array_column($tablas['nodos_semanticos'], null, 'cod_nodo_semantico');
         $variables = array_column($tablas['variables_expertas'], null, 'cod_variable_experta');
@@ -24,7 +23,7 @@ final class ExplorarConocimientoExperto
         $reglas = [];
         foreach ($tablas['reglas_expertas'] as $r) {
             $id = $r['cod_regla_experta'];
-            $meta = $version === null ? (CatalogoReglasG09Experimental::todas()[$id] ?? []) : [];
+            $meta = [];
             $condiciones = array_values(array_filter($tablas['condiciones_regla_experta'], static fn ($c) => $c['cod_regla_experta'] === $id));
             foreach ($condiciones as &$c) {
                 $v = $variables[$c['cod_variable_experta']] ?? [];
@@ -44,12 +43,12 @@ final class ExplorarConocimientoExperto
             $dominio = $meta['criterio'] ?? ($nodos[$criterioId]['codigo_semantico'] ?? 'No disponible');
             $reglas[$id] = $r + ['id' => $id, 'codigo' => $r['codigo_regla'] ?? $id, 'dominio' => $dominio, 'fundamento' => $r['observacion'] ?? null,
                 'subcomponente' => $meta['componente'] ?? ($propietarios === [] ? 'No disponible' : implode(', ', $propietarios)), 'condiciones' => $condiciones,
-                'consecuencias' => $consecuencias, 'version' => $version ?? CatalogoReglasG09Experimental::VERSION,
+                'consecuencias' => $consecuencias, 'version' => $version,
                 'restricciones' => $meta['confusores'] ?? ($r['observacion'] ?? 'Sin restricción declarada en este contrato.')];
         }
 
         return ['tablas' => $tablas, 'reglas' => $reglas, 'nodos' => $nodos,
-            'relaciones' => $tablas['relaciones_semanticas'], 'experimental' => $version === null];
+            'relaciones' => $tablas['relaciones_semanticas'], 'experimental' => false];
     }
 
     /** Diferencias por código semántico, sin equiparar PK entre revisiones. */

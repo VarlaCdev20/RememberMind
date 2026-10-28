@@ -3,7 +3,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         @forelse($informe['historial'] as $h)
             <button type="button" wire:key="historial-{{ $h['id'] }}" wire:click="seleccionarEvaluacion(@js($h['id']))" wire:loading.attr="disabled" class="rm-expert-criterion text-left min-w-0 {{ $datos['evaluacion']['id'] === $h['id'] ? 'is-selected' : '' }}" aria-pressed="{{ $datos['evaluacion']['id'] === $h['id'] ? 'true' : 'false' }}">
-                <span class="block font-semibold">{{ $h['fecha'] ?? 'Fecha no disponible' }}</span><span class="text-sm">Versión {{ $h['version'] ?? 'No disponible' }}</span>
+                <span class="block font-semibold">{{ $h['fecha'] ?? 'Fecha no disponible' }}</span>@if($puedeAuditar)<span class="text-sm">Versión {{ $h['version'] ?? 'No disponible' }}</span>@endif
                 @foreach($h['criterios'] as $c)
                     <span class="block text-sm mt-2">{{ $c['nombre'] }}</span>
                 @endforeach

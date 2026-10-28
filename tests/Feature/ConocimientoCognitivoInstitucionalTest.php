@@ -741,61 +741,25 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         self::assertSame(0, DB::table('evaluaciones_expertas')->count());
     }
 
-    public function test_observaciones_de_19_componentes_se_integran_sin_acreditar_las_15_reglas_g09(): void
+    public function test_las_observaciones_del_catalogo_test_no_entran_al_resultado_institucional(): void
     {
         $this->crearObservacionesInstitucionales();
         config(['sistema_experto.version_cognitiva' => null]);
         app(RegistrarConocimientoInstitucional::class)->ejecutar($this->usuario);
         $r = $this->consultar();
-        self::assertCount(19, $r['resultado']['observaciones_por_componente']);
-        foreach ($r['resultado']['observaciones_por_componente'] as $codigo => $filas) {
-            self::assertCount(1, $filas);
-            self::assertSame('DIFICULTAD_DOCUMENTADA', $filas[0]['codigo']);
-            self::assertSame('SIM_DIFICULTAD', $filas[0]['literal_original']);
-            self::assertSame($this->usuario->personal->getKey(), $filas[0]['autor']);
-            self::assertSame([], $filas[0]['reglas_instrumentales_acreditadas']);
-        }
-        foreach ($r['resultado']['perfil'] as $dominio) {
-            self::assertSame([], $dominio['conclusiones_candidatas']);
-            foreach ($dominio['traza']['reglas'] as $regla) {
-                self::assertSame('NO_CUMPLE', $regla['estado']);
-            }
-        }
-        self::assertSame('EV-CM-1', $r['resultado']['perfil']['COG-MEM']['compuerta_institucional']['estado']);
-        $perfil = app(ConsultarPerfilInstrumental::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now());
-        self::assertCount(1, $perfil['dominios']['COG-MEM']['componentes']['MEM-S01']['observaciones']);
-        $html = view('apoyodecision::livewire.medico.resultados-experto.perfil-instrumental', ['perfilInstrumental' => $perfil])->render();
-        self::assertStringContainsString('Dificultad documentada', $html);
-        self::assertStringContainsString('R-ATE-S01-P01', $html);
-        self::assertStringContainsString('Sin soporte coincidente en una misma aplicación', $html);
+        self::assertSame([], $r['resultado']['observaciones_por_componente']);
+        self::assertSame(19, AplicacionInstrumento::whereHas('instrumento', fn ($q) => $q->where('codigo', 'like', 'TEST-%'))->count());
         self::assertSame(0, DB::table('evaluacion_criterios')->whereNotNull('cod_resultado_criterio')->count());
     }
 
-    public function test_vinculos_observacionales_del_contrato_adoptado_se_reconstruyen_desde_mapeos_y_originales(): void
+    public function test_el_contrato_no_reconecta_catalogos_test_como_fuentes_originales(): void
     {
         $this->crearObservacionesInstitucionales();
         $version = app(RegistrarConocimientoInstitucional::class)->ejecutar($this->usuario);
-        $vinculos = app(ContratosConocimiento::class)->porVersion($version)['vinculos_instrumentales'];
-        $mapeos = DB::table('mapeos_variables_fuente')->where('cod_version_modelo', $version)
-            ->where('tipo_extraccion', 'RESPUESTA_INSTITUCIONAL')->get();
-
-        self::assertCount(19, $vinculos);
-        self::assertCount(19, $mapeos);
-        $reconstruidos = [];
-        foreach ($mapeos as $mapeo) {
-            $pregunta = PreguntaInstrumento::query()->with('instrumento')->findOrFail($mapeo->clave_selector);
-            self::assertNotNull($pregunta->instrumento);
-            $reconstruidos[$mapeo->cod_mapeo_variable_fuente] = [
-                'cod_instrumento' => $pregunta->cod_instrumento,
-                'codigo_instrumento' => $pregunta->instrumento->codigo,
-                'version_instrumento' => $pregunta->instrumento->version,
-                'cod_pregunta' => $pregunta->getKey(),
-                'campo' => 'valor_texto',
-            ];
-        }
-        ksort($vinculos);
-        ksort($reconstruidos);
-        self::assertSame($vinculos, $reconstruidos);
+        self::assertSame([], app(ContratosConocimiento::class)->porVersion($version)['vinculos_instrumentales']);
+        self::assertSame(0, DB::table('mapeos_variables_fuente')->where('cod_version_modelo', $version)
+            ->where('tipo_extraccion', 'RESPUESTA_INSTITUCIONAL')->count());
+        self::assertSame(19, Instrumento::where('codigo', 'like', 'TEST-%')->count());
     }
 
     public function test_superadmin_no_registra_conocimiento_aunque_tenga_permiso_aislado(): void

@@ -1,7 +1,7 @@
 @php($narrativa = $informe['narrativa'])
-@if($simulacion)<p class="rm-orion-note" role="note"><strong>Entorno de pruebas · Resultado de demostración · Sin uso asistencial.</strong></p>@endif
+
 <section class="rm-card rm-orion-result" aria-labelledby="orion-resultado-titulo">
-    <div class="rm-orion-section-heading"><span class="rm-expert-eyebrow">{{ $simulacion ? 'Evaluación histórica de demostración' : 'Evaluación histórica seleccionada' }}</span><span class="rm-orion-state">{{ $datos['detalle']['estado'] }}</span></div>
+    <div class="rm-orion-section-heading"><span class="rm-expert-eyebrow">{{ 'Evaluación histórica seleccionada' }}</span><span class="rm-orion-state">{{ $datos['detalle']['estado'] }}</span></div>
     <h2 id="orion-resultado-titulo">{{ $narrativa['conclusion'] }}</h2>
     <p class="rm-expert-prose">{{ $narrativa['resumen'] }}</p>
     <p class="rm-orion-result-limit"><i class="ph ph-info" aria-hidden="true"></i>{{ $informe['limite_global'] }}</p>
@@ -35,7 +35,7 @@
             <span class="rm-orion-state">{{ $informe['actual']['estado'] }}</span>
         </div>
         <p class="rm-expert-prose">{{ $informe['actual']['conclusion'] }}</p>
-        <p class="text-sm text-rm-secondary">{{ $simulacion ? 'Esta lectura procede de un caso de prueba y no representa una valoración clínica del residente.' : $informe['actual']['significado'] }}</p>
+        <p class="text-sm text-rm-secondary">{{ $informe['actual']['significado'] }}</p>
         <div class="rm-orion-toolbar">
             <button type="button" wire:click="abrirConsulta('registro')" class="rm-btn rm-btn-secondary"><i class="ph ph-files" aria-hidden="true"></i>Ver evidencias del área</button>
             <button type="button" wire:click="irASeccion('orion-desglose')" class="rm-btn rm-btn-secondary">Ver subcomponentes</button>
@@ -89,7 +89,7 @@
             <thead><tr><th scope="col">Fuente</th><th scope="col">Evidencia</th><th scope="col">Uso</th><th scope="col">Fecha</th></tr></thead>
             <tbody>
                 @forelse(array_slice(array_values($datos['detalle']['evidencias'] ?? []), 0, 5) as $referencia)
-                    <tr><th scope="row">{{ $simulacion ? 'Referencia de prueba' : ($referencia['fuente'] ?? 'Fuente registrada') }}</th><td>{{ $simulacion ? ($informe['areas'][$referencia['nombre']]['nombre'] ?? 'Referencia del caso de prueba') : ($referencia['nombre'] ?? 'Evidencia registrada') }}</td><td>{{ $referencia['papel'] ?? 'No disponible' }}</td><td>{{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($referencia['fecha'] ?? null) }}</td></tr>
+                    <tr><th scope="row">{{ $referencia['fuente'] ?? 'Fuente registrada' }}</th><td>{{ $referencia['nombre'] ?? 'Evidencia registrada' }}</td><td>{{ $referencia['papel'] ?? 'No disponible' }}</td><td>{{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($referencia['fecha'] ?? null) }}</td></tr>
                 @empty
                     <tr><td colspan="4">Sin evidencias conservadas para este resultado.</td></tr>
                 @endforelse
@@ -115,7 +115,7 @@
     </div>
     <div x-show="tab === 'grafo'" x-cloak>
         @if($exploracion)@include('apoyodecision::livewire.medico.resultados-experto.grafo', ['grafo' => $exploracion['inferencia'], 'tipo' => 'inferencia', 'titulo' => 'Caja de cristal · evaluación histórica'])
-        @else<p class="rm-orion-empty">{{ $simulacion ? 'Esta ejecución tiene un contrato de simulación separado. Puede consultar su auditoría conservada.' : 'La consulta técnica del grafo requiere autorización específica. El acceso a resultados no concede acceso a fuentes restringidas.' }}</p>@endif
+        @else<p class="rm-orion-empty">La consulta técnica del grafo requiere autorización específica. El acceso a resultados no concede acceso a fuentes restringidas.</p>@endif
     </div>
     <div x-show="tab === 'conocimiento'" x-cloak>
         @if($exploracion)@include('apoyodecision::livewire.medico.resultados-experto.grafo', ['grafo' => $exploracion['semantico'], 'tipo' => 'semantico', 'titulo' => 'Estructura del conocimiento'])
@@ -126,16 +126,13 @@
             @include('apoyodecision::livewire.medico.resultados-experto.reglas-tabla')
         @elseif(! $puedeAuditar)
             <p class="rm-orion-empty">El detalle técnico de las reglas requiere permiso de auditoría. Esto no significa que las reglas del sistema estén deshabilitadas.</p>
-        @elseif($simulacion || ($datos['prueba_tecnica'] ?? false))
+        @elseif($datos['prueba_tecnica'] ?? false)
             <p class="rm-orion-empty">Esta ejecución se conserva bajo un contrato de prueba separado y no ofrece aquí una traza clínica de reglas.</p>
         @else
             <p class="rm-orion-empty">No hay una traza de reglas conservada para la evaluación histórica seleccionada. La consulta actual del expediente no completa datos históricos ausentes.</p>
         @endif
     </div>
     <div x-show="tab === 'evidencias'" x-cloak>
-        @if($simulacion)
-            <p class="rm-orion-note">Estas evidencias pertenecen exclusivamente a la simulación conservada. No se contabilizan como cobertura clínica.</p>
-        @else
         <p class="rm-orion-note">Evidencias conservadas en esta evaluación y área. El conteo representa cobertura documental; no mide deterioro.</p>
         <button type="button" wire:click="abrirConsulta('registro')" class="rm-btn rm-btn-secondary">Abrir datos y evidencias</button>
         @php($cobertura = ['etiquetas' => ['Soporte de inferencia', 'Contexto', 'Otras evidencias'], 'valores' => [count(array_filter($datos['detalle']['evidencias'], fn ($e) => $e['papel'] === 'Soporte de inferencia')), count(array_filter($datos['detalle']['evidencias'], fn ($e) => $e['rol'] === 'CONTEXTUAL')), count(array_filter($datos['detalle']['evidencias'], fn ($e) => $e['papel'] !== 'Soporte de inferencia' && $e['rol'] !== 'CONTEXTUAL'))]])
@@ -147,6 +144,5 @@
                 <dl class="rm-orion-counts">@foreach($cobertura['etiquetas'] as $i => $etiqueta)<div><dt>{{ $etiqueta }}</dt><dd>{{ $cobertura['valores'][$i] }}</dd></div>@endforeach</dl>
             </div>
         @else<p class="rm-orion-empty">No hay evidencias históricas para graficar. La ausencia de datos no equivale a cero dificultad.</p>@endif
-        @endif
     </div>
 </section>

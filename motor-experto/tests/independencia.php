@@ -3,6 +3,8 @@
 use MotorExperto\adaptadores\entrada\DemostracionCOGMEM;
 
 // Ejecutable con PHP 8.3 sin bootstrap Laravel, Composer ni base de datos.
+require_once __DIR__.'/bootstrap.php';
+
 spl_autoload_register(function (string $class): void {
     $prefix = 'MotorExperto\\';
     if (str_starts_with($class, $prefix)) {

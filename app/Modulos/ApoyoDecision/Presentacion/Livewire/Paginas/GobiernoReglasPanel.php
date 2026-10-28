@@ -224,7 +224,7 @@ final class GobiernoReglasPanel extends Component
 
     private function seleccion(): ?VersionModeloExperto
     {
-        return $this->versionSeleccionada === '' ? null : VersionModeloExperto::query()->whereKey($this->versionSeleccionada)->firstOrFail();
+        return $this->versionSeleccionada === '' ? null : \App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarConocimientoAdministrativo::institucionales()->whereKey($this->versionSeleccionada)->firstOrFail();
     }
 
     private function regla(string $id): ReglaExperta
@@ -236,7 +236,7 @@ final class GobiernoReglasPanel extends Component
     {
         $actor = $this->autorizar();
         $seleccionada = $this->seleccion();
-        $versiones = VersionModeloExperto::query()->orderByDesc('fecha_hora_creacion')->get();
+        $versiones = \App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarConocimientoAdministrativo::institucionales()->orderByDesc('fecha_hora_creacion')->get();
         $reglas = ReglaExperta::query()->where('cod_version_modelo', $this->versionSeleccionada)
             ->when(trim($this->buscarRegla) !== '', function ($query): void {
                 $patron = '%'.mb_substr(trim($this->buscarRegla), 0, 100).'%';

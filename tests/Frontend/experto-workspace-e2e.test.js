@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:net';
 import { randomBytes } from 'node:crypto';
-import { writeFile, readFile } from 'node:fs/promises';
+import { writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { existsSync } from 'node:fs';
@@ -15,7 +15,7 @@ test('sistema experto real: roles, grafo, teclado y cinco anchos', { skip: proce
     await writeFile(db, '', { flag: 'wx', mode: 0o600 });
     const port = await new Promise(resolve => { const s = createServer().listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => resolve(p)); }); });
     const base = `http://127.0.0.1:${port}`;
-    const env = { ...process.env, APP_ENV: 'testing', APP_URL: base, RM_EXPERTO_DB: db, RM_EXPERTO_TOKEN: randomBytes(24).toString('hex'), RM_EXPERTO_COHORTE: '1' };
+    const env = { ...process.env, APP_ENV: 'testing', APP_URL: base, RM_EXPERTO_DB: db, RM_EXPERTO_TOKEN: randomBytes(24).toString('hex') };
     const router = 'tests/Support/ServidorExpertoSintetico.php';
     const phpArgs = ['-d', 'extension=pdo_sqlite', '-d', 'extension=sqlite3'];
     const run = args => new Promise((resolve, reject) => {
@@ -52,6 +52,7 @@ test('sistema experto real: roles, grafo, teclado y cinco anchos', { skip: proce
         await page.screenshot({ path: evidence(`${role}-1440.png`), fullPage: true });
         for (const width of [1440, 1280, 1024, 768, 390]) {
             await page.setViewport({ width, height: 1000 });
+            await new Promise(resolve => setTimeout(resolve, 400));
             const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
             const sidebar = await page.$eval('.rm-sidebar', el => ({ width: el.getBoundingClientRect().width, cssWidth: getComputedStyle(el).width, position: getComputedStyle(el).position, classes: el.className, shell: document.body.className })).catch(() => null);
             matrix.push({ role, width, overflow, sidebar });
@@ -59,14 +60,18 @@ test('sistema experto real: roles, grafo, teclado y cinco anchos', { skip: proce
             if (width !== 1440) await page.screenshot({ path: evidence(`${role}-${width}.png`), fullPage: true });
         }
         if (phase !== 'antes') {
-            assert.doesNotMatch(await page.$eval('body', el => el.innerText), /O\.R\.I\.O\.N\.|\bORION\b|\bNaN\b|\bundefined\b|\[object Object\]/);
+            assert.doesNotMatch(await page.$eval('body', el => el.innerText), /O\.R\.I\.O\.N\.|\bORION\b(?!-)|\bNaN\b|\bundefined\b|\[object Object\]/);
             await page.setViewport({ width: 640, height: 500 });
             assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${role} zoom/reflow`);
         }
     }
     if (phase !== 'antes') {
         await page.setViewport({ width: 1440, height: 1000 }); await go('SA', '/admin/sistema-experto');
-        await click('Conocimiento'); await page.select('#lab-modo', 'red'); await page.waitForNetworkIdle({ idleTime: 200 });
+        await click('Conocimiento');
+        const version = await page.$eval('#expert-version-scope', el => [...el.options].find(o => o.value)?.value);
+        assert.ok(version, 'Conocimiento registrado en la base desechable');
+        await page.select('#expert-version-scope', version); await page.waitForNetworkIdle({ idleTime: 300 });
+        await page.select('#lab-modo', 'red'); await page.waitForNetworkIdle({ idleTime: 200 });
         await page.waitForSelector('[data-expert-node]');
         await page.click('[data-expert-node]'); await page.waitForNetworkIdle({ idleTime: 300 });
         assert.ok(await page.$eval('.rm-knowledge-inspector', el => el.innerText.includes('Nodo seleccionado')));
@@ -102,32 +107,10 @@ test('sistema experto real: roles, grafo, teclado y cinco anchos', { skip: proce
         assert.equal(denied.status(), 404);
         assert.ok(!await page.$eval('body', el => el.innerText.includes('Residente no asignado')));
 
-        const cohorte = JSON.parse(await readFile(db + '.cohorte.json', 'utf8'));
-        await go('MED', `/admin/medico/residente/${cohorte.residente}/evaluacion-cognitiva/resultados-experto`);
-        await page.waitForSelector('[data-resident-node]', { visible: true });
-        await page.evaluate(() => [...document.querySelectorAll('.rm-resident-expert__steps button')].find(n => n.innerText.includes('Fuentes originales')).click());
-        await page.waitForFunction(() => document.querySelector('.rm-resident-expert__inspector').innerText.includes('Soporte seleccionado'));
-        await click('Requisitos de valoración');
-        await page.waitForFunction(() => [...document.querySelectorAll('.rm-resident-expert__choices strong')].some(n => n.innerText === 'Cambio corroborado'));
-        await page.evaluate(() => [...document.querySelectorAll('.rm-resident-expert__choices button')].find(n => n.innerText.includes('Alteración objetiva')).click());
-        await page.waitForFunction(() => document.querySelector('.rm-resident-expert__graph-heading h3')?.innerText === 'Alteración objetiva');
-        await click('Lista');
-        await page.waitForSelector('.rm-resident-expert__node-list', { visible: true });
-        assert.ok(await page.$eval('.rm-resident-expert__node-list', el => el.innerText.includes('Memoria')));
-        await click('Cinco áreas cognitivas');
-        for (const width of [1440, 1280, 1024, 768, 390]) {
-            await page.setViewport({ width, height: 1000 });
-            const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
-            matrix.push({ role: 'medicina-conexiones', width, overflow });
-            assert.ok(overflow <= 1, `Conexiones ${width}: overflow ${overflow}`);
-            await page.screenshot({ path: evidence(`residente-${width}.png`), fullPage: true });
-        }
-        await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
-        await page.setViewport({ width: 1440, height: 1000 });
-        await click('Mapa');
-        await page.$eval('[data-resident-node]', el => el.focus()); await page.keyboard.press('Enter');
-        assert.ok(await page.$eval('.rm-resident-expert__inspector', el => el.innerText.includes('Conexiones documentadas')));
-        assert.doesNotMatch(await page.$eval('.rm-resident-expert', el => el.innerText), /\b(?:null|NaN|undefined|Infinity)\b|\[object Object\]/);
+        await go('MED', '/admin/medico/residente/RES_QA_EXPERTO/evaluacion-cognitiva/resultados-experto');
+        assert.doesNotMatch(await page.$eval('body', el => el.innerText), /Alteración simulada|Caso sintético|Ejecutar perfil/);
+        const simulada = await page.goto(base + '/admin/medico/residente/RES_QA_EXPERTO/evaluacion-cognitiva/resultados-experto?simulacion=1', { waitUntil: 'networkidle0' });
+        assert.equal(simulada.status(), 404, 'No se permite reabrir una simulación por URL');
     }
     await writeFile(evidence('qa.json'), JSON.stringify({ phase, matrix, errors }, null, 2));
     assert.deepEqual(errors, []);

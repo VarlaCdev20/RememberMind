@@ -93,7 +93,7 @@ class TurnoEnfermeriaService
     public function obtenerPacientesAsignadosQuery(?User $user = null, ?string $codTurno = null, ?string $codEnfermeroFiltro = null): Builder
     {
         $user ??= $this->contexto->usuario();
-        $query = Residente::query();
+        $query = \App\Modulos\ApoyoDecision\Aplicacion\Consultas\FuentesValoracionOperativa::residentes(Residente::query());
 
         if ($this->tieneLecturaClinicaGlobal($user) && ! $codEnfermeroFiltro && ! $codTurno) {
             return $query;

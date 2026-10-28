@@ -96,16 +96,8 @@ final class ContratosConocimiento
             if ($contrato === null && $cabecera->codigo_version === PaqueteCognitivoInstitucional::CODIGO
                 && $cabecera->observacion === PaqueteCognitivoInstitucional::FUNDAMENTO) {
                 $contrato = PaqueteCognitivoInstitucional::contratos();
-                $fuentes = app(FuentesObservacionalesCognitivas::class)->vinculos();
-                $mapas = DB::table('mapeos_variables_fuente as m')->join('nodos_semanticos as v', 'v.cod_variable_experta', '=', 'm.cod_variable_experta')
-                    ->join('nodos_semanticos as n', 'n.cod_nodo_semantico', '=', 'v.cod_nodo_semantico')
-                    ->where('m.cod_version_modelo', $version)->get(['m.cod_mapeo_variable_fuente', 'm.clave_selector', 'n.codigo_semantico']);
-                foreach ($mapas as $mapa) {
-                    $componente = str_starts_with($mapa->codigo_semantico, 'VAR-OBS-') ? substr($mapa->codigo_semantico, 8) : null;
-                    if (isset($fuentes[$componente]) && $fuentes[$componente]['cod_pregunta'] === $mapa->clave_selector) {
-                        $contrato['vinculos_instrumentales'][$mapa->cod_mapeo_variable_fuente] = $fuentes[$componente];
-                    }
-                }
+                // Los mapeos TEST históricos se conservan, pero no se conectan al contrato operativo.
+                $contrato['vinculos_instrumentales'] = [];
             }
             if ($cabecera->codigo_version === PaquetePetersenInstitucional::CODIGO
                 && $cabecera->observacion === PaquetePetersenInstitucional::FUNDAMENTO) {

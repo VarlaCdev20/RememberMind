@@ -10,6 +10,8 @@ runtime_verified: false
 
 # Inventario instalado: corte del 27/10/2026
 
+Este corte es anterior a la [retirada del laboratorio](../RETIRADA_LABORATORIO_2026_10_27.md). Los conteos físicos se conservan como evidencia; las entradas técnicas ya no se ofrecen en el circuito operativo.
+
 [Portal](../README.md) · [Mapa de componentes](../organizacion/MAPA_COMPONENTES.md) · [Candidatos](../instrumentos/CATALOGO_CANDIDATOS.md) · [Salida íntegra de metadatos](2026-10-27.json).
 
 Se ejecutó [scripts/inventariar-experto.php](../../../scripts/inventariar-experto.php) sobre PostgreSQL local. La protección `transaction_read_only=on` se comprobó dentro de una transacción `REPEATABLE READ, READ ONLY`, cerrada con rollback. No se consultaron residentes, aplicaciones, respuestas, hechos ni evaluaciones; no se imprimieron conexión, usuarios o secretos. La hora exacta está en el JSON. Esta comprobación de metadatos no valida el motor ni una pantalla.

@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 // Sin Composer, Laravel, conexión SQL ni fixtures de la aplicación.
+require_once __DIR__.'/bootstrap.php';
+
 spl_autoload_register(static function (string $clase): void {
     $prefijo = 'MotorExperto\\';
     if (str_starts_with($clase, $prefijo)) {

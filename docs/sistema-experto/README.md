@@ -1,7 +1,7 @@
 ---
 title: "Sistema experto: fuentes, funcionamiento y límites"
 status: CURRENT
-version: "3.0"
+version: "3.1"
 last_reviewed: 2026-10-27
 owner: RememberMind
 source_of_truth: false
@@ -24,7 +24,7 @@ Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años,
 | Los 45 instrumentos y evaluaciones candidatos | [Catálogo de investigación por finalidad](instrumentos/CATALOGO_CANDIDATOS.md) |
 | Qué está realmente catalogado en la base local | [Inventario PostgreSQL del 27/10/2026](inventarios/README.md) y [metadatos](inventarios/2026-10-27.json) |
 | Reglas institucionales: fuente y gestión | [Mapa de reglas/versiones](organizacion/MAPA_COMPONENTES.md#3-reglas-en-un-solo-lugar-fuente-y-responsabilidades) y ruta existente `/admin/sistema-experto/reglas`, sujeta a autorización |
-| Laboratorio, piloto y recorrido institucional | [Diferencias y puntos de entrada](organizacion/MAPA_COMPONENTES.md#4-nombres-que-pueden-confundir) |
+| Retirada de simulaciones y laboratorio | [Alcance, conservación y verificación](RETIRADA_LABORATORIO_2026_10_27.md) |
 | Contratos aprobados y límites pendientes | Tablas y secciones siguientes; [catálogo documental completo](INDICE_DOCUMENTAL.md) para antecedentes |
 
 El inventario comprobó **26 entradas de instrumentos** (2 Barthel, 5 capturas sintéticas y 19 registros de tarea inactivos), **6 versiones de conocimiento** y **32 reglas**. Estos conteos describen metadatos, no instrumentos aplicados, validación clínica ni cierre del experto. No confundir los 45 candidatos investigados con el catálogo instalado.
@@ -61,7 +61,7 @@ El nombre PROPUESTA de un documento no invalida una adopción posterior escrita 
 - Los cuatro perfiles son orientativos de posible DCL. Una abstención fundada no se sustituye por un resultado deseado.
 - Medicina y Psicología revisan después y por separado. No se exige su firma antes de desarrollar o ejecutar técnicamente el contrato aprobado.
 - La evaluación conjunta conserva `persistido=false` mientras no exista guardado y recuperación institucional íntegros. No vincular su revisión a un DTO transitorio.
-- La cohorte de 30 casos es sintética y optativa. Sus nombres naturales no la convierten en historias clínicas originales ni entrenamiento estadístico automático.
+- El laboratorio y la cohorte simulada están desconectados del producto. Las pruebas automatizadas quedan aisladas en `tests/`; los registros técnicos almacenados se excluyen del circuito y no se reinterpretan como historia real. Véase [retirada](RETIRADA_LABORATORIO_2026_10_27.md).
 
 ## Conservación: evidencia y brecha
 

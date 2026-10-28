@@ -73,13 +73,13 @@ final readonly class PrepararCapturaInstrumental
     {
         $this->usuario($usuario);
 
-        return Instrumento::query()->where('estado', 'ACTIVO')->orderBy('nombre')->get(['cod_instrumento', 'codigo', 'nombre', 'version']);
+        return \App\Modulos\ApoyoDecision\Aplicacion\Consultas\FuentesValoracionOperativa::instrumentoInstitucional(Instrumento::query())->where('estado', 'ACTIVO')->orderBy('nombre')->get(['cod_instrumento', 'codigo', 'nombre', 'version']);
     }
 
     public function catalogo(?User $usuario, string $codigoResidente, string $codigoInstrumento): array
     {
         $this->contexto($usuario, $codigoResidente);
-        $instrumento = Instrumento::query()->whereKey($codigoInstrumento)->where('estado', 'ACTIVO')->firstOrFail();
+        $instrumento = \App\Modulos\ApoyoDecision\Aplicacion\Consultas\FuentesValoracionOperativa::instrumentoInstitucional(Instrumento::query())->whereKey($codigoInstrumento)->where('estado', 'ACTIVO')->firstOrFail();
 
         $preguntas = $instrumento->preguntas()->where('estado', 'ACTIVA')->orderBy('orden')->orderBy('cod_pregunta')
             ->with(['opciones' => fn ($q) => $q->where('estado', 'ACTIVO')->orderBy('orden')->orderBy('cod_opcion')])

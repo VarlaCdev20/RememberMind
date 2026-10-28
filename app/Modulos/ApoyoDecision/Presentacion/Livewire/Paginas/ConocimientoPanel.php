@@ -6,22 +6,16 @@ use App\Models\User;
 use App\Models\VersionModeloExperto;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarConocimientoAdministrativo;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ExplorarConocimientoExperto;
-use App\Modulos\ApoyoDecision\Aplicacion\DTOs\PresentarResultadoLaboratorio;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\ProyectarRedConocimiento;
-use App\Modulos\ApoyoDecision\Aplicacion\Servicios\EscenariosPerfilExperimental;
-use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\SesionLaboratorioExperimental;
 use App\Modulos\ApoyoDecision\Presentacion\Soporte\DatosConocimientoVisible;
 use DomainException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\Rule;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithPagination;
 use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\investigacion\dcl\CatalogoPerfilCincoDominios;
-use MotorExperto\investigacion\g09\CatalogoReglasG09Experimental;
 
 final class ConocimientoPanel extends Component
 {
@@ -29,9 +23,6 @@ final class ConocimientoPanel extends Component
 
     #[Locked]
     public ?string $version = null;
-
-    #[Locked]
-    public ?string $ejecucion = null;
 
     #[Locked]
     public string $seccion = 'gobierno';
@@ -44,14 +35,6 @@ final class ConocimientoPanel extends Component
 
     #[Locked]
     public ?string $errorOperacion = null;
-
-    public string $escenarioSeleccionado = 'memoria-atencion';
-
-    public string $buscarCasos = '';
-
-    public string $tipoCaso = '';
-
-    public string $ordenCasos = 'asc';
 
     public string $buscarReglas = '';
 
@@ -111,7 +94,7 @@ final class ConocimientoPanel extends Component
     public function ir(string $seccion): void
     {
         $this->autorizar();
-        abort_unless(in_array($seccion, ['gobierno', 'laboratorio', 'casos', 'resultados', 'conocimiento', 'residentes', 'verificacion'], true), 422);
+        abort_unless(in_array($seccion, ['gobierno', 'conocimiento', 'residentes', 'verificacion'], true), 422);
         $this->seccion = $seccion;
     }
 
@@ -150,35 +133,6 @@ final class ConocimientoPanel extends Component
         $this->dominioRed = '';
         $this->resetPage('reglasPage');
         $this->resetPage('catalogoPage');
-    }
-
-    public function ejecutarPerfil(): void
-    {
-        $this->autorizar();
-        $this->validate(['escenarioSeleccionado' => ['required', Rule::in(array_keys(EscenariosPerfilExperimental::NOMBRES))]]);
-        $this->errorOperacion = null;
-        try {
-            $this->ejecucion = app(SesionLaboratorioExperimental::class)->ejecutar(Auth::user(), $this->escenarioSeleccionado);
-            $this->seccion = 'resultados';
-        } catch (DomainException $e) {
-            report($e);
-            $this->errorOperacion = 'No se pudo completar la evaluación. El resultado anterior se conserva. Revise la integridad del caso con el equipo técnico e inténtelo de nuevo.';
-        }
-    }
-
-    public function elegirCaso(string $caso): void
-    {
-        $this->autorizar();
-        abort_unless(isset(EscenariosPerfilExperimental::NOMBRES[$caso]), 422);
-        $this->escenarioSeleccionado = $caso;
-    }
-
-    public function abrirEjecucion(string $id): void
-    {
-        $this->autorizar();
-        app(SesionLaboratorioExperimental::class)->consultar(Auth::user(), $id);
-        $this->ejecucion = $id;
-        $this->seccion = 'resultados';
     }
 
     public function abrirRegla(string $id): void
@@ -271,9 +225,6 @@ final class ConocimientoPanel extends Component
     public function updated(string $campo): void
     {
         $this->autorizar();
-        if (in_array($campo, ['buscarCasos', 'tipoCaso', 'ordenCasos'], true)) {
-            $this->resetPage('casosPage');
-        }
         if (in_array($campo, ['buscarReglas', 'dominio', 'estadoRegla', 'subcomponente'], true)) {
             $this->resetPage('reglasPage');
         }
@@ -292,28 +243,6 @@ final class ConocimientoPanel extends Component
     {
         $this->autorizar();
         $versiones = app(ConsultarConocimientoAdministrativo::class)->versiones();
-        $laboratorioDisponible = app()->environment(['local', 'testing']);
-        $historial = $laboratorioDisponible ? app(SesionLaboratorioExperimental::class)->historial(Auth::user()) : [];
-        $informe = null;
-        if ($laboratorioDisponible && $this->ejecucion !== null) {
-            $informe = app(PresentarResultadoLaboratorio::class)->construir(app(SesionLaboratorioExperimental::class)->consultar(Auth::user(), $this->ejecucion));
-        }
-        $casos = [];
-        foreach (EscenariosPerfilExperimental::NOMBRES as $id => $nombre) {
-            $entrada = EscenariosPerfilExperimental::entrada($id);
-            $ultima = collect($historial)->firstWhere('escenario', $id);
-            $tipo = match ($id) {
-                'incompleto', 'iadl-incompleta', 'diferencial', 'sin-referencias' => 'insuficiente',
-                'contradictorio' => 'contradictorio', default => 'petersen',
-                'sin-hallazgos' => 'negativo', 'no-interpretable' => 'no interpretable',
-            };
-            $casos[] = ['id' => $id, 'nombre' => $nombre, 'corte' => $entrada['contexto']['fecha_corte'],
-                'tipo' => $tipo, 'ultima' => $ultima, 'version' => CatalogoReglasG09Experimental::VERSION];
-        }
-        $casos = collect($casos)->filter(fn ($c) => ($this->tipoCaso === '' || $c['tipo'] === $this->tipoCaso)
-            && str_contains(mb_strtolower($c['id'].' '.$c['nombre']), mb_strtolower(mb_substr($this->buscarCasos, 0, 120))))
-            ->sortBy('nombre', SORT_NATURAL, $this->ordenCasos === 'desc');
-        $casos = $this->paginar($casos->values()->all(), 'casosPage');
         $conocimiento = $errorConocimiento = $red = null;
         $comparacion = [];
         try {
@@ -337,8 +266,7 @@ final class ConocimientoPanel extends Component
             && ($this->subcomponente === '' || $r['subcomponente'] === $this->subcomponente)
             && str_contains(mb_strtolower($r['codigo'].' '.($r['nombre'] ?? '').' '.($r['fundamento'] ?? '')), mb_strtolower(mb_substr($this->buscarReglas, 0, 120))))->values()->all();
         $reglas = $this->paginar($reglas, 'reglasPage');
-        $dominios = CatalogoPerfilCincoDominios::DOMINIOS;
-        $escenariosPerfil = EscenariosPerfilExperimental::NOMBRES;
+        $dominios = ['COG-MEM' => 'Memoria', 'COG-ATE' => 'Atención', 'COG-EJE' => 'Funciones ejecutivas', 'COG-LEN' => 'Lenguaje', 'COG-VIS' => 'Visuoespacial'];
         $pkCatalogo = PaqueteConocimiento::CLAVES[$this->tablaCatalogo] ?? null;
         $filasCatalogo = collect($pkCatalogo ? ($conocimiento['tablas'][$this->tablaCatalogo] ?? []) : [])
             ->filter(fn ($r) => str_contains(mb_strtolower(implode(' ', array_filter($r, 'is_scalar'))), mb_strtolower(mb_substr($this->buscarCatalogo, 0, 120))));
@@ -353,7 +281,7 @@ final class ConocimientoPanel extends Component
         $fuentesNodo = $conocimiento && $this->nodo ? (new ProyectarRedConocimiento)->fuentesNodo($conocimiento, $this->nodo) : [];
         $filasCatalogo = $this->paginar($filasCatalogo->values()->all(), 'catalogoPage');
 
-        return view('livewire.superadministrador.sistema-experto.conocimiento-panel', compact('versiones', 'laboratorioDisponible', 'historial', 'informe', 'casos', 'conocimiento', 'errorConocimiento', 'reglas', 'dominios', 'escenariosPerfil', 'comparacion', 'red', 'filasCatalogo', 'pkCatalogo', 'detalleRegistro', 'fuentesNodo', 'categoriasDatos', 'fichaDato'))
+        return view('livewire.superadministrador.sistema-experto.conocimiento-panel', compact('versiones', 'conocimiento', 'errorConocimiento', 'reglas', 'dominios', 'comparacion', 'red', 'filasCatalogo', 'pkCatalogo', 'detalleRegistro', 'fuentesNodo', 'categoriasDatos', 'fichaDato'))
             ->layout('layouts.sistema');
     }
 

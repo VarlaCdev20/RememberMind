@@ -7,7 +7,6 @@ namespace App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas;
 use App\Models\EvaluacionExperta;
 use App\Models\Residente;
 use App\Models\User;
-use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\CohorteCognitivaLocal;
 use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
@@ -52,14 +51,10 @@ final class ResidentesSistemaExperto extends Component
         $usuario = $this->autorizar();
         $busqueda = trim($this->busqueda);
         $terminos = preg_split('/\s+/u', $busqueda, -1, PREG_SPLIT_NO_EMPTY) ?: [];
-        $residentes = Residente::query()->where('estado', 'ADMITIDO')
+        $residentes = \App\Modulos\ApoyoDecision\Aplicacion\Consultas\FuentesValoracionOperativa::residentes(Residente::query())->where('estado', 'ADMITIDO')
             ->when($terminos !== [], static function ($query) use ($terminos): void {
                 foreach ($terminos as $termino) {
-                    if (mb_strtolower($termino) === 'entrenamiento' && CohorteCognitivaLocal::habilitada()) {
-                        CohorteCognitivaLocal::limitarLote($query);
 
-                        continue;
-                    }
                     $query->where(static function ($q) use ($termino): void {
                         $patron = "%{$termino}%";
                         $q->whereLike('cod_residente', $patron)

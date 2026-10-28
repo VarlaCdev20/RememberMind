@@ -69,7 +69,7 @@ final class CapturaPetersenPanel extends Component
         $usuario = auth()->user() ? User::query()->findOrFail(auth()->id()) : null;
         abort_unless($usuario, 403);
         auth()->setUser($usuario);
-        $residente = Residente::query()->findOrFail($this->codResidente);
+        $residente = \App\Modulos\ApoyoDecision\Aplicacion\Consultas\FuentesValoracionOperativa::residentes(Residente::query())->findOrFail($this->codResidente);
         Gate::forUser($usuario)->authorize('consultarOriginales', [ValoracionPetersenOriginal::class, $residente]);
 
         return [$usuario, $residente];

@@ -1,7 +1,7 @@
 ---
 title: "Mapa único de componentes del sistema experto"
 status: CURRENT
-version: "1.0"
+version: "1.1"
 last_reviewed: 2026-10-27
 owner: ApoyoDecision
 source_of_truth: false
@@ -25,7 +25,7 @@ Entrada: [portal del experto](../README.md). Este mapa organiza la implementaci�
 | Motor de inferencia institucional | [EvaluarPerfilInstitucional](../../../motor-experto/src/motor_experto/aplicacion/casos_uso/EvaluarPerfilInstitucional.php), [EvaluarConocimientoCognitivo](../../../motor-experto/src/motor_experto/aplicacion/casos_uso/EvaluarConocimientoCognitivo.php) y [EvaluarPetersenInstitucional](../../../motor-experto/src/motor_experto/dominio/petersen/EvaluarPetersenInstitucional.php) | Evaluadores puros de los contratos adoptados. No consultan historias por su cuenta ni inventan mediciones. |
 | Resultado y explicación | [ConstructorTraza](../../../motor-experto/src/motor_experto/dominio/explicacion/ConstructorTraza.php), [TrazaFuentesInstrumentales](../../../motor-experto/src/motor_experto/dominio/explicacion/TrazaFuentesInstrumentales.php) y [ResultadosExpertoResidente](../../../app/Modulos/ApoyoDecision/Presentacion/Livewire/Paginas/ResultadosExpertoResidente.php) | Salida, motivos y evidencias; la explicación y el acceso clínico siguen sujetos al contrato y permisos. |
 | Conservación y revisión | [preparación conjunta](../../../app/Modulos/ApoyoDecision/Aplicacion/Consultas/PrepararEvaluacionInstitucional.php), [instantánea conjunta](../../../motor-experto/src/motor_experto/soporte/conservacion/InstantaneaEvaluacionInstitucional.php) y [RevisarValoracionExperta](../../../app/Modulos/ApoyoDecision/Aplicacion/Acciones/RevisarValoracionExperta.php) | El conjunto instrumental/Petersen sigue transitorio; no atribuirle revisiones ni replay institucional completo. Observaciones conservadas tienen otro alcance. |
-| Laboratorio | [ConocimientoPanel](../../../app/Modulos/ApoyoDecision/Presentacion/Livewire/Paginas/ConocimientoPanel.php) y [investigación](../../../motor-experto/src/motor_experto/investigacion) | Casos y paquetes experimentales; no equivalen a atención clínica ni a adopción de una batería. |
+| Consulta administrativa | [ConocimientoPanel](../../../app/Modulos/ApoyoDecision/Presentacion/Livewire/Paginas/ConocimientoPanel.php) | Consulta de versiones institucionales registradas; sin ejecución de casos, laboratorio ni conocimiento ficticio de respaldo. |
 
 ## 2. Cómo se conectan
 
@@ -61,8 +61,8 @@ Centralizar consulta y gobierno no significa fusionar estas tablas, eliminar ver
 
 | Nombre / rama | Alcance comprobado |
 |---|---|
-| `aplicacion/casos_uso/MotorExperto.php` | Piloto COG-MEM técnico. No usar el nombre genérico como evidencia de que es la entrada institucional completa. |
-| `dominio/orion/Services/Inferencia/MotorInferenciaService.php` | Recorrido experimental que exige identidades sintéticas. No sustituye los evaluadores institucionales. |
+| `motor-experto/tests/fixtures/aplicacion/casos_uso/MotorExperto.php` | Piloto retirado del producto; solo regresión automatizada. |
+| `motor-experto/tests/fixtures/dominio/orion/Services/Inferencia/MotorInferenciaService.php` | Recorrido técnico retirado del autoload operativo; solo regresión. |
 | `dominio/inferencia/MemoriaTrabajo.php` | Memoria utilizada por el recorrido declarativo institucional. |
 | `dominio/orion/Entities/Hechos/MemoriaTrabajo.php` | Otra representación tipada usada por el recorrido experimental. No intercambiarlas por tener el mismo nombre. |
 | `dominio/orion/` | Código puro trasladado y contratos con consumidores. No se declara descartable ni se elimina por su denominación. |
@@ -79,10 +79,10 @@ El [registro de rutas](../../../app/Modulos/ApoyoDecision/Presentacion/Rutas/web
 | `/admin/sistema-experto/reglas` | Gobierno de reglas; Policy `consultarGobierno`. |
 | `/admin/sistema-experto/residentes` | Directorio de evaluación; roles y permiso contextual de lectura. |
 | `/admin/sistema-experto/residentes/{residente}/petersen` | Captura de valoraciones originales y soportes; Policy y competencia profesional. |
-| `/admin/sistema-experto` | Explorador técnico/laboratorio; Superadministrador y autorización de consulta. |
+| `/admin/sistema-experto` | Consulta administrativa del conocimiento registrado; Superadministrador y autorización de consulta. |
 | Resultados dentro del expediente por rol | Se reutilizan las rutas del módulo; permiso y Policy del residente. No añadir otra pantalla diagnóstica paralela. |
 
-Este trabajo no cambia menús ni autorización de estas pantallas y no declara QA visual de su funcionamiento. Una entrada documental no concede acceso por URL ni convierte a Superadministración en autor clínico.
+La retirada del 27/10 elimina las secciones de laboratorio sin ampliar permisos. Una entrada documental no concede acceso por URL ni convierte a Superadministración en autor clínico.
 
 ## 6. Qué sigue para terminar
 
@@ -92,4 +92,4 @@ Este trabajo no cambia menús ni autorización de estas pantallas y no declara Q
 4. Conectar revisión al resultado conservado y corregir las discrepancias de interpretación/permisos ya identificadas.
 5. Verificar casos positivos, insuficientes y contradictorios, historia, autorización y UI responsive; distinguir validación técnica de clínica.
 
-No se renombraron clases ni se trasladaron archivos históricos para lograr esta organización. Cualquier consolidación ejecutable posterior requiere mapa de consumidores y regresión del comportamiento correspondiente.
+El [retiro del laboratorio](../RETIRADA_LABORATORIO_2026_10_27.md) trasladó sus algoritmos exclusivos a directorios de pruebas. Los contratos compartidos, las instantáneas históricas y el motor institucional conservan sus identidades.

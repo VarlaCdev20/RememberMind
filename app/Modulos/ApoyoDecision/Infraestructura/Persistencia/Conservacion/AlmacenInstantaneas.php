@@ -12,7 +12,6 @@ use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorEv
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorReglas;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\EvidenciaEloquentRepository;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\ReglaExpertaEloquentRepository;
-use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\ContextoSimulacionLocal;
 use Closure;
 use DateTimeImmutable;
 use DateTimeZone;
@@ -74,21 +73,13 @@ final readonly class AlmacenInstantaneas
      * @param  string  $conexion  Nombre explícito de la base técnica desechable.
      * @param  Closure|null  $extraerOriginal  Extracción autorizada por lote, obligatoria para conservar fuentes institucionales.
      * @param  DateTimeZone  $zona  Zona de las columnas operativas de origen.
-     * @param  ContextoSimulacionLocal|null  $simulacionLocal  Capacidad optativa con identidad física/alias validada y versión cerrada.
      *                                                         No produce efectos ni excepciones durante la construcción.
      */
     public function __construct(private string $conexion, private ?Closure $extraerOriginal = null,
-        private DateTimeZone $zona = new DateTimeZone('UTC'), private ?ContextoSimulacionLocal $simulacionLocal = null) {}
+        private DateTimeZone $zona = new DateTimeZone('UTC')) {}
 
     private function db(): Connection
     {
-        if ($this->simulacionLocal !== null) {
-            if ($this->simulacionLocal->conexion !== $this->conexion) {
-                throw new DomainException('Capacidad y conexión de conservación diferentes.');
-            }
-
-            return $this->simulacionLocal->db();
-        }
 
         return ExtractorVariableMapeada::conexionSegura($this->conexion);
     }
@@ -117,7 +108,6 @@ final readonly class AlmacenInstantaneas
 
     private function contexto(string $id, string $residente, string $version): void
     {
-        $this->simulacionLocal?->validarVersion($version);
         ExtractorVariableMapeada::validarIds($id, $residente, $version);
         if (! str_starts_with($id, 'SIM-') || strlen($id) <= 4 || ! str_starts_with($residente, 'SINTETICO-') || strlen($residente) <= 10) {
             throw new DomainException('La conservación solo admite casos sintéticos explícitos.');
@@ -142,7 +132,7 @@ final readonly class AlmacenInstantaneas
             $db = $this->db();
             // Serializa también la primera inserción, cuando aún no hay cabecera.
             if (! $db->table('versiones_modelo_experto')->where('cod_version_modelo', $m->versionConocimiento)->lockForUpdate()->exists()
-                || ! $db->table('residentes')->where('cod_residente', $this->simulacionLocal?->fisico($m->residenteId) ?? $m->residenteId)->exists()) {
+                || ! $db->table('residentes')->where('cod_residente', $m->residenteId)->exists()) {
                 throw new DomainException('La conservación exige residente y versión existentes; no crea referencias.');
             }
             $cab = $this->cabecera($m->evaluacionId);
@@ -154,7 +144,7 @@ final readonly class AlmacenInstantaneas
 
                 return;
             }
-            $catalogo = CatalogoConservacionExperta::leer($this->conexion, $m->versionConocimiento, $this->simulacionLocal);
+            $catalogo = CatalogoConservacionExperta::leer($this->conexion, $m->versionConocimiento);
             foreach ($vector->resultados as $r) {
                 $this->catalogo($catalogo, 'DOMINIO', $r->dominio->value, $r->estado->value);
                 foreach ($r->subcomponentes as $s) {
@@ -165,7 +155,7 @@ final readonly class AlmacenInstantaneas
                 'huella_memoria_cognicion' => $hash] + CodecInstantanea::fecha('fecha_corte', $m->fechaCorte);
             if ($cab === null) {
                 $ahora = now()->format('Y-m-d H:i:s');
-                $e = $this->insertar('evaluaciones_expertas', $campos + ['cod_residente' => $this->simulacionLocal?->fisico($m->residenteId) ?? $m->residenteId,
+                $e = $this->insertar('evaluaciones_expertas', $campos + ['cod_residente' => $m->residenteId,
                     'cod_version_modelo' => $m->versionConocimiento, 'origen_activacion' => 'PRUEBA_TECNICA',
                     'estado_ejecucion' => 'PRUEBA_FINALIZADA', 'fecha_hora_inicio' => $ahora, 'fecha_hora_fin' => $ahora]);
             } else {
@@ -190,7 +180,7 @@ final readonly class AlmacenInstantaneas
 
     private function validarCabecera(object $c, string $residente, string $version): void
     {
-        if ($c->cod_residente !== ($this->simulacionLocal?->fisico($residente) ?? $residente) || $c->cod_version_modelo !== $version
+        if ($c->cod_residente !== ($residente) || $c->cod_version_modelo !== $version
             || $c->origen_activacion !== 'PRUEBA_TECNICA' || $c->estado_ejecucion !== 'PRUEBA_FINALIZADA') {
             throw new DomainException('Cabecera de otro contexto o fuera del alcance técnico finalizado.');
         }
@@ -427,7 +417,7 @@ final readonly class AlmacenInstantaneas
             ->leftJoin('valores_semanticos as v', 'v.cod_valor_semantico', '=', 'r.cod_valor_semantico')
             ->where('c.cod_evaluacion_experta', $e)->where('c.tipo_registro', '<>', 'D137')->orderBy('c.orden_conservacion')
             ->select(['c.*', 'n.codigo_semantico', 'n.cod_version_modelo', 'v.codigo_valor as valor', 'r.cod_valor_semantico', 'r.justificacion_original'])->get()->all();
-        $cat = CatalogoConservacionExperta::leer($this->conexion, $version, $this->simulacionLocal);
+        $cat = CatalogoConservacionExperta::leer($this->conexion, $version);
         foreach ($filas as $f) {
             $prefijo = 'SNAP:'.$f->tipo_registro.':';
             if ($f->version_conservacion !== CatalogoConservacionExperta::VERSION || $f->cod_version_modelo !== $version
@@ -548,7 +538,7 @@ final readonly class AlmacenInstantaneas
                     throw new DomainException('La caracterización IADL ya fue conservada.');
                 }
             }
-            $cat = CatalogoConservacionExperta::leer($this->conexion, $m->versionConocimiento, $this->simulacionLocal);
+            $cat = CatalogoConservacionExperta::leer($this->conexion, $m->versionConocimiento);
             foreach (array_keys($r->perfil->criterios) as $i => $codigo) {
                 $c = $this->guardarCriterio($e, $cat, 'DCL', $codigo, $r->perfil->criterios[$codigo]->value,
                     $r->perfil->justificaciones[$codigo], null, null, $i);
@@ -561,7 +551,7 @@ final readonly class AlmacenInstantaneas
                 $original = $db->table('reglas_expertas')->where('cod_regla_experta', $regla->id)->where('cod_version_modelo', $m->versionConocimiento)->value('cod_regla_experta');
                 if ($original !== null) {
                     $tipo = $db->table('reglas_expertas')->where('cod_regla_experta', $original)->value('tipo_regla');
-                    $declarada = (new ReglaExpertaEloquentRepository(new MapeadorReglas($tipo), $this->conexion, $this->simulacionLocal))
+                    $declarada = (new ReglaExpertaEloquentRepository(new MapeadorReglas($tipo), $this->conexion))
                         ->obtener($original, $m->versionConocimiento);
                     if (CodecInstantanea::huella($declarada) !== CodecInstantanea::huella($regla)) {
                         throw new DomainException('La regla aplicada difiere de su conocimiento D-137 original.');

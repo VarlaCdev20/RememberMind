@@ -11,7 +11,6 @@ use App\Models\OpcionPregunta;
 use App\Models\PreguntaInstrumento;
 use App\Models\Residente;
 use App\Models\User;
-use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\CohorteCognitivaLocal;
 use Carbon\CarbonImmutable;
 use DomainException;
 use Illuminate\Support\Facades\Gate;
@@ -26,7 +25,7 @@ final class CapturasInstrumentalesResidente
     public function consultar(User $usuario, Residente $residente, CarbonImmutable $corte, array $preguntasDeclarativas = []): array
     {
         $usuario = User::query()->findOrFail($usuario->getKey());
-        $residente = Residente::query()->findOrFail($residente->getKey());
+        $residente = \App\Modulos\ApoyoDecision\Aplicacion\Consultas\FuentesValoracionOperativa::residentes(Residente::query())->findOrFail($residente->getKey());
         Gate::forUser($usuario)->authorize('consultarResultados', [EvaluacionExperta::class, $residente]);
         $lecturaEnfermeria = Gate::forUser($usuario)->allows('consultarFuentesParaResultado', [EvaluacionExperta::class, $residente]);
         foreach (self::PERMISOS_LECTURA as $permiso) {
@@ -49,11 +48,6 @@ final class CapturasInstrumentalesResidente
         }
         $respuestas = $aplicaciones->flatMap(fn ($a) => $a->respuestas);
         $perfiles = config('sistema_experto.perfiles_instrumentales', []);
-        foreach (app(CohorteCognitivaLocal::class)->perfiles($residente) as $perfilLocal) {
-            if (! array_filter($perfiles, fn ($p) => ($p['cod_instrumento'] ?? null) === $perfilLocal['cod_instrumento'])) {
-                $perfiles[] = $perfilLocal;
-            }
-        }
         $preguntasSeleccionadas = [];
         foreach ($perfiles as $perfil) {
             foreach ($perfil['selectores'] ?? [] as $selector) {

@@ -100,7 +100,7 @@ final class CapturaPetersenOriginalTest extends TestCase
         self::assertSame($this->usuario->getKey(), $a->cod_usuario_registro);
         self::assertDatabaseCount('valoraciones_petersen_originales', 1);
         self::assertSame(1, DB::table('activity_log')->where('event', 'valoracion_original_petersen_registrada')->count());
-        $r = app(ConsultarPetersenInstitucional::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+        $r = app(ConsultarPetersenInstitucional::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now(), '1.0');
         self::assertNull($r['patron']);
         self::assertSame('U', $r['requisitos']['C04']['estado']);
         self::assertFalse($r['persistido']);
@@ -129,7 +129,7 @@ final class CapturaPetersenOriginalTest extends TestCase
             'soportes' => [['tipo_soporte' => 'HISTORIA_PREVIA', 'cod_control_cognitivo' => $control->getKey()]]]));
         $this->registrar($this->entrada(['elemento' => 'C01', 'estado_original' => 'N', 'tipo_registro' => 'RECTIFICACION',
             'cod_valoracion_anterior' => $original->getKey(), 'justificacion' => 'Rectificación sintética posterior.']));
-        $dto = app(ConsultarPetersenInstitucional::class)->preparar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+        $dto = app(ConsultarPetersenInstitucional::class)->preparar($this->usuario, $this->residente, CarbonImmutable::now(), '1.0');
         self::assertSame(InstantaneaPetersen::CONTRATO_MEMBRESIAS, $dto->contenido['contrato']);
         $soporte = $original->soportes()->sole();
         self::assertCount(1, $dto->contenido['soportes_originales']);
@@ -472,8 +472,8 @@ final class CapturaPetersenOriginalTest extends TestCase
         self::assertSame($a->getKey(), $this->registrar($e)->getKey());
         $this->travelTo(CarbonImmutable::parse('2026-10-19T12:00:01-04:00'));
         $consulta = app(ConsultarPetersenInstitucional::class);
-        self::assertSame(0, $consulta->consultar($this->usuario, $this->residente, CarbonImmutable::parse('2026-10-19T12:00:00.250000-04:00'), 'VERSION-TEST')['adquisicion']['valoraciones_al_corte']);
-        self::assertSame(1, $consulta->consultar($this->usuario, $this->residente, CarbonImmutable::parse('2026-10-19T12:00:00.750000-04:00'), 'VERSION-TEST')['adquisicion']['valoraciones_al_corte']);
+        self::assertSame(0, $consulta->consultar($this->usuario, $this->residente, CarbonImmutable::parse('2026-10-19T12:00:00.250000-04:00'), '1.0')['adquisicion']['valoraciones_al_corte']);
+        self::assertSame(1, $consulta->consultar($this->usuario, $this->residente, CarbonImmutable::parse('2026-10-19T12:00:00.750000-04:00'), '1.0')['adquisicion']['valoraciones_al_corte']);
     }
 
     public function test_rectificacion_y_anulacion_conservan_original_y_corte_tecnico(): void
@@ -484,13 +484,13 @@ final class CapturaPetersenOriginalTest extends TestCase
         $b = $this->registrar($this->entrada(['tipo_registro' => 'RECTIFICACION', 'cod_valoracion_anterior' => $a->getKey(),
             'justificacion' => 'Rectificación propia del juicio, preservando fecha clínica.']));
         $servicio = app(ConsultarPetersenInstitucional::class);
-        self::assertSame(1, $servicio->consultar($this->usuario, $this->residente, $corte, 'VERSION-TEST')['adquisicion']['valoraciones_al_corte']);
+        self::assertSame(1, $servicio->consultar($this->usuario, $this->residente, $corte, '1.0')['adquisicion']['valoraciones_al_corte']);
         $this->travel(1)->minutes();
         $this->registrar($this->entrada(['tipo_registro' => 'ANULACION', 'estado_original' => null, 'cod_valoracion_anterior' => $b->getKey(),
             'justificacion' => 'Anulación propia explícita.']));
         self::assertDatabaseCount('valoraciones_petersen_originales', 3);
         self::assertSame($a->justificacion, $a->fresh()->justificacion);
-        $r = $servicio->consultar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+        $r = $servicio->consultar($this->usuario, $this->residente, CarbonImmutable::now(), '1.0');
         self::assertCount(3, $r['adquisicion']['exclusiones']);
         self::assertNull($r['patron']);
     }
@@ -608,13 +608,13 @@ final class CapturaPetersenOriginalTest extends TestCase
         Storage::disk('local')->put('original-petersen.txt', 'original');
         $guardada = $this->registrar($e);
         $consulta = app(ConsultarPetersenInstitucional::class);
-        self::assertSame('S', $consulta->consultar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST')['requisitos']['C04']['estado']);
+        self::assertSame('S', $consulta->consultar($this->usuario, $this->residente, CarbonImmutable::now(), '1.0')['requisitos']['C04']['estado']);
         Storage::disk('local')->put('original-petersen.txt', 'alterado');
         self::assertSame($guardada->getKey(), $this->registrar($e)->getKey());
-        $r = $consulta->consultar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+        $r = $consulta->consultar($this->usuario, $this->residente, CarbonImmutable::now(), '1.0');
         self::assertSame('U', $r['requisitos']['C04']['estado']);
         self::assertSame('DOCUMENTO_ORIGINAL_NO_VERIFICABLE', $r['adquisicion']['exclusiones'][0]['motivo']);
-        $dto = $consulta->preparar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+        $dto = $consulta->preparar($this->usuario, $this->residente, CarbonImmutable::now(), '1.0');
         self::assertFalse($dto->contenido['constancias_documentales'][0]['verificado']);
         self::assertSame('SOPORTE', $dto->contenido['constancias_documentales'][0]['papel']);
         self::assertNull($dto->contenido['constancias_documentales'][0]['localizador_fuente']);
@@ -631,17 +631,17 @@ final class CapturaPetersenOriginalTest extends TestCase
             'ruta_archivo' => 'cabecera-petersen.txt', 'formato' => 'text/plain', 'hash_archivo' => hash('sha256', 'original'), 'estado' => 'VIGENTE']);
         $original = $this->registrar($this->entrada(['cod_documento_clinico' => $doc->getKey(), 'localizador_fuente' => 'Página 1']));
         $lector = app(ConsultarPetersenInstitucional::class);
-        $dto = $lector->preparar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+        $dto = $lector->preparar($this->usuario, $this->residente, CarbonImmutable::now(), '1.0');
         self::assertTrue($dto->contenido['constancias_documentales'][0]['verificado']);
         self::assertSame('Página 1', $dto->contenido['constancias_documentales'][0]['localizador_fuente']);
         self::assertSame($original->cod_usuario_registro, $dto->contenido['procedencia_valoraciones'][0]['cod_usuario_registro']);
         $doc->update(['fecha_hora' => '2027-01-01 09:00:00']);
-        $fuera = $lector->preparar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+        $fuera = $lector->preparar($this->usuario, $this->residente, CarbonImmutable::now(), '1.0');
         self::assertSame('DOCUMENTO_ORIGINAL_FUERA_DE_CORTE', $fuera->contenido['salida']['adquisicion']['exclusiones'][0]['motivo']);
         self::assertTrue($fuera->contenido['constancias_documentales'][0]['verificado']);
         self::assertSame([], $fuera->contenido['valoraciones']);
         Storage::disk('local')->put('cabecera-petersen.txt', 'alterado');
-        $alterado = $lector->preparar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+        $alterado = $lector->preparar($this->usuario, $this->residente, CarbonImmutable::now(), '1.0');
         self::assertFalse($alterado->contenido['constancias_documentales'][0]['verificado']);
         self::assertSame($dto->contenido, InstantaneaPetersen::verificar($dto->contenido, $dto->huella)->contenido);
     }
@@ -667,7 +667,7 @@ final class CapturaPetersenOriginalTest extends TestCase
         foreach ($metodos as $dominio => $metodo) {
             $meta = (new RegistroMetodosInstrumentales)->metodos()[$metodo];
             $i = count($perfiles);
-            $inst = Instrumento::create(['codigo' => 'PET-TEST-'.$i, 'nombre' => 'Instrumento sintético '.$i, 'tipo' => 'COGNITIVO', 'version' => 'TEST-1', 'estado' => 'ACTIVO']);
+            $inst = Instrumento::create(['codigo' => 'PET-TEST-'.$i, 'nombre' => 'Instrumento sintético '.$i, 'tipo' => 'COGNITIVO', 'version' => '1.0', 'estado' => 'ACTIVO']);
             $app = AplicacionInstrumento::create(['cod_residente' => $this->residente->getKey(), 'cod_personal' => $this->usuario->personal->getKey(),
                 'cod_atencion' => $atenciones[$i]->getKey(), 'cod_instrumento' => $inst->getKey(), 'fecha_hora' => '2026-10-15 09:00:00', 'estado' => 'COMPLETA']);
             $selectores = [];
@@ -680,7 +680,7 @@ final class CapturaPetersenOriginalTest extends TestCase
                     $columna => $tipo === 'LOGICO' ? true : $valores[$campo]]);
             }
             $perfiles[] = ['id' => 'PET-PERFIL-'.$i, 'cod_instrumento' => $inst->getKey(), 'codigo_instrumento' => $inst->codigo,
-                'version_instrumento' => 'TEST-1', 'metodo' => $metodo, 'identidad_instrumento' => $meta['identidad'], 'selectores' => $selectores];
+                'version_instrumento' => '1.0', 'metodo' => $metodo, 'identidad_instrumento' => $meta['identidad'], 'selectores' => $selectores];
             $mediciones[$dominio] = $app->getKey();
         }
         config(['sistema_experto.perfiles_instrumentales' => $perfiles]);
@@ -715,7 +715,7 @@ final class CapturaPetersenOriginalTest extends TestCase
                 'soportes' => [['tipo_soporte' => $elemento === 'C04' ? 'DIFERENCIAL' : 'CALIDAD', 'cod_valoracion_psicologica' => $psico->getKey()],
                     ...($elemento === 'C05' ? $revisados : [])]]));
         }
-        $r = app(ConsultarPetersenInstitucional::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+        $r = app(ConsultarPetersenInstitucional::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now(), '1.0');
         self::assertSame($patron, $r['patron'], json_encode(['dominios' => array_column($r['dominios'], 'estado'),
             'requisitos' => array_column($r['requisitos'], 'estado'), 'adquisicion' => $r['adquisicion']], JSON_UNESCAPED_UNICODE));
         self::assertSame([], $r['impedimentos']);
@@ -728,13 +728,13 @@ final class CapturaPetersenOriginalTest extends TestCase
         self::assertCount(5, $dto->contenido['instrumental']['contenido']['capturas']['capturas']);
         $regla = ReglaExperta::query()->where('cod_version_modelo', $versionGobierno)->where('codigo_regla', $patron)->sole();
         app(GestionarReglasExpertas::class)->revisar($this->usuario, $regla->getKey(), 'RECHAZADA', 'Ensayo de rechazo sin modificar las fuentes originales.');
-        $rechazado = app(ConsultarPetersenInstitucional::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+        $rechazado = app(ConsultarPetersenInstitucional::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now(), '1.0');
         self::assertNull($rechazado['patron']);
         self::assertContains('ABSTENCION_SIN_REGLA_PETERSEN_HABILITADA', $rechazado['impedimentos']);
         self::assertDatabaseCount('valoraciones_petersen_originales', 9);
         self::assertDatabaseCount('evaluaciones_expertas', 0);
         config(['sistema_experto.perfiles_instrumentales' => []]);
-        $sinPerfil = app(ConsultarPetersenInstitucional::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+        $sinPerfil = app(ConsultarPetersenInstitucional::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now(), '1.0');
         self::assertNull($sinPerfil['patron']);
         self::assertSame('U', $sinPerfil['dominios']['COG-MEM']['estado']);
         DB::table('respuestas_instrumento')->where('cod_aplicacion', reset($mediciones))->update(['valor_numero' => 0]);
@@ -780,7 +780,7 @@ final class CapturaPetersenOriginalTest extends TestCase
         ControlFuncionalIadl::create(array_replace($comunes, ['actividad' => 'MEDICACION', 'cod_control_anterior' => $a->getKey(),
             'estado' => 'RECTIFICACION', 'registrado_en' => '2026-10-19 12:01:00']));
         $lector = app(ConsultarPetersenInstitucional::class);
-        $antes = $lector->consultar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+        $antes = $lector->consultar($this->usuario, $this->residente, CarbonImmutable::now(), '1.0');
         self::assertSame('S', $antes['requisitos']['C03']['estado']);
 
         $this->travelTo(CarbonImmutable::parse('2026-10-19T12:02:00-04:00'));
@@ -790,7 +790,7 @@ final class CapturaPetersenOriginalTest extends TestCase
                 $consultasIadl++;
             }
         });
-        $despues = $lector->consultar($this->usuario, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+        $despues = $lector->consultar($this->usuario, $this->residente, CarbonImmutable::now(), '1.0');
         self::assertSame('U', $despues['requisitos']['C03']['estado']);
         self::assertNull($despues['patron']);
         self::assertSame(2, $consultasIadl, 'La lectura original y la sucesión se resuelven en lote, sin una consulta por soporte.');
@@ -848,7 +848,7 @@ final class CapturaPetersenOriginalTest extends TestCase
             ->set('form', ['elemento' => 'C03', 'soportes' => []])->set('tipoSoporte', 'IADL')->set('campoFuente', 'cod_control_iadl')
             ->assertViewHas('fuentes', fn ($fuentes) => ! in_array('cod_control_iadl', $fuentes, true))->assertViewHas('opciones', []);
         try {
-            app(ConsultarPetersenInstitucional::class)->consultar($incompatible, $this->residente, CarbonImmutable::now(), 'VERSION-TEST');
+            app(ConsultarPetersenInstitucional::class)->consultar($incompatible, $this->residente, CarbonImmutable::now(), '1.0');
             self::fail('No debe entregar una evaluación Petersen parcial sin competencia IADL.');
         } catch (AuthorizationException $e) {
             self::assertSame('This action is unauthorized.', $e->getMessage());

@@ -78,7 +78,7 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         $this->residente = Residente::factory()->create(['estado' => 'ADMITIDO', 'fecha_nacimiento' => '1950-06-15']);
         $this->actingAs($this->usuario);
         $this->instrumento = Instrumento::create(['codigo' => 'CAPTURA-SINTETICA', 'nombre' => 'Medidas sintéticas de integración',
-            'tipo' => 'COGNITIVO', 'version' => 'TEST-1', 'estado' => 'ACTIVO']);
+            'tipo' => 'COGNITIVO', 'version' => '1.0', 'estado' => 'ACTIVO']);
         $selectores = $this->respuestas = [];
         foreach (Hvlt::ENTRADAS as $campo => $tipo) {
             $pregunta = PreguntaInstrumento::create(['cod_instrumento' => $this->instrumento->getKey(), 'codigo' => 'MEDIDA-'.(count($selectores) + 1),
@@ -93,7 +93,7 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
             $this->respuestas[] = ['cod_pregunta' => $pregunta->getKey(), $columna => $valor];
         }
         $this->perfil = ['id' => 'CAPTURA-HVLT-TEST', 'cod_instrumento' => $this->instrumento->getKey(),
-            'codigo_instrumento' => $this->instrumento->codigo, 'version_instrumento' => 'TEST-1', 'metodo' => Hvlt::METODO,
+            'codigo_instrumento' => $this->instrumento->codigo, 'version_instrumento' => '1.0', 'metodo' => Hvlt::METODO,
             'identidad_instrumento' => ['instrumento' => 'HVLT-R', 'forma' => 5, 'idioma' => 'es'], 'selectores' => $selectores];
     }
 
@@ -117,7 +117,7 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         $perfiles = [];
         foreach ((new NormalizadorReferenciasEspana)->metodos() as $metodo => $meta) {
             $instrumento = Instrumento::create(['codigo' => 'NORMA-ES-TEST-'.count($perfiles), 'nombre' => 'Referencia sintética',
-                'tipo' => 'COGNITIVO', 'version' => 'VERSION-TEST', 'estado' => 'ACTIVO']);
+                'tipo' => 'COGNITIVO', 'version' => '1.0', 'estado' => 'ACTIVO']);
             $selectores = $respuestas = [];
             foreach ($meta['entradas'] as $campo => $tipo) {
                 $q = PreguntaInstrumento::create(['cod_instrumento' => $instrumento->getKey(), 'codigo' => 'ENTRADA-'.count($selectores),
@@ -181,7 +181,7 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         $perfiles = [];
         foreach ($metodos as $metodo => $meta) {
             $instrumento = Instrumento::create(['codigo' => 'REF-ADICIONAL-TEST-'.count($perfiles),
-                'nombre' => 'Referencia sintética adicional', 'tipo' => 'COGNITIVO', 'version' => 'VERSION-TEST', 'estado' => 'ACTIVO']);
+                'nombre' => 'Referencia sintética adicional', 'tipo' => 'COGNITIVO', 'version' => '1.0', 'estado' => 'ACTIVO']);
             $selectores = $respuestas = [];
             foreach ($meta['entradas'] as $campo => $tipo) {
                 $q = PreguntaInstrumento::create(['cod_instrumento' => $instrumento->getKey(),
@@ -253,7 +253,7 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         foreach ([NormalizadorReferenciaBarcelona2011::METODO => (new NormalizadorReferenciaBarcelona2011)->metadatos(),
             NormalizadorReferenciaCancelacionScand2023::METODO => (new NormalizadorReferenciaCancelacionScand2023)->metadatos()] as $metodo => $meta) {
             $instrumento = Instrumento::create(['codigo' => 'CIERRE-TEST-'.count($perfiles), 'nombre' => 'Referencia sintética de cierre',
-                'tipo' => 'COGNITIVO', 'version' => 'VERSION-TEST', 'estado' => 'ACTIVO']);
+                'tipo' => 'COGNITIVO', 'version' => '1.0', 'estado' => 'ACTIVO']);
             $selectores = $respuestas = [];
             foreach ($meta['entradas'] as $campo => $tipo) {
                 $q = PreguntaInstrumento::create(['cod_instrumento' => $instrumento->getKey(),
@@ -641,7 +641,7 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         $perfiles = [];
         foreach ((new NormalizadorBateriaBolivia2015)->metodos() as $metodo => $meta) {
             $instrumento = Instrumento::create(['codigo' => 'BATERIA-TEST-'.count($perfiles), 'nombre' => 'Instrumento sintético '.count($perfiles),
-                'tipo' => 'COGNITIVO', 'version' => 'VERSION-TEST', 'estado' => 'ACTIVO']);
+                'tipo' => 'COGNITIVO', 'version' => '1.0', 'estado' => 'ACTIVO']);
             $selectores = $respuestas = [];
             foreach ($meta['entradas'] as $campo => $tipo) {
                 $pregunta = PreguntaInstrumento::create(['cod_instrumento' => $instrumento->getKey(), 'codigo' => 'ENTRADA-'.count($selectores),

@@ -69,7 +69,7 @@ final class CapturaInstrumentalFormularioTest extends TestCase
         AsignacionPersonal::create(['cod_personal' => $this->personal->getKey(), 'cod_jornada' => $jornada->getKey(),
             'cod_area' => $area->getKey(), 'fecha_asignacion' => now(), 'estado' => 'ACTIVA']);
         $this->residente = Residente::factory()->create(['estado' => 'ADMITIDO']);
-        $this->instrumento = Instrumento::create(['codigo' => 'FORM-TEST', 'nombre' => 'Instrumento sintético', 'tipo' => 'COGNITIVO', 'version' => 'TEST-1', 'estado' => 'ACTIVO']);
+        $this->instrumento = Instrumento::create(['codigo' => 'FORM-TEST', 'nombre' => 'Instrumento sintético', 'tipo' => 'COGNITIVO', 'version' => '1.0', 'estado' => 'ACTIVO']);
         foreach (['NUMERICO', 'LOGICO', 'OPCION', 'TEXTO'] as $i => $tipo) {
             $this->preguntas[$tipo] = PreguntaInstrumento::create(['cod_instrumento' => $this->instrumento->getKey(), 'codigo' => 'Q-'.$i,
                 'enunciado' => 'Pregunta sintética '.$tipo, 'tipo_respuesta' => $tipo, 'orden' => $i, 'estado' => 'ACTIVA']);

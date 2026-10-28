@@ -6,6 +6,8 @@ declare(strict_types=1);
  * Verifica localizadores de TABLAS bolivianas sin extraer datos normativos.
  * Una coincidencia bibliográfica NUNCA permite interpretación clínica.
  */
+require_once __DIR__.'/bootstrap.php';
+
 spl_autoload_register(static function (string $clase): void {
     $prefix = 'MotorExperto\\';
     if (str_starts_with($clase, $prefix)) {

@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__.'/bootstrap.php';
+
 spl_autoload_register(static function(string $clase): void {
     $prefix = 'MotorExperto\\';
     if (str_starts_with($clase, $prefix)) {

@@ -8,9 +8,9 @@ El dominio O.R.I.O.N. reside en `src/motor_experto/dominio/orion`: entidades, vo
 
 Verificación adicional independiente: `php motor-experto/tests/orion_independencia.php`. Las pruebas `CodecIdentidadHistoricaTest` comparan siete huellas originales: enum/fecha/NULL/cero, memoria, requisitos, vector, clasificaciones positiva/abstención y regla con AST anidado. El cambio de ubicación no modifica los contratos experimentales ni los activa clínicamente.
 
-Este componente contiene la implementacion PHP existente del piloto COG-MEM: conocimiento versionado, red semantica, admissibilidad/evaluabilidad, memoria de trabajo, reglas, resolucion de soportes y explicacion. No incorpora reglas clinicas nuevas ni activa diagnosticos.
+El producto contiene los evaluadores institucionales, conocimiento versionado, red semántica, memoria de trabajo y explicación. El piloto COG-MEM y los algoritmos exclusivos del laboratorio fueron retirados de `src/` y aislados bajo `tests/fixtures/` el 27/10/2026.
 
-`MotorExperto\` se carga desde `src/motor_experto/`; no requiere Laravel, Livewire ni Eloquent. El puerto `aplicacion/puertos/EvaluadorExperto` es implementado por el motor y consumido por la persistencia tecnica de `ApoyoDecision`. El adaptador puro transforma hechos ya extraidos; la lectura Eloquent queda en Laravel.
+`MotorExperto\` se carga desde `src/motor_experto/`; no requiere Laravel, Livewire ni Eloquent. Los fixtures históricos se cargan exclusivamente mediante `tests/bootstrap.php`; no existe binding operativo del piloto `EvaluadorExperto`. El adaptador puro transforma hechos ya extraidos; la lectura Eloquent queda en Laravel.
 
 Verificacion independiente: `php motor-experto/tests/independencia.php`. Ejecuta cuatro fixtures tecnicos validos y comprueba el rechazo del fixture con cobertura insuficiente, sin arrancar Laravel ni conectar una base de datos. Las pruebas de regresion completas del piloto permanecen en `tests/Unit/SistemaExperto` y `tests/Feature/SistemaExperto` de la raiz, usando este motor separado.
 

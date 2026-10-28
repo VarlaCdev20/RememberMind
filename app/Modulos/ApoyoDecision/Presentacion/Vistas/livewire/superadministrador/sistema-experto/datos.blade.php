@@ -8,7 +8,7 @@
                     @if($valor === []) <span class="text-rm-secondary">Sin elementos registrados.</span>
                     @else @include('livewire.superadministrador.sistema-experto.datos', ['datos' => $valor]) @endif
                 @else
-                    {{ \App\Modulos\ApoyoDecision\Aplicacion\DTOs\PresentarResultadoLaboratorio::texto($valor) }}
+                    {{ is_bool($valor) ? ($valor ? 'Sí' : 'No') : ($valor ?? 'No registrado') }}
                 @endif
             </dd>
         </div>

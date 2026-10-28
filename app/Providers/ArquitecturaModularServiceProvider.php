@@ -38,25 +38,17 @@ use App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPendientesPanel;
 use App\Modulos\Alertas\Presentacion\Livewire\Paginas\IncidentesPanel;
 use App\Modulos\Alertas\Presentacion\Livewire\Paginas\PanelAlertas;
 use App\Modulos\Alertas\Presentacion\Livewire\Paginas\SaludAlertasPanel;
-use App\Modulos\ApoyoDecision\Aplicacion\Contratos\AlmacenEjecucionesExperimentales;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoObservacional;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConservacionObservacional;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ExtraccionFuentesCOGMEM;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\IdentidadesConocimiento;
-use App\Modulos\ApoyoDecision\Aplicacion\Contratos\LecturaSimulacionExperta;
 use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoOrion;
 use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\AdaptadorFuentesCOGMEM;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoOrion;
-use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoEjecucionesExperimentales;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ConservarObservaciones;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Eloquent\CargadorConocimiento;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\PaqueteObservacional;
-use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\LectorSimulacionLocal;
-use App\Modulos\ApoyoDecision\Presentacion\Consola\ArchivarPerfilExperimental;
-use App\Modulos\ApoyoDecision\Presentacion\Consola\GestionarReglasExperimentales;
-use App\Modulos\ApoyoDecision\Presentacion\Consola\ProbarPerfilExperimental;
-use App\Modulos\ApoyoDecision\Presentacion\Consola\SimularExpertoLocal;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ConocimientoPanel;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
 use App\Modulos\ApoyoDecision\Presentacion\Policies\EvaluacionExpertaPolicy;
@@ -141,15 +133,11 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
-use MotorExperto\aplicacion\casos_uso\MotorExperto;
-use MotorExperto\aplicacion\puertos\EvaluadorExperto;
 
 final class ArquitecturaModularServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->bind(LecturaSimulacionExperta::class,
-            LectorSimulacionLocal::class);
         $this->app->bind(ImagenesMedicamentos::class, ImagenMedicamento::class);
         $this->app->bind(ArchivosFotografias::class, AlmacenamientoFotografias::class);
         $this->app->bind(GestionFotografias::class, FotografiaInstitucionalPolicy::class);
@@ -165,14 +153,11 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
             PaqueteObservacional::class);
         $this->app->bind(ConservacionObservacional::class,
             ConservarObservaciones::class);
-        $this->app->bind(AlmacenEjecucionesExperimentales::class,
-            ArchivoEjecucionesExperimentales::class);
         $this->app->bind(ExtraccionFuentesCOGMEM::class, AdaptadorFuentesCOGMEM::class);
         $this->app->bind(ContextoEjecucion::class, ContextoEjecucionLaravel::class);
         $this->app->bind(EstadoPrevisualizacion::class, PrevisualizacionEnSesion::class);
         $this->app->bind(FuenteConocimientoOrion::class,
             ArchivoConocimientoOrion::class);
-        $this->app->bind(EvaluadorExperto::class, MotorExperto::class);
         $this->app->extend('view.finder', function ($previous) {
             $finder = new VistaModularFinder(
                 $this->app->make('files'), $previous->getPaths(),
@@ -188,12 +173,6 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        if ($this->app->runningInConsole()) {
-            $this->commands([SimularExpertoLocal::class,
-                ProbarPerfilExperimental::class,
-                ArchivarPerfilExperimental::class,
-                GestionarReglasExperimentales::class]);
-        }
         Gate::policy(FotografiaInstitucional::class, FotografiaInstitucionalPolicy::class);
         Blade::component('ui.dashboard-welcome-header',
             DashboardWelcomeHeader::class);

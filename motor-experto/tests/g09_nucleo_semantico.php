@@ -2,6 +2,8 @@
 declare(strict_types=1);
 
 // Verifica G09 usando el motor real D-130, sin Laravel, BDD ni residentes.
+require_once __DIR__.'/bootstrap.php';
+
 spl_autoload_register(static function (string $clase): void {
     $prefix = 'MotorExperto\\';
     if (str_starts_with($clase, $prefix)) {

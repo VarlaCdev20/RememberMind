@@ -5,6 +5,8 @@ declare(strict_types=1);
  * Integración sin Laravel: esquema operacional proyectado a SQLite :memory:.
  * Sólo fixtures SIM-/SINTETICO-. Cero reglas clínicas o BDD externa.
  */
+require_once __DIR__.'/bootstrap.php';
+
 spl_autoload_register(static function(string $class): void {
     $prefix = 'MotorExperto\\';
     if (str_starts_with($class, $prefix)) {

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion;
 
 use App\Compartido\Infraestructura\Persistencia\GeneradorCodigo;
-use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\ContextoSimulacionLocal;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
@@ -47,16 +46,14 @@ final class CatalogoConservacionExperta
      * @param  string  $conexion  Destino desechable autorizado.
      * @param  string  $version  Versión existente que será propietaria del catálogo.
      * @param  string  $usuario  Actor existente de la carga técnica.
-     * @param  ContextoSimulacionLocal|null  $simulacionLocal  Capacidad optativa limitada al paquete local.
      * @return void Catálogo preparado idempotentemente sin activar reglas.
      *
      * @throws DomainException Por versión o actor inexistentes.
      * @throws \RuntimeException Por destino no autorizado o fallo SQL, con rollback.
      */
-    public static function preparar(string $conexion, string $version, string $usuario, ?ContextoSimulacionLocal $simulacionLocal = null): void
+    public static function preparar(string $conexion, string $version, string $usuario): void
     {
-        $db = $simulacionLocal?->db($conexion) ?? ExtractorVariableMapeada::conexionSegura($conexion);
-        $simulacionLocal?->validarVersion($version);
+        $db = ExtractorVariableMapeada::conexionSegura($conexion);
         $db->transaction(function () use ($db, $conexion, $version, $usuario): void {
             if (! $db->table('versiones_modelo_experto')->where('cod_version_modelo', $version)->lockForUpdate()->exists()
                 || ! $db->table('usuarios')->where('cod_usuario', $usuario)->exists()) {
@@ -107,15 +104,13 @@ final class CatalogoConservacionExperta
     /**
      * @param  string  $conexion  Destino desechable autorizado.
      * @param  string  $version  Versión exacta propietaria.
-     * @param  ContextoSimulacionLocal|null  $simulacionLocal  Capacidad optativa limitada al paquete local.
      * @return array<string, array{nodo:string, valores:array<string,string>}> Contratos experimentales previamente instalados y habilitados.
      *
      * @throws \RuntimeException Por destino no autorizado o fallo SQL.
      */
-    public static function leer(string $conexion, string $version, ?ContextoSimulacionLocal $simulacionLocal = null): array
+    public static function leer(string $conexion, string $version): array
     {
-        $db = $simulacionLocal?->db($conexion) ?? ExtractorVariableMapeada::conexionSegura($conexion);
-        $simulacionLocal?->validarVersion($version);
+        $db = ExtractorVariableMapeada::conexionSegura($conexion);
         $filas = $db->table('nodos_semanticos as n')->join('criterios_dominios_resultado as c', 'c.cod_nodo_criterio', '=', 'n.cod_nodo_semantico')
             ->join('dominios_valores_expertos as d', 'd.cod_dominio_valores', '=', 'c.cod_dominio_valores')
             ->join('valores_semanticos as v', 'v.cod_dominio_valores', '=', 'd.cod_dominio_valores')

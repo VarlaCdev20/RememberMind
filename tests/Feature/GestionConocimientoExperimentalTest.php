@@ -130,30 +130,9 @@ final class GestionConocimientoExperimentalTest extends TestCase
         $gestor->probar($autor, $id, $p, $memoria, $nodo);
     }
 
-    public function test_consola_crea_y_retira_una_revision_declarativa_sin_editar_php(): void
+    public function test_la_consola_experimental_ya_no_esta_registrada(): void
     {
-        [$autor, $p] = $this->preparar();
-        $tablas = [];
-        foreach (PaqueteConocimiento::CLAVES as $tabla => $pk) {
-            $tablas[$tabla] = $p->tabla($tabla);
-        }
-        $archivo = tempnam(sys_get_temp_dir(), 'rm-conocimiento-');
-        self::assertNotFalse($archivo);
-        try {
-            file_put_contents($archivo, json_encode(['version' => $p->version, 'tablas' => $tablas,
-                'contratos_relaciones' => $p->contratosRelaciones, 'contratos_extraccion' => $p->contratosExtraccion, 'tipo_regla_resultado' => $p->tipoReglaResultado], JSON_THROW_ON_ERROR));
-            $salida = Artisan::call('experto:gestionar-conocimiento', ['operacion' => 'crear', '--autor' => $autor->getKey(),
-                '--codigo' => 'TEST-CONSOLA', '--motivo' => 'Prueba de creación declarativa por consola.', '--paquete' => $archivo]);
-            self::assertSame(0, $salida, Artisan::output());
-            $version = DB::table('versiones_modelo_experto')->where('codigo_version', 'TEST-CONSOLA')->value('cod_version_modelo');
-            $this->artisan('experto:gestionar-conocimiento', ['operacion' => 'comparar', '--autor' => $autor->getKey(),
-                '--revision' => $version, '--paquete' => $archivo])->assertSuccessful();
-            $this->artisan('experto:gestionar-conocimiento', ['operacion' => 'retirar', '--autor' => $autor->getKey(),
-                '--revision' => $version, '--motivo' => 'Se conserva historia y se retira el paquete.'])->assertSuccessful();
-            self::assertNotNull(DB::table('versiones_modelo_experto')->where('cod_version_modelo', $version)->value('fecha_hora_retiro'));
-        } finally {
-            unlink($archivo);
-        }
+        self::assertArrayNotHasKey('experto:gestionar-conocimiento', Artisan::all());
     }
 
     public function test_impacto_usa_las_revisiones_guardadas_y_conserva_las_fuentes_aunque_cambien_las_pk(): void

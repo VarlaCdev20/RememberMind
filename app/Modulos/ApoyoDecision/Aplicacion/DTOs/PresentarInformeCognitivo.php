@@ -13,42 +13,9 @@ final class PresentarInformeCognitivo
     private const NOMBRES = ['COG-MEM' => 'Memoria', 'COG-ATE' => 'Atención', 'COG-EJE' => 'Funciones ejecutivas',
         'COG-LEN' => 'Lenguaje', 'COG-VIS' => 'Habilidades visuoespaciales'];
 
-    /** Presenta solo la narrativa de una instantánea ficticia íntegra, sin habilitar publicación clínica. */
-    public function presentarSimulacion(array $lectura, string $criterio): array
-    {
-        $sim = $lectura['simulacion_local'] ?? [];
-        $narrativa = $sim['narrativa'] ?? [];
-        if (! app()->environment(['local', 'testing']) || ! config('sistema_experto.simulacion_local.habilitada')
-            || ($lectura['evaluacion']['version'] ?? null) !== 'SIM-ORION-LOCAL-1'
-            || ($lectura['prueba_tecnica'] ?? false) !== true || ($sim['conservacion_completa'] ?? false) !== true
-            || ($narrativa['experimental'] ?? false) !== true || ($narrativa['publicable_clinicamente'] ?? true) !== false
-            || ($narrativa['advertencia'] ?? null) !== InformeExpertoDTO::ADVERTENCIA_EXPERIMENTAL) {
-            throw new DomainException('La consulta requiere una instantánea local íntegra y habilitada.');
-        }
-        $areas = [];
-        foreach ($lectura['perfil'] as $codigo => $detalle) {
-            $areas[$codigo] = ['nombre' => self::NOMBRES[$codigo], 'icono' => $detalle['icono'],
-                'estado' => $detalle['estado'], 'conclusion' => $narrativa['funciones'][$codigo]['frase'] ?? $detalle['interpretacion'],
-                'significado' => $detalle['interpretacion'], 'por_que' => 'Lectura de la instantánea de simulación verificada; sin uso asistencial.',
-                'limites' => ['Resultado de demostración. No es una valoración clínica institucional.'],
-                'respaldo' => ['Instantánea local de simulación conservada y verificada.'], 'evaluada' => false, 'tono' => 'neutral'];
-        }
-
-        return ['titulo' => 'Evaluación neurocognitiva', 'narrativa' => $narrativa, 'areas' => $areas, 'actual' => $areas[$criterio],
-            'historial' => iterator_to_array($lectura['historial']),
-            // Cambia solo la etiqueta visible; la advertencia original sigue verificada en la instantánea.
-            'procedencia_visible' => 'Entorno de pruebas · Resultado de demostración · Sin uso asistencial.',
-            'limite_global' => 'El patrón conservado es candidato para revisión; no constituye un diagnóstico clínico.',
-            'limite_fuente' => 'Los datos de simulación no se consultan como fuentes clínicas actuales.',
-            'limite_revision' => 'Los resultados de demostración no admiten confirmación ni rechazo profesional en el expediente.'];
-    }
-
     /** Resume dictámenes opcionales sin confundir ausencia o estructura incompleta con una firma. */
-    public function resumirRevision(?array $revisiones, bool $hayEvaluacion, bool $simulacion): string
+    public function resumirRevision(?array $revisiones, bool $hayEvaluacion): string
     {
-        if ($simulacion) {
-            return 'Resultado conservado';
-        }
         if ($revisiones === null) {
             return $hayEvaluacion ? 'No habilitada para esta valoración' : 'Pendiente de una valoración disponible';
         }

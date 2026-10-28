@@ -107,8 +107,7 @@ final class LecturaResultadosExperto
             'prueba_tecnica' => false,
             'informe_tecnico' => null,
             'conocimiento_documental' => ! $evaluacion ? $this->conocimientoDocumental($criterio) : null,
-            'preparacion_memoria' => $criterio === 'COG-MEM' && ! $evaluacion
-                ? (new PreparacionFuentesCOGMEM)->consultar($usuario, $residente) : null,
+            'preparacion_memoria' => null,
             'registros_cognitivos' => ! $evaluacion
                 ? $this->registrosCognitivos($residente) : []];
     }

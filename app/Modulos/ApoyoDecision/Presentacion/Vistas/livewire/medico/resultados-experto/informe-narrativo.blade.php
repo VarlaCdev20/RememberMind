@@ -1,4 +1,4 @@
-@if($narrativa['experimental'] && !($simulacion ?? false))
+@if($narrativa['experimental'])
     <aside class="rm-expert-test-note" role="note"><strong>{{ $narrativa['advertencia'] }}</strong></aside>
 @endif
 <section class="rm-card rm-expert-clinical-conclusion" aria-labelledby="resultado-principal-titulo" aria-live="polite">
