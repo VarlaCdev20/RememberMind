@@ -21,6 +21,8 @@ La implementación usa `motor-experto/` y `app/Modulos/ApoyoDecision/`; no exist
 
 ## Contratos y decisiones aplicables
 
+Preparación actual para detección temprana en personas mayores de 60 años: [ficha y matriz de datos del 27/10/2026](MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md). Es un inventario estático para revisión: separa capacidades, fuentes parciales y conservación pendiente; no selecciona una batería ni cambia reglas o permisos.
+
 | Alcance | Fuente |
 |---|---|
 | Institucional A–D / reglas G09 | [Contenido adoptado](PROPUESTA_CONTRATO_INSTITUCIONAL_FASE_4_2026_10_19.md) |
