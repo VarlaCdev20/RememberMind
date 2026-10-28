@@ -1,7 +1,7 @@
 ---
 title: "Selección instrumental escalonada adoptada para detección temprana de DCL"
 status: APPROVED
-version: "1.0"
+version: "1.1"
 last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: true
@@ -59,6 +59,8 @@ La [matriz D01–D27](../MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md) conserva las 
 ## 5. Qué falta cerrar para cada ficha
 
 Para **MoCA, RUDAS y FAQ primero**: identidad exacta; población y condiciones de aplicación; materiales autorizados; protocolo de puntuación; normas aplicables y sus límites; capacitación/competencia; permisos de uso y digitalización; fuente original y correcciones; contrato de conexión al experto y verificación técnica. Se conserva la [ficha de cierre de la propuesta](SELECCION_PROPUESTA_2026_10_28.md#5-condiciones-para-cerrar-y-activar-cada-instrumento).
+
+Primera concreción documental: [fichas del circuito inicial](CIRCUITO_INICIAL.md), con referencias de versión, distinción entre FAQ de diez/once ítems y FAS, condiciones de uso y brechas de captura. No constituyen nuevas ediciones aprobadas, licencias obtenidas o perfiles ejecutables.
 
 La evidencia bibliográfica y las restricciones de uso están reunidas en la propuesta. MoCA y AD8 requieren resolver el alcance concreto de integración digital; no se supone licencia concedida. No se adoptan de forma automática puntos de corte de otro país ni se presenta la aprobación de la propietaria como validación profesional independiente.
 
