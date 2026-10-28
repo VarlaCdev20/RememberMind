@@ -1,7 +1,7 @@
 ---
 title: "Sistema experto: fuentes, funcionamiento y límites"
 status: CURRENT
-version: "3.10"
+version: "3.11"
 last_reviewed: 2026-10-28
 owner: RememberMind
 source_of_truth: false
@@ -29,6 +29,7 @@ Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años,
 | Ediciones, condiciones, derechos y captura de los tres iniciales | [Fichas MoCA, RUDAS y FAQ; pendientes concretos de incorporación](instrumentos/CIRCUITO_INICIAL.md) |
 | Formularios propios de captura y entrevista implementados | [Fuentes médicas, interfaz y verificación responsive](../frontend/FORMULARIOS_CAPTURA_COGNITIVA_2026_10_28.md) |
 | Qué materiales originales ya se obtuvieron y qué condiciones faltan | [Cotejo de seis documentos y consultas preparadas](instrumentos/COTEJO_MATERIALES_2026_10_28.md) |
+| Captura de funcionamiento cotidiano por Medicina/Psicología | [Formulario propio, autoría, rectificación e integración](FORMULARIO_FUNCIONAMIENTO_COTIDIANO_2026_10_28.md) |
 | Qué está realmente catalogado en la base local | [Inventario PostgreSQL del 27/10/2026](inventarios/README.md) y [metadatos](inventarios/2026-10-27.json) |
 | Reglas institucionales: fuente y gestión | [Mapa de reglas/versiones](organizacion/MAPA_COMPONENTES.md#3-reglas-en-un-solo-lugar-fuente-y-responsabilidades) y ruta existente `/admin/sistema-experto/reglas`, sujeta a autorización |
 | Retirada de simulaciones y laboratorio | [Alcance, conservación y verificación](RETIRADA_LABORATORIO_2026_10_27.md) |

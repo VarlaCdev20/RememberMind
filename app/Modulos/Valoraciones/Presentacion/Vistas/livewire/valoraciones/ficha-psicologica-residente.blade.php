@@ -721,11 +721,13 @@
                             Autonomía instrumental y actividades cotidianas (IADL)
                         </strong>
                         <p class="text-[var(--rm-text-secondary)] max-w-2xl">
-                            Diferencia la capacidad del residente de la oportunidad real en la residencia. Es la fuente fundamental para acreditar el requisito C03 de Petersen.
+                            Diferencia la capacidad del residente de la oportunidad real en la residencia. Conserva observaciones descriptivas para su revisión profesional.
                         </p>
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
-<p class="text-sm text-rm-secondary">Consulta de IADL. El registro se realiza en su circuito profesional autorizado.</p>
+@can('consultar', [\App\Models\ControlFuncionalIadl::class, $residente])
+<a href="{{ route('admin.funcionamiento-cotidiano', $residente) }}" class="rm-btn rm-btn-primary">Funcionamiento cotidiano</a>
+@endcan
                         <a href="{{ route('admin.psicologia.evaluacion.funcionamiento') }}" class="rm-btn rm-btn-secondary text-xs">
                             <i class="ph ph-clipboard mr-1"></i>Explorar instrumentos funcionales
                         </a>

@@ -12,6 +12,9 @@
             <p class="text-sm" role="status">{{ $registrados }} de 9 elementos con algún registro original vigente. Este avance describe captura, no validez clínica ni probabilidad de DCL.</p>
         </div>
         <a href="{{ $urlRetorno }}" class="rm-btn rm-btn-secondary mt-3">{{ $textoRetorno }}</a>
+        @can('consultar', [\App\Models\ControlFuncionalIadl::class, $residente])
+            <a href="{{ route('admin.funcionamiento-cotidiano', $residente) }}" class="rm-btn rm-btn-secondary mt-3">Funcionamiento cotidiano</a>
+        @endcan
         @error('historial')<p role="alert" class="mt-3">{{ $message }}</p>@enderror
         <p class="text-sm mt-2">Registre lo que valoró y sus soportes originales. El estado del dominio es una interpretación clínica documentada; el sistema calcula C02 y el patrón. La información que no esté acreditada permanece pendiente.</p>
         @if($mensaje)<p role="status" class="mt-3">{{ $mensaje }}</p>@endif

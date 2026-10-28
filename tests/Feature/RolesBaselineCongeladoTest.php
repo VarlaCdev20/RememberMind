@@ -27,6 +27,8 @@ class RolesBaselineCongeladoTest extends TestCase
         'aplicaciones_instrumento.transcribir',
         'valoraciones_petersen.crear',
         'valoraciones_petersen.rectificar',
+        'controles_funcionales_iadl.crear',
+        'controles_funcionales_iadl.rectificar',
     ];
 
     protected function setUp(): void

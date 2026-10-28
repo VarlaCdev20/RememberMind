@@ -71,3 +71,8 @@ Estas pruebas están localizadas, no reejecutadas por la limpieza documental. [E
 ## Brechas comprobadas
 
 H01/H05/H14–H22/H29: lectura revocada, fecha, series, etiquetas, Petersen paralelo, acceso confundido con ausencia, puntaje, firma y ficha desconectada. La documentación no los convierte en comportamientos válidos.
+
+
+## Funcionamiento cotidiano — entrega del 28/10/2026
+
+[Captura descriptiva propia y rectificación verificadas](../../../docs/sistema-experto/FORMULARIO_FUNCIONAMIENTO_COTIDIANO_2026_10_28.md), con Medicina/Psicología expresamente aprobadas. Acceso desde la ficha psicológica y la valoración cognitiva/funcional original. Reutiliza `controles_funcionales_iadl` y sus catálogos, sin DDL, escala nueva ni acreditación automática de C03. El informe enlazado conserva la evidencia y las limitaciones de su corte.

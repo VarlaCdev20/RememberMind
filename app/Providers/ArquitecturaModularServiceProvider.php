@@ -185,6 +185,7 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
         Gate::policy(AdministracionMedicacion::class, AdministracionMedicacionPolicy::class);
         Gate::policy(Cama::class, CamaPolicy::class);
         Gate::policy(EvaluacionExperta::class, EvaluacionExpertaPolicy::class);
+        Gate::policy(\App\Models\ControlFuncionalIadl::class, \App\Modulos\Valoraciones\Presentacion\Policies\ControlFuncionalIadlPolicy::class);
         Gate::policy(Habitacion::class, HabitacionPolicy::class);
         Gate::policy(Prescripcion::class, PrescripcionPolicy::class);
         Gate::policy(Residente::class, ResidentePolicy::class);

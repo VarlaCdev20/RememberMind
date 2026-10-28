@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use LogicException;
 
 /**
@@ -61,6 +62,11 @@ class ControlFuncionalIadl extends ModeloOperativo
     public function anterior(): BelongsTo
     {
         return $this->belongsTo(self::class, 'cod_control_anterior', 'cod_control_iadl');
+    }
+
+    public function sucesora(): HasOne
+    {
+        return $this->hasOne(self::class, 'cod_control_anterior', 'cod_control_iadl');
     }
 
     /** Impide sobrescrituras de la evidencia; el padre ya impide borrados ordinarios. */

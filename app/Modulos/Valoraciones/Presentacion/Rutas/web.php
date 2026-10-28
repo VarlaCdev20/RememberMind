@@ -107,6 +107,8 @@ return [
         Route::get('/instrumentos', [InstrumentoController::class, 'index'])->middleware('permission:instrumentos.ver')->name('instrumentos.index');
     },
     'ruta_241' => static function (): void {
+        Route::get('/residentes/{residente}/funcionamiento-cotidiano', \App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\FuncionamientoCotidianoPanel::class)
+            ->middleware('permission:controles_funcionales_iadl.ver')->name('funcionamiento-cotidiano');
         Route::post('/instrumentos/{instrumento}/residentes/{residente}', [InstrumentoController::class, 'aplicar'])->middleware('permission:aplicaciones_instrumento.crear')->name('instrumentos.aplicar');
         Route::post('/instrumentos/{instrumento}/residentes/{residente}/transcripciones/conciliar', [InstrumentoController::class, 'conciliar'])
             ->middleware('permission:aplicaciones_instrumento.transcribir')->name('instrumentos.transcripciones.conciliar');

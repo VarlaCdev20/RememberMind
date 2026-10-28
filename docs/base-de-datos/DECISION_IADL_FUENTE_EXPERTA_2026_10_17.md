@@ -80,3 +80,8 @@ La [integración local posterior](../sistema-experto/SIMULACION_LOCAL_2026_10_17
 aplicó ambas migraciones a la base de desarrollo confirmada y cargó 160
 observaciones IADL ficticias para comprobar los cinco casos autorizados.
 Esta evidencia no habilita captura o clasificación asistencial.
+
+
+## Decisión posterior de captura — 28/10/2026
+
+La propietaria aprobó completar el formulario descriptivo y designó **Medicina y Psicología** para registrar y rectificar, con los permisos específicos `controles_funcionales_iadl.crear` y `controles_funcionales_iadl.rectificar`. El [contrato y evidencia de implementación](../sistema-experto/FORMULARIO_FUNCIONAMIENTO_COTIDIANO_2026_10_28.md) amplían únicamente esa responsabilidad de captura antes excluida; no cambian tabla, columnas, relaciones, catálogos ni significado clínico. Los límites y conteos de la decisión original conservan su fecha histórica.

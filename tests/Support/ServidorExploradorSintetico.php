@@ -63,7 +63,8 @@ if ($comprobar) {
     $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
     echo json_encode(['aplicaciones' => App\Models\AplicacionInstrumento::count(),
         'respuestas' => App\Models\RespuestaInstrumento::count(), 'valor_logico' => App\Models\RespuestaInstrumento::value('valor_logico'),
-        'evaluaciones' => App\Models\EvaluacionExperta::count(), 'instrumentos' => App\Models\Instrumento::count()], JSON_THROW_ON_ERROR);
+        'evaluaciones' => App\Models\EvaluacionExperta::count(), 'instrumentos' => App\Models\Instrumento::count(),
+        'funcionamiento' => App\Models\ControlFuncionalIadl::query()->orderBy('registrado_en')->orderBy('cod_control_iadl')->get(['cod_control_iadl', 'cod_control_anterior', 'desempeno', 'oportunidad', 'nivel_previo', 'observacion'])->toArray()], JSON_THROW_ON_ERROR);
     exit;
 }
 if ($preparar) {

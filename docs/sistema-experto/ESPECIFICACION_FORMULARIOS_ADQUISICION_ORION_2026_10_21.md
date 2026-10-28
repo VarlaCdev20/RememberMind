@@ -517,8 +517,9 @@ Sin evidencia suficiente C01 queda U; un N requiere valoración negativa explíc
 
 ## 12. F04 — Funcionalidad instrumental IADL y su integración C03
 
-**Fuente existente aprobada:** `ControlFuncionalIadl`. **Escritura asistencial y
-su actor específico: GAP**, excluidos expresamente de la aprobación inicial.
+**Actualización posterior del 28/10/2026:** [captura descriptiva implementada y verificada](FORMULARIO_FUNCIONAMIENTO_COTIDIANO_2026_10_28.md), con Medicina/Psicología y permisos de creación/rectificación expresamente aprobados. Se conserva el catálogo y la ausencia de puntuación clínica. El GAP de actor/writer descrito a continuación corresponde al corte inicial y queda resuelto solo en ese alcance.
+
+**Fuente existente aprobada:** `ControlFuncionalIadl`. En el corte inicial, escritura y actor eran un GAP.
 Propietario funcional Valoraciones. Diseñar el formulario no concede su permiso;
 antes de activarlo se necesita definir responsabilidad y un flujo de Action/Policy.
 

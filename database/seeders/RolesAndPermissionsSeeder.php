@@ -60,7 +60,7 @@ class RolesAndPermissionsSeeder extends Seeder
         ];
         $permisos = array_merge($permisos, [
             'valoraciones_petersen.ver', 'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar',
-            'controles_funcionales_iadl.ver',
+            'controles_funcionales_iadl.ver', 'controles_funcionales_iadl.crear', 'controles_funcionales_iadl.rectificar',
             'reglas_expertas.ver', 'reglas_expertas.gestionar', 'reglas_expertas.revisar',
             'evaluaciones_expertas.revisar_medicina', 'evaluaciones_expertas.revisar_psicologia', 'evaluaciones_expertas.ejecutar_observaciones',
             'auditoria.ver', 'usuarios.gestionar', 'personal.gestionar', 'areas.gestionar', 'turnos.gestionar',
@@ -100,7 +100,7 @@ class RolesAndPermissionsSeeder extends Seeder
         // Durante la construcción del sistema recibe todos los permisos web,
         // incluidos los que se hayan creado fuera de este seeder.
         $roles['SUPERADMINISTRADOR']->syncPermissions(
-            Permission::query()->where('guard_name', 'web')->whereNotIn('name', ['fotografias_institucionales.gestionar', 'evaluaciones_expertas.ejecutar_observaciones', 'reglas_expertas.gestionar', 'reglas_expertas.revisar', 'aplicaciones_instrumento.transcribir', 'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar'])->get()
+            Permission::query()->where('guard_name', 'web')->whereNotIn('name', ['fotografias_institucionales.gestionar', 'evaluaciones_expertas.ejecutar_observaciones', 'reglas_expertas.gestionar', 'reglas_expertas.revisar', 'aplicaciones_instrumento.transcribir', 'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar', 'controles_funcionales_iadl.crear', 'controles_funcionales_iadl.rectificar'])->get()
         );
 
         // Dirección institucional: personal, organización, planificación maestra
@@ -173,6 +173,10 @@ class RolesAndPermissionsSeeder extends Seeder
         $roles['PSICOLOGO/A']->givePermissionTo(['valoraciones_petersen.ver', 'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar']);
         $roles['MEDICO GENERAL/GERIATRA']->givePermissionTo('controles_funcionales_iadl.ver');
         $roles['PSICOLOGO/A']->givePermissionTo('controles_funcionales_iadl.ver');
+        // Captura descriptiva aprobada por la propietaria el 28/10/2026.
+        foreach (['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A'] as $rolIadl) {
+            $roles[$rolIadl]->givePermissionTo(['controles_funcionales_iadl.crear', 'controles_funcionales_iadl.rectificar']);
+        }
         // Consulta de Alertas aprobada por la propietaria (21/10/2026).
         // Cada especialidad conserva su ámbito; no se concede gestión del aviso.
         $roles['NUTRICIONISTA']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'alertas.ver', 'atenciones', 'notas_clinicas', 'diagnosticos.ver', 'alergias.ver', 'indicaciones_clinicas.ver', 'mediciones_antropometricas', 'registros_ingesta.ver', 'registros_hidratacion.ver', 'registros_eliminacion.ver', 'valoraciones_nutricionales', 'planes_cuidado']));
