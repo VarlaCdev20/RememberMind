@@ -15,6 +15,8 @@ runtime_verified: false
 
 ## Estado vigente
 
+**Contexto escalar por atención —28/10/2026:** [tres columnas opcionales y conservación de 4FN](DECISION_CONTEXTO_ESCOLARIDAD_4FN_2026_10_28.md), sin nuevas tablas/FK/permisos ni listas de informantes/idiomas. La instrucción posterior autoriza esta extensión acotada; el inventario permanece106 de negocio+16 técnicas.
+
 La [extensión de Gerencia35/37 autorizada e instalada el27/10/2026](DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md) deja **81 operativas +25 expertas =106 tablas de negocio**, además de **16 técnicas**:122 físicas. Añade seis relaciones y ocho columnas nullable, con contenido previo conservado. La [consolidación del22/10](DECISION_CONSOLIDACION_BLOQUES_EXPERTOS_2026_10_22.md) y la auditoría del25/10 describen el inventario anterior de100 de negocio y116 físicas.
 
 El [máximo de diseño de 110](../sistema-experto/DECISION_MAXIMO_110_TABLAS_2026_10_21.md) sigue siendo capacidad de diseño, no aprobación de DDL. Su presupuesto inicial de seis relaciones correspondía al inventario entonces instalado de 104; no es un presupuesto fijo perpetuo ni autoriza diez tablas ahora.

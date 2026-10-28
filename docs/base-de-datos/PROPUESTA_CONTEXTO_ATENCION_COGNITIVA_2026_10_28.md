@@ -1,7 +1,7 @@
 ---
 title: "Propuesta acotada: contexto de evaluación en atenciones"
-status: REJECTED
-version: "1.1"
+status: PARTIALLY_SUPERSEDED
+version: "1.2"
 last_reviewed: 2026-10-28
 owner: Valoraciones
 source_of_truth: false
@@ -11,7 +11,11 @@ runtime_verified: false
 
 # Contexto de evaluación: escolaridad, idioma e informante
 
-## Decisión de la propietaria — 28/10/2026
+## Decisión posterior: ampliación escalar conservando 4FN
+
+La propietaria indicó después **«amplia los campos de ser necesario pero no rompas 4fn»**. La [decisión posterior de tres columnas por atención](DECISION_CONTEXTO_ESCOLARIDAD_4FN_2026_10_28.md) desarrolla escolaridad y capacidad referida de lectura/escritura sin nuevas relaciones. Esta propuesta de seis campos **no se adopta íntegramente**: idioma e informantes siguen sin esta ampliación estructural. El rechazo que se conserva debajo describe el paso anterior; no bloquea la extensión posterior autorizada.
+
+## Decisión anterior de la propietaria — 28/10/2026
 
 A la pregunta de aprobación de los seis campos y la FK, la propietaria respondió **«Mantener la BDD actual»**. Se adopta la alternativa 2. La ampliación queda rechazada y no instalada: no se crearán esas columnas, FK, migraciones o permisos para este alcance. El detalle de abajo conserva la propuesta como antecedente, sin autorizar su ejecución posterior.
 

@@ -48,8 +48,8 @@ test('captura propia: revisión, entrevista y cinco tamaños', { skip: process.e
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     const settled = () => page.waitForNetworkIdle({ idleTime: 250, timeout: 20000 });
-    const clickText = async (selector, text) => {
-        const handle = await page.evaluateHandle((selector_, text_) => [...document.querySelectorAll(selector_)].find(element => element.getClientRects().length && element.textContent.includes(text_) && !element.disabled), selector, text);
+    const clickText = async (selector, text, exact = false) => {
+        const handle = await page.evaluateHandle((selector_, text_, exact_) => [...document.querySelectorAll(selector_)].find(element => element.getClientRects().length && (exact_ ? element.textContent.trim() === text_ : element.textContent.includes(text_)) && !element.disabled), selector, text, exact);
         assert.ok(handle.asElement(), `Control visible: ${text}`);
         await handle.asElement().click();
         await settled();
@@ -133,6 +133,10 @@ test('captura propia: revisión, entrevista y cinco tamaños', { skip: process.e
     await clickText('[role=option]', 'Entrevista con informante familiar');
     await page.waitForFunction(() => document.querySelector('#sesion-tipo').innerText.includes('Entrevista con informante familiar'));
     await page.type('#sesion-motivo', 'Entrevista de seguimiento sintética');
+    await page.type('#sesion-escolaridad', '0');
+    await page.click('#sesion-puede_leer');
+    await clickText('.rm-choice__popover [role=option]', 'No', true);
+    await page.waitForFunction(() => document.querySelector('#sesion-puede_leer').innerText.trim() === 'No');
     await page.type('#sesion-notas', 'Relato del informante sintético, diferenciado de la observación directa.');
     await page.focus('#sesion-guia-contexto summary');
     await page.keyboard.press('Enter');
@@ -144,6 +148,8 @@ test('captura propia: revisión, entrevista y cinco tamaños', { skip: process.e
         matrix.push({ surface: 'entrevista', width, overflow });
         await page.$eval('#sesion-motivo', element => element.scrollIntoView({ block: 'center' }));
         await page.screenshot({ path: path.join(evidence, `entrevista-${width}.png`), fullPage: false });
+        await page.$eval('#sesion-escolaridad', element => element.scrollIntoView({ block: 'start' }));
+        await page.screenshot({ path: path.join(evidence, `contexto-sesion-${width}.png`), fullPage: false });
         await page.$eval('#sesion-guia-contexto', element => element.scrollIntoView({ block: 'start' }));
         await page.screenshot({ path: path.join(evidence, `guia-entrevista-${width}.png`), fullPage: false });
     }
@@ -153,6 +159,8 @@ test('captura propia: revisión, entrevista y cinco tamaños', { skip: process.e
     await clickText('button', 'Guardar sesión');
     await page.waitForFunction(() => document.body.innerText.includes('Sesión de atención psicológica registrada'));
     assert.match(await page.$eval('body', element => element.innerText), /Relato del informante sintético/);
+    const guardado = JSON.parse(await run(['--estado']));
+    assert.deepEqual(guardado.contexto_sesion, { escolaridad_anios: 0, puede_leer: false, puede_escribir: null });
     assert.deepEqual(errors, []);
     await writeFile(path.join(evidence, 'verificacion.json'), JSON.stringify({ matrix, errors, state, contrast, synthetic: true, backend: 'SQLite desechable; flujos Livewire reales' }, null, 2));
 });

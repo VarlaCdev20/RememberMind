@@ -875,6 +875,8 @@ Todas las PK `cod_*` usan `string(20)` salvo decisión futura explícitamente ap
 
 ## 19. `atenciones` — Transaccional
 
+**Extensión adoptada28/10/2026:** `escolaridad_anios SMALLINT NULL` (entero 0–32767, límite técnico), `puede_leer BOOLEAN NULL` y `puede_escribir BOOLEAN NULL`: información recabada por episodio, sin copiar admisión ni inferir normalidad. No cambia PK/FK, relaciones o grano. [Decisión, 4FN, restricciones y conservación](DECISION_CONTEXTO_ESCOLARIDAD_4FN_2026_10_28.md).
+
 **PK:** `cod_atencion string(20)`
 
 

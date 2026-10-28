@@ -848,7 +848,19 @@
                                     <input id="sesion-motivo" type="text" wire:model="formSesion.motivo" class="rm-input w-full" maxlength="255" required aria-describedby="sesion-motivo-help{{ $errors->has('formSesion.motivo') ? ' sesion-motivo-error' : '' }}" aria-invalid="{{ $errors->has('formSesion.motivo') ? 'true' : 'false' }}">
                                 </x-ui.field>
                             </x-ui.form-section>
-                            <x-ui.form-section title="Relato, observaciones y actuación" description="Diferencia la información referida de lo observado y de la intervención realizada." step="2" icon="ph-note-pencil" :columns="1">
+                            <x-ui.form-section title="Escolaridad y lectoescritura en esta sesión" description="Información recabada hoy. Es opcional, no modifica la admisión y no es una prueba de lectura o escritura." step="2" icon="ph-graduation-cap" :columns="3">
+                                <x-ui.field for="sesion-escolaridad" label="Años de educación formal informados" error="formSesion.escolaridad_anios" help="Cero si se conoce que no cursó años; deja vacío si no se conoce.">
+                                    <input id="sesion-escolaridad" type="number" min="0" max="32767" step="1" inputmode="numeric" wire:model="formSesion.escolaridad_anios" class="rm-input w-full" aria-describedby="sesion-escolaridad-help{{ $errors->has('formSesion.escolaridad_anios') ? ' sesion-escolaridad-error' : '' }}" aria-invalid="{{ $errors->has('formSesion.escolaridad_anios') ? 'true' : 'false' }}">
+                                </x-ui.field>
+                                @foreach(['puede_leer' => 'Capacidad referida para leer', 'puede_escribir' => 'Capacidad referida para escribir'] as $campoContexto => $labelContexto)
+                                    <x-ui.field :for="'sesion-'.$campoContexto" :label="$labelContexto" :error="'formSesion.'.$campoContexto" help="Selecciona solo si la información se conoce; no la deduzcas de la escolaridad.">
+                                        <x-ui.selector :id="'sesion-'.$campoContexto" :label="$labelContexto" wire:model="formSesion.{{ $campoContexto }}" :aria-invalid="$errors->has('formSesion.'.$campoContexto) ? 'true' : 'false'" :aria-describedby="'sesion-'.$campoContexto.'-help'.($errors->has('formSesion.'.$campoContexto) ? ' sesion-'.$campoContexto.'-error' : '')">
+                                            <option value="">No se conoce</option><option value="1">Sí</option><option value="0">No</option>
+                                        </x-ui.selector>
+                                    </x-ui.field>
+                                @endforeach
+                            </x-ui.form-section>
+                            <x-ui.form-section title="Relato, observaciones y actuación" description="Diferencia la información referida de lo observado y de la intervención realizada." step="3" icon="ph-note-pencil" :columns="1">
                                 <x-ui.field for="sesion-notas" label="Notas de la entrevista o sesión" error="formSesion.observacion" help="Hasta 1000 caracteres. Puedes incluir la fuente del relato, cambios descritos, respuesta del residente y acuerdos.">
                                     <textarea id="sesion-notas" wire:model="formSesion.observacion" rows="5" maxlength="1000" class="rm-textarea w-full" aria-describedby="sesion-notas-help{{ $errors->has('formSesion.observacion') ? ' sesion-notas-error' : '' }}" aria-invalid="{{ $errors->has('formSesion.observacion') ? 'true' : 'false' }}"></textarea>
                                 </x-ui.field>
@@ -920,6 +932,11 @@
                                     @if($atencion->observacion)
                                         <p class="text-[var(--rm-text-secondary)] italic text-[11px] border-t border-[var(--rm-border)]/50 pt-1">«{{ $atencion->observacion }}»</p>
                                     @endif
+                                    <dl class="rm-captura__guia-grid" aria-label="Contexto recabado en esta sesión">
+                                        <div><dt>Escolaridad informada</dt><dd>{{ $atencion->escolaridad_anios === null ? 'No registrada en esta sesión' : $atencion->escolaridad_anios.' años' }}</dd></div>
+                                        <div><dt>Lectura referida</dt><dd>{{ $atencion->puede_leer === null ? 'No se conoce' : ($atencion->puede_leer ? 'Sí' : 'No') }}</dd></div>
+                                        <div><dt>Escritura referida</dt><dd>{{ $atencion->puede_escribir === null ? 'No se conoce' : ($atencion->puede_escribir ? 'Sí' : 'No') }}</dd></div>
+                                    </dl>
                                 </div>
                             @endforeach
                         </div>

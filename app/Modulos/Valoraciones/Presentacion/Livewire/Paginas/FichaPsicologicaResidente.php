@@ -14,7 +14,9 @@ use App\Models\User;
 use App\Models\ValoracionPetersenOriginal;
 use App\Models\ValoracionPsicologica;
 use App\Modulos\Clinica\Aplicacion\Acciones\AutorizacionClinicaService;
+use App\Modulos\Valoraciones\Aplicacion\Acciones\RegistrarSesionPsicologica;
 use App\Modulos\Valoraciones\Aplicacion\Acciones\RegistrarValoracionProfesional;
+use Illuminate\Validation\ValidationException;
 use App\Modulos\Valoraciones\Aplicacion\Consultas\ConsultarTendenciaResidente;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -65,6 +67,9 @@ final class FichaPsicologicaResidente extends Component
         'tipo_atencion' => 'SEGUIMIENTO',
         'motivo' => '',
         'observacion' => '',
+        'escolaridad_anios' => '',
+        'puede_leer' => '',
+        'puede_escribir' => '',
     ];
 
     protected $queryString = ['tab'];
@@ -187,35 +192,18 @@ final class FichaPsicologicaResidente extends Component
     public function guardarSesion(): void
     {
         $usuario = $this->autorizar();
-        $personal = app(AutorizacionClinicaService::class)->autorizarMutacion($usuario, $this->residente, 'atenciones.crear', ['PSICOLOGO/A']);
-
-        $this->validate([
-            'formSesion.tipo_atencion' => ['required', 'string', 'max:60'],
-            'formSesion.motivo' => ['required', 'string', 'min:3', 'max:255'],
-            'formSesion.observacion' => ['nullable', 'string', 'max:1000'],
-        ]);
-
-        $codigos = app(CodigosEntidad::class);
-        $codArea = app(AutorizacionClinicaService::class)->areaActiva($personal)->getKey();
-
-        Atencion::create([
-            'cod_atencion' => $codigos->siguiente('atenciones'),
-            'cod_residente' => $this->residente->getKey(),
-            'cod_area' => $codArea,
-            'cod_personal' => $personal->getKey(),
-            'tipo_atencion' => $this->formSesion['tipo_atencion'],
-            'motivo' => $this->formSesion['motivo'],
-            'fecha_hora' => now(),
-            'estado' => 'FINALIZADA',
-            'observacion' => $this->formSesion['observacion'] ?: null,
-        ]);
+        try {
+            app(RegistrarSesionPsicologica::class)->registrar($usuario, $this->residente, $this->formSesion);
+        } catch (ValidationException $e) {
+            $errores = [];
+            foreach ($e->errors() as $campo => $mensajes) {
+                $errores['formSesion.'.$campo] = $mensajes;
+            }
+            throw ValidationException::withMessages($errores);
+        }
 
         $this->mostrarFormSesion = false;
-        $this->formSesion = [
-            'tipo_atencion' => 'SEGUIMIENTO',
-            'motivo' => '',
-            'observacion' => '',
-        ];
+        $this->reset('formSesion');
         $this->mensajeExito = 'Sesión de atención psicológica registrada exitosamente en el expediente.';
     }
 

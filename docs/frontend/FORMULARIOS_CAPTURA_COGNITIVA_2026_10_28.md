@@ -1,7 +1,7 @@
 ---
 title: "Formularios propios de captura cognitiva y entrevista"
 status: CURRENT
-version: "1.1"
+version: "1.2"
 last_reviewed: 2026-10-28
 owner: Valoraciones
 source_of_truth: false
@@ -62,6 +62,14 @@ Se separan idioma/comunicación, fuente del relato y condiciones conocidas. No s
 - Sin cambios de estructura, relaciones, permisos, catálogos, inferencia ni datos institucionales. No se repitió PostgreSQL: la actualización añade una referencia de lectura y ayudas; no cambia las escrituras, transacciones o bloqueos. Las pruebas de backend y navegador usan bases aisladas.
 - La propuesta de seis campos se conserva como antecedente **rechazado**, y la matriz mantiene D02/D03/D06 parciales. No se enviaron correos ni se añadieron dependencias o nombres de dominio V1.
 
+## Ampliación posterior autorizada: contexto escalar por sesión
+
+La instrucción posterior «amplia los campos de ser necesario pero no rompas 4fn» permite la [extensión de tres datos por atención](../base-de-datos/DECISION_CONTEXTO_ESCOLARIDAD_4FN_2026_10_28.md). Psicología registra opcionalmente años de escolaridad y capacidad referida para leer/escribir. Cero, «No» y desconocido conservan su diferencia. Los campos se agrupan entre el motivo y las notas, usando secciones, campos y selectores compartidos. Se muestran después en la sesión histórica, sin precargar desde admisión o desde otra atención.
+
+`RegistrarSesionPsicologica` asume la validación y escritura que antes residían en Livewire, revalida cuenta, residente, rol/profesión, permiso y área; deriva autor y fecha, y conserva atención + Activitylog en una transacción. La interfaz mantiene captura ante errores y solo anuncia éxito tras el retorno del backend. Los datos nuevos son inmutables por la vía Eloquent; esa protección no se presenta como una garantía de bloqueo de SQL directo.
+
+El recorrido E2E guarda 0/No/desconocido y comprueba su persistencia. Se revisaron las capturas de la sección en 1440, 1280, 1024, 768 y 390 px, tema claro, con reflow y sin errores JavaScript o desbordamiento horizontal: **PASS para la sección y este recorrido**. La primera ejecución eligió «No se conoce» por una coincidencia parcial del texto en el test; el selector del test se corrigió para exigir la opción exacta y la repetición pasó. El build Vite pasó con el aviso de chunks existente. La decisión BDD enlazada consolida pruebas, respaldo e instalación.
+
 ## Límites pendientes
 
-La guía narrativa no resuelve los campos estructurados de escolaridad, idioma o informante pendientes en la matriz. El formulario solo muestra preguntas del catálogo autorizado: no acredita que exista una edición completa y utilizable de cada prueba elegida. Materiales, derechos, adaptación, puntuación y conexiones clínicas deben cotejarse por instrumento. No se repitió integración PostgreSQL en este cambio de presentación ni se declara validación clínica del experto.
+La guía narrativa no sustituye datos estructurados. La ampliación posterior cubre tres datos de escolaridad por sesión; idioma, participantes y su aplicación a métodos instrumentales siguen pendientes en la matriz. El formulario solo muestra preguntas del catálogo autorizado: no acredita que exista una edición completa y utilizable de cada prueba elegida. Materiales, derechos, adaptación, puntuación y conexiones clínicas deben cotejarse por instrumento. Las verificaciones PostgreSQL posteriores de esta ampliación están en su decisión específica; no constituyen validación clínica del experto.

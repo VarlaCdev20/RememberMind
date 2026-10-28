@@ -17,6 +17,8 @@ related_modules: []
 
 # RememberMind — Baseline Rector de la BDD Operativa
 
+**Extensión acotada del28/10/2026:** [contexto escalar por atención y justificación de 4FN](DECISION_CONTEXTO_ESCOLARIDAD_4FN_2026_10_28.md): `escolaridad_anios SMALLINT NULL`, `puede_leer BOOLEAN NULL` y `puede_escribir BOOLEAN NULL`. Sin tablas/FK nuevas, backfill o inferencia automática; conserva el grano del episodio. Los límites y la evidencia están en la decisión específica.
+
 **Inventario vigente — 27/10/2026:** la instalación expresamente autorizada
 de Gerencia35/37 añade seis relaciones operativas y ocho columnas nullable:
 **81 operativas +25 expertas =106 de negocio**, más16 técnicas.

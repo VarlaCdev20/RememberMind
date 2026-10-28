@@ -21,6 +21,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Tests\TestCase;
+use App\Modulos\Valoraciones\Aplicacion\Acciones\RegistrarSesionPsicologica;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\QueryException;
+use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class FichaPsicologicaResidenteTest extends TestCase
 {
@@ -257,6 +263,172 @@ final class FichaPsicologicaResidenteTest extends TestCase
         self::assertDatabaseHas('atenciones', ['cod_residente' => $this->residente->getKey(), 'observacion' => $relato]);
         self::assertDatabaseCount('aplicaciones_instrumento', 0);
         self::assertDatabaseCount('valoraciones_petersen_originales', 0);
+    }
+
+    public function test_contexto_de_sesion_conserva_cero_no_y_si_sin_cambiar_admision(): void
+    {
+        $this->actingAs($this->psicologo);
+        $this->residente->update(['nivel_educativo' => 'Dato general de admisión']);
+        Livewire::test(FichaPsicologicaResidente::class, ['residente' => $this->residente])
+            ->call('cambiarTab', 'sesiones')->set('mostrarFormSesion', true)
+            ->set('formSesion.motivo', 'Entrevista sintética con contexto')
+            ->set('formSesion.escolaridad_anios', '0')->set('formSesion.puede_leer', '0')->set('formSesion.puede_escribir', '1')
+            ->call('guardarSesion')->assertHasNoErrors()->assertSee('0 años')
+            ->assertSet('formSesion.escolaridad_anios', '')->assertSet('formSesion.puede_leer', '');
+
+        $atencion = Atencion::sole();
+        self::assertSame(0, $atencion->escolaridad_anios);
+        self::assertFalse($atencion->puede_leer);
+        self::assertTrue($atencion->puede_escribir);
+        self::assertSame($this->psicologo->personal->getKey(), $atencion->cod_personal);
+        self::assertSame('Dato general de admisión', $this->residente->fresh()->nivel_educativo);
+        self::assertDatabaseHas('activity_log', ['event' => 'sesion_psicologica_registrada', 'subject_id' => $atencion->getKey(), 'causer_id' => $this->psicologo->getKey()]);
+        self::assertDatabaseCount('valoraciones_petersen_originales', 0);
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+    }
+
+    public static function contextoInvalido(): array
+    {
+        return [['escolaridad_anios', '-1'], ['escolaridad_anios', '1.5'], ['escolaridad_anios', '32768'],
+            ['puede_leer', 'quizás'], ['puede_escribir', 2]];
+    }
+
+    #[DataProvider('contextoInvalido')]
+    public function test_contexto_invalido_conserva_captura_y_no_escribe(string $campo, mixed $valor): void
+    {
+        $this->actingAs($this->psicologo);
+        Livewire::test(FichaPsicologicaResidente::class, ['residente' => $this->residente])
+            ->call('cambiarTab', 'sesiones')->set('mostrarFormSesion', true)->set('formSesion.motivo', 'Sesión sintética')
+            ->set('formSesion.'.$campo, $valor)->call('guardarSesion')
+            ->assertHasErrors('formSesion.'.$campo)->assertSet('formSesion.'.$campo, $valor)->assertSet('mostrarFormSesion', true);
+        self::assertDatabaseCount('atenciones', 0);
+    }
+
+    public function test_backend_no_admite_autoria_manipulada_para_el_contexto(): void
+    {
+        try {
+            app(RegistrarSesionPsicologica::class)->registrar($this->psicologo, $this->residente,
+                ['tipo_atencion' => 'SEGUIMIENTO', 'motivo' => 'Contexto sintético', 'cod_personal' => $this->enfermero->personal->getKey()]);
+            self::fail('Debe rechazar autoría enviada por el cliente.');
+        } catch (ValidationException $e) {
+            self::assertArrayHasKey('cod_personal', $e->errors());
+        }
+        self::assertDatabaseCount('atenciones', 0);
+    }
+
+    public function test_backend_revalida_cuenta_y_permiso_revocados(): void
+    {
+        $this->psicologo->roles()->first()->revokePermissionTo('atenciones.crear');
+        try {
+            app(RegistrarSesionPsicologica::class)->registrar($this->psicologo, $this->residente,
+                ['tipo_atencion' => 'SEGUIMIENTO', 'motivo' => 'Contexto sintético', 'escolaridad_anios' => 0]);
+            self::fail('Debe rechazar el permiso revocado.');
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            self::assertSame(403, $e->getStatusCode());
+        }
+        self::assertDatabaseCount('atenciones', 0);
+    }
+
+    public static function actorSinContextoAutorizado(): array
+    {
+        return [['cuenta'], ['personal'], ['rol'], ['familiar'], ['area'], ['residente']];
+    }
+
+    #[DataProvider('actorSinContextoAutorizado')]
+    public function test_backend_rechaza_actor_y_contexto_no_autorizados(string $caso): void
+    {
+        match ($caso) {
+            'cuenta' => $this->psicologo->update(['estado' => 'INACTIVO']),
+            'personal' => $this->psicologo->personal->update(['estado' => 'INACTIVO']),
+            'rol' => $this->psicologo->syncRoles(['ENFERMEROS']),
+            'familiar' => $this->psicologo->assignRole('FAMILIAR'),
+            'area' => Area::query()->update(['estado' => 'INACTIVA']),
+            'residente' => $this->residente->update(['estado' => 'EGRESADO']),
+        };
+        try {
+            app(RegistrarSesionPsicologica::class)->registrar($this->psicologo, $this->residente,
+                ['tipo_atencion' => 'SEGUIMIENTO', 'motivo' => 'Contexto sintético', 'puede_leer' => false]);
+            self::fail('Debe rechazar el actor o contexto no autorizado.');
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            self::assertSame(403, $e->getStatusCode());
+        }
+        self::assertDatabaseCount('atenciones', 0);
+    }
+
+    public function test_fallo_de_auditoria_revierte_atencion_y_contexto(): void
+    {
+        \Spatie\Activitylog\Models\Activity::creating(static function (): void {
+            throw new \RuntimeException('Fallo sintético de auditoría');
+        });
+        try {
+            app(RegistrarSesionPsicologica::class)->registrar($this->psicologo, $this->residente,
+                ['tipo_atencion' => 'SEGUIMIENTO', 'motivo' => 'Contexto sintético', 'escolaridad_anios' => 0]);
+            self::fail('No debe anunciar un registro incompleto.');
+        } catch (\RuntimeException $e) {
+            self::assertSame('Fallo sintético de auditoría', $e->getMessage());
+        }
+        self::assertDatabaseCount('atenciones', 0);
+    }
+
+    public function test_sesion_posterior_no_sobrescribe_contexto_ni_completa_desconocidos(): void
+    {
+        $accion = app(RegistrarSesionPsicologica::class);
+        $primera = $accion->registrar($this->psicologo, $this->residente,
+            ['tipo_atencion' => 'SEGUIMIENTO', 'motivo' => 'Primera sesión sintética', 'escolaridad_anios' => 0, 'puede_leer' => false]);
+        $segunda = $accion->registrar($this->psicologo, $this->residente,
+            ['tipo_atencion' => 'SEGUIMIENTO', 'motivo' => 'Otra sesión sintética']);
+        self::assertSame(0, $primera->fresh()->escolaridad_anios);
+        self::assertFalse($primera->fresh()->puede_leer);
+        foreach (Atencion::CONTEXTO_ESCOLARIDAD as $campo) self::assertNull($segunda->getAttribute($campo));
+        try {
+            $primera->update(['escolaridad_anios' => 10]);
+            self::fail('No debe sobrescribir el contexto conservado.');
+        } catch (\LogicException $e) {
+            self::assertStringContainsString('no se sobrescribe', $e->getMessage());
+        }
+        self::assertSame(0, $primera->fresh()->escolaridad_anios);
+        self::assertDatabaseCount('atenciones', 2);
+    }
+
+    public function test_ampliacion_y_reversion_vacias_conservan_filas_y_tablas(): void
+    {
+        $accion = app(RegistrarSesionPsicologica::class);
+        $a = $accion->registrar($this->psicologo, $this->residente, ['tipo_atencion' => 'SEGUIMIENTO', 'motivo' => 'Historia sintética previa']);
+        $originales = array_diff(Schema::getColumnListing('atenciones'), Atencion::CONTEXTO_ESCOLARIDAD);
+        $antes = (array) DB::table('atenciones')->where('cod_atencion', $a->getKey())->first($originales);
+        $tablas = count(Schema::getTables());
+        $migracion = require base_path('database/migrations/2026_10_28_010000_add_contexto_escolaridad_atenciones.php');
+        $migracion->down();
+        self::assertFalse(Schema::hasColumn('atenciones', 'escolaridad_anios'));
+        self::assertSame($antes, (array) DB::table('atenciones')->where('cod_atencion', $a->getKey())->first($originales));
+        $migracion->up();
+        self::assertSame($tablas, count(Schema::getTables()));
+        self::assertSame($antes, (array) DB::table('atenciones')->where('cod_atencion', $a->getKey())->first($originales));
+        foreach (Atencion::CONTEXTO_ESCOLARIDAD as $campo) self::assertNull($a->fresh()->getAttribute($campo));
+    }
+
+    public function test_rollback_con_datos_se_rechaza_sin_perder_el_contexto(): void
+    {
+        $a = app(RegistrarSesionPsicologica::class)->registrar($this->psicologo, $this->residente,
+            ['tipo_atencion' => 'SEGUIMIENTO', 'motivo' => 'Contexto sintético', 'puede_escribir' => false]);
+        $migracion = require base_path('database/migrations/2026_10_28_010000_add_contexto_escolaridad_atenciones.php');
+        try { $migracion->down(); self::fail('No debe eliminar contexto clínico.'); }
+        catch (\LogicException $e) { self::assertStringContainsString('no se elimina', $e->getMessage()); }
+        self::assertFalse($a->fresh()->puede_escribir);
+        self::assertTrue(Schema::hasColumn('atenciones', 'escolaridad_anios'));
+    }
+
+    public function test_sql_directo_rechaza_contexto_invalido(): void
+    {
+        $a = app(RegistrarSesionPsicologica::class)->registrar($this->psicologo, $this->residente,
+            ['tipo_atencion' => 'SEGUIMIENTO', 'motivo' => 'Contexto sintético']);
+        foreach (['escolaridad_anios' => -1, 'puede_leer' => 2] as $campo => $valor) {
+            try {
+                DB::transaction(fn () => DB::table('atenciones')->where('cod_atencion', $a->getKey())->update([$campo => $valor]));
+                self::fail('SQL debe rechazar el dato inválido.');
+            } catch (QueryException $e) { self::assertNotEmpty($e->getCode()); }
+            self::assertNull($a->fresh()->getAttribute($campo));
+        }
     }
 
     public function test_psicologo_puede_registrar_sesion_de_atencion(): void

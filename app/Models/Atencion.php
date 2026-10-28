@@ -7,6 +7,8 @@ use Illuminate\Support\Str;
 
 class Atencion extends ModeloOperativo
 {
+    public const CONTEXTO_ESCOLARIDAD = ['escolaridad_anios', 'puede_leer', 'puede_escribir'];
+
     protected $table = 'atenciones';
     protected $primaryKey = 'cod_atencion';
     public $incrementing = false;
@@ -15,7 +17,7 @@ class Atencion extends ModeloOperativo
 
     protected function casts(): array
     {
-        return ['fecha_hora' => 'datetime'];
+        return ['fecha_hora' => 'datetime', 'escolaridad_anios' => 'integer', 'puede_leer' => 'boolean', 'puede_escribir' => 'boolean'];
     }
 
     public function adultoMayor(): BelongsTo
@@ -121,6 +123,12 @@ class Atencion extends ModeloOperativo
     protected static function booted(): void
     {
         parent::booted();
+
+        static::updating(function (self $model): void {
+            if ($model->isDirty(self::CONTEXTO_ESCOLARIDAD)) {
+                throw new \LogicException('El contexto de una atención conservada no se sobrescribe.');
+            }
+        });
 
         static::creating(function (self $model) {
             if (empty($model->cod_atencion)) {
