@@ -68,14 +68,19 @@ test('captura propia: revisión, entrevista y cinco tamaños', { skip: process.e
     await clickText('.rm-instrumento__acciones button', 'Registrar aplicación');
     await page.click('.rm-modal-shell.is-open button[id^="captura-residente-"]');
     await clickText('.rm-choice__popover [role="option"]', 'Residente sintético');
+    await clickText('.rm-captura__modal details summary', 'Vincular una atención existente');
+    await page.click('.rm-captura__modal button[id^="captura-atencion-"]');
+    await clickText('.rm-choice__popover [role=option]', 'Profesional Sintético');
+    await page.waitForSelector('[aria-label="Referencia de la atención vinculada"]');
+    assert.match(await page.$eval('[aria-label="Referencia de la atención vinculada"]', element => element.textContent), /0 años/);
     await page.waitForSelector('.rm-modal-shell.is-open button[id^="captura-valor-"]');
     await page.click('.rm-modal-shell.is-open button[id^="captura-valor-"]');
     await clickText('.rm-choice__popover [role="option"]', 'No');
     await page.waitForFunction(() => document.querySelector('.rm-captura__pie-ayuda')?.innerText.includes('1 de 1'));
-    await page.focus('.rm-captura__modal .rm-captura__guia summary');
+    await page.focus('.rm-captura__modal [id^=captura-guia-] summary');
     await page.keyboard.press('Enter');
-    assert.match(await page.$eval('.rm-captura__modal .rm-captura__guia', element => element.innerText), /Escolaridad sintética de referencia/);
-    assert.match(await page.$eval('.rm-captura__modal .rm-captura__guia', element => element.innerText), /no indica los años cursados/);
+    assert.match(await page.$eval('.rm-captura__modal [id^=captura-guia-]', element => element.innerText), /Escolaridad sintética de referencia/);
+    assert.match(await page.$eval('.rm-captura__modal [id^=captura-guia-]', element => element.innerText), /no indica los años cursados/);
     const matrix = [];
     for (const width of [1440, 1280, 1024, 768, 390]) {
         await resize(width);
@@ -87,8 +92,12 @@ test('captura propia: revisión, entrevista y cinco tamaños', { skip: process.e
         assert.ok(dimensions.left >= -1 && dimensions.right <= width + 1 && dimensions.overflow <= 1, JSON.stringify({ width, ...dimensions }));
         matrix.push({ surface: 'captura', width, ...dimensions });
         await page.screenshot({ path: path.join(evidence, `captura-${width}.png`), fullPage: true });
-        await page.$eval('.rm-captura__modal .rm-captura__guia', element => element.scrollIntoView({ block: 'start' }));
+        await page.$eval('.rm-captura__modal [id^=captura-guia-]', element => element.scrollIntoView({ block: 'start' }));
         await page.screenshot({ path: path.join(evidence, `guia-captura-${width}.png`), fullPage: true });
+        await page.$eval('[aria-label="Referencia de la atención vinculada"]', element => { element.open = true; element.scrollIntoView({ block: 'start' }); });
+        await page.screenshot({ path: path.join(evidence, `enlace-atencion-${width}.png`), fullPage: true });
+        await page.$eval('[aria-label="Vincular una atención existente"]', element => element.scrollIntoView({ block: 'start' }));
+        await page.screenshot({ path: path.join(evidence, `selector-atencion-${width}.png`), fullPage: true });
     }
     assert.ok(await page.$eval('textarea[id^=captura-observaciones-]', element => element.getBoundingClientRect().height >= 80), 'Observaciones con espacio multilínea');
     await clickText('.rm-captura__acciones button', 'Revisar captura');
@@ -97,6 +106,9 @@ test('captura propia: revisión, entrevista y cinco tamaños', { skip: process.e
     assert.match(await page.$eval('.rm-captura__respuestas-revision', element => element.innerText), /No/);
     assert.equal(await page.$$eval('.rm-captura__revision input', elements => elements.length), 0);
     await page.screenshot({ path: path.join(evidence, 'revision-390.png'), fullPage: true });
+    if (!(await page.$eval('[aria-label="Referencia de la atención vinculada"]', element => element.open))) await page.click('[aria-label="Referencia de la atención vinculada"] summary');
+    await page.$eval('[aria-label="Referencia de la atención vinculada"]', element => element.scrollIntoView({ block: 'start' }));
+    await page.screenshot({ path: path.join(evidence, 'enlace-revision-390.png'), fullPage: true });
     for (let index = 0; index < 8; index++) {
         await page.keyboard.press('Tab');
         assert.ok(await page.evaluate(() => document.activeElement.closest('[role="dialog"]')), 'Foco dentro del diálogo de revisión');
@@ -122,6 +134,7 @@ test('captura propia: revisión, entrevista y cinco tamaños', { skip: process.e
     await page.waitForFunction(() => !document.querySelector('.rm-captura__modal'));
     const state = JSON.parse(await run(['--estado']));
     assert.equal(state.aplicaciones, 1);
+    assert.equal(state.atencion_aplicacion, 'ATE_E2E_GUIA');
     assert.equal(state.respuestas, 1);
     assert.ok(state.valor_logico === false || state.valor_logico === 0);
 

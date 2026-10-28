@@ -1,7 +1,7 @@
 ---
 title: "Formularios propios de captura cognitiva y entrevista"
 status: CURRENT
-version: "1.2"
+version: "1.3"
 last_reviewed: 2026-10-28
 owner: Valoraciones
 source_of_truth: false
@@ -69,6 +69,10 @@ La instrucción posterior «amplia los campos de ser necesario pero no rompas 4f
 `RegistrarSesionPsicologica` asume la validación y escritura que antes residían en Livewire, revalida cuenta, residente, rol/profesión, permiso y área; deriva autor y fecha, y conserva atención + Activitylog en una transacción. La interfaz mantiene captura ante errores y solo anuncia éxito tras el retorno del backend. Los datos nuevos son inmutables por la vía Eloquent; esa protección no se presenta como una garantía de bloqueo de SQL directo.
 
 El recorrido E2E guarda 0/No/desconocido y comprueba su persistencia. Se revisaron las capturas de la sección en 1440, 1280, 1024, 768 y 390 px, tema claro, con reflow y sin errores JavaScript o desbordamiento horizontal: **PASS para la sección y este recorrido**. La primera ejecución eligió «No se conoce» por una coincidencia parcial del texto en el test; el selector del test se corrigió para exigir la opción exacta y la repetición pasó. El build Vite pasó con el aviso de chunks existente. La decisión BDD enlazada consolida pruebas, respaldo e instalación.
+
+## Enlace posterior con la atención de la aplicación
+
+El [selector contextual y su verificación](../sistema-experto/ENLACE_ATENCION_APLICACION_2026_10_28.md) permiten vincular explícitamente una atención en aplicación propia o transcripción. Se busca por fecha y se muestra profesional/tipo, sin teclear la PK. La referencia plegable conserva fecha, estado y contexto del episodio; el permiso `atenciones.ver` se exige en lectura y backend al vincular. Sin ese permiso sigue disponible la captura sin vínculo. No se duplican escolaridad o lectoescritura en respuestas ni se calculan correcciones desde esa referencia.
 
 ## Límites pendientes
 

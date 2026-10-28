@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modulos\Valoraciones\Aplicacion\Consultas;
 
+use App\Models\Atencion;
 use App\Models\DocumentoClinico;
 use App\Models\Instrumento;
 use App\Models\Residente;
@@ -15,8 +16,10 @@ use App\Modulos\Clinica\Aplicacion\Consultas\ContextoClinicoService;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Valoraciones\Aplicacion\Acciones\AplicarInstrumento;
 use App\Modulos\Valoraciones\Aplicacion\DTOs\CatalogoPreguntasInstrumento;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 use LogicException;
 use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
 
@@ -69,6 +72,32 @@ final readonly class PrepararCapturaInstrumental
         return ['residente' => trim(implode(' ', [$residente->nombres, $residente->apellido_paterno, $residente->apellido_materno])),
             'profesional' => trim(implode(' ', [$personal->nombres, $personal->apellido_paterno, $personal->apellido_materno])),
             'nivel_educativo' => $residente->nivel_educativo];
+    }
+
+    /** Metadatos de atención ya autorizados; nunca selecciona la última por defecto. */
+    public function atenciones(?User $usuario, string $codigoResidente, string $fecha = ''): Collection
+    {
+        Validator::make(['fechaAtencion' => $fecha], ['fechaAtencion' => ['nullable', 'date_format:Y-m-d']])->validate();
+
+        return $this->consultaAtenciones($usuario, $codigoResidente)
+            ->when($fecha !== '', fn ($q) => $q->whereDate('fecha_hora', $fecha))
+            ->orderByDesc('fecha_hora')->orderBy('cod_atencion')->limit(100)->get();
+    }
+
+    public function atencion(?User $usuario, string $codigoResidente, string $codigoAtencion): ?Atencion
+    {
+        return $this->consultaAtenciones($usuario, $codigoResidente)->whereKey($codigoAtencion)->first();
+    }
+
+    private function consultaAtenciones(?User $usuario, string $codigoResidente): Builder
+    {
+        $usuario = $this->usuario($usuario);
+        abort_unless($usuario->checkPermissionTo('atenciones.ver', 'web'), 403);
+        $this->contexto($usuario, $codigoResidente);
+
+        return Atencion::query()->where('cod_residente', $codigoResidente)
+            ->with('personal:cod_personal,nombres,apellido_paterno,apellido_materno')
+            ->select(['cod_atencion', 'cod_personal', 'fecha_hora', 'tipo_atencion', 'estado', 'escolaridad_anios', 'puede_leer', 'puede_escribir']);
     }
 
     public function instrumentos(?User $usuario): Collection

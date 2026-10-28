@@ -1,7 +1,7 @@
 ---
 title: "Detección temprana de DCL: ficha y matriz de datos"
 status: DRAFT
-version: "0.3"
+version: "0.4"
 last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: false
@@ -52,6 +52,8 @@ Los estados pertenecen a esta matriz de auditoría; no son nuevos catálogos de 
 **Decisión inicial del 28/10/2026:** la propietaria eligió [mantener la BDD actual](../base-de-datos/PROPUESTA_CONTEXTO_ATENCION_COGNITIVA_2026_10_28.md) frente a seis campos de contexto en `atenciones`. La captura instrumental y la entrevista muestran la escolaridad general del expediente como referencia de solo lectura. La guía orienta las observaciones existentes, sin tratarlas como campos estructurados ni hechos extraídos. Esta mejora no cierra D02/D03/D06, no activa correcciones educativas ni elige un informante automáticamente.
 
 **Instrucción siguiente del mismo día:** «amplia los campos de ser necesario pero no rompas 4fn». La [extensión acotada por atención](../base-de-datos/DECISION_CONTEXTO_ESCOLARIDAD_4FN_2026_10_28.md) incorpora años de escolaridad y capacidad referida de lectura/escritura, con desconocidos explícitos e historia conservada. No se transfieren automáticamente a una aplicación instrumental ni se reutilizan como si fueran de otra fecha. D02 continúa parcial hasta resolver las fuentes/perfiles de cada método; D03/D06 no se cierran.
+
+**Continuidad implementada:** [selección explícita de la atención de la aplicación](ENLACE_ATENCION_APLICACION_2026_10_28.md), en ambas entradas. El contexto se consulta como referencia autorizada de su episodio mediante la FK ya existente; no se copia a respuestas ni cierra la aplicabilidad de D02.
 
 | ID / dato necesario | Captura y fuente localizada | Conservación y consumidor | Estado | Trabajo siguiente |
 |---|---|---|---|---|

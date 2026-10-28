@@ -62,7 +62,7 @@ $app = require $raiz.'/bootstrap/app.php';
 if ($comprobar) {
     $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
     echo json_encode(['aplicaciones' => App\Models\AplicacionInstrumento::count(),
-        'respuestas' => App\Models\RespuestaInstrumento::count(), 'valor_logico' => App\Models\RespuestaInstrumento::value('valor_logico'),
+        'respuestas' => App\Models\RespuestaInstrumento::count(), 'atencion_aplicacion' => App\Models\AplicacionInstrumento::value('cod_atencion'), 'valor_logico' => App\Models\RespuestaInstrumento::value('valor_logico'),
         'evaluaciones' => App\Models\EvaluacionExperta::count(), 'instrumentos' => App\Models\Instrumento::count(),
         'contexto_sesion' => App\Models\Atencion::query()->where('tipo_atencion', 'ENTREVISTA_FAMILIAR')->first()?->only(['escolaridad_anios', 'puede_leer', 'puede_escribir']),
         'funcionamiento' => App\Models\ControlFuncionalIadl::query()->orderBy('registrado_en')->orderBy('cod_control_iadl')->get(['cod_control_iadl', 'cod_control_anterior', 'desempeno', 'oportunidad', 'nivel_previo', 'observacion'])->toArray()], JSON_THROW_ON_ERROR);
@@ -85,6 +85,7 @@ if ($preparar) {
     $jornada = Jornada::create(['cod_turno' => $turno->getKey(), 'fecha_jornada' => today(), 'estado' => 'ABIERTA']);
     AsignacionPersonal::create(['cod_personal' => $personal->getKey(), 'cod_jornada' => $jornada->getKey(), 'cod_area' => 'ARE_COG', 'fecha_asignacion' => now(), 'estado' => 'ACTIVA']);
     Residente::factory()->create(['cod_residente' => 'RES_E2E_GUIA', 'nombres' => 'Residente sintético', 'apellido_paterno' => 'Explorador', 'apellido_materno' => 'Verificación', 'estado' => 'ADMITIDO', 'nivel_educativo' => 'Escolaridad sintética de referencia']);
+    App\Models\Atencion::create(['cod_atencion' => 'ATE_E2E_GUIA', 'cod_residente' => 'RES_E2E_GUIA', 'cod_personal' => $personal->getKey(), 'cod_area' => 'ARE_COG', 'tipo_atencion' => 'VALORACION', 'fecha_hora' => now()->subHour(), 'estado' => 'FINALIZADA', 'motivo' => 'Atención sintética de referencia', 'escolaridad_anios' => 0, 'puede_leer' => false]);
     foreach (['OBS' => ['OBSERVACIONAL', 'ACTIVO'], 'FUN' => ['FUNCIONAL', 'ACTIVO'], 'HIS' => ['COGNITIVO', 'INACTIVO']] as $codigo => [$tipo, $estado]) {
         $instrumento = Instrumento::create(['cod_instrumento' => 'E2E_'.$codigo, 'codigo' => 'SINTETICO-'.$codigo, 'nombre' => $codigo === 'FUN' ? 'Registro funcional sintético' : 'Registro de observación sintético '.$codigo, 'version' => 'QA-UI-1', 'descripcion' => 'Contenido artificial para comprobar la interfaz. No es una escala clínica.', 'tipo' => $tipo, 'estado' => $estado]);
         if ($estado === 'ACTIVO') {

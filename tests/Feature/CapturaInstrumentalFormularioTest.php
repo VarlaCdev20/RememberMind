@@ -112,6 +112,129 @@ final class CapturaInstrumentalFormularioTest extends TestCase
         self::assertDatabaseCount('aplicaciones_instrumento', 0);
     }
 
+    private function atencionCaptura(?Residente $residente = null, array $cambios = []): Atencion
+    {
+        return Atencion::create(array_replace(['cod_residente' => ($residente ?? $this->residente)->getKey(),
+            'cod_personal' => $this->personal->getKey(), 'cod_area' => AsignacionPersonal::sole()->cod_area,
+            'fecha_hora' => now()->subHour(), 'tipo_atencion' => 'SEGUIMIENTO', 'motivo' => 'Atención sintética de referencia',
+            'observacion' => 'Nota clínica que el selector no debe cargar', 'estado' => 'FINALIZADA',
+            'escolaridad_anios' => 0, 'puede_leer' => false, 'puede_escribir' => null], $cambios));
+    }
+
+    public function test_fuentes_de_atencion_se_filtran_por_residente_y_fecha_sin_exponer_notas(): void
+    {
+        $propia = $this->atencionCaptura();
+        $antigua = $this->atencionCaptura(cambios: ['fecha_hora' => '2023-11-15 08:20:10']);
+        $ajena = $this->atencionCaptura(Residente::factory()->create(['estado' => 'ADMITIDO']));
+        $consulta = app(PrepararCapturaInstrumental::class);
+        $lista = $consulta->atenciones($this->usuario, $this->residente->getKey(), '2023-11-15');
+        self::assertSame([$antigua->getKey()], $lista->modelKeys());
+        self::assertNull($lista->first()->getAttribute('observacion'));
+        self::assertNull($consulta->atencion($this->usuario, $this->residente->getKey(), $ajena->getKey()));
+        $this->abrir()->assertSet('cod_atencion', null)->assertViewHas('atencionVista', null)
+            ->assertDontSee('Nota clínica que el selector no debe cargar');
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+    }
+
+    public function test_ambas_entradas_vinculan_atencion_sin_copiar_contexto_a_respuestas(): void
+    {
+        $atencion = $this->atencionCaptura();
+        $original = $atencion->fresh()->getAttributes();
+        foreach ([false, true] as $area) {
+            $this->abrir($area)->set('cod_atencion', $atencion->getKey())
+                ->set('cod_instrumento', $this->instrumento->getKey())->assertHasNoErrors()
+                ->set('valores.'.$this->preguntas['NUMERICO']->getKey(), '1')
+                ->assertSee('Atención vinculada')->assertSee('0 años')->assertSee('no copia estos datos')
+                ->call('revisar')->assertSet('confirmando', true)->call('guardar')->assertHasNoErrors();
+        }
+        self::assertSame($original, $atencion->fresh()->getAttributes());
+        self::assertDatabaseCount('aplicaciones_instrumento', 2);
+        self::assertDatabaseCount('respuestas_instrumento', 2);
+        foreach (AplicacionInstrumento::all() as $a) self::assertSame($atencion->getKey(), $a->cod_atencion);
+        self::assertDatabaseHas('respuestas_instrumento', ['valor_numero' => 1]);
+        self::assertDatabaseCount('valoraciones_petersen_originales', 0);
+    }
+
+    public function test_vinculo_ajeno_se_rechaza_en_formulario_y_backend_sin_escribir(): void
+    {
+        $ajena = $this->atencionCaptura(Residente::factory()->create(['estado' => 'ADMITIDO']));
+        $this->abrir()->set('cod_instrumento', $this->instrumento->getKey())->set('cod_atencion', $ajena->getKey())
+            ->set('valores.'.$this->preguntas['NUMERICO']->getKey(), '1')->call('revisar')->assertHasErrors('cod_atencion')
+            ->assertSet('confirmando', false)->assertViewHas('atencionVista', null);
+        try {
+            app(AplicarInstrumento::class)->aplicar($this->usuario, ['fecha_hora' => now()->format('Y-m-d H:i:s'),
+                'cod_atencion' => $ajena->getKey(), 'respuestas' => [['cod_pregunta' => $this->preguntas['NUMERICO']->getKey(), 'valor_numero' => 1]]],
+                $this->instrumento, $this->residente);
+            self::fail('Debe rechazar una atención de otro residente.');
+        } catch (ValidationException $e) { self::assertArrayHasKey('cod_atencion', $e->errors()); }
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+        self::assertDatabaseCount('respuestas_instrumento', 0);
+    }
+
+    public function test_sin_permiso_de_atenciones_se_puede_aplicar_sin_vinculo(): void
+    {
+        $atencion = $this->atencionCaptura();
+        $this->usuario->roles()->first()->revokePermissionTo('atenciones.ver');
+        $this->usuario = $this->usuario->fresh();
+        $this->actingAs($this->usuario);
+        $this->abrir()->set('cod_instrumento', $this->instrumento->getKey())
+            ->assertViewHas('atenciones', fn ($lista) => $lista->isEmpty())->assertViewHas('atencionVista', null)
+            ->assertSee('Tu cuenta no tiene permiso para consultar atenciones')
+            ->set('valores.'.$this->preguntas['NUMERICO']->getKey(), '0')->call('revisar')->call('guardar')->assertHasNoErrors();
+        self::assertNull(AplicacionInstrumento::sole()->cod_atencion);
+        self::assertDatabaseCount('atenciones', 1);
+        self::assertSame(0, $atencion->fresh()->escolaridad_anios);
+    }
+
+    public function test_backend_rechaza_vincular_sin_permiso_de_lectura_de_atenciones(): void
+    {
+        $a = $this->atencionCaptura();
+        $this->usuario->roles()->first()->revokePermissionTo('atenciones.ver');
+        try {
+            app(AplicarInstrumento::class)->aplicar($this->usuario, ['fecha_hora' => now()->format('Y-m-d H:i:s'),
+                'cod_atencion' => $a->getKey(), 'respuestas' => [['cod_pregunta' => $this->preguntas['NUMERICO']->getKey(), 'valor_numero' => 0]]],
+                $this->instrumento, $this->residente);
+            self::fail('El backend debe comprobar la lectura de la atención.');
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) { self::assertSame(403, $e->getStatusCode()); }
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+        self::assertDatabaseCount('respuestas_instrumento', 0);
+    }
+
+    public function test_filtro_de_atenciones_invalido_muestra_error_sin_perder_captura(): void
+    {
+        $a = $this->atencionCaptura();
+        $this->abrir()->set('cod_instrumento', $this->instrumento->getKey())->set('cod_atencion', $a->getKey())
+            ->set('valores.'.$this->preguntas['NUMERICO']->getKey(), '0')->set('fechaAtencion', 'fecha inválida')
+            ->assertHasErrors('fechaAtencion')->assertSet('cod_atencion', $a->getKey())
+            ->assertSet('valores.'.$this->preguntas['NUMERICO']->getKey(), '0')
+            ->assertViewHas('atenciones', fn ($lista) => $lista->isEmpty());
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+    }
+
+    public function test_permiso_revocado_despues_de_revisar_impide_guardar_el_vinculo(): void
+    {
+        $atencion = $this->atencionCaptura();
+        $c = $this->abrir()->set('cod_instrumento', $this->instrumento->getKey())->set('cod_atencion', $atencion->getKey())
+            ->set('valores.'.$this->preguntas['NUMERICO']->getKey(), 1)->call('revisar')->assertSet('confirmando', true);
+        $this->usuario->roles()->first()->revokePermissionTo('atenciones.ver');
+        $c->call('guardar')->assertForbidden();
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+        self::assertDatabaseCount('respuestas_instrumento', 0);
+    }
+
+    public function test_cambiar_vinculo_invalida_revision_y_no_se_pierde_al_filtrar(): void
+    {
+        $a = $this->atencionCaptura(cambios: ['fecha_hora' => '2023-11-15 08:20:10']);
+        $otra = $this->atencionCaptura();
+        $this->abrir()->set('cod_instrumento', $this->instrumento->getKey())->set('cod_atencion', $a->getKey())
+            ->set('valores.'.$this->preguntas['NUMERICO']->getKey(), 1)->call('revisar')->assertSet('confirmando', true)
+            ->set('cod_atencion', $otra->getKey())->assertSet('confirmando', false)
+            ->set('fechaAtencion', '2023-11-15')->assertSet('cod_atencion', $otra->getKey())
+            ->assertViewHas('atencionVista', fn ($atencion) => $atencion->getKey() === $otra->getKey())
+            ->call('cerrar')->assertSet('confirmarDescarte', true);
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+    }
+
     public function test_areas_no_mezclan_catalogos_y_un_instrumento_historico_no_se_ofrece_para_aplicar(): void
     {
         Instrumento::create(['codigo' => 'BARTHEL_100', 'nombre' => 'Barthel sintético', 'tipo' => 'FUNCIONAL', 'estado' => 'ACTIVO']);

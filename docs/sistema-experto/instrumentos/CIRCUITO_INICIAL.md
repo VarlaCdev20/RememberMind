@@ -1,7 +1,7 @@
 ---
 title: "Fichas y preparación del circuito instrumental inicial"
 status: CURRENT
-version: "1.2"
+version: "1.3"
 last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: false
@@ -37,6 +37,8 @@ Se conservan las necesidades de la [matriz D01–D27](../MATRIZ_DATOS_DETECCION_
 | Historia funcional | Actividad, oportunidad real, desempeño, ayuda, causa y nivel previo. | `ControlFuncionalIadl` es descriptivo; no sustituye los ítems de FAQ ni genera C03 automáticamente. |
 
 El original se guarda por su flujo autorizado; el experto solo adquiere evidencia con identidad y contrato válidos. Un cribado sin hallazgos no cierra una preocupación fundada y un dato ausente no se vuelve normal.
+
+**Avance posterior del 28/10/2026:** la [referencia explícita de atención en la aplicación](../ENLACE_ATENCION_APLICACION_2026_10_28.md) conecta la FK existente en aplicación propia y transcripción, con metadatos autorizados. El contexto escalar permanece en la atención; no se extraen valores para métodos ni se cierra la incorporación de los instrumentos por este enlace.
 
 ## 3. Integración que ya existe y brechas delimitadas
 

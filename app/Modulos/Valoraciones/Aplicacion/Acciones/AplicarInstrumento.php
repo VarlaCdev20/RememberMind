@@ -61,15 +61,22 @@ final class AplicarInstrumento
                 throw ValidationException::withMessages(['solicitud' => 'Esta solicitud ya se registró. Consulta el historial antes de repetir la captura.']);
             }
             abort_unless($instrumento->estado === 'ACTIVO', 409, 'El instrumento no se encuentra activo.');
+            if (($entrada['cod_atencion'] ?? null) === '') {
+                $entrada['cod_atencion'] = null;
+            }
             $datos = Validator::make($entrada, ['fecha_hora' => ['required', 'date_format:Y-m-d H:i:s,Y-m-d\TH:i:sP,Y-m-d\TH:i:s\Z', 'before_or_equal:now'],
-                'cod_atencion' => ['nullable', 'exists:atenciones,cod_atencion'], 'clasificacion' => ['nullable', 'string', 'max:80'], 'interpretacion' => ['nullable', 'string'], 'observacion' => ['nullable', 'string'], 'respuestas' => ['required', 'array', 'min:1'],
+                'cod_atencion' => ['nullable', 'string', 'max:20'], 'clasificacion' => ['nullable', 'string', 'max:80'], 'interpretacion' => ['nullable', 'string'], 'observacion' => ['nullable', 'string'], 'respuestas' => ['required', 'array', 'min:1'],
                 'respuestas.*' => ['array:cod_pregunta,cod_opcion,valor_numero,valor_texto,valor_logico,puntaje,observacion'],
                 'respuestas.*.cod_pregunta' => ['required', 'distinct', 'exists:preguntas_instrumento,cod_pregunta'], 'respuestas.*.cod_opcion' => ['nullable', 'exists:opciones_pregunta,cod_opcion'], 'respuestas.*.valor_numero' => ['nullable', 'numeric', 'between:-99999999.9999,99999999.9999', 'decimal:0,4'], 'respuestas.*.valor_texto' => ['nullable', 'string'], 'respuestas.*.valor_logico' => ['nullable', 'boolean'], 'respuestas.*.puntaje' => ['nullable', 'numeric', 'min:0', 'max:999999.99', 'decimal:0,2'], 'respuestas.*.observacion' => ['nullable', 'string']])->validate();
             $respuestas = $datos['respuestas'];
             abort_unless(array_is_list($respuestas), 422, 'Las respuestas requieren una lista ordenada.');
             unset($datos['respuestas']);
             if (isset($datos['cod_atencion'])) {
-                abort_unless(Atencion::query()->whereKey($datos['cod_atencion'])->where('cod_residente', $residente->cod_residente)->lockForUpdate()->first(), 422, 'La atención no pertenece al residente.');
+                abort_unless($usuario->checkPermissionTo('atenciones.ver', 'web'), 403);
+                Gate::forUser($usuario)->authorize('view', $residente);
+                if (! Atencion::query()->whereKey($datos['cod_atencion'])->where('cod_residente', $residente->cod_residente)->lockForUpdate()->first()) {
+                    throw ValidationException::withMessages(['cod_atencion' => 'Selecciona una atención de este residente o deja la aplicación sin vínculo.']);
+                }
             }
             $preguntas = PreguntaInstrumento::query()->where('cod_instrumento', $instrumento->cod_instrumento)->where('estado', 'ACTIVA')->lockForUpdate()
                 ->with(['opciones' => fn ($query) => $query->where('estado', 'ACTIVO')->lockForUpdate()])->get()->keyBy('cod_pregunta');

@@ -21,6 +21,19 @@
                     <li class="{{ !$confirmando ? 'is-current' : '' }}" @if(!$confirmando) aria-current="step" @endif><span>1</span> Completar captura</li>
                     <li class="{{ $confirmando ? 'is-current' : '' }}" @if($confirmando) aria-current="step" @endif><span>2</span> Revisar y registrar</li>
                 </ol>
+                @if($atencionVista)
+                    <details class="rm-captura__guia break-words" aria-label="Referencia de la atención vinculada">
+                        <summary>Atención vinculada · {{ $atencionVista->fecha_hora?->format('d/m/Y H:i') }}</summary>
+                        <p class="rm-captura__ayuda">Profesional: {{ $atencionVista->personal?->nombres }} {{ $atencionVista->personal?->apellido_paterno }}. Información recabada en esa atención; no acredita por sí sola las condiciones de esta aplicación.</p>
+                        <p class="rm-captura__ayuda">{{ \Illuminate\Support\Str::headline(mb_strtolower($atencionVista->getRawOriginal('tipo_atencion'))) }} · Estado de la atención: {{ \Illuminate\Support\Str::headline(mb_strtolower($atencionVista->estado)) }}</p>
+                        <dl class="rm-captura__guia-grid">
+                            <div><dt>Escolaridad informada en la atención</dt><dd>{{ $atencionVista->escolaridad_anios === null ? 'No registrada' : $atencionVista->escolaridad_anios.' años' }}</dd></div>
+                            <div><dt>Lectura referida</dt><dd>{{ $atencionVista->puede_leer === null ? 'No se conoce' : ($atencionVista->puede_leer ? 'Sí' : 'No') }}</dd></div>
+                            <div><dt>Escritura referida</dt><dd>{{ $atencionVista->puede_escribir === null ? 'No se conoce' : ($atencionVista->puede_escribir ? 'Sí' : 'No') }}</dd></div>
+                        </dl>
+                        <p class="rm-captura__ayuda">Vincular conserva la referencia; no copia estos datos a las respuestas ni ajusta puntuaciones.</p>
+                    </details>
+                @endif
                 @if($confirmando)
                     <div class="rm-captura__revision" wire:key="revision-captura" tabindex="-1" x-init="$nextTick(() => $el.focus({ preventScroll: true }))">
                         <x-ui.form-section title="Revisión de la captura" description="Estos datos todavía no están guardados. Comprueba el original antes de confirmar." :columns="1" icon="ph-checks">
@@ -91,6 +104,32 @@
                             <input id="captura-hora-{{ $this->getId() }}" type="time" step="1" class="rm-input" wire:model="hora_eval" aria-required="true" aria-invalid="{{ $errors->has('hora_eval') ? 'true' : 'false' }}" aria-describedby="captura-hora-{{ $this->getId() }}-help{{ $errors->has('hora_eval') ? ' captura-hora-'.$this->getId().'-error' : '' }}" @disabled($confirmando)>
                         </x-ui.field>
                     </div>
+                        @if($cod_residente)
+                            <details class="rm-captura__guia" aria-label="Vincular una atención existente" @if($cod_atencion || $errors->has('cod_atencion') || $errors->has('fechaAtencion')) open @endif>
+                                <summary>Vincular una atención existente (opcional)</summary>
+                                @if($puedeVerAtenciones)
+                                    <p class="rm-captura__ayuda">Selecciona solo la atención a la que corresponde esta aplicación. Se muestran hasta 100; filtra por fecha para buscar otra.</p>
+                                    <x-ui.field :for="'captura-fecha-atencion-'.$this->getId()" label="Filtrar atenciones por fecha" error="fechaAtencion">
+                                        <x-ui.calendario :id="'captura-fecha-atencion-'.$this->getId()" label="Filtrar atenciones por fecha" wire:model.live="fechaAtencion" teleport="" />
+                                    </x-ui.field>
+                                    <x-ui.field :for="'captura-atencion-'.$this->getId()" label="Atención del residente" error="cod_atencion">
+                                        <x-ui.selector :id="'captura-atencion-'.$this->getId()" label="Atención del residente" wire:model.live="cod_atencion" :aria-invalid="$errors->has('cod_atencion') ? 'true' : 'false'" :aria-describedby="$errors->has('cod_atencion') ? 'captura-atencion-'.$this->getId().'-error' : null" teleport="">
+                                            <option value="">Sin vincular una atención</option>
+                                            @if($atencionVista && !$atenciones->contains('cod_atencion', $cod_atencion))
+                                                <option value="{{ $atencionVista->getKey() }}">{{ $atencionVista->fecha_hora?->format('d/m/Y H:i:s') }} · {{ $atencionVista->personal?->nombres }} {{ $atencionVista->personal?->apellido_paterno }} · {{ \Illuminate\Support\Str::headline(mb_strtolower($atencionVista->getRawOriginal('tipo_atencion'))) }}</option>
+                                            @endif
+                                            @foreach($atenciones as $atencion)
+                                                <option value="{{ $atencion->getKey() }}">{{ $atencion->fecha_hora?->format('d/m/Y H:i:s') }} · {{ $atencion->personal?->nombres }} {{ $atencion->personal?->apellido_paterno }} · {{ \Illuminate\Support\Str::headline(mb_strtolower($atencion->getRawOriginal('tipo_atencion'))) }}</option>
+                                            @endforeach
+                                        </x-ui.selector>
+                                    </x-ui.field>
+                                    @if($atenciones->isEmpty())<p class="rm-captura__ayuda" role="status">No hay atenciones disponibles para este filtro.</p>@endif
+                                    @if($cod_atencion && !$atencionVista)<p class="rm-error" role="alert">La atención seleccionada no está disponible para este residente. Vuelve a seleccionarla.</p>@endif
+                                @else
+                                    <p class="rm-captura__ayuda">Tu cuenta no tiene permiso para consultar atenciones. Puedes registrar la aplicación sin este vínculo.</p>
+                                @endif
+                            </details>
+                        @endif
                         </x-ui.form-section>
                         @if($transcripcion)
                             <x-ui.form-section title="Procedencia del documento" description="Conserva quién realizó el acto y dónde está el original." :columns="1" icon="ph-file-text">
@@ -113,12 +152,12 @@
                         </label>
                         @error('original_cotejado')<p id="captura-cotejo-{{ $this->getId() }}-error" role="alert" class="rm-error">{{ $message }}</p>@enderror
                         <p class="text-sm text-rm-secondary">Conserva el autor y la hora que figuran en el original. Una rectificación añade otra aplicación; no reemplaza la anterior.</p>
-                        <details class="space-y-3" @if($errors->has('cod_atencion') || $errors->has('clasificacion_original') || $errors->has('interpretacion_original')) open @endif>
+                        <details class="space-y-3" @if($errors->has('clasificacion_original') || $errors->has('interpretacion_original')) open @endif>
                             <summary class="cursor-pointer font-semibold">Datos adicionales que figuran en el original</summary>
                             <p class="text-sm text-rm-secondary">Copia estos datos solo si constan en el documento. No representan una conclusión nueva del sistema.</p>
-                            @foreach(['cod_atencion' => 'Código de la atención original, si consta', 'clasificacion_original' => 'Clasificación consignada en el original'] as $campo => $etiqueta)
+                            @foreach(['clasificacion_original' => 'Clasificación consignada en el original'] as $campo => $etiqueta)
                                 <x-ui.field :for="'captura-'.$campo.'-'.$this->getId()" :label="$etiqueta" :error="$campo">
-                                    <input id="captura-{{ $campo }}-{{ $this->getId() }}" class="rm-input" type="text" wire:model="{{ $campo }}" maxlength="{{ $campo === 'cod_atencion' ? 20 : 80 }}" aria-invalid="{{ $errors->has($campo) ? 'true' : 'false' }}" @if($errors->has($campo)) aria-describedby="captura-{{ $campo }}-{{ $this->getId() }}-error" @endif @disabled($confirmando)>
+                                    <input id="captura-{{ $campo }}-{{ $this->getId() }}" class="rm-input" type="text" wire:model="{{ $campo }}" maxlength="80" aria-invalid="{{ $errors->has($campo) ? 'true' : 'false' }}" @if($errors->has($campo)) aria-describedby="captura-{{ $campo }}-{{ $this->getId() }}-error" @endif @disabled($confirmando)>
                                 </x-ui.field>
                             @endforeach
                             <x-ui.field :for="'captura-interpretacion-'.$this->getId()" label="Interpretación consignada en el original" error="interpretacion_original">

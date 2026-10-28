@@ -82,6 +82,8 @@ abstract class CapturaInstrumentalModal extends Component
 
     public ?string $cod_atencion = null;
 
+    public string $fechaAtencion = '';
+
     public string $clasificacion_original = '';
 
     public string $interpretacion_original = '';
@@ -122,7 +124,7 @@ abstract class CapturaInstrumentalModal extends Component
         $contexto = $codigoResidente !== null ? $consulta->contexto(auth()->user(), $codigoResidente) : [];
         $this->reset(['cod_instrumento', 'instrumentoSeleccionado', 'codigoReservado', 'aplicacionGuardada', 'valores', 'preguntas', 'vinculoMetodo',
             'puntajesOriginales', 'observacionesRespuesta', 'cod_atencion', 'clasificacion_original', 'interpretacion_original',
-            'observaciones', 'confirmando', 'confirmarDescarte', 'busquedaResidente', 'huellaCatalogo', 'huellaConfirmacion',
+            'observaciones', 'confirmando', 'confirmarDescarte', 'busquedaResidente', 'fechaAtencion', 'huellaCatalogo', 'huellaConfirmacion',
             'transcripcion', 'cod_documento_clinico', 'cod_personal_original', 'localizador_fuente', 'original_cotejado', 'cod_aplicacion_anterior', 'cod_aplicacion_existente', 'motivo_rectificacion', 'estadoConciliacion']);
         $this->resetValidation();
         $this->cod_residente = $this->residenteSeleccionado = $codigoResidente;
@@ -147,12 +149,12 @@ abstract class CapturaInstrumentalModal extends Component
         app(PrepararCapturaInstrumental::class)->usuario(auth()->user());
         $this->contexto = $value ? app(PrepararCapturaInstrumental::class)->contexto(auth()->user(), $value) : [];
         $this->residenteSeleccionado = $value;
-        $this->reset(['cod_instrumento', 'instrumentoSeleccionado', 'preguntas', 'vinculoMetodo', 'confirmando']);
+        $this->reset(['cod_instrumento', 'instrumentoSeleccionado', 'preguntas', 'vinculoMetodo', 'confirmando', 'cod_atencion', 'fechaAtencion']);
     }
 
     public function updatedCodInstrumento(?string $value): void
     {
-        if ($this->hayRespuestas()) {
+        if ($this->instrumentoSeleccionado !== null && $this->hayRespuestas()) {
             $this->cod_instrumento = $this->instrumentoSeleccionado;
             $this->addError('cod_instrumento', 'Descarta o registra las respuestas antes de cambiar de instrumento.');
 
@@ -288,7 +290,10 @@ abstract class CapturaInstrumentalModal extends Component
     {
         $this->comprobarResidente();
         $this->validate(['cod_instrumento' => 'required|string', 'fecha_eval' => 'required|date_format:Y-m-d|before_or_equal:today',
-            'hora_eval' => 'required|date_format:H:i:s,H:i', 'observaciones' => 'nullable|string|max:4000', 'valores' => 'array']);
+            'hora_eval' => 'required|date_format:H:i:s,H:i', 'observaciones' => 'nullable|string|max:4000', 'valores' => 'array', 'cod_atencion' => 'nullable|string|max:20']);
+        if (filled($this->cod_atencion) && ! app(PrepararCapturaInstrumental::class)->atencion(auth()->user(), $this->cod_residente, $this->cod_atencion)) {
+            throw ValidationException::withMessages(['cod_atencion' => 'Selecciona una atención de este residente o deja la aplicación sin vínculo.']);
+        }
         if ($this->transcripcion) {
             $this->validate(['puntajesOriginales' => 'array', 'puntajesOriginales.*' => 'nullable|numeric|min:0|max:999999.99|decimal:0,2',
                 'observacionesRespuesta' => 'array', 'observacionesRespuesta.*' => 'nullable|string|max:4000',
@@ -342,10 +347,10 @@ abstract class CapturaInstrumentalModal extends Component
             throw ValidationException::withMessages(['registro' => 'Registra al menos una respuesta original. Las preguntas sin dato se mantienen sin respuesta.']);
         }
 
-        return ['fecha_hora' => $fechaOriginal,
+        return ['fecha_hora' => $fechaOriginal, 'cod_atencion' => $this->cod_atencion ?: null,
             'observacion' => $this->observaciones === '' ? null : $this->observaciones, 'respuestas' => $respuestas]
             + ($this->transcripcion ? ['cod_documento_clinico' => $this->cod_documento_clinico, 'cod_personal_original' => $this->cod_personal_original,
-                'cod_atencion' => $this->cod_atencion ?: null, 'clasificacion' => $this->clasificacion_original === '' ? null : $this->clasificacion_original,
+                'clasificacion' => $this->clasificacion_original === '' ? null : $this->clasificacion_original,
                 'interpretacion' => $this->interpretacion_original === '' ? null : $this->interpretacion_original,
                 'localizador_fuente' => $this->localizador_fuente, 'original_cotejado' => $this->original_cotejado,
                 'cod_aplicacion_existente' => $this->cod_aplicacion_existente ?: null,
@@ -386,11 +391,24 @@ abstract class CapturaInstrumentalModal extends Component
     public function render()
     {
         $consulta = app(PrepararCapturaInstrumental::class);
-        $instrumentos = $residentes = $documentos = collect();
+        $instrumentos = $residentes = $documentos = $atenciones = collect();
+        $atencionVista = null;
+        $puedeVerAtenciones = false;
         if ($this->mostrar) {
             $instrumentos = $consulta->instrumentos(auth()->user());
             if ($this->cod_residente !== null) {
                 $this->comprobarResidente();
+                $puedeVerAtenciones = auth()->user()->checkPermissionTo('atenciones.ver', 'web');
+                if ($puedeVerAtenciones) {
+                    try {
+                        $atenciones = $consulta->atenciones(auth()->user(), $this->cod_residente, $this->fechaAtencion);
+                    } catch (ValidationException $e) {
+                        foreach ($e->errors() as $campo => $mensajes) {
+                            $this->addError($campo, implode(' ', $mensajes));
+                        }
+                    }
+                    $atencionVista = filled($this->cod_atencion) ? $consulta->atencion(auth()->user(), $this->cod_residente, $this->cod_atencion) : null;
+                }
                 if ($this->transcripcion) {
                     $documentos = $consulta->fuentesTranscripcion(auth()->user(), $this->cod_residente);
                 }
@@ -425,6 +443,6 @@ abstract class CapturaInstrumentalModal extends Component
             'total' => count($respuestasVista), 'respondidas' => count(array_filter($respuestasVista, fn ($r) => $r['registrada'])),
             'respuestas' => $respuestasVista];
 
-        return view('livewire.valoraciones.evaluacion-geriatrica-modal', compact('instrumentos', 'residentes', 'documentos', 'resumenCaptura'));
+        return view('livewire.valoraciones.evaluacion-geriatrica-modal', compact('instrumentos', 'residentes', 'documentos', 'resumenCaptura', 'atenciones', 'atencionVista', 'puedeVerAtenciones'));
     }
 }
