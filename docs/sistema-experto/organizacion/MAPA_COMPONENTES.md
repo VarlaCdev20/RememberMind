@@ -1,7 +1,7 @@
 ---
 title: "Mapa único de componentes del sistema experto"
 status: CURRENT
-version: "1.1"
+version: "1.2"
 last_reviewed: 2026-10-27
 owner: ApoyoDecision
 source_of_truth: false
@@ -12,6 +12,8 @@ runtime_verified: false
 # Mapa único del sistema experto
 
 Entrada: [portal del experto](../README.md). Este mapa organiza la implementación existente para detección temprana de DCL en personas mayores de 60 años. No crea otro motor, cambia reglas, traslada historia ni renombra identificadores.
+
+La [estructura adoptada según el diagrama de la propietaria](ESTRUCTURA_POR_COMPONENTES.md) define los ocho componentes y su orden funcional. Este archivo conserva el índice técnico de sus implementaciones.
 
 ## 1. Dónde buscar cada parte
 
@@ -31,14 +33,21 @@ Entrada: [portal del experto](../README.md). Este mapa organiza la implementaci�
 
 ```mermaid
 flowchart TD
-    A[Captura original en Valoraciones y Cuidados] --> B[Lectura autorizada en ApoyoDecision]
-    B --> C[Hechos de la evaluación]
-    D[Versión de conocimiento en BDD] --> E[Conceptos, relaciones y reglas]
-    C --> F[Evaluadores puros de motor-experto]
-    E --> F
-    F --> G[Resultado o abstención y explicación]
-    G --> H[Preparación conjunta en memoria]
-    H --> I[Pendiente: conservación y recuperación institucional completas]
+    originales["Registros originales"] --> validacion["Validación"]
+    validacion --> hechos["Hechos del caso"]
+
+    subgraph conocimiento["Base de conocimiento"]
+        red["Red semántica"]
+        reglas["Reglas versionadas"]
+    end
+
+    red --> motor["Motor de inferencia"]
+    reglas --> motor
+    hechos --> motor
+    motor --> resultado["Resultado o abstención"]
+    motor --> explicacion["Explicación y faltantes"]
+    resultado --> conservacion["Conservación y revisión profesional"]
+    explicacion --> conservacion
 ```
 
 La reproducción de un DTO verificado en memoria no prueba su guardado relacional, cierre histórico o revisión profesional posterior.

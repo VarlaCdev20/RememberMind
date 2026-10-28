@@ -1,8 +1,8 @@
 ---
 title: "Responsabilidad funcional — ApoyoDecision"
 status: CURRENT
-version: "2.0"
-last_reviewed: 2026-10-25
+version: "2.1"
+last_reviewed: 2026-10-27
 owner: RememberMind
 source_of_truth: false
 source_of_truth_scope: [module_responsibility]
@@ -13,7 +13,7 @@ runtime_verified: false
 
 # ApoyoDecision
 
-[Entrada única del experto](../../../docs/sistema-experto/README.md): mapa de componentes, matriz de datos, instrumentos candidatos e inventario instalado. El [mapa de código](../../../docs/sistema-experto/organizacion/MAPA_COMPONENTES.md) distingue el recorrido institucional del piloto y el laboratorio sin trasladar clases ni alterar reglas.
+[Entrada única del experto](../../../docs/sistema-experto/README.md): mapa de componentes, matriz de datos, instrumentos candidatos e inventario instalado. La [estructura por componentes adoptada el 27/10/2026](../../../docs/sistema-experto/organizacion/ESTRUCTURA_POR_COMPONENTES.md) sigue el diagrama de la propietaria; el [mapa de código](../../../docs/sistema-experto/organizacion/MAPA_COMPONENTES.md) localiza sus implementaciones. El laboratorio fue retirado del circuito operativo.
 
 **Revisión documental: 25/10/2026.** Esta compilación localiza responsabilidades y comportamiento exigido por contratos existentes; no crea permisos, estados, umbrales o estructura. Las fuentes específicas prevalecen. Documentar el recorrido no significa que todos sus pasos hayan superado aceptación.
 
