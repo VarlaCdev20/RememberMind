@@ -72,6 +72,10 @@ test('captura propia: revisión, entrevista y cinco tamaños', { skip: process.e
     await page.click('.rm-modal-shell.is-open button[id^="captura-valor-"]');
     await clickText('.rm-choice__popover [role="option"]', 'No');
     await page.waitForFunction(() => document.querySelector('.rm-captura__pie-ayuda')?.innerText.includes('1 de 1'));
+    await page.focus('.rm-captura__modal .rm-captura__guia summary');
+    await page.keyboard.press('Enter');
+    assert.match(await page.$eval('.rm-captura__modal .rm-captura__guia', element => element.innerText), /Escolaridad sintética de referencia/);
+    assert.match(await page.$eval('.rm-captura__modal .rm-captura__guia', element => element.innerText), /no indica los años cursados/);
     const matrix = [];
     for (const width of [1440, 1280, 1024, 768, 390]) {
         await resize(width);
@@ -83,6 +87,8 @@ test('captura propia: revisión, entrevista y cinco tamaños', { skip: process.e
         assert.ok(dimensions.left >= -1 && dimensions.right <= width + 1 && dimensions.overflow <= 1, JSON.stringify({ width, ...dimensions }));
         matrix.push({ surface: 'captura', width, ...dimensions });
         await page.screenshot({ path: path.join(evidence, `captura-${width}.png`), fullPage: true });
+        await page.$eval('.rm-captura__modal .rm-captura__guia', element => element.scrollIntoView({ block: 'start' }));
+        await page.screenshot({ path: path.join(evidence, `guia-captura-${width}.png`), fullPage: true });
     }
     assert.ok(await page.$eval('textarea[id^=captura-observaciones-]', element => element.getBoundingClientRect().height >= 80), 'Observaciones con espacio multilínea');
     await clickText('.rm-captura__acciones button', 'Revisar captura');
@@ -128,6 +134,9 @@ test('captura propia: revisión, entrevista y cinco tamaños', { skip: process.e
     await page.waitForFunction(() => document.querySelector('#sesion-tipo').innerText.includes('Entrevista con informante familiar'));
     await page.type('#sesion-motivo', 'Entrevista de seguimiento sintética');
     await page.type('#sesion-notas', 'Relato del informante sintético, diferenciado de la observación directa.');
+    await page.focus('#sesion-guia-contexto summary');
+    await page.keyboard.press('Enter');
+    assert.match(await page.$eval('#sesion-guia-contexto', element => element.innerText), /Escolaridad sintética de referencia/);
     for (const width of [1440, 1280, 1024, 768, 390]) {
         await resize(width);
         const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
@@ -135,6 +144,8 @@ test('captura propia: revisión, entrevista y cinco tamaños', { skip: process.e
         matrix.push({ surface: 'entrevista', width, overflow });
         await page.$eval('#sesion-motivo', element => element.scrollIntoView({ block: 'center' }));
         await page.screenshot({ path: path.join(evidence, `entrevista-${width}.png`), fullPage: false });
+        await page.$eval('#sesion-guia-contexto', element => element.scrollIntoView({ block: 'start' }));
+        await page.screenshot({ path: path.join(evidence, `guia-entrevista-${width}.png`), fullPage: false });
     }
     await page.$eval('#sesion-guia-contexto', element => element.open = true);
     assert.match(await page.$eval('#sesion-guia-contexto', element => element.innerText), /Cambio y evolución/);

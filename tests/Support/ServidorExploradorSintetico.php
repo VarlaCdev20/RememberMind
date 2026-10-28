@@ -83,7 +83,7 @@ if ($preparar) {
     $turno = Turno::create(['nombre' => 'Turno sintético', 'hora_inicio' => '00:00', 'hora_cierre' => '23:59', 'orden' => 1, 'estado' => 'ACTIVO']);
     $jornada = Jornada::create(['cod_turno' => $turno->getKey(), 'fecha_jornada' => today(), 'estado' => 'ABIERTA']);
     AsignacionPersonal::create(['cod_personal' => $personal->getKey(), 'cod_jornada' => $jornada->getKey(), 'cod_area' => 'ARE_COG', 'fecha_asignacion' => now(), 'estado' => 'ACTIVA']);
-    Residente::factory()->create(['cod_residente' => 'RES_E2E_GUIA', 'nombres' => 'Residente sintético', 'apellido_paterno' => 'Explorador', 'apellido_materno' => 'Verificación', 'estado' => 'ADMITIDO']);
+    Residente::factory()->create(['cod_residente' => 'RES_E2E_GUIA', 'nombres' => 'Residente sintético', 'apellido_paterno' => 'Explorador', 'apellido_materno' => 'Verificación', 'estado' => 'ADMITIDO', 'nivel_educativo' => 'Escolaridad sintética de referencia']);
     foreach (['OBS' => ['OBSERVACIONAL', 'ACTIVO'], 'FUN' => ['FUNCIONAL', 'ACTIVO'], 'HIS' => ['COGNITIVO', 'INACTIVO']] as $codigo => [$tipo, $estado]) {
         $instrumento = Instrumento::create(['cod_instrumento' => 'E2E_'.$codigo, 'codigo' => 'SINTETICO-'.$codigo, 'nombre' => $codigo === 'FUN' ? 'Registro funcional sintético' : 'Registro de observación sintético '.$codigo, 'version' => 'QA-UI-1', 'descripcion' => 'Contenido artificial para comprobar la interfaz. No es una escala clínica.', 'tipo' => $tipo, 'estado' => $estado]);
         if ($estado === 'ACTIVO') {

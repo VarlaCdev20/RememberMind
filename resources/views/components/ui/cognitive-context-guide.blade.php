@@ -1,14 +1,18 @@
-@props(['id'])
+@props(['id', 'nivelEducativo' => null])
 
 <details {{ $attributes->class(['rm-captura__guia']) }} id="{{ $id }}">
     <summary><i class="ph-bold ph-notebook" aria-hidden="true"></i> Guía para documentar el contexto</summary>
     <p class="rm-captura__ayuda">Incluye solo información disponible y pertinente para tu valoración. Distingue el relato del residente, el del informante y lo observado directamente.</p>
+    <p class="rm-captura__ayuda"><strong>Escolaridad general del expediente:</strong> {{ filled($nivelEducativo) ? $nivelEducativo : 'No registrada' }}.</p>
+    <p class="rm-captura__ayuda">Es una referencia actual de admisión; no indica los años cursados ni acredita la capacidad para leer o escribir en la fecha de esta evaluación.</p>
     <dl class="rm-captura__guia-grid">
         <div><dt>Cambio y evolución</dt><dd>Qué cambió respecto al nivel previo, desde cuándo y quién aporta la información.</dd></div>
         <div><dt>Vida cotidiana</dt><dd>Dificultades, apoyos y oportunidades reales para realizar las actividades.</dd></div>
         <div><dt>Ánimo y conducta</dt><dd>Cambios relevantes descritos u observados, con sus circunstancias.</dd></div>
-        <div><dt>Condiciones de evaluación</dt><dd>Idioma, escolaridad y dificultades sensoriales o motoras conocidas que puedan influir.</dd></div>
+        <div><dt>Idioma y comunicación</dt><dd>Idioma utilizado y dificultades para comprender o expresarse, si se conocen. Indica si se necesitó apoyo para comunicarse.</dd></div>
+        <div><dt>Fuente del relato</dt><dd>Si otra persona aporta información, describe su relación con el residente y si conoce cómo se desenvolvía antes. No presupongas que el contacto responsable participó en la entrevista.</dd></div>
+        <div><dt>Condiciones de evaluación</dt><dd>Años cursados, capacidad para leer o escribir y dificultades sensoriales o motoras, solo cuando se conocen. Distingue lo referido de lo observado.</dd></div>
     </dl>
-    <p class="rm-captura__ayuda">Si no se conoce un dato, indícalo. Esta guía organiza el relato; no es una prueba ni genera una puntuación.</p>
+    <p class="rm-captura__ayuda">Si no se conoce un dato, indícalo. Esta guía organiza el relato; no es una prueba ni genera una puntuación. Las notas no se utilizan para ajustar automáticamente la puntuación de una prueba.</p>
     <p class="rm-captura__fuentes">Fundamento: <a href="https://alz-journals.onlinelibrary.wiley.com/doi/10.1002/alz.14333" target="_blank" rel="noopener noreferrer">Alzheimer’s Association, DETeCD-ADRD</a> y <a href="https://www.nice.org.uk/guidance/ng97/chapter/Recommendations" target="_blank" rel="noopener noreferrer">NICE NG97</a>.</p>
 </details>

@@ -1,7 +1,7 @@
 ---
 title: "Formularios propios de captura cognitiva y entrevista"
 status: CURRENT
-version: "1.0"
+version: "1.1"
 last_reviewed: 2026-10-28
 owner: Valoraciones
 source_of_truth: false
@@ -47,6 +47,20 @@ Sin DDL, migraciones, permisos nuevos, cambios de catálogo, reglas de inferenci
 - Evidencia local no versionada: `output/captura-clinica-20261028/` y su `verificacion.json`.
 
 El E2E reutiliza el servidor privado de pruebas y SQLite desechable, con ruta opt-in y token. No agrega rutas públicas, residentes de demostración ni simulaciones al sistema operativo. La versión sintética del fixture deja de contener el marcador de catálogo retirado «TEST»; los datos siguen identificados como sintéticos y aislados. Ejecución: `RM_CAPTURA_E2E=1 node --test tests/Frontend/captura-clinica-e2e.test.js` (establecer la variable según la shell).
+
+## Contexto sin ampliar el esquema — actualización del 28/10/2026
+
+La propietaria respondió «Mantener la BDD actual» a la [ampliación propuesta](../base-de-datos/PROPUESTA_CONTEXTO_ATENCION_COGNITIVA_2026_10_28.md). No se implementó el DDL. La guía compartida muestra `residentes.nivel_educativo` como escolaridad general actual de admisión, con ausencia explícita y sin convertirla a años ni acreditar lectoescritura en una fecha pasada. La captura instrumental la recibe después de la autorización existente; la entrevista reutiliza el residente ya autorizado. No se consulta ni ofrece un contacto adicional.
+
+Se separan idioma/comunicación, fuente del relato y condiciones conocidas. No se añaden controles que parezcan persistir esos datos, requisitos clínicos, parsers de narrativa o ajustes de puntuación. Las observaciones conservan su flujo y contenido original. Las dos entradas instrumentales y la entrevista comparten el mismo componente y sus estilos adaptativos existentes.
+
+### Verificación de esta actualización
+
+- `php artisan test --compact tests/Feature/CapturaInstrumentalFormularioTest.php tests/Feature/FichaPsicologicaResidenteTest.php`: **60 pruebas, 407 aserciones**, SQLite en memoria. Incluye escolaridad presente/ausente, ambas entradas instrumentales, lectura sin modificar el expediente y relato original conservado sin crear una aplicación ni un juicio Petersen.
+- `RM_CAPTURA_E2E=1 node --test tests/Frontend/captura-clinica-e2e.test.js`: **1 recorrido correcto**, repetido tras añadir evidencia de la guía abierta. Teclado para desplegarla, edición/revisión/confirmación, guardado instrumental y de entrevista, cinco anchos, sin desbordamiento horizontal ni errores JavaScript. Se inspeccionaron las capturas actuales de la guía en ambos formularios a 1440, 1280, 1024, 768 y 390 px. **PASS acotado a la guía y estos recorridos**, tema claro; no es aceptación global del producto ni de la barra lateral.
+- `npm run build`: correcto, con el aviso existente de chunks superiores a 500 kB.
+- Sin cambios de estructura, relaciones, permisos, catálogos, inferencia ni datos institucionales. No se repitió PostgreSQL: la actualización añade una referencia de lectura y ayudas; no cambia las escrituras, transacciones o bloqueos. Las pruebas de backend y navegador usan bases aisladas.
+- La propuesta de seis campos se conserva como antecedente **rechazado**, y la matriz mantiene D02/D03/D06 parciales. No se enviaron correos ni se añadieron dependencias o nombres de dominio V1.
 
 ## Límites pendientes
 

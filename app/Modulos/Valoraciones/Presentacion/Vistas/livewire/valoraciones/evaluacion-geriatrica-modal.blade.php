@@ -175,7 +175,7 @@
                     <x-ui.field :for="'captura-observaciones-'.$this->getId()" label="Observaciones de la aplicación" error="observaciones">
                         <textarea id="captura-observaciones-{{ $this->getId() }}" rows="4" class="rm-textarea" maxlength="4000" wire:model="observaciones" aria-invalid="{{ $errors->has('observaciones') ? 'true' : 'false' }}" @if($errors->has('observaciones')) aria-describedby="captura-observaciones-{{ $this->getId() }}-error" @endif @disabled($confirmando)></textarea>
                     </x-ui.field>
-                            <x-ui.cognitive-context-guide :id="'captura-guia-'.$this->getId()" />
+                            <x-ui.cognitive-context-guide :id="'captura-guia-'.$this->getId()" :nivel-educativo="$contexto['nivel_educativo'] ?? null" />
                         </x-ui.form-section>
                     @if($cod_instrumento && $vinculoMetodo !== [])
                         <details class="rm-captura__guia"><summary>Alcance de la interpretación</summary>

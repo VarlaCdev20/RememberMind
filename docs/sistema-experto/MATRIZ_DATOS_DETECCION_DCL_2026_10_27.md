@@ -1,8 +1,8 @@
 ---
 title: "Detección temprana de DCL: ficha y matriz de datos"
 status: DRAFT
-version: "0.1"
-last_reviewed: 2026-10-27
+version: "0.2"
+last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: false
 verification_scope: STATIC_SOURCE_AND_CODE_REVIEW
@@ -48,6 +48,8 @@ Conflictos resueltos o delimitados:
 Los estados pertenecen a esta matriz de auditoría; no son nuevos catálogos de la aplicación.
 
 ## 4. Matriz: contexto, cambio y fuentes personales
+
+**Decisión posterior del 28/10/2026:** la propietaria eligió [mantener la BDD actual](../base-de-datos/PROPUESTA_CONTEXTO_ATENCION_COGNITIVA_2026_10_28.md) frente a seis campos de contexto en `atenciones`. La captura instrumental y la entrevista muestran la escolaridad general del expediente como referencia de solo lectura. La guía orienta las observaciones existentes, sin tratarlas como campos estructurados ni hechos extraídos. Esta mejora no cierra D02/D03/D06, no activa correcciones educativas ni elige un informante automáticamente.
 
 | ID / dato necesario | Captura y fuente localizada | Conservación y consumidor | Estado | Trabajo siguiente |
 |---|---|---|---|---|

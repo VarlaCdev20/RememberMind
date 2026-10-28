@@ -226,6 +226,39 @@ final class FichaPsicologicaResidenteTest extends TestCase
         self::assertDatabaseCount('valoraciones_psicologicas', 0);
     }
 
+    public function test_entrevista_muestra_referencia_educativa_sin_modificar_el_expediente(): void
+    {
+        $this->residente->update(['nivel_educativo' => 'Secundaria incompleta']);
+        $antes = $this->residente->fresh()->getAttributes();
+        $this->actingAs($this->psicologo);
+
+        Livewire::test(FichaPsicologicaResidente::class, ['residente' => $this->residente])
+            ->call('cambiarTab', 'sesiones')->set('mostrarFormSesion', true)
+            ->assertSee('Escolaridad general del expediente:')->assertSee('Secundaria incompleta')
+            ->assertSee('no indica los años cursados')
+            ->assertSee('Idioma y comunicación')->assertSee('Fuente del relato');
+
+        self::assertSame($antes, $this->residente->fresh()->getAttributes());
+        self::assertDatabaseCount('atenciones', 0);
+    }
+
+    public function test_entrevista_sin_escolaridad_conserva_la_ausencia_y_el_relato_original(): void
+    {
+        $this->residente->update(['nivel_educativo' => null]);
+        $this->actingAs($this->psicologo);
+        $relato = 'Idioma referido: español. No se conoce el nivel previo; no participó un informante.';
+
+        Livewire::test(FichaPsicologicaResidente::class, ['residente' => $this->residente])
+            ->call('cambiarTab', 'sesiones')->set('mostrarFormSesion', true)->assertSee('No registrada')
+            ->set('formSesion.tipo_atencion', 'SEGUIMIENTO')->set('formSesion.motivo', 'Entrevista sintética')
+            ->set('formSesion.observacion', $relato)->call('guardarSesion')->assertHasNoErrors();
+
+        self::assertNull($this->residente->fresh()->nivel_educativo);
+        self::assertDatabaseHas('atenciones', ['cod_residente' => $this->residente->getKey(), 'observacion' => $relato]);
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+        self::assertDatabaseCount('valoraciones_petersen_originales', 0);
+    }
+
     public function test_psicologo_puede_registrar_sesion_de_atencion(): void
     {
         $this->actingAs($this->psicologo);

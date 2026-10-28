@@ -67,7 +67,8 @@ final readonly class PrepararCapturaInstrumental
             'aplicaciones_instrumento.crear', AplicarInstrumento::ROLES_APLICADORES);
 
         return ['residente' => trim(implode(' ', [$residente->nombres, $residente->apellido_paterno, $residente->apellido_materno])),
-            'profesional' => trim(implode(' ', [$personal->nombres, $personal->apellido_paterno, $personal->apellido_materno]))];
+            'profesional' => trim(implode(' ', [$personal->nombres, $personal->apellido_paterno, $personal->apellido_materno])),
+            'nivel_educativo' => $residente->nivel_educativo];
     }
 
     public function instrumentos(?User $usuario): Collection

@@ -83,6 +83,35 @@ final class CapturaInstrumentalFormularioTest extends TestCase
             : Livewire::test(EvaluacionGeriatricaModal::class, ['cod_residente' => $this->residente->getKey()])->call('abrir', $this->residente->getKey());
     }
 
+    public function test_contexto_muestra_escolaridad_de_referencia_sin_inferir_anios_ni_guardar_registros(): void
+    {
+        $this->residente->update(['nivel_educativo' => 'Primaria incompleta']);
+        $antes = $this->residente->fresh()->getAttributes();
+
+        foreach ([false, true] as $area) {
+            $this->abrir($area)->set('cod_instrumento', $this->instrumento->getKey())
+                ->assertSet('contexto.nivel_educativo', 'Primaria incompleta')
+                ->assertSee('Escolaridad general del expediente:')
+                ->assertSee('Primaria incompleta')
+                ->assertSee('no indica los años cursados')
+                ->assertSee('Idioma y comunicación')->assertSee('Fuente del relato');
+        }
+
+        self::assertSame($antes, $this->residente->fresh()->getAttributes());
+        self::assertDatabaseCount('atenciones', 0);
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+    }
+
+    public function test_escolaridad_ausente_se_muestra_desconocida_en_la_captura(): void
+    {
+        $this->residente->update(['nivel_educativo' => null]);
+
+        $this->abrir()->set('cod_instrumento', $this->instrumento->getKey())
+            ->assertSet('contexto.nivel_educativo', null)->assertSee('No registrada');
+        self::assertNull($this->residente->fresh()->nivel_educativo);
+        self::assertDatabaseCount('aplicaciones_instrumento', 0);
+    }
+
     public function test_areas_no_mezclan_catalogos_y_un_instrumento_historico_no_se_ofrece_para_aplicar(): void
     {
         Instrumento::create(['codigo' => 'BARTHEL_100', 'nombre' => 'Barthel sintético', 'tipo' => 'FUNCIONAL', 'estado' => 'ACTIVO']);

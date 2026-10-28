@@ -852,7 +852,7 @@
                                 <x-ui.field for="sesion-notas" label="Notas de la entrevista o sesión" error="formSesion.observacion" help="Hasta 1000 caracteres. Puedes incluir la fuente del relato, cambios descritos, respuesta del residente y acuerdos.">
                                     <textarea id="sesion-notas" wire:model="formSesion.observacion" rows="5" maxlength="1000" class="rm-textarea w-full" aria-describedby="sesion-notas-help{{ $errors->has('formSesion.observacion') ? ' sesion-notas-error' : '' }}" aria-invalid="{{ $errors->has('formSesion.observacion') ? 'true' : 'false' }}"></textarea>
                                 </x-ui.field>
-                                <x-ui.cognitive-context-guide id="sesion-guia-contexto" />
+                                <x-ui.cognitive-context-guide id="sesion-guia-contexto" :nivel-educativo="$residente->nivel_educativo" />
                             </x-ui.form-section>
                             <div class="rm-captura__acciones">
                                 <button type="button" wire:click="$set('mostrarFormSesion', false)" class="rm-btn rm-btn-secondary" wire:loading.attr="disabled" wire:target="guardarSesion">Cerrar formulario</button>
