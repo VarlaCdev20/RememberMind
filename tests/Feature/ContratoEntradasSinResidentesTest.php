@@ -28,6 +28,7 @@ final class ContratoEntradasSinResidentesTest extends TestCase
         });
         $r = InventarioExperto::entradas(DB::connection());
         $capturando = false;
+        self::assertSame(ContratoFuentesPetersen::mapa(), $r['mapa_fuente_a_criterio']);
         self::assertFalse($r['requiere_residentes']);
         self::assertFalse($r['certifica_preparacion_clinica']);
         self::assertSame(array_keys(ContratoFuentesPetersen::FUENTES), array_keys($r['soportes_admitidos']));

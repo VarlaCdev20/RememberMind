@@ -55,8 +55,7 @@ final class CapturaPetersenPanel extends Component
         'COG-LEN' => 'Lenguaje', 'COG-VIS' => 'Función visuoespacial', 'C01' => 'Cambio corroborado',
         'C03' => 'Independencia instrumental relativa', 'C04' => 'Evaluación diferencial', 'C05' => 'Calidad e interpretabilidad del conjunto'];
 
-    public const TIPOS = ['MEDICION' => 'Medición original', 'HISTORIA_PREVIA' => 'Funcionamiento previo', 'CORROBORACION' => 'Corroboración',
-        'IADL' => 'Actividad instrumental', 'DIFERENCIAL' => 'Revisión diferencial', 'CALIDAD' => 'Condiciones y calidad', 'DOMINIO_REVISADO' => 'Valoración de dominio revisada'];
+    public const TIPOS = \App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratoFuentesPetersen::TIPOS_SOPORTE;
 
     public function mount(Residente $residente): void
     {

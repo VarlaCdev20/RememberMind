@@ -92,7 +92,7 @@ final class InventarioExperto
         }
 
         return ['alcance' => 'ESTRUCTURA_DE_ENTRADAS_SIN_DATOS_CLINICOS', 'requiere_residentes' => false,
-            'certifica_preparacion_clinica' => false, 'soportes_admitidos' => $soportes, 'captura_original' => $captura];
+            'certifica_preparacion_clinica' => false, 'mapa_fuente_a_criterio' => ContratoFuentesPetersen::mapa(), 'soportes_admitidos' => $soportes, 'captura_original' => $captura];
     }
 
     /** Informa faltantes sin intentar crear, migrar o completar la estructura. */

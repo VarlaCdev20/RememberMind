@@ -12,10 +12,15 @@ use App\Models\Diagnostico;
 use App\Models\DocumentoClinico;
 use App\Models\ValoracionPetersenOriginal;
 use App\Models\ValoracionPsicologica;
+use MotorExperto\dominio\petersen\EvaluarPetersenInstitucional;
+use MotorExperto\dominio\petersen\ValoracionOriginalPetersen;
 
 /** Matriz cerrada de fuentes del diccionario aprobado; ningún código recibido selecciona una tabla arbitraria. */
 final class ContratoFuentesPetersen
 {
+    public const TIPOS_SOPORTE = ['MEDICION' => 'Medición original', 'HISTORIA_PREVIA' => 'Funcionamiento previo', 'CORROBORACION' => 'Corroboración',
+        'IADL' => 'Actividad instrumental', 'DIFERENCIAL' => 'Revisión diferencial', 'CALIDAD' => 'Condiciones y calidad', 'DOMINIO_REVISADO' => 'Valoración de dominio revisada'];
+
     public const FUENTES = [
         'cod_aplicacion' => [AplicacionInstrumento::class, 'aplicaciones_instrumento.ver'],
         'cod_control_cognitivo' => [ControlCognitivo::class, 'controles_cognitivos.ver'],
@@ -26,6 +31,31 @@ final class ContratoFuentesPetersen
         'cod_documento_clinico' => [DocumentoClinico::class, 'documentos_clinicos.ver'],
         'cod_valoracion_revisada' => [ValoracionPetersenOriginal::class, 'valoraciones_petersen.ver'],
     ];
+
+    /** Mapa del contrato existente, sin consultas, nuevas fuentes o valoraciones clínicas. */
+    public static function mapa(): array
+    {
+        $mapa = [];
+        $elementos = [...EvaluarPetersenInstitucional::DOMINIOS,
+            ...array_diff(array_keys(ValoracionOriginalPetersen::COMPROBACIONES), ['DOMINIO'])];
+        foreach ($elementos as $elemento) {
+            $tipos = [];
+            foreach (self::TIPOS_SOPORTE as $tipo => $nombre) {
+                $fuentes = self::admitidas($elemento, $tipo);
+                if ($fuentes !== []) {
+                    $tipos[$tipo] = ['nombre' => $nombre, 'fuentes_admitidas' => $fuentes];
+                }
+            }
+            $esDominio = in_array($elemento, EvaluarPetersenInstitucional::DOMINIOS, true);
+            $mapa[$elemento] = ['origen' => 'VALORACION_ORIGINAL_CON_SOPORTES',
+                'comprobaciones' => ValoracionOriginalPetersen::COMPROBACIONES[$esDominio ? 'DOMINIO' : $elemento],
+                'soportes' => $tipos];
+        }
+        $mapa['C02'] = ['origen' => 'DERIVADO_DE_DOMINIOS',
+            'derivado_de' => EvaluarPetersenInstitucional::DOMINIOS, 'comprobaciones' => [], 'soportes' => []];
+
+        return $mapa;
+    }
 
     public static function admitidas(string $elemento, string $tipo): array
     {

@@ -1,7 +1,7 @@
 ---
 title: "Estructura adoptada por componentes del sistema experto"
 status: CURRENT
-version: "1.2"
+version: "1.3"
 last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: true
@@ -77,6 +77,8 @@ El [mapa de archivos](MAPA_COMPONENTES.md) es el índice técnico complementario
 ## 4. Orden de desarrollo y criterio de cierre
 
 Primera entrega de los componentes 1 y 2: [registros originales y validación](REGISTROS_ORIGINALES_Y_VALIDACION.md), con contrato de captura, mapa físico de entradas y comprobación sin residentes, además de las pruebas de acceso directo. No cierra todavía la selección de instrumentos ni todos los datos de la matriz.
+
+Preparación del componente 3: [mapa de fuentes a hechos](MAPA_FUENTES_A_HECHOS.md), compartido por el contrato de soportes, el formulario y el inventario de entradas. Todavía no configura la batería instrumental ni crea hechos de personas.
 
 1. **Registros originales y validación:** cerrar dato, instrumento/fuente, autor, fecha y condición de uso; comprobar cobertura sin inventar mediciones.
 2. **Hechos del caso:** definir y verificar el paso de cada fuente a evidencia, manteniendo procedencia, ausencia y contradicción.

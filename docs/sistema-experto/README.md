@@ -1,7 +1,7 @@
 ---
 title: "Sistema experto: fuentes, funcionamiento y límites"
 status: CURRENT
-version: "3.4"
+version: "3.5"
 last_reviewed: 2026-10-28
 owner: RememberMind
 source_of_truth: false
@@ -20,6 +20,7 @@ Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años,
 | Necesito encontrar… | Abrir |
 |---|---|
 | Primer bloque: qué registrar y cómo validarlo | [Contrato de captura y preparación sin residentes](organizacion/REGISTROS_ORIGINALES_Y_VALIDACION.md) |
+| De cada fuente a las evidencias del caso | [Mapa de fuentes, áreas y criterios](organizacion/MAPA_FUENTES_A_HECHOS.md) |
 | Los componentes y el diagrama adoptados | [Estructura por ocho componentes](organizacion/ESTRUCTURA_POR_COMPONENTES.md) |
 | El código de hechos, red semántica, reglas e inferencia | [Mapa único de componentes y recorridos](organizacion/MAPA_COMPONENTES.md) |
 | Qué datos existen y qué falta capturar | [Ficha y matriz D01–D27](MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md) |
