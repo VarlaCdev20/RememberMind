@@ -1,8 +1,8 @@
 ---
 title: "Catálogo de candidatos para evaluación cognitiva y apoyo"
 status: DRAFT
-version: "0.1"
-last_reviewed: 2026-10-27
+version: "0.2"
+last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: false
 verification_scope: RESEARCH_CATALOG_NOT_INSTITUTIONAL_ADOPTION
@@ -14,6 +14,8 @@ runtime_verified: false
 [Portal](../README.md) · [Inventario instalado](../inventarios/README.md) · [Ficha y matriz](../MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md).
 
 Inventario de investigación solicitado por la propietaria para personas mayores de 60 años. No es exhaustivo ni una batería obligatoria; no implica licencia, traducción autorizada, norma local, aplicabilidad a todas las edades o selección institucional. Cada instrumento tiene alcance y versiones propios. Las tareas pueden solaparse o integrar baterías: no contar sus puntuaciones como evidencias independientes por duplicado.
+
+La [selección propuesta del 28/10/2026](SELECCION_PROPUESTA_2026_10_28.md) reduce esta investigación a siete instrumentos iniciales/de apoyo y cinco familias ampliadas para decisión institucional. Mantiene alternativas, límites y derechos pendientes; no activa los 45 candidatos ni declara una batería aprobada.
 
 ## A. Detección y evaluación cognitiva general
 
@@ -113,4 +115,4 @@ GDS aquí significa escala de depresión de Yesavage, no escala de deterioro glo
 
 Precisar identidad, edición, forma, idioma, población/rango de edad, escolaridad y normas; derechos de administración, digitalización y almacenamiento; capacitación, fuentes de puntuación y ámbito profesional. La selección y los umbrales requieren la decisión clínica/institucional correspondiente. No se copian reactivos ni baremos a la aplicación por aparecer en este catálogo.
 
-Todos los candidatos quedan **por revisar** para una nueva batería institucional. Barthel figura ya en el catálogo instalado como apoyo funcional; eso no acredita adopción del resto ni administración de pruebas. El siguiente trabajo es una comparación profesional de alternativas, no activar 45 formularios.
+Los candidatos mantienen su estado de investigación; doce familias tienen una propuesta específica de selección en el documento enlazado, todavía pendiente de decisión institucional. Barthel figura ya en el catálogo instalado como apoyo funcional; eso no acredita adopción del resto ni administración de pruebas. Cerrar la selección y sus fichas de edición, aplicabilidad y derechos precede a activar formularios.
