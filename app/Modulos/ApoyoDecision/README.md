@@ -13,6 +13,8 @@ runtime_verified: false
 
 # ApoyoDecision
 
+[Entrada única del experto](../../../docs/sistema-experto/README.md): mapa de componentes, matriz de datos, instrumentos candidatos e inventario instalado. El [mapa de código](../../../docs/sistema-experto/organizacion/MAPA_COMPONENTES.md) distingue el recorrido institucional del piloto y el laboratorio sin trasladar clases ni alterar reglas.
+
 **Revisión documental: 25/10/2026.** Esta compilación localiza responsabilidades y comportamiento exigido por contratos existentes; no crea permisos, estados, umbrales o estructura. Las fuentes específicas prevalecen. Documentar el recorrido no significa que todos sus pasos hayan superado aceptación.
 
 ## Propósito y actores

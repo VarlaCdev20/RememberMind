@@ -1,17 +1,33 @@
 ---
 title: "Sistema experto: fuentes, funcionamiento y límites"
 status: CURRENT
-version: "2.0"
-last_reviewed: 2026-10-25
+version: "3.0"
+last_reviewed: 2026-10-27
 owner: RememberMind
 source_of_truth: false
 source_of_truth_scope: [expert_contract_routing]
 verified_against_commit: 6d7b8c6d6bc03eecd2ee35add04677f2778272cd
-verification_scope: DOCUMENTATION_RECONCILIATION_WITH_LOCAL_AUDIT
+verification_scope: DOCUMENT_ROUTING_STATIC_CODE_MAP_AND_SCOPED_CATALOG_METADATA
 runtime_verified: false
 ---
 
 # Consulta cognitiva y sistema experto
+
+## Entrada única: dónde encontrar cada parte
+
+Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años, con evidencias explicables y revisión profesional. Esta organización conserva los contratos adoptados y no selecciona todavía una batería nueva.
+
+| Necesito encontrar… | Abrir |
+|---|---|
+| El código de hechos, red semántica, reglas e inferencia | [Mapa único de componentes y recorridos](organizacion/MAPA_COMPONENTES.md) |
+| Qué datos existen y qué falta capturar | [Ficha y matriz D01–D27](MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md) |
+| Los 45 instrumentos y evaluaciones candidatos | [Catálogo de investigación por finalidad](instrumentos/CATALOGO_CANDIDATOS.md) |
+| Qué está realmente catalogado en la base local | [Inventario PostgreSQL del 27/10/2026](inventarios/README.md) y [metadatos](inventarios/2026-10-27.json) |
+| Reglas institucionales: fuente y gestión | [Mapa de reglas/versiones](organizacion/MAPA_COMPONENTES.md#3-reglas-en-un-solo-lugar-fuente-y-responsabilidades) y ruta existente `/admin/sistema-experto/reglas`, sujeta a autorización |
+| Laboratorio, piloto y recorrido institucional | [Diferencias y puntos de entrada](organizacion/MAPA_COMPONENTES.md#4-nombres-que-pueden-confundir) |
+| Contratos aprobados y límites pendientes | Tablas y secciones siguientes; [catálogo documental completo](INDICE_DOCUMENTAL.md) para antecedentes |
+
+El inventario comprobó **26 entradas de instrumentos** (2 Barthel, 5 capturas sintéticas y 19 registros de tarea inactivos), **6 versiones de conocimiento** y **32 reglas**. Estos conteos describen metadatos, no instrumentos aplicados, validación clínica ni cierre del experto. No confundir los 45 candidatos investigados con el catálogo instalado.
 
 ## Recorrido vigente
 
@@ -32,7 +48,7 @@ Preparación actual para detección temprana en personas mayores de 60 años: [f
 | Procedencia instrumental | [Extensión aprobada de fuentes](PROPUESTA_FUENTES_ORIGINALES_FASE_2_2026_10_19.md) |
 | Gobierno y sustitución de reglas | [Decisión aprobada](PROPUESTA_GOBIERNO_REGLAS_2026_10_18.md) |
 | Informe y evidencias | [Contrato del informe](CONTRATO_INFORME_COGNITIVO.md) y [fuentes y límites](EVIDENCIAS_COGNITIVAS.md) |
-| Inventario y consolidaciones instaladas | [100 tablas de negocio + 16 técnicas](../base-de-datos/README.md) |
+| Inventario y consolidaciones instaladas | [106 tablas de negocio + 16 técnicas; decisión vigente sin nuevas tablas](../base-de-datos/README.md) |
 | Revisión posterior independiente | [Decisión de revisiones](../base-de-datos/DECISION_REVISIONES_EXPERTAS_2026_10_17.md) |
 
 El nombre PROPUESTA de un documento no invalida una adopción posterior escrita en él. La adopción tiene alcance concreto; no concede una firma profesional, mediciones originales ni aprobación de DDL adicional.

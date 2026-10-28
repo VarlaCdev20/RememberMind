@@ -17,6 +17,9 @@ runtime_verified: false
 
 | Documento | Uso documental |
 |---|---|
+| [organizacion/MAPA_COMPONENTES.md](organizacion/MAPA_COMPONENTES.md) | Navegación única de código, reglas, hechos, inferencia, explicación y límites institucional/laboratorio |
+| [instrumentos/CATALOGO_CANDIDATOS.md](instrumentos/CATALOGO_CANDIDATOS.md) | 45 candidatos de investigación por finalidad; no es batería adoptada ni catálogo instalado |
+| [inventarios/README.md](inventarios/README.md) | Metadatos comprobados en PostgreSQL, alcance de lectura y reproducción; no certifica casos clínicos |
 | [MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md](MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md) | Ficha e inventario estático de captura, fuentes y conservación para detección temprana en mayores de 60 años; borrador de revisión, sin nueva batería o reglas aprobadas |
 | [ACEPTACION_INTEGRAL_ORION_2026_10_21.md](ACEPTACION_INTEGRAL_ORION_2026_10_21.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
 | [ANALISIS_REFACTOR_REDUCCION_MANTENIBLE_2026_10_22.md](ANALISIS_REFACTOR_REDUCCION_MANTENIBLE_2026_10_22.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
