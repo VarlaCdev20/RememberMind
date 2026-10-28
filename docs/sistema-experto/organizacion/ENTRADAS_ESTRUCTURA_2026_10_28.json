@@ -1,0 +1,552 @@
+{
+  "fecha": "2026-10-28T00:22:51-04:00",
+  "driver": "pgsql",
+  "transaccion_solo_lectura": true,
+  "contrato_entradas": {
+    "alcance": "ESTRUCTURA_DE_ENTRADAS_SIN_DATOS_CLINICOS",
+    "requiere_residentes": false,
+    "certifica_preparacion_clinica": false,
+    "soportes_admitidos": {
+      "cod_aplicacion": {
+        "tabla": "aplicaciones_instrumento",
+        "clave_primaria": "cod_aplicacion",
+        "tabla_presente": true,
+        "clave_primaria_verificada": true,
+        "campos_existentes": [
+          "clasificacion",
+          "cod_aplicacion",
+          "cod_aplicacion_anterior",
+          "cod_atencion",
+          "cod_documento_clinico",
+          "cod_instrumento",
+          "cod_personal",
+          "cod_residente",
+          "cod_usuario_registro",
+          "estado",
+          "fecha_hora",
+          "interpretacion",
+          "localizador_fuente",
+          "observacion",
+          "puntaje_maximo",
+          "puntaje_total",
+          "registrado_en"
+        ],
+        "campos_base_faltantes": [],
+        "relaciones": [
+          {
+            "campo": "cod_residente",
+            "tabla_destino": "residentes",
+            "clave_destino": "cod_residente",
+            "verificada": true
+          }
+        ],
+        "estructura_verificada": true,
+        "permiso_lectura": "aplicaciones_instrumento.ver",
+        "campo_fecha": "fecha_hora",
+        "campo_estado": "estado"
+      },
+      "cod_control_cognitivo": {
+        "tabla": "controles_cognitivos",
+        "clave_primaria": "cod_control_cognitivo",
+        "tabla_presente": true,
+        "clave_primaria_verificada": true,
+        "campos_existentes": [
+          "atencion",
+          "cambio_cognitivo",
+          "cod_atencion",
+          "cod_control_cognitivo",
+          "cod_jornada",
+          "cod_personal",
+          "cod_residente",
+          "comprension",
+          "confusion",
+          "estado",
+          "fecha_hora",
+          "lenguaje",
+          "memoria_reciente",
+          "memoria_remota",
+          "observacion",
+          "olvida_indicaciones",
+          "orientacion_lugar",
+          "orientacion_persona",
+          "orientacion_tiempo",
+          "reconoce_entorno",
+          "reconoce_personas",
+          "repite_preguntas",
+          "sigue_instrucciones"
+        ],
+        "campos_base_faltantes": [],
+        "relaciones": [
+          {
+            "campo": "cod_residente",
+            "tabla_destino": "residentes",
+            "clave_destino": "cod_residente",
+            "verificada": true
+          }
+        ],
+        "estructura_verificada": true,
+        "permiso_lectura": "controles_cognitivos.ver",
+        "campo_fecha": "fecha_hora",
+        "campo_estado": "estado"
+      },
+      "cod_control_iadl": {
+        "tabla": "controles_funcionales_iadl",
+        "clave_primaria": "cod_control_iadl",
+        "tabla_presente": true,
+        "clave_primaria_verificada": true,
+        "campos_existentes": [
+          "actividad",
+          "causa_ayuda",
+          "cod_atencion",
+          "cod_control_anterior",
+          "cod_control_iadl",
+          "cod_personal",
+          "cod_residente",
+          "cod_usuario_registro",
+          "desempeno",
+          "estado",
+          "fecha_hora",
+          "fuente",
+          "nivel_previo",
+          "observacion",
+          "oportunidad",
+          "registrado_en",
+          "tipo_ayuda"
+        ],
+        "campos_base_faltantes": [],
+        "relaciones": [
+          {
+            "campo": "cod_residente",
+            "tabla_destino": "residentes",
+            "clave_destino": "cod_residente",
+            "verificada": true
+          }
+        ],
+        "estructura_verificada": true,
+        "permiso_lectura": "controles_funcionales_iadl.ver",
+        "campo_fecha": "fecha_hora",
+        "campo_estado": "estado"
+      },
+      "cod_valoracion_psicologica": {
+        "tabla": "valoraciones_psicologicas",
+        "clave_primaria": "cod_valoracion_psicologica",
+        "tabla_presente": true,
+        "clave_primaria_verificada": true,
+        "campos_existentes": [
+          "afecto",
+          "ansiedad",
+          "apatia",
+          "cod_atencion",
+          "cod_personal",
+          "cod_residente",
+          "cod_valoracion_psicologica",
+          "comunicacion",
+          "conclusion",
+          "conducta",
+          "estado",
+          "estado_animo",
+          "fecha_hora",
+          "impresion_cognitiva",
+          "interaccion_social",
+          "percepcion",
+          "recomendacion"
+        ],
+        "campos_base_faltantes": [],
+        "relaciones": [
+          {
+            "campo": "cod_residente",
+            "tabla_destino": "residentes",
+            "clave_destino": "cod_residente",
+            "verificada": true
+          }
+        ],
+        "estructura_verificada": true,
+        "permiso_lectura": "valoraciones_psicologicas.ver",
+        "campo_fecha": "fecha_hora",
+        "campo_estado": "estado"
+      },
+      "cod_antecedente": {
+        "tabla": "antecedentes_clinicos",
+        "clave_primaria": "cod_antecedente",
+        "tabla_presente": true,
+        "clave_primaria_verificada": true,
+        "campos_existentes": [
+          "cod_antecedente",
+          "cod_personal",
+          "cod_residente",
+          "descripcion",
+          "estado",
+          "fecha_referencia",
+          "fuente_informacion",
+          "observacion",
+          "tipo_antecedente"
+        ],
+        "campos_base_faltantes": [],
+        "relaciones": [
+          {
+            "campo": "cod_residente",
+            "tabla_destino": "residentes",
+            "clave_destino": "cod_residente",
+            "verificada": true
+          }
+        ],
+        "estructura_verificada": true,
+        "permiso_lectura": "antecedentes_clinicos.ver",
+        "campo_fecha": "fecha_referencia",
+        "campo_estado": "estado"
+      },
+      "cod_diagnostico": {
+        "tabla": "diagnosticos",
+        "clave_primaria": "cod_diagnostico",
+        "tabla_presente": true,
+        "clave_primaria_verificada": true,
+        "campos_existentes": [
+          "certeza",
+          "cod_atencion",
+          "cod_diagnostico",
+          "cod_personal",
+          "cod_residente",
+          "codigo_clinico",
+          "estado",
+          "fecha_hora",
+          "nombre",
+          "observacion",
+          "tipo"
+        ],
+        "campos_base_faltantes": [],
+        "relaciones": [
+          {
+            "campo": "cod_residente",
+            "tabla_destino": "residentes",
+            "clave_destino": "cod_residente",
+            "verificada": true
+          }
+        ],
+        "estructura_verificada": true,
+        "permiso_lectura": "diagnosticos.ver",
+        "campo_fecha": "fecha_hora",
+        "campo_estado": "estado"
+      },
+      "cod_documento_clinico": {
+        "tabla": "documentos_clinicos",
+        "clave_primaria": "cod_documento_clinico",
+        "tabla_presente": true,
+        "clave_primaria_verificada": true,
+        "campos_existentes": [
+          "cod_atencion",
+          "cod_curacion",
+          "cod_documento_clinico",
+          "cod_estudio",
+          "cod_herida",
+          "cod_personal",
+          "cod_residente",
+          "descripcion",
+          "estado",
+          "fecha_hora",
+          "formato",
+          "hash_archivo",
+          "observacion",
+          "origen",
+          "ruta_archivo",
+          "tamano_bytes",
+          "tipo_documento",
+          "titulo"
+        ],
+        "campos_base_faltantes": [],
+        "relaciones": [
+          {
+            "campo": "cod_residente",
+            "tabla_destino": "residentes",
+            "clave_destino": "cod_residente",
+            "verificada": true
+          }
+        ],
+        "estructura_verificada": true,
+        "permiso_lectura": "documentos_clinicos.ver",
+        "campo_fecha": "fecha_hora",
+        "campo_estado": "estado"
+      },
+      "cod_valoracion_revisada": {
+        "tabla": "valoraciones_petersen_originales",
+        "clave_primaria": "cod_valoracion_petersen",
+        "tabla_presente": true,
+        "clave_primaria_verificada": true,
+        "campos_existentes": [
+          "alcance_dominio",
+          "atribucion_revisada",
+          "cambio_respecto_previo",
+          "cod_atencion",
+          "cod_documento_clinico",
+          "cod_personal",
+          "cod_residente",
+          "cod_usuario_registro",
+          "cod_valoracion_anterior",
+          "cod_valoracion_petersen",
+          "condiciones_revisadas",
+          "contexto_interpretado",
+          "corroboracion_independiente",
+          "elemento",
+          "estado_original",
+          "exclusiones_revisadas",
+          "factores_pertinentes_revisados",
+          "fecha_hora",
+          "impedimento_no_resuelto",
+          "justificacion",
+          "localizador_fuente",
+          "oportunidad_adecuada",
+          "registrado_en",
+          "revision_explicita",
+          "revision_integrada",
+          "solicitud_uuid",
+          "suficiencia_conjunto",
+          "tipo_registro"
+        ],
+        "campos_base_faltantes": [],
+        "relaciones": [
+          {
+            "campo": "cod_residente",
+            "tabla_destino": "residentes",
+            "clave_destino": "cod_residente",
+            "verificada": true
+          }
+        ],
+        "estructura_verificada": true,
+        "permiso_lectura": "valoraciones_petersen.ver",
+        "campo_fecha": "fecha_hora",
+        "campo_estado": "estado_original"
+      }
+    },
+    "captura_original": {
+      "residentes": {
+        "tabla": "residentes",
+        "clave_primaria": "cod_residente",
+        "tabla_presente": true,
+        "clave_primaria_verificada": true,
+        "campos_existentes": [
+          "apellido_materno",
+          "apellido_paterno",
+          "celular",
+          "cod_residente",
+          "complemento_documento",
+          "direccion",
+          "estado",
+          "estado_civil",
+          "expedicion_documento",
+          "factor_rh",
+          "fecha_nacimiento",
+          "foto",
+          "genero",
+          "grupo_sanguineo",
+          "nivel_educativo",
+          "nombres",
+          "numero_documento",
+          "observacion",
+          "telefono"
+        ],
+        "campos_base_faltantes": [],
+        "relaciones": [],
+        "estructura_verificada": true
+      },
+      "soportes_valoracion_petersen": {
+        "tabla": "soportes_valoracion_petersen",
+        "clave_primaria": "cod_soporte_petersen",
+        "tabla_presente": true,
+        "clave_primaria_verificada": true,
+        "campos_existentes": [
+          "cod_antecedente",
+          "cod_aplicacion",
+          "cod_control_cognitivo",
+          "cod_control_iadl",
+          "cod_diagnostico",
+          "cod_documento_clinico",
+          "cod_soporte_petersen",
+          "cod_valoracion_petersen",
+          "cod_valoracion_psicologica",
+          "cod_valoracion_revisada",
+          "huella_perfil_original",
+          "metodo_original",
+          "orden",
+          "tipo_soporte"
+        ],
+        "campos_base_faltantes": [],
+        "relaciones": [
+          {
+            "campo": "cod_valoracion_petersen",
+            "tabla_destino": "valoraciones_petersen_originales",
+            "clave_destino": "cod_valoracion_petersen",
+            "verificada": true
+          },
+          {
+            "campo": "cod_aplicacion",
+            "tabla_destino": "aplicaciones_instrumento",
+            "clave_destino": "cod_aplicacion",
+            "verificada": true
+          },
+          {
+            "campo": "cod_control_cognitivo",
+            "tabla_destino": "controles_cognitivos",
+            "clave_destino": "cod_control_cognitivo",
+            "verificada": true
+          },
+          {
+            "campo": "cod_control_iadl",
+            "tabla_destino": "controles_funcionales_iadl",
+            "clave_destino": "cod_control_iadl",
+            "verificada": true
+          },
+          {
+            "campo": "cod_valoracion_psicologica",
+            "tabla_destino": "valoraciones_psicologicas",
+            "clave_destino": "cod_valoracion_psicologica",
+            "verificada": true
+          },
+          {
+            "campo": "cod_antecedente",
+            "tabla_destino": "antecedentes_clinicos",
+            "clave_destino": "cod_antecedente",
+            "verificada": true
+          },
+          {
+            "campo": "cod_diagnostico",
+            "tabla_destino": "diagnosticos",
+            "clave_destino": "cod_diagnostico",
+            "verificada": true
+          },
+          {
+            "campo": "cod_documento_clinico",
+            "tabla_destino": "documentos_clinicos",
+            "clave_destino": "cod_documento_clinico",
+            "verificada": true
+          },
+          {
+            "campo": "cod_valoracion_revisada",
+            "tabla_destino": "valoraciones_petersen_originales",
+            "clave_destino": "cod_valoracion_petersen",
+            "verificada": true
+          }
+        ],
+        "estructura_verificada": true
+      },
+      "instrumentos": {
+        "tabla": "instrumentos",
+        "clave_primaria": "cod_instrumento",
+        "tabla_presente": true,
+        "clave_primaria_verificada": true,
+        "campos_existentes": [
+          "cod_instrumento",
+          "codigo",
+          "descripcion",
+          "estado",
+          "nombre",
+          "puntaje_maximo",
+          "tipo",
+          "version"
+        ],
+        "campos_base_faltantes": [],
+        "relaciones": [],
+        "estructura_verificada": true
+      },
+      "preguntas_instrumento": {
+        "tabla": "preguntas_instrumento",
+        "clave_primaria": "cod_pregunta",
+        "tabla_presente": true,
+        "clave_primaria_verificada": true,
+        "campos_existentes": [
+          "cod_instrumento",
+          "cod_pregunta",
+          "codigo",
+          "dominio",
+          "enunciado",
+          "estado",
+          "orden",
+          "puntaje_maximo",
+          "tipo_respuesta"
+        ],
+        "campos_base_faltantes": [],
+        "relaciones": [
+          {
+            "campo": "cod_instrumento",
+            "tabla_destino": "instrumentos",
+            "clave_destino": "cod_instrumento",
+            "verificada": true
+          }
+        ],
+        "estructura_verificada": true
+      },
+      "opciones_pregunta": {
+        "tabla": "opciones_pregunta",
+        "clave_primaria": "cod_opcion",
+        "tabla_presente": true,
+        "clave_primaria_verificada": true,
+        "campos_existentes": [
+          "cod_opcion",
+          "cod_pregunta",
+          "estado",
+          "nombre",
+          "orden",
+          "puntaje",
+          "valor"
+        ],
+        "campos_base_faltantes": [],
+        "relaciones": [
+          {
+            "campo": "cod_pregunta",
+            "tabla_destino": "preguntas_instrumento",
+            "clave_destino": "cod_pregunta",
+            "verificada": true
+          }
+        ],
+        "estructura_verificada": true
+      },
+      "respuestas_instrumento": {
+        "tabla": "respuestas_instrumento",
+        "clave_primaria": "cod_respuesta",
+        "tabla_presente": true,
+        "clave_primaria_verificada": true,
+        "campos_existentes": [
+          "cod_aplicacion",
+          "cod_opcion",
+          "cod_pregunta",
+          "cod_respuesta",
+          "observacion",
+          "puntaje",
+          "valor_logico",
+          "valor_numero",
+          "valor_texto"
+        ],
+        "campos_base_faltantes": [],
+        "relaciones": [
+          {
+            "campo": "cod_aplicacion",
+            "tabla_destino": "aplicaciones_instrumento",
+            "clave_destino": "cod_aplicacion",
+            "verificada": true
+          },
+          {
+            "campo": "cod_pregunta",
+            "tabla_destino": "preguntas_instrumento",
+            "clave_destino": "cod_pregunta",
+            "verificada": true
+          },
+          {
+            "campo": "cod_opcion",
+            "tabla_destino": "opciones_pregunta",
+            "clave_destino": "cod_opcion",
+            "verificada": true
+          }
+        ],
+        "estructura_verificada": true
+      }
+    }
+  },
+  "configuracion_cantidad": {
+    "perfiles_instrumentales": 0,
+    "perfiles_interpretativos": 0,
+    "contratos_conocimiento": 0,
+    "lectura_clinica": 0
+  },
+  "limites": [
+    "Metadatos de estructura; sin filas clínicas, identidades de personas ni secretos.",
+    "No acredita instrumentos adoptados ni disponibilidad de datos de residentes."
+  ]
+}

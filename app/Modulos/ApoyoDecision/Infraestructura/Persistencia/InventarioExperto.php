@@ -2,10 +2,19 @@
 
 namespace App\Modulos\ApoyoDecision\Infraestructura\Persistencia;
 
+use App\Models\Instrumento;
+use App\Models\OpcionPregunta;
+use App\Models\PreguntaInstrumento;
+use App\Models\Residente;
+use App\Models\RespuestaInstrumento;
+use App\Models\SoporteValoracionPetersen;
+use App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratoFuentesPetersen;
 use DomainException;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Builder;
 
-/** Inventario físico D-137, 4.19.8; no representa tablas ya instaladas. */
+/** Inspección del esquema experto y sus entradas; no certifica datos ni preparación clínica. */
 final class InventarioExperto
 {
     public const TABLAS = [
@@ -45,6 +54,70 @@ final class InventarioExperto
     public static function excluirDelInventarioOperativo(array $tablas): array
     {
         return array_values(array_diff($tablas, self::TABLAS, self::CONSERVACION, self::REVISION_PROFESIONAL));
+    }
+
+    /** Contrato físico de entrada: solo esquema y permisos declarados, sin leer filas clínicas. */
+    public static function entradas(Connection $conexion): array
+    {
+        if (! in_array($conexion->getDriverName(), ['pgsql', 'sqlite'], true)) {
+            throw new DomainException('El inventario admite los motores verificados PostgreSQL y SQLite.');
+        }
+        $esquema = $conexion->getSchemaBuilder();
+        $soportes = [];
+        foreach (ContratoFuentesPetersen::FUENTES as $fk => [$modelo, $permiso]) {
+            $entidad = new $modelo;
+            $fecha = $fk === 'cod_antecedente' ? 'fecha_referencia' : 'fecha_hora';
+            $estado = $fk === 'cod_valoracion_revisada' ? 'estado_original' : 'estado';
+            $soportes[$fk] = self::describirEntrada($esquema, $entidad,
+                ['cod_residente', 'cod_personal', $fecha, $estado],
+                [['cod_residente', 'residentes', 'cod_residente']])
+                + ['permiso_lectura' => $permiso, 'campo_fecha' => $fecha, 'campo_estado' => $estado];
+        }
+        $relacionesSoporte = [['cod_valoracion_petersen', 'valoraciones_petersen_originales', 'cod_valoracion_petersen']];
+        foreach (ContratoFuentesPetersen::FUENTES as $fk => [$modelo]) {
+            $entidad = new $modelo;
+            $relacionesSoporte[] = [$fk, $entidad->getTable(), $entidad->getKeyName()];
+        }
+        $captura = [];
+        foreach ([
+            [new Residente, ['fecha_nacimiento', 'estado'], []],
+            [new SoporteValoracionPetersen, ['cod_valoracion_petersen', 'tipo_soporte', 'orden', ...array_keys(ContratoFuentesPetersen::FUENTES)], $relacionesSoporte],
+            [new Instrumento, ['codigo', 'version', 'tipo', 'estado'], []],
+            [new PreguntaInstrumento, ['cod_instrumento', 'tipo_respuesta', 'estado'], [['cod_instrumento', 'instrumentos', 'cod_instrumento']]],
+            [new OpcionPregunta, ['cod_pregunta', 'puntaje', 'estado'], [['cod_pregunta', 'preguntas_instrumento', 'cod_pregunta']]],
+            [new RespuestaInstrumento, ['cod_aplicacion', 'cod_pregunta', 'cod_opcion', 'valor_numero', 'valor_texto', 'valor_logico', 'puntaje'],
+                [['cod_aplicacion', 'aplicaciones_instrumento', 'cod_aplicacion'], ['cod_pregunta', 'preguntas_instrumento', 'cod_pregunta'], ['cod_opcion', 'opciones_pregunta', 'cod_opcion']]],
+        ] as [$entidad, $campos, $relaciones]) {
+            $captura[$entidad->getTable()] = self::describirEntrada($esquema, $entidad, $campos, $relaciones);
+        }
+
+        return ['alcance' => 'ESTRUCTURA_DE_ENTRADAS_SIN_DATOS_CLINICOS', 'requiere_residentes' => false,
+            'certifica_preparacion_clinica' => false, 'soportes_admitidos' => $soportes, 'captura_original' => $captura];
+    }
+
+    /** Informa faltantes sin intentar crear, migrar o completar la estructura. */
+    private static function describirEntrada(Builder $esquema, Model $modelo, array $campos, array $relaciones): array
+    {
+        $tabla = $modelo->getTable();
+        $presente = $esquema->hasTable($tabla);
+        $columnas = $presente ? $esquema->getColumnListing($tabla) : [];
+        sort($columnas, SORT_STRING);
+        $faltantes = array_values(array_diff([$modelo->getKeyName(), ...$campos], $columnas));
+        $pk = $presente && collect($esquema->getIndexes($tabla))->contains(
+            fn ($indice) => $indice['primary'] && $indice['columns'] === [$modelo->getKeyName()]);
+        $fks = $presente ? $esquema->getForeignKeys($tabla) : [];
+        $enlaces = [];
+        foreach ($relaciones as [$campo, $destino, $clave]) {
+            $verificada = collect($fks)->contains(static fn ($fk) => $fk['columns'] === [$campo]
+                && $fk['foreign_table'] === $destino && $fk['foreign_columns'] === [$clave]
+                && in_array($fk['foreign_schema'] ?? null, [null, 'main', 'public'], true));
+            $enlaces[] = ['campo' => $campo, 'tabla_destino' => $destino, 'clave_destino' => $clave, 'verificada' => $verificada];
+        }
+
+        return ['tabla' => $tabla, 'clave_primaria' => $modelo->getKeyName(), 'tabla_presente' => $presente,
+            'clave_primaria_verificada' => $pk, 'campos_existentes' => $columnas, 'campos_base_faltantes' => $faltantes,
+            'relaciones' => $enlaces, 'estructura_verificada' => $presente && $pk && $faltantes === []
+                && ! in_array(false, array_column($enlaces, 'verificada'), true)];
     }
 
     /** Solo metadata y conteos opcionales; no lee valores clínicos ni decide qué tablas eliminar. */

@@ -1,8 +1,8 @@
 ---
 title: "Estructura adoptada por componentes del sistema experto"
 status: CURRENT
-version: "1.1"
-last_reviewed: 2026-10-27
+version: "1.2"
+last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: true
 source_of_truth_scope: [expert_component_organization]
@@ -44,7 +44,7 @@ La explicación corresponde a la misma ejecución que el resultado, incluso cuan
 
 | Componente | Responsabilidad y salida | Entrada existente de código | Estado y trabajo pendiente |
 |---|---|---|---|
-| **1. Registros originales** | Mantener mediciones, respuestas, observaciones y documentos con residente, fecha clínica y autor. Son las fuentes del caso. | Captura en [Valoraciones](../../../app/Modulos/Valoraciones/README.md), [Cuidados](../../../app/Modulos/Cuidados/README.md) y [Clinica](../../../app/Modulos/Clinica/README.md); adquisición mediante [CapturasInstrumentalesResidente](../../../app/Modulos/ApoyoDecision/Aplicacion/Consultas/CapturasInstrumentalesResidente.php). | Existen capturas originales. Falta cerrar la batería y la cobertura de datos de la matriz; no se presupone que cada residente ya tenga todas las mediciones. |
+| **1. Registros originales** | Mantener mediciones, respuestas, observaciones y documentos con residente, fecha clínica y autor. Son las fuentes del caso. | Captura en [Valoraciones](../../../app/Modulos/Valoraciones/README.md), [Cuidados](../../../app/Modulos/Cuidados/README.md) y [Clinica](../../../app/Modulos/Clinica/README.md); adquisición mediante [CapturasInstrumentalesResidente](../../../app/Modulos/ApoyoDecision/Aplicacion/Consultas/CapturasInstrumentalesResidente.php). | Existe la capacidad de captura; los registros reales se incorporarán al operar. Falta cerrar la batería y la cobertura de datos de la matriz; no se presupone que cada residente ya tenga todas las mediciones. |
 | **2. Validación** | Comprobar permiso, competencia, pertenencia al residente, identidad instrumental, calidad y fecha de corte; conservar los motivos de exclusión. | [AplicarInstrumento](../../../app/Modulos/Valoraciones/Aplicacion/Acciones/AplicarInstrumento.php), [ExtractorCapturaInstrumental](../../../motor-experto/src/motor_experto/dominio/instrumentos/ExtractorCapturaInstrumental.php) y [FuentesValoracionOperativa](../../../app/Modulos/ApoyoDecision/Aplicacion/Consultas/FuentesValoracionOperativa.php). | Hay controles implementados. Cada instrumento que se adopte debe tener identidad y condiciones aplicables; un dato técnicamente válido no acredita por sí solo interpretación clínica. |
 | **3. Hechos del caso — base de hechos** | Construir la evidencia de una evaluación concreta, con procedencia, corte, literal original y representación válida. Mantener ausencia y contradicción. | [ConstructorMemoriaInstrumental](../../../motor-experto/src/motor_experto/adaptadores/entrada/ConstructorMemoriaInstrumental.php) y [MemoriaTrabajo institucional](../../../motor-experto/src/motor_experto/dominio/inferencia/MemoriaTrabajo.php). | Existe construcción de hechos. Es memoria de una ejecución, no una copia editable de la historia ni una nueva tabla de residentes. |
 | **4. Base de conocimiento** | Reunir una versión concreta de conceptos, relaciones, reglas, condiciones, consecuencias y referencias. | [CargadorConocimiento](../../../app/Modulos/ApoyoDecision/Infraestructura/Persistencia/Eloquent/CargadorConocimiento.php), [PaqueteConocimiento](../../../motor-experto/src/motor_experto/dominio/conocimiento/PaqueteConocimiento.php) y [gobierno de reglas](../../../app/Modulos/ApoyoDecision/Presentacion/Livewire/Paginas/GobiernoReglasPanel.php). | Existe conocimiento versionado. La fuente registrada se mantiene en la BDD existente; revisar alcance, procedencia y aprobación sin confundir estado ACTIVO con validación clínica. |
@@ -76,7 +76,7 @@ El [mapa de archivos](MAPA_COMPONENTES.md) es el índice técnico complementario
 
 ## 4. Orden de desarrollo y criterio de cierre
 
-Primera entrega de los componentes 1 y 2: [registros originales y validación](REGISTROS_ORIGINALES_Y_VALIDACION.md), con contrato de captura y pruebas de acceso directo. No cierra todavía la selección de instrumentos ni todos los datos de la matriz.
+Primera entrega de los componentes 1 y 2: [registros originales y validación](REGISTROS_ORIGINALES_Y_VALIDACION.md), con contrato de captura, mapa físico de entradas y comprobación sin residentes, además de las pruebas de acceso directo. No cierra todavía la selección de instrumentos ni todos los datos de la matriz.
 
 1. **Registros originales y validación:** cerrar dato, instrumento/fuente, autor, fecha y condición de uso; comprobar cobertura sin inventar mediciones.
 2. **Hechos del caso:** definir y verificar el paso de cada fuente a evidencia, manteniendo procedencia, ausencia y contradicción.

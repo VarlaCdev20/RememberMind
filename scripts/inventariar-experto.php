@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-// Inventario técnico de catálogos. No consulta residentes, hechos ni evaluaciones.
+// Inventario de catálogos y estructura de entrada. No consulta filas de residentes, hechos ni evaluaciones.
 require dirname(__DIR__).'/vendor/autoload.php';
 
 $app = require dirname(__DIR__).'/bootstrap/app.php';
@@ -75,6 +75,7 @@ try {
         'driver' => $driver,
         'transaccion_solo_lectura' => $soloLectura,
         'tablas_disponibles' => $disponibles,
+        'contrato_entradas' => \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\InventarioExperto::entradas($conexion),
         'instrumentos' => $instrumentos,
         'versiones_conocimiento' => $versiones,
         'totales_conocimiento' => $resumen,
@@ -82,6 +83,7 @@ try {
         'configuracion_cantidad' => $configuracion,
         'version_cognitiva_fijada_en_config' => filled(config('sistema_experto.version_cognitiva')),
         'limites' => ['No acredita instrumentos administrados, licencias, baremos ni validez clínica.',
+            'La estructura de entrada se verifica sin consultar filas clínicas; no certifica datos completos ni preparación clínica.',
             'No ejecuta inferencia, activa reglas ni valida autorización de pantallas.',
             'Un catálogo activo no equivale a una evaluación persistida ni a revisión profesional.'],
     ];
