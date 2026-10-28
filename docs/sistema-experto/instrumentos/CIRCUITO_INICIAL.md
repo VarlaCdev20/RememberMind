@@ -1,7 +1,7 @@
 ---
 title: "Fichas y preparación del circuito instrumental inicial"
 status: CURRENT
-version: "1.0"
+version: "1.1"
 last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: false
@@ -64,3 +64,8 @@ Fichas enlazadas, selección I01/I02/I04 coherente, fuentes primarias citadas y 
 ## 6. Formularios propios de captura (entrega posterior del 28/10)
 
 Tras confirmar que los materiales aún deben obtenerse, la propietaria autorizó **formularios propios de captura**. Se reorganizaron el registro de aplicaciones y la entrevista/atención psicológica existentes, con guía médica opcional y revisión de originales. El [informe de implementación y verificación](../../frontend/FORMULARIOS_CAPTURA_COGNITIVA_2026_10_28.md) delimita sus consumidores, pruebas y límites. Esta entrega posterior no activa las ediciones de MoCA/RUDAS/FAQ ni cambia las condiciones de incorporación descritas arriba. Las secciones 1–5 conservan el alcance documental de su entrega original.
+
+
+## 7. Obtención documental posterior: originales y restricción NACC
+
+Se obtuvieron **seis documentos públicos** de consulta con [identidad, SHA-256 y páginas](METADATOS_MATERIALES_2026_10_28.json). El [cotejo](COTEJO_MATERIALES_2026_10_28.md) concreta cuáles se recuperaron y cuáles no: originales ingleses RUDAS y FAQ español histórico B7S disponibles; paquete oficial español MoCA y suplemento RUDAS-PE todavía pendientes. El formulario de permisos NACC excluye uso clínico diagnóstico y limita su trámite a investigación; no se presupone una autorización asistencial. Tres consultas `.eml` concretas están preparadas localmente, sin enviar. Este avance no adopta ediciones, puntuaciones, licencias ni perfiles ejecutables; las secciones anteriores conservan sus respectivos cortes.

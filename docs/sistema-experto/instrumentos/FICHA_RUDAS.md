@@ -1,7 +1,7 @@
 ---
 title: "Ficha documental I02 — RUDAS"
 status: CURRENT
-version: "1.0"
+version: "1.1"
 last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: false
@@ -18,9 +18,9 @@ runtime_verified: false
 | Campo | Definición y estado |
 |---|---|
 | Familia seleccionada | Rowland Universal Dementia Assessment Scale, RUDAS; cribado como alternativa cuando el contexto lo haga más apropiado. |
-| Referencia original | Storey y colaboradores, 2004; guía y hoja oficiales disponibles en Dementia Australia. [R1–R3] |
+| Referencia original | Storey y colaboradores, 2004; guía y hoja oficiales de Dementia Australia obtenidas localmente el 28/10/2026, inglés, 25 y 2 páginas físicas. [R1–R3] |
 | Adaptación española localizada | **RUDAS-PE, artículo de Custodio y colaboradores de 2020**, con ajustes de procedimiento identificados en el artículo y remitidos a su **Supplemental Material 1**. [R4] |
-| Límite de identificación | La referencia al suplemento está localizada; no se obtuvo y cotejó aquí su archivo final. No asignar una versión comercial inexistente ni equiparar el formulario inglés, una traducción española genérica y RUDAS-PE. |
+| Límite de identificación | El XML editorial identifica SM1 como `Table_1.DOCX`; la recuperación desde PMC devolvió HTML y las rutas editoriales comprobadas no devolvieron un DOCX. El suplemento español sigue sin obtener/cotejar. No equiparar originales ingleses con RUDAS-PE. Véase el [cotejo y hashes](COTEJO_MATERIALES_2026_10_28.md). |
 | Formato de resultado | Seis tareas puntuadas en la hoja original y total sobre 30; no equivalen a seis instrumentos ni a una acreditación de los cinco dominios del experto. [R2–R3] |
 
 ## Aplicación y límites
@@ -43,6 +43,10 @@ La publicación RUDAS-PE indica licencia abierta del artículo; eso **no demuest
 - Cotejar versión/adaptación e idioma antes de definir selectores y puntuación. No reutilizar instrucciones inglesas como si fueran el suplemento peruano.
 - No hay un método RUDAS registrado ni un perfil activado por esta ficha; el total conserva su alcance de cribado.
 - Si las condiciones no permiten interpretación válida, conservar los motivos sin rellenar con valores normales ni inferir un resultado deseado.
+
+## Obtención y condiciones comprobadas
+
+Los originales ingleses están conservados fuera de Git, sin editar. [UNSW/CHeBA](https://www.unsw.edu.au/cheba/clinical-care/dementia-outcomes-measurement-suite-doms/doms-cognition-measures-tools) describe uso profesional no comercial y consulta a autores para otros usos; no se deduce que cubra la adaptación española dentro de RememberMind. Consulta local preparada al autor de correspondencia publicado, sin enviar ni aceptar acuerdos.
 
 ## Cierre y pendientes
 

@@ -1,0 +1,78 @@
+{
+  "fecha_cotejo": "2026-10-28",
+  "zona_horaria": "America/La_Paz",
+  "proposito": "Consulta documental local, no activacion ni licencia",
+  "originales_en_git": false,
+  "materiales": [
+    {
+      "archivo": "RUDAS-guia-original-en.pdf",
+      "url": "https://www.dementia.org.au/sites/default/files/2023-12/RUDAS-admin-scoring-guide.pdf",
+      "url_final": "https://www.dementia.org.au/sites/default/files/2023-12/RUDAS-admin-scoring-guide.pdf",
+      "tipo": "pdf",
+      "bytes": 132774,
+      "sha256": "2ed683a034d14794f5922fa971de899850ba20d4409a13cf59ab18e29001ca93",
+      "paginas_pdf": 25,
+      "estado": "DESCARGADO_VALIDADO"
+    },
+    {
+      "archivo": "RUDAS-hoja-original-en.pdf",
+      "url": "https://www.dementia.org.au/sites/default/files/2023-12/RUDAS-scoring-sheet.pdf",
+      "url_final": "https://www.dementia.org.au/sites/default/files/2023-12/RUDAS-scoring-sheet.pdf",
+      "tipo": "pdf",
+      "bytes": 24204,
+      "sha256": "e8126ad89e9c7a79947231147fb2b21d93adc04d0d491846c4433898503bcf02",
+      "paginas_pdf": 2,
+      "estado": "DESCARGADO_VALIDADO"
+    },
+    {
+      "archivo": "NACC-condiciones-solicitud-original.pdf",
+      "url": "https://files.alz.washington.edu/nacc-permission-form.pdf",
+      "url_final": "https://files.alz.washington.edu/nacc-permission-form.pdf",
+      "tipo": "pdf",
+      "bytes": 313779,
+      "sha256": "237bddbe4a8d63b6961654f0bbb38f3b46fe3433ea976592db38461aae81cc57",
+      "paginas_pdf": 4,
+      "estado": "DESCARGADO_VALIDADO"
+    },
+    {
+      "archivo": "NACC-UDSv3-instrucciones-es-original.pdf",
+      "url": "https://files.alz.washington.edu/documentation/UDSv3_SpanishInstructions.pdf",
+      "url_final": "https://files.alz.washington.edu/documentation/UDSv3_SpanishInstructions.pdf",
+      "tipo": "pdf",
+      "bytes": 1284011,
+      "sha256": "04c85904d6a86934d879426badf3d4132bbbb6af6beac0db498c1c1140e0436a",
+      "paginas_pdf": 1,
+      "estado": "DESCARGADO_VALIDADO"
+    },
+    {
+      "archivo": "FAQ-NACC-UDSv2-B7S-es-original.pdf",
+      "url": "https://files.alz.washington.edu/documentation/uds2-ivp-b7-sp.pdf",
+      "url_final": "https://files.alz.washington.edu/documentation/uds2-ivp-b7-sp.pdf",
+      "tipo": "pdf",
+      "bytes": 48966,
+      "sha256": "b2c42db731de1f3f215c5752a6d6716e2fe343c20363e862578a26662f8f45ac",
+      "paginas_pdf": 1,
+      "estado": "DESCARGADO_VALIDADO"
+    },
+    {
+      "archivo": "FAQ-HIGN-D13-2016-en-original.pdf",
+      "url": "https://hign.org/sites/default/files/2020-06/Try_This_Dementia_13.pdf",
+      "url_final": "https://hign.org/sites/default/files/2020-06/Try_This_Dementia_13.pdf",
+      "tipo": "pdf",
+      "bytes": 160323,
+      "sha256": "71d6ddd1877b33064d704b7c5f8d1c02a814ca1bd334385a922e754428e96f1b",
+      "paginas_pdf": 2,
+      "estado": "DESCARGADO_VALIDADO"
+    }
+  ],
+  "no_obtenidos": [
+    {
+      "familia": "MoCA",
+      "motivo": "Descarga oficial remite a cuenta profesional; no se creo ni se utilizo una cuenta ajena."
+    },
+    {
+      "familia": "RUDAS-PE",
+      "motivo": "SM1 localizado como Table_1.DOCX en XML/PMC; archivo Word no recuperado. Una respuesta HTML no se registro como documento obtenido."
+    }
+  ]
+}

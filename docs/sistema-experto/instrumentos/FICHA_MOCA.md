@@ -1,7 +1,7 @@
 ---
 title: "Ficha documental I01 — MoCA completo"
 status: CURRENT
-version: "1.0"
+version: "1.1"
 last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: false
@@ -43,6 +43,10 @@ Los términos actuales diferencian práctica asistencial ordinaria de incorporac
 - Vincular únicamente una edición/forma/adaptación/idioma cotejados y las preguntas reales del catálogo autorizado; no crear reactivos o PK de ejemplo en el producto.
 - Conservar puntuación original, corrección si corresponde y condiciones; no sobrescribir el original con una normalización.
 - No hay un método MoCA registrado ni un perfil activado por esta ficha. La salida de cribado no se conecta automáticamente a los literales clínicos de dominio.
+
+## Cotejo posterior del 28/10/2026
+
+El enlace de descarga del titular conduce a una cuenta profesional. No se obtuvo el paquete español ni se creó una cuenta. Los términos del 27/08/2026 distinguen incorporación a software del uso asistencial ordinario; se preparó una consulta concreta a `permission@mocacognition.com`, sin enviarla. Véanse [materiales y gestión](COTEJO_MATERIALES_2026_10_28.md#2-diferencias-que-cambian-la-incorporación). La referencia 8.1 anterior no cambia de estado.
 
 ## Cierre y pendientes
 

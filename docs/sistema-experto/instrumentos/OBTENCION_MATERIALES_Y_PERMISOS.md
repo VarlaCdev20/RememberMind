@@ -1,11 +1,11 @@
 ---
 title: "Obtención de materiales y condiciones de uso del circuito inicial"
 status: CURRENT
-version: "1.0"
+version: "1.1"
 last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: false
-verification_scope: OFFICIAL_ACCESS_ROUTES_AND_UNSENT_REQUEST_DRAFTS
+verification_scope: SIX_PUBLIC_DOCUMENTS_OBTAINED_AND_UNSENT_REQUEST_DRAFTS
 runtime_verified: false
 ---
 
@@ -13,7 +13,7 @@ runtime_verified: false
 
 La propietaria confirmó el **28/10/2026**: **«Aún hay que obtenerlos»**, en respuesta sobre formularios oficiales y autorizaciones. La [selección institucional](SELECCION_ADOPTADA_2026_10_28.md) ya está aprobada; faltan los materiales y condiciones concretos del [circuito inicial](CIRCUITO_INICIAL.md).
 
-**Estado de gestión: NO SOLICITADO desde esta tarea.** No se enviaron mensajes, formularios o datos clínicos; no se crearon cuentas, aceptaron acuerdos o compraron servicios. Los textos siguientes son borradores locales listos para revisión, no comunicaciones realizadas ni permisos obtenidos.
+**Estado de gestión: SEIS DOCUMENTOS PÚBLICOS OBTENIDOS; AUTORIZACIONES NO SOLICITADAS.** Véase el [cotejo posterior, hashes y límites](COTEJO_MATERIALES_2026_10_28.md). Los borradores iniciales de este documento conservan su corte; tres `.eml` locales posteriores concretan canales y consultas tras ese cotejo. No se enviaron mensajes, formularios o datos clínicos; no se crearon cuentas, aceptaron acuerdos o compraron servicios. Los textos siguientes son borradores locales listos para revisión, no comunicaciones realizadas ni permisos obtenidos.
 
 ## 1. Rutas verificadas y qué obtener
 
@@ -21,7 +21,7 @@ La propietaria confirmó el **28/10/2026**: **«Aún hay que obtenerlos»**, en 
 |---|---|---|
 | MoCA | [Paper](https://mocacognition.com/paper/), [permisos](https://www.mocacognition.com/permission), [contacto del titular](https://mocacognition.com/contact/). | Paquete oficial completo y sus instrucciones en la adaptación española aplicable; requisitos del evaluador; autorización/condiciones del uso en RememberMind. No comprar un producto digital suponiendo que concede derecho a reproducir el test en otro software. |
 | RUDAS | [Guía y hoja originales en Dementia Australia](https://www.dementia.org.au/professionals/assessment-and-diagnosis-dementia/rowland-universal-dementia-assessment-scale-rudas); [artículo RUDAS-PE con enlace al suplemento](https://www.frontiersin.org/journals/neurology/articles/10.3389/fneur.2020.00374/full). | Formulario español y manual final correspondientes a la adaptación; cotejar suplemento 1 y avisos de derechos; confirmar quién autoriza la adaptación y el uso digital concreto. El autor de correspondencia es una vía para aclararlo, sin asumir que posee todos los derechos. |
-| FAQ | [Documentación NACC](https://nacc-prod.parallelpublicworks.com/data-forms-and-documentation/udsv3-forms-and-documentation/) y [solicitud oficial de formularios](https://nacc-prod.parallelpublicworks.com/request-nacc-forms/). | Identificar y obtener la versión española solicitada y sus condiciones. Precisar si se ofrece FAQ o una adaptación FAS; cotejar número de ítems, puntuación y ausencias. El procedimiento publicado se refiere a investigación: consultar expresamente su alcance para software asistencial. |
+| FAQ | [Documentación NACC](https://nacc-prod.parallelpublicworks.com/data-forms-and-documentation/udsv3-forms-and-documentation/) y [solicitud oficial de formularios](https://nacc-prod.parallelpublicworks.com/request-nacc-forms/). | Identificar y obtener la versión española solicitada y sus condiciones. Precisar si se ofrece FAQ o una adaptación FAS; cotejar número de ítems, puntuación y ausencias. El formulario de permisos, página 1, limita la vía a investigación y excluye uso clínico diagnóstico. No tramitar el uso asistencial como investigación; la consulta de edición/derechos se dirige también a los autores por la vía alternativa descrita en el cotejo. |
 
 Son rutas de acceso o consulta, no una confirmación de autorización. Los [términos de MoCA](https://mocacognition.com/terms-of-use/) distinguen práctica asistencial e incorporación en otro producto; NACC solicita describir el uso pretendido. No se promete gratuidad, plazo o aprobación para RememberMind a partir de esos sitios.
 
@@ -49,7 +49,9 @@ Solicitamos confirmar el material y versión de referencia, requisitos de admini
 
 Agradecemos indicar avisos de derechos y atribución que deben conservarse y si existen condiciones adicionales para un uso asistencial institucional como el descrito. No adjuntamos datos de residentes ni pretendemos presentar el instrumento como diagnóstico autónomo.
 
-### FAQ — a NACC para material/adaptación y titular aplicable
+### FAQ — consulta aclaratoria inicial a NACC (no solicitud asistencial por su vía de investigación)
+
+**Actualización del cotejo:** este texto inicial solo puede servir como consulta aclaratoria. Para obtener material/edición española y canal de autorización asistencial se preparó posteriormente `03-faq-es.eml` al contacto publicado en BiblioPRO; tampoco se ha enviado.
 
 **Asunto:** Versión española FAQ/Pfeffer y condiciones para software asistencial
 
@@ -67,4 +69,4 @@ Separar permisos de administración, reproducción, almacenamiento de resultados
 
 Conservar originales y evidencias de permiso por los mecanismos institucionales autorizados, sin incluir en Git contraseñas, acuerdos privados o materiales clínicos protegidos. No crear una tabla de licencias ni usar JSON/EAV o texto para evitar las relaciones del modelo. Actualizar las fichas con metadatos verificables y con el alcance realmente confirmado antes de activar sus perfiles.
 
-**Preparado:** fichas y tres borradores locales, con rutas oficiales. **Pendiente externo:** obtener los materiales y resolver el alcance de uso. No se ha iniciado una contratación, enviado una solicitud ni concedido acceso a información de residentes.
+**Obtenido:** seis documentos públicos de consulta con identidad y SHA-256. **Preparado:** fichas y tres `.eml` posteriores, sin enviar. **Pendiente externo:** paquete español MoCA, suplemento RUDAS-PE, edición FAQ utilizable y alcance de derechos asistenciales/digitales. El B7S NACC histórico obtenido no equivale a ese cierre. No se ha iniciado una contratación, enviado una solicitud ni concedido acceso a información de residentes.
