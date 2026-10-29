@@ -15,6 +15,8 @@ runtime_verified: false
 
 ## Estado vigente
 
+**Extensión autorizada e instalada del 29/10/2026:** [idioma principal e informante principal por atención](PROPUESTA_CONTEXTO_IDIOMA_INFORMANTE_2026_10_29.md), tres columnas nullable, FK restrictiva al vínculo existente e índice de soporte. Conserva 4FN en este alcance,28.107 atenciones previas e inventario 106 de negocio + 16 técnicas; sin backfill ni uso inferencial automático.
+
 **Contexto escalar por atención —28/10/2026:** [tres columnas opcionales y conservación de 4FN](DECISION_CONTEXTO_ESCOLARIDAD_4FN_2026_10_28.md), sin nuevas tablas/FK/permisos ni listas de informantes/idiomas. La instrucción posterior autoriza esta extensión acotada; el inventario permanece106 de negocio+16 técnicas.
 
 La [extensión de Gerencia35/37 autorizada e instalada el27/10/2026](DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md) deja **81 operativas +25 expertas =106 tablas de negocio**, además de **16 técnicas**:122 físicas. Añade seis relaciones y ocho columnas nullable, con contenido previo conservado. La [consolidación del22/10](DECISION_CONSOLIDACION_BLOQUES_EXPERTOS_2026_10_22.md) y la auditoría del25/10 describen el inventario anterior de100 de negocio y116 físicas.

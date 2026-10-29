@@ -15,6 +15,7 @@ use App\Models\ValoracionPetersenOriginal;
 use App\Models\ValoracionPsicologica;
 use App\Modulos\Clinica\Aplicacion\Acciones\AutorizacionClinicaService;
 use App\Modulos\Valoraciones\Aplicacion\Acciones\RegistrarSesionPsicologica;
+use App\Modulos\Valoraciones\Aplicacion\Consultas\ContextoAtencionCognitiva;
 use App\Modulos\Valoraciones\Aplicacion\Acciones\RegistrarValoracionProfesional;
 use Illuminate\Validation\ValidationException;
 use App\Modulos\Valoraciones\Aplicacion\Consultas\ConsultarTendenciaResidente;
@@ -63,6 +64,9 @@ final class FichaPsicologicaResidente extends Component
     // Formulario Sesión
     public bool $mostrarFormSesion = false;
 
+    #[Locked]
+    public bool $confirmarDescarteSesion = false;
+
     public array $formSesion = [
         'tipo_atencion' => 'SEGUIMIENTO',
         'motivo' => '',
@@ -70,6 +74,9 @@ final class FichaPsicologicaResidente extends Component
         'escolaridad_anios' => '',
         'puede_leer' => '',
         'puede_escribir' => '',
+        'idioma_principal_evaluacion' => '',
+        'cod_residente_contacto_informante' => '',
+        'informante_conoce_nivel_previo' => '',
     ];
 
     protected $queryString = ['tab'];
@@ -203,8 +210,43 @@ final class FichaPsicologicaResidente extends Component
         }
 
         $this->mostrarFormSesion = false;
+        $this->confirmarDescarteSesion = false;
         $this->reset('formSesion');
         $this->mensajeExito = 'Sesión de atención psicológica registrada exitosamente en el expediente.';
+    }
+
+    public function alternarFormularioSesion(): void
+    {
+        $this->autorizar();
+        if ($this->mostrarFormSesion && (($this->formSesion['tipo_atencion'] ?? 'SEGUIMIENTO') !== 'SEGUIMIENTO'
+            || collect($this->formSesion)->except('tipo_atencion')->contains(fn ($v) => $v !== '' && $v !== null))) {
+            $this->confirmarDescarteSesion = true;
+
+            return;
+        }
+        $this->mostrarFormSesion = ! $this->mostrarFormSesion;
+    }
+
+    public function conservarSesion(): void
+    {
+        $this->autorizar();
+        $this->confirmarDescarteSesion = false;
+    }
+
+    public function descartarSesion(): void
+    {
+        $this->autorizar();
+        $this->reset('formSesion');
+        $this->mostrarFormSesion = $this->confirmarDescarteSesion = false;
+        $this->resetValidation();
+    }
+
+    public function updatedFormSesion(mixed $valor, string $campo): void
+    {
+        if ($campo === 'cod_residente_contacto_informante') {
+            $this->formSesion['informante_conoce_nivel_previo'] = '';
+            $this->resetValidation('formSesion.informante_conoce_nivel_previo');
+        }
     }
 
     public function cambiarPeriodoTendencia(int $meses): void
@@ -229,6 +271,8 @@ final class FichaPsicologicaResidente extends Component
         $puedeConsultarIadl = $usuario->checkPermissionTo('controles_funcionales_iadl.ver', 'web');
         $puedeConsultarContactos = $usuario->checkPermissionTo('contactos.ver', 'web')
             && $usuario->checkPermissionTo('residentes_contactos.ver', 'web');
+        $informantesSesion = $this->mostrarFormSesion && $puedeConsultarContactos
+            ? app(ContextoAtencionCognitiva::class)->informantes($usuario, $this->residente) : collect();
 
         // 1. Datos del Resumen
         $totalInstrumentos = AplicacionInstrumento::where('cod_residente', $codResidente)->count();
@@ -306,6 +350,7 @@ final class FichaPsicologicaResidente extends Component
             $sesionesPsicologia = Atencion::where('cod_residente', $codResidente)
                 ->whereHas('personal', fn ($q) => $q->where('profesion', 'PSICOLOGIA'))
                 ->with('personal')
+                ->when($puedeConsultarContactos, fn ($q) => $q->with('informantePrincipal.contacto:cod_contacto,nombres,apellido_paterno,apellido_materno'))
                 ->orderByDesc('fecha_hora')
                 ->get();
         } elseif ($this->tab === 'informes') {
@@ -393,6 +438,7 @@ final class FichaPsicologicaResidente extends Component
             'totalIadl',
             'puedeConsultarIadl',
             'puedeConsultarContactos',
+            'informantesSesion',
             'totalSesiones',
             'ultimaValoracionPsicologica',
             'ultimaEvaluacionCognitiva',

@@ -95,9 +95,13 @@ final readonly class PrepararCapturaInstrumental
         abort_unless($usuario->checkPermissionTo('atenciones.ver', 'web'), 403);
         $this->contexto($usuario, $codigoResidente);
 
+        $puedeVerInformante = app(ContextoAtencionCognitiva::class)->puedeVerInformantes($usuario);
+
         return Atencion::query()->where('cod_residente', $codigoResidente)
             ->with('personal:cod_personal,nombres,apellido_paterno,apellido_materno')
-            ->select(['cod_atencion', 'cod_personal', 'fecha_hora', 'tipo_atencion', 'estado', 'escolaridad_anios', 'puede_leer', 'puede_escribir']);
+            ->when($puedeVerInformante, fn ($q) => $q->with('informantePrincipal.contacto:cod_contacto,nombres,apellido_paterno,apellido_materno'))
+            ->select(['cod_atencion', 'cod_personal', 'fecha_hora', 'tipo_atencion', 'estado', 'escolaridad_anios', 'puede_leer', 'puede_escribir', 'idioma_principal_evaluacion',
+                ...($puedeVerInformante ? ['cod_residente_contacto_informante', 'informante_conoce_nivel_previo'] : [])]);
     }
 
     public function instrumentos(?User $usuario): Collection

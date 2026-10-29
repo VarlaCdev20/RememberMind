@@ -17,6 +17,8 @@ related_modules: []
 
 # RememberMind — Baseline Rector de la BDD Operativa
 
+**Extensión autorizada e instalada del 29/10/2026:** [idioma principal e informante principal por atención](PROPUESTA_CONTEXTO_IDIOMA_INFORMANTE_2026_10_29.md), tres columnas nullable, FK restrictiva al vínculo existente e índice de soporte. Conserva 4FN en este alcance,28.107 atenciones previas e inventario 106 de negocio + 16 técnicas; sin backfill ni uso inferencial automático.
+
 **Extensión acotada del28/10/2026:** [contexto escalar por atención y justificación de 4FN](DECISION_CONTEXTO_ESCOLARIDAD_4FN_2026_10_28.md): `escolaridad_anios SMALLINT NULL`, `puede_leer BOOLEAN NULL` y `puede_escribir BOOLEAN NULL`. Sin tablas/FK nuevas, backfill o inferencia automática; conserva el grano del episodio. Los límites y la evidencia están en la decisión específica.
 
 **Inventario vigente — 27/10/2026:** la instalación expresamente autorizada

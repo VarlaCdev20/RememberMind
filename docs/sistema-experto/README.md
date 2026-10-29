@@ -1,8 +1,8 @@
 ---
 title: "Sistema experto: fuentes, funcionamiento y límites"
 status: CURRENT
-version: "3.15"
-last_reviewed: 2026-10-28
+version: "3.16"
+last_reviewed: 2026-10-29
 owner: RememberMind
 source_of_truth: false
 source_of_truth_scope: [expert_contract_routing]
@@ -19,6 +19,7 @@ Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años,
 
 | Necesito encontrar… | Abrir |
 |---|---|
+| Entrega completa de la fase de contexto: conceptos, captura, integración y pruebas | [Cierre de contexto y procedencia del 29/10](ENTREGA_FASE_CONTEXTO_COGNITIVO_2026_10_29.md) |
 | Primer bloque: qué registrar y cómo validarlo | [Contrato de captura y preparación sin residentes](organizacion/REGISTROS_ORIGINALES_Y_VALIDACION.md) |
 | De cada fuente a las evidencias del caso | [Mapa de fuentes, áreas y criterios](organizacion/MAPA_FUENTES_A_HECHOS.md) |
 | Los componentes y el diagrama adoptados | [Estructura por ocho componentes](organizacion/ESTRUCTURA_POR_COMPONENTES.md) |
@@ -30,7 +31,7 @@ Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años,
 | Formularios propios de captura y entrevista implementados | [Fuentes médicas, interfaz y verificación responsive](../frontend/FORMULARIOS_CAPTURA_COGNITIVA_2026_10_28.md) |
 | Escolaridad por sesión y límites de idioma/informantes | [Tres campos escalares por atención y justificación de 4FN](../base-de-datos/DECISION_CONTEXTO_ESCOLARIDAD_4FN_2026_10_28.md) |
 | Cómo vincular la evaluación con el contexto de su atención | [Selector contextual, FK existente y límites de interpretación](ENLACE_ATENCION_APLICACION_2026_10_28.md) |
-| Por qué idioma e informantes siguen pendientes y cómo se comprueba | [Cardinalidad, 4FN e inventario técnico del contexto](CONTEXTO_IDIOMA_INFORMANTES_2026_10_28.md) |
+| Idioma e informante principal por atención, conservando 4FN | [Ampliación autorizada e instalada del 29/10](../base-de-datos/PROPUESTA_CONTEXTO_IDIOMA_INFORMANTE_2026_10_29.md); [auditoría precedente del 28/10](CONTEXTO_IDIOMA_INFORMANTES_2026_10_28.md) |
 | Qué materiales originales ya se obtuvieron y qué condiciones faltan | [Cotejo de seis documentos y consultas preparadas](instrumentos/COTEJO_MATERIALES_2026_10_28.md) |
 | Captura de funcionamiento cotidiano por Medicina/Psicología | [Formulario propio, autoría, rectificación e integración](FORMULARIO_FUNCIONAMIENTO_COTIDIANO_2026_10_28.md) |
 | Qué está realmente catalogado en la base local | [Inventario PostgreSQL del 27/10/2026](inventarios/README.md) y [metadatos](inventarios/2026-10-27.json) |

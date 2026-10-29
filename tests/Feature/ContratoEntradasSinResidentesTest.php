@@ -74,7 +74,9 @@ final class ContratoEntradasSinResidentesTest extends TestCase
         self::assertTrue($contexto['escolaridad']['vinculo_con_aplicacion']['estructura_verificada']);
         self::assertFalse($contexto['escolaridad']['se_copia_a_respuestas']);
         self::assertFalse($contexto['escolaridad']['acredita_aplicabilidad_instrumental']);
-        self::assertFalse($contexto['idioma']['contrato_de_captura_episodica_definido']);
+        self::assertTrue($contexto['idioma']['contrato_de_captura_episodica_definido']);
+        self::assertTrue($contexto['idioma']['fuente_por_episodio']['estructura_verificada']);
+        self::assertTrue($contexto['informantes']['fuente_por_episodio']['estructura_verificada']);
         self::assertFalse($contexto['idioma']['idioma_del_material_acredita_idioma_del_caso']);
         self::assertTrue($contexto['informantes']['vinculo_residente_contacto']['estructura_verificada']);
         self::assertFalse($contexto['informantes']['vinculo_maestro_acredita_participacion']);
@@ -133,7 +135,8 @@ final class ContratoEntradasSinResidentesTest extends TestCase
             $contexto = $r['contexto_evaluacion'];
             self::assertFalse($contexto['escolaridad']['estructura_de_referencia_verificada']);
             self::assertFalse($contexto['informantes']['vinculo_residente_contacto']['estructura_verificada']);
-            self::assertFalse($contexto['idioma']['contrato_de_captura_episodica_definido']);
+            self::assertTrue($contexto['idioma']['contrato_de_captura_episodica_definido']);
+            self::assertFalse($contexto['idioma']['fuente_por_episodio']['estructura_verificada']);
             self::assertFalse($contexto['informantes']['vinculo_maestro_acredita_participacion']);
             self::assertSame([], $db->getSchemaBuilder()->getTableListing());
         } finally {

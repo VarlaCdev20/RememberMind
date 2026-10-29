@@ -155,6 +155,30 @@ final class CapturaInstrumentalFormularioTest extends TestCase
         self::assertDatabaseCount('valoraciones_petersen_originales', 0);
     }
 
+    public function test_referencia_contextual_muestra_idioma_e_informante_solo_con_permisos(): void
+    {
+        $contacto = \App\Models\Contacto::create(['nombres' => 'Fuente', 'apellido_paterno' => 'Sintética', 'estado' => 'ACTIVO', 'correo' => 'no-exponer@example.invalid']);
+        $v = \App\Models\ResidenteContacto::create(['cod_residente_contacto' => 'RC_CONTEXT_TEST', 'cod_residente' => $this->residente->getKey(),
+            'cod_contacto' => $contacto->getKey(), 'parentesco' => 'FAMILIAR', 'responsable_principal' => false,
+            'contacto_emergencia' => false, 'autoriza_informacion' => false, 'autoriza_salida' => false, 'estado' => 'ACTIVO']);
+        $a = $this->atencionCaptura(cambios: ['idioma_principal_evaluacion' => 'Aymara',
+            'cod_residente_contacto_informante' => $v->getKey(), 'informante_conoce_nivel_previo' => false]);
+        $this->usuario->givePermissionTo(['contactos.ver', 'residentes_contactos.ver']);
+        $c = $this->abrir()->set('cod_instrumento', $this->instrumento->getKey())->set('cod_atencion', $a->getKey())
+            ->assertSee('Aymara')->assertSee('Fuente Sintética')->assertDontSee('no-exponer@example.invalid')
+            ->set('valores.'.$this->preguntas['NUMERICO']->getKey(), '0')->call('revisar')
+            ->assertSee('Fuente Sintética')->assertSee('no acredita por sí sola las condiciones');
+        $this->usuario->revokePermissionTo(['contactos.ver', 'residentes_contactos.ver']);
+        $this->usuario->roles()->first()->revokePermissionTo(['contactos.ver', 'residentes_contactos.ver']);
+        $c->call('$refresh')->assertSee('Aymara')->assertDontSee('Fuente Sintética')
+            ->assertSee('Consulta restringida por permisos de contactos.');
+        $fuente = app(PrepararCapturaInstrumental::class)->atencion($this->usuario, $this->residente->getKey(), $a->getKey());
+        self::assertArrayNotHasKey('cod_residente_contacto_informante', $fuente->getAttributes());
+        self::assertFalse($fuente->relationLoaded('informantePrincipal'));
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+        self::assertDatabaseCount('respuestas_instrumento', 0);
+    }
+
     public function test_vinculo_ajeno_se_rechaza_en_formulario_y_backend_sin_escribir(): void
     {
         $ajena = $this->atencionCaptura(Residente::factory()->create(['estado' => 'ADMITIDO']));

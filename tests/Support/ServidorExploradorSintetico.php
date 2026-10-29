@@ -64,7 +64,7 @@ if ($comprobar) {
     echo json_encode(['aplicaciones' => App\Models\AplicacionInstrumento::count(),
         'respuestas' => App\Models\RespuestaInstrumento::count(), 'atencion_aplicacion' => App\Models\AplicacionInstrumento::value('cod_atencion'), 'valor_logico' => App\Models\RespuestaInstrumento::value('valor_logico'),
         'evaluaciones' => App\Models\EvaluacionExperta::count(), 'instrumentos' => App\Models\Instrumento::count(),
-        'contexto_sesion' => App\Models\Atencion::query()->where('tipo_atencion', 'ENTREVISTA_FAMILIAR')->first()?->only(['escolaridad_anios', 'puede_leer', 'puede_escribir']),
+        'contexto_sesion' => App\Models\Atencion::query()->where('tipo_atencion', 'ENTREVISTA_FAMILIAR')->first()?->only([...App\Models\Atencion::CONTEXTO_ESCOLARIDAD, ...App\Models\Atencion::CONTEXTO_IDIOMA_INFORMANTE]),
         'funcionamiento' => App\Models\ControlFuncionalIadl::query()->orderBy('registrado_en')->orderBy('cod_control_iadl')->get(['cod_control_iadl', 'cod_control_anterior', 'desempeno', 'oportunidad', 'nivel_previo', 'observacion'])->toArray()], JSON_THROW_ON_ERROR);
     exit;
 }
@@ -77,6 +77,7 @@ if ($preparar) {
     Artisan::call('db:seed', ['--class' => RolesAndPermissionsSeeder::class, '--force' => true]);
     $usuario = User::factory()->create(['cod_usuario' => 'E2E_GUIA', 'estado' => 'ACTIVO']);
     $usuario->assignRole('PSICOLOGO/A');
+    $usuario->givePermissionTo(['contactos.ver', 'residentes_contactos.ver']);
     $personal = Personal::create(['cod_usuario' => $usuario->getKey(), 'nombres' => 'Profesional', 'apellido_paterno' => 'Sintético', 'numero_documento' => 'E2E-GUIA', 'profesion' => 'PSICOLOGIA', 'estado' => 'ACTIVO']);
     foreach (['ARE_COG' => 'Cognitiva', 'ARE_AFE' => 'Afectiva', 'ARE_FUN' => 'Funcionamiento', 'ARE_SOC' => 'Entorno'] as $codigo => $nombre) {
         Area::create(['cod_area' => $codigo, 'nombre' => $nombre, 'estado' => 'ACTIVA']);
@@ -85,7 +86,11 @@ if ($preparar) {
     $jornada = Jornada::create(['cod_turno' => $turno->getKey(), 'fecha_jornada' => today(), 'estado' => 'ABIERTA']);
     AsignacionPersonal::create(['cod_personal' => $personal->getKey(), 'cod_jornada' => $jornada->getKey(), 'cod_area' => 'ARE_COG', 'fecha_asignacion' => now(), 'estado' => 'ACTIVA']);
     Residente::factory()->create(['cod_residente' => 'RES_E2E_GUIA', 'nombres' => 'Residente sintético', 'apellido_paterno' => 'Explorador', 'apellido_materno' => 'Verificación', 'estado' => 'ADMITIDO', 'nivel_educativo' => 'Escolaridad sintética de referencia']);
-    App\Models\Atencion::create(['cod_atencion' => 'ATE_E2E_GUIA', 'cod_residente' => 'RES_E2E_GUIA', 'cod_personal' => $personal->getKey(), 'cod_area' => 'ARE_COG', 'tipo_atencion' => 'VALORACION', 'fecha_hora' => now()->subHour(), 'estado' => 'FINALIZADA', 'motivo' => 'Atención sintética de referencia', 'escolaridad_anios' => 0, 'puede_leer' => false]);
+    $contacto = App\Models\Contacto::create(['nombres' => 'Informante sintético', 'apellido_paterno' => 'Verificación', 'estado' => 'ACTIVO']);
+    App\Models\ResidenteContacto::create(['cod_residente_contacto' => 'RC_E2E_GUIA', 'cod_residente' => 'RES_E2E_GUIA', 'cod_contacto' => $contacto->getKey(),
+        'parentesco' => 'FAMILIAR', 'responsable_principal' => true, 'contacto_emergencia' => false, 'autoriza_informacion' => false, 'autoriza_salida' => false, 'estado' => 'ACTIVO']);
+    App\Models\Atencion::create(['cod_atencion' => 'ATE_E2E_GUIA', 'cod_residente' => 'RES_E2E_GUIA', 'cod_personal' => $personal->getKey(), 'cod_area' => 'ARE_COG', 'tipo_atencion' => 'VALORACION', 'fecha_hora' => now()->subHour(), 'estado' => 'FINALIZADA', 'motivo' => 'Atención sintética de referencia', 'escolaridad_anios' => 0, 'puede_leer' => false,
+        'idioma_principal_evaluacion' => 'Español', 'cod_residente_contacto_informante' => 'RC_E2E_GUIA', 'informante_conoce_nivel_previo' => true]);
     foreach (['OBS' => ['OBSERVACIONAL', 'ACTIVO'], 'FUN' => ['FUNCIONAL', 'ACTIVO'], 'HIS' => ['COGNITIVO', 'INACTIVO']] as $codigo => [$tipo, $estado]) {
         $instrumento = Instrumento::create(['cod_instrumento' => 'E2E_'.$codigo, 'codigo' => 'SINTETICO-'.$codigo, 'nombre' => $codigo === 'FUN' ? 'Registro funcional sintético' : 'Registro de observación sintético '.$codigo, 'version' => 'QA-UI-1', 'descripcion' => 'Contenido artificial para comprobar la interfaz. No es una escala clínica.', 'tipo' => $tipo, 'estado' => $estado]);
         if ($estado === 'ACTIVO') {

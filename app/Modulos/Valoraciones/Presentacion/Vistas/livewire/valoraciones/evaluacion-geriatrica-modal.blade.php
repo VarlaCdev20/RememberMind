@@ -26,11 +26,7 @@
                         <summary>Atención vinculada · {{ $atencionVista->fecha_hora?->format('d/m/Y H:i') }}</summary>
                         <p class="rm-captura__ayuda">Profesional: {{ $atencionVista->personal?->nombres }} {{ $atencionVista->personal?->apellido_paterno }}. Información recabada en esa atención; no acredita por sí sola las condiciones de esta aplicación.</p>
                         <p class="rm-captura__ayuda">{{ \Illuminate\Support\Str::headline(mb_strtolower($atencionVista->getRawOriginal('tipo_atencion'))) }} · Estado de la atención: {{ \Illuminate\Support\Str::headline(mb_strtolower($atencionVista->estado)) }}</p>
-                        <dl class="rm-captura__guia-grid">
-                            <div><dt>Escolaridad informada en la atención</dt><dd>{{ $atencionVista->escolaridad_anios === null ? 'No registrada' : $atencionVista->escolaridad_anios.' años' }}</dd></div>
-                            <div><dt>Lectura referida</dt><dd>{{ $atencionVista->puede_leer === null ? 'No se conoce' : ($atencionVista->puede_leer ? 'Sí' : 'No') }}</dd></div>
-                            <div><dt>Escritura referida</dt><dd>{{ $atencionVista->puede_escribir === null ? 'No se conoce' : ($atencionVista->puede_escribir ? 'Sí' : 'No') }}</dd></div>
-                        </dl>
+                        <x-ui.cognitive-attention-context :atencion="$atencionVista" :puede-ver-informante="$puedeVerInformantes" />
                         <p class="rm-captura__ayuda">Vincular conserva la referencia; no copia estos datos a las respuestas ni ajusta puntuaciones.</p>
                     </details>
                 @endif

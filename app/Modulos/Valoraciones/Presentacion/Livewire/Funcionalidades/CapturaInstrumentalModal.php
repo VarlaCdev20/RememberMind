@@ -394,8 +394,10 @@ abstract class CapturaInstrumentalModal extends Component
         $instrumentos = $residentes = $documentos = $atenciones = collect();
         $atencionVista = null;
         $puedeVerAtenciones = false;
+        $puedeVerInformantes = false;
         if ($this->mostrar) {
             $instrumentos = $consulta->instrumentos(auth()->user());
+            $puedeVerInformantes = app(\App\Modulos\Valoraciones\Aplicacion\Consultas\ContextoAtencionCognitiva::class)->puedeVerInformantes(\App\Models\User::query()->findOrFail(auth()->id()));
             if ($this->cod_residente !== null) {
                 $this->comprobarResidente();
                 $puedeVerAtenciones = auth()->user()->checkPermissionTo('atenciones.ver', 'web');
@@ -443,6 +445,6 @@ abstract class CapturaInstrumentalModal extends Component
             'total' => count($respuestasVista), 'respondidas' => count(array_filter($respuestasVista, fn ($r) => $r['registrada'])),
             'respuestas' => $respuestasVista];
 
-        return view('livewire.valoraciones.evaluacion-geriatrica-modal', compact('instrumentos', 'residentes', 'documentos', 'resumenCaptura', 'atenciones', 'atencionVista', 'puedeVerAtenciones'));
+        return view('livewire.valoraciones.evaluacion-geriatrica-modal', compact('instrumentos', 'residentes', 'documentos', 'resumenCaptura', 'atenciones', 'atencionVista', 'puedeVerAtenciones', 'puedeVerInformantes'));
     }
 }

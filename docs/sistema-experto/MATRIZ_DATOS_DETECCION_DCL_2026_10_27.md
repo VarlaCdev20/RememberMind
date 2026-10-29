@@ -1,8 +1,8 @@
 ---
 title: "Detección temprana de DCL: ficha y matriz de datos"
 status: DRAFT
-version: "0.5"
-last_reviewed: 2026-10-28
+version: "0.6"
+last_reviewed: 2026-10-29
 owner: ApoyoDecision
 source_of_truth: false
 verification_scope: STATIC_SOURCE_AND_CODE_REVIEW
@@ -57,14 +57,16 @@ Los estados pertenecen a esta matriz de auditoría; no son nuevos catálogos de 
 
 **Revisión de D03/D06:** el [informe de idioma e informantes](CONTEXTO_IDIOMA_INFORMANTES_2026_10_28.md) distingue vínculo maestro, participación episódica e idioma de material. El inventario verifica la estructura sin consultar pacientes y conserva pendientes explícitos; las preguntas de cardinalidad no autorizan nuevas tablas.
 
+**Cierre de captura principal del29/10:** [entrega de contexto y procedencia](ENTREGA_FASE_CONTEXTO_COGNITIVO_2026_10_29.md), con FK expresamente autorizada e instalada para el informante principal, idioma principal y conocimiento previo referido. Complementos narrativos no se extraen como hechos. Se resuelve la captura principal por episodio; aplicabilidad cultural/instrumental y calidad del relato siguen requiriendo contrato y valoración profesional.
+
 | ID / dato necesario | Captura y fuente localizada | Conservación y consumidor | Estado | Trabajo siguiente |
 |---|---|---|---|---|
 | D01. Identidad y edad en evaluación | Admisión formal; `fecha_nacimiento` del residente. E01/E02. | `residentes`; E03 calcula años a la fecha de la aplicación y conserva la fuente en la proyección. | C | Verificar límite de población y casos de cumpleaños/fecha desconocida; no usar edad actual para interpretar pruebas antiguas. |
 | D02. Escolaridad y alfabetización | Admisión recibe `nivel_educativo`; los métodos pueden exigir `escolaridad_anios` y `lectoescritura` en respuestas explícitas. E02/E04. | El texto educativo del residente no equivale a años de escolaridad de una aplicación; E03/E05 exigen perfiles y preguntas exactas. | P | Precisar dato y fuente para cada instrumento elegido. No convertir categorías educativas a años por suposición. |
-| D03. Idioma y contexto cultural | Algunos métodos investigados exigen idioma/identidad y condiciones como español nativo o procedencia. E04/E05. | Respuestas de la aplicación y perfil de extracción; no se localizó un dato maestro de idioma en el diccionario revisado. | P | Inventariar formularios y versiones reales; documentar aplicabilidad cultural sin deducir idioma desde país o nombre. |
+| D03. Idioma y contexto cultural | Idioma principal por atención, opcional, con referencia autorizada desde la aplicación. Otros idiomas, intérprete y limitaciones en notas para lectura profesional. | `atenciones.idioma_principal_evaluacion`; no equivale al idioma del material ni acredita aplicabilidad normativa. | P | Captura principal implementada. Cerrar versión/perfil y aplicabilidad cultural de cada método sin deducir idioma desde país o nombre. |
 | D04. Visión, audición y condiciones de aplicación | El catálogo de métodos incluye comprobaciones sensoriales según prueba; respuestas lógicas originales. E04/E05. | `respuestas_instrumento.valor_logico`, enlazado a su pregunta/aplicación. | P | Confirmar qué método pide cada condición y qué formulario la solicita. No marcar compatibilidad por defecto. |
 | D05. Ocupación previa y funcionamiento habitual | Posible soporte documental/valoración psicológica; no se localizó una captura específica consolidada en las fuentes revisadas. E08/E14. | Narrativa y documento son candidatos, no un campo estructurado ni un hecho extraído automáticamente. | N | Revisar fuentes de Admisiones, Social y clínica antes de plantear captura adicional. |
-| D06. Informante y calidad del relato | Existen contacto y vínculo con residente; C01 admite fuentes de historia/corroboración. E06/E07. | `residentes_contactos` no prueba por sí mismo quién informó una evaluación ni la fiabilidad de su relato. | P | Definir cómo identificar el informante real del episodio usando relaciones autorizadas; no escoger al responsable principal automáticamente. |
+| D06. Informante y calidad del relato | Informante principal explícito por atención mediante FK al vínculo existente y conocimiento previo referido nullable; otros relatos y discrepancias se documentan en notas. | Identifica participación principal conservada. El vínculo maestro aislado no prueba participación; la selección no certifica fiabilidad ni acredita C01 automáticamente. | P | Captura principal implementada. Corroboración y calidad siguen siendo valoración profesional con los soportes admitidos; no activar hechos desde narrativa. |
 | D07. Cambio respecto al estado previo | Observación cognitiva y juicio original C01 con `cambio_respecto_previo`, justificación y soportes. E07/E08. | `controles_cognitivos`, `valoraciones_petersen_originales` y `soportes_valoracion_petersen`. | C | Verificar inicio, evolución y ejemplos en la captura; una señal aislada no sustituye historia previa. |
 | D08. Corroboración e independencia de episodios | C01 exige `HISTORIA_PREVIA` y `CORROBORACION`; tipos de fuente cerrados. E07. | FK a control cognitivo, valoración psicológica o documento; comprobación profesional y contrato de episodios. | C | Probar que dos formularios del mismo episodio no se cuenten como corroboración independiente. Esta exigencia es institucional, no una duración universal del DCL. |
 

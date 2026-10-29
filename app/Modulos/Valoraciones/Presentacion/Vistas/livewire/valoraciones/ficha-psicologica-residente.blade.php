@@ -822,7 +822,7 @@
                         </p>
                     </div>
                     @if(auth()->user()?->hasRole('PSICOLOGO/A') && auth()->user()?->checkPermissionTo('atenciones.crear', 'web'))
-                    <button type="button" wire:click="$toggle('mostrarFormSesion')" class="rm-btn rm-btn-primary text-xs shrink-0">
+                    <button type="button" wire:click="alternarFormularioSesion" class="rm-btn rm-btn-primary text-xs shrink-0">
                         <i class="ph {{ $mostrarFormSesion ? 'ph-x' : 'ph-plus' }} mr-1"></i>
                         {{ $mostrarFormSesion ? 'Cancelar sesión' : 'Registrar nueva sesión' }}
                     </button>
@@ -833,6 +833,15 @@
                 @if($mostrarFormSesion)
                     <x-ui.section-card title="Entrevista y atención psicológica" subtitle="Documenta el motivo, las fuentes y lo observado durante la sesión." icon="ph-notebook">
                         <p class="rm-captura__ayuda mb-4">Residente: <strong>{{ $residente->nombre_completo }}</strong>. El registro conservará al profesional de la sesión y la fecha y hora del guardado.</p>
+                        @if($confirmarDescarteSesion)
+                            <div class="rm-captura__guia mb-4" role="alert" aria-label="Cambios de la sesión sin guardar">
+                                <p>Hay datos sin guardar. Puedes continuar la entrevista o descartarlos.</p>
+                                <div class="flex flex-wrap gap-3 mt-3">
+                                    <button type="button" wire:click="conservarSesion" class="rm-btn rm-btn-primary">Continuar entrevista</button>
+                                    <button type="button" wire:click="descartarSesion" class="rm-btn rm-btn-secondary">Descartar sesión</button>
+                                </div>
+                            </div>
+                        @endif
                         <form wire:submit.prevent="guardarSesion" class="rm-captura__formulario">
                             <x-ui.form-section title="Motivo y contexto" description="Identifica qué atención realizaste y qué motivó la consulta." step="1" icon="ph-chat-circle-text">
                                 <x-ui.field for="sesion-tipo" label="Tipo de atención" error="formSesion.tipo_atencion" required>
@@ -860,14 +869,38 @@
                                     </x-ui.field>
                                 @endforeach
                             </x-ui.form-section>
-                            <x-ui.form-section title="Relato, observaciones y actuación" description="Diferencia la información referida de lo observado y de la intervención realizada." step="3" icon="ph-note-pencil" :columns="1">
-                                <x-ui.field for="sesion-notas" label="Notas de la entrevista o sesión" error="formSesion.observacion" help="Hasta 1000 caracteres. Puedes incluir la fuente del relato, cambios descritos, respuesta del residente y acuerdos.">
+                            <x-ui.form-section title="Idioma y fuente del relato" description="Datos opcionales de esta atención. Seleccionar a alguien confirma que aportó información; no certifica la fiabilidad de su relato." step="3" icon="ph-users" :columns="2">
+                                <x-ui.field for="sesion-idioma" label="Idioma principal utilizado" error="formSesion.idioma_principal_evaluacion" help="Escribe un idioma, por ejemplo español, quechua o aymara. Otros idiomas e intérpretes se describen en las notas; no se deduce el idioma de la nacionalidad.">
+                                    <input id="sesion-idioma" type="text" wire:model="formSesion.idioma_principal_evaluacion" class="rm-input w-full" maxlength="80" aria-describedby="sesion-idioma-help{{ $errors->has('formSesion.idioma_principal_evaluacion') ? ' sesion-idioma-error' : '' }}" aria-invalid="{{ $errors->has('formSesion.idioma_principal_evaluacion') ? 'true' : 'false' }}">
+                                </x-ui.field>
+                                @if($puedeConsultarContactos)
+                                    <x-ui.field for="sesion-informante" label="Informante principal que participó" error="formSesion.cod_residente_contacto_informante" help="Elige solamente a quien aportó el relato. Si no participó o no está registrado, deja sin seleccionar y documenta la fuente en las notas.">
+                                        <x-ui.selector id="sesion-informante" label="Informante principal que participó" wire:model.live="formSesion.cod_residente_contacto_informante" :aria-invalid="$errors->has('formSesion.cod_residente_contacto_informante') ? 'true' : 'false'" :aria-describedby="'sesion-informante-help'.($errors->has('formSesion.cod_residente_contacto_informante') ? ' sesion-informante-error' : '')">
+                                            <option value="">Sin informante seleccionado</option>
+                                            @foreach($informantesSesion as $vinculoSesion)
+                                                <option value="{{ $vinculoSesion->getKey() }}">{{ $vinculoSesion->contacto?->nombre_completo }}</option>
+                                            @endforeach
+                                        </x-ui.selector>
+                                    </x-ui.field>
+                                    @if(filled($formSesion['cod_residente_contacto_informante'] ?? null))
+                                        <x-ui.field for="sesion-nivel-previo" label="¿El informante refiere conocer el nivel previo?" error="formSesion.informante_conoce_nivel_previo" help="Cómo funcionaba la persona antes de los cambios. No es un juicio de confiabilidad ni una conclusión sobre DCL.">
+                                            <x-ui.selector id="sesion-nivel-previo" label="¿El informante refiere conocer el nivel previo?" wire:model="formSesion.informante_conoce_nivel_previo" :aria-invalid="$errors->has('formSesion.informante_conoce_nivel_previo') ? 'true' : 'false'" :aria-describedby="'sesion-nivel-previo-help'.($errors->has('formSesion.informante_conoce_nivel_previo') ? ' sesion-nivel-previo-error' : '')">
+                                                <option value="">No se conoce</option><option value="1">Sí</option><option value="0">No</option>
+                                            </x-ui.selector>
+                                        </x-ui.field>
+                                    @endif
+                                @else
+                                    <p class="rm-captura__ayuda">La selección de contactos requiere los permisos de consulta de contactos y sus vínculos. Puedes conservar el relato en las notas de la sesión.</p>
+                                @endif
+                            </x-ui.form-section>
+                            <x-ui.form-section title="Relato, observaciones y actuación" description="Diferencia lo referido por el residente, lo referido por otras personas, lo observado y la intervención realizada." step="4" icon="ph-note-pencil" :columns="1">
+                                <x-ui.field for="sesion-notas" label="Notas de la entrevista o sesión" error="formSesion.observacion" help="Hasta 1000 caracteres. Describe cambios y su inicio, repercusión cotidiana, otros participantes o idiomas, intérprete, discrepancias y limitaciones de la evaluación; registra acuerdos y seguimiento.">
                                     <textarea id="sesion-notas" wire:model="formSesion.observacion" rows="5" maxlength="1000" class="rm-textarea w-full" aria-describedby="sesion-notas-help{{ $errors->has('formSesion.observacion') ? ' sesion-notas-error' : '' }}" aria-invalid="{{ $errors->has('formSesion.observacion') ? 'true' : 'false' }}"></textarea>
                                 </x-ui.field>
                                 <x-ui.cognitive-context-guide id="sesion-guia-contexto" :nivel-educativo="$residente->nivel_educativo" />
                             </x-ui.form-section>
                             <div class="rm-captura__acciones">
-                                <button type="button" wire:click="$set('mostrarFormSesion', false)" class="rm-btn rm-btn-secondary" wire:loading.attr="disabled" wire:target="guardarSesion">Cerrar formulario</button>
+                                <button type="button" wire:click="alternarFormularioSesion" class="rm-btn rm-btn-secondary" wire:loading.attr="disabled" wire:target="guardarSesion">Cerrar formulario</button>
                                 <button type="submit" class="rm-btn rm-btn-primary" wire:loading.attr="disabled" wire:target="guardarSesion"><span wire:loading.remove wire:target="guardarSesion">Guardar sesión</span><span wire:loading wire:target="guardarSesion">Registrando…</span></button>
                             </div>
                         </form>
@@ -932,11 +965,7 @@
                                     @if($atencion->observacion)
                                         <p class="text-[var(--rm-text-secondary)] italic text-[11px] border-t border-[var(--rm-border)]/50 pt-1">«{{ $atencion->observacion }}»</p>
                                     @endif
-                                    <dl class="rm-captura__guia-grid" aria-label="Contexto recabado en esta sesión">
-                                        <div><dt>Escolaridad informada</dt><dd>{{ $atencion->escolaridad_anios === null ? 'No registrada en esta sesión' : $atencion->escolaridad_anios.' años' }}</dd></div>
-                                        <div><dt>Lectura referida</dt><dd>{{ $atencion->puede_leer === null ? 'No se conoce' : ($atencion->puede_leer ? 'Sí' : 'No') }}</dd></div>
-                                        <div><dt>Escritura referida</dt><dd>{{ $atencion->puede_escribir === null ? 'No se conoce' : ($atencion->puede_escribir ? 'Sí' : 'No') }}</dd></div>
-                                    </dl>
+                                    <x-ui.cognitive-attention-context :atencion="$atencion" :puede-ver-informante="$puedeConsultarContactos" aria-label="Contexto recabado en esta sesión" />
                                 </div>
                             @endforeach
                         </div>

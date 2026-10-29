@@ -1,6 +1,6 @@
 ---
 title: "Contexto de evaluación: idioma e informantes, sin desnormalizar"
-status: CURRENT
+status: SUPERSEDED_IN_SCOPE
 version: "1.0"
 last_reviewed: 2026-10-28
 owner: ApoyoDecision
@@ -10,6 +10,8 @@ runtime_verified: true
 ---
 
 # Alcance de esta continuación
+
+**Actualización del29/10:** este informe conserva la evidencia del corte anterior. La propietaria autorizó la FK propuesta y el cierre con idioma principal e informante principal, con complemento narrativo; véanse [decisión estructural](../base-de-datos/PROPUESTA_CONTEXTO_IDIOMA_INFORMANTE_2026_10_29.md) y [entrega completa](ENTREGA_FASE_CONTEXTO_COGNITIVO_2026_10_29.md). Las preguntas y pendientes de captura principal descritos abajo quedaron resueltos en ese alcance. No se adoptó un registro estructurado multivaluado de participantes o idiomas.
 
 La propietaria indicó continuar después de [vincular la aplicación instrumental con su atención](ENLACE_ATENCION_APLICACION_2026_10_28.md). Se revisaron los pendientes de idioma e informantes sin asumir una nueva relación, cardinalidad o catálogo. La autorización de ampliar campos preservando4FN sigue acotada por la [decisión de no crear más tablas](../base-de-datos/DECISION_SIN_NUEVAS_TABLAS_2026_10_27.md). «Dale» o «continúa» no sustituyen esa prohibición.
 

@@ -99,6 +99,7 @@
 .rm-captura__etapas span { display: grid; place-items: center; flex: 0 0 auto; width: var(--rm-space-6); height: var(--rm-space-6); border-radius: var(--rm-radius-full); background: var(--rm-surface); font-weight: 800; }
 .rm-captura__etapas .is-current { color: var(--rm-primary-ink); background: var(--rm-selected-bg); font-weight: 700; }
 .rm-captura__formulario { display: grid; gap: var(--rm-space-5); min-width: 0; }
+.rm-captura__formulario :is(input, textarea, button, summary) { scroll-margin-block-start: calc(var(--rm-topbar-height) * 2 + var(--rm-space-6)); }
 .rm-captura__origen { min-width: 0; }
 .rm-captura__origen legend { margin-bottom: var(--rm-space-2); }
 .rm-captura__origen label { display: flex; align-items: center; gap: var(--rm-space-3); padding: var(--rm-space-3); min-height: 44px; border: 1px solid var(--rm-border); border-radius: var(--rm-radius-lg); background: var(--rm-surface-soft); cursor: pointer; }

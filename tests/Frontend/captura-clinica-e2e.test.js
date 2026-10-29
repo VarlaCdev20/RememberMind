@@ -35,7 +35,7 @@ test('captura propia: revisión, entrevista y cinco tamaños', { skip: process.e
     assert.match(await run(['--preparar']), /PREPARADO/);
     const server = spawn('php', [...args, '-S', `127.0.0.1:${port}`, '-t', 'public', router], { cwd: root, env, windowsHide: true, stdio: 'ignore' });
     t.after(() => server.kill());
-    const evidence = path.join(root, 'output', 'captura-clinica-20261028');
+    const evidence = path.join(root, 'output', 'captura-contexto-20261029');
     await mkdir(evidence, { recursive: true });
     const executablePath = [process.env.PUPPETEER_EXECUTABLE_PATH, await puppeteer.executablePath(), 'C:/Program Files/Google/Chrome/Application/chrome.exe', 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'].find(value => value && existsSync(value));
     const browser = await puppeteer.launch({ headless: true, executablePath, args: ['--no-sandbox'] });
@@ -73,6 +73,8 @@ test('captura propia: revisión, entrevista y cinco tamaños', { skip: process.e
     await clickText('.rm-choice__popover [role=option]', 'Profesional Sintético');
     await page.waitForSelector('[aria-label="Referencia de la atención vinculada"]');
     assert.match(await page.$eval('[aria-label="Referencia de la atención vinculada"]', element => element.textContent), /0 años/);
+    assert.match(await page.$eval('[aria-label="Referencia de la atención vinculada"]', element => element.textContent), /Español/);
+    assert.match(await page.$eval('[aria-label="Referencia de la atención vinculada"]', element => element.textContent), /Informante sintético Verificación/);
     await page.waitForSelector('.rm-modal-shell.is-open button[id^="captura-valor-"]');
     await page.click('.rm-modal-shell.is-open button[id^="captura-valor-"]');
     await clickText('.rm-choice__popover [role="option"]', 'No');
@@ -150,6 +152,14 @@ test('captura propia: revisión, entrevista y cinco tamaños', { skip: process.e
     await page.click('#sesion-puede_leer');
     await clickText('.rm-choice__popover [role=option]', 'No', true);
     await page.waitForFunction(() => document.querySelector('#sesion-puede_leer').innerText.trim() === 'No');
+    await page.type('#sesion-idioma', 'Quechua');
+    assert.match(await page.$eval('#sesion-informante', element => element.innerText), /Sin informante seleccionado/);
+    await page.click('#sesion-informante');
+    await clickText('.rm-choice__popover [role=option]', 'Informante sintético Verificación', true);
+    await page.waitForSelector('#sesion-nivel-previo');
+    await page.click('#sesion-nivel-previo');
+    await clickText('.rm-choice__popover [role=option]', 'No', true);
+    await page.waitForFunction(() => document.querySelector('#sesion-nivel-previo').innerText.trim() === 'No');
     await page.type('#sesion-notas', 'Relato del informante sintético, diferenciado de la observación directa.');
     await page.focus('#sesion-guia-contexto summary');
     await page.keyboard.press('Enter');
@@ -163,6 +173,13 @@ test('captura propia: revisión, entrevista y cinco tamaños', { skip: process.e
         await page.screenshot({ path: path.join(evidence, `entrevista-${width}.png`), fullPage: false });
         await page.$eval('#sesion-escolaridad', element => element.scrollIntoView({ block: 'start' }));
         await page.screenshot({ path: path.join(evidence, `contexto-sesion-${width}.png`), fullPage: false });
+        await page.$eval('#sesion-idioma', element => element.scrollIntoView({ block: 'start' }));
+        const visibleContext = await page.$eval('#sesion-idioma', element => ({ top: element.getBoundingClientRect().top,
+            labelTop: element.closest('.rm-field').querySelector('label').getBoundingClientRect().top,
+            headerBottom: document.querySelector('.rm-topbar').getBoundingClientRect().bottom }));
+        assert.ok(visibleContext.labelTop >= visibleContext.headerBottom, `Etiqueta bajo cabecera ${width}: ${JSON.stringify(visibleContext)}`);
+        matrix.push({ surface: 'idioma-informante', width, ...visibleContext });
+        await page.screenshot({ path: path.join(evidence, `idioma-informante-${width}.png`), fullPage: false });
         await page.$eval('#sesion-guia-contexto', element => element.scrollIntoView({ block: 'start' }));
         await page.screenshot({ path: path.join(evidence, `guia-entrevista-${width}.png`), fullPage: false });
     }
@@ -173,7 +190,8 @@ test('captura propia: revisión, entrevista y cinco tamaños', { skip: process.e
     await page.waitForFunction(() => document.body.innerText.includes('Sesión de atención psicológica registrada'));
     assert.match(await page.$eval('body', element => element.innerText), /Relato del informante sintético/);
     const guardado = JSON.parse(await run(['--estado']));
-    assert.deepEqual(guardado.contexto_sesion, { escolaridad_anios: 0, puede_leer: false, puede_escribir: null });
+    assert.deepEqual(guardado.contexto_sesion, { escolaridad_anios: 0, puede_leer: false, puede_escribir: null,
+        idioma_principal_evaluacion: 'Quechua', cod_residente_contacto_informante: 'RC_E2E_GUIA', informante_conoce_nivel_previo: false });
     assert.deepEqual(errors, []);
-    await writeFile(path.join(evidence, 'verificacion.json'), JSON.stringify({ matrix, errors, state, contrast, synthetic: true, backend: 'SQLite desechable; flujos Livewire reales' }, null, 2));
+    await writeFile(path.join(evidence, 'verificacion.json'), JSON.stringify({ matrix, errors, state, guardado, contrast, synthetic: true, backend: 'SQLite desechable; flujos Livewire reales' }, null, 2));
 });

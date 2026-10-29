@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 class Atencion extends ModeloOperativo
 {
     public const CONTEXTO_ESCOLARIDAD = ['escolaridad_anios', 'puede_leer', 'puede_escribir'];
+    public const CONTEXTO_IDIOMA_INFORMANTE = ['idioma_principal_evaluacion', 'cod_residente_contacto_informante', 'informante_conoce_nivel_previo'];
 
     protected $table = 'atenciones';
     protected $primaryKey = 'cod_atencion';
@@ -17,7 +18,7 @@ class Atencion extends ModeloOperativo
 
     protected function casts(): array
     {
-        return ['fecha_hora' => 'datetime', 'escolaridad_anios' => 'integer', 'puede_leer' => 'boolean', 'puede_escribir' => 'boolean'];
+        return ['fecha_hora' => 'datetime', 'escolaridad_anios' => 'integer', 'puede_leer' => 'boolean', 'puede_escribir' => 'boolean', 'informante_conoce_nivel_previo' => 'boolean'];
     }
 
     public function adultoMayor(): BelongsTo
@@ -63,6 +64,11 @@ class Atencion extends ModeloOperativo
     public function notas(): HasMany
     {
         return $this->hasMany(NotaClinica::class, 'cod_atencion', 'cod_atencion');
+    }
+
+    public function informantePrincipal(): BelongsTo
+    {
+        return $this->belongsTo(ResidenteContacto::class, 'cod_residente_contacto_informante', 'cod_residente_contacto');
     }
 
     public function getFechaAttribute(): ?\Carbon\Carbon
@@ -125,7 +131,7 @@ class Atencion extends ModeloOperativo
         parent::booted();
 
         static::updating(function (self $model): void {
-            if ($model->isDirty(self::CONTEXTO_ESCOLARIDAD)) {
+            if ($model->isDirty([...self::CONTEXTO_ESCOLARIDAD, ...self::CONTEXTO_IDIOMA_INFORMANTE])) {
                 throw new \LogicException('El contexto de una atención conservada no se sobrescribe.');
             }
         });
