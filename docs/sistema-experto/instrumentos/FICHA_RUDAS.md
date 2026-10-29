@@ -11,6 +11,8 @@ runtime_verified: false
 
 # I02 — RUDAS
 
+**Actualización del 29/10/2026:** [entrega integrada, perfil de preparación y condiciones de incorporación](../ENTREGA_INSTRUMENTOS_Y_PERFILES_INICIALES_2026_10_29.md). Se mantiene la distinción entre original inglés y adaptación RUDAS-PE; no se adopta una edición ni un baremo automáticamente.
+
 [Circuito inicial y captura compartida](CIRCUITO_INICIAL.md) · [Selección aprobada](SELECCION_ADOPTADA_2026_10_28.md).
 
 ## Identidad y finalidad

@@ -16,6 +16,26 @@ final class ContratoEntradasSinResidentesTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_comando_integra_preparacion_del_circuito_en_base_sqlite_vacia_y_solo_lectura(): void
+    {
+        $proceso = new \Symfony\Component\Process\Process([PHP_BINARY, base_path('scripts/inventariar-experto.php')], base_path(), [
+            'APP_ENV' => 'testing', 'APP_DEBUG' => 'false',
+            'APP_CONFIG_CACHE' => sys_get_temp_dir().'/remembermind-config-no-existente-'.bin2hex(random_bytes(8)).'.php',
+            'DB_CONNECTION' => 'sqlite', 'DB_DATABASE' => ':memory:', 'DB_URL' => '', 'DATABASE_URL' => '',
+            'CACHE_STORE' => 'array', 'SESSION_DRIVER' => 'array', 'QUEUE_CONNECTION' => 'sync', 'MAIL_MAILER' => 'array',
+        ]);
+        $proceso->setTimeout(45);
+        self::assertSame(0, $proceso->run(), $proceso->getErrorOutput());
+        $r = json_decode($proceso->getOutput(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertTrue($r['transaccion_solo_lectura']);
+        self::assertSame([], $r['instrumentos']);
+        self::assertFalse($r['contrato_entradas']['requiere_residentes']);
+        self::assertFalse($r['preparacion_circuito_inicial']['habilita_perfiles']);
+        self::assertFalse($r['preparacion_circuito_inicial']['consulta_datos_clinicos']);
+        self::assertCount(3, $r['preparacion_circuito_inicial']['familias']);
+        self::assertSame(0, $r['preparacion_circuito_inicial']['observacion_tecnica']['perfiles_configurados_total']);
+    }
+
     public function test_prepara_el_mapa_con_base_vacia_sin_leer_ni_escribir_filas_clinicas(): void
     {
         self::assertDatabaseCount('residentes', 0);

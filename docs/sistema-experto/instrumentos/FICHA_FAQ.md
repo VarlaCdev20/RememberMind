@@ -11,6 +11,8 @@ runtime_verified: false
 
 # I04 — FAQ/Pfeffer
 
+**Actualización del 29/10/2026:** [entrega integrada y perfil de preparación](../ENTREGA_INSTRUMENTOS_Y_PERFILES_INICIALES_2026_10_29.md). El cotejo actual confirma el alcance limitado de la vía NACC; no se declara concedida autorización asistencial digital ni una equivalencia FAQ–IADL–C03.
+
 [Circuito inicial y captura compartida](CIRCUITO_INICIAL.md) · [Selección aprobada](SELECCION_ADOPTADA_2026_10_28.md).
 
 ## Identidad y finalidad

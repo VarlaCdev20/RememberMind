@@ -1,8 +1,8 @@
 ---
 title: "Fichas y preparación del circuito instrumental inicial"
 status: CURRENT
-version: "1.3"
-last_reviewed: 2026-10-28
+version: "1.4"
+last_reviewed: 2026-10-29
 owner: ApoyoDecision
 source_of_truth: false
 verification_scope: PRIMARY_SOURCE_RESEARCH_AND_STATIC_CAPTURE_MAPPING
@@ -10,6 +10,8 @@ runtime_verified: false
 ---
 
 # Circuito inicial: entrevista + MoCA o RUDAS + FAQ
+
+**Entrega integrada del 29/10:** [instrumentos, versiones y perfiles de preparación](../ENTREGA_INSTRUMENTOS_Y_PERFILES_INICIALES_2026_10_29.md) reúne el contrato técnico, fuentes actualizadas, mapa hacia hechos e inferencia y criterios de aceptación. La consulta de preparación está integrada al inventario existente; no activa estos instrumentos. El [contexto de captura](../ENTREGA_FASE_CONTEXTO_COGNITIVO_2026_10_29.md) ya conserva escolaridad, idioma e informante principal por atención. Las referencias a brechas de contexto de los apartados siguientes describen el corte anterior o la aplicabilidad instrumental aún pendiente, no ausencia de esa captura ya instalada.
 
 La [selección por familias y niveles está aprobada](SELECCION_ADOPTADA_2026_10_28.md). Esta entrega concreta fichas documentales para su preparación: no declara instrumentos activados, materiales adquiridos o interpretaciones clínicas habilitadas.
 

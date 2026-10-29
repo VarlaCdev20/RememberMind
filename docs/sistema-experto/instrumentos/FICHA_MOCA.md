@@ -11,6 +11,8 @@ runtime_verified: false
 
 # I01 — MoCA completo
 
+**Actualización del 29/10/2026:** [entrega integrada y cotejo actual](../ENTREGA_INSTRUMENTOS_Y_PERFILES_INICIALES_2026_10_29.md). Se verificaron de nuevo las secciones 5 y 10 de los términos oficiales; no se obtuvo el paquete ni autorización de incorporación a software. La ficha conserva su carácter documental, sin perfil ejecutable.
+
 [Circuito inicial y captura compartida](CIRCUITO_INICIAL.md) · [Selección aprobada](SELECCION_ADOPTADA_2026_10_28.md).
 
 ## Identidad y finalidad
