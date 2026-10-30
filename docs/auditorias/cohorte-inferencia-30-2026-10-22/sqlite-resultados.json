@@ -4,7 +4,7 @@
     "motor": "sqlite",
     "captura": "Actions institucionales, SQL y métodos existentes",
     "consulta_sin_escrituras": true,
-    "validacion_clinica": false,
+    "evaluacion_posterior": false,
     "tablas": {
         "residentes": 30,
         "admisiones": 30,

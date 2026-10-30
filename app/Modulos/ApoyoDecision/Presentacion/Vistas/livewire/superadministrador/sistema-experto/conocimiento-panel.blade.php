@@ -20,7 +20,7 @@
     @elseif($seccion === 'verificacion')
         <x-ui.section-card title="Conservación y revisión" subtitle="Estado del recorrido institucional.">
             <p>Los resultados deben conservar sus fuentes, reglas y versiones. La conservación conjunta instrumental y Petersen continúa pendiente; una consulta en memoria no constituye un resultado histórico guardado.</p>
-            <p class="mt-3">Medicina y Psicología revisan el alcance realmente conservado con sus permisos y competencia. Los estados del catálogo no acreditan validación clínica.</p>
+            <p class="mt-3">Medicina y Psicología revisan el alcance realmente conservado con sus permisos y competencia. Consulta el estado, la versión y los requisitos técnicos del conocimiento.</p>
         </x-ui.section-card>
     @endif
     </div>

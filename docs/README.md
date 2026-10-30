@@ -40,7 +40,7 @@ Instrucción actual de la propietaria → baseline/decisiones específicas aplic
 
 Inventario instalado vigente tras la decisión del 27/10/2026: **106 tablas de negocio + 16 técnicas**. El corte auditado del 25/10 tenía 100 de negocio; se conserva como evidencia histórica. El núcleo original de 70 y los demás inventarios describen etapas; el techo de diseño 110 no instala una migración.
 
-Para desarrollar comportamiento ya aprobado no se pide una firma profesional antes de cada ejecución. Aprobación estructural, medición original, prueba técnica y validación clínica se documentan por separado.
+Para desarrollar comportamiento ya aprobado no se pide una firma profesional antes de cada ejecución. Aprobación estructural, medición original, prueba técnica y evaluación posterior en uso real se documentan por separado.
 
 ## Historia y catálogo
 

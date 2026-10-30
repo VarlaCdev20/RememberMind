@@ -45,7 +45,7 @@ por dominio ni convierte los requisitos en derivaciones desde brutos.
 | Entrega documental | 170 enlaces locales existentes; 4 PNG inspeccionados; 120 filas del inventario; sintaxis JS válida e IDs únicos del HTML | Comprobación de archivos/estructura del informe; no sustituye prueba de interacción en navegador |
 
 Los conjuntos se solapan; no se suman como si fueran casos independientes de
-validación clínica. Un test de reproducción que pasa demuestra el defecto que
+evaluación posterior en uso real. Un test de reproducción que pasa demuestra el defecto que
 afirma; no prueba que ya esté corregido.
 
 ## Comandos y artefactos

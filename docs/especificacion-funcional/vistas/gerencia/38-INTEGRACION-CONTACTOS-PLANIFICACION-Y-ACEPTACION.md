@@ -118,7 +118,7 @@ npm run build
 git diff --check
 ```
 
-Retirar las variables de QA del proceso al terminar. Registros en [evidencia local](../../../../output/auditoria-integral-20261025). No sumar grupos solapados como pruebas únicas ni convertir pruebas técnicas en validación clínica.
+Retirar las variables de QA del proceso al terminar. Registros en [evidencia local](../../../../output/auditoria-integral-20261025). No sumar grupos solapados como pruebas únicas ni convertir pruebas técnicas en evaluación posterior en uso real.
 
 ## 6. Evidencia visual
 
@@ -136,7 +136,7 @@ No es una certificación WCAG ni prueba exhaustiva de lector de pantalla/contras
 2. **Aceptación completa:** conciliar y ejecutar individualmente los212 escenarios; no se declara ese total aprobado por tener una suite con un número parecido de métodos. La evidencia de este corte acredita su alcance concreto.
 3. **Archivos anteriores:** transición revisada de ficheros históricos y equivalencia FOTO/FOTO_DOC entre consumidores, sin publicar ni mover indiscriminadamente documentos sensibles.
 4. **Fuera del alcance cambiado:** generador alternativo de Enfermería usado por otros actores, otras entradas generales de cuentas y deuda funcional de otros módulos. El calendario de Gerencia ya no depende del indicador estimado de aquel generador.
-5. **Reglas clínicas y experto:** no se modifican por completar Gerencia. Pruebas administrativas y perfiles sintéticos no acreditan validación clínica.
+5. **Reglas clínicas y experto:** no se modifican por completar Gerencia. Pruebas administrativas y perfiles sintéticos no acreditan evaluación posterior en uso real.
 
 El diseño y los tests no sustituyen las aprobaciones pendientes. No se declara Gerencia íntegramente instalado/aceptado mientras estos puntos materiales permanezcan.
 
@@ -144,4 +144,4 @@ El diseño y los tests no sustituyen las aprobaciones pendientes. No se declara 
 
 Rama observada `feature/apoyo-decision-informe-neurocognitivo`; HEAD `6d7b8c6d`. `git status --short` y `git diff --stat` se conservan en `gerencia-cierre-git-status.txt`/`gerencia-cierre-git-diff-stat.txt`, dentro de la evidencia local. Incluyen cambios simultáneos ajenos que se preservaron y no se atribuyen en bloque a esta entrega. No se ejecutó `git add`, commit, push, cambio de rama ni despliegue. No se modificaron contraseñas institucionales, remitente protegido ni datos clínicos para completar esta tarea.
 
-Dictamen: **implementación y verificación técnica acotadas satisfactorias; instalación estructural pendiente y aceptación exhaustiva no declarada**. Los218 tests son casos de software del grupo seleccionado, no los212 escenarios documentales ni una validación clínica.
+Dictamen: **implementación y verificación técnica acotadas satisfactorias; instalación estructural pendiente y aceptación exhaustiva no declarada**. Los218 tests son casos de software del grupo seleccionado, no los212 escenarios documentales ni una evaluación posterior en uso real.

@@ -64,7 +64,7 @@ La revisión de persistencia, realizada como fase de lectura con `remembermind-d
 - cobertura diaria y conteos esperados de las historias, con archivos existentes y hashes correctos;
 - cero inserciones fuera de las tablas operativas permitidas; conocimiento y resultados expertos conservados.
 
-No se afirma validación global de todos los datos anteriores, concurrencia de procesos de carga ni aceptación clínica. El bloqueo exclusivo está implementado; esta ejecución no simula dos importaciones simultáneas.
+No se afirma validación global de todos los datos anteriores, concurrencia de procesos de carga ni evaluación posterior en uso real. El bloqueo exclusivo está implementado; esta ejecución no simula dos importaciones simultáneas.
 
 ## Pruebas y herramientas
 

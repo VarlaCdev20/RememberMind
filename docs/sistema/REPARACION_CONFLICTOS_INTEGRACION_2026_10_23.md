@@ -44,4 +44,4 @@ La instalación npm inicial encontró una DLL de Vite ocupada. Se detuvo exclusi
 
 El servidor 8000 devuelve HTTP 200 en login. La URL del resultado de Enfermería sin sesión redirige correctamente a login y deja de fallar al registrar rutas. La lectura autenticada y sus permisos están probados con residentes sintéticos mediante Livewire; esta comprobación HTTP no acredita una inspección visual de la sesión real del usuario. No se reutilizaron las cookies incluidas en el adjunto.
 
-No se ejecutó la suite completa del repositorio ni una validación clínica. La reparación acredita la sintaxis global y los recorridos probados, no ausencia de cualquier defecto ajeno a esta integración.
+No se ejecutó la suite completa del repositorio ni una evaluación posterior en uso real. La reparación acredita la sintaxis global y los recorridos probados, no ausencia de cualquier defecto ajeno a esta integración.

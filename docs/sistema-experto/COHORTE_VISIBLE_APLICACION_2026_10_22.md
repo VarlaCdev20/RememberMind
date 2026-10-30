@@ -4,7 +4,7 @@ Fecha: 22/10/2026. Alcance autorizado por la propietaria: «NECESITO QUE DE LOS 
 
 ## Decisión y alcance
 
-Esta indicación sucede a la entrega inicial, que cargaba únicamente bases desechables. Autoriza agregar los treinta residentes de entrenamiento a la instalación local y hacerlos consultables desde las vistas vigentes. No convierte sus datos en historias reales ni autoriza cambios de estructura, reglas, permisos, firmas o validación clínica.
+Esta indicación sucede a la entrega inicial, que cargaba únicamente bases desechables. Autoriza agregar los treinta residentes de entrenamiento a la instalación local y hacerlos consultables desde las vistas vigentes. No convierte sus datos en historias reales ni autoriza cambios de estructura, reglas, permisos, firmas o evaluación posterior en uso real.
 
 La instalación utiliza PostgreSQL local `remembermind_dev` y ya tenía explícitamente habilitada la capacidad de simulación local para esa base. No se modificó `.env`, no se reinició la BDD y no se instalaron migraciones. Se conservan 100 tablas de negocio, sin consumir nuevas tablas del máximo aprobado.
 

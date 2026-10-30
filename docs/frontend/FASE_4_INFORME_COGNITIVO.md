@@ -104,7 +104,7 @@ elude esa restricción. QA usa HTML real exportado por PHPUnit y un navegador
 aislado local. La selección, fuente, drawer, reintento, acceso y revocación se
 ejercitan con Livewire/HTTP en pruebas, no con una sesión real del residente.
 
-No se declara validación clínica ni revisión humana del conocimiento. G09 se
+No se declara evaluación posterior en uso real ni revisión humana del conocimiento. G09 se
 verifica como **contrato de presentación**, sin ejecutar/copiar su motor. La
 suite PHP global no forma parte del gate proporcional de esta pantalla.
 

@@ -1,6 +1,6 @@
 # Decisión de contenido institucional para la fase 4
 
-Fecha: 19/10/2026. Estado: **ADOPTADO POR LA PROPIETARIA**. Respuesta explícita: «Sí, adoptar el contrato A–D propuesto». La adopción de contenido no constituye una firma profesional, una validación clínica de desempeño ni una autorización estructural.
+Fecha: 19/10/2026. Estado: **ADOPTADO POR LA PROPIETARIA**. Respuesta explícita: «Sí, adoptar el contrato A–D propuesto». La adopción de contenido no constituye una firma profesional, una evaluación posterior en uso real de desempeño ni una autorización estructural.
 
 ## Problema concreto
 

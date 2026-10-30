@@ -86,7 +86,7 @@ Los primeros ensayos de frontend coincidieron con la regeneración del manifest 
 
 ### Límites de aceptación
 
-Validación clínica/institucional, publicación de nuevas inferencias, exportación nueva, nuevos permisos y estructura: no aplican a esta implementación y no fueron habilitados. PostgreSQL y sesión operativa autenticada: NO VERIFICADOS. El test E2E opt-in verifica el Laravel real con actores sintéticos; no acredita una sesión en la instalación real. Las referencias se adaptan al shell y tokens vigentes: no se reproduce la fotografía decorativa, las tres paletas ni los porcentajes/diagnósticos ilustrativos.
+Evaluación posterior en uso real/institucional, publicación de nuevas inferencias, exportación nueva, nuevos permisos y estructura: no aplican a esta implementación y no fueron habilitados. PostgreSQL y sesión operativa autenticada: NO VERIFICADOS. El test E2E opt-in verifica el Laravel real con actores sintéticos; no acredita una sesión en la instalación real. Las referencias se adaptan al shell y tokens vigentes: no se reproduce la fotografía decorativa, las tres paletas ni los porcentajes/diagnósticos ilustrativos.
 
 
 ## Consolidación solicitada posteriormente
@@ -94,4 +94,4 @@ Validación clínica/institucional, publicación de nuevas inferencias, exportac
 El propietario solicitó reunir estos cambios en `feature/apoyo-decision-informe-neurocognitivo`
 y publicarlos para el equipo. El registro conjunto y las instrucciones de actualización
 están en `docs/sistema/PUBLICACION_CONJUNTA_2026_10_22.md`. Esta solicitud posterior
-no modifica los límites de QA visual ni supone validación clínica.
+no modifica los límites de QA visual ni supone evaluación posterior en uso real.

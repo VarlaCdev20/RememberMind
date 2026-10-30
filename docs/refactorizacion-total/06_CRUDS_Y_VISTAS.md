@@ -842,7 +842,7 @@ Reglas reproducibles aprobadas. Módulo Sistema Experto.
 |---|---|---|---|---|---|---|
 | Crear nueva versión desde anterior | Todas las versiones con estado | Versión exacta usada y evidencia | Solo borrador; publicada/validada inmutable | Retirar de nuevas operaciones sin alterar usos anteriores | Revocar versión con motivo sin borrar usos | Solo borrador nunca referenciado |
 
-Regla específica: **U(expert_rule_set_id,version); despliegue requiere validación clínica**.
+Regla específica: **U(expert_rule_set_id,version); despliegue requiere evaluación posterior en uso real**.
 
 Vista/componente: resources/views/modules/experto/expert_rule_versions/index.blade.php (lista o panel), show.blade.php (detalle) y form.blade.php donde el contrato permite borrador/alta. Componentes App\\Livewire\\Experto\\ExpertRuleVersionIndex / ExpertRuleVersionForm o panel integrado en ReglasIndex. Formularios hijo (versión, línea, contacto, tarea, acción) se montan en el detalle del padre, no requieren pantalla independiente ni tabla por pantalla.
 

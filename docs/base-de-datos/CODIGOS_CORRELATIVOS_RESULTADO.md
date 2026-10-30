@@ -2,7 +2,7 @@
 
 Fecha: 2026-10-13. Aplicado en la base local configurada; aplicación disponible.
 Autorización: formato correlativo, conversión de existentes y contador técnico
-aprobados por la propietaria. No constituye validación clínica del sistema experto.
+aprobados por la propietaria. No constituye evaluación posterior en uso real del sistema experto.
 
 ## Implementado e integración
 

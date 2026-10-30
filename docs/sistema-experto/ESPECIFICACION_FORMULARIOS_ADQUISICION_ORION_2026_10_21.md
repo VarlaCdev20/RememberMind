@@ -746,7 +746,7 @@ Verificación automática documental: **19 fichas únicas**, **23 selectores** y
 entradas se repiten entre alternativas y no son 224 preguntas nuevas de BDD.
 Ocho enlaces locales comprobados. Se revisaron rangos y condiciones contra los
 normalizadores y separaciones de competencia contra Actions/Policies; la
-verificación documental no acredita capacitación o validación clínica.
+verificación documental no acredita capacitación o evaluación posterior en uso real.
 
 La revisión independiente de lectura contrastó roles y restricciones de captura:
 sin discrepancias de rangos o unidades en las 19 fichas. Sus tres observaciones

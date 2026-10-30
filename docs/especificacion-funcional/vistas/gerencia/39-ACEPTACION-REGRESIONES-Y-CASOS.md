@@ -133,6 +133,6 @@ El recorrido confirma nombre/descripcion del diálogo,12 controles con nombre, T
 6. RO18 y otros escenarios: ampliar casos de origen histórico por acto, alcance del residente histórico y límite visible del historial; ejecución de Mapa no demuestra por sí sola esas variantes nuevas.
 7. Accesibilidad y resto de212: completar la conciliación por cada condición y superficie. No convertir los309 tests del grupo seleccionado en309 requisitos de Gerencia aceptados.
 
-Dictamen de este hito: defectos concretos corregidos y regresiones verificadas en el alcance descrito; **aceptación e instalación integral de Gerencia no declaradas**. Pruebas administrativas no son validación clínica y no modifican el motor experto.
+Dictamen de este hito: defectos concretos corregidos y regresiones verificadas en el alcance descrito; **aceptación e instalación integral de Gerencia no declaradas**. Pruebas administrativas no son evaluación posterior en uso real y no modifican el motor experto.
 
 Git: rama `feature/apoyo-decision-informe-neurocognitivo`, HEAD `6d7b8c6d`, cambios locales simultáneos conservados. `gerencia-continuacion-estado.txt` y `gerencia-continuacion-diff-stat.txt` registran el árbol, incluyendo trabajo ajeno que no se atribuye a esta entrega. No se ejecutaron staging, commit, push, cambio de rama ni despliegue.

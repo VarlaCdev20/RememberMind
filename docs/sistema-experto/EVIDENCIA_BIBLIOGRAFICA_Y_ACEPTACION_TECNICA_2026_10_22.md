@@ -6,13 +6,13 @@ Fecha de verificación: 22/10/2026. Estado: **fuentes externas verificadas; sin 
 
 La investigación fundamenta decisiones de diseño y comprueba referencias. La aceptación técnica se acredita ejecutando el software y sus pruebas. Ninguna de estas actividades registra una firma clínica ni demuestra por sí sola desempeño con residentes reales. No se cambian los estados de aprobación de las reglas en la base de datos.
 
-El desarrollo, las pruebas y la ejecución autorizada del motor continúan sin exigir una firma profesional previa para cada evaluación. Las revisiones de Medicina y Psicología son posteriores, independientes y se vinculan a resultados conservados. La validación clínica se registra como una dimensión distinta de la terminación técnica del software; no se usa como requisito para programar formularios, corregir errores o comprobar la inferencia con casos sintéticos.
+El desarrollo, las pruebas y la ejecución autorizada del motor continúan sin exigir una firma profesional previa para cada evaluación. Las revisiones de Medicina y Psicología son posteriores, independientes y se vinculan a resultados conservados. La evaluación posterior en uso real se registra como una dimensión distinta de la terminación técnica del software; no se usa como requisito para programar formularios, corregir errores o comprobar la inferencia con casos sintéticos.
 
 ## Fuentes verificadas
 
 | Fuente primaria u oficial | Información comprobada | Aplicación al sistema y límite |
 | --- | --- | --- |
-| [IMDRF/SaMD WG/N41FINAL:2017 — Clinical Evaluation](https://www.imdrf.org/documents/software-medical-device-samd-clinical-evaluation), publicado 21/09/2017 | Distingue asociación clínica válida, validación analítica/técnica y validación clínica. | Mantener evidencias separadas del fundamento bibliográfico, la corrección del procesamiento y el desempeño clínico. Es un marco de referencia; no se afirma una autorización regulatoria de RememberMind. |
+| [IMDRF/SaMD WG/N41FINAL:2017 — Clinical Evaluation](https://www.imdrf.org/documents/software-medical-device-samd-clinical-evaluation), publicado 21/09/2017 | Distingue asociación clínica válida, validación analítica/técnica y evaluación posterior en uso real. | Mantener evidencias separadas del fundamento bibliográfico, la corrección del procesamiento y el desempeño clínico. Es un marco de referencia; no se afirma una autorización regulatoria de RememberMind. |
 | [National Institute on Aging — Assessing Cognitive Impairment in Older Patients](https://www.nia.nih.gov/health/health-care-professionals-information/assessing-cognitive-impairment-older-patients) | La selección de instrumentos depende del entorno, edad y características de la población, idioma y competencia del aplicador; NIA no avala una prueba específica. | Conservar identidad instrumental, población y condiciones de aplicación. No adoptar un umbral universal ni deducir respuestas individuales de una publicación. La página se contrastó mediante su contenido indexado; la apertura directa devolvió HTTP 405. |
 | [MoCA Cognition — Terms of Use](https://mocacognition.com/terms-of-use) y [FAQ](https://mocacognition.com/faq) | La política oficial consultada distingue el uso del puntaje total para tamizaje de la interpretación de tareas, subpuntuaciones y dominios, que mantiene requisitos de capacitación/certificación. | No reproducir contenido protegido ni considerar el puntaje global como cinco mediciones de dominio. La incorporación concreta requiere cotejar la licencia y la versión aplicables. Se consultaron extractos oficiales indexados; la apertura directa de términos agotó el tiempo de respuesta. No se equipara la política antigua de la página de permisos con los términos más recientes. |
 
@@ -35,6 +35,6 @@ El mismo recorrido pasó en PostgreSQL mediante `powershell -NoProfile -Executio
 - Fundamento externo: **referencias verificadas**, con sus límites de acceso y aplicación.
 - Software: **aceptación técnica** sólo para los recorridos y pruebas ejecutados.
 - Firmas clínicas: únicamente las registradas por usuarios profesionales reales sobre resultados conservados.
-- Validación clínica del sistema: pendiente hasta disponer de evidencia de esa actividad; no se sustituye por una atribución a un experto inexistente.
+- Evaluación posterior en uso real del sistema: pendiente hasta disponer de evidencia de esa actividad; no se sustituye por una atribución a un experto inexistente.
 
 No se modificaron registros institucionales, tablas, permisos ni aprobaciones clínicas. Esta nota aclara los estados; no elimina historia documental ni altera contratos clínicos.

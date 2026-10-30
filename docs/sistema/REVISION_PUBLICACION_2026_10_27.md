@@ -5,7 +5,7 @@
 La propietaria pidió leer y revisar los cambios, conservar el trabajo,
 actualizar la entrega y ejecutar commit y push. Se conserva la rama existente
 `feature/apoyo-decision-informe-neurocognitivo`; esta publicación no integra
-directamente `main` o `develop`, no despliega y no acredita aceptación clínica.
+directamente `main` o `develop`, no despliega y no acredita evaluación posterior en uso real.
 
 El árbol reúne varios trabajos concurrentes, no una sola modificación de correo:
 

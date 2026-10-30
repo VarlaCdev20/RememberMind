@@ -244,7 +244,7 @@ certificación WCAG de todos los modales antiguos.
 Pendientes que continúan fuera de estos dos puntos: avisos de planificación
 PC14/PC15, reportes RG-T13/T16/T17, historia de ocupación RO18 y la aceptación
 restante de Gerencia. No se modificó el sistema experto ni se declara
-validación clínica.
+evaluación posterior en uso real.
 
 Git: rama `feature/apoyo-decision-informe-neurocognitivo`, HEAD `6d7b8c6d`.
 Trabajo compartido preservado. **Sin staging, commit, push ni despliegue.**

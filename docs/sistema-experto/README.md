@@ -1,8 +1,8 @@
 ---
 title: "Sistema experto: fuentes, funcionamiento y límites"
 status: CURRENT
-version: "3.17"
-last_reviewed: 2026-10-29
+version: "3.18"
+last_reviewed: 2026-10-30
 owner: RememberMind
 source_of_truth: false
 source_of_truth_scope: [expert_contract_routing]
@@ -12,6 +12,8 @@ runtime_verified: false
 ---
 
 # Consulta cognitiva y sistema experto
+
+**Orden vigente del 30/10/2026:** [estado funcional y desarrollo técnico primero](ESTADO_FUNCIONAL_Y_ORDEN_DESARROLLO_2026_10_30.md). Durante todo el desarrollo no se solicitan estudios con residentes, firmas o avales externos para continuar. Primero se completa y prueba el funcionamiento integral; la evaluación posterior en uso real se realiza después. Los controles de datos, permisos y coherencia de inferencia se conservan.
 
 ## Entrada única: dónde encontrar cada parte
 
@@ -40,7 +42,7 @@ Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años,
 | Retirada de simulaciones y laboratorio | [Alcance, conservación y verificación](RETIRADA_LABORATORIO_2026_10_27.md) |
 | Contratos aprobados y límites pendientes | Tablas y secciones siguientes; [catálogo documental completo](INDICE_DOCUMENTAL.md) para antecedentes |
 
-El inventario comprobó **26 entradas de instrumentos** (2 Barthel, 5 capturas sintéticas y 19 registros de tarea inactivos), **6 versiones de conocimiento** y **32 reglas**. Estos conteos describen metadatos, no instrumentos aplicados, validación clínica ni cierre del experto. No confundir los 45 candidatos investigados con el catálogo instalado.
+El inventario comprobó **26 entradas de instrumentos** (2 Barthel, 5 capturas sintéticas y 19 registros de tarea inactivos), **6 versiones de conocimiento** y **32 reglas**. Estos conteos describen metadatos, no instrumentos aplicados, evaluación posterior en uso real ni cierre del experto. No confundir los 45 candidatos investigados con el catálogo instalado.
 
 ## Recorrido vigente
 
@@ -52,7 +54,7 @@ La implementación usa `motor-experto/` y `app/Modulos/ApoyoDecision/`; no exist
 
 Preparación actual para detección temprana en personas mayores de 60 años: [ficha y matriz de datos del 27/10/2026](MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md). Es un inventario estático para revisión: separa capacidades, fuentes parciales y conservación pendiente; no selecciona una batería ni cambia reglas o permisos.
 
-La [decisión de selección del 28/10/2026](instrumentos/SELECCION_ADOPTADA_2026_10_28.md) complementa ese corte: cierra las familias y niveles, sin declarar perfiles instalados, derechos obtenidos o validación clínica.
+La [decisión de selección del 28/10/2026](instrumentos/SELECCION_ADOPTADA_2026_10_28.md) complementa ese corte: cierra las familias y niveles, sin declarar perfiles instalados, derechos obtenidos o evaluación posterior en uso real.
 
 | Alcance | Fuente |
 |---|---|

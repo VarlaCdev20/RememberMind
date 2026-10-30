@@ -137,4 +137,4 @@ La decisión se registrará cuando la propietaria se pronuncie sobre esta lista 
 
 ## 8. Verificación y alcance técnico
 
-Entrega exclusivamente documental: comprobar enlaces relativos, doce IDs únicos y coherencia de selección/alternativas/pendientes. No se modifican BDD, configuración, permisos, motor, formularios ni historia clínica. Pruebas de aplicación, PostgreSQL, build y QA visual no aplican a este cambio. Las fuentes externas sustentan la propuesta; no constituyen aprobación institucional, licencia obtenida ni validación clínica del sistema.
+Entrega exclusivamente documental: comprobar enlaces relativos, doce IDs únicos y coherencia de selección/alternativas/pendientes. No se modifican BDD, configuración, permisos, motor, formularios ni historia clínica. Pruebas de aplicación, PostgreSQL, build y QA visual no aplican a este cambio. Las fuentes externas sustentan la propuesta; no constituyen aprobación institucional, licencia obtenida ni evaluación posterior en uso real del sistema.

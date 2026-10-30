@@ -170,7 +170,7 @@ de consulta/auditoría, sin recibir competencia clínica por su rol.
    pantalla existente con los estados y operaciones realmente guardados.
 5. Probar faltantes, contradicción, abstención, fuentes, revisión positiva y
    negativa, IDOR, autoría, cuenta inactiva, reintento, corrección, rollback y
-   concurrencia PostgreSQL. La prueba técnica no se llama validación clínica.
+   concurrencia PostgreSQL. La prueba técnica no se llama evaluación posterior en uso real.
 
 No se retiraron avisos de ejecuciones ficticias, activaron mapeos pendientes,
 modificaron datos clínicos ni aplicaron cambios de esquema mediante esta propuesta.

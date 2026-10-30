@@ -156,7 +156,7 @@ detuvo y su directorio se retiró al finalizar.
 Verifica conservación de historia, NULL/false/cero, coherencia de residente y
 autor, fechas de jornada, idempotencia, bloqueo de producción/destino ajeno,
 competencia, alcance, rollback y rectificaciones trazables. No se presentan
-estos tests como validación clínica ni como diseño de pantallas terminado.
+estos tests como evaluación posterior en uso real ni como diseño de pantallas terminado.
 
 No se cambiaron reglas clínicas, permisos ni contratos de publicación, ni se
 ejecutaron migraciones. Build/QA visual no aplican al cambio de datos. No se

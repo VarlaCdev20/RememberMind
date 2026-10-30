@@ -127,7 +127,7 @@ No se instaló proveedor, contrató servicio ni creó tabla de notificaciones.
    comprobar coherencia con el residente. Hallazgo previo de integridad fuera
    del escritor de atención corregido; requiere reparación y pruebas específicas.
 5. No se certificó el motor de detección completo, todas sus reglas ni todos los
-   orígenes. No se ha validado clínicamente el módulo mediante pruebas técnicas.
+   orígenes. No se ha evaluado posteriormente en uso real el módulo mediante pruebas técnicas.
 
 ## Evidencia y fuentes
 

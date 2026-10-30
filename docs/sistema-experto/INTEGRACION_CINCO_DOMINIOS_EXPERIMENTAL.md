@@ -1,6 +1,6 @@
 # O.R.I.O.N. — Perfil experimental de cinco dominios y compuerta Petersen
 
-Fecha: 2026-10-17. **Estado:** verificación técnica sintética; no habilitado para uso asistencial ni validado clínicamente.
+Fecha: 2026-10-17. **Estado:** verificación técnica sintética; no habilitado para uso asistencial ni evaluado posteriormente en uso real.
 
 ## Autoridad documental
 

@@ -75,7 +75,7 @@ Revisión real pendiente por pantalla y rol: 1440/1280/1024/768/390 px, teclado/
 - **DA02:** pertenencia/jefatura permanente solo si la institución la requiere, no fabricarla desde asignaciones. La consulta contextual puede avanzar sin crear esa entidad.
 - **Representación documental/cuentas:** los requisitos funcionales están adoptados; si faltan columnas/relaciones para fechas, plazos, peticiones o historia, presentar diccionario, impacto/reversión y solicitar aprobación DDL específica. No reabrir las decisiones 1–29 o R01–R03 ya registradas.
 - **Estados y catálogos:** discrepancias observadas se resuelven por el contrato de mayor autoridad; una normalización material no se instala unilateralmente. Los nombres viejos no se introducen como dependencia nueva por citarlos en un hallazgo.
-- **Mediciones/validación clínica:** no son requisito para diseñar estas vistas gerenciales ni habilitan un diagnóstico por exportar un indicador. Los límites clínicos del sistema experto conservan su propia documentación.
+- **Mediciones/evaluación posterior en uso real:** no son requisito para diseñar estas vistas gerenciales ni habilitan un diagnóstico por exportar un indicador. Los límites clínicos del sistema experto conservan su propia documentación.
 
 ## 6. Secuencia recomendada de implementación y prueba
 

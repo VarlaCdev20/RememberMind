@@ -3,6 +3,8 @@ name: remembermind-expert-system-engineering
 description: "Diseñar conocimiento, inferencia multicriterio y explicación del futuro sistema experto cognitivo de RememberMind mediante fases Buchanan. Usar en formalización o integración aprobada; no convierte propuestas en protocolo, diagnostica ni elige pesos/umbrales clínicos."
 ---
 
+**Orden de trabajo adoptado el 30/10/2026:** completar primero el funcionamiento integral y sus pruebas técnicas. Durante todo el desarrollo no solicitar estudios con residentes, firmas, referencias humanas ni avales externos como condición para programar, probar o integrar. La evaluación posterior en uso real queda fuera de esta etapa. Conservar reglas aprobadas, datos originales, permisos, trazabilidad y abstención por datos insuficientes; no inventar resultados.
+
 # Purpose
 
 Separar ingeniería del conocimiento, operación residencial y decisión profesional.
@@ -21,7 +23,7 @@ Rebautizar signos vitales como experto cognitivo, diagnóstico/tratamiento autó
 
 # Domain assumptions
 
-El motor cognitivo aún es propuesta según documentación revisada. La tarea actual autoriza esta skill y su enfoque académico Buchanan/multicriterio; no aprueba población, algoritmo, reglas, licencias o umbrales concretos.
+El motor PHP institucional ya existe, con reglas, cinco dominios y clasificación orientativa de Petersen. Resolver el estado efectivo desde fuentes vigentes; el circuito instrumental y la conservación conjunta mantienen sus pendientes técnicos. El enfoque Buchanan organiza el trabajo y no exige avales externos durante el desarrollo ni autoriza a inventar mediciones o reglas.
 
 # Workflow
 
@@ -43,12 +45,12 @@ Fuente/regla sin versión/responsable, ausencia considerada normalidad, score/ri
 
 # Escalation rules
 
-Método, conocimiento clínico, licencias, validación humana, competencias e integración/persistencia faltantes requieren decisión. Continuar contratos técnicos/documentación/casos sintéticos independientes.
+Delimitar las decisiones institucionales, permisos y estructura todavía no autorizados según AGENTS. No pedir firmas, estudios con residentes ni referencias humanas para desarrollar. Continuar implementación, documentación y pruebas técnicas; la evaluación en uso real corresponde a una etapa posterior al funcionamiento integral.
 
 # Tests required
 
-Determinismo, falta/dato inválido, límites y conflictos según método, contribuciones/explicación reconstruibles, versión/fecha de corte y aislamiento operativo. Sin reactivos protegidos ni afirmar validación clínica desde tests técnicos.
+Determinismo, falta/dato inválido, límites y conflictos según método, contribuciones/explicación reconstruibles, versión/fecha de corte y aislamiento operativo. Sin reactivos protegidos ni afirmar evaluación posterior en uso real desde tests técnicos.
 
 # Definition of Done
 
-Artefactos Buchanan y contratos explícitos, fuentes/decisiones rastreables, explicación reproducible y límites; distinguir diseñado/implementado/verificado/validado clínicamente.
+Artefactos Buchanan y contratos explícitos, fuentes/decisiones rastreables, explicación reproducible y límites; distinguir diseñado/implementado/verificado/evaluado posteriormente en uso real.

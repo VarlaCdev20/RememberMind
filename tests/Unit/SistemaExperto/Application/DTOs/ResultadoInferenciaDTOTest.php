@@ -23,7 +23,7 @@ use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
  * ¿QUÉ RECIBE? Perfiles declarados manualmente y reglas sintéticas.
  * ¿QUÉ HACE? Construye el DTO con objetos reales del Domain.
  * ¿QUÉ DEVUELVE? Aserciones de conservación y rechazo estructural.
- * ¿QUÉ NO DEBE HACER? No afirma ejecución de un motor ni validación clínica.
+ * ¿QUÉ NO DEBE HACER? No afirma ejecución de un motor ni evaluación posterior en uso real.
  * RELACIÓN CON O.R.I.O.N.: Reglamento de Application, DTO 03 y etapa B.
  */
 final class ResultadoInferenciaDTOTest extends TestCase

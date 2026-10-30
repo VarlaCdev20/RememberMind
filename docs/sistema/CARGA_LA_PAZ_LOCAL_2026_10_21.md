@@ -90,7 +90,7 @@ completa ni se afirma que la enumeración la sustituya.
 La selección cubre carga completa, catálogos existentes, idempotencia,
 conservación, roles, documentación, rollback y rechazo de entorno/base.
 Los negativos nuevos incluyen turno incompatible, contador sin registro
-nuevo y contador que retrocede. No se presenta como validación clínica ni
+nuevo y contador que retrocede. No se presenta como evaluación posterior en uso real ni
 como QA visual integral de las pantallas.
 
 La evidencia JUnit está en `storage/app/private/lapaz-integracion-sqlite-definitivo.xml`

@@ -63,13 +63,13 @@ La batería inicial de captura, conocimiento, originales Petersen, preparación 
 | `vendor/bin/pint --test` sobre los PHP modificados | Estilo | Satisfactorio. |
 | `git diff --check -- <archivos modificados>` | Cambios de esta entrega | Sin errores de espacios. |
 
-La verificación visual con navegador no pudo ejecutarse: la herramienta devolvió `Local browser use is disabled in Work settings`. El render funcional se verificó con Livewire. No se ejecutó la suite Laravel global ni se afirma validación clínica.
+La verificación visual con navegador no pudo ejecutarse: la herramienta devolvió `Local browser use is disabled in Work settings`. El render funcional se verificó con Livewire. No se ejecutó la suite Laravel global ni se afirma evaluación posterior en uso real.
 
 ## Límites materiales del cierre integral
 
 - **Conservación institucional:** continúa sin escritor/lector SQL íntegro instalado para ambas ramas. `persistido=false` es el estado real. La referencia F02 es un ensayo amplio, no el esquema institucional nominal. Cambiar una bandera no resuelve la conservación.
 - **Historial y revisiones Petersen:** requieren una evaluación completa y recuperable. Las revisiones existentes no se conectaron a un DTO transitorio.
 - **Mediciones originales:** la consulta local del 22/10 encontró 286 aplicaciones observacionales, 704 funcionales y cero aplicaciones cognitivas instrumentales o valoraciones Petersen originales. No se fabricaron registros para obtener un patrón.
-- **Validación clínica:** los casos automatizados son sintéticos. No constituyen mediciones, firmas ni aceptación profesional de residentes reales.
+- **Evaluación posterior en uso real:** los casos automatizados son sintéticos. No constituyen mediciones, firmas ni aceptación profesional de residentes reales.
 
 La conservación íntegra sigue siendo una implementación pendiente. Se conserva el inventario de 104 tablas de negocio y el trabajo simultáneo del árbol. Sin commit, push ni despliegue.

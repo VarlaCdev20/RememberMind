@@ -75,4 +75,4 @@ Nombres ejecutables AdultoMayor/adultos-mayores siguen en Controllers/rutas aunq
 - Ejecutados casos sintéticos S01/S06 sin autenticación ni escrituras. No son pruebas de una ruta HTTP explotable.
 - Trazabilidad estática de Models, acciones, consultas, presentación, configuraciones y fuentes. Aquí no se ejecutaron suites ni QA visual: evidencia de raíz separada.
 
-No se certifica producción, exposición de archivos del despliegue, restauración de respaldo, validación clínica, licencias, concurrencia global, mínimo de tablas o completitud de diez roles. Las correcciones deben ser otra fase con negativos y efectos comprobados. Mantener 104 tablas mientras no exista una nueva decisión estructural concreta.
+No se certifica producción, exposición de archivos del despliegue, restauración de respaldo, evaluación posterior en uso real, licencias, concurrencia global, mínimo de tablas o completitud de diez roles. Las correcciones deben ser otra fase con negativos y efectos comprobados. Mantener 104 tablas mientras no exista una nueva decisión estructural concreta.

@@ -68,7 +68,7 @@ por disponer únicamente de campos o motivos de abstención.
 Catálogo versión 8, **19/19 componentes** con comparación bajo condiciones;
 373 pruebas aprobadas tanto en SQLite como en PostgreSQL desechable. La revisión
 independiente de las tres últimas conversiones es PASS técnico. El alcance de
-cálculo/documentación solicitado queda cerrado; adopción y validación clínica
+cálculo/documentación solicitado queda cerrado; adopción y evaluación posterior en uso real
 continúan expresamente pendientes. No se cambia la historia ni se ejecuta
 Petersen para completar la cobertura. Los avances de otras fases se documentan
 en sus propias actas y no se atribuyen a este cierre.
@@ -170,7 +170,7 @@ aprobado ni probado por round-trip; no modifica el inventario.
 - [ ] Revisar conocimiento y seguridad de forma independiente; corregir hallazgos antes del cierre.
 - [ ] Ejecutar SQLite, PostgreSQL desechable, pruebas concurrentes pertinentes y build; registrar comandos y evidencia visual real.
 - [ ] Completar manual de operación, técnico, reglas, arquitectura, reproducción y matriz de trazabilidad.
-- [ ] Integrar por PR hacia `develop`, con comprobaciones requeridas. Push y despliegue requieren instrucción explícita; preparación de release no equivale a validación clínica.
+- [ ] Integrar por PR hacia `develop`, con comprobaciones requeridas. Push y despliegue requieren instrucción explícita; preparación de release no equivale a evaluación posterior en uso real.
 
 **Entregable:** versión técnica aceptada y expediente de evidencia. **Cierre:** sin defectos críticos/altos pendientes en el alcance, sin sustitutos ficticios esenciales y con los límites de uso documentados. La evaluación clínica del desempeño tiene su evidencia y revisión propias; no se deduce de una suite verde.
 

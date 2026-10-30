@@ -60,7 +60,7 @@ Se reutilizan los diez casos F02 existentes, con los cuatro perfiles, insuficien
 2. Revisión diferencial pendiente, con abstención diferencial.
 3. Dos juicios originales opuestos del mismo dominio, con abstención por contradicción.
 
-Son **13 casos de ingeniería**, sin pacientes reales ni nuevas reglas clínicas. No son el manifiesto no localizado de «104 escenarios» ni acreditan validación clínica. `CasosCompletos` crea fuentes exclusivamente sintéticas y no carga datos institucionales.
+Son **13 casos de ingeniería**, sin pacientes reales ni nuevas reglas clínicas. No son el manifiesto no localizado de «104 escenarios» ni acreditan evaluación posterior en uso real. `CasosCompletos` crea fuentes exclusivamente sintéticas y no carga datos institucionales.
 
 El mapa físico se compila **offline** a partir de este corpus y del contrato explícito del manifiesto de software. Guardar/leer sólo utiliza el mapa cerrado ya generado. Un campo o tipo nuevo que no está declarado se rechaza; no crea columnas ni cambia el esquema al recibir una evaluación. **Esto no demuestra cobertura universal de toda forma futura o no ejercitada del motor.** Los estados de contradicción Petersen sí se ejercitan; no se afirma cubrir con este corpus todos los conflictos instrumentales posibles.
 
@@ -153,4 +153,4 @@ Git al cerrar este corte: rama `feature/apoyo-decision-informe-neurocognitivo`, 
 | Cumplir máximo 110 y mantenibilidad | **No cumple esta referencia; diseño institucional pendiente** |
 | FK semánticas/terminales completas y 4FN | **No acreditadas para la instalación** |
 | Historial y revisiones compuestas de producción | **No habilitados**; requieren modelo válido, aprobación específica e integración |
-| Validación clínica | No acreditada ni modificada por estas pruebas |
+| Evaluación posterior en uso real | No acreditada ni modificada por estas pruebas |

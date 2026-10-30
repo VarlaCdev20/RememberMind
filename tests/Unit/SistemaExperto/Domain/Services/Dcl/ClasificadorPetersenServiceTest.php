@@ -20,7 +20,7 @@ use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;
  * RESPONSABILIDAD: Verificar patrones, abstenciones y precedencias con un oráculo externo.
  * ENTRADAS: CSV oficiales congelados, con procedencia en Fixtures/README.md.
  * SALIDAS: Igualdad literal con cada resultado esperado, sin traducirlo por conveniencia.
- * RESTRICCIONES: Solo escenarios ficticios; no equivale a validación clínica.
+ * RESTRICCIONES: Solo escenarios ficticios; no equivale a evaluación posterior en uso real.
  * TRAZABILIDAD: DCL-PET-20261017-v0.1 y conciliación CAS-09/CAS-10/CAS-11.
  */
 final class ClasificadorPetersenServiceTest extends TestCase

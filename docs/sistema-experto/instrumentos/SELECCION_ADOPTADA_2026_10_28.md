@@ -6,7 +6,7 @@ last_reviewed: 2026-10-28
 owner: ApoyoDecision
 source_of_truth: true
 source_of_truth_scope: [instrument_family_selection, assessment_levels, initial_integration_priority]
-verification_scope: OWNER_APPROVAL_AND_STATIC_INTEGRATION_REVIEW_NOT_CLINICAL_VALIDATION
+verification_scope: OWNER_APPROVAL_AND_STATIC_INTEGRATION_REVIEW_NOT_EVALUACION_POSTERIOR
 runtime_verified: false
 supersedes: [SELECCION_PROPUESTA_2026_10_28.md]
 ---

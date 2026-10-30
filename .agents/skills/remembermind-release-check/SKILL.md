@@ -21,7 +21,7 @@ AGENTS aplicables, alcance/criterios de aceptación, contrato vigente, git statu
 
 # Domain assumptions
 
-Implementado, verificado y validado clínicamente difieren. Tarea solo de documentación/skills requiere validación de esos artefactos; PHP/build no acreditan su calidad y pueden no aplicar.
+Implementado, verificado y evaluado posteriormente en uso real difieren. Tarea solo de documentación/skills requiere validación de esos artefactos; PHP/build no acreditan su calidad y pueden no aplicar.
 
 # Workflow
 

@@ -8,7 +8,7 @@ Checkout: `feature/apoyo-decision-informe-neurocognitivo`, HEAD `b8ee4b77`. Los 
 
 Comando: `php vendor/phpunit/phpunit/phpunit --filter 'SistemaExperto|ObservacionesExpertasTest|HallazgosObservacionalesTest|RolesBaselineCongeladoTest|PresentacionG09AisladaTest'` con JUnit y log en TEMP `sistema-experto-fase01-baseline.sqlite.*`.
 
-Resultado inicial: **782 pruebas / 5.496 aserciones PASS**, SQLite en memoria, PHP 8.3.33, PHPUnit 12.5.36. El alcance es la suite relacionada, no toda la aplicación ni validación clínica. Laravel instalado 13.33.0; autoload `MotorExperto` ya existe.
+Resultado inicial: **782 pruebas / 5.496 aserciones PASS**, SQLite en memoria, PHP 8.3.33, PHPUnit 12.5.36. El alcance es la suite relacionada, no toda la aplicación ni evaluación posterior en uso real. Laravel instalado 13.33.0; autoload `MotorExperto` ya existe.
 
 PR abiertos consultados mediante API pública de GitHub el 18/10/2026: #15 contiene G09 experimental; #13 contratos de los cuatro dominios; #12 laboratorio de candidatos; #11 endurecimiento de soportes; #16 IADL y #17 observaciones básicas. Se revisa su alcance sin fusionarlos ni adjuntarlos como artefactos de trabajo de este chat. Una referencia local o página cacheada no sustituye el estado de esa consulta remota.
 
@@ -88,7 +88,7 @@ Manual, diagrama, comandos y matriz por requisito en [manual y trazabilidad](FAS
 
 Logs/JUnit: TEMP `sistema-experto-fase01-baseline.sqlite.*`, `sistema-experto-fase01-final.sqlite.*`, `sistema-experto-fase01-final.pg.*`, `sistema-experto-fase01-gates.sqlite.log` y `sistema-experto-fase01-gates.pg.*`. Los conteos se solapan; no sumarlos como casos independientes. Los programas integrados también invocan verificaciones auxiliares ya contabilizadas.
 
-La revisión independiente detectó y permitió corregir: elegibilidad comprobada fuera de la transacción, comparación sin tipo de regla, códigos concatenados ambiguamente, contexto de dominio ignorado/NULL heredado y calendario/procedencia insuficientemente tipados. Las correcciones tienen regresión específica. Revisión estática y pruebas de PostgreSQL no equivalen a una prueba de carrera multiproceso ni a validación clínica.
+La revisión independiente detectó y permitió corregir: elegibilidad comprobada fuera de la transacción, comparación sin tipo de regla, códigos concatenados ambiguamente, contexto de dominio ignorado/NULL heredado y calendario/procedencia insuficientemente tipados. Las correcciones tienen regresión específica. Revisión estática y pruebas de PostgreSQL no equivalen a una prueba de carrera multiproceso ni a evaluación posterior en uso real.
 
 Build/QA visual: este incremento no modifica CSS, JavaScript, Blade ni navegación de pantallas; no se declara QA visual ni un build nuevo por cambios de backend/consola. Se añadió workflow de programas independientes; sus comandos se ejecutaron localmente, la ejecución remota de CI queda pendiente de publicación. No se hizo commit, push, despliegue ni se ejecutaron migraciones o valoraciones en la base de desarrollo durante esta fase.
 
@@ -144,7 +144,7 @@ La revisión independiente encontró dos P2 y comprobó posteriormente sus arreg
 1. Dos reglas con igual código efectivo podían conservar dos consecuencias pero una sola ruta explicativa. `ValidadorPaqueteConocimiento` ahora rechaza duplicados, incluido el fallback por PK; hay regresión específica.
 2. Copiar la declaración de una revisión SQL retirada a una entrada libre eludía la selección elegible. La entrada libre ahora rechaza identidades/códigos registrados o reservados; exige `ejecutarConRevision`. Consulta y replay históricos siguen disponibles. El ciclo integral prueba ambos intentos de ejecución retirada y el historial intacto.
 
-Dictamen posterior: **PASS técnico acotado**, sin hallazgos nuevos en el ámbito revisado. El revisor ejecutó inicialmente 4/16 pruebas de reglas declarativas y 4/6 negativos del archivo en SQLite; los arreglos finales y el refactor fueron revisados por lectura/diff. Esas cifras no representan el total final ni una validación clínica.
+Dictamen posterior: **PASS técnico acotado**, sin hallazgos nuevos en el ámbito revisado. El revisor ejecutó inicialmente 4/16 pruebas de reglas declarativas y 4/6 negativos del archivo en SQLite; los arreglos finales y el refactor fueron revisados por lectura/diff. Esas cifras no representan el total final ni una evaluación posterior en uso real.
 
 La primera regresión integral detectó fronteras incorrectas entre capas y comprobaciones desactualizadas. Se detuvo expresamente después de 1.236 casos para corregirlas; no se presenta como una suite terminada o aprobada. Cambios:
 

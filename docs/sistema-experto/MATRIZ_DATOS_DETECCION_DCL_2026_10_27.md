@@ -40,7 +40,7 @@ Conflictos resueltos o delimitados:
 
 ## 3. Cómo leer los estados
 
-- **C — Capacidad localizada:** fuente/código localizado; no certifica datos disponibles, funcionamiento extremo a extremo ni validación clínica.
+- **C — Capacidad localizada:** fuente/código localizado; no certifica datos disponibles, funcionamiento extremo a extremo ni evaluación posterior en uso real.
 - **P — Parcial:** hay soporte, pero falta precisión, captura, enlace o comprobación.
 - **N — No localizado en el alcance revisado:** no afirmar ausencia en todo el producto; ampliar el inventario antes de proponer campos.
 - **B — Brecha confirmada:** el recorrido o contrato declara explícitamente un pendiente comprobado.
@@ -136,7 +136,7 @@ Los estados pertenecen a esta matriz de auditoría; no son nuevos catálogos de 
 | 3. Selección de evaluación inicial | Comparación de candidatos por edad, idioma, escolaridad, normas, derechos de uso y capacitación. Decisión clínica/institucional explícita de los instrumentos y reglas aplicables; no requiere aprobar todos los candidatos. |
 | 4. Contrato de captura elegido | Para cada entrada: PK fuente, tipo, unidad, ausencia, fecha, autor, corrección y condiciones. Reutilizar tablas/formularios antes de proponer ampliaciones justificadas; sin nuevas tablas. |
 | 5. Primer circuito técnico | Casos sintéticos suficientes/incompletos/contradictorios: captura → hechos → reglas adoptadas → explicación → conservación → recuperación → revisión autorizada. La conservación conjunta debe resolverse de verdad para cerrar este recorrido. |
-| 6. Aceptación | Evidencia de seguridad, persistencia, determinismo e historia; QA responsive de las pantallas modificadas, y validación clínica independiente diferenciada de las pruebas técnicas. No inventar probabilidades, puntos de corte ni frecuencias de control. |
+| 6. Aceptación | Evidencia de seguridad, persistencia, determinismo e historia; QA responsive de las pantallas modificadas, y evaluación posterior en uso real independiente diferenciada de las pruebas técnicas. No inventar probabilidades, puntos de corte ni frecuencias de control. |
 
 No programar una nueva regla diagnóstica, umbral, escala o límite de permisos a partir de esta matriz. Las brechas de configuración/captura pueden investigarse y corregirse técnicamente en el alcance ya autorizado; lo clínico o estructural reservado conserva su proceso de decisión.
 
@@ -153,7 +153,7 @@ Pruebas relacionadas **localizadas y no ejecutadas en esta entrega documental**:
 - [PermisosLecturaIadlPetersenTest](../../tests/Feature/PermisosLecturaIadlPetersenTest.php).
 - [CicloObservacionalConservadoTest](../../tests/Feature/CicloObservacionalConservadoTest.php).
 
-Build y pruebas funcionales no aplican a este cambio exclusivamente documental. Ni estos archivos ni las pruebas existentes demuestran datos completos para todos los residentes, implementación del catálogo de 45 candidatos o validación clínica del experto. Las tareas de runtime y el inventario efectivo quedan delimitados en la entrega 2.
+Build y pruebas funcionales no aplican a este cambio exclusivamente documental. Ni estos archivos ni las pruebas existentes demuestran datos completos para todos los residentes, implementación del catálogo de 45 candidatos o evaluación posterior en uso real del experto. Las tareas de runtime y el inventario efectivo quedan delimitados en la entrega 2.
 
 
 ## Actualización acotada D13 — 28/10/2026

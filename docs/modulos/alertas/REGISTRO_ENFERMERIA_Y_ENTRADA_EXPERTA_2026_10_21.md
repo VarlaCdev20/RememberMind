@@ -52,4 +52,4 @@ No se propone almacenar un formulario serializado en `descripcion`, JSON o una t
 
 ## Verificación
 
-La prueba del ciclo de Enfermería verifica guía visible, intervención autorizada, cambio de estado y conservación de eventos. Se conservan las negativas de ámbito/competencia de la entrega. No se acredita validación clínica del formulario ni alimentación experta nueva. Los resultados técnicos y la evidencia de pantalla se registran en [el informe de entrega](REDISENO_INTERACTIVO_2026_10_21.md).
+La prueba del ciclo de Enfermería verifica guía visible, intervención autorizada, cambio de estado y conservación de eventos. Se conservan las negativas de ámbito/competencia de la entrega. No se acredita evaluación posterior en uso real del formulario ni alimentación experta nueva. Los resultados técnicos y la evidencia de pantalla se registran en [el informe de entrega](REDISENO_INTERACTIVO_2026_10_21.md).

@@ -134,7 +134,7 @@ técnicos visibles ni botón que permita conceder otra prórroga.
 **Implementado, probado e instalado localmente:** diseños35/37 y conciliación
 P19 por expediente. Esta instalación sustituye los pendientes1/2 del
 [informe39](39-ACEPTACION-REGRESIONES-Y-CASOS.md); no declara todo Gerencia
-aceptado ni afecta la validación clínica del sistema experto.
+aceptado ni afecta la evaluación posterior en uso real del sistema experto.
 
 Siguen pendientes los casos específicos P03/P17 de concurrencia de alta y
 sustitución documental; PC14/PC15 de avisos de planificación; RG-T13/T16/T17

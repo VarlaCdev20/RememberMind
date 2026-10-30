@@ -44,7 +44,7 @@ use PHPUnit\Framework\TestCase;
  *
  * RESTRICCIONES:
  * No inicia Laravel, no consulta una BDD y no interpreta instrumentos.
- * El resultado de estas pruebas no acredita validación clínica.
+ * El resultado de estas pruebas no acredita evaluación posterior en uso real.
  *
  * TRAZABILIDAD:
  * Reglamento maestro, Fase A, documentación obligatoria y prueba 18.

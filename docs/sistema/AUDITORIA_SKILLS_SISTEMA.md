@@ -120,6 +120,6 @@ Pendientes de decisiones/documentación: catálogos clínicos aún abiertos, PRN
 - Cada skill de sistema nueva/evolucionada contiene frontmatter y las once secciones de cuerpo solicitadas, fuentes y límite de responsabilidad.
 - Referencias de detalle se cargan por necesidad; no replican diccionario, matriz completa de permisos o UX.
 - Lectura de fuentes distingue vigente/histórico/propuesta/conflicto/deprecación parcial/no resuelto.
-- Pruebas operativas, validación clínica experta, build y revisión visual se informan por separado.
+- Pruebas operativas, evaluación posterior en uso real experta, build y revisión visual se informan por separado.
 - Ninguna instrucción autoriza cambios de esquema, reglas clínicas, permisos o eliminación de datos sin la decisión aplicable.
 - Revisión por escenarios y validación mecánica se registran en [el informe de verificación](VERIFICACION_SKILLS_SISTEMA.md).

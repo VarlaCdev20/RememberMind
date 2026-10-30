@@ -1,7 +1,7 @@
 # Cierre de fases 6–8: contrato vigente y avance verificable
 
 Fecha: 20/10/2026. Estado: **en curso**. Este documento distingue preparación,
-conservación, interfaz y aceptación. No declara validación clínica.
+conservación, interfaz y aceptación. No declara evaluación posterior en uso real.
 
 ## Fuente de verdad y decisión estructural
 

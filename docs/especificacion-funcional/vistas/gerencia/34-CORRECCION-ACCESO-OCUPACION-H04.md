@@ -39,7 +39,7 @@ La entrada compartida muestra el mapa; el inventario de mantenimiento continúa 
 - El enlace de Historial y la ficha administrativa dependen de acceso a sus rutas. No se concede acceso a toda Administración para resolver el enlace de Ocupación.
 - Los filtros se validan con el controlador existente; `modulo` lo fija la ruta y la consulta no registra traslados, admisiones o nuevos residentes.
 
-Revisión acotada del flujo y pruebas negativas satisfactorias; no es auditoría de seguridad global ni validación clínica. No se amplían permisos de otras fuentes del expediente.
+Revisión acotada del flujo y pruebas negativas satisfactorias; no es auditoría de seguridad global ni evaluación posterior en uso real. No se amplían permisos de otras fuentes del expediente.
 
 ## 4. Pruebas ejecutadas y build
 

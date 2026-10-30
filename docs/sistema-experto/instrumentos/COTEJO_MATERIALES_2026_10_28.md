@@ -21,7 +21,7 @@ Esta decisión se refiere a consultas externas sobre instrumentos; no desactiva 
 
 ## 1. Originales disponibles para consulta
 
-Los originales están localmente en `output/materiales-instrumentos-20261028/`, fuera del commit y de los assets públicos. No se editaron ni se eliminaron avisos de derechos. [Metadatos versionados](METADATOS_MATERIALES_2026_10_28.json): URL solicitada/final, fecha del cotejo, tipo, tamaño, páginas y SHA-256; una huella identifica el archivo obtenido, no acredita licencia ni validación clínica.
+Los originales están localmente en `output/materiales-instrumentos-20261028/`, fuera del commit y de los assets públicos. No se editaron ni se eliminaron avisos de derechos. [Metadatos versionados](METADATOS_MATERIALES_2026_10_28.json): URL solicitada/final, fecha del cotejo, tipo, tamaño, páginas y SHA-256; una huella identifica el archivo obtenido, no acredita licencia ni evaluación posterior en uso real.
 
 | Archivo local | Procedencia e identidad comprobada | Páginas | Alcance |
 |---|---|---:|---|
@@ -77,4 +77,4 @@ Los pendientes anteriores no convierten el contacto externo en una tarea autoriz
 
 ## 5. Verificación y alcance
 
-Los seis archivos se validaron por firma PDF y lectura con `pypdf`; se verificaron hash y cantidad de páginas. Se inspeccionaron texto y página renderizada de las condiciones NACC y la identidad del B7S español. La respuesta HTML del suplemento fue rechazada como archivo. Se comprobaron metadatos, enlaces locales y borradores `.eml`, sin envío. No se ejecutaron pruebas de aplicación/build: entrega documental y materiales de consulta, sin cambios de código, BDD, permisos, historia clínica o motor. Esta evidencia no acredita licencia, adquisición formal ni validación clínica.
+Los seis archivos se validaron por firma PDF y lectura con `pypdf`; se verificaron hash y cantidad de páginas. Se inspeccionaron texto y página renderizada de las condiciones NACC y la identidad del B7S español. La respuesta HTML del suplemento fue rechazada como archivo. Se comprobaron metadatos, enlaces locales y borradores `.eml`, sin envío. No se ejecutaron pruebas de aplicación/build: entrega documental y materiales de consulta, sin cambios de código, BDD, permisos, historia clínica o motor. Esta evidencia no acredita licencia, adquisición formal ni evaluación posterior en uso real.

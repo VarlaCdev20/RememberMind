@@ -4,7 +4,7 @@ namespace MotorExperto\dominio\conocimiento\versiones;
 
 use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
 
-/** Propuesta de representación observacional; no acredita una validación clínica. */
+/** Propuesta de representación observacional; no acredita una evaluación posterior en uso real. */
 final class PaqueteInvestigadoCOGMEM
 {
     public const VERSION = 'VER_MEM_INV_20261008';

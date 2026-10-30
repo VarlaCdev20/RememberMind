@@ -95,7 +95,7 @@ No se modificaron Policies ni permisos; no se añadieron escrituras clínicas, d
 
 Se corrigieron fallos reales durante el trabajo: títulos antiguos en expectativas, recorrido semántico que omitía relaciones entrantes, forma del argumento de colores de RMCharts, campos de presentación de simulación, templates SVG incompatibles con el ámbito Alpine y escala inicial ilegible del grafo móvil. La última exportación HTML real se volvió a renderizar mediante el caso semántico después de los ajustes de composición.
 
-No se ejecutó toda la suite PHP del sistema. Las pruebas técnicas no equivalen a validación clínica.
+No se ejecutó toda la suite PHP del sistema. Las pruebas técnicas no equivalen a evaluación posterior en uso real.
 
 ### Navegador real y límites de la evidencia
 

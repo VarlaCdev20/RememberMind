@@ -34,7 +34,7 @@ use PHPUnit\Framework\TestCase;
  * Aserciones de conservación y rechazo por invariantes.
  *
  * RESTRICCIONES:
- * No accede a BDD, no inicia Laravel ni acredita validación clínica.
+ * No accede a BDD, no inicia Laravel ni acredita evaluación posterior en uso real.
  *
  * TRAZABILIDAD:
  * Reglamento maestro R1–R10; contrato DCL-PET-20261017-v0.1.

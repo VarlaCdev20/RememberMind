@@ -1,6 +1,6 @@
 # Fase 4 — Integración del contrato institucional A–D
 
-Fecha: 19/10/2026. Alcance: implementación y verificación del contrato adoptado por la propietaria; no equivale a validación clínica ni a conservación integral de evaluaciones.
+Fecha: 19/10/2026. Alcance: implementación y verificación del contrato adoptado por la propietaria; no equivale a evaluación posterior en uso real ni a conservación integral de evaluaciones.
 
 ## Decisión que gobierna esta entrega
 

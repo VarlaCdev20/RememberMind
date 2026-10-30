@@ -7,7 +7,7 @@ inferencias, clasificación clínica ni perfiles sobre residentes reales.
 
 **Corte vigente:** [cierre técnico de los 19 componentes](CIERRE_TECNICO_FASE_3_2026_10_19.md),
 catálogo versión 8. SCAND y TB-A completan las tres comparaciones que faltaban;
-la adopción institucional y validación clínica permanecen pendientes.
+la adopción institucional y evaluación posterior en uso real permanecen pendientes.
 
 **Actualización intermedia:** el [capítulo de referencias geriátricas adicionales](REFERENCIAS_GERIATRICAS_ADICIONALES_2026_10_19.md)
 incorpora cinco perfiles más y eleva la cobertura a 16 de 19 componentes bajo
@@ -169,7 +169,7 @@ creadas. El perfil conjunto conserva dos medidas de una única aplicación.
 
 Se prueban extremos de edad/escolaridad, ausencia, cero, sexo, identidad,
 condiciones desconocidas o falsas, longitudes frente a totales, forma JLO corta,
-sumas contradictorias y varianza dependiente. No se infiere validación clínica
+sumas contradictorias y varianza dependiente. No se infiere evaluación posterior en uso real
 de pruebas sintéticas. Las ejecuciones ampliadas se conservan en el seguimiento
 de fase 3. Build/QA visual no aplican: sin cambio frontend.
 
@@ -177,7 +177,7 @@ Suite ampliada SQLite: **210 pruebas / 2522 aserciones**, 68.87 s.
 Misma selección en PostgreSQL desechable: **210 pruebas / 2521 aserciones**,
 91.205 s; clúster detenido y retirado al finalizar. La diferencia de una aserción
 entre motores se conserva. Pint y sintaxis PHP: PASS. No se presenta esta
-verificación de ingeniería como validación clínica o gate experto independiente.
+verificación de ingeniería como evaluación posterior en uso real o gate experto independiente.
 
 ## Archivos de este incremento
 

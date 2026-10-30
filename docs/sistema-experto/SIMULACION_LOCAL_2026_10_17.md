@@ -170,6 +170,6 @@ de Clínica; esta integración no los modifica ni reduce el gate para ocultarlos
 
 Los gates independientes de persistencia, seguridad y experto no encontraron
 P1/P2 pendientes en el alcance implementado. Son verificaciones técnicas;
-no acreditan validación clínica, métricas poblacionales ni concurrencia real
+no acreditan evaluación posterior en uso real, métricas poblacionales ni concurrencia real
 entre dos procesos. No se ejecutaron operaciones de escritura Git ni push
 por la restricción expresa de los reglamentos de esta tarea.

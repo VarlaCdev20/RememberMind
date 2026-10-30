@@ -43,7 +43,7 @@ Frontend: 10/10, sin omisiones, después de incorporar estilos compartidos y rec
 ## Límites que se conservan
 
 - La conservación conjunta SQL del DTO completo continúa pendiente; `persistido=false` no se sustituye por una afirmación de guardado.
-- La cohorte comprueba lógica y recorridos; no acredita validación clínica ni aprobación profesional de los métodos.
+- La cohorte comprueba lógica y recorridos; no acredita evaluación posterior en uso real ni aprobación profesional de los métodos.
 - No se guardan revisiones sobre resultados transitorios.
 - La prueba frontend utiliza pantallas/estructuras sintéticas; no se afirma inspección interactiva de la sesión clínica del navegador.
 - El trabajo no implica despliegue, instalación de esquema ni envío de datos clínicos a GitHub.

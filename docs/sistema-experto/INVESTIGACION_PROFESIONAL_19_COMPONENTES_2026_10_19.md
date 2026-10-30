@@ -2,14 +2,14 @@
 
 Fecha de corte: 19 de octubre de 2026. Versión documental 1.5.
 Destinatarios: Medicina, Psicología y equipo de desarrollo de RememberMind.
-Estado: investigación e implementación técnica de 19 componentes; no validación clínica.
+Estado: investigación e implementación técnica de 19 componentes; no evaluación posterior en uso real.
 
 **Corte vigente:** [cierre técnico de fase 3](CIERRE_TECNICO_FASE_3_2026_10_19.md),
 con **19 de 19 componentes con algoritmo de comparación** bajo condiciones
 explícitas, catálogo versión 8. SCAND y TB-A resuelven las tres brechas anteriores;
 el acta explica para qué sirven, cómo y por qué se usan, fórmulas, fuentes,
 efecto techo y pruebas. Las referencias no se adoptan automáticamente para la
-residencia. Se cierra cálculo/documentación, no validación clínica ni inferencia
+residencia. Se cierra cálculo/documentación, no evaluación posterior en uso real ni inferencia
 institucional. Los cortes anteriores conservan sus cifras históricas.
 
 **Corte anterior, versión 7:** las [cinco referencias geriátricas adicionales](REFERENCIAS_GERIATRICAS_ADICIONALES_2026_10_19.md)
@@ -20,7 +20,7 @@ expresamente identificada. Sus tres brechas se resuelven en el acta vigente.
 registra cinco ecuaciones adicionales de SABIEX/pFCSRT y su integración. Hay once
 componentes con algoritmo normativo disponible contando las referencias españolas;
 ocho componentes continúan sin conversión completa. Esta cobertura técnica no
-afirma adopción institucional o validación clínica. Los cortes siguientes conservan
+afirma adopción institucional o evaluación posterior en uso real. Los cortes siguientes conservan
 el recorrido previo y sus pendientes a esa fecha.
 
 **Ampliación geriátrica:** el [manual investigado para mayores de 60](MANUAL_INVESTIGADO_MAYORES_60_2026_10_19.md)
@@ -515,7 +515,7 @@ mujeres, otros idiomas o escolaridad distinta.
 | Cálculo normativo | Ocho componentes, once medidas normativas |
 | Complementos descriptivos | Reconocimiento HVLT-R y dos componentes WAB castellana; tres componentes adicionales con aritmética |
 | Once normalizadores pendientes | No resueltos por disponer de guías o cálculos brutos |
-| Validación clínica institucional | No demostrada por pruebas sintéticas ni por la elección bibliográfica |
+| Evaluación posterior en uso real institucional | No demostrada por pruebas sintéticas ni por la elección bibliográfica |
 | Cierre funcional de fase 3 | **NO ACEPTADO todavía** según el criterio vigente de método aplicable y prueba por componente |
 
 La solicitud de cierre queda registrada. No se marcan las once normalizaciones

@@ -22,7 +22,7 @@ Para mostrar quién propuso, quién aprobó/rechazó y qué regla la reemplazó 
 
 Checks: NULL/PENDIENTE exige los tres campos de firma NULL. APROBADA/RECHAZADA exige actor, fecha y justificación no vacía. La fecha de revisión no puede ser anterior a la creación. Una regla no se enlaza consigo misma. El servicio valida además pertenencia de familia/sucesión y ausencia de ciclos.
 
-No se rellena la historia anterior con aprobaciones actuales. Una regla nueva comienza PENDIENTE. La ausencia de revisión profesional no bloquea la ejecución técnica válida; la salida conserva su estado pendiente y no afirma validación clínica.
+No se rellena la historia anterior con aprobaciones actuales. Una regla nueva comienza PENDIENTE. La ausencia de revisión profesional no bloquea la ejecución técnica válida; la salida conserva su estado pendiente y no afirma evaluación posterior en uso real.
 
 Archivo: reutilizar ACTIVO/INACTIVO y sucesión de versión; el motivo/autor de cambio están en la revisión del conocimiento y Activitylog. No se agrega una columna redundante de archivo. Un rechazo o sustitución no borra resultados ni permite modificar la definición histórica.
 

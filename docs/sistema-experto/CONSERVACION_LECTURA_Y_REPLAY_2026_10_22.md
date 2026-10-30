@@ -26,7 +26,7 @@ La lectura sin inferencia preserva exactamente ambas salidas; no las sustituye p
 - Coincidencia de las capturas de medición compartidas por ambas ramas.
 - Huella del manifiesto de release y correspondencia con la identidad del ejecutor capturada, cuando hay manifiesto.
 
-No recalcula aciertos, puntuaciones, normas, admisibilidad, estados cognitivos ni reglas. No consulta una base de datos, configuración clínica, archivos de pacientes ni fuentes actuales para completar huecos. La validación clínica y la comprobación completa de reglas siguen fuera de esta API.
+No recalcula aciertos, puntuaciones, normas, admisibilidad, estados cognitivos ni reglas. No consulta una base de datos, configuración clínica, archivos de pacientes ni fuentes actuales para completar huecos. La evaluación posterior en uso real y la comprobación completa de reglas siguen fuera de esta API.
 
 ### Frontera de confianza
 

@@ -25,6 +25,7 @@ final class PreparacionCircuitoInstrumentalTest extends TestCase
             self::assertFalse($familia['autoriza_inferencia']);
             self::assertSame('NO_ACREDITADOS', $familia['derechos_uso_previsto']);
             self::assertNotEmpty($familia['faltantes']);
+            self::assertDoesNotMatchRegularExpression('/FIRMA|AVAL|REFERENCIA_HUMANA|ESTUDIO_EXTERNO|ACEPTACION/', implode('|', $familia['faltantes']));
         }
     }
 

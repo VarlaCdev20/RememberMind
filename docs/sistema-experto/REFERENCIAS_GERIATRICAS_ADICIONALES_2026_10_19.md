@@ -7,7 +7,7 @@ con adopción institucional sin configurar y revisión profesional pendiente.
 **Corte posterior vigente:** [cierre técnico de fase 3, catálogo versión 8](CIERRE_TECNICO_FASE_3_2026_10_19.md).
 SCAND y TB-A resuelven ATE-S02 y LEN-S04/S05, elevando la cobertura a **19 de 19**
 bajo condiciones. Este capítulo conserva el incremento de cinco referencias y
-sus cifras históricas; adopción institucional y validación clínica no se atribuyen.
+sus cifras históricas; adopción institucional y evaluación posterior en uso real no se atribuyen.
 
 Continúa las [normalizaciones españolas](NORMALIZACIONES_REFERENCIA_2026_10_19.md),
 el [manual investigado](MANUAL_INVESTIGADO_MAYORES_60_2026_10_19.md) y el
@@ -283,4 +283,4 @@ no se usó la base operativa. JUnit y log de PostgreSQL:
 `remembermind-pg-ec07c75726b54d2e807ae111f5cb314d`, en el directorio temporal.
 
 Sin cambios frontend: build/QA visual no aplican. La verificación técnica no
-equivale a validación clínica independiente ni a revisión profesional realizada.
+equivale a evaluación posterior en uso real independiente ni a revisión profesional realizada.

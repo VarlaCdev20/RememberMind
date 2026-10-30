@@ -7,7 +7,7 @@ documentar utilidad, uso, motivo, interpretación y pruebas.
 
 **Resultado: 19 de 19 componentes tienen al menos un método de comparación
 implementado y probado bajo sus condiciones expresas. Se cierra el alcance
-técnico de cálculo y documentación de fase 3.** No se declara validación clínica,
+técnico de cálculo y documentación de fase 3.** No se declara evaluación posterior en uso real,
 adopción institucional de baremos extranjeros ni disponibilidad de mediciones
 originales para todos los residentes. La entrega no acredita el cierre integral
 de O.R.I.O.N., la fase de fuentes originales ni las etapas de inferencia.
@@ -261,7 +261,7 @@ La revisión independiente de lectura, mediante `remembermind-expert-validation`
 cotejó las nuevas fuentes y los 156 ajustes: **PASS técnico**, sin hallazgos
 bloqueantes. La revisión documental independiente también resultó PASS;
 comprobó el conteo ejecutando el registro. Se corrigió su observación menor:
-tres componentes completados mediante dos métodos nuevos. La validación clínica
+tres componentes completados mediante dos métodos nuevos. La evaluación posterior en uso real
 permanece **BLOQUEADA por falta de juicio
 experto/adopción documentada**, no por un fallo de cálculo. Esta revisión no
 revalida clínicamente los dieciséis componentes anteriores. No hay métricas

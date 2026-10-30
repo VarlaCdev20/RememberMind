@@ -158,7 +158,7 @@ final class EjecutorPerfilG09Experimental
             'perfil' => $perfil,
             'capturas_examinadas' => $capturasExaminadas,
             'clasificacion_dcl' => null,
-            'limitacion' => 'Perfil no agregado de cuatro criterios, sin diagnóstico ni validación clínica.',
+            'limitacion' => 'Perfil no agregado de cuatro criterios, sin diagnóstico ni evaluación posterior en uso real.',
         ];
     }
 }

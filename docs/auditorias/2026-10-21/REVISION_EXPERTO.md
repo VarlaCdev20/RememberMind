@@ -1,6 +1,6 @@
 # Auditoría integral de O.R.I.O.N. — 21/10/2026
 
-Estado: **revisión estática; conservación institucional y validación clínica completas pendientes**. Árbol compartido con cambios intencionales sin commit, referencia HEAD `8eee364ed32c079703b95c0eb63204dcb5512cbe` más WIP. La coordinación conserva el manifiesto técnico del corte en `storage/app/private/auditoria-corte-20261021.json`; este informe no sustituye ese manifiesto ni atribuye al HEAD los cambios no confirmados. No se consultaron datos de residentes, no se mutó SQL, no se aplicó DDL ni se ejecutaron suites en este encargo. Las cifras documentadas de pruebas anteriores pertenecen a sus cortes, no son pruebas nuevas del auditor. Único archivo escrito: este informe.
+Estado: **revisión estática; conservación institucional y evaluación posterior en uso real completas pendientes**. Árbol compartido con cambios intencionales sin commit, referencia HEAD `8eee364ed32c079703b95c0eb63204dcb5512cbe` más WIP. La coordinación conserva el manifiesto técnico del corte en `storage/app/private/auditoria-corte-20261021.json`; este informe no sustituye ese manifiesto ni atribuye al HEAD los cambios no confirmados. No se consultaron datos de residentes, no se mutó SQL, no se aplicó DDL ni se ejecutaron suites en este encargo. Las cifras documentadas de pruebas anteriores pertenecen a sus cortes, no son pruebas nuevas del auditor. Único archivo escrito: este informe.
 
 Skills: `remembermind-source-of-truth` y `remembermind-expert-validation`. Las citas `ruta:línea` son del árbol leído; cambios posteriores pueden desplazarlas. Los prefijos abreviados **APP** y **MOTOR** significan respectivamente `app/Modulos/ApoyoDecision` y `motor-experto/src/motor_experto`.
 
@@ -10,7 +10,7 @@ Skills: `remembermind-source-of-truth` y `remembermind-expert-validation`. Las c
 |---|---|
 | Instrucción actual de la propietaria | Prioritaria: entradas sin conclusión esperada; estudiar automatización y «Corregir regla». No implementar un resultado clínico supuesto para satisfacerla. |
 | `docs/base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md:22` | Vigente: **75 operativas +29 expertas =104 tablas de negocio**. El núcleo original de 70 conserva sus extensiones aprobadas. |
-| `docs/sistema-experto/PROPUESTA_CONTRATO_INSTITUCIONAL_FASE_4_2026_10_19.md:3` | A–D adoptado; adopción distinta de validación clínica. |
+| `docs/sistema-experto/PROPUESTA_CONTRATO_INSTITUCIONAL_FASE_4_2026_10_19.md:3` | A–D adoptado; adopción distinta de evaluación posterior en uso real. |
 | `docs/sistema-experto/FASE_2_MATRIZ_MAESTRA_INFERENCIA_2026_10_20.md:3` | Matriz A–D y Petersen E–H vigente para el comportamiento existente. |
 | `docs/sistema-experto/PUNTO_1_EVIDENCIA_COGNITIVA_ORIGINAL_2026_10_21.md:3` | Captura técnica disponible; adquisición clínica original pendiente. Fuente más reciente del punto instrumental. |
 | `docs/sistema-experto/ENTREGA_INTEGRAL_ORION_2026_10_20.md:6` | Expediente en curso, sin cierre institucional completo. |
@@ -276,7 +276,7 @@ Por tanto, retirar los juicios A/P y S/N exige revisar E–H y definir las deriv
 |---|---|
 | Bibliografía distinta de adopción/licencia | `PUNTO_1_EVIDENCIA_COGNITIVA_ORIGINAL_2026_10_21.md:25`, `:29`. Esta auditoría no volvió a consultar sitios externos ni emite obligaciones legales nuevas. Adoptar protocolos y derechos sigue siendo decisión institucional. |
 | Población y versiones específicas | `MOTOR/dominio/instrumentos/RegistroMetodosInstrumentales.php:12`; diccionario de 23 métodos. No trasladar baremos a cualquier edad/escolaridad/idioma o edición. |
-| Prueba sintética distinta de validación clínica | `FASE_4_CONTRATO_AD_INTEGRADO_2026_10_19.md:139`; matriz maestra, línea69. Implementar una tabla de decisión y pasar fixtures derivados de ella no demuestra exactitud clínica. |
+| Prueba sintética distinta de evaluación posterior en uso real | `FASE_4_CONTRATO_AD_INTEGRADO_2026_10_19.md:139`; matriz maestra, línea69. Implementar una tabla de decisión y pasar fixtures derivados de ella no demuestra exactitud clínica. |
 | Memoria distinta de historia conservada | `FASE_0_1_CONSERVACION_PENDIENTE_2026_10_20.md:16`. Una FK/hash no reconstruye el contenido mutable adquirido, su membresía y sus ausencias. |
 | Software distinto de entradas clínicas | `InstantaneaEvaluacionInstitucional.php:41`. El release puede conservar el ejecutor, pero necesita un writer/reader institucional de las entradas completas. |
 | Model/lector distinto de integridad SQL universal | `FASE_0_1_CONSERVACION_PENDIENTE_2026_10_20.md:85`: cruces evaluación/versión/pertenencia aún no prohibidos físicamente en todas las relaciones. No asumir autorización de nuevos triggers. |
@@ -309,7 +309,7 @@ Estos controles son una propuesta metodológica; no afirman que exista ya una mu
 | Conservación compatible con límite | Diccionario legítimo, inversa exacta poblada, FK/SQL por motor, writer/reader/replay institucional y recuperación del release | Propuesta; no DDL autorizado en este encargo |
 | Seguridad | Positivos y negativos por rol, revocación, cruces, autoría y fuentes; revisión independiente | Policies localizadas; pruebas runtime a cargo de coordinación |
 | UI | Recorrido real de Medicina/Psicología/Enfermería, vacíos/errores/abstenciones, teclado y viewports | Código auditado; QA independiente |
-| Aceptación clínica | Protocolo, referencia independiente, muestra autorizada y casos no usados para ajustar | No acreditada |
+| Evaluación posterior en uso real | Protocolo, referencia independiente, muestra autorizada y casos no usados para ajustar | No acreditada |
 
 | Dimensión | Dictamen acotado |
 |---|---|
@@ -319,7 +319,7 @@ Estos controles son una propuesta metodológica; no afirman que exista ya una mu
 | Gobierno/corrección versionada | **PASS estático acotado:** sucesión real, con límites de familia/tipo |
 | Conservación compuesta institucional | **PENDIENTE:** DTO y laboratorio no son writer institucional |
 | Mínimo 29 o viabilidad 25 expertas | **NO DEMOSTRADO:** ni irreducibilidad ni reducción exacta completas se deducen del inventario |
-| Validación clínica/diagnóstica | **NO ACREDITADA:** no se aportó protocolo/muestra/referencia independientes en este encargo |
+| Evaluación posterior en uso real/diagnóstica | **NO ACREDITADA:** no se aportó protocolo/muestra/referencia independientes en este encargo |
 
 No se necesita un médico introduciendo el resultado que se desea obtener para probar corrección técnica. Sí se necesita conocimiento explícito suficiente para derivarlo y, para medir utilidad clínica, una referencia independiente que permanezca fuera de la entrada del motor. Las tres tareas son diferentes y deben conservar esa separación.
 

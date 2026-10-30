@@ -1,7 +1,7 @@
 # O.R.I.O.N. — Clasificación Petersen experimental DCL
 
 **Versión del contrato:** `DCL-PET-20261017-v0.1`
-**Estado:** implementado y probado **únicamente con casos sintéticos**. No habilitado para uso asistencial, no validado clínicamente, no fusionado en producción.
+**Estado:** implementado y probado **únicamente con casos sintéticos**. No habilitado para uso asistencial, no evaluado posteriormente en uso real, no fusionado en producción.
 
 ## Fuentes canónicas del proyecto
 

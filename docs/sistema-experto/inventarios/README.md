@@ -47,7 +47,7 @@ No aparecen entradas formales identificadas como MoCA, ACE-III, RUDAS u otra bat
 | `ORION-PETERSEN-1` | ACTIVO | 4, revisión PENDIENTE; contrato E–H registrado. |
 | `OBS-20261017-v1` | ACTIVO | 3, revisión NULL; alcance observacional. |
 
-Los nombres son identidades técnicas preservadas. `ACTIVO` no significa validado clínicamente; revisión NULL no es aprobación. Las adopciones institucionales permiten el desarrollo técnico en su alcance y no deben transformarse en un bloqueo general por una firma pendiente.
+Los nombres son identidades técnicas preservadas. `ACTIVO` no significa evaluado posteriormente en uso real; revisión NULL no es aprobación. Las adopciones institucionales permiten el desarrollo técnico en su alcance y no deben transformarse en un bloqueo general por una firma pendiente.
 
 ## Configuración efectiva consultada
 

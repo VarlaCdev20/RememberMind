@@ -150,7 +150,7 @@ Los dos fallos de la prueba PostgreSQL inicial se conservaron como hallazgos de 
 
 Los informes JUnit y el estado de Git de la ejecución se conservaron en [la carpeta de evidencia](../auditorias/membresias-historicas-2026-10-22/). Los subconjuntos repetidos no se suman como pruebas diferentes. `git status --short` registró 230 entradas y `git diff --stat` 129 archivos seguidos modificados en el árbol **compartido**; esos totales incluyen trabajo anterior y ajeno. No se atribuyen íntegramente a este incremento.
 
-Revisión independiente de sólo lectura: detectó discrepancias temporales, orden local ignorado, copia redundante de originales y la vía SQLite `REPLACE`. Se corrigieron y añadieron regresiones; el último dictamen estático es **PASS acotado**. Los resultados ejecutados anteriores corresponden al implementador. Las pruebas son sintéticas; no acreditan validación clínica.
+Revisión independiente de sólo lectura: detectó discrepancias temporales, orden local ignorado, copia redundante de originales y la vía SQLite `REPLACE`. Se corrigieron y añadieron regresiones; el último dictamen estático es **PASS acotado**. Los resultados ejecutados anteriores corresponden al implementador. Las pruebas son sintéticas; no acreditan evaluación posterior en uso real.
 
 ## Archivos y trazabilidad
 

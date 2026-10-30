@@ -29,7 +29,7 @@ related_modules: []
 - HISTÓRICO: snapshots V1/V2.0, propuestas de otras etapas y entregas UX anteriores.
 - PROPUESTO: motor cognitivo/método y roadmap futuro, sin aprobación inferida.
 - CONFLICTIVO: estados, catálogos y afirmaciones puntuales localizados.
-- NO VERIFICADO: runtime instalado, DB desplegada, suites, carreras PostgreSQL, QA visual, producción y validación clínica.
+- NO VERIFICADO: runtime instalado, DB desplegada, suites, carreras PostgreSQL, QA visual, producción y evaluación posterior en uso real.
 
 ## Validación automática
 

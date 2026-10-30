@@ -34,7 +34,7 @@ Ajuste solicitado posteriormente: seguimiento ahora se muestra como torta comple
 - Contraste de textos muestreados sobre fondos compuestos en claro: mínimo 4.85:1. Tema oscuro revisado en escritorio.
 - El navegador tiene movimiento reducido desactivado y no expone simulación; la rama de movimiento reducido se conserva en código, sin afirmar comprobación de ese modo en ejecución.
 
-Evidencias y fixture aislado: `storage/app/qa/graficas-turno/`. No se escribieron registros clínicos ni se modificó la base de datos. El fixture no sustituye una prueba integral de Livewire ni una validación clínica.
+Evidencias y fixture aislado: `storage/app/qa/graficas-turno/`. No se escribieron registros clínicos ni se modificó la base de datos. El fixture no sustituye una prueba integral de Livewire ni una evaluación posterior en uso real.
 
 ## Integración y Git
 

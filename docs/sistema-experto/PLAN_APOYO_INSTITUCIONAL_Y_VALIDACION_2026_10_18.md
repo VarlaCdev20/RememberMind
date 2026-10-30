@@ -1,6 +1,6 @@
 # Sistema experto — transición a apoyo institucional y validación
 
-Fecha: 18/10/2026. Estado: propuesta de ejecución basada en la solicitud actual de la propietaria. Este documento identifica trabajo y criterios de aceptación; no registra una validación clínica ya realizada ni activa conocimiento.
+Fecha: 18/10/2026. Estado: propuesta de ejecución basada en la solicitud actual de la propietaria. Este documento identifica trabajo y criterios de aceptación; no registra una evaluación posterior en uso real ya realizada ni activa conocimiento.
 
 ## Objetivo
 
@@ -87,13 +87,13 @@ Texto propuesto para una salida institucional que cumpla el alcance aprobado:
 > Revisión de Psicología: pendiente / confirmada / rechazada.
 > Revisión de Medicina: pendiente / confirmada / rechazada.
 
-La interfaz reflejará la capacidad realmente habilitada: hallazgos observacionales o interpretación cognitiva aprobada. No declarará validación clínica de una capacidad que todavía no la tenga.
+La interfaz reflejará la capacidad realmente habilitada: hallazgos observacionales o interpretación cognitiva aprobada. No declarará evaluación posterior en uso real de una capacidad que todavía no la tenga.
 
 ## Fundamento externo consultado
 
-- [IMDRF N41, evaluación clínica de software](https://www.imdrf.org/documents/software-medical-device-samd-clinical-evaluation): distingue asociación clínica, validación técnica y validación clínica para el uso y la población previstos. Se utiliza como marco metodológico; no se afirma que determine por sí mismo obligaciones regulatorias bolivianas.
+- [IMDRF N41, evaluación clínica de software](https://www.imdrf.org/documents/software-medical-device-samd-clinical-evaluation): distingue asociación clínica, validación técnica y evaluación posterior en uso real para el uso y la población previstos. Se utiliza como marco metodológico; no se afirma que determine por sí mismo obligaciones regulatorias bolivianas.
 - [NICE NG97, evaluación y diagnóstico](https://www.nice.org.uk/guidance/ng97/chapter/Recommendations/): incorpora historia, efecto funcional, evaluación cognitiva y consideración de causas reversibles. No convierte estas recomendaciones en reglas de RememberMind ni selecciona automáticamente instrumentos o puntos de corte.
 
 ## Cambios de esta entrega
 
-Auditoría estática de los contratos anteriores y este plan. No se modificaron reglas, permisos, BDD, datos, avisos ni configuración de publicación. No se ejecutaron pruebas para acreditar una validación clínica; la verificación técnica previa conserva únicamente el alcance documentado de su fase.
+Auditoría estática de los contratos anteriores y este plan. No se modificaron reglas, permisos, BDD, datos, avisos ni configuración de publicación. No se ejecutaron pruebas para acreditar una evaluación posterior en uso real; la verificación técnica previa conserva únicamente el alcance documentado de su fase.

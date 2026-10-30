@@ -150,7 +150,7 @@ Se conservan los valores originales de las 25 alertas. No se inventa origen/resp
 
 La tanda PostgreSQL `alertas-consulta-real-pg.xml` encontró siete errores de variable de vista porque el proceso ya había cargado la clase anterior cuando se añadió el dato del nuevo resumen. No se presenta esa tanda como aprobada: se repitió con implementación y vistas congeladas en `alertas-consulta-final-pg.xml`. La repetición final aprobó: **27 pruebas / 223 aserciones** en PostgreSQL privado; el render fresco de los diez roles aprobó además con esa variable presente. El cluster de pruebas fue detenido al finalizar.
 
-La tanda amplia inicial se completó antes de las reparaciones. No se presenta como una nueva ejecución global totalmente verde: las correcciones se validan mediante repeticiones del caso afectado y su grupo. No se ejecutó toda la suite del repositorio ni se declara validación clínica.
+La tanda amplia inicial se completó antes de las reparaciones. No se presenta como una nueva ejecución global totalmente verde: las correcciones se validan mediante repeticiones del caso afectado y su grupo. No se ejecutó toda la suite del repositorio ni se declara evaluación posterior en uso real.
 
 ### Seguridad, persistencia y legacy
 

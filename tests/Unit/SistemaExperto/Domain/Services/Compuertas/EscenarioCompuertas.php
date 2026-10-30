@@ -27,7 +27,7 @@ use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades;
  * Objetos sintéticos o aserciones sobre preservación y rechazo.
  *
  * RESTRICCIONES:
- * No inicia Laravel, no consulta persistencia ni acredita validación clínica.
+ * No inicia Laravel, no consulta persistencia ni acredita evaluación posterior en uso real.
  *
  * TRAZABILIDAD:
  * Reglamento maestro, Fases C/D e invariantes R1–R10.

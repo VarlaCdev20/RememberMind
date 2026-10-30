@@ -91,4 +91,4 @@ La evidencia local de ejecución permanece fuera del commit. Los tests, contrato
 
 **Esta fase queda cerrada en su alcance de captura contextual y procedencia.** D02/D03/D06 siguen distinguiendo captura de aplicabilidad y calidad profesional. El siguiente trabajo del experto es cerrar derechos/versiones y perfiles de extracción de los instrumentos seleccionados, y después su integración con hechos, criterios y conservación conjunta conforme a los contratos aprobados. La configuración de un perfil no puede darse por aprobada porque existan estas columnas.
 
-No se afirma que el sistema experto completo esté terminado, validado clínicamente o autorizado para diagnóstico autónomo. No se añadieron simulaciones operativas, tablas, reactivos protegidos, umbrales, puntuaciones ni dependencias V1.
+No se afirma que el sistema experto completo esté terminado, evaluado posteriormente en uso real o autorizado para diagnóstico autónomo. No se añadieron simulaciones operativas, tablas, reactivos protegidos, umbrales, puntuaciones ni dependencias V1.

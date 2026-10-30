@@ -61,7 +61,7 @@ Los tiempos son muestras locales, no percentiles ni garantía de latencia instit
 | Contraste de pares de texto muestreados | Claro: 6,33 / 5,99 / 6,14; oscuro: 4,80 / 5,58 / 8,33. No representa una auditoría AA de toda la aplicación. |
 | `npm run build` | PASS, 110 módulos. |
 
-Los cambios finales de etiquetas, la guía de Enfermería y el sexto KPI no tuvieron una segunda pasada visual completa de los cinco anchos. No se afirma QA visual total del último corte. La compilación y las regresiones funcionales se verificaron; no equivalen a validación clínica.
+Los cambios finales de etiquetas, la guía de Enfermería y el sexto KPI no tuvieron una segunda pasada visual completa de los cinco anchos. No se afirma QA visual total del último corte. La compilación y las regresiones funcionales se verificaron; no equivalen a evaluación posterior en uso real.
 
 ## Incidencia de Personal institucional
 

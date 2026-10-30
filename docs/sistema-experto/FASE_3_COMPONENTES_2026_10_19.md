@@ -10,7 +10,7 @@ el objetivo y su seguimiento para continuar el trabajo entre sesiones.
 catálogo versión 8. **19 de 19 componentes** con comparación matemática
 disponible bajo condiciones. SCAND resuelve ATE-S02 y TB-A aporta conversiones
 con efecto techo para LEN-S04/S05. **CERRADO el alcance técnico de cálculo y
-documentación**; adopción institucional y validación clínica pendientes.
+documentación**; adopción institucional y evaluación posterior en uso real pendientes.
 Los apartados siguientes conservan los cortes históricos de la investigación.
 
 El resultado final perseguido es O.R.I.O.N. integrado: mediciones originales,
@@ -108,7 +108,7 @@ Pint y `php -l`: PASS para los seis archivos PHP propios. Revisión de cambios y
 espacios: PASS. Sin referencias ejecutables V1, operaciones de persistencia,
 dependencias nuevas o cortes clínicos en los dos componentes nuevos. La revisión
 técnica propia no se presenta como gate experto independiente. No existe
-validación clínica ni dictamen independiente de un profesional aportado por estas
+evaluación posterior en uso real ni dictamen independiente de un profesional aportado por estas
 pruebas. No se modifica frontend; build y QA visual no aplican a este incremento.
 
 ## Archivos propios del incremento
@@ -173,7 +173,7 @@ concurrentes fuera del incremento.
 **Dictamen:** investigación ampliada y aritmética verificable entregadas;
 cierre funcional de la fase 3 todavía no acreditado. No existe una guía médica
 que por sí sola proporcione las once conversiones ausentes. Tampoco se
-presenta el dictamen técnico propio como validación clínica independiente.
+presenta el dictamen técnico propio como evaluación posterior en uso real independiente.
 
 ## Ampliación: manuales investigados para mayores de 60
 
@@ -234,7 +234,7 @@ Se mantiene la separación entre pruebas puras de FCSRT y pruebas de integració
 existentes de captura/preparación y acceso. No se afirma que se haya configurado
 o administrado una nueva prueba en residentes. Sintaxis y Pint: PASS; build/QA
 visual no aplican al no cambiar Presentation/frontend. La revisión técnica propia
-no sustituye un gate experto independiente o validación clínica.
+no sustituye un gate experto independiente o evaluación posterior en uso real.
 
 Auditoría documental: PASS, diecinueve componentes únicos, nueve grupos de fuentes
 y cincuenta enlaces locales existentes en los cuatro documentos revisados.
@@ -295,7 +295,7 @@ PASS PostgreSQL desechable: **210 pruebas / 2521 aserciones**, 91.205 s.
 Evidencia temporal `remembermind-pg-6f41560d8f6e4844948090986e19cba7.junit.xml`
 y `.log`; clúster propio detenido y eliminado. No se ejecutó contra la base
 operativa. Pint, sintaxis y revisión de espacios: PASS. Los resultados de pruebas
-no sustituyen revisión experta independiente ni validación clínica.
+no sustituyen revisión experta independiente ni evaluación posterior en uso real.
 
 Integración: se reutilizan registro, extractor, captura autorizada SQL, perfil y
 explicación. No hay nuevas tablas, permisos, reglas, datos reales o cambios de
@@ -381,7 +381,7 @@ Evidencia temporal JUnit/log `remembermind-pg-ec07c75726b54d2e807ae111f5cb314d`.
 Clúster propio detenido y eliminado; no se usó la BDD operativa. La diferencia
 de una aserción entre motores se conserva. Pint: PASS tras ordenar imports.
 Sin cambios frontend: build/QA visual no aplican. Las verificaciones matemáticas
-y sintéticas no constituyen una revisión experta independiente o validación clínica.
+y sintéticas no constituyen una revisión experta independiente o evaluación posterior en uso real.
 
 Archivos propios del incremento:
 
@@ -406,7 +406,7 @@ Archivos propios del incremento:
 Legacy: los normalizadores nuevos son PHP del motor independiente; no incorporan
 dominios V1 ni consultas SQL. Commit local limitado a estos archivos; sin push.
 Pendiente: resolver los tres métodos restantes con fuente completa, comprobar
-la pertinencia institucional y realizar la revisión experta/validación clínica
+la pertinencia institucional y realizar la revisión experta/evaluación posterior en uso real
 con el alcance correspondiente. **No se registra el cierre completo de fase 3.**
 
 Comprobación final: sintaxis de los once archivos PHP y Pint PASS; 66 enlaces
@@ -426,7 +426,7 @@ PostgreSQL desechable**. Tras agregar la condición de español nativo SCAND,
 el revisor independiente repitió el circuito estrecho en SQLite: **75 / 1036**,
 PASS; reejecución PostgreSQL posterior **75 / 1036**, PASS. Sintaxis de diez PHP,
 Pint y 97 enlaces locales de ocho documentos verificados sin errores.
-Revisión experta: PASS técnico, validación clínica/adopción pendientes.
+Revisión experta: PASS técnico, evaluación posterior en uso real/adopción pendientes.
 
 **Se cierra el alcance técnico de cálculo y documentación de fase 3.** Los
 pendientes del corte versión 7 quedan sustituidos por los límites concretos

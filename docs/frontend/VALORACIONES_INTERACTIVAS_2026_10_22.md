@@ -188,7 +188,7 @@ Los artefactos permanecen locales y se excluyen del commit de código.
   zoom 200 %, lector de pantalla, tema, móvil y todos los roles cuando se habilite
   el navegador. La prueba automatizada no sustituye esa revisión humana.
 - Las guías específicas de aplicación requieren manual autorizado, edición y
-  validación clínica. Ninguna guía se marca VALIDADA. Si faltan, se informa la
+  evaluación posterior en uso real. Ninguna guía se marca VALIDADA. Si faltan, se informa la
   brecha y se permite consultar la orientación documental segura.
 - Derechos y aprobación de identidad definitiva del avatar; no se usa la mascota
   derivada del ZIP como activo comercial validado.
@@ -207,4 +207,4 @@ Los artefactos permanecen locales y se excluyen del commit de código.
 El propietario solicitó reunir estos cambios en `feature/apoyo-decision-informe-neurocognitivo`
 y publicarlos para el equipo. El registro conjunto y las instrucciones de actualización
 están en `docs/sistema/PUBLICACION_CONJUNTA_2026_10_22.md`. Esta solicitud posterior
-no modifica los límites de QA visual ni supone validación clínica.
+no modifica los límites de QA visual ni supone evaluación posterior en uso real.

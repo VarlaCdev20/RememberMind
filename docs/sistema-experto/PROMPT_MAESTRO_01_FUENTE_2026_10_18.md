@@ -591,4 +591,4 @@ Al final quiero conocer:
 6. Qué pruebas pasaron.
 7. Qué quedó pendiente y por qué.
 
-Nunca declares «validado clínicamente» algo que solo haya superado pruebas de ingeniería.
+Nunca declares «evaluado posteriormente en uso real» algo que solo haya superado pruebas de ingeniería.

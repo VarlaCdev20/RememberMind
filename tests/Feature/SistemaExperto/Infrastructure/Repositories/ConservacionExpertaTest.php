@@ -47,7 +47,7 @@ use Tests\Unit\SistemaExperto\Infrastructure\Mappers\EscenarioMapeadores;
  * ¿QUÉ RECIBE? Objetos y referencias institucionales completamente ficticios.
  * ¿QUÉ HACE? Guarda y recupera con nuevas instancias del repositorio real.
  * ¿QUÉ DEVUELVE? Evidencia de tipos, identidad compartida, orden, FK y rollback.
- * ¿QUÉ NO DEBE HACER? No simula SQL ni declara validación clínica.
+ * ¿QUÉ NO DEBE HACER? No simula SQL ni declara evaluación posterior en uso real.
  */
 final class ConservacionExpertaTest extends RepositoriosTestCase
 {

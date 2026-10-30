@@ -69,4 +69,4 @@ Aplicación conserva Eloquent, DB, Gate, Validator, Cache, configuración, resol
 
 No se certifica ausencia universal de SQL diferido en todas las vistas. Archivos y transacciones DB no son atómicos de forma universal: existen flujos heredados con riesgo de huérfanos ante fallos posteriores y hashes que pueden devolver `false`. La privacidad de documentos en disco público requiere su intervención específica. Es deuda separada, conservada explícitamente; no se afirma haberla resuelto mediante interfaces.
 
-La validación clínica, la activación de inferencias, el advisory de desarrollo pendiente y el CI remoto conservan los límites del [informe de preparación](../sistema/PREPARACION_DESARROLLO_2026_10_11.md).
+La evaluación posterior en uso real, la activación de inferencias, el advisory de desarrollo pendiente y el CI remoto conservan los límites del [informe de preparación](../sistema/PREPARACION_DESARROLLO_2026_10_11.md).

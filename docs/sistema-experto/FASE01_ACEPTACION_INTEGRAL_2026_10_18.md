@@ -1,6 +1,6 @@
 # Fase 01 — aceptación técnica y trazabilidad integral
 
-Fecha: 18/10/2026. Alcance: **prototipo de ingeniería**, conforme al Prompt Maestro 01. La aceptación clínica queda fuera de esta entrega. La conservación del perfil compuesto usa la alternativa experimental expresamente permitida por §14; no se afirma que el perfil se guarde en las tablas institucionales.
+Fecha: 18/10/2026. Alcance: **prototipo de ingeniería**, conforme al Prompt Maestro 01. La evaluación posterior en uso real queda fuera de esta entrega. La conservación del perfil compuesto usa la alternativa experimental expresamente permitida por §14; no se afirma que el perfil se guarde en las tablas institucionales.
 
 Estado final: **A–M implementados y verificados en ese alcance compatible**. Regresión global de 2.271 casos sin fallos (23 omisiones previstas); batería final de 431/9.955 PASS en SQLite y configuración PostgreSQL desechable, doce programas independientes PASS y VT01–15 registrados para las quince reglas. Detalle y límites en [auditoría](FASE01_AUDITORIA_Y_EVIDENCIA_2026_10_18.md); los conteos se solapan.
 

@@ -63,7 +63,7 @@ Edades: 61–89 años; escolaridad de ensayo: 4, 8 y 12 años. Quince casos incl
 | S29 | Originales de memoria A y P concurrentes | Memoria X; abstención por contradicción |
 | S30 | Segundo original memoria A no incluido en C05 | Memoria A, C05 U; revisión del conjunto pendiente |
 
-El juicio original A/P es una entrada sintética explícita para probar el contrato, no un estado inferido automáticamente de un z ni una aprobación profesional real. El motor decide C02, requisitos derivados, exclusiones, abstenciones y patrón final. Se reutilizan cinco métodos existentes que aportan seis componentes; este ensayo no afirma que cada uno de los 19 subcomponentes disponga aquí de un protocolo independiente ni que se hayan validado clínicamente los 23 métodos del catálogo.
+El juicio original A/P es una entrada sintética explícita para probar el contrato, no un estado inferido automáticamente de un z ni una aprobación profesional real. El motor decide C02, requisitos derivados, exclusiones, abstenciones y patrón final. Se reutilizan cinco métodos existentes que aportan seis componentes; este ensayo no afirma que cada uno de los 19 subcomponentes disponga aquí de un protocolo independiente ni que se hayan evaluado posteriormente en uso real los 23 métodos del catálogo.
 
 ## Volumen realmente cargado en cada base desechable
 
@@ -135,7 +135,7 @@ El `git diff --check` global detecta espacios al final de línea en la agenda de
 - Hallazgo de autorización: el rol médico predeterminado no recibe `valoraciones_psicologicas.ver`. El prefijo `valoraciones_` del seeder no coincide con los recursos separados por punto. Cuando C04/C05 usan esa fuente, la consulta completa responde 403. El ensayo comprueba la denegación y asigna **solo a su cuenta médica sintética** el permiso explícito para verificar la lectura autorizada. No se amplía el rol ni se cambia la instalación institucional. Una eventual ampliación institucional de lectura de esta fuente necesita decisión específica de la propietaria, conforme a AGENTS.md.
 - Pendiente por decisión de la propietaria: conservación SQL completa del DTO conjunto y revisiones profesionales sobre ese resultado conservado.
 - Pendiente de fuentes reales: protocolos, perfiles y juicios originales del residente piloto. Las observaciones ya existentes siguen disponibles; no se convierten retrospectivamente en pruebas.
-- Pendiente de validación clínica: concordancia con casos revisados por profesionales y autorización de los perfiles instrumentales. Las pruebas sintéticas acreditan lógica y flujo técnico.
+- Pendiente de evaluación posterior en uso real: concordancia con casos revisados por profesionales y autorización de los perfiles instrumentales. Las pruebas sintéticas acreditan lógica y flujo técnico.
 
 No se cambia la interfaz institucional, no se despliega otro servidor, no se crea un acceso alternativo y no se ejecutan commit ni push. La cohorte se reconstruye en las pruebas; no queda instalada en el expediente operativo al terminar el runner.
 

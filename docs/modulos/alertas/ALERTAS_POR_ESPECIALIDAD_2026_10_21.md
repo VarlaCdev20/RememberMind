@@ -72,4 +72,4 @@ Las pruebas de especialidad verifican las columnas persistidas, autoría, conser
 
 No se añadieron dependencias, migraciones ni compatibilidad V1. No se realizaron staging, commits, push ni despliegue; se conserva el trabajo local preexistente. Los alias históricos de rutas del sistema siguen fuera de una limpieza global.
 
-Pendiente: revisión visual y de interacción en navegador cuando esté disponible. La ausencia de QA visual no se presenta como aceptación clínica ni como cumplimiento global de accesibilidad.
+Pendiente: revisión visual y de interacción en navegador cuando esté disponible. La ausencia de QA visual no se presenta como evaluación posterior en uso real ni como cumplimiento global de accesibilidad.

@@ -6,7 +6,7 @@ La instrucción inicial fue analizar y guardar el alcance sin implementar. Ese c
 
 Esta es la memoria persistente del trabajo en el repositorio; no supone memoria global fuera de este proyecto.
 
-**Corte final: 53 casillas verificadas y 1 reservada.** Es un conteo de comprobaciones, no un porcentaje de aceptación clínica. Los recorridos A–M se detallan en la [matriz integral](FASE01_ACEPTACION_INTEGRAL_2026_10_18.md). Acceso documental y regresión resueltos. La casilla pendiente corresponde a conservación institucional completa en BDD: la fase utiliza la alternativa compatible del §14 y entrega la RFC, sin ampliar el esquema.
+**Corte final: 53 casillas verificadas y 1 reservada.** Es un conteo de comprobaciones, no un porcentaje de evaluación posterior en uso real. Los recorridos A–M se detallan en la [matriz integral](FASE01_ACEPTACION_INTEGRAL_2026_10_18.md). Acceso documental y regresión resueltos. La casilla pendiente corresponde a conservación institucional completa en BDD: la fase utiliza la alternativa compatible del §14 y entrega la RFC, sin ampliar el esquema.
 
 ## Fuente conservada
 
@@ -143,7 +143,7 @@ Los entregables A–M se aceptan por recorrido completo. Las casillas siguientes
 
 - [x] Cubrir los 24 grupos de prueba del §16: hechos, mapeos, fuentes, versiones, grafo, reglas/no emisión, evaluabilidad, confusores, contradicción, doble conteo, cinco dominios, PET-01–04/abstenciones, longitudinalidad, creación/sucesión/archivo, replay, seguridad, aislamiento asistencial, persistencia compatible, explicación y regresión. Suite global: 2.271 casos/45.078 aserciones, cero fallos y 23 omisiones previstas. Batería final posterior al cotejo: 431/9.955 PASS en SQLite y configuración PostgreSQL desechable; doce programas independientes PASS. Los conteos se solapan; matriz VT y límites exactos en auditoría.
 - [x] Ejecutar pruebas unitarias y de integración reales: SQLite en memoria y PostgreSQL desechable; nunca producción ni reset de la base de desarrollo. Segundo incremento: regresión relacionada 820/5.666, integración e inventario PG 57/397; escenarios finales de consola 3/33 en ambos motores. Los conteos se solapan.
-- [x] Registrar comandos, entorno, versión, cantidades, fallos y artefactos; no igualar pruebas técnicas con validación clínica. Véase auditoría y evidencia, sin sumar suites solapadas.
+- [x] Registrar comandos, entorno, versión, cantidades, fallos y artefactos; no igualar pruebas técnicas con evaluación posterior en uso real. Véase auditoría y evidencia, sin sumar suites solapadas.
 - [x] Verificar recorrido integral y pruebas de mutación de hechos/condiciones sobre casos sintéticos. Fuentes ficticias → perfil → Petersen/abstención → contrato y replay; NULL, contexto, confusor, contradicción, requisito IADL/diferencial y sucesora. La conservación durable es una aceptación separada que permanece abierta.
 - [x] Ejecutar build y QA funcional/visual si cambia la interfaz; reportar cualquier verificación no realizada. No aplica build/QA visual nuevo en estos incrementos de motor/backend/consola: no se cambió la interfaz. No se presenta el trabajo visual previo del árbol como verificado por estas pruebas.
 - [x] Entregar manual, diagrama, catálogos y matriz de trazabilidad integral; identificar deuda técnica y decisiones pendientes. Se añadieron aceptación A–M, 24 grupos, cotejo documental y matriz ejecutada VT01–15 de quince reglas.

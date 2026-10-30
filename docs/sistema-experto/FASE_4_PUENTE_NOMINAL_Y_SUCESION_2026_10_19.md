@@ -88,7 +88,7 @@ Build no aplica: backend y documentación, sin cambios de interfaz o assets. No 
 | Pint de los cinco PHP propios | PASS |
 | Correspondencia candidato / workspace | SHA-256 idéntico de los cinco PHP; reflexión del autoloader resuelve el archivo del candidato |
 | Documentación | 69 enlaces locales comprobados en los cuatro documentos del incremento; diff sin errores de espacios |
-| Gate independiente final | PASS técnico estático del delta final, sin P1/P2 pendientes identificados; no validación clínica |
+| Gate independiente final | PASS técnico estático del delta final, sin P1/P2 pendientes identificados; no evaluación posterior en uso real |
 
 Los XML y logs se conservan en `storage/app/private/fase4-nominal-final-{sqlite,postgres}.{xml,log}`; las dos regresiones iniciales fallidas están en `fase4-nominal-red.xml` y `fase4-herencia-red.xml`. El manifiesto de integridad del candidato es `fase4-nominal-candidato-verificado.json`. Son evidencia técnica local privada, excluida de Git. No se ejecutó la suite global ni QA visual, y no se presentan como validez diagnóstica.
 

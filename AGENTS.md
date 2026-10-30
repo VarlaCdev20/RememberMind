@@ -110,11 +110,15 @@ Ask before decisions that create or change:
 
 Technical autonomy means Codex decides **how** to implement. It does not mean Codex invents **what** the institution should require.
 
+## Orden de desarrollo adoptado el 30/10/2026
+
+La propietaria exige terminar el funcionamiento integral mediante ingeniería y pruebas técnicas, sin solicitar durante el desarrollo estudios con residentes, firmas, referencias humanas ni avales externos. La evaluación posterior en uso real se hará después y no es un requisito para desarrollar, probar o integrar. Conservar datos originales, reglas aprobadas, autorización, trazabilidad y abstenciones justificadas. Esta secuencia no autoriza inventar mediciones, declarar resultados no comprobados o incorporar contenido de terceros fuera de su alcance permitido.
+
 ## Documentation and approved work
 
 Start at `docs/README.md`; use `docs/modulos/README.md` to locate the twelve owners and process contracts. `docs/ESTADO_ACTUAL.md` summarizes the latest local evidence; dated delivery reports remain evidence of their own cut. A historical scope restriction such as "documentation only", "during the move", or a previous phase ceiling does not govern unrelated later work. Do not repeat an approval already recorded for the same scope. Existing clinical/structural boundaries still apply.
 
-Develop and test already-authorized behavior without requiring a professional signature before each execution. Keep technical implementation, original measurements, structural approval and clinical validation separate. Missing measurements cause a justified limitation or abstention, not a blanket development freeze.
+Develop and test already-authorized behavior without requiring a professional signature before each execution. Keep technical implementation, original measurements, structural approval and post-development assessment separate. Missing measurements cause a justified limitation or abstention, not a blanket development freeze.
 
 ## Responsible scope
 

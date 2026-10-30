@@ -160,7 +160,7 @@ Verificación: cinco pruebas PHP PASS (52 aserciones), `npm test` PASS (173), bu
 
 ## Cierre backend de Heridas / Curaciones — 13/10/2026
 
-**Resultado de las correcciones solicitadas: VERIFIED_RUNTIME.** Alcance: cierre del formulario, concurrencia sobre la misma herida, transporte real de fotografías al límite y regresión del flujo. No equivale a aceptación clínica de catálogos/reglas, certificación de producción ni aceptación visual de las últimas ilustraciones.
+**Resultado de las correcciones solicitadas: VERIFIED_RUNTIME.** Alcance: cierre del formulario, concurrencia sobre la misma herida, transporte real de fotografías al límite y regresión del flujo. No equivale a evaluación posterior en uso real de catálogos/reglas, certificación de producción ni aceptación visual de las últimas ilustraciones.
 
 ### Cierre único y conservación de historia
 

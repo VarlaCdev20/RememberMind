@@ -2,7 +2,7 @@
 
 **Versión:** `PTE-DCL-G08-TEST-01`
 **Fecha:** 17/10/2026
-**Estado:** implementación experimental TEST_ONLY, pruebas específicas satisfactorias. No validado clínicamente, no habilitado con residentes reales y PR #15 aún en borrador.
+**Estado:** implementación experimental TEST_ONLY, pruebas específicas satisfactorias. No evaluado posteriormente en uso real, no habilitado con residentes reales y PR #15 aún en borrador.
 
 ## Fuentes oficiales
 

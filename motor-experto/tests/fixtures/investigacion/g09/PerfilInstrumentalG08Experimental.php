@@ -29,7 +29,7 @@ final class PerfilInstrumentalG08Experimental
             'componente' => $componente,
             'metodo' => 'PATRON_EXACTO_SOLO_FIXTURE',
             'origen' => 'SIMULACION_INFORMATICA_NO_INSTRUMENTO_CLINICO',
-            'estado_g08' => 'NO_VALIDADO_CLINICAMENTE',
+            'estado_g08' => 'SOLO_VERIFICACION_TECNICA',
             'solo_pruebas_tecnicas' => true,
             'preguntas_requeridas' => [
                 $pregunta => [

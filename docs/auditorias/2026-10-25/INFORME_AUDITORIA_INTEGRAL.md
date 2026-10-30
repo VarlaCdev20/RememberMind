@@ -4,7 +4,7 @@
 **Objeto:** implementación local de `VarlaCdev20/RememberMind`.\
 **Rama observada:** `feature/apoyo-decision-informe-neurocognitivo`.\
 **HEAD al iniciar:** `6d7b8c6d`, con modificaciones locales preexistentes.\
-**Naturaleza:** auditoría técnica, funcional, de seguridad y de consistencia de presentación. No acredita una titulación profesional, validación clínica ni certificación regulatoria.
+**Naturaleza:** auditoría técnica, funcional, de seguridad y de consistencia de presentación. No acredita una titulación profesional, evaluación posterior en uso real ni certificación regulatoria.
 
 ## 1. Dictamen ejecutivo
 
@@ -282,7 +282,7 @@ La traza se delega a auditoría técnica de Superadministración. Medicina/Psico
 - Abstenciones por contradicción, revisión diferencial, insuficiencia, requisito negativo o falta de gobierno/regla habilitada.
 - Trazas y explicaciones con el alcance realmente disponible.
 
-No acredita diagnóstico confirmado, porcentajes de deterioro, probabilidad individual, tratamiento automático ni validación clínica. La historia conjunta instrumental/Petersen sigue sin el cierre SQL institucional descrito.
+No acredita diagnóstico confirmado, porcentajes de deterioro, probabilidad individual, tratamiento automático ni evaluación posterior en uso real. La historia conjunta instrumental/Petersen sigue sin el cierre SQL institucional descrito.
 
 ## 9. Hallazgos de frontend y contenido clínico
 
@@ -411,9 +411,9 @@ El build actual produce aproximadamente **1.933,21 kB de CSS** (274,54 kB gzip) 
 
 ### H32 — Pendiente de aceptación: revisión visual y clínica no realizadas
 
-La revisión visual actual está bloqueada por la política del navegador. La base tiene cero revisiones expertas; no se aportó una muestra de casos con dictamen profesional independiente vinculada al resultado conservado. No se puede asignar un porcentaje serio de culminación global ni validación clínica por suites sintéticas.
+La revisión visual actual está bloqueada por la política del navegador. La base tiene cero revisiones expertas; no se aportó una muestra de casos con dictamen profesional independiente vinculada al resultado conservado. No se puede asignar un porcentaje serio de culminación global ni evaluación posterior en uso real por suites sintéticas.
 
-**Cierre:** recorrido visual autorizado por rol/estado/tamaño y validación clínica separada, con discrepancias, responsables y límites. Estas verificaciones no deben usarse para retrasar la corrección técnica de H01–H31.
+**Cierre:** recorrido visual autorizado por rol/estado/tamaño y evaluación posterior en uso real separada, con discrepancias, responsables y límites. Estas verificaciones no deben usarse para retrasar la corrección técnica de H01–H31.
 
 ## 11. Resultados de pruebas de esta auditoría
 

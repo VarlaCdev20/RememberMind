@@ -27,7 +27,7 @@ Las cards translúcidas mezclan la superficie clara al 84% con el lienzo; la com
 - Acentos salvia, azul y lavanda concentrados en función/encabezados. Sin bisel en botones ni desplazamiento decorativo de los bloques principales.
 - Se excluye el dashboard compartido de una regla antigua de Enfermería que alteraba sus cards respecto a los demás roles.
 - `priority-alert` oculta únicamente el prefijo técnico de vínculo de herida al presentar la descripción. No modifica el texto persistido ni el vínculo backend.
-- Los formularios y directorios consumen los mismos tokens de superficie. No cambian BDD, responsabilidades profesionales, validación clínica ni permisos.
+- Los formularios y directorios consumen los mismos tokens de superficie. No cambian BDD, responsabilidades profesionales, evaluación posterior en uso real ni permisos.
 
 ## Verificación
 

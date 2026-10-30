@@ -147,7 +147,7 @@ Los resultados finales de este corte se registran en la tabla siguiente. Las eje
 3. Conservar y leer las salidas/trazas completas independientemente del replay, o formalizar expresamente otro contrato; el requisito actual pide ambas propiedades.
 4. Probar la transición y reversión pobladas de cualquier tabla existente que se reutilice, todos sus consumidores, 4FN, crecimiento y mantenimiento. Este ensayo sólo añadió tablas propias.
 5. Pasar el gate independiente y presentar entonces el diccionario/DDL concreto que cumpla el máximo para aprobación estructural, como exigen los [AGENTS de BDD](../../database/AGENTS.md). No se pide aprobar este candidato que ya incumple el máximo.
-6. Tras esa autorización, integrar conservación real, historial y revisiones posteriores independientes; repetir la aceptación operativa completa. Las mediciones reales y la validación clínica siguen siendo requisitos distintos del desarrollo técnico.
+6. Tras esa autorización, integrar conservación real, historial y revisiones posteriores independientes; repetir la aceptación operativa completa. Las mediciones reales y la evaluación posterior en uso real siguen siendo requisitos distintos del desarrollo técnico.
 
 No se afirma una cota mínima universal. Como simple comparación aritmética, incluso reutilizar hipotéticamente las 12 tablas de conocimiento y una cabecera reduciría este candidato a 21 tablas adicionales (**125 en total**), todavía 15 por encima del máximo; esa reutilización tampoco está demostrada. Aumentar el máximo por sí solo no corrige los puntos 2–4.
 

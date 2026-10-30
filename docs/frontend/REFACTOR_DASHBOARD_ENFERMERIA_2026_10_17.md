@@ -79,7 +79,7 @@ Los exports usan datos sintéticos. El caso de gráficas añade payloads agregad
 solo en una subclase privada de QA; no son registros guardados ni nuevas reglas.
 El transporte Livewire se sustituye en el navegador y no se cargan los iconos o
 la fotografía externos. Esta revisión no equivale a E2E contra servidor,
-integración PostgreSQL o aceptación clínica integral. No se incluyen fixtures,
+integración PostgreSQL o evaluación posterior en uso real integral. No se incluyen fixtures,
 capturas ni scripts temporales de QA en el commit.
 
 ## Comandos principales

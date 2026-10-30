@@ -26,6 +26,6 @@ runtime_verified: false
 - Implementación localizada.
 - Verificación técnica ejecutada.
 - QA visual ejecutada.
-- Validación clínica cuando corresponda, con evidencia identificada.
+- Evaluación posterior en uso real cuando corresponda, con evidencia identificada.
 
 Completar un documento no completa el software. La ausencia de QA o una decisión nueva limita su alcance; no detiene todo el desarrollo autorizado. [Estado actual del producto](../../ESTADO_ACTUAL.md).

@@ -76,7 +76,7 @@ git diff --check
 Las capturas son fixtures sintéticas con Alpine real y transporte Livewire
 sustituido. La carga de iconos Phosphor del CDN no está incluida en ese harness;
 no se cambió en producción. La matriz no representa E2E contra servidor ni
-validación clínica o integración PostgreSQL. Medicación sin dosis pendiente
+evaluación posterior en uso real o integración PostgreSQL. Medicación sin dosis pendiente
 redirige al módulo correspondiente; no se simula una prescripción para abrirla.
 
 No se añadieron dependencias V1. El backend, los formularios internos, sus gráficas

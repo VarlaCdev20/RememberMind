@@ -143,5 +143,5 @@ esta aceptación se basa en Chromium automatizado con base desechable. El shell
 de esa prueba intenta usar SweetAlert externo, bloqueado por el router privado;
 se documentaron seis avisos `Swal is not defined` ajenos al explorador. La
 revisión manual en la sesión real de la propietaria y PostgreSQL siguen
-pendientes. Este cierre de QA no sustituye la validación clínica ni aprueba
+pendientes. Este cierre de QA no sustituye la evaluación posterior en uso real ni aprueba
 activación de conocimiento.

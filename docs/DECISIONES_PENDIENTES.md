@@ -117,7 +117,7 @@ C. Mantener regla vigente, documentando límite, hasta decisión concreta.
 
 ## DEC-OPEN-005
 
-**Título:** Medición original, derechos y validación clínica del experto.
+**Título:** Medición original, derechos y evaluación posterior en uso real del experto.
 
 **Estado al 25/10/2026: PARCIALMENTE RESUELTA por decisiones específicas; siguen abiertos los alcances enumerados.**
 
@@ -129,11 +129,11 @@ C. Mantener regla vigente, documentando límite, hasta decisión concreta.
 | Revisión posterior | Medicina y Psicología por separado; el alcance conjunto depende de conservación real |
 | Conservación conjunta | Diseño institucional y guardado SQL íntegro pendientes; no se equiparan al prototipo |
 | Aplicaciones originales, método y licencias | Requeridos por evidencia/instrumento concreto; no completados por una aprobación documental |
-| Validación clínica de desempeño | Pendiente de casos y revisión profesional independiente |
+| Evaluación posterior en uso real de desempeño | Pendiente de casos y revisión profesional independiente |
 
 No reabrir A–D/E–H como si faltara su adopción. No exigir firma previa para desarrollar, probar o ejecutar técnicamente los contratos aprobados; conservar estado, límites y abstenciones. Tampoco convertir una investigación o consentimiento de desarrollo en medición, certificación o validación profesional inexistente.
 
-**Bloquea exclusivamente:** contenido clínico nuevo no aprobado, uso no autorizado de instrumentos, instalación de DDL no autorizada y declaración de validación clínica sin evidencia. No bloquea correcciones técnicas compatibles, pruebas desechables ni implementación del alcance ya aprobado.
+**Bloquea exclusivamente:** contenido clínico nuevo no aprobado, uso no autorizado de instrumentos, instalación de DDL no autorizada y declaración de evaluación posterior en uso real sin evidencia. No bloquea correcciones técnicas compatibles, pruebas desechables ni implementación del alcance ya aprobado.
 
 **Evidencia actual:** [índice experto](sistema-experto/README.md) y [auditoría del 25/10](auditorias/2026-10-25/INFORME_AUDITORIA_INTEGRAL.md), H07–H13. Las opciones generales anteriores se sustituyen por esta separación de alcances; no se crean nuevas reglas.
 

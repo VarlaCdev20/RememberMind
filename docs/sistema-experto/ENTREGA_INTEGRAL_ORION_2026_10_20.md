@@ -250,7 +250,7 @@ no se atribuye su autoría a este incremento.
 - [ ] Conectar su informe, historial y las dos revisiones posteriores con
   distinción de estados y QA visual/funcional real.
 - [ ] Resolver por los profesionales las revisiones y perfiles interpretativos
-  concretos pendientes; registrar la evidencia de validación clínica.
+  concretos pendientes; registrar la evidencia de evaluación posterior en uso real.
 - [ ] Consolidar gates finales, documentación, commit de alcance y revisión
   para integración. Push y despliegue requieren instrucción explícita.
 

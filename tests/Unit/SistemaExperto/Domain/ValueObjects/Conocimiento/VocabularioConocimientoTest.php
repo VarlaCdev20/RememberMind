@@ -26,7 +26,7 @@ use PHPUnit\Framework\TestCase;
  * Aserciones sobre representación y rechazo, sin resultados de inferencia.
  *
  * RESTRICCIONES:
- * No inicia Laravel, no consulta BDD, no clasifica ni acredita validación clínica.
+ * No inicia Laravel, no consulta BDD, no clasifica ni acredita evaluación posterior en uso real.
  *
  * TRAZABILIDAD:
  * Documento Maestro D-123/D-130; reglamento maestro R1/R8/R10.

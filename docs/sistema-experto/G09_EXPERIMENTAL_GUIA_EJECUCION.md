@@ -50,7 +50,7 @@ El informe técnico reconstruye: identificador de regla → condiciones satisfec
 
 **En integración:** conexión a motor genérico persistente y reporte segregado de investigación; pruebas sobre SQLite/PostgreSQL efímeros, validación de permisos y acciones desactivadas fuera de pruebas.
 
-**En validación clínica posterior:** con base legal/ética, casos desidentificados interpretados por profesionales, comparación ciega, análisis de discrepancias y evaluación independiente. Solo después se considerará G13 y posible publicación asistencial.
+**En evaluación posterior en uso real posterior:** con base legal/ética, casos desidentificados interpretados por profesionales, comparación ciega, análisis de discrepancias y evaluación independiente. Solo después se considerará G13 y posible publicación asistencial.
 
 **La clasificación global de DCL todavía no se incluye**: requiere contrato de criterios generales, autonomía funcional, subtipos y validación diferenciada de G09 por subcomponentes.
 

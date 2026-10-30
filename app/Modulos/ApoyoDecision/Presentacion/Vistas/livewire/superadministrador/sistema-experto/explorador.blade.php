@@ -44,7 +44,7 @@
     @elseif($modoConocimiento === 'red')
         @include('livewire.superadministrador.sistema-experto.red-semantica')
     @elseif($modoConocimiento === 'versiones')
-        <x-ui.section-card title="Comparación técnica de versiones" subtitle="Cambios de reglas por código semántico. No ejecuta casos ni acredita validación clínica.">
+        <x-ui.section-card title="Comparación técnica de versiones" subtitle="Consulta los cambios entre versiones de las reglas por su código semántico.">
             <label for="lab-comparada" class="block font-semibold mb-2">Comparar la versión consultada con</label>
             <select id="lab-comparada" wire:model.live="versionComparada" class="rm-input w-full"><option value="">Seleccione una versión almacenada</option>@foreach($versiones as $v)<option value="{{ $v->cod_version_modelo }}">{{ $v->codigo_version }} · {{ $v->estado }}</option>@endforeach</select>
             @forelse($comparacion as $id => $c)

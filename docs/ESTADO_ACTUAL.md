@@ -13,7 +13,7 @@ runtime_verified: false
 
 # Estado actual de RememberMind
 
-**Corte: 25/10/2026, America/La_Paz.** Rama observada: `feature/apoyo-decision-informe-neurocognitivo`; HEAD `6d7b8c6d`, con cambios locales concurrentes. Este documento describe el árbol auditado; no certifica producción ni validación clínica. La limpieza posterior de Markdown no reejecuta ni transforma esas pruebas.
+**Corte: 25/10/2026, America/La_Paz.** Rama observada: `feature/apoyo-decision-informe-neurocognitivo`; HEAD `6d7b8c6d`, con cambios locales concurrentes. Este documento describe el árbol auditado; no certifica producción ni evaluación posterior en uso real. La limpieza posterior de Markdown no reejecuta ni transforma esas pruebas.
 
 ## Dictamen y prioridades
 
@@ -68,4 +68,4 @@ No sumar filtros solapados como cobertura única. No convertir omisiones en PASS
 - [Modelo de autorización](seguridad/MODELO_AUTORIZACION.md); [contrato visual](frontend/CONTRATO_VISUAL_UX_UI.md).
 - [Cortes anteriores hasta el 11/10](historico/ESTADO_CORTES_HASTA_2026_10_11.md): historia conservada, sin aceptar nuevamente el árbol actual por sus pruebas.
 
-Las correcciones de software compatibles con contratos aprobados continúan sin exigir una nueva firma clínica para programar. No se fabrican mediciones ni aprobaciones. Producción y validación clínica requieren evidencias propias.
+Las correcciones de software compatibles con contratos aprobados continúan sin exigir una nueva firma clínica para programar. No se fabrican mediciones ni aprobaciones. Producción y evaluación posterior en uso real requieren evidencias propias.

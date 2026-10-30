@@ -104,4 +104,4 @@ Nuevo intento de observar la pestaña: CUA rechazó adquirir acceso por la polí
 El propietario solicitó reunir estos cambios en `feature/apoyo-decision-informe-neurocognitivo`
 y publicarlos para el equipo. El registro conjunto y las instrucciones de actualización
 están en `docs/sistema/PUBLICACION_CONJUNTA_2026_10_22.md`. Esta solicitud posterior
-no modifica los límites de QA visual ni supone validación clínica.
+no modifica los límites de QA visual ni supone evaluación posterior en uso real.

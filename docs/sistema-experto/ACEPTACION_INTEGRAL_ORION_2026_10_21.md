@@ -1,6 +1,6 @@
 # O.R.I.O.N. — corte de aceptación integral
 
-**Fecha:** 21/10/2026. **Estado:** cierre técnico parcial verificable. No se declara culminación institucional ni validación clínica. Sin commit, push, despliegue o migración institucional.
+**Fecha:** 21/10/2026. **Estado:** cierre técnico parcial verificable. No se declara culminación institucional ni evaluación posterior en uso real. Sin commit, push, despliegue o migración institucional.
 
 ## Actualización del 22/10/2026
 
@@ -12,7 +12,7 @@ La [continuación de conservación](CONSERVACION_LECTURA_Y_REPLAY_2026_10_22.md)
 
 Se corrigió la lectura de autoridad en `AGENTS.md`, `database/AGENTS.md`, `tests/AGENTS.md`, el baseline, su diccionario y el índice de O.R.I.O.N.: **70** es el núcleo V2.1, **104** es el inventario instalado comprobado (75 operativas, 29 expertas) y **110** es el máximo de diseño aprobado. Esta aclaración documental no modifica el esquema ni aprueba DDL.
 
-En el árbol local actual, `php artisan test --filter='SistemaExpertoOrionNivel1Test|PreparacionCompuestaCoherenteTest|ReferenciaF02SqliteDesechableTest|RevisionValoracionExpertaTest' --compact --stop-on-failure` terminó con **31 pruebas, 129 aserciones y tres omisiones** propias de carreras que requieren dos conexiones. `php artisan test --filter='CapturaInstrumentalInstitucionalTest|ConocimientoCognitivoInstitucionalTest|CapturaPetersenOriginalTest|PetersenInstitucionalTest|InstantaneaEvaluacionInstitucionalTest' --compact --stop-on-failure` terminó con **205 pruebas y 1734 aserciones**, sin fallos. El segundo filtro también incluyó `GobiernoPetersenInstitucionalTest`. Son pruebas sintéticas sobre la configuración de testing; no acreditan validación clínica ni guardado institucional bajo 110 tablas.
+En el árbol local actual, `php artisan test --filter='SistemaExpertoOrionNivel1Test|PreparacionCompuestaCoherenteTest|ReferenciaF02SqliteDesechableTest|RevisionValoracionExpertaTest' --compact --stop-on-failure` terminó con **31 pruebas, 129 aserciones y tres omisiones** propias de carreras que requieren dos conexiones. `php artisan test --filter='CapturaInstrumentalInstitucionalTest|ConocimientoCognitivoInstitucionalTest|CapturaPetersenOriginalTest|PetersenInstitucionalTest|InstantaneaEvaluacionInstitucionalTest' --compact --stop-on-failure` terminó con **205 pruebas y 1734 aserciones**, sin fallos. El segundo filtro también incluyó `GobiernoPetersenInstitucionalTest`. Son pruebas sintéticas sobre la configuración de testing; no acreditan evaluación posterior en uso real ni guardado institucional bajo 110 tablas.
 
 El oráculo SQL completo pasó en SQLite desechable, incluida la variante montada sobre las migraciones actuales; sobrepasa el presupuesto relacional y no es una migración candidata. La brecha de conservación y la necesidad de mediciones originales interpretables permanecen. `persistido=false` continúa siendo el estado correcto de `EVALUACION-INSTITUCIONAL-1`.
 
@@ -40,10 +40,10 @@ flowchart LR
 
 ## Matriz de aceptación
 
-| Componente | Implementado | Verificado técnicamente en este corte | Validado clínicamente | Pendiente o bloqueo |
+| Componente | Implementado | Verificado técnicamente en este corte | evaluado posteriormente en uso real | Pendiente o bloqueo |
 | --- | --- | --- | --- | --- |
 | Captura instrumental | Sí, con instrumento, preguntas/respuestas y procedencia | Regresión de permisos y baterías relacionadas | No | Aplicaciones originales de pruebas concretas, método y derechos adoptados. Las 286 actuales son observaciones. |
-| Cinco dominios / 19 componentes | Motor y contratos existentes | Pruebas Petersen y compuestas; no aceptación clínica por dominio en esta entrega | No | Entradas originales interpretables y perfiles habilitados por método. |
+| Cinco dominios / 19 componentes | Motor y contratos existentes | Pruebas Petersen y compuestas; no evaluación posterior en uso real por dominio en esta entrega | No | Entradas originales interpretables y perfiles habilitados por método. |
 | Red y reglas | Paquetes versionados, 17 reglas cognitivas, gobierno Petersen | Pruebas de cuatro patrones y archivo/revisión existentes | No | Activación clínica por regla/perfil y evaluación profesional de rendimiento. |
 | Petersen C01–C05 | Nueve juicios originales; C02 derivado; cuatro patrones y abstenciones | 134 pruebas / 1495 aserciones en batería relacionada SQLite; 28 / 208 Petersen en PostgreSQL desechable | No | Sin originales suficientes, abstención; sin historia íntegra no puede firmarse este resultado. |
 | DTO compuesto / ejecutor | Preparación y replay en memoria; vínculo verificable a release | Suite compuesta y ensayos parciales B01–B03 | No | SQL institucional guardar/recuperar/replay completo. `persistido=false`. |
@@ -93,7 +93,7 @@ Para registrar formalmente una revisión **no concluyente** falta una decisión 
 | `vendor/bin/pint --test` sobre los cinco PHP modificados | Estilo PHP | PASS. |
 | `git diff --check` | Árbol compartido | FAIL por espacios finales en una vista de Cuidados ajena a este cambio. No se modificó esa vista. |
 
-La aceptación visual de esta entrega y la validación clínica con casos profesionales **no se ejecutaron**. No hay prueba nueva del round-trip institucional ni de concurrencia de su diseño, porque ese diseño aún no existe. Las pruebas sintéticas no equivalen a una firma o a desempeño diagnóstico.
+La aceptación visual de esta entrega y la evaluación posterior en uso real con casos profesionales **no se ejecutaron**. No hay prueba nueva del round-trip institucional ni de concurrencia de su diseño, porque ese diseño aún no existe. Las pruebas sintéticas no equivalen a una firma o a desempeño diagnóstico.
 
 ## Matriz para validación profesional posterior
 

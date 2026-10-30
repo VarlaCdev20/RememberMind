@@ -110,7 +110,7 @@ git diff --stat
 | Observaciones clínicas actuales | Continúan siendo observaciones; no se inventaron medidas ni firmas |
 | Conservación compuesta instrumental/Petersen | **Pendiente material**, no implementada por esta reducción |
 | Revisiones del DTO compuesto | Bloqueadas hasta disponer de una evaluación conjunta durable y recuperable |
-| Validación clínica | No acreditada por pruebas técnicas |
+| Evaluación posterior en uso real | No acreditada por pruebas técnicas |
 
 El presupuesto pasa a disponer de diez relaciones antes del máximo 110. Eso **no demuestra** que las entradas/salidas completas del DTO compuesto quepan en diez relaciones nuevas ni autoriza su instalación. El [ensayo nominal anterior](ENSAYO_NOMINAL_CONSERVACION_2026_10_22.md) sigue siendo evidencia de brechas, no diseño instalado: sus tablas adicionales no se crearon. Falta cerrar un diccionario completo y mantenible de las entradas, conocimiento adquirido, salidas y membresías; demostrar recuperación exacta/replay de ambas ramas; y aprobar específicamente sus modificaciones estructurales. `persistido=false` se mantiene en ese recorrido. No se oculta este límite para declarar culminación total.
 

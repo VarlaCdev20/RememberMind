@@ -47,7 +47,7 @@ final class PreparacionCircuitoInstrumental
                 'edicion_operativa' => null, 'perfil_ejecutable' => null,
                 'derechos_uso_previsto' => 'NO_ACREDITADOS',
                 'faltantes' => ['MATERIAL_FINAL_Y_DERECHOS_DEL_USO_PREVISTO', 'APLICABILIDAD_Y_PROTOCOLO_DE_EDICION',
-                    'IDENTIDAD_CATALOGO_Y_SELECTORES_EXACTOS', 'METODO_Y_PERFIL_VERIFICADOS', 'ACEPTACION_CLINICA_APLICABLE'],
+                    'IDENTIDAD_CATALOGO_Y_SELECTORES_EXACTOS', 'METODO_Y_PERFIL_VERIFICADOS'],
                 'autoriza_inferencia' => false];
         }
         unset($familia);

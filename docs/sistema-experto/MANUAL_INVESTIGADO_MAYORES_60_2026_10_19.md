@@ -4,7 +4,7 @@ Fecha de consulta: **19/10/2026**, zona America/La_Paz. Versión 1.3.
 Población solicitada por la propietaria: **personas mayores de 60 años**, sin
 techo de edad institucional supuesto. Estado: investigación documentada, cálculos
 descriptivos y comparaciones de referencia implementadas; alcance técnico de
-fase 3 cerrado con condiciones, adopción y validación clínica pendientes.
+fase 3 cerrado con condiciones, adopción y evaluación posterior en uso real pendientes.
 
 **Capítulo final y corte vigente:** [SCAND y TB-A, matriz de 19 componentes y
 cierre técnico](CIERRE_TECNICO_FASE_3_2026_10_19.md). Documenta los tres componentes
@@ -63,7 +63,7 @@ de procedencia dudosa.
 | --- | --- | --- |
 | Manual oficial de aplicación y corrección | Versión, instrucciones, rúbrica, interrupciones | Que se haya aplicado a un residente o que otra edición sea equivalente |
 | Artículo original normativo completo | Muestra, cálculo y límites publicados | Un protocolo institucional o permiso para reproducir materiales de terceros |
-| Artículo de validación clínica | Rendimiento en el problema y población estudiados | DCL en otra enfermedad, cultura o contexto |
+| Artículo de evaluación posterior en uso real | Rendimiento en el problema y población estudiados | DCL en otra enfermedad, cultura o contexto |
 | Resumen/indexación | Identidad, DOI y hallazgos resumidos | Coeficientes o tablas que no contiene |
 | Ficha del editor | Edición, material y acceso comercial | Lectura del manual completo o disponibilidad de todos los baremos |
 | Guía médica | Marco de evaluación e interpretación | Las diecinueve fórmulas concretas del sistema |
@@ -357,7 +357,7 @@ implementadas y probadas en el [cierre técnico](CIERRE_TECNICO_FASE_3_2026_10_1
 Los puntos 2–3 quedan resueltos para los métodos seleccionados; el conflicto
 Token chileno no se transforma en un algoritmo, se ofrece la alternativa UNAL
 expresamente identificada. Continúan la pertinencia/adopción institucional,
-materiales originales y validación clínica. Se conserva esta lista como historia.
+materiales originales y evaluación posterior en uso real. Se conserva esta lista como historia.
 
 1. Para los tres componentes sin conversión normativa completa (ATE-S02,
    LEN-S04 y LEN-S05) y la adopción de las referencias nuevas:

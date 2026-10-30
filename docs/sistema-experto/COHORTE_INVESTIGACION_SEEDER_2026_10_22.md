@@ -57,7 +57,7 @@ Treinta casos de 61–89 años, con 4, 8 o 12 años de escolaridad. País normat
 
 Los quince casos con caída y los seis antecedentes contextuales se distribuyen sin utilizarlos como determinantes del perfil. Una caída no acredita DCL. Los juicios originales A/P/I son entradas **sintéticas explícitas**: no se pretende que la normalización numérica genere por sí sola esos juicios clínicos. C02 y el patrón final sí se derivan mediante el motor real.
 
-Las cinco capturas metodológicas ejercitan seis subcomponentes existentes. No se afirma cobertura instrumental completa de los 19 subcomponentes ni validación clínica de los 23 métodos del catálogo.
+Las cinco capturas metodológicas ejercitan seis subcomponentes existentes. No se afirma cobertura instrumental completa de los 19 subcomponentes ni evaluación posterior en uso real de los 23 métodos del catálogo.
 
 La matriz nominal completa, con edades, escolaridad, variante, cinco estados esperados y fuentes, está en [matriz-casos.csv](../auditorias/cohorte-investigacion-2026-10-22/matriz-casos.csv). El [manifiesto versionado](../auditorias/cohorte-investigacion-2026-10-22/manifiesto.json) incluye referencias, métodos y resultados esperados externos a las tablas clínicas.
 
@@ -120,4 +120,4 @@ Build y QA visual no aplican a esta modificación: no cambia Blade, CSS ni JavaS
 
 ## Estado final y límites
 
-Los resultados de esta ejecución se registran en el [acta de evidencias](../auditorias/cohorte-investigacion-2026-10-22/README.md). Implementación y aceptación técnica deben leerse por separado de validación clínica. No hay casos profesionales revisados ni firmas nuevas. La cohorte no valida el comportamiento en una población real, no garantiza ausencia de errores y no autoriza decisiones asistenciales automáticas.
+Los resultados de esta ejecución se registran en el [acta de evidencias](../auditorias/cohorte-investigacion-2026-10-22/README.md). Implementación y aceptación técnica deben leerse por separado de evaluación posterior en uso real. No hay casos profesionales revisados ni firmas nuevas. La cohorte no valida el comportamiento en una población real, no garantiza ausencia de errores y no autoriza decisiones asistenciales automáticas.

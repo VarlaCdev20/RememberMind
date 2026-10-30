@@ -88,7 +88,7 @@ La selección depende del riesgo, no de cargar todas las skills. Una vez resuelt
 | Signos vitales | fuente/guardrails/dominio/autorización/historia/alertas + integridad si persistencia | Preview puro, backend interpreta, origen/eventos; objetivo aprobado según decisión vigente |
 | Pase de turno | workflow/continuidad/autorización + persistencia/historia pertinente | Pendientes reales al siguiente profesional con scope |
 | Reporte/archivo familiar | fuente/autorización + performance si medido + security-review | Vínculo no habilita contenido completo; fuente intacta y descarga reautorizada |
-| Motor cognitivo futuro | fuente/guardrails/expert-engineering/dominio/autorización + expert-validation/testing | Diseño técnico ≠ aprobación ni validación clínica; falta de método se aísla |
+| Motor cognitivo futuro | fuente/guardrails/expert-engineering/dominio/autorización + expert-validation/testing | Diseño técnico ≠ aprobación ni evaluación posterior en uso real; falta de método se aísla |
 | Documentación o skills | Fuentes, skill-creator y verificación de formato/enlaces/escenarios | Sin cambios funcionales; suites/build no aplican por mera creación de instrucciones |
 
 ## Integración con UX

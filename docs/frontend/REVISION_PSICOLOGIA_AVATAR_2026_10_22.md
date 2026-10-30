@@ -101,7 +101,7 @@ Las páginas quedan abiertas con la sesión autorizada para revisión del propie
 - Acordar y validar la identidad del avatar: la mascota del ZIP no está integrada
   definitivamente; los derechos y la aprobación del personaje siguen pendientes.
 - Sustituir la orientación documental por guías específicas únicamente cuando
-  existan manual, edición, derechos y validación clínica. Ninguna se marca VALIDADA.
+  existan manual, edición, derechos y evaluación posterior en uso real. Ninguna se marca VALIDADA.
 - Completar la matriz visual y accesible actual en tablet/móvil, zoom 200 %, lector
   de pantalla y recuperación tras errores. Lo observado en escritorio no acredita
   todas esas variantes.

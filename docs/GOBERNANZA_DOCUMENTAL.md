@@ -76,7 +76,7 @@ No replicar diccionario/matriz clínica por conveniencia. Estado, roadmap, decis
 
 Mantener rutas históricas durante Fase 1. Avisar en carpeta y documentos que podrían confundirse con norma. Migrar a docs/historico solo tras conocer enlaces entrantes de README/AGENTS/skills/docs.
 
-Cuando cambian locks, extensión BDD, contrato institucional o entrega con evidencia, revisar documentos afectados. No fijar fechas de entrega ficticias ni afirmar validación clínica de una skill. Para futuros agentes empezar en [el portal](README.md).
+Cuando cambian locks, extensión BDD, contrato institucional o entrega con evidencia, revisar documentos afectados. No fijar fechas de entrega ficticias ni afirmar evaluación posterior en uso real de una skill. Para futuros agentes empezar en [el portal](README.md).
 
 ## Alcance de la Fase 1 histórica
 
@@ -85,7 +85,7 @@ La restricción «solo Markdown, sin producto ni commit» describe exclusivament
 ## Mantenimiento vigente
 
 - Estado actual apunta al último corte comprobado; los informes fechados conservan sus resultados originales.
-- Separar requisito aprobado, implementación observada, pruebas ejecutadas y validación clínica. No inventar una aprobación para resolver un conflicto de nombres.
+- Separar requisito aprobado, implementación observada, pruebas ejecutadas y evaluación posterior en uso real. No inventar una aprobación para resolver un conflicto de nombres.
 - Una aprobación vigente del mismo alcance se reutiliza: no pedirla otra vez por el nombre PROPUESTA de un archivo.
 - La investigación, una skill y una prueba sintética no sustituyen datos originales ni aprobación estructural. Las correcciones técnicas independientes continúan.
 - Antes de retirar un documento comprobar enlaces entrantes, decisiones únicas y consumidores. Sin duplicados exactos no eliminar evidencia solo para reducir un contador.

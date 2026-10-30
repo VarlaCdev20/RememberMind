@@ -30,7 +30,7 @@ Se reutilizan `collection-header`, `filter-bar`, `action-button`, `status-badge`
 - Contraste muestreado sobre fondos reales de claro: texto de estado mínimo **5.45:1**, aviso crítico **6.14:1**, cuerpo **7.79:1**. No es certificación global de accesibilidad.
 - Se preservan los tokens de movimiento y la rama de movimiento reducido. La comprobación visual de esta tarea se realizó en claro; no se afirma comprobación del tema oscuro ni simulación de movimiento reducido en el navegador conectado.
 
-Evidencia sintética: `storage/app/qa/incidentes/normal-{ancho}.jpg`, `detail-{ancho}.jpg`, `filters-390.jpg`, `history-390.jpg`, `empty-390.jpg` y `error-390.jpg`. El fixture es una exportación estática; la lógica Livewire se verifica en pruebas y el modal se ejercitó en la pantalla conectada. No sustituye validación clínica ni integración PostgreSQL.
+Evidencia sintética: `storage/app/qa/incidentes/normal-{ancho}.jpg`, `detail-{ancho}.jpg`, `filters-390.jpg`, `history-390.jpg`, `empty-390.jpg` y `error-390.jpg`. El fixture es una exportación estática; la lógica Livewire se verifica en pruebas y el modal se ejercitó en la pantalla conectada. No sustituye evaluación posterior en uso real ni integración PostgreSQL.
 
 ## Límites
 

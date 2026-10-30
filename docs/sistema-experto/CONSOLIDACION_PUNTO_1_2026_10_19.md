@@ -1,6 +1,6 @@
 # Punto 1 — Consolidación del sistema experto
 
-Fecha: 19/10/2026. Estado: **CERRADO en su alcance de consolidación documental y revisión estática**. No significa cierre de los ocho entregables ni aceptación clínica. No se modifican motor, datos, estructura, permisos o pantallas en este punto.
+Fecha: 19/10/2026. Estado: **CERRADO en su alcance de consolidación documental y revisión estática**. No significa cierre de los ocho entregables ni evaluación posterior en uso real. No se modifican motor, datos, estructura, permisos o pantallas en este punto.
 
 Continuación posterior autorizada: la [integración del laboratorio](INTEGRACION_LABORATORIO_2026_10_19.md) incorpora y verifica el conjunto que aquí se encontró sin integrar. Este documento y su CSV conservan la fotografía del corte `f3d56ed2`; la continuación no cambia retrospectivamente sus hashes ni cierra E3/E4/E6 institucionales.
 

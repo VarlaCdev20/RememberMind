@@ -58,4 +58,4 @@ Esta evidencia cubre el contenido de la vista en aislamiento. No equivale a insp
 
 Los JUnit y logs de esta ejecución permanecen bajo `storage/logs/`; el HTML, las capturas y la matriz de renderizado se mantienen en un directorio temporal de QA, sin registros institucionales. No se copian credenciales, sesiones operativas ni la base institucional.
 
-Sin migraciones, cargas de datos, push ni despliegue en esta tarea. La conservación conjunta SQL y la validación clínica conservan sus pendientes previos.
+Sin migraciones, cargas de datos, push ni despliegue en esta tarea. La conservación conjunta SQL y la evaluación posterior en uso real conservan sus pendientes previos.

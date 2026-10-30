@@ -35,7 +35,7 @@ related_modules: []
 
 - [Decisión específica](base-de-datos/DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md) tras «autorizo»: seis relaciones y ocho columnas nullable instaladas en PostgreSQL local,106 de negocio +16 técnicas; respaldo previo y datos originales conservados.
 - P19 conciliado mediante concesión única de la misma alta, lectura de procedencia y plazo compartido sin copiar autorías ni ocultar contradicciones; sin cambios al DDL revisado.
-- [Informe40](especificacion-funcional/vistas/gerencia/40-INSTALACION-AUTORIZADA-Y-PRORROGA-EXPEDIENTE.md):30/229 SQLite,36/265 PostgreSQL, instalación atómica3/22 y3/24, navegador58 combinaciones sin desbordamiento y buildPASS. Verificación posterior de90 restricciones y cuatro triggers. Mantiene pendientes de aceptación del rol y separa validación clínica. Sin staging, commit, push ni despliegue.
+- [Informe40](especificacion-funcional/vistas/gerencia/40-INSTALACION-AUTORIZADA-Y-PRORROGA-EXPEDIENTE.md):30/229 SQLite,36/265 PostgreSQL, instalación atómica3/22 y3/24, navegador58 combinaciones sin desbordamiento y buildPASS. Verificación posterior de90 restricciones y cuatro triggers. Mantiene pendientes de aceptación del rol y separa evaluación posterior en uso real. Sin staging, commit, push ni despliegue.
 
 ## 2026-10-26 — Regresiones de aceptación de Gerencia
 
@@ -230,7 +230,7 @@ related_modules: []
 ## 2026-10-11 — Preparación para continuar desarrollo
 
 - [Entrega vigente](sistema/PREPARACION_DESARROLLO_2026_10_11.md) con seis etapas, commits locales, comandos seguros y limitaciones abiertas.
-- Estado actual actualizado con suite SQLite completa (1.079/31.452, 15 omisiones), cohorte PostgreSQL (143/2.489), frontend (151) y build; evidencia separada de historia, producción y validación clínica.
+- Estado actual actualizado con suite SQLite completa (1.079/31.452, 15 omisiones), cohorte PostgreSQL (143/2.489), frontend (151) y build; evidencia separada de historia, producción y evaluación posterior en uso real.
 - README e índices apuntan al repositorio canónico y a los límites de arquitectura comprobados. Instalación general sin migraciones ni regeneración de claves automáticas.
 
 ## 2026-10-10 — Auditoría posterior a la migración híbrida

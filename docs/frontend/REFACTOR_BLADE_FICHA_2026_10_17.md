@@ -98,7 +98,7 @@ Tampoco se reorganizaron aquí perfil, autenticación ni los demás módulos.
 - La aceptación visual final la realizó el implementador. El intento de revisión
   independiente no pudo completarse por disponibilidad del agente; no se declara
   un dictamen independiente. Esta evidencia cubre presentación e interacción en
-  fixtures, no una sesión completa contra PostgreSQL ni una validación clínica.
+  fixtures, no una sesión completa contra PostgreSQL ni una evaluación posterior en uso real.
 
 Comandos reproducibles para los checks incorporados al repositorio:
 

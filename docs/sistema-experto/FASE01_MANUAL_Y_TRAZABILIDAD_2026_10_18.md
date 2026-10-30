@@ -1,6 +1,6 @@
 # Sistema experto — laboratorio integrado y trazabilidad de Fase 01
 
-Estado: **recorridos técnicos integrados; cierre y verificación registrados por incremento**. No validado clínicamente. La matriz actual está en [aceptación A–M y 24 grupos](FASE01_ACEPTACION_INTEGRAL_2026_10_18.md); la lista y sus restricciones se conservan en el [checklist maestro](PROMPT_MAESTRO_01_CHECKLIST_2026_10_18.md). Las secciones iniciales describen el laboratorio básico; la sección final incorpora adquisición común, reglas SQL G09 e historia técnica.
+Estado: **recorridos técnicos integrados; cierre y verificación registrados por incremento**. No evaluado posteriormente en uso real. La matriz actual está en [aceptación A–M y 24 grupos](FASE01_ACEPTACION_INTEGRAL_2026_10_18.md); la lista y sus restricciones se conservan en el [checklist maestro](PROMPT_MAESTRO_01_CHECKLIST_2026_10_18.md). Las secciones iniciales describen el laboratorio básico; la sección final incorpora adquisición común, reglas SQL G09 e historia técnica.
 
 ## Ejecución sin conexión a expedientes
 
@@ -99,7 +99,7 @@ Los lectores Livewire del residente y las operaciones asistenciales permanecen f
 | Longitudinalidad | `ComparadorLongitudinalExperimental`, contrato de perfil | Casos comparables, protocolo distinto, oportunidad desconocida, tipo incompatible, corte, ausencia, replay integrado | Verificado sin diagnóstico, progresión ni ventana inventada |
 | Seguridad e integración | CLI y proveedor modular existente | `ConsolaPerfilExperimentalTest`: rechazo de producción y códigos operativos, cero escrituras institucionales | Verificado; no nuevos permisos ni rutas HTTP |
 | Historia y persistencia integral G09 | Contratos D-137 y conservación V2 existentes | Se conserva conocimiento y se devuelve snapshot en memoria; no se guarda el perfil G09 integral | Pendiente de resolver contrato, sin fingir persistencia |
-| Reportes y cierre | Este manual, checklist y auditoría | JUnit SQLite/PostgreSQL y programas independientes | Evidencia final registrada en auditoría; sin validación clínica |
+| Reportes y cierre | Este manual, checklist y auditoría | JUnit SQLite/PostgreSQL y programas independientes | Evidencia final registrada en auditoría; sin evaluación posterior en uso real |
 
 ## Restricciones registradas tras el segundo incremento
 

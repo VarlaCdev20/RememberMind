@@ -69,7 +69,7 @@ Evidencias de esta entrega en `output/funcionamiento-cotidiano-*`, excluidas del
 - Regresión ampliada de permisos/roles en PostgreSQL: **16 pruebas pasan y 1 falla**, por el texto esperado «Organización y planificación» en el dashboard de Gerencia. Es una vista ajena a esta entrega y no se modificó para hacer pasar la prueba. Las dos pruebas nuevas de asignación/edición de permisos están incluidas entre las aprobadas.
 - Instalación local acotada en PostgreSQL completada y verificada: dos permisos para Medicina/Psicología, roles ajenos intactos, cero registros clínicos escritos y sin DDL. Evidencia `output/funcionamiento-cotidiano-instalacion.json`.
 - Build Vite correcto; permanece el aviso previo de tamaño de chunks.
-- Revisiones de seguridad/BDD por fase de solo lectura: autoría, permisos, IDOR, atomicidad, historial y diferencias entre garantía de Action y esquema documentadas. Evidencia técnica no equivale a validación clínica.
+- Revisiones de seguridad/BDD por fase de solo lectura: autoría, permisos, IDOR, atomicidad, historial y diferencias entre garantía de Action y esquema documentadas. Evidencia técnica no equivale a evaluación posterior en uso real.
 
 El helper PowerShell general de PostgreSQL se detuvo por un bloqueo de tuberías al arrancar el cluster; se paró ese cluster propio y se ejecutó la misma suite con un lanzador local aislado. El resultado PostgreSQL informado corresponde a la ejecución terminada, no al intento interrumpido. No se cambió el helper general.
 

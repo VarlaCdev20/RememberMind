@@ -38,7 +38,7 @@ Suite SQLite completa en el commit indicado: **1.079 pruebas, 31.452 aserciones,
 
 La arquitectura administrativa conserva doce propietarios y cuatro capas, con excepciones Eloquent explícitas; el núcleo experto verifica independencia de Laravel y adaptadores. No se afirma separación absoluta de todo el legado. Composer y auditoría npm runtime sin avisos; npm completo mantiene un advisory alto de desarrollo (`braces`), controlado temporalmente hasta 11/11/2026. Documentos de usuario en disco público requieren un trabajo específico de privacidad. Los 50 archivos protegidos conservan hash y tamaño; no se modificó el esquema congelado ni la base instalada.
 
-En ese corte los commits eran locales; CI remoto, QA visual integral, producción y validación clínica quedaban fuera de esa evidencia. `runtime_verified: false` conserva el límite de certificación integral, aunque las suites indicadas sí fueron ejecutadas. Las secciones siguientes son históricas y no sustituyen este corte.
+En ese corte los commits eran locales; CI remoto, QA visual integral, producción y evaluación posterior en uso real quedaban fuera de esa evidencia. `runtime_verified: false` conserva el límite de certificación integral, aunque las suites indicadas sí fueron ejecutadas. Las secciones siguientes son históricas y no sustituyen este corte.
 
 ## Actualización arquitectónica — 10/10/2026
 

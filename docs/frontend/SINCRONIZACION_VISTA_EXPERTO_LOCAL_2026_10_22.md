@@ -60,4 +60,4 @@ La primera corrida de PHP falló en tres variantes por esperar la etiqueta anter
 
 Los JUnit y logs se conservan bajo `storage/logs/experto-vista-publicada-*`. La comprobación de rutas se realiza con fixtures sintéticos, sin tomar una sesión institucional ni crear accesos de respaldo. No se afirma inspección visual de la sesión abierta del navegador de Work.
 
-No hubo cambios de BDD, permisos, reglas clínicas, datos de residentes, commit, push ni despliegue. La conservación conjunta SQL y la validación clínica mantienen sus pendientes anteriores.
+No hubo cambios de BDD, permisos, reglas clínicas, datos de residentes, commit, push ni despliegue. La conservación conjunta SQL y la evaluación posterior en uso real mantienen sus pendientes anteriores.

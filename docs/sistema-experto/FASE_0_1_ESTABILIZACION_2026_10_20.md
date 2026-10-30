@@ -37,7 +37,7 @@ Comparación por identidad de caso: los 2144 originales de SQLite siguen present
 
 Los casos automatizados cubren inferencia, grafo y reglas existentes, adaptadores y fuentes, captura Petersen, corte documental, replay, conservación disponible, revisiones, gobierno, permisos, navegación, arquitectura, agenda y concurrencia PostgreSQL. Los comandos, JUnit y detalle por caso están adjuntos. Las pruebas de corrupción generan deliberadamente excepciones registradas; se evaluó el estado JUnit de cada caso.
 
-Controles adicionales: 22 archivos PHP sin errores de sintaxis; Pint `--test` aprobado en los 21 archivos tratados con ese formateador; ninguna migración alterada según SHA256; build Vite aprobado en directorio temporal (7,05 s); los dos ensayos de independencia del motor aprobados. `git diff --check` señala espacios finales en los dos Blade que ya tenían esos hunks en el diff inicial del propietario; no es un fallo PHPUnit y se conservaron esos cambios previos. No se ejecutó QA visual manual ni validación clínica de instrumentos; estas pruebas técnicas no equivalen a certificación clínica.
+Controles adicionales: 22 archivos PHP sin errores de sintaxis; Pint `--test` aprobado en los 21 archivos tratados con ese formateador; ninguna migración alterada según SHA256; build Vite aprobado en directorio temporal (7,05 s); los dos ensayos de independencia del motor aprobados. `git diff --check` señala espacios finales en los dos Blade que ya tenían esos hunks en el diff inicial del propietario; no es un fallo PHPUnit y se conservaron esos cambios previos. No se ejecutó QA visual manual ni evaluación posterior en uso real de instrumentos; estas pruebas técnicas no equivalen a certificación clínica.
 
 ## Las 29 tablas y sus relaciones
 

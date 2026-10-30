@@ -196,4 +196,4 @@ y restaura las variables del proceso. Las unitarias del vinculador prohíben
 abrir PDO. No se usa `.env` para apuntar las pruebas a una base institucional.
 
 Las suites técnicas acreditan los casos ejecutados en cada motor. No constituyen
-validación clínica ni prueban una integración asistencial que continúa deshabilitada.
+evaluación posterior en uso real ni prueban una integración asistencial que continúa deshabilitada.

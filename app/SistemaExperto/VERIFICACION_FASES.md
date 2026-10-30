@@ -98,7 +98,7 @@ sobrescritura, procedencia ajena y conservación parcial.
 | Historial D-137 visible después de anexar snapshot, PostgreSQL | **1 prueba / 4 aserciones, PASS** | `remembermind-pg-be330bb9bc2c45abad1966e0838baa85.junit.xml`; las evaluaciones exclusivamente V2 no se publican por G09 |
 | Orden corrupto rechazado sin coerción, PostgreSQL | **1 prueba / 1 aserción, PASS** | `remembermind-pg-19274e587a6447c1884e45eeded0cf39.junit.xml`; regresión también cubierta en SQLite |
 | Conservación e inventario PostgreSQL, ejecución estrecha anterior | 36 pruebas / 496 aserciones, PASS | `remembermind-pg-4c076537f8934a9a92f60c2c1451ca74.junit.xml`; solapada con el grupo de 162, no se suma |
-| Gate independiente de estructura / contenido de persistencia | PASS estático, sin P1/P2 pendientes | Revisores de lectura; no equivale a validación clínica ni a prueba de carreras |
+| Gate independiente de estructura / contenido de persistencia | PASS estático, sin P1/P2 pendientes | Revisores de lectura; no equivale a evaluación posterior en uso real ni a prueba de carreras |
 | Sintaxis PHP / Pint / diff | PASS | PHP-l en 56 archivos propios nuevos/modificados; Pint acotado y git diff --check |
 
 El total PostgreSQL vigente es **165 casos / 1215 aserciones** de los cuatro grupos

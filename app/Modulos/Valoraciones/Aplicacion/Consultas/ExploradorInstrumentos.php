@@ -91,7 +91,7 @@ final class ExploradorInstrumentos
                 : 'La referencia de investigación no demuestra licencia ni disponibilidad clínica. Aplicar un instrumento no demuestra por sí solo deterioro cognitivo: requiere medidas originales, contexto y revisión profesional.');
 
         return $tarjeta + ['version_guia' => self::VERSION, 'validacion' => 'REFERENCIA_NO_CLINICA',
-            'precaucion' => 'Guía pendiente de validación clínica. Esta orientación de registro no sustituye el manual autorizado de la edición real ni habilita su aplicación.',
+            'precaucion' => 'Guía de registro para el desarrollo del circuito. Utiliza el manual correspondiente a la edición del instrumento; la orientación no reemplaza sus instrucciones.',
             'materiales' => 'Manual y materiales autorizados de la edición aplicada; fuente original identificable. Verifica disponibilidad y derechos con el responsable clínico.',
             'limite' => $limite,
             'relacion' => 'La interpretación requiere fuentes autorizadas, método y versión, condiciones, episodio, autor y medidas originales. La condición conceptual instrumental exige C1 ∧ C2 ∧ C3 de la misma aplicación. Si faltan datos o hay discrepancias, corresponde abstención con razones. Petersen conserva cinco dominios y C01/C03/C04/C05 originales; C02 se deriva. Medicina y Psicología revisan por separado.',

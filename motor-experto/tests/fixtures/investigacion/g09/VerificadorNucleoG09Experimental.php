@@ -17,7 +17,7 @@ use MotorExperto\dominio\objetos_valor\FuenteBrutaCOGMEM;
  * MemoriaTrabajo, red semántica y PaqueteConocimiento).
  *
  * TRABAJA SOLO CON TRAZAS DE PRUEBA: nunca persiste hechos ni autoriza
- * conocimiento G08. No es una segunda validación clínica independiente.
+ * conocimiento G08. No es una segunda evaluación posterior en uso real independiente.
  */
 final class VerificadorNucleoG09Experimental
 {

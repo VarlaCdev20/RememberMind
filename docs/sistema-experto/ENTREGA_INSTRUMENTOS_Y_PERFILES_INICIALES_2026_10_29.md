@@ -27,7 +27,7 @@ La población objetivo se conserva como **personas mayores de 60 años**, sin ca
 | Perfiles de preparación | I01, I02 e I04 consultables desde una única clase, con faltantes explícitos; no son perfiles ejecutables ficticios. |
 | Integración técnica | El inventario existente incorpora `preparacion_circuito_inicial`, sin datos de residentes ni cambios en los perfiles del motor. |
 | Conexión conceptual al experto | Mapa de originales, contexto, extracción, cinco dominios y juicios C01–C05, con sus exclusiones. |
-| Aceptación | Casos técnicos y criterios para distinguir preparación, activación y validación clínica. |
+| Aceptación | Casos técnicos y criterios para distinguir preparación, activación y evaluación posterior en uso real. |
 
 No se entrega una batería clínica activada, una licencia, una nueva escala propia, reactivos protegidos o baremos bolivianos inexistentes en las fuentes revisadas.
 
@@ -97,7 +97,7 @@ Esta tabla especifica cómo revisar un perfil; no es una propuesta de nuevas col
 | Ausencias | Distinguir cero, No, desconocido, incompleto, no aplicable y referencia incoherente según el protocolo. |
 | Transformación | Fórmula, reglas, unidades y población justificadas por el método; nada de convertir categorías a años o totales a dominios por suposición. |
 | Salida y explicación | Resultado admisible, restricciones, fuentes, versión y motivos de abstención; sin diagnóstico autónomo o probabilidad inventada. |
-| Condiciones de incorporación | Material y uso previsto acreditados; verificación técnica y aceptación clínica correspondientes, separadas. |
+| Condiciones de incorporación | Material y uso previsto pertinentes al alcance implementado; protocolo, perfiles y verificación técnica. No exigir un estudio externo durante el desarrollo. |
 
 Los contratos de extracción existentes comprueban identidades, selectores, tipos y procedencia. Esta entrega no altera sus reglas ni introduce un atajo desde las notas de entrevista.
 
@@ -160,11 +160,11 @@ La consulta no recibe datos de residentes, no lee aplicaciones/respuestas ni eje
 | Documento inglés o variante de otra longitud | No declararlo material español final o edición intercambiable. |
 | Total global sin perfil admisible | No convertirlo en dominio, C02, C03, subtipo o probabilidad de DCL. |
 
-Pruebas del alcance: SQLite, 15 pruebas/407 aserciones correctas, incluyendo invocación real del CLI sobre una base en memoria nueva y de solo lectura. PostgreSQL 18 aislado: 14 correctas/369 aserciones y 1 omitida porque comprueba `PRAGMA query_only`, específico de SQLite. El cluster desechable se detuvo y eliminó al terminar. Los tests usan metadatos artificiales y bases desechables; no son pruebas piloto con residentes ni validación clínica.
+Pruebas del alcance: SQLite, 15 pruebas/407 aserciones correctas, incluyendo invocación real del CLI sobre una base en memoria nueva y de solo lectura. PostgreSQL 18 aislado: 14 correctas/369 aserciones y 1 omitida porque comprueba `PRAGMA query_only`, específico de SQLite. El cluster desechable se detuvo y eliminó al terminar. Los tests usan metadatos artificiales y bases desechables; no son pruebas piloto con residentes ni evaluación posterior en uso real.
 
 Se verificaron nuevamente firma PDF, tamaño y SHA-256 de los seis originales ya conservados; coinciden con los metadatos del 28/10. No se registra como obtenido un paquete o suplemento faltante y no se confunde integridad del archivo con derechos de uso.
 
-**Revisión independiente:** PASS técnico acotado para consulta, integración y documentación, sin hallazgos bloqueantes. **Aceptación clínica: BLOQUEADA** por materiales, alcance de uso, aplicabilidad/protocolo y perfiles pendientes. El revisor no repitió suites; examinó código, fuentes y evidencias. No se presenta esa revisión como validación clínica independiente de instrumentos o inferencia.
+**Revisión independiente:** PASS técnico acotado para consulta, integración y documentación, sin hallazgos bloqueantes. La evaluación en uso real corresponde a una etapa posterior al funcionamiento integral y no condiciona el desarrollo técnico actual. El revisor no repitió suites; examinó código, fuentes y evidencias. No se presenta esa revisión como evaluación posterior en uso real independiente de instrumentos o inferencia.
 
 Build y QA visual no aplican: esta fase no modifica frontend. No se añadieron nombres o dependencias V1. Las evidencias locales `output/perfiles-iniciales-*` quedan fuera del commit; código y pruebas son reproducibles.
 

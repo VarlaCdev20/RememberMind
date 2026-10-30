@@ -96,7 +96,7 @@ Contrastes de pares opacos de tokens, calculados como apoyo: texto principal/sup
 - Identidades de consulta marcadas `#[Locked]`; la entrada no permite atribuir registros a otro profesional ni ejecutar cuidados.
 - Fallos SQL/integridad reportados con mensajes seguros. Error instrumental no equivale a ausencia y bloquea una comparación no verificable.
 - Sin migraciones, reglas clínicas, umbrales, diagnósticos automáticos, nuevos historiales ni dependencias. El motor técnico permanece en `motor-experto`; consultas y UI en `ApoyoDecision`.
-- Revisión independiente de solo lectura: sin P1 detectados. Se corrigieron dos P2 (error confundido con ausencia y registro asociado incorrecto); una segunda revisión acotada confirmó esos cierres. No equivale a validación clínica.
+- Revisión independiente de solo lectura: sin P1 detectados. Se corrigieron dos P2 (error confundido con ausencia y registro asociado incorrecto); una segunda revisión acotada confirmó esos cierres. No equivale a evaluación posterior en uso real.
 
 ## G. Pruebas y build
 
