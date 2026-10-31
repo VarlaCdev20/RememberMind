@@ -18,7 +18,7 @@ use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoRes
 use Carbon\CarbonImmutable;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use DomainException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Support\EsquemaSinTransaccion;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
@@ -27,7 +27,7 @@ use Tests\TestCase;
 
 final class SucesionObservacionalTest extends TestCase
 {
-    use RefreshDatabase;
+    use EsquemaSinTransaccion;
 
     private User $actor;
 

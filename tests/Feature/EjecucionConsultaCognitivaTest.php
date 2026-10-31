@@ -80,6 +80,29 @@ final class EjecucionConsultaCognitivaTest extends TestCase
         $this->assertDatabaseCount('evaluaciones_expertas', 0);
     }
 
+    public function test_lectura_sin_permiso_petersen_conserva_mediciones_sin_ampliar_acceso(): void
+    {
+        $this->actor->roles()->first()->revokePermissionTo('valoraciones_petersen.ver');
+        $perfil = app(ConsultarPerfilInstrumental::class)->consultar($this->actor, $this->residente, CarbonImmutable::now());
+        self::assertArrayHasKey('capturas_originales', $perfil);
+        self::assertArrayNotHasKey('petersen_institucional', $perfil);
+        self::assertFalse($perfil['inferencia_declarativa']['persistido']);
+        self::assertSame(0, DB::transactionLevel());
+        $this->assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
+    public function test_lectura_sin_version_conserva_originales_sin_afirmar_inferencia(): void
+    {
+        DB::table('versiones_modelo_experto')->update(['estado' => 'INACTIVO']);
+        $perfil = app(ConsultarPerfilInstrumental::class)->consultar($this->actor, $this->residente, CarbonImmutable::now());
+        self::assertArrayHasKey('capturas_originales', $perfil);
+        self::assertFalse($perfil['inferencia_declarativa']['disponible']);
+        self::assertSame('SIN_VERSION_COGNITIVA_VINCULADA', $perfil['inferencia_declarativa']['motivo']);
+        self::assertArrayNotHasKey('petersen_institucional', $perfil);
+        self::assertSame(0, DB::transactionLevel());
+        $this->assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
     public function test_render_consulta_una_sola_vez_el_historial_observacional(): void
     {
         $lecturas = 0;

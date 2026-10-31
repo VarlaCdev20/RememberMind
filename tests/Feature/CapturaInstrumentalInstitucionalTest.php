@@ -7,6 +7,7 @@ namespace Tests\Feature;
 use App\Models\AplicacionInstrumento;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
+use App\Models\AsignacionResidenteJornada;
 use App\Models\DocumentoClinico;
 use App\Models\Instrumento;
 use App\Models\Jornada;
@@ -27,7 +28,7 @@ use App\Modulos\Valoraciones\Aplicacion\Consultas\PrepararCapturaInstrumental;
 use App\Modulos\Valoraciones\Presentacion\Livewire\Funcionalidades\EvaluacionGeriatricaModal;
 use Carbon\CarbonImmutable;
 use Database\Seeders\RolesAndPermissionsSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Support\EsquemaSinTransaccion;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -49,7 +50,7 @@ use Tests\TestCase;
 
 final class CapturaInstrumentalInstitucionalTest extends TestCase
 {
-    use RefreshDatabase;
+    use EsquemaSinTransaccion;
 
     private User $usuario;
 
@@ -361,6 +362,43 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         self::assertNull($perfil['diagnostico']);
         self::assertDatabaseCount('evaluaciones_expertas', 0);
         self::assertNull($aplicacion->fresh()->puntaje_total);
+    }
+
+    public function test_enfermeria_consulta_medicion_componente_y_evolucion_sin_inferencia(): void
+    {
+        $aplicacion = $this->aplicar();
+        config(['sistema_experto.perfiles_instrumentales' => [$this->perfil]]);
+        $enfermera = User::factory()->create(['estado' => 'ACTIVO']);
+        $enfermera->assignRole('ENFERMEROS');
+        $personal = Personal::create(['cod_usuario' => $enfermera->getKey(), 'nombres' => 'Enfermera',
+            'apellido_paterno' => 'Sintética', 'numero_documento' => 'LECTURA-ENF-TEST', 'profesion' => 'ENFERMERIA', 'estado' => 'ACTIVO']);
+        $turno = Turno::create(['nombre' => 'Lectura sintética', 'hora_inicio' => '00:00', 'hora_cierre' => '23:59', 'estado' => 'ACTIVO']);
+        $jornada = Jornada::create(['cod_turno' => $turno->getKey(), 'fecha_jornada' => today(), 'estado' => 'ABIERTA']);
+        AsignacionResidenteJornada::create(['cod_residente' => $this->residente->getKey(), 'cod_personal' => $personal->getKey(),
+            'cod_jornada' => $jornada->getKey(), 'fecha_hora' => now(), 'estado' => 'ACTIVA']);
+        config(['sistema_experto.version_cognitiva' => 'VERSION-INFERENCIA-PROHIBIDA']);
+        DB::connection()->beforeExecuting(static function (string $sql, array $bindings): void {
+            if (str_contains($sql, 'from "versiones_modelo_experto"') && in_array('VERSION-INFERENCIA-PROHIBIDA', $bindings, true)) {
+                throw new \LogicException('Enfermería no debe iniciar la adquisición de conocimiento para inferencia.');
+            }
+        });
+        $this->actingAs($enfermera);
+        $pagina = Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
+            ->assertOk()->assertSet('enfermeria', true)
+            ->assertDontSee('No se pudieron consultar las mediciones instrumentales')
+            ->call('abrirRegistroComponente', 'MEM-S01')->assertOk()
+            ->assertSet('componenteRegistro', 'MEM-S01')->assertSee('Medidas sintéticas de integración');
+        self::assertSame($this->instrumento->nombre, $pagina->viewData('registroComponente')['mediciones'][0]['instrumento']);
+        $pagina->call('abrirEvolucion')->assertOk()->assertSet('evolucionAbierta', true);
+        $series = $pagina->viewData('seriesEvolucion');
+        self::assertNotEmpty($series);
+        self::assertNotEmpty($series[0]['puntos']);
+        $pagina->call('verMedicion', $series[0]['puntos'][0]['id'])->assertOk();
+        self::assertSame($aplicacion->respuestas()->count(), count($this->respuestas));
+        self::assertNull($aplicacion->fresh()->puntaje_total);
+        $this->assertDatabaseCount('evaluaciones_expertas', 0);
+        $pagina->call('analizarEvidencia')->assertForbidden();
+        $this->assertDatabaseCount('evaluaciones_expertas', 0);
     }
 
     public function test_faltantes_no_se_llenan_y_cero_original_se_conserva(): void

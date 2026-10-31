@@ -11,6 +11,7 @@ use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoInstituci
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoPetersen;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarValoracionPetersenOriginal;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\PrepararEvaluacionInstitucional;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarPerfilInstrumental;
 use Carbon\CarbonImmutable;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use DomainException;
@@ -67,12 +68,18 @@ final class PreparacionCompuestaCoherenteTest extends TestCase
         }
     }
 
-    public function test_rechaza_transaccion_externa_sin_confirmarla_ni_adquirir(): void
+    public static function recorridos(): array
+    {
+        return [['preparacion'], ['consulta']];
+    }
+
+    #[DataProvider('recorridos')]
+    public function test_rechaza_transaccion_externa_sin_confirmarla_ni_adquirir(string $recorrido): void
     {
         DB::beginTransaction();
         try {
             try {
-                $this->preparar();
+                $this->leerPetersen($recorrido);
                 self::fail('No debe elevar un savepoint ni consumir una transacción ajena.');
             } catch (DomainException $e) {
                 self::assertStringContainsString('transacción propia', $e->getMessage());
@@ -112,7 +119,8 @@ final class PreparacionCompuestaCoherenteTest extends TestCase
         };
     }
 
-    public function test_ambas_ramas_observan_el_mismo_corte_sql_aunque_ingresen_juicios_y_revisiones(): void
+    #[DataProvider('recorridos')]
+    public function test_ambas_ramas_observan_el_mismo_corte_sql_aunque_ingresen_juicios_y_revisiones(string $recorrido): void
     {
         $pdo = $this->conexionConcurrente();
         $original = app(RegistrarValoracionPetersenOriginal::class)->ejecutar($this->actor, $this->residente,
@@ -133,35 +141,41 @@ final class PreparacionCompuestaCoherenteTest extends TestCase
             $s->execute([$this->actor->getKey(), '2026-10-19 12:00:00', 'Decisión sintética concurrente.', $this->versionPetersen]);
             self::assertSame(4, $s->rowCount());
         });
-        $antes = $this->preparar()->contenido['petersen']['contenido'];
+        $antes = $this->leerPetersen($recorrido);
         self::assertTrue($ocurrio());
         self::assertSame(1, $antes['adquisicion']['valoraciones_al_corte']);
-        self::assertSame(['PENDIENTE'], array_values(array_unique(array_column($antes['gobierno']['conocimiento']['tablas']['reglas_expertas'], 'estado_revision'))));
-        $despues = $this->preparar()->contenido['petersen']['contenido'];
+        self::assertSame(['PENDIENTE'], array_values(array_unique(array_column($antes['gobierno']['reglas'], 'estado_revision'))));
+        $despues = $this->leerPetersen($recorrido);
         self::assertSame(2, $despues['adquisicion']['valoraciones_al_corte']);
-        self::assertSame(['RECHAZADA'], array_values(array_unique(array_column($despues['gobierno']['conocimiento']['tablas']['reglas_expertas'], 'estado_revision'))));
+        self::assertSame(['RECHAZADA'], array_values(array_unique(array_column($despues['gobierno']['reglas'], 'estado_revision'))));
         $this->assertDatabaseCount('evaluaciones_expertas', 0);
     }
 
     public static function revocaciones(): array
     {
-        return [['CUENTA'], ['PERMISO_DOCUMENTAL']];
+        return [['CUENTA', 'preparacion'], ['PERMISO_DOCUMENTAL', 'preparacion'],
+            ['CUENTA', 'consulta'], ['PERMISO_DOCUMENTAL', 'consulta'], ['PERMISO_PETERSEN', 'consulta']];
     }
 
     #[DataProvider('revocaciones')]
-    public function test_revocacion_confirmada_durante_snapshot_impide_entregar_el_dto(string $tipo): void
+    public function test_revocacion_confirmada_durante_snapshot_impide_entregar_el_dto(string $tipo, string $recorrido): void
     {
         $pdo = $this->conexionConcurrente();
         $this->actor->givePermissionTo('documentos_clinicos.ver');
+        $rol = $this->actor->roles()->first();
+        $rol->revokePermissionTo('valoraciones_petersen.ver');
+        $this->actor->givePermissionTo('valoraciones_petersen.ver');
         $ocurrio = $this->entreRamas(function () use ($pdo, $tipo): void {
-            $s = $pdo->prepare($tipo === 'CUENTA'
-                ? "UPDATE usuarios SET estado='INACTIVO' WHERE cod_usuario=?"
-                : "DELETE FROM model_has_permissions WHERE model_id=? AND permission_id IN (SELECT id FROM permissions WHERE name='documentos_clinicos.ver')");
+            $s = $pdo->prepare(match ($tipo) {
+                'CUENTA' => "UPDATE usuarios SET estado='INACTIVO' WHERE cod_usuario=?",
+                'PERMISO_DOCUMENTAL' => "DELETE FROM model_has_permissions WHERE model_id=? AND permission_id IN (SELECT id FROM permissions WHERE name='documentos_clinicos.ver')",
+                default => "DELETE FROM model_has_permissions WHERE model_id=? AND permission_id IN (SELECT id FROM permissions WHERE name='valoraciones_petersen.ver')",
+            });
             $s->execute([$this->actor->getKey()]);
             self::assertSame(1, $s->rowCount());
         });
         try {
-            $this->preparar();
+            $this->leerPetersen($recorrido);
             self::fail('La vista RR no debe ocultar la revocación al entregar el DTO.');
         } catch (AuthorizationException|HttpException $e) {
             self::assertTrue($ocurrio());
@@ -169,5 +183,12 @@ final class PreparacionCompuestaCoherenteTest extends TestCase
             self::assertSame(0, DB::transactionLevel());
             $this->assertDatabaseCount('evaluaciones_expertas', 0);
         }
+    }
+
+    private function leerPetersen(string $recorrido): array
+    {
+        return $recorrido === 'consulta'
+            ? app(ConsultarPerfilInstrumental::class)->consultar($this->actor, $this->residente, CarbonImmutable::now())['petersen_institucional']
+            : $this->preparar()->contenido['petersen']['contenido']['salida'];
     }
 }

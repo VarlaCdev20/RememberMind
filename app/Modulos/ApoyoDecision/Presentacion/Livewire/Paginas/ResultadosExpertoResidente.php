@@ -652,7 +652,9 @@ class ResultadosExpertoResidente extends Component
                 $errorInstrumental = ! $this->analisisEjecutado;
             } else {
                 $corte = $this->fechaAnalisis ? CarbonImmutable::parse($this->fechaAnalisis) : CarbonImmutable::now();
-                $perfilInstrumental = $consultaPerfil->consultar(auth()->user(), $residente, $corte);
+                $perfilInstrumental = $this->enfermeria
+                    ? $consultaPerfil->consultarMediciones(auth()->user(), $residente, $corte)
+                    : $consultaPerfil->consultar(auth()->user(), $residente, $corte);
             }
             $capturaInstrumental = $perfilInstrumental['capturas_originales'] ?? null;
             if (! $this->enfermeria) {

@@ -21,14 +21,14 @@ use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoRes
 use App\Modulos\Cuidados\Aplicacion\Acciones\PaseTurnoService;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\AgendaEnfermeria;
 use Database\Seeders\DatabaseSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Support\EsquemaSinTransaccion;
 use Illuminate\Support\Carbon;
 use Livewire\Livewire;
 use Tests\TestCase;
 
 class RedisenoEnfermeriaIntegralTest extends TestCase
 {
-    use RefreshDatabase;
+    use EsquemaSinTransaccion;
 
     private User $enfermero;
 

@@ -24,7 +24,7 @@ use DateTimeImmutable;
 use DomainException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\QueryException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Support\EsquemaSinTransaccion;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
@@ -39,7 +39,7 @@ use Tests\TestCase;
 final class HallazgosObservacionalesTest extends TestCase
 {
     use CorromperConservacionParaPrueba;
-    use RefreshDatabase;
+    use EsquemaSinTransaccion;
 
     private User $medico;
 
@@ -104,16 +104,18 @@ final class HallazgosObservacionalesTest extends TestCase
         $this->control();
         app(RegistrarConocimientoPetersen::class)->ejecutar($this->medico);
 
-        Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
+        $pagina = Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
             ->assertSee('Señales observadas en el seguimiento')
             ->assertSee('Se documentó un episodio de repetición de preguntas.')
-            ->assertSee('Ver controles y reglas de seguimiento')
+            ->assertSee('Ver controles y reglas')
             ->assertSee('Perfil pendiente de valoración')
-            ->assertDontSee('Mapa radial interactivo de cinco áreas')
             ->assertDontSee('Patrón orientativo')
             ->call('irASeccion', 'hallazgos-observacionales')
             ->assertDispatched('orion-navigate', seccion: 'hallazgos-observacionales');
 
+        self::assertNull($pagina->viewData('perfilInstrumental')['petersen_institucional']['patron']);
+        self::assertCount(5, $pagina->viewData('perfilInstrumental')['petersen_institucional']['dominios']);
+        self::assertSame(['U'], array_values(array_unique(array_column($pagina->viewData('perfilInstrumental')['petersen_institucional']['dominios'], 'estado'))));
         self::assertDatabaseCount('valoraciones_petersen_originales', 0);
         self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
     }

@@ -19,7 +19,7 @@ use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoRes
 use Carbon\CarbonImmutable;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Support\EsquemaSinTransaccion;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Livewire;
@@ -36,7 +36,7 @@ use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;
 /** Integración del informe, fuente funcional y auditoría; todas las filas son efímeras. */
 final class InformeNeurocognitivoTest extends TestCase
 {
-    use RefreshDatabase;
+    use EsquemaSinTransaccion;
 
     private User $medico;
 

@@ -16,7 +16,7 @@ use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\QueryException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Support\EsquemaSinTransaccion;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
@@ -26,7 +26,7 @@ use Tests\TestCase;
 /** Verifica firma y persistencia reales con datos efímeros; no acredita metodología clínica. */
 final class RevisionValoracionExpertaTest extends TestCase
 {
-    use RefreshDatabase;
+    use EsquemaSinTransaccion;
     use \Tests\Support\CorromperConservacionParaPrueba;
 
     private User $medico;

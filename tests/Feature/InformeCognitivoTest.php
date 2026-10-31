@@ -19,7 +19,7 @@ use App\Modulos\ApoyoDecision\Aplicacion\DTOs\PresentarInformeCognitivo;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Database\QueryException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Support\EsquemaSinTransaccion;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -30,7 +30,7 @@ use Tests\TestCase;
 /** Comprueba el informe real sobre filas artificiales; no ejecuta motores ni atribuye aprobación clínica. */
 class InformeCognitivoTest extends TestCase
 {
-    use RefreshDatabase;
+    use EsquemaSinTransaccion;
     use \Tests\Support\CorromperConservacionParaPrueba;
 
     private User $medico;
@@ -290,6 +290,12 @@ class InformeCognitivoTest extends TestCase
     /** La consulta propia fuera de turno conserva lectura; revocar la asignación retira el acceso. */
     public function test_enfermeria_asignada_consulta_informe_y_pierde_acceso_al_revocar_asignacion(): void
     {
+        config(['sistema_experto.version_cognitiva' => 'VERSION-INFERENCIA-PROHIBIDA']);
+        DB::connection()->beforeExecuting(static function (string $sql, array $bindings): void {
+            if (str_contains($sql, 'from "versiones_modelo_experto"') && in_array('VERSION-INFERENCIA-PROHIBIDA', $bindings, true)) {
+                throw new \LogicException('Enfermería no debe iniciar la adquisición de conocimiento para inferencia.');
+            }
+        });
         $enfermera = User::factory()->create(['estado' => 'ACTIVO']);
         $enfermera->assignRole('ENFERMEROS');
         $personal = Personal::create(['cod_usuario' => $enfermera->getKey(), 'nombres' => 'Enfermera',

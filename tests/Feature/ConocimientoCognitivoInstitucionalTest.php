@@ -30,7 +30,7 @@ use Carbon\CarbonImmutable;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use DomainException;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Support\EsquemaSinTransaccion;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
@@ -51,7 +51,7 @@ use Tests\TestCase;
 /** Solo datos sintéticos en la BDD desechable; no identifica instrumentos de residentes por similitud. */
 final class ConocimientoCognitivoInstitucionalTest extends TestCase
 {
-    use RefreshDatabase;
+    use EsquemaSinTransaccion;
 
     private User $usuario;
 

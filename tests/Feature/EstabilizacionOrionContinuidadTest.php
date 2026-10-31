@@ -21,7 +21,7 @@ use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoRes
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\AgendaEnfermeria;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Support\EsquemaSinTransaccion;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
@@ -31,7 +31,7 @@ use Tests\TestCase;
 
 class EstabilizacionOrionContinuidadTest extends TestCase
 {
-    use RefreshDatabase;
+    use EsquemaSinTransaccion;
 
     private User $enfermero;
 
@@ -158,7 +158,13 @@ class EstabilizacionOrionContinuidadTest extends TestCase
     public function test_consulta_cognitiva_tres_modales_excluyentes_y_sin_escritura(): void
     {
         $this->mock(\App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado::class)->shouldNotReceive('instantanea');
-        $this->mock(\App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoObservacional::class)->shouldNotReceive('vigente', 'historico', 'verificar');
+        // Consultar/verificar observaciones es lectura aprobada; no debe producir escrituras.
+        $escrituras = [];
+        DB::listen(static function ($consulta) use (&$escrituras): void {
+            if (preg_match('/^\s*(insert|update|delete)\b/i', $consulta->sql)) {
+                $escrituras[] = $consulta->sql;
+            }
+        });
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
             ->assertSee('¿Qué encontró el sistema?')->assertSee('Solo lectura · Enfermería')
             ->assertDontSee('O.R.I.O.N.')->assertDontSee('Registrar mediciones')
@@ -170,6 +176,7 @@ class EstabilizacionOrionContinuidadTest extends TestCase
             ->call('seleccionarCriterio', 'COG-ATE')->assertSet('consultaAbierta', false)->assertSet('criterio', 'COG-ATE')
             ->call('abrirSignificado')->assertSet('criterio', 'COG-ATE')
             ->call('abrirConsultaResultado', 'registro')->assertSet('criterio', 'COG-MEM')->assertSet('consultaAbierta', true)->assertSet('significadoAbierto', false);
+        self::assertSame([], $escrituras);
         $this->assertDatabaseCount('ejecuciones_cuidado', 0);
     }
 

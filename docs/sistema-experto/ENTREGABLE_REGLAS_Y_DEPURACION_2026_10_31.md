@@ -1,17 +1,19 @@
 ---
 title: "Entregable único: reglas existentes, correcciones y depuración operativa"
 status: CURRENT
-version: "1.0"
+version: "1.1"
 last_reviewed: 2026-10-31
 owner: ApoyoDecision
 source_of_truth: false
-verification_scope: READ_ONLY_RULE_CATALOG_TECHNICAL_GOVERNANCE_AND_RUNTIME_CLEANUP
+verification_scope: RULE_GOVERNANCE_RUNTIME_CLEANUP_AND_CONSISTENT_SOURCE_READS
 runtime_verified: true
 ---
 
 # Resultado y alcance
 
 Se cierra la corrección técnica de la prueba de reglas, se detalla el catálogo real y se retiran ocho componentes exclusivamente experimentales que seguían dentro de `app/`. No se modifican las definiciones médicas, condiciones, consecuencias, umbrales o criterios institucionales. Tampoco se crean tablas, relaciones o permisos: se mantiene la decisión de la propietaria de conservarlos.
+
+**Actualización posterior del mismo día:** se corrigen también la adquisición ordinaria de fuentes y la consulta de Enfermería; alcance y evidencia en la sección9. Este documento reúne ambos cambios para conservar un solo entregable de cierre técnico.
 
 **No se declara cerrado el experto integral:** los perfiles instrumentales iniciales y la conservación conjunta siguen pendientes. La limpieza del código y una prueba lógica correcta no sustituyen esos componentes.
 
@@ -163,3 +165,37 @@ Evidencias locales, excluidas deGit: `output/experto-reglas-20261031-*`, `output
 El trabajo mantiene las rutas y permisos existentes. No se amplía la escritura clínica, no se instala DDL, no se envía correo y no se realiza push. Los perfiles iniciales y el guardado/historial conjuntos no se completan mediante este cambio: permanecen separados de la corrección de reglas y de la depuración operativa.
 
 La entrega se conserva en un commit local de alcance propio. Los cambios locales de otros trabajos permanecen sin incorporar.
+
+## 9. Cierre de lectura consistente y consulta de Enfermería
+
+La carga ordinaria del perfil adquiría las medidas instrumentales y Petersen en transacciones separadas. El botón de análisis ya utilizaba una adquisición conjunta consistente; una interacción posterior volvía al recorrido ordinario. Se comparte ahora `LecturaCognitivaConsistente` entre ambos recorridos y la consulta de mediciones:
+
+- Abre una transacción propia; en PostgreSQL establece REPEATABLE READ antes del primer SELECT. No acepta una transacción ajena ni eleva silenciosamente un savepoint.
+- Recarga cuenta/residente y comprueba los permisos y Policies actuales. Después de liberar la instantánea vuelve a autorizarlos, incluidos documentos, funcionalidad y acceso a originales Petersen. No entrega la lectura si se pierde una capacidad que tenía al adquirirla.
+- En la carga ordinaria, ambas ramas comparten una adquisición de mediciones. La proyección del análisis explícito sigue utilizando exclusivamente el DTO adquirido en esa petición.
+- Conserva el recorrido parcial autorizado: sin versión se muestran los originales sin afirmar inferencia; sin permiso Petersen no se consulta ni expone esa rama.
+- Enfermería usa exclusivamente `consultarMediciones()` en el render. No ejecuta la adquisición/inferencia conjunta al abrir la pantalla o cambiar un área; conserva consulta histórica publicable, seguimiento cognitivo y continuidad de cuidados según sus permisos.
+
+No se guardan resultados en sesión, archivos, JSON, texto que sustituya relaciones ni otra persistencia alternativa. Las consultas continúan declarando `persistido=false`. Una nueva petición no se presenta como el análisis anterior.
+
+Las fixtures afectadas usan el soporte existente `EsquemaSinTransaccion`: el coordinador debe poder abrir y liberar su transacción real. Se conserva la guarda de producción, en lugar de relajarla para satisfacer una transacción externa del arnés de pruebas. No se reducen las aserciones de autorización, procedencia o historia.
+
+La revisión independiente de lectura emitió PASS acotado sobre autorización, fallbacks y separación de Enfermería. Las carreras PostgreSQL comprueban ambos recorridos frente a nuevos juicios/revisión de reglas y frente a revocación de cuenta, permiso documental y acceso Petersen.
+
+Evidencia de esta actualización: `output/experto-cierre-lectura-*`, excluida del commit. El grupo final PostgreSQL18 desechable pasa **24 pruebas/193 aserciones**, incluidas ambas carreras de lectura, las revocaciones y los dos recorridos de Enfermería; sin omisiones. El informe cognitivo completo repetido en SQLite pasa **32 pruebas/319 aserciones**; la prueba de mediciones/componentes/evolución y la de historial/asignación pasan **2/41**. Los grupos se solapan y no se suman como pruebas únicas.
+
+La comprobación funcional de navegador pasa **1 prueba**, con Medicina, Enfermería y administración del conocimiento en1440/1280/1024/768/390px: cero desbordamiento horizontal medido y cero errores JS; también comprueba teclado, navegación, IDOR y rechazo de la URL de simulación. Las capturas de Enfermería390/1440 confirman el fallback sin resultado publicado. Esto no acredita un rediseño visual global: la barra lateral compacta preexistente aún muestra etiquetas verticales; no se modificó en este alcance. El build Vite pasa, con el aviso previo de tamaño de bundle.
+
+La batería inicial SQLite descubre188 casos:180 correctos,7 carreras exclusivas de PostgreSQL omitidas y1 error del arnés nuevo al intentar simular una clase final. Se corrigió la prueba sin modificar esa clase de producción y se repitió su grupo completo32/319, además del recorrido ampliado de Enfermería. Una batería separada de172 casos detectó dos expectativas antiguas: prohibir la lectura observacional aprobada y prohibir una gráfica que ahora representa cobertura. Se sustituyen por cero escrituras y por ausencia de patrón con cinco dominios desconocidos, conservando la prohibición de inferencia instrumental y de clasificaciones guardadas. La repetición completa de sus dos grupos pasa **57 pruebas/254 aserciones**, sin fallos ni pruebas riesgosas; la comprobación final explícita de cinco dominios pasa **1/12**. No se cambió producción para satisfacer las expectativas obsoletas. La revisión independiente de esas correcciones emitió PASS acotado.
+
+La batería PostgreSQL ampliada de188 casos se interrumpió deliberadamente antes de completarse; no se presenta como aprobada. Se ejecutó en otro clúster propio el grupo final24/193 que cubre el cambio. Ambos runners terminaron su apagado/limpieza; no se migró ni se modificó la BDD operativa. No se ejecutó la suite global.
+
+Comandos finales reproducibles: `php vendor/phpunit/phpunit/phpunit --no-progress --do-not-cache-result tests/Feature/InformeCognitivoTest.php`; el mismo comando para `tests/Feature/EstabilizacionOrionContinuidadTest.php tests/Feature/HallazgosObservacionalesTest.php`; perfiles PostgreSQL desechables con filtro `PreparacionCompuestaCoherenteTest|EjecucionConsultaCognitivaTest|test_enfermeria_consulta_medicion_componente_y_evolucion_sin_inferencia|test_enfermeria_asignada_consulta_informe_y_pierde_acceso_al_revocar_asignacion`; navegador `RM_EXPERTO_E2E=1 RM_EXPERTO_FASE=cierre-lectura node --test tests/Frontend/experto-workspace-e2e.test.js`; `npm run build`. El perfil PostgreSQL requiere el runner seguro y su base temporal, no la configuración operativa.
+
+### Límites que permanecen
+
+1. **Perfiles iniciales MoCA/RUDAS/FAQ:** siguen sin una edición operativa, identidad/selectores y método de interpretación adoptados. Las capturas propias ya disponibles no se convierten en esos instrumentos ni el total de un cribado en cinco dominios. No se fabrican perfiles para eliminar el pendiente.
+2. **Guardado e historial conjuntos instrumental/Petersen:** siguen sin implementación. La propietaria rechazó las relaciones/permisos propuestos y pidió conservar los actuales; esta corrección no revoca esa decisión ni la vuelve a solicitar. El historial observacional existente conserva su funcionamiento separado.
+3. **Filas históricas de simulación:** permanece el alcance físico de la sección7. La exclusión operativa no se presenta como borrado de la BDD ni se elimina historia para aparentar depuración completa.
+
+Por tanto, se cierra esta corrección de lectura, autorización y separación por rol; no se declara terminado el experto integral ni se cambian reglas médicas bajo esa afirmación.

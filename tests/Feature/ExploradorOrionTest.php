@@ -11,7 +11,7 @@ use App\Modulos\ApoyoDecision\Aplicacion\DTOs\GrafoInferenciaHistorica;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Support\EsquemaSinTransaccion;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
 use Tests\Support\InformeCognitivoFixture as F;
@@ -19,7 +19,7 @@ use Tests\TestCase;
 
 class ExploradorOrionTest extends TestCase
 {
-    use RefreshDatabase;
+    use EsquemaSinTransaccion;
 
     private User $actor;
 

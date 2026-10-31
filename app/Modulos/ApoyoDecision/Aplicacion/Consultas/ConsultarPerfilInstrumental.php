@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 /** Orquesta fuentes institucionales autorizadas y la red documental; no usa casos del laboratorio. */
 final readonly class ConsultarPerfilInstrumental
 {
-    public function __construct(private ConsultarConocimientoCognitivo $conocimiento) {}
+    public function __construct(private ConsultarConocimientoCognitivo $conocimiento, private LecturaCognitivaConsistente $lectura) {}
 
     /** Proyección de la ejecución compuesta ya adquirida y autorizada; no vuelve a consultar fuentes. */
     public function desdePreparacion(InstantaneaEvaluacionInstitucional $evaluacion): array
@@ -49,7 +49,15 @@ final readonly class ConsultarPerfilInstrumental
     public function consultarMediciones(User $usuario, Residente $residente, CarbonImmutable $corte): ?array
     {
         try {
-            $capturas = app(CapturasInstrumentalesResidente::class)->consultar($usuario, $residente, $corte);
+            return $this->lectura->consultar($usuario, $residente, function (User $cuenta, Residente $caso) use ($corte): ?array {
+                $capturas = app(CapturasInstrumentalesResidente::class)->consultar($cuenta, $caso, $corte);
+                if (! $capturas['disponible']) {
+                    return null;
+                }
+                $red = (new PerfilConceptualCognitivo)->construir(app(FuenteConocimientoOrion::class)->leer());
+
+                return (new PerfilInstrumentalCognitivo)->construir($red, $capturas);
+            });
         } catch (HttpException $e) {
             if ($e->getStatusCode() !== 403) {
                 throw $e;
@@ -57,15 +65,15 @@ final readonly class ConsultarPerfilInstrumental
 
             return null;
         }
-        if (! $capturas['disponible']) {
-            return null;
-        }
-        $red = (new PerfilConceptualCognitivo)->construir(app(FuenteConocimientoOrion::class)->leer());
-
-        return (new PerfilInstrumentalCognitivo)->construir($red, $capturas);
     }
 
     public function consultar(User $usuario, Residente $residente, CarbonImmutable $corte): ?array
+    {
+        return $this->lectura->consultar($usuario, $residente,
+            fn (User $cuenta, Residente $caso): ?array => $this->adquirirPerfil($cuenta, $caso, $corte));
+    }
+
+    private function adquirirPerfil(User $usuario, Residente $residente, CarbonImmutable $corte): ?array
     {
         $consulta = $this->conocimiento->adquirir($usuario, $residente, $corte);
         $instantanea = $consulta['_instantanea'] ?? null;

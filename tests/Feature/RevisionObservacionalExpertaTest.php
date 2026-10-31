@@ -17,7 +17,7 @@ use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoRes
 use Database\Seeders\RolesAndPermissionsSeeder;
 use DomainException;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Support\EsquemaSinTransaccion;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
@@ -25,7 +25,7 @@ use Tests\TestCase;
 
 final class RevisionObservacionalExpertaTest extends TestCase
 {
-    use RefreshDatabase;
+    use EsquemaSinTransaccion;
 
     private User $medico;
 

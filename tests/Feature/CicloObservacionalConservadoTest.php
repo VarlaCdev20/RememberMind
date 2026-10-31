@@ -17,7 +17,7 @@ use App\Modulos\ApoyoDecision\Dominio\Revision\DisciplinaRevision;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
 use Carbon\CarbonImmutable;
 use Database\Seeders\RolesAndPermissionsSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Support\EsquemaSinTransaccion;
 use Livewire\Livewire;
 use MotorExperto\soporte\conservacion\CodecInstantanea;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -26,7 +26,7 @@ use Tests\TestCase;
 /** Aceptación de un resultado conservado real del software, con fuentes sintéticas desechables. */
 final class CicloObservacionalConservadoTest extends TestCase
 {
-    use RefreshDatabase;
+    use EsquemaSinTransaccion;
 
     #[DataProvider('ordenesIndependientes')]
     public function test_guardar_recuperar_y_revisar_por_ambas_disciplinas_sin_alterar_el_resultado(array $orden): void

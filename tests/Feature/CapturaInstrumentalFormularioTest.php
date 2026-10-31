@@ -29,7 +29,7 @@ use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\SaludEvaluacionesGeri
 use Carbon\CarbonImmutable;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Database\QueryException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Support\EsquemaSinTransaccion;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -41,7 +41,7 @@ use Tests\TestCase;
 
 final class CapturaInstrumentalFormularioTest extends TestCase
 {
-    use RefreshDatabase;
+    use EsquemaSinTransaccion;
 
     private User $usuario;
 
