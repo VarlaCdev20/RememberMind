@@ -7,6 +7,7 @@ namespace App\Modulos\ApoyoDecision\Aplicacion\Consultas;
 use App\Models\Residente;
 use App\Models\User;
 use App\Models\ValoracionPetersenOriginal;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\PlanCapturaDcl;
 use App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratosConocimiento;
 use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoOrion;
 use Carbon\CarbonImmutable;
@@ -37,6 +38,7 @@ final readonly class ConsultarPerfilInstrumental
             'revision_profesional' => 'PENDIENTE',
         ];
         $perfil['petersen_institucional'] = $evaluacion->contenido['petersen']['contenido']['salida'];
+        $perfil['plan_captura'] = (new PlanCapturaDcl)->desdePetersen($perfil['petersen_institucional']);
         $perfil['evaluacion_institucional'] = ['contrato' => $evaluacion->contenido['contrato'],
             'huella' => $evaluacion->huella, 'persistido' => false];
 
@@ -88,6 +90,7 @@ final readonly class ConsultarPerfilInstrumental
             // Un fallo de adquisición debe llegar al manejador de la pantalla, nunca aparentar éxito.
             $perfil['petersen_institucional'] = app(ConsultarPetersenInstitucional::class)
                 ->preparar($cuenta, $residente, $corte, $versionParaPetersen, $instantanea)->contenido['salida'];
+            $perfil['plan_captura'] = (new PlanCapturaDcl)->desdePetersen($perfil['petersen_institucional']);
         }
 
         return $perfil;

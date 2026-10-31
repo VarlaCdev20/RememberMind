@@ -12,6 +12,8 @@
 @php($requisitosPendientes = collect($nombresRequisitos)->filter(fn ($nombre, $codigo) => ($petersen['requisitos'][$codigo]['estado'] ?? 'U') === 'U'))
 @php($hayDominiosValorados = collect($petersen['dominios'])->contains(fn ($dominio) => ($dominio['estado'] ?? 'U') !== 'U'))
 
+@include('apoyodecision::livewire.medico.resultados-experto.plan-captura')
+
 @if($psicologia)
     @include('apoyodecision::livewire.medico.resultados-experto.petersen-psicologia')
     <details id="orion-petersen-detalle" class="rm-psychology-technical">

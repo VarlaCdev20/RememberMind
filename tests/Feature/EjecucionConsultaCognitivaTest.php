@@ -55,6 +55,8 @@ final class EjecucionConsultaCognitivaTest extends TestCase
         self::assertArrayHasKey('petersen_institucional', $perfil);
         self::assertSame($consulta['capturas']['fecha_corte'], $perfil['petersen_institucional']['fecha_corte']);
         self::assertFalse($perfil['petersen_institucional']['persistido']);
+        self::assertSame('PLAN-CAPTURA-DCL-1', $perfil['plan_captura']['contrato']);
+        self::assertCount(5, $perfil['plan_captura']['pendientes']);
         self::assertArrayNotHasKey('_instantanea', $perfil['inferencia_declarativa']);
         $this->assertDatabaseCount('evaluaciones_expertas', 0);
     }
@@ -72,6 +74,8 @@ final class EjecucionConsultaCognitivaTest extends TestCase
             ->assertSet('analisisEjecutado', true)
             ->assertSet('fechaAnalisis', CarbonImmutable::now()->format('Y-m-d\TH:i:s.uP'))
             ->assertSee('Resultado calculado para esta consulta:');
+        $pagina->assertSee('Qué información conviene completar o revisar')
+            ->assertSee('Guía de registro y fundamento');
         self::assertSame(1, $adquisiciones, 'La acción y su render deben compartir una sola adquisición de medidas.');
         $this->assertDatabaseCount('evaluaciones_expertas', 0);
     }
@@ -89,6 +93,7 @@ final class EjecucionConsultaCognitivaTest extends TestCase
         self::assertSame($dto->contenido['instrumental']['contenido']['salida']['resultado'], $perfil['inferencia_declarativa']['resultado']);
         self::assertSame($dto->huella, $perfil['evaluacion_institucional']['huella']);
         self::assertFalse($perfil['evaluacion_institucional']['persistido']);
+        self::assertSame('PLAN-CAPTURA-DCL-1', $perfil['plan_captura']['contrato']);
     }
 
     public function test_un_fallo_petersen_no_anuncia_exito_y_no_expone_el_error_interno(): void

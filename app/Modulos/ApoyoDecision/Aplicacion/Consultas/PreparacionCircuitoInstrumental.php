@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modulos\ApoyoDecision\Aplicacion\Consultas;
 
 use DomainException;
+use MotorExperto\dominio\instrumentos\GuiaAdquisicionDcl;
 
 /**
  * Estado de preparación de las familias seleccionadas, sin leer casos ni ejecutar perfiles.
@@ -55,7 +56,7 @@ final class PreparacionCircuitoInstrumental
         return ['contrato' => self::CONTRATO, 'fecha_cotejo' => '2026-10-29',
             'alcance' => 'PREPARACION_DE_FAMILIAS_NO_PERFILES_EJECUTABLES',
             'poblacion_objetivo' => 'PERSONAS_MAYORES_DE_60_ANIOS',
-            'familias' => $familias,
+            'familias' => $familias, 'guia_captura' => (new GuiaAdquisicionDcl)->contrato(),
             'observacion_tecnica' => ['perfiles_configurados_total' => count($perfilesConfigurados),
                 'metodos_registrados_total' => count($metodosRegistrados),
                 'conteos_acreditan_derechos_o_aplicabilidad' => false],
