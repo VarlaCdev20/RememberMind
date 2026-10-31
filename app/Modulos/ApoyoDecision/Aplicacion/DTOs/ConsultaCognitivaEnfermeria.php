@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modulos\ApoyoDecision\Aplicacion\DTOs;
 
 use MotorExperto\dominio\conocimiento\reglas\EvaluadorObservaciones;
+use DomainException;
 
 /** Contrato de lectura: no normaliza, interpreta ni reconstruye inferencias. */
 final class ConsultaCognitivaEnfermeria
@@ -16,6 +17,9 @@ final class ConsultaCognitivaEnfermeria
 
     public function presentar(array $datos, array $informe, ?array $perfil): array
     {
+        if (($datos['prueba_tecnica'] ?? false) || isset($datos['simulacion_local'])) {
+            throw new DomainException('La consulta de Enfermería requiere resultados operativos.');
+        }
         $actual = $informe['actual'];
         $principal = $informe['areas']['COG-MEM'] ?? $actual;
         $sin = $datos['evaluacion'] === null;
@@ -45,8 +49,8 @@ final class ConsultaCognitivaEnfermeria
 
         return ['titulo' => $titulo, 'resumen' => $resumen, 'integridad' => $integridad, 'sin_evaluacion' => $sin,
             'componentes' => $componentes, 'areas' => $informe['areas'], 'actual' => $actual,
-            'area_principal' => isset($datos['simulacion_local']) ? 'Perfil cognitivo de demostración' : LenguajeResultadosExperto::CRITERIOS['COG-MEM']['nombre'],
-            'estado_principal' => isset($datos['simulacion_local']) ? 'Resultado conservado' : $principal['estado']];
+            'area_principal' => LenguajeResultadosExperto::CRITERIOS['COG-MEM']['nombre'],
+            'estado_principal' => $principal['estado']];
     }
 
     /** Expone la lectura observacional con su alcance; no la convierte en resultado DCL. */

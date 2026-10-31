@@ -10,6 +10,8 @@ runtime_verified: true
 
 # Retirada operativa del laboratorio
 
+Actualización del 31/10/2026: el [entregable de reglas y depuración](ENTREGABLE_REGLAS_Y_DEPURACION_2026_10_31.md) retira ocho DTO/casos de uso experimentales residuales del autoload de `app/`, extrae la presentación G09 a soporte de pruebas y elimina el fallback de demostración de Enfermería. El inventario sigue distinguiendo las ocho reglas físicas históricas excluidas; no se afirma una purga de la BDD.
+
 Petición de la propietaria: «todo lo simulado o laboratorio bórralo y desconéctalo». Esta entrega retira el recorrido experimental del producto; no cambia reglas clínicas, permisos, tablas ni columnas. Entrada vigente: [portal](README.md).
 
 ## Retirado del producto

@@ -31,7 +31,7 @@ final class ContratoDTOsTest extends TestCase
     /** Verifica exactamente cinco archivos y sus PHPDoc; sin parámetros ni errores de lectura esperados. @return void */
     public function test_cinco_dtos_final_readonly_tipados_y_documentados(): void
     {
-        $raiz = realpath(dirname(__DIR__, 5).'/app/Modulos/ApoyoDecision/Aplicacion/DTOs');
+        $raiz = realpath(dirname(__DIR__, 5).'/tests/Support/Fixtures/app/Modulos/ApoyoDecision/Aplicacion/DTOs');
         $tipos = [SolicitudInferenciaDTO::class, EvidenciasEntradaDTO::class, ResultadoInferenciaDTO::class,
             ResultadoDclDTO::class, InformeExpertoDTO::class];
         $esperados = [];
@@ -74,7 +74,7 @@ final class ContratoDTOsTest extends TestCase
     public function test_dependencias_sin_laravel_ni_inversion_de_capas(): void
     {
         $raiz = dirname(__DIR__, 5);
-        foreach (['DTOs' => '/app/Modulos/ApoyoDecision/Aplicacion/DTOs', 'Domain' => '/motor-experto/src/motor_experto/dominio/orion'] as $capa => $ruta) {
+        foreach (['DTOs' => '/tests/Support/Fixtures/app/Modulos/ApoyoDecision/Aplicacion/DTOs', 'Domain' => '/motor-experto/src/motor_experto/dominio/orion'] as $capa => $ruta) {
             $archivos = $capa === 'DTOs' ? array_map(fn ($clase) => (new ReflectionClass($clase))->getFileName(), [EvidenciasEntradaDTO::class, SolicitudInferenciaDTO::class, ResultadoInferenciaDTO::class, ResultadoDclDTO::class, InformeExpertoDTO::class]) : null;
             foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($raiz.$ruta)) as $archivo) {
                 if (! $archivo->isFile() || $archivo->getExtension() !== 'php') {

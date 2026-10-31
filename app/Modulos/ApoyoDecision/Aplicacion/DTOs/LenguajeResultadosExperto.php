@@ -77,24 +77,6 @@ final class LenguajeResultadosExperto
         };
     }
 
-    /**
-     * Catálogo descriptivo G09-EXP consultado el 17/10/2026 en pr15-ci-utf8.
-     * No acredita soporte, evaluabilidad o autorización clínica. No se integra
-     * con resultados D-137 ni se convierte en los estados objetivos A/P de Petersen.
-     */
-    public static function estadoG09(string $codigo): ?array
-    {
-        return match ($codigo) {
-            'SIN_EVIDENCIA_ADMISIBLE' => ['estado' => 'Sin evidencia admisible', 'alcance' => 'La prueba experimental no dispone de evidencia admisible para emitir un hallazgo.'],
-            'SOLO_SENAL_CONTEXTO' => ['estado' => 'Solo señal de contexto', 'alcance' => 'La prueba conserva información preliminar de contexto; no acredita un hallazgo del área.'],
-            'EVALUABLE_SIN_SOPORTE' => ['estado' => 'Evaluable sin soporte positivo', 'alcance' => 'La tarea experimental es interpretable, pero no conserva soporte de una regla positiva. No equivale a preservación cognitiva.'],
-            'HALLAZGO_ACOTADO' => ['estado' => 'Hallazgo experimental acotado', 'alcance' => 'El hallazgo se limita al componente y a los soportes de la prueba técnica. No constituye un diagnóstico.'],
-            'MULTIPLES_HALLAZGOS_PENDIENTES_DE_RESOLUCION' => ['estado' => 'Múltiples hallazgos pendientes de resolución', 'alcance' => 'Se conservan varias rutas experimentales; ninguna se prioriza automáticamente ni se resume como un resultado unitario.'],
-            'EVIDENCIA_CONTRADICTORIA' => ['estado' => 'Evidencia contradictoria', 'alcance' => 'Las fuentes de la prueba experimental no permiten una conclusión consistente. Se conserva la contradicción sin elegir un resultado.'],
-            default => null,
-        };
-    }
-
     /** Traduce metadatos técnicos conocidos y conserva literales desconocidos solo en el detalle de fuente. */
     public static function etiqueta(string $codigo): string
     {

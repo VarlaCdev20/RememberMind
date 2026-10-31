@@ -29,6 +29,8 @@ final class ContratoEntradasSinResidentesTest extends TestCase
         $r = json_decode($proceso->getOutput(), true, flags: JSON_THROW_ON_ERROR);
         self::assertTrue($r['transaccion_solo_lectura']);
         self::assertSame([], $r['instrumentos']);
+        self::assertSame([], $r['catalogo_reglas']);
+        self::assertFalse($r['catalogo_reglas_disponible']);
         self::assertFalse($r['contrato_entradas']['requiere_residentes']);
         self::assertFalse($r['preparacion_circuito_inicial']['habilita_perfiles']);
         self::assertFalse($r['preparacion_circuito_inicial']['consulta_datos_clinicos']);

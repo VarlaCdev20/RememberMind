@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Modulos\ApoyoDecision\Aplicacion\DTOs\PresentarInformeCognitivo;
+use Tests\Support\Fixtures\PresentarInformeG09Prueba as PresentarInformeCognitivo;
 use DomainException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;

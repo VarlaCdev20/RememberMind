@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\DataProvider;
 use MotorExperto\adaptadores\entrada\EjemploTecnicoCOGMEM;
 use Tests\Support\InformeCognitivoFixture;
 use Tests\TestCase;
@@ -433,5 +434,84 @@ final class GobiernoReglasExpertasTest extends TestCase
         self::assertSame($antes, [DB::table('evaluaciones_expertas')->count(), DB::table('reglas_expertas')->count(), DB::table('activity_log')->count()]);
         self::assertNull(ReglaExperta::query()->findOrFail('RULE_A')->estado_revision);
         $panel->set('entradaPrueba.VAR_INS', 'RES_D')->call('probarCondiciones')->assertHasErrors('gobierno');
+    }
+
+    public static function entradasSinHabilitacion(): array
+    {
+        return [['valor_inactivo'], ['valor_no_aprobado'], ['variable_inactiva'], ['dominio_inactivo']];
+    }
+
+    #[DataProvider('entradasSinHabilitacion')]
+    public function test_prueba_rechaza_entradas_que_el_motor_no_admite(string $caso): void
+    {
+        $auditoria = DB::table('activity_log')->count();
+        $this->corromperConservacion(static function () use ($caso): void {
+            match ($caso) {
+                'valor_inactivo' => DB::table('valores_semanticos')->where('cod_valor_semantico', 'VAL_A')->update(['estado' => 'INACTIVO']),
+                'valor_no_aprobado' => DB::table('valores_semanticos')->where('cod_valor_semantico', 'VAL_A')->update(['estado_aprobacion' => 'PENDIENTE']),
+                'variable_inactiva' => DB::table('nodos_semanticos')->where('cod_variable_experta', 'VAR_INS')->update(['estado_variable' => 'INACTIVO']),
+                default => DB::table('dominios_valores_expertos')->whereIn('cod_dominio_valores',
+                    DB::table('valores_semanticos')->where('cod_valor_semantico', 'VAL_A')->select('cod_dominio_valores'))->update(['estado' => 'INACTIVO']),
+            };
+        });
+        try {
+            app(Gestor::class)->probar($this->medico, 'RULE_A', ['VAR_INS' => 'VAL_A']);
+            self::fail('Una entrada no habilitada no debe aparentar una prueba utilizable.');
+        } catch (DomainException) {
+            self::assertDatabaseCount('evaluaciones_expertas', 0);
+            self::assertSame($auditoria, DB::table('activity_log')->count());
+        }
+    }
+
+    public function test_regla_archivada_con_condiciones_cumplidas_se_distingue_de_habilitacion(): void
+    {
+        $this->corromperConservacion(static fn () => DB::table('reglas_expertas')->where('cod_regla_experta', 'RULE_A')->update(['estado' => 'INACTIVO']));
+        $r = app(Gestor::class)->probar($this->medico, 'RULE_A', ['VAR_INS' => 'VAL_A']);
+        self::assertTrue($r['cumple']);
+        self::assertFalse($r['disponibilidad_catalogo']['habilitada_en_catalogo']);
+        self::assertContains('La regla está archivada o inactiva.', $r['disponibilidad_catalogo']['motivos']);
+        self::assertFalse($r['condiciones_y_catalogo_habilitados']);
+        self::assertFalse($r['disponibilidad_catalogo']['acredita_ejecucion_clinica']);
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+        Livewire::test(GobiernoReglasPanel::class)->set('versionSeleccionada', 'VER_TEST')
+            ->call('prepararPrueba', 'RULE_A')->set('entradaPrueba.VAR_INS', 'VAL_A')->call('probarCondiciones')->assertHasNoErrors()
+            ->assertSee('Se cumplen todas las condiciones con estas entradas.')
+            ->assertSee('La regla no está habilitada en el catálogo para nuevas ejecuciones.')
+            ->assertSee('Condición 1: Cumple')->assertDontSee('COND_A:')
+            ->assertSee('La prueba lógica no acredita mediciones');
+    }
+
+    public function test_regla_rechazada_mantiene_prueba_logica_sin_aparentar_habilitacion(): void
+    {
+        $version = $this->revision();
+        $regla = ReglaExperta::query()->where('cod_version_modelo', $version)->where('cod_regla_anterior', 'RULE_A')->sole();
+        app(Gestor::class)->revisar($this->medico, $regla->getKey(), 'RECHAZADA', 'Requiere una definición nueva para el caso técnico.');
+        $condicion = $regla->condicionesReglaExperta()->sole();
+        $r = app(Gestor::class)->probar($this->medico, $regla->getKey(), [$condicion->cod_variable_experta => $condicion->cod_valor_semantico]);
+        self::assertTrue($r['cumple']);
+        self::assertContains('La regla tiene una decisión de rechazo.', $r['disponibilidad_catalogo']['motivos']);
+        self::assertFalse($r['condiciones_y_catalogo_habilitados']);
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
+    public function test_selector_no_ofrece_valores_inactivos_o_no_aprobados(): void
+    {
+        $this->corromperConservacion(static fn () => DB::table('valores_semanticos')->where('cod_valor_semantico', 'VAL_A')->update(['estado' => 'INACTIVO']));
+        Livewire::test(GobiernoReglasPanel::class)->set('versionSeleccionada', 'VER_TEST')
+            ->call('prepararPrueba', 'RULE_A')->assertDontSee('value="VAL_A"', false)
+            ->set('entradaPrueba.VAR_INS', 'VAL_A')->call('probarCondiciones')->assertHasErrors('gobierno');
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
+    public function test_prueba_directa_no_reabre_una_regla_del_paquete_retirado(): void
+    {
+        DB::table('versiones_modelo_experto')->where('cod_version_modelo', 'VER_TEST')->update(['codigo_version' => 'SIM-RETIRADA']);
+        try {
+            app(Gestor::class)->probar($this->medico, 'RULE_A', ['VAR_INS' => 'VAL_A']);
+            self::fail('No se prueban paquetes retirados mediante una llamada directa.');
+        } catch (DomainException $e) {
+            self::assertStringContainsString('retirado', $e->getMessage());
+            self::assertDatabaseCount('evaluaciones_expertas', 0);
+        }
     }
 }

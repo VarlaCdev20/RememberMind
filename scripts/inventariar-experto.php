@@ -61,6 +61,41 @@ try {
             ->selectRaw('COUNT(*) as cantidad')->groupBy('cod_version_modelo', 'estado', 'estado_revision')
             ->orderBy('cod_version_modelo')->orderBy('estado')->orderBy('estado_revision')
             ->get()->map(fn ($fila): array => (array) $fila)->all() : [];
+    $catalogoReglas = [];
+    $tablasCatalogo = ['reglas_expertas', 'versiones_modelo_experto', 'condiciones_regla_experta',
+        'consecuencias_regla_experta', 'nodos_semanticos', 'valores_semanticos', 'criterios_dominios_resultado'];
+    $catalogoDisponible = count(array_filter($tablasCatalogo, fn ($tabla) => $esquema->hasTable($tabla))) === count($tablasCatalogo)
+        && $esquema->hasColumn('nodos_semanticos', 'cod_variable_experta');
+    if ($catalogoDisponible) {
+        $visibles = \App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarConocimientoAdministrativo::institucionales()
+            ->pluck('cod_version_modelo')->all();
+        $condiciones = $conexion->table('condiciones_regla_experta as c')
+            ->join('nodos_semanticos as n', 'n.cod_variable_experta', '=', 'c.cod_variable_experta')
+            ->join('valores_semanticos as v', 'v.cod_valor_semantico', '=', 'c.cod_valor_semantico')
+            ->orderBy('n.codigo_semantico')->get(['c.cod_regla_experta', 'n.codigo_semantico as variable', 'v.codigo_valor as valor_esperado'])
+            ->groupBy('cod_regla_experta');
+        $consecuencias = $conexion->table('consecuencias_regla_experta as c')
+            ->join('criterios_dominios_resultado as d', 'd.cod_criterio_dominio_resultado', '=', 'c.cod_criterio_dominio_resultado')
+            ->join('nodos_semanticos as n', 'n.cod_nodo_semantico', '=', 'd.cod_nodo_criterio')
+            ->join('valores_semanticos as v', 'v.cod_valor_semantico', '=', 'c.cod_valor_semantico')
+            ->orderBy('n.codigo_semantico')->get(['c.cod_regla_experta', 'n.codigo_semantico as criterio', 'v.codigo_valor as valor_emitido'])
+            ->groupBy('cod_regla_experta');
+        $catalogoReglas = $conexion->table('reglas_expertas as r')
+            ->join('versiones_modelo_experto as v', 'v.cod_version_modelo', '=', 'r.cod_version_modelo')
+            ->orderBy('v.codigo_version')->orderBy('r.codigo_regla')
+            ->get(['r.cod_regla_experta', 'r.cod_version_modelo', 'r.codigo_regla', 'r.nombre', 'r.estado', 'r.estado_revision',
+                'v.codigo_version', 'v.estado as estado_version'])
+            ->map(static function ($regla) use ($visibles, $condiciones, $consecuencias): array {
+                $id = $regla->cod_regla_experta;
+
+                return ['codigo' => $regla->codigo_regla, 'nombre' => $regla->nombre, 'version' => $regla->codigo_version,
+                    'estado' => $regla->estado, 'revision' => $regla->estado_revision, 'estado_version' => $regla->estado_version,
+                    'incluida_en_catalogo_institucional' => in_array($regla->cod_version_modelo, $visibles, true),
+                    'condiciones' => ($condiciones[$id] ?? collect())->map(fn ($c) => ['variable' => $c->variable, 'valor_esperado' => $c->valor_esperado])->all(),
+                    'consecuencias' => ($consecuencias[$id] ?? collect())->map(fn ($c) => ['criterio' => $c->criterio, 'valor_emitido' => $c->valor_emitido])->all(),
+                    'acredita_ejecucion' => false];
+            })->all();
+    }
     $configuracion = [];
     foreach (['perfiles_instrumentales', 'perfiles_interpretativos', 'contratos_conocimiento', 'lectura_clinica'] as $clave) {
         $valor = config('sistema_experto.'.$clave, []);
@@ -80,6 +115,8 @@ try {
         'versiones_conocimiento' => $versiones,
         'totales_conocimiento' => $resumen,
         'reglas_por_version_y_estado' => $reglasPorVersion,
+        'catalogo_reglas' => $catalogoReglas,
+        'catalogo_reglas_disponible' => $catalogoDisponible,
         'configuracion_cantidad' => $configuracion,
         'preparacion_circuito_inicial' => (new \App\Modulos\ApoyoDecision\Aplicacion\Consultas\PreparacionCircuitoInstrumental)->resumir(
             config('sistema_experto.perfiles_instrumentales', []),

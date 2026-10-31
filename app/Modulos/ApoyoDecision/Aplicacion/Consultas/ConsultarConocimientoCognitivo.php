@@ -60,7 +60,7 @@ final class ConsultarConocimientoCognitivo
                 if ($v->estado !== 'ACTIVO' || ($v->fecha_hora_retiro !== null && CarbonImmutable::parse($v->getRawOriginal('fecha_hora_retiro'))->lessThanOrEqualTo($corte)) || $v->fecha_hora_vigencia === null
                     || CarbonImmutable::parse($v->getRawOriginal('fecha_hora_vigencia'))->greaterThan($corte)
                     || preg_match('/SIM|TEST|EXPERIMENTAL/i', $v->codigo_version)) {
-                    throw new DomainException('La versión declarativa no está vigente o pertenece al laboratorio.');
+                    throw new DomainException('La versión declarativa no está vigente o no es elegible para el circuito institucional.');
                 }
                 $contrato = app(ContratosConocimiento::class)->porVersion($version);
                 $tablas = app(ConocimientoVersionado::class)->instantanea($version);

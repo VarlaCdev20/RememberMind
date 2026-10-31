@@ -31,6 +31,28 @@ final class RetiradaLaboratorioExpertoTest extends TestCase
         $this->actingAs($actor);
     }
 
+    public function test_autoload_del_producto_no_resuelve_los_ocho_componentes_exclusivos_retirados(): void
+    {
+        $clases = ['DTOs\\SolicitudInferenciaDTO', 'DTOs\\EvidenciasEntradaDTO', 'DTOs\\ResultadoInferenciaDTO',
+            'DTOs\\ResultadoDclDTO', 'DTOs\\InformeExpertoDTO', 'DTOs\\PresentarPatronExperimental',
+            'CasosDeUso\\ClasificarDclUseCase', 'CasosDeUso\\GenerarInformeUseCase'];
+        $clases = array_map(static fn ($c) => 'App\\Modulos\\ApoyoDecision\\Aplicacion\\'.$c, $clases);
+        $codigo = 'require $argv[1]; $c = json_decode($argv[2], true, flags: JSON_THROW_ON_ERROR); echo count(array_filter($c, "class_exists"));';
+        $proceso = new \Symfony\Component\Process\Process([PHP_BINARY, '-r', $codigo, base_path('vendor/autoload.php'), json_encode($clases, JSON_THROW_ON_ERROR)]);
+        $proceso->setTimeout(30);
+        self::assertSame(0, $proceso->run(), $proceso->getErrorOutput());
+        self::assertSame('0', $proceso->getOutput());
+        self::assertFalse(method_exists(\App\Modulos\ApoyoDecision\Aplicacion\DTOs\PresentarInformeCognitivo::class, 'presentarG09Prueba'));
+        self::assertFalse(method_exists(\App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto::class, 'estadoG09'));
+    }
+
+    public function test_consulta_de_enfermeria_rechaza_el_antiguo_payload_simulado(): void
+    {
+        $this->expectException(\DomainException::class);
+        (new \App\Modulos\ApoyoDecision\Aplicacion\DTOs\ConsultaCognitivaEnfermeria)
+            ->presentar(['simulacion_local' => ['activo' => true]], [], null);
+    }
+
     public function test_sin_version_no_aparece_conocimiento_ficticio_y_las_secciones_retiradas_se_rechazan(): void
     {
         $consulta = app(ExplorarConocimientoExperto::class)->obtener(null);

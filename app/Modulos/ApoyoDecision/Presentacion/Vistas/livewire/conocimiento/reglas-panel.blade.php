@@ -95,7 +95,7 @@
                     <div><label for="gob-prueba-{{ $v['cod_variable_experta'] }}">{{ $nombresNodos[$v['cod_nodo_semantico']] ?? $v['cod_variable_experta'] }}</label>
                         <select id="gob-prueba-{{ $v['cod_variable_experta'] }}" wire:model="entradaPrueba.{{ $v['cod_variable_experta'] }}" class="rm-select w-full !leading-normal !min-h-11">
                             <option value="">Sin dato</option>
-                            @foreach($tablas['valores_semanticos'] ?? [] as $valor)@if($valor['cod_dominio_valores'] === $v['cod_dominio_valores'])<option value="{{ $valor['cod_valor_semantico'] }}">{{ $valor['nombre'] }}</option>@endif @endforeach
+                            @foreach($tablas['valores_semanticos'] ?? [] as $valor)@if($valor['cod_dominio_valores'] === $v['cod_dominio_valores'] && $valor['estado'] === 'ACTIVO' && $valor['estado_aprobacion'] === 'APROBADO')<option value="{{ $valor['cod_valor_semantico'] }}">{{ $valor['nombre'] }}</option>@endif @endforeach
                         </select>
                     </div>
                 @endforeach
@@ -104,8 +104,12 @@
             </form>
             @if($resultadoPrueba)
                 <div role="status" class="mt-4" x-show="!entradaCambiada"><strong>{{ $resultadoPrueba['estado'] === 'NO_EVALUABLE' ? 'Faltan datos para evaluar estas condiciones.' : ($resultadoPrueba['cumple'] ? 'Se cumplen todas las condiciones con estas entradas.' : 'Estas entradas no cumplen todas las condiciones.') }}</strong>
-                    <ul class="list-disc pl-5 mt-2">@foreach($resultadoPrueba['condiciones'] as $c)<li>{{ $c['condicion'] }}: {{ ['CUMPLE' => 'Cumple', 'NO_CUMPLE' => 'Sin soporte coincidente', 'NO_EVALUABLE' => 'Sin dato'] [$c['estado']] }}</li>@endforeach</ul>
-                    <p class="text-sm mt-2">No se ha creado una evaluación ni una decisión de revisión.</p>
+                    <p class="text-sm mt-2 font-semibold">{{ $resultadoPrueba['disponibilidad_catalogo']['habilitada_en_catalogo'] ? 'Metadatos de la regla habilitados en el catálogo.' : 'La regla no está habilitada en el catálogo para nuevas ejecuciones.' }}</p>
+                    @if($resultadoPrueba['disponibilidad_catalogo']['motivos'])
+                        <ul class="list-disc pl-5 mt-2">@foreach($resultadoPrueba['disponibilidad_catalogo']['motivos'] as $motivo)<li>{{ $motivo }}</li>@endforeach</ul>
+                    @endif
+                    <ul class="list-disc pl-5 mt-2">@foreach($resultadoPrueba['condiciones'] as $c)<li>Condición {{ $loop->iteration }}: {{ ['CUMPLE' => 'Cumple', 'NO_CUMPLE' => 'Sin soporte coincidente', 'NO_EVALUABLE' => 'Sin dato'] [$c['estado']] }}</li>@endforeach</ul>
+                    <p class="text-sm mt-2">La prueba lógica no acredita mediciones, aplicabilidad ni autorización de ejecución. No se ha creado una evaluación ni una decisión de revisión.</p>
                 </div>
             @endif
         </x-ui.section-card>

@@ -20,9 +20,9 @@ final class PresentacionNeurocognitivaTest extends TestCase
     public function test_revision_ausente_o_parcial_no_produce_offsets_nulos_ni_inventa_firmas(): void
     {
         $p = new PresentarInformeCognitivo;
-        self::assertSame('Pendiente de una valoración disponible', $p->resumirRevision(null, false, false));
-        self::assertSame('No habilitada para esta valoración', $p->resumirRevision(null, true, false));
-        self::assertSame('Resultado conservado', $p->resumirRevision(null, true, true));
+        self::assertSame('Pendiente de una valoración disponible', $p->resumirRevision(null, false));
+        self::assertSame('No habilitada para esta valoración', $p->resumirRevision(null, true));
+        self::assertFalse(method_exists($p, 'presentarG09Prueba'));
         self::assertSame('Psicología: estado no disponible. Medicina: estado no disponible.',
             $p->resumirRevision(['PSICOLOGIA' => null, 'MEDICINA' => null], true, false));
         self::assertSame('Psicología: confirmada. Medicina: estado no disponible.',

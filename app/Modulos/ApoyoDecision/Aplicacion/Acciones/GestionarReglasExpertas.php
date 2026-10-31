@@ -10,8 +10,11 @@ use App\Models\User;
 use App\Models\VersionModeloExperto;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\IdentidadesConocimiento;
+use App\Modulos\ApoyoDecision\Aplicacion\DTOs\DisponibilidadReglaCatalogo;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarConocimientoAdministrativo;
 use App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratosConocimiento;
 use DomainException;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use MotorExperto\dominio\conocimiento\CompiladorObservacional;
@@ -29,10 +32,13 @@ final class GestionarReglasExpertas
         return DB::transaction(function () use ($actor, $regla, $entradas): array {
             $this->actor($actor, 'gestionarReglas');
             $r = ReglaExperta::query()->whereKey($regla)->sole();
+            $version = VersionModeloExperto::query()->findOrFail($r->cod_version_modelo);
+            $this->institucional($version);
             $tablas = app(ConocimientoVersionado::class)->instantanea($r->cod_version_modelo);
             $condiciones = array_values(array_filter($tablas['condiciones_regla_experta'], fn ($c) => $c['cod_regla_experta'] === $regla));
             $variables = array_column($tablas['variables_expertas'], null, 'cod_variable_experta');
             $valores = array_column($tablas['valores_semanticos'], null, 'cod_valor_semantico');
+            $dominios = array_column($tablas['dominios_valores_expertos'], null, 'cod_dominio_valores');
             if (array_diff(array_keys($entradas), array_column($condiciones, 'cod_variable_experta'))) {
                 throw new DomainException('Las entradas deben pertenecer a las condiciones de esta regla.');
             }
@@ -42,7 +48,10 @@ final class GestionarReglasExpertas
                     continue;
                 }
                 if (! is_string($valor) || ! isset($valores[$valor], $variables[$variable])
-                    || $valores[$valor]['cod_dominio_valores'] !== $variables[$variable]['cod_dominio_valores']) {
+                    || $valores[$valor]['cod_dominio_valores'] !== $variables[$variable]['cod_dominio_valores']
+                    || $variables[$variable]['estado'] !== 'ACTIVO'
+                    || $valores[$valor]['estado'] !== 'ACTIVO' || $valores[$valor]['estado_aprobacion'] !== 'APROBADO'
+                    || ($dominios[$valores[$valor]['cod_dominio_valores']]['estado'] ?? null) !== 'ACTIVO') {
                     throw new DomainException('Entrada incompatible con el dominio de la variable.');
                 }
                 $hechos[] = ['id' => 'ENTRADA-'.(count($hechos) + 1), 'variable' => $variable, 'valor' => $valor];
@@ -60,8 +69,13 @@ final class GestionarReglasExpertas
             $estado = in_array('NO_CUMPLE', $estados, true) ? 'NO_CUMPLE'
                 : (in_array('NO_EVALUABLE', $estados, true) ? 'NO_EVALUABLE' : 'CUMPLE');
 
+            $disponibilidad = (new DisponibilidadReglaCatalogo)->describir($r->getAttributes(),
+                $version->getAttributes(), $tablas, CarbonImmutable::now());
+
             return ['regla' => $regla, 'version' => $r->cod_version_modelo, 'condiciones' => $evaluadas,
-                'cumple' => $estado === 'CUMPLE', 'estado' => $estado, 'persistido' => false];
+                'cumple' => $estado === 'CUMPLE', 'estado' => $estado, 'persistido' => false,
+                'disponibilidad_catalogo' => $disponibilidad,
+                'condiciones_y_catalogo_habilitados' => $estado === 'CUMPLE' && $disponibilidad['habilitada_en_catalogo']];
         });
     }
 
@@ -242,8 +256,8 @@ final class GestionarReglasExpertas
 
     private function institucional(VersionModeloExperto $v): void
     {
-        if (preg_match('/SIM|TEST|EXPERIMENTAL/i', $v->codigo_version)) {
-            throw new DomainException('Los paquetes de laboratorio mantienen su gestor y contrato propios.');
+        if (! ConsultarConocimientoAdministrativo::institucionales()->whereKey($v->getKey())->exists()) {
+            throw new DomainException('El conocimiento técnico retirado no se gestiona desde el circuito institucional.');
         }
     }
 

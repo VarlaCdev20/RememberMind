@@ -2,10 +2,7 @@
 
 namespace App\Modulos\ApoyoDecision\Aplicacion\DTOs;
 
-use App\Modulos\ApoyoDecision\Dominio\Reglas\BaseTecnicaDesechable;
-use App\Modulos\ApoyoDecision\Aplicacion\DTOs\InformeExpertoDTO;
 use DomainException;
-use Illuminate\Support\Facades\DB;
 
 /** Compone un informe de lectura a partir del lector autorizado; no consulta fuentes ni infiere. */
 final class PresentarInformeCognitivo
@@ -116,26 +113,4 @@ final class PresentarInformeCognitivo
                 : 'El registro disponible no reúne una conclusión publicable con soporte verificable para esta área. Consulte las fuentes y los límites conservados.'];
     }
 
-    /**
-     * Presenta únicamente un informe G09 ya construido en una base desechable de testing.
-     * No existe ruta asistencial que invoque este método ni se importa el motor experimental.
-     */
-    public function presentarG09Prueba(array $informe): array
-    {
-        $c = DB::connection();
-        if (! app()->environment('testing') || ! BaseTecnicaDesechable::permite(
-            $c->getDriverName(), $c->getDatabaseName(), $c->getConfig('username'), $c->getConfig('host'))
-            || ($informe['uso'] ?? null) !== 'PRUEBA_TECNICA_NO_CLINICA'
-            || ($informe['version'] ?? null) !== 'G09-EXP-20261017'
-            || ! in_array($informe['criterio'] ?? null, ['COG-ATE', 'COG-EJE', 'COG-LEN', 'COG-VIS'], true)) {
-            throw new DomainException('La presentación G09 requiere un informe técnico aislado; no admite residentes asistenciales.');
-        }
-        $texto = LenguajeResultadosExperto::estadoG09($informe['estado_tecnico'] ?? '');
-        if ($texto === null) {
-            throw new DomainException('Estado G09 sin contrato de presentación.');
-        }
-
-        return $texto + ['estado_original' => $informe['estado_tecnico'], 'uso' => $informe['uso'],
-            'publicable' => false, 'limites' => 'Datos sintéticos. Sin diagnóstico, gravedad, pronóstico ni clasificación Petersen.'];
-    }
 }
