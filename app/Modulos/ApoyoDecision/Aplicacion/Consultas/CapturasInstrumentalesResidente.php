@@ -31,6 +31,9 @@ final class CapturasInstrumentalesResidente
         foreach (self::PERMISOS_LECTURA as $permiso) {
             abort_unless($lecturaEnfermeria || $usuario->checkPermissionTo($permiso, 'web'), 403);
         }
+        if ($corte->greaterThan(CarbonImmutable::now())) {
+            throw new DomainException('La fecha de corte de las mediciones no puede estar en el futuro.');
+        }
         if (! array_is_list($preguntasDeclarativas) || array_filter($preguntasDeclarativas, static fn ($p) => ! is_string($p) || $p === '')) {
             throw new DomainException('Las preguntas declarativas requieren identidades explícitas.');
         }
@@ -81,11 +84,16 @@ final class CapturasInstrumentalesResidente
                     $documentoOriginal['fecha_hora'] = $doc->fecha_hora?->format('Y-m-d\TH:i:s.uP');
                 }
                 if (! array_key_exists($a->cod_documento_clinico, $documentosVerificados)) {
-                    $archivos = app(ArchivosAplicacion::class);
-                    $hash = $doc && $archivos->existe('local', $doc->ruta_archivo) ? $archivos->hash('local', $doc->ruta_archivo) : false;
-                    $documentosVerificados[$a->cod_documento_clinico] = $doc !== null && $doc->estado === 'VIGENTE'
-                        && $doc->cod_residente === $residente->getKey() && is_string($hash) && hash_equals($doc->hash_archivo, $hash)
+                    // Primero pertenencia y admisibilidad; una FK incoherente nunca autoriza I/O privado ajeno.
+                    $admisible = $doc !== null && $doc->estado === 'VIGENTE'
+                        && $doc->cod_residente === $residente->getKey()
                         && CorteDocumentoInstrumental::admite($documentoOriginal, $corte);
+                    $hash = false;
+                    if ($admisible) {
+                        $archivos = app(ArchivosAplicacion::class);
+                        $hash = $archivos->existe('local', $doc->ruta_archivo) ? $archivos->hash('local', $doc->ruta_archivo) : false;
+                    }
+                    $documentosVerificados[$a->cod_documento_clinico] = $admisible && is_string($hash) && hash_equals($doc->hash_archivo, $hash);
                 }
                 $estadoDocumento = $documentosVerificados[$a->cod_documento_clinico] ? 'VERIFICADO' : 'ORIGINAL_NO_VERIFICABLE';
                 if ($estadoDocumento !== 'VERIFICADO') {

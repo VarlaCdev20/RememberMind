@@ -80,6 +80,37 @@ final class EjecucionConsultaCognitivaTest extends TestCase
         $this->assertDatabaseCount('evaluaciones_expertas', 0);
     }
 
+    public function test_render_consulta_una_sola_vez_el_historial_observacional(): void
+    {
+        $lecturas = 0;
+        DB::listen(static function (QueryExecuted $evento) use (&$lecturas): void {
+            if (preg_match('/count\s*\(\s*\*\s*\)\s+as\s+"?aggregate/i', $evento->sql) && str_contains($evento->sql, '"evaluaciones_expertas"')
+                && in_array('OBSERVACIONAL', $evento->bindings, true) && in_array('OBS-SNAP-1', $evento->bindings, true)) {
+                $lecturas++;
+            }
+        });
+        Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])->assertOk();
+        self::assertSame(1, $lecturas);
+    }
+
+    public function test_fallo_observacional_no_borra_un_analisis_instrumental_correcto(): void
+    {
+        $pagina = Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente]);
+        DB::connection()->beforeExecuting(static function (string $sql, array $bindings): void {
+            if (str_contains($sql, '"evaluaciones_expertas"') && in_array('OBSERVACIONAL', $bindings, true)
+                && in_array('OBS-SNAP-1', $bindings, true)) {
+                throw new DomainException('DETALLE-OBS-INTERNO');
+            }
+        });
+        $pagina->call('analizarEvidencia')->assertHasNoErrors()
+            ->assertSet('analisisEjecutado', true)
+            ->assertSee('Resultado calculado para esta consulta:')
+            ->assertSee('No se pudieron consultar los hallazgos observacionales')
+            ->assertDontSee('No se pudieron consultar las mediciones instrumentales')
+            ->assertDontSee('DETALLE-OBS-INTERNO');
+        $this->assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
     public function test_la_presentacion_conserva_ambas_salidas_y_la_huella_sin_consultar_datos_actuales(): void
     {
         $dto = app(PrepararEvaluacionInstitucional::class)->preparar($this->actor, $this->residente, CarbonImmutable::now());

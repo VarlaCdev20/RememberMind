@@ -563,9 +563,67 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         $antes = $consulta->consultar($this->usuario, $this->residente, CarbonImmutable::parse('2026-10-18 12:00:00'));
         self::assertSame([], $antes['capturas']);
 
-        $despues = $consulta->consultar($this->usuario, $this->residente, CarbonImmutable::parse('2026-10-18 12:02:00'));
+        $this->travelTo(CarbonImmutable::parse('2026-10-18 12:02:00'));
+        $despues = $consulta->consultar($this->usuario, $this->residente, CarbonImmutable::now());
         self::assertSame([$a->getKey()], array_column($despues['capturas'], 'cod_aplicacion'));
         self::assertSame('2026-10-18T12:01:00.000000-04:00', $despues['capturas'][0]['procedencia']['registrado_en']);
+    }
+
+    public function test_adquisicion_directa_rechaza_un_corte_futuro(): void
+    {
+        $this->aplicar();
+        $this->expectException(\DomainException::class);
+        app(CapturasInstrumentalesResidente::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now()->addMinute());
+    }
+
+    public static function documentosNoAdmisibles(): array
+    {
+        return [['ajeno'], ['futuro'], ['inactivo']];
+    }
+
+    #[DataProvider('documentosNoAdmisibles')]
+    public function test_documento_no_admisible_no_provoca_lectura_de_su_archivo_privado(string $caso): void
+    {
+        $entrada = $this->entradaHistorica();
+        app(AplicarInstrumento::class)->transcribir($this->usuario, $entrada, $this->instrumento, $this->residente);
+        $cambios = match ($caso) {
+            'ajeno' => ['cod_residente' => Residente::factory()->create(['estado' => 'ADMITIDO'])->getKey()],
+            'futuro' => ['fecha_hora' => now()->addMinute()],
+            default => ['estado' => 'INACTIVO'],
+        };
+        DB::table('documentos_clinicos')->where('cod_documento_clinico', $entrada['cod_documento_clinico'])->update($cambios);
+        $this->mock(\App\Compartido\Aplicacion\Contratos\ArchivosAplicacion::class, static function ($archivos): void {
+            $archivos->shouldNotReceive('existe');
+            $archivos->shouldNotReceive('hash');
+        });
+        $captura = $this->captura()['capturas'][0];
+        self::assertNull($captura['extraccion']);
+        self::assertContains('ORIGINAL_NO_VERIFICABLE', $captura['motivos']);
+        if ($caso === 'ajeno') {
+            self::assertNull($captura['documento_original']);
+        }
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
+    public static function estadosHttpMediciones(): array
+    {
+        return [['prohibido', 403], ['no_encontrado', 404], ['servicio_no_disponible', 503]];
+    }
+
+    #[DataProvider('estadosHttpMediciones')]
+    public function test_consulta_de_mediciones_no_oculta_fallos_http_inesperados(string $nombre, int $estado): void
+    {
+        $error = new HttpException($estado, 'Detalle interno de prueba '.$nombre);
+        DB::connection()->beforeExecuting(static function (string $sql) use ($error): void {
+            if (str_contains($sql, 'from "aplicaciones_instrumento"')) {
+                throw $error;
+            }
+        });
+        if ($estado !== 403) {
+            $this->expectExceptionObject($error);
+        }
+        $r = app(ConsultarPerfilInstrumental::class)->consultarMediciones($this->usuario, $this->residente, CarbonImmutable::now());
+        self::assertNull($r);
     }
 
     public function test_sin_permiso_documental_no_lee_una_aplicacion_vinculada_a_documento(): void

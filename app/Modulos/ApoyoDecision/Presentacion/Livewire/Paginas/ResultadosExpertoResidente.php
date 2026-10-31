@@ -674,24 +674,8 @@ class ResultadosExpertoResidente extends Component
             }
         } catch (QueryException|DomainException $e) {
             report($e);
-            $errorInstrumental = true;
-            $this->analisisEjecutado = false;
-            $this->fechaAnalisis = null;
-            $this->mensajeAnalisis = null;
-        }
-        if (! $this->enfermeria) {
-            try {
-                $hallazgosObservacionales = app(ConsultarObservacionesConservadas::class)->consultar(auth()->user(), $residente,
-                    $this->evaluacionObservacional, $this->getPage('observaciones'), $this->getPage('historiaObservaciones'))
-                    ?? app(ConsultarHallazgosObservacionales::class)->consultar(auth()->user(), $residente, $this->getPage('observaciones'));
-                if ($hallazgosObservacionales && $hallazgosObservacionales['persistido']) {
-                    $revisionesObservacionales = app(ConsultarRevisionesValoracionExperta::class)->consultar(auth()->user(), $hallazgosObservacionales['id']);
-                }
-            } catch (QueryException|DomainException $e) {
-                report($e);
-                $hallazgosObservacionales = $revisionesObservacionales = null;
-                $errorObservacional = true;
-            }
+            $hallazgosObservacionales = $revisionesObservacionales = null;
+            $errorObservacional = true;
         }
         try {
             $datos = $this->leerResultados($residente, $this->evaluacion, $this->getPage('historia'));

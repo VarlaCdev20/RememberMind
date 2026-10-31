@@ -51,6 +51,10 @@ final readonly class ConsultarPerfilInstrumental
         try {
             $capturas = app(CapturasInstrumentalesResidente::class)->consultar($usuario, $residente, $corte);
         } catch (HttpException $e) {
+            if ($e->getStatusCode() !== 403) {
+                throw $e;
+            }
+
             return null;
         }
         if (! $capturas['disponible']) {

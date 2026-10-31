@@ -1,7 +1,7 @@
 ---
 title: "Sistema experto: fuentes, funcionamiento y límites"
 status: CURRENT
-version: "3.19"
+version: "3.20"
 last_reviewed: 2026-10-31
 owner: RememberMind
 source_of_truth: false
@@ -21,6 +21,7 @@ Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años,
 
 | Necesito encontrar… | Abrir |
 |---|---|
+| Cierre técnico actual con relaciones y permisos conservados; reglas para la siguiente etapa | [Entregable único de correcciones y estado pendiente](ENTREGABLE_CORRECCIONES_TECNICAS_2026_10_31.md) |
 | Entregable único actual: fundamento médico, guía integrada de captura y brechas pendientes | [Entrega del 31/10: fuentes profesionales, plan de faltantes y límites técnicos](ENTREGABLE_INTEGRACION_Y_FUENTES_DCL_2026_10_31.md) |
 | Entrega única de instrumentos iniciales, versiones y perfiles de preparación | [Circuito inicial, conexión a hechos/inferencia y condiciones reales de activación](ENTREGA_INSTRUMENTOS_Y_PERFILES_INICIALES_2026_10_29.md) |
 | Entrega completa de la fase de contexto: conceptos, captura, integración y pruebas | [Cierre de contexto y procedencia del 29/10](ENTREGA_FASE_CONTEXTO_COGNITIVO_2026_10_29.md) |

@@ -37,6 +37,8 @@ Esta instrucción sustituye cualquier formulación anterior que colocara esa eva
 
 Actualización acotada del 31/10: [entregable de fuentes médicas y guía integrada de captura](ENTREGABLE_INTEGRACION_Y_FUENTES_DCL_2026_10_31.md). El contrato incorporado sí admite memoria vacía y abstención; la falta de vínculos impide interpretar instrumentos específicos, no ejecutar ese motor. La conservación conjunta sigue pendiente.
 
+Decisión posterior del mismo día: la propietaria mantiene relaciones y permisos actuales. El [cierre técnico compatible](ENTREGABLE_CORRECCIONES_TECNICAS_2026_10_31.md) corrige adquisición, acceso a archivos y aislamiento de errores sin modificar reglas; la propuesta de conservación queda rechazada y no se instala.
+
 1. **Cerrar el contrato técnico de los instrumentos iniciales:** edición/forma/idioma exactos, material y protocolo documentados, respuestas, ausencias, unidades y transformaciones. Conservar el alcance de uso del material sin reproducir contenido de terceros fuera de lo permitido; no exigir una firma o estudio externo para avanzar técnicamente.
 2. **Implementar perfiles y vínculos exactos:** conectar PK/versiones/preguntas reales con entradas de métodos registrados y componentes del conocimiento. No repartir un total de cribado entre dominios ni identificar una edición por semejanza de nombre.
 3. **Probar la cadena completa de adquisición e inferencia:** originales autorizados y fecha de corte → mediciones → hechos → condiciones/reglas → resultado o abstención → explicación. Cubrir faltantes, contradicciones, formatos incorrectos y fuentes ajenas. La falta de datos de un caso produce una limitación explícita, no una prohibición de desarrollar.
