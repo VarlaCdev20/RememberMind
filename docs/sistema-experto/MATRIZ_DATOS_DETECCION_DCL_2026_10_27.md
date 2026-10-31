@@ -1,8 +1,8 @@
 ---
 title: "Detección temprana de DCL: ficha y matriz de datos"
-status: DRAFT
-version: "0.6"
-last_reviewed: 2026-10-29
+status: HISTORICAL
+version: "0.7"
+last_reviewed: 2026-10-31
 owner: ApoyoDecision
 source_of_truth: false
 verification_scope: STATIC_SOURCE_AND_CODE_REVIEW
@@ -10,6 +10,8 @@ runtime_verified: false
 ---
 
 # Detección temprana de DCL: ficha y matriz de datos
+
+> Corte histórico del27–29/10/2026, conservado íntegramente como antecedente. Desde el31/10 la guía de trabajo es la [matriz única dato → instrumento → regla → resultado](MATRIZ_TRAZABILIDAD_DCL.md), con los mismos identificadores D01–D27, conexiones contrastadas y requisitos de conservación/4FN. No usar este corte como estado actual del experto.
 
 ## 1. Alcance de esta entrega
 

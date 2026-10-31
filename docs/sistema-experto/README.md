@@ -1,7 +1,7 @@
 ---
 title: "Sistema experto: fuentes, funcionamiento y límites"
 status: CURRENT
-version: "3.22"
+version: "3.23"
 last_reviewed: 2026-10-31
 owner: RememberMind
 source_of_truth: false
@@ -21,6 +21,7 @@ Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años,
 
 | Necesito encontrar… | Abrir |
 |---|---|
+| Matriz actual: qué dato alimenta cada instrumento/regla, qué resultado permite y qué debe guardarse | [Matriz única de trazabilidad, perfiles exactos, brechas y conservación/4FN](MATRIZ_TRAZABILIDAD_DCL.md) |
 | Cierre técnico actual: lectura consistente, Enfermería, reglas y depuración | [Entregable único actualizado: correcciones, pruebas y pendientes precisos](ENTREGABLE_REGLAS_Y_DEPURACION_2026_10_31.md) |
 | Cierre técnico actual con relaciones y permisos conservados; reglas para la siguiente etapa | [Entregable único de correcciones y estado pendiente](ENTREGABLE_CORRECCIONES_TECNICAS_2026_10_31.md) |
 | Entregable único actual: fundamento médico, guía integrada de captura y brechas pendientes | [Entrega del 31/10: fuentes profesionales, plan de faltantes y límites técnicos](ENTREGABLE_INTEGRACION_Y_FUENTES_DCL_2026_10_31.md) |
@@ -30,7 +31,7 @@ Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años,
 | De cada fuente a las evidencias del caso | [Mapa de fuentes, áreas y criterios](organizacion/MAPA_FUENTES_A_HECHOS.md) |
 | Los componentes y el diagrama adoptados | [Estructura por ocho componentes](organizacion/ESTRUCTURA_POR_COMPONENTES.md) |
 | El código de hechos, red semántica, reglas e inferencia | [Mapa único de componentes y recorridos](organizacion/MAPA_COMPONENTES.md) |
-| Qué datos existen y qué falta capturar | [Ficha y matriz D01–D27](MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md) |
+| Antecedente de la matriz de datos y sus entregas de contexto | [Corte histórico D01–D27 del27–29/10](MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md); la matriz vigente está en la primera fila |
 | Los 45 instrumentos y evaluaciones candidatos | [Catálogo de investigación por finalidad](instrumentos/CATALOGO_CANDIDATOS.md) |
 | Qué instrumentos se seleccionaron y qué integramos primero | [Selección escalonada adoptada y pendientes de activación](instrumentos/SELECCION_ADOPTADA_2026_10_28.md) |
 | Ediciones, condiciones, derechos y captura de los tres iniciales | [Fichas MoCA, RUDAS y FAQ; pendientes concretos de incorporación](instrumentos/CIRCUITO_INICIAL.md) |
@@ -55,7 +56,7 @@ La implementación usa `motor-experto/` y `app/Modulos/ApoyoDecision/`; no exist
 
 ## Contratos y decisiones aplicables
 
-Preparación actual para detección temprana en personas mayores de 60 años: [ficha y matriz de datos del 27/10/2026](MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md). Es un inventario estático para revisión: separa capacidades, fuentes parciales y conservación pendiente; no selecciona una batería ni cambia reglas o permisos.
+Preparación actual para detección temprana en personas mayores de60 años: [matriz única de trazabilidad](MATRIZ_TRAZABILIDAD_DCL.md), actualizada el31/10. Conecta D01–D27 con19 componentes,23 métodos,24 reglas existentes y requisitos de conservación por grano. Su anexo se contrasta offline con el código; no activa perfiles, cambia reglas ni certifica un despliegue. La [ficha del27–29/10](MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md) conserva el antecedente.
 
 La [decisión de selección del 28/10/2026](instrumentos/SELECCION_ADOPTADA_2026_10_28.md) complementa ese corte: cierra las familias y niveles, sin declarar perfiles instalados, derechos obtenidos o evaluación posterior en uso real.
 
