@@ -47,3 +47,8 @@ La inspección visual detectó además la altura fija de fila heredada, que caus
 Ejecución focal final: 1 test E2E correcto (85 s), diez combinaciones más modo oscuro y estados. Evidencia local sintética: output/auditoria-integral-20261025/gerencia-renovada/personal-unificado/resultado.json y capturas del mismo directorio. Build final correcto. PHP:28 pruebas únicas /202 aserciones (25 de Personal/navegación y3 de compatibilidad del componente); no sumar el filtro inicial solapado.
 
 Verificación limitada a la presentación y regresiones indicadas. No se reejecutó la CI completa ni se modificó la base operativa. La rama conserva trabajo previo de otras tareas; el commit incluye únicamente esta entrega.
+
+## Ajuste posterior de densidad y botones
+
+A petición de la propietaria se reducen padding y separaciones de cabecera, filtros, tarjetas y filas; avatar de56 px en tarjetas y títulos con la escala de sección. Las acciones se agrupan al final de la fila; en tarjetas Ver ficha ocupa el espacio junto a Acciones, eliminando la separación amplia. Se conservan controles de44 px, estados y permisos. Verificación posterior: build correcto y E2E focal PASS (10 combinaciones en cinco anchos, filtros, menús/Escape/foco y oscuro390), sin superposiciones ni desbordamientos; cero errores JS/HTTP. Capturas sintéticas actualizadas en el mismo directorio de evidencia.
+
