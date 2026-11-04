@@ -119,12 +119,15 @@ final class ConsultarPetersenInstitucional
                 }
                 if ($f->cod_documento_clinico !== null) {
                     $doc = $documentosOriginales->get($f->cod_documento_clinico);
-                    $verificado = $doc !== null && app(VerificarOriginalDocumentalPetersen::class)->verificar($doc);
+                    // La fecha y la pertenencia se comprueban antes de abrir el original privado.
+                    $verificado = $doc !== null && $doc->fecha_hora !== null && ! $doc->fecha_hora->greaterThan($corte)
+                        && app(VerificarOriginalDocumentalPetersen::class)->verificar($doc);
                     $documentos[] = $this->constancia($f->getKey(), 'ORIGINAL', $f->cod_documento_clinico, $doc, $verificado, $f->localizador_fuente);
-                    if (! $verificado || $doc->fecha_hora === null || $doc->fecha_hora->greaterThan($corte)) {
+                    if (! $verificado) {
                         $excluidos[] = ['valoracion' => $f->getKey(), 'elemento' => $f->elemento,
-                            'motivo' => ! $verificado ? 'DOCUMENTO_ORIGINAL_NO_VERIFICABLE'
-                                : ($doc->fecha_hora === null ? 'FUENTE_SIN_INSTANTE_CLINICO_IDENTIFICABLE' : 'DOCUMENTO_ORIGINAL_FUERA_DE_CORTE')];
+                            'motivo' => $doc === null ? 'DOCUMENTO_ORIGINAL_NO_VERIFICABLE'
+                                : ($doc->fecha_hora === null ? 'FUENTE_SIN_INSTANTE_CLINICO_IDENTIFICABLE'
+                                    : ($doc->fecha_hora->greaterThan($corte) ? 'DOCUMENTO_ORIGINAL_FUERA_DE_CORTE' : 'DOCUMENTO_ORIGINAL_NO_VERIFICABLE'))];
 
                         continue;
                     }
@@ -140,11 +143,15 @@ final class ConsultarPetersenInstitucional
                     }
                     $fk = reset($fks);
                     $o = ($originales[$fk] ?? collect())->get($s->$fk);
+                    $tipoAdmitido = in_array($fk, F::admitidas($f->elemento, $s->tipo_soporte), true);
                     if ($fk === 'cod_documento_clinico') {
-                        $verificado = $o !== null && app(VerificarOriginalDocumentalPetersen::class)->verificar($o);
+                        $verificado = $o !== null && $tipoAdmitido && $o->fecha_hora !== null && ! $o->fecha_hora->greaterThan($corte)
+                            && $o->cod_personal !== null
+                            && ($o->cod_atencion === null || $o->getRelation('atencion')?->cod_residente === $residente->getKey())
+                            && app(VerificarOriginalDocumentalPetersen::class)->verificar($o);
                         $documentos[] = $this->constancia($f->getKey(), 'SOPORTE', $s->$fk, $o, $verificado, null);
                     }
-                    if (! $o || ! in_array($fk, F::admitidas($f->elemento, $s->tipo_soporte), true)) {
+                    if (! $o || ! $tipoAdmitido) {
                         $incompatible = true;
                         $excluidos[] = ['valoracion' => $f->getKey(), 'elemento' => $f->elemento, 'motivo' => 'SOPORTE_NO_DISPONIBLE_O_INCOMPATIBLE'];
 
@@ -178,15 +185,15 @@ final class ConsultarPetersenInstitucional
 
                         continue;
                     }
-                    if ($o instanceof DocumentoClinico && ! $verificado) {
-                        $incompatible = true;
-                        $excluidos[] = ['valoracion' => $f->getKey(), 'elemento' => $f->elemento, 'motivo' => 'DOCUMENTO_ORIGINAL_NO_VERIFICABLE'];
-
-                        continue;
-                    }
                     if ($o instanceof DocumentoClinico && $fecha->greaterThan($corte)) {
                         $incompatible = true;
                         $excluidos[] = ['valoracion' => $f->getKey(), 'elemento' => $f->elemento, 'motivo' => 'DOCUMENTO_ORIGINAL_FUERA_DE_CORTE'];
+
+                        continue;
+                    }
+                    if ($o instanceof DocumentoClinico && ! $verificado) {
+                        $incompatible = true;
+                        $excluidos[] = ['valoracion' => $f->getKey(), 'elemento' => $f->elemento, 'motivo' => 'DOCUMENTO_ORIGINAL_NO_VERIFICABLE'];
 
                         continue;
                     }

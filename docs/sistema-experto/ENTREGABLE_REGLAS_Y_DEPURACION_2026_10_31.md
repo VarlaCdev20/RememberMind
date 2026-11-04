@@ -1,8 +1,8 @@
 ---
 title: "Entregable único: reglas existentes, correcciones y depuración operativa"
 status: CURRENT
-version: "1.1"
-last_reviewed: 2026-10-31
+version: "1.2"
+last_reviewed: 2026-11-04
 owner: ApoyoDecision
 source_of_truth: false
 verification_scope: RULE_GOVERNANCE_RUNTIME_CLEANUP_AND_CONSISTENT_SOURCE_READS
@@ -14,6 +14,8 @@ runtime_verified: true
 Se cierra la corrección técnica de la prueba de reglas, se detalla el catálogo real y se retiran ocho componentes exclusivamente experimentales que seguían dentro de `app/`. No se modifican las definiciones médicas, condiciones, consecuencias, umbrales o criterios institucionales. Tampoco se crean tablas, relaciones o permisos: se mantiene la decisión de la propietaria de conservarlos.
 
 **Actualización posterior del mismo día:** se corrigen también la adquisición ordinaria de fuentes y la consulta de Enfermería; alcance y evidencia en la sección9. Este documento reúne ambos cambios para conservar un solo entregable de cierre técnico.
+
+**Actualización del04/11/2026:** la sección10 incorpora la corrección de admisibilidad documental Petersen antes de acceder al archivo privado, con pruebas por motor. Los inventarios y verificaciones anteriores conservan sus fechas originales.
 
 **No se declara cerrado el experto integral:** los perfiles instrumentales iniciales y la conservación conjunta siguen pendientes. La limpieza del código y una prueba lógica correcta no sustituyen esos componentes.
 
@@ -199,3 +201,40 @@ Comandos finales reproducibles: `php vendor/phpunit/phpunit/phpunit --no-progres
 3. **Filas históricas de simulación:** permanece el alcance físico de la sección7. La exclusión operativa no se presenta como borrado de la BDD ni se elimina historia para aparentar depuración completa.
 
 Por tanto, se cierra esta corrección de lectura, autorización y separación por rol; no se declara terminado el experto integral ni se cambian reglas médicas bajo esa afirmación.
+
+## 10. Documentos Petersen: admisibilidad antes del acceso privado —04/11/2026
+
+El lector podía intentar verificar los bytes de un documento antes de descartar su fecha posterior al corte. En soportes también abría el archivo antes de comprobar la compatibilidad del tipo, el autor y la atención. Aunque después excluyera la evidencia, realizaba un acceso privado innecesario y podía comunicar un motivo genérico de archivo no verificable en lugar del motivo temporal.
+
+`ConsultarPetersenInstitucional` comprueba ahora pertenencia al residente y fecha antes de verificar un documento original. Para soportes comprueba además el tipo admitido, autor y coherencia con la atención. Conserva las constancias de exclusión con `verificado=false`, sin abrir el archivo, y prioriza el motivo `DOCUMENTO_ORIGINAL_FUERA_DE_CORTE` cuando corresponde. Un documento ajeno no aporta metadatos al caso. Los documentos admisibles continúan verificándose por sus bytes y hash; una modificación de contenido sigue causando exclusión.
+
+No cambian reglas clínicas, umbrales, versiones, Policies, permisos, relaciones ni columnas. Las valoraciones originales, sus soportes e identidades permanecen intactos; la consulta no guarda una evaluación institucional ni la presenta como persistida. Los DTO siguen comprobando integridad y reconstrucción de su explicación sin volver a consultar los originales.
+
+### Verificación técnica acotada
+
+| Comprobación | Evidencia |
+|---|---|
+| Casos documentales SQLite, repetición final |10 pruebas/104 aserciones correctas. Incluye original y soporte futuro, ajeno, inactivo, soporte sin autor, atención ajena, archivo válido y alterado, motivo explícito, constancia y ausencia de escritura. |
+| Recorrido SQL → mediciones → juicios → inferencia y autorización, SQLite |11 pruebas/84 aserciones correctas: cuatro patrones, roles sin competencia, cuenta revocada y soporte de otro residente. |
+| Motor Petersen, DTO conjunto y membresías, sin BDD |105 pruebas/264 aserciones correctas: patrones, ausencia, contradicción e integridad de reconstrucción conforme al contrato existente. |
+| PostgreSQL18 desechable: documentos y cuatro patrones |13 pruebas/162 aserciones correctas, sin omisiones. |
+| PostgreSQL18 desechable: atención ajena |1 prueba/7 aserciones correctas: la FK compuesta rechaza la mutación con `23503`, conserva el documento y no crea una evaluación. Sin desactivar restricciones ni omitir el caso. |
+| Revisión independiente de seguridad y regresión |PASS acotado del diff y evidencia de las pruebas; sin hallazgos pendientes en el cambio productivo. |
+| Sintaxis, diff y matriz de trazabilidad offline |Correctos. La matriz conserva27 datos,19 componentes y23 métodos; no ejecuta SQL ni inferencia. |
+
+Existe una diferencia previa entre esquemas efectivos de pruebas: PostgreSQL conserva la FK compuesta documento/atención/residente; SQLite permite construir ese vínculo incoherente y el lector lo descarta antes del acceso privado. La prueba comprueba la protección efectiva de cada motor; esta entrega no instala DDL ni afirma que sus restricciones físicas sean idénticas. La discrepancia de SQLite queda registrada para la auditoría del esquema, fuera de esta corrección de lectura.
+
+La comprobación opcional de Pint encuentra categorías de estilo ya presentes en las versiones deHEAD de ambos archivos, contrastadas sobre copias locales. No se aplica una reformateación completa para resolver este defecto. `php -l` y `git diff --check` del cambio son correctos. No se repite el build ni la QA visual porque no cambia frontend. No se ejecuta la suite global.
+
+Comandos reproducibles: `php vendor/phpunit/phpunit/phpunit --no-progress --do-not-cache-result tests/Feature/CapturaPetersenOriginalTest.php --filter=test_documento_`; el mismo archivo con filtro `test_caso_completo_se_clasifica|test_cuenta_revocada|test_roles_sin_competencia|test_soporte_de_otro_residente`; `php vendor/phpunit/phpunit/phpunit --no-progress --do-not-cache-result tests/Unit/PetersenInstitucionalTest.php tests/Unit/InstantaneaEvaluacionInstitucionalTest.php tests/Unit/MembresiasOriginalesPetersenTest.php`; `php scripts/verificar-matriz-trazabilidad-dcl.php --check`. Para PostgreSQL se usaron clústeres temporales propios, usuario sin privilegios, almacenamiento aislado, configuración de pruebas y apagado/limpieza confirmados. No se migró ni modificó la BDD operativa.
+
+Evidencias locales, fuera del commit: `output/experto-documentos-20261104-*`, `output/experto-documentos-atencion-20261104-*` y runners aislados correspondientes. No contienen mediciones de residentes reales. El trabajo no introduce ni reconecta simulaciones operativas, no envía correo y no hace push.
+
+### Estado integral que no cambia con este parche
+
+- El motor y los recorridos técnicos con fuentes originales están implementados y tienen pruebas; un caso sin datos suficientes conserva una abstención explicada.
+- Los perfiles iniciales MoCA/RUDAS/FAQ todavía necesitan fijar edición, identidad/selectores y método de interpretación aplicable. No se habilitan asignando un nombre a una captura propia ni inventando umbrales.
+- El guardado e historial conjuntos instrumental/Petersen siguen pendientes de resolver la decisión estructural y de permisos previamente rechazada. Una nueva solicitud general de continuar no se toma como aprobación de aquella ampliación. El historial observacional existente permanece separado y funcional.
+- No se solicita evaluación externa ni estudios con residentes para desarrollar. Estos pendientes son de contrato instrumental y conservación del resultado, no requisitos de aval externo.
+
+Esta entrega cierra el defecto documental descrito y deja el alcance integrado verificable. No declara listo el experto integral mientras permanezcan los dos componentes anteriores.

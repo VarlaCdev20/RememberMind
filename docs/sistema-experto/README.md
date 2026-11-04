@@ -1,8 +1,8 @@
 ---
 title: "Sistema experto: fuentes, funcionamiento y límites"
 status: CURRENT
-version: "3.23"
-last_reviewed: 2026-10-31
+version: "3.24"
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
 source_of_truth_scope: [expert_contract_routing]
@@ -22,7 +22,7 @@ Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años,
 | Necesito encontrar… | Abrir |
 |---|---|
 | Matriz actual: qué dato alimenta cada instrumento/regla, qué resultado permite y qué debe guardarse | [Matriz única de trazabilidad, perfiles exactos, brechas y conservación/4FN](MATRIZ_TRAZABILIDAD_DCL.md) |
-| Cierre técnico actual: lectura consistente, Enfermería, reglas y depuración | [Entregable único actualizado: correcciones, pruebas y pendientes precisos](ENTREGABLE_REGLAS_Y_DEPURACION_2026_10_31.md) |
+| Cierre técnico actual: documentos Petersen, lectura consistente, Enfermería, reglas y depuración | [Entregable único actualizado al04/11: correcciones, pruebas y pendientes precisos](ENTREGABLE_REGLAS_Y_DEPURACION_2026_10_31.md) |
 | Cierre técnico actual con relaciones y permisos conservados; reglas para la siguiente etapa | [Entregable único de correcciones y estado pendiente](ENTREGABLE_CORRECCIONES_TECNICAS_2026_10_31.md) |
 | Entregable único actual: fundamento médico, guía integrada de captura y brechas pendientes | [Entrega del 31/10: fuentes profesionales, plan de faltantes y límites técnicos](ENTREGABLE_INTEGRACION_Y_FUENTES_DCL_2026_10_31.md) |
 | Entrega única de instrumentos iniciales, versiones y perfiles de preparación | [Circuito inicial, conexión a hechos/inferencia y condiciones reales de activación](ENTREGA_INSTRUMENTOS_Y_PERFILES_INICIALES_2026_10_29.md) |

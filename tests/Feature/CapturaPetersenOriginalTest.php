@@ -638,12 +638,92 @@ final class CapturaPetersenOriginalTest extends TestCase
         $doc->update(['fecha_hora' => '2027-01-01 09:00:00']);
         $fuera = $lector->preparar($this->usuario, $this->residente, CarbonImmutable::now(), '1.0');
         self::assertSame('DOCUMENTO_ORIGINAL_FUERA_DE_CORTE', $fuera->contenido['salida']['adquisicion']['exclusiones'][0]['motivo']);
-        self::assertTrue($fuera->contenido['constancias_documentales'][0]['verificado']);
+        self::assertFalse($fuera->contenido['constancias_documentales'][0]['verificado']);
         self::assertSame([], $fuera->contenido['valoraciones']);
         Storage::disk('local')->put('cabecera-petersen.txt', 'alterado');
         $alterado = $lector->preparar($this->usuario, $this->residente, CarbonImmutable::now(), '1.0');
         self::assertFalse($alterado->contenido['constancias_documentales'][0]['verificado']);
         self::assertSame($dto->contenido, InstantaneaPetersen::verificar($dto->contenido, $dto->huella)->contenido);
+    }
+
+    public static function documentosNoAdmisibles(): array
+    {
+        $casos = [];
+        foreach (['ORIGINAL', 'SOPORTE'] as $papel) {
+            foreach (['futuro', 'ajeno', 'inactivo'] as $caso) {
+                $casos[$papel.'_'.$caso] = [$papel, $caso];
+            }
+        }
+        $casos['SOPORTE_sin_autor'] = ['SOPORTE', 'sin_autor'];
+        $casos['SOPORTE_atencion_ajena'] = ['SOPORTE', 'atencion_ajena'];
+
+        return $casos;
+    }
+
+    #[DataProvider('documentosNoAdmisibles')]
+    public function test_documento_excluido_no_abre_archivo_privado_y_conserva_motivo(string $papel, string $caso): void
+    {
+        $this->usuario->givePermissionTo(Permission::findOrCreate('documentos_clinicos.ver', 'web'));
+        Storage::fake('local');
+        Storage::disk('local')->put('documento-corte.txt', 'original');
+        $doc = DocumentoClinico::create(['cod_residente' => $this->residente->getKey(),
+            'cod_personal' => $this->usuario->personal->getKey(), 'fecha_hora' => '2026-10-17 09:00:00',
+            'tipo_documento' => 'INFORME', 'titulo' => 'Documento sintético de corte', 'ruta_archivo' => 'documento-corte.txt',
+            'formato' => 'text/plain', 'hash_archivo' => hash('sha256', 'original'), 'estado' => 'VIGENTE']);
+        $entrada = $papel === 'ORIGINAL'
+            ? ['cod_documento_clinico' => $doc->getKey(), 'localizador_fuente' => 'Página 1']
+            : ['soportes' => [['tipo_soporte' => 'DIFERENCIAL', 'cod_documento_clinico' => $doc->getKey()]]];
+        $this->registrar($this->entrada($entrada));
+        $motivo = match ($caso) {
+            'futuro' => 'DOCUMENTO_ORIGINAL_FUERA_DE_CORTE',
+            'sin_autor', 'atencion_ajena' => 'PROCEDENCIA_ORIGINAL_INCOMPATIBLE',
+            'ajeno' => $papel === 'ORIGINAL' ? 'DOCUMENTO_ORIGINAL_NO_VERIFICABLE' : 'SOPORTE_NO_DISPONIBLE_O_INCOMPATIBLE',
+            default => 'DOCUMENTO_ORIGINAL_NO_VERIFICABLE',
+        };
+        if ($caso === 'atencion_ajena') {
+            $area = Area::create(['nombre' => 'Área sintética de procedencia', 'estado' => 'ACTIVA']);
+            $atencion = Atencion::create(['cod_residente' => Residente::factory()->create(['estado' => 'ADMITIDO'])->getKey(),
+                'cod_personal' => $this->usuario->personal->getKey(), 'cod_area' => $area->getKey(),
+                'tipo_atencion' => 'VALORACION', 'fecha_hora' => '2026-10-17 09:00:00', 'estado' => 'FINALIZADA']);
+        }
+        $cambios = match ($caso) {
+            'futuro' => ['fecha_hora' => CarbonImmutable::now()->addMinute()],
+            'ajeno' => ['cod_residente' => Residente::factory()->create(['estado' => 'ADMITIDO'])->getKey()],
+            'sin_autor' => ['cod_personal' => null],
+            'atencion_ajena' => ['cod_atencion' => $atencion->getKey()],
+            default => ['estado' => 'INACTIVO'],
+        };
+        $this->mock(\App\Compartido\Aplicacion\Contratos\ArchivosAplicacion::class, static function ($archivos): void {
+            $archivos->shouldNotReceive('existe');
+            $archivos->shouldNotReceive('hash');
+        });
+        if ($caso === 'atencion_ajena' && DB::getDriverName() === 'pgsql') {
+            // PostgreSQL conserva la FK compuesta: se prueba el rechazo, sin debilitarla para llegar al lector.
+            try {
+                $doc->update($cambios);
+                self::fail('La FK debe impedir atribuir el documento a una atención ajena.');
+            } catch (QueryException $ex) {
+                self::assertSame('23503', $ex->getCode());
+            }
+            self::assertNull($doc->fresh()->cod_atencion);
+            self::assertDatabaseCount('valoraciones_petersen_originales', 1);
+            self::assertDatabaseCount('evaluaciones_expertas', 0);
+
+            return;
+        }
+        $doc->update($cambios);
+        $dto = app(ConsultarPetersenInstitucional::class)->preparar($this->usuario, $this->residente, CarbonImmutable::now(), '1.0');
+        self::assertContains($motivo, array_column($dto->contenido['adquisicion']['exclusiones'], 'motivo'));
+        self::assertSame([], $dto->contenido['valoraciones']);
+        self::assertFalse($dto->contenido['constancias_documentales'][0]['verificado']);
+        self::assertSame($papel, $dto->contenido['constancias_documentales'][0]['papel']);
+        if ($caso === 'ajeno') {
+            self::assertNull($dto->contenido['constancias_documentales'][0]['cod_residente']);
+            self::assertNull($dto->contenido['constancias_documentales'][0]['hash_archivo']);
+        }
+        self::assertStringNotContainsString('ruta_archivo', serialize($dto->contenido));
+        self::assertSame($dto->contenido, InstantaneaPetersen::verificar($dto->contenido, $dto->huella)->contenido);
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
     }
 
     /** Recorre SQL → captura → juicios → cuatro patrones; sin sembrar una clasificación esperada. */
