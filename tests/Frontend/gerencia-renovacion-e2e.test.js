@@ -96,6 +96,55 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
         rutas.push(['documentacion','/admin/personal-documentacion']);
     }
     const evidencia=[];
+    if (process.env.RM_GERENCIA_QA_PERSONAL) {
+        const personalOut = join(out, 'personal-unificado'); mkdirSync(personalOut, {recursive:true});
+        for (const width of [1440,1280,1024,768,390]) {
+            await page.setViewport({width,height:960});
+            await go('/admin/personal-institucional');
+            const filas = await page.$$eval('.rm-staff-directory__table tbody tr', rows => rows.length);
+            assert.ok(filas > 0);
+            for (const mode of ['tabla','tarjetas']) {
+                const actualizacion = page.waitForResponse(r=>r.request().method()==='POST' && new URL(r.url()).pathname.endsWith('/update'));
+                await page.click(`button[wire\\:click="cambiarVistaListadoResumen('${mode}')"]`);
+                await actualizacion;
+                await page.waitForSelector(mode === 'tabla' ? '.rm-staff-directory__table' : '.rm-staff-directory__cards [data-entity="personal"]');
+                const medidas = await page.evaluate(() => ({
+                    overflow:document.documentElement.scrollWidth>innerWidth+1,
+                    prohibidos:/\b(?:undefined|NaN|Infinity|null)\b|\[object Object\]/.test(document.querySelector('main').innerText),
+                    tarjetas:document.querySelectorAll('.rm-staff-directory__cards [data-entity="personal"]').length,
+                    fuentes:[...document.querySelectorAll('.rm-staff-directory button')].filter(e=>e.getClientRects().length).every(e=>e.getBoundingClientRect().height>=43),
+                    controlesPequenos:[...document.querySelectorAll('.rm-staff-directory button')].filter(e=>e.getClientRects().length && e.getBoundingClientRect().height<43).map(e=>({texto:e.getAttribute('aria-label')||e.textContent.trim(),alto:e.getBoundingClientRect().height,minimo:getComputedStyle(e).minHeight})),
+                    celdasContenidas:[...document.querySelectorAll('.rm-staff-directory__table tbody tr')].every(row=>[...row.cells].every(cell=>cell.getBoundingClientRect().bottom<=row.getBoundingClientRect().bottom+1)),
+                }));
+                assert.equal(medidas.overflow,false,`${mode} ${width}: sin scroll horizontal`);
+                assert.equal(medidas.prohibidos,false);
+                assert.equal(medidas.fuentes,true,`${mode} ${width}: controles táctiles ${JSON.stringify(medidas.controlesPequenos)}`);
+                assert.equal(medidas.celdasContenidas,true,`${mode} ${width}: filas sin superposición vertical`);
+                if(mode==='tarjetas') assert.equal(medidas.tarjetas,filas);
+                const trigger = '.rm-staff-directory__actions button[aria-expanded]';
+                await page.click(trigger);
+                await page.waitForSelector('.rm-staff-directory__menu',{visible:true});
+                assert.ok(await page.$eval('.rm-staff-directory__menu', e=>e.getBoundingClientRect().left>=0 && e.getBoundingClientRect().right<=innerWidth+1));
+                await page.keyboard.press('Escape');
+                await page.waitForFunction(selector=>document.querySelector(selector)?.getAttribute('aria-expanded')==='false',{},trigger);
+                assert.equal(await page.$eval(trigger,e=>e===document.activeElement),true);
+                await page.evaluate(()=>{window.scrollTo(0,0);document.querySelectorAll('main,[data-rm-main]').forEach(e=>e.scrollTop=0);});
+                await page.screenshot({path:join(personalOut,`${mode}-${width}.png`),fullPage:true});
+                evidencia.push({width,mode,...medidas,menuYFoco:true});
+            }
+        }
+        await page.type('#gerencia-personal-buscar','sin-coincidencia-qa');
+        await page.waitForFunction(()=>document.querySelector('main').innerText.includes('Sin coincidencias'));
+        await page.click('button[wire\\:click="limpiarFiltrosResumen"]');
+        await page.waitForSelector('.rm-staff-directory__cards [data-entity="personal"]');
+        await page.screenshot({path:join(personalOut,'tarjetas-390-final.png'),fullPage:true});
+        await page.evaluate(()=>{document.documentElement.classList.add('dark');document.documentElement.setAttribute('data-theme','dark');});
+        assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'Tarjetas en modo oscuro sin desbordamiento');
+        await page.screenshot({path:join(personalOut,'tarjetas-390-oscuro.png'),fullPage:true});
+        assert.deepEqual(errors,[]); assert.deepEqual(solicitudesFallidas,[]);
+        writeFileSync(join(personalOut,'resultado.json'),JSON.stringify({evidencia,filtros:true,oscuro390:true,errors,solicitudesFallidas},null,2));
+        return;
+    }
     if (process.env.RM_GERENCIA_QA_CORRECCION) {
         const etapa = nombre => writeFileSync(join(out, 'etapa.json'), JSON.stringify({ etapa: nombre }));
         etapa('preparar dos pestañas');

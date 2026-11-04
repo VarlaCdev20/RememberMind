@@ -1,4 +1,4 @@
-@props(['name', 'photo' => null, 'age' => null, 'code', 'initials' => null, 'mode' => 'card', 'selectMethod' => null, 'primaryHref' => null])
+@props(['name', 'photo' => null, 'age' => null, 'code', 'initials' => null, 'mode' => 'card', 'selectMethod' => null, 'primaryHref' => null, 'secondary' => null])
 @php
     $visibleName = \Illuminate\Support\Str::title(mb_strtolower($name));
     $nameParts = preg_split('/\s+/u', trim($visibleName)) ?: [];
@@ -26,13 +26,13 @@
         @if($primaryHref)<a href="{{ $primaryHref }}" class="rm-resident-directory__name">{{ $visibleName }}</a>
         @elseif($selectMethod)<button type="button" wire:click="{{ $selectMethod }}('{{ $code }}')" class="rm-resident-directory__name">{{ $visibleName }}</button>
         @else<strong class="rm-resident-directory__name">{{ $visibleName }}</strong>@endif
-        <span class="rm-resident-compact-card__age">{{ $age !== null ? $age.' años' : 'Edad no registrada' }}</span>
+        <span class="rm-resident-compact-card__age">{{ $secondary ?? ($age !== null ? $age.' años' : 'Edad no registrada') }}</span>
     @else
         <div class="rm-resident-directory__name-wrap">
             @if($primaryHref)<a href="{{ $primaryHref }}" class="rm-resident-directory__name">{{ $visibleName }}</a>
             @elseif($selectMethod)<button type="button" wire:click="{{ $selectMethod }}('{{ $code }}')" class="rm-resident-directory__name">{{ $visibleName }}</button>
             @else<strong class="rm-resident-directory__name">{{ $visibleName }}</strong>@endif
-            <span><i class="ph-bold ph-user" aria-hidden="true"></i>{{ $age !== null ? $age.' años' : 'Edad no registrada' }}</span>
+            <span><i class="ph-bold {{ $secondary !== null ? 'ph-envelope-simple' : 'ph-user' }}" aria-hidden="true"></i>{{ $secondary ?? ($age !== null ? $age.' años' : 'Edad no registrada') }}</span>
         </div>
     @endif
 </div>

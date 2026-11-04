@@ -5,6 +5,7 @@
     'primaryLabel' => 'Ver resumen', 'selectMethod' => null, 'primaryHref' => null,
     'contextLabel' => null, 'contextValue' => null, 'contextTime' => null,
     'alertCount' => null, 'statusLabel' => null, 'statusTone' => 'slate',
+    'secondary' => null, 'entity' => 'resident',
 ])
 @php
     $code ??= $resident?->cod_residente;
@@ -32,18 +33,19 @@
         default => 'superadmin',
     };
 @endphp
-<x-ui.person-entity-card wire:key="resident-card-{{ $mode }}-{{ $code }}" {{ $attributes->class([
+<x-ui.person-entity-card :entity="$entity" wire:key="resident-card-{{ $mode }}-{{ $code }}" {{ $attributes->class([
     'rm-resident-directory__item', 'rm-resident-directory__item--'.$mode,
     'rm-resident-compact-card' => $mode === 'card', 'is-selected' => $selected,
 ]) }} role="listitem" data-role="{{ $roleTone ?? '' }}" data-variant="{{ $variant }}" x-data="{ open: false }" ::class="{ 'has-open-menu': open }">
     @if($mode === 'row' && $statusLabel)
         <span class="rm-resident-directory__status rm-resident-directory__status--{{ $statusTone }}"><i class="ph-bold {{ $statusTone === 'red' ? 'ph-warning-circle' : ($statusTone === 'amber' ? 'ph-heartbeat' : 'ph-shield-check') }}" aria-hidden="true"></i>{{ $statusLabel }}</span>
     @endif
-    <x-ui.resident-card-identity :name="$name" :photo="$photo" :age="$age" :code="$code" :initials="$initials" :mode="$mode" :select-method="$selectMethod" :primary-href="$primaryHref" />
+    <x-ui.resident-card-identity :name="$name" :photo="$photo" :age="$age" :code="$code" :initials="$initials" :mode="$mode" :select-method="$selectMethod" :primary-href="$primaryHref" :secondary="$secondary" />
     @if(isset($status))
         <div class="rm-resident-card__status">{{ $status }}</div>
     @endif
     @if($mode === 'card')
+        @if($showLocation || $contextLabel || $alertCount !== null || isset($details))
         <div class="rm-resident-compact-card__facts">
             @if($showLocation)<p><i class="ph-bold ph-bed" aria-hidden="true"></i><span>{{ $location }}</span></p>@endif
             @if($contextLabel)
@@ -54,15 +56,20 @@
                 {{ $details }}
             @endif
         </div>
+        @endif
         @if(isset($footerNote))
             <div class="rm-resident-card__footer-note">{{ $footerNote }}</div>
         @endif
         <div class="rm-resident-compact-card__footer" @if($hasMenu) @keydown.escape.stop="if (open) { open = false; $refs.more.focus() }" @endif>
+            @if(isset($actions))
+                {{ $actions }}
+            @else
             @if($primaryHref)<a href="{{ $primaryHref }}" class="rm-resident-directory__open">{{ $primaryLabel }} <i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a>
             @elseif($selectMethod)<button type="button" wire:click="{{ $selectMethod }}('{{ $code }}')" class="rm-resident-directory__open" aria-label="{{ $primaryLabel }} de {{ $name }}">{{ $primaryLabel }} <i class="ph-bold ph-arrow-right" aria-hidden="true"></i></button>@endif
             @if($hasMenu)
                 <button type="button" x-ref="more" class="rm-resident-compact-card__more" :class="{ 'is-open': open }" @click="open = !open; if (open) $nextTick(() => $refs.menu.querySelector('a, button')?.focus())" :aria-expanded="open.toString()" aria-controls="resident-actions-{{ $code }}" aria-label="Más acciones para {{ $name }}" aria-haspopup="true"><i class="ph-bold ph-dots-three" aria-hidden="true"></i></button>
                 <div id="resident-actions-{{ $code }}" x-ref="menu" class="rm-resident-compact-card__menu" x-show="open" x-cloak x-transition.opacity.duration.150ms @click.outside="open = false" role="group" aria-label="Acciones para {{ $name }}">{{ $menu }}</div>
+            @endif
             @endif
         </div>
     @else

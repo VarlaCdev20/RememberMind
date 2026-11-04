@@ -1,34 +1,68 @@
-<div class="rm-management-workspace space-y-4">
-    <x-ui.collection-header title="Personal" subtitle="Trabajadores, datos laborales y cuentas de acceso autorizadas" icon="ph-identification-badge"><x-slot:actions><a class="rm-btn-secondary" href="{{ route('admin.personal.documentacion') }}">Documentación laboral</a>@can('personal.gestionar')<button class="rm-btn-primary" type="button" wire:click="abrirModalNuevo" wire:loading.attr="disabled"><i class="ph-bold ph-user-plus" aria-hidden="true"></i> Registrar trabajador</button>@endcan</x-slot:actions></x-ui.collection-header>
-    <x-ui.filter-bar>
-        <div class="rm-management-tabs">
+<div class="rm-management-workspace rm-staff-directory space-y-4">
+    <x-ui.collection-header title="Personal" subtitle="Equipo institucional, documentación y acceso" icon="ph-identification-badge" class="rm-staff-directory__heading">
+        <x-slot:actions>
+            <a class="rm-btn rm-btn-secondary" href="{{ route('admin.personal.documentacion') }}"><i class="ph-bold ph-files" aria-hidden="true"></i> Documentación laboral</a>
+            @can('personal.gestionar')<x-ui.action-button wire:click="abrirModalNuevo" icono="ph-user-plus" loading="abrirModalNuevo">Registrar trabajador</x-ui.action-button>@endcan
+        </x-slot:actions>
+    </x-ui.collection-header>
+    @error('recuperacion')<p role="alert" class="rm-alert rm-alert-danger">{{ $message }}</p>@enderror
+    <x-ui.section-card title="Equipo institucional" icon="ph-users-three" :count="$personalResumenTotal" class="rm-staff-directory__panel">
+        <x-slot:actions>
+            <x-ui.collection-view-switch mode="livewire" change-method="cambiarVistaListadoResumen" :value="$vistaListadoResumen" label="Presentación del personal"
+                :options="[['value'=>'tabla','label'=>'Tabla','icon'=>'ph-table'],['value'=>'tarjetas','label'=>'Tarjetas','icon'=>'ph-squares-four']]" />
+        </x-slot:actions>
+        <x-ui.filter-bar class="rm-staff-directory__filters">
             <x-ui.field label="Buscar trabajador" for="gerencia-personal-buscar"><input id="gerencia-personal-buscar" class="rm-input" type="search" wire:model.live.debounce.300ms="busquedaResumen" placeholder="Nombre o correo"></x-ui.field>
             <x-ui.field label="Estado de acceso" for="gerencia-personal-estado"><select id="gerencia-personal-estado" class="rm-input" wire:model.live="estadoResumen"><option value="">Todos</option><option value="activo">Activo</option><option value="inactivo">Inactivo</option><option value="suspendido">Suspendido</option></select></x-ui.field>
-            <button type="button" class="rm-btn-secondary" wire:click="limpiarFiltrosResumen">Limpiar</button>
-        </div>
-    </x-ui.filter-bar>
-    <p class="rm-help">{{ $personalResumenTotal }} registros. Estado laboral y acceso a la cuenta se conservan por separado.</p>
-    @error('recuperacion')<p role="alert" class="rm-alert rm-alert-danger">{{ $message }}</p>@enderror
-    <nav class="rm-management-tabs" aria-label="Presentación del personal">
-        @foreach(['tabla'=>'Tabla','tarjetas'=>'Tarjetas'] as $modo=>$etiqueta)<button type="button" class="{{ $vistaListadoResumen === $modo ? 'rm-btn-primary' : 'rm-btn-secondary' }}" wire:click="cambiarVistaListadoResumen('{{ $modo }}')" aria-pressed="{{ $vistaListadoResumen === $modo ? 'true' : 'false' }}">{{ $etiqueta }}</button>@endforeach
-    </nav>
-    <x-ui.section-card title="Equipo institucional" icon="ph-users-three">
-        @if($personalResumen->isEmpty())<x-ui.empty-state titulo="Sin coincidencias" texto="Prueba otra búsqueda o filtro." icono="ph-users" />@else
-        @if($vistaListadoResumen === 'tarjetas')
-        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        @foreach($personalResumen as $usuario)
-            <x-ui.person-entity-card entity="personal" class="rm-card p-4 space-y-3">
-                <h3 class="rm-section-title">{{ mb_convert_case(mb_strtolower($usuario->name), MB_CASE_TITLE, 'UTF-8') }}</h3><p class="rm-help break-words">{{ $usuario->correo }}</p>
-                <dl class="rm-management-context"><div><dt>Función</dt><dd>{{ $usuario->personal?->profesion ?: 'Sin ficha laboral' }}</dd></div><div><dt>Estado laboral</dt><dd>{{ $usuario->personal?->estado ?: 'Sin registrar' }}</dd></div><div><dt>Acceso a la cuenta</dt><dd>{{ $usuario->estado }}</dd></div></dl>
-                @include('identidad::livewire.identidad.personal-institucional-panel.gerencia-acciones')
-            </x-ui.person-entity-card>
-        @endforeach
-        </div>
+            <x-ui.action-button variant="ghost" wire:click="limpiarFiltrosResumen" icono="ph-arrow-counter-clockwise">Limpiar</x-ui.action-button>
+        </x-ui.filter-bar>
+        <p class="rm-help rm-staff-directory__context">El estado laboral y el acceso a la cuenta son independientes.</p>
+        <div wire:loading.delay wire:target="busquedaResumen,estadoResumen,cambiarVistaListadoResumen,limpiarFiltrosResumen" class="rm-help" role="status">Actualizando personal…</div>
+        @if($personalResumen->isEmpty())
+            <x-ui.empty-state titulo="Sin coincidencias" texto="Prueba otra búsqueda o limpia los filtros para ver el equipo." icono="ph-users" />
+        @elseif($vistaListadoResumen === 'tarjetas')
+            <div class="rm-staff-directory__cards" role="list">
+                @foreach($personalResumen as $usuario)
+                    @php
+                        $nombre = mb_convert_case(mb_strtolower($usuario->name, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+                        $funcion = $usuario->personal?->profesion;
+                    @endphp
+                    <x-ui.resident-card entity="personal" :name="$nombre" :code="$usuario->getKey()" :secondary="$usuario->correo" :show-location="false" variant="inherit" class="rm-staff-directory__card">
+                        <x-slot:status>
+                        <p class="rm-staff-directory__profession">{{ $funcion ? \Illuminate\Support\Str::headline(mb_strtolower($funcion, 'UTF-8')) : 'Sin ficha laboral' }}</p>
+                        <dl class="rm-staff-directory__states">
+                            <div><dt>Estado laboral</dt><dd><x-ui.status-badge :estado="$usuario->personal?->estado ?? ''" :label="$usuario->personal ? null : 'Sin registrar'" /></dd></div>
+                            <div><dt>Acceso</dt><dd><x-ui.status-badge :estado="$usuario->estado" /></dd></div>
+                        </dl>
+                        </x-slot:status>
+                        <x-slot:actions>@include('identidad::livewire.identidad.personal-institucional-panel.gerencia-acciones')</x-slot:actions>
+                    </x-ui.resident-card>
+                @endforeach
+            </div>
         @else
-        <div class="rm-table-scroll"><table class="rm-table"><caption class="sr-only">Personal institucional y acceso</caption><thead><tr><th scope="col">Trabajador</th><th scope="col">Función</th><th scope="col">Estado laboral</th><th scope="col">Acceso</th><th scope="col">Acciones</th></tr></thead><tbody>@foreach($personalResumen as $usuario)<tr><th scope="row"><strong>{{ mb_convert_case(mb_strtolower($usuario->name), MB_CASE_TITLE, 'UTF-8') }}</strong><small class="block">{{ $usuario->correo }}</small></th><td>{{ $usuario->personal?->profesion ?: 'Sin ficha laboral' }}</td><td>{{ $usuario->personal?->estado ?: 'Sin registrar' }}</td><td>{{ $usuario->estado }}</td><td>@include('identidad::livewire.identidad.personal-institucional-panel.gerencia-acciones')</td></tr>@endforeach</tbody></table></div>
+            <div class="rm-staff-directory__table-wrap">
+                <table class="rm-table rm-staff-directory__table" role="table">
+                    <caption class="sr-only">Personal institucional y acceso</caption>
+                    <thead><tr><th scope="col">Trabajador</th><th scope="col">Función</th><th scope="col">Estado laboral</th><th scope="col">Acceso</th><th scope="col">Acciones</th></tr></thead>
+                    <tbody>
+                        @foreach($personalResumen as $usuario)
+                            @php
+                                $nombre = mb_convert_case(mb_strtolower($usuario->name, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+                                $funcion = $usuario->personal?->profesion;
+                            @endphp
+                            <tr wire:key="personal-row-{{ $usuario->getKey() }}">
+                                <td data-label="Trabajador"><x-ui.resident-card-identity :name="$nombre" :code="$usuario->getKey()" :secondary="$usuario->correo" mode="row" /></td>
+                                <td data-label="Función">{{ $funcion ? \Illuminate\Support\Str::headline(mb_strtolower($funcion, 'UTF-8')) : 'Sin ficha laboral' }}</td>
+                                <td data-label="Estado laboral"><x-ui.status-badge :estado="$usuario->personal?->estado ?? ''" :label="$usuario->personal ? null : 'Sin registrar'" /></td>
+                                <td data-label="Acceso"><x-ui.status-badge :estado="$usuario->estado" /></td>
+                                <td data-label="Acciones">@include('identidad::livewire.identidad.personal-institucional-panel.gerencia-acciones')</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         @endif
-        <x-ui.paginacion :paginator="$personalResumen" mode="livewire" label="trabajadores" />
-        @endif
+        @if($personalResumen->isNotEmpty())<x-ui.paginacion :paginator="$personalResumen" mode="livewire" label="trabajadores" />@endif
     </x-ui.section-card>
     @include('livewire.identidad.personal-institucional-panel.modales.gestion')
     @if($modalLaboral)
