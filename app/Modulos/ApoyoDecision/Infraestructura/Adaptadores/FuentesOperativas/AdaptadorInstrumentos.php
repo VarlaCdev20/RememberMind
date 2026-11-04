@@ -18,28 +18,7 @@ use DomainException;
 use Illuminate\Database\Eloquent\Collection;
 use RuntimeException;
 
-/**
- * TÍTULO:
- * Adaptador de evaluaciones instrumentales.
- *
- * CAPA:
- * Infrastructure - Adapters.
- *
- * ¿PARA QUÉ SIRVE?
- * Recupera datos brutos autorizados sin interpretación clínica.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * Aplicaciones sintéticas y selectores de respuesta registrados por versión del conocimiento.
- *
- * ¿QUÉ HACE?
- * Recupera instrumento/versión, preguntas, respuestas y opciones; comprueba sus FK.
- *
- * ¿QUÉ DEVUELVE?
- * Valores escalares brutos y procedencia consultable, con NULL intacto.
- *
- * ¿QUÉ NO DEBE HACER?
- * No calcula baremos, interpreta totales como dominios ni transforma respuestas en diagnósticos.
- */
+/** Recupera aplicaciones y respuestas originales con sus vínculos verificados. */
 final readonly class AdaptadorInstrumentos
 {
     /** Modelo existente del contrato físico. */
@@ -64,15 +43,13 @@ final readonly class AdaptadorInstrumentos
     private const CAMPOS_RESPUESTA = ['valor_numero' => 'decimal', 'valor_texto' => 'texto', 'valor_logico' => 'booleano',
         'puntaje' => 'decimal', 'cod_opcion' => 'texto'];
 
-    /** @var array<string, array<string, array{instrumento: string, version: string, pregunta: string, campo: string}>> Copia del contrato técnico por versión y selector. */
+    /** @var array<string, array<string, array{instrumento: string, version: string, pregunta: string, campo: string}>> */
     private array $selectores;
 
     /**
      * Registra selectores explícitos; vacío solo habilita columnas brutas directas.
-     *
-     * @param  array<string, array<string, array{instrumento: string, version: string, pregunta: string, campo: string}>>  $selectoresPorVersion  PK de instrumento/pregunta, versión formal y columna exactas.
-     *
-     * @throws DomainException Por contrato incompleto, selector inválido o campo no soportado.
+     * @param array<string, array<string, array{instrumento: string, version: string, pregunta: string, campo: string}>> $selectoresPorVersion
+     * @throws DomainException
      */
     public function __construct(array $selectoresPorVersion = [])
     {
@@ -106,16 +83,14 @@ final readonly class AdaptadorInstrumentos
 
     /**
      * Recupera aplicaciones y dependencias por lotes, sin leer reactivos protegidos.
-     *
-     * @param  EvaluacionExperta  $evaluacion  Contexto experimental exacto.
-     * @param  list<string>  $ids  PK de aplicaciones originales.
-     * @param  DateTimeImmutable  $corte  Corte clínico inclusivo.
-     * @param  string  $conexion  Destino técnico segregado.
-     * @param  DateTimeZone  $zona  Zona SQL explícita.
-     * @return Collection<int, AplicacionInstrumento> Instrumento y respuestas cargados para aplicaciones hasta el corte; posteriores solo metadatos.
-     *
-     * @throws DomainException Por contexto, estado, fecha o FK incoherentes.
-     * @throws RuntimeException Por origen o dependencia inexistente.
+     * @param EvaluacionExperta $evaluacion
+     * @param list<string> $ids
+     * @param DateTimeImmutable $corte
+     * @param string $conexion
+     * @param DateTimeZone $zona
+     * @return Collection<int, AplicacionInstrumento>
+     * @throws DomainException
+     * @throws RuntimeException
      */
     public function recuperar(EvaluacionExperta $evaluacion, array $ids, DateTimeImmutable $corte, string $conexion, DateTimeZone $zona): Collection
     {
@@ -166,11 +141,9 @@ final readonly class AdaptadorInstrumentos
 
     /**
      * Rechaza campos y selectores no registrados antes de leer aplicaciones.
-     *
-     * @param  MapeoVariableFuente  $mapeo  Contrato persistido.
-     * @return void No interpreta puntajes ni crea correspondencias.
-     *
-     * @throws DomainException Por modo/campo/selector no soportados.
+     * @param MapeoVariableFuente $mapeo
+     * @return void
+     * @throws DomainException
      */
     public function validarMapeo(MapeoVariableFuente $mapeo): void
     {
@@ -183,13 +156,11 @@ final readonly class AdaptadorInstrumentos
 
     /**
      * Conserva un total bruto o una columna de una respuesta original.
-     *
-     * @param  AplicacionInstrumento  $origen  Aplicación con instrumento/respuestas precargados.
-     * @param  MapeoVariableFuente  $mapeo  Campo directo o selector de la versión exacta.
-     * @return string|int|float|bool|null Valor original; una respuesta existente con NULL continúa NULL.
-     *
-     * @throws DomainException Por versión formal desconocida/incompatible o referencia incoherente.
-     * @throws RuntimeException Por respuesta requerida ausente; no se fabrica un valor normal.
+     * @param AplicacionInstrumento $origen
+     * @param MapeoVariableFuente $mapeo
+     * @return string|int|float|bool|null
+     * @throws DomainException
+     * @throws RuntimeException
      */
     public function extraer(AplicacionInstrumento $origen, MapeoVariableFuente $mapeo): string|int|float|bool|null
     {
@@ -223,11 +194,9 @@ final readonly class AdaptadorInstrumentos
 
     /**
      * Conserva la versión formal y las PK sin interpretar su contenido.
-     *
-     * @param  AplicacionInstrumento  $origen  Aplicación con instrumento/respuestas materializados.
-     * @return array{aplicacion: string, instrumento: string, version: string|null, respuestas: list<array{respuesta: string, pregunta: string, opcion: string|null}>} Referencias originales, sin textos de reactivos.
-     *
-     * @throws DomainException Por relaciones faltantes o versión de tipo inválido.
+     * @param AplicacionInstrumento $origen
+     * @return array{aplicacion: string, instrumento: string, version: string|null, respuestas: list<array{respuesta: string, pregunta: string, opcion: string|null}>}
+     * @throws DomainException
      */
     public function procedencia(AplicacionInstrumento $origen): array
     {
@@ -252,11 +221,9 @@ final readonly class AdaptadorInstrumentos
 
     /**
      * Un total nunca se promueve a evidencia de un dominio específico.
-     *
-     * @param  MapeoVariableFuente  $mapeo  Contrato de extracción explícito.
-     * @return string HECHO para campos directos; descriptor cognitivo solo para un selector con propietario documentado.
-     *
-     * @throws DomainException Por propietario primario incoherente.
+     * @param MapeoVariableFuente $mapeo
+     * @return string
+     * @throws DomainException
      */
     public function tipo(MapeoVariableFuente $mapeo): string
     {
@@ -266,11 +233,9 @@ final readonly class AdaptadorInstrumentos
 
     /**
      * Localiza un selector sin reutilizarlo en otra versión del conocimiento.
-     *
-     * @param  MapeoVariableFuente  $mapeo  Mapeo persistido.
-     * @return array{instrumento: string, version: string, pregunta: string, campo: string} Contrato técnico literal.
-     *
-     * @throws DomainException Por selector no registrado, modo no soportado o campo incompatible.
+     * @param MapeoVariableFuente $mapeo
+     * @return array{instrumento: string, version: string, pregunta: string, campo: string}
+     * @throws DomainException
      */
     private function selector(MapeoVariableFuente $mapeo): array
     {

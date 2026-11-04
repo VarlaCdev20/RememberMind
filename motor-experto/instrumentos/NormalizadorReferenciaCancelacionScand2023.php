@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace MotorExperto\instrumentos;
 
-/**
- * Eficiencia en cancelación P/W de SCAND: cálculo original y tablas 7–8.
- * Consulta celdas publicadas; no inventa la conversión fuera del soporte observado.
- * La tarea no es Ruff, cancelación A ni una segunda evidencia de atención sostenida.
- */
+/** Eficiencia en cancelación P/W de SCAND: cálculo original y tablas 7–8. */
 final class NormalizadorReferenciaCancelacionScand2023
 {
     public const METODO = 'LC-PW-ES-SCAND-2023-EFICIENCIA';

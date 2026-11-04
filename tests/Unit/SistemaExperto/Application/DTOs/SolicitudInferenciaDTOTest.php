@@ -14,19 +14,13 @@ use PHPUnit\Framework\TestCase;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 use TypeError;
 
-/**
- * TÍTULO: Contrato de solicitud experimental.
- * CAPA: Application (pruebas unitarias).
- * ¿PARA QUÉ SIRVE? Comprueba identidades, modo sintético y contexto temporal.
- * ¿QUÉ RECIBE? Solicitudes y memorias ficticias, sin datos personales.
- * ¿QUÉ HACE? Construye el DTO y contrasta casos válidos e incompatibles.
- * ¿QUÉ DEVUELVE? Aserciones de conservación y rechazo.
- * ¿QUÉ NO DEBE HACER? No ejecuta inferencia, Laravel ni persistencia.
- * RELACIÓN CON O.R.I.O.N.: Reglamento de Application, DTO 01 y etapa B.
- */
+/** Comprueba identidades, modo sintético y contexto temporal. */
 final class SolicitudInferenciaDTOTest extends TestCase
 {
-    /** Conserva la petición original; sin parámetros ni excepciones esperadas. @return void */
+    /**
+ * Conserva la petición original
+ * @return void
+ */
     public function test_conserva_identidades_fecha_version_y_modo(): void
     {
         $fecha = F::fecha();
@@ -43,11 +37,9 @@ final class SolicitudInferenciaDTOTest extends TestCase
 
     /**
      * Rechaza entradas que no identifican inequívocamente una simulación.
-     *
-     * @param  string  $campo  Parámetro alterado.
-     * @param  string  $valor  Valor artificial inválido.
-     *
-     * @throws DomainException Rechazo esperado, sin normalizar el valor.
+     * @param string $campo
+     * @param string $valor
+     * @throws DomainException
      */
     #[DataProvider('identidadesInvalidas')]
     public function test_rechaza_identidades_y_modos_invalidos(string $campo, string $valor): void
@@ -58,9 +50,7 @@ final class SolicitudInferenciaDTOTest extends TestCase
 
     /**
      * Proporciona límites de identidad y los modos expresamente excluidos.
-     *
-     * @return iterable<string, array{string, string}> Parámetros inválidos.
-     *                                                 Sin parámetros ni excepciones.
+     * @return iterable<string, array{string, string}>
      */
     public static function identidadesInvalidas(): iterable
     {
@@ -79,10 +69,8 @@ final class SolicitudInferenciaDTOTest extends TestCase
 
     /**
      * Rechaza cadenas y fechas mutables; no analiza fechas ambiguas dentro del DTO.
-     *
-     * @param  mixed  $fecha  Entrada con tipo incompatible.
-     *
-     * @throws TypeError Rechazo exigido por DateTimeImmutable.
+     * @param mixed $fecha
+     * @throws TypeError
      */
     #[DataProvider('fechasInvalidas')]
     public function test_fecha_debe_ser_un_instante_inmutable(mixed $fecha): void
@@ -91,7 +79,7 @@ final class SolicitudInferenciaDTOTest extends TestCase
         self::solicitud(['fechaCorte' => $fecha]);
     }
 
-    /** @return iterable<string, array{mixed}> Fechas inválidas; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{mixed}> */
     public static function fechasInvalidas(): iterable
     {
         yield 'cadena inválida' => ['fecha-inexistente'];
@@ -101,11 +89,9 @@ final class SolicitudInferenciaDTOTest extends TestCase
 
     /**
      * Contrasta cada dimensión del contexto sin reconstruir hechos.
-     *
-     * @param  string  $campo  Dimensión alterada de la memoria.
-     * @param  string|DateTimeImmutable  $valor  Valor ajeno a la solicitud.
-     *
-     * @throws DomainException Rechazo esperado antes de transportar la memoria.
+     * @param string $campo
+     * @param string|DateTimeImmutable $valor
+     * @throws DomainException
      */
     #[DataProvider('contextosAjenos')]
     public function test_memoria_debe_coincidir_con_todo_el_contexto(string $campo, string|DateTimeImmutable $valor): void
@@ -120,7 +106,7 @@ final class SolicitudInferenciaDTOTest extends TestCase
         $solicitud->exigirContexto($memoria);
     }
 
-    /** @return iterable<string, array{string, string|DateTimeImmutable}> Contextos ajenos; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string, string|DateTimeImmutable}> */
     public static function contextosAjenos(): iterable
     {
         yield 'evaluación' => ['evaluacionId', 'SIM-OTRA'];
@@ -129,7 +115,10 @@ final class SolicitudInferenciaDTOTest extends TestCase
         yield 'corte posterior' => ['fechaCorte', F::fecha()->modify('+1 second')];
     }
 
-    /** Admite el mismo instante en otra zona; sin parámetros ni excepciones esperadas. @return void */
+    /**
+ * Admite el mismo instante en otra zona
+ * @return void
+ */
     public function test_contexto_compara_instantes_y_no_cadenas_de_zona(): void
     {
         $solicitud = self::solicitud(['fechaCorte' => new DateTimeImmutable('2026-10-17T16:00:00+00:00')]);
@@ -140,11 +129,9 @@ final class SolicitudInferenciaDTOTest extends TestCase
 
     /**
      * Construye una solicitud ficticia con cambios controlados para negativos.
-     *
-     * @param  array<string, mixed>  $cambios  Parámetros nombrados a sustituir.
-     * @return SolicitudInferenciaDTO Solicitud real del contrato.
-     *
-     * @throws DomainException|TypeError Cuando el cambio reproduce una entrada inválida.
+     * @param array<string, mixed> $cambios
+     * @return SolicitudInferenciaDTO
+     * @throws DomainException|TypeError
      */
     private static function solicitud(array $cambios = []): SolicitudInferenciaDTO
     {

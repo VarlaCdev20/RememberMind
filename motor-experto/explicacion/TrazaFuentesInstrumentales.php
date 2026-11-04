@@ -7,11 +7,7 @@ namespace MotorExperto\explicacion;
 use MotorExperto\hechos\MemoriaTrabajo;
 use MotorExperto\hechos\EvidenciaExperta;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Procedencia de la explicación instrumental.
- * Completa la traza declarativa con los originales verificados, incluidos los no disponibles.
- * Preserva microsegundos y no modifica el formato del contrato histórico COG-MEM.
- */
+/** Vincula la explicación con los originales verificados y sus fechas exactas. */
 final class TrazaFuentesInstrumentales
 {
     public function completar(array $traza, MemoriaTrabajo $memoria): array

@@ -17,41 +17,15 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 use PHPUnit\Framework\TestCase;
 
-/**
- * TÍTULO: Resultados candidatos y abstenciones con requisitos explícitos.
- *
- * CAPA: Domain (verificación unitaria).
- *
- * SUBSISTEMA: Funcionalidad y clasificación experimental.
- *
- * RESPONSABILIDAD:
- * Verificar las precondiciones de los objetos, sin ejecutar clasificación.
- *
- * ENTRADAS:
- * Casos y referencias totalmente ficticios.
- *
- * SALIDAS:
- * Aserciones de conservación y rechazo por invariantes.
- *
- * RESTRICCIONES:
- * No accede a BDD, no inicia Laravel ni acredita evaluación posterior en uso real.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R1–R10; contrato DCL-PET-20261017-v0.1.
- */
+/** Verificar las precondiciones de los objetos, sin ejecutar clasificación. */
 final class DclEntitiesTest extends TestCase
 {
 
     /**
      * Admite cuatro candidatos previamente declarados con distribución compatible.
-     *
-     * No prueba un clasificador: el patrón es entrada explícita del constructor.
-     *
-     * @param list<string> $estados Perfil cognitivo manual.
-     * @param P $patron Patrón candidato declarado.
+     * @param list<string> $estados
+     * @param P $patron
      * @return void
-     *
-     * No se esperan excepciones con los casos ficticios coherentes.
      */
     #[DataProvider('patrones')]
     public function test_cuatro_patrones_declarados_conservan_perfil_y_soportes(array $estados, P $patron): void
@@ -68,10 +42,7 @@ final class DclEntitiesTest extends TestCase
 
     /**
      * Declara los cuatro perfiles de referencia sin puntajes ni instrumentos reales.
-     *
-     * @return iterable<string, array{list<string>, P}> Distribuciones documentales.
-     *
-     * No recibe parámetros ni lanza excepciones.
+     * @return iterable<string, array{list<string>, P}>
      */
     public static function patrones(): iterable
     {
@@ -82,10 +53,7 @@ final class DclEntitiesTest extends TestCase
     }
     /**
      * Rechaza una estructura de cuatro criterios sin completar el quinto por defecto.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_perfil_rechaza_requisito_faltante(): void
     {
@@ -97,10 +65,7 @@ final class DclEntitiesTest extends TestCase
     }
     /**
      * Rechaza ACREDITADO si falta la referencia positiva del requisito.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_perfil_rechaza_acreditacion_sin_soporte(): void
     {
@@ -112,10 +77,7 @@ final class DclEntitiesTest extends TestCase
     }
     /**
      * Impide declarar C03 acreditado mientras el perfil funcional sigue pendiente.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_perfil_rechaza_c03_sin_revision_funcional_acreditada(): void
     {
@@ -124,10 +86,7 @@ final class DclEntitiesTest extends TestCase
     }
     /**
      * Rechaza una acreditación incompatible con la revisión diferencial explícita.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_perfil_rechaza_c04_acreditado_con_diferencial_impedido(): void
     {
@@ -136,10 +95,7 @@ final class DclEntitiesTest extends TestCase
     }
     /**
      * Rechaza PET aunque los dominios estén A/P si falta C01.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_requisito_pendiente_impide_patron(): void
     {
@@ -149,10 +105,7 @@ final class DclEntitiesTest extends TestCase
     }
     /**
      * Rechaza PET con una condición general expresamente incumplida.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_requisito_no_acreditado_impide_patron(): void
     {
@@ -163,10 +116,9 @@ final class DclEntitiesTest extends TestCase
 
     /**
      * Rechaza candidatos con un dominio desconocido, no interpretable o contradictorio.
-     *
-     * @param string $estado Estado bloqueante de memoria.
+     * @param string $estado
      * @return void
-     * @throws DomainException Excepción exigida para impedir conclusión.
+     * @throws DomainException
      */
     #[DataProvider('noConcluyentes')]
     public function test_ui_x_impiden_patron(string $estado): void
@@ -178,10 +130,7 @@ final class DclEntitiesTest extends TestCase
 
     /**
      * Proporciona los tres estados no concluyentes del contrato.
-     *
-     * @return iterable<string, array{string}> U, I y X.
-     *
-     * No recibe parámetros ni lanza excepciones.
+     * @return iterable<string, array{string}>
      */
     public static function noConcluyentes(): iterable
     {
@@ -191,10 +140,7 @@ final class DclEntitiesTest extends TestCase
     }
     /**
      * Conserva la no conclusión sin inventar un quinto subtipo.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_abstencion_preserva_motivos_y_perfil_pendiente(): void
     {
@@ -206,10 +152,7 @@ final class DclEntitiesTest extends TestCase
     }
     /**
      * Representa un diferencial no resuelto sin diagnosticar ni emitir PET.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_diferencial_pendiente_conserva_abstencion(): void
     {
@@ -220,10 +163,7 @@ final class DclEntitiesTest extends TestCase
     }
     /**
      * Conserva explícitamente C02 acreditado con todos los dominios P como no conclusión.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_c02_incoherente_puede_conservarse_para_adjudicacion(): void
     {
@@ -234,10 +174,7 @@ final class DclEntitiesTest extends TestCase
     }
     /**
      * Impide declarar PET-04 para un perfil amnésico de dominio único.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_patron_incompatible_con_distribucion_se_rechaza(): void
     {
@@ -246,10 +183,7 @@ final class DclEntitiesTest extends TestCase
     }
     /**
      * Impide una salida que afirme simultáneamente patrón y abstención.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_patron_y_abstencion_no_pueden_coexistir(): void
     {
@@ -258,10 +192,7 @@ final class DclEntitiesTest extends TestCase
     }
     /**
      * Impide una no conclusión sin explicación estructurada.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_abstencion_sin_motivos_se_rechaza(): void
     {
@@ -270,10 +201,7 @@ final class DclEntitiesTest extends TestCase
     }
     /**
      * Conserva las reglas originales sin ejecutar ni copiar su lógica.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_reglas_declaradas_preservan_identidad_y_version(): void
     {
@@ -285,10 +213,7 @@ final class DclEntitiesTest extends TestCase
     }
     /**
      * Rechaza trazabilidad que mezcle una regla ajena al conocimiento del caso.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_regla_aplicada_de_otra_version_se_rechaza(): void
     {
@@ -301,9 +226,8 @@ final class DclEntitiesTest extends TestCase
 
     /**
      * Evita sustituir la procedencia de un requisito mediante una copia equivalente.
-     *
      * @return void
-     * @throws DomainException Excepción esperada por pérdida del soporte original.
+     * @throws DomainException
      */
     public function test_perfil_rechaza_copia_del_soporte_original(): void
     {
@@ -318,9 +242,8 @@ final class DclEntitiesTest extends TestCase
 
     /**
      * Un soporte acreditado de C02 no demuestra el cambio corroborado exigido en C01.
-     *
      * @return void
-     * @throws DomainException Excepción esperada por alcance semántico incompatible.
+     * @throws DomainException
      */
     public function test_perfil_rechaza_soporte_de_otro_requisito(): void
     {
@@ -335,9 +258,8 @@ final class DclEntitiesTest extends TestCase
 
     /**
      * Rechaza aplicar las invariantes actuales a una versión de contrato desconocida.
-     *
      * @return void
-     * @throws DomainException Excepción esperada sin adaptación silenciosa de versiones.
+     * @throws DomainException
      */
     public function test_perfil_rechaza_version_de_contrato_no_implementada(): void
     {

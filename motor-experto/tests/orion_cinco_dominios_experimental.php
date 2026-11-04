@@ -1,11 +1,7 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Prueba de cinco dominios, datos ficticios únicamente.
- * Reutiliza el contrato de tablas instrumentales en SQLite :memory:.
- * DCL debe abstenerse ante cualquier combinación de salidas sintéticas.
- */
+/** Prueba de cinco dominios, datos ficticios únicamente. */
 require_once __DIR__.'/bootstrap.php';
 
 spl_autoload_register(static function (string $clase): void {

@@ -11,18 +11,10 @@ use Illuminate\Support\Facades\Schema;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 
-/**
- * TÍTULO: Lectura de evidencias y corte clínico inclusivo.
- * CAPA: Infrastructure - Repositories (pruebas de integración).
- * ¿PARA QUÉ SIRVE? Prueba la coordinación de Eloquent, extracción por lote y mapper.
- * ¿QUÉ INFORMACIÓN RECIBE? Fixtures sintéticas sobre las migraciones reales.
- * ¿QUÉ HACE? Conserva procedencia y distingue ausencia, falta técnica y duplicación.
- * ¿QUÉ DEVUELVE? Aserciones sobre entidades, contexto y consultas.
- * ¿QUÉ NO DEBE HACER? No infiere A/P, interpreta instrumentos ni reemplaza IADL.
- */
+/** Prueba la coordinación de Eloquent, extracción por lote y mapper. */
 final class EvidenciaEloquentRepositoryTest extends RepositoriosTestCase
 {
-    /** Preserva el original aunque su incorporación técnica sea posterior; sin parámetros ni excepciones esperadas. */
+    /** Preserva el original aunque su incorporación técnica sea posterior */
     public function test_recupera_observacion_y_procedencia_originales_sin_escribir(): void
     {
         EscenarioRepositorios::evidencia();
@@ -46,9 +38,8 @@ final class EvidenciaEloquentRepositoryTest extends RepositoriosTestCase
 
     /**
      * Conserva NULL y cero textual sin convertirlos en false.
-     *
-     * @param  string|null  $valor  Dato físico artificial.
-     * @return void Sin excepciones esperadas.
+     * @param string|null $valor
+     * @return void
      */
     #[DataProvider('valoresBrutos')]
     public function test_conserva_valores_brutos_sin_default_clinico(?string $valor): void
@@ -59,14 +50,14 @@ final class EvidenciaEloquentRepositoryTest extends RepositoriosTestCase
         self::assertSame($valor, $memoria->hechos['SIM-EVID']->valor);
     }
 
-    /** @return iterable<string, array{string|null}> Valores sin equivalencia clínica; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string|null}> */
     public static function valoresBrutos(): iterable
     {
         yield 'NULL' => [null];
         yield 'cero textual' => ['0'];
     }
 
-    /** Excluye un registro un segundo posterior al corte; sin parámetros ni excepciones esperadas. */
+    /** Excluye un registro un segundo posterior al corte */
     public function test_excluye_fuentes_posteriores_al_corte_sin_usar_fecha_de_incorporacion(): void
     {
         EscenarioRepositorios::evidencia(['fecha_hora' => '2026-10-17 12:00:01']);
@@ -77,7 +68,7 @@ final class EvidenciaEloquentRepositoryTest extends RepositoriosTestCase
         self::assertEquals(self::corte(), $memoria->fechaCorte);
     }
 
-    /** Un destino técnico HECHO conserva contexto sin acreditar evidencia cognitiva; sin parámetros ni excepciones esperadas. */
+    /** Un destino técnico HECHO conserva contexto sin acreditar evidencia cognitiva */
     public function test_conserva_hechos_de_contexto_sin_crear_evidencia_cognitiva(): void
     {
         EscenarioRepositorios::evidencia();
@@ -87,7 +78,7 @@ final class EvidenciaEloquentRepositoryTest extends RepositoriosTestCase
         self::assertSame([], $memoria->evidencias);
     }
 
-    /** La cantidad de consultas permanece constante al añadir otro origen; sin parámetros ni excepciones esperadas. */
+    /** La cantidad de consultas permanece constante al añadir otro origen */
     public function test_extrae_los_origenes_por_lote_sin_una_consulta_por_evidencia(): void
     {
         EscenarioRepositorios::evidencia();
@@ -113,7 +104,7 @@ final class EvidenciaEloquentRepositoryTest extends RepositoriosTestCase
         $this->exigirSoloLecturas();
     }
 
-    /** No solicita fuentes cuando la cabecera existe sin filas admitidas; sin parámetros ni excepciones esperadas. */
+    /** No solicita fuentes cuando la cabecera existe sin filas admitidas */
     public function test_una_memoria_vacia_conserva_el_contexto_sin_invocar_extraccion(): void
     {
         EscenarioRepositorios::evidencia();

@@ -6,14 +6,7 @@ namespace MotorExperto\investigacion\dcl;
 
 use DomainException;
 
-/**
- * Puente DOCUMENTAL de prueba, no interpretador neuropsicológico.
- *
- * En G08 todavía no existen baremos admitidos: solo admite interpretaciones
- * de referencia SINTÉTICAS, independientes de D-131 y G09, con procedencia,
- * edición/tarea/norma SIMULADAS declaradas. Nunca deriva A o P de que se
- * cumpla/falle una regla positiva, del score total ni de una nota libre.
- */
+/** Puente DOCUMENTAL de prueba, no interpretador neuropsicológico. */
 final class AdaptadorEstadosPetersenExperimental
 {
     public const VERSION = 'PTE-DCL-G08-TEST-01';
@@ -26,11 +19,7 @@ final class AdaptadorEstadosPetersenExperimental
         'DCL-C05' => 'EVALUABILIDAD_SIMULADA',
     ];
 
-    /**
-     * $referencias['dominios'][COG-...] = lista de valoraciones INDEPENDIENTES
-     * ficticias; $referencias['criterios'][DCL-C..] = acta simulada separada.
-     * No se acepta un A/P procedente del resultado descriptivo del motor.
-     */
+    /** $referencias['dominios'][COG-...] = lista de valoraciones INDEPENDIENTES ficticias; $referencias['criterios'][DCL-C..] = acta simulada separada. */
     public function preparar(array $integrado, array $referencias): array
     {
         if (($integrado['uso'] ?? null) !== 'PRUEBA_TECNICA_NO_CLINICA'

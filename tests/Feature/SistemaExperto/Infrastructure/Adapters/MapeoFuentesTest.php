@@ -15,31 +15,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Tests\Feature\SistemaExperto\Infrastructure\Repositories\EscenarioRepositorios;
 
-/**
- * TÍTULO:
- * Resolución versionada y rechazo de fuentes no autorizadas.
- *
- * CAPA:
- * Infrastructure - Adapters.
- *
- * ¿PARA QUÉ SIRVE?
- * Recupera datos brutos autorizados sin interpretación clínica.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * Tablas 07 y 08 reales con cambios de fixtures sintéticas.
- *
- * ¿QUÉ HACE?
- * Verifica metadatos, registros explícitos, contexto y ausencia de IADL.
- *
- * ¿QUÉ DEVUELVE?
- * Fuentes exactas o errores explícitos sin efectos sobre datos asistenciales.
- *
- * ¿QUÉ NO DEBE HACER?
- * No habilita fuentes desde nombres de tabla o clases arbitrarias.
- */
+/** Recupera datos brutos autorizados sin interpretación clínica. */
 final class MapeoFuentesTest extends AdaptadoresTestCase
 {
-    /** Resuelve por código, PK y versión sin fallback; sin parámetros ni excepciones esperadas. */
+    /** Resuelve por código, PK y versión sin fallback */
     public function test_resuelve_solo_la_fuente_de_la_version_exacta(): void
     {
         $this->prepararControl();
@@ -61,11 +40,9 @@ final class MapeoFuentesTest extends AdaptadoresTestCase
 
     /**
      * Una tabla permitida no basta si los otros metadatos no coinciden.
-     *
-     * @param  string  $columna  Metadato manipulado.
-     * @param  string|null  $valor  Dato incompatible.
-     *
-     * @throws DomainException Rechazo esperado antes de consultar fuentes operativas.
+     * @param string $columna
+     * @param string|null $valor
+     * @throws DomainException
      */
     #[DataProvider('metadatosInvalidos')]
     public function test_rechaza_metadatos_fisicos_incompatibles(string $columna, ?string $valor): void
@@ -76,7 +53,7 @@ final class MapeoFuentesTest extends AdaptadoresTestCase
         $this->resolver()->resolver('SIM-V1', 'SIM-CONTROLES');
     }
 
-    /** @return iterable<string, array{string, string|null}> Incompatibilidades independientes; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string, string|null}> */
     public static function metadatosInvalidos(): iterable
     {
         yield 'tabla arbitraria' => ['tabla_raiz', 'usuarios'];

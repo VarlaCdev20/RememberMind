@@ -14,42 +14,19 @@ use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum;
 use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\MapeoFuentes\ExtractorVariableMapeada;
 use DomainException;
 
-/**
- * TÍTULO:
- * Vocabulario técnico de conservación ORION-SNAP-2.
- *
- * CAPA:
- * Infrastructure — Persistence.
- *
- * ¿PARA QUÉ SIRVE?
- * Prepara explícitamente los catálogos experimentales aprobados.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * Versión y usuario existentes, conexión desechable explícita.
- *
- * ¿QUÉ HACE?
- * Reutiliza nodos, dominios, valores y contratos físicos D-137.
- *
- * ¿QUÉ DEVUELVE?
- * Un catálogo versionado sin activar reglas ni uso clínico.
- *
- * ¿QUÉ NO DEBE HACER?
- * No crea usuarios/versiones de conveniencia ni cambia G09.
- */
+/** Prepara los catálogos del contrato de conservación autorizado. */
 final class CatalogoConservacionExperta
 {
     public const VERSION = 'ORION-SNAP-2';
 
     /**
      * Instala el vocabulario explícitamente, nunca como fallback de guardar().
-     *
-     * @param  string  $conexion  Destino desechable autorizado.
-     * @param  string  $version  Versión existente que será propietaria del catálogo.
-     * @param  string  $usuario  Actor existente de la carga técnica.
-     * @return void Catálogo preparado idempotentemente sin activar reglas.
-     *
-     * @throws DomainException Por versión o actor inexistentes.
-     * @throws \RuntimeException Por destino no autorizado o fallo SQL, con rollback.
+     * @param string $conexion
+     * @param string $version
+     * @param string $usuario
+     * @return void
+     * @throws DomainException
+     * @throws \RuntimeException
      */
     public static function preparar(string $conexion, string $version, string $usuario): void
     {
@@ -102,11 +79,10 @@ final class CatalogoConservacionExperta
     }
 
     /**
-     * @param  string  $conexion  Destino desechable autorizado.
-     * @param  string  $version  Versión exacta propietaria.
-     * @return array<string, array{nodo:string, valores:array<string,string>}> Contratos experimentales previamente instalados y habilitados.
-     *
-     * @throws \RuntimeException Por destino no autorizado o fallo SQL.
+     * @param string $conexion
+     * @param string $version
+     * @return array<string, array{nodo:string, valores:array<string,string>}>
+     * @throws \RuntimeException
      */
     public static function leer(string $conexion, string $version): array
     {

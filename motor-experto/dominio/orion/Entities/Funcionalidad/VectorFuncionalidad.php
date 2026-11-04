@@ -8,35 +8,7 @@ use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
 use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Clasificación experimental (Perfil funcional).
- *
- * Conserva la declaración de independencia funcional relativa y las IADL que la sustentan.
- * La declaración requiere revisión explícita del contexto; no surge de una lista vacía de actividades.
- *
- * TÍTULO: Perfil funcional revisado de forma explícita.
- *
- * CAPA: Domain.
- *
- * SUBSISTEMA: Compuertas funcionales.
- *
- * RESPONSABILIDAD:
- * Conservar IADL y una declaración externa de independencia relativa sin deducirla.
- *
- * ENTRADAS:
- * Memoria, estado declarado, lista de evidencias, revisor y justificación.
- *
- * SALIDAS:
- * Perfil inmutable con limitaciones y fuentes funcionales originales.
- *
- * RESTRICCIONES:
- * No sustituye IADL por BADL, no calcula promedios ni umbrales.
- * La no acreditación no puede sustentarse solo en ayuda no cognitiva.
- * Una evidencia interpretable es requisito técnico, no suficiencia clínica.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R1/R3/R4/R5/R9; DCL-PET-20261017-v0.1, C03.
- */
+/** Conserva la independencia funcional declarada y las actividades que la sustentan. */
 final readonly class VectorFuncionalidad
 {
     /** @var list<EvidenciaIadl> Fuentes funcionales originales, sin duplicados. */
@@ -44,13 +16,12 @@ final readonly class VectorFuncionalidad
 
     /**
      * Comprueba coherencia de una declaración funcional ficticia.
-     *
-     * @param MemoriaTrabajo $memoria Contexto propietario y hechos originales.
-     * @param EstadoCriterioDclEnum $independenciaRelativa Estado declarado externamente.
-     * @param list<EvidenciaIadl> $evidencias IADL contextualizadas.
-     * @param string|null $revisorSinteticoId Responsable ficticio de la declaración.
-     * @param string $justificacion Fundamento o información pendiente.
-     * @throws DomainException Por identidad, contexto, duplicación o declaración sin soporte.
+     * @param MemoriaTrabajo $memoria
+     * @param EstadoCriterioDclEnum $independenciaRelativa
+     * @param list<EvidenciaIadl> $evidencias
+     * @param string|null $revisorSinteticoId
+     * @param string $justificacion
+     * @throws DomainException
      */
     public function __construct(
         /** Contexto de evaluación. */ public MemoriaTrabajo $memoria,

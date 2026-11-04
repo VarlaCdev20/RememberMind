@@ -19,40 +19,13 @@ use Illuminate\Database\Eloquent\Model;
 use MotorExperto\dominio\orion\Entities\Conocimiento\ReglaExperta;
 use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
 
-/**
- * TÍTULO:
- * Conversión de reglas relacionales a conocimiento declarativo.
- *
- * CAPA:
- * Infrastructure - Persistence - Mappers.
- *
- * ¿PARA QUÉ SIRVE?
- * Traduce condiciones positivas D-130 y una consecuencia a la gramática de Domain.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * ReglaExperta de App\Models con versión, condiciones, consecuencias y sus
- * dependencias ya cargadas; tipo de regla previsto por el contrato versionado.
- *
- * ¿QUÉ HACE?
- * Valida PK/FK, dominios de valores y versiones. Conserva los códigos semánticos
- * y expresa la conjunción mediante Y e IGUAL_A, sin evaluar las condiciones.
- *
- * ¿QUÉ DEVUELVE?
- * Una ReglaExperta inmutable; su fuente identifica la fila física original.
- *
- * ¿QUÉ NO DEBE HACER?
- * No consulta, activa, ejecuta ni edita conocimiento. No inventa operadores:
- * D-130 admite condiciones positivas conjuntivas. Domain solo admite una
- * consecuencia; cero o varias se rechazan sin truncar el contrato físico.
- */
+/** Traduce condiciones y consecuencias registradas a reglas del motor. */
 final readonly class MapeadorReglas
 {
     /**
      * Recibe el tipo soportado desde el contrato de conocimiento, sin elegirlo.
-     *
-     * @param  string  $tipoReglaResultado  Tipo exacto definido por el paquete versionado.
-     *
-     * @throws DomainException Si el contrato no identifica el tipo de regla.
+     * @param string $tipoReglaResultado
+     * @throws DomainException
      */
     public function __construct(
         /** Tipo técnico explícito; no constituye autorización clínica. */ private string $tipoReglaResultado,
@@ -64,11 +37,9 @@ final readonly class MapeadorReglas
 
     /**
      * Reconstruye la regla sin consultar relaciones que no hayan sido cargadas.
-     *
-     * @param  ReglaModelo  $fila  Regla con su versión y dependencias completas.
-     * @return ReglaExperta Condiciones declarativas y consecuencia exacta.
-     *
-     * @throws DomainException Por tipo, estado, FK, versión, carga o cardinalidad incompatibles.
+     * @param ReglaModelo $fila
+     * @return ReglaExperta
+     * @throws DomainException
      */
     public function aDominio(ReglaModelo $fila): ReglaExperta
     {
@@ -149,13 +120,11 @@ final readonly class MapeadorReglas
 
     /**
      * Comprueba el dominio y, cuando corresponde, la habilitación persistida.
-     *
-     * @param  ValorSemantico  $valor  Valor ya cargado con su dominio.
-     * @param  string  $version  Versión propietaria de la regla.
-     * @param  bool  $activa  Habilitación declarada en la fila original.
-     * @return void No acredita valores pendientes ni altera sus estados.
-     *
-     * @throws DomainException Por FK, versión o dependencia no habilitada.
+     * @param ValorSemantico $valor
+     * @param string $version
+     * @param bool $activa
+     * @return void
+     * @throws DomainException
      */
     private static function validarValor(ValorSemantico $valor, string $version, bool $activa): void
     {
@@ -170,12 +139,10 @@ final readonly class MapeadorReglas
 
     /**
      * Lee columnas concretas sin coerción ni accessors.
-     *
-     * @param  Model  $modelo  Fila materializada.
-     * @param  string  $campo  Columna física fija.
-     * @return string Texto original no vacío.
-     *
-     * @throws DomainException Por campo ausente o tipo incompatible.
+     * @param Model $modelo
+     * @param string $campo
+     * @return string
+     * @throws DomainException
      */
     private static function texto(Model $modelo, string $campo): string
     {
@@ -189,13 +156,11 @@ final readonly class MapeadorReglas
 
     /**
      * Recupera una dependencia cargada sin disparar consultas.
-     *
-     * @param  Model  $modelo  Fila propietaria.
-     * @param  string  $nombre  Relación fija de App\Models.
-     * @param  class-string<Model>  $tipo  Clase esperada.
-     * @return Model Dependencia original.
-     *
-     * @throws DomainException Por relación ausente, NULL o tipo incorrecto.
+     * @param Model $modelo
+     * @param string $nombre
+     * @param class-string<Model> $tipo
+     * @return Model
+     * @throws DomainException
      */
     private static function relacion(Model $modelo, string $nombre, string $tipo): Model
     {
@@ -208,12 +173,10 @@ final readonly class MapeadorReglas
 
     /**
      * Exige una colección física cargada por el futuro repositorio.
-     *
-     * @param  Model  $modelo  Fila propietaria.
-     * @param  string  $nombre  Nombre fijo de la colección.
-     * @return Collection Colección original.
-     *
-     * @throws DomainException Por relación no cargada o mal tipada.
+     * @param Model $modelo
+     * @param string $nombre
+     * @return Collection
+     * @throws DomainException
      */
     private static function coleccion(Model $modelo, string $nombre): Collection
     {

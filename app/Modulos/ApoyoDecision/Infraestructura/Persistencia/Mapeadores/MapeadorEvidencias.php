@@ -25,42 +25,12 @@ use DateTimeZone;
 use DomainException;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * TÍTULO:
- * Conversión de evidencias con procedencia operativa verificable.
- *
- * CAPA:
- * Infrastructure - Persistence - Mappers.
- *
- * ¿PARA QUÉ SIRVE?
- * Reconstruye hechos y descripciones cognitivas desde modelos ya materializados,
- * conservando evaluación, fuente, registro, episodio y fecha originales.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * EvidenciaEvaluacion con evaluación y mapeo cargados, modelo operativo original,
- * valor tipado entregado por el extractor autorizado, corte y zona de almacenamiento.
- *
- * ¿QUÉ HACE?
- * Verifica FK/versiones, fuente, sujeto sintético, vigencia y fecha. Usa la atención
- * original como episodio; en seguimientos usa la actividad vinculada, si existe.
- * La ausencia de ese vínculo se rechaza, sin inventar un episodio.
- *
- * ¿QUÉ DEVUELVE?
- * HechoExperto o EvidenciaCognitiva descriptiva con valor intacto, incluido NULL.
- *
- * ¿QUÉ NO DEBE HACER?
- * No extrae columnas configurables, consulta fuentes, interpreta puntuaciones ni
- * genera A/P. D-137 no conserva valor bruto, episodio o fecha clínica: no se usa
- * fecha_hora_incorporacion para sustituirlos. El extractor debe aportar el valor
- * original ya tipado; este mapper lo conserva sin realizar otra extracción.
- */
+/** Reconstruye hechos y evidencias conservando sus fuentes, episodio y fecha originales. */
 final readonly class MapeadorEvidencias
 {
     /**
      * Recibe la zona explícita de las fechas SQL sin zona horaria.
-     *
-     * @param  DateTimeZone  $zonaAlmacenamiento  Zona del entorno segregado.
-     *                                            No consulta configuración global ni se esperan excepciones.
+     * @param DateTimeZone $zonaAlmacenamiento
      */
     public function __construct(
         /** Zona de interpretación de columnas datetime físicas. */ private DateTimeZone $zonaAlmacenamiento,
@@ -68,14 +38,12 @@ final readonly class MapeadorEvidencias
 
     /**
      * Reconstruye un hecho con el registro operativo que acredita su procedencia.
-     *
-     * @param  EvidenciaEvaluacion  $fila  Evidencia con evaluacion y mapeoVariableFuente precargados.
-     * @param  ControlCognitivo|SeguimientoPedagogico|ValoracionFuncional|AplicacionInstrumento  $origen  Registro fuente original.
-     * @param  DateTimeImmutable  $corte  Última fecha clínica admitida, inclusiva.
-     * @param  string|int|float|bool|null  $valorExtraido  Dato original ya tipado por el extractor autorizado.
-     * @return HechoExperto Hecho sin normalización ni interpretación clínica.
-     *
-     * @throws DomainException Por contexto, fuente, versión, episodio o fecha incompatibles.
+     * @param EvidenciaEvaluacion $fila
+     * @param ControlCognitivo|SeguimientoPedagogico|ValoracionFuncional|AplicacionInstrumento $origen
+     * @param DateTimeImmutable $corte
+     * @param string|int|float|bool|null $valorExtraido
+     * @return HechoExperto
+     * @throws DomainException
      */
     public function aHecho(
         EvidenciaEvaluacion $fila,
@@ -139,14 +107,12 @@ final readonly class MapeadorEvidencias
 
     /**
      * Sitúa una observación en el propietario primario documentado de su variable.
-     *
-     * @param  EvidenciaEvaluacion  $fila  Evidencia y dependencias precargadas.
-     * @param  ControlCognitivo|SeguimientoPedagogico|ValoracionFuncional|AplicacionInstrumento  $origen  Fuente original.
-     * @param  DateTimeImmutable  $corte  Corte inclusivo del caso.
-     * @param  string|int|float|bool|null  $valorExtraido  Valor bruto ya tipado, sin baremación.
-     * @return EvidenciaCognitiva Descripción del dominio/subcomponente explícitamente vinculado.
-     *
-     * @throws DomainException Por propietario no documentado o incumplimiento de aHecho.
+     * @param EvidenciaEvaluacion $fila
+     * @param ControlCognitivo|SeguimientoPedagogico|ValoracionFuncional|AplicacionInstrumento $origen
+     * @param DateTimeImmutable $corte
+     * @param string|int|float|bool|null $valorExtraido
+     * @return EvidenciaCognitiva
+     * @throws DomainException
      */
     public function aDominio(
         EvidenciaEvaluacion $fila,
@@ -181,11 +147,9 @@ final readonly class MapeadorEvidencias
 
     /**
      * Analiza el formato SQL exacto sin aceptar fechas normalizadas o relativas.
-     *
-     * @param  string  $valor  Fecha física con precisión de segundos.
-     * @return DateTimeImmutable Instante en la zona explícitamente recibida.
-     *
-     * @throws DomainException Por formato o fecha de calendario inválidos.
+     * @param string $valor
+     * @return DateTimeImmutable
+     * @throws DomainException
      */
     private function fecha(string $valor): DateTimeImmutable
     {
@@ -201,12 +165,10 @@ final readonly class MapeadorEvidencias
 
     /**
      * Lee una columna concreta sin activar accessors que completen datos ausentes.
-     *
-     * @param  Model  $modelo  Registro materializado.
-     * @param  string  $campo  Columna física del contrato.
-     * @return string Texto original no vacío.
-     *
-     * @throws DomainException Por columna ausente, NULL o tipo incompatible.
+     * @param Model $modelo
+     * @param string $campo
+     * @return string
+     * @throws DomainException
      */
     private static function texto(Model $modelo, string $campo): string
     {
@@ -220,13 +182,11 @@ final readonly class MapeadorEvidencias
 
     /**
      * Recupera dependencias ya cargadas, sin resolverlas desde la base de datos.
-     *
-     * @param  Model  $modelo  Propietario de la relación.
-     * @param  string  $nombre  Relación fija de App\Models.
-     * @param  class-string<Model>  $tipo  Tipo esperado.
-     * @return Model Objeto relacionado original.
-     *
-     * @throws DomainException Por relación ausente o incorrectamente tipada.
+     * @param Model $modelo
+     * @param string $nombre
+     * @param class-string<Model> $tipo
+     * @return Model
+     * @throws DomainException
      */
     private static function relacion(Model $modelo, string $nombre, string $tipo): Model
     {

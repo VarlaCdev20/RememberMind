@@ -14,16 +14,7 @@ use DomainException;
 use Illuminate\Database\Eloquent\Collection;
 use RuntimeException;
 
-/**
- * TÍTULO: Adaptador descriptivo de funcionalidad instrumental.
- * CAPA: Infrastructure - Adapters.
- * ¿PARA QUÉ SIRVE? Recupera la fuente IADL aprobada sin acreditar independencia.
- * ¿QUÉ INFORMACIÓN RECIBE? Evaluación sintética, PK originales, corte, conexión y mapeo.
- * ¿QUÉ HACE? Contrasta el esquema y transporta columnas fijas hasta el corte.
- * ¿QUÉ DEVUELVE? Originales y escalares nullable, siempre como hechos descriptivos.
- * ¿QUÉ NO DEBE HACER? No traduce oportunidad a interpretabilidad, causa a atribución
- * cognitiva ni una observación o BADL a C03. No inventa atención para una fila sin vínculo.
- */
+/** Lee actividades instrumentales originales; no acredita independencia funcional. */
 final readonly class AdaptadorIadlExperimental
 {
     /** Modelo original de la extensión aprobada. */
@@ -47,11 +38,9 @@ final readonly class AdaptadorIadlExperimental
 
     /**
      * Comprueba la tabla y todas sus columnas sin afirmar disponibilidad de datos.
-     *
-     * @param  string  $conexion  Destino técnico desechable.
-     * @return array{disponible: bool, motivo: string} Disponibilidad del contrato físico.
-     *
-     * @throws RuntimeException Fuera de testing/destino autorizado o ante fallo SQL.
+     * @param string $conexion
+     * @return array{disponible: bool, motivo: string}
+     * @throws RuntimeException
      */
     public function disponibilidad(string $conexion): array
     {
@@ -67,16 +56,14 @@ final readonly class AdaptadorIadlExperimental
 
     /**
      * Lee únicamente las PK explícitas del mismo residente.
-     *
-     * @param  EvaluacionExperta  $evaluacion  Cabecera sintética original.
-     * @param  list<string>  $ids  Identidades originales solicitadas.
-     * @param  DateTimeImmutable  $corte  Instante clínico inclusivo.
-     * @param  string  $conexion  Conexión segregada.
-     * @param  DateTimeZone  $zona  Zona SQL explícita.
-     * @return Collection<int, ControlFuncionalIadl> Originales; futuros solo incluyen metadatos.
-     *
-     * @throws DomainException Por contexto, estado o atención incompatibles.
-     * @throws RuntimeException Por esquema/origen indisponible o conexión no autorizada.
+     * @param EvaluacionExperta $evaluacion
+     * @param list<string> $ids
+     * @param DateTimeImmutable $corte
+     * @param string $conexion
+     * @param DateTimeZone $zona
+     * @return Collection<int, ControlFuncionalIadl>
+     * @throws DomainException
+     * @throws RuntimeException
      */
     public function recuperar(EvaluacionExperta $evaluacion, array $ids, DateTimeImmutable $corte, string $conexion, DateTimeZone $zona): Collection
     {
@@ -94,7 +81,11 @@ final readonly class AdaptadorIadlExperimental
         ExtractorVariableMapeada::campoMapeado($mapeo, self::CAMPOS);
     }
 
-    /** @param ControlFuncionalIadl $origen Original cargado. @param MapeoVariableFuente $mapeo Campo explícito. @return string|int|float|bool|null Dato sin interpretación; lanza DomainException si no se cargó. */
+    /**
+ * @param ControlFuncionalIadl $origen
+ * @param MapeoVariableFuente $mapeo
+ * @return string|int|float|bool|null
+ */
     public function extraer(ControlFuncionalIadl $origen, MapeoVariableFuente $mapeo): string|int|float|bool|null
     {
         $campo = ExtractorVariableMapeada::campoMapeado($mapeo, self::CAMPOS);

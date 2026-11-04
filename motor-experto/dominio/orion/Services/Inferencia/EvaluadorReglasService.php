@@ -11,29 +11,16 @@ use MotorExperto\dominio\orion\ValueObjects\Conocimiento\EstadoReglaEnum;
 use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Motor de inferencia (Reglas declarativas).
- * TÍTULO: Evaluación lógica trazable de una regla versionada.
- * CAPA: Domain.
- * SUBSISTEMA: Inferencia.
- * RESPONSABILIDAD: Evaluar la gramática tipada conservando desconocimiento y soportes.
- * ENTRADAS: Regla, memoria original y hechos admitidos explícitamente.
- * SALIDAS: Estado, árbol de condiciones, soportes originales y consecuencia opcional.
- * RESTRICCIONES: No ejecuta texto, aplica baremos, afirma hechos nuevos ni interpreta G09 como A/P.
- * TRAZABILIDAD: R1/R3/R4/R8/R10; conjunción y soportes D-130. O/NO/DISTINTO_DE
- * y lógica trivalente son el contrato técnico de esta PoC, no una extensión de D-130.
- */
+/** Evalúa condiciones tipadas; conserva los datos desconocidos y sus soportes. */
 final readonly class EvaluadorReglasService
 {
     /**
      * Evalúa todas las ramas para conservar su explicación, incluso si una decide la composición.
-     *
-     * @param  ReglaExperta  $regla  Conocimiento original, nunca una expresión ejecutable.
-     * @param  MemoriaTrabajo  $memoria  Contexto propietario.
-     * @param  list<HechoExperto>  $hechosAdmitidos  Selección original verificada por el llamador.
+     * @param ReglaExperta $regla
+     * @param MemoriaTrabajo $memoria
+     * @param list<HechoExperto> $hechosAdmitidos
      * @return array{regla: ReglaExperta, memoria: MemoriaTrabajo, estado: EstadoReglaEnum, condiciones: ?array, soportes: list<HechoExperto>, consecuencia: ?array}
-     *
-     * @throws DomainException Por versión, duplicación o sustitución de hechos originales.
+     * @throws DomainException
      */
     public function evaluar(ReglaExperta $regla, MemoriaTrabajo $memoria, array $hechosAdmitidos): array
     {
@@ -62,12 +49,9 @@ final readonly class EvaluadorReglasService
 
     /**
      * Aplica comparación estricta y tablas trivalentes: NO desconocido sigue desconocido.
-     * Una variable con declaraciones incompatibles o algún null no queda resuelta por mayoría.
-     *
-     * @param  array<string, mixed>  $nodo  Árbol ya validado por ReglaExperta.
-     * @param  array<string, list<HechoExperto>>  $hechos  Hechos originales por concepto.
+     * @param array<string, mixed> $nodo
+     * @param array<string, list<HechoExperto>> $hechos
      * @return array{operador: OperadorCondicionEnum, valor: ?bool, motivo: string, soportes: list<HechoExperto>, ramas: list<array>, variable: ?string, esperado: string|int|float|bool|null}
-     *                                                                                                                                                                                         No produce efectos externos ni excepciones sobre entradas construidas válidas.
      */
     private function evaluarNodo(array $nodo, array $hechos): array
     {

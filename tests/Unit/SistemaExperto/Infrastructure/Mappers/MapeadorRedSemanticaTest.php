@@ -11,18 +11,10 @@ use Illuminate\Database\Eloquent\Collection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * TÍTULO: Reconstrucción de grafos Eloquent en memoria.
- * CAPA: Infrastructure - Mappers (pruebas unitarias).
- * ¿PARA QUÉ SIRVE? Verifica PK, códigos, dirección de aristas y rechazos.
- * ¿QUÉ INFORMACIÓN RECIBE? Versiones ficticias con modelos reales precargados.
- * ¿QUÉ HACE? Convierte el grafo y altera únicamente las entradas sintéticas.
- * ¿QUÉ DEVUELVE? Aserciones sobre la red y sus invariantes.
- * ¿QUÉ NO DEBE HACER? No crea ni consulta tablas, ni activa conocimiento.
- */
+/** Verifica PK, códigos, dirección de aristas y rechazos. */
 final class MapeadorRedSemanticaTest extends TestCase
 {
-    /** Conserva las PK, códigos y extremos sin inventar la inversa; sin parámetros ni excepciones esperadas. */
+    /** Conserva las PK, códigos y extremos sin inventar la inversa */
     public function test_reconstruye_nodos_y_aristas_con_identidad_compartida(): void
     {
         $modelo = EscenarioMapeadores::red();
@@ -42,10 +34,8 @@ final class MapeadorRedSemanticaTest extends TestCase
 
     /**
      * Rechaza entradas cuya semántica o identidad no puede conservar Domain.
-     *
-     * @param  string  $caso  Manipulación artificial del grafo.
-     *
-     * @throws DomainException Rechazo explícito esperado.
+     * @param string $caso
+     * @throws DomainException
      */
     #[DataProvider('grafosInvalidos')]
     public function test_rechaza_grafos_incompatibles(string $caso): void
@@ -86,7 +76,7 @@ final class MapeadorRedSemanticaTest extends TestCase
         (new MapeadorRedSemantica)->aDominio($version);
     }
 
-    /** @return iterable<string, array{string}> Manipulaciones independientes; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string}> */
     public static function grafosInvalidos(): iterable
     {
         foreach (['nodo ajeno', 'extremo ausente', 'arista ajena', 'predicado desconocido', 'modalidad no representable',
@@ -97,10 +87,8 @@ final class MapeadorRedSemanticaTest extends TestCase
 
     /**
      * Impide convertir tipos falsy en códigos o textos de un nodo.
-     *
-     * @param  mixed  $valor  Atributo incompatible.
-     *
-     * @throws DomainException Rechazo esperado sin cast a string.
+     * @param mixed $valor
+     * @throws DomainException
      */
     #[DataProvider('codigosInvalidos')]
     public function test_no_convierte_null_false_o_cero_en_codigo_semantico(mixed $valor): void
@@ -111,7 +99,7 @@ final class MapeadorRedSemanticaTest extends TestCase
         (new MapeadorRedSemantica)->aNodo($nodo);
     }
 
-    /** @return iterable<string, array{mixed}> Atributos inválidos; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{mixed}> */
     public static function codigosInvalidos(): iterable
     {
         yield 'null' => [null];

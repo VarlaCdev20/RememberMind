@@ -24,43 +24,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use RuntimeException;
 
-/**
- * TÍTULO:
- * Conservación Eloquent de perfiles experimentales.
- *
- * CAPA:
- * Infrastructure - Persistence - Repositories.
- *
- * ¿PARA QUÉ SIRVE?
- * Implementa el puerto completo y preserva lecturas anteriores.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * Contexto exacto, conexión segregada y extractores explícitos.
- *
- * ¿QUÉ HACE?
- * Delega instantáneas V2 al almacén y las anteriores al mapper D-137.
- *
- * ¿QUÉ DEVUELVE?
- * Memoria, perfil y clasificación originales o ausencia explícita.
- *
- * ¿QUÉ NO DEBE HACER?
- * No reinterpreta G09, crea fuentes, sobrescribe historia ni
- * oculta una instantánea nueva incompleta mediante el recuperador anterior.
- */
+/** Conserva evaluaciones y sus lecturas originales mediante el contrato de persistencia. */
 final readonly class EvaluacionExpertaEloquentRepository implements EvaluacionExpertaRepositoryInterface
 {
     private AlmacenInstantaneas $almacen;
 
     /**
      * Recibe la recuperación de memoria, sin crear otra ni registrar bindings.
-     *
-     * @param  MapeadorResultados  $mapeador  Conversor de resultados existentes.
-     * @param  Closure|null  $recuperarMemoria  Instantánea original del contexto y corte exactos.
-     * @param  string  $conexionExperimental  Nombre de base técnica segregada.
-     * @param  Closure|null  $extraerOriginal  Extracción por lote para contrastar fuentes institucionales al guardar.
-     * @param  DateTimeZone|null  $zona  Zona explícita de las columnas operativas originales.
-     *
-     * @throws DomainException Por nombre de conexión inválido.
+     * @param MapeadorResultados $mapeador
+     * @param Closure|null $recuperarMemoria
+     * @param string $conexionExperimental
+     * @param Closure|null $extraerOriginal
+     * @param DateTimeZone|null $zona
+     * @throws DomainException
      */
     public function __construct(
         /** Conversor sin inferencia. */ private MapeadorResultados $mapeador,
@@ -75,15 +51,13 @@ final readonly class EvaluacionExpertaEloquentRepository implements EvaluacionEx
 
     /**
      * Recupera el perfil completo de una evaluación sintética finalizada.
-     *
-     * @param  string  $evaluacionId  Identidad artificial exacta.
-     * @param  string  $residenteId  Caso sintético exacto.
-     * @param  string  $versionConocimiento  Versión propietaria.
-     * @param  DateTimeImmutable  $fechaCorte  Corte original, no fecha de ejecución.
-     * @return VectorCognitivo|null Perfil convertido o evaluación inexistente.
-     *
-     * @throws DomainException Por contexto, corte, conocimiento, perfil o soporte incompatibles.
-     * @throws RuntimeException Por base no autorizada, memoria no disponible o fallo de lectura.
+     * @param string $evaluacionId
+     * @param string $residenteId
+     * @param string $versionConocimiento
+     * @param DateTimeImmutable $fechaCorte
+     * @return VectorCognitivo|null
+     * @throws DomainException
+     * @throws RuntimeException
      */
     public function obtener(string $evaluacionId, string $residenteId, string $versionConocimiento, DateTimeImmutable $fechaCorte): ?VectorCognitivo
     {
@@ -133,12 +107,10 @@ final readonly class EvaluacionExpertaEloquentRepository implements EvaluacionEx
 
     /**
      * Contrasta la procedencia persistida con el hecho original, sin reconstruirlo.
-     *
-     * @param  EvidenciaEvaluacion  $fila  Soporte con mapeo y fuente cargados.
-     * @param  MemoriaTrabajo  $memoria  Instantánea original de la misma evaluación.
-     * @return void No acredita independencia ni interpreta un valor.
-     *
-     * @throws DomainException Por registro, fuente, FK o versión distintos del original.
+     * @param EvidenciaEvaluacion $fila
+     * @param MemoriaTrabajo $memoria
+     * @return void
+     * @throws DomainException
      */
     private static function validarOrigenSoporte(EvidenciaEvaluacion $fila, MemoriaTrabajo $memoria): void
     {
@@ -162,11 +134,9 @@ final readonly class EvaluacionExpertaEloquentRepository implements EvaluacionEx
 
     /**
      * Conserva la memoria y los resultados originales de forma atómica.
-     *
-     * @param  VectorCognitivo  $evaluacion  Instantánea original que no será modificada.
-     * @return void Conserva una vez; un reintento idéntico no escribe.
-     *
-     * @throws RuntimeException Por fallo técnico de escritura; la transacción revierte sus efectos.
+     * @param VectorCognitivo $evaluacion
+     * @return void
+     * @throws RuntimeException
      */
     public function guardar(VectorCognitivo $evaluacion): void
     {
@@ -175,11 +145,9 @@ final readonly class EvaluacionExpertaEloquentRepository implements EvaluacionEx
 
     /**
      * Conserva clasificación, requisitos y soportes sobre la cognición ya guardada.
-     *
-     * @param  ResultadoClasificacionDcl  $resultado  Clasificación experimental original.
-     * @return void No escribe diagnósticos ni resultados parciales.
-     *
-     * @throws RuntimeException Por fallo técnico; no confirma una clasificación parcial.
+     * @param ResultadoClasificacionDcl $resultado
+     * @return void
+     * @throws RuntimeException
      */
     public function guardarClasificacion(ResultadoClasificacionDcl $resultado): void
     {
@@ -188,16 +156,14 @@ final readonly class EvaluacionExpertaEloquentRepository implements EvaluacionEx
 
     /**
      * Recupera DCL V2 y distingue el contrato anterior no representable.
-     *
-     * @param  string  $evaluacionId  Identidad artificial exacta.
-     * @param  string  $residenteId  Sujeto sintético exacto.
-     * @param  string  $versionConocimiento  Versión propietaria.
-     * @param  DateTimeImmutable  $fechaCorte  Corte original solicitado.
-     * @param  string  $versionContrato  Contrato DCL solicitado, sin interpretación.
-     * @return ResultadoClasificacionDcl|null Resultado conservado, evaluación ausente o clasificación V2 aún no registrada.
-     *
-     * @throws DomainException Por identidad o contexto incompatibles.
-     * @throws RuntimeException Por fallo técnico o por una evaluación anterior D-137 sin representación íntegra de C01–C05.
+     * @param string $evaluacionId
+     * @param string $residenteId
+     * @param string $versionConocimiento
+     * @param DateTimeImmutable $fechaCorte
+     * @param string $versionContrato
+     * @return ResultadoClasificacionDcl|null
+     * @throws DomainException
+     * @throws RuntimeException
      */
     public function obtenerClasificacion(string $evaluacionId, string $residenteId, string $versionConocimiento, DateTimeImmutable $fechaCorte, string $versionContrato): ?ResultadoClasificacionDcl
     {
@@ -216,14 +182,12 @@ final readonly class EvaluacionExpertaEloquentRepository implements EvaluacionEx
 
     /**
      * Lee una cabecera mínima antes de recuperar memoria o resultados.
-     *
-     * @param  string  $evaluacionId  PK solicitada.
-     * @param  string  $residenteId  Caso propietario.
-     * @param  string  $versionConocimiento  Versión exacta.
-     * @return EvaluacionModelo|null Cabecera del contexto o ausencia física.
-     *
-     * @throws DomainException Por residente/versión ajenos o ejecución no técnica finalizada.
-     * @throws RuntimeException Por conexión no autorizada o fallo de lectura.
+     * @param string $evaluacionId
+     * @param string $residenteId
+     * @param string $versionConocimiento
+     * @return EvaluacionModelo|null
+     * @throws DomainException
+     * @throws RuntimeException
      */
     private function cabecera(string $evaluacionId, string $residenteId, string $versionConocimiento): ?EvaluacionModelo
     {
@@ -243,13 +207,11 @@ final readonly class EvaluacionExpertaEloquentRepository implements EvaluacionEx
 
     /**
      * Rechaza solicitudes asistenciales antes de cualquier consulta.
-     *
-     * @param  string  $evaluacionId  Evaluación artificial con prefijo SIM-.
-     * @param  string  $residenteId  Caso artificial con prefijo SINTETICO-.
-     * @param  string  $versionConocimiento  Versión exacta.
-     * @return void No selecciona otro sujeto ni otra versión.
-     *
-     * @throws DomainException Por identidad inválida o solicitud no sintética.
+     * @param string $evaluacionId
+     * @param string $residenteId
+     * @param string $versionConocimiento
+     * @return void
+     * @throws DomainException
      */
     private static function validarContexto(string $evaluacionId, string $residenteId, string $versionConocimiento): void
     {
@@ -262,11 +224,9 @@ final readonly class EvaluacionExpertaEloquentRepository implements EvaluacionEx
 
     /**
      * Exige identidades explícitas sin normalizarlas ni interpolarlas en SQL.
-     *
-     * @param  string  ...$ids  Códigos recibidos por el contrato.
-     * @return void No consulta la base.
-     *
-     * @throws DomainException Por código vacío o con separadores/control.
+     * @param string ...$ids
+     * @return void
+     * @throws DomainException
      */
     private static function validarIdentidades(string ...$ids): void
     {
@@ -279,10 +239,8 @@ final readonly class EvaluacionExpertaEloquentRepository implements EvaluacionEx
 
     /**
      * Resuelve únicamente el destino experimental nombrado por el llamador.
-     *
-     * @return string Nombre de conexión, nunca el predeterminado implícito.
-     *
-     * @throws RuntimeException Fuera de testing o de las bases desechables autorizadas.
+     * @return string
+     * @throws RuntimeException
      */
     private function conexion(): string
     {

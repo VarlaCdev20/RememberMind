@@ -13,41 +13,13 @@ use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
 use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum;
 use DomainException;
 
-/**
- * TÍTULO: EvaluadorEvaluabilidadService.
- *
- * CAPA: Domain.
- *
- * SUBSISTEMA: Compuertas de evaluabilidad.
- *
- * RESPONSABILIDAD:
- * Determinar información insuficiente, señal o integración técnica de un dominio.
- *
- * ENTRADAS:
- * Memoria, dominio, candidatas, procedencias y revisión contextual explícitas.
- *
- * SALIDAS:
- * Nivel tipado, código EV específico, soportes, exclusiones y motivos trazables.
- *
- * RESTRICCIONES:
- * No emite A/P ni patrones PET; evaluabilidad no es alteración.
- * No exige basal previa, mínimo de observaciones, baremos o puntuación global.
- * Fuera del piloto COG-MEM esta coordinación es propuesta técnica experimental.
- * El nivel 2 requiere referencia externa sintética completa, procedencia
- * verificada y contexto acreditado; no aprueba instrumentos ni uso clínico.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R1/R2/R3/R4/R6/R8/R9; D-122 y CTX-MEM-01.
- */
+/** Determina si hay información suficiente para evaluar; no establece alteración cognitiva. */
 final readonly class EvaluadorEvaluabilidadService
 {
     /**
      * Conecta colaboradores puros sin iniciar procesos externos.
-     *
-     * @param VerificadorEvidenciaService $verificador Verificador de procedencia y calidad.
-     * @param EvaluadorConfusoresService $confusores Evaluador de revisión contextual.
-     *
-     * No lanza excepciones.
+     * @param VerificadorEvidenciaService $verificador
+     * @param EvaluadorConfusoresService $confusores
      */
     public function __construct(
         /** Verificación pura de candidatas. */
@@ -58,23 +30,13 @@ final readonly class EvaluadorEvaluabilidadService
 
     /**
      * Evalúa compuertas y mantiene separados nivel, resultado e incertidumbre.
-     *
-     * La integración no se obtiene por acumular señales ni por falta de hallazgos.
-     * La invalidación explícita conserva señales observacionales admisibles,
-     * pero impide cerrar una evaluación apoyada solo en referencias instrumentales.
-     *
-     * @param MemoriaTrabajo $memoria Instantánea original.
-     * @param DominioCognitivoEnum $dominio Dominio evaluado.
-     * @param list<EvidenciaCognitiva> $candidatas Evidencias seleccionadas explícitamente.
-     * @param list<HechoExperto> $revisionesProcedencia Declaraciones de procedencia.
-     * @param list<HechoExperto> $revisionesContexto Declaraciones contextuales COG-*:campo.
-     * @return array{
-     *   uso: string, memoria: MemoriaTrabajo, dominio: DominioCognitivoEnum,
-     *   estado: EvaluabilidadEnum, codigo: string, habilitaResultado: bool,
-     *   soportesIntegracion: list<EvidenciaCognitiva>, faltantes: list<string>,
-     *   motivos: list<string>, modificador: ?string, verificacion: array, contexto: array
-     * } Informe de compuertas; habilitaResultado solo expresa nivel técnico.
-     * @throws DomainException Por entradas incoherentes detectadas por los colaboradores.
+     * @param MemoriaTrabajo $memoria
+     * @param DominioCognitivoEnum $dominio
+     * @param list<EvidenciaCognitiva> $candidatas
+     * @param list<HechoExperto> $revisionesProcedencia
+     * @param list<HechoExperto> $revisionesContexto
+     * @return array{ uso: string, memoria: MemoriaTrabajo, dominio: DominioCognitivoEnum, estado: EvaluabilidadEnum, codigo: string, habilitaResultado: bool, soportesIntegracion: list<EvidenciaCognitiva>, faltantes: list<string>, motivos: list<string>, modificador: ?string, verificacion: array, contexto: array }
+     * @throws DomainException
      */
     public function evaluar(MemoriaTrabajo $memoria, DominioCognitivoEnum $dominio, array $candidatas,
         array $revisionesProcedencia = [], array $revisionesContexto = []): array

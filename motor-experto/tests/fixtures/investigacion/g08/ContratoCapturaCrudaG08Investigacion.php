@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace MotorExperto\investigacion\g08;
 
-/**
- * Especifica la captura de MEDIDAS CRUDAS de 12 tareas incluidas en siete
- * artículos normativos de Bolivia. NO calcula percentiles ni interpreta casos.
- * Una tarea en este mapa NO significa autorización de aplicación.
- */
+/** Especifica la captura de MEDIDAS CRUDAS de 12 tareas incluidas en siete artículos normativos de Bolivia. */
 final class ContratoCapturaCrudaG08Investigacion
 {
     public const VERSION = 'G08-CAPTURA-BO-20261017-01';

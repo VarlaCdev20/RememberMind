@@ -8,11 +8,7 @@ use DomainException;
 use MotorExperto\investigacion\dcl\CatalogoPerfilCincoDominios;
 use MotorExperto\investigacion\g09\CatalogoReglasG09Experimental as Catalogo;
 
-/**
- * Contrato de presentación del laboratorio: consolida salidas y procedencia ya calculadas.
- * No decide evaluabilidad, interpreta instrumentos ni convierte hallazgos en estados DCL.
- * Los estados añadidos son proyecciones técnicas en memoria, nunca catálogos persistidos.
- */
+/** Contrato de presentación del laboratorio: consolida salidas y procedencia ya calculadas. */
 final class ConstructorResultadoExperimental
 {
     public function construir(array $perfil, array $contexto, ?array $referencias): array

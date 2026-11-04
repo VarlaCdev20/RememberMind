@@ -17,25 +17,14 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 
-/**
- * TÍTULO: Transporte de patrones candidatos y abstenciones.
- * CAPA: Application (pruebas unitarias).
- * ¿PARA QUÉ SIRVE? Comprueba que Application no cambie la salida de Domain.
- * ¿QUÉ RECIBE? Resultados declarados con perfiles sintéticos compatibles.
- * ¿QUÉ HACE? Envuelve resultados originales y verifica sus referencias.
- * ¿QUÉ DEVUELVE? Aserciones sobre candidatos, abstenciones y requisitos.
- * ¿QUÉ NO DEBE HACER? No ejecuta ni acredita un clasificador todavía pendiente.
- * RELACIÓN CON O.R.I.O.N.: Reglamento de Application, DTO 04 y etapa B.
- */
+/** Comprueba que Application no cambie la salida de Domain. */
 final class ResultadoDclDTOTest extends TestCase
 {
     /**
      * Conserva cada candidato declarado y sus soportes originales.
-     *
-     * @param  list<string>  $estados  Cinco estados sintéticos de entrada.
-     * @param  P  $patron  Candidato explícito, no calculado por el DTO.
+     * @param list<string> $estados
+     * @param P $patron
      * @return void
-     *              Sin excepciones esperadas con la distribución compatible.
      */
     #[DataProvider('patrones')]
     public function test_transporta_los_cuatro_patrones_sin_reclasificar(array $estados, P $patron): void
@@ -56,7 +45,7 @@ final class ResultadoDclDTOTest extends TestCase
         self::assertSame($perfil->versionContrato, $dto->versionContrato);
     }
 
-    /** @return iterable<string, array{list<string>, P}> Distribuciones manuales; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{list<string>, P}> */
     public static function patrones(): iterable
     {
         yield 'PET-01' => [['A', 'P', 'P', 'P', 'P'], P::AMNESICO_DOMINIO_UNICO];
@@ -67,11 +56,9 @@ final class ResultadoDclDTOTest extends TestCase
 
     /**
      * Conserva motivos de no conclusión sin introducir un patrón favorable.
-     *
-     * @param  string  $caso  Tipo de limitación sintética.
-     * @param  M  $motivo  Salida declarada del Domain.
+     * @param string $caso
+     * @param M $motivo
      * @return void
-     *              Sin excepciones esperadas; el DTO no decide el motivo de abstención.
      */
     #[DataProvider('abstenciones')]
     public function test_abstencion_se_transporta_sin_convertirla_en_pet(string $caso, M $motivo): void
@@ -91,7 +78,7 @@ final class ResultadoDclDTOTest extends TestCase
         self::assertSame($perfil->criterios, $dto->criterios);
     }
 
-    /** @return iterable<string, array{string, M}> No conclusiones; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string, M}> */
     public static function abstenciones(): iterable
     {
         yield 'datos insuficientes' => ['insuficiente', M::ABSTENCION_INFORMACION_INSUFICIENTE];
@@ -117,7 +104,7 @@ final class ResultadoDclDTOTest extends TestCase
         $dto->patronCandidato = P::NO_AMNESICO_MULTIDOMINIO;
     }
 
-    /** @return SolicitudInferenciaDTO Solicitud ficticia; sin parámetros ni excepciones esperadas. */
+    /** @return SolicitudInferenciaDTO */
     private static function solicitud(): SolicitudInferenciaDTO
     {
         return new SolicitudInferenciaDTO('SIM-SOL', 'SIM-EVAL', 'SINTETICO-RES', F::fecha(), 'SIM-V1');

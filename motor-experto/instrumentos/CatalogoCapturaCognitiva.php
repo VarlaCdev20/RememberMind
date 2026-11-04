@@ -4,13 +4,7 @@ declare(strict_types=1);
 
 namespace MotorExperto\instrumentos;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Diccionario de adquisición cognitiva.
- *
- * Especifica las mediciones de los diecinueve componentes con su fuente y límites.
- * Es metadato de investigación, no un catálogo BDD ni una aplicación a un residente.
- * Una definición de campo nunca aporta por sí misma su valor, edición o autoría.
- */
+/** Describe las mediciones de los diecinueve componentes y sus fuentes; no contiene capturas reales. */
 final class CatalogoCapturaCognitiva
 {
     public const VERSION = 'CAPTURA-COGNITIVA-8-20261019';

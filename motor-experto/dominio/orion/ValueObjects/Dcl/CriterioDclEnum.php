@@ -4,43 +4,7 @@ declare(strict_types=1);
 
 namespace MotorExperto\dominio\orion\ValueObjects\Dcl;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Clasificación experimental (Vocabulario de requisitos).
- *
- * Identifica DCL-C01 a DCL-C05 y mantiene separados sus significados.
- * La identidad de un requisito permite referenciarlo; su acreditación exige soportes explícitos.
- *
- * TÍTULO: Identidad de los cinco requisitos generales DCL.
- *
- * CAPA: Domain.
- *
- * SUBSISTEMA: Clasificación experimental.
- *
- * RESPONSABILIDAD:
- * Identificar C01–C05 sin confundir su significado con su acreditación.
- *
- * ENTRADAS:
- * Uno de los códigos DCL-C01 a DCL-C05 del contrato experimental.
- *
- * SALIDAS:
- * La identidad tipada de un requisito que deberá examinarse separadamente.
- *
- * RESTRICCIONES:
- * La existencia del código no acredita el requisito. C05 es un control de
- * ingeniería de interpretabilidad, no un criterio clínico universal.
- * C03 considera IADL, nivel previo y causas no cognitivas; C04 no es
- * una conclusión etiológica. No se evalúan personas reales en esta fase.
- *
- * TRAZABILIDAD:
- * Reglamento maestro, Fase A y R7/R9; contrato experimental
- * DCL-PET-20261017-v0.1, sección 2.2. Su estado es investigación
- * y formalización para dictamen clínico, sin ejecución clínica.
- *
- * Las propiedades nativas e inmutables name y value conservan, respectivamente,
- * el identificador PHP del caso y su literal de intercambio. from() rechaza
- * valores ajenos mediante ValueError; tryFrom() devuelve null sin sustituirlo
- * por un estado favorable. Estas operaciones no ejecutan inferencias.
- */
+/** Identifica los cinco requisitos; su existencia no demuestra su cumplimiento. */
 enum CriterioDclEnum: string
 {
     /** DCL-C01: cambio cognitivo e historia corroborada. */

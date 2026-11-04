@@ -6,11 +6,7 @@ namespace MotorExperto\investigacion\g09;
 
 use DomainException;
 
-/**
- * Motor de pruebas sin Laravel, base de datos, pacientes ni efectos laterales.
- * Todos los atributos de evidencia son atestaciones sintéticas TEST_ONLY;
- * ninguna escala, norma ni punto de corte se infiere en esta clase.
- */
+/** Motor de pruebas sin Laravel, base de datos, pacientes ni efectos laterales. */
 final class EvaluadorG09Experimental
 {
     private const ESTADOS = [

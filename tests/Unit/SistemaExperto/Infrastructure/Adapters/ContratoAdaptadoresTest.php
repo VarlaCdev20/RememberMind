@@ -16,31 +16,10 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
 
-/**
- * TÍTULO:
- * Contrato de las siete clases de adaptadores.
- *
- * CAPA:
- * Infrastructure - Adapters.
- *
- * ¿PARA QUÉ SIRVE?
- * Recupera datos brutos autorizados sin interpretación clínica.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * Clases finales de Infrastructure y metadatos físicos de los modelos existentes.
- *
- * ¿QUÉ HACE?
- * Inspecciona tipos, readonly, strict_types y PHPDoc en español.
- *
- * ¿QUÉ DEVUELVE?
- * Aserciones sobre los siete componentes exigidos por esta etapa.
- *
- * ¿QUÉ NO DEBE HACER?
- * No sustituye las pruebas de integración ni habilita nuevos catálogos.
- */
+/** Recupera datos brutos autorizados sin interpretación clínica. */
 final class ContratoAdaptadoresTest extends TestCase
 {
-    /** Comprueba clases y comentarios sin abrir conexiones; sin parámetros ni excepciones esperadas. */
+    /** Comprueba clases y comentarios sin abrir conexiones */
     public function test_siete_clases_tipadas_documentadas_y_sin_modelos_duplicados(): void
     {
         $clases = [AdaptadorControlesCognitivos::class, AdaptadorSeguimientosPedagogicos::class,
@@ -54,10 +33,9 @@ final class ContratoAdaptadoresTest extends TestCase
             self::assertStringStartsWith("<?php\n\ndeclare(strict_types=1);", str_replace("\r\n", "\n", file_get_contents($r->getFileName())));
             $doc = $r->getDocComment();
             self::assertNotFalse($doc);
-            foreach (['TÍTULO:', 'CAPA:', '¿PARA QUÉ SIRVE?', '¿QUÉ INFORMACIÓN RECIBE?',
-                '¿QUÉ HACE?', '¿QUÉ DEVUELVE?', '¿QUÉ NO DEBE HACER?'] as $seccion) {
-                self::assertStringContainsString($seccion, $doc);
-            }
+            self::assertIsString($doc);
+            self::assertMatchesRegularExpression('/\p{L}{3}/u', $doc);
+            self::assertLessThanOrEqual(240, mb_strlen($doc));
             foreach ($r->getMethods(ReflectionMethod::IS_PUBLIC) as $metodo) {
                 self::assertNotFalse($metodo->getDocComment());
                 foreach ($metodo->getParameters() as $parametro) {

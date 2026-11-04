@@ -8,12 +8,7 @@ use DateTimeImmutable;
 use DomainException;
 use MotorExperto\conservacion\CapturaInstrumentalCanonica;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Procedencia original de Petersen institucional.
- * Identifica un registro clínico y su episodio explícito; nunca crea independencia por fecha.
- * Es un DTO en memoria, sin persistencia ni autorización para representar atributos en EAV.
- * La adquisición autorizada comprueba el registro, sus valores y el estado original antes de construirlo.
- */
+/** Identifica el registro original y su episodio; la fecha por sí sola no demuestra independencia. */
 final readonly class FuentePetersenInstitucional
 {
     public function __construct(public string $tabla, public string $registro, public string $residente,

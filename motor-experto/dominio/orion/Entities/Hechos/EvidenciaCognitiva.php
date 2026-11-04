@@ -9,36 +9,7 @@ use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\SubcomponenteCognitivoEnum;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Base de hechos (Evidencia cognitiva).
- *
- * Sitúa un hecho original en un dominio o subcomponente y documenta su alcance.
- * Permite reconocer fuentes reutilizadas antes de tratarlas como corroboración independiente.
- *
- * TÍTULO: Evidencia cognitiva con alcance y procedencia.
- *
- * CAPA: Domain.
- *
- * SUBSISTEMA: Base de hechos.
- *
- * RESPONSABILIDAD:
- * Vincular un hecho original a un dominio o subcomponente sin alterar su origen.
- *
- * ENTRADAS:
- * Hecho, dominio, subcomponente opcional, hallazgo, instrumento y justificación.
- * Las referencias externas ficticias incluyen metadatos SIM explícitos.
- *
- * SALIDAS:
- * Evidencia inmutable y comprobación de independencia respecto a otra evidencia.
- *
- * RESTRICCIONES:
- * No deduce A/P de G09 ni de un puntaje; los literales SIM son referencias
- * externas predeterminadas. Los metadatos SIM no representan normas aprobadas.
- * Un mismo episodio o resultado reutilizado no es corroboración independiente.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R1/R3/R4/R8/R9; puente PTE-DCL-G08-TEST-01 experimental.
- */
+/** Vincula cada evidencia a su fuente y alcance; permite detectar fuentes reutilizadas. */
 final readonly class EvidenciaCognitiva
 {
     /** @var array<string, string> Metadatos sintéticos copiados; vacíos para hallazgos descriptivos. */
@@ -46,15 +17,14 @@ final readonly class EvidenciaCognitiva
 
     /**
      * Construye una evidencia sin interpretar puntuaciones.
-     *
-     * @param HechoExperto $hecho Instantánea original preservada.
-     * @param DominioCognitivoEnum $dominio Dominio propietario.
-     * @param SubcomponenteCognitivoEnum|null $subcomponente Alcance específico; null identifica alcance de dominio.
-     * @param HallazgoInstrumentalEnum $hallazgo Descriptor explícito, no resultado integrado.
-     * @param string|null $instrumentoId Identidad de instrumento, cuando existe.
-     * @param string $justificacion Razón de la descripción o limitación.
-     * @param array<string, string> $referenciaSintetica Instrumento, edición, subprueba, norma, idioma, población y revisor ficticios.
-     * @throws DomainException Por dominio, identidad, ausencia o referencia incoherentes.
+     * @param HechoExperto $hecho
+     * @param DominioCognitivoEnum $dominio
+     * @param SubcomponenteCognitivoEnum|null $subcomponente
+     * @param HallazgoInstrumentalEnum $hallazgo
+     * @param string|null $instrumentoId
+     * @param string $justificacion
+     * @param array<string, string> $referenciaSintetica
+     * @throws DomainException
      */
     public function __construct(
         /** Hecho original inmutable. */ public HechoExperto $hecho,
@@ -106,11 +76,8 @@ final readonly class EvidenciaCognitiva
 
     /**
      * Contrasta independencia de fuentes dentro del mismo caso y versión.
-     *
-     * @param self $otra Evidencia a contrastar.
-     * @return bool False para otra ejecución o reutilización de resultado/episodio.
-     *
-     * No lanza excepciones ni cuenta contribuciones.
+     * @param self $otra
+     * @return bool
      */
     public function esIndependienteDe(self $otra): bool
     {

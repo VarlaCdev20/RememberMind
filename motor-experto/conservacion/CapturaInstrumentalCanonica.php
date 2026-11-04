@@ -6,11 +6,7 @@ namespace MotorExperto\conservacion;
 
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Contrato escalar de fuentes instrumentales.
- * Proyecta columnas explícitas y sus tipos SQL sin almacenar datos ni aceptar objetos Eloquent.
- * Mantiene NULL, cero, false, decimales exactos y preguntas seleccionadas sin respuesta.
- */
+/** Conserva valores y tipos originales, incluidos ausencia, cero y falso. */
 final class CapturaInstrumentalCanonica
 {
     private const INSTRUMENTO = ['cod_instrumento', 'codigo', 'nombre', 'tipo', 'version', 'descripcion', 'puntaje_maximo', 'estado'];

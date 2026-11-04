@@ -10,47 +10,12 @@ use DomainException;
 use MotorExperto\dominio\orion\Repositories\Hechos\EvidenciaRepositoryInterface;
 use RuntimeException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Application (CU-01, adquisición de hechos).
- *
- * TÍTULO:
- * Extracción de hechos para una evaluación.
- *
- * CAPA:
- * Application - Casos de Uso.
- *
- * ¿PARA QUÉ SIRVE?
- * Obtiene la instantánea del caso ficticio mediante el contrato de evidencias
- * de Domain y la entrega sin modificar sus hechos ni su procedencia.
- *
- * ¿QUÉ RECIBE?
- * Una SolicitudInferenciaDTO validada y un repositorio inyectado por constructor.
- *
- * ¿QUÉ HACE?
- * 1. Solicita la evaluación, caso sintético, versión y corte exactos.
- * 2. Entrega la memoria original al DTO, que contrasta el contexto recibido.
- * 3. Informa si la colección de evidencias cognitivas está vacía.
- *
- * ¿QUÉ DEVUELVE?
- * Un EvidenciasEntradaDTO con hechos, evidencias y referencias originales.
- *
- * ¿QUÉ NO DEBE HACER?
- * No consulta tablas, infiere normalidad, interpreta instrumentos ni oculta
- * fallos técnicos devolviendo una colección vacía.
- *
- * RELACIÓN CON O.R.I.O.N.:
- * Implementa CU-01 y utiliza EvidenciaRepositoryInterface::paraEvaluacion.
- * Ese contrato no informa disponibilidad de fuentes: el mapa correspondiente
- * permanece sin declaraciones, sin afirmar que las fuentes estén disponibles.
- */
+/** Obtiene la instantánea del caso ficticio mediante el contrato de evidencias de Domain y la entrega sin modificar sus hechos ni su procedencia. */
 final readonly class ExtraerHechosUseCase
 {
     /**
      * Recibe la capacidad abstracta de recuperar hechos, sin elegir persistencia.
-     *
-     * @param  EvidenciaRepositoryInterface  $evidencias  Repositorio de Domain.
-     *
-     * No ejecuta consultas ni se esperan excepciones durante la construcción.
+     * @param EvidenciaRepositoryInterface $evidencias
      */
     public function __construct(
         /** Contrato encargado de recuperar la instantánea original. */ private EvidenciaRepositoryInterface $evidencias,
@@ -58,12 +23,10 @@ final readonly class ExtraerHechosUseCase
 
     /**
      * Recupera una única instantánea y conserva íntegra la respuesta del repositorio.
-     *
-     * @param  SolicitudInferenciaDTO  $solicitud  Petición exclusivamente sintética.
-     * @return EvidenciasEntradaDTO Respuesta con contexto y procedencia conservados.
-     *
-     * @throws DomainException Si la respuesta corresponde a otro contexto o corte.
-     * @throws RuntimeException Si el repositorio falla; el error se propaga sin ocultarlo.
+     * @param SolicitudInferenciaDTO $solicitud
+     * @return EvidenciasEntradaDTO
+     * @throws DomainException
+     * @throws RuntimeException
      */
     public function ejecutar(SolicitudInferenciaDTO $solicitud): EvidenciasEntradaDTO
     {

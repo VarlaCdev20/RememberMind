@@ -24,11 +24,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use RuntimeException;
 
-/**
- * Adquisición por lotes desde Models existentes en una base de pruebas desechable.
- * Reutiliza listas/tipos de adaptadores; psicología y contexto médico conservan texto
- * sin NLP, interpretación ni conversión a variables cognitivas o estados Petersen.
- */
+/** Adquisición por lotes desde Models existentes en una base de pruebas desechable. */
 final class RecolectorContextoPerfilExperimental
 {
     public const VERSION = 'CTX-FUENTES-TEST-1';

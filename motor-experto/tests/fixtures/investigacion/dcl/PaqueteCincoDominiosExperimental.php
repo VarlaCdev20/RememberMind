@@ -9,11 +9,7 @@ use MotorExperto\adaptadores\entrada\EjemploTecnicoCOGMEM;
 use MotorExperto\conocimiento\CompiladorPerfilCognitivo;
 use MotorExperto\conocimiento\PaqueteConocimiento;
 
-/**
- * Revisión integrada de ingeniería: D-131 y G09 comparten grafo y versión.
- * Conserva el hash y la versión de cada fuente; rechaza colisiones en vez de sobrescribirlas.
- * Los conceptos MEM sin contrato de tarea siguen inactivos. No se publica conocimiento institucional.
- */
+/** Revisión integrada de ingeniería: D-131 y G09 comparten grafo y versión. */
 final class PaqueteCincoDominiosExperimental
 {
     public function integrar(PaqueteConocimiento $g09): array

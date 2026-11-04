@@ -9,39 +9,12 @@ use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoIadlEnum;
 use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\OportunidadIadlEnum;
 use PHPUnit\Framework\TestCase;
 
-/**
- * TÍTULO: Separación de oportunidad, desempeño y revisión diferencial.
- *
- * CAPA: Domain (verificación unitaria).
- *
- * SUBSISTEMA: Contratos de ValueObjects.
- *
- * RESPONSABILIDAD:
- * Comprobar los límites semánticos del vocabulario aislado de esta fase.
- *
- * ENTRADAS:
- * Códigos documentales y propuestas técnicas, sin información clínica real.
- *
- * SALIDAS:
- * Aserciones sobre representación y rechazo, sin resultados de inferencia.
- *
- * RESTRICCIONES:
- * No inicia Laravel, no consulta BDD, no clasifica ni acredita evaluación posterior en uso real.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R1/R5/R7; Documento Maestro sección 3.13.2.
- */
+/** Comprobar los límites semánticos del vocabulario aislado de esta fase. */
 final class VocabularioFuncionalidadTest extends TestCase
 {
     /**
      * Evita que el vocabulario presente ayuda o no ejecución como causa cognitiva.
-     *
-     * Solo prueba la frontera de representación: las compuertas funcionales
-     * todavía corresponden a una fase posterior.
-     *
      * @return void
-     *
-     * No recibe parámetros ni espera excepciones.
      */
     public function test_oportunidad_y_desempeno_son_dimensiones_distintas(): void
     {
@@ -54,10 +27,7 @@ final class VocabularioFuncionalidadTest extends TestCase
 
     /**
      * Conserva el diferencial pendiente separado de una revisión completada.
-     *
      * @return void
-     *
-     * No recibe parámetros ni infiere un diagnóstico desde los estados.
      */
     public function test_revision_ausente_no_se_representa_como_completada(): void
     {

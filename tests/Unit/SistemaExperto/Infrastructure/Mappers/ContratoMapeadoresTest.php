@@ -18,18 +18,10 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 
-/**
- * TÍTULO: Contrato de mappers, modelos existentes y ausencia de consultas.
- * CAPA: Infrastructure - Mappers (pruebas unitarias).
- * ¿PARA QUÉ SIRVE? Comprueba estructura, PHPDoc y reutilización de los 23 modelos.
- * ¿QUÉ INFORMACIÓN RECIBE? Clases reales y modelos ficticios en memoria.
- * ¿QUÉ HACE? Inspecciona metadatos y prohíbe resolver conexiones durante la conversión.
- * ¿QUÉ DEVUELVE? Aserciones verificables de tipos y aislamiento de BDD.
- * ¿QUÉ NO DEBE HACER? No acredita tablas instaladas, integración PostgreSQL ni activación clínica.
- */
+/** Comprueba estructura, PHPDoc y reutilización de los 23 modelos. */
 final class ContratoMapeadoresTest extends TestCase
 {
-    /** Comprueba los cuatro archivos, tipos y documentación; sin parámetros ni errores de lectura esperados. */
+    /** Comprueba los cuatro archivos, tipos y documentación */
     public function test_cuatro_mappers_tipados_documentados_y_sin_modelos_duplicados(): void
     {
         $tipos = [MapeadorReglas::class, MapeadorRedSemantica::class, MapeadorEvidencias::class, MapeadorResultados::class];
@@ -43,10 +35,9 @@ final class ContratoMapeadoresTest extends TestCase
             $archivos[] = basename($r->getFileName());
             $doc = $r->getDocComment();
             self::assertNotFalse($doc);
-            foreach (['TÍTULO:', 'CAPA:', '¿PARA QUÉ SIRVE?', '¿QUÉ INFORMACIÓN RECIBE?',
-                '¿QUÉ HACE?', '¿QUÉ DEVUELVE?', '¿QUÉ NO DEBE HACER?'] as $apartado) {
-                self::assertStringContainsString($apartado, $doc, $tipo);
-            }
+            self::assertIsString($doc);
+            self::assertMatchesRegularExpression('/\p{L}{3}/u', $doc);
+            self::assertLessThanOrEqual(240, mb_strlen($doc));
             $entrada = $r->getMethod('aDominio')->getParameters()[0]->getType()->getName();
             self::assertTrue(is_subclass_of($entrada, Model::class));
             self::assertStringStartsWith('App\\Models\\', $entrada);
@@ -68,7 +59,7 @@ final class ContratoMapeadoresTest extends TestCase
         self::assertSame($archivos, $reales);
     }
 
-    /** Contrasta metadatos físicos, sin afirmar instalación de tablas; sin parámetros ni excepciones esperadas. */
+    /** Contrasta metadatos físicos, sin afirmar instalación de tablas */
     public function test_los_23_modelos_existentes_conservan_tablas_y_pk_d137(): void
     {
         $modelos = [
@@ -109,7 +100,7 @@ final class ContratoMapeadoresTest extends TestCase
         }
     }
 
-    /** Demuestra conversión sin resolver conexiones ni guardar filas; sin parámetros ni excepciones esperadas. */
+    /** Demuestra conversión sin resolver conexiones ni guardar filas */
     public function test_los_cuatro_mappers_funcionan_sin_consultas_ni_conexion(): void
     {
         $anterior = Model::getConnectionResolver();

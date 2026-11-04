@@ -16,16 +16,7 @@ use DomainException;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;
 
-/**
- * TÍTULO: Explicación reconstruible desde los resultados originales.
- * CAPA: Domain (pruebas).
- * SUBSISTEMA: Explicación.
- * RESPONSABILIDAD: Verificar procedencia, abstenciones y frontera sintética directa.
- * ENTRADAS: Perfiles ficticios reales de Domain, sin servicios simulados.
- * SALIDAS: Tres niveles reproducibles o rechazo de entradas incompatibles.
- * RESTRICCIONES: No acredita validación profesional ni genera formatos de presentación.
- * TRAZABILIDAD: R1/R3/R4/R7/R9; Documento 04 y contrato DCL-PET.
- */
+/** Verificar procedencia, abstenciones y frontera sintética directa. */
 final class GeneradorExplicacionServiceTest extends TestCase
 {
     /** Preserva exclusiones, fuentes, referencias SIM y razones de abstención. */

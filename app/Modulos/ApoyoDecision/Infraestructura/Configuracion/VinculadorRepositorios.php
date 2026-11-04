@@ -32,35 +32,7 @@ use Illuminate\Container\Container;
 use LogicException;
 use RuntimeException;
 
-/**
- * TÍTULO:
- * Configuración de dependencias del sistema experto.
- *
- * CAPA:
- * Infrastructure - Configuracion.
- *
- * ¿PARA QUÉ SIRVE?
- * Enlaza los cuatro puertos de Domain con las implementaciones Eloquent de la PoC.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * Conexión experimental, zona SQL, tipo de regla, roles de soporte, registro
- * explícito de adaptadores y recuperador de la memoria original del caso.
- *
- * ¿QUÉ HACE?
- * Construye el grafo compatible y registra catorce bindings compartidos en Laravel.
- * Valida testing y el destino desechable antes de alterar el contenedor; detecta
- * colisiones antes de registrar y conserva los contratos propios de ApoyoDecision.
- *
- * ¿QUÉ DEVUELVE?
- * Un contenedor capaz de resolver interfaces, repositorios, mappers y extracción.
- * Repetir el registro con esta misma instancia no sustituye dependencias.
- *
- * ¿QUÉ NO DEBE HACER?
- * No registra providers de arranque, consulta tablas, ejecuta inferencia ni habilita
- * atención clínica. No reconstruye una memoria desde datos incompletos ni guarda
- * resultados entre casos. Las instantáneas V2 se recuperan desde SQL; el Closure
- * original es opcional y se utiliza únicamente para evaluaciones anteriores.
- */
+/** Registra los repositorios y adaptadores con configuración explícita, sin abrir conexiones. */
 final readonly class VinculadorRepositorios
 {
     /** @var array<class-string, object> Servicios sin estado de evaluación; las interfaces comparten la instancia concreta. */
@@ -71,15 +43,13 @@ final readonly class VinculadorRepositorios
 
     /**
      * Prepara dependencias sin abrir PDO, consultar BDD ni registrar servicios globales.
-     *
-     * @param  string  $conexionExperimental  Nombre explícito de una conexión técnica segregada.
-     * @param  DateTimeZone  $zonaAlmacenamiento  Zona única para repositorio, extractor y mappers.
-     * @param  string  $tipoReglaResultado  Tipo literal del contrato versionado, sin default clínico.
-     * @param  list<string>  $rolesSoporte  Roles explícitos; vacío no autoriza soportes.
-     * @param  array<string, AdaptadorControlesCognitivos|AdaptadorSeguimientosPedagogicos|AdaptadorValoracionesFuncionales|AdaptadorInstrumentos|AdaptadorIadlExperimental>  $adaptadores  Clave contractual a instancia conocida; los selectores instrumentales se configuran en su instancia.
-     * @param  Closure(string, string, string, DateTimeImmutable): MemoriaTrabajo  $recuperarMemoria  Instantánea original por evaluación, residente, versión y corte; no se almacena ni inventa aquí.
-     *
-     * @throws DomainException Por conexión, tipo, rol o registro de adaptadores inválidos.
+     * @param string $conexionExperimental
+     * @param DateTimeZone $zonaAlmacenamiento
+     * @param string $tipoReglaResultado
+     * @param list<string> $rolesSoporte
+     * @param array<string, AdaptadorControlesCognitivos|AdaptadorSeguimientosPedagogicos|AdaptadorValoracionesFuncionales|AdaptadorInstrumentos|AdaptadorIadlExperimental> $adaptadores
+     * @param Closure(string, string, string, DateTimeImmutable): MemoriaTrabajo $recuperarMemoria
+     * @throws DomainException
      */
     public function __construct(
         /** Destino explícito de todos los repositorios. */ private string $conexionExperimental,
@@ -124,12 +94,10 @@ final readonly class VinculadorRepositorios
 
     /**
      * Registra el grafo exclusivamente en el contenedor experimental solicitado.
-     *
-     * @param  Container  $contenedor  Contenedor Laravel en testing; no se sustituye el global.
-     * @return void Conserva instancias y bindings ajenos; no ejecuta consultas SQL.
-     *
-     * @throws RuntimeException Por entorno o conexión no desechables.
-     * @throws LogicException Por binding, alias o instancia preexistentes de otra configuración.
+     * @param Container $contenedor
+     * @return void
+     * @throws RuntimeException
+     * @throws LogicException
      */
     public function registrar(Container $contenedor): void
     {

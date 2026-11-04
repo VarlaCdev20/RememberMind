@@ -54,11 +54,7 @@ final class PresentarInformeCognitivo
             'limite_revision' => 'Psicología y Medicina confirman o rechazan por separado las valoraciones habilitadas para revisión profesional.'];
     }
 
-    /**
-     * Diferencia ausencia, preliminar, insuficiencia, bloqueo de publicación e integridad.
-     * Solo COG-MEM tiene contrato de resultado en este lector. Un código G09 o
-     * una etiqueta observacional nunca se publica como un resultado de memoria.
-     */
+    /** Diferencia ausencia, preliminar, insuficiencia, bloqueo de publicación e integridad. */
     private function area(string $codigo, array $d, int $observaciones): array
     {
         $soportes = array_values(array_filter($d['evidencias'], fn ($e) => $e['papel'] === 'Soporte de inferencia'));

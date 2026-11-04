@@ -17,36 +17,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 use PHPUnit\Framework\TestCase;
 
-/**
- * TÍTULO: Perfiles sin agregación y resultados con alcance positivo.
- *
- * CAPA: Domain (verificación unitaria).
- *
- * SUBSISTEMA: Hechos y resultados cognitivos.
- *
- * RESPONSABILIDAD:
- * Verificar conservación, contexto y rechazo de conclusiones sin soporte.
- *
- * ENTRADAS:
- * Hechos y referencias totalmente ficticios.
- *
- * SALIDAS:
- * Aserciones sobre invariantes constructivas, sin interpretación clínica.
- *
- * RESTRICCIONES:
- * No inicia Laravel, no consulta BDD ni implementa servicios de la Fase D.
- *
- * TRAZABILIDAD:
- * Reglamento maestro, Fase B e invariantes R1–R10.
- */
+/** Verificar conservación, contexto y rechazo de conclusiones sin soporte. */
 final class CognicionEntitiesTest extends TestCase
 {
     /**
      * Construye desconocimiento explícito con cero soportes.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_subcomponente_desconocido_permite_ausencia_sin_normalizar(): void
     {
@@ -56,10 +32,7 @@ final class CognicionEntitiesTest extends TestCase
     }
     /**
      * Impide que un hallazgo de atención se presente como memoria.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_subcomponente_rechaza_evidencia_de_otro_eje(): void
     {
@@ -69,10 +42,7 @@ final class CognicionEntitiesTest extends TestCase
     }
     /**
      * Conserva un hallazgo de tarea sin elevarlo automáticamente a A.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_subcomponente_preserva_fuente_y_no_crea_estado_de_dominio(): void
     {
@@ -83,10 +53,7 @@ final class CognicionEntitiesTest extends TestCase
     }
     /**
      * Rechaza P a partir del solo nivel de evaluabilidad 2.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_integrada_no_acredita_rendimiento_esperado_sin_soporte(): void
     {
@@ -95,10 +62,7 @@ final class CognicionEntitiesTest extends TestCase
     }
     /**
      * Rechaza A aun cuando haya un hallazgo descriptivo del mismo dominio.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_hallazgo_g09_no_acredita_alteracion_completa(): void
     {
@@ -108,10 +72,7 @@ final class CognicionEntitiesTest extends TestCase
     }
     /**
      * Rechaza convertir una referencia de subcomponente en estado global A.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_tarea_aislada_no_sustituye_referencia_del_dominio(): void
     {
@@ -121,10 +82,7 @@ final class CognicionEntitiesTest extends TestCase
     }
     /**
      * Rechaza A cuando la compuerta declara únicamente pre-evaluación.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_senal_no_habilita_alteracion_aunque_exista_referencia(): void
     {
@@ -134,10 +92,7 @@ final class CognicionEntitiesTest extends TestCase
     }
     /**
      * Impide reutilizar evidencia de atención para memoria.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_resultado_rechaza_soporte_de_otro_dominio(): void
     {
@@ -147,10 +102,7 @@ final class CognicionEntitiesTest extends TestCase
     }
     /**
      * Admite una declaración sintética completa sin introducir un requisito basal universal.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_referencia_positiva_no_requiere_linea_basal_inventada(): void
     {
@@ -160,10 +112,7 @@ final class CognicionEntitiesTest extends TestCase
     }
     /**
      * Rechaza A cuando existe también una referencia completa P sin adjudicar.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_referencias_opuestas_no_admiten_estado_concluyente(): void
     {
@@ -176,10 +125,7 @@ final class CognicionEntitiesTest extends TestCase
 
     /**
      * Rechaza concluir cuando una evidencia completa declara falta de interpretabilidad.
-     *
      * @return void
-     *
-     * No recibe parámetros; se espera DomainException por contexto no interpretable.
      */
     public function test_referencia_positiva_no_oculta_evidencia_no_interpretable(): void
     {
@@ -191,10 +137,7 @@ final class CognicionEntitiesTest extends TestCase
     }
     /**
      * Conserva cinco estados U explícitos y su memoria sin generar normalidad.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_vector_conserva_cinco_desconocidos_sin_indice_global(): void
     {
@@ -208,10 +151,7 @@ final class CognicionEntitiesTest extends TestCase
     }
     /**
      * Rechaza cuatro dominios en lugar de completar silenciosamente el quinto.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_vector_rechaza_eje_faltante(): void
     {
@@ -222,10 +162,7 @@ final class CognicionEntitiesTest extends TestCase
     }
     /**
      * Rechaza dos resultados del mismo eje aunque la colección tenga cinco elementos.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_vector_rechaza_dominio_duplicado(): void
     {
@@ -236,10 +173,7 @@ final class CognicionEntitiesTest extends TestCase
     }
     /**
      * Impide mezclar dos memorias construidas por separado.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_vector_rechaza_instantaneas_distintas(): void
     {
@@ -250,10 +184,7 @@ final class CognicionEntitiesTest extends TestCase
     }
     /**
      * Impide presentar un episodio común como dos soportes independientes A/P.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_vector_rechaza_episodio_reutilizado_entre_dominios(): void
     {
@@ -273,10 +204,7 @@ final class CognicionEntitiesTest extends TestCase
 
     /**
      * Conserva las dos referencias opuestas al declarar un subcomponente contradictorio.
-     *
      * @return void
-     *
-     * No recibe parámetros; las referencias son manuales y exclusivamente sintéticas.
      */
     public function test_subcomponente_contradictorio_preserva_ambos_soportes(): void
     {
@@ -293,10 +221,9 @@ final class CognicionEntitiesTest extends TestCase
 
     /**
      * Impide seleccionar una conclusión favorable u opuesta ocultando el conflicto.
-     *
-     * @param H $hallazgo Conclusión incompatible con los dos soportes recibidos.
+     * @param H $hallazgo
      * @return void
-     * @throws DomainException Excepción esperada por contradicción no preservada.
+     * @throws DomainException
      */
     #[DataProvider('hallazgosConcluyentes')]
     public function test_subcomponente_no_oculta_referencias_opuestas(H $hallazgo): void
@@ -312,10 +239,7 @@ final class CognicionEntitiesTest extends TestCase
 
     /**
      * Aporta los dos hallazgos sintéticos que el conflicto impide declarar.
-     *
-     * @return iterable<string, array{H}> Conclusiones explícitas incompatibles.
-     *
-     * No recibe parámetros ni lanza excepciones.
+     * @return iterable<string, array{H}>
      */
     public static function hallazgosConcluyentes(): iterable
     {

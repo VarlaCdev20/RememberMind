@@ -34,32 +34,10 @@ use Tests\Feature\SistemaExperto\Infrastructure\Repositories\EscenarioRepositori
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades;
 use Tests\Unit\SistemaExperto\Infrastructure\Mappers\EscenarioMapeadores as F;
 
-/**
- * TÍTULO:
- * Resolución de dependencias y lectura Eloquent en Laravel.
- *
- * CAPA:
- * Infrastructure - Configuracion (pruebas de integración).
- *
- * ¿PARA QUÉ SIRVE?
- * Prueba el vinculador dentro de la aplicación y los puertos reales de Domain.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * Fixtures sintéticas y el destino que Tests\TestCase verifica como desechable.
- *
- * ¿QUÉ HACE?
- * Recorre contenedor, repositorios, extracción, mappers y CU-01 sin mocks del núcleo.
- * Comprueba ApoyoDecision, configuración instrumental y ausencia de escrituras.
- *
- * ¿QUÉ DEVUELVE?
- * Entidades y DTO reales, con contexto y datos NULL conservados.
- *
- * ¿QUÉ NO DEBE HACER?
- * No conecta una base de producción, registra providers ni activa inferencia clínica.
- */
+/** Prueba el vinculador dentro de la aplicación y los puertos reales de Domain. */
 final class VinculadorRepositoriosFeatureTest extends AdaptadoresTestCase
 {
-    /** El registro explícito no consulta ni altera bindings previos; sin parámetros ni excepciones esperadas. */
+    /** El registro explícito no consulta ni altera bindings previos */
     public function test_resuelve_los_cuatro_puertos_sin_duplicar_apoyo_decision(): void
     {
         $previos = $this->app->getBindings();
@@ -89,7 +67,7 @@ final class VinculadorRepositoriosFeatureTest extends AdaptadoresTestCase
         self::assertFalse(config('sistema_experto.lectura_tecnica_pruebas.habilitada'));
     }
 
-    /** Los puertos resueltos ejecutan consultas y mappers reales; sin parámetros ni excepciones esperadas. */
+    /** Los puertos resueltos ejecutan consultas y mappers reales */
     public function test_puertos_del_contenedor_recuperan_reglas_y_red_de_la_version_exacta(): void
     {
         EscenarioRepositorios::guardarGrafo(F::regla());
@@ -111,9 +89,8 @@ final class VinculadorRepositoriosFeatureTest extends AdaptadoresTestCase
 
     /**
      * El contenedor conecta CU-01 con extracción y Domain reales.
-     *
-     * @param  bool|null  $valor  Booleano físico o ausencia explícita.
-     * @return void Sin excepciones esperadas.
+     * @param bool|null $valor
+     * @return void
      */
     #[DataProvider('valoresOriginales')]
     public function test_caso_de_uso_resuelto_conserva_null_y_false_hasta_domain(?bool $valor): void
@@ -134,14 +111,14 @@ final class VinculadorRepositoriosFeatureTest extends AdaptadoresTestCase
         $this->exigirSoloLecturas();
     }
 
-    /** @return iterable<string, array{bool|null}> Dato faltante y booleano conocido; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{bool|null}> */
     public static function valoresOriginales(): iterable
     {
         yield 'NULL' => [null];
         yield 'false' => [false];
     }
 
-    /** Conserva selectores instrumentales configurados, sin sustituirlos por un adaptador vacío; sin parámetros ni excepciones esperadas. */
+    /** Conserva selectores instrumentales configurados, sin sustituirlos por un adaptador vacío */
     public function test_binding_conserva_el_selector_instrumental_explicito(): void
     {
         $this->prepararInstrumento(['valor_logico' => false]);
@@ -155,7 +132,7 @@ final class VinculadorRepositoriosFeatureTest extends AdaptadoresTestCase
         self::assertSame('SIM-INST', $memoria->evidencias['SIM-EVID']->instrumentoId);
     }
 
-    /** El proveedor original se invoca por contexto, sin fabricar memoria desde las tablas; sin parámetros ni errores sin capturar. */
+    /** El proveedor original se invoca por contexto, sin fabricar memoria desde las tablas */
     public function test_evaluaciones_resueltas_conservan_memoria_y_rechazan_otro_corte(): void
     {
         [, $memoria] = EscenarioRepositorios::resultadosConSoporte();
@@ -183,7 +160,7 @@ final class VinculadorRepositoriosFeatureTest extends AdaptadoresTestCase
         self::assertSame($repositorio, $this->app->make(EvaluacionExpertaRepositoryInterface::class));
     }
 
-    /** Las restricciones de escritura del puerto permanecen activas tras vincular; sin parámetros ni errores sin capturar. */
+    /** Las restricciones de escritura del puerto permanecen activas tras vincular */
     public function test_binding_no_crea_catalogos_de_conveniencia_para_guardar(): void
     {
         $perfil = EscenarioEntidades::perfil(['U', 'U', 'U', 'U', 'U']);
@@ -200,7 +177,7 @@ final class VinculadorRepositoriosFeatureTest extends AdaptadoresTestCase
         self::assertSame(0, DB::table('evaluaciones_expertas')->count());
     }
 
-    /** Rechaza un destino SQLite físico sin crearlo ni abrirlo; sin parámetros ni errores sin capturar. */
+    /** Rechaza un destino SQLite físico sin crearlo ni abrirlo */
     public function test_conexion_no_desechable_no_abre_archivo_ni_registra_servicios(): void
     {
         $ruta = sys_get_temp_dir().'/orion-vinculador-rechazada-'.bin2hex(random_bytes(8)).'.sqlite';
@@ -217,7 +194,7 @@ final class VinculadorRepositoriosFeatureTest extends AdaptadoresTestCase
         self::assertSame($antes, $this->app->getBindings());
     }
 
-    /** Un binding previo se respeta sin registro parcial; sin parámetros ni errores sin capturar. */
+    /** Un binding previo se respeta sin registro parcial */
     public function test_contenedor_real_rechaza_una_colision_sin_reemplazarla(): void
     {
         $this->app->bind(EvaluacionExpertaRepositoryInterface::class, static function (): never {
@@ -236,10 +213,9 @@ final class VinculadorRepositoriosFeatureTest extends AdaptadoresTestCase
 
     /**
      * Construye la configuración explícita del escenario sin elegir reglas clínicas.
-     *
-     * @param  Closure|null  $memoria  Recuperación de la instantánea original; ausente significa indisponible, nunca inventada.
-     * @param  AdaptadorInstrumentos|null  $instrumentos  Selectores instrumentales ficticios.
-     * @return VinculadorRepositorios Grafo real para el perfil seguro actual.
+     * @param Closure|null $memoria
+     * @param AdaptadorInstrumentos|null $instrumentos
+     * @return VinculadorRepositorios
      */
     private function vinculador(?Closure $memoria = null, ?AdaptadorInstrumentos $instrumentos = null): VinculadorRepositorios
     {

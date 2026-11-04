@@ -26,35 +26,13 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use RuntimeException;
 
-/**
- * TÍTULO:
- * Extracción de variables conforme al modelo experto.
- *
- * CAPA:
- * Infrastructure - Adapters.
- *
- * ¿PARA QUÉ SIRVE?
- * Recupera datos brutos autorizados sin interpretación clínica.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * Evidencias del repositorio, corte explícito, resolución de fuentes y zona SQL.
- *
- * ¿QUÉ HACE?
- * Consulta el contrato 08 por lote, comprueba FK/versiones y delega en adaptadores conocidos.
- *
- * ¿QUÉ DEVUELVE?
- * El contrato de extracción del repositorio: origen original, valor escalar nullable y destino técnico.
- *
- * ¿QUÉ NO DEBE HACER?
- * No ejecuta SQL desde campos configurables, crea defaults, interpreta instrumentos ni consulta personas reales.
- */
+/** Extrae el valor original de una variable según el mapeo de la versión. */
 final readonly class ExtractorVariableMapeada
 {
     /**
      * Recibe resolución y zona horaria sin registrar bindings ni ejecutar consultas.
-     *
-     * @param  ResolutorFuenteExperta  $fuentes  Registro explícito y conexión segregada.
-     * @param  DateTimeZone  $zonaAlmacenamiento  Zona de fechas clínicas SQL.
+     * @param ResolutorFuenteExperta $fuentes
+     * @param DateTimeZone $zonaAlmacenamiento
      */
     public function __construct(
         /** Fuente/implementación de la versión exacta. */ private ResolutorFuenteExperta $fuentes,
@@ -63,14 +41,12 @@ final readonly class ExtractorVariableMapeada
 
     /**
      * Proporciona directamente el callable requerido por EvidenciaEloquentRepository.
-     *
-     * @param  Collection<int, EvidenciaEvaluacion>  $filas  Evidencias existentes de una sola evaluación.
-     * @param  DateTimeImmutable  $corte  Corte original inclusivo.
-     * @param  string  $conexion  Nombre exacto esperado por el repositorio.
-     * @return array<string, array{origen: Model, valor: string|int|float|bool|null, tipo: 'HECHO'|'EVIDENCIA_COGNITIVA'}> Lote por PK de evidencia; las filas posteriores al corte solo llevan metadatos para que el repositorio las excluya.
-     *
-     * @throws DomainException Por mezcla de casos/versiones, selector o tipo incompatible.
-     * @throws RuntimeException Por fuente, mapeo u origen no disponibles o base no autorizada.
+     * @param Collection<int, EvidenciaEvaluacion> $filas
+     * @param DateTimeImmutable $corte
+     * @param string $conexion
+     * @return array<string, array{origen: Model, valor: string|int|float|bool|null, tipo: 'HECHO'|'EVIDENCIA_COGNITIVA'}>
+     * @throws DomainException
+     * @throws RuntimeException
      */
     public function __invoke(Collection $filas, DateTimeImmutable $corte, string $conexion): array
     {
@@ -142,17 +118,15 @@ final readonly class ExtractorVariableMapeada
 
     /**
      * Recupera columnas del adaptador por lotes; los nombres vienen de constantes.
-     *
-     * @param  AdaptadorControlesCognitivos|AdaptadorSeguimientosPedagogicos|AdaptadorValoracionesFuncionales|AdaptadorInstrumentos  $adaptador  Instancia final conocida.
-     * @param  EvaluacionExperta  $evaluacion  Contexto que se contrasta con su cabecera persistida.
-     * @param  list<string>  $ids  PK exactas solicitadas.
-     * @param  DateTimeImmutable  $corte  Corte inclusivo.
-     * @param  string  $conexion  Destino técnico explícito.
-     * @param  DateTimeZone  $zona  Zona SQL explícita.
-     * @return Collection<int, Model> Originales hasta el corte; posteriores únicamente con metadatos.
-     *
-     * @throws DomainException Por contexto, episodio, estado o fecha inválidos.
-     * @throws RuntimeException Por base no autorizada u origen no disponible.
+     * @param AdaptadorControlesCognitivos|AdaptadorSeguimientosPedagogicos|AdaptadorValoracionesFuncionales|AdaptadorInstrumentos $adaptador
+     * @param EvaluacionExperta $evaluacion
+     * @param list<string> $ids
+     * @param DateTimeImmutable $corte
+     * @param string $conexion
+     * @param DateTimeZone $zona
+     * @return Collection<int, Model>
+     * @throws DomainException
+     * @throws RuntimeException
      */
     public static function recuperarOperativos(AdaptadorControlesCognitivos|AdaptadorSeguimientosPedagogicos|AdaptadorValoracionesFuncionales|AdaptadorInstrumentos|AdaptadorIadlExperimental $adaptador,
         EvaluacionExperta $evaluacion, array $ids, DateTimeImmutable $corte, string $conexion, DateTimeZone $zona): Collection
@@ -241,12 +215,10 @@ final readonly class ExtractorVariableMapeada
 
     /**
      * Restringe toda lectura experimental antes de abrir el PDO.
-     *
-     * @param  string  $nombre  Conexión nombrada explícitamente.
-     * @return Connection Destino autorizado por la guarda institucional existente.
-     *
-     * @throws DomainException Por nombre vacío o inválido.
-     * @throws RuntimeException Fuera de testing o de bases técnicas desechables.
+     * @param string $nombre
+     * @return Connection
+     * @throws DomainException
+     * @throws RuntimeException
      */
     public static function conexionSegura(string $nombre): Connection
     {
@@ -266,11 +238,9 @@ final readonly class ExtractorVariableMapeada
 
     /**
      * Comprueba la forma de los identificadores sin normalizarlos ni interpolarlos.
-     *
-     * @param  string  ...$ids  Códigos del contrato exacto.
-     * @return void No consulta ni fabrica valores.
-     *
-     * @throws DomainException Por cadena vacía o con espacios/control.
+     * @param string ...$ids
+     * @return void
+     * @throws DomainException
      */
     public static function validarIds(string ...$ids): void
     {
@@ -283,12 +253,10 @@ final readonly class ExtractorVariableMapeada
 
     /**
      * Resuelve un campo directo únicamente contra una lista cerrada del adaptador.
-     *
-     * @param  MapeoVariableFuente  $mapeo  Contrato persistido.
-     * @param  array<string, string>  $permitidos  Constantes de columnas físicas del adaptador.
-     * @return string Nombre físico validado, utilizado solo para leer atributos cargados.
-     *
-     * @throws DomainException Por modo, campo o selector no soportados.
+     * @param MapeoVariableFuente $mapeo
+     * @param array<string, string> $permitidos
+     * @return string
+     * @throws DomainException
      */
     public static function campoMapeado(MapeoVariableFuente $mapeo, array $permitidos): string
     {
@@ -304,13 +272,11 @@ final readonly class ExtractorVariableMapeada
 
     /**
      * Lee atributos físicos sin accessors que completen ausencias.
-     *
-     * @param  Model  $modelo  Original materializado con la columna seleccionada.
-     * @param  string  $campo  Columna ya permitida por el adaptador.
-     * @param  string  $tipo  Tipo físico de la lista cerrada.
-     * @return string|bool|null Texto, decimal transportado como texto, booleano o NULL.
-     *
-     * @throws DomainException Por columna ausente o valor incompatible con el tipo.
+     * @param Model $modelo
+     * @param string $campo
+     * @param string $tipo
+     * @return string|bool|null
+     * @throws DomainException
      */
     public static function valorFisico(Model $modelo, string $campo, string $tipo): string|bool|null
     {
@@ -345,11 +311,9 @@ final readonly class ExtractorVariableMapeada
 
     /**
      * Identifica el propietario documental, sin convertir datos en A/P.
-     *
-     * @param  MapeoVariableFuente  $mapeo  Variable con propietario primario precargado.
-     * @return string Destino técnico HECHO o EVIDENCIA_COGNITIVA descriptiva.
-     *
-     * @throws DomainException Por propietario de otra versión o no cargado.
+     * @param MapeoVariableFuente $mapeo
+     * @return string
+     * @throws DomainException
      */
     public static function tipoDeclarado(MapeoVariableFuente $mapeo): string
     {
@@ -385,12 +349,10 @@ final readonly class ExtractorVariableMapeada
 
     /**
      * Valida el instante original sin aceptar normalizaciones de calendario.
-     *
-     * @param  Model  $original  Modelo con fecha_hora física seleccionada.
-     * @param  DateTimeZone  $zona  Zona explícita del almacenamiento.
-     * @return DateTimeImmutable Fecha real del registro original.
-     *
-     * @throws DomainException Por dato ausente, fecha o formato inválidos.
+     * @param Model $original
+     * @param DateTimeZone $zona
+     * @return DateTimeImmutable
+     * @throws DomainException
      */
     public static function fechaOriginal(Model $original, DateTimeZone $zona): DateTimeImmutable
     {
@@ -410,12 +372,10 @@ final readonly class ExtractorVariableMapeada
 
     /**
      * Contrasta variable/nodo y versión del mapeo antes de consultar una fuente.
-     *
-     * @param  MapeoVariableFuente  $mapeo  Contrato con variable/nodo cargados.
-     * @param  string  $version  Versión única de la evaluación.
-     * @return void No activa conocimiento ni selecciona otra variable.
-     *
-     * @throws DomainException Por estado o FK/versión incompatibles.
+     * @param MapeoVariableFuente $mapeo
+     * @param string $version
+     * @return void
+     * @throws DomainException
      */
     private static function validarMapeo(MapeoVariableFuente $mapeo, string $version): void
     {
@@ -437,11 +397,9 @@ final readonly class ExtractorVariableMapeada
 
     /**
      * Impide consultar fuentes asistenciales a través de la PoC.
-     *
-     * @param  EvaluacionExperta  $evaluacion  Cabecera original de evaluación.
-     * @return void No consulta otro residente ni inventa una cabecera.
-     *
-     * @throws DomainException Por evaluación/residente no sintéticos o modo asistencial.
+     * @param EvaluacionExperta $evaluacion
+     * @return void
+     * @throws DomainException
      */
     private static function contextoSintetico(EvaluacionExperta $evaluacion): void
     {

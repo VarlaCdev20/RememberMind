@@ -13,18 +13,10 @@ use Illuminate\Database\Eloquent\Collection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * TÍTULO: Lectura de resultados literales con soportes originales.
- * CAPA: Infrastructure - Mappers (pruebas unitarias).
- * ¿PARA QUÉ SIRVE? Verifica estados separados, evaluabilidad, contexto y suficiencia.
- * ¿QUÉ INFORMACIÓN RECIBE? Filas sintéticas que declaran literalmente el contrato de Domain.
- * ¿QUÉ HACE? Reconstruye resultados y rechaza catálogos o referencias incompatibles.
- * ¿QUÉ DEVUELVE? Aserciones sobre el perfil y sus evidencias.
- * ¿QUÉ NO DEBE HACER? No declara que A/P esté instalado en D-137 ni valida clínicamente los estados.
- */
+/** Verifica estados separados, evaluabilidad, contexto y suficiencia. */
 final class MapeadorResultadosTest extends TestCase
 {
-    /** Conserva los cinco estados sin índice ni inferencia desde evaluabilidad; sin parámetros ni excepciones esperadas. */
+    /** Conserva los cinco estados sin índice ni inferencia desde evaluabilidad */
     public function test_reconstruye_cinco_dominios_con_sus_soportes_originales(): void
     {
         [$modelo, $memoria] = EscenarioMapeadores::resultados();
@@ -42,10 +34,8 @@ final class MapeadorResultadosTest extends TestCase
 
     /**
      * No convierte los literales descriptivos de G09 en alteración o preservación.
-     *
-     * @param  string  $codigo  Código semántico sin equivalencia literal en Domain.
-     *
-     * @throws DomainException Rechazo explícito esperado.
+     * @param string $codigo
+     * @throws DomainException
      */
     #[DataProvider('resultadosG09')]
     public function test_resultados_descriptivos_no_se_convierten_en_apx(string $codigo): void
@@ -59,7 +49,7 @@ final class MapeadorResultadosTest extends TestCase
         self::mapper()->aDominio($fila, $memoria);
     }
 
-    /** @return iterable<string, array{string}> Literales del piloto descriptivo; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string}> */
     public static function resultadosG09(): iterable
     {
         yield 'dificultad' => ['DIFICULTAD_EVIDENCIADA'];
@@ -80,10 +70,8 @@ final class MapeadorResultadosTest extends TestCase
 
     /**
      * Impide reconstruir conclusiones sin referencias y contexto compatibles.
-     *
-     * @param  string  $caso  Manipulación independiente de las filas.
-     *
-     * @throws DomainException Rechazo esperado sin cambiar Domain.
+     * @param string $caso
+     * @throws DomainException
      */
     #[DataProvider('resultadosInvalidos')]
     public function test_rechaza_resultados_sin_contrato_coherente(string $caso): void
@@ -131,7 +119,7 @@ final class MapeadorResultadosTest extends TestCase
         self::mapper()->aVector($modelo, $memoria);
     }
 
-    /** @return iterable<string, array{string}> Incompatibilidades de reconstrucción; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string}> */
     public static function resultadosInvalidos(): iterable
     {
         foreach (['residente ajeno', 'versión ajena', 'modo asistencial', 'catálogo ajeno', 'sin soportes A', 'soporte contextual A',
@@ -141,7 +129,7 @@ final class MapeadorResultadosTest extends TestCase
         }
     }
 
-    /** Mantiene desconocimiento con cero evidencias, sin inventar normalidad; sin parámetros ni excepciones esperadas. */
+    /** Mantiene desconocimiento con cero evidencias, sin inventar normalidad */
     public function test_perfil_desconocido_no_inventa_soportes_ni_resultados_favorables(): void
     {
         [$modelo, $memoria] = EscenarioMapeadores::resultados(['U', 'U', 'U', 'U', 'U']);
@@ -153,7 +141,7 @@ final class MapeadorResultadosTest extends TestCase
         }
     }
 
-    /** Evita cambiar permisos de soporte mediante referencias PHP externas; sin parámetros ni excepciones esperadas. */
+    /** Evita cambiar permisos de soporte mediante referencias PHP externas */
     public function test_copia_roles_del_contrato_sin_referencias_mutables(): void
     {
         $rol = 'SIM-SOPORTE';
@@ -171,7 +159,7 @@ final class MapeadorResultadosTest extends TestCase
         new MapeadorResultados(new DateTimeZone('America/La_Paz'), ['CONTEXTUAL']);
     }
 
-    /** @return MapeadorResultados Mapper con contrato de roles ficticio explícito; sin parámetros ni excepciones. */
+    /** @return MapeadorResultados */
     private static function mapper(): MapeadorResultados
     {
         return new MapeadorResultados(new DateTimeZone('America/La_Paz'), ['SIM-SOPORTE']);

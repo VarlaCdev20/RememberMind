@@ -16,24 +16,12 @@ use MotorExperto\dominio\orion\ValueObjects\Cognicion\EvaluabilidadEnum;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\SubcomponenteCognitivoEnum;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Motor de inferencia (Perfil por dominios).
- * TÍTULO: Integración experimental sustentada sin puntuación global.
- * CAPA: Domain.
- * SUBSISTEMA: Inferencia.
- * RESPONSABILIDAD: Aplicar compuertas a referencias explícitas y conservar U/I/X.
- * ENTRADAS: Memoria, dominio, candidatas y revisiones originales.
- * SALIDAS: Resultado de dominio, compuertas y exclusiones verificables.
- * RESTRICCIONES: No promueve una tarea o consecuencia G09 a A/P; tampoco suma señales.
- * TRAZABILIDAD: R1–R8; referencias externas sintéticas del contrato DCL-PET.
- */
+/** Integra evidencias admisibles por dominio; conserva incertidumbres y contradicciones. */
 final readonly class IntegradorDominiosService
 {
     /**
      * Conecta la compuerta pura; no realiza consultas ni acredita revisiones.
-     *
-     * @param  EvaluadorEvaluabilidadService  $evaluabilidad  Colaborador sin estado por caso.
-     *                                                        No produce resultados ni excepciones durante la construcción.
+     * @param EvaluadorEvaluabilidadService $evaluabilidad
      */
     public function __construct(
         /** Evaluación independiente del estado cognitivo. */
@@ -42,15 +30,13 @@ final readonly class IntegradorDominiosService
 
     /**
      * Integra únicamente soportes con procedencia acreditada en esta memoria.
-     *
-     * @param  MemoriaTrabajo  $memoria  Instantánea original.
-     * @param  DominioCognitivoEnum  $dominio  Eje que se conserva separado.
-     * @param  list<EvidenciaCognitiva>  $candidatas  Referencias originales.
-     * @param  list<HechoExperto>  $procedencias  Declaraciones de procedencia.
-     * @param  list<HechoExperto>  $contexto  Declaraciones contextuales del eje.
-     * @return array{resultado: ResultadoDominio, compuertas: array} Resultado y antecedente íntegro.
-     *
-     * @throws \DomainException Por identidad, duplicación o contexto inválido.
+     * @param MemoriaTrabajo $memoria
+     * @param DominioCognitivoEnum $dominio
+     * @param list<EvidenciaCognitiva> $candidatas
+     * @param list<HechoExperto> $procedencias
+     * @param list<HechoExperto> $contexto
+     * @return array{resultado: ResultadoDominio, compuertas: array}
+     * @throws \DomainException
      */
     public function integrar(MemoriaTrabajo $memoria, DominioCognitivoEnum $dominio, array $candidatas,
         array $procedencias = [], array $contexto = []): array
@@ -95,10 +81,8 @@ final readonly class IntegradorDominiosService
 
     /**
      * Conserva conflictos y límites antes de elegir un descriptor documentado.
-     *
-     * @param  list<EvidenciaCognitiva>  $soportes  Evidencias del mismo alcance.
-     * @return HallazgoInstrumentalEnum Descriptor sustentado o desconocido.
-     *                                  No cuenta votos, establece cortes clínicos ni transforma ausencia en preservación.
+     * @param list<EvidenciaCognitiva> $soportes
+     * @return HallazgoInstrumentalEnum
      */
     private function resolverHallazgo(array $soportes): HallazgoInstrumentalEnum
     {

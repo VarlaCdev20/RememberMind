@@ -13,19 +13,13 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 
-/**
- * TÍTULO: Transporte de evidencia original y disponibilidad.
- * CAPA: Application (pruebas unitarias).
- * ¿PARA QUÉ SIRVE? Comprueba conservación de hechos, procedencia y ausencias.
- * ¿QUÉ RECIBE? Memorias y metadatos ficticios.
- * ¿QUÉ HACE? Construye el DTO y manipula únicamente sus entradas artificiales.
- * ¿QUÉ DEVUELVE? Aserciones sobre contexto y copias inmutables.
- * ¿QUÉ NO DEBE HACER? No consulta repositorios reales ni modifica Domain.
- * RELACIÓN CON O.R.I.O.N.: Reglamento de Application, DTO 02 y etapa B.
- */
+/** Comprueba conservación de hechos, procedencia y ausencias. */
 final class EvidenciasEntradaDTOTest extends TestCase
 {
-    /** Conserva objetos y referencias de procedencia; sin parámetros ni excepciones esperadas. @return void */
+    /**
+ * Conserva objetos y referencias de procedencia
+ * @return void
+ */
     public function test_transporta_hechos_de_contexto_y_evidencias_originales(): void
     {
         $e = F::evidencia(hallazgo: HallazgoInstrumentalEnum::DESCONOCIDO, cambiosHecho: ['valor' => null]);
@@ -45,7 +39,10 @@ final class EvidenciasEntradaDTOTest extends TestCase
         ], $dto->referenciasProcedencia[$e->hecho->id]);
     }
 
-    /** Una memoria vacía conserva las ausencias; sin parámetros ni excepciones esperadas. @return void */
+    /**
+ * Una memoria vacía conserva las ausencias
+ * @return void
+ */
     public function test_sin_evidencias_no_fabrica_normalidad(): void
     {
         $dto = new EvidenciasEntradaDTO(self::solicitud(), F::memoria(),
@@ -66,7 +63,10 @@ final class EvidenciasEntradaDTOTest extends TestCase
         new EvidenciasEntradaDTO(self::solicitud(), $memoria);
     }
 
-    /** Rompe referencias mutables de ambos mapas; sin parámetros ni excepciones esperadas. @return void */
+    /**
+ * Rompe referencias mutables de ambos mapas
+ * @return void
+ */
     public function test_metadatos_no_cambian_al_mutar_las_referencias_de_entrada(): void
     {
         $dato = 'Ausencia original.';
@@ -82,11 +82,9 @@ final class EvidenciasEntradaDTOTest extends TestCase
 
     /**
      * Rechaza metadatos ambiguos en cualquiera de los dos mapas de disponibilidad.
-     *
-     * @param  string  $campo  Mapa al que pertenece el error.
-     * @param  array<mixed>  $datos  Estructura inválida.
-     *
-     * @throws DomainException Rechazo esperado sin completar razones por defecto.
+     * @param string $campo
+     * @param array<mixed> $datos
+     * @throws DomainException
      */
     #[DataProvider('metadatosInvalidos')]
     public function test_rechaza_metadatos_sin_identificador_o_razon(string $campo, array $datos): void
@@ -95,7 +93,7 @@ final class EvidenciasEntradaDTOTest extends TestCase
         new EvidenciasEntradaDTO(self::solicitud(), F::memoria(), ...[$campo => $datos]);
     }
 
-    /** @return iterable<string, array{string, array<mixed>}> Metadatos negativos; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string, array<mixed>}> */
     public static function metadatosInvalidos(): iterable
     {
         foreach (['datosFaltantes', 'fuentesNoDisponibles'] as $campo) {
@@ -106,7 +104,7 @@ final class EvidenciasEntradaDTOTest extends TestCase
         }
     }
 
-    /** @return SolicitudInferenciaDTO Petición ficticia; sin parámetros ni excepciones esperadas. */
+    /** @return SolicitudInferenciaDTO */
     private static function solicitud(): SolicitudInferenciaDTO
     {
         return new SolicitudInferenciaDTO('SIM-SOL', 'SIM-EVAL', 'SINTETICO-RES', F::fecha(), 'SIM-V1');

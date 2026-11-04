@@ -7,34 +7,7 @@ namespace MotorExperto\dominio\orion\Entities\Conocimiento;
 use MotorExperto\dominio\orion\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Base de conocimiento (Relaciones semánticas).
- *
- * Expresa una relación dirigida entre dos conceptos de la misma versión.
- * Preserva el predicado declarado sin introducir conexiones inversas o implícitas.
- *
- * TÍTULO: Arista explícita entre nodos versionados.
- *
- * CAPA: Domain.
- *
- * SUBSISTEMA: Base de conocimiento.
- *
- * RESPONSABILIDAD:
- * Vincular origen y destino existentes sin mezclar versiones ni inventar enlaces.
- *
- * ENTRADAS:
- * ID, nodos inmutables de origen/destino y predicado tipado.
- *
- * SALIDAS:
- * Una arista dirigida con versión deducida de sus dos extremos coherentes.
- *
- * RESTRICCIONES:
- * No implica simetría, transitividad, causalidad ni habilitación automática.
- * Los predicados provisionales conservan el estado documental de la Fase A.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R4/R10; normalización de predicados D-123.
- */
+/** Vincula dos conceptos de la misma versión mediante una relación dirigida. */
 final readonly class RelacionSemantica
 {
     /** Versión común de ambos extremos. */
@@ -42,12 +15,11 @@ final readonly class RelacionSemantica
 
     /**
      * Construye una arista dirigida sin inferencias adicionales.
-     *
-     * @param string $id Identidad de la relación.
-     * @param NodoSemantico $origen Nodo original.
-     * @param TipoRelacionSemanticaEnum $tipo Significado de la arista.
-     * @param NodoSemantico $destino Nodo de destino.
-     * @throws DomainException Por ID inválido o extremos de versiones diferentes.
+     * @param string $id
+     * @param NodoSemantico $origen
+     * @param TipoRelacionSemanticaEnum $tipo
+     * @param NodoSemantico $destino
+     * @throws DomainException
      */
     public function __construct(
         /** Identidad de la arista. */ public string $id,

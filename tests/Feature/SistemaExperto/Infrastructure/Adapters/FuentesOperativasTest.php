@@ -11,31 +11,10 @@ use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 
-/**
- * TÍTULO:
- * Pruebas integradas de controles, seguimiento y BADL.
- *
- * CAPA:
- * Infrastructure - Adapters.
- *
- * ¿PARA QUÉ SIRVE?
- * Recupera datos brutos autorizados sin interpretación clínica.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * Registros sintéticos y mapeos reales de la versión SIM-V1.
- *
- * ¿QUÉ HACE?
- * Recorre repositorio, extractor, adaptadores y mapper reales.
- *
- * ¿QUÉ DEVUELVE?
- * Aserciones de NULL, tipos, procedencia, corte y ausencia de efectos.
- *
- * ¿QUÉ NO DEBE HACER?
- * No interpreta puntuaciones, reemplaza IADL ni simula la BDD central.
- */
+/** Recupera datos brutos autorizados sin interpretación clínica. */
 final class FuentesOperativasTest extends AdaptadoresTestCase
 {
-    /** NULL sigue desconocido, sin accessors ni escrituras; sin parámetros ni excepciones esperadas. */
+    /** NULL sigue desconocido, sin accessors ni escrituras */
     public function test_control_null_permanece_null_hasta_el_dominio(): void
     {
         $this->prepararControl(['memoria_reciente' => null]);
@@ -51,9 +30,8 @@ final class FuentesOperativasTest extends AdaptadoresTestCase
 
     /**
      * Un booleano conocido nunca se confunde con ausencia.
-     *
-     * @param  bool|null  $valor  Valor físico del escenario.
-     * @return void Sin excepciones esperadas.
+     * @param bool|null $valor
+     * @return void
      */
     #[DataProvider('booleanos')]
     public function test_control_conserva_booleano_y_null_sin_inventar_normalidad(?bool $valor): void
@@ -65,7 +43,7 @@ final class FuentesOperativasTest extends AdaptadoresTestCase
         self::assertSame($valor, $memoria->hechos['SIM-EVID']->valor);
     }
 
-    /** @return iterable<string, array{bool|null}> Valores independientes; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{bool|null}> */
     public static function booleanos(): iterable
     {
         yield 'NULL' => [null];
@@ -73,7 +51,7 @@ final class FuentesOperativasTest extends AdaptadoresTestCase
         yield 'true' => [true];
     }
 
-    /** No selecciona la columna clínica de un registro futuro; sin parámetros ni excepciones esperadas. */
+    /** No selecciona la columna clínica de un registro futuro */
     public function test_fuente_futura_solo_transporta_metadatos_y_no_genera_hechos(): void
     {
         $this->prepararControl(['fecha_hora' => '2026-10-17 12:00:01', 'memoria_reciente' => 'NO-DEBE-LEERSE']);
@@ -89,7 +67,7 @@ final class FuentesOperativasTest extends AdaptadoresTestCase
         }
     }
 
-    /** Un campo textual cero se conserva literalmente; sin parámetros ni excepciones esperadas. */
+    /** Un campo textual cero se conserva literalmente */
     public function test_seguimiento_transporta_valor_y_actividad_original(): void
     {
         $this->prepararControl();
@@ -105,7 +83,7 @@ final class FuentesOperativasTest extends AdaptadoresTestCase
         self::assertSame(HallazgoInstrumentalEnum::HALLAZGO_DESCRIPTIVO, $memoria->evidencias['SIM-EVID']->hallazgo);
     }
 
-    /** BADL queda como hecho y no recibe los defaults de presentación; sin parámetros ni excepciones esperadas. */
+    /** BADL queda como hecho y no recibe los defaults de presentación */
     public function test_badl_null_no_se_convierte_en_autonomia_ni_iadl(): void
     {
         $this->prepararControl();
@@ -179,7 +157,7 @@ final class FuentesOperativasTest extends AdaptadoresTestCase
         $this->repositorioAdaptado()->paraEvaluacion('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', self::corte());
     }
 
-    /** Dos fuentes del mismo episodio se conservan sin tratarlas como independientes; sin parámetros ni excepciones esperadas. */
+    /** Dos fuentes del mismo episodio se conservan sin tratarlas como independientes */
     public function test_consultas_por_lote_y_episodio_compartido_no_crean_corroboracion(): void
     {
         $this->prepararControl();

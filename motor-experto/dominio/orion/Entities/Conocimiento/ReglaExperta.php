@@ -7,35 +7,7 @@ namespace MotorExperto\dominio\orion\Entities\Conocimiento;
 use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Base de conocimiento (Reglas declarativas).
- *
- * Describe qué condiciones y consecuencia pertenecen a una versión del conocimiento.
- * Conserva la regla como datos inmutables para que un servicio pueda evaluarla.
- *
- * TÍTULO: Regla versionada expresada como datos tipados.
- *
- * CAPA: Domain.
- *
- * SUBSISTEMA: Base de conocimiento.
- *
- * RESPONSABILIDAD:
- * Separar identidad, condiciones, consecuencia, fuente y habilitación técnica.
- *
- * ENTRADAS:
- * Árbol de condiciones de la gramática interna, consecuencia escalar y versión.
- *
- * SALIDAS:
- * Conocimiento inmutable preparado para un evaluador posterior.
- *
- * RESTRICCIONES:
- * No ejecuta cadenas, no contiene reglas G09 fijas ni activa uso clínico.
- * La gramática es propuesta interna de la PoC y no cambia D-130 vigente.
- * Profundidad máxima 32: límite técnico contra estructuras cíclicas o abusivas.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R1/R8/R10; operadores provisionales de la Fase A.
- */
+/** Define condiciones y consecuencia como datos; no ejecuta expresiones de texto. */
 final readonly class ReglaExperta
 {
     /** @var array<string, mixed> Árbol validado y copiado sin referencias externas. */
@@ -46,14 +18,13 @@ final readonly class ReglaExperta
 
     /**
      * Construye conocimiento declarativo sin ejecutar sus condiciones.
-     *
-     * @param string $id Identidad de regla.
-     * @param string $versionConocimiento Versión propietaria.
-     * @param array<string, mixed> $condiciones Árbol tipado de condiciones.
-     * @param array{concepto: string, valor: string|int|float|bool} $consecuencia Salida declarada.
-     * @param bool $habilitada Habilitación técnica explícita, nunca autorización clínica.
-     * @param string $fuente Fuente documental identificable.
-     * @throws DomainException Por forma, literal, identidad o profundidad inválidos.
+     * @param string $id
+     * @param string $versionConocimiento
+     * @param array<string, mixed> $condiciones
+     * @param array{concepto: string, valor: string|int|float|bool} $consecuencia
+     * @param bool $habilitada
+     * @param string $fuente
+     * @throws DomainException
      */
     public function __construct(
         /** Identidad única de la regla. */ public string $id,
@@ -79,15 +50,10 @@ final readonly class ReglaExperta
 
     /**
      * Valida y reconstruye el árbol para romper referencias externas de arrays.
-     *
-     * IGUAL_A/DISTINTO_DE: operador, variable y valor conocido.
-     * Y/O: operador y lista no vacía de condiciones. NO: operador y condición.
-     * Ninguna rama evalúa valores ni completa ausencias.
-     *
-     * @param array<string, mixed> $condicion Nodo declarativo.
-     * @param int $profundidad Profundidad técnica acumulada.
-     * @return array<string, mixed> Copia validada del nodo.
-     * @throws DomainException Por operador, forma, literal o profundidad inválidos.
+     * @param array<string, mixed> $condicion
+     * @param int $profundidad
+     * @return array<string, mixed>
+     * @throws DomainException
      */
     private static function copiarCondicion(array $condicion, int $profundidad): array
     {
@@ -128,10 +94,9 @@ final readonly class ReglaExperta
 
     /**
      * Admite solamente valores escalares conocidos, sin coerción.
-     *
-     * @param mixed $valor Literal recibido de la estructura declarativa.
-     * @return string|int|float|bool Literal original.
-     * @throws DomainException Por null, objeto, array o número no finito.
+     * @param mixed $valor
+     * @return string|int|float|bool
+     * @throws DomainException
      */
     private static function literal(mixed $valor): string|int|float|bool
     {
@@ -144,12 +109,9 @@ final readonly class ReglaExperta
 
     /**
      * Verifica forma cerrada sin depender del orden de las claves.
-     *
-     * @param array<mixed> $datos Estructura candidata.
-     * @param list<string> $claves Claves exactas exigidas.
-     * @return bool Coincidencia estructural, sin interpretación del contenido.
-     *
-     * No lanza excepciones.
+     * @param array<mixed> $datos
+     * @param list<string> $claves
+     * @return bool
      */
     private static function tieneClaves(array $datos, array $claves): bool
     {

@@ -9,19 +9,13 @@ use MotorExperto\dominio\orion\Services\Compuertas\EvaluadorConfusoresService;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;
 
-/**
- * TÍTULO: Caso completo con referencias y revisiones sintéticas independientes.
- * CAPA: Domain (pruebas).
- * SUBSISTEMA: Fixtures de inferencia.
- * RESPONSABILIDAD: Preparar originales compartidos entre servicios y casos de uso.
- * ENTRADAS: Cinco estados explícitos del escenario, nunca puntuaciones reales.
- * SALIDAS: Memoria, revisiones y declaraciones DCL ficticias.
- * RESTRICCIONES: No acredita aptitud clínica, carga Laravel ni consulta bases.
- * TRAZABILIDAD: R1–R10; matriz 03A y referencias SIM del contrato.
- */
+/** Preparar originales compartidos entre servicios y casos de uso. */
 final class EscenarioInferencia
 {
-    /** @param list<string> $estados Estados explícitos. @return array Escenario original sin efectos externos; puede lanzar DomainException por entradas incoherentes. */
+    /**
+ * @param list<string> $estados
+ * @return array
+ */
     public static function completo(array $estados = ['A', 'P', 'P', 'P', 'P']): array
     {
         $perfil = E::perfil($estados);

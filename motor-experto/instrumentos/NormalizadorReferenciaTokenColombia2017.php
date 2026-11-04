@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace MotorExperto\instrumentos;
 
-/**
- * Consulta tabulada de Token abreviado: tesis original UNAL de Duarte, 2017.
- * Conserva el nivel de evidencia, las lagunas editoriales y el ajuste tabulado.
- * No reconstruye reactivos ni inventa redondeos, percentiles finales o diagnósticos.
- */
+/** Consulta tabulada de Token abreviado: tesis original UNAL de Duarte, 2017. */
 final class NormalizadorReferenciaTokenColombia2017
 {
     public const METODO = 'TOKEN-CO-UNAL-2017-TABLAS';

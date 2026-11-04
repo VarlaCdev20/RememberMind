@@ -10,36 +10,12 @@ use MotorExperto\dominio\orion\ValueObjects\Dcl\MotivoAbstencionEnum;
 use MotorExperto\dominio\orion\ValueObjects\Dcl\SubtipoDclEnum;
 use PHPUnit\Framework\TestCase;
 
-/**
- * TÍTULO: Requisitos y salidas del contrato experimental Petersen.
- *
- * CAPA: Domain (verificación unitaria).
- *
- * SUBSISTEMA: Contratos de ValueObjects.
- *
- * RESPONSABILIDAD:
- * Comprobar los límites semánticos del vocabulario aislado de esta fase.
- *
- * ENTRADAS:
- * Códigos documentales y propuestas técnicas, sin información clínica real.
- *
- * SALIDAS:
- * Aserciones sobre representación y rechazo, sin resultados de inferencia.
- *
- * RESTRICCIONES:
- * No inicia Laravel, no consulta BDD, no clasifica ni acredita evaluación posterior en uso real.
- *
- * TRAZABILIDAD:
- * DCL-PET-20261017-v0.1, secciones 2–6 y cierre 03A; R1/R7/R9.
- */
+/** Comprobar los límites semánticos del vocabulario aislado de esta fase. */
 final class VocabularioDclTest extends TestCase
 {
     /**
      * Verifica los cinco requisitos y su identidad semántica documental.
-     *
      * @return void
-     *
-     * No recibe parámetros ni evalúa los requisitos.
      */
     public function test_requisitos_c01_a_c05_conservan_su_significado(): void
     {
@@ -54,10 +30,7 @@ final class VocabularioDclTest extends TestCase
 
     /**
      * Usa los estados textuales del documento, sin confundirlos con A/P/U/I/X.
-     *
      * @return void
-     *
-     * No recibe parámetros ni interpreta los alias del código experimental previo.
      */
     public function test_estados_criterio_preservan_pendiente_y_no_acreditado(): void
     {
@@ -70,10 +43,7 @@ final class VocabularioDclTest extends TestCase
 
     /**
      * Verifica exactamente los cuatro patrones candidatos, sin quinto subtipo.
-     *
      * @return void
-     *
-     * No recibe parámetros ni realiza una clasificación.
      */
     public function test_patrones_conservan_codigos_y_significados(): void
     {
@@ -87,10 +57,7 @@ final class VocabularioDclTest extends TestCase
 
     /**
      * Exige que ninguna abstención pueda construirse como un patrón candidato.
-     *
      * @return void
-     *
-     * No recibe parámetros; se verifican los códigos exactos del contrato.
      */
     public function test_abstenciones_son_salidas_separadas_de_patrones(): void
     {
@@ -113,10 +80,7 @@ final class VocabularioDclTest extends TestCase
 
     /**
      * Conserva el nombre conciliado de adjudicación y rechaza el literal histórico.
-     *
      * @return void
-     *
-     * No recibe parámetros ni modifica la matriz documental de origen.
      */
     public function test_adjudicacion_respeta_conciliacion_documental_03a(): void
     {

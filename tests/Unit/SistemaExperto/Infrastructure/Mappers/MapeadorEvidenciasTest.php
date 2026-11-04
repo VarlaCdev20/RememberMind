@@ -18,22 +18,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 
-/**
- * TÍTULO: Evidencias originales con contexto y fecha clínica.
- * CAPA: Infrastructure - Mappers (pruebas unitarias).
- * ¿PARA QUÉ SIRVE? Verifica conservación de tipos, fuentes, fechas y alcance.
- * ¿QUÉ INFORMACIÓN RECIBE? Filas Eloquent ficticias y valores del extractor declarados manualmente.
- * ¿QUÉ HACE? Convierte los modelos admitidos y prueba los rechazos del contrato.
- * ¿QUÉ DEVUELVE? Aserciones de procedencia, desconocimiento y descripción.
- * ¿QUÉ NO DEBE HACER? No extrae datos de BDD, interpreta instrumentos ni inventa IADL.
- */
+/** Verifica conservación de tipos, fuentes, fechas y alcance. */
 final class MapeadorEvidenciasTest extends TestCase
 {
     /**
      * Conserva cada valor tipado sin equiparar ausencia, false, cero y decimal.
-     *
-     * @param  string|int|float|bool|null  $valor  Dato declarado por el extractor de prueba.
-     *                                             Sin excepciones esperadas con las referencias sintéticas.
+     * @param string|int|float|bool|null $valor
      */
     #[DataProvider('valoresOriginales')]
     public function test_preserva_valor_y_fecha_del_original_sin_interpretar(string|int|float|bool|null $valor): void
@@ -55,7 +45,7 @@ final class MapeadorEvidenciasTest extends TestCase
         self::assertSame($antes, $original->getAttributes());
     }
 
-    /** @return iterable<string, array{string|int|float|bool|null}> Literales originales; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string|int|float|bool|null}> */
     public static function valoresOriginales(): iterable
     {
         yield 'ausencia' => [null];
@@ -67,7 +57,7 @@ final class MapeadorEvidenciasTest extends TestCase
         yield 'texto que no acredita A' => ['ALTERACION_OBJETIVA_SIMULADA'];
     }
 
-    /** Conserva el subcomponente expresamente vinculado, sin ampliarlo; sin parámetros ni excepciones esperadas. */
+    /** Conserva el subcomponente expresamente vinculado, sin ampliarlo */
     public function test_propietario_documentado_conserva_alcance_de_subcomponente(): void
     {
         [$fila, $original] = EscenarioMapeadores::evidencia();
@@ -82,11 +72,9 @@ final class MapeadorEvidenciasTest extends TestCase
 
     /**
      * Conserva atención/actividad originales de las demás fuentes soportadas.
-     *
-     * @param  class-string  $tipo  Modelo operativo existente.
-     * @param  string  $pk  PK física.
-     * @param  array<string, string>  $contexto  Episodio e instrumento originales.
-     *                                           Sin excepciones esperadas.
+     * @param class-string $tipo
+     * @param string $pk
+     * @param array<string, string> $contexto
      */
     #[DataProvider('fuentesOriginales')]
     public function test_modelos_operativos_preservan_episodio_sin_crear_iadl(string $tipo, string $pk, array $contexto): void
@@ -105,7 +93,7 @@ final class MapeadorEvidenciasTest extends TestCase
         self::assertNull($hecho->valor);
     }
 
-    /** @return iterable<string, array{class-string, string, array<string, string>}> Fuentes físicas; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{class-string, string, array<string, string>}> */
     public static function fuentesOriginales(): iterable
     {
         yield 'BADL' => [ValoracionFuncional::class, 'cod_valoracion_funcional', ['cod_atencion' => 'SIM-AT-FUNC']];
@@ -115,10 +103,8 @@ final class MapeadorEvidenciasTest extends TestCase
 
     /**
      * Rechaza procedencia, identidad o fechas que no acreditan el contexto original.
-     *
-     * @param  string  $caso  Manipulación independiente del escenario.
-     *
-     * @throws DomainException Rechazo esperado sin inventar datos sustitutos.
+     * @param string $caso
+     * @throws DomainException
      */
     #[DataProvider('evidenciasInvalidas')]
     public function test_rechaza_evidencia_ajena_o_incompleta(string $caso): void
@@ -158,7 +144,7 @@ final class MapeadorEvidenciasTest extends TestCase
         self::mapper()->aDominio($fila, $original, F::fecha(), false);
     }
 
-    /** @return iterable<string, array{string}> Casos incompatibles; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string}> */
     public static function evidenciasInvalidas(): iterable
     {
         foreach (['otro residente', 'evaluación ajena', 'caso real', 'mapeo de otra versión', 'fuente inactiva',
@@ -182,7 +168,7 @@ final class MapeadorEvidenciasTest extends TestCase
         new MemoriaTrabajo('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', F::fecha(), [$a, $b]);
     }
 
-    /** @return MapeadorEvidencias Mapper con zona de almacenamiento explícita; sin parámetros ni excepciones. */
+    /** @return MapeadorEvidencias */
     private static function mapper(): MapeadorEvidencias
     {
         return new MapeadorEvidencias(new DateTimeZone('America/La_Paz'));

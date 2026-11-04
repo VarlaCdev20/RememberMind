@@ -10,18 +10,10 @@ use DomainException;
 use Illuminate\Support\Facades\DB;
 use Tests\Unit\SistemaExperto\Infrastructure\Mappers\EscenarioMapeadores as F;
 
-/**
- * TÍTULO: Lectura Eloquent de redes semánticas versionadas.
- * CAPA: Infrastructure - Repositories (pruebas de integración).
- * ¿PARA QUÉ SIRVE? Distingue ausencia de versión, grafo vacío y conocimiento incompatible.
- * ¿QUÉ INFORMACIÓN RECIBE? Filas reales sintéticas en el esquema congelado.
- * ¿QUÉ HACE? Precarga el grafo y ejecuta el mapper real.
- * ¿QUÉ DEVUELVE? Aserciones sobre identidades, versión y ausencia de escrituras.
- * ¿QUÉ NO DEBE HACER? No fabrica aristas ni redefine estados del conocimiento.
- */
+/** Distingue ausencia de versión, grafo vacío y conocimiento incompatible. */
 final class RedSemanticaEloquentRepositoryTest extends RepositoriosTestCase
 {
-    /** Conserva identidad y dirección sin consultas por nodo; sin parámetros ni excepciones esperadas. */
+    /** Conserva identidad y dirección sin consultas por nodo */
     public function test_recupera_la_red_y_sus_extremos_originales(): void
     {
         EscenarioRepositorios::guardarGrafo(F::red());
@@ -37,7 +29,7 @@ final class RedSemanticaEloquentRepositoryTest extends RepositoriosTestCase
         $this->exigirSoloLecturas();
     }
 
-    /** Distingue versión vacía y versión inexistente sin fallback; sin parámetros ni excepciones esperadas. */
+    /** Distingue versión vacía y versión inexistente sin fallback */
     public function test_una_version_vacia_no_equivale_a_una_version_inexistente(): void
     {
         self::assertSame([], $this->repositorio()->porVersion('SIM-V1')->nodos);
@@ -64,7 +56,7 @@ final class RedSemanticaEloquentRepositoryTest extends RepositoriosTestCase
         $this->repositorio()->porVersion('SIM-V1');
     }
 
-    /** @return RedSemanticaEloquentRepository Repositorio real sobre el destino de prueba; sin parámetros ni excepciones. */
+    /** @return RedSemanticaEloquentRepository */
     private function repositorio(): RedSemanticaEloquentRepository
     {
         return new RedSemanticaEloquentRepository(new MapeadorRedSemantica, $this->conexionPruebas());

@@ -15,39 +15,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use RuntimeException;
 
-/**
- * TÍTULO:
- * Recuperación Eloquent de una red semántica.
- *
- * CAPA:
- * Infrastructure - Persistence - Repositories.
- *
- * ¿PARA QUÉ SIRVE?
- * Implementa el puerto de red utilizando la versión física solicitada.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * Versión explícita, mapper y conexión experimental segregada.
- *
- * ¿QUÉ HACE?
- * Precarga nodos y relaciones por sus FK existentes y los pasa al mapper.
- *
- * ¿QUÉ DEVUELVE?
- * RedSemantica o null exclusivamente cuando la versión no existe.
- * Una versión existente sin nodos conserva su red vacía.
- *
- * ¿QUÉ NO DEBE HACER?
- * No filtra estados para ocultar incompatibilidades, completa aristas,
- * interpreta modalidades ni consulta otra versión o una base institucional.
- */
+/** Recupera la red semántica de la versión solicitada. */
 final readonly class RedSemanticaEloquentRepository implements RedSemanticaRepositoryInterface
 {
     /**
      * Configura la lectura sin consultar ni registrar servicios.
-     *
-     * @param  MapeadorRedSemantica  $mapeador  Conversor existente.
-     * @param  string  $conexionExperimental  Conexión técnica explícita.
-     *
-     * @throws DomainException Por nombre de conexión inválido.
+     * @param MapeadorRedSemantica $mapeador
+     * @param string $conexionExperimental
+     * @throws DomainException
      */
     public function __construct(
         /** Conversor del grafo. */ private MapeadorRedSemantica $mapeador,
@@ -58,12 +33,10 @@ final readonly class RedSemanticaEloquentRepository implements RedSemanticaRepos
 
     /**
      * Recupera una instantánea sin alterar estados físicos.
-     *
-     * @param  string  $versionConocimiento  PK de la versión exacta.
-     * @return RedSemantica|null Grafo validado o versión ausente.
-     *
-     * @throws DomainException Por versión inválida, modalidades o grafo incompatibles.
-     * @throws RuntimeException Por destino no autorizado o fallo técnico de Eloquent.
+     * @param string $versionConocimiento
+     * @return RedSemantica|null
+     * @throws DomainException
+     * @throws RuntimeException
      */
     public function porVersion(string $versionConocimiento): ?RedSemantica
     {
@@ -78,11 +51,9 @@ final readonly class RedSemanticaEloquentRepository implements RedSemanticaRepos
 
     /**
      * Exige identidades explícitas sin normalizarlas ni interpolarlas en SQL.
-     *
-     * @param  string  ...$ids  Códigos recibidos por el contrato.
-     * @return void No consulta la base.
-     *
-     * @throws DomainException Por código vacío o con separadores/control.
+     * @param string ...$ids
+     * @return void
+     * @throws DomainException
      */
     private static function validarIdentidades(string ...$ids): void
     {
@@ -95,10 +66,8 @@ final readonly class RedSemanticaEloquentRepository implements RedSemanticaRepos
 
     /**
      * Resuelve únicamente el destino experimental nombrado por el llamador.
-     *
-     * @return string Nombre de conexión, nunca el predeterminado implícito.
-     *
-     * @throws RuntimeException Fuera de testing o de las bases desechables autorizadas.
+     * @return string
+     * @throws RuntimeException
      */
     private function conexion(): string
     {

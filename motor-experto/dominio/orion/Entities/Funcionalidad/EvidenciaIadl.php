@@ -9,49 +9,20 @@ use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoIadlEnum;
 use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\OportunidadIadlEnum;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Base de hechos (Actividades instrumentales de la vida diaria).
- *
- * Describe el desempeño de una actividad junto con la oportunidad, el nivel previo y la causa de ayuda.
- * Ese contexto permite distinguir limitaciones institucionales o motoras de una atribución cognitiva simulada.
- *
- * TÍTULO: Evidencia contextual de una actividad instrumental.
- *
- * CAPA: Domain.
- *
- * SUBSISTEMA: Base de hechos.
- *
- * RESPONSABILIDAD:
- * Separar actividad, desempeño, oportunidad, nivel previo y causa de ayuda.
- *
- * ENTRADAS:
- * Hecho original, actividad, estados tipados y revisión causal ficticia opcional.
- *
- * SALIDAS:
- * Una evidencia inmutable cuya interpretabilidad contextual puede consultarse.
- *
- * RESTRICCIONES:
- * La atribución nullable es propuesta técnica de la PoC, nunca una inferencia
- * clínica. Ayuda motora o sustitución institucional no demuestran deterioro.
- * La ausencia de revisión permanece null; no se convierte en causa cognitiva.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R1/R4/R5/R9; Documento Maestro §3.13.2 y DCL-C03 experimental.
- */
+/** Conserva desempeño, oportunidad, nivel previo y causa de ayuda en una actividad instrumental. */
 final readonly class EvidenciaIadl
 {
     /**
      * Conserva una observación contextual y, si existe, una revisión sintética.
-     *
-     * @param HechoExperto $hecho Fuente original y contexto temporal.
-     * @param string $actividadId Actividad documentada, sin imponer un catálogo nuevo.
-     * @param EstadoIadlEnum $estado Desempeño observado.
-     * @param OportunidadIadlEnum $oportunidad Oportunidad real o limitación.
-     * @param EstadoIadlEnum|null $nivelPrevio Desempeño previo conocido, si existe.
-     * @param string|null $causaAyuda Causa descrita; no se interpreta texto automáticamente.
-     * @param bool|null $atribucionCognitivaSimulada Declaración externa ficticia; null significa no revisada.
-     * @param string|null $revisorSinteticoId Revisor ficticio explícito.
-     * @throws DomainException Por datos incoherentes o atribución sin revisión sintética.
+     * @param HechoExperto $hecho
+     * @param string $actividadId
+     * @param EstadoIadlEnum $estado
+     * @param OportunidadIadlEnum $oportunidad
+     * @param EstadoIadlEnum|null $nivelPrevio
+     * @param string|null $causaAyuda
+     * @param bool|null $atribucionCognitivaSimulada
+     * @param string|null $revisorSinteticoId
+     * @throws DomainException
      */
     public function __construct(
         /** Hecho original. */ public HechoExperto $hecho,
@@ -90,10 +61,7 @@ final readonly class EvidenciaIadl
 
     /**
      * Comprueba disponibilidad de contexto, sin resolver independencia funcional.
-     *
-     * @return bool Hay ejecución contextualizada y revisión ficticia explícita.
-     *
-     * No recibe parámetros ni lanza excepciones. No acredita por sí misma C03.
+     * @return bool
      */
     public function esInterpretable(): bool
     {

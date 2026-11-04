@@ -14,11 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Gate;
 use MotorExperto\conocimiento\ReglasObservacionales;
 
-/**
- * Consulta autorizada del primer nivel observacional sobre controles originales.
- * Cada página declara su alcance; no cambia una evaluación histórica ni guarda una traza ficticia.
- * El motor recibe una instantánea escalar, no Models, SQL o dependencias de Laravel.
- */
+/** Consulta autorizada del primer nivel observacional sobre controles originales. */
 final class ConsultarHallazgosObservacionales
 {
     public function consultar(User $usuario, Residente $residente, int $pagina = 1): array

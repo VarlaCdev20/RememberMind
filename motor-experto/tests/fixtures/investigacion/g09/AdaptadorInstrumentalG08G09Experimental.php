@@ -7,10 +7,7 @@ namespace MotorExperto\investigacion\g09;
 use DomainException;
 use MotorExperto\hechos\InspectorComponenteInstrumental;
 
-/**
- * Puente de datos con estructura de aplicaciones_instrumento y respuestas_instrumento
- * hacia G09-EXP. NO consulta BDD ni interpreta pruebas reales.
- */
+/** Puente de datos con estructura de aplicaciones_instrumento y respuestas_instrumento hacia G09-EXP. */
 final class AdaptadorInstrumentalG08G09Experimental
 {
     public function preparar(string $regla, array $contexto, array $captura): array

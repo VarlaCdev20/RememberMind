@@ -16,19 +16,13 @@ use RecursiveIteratorIterator;
 use ReflectionClass;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 
-/**
- * TÍTULO: Manifiesto y límites de los cinco DTOs.
- * CAPA: Application (pruebas unitarias).
- * ¿PARA QUÉ SIRVE? Verifica estructura, documentación y dirección de dependencias.
- * ¿QUÉ RECIBE? Los cinco tipos autorizados y su código local.
- * ¿QUÉ HACE? Inspecciona sus contratos y comprueba inmutabilidad observable.
- * ¿QUÉ DEVUELVE? Aserciones reproducibles de arquitectura y documentación.
- * ¿QUÉ NO DEBE HACER? No modifica fuentes, inicia Laravel ni prueba ejecución clínica.
- * RELACIÓN CON O.R.I.O.N.: Reglamento de Application, etapas B y revisión proporcional.
- */
+/** Verifica estructura, documentación y dirección de dependencias. */
 final class ContratoDTOsTest extends TestCase
 {
-    /** Verifica exactamente cinco archivos y sus PHPDoc; sin parámetros ni errores de lectura esperados. @return void */
+    /**
+ * Verifica exactamente cinco archivos y sus PHPDoc
+ * @return void
+ */
     public function test_cinco_dtos_final_readonly_tipados_y_documentados(): void
     {
         $raiz = realpath(dirname(__DIR__, 5).'/tests/Support/Fixtures/app/Modulos/ApoyoDecision/Aplicacion/DTOs');
@@ -45,10 +39,9 @@ final class ContratoDTOsTest extends TestCase
             self::assertStringStartsWith("<?php\n\ndeclare(strict_types=1);", file_get_contents($archivo));
             $doc = $r->getDocComment();
             self::assertNotFalse($doc);
-            foreach (['TÍTULO:', 'CAPA:', '¿PARA QUÉ SIRVE?', '¿QUÉ RECIBE?', '¿QUÉ HACE?',
-                '¿QUÉ DEVUELVE?', '¿QUÉ NO DEBE HACER?', 'RELACIÓN CON O.R.I.O.N.:'] as $apartado) {
-                self::assertStringContainsString($apartado, $doc, $tipo);
-            }
+            self::assertIsString($doc);
+            self::assertMatchesRegularExpression('/\p{L}{3}/u', $doc);
+            self::assertLessThanOrEqual(240, mb_strlen($doc));
             foreach ($r->getProperties() as $propiedad) {
                 self::assertTrue($propiedad->isReadOnly());
                 self::assertNotNull($propiedad->getType());
@@ -70,7 +63,10 @@ final class ContratoDTOsTest extends TestCase
         self::assertSame($esperados, $actuales);
     }
 
-    /** Revisa dependencias ejecutables y la dirección Domain/Application; sin parámetros ni errores esperados. @return void */
+    /**
+ * Revisa dependencias ejecutables y la dirección Domain/Application
+ * @return void
+ */
     public function test_dependencias_sin_laravel_ni_inversion_de_capas(): void
     {
         $raiz = dirname(__DIR__, 5);

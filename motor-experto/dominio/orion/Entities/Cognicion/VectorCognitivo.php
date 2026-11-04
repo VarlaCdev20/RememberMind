@@ -8,35 +8,7 @@ use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Motor de inferencia (Perfil cognitivo multicriterio).
- *
- * Mantiene separados memoria, atención, función ejecutiva, lenguaje y capacidad visuoespacial.
- * Conserva un único contexto de evaluación y evita reutilizar soportes como contribuciones independientes.
- *
- * TÍTULO: Perfil explícito de cinco dominios.
- *
- * CAPA: Domain.
- *
- * SUBSISTEMA: Motor de inferencia.
- *
- * RESPONSABILIDAD:
- * Conservar los cinco ejes sin puntuación global y comprobar soportes no reutilizados.
- *
- * ENTRADAS:
- * Lista completa de cinco resultados de la misma instantánea.
- *
- * SALIDAS:
- * Mapa canónico de dominios con resultados y trazabilidad originales.
- *
- * RESTRICCIONES:
- * No rellena dominios faltantes ni calcula medias, severidad o índices.
- * Las referencias A/P no se reutilizan entre dominios como corroboraciones
- * independientes; los hallazgos descriptivos siguen separados.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R1/R3/R4/R6/R7/R8.
- */
+/** Reúne los cinco dominios del mismo caso, sin puntuación global ni soportes duplicados. */
 final readonly class VectorCognitivo
 {
     /** Contexto común, incluidos evaluación, sujeto, versión y fecha de corte. */
@@ -47,9 +19,8 @@ final readonly class VectorCognitivo
 
     /**
      * Construye un perfil completo sin inventar resultados faltantes.
-     *
-     * @param list<ResultadoDominio> $resultados Cinco dominios explícitos.
-     * @throws DomainException Por cobertura incompleta, duplicación o evidencia reutilizada.
+     * @param list<ResultadoDominio> $resultados
+     * @throws DomainException
      */
     public function __construct(array $resultados)
     {
@@ -87,11 +58,8 @@ final readonly class VectorCognitivo
 
     /**
      * Recupera un eje existente sin sintetizar un estado global.
-     *
-     * @param DominioCognitivoEnum $dominio Eje solicitado.
-     * @return ResultadoDominio Resultado original.
-     *
-     * No lanza excepciones: la cobertura completa fue validada al construir.
+     * @param DominioCognitivoEnum $dominio
+     * @return ResultadoDominio
      */
     public function resultado(DominioCognitivoEnum $dominio): ResultadoDominio
     {

@@ -6,11 +6,7 @@ namespace MotorExperto\investigacion\g09;
 
 use DomainException;
 
-/**
- * A01–A14 y G10 como atestaciones explícitas de laboratorio, previas a D-130.
- * No deduce confusores ni su efecto desde síntomas, puntajes o narrativa clínica.
- * Las verificaciones estructurales del lector/inspector siguen siendo obligatorias.
- */
+/** A01–A14 y G10 como atestaciones explícitas de laboratorio, previas a D-130. */
 final class ControlesTareaG09Experimental
 {
     public const VERSION = 'ADM-G09-TEST-1';

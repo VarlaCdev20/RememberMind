@@ -4,12 +4,7 @@ declare(strict_types=1);
 
 namespace MotorExperto\instrumentos;
 
-/**
- * Diferencia descriptiva de reconocimiento HVLT-R; no es una norma boliviana.
- * FITBIR describe aciertos menos falsas alarmas. Su rango declarado 0–12
- * contradice los valores negativos posibles: se conserva la diferencia firmada
- * y se advierte el conflicto, sin truncar ni atribuir validez clínica al índice.
- */
+/** Diferencia descriptiva de reconocimiento HVLT-R; no es una norma boliviana. */
 final class CalculadorReconocimientoHvlt
 {
     public const METODO = 'HVLT-R-F5-RECONOCIMIENTO-BRUTO-1';

@@ -13,18 +13,10 @@ use Illuminate\Support\Facades\DB;
 use RuntimeException;
 use Tests\Unit\SistemaExperto\Infrastructure\Mappers\EscenarioMapeadores as F;
 
-/**
- * TÍTULO: Lectura real de reglas por ID y versión.
- * CAPA: Infrastructure - Repositories (pruebas de integración).
- * ¿PARA QUÉ SIRVE? Verifica la implementación del puerto de reglas.
- * ¿QUÉ INFORMACIÓN RECIBE? Fixtures sintéticas sobre las migraciones reales.
- * ¿QUÉ HACE? Consulta por parámetros y convierte con el mapper real.
- * ¿QUÉ DEVUELVE? Aserciones sobre entidades, contexto y consultas.
- * ¿QUÉ NO DEBE HACER? No ejecuta reglas ni acredita conocimiento clínico.
- */
+/** Verifica la implementación del puerto de reglas. */
 final class ReglaExpertaEloquentRepositoryTest extends RepositoriosTestCase
 {
-    /** Conserva condiciones y consecuencia exactas; sin parámetros ni excepciones esperadas. */
+    /** Conserva condiciones y consecuencia exactas */
     public function test_obtiene_la_regla_con_dependencias_precargadas(): void
     {
         EscenarioRepositorios::guardarGrafo(F::regla());
@@ -43,7 +35,7 @@ final class ReglaExpertaEloquentRepositoryTest extends RepositoriosTestCase
         $this->exigirSoloLecturas();
     }
 
-    /** No busca una regla ajena cuando la versión solicitada no la contiene; sin parámetros ni excepciones esperadas. */
+    /** No busca una regla ajena cuando la versión solicitada no la contiene */
     public function test_ausencia_y_version_distinta_no_tienen_fallback(): void
     {
         EscenarioRepositorios::guardarGrafo(F::regla());
@@ -54,7 +46,7 @@ final class ReglaExpertaEloquentRepositoryTest extends RepositoriosTestCase
         self::assertSame([], $this->reglas()->porVersion('SIM-V2'));
     }
 
-    /** Lista reglas inactivas sin consultas adicionales por regla; sin parámetros ni excepciones esperadas. */
+    /** Lista reglas inactivas sin consultas adicionales por regla */
     public function test_orden_habilitacion_y_numero_de_consultas_no_dependen_de_la_cantidad_de_reglas(): void
     {
         $primera = F::regla();
@@ -96,7 +88,7 @@ final class ReglaExpertaEloquentRepositoryTest extends RepositoriosTestCase
         $this->reglas()->porVersion('SIM-V1');
     }
 
-    /** Los códigos se enlazan como parámetros y no como SQL; sin parámetros ni excepciones esperadas. */
+    /** Los códigos se enlazan como parámetros y no como SQL */
     public function test_una_version_con_texto_sql_no_amplia_la_consulta(): void
     {
         EscenarioRepositorios::guardarGrafo(F::regla());

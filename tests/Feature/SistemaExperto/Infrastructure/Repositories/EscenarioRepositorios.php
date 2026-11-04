@@ -22,15 +22,7 @@ use Illuminate\Support\Facades\Schema;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades;
 use Tests\Unit\SistemaExperto\Infrastructure\Mappers\EscenarioMapeadores as F;
 
-/**
- * TÍTULO: Persistencia de escenarios sintéticos sobre las migraciones existentes.
- * CAPA: Infrastructure - Repositories (pruebas de integración).
- * ¿PARA QUÉ SIRVE? Reutiliza los datos de mappers sin inventar un esquema de prueba.
- * ¿QUÉ INFORMACIÓN RECIBE? Modelos ficticios y la base desechable de Tests\\TestCase.
- * ¿QUÉ HACE? Inserta fixtures explícitas según PK/FK y orden D-137.
- * ¿QUÉ DEVUELVE? Filas reales para consultas Eloquent.
- * ¿QUÉ NO DEBE HACER? No ejecuta inferencia, crea migraciones nuevas ni accede a bases institucionales.
- */
+/** Reutiliza los datos de mappers sin inventar un esquema de prueba. */
 final class EscenarioRepositorios
 {
     /** Inserta referencias artificiales de FK; sin parámetros, retorno ni excepciones esperadas. */
@@ -52,9 +44,8 @@ final class EscenarioRepositorios
 
     /**
      * Inserta una versión documental sin activar un servicio clínico.
-     *
-     * @param  string  $id  PK artificial.
-     * @return void Sin excepciones esperadas para una PK nueva.
+     * @param string $id
+     * @return void
      */
     public static function version(string $id): void
     {
@@ -63,11 +54,9 @@ final class EscenarioRepositorios
 
     /**
      * Conserva el grafo del fixture en orden FK, sin copiar tablas ni columnas.
-     *
-     * @param  Model  $raiz  Escenario Eloquent no persistido.
-     * @return void Inserta únicamente filas ficticias.
-     *
-     * @throws QueryException Por fixture que viole el esquema real.
+     * @param Model $raiz
+     * @return void
+     * @throws QueryException
      */
     public static function guardarGrafo(Model $raiz): void
     {
@@ -85,11 +74,9 @@ final class EscenarioRepositorios
 
     /**
      * Prepara evidencia y registro fuente reales en el destino de prueba.
-     *
-     * @param  array<string, mixed>  $cambios  Valores físicos explícitos para la fuente.
-     * @return ControlCognitivo Original recuperado por Eloquent.
-     *
-     * @throws QueryException Por fixture incompatible.
+     * @param array<string, mixed> $cambios
+     * @return ControlCognitivo
+     * @throws QueryException
      */
     public static function evidencia(array $cambios = []): ControlCognitivo
     {
@@ -103,9 +90,7 @@ final class EscenarioRepositorios
 
     /**
      * Declara un I exclusivamente sintético, con referencia original íntegra.
-     *
-     * @return array{EvaluacionExperta, MemoriaTrabajo} Filas y memoria originales.
-     *                                                  No acredita un catálogo instalado ni interpreta el control operativo.
+     * @return array{EvaluacionExperta, MemoriaTrabajo}
      */
     public static function resultadosConSoporte(): array
     {
@@ -139,11 +124,10 @@ final class EscenarioRepositorios
 
     /**
      * Reúne objetos con ciclos sin guardar un hijo antes de sus padres.
-     *
-     * @param  Model  $modelo  Fila ficticia.
-     * @param  array<string, array<string, Model>>  $filas  Filas por tabla/PK.
-     * @param  array<int, bool>  $visitados  Identidad de objeto ya inspeccionada.
-     * @return void No modifica los modelos.
+     * @param Model $modelo
+     * @param array<string, array<string, Model>> $filas
+     * @param array<int, bool> $visitados
+     * @return void
      */
     private static function reunir(Model $modelo, array &$filas, array &$visitados): void
     {
@@ -166,11 +150,9 @@ final class EscenarioRepositorios
 
     /**
      * Completa solo metadatos sintéticos requeridos por las migraciones vigentes.
-     *
-     * @param  Model  $modelo  Fila no persistida.
-     * @return void Inserta la PK exacta; una fila ya preparada se reutiliza por esa PK.
-     *
-     * @throws QueryException Por inconsistencia del escenario.
+     * @param Model $modelo
+     * @return void
+     * @throws QueryException
      */
     private static function insertar(Model $modelo): void
     {

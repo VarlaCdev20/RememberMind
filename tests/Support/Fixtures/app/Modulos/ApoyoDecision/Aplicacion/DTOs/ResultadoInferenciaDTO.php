@@ -12,38 +12,7 @@ use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Application (Transporte del perfil cognitivo).
- *
- * TÍTULO:
- * Resultado del análisis cognitivo.
- *
- * CAPA:
- * Application - Objetos de Transferencia de Datos (DTOs).
- *
- * ¿PARA QUÉ SIRVE?
- * Transporta los cinco resultados de Domain con evaluabilidad, evidencias,
- * reglas y trazabilidad, manteniendo separados los dominios.
- *
- * ¿QUÉ RECIBE?
- * Solicitud, vector cognitivo original, versión del motor, reglas por dominio
- * y textos de traza y advertencias identificados, suministrados por el productor.
- *
- * ¿QUÉ HACE?
- * Contrasta el contexto y el tipado de las reglas. Copia metadatos y expone
- * los resultados originales, incluyendo sus contradicciones declaradas.
- *
- * ¿QUÉ DEVUELVE?
- * Un perfil inmutable con sus cinco resultados y versiones trazables.
- *
- * ¿QUÉ NO DEBE HACER?
- * No ejecuta el motor, evalúa reglas, convierte G09 en A/P ni calcula un índice
- * global. Los textos recibidos no acreditan por sí mismos una ejecución.
- *
- * RELACIÓN CON O.R.I.O.N.:
- * Es el contrato de salida de CU-03. EjecutarInferenciaUseCase proporciona
- * resultados y trazas del motor real; el DTO no sustituye su ejecución.
- */
+/** Transporta los cinco resultados de Domain con evaluabilidad, evidencias, reglas y trazabilidad, manteniendo separados los dominios. */
 final readonly class ResultadoInferenciaDTO
 {
     /** @var array<string, ResultadoDominio> Resultados originales con estados, evaluabilidad y evidencias. */
@@ -72,18 +41,16 @@ final readonly class ResultadoInferenciaDTO
 
     /**
      * Envuelve un perfil validado sin reconstruir ni modificar sus resultados.
-     *
-     * @param  SolicitudInferenciaDTO  $solicitud  Solicitud propietaria del resultado.
-     * @param  VectorCognitivo  $perfilCognitivo  Perfil completo producido por Domain.
-     * @param  string  $versionMotor  Versión del productor, explícita y sin defaults.
-     * @param  array<string, list<ReglaExperta>>  $reglasPorDominio  Cinco listas explícitas, posiblemente vacías.
-     * @param  array<string, string>  $trazas  Textos de ejecución recibidos; vacío conserva falta de trazas.
-     * @param  array<string, string>  $advertencias  Limitaciones declaradas por el productor.
-     * @param  list<RelacionSemantica>  $relacionesUtilizadas  Aristas originales de esta versión.
-     * @param  array<string, string>  $exclusiones  Motivos originales por referencia excluida.
-     * @param  array<string, array>  $evaluacionesReglas  Resultados originales del evaluador y sus soportes.
-     *
-     * @throws DomainException Por contexto, versión, reglas o metadatos inválidos.
+     * @param SolicitudInferenciaDTO $solicitud
+     * @param VectorCognitivo $perfilCognitivo
+     * @param string $versionMotor
+     * @param array<string, list<ReglaExperta>> $reglasPorDominio
+     * @param array<string, string> $trazas
+     * @param array<string, string> $advertencias
+     * @param list<RelacionSemantica> $relacionesUtilizadas
+     * @param array<string, string> $exclusiones
+     * @param array<string, array> $evaluacionesReglas
+     * @throws DomainException
      */
     public function __construct(
         /** Petición original. */ public SolicitudInferenciaDTO $solicitud,
@@ -157,11 +124,9 @@ final readonly class ResultadoInferenciaDTO
 
     /**
      * Conserva textos identificados sin mantener referencias mutables del llamador.
-     *
-     * @param  array<string, string>  $textos  Metadatos textuales del productor.
-     * @return array<string, string> Copia con el mismo contenido y orden.
-     *
-     * @throws DomainException Por identificador o texto inválido.
+     * @param array<string, string> $textos
+     * @return array<string, string>
+     * @throws DomainException
      */
     private static function copiarTextos(array $textos): array
     {

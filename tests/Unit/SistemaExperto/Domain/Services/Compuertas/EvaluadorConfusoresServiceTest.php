@@ -11,36 +11,12 @@ use DomainException;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 use PHPUnit\Framework\TestCase;
 
-/**
- * TÍTULO: EvaluadorConfusoresServiceTest.
- *
- * CAPA: Domain (verificación unitaria).
- *
- * SUBSISTEMA: Compuertas.
- *
- * RESPONSABILIDAD:
- * Verificar admisión, procedencia y contexto sin convertir ausencia en normalidad.
- *
- * ENTRADAS:
- * Evidencias y declaraciones artificiales explícitas.
- *
- * SALIDAS:
- * Aserciones sobre informes, rechazos y fuentes originales.
- *
- * RESTRICCIONES:
- * No consulta BDD, no usa mocks del motor ni interpreta instrumentos reales.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R1/R2/R3/R4/R8 y contexto CTX-MEM-01.
- */
+/** Verificar admisión, procedencia y contexto sin convertir ausencia en normalidad. */
 final class EvaluadorConfusoresServiceTest extends TestCase
 {
     /**
      * Impide interpretar falta de revisión como ausencia de confusores.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_revision_ausente_conserva_pendiente_y_flags_desconocidos(): void
     {
@@ -52,10 +28,7 @@ final class EvaluadorConfusoresServiceTest extends TestCase
     }
     /**
      * Admite una revisión declarada con invalidación explícitamente descartada.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_revision_explicita_acredita_contexto_sin_diagnosticar(): void
     {
@@ -67,10 +40,7 @@ final class EvaluadorConfusoresServiceTest extends TestCase
     }
     /**
      * Conserva una invalidación declarada sin atribuirle etiología.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_invalidador_explicito_bloquea(): void
     {
@@ -81,10 +51,7 @@ final class EvaluadorConfusoresServiceTest extends TestCase
     }
     /**
      * Conserva la revisión pendiente aunque confusores_revisados sea true.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_invalidador_ausente_no_se_supone_false(): void
     {
@@ -95,10 +62,7 @@ final class EvaluadorConfusoresServiceTest extends TestCase
     }
     /**
      * Impide escoger la revisión favorable entre declaraciones opuestas.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_contexto_contradictorio_conserva_ambas_fuentes(): void
     {
@@ -113,10 +77,7 @@ final class EvaluadorConfusoresServiceTest extends TestCase
 
     /**
      * Una revisión todavía pendiente no se oculta seleccionando otra favorable.
-     *
      * @return void
-     *
-     * No recibe parámetros; no se esperan excepciones para las declaraciones originales.
      */
     public function test_revision_pendiente_no_se_oculta_tras_otra_favorable(): void
     {
@@ -130,10 +91,7 @@ final class EvaluadorConfusoresServiceTest extends TestCase
     }
     /**
      * Conserva MOD-CM-1 sin invalidar ni restar puntos.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_advertencia_memoria_es_ortogonal(): void
     {
@@ -144,10 +102,7 @@ final class EvaluadorConfusoresServiceTest extends TestCase
     }
     /**
      * Conserva una advertencia de atención sin crear códigos oficiales nuevos.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_no_inventa_modificador_para_otro_dominio(): void
     {
@@ -158,10 +113,7 @@ final class EvaluadorConfusoresServiceTest extends TestCase
     }
     /**
      * Impide usar una revisión de memoria para acreditar atención.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_revision_de_otro_dominio_se_rechaza(): void
     {
@@ -171,10 +123,7 @@ final class EvaluadorConfusoresServiceTest extends TestCase
     }
     /**
      * Rechaza un concepto clínico ajeno al contrato explícito de revisión.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_no_interpreta_medicacion_como_confusor_por_si_sola(): void
     {

@@ -27,25 +27,14 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 
-/**
- * TÍTULO: Modelos Eloquent ficticios para conversión en memoria.
- * CAPA: Infrastructure - Mappers (fixtures unitarias).
- * ¿PARA QUÉ SIRVE? Proporciona filas normalizadas con relaciones cargadas explícitamente.
- * ¿QUÉ INFORMACIÓN RECIBE? Valores sintéticos y cambios controlados de los tests.
- * ¿QUÉ HACE? Materializa App\Models mediante atributos físicos sin guardarlos.
- * ¿QUÉ DEVUELVE? Objetos Eloquent reales y memorias reales de Domain.
- * ¿QUÉ NO DEBE HACER? No crea tablas, fuentes institucionales ni catálogos persistidos.
- * Los estados A/P/U/I/X en filas de prueba no acreditan que ese catálogo esté instalado.
- */
+/** Proporciona filas normalizadas con relaciones cargadas explícitamente. */
 final class EscenarioMapeadores
 {
     /**
      * Materializa una fila sin fill, casts, eventos de guardado o acceso a BDD.
-     *
-     * @param  class-string<Model>  $tipo  Tipo Eloquent existente.
-     * @param  array<string, mixed>  $atributos  Columnas físicas del escenario.
-     * @return Model Modelo nuevo, no persistido.
-     *               Sin excepciones esperadas con los tipos suministrados.
+     * @param class-string<Model> $tipo
+     * @param array<string, mixed> $atributos
+     * @return Model
      */
     public static function modelo(string $tipo, array $atributos): Model
     {
@@ -54,13 +43,11 @@ final class EscenarioMapeadores
 
     /**
      * Construye un concepto con sus columnas originales.
-     *
-     * @param  string  $id  PK de nodo ficticia.
-     * @param  string  $codigo  Código semántico.
-     * @param  string  $tipo  Tipo documental.
-     * @param  string  $version  Versión propietaria.
-     * @return NodoSemantico Fila sin persistir.
-     *                       Sin excepciones esperadas.
+     * @param string $id
+     * @param string $codigo
+     * @param string $tipo
+     * @param string $version
+     * @return NodoSemantico
      */
     public static function nodo(string $id, string $codigo, string $tipo = 'CRITERIO', string $version = 'SIM-V1'): NodoSemantico
     {
@@ -69,7 +56,7 @@ final class EscenarioMapeadores
             'definicion' => 'Definición artificial para probar el contrato.', 'estado' => 'ACTIVO']);
     }
 
-    /** @return VersionModeloExperto Grafo explícito de dos nodos y una arista; sin parámetros ni excepciones. */
+    /** @return VersionModeloExperto */
     public static function red(): VersionModeloExperto
     {
         $version = self::modelo(VersionModeloExperto::class, ['cod_version_modelo' => 'SIM-V1', 'estado' => 'ACTIVO']);
@@ -84,7 +71,7 @@ final class EscenarioMapeadores
         return $version;
     }
 
-    /** @return ReglaExperta Regla de dos condiciones y una consecuencia; sin parámetros ni excepciones. */
+    /** @return ReglaExperta */
     public static function regla(): ReglaExperta
     {
         $regla = self::modelo(ReglaExperta::class, ['cod_regla_experta' => 'SIM-R', 'cod_version_modelo' => 'SIM-V1',
@@ -122,7 +109,7 @@ final class EscenarioMapeadores
         return $regla;
     }
 
-    /** @return array{EvidenciaEvaluacion, ControlCognitivo} Evidencia y fuente originales; sin parámetros ni excepciones. */
+    /** @return array{EvidenciaEvaluacion, ControlCognitivo} */
     public static function evidencia(): array
     {
         $evaluacion = self::modelo(EvaluacionExperta::class, ['cod_evaluacion_experta' => 'SIM-EVAL',
@@ -150,10 +137,8 @@ final class EscenarioMapeadores
 
     /**
      * Prepara cinco filas de resultados con soportes originales ya validados.
-     *
-     * @param  list<string>  $estados  Estados manuales del contrato de Domain.
-     * @return array{EvaluacionExperta, MemoriaTrabajo} Cabecera Eloquent y memoria original.
-     *                                                  Sin excepciones esperadas con los perfiles sintéticos solicitados.
+     * @param list<string> $estados
+     * @return array{EvaluacionExperta, MemoriaTrabajo}
      */
     public static function resultados(array $estados = ['A', 'P', 'U', 'I', 'X']): array
     {

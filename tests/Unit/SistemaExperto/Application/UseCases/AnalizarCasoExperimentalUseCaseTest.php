@@ -25,16 +25,7 @@ use RuntimeException;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;
 use Tests\Unit\SistemaExperto\Domain\Services\Inferencia\EscenarioInferencia;
 
-/**
- * TÍTULO: Recorrido real de los cinco casos con puertos de repositorio simulados.
- * CAPA: Application (pruebas).
- * ¿PARA QUÉ SIRVE? Verifica orquestación, identidad, informe automático y propagación de fallos.
- * ¿QUÉ RECIBE? Casos sintéticos y mocks únicamente en los puertos de persistencia.
- * ¿QUÉ HACE? Ejecuta todos los servicios Domain reales, sin simular inferencia ni clasificación.
- * ¿QUÉ DEVUELVE? Aserciones de resultados y ausencia de ejecución posterior a un fallo.
- * ¿QUÉ NO DEBE HACER? No confunde mocks con prueba SQL ni activa uso clínico.
- * RELACIÓN CON O.R.I.O.N.: CU-01..CU-06 y R1–R10.
- */
+/** Verifica orquestación, identidad, informe automático y propagación de fallos. */
 final class AnalizarCasoExperimentalUseCaseTest extends TestCase
 {
     /** @return iterable<string, array{array, string}> Distribuciones sintéticas independientes para los cuatro patrones. */
@@ -162,7 +153,12 @@ final class AnalizarCasoExperimentalUseCaseTest extends TestCase
         return new SolicitudInferenciaDTO('SIM-SOLICITUD', 'SIM-EVAL', 'SINTETICO-RES', E::fecha(), 'SIM-V1');
     }
 
-    /** @param EvidenciaRepositoryInterface $evidencias Puerto simulado. @param ReglaExpertaRepositoryInterface $reglas Puerto simulado. @param RedSemanticaRepositoryInterface $red Puerto simulado. @return AnalizarCasoExperimentalUseCase Flujo real sin sustitutos del Domain. */
+    /**
+ * @param EvidenciaRepositoryInterface $evidencias
+ * @param ReglaExpertaRepositoryInterface $reglas
+ * @param RedSemanticaRepositoryInterface $red
+ * @return AnalizarCasoExperimentalUseCase
+ */
     private function coordinador(EvidenciaRepositoryInterface $evidencias, ReglaExpertaRepositoryInterface $reglas,
         RedSemanticaRepositoryInterface $red): AnalizarCasoExperimentalUseCase
     {

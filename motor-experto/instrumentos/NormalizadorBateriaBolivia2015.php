@@ -6,14 +6,7 @@ namespace MotorExperto\instrumentos;
 
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Referencias instrumentales de Bolivia.
- *
- * Implementa medidas de seis publicaciones originales de NeuroRehabilitation (2015).
- * Conserva el bruto, las condiciones y la dirección del indicador. Los modelos
- * comparan rendimiento; no convierten una puntuación en alteración de dominio o DCL.
- * No contiene estímulos, láminas, respuestas correctas ni rúbricas de administración.
- */
+/** Compara medidas con referencias bolivianas publicadas en 2015; no clasifica dominios. */
 final class NormalizadorBateriaBolivia2015
 {
     public const CONTEXTO = ['escolaridad_anios' => 'ENTERO', 'espanol_nativo' => 'LOGICO',

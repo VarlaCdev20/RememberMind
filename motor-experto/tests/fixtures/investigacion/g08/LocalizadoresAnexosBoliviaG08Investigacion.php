@@ -6,11 +6,7 @@ namespace MotorExperto\investigacion\g08;
 
 use DomainException;
 
-/**
- * Índice de tablas concretas publicadas para BOLIVIA, sin importar valores.
- * No contiene percentiles, ecuaciones, puntuaciones ni puntos de corte.
- * Índice bibliográfico ≠ autorización de aplicación clínica.
- */
+/** Índice de tablas concretas publicadas para BOLIVIA, sin importar valores. */
 final class LocalizadoresAnexosBoliviaG08Investigacion
 {
     public const VERSION = 'G08-ANEXOS-BO-20261017-01';
@@ -67,10 +63,7 @@ final class LocalizadoresAnexosBoliviaG08Investigacion
             ?? throw new DomainException('G08: tabla boliviana no localizada para ese componente y esa tarea.');
     }
 
-    /**
-     * Comprueba IDENTIDAD de la tabla citada, no aplicabilidad clínica.
-     * Aunque coincida, no autoriza norma, percentil ni interpretación A/P.
-     */
+    /** Comprueba IDENTIDAD de la tabla citada, no aplicabilidad clínica. */
     public function contrastar(string $componente, string $tarea, array $cita): array
     {
         $n = self::buscar($componente, $tarea);

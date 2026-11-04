@@ -16,39 +16,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use RuntimeException;
 
-/**
- * TÍTULO:
- * Recuperación Eloquent de reglas versionadas.
- *
- * CAPA:
- * Infrastructure - Persistence - Repositories.
- *
- * ¿PARA QUÉ SIRVE?
- * Implementa el puerto de reglas del nuevo Domain sobre App\Models.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * ID y versión exactos, mapper y conexión experimental explícita.
- *
- * ¿QUÉ HACE?
- * Consulta con parámetros enlazados y precarga condiciones y consecuencias.
- * Conserva reglas inactivas; el mapper valida su habilitación original.
- *
- * ¿QUÉ DEVUELVE?
- * ReglaExperta, ausencia explícita o lista ordenada por ID.
- *
- * ¿QUÉ NO DEBE HACER?
- * No ejecuta reglas, elige otra versión, activa conocimiento ni escribe.
- * Solo opera en testing contra destinos permitidos por BaseTecnicaDesechable.
- */
+/** Recupera las reglas registradas y sus condiciones por versión. */
 final readonly class ReglaExpertaEloquentRepository implements ReglaExpertaRepositoryInterface
 {
     /**
      * Recibe dependencias sin abrir una conexión ni registrar bindings.
-     *
-     * @param  MapeadorReglas  $mapeador  Conversor del contrato versionado.
-     * @param  string  $conexionExperimental  Nombre de conexión segregada.
-     *
-     * @throws DomainException Si el nombre de conexión es inválido.
+     * @param MapeadorReglas $mapeador
+     * @param string $conexionExperimental
+     * @throws DomainException
      */
     public function __construct(
         /** Conversión sin inferencia. */ private MapeadorReglas $mapeador,
@@ -59,13 +34,11 @@ final readonly class ReglaExpertaEloquentRepository implements ReglaExpertaRepos
 
     /**
      * Recupera una regla únicamente dentro de su versión solicitada.
-     *
-     * @param  string  $id  PK original.
-     * @param  string  $versionConocimiento  Versión propietaria exacta.
-     * @return ReglaExperta|null Regla convertida o ausencia dentro de esa versión.
-     *
-     * @throws DomainException Por identidad inválida o conocimiento incompatible.
-     * @throws RuntimeException Por destino no autorizado o fallo de lectura Eloquent.
+     * @param string $id
+     * @param string $versionConocimiento
+     * @return ReglaExperta|null
+     * @throws DomainException
+     * @throws RuntimeException
      */
     public function obtener(string $id, string $versionConocimiento): ?ReglaExperta
     {
@@ -77,12 +50,10 @@ final readonly class ReglaExpertaEloquentRepository implements ReglaExpertaRepos
 
     /**
      * Entrega las reglas originales, incluidas las no habilitadas.
-     *
-     * @param  string  $versionConocimiento  Versión exacta, sin fallback.
-     * @return list<ReglaExperta> Reglas únicas ordenadas lexicográficamente por PK.
-     *
-     * @throws DomainException Por versión o dependencia incompatible.
-     * @throws RuntimeException Por destino no autorizado o fallo técnico.
+     * @param string $versionConocimiento
+     * @return list<ReglaExperta>
+     * @throws DomainException
+     * @throws RuntimeException
      */
     public function porVersion(string $versionConocimiento): array
     {
@@ -99,11 +70,9 @@ final readonly class ReglaExpertaEloquentRepository implements ReglaExpertaRepos
 
     /**
      * Prepara una lectura con todas las dependencias requeridas por el mapper.
-     *
-     * @param  string  $versionConocimiento  Versión ya validada.
-     * @return Builder<ReglaModelo> Consulta acotada; no carga usuarios ni datos personales.
-     *
-     * @throws RuntimeException Por conexión experimental no autorizada.
+     * @param string $versionConocimiento
+     * @return Builder<ReglaModelo>
+     * @throws RuntimeException
      */
     private function consulta(string $versionConocimiento): Builder
     {
@@ -120,11 +89,9 @@ final readonly class ReglaExpertaEloquentRepository implements ReglaExpertaRepos
 
     /**
      * Exige identidades explícitas sin normalizarlas ni interpolarlas en SQL.
-     *
-     * @param  string  ...$ids  Códigos recibidos por el contrato.
-     * @return void No consulta la base.
-     *
-     * @throws DomainException Por código vacío o con separadores/control.
+     * @param string ...$ids
+     * @return void
+     * @throws DomainException
      */
     private static function validarIdentidades(string ...$ids): void
     {
@@ -137,10 +104,8 @@ final readonly class ReglaExpertaEloquentRepository implements ReglaExpertaRepos
 
     /**
      * Resuelve únicamente el destino experimental nombrado por el llamador.
-     *
-     * @return string Nombre de conexión, nunca el predeterminado implícito.
-     *
-     * @throws RuntimeException Fuera de testing o de las bases desechables autorizadas.
+     * @return string
+     * @throws RuntimeException
      */
     private function conexion(): string
     {

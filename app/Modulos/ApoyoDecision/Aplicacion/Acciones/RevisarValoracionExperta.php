@@ -20,13 +20,13 @@ final readonly class RevisarValoracionExperta
     public function __construct(private ValoracionRevisable $contratos) {}
 
     /**
-     * @param  User  $usuario  Cuenta de la sesión; su personal se obtiene de nuevo dentro de la transacción.
-     * @param  string  $evaluacionId  Evaluación original, autorizada para revisión profesional.
-     * @param  DisciplinaRevision  $disciplina  Responsabilidad explícita de esta firma.
-     * @param  string  $decision  CONFIRMADA o RECHAZADA, sin alterar la salida del motor.
-     * @param  string  $justificacion  Fundamento profesional obligatorio.
-     * @param  string|null  $anteriorId  Cabeza que el profesional estaba revisando; null solo para la primera firma.
-     * @return RevisionEvaluacionExperta Dictamen nuevo o reintento idéntico.
+     * @param User $usuario
+     * @param string $evaluacionId
+     * @param DisciplinaRevision $disciplina
+     * @param string $decision
+     * @param string $justificacion
+     * @param string|null $anteriorId
+     * @return RevisionEvaluacionExperta
      */
     public function ejecutar(User $usuario, string $evaluacionId, DisciplinaRevision $disciplina,
         string $decision, string $justificacion, ?string $anteriorId = null): RevisionEvaluacionExperta

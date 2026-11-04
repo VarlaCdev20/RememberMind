@@ -6,11 +6,7 @@ namespace MotorExperto\instrumentos;
 
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Adquisición instrumental.
- * Traduce preguntas identificadas explícitamente a medidas de un método registrado.
- * Conserva cada bruto y su procedencia; una etiqueta nominal nunca se convierte en un ensayo.
- */
+/** Extrae medidas desde preguntas identificadas y conserva cada valor y su procedencia. */
 final class ExtractorCapturaInstrumental
 {
     public function extraer(array $perfil, array $aplicacion, array $respuestas, ?int $edad): array

@@ -16,18 +16,7 @@ use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
 use MotorExperto\dominio\orion\ValueObjects\Conocimiento\EstadoReglaEnum;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Motor de inferencia (Coordinación pura).
- * TÍTULO: Ejecución experimental versionada de cinco dominios.
- * CAPA: Domain.
- * SUBSISTEMA: Inferencia.
- * RESPONSABILIDAD: Coordinar compuertas, participación semántica, reglas y perfil.
- * ENTRADAS: Memoria sintética, reglas, grafo y contratos de participación explícitos.
- * SALIDAS: Vector, reglas realmente cumplidas, trazas y exclusiones reproducibles.
- * RESTRICCIONES: No consulta SQL, modifica memoria ni encadena consecuencias como hechos.
- * Las reglas descriptivas no son referencias externas A/P. No se reescribe el piloto anterior.
- * TRAZABILIDAD: R1–R10; semántica de soportes D-130 y separación descriptiva D-131/G09.
- */
+/** Solo pruebas: coordinar compuertas, participación semántica, reglas y perfil. */
 final readonly class MotorInferenciaService
 {
     /** Versión del productor técnico, independiente de la versión de conocimiento. */
@@ -35,11 +24,9 @@ final readonly class MotorInferenciaService
 
     /**
      * Recibe colaboradores puros sin efectos ni estado por caso.
-     *
-     * @param  EvaluadorReglasService  $reglas  Evaluador de condiciones, no de puntuaciones.
-     * @param  IntegradorDominiosService  $integrador  Integra referencias con compuertas.
-     * @param  EvaluadorRedSemanticaService  $semantica  Valida contratos de participación.
-     *                                                   No ejecuta inferencia ni produce excepciones durante la construcción.
+     * @param EvaluadorReglasService $reglas
+     * @param IntegradorDominiosService $integrador
+     * @param EvaluadorRedSemanticaService $semantica
      */
     public function __construct(
         /** Evaluación lógica trivalente. */ private EvaluadorReglasService $reglas = new EvaluadorReglasService,
@@ -49,18 +36,16 @@ final readonly class MotorInferenciaService
 
     /**
      * Ejecuta una pasada declarativa sin convertir sus consecuencias en nuevas evidencias clínicas.
-     *
-     * @param  MemoriaTrabajo  $memoria  Caso sintético original.
-     * @param  list<ReglaExperta>  $reglas  Reglas únicas de la misma versión, incluso inactivas.
-     * @param  RedSemantica  $red  Grafo de la misma versión.
-     * @param  array<string, DominioCognitivoEnum>  $dominiosReglas  Adscripción explícita por regla.
-     * @param  list<array>  $contratosRelaciones  Contratos tipados requeridos por EvaluadorRedSemanticaService.
-     * @param  array<string, ?bool>  $habilitaciones  Habilitación explícita de aristas por ID.
-     * @param  list<HechoExperto>  $procedencias  Revisiones originales para todas las candidatas.
-     * @param  list<HechoExperto>  $contexto  Revisiones originales COG-*:campo.
+     * @param MemoriaTrabajo $memoria
+     * @param list<ReglaExperta> $reglas
+     * @param RedSemantica $red
+     * @param array<string, DominioCognitivoEnum> $dominiosReglas
+     * @param list<array> $contratosRelaciones
+     * @param array<string, ?bool> $habilitaciones
+     * @param list<HechoExperto> $procedencias
+     * @param list<HechoExperto> $contexto
      * @return array{perfil: VectorCognitivo, versionMotor: string, reglasPorDominio: array, trazas: array<string, string>, advertencias: array<string, string>, exclusiones: array<string, string>, relacionesUtilizadas: array, evaluacionesReglas: array, compuertas: array}
-     *
-     * @throws DomainException Por caso real, versión/contrato inválido o soporte reutilizado.
+     * @throws DomainException
      */
     public function inferir(MemoriaTrabajo $memoria, array $reglas, RedSemantica $red, array $dominiosReglas,
         array $contratosRelaciones = [], array $habilitaciones = [], array $procedencias = [], array $contexto = []): array
@@ -159,12 +144,10 @@ final readonly class MotorInferenciaService
 
     /**
      * Exige para cada variable un vínculo directo habilitado al concepto de consecuencia.
-     *
-     * @param  ReglaExperta  $regla  Regla cuyo árbol se inspecciona como datos.
-     * @param  array  $validadas  Aristas originales y contratos tipados.
-     * @param  array<string, ?bool>  $habilitaciones  Declaraciones de participación.
-     * @return ?array Lista de aristas utilizadas, o null ante participación no acreditada.
-     *                No crea caminos, invierte predicados ni aprueba relaciones por su sola existencia.
+     * @param ReglaExperta $regla
+     * @param array $validadas
+     * @param array<string, ?bool> $habilitaciones
+     * @return ?array
      */
     private function participacion(ReglaExperta $regla, array $validadas, array $habilitaciones): ?array
     {

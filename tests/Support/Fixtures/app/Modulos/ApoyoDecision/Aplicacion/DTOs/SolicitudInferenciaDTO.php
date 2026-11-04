@@ -9,38 +9,7 @@ use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
 use DateTimeImmutable;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Application (Solicitud experimental).
- *
- * TÍTULO:
- * Solicitud de análisis del sistema experto.
- *
- * CAPA:
- * Application - Objetos de Transferencia de Datos (DTOs).
- *
- * ¿PARA QUÉ SIRVE?
- * Identifica una petición experimental y fija el contexto que debe conservarse
- * durante extracción, inferencia y elaboración del informe.
- *
- * ¿QUÉ RECIBE?
- * Identificadores de solicitud, evaluación y caso sintético, fecha de corte,
- * versión de conocimiento y modo de ejecución explícito.
- *
- * ¿QUÉ HACE?
- * Valida identidades y modo sintético. Permite contrastar una memoria existente
- * con el contexto solicitado sin reconstruirla ni cambiar sus hechos.
- *
- * ¿QUÉ DEVUELVE?
- * Una solicitud inmutable con fecha y versión originales.
- *
- * ¿QUÉ NO DEBE HACER?
- * No admite ejecución clínica, consulta fuentes, interpreta instrumentos
- * ni garantiza idempotencia: conserva el identificador para comprobarla después.
- *
- * RELACIÓN CON O.R.I.O.N.:
- * Es la entrada de CU-01 a CU-06. Reutiliza el marcador experimental de Domain
- * y los prefijos SIM-/SINTETICO- utilizados por sus referencias ficticias.
- */
+/** Identifica una petición experimental y fija el contexto que debe conservarse durante extracción, inferencia y elaboración del informe. */
 final readonly class SolicitudInferenciaDTO
 {
     /** Único modo admitido; coincide con el alcance declarado por Domain. */
@@ -48,16 +17,14 @@ final readonly class SolicitudInferenciaDTO
 
     /**
      * Valida una solicitud sin asignar datos ausentes ni normalizar identidades.
-     *
-     * @param  string  $solicitudId  Identidad de petición, conservada para trazabilidad.
-     * @param  string  $evaluacionId  Evaluación ficticia con prefijo SIM-.
-     * @param  string  $casoSinteticoId  Caso ficticio con prefijo SINTETICO-.
-     * @param  DateTimeImmutable  $fechaCorte  Instante válido e inmutable, con su zona.
-     * @param  string  $versionConocimiento  Versión o manifiesto requerido, sin resolverlo.
-     * @param  string  $modoEjecucion  Marcador de simulación académica no clínica.
-     *
-     * @throws DomainException Por identidad vacía, prefijo incompleto o modo no admitido.
-     * @throws \TypeError Si la fecha u otro argumento incumple el tipo declarado.
+     * @param string $solicitudId
+     * @param string $evaluacionId
+     * @param string $casoSinteticoId
+     * @param DateTimeImmutable $fechaCorte
+     * @param string $versionConocimiento
+     * @param string $modoEjecucion
+     * @throws DomainException
+     * @throws \TypeError
      */
     public function __construct(
         /** Identidad de la solicitud original. */ public string $solicitudId,
@@ -83,14 +50,8 @@ final readonly class SolicitudInferenciaDTO
 
     /**
      * Contrasta la identidad de una memoria ya validada por Domain.
-     * No devuelve datos ni modifica la instantánea recibida.
-     *
-     * @param  MemoriaTrabajo  $memoria  Instantánea recibida de un contrato de dominio.
-     *
-     * @throws DomainException Si evaluación, caso, versión o corte no coinciden.
-     *
-     * El residenteId de esta memoria identifica exclusivamente el caso sintético.
-     * La comparación temporal usa el instante, aunque las zonas sean distintas.
+     * @param MemoriaTrabajo $memoria
+     * @throws DomainException
      */
     public function exigirContexto(MemoriaTrabajo $memoria): void
     {

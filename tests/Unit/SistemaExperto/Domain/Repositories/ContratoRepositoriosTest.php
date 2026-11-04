@@ -17,36 +17,12 @@ use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
-/**
- * TÍTULO: Contratos abstractos de las cuatro interfaces, sin persistencia simulada.
- *
- * CAPA: Domain (verificación unitaria).
- *
- * SUBSISTEMA: Repositorios y compuertas.
- *
- * RESPONSABILIDAD:
- * Verificar contratos explícitos con fuentes artificiales y objetos reales.
- *
- * ENTRADAS:
- * Identidades, declaraciones y referencias ficticias de prueba.
- *
- * SALIDAS:
- * Objetos sintéticos o aserciones sobre preservación y rechazo.
- *
- * RESTRICCIONES:
- * No inicia Laravel, no consulta persistencia ni acredita evaluación posterior en uso real.
- *
- * TRAZABILIDAD:
- * Reglamento maestro, Fases C/D e invariantes R1–R10.
- */
+/** Verificar contratos explícitos con fuentes artificiales y objetos reales. */
 final class ContratoRepositoriosTest extends TestCase
 {
     /**
      * Verifica interfaces puras, namespaces y documentación de cada método.
-     *
      * @return void
-     *
-     * No recibe parámetros ni ejecuta implementaciones de persistencia.
      */
     public function test_cuatro_puertos_documentados_sin_implementaciones(): void
     {
@@ -56,9 +32,10 @@ final class ContratoRepositoriosTest extends TestCase
             $r = new ReflectionClass($interfaz);
             self::assertTrue($r->isInterface());
             self::assertStringStartsWith('MotorExperto\\dominio\\orion\\Repositories\\', $r->getName());
-            foreach (['TÍTULO:', 'CAPA:', 'SUBSISTEMA:', 'RESPONSABILIDAD:', 'ENTRADAS:', 'SALIDAS:', 'RESTRICCIONES:', 'TRAZABILIDAD:'] as $campo) {
-                self::assertStringContainsString($campo, $r->getDocComment());
-            }
+            $doc = $r->getDocComment();
+            self::assertIsString($doc);
+            self::assertMatchesRegularExpression('/\p{L}{3}/u', $doc);
+            self::assertLessThanOrEqual(240, mb_strlen($doc));
             foreach ($r->getMethods() as $metodo) {
                 self::assertTrue($metodo->isAbstract());
                 self::assertNotNull($metodo->getReturnType());
@@ -73,10 +50,7 @@ final class ContratoRepositoriosTest extends TestCase
 
     /**
      * Verifica tipos de dominio y consultas con versión y corte explícitos.
-     *
      * @return void
-     *
-     * No recibe parámetros; no acredita funcionamiento de un adaptador futuro.
      */
     public function test_tipos_de_dominio_y_contexto_explicito(): void
     {

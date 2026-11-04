@@ -9,48 +9,15 @@ use App\Modulos\ApoyoDecision\Aplicacion\DTOs\SolicitudInferenciaDTO;
 use DomainException;
 use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Application (CU-02, memoria de trabajo).
- *
- * TÍTULO:
- * Preparación de la memoria de trabajo.
- *
- * CAPA:
- * Application - Casos de Uso.
- *
- * ¿PARA QUÉ SIRVE?
- * Prepara la instantánea que recibirá el motor conservando la identidad de
- * los hechos y evidencias recuperados para una única solicitud experimental.
- *
- * ¿QUÉ RECIBE?
- * SolicitudInferenciaDTO y EvidenciasEntradaDTO de la misma petición.
- *
- * ¿QUÉ HACE?
- * 1. Contrasta la petición original, incluyendo su identificador de solicitud.
- * 2. Delega la comprobación de contexto al DTO de solicitud.
- * 3. Construye MemoriaTrabajo y delega en Domain sus invariantes constructivas.
- *
- * ¿QUÉ DEVUELVE?
- * Una nueva MemoriaTrabajo con las mismas evidencias y hechos originales.
- *
- * ¿QUÉ NO DEBE HACER?
- * No recupera datos nuevamente, aplica reglas cognitivas, acredita requisitos
- * ni completa una memoria vacía con hechos o resultados ficticios.
- *
- * RELACIÓN CON O.R.I.O.N.:
- * Implementa CU-02. Domain conserva la responsabilidad por duplicación,
- * procedencia, versiones y corte; Application solo coordina la construcción.
- */
+/** Prepara la instantánea que recibirá el motor conservando la identidad de los hechos y evidencias recuperados para una única solicitud experimental. */
 final readonly class PrepararMemoriaTrabajoUseCase
 {
     /**
      * Organiza las colecciones recibidas mediante el constructor real de Domain.
-     *
-     * @param  SolicitudInferenciaDTO  $solicitud  Petición propietaria de la memoria.
-     * @param  EvidenciasEntradaDTO  $entrada  Evidencias extraídas para esa petición.
-     * @return MemoriaTrabajo Instantánea validada, posiblemente vacía, sin alterar la entrada.
-     *
-     * @throws DomainException Por mezcla de peticiones o incumplimiento de invariantes de Domain.
+     * @param SolicitudInferenciaDTO $solicitud
+     * @param EvidenciasEntradaDTO $entrada
+     * @return MemoriaTrabajo
+     * @throws DomainException
      */
     public function ejecutar(SolicitudInferenciaDTO $solicitud, EvidenciasEntradaDTO $entrada): MemoriaTrabajo
     {

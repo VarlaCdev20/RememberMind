@@ -18,18 +18,10 @@ use Illuminate\Support\Facades\DB;
 use RuntimeException;
 use Tests\Unit\SistemaExperto\Infrastructure\Mappers\EscenarioMapeadores as F;
 
-/**
- * TÍTULO: Guardas de ámbito y conexión de los cuatro repositorios.
- * CAPA: Infrastructure - Repositories (pruebas de integración).
- * ¿PARA QUÉ SIRVE? Impide consultas fuera de la PoC segregada.
- * ¿QUÉ INFORMACIÓN RECIBE? Modelos y memorias sintéticas explícitas.
- * ¿QUÉ HACE? Intenta lecturas reales fuera de testing o contra destinos no permitidos.
- * ¿QUÉ DEVUELVE? Aserciones sobre el contrato y sus efectos.
- * ¿QUÉ NO DEBE HACER? No simula autorización institucional ni publica el módulo.
- */
+/** Impide consultas fuera de la PoC segregada. */
 final class GuardasRepositoriosTest extends RepositoriosTestCase
 {
-    /** Rechaza producción antes de ejecutar SQL; sin parámetros ni excepciones sin capturar. */
+    /** Rechaza producción antes de ejecutar SQL */
     public function test_los_cuatro_repositorios_rechazan_entorno_no_testing(): void
     {
         DB::connection()->enableQueryLog();
@@ -50,7 +42,7 @@ final class GuardasRepositoriosTest extends RepositoriosTestCase
         self::assertSame([], DB::connection()->getQueryLog());
     }
 
-    /** Rechaza una base SQLite física sin abrirla ni crearla; sin parámetros ni excepciones sin capturar. */
+    /** Rechaza una base SQLite física sin abrirla ni crearla */
     public function test_rechaza_bases_no_desechables_sin_abrir_su_pdo(): void
     {
         $ruta = sys_get_temp_dir().'/orion-rechazada-'.bin2hex(random_bytes(8)).'.sqlite';
@@ -66,7 +58,7 @@ final class GuardasRepositoriosTest extends RepositoriosTestCase
         self::assertFileDoesNotExist($ruta);
     }
 
-    /** No hereda la conexión predeterminada ni en relaciones precargadas; sin parámetros ni excepciones esperadas. */
+    /** No hereda la conexión predeterminada ni en relaciones precargadas */
     public function test_usa_la_conexion_nombrada_tambien_para_las_relaciones(): void
     {
         EscenarioRepositorios::guardarGrafo(F::regla());
@@ -81,7 +73,7 @@ final class GuardasRepositoriosTest extends RepositoriosTestCase
         }
     }
 
-    /** Identidades inválidas se rechazan antes de Eloquent; sin parámetros ni excepciones sin capturar. */
+    /** Identidades inválidas se rechazan antes de Eloquent */
     public function test_rechaza_identidades_vacias_y_casos_asistenciales_antes_de_consultar(): void
     {
         DB::connection()->enableQueryLog();
@@ -108,9 +100,8 @@ final class GuardasRepositoriosTest extends RepositoriosTestCase
 
     /**
      * Prepara una lectura por cada puerto, sin ejecutar aún consultas.
-     *
-     * @param  string  $conexion  Nombre explícito a comprobar.
-     * @return list<\Closure> Operaciones reales con contexto válido.
+     * @param string $conexion
+     * @return list<\Closure>
      */
     private function lecturas(string $conexion): array
     {

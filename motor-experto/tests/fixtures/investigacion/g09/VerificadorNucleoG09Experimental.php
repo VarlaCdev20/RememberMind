@@ -12,13 +12,7 @@ use MotorExperto\hechos\ContextoEjecucion;
 use MotorExperto\hechos\EvidenciaExperta;
 use MotorExperto\hechos\FuenteBrutaCOGMEM;
 
-/**
- * Verifica las conclusiones G09 con el núcleo D-130 real (EvaluadorReglas,
- * MemoriaTrabajo, red semántica y PaqueteConocimiento).
- *
- * TRABAJA SOLO CON TRAZAS DE PRUEBA: nunca persiste hechos ni autoriza
- * conocimiento G08. No es una segunda evaluación posterior en uso real independiente.
- */
+/** Verifica las conclusiones G09 con el núcleo D-130 real (EvaluadorReglas, MemoriaTrabajo, red semántica y PaqueteConocimiento). */
 final class VerificadorNucleoG09Experimental
 {
     public function cotejar(array $resultado, ?array $contextoOriginal = null): array

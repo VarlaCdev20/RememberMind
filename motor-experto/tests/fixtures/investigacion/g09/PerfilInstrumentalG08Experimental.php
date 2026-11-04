@@ -6,10 +6,7 @@ namespace MotorExperto\investigacion\g09;
 
 use DomainException;
 
-/**
- * G08 — Perfil exclusivamente sintético; no contiene normas ni puntajes clínicos.
- * El catálogo G09 delimita los 15 subcomponentes documentados del proyecto.
- */
+/** G08 — Perfil exclusivamente sintético; no contiene normas ni puntajes clínicos. */
 final class PerfilInstrumentalG08Experimental
 {
     public static function paraRegla(string $regla): array

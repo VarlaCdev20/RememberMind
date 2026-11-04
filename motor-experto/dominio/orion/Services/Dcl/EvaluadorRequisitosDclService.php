@@ -11,25 +11,13 @@ use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum;
 use MotorExperto\dominio\orion\ValueObjects\Dcl\MotivoAbstencionEnum;
 use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Clasificación experimental (Compuertas DCL).
- * TÍTULO: Comprobación de requisitos C01–C05 y coherencia contractual.
- * CAPA: Domain.
- * SUBSISTEMA: DCL experimental.
- * RESPONSABILIDAD: Identificar impedimentos sin acreditar requisitos por inferencia.
- * ENTRADAS: Perfil sintético con declaraciones y soportes originales.
- * SALIDAS: Admisibilidad, motivos y razones de cada impedimento.
- * RESTRICCIONES: No sustituye revisión IADL/diferencial ni emite diagnóstico.
- * TRAZABILIDAD: R1/R5/R7/R9; DCL-PET-20261017-v0.1 §§4–6.
- */
+/** Detecta requisitos pendientes, incumplidos o contradictorios antes de clasificar. */
 final readonly class EvaluadorRequisitosDclService
 {
     /**
      * Conserva todos los motivos en orden técnico determinista, sin prioridad clínica.
-     *
-     * @param  PerfilRequisitosDcl  $perfil  Entradas ya validadas constructivamente.
+     * @param PerfilRequisitosDcl $perfil
      * @return array{habilitado: bool, motivos: list<MotivoAbstencionEnum>, impedimentos: list<MotivoAbstencionEnum>, razones: array<string, string>}
-     *                                                                                                                                                No produce efectos ni modifica los requisitos declarados.
      */
     public function evaluar(PerfilRequisitosDcl $perfil): array
     {

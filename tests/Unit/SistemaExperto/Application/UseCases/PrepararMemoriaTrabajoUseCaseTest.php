@@ -16,19 +16,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 
-/**
- * TÍTULO: Preparación de memoria con los objetos recuperados.
- * CAPA: Application (pruebas unitarias).
- * ¿PARA QUÉ SIRVE? Comprueba aislamiento de peticiones y conservación de originales.
- * ¿QUÉ RECIBE? Solicitudes y DTOs de evidencia exclusivamente sintéticos.
- * ¿QUÉ HACE? Ejecuta CU-02 y recorre también la conexión real CU-01 → CU-02.
- * ¿QUÉ DEVUELVE? Aserciones sobre memoria, contexto y ausencia de mutaciones.
- * ¿QUÉ NO DEBE HACER? No evalúa compuertas, reglas o requisitos clínicos.
- * RELACIÓN CON O.R.I.O.N.: Reglamento de Application, CU-02 y etapa C.
- */
+/** Comprueba aislamiento de peticiones y conservación de originales. */
 final class PrepararMemoriaTrabajoUseCaseTest extends TestCase
 {
-    /** Construye otra memoria conservando los originales; sin parámetros ni excepciones esperadas. */
+    /** Construye otra memoria conservando los originales */
     public function test_construye_memoria_nueva_con_hechos_y_evidencias_originales(): void
     {
         $solicitud = self::solicitud();
@@ -53,7 +44,7 @@ final class PrepararMemoriaTrabajoUseCaseTest extends TestCase
         self::assertFalse($a->esIndependienteDe($b));
     }
 
-    /** Conserva una entrada vacía sin generar resultados; sin parámetros ni excepciones esperadas. */
+    /** Conserva una entrada vacía sin generar resultados */
     public function test_ausencia_de_evidencias_no_produce_hechos_de_normalidad(): void
     {
         $solicitud = self::solicitud();
@@ -70,11 +61,9 @@ final class PrepararMemoriaTrabajoUseCaseTest extends TestCase
 
     /**
      * Una entrada válida para otra petición no puede contaminar la memoria objetivo.
-     *
-     * @param  string  $campo  Dimensión alterada de la solicitud de entrada.
-     * @param  string|DateTimeImmutable  $valor  Identidad o corte ajenos.
-     *
-     * @throws DomainException Rechazo esperado antes de construir la memoria objetivo.
+     * @param string $campo
+     * @param string|DateTimeImmutable $valor
+     * @throws DomainException
      */
     #[DataProvider('solicitudesAjenas')]
     public function test_rechaza_entrada_de_otra_peticion(string $campo, string|DateTimeImmutable $valor): void
@@ -88,7 +77,7 @@ final class PrepararMemoriaTrabajoUseCaseTest extends TestCase
         (new PrepararMemoriaTrabajoUseCase)->ejecutar(self::solicitud(), $entrada);
     }
 
-    /** @return iterable<string, array{string, string|DateTimeImmutable}> Peticiones ajenas; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string, string|DateTimeImmutable}> */
     public static function solicitudesAjenas(): iterable
     {
         yield 'solicitud' => ['solicitudId', 'SIM-OTRA-SOL'];
@@ -98,7 +87,7 @@ final class PrepararMemoriaTrabajoUseCaseTest extends TestCase
         yield 'corte' => ['fechaCorte', F::fecha()->modify('-1 second')];
     }
 
-    /** Acepta una solicitud equivalente por valor, sin exigir el mismo objeto; sin parámetros ni excepciones esperadas. */
+    /** Acepta una solicitud equivalente por valor, sin exigir el mismo objeto */
     public function test_acepta_solicitud_inmutable_equivalente(): void
     {
         $solicitud = self::solicitud();
@@ -110,7 +99,7 @@ final class PrepararMemoriaTrabajoUseCaseTest extends TestCase
         self::assertSame($solicitud->evaluacionId, $memoria->evaluacionId);
     }
 
-    /** Conecta extracción y preparación con una sola consulta; sin parámetros ni excepciones esperadas. */
+    /** Conecta extracción y preparación con una sola consulta */
     public function test_extraccion_y_preparacion_comparten_hechos_sin_reconsultar(): void
     {
         $solicitud = self::solicitud();
@@ -126,7 +115,7 @@ final class PrepararMemoriaTrabajoUseCaseTest extends TestCase
         self::assertSame($e, $memoria->evidencia($e->hecho->id));
     }
 
-    /** Repetir la preparación no acumula evidencias ni reconsulta; sin parámetros ni excepciones esperadas. */
+    /** Repetir la preparación no acumula evidencias ni reconsulta */
     public function test_preparar_dos_veces_la_misma_entrada_conserva_originales_sin_duplicarlos(): void
     {
         $solicitud = self::solicitud();
@@ -151,7 +140,7 @@ final class PrepararMemoriaTrabajoUseCaseTest extends TestCase
         self::assertSame($original, $entrada->memoria);
     }
 
-    /** Conserva una evidencia en el corte aunque la fuente use UTC; sin parámetros ni excepciones esperadas. */
+    /** Conserva una evidencia en el corte aunque la fuente use UTC */
     public function test_preparacion_preserva_fecha_original_y_corte_equivalente_en_otra_zona(): void
     {
         $solicitud = self::solicitud();
@@ -175,10 +164,8 @@ final class PrepararMemoriaTrabajoUseCaseTest extends TestCase
 
     /**
      * Construye una solicitud ficticia con cambios explícitos de contexto.
-     *
-     * @param  array<string, mixed>  $cambios  Parámetros nombrados a sustituir.
-     * @return SolicitudInferenciaDTO Solicitud real del escenario.
-     *                                Sin excepciones esperadas con los valores de los proveedores.
+     * @param array<string, mixed> $cambios
+     * @return SolicitudInferenciaDTO
      */
     private static function solicitud(array $cambios = []): SolicitudInferenciaDTO
     {

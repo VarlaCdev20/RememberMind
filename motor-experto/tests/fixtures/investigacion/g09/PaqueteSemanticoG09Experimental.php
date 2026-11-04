@@ -6,15 +6,7 @@ namespace MotorExperto\investigacion\g09;
 
 use MotorExperto\conocimiento\PaqueteConocimiento;
 
-/**
- * Materializa G09-EXP como grafo/paquete D-123 exclusivamente para
- * validación cruzada del EvaluadorReglas real de RememberMind.
- *
- * Todos los nodos/valores son artificiales y NO SE PERSISTEN.
- * Los indicadores APROBADO exigidos por EvaluadorReglas corresponden
- * ÚNICAMENTE a literales SIMULADOS dentro de este paquete TEST_ONLY:
- * no representan autorización ni aprobación clínica G08/G09.
- */
+/** Materializa G09-EXP como grafo/paquete D-123 exclusivamente para validación cruzada del EvaluadorReglas real de RememberMind. */
 final class PaqueteSemanticoG09Experimental
 {
     /** Metadatos declarados de ingeniería para las tablas existentes; actor/fecha los deriva el gestor. */

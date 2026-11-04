@@ -13,16 +13,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;
 
-/**
- * TÍTULO: Lógica trivalente y soportes originales de reglas.
- * CAPA: Domain (pruebas).
- * SUBSISTEMA: Inferencia.
- * RESPONSABILIDAD: Probar ausencia, comparación estricta, composición y habilitación.
- * ENTRADAS: Hechos sintéticos con null, false, cero, conflicto y valores conocidos.
- * SALIDAS: Estados y árboles realmente producidos por el evaluador.
- * RESTRICCIONES: No ejecuta texto, SQL ni pruebas clínicas.
- * TRAZABILIDAD: R1/R3/R4/R8/R10; gramática de ReglaExperta.
- */
+/** Probar ausencia, comparación estricta, composición y habilitación. */
 final class EvaluadorReglasServiceTest extends TestCase
 {
     /** @return iterable<string, array> Casos que diferencian ausencia, tipo y valor. */

@@ -19,15 +19,7 @@ use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\RedSeman
 use Illuminate\Support\Facades\DB;
 use Tests\Feature\SistemaExperto\Infrastructure\Adapters\AdaptadoresTestCase;
 
-/**
- * TÍTULO: Recorrido experimental con repositorios, mappers y Domain reales.
- * CAPA: Infrastructure (prueba de integración).
- * ¿PARA QUÉ SIRVE? Demuestra adquisición SQL y los cinco casos de uso sin mocks.
- * ¿QUÉ INFORMACIÓN RECIBE? Un control ficticio y una versión documental en base desechable.
- * ¿QUÉ HACE? Ejecuta extracción, memoria, inferencia, DCL e informe sin acreditar ausencias.
- * ¿QUÉ DEVUELVE? Cinco U y abstención explicada con la procedencia consultada.
- * ¿QUÉ NO DEBE HACER? No persiste una instantánea incompleta ni activa el circuito asistencial.
- */
+/** Demuestra adquisición SQL y los cinco casos de uso sin mocks. */
 final class AnalizarCasoExperimentalFeatureTest extends AdaptadoresTestCase
 {
     /** Una observación existente sin revisiones suficientes no se convierte en A/P ni en PET. */

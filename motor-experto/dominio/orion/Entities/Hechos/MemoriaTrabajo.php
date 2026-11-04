@@ -8,35 +8,7 @@ use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
 use DateTimeImmutable;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Memoria de trabajo (Contexto de inferencia).
- *
- * Reúne los hechos y evidencias admitidos para una evaluación y fecha de corte.
- * Cada incorporación crea otra instantánea y conserva intactas las evidencias originales.
- *
- * TÍTULO: Memoria inmutable de una evaluación.
- *
- * CAPA: Domain.
- *
- * SUBSISTEMA: Memoria de trabajo.
- *
- * RESPONSABILIDAD:
- * Retener hechos originales y evidencias del mismo caso hasta una fecha de corte.
- *
- * ENTRADAS:
- * Identidad de evaluación, residente, versión, corte y listas explícitas tipadas.
- *
- * SALIDAS:
- * Mapas de hechos y evidencias; incorporaciones producen una memoria nueva.
- *
- * RESTRICCIONES:
- * No mezcla casos ni versiones, no sobrescribe hechos, no duplica fuentes.
- * Los episodios compartidos pueden conservarse, pero nunca se cuentan aquí
- * como corroboraciones: la independencia se consulta en EvidenciaCognitiva.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R1/R3/R4 y memoria del motor D-124/D-137.
- */
+/** Agrupa hechos y evidencias del mismo caso hasta una fecha de corte, sin sobrescribirlos. */
 final readonly class MemoriaTrabajo
 {
     /** @var array<string, HechoExperto> Hechos originales por ID. */
@@ -47,14 +19,13 @@ final readonly class MemoriaTrabajo
 
     /**
      * Valida la instantánea completa antes de publicarla.
-     *
-     * @param string $evaluacionId Evaluación propietaria.
-     * @param string $residenteId Sujeto propietario.
-     * @param string $versionConocimiento Versión única.
-     * @param DateTimeImmutable $fechaCorte Corte inclusivo.
-     * @param list<HechoExperto> $hechos Hechos originales.
-     * @param list<EvidenciaCognitiva> $evidencias Evidencias ligadas a esos mismos objetos.
-     * @throws DomainException Por identidad, duplicación, contexto o sustitución del original.
+     * @param string $evaluacionId
+     * @param string $residenteId
+     * @param string $versionConocimiento
+     * @param DateTimeImmutable $fechaCorte
+     * @param list<HechoExperto> $hechos
+     * @param list<EvidenciaCognitiva> $evidencias
+     * @throws DomainException
      */
     public function __construct(
         /** Evaluación propietaria. */ public string $evaluacionId,
@@ -99,10 +70,9 @@ final readonly class MemoriaTrabajo
 
     /**
      * Incorpora un hecho en otra instantánea sin modificar esta memoria.
-     *
-     * @param HechoExperto $hecho Hecho original a incorporar.
-     * @return self Memoria nueva.
-     * @throws DomainException Si el constructor detecta duplicación o contexto ajeno.
+     * @param HechoExperto $hecho
+     * @return self
+     * @throws DomainException
      */
     public function conHecho(HechoExperto $hecho): self
     {
@@ -112,10 +82,9 @@ final readonly class MemoriaTrabajo
 
     /**
      * Incorpora evidencia y, si falta, su hecho original en una memoria nueva.
-     *
-     * @param EvidenciaCognitiva $evidencia Evidencia a conservar.
-     * @return self Instantánea nueva con la incorporación validada.
-     * @throws DomainException Por duplicación, contexto ajeno o reemplazo de origen.
+     * @param EvidenciaCognitiva $evidencia
+     * @return self
+     * @throws DomainException
      */
     public function conEvidencia(EvidenciaCognitiva $evidencia): self
     {
@@ -130,10 +99,9 @@ final readonly class MemoriaTrabajo
 
     /**
      * Consulta una evidencia existente, sin crear una evidencia desconocida.
-     *
-     * @param string $id Identidad del hecho documentado.
-     * @return EvidenciaCognitiva Evidencia original.
-     * @throws DomainException Si está ausente.
+     * @param string $id
+     * @return EvidenciaCognitiva
+     * @throws DomainException
      */
     public function evidencia(string $id): EvidenciaCognitiva
     {
@@ -142,11 +110,8 @@ final readonly class MemoriaTrabajo
 
     /**
      * Conserva el filtro de dominio sin ponderar ni agrupar hallazgos.
-     *
-     * @param DominioCognitivoEnum $dominio Dominio consultado.
-     * @return list<EvidenciaCognitiva> Evidencias originales vinculadas.
-     *
-     * No lanza excepciones.
+     * @param DominioCognitivoEnum $dominio
+     * @return list<EvidenciaCognitiva>
      */
     public function evidenciasParaDominio(DominioCognitivoEnum $dominio): array
     {

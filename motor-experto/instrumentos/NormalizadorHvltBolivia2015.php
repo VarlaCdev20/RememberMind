@@ -4,13 +4,7 @@ declare(strict_types=1);
 
 namespace MotorExperto\instrumentos;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Normalización instrumental.
- *
- * Modelo boliviano publicado por Arango-Lasprilla et al. (2015), tablas 2 y 4.
- * DOI 10.3233/NRE-151286. Solo aprendizaje total y recuerdo libre, HVLT-R forma 5.
- * No contiene reactivos, cortes diagnósticos, inferencias de DCL ni firmas profesionales.
- */
+/** Aplica el modelo boliviano de 2015 a aprendizaje y recuerdo libre de HVLT-R, forma 5. */
 final class NormalizadorHvltBolivia2015
 {
     public const METODO = 'HVLT-R-BO-2015-F5';
@@ -22,10 +16,7 @@ final class NormalizadorHvltBolivia2015
         'espanol_nativo' => 'LOGICO', 'nacimiento_bolivia' => 'LOGICO', 'residencia_bolivia' => 'LOGICO',
         'lectoescritura' => 'LOGICO', 'administracion_estandarizada' => 'LOGICO'];
 
-    /**
-     * El llamador aporta mediciones y contexto documentados; nunca se deducen de una etiqueta nominal.
-     * NULL o contexto no acreditado conserva el bruto y enumera las causas de no normalización.
-     */
+    /** El llamador aporta mediciones y contexto documentados; nunca se deducen de una etiqueta nominal. */
     public function normalizar(array $captura): array
     {
         $contexto = [];

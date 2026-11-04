@@ -6,46 +6,18 @@ namespace MotorExperto\dominio\orion\Entities\Conocimiento;
 
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Base de conocimiento (Conceptos semánticos).
- *
- * Representa un concepto identificable dentro de una versión de la red semántica.
- * Su existencia describe conocimiento; por sí sola no acredita evidencia ni un hallazgo.
- *
- * TÍTULO: Nodo versionado de conocimiento.
- *
- * CAPA: Domain.
- *
- * SUBSISTEMA: Base de conocimiento.
- *
- * RESPONSABILIDAD:
- * Preservar identidad y significado de un concepto sin inferir aristas.
- *
- * ENTRADAS:
- * ID, versión, código semántico, nombre, tipo documental y definición.
- *
- * SALIDAS:
- * Un nodo inmutable utilizable por una red de la misma versión.
- *
- * RESTRICCIONES:
- * El tipo es documental y explícito; no se crea un catálogo clínico nuevo.
- * Un nodo no acredita evidencia, habilitación ni resultado cognitivo.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R4/R10; grafo versionado D-123.
- */
+/** Identifica un concepto y su significado dentro de una versión. */
 final readonly class NodoSemantico
 {
     /**
      * Valida la identidad y la descripción mínima del nodo.
-     *
-     * @param string $id Identidad del nodo.
-     * @param string $versionConocimiento Versión propietaria.
-     * @param string $codigo Código semántico, distinto del ID local.
-     * @param string $nombre Nombre documental.
-     * @param string $tipo Tipo documental, por ejemplo CRITERIO o VARIABLE.
-     * @param string $definicion Significado explícito.
-     * @throws DomainException Si falta identidad o significado.
+     * @param string $id
+     * @param string $versionConocimiento
+     * @param string $codigo
+     * @param string $nombre
+     * @param string $tipo
+     * @param string $definicion
+     * @throws DomainException
      */
     public function __construct(
         /** Identidad del nodo. */ public string $id,

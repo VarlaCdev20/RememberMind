@@ -6,11 +6,7 @@ namespace MotorExperto\instrumentos;
 
 use DomainException;
 
-/**
- * Regresiones españolas reconstruidas desde artículos originales y cotejo de autores.
- * Son referencias poblacionales explícitas, sin adopción clínica automática en Bolivia.
- * No incluyen umbrales, diagnósticos, estímulos ni la fórmula FCSRT-Del conflictiva.
- */
+/** Regresiones españolas reconstruidas desde artículos originales y cotejo de autores. */
 final class NormalizadorReferenciasEspana
 {
     public const DSB = 'DSB-ES-SABIEX-2021-LONGITUD';

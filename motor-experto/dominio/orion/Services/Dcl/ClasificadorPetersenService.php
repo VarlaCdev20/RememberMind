@@ -10,24 +10,12 @@ use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum;
 use MotorExperto\dominio\orion\ValueObjects\Dcl\SubtipoDclEnum;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Clasificación experimental (Patrones candidatos).
- * TÍTULO: Clasificador Petersen exclusivamente sintético.
- * CAPA: Domain.
- * SUBSISTEMA: DCL experimental.
- * RESPONSABILIDAD: Seleccionar PET-01..04 solo después de todas las compuertas.
- * ENTRADAS: Perfil original C01–C05 de un caso ficticio.
- * SALIDAS: Patrón candidato sustentado o abstención con todos sus motivos.
- * RESTRICCIONES: No diagnostica, acredita C03/C04, convierte G09 a A/P ni crea reglas aplicadas ficticias.
- * TRAZABILIDAD: R7/R9; distribución explícita DCL-PET-20261017-v0.1.
- */
+/** Selecciona un patrón candidato solo con requisitos cumplidos; conserva las abstenciones. */
 final readonly class ClasificadorPetersenService
 {
     /**
      * Recibe la comprobación de requisitos sin activar capacidades asistenciales.
-     *
-     * @param  EvaluadorRequisitosDclService  $requisitos  Evaluador puro de impedimentos.
-     *                                                     No clasifica ni lanza excepciones durante la construcción.
+     * @param EvaluadorRequisitosDclService $requisitos
      */
     public function __construct(
         /** Evaluador puro de condiciones y coherencia. */
@@ -36,11 +24,9 @@ final readonly class ClasificadorPetersenService
 
     /**
      * Clasifica la distribución sustentada; no calcula estados de dominio.
-     *
-     * @param  PerfilRequisitosDcl  $perfil  Requisitos y cinco dominios explícitos.
-     * @return ResultadoClasificacionDcl Resultado inmutable que retiene el perfil original.
-     *
-     * @throws \DomainException Si la salida viola las invariantes del resultado.
+     * @param PerfilRequisitosDcl $perfil
+     * @return ResultadoClasificacionDcl
+     * @throws \DomainException
      */
     public function clasificar(PerfilRequisitosDcl $perfil): ResultadoClasificacionDcl
     {

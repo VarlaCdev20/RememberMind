@@ -21,19 +21,13 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 
-/**
- * TÍTULO: Informe estructurado y trazabilidad del contexto.
- * CAPA: Application (pruebas unitarias).
- * ¿PARA QUÉ SIRVE? Comprueba los tres niveles, las versiones y la advertencia.
- * ¿QUÉ RECIBE? Explicaciones manuales y resultados ficticios de Domain.
- * ¿QUÉ HACE? Construye el informe sin ejecutar un generador de explicación.
- * ¿QUÉ DEVUELVE? Aserciones de conservación, inmutabilidad y rechazo.
- * ¿QUÉ NO DEBE HACER? No acredita inferencia, diagnóstico ni integración Laravel.
- * RELACIÓN CON O.R.I.O.N.: Reglamento de Application, DTO 05 y etapa B.
- */
+/** Comprueba los tres niveles, las versiones y la advertencia. */
 final class InformeExpertoDTOTest extends TestCase
 {
-    /** Conserva las tres secciones sin fabricar Petersen; sin parámetros ni excepciones esperadas. @return void */
+    /**
+ * Conserva las tres secciones sin fabricar Petersen
+ * @return void
+ */
     public function test_informe_sin_dcl_conserva_textos_y_advertencia_obligatoria(): void
     {
         $inferencia = self::inferencia(F::perfil(['U', 'U', 'U', 'U', 'U'])->cognicion);
@@ -50,7 +44,10 @@ final class InformeExpertoDTOTest extends TestCase
         self::assertSame('SIMULACIÓN ACADÉMICA — SIN VALIDEZ DIAGNÓSTICA — NO UTILIZAR PARA DECISIONES ASISTENCIALES.', $dto->advertencia);
     }
 
-    /** Conserva abstención, relaciones y exclusiones originales; sin parámetros ni excepciones esperadas. @return void */
+    /**
+ * Conserva abstención, relaciones y exclusiones originales
+ * @return void
+ */
     public function test_informe_con_abstencion_conserva_toda_la_trazabilidad(): void
     {
         $perfil = F::perfil(['U', 'P', 'P', 'P', 'P']);
@@ -76,10 +73,8 @@ final class InformeExpertoDTOTest extends TestCase
 
     /**
      * Impide un informe con uno de sus niveles obligatorio vacío.
-     *
-     * @param  string  $seccion  Nombre del nivel incompleto.
-     *
-     * @throws DomainException Rechazo esperado sin generar un texto sustitutivo.
+     * @param string $seccion
+     * @throws DomainException
      */
     #[DataProvider('seccionesObligatorias')]
     public function test_rechaza_seccion_vacia(string $seccion): void
@@ -91,7 +86,7 @@ final class InformeExpertoDTOTest extends TestCase
         new InformeExpertoDTO($inferencia, null, ...$textos);
     }
 
-    /** @return iterable<string, array{string}> Niveles obligatorios; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string}> */
     public static function seccionesObligatorias(): iterable
     {
         yield 'nivel 1' => ['resumen'];
@@ -126,10 +121,8 @@ final class InformeExpertoDTOTest extends TestCase
 
     /**
      * Rechaza referencias de explicación sin identidad o versión compatible.
-     *
-     * @param  string  $caso  Error artificial de la lista de relaciones.
-     *
-     * @throws DomainException Rechazo estructural esperado sin evaluar la red.
+     * @param string $caso
+     * @throws DomainException
      */
     #[DataProvider('relacionesInvalidas')]
     public function test_rechaza_relaciones_incompatibles(string $caso): void
@@ -146,7 +139,7 @@ final class InformeExpertoDTOTest extends TestCase
         new InformeExpertoDTO($inferencia, null, 'Resumen.', 'Interpretación.', 'Fundamento.', $relaciones);
     }
 
-    /** @return iterable<string, array{string}> Relaciones inválidas; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string}> */
     public static function relacionesInvalidas(): iterable
     {
         foreach (['duplicada', 'otra versión', 'sin tipar', 'sin lista'] as $caso) {
@@ -172,10 +165,8 @@ final class InformeExpertoDTOTest extends TestCase
 
     /**
      * Envuelve un perfil manual, sin simular una ejecución del motor.
-     *
-     * @param  VectorCognitivo  $perfil  Perfil sintético original.
-     * @return ResultadoInferenciaDTO Resultado de transporte para el escenario.
-     *                                Sin excepciones esperadas con el contexto fijo.
+     * @param VectorCognitivo $perfil
+     * @return ResultadoInferenciaDTO
      */
     private static function inferencia(VectorCognitivo $perfil): ResultadoInferenciaDTO
     {
@@ -188,10 +179,8 @@ final class InformeExpertoDTOTest extends TestCase
 
     /**
      * Declara una relación semántica artificial, sin inventar enlaces inferidos.
-     *
-     * @param  string  $version  Versión propietaria de los nodos y de la arista.
-     * @return RelacionSemantica Relación original del escenario.
-     *                           Sin excepciones esperadas con las identidades fijas.
+     * @param string $version
+     * @return RelacionSemantica
      */
     private static function relacion(string $version = 'SIM-V1'): RelacionSemantica
     {

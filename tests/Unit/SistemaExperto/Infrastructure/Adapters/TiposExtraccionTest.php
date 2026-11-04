@@ -16,37 +16,15 @@ use DomainException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * TÍTULO:
- * Tipos físicos y conservación explícita de ausencias.
- *
- * CAPA:
- * Infrastructure - Adapters.
- *
- * ¿PARA QUÉ SIRVE?
- * Recupera datos brutos autorizados sin interpretación clínica.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * Atributos originales en modelos Eloquent sin BDD.
- *
- * ¿QUÉ HACE?
- * Verifica NULL, booleanos, textos y decimales sin accessors ni baremos.
- *
- * ¿QUÉ DEVUELVE?
- * Valores tipados exactos y rechazos de datos incompatibles.
- *
- * ¿QUÉ NO DEBE HACER?
- * No ejecuta reglas ni supone normalidad desde NULL o falso.
- */
+/** Recupera datos brutos autorizados sin interpretación clínica. */
 final class TiposExtraccionTest extends TestCase
 {
     /**
      * Conserva NULL y valores conocidos sin defaults.
-     *
-     * @param  mixed  $valor  Dato físico explícito.
-     * @param  string  $tipo  Tipo autorizado del adaptador.
-     * @param  mixed  $esperado  Representación tipada.
-     * @return void Sin excepciones esperadas.
+     * @param mixed $valor
+     * @param string $tipo
+     * @param mixed $esperado
+     * @return void
      */
     #[DataProvider('valoresValidos')]
     public function test_conserva_el_tipo_de_los_valores_fisicos(mixed $valor, string $tipo, mixed $esperado): void
@@ -56,7 +34,7 @@ final class TiposExtraccionTest extends TestCase
         self::assertSame($esperado, ExtractorVariableMapeada::valorFisico($modelo, 'memoria_reciente', $tipo));
     }
 
-    /** @return iterable<string, array{mixed, string, mixed}> Valores independientes; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{mixed, string, mixed}> */
     public static function valoresValidos(): iterable
     {
         yield 'texto NULL' => [null, 'texto', null];
@@ -78,11 +56,9 @@ final class TiposExtraccionTest extends TestCase
 
     /**
      * Rechaza coerciones que cambiarían el significado.
-     *
-     * @param  mixed  $valor  Dato incompatible.
-     * @param  string  $tipo  Tipo esperado.
-     *
-     * @throws DomainException Rechazo esperado.
+     * @param mixed $valor
+     * @param string $tipo
+     * @throws DomainException
      */
     #[DataProvider('valoresInvalidos')]
     public function test_rechaza_coerciones_ambiguas(mixed $valor, string $tipo): void
@@ -92,7 +68,7 @@ final class TiposExtraccionTest extends TestCase
         ExtractorVariableMapeada::valorFisico($modelo, 'memoria_reciente', $tipo);
     }
 
-    /** @return iterable<string, array{mixed, string}> Incompatibilidades; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{mixed, string}> */
     public static function valoresInvalidos(): iterable
     {
         yield 'false a texto' => [false, 'texto'];
@@ -114,7 +90,7 @@ final class TiposExtraccionTest extends TestCase
         ExtractorVariableMapeada::valorFisico(new ControlCognitivo, 'memoria_reciente', 'texto');
     }
 
-    /** Evita defaults MEDIO/REGULAR y otros de presentación en funcionalidad; sin parámetros ni excepciones esperadas. */
+    /** Evita defaults MEDIO/REGULAR y otros de presentación en funcionalidad */
     public function test_los_adaptadores_no_usan_accessors_de_presentacion(): void
     {
         $original = (new ValoracionFuncional)->setRawAttributes(['nivel_dependencia' => null], true);
@@ -128,12 +104,10 @@ final class TiposExtraccionTest extends TestCase
 
     /**
      * Rechaza cualquier campo/selector fuera de una lista cerrada.
-     *
-     * @param  string  $modo  Modo declarado.
-     * @param  string|null  $campo  Campo declarado.
-     * @param  string|null  $selector  Selector declarado.
-     *
-     * @throws DomainException Rechazo esperado.
+     * @param string $modo
+     * @param string|null $campo
+     * @param string|null $selector
+     * @throws DomainException
      */
     #[DataProvider('mapeosInvalidos')]
     public function test_mapeos_no_soportados_no_ejecutan_lecturas(string $modo, ?string $campo, ?string $selector): void
@@ -145,7 +119,7 @@ final class TiposExtraccionTest extends TestCase
         (new AdaptadorControlesCognitivos)->validarMapeo($mapeo);
     }
 
-    /** @return iterable<string, array{string, string|null, string|null}> Modos sin contrato; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string, string|null, string|null}> */
     public static function mapeosInvalidos(): iterable
     {
         yield 'campo desconocido' => ['CAMPO_DIRECTO', 'cod_usuario', null];

@@ -26,41 +26,13 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use PHPUnit\Framework\TestCase;
 
-/**
- * TÍTULO: Contrato físico, documentación y carga pura de los 15 ValueObjects.
- *
- * CAPA: Domain (verificación unitaria).
- *
- * SUBSISTEMA: Contratos de ValueObjects.
- *
- * RESPONSABILIDAD:
- * Verificar los vocabularios y límites de la Fase A sin implementar inferencias.
- *
- * ENTRADAS:
- * Códigos documentales y literales técnicos artificiales, sin datos de residentes.
- *
- * SALIDAS:
- * Aserciones reproducibles sobre identidad, rechazo o documentación del contrato.
- *
- * RESTRICCIONES:
- * No inicia Laravel, no consulta una BDD y no interpreta instrumentos.
- * El resultado de estas pruebas no acredita evaluación posterior en uso real.
- *
- * TRAZABILIDAD:
- * Reglamento maestro, Fase A, documentación obligatoria y prueba 18.
- */
+/** Verificar los vocabularios y límites de la Fase A sin implementar inferencias. */
 final class ContratoValueObjectsTest extends TestCase
 {
     /**
      * Comprueba que cada literal declarado reconstruye la misma identidad.
-     *
-     * También exige que un código ajeno permanezca sin representación; no
-     * se permite un reemplazo silencioso por normalidad o por nivel cero.
-     *
-     * @param class-string<BackedEnum> $enum Tipo del vocabulario bajo prueba.
+     * @param class-string<BackedEnum> $enum
      * @return void
-     *
-     * No se esperan excepciones con los casos válidos; un fallo se informa.
      */
     #[DataProvider('catalogos')]
     public function test_construccion_conserva_identidad_y_rechaza_valores_ajenos(string $enum): void
@@ -76,10 +48,7 @@ final class ContratoValueObjectsTest extends TestCase
 
     /**
      * Enumera exactamente los quince archivos autorizados de producción.
-     *
-     * @return iterable<string, array{class-string<BackedEnum>}> Catálogos tipados.
-     *
-     * No recibe parámetros ni lanza excepciones.
+     * @return iterable<string, array{class-string<BackedEnum>}>
      */
     public static function catalogos(): iterable
     {
@@ -106,13 +75,7 @@ final class ContratoValueObjectsTest extends TestCase
 
     /**
      * Verifica el manifiesto, namespaces, strict_types y los PHPDoc requeridos.
-     *
-     * Revisa también cada caso y cada método propio; los métodos nativos del
-     * lenguaje quedan fuera porque no se declaran en los archivos del proyecto.
-     *
      * @return void
-     *
-     * No recibe parámetros ni oculta errores de lectura o reflexión.
      */
     public function test_estructura_y_documentacion_completas(): void
     {
@@ -137,10 +100,10 @@ final class ContratoValueObjectsTest extends TestCase
             self::assertStringStartsWith("<?php\n\ndeclare(strict_types=1);", file_get_contents($path));
             $doc = $reflection->getDocComment();
             self::assertNotFalse($doc, $enum);
-            self::assertStringContainsString('COMPONENTE DEL SISTEMA EXPERTO:', $doc, $enum);
-            foreach (['TÍTULO:', 'CAPA:', 'SUBSISTEMA:', 'RESPONSABILIDAD:', 'ENTRADAS:', 'SALIDAS:', 'RESTRICCIONES:', 'TRAZABILIDAD:'] as $label) {
-                self::assertStringContainsString($label, $doc, $enum);
-            }
+
+            self::assertIsString($doc);
+            self::assertMatchesRegularExpression('/\p{L}{3}/u', $doc);
+            self::assertLessThanOrEqual(240, mb_strlen($doc));
             foreach ($reflection->getCases() as $case) {
                 self::assertNotFalse($case->getDocComment(), $enum.'::'.$case->getName());
             }
@@ -158,13 +121,7 @@ final class ContratoValueObjectsTest extends TestCase
 
     /**
      * Busca dependencias Laravel en tokens ejecutables de todo el Domain.
-     *
-     * Los comentarios no se consideran imports. La carga previa de los quince
-     * enums funciona con Composer y PHP estándar, sin iniciar la aplicación.
-     *
      * @return void
-     *
-     * No recibe parámetros; errores de lectura no se silencian.
      */
     public function test_domain_no_depende_de_laravel(): void
     {

@@ -14,37 +14,12 @@ use TypeError;
 use ValueError;
 use PHPUnit\Framework\TestCase;
 
-/**
- * TÍTULO: Correspondencia cognitiva y separación de evaluabilidad y resultado.
- *
- * CAPA: Domain (verificación unitaria).
- *
- * SUBSISTEMA: Contratos de ValueObjects.
- *
- * RESPONSABILIDAD:
- * Verificar los vocabularios y límites de la Fase A sin implementar inferencias.
- *
- * ENTRADAS:
- * Códigos documentales y literales técnicos artificiales, sin datos de residentes.
- *
- * SALIDAS:
- * Aserciones reproducibles sobre identidad, rechazo o documentación del contrato.
- *
- * RESTRICCIONES:
- * No inicia Laravel, no consulta una BDD y no interpreta instrumentos.
- * El resultado de estas pruebas no acredita evaluación posterior en uso real.
- *
- * TRAZABILIDAD:
- * Reglamento maestro, Fase A, R1/R2/R6/R8; catálogo O.R.I.O.N. D-108/D-135.
- */
+/** Verificar los vocabularios y límites de la Fase A sin implementar inferencias. */
 final class VocabularioCognicionTest extends TestCase
 {
     /**
      * Comprueba códigos de dominio y estados sin introducir un sexto eje.
-     *
      * @return void
-     *
-     * No recibe parámetros ni espera excepciones con los códigos oficiales.
      */
     public function test_cinco_dominios_y_cinco_estados_documentales(): void
     {
@@ -58,12 +33,9 @@ final class VocabularioCognicionTest extends TestCase
 
     /**
      * Verifica la pertenencia primaria de cada uno de los 19 subcomponentes.
-     *
-     * @param string $codigo Código documental de subcomponente.
-     * @param string $dominio Código documental esperado del dominio.
+     * @param string $codigo
+     * @param string $dominio
      * @return void
-     *
-     * No se esperan excepciones con códigos incluidos en el catálogo.
      */
     #[DataProvider('subcomponentes')]
     public function test_subcomponente_conserva_su_dominio_primario(string $codigo, string $dominio): void
@@ -73,10 +45,7 @@ final class VocabularioCognicionTest extends TestCase
 
     /**
      * Proporciona las 19 correspondencias del catálogo documental.
-     *
-     * @return iterable<string, array{string, string}> Código y dominio esperado.
-     *
-     * No recibe parámetros ni lanza excepciones.
+     * @return iterable<string, array{string, string}>
      */
     public static function subcomponentes(): iterable
     {
@@ -96,13 +65,10 @@ final class VocabularioCognicionTest extends TestCase
 
     /**
      * Comprueba las quince combinaciones de nivel y prefijo documental.
-     *
-     * @param string $dominio Código del dominio bajo prueba.
-     * @param int $nivel Nivel explícito de compuerta, nunca una puntuación.
-     * @param string $esperado Código completo documentado.
+     * @param string $dominio
+     * @param int $nivel
+     * @param string $esperado
      * @return void
-     *
-     * No se esperan excepciones con las combinaciones válidas.
      */
     #[DataProvider('codigosEvaluabilidad')]
     public function test_codigo_evaluabilidad_respeta_dominio(string $dominio, int $nivel, string $esperado): void
@@ -112,10 +78,7 @@ final class VocabularioCognicionTest extends TestCase
 
     /**
      * Declara ejemplos completos sin depender del mapeo implementado.
-     *
-     * @return iterable<string, array{string, int, string}> Dominio, nivel y código.
-     *
-     * No recibe parámetros ni lanza excepciones.
+     * @return iterable<string, array{string, int, string}>
      */
     public static function codigosEvaluabilidad(): iterable
     {
@@ -132,13 +95,7 @@ final class VocabularioCognicionTest extends TestCase
 
     /**
      * Demuestra que el nivel 1 nombra señal, sin exigir una referencia basal.
-     *
-     * El nivel 2 tampoco admite parámetros de línea basal ni produce A/P.
-     * Solo se verifica representación; todavía no existe un evaluador.
-     *
      * @return void
-     *
-     * No recibe parámetros ni espera excepciones.
      */
     public function test_niveles_no_son_resultados_ni_requisitos_de_linea_basal(): void
     {
@@ -151,10 +108,7 @@ final class VocabularioCognicionTest extends TestCase
 
     /**
      * Comprueba que un nivel fuera de contrato falla, sin redondeo ni default.
-     *
      * @return void
-     *
-     * Se espera ValueError al intentar construir el nivel 3.
      */
     public function test_rechaza_nivel_no_documentado(): void
     {
@@ -164,10 +118,7 @@ final class VocabularioCognicionTest extends TestCase
 
     /**
      * Comprueba que la ausencia no se convierte en el nivel cero.
-     *
      * @return void
-     *
-     * Se espera TypeError por null: la entrada debe declararse explícitamente.
      */
     public function test_null_no_se_convierte_en_nivel_cero(): void
     {
@@ -177,10 +128,7 @@ final class VocabularioCognicionTest extends TestCase
 
     /**
      * Comprueba que la ausencia no se convierte en rendimiento esperado.
-     *
      * @return void
-     *
-     * Se espera TypeError por null, sin fallback a P.
      */
     public function test_null_no_se_convierte_en_rendimiento_esperado(): void
     {

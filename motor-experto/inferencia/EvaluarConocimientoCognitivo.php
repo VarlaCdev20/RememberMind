@@ -15,12 +15,7 @@ use MotorExperto\explicacion\ConstructorTraza;
 use MotorExperto\explicacion\TrazaFuentesInstrumentales;
 use MotorExperto\hechos\MemoriaTrabajo;
 
-/**
- * Ejecución declarativa pura sobre hechos originales y un paquete completo de cinco dominios.
- * No crea fuentes, deduce A/P, agrega puntuaciones ni persiste evaluaciones.
- * La aplicación institucional debe autorizar el acceso y proporcionar su versión y extracción verificadas.
- * Las conclusiones son las consecuencias positivas exactas del conocimiento, no una interpretación clínica nueva.
- */
+/** Ejecución declarativa pura sobre hechos originales y un paquete completo de cinco dominios. */
 final class EvaluarConocimientoCognitivo
 {
     public function ejecutar(PaqueteConocimiento $p, MemoriaTrabajo $m): array

@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace MotorExperto\instrumentos;
 
-/**
- * Puntuaciones descriptivas de WAB castellana, Nau Llibres, edición de 2000.
- * Usa la tabla de puntuaciones de la página impresa 18; no reproduce reactivos
- * ni rúbricas. No importa normas WAB-R, no calcula cociente de afasia ni DCL.
- */
+/** Puntuaciones descriptivas de WAB castellana, Nau Llibres, edición de 2000. */
 final class CalculadorLenguajeWabCastellano2000
 {
     public const METODO = 'WAB-ES-2000-ORAL-BRUTO-1';

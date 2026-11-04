@@ -7,11 +7,7 @@ namespace MotorExperto\investigacion\dcl;
 use MotorExperto\conocimiento\RedSemantica;
 use MotorExperto\investigacion\g09\CatalogoReglasG09Experimental;
 
-/**
- * Catálogo conceptual D-108/D-135: cinco dominios y diecinueve subcomponentes.
- * Es una red documental inactiva; no es una versión ejecutable que mezcle paquetes.
- * Conserva la frontera EJE-S03/Memoria y no crea reglas para los cuatro conceptos MEM.
- */
+/** Catálogo conceptual D-108/D-135: cinco dominios y diecinueve subcomponentes. */
 final class CatalogoPerfilCincoDominios
 {
     public const VERSION = 'PERFIL-CONCEP-1';

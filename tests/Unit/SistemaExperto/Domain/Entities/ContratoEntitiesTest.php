@@ -24,36 +24,12 @@ use RecursiveIteratorIterator;
 use ReflectionClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * TÍTULO: Manifiesto, documentación e inmutabilidad de las catorce entidades.
- *
- * CAPA: Domain (verificación unitaria).
- *
- * SUBSISTEMA: Entidades y sus invariantes.
- *
- * RESPONSABILIDAD:
- * Verificar constructores y comportamiento local de la Fase B.
- *
- * ENTRADAS:
- * Escenarios artificiales sin datos de residentes ni instrumentos reales.
- *
- * SALIDAS:
- * Aserciones de conservación, rechazo e inmutabilidad.
- *
- * RESTRICCIONES:
- * No inicia Laravel, no accede a BDD ni acredita evaluación posterior en uso real.
- *
- * TRAZABILIDAD:
- * Reglamento maestro, Fase B, documentación obligatoria e invariantes R1–R10.
- */
+/** Verificar constructores y comportamiento local de la Fase B. */
 final class ContratoEntitiesTest extends TestCase
 {
     /**
      * Comprueba clases, namespaces, propiedades, métodos y constantes documentados.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_catorce_clases_final_readonly_con_documentacion_completa(): void
     {
@@ -74,10 +50,10 @@ final class ContratoEntitiesTest extends TestCase
             self::assertStringStartsWith("<?php\n\ndeclare(strict_types=1);", file_get_contents($archivo));
             $doc = $r->getDocComment();
             self::assertNotFalse($doc);
-            self::assertStringContainsString('COMPONENTE DEL SISTEMA EXPERTO:', $doc, $clase);
-            foreach (['TÍTULO:', 'CAPA:', 'SUBSISTEMA:', 'RESPONSABILIDAD:', 'ENTRADAS:', 'SALIDAS:', 'RESTRICCIONES:', 'TRAZABILIDAD:'] as $titulo) {
-                self::assertStringContainsString($titulo, $doc, $clase);
-            }
+
+            self::assertIsString($doc);
+            self::assertMatchesRegularExpression('/\p{L}{3}/u', $doc);
+            self::assertLessThanOrEqual(240, mb_strlen($doc));
             foreach ($r->getProperties() as $propiedad) {
                 self::assertTrue($propiedad->isReadOnly());
                 self::assertNotNull($propiedad->getType());
@@ -101,10 +77,7 @@ final class ContratoEntitiesTest extends TestCase
 
     /**
      * Impide reemplazar el valor de un hecho construido.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_propiedad_original_no_puede_reescribirse(): void
     {
@@ -115,10 +88,7 @@ final class ContratoEntitiesTest extends TestCase
 
     /**
      * Impide borrar hechos desde una colección pública readonly.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_coleccion_de_memoria_no_puede_mutarse_desde_fuera(): void
     {

@@ -11,15 +11,7 @@ use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * TÍTULO: Conversión de reglas D-130 sin ejecución.
- * CAPA: Infrastructure - Mappers (pruebas unitarias).
- * ¿PARA QUÉ SIRVE? Comprueba conjunción positiva, referencias y habilitación original.
- * ¿QUÉ INFORMACIÓN RECIBE? Modelos sintéticos normalizados con sus dependencias.
- * ¿QUÉ HACE? Mapea conocimiento y prueba rechazos estructurales.
- * ¿QUÉ DEVUELVE? Aserciones de conservación y fallo explícito.
- * ¿QUÉ NO DEBE HACER? No evalúa condiciones ni activa catálogos.
- */
+/** Comprueba conjunción positiva, referencias y habilitación original. */
 final class MapeadorReglasTest extends TestCase
 {
     public function test_una_regla_rechazada_no_se_rehabilita_al_mapearla(): void
@@ -31,7 +23,7 @@ final class MapeadorReglasTest extends TestCase
         self::assertSame('RECHAZADA', $modelo->getAttributes()['estado_revision']);
     }
 
-    /** Conserva PK, códigos y la cadena cero sin ejecutarlos; sin parámetros ni excepciones esperadas. */
+    /** Conserva PK, códigos y la cadena cero sin ejecutarlos */
     public function test_traduce_conjuncion_positiva_y_consecuencia_sin_coercion(): void
     {
         $modelo = EscenarioMapeadores::regla();
@@ -50,7 +42,7 @@ final class MapeadorReglasTest extends TestCase
         self::assertSame($original, $modelo->getAttributes());
     }
 
-    /** Conserva inhabilitación documental, sin promover la versión; sin parámetros ni excepciones esperadas. */
+    /** Conserva inhabilitación documental, sin promover la versión */
     public function test_regla_inactiva_permanece_inhabilitada(): void
     {
         $modelo = EscenarioMapeadores::regla();
@@ -64,10 +56,8 @@ final class MapeadorReglasTest extends TestCase
 
     /**
      * Rechaza conocimiento que no puede transformarse sin alterar el contrato.
-     *
-     * @param  string  $caso  Manipulación de una dependencia del escenario.
-     *
-     * @throws DomainException Rechazo explícito esperado.
+     * @param string $caso
+     * @throws DomainException
      */
     #[DataProvider('reglasInvalidas')]
     public function test_rechaza_regla_incoherente_o_no_representable(string $caso): void
@@ -106,7 +96,7 @@ final class MapeadorReglasTest extends TestCase
         (new MapeadorReglas('RESULTADO'))->aDominio($regla);
     }
 
-    /** @return iterable<string, array{string}> Errores de contrato; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string}> */
     public static function reglasInvalidas(): iterable
     {
         foreach (['sin condiciones', 'sin consecuencia', 'varias consecuencias', 'condición ajena',

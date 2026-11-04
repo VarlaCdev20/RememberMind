@@ -15,36 +15,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 use PHPUnit\Framework\TestCase;
 
-/**
- * TÍTULO: Identidad, temporalidad, deduplicación y memoria inmutable.
- *
- * CAPA: Domain (verificación unitaria).
- *
- * SUBSISTEMA: Hechos y resultados cognitivos.
- *
- * RESPONSABILIDAD:
- * Verificar conservación, contexto y rechazo de conclusiones sin soporte.
- *
- * ENTRADAS:
- * Hechos y referencias totalmente ficticios.
- *
- * SALIDAS:
- * Aserciones sobre invariantes constructivas, sin interpretación clínica.
- *
- * RESTRICCIONES:
- * No inicia Laravel, no consulta BDD ni implementa servicios de la Fase D.
- *
- * TRAZABILIDAD:
- * Reglamento maestro, Fase B e invariantes R1–R10.
- */
+/** Verificar conservación, contexto y rechazo de conclusiones sin soporte. */
 final class HechosEntitiesTest extends TestCase
 {
     /**
      * Conserva cada valor original sin convertir ausencia en normalidad.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_ausencia_false_y_cero_se_conservan_sin_inferencias(): void
     {
@@ -55,10 +31,9 @@ final class HechosEntitiesTest extends TestCase
 
     /**
      * Rechaza tokens de identidad vacíos, con espacios o con controles.
-     *
-     * @param string $id Identidad inválida artificial.
+     * @param string $id
      * @return void
-     * @throws DomainException Excepción exigida por la entrada inválida.
+     * @throws DomainException
      */
     #[DataProvider('identidadesInvalidas')]
     public function test_identidad_invalida_se_rechaza(string $id): void
@@ -69,10 +44,7 @@ final class HechosEntitiesTest extends TestCase
 
     /**
      * Proporciona tokens inválidos sin datos reales.
-     *
-     * @return iterable<string, array{string}> Identificadores negativos.
-     *
-     * No recibe parámetros ni lanza excepciones.
+     * @return iterable<string, array{string}>
      */
     public static function identidadesInvalidas(): iterable
     {
@@ -83,10 +55,7 @@ final class HechosEntitiesTest extends TestCase
     }
     /**
      * Impide NaN como dato aparentemente interpretable.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_numero_no_finito_se_rechaza(): void
     {
@@ -95,10 +64,7 @@ final class HechosEntitiesTest extends TestCase
     }
     /**
      * Rechaza vincular atención a memoria por manipulación de entrada.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_evidencia_no_admite_subcomponente_de_otro_dominio(): void
     {
@@ -107,10 +73,7 @@ final class HechosEntitiesTest extends TestCase
     }
     /**
      * Admite null como desconocido sin fabricar una conclusión.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_dato_ausente_solo_conserva_desconocimiento(): void
     {
@@ -120,10 +83,7 @@ final class HechosEntitiesTest extends TestCase
     }
     /**
      * Rechaza interpretar una fuente ausente.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_null_no_sostiene_hallazgo_descriptivo(): void
     {
@@ -132,10 +92,7 @@ final class HechosEntitiesTest extends TestCase
     }
     /**
      * Rechaza A/P simulado cuya procedencia es un hallazgo del propio motor.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_g09_no_puede_hacerse_pasar_por_referencia_independiente(): void
     {
@@ -145,10 +102,7 @@ final class HechosEntitiesTest extends TestCase
     }
     /**
      * Rechaza una referencia A/P con metadatos incompletos.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_referencia_sin_norma_ficticia_se_rechaza(): void
     {
@@ -160,10 +114,7 @@ final class HechosEntitiesTest extends TestCase
     }
     /**
      * Comprueba que incorporar evidencia no modifica la memoria anterior.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_memoria_incorpora_en_otra_instantanea_y_preserva_original(): void
     {
@@ -178,11 +129,10 @@ final class HechosEntitiesTest extends TestCase
 
     /**
      * Rechaza hechos de otra evaluación, sujeto, versión o posteriores al corte.
-     *
-     * @param string $campo Parámetro del contexto manipulado.
-     * @param string|DateTimeImmutable $valor Valor incompatible.
+     * @param string $campo
+     * @param string|DateTimeImmutable $valor
      * @return void
-     * @throws DomainException Excepción exigida por el contexto ajeno.
+     * @throws DomainException
      */
     #[DataProvider('contextosAjenos')]
     public function test_memoria_rechaza_contexto_ajeno(string $campo, string|DateTimeImmutable $valor): void
@@ -193,10 +143,7 @@ final class HechosEntitiesTest extends TestCase
 
     /**
      * Proporciona cuatro alteraciones independientes del contexto.
-     *
-     * @return iterable<string, array{string, string|DateTimeImmutable}> Manipulaciones.
-     *
-     * No recibe parámetros ni lanza excepciones.
+     * @return iterable<string, array{string, string|DateTimeImmutable}>
      */
     public static function contextosAjenos(): iterable
     {
@@ -207,10 +154,7 @@ final class HechosEntitiesTest extends TestCase
     }
     /**
      * Conserva un hecho situado exactamente en la fecha de corte.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_corte_inclusivo_admite_fecha_exacta(): void
     {
@@ -219,10 +163,7 @@ final class HechosEntitiesTest extends TestCase
     }
     /**
      * Impide duplicar una fuente atómica renombrando el hecho.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_misma_fuente_con_otro_id_se_rechaza(): void
     {
@@ -233,10 +174,7 @@ final class HechosEntitiesTest extends TestCase
     }
     /**
      * Rechaza la misma evidencia incorporada dos veces.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_evidencia_reincorporada_no_se_cuenta_dos_veces(): void
     {
@@ -247,10 +185,7 @@ final class HechosEntitiesTest extends TestCase
     }
     /**
      * Conserva la dependencia aunque los registros e instrumentos tengan IDs distintos.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_mismo_episodio_no_es_corroboracion_independiente(): void
     {
@@ -261,10 +196,7 @@ final class HechosEntitiesTest extends TestCase
     }
     /**
      * Impide renombrar episodio y hecho para reutilizar un instrumento como soporte independiente.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_instrumento_reutilizado_no_es_corroboracion_independiente(): void
     {
@@ -277,9 +209,8 @@ final class HechosEntitiesTest extends TestCase
 
     /**
      * Rechaza sustituir el hecho original por un objeto idéntico copiado.
-     *
      * @return void
-     * @throws DomainException Excepción esperada al perder la identidad de origen.
+     * @throws DomainException
      */
     public function test_memoria_rechaza_evidencia_ligada_a_una_copia_del_hecho(): void
     {
@@ -294,9 +225,8 @@ final class HechosEntitiesTest extends TestCase
 
     /**
      * Evita incorporar una descripción sin su hecho original en la instantánea.
-     *
      * @return void
-     * @throws DomainException Excepción esperada por soporte ausente.
+     * @throws DomainException
      */
     public function test_constructor_de_memoria_rechaza_evidencia_sin_hecho(): void
     {
@@ -306,9 +236,8 @@ final class HechosEntitiesTest extends TestCase
 
     /**
      * Una consulta fallida no fabrica una evidencia desconocida ni preservada.
-     *
      * @return void
-     * @throws DomainException Excepción esperada por identidad no registrada.
+     * @throws DomainException
      */
     public function test_consulta_de_evidencia_ausente_falla_explicitamente(): void
     {
@@ -318,12 +247,9 @@ final class HechosEntitiesTest extends TestCase
 
     /**
      * Rechaza tratar otro caso como corroboración aunque sus fuentes difieran.
-     *
-     * @param string $campo Dimensión del contexto alterada.
-     * @param string $valor Identificador artificial incompatible.
+     * @param string $campo
+     * @param string $valor
      * @return void
-     *
-     * No se esperan excepciones; se contrasta la independencia en ambos sentidos.
      */
     #[DataProvider('contextosDeIndependenciaAjenos')]
     public function test_independencia_exige_la_misma_evaluacion_residente_y_version(string $campo, string $valor): void
@@ -337,10 +263,7 @@ final class HechosEntitiesTest extends TestCase
 
     /**
      * Separa alteraciones de evaluación, residente y versión del conocimiento.
-     *
-     * @return iterable<string, array{string, string}> Contextos incompatibles.
-     *
-     * No recibe parámetros ni lanza excepciones.
+     * @return iterable<string, array{string, string}>
      */
     public static function contextosDeIndependenciaAjenos(): iterable
     {
@@ -351,10 +274,7 @@ final class HechosEntitiesTest extends TestCase
 
     /**
      * La igualdad temporal depende del instante, no de la zona que lo representa.
-     *
      * @return void
-     *
-     * No recibe parámetros; no se esperan excepciones en el corte inclusivo.
      */
     public function test_corte_inclusivo_admite_el_mismo_instante_en_otra_zona(): void
     {
@@ -365,10 +285,7 @@ final class HechosEntitiesTest extends TestCase
 
     /**
      * Congela metadatos de referencia aunque el llamador mantenga una referencia PHP.
-     *
      * @return void
-     *
-     * No recibe parámetros; las normas y revisores son exclusivamente ficticios.
      */
     public function test_metadatos_sinteticos_no_cambian_por_referencias_externas(): void
     {

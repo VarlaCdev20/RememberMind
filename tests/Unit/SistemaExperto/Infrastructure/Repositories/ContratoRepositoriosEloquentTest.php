@@ -16,18 +16,10 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
 
-/**
- * TÍTULO: Compatibilidad y documentación de los cuatro puertos Eloquent.
- * CAPA: Infrastructure - Repositories (pruebas unitarias).
- * ¿PARA QUÉ SIRVE? Conserva las interfaces existentes sin ampliar Domain.
- * ¿QUÉ INFORMACIÓN RECIBE? Clases reales y firmas de los contratos aprobados.
- * ¿QUÉ HACE? Comprueba implementaciones, tipos, readonly y PHPDoc en español.
- * ¿QUÉ DEVUELVE? Aserciones sobre el contrato público solicitado.
- * ¿QUÉ NO DEBE HACER? No sustituye las pruebas de consultas y bases desechables.
- */
+/** Conserva las interfaces existentes sin ampliar Domain. */
 final class ContratoRepositoriosEloquentTest extends TestCase
 {
-    /** Verifica los cuatro contratos y su documentación sin BDD; sin parámetros ni excepciones esperadas. */
+    /** Verifica los cuatro contratos y su documentación sin BDD */
     public function test_las_cuatro_clases_conservan_las_firmas_del_dominio(): void
     {
         $clases = [
@@ -48,10 +40,9 @@ final class ContratoRepositoriosEloquentTest extends TestCase
             self::assertStringStartsWith("<?php\n\ndeclare(strict_types=1);", str_replace("\r\n", "\n", file_get_contents($archivo)));
             $doc = $reflexion->getDocComment();
             self::assertNotFalse($doc);
-            foreach (['TÍTULO:', 'CAPA:', '¿PARA QUÉ SIRVE?', '¿QUÉ INFORMACIÓN RECIBE?',
-                '¿QUÉ HACE?', '¿QUÉ DEVUELVE?', '¿QUÉ NO DEBE HACER?'] as $seccion) {
-                self::assertStringContainsString($seccion, $doc);
-            }
+            self::assertIsString($doc);
+            self::assertMatchesRegularExpression('/\p{L}{3}/u', $doc);
+            self::assertLessThanOrEqual(240, mb_strlen($doc));
             foreach ($reflexion->getMethods(ReflectionMethod::IS_PUBLIC) as $metodo) {
                 self::assertNotFalse($metodo->getDocComment());
                 self::assertStringContainsString('@throws', $metodo->getDocComment());

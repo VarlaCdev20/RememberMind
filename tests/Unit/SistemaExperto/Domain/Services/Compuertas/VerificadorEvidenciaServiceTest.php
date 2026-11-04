@@ -11,36 +11,12 @@ use DomainException;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 use PHPUnit\Framework\TestCase;
 
-/**
- * TÍTULO: VerificadorEvidenciaServiceTest.
- *
- * CAPA: Domain (verificación unitaria).
- *
- * SUBSISTEMA: Compuertas.
- *
- * RESPONSABILIDAD:
- * Verificar admisión, procedencia y contexto sin convertir ausencia en normalidad.
- *
- * ENTRADAS:
- * Evidencias y declaraciones artificiales explícitas.
- *
- * SALIDAS:
- * Aserciones sobre informes, rechazos y fuentes originales.
- *
- * RESTRICCIONES:
- * No consulta BDD, no usa mocks del motor ni interpreta instrumentos reales.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R1/R2/R3/R4/R8 y contexto CTX-MEM-01.
- */
+/** Verificar admisión, procedencia y contexto sin convertir ausencia en normalidad. */
 final class VerificadorEvidenciaServiceTest extends TestCase
 {
     /**
      * Conserva la evidencia y su revisión originales sin modificar memoria.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_admite_original_con_procedencia_explicita_y_preserva_fuentes(): void
     {
@@ -54,10 +30,7 @@ final class VerificadorEvidenciaServiceTest extends TestCase
     }
     /**
      * Rechaza admisión sin prueba de procedencia y conserva null.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_procedencia_ausente_permanece_desconocida(): void
     {
@@ -70,10 +43,7 @@ final class VerificadorEvidenciaServiceTest extends TestCase
     }
     /**
      * Conserva el rechazo explícito sin transformarlo en resultado cognitivo.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_procedencia_negada_no_es_ausencia_ni_normalidad(): void
     {
@@ -85,10 +55,7 @@ final class VerificadorEvidenciaServiceTest extends TestCase
     }
     /**
      * Conserva una revisión original cuyo resultado todavía es desconocido.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_declaracion_null_no_se_convierte_en_false(): void
     {
@@ -100,10 +67,7 @@ final class VerificadorEvidenciaServiceTest extends TestCase
     }
     /**
      * Rechaza elegir silenciosamente entre dos revisiones incompatibles.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_procedencias_opuestas_se_conservan_como_contradiccion(): void
     {
@@ -119,10 +83,7 @@ final class VerificadorEvidenciaServiceTest extends TestCase
     }
     /**
      * Rechaza cero como sustituto ambiguo de una revisión booleana.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_declaracion_numerica_no_se_coacciona_a_booleano(): void
     {
@@ -133,10 +94,7 @@ final class VerificadorEvidenciaServiceTest extends TestCase
     }
     /**
      * Excluye el dato desconocido aunque su procedencia esté verificada.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_null_original_no_se_admite_como_hallazgo(): void
     {
@@ -148,10 +106,7 @@ final class VerificadorEvidenciaServiceTest extends TestCase
     }
     /**
      * Admite un dato conocido explícito conservando su valor, sin convertirlo a P.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_false_original_se_conserva_sin_inferir_preservacion(): void
     {
@@ -163,10 +118,7 @@ final class VerificadorEvidenciaServiceTest extends TestCase
     }
     /**
      * Admite una sola instancia y explica la repetición.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_repeticion_de_candidata_no_se_cuenta_dos_veces(): void
     {
@@ -178,10 +130,7 @@ final class VerificadorEvidenciaServiceTest extends TestCase
     }
     /**
      * Conserva fuentes distintas sin presentarlas como corroboraciones independientes.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_mismo_episodio_se_identifica_como_dependencia(): void
     {
@@ -194,10 +143,7 @@ final class VerificadorEvidenciaServiceTest extends TestCase
     }
     /**
      * Rechaza una candidata reconstruida que sustituiría al objeto original.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_evidencia_ajena_a_la_instantanea_se_rechaza(): void
     {
@@ -208,10 +154,7 @@ final class VerificadorEvidenciaServiceTest extends TestCase
     }
     /**
      * Rechaza una candidata de otra evaluación antes de valorar su contenido.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_evidencia_de_otro_caso_se_rechaza(): void
     {
@@ -221,10 +164,7 @@ final class VerificadorEvidenciaServiceTest extends TestCase
     }
     /**
      * Explica la exclusión de un eje ajeno sin trasladar su hallazgo.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_evidencia_de_otro_dominio_se_excluye(): void
     {
@@ -236,10 +176,7 @@ final class VerificadorEvidenciaServiceTest extends TestCase
     }
     /**
      * Rechaza repetir una revisión original en la colección de declaraciones.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_revisiones_repetidas_no_se_cuentan_dos_veces(): void
     {

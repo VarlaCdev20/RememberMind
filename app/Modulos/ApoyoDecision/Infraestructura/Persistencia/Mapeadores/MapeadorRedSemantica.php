@@ -15,40 +15,14 @@ use DomainException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * TÍTULO:
- * Conversión de la red semántica persistida.
- *
- * CAPA:
- * Infrastructure - Persistence - Mappers.
- *
- * ¿PARA QUÉ SIRVE?
- * Reconstruye conceptos y aristas de una versión sin cambiar sus PK ni códigos.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * Modelos App\Models de versión, nodos y relaciones, con colecciones ya cargadas.
- *
- * ¿QUÉ HACE?
- * Comprueba versión, identidad, estado y referencias; reutiliza los mismos nodos
- * al construir aristas y delega la integridad del grafo en RedSemantica.
- *
- * ¿QUÉ DEVUELVE?
- * NodoSemantico, RelacionSemantica o RedSemantica del nuevo Domain.
- *
- * ¿QUÉ NO DEBE HACER?
- * No consulta ni modifica modelos. No activa conocimiento inactivo ni convierte
- * modalidades de relación en enlaces genéricos: Domain no representa esos estados.
- * Este contrato admite únicamente filas ACTIVO y modalidad null.
- */
+/** Reconstruye nodos y relaciones de una versión sin cambiar sus identificadores. */
 final readonly class MapeadorRedSemantica
 {
     /**
      * Construye la red de la versión con las relaciones explícitamente cargadas.
-     *
-     * @param  VersionModeloExperto  $version  Versión con nodosSemanticos y relacionesSemanticas.
-     * @return RedSemantica Grafo que conserva identidades físicas y códigos semánticos.
-     *
-     * @throws DomainException Por carga incompleta, versión/estado ajenos o duplicación.
+     * @param VersionModeloExperto $version
+     * @return RedSemantica
+     * @throws DomainException
      */
     public function aDominio(VersionModeloExperto $version): RedSemantica
     {
@@ -78,11 +52,9 @@ final readonly class MapeadorRedSemantica
 
     /**
      * Proyecta un concepto sin normalizar sus identificadores ni su definición.
-     *
-     * @param  NodoModelo  $fila  Nodo físico, sin necesidad de carga diferida.
-     * @return NodoSemantico Concepto inmutable con PK y código originales.
-     *
-     * @throws DomainException Por atributo faltante, estado no representable o datos inválidos.
+     * @param NodoModelo $fila
+     * @return NodoSemantico
+     * @throws DomainException
      */
     public function aNodo(NodoModelo $fila): NodoSemantico
     {
@@ -100,12 +72,10 @@ final readonly class MapeadorRedSemantica
 
     /**
      * Construye una arista utilizando las instancias originales del grafo.
-     *
-     * @param  RelacionModelo  $fila  Arista física de modalidad null.
-     * @param  array<string, NodoSemantico>  $nodos  Nodos previamente convertidos por PK.
-     * @return RelacionSemantica Arista dirigida, sin inferir inversas.
-     *
-     * @throws DomainException Por predicado, modalidad, FK o versión incompatibles.
+     * @param RelacionModelo $fila
+     * @param array<string, NodoSemantico> $nodos
+     * @return RelacionSemantica
+     * @throws DomainException
      */
     public function aRelacion(RelacionModelo $fila, array $nodos): RelacionSemantica
     {
@@ -129,12 +99,10 @@ final readonly class MapeadorRedSemantica
 
     /**
      * Lee texto físico sin accessors, casts ni sustitución de NULL.
-     *
-     * @param  Model  $modelo  Registro ya materializado.
-     * @param  string  $campo  Columna fija utilizada por este mapper.
-     * @return string Texto original no vacío.
-     *
-     * @throws DomainException Por columna ausente, tipo incompatible o texto vacío.
+     * @param Model $modelo
+     * @param string $campo
+     * @return string
+     * @throws DomainException
      */
     private static function texto(Model $modelo, string $campo): string
     {
@@ -148,11 +116,9 @@ final readonly class MapeadorRedSemantica
 
     /**
      * Evita promover estados que la entidad de Domain no puede conservar.
-     *
-     * @param  Model  $modelo  Fila de conocimiento.
-     * @return void No cambia el estado físico.
-     *
-     * @throws DomainException Cuando el estado no es ACTIVO.
+     * @param Model $modelo
+     * @return void
+     * @throws DomainException
      */
     private static function exigirActivo(Model $modelo): void
     {
@@ -163,12 +129,10 @@ final readonly class MapeadorRedSemantica
 
     /**
      * Exige una colección materializada y evita cualquier consulta implícita.
-     *
-     * @param  Model  $modelo  Modelo propietario.
-     * @param  string  $relacion  Nombre fijo declarado por App\Models.
-     * @return Collection Colección original ya cargada.
-     *
-     * @throws DomainException Por relación ausente o valor de otro tipo.
+     * @param Model $modelo
+     * @param string $relacion
+     * @return Collection
+     * @throws DomainException
      */
     private static function coleccion(Model $modelo, string $relacion): Collection
     {

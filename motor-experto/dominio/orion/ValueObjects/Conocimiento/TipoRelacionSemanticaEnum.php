@@ -4,43 +4,7 @@ declare(strict_types=1);
 
 namespace MotorExperto\dominio\orion\ValueObjects\Conocimiento;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Base de conocimiento (Vocabulario de relaciones).
- *
- * Nombra el vínculo explícito entre dos conceptos de la red semántica.
- * La selección de predicados es una propuesta de la PoC; no define conexiones nuevas.
- *
- * TÍTULO: Predicados documentales de la red semántica.
- *
- * CAPA: Domain.
- *
- * SUBSISTEMA: Base de conocimiento.
- *
- * RESPONSABILIDAD:
- * Identificar el significado de una arista sin crear conexiones implícitas.
- *
- * ENTRADAS:
- * Literales documentados en O.R.I.O.N.; no se aceptan sinónimos automáticos.
- *
- * SALIDAS:
- * Un predicado tipado para el contrato de relaciones versionado.
- *
- * RESTRICCIONES:
- * El catálogo definitivo sigue pendiente según D-123: esta selección es una
- * propuesta interna de la PoC, no un catálogo clínico ratificado. No autoriza
- * transitividad, inversión, causalidad ni participación inferencial automática.
- * CANDIDATA es estado de una relación, no parte del nombre del predicado.
- *
- * TRAZABILIDAD:
- * Documento Maestro O.R.I.O.N., D-123: normalización de predicados y familias
- * documentadas. Catálogo local orion-v1-conceptos.json, consulta 2026-10-08.
- * No se altera el grafo ni la persistencia del motor vigente.
- *
- * Las propiedades nativas e inmutables name y value conservan, respectivamente,
- * el identificador PHP del caso y su literal de intercambio. from() rechaza
- * valores ajenos mediante ValueError; tryFrom() devuelve null sin sustituirlo
- * por un estado favorable. Estas operaciones no ejecutan inferencias.
- */
+/** Identifica el significado de una relación explícita entre conceptos. */
 enum TipoRelacionSemanticaEnum: string
 {
     /** Pertenencia de un concepto a un conjunto o bloque, sin peso implícito. */

@@ -14,28 +14,7 @@ use DomainException;
 use Illuminate\Database\Eloquent\Collection;
 use RuntimeException;
 
-/**
- * TÍTULO:
- * Adaptador de funcionalidad básica.
- *
- * CAPA:
- * Infrastructure - Adapters.
- *
- * ¿PARA QUÉ SIRVE?
- * Recupera datos brutos autorizados sin interpretación clínica.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * Evaluación sintética, IDs originales, corte inclusivo y mapeo persistido.
- *
- * ¿QUÉ HACE?
- * Valida campos de una lista cerrada y mantiene NULL; preserva fecha, autor y episodio.
- *
- * ¿QUÉ DEVUELVE?
- * Modelos originales y valores tipados sin baremación. Su destino siempre es HECHO (BADL).
- *
- * ¿QUÉ NO DEBE HACER?
- * No sustituye IADL, acredita DCL-C03 ni usa accessors que inventan valores por defecto.
- */
+/** Recupera valoraciones funcionales originales sin sustituir la evaluación instrumental. */
 final readonly class AdaptadorValoracionesFuncionales
 {
     /** Modelo existente; nunca se obtiene de una cadena suministrada por el cliente. */
@@ -58,16 +37,14 @@ final readonly class AdaptadorValoracionesFuncionales
 
     /**
      * Recupera un lote acotado y solo carga valores hasta el corte.
-     *
-     * @param  EvaluacionExperta  $evaluacion  Cabecera sintética que se contrasta con la BDD.
-     * @param  list<string>  $ids  PK originales solicitadas.
-     * @param  DateTimeImmutable  $corte  Corte clínico inclusivo.
-     * @param  string  $conexion  Conexión técnica explícita.
-     * @param  DateTimeZone  $zona  Zona SQL de los registros.
-     * @return Collection<int, ValoracionFuncional> Originales; posteriores al corte solo conservan metadatos.
-     *
-     * @throws DomainException Por contexto, fecha, episodio o estado incompatibles.
-     * @throws RuntimeException Por base no autorizada u origen no disponible.
+     * @param EvaluacionExperta $evaluacion
+     * @param list<string> $ids
+     * @param DateTimeImmutable $corte
+     * @param string $conexion
+     * @param DateTimeZone $zona
+     * @return Collection<int, ValoracionFuncional>
+     * @throws DomainException
+     * @throws RuntimeException
      */
     public function recuperar(EvaluacionExperta $evaluacion, array $ids, DateTimeImmutable $corte, string $conexion, DateTimeZone $zona): Collection
     {
@@ -76,11 +53,9 @@ final readonly class AdaptadorValoracionesFuncionales
 
     /**
      * Comprueba el campo fijo antes de leer cualquier registro operativo.
-     *
-     * @param  MapeoVariableFuente  $mapeo  Contrato persistido de extracción.
-     * @return void No consulta ni interpreta el dato.
-     *
-     * @throws DomainException Por modo, campo o selector no soportados.
+     * @param MapeoVariableFuente $mapeo
+     * @return void
+     * @throws DomainException
      */
     public function validarMapeo(MapeoVariableFuente $mapeo): void
     {
@@ -89,12 +64,10 @@ final readonly class AdaptadorValoracionesFuncionales
 
     /**
      * Transporta la columna explícita, incluido NULL, sin accessors de presentación.
-     *
-     * @param  ValoracionFuncional  $origen  Registro original ya recuperado.
-     * @param  MapeoVariableFuente  $mapeo  Campo directo validado.
-     * @return string|int|float|bool|null Valor original con su tipo físico documentado.
-     *
-     * @throws DomainException Por columna no recuperada o valor de tipo incompatible.
+     * @param ValoracionFuncional $origen
+     * @param MapeoVariableFuente $mapeo
+     * @return string|int|float|bool|null
+     * @throws DomainException
      */
     public function extraer(ValoracionFuncional $origen, MapeoVariableFuente $mapeo): string|int|float|bool|null
     {
@@ -105,11 +78,9 @@ final readonly class AdaptadorValoracionesFuncionales
 
     /**
      * Declara el destino técnico sin calificar el estado cognitivo.
-     *
-     * @param  MapeoVariableFuente  $mapeo  Variable y propietario primario cargados.
-     * @return string HECHO; BADL no acredita independencia instrumental.
-     *
-     * @throws DomainException Por propietario primario ajeno o incompatible.
+     * @param MapeoVariableFuente $mapeo
+     * @return string
+     * @throws DomainException
      */
     public function tipo(MapeoVariableFuente $mapeo): string
     {

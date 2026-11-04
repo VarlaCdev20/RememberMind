@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace MotorExperto\instrumentos;
 
-/**
- * Conversión publicada de dos subpruebas TB-A con efecto techo (tabla 5).
- * Una escala extrema del artículo no se convierte en gravedad ni capacidad superior.
- * No aplica baremos TB-A a WAB, TB revisado o notas generales del expediente.
- */
+/** Conversión publicada de dos subpruebas TB-A con efecto techo (tabla 5). */
 final class NormalizadorReferenciaBarcelona2011
 {
     public const METODO = 'TB-A-ES-NEURONORMA-2011-LENGUAJE';

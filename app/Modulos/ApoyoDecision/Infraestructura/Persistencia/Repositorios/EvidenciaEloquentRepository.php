@@ -29,46 +29,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use RuntimeException;
 
-/**
- * TÍTULO:
- * Recuperación Eloquent de evidencias con sus fuentes originales.
- *
- * CAPA:
- * Infrastructure - Persistence - Repositories.
- *
- * ¿PARA QUÉ SIRVE?
- * Implementa la memoria de lectura del caso experimental sin inferencia.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * Evaluación, residente sintético, versión, corte y una extracción autorizada
- * por lotes. Cada origen aporta el modelo, el valor bruto tipado y el destino
- * técnico HECHO o EVIDENCIA_COGNITIVA; no es una interpretación clínica.
- *
- * ¿QUÉ HACE?
- * Acota la cabecera, precarga mapeos activos coherentes, solicita los registros
- * originales al colaborador inyectado y conserva los anteriores al corte.
- * Excluye filas no admitidas sin convertir esa ausencia en normalidad.
- *
- * ¿QUÉ DEVUELVE?
- * MemoriaTrabajo con hechos/evidencias originales o memoria vacía contextual.
- *
- * ¿QUÉ NO DEBE HACER?
- * No implementa anticipadamente los adaptadores de la etapa D, usa nombres
- * configurables como SQL, inventa valores/procedencia ni acredita A/P.
- * La extracción debe validar tipos/selectores y claves de adaptador autorizados.
- * Si falta un origen solicitado, falla explícitamente; no disimula la falta.
- */
+/** Recupera la memoria original del caso sin inferir resultados. */
 final readonly class EvidenciaEloquentRepository implements EvidenciaRepositoryInterface
 {
     /**
      * Recibe la extracción autorizada; no la elige ni registra globalmente.
-     *
-     * @param  MapeadorEvidencias  $mapeador  Conversor existente.
-     * @param  Closure(Collection<int, EvidenciaEvaluacion>, DateTimeImmutable, string): array<string, array{origen: ControlCognitivo|SeguimientoPedagogico|ValoracionFuncional|AplicacionInstrumento, valor: string|int|float|bool|null, tipo: 'HECHO'|'EVIDENCIA_COGNITIVA'}>  $extraerOrigenes  Extracción por lote sobre la misma conexión, sin efectos de escritura.
-     * @param  DateTimeZone  $zonaAlmacenamiento  Misma zona SQL configurada para el mapper.
-     * @param  string  $conexionExperimental  Conexión segregada explícita.
-     *
-     * @throws DomainException Por nombre de conexión inválido.
+     * @param MapeadorEvidencias $mapeador
+     * @param Closure(Collection<int, EvidenciaEvaluacion>, DateTimeImmutable, string): array<string, array{origen: ControlCognitivo|SeguimientoPedagogico|ValoracionFuncional|AplicacionInstrumento, valor: string|int|float|bool|null, tipo: 'HECHO'|'EVIDENCIA_COGNITIVA'}> $extraerOrigenes
+     * @param DateTimeZone $zonaAlmacenamiento
+     * @param string $conexionExperimental
+     * @throws DomainException
      */
     public function __construct(
         /** Conversor sin lógica clínica. */ private MapeadorEvidencias $mapeador,
@@ -81,15 +51,13 @@ final readonly class EvidenciaEloquentRepository implements EvidenciaRepositoryI
 
     /**
      * Recupera hechos inclusivos del contexto exacto solicitado.
-     *
-     * @param  string  $evaluacionId  Evaluación artificial propietaria.
-     * @param  string  $residenteId  Caso sintético propietario.
-     * @param  string  $versionConocimiento  Versión exacta.
-     * @param  DateTimeImmutable  $fechaCorte  Último instante clínico admitido.
-     * @return MemoriaTrabajo Instantánea con procedencia sin normalización clínica.
-     *
-     * @throws DomainException Por contexto, origen, representación, fecha o duplicación incompatibles.
-     * @throws RuntimeException Por destino no autorizado, origen no disponible o fallo técnico.
+     * @param string $evaluacionId
+     * @param string $residenteId
+     * @param string $versionConocimiento
+     * @param DateTimeImmutable $fechaCorte
+     * @return MemoriaTrabajo
+     * @throws DomainException
+     * @throws RuntimeException
      */
     public function paraEvaluacion(string $evaluacionId, string $residenteId, string $versionConocimiento, DateTimeImmutable $fechaCorte): MemoriaTrabajo
     {
@@ -169,12 +137,10 @@ final readonly class EvidenciaEloquentRepository implements EvidenciaRepositoryI
 
     /**
      * Protege el contexto antes de invocar al colaborador de extracción.
-     *
-     * @param  EvidenciaEvaluacion  $fila  Evidencia con dependencias precargadas.
-     * @param  string  $version  Versión propietaria.
-     * @return void No consulta tablas operativas ni interpreta selectores.
-     *
-     * @throws DomainException Por FK, versión, fuente o estado no autorizados.
+     * @param EvidenciaEvaluacion $fila
+     * @param string $version
+     * @return void
+     * @throws DomainException
      */
     private static function validarMapeo(EvidenciaEvaluacion $fila, string $version): void
     {
@@ -215,11 +181,9 @@ final readonly class EvidenciaEloquentRepository implements EvidenciaRepositoryI
 
     /**
      * Analiza la fecha física para excluir fuentes posteriores antes del mapeo.
-     *
-     * @param  Model  $origen  Modelo operativo materializado y autorizado.
-     * @return DateTimeImmutable Instante clínico original en la zona explícita.
-     *
-     * @throws DomainException Por fecha ausente, inválida o normalizada silenciosamente.
+     * @param Model $origen
+     * @return DateTimeImmutable
+     * @throws DomainException
      */
     private function fechaOriginal(Model $origen): DateTimeImmutable
     {
@@ -239,13 +203,11 @@ final readonly class EvidenciaEloquentRepository implements EvidenciaRepositoryI
 
     /**
      * Rechaza solicitudes asistenciales antes de cualquier consulta.
-     *
-     * @param  string  $evaluacionId  Evaluación artificial con prefijo SIM-.
-     * @param  string  $residenteId  Caso artificial con prefijo SINTETICO-.
-     * @param  string  $versionConocimiento  Versión exacta.
-     * @return void No selecciona otro sujeto ni otra versión.
-     *
-     * @throws DomainException Por identidad inválida o solicitud no sintética.
+     * @param string $evaluacionId
+     * @param string $residenteId
+     * @param string $versionConocimiento
+     * @return void
+     * @throws DomainException
      */
     private static function validarContexto(string $evaluacionId, string $residenteId, string $versionConocimiento): void
     {
@@ -258,11 +220,9 @@ final readonly class EvidenciaEloquentRepository implements EvidenciaRepositoryI
 
     /**
      * Exige identidades explícitas sin normalizarlas ni interpolarlas en SQL.
-     *
-     * @param  string  ...$ids  Códigos recibidos por el contrato.
-     * @return void No consulta la base.
-     *
-     * @throws DomainException Por código vacío o con separadores/control.
+     * @param string ...$ids
+     * @return void
+     * @throws DomainException
      */
     private static function validarIdentidades(string ...$ids): void
     {
@@ -275,10 +235,8 @@ final readonly class EvidenciaEloquentRepository implements EvidenciaRepositoryI
 
     /**
      * Resuelve únicamente el destino experimental nombrado por el llamador.
-     *
-     * @return string Nombre de conexión, nunca el predeterminado implícito.
-     *
-     * @throws RuntimeException Fuera de testing o de las bases desechables autorizadas.
+     * @return string
+     * @throws RuntimeException
      */
     private function conexion(): string
     {

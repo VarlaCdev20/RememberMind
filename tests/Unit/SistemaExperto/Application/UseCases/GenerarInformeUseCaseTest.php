@@ -22,19 +22,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 
-/**
- * TÍTULO: Ensamblaje de explicaciones y resultados recibidos.
- * CAPA: Application (pruebas unitarias).
- * ¿PARA QUÉ SIRVE? Verifica que CU-05 conserve el contenido y el contexto originales.
- * ¿QUÉ RECIBE? Resultados y explicaciones manuales exclusivamente sintéticos.
- * ¿QUÉ HACE? Ejecuta la modalidad de recepción de explicaciones del caso de uso.
- * ¿QUÉ DEVUELVE? Aserciones sobre el informe y el rechazo de entradas incompatibles.
- * ¿QUÉ NO DEBE HACER? No acredita generación automática de explicación ni clasificación.
- * RELACIÓN CON O.R.I.O.N.: Reglamento de Application, CU-05 y etapa C.
- */
+/** Verifica que CU-05 conserve el contenido y el contexto originales. */
 final class GenerarInformeUseCaseTest extends TestCase
 {
-    /** Conserva un candidato ya declarado y los tres textos recibidos; sin parámetros ni excepciones esperadas. */
+    /** Conserva un candidato ya declarado y los tres textos recibidos */
     public function test_ensambla_informe_preservando_candidato_textos_versiones_y_trazas(): void
     {
         $perfil = F::perfil();
@@ -63,7 +54,7 @@ final class GenerarInformeUseCaseTest extends TestCase
         self::assertSame(InformeExpertoDTO::ADVERTENCIA_EXPERIMENTAL, $informe->advertencia);
     }
 
-    /** Conserva la abstención sin añadir un patrón; sin parámetros ni excepciones esperadas. */
+    /** Conserva la abstención sin añadir un patrón */
     public function test_informe_de_abstencion_conserva_motivos_y_limitaciones(): void
     {
         $perfil = F::perfil(['U', 'P', 'P', 'P', 'P']);
@@ -82,7 +73,7 @@ final class GenerarInformeUseCaseTest extends TestCase
         self::assertSame($perfil->soportes, $informe->dcl->soportes);
     }
 
-    /** La ausencia de Petersen permanece explícita; sin parámetros ni excepciones esperadas. */
+    /** La ausencia de Petersen permanece explícita */
     public function test_informe_sin_clasificacion_no_sintetiza_un_resultado_dcl(): void
     {
         $inferencia = self::inferencia(F::perfil(['U', 'U', 'U', 'U', 'U']));
@@ -120,10 +111,8 @@ final class GenerarInformeUseCaseTest extends TestCase
 
     /**
      * Delega al DTO el rechazo de explicaciones incompletas sin sustituir sus textos.
-     *
-     * @param  string  $seccion  Nivel que falta en la explicación recibida.
-     *
-     * @throws DomainException Rechazo esperado del DTO, propagado por el caso de uso.
+     * @param string $seccion
+     * @throws DomainException
      */
     #[DataProvider('secciones')]
     public function test_propaga_rechazo_de_una_explicacion_incompleta(string $seccion): void
@@ -136,7 +125,7 @@ final class GenerarInformeUseCaseTest extends TestCase
         (new GenerarInformeUseCase)->ejecutar($inferencia->solicitud, $inferencia, null, ...$textos);
     }
 
-    /** @return iterable<string, array{string}> Los tres niveles obligatorios; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string}> */
     public static function secciones(): iterable
     {
         yield 'nivel 1' => ['resumen'];
@@ -144,7 +133,7 @@ final class GenerarInformeUseCaseTest extends TestCase
         yield 'nivel 3' => ['fundamento'];
     }
 
-    /** Transporta la relación citada sin omitirla o reconstruirla; sin parámetros ni excepciones esperadas. */
+    /** Transporta la relación citada sin omitirla o reconstruirla */
     public function test_conserva_las_relaciones_semanticas_recibidas_con_el_fundamento(): void
     {
         $inferencia = self::inferencia(F::perfil());
@@ -173,10 +162,8 @@ final class GenerarInformeUseCaseTest extends TestCase
 
     /**
      * Construye una arista explícita para probar el transporte de la explicación.
-     *
-     * @param  string  $version  Versión propietaria de nodos y relación.
-     * @return RelacionSemantica Referencia ficticia original, sin inferir enlaces.
-     *                           Sin excepciones esperadas con los identificadores del escenario.
+     * @param string $version
+     * @return RelacionSemantica
      */
     private static function relacion(string $version = 'SIM-V1'): RelacionSemantica
     {
@@ -190,10 +177,8 @@ final class GenerarInformeUseCaseTest extends TestCase
 
     /**
      * Envuelve un perfil manual sin simular una llamada al motor pendiente.
-     *
-     * @param  PerfilRequisitosDcl  $perfil  Perfil original del escenario ficticio.
-     * @return ResultadoInferenciaDTO Resultado preparado para comprobar orquestación.
-     *                                Sin excepciones esperadas con el contexto fijo.
+     * @param PerfilRequisitosDcl $perfil
+     * @return ResultadoInferenciaDTO
      */
     private static function inferencia(PerfilRequisitosDcl $perfil): ResultadoInferenciaDTO
     {

@@ -9,36 +9,14 @@ use DateTimeImmutable;
 use DateTimeZone;
 use DomainException;
 
-/**
- * TÍTULO:
- * Conservación exacta de valores y fechas.
- *
- * CAPA:
- * Infrastructure — Persistence.
- *
- * ¿PARA QUÉ SIRVE?
- * Evita coerciones al conservar instantáneas.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * Escalares, fechas y objetos públicos de Domain.
- *
- * ¿QUÉ HACE?
- * Codifica columnas fijas y calcula una huella tipada ordenada.
- *
- * ¿QUÉ DEVUELVE?
- * Valores originales, fechas originales y hashes SHA-256.
- *
- * ¿QUÉ NO DEBE HACER?
- * No serializa objetos, usa JSON ni interpreta datos clínicos.
- */
+/** Conserva valores, fechas y huellas sin cambiar sus tipos. */
 final class CodecInstantanea
 {
     /**
-     * @param  string  $p  Prefijo fijo de columnas definido por el diccionario.
-     * @param  string|int|float|bool|null  $v  Escalar original sin coerción.
-     * @return array<string, mixed> Una sola columna de valor activa o ninguna para NULL.
-     *
-     * @throws DomainException Por texto no representable o real no finito.
+     * @param string $p
+     * @param string|int|float|bool|null $v
+     * @return array<string, mixed>
+     * @throws DomainException
      */
     public static function escalar(string $p, string|int|float|bool|null $v): array
     {
@@ -62,11 +40,10 @@ final class CodecInstantanea
     }
 
     /**
-     * @param  string  $p  Prefijo fijo del diccionario.
-     * @param  object  $r  Fila SQL con todas las columnas escalares.
-     * @return string|int|float|bool|null Original tipado con exclusión de columnas ajenas.
-     *
-     * @throws DomainException Por discriminador, tipo, valor o forma corruptos.
+     * @param string $p
+     * @param object $r
+     * @return string|int|float|bool|null
+     * @throws DomainException
      */
     public static function leerEscalar(string $p, object $r): string|int|float|bool|null
     {
@@ -91,11 +68,9 @@ final class CodecInstantanea
 
     /**
      * Acepta solo la materialización booleana de los motores soportados.
-     *
-     * @param  mixed  $v  Valor SQL original.
-     * @return bool Valor conocido exacto, sin interpretar ausencia como false.
-     *
-     * @throws DomainException Por valor fuera de bool/0/1.
+     * @param mixed $v
+     * @return bool
+     * @throws DomainException
      */
     public static function booleano(mixed $v): bool
     {
@@ -128,10 +103,9 @@ final class CodecInstantanea
     }
 
     /**
-     * @param  string  $p  Prefijo temporal fijo del diccionario.
-     * @param  DateTimeImmutable  $v  Fecha original que no se modifica.
-     * @return array<string, string|int> Instante UTC y zona/offset originales.
-     *                                   No produce efectos ni excepciones para la fecha tipada recibida.
+     * @param string $p
+     * @param DateTimeImmutable $v
+     * @return array<string, string|int>
      */
     public static function fecha(string $p, DateTimeImmutable $v): array
     {
@@ -141,13 +115,11 @@ final class CodecInstantanea
 
     /**
      * Reconstruye y contrasta la zona explícita; nunca usa la zona global.
-     *
-     * @param  string  $p  Prefijo temporal fijo del diccionario.
-     * @param  object  $r  Fila con instante, zona y offset originales.
-     * @return DateTimeImmutable Fecha exacta de la instantánea.
-     *
-     * @throws DomainException Por fecha, calendario u offset incompatibles.
-     * @throws \DateInvalidTimeZoneException Por zona no representable.
+     * @param string $p
+     * @param object $r
+     * @return DateTimeImmutable
+     * @throws DomainException
+     * @throws \DateInvalidTimeZoneException
      */
     public static function leerFecha(string $p, object $r): DateTimeImmutable
     {
@@ -172,11 +144,9 @@ final class CodecInstantanea
 
     /**
      * Hash de contenido, tipos y orden; no es un almacén alternativo.
-     *
-     * @param  mixed  $v  Escalares, arrays y objetos públicos de Domain sin ciclos.
-     * @return string SHA-256 de la representación canónica tipada.
-     *
-     * @throws DomainException Por objeto ajeno, valor no finito o texto no representable.
+     * @param mixed $v
+     * @return string
+     * @throws DomainException
      */
     public static function huella(mixed $v): string
     {

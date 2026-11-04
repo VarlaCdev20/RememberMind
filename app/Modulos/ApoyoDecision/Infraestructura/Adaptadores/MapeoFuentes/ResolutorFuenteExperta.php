@@ -13,40 +13,17 @@ use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\Adap
 use DomainException;
 use RuntimeException;
 
-/**
- * TÍTULO:
- * Resolución de fuentes autorizadas.
- *
- * CAPA:
- * Infrastructure - Adapters.
- *
- * ¿PARA QUÉ SIRVE?
- * Recupera datos brutos autorizados sin interpretación clínica.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * Conexión segregada y registro explícito clave_adaptador → instancia conocida.
- *
- * ¿QUÉ HACE?
- * Consulta la tabla 07 por versión exacta y valida tabla, PK, campos y estado.
- *
- * ¿QUÉ DEVUELVE?
- * La fuente física original y su adaptador registrado; ausencia como error explícito.
- *
- * ¿QUÉ NO DEBE HACER?
- * No interpreta tabla_raiz como permiso SQL ni instancia clases desde cadenas de la BDD.
- */
+/** Selecciona el adaptador registrado para una fuente; rechaza fuentes no admitidas. */
 final readonly class ResolutorFuenteExperta
 {
-    /** @var array<string, AdaptadorControlesCognitivos|AdaptadorSeguimientosPedagogicos|AdaptadorValoracionesFuncionales|AdaptadorInstrumentos|AdaptadorIadlExperimental> Registro copiado, sin referencias mutables externas. */
+    /** @var array<string, AdaptadorControlesCognitivos|AdaptadorSeguimientosPedagogicos|AdaptadorValoracionesFuncionales|AdaptadorInstrumentos|AdaptadorIadlExperimental> */
     private array $adaptadores;
 
     /**
      * Registra únicamente instancias finales conocidas, sin inventar claves de catálogo.
-     *
-     * @param  string  $conexionExperimental  Nombre del destino técnico.
-     * @param  array<string, AdaptadorControlesCognitivos|AdaptadorSeguimientosPedagogicos|AdaptadorValoracionesFuncionales|AdaptadorInstrumentos|AdaptadorIadlExperimental>  $adaptadores  Claves literales del contrato versionado; no se registran bindings globales.
-     *
-     * @throws DomainException Por clave o instancia ajenas al registro soportado.
+     * @param string $conexionExperimental
+     * @param array<string, AdaptadorControlesCognitivos|AdaptadorSeguimientosPedagogicos|AdaptadorValoracionesFuncionales|AdaptadorInstrumentos|AdaptadorIadlExperimental> $adaptadores
+     * @throws DomainException
      */
     public function __construct(
         /** Destino explícito; jamás usa la base institucional por defecto. */ private string $conexionExperimental,
@@ -71,10 +48,8 @@ final readonly class ResolutorFuenteExperta
 
     /**
      * Comprueba el destino antes de consultar contratos o fuentes.
-     *
-     * @return string Nombre de conexión segregada.
-     *
-     * @throws RuntimeException Por entorno o base no autorizados.
+     * @return string
+     * @throws RuntimeException
      */
     public function conexion(): string
     {
@@ -85,13 +60,11 @@ final readonly class ResolutorFuenteExperta
 
     /**
      * Resuelve un código de fuente en una versión, sin fallback.
-     *
-     * @param  string  $versionConocimiento  Versión propietaria exacta.
-     * @param  string  $codigoFuente  Código semántico de fuente exacto.
-     * @return array{fuente: FuenteDatoExperta, adaptador: object} Fila original y adaptador conocido.
-     *
-     * @throws DomainException Por metadatos incoherentes o estado inactivo.
-     * @throws RuntimeException Por fuente inexistente, no registrada o no disponible.
+     * @param string $versionConocimiento
+     * @param string $codigoFuente
+     * @return array{fuente: FuenteDatoExperta, adaptador: object}
+     * @throws DomainException
+     * @throws RuntimeException
      */
     public function resolver(string $versionConocimiento, string $codigoFuente): array
     {
@@ -107,13 +80,11 @@ final readonly class ResolutorFuenteExperta
 
     /**
      * Resuelve un lote de FK sin una consulta por evidencia.
-     *
-     * @param  list<string>  $ids  PK de fuentes originales.
-     * @param  string  $versionConocimiento  Versión única de la evaluación.
-     * @return array<string, array{fuente: FuenteDatoExperta, adaptador: object}> Fuentes por PK.
-     *
-     * @throws DomainException Por metadatos incompatibles.
-     * @throws RuntimeException Por una fuente ausente, no registrada o no habilitada.
+     * @param list<string> $ids
+     * @param string $versionConocimiento
+     * @return array<string, array{fuente: FuenteDatoExperta, adaptador: object}>
+     * @throws DomainException
+     * @throws RuntimeException
      */
     public function porIds(array $ids, string $versionConocimiento): array
     {
@@ -137,13 +108,11 @@ final readonly class ResolutorFuenteExperta
 
     /**
      * Contrasta metadatos con constantes del código, nunca con SQL configurable.
-     *
-     * @param  FuenteDatoExperta  $fuente  Fuente recuperada del destino segregado.
-     * @param  string  $version  Versión exacta.
-     * @return array{fuente: FuenteDatoExperta, adaptador: object} Dependencias originales.
-     *
-     * @throws DomainException Por versión, estado, tabla o campos incompatibles.
-     * @throws RuntimeException Por clave desconocida o IADL no disponible.
+     * @param FuenteDatoExperta $fuente
+     * @param string $version
+     * @return array{fuente: FuenteDatoExperta, adaptador: object}
+     * @throws DomainException
+     * @throws RuntimeException
      */
     private function validar(FuenteDatoExperta $fuente, string $version): array
     {

@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace MotorExperto\instrumentos;
 
-/**
- * Consulta de percentiles publicados TOL-F, GHS alemán, únicamente de 60 a 79 años.
- * No convierte TOL-DX, años escolares bolivianos ni percentiles redondeados en z.
- */
+/** Consulta de percentiles publicados TOL-F, GHS alemán, únicamente de 60 a 79 años. */
 final class NormalizadorReferenciaTolF2019
 {
     public const METODO = 'TOL-F-DE-GHS-2019-24';

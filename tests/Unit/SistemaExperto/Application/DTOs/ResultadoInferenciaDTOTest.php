@@ -16,19 +16,13 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 
-/**
- * TÍTULO: Transporte del perfil de cinco dominios.
- * CAPA: Application (pruebas unitarias).
- * ¿PARA QUÉ SIRVE? Verifica conservación de estados, reglas, versiones y trazas.
- * ¿QUÉ RECIBE? Perfiles declarados manualmente y reglas sintéticas.
- * ¿QUÉ HACE? Construye el DTO con objetos reales del Domain.
- * ¿QUÉ DEVUELVE? Aserciones de conservación y rechazo estructural.
- * ¿QUÉ NO DEBE HACER? No afirma ejecución de un motor ni evaluación posterior en uso real.
- * RELACIÓN CON O.R.I.O.N.: Reglamento de Application, DTO 03 y etapa B.
- */
+/** Verifica conservación de estados, reglas, versiones y trazas. */
 final class ResultadoInferenciaDTOTest extends TestCase
 {
-    /** Conserva los cinco estados diferenciados; sin parámetros ni excepciones esperadas. @return void */
+    /**
+ * Conserva los cinco estados diferenciados
+ * @return void
+ */
     public function test_transporta_cinco_dominios_sin_reinterpretarlos(): void
     {
         $perfil = F::perfil(['A', 'P', 'U', 'I', 'X'])->cognicion;
@@ -49,7 +43,10 @@ final class ResultadoInferenciaDTOTest extends TestCase
         self::assertFalse(property_exists($dto, 'puntuacionGlobal'));
     }
 
-    /** Una traza ausente no se sustituye por éxito; sin parámetros ni excepciones esperadas. @return void */
+    /**
+ * Una traza ausente no se sustituye por éxito
+ * @return void
+ */
     public function test_conserva_ausencia_de_trazas_y_perfil_desconocido(): void
     {
         $perfil = F::perfil(['U', 'U', 'U', 'U', 'U'])->cognicion;
@@ -63,7 +60,10 @@ final class ResultadoInferenciaDTOTest extends TestCase
         }
     }
 
-    /** Protege listas anidadas y textos de referencias PHP; sin parámetros ni excepciones esperadas. @return void */
+    /**
+ * Protege listas anidadas y textos de referencias PHP
+ * @return void
+ */
     public function test_copia_reglas_anidadas_trazas_y_advertencias(): void
     {
         $regla = self::regla();
@@ -85,10 +85,8 @@ final class ResultadoInferenciaDTOTest extends TestCase
 
     /**
      * Rechaza atribuciones de reglas sin un contrato estructural coherente.
-     *
-     * @param  string  $caso  Alteración artificial de las reglas recibidas.
-     *
-     * @throws DomainException Rechazo esperado, sin ejecutar ninguna regla.
+     * @param string $caso
+     * @throws DomainException
      */
     #[DataProvider('reglasInvalidas')]
     public function test_rechaza_reglas_incoherentes(string $caso): void
@@ -117,7 +115,7 @@ final class ResultadoInferenciaDTOTest extends TestCase
         new ResultadoInferenciaDTO(self::solicitud(), $perfil, 'SIM-MOTOR-V1', $reglas, []);
     }
 
-    /** @return iterable<string, array{string}> Formas inválidas; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string}> */
     public static function reglasInvalidas(): iterable
     {
         foreach (['dominio faltante', 'dominio ajeno', 'lista sin tipar', 'duplicada', 'otra versión',
@@ -145,11 +143,9 @@ final class ResultadoInferenciaDTOTest extends TestCase
 
     /**
      * Comprueba que una traza o advertencia requiera texto identificable.
-     *
-     * @param  string  $campo  Metadato a sustituir.
-     * @param  array<mixed>  $datos  Entrada inválida.
-     *
-     * @throws DomainException Rechazo estructural esperado.
+     * @param string $campo
+     * @param array<mixed> $datos
+     * @throws DomainException
      */
     #[DataProvider('textosInvalidos')]
     public function test_rechaza_textos_de_traza_y_advertencia_invalidos(string $campo, array $datos): void
@@ -161,7 +157,7 @@ final class ResultadoInferenciaDTOTest extends TestCase
         new ResultadoInferenciaDTO(self::solicitud(), $perfil, 'SIM-MOTOR-V1', self::reglasVacias(), ...$argumentos);
     }
 
-    /** @return iterable<string, array{string, array<mixed>}> Metadatos inválidos; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string, array<mixed>}> */
     public static function textosInvalidos(): iterable
     {
         foreach (['trazas', 'advertencias'] as $campo) {
@@ -171,13 +167,13 @@ final class ResultadoInferenciaDTOTest extends TestCase
         }
     }
 
-    /** @return SolicitudInferenciaDTO Petición ficticia; sin parámetros ni excepciones esperadas. */
+    /** @return SolicitudInferenciaDTO */
     private static function solicitud(): SolicitudInferenciaDTO
     {
         return new SolicitudInferenciaDTO('SIM-SOL', 'SIM-EVAL', 'SINTETICO-RES', F::fecha(), 'SIM-V1');
     }
 
-    /** @return array<string, list<ReglaExperta>> Cinco listas explícitas; sin parámetros ni excepciones. */
+    /** @return array<string, list<ReglaExperta>> */
     private static function reglasVacias(): array
     {
         return array_fill_keys(array_column(D::cases(), 'value'), []);
@@ -185,12 +181,10 @@ final class ResultadoInferenciaDTOTest extends TestCase
 
     /**
      * Declara conocimiento artificial para comprobar transporte y versiones.
-     *
-     * @param  string  $id  Identidad de regla.
-     * @param  string  $version  Versión de conocimiento.
-     * @param  bool  $habilitada  Habilitación técnica, nunca clínica.
-     * @return ReglaExperta Regla original, sin ejecutar.
-     *                      Sin excepciones esperadas con los valores de estos escenarios.
+     * @param string $id
+     * @param string $version
+     * @param bool $habilitada
+     * @return ReglaExperta
      */
     private static function regla(string $id = 'SIM-R', string $version = 'SIM-V1', bool $habilitada = true): ReglaExperta
     {

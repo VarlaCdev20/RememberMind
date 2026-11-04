@@ -32,28 +32,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use RuntimeException;
 
-/**
- * TÍTULO:
- * Registro aislado de dependencias sin abrir una base de datos.
- *
- * CAPA:
- * Infrastructure - Configuracion (pruebas unitarias).
- *
- * ¿PARA QUÉ SIRVE?
- * Comprueba la resolución de los cuatro puertos y la protección de bindings ajenos.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * Contenedor Laravel real y conexión SQLite cuyo inicializador PDO siempre falla.
- *
- * ¿QUÉ HACE?
- * Registra y resuelve el grafo; prueba colisiones, repetición y rechazos de entorno.
- *
- * ¿QUÉ DEVUELVE?
- * Aserciones de identidad, configuración explícita, PHPDoc y ausencia de consultas.
- *
- * ¿QUÉ NO DEBE HACER?
- * No acredita integración SQL ni abre archivos de base o conexiones productivas.
- */
+/** Comprueba la resolución de los cuatro puertos y la protección de bindings ajenos. */
 final class VinculadorRepositoriosTest extends TestCase
 {
     /** Contenedor global anterior que se restaura después de cada prueba. */
@@ -65,7 +44,7 @@ final class VinculadorRepositoriosTest extends TestCase
     /** Contenedor real aislado de cada caso. */
     private Container $contenedor;
 
-    /** Prepara únicamente metadatos de conexión y globals reversibles; sin parámetros ni errores esperados. */
+    /** Prepara únicamente metadatos de conexión y globals reversibles */
     protected function setUp(): void
     {
         parent::setUp();
@@ -78,7 +57,7 @@ final class VinculadorRepositoriosTest extends TestCase
         Model::setConnectionResolver($resolver);
     }
 
-    /** Restaura exactamente el entorno previo; sin parámetros ni errores esperados. */
+    /** Restaura exactamente el entorno previo */
     protected function tearDown(): void
     {
         Container::setInstance($this->contenedorAnterior);
@@ -90,7 +69,7 @@ final class VinculadorRepositoriosTest extends TestCase
         parent::tearDown();
     }
 
-    /** Resuelve todos los contratos sin ejecutar el inicializador PDO; sin parámetros ni excepciones esperadas. */
+    /** Resuelve todos los contratos sin ejecutar el inicializador PDO */
     public function test_registra_los_cuatro_puertos_y_el_grafo_sin_abrir_pdo(): void
     {
         $this->vinculador()->registrar($this->contenedor);
@@ -112,7 +91,7 @@ final class VinculadorRepositoriosTest extends TestCase
         self::assertCount(14, $this->contenedor->getBindings());
     }
 
-    /** El registro repetido conserva instancias y factories exactas; sin parámetros ni excepciones esperadas. */
+    /** El registro repetido conserva instancias y factories exactas */
     public function test_registro_repetido_no_reemplaza_ni_duplica_dependencias(): void
     {
         $vinculador = $this->vinculador();
@@ -125,7 +104,7 @@ final class VinculadorRepositoriosTest extends TestCase
         self::assertSame($repositorio, $this->contenedor->make(EvidenciaRepositoryInterface::class));
     }
 
-    /** Una colisión se detecta antes de registrar o ejecutar una factory ajena; sin parámetros ni errores sin capturar. */
+    /** Una colisión se detecta antes de registrar o ejecutar una factory ajena */
     public function test_colision_no_ejecuta_una_factory_ni_deja_registros_parciales(): void
     {
         $this->contenedor->bind(EvaluacionExpertaRepositoryInterface::class, static function (): never {
@@ -142,7 +121,7 @@ final class VinculadorRepositoriosTest extends TestCase
         self::assertFalse($this->contenedor->bound(ReglaExpertaRepositoryInterface::class));
     }
 
-    /** Los aliases ajenos también se conservan; sin parámetros ni errores sin capturar. */
+    /** Los aliases ajenos también se conservan */
     public function test_no_sobrescribe_un_alias_preexistente(): void
     {
         $this->contenedor->alias('SIM-PUERTO-AJENO', EvidenciaRepositoryInterface::class);
@@ -156,7 +135,7 @@ final class VinculadorRepositoriosTest extends TestCase
         self::assertSame([], $this->contenedor->getBindings());
     }
 
-    /** Una instancia ajena inyectada después del registro se detecta; sin parámetros ni errores sin capturar. */
+    /** Una instancia ajena inyectada después del registro se detecta */
     public function test_registro_repetido_detecta_una_instancia_sustituida(): void
     {
         $vinculador = $this->vinculador();
@@ -184,7 +163,7 @@ final class VinculadorRepositoriosTest extends TestCase
         }
     }
 
-    /** Una base física se rechaza inspeccionando configuración, sin abrir su PDO; sin parámetros ni errores sin capturar. */
+    /** Una base física se rechaza inspeccionando configuración, sin abrir su PDO */
     public function test_base_no_desechable_no_deja_bindings(): void
     {
         Model::setConnectionResolver(new ConnectionResolver(['orion_test' => self::conexionSinPdo('BASE_INSTITUCIONAL.sqlite')]));
@@ -204,17 +183,17 @@ final class VinculadorRepositoriosTest extends TestCase
         new VinculadorRepositorios('orion_test', new DateTimeZone('America/La_Paz'), 'RESULTADO', ['CONTEXTUAL'], [], static fn () => null);
     }
 
-    /** Comprueba estrictos, inmutabilidad y PHPDoc exigido; sin parámetros ni errores de lectura esperados. */
+    /** Comprueba estrictos, inmutabilidad y PHPDoc exigido */
     public function test_vinculador_esta_documentado_y_tipado(): void
     {
         $r = new ReflectionClass(VinculadorRepositorios::class);
         self::assertTrue($r->isFinal());
         self::assertTrue($r->isReadOnly());
         self::assertStringStartsWith("<?php\n\ndeclare(strict_types=1);", str_replace("\r\n", "\n", file_get_contents($r->getFileName())));
-        foreach (['TÍTULO:', 'CAPA:', '¿PARA QUÉ SIRVE?', '¿QUÉ INFORMACIÓN RECIBE?',
-            '¿QUÉ HACE?', '¿QUÉ DEVUELVE?', '¿QUÉ NO DEBE HACER?'] as $seccion) {
-            self::assertStringContainsString($seccion, $r->getDocComment());
-        }
+        $doc = $r->getDocComment();
+        self::assertIsString($doc);
+        self::assertMatchesRegularExpression('/\p{L}{3}/u', $doc);
+        self::assertLessThanOrEqual(240, mb_strlen($doc));
         foreach ($r->getMethods() as $metodo) {
             self::assertNotFalse($metodo->getDocComment());
             foreach ($metodo->getParameters() as $parametro) {
@@ -224,7 +203,7 @@ final class VinculadorRepositoriosTest extends TestCase
         }
     }
 
-    /** @return VinculadorRepositorios Configuración explícita sin memoria inventada ni consultas; sin parámetros ni errores esperados. */
+    /** @return VinculadorRepositorios */
     private function vinculador(): VinculadorRepositorios
     {
         return new VinculadorRepositorios('orion_test', new DateTimeZone('America/La_Paz'), 'RESULTADO', [],
@@ -235,9 +214,8 @@ final class VinculadorRepositoriosTest extends TestCase
 
     /**
      * Construye metadatos reales de conexión con apertura PDO prohibida.
-     *
-     * @param  string  $database  Nombre de destino que se somete a la guarda.
-     * @return SQLiteConnection Conexión sin abrir; falla inmediatamente si se intenta consultar.
+     * @param string $database
+     * @return SQLiteConnection
      */
     private static function conexionSinPdo(string $database): SQLiteConnection
     {

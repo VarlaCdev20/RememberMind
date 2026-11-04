@@ -6,10 +6,7 @@ namespace MotorExperto\investigacion\g09;
 
 use DomainException;
 
-/**
- * Informe legible generado SOLO de trazas sintéticas verificadas G09-EXP.
- * No redacta diagnóstico, clasificación de DCL ni orientación médica.
- */
+/** Informe legible generado SOLO de trazas sintéticas verificadas G09-EXP. */
 final class ConstructorInformeG09Experimental
 {
     public function construir(array $evaluacion, array $capturas = []): array

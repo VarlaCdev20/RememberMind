@@ -25,35 +25,7 @@ use DomainException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * TÍTULO:
- * Reconstrucción de resultados expertos persistidos.
- *
- * CAPA:
- * Infrastructure - Persistence - Mappers.
- *
- * ¿PARA QUÉ SIRVE?
- * Convierte resultados Eloquent en entidades de Domain conservando sus soportes.
- * La dirección de lectura responde a la instrucción actual de esta etapa.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * ResultadoCriterio o EvaluacionExperta con sus relaciones cargadas y una memoria
- * original del caso sintético. D-137 no guarda el corte clínico: debe recibirse
- * esa instantánea explícita, sin deducir el corte desde la fecha de ejecución.
- *
- * ¿QUÉ HACE?
- * Verifica PK/FK, catálogos, versión, evaluabilidad y soportes. Solo acepta
- * correspondencias literales A/P/U/I/X y delega su suficiencia en Domain.
- *
- * ¿QUÉ DEVUELVE?
- * ResultadoDominio o VectorCognitivo, sin agregar los cinco dominios.
- *
- * ¿QUÉ NO DEBE HACER?
- * No convierte DIFICULTAD_EVIDENCIADA, SIN_DIFICULTAD_EVIDENCIADA o HALLAZGOS_MIXTOS
- * en A/P/X. No modifica registros ni reconstruye Petersen desde datos que no
- * contienen C01–C05 y su contrato. No omite modificadores que Domain no representa.
- * Aceptar una fila sintética no declara instalado o aprobado un catálogo nuevo.
- */
+/** Reconstruye resultados y sus soportes desde los registros originales. */
 final readonly class MapeadorResultados
 {
     /** @var list<string> Copia independiente de los roles autorizados por el contrato recibido. */
@@ -61,11 +33,9 @@ final readonly class MapeadorResultados
 
     /**
      * Recibe la zona explícita de las fechas técnicas del almacenamiento SQL.
-     *
-     * @param  DateTimeZone  $zonaAlmacenamiento  Zona del entorno segregado.
-     * @param  list<string>  $rolesSoporte  Roles autorizados por el contrato versionado; vacío no autoriza soportes.
-     *
-     * @throws DomainException Por lista inválida o intento de usar CONTEXTUAL como soporte.
+     * @param DateTimeZone $zonaAlmacenamiento
+     * @param list<string> $rolesSoporte
+     * @throws DomainException
      */
     public function __construct(
         /** Zona de columnas datetime sin información horaria propia. */ private DateTimeZone $zonaAlmacenamiento,
@@ -88,12 +58,10 @@ final readonly class MapeadorResultados
 
     /**
      * Reconstruye un dominio con su estado literal y referencias originales.
-     *
-     * @param  ResultadoCriterio  $fila  Resultado con evaluacionCriterio y valor precargados.
-     * @param  MemoriaTrabajo  $memoria  Instantánea original con las evidencias a fecha de corte.
-     * @return ResultadoDominio Estado validado por su constructor, sin recalcularlo.
-     *
-     * @throws DomainException Por contexto, catálogo, carga, modificador o soporte incompatible.
+     * @param ResultadoCriterio $fila
+     * @param MemoriaTrabajo $memoria
+     * @return ResultadoDominio
+     * @throws DomainException
      */
     public function aDominio(ResultadoCriterio $fila, MemoriaTrabajo $memoria): ResultadoDominio
     {
@@ -186,12 +154,10 @@ final readonly class MapeadorResultados
 
     /**
      * Recupera los cinco resultados explícitos sin crear dominios faltantes.
-     *
-     * @param  EvaluacionExperta  $fila  Evaluación con evaluacionCriterios.resultado cargados.
-     * @param  MemoriaTrabajo  $memoria  Única instantánea de origen de todos los soportes.
-     * @return VectorCognitivo Perfil completo, sin promedio ni índice global.
-     *
-     * @throws DomainException Por evaluación ajena, resultado ausente, duplicación o perfil incompleto.
+     * @param EvaluacionExperta $fila
+     * @param MemoriaTrabajo $memoria
+     * @return VectorCognitivo
+     * @throws DomainException
      */
     public function aVector(EvaluacionExperta $fila, MemoriaTrabajo $memoria): VectorCognitivo
     {
@@ -217,12 +183,10 @@ final readonly class MapeadorResultados
 
     /**
      * Verifica el ámbito sintético sin consultar al residente ni deducir el corte.
-     *
-     * @param  EvaluacionExperta  $fila  Cabecera persistida del caso.
-     * @param  MemoriaTrabajo  $memoria  Instantánea explícita de la misma ejecución.
-     * @return void No consulta ni modifica la evaluación.
-     *
-     * @throws DomainException Por evaluación/residente/versión ajenos o ejecución no sintética.
+     * @param EvaluacionExperta $fila
+     * @param MemoriaTrabajo $memoria
+     * @return void
+     * @throws DomainException
      */
     private static function validarEvaluacion(EvaluacionExperta $fila, MemoriaTrabajo $memoria): void
     {
@@ -239,11 +203,9 @@ final readonly class MapeadorResultados
 
     /**
      * Valida una fecha SQL técnica sin conversiones de calendario silenciosas.
-     *
-     * @param  string  $valor  Fecha física con precisión de segundos.
-     * @return DateTimeImmutable Fecha en la zona explícitamente recibida.
-     *
-     * @throws DomainException Por fecha o formato inválidos.
+     * @param string $valor
+     * @return DateTimeImmutable
+     * @throws DomainException
      */
     private function fecha(string $valor): DateTimeImmutable
     {
@@ -259,12 +221,10 @@ final readonly class MapeadorResultados
 
     /**
      * Lee una columna concreta sin casts ni accessors.
-     *
-     * @param  Model  $modelo  Registro materializado.
-     * @param  string  $campo  Columna fija del contrato.
-     * @return string Texto original no vacío.
-     *
-     * @throws DomainException Por columna ausente, NULL o tipo incompatible.
+     * @param Model $modelo
+     * @param string $campo
+     * @return string
+     * @throws DomainException
      */
     private static function texto(Model $modelo, string $campo): string
     {
@@ -278,13 +238,11 @@ final readonly class MapeadorResultados
 
     /**
      * Exige una dependencia materializada sin acceso diferido a la base de datos.
-     *
-     * @param  Model  $modelo  Propietario de la relación.
-     * @param  string  $nombre  Relación fija de App\Models.
-     * @param  class-string<Model>  $tipo  Clase esperada.
-     * @return Model Dependencia original.
-     *
-     * @throws DomainException Por relación ausente, NULL o de otro tipo.
+     * @param Model $modelo
+     * @param string $nombre
+     * @param class-string<Model> $tipo
+     * @return Model
+     * @throws DomainException
      */
     private static function relacion(Model $modelo, string $nombre, string $tipo): Model
     {
@@ -297,12 +255,10 @@ final readonly class MapeadorResultados
 
     /**
      * Obtiene una colección precargada y conserva su contenido.
-     *
-     * @param  Model  $modelo  Modelo propietario.
-     * @param  string  $nombre  Nombre fijo de la colección.
-     * @return Collection Colección original.
-     *
-     * @throws DomainException Si la relación no fue cargada o está mal tipada.
+     * @param Model $modelo
+     * @param string $nombre
+     * @return Collection
+     * @throws DomainException
      */
     private static function coleccion(Model $modelo, string $nombre): Collection
     {

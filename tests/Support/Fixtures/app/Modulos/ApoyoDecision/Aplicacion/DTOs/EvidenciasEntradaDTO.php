@@ -10,38 +10,7 @@ use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
 use DateTimeImmutable;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Application (Transporte de evidencias).
- *
- * TÍTULO:
- * Conjunto de evidencias para la inferencia.
- *
- * CAPA:
- * Application - Objetos de Transferencia de Datos (DTOs).
- *
- * ¿PARA QUÉ SIRVE?
- * Transporta los hechos y evidencias recuperados junto con su procedencia
- * y las ausencias informadas por la fuente.
- *
- * ¿QUÉ RECIBE?
- * Solicitud original, memoria validada de Domain y mapas de datos faltantes
- * o fuentes no disponibles, con una razón explícita por identificador.
- *
- * ¿QUÉ HACE?
- * Contrasta el contexto, conserva los objetos originales y copia las referencias
- * de procedencia. Conserva una memoria vacía sin inventar resultados negativos.
- *
- * ¿QUÉ DEVUELVE?
- * Evidencias tipadas, hechos originales y metadatos inmutables de disponibilidad.
- *
- * ¿QUÉ NO DEBE HACER?
- * No consulta repositorios, filtra silenciosamente otro caso, califica pruebas
- * ni duplica las validaciones de integridad que ya realiza MemoriaTrabajo.
- *
- * RELACIÓN CON O.R.I.O.N.:
- * Conecta CU-01 con CU-02. El repositorio actual entrega MemoriaTrabajo;
- * conservarla evita perder hechos de contexto que no son evidencia cognitiva.
- */
+/** Transporta los hechos y evidencias recuperados junto con su procedencia y las ausencias informadas por la fuente. */
 final readonly class EvidenciasEntradaDTO
 {
     /** @var array<string, HechoExperto> Hechos originales, incluidos los de contexto. */
@@ -50,7 +19,7 @@ final readonly class EvidenciasEntradaDTO
     /** @var array<string, EvidenciaCognitiva> Evidencias originales por identidad del hecho. */
     public array $evidencias;
 
-    /** @var array<string, array{fuenteId: string, origenId: string, episodioId: string, fecha: DateTimeImmutable, versionConocimiento: string}> Procedencia por hecho. */
+    /** @var array<string, array{fuenteId: string, origenId: string, episodioId: string, fecha: DateTimeImmutable, versionConocimiento: string}> */
     public array $referenciasProcedencia;
 
     /** @var array<string, string> Identificador del dato faltante y razón declarada. */
@@ -61,13 +30,11 @@ final readonly class EvidenciasEntradaDTO
 
     /**
      * Conserva la respuesta de Domain sin sustituir evidencias ni completar ausencias.
-     *
-     * @param  SolicitudInferenciaDTO  $solicitud  Petición original y contexto sintético.
-     * @param  MemoriaTrabajo  $memoria  Respuesta íntegra del repositorio de Domain.
-     * @param  array<string, string>  $datosFaltantes  Ausencias declaradas; vacío significa ninguna informada.
-     * @param  array<string, string>  $fuentesNoDisponibles  Indisponibilidades declaradas, sin suponer disponibilidad.
-     *
-     * @throws DomainException Por contexto ajeno o metadatos estructuralmente inválidos.
+     * @param SolicitudInferenciaDTO $solicitud
+     * @param MemoriaTrabajo $memoria
+     * @param array<string, string> $datosFaltantes
+     * @param array<string, string> $fuentesNoDisponibles
+     * @throws DomainException
      */
     public function __construct(
         /** Solicitud a la que pertenecen las evidencias. */ public SolicitudInferenciaDTO $solicitud,
@@ -93,11 +60,9 @@ final readonly class EvidenciasEntradaDTO
 
     /**
      * Reconstruye metadatos para romper referencias externas de los arrays PHP.
-     *
-     * @param  array<string, string>  $ausencias  Identificadores y razones recibidos.
-     * @return array<string, string> Copia independiente que conserva los textos exactos.
-     *
-     * @throws DomainException Por identificador inválido o razón vacía/no textual.
+     * @param array<string, string> $ausencias
+     * @return array<string, string>
+     * @throws DomainException
      */
     private static function copiarAusencias(array $ausencias): array
     {

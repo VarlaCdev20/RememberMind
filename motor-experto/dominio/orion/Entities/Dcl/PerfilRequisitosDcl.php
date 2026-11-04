@@ -12,35 +12,7 @@ use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum;
 use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Clasificación experimental (Requisitos de entrada).
- *
- * Reúne los cinco requisitos DCL y sus soportes junto con los perfiles cognitivo y funcional.
- * Mantiene las condiciones pendientes o contradictorias visibles para una decisión posterior.
- *
- * TÍTULO: Perfil explícito C01–C05 de una simulación.
- *
- * CAPA: Domain.
- *
- * SUBSISTEMA: Clasificación experimental.
- *
- * RESPONSABILIDAD:
- * Preservar requisitos, soportes, revisión diferencial y perfiles sin acreditarlos.
- *
- * ENTRADAS:
- * Vectores cognitivo/funcional, cinco estados, soportes originales y justificaciones.
- *
- * SALIDAS:
- * Perfil inmutable completo, incluido PENDIENTE cuando una condición no se conoce.
- *
- * RESTRICCIONES:
- * No mezcla instantáneas, no usa residentes reales ni acredita requisitos por
- * ausencia. C03 requiere revisión IADL; C04 permanece separado del diagnóstico.
- * No transforma las discrepancias de C02 en normalidad ni las oculta.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R1/R3/R4/R5/R7/R9; contrato DCL-PET-20261017-v0.1.
- */
+/** Reúne requisitos y soportes del caso; conserva pendientes y contradicciones. */
 final readonly class PerfilRequisitosDcl
 {
     /** Contrato experimental verificable; no autorización clínica. */
@@ -57,15 +29,14 @@ final readonly class PerfilRequisitosDcl
 
     /**
      * Construye requisitos declarados sin inferirlos desde el vector cognitivo.
-     *
-     * @param VectorCognitivo $cognicion Perfil cognitivo de la simulación.
-     * @param VectorFuncionalidad $funcionalidad Perfil funcional de la misma memoria.
-     * @param EstadoDiferencialEnum $diferencial Revisión diferencial declarada.
-     * @param array<string, EstadoCriterioDclEnum> $criterios Cinco estados explícitos.
-     * @param array<string, list<HechoExperto>> $soportes Referencias ficticias independientes.
-     * @param array<string, string> $justificaciones Razones para los cinco criterios.
-     * @param string $versionContrato Versión experimental, separada de la versión del conocimiento.
-     * @throws DomainException Por perfil incompleto, soporte ajeno o acreditación incoherente.
+     * @param VectorCognitivo $cognicion
+     * @param VectorFuncionalidad $funcionalidad
+     * @param EstadoDiferencialEnum $diferencial
+     * @param array<string, EstadoCriterioDclEnum> $criterios
+     * @param array<string, list<HechoExperto>> $soportes
+     * @param array<string, string> $justificaciones
+     * @param string $versionContrato
+     * @throws DomainException
      */
     public function __construct(
         /** Perfil cognitivo original. */ public VectorCognitivo $cognicion,

@@ -11,51 +11,17 @@ use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
 use DomainException;
 
-/**
- * TÍTULO: VerificadorEvidenciaService.
- *
- * CAPA: Domain.
- *
- * SUBSISTEMA: Admisibilidad y procedencia.
- *
- * RESPONSABILIDAD:
- * Verificar pertenencia, declaraciones de procedencia, calidad y no duplicación.
- *
- * ENTRADAS:
- * Memoria original, dominio, evidencias candidatas y hechos de revisión explícitos.
- *
- * SALIDAS:
- * Evidencias admitidas/excluidas, motivos, dependencias y fuentes de revisión.
- *
- * RESTRICCIONES:
- * No transforma datos ausentes en normalidad ni interpreta puntuaciones.
- * Los nombres VERIFICACION_PROCEDENCIA:<id> son envolturas técnicas internas
- * de la PoC, no códigos clínicos ni declaraciones de aprobación real.
- * Conserva fuentes dependientes, identificándolas sin contarlas como independientes.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R1/R3/R4/R8; admisibilidad D-111..116 del piloto.
- */
+/** Comprueba procedencia y contexto de cada evidencia; conserva rechazos y dependencias. */
 final readonly class VerificadorEvidenciaService
 {
     /**
      * Verifica candidatas y conserva cada rechazo sin alterar la memoria.
-     *
-     * Cada procedencia se declara en un hecho booleano o null con concepto
-     * VERIFICACION_PROCEDENCIA:<id>. Debe pertenecer a la misma memoria.
-     * Una declaración ausente/contradictoria no permite admitir la evidencia.
-     *
-     * @param MemoriaTrabajo $memoria Instantánea original.
-     * @param DominioCognitivoEnum $dominio Dominio solicitado.
-     * @param list<EvidenciaCognitiva> $candidatas Evidencias originales, posiblemente repetidas.
-     * @param list<HechoExperto> $revisionesProcedencia Declaraciones originales de verificación.
-     * @return array{
-     *   admitidas: list<EvidenciaCognitiva>,
-     *   excluidas: list<array{evidencia: EvidenciaCognitiva, motivos: list<string>}>,
-     *   dependencias: list<array{primera: EvidenciaCognitiva, segunda: EvidenciaCognitiva, motivos: list<string>}>,
-     *   procedencias: array<string, array{valor: ?bool, contradictoria: bool, soportes: list<HechoExperto>}>
-     * } Informe técnico determinista, sin resultado cognitivo.
-     * @throws DomainException Por forma inválida, contexto ajeno o sustitución del original.
+     * @param MemoriaTrabajo $memoria
+     * @param DominioCognitivoEnum $dominio
+     * @param list<EvidenciaCognitiva> $candidatas
+     * @param list<HechoExperto> $revisionesProcedencia
+     * @return array{ admitidas: list<EvidenciaCognitiva>, excluidas: list<array{evidencia: EvidenciaCognitiva, motivos: list<string>}>, dependencias: list<array{primera: EvidenciaCognitiva, segunda: EvidenciaCognitiva, motivos: list<string>}>, procedencias: array<string, array{valor: ?bool, contradictoria: bool, soportes: list<HechoExperto>}> }
+     * @throws DomainException
      */
     public function verificar(MemoriaTrabajo $memoria, DominioCognitivoEnum $dominio, array $candidatas, array $revisionesProcedencia = []): array
     {
@@ -137,16 +103,11 @@ final readonly class VerificadorEvidenciaService
 
     /**
      * Lee declaraciones booleanas originales sin coerción ni defaults favorables.
-     *
-     * Las discrepancias true/false son contradicciones; un null explícito
-     * mantiene el estado pendiente aun si existe otra declaración conocida.
-     * Ordenar IDs aporta reproducibilidad, sin prioridad clínica.
-     *
-     * @param MemoriaTrabajo $memoria Instantánea propietaria.
-     * @param list<HechoExperto> $hechos Declaraciones originales.
-     * @param list<string> $conceptosPermitidos Vocabulario técnico cerrado de esta lectura.
-     * @return array<string, array{valor: ?bool, contradictoria: bool, soportes: list<HechoExperto>}> Declaraciones y procedencia.
-     * @throws DomainException Por tipo, concepto, duplicación o contexto inválidos.
+     * @param MemoriaTrabajo $memoria
+     * @param list<HechoExperto> $hechos
+     * @param list<string> $conceptosPermitidos
+     * @return array<string, array{valor: ?bool, contradictoria: bool, soportes: list<HechoExperto>}>
+     * @throws DomainException
      */
     public function leerDeclaraciones(MemoriaTrabajo $memoria, array $hechos, array $conceptosPermitidos): array
     {

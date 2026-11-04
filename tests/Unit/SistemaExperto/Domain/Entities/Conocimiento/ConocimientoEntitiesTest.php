@@ -14,36 +14,12 @@ use DomainException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * TÍTULO: Identidad versionada, grafo explícito y condiciones declarativas.
- *
- * CAPA: Domain (verificación unitaria).
- *
- * SUBSISTEMA: Entidades y sus invariantes.
- *
- * RESPONSABILIDAD:
- * Verificar constructores y comportamiento local de la Fase B.
- *
- * ENTRADAS:
- * Escenarios artificiales sin datos de residentes ni instrumentos reales.
- *
- * SALIDAS:
- * Aserciones de conservación, rechazo e inmutabilidad.
- *
- * RESTRICCIONES:
- * No inicia Laravel, no accede a BDD ni acredita evaluación posterior en uso real.
- *
- * TRAZABILIDAD:
- * Reglamento maestro, Fase B, documentación obligatoria e invariantes R1–R10.
- */
+/** Verificar constructores y comportamiento local de la Fase B. */
 final class ConocimientoEntitiesTest extends TestCase
 {
     /**
      * Consulta exclusivamente la arista existente y preserva sus nodos.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_red_conserva_aristas_directas_sin_inventar_la_inversa(): void
     {
@@ -59,10 +35,7 @@ final class ConocimientoEntitiesTest extends TestCase
 
     /**
      * Rechaza una arista entre versiones sin crear compatibilidad implícita.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_relacion_rechaza_versiones_diferentes(): void
     {
@@ -74,10 +47,7 @@ final class ConocimientoEntitiesTest extends TestCase
 
     /**
      * Rechaza un nodo incompleto antes de incorporarlo a una red.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_nodo_rechaza_identidad_vacia(): void
     {
@@ -87,10 +57,7 @@ final class ConocimientoEntitiesTest extends TestCase
 
     /**
      * Impide dos identidades locales para el mismo concepto de una versión.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_red_rechaza_codigo_semantico_duplicado(): void
     {
@@ -102,10 +69,7 @@ final class ConocimientoEntitiesTest extends TestCase
 
     /**
      * Impide recontar la misma arista bajo otro ID.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_red_rechaza_arista_duplicada(): void
     {
@@ -119,10 +83,7 @@ final class ConocimientoEntitiesTest extends TestCase
 
     /**
      * Impide que la relación introduzca nodos ausentes de la instantánea.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_red_rechaza_extremo_no_incorporado(): void
     {
@@ -135,10 +96,7 @@ final class ConocimientoEntitiesTest extends TestCase
 
     /**
      * Conserva datos declarativos aunque el array original cambie por referencia.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_regla_conserva_version_y_rompe_referencias_externas(): void
     {
@@ -154,10 +112,7 @@ final class ConocimientoEntitiesTest extends TestCase
 
     /**
      * Rechaza expresiones en cadenas sin ejecutar código.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_regla_rechaza_texto_como_condicion_hija(): void
     {
@@ -168,10 +123,7 @@ final class ConocimientoEntitiesTest extends TestCase
 
     /**
      * Evita usar ausencia como condición positiva o consecuencia.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_regla_rechaza_literal_null(): void
     {
@@ -182,10 +134,7 @@ final class ConocimientoEntitiesTest extends TestCase
 
     /**
      * Rechaza un ciclo de referencias mediante el límite técnico de profundidad.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_regla_rechaza_arbol_ciclico(): void
     {
@@ -197,10 +146,9 @@ final class ConocimientoEntitiesTest extends TestCase
 
     /**
      * Impide que conocimiento incompleto o ambiguo entre al evaluador posterior.
-     *
-     * @param array<string, mixed> $condicion Árbol artificial mal formado.
+     * @param array<string, mixed> $condicion
      * @return void
-     * @throws DomainException Rechazo esperado, sin evaluar el árbol recibido.
+     * @throws DomainException
      */
     #[DataProvider('condicionesInvalidas')]
     public function test_regla_rechaza_gramatica_incompleta_o_ambigua(array $condicion): void
@@ -212,10 +160,7 @@ final class ConocimientoEntitiesTest extends TestCase
 
     /**
      * Aporta errores estructurales que no deben recibir defaults inferenciales.
-     *
-     * @return iterable<string, array{array<string, mixed>}> Árboles negativos.
-     *
-     * No recibe parámetros ni lanza excepciones.
+     * @return iterable<string, array{array<string, mixed>}>
      */
     public static function condicionesInvalidas(): iterable
     {
@@ -233,11 +178,8 @@ final class ConocimientoEntitiesTest extends TestCase
 
     /**
      * Conserva literales falsy en una regla compuesta sin tratarlos como ausencias.
-     *
-     * @param string|int|float|bool $valor Literal conocido con tipo explícito.
+     * @param string|int|float|bool $valor
      * @return void
-     *
-     * No se esperan excepciones; construir la regla no ejecuta sus condiciones.
      */
     #[DataProvider('literalesConocidos')]
     public function test_regla_conserva_tipos_en_composiciones_y_consecuencias(string|int|float|bool $valor): void
@@ -259,10 +201,7 @@ final class ConocimientoEntitiesTest extends TestCase
 
     /**
      * Define datos conocidos que una comprobación de truthiness perdería.
-     *
-     * @return iterable<string, array{string|int|float|bool}> Literales distintos.
-     *
-     * No recibe parámetros ni lanza excepciones.
+     * @return iterable<string, array{string|int|float|bool}>
      */
     public static function literalesConocidos(): iterable
     {
@@ -274,10 +213,9 @@ final class ConocimientoEntitiesTest extends TestCase
 
     /**
      * Evita que una consecuencia mal formada publique una conclusión aparente.
-     *
-     * @param array<string, mixed> $consecuencia Salida declarativa inválida.
+     * @param array<string, mixed> $consecuencia
      * @return void
-     * @throws DomainException Rechazo esperado antes de publicar conocimiento.
+     * @throws DomainException
      */
     #[DataProvider('consecuenciasInvalidas')]
     public function test_regla_rechaza_consecuencia_desconocida_o_no_finita(array $consecuencia): void
@@ -290,10 +228,7 @@ final class ConocimientoEntitiesTest extends TestCase
 
     /**
      * Proporciona salidas ausentes, no escalares y ambiguas.
-     *
-     * @return iterable<string, array{array<string, mixed>}> Consecuencias negativas.
-     *
-     * No recibe parámetros ni lanza excepciones.
+     * @return iterable<string, array{array<string, mixed>}>
      */
     public static function consecuenciasInvalidas(): iterable
     {
@@ -305,10 +240,7 @@ final class ConocimientoEntitiesTest extends TestCase
 
     /**
      * Protege la consecuencia de cambios posteriores en referencias del llamador.
-     *
      * @return void
-     *
-     * No recibe parámetros; no se esperan excepciones con los datos ficticios.
      */
     public function test_consecuencia_no_cambia_al_mutar_su_array_de_origen(): void
     {

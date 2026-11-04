@@ -14,24 +14,12 @@ use MotorExperto\dominio\orion\Services\Dcl\ClasificadorPetersenService;
 use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum;
 use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Application (CU-04).
- * TÍTULO: Clasificación experimental según Petersen.
- * CAPA: Application - Casos de Uso.
- * ¿PARA QUÉ SIRVE? Solicita un patrón candidato o abstención a Domain.
- * ¿QUÉ RECIBE? Inferencia, C01–C05, IADL y revisión diferencial explícitas.
- * ¿QUÉ HACE? Compone las entidades originales y delega al clasificador.
- * ¿QUÉ DEVUELVE? ResultadoDclDTO conservando el mismo perfil cognitivo.
- * ¿QUÉ NO DEBE HACER? No acredita C03 desde BADL ni resuelve C04 por síntomas.
- * RELACIÓN CON O.R.I.O.N.: CU-04 y contrato DCL-PET-20261017-v0.1.
- */
+/** Solicita un patrón candidato o abstención a Domain. */
 final readonly class ClasificarDclUseCase
 {
     /**
      * Recibe un clasificador puro; no activa procesos ni persistencia.
-     *
-     * @param  ClasificadorPetersenService  $clasificador  Selección contractual en Domain.
-     *                                                     No clasifica ni lanza excepciones durante la construcción.
+     * @param ClasificadorPetersenService $clasificador
      */
     public function __construct(
         /** Selecciona patrón o abstención en Domain. */ private ClasificadorPetersenService $clasificador = new ClasificadorPetersenService,
@@ -39,21 +27,19 @@ final readonly class ClasificarDclUseCase
 
     /**
      * Transporta declaraciones externas al contrato de Domain, que valida su coherencia.
-     *
-     * @param  SolicitudInferenciaDTO  $solicitud  Petición original.
-     * @param  ResultadoInferenciaDTO  $inferencia  Perfil producido por CU-03.
-     * @param  array  $criterios  Cinco estados explícitos C01–C05.
-     * @param  array  $soportes  Hechos originales por criterio, no IDs inventados.
-     * @param  array  $justificaciones  Razones de cada requisito.
-     * @param  EstadoDiferencialEnum  $diferencial  Revisión externa declarada.
-     * @param  EstadoCriterioDclEnum  $independenciaRelativa  Revisión funcional declarada.
-     * @param  array  $evidenciasIadl  Evidencias originales con oportunidad y nivel previo.
-     * @param  string|null  $revisorSinteticoId  Revisor ficticio de funcionalidad.
-     * @param  string  $justificacionFuncional  Razón funcional explícita.
-     * @param  string  $versionContrato  Contrato experimental exacto.
-     * @return ResultadoDclDTO Resultado original y contexto conservados.
-     *
-     * @throws DomainException Por peticiones mezcladas o invariantes de Domain incumplidas.
+     * @param SolicitudInferenciaDTO $solicitud
+     * @param ResultadoInferenciaDTO $inferencia
+     * @param array $criterios
+     * @param array $soportes
+     * @param array $justificaciones
+     * @param EstadoDiferencialEnum $diferencial
+     * @param EstadoCriterioDclEnum $independenciaRelativa
+     * @param array $evidenciasIadl
+     * @param string|null $revisorSinteticoId
+     * @param string $justificacionFuncional
+     * @param string $versionContrato
+     * @return ResultadoDclDTO
+     * @throws DomainException
      */
     public function ejecutar(SolicitudInferenciaDTO $solicitud, ResultadoInferenciaDTO $inferencia,
         array $criterios, array $soportes, array $justificaciones, EstadoDiferencialEnum $diferencial,

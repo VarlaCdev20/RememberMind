@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace MotorExperto\investigacion\g08;
 
-/**
- * Lista de comprobación G08 orientada a ingeniería y revisión bibliográfica.
- * Incluso una ficha aparentemente completa es SOLO una declaración del autor
- * de la captura: NO se convierte en evidencia clínica o estado DCL A/P.
- */
+/** Lista de comprobación G08 orientada a ingeniería y revisión bibliográfica. */
 final class AuditorAplicabilidadG08Investigacion
 {
     public const VERSION = 'G08-CHECK-20261017-R1';

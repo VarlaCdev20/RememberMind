@@ -7,14 +7,7 @@ namespace MotorExperto\investigacion\g09;
 use DomainException;
 use PDO;
 
-/**
- * Lee capturas instrumentales de una base SQLite EN MEMORIA, exclusivamente
- * con identificadores SINTETICO-/SIM-. No permite fichero, PDO de Laravel,
- * conexiones asistenciales ni instrumentos no simulados.
- *
- * Proyecta nombres operativos reales: instrumentos, aplicaciones_instrumento,
- * preguntas_instrumento, respuestas_instrumento y opciones_pregunta.
- */
+/** Lee capturas instrumentales de una base SQLite EN MEMORIA, exclusivamente con identificadores SINTETICO-/SIM-. */
 final class LectorSQLiteG08Experimental
 {
     public function __construct(private readonly PDO $db)

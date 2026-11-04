@@ -7,38 +7,7 @@ namespace App\Modulos\ApoyoDecision\Aplicacion\DTOs;
 use MotorExperto\dominio\orion\Entities\Conocimiento\RelacionSemantica;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Application (Informe estructurado).
- *
- * TÍTULO:
- * Informe final estructurado de O.R.I.O.N.
- *
- * CAPA:
- * Application - Objetos de Transferencia de Datos (DTOs).
- *
- * ¿PARA QUÉ SIRVE?
- * Transporta los tres niveles del informe: resumen, interpretación y fundamento,
- * junto con los resultados originales que permiten revisar su trazabilidad.
- *
- * ¿QUÉ RECIBE?
- * Resultado cognitivo, resultado DCL opcional, textos explicativos suministrados
- * por Domain, relaciones utilizadas y exclusiones justificadas.
- *
- * ¿QUÉ HACE?
- * Verifica la coherencia del contexto, conserva el texto recibido y adjunta
- * versiones y la advertencia experimental obligatoria.
- *
- * ¿QUÉ DEVUELVE?
- * Un informe inmutable con sus tres secciones y referencias originales.
- *
- * ¿QUÉ NO DEBE HACER?
- * No redacta conclusiones nuevas, interpreta instrumentos, modifica estados,
- * diagnostica ni genera PDF, HTML o vistas. No sustituye al servicio de explicación.
- *
- * RELACIÓN CON O.R.I.O.N.:
- * Es la salida prevista de CU-05/CU-06. Evidencias, reglas, trazas y motivos
- * permanecen accesibles en los DTOs originales, sin producir copias divergentes.
- */
+/** Transporta los tres niveles del informe: resumen, interpretación y fundamento, junto con los resultados originales que permiten revisar su trazabilidad. */
 final readonly class InformeExpertoDTO
 {
     /** Advertencia obligatoria del reglamento; ningún constructor puede reemplazarla. */
@@ -61,16 +30,14 @@ final readonly class InformeExpertoDTO
 
     /**
      * Conserva un informe explicado previamente, sin generar interpretación adicional.
-     *
-     * @param  ResultadoInferenciaDTO  $inferencia  Resultados, evidencias, reglas y trazas originales.
-     * @param  ResultadoDclDTO|null  $dcl  Resultado opcional del mismo perfil cognitivo.
-     * @param  string  $resumen  Nivel 1: contexto, evaluabilidad y hallazgos o limitaciones.
-     * @param  string  $interpretacion  Nivel 2: perfil y patrón candidato o abstención.
-     * @param  string  $fundamento  Nivel 3: explicación respaldada por las referencias conservadas.
-     * @param  list<RelacionSemantica>  $relacionesUtilizadas  Relaciones citadas por Domain, de la misma versión.
-     * @param  array<string, string>  $exclusiones  Exclusiones y razones suministradas por Domain.
-     *
-     * @throws DomainException Por secciones vacías, mezcla de perfiles o referencias inválidas.
+     * @param ResultadoInferenciaDTO $inferencia
+     * @param ResultadoDclDTO|null $dcl
+     * @param string $resumen
+     * @param string $interpretacion
+     * @param string $fundamento
+     * @param list<RelacionSemantica> $relacionesUtilizadas
+     * @param array<string, string> $exclusiones
+     * @throws DomainException
      */
     public function __construct(
         /** Perfil cognitivo y trazabilidad originales. */ public ResultadoInferenciaDTO $inferencia,

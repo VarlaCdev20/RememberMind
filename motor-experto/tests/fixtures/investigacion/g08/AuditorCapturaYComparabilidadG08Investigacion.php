@@ -6,11 +6,7 @@ namespace MotorExperto\investigacion\g08;
 
 use DomainException;
 
-/**
- * Verifica la FORMA de una captura numérica sintética y compara los metadatos
- * básicos con el método de los artículos multicéntricos. Nunca calcula baremos.
- * Este auditor NO lee una persona real ni sustituye juicio profesional.
- */
+/** Verifica la FORMA de una captura numérica sintética y compara los metadatos básicos con el método de los artículos multicéntricos. */
 final class AuditorCapturaYComparabilidadG08Investigacion
 {
     public const VERSION = 'G08-CAPTURA-COMP-20261017-01';

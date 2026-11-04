@@ -10,41 +10,19 @@ use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades;
 
-/**
- * TÍTULO: Preparación manual de declaraciones sintéticas.
- *
- * CAPA: Domain (verificación unitaria).
- *
- * SUBSISTEMA: Repositorios y compuertas.
- *
- * RESPONSABILIDAD:
- * Verificar contratos explícitos con fuentes artificiales y objetos reales.
- *
- * ENTRADAS:
- * Identidades, declaraciones y referencias ficticias de prueba.
- *
- * SALIDAS:
- * Objetos sintéticos o aserciones sobre preservación y rechazo.
- *
- * RESTRICCIONES:
- * No inicia Laravel, no consulta persistencia ni acredita evaluación posterior en uso real.
- *
- * TRAZABILIDAD:
- * Reglamento maestro, Fases C/D e invariantes R1–R10.
- */
+/** Verificar contratos explícitos con fuentes artificiales y objetos reales. */
 final class EscenarioCompuertas
 {
     /**
      * Construye un escenario con declaraciones explícitas, sin defaults de aprobación.
-     *
-     * @param list<EvidenciaCognitiva> $evidencias Evidencias originales únicas.
-     * @param array<string, mixed> $contexto Valores declarados para campos de contexto.
-     * @param array<string, mixed> $procedencias Verificaciones declaradas por ID de evidencia.
-     * @param list<HechoExperto> $contextoExtra Revisiones adicionales para probar contradicciones.
-     * @param list<HechoExperto> $procedenciaExtra Verificaciones adicionales.
-     * @param DominioCognitivoEnum $dominio Eje de las declaraciones de contexto.
-     * @return array{memoria: MemoriaTrabajo, candidatas: list<EvidenciaCognitiva>, contexto: list<HechoExperto>, procedencias: list<HechoExperto>} Escenario real del Domain.
-     * @throws \DomainException Si los hechos artificiales violan el contexto de memoria.
+     * @param list<EvidenciaCognitiva> $evidencias
+     * @param array<string, mixed> $contexto
+     * @param array<string, mixed> $procedencias
+     * @param list<HechoExperto> $contextoExtra
+     * @param list<HechoExperto> $procedenciaExtra
+     * @param DominioCognitivoEnum $dominio
+     * @return array{memoria: MemoriaTrabajo, candidatas: list<EvidenciaCognitiva>, contexto: list<HechoExperto>, procedencias: list<HechoExperto>}
+     * @throws \DomainException
      */
     public static function preparar(array $evidencias = [], array $contexto = [], array $procedencias = [],
         array $contextoExtra = [], array $procedenciaExtra = [], DominioCognitivoEnum $dominio = DominioCognitivoEnum::MEMORIA): array
@@ -70,13 +48,8 @@ final class EscenarioCompuertas
 
     /**
      * Declara manualmente las cuatro condiciones conocidas de un caso positivo.
-     *
-     * La basal y la advertencia no se inventan: no se incluyen salvo override.
-     *
-     * @param array<string, mixed> $cambios Variantes del escenario positivo.
-     * @return array<string, mixed> Declaraciones ficticias, nunca valores calculados.
-     *
-     * No lanza excepciones.
+     * @param array<string, mixed> $cambios
+     * @return array<string, mixed>
      */
     public static function contextoCompleto(array $cambios = []): array
     {

@@ -7,11 +7,7 @@ namespace MotorExperto\investigacion\g09;
 use DomainException;
 use MotorExperto\conocimiento\PaqueteConocimiento;
 
-/**
- * Flujo integral TEST_ONLY de cuatro criterios G09:
- * SQLite en memoria → inspector de respuestas → evidencia → regla → informe.
- * Produce un perfil NO agregado; no evalúa Memoria ni clasifica DCL.
- */
+/** Flujo integral TEST_ONLY de cuatro criterios G09: SQLite en memoria → inspector de respuestas → evidencia → regla → informe. */
 final class EjecutorPerfilG09Experimental
 {
     private readonly AdaptadorInstrumentalG08G09Experimental $adaptador;
@@ -28,10 +24,7 @@ final class EjecutorPerfilG09Experimental
         $this->informes = new ConstructorInformeG09Experimental;
     }
 
-    /**
-     * $tareas: [['regla' => 'R-ATE-S01-P01', 'aplicacion' => 'SIM-AP-...'], ...].
-     * $base: evaluación ficticia, residente ficticio, fecha_corte y contexto.
-     */
+    /** $tareas: [['regla' => 'R-ATE-S01-P01', 'aplicacion' => 'SIM-AP-...'], ...]. $base: evaluación ficticia, residente ficticio, fecha_corte y contexto. */
     public function evaluar(array $base, array $tareas): array
     {
         if (($base['uso'] ?? null) !== 'TEST_ONLY'

@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace MotorExperto\instrumentos;
 
-/**
- * Totales descriptivos de FCSRT de palabras según el procedimiento NEURONORMA.
- * Cotejo: Calderón-Rubio et al., 2021, apartado 2.2.1. No reproduce estímulos,
- * no aplica baremos españoles a residentes ni intercambia palabras e imágenes.
- */
+/** Totales descriptivos de FCSRT de palabras según el procedimiento NEURONORMA. */
 final class CalculadorRecuerdoConClavesFcsrt
 {
     public const METODO = 'FCSRT-PALABRAS-NEURONORMA-BRUTO-1';

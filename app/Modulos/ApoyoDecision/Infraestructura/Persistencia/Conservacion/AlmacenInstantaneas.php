@@ -43,37 +43,14 @@ use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoIadlEnum as Esta
 use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\OportunidadIadlEnum as Oportunidad;
 use MotorExperto\conservacion\CodecInstantanea;
 
-/**
- * TÍTULO:
- * Conservación relacional de memoria, cognición y clasificación.
- *
- * CAPA:
- * Infrastructure — Persistence.
- *
- * ¿PARA QUÉ SIRVE?
- * Implementa instantáneas recuperables sin un proceso anterior.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * Objetos originales y una conexión experimental segregada.
- *
- * ¿QUÉ HACE?
- * Escribe atómicamente, reutiliza D-137 y verifica contenido al leer.
- *
- * ¿QUÉ DEVUELVE?
- * Los mismos valores y relaciones de identidad reconstruidos.
- *
- * ¿QUÉ NO DEBE HACER?
- * No interpreta clínica, crea fuentes ni sobrescribe historia.
- */
+/** Conserva y recupera instantáneas verificables sin depender de un proceso anterior. */
 final readonly class AlmacenInstantaneas
 {
     /**
      * Prepara capacidades sin abrir conexiones ni ejecutar SQL.
-     *
-     * @param  string  $conexion  Nombre explícito de la base técnica desechable.
-     * @param  Closure|null  $extraerOriginal  Extracción autorizada por lote, obligatoria para conservar fuentes institucionales.
-     * @param  DateTimeZone  $zona  Zona de las columnas operativas de origen.
-     *                                                         No produce efectos ni excepciones durante la construcción.
+     * @param string $conexion
+     * @param Closure|null $extraerOriginal
+     * @param DateTimeZone $zona
      */
     public function __construct(private string $conexion, private ?Closure $extraerOriginal = null,
         private DateTimeZone $zona = new DateTimeZone('UTC')) {}
@@ -86,11 +63,9 @@ final readonly class AlmacenInstantaneas
 
     /**
      * Resuelve identidad original o cabecera anterior sin inventar referencias.
-     *
-     * @param  string  $id  Identidad original explícita.
-     * @return object|null Cabecera del destino solicitado o ausencia física.
-     *
-     * @throws RuntimeException Por entorno/conexión no autorizados o fallo SQL.
+     * @param string $id
+     * @return object|null
+     * @throws RuntimeException
      */
     public function cabecera(string $id): ?object
     {
@@ -116,12 +91,10 @@ final readonly class AlmacenInstantaneas
 
     /**
      * Conserva la cognición completa o ninguna fila; el reintento no sobrescribe.
-     *
-     * @param  VectorCognitivo  $vector  Memoria y resultados originales de un caso sintético.
-     * @return void Confirma solo la transacción completa o un reintento idéntico.
-     *
-     * @throws DomainException Por contexto, catálogo, origen o contenido incompatible.
-     * @throws RuntimeException Por destino no autorizado o fallo de almacenamiento.
+     * @param VectorCognitivo $vector
+     * @return void
+     * @throws DomainException
+     * @throws RuntimeException
      */
     public function guardar(VectorCognitivo $vector): void
     {
@@ -306,15 +279,13 @@ final readonly class AlmacenInstantaneas
 
     /**
      * Recupera valores originales; no vuelve a consultar fuentes mutables.
-     *
-     * @param  string  $id  Identidad original de evaluación.
-     * @param  string  $residente  Sujeto sintético propietario.
-     * @param  string  $version  Versión exacta del conocimiento.
-     * @param  DateTimeImmutable  $corte  Corte con instante, precisión y zona originales.
-     * @return VectorCognitivo|null Perfil completo o ausencia real.
-     *
-     * @throws DomainException Por contexto, temporalidad, FK o instantánea incompletos/incompatibles.
-     * @throws RuntimeException Por destino no autorizado o fallo SQL.
+     * @param string $id
+     * @param string $residente
+     * @param string $version
+     * @param DateTimeImmutable $corte
+     * @return VectorCognitivo|null
+     * @throws DomainException
+     * @throws RuntimeException
      */
     public function obtener(string $id, string $residente, string $version, DateTimeImmutable $corte): ?VectorCognitivo
     {
@@ -485,12 +456,10 @@ final readonly class AlmacenInstantaneas
 
     /**
      * Conserva DCL solo sobre una cognición previa idéntica.
-     *
-     * @param  ResultadoClasificacionDcl  $r  Requisitos, funcionalidad, salida y reglas originales.
-     * @return void Confirma una clasificación íntegra o un reintento idéntico.
-     *
-     * @throws DomainException Por cognición ausente, contenido divergente o conocimiento adulterado.
-     * @throws RuntimeException Por destino no autorizado o fallo SQL, con rollback.
+     * @param ResultadoClasificacionDcl $r
+     * @return void
+     * @throws DomainException
+     * @throws RuntimeException
      */
     public function guardarClasificacion(ResultadoClasificacionDcl $r): void
     {
@@ -582,16 +551,14 @@ final readonly class AlmacenInstantaneas
 
     /**
      * Recuperación íntegra de DCL; ausencia real se distingue de corrupción.
-     *
-     * @param  string  $id  Identidad original de evaluación.
-     * @param  string  $residente  Sujeto sintético propietario.
-     * @param  string  $version  Versión exacta de conocimiento.
-     * @param  DateTimeImmutable  $corte  Corte original inclusivo y su zona.
-     * @param  string  $contrato  Versión original del contrato experimental DCL.
-     * @return ResultadoClasificacionDcl|null Resultado íntegro o ausencia real.
-     *
-     * @throws DomainException Por contexto, contrato, FK, orden o contenido incompatibles.
-     * @throws RuntimeException Por destino no autorizado o fallo SQL.
+     * @param string $id
+     * @param string $residente
+     * @param string $version
+     * @param DateTimeImmutable $corte
+     * @param string $contrato
+     * @return ResultadoClasificacionDcl|null
+     * @throws DomainException
+     * @throws RuntimeException
      */
     public function obtenerClasificacion(string $id, string $residente, string $version, DateTimeImmutable $corte, string $contrato): ?ResultadoClasificacionDcl
     {

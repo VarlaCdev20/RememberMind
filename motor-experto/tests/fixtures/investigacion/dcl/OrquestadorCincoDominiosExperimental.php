@@ -16,13 +16,7 @@ use MotorExperto\hechos\FuenteBrutaCOGMEM;
 use MotorExperto\investigacion\g09\CatalogoReglasG09Experimental;
 use MotorExperto\investigacion\g09\EjecutorPerfilG09Experimental;
 
-/**
- * Demostración sin uso clínico: mismo individuo/caso/corte para cinco dominios.
- * El caso de uso integral proporciona una revisión única a Memoria y G09.
- * La entrada histórica sin paquete conserva su contrato de laboratorio anterior.
- * Petersen recibe U en los cinco dominios: jamás infiere A/P de resultados
- * descriptivos, de una regla que no cumplió o de una respuesta sintética.
- */
+/** Demostración sin uso clínico: mismo individuo/caso/corte para cinco dominios. */
 final class OrquestadorCincoDominiosExperimental
 {
     public const VERSION_PERFIL = 'INTEGRA5-EXP-01';

@@ -8,10 +8,7 @@ use DomainException;
 use MotorExperto\instrumentos\GuiaAdquisicionDcl;
 use MotorExperto\instrumentos\CircuitoInstrumentalInicial;
 
-/**
- * Estado de preparación de las familias seleccionadas, sin leer casos ni ejecutar perfiles.
- * Referencias candidatas no equivalen a identidad operativa, licencia o método clínico aprobado.
- */
+/** Estado de preparación de las familias seleccionadas, sin leer casos ni ejecutar perfiles. */
 final class PreparacionCircuitoInstrumental
 {
     public const CONTRATO = 'PREPARACION-CIRCUITO-INICIAL-1';

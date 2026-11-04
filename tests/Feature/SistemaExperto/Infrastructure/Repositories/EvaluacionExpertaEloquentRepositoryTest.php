@@ -19,19 +19,11 @@ use RuntimeException;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as D;
 use Tests\Unit\SistemaExperto\Infrastructure\Mappers\EscenarioMapeadores as F;
 
-/**
- * TÍTULO: Lectura de resultados con memoria original y escrituras cerradas.
- * CAPA: Infrastructure - Repositories (pruebas de integración).
- * ¿PARA QUÉ SIRVE? Verifica el puerto de evaluaciones dentro del alcance representable.
- * ¿QUÉ INFORMACIÓN RECIBE? Modelos y memorias sintéticas explícitas.
- * ¿QUÉ HACE? Consulta criterios/resultados y rechaza instantáneas o procedencias ajenas.
- * ¿QUÉ DEVUELVE? Aserciones sobre el contrato y sus efectos.
- * ¿QUÉ NO DEBE HACER? No guarda diagnósticos, fabrica C01–C05 ni convierte G09 en A/P.
- */
+/** Verifica el puerto de evaluaciones dentro del alcance representable. */
 final class EvaluacionExpertaEloquentRepositoryTest extends RepositoriosTestCase
 {
     use \Tests\Support\CorromperConservacionParaPrueba;
-    /** Conserva la memoria original y los cinco U explícitos; sin parámetros ni excepciones esperadas. */
+    /** Conserva la memoria original y los cinco U explícitos */
     public function test_recupera_el_vector_con_los_cinco_dominios_originales(): void
     {
         [$modelo, $memoria] = F::resultados(['U', 'U', 'U', 'U', 'U']);
@@ -50,7 +42,7 @@ final class EvaluacionExpertaEloquentRepositoryTest extends RepositoriosTestCase
         $this->exigirSoloLecturas();
     }
 
-    /** Lee un I previamente declarado en el fixture, sin interpretarlo; sin parámetros ni excepciones esperadas. */
+    /** Lee un I previamente declarado en el fixture, sin interpretarlo */
     public function test_preserva_soporte_y_procedencia_originales_del_resultado(): void
     {
         [, $memoria] = EscenarioRepositorios::resultadosConSoporte();
@@ -72,7 +64,7 @@ final class EvaluacionExpertaEloquentRepositoryTest extends RepositoriosTestCase
             ->obtener('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', self::corte());
     }
 
-    /** La ausencia física no invoca la recuperación de memoria; sin parámetros ni excepciones esperadas. */
+    /** La ausencia física no invoca la recuperación de memoria */
     public function test_devuelve_null_solo_para_evaluacion_inexistente(): void
     {
         $repo = $this->repositorio(static function (): never {
@@ -85,10 +77,8 @@ final class EvaluacionExpertaEloquentRepositoryTest extends RepositoriosTestCase
 
     /**
      * Rechaza instantáneas sin identidad temporal exacta.
-     *
-     * @param  string  $caso  Incompatibilidad independiente.
-     *
-     * @throws DomainException Rechazo esperado de contexto o corte ajeno.
+     * @param string $caso
+     * @throws DomainException
      */
     #[DataProvider('contextosAjenos')]
     public function test_no_sustituye_memoria_original_por_otro_contexto(string $caso): void
@@ -102,7 +92,7 @@ final class EvaluacionExpertaEloquentRepositoryTest extends RepositoriosTestCase
             ->obtener('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', self::corte());
     }
 
-    /** @return iterable<string, array{string}> Contextos ajenos; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string}> */
     public static function contextosAjenos(): iterable
     {
         yield 'residente' => ['residente'];
@@ -143,7 +133,7 @@ final class EvaluacionExpertaEloquentRepositoryTest extends RepositoriosTestCase
             ->obtener('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', self::corte());
     }
 
-    /** Escrituras no soportadas fallan sin emitir SQL ni alterar el perfil; sin parámetros ni excepciones sin capturar. */
+    /** Escrituras no soportadas fallan sin emitir SQL ni alterar el perfil */
     public function test_las_escrituras_sin_catalogo_no_generan_efectos_ni_exito_falso(): void
     {
         $perfil = D::perfil(['U', 'U', 'U', 'U', 'U']);

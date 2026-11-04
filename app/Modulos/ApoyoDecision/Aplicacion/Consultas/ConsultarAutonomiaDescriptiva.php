@@ -69,11 +69,7 @@ final class ConsultarAutonomiaDescriptiva
                 : 'No hay observaciones de actividades cotidianas disponibles para esta consulta.'];
     }
 
-    /**
-     * Captura longitudinal al corte para preparar soportes institucionales.
-     * Conserva originales y rectificaciones; no elige la última actividad para acreditar C03.
-     * No guarda datos ni completa una evaluación histórica con información actual.
-     */
+    /** Captura longitudinal al corte para preparar soportes institucionales. */
     public function capturar(User $usuario, Residente $residente, CarbonImmutable $corte): array
     {
         $usuario = User::query()->findOrFail($usuario->getKey());

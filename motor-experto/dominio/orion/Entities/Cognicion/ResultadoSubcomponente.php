@@ -11,34 +11,7 @@ use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\SubcomponenteCognitivoEnum;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Motor de inferencia (Resultados por subcomponente).
- *
- * Conserva un hallazgo declarado y las evidencias originales que lo sustentan.
- * El alcance de una tarea permanece separado del resultado integrado de su dominio.
- *
- * TÍTULO: Resultado explícito de un subcomponente.
- *
- * CAPA: Domain.
- *
- * SUBSISTEMA: Motor de inferencia.
- *
- * RESPONSABILIDAD:
- * Conservar un hallazgo declarado con sus soportes originales y alcance específico.
- *
- * ENTRADAS:
- * Subcomponente, hallazgo, memoria, IDs de evidencia y justificación.
- *
- * SALIDAS:
- * Un resultado inmutable vinculado a una única instantánea de evaluación.
- *
- * RESTRICCIONES:
- * No convierte un resultado de tarea en el estado de todo un dominio.
- * Una ausencia permanece DESCONOCIDO; no se calculan baremos ni umbrales.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R1/R3/R4/R6/R8 y subcomponentes de la Fase A.
- */
+/** Conserva un hallazgo de tarea y sus fuentes; no concluye el estado del dominio. */
 final readonly class ResultadoSubcomponente
 {
     /** Dominio primario documental, no resultado cognitivo. */
@@ -49,13 +22,12 @@ final readonly class ResultadoSubcomponente
 
     /**
      * Valida coherencia del resultado declarado sin inferirlo.
-     *
-     * @param SubcomponenteCognitivoEnum $subcomponente Alcance del resultado.
-     * @param HallazgoInstrumentalEnum $hallazgo Descriptor declarado.
-     * @param MemoriaTrabajo $memoria Instantánea original.
-     * @param list<string> $evidenciasIds IDs de soportes en esa memoria.
-     * @param string $justificacion Fundamentación o limitación explícita.
-     * @throws DomainException Por soporte ausente, duplicado, de otro alcance o incompatible.
+     * @param SubcomponenteCognitivoEnum $subcomponente
+     * @param HallazgoInstrumentalEnum $hallazgo
+     * @param MemoriaTrabajo $memoria
+     * @param list<string> $evidenciasIds
+     * @param string $justificacion
+     * @throws DomainException
      */
     public function __construct(
         /** Subcomponente propietario. */ public SubcomponenteCognitivoEnum $subcomponente,

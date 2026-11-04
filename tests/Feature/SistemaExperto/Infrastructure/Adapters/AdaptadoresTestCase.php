@@ -20,35 +20,13 @@ use Illuminate\Support\Facades\DB;
 use Tests\Feature\SistemaExperto\Infrastructure\Repositories\EscenarioRepositorios;
 use Tests\Feature\SistemaExperto\Infrastructure\Repositories\RepositoriosTestCase;
 
-/**
- * TÍTULO:
- * Entorno de integración de adaptadores con fuentes ficticias.
- *
- * CAPA:
- * Infrastructure - Adapters.
- *
- * ¿PARA QUÉ SIRVE?
- * Recupera datos brutos autorizados sin interpretación clínica.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * Las migraciones reales en SQLite :memory: o PostgreSQL desechable.
- *
- * ¿QUÉ HACE?
- * Inserta datos sintéticos y prepara la conexión explícita del perfil de pruebas.
- *
- * ¿QUÉ DEVUELVE?
- * Adaptadores, resolver y repositorio reales.
- *
- * ¿QUÉ NO DEBE HACER?
- * No accede a datos institucionales, copia instrumentos protegidos ni habilita proveedores.
- */
+/** Recupera datos brutos autorizados sin interpretación clínica. */
 abstract class AdaptadoresTestCase extends RepositoriosTestCase
 {
     /**
      * Prepara el control y metadatos físicos autorizados del escenario.
-     *
-     * @param  array<string, mixed>  $datos  Cambios explícitos del registro sintético.
-     * @return void Inserta solo fixtures, sin excepciones esperadas para el caso válido.
+     * @param array<string, mixed> $datos
+     * @return void
      */
     protected function prepararControl(array $datos = []): void
     {
@@ -60,13 +38,12 @@ abstract class AdaptadoresTestCase extends RepositoriosTestCase
 
     /**
      * Configura una fuente operativa del fixture sin modificar su estructura.
-     *
-     * @param  string  $tabla  Tabla existente.
-     * @param  string  $pk  PK existente.
-     * @param  string  $clave  Clave técnica explícita del registro de prueba.
-     * @param  string  $registro  ID original.
-     * @param  string  $campo  Campo directo seleccionado.
-     * @return void Solo datos artificiales del entorno desechable.
+     * @param string $tabla
+     * @param string $pk
+     * @param string $clave
+     * @param string $registro
+     * @param string $campo
+     * @return void
      */
     protected function cambiarFuente(string $tabla, string $pk, string $clave, string $registro, string $campo): void
     {
@@ -81,9 +58,8 @@ abstract class AdaptadoresTestCase extends RepositoriosTestCase
 
     /**
      * Registra únicamente las implementaciones explícitas del escenario.
-     *
-     * @param  AdaptadorInstrumentos|null  $instrumentos  Selectores del paquete ficticio.
-     * @return ResolutorFuenteExperta Resolver sin bindings globales.
+     * @param AdaptadorInstrumentos|null $instrumentos
+     * @return ResolutorFuenteExperta
      */
     protected function resolver(?AdaptadorInstrumentos $instrumentos = null): ResolutorFuenteExperta
     {
@@ -98,9 +74,8 @@ abstract class AdaptadoresTestCase extends RepositoriosTestCase
 
     /**
      * Conecta el extractor real mediante el contrato preparado en la etapa C.
-     *
-     * @param  AdaptadorInstrumentos|null  $instrumentos  Registro instrumental opcional del escenario.
-     * @return EvidenciaEloquentRepository Repositorio, extracción y mappers reales.
+     * @param AdaptadorInstrumentos|null $instrumentos
+     * @return EvidenciaEloquentRepository
      */
     protected function repositorioAdaptado(?AdaptadorInstrumentos $instrumentos = null): EvidenciaEloquentRepository
     {
@@ -110,7 +85,7 @@ abstract class AdaptadoresTestCase extends RepositoriosTestCase
         return new EvidenciaEloquentRepository(new MapeadorEvidencias($zona), Closure::fromCallable($extraer), $zona, $this->conexionPruebas());
     }
 
-    /** @return EvaluacionExperta Cabecera original de la prueba; sin parámetros ni excepciones esperadas. */
+    /** @return EvaluacionExperta */
     protected function evaluacion(): EvaluacionExperta
     {
         return EvaluacionExperta::on($this->conexionPruebas())->whereKey('SIM-EVAL')->firstOrFail();
@@ -118,10 +93,9 @@ abstract class AdaptadoresTestCase extends RepositoriosTestCase
 
     /**
      * Prepara una aplicación y respuesta completamente artificiales.
-     *
-     * @param  array<string, mixed>  $datos  Valores físicos de la respuesta.
-     * @param  string|null  $version  Versión formal; NULL no se reemplaza.
-     * @return void Solo fixtures sobre las tablas existentes.
+     * @param array<string, mixed> $datos
+     * @param string|null $version
+     * @return void
      */
     protected function prepararInstrumento(array $datos = [], ?string $version = 'SIM-ED1'): void
     {
@@ -143,9 +117,8 @@ abstract class AdaptadoresTestCase extends RepositoriosTestCase
 
     /**
      * Vincula un selector artificial sin asignarle interpretación cognitiva.
-     *
-     * @param  string  $campo  Columna de la respuesta.
-     * @return AdaptadorInstrumentos Registro explícito de ese selector en SIM-V1.
+     * @param string $campo
+     * @return AdaptadorInstrumentos
      */
     protected function selector(string $campo = 'valor_texto'): AdaptadorInstrumentos
     {

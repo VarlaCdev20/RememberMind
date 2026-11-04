@@ -12,37 +12,7 @@ use MotorExperto\dominio\orion\ValueObjects\Dcl\MotivoAbstencionEnum;
 use MotorExperto\dominio\orion\ValueObjects\Dcl\SubtipoDclEnum;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Application (Salida experimental de Petersen).
- *
- * TÍTULO:
- * Resultado experimental de clasificación Petersen.
- *
- * CAPA:
- * Application - Objetos de Transferencia de Datos (DTOs).
- *
- * ¿PARA QUÉ SIRVE?
- * Transporta el resultado original de Domain, sea un patrón candidato
- * sintético o una abstención, con sus requisitos y soportes.
- *
- * ¿QUÉ RECIBE?
- * La solicitud original y un ResultadoClasificacionDcl ya validado por Domain.
- *
- * ¿QUÉ HACE?
- * Contrasta el contexto y proyecta literalmente los estados, motivos, patrón
- * y versión contractual sin ofrecer parámetros para reemplazarlos.
- *
- * ¿QUÉ DEVUELVE?
- * Una salida inmutable vinculada a la evaluación y al perfil original.
- *
- * ¿QUÉ NO DEBE HACER?
- * No selecciona PET, acredita C01–C05, resuelve C03/C04 ni modifica abstenciones.
- * No expresa un diagnóstico o una conclusión etiológica.
- *
- * RELACIÓN CON O.R.I.O.N.:
- * Es el contrato de salida de CU-04; conserva PET-01 a PET-04 y los motivos
- * del contrato experimental verificado por PerfilRequisitosDcl.
- */
+/** Transporta el resultado original de Domain, sea un patrón candidato sintético o una abstención, con sus requisitos y soportes. */
 final readonly class ResultadoDclDTO
 {
     /** Identidad de la evaluación a la que pertenece esta salida. */
@@ -71,14 +41,9 @@ final readonly class ResultadoDclDTO
 
     /**
      * Proyecta una salida ya validada sin reimplementar el clasificador.
-     *
-     * @param  SolicitudInferenciaDTO  $solicitud  Contexto del análisis experimental.
-     * @param  ResultadoClasificacionDcl  $resultado  Salida original con perfil, explicación y reglas.
-     *
-     * @throws DomainException Si la salida pertenece a otro caso, evaluación, versión o corte.
-     *
-     * La exclusión entre patrón y abstención ya está garantizada por Domain;
-     * conservar su objeto mantiene también diferencial y condiciones verificadas.
+     * @param SolicitudInferenciaDTO $solicitud
+     * @param ResultadoClasificacionDcl $resultado
+     * @throws DomainException
      */
     public function __construct(
         /** Solicitud original. */ public SolicitudInferenciaDTO $solicitud,

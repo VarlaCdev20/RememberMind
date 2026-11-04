@@ -6,13 +6,7 @@ namespace MotorExperto\instrumentos;
 
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Comprobación de fuentes y completitud instrumental.
- *
- * Expone los faltantes del extractor y las restricciones del método ya ejecutado.
- * Cuenta datos tipados, incluidos cero y «No»; no acredita su veracidad, adopta
- * instrumentos ni convierte completitud de captura en interpretación clínica.
- */
+/** Informa faltantes y límites del método; una captura completa no demuestra alteración. */
 final class ComprobacionAdquisicionInstrumental
 {
     public function comprobar(array $capturas): array

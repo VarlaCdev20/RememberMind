@@ -9,12 +9,7 @@ use MotorExperto\conocimiento\PaqueteConocimiento;
 use MotorExperto\conocimiento\PertenenciaVariableCognitiva;
 use MotorExperto\hechos\MemoriaTrabajo;
 
-/**
- * Alcance de las conjunciones cognitivas sobre el AND D-130 existente.
- * Una tarea debe satisfacer su conjunción en una misma aplicación/fuente.
- * Una regla que declara variables de componentes distintos conserva su alcance multicomponente.
- * No convierte IDs o fechas diferentes en episodios clínicos independientes.
- */
+/** Alcance de las conjunciones cognitivas sobre el AND D-130 existente. */
 final class EvaluadorReglasCognitivas
 {
     public function evaluar(PaqueteConocimiento $p, MemoriaTrabajo $m, string $criterio): array

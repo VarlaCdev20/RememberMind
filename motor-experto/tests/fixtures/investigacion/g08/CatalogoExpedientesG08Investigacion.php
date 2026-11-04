@@ -6,11 +6,7 @@ namespace MotorExperto\investigacion\g08;
 
 use DomainException;
 
-/**
- * Inventario G08 documentado, NO un catálogo de instrumentos administrables.
- * Fuentes: G08 auditoría 2026-10-17 y resúmenes PubMed originales.
- * La palabra candidata significa EXISTENCIA BIBLIOGRÁFICA, nunca baremo elegido.
- */
+/** Inventario G08 documentado, NO un catálogo de instrumentos administrables. */
 final class CatalogoExpedientesG08Investigacion
 {
     public const VERSION = 'G08-AUDIT-20261017-R1';

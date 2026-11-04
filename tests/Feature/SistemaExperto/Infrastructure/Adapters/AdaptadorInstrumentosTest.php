@@ -12,31 +12,10 @@ use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 
-/**
- * TÍTULO:
- * Integración instrumental sin baremos inventados.
- *
- * CAPA:
- * Infrastructure - Adapters.
- *
- * ¿PARA QUÉ SIRVE?
- * Recupera datos brutos autorizados sin interpretación clínica.
- *
- * ¿QUÉ INFORMACIÓN RECIBE?
- * Aplicaciones y reactivos completamente ficticios, con versiones y mapeos explícitos.
- *
- * ¿QUÉ HACE?
- * Prueba campo directo, selector y todas sus referencias físicas con Eloquent real.
- *
- * ¿QUÉ DEVUELVE?
- * Valores brutos, NULL y procedencia original; fallos explícitos ante incompatibilidad.
- *
- * ¿QUÉ NO DEBE HACER?
- * No reproduce instrumentos reales ni atribuye dominios desde totales o preguntas.dominio.
- */
+/** Recupera datos brutos autorizados sin interpretación clínica. */
 final class AdaptadorInstrumentosTest extends AdaptadoresTestCase
 {
-    /** El total cero es un hecho bruto, sin puntuación cognitiva; sin parámetros ni excepciones esperadas. */
+    /** El total cero es un hecho bruto, sin puntuación cognitiva */
     public function test_total_cero_se_transporta_como_hecho_sin_interpretacion(): void
     {
         $this->prepararInstrumento();
@@ -51,7 +30,7 @@ final class AdaptadorInstrumentosTest extends AdaptadoresTestCase
         $this->exigirSoloLecturas();
     }
 
-    /** El total NULL continúa NULL y la versión ausente no se completa; sin parámetros ni excepciones esperadas. */
+    /** El total NULL continúa NULL y la versión ausente no se completa */
     public function test_total_y_version_null_no_reciben_valores_por_defecto(): void
     {
         $this->prepararInstrumento(version: null);
@@ -66,11 +45,10 @@ final class AdaptadorInstrumentosTest extends AdaptadoresTestCase
 
     /**
      * Una respuesta existente se conserva con el tipo de su columna configurada.
-     *
-     * @param  string  $campo  Columna autorizada de la respuesta.
-     * @param  string|bool|null  $valor  Valor original.
-     * @param  string|bool|null  $esperado  Valor tipado esperado sin baremación.
-     * @return void Sin excepciones esperadas.
+     * @param string $campo
+     * @param string|bool|null $valor
+     * @param string|bool|null $esperado
+     * @return void
      */
     #[DataProvider('respuestasBrutas')]
     public function test_selector_conserva_null_false_cero_y_decimal(string $campo, string|bool|null $valor, string|bool|null $esperado): void
@@ -85,7 +63,7 @@ final class AdaptadorInstrumentosTest extends AdaptadoresTestCase
         self::assertSame('SIM-INST', $memoria->evidencias['SIM-EVID']->instrumentoId);
     }
 
-    /** @return iterable<string, array{string, string|bool|null, string|bool|null}> Casos físicos independientes; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string, string|bool|null, string|bool|null}> */
     public static function respuestasBrutas(): iterable
     {
         yield 'texto NULL' => ['valor_texto', null, null];
@@ -96,7 +74,7 @@ final class AdaptadorInstrumentosTest extends AdaptadoresTestCase
         yield 'decimal' => ['valor_numero', '12.3456', '12.3456'];
     }
 
-    /** Una opción se conserva por su PK y no se puntúa automáticamente; sin parámetros ni excepciones esperadas. */
+    /** Una opción se conserva por su PK y no se puntúa automáticamente */
     public function test_selector_opcion_preserva_fk_y_procedencia_sin_usar_su_puntaje(): void
     {
         $this->prepararInstrumento(['cod_opcion' => 'SIM-OPC']);
@@ -131,10 +109,8 @@ final class AdaptadorInstrumentosTest extends AdaptadoresTestCase
 
     /**
      * Una versión formal distinta o ausente no habilita el selector.
-     *
-     * @param  string|null  $version  Versión física no coincidente.
-     *
-     * @throws DomainException Rechazo esperado sin elegir una versión por defecto.
+     * @param string|null $version
+     * @throws DomainException
      */
     #[DataProvider('versionesIncompatibles')]
     public function test_selector_exige_la_version_formal_exacta(?string $version): void
@@ -145,7 +121,7 @@ final class AdaptadorInstrumentosTest extends AdaptadoresTestCase
         $this->repositorioAdaptado($adaptador)->paraEvaluacion('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', self::corte());
     }
 
-    /** @return iterable<string, array{string|null}> Versiones incompatibles; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string|null}> */
     public static function versionesIncompatibles(): iterable
     {
         yield 'ausente' => [null];
@@ -176,10 +152,8 @@ final class AdaptadorInstrumentosTest extends AdaptadoresTestCase
 
     /**
      * Solo el estado operacional COMPLETA habilita una aplicación.
-     *
-     * @param  string  $estado  Estado incompatible.
-     *
-     * @throws DomainException Rechazo esperado tanto del adaptador como del mapper.
+     * @param string $estado
+     * @throws DomainException
      */
     #[DataProvider('estadosInvalidos')]
     public function test_no_cambia_el_estado_de_la_aplicacion_para_habilitarla(string $estado): void
@@ -190,14 +164,14 @@ final class AdaptadorInstrumentosTest extends AdaptadoresTestCase
         $this->repositorioAdaptado()->paraEvaluacion('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', self::corte());
     }
 
-    /** @return iterable<string, array{string}> Estados no admitidos; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string}> */
     public static function estadosInvalidos(): iterable
     {
         yield 'anulada' => ['ANULADA'];
         yield 'alias de otra fuente' => ['VIGENTE'];
     }
 
-    /** No carga preguntas/respuestas de una aplicación futura; sin parámetros ni excepciones esperadas. */
+    /** No carga preguntas/respuestas de una aplicación futura */
     public function test_instrumento_posterior_al_corte_no_carga_sus_respuestas(): void
     {
         $this->prepararInstrumento();

@@ -8,12 +8,7 @@ use MotorExperto\inferencia\EvaluarPetersenInstitucional;
 
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Interpretación original, anterior a la clasificación.
- * Conserva el juicio y sus soportes; no acepta un patrón DCL esperado como entrada.
- * C02 se obtiene del perfil y no puede declararse como valoración independiente.
- * Las comprobaciones son condiciones documentadas de la valoración original, no firmas posteriores.
- */
+/** Conserva el juicio original y sus soportes; la alteración objetiva se deriva del perfil. */
 final readonly class ValoracionOriginalPetersen
 {
     public const COMPROBACIONES = [

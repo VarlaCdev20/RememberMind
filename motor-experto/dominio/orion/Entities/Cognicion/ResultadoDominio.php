@@ -12,35 +12,7 @@ use MotorExperto\dominio\orion\ValueObjects\Cognicion\EvaluabilidadEnum;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Motor de inferencia (Resultados por dominio).
- *
- * Representa el estado declarado de un dominio con su evaluabilidad y soportes.
- * Distingue evidencia suficiente, desconocimiento, falta de interpretabilidad y contradicción.
- *
- * TÍTULO: Resultado de dominio sustentado y no agregado.
- *
- * CAPA: Domain.
- *
- * SUBSISTEMA: Motor de inferencia.
- *
- * RESPONSABILIDAD:
- * Validar un estado declarado del dominio sin deducirlo de tareas aisladas.
- *
- * ENTRADAS:
- * Dominio, A/P/U/I/X, evaluabilidad, memoria, subresultados y soportes seleccionados.
- *
- * SALIDAS:
- * Resultado inmutable con evidencia original y requisitos constructivos explícitos.
- *
- * RESTRICCIONES:
- * A/P exigen evaluación integrada y referencia externa sintética de alcance
- * completo. No se exige línea basal automáticamente ni cantidad clínica fija
- * de instrumentos. El constructor verifica declaraciones; no integra hallazgos.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R1/R2/R3/R4/R6/R8/R9; DCL-PET-20261017-v0.1.
- */
+/** Conserva el estado declarado de un dominio y sus evidencias. */
 final readonly class ResultadoDominio
 {
     /** @var array<string, ResultadoSubcomponente> Subresultados por código, sin promedios. */
@@ -51,15 +23,14 @@ final readonly class ResultadoDominio
 
     /**
      * Comprueba un estado explícito y sus soportes, sin asignarlo automáticamente.
-     *
-     * @param DominioCognitivoEnum $dominio Dominio propietario.
-     * @param EstadoDominioEnum $estado Estado declarado.
-     * @param EvaluabilidadEnum $evaluabilidad Compuerta declarada por separado.
-     * @param MemoriaTrabajo $memoria Única instantánea propietaria.
-     * @param list<ResultadoSubcomponente> $subcomponentes Resultados específicos.
-     * @param list<string> $evidenciasIds Soportes originales en memoria.
-     * @param string $justificacion Razón explícita de interpretación o abstención.
-     * @throws DomainException Por alcance, contexto, duplicación o conclusión insuficiente.
+     * @param DominioCognitivoEnum $dominio
+     * @param EstadoDominioEnum $estado
+     * @param EvaluabilidadEnum $evaluabilidad
+     * @param MemoriaTrabajo $memoria
+     * @param list<ResultadoSubcomponente> $subcomponentes
+     * @param list<string> $evidenciasIds
+     * @param string $justificacion
+     * @throws DomainException
      */
     public function __construct(
         /** Dominio propietario. */ public DominioCognitivoEnum $dominio,
@@ -121,10 +92,7 @@ final readonly class ResultadoDominio
 
     /**
      * Selecciona soportes positivos del estado A/P ya declarado y validado.
-     *
-     * @return list<EvidenciaCognitiva> Referencias completas; vacío para U/I/X.
-     *
-     * No recibe parámetros ni lanza excepciones. No calcula el estado.
+     * @return list<EvidenciaCognitiva>
      */
     public function soportesPositivos(): array
     {

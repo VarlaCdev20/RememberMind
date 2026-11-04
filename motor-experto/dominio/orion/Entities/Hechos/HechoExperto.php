@@ -7,51 +7,22 @@ namespace MotorExperto\dominio\orion\Entities\Hechos;
 use DateTimeImmutable;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Memoria de trabajo (Hechos originales).
- *
- * Conserva un dato junto con su evaluación, residente, episodio, origen y fecha.
- * Mantiene distintos la ausencia, el valor false y el cero para evitar conclusiones implícitas.
- *
- * TÍTULO: Hecho atómico con procedencia y contexto.
- *
- * CAPA: Domain.
- *
- * SUBSISTEMA: Memoria de trabajo.
- *
- * RESPONSABILIDAD:
- * Conservar un valor original y la identidad temporal de la fuente que lo produjo.
- *
- * ENTRADAS:
- * Identificadores explícitos de hecho, evaluación, residente, episodio, fuente,
- * registro original, versión, concepto, fecha y valor escalar o ausente.
- *
- * SALIDAS:
- * Una instantánea inmutable y comprobaciones de pertenencia al caso.
- *
- * RESTRICCIONES:
- * No consulta persistencia ni transforma null, false o cero en normalidad.
- * Los identificadores son tokens técnicos no vacíos; no se imponen PK de BDD.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R1/R3/R4 y contrato de procedencia D-124/D-137.
- */
+/** Conserva el dato original, su fuente y su contexto; distingue ausencia, falso y cero. */
 final readonly class HechoExperto
 {
     /**
      * Construye un hecho sin normalizar ni completar su contenido.
-     *
-     * @param string $id Identidad única de este hecho.
-     * @param string $evaluacionId Evaluación propietaria.
-     * @param string $residenteId Sujeto propietario; no se busca en una BDD.
-     * @param string $episodioId Episodio original, conservado entre relecturas.
-     * @param string $fuenteId Tipo o sistema de origen identificable.
-     * @param string $origenId Identidad atómica del registro o resultado fuente.
-     * @param string $versionConocimiento Versión de interpretación de la instantánea.
-     * @param string $concepto Concepto o variable representado.
-     * @param DateTimeImmutable $fecha Fecha del hecho, nunca sustituida por ahora.
-     * @param string|int|float|bool|null $valor Dato original, con ausencia explícita.
-     * @throws DomainException Por identidad vacía, espacios de control o número no finito.
+     * @param string $id
+     * @param string $evaluacionId
+     * @param string $residenteId
+     * @param string $episodioId
+     * @param string $fuenteId
+     * @param string $origenId
+     * @param string $versionConocimiento
+     * @param string $concepto
+     * @param DateTimeImmutable $fecha
+     * @param string|int|float|bool|null $valor
+     * @throws DomainException
      */
     public function __construct(
         /** Identificador del hecho. */ public string $id,
@@ -77,13 +48,12 @@ final readonly class HechoExperto
 
     /**
      * Comprueba pertenencia y corte sin interpretar el valor.
-     *
-     * @param string $evaluacionId Evaluación esperada.
-     * @param string $residenteId Sujeto esperado.
-     * @param string $versionConocimiento Versión esperada.
-     * @param DateTimeImmutable $fechaCorte Última fecha admitida, inclusiva.
+     * @param string $evaluacionId
+     * @param string $residenteId
+     * @param string $versionConocimiento
+     * @param DateTimeImmutable $fechaCorte
      * @return void
-     * @throws DomainException Si el hecho es ajeno o posterior al corte.
+     * @throws DomainException
      */
     public function exigirContexto(string $evaluacionId, string $residenteId, string $versionConocimiento, DateTimeImmutable $fechaCorte): void
     {
@@ -95,10 +65,7 @@ final readonly class HechoExperto
 
     /**
      * Identifica una fuente atómica aunque se cambie el ID local del hecho.
-     *
-     * @return non-empty-string Tupla serializada, no dato persistido ni expresión.
-     *
-     * No recibe parámetros ni lanza excepciones para el estado construido.
+     * @return non-empty-string
      */
     public function claveOrigen(): string
     {

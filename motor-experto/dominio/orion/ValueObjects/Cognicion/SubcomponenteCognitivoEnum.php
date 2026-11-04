@@ -4,43 +4,7 @@ declare(strict_types=1);
 
 namespace MotorExperto\dominio\orion\ValueObjects\Cognicion;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Base de conocimiento (Subcomponentes cognitivos).
- *
- * Identifica los diecinueve subcomponentes y su pertenencia a un dominio primario.
- * Esta correspondencia conserva el alcance de las tareas y no acredita alteración del dominio completo.
- *
- * TÍTULO: Identidad y pertenencia de los 19 subcomponentes.
- *
- * CAPA: Domain.
- *
- * SUBSISTEMA: Base de conocimiento.
- *
- * RESPONSABILIDAD:
- * Asociar cada código documental a un único dominio primario del perfil.
- *
- * ENTRADAS:
- * Un código MEM-S01…04, ATE-S01…03, EJE-S01…05, LEN-S01…05 o VIS-S01…02.
- *
- * SALIDAS:
- * Un subcomponente tipado y su dominio primario, sin inferencia de rendimiento.
- *
- * RESTRICCIONES:
- * La pertenencia no crea evidencia ni la vuelve independiente; un solapamiento
- * entre tareas no autoriza doble conteo ni alteración de todo un dominio.
- * Los subcomponentes siguen siendo conceptos documentales, no instrumentos
- * aprobados, baremos, permisos de aplicación ni reglas clínicas ejecutables.
- *
- * TRAZABILIDAD:
- * Catálogo O.R.I.O.N. local orion-v1-conceptos.json, consulta 2026-10-08;
- * PaquetesCandidatosCognitivos D-108/D-135 y G09-EXP-20261017 experimental.
- * Reglamento maestro, Fase A, R3, R6 y R8.
- *
- * Las propiedades nativas e inmutables name y value conservan, respectivamente,
- * el identificador PHP del caso y su literal de intercambio. from() rechaza
- * valores ajenos mediante ValueError; tryFrom() devuelve null sin sustituirlo
- * por un estado favorable. Estas operaciones no ejecutan inferencias.
- */
+/** Asocia cada componente cognitivo a su dominio primario. */
 enum SubcomponenteCognitivoEnum: string
 {
     /** MEM-S01: aprendizaje y adquisición. */
@@ -102,13 +66,7 @@ enum SubcomponenteCognitivoEnum: string
 
     /**
      * Devuelve la adscripción primaria del subcomponente, sin valorar evidencia.
-     *
-     * El mapeo explícito conserva la frontera de EJE-S03 con memoria y evita
-     * asignar un mismo subcomponente a dos ejes por semejanza de su nombre.
-     *
-     * @return DominioCognitivoEnum Dominio documental propietario primario.
-     *
-     * No recibe parámetros ni lanza excepciones: todos los casos están cubiertos.
+     * @return DominioCognitivoEnum
      */
     public function dominio(): DominioCognitivoEnum
     {

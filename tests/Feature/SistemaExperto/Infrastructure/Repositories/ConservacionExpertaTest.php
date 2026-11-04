@@ -40,15 +40,7 @@ use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;
 use Tests\Unit\SistemaExperto\Domain\Services\Inferencia\EscenarioInferencia;
 use Tests\Unit\SistemaExperto\Infrastructure\Mappers\EscenarioMapeadores;
 
-/**
- * TÍTULO: Conservación exacta sobre esquema real y base desechable.
- * CAPA: Infrastructure — pruebas de integración.
- * ¿PARA QUÉ SIRVE? Demuestra recuperación durable, atomicidad e inmutabilidad.
- * ¿QUÉ RECIBE? Objetos y referencias institucionales completamente ficticios.
- * ¿QUÉ HACE? Guarda y recupera con nuevas instancias del repositorio real.
- * ¿QUÉ DEVUELVE? Evidencia de tipos, identidad compartida, orden, FK y rollback.
- * ¿QUÉ NO DEBE HACER? No simula SQL ni declara evaluación posterior en uso real.
- */
+/** Demuestra recuperación durable, atomicidad e inmutabilidad. */
 final class ConservacionExpertaTest extends RepositoriosTestCase
 {
     use \Tests\Support\CorromperConservacionParaPrueba;

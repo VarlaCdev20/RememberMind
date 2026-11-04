@@ -13,35 +13,7 @@ use MotorExperto\dominio\orion\ValueObjects\Dcl\SubtipoDclEnum;
 use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Clasificación experimental (Salida y trazabilidad).
- *
- * Conserva un patrón candidato declarado o una abstención con razones y antecedentes.
- * Valida la coherencia de la salida en escenarios sintéticos, sin emitir un diagnóstico clínico.
- *
- * TÍTULO: Resultado candidato o abstención trazable.
- *
- * CAPA: Domain.
- *
- * SUBSISTEMA: Clasificación y explicación experimental.
- *
- * RESPONSABILIDAD:
- * Conservar una salida declarada coherente, sin ejecutar la clasificación.
- *
- * ENTRADAS:
- * Perfil, patrón opcional, motivos separados, justificación y reglas técnicas aplicadas.
- *
- * SALIDAS:
- * Resultado inmutable exclusivamente sintético con acceso a todos sus soportes.
- *
- * RESTRICCIONES:
- * No decide qué patrón emitir: el servicio futuro lo hará. El constructor solo
- * rechaza candidatos incompatibles con sus precondiciones y distribución.
- * No constituye diagnóstico, etiología, pronóstico ni autorización asistencial.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R1/R3/R4/R7/R9/R10; DCL-PET-20261017-v0.1 §§4–6.
- */
+/** Conserva un patrón orientativo o una abstención con sus motivos y fuentes. */
 final readonly class ResultadoClasificacionDcl
 {
     /** Marcador inmutable de alcance, nunca habilitación clínica. */
@@ -55,13 +27,12 @@ final readonly class ResultadoClasificacionDcl
 
     /**
      * Valida una salida declarada; nunca selecciona automáticamente un patrón.
-     *
-     * @param PerfilRequisitosDcl $perfil Entradas y soportes originales.
-     * @param SubtipoDclEnum|null $patronCandidato Patrón propuesto o null si no concluye.
-     * @param list<MotivoAbstencionEnum> $motivos Razones explícitas de no conclusión.
-     * @param string $justificacion Explicación de la salida.
-     * @param list<ReglaExperta> $reglasAplicadas Reglas técnicas realmente declaradas como aplicadas.
-     * @throws DomainException Por salida ambigua, insuficiente, incoherente o de otra versión.
+     * @param PerfilRequisitosDcl $perfil
+     * @param SubtipoDclEnum|null $patronCandidato
+     * @param list<MotivoAbstencionEnum> $motivos
+     * @param string $justificacion
+     * @param list<ReglaExperta> $reglasAplicadas
+     * @throws DomainException
      */
     public function __construct(
         /** Perfil original de la simulación. */ public PerfilRequisitosDcl $perfil,

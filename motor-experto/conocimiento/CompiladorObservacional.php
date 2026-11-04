@@ -7,11 +7,7 @@ namespace MotorExperto\conocimiento;
 use DomainException;
 use MotorExperto\conocimiento\ReglasObservacionales as Motor;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Conocimiento observacional versionado.
- * Compila únicamente las implicaciones booleanas descriptivas ya representadas.
- * No ejecuta expresiones de metadatos, interpreta instrumentos ni añade reglas clínicas.
- */
+/** Compila las reglas booleanas de observación de una versión. */
 final class CompiladorObservacional
 {
     /** $ejecutadas congela la selección histórica; una revisión posterior no cambia su causalidad. */

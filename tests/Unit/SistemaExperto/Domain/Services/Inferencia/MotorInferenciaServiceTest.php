@@ -21,16 +21,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;
 
-/**
- * TÍTULO: Integración real de compuertas, semántica y reglas.
- * CAPA: Domain (pruebas).
- * SUBSISTEMA: Inferencia.
- * RESPONSABILIDAD: Probar perfil completo, ausencia, conflicto y separación G09/A-P.
- * ENTRADAS: Memorias y grafo ficticios; colaboradores reales sin mocks.
- * SALIDAS: Cinco dominios, trazas y exclusiones conservadas.
- * RESTRICCIONES: No activa uso clínico ni genera datos institucionales.
- * TRAZABILIDAD: R1–R10 y puente de referencias DCL experimental.
- */
+/** Probar perfil completo, ausencia, conflicto y separación G09/A-P. */
 final class MotorInferenciaServiceTest extends TestCase
 {
     /** Referencias completas y contexto acreditado permiten A/P sin exigir basal previa. */

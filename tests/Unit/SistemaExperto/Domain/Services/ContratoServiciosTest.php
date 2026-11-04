@@ -17,36 +17,12 @@ use MotorExperto\dominio\orion\Services\Semantica\EvaluadorRedSemanticaService;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
-/**
- * TÍTULO: Documentación y frontera de los diez servicios solicitados.
- *
- * CAPA: Domain (verificación unitaria).
- *
- * SUBSISTEMA: Repositorios y compuertas.
- *
- * RESPONSABILIDAD:
- * Verificar contratos explícitos con fuentes artificiales y objetos reales.
- *
- * ENTRADAS:
- * Identidades, declaraciones y referencias ficticias de prueba.
- *
- * SALIDAS:
- * Objetos sintéticos o aserciones sobre preservación y rechazo.
- *
- * RESTRICCIONES:
- * No inicia Laravel, no consulta persistencia ni acredita evaluación posterior en uso real.
- *
- * TRAZABILIDAD:
- * Reglamento maestro, Fases C/D e invariantes R1–R10.
- */
+/** Verificar contratos explícitos con fuentes artificiales y objetos reales. */
 final class ContratoServiciosTest extends TestCase
 {
     /**
      * Verifica documentación, tipos e inmutabilidad de los colaboradores.
-     *
      * @return void
-     *
-     * No recibe parámetros ni ejecuta componentes fuera del alcance C/D.
      */
     public function test_servicios_puros_tipados_y_documentados(): void
     {
@@ -58,9 +34,10 @@ final class ContratoServiciosTest extends TestCase
             self::assertTrue($r->isFinal());
             self::assertTrue($r->isReadOnly());
             self::assertStringStartsWith("<?php\n\ndeclare(strict_types=1);", file_get_contents($r->getFileName()));
-            foreach (['TÍTULO:', 'CAPA:', 'SUBSISTEMA:', 'RESPONSABILIDAD:', 'ENTRADAS:', 'SALIDAS:', 'RESTRICCIONES:', 'TRAZABILIDAD:'] as $campo) {
-                self::assertStringContainsString($campo, $r->getDocComment());
-            }
+            $doc = $r->getDocComment();
+            self::assertIsString($doc);
+            self::assertMatchesRegularExpression('/\p{L}{3}/u', $doc);
+            self::assertLessThanOrEqual(240, mb_strlen($doc));
             foreach ($r->getProperties() as $propiedad) {
                 self::assertTrue($propiedad->isReadOnly());
                 self::assertNotFalse($propiedad->getDocComment());

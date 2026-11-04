@@ -13,16 +13,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;
 
-/**
- * TÍTULO: Contraste del clasificador con las 62 filas oficiales de la matriz 03A.
- * CAPA: Domain (pruebas).
- * SUBSISTEMA: DCL experimental.
- * RESPONSABILIDAD: Verificar patrones, abstenciones y precedencias con un oráculo externo.
- * ENTRADAS: CSV oficiales congelados, con procedencia en Fixtures/README.md.
- * SALIDAS: Igualdad literal con cada resultado esperado, sin traducirlo por conveniencia.
- * RESTRICCIONES: Solo escenarios ficticios; no equivale a evaluación posterior en uso real.
- * TRAZABILIDAD: DCL-PET-20261017-v0.1 y conciliación CAS-09/CAS-10/CAS-11.
- */
+/** Verificar patrones, abstenciones y precedencias con un oráculo externo. */
 final class ClasificadorPetersenServiceTest extends TestCase
 {
     /** @return iterable<string, array{array}> Filas externas de las dos hojas, sin ejecutar red durante tests. */

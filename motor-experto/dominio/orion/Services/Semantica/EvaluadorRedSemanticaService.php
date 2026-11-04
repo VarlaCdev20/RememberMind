@@ -10,39 +10,15 @@ use MotorExperto\dominio\orion\ValueObjects\Conocimiento\EstadoReglaEnum;
 use MotorExperto\dominio\orion\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
 use DomainException;
 
-/**
- * TÍTULO: EvaluadorRedSemanticaService.
- *
- * CAPA: Domain.
- *
- * SUBSISTEMA: Red semántica.
- *
- * RESPONSABILIDAD:
- * Validar contratos tipados del grafo y consultar vínculos directos habilitados.
- *
- * ENTRADAS:
- * Red versionada, contratos explícitos por predicado y tipos, y habilitaciones.
- *
- * SALIDAS:
- * Aristas originales validadas y consulta trazable de una conexión exacta.
- *
- * RESTRICCIONES:
- * No inventa caminos, equivalencias, inversas o enlaces; existir no autoriza
- * participar. Las habilitaciones ausentes permanecen desconocidas.
- * Los campos de contrato son propuestas técnicas internas; no permisos clínicos.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R1/R4/R8/R10 y contratos versionados de aristas D-123.
- */
+/** Comprueba relaciones directas y su habilitación; no inventa vínculos ni caminos. */
 final readonly class EvaluadorRedSemanticaService
 {
     /**
      * Valida cada arista contra un contrato único de versión, predicado y tipos.
-     *
-     * @param RedSemantica $red Instantánea original.
-     * @param list<array{versionConocimiento: string, tipo: TipoRelacionSemanticaEnum, tipoOrigen: string, tipoDestino: string, habilitaParticipacion: bool}> $contratos Contratos explícitos.
-     * @return array<string, array{relacion: RelacionSemantica, contrato: array}> Aristas por ID y contrato coincidente.
-     * @throws DomainException Por versión, ambigüedad, tipo o contrato ausente.
+     * @param RedSemantica $red
+     * @param list<array{versionConocimiento: string, tipo: TipoRelacionSemanticaEnum, tipoOrigen: string, tipoDestino: string, habilitaParticipacion: bool}> $contratos
+     * @return array<string, array{relacion: RelacionSemantica, contrato: array}>
+     * @throws DomainException
      */
     public function validarRed(RedSemantica $red, array $contratos): array
     {
@@ -62,20 +38,14 @@ final readonly class EvaluadorRedSemanticaService
 
     /**
      * Consulta una arista dirigida exacta sin usar transitividad ni inversión.
-     *
-     * NO_CUMPLE solo significa que esa arista está ausente de esta instantánea;
-     * no convierte ausencia de evidencia cognitiva en normalidad. CUMPLE solo
-     * confirma el vínculo habilitado técnicamente. La participación requiere
-     * además el contrato explícito habilitaParticipacion=true.
-     *
-     * @param RedSemantica $red Red original.
-     * @param string $origenId Nodo de origen existente.
-     * @param TipoRelacionSemanticaEnum $tipo Predicado solicitado.
-     * @param string $destinoId Nodo de destino existente.
-     * @param list<array{versionConocimiento: string, tipo: TipoRelacionSemanticaEnum, tipoOrigen: string, tipoDestino: string, habilitaParticipacion: bool}> $contratos Contratos versionados.
-     * @param array<string, ?bool> $habilitaciones Declaraciones técnicas por ID de arista.
-     * @return array{versionConocimiento: string, estado: EstadoReglaEnum, relacion: ?RelacionSemantica, habilitada: ?bool, autorizaParticipacion: bool, motivo: string} Consulta trazable.
-     * @throws DomainException Por nodos ausentes, contrato incompatible o habilitación inválida.
+     * @param RedSemantica $red
+     * @param string $origenId
+     * @param TipoRelacionSemanticaEnum $tipo
+     * @param string $destinoId
+     * @param list<array{versionConocimiento: string, tipo: TipoRelacionSemanticaEnum, tipoOrigen: string, tipoDestino: string, habilitaParticipacion: bool}> $contratos
+     * @param array<string, ?bool> $habilitaciones
+     * @return array{versionConocimiento: string, estado: EstadoReglaEnum, relacion: ?RelacionSemantica, habilitada: ?bool, autorizaParticipacion: bool, motivo: string}
+     * @throws DomainException
      */
     public function evaluarRelacion(RedSemantica $red, string $origenId, TipoRelacionSemanticaEnum $tipo, string $destinoId,
         array $contratos, array $habilitaciones = []): array
@@ -119,11 +89,10 @@ final readonly class EvaluadorRedSemanticaService
 
     /**
      * Normaliza contratos y rechaza duplicación exacta o formas abiertas ambiguas.
-     *
-     * @param RedSemantica $red Versión propietaria.
-     * @param list<array<string, mixed>> $contratos Estructuras declaradas.
-     * @return array<string, array{versionConocimiento: string, tipo: TipoRelacionSemanticaEnum, tipoOrigen: string, tipoDestino: string, habilitaParticipacion: bool}> Índice único.
-     * @throws DomainException Por contrato mal formado, duplicado o de otra versión.
+     * @param RedSemantica $red
+     * @param list<array<string, mixed>> $contratos
+     * @return array<string, array{versionConocimiento: string, tipo: TipoRelacionSemanticaEnum, tipoOrigen: string, tipoDestino: string, habilitaParticipacion: bool}>
+     * @throws DomainException
      */
     private function indexarContratos(RedSemantica $red, array $contratos): array
     {

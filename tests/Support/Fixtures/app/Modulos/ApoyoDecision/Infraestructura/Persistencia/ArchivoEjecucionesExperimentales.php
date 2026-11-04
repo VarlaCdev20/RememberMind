@@ -14,11 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use MotorExperto\conservacion\CodecInstantanea;
 use RuntimeException;
 
-/**
- * Archivo privado cifrado de evidencia de pruebas, permitido por §14 del Prompt Maestro.
- * Conserva entradas/salidas técnicas; no sustituye las tablas expertas, historia clínica
- * ni el contrato pendiente de conservación institucional del manifiesto compuesto.
- */
+/** Archivo privado cifrado de evidencia de pruebas, permitido por §14 del Prompt Maestro. */
 final class ArchivoEjecucionesExperimentales implements AlmacenEjecucionesExperimentales
 {
     public const VERSION = 'ARCHIVO-PERFIL-TEST-1';

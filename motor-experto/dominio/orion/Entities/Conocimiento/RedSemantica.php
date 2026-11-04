@@ -7,34 +7,7 @@ namespace MotorExperto\dominio\orion\Entities\Conocimiento;
 use MotorExperto\dominio\orion\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Base de conocimiento (Red semántica).
- *
- * Reúne los conceptos y relaciones explícitos de una versión del conocimiento.
- * Permite consultar el grafo conservando la identidad de sus nodos y aristas.
- *
- * TÍTULO: Instantánea inmutable del grafo semántico.
- *
- * CAPA: Domain.
- *
- * SUBSISTEMA: Base de conocimiento.
- *
- * RESPONSABILIDAD:
- * Validar unicidad de nodos, códigos y aristas y pertenencia de sus extremos.
- *
- * ENTRADAS:
- * Versión explícita, lista de nodos y lista de relaciones ya construidas.
- *
- * SALIDAS:
- * Mapas canónicos y consultas de conexiones directas existentes.
- *
- * RESTRICCIONES:
- * No completa caminos, no invierte relaciones ni calcula inferencias clínicas.
- * Conserva exactamente los nodos recibidos; las versiones nunca se fusionan.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R4/R10 y red versionada del motor D-123/D-137.
- */
+/** Conserva los conceptos y vínculos explícitos de una versión; no añade conexiones. */
 final readonly class RedSemantica
 {
     /** @var array<string, NodoSemantico> Nodos por identidad única. */
@@ -45,11 +18,10 @@ final readonly class RedSemantica
 
     /**
      * Construye una instantánea consistente, incluso cuando está vacía.
-     *
-     * @param string $versionConocimiento Versión única del grafo.
-     * @param list<NodoSemantico> $nodos Nodos explícitos.
-     * @param list<RelacionSemantica> $relaciones Relaciones explícitas.
-     * @throws DomainException Por colección mal tipada, duplicación o extremo ajeno.
+     * @param string $versionConocimiento
+     * @param list<NodoSemantico> $nodos
+     * @param list<RelacionSemantica> $relaciones
+     * @throws DomainException
      */
     public function __construct(
         /** Versión del grafo. */ public string $versionConocimiento,
@@ -89,10 +61,9 @@ final readonly class RedSemantica
 
     /**
      * Recupera un nodo existente, sin fabricar un reemplazo.
-     *
-     * @param string $id Identidad solicitada.
-     * @return NodoSemantico Nodo original.
-     * @throws DomainException Si no pertenece al grafo.
+     * @param string $id
+     * @return NodoSemantico
+     * @throws DomainException
      */
     public function nodo(string $id): NodoSemantico
     {
@@ -101,11 +72,10 @@ final readonly class RedSemantica
 
     /**
      * Consulta exclusivamente aristas salientes directas.
-     *
-     * @param string $origenId Nodo de origen existente.
-     * @param TipoRelacionSemanticaEnum|null $tipo Predicado opcional de filtro.
-     * @return list<RelacionSemantica> Aristas originales, nunca inferidas.
-     * @throws DomainException Si el origen no pertenece al grafo.
+     * @param string $origenId
+     * @param TipoRelacionSemanticaEnum|null $tipo
+     * @return list<RelacionSemantica>
+     * @throws DomainException
      */
     public function salientes(string $origenId, ?TipoRelacionSemanticaEnum $tipo = null): array
     {

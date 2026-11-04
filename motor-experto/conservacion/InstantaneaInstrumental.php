@@ -16,11 +16,7 @@ use MotorExperto\instrumentos\ExtractorCapturaInstrumental;
 use MotorExperto\instrumentos\PerfilInstrumentalCognitivo;
 use MotorExperto\hechos\ContextoEjecucion;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Preparación de conservación y reproducción.
- * DTO inmutable en memoria con fuentes, contrato, revisión y salida declarativa verificables.
- * No es un repositorio, archivo clínico, firma profesional ni autorización para persistir JSON.
- */
+/** Reúne fuentes, versión y resultado verificables en memoria; no guarda una historia clínica. */
 final readonly class InstantaneaInstrumental
 {
     private function __construct(public array $contenido, public string $huella) {}
@@ -80,10 +76,7 @@ final readonly class InstantaneaInstrumental
         return $original;
     }
 
-    /**
-     * Comprueba contenido recuperado contra una huella confiable sin recalcular la salida.
-     * No acredita almacenamiento, autenticidad de una huella aportada por cliente ni validez clínica.
-     */
+    /** Comprueba contenido recuperado contra una huella confiable sin recalcular la salida. */
     public static function verificarIntegridad(array $contenido, string $huella): self
     {
         $contenido = IntegridadPreparacion::comprobar($contenido, $huella);

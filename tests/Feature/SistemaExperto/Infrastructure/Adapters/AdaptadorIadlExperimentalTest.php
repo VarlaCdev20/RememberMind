@@ -14,15 +14,7 @@ use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 
-/**
- * TÍTULO: Fuente IADL aprobada, leída sobre las migraciones reales.
- * CAPA: Infrastructure - Adapters (integración).
- * ¿PARA QUÉ SIRVE? Verifica identidad, corte, NULL, FK e historia sin interpretación clínica.
- * ¿QUÉ INFORMACIÓN RECIBE? Una base desechable y observaciones totalmente sintéticas.
- * ¿QUÉ HACE? Ejecuta adaptador, extractor, mapper y repositorio reales.
- * ¿QUÉ DEVUELVE? Aserciones sobre hechos descriptivos y rechazos sin efectos parciales.
- * ¿QUÉ NO DEBE HACER? No crea residentes como fallback ni acredita C03 desde la causa de ayuda.
- */
+/** Verifica identidad, corte, NULL, FK e historia sin interpretación clínica. */
 final class AdaptadorIadlExperimentalTest extends AdaptadoresTestCase
 {
     /** La observación NULL permanece NULL y no se crea acreditación C03 o evidencia cognitiva. */
@@ -143,7 +135,10 @@ final class AdaptadorIadlExperimentalTest extends AdaptadoresTestCase
         self::assertSame(1, DB::table('controles_funcionales_iadl')->count());
     }
 
-    /** @param array $cambios Variantes explícitas sintéticas. @param string $campo Campo directo. Inserta únicamente fixtures sobre la extensión aprobada. */
+    /**
+ * @param array $cambios
+ * @param string $campo
+ */
     private function prepararIadl(array $cambios = [], string $campo = 'observacion'): void
     {
         $this->prepararControl();

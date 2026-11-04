@@ -7,11 +7,7 @@ namespace MotorExperto\conocimiento;
 use DomainException;
 use MotorExperto\conocimiento\RedSemantica;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Base de conocimiento, red conceptual cognitiva.
- * Proyecta la fuente documental vigente con cinco dominios y diecinueve componentes.
- * Las relaciones describen pertenencia; no activan reglas, pesos ni interpretaciones clínicas.
- */
+/** Organiza cinco dominios y diecinueve componentes; sus relaciones no implican hallazgos. */
 final class PerfilConceptualCognitivo
 {
     public const CANTIDADES = ['COG-MEM' => 4, 'COG-ATE' => 3, 'COG-EJE' => 5, 'COG-LEN' => 5, 'COG-VIS' => 2];

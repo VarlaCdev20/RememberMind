@@ -12,13 +12,7 @@ use MotorExperto\conocimiento\ReglasPetersen;
 use MotorExperto\instrumentos\ExtractorCapturaInstrumental;
 use MotorExperto\hechos\ContextoEjecucion;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Clasificación orientativa institucional de Petersen.
- * Aplica el contrato E–H adoptado el 19/10/2026, con acreditaciones originales individuales.
- * Deriva C02 y los cuatro patrones; conserva abstenciones, causas secundarias y soportes.
- * No convierte observaciones, G09, D-131 ni z aislados en estados de dominio o requisitos.
- * No consulta Laravel, SQL ni configuración; no retira las guardas del laboratorio.
- */
+/** Deriva patrones orientativos desde originales y requisitos; conserva soportes y abstenciones. */
 final class EvaluarPetersenInstitucional
 {
     public const CONTRATO = 'PETERSEN-INSTITUCIONAL-1';

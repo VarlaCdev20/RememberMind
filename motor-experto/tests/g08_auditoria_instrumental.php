@@ -2,10 +2,7 @@
 
 declare(strict_types=1);
 
-/**
- * G08: correspondencia del inventario 15 componentes G09, bibliografía candidata,
- * brechas por edición/tarea/edad y bloqueo absoluto de interpretación clínica.
- */
+/** G08: correspondencia del inventario 15 componentes G09, bibliografía candidata, brechas por edición/tarea/edad y bloqueo absoluto de interpretación clínica. */
 require_once __DIR__.'/bootstrap.php';
 
 spl_autoload_register(static function (string $clase): void {

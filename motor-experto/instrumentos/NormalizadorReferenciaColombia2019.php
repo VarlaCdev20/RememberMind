@@ -6,11 +6,7 @@ namespace MotorExperto\instrumentos;
 
 use DomainException;
 
-/**
- * Comparaciones descriptivas con las tablas 10–11 del registro API colombiano.
- * La DE es del grupo, no un error residual; no se supone distribución normal.
- * No adopta estas referencias antioqueñas como baremos clínicos de Bolivia.
- */
+/** Comparaciones descriptivas con las tablas 10–11 del registro API colombiano. */
 final class NormalizadorReferenciaColombia2019
 {
     public const RAVEN = 'RAVEN-A-CO-API-2019';

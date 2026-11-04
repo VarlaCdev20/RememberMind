@@ -10,32 +10,20 @@ use MotorExperto\dominio\orion\Entities\Conocimiento\RelacionSemantica;
 use MotorExperto\dominio\orion\Entities\Dcl\ResultadoClasificacionDcl;
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Explicación (Reconstrucción de antecedentes).
- * TÍTULO: Explicación reproducible en tres niveles.
- * CAPA: Domain.
- * SUBSISTEMA: Explicación.
- * RESPONSABILIDAD: Exponer perfil, compuertas, reglas, fuentes y motivos originales.
- * ENTRADAS: Vector original, reglas aplicadas, trazas, advertencias y DCL opcional.
- * SALIDAS: Resumen, interpretación y fundamento como texto sin formato de presentación.
- * RESTRICCIONES: No genera HTML/PDF, inventa revisión profesional ni prescribe acciones.
- * TRAZABILIDAD: R1/R3/R4/R7/R8/R9; Documento 04 y contrato DCL-PET experimental.
- */
+/** Explica el resultado con las reglas, evidencias y motivos originales. */
 final readonly class GeneradorExplicacionService
 {
     /**
      * Construye la explicación desde resultados conservados, sin volver a ejecutar reglas.
-     *
-     * @param  VectorCognitivo  $perfil  Perfil original de una única instantánea.
-     * @param  array<string, list<ReglaExperta>>  $reglasPorDominio  Reglas efectivamente cumplidas.
-     * @param  array<string, string>  $trazas  Antecedentes de compuertas y condiciones.
-     * @param  array<string, string>  $advertencias  Limitaciones del productor.
-     * @param  ResultadoClasificacionDcl|null  $dcl  Salida del mismo perfil, si se solicitó.
-     * @param  list<RelacionSemantica>  $relaciones  Aristas utilizadas de la versión original.
-     * @param  array<string, string>  $exclusiones  Evidencias descartadas y razones.
-     * @return array{resumen: string, interpretacion: string, fundamento: string} Tres niveles reproducibles.
-     *
-     * @throws DomainException Por mezcla de perfiles, referencias o metadatos incompatibles.
+     * @param VectorCognitivo $perfil
+     * @param array<string, list<ReglaExperta>> $reglasPorDominio
+     * @param array<string, string> $trazas
+     * @param array<string, string> $advertencias
+     * @param ResultadoClasificacionDcl|null $dcl
+     * @param list<RelacionSemantica> $relaciones
+     * @param array<string, string> $exclusiones
+     * @return array{resumen: string, interpretacion: string, fundamento: string}
+     * @throws DomainException
      */
     public function generar(VectorCognitivo $perfil, array $reglasPorDominio, array $trazas, array $advertencias = [],
         ?ResultadoClasificacionDcl $dcl = null, array $relaciones = [], array $exclusiones = []): array
@@ -136,7 +124,10 @@ final readonly class GeneradorExplicacionService
             'fundamento' => 'Evaluación '.$m->evaluacionId.'; conocimiento '.$m->versionConocimiento."\n".implode("\n", $fundamento)];
     }
 
-    /** @param mixed $valor Dato original. @return string Representación tipada sin reemplazar null, false o cero; puede lanzar JsonException por texto inválido. */
+    /**
+ * @param mixed $valor
+ * @return string
+ */
     private function literal(mixed $valor): string
     {
         return json_encode($valor, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION);

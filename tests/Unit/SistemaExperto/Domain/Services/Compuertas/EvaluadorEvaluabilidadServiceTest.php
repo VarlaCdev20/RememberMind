@@ -13,40 +13,14 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 use PHPUnit\Framework\TestCase;
 
-/**
- * TÍTULO: Evaluabilidad técnica separada de resultados cognitivos.
- *
- * CAPA: Domain (verificación unitaria).
- *
- * SUBSISTEMA: Compuertas y semántica.
- *
- * RESPONSABILIDAD:
- * Verificar resultados técnicos trazables y cierres ante incertidumbre.
- *
- * ENTRADAS:
- * Perfiles, declaraciones y grafos completamente ficticios.
- *
- * SALIDAS:
- * Aserciones sobre niveles y vínculos explícitos, sin resultados clínicos.
- *
- * RESTRICCIONES:
- * No inicia Laravel ni consulta persistencia. No clasifica patrones Petersen.
- *
- * TRAZABILIDAD:
- * Reglamento maestro R1/R2/R3/R4/R6/R8/R10 y CTX-MEM-01.
- */
+/** Verificar resultados técnicos trazables y cierres ante incertidumbre. */
 final class EvaluadorEvaluabilidadServiceTest extends TestCase
 {
     /**
      * Integra técnicamente cada dominio con una referencia y contexto ficticios.
-     *
-     * La basal ausente sigue null y no impide el nivel 2; no se emite A/P.
-     *
-     * @param D $dominio Eje cognitivo de prueba.
-     * @param string $codigo Código oficial esperado del nivel 2.
+     * @param D $dominio
+     * @param string $codigo
      * @return void
-     *
-     * No se esperan excepciones para los cinco escenarios válidos.
      */
     #[DataProvider('dominios')]
     public function test_cinco_dominios_integran_sin_exigir_basal(D $dominio, string $codigo): void
@@ -65,10 +39,7 @@ final class EvaluadorEvaluabilidadServiceTest extends TestCase
 
     /**
      * Proporciona prefijos documentales sin derivarlos del código implementado.
-     *
-     * @return iterable<string, array{D, string}> Cinco códigos explícitos.
-     *
-     * No recibe parámetros ni lanza excepciones.
+     * @return iterable<string, array{D, string}>
      */
     public static function dominios(): iterable
     {
@@ -81,10 +52,7 @@ final class EvaluadorEvaluabilidadServiceTest extends TestCase
 
     /**
      * Conserva nivel 0 aunque existan declaraciones contextuales completas.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_sin_evidencia_no_se_habilita_resultado(): void
     {
@@ -96,10 +64,7 @@ final class EvaluadorEvaluabilidadServiceTest extends TestCase
     }
     /**
      * Impide cerrar un dominio con un hallazgo descriptivo.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_observacion_aislada_solo_es_senal(): void
     {
@@ -112,10 +77,7 @@ final class EvaluadorEvaluabilidadServiceTest extends TestCase
     }
     /**
      * Impide integrar el dominio desde una referencia limitada a un subcomponente.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_referencia_de_tarea_no_equivale_a_dominio_completo(): void
     {
@@ -125,10 +87,7 @@ final class EvaluadorEvaluabilidadServiceTest extends TestCase
     }
     /**
      * Conserva señal cuando una referencia completa carece de revisión contextual.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_contexto_incompleto_no_habilita_integracion(): void
     {
@@ -141,10 +100,7 @@ final class EvaluadorEvaluabilidadServiceTest extends TestCase
     }
     /**
      * Rechaza nivel 2 pese a que los demás campos sean conocidos.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_componente_no_validado_impide_integracion(): void
     {
@@ -156,10 +112,7 @@ final class EvaluadorEvaluabilidadServiceTest extends TestCase
     }
     /**
      * Excluye una referencia aunque su contexto esté declarado completo.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_procedencia_no_verificada_impide_cualquier_integracion(): void
     {
@@ -171,10 +124,7 @@ final class EvaluadorEvaluabilidadServiceTest extends TestCase
     }
     /**
      * Impide cerrar o mantener como señal una referencia puramente instrumental invalidada.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_invalidacion_sin_observacion_no_conserva_senal_instrumental(): void
     {
@@ -187,10 +137,7 @@ final class EvaluadorEvaluabilidadServiceTest extends TestCase
     }
     /**
      * Conserva una señal observacional admisible aunque el contexto impida integración.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_invalidacion_conserva_observacion_sin_integrar(): void
     {
@@ -202,10 +149,7 @@ final class EvaluadorEvaluabilidadServiceTest extends TestCase
     }
     /**
      * Conserva el conflicto entre A/P ficticios sin adjudicar un resultado.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_referencias_completas_opuestas_impiden_integracion(): void
     {
@@ -219,10 +163,7 @@ final class EvaluadorEvaluabilidadServiceTest extends TestCase
     }
     /**
      * Impide seleccionar solo la entrada favorable del dominio.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_no_interpretable_no_se_oculta_tras_referencia_positiva(): void
     {
@@ -236,10 +177,7 @@ final class EvaluadorEvaluabilidadServiceTest extends TestCase
     }
     /**
      * Conserva basal=false sin alterar el nivel integrado declarado por los requisitos pertinentes.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_basal_negada_no_es_una_senal_ni_un_bloqueo_automatico(): void
     {
@@ -252,10 +190,7 @@ final class EvaluadorEvaluabilidadServiceTest extends TestCase
     }
     /**
      * Conserva advertencia y nivel 2 sin transformar el resultado cognitivo.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_advertencia_no_invalidante_es_ortogonal_al_nivel(): void
     {
@@ -267,10 +202,7 @@ final class EvaluadorEvaluabilidadServiceTest extends TestCase
     }
     /**
      * Conserva las mismas fuentes y decisiones con otro orden de selección.
-     *
      * @return void
-     *
-     * No recibe parámetros; las excepciones esperadas se declaran en la prueba.
      */
     public function test_informe_es_determinista_al_reordenar_entradas(): void
     {
@@ -287,11 +219,10 @@ final class EvaluadorEvaluabilidadServiceTest extends TestCase
 
     /**
      * Ejecuta los colaboradores reales del servicio sobre un escenario artificial.
-     *
-     * @param array{memoria: \MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo, candidatas: array, contexto: array, procedencias: array} $escenario Entradas explícitas.
-     * @param D $dominio Eje solicitado.
-     * @return array Informe puro de evaluabilidad.
-     * @throws \DomainException Si el escenario viola el contrato.
+     * @param array{memoria: \MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo, candidatas: array, contexto: array, procedencias: array} $escenario
+     * @param D $dominio
+     * @return array
+     * @throws \DomainException
      */
     private function evaluar(array $escenario, D $dominio = D::MEMORIA): array
     {

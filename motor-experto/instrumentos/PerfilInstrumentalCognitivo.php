@@ -6,11 +6,7 @@ namespace MotorExperto\instrumentos;
 
 use DomainException;
 
-/**
- * COMPONENTE DEL SISTEMA EXPERTO: Integración de mediciones instrumentales.
- * Reúne mediciones por su componente primario y preserva todas las aplicaciones.
- * No transforma puntuaciones z, respuestas nominales ni falta de medición en A/P o DCL.
- */
+/** Agrupa mediciones por componente y conserva sus aplicaciones; no convierte ausencias en normalidad. */
 final class PerfilInstrumentalCognitivo
 {
     public function construir(array $red, array $captura, ?array $inferencia = null): array

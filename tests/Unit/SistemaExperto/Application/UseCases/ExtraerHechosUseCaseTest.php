@@ -16,19 +16,10 @@ use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 
-/**
- * TÍTULO: Orquestación de la extracción por contrato de Domain.
- * CAPA: Application (pruebas unitarias).
- * ¿PARA QUÉ SIRVE? Comprueba parámetros, procedencia y propagación de errores de CU-01.
- * ¿QUÉ RECIBE? Solicitudes sintéticas y un repositorio simulado en memoria.
- * ¿QUÉ HACE? Ejecuta el caso de uso con entidades reales y respuestas controladas.
- * ¿QUÉ DEVUELVE? Aserciones sobre la consulta y el DTO obtenido.
- * ¿QUÉ NO DEBE HACER? No conecta fuentes clínicas ni sustituye el motor de Domain.
- * RELACIÓN CON O.R.I.O.N.: Reglamento de Application, CU-01 y etapa C.
- */
+/** Comprueba parámetros, procedencia y propagación de errores de CU-01. */
 final class ExtraerHechosUseCaseTest extends TestCase
 {
-    /** Conserva hechos y evidencias con una única consulta exacta; sin parámetros ni excepciones esperadas. */
+    /** Conserva hechos y evidencias con una única consulta exacta */
     public function test_consulta_contexto_exacto_y_preserva_objetos_y_procedencia(): void
     {
         $solicitud = self::solicitud();
@@ -51,7 +42,7 @@ final class ExtraerHechosUseCaseTest extends TestCase
         self::assertSame([], $dto->fuentesNoDisponibles);
     }
 
-    /** Expresa una colección ausente sin inferir un resultado o disponibilidad; sin parámetros ni excepciones esperadas. */
+    /** Expresa una colección ausente sin inferir un resultado o disponibilidad */
     public function test_memoria_vacia_informa_ausencia_sin_fabricar_evidencias(): void
     {
         $solicitud = self::solicitud();
@@ -70,11 +61,9 @@ final class ExtraerHechosUseCaseTest extends TestCase
 
     /**
      * Rechaza una respuesta coherente internamente que pertenece a otro contexto.
-     *
-     * @param  string  $campo  Dimensión alterada de la memoria retornada.
-     * @param  string|DateTimeImmutable  $valor  Valor incompatible con la petición.
-     *
-     * @throws DomainException Rechazo esperado al construir el DTO de entrada.
+     * @param string $campo
+     * @param string|DateTimeImmutable $valor
+     * @throws DomainException
      */
     #[DataProvider('respuestasAjenas')]
     public function test_rechaza_respuesta_ajena_o_con_corte_posterior(string $campo, string|DateTimeImmutable $valor): void
@@ -90,7 +79,7 @@ final class ExtraerHechosUseCaseTest extends TestCase
         $caso->ejecutar($solicitud);
     }
 
-    /** @return iterable<string, array{string, string|DateTimeImmutable}> Respuestas ajenas; sin parámetros ni excepciones. */
+    /** @return iterable<string, array{string, string|DateTimeImmutable}> */
     public static function respuestasAjenas(): iterable
     {
         yield 'evaluación' => ['evaluacionId', 'SIM-OTRA'];
@@ -123,7 +112,7 @@ final class ExtraerHechosUseCaseTest extends TestCase
         $caso->ejecutar(self::solicitud());
     }
 
-    /** Conserva hechos de contexto aunque no haya evidencia cognitiva; sin parámetros ni excepciones esperadas. */
+    /** Conserva hechos de contexto aunque no haya evidencia cognitiva */
     public function test_respuesta_sin_evidencia_cognitiva_conserva_hechos_de_contexto(): void
     {
         $solicitud = self::solicitud();
@@ -141,7 +130,7 @@ final class ExtraerHechosUseCaseTest extends TestCase
         self::assertSame([], $dto->fuentesNoDisponibles);
     }
 
-    /** Aísla dos respuestas sucesivas del mismo repositorio; sin parámetros ni excepciones esperadas. */
+    /** Aísla dos respuestas sucesivas del mismo repositorio */
     public function test_dos_solicitudes_consecutivas_no_comparten_hechos_ni_contexto(): void
     {
         $primera = self::solicitud();
@@ -216,11 +205,9 @@ final class ExtraerHechosUseCaseTest extends TestCase
 
     /**
      * Configura una respuesta real de Domain para una única llamada al repositorio.
-     *
-     * @param  SolicitudInferenciaDTO  $solicitud  Parámetros exactos que debe recibir el contrato.
-     * @param  MemoriaTrabajo  $respuesta  Instantánea real del escenario.
-     * @return EvidenciaRepositoryInterface Doble exclusivo de la fuente, sin Eloquent.
-     *                                      Sin excepciones esperadas durante su configuración.
+     * @param SolicitudInferenciaDTO $solicitud
+     * @param MemoriaTrabajo $respuesta
+     * @return EvidenciaRepositoryInterface
      */
     private function repositorio(SolicitudInferenciaDTO $solicitud, MemoriaTrabajo $respuesta): EvidenciaRepositoryInterface
     {
@@ -233,7 +220,7 @@ final class ExtraerHechosUseCaseTest extends TestCase
         return $repositorio;
     }
 
-    /** @return SolicitudInferenciaDTO Petición ficticia; sin parámetros ni excepciones esperadas. */
+    /** @return SolicitudInferenciaDTO */
     private static function solicitud(): SolicitudInferenciaDTO
     {
         return new SolicitudInferenciaDTO('SIM-SOL', 'SIM-EVAL', 'SINTETICO-RES', F::fecha(), 'SIM-V1');
