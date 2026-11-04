@@ -58,3 +58,11 @@ Se reduce el relleno horizontal de celdas y se redistribuyen los anchos de las c
 Se retira exclusivamente de esta vista el selector de tamaño sin conexión funcional: el backend pagina en12 registros y no expone la propiedad porPagina. Se conservan el rango, el total y los botones del paginador compartido. No cambia el tamaño de página, los permisos ni la persistencia.
 
 Verificación final del ajuste: build correcto y E2E focal PASS (35 s), tabla/tarjetas en1440/1280/1024/768/390 px, filtros, menús, Escape/foco y oscuro390. Sin desbordamientos, superposición de filas, controles pequeños ni errores JS/HTTP. Capturas sintéticas actualizadas; no se reejecutó la CI completa.
+
+## Refinamiento de paginación y filtros
+
+Se añade la variante reutilizable rm-pagination--compact al componente canónico: grupo continuo de navegación, botones planos, página activa salvia y distribución centrada en móvil; controles de44 px y semántica existente. Se aplica solo a Personal y se eliminan sus overrides locales anteriores. Los demás consumidores conservan su presentación.
+
+El filtro conserva búsqueda, estado y limpieza existentes, con mayor separación entre controles, opción Todos los accesos y región con nombre accesible. Se elimina la superficie/sombra heredada para integrarlo con el listado; escritorio en una fila y móvil con búsqueda completa y estado junto a Limpiar. Sin cambios de consultas, permisos, reglas ni BDD.
+
+Verificación final: build correcto (advertencia existente de bundle); E2E focal PASS en26 s, diez combinaciones de tabla/tarjetas en cinco anchos, búsqueda/vacío/limpieza, menú/Escape/foco y oscuro390. Sin desbordamientos, superposición ni errores JS/HTTP. Inspección visual de capturas sintéticas; no se ejecutó la CI completa.

@@ -14,3 +14,14 @@
 .rm-pagination__ellipsis { width: 18px; text-align: center; }
 @media (max-width: 640px) { .rm-pagination { gap: var(--rm-space-2); padding: var(--rm-space-3); } .rm-pagination__range { flex: 1 1 140px; } .rm-pagination__pages { flex-basis: 100%; justify-content: center; } }
 @media (prefers-reduced-motion: reduce) { .rm-pagination * { transition: none !important; } }
+
+/* Variante integrada para listados dentro de una superficie compartida. */
+.rm-pagination.rm-pagination--compact { min-height: 44px; gap: var(--rm-space-2); margin-top: var(--rm-space-2); padding: var(--rm-space-2) 0 0; border: 0; border-top: 1px solid var(--rm-border-soft); border-radius: 0; background: transparent; box-shadow: none; }
+.rm-pagination--compact .rm-pagination__pages { margin-inline-start: auto; gap: var(--rm-space-1); padding: var(--rm-space-1); border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-md); background: var(--rm-surface-soft); }
+.rm-pagination--compact .rm-pagination__page { border-color: transparent; border-radius: var(--rm-radius-sm); background: transparent; box-shadow: none; }
+.rm-pagination--compact .rm-pagination__page.is-current { border-color: var(--rm-primary); background: var(--rm-selected-bg); color: var(--rm-selected-text); }
+.rm-pagination--compact .rm-pagination__page:disabled { opacity: .4; }
+@media (max-width: 640px) {
+    .rm-pagination--compact .rm-pagination__range { flex-basis: 100%; text-align: center; }
+    .rm-pagination--compact .rm-pagination__pages { flex-basis: auto; max-width: 100%; margin-inline: auto; }
+}

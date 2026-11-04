@@ -11,9 +11,9 @@
             <x-ui.collection-view-switch mode="livewire" change-method="cambiarVistaListadoResumen" :value="$vistaListadoResumen" label="Presentación del personal"
                 :options="[['value'=>'tabla','label'=>'Tabla','icon'=>'ph-table'],['value'=>'tarjetas','label'=>'Tarjetas','icon'=>'ph-squares-four']]" />
         </x-slot:actions>
-        <x-ui.filter-bar class="rm-staff-directory__filters">
+        <x-ui.filter-bar class="rm-staff-directory__filters" aria-label="Filtrar personal institucional">
             <x-ui.field label="Buscar trabajador" for="gerencia-personal-buscar"><input id="gerencia-personal-buscar" class="rm-input" type="search" wire:model.live.debounce.300ms="busquedaResumen" placeholder="Nombre o correo"></x-ui.field>
-            <x-ui.field label="Estado de acceso" for="gerencia-personal-estado"><select id="gerencia-personal-estado" class="rm-input" wire:model.live="estadoResumen"><option value="">Todos</option><option value="activo">Activo</option><option value="inactivo">Inactivo</option><option value="suspendido">Suspendido</option></select></x-ui.field>
+            <x-ui.field label="Estado de acceso" for="gerencia-personal-estado"><select id="gerencia-personal-estado" class="rm-input" wire:model.live="estadoResumen"><option value="">Todos los accesos</option><option value="activo">Activo</option><option value="inactivo">Inactivo</option><option value="suspendido">Suspendido</option></select></x-ui.field>
             <x-ui.action-button variant="ghost" wire:click="limpiarFiltrosResumen" icono="ph-arrow-counter-clockwise">Limpiar</x-ui.action-button>
         </x-ui.filter-bar>
         <p class="rm-help rm-staff-directory__context">El estado laboral y el acceso a la cuenta son independientes.</p>
@@ -62,7 +62,7 @@
                 </table>
             </div>
         @endif
-        @if($personalResumen->isNotEmpty())<x-ui.paginacion :paginator="$personalResumen" mode="livewire" label="trabajadores" :show-per-page="false" />@endif
+        @if($personalResumen->isNotEmpty())<x-ui.paginacion class="rm-pagination--compact" :paginator="$personalResumen" mode="livewire" label="trabajadores" :show-per-page="false" />@endif
     </x-ui.section-card>
     @include('livewire.identidad.personal-institucional-panel.modales.gestion')
     @if($modalLaboral)
