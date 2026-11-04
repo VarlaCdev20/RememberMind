@@ -7,7 +7,7 @@ namespace MotorExperto\conocimiento;
 use DateTimeImmutable;
 use DomainException;
 
-/** Interpreta observaciones del seguimiento; no establece un diagnóstico de DCL. */
+/** Revisa las observaciones de memoria y los cambios cognitivos registrados. */
 final class ReglasObservacionales
 {
     public const VERSION = 'OBS-20261017-v1';
