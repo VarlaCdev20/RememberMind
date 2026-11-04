@@ -1700,7 +1700,7 @@ Módulo 13: Sistema Experto. Perfil V (ver 06). Reglas reproducibles aprobadas.
 | approved_at | timestamptz? |
 | status | text |
 
-Restricciones y semántica: U(expert_rule_set_id,version); despliegue requiere validación clínica. Se añaden todas las columnas comunes que corresponden a su perfil.
+Restricciones y semántica: U(expert_rule_set_id,version); despliegue requiere evaluación posterior en uso real. Se añaden todas las columnas comunes que corresponden a su perfil.
 
 ### expert_runs — ExpertRun
 

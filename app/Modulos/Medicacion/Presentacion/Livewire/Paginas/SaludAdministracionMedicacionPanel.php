@@ -11,9 +11,11 @@ use App\Models\Residente;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Medicacion\Aplicacion\Acciones\RegistrarAdministracionMedicacionService;
 use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
+use App\Modulos\Medicacion\Infraestructura\Archivos\ImagenMedicamento;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
@@ -76,6 +78,7 @@ class SaludAdministracionMedicacionPanel extends Component
     // Modal flotante maestro de Medicamento
     public bool $modalMedicamentoAbierto = false;
 
+    #[Locked]
     public array $medicamentoFicha = [];
 
     // Filtros de la pestaña Historial
@@ -530,6 +533,8 @@ class SaludAdministracionMedicacionPanel extends Component
 
     public function abrirDrawerDosis(string $codPrescripcion, string $hora, ?string $codResidente = null): void
     {
+        $usuario = Auth::user()?->fresh();
+        abort_unless($usuario?->estado === 'ACTIVO', 403);
         $this->resetValidation();
         $this->mostrarFormularioOmision = false;
         $this->observacionEnfermeria = '';
@@ -545,7 +550,7 @@ class SaludAdministracionMedicacionPanel extends Component
                 'personal',
                 'horarios',
                 'residente.ocupacionActiva.cama.habitacion',
-                'residente.alergias' => fn ($q) => $q->where('estado', 'ACTIVO'),
+                'residente.alergias' => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO']),
             ])
             ->where('cod_prescripcion', $codPrescripcion)
             ->first();
@@ -563,6 +568,12 @@ class SaludAdministracionMedicacionPanel extends Component
             return;
         }
 
+        abort_unless($usuario->can('view', $prescripcion), 403);
+        if ($usuario->hasRole('ENFERMEROS')) {
+            app(TurnoEnfermeriaService::class)->autorizarConsultaResidente($prescripcion->cod_residente, $usuario);
+        }
+        abort_if($codResidente && $codResidente !== $prescripcion->cod_residente, 403);
+        $this->cerrarModalMedicamento();
         $residente = $prescripcion->residente;
         $this->selectedResidenteId = $residente?->cod_residente ?? $codResidente;
         $medicamento = $prescripcion->medicamento;
@@ -570,7 +581,18 @@ class SaludAdministracionMedicacionPanel extends Component
         // Horario específico de la dosis
         $horario = $prescripcion->horarios->first(function ($h) {
             return substr((string) $h->hora_programada, 0, 5) === $this->selectedHora;
-        }) ?? $prescripcion->horarios->first();
+        });
+
+        // La frecuencia describe la orden; las horas se leen de su programación real.
+        $horariosActivos = $prescripcion->horarios
+            ->where('estado', 'ACTIVO')
+            ->sortBy('hora_programada')
+            ->map(fn ($item) => [
+                'hora' => substr((string) $item->hora_programada, 0, 5),
+                'dias' => filled($item->dias_semana) && strtoupper(trim($item->dias_semana)) !== 'TODOS'
+                    ? $item->dias_semana : 'Todos los días',
+                'seleccionado' => substr((string) $item->hora_programada, 0, 5) === $this->selectedHora,
+            ])->values()->all();
 
         // Registro de administración para esta dosis hoy si ya se efectuó
         $registroHoy = AdministracionMedicacion::query()
@@ -654,17 +676,20 @@ class SaludAdministracionMedicacionPanel extends Component
                 'dosis' => $prescripcion->dosis ? "{$prescripcion->dosis} {$prescripcion->unidad_dosis}" : '1 dosis',
                 'unidad' => $prescripcion->unidad_dosis ?: 'mg',
                 'via' => ucfirst(strtolower((string) $prescripcion->via_administracion)),
-                'frecuencia' => $prescripcion->frecuencia ?: 'Cada 8 horas',
-                'indicacion' => $prescripcion->indicacion ?: ($prescripcion->observacion ?: 'Tratamiento según indicación médica'),
+                'frecuencia' => $prescripcion->frecuencia ?: 'Frecuencia no registrada',
+                'indicacion' => $prescripcion->indicacion ?: 'Indicación no registrada. Consulta al profesional prescriptor.',
                 'segun_necesidad' => $prescripcion->segun_necesidad ? 'Sí (PRN)' : 'No',
                 'fecha' => $prescripcion->fecha_hora_prescripcion?->format('d/m/Y H:i') ?? 'N/A',
                 'prescriptor' => $prescripcion->medico_indica ?: ($prescripcion->personal ? trim("{$prescripcion->personal->nombres} {$prescripcion->personal->apellido_paterno}") : 'Prescriptor no registrado'),
+                'profesion_prescriptor' => $prescripcion->personal?->profesion ?: 'Profesión no registrada',
+                'especialidad_prescriptor' => $prescripcion->personal?->especialidad,
                 'estado' => $prescripcion->estado ?: 'ACTIVA',
             ],
 
             // D. PROGRAMACIÓN
             'programacion' => [
                 'hora_programada' => $this->selectedHora,
+                'horarios_activos' => $horariosActivos,
                 'dosis_programada' => $horario?->dosis_programada ? "{$horario->dosis_programada} {$prescripcion->unidad_dosis}" : "{$prescripcion->dosis} {$prescripcion->unidad_dosis}",
                 'dias' => $horario?->dias_semana ?: 'Todos los días',
                 'estado_horario' => $horario?->estado ?: 'ACTIVO',
@@ -672,6 +697,7 @@ class SaludAdministracionMedicacionPanel extends Component
 
             // E. SEGURIDAD
             'seguridad' => [
+                'tiene_alergias' => $alergiasReales->isNotEmpty(),
                 'alergias' => $alergiasTexto,
                 'observaciones' => $prescripcion->observacion ?: 'Sin observaciones relevantes registradas.',
                 'control_especial' => $medicamento?->control_especial ? 'Sí — Medicamento bajo control especial' : 'No',
@@ -696,6 +722,7 @@ class SaludAdministracionMedicacionPanel extends Component
 
     public function cerrarDrawerDosis(): void
     {
+        $this->cerrarModalMedicamento();
         $this->drawerDosisAbierto = false;
         $this->drawerAbierto = false;
         $this->drawerPaso = 'detalle';
@@ -707,9 +734,18 @@ class SaludAdministracionMedicacionPanel extends Component
 
     public function abrirModalMedicamento(?string $codMedicamento = null): void
     {
+        $usuario = Auth::user()?->fresh();
+        abort_unless($usuario?->estado === 'ACTIVO', 403);
         $codMed = $codMedicamento ?: ($this->dosisDetalle['cod_medicamento'] ?? null);
         if (! $codMed) {
             return;
+        }
+
+        // Enfermería consulta el medicamento de una orden autorizada, sin adquirir acceso global al catálogo.
+        if (! $usuario->can('medicamentos.ver')) {
+            abort_unless($usuario->can('prescripciones.ver') && $this->selectedPrescripcionId, 403);
+            $prescripcion = Prescripcion::query()->whereKey($this->selectedPrescripcionId)->where('cod_medicamento', $codMed)->firstOrFail();
+            app(TurnoEnfermeriaService::class)->autorizarConsultaResidente($prescripcion->cod_residente, $usuario);
         }
 
         $med = Medicamento::query()->where('cod_medicamento', $codMed)->first();
@@ -725,19 +761,14 @@ class SaludAdministracionMedicacionPanel extends Component
                 'control_especial' => $med->control_especial ? 'Sí' : 'No',
                 'estado' => ucfirst(strtolower((string) $med->estado)),
                 'observacion' => $med->observacion ?: 'Información farmacológica ampliada no registrada.',
+                'imagen' => app(ImagenMedicamento::class)->paraCodigo($med->getKey()),
             ];
         } else {
-            $this->medicamentoFicha = [
-                'nombre_generico' => strtoupper($this->dosisDetalle['medicamento']['nombre_destacado'] ?? 'FUROSEMIDA'),
-                'nombre_comercial' => 'No registrado',
-                'concentracion' => $this->dosisDetalle['medicamento']['concentracion'] ?? '40 mg',
-                'forma_farmaceutica' => 'Comprimido',
-                'unidad' => 'mg',
-                'via_predeterminada' => 'Oral',
-                'control_especial' => 'No',
-                'estado' => 'Activo',
-                'observacion' => 'Información farmacológica ampliada no registrada.',
-            ];
+            $this->medicamentoFicha = [];
+            $this->modalMedicamentoAbierto = false;
+            $this->addError('medicamento', 'El medicamento solicitado no está disponible en el catálogo.');
+
+            return;
         }
 
         $this->modalMedicamentoAbierto = true;
@@ -769,6 +800,12 @@ class SaludAdministracionMedicacionPanel extends Component
         $codResidente = $this->selectedResidenteId;
 
         $prescripcion = Prescripcion::where('cod_prescripcion', $codPrescripcion)->first();
+
+        if (! $prescripcion) {
+            $this->addError('administracion_error', 'La prescripción ya no está disponible.');
+
+            return;
+        }
 
         if ($prescripcion) {
             try {
@@ -850,6 +887,12 @@ class SaludAdministracionMedicacionPanel extends Component
         $codResidente = $this->selectedResidenteId;
 
         $prescripcion = Prescripcion::where('cod_prescripcion', $codPrescripcion)->first();
+
+        if (! $prescripcion) {
+            $this->addError('administracion_error', 'La prescripción ya no está disponible.');
+
+            return;
+        }
 
         if ($prescripcion) {
             try {
@@ -950,7 +993,8 @@ class SaludAdministracionMedicacionPanel extends Component
 
         // 3. Agenda de dosis de hoy desde el servicio institucional
         $fechaKardex = ! empty($this->filtroKardexFecha) ? Carbon::parse($this->filtroKardexFecha) : today();
-        $agendaDosis = $agendaService->paraAdultos($codigosResidentes, $fechaKardex);
+        $momentoAgenda = $fechaKardex->isToday() ? now() : $fechaKardex;
+        $agendaDosis = $agendaService->paraAdultos($codigosResidentes, $momentoAgenda);
 
         // Mapear dosis por residente y hora para la matriz
         $matrizKardex = [];
@@ -1189,6 +1233,26 @@ class SaludAdministracionMedicacionPanel extends Component
             return strcmp($a['hora'], $b['hora']);
         })->values();
 
+        // Misma agenda autorizada y filtrada que la tabla; no son indicadores clínicos.
+        $estadosGrafica = [
+            'PENDIENTE' => ['label' => 'Pendientes', 'tono' => 'warning'],
+            'PROXIMA' => ['label' => 'Próximas', 'tono' => 'info'],
+            'VENCIDA' => ['label' => 'Retrasadas', 'tono' => 'danger'],
+            'ADMINISTRADA' => ['label' => 'Administradas', 'tono' => 'success'],
+            'OMITIDA' => ['label' => 'Omitidas', 'tono' => 'neutral'],
+        ];
+        $conteosPorEstado = $dosisHoy->countBy('estado_raw');
+        $graficasAgenda = [
+            'fecha' => $fechaKardex->toDateString(),
+            'total' => $dosisHoy->count(),
+            'estados' => collect($estadosGrafica)->map(fn ($meta, $estado) => [
+                ...$meta, 'cantidad' => $conteosPorEstado->get($estado, 0),
+            ])->values()->all(),
+            'horarios' => $dosisHoy->countBy('hora')->sortKeys()->map(fn ($cantidad, $hora) => [
+                'label' => $hora, 'cantidad' => $cantidad,
+            ])->values()->all(),
+        ];
+
         $dPresc = is_numeric($this->formDosisPrescritaValor) ? (float) $this->formDosisPrescritaValor : 0.0;
         $dAdmin = is_numeric($this->formDosisAdministrada) ? (float) $this->formDosisAdministrada : 0.0;
 
@@ -1197,6 +1261,7 @@ class SaludAdministracionMedicacionPanel extends Component
             'horasKardex' => $horasKardex,
             'matrizKardex' => $matrizKardex,
             'dosisHoy' => $dosisHoy,
+            'graficasAgenda' => $graficasAgenda,
             'conteoAdministradas' => $conteoAdministradas,
             'conteoPendientes' => $conteoPendientes,
             'conteoRetrasadas' => $conteoRetrasadas,

@@ -18,7 +18,7 @@ final class GestionarAtenciones
         $personal = Personal::where('cod_usuario', $usuario?->cod_usuario)->first();
         $codArea = $personal?->asignaciones()->whereIn('estado', ['ACTIVA', 'ACTIVO'])->latest('fecha_asignacion')->value('cod_area');
         abort_unless($personal && $codArea, 422, 'El usuario debe tener personal y área institucional asignados.');
-        Atencion::create(['cod_atencion' => 'ATN_'.strtoupper(Str::random(10)), 'cod_residente' => $adulto_mayor->cod_residente, 'cod_area' => $codArea, 'cod_personal' => $personal->cod_personal, 'tipo_atencion' => data_get($entrada, 'cod_tipo_aten'), 'motivo' => data_get($entrada, 'motivo') ?? 'Atención programada', 'fecha_hora' => $fechaHora, 'estado' => data_get($entrada, 'estado', 'PENDIENTE'), 'observacion' => data_get($entrada, 'obs')]);
+        Atencion::create(['cod_atencion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('atenciones'), 'cod_residente' => $adulto_mayor->cod_residente, 'cod_area' => $codArea, 'cod_personal' => $personal->cod_personal, 'tipo_atencion' => data_get($entrada, 'cod_tipo_aten'), 'motivo' => data_get($entrada, 'motivo') ?? 'Atención programada', 'fecha_hora' => $fechaHora, 'estado' => data_get($entrada, 'estado', 'PENDIENTE'), 'observacion' => data_get($entrada, 'obs')]);
 
         return null;
     }

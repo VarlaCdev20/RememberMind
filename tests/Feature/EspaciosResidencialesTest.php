@@ -97,9 +97,9 @@ class EspaciosResidencialesTest extends TestCase
         }
     }
 
-    public function test_rutas_separan_inventario_mapa_y_redirigen_el_directorio_antiguo(): void
+    public function test_rutas_separan_inventario_y_consulta_del_mapa_sin_redireccion_administrativa(): void
     {
-        $this->get(route('admin.habitaciones.index'))->assertRedirect(route('admin.administracion.habitaciones'));
+        $this->get(route('admin.habitaciones.index'))->assertOk()->assertSee('Mapa de alojamiento')->assertDontSee('Nueva habitación');
         $this->get(route('admin.administracion.habitaciones'))->assertOk()->assertSee('Nueva habitación')->assertSee('Inventario físico')->assertDontSee('Gestionar espacios');
         $this->get(route('admin.administracion.ocupacion'))->assertOk()->assertSee('Mapa de alojamiento')->assertDontSee('Nueva habitación')->assertDontSee('Añadir cama');
         $this->get(route('admin.administracion.ocupacion', ['tab' => 'historial']))->assertOk()->assertViewIs('pages.admin.administracion.operacion');

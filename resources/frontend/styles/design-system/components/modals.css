@@ -29,6 +29,22 @@
     overscroll-behavior: contain;
 }
 
+/* Variante de lectura: el glass se limita al marco, nunca al texto superpuesto. */
+.rm-modal-shell.rm-modal-shell--reading .rm-modal-panel,
+.rm-modal-shell.rm-modal-shell--reading .rm-modal-body {
+    background: var(--rm-surface);
+    background-image: none;
+    backdrop-filter: none;
+}
+.rm-modal-shell.rm-modal-shell--reading .rm-modal-panel .rm-modal-panel__title { font: 700 var(--rm-font-size-section)/1.35 var(--rm-font-title); }
+.rm-modal-shell--reading .rm-modal-panel__title { overflow-wrap: anywhere; }
+.rm-modal-shell--reading :is(.rm-modal-panel__close, .rm-modal-panel__back) { width: 44px; height: 44px; min-width: 44px; flex-shrink: 0; }
+@media (max-width: 639px) {
+    .rm-modal-shell.rm-modal-shell--reading { padding: max(var(--rm-space-2), env(safe-area-inset-top)) max(var(--rm-space-2), env(safe-area-inset-right)) max(var(--rm-space-2), env(safe-area-inset-bottom)) max(var(--rm-space-2), env(safe-area-inset-left)); }
+    .rm-modal-shell--reading .rm-modal-header { padding: var(--rm-space-3); gap: var(--rm-space-2); }
+    .rm-modal-shell--reading .rm-modal-footer { gap: var(--rm-space-2); padding: var(--rm-space-3); }
+}
+
 /* El modal Jetstream comparte el contrato de alto del resto del sistema. */
 .jetstream-modal {
     z-index: var(--rm-z-modal, 1000);

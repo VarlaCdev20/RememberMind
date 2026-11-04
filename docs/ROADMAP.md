@@ -1,71 +1,37 @@
 ---
-title: "Roadmap documental de RememberMind"
+title: "Secuencia de trabajo y pendientes actuales"
 status: CURRENT
-version: "1.0"
-last_reviewed: 2026-10-06
+version: "2.0"
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
-verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
-verification_scope: STATIC_REPOSITORY_REVIEW
+source_of_truth_scope: [work_sequence]
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_AND_REGISTERED_ROUTES
 runtime_verified: false
-supersedes: []
-related_docs: []
-related_modules: []
 ---
 
-# Roadmap
+# Secuencia de trabajo
 
-Mapa de secuencia; no prueba de implementación. NOW recoge encargo activo. NEXT/LATER/FUTURE son propuestas o candidatas, sin fechas ni compromisos nuevos. Cambios de permisos, clínica/estructura o privacidad necesitan la decisión correspondiente.
+Revisión del 04/11/2026. Este documento ordena trabajo; no aprueba reglas, permisos, estructura o fechas de entrega. La implementación comprobada se resume en [Estado actual](ESTADO_ACTUAL.md).
 
-# NOW
+| Orden | Trabajo | Estado y condición de cierre |
+|---|---|---|
+|1| Mantener documentación coherente con código, fuentes y decisiones | Reconciliación actual: inventarios, rutas, componentes, enlaces y distinción entre historia/propuesta/estado vigente. [Catálogo](INDICE_DOCUMENTAL.md). |
+|2| Cerrar conservación institucional conjunta del experto | Pendiente. Reutilizar el modelo y permisos actuales; la transición propuesta del 31/10 fue rechazada. Requiere resultado/abstención, hechos, versiones, explicación y recuperación fiel, sin presentar un DTO como guardado. |
+|3| Precisar vínculos instrumentales e interpretación por componente | Los tres perfiles iniciales ya capturan y puntúan. Ampliar vínculos/métodos aplicables según fuentes originales y contrato adoptado; no transformar totales en diagnósticos ni inventar baremos. |
+|4| Reconciliar deuda de seguridad y continuidad por flujo | Reproducir los hallazgos antiguos antes de declararlos actuales; reutilizar las correcciones posteriores acreditadas de Gerencia y experto. [Deuda técnica](DEUDA_TECNICA.md). |
+|5| Completar aceptación de módulos y procesos | Verificar por actor, entrada, autorización, persistencia, errores y continuidad. Una ruta registrada o una ficha documental no equivale a aceptación. [Doce módulos](modulos/README.md). |
+|6| Integración, CI y entrega | Revisar cambios locales, ejecutar gates del alcance y PR según Git Flow. No declarar producción ni publicar trabajo ajeno por actualizar documentación. |
 
-| Área | Objetivo | Dependencia | Estado | Documento relacionado |
-|---|---|---|---|---|
-| Contratos documentales | Fase 2: arquitectura, dominio, seguridad, siete módulos y trazabilidad | Fuentes/contratos y revisión independiente final | ENTREGADO con PASS documental estático; runtime false | [TRAZABILIDAD](TRAZABILIDAD.md) |
-| Fase 3 | Hardening A–E y evidencia runtime del núcleo | Contratos vigentes y PostgreSQL desechable | CURRENT, hardening acotado verificado; gate global FAIL | [TRAZABILIDAD](TRAZABILIDAD.md) |
-| Producto previo | Conservar trabajo sin commit de legacy/integraciones | Revisión posterior de su propietaria | Preservado; no reset ni commit | ESTADO_ACTUAL |
+## Capacidades ya presentes
 
-# NEXT
+El motor simbólico, la red, las 24 reglas fuente, la explicación, las abstenciones, la captura descriptiva y los perfiles iniciales existen; no son un «motor futuro» por construir desde cero. Las observaciones tienen un circuito conservado. La persistencia conjunta instrumental/Petersen continúa siendo un pendiente distinto.
 
-Fase 3 fue autorizada expresamente y se registra en NOW. NEXT conserva trabajo pendiente/Fase 4 propuesto; no autoriza implementación adicional.
+La documentación de Gerencia incluye extensiones y avisos compartidos autorizados e instalados; las propuestas anteriores se conservan como antecedentes. Los reportes de Enfermería tienen entregas por período/residente y por áreas; su aceptación no se extiende automáticamente a todos los módulos.
 
-| Área | Objetivo | Dependencia | Estado | Documento relacionado |
-|---|---|---|---|---|
-| Arquitectura/dominio/seguridad | Completar contratos de otros dominios y mantener trazabilidad tras futuros cambios | Cierre Fase 2 y fuentes específicas | PROPUESTA | [Mapa funcional](sistema/MAPA_DOMINIO_FUNCIONAL.md); DECISIONES_PENDIENTES |
-| Familia/archivos/reportes | Verificar y corregir filtros por contenido según contrato | Pruebas de reproducción y frontera aprobada | PROPUESTA prioritaria | TECH-001, DEC-OPEN-006 |
-| Alertas | Contrastar todos los caminos de creación/transición/eventos | Contrato vigente por operación | PROPUESTA | TECH-002 |
-| BDD/integración | Resolver estados y acreditar garantías/rollback/carreras PostgreSQL | Decisión de catálogo y entorno desechable | PROPUESTA | DEC-OPEN-001/002, TECH-005 |
+## Límites de esta secuencia
 
-# LATER
+Sin nuevas tablas ni cambios no aprobados de relaciones/permisos. Sin simulaciones operativas ni datos ficticios para completar historias. Se permiten datos sintéticos aislados en pruebas técnicas. Durante el desarrollo no se exige evaluación externa, firma o estudio con residentes para implementar el alcance autorizado.
 
-| Área | Objetivo | Dependencia | Estado | Documento relacionado |
-|---|---|---|---|---|
-| Módulos | Documentación funcional por disciplina, entradas/salidas/excepciones y pruebas | Contratos de Fase 2 | PROPUESTA | sistema/MAPA_DOMINIO_FUNCIONAL |
-| Histórico | Evaluar migración a docs/historico con inventario de enlaces entrantes | No romper README/AGENTS/skills/referencias | PROPUESTA, sin traslado masivo hoy | GOBERNANZA_DOCUMENTAL |
-| UX | Consolidar aplicación del DS y cobertura visual/responsive/accesibilidad | Referencias/contratos y evidencia real | PROPUESTA | frontend/CONTRATO_VISUAL_UX_UI |
-| Calidad | Trazabilidad requisito → regla → código → test | Requisitos y contratos vigentes | PROPUESTA | tests/AGENTS; GOBERNANZA_DOCUMENTAL |
-
-# FUTURE
-
-Candidatas coherentes; no funcionalidades existentes ni promesas:
-
-| Área | Objetivo | Dependencia | Estado | Documento relacionado |
-|---|---|---|---|---|
-| UX | Consolidación completa DS, accesibilidad avanzada, pruebas visuales y responsive exhaustivo | Contratos y QA real | CANDIDATA | frontend/CONTRATO_VISUAL_UX_UI |
-| Consultas | Mejoras de reportes/dashboards y performance | Necesidad y medición concreta | CANDIDATA | TECH-001; stack sistema performance |
-| Operación | Observabilidad y recuperación ante desastres acreditadas | Entorno, privacidad y simulacro | CANDIDATA | produccion/DESPLIEGUE_SEGURO |
-| Integraciones | Interoperabilidad/servicios externos | Decisión institucional, privacidad y contrato técnico | CANDIDATA, no integración aprobada localizada | DECISIONES_PENDIENTES |
-| Experto | Motor, base de conocimiento versionada, explicación avanzada, validación humana y métricas | Método/derechos/fuentes/datos y estructura aprobados | PROPUESTA dependiente | DEC-OPEN-005; sistema-experto/README |
-| Documentación | Automatización y validación documental CI | Convención y casos reales | CANDIDATA; no configurar CI en Fase 1 | GOBERNANZA_DOCUMENTAL |
-
-# OUT OF SCOPE
-
-Fuera de Fase 3: nuevas funcionalidades, refactor global, cambios estructurales BDD/índices, reglas clínicas/competencias nuevas, rediseño UX/UI general, sistema experto, deploy, commit/push. El hardening autorizado se limita al núcleo y contratos vigentes; no se autoriza corregir cualquier deuda por aparecer aquí.
-
-Fuera del contrato permanente: diagnóstico/tratamiento autónomo que sustituya profesionales, nueva dependencia V1 permanente, permisos por conveniencia y expansión del esquema sin aprobación. Historia experta/arquitectónica no autoriza nuevas tecnologías o tablas.
-
-## Actualización de ejecución Fase 3
-
-Fase 3 pasó de propuesta a CURRENT por instrucción expresa de la propietaria. Lotes A–E implementan hardening acotado y verificación en PostgreSQL desechable; evidencia y límites en [TRAZABILIDAD](TRAZABILIDAD.md). No amplía BDD, permisos clínicos, catálogos, publicación Familiar ni metodología experta. Suite final FAIL (14 fallos previos más una expectativa Familiar revalidada después); cohortes del núcleo, build y reset/seed final PASS. Fallo JS de sidebar fuera del alcance se mantiene visible; evidencia exacta y límites en TRAZABILIDAD.
-
-Fase 4 permanece PROPOSED: resolver calidad global pendiente con alcance aprobado antes de iniciar rediseño general, y tratar DEC-OPEN-001..006 únicamente mediante decisiones de la propietaria. No hay commit/push ni autorización de cambios futuros por esta recomendación.
+Las ideas de interoperabilidad, transporte asíncrono y despliegue requieren su contrato y evidencia propios; no se activan por existir una carpeta. El [roadmap anterior](historico/ROADMAP_ANTERIOR_A_2026_11_04.md) conserva la secuencia documental de fases previas.

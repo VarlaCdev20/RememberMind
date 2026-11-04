@@ -20,6 +20,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
+use Livewire\Attributes\Locked;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Spatie\Permission\Models\Role;
@@ -255,6 +256,9 @@ class UsuariosPanel extends Component
 
     public $tipoDocSeleccionado;
 
+    #[Locked]
+    public ?array $referenciaDocumento = null;
+
     public $tipoDocNombre;
 
     public $fechaEmisionDoc;
@@ -336,10 +340,10 @@ class UsuariosPanel extends Component
             $this->cod_area = null;
             $this->fecha_ingreso = null;
         } elseif (in_array($val, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA'])) {
-            $this->cod_area = 'ARE_0004'; // Sugerencia inicial
+            $this->cod_area = null; // El área se selecciona del catálogo vigente.
             $this->fecha_ingreso = now()->format('Y-m-d');
         } elseif (in_array($val, ['SUPERADMINISTRADOR', 'ADMINISTRADOR'])) {
-            $this->cod_area = 'ARE_0003'; // Sugerencia inicial
+            $this->cod_area = null; // El área se selecciona del catálogo vigente.
             $this->fecha_ingreso = now()->format('Y-m-d');
         }
 
@@ -720,9 +724,9 @@ class UsuariosPanel extends Component
         $nombre = strtoupper((string) $val);
         if ($nombre !== '') {
             if (in_array($nombre, ['ENFERMERÍA', 'GERIATRÍA', 'NUTRICIÓN', 'FISIOTERAPIA'])) {
-                $this->cod_area = 'ARE_0004'; // Área de Atención Médica
+                $this->cod_area = null; // El área se selecciona del catálogo vigente.
             } elseif (in_array($nombre, ['PSICOLOGÍA', 'PEDAGOGÍA'])) {
-                $this->cod_area = 'ARE_0005'; // Área de Psicología y Seguimiento Cognitivo
+                $this->cod_area = null; // El área se selecciona del catálogo vigente.
             }
         }
     }
@@ -736,11 +740,11 @@ class UsuariosPanel extends Component
         $nombre = strtoupper((string) $val);
         if ($nombre !== '') {
             if (str_contains($nombre, 'COORDINACIÓN DE PROGRAMAS') || str_contains($nombre, 'PROGRAMAS')) {
-                $this->cod_area = 'ARE_0002'; // Coordinación de Programas y Servicios
+                $this->cod_area = null; // El área se selecciona del catálogo vigente.
             } elseif (str_contains($nombre, 'DIRECCIÓN')) {
-                $this->cod_area = 'ARE_0001'; // Dirección General
+                $this->cod_area = null; // El área se selecciona del catálogo vigente.
             } else {
-                $this->cod_area = 'ARE_0003'; // Área Administrativa y Registro Institucional
+                $this->cod_area = null; // El área se selecciona del catálogo vigente.
             }
         }
     }
@@ -815,7 +819,7 @@ class UsuariosPanel extends Component
             'parentesco_emergencia' => ['required', 'string', 'max:100'],
             'celular_emergencia' => ['required', 'string', 'max:20', 'different:telefono', 'regex:/^\d+$/'],
             'rol' => ['required', 'exists:roles,name'],
-            'cod_area' => ['nullable', 'string', 'in:ARE_0001,ARE_0002,ARE_0003,ARE_0004,ARE_0005'],
+            'cod_area' => ['nullable', 'string', 'exists:areas,cod_area'],
         ];
 
         $rules = array_merge($rules, $this->reglasDireccion());
@@ -897,17 +901,21 @@ class UsuariosPanel extends Component
 
     private function validarUnicidadDocumento($fail)
     {
-        $query = User::whereRaw('UPPER(pais_documento) = ?', [mb_strtoupper((string) $this->pais_documento, 'UTF-8')])
-            ->whereRaw('UPPER(tipo_documento) = ?', [mb_strtoupper((string) $this->tipo_documento, 'UTF-8')])
-            ->whereRaw('UPPER(numero_documento) = ?', [mb_strtoupper((string) $this->numero_documento, 'UTF-8')]);
-        if (mb_strtoupper((string) $this->pais_documento, 'UTF-8') === 'BOLIVIA') {
-            $query->whereRaw('UPPER(expedido) = ?', [mb_strtoupper((string) $this->expedido, 'UTF-8')]);
-        }
-        if ($this->isEdit) {
-            $query->where('cod_usuario', '!=', $this->usuarioId);
-        }
-        if ($query->exists()) {
-            $fail('El documento de identidad ya está registrado en el sistema.');
+        // La identidad pertenece a personal/contactos; usuarios solo conserva el acceso.
+        // El número es único en personal, independientemente del lugar de expedición.
+        foreach ([Personal::class, Contacto::class] as $modelo) {
+            $query = $modelo::query()->whereRaw('UPPER(numero_documento) = ?', [
+                mb_strtoupper(trim((string) $this->numero_documento), 'UTF-8'),
+            ]);
+            if ($this->isEdit && $this->usuarioId) {
+                $query->where(fn ($persona) => $persona->whereNull('cod_usuario')
+                    ->orWhere('cod_usuario', '!=', $this->usuarioId));
+            }
+            if ($query->exists()) {
+                $fail('El documento de identidad ya está registrado en el sistema.');
+
+                return;
+            }
         }
     }
 
@@ -925,16 +933,23 @@ class UsuariosPanel extends Component
             return;
         }
 
-        // 1. Unicidad del teléfono completo
-        $query = User::where('codigo_telefono', $this->codigo_telefono)
-            ->where('telefono', $this->telefono);
-        if ($this->isEdit) {
-            $query->where('cod_usuario', '!=', $this->usuarioId);
-        }
-        if ($query->exists()) {
-            $fail('El celular ya está registrado.');
+        // El contacto se almacena en los perfiles V2, no en la cuenta de acceso.
+        foreach ([Personal::class, Contacto::class] as $modelo) {
+            $query = $modelo::query()->where(function ($perfil) use ($modelo) {
+                $perfil->where('telefono', $this->telefono);
+                if ($modelo === Contacto::class) {
+                    $perfil->orWhere('celular', $this->telefono);
+                }
+            });
+            if ($this->isEdit && $this->usuarioId) {
+                $query->where(fn ($perfil) => $perfil->whereNull('cod_usuario')
+                    ->orWhere('cod_usuario', '!=', $this->usuarioId));
+            }
+            if ($query->exists()) {
+                $fail('El celular ya está registrado.');
 
-            return;
+                return;
+            }
         }
 
         // 2. Sin letras o símbolos
@@ -1160,8 +1175,8 @@ class UsuariosPanel extends Component
             return;
         }
 
-        // Protección absoluta de USU_0001
-        if ($cod_usuario === 'USU_0001' && auth()->id() !== 'USU_0001') {
+        // Protección absoluta de COD_USU_000001
+        if (User::find($cod_usuario)?->esCuentaPrincipal() && ! auth()->user()?->esCuentaPrincipal()) {
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Acceso denegado',
@@ -1621,7 +1636,7 @@ class UsuariosPanel extends Component
             return;
         }
 
-        // Determinar estado y acceso por defecto en modo creación, protegiendo a USU_0001
+        // Determinar estado y acceso por defecto en modo creación, protegiendo a COD_USU_000001
         $estadoGuardado = $this->estado;
         $accesoGuardado = $this->acceso_sistema;
 
@@ -1630,7 +1645,7 @@ class UsuariosPanel extends Component
             $accesoGuardado = 'HABILITADO';
         }
 
-        if ($this->isEdit && $this->usuarioId === 'USU_0001') {
+        if ($this->isEdit && User::find($this->usuarioId)?->esCuentaPrincipal()) {
             $estadoGuardado = 'ACTIVO';
             $accesoGuardado = 'HABILITADO';
             $this->rol = 'admin';
@@ -1851,7 +1866,7 @@ class UsuariosPanel extends Component
         $usuario = User::findOrFail($id);
 
         // Protección absoluta del Administrador Principal
-        if ($usuario->cod_usuario === 'USU_0001' || $usuario->correo === 'admincasaamandita@gmail.com') {
+        if ($usuario->esCuentaPrincipal()) {
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Acción denegada',
@@ -1909,8 +1924,8 @@ class UsuariosPanel extends Component
 
         $usuario = User::findOrFail($cod_usuario);
 
-        // Protección absoluta de USU_0001
-        if ($usuario->cod_usuario === 'USU_0001' && auth()->id() !== 'USU_0001') {
+        // Protección absoluta de COD_USU_000001
+        if ($usuario->esCuentaPrincipal() && ! auth()->user()?->esCuentaPrincipal()) {
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Acción no permitida',
@@ -1958,7 +1973,7 @@ class UsuariosPanel extends Component
 
             if (! empty($this->search)) {
                 $query->where(function ($q) {
-                    $q->whereLike('correo', '%'.$this->search.'%')
+                    $q->whereLike('usuarios.correo', '%'.$this->search.'%')
                         ->orWhereHas('personal', function ($pq) {
                             $pq->whereLike('nombres', '%'.$this->search.'%')
                                 ->orWhereLike('apellido_paterno', '%'.$this->search.'%')
@@ -1968,7 +1983,7 @@ class UsuariosPanel extends Component
             }
 
             if (! empty($this->filtroEstado)) {
-                $query->where('estado', $this->filtroEstado);
+                $query->where('usuarios.estado', $this->filtroEstado);
             }
 
             if (! empty($this->filtroRol)) {
@@ -2176,6 +2191,7 @@ class UsuariosPanel extends Component
         $usuario = $this->usuarioDetalle;
         abort_unless($usuario, 404);
         $tipo = app(DocumentacionUsuarioService::class)->tipoDisponible($usuario, $codTipoDoc);
+        $this->referenciaDocumento = app(DocumentacionUsuarioService::class)->referenciaVigente($usuario, $codTipoDoc, auth()->user());
         $this->tipoDocSeleccionado = $codTipoDoc;
         $this->tipoDocNombre = $tipo->nombre;
         $this->archivoTemporal = null;
@@ -2189,6 +2205,7 @@ class UsuariosPanel extends Component
     {
         $this->mostrarModalSubirDoc = false;
         $this->tipoDocSeleccionado = null;
+        $this->referenciaDocumento = null;
         $this->tipoDocNombre = null;
         $this->archivoTemporal = null;
         $this->fechaEmisionDoc = null;
@@ -2226,20 +2243,25 @@ class UsuariosPanel extends Component
         $service = app(DocumentacionUsuarioService::class);
 
         try {
+            if ($this->referenciaDocumento === null) {
+                throw ValidationException::withMessages(['file' => 'Abre la carga desde el documento que deseas actualizar.']);
+            }
             $service->subirDocumento(
                 $usuario,
                 $this->tipoDocSeleccionado,
                 $this->archivoTemporal,
                 $this->fechaEmisionDoc,
                 $this->fechaVencimientoDoc,
-                $this->observacionesDoc
+                $this->observacionesDoc,
+                auth()->user(),
+                $this->referenciaDocumento
             );
 
             // Refrescar el usuario para reflejar el estado cargado
             $this->usuarioDetalle = User::with([
                 'roles',
                 'documentos',
-                'contactos.adultosMayores',
+                'contactos.residentes',
             ])->findOrFail($usuario->cod_usuario);
 
             $this->cerrarModalSubirDoc();
@@ -2276,8 +2298,8 @@ class UsuariosPanel extends Component
 
         if (! empty($this->search)) {
             $query->where(function ($q) {
-                $q->whereLike('correo', '%'.$this->search.'%')
-                    ->orWhereLike('cod_usuario', '%'.$this->search.'%')
+                $q->whereLike('usuarios.correo', '%'.$this->search.'%')
+                    ->orWhereLike('usuarios.cod_usuario', '%'.$this->search.'%')
                     ->orWhereHas('personal', function ($pq) {
                         $pq->whereLike('nombres', '%'.$this->search.'%')
                             ->orWhereLike('apellido_paterno', '%'.$this->search.'%')
@@ -2287,7 +2309,7 @@ class UsuariosPanel extends Component
         }
 
         if (! empty($this->filtroEstado)) {
-            $query->where('estado', $this->filtroEstado);
+            $query->where('usuarios.estado', $this->filtroEstado);
         }
 
         if (! empty($this->filtroRol)) {
@@ -2295,7 +2317,7 @@ class UsuariosPanel extends Component
         }
 
         if (! empty($this->filtroGenero)) {
-            $query->where('genero', $this->filtroGenero);
+            $query->where('personal.genero', $this->filtroGenero);
         }
 
         if (! empty($this->filtroArea)) {
@@ -2330,10 +2352,7 @@ class UsuariosPanel extends Component
             'roles' => Role::all(),
             'especialidades' => collect(),
             'cargosAdmin' => collect(),
-            'areas' => collect(User::$areasEstaticas)->map(fn ($nombre, $codigo) => (object) [
-                'cod_area' => $codigo,
-                'nombre' => $nombre,
-            ]),
+            'areas' => \App\Models\Area::query()->where('estado', 'ACTIVA')->orderBy('nombre')->get(),
             'usuarioFicha' => $usuarioFichaModel,
             'residentesDisponibles' => Residente::query()
                 ->whereIn('estado', ['ACTIVO', 'ADMITIDO'])

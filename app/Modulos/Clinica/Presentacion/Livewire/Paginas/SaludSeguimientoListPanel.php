@@ -2,12 +2,12 @@
 
 namespace App\Modulos\Clinica\Presentacion\Livewire\Paginas;
 
-use App\Models\Alerta;
 use App\Models\Atencion;
 use App\Models\Prescripcion;
 use App\Models\Residente;
 use App\Models\SignoVital;
 use App\Models\ValoracionFuncional;
+use App\Modulos\Alertas\Aplicacion\Consultas\BandejaAlertas;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -213,7 +213,7 @@ class SaludSeguimientoListPanel extends Component
             'medicaciones_activas' => Prescripcion::whereIn('estado', ['ACTIVA', 'ACTIVO'])->count(),
             'controles_hoy' => SignoVital::whereDate('fecha_hora', today())->count(),
             'valoraciones' => ValoracionFuncional::where('fecha_hora', '>=', now()->subDays(30))->count(),
-            'alertas_pendientes' => Alerta::whereIn('estado', ['ABIERTA', 'EN_ATENCION'])->count(),
+            'alertas_pendientes' => app(BandejaAlertas::class)->pendientes(auth()->user())->count(),
             'adultos_sin_ficha' => 0,
         ];
 

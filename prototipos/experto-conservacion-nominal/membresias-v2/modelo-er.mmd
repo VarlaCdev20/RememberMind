@@ -1,0 +1,5 @@
+erDiagram
+    evaluaciones_expertas ||--o{ juicios_petersen_adquiridos : adquisicion
+    valoraciones_petersen_originales ||--o{ juicios_petersen_adquiridos : original_inmutable
+    juicios_petersen_adquiridos ||--o{ soportes_petersen_adquiridos : miembros
+    soportes_valoracion_petersen ||--o{ soportes_petersen_adquiridos : soporte_inmutable

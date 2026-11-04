@@ -24,6 +24,7 @@ class UsuarioFichaService
             'rol' => $usuario->roles->first()?->name ?? 'Sin rol',
             'nombre_rol' => $this->formatearRol($usuario->roles->first()?->name),
             'area' => $usuario->areaInstitucional?->nombre ?? 'Sin asignar',
+            'fecha_ingreso' => $usuario->personal?->fecha_ingreso?->format('d/m/Y') ?? 'No registrada',
             'horarios' => $this->obtenerHorariosActivos($usuario),
             'historial_horarios' => $this->obtenerHistorialHorarios($usuario),
             'avance_documental' => app(DocumentacionUsuarioService::class)->calcularAvanceDocumental($usuario),

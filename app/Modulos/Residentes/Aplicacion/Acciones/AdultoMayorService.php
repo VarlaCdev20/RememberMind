@@ -256,7 +256,7 @@ class AdultoMayorService
         }
 
         SeguroResidente::create([
-            'cod_seguro' => 'SEG_'.Str::upper(Str::random(10)),
+            'cod_seguro' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('seguros_residente'),
             'cod_residente' => $residente->cod_residente,
             'entidad' => $entidad,
             'estado' => 'ACTIVO',
@@ -291,7 +291,7 @@ class AdultoMayorService
         $contacto = $vinculo?->contacto;
         if (! $contacto) {
             $contacto = Contacto::create([
-                'cod_contacto' => 'CON_'.Str::upper(Str::random(10)),
+                'cod_contacto' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('contactos'),
                 'nombres' => $nombres,
                 'apellido_paterno' => $apellidoPaterno,
                 'celular' => $data['contacto_emergencia_celular'],
@@ -300,7 +300,7 @@ class AdultoMayorService
             ]);
 
             $vinculo = ResidenteContacto::create([
-                'cod_residente_contacto' => 'RC_'.Str::upper(Str::random(10)),
+                'cod_residente_contacto' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('residentes_contactos'),
                 'cod_residente' => $residente->cod_residente,
                 'cod_contacto' => $contacto->cod_contacto,
                 'parentesco' => $data['contacto_emergencia_parentesco'],
@@ -349,7 +349,7 @@ class AdultoMayorService
             $residente->save();
 
             HistorialEstadoResidente::create([
-                'cod_historial_estado' => 'HER_'.strtoupper(Str::random(10)),
+                'cod_historial_estado' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('historial_estados_residente'),
                 'cod_residente' => $residente->cod_residente,
                 'cod_usuario_registro' => $codUsuarioRegistro,
                 'estado_anterior' => $anterior,
@@ -375,7 +375,7 @@ class AdultoMayorService
             $residente->save();
 
             HistorialEstadoResidente::create([
-                'cod_historial_estado' => 'HER_'.strtoupper(Str::random(10)),
+                'cod_historial_estado' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('historial_estados_residente'),
                 'cod_residente' => $residente->cod_residente,
                 'cod_usuario_registro' => $codUsuarioRegistro,
                 'estado_anterior' => $anterior,

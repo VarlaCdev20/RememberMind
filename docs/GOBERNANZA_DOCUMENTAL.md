@@ -1,12 +1,12 @@
 ---
 title: "Gobernanza documental de RememberMind"
 status: CURRENT
-version: "1.0"
-last_reviewed: 2026-10-06
+version: "2.1"
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: true
-verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
-verification_scope: STATIC_REPOSITORY_REVIEW
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_AND_REGISTERED_ROUTES
 runtime_verified: false
 supersedes: []
 related_docs: []
@@ -14,6 +14,11 @@ related_modules: []
 ---
 
 # Gobernanza documental
+
+## Entradas vigentes
+
+[Estado actual](ESTADO_ACTUAL.md), [inventario de implementación](sistema/INVENTARIO_ACTUAL.md) y [catálogo completo](INDICE_DOCUMENTAL.md), reconciliados al 04/11/2026. Los inventarios estáticos se generan del árbol; los informes de ejecución conservan fecha, entorno y alcance. `php scripts/verificar-documentacion.php --check` comprueba enlaces locales y consistencia de los recuentos documentados sin acceder a datos clínicos.
+
 
 ## Metadatos de documentos importantes
 
@@ -53,6 +58,8 @@ El portal `docs/README.md` delimita su autoridad con `source_of_truth_scope: [do
 | DEPRECATED | Sustituido para uso normativo; conservar motivo y reemplazo |
 | HISTORICAL | Snapshot/antecedente; DO NOT USE AS CURRENT SOURCE OF TRUTH |
 
+También existen estados de alcance en entregas y decisiones: `ADOPTED_INSTALLED_LOCAL` / `APPROVED_INSTALLED_LOCAL` registran adopción e instalación local fechada; `REJECTED`, `PARTIALLY_SUPERSEDED` y `SUPERSEDED_IN_SCOPE` delimitan rechazo/sustitución; `VERIFIED_LOCAL`, `ACCEPTED`, `IMPLEMENTED_ACCEPTANCE_PENDING` e `IMPLEMENTADA_QA_SESION_PENDIENTE` describen evidencia o aceptación parcial de su corte. No convierten el documento en autorización universal ni aceptan el módulo completo. El catálogo conserva su estado declarado y distingue su uso.
+
 CONFLICTING y UNKNOWN son hallazgos de auditoría, no estados YAML. Declarar parte afectada y enlazar decisión/deuda. No usar FINAL, FINAL2 o NUEVO como criterio de autoridad.
 
 ## Autoridad y evidencia
@@ -76,8 +83,18 @@ No replicar diccionario/matriz clínica por conveniencia. Estado, roadmap, decis
 
 Mantener rutas históricas durante Fase 1. Avisar en carpeta y documentos que podrían confundirse con norma. Migrar a docs/historico solo tras conocer enlaces entrantes de README/AGENTS/skills/docs.
 
-Cuando cambian locks, extensión BDD, contrato institucional o entrega con evidencia, revisar documentos afectados. No fijar fechas de entrega ficticias ni afirmar validación clínica de una skill. Para futuros agentes empezar en [el portal](README.md).
+Cuando cambian locks, extensión BDD, contrato institucional o entrega con evidencia, revisar documentos afectados. No fijar fechas de entrega ficticias ni afirmar evaluación posterior en uso real de una skill. Para futuros agentes empezar en [el portal](README.md).
 
-## Límites de esta fase
+## Alcance de la Fase 1 histórica
 
-Solo Markdown/documentación. Sin producto, BDD, migraciones, permisos, configuración funcional, UX, reglas clínicas ni commit. La revisión final independiente y la verificación se registran en [el informe](VERIFICACION_DOCUMENTAL_FASE_1.md).
+La restricción «solo Markdown, sin producto ni commit» describe exclusivamente el corte documental original del 06/10/2026 y su [verificación](VERIFICACION_DOCUMENTAL_FASE_1.md). No limita tareas posteriores de implementación autorizadas por la propietaria.
+
+## Mantenimiento vigente
+
+- Estado actual apunta al último corte comprobado; los informes fechados conservan sus resultados originales.
+- Separar requisito aprobado, implementación observada, pruebas ejecutadas y evaluación posterior en uso real. No inventar una aprobación para resolver un conflicto de nombres.
+- Una aprobación vigente del mismo alcance se reutiliza: no pedirla otra vez por el nombre PROPUESTA de un archivo.
+- La investigación, una skill y una prueba sintética no sustituyen datos originales ni aprobación estructural. Las correcciones técnicas independientes continúan.
+- Antes de retirar un documento comprobar enlaces entrantes, decisiones únicas y consumidores. Sin duplicados exactos no eliminar evidencia solo para reducir un contador.
+- Enlaces a clases movidas se actualizan a su ubicación real. Si el artefacto no existe y no hay sustituto comprobado, retirar el enlace roto y conservar el aviso de ausencia con la ruta original.
+- Las especificaciones de módulos se localizan en [el índice funcional](modulos/README.md); las instrucciones de AGENTS orientan el trabajo y no reemplazan esos contratos.

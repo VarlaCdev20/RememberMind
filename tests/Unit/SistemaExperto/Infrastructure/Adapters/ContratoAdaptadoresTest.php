@@ -1,0 +1,75 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Unit\SistemaExperto\Infrastructure\Adapters;
+
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\AdaptadorControlesCognitivos;
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\AdaptadorIadlExperimental;
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\AdaptadorInstrumentos;
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\AdaptadorSeguimientosPedagogicos;
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\AdaptadorValoracionesFuncionales;
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\MapeoFuentes\ExtractorVariableMapeada;
+use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\MapeoFuentes\ResolutorFuenteExperta;
+use DomainException;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionMethod;
+
+/** Recupera datos brutos autorizados sin interpretación clínica. */
+final class ContratoAdaptadoresTest extends TestCase
+{
+    /** Comprueba clases y comentarios sin abrir conexiones */
+    public function test_siete_clases_tipadas_documentadas_y_sin_modelos_duplicados(): void
+    {
+        $clases = [AdaptadorControlesCognitivos::class, AdaptadorSeguimientosPedagogicos::class,
+            AdaptadorValoracionesFuncionales::class, AdaptadorInstrumentos::class, AdaptadorIadlExperimental::class,
+            ResolutorFuenteExperta::class, ExtractorVariableMapeada::class];
+        foreach ($clases as $clase) {
+            $r = new ReflectionClass($clase);
+            self::assertTrue($r->isFinal());
+            self::assertTrue($r->isReadOnly());
+            self::assertStringStartsWith('App\\Modulos\\ApoyoDecision\\Infraestructura\\Adaptadores\\', $r->getNamespaceName());
+            self::assertStringStartsWith("<?php\n\ndeclare(strict_types=1);", str_replace("\r\n", "\n", file_get_contents($r->getFileName())));
+            $doc = $r->getDocComment();
+            self::assertNotFalse($doc);
+            self::assertIsString($doc);
+            self::assertMatchesRegularExpression('/\p{L}{3}/u', $doc);
+            self::assertLessThanOrEqual(240, mb_strlen($doc));
+            foreach ($r->getMethods(ReflectionMethod::IS_PUBLIC) as $metodo) {
+                self::assertNotFalse($metodo->getDocComment());
+                foreach ($metodo->getParameters() as $parametro) {
+                    self::assertNotNull($parametro->getType());
+                    self::assertStringContainsString('$'.$parametro->getName(), $metodo->getDocComment());
+                }
+                if (! $metodo->isConstructor()) {
+                    self::assertNotNull($metodo->getReturnType());
+                }
+            }
+        }
+        $raiz = dirname((new ReflectionClass(ExtractorVariableMapeada::class))->getFileName(), 2);
+        self::assertCount(7, [...glob($raiz.'/FuentesOperativas/*.php'), ...glob($raiz.'/MapeoFuentes/*.php')]);
+        foreach ([AdaptadorControlesCognitivos::class, AdaptadorSeguimientosPedagogicos::class,
+            AdaptadorValoracionesFuncionales::class, AdaptadorInstrumentos::class] as $adaptador) {
+            $modelo = new ($adaptador::MODELO);
+            self::assertSame($modelo->getTable(), $adaptador::TABLA);
+            self::assertSame($modelo->getKeyName(), $adaptador::PK);
+        }
+    }
+
+    /** @throws DomainException No se admiten clases arbitrarias a partir de una clave configurable. */
+    public function test_registro_rechaza_instancias_ajenas_a_los_cinco_adaptadores(): void
+    {
+        $this->expectException(DomainException::class);
+        new ResolutorFuenteExperta('sqlite', ['SIM-MAL' => new \stdClass]);
+    }
+
+    /** @throws DomainException No se registra una columna no existente para un selector instrumental. */
+    public function test_selector_rechaza_columnas_de_interpretacion_inventadas(): void
+    {
+        $this->expectException(DomainException::class);
+        new AdaptadorInstrumentos(['SIM-V1' => ['SIM-SEL' => [
+            'instrumento' => 'SIM-INST', 'version' => 'SIM-ED', 'pregunta' => 'SIM-PREG', 'campo' => 'diagnostico_dcl',
+        ]]]);
+    }
+}

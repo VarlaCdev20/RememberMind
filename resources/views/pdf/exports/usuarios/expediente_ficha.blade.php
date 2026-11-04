@@ -63,13 +63,7 @@
  </td>
  <td class="label-detail">Fecha Ingreso:</td>
  <td class="value-detail">
- @if($usuario->hasAnyRole(['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'PEDAGOGO', 'NUTRICIONISTA', 'FISIOTERAPEUTA']) && $usuario->personalSalud?->fecha_ing)
- {{ $usuario->personalSalud->fecha_ing instanceof \Carbon\Carbon ? $usuario->personalSalud->fecha_ing->format('d/m/Y') : \Carbon\Carbon::parse($usuario->personalSalud->fecha_ing)->format('d/m/Y') }}
- @elseif($usuario->hasAnyRole(['SUPERADMINISTRADOR', 'ADMINISTRADOR']) && $usuario->personalAdmin?->fecha_ingreso)
- {{ $usuario->personalAdmin->fecha_ingreso instanceof \Carbon\Carbon ? $usuario->personalAdmin->fecha_ingreso->format('d/m/Y') : \Carbon\Carbon::parse($usuario->personalAdmin->fecha_ingreso)->format('d/m/Y') }}
- @else
- {{ $usuario->created_at->format('d/m/Y') }}
- @endif
+ {{ $fecha_ingreso ?? 'No registrada' }}
  </td>
  </tr>
  <tr>
@@ -94,13 +88,13 @@
  <table class="details-table">
  <tr>
  <td class="label-detail">Turno Planificado:</td>
- <td class="value-detail" style="font-weight: bold; color: #2F3E5C;">{{ $horarios->turno?->nombre }}</td>
+ <td class="value-detail" style="font-weight: bold; color: #2F3E5C;">{{ $horarios->jornada?->turno?->nombre ?? 'Sin turno registrado' }}</td>
  <td class="label-detail">Sector Asignado:</td>
  <td class="value-detail" style="font-weight: bold;">{{ $horarios->area?->nombre }}</td>
  </tr>
  <tr>
  <td class="label-detail">Rango Horario:</td>
- <td class="value-detail">{{ substr($horarios->turno?->hora_inicio, 0, 5) }} a {{ substr($horarios->turno?->hora_fin, 0, 5) }}</td>
+ <td class="value-detail">{{ substr($horarios->jornada?->turno?->hora_inicio ?? '', 0, 5) }} a {{ substr($horarios->jornada?->turno?->hora_cierre ?? '', 0, 5) }}</td>
  <td class="label-detail">Das de Jornada:</td>
  <td class="value-detail">
  @foreach($horarios->dias_semana ?? [] as $d)
@@ -142,6 +136,7 @@
  {{ $doc['nombre'] }}
  <div style="font-size: 8px; color: #7C7168; font-weight: normal; margin-top: 1px;">
  {{ $doc['descripcion'] }}
+ <x-ui.document-requirement-warning :item="$doc" />
  </div>
  </td>
  <td>
@@ -162,11 +157,11 @@
  };
  @endphp
  <span style="{{ $statusColor }}">
- {{ $doc['estado'] }}
+ {{ ($doc['conflicto'] ?? false) ? 'Revisión necesaria' : $doc['estado'] }}
  </span>
  </td>
  <td>
- {{ $doc['cargado'] && $doc['documento']->created_at ? $doc['documento']->created_at->format('d/m/Y') : 'Pendiente' }}
+ {{ $doc['documento']?->fecha_hora_carga?->format('d/m/Y') ?? ($doc['cargado'] ? 'No registrada' : 'Sin entrega') }}
  </td>
  </tr>
  @endforeach

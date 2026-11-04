@@ -33,7 +33,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: mbstring, pdo_sqlite
+          extensions: mbstring, pdo_sqlite, gd, exif
           coverage: none
       - uses: actions/setup-node@v4
         with:
@@ -43,7 +43,11 @@ jobs:
       - run: composer validate --strict --no-check-publish
       - run: composer audit
       - name: Validate PHP syntax
-        run: find app bootstrap config database routes tests motor-experto/src -name '*.php' -print0 | xargs -0 -n1 php -l
+        run: find app bootstrap config database routes tests motor-experto -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Pure expert engines without Laravel
+        run: |
+          php motor-experto/tests/independencia.php
+          php motor-experto/tests/dominio_independencia.php
       - run: npm ci
       - name: Install browser for frontend tests
         run: npx puppeteer browsers install chrome
@@ -61,6 +65,10 @@ jobs:
           RM_BROWSER_HEADFUL: '1'
       - name: Independent expert engine
         run: php motor-experto/tests/independencia.php
+      - name: Verify expert test discovery
+        run: |
+          php vendor/phpunit/phpunit/phpunit --list-tests-xml pruebas-experto-sqlite.xml
+          php scripts/verificar-descubrimiento-experto.php pruebas-experto-sqlite.xml sqlite
       - name: Full SQLite suite
         run: composer test -- --log-junit=phpunit-sqlite.xml
       - name: Verification evidence
@@ -70,6 +78,7 @@ jobs:
           name: quality-evidence
           path: |
             phpunit-sqlite.xml
+            pruebas-experto-sqlite.xml
             npm-audit-full.json
 
   postgres-integration:
@@ -106,7 +115,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: mbstring, pdo_pgsql
+          extensions: mbstring, pdo_pgsql, pdo_sqlite, gd, exif
           coverage: none
       - uses: actions/setup-node@v4
         with:
@@ -129,14 +138,20 @@ jobs:
       - run: composer install --no-interaction --prefer-dist --no-progress
       - run: npm ci
       - run: npm run build
+      - name: Verify PostgreSQL expert test discovery
+        run: |
+          php vendor/phpunit/phpunit/phpunit -c phpunit.postgres.xml --filter 'CircuitoInstrumentalInicialTest|RetiradaLaboratorioExpertoTest|ExploradorExpertoTest|GobiernoReglasExpertasTest|ConocimientoCognitivoInstitucionalTest|CicloObservacionalConservadoTest|ConservacionCompletaSQLTest' --list-tests-xml pruebas-experto-postgres.xml
+          php scripts/verificar-descubrimiento-experto.php pruebas-experto-postgres.xml postgres
       - name: PostgreSQL contracts, role login and concurrency
         run: >-
           php vendor/phpunit/phpunit/phpunit -c phpunit.postgres.xml
-          --filter 'AccesoDashboardPorRolTest|AuthenticationTest|BddOperativaV2Test|ContratoPersonalInstitucionalTest|ContratoDocumentacionUsuarioTest|ContratoSeguridadCuentaTest|FichaCuidadosTest|CargaConocimientoOrionTest|ConocimientoPanelTest|RolesVistasPermisosMatrixTest|Fase3AdmisionAtomicidadTest|AlojamientoBloqueoPostgresTest|Fase3ConcurrenciaCamaPostgresTest|PersistenciaExpertaTest|ResultadosExpertoResidenteTest|PaqueteInvestigadoCOGMEMTest|DolorMigrationTest|DesacoplamientoContextoTest|PanelAlertaPreparadoTest|ConsultasPorCapaTest|ExploradorAdministrativoTest|ApplicationBoundaryTest|DesacoplamientoArchivosTest|ReportesPortabilidadTest|FrontendRestauradoV2Test|PantallasConectadasTest|VistasModularesTest|DashboardAdministracionIntegracionVisualTest'
+          --filter 'FotografiasHeridasTest|FotografiasHeridasMigrationTest|GaleriaInstitucionalTest|GaleriaInstitucionalConcurrenciaPostgresTest|GerenciaDashboardTest|PersonalInstitucionalResponsiveTest|CodigosCorrelativosTest|AsignacionesJornadaPlanificadaTest|AccesoDashboardPorRolTest|AuthenticationTest|BddOperativaV2Test|ContratoPersonalInstitucionalTest|ContratoDocumentacionUsuarioTest|DocumentacionLaboralGateTest|ContratoSeguridadCuentaTest|FichaCuidadosTest|RetiradaLaboratorioExpertoTest|ExploradorExpertoTest|RolesVistasPermisosMatrixTest|Fase3AdmisionAtomicidadTest|AlojamientoBloqueoPostgresTest|Fase3ConcurrenciaCamaPostgresTest|PersistenciaExpertaTest|InformeCognitivoTest|InformeNeurocognitivoTest|ResumenCognitivoResidenteTest|DolorMigrationTest|DesacoplamientoContextoTest|PanelAlertaPreparadoTest|ConsultasPorCapaTest|ExploradorAdministrativoTest|ApplicationBoundaryTest|DesacoplamientoArchivosTest|ReportesPortabilidadTest|FrontendRestauradoV2Test|PantallasConectadasTest|VistasModularesTest|DashboardAdministracionIntegracionVisualTest|AdquisicionPerfilExperimentalTest|ArchivoPerfilExperimentalTest|GestionConocimientoExperimentalTest|ConsolaPerfilExperimentalTest|CircuitoInstrumentalInicialTest|CicloObservacionalConservadoTest|ConservacionCompletaSQLTest|GobiernoReglasExpertasTest|GobiernoReglasConcurrenciaPostgresTest|SucesionObservacionalTest|HallazgosObservacionalesTest|PreparacionInstrumentalInvestigadaTest|CapturaInstrumentalInstitucionalTest|CapturaInstrumentalFormularioTest|SeguridadTransversalClinicaTest|TranscripcionInstrumentalConcurrenciaPostgresTest'
           --log-junit=phpunit-postgres.xml
       - name: PostgreSQL evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: postgres-evidence
-          path: phpunit-postgres.xml
+          path: |
+            phpunit-postgres.xml
+            pruebas-experto-postgres.xml

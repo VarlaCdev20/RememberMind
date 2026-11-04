@@ -66,13 +66,17 @@
         <p id="signos-fecha-ayuda"><i class="ph-bold ph-lock-simple" aria-hidden="true"></i> Fecha y hora automáticas · No editables</p>
         @error('fecha_hora')<p id="signos-fecha-error" class="rm-signos__error" role="alert">{{ $message }}</p>@enderror
     </section>
+    <x-ui.clinical-consultation-bar>
+        <x-ui.action-button variant="secondary" icono="ph-clock-counter-clockwise" @click="openTrend(active, $event.currentTarget); $nextTick(() => rmFocusClinicalHistory($refs.trendDialog))" x-bind:aria-expanded="trendOpen" aria-controls="signos-grafica-popup" aria-haspopup="dialog">Ver historial</x-ui.action-button>
+        <x-ui.action-button variant="secondary" icono="ph-chart-line" @click="openTrend(active, $event.currentTarget)" x-bind:aria-expanded="trendOpen" aria-controls="signos-grafica-popup" aria-haspopup="dialog">Ver evolución</x-ui.action-button>
+    </x-ui.clinical-consultation-bar>
     @error('continuidad_signos')<p class="rm-signos__global-error" role="alert">{{ $message }}</p>@enderror
     @if($signosObjetivos !== [])
         <details class="rm-signos__observations">
             <summary>Objetivos médicos aplicables a esta medición</summary>
             @foreach($signosObjetivos as $objetivo)
                 <p><strong>{{ $objetivo['parametro'] }} · {{ $objetivo['rango'] }}</strong><br>
-                    Médico: {{ $objetivo['medico'] }} · {{ $objetivo['codigo'] }}<br>
+                    Médico: {{ $objetivo['medico'] }}<br>
                     Vigencia: {{ $objetivo['desde'] }} — {{ $objetivo['hasta'] }}<br>
                     Límites críticos: {{ $objetivo['criticos'] }} · Motivo: {{ $objetivo['motivo'] }}</p>
             @endforeach
@@ -275,7 +279,7 @@
         <div class="rm-signos__graph-popup-body">
             <template x-if="trendOpen && active"><div>
                 @include('livewire.cuidados.partials.mis-residentes-signos-grafica')
-                <details class="rm-signos__popup-history" x-show="records(active).length"><summary>Últimos registros guardados</summary><template x-for="(row, index) in records(active).slice(0, 3)" :key="index"><div class="rm-signos__history-item"><span x-text="row.fecha"></span><strong x-text="labelOf(row, active) + ' ' + meta[active].unit"></strong></div></template>@can('enfermeria.ver_ficha_paciente')<a href="{{ route('admin.enfermeria.pacientes.ficha', ['adulto' => $detalleResidente['cod_residente'], 'tab' => 'signos']) }}">Ver historial en la ficha clínica</a>@endcan</details>
+                <details class="rm-signos__popup-history" data-clinical-history x-show="records(active).length"><summary>Últimos registros guardados</summary><template x-for="(row, index) in records(active).slice(0, 3)" :key="index"><div class="rm-signos__history-item"><span x-text="row.fecha"></span><strong x-text="labelOf(row, active) + ' ' + meta[active].unit"></strong></div></template>@can('enfermeria.ver_ficha_paciente')<a href="{{ route('admin.enfermeria.pacientes.ficha', ['adulto' => $detalleResidente['cod_residente'], 'tab' => 'signos']) }}">Ver historial en la ficha clínica</a>@endcan</details>
             </div></template>
         </div>
         <footer class="rm-signos__graph-popup-tools">

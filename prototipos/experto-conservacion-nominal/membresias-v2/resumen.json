@@ -1,0 +1,17 @@
+{
+    "alcance": "SUBMODELO_MEMBRESIAS_ORIGINALES_PETERSEN_V2",
+    "instalable_institucionalmente": false,
+    "conserva_dto_completo": false,
+    "base_actual": 100,
+    "tablas_nuevas_submodelo": 2,
+    "total_hipotetico_submodelo": 102,
+    "maximo_global": 110,
+    "columnas_cabecera_propuestas": 4,
+    "columnas_juicio_adquirido": 8,
+    "columnas_soporte_adquirido": 4,
+    "conectores_fk": 4,
+    "huella_ddl_sqlite": "c0c6e664325636cd6b7c7e35161a8592617de150a3edfb6518ebc71f4dacbc67",
+    "huella_ddl_postgres": "2c1d55b7ac953f48b87152ab7d8bca88a2caed87ad641ff545b859d21848d17b",
+    "prueba_compatibilidad_baseline": "CapturaPetersenOriginalTest::test_sql_membresias_*",
+    "no_modifica_base_institucional": true
+}

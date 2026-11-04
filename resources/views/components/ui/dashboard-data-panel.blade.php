@@ -9,9 +9,12 @@
     $maximum = max(array_merge([1], array_map(fn ($item) => max(0, (int) ($item['value'] ?? 0)), $items)));
     $cursor = 0;
     $stops = [];
+    $semanticColors = ['danger'=>'--rm-danger-strong', 'warning'=>'--rm-warning-strong', 'info'=>'--rm-info-strong', 'success'=>'--rm-success-strong', 'neutral'=>'--rm-text-secondary'];
+    $itemColors = [];
     foreach ($items as $index => $item) {
         $next = $total > 0 ? $cursor + max(0, (int) ($item['value'] ?? 0)) * 100 / $total : $cursor;
-        $token = '--rm-chart-'.(($index % 6) + 1);
+        $token = $semanticColors[$item['tone'] ?? ''] ?? '--rm-chart-'.(($index % 6) + 1);
+        $itemColors[$index] = $token;
         if ($next > $cursor) {
             $edge = min(0.45, ($next - $cursor) / 4);
             $fillStart = $cursor + $edge;
@@ -36,12 +39,12 @@
     </div>
 
     @if(!$items || (in_array($type, ['bars', 'segments', 'donut'], true) && $total === 0))
-        <x-ui.empty-state compact :icono="$panel['icon'] ?? 'ph-chart-bar'" titulo="Sin datos por mostrar" :texto="$panel['empty'] ?? 'Aún no hay registros para este bloque.'" />
+        <x-ui.empty-state compact :icono="$panel['icon'] ?? 'ph-chart-bar'" :titulo="$panel['emptyTitle'] ?? 'Sin datos por mostrar'" :texto="$panel['empty'] ?? 'Aún no hay registros para este bloque.'" />
     @elseif(in_array($type, ['list', 'timeline'], true))
         <ul class="rm-dashboard-data-panel__list {{ $type === 'timeline' ? 'rm-dashboard-data-panel__list--timeline' : '' }}">
             @foreach($items as $item)
                 <li>
-                    <span class="rm-dashboard-data-panel__row-copy"><strong>{{ $item['label'] }}</strong>@if(!empty($item['detail']))<small>{{ $item['detail'] }}</small>@endif</span>
+                    <span class="rm-dashboard-data-panel__row-copy"><strong>@if(!empty($item['url']))<a href="{{ $item['url'] }}">{{ $item['label'] }}</a>@else{{ $item['label'] }}@endif</strong>@if(!empty($item['detail']))<small>{{ $item['detail'] }}</small>@endif</span>
                     @if(isset($item['value']))<b>{{ $item['value'] }}</b>@endif
                 </li>
             @endforeach
@@ -63,7 +66,7 @@
         <div class="rm-dashboard-data-panel__donut-layout">
             <div class="rm-dashboard-data-panel__donut" style="background: conic-gradient({{ $gradient }})" role="img" aria-label="{{ collect($items)->map(fn ($item) => $item['label'].': '.$item['value'])->implode(', ') }}"><span><strong>{{ $total }}</strong><small>total</small></span></div>
             <ul class="rm-dashboard-data-panel__legend">
-                @foreach($items as $item)<li><span>{{ $item['label'] }}</span><strong>{{ $item['value'] }}</strong></li>@endforeach
+                @foreach($items as $index => $item)<li class="rm-chart-colored-item" style="--rm-chart-item-color: var({{ $itemColors[$index] }})"><span>{{ $item['label'] }}</span><strong>{{ $item['value'] }}</strong></li>@endforeach
             </ul>
         </div>
     @endif

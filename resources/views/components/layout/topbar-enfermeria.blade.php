@@ -46,19 +46,7 @@
         {{-- Campana de Notificaciones / Alertas --}}
         @auth
             @if(app(\App\Modulos\Identidad\Presentacion\Navegacion\VisibilidadNavegacion::class)->puedeVerRuta('admin.enfermeria.alertas'))
-            <a href="{{ route('admin.enfermeria.alertas') }}"
-               class="rm-topbar__action rm-topbar__notification"
-               title="Notificaciones y alertas" aria-label="Ver alertas">
-                <i class="ph-bold ph-bell text-lg" aria-hidden="true"></i>
-                @php
-                    $conteoAlertasTop = $alertasCount ?? null;
-                @endphp
-                @if($conteoAlertasTop > 0)
-                    <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--rm-danger)] text-[9.5px] font-black text-[var(--rm-text-inverse)] ring-2 ring-[var(--rm-surface)]">
-                        {{ $conteoAlertasTop }}
-                    </span>
-                @endif
-            </a>
+            <livewire:alertas.campana-notificaciones />
             @endif
         @endauth
 

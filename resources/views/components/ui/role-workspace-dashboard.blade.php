@@ -5,6 +5,7 @@
     $indicadores = $perfil['indicadores'] ?? [];
     $panels = $perfil['panels'] ?? [];
     $esSuperadministracion = ($perfil['rol'] ?? '') === 'SUPERADMINISTRADOR';
+    $esGerencia = ($perfil['rol'] ?? '') === 'GERENTE';
     $nombreSaludo = $saludo['nombre'] ?? 'Usuario';
     if ($esSuperadministracion) {
         $nombreSaludo = mb_convert_case(mb_strtolower($nombreSaludo, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
@@ -14,6 +15,7 @@
     );
     $contextoFoto = match ($perfil['rol'] ?? '') {
         'SUPERADMINISTRADOR' => 'superadmin',
+        'GERENTE' => 'gerencia',
         'ADMINISTRADOR' => 'administracion',
         'MEDICO GENERAL/GERIATRA' => 'medico',
         'PSICOLOGO/A' => 'psicologia',
@@ -26,12 +28,15 @@
     };
 @endphp
 
+@if($esGerencia)
+    @include('reportes::paginas.gerencia.inicio')
+@else
 <div @class(['rm-dashboard-composition', 'rm-dashboard-composition--superadmin' => $esSuperadministracion])>
     <x-ui.role-dashboard-hero
         personal-greeting
         :eyebrow="$perfil['eyebrow'] ?? 'CENTRO GERIÁTRICO LOS ALMENDROS'"
         :title="($saludo['saludo'] ?? 'Bienvenido') . ', ' . $nombreSaludo"
-        :highlight="$esSuperadministracion ? null : ($perfil['highlight'] ?? 'Tu espacio de trabajo')"
+        :highlight="($esSuperadministracion) ? null : ($perfil['highlight'] ?? 'Tu espacio de trabajo')"
         :description="$esSuperadministracion ? '' : ($perfil['description'] ?? '')"
         :scope="$esSuperadministracion ? (empty($perfil['jornada']) ? '' : 'Jornada actual: '.$perfil['jornada']) : null"
         :image-label="$esSuperadministracion ? false : null"
@@ -41,7 +46,7 @@
         :meta="[
             ['icon' => 'ph-calendar-blank', 'label' => $saludo['fecha'] ?? now()->format('d/m/Y')],
             ['icon' => 'ph-identification-badge', 'label' => $saludo['rolLegible'] ?? 'Perfil institucional'],
-            ['icon' => 'ph-shield-check', 'label' => $esSuperadministracion ? '' : 'Acceso según permisos'],
+            ['icon' => 'ph-shield-check', 'label' => ($esSuperadministracion) ? '' : 'Acceso según permisos'],
         ]"
     >
         @unless($esSuperadministracion)
@@ -99,3 +104,4 @@
         </section>
     @endunless
 </div>
+@endif

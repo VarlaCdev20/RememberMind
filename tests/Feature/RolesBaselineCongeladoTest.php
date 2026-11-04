@@ -2,20 +2,34 @@
 
 namespace Tests\Feature;
 
-use App\Modulos\Identidad\Presentacion\Navegacion\SidebarService;
-use App\Modulos\Identidad\Presentacion\Livewire\Paginas\RolesPermisosPanel;
 use App\Models\User;
+use App\Modulos\Identidad\Aplicacion\Acciones\ActualizarPermisosRol;
+use App\Modulos\Identidad\Presentacion\Livewire\Paginas\RolesPermisosPanel;
+use App\Modulos\Identidad\Presentacion\Navegacion\SidebarService;
 use App\Modulos\Medicacion\Presentacion\Policies\PrescripcionPolicy;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 
 class RolesBaselineCongeladoTest extends TestCase
 {
     use RefreshDatabase;
+
+    private const PERMISOS_EXCLUIDOS_SUPERADMIN = [
+        'fotografias_institucionales.gestionar',
+        'evaluaciones_expertas.ejecutar_observaciones',
+        'reglas_expertas.gestionar',
+        'reglas_expertas.revisar',
+        'aplicaciones_instrumento.transcribir',
+        'valoraciones_petersen.crear',
+        'valoraciones_petersen.rectificar',
+        'controles_funcionales_iadl.crear',
+        'controles_funcionales_iadl.rectificar',
+    ];
 
     protected function setUp(): void
     {
@@ -50,9 +64,16 @@ class RolesBaselineCongeladoTest extends TestCase
         $this->assertTrue($user->can('admisiones.formalizar'));
         $this->assertTrue(app(PrescripcionPolicy::class)->create($user));
         $this->assertEqualsCanonicalizing(
-            Permission::query()->where('guard_name', 'web')->pluck('name')->all(),
+            Permission::query()->where('guard_name', 'web')->whereNotIn('name', self::PERMISOS_EXCLUIDOS_SUPERADMIN)->pluck('name')->all(),
             $user->getAllPermissions()->pluck('name')->all()
         );
+        $this->assertTrue($user->can('controles_funcionales_iadl.ver'));
+        $this->assertFalse($user->can('valoraciones_petersen.crear'));
+        $this->assertFalse($user->can('valoraciones_petersen.rectificar'));
+        $this->assertFalse($user->can('fotografias_institucionales.gestionar'));
+        // Decisión explícita de la propietaria: el guardado observacional pertenece solo a Medicina/Psicología.
+        $this->assertFalse($user->can('evaluaciones_expertas.ejecutar_observaciones'));
+        $this->assertTrue($user->can('fotografias_institucionales.ver'));
     }
 
     public function test_permiso_nuevo_se_asigna_al_superadmin_y_sobrevive_al_resembrado(): void
@@ -79,9 +100,93 @@ class RolesBaselineCongeladoTest extends TestCase
             ->call('guardarPermisos');
 
         $this->assertSame(
-            Permission::query()->where('guard_name', 'web')->count(),
+            Permission::query()->where('guard_name', 'web')->whereNotIn('name', self::PERMISOS_EXCLUIDOS_SUPERADMIN)->count(),
             $rol->fresh()->permissions()->count()
         );
+        $this->assertFalse($rol->fresh()->hasPermissionTo('evaluaciones_expertas.ejecutar_observaciones'));
+        $this->assertFalse($rol->fresh()->hasPermissionTo('reglas_expertas.gestionar'));
+        $this->assertFalse($rol->fresh()->hasPermissionTo('reglas_expertas.revisar'));
+        $this->assertTrue($rol->fresh()->hasPermissionTo('controles_funcionales_iadl.ver'));
+    }
+
+    public function test_crear_el_permiso_observacional_no_lo_concede_automaticamente_a_superadministracion(): void
+    {
+        $nombre = 'evaluaciones_expertas.ejecutar_observaciones';
+        Permission::findByName($nombre, 'web')->delete();
+        $permiso = Permission::create(['name' => $nombre, 'guard_name' => 'web']);
+
+        $this->assertFalse($permiso->roles()->exists());
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $this->assertEqualsCanonicalizing(['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A'], $permiso->fresh()->roles()->pluck('name')->all());
+    }
+
+    public function test_editor_de_roles_no_puede_conceder_guardado_observacional_a_enfermeria(): void
+    {
+        $actor = $this->usuarioConRol('SUPERADMINISTRADOR');
+        $rol = Role::findByName('ENFERMEROS', 'web');
+        $antes = $rol->permissions()->pluck('name')->all();
+        try {
+            app(ActualizarPermisosRol::class)
+                ->guardar($actor, $rol, [...$antes, 'evaluaciones_expertas.ejecutar_observaciones']);
+            $this->fail('Se aceptó una concesión fuera de las competencias aprobadas.');
+        } catch (HttpException $e) {
+            $this->assertSame(403, $e->getStatusCode());
+        }
+        $this->assertEqualsCanonicalizing($antes, $rol->fresh()->permissions()->pluck('name')->all());
+    }
+
+    public function test_editor_no_concede_lectura_iadl_a_enfermeria(): void
+    {
+        $actor = $this->usuarioConRol('SUPERADMINISTRADOR');
+        $rol = Role::findByName('ENFERMEROS', 'web');
+        $antes = $rol->permissions()->pluck('name')->all();
+
+        try {
+            app(ActualizarPermisosRol::class)->guardar($actor, $rol, [...$antes, 'controles_funcionales_iadl.ver']);
+            $this->fail('Se concedió la fuente IADL a un rol fuera del contrato aprobado.');
+        } catch (HttpException $e) {
+            $this->assertSame(403, $e->getStatusCode());
+        }
+
+        $this->assertEqualsCanonicalizing($antes, $rol->fresh()->permissions()->pluck('name')->all());
+    }
+
+    public function test_gobierno_se_reserva_a_medicina_y_psicologia_incluso_al_crear_permisos(): void
+    {
+        $actor = $this->usuarioConRol('SUPERADMINISTRADOR');
+        foreach (['reglas_expertas.gestionar', 'reglas_expertas.revisar'] as $nombre) {
+            Permission::findByName($nombre, 'web')->delete();
+            $permiso = Permission::create(['name' => $nombre, 'guard_name' => 'web']);
+            $this->assertFalse($permiso->roles()->exists());
+            $this->seed(RolesAndPermissionsSeeder::class);
+            $this->assertEqualsCanonicalizing(['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A'], $permiso->fresh()->roles()->pluck('name')->all());
+            $rol = Role::findByName('ENFERMEROS', 'web');
+            $antes = $rol->permissions()->pluck('name')->all();
+            try {
+                app(ActualizarPermisosRol::class)->guardar($actor, $rol, [...$antes, $nombre]);
+                $this->fail('Se concedió gobierno fuera de Medicina/Psicología.');
+            } catch (HttpException $e) {
+                $this->assertSame(403, $e->getStatusCode());
+                $this->assertEqualsCanonicalizing($antes, $rol->fresh()->permissions()->pluck('name')->all());
+            }
+        }
+    }
+
+    public function test_editor_rechaza_ids_y_arrays_anidados_sin_modificar_permisos(): void
+    {
+        $actor = $this->usuarioConRol('SUPERADMINISTRADOR');
+        $rol = Role::findByName('ENFERMEROS', 'web');
+        $antes = $rol->permissions()->pluck('name')->all();
+        $permiso = Permission::findByName('evaluaciones_expertas.ejecutar_observaciones', 'web');
+        foreach ([[$permiso->id], [(string) $permiso->id], [[$permiso->name]]] as $entrada) {
+            try {
+                app(ActualizarPermisosRol::class)->guardar($actor, $rol, $entrada);
+                $this->fail('Se aceptó una representación de permiso manipulada.');
+            } catch (HttpException $e) {
+                $this->assertSame(422, $e->getStatusCode());
+            }
+            $this->assertEqualsCanonicalizing($antes, $rol->fresh()->permissions()->pluck('name')->all());
+        }
     }
 
     public function test_gerente_dirige_personal_y_planificacion_sin_competencia_clinica(): void
@@ -142,7 +247,7 @@ class RolesBaselineCongeladoTest extends TestCase
             ->assertOk()->assertSee('Superadministración')->assertSee('Residentes activos');
 
         $this->actingAs($this->usuarioConRol('GERENTE'))->get(route('dashboard'))
-            ->assertOk()->assertSee('con visión de cobertura')->assertSee('Personal activo');
+            ->assertOk()->assertSee('Organización y planificación')->assertSee('Personal activo');
 
         $this->actingAs($this->usuarioConRol('ADMINISTRADOR'))->get(route('dashboard'))
             ->assertRedirect(route('admin.administracion.dashboard'));

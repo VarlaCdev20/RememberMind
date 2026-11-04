@@ -28,11 +28,9 @@
 
     {{-- Tipografía Oficial Google Fonts (Nunito Sans) --}}
 
-    {{-- Phosphor Icons Oficial --}}
-    <script defer src="https://unpkg.com/@phosphor-icons/web"></script>
+    {{-- Iconos oficiales compilados localmente con Vite. --}}
 
-    {{-- Chart.js Oficial --}}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {{-- Chart.js y notificaciones utilizan la entrada local compartida de Vite. --}}
 
     @vite(['resources/frontend/styles/app.css', 'resources/frontend/scripts/app.js'])
 

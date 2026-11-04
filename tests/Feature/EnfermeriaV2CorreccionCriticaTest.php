@@ -517,7 +517,7 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
         $atencion = Atencion::query()->create([
             'cod_atencion' => 'ATE_CRIT_01',
             'cod_residente' => $residente->cod_residente,
-            'cod_area' => $area?->cod_area ?: 'ARE_0001',
+            'cod_area' => $area?->cod_area ?: 'COD_ARE_000001',
             'cod_personal' => $personal->cod_personal,
             'tipo_atencion' => 'CONSULTA MEDICA',
             'motivo' => 'Evaluacion farmacologica',

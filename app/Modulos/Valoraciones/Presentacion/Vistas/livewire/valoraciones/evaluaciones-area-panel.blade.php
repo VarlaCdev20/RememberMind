@@ -1,4 +1,5 @@
-<div class="space-y-6">
+<div class="space-y-6 rm-valoraciones-area" x-data="{ errorSolicitud: '' }" @rm-valoraciones-error="errorSolicitud = $event.detail.message" @rm-valoraciones-inicio="errorSolicitud = ''">
+ <p x-show="errorSolicitud" x-cloak x-text="errorSolicitud" role="alert" class="rm-error"></p>
 
  {{-- Breadcrumb + Encabezado --}}
  <nav class="flex text-[10px] font-bold uppercase tracking-widest text-meta" aria-label="Breadcrumb">
@@ -20,14 +21,42 @@
   class="inline-flex items-center gap-2 rounded-xl border border-borde bg-fondo-card px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-parrafo transition hover:bg-fondo-panel">
   <i class="ph-bold ph-arrow-left"></i> Volver
   </a>
-  @can('aplicaciones_instrumento.crear')
+  @if($instrumentosActivos->isNotEmpty() && $puedeCapturar)
   <button wire:click="nuevaEvaluacion()"
    class="inline-flex items-center gap-2 rounded-xl bg-boton-principal px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-sm transition hover:-translate-y-0.5 hover:shadow-md active:scale-95">
   <i class="ph-bold ph-plus-circle text-sm"></i> Nueva Evaluación
   </button>
-  @endcan
+  @endif
  </x-slot:actions>
  </x-ui.collection-header>
+
+ @if($codArea === 'ARE_COG' && auth()->user()?->hasRole('PSICOLOGO/A') && auth()->user()?->can('valoraciones_petersen.crear'))
+ <x-ui.section-card title="Valoración cognitiva y funcional" subtitle="Seleccione al residente para documentar su valoración profesional y los registros que la sustentan" icon="ph-brain">
+  <p class="text-sm text-rm-secondary">Aquí se documentan los cinco dominios cognitivos y los requisitos originales de Petersen. C02 se obtiene de los dominios; no se registra manualmente.</p>
+  <div class="mt-4 max-w-lg">
+   <label for="buscar-residente-valoracion" class="block text-sm font-semibold">Buscar residente por nombre</label>
+   <input id="buscar-residente-valoracion" type="search" wire:model.live.debounce.300ms="busquedaValoracion" maxlength="80" autocomplete="off" placeholder="Nombre o apellido" class="rm-input w-full">
+  </div>
+  @if($residentesValoracion->isEmpty())
+   <p class="mt-4 text-sm text-rm-secondary" role="status">No se encontraron residentes admitidos disponibles. Revise el nombre buscado.</p>
+  @else
+   <ul class="mt-4 grid gap-3 md:grid-cols-2" aria-label="Residentes para valoración cognitiva y funcional">
+    @foreach($residentesValoracion as $residenteValoracion)
+     <li wire:key="valoracion-cognitiva-{{ $residenteValoracion->getKey() }}" class="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-xl border border-rm p-3">
+      <div class="min-w-0"><p class="break-words font-semibold">{{ $residenteValoracion->nombre_completo }}</p><p class="text-sm text-rm-secondary">{{ $residenteValoracion->edad !== null ? $residenteValoracion->edad.' años' : 'Edad no registrada' }}</p></div>
+      <a href="{{ route('admin.sistema-experto.petersen-original', $residenteValoracion) }}" class="rm-btn rm-btn-primary">Abrir valoración<span class="sr-only"> cognitiva y funcional de {{ $residenteValoracion->nombre_completo }}</span></a>
+     </li>
+    @endforeach
+   </ul>
+   <p class="mt-3 text-sm text-rm-secondary">Se muestran hasta ocho residentes. Busque por nombre para encontrar otro.</p>
+  @endif
+ </x-ui.section-card>
+ @endif
+ <nav class="rm-valoraciones-areas" aria-label="Áreas de valoración">
+ @foreach(['cognitiva' => ['ARE_COG', 'Cognitiva', 'ph-brain'], 'afectiva' => ['ARE_AFE', 'Afectiva', 'ph-heart'], 'funcionamiento' => ['ARE_FUN', 'Funcionamiento', 'ph-person-simple-walk'], 'entorno' => ['ARE_SOC', 'Entorno y red social', 'ph-users-four']] as $rutaArea => [$codigoArea, $tituloArea, $iconoArea])
+ <a href="{{ route('admin.psicologia.evaluacion.'.$rutaArea) }}" @if($codArea === $codigoArea) aria-current="page" @endif><i class="ph-bold {{ $iconoArea }}" aria-hidden="true"></i>{{ $tituloArea }}</a>
+ @endforeach
+ </nav>
 
  {{-- Stats del área --}}
  <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -36,23 +65,32 @@
  <x-ui.metric-card icon="ph-warning-circle" :value="$alertasCriticas" label="Alertas críticas" :variant="$alertasCriticas > 0 ? 'coral' : 'neutral'" />
  </div>
 
- {{-- Instrumentos disponibles --}}
- @if($instrumentos->count() > 0)
- <div class="rounded-2xl border border-borde bg-fondo-panel p-4">
- <p class="mb-3 text-[10px] font-bold uppercase tracking-widest text-apoyo">Instrumentos disponibles en esta área</p>
- <div class="flex flex-wrap gap-2">
-  @foreach($instrumentos as $inst)
-  <span class="inline-flex items-center gap-1.5 rounded-full border border-borde bg-fondo-card px-3 py-1 text-[11px] font-bold text-parrafo">
-  <span class="{{ $areaConfig['color_txt'] }} font-black">{{ $inst->siglas }}</span>
-  {{ $inst->nombre }}
-  @if($inst->puntaje_maximo)
-  <span class="text-apoyo">/ {{ number_format($inst->puntaje_maximo, 0) }} pts</span>
+ @include('valoraciones::livewire.valoraciones.explorador-instrumentos')
+
+ @if($codArea === 'ARE_COG' && auth()->user()?->hasRole('PSICOLOGO/A') && auth()->user()?->can('valoraciones_petersen.crear'))
+ <x-ui.section-card title="Valoración cognitiva y funcional" subtitle="Seleccione al residente para documentar su valoración profesional y los registros que la sustentan" icon="ph-brain">
+  <p class="text-sm text-rm-secondary">Aquí se documentan los cinco dominios cognitivos y los requisitos originales de Petersen. C02 se obtiene de los dominios; no se registra manualmente.</p>
+  <div class="mt-4 max-w-lg">
+   <label for="buscar-residente-valoracion" class="block text-sm font-semibold">Buscar residente por nombre</label>
+   <input id="buscar-residente-valoracion" type="search" wire:model.live.debounce.300ms="busquedaValoracion" maxlength="80" autocomplete="off" placeholder="Nombre o apellido" class="rm-input w-full">
+  </div>
+  @if($residentesValoracion->isEmpty())
+   <p class="mt-4 text-sm text-rm-secondary" role="status">No se encontraron residentes admitidos disponibles. Revise el nombre buscado.</p>
+  @else
+   <ul class="mt-4 grid gap-3 md:grid-cols-2" aria-label="Residentes para valoración cognitiva y funcional">
+    @foreach($residentesValoracion as $residenteValoracion)
+     <li wire:key="valoracion-cognitiva-{{ $residenteValoracion->getKey() }}" class="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-xl border border-rm p-3">
+      <div class="min-w-0"><p class="break-words font-semibold">{{ $residenteValoracion->nombre_completo }}</p><p class="text-sm text-rm-secondary">{{ $residenteValoracion->edad !== null ? $residenteValoracion->edad.' años' : 'Edad no registrada' }}</p></div>
+      <a href="{{ route('admin.sistema-experto.petersen-original', $residenteValoracion) }}" class="rm-btn rm-btn-primary">Abrir valoración<span class="sr-only"> cognitiva y funcional de {{ $residenteValoracion->nombre_completo }}</span></a>
+     </li>
+    @endforeach
+   </ul>
+   <p class="mt-3 text-sm text-rm-secondary">Se muestran hasta ocho residentes. Busque por nombre para encontrar otro.</p>
   @endif
-  </span>
-  @endforeach
- </div>
- </div>
+ </x-ui.section-card>
  @endif
+
+
 
      {{-- Filtros --}}
     <x-ui.filter-bar class="mb-4">
@@ -82,25 +120,23 @@
             {{-- Filtro Alerta --}}
             <div class="lg:col-span-3">
                 <label for="evaluaciones-alerta" class="rm-collection-filter-label">Nivel de alerta</label>
-                <select id="evaluaciones-alerta" wire:model.live="filtroAlerta"
-                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                <x-ui.selector id="evaluaciones-alerta" label="Nivel de alerta" wire:model.live="filtroAlerta">
                     <option value="">Todos los niveles</option>
                     <option value="NORMAL">Normal</option>
                     <option value="PREVENTIVO">Preventivo</option>
                     <option value="CRITICO">Crítico</option>
-                </select>
+                </x-ui.selector>
             </div>
 
             {{-- Filtro Instrumento --}}
             <div class="lg:col-span-3">
                 <label for="evaluaciones-instrumento" class="rm-collection-filter-label">Instrumento</label>
-                <select id="evaluaciones-instrumento" wire:model.live="filtroInstrumento"
-                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+                <x-ui.selector id="evaluaciones-instrumento" label="Instrumento" wire:model.live="filtroInstrumento">
                     <option value="">Todos los instrumentos</option>
                     @foreach($instrumentos as $inst)
                         <option value="{{ $inst->cod_instrumento }}">{{ $inst->siglas }} — {{ $inst->nombre }}</option>
                     @endforeach
-                </select>
+                </x-ui.selector>
             </div>
         </div>
 
@@ -140,6 +176,13 @@
         @endif
     </x-ui.filter-bar>
 
+ @if($instrumentos->isEmpty())
+ <p class="text-sm text-rm-secondary" role="status">El catálogo actual no tiene instrumentos asociados a esta área. Consulte los registros existentes desde la ficha del residente; aquí no se puede iniciar una aplicación de esta área.</p>
+ @elseif($instrumentosActivos->isEmpty())
+ <p class="text-sm text-rm-secondary" role="status">Las aplicaciones históricas de esta área siguen visibles. Sus instrumentos están inactivos para nuevas aplicaciones.</p>
+ @endif
+
+ <h2 class="rm-explorador__titulo-historial">Historial de aplicaciones</h2>
  {{-- Tabla de evaluaciones --}}
  <div class="rm-table-container rounded-3xl border border-borde bg-fondo-card shadow-sm overflow-hidden">
  @if($evaluaciones->count() > 0)
@@ -151,61 +194,62 @@
    <th class="px-5 py-3">Instrumento</th>
    <th class="px-5 py-3">Puntaje</th>
    <th class="px-5 py-3">Resultado / Categoría</th>
-   <th class="px-5 py-3">Nivel Alerta</th>
-   <th class="px-5 py-3">Evaluador</th>
+   <th class="px-5 py-3">Clasificación registrada</th>
+   <th class="px-5 py-3">Profesional y fuente original</th>
    <th class="px-5 py-3">Fecha</th>
-   @can('aplicaciones_instrumento.crear')<th class="px-5 py-3 text-center">Acción</th>@endcan
+   @if($instrumentosActivos->isNotEmpty() && $puedeCapturar)<th class="px-5 py-3 text-center">Acción</th>@endif
    </tr>
   </thead>
   <tbody class="divide-y divide-borde/50">
    @foreach($evaluaciones as $eval)
    @php
-   $alertaClass = match($eval->nivel_alerta) {
+   $alertaClass = match($eval->clasificacion) {
     'CRITICO' => 'bg-estado-peligro text-white',
     'PREVENTIVO' => 'bg-estado-advertencia text-white',
-    default => 'bg-estado-exitoBg text-estado-exito',
+    'NORMAL' => 'bg-estado-exitoBg text-estado-exito',
+    default => 'bg-fondo-panel text-parrafo',
    };
    @endphp
    <tr class="hover:bg-fondo-panel/50 transition-colors">
    <td class="px-5 py-3">
     <div class="flex items-center gap-2.5">
     <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full {{ $areaConfig['color_bg'] }} {{ $areaConfig['color_txt'] }} text-sm font-black">
-     {{ substr($eval->adulto?->nombres ?? '?', 0, 1) }}{{ substr($eval->adulto?->ap_paterno ?? '', 0, 1) }}
+     {{ mb_substr($eval->adulto?->nombres ?? '?', 0, 1) }}{{ mb_substr($eval->adulto?->apellido_paterno ?? '', 0, 1) }}
     </div>
     <div>
      <div class="font-bold text-titulo">
-     {{ $eval->adulto?->nombres ?? '—' }} {{ $eval->adulto?->ap_paterno ?? '' }}
+     {{ $eval->adulto?->nombres ?? '—' }} {{ $eval->adulto?->apellido_paterno ?? '' }}
      </div>
-     <div class="text-[10px] text-apoyo">CI: {{ $eval->adulto?->ci ?? '—' }}</div>
+     <div class="text-[10px] text-apoyo">Documento: {{ $eval->adulto?->numero_documento ?? '—' }}</div>
     </div>
     </div>
    </td>
    <td class="px-5 py-3">
-    <div class="font-bold text-titulo">{{ $eval->instrumento?->siglas ?? '—' }}</div>
+    <div class="font-bold text-titulo">{{ $eval->instrumento?->codigo ?? '—' }}</div>
     <div class="text-[10px] text-apoyo max-w-[160px] truncate">{{ $eval->instrumento?->nombre ?? '' }}</div>
    </td>
    <td class="px-5 py-3 font-black text-titulo">
-    {{ $eval->puntaje_total !== null ? number_format($eval->puntaje_total, 0) : '—' }}
-    @if($eval->instrumento?->puntaje_maximo)
-    <span class="text-[10px] font-semibold text-apoyo">/ {{ number_format($eval->instrumento->puntaje_maximo, 0) }}</span>
+    {{ $eval->puntaje_total !== null ? number_format($eval->puntaje_total, 2) : '—' }}
+    @if($eval->puntaje_maximo !== null)
+    <span class="text-[10px] font-semibold text-apoyo">/ {{ number_format($eval->puntaje_maximo, 2) }}</span>
     @endif
    </td>
    <td class="px-5 py-3 text-xs font-semibold text-parrafo max-w-[160px] truncate"
-    title="{{ $eval->categoria_resultado ?? '' }}">
-    {{ $eval->categoria_resultado ?? '—' }}
+    title="{{ $eval->interpretacion ?? '' }}">
+    {{ $eval->interpretacion ?? '—' }}
    </td>
    <td class="px-5 py-3">
     <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider {{ $alertaClass }}">
-    {{ $eval->nivel_alerta ?? 'NORMAL' }}
+    {{ $eval->clasificacion ?? 'Sin clasificación' }}
     </span>
    </td>
    <td class="px-5 py-3 text-xs text-apoyo">
-    {{ $eval->evaluador?->name ?? '—' }}
+    {{ $eval->evaluador?->nombres ?? '—' }} {{ $eval->evaluador?->apellido_paterno ?? '' }}<p>{{ $eval->cod_documento_clinico ? 'Documento original asociado' : 'Registro de aplicación' }}</p>@if($eval->localizador_fuente)<p>{{ $eval->localizador_fuente }}</p>@endif
    </td>
    <td class="px-5 py-3 text-xs font-medium text-apoyo">
-    {{ $eval->fecha_eval ? \Carbon\Carbon::parse($eval->fecha_eval)->format('d/m/Y') : '—' }}
+    {{ $eval->fecha_hora?->format('d/m/Y H:i') ?? '—' }}
    </td>
-   @can('aplicaciones_instrumento.crear')
+   @if($instrumentosActivos->isNotEmpty() && $puedeCapturar)
    <td class="px-5 py-3 text-center">
     <button wire:click="nuevaEvaluacion('{{ $eval->adulto?->cod_residente }}')"
      title="Nueva evaluación para este residente"
@@ -213,7 +257,7 @@
     <i class="ph-bold ph-plus text-sm"></i>
     </button>
    </td>
-   @endcan
+   @endif
    </tr>
    @endforeach
   </tbody>
@@ -237,10 +281,12 @@
   @if($busqueda || $filtroAlerta || $filtroInstrumento)
    Intenta modificar los filtros de búsqueda.
   @else
-   Registra la primera evaluación de <strong>{{ $nombreArea }}</strong> para un adulto mayor.
+   @if($instrumentosActivos->isNotEmpty())Registre la primera aplicación vigente de <strong>{{ $nombreArea }}</strong> para un residente.
+   @elseif($instrumentos->isNotEmpty())No hay aplicaciones de esta área en el período consultado. Sus instrumentos históricos no admiten nuevas aplicaciones.
+   @else No hay instrumentos asociados a esta área en el catálogo actual.@endif
   @endif
   </p>
-  @if(!$busqueda && !$filtroAlerta && !$filtroInstrumento && auth()->user()?->can('aplicaciones_instrumento.crear'))
+  @if($instrumentosActivos->isNotEmpty() && !$busqueda && !$filtroAlerta && !$filtroInstrumento && $puedeCapturar)
   <button wire:click="nuevaEvaluacion()"
    class="mt-5 inline-flex items-center gap-2 rounded-xl bg-boton-principal px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-inverso shadow-md transition hover:-translate-y-0.5 active:scale-95">
   <i class="ph-bold ph-plus-circle text-sm"></i> Nueva Evaluación
@@ -250,35 +296,23 @@
  @endif
  </div>
 
- {{-- Observaciones clínicas por área --}}
- <div class="rounded-2xl border border-borde bg-fondo-panel p-5">
- <div class="flex items-start gap-3">
-  <div class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg {{ $areaConfig['color_bg'] }} {{ $areaConfig['color_txt'] }}">
-  <i class="ph-bold ph-info text-base"></i>
-  </div>
-  <div>
-  <p class="text-xs font-black uppercase tracking-wider text-titulo mb-1">
-   Guía de Interpretación — Área {{ $nombreArea }}
-  </p>
-  @php
-   $guias = [
-   'ARE_COG' => 'Evalúa memoria, orientación, lenguaje y funciones ejecutivas. Instrumentos: MMSE (≥24 normal), MoCA (≥26 normal), Mini-Cog (0-2 riesgo). Puntajes bajos indican deterioro cognitivo que requiere seguimiento especializado.',
-   'ARE_AFE' => 'Detecta síntomas depresivos y estado emocional. GDS-15: 0-4 normal, 5-8 depresión leve, ≥9 depresión severa. CESD-7: ≥6 sugiere sintomatología depresiva. Requiere intervención psicológica inmediata si es crítico.',
-   'ARE_FUN' => 'Mide la capacidad funcional y autonomía. Katz (0-6 pts): evalúa actividades básicas. Lawton (0-8 pts): actividades instrumentales. SPPB ≤9 indica fragilidad. TUG >12 seg indica riesgo de caída.',
-   'ARE_NUT' => 'Detecta riesgo de malnutrición. MNA-SF (≥12 normal, 8-11 riesgo, ≤7 malnutrido). MUST: 0 bajo riesgo, ≥2 alto riesgo. SARC-F: ≥4 sugiere sarcopenia.',
-   'ARE_SOC' => 'Evalúa recursos sociales, familiares y entorno físico. Detecta riesgo de maltrato, aislamiento y barreras arquitectónicas. Escala de maltrato: ≥6 indica riesgo significativo.',
-   ];
-  @endphp
-  <p class="text-xs font-semibold text-parrafo leading-relaxed">
-   {{ $guias[$codArea] ?? 'Consultar los criterios específicos del instrumento utilizado.' }}
-  </p>
-  </div>
+ <div class="rm-explorador__nota" role="note">
+ <p>{{ match($codArea) { 'ARE_COG' => 'Las observaciones describen componentes; no equivalen a mediciones estandarizadas. Una interpretación puede abstenerse por falta de fuentes o condiciones.', 'ARE_FUN' => 'Barthel registra actividades básicas. La independencia IADL y C03 requieren su circuito original y sus responsables autorizados; aquí se consultan según permiso.', 'ARE_AFE' => 'La valoración psicológica conserva entrevista, estado afectivo, conducta, conclusión y seguimiento. Un vacío instrumental no significa falta de atención.', 'ARE_SOC' => 'La entrevista contextual y la red de apoyo requieren fuentes identificables, relación del informante y confidencialidad. No se crean tests sociales.', default => 'Consulta las fuentes y competencias autorizadas del área.' } }}</p>
  </div>
- </div>
+ @if(in_array($codArea, ['ARE_AFE', 'ARE_SOC', 'ARE_FUN']))
+ <x-ui.section-card title="Continuar en la ficha del residente" subtitle="Consulta el contexto y utiliza el registro profesional existente" icon="ph-user-focus">
+ <x-ui.field for="continuidad-buscar" label="Buscar residente"><input id="continuidad-buscar" class="rm-input" type="search" maxlength="80" wire:model.live.debounce.300ms="busquedaValoracion"></x-ui.field>
+ <ul class="rm-explorador__continuidad">@foreach($residentesContinuidad as $residenteContinuidad)<li><span>{{ $residenteContinuidad->nombre_completo }}</span><a class="rm-btn rm-btn-secondary" href="{{ route('admin.psicologia.residente.ficha', ['residente' => $residenteContinuidad, 'tab' => match($codArea) { 'ARE_AFE' => 'afectiva', 'ARE_SOC' => 'entorno', default => 'funcionamiento' }]) }}">Abrir ficha<span class="sr-only"> de {{ $residenteContinuidad->nombre_completo }}</span></a></li>@endforeach</ul>
+ </x-ui.section-card>
+ @if($residentesContinuidad->isEmpty())
+ <p class="rm-explorador__nota" role="status">No hay residentes disponibles para esta consulta. Revisa el nombre o los permisos de acceso.</p>
+ @endif
+ @endif
+ @include('valoraciones::livewire.valoraciones.guia-instrumento')
 
  {{-- Modal de nueva evaluación --}}
- @can('aplicaciones_instrumento.crear')
+ @if($instrumentosActivos->isNotEmpty() && $puedeCapturar)
  @livewire('valoraciones.evaluacion-geriatrica-area-modal')
- @endcan
+ @endif
 
 </div>

@@ -37,7 +37,7 @@
      class="h-10 w-full rounded-xl border border-borde-suave bg-fondo-card/40 px-3 text-xs font-bold text-titulo outline-none focus:border-borde-focus">
      <option value="">Seleccione un enfermero...</option>
      @foreach ($this->enfermerosParaPlaza as $nurse)
-     <option value="{{ $nurse->cod_usuario }}">{{ $nurse->name }} ({{ $nurse->cod_usuario }})</option>
+     <option value="{{ $nurse->cod_usuario }}">{{ $nurse->name }}</option>
      @endforeach
     </select>
     @error('enfermeroSeleccionado')

@@ -59,7 +59,7 @@ class OcupacionCama extends ModeloOperativo
     {
         static::creating(function (self $ocupacion): void {
             if (empty($ocupacion->cod_ocupacion)) {
-                $ocupacion->cod_ocupacion = 'OCP_' . strtoupper(\Illuminate\Support\Str::random(10));
+                $ocupacion->cod_ocupacion = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('ocupaciones_cama', $ocupacion->getConnectionName());
             }
 
             if (empty($ocupacion->cod_usuario_registro)) {

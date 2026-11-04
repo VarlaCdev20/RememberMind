@@ -17,6 +17,52 @@ related_modules: []
 
 # RememberMind — BDD Operativa V2.1: 70 tablas
 
+**Extensión autorizada e instalada del 29/10/2026:** [idioma principal e informante principal por atención](PROPUESTA_CONTEXTO_IDIOMA_INFORMANTE_2026_10_29.md), tres columnas nullable, FK restrictiva al vínculo existente e índice de soporte. Conserva 4FN en este alcance,28.107 atenciones previas e inventario 106 de negocio + 16 técnicas; sin backfill ni uso inferencial automático.
+
+**Inventario vigente — 27/10/2026:** extensión de Gerencia35/37 aprobada e
+instalada: **81 operativas +25 expertas =106 de negocio**, más16 técnicas.
+El núcleo de70 no cambia. [Diccionarios nominales y evidencia](DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md).
+Ocho columnas nuevas permanecen NULL en la historia previa; seis relaciones
+conservan los hechos nuevos sin inventar registros retroactivos.
+
+**Inventario anterior — 22/10/2026:** cuatro consolidaciones expertas singulares
+aprobadas e instaladas dejan **75 operativas + 25 expertas = 100 tablas de
+negocio**, más 16 técnicas. El núcleo operativo de 70 no cambia.
+[Diccionario nominal, FK, guardas y reversión](DECISION_CONSOLIDACION_BLOQUES_EXPERTOS_2026_10_22.md).
+Esta reducción conserva los datos existentes; no resuelve por sí sola el DTO
+institucional compuesto ni autoriza conocimiento clínico.
+
+**Inventario histórico — 20/10/2026:** la reducción experta aprobada e instalada
+dejó **75 operativas + 29 expertas = 104 tablas de negocio**. Este documento
+sigue definiendo las 70 tablas del núcleo congelado; las extensiones y la
+reducción están en sus decisiones separadas. Véase la
+[decisión de reducción y verificación](DECISION_REDUCCION_EXPERTA_2026_10_20.md).
+Los inventarios anteriores que siguen abajo corresponden a sus fechas. La
+[decisión del 21/10/2026](../sistema-experto/DECISION_MAXIMO_110_TABLAS_2026_10_21.md)
+permite diseñar hasta **110 tablas de negocio**, pero no aprueba un cambio
+estructural concreto ni modifica este diccionario del núcleo congelado.
+
+**Petersen original aprobado — 19/10/2026:** dos relaciones clínicas,
+`valoraciones_petersen_originales` y `soportes_valoracion_petersen`. Inventario
+aprobado: **75 operativas + 33 expertas = 108 tablas de negocio**. El núcleo
+de 70 no cambia. [Diccionario físico de la extensión, FK, checks e historia](../sistema-experto/PROPUESTA_CAPTURA_PETERSEN_ORIGINAL_2026_10_19.md).
+
+**Gobierno de reglas aprobado — 18/10/2026:** `reglas_expertas` incorpora únicamente `cod_regla_anterior` (string20, self-FK), `estado_revision` (string20), `cod_usuario_revision` (string20, FK usuarios), `fecha_hora_revision` (datetime) y `justificacion_revision` (text), todas nullable. Firma coherente, primera decisión y antecedente inmutables; FK restrictivas e indexadas. [Diccionario, autorización y análisis de 4FN](../sistema-experto/PROPUESTA_GOBIERNO_REGLAS_2026_10_18.md). Inventario: **106 tablas de negocio**, sin tablas nuevas.
+
+**Origen observacional aprobado — 18/10/2026:** dos FK nullable, índices y checks en `hechos_instantanea_experta`, sin tablas nuevas. Inventario vigente: 33 expertas + 73 operativas = 106 de negocio. [Diccionario aprobado](../sistema-experto/PROPUESTA_CONSERVACION_OBSERVACIONAL_V1.md).
+
+**Revisiones profesionales aprobadas — 17/10/2026:** una tabla de dictámenes
+con Psicología y Medicina separadas; inventario vigente **33 expertas + 73
+operativas = 106 tablas de negocio**. [Diccionario aprobado](DECISION_REVISIONES_EXPERTAS_2026_10_17.md).
+El núcleo operativo mantiene sus columnas y relaciones.
+
+**Conservación experta V2 aprobada — 17/10/2026:** nueve tablas suplementarias y ampliaciones de D-137: **32 expertas + 73 operativas = 105 tablas de negocio**. [decisión aprobada](DECISION_CONSERVACION_EXPERTA_V2_2026_10_17.md). No activa uso asistencial; las tablas técnicas quedan fuera del conteo.
+
+**Extensión aprobada IADL — 17/10/2026:** el inventario vigente incorpora `controles_funcionales_iadl` y suma **73 operativas**. Su [diccionario aprobado](DECISION_IADL_FUENTE_EXPERTA_2026_10_17.md) se mantiene separado del núcleo de 70 y de las 23 tablas expertas.
+
+**Extensión aprobada — 17/10/2026:** una tabla `fotografias_institucionales`; inventario vigente **72 operativas**, conservando las existentes. Véase [decisión Galería y 4FN](DECISION_GALERIA_INSTITUCIONAL_2026_10_17.md). Los conteos anteriores conservan el alcance de sus versiones.
+
+
 > **Extensión aprobada V2.2:** este diccionario conserva las 70 tablas base. La tabla 71 `objetivos_signos_vitales` se especifica en [decisión V2.2](DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md).
 
 **Estado:** CONGELADO
@@ -68,6 +114,9 @@ Todas las PK `cod_*` usan `string(20)` salvo decisión futura explícitamente ap
 - `correo string(120) UNIQUE NOT NULL`
 
 - `contrasena string(255) NOT NULL`
+
+- `remember_token string(100) NULL` — extensión aprobada del 26/10/2026;
+  [decisión Recordarme](DECISION_RECORDARME_2026_10_26.md), sin nuevas tablas.
 
 - `foto string(255) NULL`
 
@@ -828,6 +877,8 @@ Todas las PK `cod_*` usan `string(20)` salvo decisión futura explícitamente ap
 
 ## 19. `atenciones` — Transaccional
 
+**Extensión adoptada28/10/2026:** `escolaridad_anios SMALLINT NULL` (entero 0–32767, límite técnico), `puede_leer BOOLEAN NULL` y `puede_escribir BOOLEAN NULL`: información recabada por episodio, sin copiar admisión ni inferir normalidad. No cambia PK/FK, relaciones o grano. [Decisión, 4FN, restricciones y conservación](DECISION_CONTEXTO_ESCOLARIDAD_4FN_2026_10_28.md).
+
 **PK:** `cod_atencion string(20)`
 
 
@@ -1372,6 +1423,8 @@ Extensión explícitamente aprobada el 09/10/2026:
 
 
 ## 34. `documentos_clinicos` — Transaccional
+
+**Extensión posterior aprobada — 11/10/2026:** se añaden `cod_herida string(20) NULL` y `cod_curacion string(20) NULL`, cada una con índice y FK RESTRICT a su entidad. No se usan simultáneamente. El resto de esta sección describe el núcleo histórico; contrato adicional en [DECISION_FOTOGRAFIAS_HERIDAS_V2](DECISION_FOTOGRAFIAS_HERIDAS_V2.md).
 
 **PK:** `cod_documento_clinico string(20)`
 
@@ -2411,6 +2464,8 @@ No cambia PK/FK, relaciones ni inventario de tablas. Las ramas URINARIA/INTESTIN
 
 
 ## 60. `aplicaciones_instrumento` — Transaccional
+
+**Extensión aprobada 19/10/2026:** `cod_usuario_registro string(20) NULL` FK restrictiva a `usuarios.cod_usuario`; `registrado_en datetime(6) NULL`; `cod_documento_clinico string(20) NULL` FK restrictiva a `documentos_clinicos.cod_documento_clinico`; `localizador_fuente string(120) NULL`; `cod_aplicacion_anterior string(20) NULL` self-FK restrictiva. FK indexadas; usuario/instante y documento/localizador forman pares completos; localizador no vacío y antecesora distinta de sí misma. UNIQUE parcial documento/localizador para la primera transcripción y UNIQUE parcial de antecesora para una sucesora directa. Filas anteriores permanecen sin metadatos inventados. [Decisión y detalle de conciliación/4FN](../sistema-experto/PROPUESTA_FUENTES_ORIGINALES_FASE_2_2026_10_19.md). Sin nuevas tablas ni alteración de los atributos base siguientes.
 
 **PK:** `cod_aplicacion string(20)`
 

@@ -1,5 +1,7 @@
 # Datos sintéticos para desarrollo local
 
+> Alcance de inventario: las cifras de esta decisión describen su fecha. El [inventario vigente](README.md) incorpora las extensiones posteriores:106 tablas de negocio+16 técnicas. La decisión conserva exclusivamente sus columnas, relaciones y reglas autorizadas.
+
 `DatabaseSeeder` instala los roles y permisos canónicos; no carga expedientes de muestra en la aplicación local ni en producción. En pruebas prepara también las cuentas requeridas por los tests existentes.
 
 La carga optativa vigente es `Historical2026Seeder`: **30 residentes con nombres, nacimientos e historiales distintos**, admisión formal, camas y asignaciones por turno. Respeta las **71 tablas operativas de V2.1 + V2.2**, sin modificar el esquema.

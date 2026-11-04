@@ -47,6 +47,9 @@ const RM_CHART_TONES = new Set(['care', 'clinical', 'alert', 'neutral', 'cogniti
 const RM_CHART_DOMAINS = new Set(['residents', 'beds', 'alerts', 'medication', 'cognitive', 'rehab', 'staff', 'activities']);
 
 export function rmChartColor(tone, variant = 'primary') {
+    if (tone === 'cognitive' && variant === 'strong') {
+        return rmGetCss('--rm-chart-cognitive-strong');
+    }
     if (variant === 'soft' && RM_CHART_TONES.has(tone)) {
         return rmGetCss(`--rm-chart-${tone}-100`);
     }
@@ -360,32 +363,13 @@ export function rmGetOriginLabel(origenKey) {
     return CLINICAL_ORIGINS_MAP[origenKey]?.name || origenKey;
 }
 
-// --- Gradientes Elegantes para Barras y Áreas ---
+// Rellenos sólidos: conservar las firmas utilizadas por los consumidores existentes.
 export function rmCreateGradient(ctx, hex, height = 240) {
-    if (!ctx) return hex;
-    try {
-        const gradient = ctx.createLinearGradient(0, 0, 0, height);
-        const alpha = rmChartNumber('--rm-line-area-opacity', .12);
-        gradient.addColorStop(0,   rmHexToRgba(hex, alpha));
-        gradient.addColorStop(0.5, rmHexToRgba(hex, alpha / 2));
-        gradient.addColorStop(1,   rmHexToRgba(hex, 0));
-        return gradient;
-    } catch (e) {
-        return hex;
-    }
+    return rmHexToRgba(hex, rmChartNumber('--rm-line-area-opacity', .12));
 }
 
 export function rmCreateBarGradient(ctx, hex, height = 240) {
-    if (!ctx) return hex;
-    try {
-        const gradient = ctx.createLinearGradient(0, 0, 0, height);
-        gradient.addColorStop(0,   rmHexToRgba(hex, rmChartNumber('--rm-bar-fill-hover-opacity', .96)));
-        gradient.addColorStop(0.6, rmHexToRgba(hex, rmChartNumber('--rm-bar-fill-opacity', .84)));
-        gradient.addColorStop(1,   rmHexToRgba(hex, rmChartNumber('--rm-bar-fill-soft-opacity', .72)));
-        return gradient;
-    } catch (e) {
-        return hex;
-    }
+    return rmHexToRgba(hex, rmChartNumber('--rm-bar-fill-opacity', .84));
 }
 
 // --- Opciones Base Compartidas ---

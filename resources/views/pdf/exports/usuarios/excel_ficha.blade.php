@@ -107,10 +107,10 @@
  </tr>
  @foreach($checklist as $doc)
  <tr>
- <td>{{ $doc['nombre'] }}</td>
+ <td>{{ $doc['nombre'] }}<x-ui.document-requirement-warning :item="$doc" /></td>
  <td>{{ $doc['obligatorio'] ? 'OBLIGATORIO' : 'OPCIONAL' }}</td>
- <td style="font-weight: bold;">{{ $doc['estado'] }}</td>
- <td>{{ $doc['cargado'] && $doc['documento']->created_at ? $doc['documento']->created_at->format('d/m/Y H:i') : 'Pendiente' }}</td>
+ <td style="font-weight: bold;">{{ ($doc['conflicto'] ?? false) ? 'Revisión necesaria' : $doc['estado'] }}</td>
+ <td>{{ $doc['documento']?->fecha_hora_carga?->format('d/m/Y H:i') ?? ($doc['cargado'] ? 'No registrada' : 'Sin entrega') }}</td>
  </tr>
  @endforeach
  <tr><td></td></tr>

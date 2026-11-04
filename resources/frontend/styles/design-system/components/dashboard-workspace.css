@@ -1,6 +1,6 @@
 /* Superficies y proporciones compartidas por los dashboards de todos los roles. */
 .rm-shell:has(.rm-dashboard-composition) {
-    --rm-dashboard-app-bg: #F3EEE8;
+    --rm-dashboard-app-bg: var(--rm-bg-app);
     --rm-dashboard-shell-bg: #DDD6CF;
     --rm-dashboard-header-bg: #E6E0D9;
     --rm-dashboard-card-surface: var(--rm-dashboard-surface-soft);
@@ -12,7 +12,7 @@
     --rm-dashboard-heading-mint: #62836B;
     --rm-dashboard-heading-ink: color-mix(in srgb, var(--rm-dashboard-heading-coffee) 50%, var(--rm-dashboard-heading-mint));
     --rm-dashboard-text-secondary: #67615B;
-    --rm-dashboard-text-muted: #847D76;
+    --rm-dashboard-text-muted: var(--rm-text-secondary);
     --rm-dashboard-sage-700: #5F7D67;
     --rm-dashboard-sage-600: #6F8A72;
     --rm-dashboard-sage-100: #DCE6DD;
@@ -38,7 +38,7 @@
     --rm-text-primary: var(--rm-dashboard-text);
     --rm-text-secondary: var(--rm-dashboard-text-secondary);
 }
-.rm-dashboard-composition--superadmin { gap: 18px; }
+.rm-dashboard-composition--superadmin { gap: var(--rm-page-gap); }
 .rm-dashboard-composition > .rm-dashboard-header:not(.rm-dashboard-header--compact) {
     --rm-dashboard-hero-height: 230px;
     --rm-header-bg: var(--rm-dashboard-header-bg);
@@ -163,22 +163,102 @@
         color-mix(in srgb, var(--rm-dashboard-header-bg) 25%, transparent) 42%,
         transparent 64%);
 }
+.rm-dashboard-composition {
+    --rm-dashboard-metric-min-height: 98px;
+    --rm-dashboard-metric-value-size: calc(var(--rm-font-size-kpi) + 5px);
+    --rm-dashboard-metric-label-size: calc(var(--rm-font-size-body) + 2px);
+    --rm-dashboard-metric-description-size: calc(var(--rm-font-size-meta) + 1px);
+}
 .rm-dashboard-composition .rm-metric-card {
-    min-height: 116px;
+    container-type: inline-size;
+    min-height: var(--rm-dashboard-metric-min-height);
+    padding: var(--rm-card-padding);
     border-radius: 16px;
     border-color: var(--rm-dashboard-card-border);
     background-color: var(--rm-dashboard-card-bg);
     background-image: none;
     box-shadow: var(--rm-dashboard-card-shadow);
 }
-.rm-dashboard-composition .rm-metric-card__value {
-    font: 800 30px/1.05 var(--rm-font-friendly);
+.rm-dashboard-composition .rm-metric-card .rm-metric-card__value {
+    padding-right: 36px;
+    font: 800 var(--rm-dashboard-metric-value-size)/1 var(--rm-font-friendly);
 }
-.rm-dashboard-composition .rm-metric-card__label {
-    font: 700 14px/1.25 var(--rm-font-friendly);
+.rm-dashboard-composition .rm-metric-card .rm-metric-card__label {
+    margin-top: var(--rm-space-1);
+    font: 700 var(--rm-dashboard-metric-label-size)/1.3 var(--rm-font-friendly);
 }
-.rm-dashboard-composition .rm-metric-card__description {
-    font: 500 12px/1.35 var(--rm-font-body);
+.rm-dashboard-composition .rm-metric-card .rm-metric-card__description {
+    margin-top: var(--rm-space-1);
+    font: 500 var(--rm-dashboard-metric-description-size)/1.4 var(--rm-font-body);
+}
+.rm-dashboard-composition .rm-metric-card__top { top: var(--rm-space-2); right: var(--rm-space-2); }
+.rm-dashboard-composition .rm-metric-card__icon { width: var(--rm-control-sm); height: var(--rm-control-sm); flex-basis: var(--rm-control-sm); font-size: var(--rm-icon-md); line-height: 1; }
+
+/* Resumen del turno: cifra a la izquierda y texto contiguo, sin alturas reservadas. */
+.rm-dashboard-composition :is(.rm-dashboard-overview, .rm-nursing-dashboard__overview) {
+    gap: var(--rm-grid-gap);
+}
+.rm-dashboard-composition :is(.rm-dashboard-overview, .rm-nursing-dashboard__overview) > .rm-metric-card {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: var(--rm-space-3);
+    row-gap: var(--rm-space-1);
+    align-content: center;
+    align-items: center;
+    padding: var(--rm-space-4);
+    padding-block-start: calc(var(--rm-space-8) + var(--rm-space-1));
+}
+.rm-dashboard-composition :is(.rm-dashboard-overview, .rm-nursing-dashboard__overview) .rm-metric-card__body {
+    display: contents;
+}
+.rm-dashboard-composition :is(.rm-dashboard-overview, .rm-nursing-dashboard__overview) .rm-metric-card__value {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 0;
+    padding: 0;
+    font-size: clamp(calc(var(--rm-font-size-kpi) + 5px), 18cqi, calc(var(--rm-font-size-kpi) + 13px));
+    font-weight: var(--rm-font-weight-extrabold);
+    line-height: 1;
+    letter-spacing: var(--rm-letter-spacing-tight);
+    font-variant-numeric: lining-nums tabular-nums;
+}
+.rm-dashboard-composition :is(.rm-dashboard-overview, .rm-nursing-dashboard__overview) .rm-metric-card__label {
+    grid-column: 2;
+    grid-row: 1;
+    min-height: 0;
+    margin: 0;
+    font-size: var(--rm-font-size-card);
+    line-height: 1.3;
+    text-wrap: pretty;
+    overflow-wrap: anywhere;
+}
+.rm-dashboard-composition :is(.rm-dashboard-overview, .rm-nursing-dashboard__overview) .rm-metric-card__description {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+    margin: 0;
+    font-size: var(--rm-font-size-compact);
+    line-height: 1.45;
+}
+.rm-dashboard-composition :is(.rm-dashboard-overview, .rm-nursing-dashboard__overview) .rm-metric-card__top {
+    position: absolute;
+    inset-block-start: var(--rm-space-2);
+    inset-inline-end: var(--rm-space-2);
+}
+.rm-dashboard-composition :is(.rm-dashboard-overview, .rm-nursing-dashboard__overview) .rm-metric-card__icon {
+    width: var(--rm-space-7);
+    height: var(--rm-space-7);
+    flex-basis: var(--rm-space-7);
+    font-size: var(--rm-icon-md);
+}
+.rm-dashboard-composition :is(.rm-dashboard-overview, .rm-nursing-dashboard__overview) .rm-metric-card__skeleton {
+    grid-column: 1 / -1;
+}
+@media (max-width: 639px) {
+    .rm-dashboard-composition :is(.rm-dashboard-overview, .rm-nursing-dashboard__overview) > .rm-metric-card {
+        padding: var(--rm-space-3);
+        padding-block-start: calc(var(--rm-space-8) + var(--rm-space-1));
+    }
 }
 .rm-dashboard-composition :is(.rm-card:not(.rm-chart-card, .rm-metric-card),
     .rm-dashboard-data-panel:not(.rm-dashboard-data-panel--chart),
@@ -199,7 +279,7 @@
 }
 .rm-dashboard-composition.rm-admin-dashboard .rm-admin-dashboard__state-strip > .rm-metric-card,
 .rm-dashboard-composition.rm-nursing-dashboard .rm-nursing-dashboard__kpi {
-    min-height: 116px;
+    min-height: var(--rm-dashboard-metric-min-height);
     border-color: var(--rm-dashboard-card-border);
     border-radius: 16px;
     background: var(--rm-dashboard-card-bg);
@@ -248,11 +328,11 @@
     background: linear-gradient(180deg, var(--rm-chart-card-glass), var(--rm-chart-card-bg));
     box-shadow: var(--rm-chart-card-shadow);
 }
-.rm-dashboard-composition--superadmin .rm-dashboard-data-grid { gap: 12px; }
-.rm-dashboard-composition--superadmin .rm-dashboard-data-panel { padding: 14px; }
-.rm-dashboard-composition--superadmin .rm-dashboard-data-panel__heading { margin-bottom: 8px; }
-.rm-dashboard-composition--superadmin .rm-dashboard-data-panel__heading h2 { font-size: 15px; }
-.rm-dashboard-composition--superadmin .rm-dashboard-data-panel__icon { width: 28px; height: 28px; flex-basis: 28px; }
+.rm-dashboard-composition--superadmin .rm-dashboard-data-grid { gap: var(--rm-grid-gap); }
+.rm-dashboard-composition--superadmin .rm-dashboard-data-panel { padding: var(--rm-card-padding); }
+.rm-dashboard-composition--superadmin .rm-dashboard-data-panel__heading { margin-bottom: var(--rm-space-4); }
+.rm-dashboard-composition--superadmin .rm-dashboard-data-panel__heading h2 { font-size: var(--rm-font-size-section); }
+.rm-dashboard-composition--superadmin .rm-dashboard-data-panel__icon { width: var(--rm-control-sm); height: var(--rm-control-sm); flex-basis: var(--rm-control-sm); }
 .rm-dashboard-composition--superadmin .rm-dashboard-data-panel__list li { min-height: 40px; padding-block: 6px; }
 .rm-dashboard-composition--superadmin .rm-dashboard-data-panel__bars li { margin-top: 8px; }
 .rm-dashboard-composition--superadmin .rm-dashboard-data-panel__donut { width: 124px; height: 124px; flex-basis: 124px; }
@@ -309,8 +389,7 @@
     .rm-dashboard-composition .rm-dashboard-header:not(.rm-dashboard-header--compact) .rm-dashboard-header__title { font-size: clamp(26px, 8vw, 34px); }
     .rm-dashboard-composition .rm-metric-card,
     .rm-dashboard-composition.rm-admin-dashboard .rm-admin-dashboard__state-strip > .rm-metric-card,
-    .rm-dashboard-composition.rm-nursing-dashboard .rm-nursing-dashboard__kpi { min-height: 110px; }
-    .rm-dashboard-composition .rm-metric-card__value { font-size: 28px; }
+    .rm-dashboard-composition.rm-nursing-dashboard .rm-nursing-dashboard__kpi { min-height: var(--rm-dashboard-metric-min-height); }
 }
 @media (prefers-reduced-motion: reduce) {
     .rm-dashboard-header__ornament { animation: none; }

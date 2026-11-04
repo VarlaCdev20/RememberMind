@@ -1,0 +1,230 @@
+ M AGENTS.md
+ M app/Compartido/Infraestructura/Persistencia/CatalogoCodigos.php
+ M app/Models/ClasificacionDclInstantanea.php
+ M app/Models/ResultadoCriterio.php
+ M app/Models/TrazaInferencia.php
+ M app/Models/VariableExperta.php
+ M app/Modulos/ApoyoDecision/Aplicacion/Acciones/CargarConocimientoOrion.php
+ M app/Modulos/ApoyoDecision/Aplicacion/Acciones/CargarPaqueteInvestigadoCOGMEM.php
+ M app/Modulos/ApoyoDecision/Aplicacion/Acciones/GestionarConocimientoExperimental.php
+ M app/Modulos/ApoyoDecision/Aplicacion/Acciones/GestionarReglasExpertas.php
+ M app/Modulos/ApoyoDecision/Aplicacion/Acciones/PersistirEvaluacionTecnica.php
+ M app/Modulos/ApoyoDecision/Aplicacion/Acciones/RegistrarConocimientoInstitucional.php
+ M app/Modulos/ApoyoDecision/Aplicacion/Acciones/RegistrarConocimientoPetersen.php
+ M app/Modulos/ApoyoDecision/Aplicacion/Consultas/CapturasInstrumentalesResidente.php
+ M app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarConocimientoCognitivo.php
+ M app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarObservacionesConservadas.php
+ M app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarPerfilInstrumental.php
+ M app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarPetersenInstitucional.php
+ M app/Modulos/ApoyoDecision/Aplicacion/Consultas/LecturaResultadosExperto.php
+ M app/Modulos/ApoyoDecision/Aplicacion/Consultas/PrepararEvaluacionInstitucional.php
+ M app/Modulos/ApoyoDecision/Aplicacion/DTOs/PresentarInformeCognitivo.php
+ M app/Modulos/ApoyoDecision/Aplicacion/Servicios/ContratosConocimiento.php
+ M app/Modulos/ApoyoDecision/Infraestructura/Persistencia/Conservacion/AlmacenInstantaneas.php
+ M app/Modulos/ApoyoDecision/Infraestructura/Persistencia/ConservarObservaciones.php
+ M app/Modulos/ApoyoDecision/Infraestructura/Persistencia/Eloquent/CargadorConocimiento.php
+ M app/Modulos/ApoyoDecision/Infraestructura/Persistencia/IdentidadesConocimiento.php
+ M app/Modulos/ApoyoDecision/Infraestructura/Persistencia/InventarioExperto.php
+ M app/Modulos/ApoyoDecision/Infraestructura/Persistencia/PaqueteObservacional.php
+ M app/Modulos/ApoyoDecision/Infraestructura/Simulacion/PaqueteSimulacionLocal.php
+ M app/Modulos/ApoyoDecision/Infraestructura/Simulacion/TrazaSimulacionLocal.php
+ M app/Modulos/ApoyoDecision/Presentacion/Livewire/Paginas/CapturaPetersenPanel.php
+ M app/Modulos/ApoyoDecision/Presentacion/Livewire/Paginas/ResidentesSistemaExperto.php
+ M app/Modulos/ApoyoDecision/Presentacion/Livewire/Paginas/ResultadosExpertoResidente.php
+ M app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/experto/residentes.blade.php
+ M app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto-residente.blade.php
+ M app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/captura-instrumental.blade.php
+ M app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/evidencias.blade.php
+ M app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/hallazgos-observacionales.blade.php
+ M app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/historial.blade.php
+ M app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/informe-narrativo.blade.php
+ M app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/perfil-instrumental.blade.php
+ M app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/petersen-institucional.blade.php
+ M app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/revision-profesional.blade.php
+ M app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/petersen/captura-original.blade.php
+ M app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/resumen/memoria-estado-cognitivo.blade.php
+ M app/Modulos/Cuidados/Aplicacion/Acciones/GestionarEjecucionesAgenda.php
+ M app/Modulos/Cuidados/Aplicacion/Acciones/PaseTurnoService.php
+ M app/Modulos/Cuidados/Aplicacion/Consultas/MiTurnoService.php
+ M app/Modulos/Cuidados/Presentacion/Livewire/Paginas/AgendaEnfermeria.php
+ M app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/agenda-enfermeria.blade.php
+ M app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/partials/pase-turno-contexto.blade.php
+ M app/Modulos/Identidad/Presentacion/Navegacion/SidebarService.php
+ M app/Modulos/Institucion/Presentacion/Livewire/Funcionalidades/PersonalInstitucionalHorarios.php
+ M app/Modulos/Valoraciones/Aplicacion/Consultas/InstrumentosDelArea.php
+ M app/Modulos/Valoraciones/Aplicacion/Consultas/PrepararCapturaInstrumental.php
+ M app/Modulos/Valoraciones/Presentacion/Livewire/Funcionalidades/CapturaInstrumentalModal.php
+ M app/Modulos/Valoraciones/Presentacion/Livewire/Paginas/DashboardPsicologo.php
+ M app/Modulos/Valoraciones/Presentacion/Livewire/Paginas/EvaluacionesAreaPanel.php
+ M app/Modulos/Valoraciones/Presentacion/Rutas/web.php
+ M app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/dashboard-psicologo.blade.php
+ M app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/evaluacion-geriatrica-modal.blade.php
+ M app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/evaluaciones-area-panel.blade.php
+ M app/Providers/ArquitecturaModularServiceProvider.php
+ M config/vistas_modulares.php
+ M database/AGENTS.md
+ M database/seeders/RolesAndPermissionsSeeder.php
+ M docs/base-de-datos/REMEMBERMIND_BDD_70_TABLAS.md
+ M docs/base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md
+ M docs/sistema-experto/ENSAYO_CINCO_RELACIONES_104_2026_10_21.md
+ M docs/sistema-experto/README.md
+ M motor-experto/src/motor_experto/adaptadores/entrada/ConstructorMemoriaInstrumental.php
+ M motor-experto/src/motor_experto/soporte/conservacion/InstantaneaEvaluacionInstitucional.php
+ M motor-experto/src/motor_experto/soporte/conservacion/InstantaneaInstrumental.php
+ M motor-experto/src/motor_experto/soporte/conservacion/InstantaneaPetersen.php
+ M resources/frontend/scripts/app.js
+ M resources/frontend/styles/design-system/charts/chart-theme.js
+ M resources/frontend/styles/design-system/components/dashboard-data.css
+ M resources/frontend/styles/design-system/components/drawers.css
+ M resources/frontend/styles/design-system/components/modals.css
+ M resources/frontend/styles/design-system/components/sidebar.css
+ M resources/frontend/styles/design-system/components/topbar.css
+ M resources/frontend/styles/design-system/patterns/expert-results.css
+ M resources/frontend/styles/design-system/patterns/palette-consistency.css
+ M resources/frontend/styles/design-system/tokens/chart-colors.css
+ M resources/frontend/styles/design-system/tokens/colors.css
+ M resources/frontend/styles/layouts/estructura-institucional.css
+ M resources/views/components/layout/barra-lateral-sistema.blade.php
+ M resources/views/components/layout/navbar-sistema.blade.php
+ M resources/views/components/layout/sidebar-shell-state.blade.php
+ M resources/views/components/ui/drawer-livewire.blade.php
+ M resources/views/components/ui/modal-livewire.blade.php
+ M routes/web.php
+ M scripts/probar-postgres.ps1
+ M tests/AGENTS.md
+ M tests/Feature/CapturaInstrumentalFormularioTest.php
+ M tests/Feature/CapturaInstrumentalInstitucionalTest.php
+ M tests/Feature/CapturaPetersenOriginalTest.php
+ M tests/Feature/CodigosCorrelativosTest.php
+ M tests/Feature/ConocimientoCognitivoInstitucionalTest.php
+ M tests/Feature/GobiernoReglasExpertasTest.php
+ M tests/Feature/HallazgosObservacionalesTest.php
+ M tests/Feature/InformeCognitivoTest.php
+ M tests/Feature/LaPazSeedIntegrityTest.php
+ M tests/Feature/MiTurnoAuditoriaCierreTest.php
+ M tests/Feature/NavegacionSistemaExpertoTest.php
+ M tests/Feature/PersonalInstitucionalHorariosTest.php
+ M tests/Feature/PsychologyDashboardDataTest.php
+ M tests/Feature/ResumenCognitivoResidenteTest.php
+ M tests/Feature/RevisionExpertaConcurrenciaPostgresTest.php
+ M tests/Feature/RevisionObservacionalExpertaTest.php
+ M tests/Feature/RevisionValoracionExpertaTest.php
+ M tests/Feature/RolesVistasPermisosMatrixTest.php
+ M tests/Feature/SidebarServiceTest.php
+ M tests/Feature/SimulacionLocalExpertoTest.php
+ M tests/Feature/SistemaExperto/Infrastructure/Repositories/ConservacionExpertaTest.php
+ M tests/Feature/SistemaExperto/Infrastructure/Repositories/EscenarioRepositorios.php
+ M tests/Feature/SistemaExperto/Infrastructure/Repositories/EvaluacionExpertaEloquentRepositoryTest.php
+ M tests/Feature/SistemaExperto/Infrastructure/Repositories/ReduccionFisicaConservacionTest.php
+ M tests/Feature/SucesionObservacionalTest.php
+ M tests/Frontend/chart-design-system.test.js
+ M tests/Frontend/shell-visual-consistency.test.js
+ M tests/Frontend/sidebar-responsive.test.js
+ M tests/Support/CorromperConservacionParaPrueba.php
+ M tests/Support/InformeCognitivoFixture.php
+ M tests/TestCase.php
+ M tests/Unit/InstantaneaEvaluacionInstitucionalTest.php
+ M tests/Unit/InstantaneaInstrumentalCompletaTest.php
+ M tests/Unit/InventarioExpertoTest.php
+ M tests/Unit/SistemaExperto/Infrastructure/Mappers/ContratoMapeadoresTest.php
+?? app/Models/ModeloBloqueExperto.php
+?? app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarActividadCognitiva.php
+?? app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarContinuidadAsistencialExperta.php
+?? app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarExploracionOrion.php
+?? app/Modulos/ApoyoDecision/Aplicacion/DTOs/ConsultaCognitivaEnfermeria.php
+?? app/Modulos/ApoyoDecision/Aplicacion/DTOs/GrafoInferenciaHistorica.php
+?? app/Modulos/ApoyoDecision/Aplicacion/DTOs/ResumirFuentesCognitivas.php
+?? app/Modulos/ApoyoDecision/Infraestructura/Persistencia/Conservacion/BloquesExpertos.php
+?? app/Modulos/ApoyoDecision/Infraestructura/Persistencia/Conservacion/TransicionBloquesExpertos.php
+?? app/Modulos/ApoyoDecision/Presentacion/Soporte/
+?? app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/consulta.blade.php
+?? app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/enfermeria-evolucion.blade.php
+?? app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/enfermeria-ventanas.blade.php
+?? app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/enfermeria.blade.php
+?? app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/explorador.blade.php
+?? app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/grafico-areas.blade.php
+?? app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/grafo.blade.php
+?? app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/reglas-tabla.blade.php
+?? app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/resumen-fuentes.blade.php
+?? app/Modulos/Cuidados/Aplicacion/Consultas/OcurrenciasCuidado.php
+?? app/Modulos/Valoraciones/Aplicacion/Consultas/ConsultarTendenciaResidente.php
+?? app/Modulos/Valoraciones/Presentacion/Livewire/Paginas/ActividadPsicologicaGeneral.php
+?? app/Modulos/Valoraciones/Presentacion/Livewire/Paginas/FichaPsicologicaResidente.php
+?? app/Modulos/Valoraciones/Presentacion/Livewire/Paginas/MisResidentesPsicologia.php
+?? app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/actividad-psicologica-general.blade.php
+?? app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/ficha-psicologica-residente.blade.php
+?? app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/mis-residentes-psicologia.blade.php
+?? database/migrations/2026_10_22_120000_consolidate_bloques_expertos_singulares.php
+?? docs/auditorias/
+?? docs/base-de-datos/DECISION_CONSOLIDACION_BLOQUES_EXPERTOS_2026_10_22.md
+?? docs/frontend/EVALUACION_COGNITIVA_ENFERMERIA_ENTREGA_2026_10_20.md
+?? docs/frontend/EVALUACION_COGNITIVA_RESPONSIVE_2026_10_21.md
+?? docs/frontend/ORION_EXPLICABILIDAD_ENTREGA_2026_10_20.md
+?? docs/frontend/PROPUESTA_VISTA_RESULTADOS_PSICOLOGIA_2026_10_22.md
+?? docs/frontend/RESULTADOS_COGNITIVOS_REFERENCIA_2026_10_21.md
+?? docs/frontend/maquetas/
+?? docs/sistema-experto/ACEPTACION_INTEGRAL_ORION_2026_10_21.md
+?? docs/sistema-experto/ANALISIS_REFACTOR_REDUCCION_MANTENIBLE_2026_10_22.md
+?? docs/sistema-experto/CIERRE_REFACTOR_BLOQUES_2026_10_22.md
+?? docs/sistema-experto/CONCILIACION_TRES_PERFILES_DCL_2026_10_22.md
+?? docs/sistema-experto/CONSERVACION_LECTURA_Y_REPLAY_2026_10_22.md
+?? docs/sistema-experto/DECISION_MAXIMO_110_TABLAS_2026_10_21.md
+?? docs/sistema-experto/DICTAMEN_CONSERVACION_INSTITUCIONAL_110_2026_10_21.md
+?? docs/sistema-experto/EJECUCION_COMPUESTA_INTEGRADA_2026_10_22.md
+?? docs/sistema-experto/ENSAYO_NOMINAL_CONSERVACION_2026_10_22.md
+?? docs/sistema-experto/ENTREGA_INTEGRAL_ORION_2026_10_20.md
+?? docs/sistema-experto/EVIDENCIA_BIBLIOGRAFICA_Y_ACEPTACION_TECNICA_2026_10_22.md
+?? docs/sistema-experto/FASE_0_1_CONSERVACION_PENDIENTE_2026_10_20.md
+?? docs/sistema-experto/FASE_0_1_ESTABILIZACION_2026_10_20.md
+?? docs/sistema-experto/INTEGRACION_F02_SOBRE_ESQUEMA_REAL_2026_10_21.md
+?? docs/sistema-experto/MEMBRESIAS_HISTORICAS_SQL_2026_10_22.md
+?? docs/sistema-experto/PETERSEN_REVISION_Y_CONSERVACION_ESTADO_2026_10_21.md
+?? docs/sistema-experto/PUNTO_1_EVIDENCIA_COGNITIVA_ORIGINAL_2026_10_21.md
+?? docs/sistema-experto/RECUPERACION_SQL_COMPLETA_REFERENCIA_2026_10_22.md
+?? docs/sistema-experto/RESOLUCION_RUTAS_CONSERVACION_110_2026_10_21.md
+?? motor-experto/src/motor_experto/dominio/instrumentos/CorteDocumentoInstrumental.php
+?? motor-experto/src/motor_experto/soporte/conservacion/IntegridadPreparacion.php
+?? motor-experto/src/motor_experto/soporte/conservacion/MembresiasOriginalesPetersen.php
+?? prototipos/orion-conservacion-0_2/
+?? prototipos/orion-conservacion-100/
+?? prototipos/orion-conservacion-110/
+?? prototipos/orion-conservacion-nominal/
+?? resources/frontend/scripts/modules/orion-explorador.js
+?? scripts/consolidar-bloques-expertos.php
+?? scripts/inventariar-salidas-institucionales.php
+?? scripts/verificar-consolidacion-experta.php
+?? tests/Feature/ActividadPsicologicaGeneralTest.php
+?? tests/Feature/CicloObservacionalConservadoTest.php
+?? tests/Feature/ConservacionCompletaSQLTest.php
+?? tests/Feature/ConservacionNominalCompuestaTest.php
+?? tests/Feature/ConsolidacionBloquesConcurrenciaPostgresTest.php
+?? tests/Feature/EjecucionConsultaCognitivaTest.php
+?? tests/Feature/EstabilizacionOrionContinuidadTest.php
+?? tests/Feature/ExploradorOrionTest.php
+?? tests/Feature/FichaPsicologicaResidenteTest.php
+?? tests/Feature/GuardasPreparacionBaseTest.php
+?? tests/Feature/MisResidentesPsicologiaTest.php
+?? tests/Feature/PreparacionCompuestaCoherenteTest.php
+?? tests/Feature/PreparacionPostgresRepetidaTest.php
+?? tests/Feature/RedisenoEnfermeriaIntegralTest.php
+?? tests/Feature/SistemaExperto/Infrastructure/Repositories/ConsolidacionBloquesExpertosTest.php
+?? tests/Feature/SistemaExpertoOrionNivel1Test.php
+?? tests/Frontend/cognitive-radial.test.js
+?? tests/Frontend/cognitive-responsive.test.js
+?? tests/Frontend/orion-explorador.test.js
+?? tests/Support/EsquemaSinTransaccion.php
+?? tests/Support/RestablecerEsquemaPostgres.php
+?? tests/Support/leer_preparacion_sin_inferencia.php
+?? tests/Unit/ConservacionCriterioPostgresTest.php
+?? tests/Unit/ConsultaCognitivaEnfermeriaTest.php
+?? tests/Unit/ContratoNominalTest.php
+?? tests/Unit/CorteDocumentoInstrumentalTest.php
+?? tests/Unit/FechaVisibleTest.php
+?? tests/Unit/MembresiasOriginalesPetersenTest.php
+?? tests/Unit/MotivoPetersenVisibleTest.php
+?? tests/Unit/OcurrenciasCuidadoTest.php
+?? tests/Unit/ReferenciaF02PostgresDesechableTest.php
+?? tests/Unit/ReferenciaF02SqliteDesechableTest.php
+?? tests/Unit/ResumenPetersenVisibleTest.php
+?? tests/Unit/ResumirFuentesCognitivasTest.php
+?? work/

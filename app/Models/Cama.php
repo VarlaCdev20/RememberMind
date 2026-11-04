@@ -53,7 +53,7 @@ class Cama extends ModeloOperativo
         parent::boot();
         static::saving(function (self $cama) {
             if (empty($cama->attributes['cod_cama'])) {
-                $cama->attributes['cod_cama'] = 'CAM_' . Str::upper(Str::random(10));
+                $cama->attributes['cod_cama'] = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('camas', $cama->getConnectionName());
             }
             if (empty($cama->attributes['codigo'])) {
                 $cama->attributes['codigo'] = (string) ($cama->attributes['numero'] ?? ('CAM-' . rand(100, 999)));

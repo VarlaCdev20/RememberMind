@@ -18,6 +18,8 @@ related_modules: [alertas]
 
 # Alertas
 
+Implementación de presentación por especialidad, 22 de octubre de 2026: [representaciones funcionales, campos, integración y verificación](REPRESENTACIONES_FUNCIONALES_2026_10_22.md). Este informe acotado no sustituye el contrato ni aprueba nuevas reglas clínicas.
+
 Compilación vigente, no aprobación de reglas nuevas. **APPROVED CONTRACT**: [AGENTS](../../../AGENTS.md), [baseline](../../../docs/base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md), [diccionario](../../../docs/base-de-datos/REMEMBERMIND_BDD_70_TABLAS.md), [roles](../../../docs/arquitectura/REMEMBERMIND_ROLES_BASELINE_CONGELADO.md). Descripciones de entradas, estados, clases y efectos son **OBSERVED IMPLEMENTATION**, sin certificar cumplimiento en todas las variantes. **CONFLICT** y **TECHNICAL DEBT** señalan discrepancias; **OPEN DECISION** no autoriza cambiar contrato.
 
 Fase 2 documentó evidencia estática. Fase 3 ejecutó pruebas acotadas en PostgreSQL aislado: [trazabilidad](../../TRAZABILIDAD.md). runtime_verified: false conserva ausencia de certificación global; verified_against_commit identifica la base, no un commit de estas correcciones.
@@ -108,11 +110,11 @@ Pase incluye RECONOCIDA/ASIGNADA además de las alertas activas ya leídas; TECH
 
 ## 22. Entrada UI
 
-[resources/views/livewire/alertas/alertas-panel.blade.php](../../../resources/views/livewire/alertas/alertas-panel.blade.php)
+[resources/views/livewire/alertas/alertas-panel.blade.php](../../../app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/alertas-panel.blade.php)
 
 ## 23. Livewire / Controllers
 
-[app/Frontend/Livewire/Compartido/Alertas/AlertasPanel.php](../../../app/Frontend/Livewire/Compartido/Alertas/AlertasPanel.php), [app/Http/Controllers/Alertas/AlertaController.php](../../../app/Http/Controllers/Alertas/AlertaController.php)
+[app/Modulos/Alertas/Presentacion/Livewire/Paginas/AlertasPanel.php](../../../app/Modulos/Alertas/Presentacion/Livewire/Paginas/AlertasPanel.php), [app/Http/Controllers/Alertas/AlertaController.php](../../../app/Modulos/Alertas/Presentacion/Http/Controllers/AlertaController.php)
 
 ## 24. Actions
 
@@ -120,7 +122,7 @@ NONE OBSERVED en el recorrido investigado; no se exige una clase vacía por sime
 
 ## 25. Services
 
-[app/Backend/Modulos/Alertas/Servicios/AlertasService.php](../../../app/Backend/Modulos/Alertas/Servicios/AlertasService.php), [app/Backend/Modulos/Alertas/Servicios/DeteccionAlertasService.php](../../../app/Backend/Modulos/Alertas/Servicios/DeteccionAlertasService.php), [app/Backend/Modulos/Clinica/SignosVitales/ServicioDecisionAlertaClinica.php](../../../app/Backend/Modulos/Clinica/SignosVitales/ServicioDecisionAlertaClinica.php)
+[app/Modulos/Alertas/Aplicacion/Acciones/AlertasService.php](../../../app/Modulos/Alertas/Aplicacion/Acciones/AlertasService.php), [app/Modulos/Alertas/Aplicacion/Acciones/DeteccionAlertasService.php](../../../app/Modulos/Alertas/Aplicacion/Acciones/DeteccionAlertasService.php), [app/Modulos/Alertas/Aplicacion/Acciones/ServicioDecisionAlertaClinica.php](../../../app/Modulos/Alertas/Aplicacion/Acciones/ServicioDecisionAlertaClinica.php)
 
 ## 26. Policies
 

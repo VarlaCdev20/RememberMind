@@ -13,7 +13,8 @@
     $historia = $datos['historia'];
     $maxHistoria = max(1, collect($historia)->max(fn ($dia) => max($dia['ocupadas'], $dia['admisiones'])));
     $maxDinamica = max(1, collect($datos['dinamica'])->max(fn ($dia) => max($dia['visitas'], $dia['actividades'])));
-    $fotosBienvenida = app(\App\Modulos\Reportes\Presentacion\DashboardPhotoRotation::class)->pair('administracion');
+    $rotadorFotos = app(\App\Modulos\Reportes\Presentacion\DashboardPhotoRotation::class);
+    $fotosBienvenida = $rotadorFotos->pair('administracion');
     $pendientes = ($puedeAlertas ? $datos['alertas_activas'] : 0)
         + ($puedePreadmisiones ? $datos['preadmisiones_pendientes'] : 0)
         + ($puedeAdmisiones ? $datos['admisiones_pendientes'] : 0);
@@ -45,6 +46,7 @@
         :date="$saludo['fecha']"
         scope="Centro de Coordinación Residencial"
         :image="asset($fotosBienvenida[0])"
+        :image-alt="$rotadorFotos->altFor(asset($fotosBienvenida[0]), 'Actividades y espacios del centro')"
     />
     @if($puedePreadmisiones)
         <div class="rm-dashboard-header-actions"><a class="rm-admin-dashboard__primary-action" href="{{ route('admin.admisiones.preadmisiones') }}"><i class="ph-bold ph-user-plus" aria-hidden="true"></i> Revisar preadmisiones</a></div>

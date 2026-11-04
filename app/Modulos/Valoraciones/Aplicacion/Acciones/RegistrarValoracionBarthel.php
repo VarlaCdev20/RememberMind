@@ -32,7 +32,7 @@ final class RegistrarValoracionBarthel
             abort_unless($personal && $codArea, 422, 'El usuario debe tener personal y área institucional activa.');
 
             $atencion = Atencion::query()->create([
-                'cod_atencion' => 'ATN_'.Str::upper(Str::random(10)),
+                'cod_atencion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('atenciones'),
                 'cod_residente' => $datos['cod_residente'],
                 'cod_area' => $codArea,
                 'cod_personal' => $personal->cod_personal,
@@ -44,7 +44,7 @@ final class RegistrarValoracionBarthel
             ]);
 
             ValoracionFuncional::create([
-                'cod_valoracion_funcional' => 'VAF_'.Str::upper(Str::random(10)),
+                'cod_valoracion_funcional' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('valoraciones_funcionales'),
                 'cod_residente' => $datos['cod_residente'],
                 'cod_personal' => $personal->cod_personal,
                 'cod_atencion' => $atencion->cod_atencion,

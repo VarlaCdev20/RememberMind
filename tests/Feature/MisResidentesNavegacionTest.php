@@ -85,16 +85,17 @@ class MisResidentesNavegacionTest extends TestCase
         $this->travelTo(Carbon::today()->setTime(10, 0));
         $this->actingAs($this->enfermero)->get(route('admin.enfermeria.pacientes', [
             'cuidado' => 'heridas', 'residente' => $this->residenteAsignado->cod_residente,
-        ]))->assertOk()->assertSee(route('admin.enfermeria.registros', [
-            'seccion' => 'HERIDAS', 'adulto' => $this->residenteAsignado->cod_residente, 'cuidado' => 'heridas',
-        ]));
+        ]))->assertOk()->assertSee('Registrar heridas');
+        Livewire::actingAs($this->enfermero)->test(MisPacientes::class, [
+            'cuidado' => 'heridas', 'residente' => $this->residenteAsignado->cod_residente,
+        ])->call('abrirCuidadoSeleccionado')->assertSet('registroTipo', 'heridas')->assertSeeHtml('data-wound-popup="true"');
         Livewire::actingAs($this->enfermero)->test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\RegistrosEnfermeria::class, [
             'seccion' => 'HERIDAS', 'codResidente' => $this->residenteAsignado->cod_residente,
         ])->assertSee('Sin heridas registradas')->set('codResidente', $this->residenteAjeno->cod_residente)->assertForbidden();
         $this->actingAs($this->enfermero)->get(route('admin.enfermeria.registros', [
             'cuidado' => 'heridas', 'seccion' => 'HERIDAS', 'adulto' => $this->residenteAsignado->cod_residente,
-        ]))->assertOk()->assertSee('openSection: 2', false)
-            ->assertSee('class="rm-sidebar__subitem rm-nav-item is-active"', false);
+        ]))->assertOk()->assertSee('openSection: null', false)
+            ->assertSee('class="rm-sidebar__item is-active"', false);
     }
 
     protected function setUp(): void

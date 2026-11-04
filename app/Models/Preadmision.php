@@ -129,7 +129,7 @@ class Preadmision extends ModeloOperativo
                 $registro->fill($valores)->save();
             } else {
                 $preadmision->valoracionEnfermeriaRegistro()->create($valores + [
-                    'cod_valoracion_enfermeria' => 'VEN_'.Str::upper(Str::random(12)),
+                    'cod_valoracion_enfermeria' => app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('valoraciones_enfermeria_preadmision'),
                 ]);
             }
 

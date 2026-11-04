@@ -51,6 +51,7 @@
  {{ $doc['nombre'] }}
  <div style="font-size: 8px; color: #7C7168; font-weight: normal; margin-top: 1px;">
  {{ $doc['descripcion'] }}
+ <x-ui.document-requirement-warning :item="$doc" />
  </div>
  </td>
  <td>
@@ -71,11 +72,11 @@
  };
  @endphp
  <span style="{{ $statusColor }}">
- {{ $doc['estado'] }}
+ {{ ($doc['conflicto'] ?? false) ? 'Revisión necesaria' : $doc['estado'] }}
  </span>
  </td>
  <td>
- {{ $doc['cargado'] && $doc['documento']->created_at ? $doc['documento']->created_at->format('d/m/Y') : 'Pendiente' }}
+ {{ $doc['documento']?->fecha_hora_carga?->format('d/m/Y') ?? ($doc['cargado'] ? 'No registrada' : 'Sin entrega') }}
  </td>
  </tr>
  @endforeach

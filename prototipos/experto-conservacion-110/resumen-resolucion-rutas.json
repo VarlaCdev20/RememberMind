@@ -1,0 +1,9 @@
+{
+    "rutas": 51,
+    "campos_contrato": 783,
+    "modelos": 39,
+    "rutas_resueltas_en_candidato_110": 0,
+    "rutas_con_ensayo_parcial": 9,
+    "rutas_sin_tabla_candidata_instalada": 9,
+    "rutas_con_bloqueo_individual": 51
+}

@@ -8,6 +8,7 @@ use App\Models\EstudioClinico;
 use App\Models\Residente;
 use App\Modulos\Clinica\Aplicacion\Acciones\AutorizacionClinicaService;
 use App\Modulos\Clinica\Aplicacion\Acciones\GestionarEstudiosClinicos;
+use App\Modulos\Cuidados\Presentacion\Http\Controllers\FotografiaHeridaController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -48,6 +49,9 @@ class EstudioClinicoController extends Controller
 
     public function descargar(DocumentoClinico $documentoClinico): StreamedResponse
     {
+        if ($documentoClinico->tipo_documento === 'FOTO_HERIDA') {
+            return app(FotografiaHeridaController::class)(request(), $documentoClinico->residente()->firstOrFail(), $documentoClinico);
+        }
         $this->authorize('view', $documentoClinico->residente()->firstOrFail());
         abort_unless(request()->user()->can('documentos_clinicos.ver'), 403);
         abort_unless(Storage::disk('local')->exists($documentoClinico->ruta_archivo), 404);

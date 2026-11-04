@@ -1,0 +1,69 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Modulos\ApoyoDecision\Aplicacion\Acciones;
+
+use App\Models\EvaluacionExperta;
+use App\Models\RevisionEvaluacionExperta;
+use App\Models\User;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ValoracionRevisable;
+use App\Modulos\ApoyoDecision\Dominio\Revision\CadenaRevisiones;
+use App\Modulos\ApoyoDecision\Dominio\Revision\DisciplinaRevision;
+use DomainException;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+
+/** Registra un dictamen de una disciplina sobre la valoración exacta, sin confirmar automáticamente otra. */
+final readonly class RevisarValoracionExperta
+{
+    public function __construct(private ValoracionRevisable $contratos) {}
+
+    /**
+     * @param User $usuario
+     * @param string $evaluacionId
+     * @param DisciplinaRevision $disciplina
+     * @param string $decision
+     * @param string $justificacion
+     * @param string|null $anteriorId
+     * @return RevisionEvaluacionExperta
+     */
+    public function ejecutar(User $usuario, string $evaluacionId, DisciplinaRevision $disciplina,
+        string $decision, string $justificacion, ?string $anteriorId = null): RevisionEvaluacionExperta
+    {
+        $justificacion = trim($justificacion);
+        if (! in_array($decision, ['CONFIRMADA', 'RECHAZADA'], true) || $justificacion === '' || mb_strlen($justificacion) > 10000) {
+            throw new DomainException('Indique una decisión válida y su justificación, hasta 10000 caracteres.');
+        }
+
+        return DB::transaction(function () use ($usuario, $evaluacionId, $disciplina, $decision, $justificacion, $anteriorId): RevisionEvaluacionExperta {
+            $cuenta = User::query()->whereKey($usuario->getKey())->lockForUpdate()->firstOrFail();
+            $evaluacion = EvaluacionExperta::query()->with('residente')->whereKey($evaluacionId)->lockForUpdate()->firstOrFail();
+            Gate::forUser($cuenta)->authorize('revisarValoracion', [$evaluacion, $disciplina]);
+            $personal = $cuenta->personal()->where('estado', 'ACTIVO')->where('profesion', $disciplina->value)->lockForUpdate()->sole();
+            // La lectura verifica el soporte original; jamás acepta firmas de fixtures o de resultados corruptos.
+            if ($this->contratos->verificar($cuenta, $evaluacion) === null) {
+                throw new DomainException('Esta evaluación no tiene un contrato operativo aprobado para revisión profesional.');
+            }
+            $base = RevisionEvaluacionExperta::query()->where('cod_evaluacion_experta', $evaluacionId)->where('disciplina', $disciplina->value);
+            $filas = (clone $base)->lockForUpdate()->get();
+            $cabezaId = CadenaRevisiones::cabeza($filas->pluck('cod_revision_anterior', 'cod_revision_experta')->all());
+            $cabeza = $cabezaId === null ? null : $filas->firstWhere('cod_revision_experta', $cabezaId);
+            if ($cabeza && $cabeza->cod_revision_anterior === $anteriorId && $cabeza->cod_usuario === $cuenta->getKey()
+                && $cabeza->cod_personal === $personal->getKey() && $cabeza->decision === $decision && $cabeza->justificacion === $justificacion) {
+                return $cabeza;
+            }
+            if ($cabeza?->getKey() !== $anteriorId || ($anteriorId !== null && ! $filas->contains('cod_revision_experta', $anteriorId))) {
+                throw new DomainException('La revisión cambió. Recargue la valoración antes de registrar otra decisión.');
+            }
+            $revision = RevisionEvaluacionExperta::create(['cod_evaluacion_experta' => $evaluacionId, 'disciplina' => $disciplina->value,
+                'cod_personal' => $personal->getKey(), 'cod_usuario' => $cuenta->getKey(), 'fecha_hora_revision' => now(),
+                'decision' => $decision, 'justificacion' => $justificacion, 'cod_revision_anterior' => $anteriorId]);
+            activity('SistemaExperto')->causedBy($cuenta)->performedOn($revision)
+                ->withProperties(['evaluacion' => $evaluacionId, 'disciplina' => $disciplina->value, 'decision' => $decision])
+                ->log('Revisión profesional de valoración experta registrada.');
+
+            return $revision;
+        }, 5);
+    }
+}

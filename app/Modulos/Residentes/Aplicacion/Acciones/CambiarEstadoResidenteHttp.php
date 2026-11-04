@@ -25,7 +25,7 @@ final class CambiarEstadoResidenteHttp
             $adulto_mayor->estado = $nuevoEstado;
             $adulto_mayor->observacion = data_get($entrada, 'motivo') ?? $adulto_mayor->observacion;
             $adulto_mayor->save();
-            HistorialEstadoResidente::create(['cod_historial_estado' => 'HER_'.strtoupper(Str::random(10)), 'cod_residente' => $adulto_mayor->cod_residente, 'cod_usuario_registro' => $usuario->cod_usuario, 'estado_anterior' => $estadoAnterior ?? 'ACTIVO', 'estado_nuevo' => $nuevoEstado, 'fecha_hora' => now(), 'motivo' => data_get($entrada, 'motivo') ?? 'Cambio de estado administrativo']);
+            HistorialEstadoResidente::create(['cod_historial_estado' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('historial_estados_residente'), 'cod_residente' => $adulto_mayor->cod_residente, 'cod_usuario_registro' => $usuario->cod_usuario, 'estado_anterior' => $estadoAnterior ?? 'ACTIVO', 'estado_nuevo' => $nuevoEstado, 'fecha_hora' => now(), 'motivo' => data_get($entrada, 'motivo') ?? 'Cambio de estado administrativo']);
             \DB::commit();
 
             return null;

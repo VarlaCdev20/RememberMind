@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades\HistorialAlerta;
-use App\Models\Residente;
 use App\Models\Alerta;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Jornada;
+use App\Models\Residente;
 use App\Models\Turno;
 use App\Models\User;
+use App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades\HistorialAlerta;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -28,6 +28,7 @@ class AlertasHistorialFeatureTest extends TestCase
         }
         $this->actingAs($user);
         $adulto = Residente::factory()->create(['estado' => 'ACTIVO']);
+
         return [$user, $adulto];
     }
 
@@ -121,7 +122,7 @@ class AlertasHistorialFeatureTest extends TestCase
             ->assertSee('Revisión presencial efectuada')
             ->assertViewHas('alerta', fn ($actual) => $actual->estado === 'ABIERTA')
             ->assertSee('Abierta')
-            ->assertSee('Historial de Intervenciones');
+            ->assertSee('Historial de eventos');
     }
 
     public function test_usuario_con_permiso_gestionar_puede_registrar_accion_en_eventos_alerta(): void

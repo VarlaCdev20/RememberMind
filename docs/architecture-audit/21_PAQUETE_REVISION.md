@@ -202,7 +202,7 @@ V=ver, C=crear, E=editar borrador propio, L=validar/finalizar, N=anular con moti
 | Familiar | Residents/Documents F; visitas propias F | Solicitud de visita C/E/N propia si módulo habilitado | Vínculo + autorización vigente + campos publicados |
 | Superadmin técnico | Identity/concesión restringida y operación técnica V/A | Gestión técnica auditada | Sin bypass clínico; no autoasignarse privilegios asistenciales |
 
-Acceso efectivo = cuenta activa/habilitada + permiso + alcance por residente/turno + estado del registro + campos permitidos. Aplicar antes de Query/serialización y también a exportación, Jobs y cargas diferidas. No usar roles.first() para elegir autoridad. La validación clínica y reglas institucionales de cada profesión necesitan revisión profesional; la matriz es propuesta de ingeniería.
+Acceso efectivo = cuenta activa/habilitada + permiso + alcance por residente/turno + estado del registro + campos permitidos. Aplicar antes de Query/serialización y también a exportación, Jobs y cargas diferidas. No usar roles.first() para elegir autoridad. La evaluación posterior en uso real y reglas institucionales de cada profesión necesitan revisión profesional; la matriz es propuesta de ingeniería.
 
 Un técnico con acceso a infraestructura no puede quedar físicamente excluido de toda posibilidad de acceso a datos por una Policy Laravel; la separación propuesta limita **el acceso rutinario de aplicación**, complementado por auditoría y procedimientos. No presentarla como garantía criptográfica frente a administradores de BD.
 
@@ -666,7 +666,7 @@ Solo crear carpetas usadas. ClinicalLayout no es necesario si ResidentHeader y c
 | Después | Assessment, admisión/residentes, signos, medicación y turno por cortes | Catálogos/voluntariado/administración de menor prioridad |
 | Ampliación | Portal familiar seguro, nutrición/movilidad y experto según alcance | PDF/correo Blade permanentemente |
 
-Misma sesión, CSRF y guard. Bundle Vue en rutas Inertia, bundle Livewire/Alpine en legacy. Al cruzar fronteras usar enlace normal/navegación completa; no wire:navigate e Inertia como propietarios del mismo DOM. No duplicar validación clínica en TS; errors y conflictos vienen del servidor.
+Misma sesión, CSRF y guard. Bundle Vue en rutas Inertia, bundle Livewire/Alpine en legacy. Al cruzar fronteras usar enlace normal/navegación completa; no wire:navigate e Inertia como propietarios del mismo DOM. No duplicar evaluación posterior en uso real en TS; errors y conflictos vienen del servidor.
 
 Para cada pantalla: antigua → nueva usando mismo caso de uso → pruebas de paridad/acceso → conmutación de ruta → ventana corta de reversión compatible → retiro de anterior y listeners/includes. Si cambió persistencia, no volver al writer viejo sin conciliar nuevas escrituras. En el MVP investigador se puede conservar más Livewire; una tesis no requiere migrar toda administración para probar el experto.
 

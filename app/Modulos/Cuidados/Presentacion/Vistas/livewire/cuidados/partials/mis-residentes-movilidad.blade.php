@@ -6,6 +6,9 @@
         <x-validation-errors />
     @endif
     <div class="rm-movilidad__timestamp"><i class="ph-bold ph-clock" aria-hidden="true"></i><div><strong>Momento del registro</strong><time>{{ \Carbon\Carbon::parse($movMomento)->format('d/m/Y · H:i') }}</time></div><span><i class="ph-bold ph-lock" aria-hidden="true"></i> Fecha y hora automáticas · No editables<small>La hora definitiva se asigna al guardar.</small></span></div>
+    <x-ui.clinical-consultation-bar>
+        <button type="button" class="rm-btn rm-btn-secondary" @click="openTrend($event.currentTarget)" aria-controls="movilidad-historial-popup" :aria-expanded="trendOpen">Ver historial</button>
+    </x-ui.clinical-consultation-bar>
     <div class="rm-movilidad__layout">
         <div class="rm-movilidad__capture">
             <section class="rm-movilidad__section"><h4><b>A</b> Motivo del registro</h4><x-ui.mobility-choice-group field="motivo_registro" :label="$movOpciones['motivo_registro']['label']" :options="$movOpciones['motivo_registro']['options']" icon="ph-clipboard-text" /><x-ui.mobility-other-detail field="motivo_otro" selection="motivo_registro" label="Especifica el otro motivo" /></section>
@@ -35,7 +38,7 @@
                     @if($movHistorial)<time>{{ $movHistorial[0]['fecha'] }} · {{ $movHistorial[0]['hora'] }}</time><strong>{{ $movHistorial[0]['actividad'] }}</strong><dl>@foreach($movHistorial[0]['campos'] as $field)<div><dt>{{ $field['nombre'] }}</dt><dd>{{ $field['valor'] }}</dd></div>@endforeach</dl>@else<p class="rm-help">Sin registros previos de movilidad.</p>@endif
                 </section>
                 <section class="rm-movilidad__section"><h5><i class="ph-bold ph-calendar-check" aria-hidden="true"></i> Jornada actual</h5><div class="rm-movilidad__counts">@foreach(['registros' => 'Registros de movilidad', 'deambulacion' => 'Actividades con deambulación', 'fatiga' => 'Con fatiga registrada'] as $key => $label)<span><b>{{ $movContinuidad[$key] ?? 0 }}</b>{{ $label }}</span>@endforeach</div><p class="rm-help">Conteos de eventos guardados, no una valoración funcional.</p></section>
-                <section class="rm-movilidad__section"><h5>Historial reciente</h5><ol class="rm-movilidad__recent">@forelse(array_slice($movHistorial, 0, 6) as $row)<li><time>{{ $row['fecha'] }} · {{ $row['hora'] }}</time><strong>{{ $row['actividad'] }}</strong><span>{{ collect($row['campos'])->whereIn('nombre', ['Movilidad observada', 'Dispositivo', 'Distancia recorrida', 'Apoyo requerido', 'Fatiga'])->pluck('valor')->join(' · ') }}</span></li>@empty<li>Sin registros previos.</li>@endforelse</ol><button type="button" class="rm-btn-secondary" @click="openTrend($event.currentTarget)" aria-controls="movilidad-historial-popup" :aria-expanded="trendOpen">Ver historial</button></section>
+                <section class="rm-movilidad__section"><h5>Historial reciente</h5><ol class="rm-movilidad__recent">@forelse(array_slice($movHistorial, 0, 6) as $row)<li><time>{{ $row['fecha'] }} · {{ $row['hora'] }}</time><strong>{{ $row['actividad'] }}</strong><span>{{ collect($row['campos'])->whereIn('nombre', ['Movilidad observada', 'Dispositivo', 'Distancia recorrida', 'Apoyo requerido', 'Fatiga'])->pluck('valor')->join(' · ') }}</span></li>@empty<li>Sin registros previos.</li>@endforelse</ol></section>
                 @include('livewire.cuidados.partials.mis-residentes-movilidad-historial')
             @else<p class="rm-help">El historial requiere permiso de consulta de movilidad.</p>@endcan
         </aside>

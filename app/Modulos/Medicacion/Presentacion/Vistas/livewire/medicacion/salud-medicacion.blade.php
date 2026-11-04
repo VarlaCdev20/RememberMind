@@ -72,7 +72,7 @@
    <select wire:model="nuevo_cod_residente" class="w-full rounded-xl border border-[var(--rm-border)]/70 bg-[var(--rm-bg-app)] py-2.5 pl-10 pr-4 text-xs font-bold text-[var(--rm-text-body)] outline-none transition appearance-none focus:border-[var(--rm-primary)] focus:ring-2 focus:ring-boton-principal/20">
    <option value="">-- Seleccione un residente --</option>
    @foreach($adultos as $ad)
-    <option value="{{ $ad->cod_residente }}">{{ $ad->nombres }} {{ $ad->ap_paterno }} ({{ $ad->cod_residente }})</option>
+    <option value="{{ $ad->cod_residente }}">{{ $ad->nombres }} {{ $ad->ap_paterno }}</option>
    @endforeach
    </select>
    </div>

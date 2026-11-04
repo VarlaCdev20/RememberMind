@@ -14,9 +14,9 @@
  <form wire:submit.prevent="guardarDocumento" class="space-y-4">
  {{-- Archivo Temporal --}}
  <div class="space-y-1">
- <label class="block text-[9px] font-bold uppercase tracking-widest text-apoyo">Archivo (PDF, JPG, JPEG, PNG - Max 10MB) *</label>
+ <label for="archivoDoc" class="rm-label">Archivo original (PDF, JPG o PNG; hasta 10 MB) *</label>
  <div class="relative flex flex-col items-center justify-center border-2 border-dashed border-borde rounded-xl bg-fondo-card/40 p-4 transition hover:bg-fondo-card/60">
- <input type="file" wire:model="archivoTemporal" id="archivoDoc" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept=".pdf,.jpg,.jpeg,.png">
+ <input type="file" wire:model="archivoTemporal" id="archivoDoc" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept=".pdf,.jpg,.jpeg,.png" aria-invalid="{{ $errors->has('archivoTemporal') ? 'true' : 'false' }}" @if($errors->has('archivoTemporal')) aria-describedby="archivoDoc-error" @endif>
  
  <div class="text-center space-y-1 pointer-events-none">
  <i class="ph-bold ph-cloud-arrow-up text-3xl text-parrafo/45"></i>
@@ -30,7 +30,7 @@
  <p class="text-[9px] text-meta">Formatos: PDF, JPG, PNG de hasta 10 MB</p>
  </div>
  </div>
- @error('archivoTemporal') <span class="mt-1 block text-[9px] font-bold text-boton-acento uppercase">{{ $message }}</span> @enderror
+ @error('archivoTemporal') <p id="archivoDoc-error" class="rm-error" role="alert">{{ $message }}</p> @enderror
  </div>
 
  {{-- Fechas --}}

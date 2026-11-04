@@ -6,6 +6,10 @@
 <div class="rm-clinical-form rm-ingesta" x-data="rmIngestaRegistro(@js($ingestaHistorial), @js($capturaIngesta), @js($ingestaMomento), @js(config('enfermeria.porcentaje_baja_ingesta', 50)))" :data-graph-open="trendOpen ? 'true' : 'false'" aria-label="Registro de ingesta">
     <x-validation-errors class="rm-clinical-form__errors" />
     <p class="rm-clinical-form__note rm-ingesta__timestamp"><i class="ph-bold ph-clock" aria-hidden="true"></i> Registro: {{ \Carbon\Carbon::parse($ingestaMomento)->format('d/m/Y H:i') }} · La hora definitiva se asigna al guardar.</p>
+    <x-ui.clinical-consultation-bar>
+        <x-ui.action-button variant="secondary" icono="ph-clock-counter-clockwise" @click="openTrend($event.currentTarget); $nextTick(() => rmFocusClinicalHistory($refs.trendDialog))" x-bind:aria-expanded="trendOpen" aria-controls="ingesta-grafica-popup" aria-haspopup="dialog">Ver historial</x-ui.action-button>
+        <button class="rm-btn rm-btn-secondary" type="button" @click="openTrend($event.currentTarget)" aria-controls="ingesta-grafica-popup" :aria-expanded="trendOpen"><i class="ph-bold ph-chart-line" aria-hidden="true"></i> Ver evolución</button>
+    </x-ui.clinical-consultation-bar>
     <div class="rm-ingesta__layout">
         <div class="rm-ingesta__column">
             <x-ui.form-section title="Tipo de comida" icon="ph-bowl-food" :columns="1" class="rm-clinical-form__section">
@@ -72,7 +76,7 @@
                 @endcan
                 <div class="rm-ingesta__comparison" aria-live="polite"><span>Actual · Sin guardar</span><strong x-text="current() === null ? 'Sin registrar' : current() + ' %'"></strong><span>Diferencia descriptiva</span><b x-text="comparison()"></b></div>
                 @can('registros_ingesta.ver')
-                    <button class="rm-btn-secondary" type="button" @click="openTrend($event.currentTarget)" aria-controls="ingesta-grafica-popup" :aria-expanded="trendOpen"><i class="ph-bold ph-chart-line" aria-hidden="true"></i> Ver evolución</button>
+
                     <p class="rm-help">Últimos {{ count($ingestaHistorial) }} registros. La vista previa no modifica la historia.</p>
                     <details class="rm-ingesta__recent">
                         <summary>Últimos registros</summary>

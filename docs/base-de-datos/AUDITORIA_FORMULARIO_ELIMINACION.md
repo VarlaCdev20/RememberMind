@@ -12,6 +12,8 @@ related_docs: [DECISION_ELIMINACION_V2.md, ../frontend/FORMULARIO_ELIMINACION_V2
 
 # Auditoría del formulario Eliminación V2
 
+> Alcance de inventario: las cifras de esta decisión describen su fecha. El [inventario vigente](README.md) incorpora las extensiones posteriores:106 tablas de negocio+16 técnicas. La decisión conserva exclusivamente sus columnas, relaciones y reglas autorizadas.
+
 La aprobación expresa del 09/10/2026 sustituye el contrato anterior de captura de este documento. La versión 1.0 describía cantidad/característica en texto y campos estructurados todavía propuestos. La extensión nueva no se atribuye al baseline original.
 
 ## Estructura

@@ -80,7 +80,10 @@ class AreasInstitucionalesV2Test extends TestCase
     #[DataProvider('exportacionesConError')]
     public function test_exportacion_sin_permiso_no_invoca_exportador_ni_audita_exito(string $metodo, string $exportador, array $argumentos, string $mensaje): void
     {
-        $this->actingAs(User::factory()->create(['estado' => 'ACTIVO']));
+        $actor = User::factory()->create(['estado' => 'ACTIVO']);
+        \Spatie\Permission\Models\Permission::findOrCreate('areas.ver', 'web');
+        $actor->givePermissionTo('areas.ver');
+        $this->actingAs($actor);
         $this->mock(ReportExportService::class, fn ($mock) => $mock->shouldNotReceive($exportador));
         $componente = Livewire::test(AreasInstitucionalesPanel::class);
         $auditorias = Activity::query()->count();
@@ -102,8 +105,7 @@ class AreasInstitucionalesV2Test extends TestCase
         $actor->update(['estado' => 'INACTIVO']);
         $auditorias = Activity::query()->count();
 
-        $componente->call($metodo, ...$argumentos)
-            ->assertDispatched('swal:modal', fn ($evento, $datos) => ($datos[0]['title'] ?? null) === 'Acceso denegado');
+        $componente->call($metodo, ...$argumentos)->assertForbidden();
         $this->assertSame($auditorias, Activity::query()->count());
     }
 

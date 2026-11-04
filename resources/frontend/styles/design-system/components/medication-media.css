@@ -1,0 +1,7 @@
+/* Presentación compartida de fotografías de catálogo, con fallback explícito. */
+.rm-medication-media { margin: 0; min-width: 0; }
+.rm-medication-media__stage { display: grid; place-items: center; min-height: 168px; padding: var(--rm-space-3); border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-xl); background: linear-gradient(145deg, var(--rm-surface), var(--rm-surface-soft)); overflow: hidden; }
+.rm-medication-media__photo { width: 100%; height: 168px; object-fit: contain; }
+.rm-medication-media__illustration { width: min(100%, 320px); }
+.rm-medication-media__illustration svg { display: block; width: 100%; height: auto; }
+.rm-medication-media figcaption { margin-top: var(--rm-space-2); font-family: var(--rm-font-family); font-size: var(--rm-font-size-meta); color: var(--rm-text-secondary); line-height: var(--rm-line-height-body); }

@@ -1,0 +1,34 @@
+{
+  "fecha": "2026-11-04",
+  "alcance": "Identidad y referencia de puntuación. Materiales privados de consulta fuera de assets y commits; no acredita derechos de terceros.",
+  "fuentes": [
+    {
+      "archivo": "MOCA81-ES-ID061021.pdf",
+      "url": "https://championsforhealth.org/wp-content/uploads/2018/12/MOCA-8.1-Spanish.pdf",
+      "url_final": "https://championsforhealth.org/wp-content/uploads/2018/12/MOCA-8.1-Spanish.pdf",
+      "bytes": 460984,
+      "sha256": "92435e5b2cc4ece7aa535f083051943adbe46240eaeaadd73ec741ebd26b7a31"
+    },
+    {
+      "archivo": "RUDASPE2020-supplementary.zip",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC7232574/supplementaryFiles",
+      "url_final": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC7232574/supplementaryFiles",
+      "bytes": 282524,
+      "sha256": "f8683ae8c8ed342d5f2f28bb1f500d07435e9bf7df1528d2550aeb6da853db5d"
+    },
+    {
+      "archivo": "RUDASPE2020-Table_2.docx",
+      "miembro_zip": "Table_2.DOCX",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC7232574/supplementaryFiles",
+      "bytes": 33780,
+      "sha256": "33d04df631c87dc564f636c2861efd13e49dcb0354e5849f42e48baf97966cc0"
+    },
+    {
+      "archivo": "FAQ-UDS2-B7S-2008-ES.pdf",
+      "url": "https://files.alz.washington.edu/documentation/uds2-ivp-b7-sp.pdf",
+      "url_final": "https://files.alz.washington.edu/documentation/uds2-ivp-b7-sp.pdf",
+      "bytes": 48966,
+      "sha256": "b2c42db731de1f3f215c5752a6d6716e2fe343c20363e862578a26662f8f45ac"
+    }
+  ]
+}

@@ -32,7 +32,7 @@ class AgendaTurnoService
         $residentes = Residente::with(['cama.habitacion'])->whereIn('cod_residente', $codigos)->get()->keyBy('cod_residente');
         $enCentro = $residentes->filter(fn (Residente $adulto) => ($adulto->estado_operativo ?: 'EN_CENTRO') === 'EN_CENTRO')->keys()->all();
 
-        $alertas = Alerta::whereIn('cod_residente', $codigos)->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])
+        $alertas = Alerta::whereIn('cod_residente', $codigos)->whereIn('estado', Alerta::ESTADOS_ACTIVOS)
             ->get()->map(fn ($alerta) => [
                 'id' => 'alerta-'.$alerta->cod_alerta,
                 'origen_id' => $alerta->cod_alerta,

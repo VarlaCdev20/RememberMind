@@ -1,0 +1,1 @@
+<dl class="rm-alert-desk__fields">@foreach($camposContexto as $campo)<div><dt>{{ $contextoTrabajo['campos'][$campo]['etiqueta'] }}</dt><dd>{{ $contextoTrabajo['campos'][$campo]['valor'] }}</dd></div>@endforeach</dl>

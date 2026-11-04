@@ -31,7 +31,7 @@ class FolderOrganizationTest extends TestCase
     {
         $this->assertNamespacesMatchPath(app_path('Modulos'), 'App\\Modulos');
         $this->assertNamespacesMatchPath(app_path('Compartido'), 'App\\Compartido');
-        $this->assertNamespacesMatchPath(base_path('motor-experto/src/motor_experto'), 'MotorExperto');
+        $this->assertNamespacesMatchPath(base_path('motor-experto'), 'MotorExperto');
         $this->assertNamespacesMatchPath(app_path('Http/Controllers'), 'App\\Http\\Controllers');
     }
 
@@ -58,12 +58,6 @@ class FolderOrganizationTest extends TestCase
         }
         $this->assertGreaterThan(0, $dominio);
         $this->assertGreaterThan(0, $aplicacion);
-        foreach (File::allFiles(base_path('motor-experto/src')) as $file) {
-            if ($file->getExtension() !== 'php') {
-                continue;
-            }
-            $this->assertDoesNotMatchRegularExpression('/^use\s+(?:App|Illuminate|Livewire)\\\\/m', File::get($file->getPathname()), $file->getPathname());
-        }
         foreach (['app', 'database', 'routes', 'config', 'bootstrap'] as $directory) {
             foreach (File::allFiles(base_path($directory)) as $file) {
                 if ($file->getExtension() !== 'php') {
@@ -72,6 +66,28 @@ class FolderOrganizationTest extends TestCase
                 $content = File::get($file->getPathname());
                 $this->assertStringNotContainsString('App\\Backend\\', $content, $file->getPathname());
                 $this->assertStringNotContainsString('App\\Frontend\\', $content, $file->getPathname());
+            }
+        }
+    }
+
+    public function test_el_motor_directo_es_puro_y_composer_excluye_sus_fixtures(): void
+    {
+        $this->assertDirectoryDoesNotExist(base_path('motor-experto/src'));
+        $archivos = 0;
+        foreach (File::allFiles(base_path('motor-experto')) as $file) {
+            if ($file->getExtension() !== 'php' || str_starts_with(str_replace('\\', '/', $file->getRelativePathname()), 'tests/')) {
+                continue;
+            }
+            $archivos++;
+            $this->assertDoesNotMatchRegularExpression('/^use\s+(?:App|Illuminate|Livewire)\\\\/m', File::get($file->getPathname()), $file->getPathname());
+        }
+        $this->assertGreaterThan(0, $archivos);
+        $loader = require base_path('vendor/autoload.php');
+        $this->assertSame(realpath(base_path('motor-experto')), realpath($loader->getPrefixesPsr4()['MotorExperto\\'][0]));
+        $this->assertFalse($loader->findFile('MotorExperto\\adaptadores\\entrada\\DemostracionCOGMEM'));
+        foreach ($loader->getClassMap() as $clase => $ruta) {
+            if (str_starts_with($clase, 'MotorExperto\\')) {
+                $this->assertStringNotContainsString('/tests/', str_replace('\\', '/', $ruta));
             }
         }
     }
@@ -86,7 +102,8 @@ class FolderOrganizationTest extends TestCase
                 'wheres' => $ruta->wheres, 'bindingFields' => $ruta->bindingFields()];
         }
         $esperadas = json_decode(File::get(base_path('tests/Fixtures/Architecture/routes.json')), true, 512, JSON_THROW_ON_ERROR);
-        $this->assertCount(296, $actuales);
+        // Incluye consulta/gobierno, conciliación/transcripción y captura original Petersen aprobada.
+        $this->assertCount(305, $actuales);
         $this->assertSame(
             $this->normalizarPrefijosLivewire($esperadas),
             $this->normalizarPrefijosLivewire($actuales, ltrim(EndpointResolver::prefix(), '/')),
@@ -104,7 +121,7 @@ class FolderOrganizationTest extends TestCase
 
         $normalizadas = 0;
         foreach ($rutas as &$ruta) {
-            if (preg_match('/^livewire-[a-f0-9]{8}\/(.+)$/D', $ruta['uri'], $coincidencia)
+            if (preg_match('/^livewire-(?:[a-f0-9]{8}|\{hash\})\/(.+)$/D', $ruta['uri'], $coincidencia)
                 && in_array($coincidencia[1], $endpoints, true)) {
                 if ($prefijoActual !== null) {
                     $this->assertSame($prefijoActual, explode('/', $ruta['uri'], 2)[0]);
@@ -123,6 +140,9 @@ class FolderOrganizationTest extends TestCase
     private function assertNamespacesMatchPath(string $root, string $rootNamespace): void
     {
         foreach (File::allFiles($root) as $file) {
+            if ($rootNamespace === 'MotorExperto' && str_starts_with(str_replace('\\', '/', $file->getRelativePathname()), 'tests/')) {
+                continue;
+            }
             if ($file->getExtension() !== 'php' || str_ends_with($file->getFilename(), '.blade.php')) {
                 continue;
             }

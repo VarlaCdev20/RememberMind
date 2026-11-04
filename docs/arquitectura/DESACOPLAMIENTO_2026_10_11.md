@@ -1,6 +1,6 @@
 ---
 title: "Desacoplamiento de fronteras de aplicación"
-status: CURRENT
+status: HISTORICAL
 last_reviewed: 2026-10-11
 owner: RememberMind
 source_of_truth: false
@@ -10,6 +10,8 @@ runtime_verified: false
 ---
 
 # Desacoplamiento — 11/10/2026
+
+> **Informe de su corte original.** Sus pruebas, cifras y limitaciones se conservan como evidencia fechada. El [estado actual](../ESTADO_ACTUAL.md) incorpora las entregas posteriores; este informe no certifica nuevamente el árbol vigente.
 
 Continuación sobre `9e5d3be`, en `C:\Users\CARLAENCINAS\Desktop\RememberMind`, rama `PODEMOS-SEGUIR`. Se conserva el [ADR híbrido](ADR_ARQUITECTURA_HIBRIDA.md): doce propietarios y cuatro capas para administración/operación; puertos y adaptadores para el núcleo experto. Aplicación conserva Eloquent y capacidades Laravel autorizadas por el ADR.
 
@@ -69,4 +71,4 @@ Aplicación conserva Eloquent, DB, Gate, Validator, Cache, configuración, resol
 
 No se certifica ausencia universal de SQL diferido en todas las vistas. Archivos y transacciones DB no son atómicos de forma universal: existen flujos heredados con riesgo de huérfanos ante fallos posteriores y hashes que pueden devolver `false`. La privacidad de documentos en disco público requiere su intervención específica. Es deuda separada, conservada explícitamente; no se afirma haberla resuelto mediante interfaces.
 
-La validación clínica, la activación de inferencias, el advisory de desarrollo pendiente y el CI remoto conservan los límites del [informe de preparación](../sistema/PREPARACION_DESARROLLO_2026_10_11.md).
+La evaluación posterior en uso real, la activación de inferencias, el advisory de desarrollo pendiente y el CI remoto conservan los límites del [informe de preparación](../sistema/PREPARACION_DESARROLLO_2026_10_11.md).

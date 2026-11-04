@@ -39,7 +39,7 @@ class Historical2026Seeder extends Seeder
     {
         $this->guardEnvironment();
         $cases = require __DIR__.'/data/historical2026.php';
-        $existing = DB::table('preadmisiones')->where('cod_preadmision', 'like', 'H26_PRE_%')->count();
+        $existing = DB::table('preadmisiones')->whereIn('numero_documento', array_map(fn (int $i) => (string) (99000000 + $i), range(1, 30)))->count();
         if ($existing) {
             if ($existing !== count($cases)) {
                 throw new RuntimeException('Carga histórica parcial: restaurar el respaldo; no completar ni sobrescribir silenciosamente.');
@@ -59,7 +59,7 @@ class Historical2026Seeder extends Seeder
                 if (DB::getDriverName() === 'pgsql') {
                     // Evita dos cargas concurrentes del mismo conjunto, sin desactivar restricciones.
                     DB::select('select pg_advisory_xact_lock(?)', [2026100830]);
-                    if (DB::table('preadmisiones')->where('cod_preadmision', 'H26_PRE_01')->exists()) {
+                    if (DB::table('preadmisiones')->where('numero_documento', '99000001')->exists()) {
                         throw new RuntimeException('Otro proceso inició la misma carga.');
                     }
                 }
@@ -73,7 +73,7 @@ class Historical2026Seeder extends Seeder
                     $this->flush();
                 }
                 $this->assertIntegrity();
-                activity('Desarrollo')->causedBy(User::findOrFail('H26_USU_ADMIN'))
+                activity('Desarrollo')->causedBy(User::findOrFail($this->codigoImportacion('H26_USU_ADMIN')))
                     ->withProperties(['dataset' => self::VERSION, 'referencia' => self::REFERENCE_DATE, 'residentes' => 30])
                     ->log('Carga explícita de historiales sintéticos 2026; sin modificación del esquema.');
                 if (app()->environment('local')) {
@@ -93,6 +93,38 @@ class Historical2026Seeder extends Seeder
         $this->command?->info('30 residentes admitidos, 30 camas y controles diarios hasta '.self::CUTOFF.'.');
     }
 
+    private array $identidadesImportacion = [];
+
+    /** Alias efímeros del fixture: las filas reciben siempre su código definitivo. */
+    private function codigoImportacion(string $alias): string
+    {
+        $familia = explode('_', $alias)[1] ?? '';
+        $tabla = match ($familia) {
+            'USU'=>'usuarios', 'PER'=>'personal', 'ARE'=>'areas', 'TUR'=>'turnos',
+            'HAB'=>'habitaciones', 'CAM'=>'camas', 'TEC'=>'tipos_estudio_clinico', 'COM'=>'componentes_estudio',
+            'INS'=>'instrumentos', 'PREG'=>'preguntas_instrumento', 'OPT'=>'opciones_pregunta',
+            'J'=>'jornadas', 'AP'=>'asignaciones_personal', 'SOL','PRE'=>'preadmisiones',
+            'CTO'=>'contactos', 'VEP'=>'valoraciones_enfermeria_preadmision', 'ANT'=>'antecedentes_clinicos',
+            'NOT','NIN','NCR','ND'=>'notas_clinicas', 'DIA'=>'diagnosticos', 'ALE'=>'alergias',
+            'DIS'=>'dispositivos_clinicos', 'IND'=>'indicaciones_clinicas', 'PLA','PFH'=>'planes_cuidado',
+            'INT','IED','IFH'=>'intervenciones_cuidado', 'PRO','PED','PGH'=>'programaciones_cuidado',
+            'OSV'=>'objetivos_signos_vitales', 'DV2','DO'=>'valoraciones_dolor', 'AT','AD'=>'atenciones',
+            'DOC'=>'documentos', 'RX'=>'prescripciones', 'HRX'=>'horarios_prescripcion',
+            'AR'=>'asignaciones_residente_jornada', 'SV','SVR'=>'signos_vitales', 'CO'=>'registros_conductuales',
+            'SU'=>'registros_sueno', 'IN'=>'registros_ingesta', 'HI'=>'registros_hidratacion',
+            'EL'=>'registros_eliminacion', 'MO'=>'registros_movilidad', 'EC','EP','EF'=>'ejecuciones_cuidado',
+            'CG'=>'controles_cognitivos', 'AM'=>'administraciones_medicacion', 'PT'=>'pases_turno',
+            'MA'=>'mediciones_antropometricas', 'VN'=>'valoraciones_nutricionales', 'VF'=>'valoraciones_funcionales',
+            'AI'=>'aplicaciones_instrumento', 'RI'=>'respuestas_instrumento', 'VP'=>'valoraciones_psicologicas',
+            'AC'=>'actividades', 'PA'=>'participantes_actividad', 'SP'=>'seguimientos_pedagogicos',
+            'VIS','VI'=>'visitas', 'EST'=>'estudios_clinicos', 'RES'=>'resultados_estudio', 'INF'=>'informes_estudio',
+            'DCL'=>'documentos_clinicos', 'DER'=>'derivaciones', 'INCI'=>'incidentes',
+            'AL','ALC','ALA'=>'alertas', 'EAL','EAC','EAA'=>'eventos_alerta', 'HER'=>'heridas', 'CH'=>'curaciones_herida',
+            default=>throw new RuntimeException('Familia de fixture desconocida: '.$familia),
+        };
+
+        return $this->identidadesImportacion[$alias] ??= app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente($tabla);
+    }
     private function guardEnvironment(): void
     {
         if (! app()->environment(['local', 'testing'])) {
@@ -159,7 +191,7 @@ class Historical2026Seeder extends Seeder
 
     private function base(): void
     {
-        $this->account('H26_USU_ADMIN', 'admisiones@remembermind.test', 'ADMINISTRADOR');
+        $this->account($this->codigoImportacion('H26_USU_ADMIN'), 'admisiones@remembermind.test', 'ADMINISTRADOR');
         $staff = [
             ['Lucía', 'Mamani'], ['Daniel', 'Rojas'], ['Paola', 'Quispe'], ['Miguel', 'Arce'],
             ['Verónica', 'Vargas'], ['Diego', 'Salazar'], ['Adriana', 'Paredes'], ['Sergio', 'Condori'],
@@ -168,9 +200,9 @@ class Historical2026Seeder extends Seeder
         ];
         foreach ($staff as $n => [$name, $surname]) {
             $i = $n + 1;
-            $user = sprintf('H26_USU_N%02d', $i);
+            $user = $this->codigoImportacion(sprintf('H26_USU_N%02d', $i));
             $this->account($user, sprintf('enfermeria.%02d@remembermind.test', $i), 'ENFERMEROS');
-            $this->staff(sprintf('H26_PER_N%02d', $i), $user, $name, $surname, 'ENFERMERIA', $i);
+            $this->staff($this->codigoImportacion(sprintf('H26_PER_N%02d', $i)), $user, $name, $surname, 'ENFERMERIA', $i);
         }
         foreach ([
             ['MED', 'Carolina', 'Soria', 'MEDICO GENERAL/GERIATRA', 'MEDICINA', 'Medicina general'],
@@ -180,22 +212,22 @@ class Historical2026Seeder extends Seeder
             ['FIS', 'Marcos', 'Valdez', 'FISIOTERAPEUTA', 'FISIOTERAPIA', 'Rehabilitación'],
             ['PED', 'Natalia', 'Suárez', 'PEDAGOGO', 'PEDAGOGIA', 'Estimulación y aprendizaje'],
         ] as $n => [$code, $name, $surname, $role, $profession, $specialty]) {
-            $this->account('H26_USU_'.$code, strtolower($code).'@remembermind.test', $role);
-            $this->staff('H26_PER_'.$code, 'H26_USU_'.$code, $name, $surname, $profession, 20 + $n, $specialty);
+            $this->account($this->codigoImportacion('H26_USU_'.$code), strtolower($code).'@remembermind.test', $role);
+            $this->staff($this->codigoImportacion('H26_PER_'.$code), $this->codigoImportacion('H26_USU_'.$code), $name, $surname, $profession, 20 + $n, $specialty);
         }
-        $this->staff('H26_PER_ADMIN', 'H26_USU_ADMIN', 'Patricia', 'León', 'ADMINISTRACION', 30);
+        $this->staff($this->codigoImportacion('H26_PER_ADMIN'), $this->codigoImportacion('H26_USU_ADMIN'), 'Patricia', 'León', 'ADMINISTRACION', 30);
         foreach (['ENF' => 'Enfermería', 'MED' => 'Medicina', 'PSI' => 'Psicología', 'NUT' => 'Nutrición', 'FIS' => 'Fisioterapia', 'PED' => 'Pedagogía', 'ADM' => 'Admisiones'] as $code => $name) {
-            $this->put('areas', 'H26_ARE_'.$code, ['nombre' => $name.' integral', 'descripcion' => 'Atención institucional del área de '.$name.'.', 'estado' => 'ACTIVA']);
+            $this->put('areas', $this->codigoImportacion('H26_ARE_'.$code), ['nombre' => $name.' integral', 'descripcion' => 'Atención institucional del área de '.$name.'.', 'estado' => 'ACTIVA']);
         }
         foreach ([['00:00:00', '12:00:00', 'Guardia de madrugada y mañana'], ['12:00:00', '00:00:00', 'Guardia de tarde y noche']] as $s => [$start, $end, $name]) {
-            $this->put('turnos', 'H26_TUR_'.$s, ['nombre' => $name, 'hora_inicio' => $start, 'hora_cierre' => $end, 'orden' => $s + 1, 'estado' => 'ACTIVO']);
+            $this->put('turnos', $this->codigoImportacion('H26_TUR_'.$s), ['nombre' => $name, 'hora_inicio' => $start, 'hora_cierre' => $end, 'orden' => $s + 1, 'estado' => 'ACTIVO']);
         }
         for ($i = 1; $i <= 30; $i++) {
-            $this->put('habitaciones', sprintf('H26_HAB_%02d', $i), [
+            $this->put('habitaciones', $this->codigoImportacion(sprintf('H26_HAB_%02d', $i)), [
                 'codigo' => (string) (200 + $i), 'nombre' => 'Habitación '.(200 + $i),
                 'tipo' => 'INDIVIDUAL', 'piso' => $i <= 15 ? '1' : '2', 'capacidad' => 1, 'estado' => 'ACTIVA',
             ]);
-            $this->put('camas', sprintf('H26_CAM_%02d', $i), ['cod_habitacion' => sprintf('H26_HAB_%02d', $i),
+            $this->put('camas', $this->codigoImportacion(sprintf('H26_CAM_%02d', $i)), ['cod_habitacion' => $this->codigoImportacion(sprintf('H26_HAB_%02d', $i)),
                 'codigo' => (200 + $i).'-A', 'tipo' => 'ESTANDAR', 'estado' => 'ACTIVA']);
         }
         foreach (require __DIR__.'/data/medicamentos_investigados.php' as [$code, $name, $strength]) {
@@ -222,12 +254,12 @@ class Historical2026Seeder extends Seeder
     private function catalogs(): void
     {
         // Autorización expresa de la propietaria: glucemia y Barthel 10 actividades, sin clasificación nueva.
-        $this->put('tipos_estudio_clinico', 'H26_TEC_GLU', ['nombre' => 'Glucemia de laboratorio', 'categoria' => 'LABORATORIO',
+        $this->put('tipos_estudio_clinico', $this->codigoImportacion('H26_TEC_GLU'), ['nombre' => 'Glucemia de laboratorio', 'categoria' => 'LABORATORIO',
             'descripcion' => 'Determinación de glucosa en sangre; condiciones de obtención consignadas en el informe.',
             'requiere_componentes' => true, 'requiere_informe' => true, 'estado' => 'ACTIVO']);
-        $this->put('componentes_estudio', 'H26_COM_GLU', ['cod_tipo_estudio' => 'H26_TEC_GLU', 'nombre' => 'Glucosa',
+        $this->put('componentes_estudio', $this->codigoImportacion('H26_COM_GLU'), ['cod_tipo_estudio' => $this->codigoImportacion('H26_TEC_GLU'), 'nombre' => 'Glucosa',
             'unidad_referencia' => 'mg/dL', 'tipo_resultado' => 'NUMERICO', 'orden' => 1, 'estado' => 'ACTIVO']);
-        $this->put('instrumentos', 'H26_INS_BARTHEL', ['codigo' => 'BARTHEL_100', 'nombre' => 'Índice de Barthel',
+        $this->put('instrumentos', $this->codigoImportacion('H26_INS_BARTHEL'), ['codigo' => 'BARTHEL_100', 'nombre' => 'Índice de Barthel',
             'tipo' => 'FUNCIONAL', 'version' => '10 actividades / 100 puntos', 'puntaje_maximo' => 100,
             'descripcion' => 'Actividades y puntuaciones del formulario vigente; no aplica clasificación experta automática.', 'estado' => 'ACTIVO']);
         // Solo nombres de actividades y valores, sin reproducir un cuestionario/licencia ajenos.
@@ -237,12 +269,12 @@ class Historical2026Seeder extends Seeder
             ['Traslados', [0, 5, 10, 15]], ['Deambulación', [0, 5, 10, 15]], ['Escaleras', [0, 5, 10]],
         ];
         foreach ($items as $n => [$name, $scores]) {
-            $q = sprintf('H26_PREG_%02d', $n + 1);
-            $this->put('preguntas_instrumento', $q, ['cod_instrumento' => 'H26_INS_BARTHEL', 'codigo' => 'ADL_'.($n + 1),
+            $q = $this->codigoImportacion(sprintf('H26_PREG_%02d', $n + 1));
+            $this->put('preguntas_instrumento', $q, ['cod_instrumento' => $this->codigoImportacion('H26_INS_BARTHEL'), 'codigo' => 'ADL_'.($n + 1),
                 'enunciado' => $name, 'dominio' => 'ACTIVIDADES_VIDA_DIARIA', 'tipo_respuesta' => 'OPCION_UNICA',
                 'puntaje_maximo' => max($scores), 'orden' => $n + 1, 'estado' => 'ACTIVA']);
             foreach ($scores as $order => $score) {
-                $this->put('opciones_pregunta', sprintf('H26_OPT_%02d_%02d', $n + 1, $score), ['cod_pregunta' => $q,
+                $this->put('opciones_pregunta', $this->codigoImportacion(sprintf('H26_OPT_%02d_%02d', $n + 1, $score)), ['cod_pregunta' => $q,
                     'nombre' => $score.' puntos', 'valor' => (string) $score, 'puntaje' => $score, 'orden' => $order + 1, 'estado' => 'ACTIVO']);
             }
         }
@@ -257,20 +289,20 @@ class Historical2026Seeder extends Seeder
                 $j = $this->jornada($date, $shift);
                 $start = $date.($shift ? ' 12:00:00' : ' 00:00:00');
                 $closed = $date < self::REFERENCE_DATE;
-                $this->put('jornadas', $j, ['cod_turno' => 'H26_TUR_'.$shift, 'cod_usuario_apertura' => 'H26_USU_ADMIN',
-                    'cod_usuario_cierre' => $closed ? 'H26_USU_ADMIN' : null, 'fecha_jornada' => $date,
+                $this->put('jornadas', $j, ['cod_turno' => $this->codigoImportacion('H26_TUR_'.$shift), 'cod_usuario_apertura' => $this->codigoImportacion('H26_USU_ADMIN'),
+                    'cod_usuario_cierre' => $closed ? $this->codigoImportacion('H26_USU_ADMIN'): null, 'fecha_jornada' => $date,
                     'estado' => $closed ? 'CERRADA' : 'ABIERTA']);
                 for ($slot = 0; $slot < 4; $slot++) {
                     $nurse = $this->nurse($date, $shift, $slot);
-                    $this->put('asignaciones_personal', 'H26_AP_'.substr($date, 2, 2).substr($date, 5, 2).substr($date, 8, 2).'_'.$shift.$slot,
-                        ['cod_jornada' => $j, 'cod_personal' => $nurse, 'cod_area' => 'H26_ARE_ENF', 'funcion' => 'Cuidados y continuidad asistencial',
+                    $this->put('asignaciones_personal', $this->codigoImportacion('H26_AP_'.substr($date, 2, 2).substr($date, 5, 2).substr($date, 8, 2).'_'.$shift.$slot),
+                        ['cod_jornada' => $j, 'cod_personal' => $nurse, 'cod_area' => $this->codigoImportacion('H26_ARE_ENF'), 'funcion' => 'Cuidados y continuidad asistencial',
                             'tipo_asignacion' => 'TITULAR', 'fecha_asignacion' => $start,
                             'estado' => $closed ? 'FINALIZADA' : 'ACTIVA']);
                 }
                 if ($shift === 0 && $day->isWeekday()) {
                     foreach (['MED', 'GER', 'PSI', 'NUT', 'FIS', 'PED'] as $code) {
-                        $this->put('asignaciones_personal', 'H26_AP_'.str_replace('-', '', substr($date, 2)).'_'.$code,
-                            ['cod_jornada' => $j, 'cod_personal' => 'H26_PER_'.$code, 'cod_area' => 'H26_ARE_'.($code === 'GER' ? 'MED' : $code),
+                        $this->put('asignaciones_personal', $this->codigoImportacion('H26_AP_'.str_replace('-', '', substr($date, 2)).'_'.$code),
+                            ['cod_jornada' => $j, 'cod_personal' => $this->codigoImportacion('H26_PER_'.$code), 'cod_area' => $this->codigoImportacion('H26_ARE_'.($code === 'GER' ? 'MED' : $code)),
                                 'funcion' => 'Atención interdisciplinaria', 'tipo_asignacion' => 'TITULAR', 'fecha_asignacion' => $date.' 08:00:00',
                                 'estado' => $closed ? 'FINALIZADA' : 'ACTIVA']);
                     }
@@ -281,15 +313,15 @@ class Historical2026Seeder extends Seeder
 
     private function jornada(string $date, int $shift): string
     {
-        return 'H26_J_'.str_replace('-', '', substr($date, 2)).'_'.$shift;
+        return $this->codigoImportacion('H26_J_'.str_replace('-', '', substr($date, 2)).'_'.$shift);
     }
 
     private function pendingAdmissions(): void
     {
         foreach ([['Adela', 'Morales', '1949-09-10', 'PENDIENTE'], ['Ramiro', 'Tapia', '1944-12-08', 'APROBADA'],
             ['Lidia', 'Estrada', '1950-02-20', 'RECHAZADA'], ['Ernesto', 'Reyes', '1941-08-12', 'PENDIENTE']] as $n => [$name, $surname, $birth, $state]) {
-            $this->put('preadmisiones', 'H26_SOL_'.($n + 1), ['cod_usuario_registro' => 'H26_USU_ADMIN',
-                'cod_usuario_revision' => $state === 'PENDIENTE' ? null : 'H26_USU_ADMIN',
+            $this->put('preadmisiones', $this->codigoImportacion('H26_SOL_'.($n + 1)), ['cod_usuario_registro' => $this->codigoImportacion('H26_USU_ADMIN'),
+                'cod_usuario_revision' => $state === 'PENDIENTE' ? null : $this->codigoImportacion('H26_USU_ADMIN'),
                 'nombres' => $name, 'apellido_paterno' => $surname, 'apellido_materno' => 'Pérez',
                 'numero_documento' => (string) (99000100 + $n), 'fecha_nacimiento' => $birth,
                 'genero' => $n % 2 ? 'MASCULINO' : 'FEMENINO', 'motivo_ingreso' => 'Solicitud de residencia y acompañamiento.',
@@ -303,12 +335,12 @@ class Historical2026Seeder extends Seeder
     {
         $team = ((int) CarbonImmutable::parse($date)->dayOfYear % 2) + $shift * 2;
 
-        return sprintf('H26_PER_N%02d', $team * 4 + $slot + 1);
+        return $this->codigoImportacion(sprintf('H26_PER_N%02d', $team * 4 + $slot + 1));
     }
 
     private function code(string $kind, int $i, string $date, int $slot = 0): string
     {
-        return sprintf('H26_%s_%02d_%s%d', $kind, $i, str_replace('-', '', substr($date, 2)), $slot);
+        return $this->codigoImportacion(sprintf('H26_%s_%02d_%s%d', $kind, $i, str_replace('-', '', substr($date, 2)), $slot));
     }
 
     private function variation(int $i, string $date, string $metric, int $max): int
@@ -320,14 +352,14 @@ class Historical2026Seeder extends Seeder
     {
         [$name, $paternal, $maternal, $birth, $gender, $admit, $profile] = $case;
         $serial = sprintf('%02d', $i);
-        $contact = 'H26_CTO_'.$serial;
-        $familyUser = 'H26_USU_F'.$serial;
+        $contact = $this->codigoImportacion('H26_CTO_'.$serial);
+        $familyUser = $this->codigoImportacion('H26_USU_F'.$serial);
         $this->account($familyUser, 'familia.'.$serial.'@remembermind.test', 'FAMILIAR');
         $this->put('contactos', $contact, ['cod_usuario' => $familyUser, 'nombres' => $gender === 'FEMENINO' ? 'Daniela' : 'Rodrigo',
             'apellido_paterno' => $paternal, 'apellido_materno' => 'Méndez', 'numero_documento' => (string) (97000000 + $i),
             'telefono' => '7300'.sprintf('%04d', $i), 'celular' => '7400'.sprintf('%04d', $i),
             'correo' => 'familia.'.$serial.'@remembermind.test', 'direccion' => 'Avenida Las Flores '.(300 + $i), 'estado' => 'ACTIVO']);
-        $pre = 'H26_PRE_'.$serial;
+        $pre = $this->codigoImportacion('H26_PRE_'.$serial);
         $request = CarbonImmutable::parse($admit)->subDays(4)->setTime(9, 0)->toDateTimeString();
         $review = CarbonImmutable::parse($admit)->subDays(1)->setTime(9, 0)->toDateTimeString();
         $nurse = $this->nurse($admit, 0, ($i - 1) % 4);
@@ -337,7 +369,7 @@ class Historical2026Seeder extends Seeder
             'nutricion' => 'Apoyo en alimentación y seguimiento nutricional.',
             default => 'Residencia permanente con acompañamiento y seguimiento de salud.',
         };
-        $this->put('preadmisiones', $pre, ['cod_contacto' => $contact, 'cod_usuario_registro' => 'H26_USU_ADMIN',
+        $this->put('preadmisiones', $pre, ['cod_contacto' => $contact, 'cod_usuario_registro' => $this->codigoImportacion('H26_USU_ADMIN'),
             'nombres' => $name, 'apellido_paterno' => $paternal, 'apellido_materno' => $maternal,
             'numero_documento' => (string) (99000000 + $i), 'expedicion_documento' => 'LP', 'fecha_nacimiento' => $birth,
             'genero' => $gender, 'estado_civil' => $i % 3 ? 'VIUDO/A' : 'CASADO/A',
@@ -346,8 +378,8 @@ class Historical2026Seeder extends Seeder
             'permanencia' => 'PERMANENTE', 'prioridad' => 'MEDIA', 'descripcion_caso' => $reason,
             'fecha_solicitud' => $request, 'estado' => 'PENDIENTE']);
         $preadNurse = $this->nurse(substr($review, 0, 10), 0, ($i - 1) % 4);
-        $this->put('valoraciones_enfermeria_preadmision', 'H26_VEP_'.$serial, [
-            'cod_preadmision' => $pre, 'cod_usuario_registro' => str_replace('PER', 'USU', $preadNurse),
+        $this->put('valoraciones_enfermeria_preadmision', $this->codigoImportacion('H26_VEP_'.$serial), [
+            'cod_preadmision' => $pre, 'cod_usuario_registro' => \App\Models\Personal::findOrFail($preadNurse)->cod_usuario,
             'cod_personal_valorador' => $preadNurse, 'fecha_hora' => $review,
             'estado_general' => 'ESTABLE', 'nivel_conciencia' => 'ALERTA',
             'orientacion_persona' => 'ORIENTADO', 'orientacion_tiempo' => $profile === 'cognicion' ? 'PARCIALMENTE_ORIENTADO' : 'ORIENTADO', 'orientacion_espacio' => 'ORIENTADO',
@@ -367,66 +399,57 @@ class Historical2026Seeder extends Seeder
             'recomendacion_enfermeria' => $reason,
         ]);
         DB::table('preadmisiones')->where('cod_preadmision', $pre)->update([
-            'estado' => 'APROBADA', 'cod_usuario_revision' => 'H26_USU_ADMIN', 'fecha_revision' => $review,
+            'estado' => 'APROBADA', 'cod_usuario_revision' => $this->codigoImportacion('H26_USU_ADMIN'), 'fecha_revision' => $review,
         ]);
 
-        // Determinismo limitado a los códigos de la Action; nunca se usa para contraseñas.
-        $sequence = 0;
-        Str::createRandomStringsUsing(function (int $length) use ($i, &$sequence): string {
-            return substr(hash('sha256', self::VERSION.':admision:'.$i.':'.(++$sequence)), 0, $length);
-        });
-        try {
             $resident = app(FormalizarAdmision::class)->ejecutar(Preadmision::findOrFail($pre), [
-                'cod_cama' => 'H26_CAM_'.$serial, 'cod_contacto' => $contact, 'fecha_hora_admision' => $admit.' 07:00:00',
+                'cod_cama' => $this->codigoImportacion('H26_CAM_'.$serial), 'cod_contacto' => $contact, 'fecha_hora_admision' => $admit.' 07:00:00',
                 'fecha_consentimiento' => $admit.' 07:00:00', 'parentesco' => 'HIJO/A',
                 'autoriza_informacion' => true, 'autoriza_salida' => true, 'celular' => '7600'.sprintf('%04d', $i),
                 'nivel_educativo' => $i % 2 ? 'SECUNDARIA' : 'PRIMARIA', 'grupo_sanguineo' => ['O', 'A', 'B'][$i % 3],
                 'factor_rh' => '+', 'seguro_entidad' => 'Seguro de Salud Integral', 'seguro_plan' => 'Cobertura integral',
                 'seguro_afiliacion' => '9900'.sprintf('%04d', $i), 'seguro_titular' => $name.' '.$paternal.' '.$maternal,
                 'seguro_cobertura' => 'Consulta y atención de salud',
-            ], User::findOrFail('H26_USU_ADMIN'));
-        } finally {
-            Str::createRandomStringsNormally();
-        }
+            ], User::findOrFail($this->codigoImportacion('H26_USU_ADMIN')));
         $r = $resident->cod_residente;
         $this->manifest[] = ['numero' => $i, 'cod_residente' => $r, 'perfil' => $profile, 'admision' => $admit];
         $context = ['cod_residente' => $r];
         $this->documents($i, $r, $pre, $admit, $name.' '.$paternal.' '.$maternal);
         $medical = $this->attention($i, $r, $admit, 'MED', 'ADM', 'Conciliación y valoración médica de ingreso.');
-        $this->put('antecedentes_clinicos', 'H26_ANT_'.$serial, $context + ['cod_personal' => 'H26_PER_MED', 'tipo_antecedente' => 'PERSONAL',
+        $this->put('antecedentes_clinicos', $this->codigoImportacion('H26_ANT_'.$serial), $context + ['cod_personal' => $this->codigoImportacion('H26_PER_MED'), 'tipo_antecedente' => 'PERSONAL',
             'descripcion' => $this->history($profile), 'fecha_referencia' => $admit, 'fuente_informacion' => 'Entrevista de ingreso y documentación aportada', 'estado' => 'VIGENTE']);
-        $this->put('notas_clinicas', 'H26_NOT_'.$serial, $context + ['cod_atencion' => $medical, 'cod_personal' => 'H26_PER_MED',
+        $this->put('notas_clinicas', $this->codigoImportacion('H26_NOT_'.$serial), $context + ['cod_atencion' => $medical, 'cod_personal' => $this->codigoImportacion('H26_PER_MED'),
             'tipo_nota' => 'EVOLUCION', 'contenido' => $this->history($profile).' Conciliación de medicación y plan interdisciplinario documentados. Residente sin síntomas agudos al ingreso.',
             'fecha_hora' => $admit.' 08:00:00', 'estado' => 'VIGENTE']);
         if (in_array($profile, ['hta', 'diabetes', 'tiroides', 'movilidad'], true)) {
             $diagnosis = ['hta' => 'Hipertensión arterial', 'diabetes' => 'Diabetes mellitus tipo 2', 'tiroides' => 'Hipotiroidismo', 'movilidad' => 'Artrosis de rodilla'][$profile];
-            $this->put('diagnosticos', 'H26_DIA_'.$serial, $context + ['cod_atencion' => $medical, 'cod_personal' => 'H26_PER_MED',
+            $this->put('diagnosticos', $this->codigoImportacion('H26_DIA_'.$serial), $context + ['cod_atencion' => $medical, 'cod_personal' => $this->codigoImportacion('H26_PER_MED'),
                 'nombre' => $diagnosis, 'tipo' => 'CRONICO', 'certeza' => 'CONFIRMADO', 'fecha_hora' => $admit.' 08:00:00', 'estado' => 'ACTIVO',
                 'observacion' => 'Antecedente previamente documentado; sin inferencia automática a partir de mediciones.']);
         }
         if ($i === 6) {
-            $this->put('alergias', 'H26_ALE_'.$serial, $context + ['cod_personal' => 'H26_PER_MED', 'tipo' => 'MEDICAMENTO',
+            $this->put('alergias', $this->codigoImportacion('H26_ALE_'.$serial), $context + ['cod_personal' => $this->codigoImportacion('H26_PER_MED'), 'tipo' => 'MEDICAMENTO',
                 'sustancia' => 'Penicilina', 'reaccion' => 'Urticaria referida', 'gravedad' => 'MODERADA', 'fecha_hora' => $admit.' 08:00:00', 'estado' => 'ACTIVA']);
         }
         if ($profile === 'movilidad') {
-            $this->put('dispositivos_clinicos', 'H26_DIS_'.$serial, $context + ['cod_personal' => 'H26_PER_FIS', 'tipo' => 'ANDADOR',
+            $this->put('dispositivos_clinicos', $this->codigoImportacion('H26_DIS_'.$serial), $context + ['cod_personal' => $this->codigoImportacion('H26_PER_FIS'), 'tipo' => 'ANDADOR',
                 'descripcion' => 'Andador de cuatro apoyos ajustado al residente.', 'ubicacion' => 'Apoyo para marcha', 'fecha_colocacion' => $admit, 'estado' => 'ACTIVO']);
         }
-        $this->put('indicaciones_clinicas', 'H26_IND_'.$serial, $context + ['cod_atencion' => $medical, 'cod_personal' => 'H26_PER_MED',
+        $this->put('indicaciones_clinicas', $this->codigoImportacion('H26_IND_'.$serial), $context + ['cod_atencion' => $medical, 'cod_personal' => $this->codigoImportacion('H26_PER_MED'),
             'tipo_indicacion' => 'CUIDADO', 'descripcion' => $reason.' Registrar signos, alimentación, líquidos, eliminación y tolerancia a la actividad.',
             'prioridad' => 'MEDIA', 'fecha_hora' => $admit.' 08:00:00', 'estado' => 'VIGENTE']);
-        $plan = 'H26_PLA_'.$serial;
-        $intervention = 'H26_INT_'.$serial;
-        $this->put('planes_cuidado', $plan, $context + ['cod_area' => 'H26_ARE_ENF', 'cod_personal' => $nurse, 'tipo_plan' => 'INICIAL',
+        $plan = $this->codigoImportacion('H26_PLA_'.$serial);
+        $intervention = $this->codigoImportacion('H26_INT_'.$serial);
+        $this->put('planes_cuidado', $plan, $context + ['cod_area' => $this->codigoImportacion('H26_ARE_ENF'), 'cod_personal' => $nurse, 'tipo_plan' => 'INICIAL',
             'nombre' => 'Plan de cuidados individual', 'objetivo_general' => $reason, 'prioridad' => 'MEDIA', 'fecha_hora_apertura' => $admit.' 08:15:00', 'estado' => 'ACTIVO']);
         $this->put('intervenciones_cuidado', $intervention, ['cod_plan' => $plan, 'nombre' => 'Acompañamiento en actividades diarias',
             'descripcion' => 'Comprobar confort y apoyar higiene, movilidad y alimentación según autonomía observada.',
             'objetivo_especifico' => 'Conservar autonomía y documentar cambios.', 'prioridad' => 'MEDIA', 'estado' => 'ACTIVA']);
-        $this->put('programaciones_cuidado', 'H26_PRO_'.$serial, ['cod_intervencion' => $intervention, 'cod_turno' => 'H26_TUR_0',
+        $this->put('programaciones_cuidado', $this->codigoImportacion('H26_PRO_'.$serial), ['cod_intervencion' => $intervention, 'cod_turno' => $this->codigoImportacion('H26_TUR_0'),
             'frecuencia' => 'DIARIA', 'hora_programada' => '09:30:00', 'fecha_activacion' => $admit, 'estado' => 'ACTIVA']);
         $rx = $this->prescription($i, $r, $medical, $admit, $profile);
         if ($profile === 'diabetes') {
-            $this->put('objetivos_signos_vitales', 'H26_OSV_'.$serial, $context + ['cod_personal' => 'H26_PER_MED',
+            $this->put('objetivos_signos_vitales', $this->codigoImportacion('H26_OSV_'.$serial), $context + ['cod_personal' => $this->codigoImportacion('H26_PER_MED'),
                 'parametro' => 'glucemia', 'min_objetivo' => 100, 'max_objetivo' => 180, 'min_critico' => null, 'max_critico' => null,
                 'vigente_desde' => $admit.' 08:00:00', 'estado' => 'VIGENTE',
                 'motivo' => 'Objetivo individual preprandial del caso sintético de cuidados de larga duración. Referencia de contexto: ADA 2026, adultos mayores. No es una regla institucional ni una orden para pacientes reales.']);
@@ -449,8 +472,8 @@ class Historical2026Seeder extends Seeder
             1 => [4], 2 => [8, 5, 3], 3 => [4, 4], default => []
         };
         foreach ($values as $step => $value) {
-            $root = 'H26_DV2_'.$i.'_0';
-            $this->put('valoraciones_dolor', 'H26_DV2_'.$i.'_'.$step, [
+            $root = $this->codigoImportacion('H26_DV2_'.$i.'_0');
+            $this->put('valoraciones_dolor', $this->codigoImportacion('H26_DV2_'.$i.'_'.$step), [
                 'cod_residente' => $resident, 'cod_personal' => $nurse,
                 'cod_valoracion_origen' => $step === 0 ? null : $root,
                 'fecha_hora' => self::REFERENCE_DATE.' '.sprintf('%02d:20:00', 7 + $step),
@@ -487,8 +510,8 @@ class Historical2026Seeder extends Seeder
     private function attention(int $i, string $r, string $date, string $professional, string $kind, string $reason, string $time = '08:00:00'): string
     {
         $id = $this->code('AT', $i, $date, ['MED' => 0, 'GER' => 1, 'PSI' => 2, 'NUT' => 3, 'FIS' => 4, 'PED' => 5][$professional]);
-        $this->put('atenciones', $id, ['cod_residente' => $r, 'cod_area' => 'H26_ARE_'.($professional === 'GER' ? 'MED' : $professional),
-            'cod_personal' => 'H26_PER_'.$professional, 'tipo_atencion' => $kind, 'motivo' => $reason,
+        $this->put('atenciones', $id, ['cod_residente' => $r, 'cod_area' => $this->codigoImportacion('H26_ARE_'.($professional === 'GER' ? 'MED' : $professional)),
+            'cod_personal' => $this->codigoImportacion('H26_PER_'.$professional), 'tipo_atencion' => $kind, 'motivo' => $reason,
             'fecha_hora' => $date.' '.$time, 'estado' => 'FINALIZADA']);
 
         return $id;
@@ -499,7 +522,7 @@ class Historical2026Seeder extends Seeder
         $content = "Expediente institucional\nNombre: $name\nIngreso: $date\nOrigen: datos sintéticos de desarrollo. No válido para atención real.\n";
         $path = sprintf('historical2026/expedientes/%02d.txt', $i);
         $this->writePrivate($path, $content);
-        $this->put('documentos', sprintf('H26_DOC_%02d', $i), ['cod_residente' => $r, 'cod_usuario_validacion' => 'H26_USU_ADMIN',
+        $this->put('documentos', $this->codigoImportacion(sprintf('H26_DOC_%02d', $i)), ['cod_residente' => $r, 'cod_usuario_validacion' => $this->codigoImportacion('H26_USU_ADMIN'),
             'tipo_documento' => 'EXPEDIENTE', 'nombre' => 'Expediente de ingreso', 'ruta_archivo' => $path,
             'tipo_archivo' => 'text/plain', 'hash_archivo' => hash('sha256', $content), 'fecha_validacion' => $date.' 08:00:00', 'estado' => 'VALIDADO']);
     }
@@ -518,17 +541,17 @@ class Historical2026Seeder extends Seeder
             return null;
         }
         [$med, $dose, $unit, $times, $indication] = $definition;
-        $rx = sprintf('H26_RX_%02d', $i);
+        $rx = $this->codigoImportacion(sprintf('H26_RX_%02d', $i));
         $end = $profile === 'dolor' ? CarbonImmutable::parse($date)->addDays(5)->setTime(8, 0)->toDateTimeString() : null;
         $this->put('prescripciones', $rx, ['cod_residente' => $r, 'cod_atencion' => $attention, 'cod_medicamento' => $this->medications[$med],
-            'cod_personal' => 'H26_PER_MED', 'dosis' => $dose, 'unidad_dosis' => $unit, 'via_administracion' => 'ORAL',
+            'cod_personal' => $this->codigoImportacion('H26_PER_MED'), 'dosis' => $dose, 'unidad_dosis' => $unit, 'via_administracion' => 'ORAL',
             'frecuencia' => count($times) === 2 ? 'DOS_VECES_AL_DIA' : 'DIARIA', 'indicacion' => $indication,
             'segun_necesidad' => false, 'fecha_hora_prescripcion' => $date.' 08:00:00', 'estado' => $end ? 'SUSPENDIDA' : 'ACTIVA',
-            'fecha_hora_suspension' => $end, 'cod_personal_suspension' => $end ? 'H26_PER_MED' : null,
+            'fecha_hora_suspension' => $end, 'cod_personal_suspension' => $end ? $this->codigoImportacion('H26_PER_MED'): null,
             'motivo_suspension' => $end ? 'Tratamiento temporal concluido; respuesta favorable documentada.' : null,
             'observacion' => 'Orden del escenario sintético; no trasladar a pacientes reales.']);
         foreach ($times as $slot => $time) {
-            $this->put('horarios_prescripcion', sprintf('H26_HRX_%02d_%d', $i, $slot), ['cod_prescripcion' => $rx,
+            $this->put('horarios_prescripcion', $this->codigoImportacion(sprintf('H26_HRX_%02d_%d', $i, $slot)), ['cod_prescripcion' => $rx,
                 'hora_programada' => $time, 'dosis_programada' => $dose, 'estado' => $end ? 'INACTIVO' : 'ACTIVO']);
         }
 
@@ -547,7 +570,7 @@ class Historical2026Seeder extends Seeder
         $j = $this->jornada($date, 0);
         $context = ['cod_residente' => $r, 'cod_personal' => $nurse, 'cod_jornada' => $j];
         $dailyAttention = $this->code('AD', $i, $date);
-        $this->put('atenciones', $dailyAttention, ['cod_residente' => $r, 'cod_area' => 'H26_ARE_ENF', 'cod_personal' => $nurse,
+        $this->put('atenciones', $dailyAttention, ['cod_residente' => $r, 'cod_area' => $this->codigoImportacion('H26_ARE_ENF'), 'cod_personal' => $nurse,
             'tipo_atencion' => 'SEGUIMIENTO_DIARIO', 'motivo' => 'SEGUIMIENTO_DIARIO:'.($profile === 'critica' && $elapsed === 21 ? 'VIGILANCIA' : 'ESTABLE'), 'fecha_hora' => $date.' 09:00:00', 'estado' => 'FINALIZADA',
             'observacion' => 'Control diario, higiene, confort, ingesta y líquidos registrados. '.$this->history($profile)]);
         $clinicalContext = $context + ['cod_atencion' => $dailyAttention];
@@ -641,7 +664,7 @@ class Historical2026Seeder extends Seeder
                 }
                 $shift = $time >= '12:00:00' ? 1 : 0;
                 $this->put('administraciones_medicacion', $this->code('AM', $i, $date, $slot), [
-                    'cod_prescripcion' => $rx['rx'], 'cod_horario_prescripcion' => sprintf('H26_HRX_%02d_%d', $i, $slot),
+                    'cod_prescripcion' => $rx['rx'], 'cod_horario_prescripcion' => $this->codigoImportacion(sprintf('H26_HRX_%02d_%d', $i, $slot)),
                     'cod_residente' => $r, 'cod_jornada' => $this->jornada($date, $shift), 'cod_personal' => $this->nurse($date, $shift, ($i - 1) % 4),
                     'fecha_hora_programada' => $date.' '.$time, 'fecha_hora_administracion' => $date.' '.$time,
                     'resultado' => 'ADMINISTRADA', 'dosis_administrada' => $rx['dose'], 'efecto_observado' => 'Sin molestias inmediatas referidas.',
@@ -681,14 +704,14 @@ class Historical2026Seeder extends Seeder
                 throw new RuntimeException('La agenda de valoraciones excede el corte aprobado.');
             }
             $at = $this->attention($i, $r, $date, $professional, 'VALORACION', 'Seguimiento interdisciplinario del plan individual.', $time);
-            $base = ['cod_residente' => $r, 'cod_personal' => 'H26_PER_'.$professional, 'cod_atencion' => $at, 'fecha_hora' => $date.' '.$time, 'estado' => 'VIGENTE'];
+            $base = ['cod_residente' => $r, 'cod_personal' => $this->codigoImportacion('H26_PER_'.$professional), 'cod_atencion' => $at, 'fecha_hora' => $date.' '.$time, 'estado' => 'VIGENTE'];
             if ($professional === 'NUT') {
                 $elapsed = (int) CarbonImmutable::parse($date)->diffInDays(CarbonImmutable::parse((require __DIR__.'/data/historical2026.php')[$i - 1][5]), true);
                 $weight = round(54 + $i % 20 + sin((int) CarbonImmutable::parse($date)->dayOfYear / 30) * 0.4
                     + ($profile === 'nutricion' ? ($elapsed <= 84 ? -min(4.8, max(0, $elapsed - 28) * 4.8 / 56) : -4.8 + min(3.2, ($elapsed - 84) * 3.2 / 84)) : 0), 2);
                 $height = 150 + $i % 20;
                 $measurement = $this->code('MA', $i, $date);
-                $this->put('mediciones_antropometricas', $measurement, ['cod_residente' => $r, 'cod_personal' => 'H26_PER_NUT',
+                $this->put('mediciones_antropometricas', $measurement, ['cod_residente' => $r, 'cod_personal' => $this->codigoImportacion('H26_PER_NUT'),
                     'fecha_hora' => $date.' '.$time, 'peso' => $weight, 'talla' => $height,
                     'imc' => round($weight / (($height / 100) ** 2), 2), 'perimetro_braquial' => 25 + $i % 4,
                     'perimetro_pantorrilla' => 32 + $i % 4, 'observacion' => 'Medición con equipo calibrado y técnica habitual.']);
@@ -710,12 +733,12 @@ class Historical2026Seeder extends Seeder
                     'conclusion' => 'Autonomía y apoyos observados directamente.', 'recomendacion' => $help ? 'Mantener apoyo y actividad supervisada.' : 'Mantener la actividad cotidiana tolerada.']);
                 $scores = $help ? [10, 0, 5, 5, 10, 10, 5, 10, 10, 0] : [10, 5, 5, 10, 10, 10, 10, 15, 15, 10];
                 $app = $this->code('AI', $i, $date);
-                $this->put('aplicaciones_instrumento', $app, $base + ['cod_instrumento' => 'H26_INS_BARTHEL',
+                $this->put('aplicaciones_instrumento', $app, $base + ['cod_instrumento' => $this->codigoImportacion('H26_INS_BARTHEL'),
                     'puntaje_total' => array_sum($scores), 'puntaje_maximo' => 100,
                     'clasificacion' => null, 'interpretacion' => 'Puntuación descriptiva de las actividades; revisar junto con la valoración funcional.']);
                 foreach ($scores as $q => $score) {
                     $this->put('respuestas_instrumento', $this->code('RI', $i, $date, $q), ['cod_aplicacion' => $app,
-                        'cod_pregunta' => sprintf('H26_PREG_%02d', $q + 1), 'cod_opcion' => sprintf('H26_OPT_%02d_%02d', $q + 1, $score),
+                        'cod_pregunta' => $this->codigoImportacion(sprintf('H26_PREG_%02d', $q + 1)), 'cod_opcion' => $this->codigoImportacion(sprintf('H26_OPT_%02d_%02d', $q + 1, $score)),
                         'valor_numero' => $score, 'puntaje' => $score]);
                 }
             } elseif ($professional === 'PSI') {
@@ -725,9 +748,9 @@ class Historical2026Seeder extends Seeder
                     'impresion_cognitiva' => $profile === 'cognicion' ? 'Dificultad de orientación temporal observada; pendiente seguimiento.' : 'Sin cambios observados durante la entrevista.',
                     'conclusion' => 'Entrevista y observación descriptiva, sin inferencia diagnóstica automática.', 'recomendacion' => 'Mantener acompañamiento y registrar cambios.']);
             } else {
-                $activity = 'H26_AC_'.str_replace('-', '', substr($date, 2));
+                $activity = $this->codigoImportacion('H26_AC_'.str_replace('-', '', substr($date, 2)));
                 if (! DB::table('actividades')->where('cod_actividad', $activity)->exists()) {
-                    $this->put('actividades', $activity, ['cod_area' => 'H26_ARE_PED', 'cod_personal' => 'H26_PER_PED',
+                    $this->put('actividades', $activity, ['cod_area' => $this->codigoImportacion('H26_ARE_PED'), 'cod_personal' => $this->codigoImportacion('H26_PER_PED'),
                         'tipo' => 'ESTIMULACION', 'nombre' => 'Lectura y conversación guiada', 'descripcion' => 'Lectura breve y conversación sobre experiencias cotidianas.',
                         'fecha_hora' => $date.' 09:40:00', 'duracion_minutos' => 20, 'lugar' => 'Sala de actividades', 'cupo' => 30, 'estado' => 'FINALIZADA']);
                 }
@@ -748,43 +771,43 @@ class Historical2026Seeder extends Seeder
         $date = CarbonImmutable::parse($admit)->addDays(1)->toDateString();
         $serial = sprintf('%02d', $i);
         // La visita de contacto sucede después del ingreso y antes del corte.
-        $this->put('visitas', 'H26_VIS_'.$serial, ['cod_residente' => $r, 'cod_contacto' => 'H26_CTO_'.$serial,
-            'cod_usuario_autorizacion' => 'H26_USU_ADMIN', 'fecha_hora_programada' => $date.' 09:00:00',
+        $this->put('visitas', $this->codigoImportacion('H26_VIS_'.$serial), ['cod_residente' => $r, 'cod_contacto' => $this->codigoImportacion('H26_CTO_'.$serial),
+            'cod_usuario_autorizacion' => $this->codigoImportacion('H26_USU_ADMIN'), 'fecha_hora_programada' => $date.' 09:00:00',
             'fecha_hora_ingreso' => $date.' 09:00:00', 'fecha_hora_salida' => $date.' 09:45:00', 'motivo' => 'Visita familiar', 'estado' => 'FINALIZADA']);
         if ($i % 3 !== 0) {
             $interval = $i % 2 ? 7 : 30;
             foreach (CarbonImmutable::parse($admit)->addDays($interval)->daysUntil(self::REFERENCE_DATE, $interval) as $visit) {
                 $d = $visit->toDateString();
-                $this->put('visitas', $this->code('VI', $i, $d), ['cod_residente' => $r, 'cod_contacto' => 'H26_CTO_'.$serial,
-                    'cod_usuario_autorizacion' => 'H26_USU_ADMIN', 'fecha_hora_programada' => $d.' 09:00:00',
+                $this->put('visitas', $this->code('VI', $i, $d), ['cod_residente' => $r, 'cod_contacto' => $this->codigoImportacion('H26_CTO_'.$serial),
+                    'cod_usuario_autorizacion' => $this->codigoImportacion('H26_USU_ADMIN'), 'fecha_hora_programada' => $d.' 09:00:00',
                     'fecha_hora_ingreso' => $d.' 09:00:00', 'fecha_hora_salida' => $d.' 09:30:00', 'motivo' => 'Visita familiar', 'estado' => 'FINALIZADA']);
             }
         }
         if ($profile === 'diabetes') {
             $at = $this->attention($i, $r, $date, 'MED', 'CONTROL', 'Control de glucemia y revisión clínica.');
-            $study = 'H26_EST_'.$serial;
-            $this->put('estudios_clinicos', $study, ['cod_residente' => $r, 'cod_atencion' => $at, 'cod_tipo_estudio' => 'H26_TEC_GLU',
-                'cod_personal' => 'H26_PER_MED', 'motivo' => 'Seguimiento de diabetes conocida', 'prioridad' => 'MEDIA',
+            $study = $this->codigoImportacion('H26_EST_'.$serial);
+            $this->put('estudios_clinicos', $study, ['cod_residente' => $r, 'cod_atencion' => $at, 'cod_tipo_estudio' => $this->codigoImportacion('H26_TEC_GLU'),
+                'cod_personal' => $this->codigoImportacion('H26_PER_MED'), 'motivo' => 'Seguimiento de diabetes conocida', 'prioridad' => 'MEDIA',
                 'fecha_solicitud' => $date.' 08:00:00', 'fecha_realizacion' => $date.' 09:00:00', 'centro_medico' => 'Laboratorio institucional', 'estado' => 'REALIZADO']);
-            $this->put('resultados_estudio', 'H26_RES_'.$serial, ['cod_estudio' => $study, 'cod_componente' => 'H26_COM_GLU',
+            $this->put('resultados_estudio', $this->codigoImportacion('H26_RES_'.$serial), ['cod_estudio' => $study, 'cod_componente' => $this->codigoImportacion('H26_COM_GLU'),
                 'valor_numerico' => 128 + $i % 12, 'unidad' => 'mg/dL', 'rango_referencia' => null, 'clasificacion' => null,
                 'observacion' => 'Muestra en ayunas; resultado sintético, sin atribución de rango universal.']);
-            $this->put('informes_estudio', 'H26_INF_'.$serial, ['cod_estudio' => $study, 'cod_personal' => 'H26_PER_MED',
+            $this->put('informes_estudio', $this->codigoImportacion('H26_INF_'.$serial), ['cod_estudio' => $study, 'cod_personal' => $this->codigoImportacion('H26_PER_MED'),
                 'fecha_hora' => $date.' 09:30:00', 'hallazgos' => 'Glucemia registrada en el componente del estudio.',
                 'conclusion' => 'Resultado revisado en el contexto de diabetes conocida.', 'recomendacion' => 'Mantener seguimiento individual indicado.', 'origen' => 'INTERNO', 'estado' => 'VIGENTE']);
             $content = "Informe de glucemia\nFecha: $date\nGlucosa: ".(128 + $i % 12)." mg/dL\nMuestra en ayunas. Datos sintéticos; no válido para uso clínico real.\n";
             $path = 'historical2026/informes/'.$serial.'.txt';
             $this->writePrivate($path, $content);
-            $this->put('documentos_clinicos', 'H26_DCL_'.$serial, ['cod_residente' => $r, 'cod_estudio' => $study, 'cod_atencion' => $at,
-                'cod_personal' => 'H26_PER_MED', 'tipo_documento' => 'INFORME', 'titulo' => 'Informe de glucemia', 'descripcion' => 'Informe vinculado al resultado de laboratorio.',
+            $this->put('documentos_clinicos', $this->codigoImportacion('H26_DCL_'.$serial), ['cod_residente' => $r, 'cod_estudio' => $study, 'cod_atencion' => $at,
+                'cod_personal' => $this->codigoImportacion('H26_PER_MED'), 'tipo_documento' => 'INFORME', 'titulo' => 'Informe de glucemia', 'descripcion' => 'Informe vinculado al resultado de laboratorio.',
                 'ruta_archivo' => $path, 'formato' => 'TXT', 'tamano_bytes' => strlen($content), 'hash_archivo' => hash('sha256', $content),
                 'fecha_hora' => $date.' 09:30:00', 'origen' => 'INTERNO', 'estado' => 'VIGENTE']);
         }
         if (in_array($profile, ['movilidad', 'cognicion', 'nutricion'], true)) {
             $professional = ['movilidad' => 'FIS', 'cognicion' => 'PSI', 'nutricion' => 'NUT'][$profile];
             $at = $this->attention($i, $r, $date, 'MED', 'CONTROL', 'Revisión y coordinación interdisciplinaria.');
-            $this->put('derivaciones', 'H26_DER_'.$serial, ['cod_residente' => $r, 'cod_area_solicitante' => 'H26_ARE_MED',
-                'cod_area_receptora' => 'H26_ARE_'.$professional, 'cod_personal_solicitante' => 'H26_PER_MED', 'cod_personal_receptor' => 'H26_PER_'.$professional,
+            $this->put('derivaciones', $this->codigoImportacion('H26_DER_'.$serial), ['cod_residente' => $r, 'cod_area_solicitante' => $this->codigoImportacion('H26_ARE_MED'),
+                'cod_area_receptora' => $this->codigoImportacion('H26_ARE_'.$professional), 'cod_personal_solicitante' => $this->codigoImportacion('H26_PER_MED'), 'cod_personal_receptor' => $this->codigoImportacion('H26_PER_'.$professional),
                 'cod_atencion' => $at, 'motivo' => $this->history($profile), 'prioridad' => 'MEDIA', 'fecha_hora' => $date.' 08:15:00',
                 'respuesta' => 'Se coordina valoración y se mantiene seguimiento en el plan individual.', 'estado' => 'ATENDIDA']);
         }
@@ -792,34 +815,34 @@ class Historical2026Seeder extends Seeder
             $eventDate = CarbonImmutable::parse($admit)->addDays(21)->toDateString();
             $nurse = $this->nurse($eventDate, 0, ($i - 1) % 4);
             $j = $this->jornada($eventDate, 0);
-            $this->put('incidentes', 'H26_INCI_'.$serial, ['cod_residente' => $r, 'cod_personal' => $nurse, 'cod_jornada' => $j,
+            $this->put('incidentes', $this->codigoImportacion('H26_INCI_'.$serial), ['cod_residente' => $r, 'cod_personal' => $nurse, 'cod_jornada' => $j,
                 'tipo_incidente' => $profile === 'herida' ? 'LESION' : 'CAIDA', 'gravedad' => 'LEVE', 'lugar' => 'Habitación',
                 'fecha_hora' => $eventDate.' 08:30:00', 'descripcion' => $profile === 'herida' ? 'Rozadura superficial en antebrazo durante una actividad.' : 'Caída al intentar levantarse sin apoyo; sin lesión observada.',
                 'medida_inmediata' => 'Se asegura el entorno, se valora al residente y se comunica al médico.', 'requiere_medico' => true,
                 'requiere_derivacion' => false, 'estado' => 'CERRADO']);
-            $alert = 'H26_AL_'.$serial;
-            $this->put('alertas', $alert, ['cod_residente' => $r, 'cod_personal_responsable' => 'H26_PER_MED',
-                'tipo' => 'INCIDENTE', 'prioridad' => 'ALTA', 'modulo' => 'incidentes', 'cod_registro' => 'H26_INCI_'.$serial,
+            $alert = $this->codigoImportacion('H26_AL_'.$serial);
+            $this->put('alertas', $alert, ['cod_residente' => $r, 'cod_personal_responsable' => $this->codigoImportacion('H26_PER_MED'),
+                'tipo' => 'INCIDENTE', 'prioridad' => 'ALTA', 'modulo' => 'incidentes', 'cod_registro' => $this->codigoImportacion('H26_INCI_'.$serial),
                 'titulo' => 'Revisión de incidente', 'descripcion' => 'Revisión médica solicitada por el incidente documentado.',
                 'fecha_hora' => $eventDate.' 08:35:00', 'generacion' => 'MANUAL', 'estado' => 'CERRADA']);
-            foreach ([['CREACION', null, 'ABIERTA', '08:35:00', str_replace('PER', 'USU', $nurse), 'Incidente comunicado.'],
-                ['ATENCION', 'ABIERTA', 'EN_ATENCION', '09:00:00', 'H26_USU_MED', 'Médico valora el incidente y documenta medidas.'],
-                ['CIERRE', 'EN_ATENCION', 'CERRADA', '09:30:00', 'H26_USU_MED', 'Atención documentada; seguimiento de cuidados indicado.']] as $slot => [$kind, $before, $after, $time, $user, $description]) {
-                $this->put('eventos_alerta', 'H26_EAL_'.$serial.'_'.$slot, ['cod_alerta' => $alert, 'cod_usuario' => $user,
+            foreach ([['CREACION', null, 'ABIERTA', '08:35:00', \App\Models\Personal::findOrFail($nurse)->cod_usuario, 'Incidente comunicado.'],
+                ['ATENCION', 'ABIERTA', 'EN_ATENCION', '09:00:00', $this->codigoImportacion('H26_USU_MED'), 'Médico valora el incidente y documenta medidas.'],
+                ['CIERRE', 'EN_ATENCION', 'CERRADA', '09:30:00', $this->codigoImportacion('H26_USU_MED'), 'Atención documentada; seguimiento de cuidados indicado.']] as $slot => [$kind, $before, $after, $time, $user, $description]) {
+                $this->put('eventos_alerta', $this->codigoImportacion('H26_EAL_'.$serial.'_'.$slot), ['cod_alerta' => $alert, 'cod_usuario' => $user,
                     'tipo_evento' => $kind, 'estado_anterior' => $before, 'estado_nuevo' => $after, 'fecha_hora' => $eventDate.' '.$time, 'descripcion' => $description]);
             }
             $at = $this->attention($i, $r, $eventDate, 'MED', 'CONTROL', 'Valoración posterior al incidente.', '09:00:00');
-            $this->put('notas_clinicas', 'H26_NIN_'.$serial, ['cod_residente' => $r, 'cod_atencion' => $at, 'cod_personal' => 'H26_PER_MED',
+            $this->put('notas_clinicas', $this->codigoImportacion('H26_NIN_'.$serial), ['cod_residente' => $r, 'cod_atencion' => $at, 'cod_personal' => $this->codigoImportacion('H26_PER_MED'),
                 'tipo_nota' => 'EVOLUCION', 'contenido' => 'Valoración tras incidente. Residente alerta, sin síntomas sistémicos. Se documenta cuidado local o acompañamiento y vigilancia según el incidente.',
                 'fecha_hora' => $eventDate.' 09:00:00', 'estado' => 'VIGENTE']);
             if ($profile === 'herida') {
                 $close = CarbonImmutable::parse($eventDate)->addDays(7)->toDateString();
-                $this->put('heridas', 'H26_HER_'.$serial, ['cod_residente' => $r, 'cod_personal' => $nurse, 'tipo_herida' => 'SUPERFICIAL',
+                $this->put('heridas', $this->codigoImportacion('H26_HER_'.$serial), ['cod_residente' => $r, 'cod_personal' => $nurse, 'tipo_herida' => 'SUPERFICIAL',
                     'ubicacion' => 'Antebrazo izquierdo', 'causa' => 'Rozadura', 'clasificacion' => 'LESION_SUPERFICIAL',
                     'fecha_hora_identificacion' => $eventDate.' 08:30:00', 'fecha_hora_cierre' => $close.' 09:00:00', 'estado' => 'CERRADA']);
                 for ($n = 0; $n <= 7; $n++) {
                     $d = CarbonImmutable::parse($eventDate)->addDays($n)->toDateString();
-                    $this->put('curaciones_herida', $this->code('CH', $i, $d), ['cod_herida' => 'H26_HER_'.$serial,
+                    $this->put('curaciones_herida', $this->code('CH', $i, $d), ['cod_herida' => $this->codigoImportacion('H26_HER_'.$serial),
                         'cod_personal' => $this->nurse($d, 0, ($i - 1) % 4), 'cod_jornada' => $this->jornada($d, 0), 'fecha_hora' => $d.' 09:00:00',
                         'longitud' => round(max(0, 1.4 - $n * 0.2), 2), 'ancho' => round(max(0, 0.7 - $n * 0.1), 2), 'profundidad' => 0,
                         'tejido' => $n < 7 ? 'EN_EPITELIZACION' : 'EPITELIZADO', 'exudado' => 'AUSENTE', 'olor' => 'AUSENTE', 'dolor' => $n < 3 ? 1 : 0,
@@ -834,18 +857,18 @@ class Historical2026Seeder extends Seeder
             if (ClasificacionSignosVitalesService::evaluarRegistro($source)['global'] !== 'critico') {
                 throw new RuntimeException('El caso crítico debe cumplir la regla vigente, sin umbral del seeder.');
             }
-            $alert = 'H26_ALC_'.$serial;
-            $this->put('alertas', $alert, ['cod_residente' => $r, 'cod_personal_responsable' => 'H26_PER_MED',
+            $alert = $this->codigoImportacion('H26_ALC_'.$serial);
+            $this->put('alertas', $alert, ['cod_residente' => $r, 'cod_personal_responsable' => $this->codigoImportacion('H26_PER_MED'),
                 'tipo' => 'SIGNOS_VITALES_CRITICOS', 'prioridad' => 'CRITICO', 'modulo' => 'SIGNOS', 'cod_registro' => $source->cod_signo,
                 'titulo' => 'Signos vitales: valor crítico registrado', 'descripcion' => 'Pulso 38 lpm confirmado; requiere atención según la regla vigente.',
                 'fecha_hora' => $d.' 08:00:00', 'generacion' => 'AUTOMATICA', 'estado' => 'CERRADA']);
             foreach ([['CREACION', null, 'ABIERTA', '08:00:00'], ['ATENCION', 'ABIERTA', 'EN_ATENCION', '08:15:00'], ['CIERRE', 'EN_ATENCION', 'CERRADA', '09:40:00']] as $n => [$kind, $before, $after, $time]) {
-                $this->put('eventos_alerta', 'H26_EAC_'.$serial.'_'.$n, ['cod_alerta' => $alert, 'cod_usuario' => $n ? 'H26_USU_MED' : str_replace('PER', 'USU', $source->cod_personal),
+                $this->put('eventos_alerta', $this->codigoImportacion('H26_EAC_'.$serial.'_'.$n), ['cod_alerta' => $alert, 'cod_usuario' => $n ? $this->codigoImportacion('H26_USU_MED'): \App\Models\Personal::findOrFail($source->cod_personal)->cod_usuario,
                     'tipo_evento' => $kind, 'estado_anterior' => $before, 'estado_nuevo' => $after, 'fecha_hora' => $d.' '.$time,
                     'descripcion' => $n ? 'Atención médica y evolución documentadas; vigilancia posterior indicada.' : 'Alerta vinculada a la lectura crítica confirmada.']);
             }
             $at = $this->attention($i, $r, $d, 'MED', 'CONTROL', 'Valoración urgente por pulso lento confirmado.', '08:15:00');
-            $this->put('notas_clinicas', 'H26_NCR_'.$serial, ['cod_residente' => $r, 'cod_atencion' => $at, 'cod_personal' => 'H26_PER_MED',
+            $this->put('notas_clinicas', $this->codigoImportacion('H26_NCR_'.$serial), ['cod_residente' => $r, 'cod_atencion' => $at, 'cod_personal' => $this->codigoImportacion('H26_PER_MED'),
                 'tipo_nota' => 'EVOLUCION', 'contenido' => 'Evaluación urgente y vigilancia clínica documentadas. Control posterior de pulso 70 lpm, residente alerta y sin molestias. Se mantiene seguimiento, sin diagnóstico automático.',
                 'fecha_hora' => $d.' 09:40:00', 'estado' => 'VIGENTE']);
             $recheck = (array) $source->getRawOriginal();
@@ -854,42 +877,42 @@ class Historical2026Seeder extends Seeder
             $recheck['fecha_hora'] = $d.' 09:30:00';
             $recheck['cod_atencion'] = $at;
             $recheck['observacion'] = 'Control posterior a la atención médica; lectura y contexto documentados.';
-            $this->put('signos_vitales', 'H26_SVR_'.$serial, $recheck);
+            $this->put('signos_vitales', $this->codigoImportacion('H26_SVR_'.$serial), $recheck);
         }
         if ($profile === 'abierta') {
             $d = self::REFERENCE_DATE;
             $nurse = $this->nurse($d, 0, ($i - 1) % 4);
-            $this->put('alertas', 'H26_ALA_'.$serial, ['cod_residente' => $r, 'cod_personal_responsable' => $nurse,
+            $this->put('alertas', $this->codigoImportacion('H26_ALA_'.$serial), ['cod_residente' => $r, 'cod_personal_responsable' => $nurse,
                 'tipo' => 'EVALUACION MEDICA REQUERIDA', 'prioridad' => 'ALTO', 'modulo' => 'SOLICITUD_MEDICA', 'cod_registro' => $this->code('IN', $i, $d),
                 'titulo' => 'Disminución de ingesta en seguimiento', 'descripcion' => 'Menor ingesta en los últimos días; se solicita valoración médica y nutricional.',
                 'fecha_hora' => $d.' 09:20:00', 'generacion' => 'MANUAL', 'estado' => 'ABIERTA']);
-            $this->put('eventos_alerta', 'H26_EAA_'.$serial, ['cod_alerta' => 'H26_ALA_'.$serial, 'cod_usuario' => str_replace('PER', 'USU', $nurse),
+            $this->put('eventos_alerta', $this->codigoImportacion('H26_EAA_'.$serial), ['cod_alerta' => $this->codigoImportacion('H26_ALA_'.$serial), 'cod_usuario' => \App\Models\Personal::findOrFail($nurse)->cod_usuario,
                 'tipo_evento' => 'CREACION', 'estado_anterior' => null, 'estado_nuevo' => 'ABIERTA', 'fecha_hora' => $d.' 09:20:00', 'descripcion' => 'Solicitud de evaluación documentada; atención aún pendiente al corte.']);
-            $intervention = 'H26_IED_'.$serial;
-            $this->put('intervenciones_cuidado', $intervention, ['cod_plan' => 'H26_PLA_'.$serial, 'nombre' => 'Revisión de consumo alimentario',
+            $intervention = $this->codigoImportacion('H26_IED_'.$serial);
+            $this->put('intervenciones_cuidado', $intervention, ['cod_plan' => $this->codigoImportacion('H26_PLA_'.$serial), 'nombre' => 'Revisión de consumo alimentario',
                 'descripcion' => 'Revisar y comunicar el consumo reciente al equipo médico y nutricional.', 'prioridad' => 'ALTA', 'estado' => 'ACTIVA']);
-            $this->put('programaciones_cuidado', 'H26_PED_'.$serial, ['cod_intervencion' => $intervention, 'cod_turno' => 'H26_TUR_0',
+            $this->put('programaciones_cuidado', $this->codigoImportacion('H26_PED_'.$serial), ['cod_intervencion' => $intervention, 'cod_turno' => $this->codigoImportacion('H26_TUR_0'),
                 'frecuencia' => 'DIARIA', 'hora_programada' => '09:45:00', 'fecha_activacion' => $d, 'estado' => 'ACTIVA']);
-            $this->put('ejecuciones_cuidado', 'H26_EP_'.$serial, ['cod_intervencion' => $intervention, 'cod_residente' => $r,
+            $this->put('ejecuciones_cuidado', $this->codigoImportacion('H26_EP_'.$serial), ['cod_intervencion' => $intervention, 'cod_residente' => $r,
                 'cod_jornada' => $this->jornada($d, 0), 'cod_personal' => $nurse, 'fecha_hora_programada' => $d.' 09:45:00',
                 'fecha_hora_ejecucion' => null, 'resultado' => null, 'estado' => 'PENDIENTE', 'observacion' => 'Revisión pendiente al corte; no se acredita atención por anticipado.']);
         }
         if ($profile === 'movilidad') {
             $end = CarbonImmutable::parse($admit)->addDays(84)->toDateString();
-            $this->put('planes_cuidado', 'H26_PFH_'.$serial, ['cod_residente' => $r, 'cod_area' => 'H26_ARE_FIS',
-                'cod_personal' => 'H26_PER_FIS', 'tipo_plan' => 'INICIAL', 'nombre' => 'Recuperación de movilidad',
+            $this->put('planes_cuidado', $this->codigoImportacion('H26_PFH_'.$serial), ['cod_residente' => $r, 'cod_area' => $this->codigoImportacion('H26_ARE_FIS'),
+                'cod_personal' => $this->codigoImportacion('H26_PER_FIS'), 'tipo_plan' => 'INICIAL', 'nombre' => 'Recuperación de movilidad',
                 'objetivo_general' => 'Mejorar traslados y tolerancia a la marcha con apoyo ajustado.', 'prioridad' => 'MEDIA',
                 'fecha_hora_apertura' => $admit.' 08:30:00', 'fecha_hora_cierre' => $end.' 10:00:00', 'estado' => 'CERRADO']);
-            $this->put('intervenciones_cuidado', 'H26_IFH_'.$serial, ['cod_plan' => 'H26_PFH_'.$serial,
+            $this->put('intervenciones_cuidado', $this->codigoImportacion('H26_IFH_'.$serial), ['cod_plan' => $this->codigoImportacion('H26_PFH_'.$serial),
                 'nombre' => 'Ejercicio y marcha supervisada', 'descripcion' => 'Sesiones progresivas según tolerancia observada.',
                 'prioridad' => 'MEDIA', 'estado' => 'INACTIVA']);
-            $this->put('programaciones_cuidado', 'H26_PGH_'.$serial, ['cod_intervencion' => 'H26_IFH_'.$serial,
-                'cod_turno' => 'H26_TUR_0', 'frecuencia' => 'SEMANAL', 'hora_programada' => '10:00:00',
+            $this->put('programaciones_cuidado', $this->codigoImportacion('H26_PGH_'.$serial), ['cod_intervencion' => $this->codigoImportacion('H26_IFH_'.$serial),
+                'cod_turno' => $this->codigoImportacion('H26_TUR_0'), 'frecuencia' => 'SEMANAL', 'hora_programada' => '10:00:00',
                 'fecha_activacion' => $admit, 'fecha_desactivacion' => $end, 'estado' => 'INACTIVA']);
             foreach (CarbonImmutable::parse($admit)->daysUntil($end, 7) as $session) {
                 $d = $session->toDateString();
-                $this->put('ejecuciones_cuidado', $this->code('EF', $i, $d), ['cod_intervencion' => 'H26_IFH_'.$serial,
-                    'cod_residente' => $r, 'cod_jornada' => $this->jornada($d, 0), 'cod_personal' => 'H26_PER_FIS',
+                $this->put('ejecuciones_cuidado', $this->code('EF', $i, $d), ['cod_intervencion' => $this->codigoImportacion('H26_IFH_'.$serial),
+                    'cod_residente' => $r, 'cod_jornada' => $this->jornada($d, 0), 'cod_personal' => $this->codigoImportacion('H26_PER_FIS'),
                     'fecha_hora_programada' => $d.' 10:00:00', 'fecha_hora_ejecucion' => $d.' 10:00:00',
                     'resultado' => 'Sesión realizada; mejor tolerancia y apoyo reevaluado.', 'estado' => 'REALIZADA']);
             }
@@ -898,7 +921,7 @@ class Historical2026Seeder extends Seeder
 
     public function assertIntegrity(): void
     {
-        $admissions = DB::table('admisiones')->whereIn('cod_preadmision', DB::table('preadmisiones')->select('cod_preadmision')->where('cod_preadmision', 'like', 'H26_PRE_%'))->get();
+        $admissions = DB::table('admisiones')->whereIn('cod_preadmision', DB::table('preadmisiones')->select('cod_preadmision')->whereIn('numero_documento', array_map(fn (int $i) => (string) (99000000 + $i), range(1, 30))))->get();
         if ($admissions->count() !== 30) {
             throw new RuntimeException('El conjunto debe contener 30 admisiones formales.');
         }
@@ -937,16 +960,16 @@ class Historical2026Seeder extends Seeder
         }
         $ids = $admissions->pluck('cod_residente');
         if (DB::table('residentes')->whereIn('cod_residente', $ids)->distinct()->count('fecha_nacimiento') !== 30
-            || DB::table('asignaciones_residente_jornada')->whereIn('cod_residente', $ids)->where('cod_jornada', $this->jornada(self::REFERENCE_DATE, 0))->where('estado', 'ACTIVA')->count() !== 30) {
+            || DB::table('asignaciones_residente_jornada')->whereIn('cod_residente', $ids)->where('cod_jornada', DB::table('jornadas as j')->join('turnos as t', 't.cod_turno', '=', 'j.cod_turno')->join('usuarios as u', 'u.cod_usuario', '=', 'j.cod_usuario_apertura')->where('j.fecha_jornada', self::REFERENCE_DATE)->where('t.hora_inicio', '00:00:00')->where('t.hora_cierre', '12:00:00')->where('u.correo', 'admisiones@remembermind.test')->sole(['j.cod_jornada'])->cod_jornada)->where('estado', 'ACTIVA')->count() !== 30) {
             throw new RuntimeException('Fechas de nacimiento o asignación actual incompletas.');
         }
         if (DB::table('administraciones_medicacion as a')->join('prescripciones as p', 'p.cod_prescripcion', '=', 'a.cod_prescripcion')
-            ->where('a.cod_administracion', 'like', 'H26_%')->whereColumn('a.cod_residente', '<>', 'p.cod_residente')->exists()) {
+            ->whereIn('a.cod_residente', $admissions->pluck('cod_residente'))->whereColumn('a.cod_residente', '<>', 'p.cod_residente')->exists()) {
             throw new RuntimeException('Administración cruzada entre residentes.');
         }
         if (DB::table('respuestas_instrumento as r')->join('aplicaciones_instrumento as a', 'a.cod_aplicacion', '=', 'r.cod_aplicacion')
             ->join('preguntas_instrumento as p', 'p.cod_pregunta', '=', 'r.cod_pregunta')->join('opciones_pregunta as o', 'o.cod_opcion', '=', 'r.cod_opcion')
-            ->where('r.cod_respuesta', 'like', 'H26_%')->where(function ($q) {
+            ->whereIn('a.cod_residente', $admissions->pluck('cod_residente'))->where(function ($q) {
                 $q->whereColumn('a.cod_instrumento', '<>', 'p.cod_instrumento')->orWhereColumn('o.cod_pregunta', '<>', 'p.cod_pregunta');
             })->exists()) {
             throw new RuntimeException('Respuesta de instrumento incoherente.');

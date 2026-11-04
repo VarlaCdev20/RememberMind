@@ -48,7 +48,7 @@ final class RegistrarValoracionMedica
                     'observacion' => $observacion,
                 ]);
             } else {
-                $codAtencion = 'ATN_'.strtoupper(Str::random(10));
+                $codAtencion = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('atenciones');
                 $atencion = Atencion::create([
                     'cod_atencion' => $codAtencion,
                     'cod_residente' => $datos['codResidente'],
@@ -62,7 +62,7 @@ final class RegistrarValoracionMedica
                 ]);
 
                 NotaClinica::create([
-                    'cod_nota' => 'NOT_'.strtoupper(Str::random(10)),
+                    'cod_nota' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('notas_clinicas'),
                     'cod_atencion' => $codAtencion,
                     'cod_residente' => $datos['codResidente'],
                     'cod_personal' => $codPersonal,
@@ -78,7 +78,7 @@ final class RegistrarValoracionMedica
                         $estadoAnterior = $residente->estado;
                         $residente->update(['estado' => 'ACTIVO']);
                         HistorialEstadoResidente::create([
-                            'cod_historial_estado' => 'HER_'.strtoupper(Str::random(10)),
+                            'cod_historial_estado' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('historial_estados_residente'),
                             'cod_residente' => $datos['codResidente'],
                             'cod_usuario_registro' => $usuario->cod_usuario,
                             'estado_anterior' => $estadoAnterior,

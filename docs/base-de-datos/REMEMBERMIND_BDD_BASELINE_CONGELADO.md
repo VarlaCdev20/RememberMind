@@ -17,9 +17,75 @@ related_modules: []
 
 # RememberMind — Baseline Rector de la BDD Operativa
 
-> **Extensión aprobada V2.2:** las 70 tablas V2.1 descritas aquí permanecen congeladas. La propietaria aprobó el 4 de octubre de 2026 una tabla adicional `objetivos_signos_vitales` sin alterar las existentes. El inventario vigente tiene **71 tablas operativas**. Véase [decisión V2.2](DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md).
+> Alcance de inventario: las cifras de esta decisión describen su fecha. El [inventario vigente](README.md) incorpora las extensiones posteriores:106 tablas de negocio+16 técnicas. La decisión conserva exclusivamente sus columnas, relaciones y reglas autorizadas.
+
+**Extensión autorizada e instalada del 29/10/2026:** [idioma principal e informante principal por atención](PROPUESTA_CONTEXTO_IDIOMA_INFORMANTE_2026_10_29.md), tres columnas nullable, FK restrictiva al vínculo existente e índice de soporte. Conserva 4FN en este alcance,28.107 atenciones previas e inventario 106 de negocio + 16 técnicas; sin backfill ni uso inferencial automático.
+
+**Extensión acotada del 28/10/2026:** [contexto escalar por atención y justificación de 4FN](DECISION_CONTEXTO_ESCOLARIDAD_4FN_2026_10_28.md): `escolaridad_anios SMALLINT NULL`, `puede_leer BOOLEAN NULL` y `puede_escribir BOOLEAN NULL`. Sin tablas/FK nuevas, backfill o inferencia automática; conserva el grano del episodio. Los límites y la evidencia están en la decisión específica.
+
+**Extensión posterior del 27/10/2026:** [aviso compartido adoptado e instalado](DECISION_AVISO_COMPARTIDO_CAMPOS_2026_10_27.md), seis columnas nullable en `eventos_asignacion_personal`, sin tablas ni permisos nuevos. Se conservan106 de negocio+16 técnicas. Originales inmutables; metadatos anteriores NULL. La [decisión de no crear más tablas](DECISION_SIN_NUEVAS_TABLAS_2026_10_27.md) prevalece sobre el techo histórico110 de los apartados anteriores.
+
+**Inventario vigente — 27/10/2026:** la instalación expresamente autorizada
+de Gerencia35/37 añade seis relaciones operativas y ocho columnas nullable:
+**81 operativas +25 expertas =106 de negocio**, más16 técnicas.
+[Decisión, diccionarios, instalación y reversión](DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md).
+Se verificó contenido previo conservado; no se completaron fechas o autorías
+históricas desconocidas. El máximo de diseño sigue en 110. Los conteos de las
+decisiones anteriores conservan su fecha y alcance.
+
+**Extensión aprobada — 26/10/2026:** `usuarios.remember_token VARCHAR(100) NULL`
+para Recordarme, con cookie de 30 días. No añade tablas ni modifica PK/FK.
+Véase la [decisión específica](DECISION_RECORDARME_2026_10_26.md).
+
+**Inventario anterior — 22/10/2026:** la consolidación de cuatro bloques singulares
+aprobada por la propietaria quedó instalada en PostgreSQL local: **75 operativas
++ 25 expertas = 100 tablas de negocio**, además de 16 técnicas. Conserva las
+257 filas trasladadas, las siete FK entrantes y las identidades históricas.
+[Decisión, diccionario nominal y transición](DECISION_CONSOLIDACION_BLOQUES_EXPERTOS_2026_10_22.md).
+El máximo de diseño sigue en 110. La conservación compuesta completa continúa
+pendiente; esta reducción no la acredita ni activa conocimiento clínico.
+
+**Inventario histórico — 20/10/2026:** la reducción experta aprobada e instalada
+dejó **75 tablas operativas + 29 expertas = 104 tablas de negocio**. Se
+retiraron cuatro relaciones expertas redundantes preservando las historias y
+FK afectadas; el núcleo operativo V2.1 de 70 tablas sigue congelado. Véase la
+[decisión y evidencia de instalación](DECISION_REDUCCION_EXPERTA_2026_10_20.md).
+Los inventarios de 108, 106 y 105 citados más abajo describen el momento de
+cada extensión anterior. La [decisión del 21/10/2026](../sistema-experto/DECISION_MAXIMO_110_TABLAS_2026_10_21.md)
+fija un máximo de **110 tablas de negocio para diseño**; no aprueba migraciones
+ni altera el núcleo congelado o las extensiones instaladas.
+
+**Extensión aprobada — 19/10/2026:** dos relaciones de valoración original y
+soportes de Petersen; **75 operativas + 33 expertas = 108 tablas de negocio**.
+Conservan 4FN, autoría propia, cadenas inmutables y FK originales restrictivas.
+[Diccionario aprobado](../sistema-experto/PROPUESTA_CAPTURA_PETERSEN_ORIGINAL_2026_10_19.md).
+La conservación íntegra de las ejecuciones sigue fuera de esta extensión.
+Aplicada en PostgreSQL local `remembermind_dev`; [acta de instalación y límites](../sistema-experto/FASE_5_CAPTURA_PETERSEN_Y_REPRODUCCION_2026_10_19.md).
+Los conteos posteriores conservan el alcance de sus decisiones anteriores.
+
+**Fuentes originales aprobadas — 19/10/2026:** cinco columnas nullable en `aplicaciones_instrumento`: usuario de registro, instante técnico, documento clínico original, localizador y aplicación anterior. FK restrictivas, checks e índices únicos de fuente inicial/sucesora; sin tablas nuevas ni relleno de historia desconocida. Se conservan **73 operativas + 33 expertas = 106**. [Decisión, diccionario y 4FN](../sistema-experto/PROPUESTA_FUENTES_ORIGINALES_FASE_2_2026_10_19.md).
+
+**Gobierno de reglas aprobado — 18/10/2026:** cinco columnas nullable en `reglas_expertas`: antecesora, estado de revisión, usuario revisor, fecha y justificación. FK restrictivas, índices y checks; primera decisión y enlace histórico inmutables. Sin tablas nuevas; **33 expertas + 73 operativas = 106**. [Aprobación, diccionario y 4FN](../sistema-experto/PROPUESTA_GOBIERNO_REGLAS_2026_10_18.md).
+
+**Ampliación observacional aprobada — 18/10/2026:** dos FK nullable, índices y checks en `hechos_instantanea_experta` para conservar control cognitivo y autor originales. Sin tablas nuevas ni borrado de historia; se mantienen 33 expertas + 73 operativas. [Decisión y diccionario](../sistema-experto/PROPUESTA_CONSERVACION_OBSERVACIONAL_V1.md).
+
+**Revisiones profesionales aprobadas — 17/10/2026:** una tabla de dictámenes
+con Psicología y Medicina separadas; **33 expertas + 73 operativas = 106 tablas
+de negocio**. [Decisión aprobada](DECISION_REVISIONES_EXPERTAS_2026_10_17.md).
+No convierte las ejecuciones de prueba en valoraciones clínicas.
+
+**Conservación experta V2 aprobada — 17/10/2026:** nueve tablas suplementarias y ampliaciones de D-137: **32 expertas + 73 operativas = 105 tablas de negocio**. [decisión aprobada](DECISION_CONSERVACION_EXPERTA_V2_2026_10_17.md). No activa uso asistencial; las tablas técnicas quedan fuera del conteo.
+
+**Extensión aprobada IADL — 17/10/2026:** una tabla `controles_funcionales_iadl`, su Model y adaptador descriptivo; inventario vigente **73 operativas**. Sin nuevas pantallas/permisos ni clasificación clínica: [decisión IADL](DECISION_IADL_FUENTE_EXPERTA_2026_10_17.md). Las 23 tablas expertas D-137 no cambian; conteos anteriores describen sus versiones.
+
+**Extensión aprobada — 17/10/2026:** una tabla `fotografias_institucionales`; inventario vigente **72 operativas**, conservando las existentes. Véase [decisión Galería y 4FN](DECISION_GALERIA_INSTITUCIONAL_2026_10_17.md). Los conteos anteriores conservan el alcance de sus versiones.
+
+
+> **Extensión aprobada V2.2 — estado al 04/10/2026:** las 70 tablas V2.1 descritas aquí permanecen congeladas. La propietaria aprobó entonces una tabla adicional `objetivos_signos_vitales` sin alterar las existentes, elevando el inventario de esa fecha a **71 tablas operativas**. Véase [decisión V2.2](DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md); el inventario actual figura al inicio de este documento.
 
 **Estado:** CONGELADO
+
+**Ampliación aprobada Heridas / Curaciones V2 — 11/10/2026:** dos FK opcionales e indexadas en `documentos_clinicos`, con borrado restrictivo hacia heridas o curaciones. Sin nuevas tablas ni columnas fotográficas en esas entidades. Alcance en [DECISION_FOTOGRAFIAS_HERIDAS_V2](DECISION_FOTOGRAFIAS_HERIDAS_V2.md); el núcleo histórico conserva su congelamiento.
 
 **Ampliación aprobada Dolor V2 — 09/10/2026:** tres columnas y self-FK con
 coherencia de residente en `valoraciones_dolor`; sin nuevas tablas. Alcance
@@ -34,6 +100,12 @@ baseline conserva su congelamiento.
 **Decisión arquitectónica:** [`DECISION_ARQUITECTURA_BDD_V2_1.md`](DECISION_ARQUITECTURA_BDD_V2_1.md)
 **Versión anterior:** BDD Operativa V2.0 — 69 tablas — HISTÓRICA
 **Documento técnico complementario:** [`docs/arquitectura/REMEMBERMIND_BASELINE_TECNICO.md`](../arquitectura/REMEMBERMIND_BASELINE_TECNICO.md)
+
+**Códigos correlativos — 13/10/2026:** valores `COD_<prefijo>_<correlativo>`
+ y renumeración de existentes autorizados, conservando columnas y PK/FK.
+ La tabla técnica `secuencias_codigos` está aprobada y queda fuera de las
+ 71 tablas operativas y las 23 del experto. Véase
+ [decisión de códigos](DECISION_CODIGOS_CORRELATIVOS.md).
 
 ---
 

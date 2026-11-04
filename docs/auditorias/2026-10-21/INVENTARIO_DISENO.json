@@ -1,0 +1,287 @@
+{
+  "metodo": "Conteo estático; ocurrencias no equivalen a defectos o a verificación visual. Style puede ser geometría de gráfico; HEX puede ser export o gráfico. No incluye componentes dinámicos ni vistas no modulares.",
+  "componentes_blade_compartidos": 128,
+  "modulos": [
+    {
+      "modulo": "Admisiones",
+      "vistas": 10,
+      "referencias_componentes": 47,
+      "componentes_distintos": 11,
+      "style_atributos": 1,
+      "vistas_con_hex": 0,
+      "vistas_senales_consulta": 0,
+      "ejemplos_hex": []
+    },
+    {
+      "modulo": "Alertas",
+      "vistas": 16,
+      "referencias_componentes": 83,
+      "componentes_distintos": 17,
+      "style_atributos": 3,
+      "vistas_con_hex": 1,
+      "vistas_senales_consulta": 0,
+      "ejemplos_hex": [
+        "app/Modulos/Alertas/Presentacion/Vistas/livewire/alertas/salud-alertas-panel.blade.php"
+      ]
+    },
+    {
+      "modulo": "ApoyoDecision",
+      "vistas": 33,
+      "referencias_componentes": 60,
+      "componentes_distintos": 5,
+      "style_atributos": 1,
+      "vistas_con_hex": 0,
+      "vistas_senales_consulta": 0,
+      "ejemplos_hex": []
+    },
+    {
+      "modulo": "Clinica",
+      "vistas": 71,
+      "referencias_componentes": 112,
+      "componentes_distintos": 20,
+      "style_atributos": 25,
+      "vistas_con_hex": 1,
+      "vistas_senales_consulta": 0,
+      "ejemplos_hex": [
+        "app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/modales/selector-registro.blade.php"
+      ]
+    },
+    {
+      "modulo": "Cuidados",
+      "vistas": 68,
+      "referencias_componentes": 355,
+      "componentes_distintos": 52,
+      "style_atributos": 6,
+      "vistas_con_hex": 0,
+      "vistas_senales_consulta": 0,
+      "ejemplos_hex": []
+    },
+    {
+      "modulo": "Identidad",
+      "vistas": 48,
+      "referencias_componentes": 49,
+      "componentes_distintos": 15,
+      "style_atributos": 168,
+      "vistas_con_hex": 28,
+      "vistas_senales_consulta": 0,
+      "ejemplos_hex": [
+        "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/create.blade.php",
+        "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/autorizacion-administrativa.blade.php",
+        "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/autorizacion-comunicacion.blade.php",
+        "app/Modulos/Identidad/Presentacion/Vistas/paginas/usuarios/documentos/individuales/carta-bienvenida.blade.php"
+      ]
+    },
+    {
+      "modulo": "Institucion",
+      "vistas": 29,
+      "referencias_componentes": 80,
+      "componentes_distintos": 19,
+      "style_atributos": 17,
+      "vistas_con_hex": 0,
+      "vistas_senales_consulta": 0,
+      "ejemplos_hex": []
+    },
+    {
+      "modulo": "Medicacion",
+      "vistas": 15,
+      "referencias_componentes": 55,
+      "componentes_distintos": 17,
+      "style_atributos": 0,
+      "vistas_con_hex": 0,
+      "vistas_senales_consulta": 0,
+      "ejemplos_hex": []
+    },
+    {
+      "modulo": "Reportes",
+      "vistas": 24,
+      "referencias_componentes": 42,
+      "componentes_distintos": 14,
+      "style_atributos": 215,
+      "vistas_con_hex": 16,
+      "vistas_senales_consulta": 0,
+      "ejemplos_hex": [
+        "app/Modulos/Reportes/Presentacion/Vistas/paginas/bitacora/index.blade.php",
+        "app/Modulos/Reportes/Presentacion/Vistas/paginas/adultos-mayores/reportes/general.blade.php",
+        "app/Modulos/Reportes/Presentacion/Vistas/paginas/adultos-mayores/reportes/institucional.blade.php",
+        "app/Modulos/Reportes/Presentacion/Vistas/paginas/adultos-mayores/reportes/pdf_especifico.blade.php"
+      ]
+    },
+    {
+      "modulo": "Residentes",
+      "vistas": 27,
+      "referencias_componentes": 56,
+      "componentes_distintos": 17,
+      "style_atributos": 15,
+      "vistas_con_hex": 4,
+      "vistas_senales_consulta": 0,
+      "ejemplos_hex": [
+        "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/edit.blade.php",
+        "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/documentos/index.blade.php",
+        "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show/_cabecera-expediente.blade.php",
+        "app/Modulos/Residentes/Presentacion/Vistas/paginas/adultos-mayores/show/_modales-existentes.blade.php"
+      ]
+    },
+    {
+      "modulo": "Social",
+      "vistas": 7,
+      "referencias_componentes": 45,
+      "componentes_distintos": 8,
+      "style_atributos": 2,
+      "vistas_con_hex": 0,
+      "vistas_senales_consulta": 0,
+      "ejemplos_hex": []
+    },
+    {
+      "modulo": "Valoraciones",
+      "vistas": 11,
+      "referencias_componentes": 41,
+      "componentes_distintos": 12,
+      "style_atributos": 1,
+      "vistas_con_hex": 0,
+      "vistas_senales_consulta": 0,
+      "ejemplos_hex": []
+    }
+  ],
+  "componentes_mas_referidos": [
+    [
+      "ui.field",
+      112
+    ],
+    [
+      "ui.empty-state",
+      80
+    ],
+    [
+      "ui.action-button",
+      79
+    ],
+    [
+      "ui.metric-card",
+      72
+    ],
+    [
+      "ui.status-badge",
+      61
+    ],
+    [
+      "ui.section-card",
+      60
+    ],
+    [
+      "ui.form-section",
+      52
+    ],
+    [
+      "ui.filter-bar",
+      52
+    ],
+    [
+      "ui.modal-livewire",
+      51
+    ],
+    [
+      "ui.selector",
+      31
+    ],
+    [
+      "ui.page-header",
+      28
+    ],
+    [
+      "ui.collection-header",
+      28
+    ],
+    [
+      "sistema-layout",
+      26
+    ],
+    [
+      "ui.section-header",
+      24
+    ],
+    [
+      "ui.card",
+      21
+    ],
+    [
+      "validation-errors",
+      17
+    ],
+    [
+      "ui.clinical-consultation-bar",
+      14
+    ],
+    [
+      "ui.paginacion",
+      12
+    ],
+    [
+      "ui.resultado-operacion-clinica",
+      12
+    ],
+    [
+      "ui.callout",
+      11
+    ],
+    [
+      "ui.drawer-livewire",
+      10
+    ],
+    [
+      "residentes.navegacion-ficha",
+      9
+    ],
+    [
+      "ui.clinical-clear-action",
+      9
+    ],
+    [
+      "ui.calendario",
+      8
+    ],
+    [
+      "secondary-button",
+      8
+    ],
+    [
+      "ui.skeleton",
+      8
+    ],
+    [
+      "ui.collection-results",
+      8
+    ],
+    [
+      "input",
+      7
+    ],
+    [
+      "ui.clinical-trend-window",
+      7
+    ],
+    [
+      "button",
+      6
+    ],
+    [
+      "ui.elimination-choice-group",
+      6
+    ],
+    [
+      "ui.clinical-capture-choice",
+      6
+    ],
+    [
+      "app-layout",
+      6
+    ],
+    [
+      "ui.free-text-select",
+      5
+    ],
+    [
+      "ui.resident-card",
+      5
+    ]
+  ]
+}

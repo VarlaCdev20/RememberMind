@@ -15,6 +15,8 @@ related_modules: []
 
 # Extensión clínica V2.2 — objetivos individuales de signos vitales
 
+> Alcance de inventario: las cifras de esta decisión describen su fecha. El [inventario vigente](README.md) incorpora las extensiones posteriores:106 tablas de negocio+16 técnicas. La decisión conserva exclusivamente sus columnas, relaciones y reglas autorizadas.
+
 **Aprobación de la propietaria:** 4 de octubre de 2026. La extensión se autorizó condicionada a consistencia, cuarta forma normal y reutilización. No modifica las 70 tablas del baseline V2.1; añade una tabla operativa, por lo que el inventario actual contiene **71 tablas operativas**.
 
 ## Necesidad y alcance

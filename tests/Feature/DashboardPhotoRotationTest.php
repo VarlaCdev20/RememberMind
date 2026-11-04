@@ -13,7 +13,7 @@ class DashboardPhotoRotationTest extends TestCase
         $rotation = app(DashboardPhotoRotation::class);
         $fallback = asset('images/FOTOS CENTRO DE ADULTOS MAYORES/489963938_1158744422930145_8442506970304201426_n.jpg');
 
-        foreach (['superadmin', 'administracion', 'medico', 'psicologia', 'nutricionista', 'fisioterapeuta', 'pedagogo', 'familiar', 'enfermeria', 'perfil-general'] as $role) {
+        foreach (['login', 'superadmin', 'administracion', 'medico', 'psicologia', 'nutricionista', 'fisioterapeuta', 'pedagogo', 'familiar', 'enfermeria', 'perfil-general'] as $role) {
             session()->forget('dashboard_photo_rotation_'.md5('hero:'.$role));
             $first = $rotation->heroImage($role, $fallback);
             $second = $rotation->heroImage($role, $fallback);

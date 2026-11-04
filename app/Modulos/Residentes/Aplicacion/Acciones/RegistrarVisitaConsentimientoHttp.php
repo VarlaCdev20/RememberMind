@@ -20,7 +20,7 @@ final class RegistrarVisitaConsentimientoHttp
         $datos = Validator::make($entrada, ['cod_contacto' => ['required', 'exists:contactos,cod_contacto'], 'fecha_hora_programada' => ['nullable', 'date'], 'fecha_hora_ingreso' => ['nullable', 'date'], 'fecha_hora_salida' => ['nullable', 'date', 'after_or_equal:fecha_hora_ingreso'], 'motivo' => ['nullable', 'string', 'max:160'], 'estado' => ['required', 'in:PROGRAMADA,AUTORIZADA,EN_CURSO,FINALIZADA,CANCELADA'], 'observacion' => ['nullable', 'string']])->validate();
         abort_unless(ResidenteContacto::query()->where('cod_residente', $residente->cod_residente)->where('cod_contacto', $datos['cod_contacto'])->where('estado', 'ACTIVO')->exists(), 422, 'El contacto no está vinculado al residente.');
 
-        return Visita::query()->create(['cod_visita' => $this->codigo('VIS'), 'cod_residente' => $residente->cod_residente, 'cod_usuario_autorizacion' => $usuario->cod_usuario, ...$datos]);
+        return Visita::query()->create(['cod_visita' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('visitas'), 'cod_residente' => $residente->cod_residente, 'cod_usuario_autorizacion' => $usuario->cod_usuario, ...$datos]);
     }
 
     public function registrarConsentimiento(User $usuario, array $entrada, Residente $residente): mixed
@@ -33,11 +33,7 @@ final class RegistrarVisitaConsentimientoHttp
             abort_unless(ResidenteContacto::query()->whereKey($datos['cod_residente_contacto'])->where('cod_residente', $residente->cod_residente)->where('estado', 'ACTIVO')->exists(), 422, 'El firmante no está vinculado al residente.');
         }
 
-        return Consentimiento::query()->create(['cod_consentimiento' => $this->codigo('CON'), 'cod_residente' => $residente->cod_residente, 'cod_admision' => $admision->cod_admision, 'cod_usuario_registro' => $usuario->cod_usuario, ...$datos, 'fecha_consentimiento' => $datos['fecha_consentimiento'] ?? now(), 'estado' => 'VIGENTE']);
+        return Consentimiento::query()->create(['cod_consentimiento' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('consentimientos'), 'cod_residente' => $residente->cod_residente, 'cod_admision' => $admision->cod_admision, 'cod_usuario_registro' => $usuario->cod_usuario, ...$datos, 'fecha_consentimiento' => $datos['fecha_consentimiento'] ?? now(), 'estado' => 'VIGENTE']);
     }
 
-    private function codigo(string $prefijo): string
-    {
-        return $prefijo.'_'.Str::upper(Str::random(12));
-    }
 }

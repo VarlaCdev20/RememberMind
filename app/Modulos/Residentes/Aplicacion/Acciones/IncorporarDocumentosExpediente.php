@@ -47,7 +47,7 @@ final class IncorporarDocumentosExpediente
         $rutaArchivo = $this->ficheros->recibir($entrada['nuevoDocArchivo'], 'documentos/adultos-mayores', 'local');
 
         $doc = Documento::create([
-            'cod_documento' => 'DOC_'.Str::upper(Str::random(12)),
+            'cod_documento' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('documentos'),
             'cod_residente' => $entrada['adultoMayor']->cod_residente,
             'cod_usuario' => $usuario->getKey(),
             'nombre' => trim($entrada['nuevoDocNombre']),

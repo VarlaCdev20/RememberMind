@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Compartido\Aplicacion\Contratos\ArchivosAplicacion;
+use App\Compartido\Aplicacion\Contratos\CodigosEntidad;
 use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
 use App\Compartido\Aplicacion\Contratos\DocumentosUsuario;
 use App\Compartido\Aplicacion\Contratos\EnlacesAplicacion;
@@ -13,17 +14,20 @@ use App\Compartido\Infraestructura\Documentos\ArchivosLaravel;
 use App\Compartido\Infraestructura\Documentos\GeneradorPdfLaravel;
 use App\Compartido\Infraestructura\Navegacion\EnlacesLaravel;
 use App\Compartido\Infraestructura\Notificaciones\NotificacionesRegistroLaravel;
+use App\Compartido\Infraestructura\Persistencia\GeneradorCodigo;
 use App\Compartido\Infraestructura\Seguridad\ContextoEjecucionLaravel;
 use App\Compartido\Infraestructura\Vistas\VistaModularFinder;
 use App\Compartido\Presentacion\Componentes\DashboardWelcomeHeader;
 use App\Models\AdministracionMedicacion;
 use App\Models\Cama;
 use App\Models\EvaluacionExperta;
+use App\Models\FotografiaInstitucional;
 use App\Models\Habitacion;
 use App\Models\Prescripcion;
 use App\Models\Residente;
 use App\Models\ValoracionEnfermeriaPreadmision;
 use App\Models\VersionModeloExperto;
+use App\Modulos\Identidad\Presentacion\Policies\DocumentoLaboralPolicy;
 use App\Modulos\Admisiones\Presentacion\Livewire\Funcionalidades\DecisionAdmisionModal;
 use App\Modulos\Admisiones\Presentacion\Livewire\Paginas\AlojamientoResidente;
 use App\Modulos\Admisiones\Presentacion\Livewire\Paginas\PreadmisionesPanel;
@@ -35,12 +39,17 @@ use App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPendientesPanel;
 use App\Modulos\Alertas\Presentacion\Livewire\Paginas\IncidentesPanel;
 use App\Modulos\Alertas\Presentacion\Livewire\Paginas\PanelAlertas;
 use App\Modulos\Alertas\Presentacion\Livewire\Paginas\SaludAlertasPanel;
+use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoObservacional;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
+use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConservacionObservacional;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ExtraccionFuentesCOGMEM;
-use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoOrion;
+use App\Modulos\ApoyoDecision\Aplicacion\Contratos\IdentidadesConocimiento;
+use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoCognitivo;
 use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\AdaptadorFuentesCOGMEM;
-use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoOrion;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoCognitivo;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ConservarObservaciones;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Eloquent\CargadorConocimiento;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\PaqueteObservacional;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ConocimientoPanel;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente;
 use App\Modulos\ApoyoDecision\Presentacion\Policies\EvaluacionExpertaPolicy;
@@ -59,11 +68,14 @@ use App\Modulos\Clinica\Presentacion\Livewire\Paginas\SignosVitalesPanel;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\AgendaEnfermeria;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\DashboardTurno;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\MisPacientes;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\ObservacionCognitiva;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PaseTurnoPanel;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PlanCuidadoPanel;
+use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\RegistroConducta;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\RegistrosEnfermeria;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\SeguimientoDiarioPanel;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\TareasPlanPanel;
+use App\Modulos\Cuidados\Presentacion\Policies\DocumentoHeridaPolicy;
 use App\Modulos\Identidad\Aplicacion\Contratos\EstadoPrevisualizacion;
 use App\Modulos\Identidad\Infraestructura\Seguridad\PrevisualizacionEnSesion;
 use App\Modulos\Identidad\Presentacion\Livewire\Funcionalidades\PersonalInstitucionalForm;
@@ -71,6 +83,9 @@ use App\Modulos\Identidad\Presentacion\Livewire\Paginas\PersonalInstitucionalPan
 use App\Modulos\Identidad\Presentacion\Livewire\Paginas\RolesPermisosPanel;
 use App\Modulos\Identidad\Presentacion\Livewire\Paginas\UsuarioFichaPanel;
 use App\Modulos\Identidad\Presentacion\Livewire\Paginas\UsuariosPanel;
+use App\Modulos\Institucion\Aplicacion\Contratos\ArchivosFotografias;
+use App\Modulos\Institucion\Aplicacion\Contratos\GestionFotografias;
+use App\Modulos\Institucion\Infraestructura\Fotografias\AlmacenamientoFotografias;
 use App\Modulos\Institucion\Presentacion\Livewire\Funcionalidades\PersonalInstitucionalHorarios;
 use App\Modulos\Institucion\Presentacion\Livewire\Paginas\AreasInstitucionalesPanel;
 use App\Modulos\Institucion\Presentacion\Livewire\Paginas\AsignacionTurnoPanel;
@@ -78,7 +93,10 @@ use App\Modulos\Institucion\Presentacion\Livewire\Paginas\HabitacionesPanel;
 use App\Modulos\Institucion\Presentacion\Livewire\Paginas\TurnosAsignacionesPanel;
 use App\Modulos\Institucion\Presentacion\Livewire\Paginas\TurnosEnfermeriaPanel;
 use App\Modulos\Institucion\Presentacion\Policies\CamaPolicy;
+use App\Modulos\Institucion\Presentacion\Policies\FotografiaInstitucionalPolicy;
 use App\Modulos\Institucion\Presentacion\Policies\HabitacionPolicy;
+use App\Modulos\Medicacion\Aplicacion\Contratos\ImagenesMedicamentos;
+use App\Modulos\Medicacion\Infraestructura\Archivos\ImagenMedicamento;
 use App\Modulos\Medicacion\Presentacion\Livewire\Funcionalidades\AdministracionMedicacionModal;
 use App\Modulos\Medicacion\Presentacion\Livewire\Funcionalidades\MedicacionAdultoModal;
 use App\Modulos\Medicacion\Presentacion\Livewire\Paginas\SaludAdministracionMedicacionPanel;
@@ -106,6 +124,7 @@ use App\Modulos\Valoraciones\Presentacion\Livewire\Funcionalidades\ValoracionIni
 use App\Modulos\Valoraciones\Presentacion\Livewire\Funcionalidades\ValoracionMedicaModal;
 use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\DashboardPsicologo;
 use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\EvaluacionesAreaPanel;
+use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\FichaPsicologicaResidente;
 use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\SaludEvaluacionesGeriatricasPanel;
 use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\SaludValoracionPanel;
 use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\ValoracionEnfermeriaPanel;
@@ -115,29 +134,35 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
-use MotorExperto\aplicacion\casos_uso\MotorExperto;
-use MotorExperto\aplicacion\puertos\EvaluadorExperto;
 
 final class ArquitecturaModularServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(ImagenesMedicamentos::class, ImagenMedicamento::class);
+        $this->app->bind(ArchivosFotografias::class, AlmacenamientoFotografias::class);
+        $this->app->bind(GestionFotografias::class, FotografiaInstitucionalPolicy::class);
+        $this->app->singleton(CodigosEntidad::class, GeneradorCodigo::class);
+        $this->app->bind(IdentidadesConocimiento::class, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\IdentidadesConocimiento::class);
         $this->app->bind(ArchivosAplicacion::class, ArchivosLaravel::class);
         $this->app->bind(GeneradorPdf::class, GeneradorPdfLaravel::class);
         $this->app->bind(NotificacionesRegistro::class, NotificacionesRegistroLaravel::class);
         $this->app->bind(DocumentosUsuario::class, AlmacenamientoDocumentosUsuario::class);
         $this->app->bind(EnlacesAplicacion::class, EnlacesLaravel::class);
         $this->app->bind(ConocimientoVersionado::class, CargadorConocimiento::class);
+        $this->app->bind(ConocimientoObservacional::class,
+            PaqueteObservacional::class);
+        $this->app->bind(ConservacionObservacional::class,
+            ConservarObservaciones::class);
         $this->app->bind(ExtraccionFuentesCOGMEM::class, AdaptadorFuentesCOGMEM::class);
         $this->app->bind(ContextoEjecucion::class, ContextoEjecucionLaravel::class);
         $this->app->bind(EstadoPrevisualizacion::class, PrevisualizacionEnSesion::class);
-        $this->app->bind(FuenteConocimientoOrion::class,
-            ArchivoConocimientoOrion::class);
-        $this->app->bind(EvaluadorExperto::class, MotorExperto::class);
+        $this->app->bind(FuenteConocimientoCognitivo::class,
+            ArchivoConocimientoCognitivo::class);
         $this->app->extend('view.finder', function ($previous) {
             $finder = new VistaModularFinder(
-                $this->app['files'], $previous->getPaths(),
-                $this->app['config']->get('vistas_modulares', []), $this->app->basePath(),
+                $this->app->make('files'), $previous->getPaths(),
+                $this->app->make('config')->get('vistas_modulares', []), $this->app->basePath(),
             );
             foreach ($previous->getHints() as $namespace => $paths) {
                 $finder->addNamespace($namespace, $paths);
@@ -149,6 +174,7 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Gate::policy(FotografiaInstitucional::class, FotografiaInstitucionalPolicy::class);
         Blade::component('ui.dashboard-welcome-header',
             DashboardWelcomeHeader::class);
         foreach (glob($this->app->basePath('app/Modulos/*/Presentacion/Vistas'), GLOB_ONLYDIR) as $path) {
@@ -160,9 +186,15 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
         Gate::policy(AdministracionMedicacion::class, AdministracionMedicacionPolicy::class);
         Gate::policy(Cama::class, CamaPolicy::class);
         Gate::policy(EvaluacionExperta::class, EvaluacionExpertaPolicy::class);
+        Gate::policy(\App\Models\ControlFuncionalIadl::class, \App\Modulos\Valoraciones\Presentacion\Policies\ControlFuncionalIadlPolicy::class);
         Gate::policy(Habitacion::class, HabitacionPolicy::class);
         Gate::policy(Prescripcion::class, PrescripcionPolicy::class);
         Gate::policy(Residente::class, ResidentePolicy::class);
+        Gate::define('consultar-documento-laboral', [DocumentoLaboralPolicy::class, 'view']);
+        Gate::define('revisar-documento-laboral', [DocumentoLaboralPolicy::class, 'review']);
+        Gate::define('consultar-evidencia-herida', [DocumentoHeridaPolicy::class, 'consultar']);
+        Gate::define('consultar-contexto-evidencia-herida', [DocumentoHeridaPolicy::class, 'consultarHerida']);
+        Gate::define('adjuntar-evidencia-herida', [DocumentoHeridaPolicy::class, 'adjuntar']);
         Gate::policy(ValoracionEnfermeriaPreadmision::class, ValoracionEnfermeriaPreadmisionPolicy::class);
         Gate::policy(VersionModeloExperto::class, VersionModeloExpertoPolicy::class);
 
@@ -202,6 +234,8 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
         Livewire::component('app.frontend.livewire.compartido.residentes.expediente-panel', ExpedientePanel::class);
         Livewire::component('app.frontend.livewire.compartido.residentes.red-apoyo-panel', RedApoyoPanel::class);
         Livewire::component('app.frontend.livewire.compartido.valoraciones.evaluaciones-area-panel', EvaluacionesAreaPanel::class);
+        Livewire::component('app.frontend.livewire.compartido.valoraciones.ficha-psicologica-residente', FichaPsicologicaResidente::class);
+        Livewire::component('valoraciones.ficha-psicologica-residente', FichaPsicologicaResidente::class);
         Livewire::component('app.frontend.livewire.compartido.valoraciones.evaluacion-geriatrica-area-modal', EvaluacionGeriatricaAreaModal::class);
         Livewire::component('app.frontend.livewire.compartido.valoraciones.evaluacion-geriatrica-modal', EvaluacionGeriatricaModal::class);
         Livewire::component('app.frontend.livewire.compartido.valoraciones.salud-evaluaciones-geriatricas-panel', SaludEvaluacionesGeriatricasPanel::class);
@@ -216,6 +250,8 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
         Livewire::component('app.frontend.livewire.enfermeria.cuidados.pase-turno-panel', PaseTurnoPanel::class);
         Livewire::component('app.frontend.livewire.enfermeria.cuidados.plan-cuidado-panel', PlanCuidadoPanel::class);
         Livewire::component('app.frontend.livewire.enfermeria.cuidados.registros-enfermeria', RegistrosEnfermeria::class);
+        Livewire::component('cuidados.registro-conducta', RegistroConducta::class);
+        Livewire::component('cuidados.observacion-cognitiva', ObservacionCognitiva::class);
         Livewire::component('app.frontend.livewire.enfermeria.cuidados.reporte-enfermeria', ReporteEnfermeria::class);
         Livewire::component('app.frontend.livewire.enfermeria.cuidados.seguimiento-diario-panel', SeguimientoDiarioPanel::class);
         Livewire::component('app.frontend.livewire.enfermeria.cuidados.tareas-plan-panel', TareasPlanPanel::class);
@@ -238,5 +274,6 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
         Livewire::component('app.frontend.livewire.superadministrador.identidad.roles-permisos-panel', RolesPermisosPanel::class);
         Livewire::component('app.frontend.livewire.superadministrador.reportes.reportes-institucionales-panel', ReportesInstitucionalesPanel::class);
         Livewire::component('app.frontend.livewire.superadministrador.sistema-experto.conocimiento-panel', ConocimientoPanel::class);
+        Livewire::component('apoyodecision.gobierno-reglas', \App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\GobiernoReglasPanel::class);
     }
 }

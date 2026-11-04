@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\CARLAENCINAS\Desktop\RememberMind\phpunit.postgres.xml" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="3.638266">
+    <testsuite name="Feature" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="3.638266">
+      <testsuite name="Tests\Feature\ConsolidacionBloquesConcurrenciaPostgresTest" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\ConsolidacionBloquesConcurrenciaPostgresTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="3.638266">
+        <testcase name="test_dos_escritores_no_completan_dos_veces_el_mismo_bloque" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\ConsolidacionBloquesConcurrenciaPostgresTest.php" line="22" class="Tests\Feature\ConsolidacionBloquesConcurrenciaPostgresTest" classname="Tests.Feature.ConsolidacionBloquesConcurrenciaPostgresTest" assertions="5" time="3.638266"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

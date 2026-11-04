@@ -981,6 +981,11 @@ class MiTurnoService
                         continue;
                     }
 
+                    if (($plan->fecha_hora_apertura && $fechaHoraProg->lt($plan->fecha_hora_apertura))
+                        || ($plan->fecha_hora_cierre && $fechaHoraProg->gt($plan->fecha_hora_cierre))) {
+                        continue;
+                    }
+
                     // Regla: Si el residente se asigna a mitad del turno, no atribuir tareas anteriores a fecha_hora de la asignación
                     if (isset($fechasAsignacionResidentes[$plan->cod_residente])) {
                         $fechaAsig = $fechasAsignacionResidentes[$plan->cod_residente];
@@ -1006,47 +1011,24 @@ class MiTurnoService
                         continue;
                     }
 
-                    // Relacionar ejecución con tarea programada
-                    $ejecReal = $ejecuciones->first(function ($ej) use ($intervencion, $plan, $jornada, $fechaHoraProg) {
-                        if ($ej->cod_intervencion !== $intervencion->cod_intervencion) {
-                            return false;
-                        }
-                        if ($ej->cod_residente !== $plan->cod_residente) {
-                            return false;
-                        }
-                        if ($ej->cod_jornada === $jornada->cod_jornada) {
-                            return true;
-                        }
-                        if ($ej->fecha_hora_programada) {
-                            return abs(Carbon::parse($ej->fecha_hora_programada)->diffInMinutes($fechaHoraProg)) <= 30;
-                        }
-
-                        return false;
-                    });
-
-                    $estado = 'PENDIENTE';
-                    $detalleOmitida = null;
-
-                    if ($ejecReal) {
-                        $resEj = strtoupper(trim((string) $ejecReal->resultado));
-                        $estEj = strtoupper(trim((string) $ejecReal->estado));
-
-                        if (in_array($resEj, ['OMITIDA', 'NO_REALIZADA'], true) || $estEj === 'OMITIDA' || ! empty($ejecReal->motivo_omision)) {
-                            $estado = 'REALIZADO';
-                            $detalleOmitida = $ejecReal->motivo_omision ?: 'Cuidado omitido justificadamente';
-                        } elseif (in_array($resEj, ['REALIZADA', 'COMPLETADA'], true) || $estEj === 'REALIZADA' || $estEj === 'FINALIZADA') {
-                            $estado = 'REALIZADO';
-                        } else {
-                            $estado = 'REALIZADO';
-                        }
-                    } else {
+                    // La jornada por sí sola no identifica una ocurrencia; comprobar fecha y hora exactas.
+                    $ejecReal = $ejecuciones->first(fn ($ej) => app(OcurrenciasCuidado::class)->corresponde(
+                        $ej, $plan->cod_residente, $intervencion->cod_intervencion, $fechaHoraProg));
+                    $estadoOcurrencia = app(OcurrenciasCuidado::class)->estado($ejecReal);
+                    $estado = match ($estadoOcurrencia) {
+                        'REALIZADA', 'NO_REALIZADA' => 'REALIZADO',
+                        'CANCELADA' => 'CANCELADA',
+                        default => 'PENDIENTE',
+                    };
+                    $detalleOmitida = $estadoOcurrencia === 'NO_REALIZADA'
+                        ? ($ejecReal->motivo_omision ?: 'Cuidado omitido justificadamente') : null;
+                    if ($estado === 'PENDIENTE') {
                         if ($momentoActual->gt($fechaHoraProg->copy()->addMinutes(60))) {
                             $estado = 'RETRASADO';
                         } elseif ($momentoActual->diffInMinutes($fechaHoraProg, false) <= 60 && $fechaHoraProg->isFuture()) {
                             $estado = 'PRÓXIMO';
                         }
                     }
-
                     $codProgId = $programacion->cod_programacion ?: ($programacion->cod_programacion_cuidado ?: 'PROG');
                     $claveCuidado = "CUID_{$codProgId}_{$plan->cod_residente}_".$fechaHoraProg->format('YmdHi');
                     if (isset($agenda[$claveCuidado])) {
@@ -1086,7 +1068,11 @@ class MiTurnoService
             }
 
             $progTime = $ejec->fecha_hora_programada ? Carbon::parse($ejec->fecha_hora_programada) : ($ejec->fecha_hora_ejecucion ? Carbon::parse($ejec->fecha_hora_ejecucion) : $inicioTurno);
-            $estado = in_array(strtoupper((string) $ejec->estado), ['REALIZADA', 'COMPLETADA', 'FINALIZADA']) ? 'REALIZADO' : 'PENDIENTE';
+            $estado = match (app(OcurrenciasCuidado::class)->estado($ejec)) {
+                'REALIZADA', 'NO_REALIZADA' => 'REALIZADO',
+                'CANCELADA' => 'CANCELADA',
+                default => 'PENDIENTE',
+            };
             if ($estado === 'PENDIENTE' && $momentoActual->gt($progTime->copy()->addMinutes(60))) {
                 $estado = 'RETRASADO';
             }

@@ -1,779 +1,157 @@
-<div class="rm-pilot-alertas rm-page-layout font-sans">
- {{-- Encabezado Institucional Canónico --}}
- <x-ui.page-header
-  title="Alertas clínicas y cuidados"
-  subtitle="Monitoreo continuo de alertas clínicas, signos vitales, administración de fármacos y eventos asistenciales en Los Almendros."
-  overline="Centro de control asistencial"
-  icon="ph-shield-warning"
-  color="bg-[var(--rm-danger-action)]">
-  @can('alertas.gestionar')
-  <x-ui.action-button
-   variant="accent"
-   size="sm"
-   icono="ph-plus-circle"
-   wire:click="abrirCrear"
-   class="cursor-pointer">
-   Registrar alerta
-  </x-ui.action-button>
-
-  <x-ui.action-button
-   variant="secondary"
-   size="sm"
-   wire:click="detectarAlertas"
-   wire:loading.attr="disabled"
-   class="cursor-pointer">
-   <i class="ph ph-arrows-clockwise text-lg" wire:loading.class="animate-spin" wire:target="detectarAlertas"></i>
-   <span wire:loading.remove wire:target="detectarAlertas">Detectar pendientes</span>
-   <span wire:loading wire:target="detectarAlertas">Analizando...</span>
-  </x-ui.action-button>
-  @endcan
-
-  <x-ui.action-button
-   variant="icon"
-   size="sm"
-   wire:click="$refresh"
-   title="Actualizar datos"
-   aria-label="Actualizar datos"
-   class="cursor-pointer">
-   <i class="ph ph-arrow-clockwise text-lg" wire:loading.class="animate-spin" wire:target="$refresh"></i>
-  </x-ui.action-button>
- </x-ui.page-header>
-
- {{-- Notificación Flash Institucional --}}
- @if (session()->has('mensaje'))
- <x-ui.callout variant="success" title="Operación completada">
-  {{ session('mensaje') }}
- </x-ui.callout>
- @endif
-
- <x-validation-errors class="mb-2" />
-
- {{-- TARJETAS KPI: BASE CÁLIDA (var(--rm-surface)) + MODO OSCURO --}}
- <section class="rm-kpi-grid">
- {{-- Card 1: Total Alertas --}}
- <div wire:click="limpiarFiltros"
-  class="rm-card-metric rm-card-interactive cursor-pointer border-l-[3px] border-l-[var(--rm-action-primary)]">
-  <div class="flex items-center justify-between">
-  <span class="rm-metric-label">Total Registro</span>
-  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] border border-[var(--rm-action-primary)]/20">
-   <i class="ph ph-bell text-lg"></i>
-  </span>
-  </div>
-  <div class="mt-1 flex items-baseline justify-between gap-2">
-  <span class="rm-metric-value">{{ $conteos['total'] ?? 0 }}</span>
-  <div class="w-20 h-7 shrink-0 pointer-events-none">
-   <x-ui.sparkline :id="'spark-kpi-total'" :data="[max(1, ($conteos['total'] ?? 0) - 3), max(1, ($conteos['total'] ?? 0) - 1), max(1, ($conteos['total'] ?? 0) - 2), max(1, ($conteos['total'] ?? 0) - 1), ($conteos['total'] ?? 0)]" color="primary" height="28px" />
-  </div>
-  </div>
-  <div class="rm-metric-meta justify-between">
-  <span>Alertas en sistema</span>
-  <span class="font-semibold underline underline-offset-2">Ver todas</span>
-  </div>
- </div>
-
- {{-- Card 2: Críticas y Altas --}}
- <div wire:click="setFiltroRapido('filtroNivel', 'CRITICO')"
-  class="rm-card-metric rm-card-interactive cursor-pointer border-l-[3px] border-l-[var(--rm-danger)] {{ $filtroNivel === 'CRITICO' ? 'ring-1 ring-[var(--rm-danger)]/40 bg-[var(--rm-danger-soft)]/20' : '' }}">
-  <div class="flex items-center justify-between">
-  <div class="flex items-center gap-1.5">
-   <span class="relative flex h-2.5 w-2.5">
-   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--rm-danger-action)] opacity-75"></span>
-   <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[var(--rm-danger-action)]"></span>
-   </span>
-   <span class="rm-metric-label text-[var(--rm-danger-action)]">Críticas y Altas</span>
-  </div>
-  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-danger-soft)] text-[var(--rm-danger)] border border-[var(--rm-danger)]/20">
-   <i class="ph ph-warning-octagon text-lg"></i>
-  </span>
-  </div>
-  <div class="mt-1 flex items-baseline justify-between gap-2">
-  <span class="rm-metric-value text-[var(--rm-danger-action)]">
-   {{ ($conteos['criticas'] ?? 0) + ($conteos['altas'] ?? 0) }}
-  </span>
-  <div class="w-20 h-7 shrink-0 pointer-events-none">
-   <x-ui.sparkline :id="'spark-kpi-criticas'" :data="[max(0, ($conteos['criticas'] ?? 0) - 2), max(0, ($conteos['criticas'] ?? 0) + 1), max(0, ($conteos['criticas'] ?? 0) - 1), ($conteos['criticas'] ?? 0)]" color="danger" height="28px" />
-  </div>
-  </div>
-  <div class="rm-metric-meta justify-between text-[var(--rm-text-soft)]">
-  <span class="font-medium text-[var(--rm-danger-action)]">{{ $conteos['criticas'] ?? 0 }} críticas</span>
-  <span>{{ $conteos['altas'] ?? 0 }} altas</span>
-  </div>
- </div>
-
- {{-- Card 3: Por Atender --}}
- <div wire:click="setFiltroRapido('filtroEstado', 'ABIERTA')"
-  class="rm-card-metric rm-card-interactive cursor-pointer border-l-[3px] border-l-[var(--rm-warning)] {{ $filtroEstado === 'ABIERTA' ? 'ring-1 ring-[var(--rm-warning)]/40 bg-[var(--rm-warning-soft)]/20' : '' }}">
-  <div class="flex items-center justify-between">
-  <span class="rm-metric-label text-[var(--rm-warning)]">Por Atender</span>
-  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-warning-soft)] text-[var(--rm-warning)] border border-[var(--rm-warning)]/20">
-   <i class="ph ph-clock-countdown text-lg"></i>
-  </span>
-  </div>
-  <div class="mt-1 flex items-baseline justify-between gap-2">
-  <span class="rm-metric-value text-[var(--rm-warning)]">{{ $conteos['abiertas'] ?? 0 }}</span>
-  <div class="w-20 h-7 shrink-0 pointer-events-none">
-   <x-ui.sparkline :id="'spark-kpi-abiertas'" :data="[max(0, ($conteos['abiertas'] ?? 0) + 2), max(0, ($conteos['abiertas'] ?? 0) + 1), max(0, ($conteos['abiertas'] ?? 0)), ($conteos['abiertas'] ?? 0)]" color="warning" height="28px" />
-  </div>
-  </div>
-  <div class="rm-metric-meta text-[var(--rm-text-soft)]">
-  <i class="ph ph-hourglass-high"></i>
-  <span>Abiertas sin atención</span>
-  </div>
- </div>
-
- {{-- Card 4: En Atención --}}
- <div wire:click="setFiltroRapido('filtroEstado', 'EN_ATENCION')"
-  class="rm-card-metric rm-card-interactive cursor-pointer border-l-[3px] border-l-[var(--rm-info)] {{ $filtroEstado === 'EN_ATENCION' ? 'ring-1 ring-[var(--rm-info)]/40 bg-[var(--rm-info-soft)]/20' : '' }}">
-  <div class="flex items-center justify-between">
-  <span class="rm-metric-label text-[var(--rm-info-action)]">En Atención</span>
-  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-info-soft)] text-[var(--rm-info)] border border-[var(--rm-info)]/20">
-   <i class="ph ph-first-aid text-lg"></i>
-  </span>
-  </div>
-  <div class="mt-1 flex items-baseline justify-between gap-2">
-  <span class="rm-metric-value text-[var(--rm-info-action)]">{{ $conteos['en_atencion'] ?? 0 }}</span>
-  <div class="w-20 h-7 shrink-0 pointer-events-none">
-   <x-ui.sparkline :id="'spark-kpi-atencion'" :data="[max(0, ($conteos['en_atencion'] ?? 0) - 1), max(0, ($conteos['en_atencion'] ?? 0) + 1), max(0, ($conteos['en_atencion'] ?? 0)), ($conteos['en_atencion'] ?? 0)]" color="info" height="28px" />
-  </div>
-  </div>
-  <div class="rm-metric-meta text-[var(--rm-text-soft)]">
-  <i class="ph ph-arrows-clockwise"></i>
-  <span>Protocolo en curso</span>
-  </div>
- </div>
-
- {{-- Card 5: Resueltas --}}
- <div wire:click="setFiltroRapido('filtroEstado', 'CERRADA')"
-  class="rm-card-metric rm-card-interactive cursor-pointer border-l-[3px] border-l-[var(--rm-success)] {{ $filtroEstado === 'CERRADA' ? 'ring-1 ring-[var(--rm-success)]/40 bg-[var(--rm-success-soft)]/20' : '' }}">
-  <div class="flex items-center justify-between">
-  <span class="rm-metric-label text-[var(--rm-success-action)]">Resueltas</span>
-  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rm-success-soft)] text-[var(--rm-success)] border border-[var(--rm-success)]/20">
-   <i class="ph ph-check-circle text-lg"></i>
-  </span>
-  </div>
-  <div class="mt-1 flex items-baseline justify-between gap-2">
-  <span class="rm-metric-value text-[var(--rm-success-action)]">{{ $conteos['cerradas'] ?? 0 }}</span>
-  <div class="w-20 h-7 shrink-0 pointer-events-none">
-   <x-ui.sparkline :id="'spark-kpi-cerradas'" :data="[max(0, ($conteos['cerradas'] ?? 0) - 3), max(0, ($conteos['cerradas'] ?? 0) - 2), max(0, ($conteos['cerradas'] ?? 0) - 1), ($conteos['cerradas'] ?? 0)]" color="success" height="28px" />
-  </div>
-  </div>
-  <div class="rm-metric-meta text-[var(--rm-text-soft)]">
-  <i class="ph ph-archive-box"></i>
-  <span>Historial conservado</span>
-  </div>
- </div>
- </section>
-
- {{-- Script Chart.js — RememberMind Chart Design System --}}
-<script>
-    window.alertasDashboardComponent = function(chartData, conteos) {
-        return {
-            chartData: chartData,
-            conteos: conteos,
-
-            initAllCharts() {
-                const initCharts = () => {
-                    if (typeof Chart === 'undefined' || typeof window.RMCharts === 'undefined' || !window.RMCharts.presets) {
-                        setTimeout(initCharts, 80);
-                        return;
-                    }
-                    try { this.renderGraficoNivel(); } catch (e) { console.warn('[RM Charts] Error en gráfico nivel:', e); }
-                    try { this.renderGraficoOrigen(); } catch (e) { console.warn('[RM Charts] Error en gráfico origen:', e); }
-                    try { this.renderGraficoEstado(); } catch (e) { console.warn('[RM Charts] Error en gráfico estado:', e); }
-                };
-
-                this.$nextTick(initCharts);
-
-                // Reactividad automática con Livewire
-                if (typeof this.$wire !== 'undefined' && this.$wire) {
-                    window.RMCharts.watchLivewire(this.$wire, 'chartData', (newData) => {
-                        this.chartData = newData;
-                        this.updateCharts();
-                    });
-                }
-
-                // Observador del dark mode real de RememberMind (sin recargar página)
-                window.RMCharts.onThemeChange(() => {
-                    this.renderGraficoNivel();
-                    this.renderGraficoOrigen();
-                    this.renderGraficoEstado();
-                }, 'alertas-panel');
-            },
-
-            // --- Gráfico 1: Nivel de Severidad (Doughnut semántico) ---
-            renderGraficoNivel() {
-                const niveles = this.chartData.niveles || {};
-                const sem = window.RMCharts.semanticColors();
-
-                const config = window.RMCharts.presets.doughnut(
-                    ['Crítico', 'Alto', 'Medio', 'Bajo'],
-                    [
-                        parseInt(niveles.CRITICO) || 0,
-                        parseInt(niveles.ALTO) || 0,
-                        parseInt(niveles.MEDIO) || 0,
-                        parseInt(niveles.BAJO) || 0
-                    ],
-                    [sem.danger, sem.warningHigh, sem.info, sem.success]
-                );
-
-                window.RMCharts.init('alertas_nivel', 'chartAlertasNivel', config, () => this.renderGraficoNivel());
-            },
-
-            // --- Gráfico 2: Origen de Alertas (Barras horizontales con mapping ESTABLE origen -> color) ---
-            renderGraficoOrigen() {
-                const origenes = this.chartData.origenes || {};
-                const originKeys = Object.keys(origenes);
-
-                // Labels amigables y colores fijos por origen clínico (nunca varían con el orden)
-                const labels = originKeys.map(k => window.RMCharts.getOriginLabel(k));
-                const dataValues = originKeys.map(k => parseInt(origenes[k]) || 0);
-                const barColors = originKeys.map(k => window.RMCharts.getOriginColor(k));
-
-                const maxVal = Math.max(...(dataValues.length ? dataValues : [0]), 1);
-                const suggestedMax = maxVal + Math.ceil(maxVal * 0.35) + 1;
-
-                const config = window.RMCharts.presets.barHorizontal(
-                    labels,
-                    dataValues,
-                    barColors,
-                    {
-                        _datasetLabel: 'Alertas por Origen',
-                    }
-                );
-
-                window.RMCharts.init('alertas_origen', 'chartAlertasOrigen', config, () => this.renderGraficoOrigen());
-            },
-
-            // --- Gráfico 3: Ciclo de Vida / Estado (Doughnut semántico) ---
-            renderGraficoEstado() {
-                const estados = this.chartData.estados || {};
-                const sem = window.RMCharts.semanticColors();
-
-                const config = window.RMCharts.presets.doughnut(
-                    ['Abiertas', 'En Atención', 'Resueltas'],
-                    [
-                        parseInt(estados.ABIERTA) || 0,
-                        parseInt(estados.EN_ATENCION) || 0,
-                        parseInt(estados.CERRADA) || 0
-                    ],
-                    [sem.info, sem.primary, sem.success]
-                );
-
-                window.RMCharts.init('alertas_estado', 'chartAlertasEstado', config, () => this.renderGraficoEstado());
-            },
-
-            // --- Actualización reactiva sin duplicar instancias ---
-            updateCharts() {
-                if (!window.RMCharts.has('alertas_nivel') || !window.RMCharts.has('alertas_origen') || !window.RMCharts.has('alertas_estado')) {
-                    this.initAllCharts();
-                    return;
-                }
-                try {
-                    // Nivel
-                    if (this.chartData.niveles) {
-                        const n = this.chartData.niveles;
-                        window.RMCharts.update('alertas_nivel', [
-                            parseInt(n.CRITICO) || 0, parseInt(n.ALTO) || 0, parseInt(n.MEDIO) || 0, parseInt(n.BAJO) || 0
-                        ]);
-                    }
-                    // Origen
-                    if (this.chartData.origenes) {
-                        const origenes = this.chartData.origenes;
-                        const originKeys = Object.keys(origenes);
-                        const labels = originKeys.map(k => window.RMCharts.getOriginLabel(k));
-                        const dataValues = originKeys.map(k => parseInt(origenes[k]) || 0);
-                        window.RMCharts.update('alertas_origen', dataValues, labels);
-                    }
-                    // Estado
-                    if (this.chartData.estados) {
-                        const e = this.chartData.estados;
-                        window.RMCharts.update('alertas_estado', [
-                            parseInt(e.ABIERTA) || 0, parseInt(e.EN_ATENCION) || 0, parseInt(e.CERRADA) || 0
-                        ]);
-                    }
-                } catch (err) {
-                    console.warn('[RM Charts] Error en actualización, reinicializando:', err);
-                    this.initAllCharts();
-                }
-            }
-        };
-    };
-</script>
-
-    {{-- SECCIÓN DE GRÁFICOS ANALÍTICOS: ANILLOS Y BARRAS GRUESAS CON SOPORTE MODO OSCURO --}}
-    <section class="grid grid-cols-1 lg:grid-cols-12 gap-4" wire:ignore x-data="alertasDashboardComponent(@js($chartData), @js($conteos))" x-init="initAllCharts()">
-        {{-- Gráfico 1: Severidad (Donut Grueso con Métrica Central) --}}
-        <div class="lg:col-span-4 rm-chart-card rm-chart-glass">
-            <div class="rm-chart-header">
-                <div>
-                    <h3 class="rm-chart-title">Severidad de Alertas</h3>
-                    <p class="rm-chart-subtitle">Distribución por nivel de criticidad</p>
-                </div>
-                <span class="rm-chart-kpi-badge">
-                    {{ ($conteos['criticas'] ?? 0) }} Críticas
-                </span>
-            </div>
-            <div class="relative rm-chart-body is-md" style="height: 220px; width: 100%;">
-                <canvas id="chartAlertasNivel"></canvas>
-                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span class="text-xl font-extrabold text-[var(--rm-text-title)] dark:text-slate-100">
-                        {{ $conteos['total'] ?? 0 }}
-                    </span>
-                    <span class="text-[10px] font-semibold text-[var(--rm-text-muted)] dark:text-slate-400 uppercase tracking-wider">
-                        Alertas
-                    </span>
-                </div>
-            </div>
-        </div>
-
-        {{-- Gráfico 2: Origen de Alertas (Barras Horizontales Gruesas y Redondeadas) --}}
-        <div class="lg:col-span-4 rm-chart-card rm-chart-glass">
-            <div class="rm-chart-header">
-                <div>
-                    <h3 class="rm-chart-title">Alertas por Origen</h3>
-                    <p class="rm-chart-subtitle">Eventos según categoría asistencial</p>
-                </div>
-                <span class="rm-chart-kpi-badge">
-                    {{ count($chartData['origenes'] ?? []) }} orígenes
-                </span>
-            </div>
-            <div class="rm-chart-body is-md" style="height: 220px; width: 100%;">
-                <canvas id="chartAlertasOrigen"></canvas>
-            </div>
-        </div>
-
-        {{-- Gráfico 3: Estado de Gestión (Donut Grueso con % de Resueltas) --}}
-        <div class="lg:col-span-4 rm-chart-card rm-chart-glass">
-            <div class="rm-chart-header">
-                <div>
-                    <h3 class="rm-chart-title">Estado de Gestión</h3>
-                    <p class="rm-chart-subtitle">Evolución y resolución del turno</p>
-                </div>
-                <span class="rm-chart-kpi-badge">
-                    {{ ($conteos['total'] ?? 0) > 0 ? round((($conteos['cerradas'] ?? 0) / $conteos['total']) * 100) : 0 }}% Resueltas
-                </span>
-            </div>
-            <div class="relative rm-chart-body is-md" style="height: 220px; width: 100%;">
-                <canvas id="chartAlertasEstado"></canvas>
-                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span class="text-xl font-extrabold text-[var(--rm-success)]">
-                        {{ ($conteos['total'] ?? 0) > 0 ? round((($conteos['cerradas'] ?? 0) / $conteos['total']) * 100) : 0 }}%
-                    </span>
-                    <span class="text-[10px] font-semibold text-[var(--rm-text-muted)] dark:text-slate-400 uppercase tracking-wider">
-                        Resueltas
-                    </span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-        {{-- BARRA DE FILTROS UNIFICADA: ESTRUCTURA DE EMERGENCIAS + VISTA DE INCIDENTES --}}
-    <x-ui.filter-bar class="mb-4">
-        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2">
-            {{-- Búsqueda textual --}}
-            <div class="lg:col-span-4 relative flex items-center">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
-                    <i class="ph-bold ph-magnifying-glass text-base"></i>
-                </span>
-                <input type="text"
-                    wire:model.live.debounce.300ms="search"
-                    placeholder="Buscar por residente, diagnóstico o motivo..."
-                    class="w-full rounded-xl border border-[var(--rm-border)]  bg-[var(--rm-input-bg)]  py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
-                @if($search !== '')
-                    <button type="button"
-                        wire:click="limpiarFiltro('search')"
-                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-primary)] cursor-pointer"
-                        title="Limpiar búsqueda">
-                        <i class="ph-bold ph-x-circle text-base"></i>
-                    </button>
-                @endif
-            </div>
-
-            {{-- Filtro Estado --}}
-            <div class="lg:col-span-2">
-                <select wire:model.live="filtroEstado" class="w-full rounded-xl border border-[var(--rm-border)]  bg-[var(--rm-input-bg)]  py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
-                    <option value="ABIERTA">Abierta / Pendiente (Inicial)</option>
-                    <option value="EN_ATENCION">En Atención</option>
-                    <option value="CERRADA">Cerrada / Resuelta</option>
-                    <option value="">Todos los estados</option>
-                </select>
-            </div>
-
-            {{-- Filtro Nivel --}}
-            <div class="lg:col-span-2">
-                <select wire:model.live="filtroNivel" class="w-full rounded-xl border border-[var(--rm-border)]  bg-[var(--rm-input-bg)]  py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
-                    <option value="">Todos los niveles</option>
-                    <option value="CRITICO">Crítico</option>
-                    <option value="ALTO">Alto</option>
-                    <option value="MEDIO">Medio</option>
-                    <option value="BAJO">Bajo</option>
-                </select>
-            </div>
-
-            {{-- Filtro Origen --}}
-            <div class="lg:col-span-2">
-                <select wire:model.live="filtroOrigen" class="w-full rounded-xl border border-[var(--rm-border)]  bg-[var(--rm-input-bg)]  py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
-                    <option value="">Todos los orígenes</option>
-                    <option value="SIGNOS">Signos Vitales</option>
-                    <option value="MEDICACION">Medicación</option>
-                    <option value="INCIDENTE">Incidente Asistencial</option>
-                    <option value="PLAN">Plan de Cuidado</option>
-                    <option value="SEGUIMIENTO">Seguimiento Clínico</option>
-                    <option value="SOLICITUD_MEDICA">Solicitud Médica</option>
-                    <option value="MANUAL">Registro Manual</option>
-                    <option value="FICHA">Ficha Clínica</option>
-                    <option value="VALORACION">Valoración</option>
-                </select>
-            </div>
-
-            {{-- Filtro Residente --}}
-            <div class="lg:col-span-2">
-                <select wire:model.live="filtroAdulto" class="w-full rounded-xl border border-[var(--rm-border)]  bg-[var(--rm-input-bg)]  py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
-                    <option value="">Todos los residentes</option>
-                    @foreach($adultos as $ad)
-                        <option value="{{ $ad->cod_residente }}">
-                            {{ $ad->ap_paterno }} {{ $ad->nombres }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-        </div>
-
-        {{-- Fila de chips de filtros activos (desplazable y con colorcitos) --}}
-        @php
-            $hasFiltrosActivos = !empty($search) || ($filtroEstado !== 'ABIERTA') || !empty($filtroNivel) || !empty($filtroOrigen) || !empty($filtroAdulto);
-        @endphp
-        @if($hasFiltrosActivos)
-            <div class="rm-filter-bar__active">
-                <div class="rm-filter-scroll">
-                    <span class="rm-filter-bar__active-label">
-                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
-                    </span>
-
-                    @if(!empty($search))
-                        <span class="rm-filter-chip rm-filter-chip--search">
-                            <i class="ph-bold ph-magnifying-glass text-xs"></i>
-                            <span>Búsqueda: "{{ Str::limit($search, 16) }}"</span>
-                            <button type="button" wire:click="limpiarFiltro('search')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
-                        </span>
-                    @endif
-
-                    @if($filtroEstado !== 'ABIERTA')
-                        <span class="rm-filter-chip {{ $filtroEstado === 'EN_ATENCION' ? 'rm-filter-chip--warning' : ($filtroEstado === 'CERRADA' ? 'rm-filter-chip--success' : 'rm-filter-chip--danger') }}">
-                            <span class="w-1.5 h-1.5 rounded-full {{ $filtroEstado === 'EN_ATENCION' ? 'bg-[var(--rm-status-high)]' : ($filtroEstado === 'CERRADA' ? 'bg-[var(--rm-action-primary)]' : 'bg-[var(--rm-danger)]') }}"></span>
-                            <span>Estado: {{ $filtroEstado === 'EN_ATENCION' ? 'En Atención' : ($filtroEstado === 'CERRADA' ? 'Cerrada' : 'Todos') }}</span>
-                            <button type="button" wire:click="limpiarFiltro('filtroEstado')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
-                        </span>
-                    @endif
-
-                    @if(!empty($filtroNivel))
-                        <span class="rm-filter-chip {{ in_array($filtroNivel, ['CRITICO', 'ALTO']) ? 'rm-filter-chip--danger' : 'rm-filter-chip--warning' }}">
-                            <i class="ph-bold ph-warning-circle text-xs"></i>
-                            <span>Nivel: {{ $filtroNivel }}</span>
-                            <button type="button" wire:click="limpiarFiltro('filtroNivel')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
-                        </span>
-                    @endif
-
-                    @if(!empty($filtroOrigen))
-                        <span class="rm-filter-chip rm-filter-chip--clinical">
-                            <i class="ph-bold ph-tag text-xs"></i>
-                            <span>Origen: {{ $filtroOrigen }}</span>
-                            <button type="button" wire:click="limpiarFiltro('filtroOrigen')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
-                        </span>
-                    @endif
-
-                    @if(!empty($filtroAdulto))
-                        @php $adFiltrado = $adultos->firstWhere('cod_residente', $filtroAdulto); @endphp
-                        <span class="rm-filter-chip rm-filter-chip--info">
-                            <i class="ph-bold ph-user text-xs"></i>
-                            <span>Residente: {{ $adFiltrado ? $adFiltrado->ap_paterno : 'Filtrado' }}</span>
-                            <button type="button" wire:click="limpiarFiltro('filtroAdulto')" title="Quitar filtro"><i class="ph-bold ph-x text-xs"></i></button>
-                        </span>
-                    @endif
-                </div>
-
-                <div class="flex items-center gap-2 shrink-0">
-                    <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[var(--rm-surface-alt)] text-[var(--rm-text-secondary)] border border-[var(--rm-border-soft)]">
-                        {{ $alertas->total() }} coincidentes
-                    </span>
-
-                    <button type="button"
-                        wire:click="limpiarFiltros"
-                        class="rm-filter-bar__clear-btn">
-                        <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
-                        <span>Limpiar filtros</span>
-                    </button>
-                </div>
-            </div>
+<div class="rm-pilot-alertas rm-emergency-workspace rm-page-layout" data-alert-workspace="{{ $perfil['foco'] }}" x-data="rmAlertasInteraccion()" @alertas-caso-seleccionado.window="$refs.contextoCaso.focus({ preventScroll: true }); $refs.contextoCaso.scrollIntoView({ block: 'nearest', behavior: 'instant' });" @rm-alertas-request="estado($event.detail)" @rm-alertas-error="errorSolicitud = $event.detail.message" :aria-busy="solicitudes > 0" @click.capture="proteger($event)" @keydown.escape.window.capture="proteger($event)" @unless($preview || $modalCrear || $modalAtender || $modalCerrar || $modalDetalle || $modalEspecialidad || $drawerGrafico || $drawerUbicacion) wire:poll.visible.60s @endunless>
+    @use('App\Modulos\Alertas\Aplicacion\Formato\LenguajeAlerta')
+    @if($perfil['foco'] === 'supervision')
+        @include('alertas::livewire.alertas.gerencia')
+    @else
+    <x-ui.page-header :title="$perfil['titulo']" :subtitle="$perfil['descripcion']" overline="Alertas · espacio de trabajo" :icon="$perfil['icono']" class="rm-alert-workspace-heading">
+        @if(auth()->user()->hasAnyRole(['SUPERADMINISTRADOR','ADMINISTRADOR']))<a href="{{ route('admin.alertas-clinicas.por-rol') }}" class="rm-btn rm-btn-secondary"><i class="ph-bold ph-users-three" aria-hidden="true"></i>Vistas por rol</a>@endif
+        @if($preview && in_array($perfil['foco'],['turno','coordinacion','auditoria'],true) && auth()->user()->can('alertas.gestionar'))<x-ui.action-button variant="secondary" wire:click="abrirCrear" loading="abrirCrear" icono="ph-eye">Consultar formulario de aviso</x-ui.action-button>@endif
+        @if(!$preview && auth()->user()->can('alertas.gestionar') && ($puedeIntervenir || $puedeCoordinar))
+            <x-ui.action-button wire:click="abrirCrear" loading="abrirCrear" icono="ph-plus">Registrar alerta</x-ui.action-button>
+            <x-ui.action-button variant="secondary" wire:click="detectarAlertas" loading="detectarAlertas" icono="ph-magnifying-glass">Detectar pendientes</x-ui.action-button>
         @endif
-    </x-ui.filter-bar>
 
-    {{-- TABLA ASISTENCIAL MEDIANA + MODO OSCURO + PIE DE PAGINACIÓN INSTITUCIONAL --}}
-    <section class="rm-table-wrapper">
-        <div class="w-full overflow-x-auto overscroll-x-contain">
-            <table class="rm-data-table rm-data-table--actions rm-table w-full min-w-[980px] table-fixed">
-                <thead class="rm-table-header">
-                    <tr>
-                        <th class="w-[23%] text-left font-bold">Residente y Ubicación</th>
-                        <th class="w-[14%] text-left font-bold">Clasificación</th>
-                        <th class="w-[28%] text-left font-bold">Motivo Clínico</th>
-                        <th class="w-[15%] text-left font-bold">Responsable</th>
-                        <th class="w-[8%] text-center font-bold">Estado</th>
-                        <th class="w-[12%] text-right font-bold">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="text-xs">
-                    @forelse($alertas as $alerta)
-                        @php
-                            $nivelTexto = match($alerta->prioridad) {
-                                'CRITICO' => 'Crítico',
-                                'ALTO' => 'Alto',
-                                'MEDIO' => 'Medio',
-                                'BAJO' => 'Bajo',
-                                default => $alerta->prioridad
-                            };
-                            $estadoTexto = match($alerta->estado) {
-                                'ABIERTA' => 'Por Atender',
-                                'EN_ATENCION' => 'En Atención',
-                                'CERRADA' => 'Resuelta',
-                                default => $alerta->estado
-                            };
-                        @endphp
-                        <tr class="rm-table-row">
-                            {{-- Columna 1: Residente y Ubicación --}}
-                            <td class="px-2.5 py-2">
-                                <div class="flex items-center gap-2">
-                                    <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--rm-surface-alt)] dark:bg-slate-800 border border-[var(--rm-border)]  text-[var(--rm-text-title)] dark:text-slate-200 font-extrabold text-[11px] shadow-2xs">
-                                        {{ substr($alerta->adultoMayor?->nombres ?? 'R', 0, 1) }}{{ substr($alerta->adultoMayor?->ap_paterno ?? 'M', 0, 1) }}
-                                    </div>
-                                    <div class="min-w-0 flex-1">
-                                        <div class="font-bold text-[var(--rm-text-title)] dark:text-slate-100 truncate text-xs">
-                                            {{ $alerta->adultoMayor?->ap_paterno }} {{ $alerta->adultoMayor?->ap_materno }} {{ $alerta->adultoMayor?->nombres }}
-                                        </div>
-                                        <div class="text-[10.5px] text-[var(--rm-text-muted)] dark:text-slate-400 flex items-center gap-1 mt-0.5 truncate">
-                                            <i class="ph ph-map-pin text-[var(--rm-primary)] shrink-0"></i>
-                                            <span class="truncate">{{ $alerta->adultoMayor?->ubicacion_texto ?? 'Sin ubicación asignada' }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-
-                            {{-- Columna 2: Clasificación y Nivel --}}
-                            <td class="px-2 py-2">
-                                <div class="flex flex-col gap-1 items-start">
-                                    <x-ui.status-badge :estado="$alerta->prioridad" :label="$nivelTexto" />
-                                    <x-ui.status-badge :estado="$alerta->modulo" variant="clinical" class="text-[9.5px]" />
-                                </div>
-                            </td>
-
-                            {{-- Columna 3: Motivo y Diagnóstico Clínico --}}
-                            <td class="px-2.5 py-2">
-                                <div class="font-bold text-[var(--rm-text-title)] dark:text-slate-100 truncate text-xs">
-                                    {{ $alerta->tipo }}
-                                </div>
-                                <div class="text-[10.5px] text-[var(--rm-text-muted)] dark:text-slate-400 line-clamp-1 mt-0.5">
-                                    {{ $alerta->descripcion }}
-                                </div>
-                                <div class="text-[9.5px] text-slate-400 dark:text-slate-500 font-mono mt-0.5">
-                                    {{ $alerta->fecha_alerta?->format('d/m/Y H:i') ?? 'Sin fecha' }}
-                                </div>
-                            </td>
-
-                            {{-- Columna 4: Responsable / Turno --}}
-                            <td class="px-2 py-2">
-                                <div class="font-medium text-[var(--rm-text-title)] dark:text-slate-200 truncate text-xs">
-                                    {{ $alerta->responsable ? $alerta->responsable->nombres . ' ' . $alerta->responsable->ap_paterno : 'Sin asignar' }}
-                                </div>
-                                <div class="text-[10px] text-[var(--rm-text-muted)] dark:text-slate-400 font-mono mt-0.5 truncate">
-                                    Turno: {{ $alerta->turno?->tipo_turno ?? 'N/A' }}
-                                </div>
-                            </td>
-
-                            {{-- Columna 5: Estado (Badge chiquito con reborde sutil y dot de pulso) --}}
-                            <td class="px-1.5 py-2 text-center whitespace-nowrap">
-                                <x-ui.status-badge :estado="$alerta->estado" :label="$estadoTexto" />
-                            </td>
-
-                            {{-- Columna 6: Acciones (Principales + Menú Secundario) --}}
-                            <td class="px-3 py-1.5 text-right whitespace-nowrap">
-                                <div class="inline-flex items-center gap-1 justify-end">
-                                    {{-- 1. Atender Alerta (Visible principal) --}}
-                                    @if($alerta->estado !== 'CERRADA')
-                                        <button type="button"
-                                            wire:click="atenderAlerta('{{ $alerta->cod_alerta }}')"
-                                            class="rm-action-btn rm-action-btn-atender"
-                                            title="Iniciar / Registrar Atención Asistencial">
-                                            <i class="ph ph-first-aid"></i>
-                                        </button>
-                                    @endif
-
-                                    {{-- 2. Ver Gráficos Clínicos (Drawer Lateral) --}}
-                                    <button type="button"
-                                        wire:click="verGraficos('{{ $alerta->cod_residente }}')"
-                                        class="rm-action-btn rm-action-btn-drawer"
-                                        title="[Panel Lateral] Gráficos y Constantes">
-                                        <i class="ph ph-chart-line-up"></i>
-                                    </button>
-
-                                    {{-- 3. Ver Ubicación / Cama (Drawer Lateral) --}}
-                                    <button type="button"
-                                        wire:click="verUbicacion('{{ $alerta->cod_residente }}')"
-                                        class="rm-action-btn rm-action-btn-ubicacion"
-                                        title="[Panel Lateral] Ubicación y Cama">
-                                        <i class="ph ph-bed"></i>
-                                    </button>
-
-                                    {{-- 4. Menú Secundario (...) --}}
-                                    <div x-data="{ open: false }" class="relative inline-block text-left" @click.outside="open = false">
-                                        <button type="button"
-                                            @click="open = !open"
-                                            class="rm-action-btn rm-action-btn-more"
-                                            title="Más opciones de la alerta">
-                                            <i class="ph ph-dots-three-vertical"></i>
-                                        </button>
-
-                                        <div x-show="open"
-                                             x-transition:enter="transition ease-out duration-100"
-                                             x-transition:enter-start="transform opacity-0 scale-95"
-                                             x-transition:enter-end="transform opacity-100 scale-100"
-                                             x-transition:leave="transition ease-in duration-75"
-                                             x-transition:leave-start="transform opacity-100 scale-100"
-                                             x-transition:leave-end="transform opacity-0 scale-95"
-                                             class="absolute right-0 z-50 mt-1 w-48 origin-top-right rounded-xl border border-[var(--rm-border)]  bg-[var(--rm-surface)]  shadow-xl py-1 text-xs focus:outline-none"
-                                             style="display: none;">
-
-                                            {{-- Ver Expediente / Detalle --}}
-                                            <button type="button"
-                                                wire:click="verDetalle('{{ $alerta->cod_alerta }}'); open = false;"
-                                                class="w-full flex items-center gap-2 px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-[var(--rm-surface-soft)] dark:hover:bg-slate-700/70 text-left font-medium transition cursor-pointer">
-                                                <i class="ph ph-file-text text-sm text-slate-500 dark:text-slate-400"></i>
-                                                <span>Ver expediente clínico</span>
-                                            </button>
-
-                                            {{-- Finalizar / Cerrar Alerta --}}
-                                            @if($alerta->estado !== 'CERRADA')
-                                                <button type="button"
-                                                    wire:click="cerrarAlerta('{{ $alerta->cod_alerta }}'); open = false;"
-                                                    class="w-full flex items-center gap-2 px-3 py-2 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-left font-medium transition cursor-pointer border-t border-slate-100 /60">
-                                                    <i class="ph ph-check-circle text-sm text-[var(--rm-success)]"></i>
-                                                    <span>Finalizar / Cerrar alerta</span>
-                                                </button>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="px-6 py-12 text-center text-slate-500 dark:text-slate-400">
-                                <div class="flex flex-col items-center justify-center gap-2">
-                                    <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--rm-surface-soft)] dark:bg-slate-800 text-slate-400 text-2xl">
-                                        <i class="ph ph-bell-slash"></i>
-                                    </span>
-                                    <div class="font-bold text-slate-700 dark:text-slate-300 text-sm">
-                                        No se encontraron alertas clínicas
-                                    </div>
-                                    <div class="text-xs text-slate-400 max-w-sm">
-                                        No hay alertas registradas que coincidan con los filtros seleccionados en este momento.
-                                    </div>
-                                    @if($search || $filtroEstado || $filtroNivel || $filtroOrigen || $filtroAdulto)
-                                        <button type="button"
-                                            wire:click="limpiarFiltros"
-                                            class="mt-2 px-4 py-2 rounded-xl text-xs font-bold text-white bg-[var(--rm-text-primary)] hover:bg-[var(--rm-text-body)] transition cursor-pointer">
-                                            Restablecer filtros
-                                        </button>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        {{-- PIE DE TABLA: RESUMEN, SELECTOR POR PÁGINA Y NAVEGACIÓN INSTITUCIONAL --}}
-        <div class="rm-pagination-bar px-3.5 py-2 border-t border-[var(--rm-border-soft)] /60 bg-[var(--rm-surface-soft)]/90 dark:bg-slate-900/90 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs">
-            {{-- Lado Izquierdo: Resumen numérico y selector por página --}}
-            <div class="flex flex-wrap items-center gap-2.5 text-[var(--rm-text-muted)] dark:text-slate-400">
-                <div class="text-[11.5px]">
-                    Mostrando
-                    <span class="font-bold text-[var(--rm-text-title)] dark:text-slate-200">{{ $alertas->firstItem() ?? 0 }}</span>
-                    a
-                    <span class="font-bold text-[var(--rm-text-title)] dark:text-slate-200">{{ $alertas->lastItem() ?? 0 }}</span>
-                    de
-                    <span class="font-bold text-[var(--rm-text-title)] dark:text-slate-200">{{ $alertas->total() }}</span>
-                    alertas
-                </div>
-
-                <span class="hidden sm:inline text-slate-300 dark:text-slate-700">|</span>
-
-                <div class="flex items-center gap-1.5 text-[11.5px]">
-                    <span>Mostrar</span>
-                    <select wire:model.live="perPage" class="h-7 py-0 px-2 text-xs font-semibold rounded-md bg-[var(--rm-input-bg)]  border border-[var(--rm-border)]  text-slate-700 dark:text-slate-200 cursor-pointer outline-none">
-                        <option value="10">10</option>
-                        <option value="15">15</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                    </select>
-                    <span>por pág.</span>
-                </div>
-            </div>
-
-            {{-- Lado Derecho: Controles de Paginación --}}
-            @if($alertas->hasPages())
-                <nav role="navigation" aria-label="Paginación" class="flex items-center gap-1">
-                    {{-- Botón Anterior --}}
-                    @if ($alertas->onFirstPage())
-                        <span class="h-7 px-2 rounded-md border border-slate-200/80 dark:border-slate-800 text-slate-400 dark:text-slate-600 bg-[var(--rm-surface-soft)]/40 dark:bg-slate-900/30 cursor-not-allowed flex items-center gap-1 font-medium text-[11px]">
-                            <i class="ph ph-caret-left text-xs"></i>
-                            <span class="hidden md:inline">Anterior</span>
-                        </span>
-                    @else
-                        <button type="button" wire:click="previousPage" wire:loading.attr="disabled" class="h-7 px-2 rounded-md border border-[var(--rm-border)]  text-slate-700 dark:text-slate-200 bg-[var(--rm-surface)]  hover:bg-[var(--rm-surface-alt)] dark:hover:bg-slate-700 transition flex items-center gap-1 font-medium text-[11px] cursor-pointer">
-                            <i class="ph ph-caret-left text-xs"></i>
-                            <span class="hidden md:inline">Anterior</span>
-                        </button>
-                    @endif
-
-                    {{-- Enlaces Numéricos --}}
-                    <div class="flex items-center gap-1">
-                        @foreach ($alertas->getUrlRange(max(1, $alertas->currentPage() - 2), min($alertas->lastPage(), $alertas->currentPage() + 2)) as $page => $url)
-                            @if ($page == $alertas->currentPage())
-                                <span class="min-w-[28px] h-7 px-1.5 flex items-center justify-center rounded-md bg-[var(--rm-primary)] text-white font-bold text-xs shadow-2xs">
-                                    {{ $page }}
-                                </span>
-                            @else
-                                <button type="button" wire:click="gotoPage({{ $page }})" class="min-w-[28px] h-7 px-1.5 flex items-center justify-center rounded-md border border-[var(--rm-border)]  bg-[var(--rm-surface)]  text-slate-700 dark:text-slate-200 hover:bg-[var(--rm-surface-alt)] dark:hover:bg-slate-700 font-medium text-xs transition cursor-pointer">
-                                    {{ $page }}
-                                </button>
-                            @endif
-                        @endforeach
-                    </div>
-
-                    {{-- Botón Siguiente --}}
-                    @if ($alertas->hasMorePages())
-                        <button type="button" wire:click="nextPage" wire:loading.attr="disabled" class="h-7 px-2 rounded-md border border-[var(--rm-border)]  text-slate-700 dark:text-slate-200 bg-[var(--rm-surface)]  hover:bg-[var(--rm-surface-alt)] dark:hover:bg-slate-700 transition flex items-center gap-1 font-medium text-[11px] cursor-pointer">
-                            <span class="hidden md:inline">Siguiente</span>
-                            <i class="ph ph-caret-right text-xs"></i>
-                        </button>
-                    @else
-                        <span class="h-7 px-2 rounded-md border border-slate-200/80 dark:border-slate-800 text-slate-400 dark:text-slate-600 bg-[var(--rm-surface-soft)]/40 dark:bg-slate-900/30 cursor-not-allowed flex items-center gap-1 font-medium text-[11px]">
-                            <span class="hidden md:inline">Siguiente</span>
-                            <i class="ph ph-caret-right text-xs"></i>
-                        </span>
-                    @endif
-                </nav>
-            @endif
-        </div>
+    </x-ui.page-header>
+    @if(session()->has('mensaje'))<div role="status" aria-live="polite"><x-ui.callout variant="success" title="Registro confirmado">{{ session('mensaje') }}</x-ui.callout></div>@endif
+    @unless($modalCrear || $modalAtender || $modalCerrar || $modalDetalle || $modalEspecialidad)
+        <x-validation-errors />
+    @endunless
+    @if($preview)
+        <x-ui.callout variant="info" title="Previsualización de solo lectura">
+            Se muestra la organización del rol seleccionado con el ámbito autorizado de tu cuenta actual. Esta vista no acredita una asignación de turno ni concede permisos profesionales.
+        </x-ui.callout>
+    @endif
+    <div wire:offline class="rm-callout" role="alert">Se perdió la conexión. Conserva tu captura y vuelve a intentar al recuperar el acceso.</div>
+    <div wire:loading.delay wire:target="guardarAlerta,guardarAtencion,guardarCierre,guardarAccion,guardarRegistroEspecialidad,asignarResponsable,detectarAlertas" role="status" aria-live="polite" class="rm-alert-request-status"><i class="ph-bold ph-hourglass-medium" aria-hidden="true"></i><span x-text="guardados ? 'Procesando la operación. Conserva esta ventana hasta recibir el resultado.' : 'Consultando las alertas… puedes seguir revisando la información visible.'"></span></div>
+    <div x-show="errorSolicitud" x-cloak role="alert" class="rm-callout rm-alert-request-error"><i class="ph-bold ph-warning-circle" aria-hidden="true"></i><p x-text="errorSolicitud"></p><button type="button" class="rm-btn rm-btn-secondary" @click="errorSolicitud = ''">Mantener captura</button></div>
+    <section class="rm-alert-specialties rm-alert-trace" aria-label="Alertas por vínculo profesional">
+        <h2>{{ $filtroEspecialidad === '' ? 'Todas las especialidades de tu ámbito' : ($especialidadesDisponibles[$filtroEspecialidad] ?? 'Sin vínculo profesional verificable') }}</h2>
+        <p>Elige la especialidad relacionada con el responsable o con el profesional del registro de origen. Una valoración del residente, por sí sola, no vincula una alerta a esa especialidad.</p>
+        <x-ui.alerta-filtro-chips label="Especialidad vinculada" campo="filtroEspecialidad" :actual="$filtroEspecialidad" :opciones="[''=>'Todas las autorizadas'] + $especialidadesDisponibles + ['SIN_VINCULO'=>'Sin vínculo verificable']" />
+        <p class="rm-help">Los vínculos utilizan los roles profesionales actuales de las cuentas relacionadas. No equivalen a un diagnóstico ni a una derivación. Las prioridades activas de tu ámbito siguen visibles debajo.</p>
     </section>
+    @if($estadosHistoricos)
+        <x-ui.callout variant="warning" title="Hay alertas de registros anteriores">
+            <p>{{ array_sum($estadosHistoricos) }} alerta(s) conservan estados de registros anteriores. Se conservan sin reclasificar. «Urgentes» incluye solo prioridades altas o críticas del ciclo actual; «Por atender» incluye avisos actuales sin atención en curso.</p>
+            @foreach($estadosHistoricos as $estado=>$cantidad)<button type="button" class="rm-btn rm-btn-secondary" wire:click="setFiltroRapido('filtroEstado','{{ $estado }}')" aria-pressed="{{ $filtroEstado === $estado ? 'true' : 'false' }}">{{ $filtroEstado === $estado ? 'Mostrando' : 'Consultar' }} {{ $cantidad }} · {{ $estado }}</button>@endforeach
+        </x-ui.callout>
+    @endif
 
-    {{-- Modales de Gestión Clínica Canónicos --}}
+    @include('livewire.alertas.resumen-trabajo')
+    @unless($perfil['foco'] === 'coordinacion')
+    <section class="rm-alert-kpis" aria-label="Resumen de la especialidad seleccionada, antes de los filtros de lista">
+        @foreach([['Urgentes','urgentes',$conteos['criticas']+$conteos['altas'],'Críticas y altas activas'],['Por atender','por_atender',$conteos['por_atender'],'Sin atención en curso'],['En atención','en_atencion',$conteos['en_atencion'],'Actuación registrada'],['Cerradas','cerradas',$conteos['cerradas'],'Historial conservado'],['Registros anteriores','anteriores',$conteos['anteriores'],'Estado original conservado'],['Todas','todas',$conteos['total'],'Alertas de tu ámbito'],['Sin responsable','sin_responsable',$conteos['sin_responsable'],'Activas sin asignación'],['Con límite superado','fuera_plazo',$conteos['vencidas'],'Fecha límite guardada']] as [$etiqueta,$clave,$cantidad,$ayuda])
+            @continue(!in_array($clave, $perfil['indicadores'], true))
+            <button type="button" class="rm-alert-kpi {{ $clave === 'urgentes' ? 'is-priority' : '' }}" wire:click="filtrarResumen('{{ $clave }}')" aria-pressed="{{ match($clave) { 'urgentes' => $filtroNivel === 'PRIORITARIAS' && $filtroEstado === '', 'por_atender' => $filtroEstado === 'POR_ATENDER', 'en_atencion' => $filtroEstado === 'EN_ATENCION', 'cerradas' => $filtroEstado === 'CERRADA', 'anteriores' => $filtroEstado === 'ANTERIORES', 'sin_responsable' => $filtroResponsabilidad === 'SIN_RESPONSABLE' && $filtroEstado === 'ACTIVAS', 'fuera_plazo' => $filtroEstado === 'CON_LIMITE_SUPERADO', 'todas' => $filtroEstado === '' && $filtroNivel === '', default => false } ? 'true' : 'false' }}" wire:loading.attr="disabled" aria-label="{{ $etiqueta }}: {{ $cantidad }}. {{ $ayuda }}"><strong>{{ $cantidad }}</strong><span class="rm-alert-kpi__copy"><span>{{ $etiqueta }}</span><small>{{ $ayuda }}</small></span></button>
+        @endforeach
+    </section>
+    @endunless
+    @if($prioritarias->isNotEmpty())
+        <nav class="rm-alert-urgent-strip" aria-label="Prioridades activas que permanecen pendientes">
+            <strong><i class="ph-bold ph-warning-octagon" aria-hidden="true"></i> Prioridades activas de todo tu ámbito</strong>
+            @foreach($prioritarias as $prioritaria)<button type="button" class="rm-btn rm-btn-secondary" wire:click="verDetalle('{{ $prioritaria->getKey() }}')">{{ LenguajeAlerta::prioridad($prioritaria->prioridad) }} · Residente: {{ $prioritaria->residente?->nombre_completo }} · Ver detalle</button>@endforeach
+            <button type="button" class="rm-btn rm-btn-secondary" wire:click="verPrioritarias">Ver todas las prioridades activas</button>
+        </nav>
+    @endif
+    <div class="rm-alert-workspace-grid">
+    <div class="rm-alert-workspace-grid__main">
+    <x-ui.filter-bar>
+        <div class="rm-alert-filter-top"><h2>Encuentra y revisa una alerta</h2><button type="button" class="rm-btn rm-btn-ghost" wire:click="limpiarFiltros">Restablecer filtros</button></div>
+        <x-ui.field label="Buscar alertas" for="alertas-buscar"><input id="alertas-buscar" type="search" wire:model.live.debounce.300ms="search" class="rm-input" placeholder="Nombre, habitación, cama, motivo o tipo"></x-ui.field>
+        <p class="rm-help" role="status" aria-live="polite"><span wire:loading.remove wire:target="search">La lista se filtra mientras escribes. No necesitas actualizar la página.</span><span wire:loading.delay wire:target="search">Buscando coincidencias…</span></p>
+        <x-ui.alerta-filtro-chips label="Estado" campo="filtroEstado" :actual="$filtroEstado" :opciones="['ACTIVAS'=>'Activas','POR_ATENDER'=>'Por atender','EN_ATENCION'=>'En atención','ATENDIDA'=>'Atendidas · por cerrar','CERRADA'=>'Cerradas','ANULADA'=>'Anuladas','ANTERIORES'=>'Registros anteriores',''=>'Todas']" />
+        <x-ui.alerta-filtro-chips label="Prioridad" campo="filtroNivel" :actual="$filtroNivel" :opciones="[''=>'Todas las prioridades','PRIORITARIAS'=>'Críticas y altas activas','CRITICO'=>'Críticas','ALTO'=>'Altas','MEDIO'=>'Medias','BAJO'=>'Bajas']" />
+        <div class="rm-alert-more-filters" x-data="{ abierto: @js((bool)($filtroOrigen || $filtroResponsabilidad || $fechaDesde || $fechaHasta)) }">
+            <button type="button" class="rm-btn rm-btn-secondary rm-alert-disclosure" @click="abierto = !abierto" :aria-expanded="abierto" aria-controls="alertas-filtros-extra"><i class="ph-bold ph-faders-horizontal" aria-hidden="true"></i><span>Origen, responsable y fechas</span><i class="ph-bold" :class="abierto ? 'ph-minus' : 'ph-plus'" aria-hidden="true"></i></button>
+            <div id="alertas-filtros-extra" class="rm-alert-filter-panel" x-show="abierto" x-cloak>
+            <x-ui.alerta-filtro-chips label="Origen registrado" campo="filtroOrigen" :actual="$filtroOrigen" :opciones="[''=>'Todos los orígenes'] + collect($origenesDisponibles)->mapWithKeys(fn($o)=>[$o=>str_replace('_',' ',$o)])->all()" />
+            <x-ui.alerta-filtro-chips label="Responsabilidad" campo="filtroResponsabilidad" :actual="$filtroResponsabilidad" :opciones="[''=>'Cualquier responsable','SIN_RESPONSABLE'=>'Sin responsable'] + (auth()->user()->personal ? ['PROPIAS'=>'A mi cargo'] : [])" />
+            <div class="rm-alert-filters">
+                <x-ui.field label="Registradas desde" for="alertas-desde" error="fechaDesde"><x-ui.calendario label="Registradas desde" id="alertas-desde" wire:model.live="fechaDesde" :max="$fechaHasta" aria-invalid="{{ $errors->has('fechaDesde') ? 'true' : 'false' }}" aria-describedby="alertas-desde-error" /></x-ui.field>
+                <x-ui.field label="Registradas hasta" for="alertas-hasta" error="fechaHasta"><x-ui.calendario label="Registradas hasta" id="alertas-hasta" wire:model.live="fechaHasta" :min="$fechaDesde" aria-invalid="{{ $errors->has('fechaHasta') ? 'true' : 'false' }}" aria-describedby="alertas-hasta-error" /></x-ui.field>
+            </div>
+            </div>
+        </div>
+    </x-ui.filter-bar>
+    <div class="rm-alert-list-heading" id="alertas-bandeja"><div><h2>{{ $perfil['bandeja'] }}</h2><p>{{ $alertas->total() }} de {{ $conteos['total'] }} alerta(s) de tu ámbito · {{ $filtroEstado === 'ACTIVAS' ? 'Pendientes actuales' : match($filtroEstado) { 'POR_ATENDER'=>'Por atender', 'ANTERIORES'=>'Registros anteriores', 'CON_LIMITE_SUPERADO'=>'Activas con límite superado', ''=>'Todos los estados', default=>LenguajeAlerta::estado($filtroEstado) } }}</p>@if(str_starts_with($filtroResponsabilidad,'PERSONAL:'))<button type="button" class="rm-btn rm-btn-ghost" wire:click="setFiltroRapido('filtroResponsabilidad','')">Quitar filtro de responsable</button>@endif</div>@if($alertas->total() > 0)<p class="rm-help">{{ $sinResponsableConsulta }} sin responsable registrado en esta consulta</p>@endif</div>
+    <section class="rm-alert-case-list" aria-label="Alertas de la consulta">
+        @forelse($alertas as $alerta)
+            <article data-priority="{{ $alerta->prioridad }}" class="rm-alert-case {{ $traza && $traza['codigo'] === $alerta->getKey() ? 'is-selected' : '' }} {{ in_array($alerta->prioridad, ['CRITICO','CRITICA']) ? 'is-critical' : '' }}" wire:key="alerta-{{ $alerta->getKey() }}">
+                <header class="rm-alert-case__header"><div class="rm-alert-case__signal"><i class="ph-bold ph-bell-ringing" aria-hidden="true"></i><span>Alerta</span><span class="rm-badge rm-alert-severity {{ in_array($alerta->prioridad, ['CRITICO','CRITICA']) ? 'is-critical' : (in_array($alerta->prioridad,['ALTO','ALTA']) ? 'is-high' : '') }}">{{ LenguajeAlerta::prioridad($alerta->prioridad) }}</span><span class="rm-badge">{{ LenguajeAlerta::estado($alerta->estado) }}</span></div></header>
+                <p class="rm-alert-case__status">{{ LenguajeAlerta::situacion($alerta) }}</p>
+                <div class="rm-alert-case__specialties">
+                    @forelse($vinculosAlertas[$alerta->getKey()] ?? [] as $vinculo)<p><strong>{{ $vinculo['nombre'] }}</strong><span>{{ implode(' · ', $vinculo['motivos']) }}</span></p>
+                    @empty<p>Sin vínculo profesional verificable con tus permisos de consulta.</p>@endforelse
+                </div>
+                <div class="rm-alert-case__body">
+                    <div class="rm-alert-case__reason"><p class="rm-alert-case__resident-label">Nombre del residente</p><h3>{{ $alerta->residente?->nombre_completo }}</h3><p class="rm-alert-case__resident-label">Tipo de alerta</p><h4>{{ LenguajeAlerta::tipo($alerta->tipo) }}</h4><p class="rm-alert-case__resident-label">Motivo registrado</p><p class="rm-alert-case__description">{{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($alerta->descripcion) }}</p></div>
+                    <dl class="rm-alert-case__facts">
+                        <div><dt><i class="ph-bold ph-map-pin" aria-hidden="true"></i>Ubicación actual</dt><dd>{{ $alerta->residente?->cama?->habitacion?->codigo ?: 'Habitación no registrada' }} · {{ $alerta->residente?->cama?->codigo ?: 'Cama no registrada' }}</dd></div>
+                        <div><dt><i class="ph-bold ph-user-check" aria-hidden="true"></i>Responsable del seguimiento</dt><dd>{{ \App\Modulos\Alertas\Aplicacion\Formato\LenguajeAlerta::responsable($alerta->responsable) }}</dd></div>
+                        <div><dt><i class="ph-bold ph-clock" aria-hidden="true"></i>Registrada</dt><dd><time datetime="{{ $alerta->fecha_hora?->toIso8601String() }}">{{ $alerta->fecha_hora?->format('d/m/Y H:i') ?: 'Fecha no registrada' }}</time></dd></div>
+                        <div><dt><i class="ph-bold ph-git-branch" aria-hidden="true"></i>Origen</dt><dd>{{ str_replace('_',' ', $alerta->modulo ?: 'Sin origen registrado') }}</dd></div>
+                        @if($alerta->fecha_hora_limite)<div><dt>Límite registrado</dt><dd>{{ $alerta->fecha_hora_limite->format('d/m/Y H:i') }}</dd></div>@endif
+                    </dl>
+                </div>
+                <footer class="rm-alert-case__actions">
+                    <span class="rm-alert-case__provenance"><i class="ph-bold {{ $alerta->generacion === 'MANUAL' ? 'ph-note-pencil' : 'ph-bell-ringing' }}" aria-hidden="true"></i>{{ match($alerta->generacion) { 'MANUAL' => 'Registro manual', 'AUTOMATICA', 'AUTOMATICO' => 'Detección registrada', default => 'Generación sin registrar' } }}</span>
+                    <div class="rm-alert-case__primary-actions">
+                        <x-ui.action-button variant="secondary" wire:click="verDetalle('{{ $alerta->getKey() }}')" loading="verDetalle('{{ $alerta->getKey() }}')" icono="ph-arrow-up-right">Ver detalle</x-ui.action-button>
+                        <x-ui.action-button :variant="$definicionEspecialidad ? 'primary' : 'ghost'" wire:click="seleccionarTraza('{{ $alerta->getKey() }}')" loading="seleccionarTraza('{{ $alerta->getKey() }}')" aria-pressed="{{ $traza && $traza['codigo'] === $alerta->getKey() ? 'true' : 'false' }}" :icono="$perfil['icono']">{{ $perfil['seleccionar'] }}</x-ui.action-button>
+                        @if($puedeIntervenir && in_array($alerta->estado, \App\Models\Alerta::ESTADOS_ACTIVOS, true))
+                            @if($alerta->estado === 'EN_ATENCION')<x-ui.action-button wire:click="verDetalle('{{ $alerta->getKey() }}')" loading="verDetalle('{{ $alerta->getKey() }}')" icono="ph-note-pencil">Añadir seguimiento</x-ui.action-button>
+                            @else<x-ui.action-button wire:click="atenderAlerta('{{ $alerta->getKey() }}')" loading="atenderAlerta('{{ $alerta->getKey() }}')" icono="ph-first-aid">Registrar intervención</x-ui.action-button>@endif
+                        @elseif($puedeCoordinar && in_array($alerta->estado, \App\Models\Alerta::ESTADOS_ACTIVOS, true))
+                            <x-ui.action-button wire:click="verDetalle('{{ $alerta->getKey() }}')" loading="verDetalle('{{ $alerta->getKey() }}')" icono="ph-note-pencil">Registrar coordinación</x-ui.action-button>
+                        @endif
+                        @if($definicionEspecialidad)<x-ui.action-button variant="secondary" wire:click="abrirRegistroEspecialidad('{{ $alerta->getKey() }}')" loading="abrirRegistroEspecialidad('{{ $alerta->getKey() }}')" icono="ph-notebook">{{ $preview || !auth()->user()->can($definicionEspecialidad['permiso']) ? 'Ver campos: ' : 'Registrar: ' }}{{ mb_strtolower($definicionEspecialidad['titulo']) }}</x-ui.action-button>@endif
+                        @can('signos_vitales.ver')<x-ui.action-button variant="ghost" wire:click="verGraficos('{{ $alerta->cod_residente }}')" loading="verGraficos('{{ $alerta->cod_residente }}')" icono="ph-chart-line">Mediciones</x-ui.action-button>@endcan
+                    </div>
+                </footer>
+            </article>
+        @empty
+            <x-ui.empty-state icono="ph-bell-slash" :titulo="$conteos['total'] > 0 ? 'Ninguna alerta coincide con estos filtros' : ($filtroEspecialidad ? 'No hay alertas con este vínculo profesional' : 'Aún no hay alertas registradas en tu ámbito')" :texto="$conteos['total'] > 0 ? 'Ajusta el estado, la prioridad o las fechas para revisar las alertas de esta especialidad.' : ($filtroEspecialidad ? 'No consta un responsable ni una fuente autorizada que vincule alertas a esta selección. Puedes consultar Todas las autorizadas. No se crean avisos para llenar esta vista.' : 'Las alertas aparecerán aquí cuando se registre una situación que requiera seguimiento.')" />
+            @if($filtroEspecialidad)<button type="button" class="rm-btn rm-btn-secondary" wire:click="setFiltroRapido('filtroEspecialidad','')">Consultar todas las especialidades autorizadas</button>@endif
+            @if($conteos['total'] > 0)<button type="button" class="rm-btn rm-btn-secondary" wire:click="filtrarResumen('todas')">Ver todas las alertas</button>@endif
+        @endforelse
+    </section>
+    {{ $alertas->links() }}
+    </div>
+    <aside class="rm-alert-workspace-grid__aside" x-ref="contextoCaso" tabindex="-1" aria-label="Contexto de trabajo del caso seleccionado">
+        @include('livewire.alertas.puesto-profesional')
+        <x-ui.alerta-trazabilidad :traza="$traza" :titulo="$perfil['seleccionar']" :icono="$perfil['icono']" :foco="$perfil['foco']" :registro-especialidad="(bool)$definicionEspecialidad" />
+        @if($traza && in_array($perfil['foco'],['auditoria','supervision'],true))
+        <section class="rm-alert-trace"><h3>Movimiento del registro</h3><p>Eventos guardados de la alerta seleccionada.</p>
+            @forelse(array_slice($traza['movimientos'],0,3) as $movimiento)<article class="rm-alert-recent-event"><strong>{{ $movimiento['tipo'] }}</strong><p>{{ $movimiento['texto'] }}</p></article>@empty<p>No hay eventos guardados para esta alerta.</p>@endforelse
+        </section>
+        @endif
+        <section class="rm-alert-trace"><h3>Análisis de la consulta</h3><p>Distribuciones reales con los mismos filtros, antes de paginar.</p><button type="button" class="rm-btn rm-btn-secondary" wire:click="$toggle('mostrarAnalisis')" aria-expanded="{{ $mostrarAnalisis ? 'true' : 'false' }}" aria-controls="alertas-analisis">{{ $mostrarAnalisis ? 'Ocultar análisis y gráficos' : 'Ver análisis y gráficos' }}</button></section>
+        <a href="#alertas-bandeja" class="rm-btn rm-btn-ghost">Volver a la bandeja de casos</a>
+    </aside>
+    </div>
+    <div id="alertas-analisis">@if($mostrarAnalisis)
+    @if($alertas->total() > 0)
+        <section class="rm-alert-analytics" aria-labelledby="alertas-graficas-titulo">
+            <header class="rm-alert-analytics__heading"><span><i class="ph-bold ph-chart-donut" aria-hidden="true"></i><strong id="alertas-graficas-titulo">Gráficas de tus alertas</strong></span><p>{{ $alertas->total() }} alertas en esta consulta · mismos filtros que la lista, antes de paginar.</p></header>
+            <div class="rm-alert-context-grid">
+                <x-ui.dashboard-data-panel :panel="['title'=>'Prioridad registrada','subtitle'=>'Cuántas alertas hay en cada prioridad','type'=>'donut','items'=>collect($chartData['niveles'])->map(fn($n,$label)=>['label'=>str_replace('_',' ', $label ?: 'Sin prioridad registrada'),'value'=>$n,'tone'=>match($label) {'CRITICO','CRITICA'=>'danger','ALTO','ALTA','MEDIO','MEDIA'=>'warning','BAJO','BAJA'=>'info',default=>'neutral'}])->values()->all(),'icon'=>'ph-warning-octagon']" />
+                <x-ui.dashboard-data-panel :panel="['title'=>'Estado registrado','subtitle'=>'Situación guardada de las alertas consultadas','type'=>'bars','items'=>collect($chartData['estados'])->map(fn($n,$label)=>['label'=>str_replace('_',' ', $label ?: 'Sin estado registrado'),'value'=>$n])->values()->all(),'icon'=>'ph-list-checks']" />
+                <x-ui.dashboard-data-panel :panel="['title'=>'Origen de las alertas','subtitle'=>'Proceso vinculado al registro, cuando consta','type'=>'bars','items'=>collect($chartData['origenes'])->map(fn($n,$label)=>['label'=>str_replace('_',' ', $label ?: 'Sin origen registrado'),'value'=>$n])->values()->all(),'icon'=>'ph-chart-bar']" />
+            </div>
+        </section>
+    @endif
+    @endif</div>
+    @if($perfil['foco'] === 'auditoria')
+        <section class="rm-alert-trace"><h3>Vigilancia automática</h3><span class="rm-badge">Pendiente de habilitación</span><p class="rm-help">La ejecución sin sesión requiere una autoría institucional aprobada. La detección manual autorizada sigue disponible. No se confirma vigilancia automática activa.</p></section>
+    @endif
+    @php($alertaActiva = $detalle)
+    @include('livewire.alertas.modales.detalle')
     @include('livewire.alertas.modales.crear')
-    @include('livewire.alertas.modales.drawer-graficos')
-    @include('livewire.alertas.modales.drawer-ubicacion')
+    @include('livewire.alertas.modales.especialidad')
     @include('livewire.alertas.modales.atender')
     @include('livewire.alertas.modales.cerrar')
-    @include('livewire.alertas.modales.detalle')
     @include('livewire.alertas.modales.resultado-cierre')
+    @include('livewire.alertas.modales.drawer-graficos')
+    @include('livewire.alertas.modales.drawer-ubicacion')
+    @endif
 </div>

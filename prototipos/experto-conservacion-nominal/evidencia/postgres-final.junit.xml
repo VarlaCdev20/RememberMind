@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\CARLAENCINAS\Desktop\RememberMind\phpunit.postgres.xml" tests="7" assertions="154" errors="0" failures="0" skipped="0" time="115.300344">
+    <testsuite name="Unit" tests="2" assertions="13" errors="0" failures="0" skipped="0" time="0.231255">
+      <testsuite name="Tests\Unit\ContratoNominalTest" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Unit\ContratoNominalTest.php" tests="2" assertions="13" errors="0" failures="0" skipped="0" time="0.231255">
+        <testcase name="test_el_ddl_y_la_cobertura_de_783_rutas_coinciden_con_el_codigo" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Unit\ContratoNominalTest.php" line="26" class="Tests\Unit\ContratoNominalTest" classname="Tests.Unit.ContratoNominalTest" assertions="5" time="0.226608"/>
+        <testcase name="test_sqlite_distingue_texto_precision_tipo_cero_negativo_null_y_ausencia" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Unit\ContratoNominalTest.php" line="40" class="Tests\Unit\ContratoNominalTest" classname="Tests.Unit.ContratoNominalTest" assertions="8" time="0.004647"/>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Feature" tests="5" assertions="141" errors="0" failures="0" skipped="0" time="115.069089">
+      <testsuite name="Tests\Feature\ConservacionNominalCompuestaTest" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\ConservacionNominalCompuestaTest.php" tests="5" assertions="141" errors="0" failures="0" skipped="0" time="115.069089">
+        <testcase name="test_diez_casos_recuperan_todas_las_entradas_y_reproducen_el_dto_con_ejecutor_retenido" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\ConservacionNominalCompuestaTest.php" line="91" class="Tests\Feature\ConservacionNominalCompuestaTest" classname="Tests.Feature.ConservacionNominalCompuestaTest" assertions="73" time="46.059664"/>
+        <testcase name="test_fallo_parcial_no_deja_filas_y_una_historia_cerrada_es_inmutable" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\ConservacionNominalCompuestaTest.php" line="112" class="Tests\Feature\ConservacionNominalCompuestaTest" classname="Tests.Feature.ConservacionNominalCompuestaTest" assertions="39" time="15.851543"/>
+        <testcase name="test_postgres_solapa_cierre_insercion_tardia_y_reintento_idempotente" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\ConservacionNominalCompuestaTest.php" line="144" class="Tests\Feature\ConservacionNominalCompuestaTest" classname="Tests.Feature.ConservacionNominalCompuestaTest" assertions="12" time="18.218022"/>
+        <testcase name="test_rechaza_identidad_ajena_propietario_cruzado_y_cierre_incompleto" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\ConservacionNominalCompuestaTest.php" line="214" class="Tests\Feature\ConservacionNominalCompuestaTest" classname="Tests.Feature.ConservacionNominalCompuestaTest" assertions="10" time="16.015224"/>
+        <testcase name="test_ensayo_poblado_se_retira_y_restauran_las_dos_ramas_sin_cambiar_tablas_instaladas" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\ConservacionNominalCompuestaTest.php" line="286" class="Tests\Feature\ConservacionNominalCompuestaTest" classname="Tests.Feature.ConservacionNominalCompuestaTest" assertions="7" time="18.924637"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

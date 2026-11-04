@@ -71,7 +71,7 @@ class ModalesMedicacionSeguridadClinicaTest extends TestCase
         ]);
 
         Area::firstOrCreate(
-            ['cod_area' => 'ARE_0001'],
+            ['cod_area' => 'COD_ARE_000001'],
             [
                 'nombre' => 'Enfermeria Clinica',
                 'descripcion' => 'Area de atencion y cuidados',
@@ -97,7 +97,7 @@ class ModalesMedicacionSeguridadClinicaTest extends TestCase
             ['cod_atencion' => 'ATN_TEST_01'],
             [
                 'cod_residente' => $this->adulto->cod_residente,
-                'cod_area' => 'ARE_0001',
+                'cod_area' => 'COD_ARE_000001',
                 'cod_personal' => $this->enfermero->personal->cod_personal,
                 'tipo_atencion' => 'CONTROL_MEDICO',
                 'motivo' => 'Control rutinario',

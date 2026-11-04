@@ -168,7 +168,7 @@ class FichaMedicaService
                         $existente->update(['estado' => 'ACTIVO', 'fecha_hora' => $ahora]);
                     } else {
                         Alergia::create([
-                            'cod_alergia' => 'ALE_'.strtoupper(Str::random(10)),
+                            'cod_alergia' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('alergias'),
                             'cod_residente' => $codResidente,
                             'cod_personal' => $codPersonal,
                             'tipo' => 'GENERAL',
@@ -187,7 +187,6 @@ class FichaMedicaService
                 AntecedenteClinico::updateOrCreate(
                     ['cod_residente' => $codResidente, 'tipo_antecedente' => 'QUIRURGICO'],
                     [
-                        'cod_antecedente' => 'ANT_'.strtoupper(Str::random(10)),
                         'cod_personal' => $codPersonal,
                         'descripcion' => trim($datos['cirugias']),
                         'fecha_referencia' => $ahora->toDateString(),
@@ -202,7 +201,6 @@ class FichaMedicaService
                 AntecedenteClinico::updateOrCreate(
                     ['cod_residente' => $codResidente, 'tipo_antecedente' => 'HOSPITALIZACION'],
                     [
-                        'cod_antecedente' => 'ANT_'.strtoupper(Str::random(10)),
                         'cod_personal' => $codPersonal,
                         'descripcion' => trim($datos['hospitalizaciones']),
                         'fecha_referencia' => $ahora->toDateString(),
@@ -217,7 +215,6 @@ class FichaMedicaService
                 AntecedenteClinico::updateOrCreate(
                     ['cod_residente' => $codResidente, 'tipo_antecedente' => 'NUTRICIONAL'],
                     [
-                        'cod_antecedente' => 'ANT_'.strtoupper(Str::random(10)),
                         'cod_personal' => $codPersonal,
                         'descripcion' => trim($datos['restricciones_alimentarias']),
                         'fecha_referencia' => $ahora->toDateString(),
@@ -237,7 +234,7 @@ class FichaMedicaService
                         $existente->update(['estado' => 'ACTIVO', 'fecha_hora' => $ahora]);
                     } else {
                         Diagnostico::create([
-                            'cod_diagnostico' => 'DIA_'.strtoupper(Str::random(10)),
+                            'cod_diagnostico' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('diagnosticos'),
                             'cod_residente' => $codResidente,
                             'cod_personal' => $codPersonal,
                             'nombre' => $nombreDiag,
@@ -256,7 +253,7 @@ class FichaMedicaService
 
             // 6. Observación Médica / Atención / Nota Clínica
             if (isset($datos['observacion_medica']) && trim((string) $datos['observacion_medica']) !== '') {
-                $codAtencion = 'ATN_'.strtoupper(Str::random(10));
+                $codAtencion = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('atenciones');
                 Atencion::create([
                     'cod_atencion' => $codAtencion,
                     'cod_residente' => $codResidente,
@@ -270,7 +267,7 @@ class FichaMedicaService
                 ]);
 
                 NotaClinica::create([
-                    'cod_nota' => 'NOT_'.strtoupper(Str::random(10)),
+                    'cod_nota' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('notas_clinicas'),
                     'cod_atencion' => $codAtencion,
                     'cod_residente' => $codResidente,
                     'cod_personal' => $codPersonal,

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Compartido\Infraestructura\Notificaciones\ExigirTransporteCorreoReal;
 use App\Models\Residente;
 use App\Modulos\Admisiones\Presentacion\Livewire\Funcionalidades\DecisionAdmisionModal;
 use App\Modulos\Admisiones\Presentacion\Livewire\Paginas\PreadmisionesPanel;
@@ -37,6 +38,8 @@ use App\Modulos\Valoraciones\Presentacion\Livewire\Funcionalidades\ValoracionMed
 use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\SaludEvaluacionesGeriatricasPanel;
 use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\SaludValoracionPanel;
 use Carbon\Carbon;
+use Illuminate\Mail\Events\MessageSending;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -59,10 +62,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Event::listen(MessageSending::class, ExigirTransporteCorreoReal::class);
+
         Carbon::setLocale('es');
         setlocale(LC_TIME, 'es_ES.utf8', 'es_ES', 'es');
 
         Permission::created(function (Permission $permission): void {
+            // La propietaria reservó esta ejecución a Medicina y Psicología, también al crear el permiso.
+            if (in_array($permission->name, ['fotografias_institucionales.gestionar', 'aplicaciones_instrumento.transcribir',
+                'evaluaciones_expertas.ejecutar_observaciones', 'reglas_expertas.gestionar', 'reglas_expertas.revisar',
+                'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar',
+                'controles_funcionales_iadl.crear', 'controles_funcionales_iadl.rectificar'], true)) {
+                return;
+            }
             Role::query()
                 ->where('name', 'SUPERADMINISTRADOR')
                 ->where('guard_name', $permission->guard_name)
@@ -125,6 +137,7 @@ class AppServiceProvider extends ServiceProvider
         Livewire::component('alertas.campana-notificaciones', CampanaNotificaciones::class);
         Livewire::component('alertas.salud-alertas-panel', SaludAlertasPanel::class);
         Livewire::component('alertas.alertas-panel', AlertasPanel::class);
+        Livewire::component('alertas.comparar-roles', \App\Modulos\Alertas\Presentacion\Livewire\Paginas\CompararAlertasRoles::class);
         Livewire::component('features.alertas.historial-alerta', HistorialAlerta::class);
         Livewire::component('medicacion.medicacion-adulto-modal', MedicacionAdultoModal::class);
         Livewire::component('medicacion.salud-medicacion-panel', SaludMedicacionPanel::class);

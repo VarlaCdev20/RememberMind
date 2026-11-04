@@ -17,11 +17,21 @@ class PersonalInstitucionalHorariosTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        (require base_path('database/propuestas/gerencia/2026_10_26_000002_historia_vinculos_asignaciones.php'))->up();
+        \Spatie\Permission\Models\Permission::findOrCreate('turnos.asignar', 'web');
+        $actor = User::factory()->create(['estado' => 'ACTIVO']);
+        $actor->givePermissionTo('turnos.asignar');
+        $this->actingAs($actor);
+    }
+
     public function test_creates_schedule_rows_and_updates_user_area(): void
     {
         $user = $this->crearUsuarioConRol('ENFERMEROS');
         $area = $this->crearArea('ARE_0004', 'AREA DE ATENCION MEDICA', 'Salud');
-        $turno = $this->crearTurno('TUR_0001', 'MANANA', '08:00:00', '16:00:00');
+        $turno = $this->crearTurno('COD_TUR_000001', 'MANANA', '08:00:00', '16:00:00');
 
         Livewire::test(PersonalInstitucionalHorarios::class, [
             'usuarioId' => $user->cod_usuario,
@@ -44,11 +54,11 @@ class PersonalInstitucionalHorariosTest extends TestCase
         ]);
     }
 
-    public function test_editing_an_assignment_finalizes_previous_rows_and_creates_a_new_version(): void
+    public function test_edicion_posterior_conserva_ocurrencias_anteriores_y_registra_nuevas_fechas(): void
     {
         $user = $this->crearUsuarioConRol('ENFERMEROS');
         $area = $this->crearArea('ARE_0004', 'AREA DE ATENCION MEDICA', 'Salud');
-        $turnoManana = $this->crearTurno('TUR_0001', 'MANANA', '08:00:00', '16:00:00');
+        $turnoManana = $this->crearTurno('COD_TUR_000001', 'MANANA', '08:00:00', '16:00:00');
         $turnoTarde = $this->crearTurno('TUR_0002', 'TARDE', '16:00:00', '22:00:00');
 
         Livewire::test(PersonalInstitucionalHorarios::class, [
@@ -80,13 +90,41 @@ class PersonalInstitucionalHorariosTest extends TestCase
             ->assertHasNoErrors();
 
         $personal = $user->personal()->firstOrFail();
-        $this->assertSame(2, AsignacionPersonal::where('cod_personal', $personal->cod_personal)->where('estado', 'ACTIVO')->count());
-        $this->assertSame(2, AsignacionPersonal::where('cod_personal', $personal->cod_personal)->where('estado', 'INACTIVO')->count());
+        $this->assertSame(4, AsignacionPersonal::where('cod_personal', $personal->cod_personal)->where('estado', 'ACTIVO')->count());
+        $this->assertSame(0, AsignacionPersonal::where('cod_personal', $personal->cod_personal)->where('estado', 'INACTIVO')->count());
+        $this->assertSame(2,AsignacionPersonal::where('cod_personal',$personal->cod_personal)->whereHas('jornada',fn($q)=>$q->where('fecha_jornada','<','2026-06-15'))->where('estado','ACTIVO')->count());
         $this->assertDatabaseHas('asignaciones_personal', [
             'cod_personal' => $personal->cod_personal,
             'cod_area' => $area->cod_area,
             'estado' => 'ACTIVO',
         ]);
+    }
+
+    public function test_displays_both_active_assignment_states_and_preserves_finalized_state(): void
+    {
+        $user = $this->crearUsuarioConRol('ENFERMEROS');
+        $area = $this->crearArea('ARE_0004', 'AREA DE ATENCION MEDICA', 'Salud');
+        $turno = $this->crearTurno('COD_TUR_000001', 'MANANA', '08:00:00', '16:00:00');
+
+        Livewire::test(PersonalInstitucionalHorarios::class, ['usuarioId' => $user->cod_usuario])
+            ->set('f_cod_area', $area->cod_area)
+            ->set('f_cod_turno', $turno->cod_turno)
+            ->set('f_dias_semana', ['LUNES'])
+            ->set('f_fecha_inicio', '2026-06-08')
+            ->set('f_tipo_asignacion', 'ROTATIVO')
+            ->call('guardar')
+            ->assertHasNoErrors();
+
+        $asignacion = AsignacionPersonal::where('cod_personal', $user->personal->cod_personal)->sole();
+
+        foreach (['ACTIVO' => 'ACTIVA', 'ACTIVA' => 'ACTIVA', 'INACTIVO' => 'FINALIZADA'] as $guardado => $visible) {
+            $asignacion->update(['estado' => $guardado]);
+
+            Livewire::test(PersonalInstitucionalHorarios::class, ['usuarioId' => $user->cod_usuario])
+                ->assertSet('asignaciones.0.estado', $visible);
+
+            $this->assertSame($guardado, $asignacion->fresh()->estado);
+        }
     }
 
     private function crearUsuarioConRol(string $rol): User

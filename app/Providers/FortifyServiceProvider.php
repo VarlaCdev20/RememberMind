@@ -63,6 +63,14 @@ class FortifyServiceProvider extends ServiceProvider
             FailedPasswordResetLinkRequestResponse::class,
             PasswordResetLinkResponse::class
         );
+        $this->app->bind(\Laravel\Fortify\Contracts\PasswordResetResponse::class,
+            \App\Modulos\Identidad\Presentacion\Http\Responses\RestablecimientoContrasenaResponse::class);
+        $this->app->bind(\Laravel\Fortify\Contracts\FailedPasswordResetResponse::class,
+            \App\Modulos\Identidad\Presentacion\Http\Responses\RestablecimientoContrasenaResponse::class);
+        $this->app->bind(\Laravel\Fortify\Http\Controllers\NewPasswordController::class,
+            \App\Modulos\Identidad\Presentacion\Http\Controllers\RestablecerContrasenaController::class);
+        $this->app->bind(\Laravel\Fortify\Http\Controllers\PasswordResetLinkController::class,
+            \App\Modulos\Identidad\Presentacion\Http\Controllers\SolicitarRecuperacionContrasenaController::class);
     }
 
 
@@ -71,11 +79,26 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \Illuminate\Support\Facades\Auth::provider('usuarios_activos', function ($app, array $config) {
+            return new \App\Modulos\Identidad\Infraestructura\Autenticacion\ProveedorUsuariosActivos($app['hash'], $config['model']);
+        });
         $this->configureActions();
 
         $this->configureAuthentication();
 
         $this->configureRateLimiting();
+
+        Fortify::resetPasswordView(function (Request $request) {
+            $correo = $request->query(Fortify::email(), '');
+
+            return response()->view('auth.reset-password', [
+                'request' => $request,
+                'correo' => is_string($correo) ? mb_strtolower(trim($correo)) : '',
+                'politica' => ResetUserPassword::passwordPolicy(),
+                'enlaceValido' => app(\App\Modulos\Identidad\Aplicacion\Consultas\ConsultarEnlaceRecuperacion::class)
+                    ->esUtilizable($correo, $request->route('token')),
+            ])->header('Cache-Control', 'no-store, private')->header('Referrer-Policy', 'no-referrer');
+        });
     }
 
 

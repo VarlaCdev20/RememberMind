@@ -24,6 +24,14 @@ Fase 2 fue una revisión estática. Fase 3 ejecutó verificación acotada en Pos
 
 ## 1. Propósito
 
+### Planificación asistencial en jornadas futuras — 2026-10-11
+
+La instrucción de la propietaria de mantener los residentes asignados durante una guardia continua de 48 horas requiere registrar también sus jornadas futuras. `GestionarAsignacionesJornada` admite esas fechas únicamente sobre jornadas existentes, abiertas a planificación, y con asignación laboral activa del profesional a un área activa. La cuenta y el perfil de Enfermería deben estar activos y el residente admitido. El actor necesita cuenta activa y `turnos.asignar`; los niveles de supervisión se indican expresamente por residente.
+
+Planificar no habilita escritura clínica antes del horario: se conservan los controles de ventana temporal y alcance de Enfermería. La operación bloquea la jornada antes de comprobar duplicados y registra actor y asignación mediante Activitylog en la misma transacción. No altera camas, historia clínica, permisos ni esquema. La validación adicional de planificación se aplica a fechas futuras; no certifica todos los caminos históricos del módulo.
+
+Evidencia ejecutable: `AsignacionesJornadaPlanificadaTest` cubre los cuatro niveles, denegaciones de cuenta/permiso/rol/personal/área/asignación/jornada/turno/residente, duplicados, auditoría y límites horarios. Se incluye en el gate PostgreSQL. Los resultados de ejecución se informan por entorno; SQLite no acredita concurrencia PostgreSQL.
+
 ### Consulta de Enfermería fuera de turno — decisión del propietario, 2026-10-10
 
 Fuera de turno, Enfermería consulta **solo sus residentes asignados**, sin heredar
@@ -183,11 +191,11 @@ Contexto conecta cuidados y emisor/receptor de pase; responsable de área se mue
 
 ## 22. Entrada UI
 
-[resources/views/livewire/identidad/turnos-asignaciones-panel.blade.php](../../../resources/views/livewire/identidad/turnos-asignaciones-panel.blade.php)
+[resources/views/livewire/identidad/turnos-asignaciones-panel.blade.php](../../../app/Modulos/Institucion/Presentacion/Vistas/livewire/identidad/turnos-asignaciones-panel.blade.php)
 
 ## 23. Livewire / Controllers
 
-[app/Frontend/Livewire/Administracion/Identidad/TurnosAsignacionesPanel.php](../../../app/Frontend/Livewire/Administracion/Identidad/TurnosAsignacionesPanel.php), [app/Http/Controllers/Identidad/InstitucionalController.php](../../../app/Http/Controllers/Identidad/InstitucionalController.php), [app/Http/Controllers/Cuidados/CuidadoController.php](../../../app/Http/Controllers/Cuidados/CuidadoController.php)
+[app/Modulos/Institucion/Presentacion/Livewire/Paginas/TurnosAsignacionesPanel.php](../../../app/Modulos/Institucion/Presentacion/Livewire/Paginas/TurnosAsignacionesPanel.php), [app/Http/Controllers/Identidad/InstitucionalController.php](../../../app/Modulos/Institucion/Presentacion/Http/Controllers/InstitucionalController.php), [app/Http/Controllers/Cuidados/CuidadoController.php](../../../app/Modulos/Cuidados/Presentacion/Http/Controllers/CuidadoController.php)
 
 ## 24. Actions
 
@@ -195,7 +203,7 @@ NONE OBSERVED en el recorrido investigado; no se exige una clase vacía por sime
 
 ## 25. Services
 
-[app/Backend/Modulos/Enfermeria/Servicios/TurnoEnfermeriaService.php](../../../app/Backend/Modulos/Enfermeria/Servicios/TurnoEnfermeriaService.php), [app/Backend/Modulos/Enfermeria/Servicios/MiTurnoService.php](../../../app/Backend/Modulos/Enfermeria/Servicios/MiTurnoService.php)
+[app/Modulos/Cuidados/Aplicacion/Consultas/TurnoEnfermeriaService.php](../../../app/Modulos/Cuidados/Aplicacion/Consultas/TurnoEnfermeriaService.php), [app/Modulos/Cuidados/Aplicacion/Consultas/MiTurnoService.php](../../../app/Modulos/Cuidados/Aplicacion/Consultas/MiTurnoService.php)
 
 ## 26. Policies
 

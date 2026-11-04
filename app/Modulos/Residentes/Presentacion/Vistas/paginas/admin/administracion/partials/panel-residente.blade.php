@@ -28,7 +28,7 @@
         @endif
         <div>
             <h3>{{ $nombreResidente }}</h3>
-            <p>{{ $residente->cod_residente }}{{ $residente->numero_documento ? ' · CI '.$residente->numero_documento : '' }}{{ $residente->edad !== null ? ' · '.$residente->edad.' años' : '' }}</p>
+            <p>{{ collect([$residente->numero_documento ? 'CI '.$residente->numero_documento : null, $residente->edad !== null ? $residente->edad.' años' : null])->filter()->implode(' · ') }}</p>
             <x-ui.status-badge :estado="$residente->estado" />
         </div>
     </header>

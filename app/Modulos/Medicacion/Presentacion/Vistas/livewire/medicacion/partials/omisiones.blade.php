@@ -23,7 +23,7 @@
 
  {{-- Tabla Continua con Proporciones Estables y Scroll Horizontal Responsivo --}}
  <div class="w-full overflow-hidden">
- <table class="rm-data-table rm-data-table--actions w-full table-auto text-left border-collapse">
+ <table class="rm-medication-workspace__dose-table rm-data-table rm-data-table--actions w-full table-auto text-left border-collapse">
  <thead>
  <tr class="bg-[var(--rm-surface-soft)] text-[11px] font-[700] text-[var(--rm-text-muted)] uppercase tracking-wider border-b border-[var(--rm-border-soft)]">
   <th class="px-2.5 py-2.5 w-[65px] text-center">Hora</th>
@@ -52,14 +52,14 @@
   class="cursor-pointer transition-colors duration-150 hover:bg-[var(--rm-surface-soft)]/50 dark:hover:bg-[var(--rm-surface-raised)]/[0.03]">
 
   {{-- Hora --}}
-  <td class="px-2.5 py-2.5 text-center whitespace-nowrap">
+  <td data-label="Hora" class="px-2.5 py-2.5 text-center whitespace-nowrap">
   <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-[var(--rm-surface-soft)] border border-[var(--rm-border-soft)] text-[var(--rm-text-primary)] font-mono text-[11px] font-[700]">
   {{ $horaStr }}
   </span>
   </td>
 
   {{-- Residente --}}
-  <td class="px-3 py-2.5">
+  <td data-label="Residente" class="px-3 py-2.5">
   <div class="flex items-center gap-2 min-w-0">
   <div class="w-7 h-7 rounded-full bg-[var(--rm-surface-soft)] border border-[var(--rm-border-soft)] flex items-center justify-center font-[700] text-[10.5px] text-[var(--rm-text-primary)] shrink-0">
    {{ $iniciales }}
@@ -71,19 +71,19 @@
   </td>
 
   {{-- Medicamento --}}
-  <td class="px-3 py-2.5">
+  <td data-label="Medicamento" class="px-3 py-2.5">
   <span class="font-[600] text-[13px] text-[var(--rm-text-primary)] leading-snug break-words whitespace-normal">
   {{ $omision->prescripcion?->medicamento?->nombre_generico ?? ($omision->prescripcion?->nombre_medicamento ?? 'Medicamento') }}
   </span>
   </td>
 
   {{-- Dosis --}}
-  <td class="px-2 py-2.5 text-[var(--rm-text-muted)] font-mono text-[11.5px] whitespace-nowrap">
+  <td data-label="Dosis" class="px-2 py-2.5 text-[var(--rm-text-muted)] font-mono text-[11.5px] whitespace-nowrap">
   {{ $omision->prescripcion?->dosis ?? '1' }} {{ $omision->prescripcion?->unidad_dosis ?? 'comp' }}
   </td>
 
   {{-- Motivo con Tag de Omisión --}}
-  <td class="px-3 py-2.5">
+  <td data-label="Motivo" class="px-3 py-2.5">
   <div class="space-y-0.5">
   <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10.5px] font-[700] bg-[var(--rm-danger-soft)] dark:bg-[var(--rm-danger-soft)] text-[var(--rm-danger)] border border-[var(--rm-danger)]/40">
    <i class="ph-bold ph-warning text-xs"></i>
@@ -98,12 +98,12 @@
   </td>
 
   {{-- Profesional --}}
-  <td class="px-2.5 py-2.5 text-[var(--rm-text-primary)] whitespace-nowrap font-medium text-xs">
+  <td data-label="Profesional" class="px-2.5 py-2.5 text-[var(--rm-text-primary)] whitespace-nowrap font-medium text-xs">
   {{ $omision->personal?->nombres ?? ($omision->registrador?->nombres ?? 'Personal de enfermería') }}
   </td>
 
   {{-- Acción: Botón Ver --}}
-  <td class="px-2.5 py-2.5 text-right whitespace-nowrap" @click.stop>
+  <td data-label="Acción" class="px-2.5 py-2.5 text-right whitespace-nowrap" @click.stop>
   <button
   type="button"
   wire:click="abrirDrawerDosis('{{ $codPresc }}', '{{ $horaStr }}', '{{ $codRes }}')"

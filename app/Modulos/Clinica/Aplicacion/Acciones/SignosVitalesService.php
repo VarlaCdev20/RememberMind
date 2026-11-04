@@ -132,7 +132,7 @@ class SignosVitalesService
                 'fecha_hora' => $fechaHora,
             ], $codResidente);
             $signo = SignoVital::create([
-                'cod_signo' => 'SGN_'.strtoupper(Str::random(10)),
+                'cod_signo' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('signos_vitales'),
                 'cod_residente' => $codResidente,
                 'cod_personal' => $codPersonal,
                 'fecha_hora' => $fechaHora,
@@ -175,7 +175,7 @@ class SignosVitalesService
             $fechaHora = Carbon::parse($datos['fecha'].' '.$datos['hora']);
 
             return SignoVital::create([
-                'cod_signo' => 'SGN_'.strtoupper(Str::random(10)),
+                'cod_signo' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('signos_vitales'),
                 'cod_residente' => $bloqueado->cod_residente,
                 'cod_personal' => $codPersonal,
                 'fecha_hora' => $fechaHora,

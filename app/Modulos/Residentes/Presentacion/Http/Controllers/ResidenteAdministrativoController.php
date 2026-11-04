@@ -21,6 +21,9 @@ class ResidenteAdministrativoController extends Controller
     {
         $persona = $residente;
         $this->authorize('view', $persona);
+        if ($request->user()->hasRole('GERENTE') && !$request->user()->hasRole('SUPERADMINISTRADOR')) {
+            return $this->gerencia($request, $persona);
+        }
         $tab = $request->validate(['tab' => ['sometimes', 'in:'.implode(',', array_keys(self::TABS))]])['tab'] ?? 'resumen';
 
         $ocupacion = DB::table('ocupaciones_cama as oc')
@@ -96,5 +99,36 @@ class ResidenteAdministrativoController extends Controller
     private function fila(string $titulo, ?string $detalle, ?string $fecha, ?string $estado): array
     {
         return compact('titulo', 'detalle', 'fecha', 'estado');
+    }
+
+    private function gerencia(Request $request, Residente $persona)
+    {
+        $usuario = $request->user();
+        $tabs = ['resumen' => 'Identidad administrativa', 'historial' => 'Historia administrativa'];
+        if ($usuario->can('habitaciones.ver') && $usuario->can('ocupaciones_cama.ver')) $tabs['ubicacion'] = 'Alojamiento';
+        if ($usuario->can('admisiones.ver')) $tabs['admision'] = 'Admisión';
+        if ($usuario->can('contactos.ver') && $usuario->can('residentes_contactos.ver')) $tabs['contactos'] = 'Contactos autorizados';
+        $tab = $request->query('tab', 'resumen');
+        abort_unless(is_string($tab) && array_key_exists($tab, $tabs), 403, 'No tienes acceso a esta sección del expediente.');
+        $codigo = $persona->getKey();
+        $filas = match ($tab) {
+            'ubicacion' => DB::table('ocupaciones_cama as oc')->join('camas as c', 'c.cod_cama', '=', 'oc.cod_cama')
+                ->join('habitaciones as h', 'h.cod_habitacion', '=', 'c.cod_habitacion')->where('oc.cod_residente', $codigo)
+                ->orderByDesc('oc.fecha_hora_asignacion')->orderBy('oc.cod_ocupacion')
+                ->get(['h.codigo as habitacion','c.codigo as cama','oc.fecha_hora_asignacion','oc.fecha_hora_liberacion','oc.estado'])
+                ->map(fn ($r) => $this->fila('Habitación '.$r->habitacion.' · Cama '.$r->cama,
+                    $r->fecha_hora_liberacion ? 'Liberada el '.\Carbon\Carbon::parse($r->fecha_hora_liberacion)->format('d/m/Y H:i') : 'Sin liberación registrada', $r->fecha_hora_asignacion, $r->estado)),
+            'admision' => DB::table('admisiones')->where('cod_residente', $codigo)->orderByDesc('fecha_hora_admision')
+                ->get(['tipo_ingreso','fecha_hora_admision','estado'])->map(fn ($r) => $this->fila('Admisión formal', str_replace('_', ' ', $r->tipo_ingreso), $r->fecha_hora_admision, $r->estado)),
+            'contactos' => DB::table('residentes_contactos as rc')->join('contactos as c','c.cod_contacto','=','rc.cod_contacto')
+                ->where('rc.cod_residente',$codigo)->orderByDesc('rc.responsable_principal')->orderBy('c.apellido_paterno')
+                ->get(['c.nombres','c.apellido_paterno','c.celular','rc.parentesco','rc.responsable_principal','rc.estado'])
+                ->map(fn ($r) => $this->fila($r->nombres.' '.$r->apellido_paterno, $r->parentesco.($r->responsable_principal ? ' · Responsable principal' : '').($r->celular ? ' · '.$r->celular : ''), null, $r->estado)),
+            'historial' => DB::table('historial_estados_residente')->where('cod_residente',$codigo)->orderByDesc('fecha_hora')
+                ->get(['estado_nuevo','motivo','fecha_hora'])->map(fn ($r) => $this->fila(str_replace('_', ' ', $r->estado_nuevo), \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($r->motivo), $r->fecha_hora, $r->estado_nuevo)),
+            default => collect(),
+        };
+
+        return view('residentes::paginas.gerencia.ficha', compact('persona','tabs','tab','filas'));
     }
 }

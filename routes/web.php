@@ -27,6 +27,12 @@ $rutas['Cuidados'] = require base_path('app/Modulos/Cuidados/Presentacion/Rutas/
 
 $rutas['Compartido']['ruta_001']();
 
+Route::middleware(['auth:sanctum','cuenta.activa'])->group(function () {
+    Route::get('/cambiar-contrasena-inicial', [\App\Modulos\Identidad\Presentacion\Http\Controllers\CambiarPasswordInicialController::class,'show'])->name('password.inicial');
+    Route::post('/cambiar-contrasena-inicial', [\App\Modulos\Identidad\Presentacion\Http\Controllers\CambiarPasswordInicialController::class,'guardar'])
+        ->middleware('throttle:6,1')->name('password.inicial.guardar');
+});
+
 /*
 |--------------------------------------------------------------------------
 | RUTAS AUTENTICADAS
@@ -153,6 +159,7 @@ Route::middleware([
             $rutas['Institucion']['ruta_034']();
 
             $rutas['Institucion']['ruta_035']();
+            $rutas['Institucion']['galeria']();
 
             $rutas['Institucion']['ruta_036']();
 
@@ -576,6 +583,7 @@ Route::middleware([
             Route::prefix('psicologia')
                 ->name('psicologia.')
                 ->group(function () use ($rutas) {
+                    $rutas['ApoyoDecision']['revision_psicologia']();
                     $rutas['Valoraciones']['ruta_173']();
                     $rutas['Valoraciones']['ruta_174']();
                     $rutas['Valoraciones']['ruta_175']();
@@ -587,7 +595,8 @@ Route::middleware([
                     $rutas['Valoraciones']['ruta_178']();
 
                     $rutas['Valoraciones']['ruta_179']();
-
+                    $rutas['Valoraciones']['ruta_psicologia_ficha']();
+                    $rutas['Valoraciones']['ruta_psicologia_actividad_general']();
                 });
 
             /*

@@ -5,25 +5,56 @@ namespace App\Modulos\ApoyoDecision\Aplicacion\Consultas;
 use App\Models\ControlCognitivo;
 use App\Models\EvaluacionCriterio;
 use App\Models\EvaluacionExperta;
-use App\Models\NodoSemantico;
 use App\Models\Residente;
 use App\Models\User;
-use App\Modulos\ApoyoDecision\Aplicacion\Acciones\CargarConocimientoOrion;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto as L;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Gate;
 
 /** Lectura exacta del historial: no ejecuta el motor ni remapea fuentes. */
 final class LecturaResultadosExperto
 {
+    /** Resume exclusivamente una lectura clínica conservada del período; jamás publica pruebas técnicas. */
+    public function resumenMemoriaEnPeriodo(User $usuario, Residente $residente, CarbonImmutable $desde, CarbonImmutable $hasta): ?array
+    {
+        Gate::forUser($usuario)->authorize('consultarResultados', [EvaluacionExperta::class, $residente]);
+        if (! config('sistema_experto.lectura_clinica', [])) {
+            return null;
+        }
+        $id = AlcanceLecturaExperta::limitar(EvaluacionExperta::query()->paraLecturaD137())
+            ->where('cod_residente', $residente->getKey())->whereBetween('fecha_hora_inicio', [$desde, $hasta])
+            ->whereIn('cod_version_modelo', array_keys(config('sistema_experto.lectura_clinica', [])))
+            ->whereHas('version', fn ($q) => $q->whereNotLike('codigo_version', '%TEST%'))
+            ->whereNotLike('estado_ejecucion', '%TEST%')->whereNotLike('origen_activacion', '%TEST%')
+            ->whereHas('evaluacionCriterios', fn ($q) => $q->where('tipo_registro', 'D137')
+                ->whereHas('criterio', fn ($n) => $n->where('codigo_semantico', 'COG-MEM')))
+            ->orderByDesc('fecha_hora_inicio')->orderByDesc('cod_evaluacion_experta')->value('cod_evaluacion_experta');
+        if (! $id) {
+            return null;
+        }
+        $lectura = $this->consultar($usuario, $residente, $id, 'COG-MEM');
+        $detalle = $lectura['detalle'];
+        if (! $detalle['autorizado']) {
+            return null;
+        }
+
+        return ['estado' => $detalle['resultado'] && ! $detalle['integridad'] ? 'Hallazgo sustentado' : 'Información insuficiente',
+            'observacion' => $detalle['resultado']['titulo'] ?? 'No se dispone de una conclusión experta verificable.',
+            'alcance' => $detalle['interpretacion'], 'fecha' => $lectura['evaluacion']['fecha'],
+            'autor' => $lectura['evaluacion']['solicitante'] ?? 'Solicitante no disponible'];
+    }
+
+    /** Recupera la evaluación histórica exacta y valida su soporte sin ejecutar inferencia. */
     public function consultar(User $usuario, Residente $residente, ?string $id, string $criterio, int $pagina = 1): array
     {
         Gate::forUser($usuario)->authorize('consultarResultados', [EvaluacionExperta::class, $residente]);
         abort_unless(isset(L::CRITERIOS[$criterio]), 422);
-        $base = AlcanceLecturaExperta::limitar(EvaluacionExperta::query()->where('cod_residente', $residente->cod_residente));
+        $base = AlcanceLecturaExperta::limitar(EvaluacionExperta::query()->paraLecturaD137()->where('cod_residente', $residente->cod_residente));
         $historial = (clone $base)
             ->orderByDesc('fecha_hora_inicio')->orderByDesc('cod_evaluacion_experta')->paginate(8, ['*'], 'historia', $pagina);
         $id ??= (clone $base)->orderByDesc('fecha_hora_inicio')->orderByDesc('cod_evaluacion_experta')->value('cod_evaluacion_experta');
         $relaciones = [
+            'evaluacionCriterios' => static fn ($q) => $q->where('tipo_registro', 'D137'),
             'version', 'personalSolicitante', 'evaluacionCriterios.criterio',
             'evidenciasEvaluacion.mapeoVariableFuente.fuente',
             'evidenciasEvaluacion.relacionesEvidenciasEvaluacionPorEvidenciaOrigen',
@@ -37,6 +68,8 @@ final class LecturaResultadosExperto
             'evaluacionCriterios.traza.evaluacionesReglas.regla.consecuenciasReglaExperta.criterioDominioResultado',
             'evaluacionCriterios.traza.evaluacionesReglas.regla.consecuenciasReglaExperta.valor',
             'evaluacionCriterios.traza.evaluacionesReglas.evaluacionesCondicionesRegla.condicion',
+            'evaluacionCriterios.traza.evaluacionesReglas.evaluacionesCondicionesRegla.condicion.variable.nodo',
+            'evaluacionCriterios.traza.evaluacionesReglas.evaluacionesCondicionesRegla.condicion.valor',
             'evaluacionCriterios.traza.evaluacionesReglas.evaluacionesCondicionesRegla.evidenciasSoporteCondicion',
         ];
         $historial->getCollection()->load($relaciones);
@@ -66,23 +99,16 @@ final class LecturaResultadosExperto
         return ['residente' => ['codigo' => $residente->cod_residente, 'nombre' => trim(implode(' ', [$residente->nombres, $residente->apellido_paterno, $residente->apellido_materno])), 'edad' => $edad],
             'evaluacion' => $evaluacion ? ['id' => $evaluacion->getKey(), 'fecha' => $evaluacion->fecha_hora_inicio?->format('d/m/Y H:i'), 'version' => $evaluacion->version?->codigo_version ?? 'No disponible', 'estado' => $evaluacion->estado_ejecucion, 'solicitante' => $evaluacion->personalSolicitante ? trim(implode(' ', [$evaluacion->personalSolicitante->nombres, $evaluacion->personalSolicitante->apellido_paterno, $evaluacion->personalSolicitante->apellido_materno])) : null] : null,
             'perfil' => $perfil, 'detalle' => $perfil[$criterio], 'historial' => $historial,
-            'prueba_tecnica' => AlcanceLecturaExperta::habilitada(),
-            'informe_tecnico' => $criterio === 'COG-MEM'
-                ? AlcanceLecturaExperta::informe($evaluacion?->getKey(), $residente->getKey()) : null,
-            'conocimiento_documental' => ! $evaluacion ? $this->conocimientoDocumental($criterio) : null,
-            'preparacion_memoria' => $criterio === 'COG-MEM' && ! $evaluacion
-                ? (new PreparacionFuentesCOGMEM)->consultar($usuario, $residente) : null,
-            'registros_cognitivos' => $criterio === 'COG-MEM' && ! $evaluacion
+            'grupos_origen' => $evaluacion ? ($this->gruposOrigen($evaluacion) ?? []) : [],
+            'autonomia' => $evaluacion ? ['disponible' => false, 'actividades' => [], 'acredita_independencia' => false,
+                'motivo' => 'La información funcional no está conservada dentro de esta evaluación. Las observaciones actuales del expediente no completan su evidencia histórica.']
+                : (new ConsultarAutonomiaDescriptiva)->consultar($usuario, $residente),
+            'prueba_tecnica' => false,
+            'informe_tecnico' => null,
+            'conocimiento_documental' => null,
+            'preparacion_memoria' => null,
+            'registros_cognitivos' => ! $evaluacion
                 ? $this->registrosCognitivos($residente) : []];
-    }
-
-    private function conocimientoDocumental(string $criterio): ?array
-    {
-        $nodo = NodoSemantico::query()->with('version')
-            ->where('cod_version_modelo', CargarConocimientoOrion::VERSION)->where('codigo_semantico', $criterio)->first();
-
-        return $nodo ? ['version' => $nodo->version->codigo_version, 'nombre' => $nodo->nombre,
-            'definicion' => $nodo->definicion, 'procedencia' => $nodo->observacion] : null;
     }
 
     /** Datos guardados de la fuente operativa; nunca equivalen a una inferencia. */
@@ -92,7 +118,7 @@ final class LecturaResultadosExperto
             'repite_preguntas' => 'Repetición de preguntas', 'olvida_indicaciones' => 'Olvido de indicaciones',
             'cambio_cognitivo' => 'Cambio cognitivo registrado'];
 
-        return ControlCognitivo::query()->where('cod_residente', $residente->getKey())
+        return FuentesValoracionOperativa::limitar(ControlCognitivo::query())->where('cod_residente', $residente->getKey())
             ->where('estado', 'VIGENTE')->where('fecha_hora', '<=', now())
             ->with('personal:cod_personal,nombres,apellido_paterno,apellido_materno')
             ->orderByDesc('fecha_hora')->orderByDesc('cod_control_cognitivo')->limit(5)->get()
@@ -117,9 +143,11 @@ final class LecturaResultadosExperto
             })->all();
     }
 
+    /** Conserva estado y evaluabilidad originales para el presentador y verifica la traza almacenada. */
     private function detalle(?EvaluacionExperta $evaluacion, ?EvaluacionCriterio $ec, string $codigo): array
     {
-        $d = ['estado' => 'Sin evaluación disponible', 'activacion' => 'Conocimiento no activado', 'evaluabilidad' => null, 'modificador' => null, 'motivo' => null,
+        $d = ['criterio_registrado' => $ec !== null, 'evaluabilidad_codigo' => $ec?->estado_evaluabilidad,
+            'estado' => 'Sin evaluación disponible', 'activacion' => 'Conocimiento no activado', 'evaluabilidad' => null, 'modificador' => null, 'motivo' => null,
             'resultado' => null, 'interpretacion' => 'Todavía no hay una evaluación guardada para esta área. No se ha emitido una conclusión.', 'evidencias' => [], 'reglas' => [], 'integridad' => [], 'traza' => null, 'autorizado' => false];
         if (! $ec) {
             return $d;
@@ -131,7 +159,7 @@ final class LecturaResultadosExperto
         $autorizado = in_array($codigo, $contrato['criterios'] ?? [], true)
             && in_array($evaluacion->estado_ejecucion, $contrato['estados_ejecucion'] ?? [], true);
         $d['autorizado'] = $autorizado;
-        $d['activacion'] = $autorizado ? (AlcanceLecturaExperta::habilitada() ? 'Resultado de prueba técnica' : 'Lectura histórica autorizada') : 'Conocimiento no activado';
+        $d['activacion'] = $autorizado ? 'Lectura histórica autorizada' : 'Conocimiento no activado';
         $d['estado'] = 'Publicación clínica no habilitada';
         $d['interpretacion'] = 'El conocimiento de esta área y versión no tiene un contrato de publicación clínica habilitado. No se publica una interpretación.';
         if (! in_array($ec->estado_evaluabilidad, ['EV-CM-0', 'EV-CM-1', 'EV-CM-2'], true)) {
@@ -161,7 +189,18 @@ final class LecturaResultadosExperto
                 'valor' => $e->valor?->codigo_valor, 'fecha' => $e->fecha_hora_incorporacion?->format('d/m/Y H:i'),
                 'admisibilidad' => $e->estado_admisibilidad, 'motivo' => $e->motivo_admisibilidad, 'representacion' => $e->estado_representacion,
                 'rol' => $participacion->rol_en_criterio, 'participacion' => $participacion->estado_participacion, 'justificacion' => $participacion->justificacion,
+                'relaciones' => $e->relacionesEvidenciasEvaluacionPorEvidenciaOrigen->map(fn ($r) => [
+                    'origen' => $r->cod_evidencia_origen, 'destino' => $r->cod_evidencia_destino, 'tipo' => $r->tipo_relacion,
+                ])->all(),
                 'papel' => $participacion->rol_en_criterio === 'CONTEXTUAL' ? 'Contexto' : 'No utilizada como soporte del resultado'];
+        }
+        $idsEvaluacion = $evaluacion->evidenciasEvaluacion->modelKeys();
+        foreach ($d['evidencias'] as $evidencia) {
+            foreach ($evidencia['relaciones'] as $relacion) {
+                if (! in_array($relacion['origen'], $idsEvaluacion, true) || ! in_array($relacion['destino'], $idsEvaluacion, true)) {
+                    $d['integridad'][] = 'Una relación de evidencia no pertenece a la evaluación conservada.';
+                }
+            }
         }
         if ($traza) {
             $d['traza'] = ['id' => $traza->getKey(), 'estado' => $traza->estado_inferencia, 'inicio' => $traza->fecha_hora_inicio?->format('d/m/Y H:i'), 'fin' => $traza->fecha_hora_fin?->format('d/m/Y H:i')];
@@ -216,9 +255,15 @@ final class LecturaResultadosExperto
                         $d['integridad'][] = 'Una regla satisfecha contiene condiciones no satisfechas.';
                     }
                     $soportesRegla = array_merge($soportesRegla, $soportes);
-                    $condiciones[] = ['id' => $c->getKey(), 'estado' => $condicionEvaluada->estado_condicion, 'variable' => $c->cod_variable_experta, 'valor' => $c->cod_valor_semantico, 'soportes' => $soportes];
+                    $condiciones[] = ['id' => $c->getKey(), 'estado' => $condicionEvaluada->estado_condicion,
+                        'variable' => $c->cod_variable_experta, 'variable_nombre' => $c->variable?->nodo?->nombre ?? $c->cod_variable_experta,
+                        'valor' => $c->cod_valor_semantico, 'valor_nombre' => $c->valor?->codigo_valor ?? $c->cod_valor_semantico,
+                        'soportes' => $soportes];
                 }
-                if (count($condiciones) !== $regla->condicionesReglaExperta->count() || ! $condiciones) {
+                $identidadesCondiciones = array_column($condiciones, 'id');
+                if (count($condiciones) !== $regla->condicionesReglaExperta->count() || ! $condiciones
+                    || count(array_unique($identidadesCondiciones)) !== count($identidadesCondiciones)
+                    || $regla->condicionesReglaExperta->pluck('cod_condicion_regla')->diff($identidadesCondiciones)->isNotEmpty()) {
                     $d['integridad'][] = 'La traza no conserva todas las condiciones de una regla evaluada.';
                 } elseif (($er->estado_regla === 'CUMPLE') !== collect($condiciones)->every(fn ($c) => $c['estado'] === 'CUMPLE')) {
                     $d['integridad'][] = 'El estado de una regla no coincide con sus condiciones conservadas.';
@@ -247,7 +292,10 @@ final class LecturaResultadosExperto
                         $d['evidencias'][$eid]['papel'] = 'Soporte de inferencia';
                     }
                 }
-                $d['reglas'][] = ['id' => $regla->getKey(), 'nombre' => $regla->nombre ?? 'Regla registrada', 'estado' => $er->estado_regla, 'condiciones' => $condiciones, 'consecuencias' => $cs];
+                $d['reglas'][] = ['id' => $regla->getKey(), 'nombre' => $regla->nombre ?? 'Regla registrada',
+                    'codigo' => $regla->codigo_regla, 'version' => $evaluacion->version?->codigo_version,
+                    'tipo' => $regla->tipo_regla, 'descripcion' => $regla->descripcion,
+                    'estado' => $er->estado_regla, 'condiciones' => $condiciones, 'consecuencias' => $cs];
             }
             if ($autorizado && ! in_array($traza->estado_inferencia, $contrato['estados_inferencia'] ?? [], true)) {
                 $d['integridad'][] = 'El estado de la traza no tiene un contrato de publicación autorizado.';
@@ -286,9 +334,7 @@ final class LecturaResultadosExperto
                     $d['integridad'][] = 'El resultado no coincide con las consecuencias conservadas de reglas satisfechas.';
                 } elseif ($autorizado) {
                     $d['resultado'] = L::RESULTADOS[$valor->codigo_valor] + ['codigo' => $valor->codigo_valor];
-                    $d['interpretacion'] = AlcanceLecturaExperta::habilitada()
-                        ? 'Resultado semántico de la ejecución artificial: '.$valor->codigo_valor.'. Comprueba el recorrido del motor, la evidencia y la presentación; no determina el estado cognitivo de una persona ni acredita validación profesional.'
-                        : $d['resultado']['interpretacion'];
+                    $d['interpretacion'] = $d['resultado']['interpretacion'];
                     $d['estado'] = $d['resultado']['titulo'];
                 }
             } elseif ($autorizado) {
@@ -300,6 +346,7 @@ final class LecturaResultadosExperto
         return $this->cerrarDetalle($d);
     }
 
+    /** Suprime conclusiones incompatibles sin alterar la evaluación persistida. */
     private function cerrarDetalle(array $d): array
     {
         if ($d['integridad']) {
@@ -322,13 +369,32 @@ final class LecturaResultadosExperto
         return $d;
     }
 
+    /** Contrasta independencia efectiva de soportes conservados para los hallazgos mixtos. */
     private function soportesIndependientes(array $rutas, EvaluacionExperta $evaluacion): bool
+    {
+        $grupos = $this->gruposOrigen($evaluacion);
+        if ($grupos === null) {
+            return false;
+        }
+        $conjuntos = [];
+        foreach (['DIFICULTAD_EVIDENCIADA', 'SIN_DIFICULTAD_EVIDENCIADA'] as $codigo) {
+            $ids = array_merge(...($rutas[$codigo] ?? []));
+            $efectivos = array_values(array_unique(array_map(fn ($id) => $grupos[$id], $ids)));
+            sort($efectivos, SORT_STRING);
+            $conjuntos[] = $efectivos;
+        }
+
+        return (bool) $conjuntos[0] && (bool) $conjuntos[1] && $conjuntos[0] !== $conjuntos[1];
+    }
+
+    /** Agrupa registros y relaciones del mismo episodio para no repetir su contribución. */
+    private function gruposOrigen(EvaluacionExperta $evaluacion): ?array
     {
         $grupos = [];
         foreach ($evaluacion->evidenciasEvaluacion as $e) {
             $mapa = $e->mapeoVariableFuente;
             if (! $mapa || $mapa->cod_version_modelo !== $evaluacion->cod_version_modelo || ! $mapa->fuente) {
-                return false;
+                return null;
             }
             $grupos[$e->getKey()] = serialize([$mapa->fuente->tabla_raiz, $e->cod_registro_fuente, $mapa->campo_valor ?? $mapa->clave_selector]);
         }
@@ -338,7 +404,7 @@ final class LecturaResultadosExperto
                     continue;
                 }
                 if (! isset($grupos[$r->cod_evidencia_origen], $grupos[$r->cod_evidencia_destino])) {
-                    return false;
+                    return null;
                 }
                 $a = $grupos[$r->cod_evidencia_origen];
                 $b = $grupos[$r->cod_evidencia_destino];
@@ -351,14 +417,7 @@ final class LecturaResultadosExperto
                 unset($g);
             }
         }
-        $conjuntos = [];
-        foreach (['DIFICULTAD_EVIDENCIADA', 'SIN_DIFICULTAD_EVIDENCIADA'] as $codigo) {
-            $ids = array_merge(...($rutas[$codigo] ?? []));
-            $efectivos = array_values(array_unique(array_map(fn ($id) => $grupos[$id], $ids)));
-            sort($efectivos, SORT_STRING);
-            $conjuntos[] = $efectivos;
-        }
 
-        return (bool) $conjuntos[0] && (bool) $conjuntos[1] && $conjuntos[0] !== $conjuntos[1];
+        return $grupos;
     }
 }

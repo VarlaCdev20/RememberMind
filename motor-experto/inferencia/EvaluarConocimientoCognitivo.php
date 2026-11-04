@@ -1,0 +1,87 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MotorExperto\inferencia;
+
+use DomainException;
+use MotorExperto\conocimiento\AdmisibilidadCognitivaInstitucional;
+use MotorExperto\conocimiento\AdmisibilidadFuenteCOGMEM;
+use MotorExperto\conocimiento\CompiladorPerfilCognitivo;
+use MotorExperto\conocimiento\MapeadorSemantico;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\inferencia\EvaluadorReglasCognitivas;
+use MotorExperto\explicacion\ConstructorTraza;
+use MotorExperto\explicacion\TrazaFuentesInstrumentales;
+use MotorExperto\hechos\MemoriaTrabajo;
+
+/** Ejecución declarativa pura sobre hechos originales y un paquete completo de cinco dominios. */
+final class EvaluarConocimientoCognitivo
+{
+    public function ejecutar(PaqueteConocimiento $p, MemoriaTrabajo $m): array
+    {
+        if ($p->version !== $m->contexto->version) {
+            throw new DomainException('El conocimiento y la memoria deben pertenecer a la misma revisión.');
+        }
+        $red = (new CompiladorPerfilCognitivo)->compilar($p);
+        $memoria = $red['dominios']['COG-MEM'];
+        $instrumentalesMemoria = array_fill_keys(array_column($m->paraCriterio($memoria), 'id'), true);
+        foreach ($m->todas() as $e) {
+            $original = (new MapeadorSemantico)->mapear($p, $m->contexto, $e->fuente, $e->mapeoVariable);
+            $original = (new AdmisibilidadCognitivaInstitucional)->validar($p, $original);
+            if (isset($instrumentalesMemoria[$e->id])) {
+                $original = (new AdmisibilidadFuenteCOGMEM)->validar($p, $original);
+            }
+            if (serialize($original) !== serialize($e)) {
+                throw new DomainException('Un hecho no coincide con su fuente original y el mapeo de la revisión.');
+            }
+        }
+        $perfil = [];
+        foreach ($red['dominios'] as $codigo => $criterio) {
+            $reglas = (new EvaluadorReglasCognitivas)->evaluar($p, $m, $criterio);
+            $contradicciones = $valores = [];
+            foreach ($m->paraCriterio($criterio) as $e) {
+                if (! $e->utilizable()) {
+                    continue;
+                }
+                $unidad = $m->soportesEfectivos([$e->id])[0];
+                $valores[$unidad][$e->variable][$e->valor][] = $e->id;
+            }
+            foreach ($valores as $unidad => $variables) {
+                foreach ($variables as $variable => $alternativas) {
+                    if (count($alternativas) > 1) {
+                        $contradicciones[] = ['unidad' => $unidad, 'variable' => $variable, 'valores_y_evidencias' => $alternativas];
+                    }
+                }
+            }
+            $conclusiones = [];
+            if ($contradicciones === []) {
+                foreach ($reglas as $regla) {
+                    if ($regla['estado'] !== 'CUMPLE') {
+                        continue;
+                    }
+                    $valor = $regla['consecuencia']['cod_valor_semantico'];
+                    $ids = array_values(array_unique(array_merge(...array_column($regla['condiciones'], 'soportes'))));
+                    $conclusiones[$valor]['codigo'] = $p->fila('valores_semanticos', $valor)['codigo_valor'];
+                    $conclusiones[$valor]['reglas'][] = $regla['regla'];
+                    $conclusiones[$valor]['evidencias'] = array_values(array_unique([...($conclusiones[$valor]['evidencias'] ?? []), ...$ids]));
+                }
+            }
+            foreach ($conclusiones as &$conclusion) {
+                sort($conclusion['reglas'], SORT_STRING);
+                sort($conclusion['evidencias'], SORT_STRING);
+                $conclusion['soportes_efectivos'] = $m->soportesEfectivos($conclusion['evidencias']);
+            }
+            unset($conclusion);
+            ksort($conclusiones, SORT_STRING);
+            $perfil[$codigo] = ['criterio' => $criterio, 'conclusiones_candidatas' => $conclusiones,
+                'contradicciones' => $contradicciones,
+                'traza' => (new TrazaFuentesInstrumentales)->completar((new ConstructorTraza)->construir($p, $m, $criterio,
+                    ['alcance' => 'CONJUNCIONES_DECLARATIVAS', 'sin_interpretacion_A_P' => true], $reglas, null), $m)];
+        }
+
+        return ['version' => $p->version, 'evaluacion' => $m->contexto->evaluacion, 'residente' => $m->contexto->residente,
+            'fecha_corte' => $m->contexto->fechaCorte->format('Y-m-d\TH:i:s.uP'), 'red' => $red, 'perfil' => $perfil,
+            'alcance' => 'CONSECUENCIAS_DECLARATIVAS', 'clasificacion_dcl' => null, 'persistido' => false];
+    }
+}

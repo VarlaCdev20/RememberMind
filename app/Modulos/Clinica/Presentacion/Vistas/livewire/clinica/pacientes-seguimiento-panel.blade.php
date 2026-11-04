@@ -151,16 +151,8 @@
     default => 'bg-fondo-panel text-apoyo',
    };
 
-   // Alertas de signos
-   $alertaSv = false;
-   if ($sv) {
-    $sist = $sv->presion_sistolica ?? 0;
-    $fc = $sv->frecuencia_cardiaca ?? 0;
-    $sat = $sv->saturacion;
-    $alertaSv = $sist > 160 || ($sist > 0 && $sist < 90)
-    || $fc > 100 || ($fc > 0 && $fc < 50)
-    || ($sat !== null && $sat < 92);
-   }
+   $interpretacionSv = $sv ? ($interpretacionesSignos[$sv->cod_signo] ?? []) : [];
+   $alertaSv = in_array($interpretacionSv['key'] ?? '', ['observacion', 'fuera_rango', 'requiere_revision'], true);
    @endphp
    <tr class="hover:bg-fondo-panel/50 transition-colors">
    <td class="px-5 py-3">

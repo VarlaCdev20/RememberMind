@@ -1,0 +1,234 @@
+{
+    "contrato": "EVALUACION-INSTITUCIONAL-1",
+    "origen": "CORPUS_SINTETICO_F02_EXISTENTE",
+    "cantidad_casos": 10,
+    "rutas_estructurales_observadas": 6401,
+    "contiene_datos_clinicos_reales": false,
+    "es_mapa_fisico_sql": false,
+    "acredita_cobertura_de_todas_las_reglas": false,
+    "tablas_base_instaladas": 100,
+    "maximo_autorizado_diseno": 110,
+    "incluido_en_mapa_historico_783": false,
+    "casos": {
+        "PET01": {
+            "instrumental_salida": {
+                "hojas_escalares": 6723,
+                "arreglos": 1713,
+                "valores_null": 406
+            },
+            "petersen_salida": {
+                "hojas_escalares": 2815,
+                "arreglos": 554,
+                "valores_null": 274
+            },
+            "extracciones_instrumentales": {
+                "hojas_escalares": 695,
+                "arreglos": 139,
+                "valores_null": 17
+            },
+            "fuente_conceptual": {
+                "hojas_escalares": 626,
+                "arreglos": 142,
+                "valores_null": 0
+            }
+        },
+        "PET02": {
+            "instrumental_salida": {
+                "hojas_escalares": 6723,
+                "arreglos": 1713,
+                "valores_null": 406
+            },
+            "petersen_salida": {
+                "hojas_escalares": 2816,
+                "arreglos": 554,
+                "valores_null": 274
+            },
+            "extracciones_instrumentales": {
+                "hojas_escalares": 695,
+                "arreglos": 139,
+                "valores_null": 17
+            },
+            "fuente_conceptual": {
+                "hojas_escalares": 626,
+                "arreglos": 142,
+                "valores_null": 0
+            }
+        },
+        "PET03": {
+            "instrumental_salida": {
+                "hojas_escalares": 6723,
+                "arreglos": 1713,
+                "valores_null": 406
+            },
+            "petersen_salida": {
+                "hojas_escalares": 2815,
+                "arreglos": 554,
+                "valores_null": 274
+            },
+            "extracciones_instrumentales": {
+                "hojas_escalares": 695,
+                "arreglos": 139,
+                "valores_null": 17
+            },
+            "fuente_conceptual": {
+                "hojas_escalares": 626,
+                "arreglos": 142,
+                "valores_null": 0
+            }
+        },
+        "PET04": {
+            "instrumental_salida": {
+                "hojas_escalares": 6723,
+                "arreglos": 1713,
+                "valores_null": 406
+            },
+            "petersen_salida": {
+                "hojas_escalares": 2816,
+                "arreglos": 554,
+                "valores_null": 274
+            },
+            "extracciones_instrumentales": {
+                "hojas_escalares": 695,
+                "arreglos": 139,
+                "valores_null": 17
+            },
+            "fuente_conceptual": {
+                "hojas_escalares": 626,
+                "arreglos": 142,
+                "valores_null": 0
+            }
+        },
+        "SIN_C03": {
+            "instrumental_salida": {
+                "hojas_escalares": 6723,
+                "arreglos": 1713,
+                "valores_null": 406
+            },
+            "petersen_salida": {
+                "hojas_escalares": 2786,
+                "arreglos": 547,
+                "valores_null": 276
+            },
+            "extracciones_instrumentales": {
+                "hojas_escalares": 695,
+                "arreglos": 139,
+                "valores_null": 17
+            },
+            "fuente_conceptual": {
+                "hojas_escalares": 626,
+                "arreglos": 142,
+                "valores_null": 0
+            }
+        },
+        "SIN_GOBIERNO": {
+            "instrumental_salida": {
+                "hojas_escalares": 6723,
+                "arreglos": 1713,
+                "valores_null": 406
+            },
+            "petersen_salida": {
+                "hojas_escalares": 2626,
+                "arreglos": 481,
+                "valores_null": 277
+            },
+            "extracciones_instrumentales": {
+                "hojas_escalares": 695,
+                "arreglos": 139,
+                "valores_null": 17
+            },
+            "fuente_conceptual": {
+                "hojas_escalares": 626,
+                "arreglos": 142,
+                "valores_null": 0
+            }
+        },
+        "SIN_DATOS": {
+            "instrumental_salida": {
+                "hojas_escalares": 3330,
+                "arreglos": 1113,
+                "valores_null": 111
+            },
+            "petersen_salida": {
+                "hojas_escalares": 205,
+                "arreglos": 114,
+                "valores_null": 2
+            },
+            "extracciones_instrumentales": {
+                "hojas_escalares": 0,
+                "arreglos": 1,
+                "valores_null": 0
+            },
+            "fuente_conceptual": {
+                "hojas_escalares": 626,
+                "arreglos": 142,
+                "valores_null": 0
+            }
+        },
+        "AUSENCIAS_NULL_ORDEN": {
+            "instrumental_salida": {
+                "hojas_escalares": 6848,
+                "arreglos": 1747,
+                "valores_null": 428
+            },
+            "petersen_salida": {
+                "hojas_escalares": 2822,
+                "arreglos": 558,
+                "valores_null": 277
+            },
+            "extracciones_instrumentales": {
+                "hojas_escalares": 696,
+                "arreglos": 139,
+                "valores_null": 18
+            },
+            "fuente_conceptual": {
+                "hojas_escalares": 626,
+                "arreglos": 142,
+                "valores_null": 0
+            }
+        },
+        "SEIS_FUENTES_Y_DOCUMENTOS": {
+            "instrumental_salida": {
+                "hojas_escalares": 6723,
+                "arreglos": 1713,
+                "valores_null": 406
+            },
+            "petersen_salida": {
+                "hojas_escalares": 2834,
+                "arreglos": 560,
+                "valores_null": 277
+            },
+            "extracciones_instrumentales": {
+                "hojas_escalares": 695,
+                "arreglos": 139,
+                "valores_null": 17
+            },
+            "fuente_conceptual": {
+                "hojas_escalares": 626,
+                "arreglos": 142,
+                "valores_null": 0
+            }
+        },
+        "VINCULO_INTERPRETATIVO": {
+            "instrumental_salida": {
+                "hojas_escalares": 7078,
+                "arreglos": 1825,
+                "valores_null": 422
+            },
+            "petersen_salida": {
+                "hojas_escalares": 2828,
+                "arreglos": 556,
+                "valores_null": 278
+            },
+            "extracciones_instrumentales": {
+                "hojas_escalares": 695,
+                "arreglos": 139,
+                "valores_null": 17
+            },
+            "fuente_conceptual": {
+                "hojas_escalares": 626,
+                "arreglos": 142,
+                "valores_null": 0
+            }
+        }
+    }
+}

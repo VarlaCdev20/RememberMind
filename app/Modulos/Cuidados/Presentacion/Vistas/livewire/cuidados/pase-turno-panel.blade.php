@@ -1,795 +1,113 @@
-﻿<!-- rm-filter-bar -->
-<div class="space-y-6 font-sans text-[var(--rm-text-primary)]" >
-
-    {{-- CABECERA INSTITUCIONAL --}}
+<div class="rm-handoff space-y-6" x-data="{
+    captureDirty: false, receiptDirty: false, discardCapture: false, discardReceipt: false,
+    contextOpen: window.matchMedia('(min-width: 1024px)').matches, returnFocusKey: null,
+    rememberTrigger(event) {
+        const button = event.target.closest('button');
+        if (button?.getAttribute('wire:click')?.startsWith('abrir')) this.returnFocusKey = button.closest('article')?.getAttribute('wire:key');
+    },
+    restoreTrigger() {
+        this.$nextTick(() => requestAnimationFrame(() => {
+            const card = [...this.$root.querySelectorAll('article')].find(element => element.getAttribute('wire:key') === this.returnFocusKey);
+            (card?.querySelector('button:not([disabled])') || this.$root.querySelector('button'))?.focus();
+        }));
+    }
+}" @click.capture="rememberTrigger($event)" @pase-ventana-cerrada.window="restoreTrigger()" @pase-captura-abierta.window="captureDirty = false; discardCapture = false" @pase-recepcion-abierta.window="receiptDirty = false; discardReceipt = false" @resize.window="contextOpen = window.matchMedia('(min-width: 1024px)').matches">
     <x-ui.collection-header title="Pases de turno" subtitle="Continuidad de cuidados y comunicación entre jornadas." icon="ph-arrows-left-right" eyebrow="Continuidad asistencial">
-      <x-slot:actions>
-        {{-- Selector de Pestañas Principales --}}
-        <div class="inline-flex rounded-xl bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-surface)] p-1 border border-[var(--rm-border)] dark:border-[var(--rm-border)]">
-            <button wire:click="cambiarTab('entrega')"
-                class="flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition {{ $tabActivo === 'entrega' ? 'bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] shadow-sm' : 'text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] hover:text-[var(--rm-text-primary)]' }}">
-                <i class="ph-bold ph-handshake text-sm"></i>
-                <span>Transferencia de guardia</span>
-            </button>
-            <button wire:click="cambiarTab('historial')"
-                class="flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition {{ $tabActivo === 'historial' ? 'bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] shadow-sm' : 'text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] hover:text-[var(--rm-text-primary)]' }}">
-                <i class="ph-bold ph-clock-counter-clockwise text-sm"></i>
-                <span>Historial de pases</span>
-            </button>
-        </div>
-      </x-slot:actions>
+        <x-slot:actions><div class="rm-handoff__tabs" role="group" aria-label="Vistas de pases">
+            <x-ui.action-button :variant="$tabActivo === 'entrega' ? 'primary' : 'secondary'" icono="ph-handshake" wire:click="cambiarTab('entrega')" aria-pressed="{{ $tabActivo === 'entrega' ? 'true' : 'false' }}">Transferencia de guardia</x-ui.action-button>
+            <x-ui.action-button :variant="$tabActivo === 'historial' ? 'primary' : 'secondary'" icono="ph-clock-counter-clockwise" wire:click="cambiarTab('historial')" aria-pressed="{{ $tabActivo === 'historial' ? 'true' : 'false' }}">Historial de pases</x-ui.action-button>
+        </div></x-slot:actions>
     </x-ui.collection-header>
+    @if(session()->has('mensaje'))<p class="rm-handoff__notice" role="status"><i class="ph-bold ph-check-circle" aria-hidden="true"></i>{{ session('mensaje') }}</p>@endif
+    <section class="rm-handoff__context-bar rm-card" aria-label="Contexto del pase">
+        <div><span>Jornada actual · saliente</span><strong>{{ $jornadaSaliente?->turno?->nombre ?? 'Fuera de jornada activa' }}</strong>@if($jornadaSaliente)<small>{{ $jornadaSaliente->fecha_jornada->format('d/m/Y') }} · {{ substr($jornadaSaliente->turno->hora_inicio, 0, 5) }}–{{ substr($jornadaSaliente->turno->hora_cierre, 0, 5) }}</small>@endif</div>
+        <div><span>Profesional responsable</span><strong>{{ auth()->user()->name }}</strong></div>
+        <div><span>Relevo · siguiente jornada</span><strong>{{ $jornadaEntrante?->turno?->nombre ?? 'Sin relevo planificado' }}</strong>@if($jornadaEntrante)<small>{{ $jornadaEntrante->fecha_jornada->format('d/m/Y') }} · {{ substr($jornadaEntrante->turno->hora_inicio, 0, 5) }}–{{ substr($jornadaEntrante->turno->hora_cierre, 0, 5) }}</small>@endif</div>
+    </section>
+    @if($errorConfiguracion)<div class="rm-handoff__notice" data-tone="warning" role="status"><i class="ph-bold ph-info" aria-hidden="true"></i><div><strong>{{ $errorConfiguracion }}</strong><p>La consulta del historial y de los pases recibibles sigue disponible. Si falta el relevo, solicita a coordinación revisar la planificación.</p></div></div>@endif
 
-    {{-- MENSAJES FLASH --}}
-    @if(session()->has('mensaje'))
-        <div class="flex items-center justify-between rounded-xl bg-[var(--rm-action-primary-soft)] border border-[var(--rm-action-primary)]/40 px-4 py-3 text-xs font-bold text-[var(--rm-action-primary)] dark:text-[var(--rm-success)]">
-            <div class="flex items-center gap-2">
-                <i class="ph-bold ph-check-circle text-base"></i>
-                <span>{{ session('mensaje') }}</span>
-            </div>
-            <button type="button" onclick="this.parentElement.remove()" class="text-[var(--rm-action-primary)] hover:opacity-75">
-                <i class="ph-bold ph-x text-sm"></i>
-            </button>
-        </div>
-    @endif
-
-    {{-- BARRA DE CONTEXTO ASISTENCIAL (SOLO LECTURA, DETERMINADA POR EL SISTEMA) --}}
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 rounded-2xl bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] p-4 text-xs">
-        {{-- Jornada actual --}}
-        <div class="flex items-center gap-3">
-            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-[var(--rm-warning)] shrink-0 border border-[var(--rm-border)]/60">
-                <i class="ph-bold ph-sun text-lg"></i>
-            </div>
-            <div>
-                <span class="text-[10px] uppercase font-bold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] block">Jornada actual (Saliente):</span>
-                <span class="font-bold text-xs text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)]">
-                    {{ $jornadaSaliente ? (($jornadaSaliente->turno?->nombre ?? 'Guardia activa') . ' · ' . \Carbon\Carbon::parse($jornadaSaliente->fecha_jornada)->format('d/m/Y')) : 'Sin jornada activa asignada' }}
-                </span>
-            </div>
-        </div>
-
-        {{-- Profesional autenticado --}}
-        <div class="flex items-center gap-3">
-            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] shrink-0 border border-[var(--rm-border)]/60">
-                <i class="ph-bold ph-user text-lg"></i>
-            </div>
-            <div>
-                <span class="text-[10px] uppercase font-bold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] block">Profesional responsable:</span>
-                <span class="font-bold text-xs text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)]">
-                    {{ auth()->user()->name ?? 'Enfermería' }}
-                </span>
-            </div>
-        </div>
-
-        {{-- Siguiente jornada --}}
-        <div class="flex items-center gap-3">
-            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] text-[var(--rm-action-primary)] shrink-0 border border-[var(--rm-border)]/60">
-                <i class="ph-bold ph-arrow-right text-lg"></i>
-            </div>
-            <div>
-                <span class="text-[10px] uppercase font-bold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] block">Siguiente jornada (Entrante):</span>
-                <span class="font-bold text-xs text-[var(--rm-warning)] dark:text-[var(--rm-warning)]">
-                    {{ $jornadaEntrante ? (($jornadaEntrante->turno?->nombre ?? 'Siguiente guardia') . ' · ' . \Carbon\Carbon::parse($jornadaEntrante->fecha_jornada)->format('d/m/Y')) : 'Sin jornada entrante planificada' }}
-                </span>
-            </div>
-        </div>
-    </div>
-
-
-    {{-- ======================================================== --}}
-    {{-- VISTA 1: TRANSFERENCIA DE GUARDIA (OPERATIVA)            --}}
-    {{-- ======================================================== --}}
     @if($tabActivo === 'entrega')
-
-        {{-- SECCIÓN A: PASES PENDIENTES DE RECIBIR (SI EXISTEN PARA ESTE PROFESIONAL) --}}
-        @if(!empty($pasesPendientesRecibir))
-            <div class="space-y-3 rounded-2xl bg-[var(--rm-surface-soft)]/70 dark:bg-[var(--rm-surface)]/70 border border-[var(--rm-border)] dark:border-[var(--rm-border)] p-4 sm:p-5">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <i class="ph-bold ph-tray text-base text-[var(--rm-warning)]"></i>
-                        <h2 class="text-sm font-black text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)]">
-                            Pases pendientes de recibir ({{ count($pasesPendientesRecibir) }})
-                        </h2>
-                    </div>
-                    <span class="text-[11px] font-semibold text-[var(--rm-warning)] dark:text-[var(--rm-warning)]">
-                        Confirme la recepción para asumir la continuidad asistencial
-                    </span>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    @foreach($pasesPendientesRecibir as $paseRec)
-                        <div class="rounded-xl bg-[var(--rm-surface)] dark:bg-[var(--rm-text-primary)] border border-[var(--rm-border)] p-4 space-y-3 shadow-xs">
-                            <div class="flex items-start justify-between gap-2">
-                                <div>
-                                    <h3 class="font-bold text-xs text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)]">
-                                        {{ $paseRec->residente?->nombre_completo ?? 'Residente' }}
-                                    </h3>
-                                    <span class="text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
-                                        {{ $paseRec->residente?->ubicacion_formateada ?? 'Sin ubicación' }}
-                                    </span>
-                                </div>
-                                <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-[var(--rm-warning-soft)] text-[var(--rm-warning)]">
-                                    Entregado
-                                </span>
-                            </div>
-
-                            <div class="text-[11px] text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] space-y-0.5 border-t border-[var(--rm-border)]/40 pt-2">
-                                <div><strong class="text-[var(--rm-text-primary)]">De:</strong> {{ $paseRec->personalSaliente?->usuario?->name ?? 'Enfermero saliente' }}</div>
-                                <div><strong class="text-[var(--rm-text-primary)]">Transición:</strong> {{ $paseRec->jornadaSaliente?->turno?->nombre }} → {{ $paseRec->jornadaEntrante?->turno?->nombre }}</div>
-                                <p class="line-clamp-2 italic text-[var(--rm-text-primary)] mt-1">"{{ $paseRec->resumen }}"</p>
-                            </div>
-
-                            <button wire:click="abrirRevisarPase('{{ $paseRec->cod_pase }}')"
-                                class="w-full flex items-center justify-center gap-1.5 rounded-lg bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-white py-1.5 text-xs font-bold transition">
-                                <i class="ph-bold ph-check-square"></i> Revisar y recibir pase
-                            </button>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
+        @if(count($pasesPendientesRecibir))
+            <section class="space-y-3" aria-labelledby="handoff-receive-title"><x-ui.section-header id="handoff-receive-title" level="2" title="Pases pendientes de recibir" :subtitle="count($pasesPendientesRecibir).' pases dirigidos a ti o a residentes de tu jornada entrante.'" icon="ph-tray" />
+                <div class="rm-handoff__grid">@foreach($pasesPendientesRecibir as $paseRec)
+                    <article class="rm-card rm-handoff__resident" wire:key="recibir-{{ $paseRec->getKey() }}"><header><div><h3>{{ $paseRec->residente?->nombre_completo ?? 'Residente no disponible' }}</h3><p>{{ $paseRec->residente?->ubicacion_formateada ?? 'Ubicación no disponible' }}</p></div><x-ui.status-badge :estado="$paseRec->estado" /></header>
+                        <p>De <strong>{{ $paseRec->personalSaliente?->usuario?->name ?? 'Profesional no disponible' }}</strong></p><p>{{ $paseRec->fecha_hora?->format('d/m/Y H:i') }} · {{ $paseRec->jornadaSaliente?->turno?->nombre }} → {{ $paseRec->jornadaEntrante?->turno?->nombre }}</p>
+                        <p class="rm-handoff__excerpt">{{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($paseRec->resumen) }}</p>
+                        <x-ui.action-button variant="primary" icono="ph-check-square" wire:click="abrirRevisarPase('{{ $paseRec->getKey() }}')" loading="abrirRevisarPase">Revisar pase</x-ui.action-button>
+                    </article>
+                @endforeach</div>
+            </section>
         @endif
-
-        {{-- SECCIÓN B: RESIDENTES A ENTREGAR --}}
-        <div class="space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div class="flex items-center gap-2">
-                    <h2 class="text-base font-black text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)]">
-                        Residentes a entregar
-                    </h2>
-                    <span class="text-xs text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
-                        ({{ count($residentesAEntregar) }} asignados a su guardia)
-                    </span>
-                </div>
-
-                {{-- Subfiltros --}}
-                <div class="flex items-center gap-1.5 text-xs">
-                    <button wire:click="$set('filtroEntrega', 'todos')"
-                        class="px-3 py-1 rounded-lg font-bold transition {{ $filtroEntrega === 'todos' ? 'bg-[var(--rm-action-primary)] text-white shadow-xs' : 'bg-[var(--rm-surface-soft)] text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)]' }}">
-                        Todos
-                    </button>
-                    <button wire:click="$set('filtroEntrega', 'criticos')"
-                        class="px-3 py-1 rounded-lg font-bold transition {{ $filtroEntrega === 'criticos' ? 'bg-[var(--rm-danger)] text-white' : 'bg-[var(--rm-surface-soft)] text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)]' }}">
-                        Con Alerta / Incidente
-                    </button>
-                    <button wire:click="$set('filtroEntrega', 'pendientes')"
-                        class="px-3 py-1 rounded-lg font-bold transition {{ $filtroEntrega === 'pendientes' ? 'bg-[var(--rm-warning)] text-white' : 'bg-[var(--rm-surface-soft)] text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)]' }}">
-                        Por entregar
-                    </button>
-                </div>
+        <section class="space-y-3" aria-labelledby="handoff-outgoing-title">
+            <div class="rm-handoff__section-heading"><x-ui.section-header id="handoff-outgoing-title" level="2" title="Residentes a entregar" subtitle="Prepara el resumen, comunica pendientes y confirma la entrega." icon="ph-users-three" />
+                <div class="rm-handoff__tabs" role="group" aria-label="Filtrar residentes a entregar">@foreach(['todos' => 'Todos', 'criticos' => 'Con alerta / incidente', 'pendientes' => 'Por entregar'] as $filtro => $etiqueta)<x-ui.action-button :variant="$filtroEntrega === $filtro ? 'primary' : 'secondary'" wire:click="$set('filtroEntrega', '{{ $filtro }}')" aria-pressed="{{ $filtroEntrega === $filtro ? 'true' : 'false' }}">{{ $etiqueta }}</x-ui.action-button>@endforeach</div>
             </div>
-
-            {{-- Grid de Residentes a Entregar --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                @forelse($residentesAEntregar as $item)
-                    @php
-                        $r = $item['residente'];
-                        $pase = $item['pase'];
-                        $esCritico = $item['tiene_alerta_critica'] || $item['incidentes_count'] > 0;
-                        $esEntregado = $pase && $pase->esEntregado();
-                        $esRecibido = $pase && $pase->esRecibido();
-                        $esBorrador = $pase && $pase->esBorrador();
-                    @endphp
-
-                    <div class="rounded-2xl bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border {{ $esCritico ? 'border-[var(--rm-danger)]/70 bg-[var(--rm-danger-soft)]/80 dark:bg-[var(--rm-danger)]/80' : 'border-[var(--rm-border)] dark:border-[var(--rm-border)]' }} p-4 sm:p-5 shadow-sm space-y-3 flex flex-col justify-between">
-                        <div class="space-y-2">
-                            {{-- Cabecera Tarjeta: Residente y Ubicación --}}
-                            <div class="flex items-start justify-between gap-2">
-                                <div>
-                                    <h3 class="font-bold text-sm text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)]">
-                                        {{ $r->nombre_completo }}
-                                    </h3>
-                                    <span class="text-xs text-[var(--rm-warning)] dark:text-[var(--rm-warning)] font-medium block">
-                                        {{ $r->ubicacion_formateada }}
-                                    </span>
-                                </div>
-
-                                {{-- Badge de Estado del Pase --}}
-                                @if($esRecibido)
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] border border-[var(--rm-action-primary)]/40">
-                                        ✓ Recibido
-                                    </span>
-                                @elseif($esEntregado)
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-[var(--rm-warning-soft)] text-[var(--rm-warning)] border border-[var(--rm-warning)]/40">
-                                        ● Entregado
-                                    </span>
-                                @elseif($esBorrador)
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-[var(--rm-warning-soft)] text-[var(--rm-warning)] border border-[var(--rm-warning)]/40">
-                                        ✎ Borrador
-                                    </span>
-                                @else
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-[var(--rm-text-secondary)]/20 text-[var(--rm-text-secondary)]">
-                                        Pendiente
-                                    </span>
-                                @endif
-                            </div>
-
-                            {{-- Profesional Receptor Resuelto Automáticamente --}}
-                            <div class="rounded-xl bg-[var(--rm-surface-soft)]/50 dark:bg-[var(--rm-surface)]/50 p-2.5 border border-[var(--rm-border)]/50 text-xs">
-                                <span class="text-[10px] uppercase font-bold text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)] block">
-                                    Enfermero/a receptor/a (Jornada entrante):
-                                </span>
-                                <span class="font-bold {{ $item['tiene_receptor'] ? 'text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)]' : 'text-[var(--rm-warning)] italic' }}">
-                                    {{ $item['nombre_receptor'] }}
-                                </span>
-                            </div>
-
-                            {{-- Alertas / Incidentes vigentes --}}
-                            @if($esCritico)
-                                <div class="space-y-1">
-                                    @if($item['alertas_count'] > 0)
-                                        <div class="flex items-center gap-1.5 text-[11px] font-bold text-[var(--rm-danger)]">
-                                            <i class="ph-bold ph-warning-circle"></i>
-                                            <span>{{ $item['alertas_count'] }} alerta(s) clínica(s) activa(s)</span>
-                                        </div>
-                                    @endif
-                                    @if($item['incidentes_count'] > 0)
-                                        <div class="flex items-center gap-1.5 text-[11px] font-bold text-[var(--rm-warning)]">
-                                            <i class="ph-bold ph-warning-octagon"></i>
-                                            <span>{{ $item['incidentes_count'] }} incidente(s) en la jornada</span>
-                                        </div>
-                                    @endif
-                                </div>
-                            @endif
-                        </div>
-
-                        {{-- Botón de Acción --}}
-                        <div class="pt-2 border-t border-[var(--rm-border)]/40 dark:border-[var(--rm-border)]">
-                            @if($esRecibido || $esEntregado)
-                                <button wire:click="abrirVer('{{ $pase->cod_pase }}')"
-                                    class="w-full flex items-center justify-center gap-1.5 rounded-xl bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-surface)] hover:bg-[var(--rm-border)] py-2 text-xs font-bold text-[var(--rm-text-primary)] dark:text-[var(--rm-surface)] transition">
-                                    <i class="ph-bold ph-eye"></i> Ver pase registrado
-                                </button>
-                            @else
-                                <button wire:click="abrirPrepararPase('{{ $r->cod_residente }}')"
-                                    class="w-full flex items-center justify-center gap-1.5 rounded-xl bg-[var(--rm-warning)] hover:bg-[var(--rm-warning)] text-white py-2 text-xs font-bold transition shadow-xs">
-                                    <i class="ph-bold ph-notepad"></i>
-                                    <span>{{ $esBorrador ? 'Continuar preparando pase' : 'Preparar pase' }}</span>
-                                </button>
-                            @endif
-                        </div>
-                    </div>
-                @empty
-                    <div class="col-span-full rounded-2xl bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] p-12 text-center text-[var(--rm-text-secondary)] dark:text-[var(--rm-text-muted)]">
-                        <p class="font-bold text-sm">No hay residentes asignados para entregar en la jornada actual.</p>
-                    </div>
-                @endforelse
+            <div class="rm-handoff__grid">@forelse($residentesAEntregar as $item)
+                @php($pase = $item['pase'])
+                <article class="rm-card rm-handoff__resident" wire:key="entregar-{{ $item['residente']->getKey() }}"><header><div><h3>{{ $item['nombre_completo'] }}</h3><p>{{ $item['ubicacion'] }}</p></div><x-ui.status-badge :estado="$pase?->estado ?? 'SIN_INICIAR'" /></header>
+                    <p><span class="rm-caption">Receptor designado</span><strong class="block">{{ $item['nombre_receptor'] }}</strong></p>
+                    <div class="rm-handoff__indicators"><span><i class="ph-bold ph-bell" aria-hidden="true"></i>{{ $item['alertas_count'] }} alertas activas</span><span><i class="ph-bold ph-warning-circle" aria-hidden="true"></i>{{ $item['incidentes_count'] }} incidentes abiertos / en seguimiento</span></div>
+                    @if($pase && ! $pase->esBorrador())<x-ui.action-button variant="secondary" icono="ph-eye" wire:click="abrirVer('{{ $pase->getKey() }}')" loading="abrirVer">Ver pase</x-ui.action-button>
+                    @elseif($jornadaEntrante && auth()->user()->can($pase ? 'pases_turno.editar' : 'pases_turno.crear') && (! $pase || $pase->cod_personal_saliente === $personal?->getKey()))<x-ui.action-button variant="primary" icono="ph-note-pencil" wire:click="abrirPrepararPase('{{ $item['residente']->getKey() }}')" loading="abrirPrepararPase">{{ $pase ? 'Continuar borrador' : 'Preparar pase' }}</x-ui.action-button>
+                    @else<p class="rm-help">{{ $jornadaEntrante ? 'Preparación disponible para el autor autorizado.' : 'La entrega estará disponible cuando exista un relevo planificado.' }}</p>@endif
+                </article>
+            @empty<div class="rm-handoff__empty"><x-ui.empty-state icono="ph-users-three" titulo="Sin residentes en esta vista" texto="Revisa el filtro o consulta el historial de tus pases. La preparación requiere una jornada activa con residentes asignados." /></div>@endforelse</div>
+        </section>
+    @else
+        <section class="space-y-4" aria-labelledby="handoff-history-title"><x-ui.section-header id="handoff-history-title" level="2" title="Historial de pases" subtitle="Registros conservados con su autoría, entrega y recepción." icon="ph-clock-counter-clockwise" />
+            <div class="rm-filter-bar rm-handoff__filters">
+                <x-ui.field label="Buscar" for="handoff-search"><input id="handoff-search" class="rm-input" wire:model.live.debounce.350ms="searchHistorial" maxlength="100" placeholder="Residente o resumen"></x-ui.field>
+                <x-ui.field label="Fecha del pase" for="handoff-date"><input id="handoff-date" class="rm-input" type="date" wire:model.live="filtroFechaHistorial"></x-ui.field>
+                <x-ui.field label="Estado" for="handoff-state"><select id="handoff-state" class="rm-select" wire:model.live="filtroEstadoHistorial"><option value="">Todos los estados</option>@foreach(['BORRADOR' => 'Borrador', 'ENTREGADO' => 'Entregado', 'RECIBIDO' => 'Recibido', 'ANULADO' => 'Anulado', 'EMITIDO' => 'Emitido', 'GENERADO' => 'Generado', 'PENDIENTE' => 'Pendiente'] as $estado => $etiqueta)<option value="{{ $estado }}">{{ $etiqueta }}</option>@endforeach</select></x-ui.field>
+                <x-ui.action-button variant="secondary" icono="ph-funnel-x" wire:click="limpiarHistorial">Limpiar filtros</x-ui.action-button>
             </div>
-        </div>
+            <p class="rm-caption" role="status">{{ $historialPases->total() }} pases encontrados</p>
+            <div class="rm-handoff__grid">@forelse($historialPases as $pase)
+                <article class="rm-card rm-handoff__resident" wire:key="historial-{{ $pase->getKey() }}"><header><div><h3>{{ $pase->residente?->nombre_completo ?? 'Residente no disponible' }}</h3><p>{{ $pase->fecha_hora?->format('d/m/Y H:i') }}</p></div><x-ui.status-badge :estado="$pase->estado" /></header>
+                    <p>{{ $pase->jornadaSaliente?->turno?->nombre }} → {{ $pase->jornadaEntrante?->turno?->nombre }}</p><p><span class="rm-caption">Profesional saliente</span><strong class="block">{{ $pase->personalSaliente?->usuario?->name ?? 'No disponible' }}</strong></p>
+                    <p class="rm-handoff__excerpt">{{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($pase->resumen) }}</p><x-ui.action-button variant="secondary" icono="ph-eye" wire:click="abrirVer('{{ $pase->getKey() }}')" loading="abrirVer">Ver detalle</x-ui.action-button>
+                </article>
+            @empty<div class="rm-handoff__empty"><x-ui.empty-state icono="ph-clock-counter-clockwise" titulo="No hay pases para estos filtros" texto="Prueba otra fecha o limpia los filtros para consultar todo el historial autorizado." /></div>@endforelse</div>
+            <x-ui.paginacion :paginator="$historialPases" mode="livewire" :show-per-page="false" label="pases" />
+        </section>
     @endif
 
-
-    {{-- ======================================================== --}}
-    {{-- VISTA 2: TAB HISTORIAL DE PASES                          --}}
-    {{-- ======================================================== --}}
-    @if($tabActivo === 'historial')
-        <div class="space-y-4">
-            {{-- Filtros del Historial formato alertas --}}
-            <x-ui.filter-bar class="mb-4">
-                <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
-                    {{-- Búsqueda textual --}}
-                    <div class="lg:col-span-6 relative flex items-center">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
-                            <i class="ph-bold ph-magnifying-glass text-base"></i>
-                        </span>
-                        <input wire:model.live.debounce.300ms="searchHistorial" type="text"
-                            placeholder="Buscar residente o resumen..."
-                            class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
-                        @if(!empty($searchHistorial))
-                            <button type="button" wire:click="$set('searchHistorial', '')" class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-primary)] cursor-pointer" title="Limpiar búsqueda">
-                                <i class="ph-bold ph-x-circle text-base"></i>
-                            </button>
-                        @endif
-                    </div>
-
-                    {{-- Fecha --}}
-                    <div class="lg:col-span-3">
-                        <input wire:model.live="filtroFechaHistorial" type="date" title="Filtrar por fecha"
-                            class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer">
-                    </div>
-
-                    {{-- Estado --}}
-                    <div class="lg:col-span-3">
-                        <select wire:model.live="filtroEstadoHistorial"
-                            class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer">
-                            <option value="">Todos los estados</option>
-                            <option value="ENTREGADO">Entregado</option>
-                            <option value="RECIBIDO">Recibido</option>
-                            <option value="BORRADOR">Borrador</option>
-                        </select>
-                    </div>
-                </div>
-
-                {{-- Fila de chips de filtros activos --}}
-                @php
-                    $hasFiltrosPase = !empty($searchHistorial) || !empty($filtroFechaHistorial) || !empty($filtroEstadoHistorial);
-                @endphp
-                @if($hasFiltrosPase)
-                    <div class="rm-filter-bar__active">
-                        <div class="flex flex-wrap items-center gap-1.5">
-                            <span class="rm-filter-bar__active-label">
-                                <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
-                            </span>
-                            @if(!empty($searchHistorial))
-                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
-                                    <span>Búsqueda: "{{ Str::limit($searchHistorial, 16) }}"</span>
-                                    <button type="button" wire:click="$set('searchHistorial', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-                                </span>
-                            @endif
-                            @if(!empty($filtroFechaHistorial))
-                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
-                                    <span>Fecha: {{ $filtroFechaHistorial }}</span>
-                                    <button type="button" wire:click="$set('filtroFechaHistorial', null)" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-                                </span>
-                            @endif
-                            @if(!empty($filtroEstadoHistorial))
-                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-warning-soft)] border border-[var(--rm-warning)] text-[11px] font-bold text-[var(--rm-warning)]">
-                                    <span>Estado: {{ $filtroEstadoHistorial }}</span>
-                                    <button type="button" wire:click="$set('filtroEstadoHistorial', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-                                </span>
-                            @endif
-                        </div>
-
-                        <div class="flex items-center gap-2.5">
-                            <button type="button"
-                                wire:click="$set('searchHistorial', ''); $set('filtroFechaHistorial', null); $set('filtroEstadoHistorial', '');"
-                                class="inline-flex items-center gap-1 rounded-xl bg-[var(--rm-primary-soft)] hover:bg-[var(--rm-primary)] hover:text-white text-[var(--rm-primary)] border border-[var(--rm-primary)]/30 py-1 px-2.5 text-xs font-bold transition cursor-pointer">
-                                <i class="ph-bold ph-arrow-counter-clockwise"></i>
-                                <span>Limpiar filtros</span>
-                            </button>
-                        </div>
-                    </div>
-                @endif
-            </x-ui.filter-bar>
-
-            {{-- Tabla / Bitácora de Historial --}}
-            <div class="rounded-2xl bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="rm-data-table rm-data-table--actions w-full text-left text-xs border-collapse">
-                        <thead>
-                            <tr class="bg-[var(--rm-surface-soft)] dark:bg-[var(--rm-surface)] text-[var(--rm-text-secondary)] font-bold border-b border-[var(--rm-border)]">
-                                <th class="py-3 px-4">FECHA / HORA</th>
-                                <th class="py-3 px-4">RESIDENTE</th>
-                                <th class="py-3 px-4">TRANSICIÓN</th>
-                                <th class="py-3 px-4">RESUMEN CLÍNICO</th>
-                                <th class="py-3 px-4 text-center">ESTADO</th>
-                                <th class="py-3 px-4 text-right">ACCIÓN</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-[var(--rm-border)]/40 text-[var(--rm-text-primary)]">
-                            @forelse($historialPases as $hPase)
-                                <tr class="hover:bg-[var(--rm-surface)]/50 transition">
-                                    <td class="py-3 px-4 whitespace-nowrap">
-                                        <div class="font-bold">{{ \Carbon\Carbon::parse($hPase->fecha_hora)->format('d/m/Y H:i') }}</div>
-                                        @if($hPase->fecha_hora_recepcion)
-                                            <div class="text-[10px] text-[var(--rm-action-primary)]">Recibido: {{ \Carbon\Carbon::parse($hPase->fecha_hora_recepcion)->format('d/m/Y H:i') }}</div>
-                                        @endif
-                                    </td>
-                                    <td class="py-3 px-4 font-bold">
-                                        <div>{{ $hPase->residente?->nombre_completo ?? 'Residente' }}</div>
-                                        <div class="text-[10px] font-normal text-[var(--rm-text-secondary)]">{{ $hPase->residente?->ubicacion_formateada }}</div>
-                                    </td>
-                                    <td class="py-3 px-4 whitespace-nowrap text-[11px]">
-                                        <div><strong>De:</strong> {{ $hPase->personalSaliente?->usuario?->name ?? 'Personal' }} ({{ $hPase->jornadaSaliente?->turno?->nombre }})</div>
-                                        <div><strong>A:</strong> {{ $hPase->personalEntrante?->usuario?->name ?? 'Pendiente' }} ({{ $hPase->jornadaEntrante?->turno?->nombre }})</div>
-                                    </td>
-                                    <td class="py-3 px-4 max-w-xs truncate" title="{{ $hPase->resumen }}">
-                                        {{ $hPase->resumen }}
-                                    </td>
-                                    <td class="py-3 px-4 text-center whitespace-nowrap">
-                                        @if($hPase->esRecibido())
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)]">Recibido</span>
-                                        @elseif($hPase->esEntregado())
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-[var(--rm-warning-soft)] text-[var(--rm-warning)]">Entregado</span>
-                                        @else
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-[var(--rm-warning-soft)] text-[var(--rm-warning)]">Borrador</span>
-                                        @endif
-                                    </td>
-                                    <td class="py-3 px-4 text-right whitespace-nowrap">
-                                        <button wire:click="abrirVer('{{ $hPase->cod_pase }}')"
-                                            class="inline-flex items-center gap-1 rounded-lg bg-[var(--rm-surface-soft)] hover:bg-[var(--rm-border)] px-2.5 py-1 text-xs font-bold transition">
-                                            <i class="ph-bold ph-eye"></i> Ver
-                                        </button>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="py-12 text-center text-[var(--rm-text-secondary)]">No se encontraron pases registrados.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                @if($historialPases->hasPages())
-                    <div class="p-4 bg-[var(--rm-surface-soft)]/60 border-t border-[var(--rm-border)]">
-                        {{ $historialPases->links() }}
-                    </div>
-                @endif
+    <x-ui.modal-livewire id="handoff-prepare" wire:model="modalPreparar" title="Preparar pase de turno" subtitle="Resume la jornada y comunica lo que necesita conocer el relevo." maxWidth="xl" closeMethod="cerrarModalPreparar" alpineClose="if (captureDirty) discardCapture = true; else $wire.cerrarModalPreparar()" class="rm-handoff__modal rm-clinical-form-modal">
+        @if($modalPreparar && $residenteSeleccionado)
+            <x-slot:context><div class="rm-handoff__identity"><div><span class="rm-caption">Residente</span><h3>{{ $residenteSeleccionado->nombre_completo }}</h3><p>{{ $residenteSeleccionado->ubicacion_formateada }}</p></div><div><span class="rm-caption">Receptor designado</span><strong>{{ $nombreReceptorDesignado }}</strong></div></div></x-slot:context>
+            <div x-show="discardCapture" x-cloak class="rm-handoff__notice" data-tone="warning" role="alert"><div><strong>Hay cambios sin guardar.</strong><p>Puedes seguir editando o cerrar y descartar esta captura.</p><div class="rm-handoff__tabs"><button type="button" class="rm-btn-secondary" @click="discardCapture = false">Seguir editando</button><button type="button" class="rm-btn-secondary" @click="captureDirty = false; discardCapture = false; $wire.cerrarModalPreparar()">Descartar cambios</button></div></div></div>
+            @if(count($contextoClinico['alertas'] ?? []) || count($contextoClinico['incidentes'] ?? []))<p class="rm-handoff__notice" data-tone="warning"><i class="ph-bold ph-warning-circle" aria-hidden="true"></i>{{ count($contextoClinico['alertas'] ?? []) }} alertas activas y {{ count($contextoClinico['incidentes'] ?? []) }} incidentes para revisar en el contexto.</p>@endif
+            <div class="rm-handoff__capture-layout">
+                <form id="handoff-form" class="space-y-5" wire:submit="confirmarEntrega" @input="captureDirty = true" @change="captureDirty = true">
+                    <x-ui.form-section title="Resumen de la jornada" description="Describe hechos observados. El estado general es texto libre y no constituye una clasificación automática." :columns="1" step="1">
+                        <x-ui.field label="Estado general descrito" for="handoff-general" error="estadoGeneral"><input id="handoff-general" class="rm-input" wire:model="estadoGeneral" maxlength="200" aria-invalid="{{ $errors->has('estadoGeneral') ? 'true' : 'false' }}" @error('estadoGeneral') aria-describedby="handoff-general-error" @enderror></x-ui.field>
+                        <x-ui.field label="Resumen clínico de la guardia" for="handoff-summary" error="resumenTurno" required help="Obligatorio para entregar. Entre 5 y 5000 caracteres."><textarea id="handoff-summary" class="rm-textarea" wire:model="resumenTurno" rows="4" maxlength="5000" aria-invalid="{{ $errors->has('resumenTurno') ? 'true' : 'false' }}" @error('resumenTurno') aria-describedby="handoff-summary-error" @enderror></textarea></x-ui.field>
+                    </x-ui.form-section>
+                    <x-ui.form-section title="Continuidad de cuidados" :columns="1" step="2">
+                        @foreach(['pendientesTurno' => 'Acciones o cuidados pendientes', 'vigilanciaTurno' => 'Puntos de vigilancia especial', 'recomendacionTurno' => 'Recomendaciones para el relevo'] as $campo => $etiqueta)<x-ui.field :label="$etiqueta" :for="'handoff-'.$campo" :error="$campo"><textarea id="handoff-{{ $campo }}" class="rm-textarea" wire:model="{{ $campo }}" rows="2" maxlength="3000" aria-invalid="{{ $errors->has($campo) ? 'true' : 'false' }}" @if($errors->has($campo)) aria-describedby="handoff-{{ $campo }}-error" @endif></textarea></x-ui.field>@endforeach
+                    </x-ui.form-section>
+                    <p class="rm-help">Guardar borrador permite continuar después. Confirmar entrega conserva el pase y bloquea su edición; no marca los pendientes como resueltos.</p>
+                    @error('error_general')<p class="rm-error" role="alert">{{ $message }}</p>@enderror
+                </form>
+                <details class="rm-handoff__support" :open="contextOpen" @toggle="contextOpen = $el.open"><summary><i class="ph-bold ph-activity" aria-hidden="true"></i> Contexto clínico · solo lectura</summary><div class="space-y-4">@include('cuidados::livewire.cuidados.partials.pase-turno-contexto')</div></details>
             </div>
-        </div>
-    @endif
-
-
-    {{-- ======================================================== --}}
-    {{-- MODAL 1: PREPARAR PASE (2 ZONAS: CONTEXTO + FORMULARIO)  --}}
-    {{-- ======================================================== --}}
-    @if($modalPreparar && $residenteSeleccionado)
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
-            <div class="relative w-full max-w-5xl max-h-[92vh] flex flex-col rounded-2xl bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] shadow-2xl overflow-hidden my-auto"
-                @click.outside="$wire.cerrarModalPreparar()">
-
-                {{-- Cabecera --}}
-                <div class="flex items-center justify-between border-b border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-5 py-4">
-                    <div class="flex items-center gap-3">
-                        <i class="ph-bold ph-handshake text-xl text-[var(--rm-warning)]"></i>
-                        <div>
-                            <h2 class="text-base font-black text-[var(--rm-text-primary)]">
-                                Preparar pase de turno: {{ $residenteSeleccionado->nombre_completo }}
-                            </h2>
-                            <p class="text-[11px] font-medium text-[var(--rm-text-secondary)]">
-                                {{ $residenteSeleccionado->ubicacion_formateada }} · Receptor previsto: <strong>{{ $nombreReceptorDesignado }}</strong>
-                            </p>
-                        </div>
-                    </div>
-                    <button wire:click="cerrarModalPreparar" class="text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)]">
-                        <i class="ph-bold ph-x text-lg"></i>
-                    </button>
-                </div>
-
-                {{-- Cuerpo Dividido en 2 Zonas --}}
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-0 overflow-y-auto flex-1 text-xs">
-
-                    {{-- ========================================== --}}
-                    {{-- ZONA IZQUIERDA: CONTEXTO DEL TURNO (READONLY) --}}
-                    {{-- ========================================== --}}
-                    <div class="lg:col-span-6 p-5 space-y-4 border-b lg:border-b-0 lg:border-r border-[var(--rm-border)] bg-[var(--rm-surface)] dark:bg-[var(--rm-surface-soft)] overflow-y-auto max-h-[70vh]">
-                        <div class="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-[var(--rm-warning)]">
-                            <i class="ph-bold ph-activity text-sm"></i> Contexto clínico real de la guardia (Solo lectura)
-                        </div>
-
-                        {{-- 1. Alertas e Incidentes --}}
-                        @if(!empty($contextoClinico['alertas']) || !empty($contextoClinico['incidentes']))
-                            <div class="space-y-2 rounded-xl bg-[var(--rm-danger-soft)] border border-[var(--rm-danger)]/40 p-3">
-                                <span class="font-bold text-[11px] text-[var(--rm-danger)] block uppercase tracking-wider">
-                                    Alertas e Incidentes Activos
-                                </span>
-                                @foreach($contextoClinico['alertas'] as $alt)
-                                    <div class="text-[11px] text-[var(--rm-danger)] font-semibold flex items-center gap-1">
-                                        <i class="ph-bold ph-warning"></i> Alerta ({{ $alt['prioridad'] }}): {{ $alt['titulo'] }}
-                                    </div>
-                                @endforeach
-                                @foreach($contextoClinico['incidentes'] as $inc)
-                                    <div class="text-[11px] text-[var(--rm-warning)] font-semibold flex items-center gap-1">
-                                        <i class="ph-bold ph-warning-octagon"></i> Incidente: {{ $inc['tipo'] }} ({{ $inc['gravedad'] }}) - {{ $inc['descripcion'] }}
-                                    </div>
-                                @endforeach
-                            </div>
-                        @endif
-
-                        {{-- 2. Medicación --}}
-                        <div class="space-y-2 rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)]/60 p-3">
-                            <span class="font-bold text-[11px] text-[var(--rm-text-primary)] block uppercase tracking-wider">
-                                Medicación del Turno
-                            </span>
-                            <div class="space-y-1">
-                                <span class="text-[10px] font-bold text-[var(--rm-action-primary)]">Administradas:</span>
-                                @forelse($contextoClinico['meds_administradas'] as $ma)
-                                    <div class="text-[11px] text-[var(--rm-text-primary)]">
-                                        ✓ {{ $ma['hora'] }} - {{ $ma['medicamento'] }} ({{ $ma['dosis'] }}) - {{ $ma['via'] }}
-                                    </div>
-                                @empty
-                                    <div class="text-[10px] text-[var(--rm-text-secondary)] italic">Sin administraciones registradas en el turno.</div>
-                                @endforelse
-                            </div>
-                            @if(!empty($contextoClinico['meds_pendientes']))
-                                <div class="space-y-1 pt-1 border-t border-[var(--rm-border)]/40">
-                                    <span class="text-[10px] font-bold text-[var(--rm-danger)]">Pendientes / Omitidas:</span>
-                                    @foreach($contextoClinico['meds_pendientes'] as $mp)
-                                        <div class="text-[11px] text-[var(--rm-danger)]">
-                                            ⚠ {{ $mp['hora'] }} - {{ $mp['medicamento'] }} ({{ $mp['estado'] }})
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @endif
-                        </div>
-
-                        {{-- 3. Cuidados e Intervenciones --}}
-                        <div class="space-y-2 rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)]/60 p-3">
-                            <span class="font-bold text-[11px] text-[var(--rm-text-primary)] block uppercase tracking-wider">
-                                Cuidados de Enfermería
-                            </span>
-                            <div class="space-y-1">
-                                <span class="text-[10px] font-bold text-[var(--rm-action-primary)]">Realizados:</span>
-                                @forelse($contextoClinico['cuidados_realizados'] as $cr)
-                                    <div class="text-[11px] text-[var(--rm-text-primary)]">✓ {{ $cr['intervencion'] }}</div>
-                                @empty
-                                    <div class="text-[10px] text-[var(--rm-text-secondary)] italic">Sin cuidados registrados como realizados.</div>
-                                @endforelse
-                            </div>
-                            @if(!empty($contextoClinico['cuidados_pendientes']))
-                                <div class="space-y-1 pt-1 border-t border-[var(--rm-border)]/40">
-                                    <span class="text-[10px] font-bold text-[var(--rm-warning)]">Pendientes:</span>
-                                    @foreach($contextoClinico['cuidados_pendientes'] as $cp)
-                                        <div class="text-[11px] text-[var(--rm-warning)]">● {{ $cp['intervencion'] }} ({{ $cp['estado'] }})</div>
-                                    @endforeach
-                                </div>
-                            @endif
-                        </div>
-
-                        {{-- 4. Constantes y Evolución --}}
-                        <div class="grid grid-cols-2 gap-2 text-[11px]">
-                            <div class="rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)]/60 p-2.5 space-y-1">
-                                <span class="font-bold text-[var(--rm-text-primary)] block">Signos Vitales:</span>
-                                @if($contextoClinico['signos_vitales'])
-                                    @php $sv = $contextoClinico['signos_vitales']; @endphp
-                                    <div>PA: {{ $sv->presion_sistolica }}/{{ $sv->presion_diastolica }} mmHg</div>
-                                    <div>FC: {{ $sv->frecuencia_cardiaca }} lpm</div>
-                                    <div>SpO2: {{ $sv->saturacion_oxigeno }}%</div>
-                                    <div>Temp: {{ $sv->temperatura }}°C</div>
-                                @else
-                                    <span class="text-[var(--rm-text-secondary)] italic">Sin registro vigente</span>
-                                @endif
-                            </div>
-
-                            <div class="rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)]/60 p-2.5 space-y-1">
-                                <span class="font-bold text-[var(--rm-text-primary)] block">Dolor y Heridas:</span>
-                                <div>Dolor: {{ $contextoClinico['dolor']?->intensidad !== null ? $contextoClinico['dolor']->intensidad . '/10' : 'No evaluado' }}</div>
-                                <div>Heridas: {{ count($contextoClinico['heridas']) }} activa(s)</div>
-                                @foreach($contextoClinico['heridas'] as $herida)
-                                    <div>{{ $herida['ubicacion'] }} · Última curación: {{ $herida['ultima_curacion'] ?? 'Sin registro' }}</div>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        {{-- 5. Registros de Necesidades Básicas --}}
-                        <div class="rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)]/60 p-2.5 space-y-1 text-[11px]">
-                            <span class="font-bold text-[var(--rm-text-primary)] block">Últimos registros guardados:</span>
-                            <div class="grid grid-cols-2 gap-1 text-[10px] text-[var(--rm-text-secondary)]">
-                                <div>Ingesta: {{ $contextoClinico['ingesta']?->porcentaje_consumido !== null ? $contextoClinico['ingesta']->porcentaje_consumido.'%' : 'Sin registro' }}</div>
-                                <div>Hidratación: {{ $contextoClinico['hidratacion']?->cantidad_ml !== null ? $contextoClinico['hidratacion']->cantidad_ml.' ml' : 'Sin registro' }}</div>
-                                <div>Eliminación: {{ $contextoClinico['eliminacion']?->resumenOperacional()['tipo_label'] ?? 'Sin registro' }}</div>
-                                <div>Sueño: {{ $contextoClinico['sueno']?->calidad ?? 'Sin registro' }}</div>
-                                <div>Cognición: {{ $contextoClinico['cognicion']?->observacion ?? 'Sin observación registrada' }}</div>
-                                @if($contextoClinico['cognicion'])
-                                    <div>Orientación: {{ $contextoClinico['cognicion']->orientacion_persona ?? 'Sin dato' }} / {{ $contextoClinico['cognicion']->orientacion_lugar ?? 'Sin dato' }} / {{ $contextoClinico['cognicion']->orientacion_tiempo ?? 'Sin dato' }} · {{ $contextoClinico['cognicion']->fecha_hora->format('d/m/Y H:i') }}</div>
-                                @endif
-                                <div>Conducta: {{ $contextoClinico['conducta']?->descripcion ?? 'Sin descripción registrada' }}</div>
-                                <div>Movilidad: {{ $contextoClinico['movilidad']?->marcha ?? 'Sin registro' }}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- ========================================== --}}
-                    {{-- ZONA DERECHA: FORMULARIO DEL PASE          --}}
-                    {{-- ========================================== --}}
-                    <div class="lg:col-span-6 p-5 space-y-4 overflow-y-auto max-h-[70vh] flex flex-col justify-between">
-                        <div class="space-y-4">
-                            <div class="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-[var(--rm-warning)]">
-                                <i class="ph-bold ph-pencil-simple text-sm"></i> Formulario de transferencia
-                            </div>
-
-                            {{-- Estado General --}}
-                            <div class="space-y-1">
-                                <label class="font-bold text-[var(--rm-text-secondary)]">Estado general del residente al cierre:</label>
-                                <input wire:model="estadoGeneral" type="text"
-                                    placeholder="Ej: Tranquilo, consciente, afebril, sin cambios agudos..."
-                                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] py-2 px-3 text-xs text-[var(--rm-text-primary)] focus:outline-none focus:border-[var(--rm-warning)]">
-                            </div>
-
-                            {{-- Resumen Obligatorio --}}
-                            <div class="space-y-1">
-                                <label class="font-bold text-[var(--rm-text-primary)]">Resumen clínico de la guardia * (Obligatorio):</label>
-                                <textarea wire:model="resumenTurno" rows="4"
-                                    placeholder="Hechos relevantes ocurridos, evolución de enfermería durante el turno..."
-                                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-3 text-xs text-[var(--rm-text-primary)] focus:outline-none focus:border-[var(--rm-warning)]"></textarea>
-                                @error('resumenTurno')
-                                    <span class="text-[11px] font-bold text-[var(--rm-danger)]">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            {{-- Pendientes --}}
-                            <div class="space-y-1">
-                                <label class="font-bold text-[var(--rm-text-secondary)]">Acciones o cuidados pendientes:</label>
-                                <textarea wire:model="pendientesTurno" rows="2"
-                                    placeholder="Controles pendientes, administración de medicación post-turno..."
-                                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-2.5 text-xs text-[var(--rm-text-primary)] focus:outline-none focus:border-[var(--rm-warning)]"></textarea>
-                            </div>
-
-                            {{-- Vigilancia --}}
-                            <div class="space-y-1">
-                                <label class="font-bold text-[var(--rm-warning)]">Puntos de vigilancia especial:</label>
-                                <textarea wire:model="vigilanciaTurno" rows="2"
-                                    placeholder="Vigilar diuresis, riesgo de caída, patrón respiratorio..."
-                                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-2.5 text-xs text-[var(--rm-text-primary)] focus:outline-none focus:border-[var(--rm-warning)]"></textarea>
-                            </div>
-
-                            {{-- Recomendaciones --}}
-                            <div class="space-y-1">
-                                <label class="font-bold text-[var(--rm-text-secondary)]">Recomendaciones de cuidado para el relevo:</label>
-                                <textarea wire:model="recomendacionTurno" rows="2"
-                                    placeholder="Recomendaciones dentro de la competencia de enfermería..."
-                                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-2.5 text-xs text-[var(--rm-text-primary)] focus:outline-none focus:border-[var(--rm-warning)]"></textarea>
-                            </div>
-
-                            @error('error_general')
-                                <div class="rounded-xl bg-[var(--rm-danger-soft)] border border-[var(--rm-danger)] p-2.5 text-xs font-bold text-[var(--rm-danger)]">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-
-                        {{-- Botones de Acción del Formulario --}}
-                        <div class="flex items-center justify-end gap-2 pt-3 border-t border-[var(--rm-border)]">
-                            <button type="button" wire:click="guardarBorrador"
-                                class="rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] px-4 py-2 text-xs font-bold text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)] transition">
-                                <i class="ph-bold ph-floppy-disk"></i> Guardar borrador
-                            </button>
-                            <button type="button" wire:click="confirmarEntrega"
-                                class="rounded-xl bg-[var(--rm-warning)] hover:bg-[var(--rm-warning)] text-white px-5 py-2 text-xs font-bold transition shadow-xs">
-                                <i class="ph-bold ph-paper-plane-right"></i> Confirmar entrega
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            <x-slot:footer><x-ui.action-button variant="secondary" wire:click="guardarBorrador" loading="guardarBorrador" icono="ph-floppy-disk">Guardar borrador</x-ui.action-button><x-ui.action-button tipo="submit" form="handoff-form" variant="primary" loading="confirmarEntrega" icono="ph-paper-plane-right">Confirmar entrega</x-ui.action-button></x-slot:footer>
+        @endif
+    </x-ui.modal-livewire>
+    <x-ui.modal-livewire id="handoff-receive" wire:model="modalRevisar" title="Revisar y recibir pase" subtitle="Lee el resumen y los pendientes antes de confirmar la recepción." maxWidth="lg" closeMethod="cerrarModalRevisar" alpineClose="if (receiptDirty) discardReceipt = true; else $wire.cerrarModalRevisar()" class="rm-handoff__modal">
+        @if($modalRevisar && $paseSeleccionado)
+            <div x-show="discardReceipt" x-cloak class="rm-handoff__notice" role="alert"><div><strong>La observación aún no está guardada.</strong><div class="rm-handoff__tabs"><button type="button" class="rm-btn-secondary" @click="discardReceipt = false">Seguir revisando</button><button type="button" class="rm-btn-secondary" @click="receiptDirty = false; discardReceipt = false; $wire.cerrarModalRevisar()">Descartar y cerrar</button></div></div></div>
+            <div class="space-y-4">@include('cuidados::livewire.cuidados.partials.pase-turno-detalle')
+                @if($puedeRecibirSeleccionado)<form id="handoff-receive-form" wire:submit="confirmarRecepcion" @input="receiptDirty = true"><x-ui.field label="Observación de recepción" for="handoff-receive-note" error="observacionRecepcion" help="Opcional. La recepción quedará registrada a tu nombre con la hora del sistema."><textarea id="handoff-receive-note" class="rm-textarea" wire:model="observacionRecepcion" maxlength="3000" rows="3" aria-invalid="{{ $errors->has('observacionRecepcion') ? 'true' : 'false' }}"></textarea></x-ui.field></form>@endif
+                @error('error_recepcion')<p class="rm-error" role="alert">{{ $message }}</p>@enderror
             </div>
-        </div>
-    @endif
-
-
-    {{-- ======================================================== --}}
-    {{-- MODAL 2: REVISAR Y RECIBIR PASE                          --}}
-    {{-- ======================================================== --}}
-    @if($modalRevisar && $paseSeleccionado)
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm">
-            <div class="relative w-full max-w-2xl rounded-2xl bg-[var(--rm-surface)] border border-[var(--rm-border)] shadow-2xl overflow-hidden"
-                @click.outside="$wire.cerrarModalRevisar()">
-
-                <div class="flex items-center justify-between border-b border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-5 py-4">
-                    <div>
-                        <h3 class="text-sm font-black text-[var(--rm-text-primary)]">
-                            Confirmar recepción de guardia: {{ $paseSeleccionado->residente?->nombre_completo }}
-                        </h3>
-                        <p class="text-[11px] text-[var(--rm-text-secondary)]">
-                            Entregado por: {{ $paseSeleccionado->personalSaliente?->usuario?->name }} ({{ $paseSeleccionado->jornadaSaliente?->turno?->nombre }})
-                        </p>
-                    </div>
-                    <button wire:click="cerrarModalRevisar" class="text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)]">
-                        <i class="ph-bold ph-x text-lg"></i>
-                    </button>
-                </div>
-
-                <div class="p-5 space-y-4 text-xs max-h-[70vh] overflow-y-auto">
-                    {{-- Ficha del Pase Entregado --}}
-                    <div class="space-y-2 rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)] p-3.5">
-                        <div>
-                            <span class="text-[10px] uppercase font-bold text-[var(--rm-text-secondary)] block">Estado general:</span>
-                            <span class="font-bold text-[var(--rm-text-primary)]">{{ $paseSeleccionado->estado_general ?: 'Sin especificar' }}</span>
-                        </div>
-                        <div>
-                            <span class="text-[10px] uppercase font-bold text-[var(--rm-text-secondary)] block">Resumen clínico del turno saliente:</span>
-                            <p class="text-[var(--rm-text-primary)] whitespace-pre-line leading-relaxed">{{ $paseSeleccionado->resumen }}</p>
-                        </div>
-                        @if($paseSeleccionado->pendientes)
-                            <div>
-                                <span class="text-[10px] uppercase font-bold text-[var(--rm-warning)] block">Pendientes:</span>
-                                <p class="text-[var(--rm-text-primary)]">{{ $paseSeleccionado->pendientes }}</p>
-                            </div>
-                        @endif
-                        @if($paseSeleccionado->vigilancia)
-                            <div>
-                                <span class="text-[10px] uppercase font-bold text-[var(--rm-warning)] block">Puntos de vigilancia:</span>
-                                <p class="text-[var(--rm-text-primary)]">{{ $paseSeleccionado->vigilancia }}</p>
-                            </div>
-                        @endif
-                    </div>
-
-                    {{-- Campo Editable: Observación de Recepción --}}
-                    <div class="space-y-1">
-                        <label class="font-bold text-[var(--rm-text-primary)]">Observación de recepción (opcional):</label>
-                        <textarea wire:model="observacionRecepcion" rows="2"
-                            placeholder="Notas al momento de asumir el cuidado del residente..."
-                            class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-2.5 text-xs text-[var(--rm-text-primary)] focus:outline-none focus:border-[var(--rm-warning)]"></textarea>
-                    </div>
-
-                    @error('error_recepcion')
-                        <div class="rounded-xl bg-[var(--rm-danger-soft)] border border-[var(--rm-danger)] p-2.5 text-xs font-bold text-[var(--rm-danger)]">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-
-                <div class="flex items-center justify-end gap-2 border-t border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-5 py-3">
-                    <button wire:click="cerrarModalRevisar"
-                        class="rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] px-4 py-2 text-xs font-bold text-[var(--rm-text-secondary)]">
-                        Cancelar
-                    </button>
-                    <button wire:click="confirmarRecepcion"
-                        class="rounded-xl bg-[var(--rm-action-primary)] hover:bg-[var(--rm-action-primary-hover)] text-white px-5 py-2 text-xs font-bold transition">
-                        ✓ Confirmar recepción de guardia
-                    </button>
-                </div>
-            </div>
-        </div>
-    @endif
-
-
-    {{-- ======================================================== --}}
-    {{-- MODAL 3: VER DETALLE (SOLO LECTURA)                      --}}
-    {{-- ======================================================== --}}
-    @if($modalVer && $paseSeleccionado)
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm">
-            <div class="relative w-full max-w-2xl rounded-2xl bg-[var(--rm-surface)] border border-[var(--rm-border)] shadow-2xl overflow-hidden"
-                @click.outside="$wire.cerrarModalVer()">
-
-                <div class="flex items-center justify-between border-b border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-5 py-4">
-                    <div>
-                        <h3 class="text-sm font-black text-[var(--rm-text-primary)]">
-                            Detalle de pase de turno: {{ $paseSeleccionado->residente?->nombre_completo }}
-                        </h3>
-                        <p class="text-[11px] text-[var(--rm-text-secondary)]">
-                            Código: {{ $paseSeleccionado->cod_pase }} · Estado: <strong>{{ $paseSeleccionado->estado }}</strong>
-                        </p>
-                    </div>
-                    <button wire:click="cerrarModalVer" class="text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)]">
-                        <i class="ph-bold ph-x text-lg"></i>
-                    </button>
-                </div>
-
-                <div class="p-5 space-y-3 text-xs max-h-[70vh] overflow-y-auto">
-                    <div class="grid grid-cols-2 gap-2 bg-[var(--rm-surface-soft)]/50 p-3 rounded-xl">
-                        <div><strong>Saliente:</strong> {{ $paseSeleccionado->personalSaliente?->usuario?->name }} ({{ $paseSeleccionado->jornadaSaliente?->turno?->nombre }})</div>
-                        <div><strong>Entrante:</strong> {{ $paseSeleccionado->personalEntrante?->usuario?->name ?? 'Pendiente' }} ({{ $paseSeleccionado->jornadaEntrante?->turno?->nombre }})</div>
-                        <div><strong>Fecha entrega:</strong> {{ \Carbon\Carbon::parse($paseSeleccionado->fecha_hora)->format('d/m/Y H:i') }}</div>
-                        <div><strong>Fecha recepción:</strong> {{ $paseSeleccionado->fecha_hora_recepcion ? \Carbon\Carbon::parse($paseSeleccionado->fecha_hora_recepcion)->format('d/m/Y H:i') : 'Pendiente' }}</div>
-                    </div>
-
-                    <div>
-                        <span class="font-bold text-[var(--rm-text-secondary)] block">Estado General:</span>
-                        <p class="text-[var(--rm-text-primary)]">{{ $paseSeleccionado->estado_general ?: 'Sin especificar' }}</p>
-                    </div>
-
-                    <div>
-                        <span class="font-bold text-[var(--rm-text-primary)] block">Resumen Clínico:</span>
-                        <p class="text-[var(--rm-text-primary)] whitespace-pre-line leading-relaxed bg-[var(--rm-surface)] p-3 rounded-xl border border-[var(--rm-border)]/40">{{ $paseSeleccionado->resumen }}</p>
-                    </div>
-
-                    @if($paseSeleccionado->pendientes)
-                        <div>
-                            <span class="font-bold text-[var(--rm-warning)] block">Pendientes:</span>
-                            <p class="text-[var(--rm-text-primary)]">{{ $paseSeleccionado->pendientes }}</p>
-                        </div>
-                    @endif
-
-                    @if($paseSeleccionado->vigilancia)
-                        <div>
-                            <span class="font-bold text-[var(--rm-warning)] block">Vigilancia:</span>
-                            <p class="text-[var(--rm-text-primary)]">{{ $paseSeleccionado->vigilancia }}</p>
-                        </div>
-                    @endif
-
-                    @if($paseSeleccionado->recomendacion)
-                        <div>
-                            <span class="font-bold text-[var(--rm-text-secondary)] block">Recomendación:</span>
-                            <p class="text-[var(--rm-text-primary)]">{{ $paseSeleccionado->recomendacion }}</p>
-                        </div>
-                    @endif
-
-                    @if($paseSeleccionado->observacion_recepcion)
-                        <div class="rounded-xl bg-[var(--rm-action-primary-soft)] border border-[var(--rm-action-primary)]/30 p-2.5">
-                            <span class="font-bold text-[var(--rm-action-primary)] block">Nota de recepción del relevo:</span>
-                            <p class="text-[var(--rm-text-primary)]">{{ $paseSeleccionado->observacion_recepcion }}</p>
-                        </div>
-                    @endif
-                </div>
-
-                <div class="flex items-center justify-end border-t border-[var(--rm-border)] bg-[var(--rm-surface-soft)] px-5 py-3">
-                    <button wire:click="cerrarModalVer"
-                        class="rounded-xl bg-[var(--rm-warning)] hover:bg-[var(--rm-warning)] text-white px-4 py-2 text-xs font-bold transition">
-                        Cerrar
-                    </button>
-                </div>
-            </div>
-        </div>
-    @endif
-
+            <x-slot:footer><x-ui.action-button variant="secondary" @click="if (receiptDirty) discardReceipt = true; else $wire.cerrarModalRevisar()">Cerrar</x-ui.action-button>@if($puedeRecibirSeleccionado)<x-ui.action-button tipo="submit" form="handoff-receive-form" variant="primary" icono="ph-check-circle" loading="confirmarRecepcion">Confirmar recepción</x-ui.action-button>@endif</x-slot:footer>
+        @endif
+    </x-ui.modal-livewire>
+    <x-ui.modal-livewire id="handoff-detail" wire:model="modalVer" title="Detalle del pase de turno" subtitle="Consulta de solo lectura. El historial conserva sus registros." maxWidth="lg" closeMethod="cerrarModalVer" :showValidation="false" class="rm-handoff__modal">
+        @if($modalVer && $paseSeleccionado)<div class="space-y-4">@include('cuidados::livewire.cuidados.partials.pase-turno-detalle')
+            @if($mostrarAnulacion)<form id="handoff-annul-form" wire:submit="confirmarAnulacion" class="rm-handoff__notice" data-tone="warning"><div><strong>Anular este pase de turno</strong><p>El contenido y la recepción se conservarán en el historial. Esta acción no resuelve los pendientes comunicados.</p><x-ui.field label="Motivo de anulación" for="handoff-annul-note" error="motivoAnulacion" help="Opcional. Se conservará en la auditoría de la acción."><textarea id="handoff-annul-note" class="rm-textarea" wire:model="motivoAnulacion" maxlength="3000" rows="3"></textarea></x-ui.field></div></form>@endif
+        </div>@endif
+        <x-slot:footer><x-ui.action-button variant="secondary" wire:click="cerrarModalVer">Cerrar</x-ui.action-button>@if($modalVer && $puedeAnularSeleccionado)@if($mostrarAnulacion)<x-ui.action-button variant="secondary" wire:click="$set('mostrarAnulacion', false)">Volver a revisar</x-ui.action-button><x-ui.action-button tipo="submit" form="handoff-annul-form" variant="danger" loading="confirmarAnulacion">Confirmar anulación</x-ui.action-button>@else<x-ui.action-button variant="danger" icono="ph-prohibit" wire:click="solicitarAnulacion">Anular pase</x-ui.action-button>@endif @endif</x-slot:footer>
+    </x-ui.modal-livewire>
 </div>

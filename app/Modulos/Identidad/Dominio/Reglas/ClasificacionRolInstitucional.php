@@ -10,15 +10,15 @@ final class ClasificacionRolInstitucional
     public static function paraRol(string $rol): ?array
     {
         $datos = match ($rol) {
-            'ENFERMEROS' => ['salud', 'ENFERMERO', 'Enfermero(a)', 'ARE_0004'],
-            'MEDICO GENERAL/GERIATRA' => ['salud', 'MEDICO_GENERAL', 'Médico General/Geriatra', 'ARE_0004'],
-            'PSICOLOGO/A' => ['salud', 'PSICOLOGO', 'Psicólogo(a)', 'ARE_0005'],
-            'PEDAGOGO' => ['salud', 'PEDAGOGO', 'Pedagogo(a)', 'ARE_0005'],
-            'NUTRICIONISTA' => ['salud', 'NUTRICIONISTA', 'Nutricionista', 'ARE_0004'],
-            'FISIOTERAPEUTA' => ['salud', 'FISIOTERAPEUTA', 'Fisioterapeuta', 'ARE_0004'],
-            'SUPERADMINISTRADOR' => ['admin', 'SUPERADMINISTRADOR', 'Superadministrador(a)', 'ARE_0009'],
+            'ENFERMEROS' => ['salud', 'ENFERMERO', 'Enfermero(a)', null],
+            'MEDICO GENERAL/GERIATRA' => ['salud', 'MEDICO_GENERAL', 'Médico General/Geriatra', null],
+            'PSICOLOGO/A' => ['salud', 'PSICOLOGO', 'Psicólogo(a)', null],
+            'PEDAGOGO' => ['salud', 'PEDAGOGO', 'Pedagogo(a)', null],
+            'NUTRICIONISTA' => ['salud', 'NUTRICIONISTA', 'Nutricionista', null],
+            'FISIOTERAPEUTA' => ['salud', 'FISIOTERAPEUTA', 'Fisioterapeuta', null],
+            'SUPERADMINISTRADOR' => ['admin', 'SUPERADMINISTRADOR', 'Superadministrador(a)', null],
             'GERENTE' => ['admin', 'GERENTE', 'Gerente', null],
-            'ADMINISTRADOR' => ['admin', 'ADMINISTRADOR', 'Administrador(a)', 'ARE_0003'],
+            'ADMINISTRADOR' => ['admin', 'ADMINISTRADOR', 'Administrador(a)', null],
             default => null,
         };
         if ($datos === null) {

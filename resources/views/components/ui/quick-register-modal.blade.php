@@ -2,8 +2,10 @@
     'model', 'title', 'subtitle' => null, 'closeMethod', 'backMethod' => null,
     'backLabel' => 'Volver', 'id' => 'quick-register', 'icon' => null,
     'context' => null, 'footer' => null,
+    'alpineClose' => null, 'alpineBack' => null, 'autoFocus' => true,
+    'backText' => false, 'dragIcon' => 'ph-dots-six',
 ])
-<x-ui.modal-livewire :id="$id" wire:model="{{ $model }}" class="{{ $attributes->get('class') }}" :title="$title" :subtitle="$subtitle" max-width="lg" :close-method="$closeMethod" :back-method="$backMethod" :back-label="$backLabel" :show-validation="false" :dismiss-on-backdrop="true" :draggable="true">
+<x-ui.modal-livewire :id="$id" wire:model="{{ $model }}" class="{{ $attributes->get('class') }}" :title="$title" :subtitle="$subtitle" max-width="lg" :close-method="$closeMethod" :back-method="$backMethod" :back-label="$backLabel" :back-text="$backText" :drag-icon="$dragIcon" :show-validation="false" :dismiss-on-backdrop="true" :draggable="true" :alpine-close="$alpineClose" :alpine-back="$alpineBack" :auto-focus="$autoFocus">
     @if(isset($icon))
         <x-slot:icon>{{ $icon }}</x-slot:icon>
     @endif

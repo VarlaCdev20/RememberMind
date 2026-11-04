@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\CARLAENCINAS\Desktop\RememberMind\phpunit.postgres.xml" tests="3" assertions="2144" errors="0" failures="0" skipped="0" time="51.216650">
+    <testsuite name="Feature" tests="3" assertions="2144" errors="0" failures="0" skipped="0" time="51.216650">
+      <testsuite name="Tests\Feature\CohorteInferencia30Test" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CohorteInferencia30Test.php" tests="3" assertions="2144" errors="0" failures="0" skipped="0" time="51.216650">
+        <testcase name="test_treinta_admisiones_fuentes_originales_dos_ramas_y_cuatro_perfiles_reproducibles" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CohorteInferencia30Test.php" line="30" class="Tests\Feature\CohorteInferencia30Test" classname="Tests.Feature.CohorteInferencia30Test" assertions="2128" time="42.781750"/>
+        <testcase name="test_rechaza_entorno_local_antes_de_escribir" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CohorteInferencia30Test.php" line="235" class="Tests\Feature\CohorteInferencia30Test" classname="Tests.Feature.CohorteInferencia30Test" assertions="3" time="3.027808"/>
+        <testcase name="test_fallo_parcial_revierte_admision_fuentes_auditoria_y_correlativos" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CohorteInferencia30Test.php" line="250" class="Tests\Feature\CohorteInferencia30Test" classname="Tests.Feature.CohorteInferencia30Test" assertions="13" time="5.407091"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

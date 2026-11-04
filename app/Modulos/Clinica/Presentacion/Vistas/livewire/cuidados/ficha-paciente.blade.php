@@ -87,4 +87,9 @@
     @livewire('medicacion.medicacion-adulto-modal')
 
     @include('livewire.cuidados.ficha.modales')
+    <div @ficha-heridas-popup-cerrado.window="modalSelectorAtencion = !$event.detail.volverAlResidente; $nextTick(() => document.getElementById('ficha-heridas-trigger')?.focus())">
+        @if($modalHeridas)
+            <livewire:app.frontend.livewire.enfermeria.cuidados.registros-enfermeria :cod-residente="$adultoMayor->getKey()" :emergente="true" :key="'ficha-heridas-popup-'.$adultoMayor->getKey()" />
+        @endif
+    </div>
 </div>

@@ -63,7 +63,8 @@ class NursingDashboardAgendaTest extends TestCase
 
     public function test_graficas_del_turno_usan_indicadores_verificables_sin_inventar_clasificacion_clinica(): void
     {
-        $vista = file_get_contents(base_path('app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/dashboard-turno.blade.php'));
+        $vista = $this->contenidoVistaConParciales('livewire.cuidados.dashboard-turno');
+        $javascript = file_get_contents(resource_path('frontend/scripts/modules/nursing-dashboard.js'));
         $inicio = strpos($vista, '<x-ui.card class="rm-nursing-dashboard__distribution');
         $fin = strpos($vista, '</x-ui.card>', $inicio);
         $card = substr($vista, $inicio, $fin - $inicio);
@@ -80,11 +81,22 @@ class NursingDashboardAgendaTest extends TestCase
         $this->assertStringContainsString('Sin acciones para graficar', $vista);
         $this->assertStringContainsString('rm-chart-card rm-incident-trend', $vista);
         $this->assertStringContainsString('rm-nursing-distribution rm-chart-card', $vista);
-        $this->assertStringContainsString('window.RMCharts.presets.doughnut', $vista);
-        $this->assertStringContainsString('window.RMCharts.presets.barHorizontal', $vista);
-        $this->assertStringContainsString('prefers-reduced-motion: reduce', $vista);
+        $this->assertStringContainsString('window.RMCharts.presets.doughnut', $javascript);
+        $this->assertStringContainsString('window.RMCharts.presets.barHorizontal', $javascript);
+        $this->assertStringContainsString('prefers-reduced-motion: reduce', $javascript);
         $this->assertStringContainsString('Evolución de incidentes', $vista);
         $this->assertStringNotContainsString('data-nursing-incidents-by-type', $vista);
+    }
+
+    private function contenidoVistaConParciales(string $vista): string
+    {
+        $contenido = file_get_contents(view()->getFinder()->find($vista));
+        preg_match_all("/@include\\('([^']+)'/", $contenido, $parciales);
+        foreach ($parciales[1] as $parcial) {
+            $contenido .= $this->contenidoVistaConParciales($parcial);
+        }
+
+        return $contenido;
     }
 
     private function evento(string $titulo, string $estado, int $momento): array

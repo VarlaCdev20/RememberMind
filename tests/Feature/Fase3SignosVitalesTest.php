@@ -261,4 +261,17 @@ class Fase3SignosVitalesTest extends TestCase
             ->assertSet('signosHistorial.0.alerta_estado', 'EN_ATENCION');
     }
 
+    public function test_modal_compartido_conserva_residente_y_guarda_con_autoria_autorizada(): void
+    {
+        \Livewire\Livewire::test(\App\Modulos\Clinica\Presentacion\Livewire\Funcionalidades\RegistroSignosVitalesModal::class)
+            ->call('abrir', $this->residente->cod_residente)
+            ->assertSet('cod_residente', $this->residente->cod_residente)
+            ->set('fc', '75')->set('saturacion', '89')
+            ->assertDontSee('Saturación crítica')->call('guardar')->assertOk()
+            ->assertHasNoErrors()->assertSet('mostrar', false)->assertDispatched('signos-guardados');
+        $this->assertDatabaseHas('signos_vitales', ['cod_residente' => $this->residente->cod_residente,
+            'cod_personal' => $this->usuario->personal->cod_personal,
+            'frecuencia_cardiaca' => 75, 'saturacion_oxigeno' => 89]);
+        $this->assertDatabaseCount('alertas', 0);
+    }
 }

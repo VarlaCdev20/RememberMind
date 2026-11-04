@@ -1,0 +1,462 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Modulos\Valoraciones\Presentacion\Livewire\Funcionalidades;
+
+use App\Compartido\Aplicacion\Contratos\CodigosEntidad;
+use App\Models\Instrumento;
+use App\Models\Residente;
+use App\Modulos\Valoraciones\Aplicacion\Acciones\AplicarInstrumento;
+use App\Modulos\Valoraciones\Aplicacion\Consultas\PrepararCapturaInstrumental;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Locked;
+use Livewire\Component;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+
+/** Interacción compartida por residente y área; AplicarInstrumento protege la operación institucional. */
+abstract class CapturaInstrumentalModal extends Component
+{
+    #[Locked]
+    public bool $mostrar = false;
+
+    #[Locked]
+    public bool $confirmando = false;
+
+    #[Locked]
+    public bool $confirmarDescarte = false;
+
+    #[Locked]
+    public ?string $residenteFijo = null;
+
+    #[Locked]
+    public ?string $residenteSeleccionado = null;
+
+    #[Locked]
+    public ?string $instrumentoSeleccionado = null;
+
+    #[Locked]
+    public ?string $codigoReservado = null;
+
+    #[Locked]
+    public ?string $aplicacionGuardada = null;
+
+    public ?string $cod_residente = null;
+
+    public ?string $cod_instrumento = null;
+
+    public string $fecha_eval = '';
+
+    public string $hora_eval = '';
+
+    public string $busquedaResidente = '';
+
+    public string $observaciones = '';
+
+    public bool $transcripcion = false;
+
+    public ?string $cod_documento_clinico = null;
+
+    public string $cod_personal_original = '';
+
+    public string $localizador_fuente = '';
+
+    public bool $original_cotejado = false;
+
+    public ?string $cod_aplicacion_anterior = null;
+
+    public ?string $cod_aplicacion_existente = null;
+
+    public string $motivo_rectificacion = '';
+
+    #[Locked]
+    public ?string $estadoConciliacion = null;
+
+    public array $valores = [];
+
+    public array $puntajesOriginales = [];
+
+    public array $observacionesRespuesta = [];
+
+    public ?string $cod_atencion = null;
+
+    public string $fechaAtencion = '';
+
+    public string $clasificacion_original = '';
+
+    public string $interpretacion_original = '';
+
+    #[Locked]
+    public array $preguntas = [];
+
+    #[Locked]
+    public array $vinculoMetodo = [];
+
+    #[Locked]
+    public array $contexto = [];
+
+    #[Locked]
+    public ?string $huellaCatalogo = null;
+
+    #[Locked]
+    public ?string $huellaConfirmacion = null;
+
+    #[Locked]
+    public array $fechaInicial = [];
+
+    public function mount(?string $cod_residente = null): void
+    {
+        $this->residenteFijo = $cod_residente;
+    }
+
+    protected function preparar(?string $codigoResidente): bool
+    {
+        if ($this->mostrar && $this->tieneCambios()) {
+            $this->addError('registro', 'Conserva o descarta la captura actual antes de abrir otra.');
+
+            return false;
+        }
+        $consulta = app(PrepararCapturaInstrumental::class);
+        $consulta->usuario(auth()->user());
+        abort_if($this->residenteFijo !== null && $codigoResidente !== $this->residenteFijo, 403);
+        $contexto = $codigoResidente !== null ? $consulta->contexto(auth()->user(), $codigoResidente) : [];
+        $this->reset(['cod_instrumento', 'instrumentoSeleccionado', 'codigoReservado', 'aplicacionGuardada', 'valores', 'preguntas', 'vinculoMetodo',
+            'puntajesOriginales', 'observacionesRespuesta', 'cod_atencion', 'clasificacion_original', 'interpretacion_original',
+            'observaciones', 'confirmando', 'confirmarDescarte', 'busquedaResidente', 'fechaAtencion', 'huellaCatalogo', 'huellaConfirmacion',
+            'transcripcion', 'cod_documento_clinico', 'cod_personal_original', 'localizador_fuente', 'original_cotejado', 'cod_aplicacion_anterior', 'cod_aplicacion_existente', 'motivo_rectificacion', 'estadoConciliacion']);
+        $this->resetValidation();
+        $this->cod_residente = $this->residenteSeleccionado = $codigoResidente;
+        $this->contexto = $contexto;
+        $this->fecha_eval = now()->format('Y-m-d');
+        $this->hora_eval = now()->format('H:i:s');
+        $this->fechaInicial = [$this->fecha_eval, $this->hora_eval];
+        $this->mostrar = true;
+
+        return true;
+    }
+
+    public function updatedCodResidente(?string $value): void
+    {
+        if ($this->residenteSeleccionado !== null && $this->tieneCambios()) {
+            $this->cod_residente = $this->residenteSeleccionado;
+            $this->addError('cod_residente', 'Descarta o registra las respuestas antes de cambiar de residente.');
+
+            return;
+        }
+        abort_if($this->residenteFijo !== null && $value !== $this->residenteFijo, 403);
+        app(PrepararCapturaInstrumental::class)->usuario(auth()->user());
+        $this->contexto = $value ? app(PrepararCapturaInstrumental::class)->contexto(auth()->user(), $value) : [];
+        $this->residenteSeleccionado = $value;
+        $this->reset(['cod_instrumento', 'instrumentoSeleccionado', 'preguntas', 'vinculoMetodo', 'confirmando', 'cod_atencion', 'fechaAtencion']);
+    }
+
+    public function updatedCodInstrumento(?string $value): void
+    {
+        if ($this->instrumentoSeleccionado !== null && $this->hayRespuestas()) {
+            $this->cod_instrumento = $this->instrumentoSeleccionado;
+            $this->addError('cod_instrumento', 'Descarta o registra las respuestas antes de cambiar de instrumento.');
+
+            return;
+        }
+        $this->comprobarResidente();
+        $catalogo = $value ? app(PrepararCapturaInstrumental::class)->catalogo(auth()->user(), $this->cod_residente, $value) : [];
+        $this->preguntas = $catalogo['preguntas'] ?? [];
+        $this->vinculoMetodo = $catalogo['vinculo_metodo'] ?? [];
+        $this->huellaCatalogo = $catalogo['huella'] ?? null;
+        $this->instrumentoSeleccionado = $value;
+        $this->confirmando = false;
+        $this->resetValidation();
+    }
+
+    public function updated(string $property): void
+    {
+        if ($property === 'transcripcion' && $this->transcripcion) {
+            $this->fecha_eval = $this->hora_eval = '';
+        }
+        if (str_starts_with($property, 'valores.') || str_starts_with($property, 'puntajesOriginales.') || str_starts_with($property, 'observacionesRespuesta.')
+            || in_array($property, ['valores', 'puntajesOriginales', 'observacionesRespuesta', 'cod_atencion', 'clasificacion_original', 'interpretacion_original', 'cod_residente', 'cod_instrumento', 'observaciones', 'fecha_eval', 'hora_eval',
+                'transcripcion', 'cod_documento_clinico', 'cod_personal_original', 'localizador_fuente', 'original_cotejado', 'cod_aplicacion_anterior', 'cod_aplicacion_existente', 'motivo_rectificacion'], true)) {
+            $this->confirmando = false;
+            $this->huellaConfirmacion = null;
+        }
+    }
+
+    public function revisar(): void
+    {
+        $entrada = $this->entrada();
+        if ($this->transcripcion) {
+            try {
+                $this->estadoConciliacion = app(AplicarInstrumento::class)->conciliar(auth()->user(), $entrada,
+                    Instrumento::query()->findOrFail($this->cod_instrumento), Residente::query()->findOrFail($this->cod_residente))['estado'];
+            } catch (ValidationException $e) {
+                $this->mostrarErroresRegistro($e, $entrada);
+
+                return;
+            } catch (HttpException $e) {
+                if (! in_array($e->getStatusCode(), [409, 422], true)) {
+                    throw $e;
+                }
+                $this->addError('registro', $e->getMessage());
+
+                return;
+            }
+        }
+        // Reserva interna: la PK proporciona una identidad única para los reenvíos del formulario confirmado.
+        $this->codigoReservado ??= app(CodigosEntidad::class)->siguiente('aplicaciones_instrumento');
+        $this->huellaConfirmacion = $this->huellaEntrada($entrada);
+        $this->confirmando = true;
+    }
+
+    public function volver(): void
+    {
+        $this->confirmando = $this->confirmarDescarte = false;
+    }
+
+    public function guardar(): void
+    {
+        if ($this->aplicacionGuardada !== null) {
+            return;
+        }
+        $entrada = $this->entrada();
+        if (! $this->confirmando || $this->codigoReservado === null || $this->huellaConfirmacion === null
+            || ! hash_equals($this->huellaConfirmacion, $this->huellaEntrada($entrada))) {
+            $this->addError('registro', 'Revisa las respuestas y confirma la captura antes de registrarla.');
+
+            return;
+        }
+        try {
+            $accion = app(AplicarInstrumento::class);
+            $instrumento = Instrumento::query()->findOrFail($this->cod_instrumento);
+            $residente = Residente::query()->findOrFail($this->cod_residente);
+            $aplicacion = $this->transcripcion ? $accion->transcribir(auth()->user(), $entrada, $instrumento, $residente, $this->huellaCatalogo)
+                : $accion->aplicar(auth()->user(), $entrada, $instrumento, $residente, $this->codigoReservado, $this->huellaCatalogo);
+        } catch (ValidationException $e) {
+            $this->mostrarErroresRegistro($e, $entrada);
+
+            return;
+        } catch (QueryException $e) {
+            report($e);
+            $this->addError('registro', 'No se pudo registrar la captura. Conservamos tus respuestas para que puedas volver a intentarlo.');
+
+            return;
+        } catch (HttpException $e) {
+            if (! in_array($e->getStatusCode(), [409, 422], true)) {
+                throw $e;
+            }
+            $this->addError('registro', $e->getMessage());
+
+            return;
+        }
+        $this->aplicacionGuardada = $aplicacion->getKey();
+        $this->mostrar = $this->confirmando = false;
+        $this->valores = [];
+        $this->puntajesOriginales = $this->observacionesRespuesta = [];
+        $this->observaciones = '';
+        $this->dispatch('evaluacion-geriatrica-guardada', codAplicacion: $aplicacion->getKey());
+        $this->dispatch('swal:alert', ['type' => 'success', 'title' => 'Captura registrada',
+            'message' => 'Se guardaron las respuestas originales con su fecha y profesional. Consulta el perfil para ver los cálculos disponibles.']);
+    }
+
+    private function comprobarResidente(): void
+    {
+        abort_unless($this->cod_residente !== null && ($this->residenteFijo === null || $this->cod_residente === $this->residenteFijo), 403);
+        $this->contexto = app(PrepararCapturaInstrumental::class)->contexto(auth()->user(), $this->cod_residente);
+    }
+
+    private function huellaEntrada(array $entrada): string
+    {
+        return hash('sha256', json_encode([$this->cod_residente, $this->cod_instrumento, $this->huellaCatalogo, $entrada], JSON_THROW_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION));
+    }
+
+    private function mostrarErroresRegistro(ValidationException $e, array $entrada): void
+    {
+        foreach ($e->errors() as $campo => $mensajes) {
+            $destino = 'registro';
+            if (preg_match('/^respuestas\.(\d+)\.(\w+)$/', $campo, $m) && isset($entrada['respuestas'][(int) $m[1]])) {
+                $destino = match ($m[2]) {
+                    'puntaje' => 'puntajesOriginales', 'observacion' => 'observacionesRespuesta', default => 'valores',
+                }.'.'.$entrada['respuestas'][(int) $m[1]]['cod_pregunta'];
+            } elseif (in_array($campo, ['cod_documento_clinico', 'cod_personal_original', 'localizador_fuente', 'original_cotejado',
+                'cod_aplicacion_anterior', 'cod_aplicacion_existente', 'motivo_rectificacion', 'cod_atencion'], true)) {
+                $destino = $campo;
+            }
+            $this->addError($destino, implode(' ', $mensajes));
+        }
+    }
+
+    private function entrada(): array
+    {
+        $this->comprobarResidente();
+        $this->validate(['cod_instrumento' => 'required|string', 'fecha_eval' => 'required|date_format:Y-m-d|before_or_equal:today',
+            'hora_eval' => 'required|date_format:H:i:s,H:i', 'observaciones' => 'nullable|string|max:4000', 'valores' => 'array', 'cod_atencion' => 'nullable|string|max:20']);
+        if (filled($this->cod_atencion) && ! app(PrepararCapturaInstrumental::class)->atencion(auth()->user(), $this->cod_residente, $this->cod_atencion)) {
+            throw ValidationException::withMessages(['cod_atencion' => 'Selecciona una atención de este residente o deja la aplicación sin vínculo.']);
+        }
+        if ($this->transcripcion) {
+            $this->validate(['puntajesOriginales' => 'array', 'puntajesOriginales.*' => 'nullable|numeric|min:0|max:999999.99|decimal:0,2',
+                'observacionesRespuesta' => 'array', 'observacionesRespuesta.*' => 'nullable|string|max:4000',
+                'cod_atencion' => 'nullable|string', 'clasificacion_original' => 'nullable|string|max:80', 'interpretacion_original' => 'nullable|string|max:4000']);
+        }
+        $fechaOriginal = $this->fecha_eval.' '.$this->hora_eval.(strlen($this->hora_eval) === 5 ? ':00' : '');
+        Validator::make(['hora_eval' => $fechaOriginal], ['hora_eval' => 'before_or_equal:now'],
+            ['hora_eval.before_or_equal' => 'La fecha y hora originales no pueden ser futuras.'])->validate();
+        $catalogo = app(PrepararCapturaInstrumental::class)->catalogo(auth()->user(), $this->cod_residente, $this->cod_instrumento);
+        if ($this->huellaCatalogo === null || ! hash_equals($this->huellaCatalogo, $catalogo['huella'])) {
+            throw ValidationException::withMessages(['cod_instrumento' => 'El catálogo cambió. Revisa el instrumento actualizado antes de registrar la captura.']);
+        }
+        $preguntas = $catalogo['preguntas'];
+        $porCodigo = array_column($preguntas, null, 'codigo');
+        $respuestas = [];
+        if ($this->transcripcion) {
+            foreach (['puntajesOriginales', 'observacionesRespuesta'] as $grupo) {
+                foreach ($this->{$grupo} as $codigo => $valor) {
+                    if ($valor !== null && $valor !== '' && (! isset($porCodigo[$codigo]) || ($this->valores[$codigo] ?? null) === null || $this->valores[$codigo] === '')) {
+                        throw ValidationException::withMessages([$grupo.'.'.$codigo => 'Registra primero la respuesta original de esta pregunta.']);
+                    }
+                }
+            }
+        }
+        foreach ($this->valores as $codigo => $valor) {
+            if (! isset($porCodigo[$codigo]) || $porCodigo[$codigo]['campo'] === null) {
+                throw ValidationException::withMessages(['valores.'.$codigo => 'La pregunta no pertenece al instrumento activo.']);
+            }
+            if ($valor !== null && $valor !== '') {
+                $campo = $porCodigo[$codigo]['campo'];
+                Validator::make(['valores' => [$codigo => $valor]], ['valores.'.$codigo => match ($campo) {
+                    'valor_numero' => 'required|numeric|between:-99999999.9999,99999999.9999|decimal:0,4',
+                    'valor_logico' => 'required|boolean', 'valor_texto' => 'required|string', 'cod_opcion' => 'required|string',
+                }])->validate();
+                if ($campo === 'cod_opcion' && ! in_array($valor, array_column($porCodigo[$codigo]['opciones'], 'codigo'), true)) {
+                    throw ValidationException::withMessages(['valores.'.$codigo => 'Selecciona una opción activa de esta pregunta.']);
+                }
+                $respuesta = ['cod_pregunta' => $codigo, $campo => $valor];
+                if ($this->transcripcion) {
+                    foreach (['puntajesOriginales' => 'puntaje', 'observacionesRespuesta' => 'observacion'] as $grupo => $destino) {
+                        $dato = $this->{$grupo}[$codigo] ?? null;
+                        if ($dato !== null && $dato !== '') {
+                            $respuesta[$destino] = $dato;
+                        }
+                    }
+                }
+                $respuestas[] = $respuesta;
+            }
+        }
+        if ($respuestas === []) {
+            throw ValidationException::withMessages(['registro' => 'Registra al menos una respuesta original. Las preguntas sin dato se mantienen sin respuesta.']);
+        }
+        if (($catalogo['vinculo_metodo']['inicial'] ?? null) !== null) {
+            app(\App\Modulos\ApoyoDecision\Aplicacion\Servicios\PerfilesInstrumentalesIniciales::class)
+                ->puntuacion($catalogo['vinculo_metodo']['inicial'], $respuestas);
+        }
+
+        return ['fecha_hora' => $fechaOriginal, 'cod_atencion' => $this->cod_atencion ?: null,
+            'observacion' => $this->observaciones === '' ? null : $this->observaciones, 'respuestas' => $respuestas]
+            + ($this->transcripcion ? ['cod_documento_clinico' => $this->cod_documento_clinico, 'cod_personal_original' => $this->cod_personal_original,
+                'clasificacion' => $this->clasificacion_original === '' ? null : $this->clasificacion_original,
+                'interpretacion' => $this->interpretacion_original === '' ? null : $this->interpretacion_original,
+                'localizador_fuente' => $this->localizador_fuente, 'original_cotejado' => $this->original_cotejado,
+                'cod_aplicacion_existente' => $this->cod_aplicacion_existente ?: null,
+                'cod_aplicacion_anterior' => $this->cod_aplicacion_anterior ?: null, 'motivo_rectificacion' => $this->motivo_rectificacion ?: null] : []);
+    }
+
+    public function resumenInicial(): ?array
+    {
+        $definicion = $this->vinculoMetodo['inicial'] ?? null;
+
+        return $definicion === null ? null
+            : app(\App\Modulos\ApoyoDecision\Aplicacion\Servicios\PerfilesInstrumentalesIniciales::class)->previsualizar($definicion, $this->valores);
+    }
+
+    private function tieneCambios(): bool
+    {
+        return $this->hayRespuestas() || $this->fechaInicial !== [$this->fecha_eval, $this->hora_eval]
+            || $this->cod_documento_clinico !== null || $this->localizador_fuente !== '' || $this->cod_personal_original !== '' || $this->motivo_rectificacion !== '';
+    }
+
+    private function hayRespuestas(): bool
+    {
+        return $this->observaciones !== '' || $this->cod_atencion !== null || $this->clasificacion_original !== '' || $this->interpretacion_original !== ''
+            || count(array_filter([...array_values($this->valores), ...array_values($this->puntajesOriginales), ...array_values($this->observacionesRespuesta)], fn ($v) => $v !== null && $v !== '')) > 0;
+    }
+
+    public function cerrar(): void
+    {
+        if ($this->tieneCambios()) {
+            $this->confirmarDescarte = true;
+
+            return;
+        }
+        $this->mostrar = false;
+    }
+
+    public function descartar(): void
+    {
+        $this->mostrar = $this->confirmando = $this->confirmarDescarte = false;
+        $this->valores = [];
+        $this->puntajesOriginales = $this->observacionesRespuesta = [];
+        $this->observaciones = '';
+        $this->resetValidation();
+    }
+
+    public function render()
+    {
+        $consulta = app(PrepararCapturaInstrumental::class);
+        $instrumentos = $residentes = $documentos = $atenciones = collect();
+        $atencionVista = null;
+        $puedeVerAtenciones = false;
+        $puedeVerInformantes = false;
+        if ($this->mostrar) {
+            $instrumentos = $consulta->instrumentos(auth()->user());
+            $puedeVerInformantes = app(\App\Modulos\Valoraciones\Aplicacion\Consultas\ContextoAtencionCognitiva::class)->puedeVerInformantes(\App\Models\User::query()->findOrFail(auth()->id()));
+            if ($this->cod_residente !== null) {
+                $this->comprobarResidente();
+                $puedeVerAtenciones = auth()->user()->checkPermissionTo('atenciones.ver', 'web');
+                if ($puedeVerAtenciones) {
+                    try {
+                        $atenciones = $consulta->atenciones(auth()->user(), $this->cod_residente, $this->fechaAtencion);
+                    } catch (ValidationException $e) {
+                        foreach ($e->errors() as $campo => $mensajes) {
+                            $this->addError($campo, implode(' ', $mensajes));
+                        }
+                    }
+                    $atencionVista = filled($this->cod_atencion) ? $consulta->atencion(auth()->user(), $this->cod_residente, $this->cod_atencion) : null;
+                }
+                if ($this->transcripcion) {
+                    $documentos = $consulta->fuentesTranscripcion(auth()->user(), $this->cod_residente);
+                }
+            }
+            if ($this->residenteFijo === null) {
+                $residentes = $consulta->residentes(auth()->user(), mb_substr($this->busquedaResidente, 0, 100));
+            }
+        }
+
+        $respuestasVista = [];
+        foreach ($this->preguntas as $pregunta) {
+            $valor = $this->valores[$pregunta['codigo']] ?? null;
+            $registrada = $valor !== null && $valor !== '';
+            $texto = 'Sin registrar';
+            if ($registrada) {
+                $texto = match ($pregunta['campo']) {
+                    'valor_logico' => match (true) {
+                        in_array($valor, [true, 1, '1'], true) => 'Sí',
+                        in_array($valor, [false, 0, '0'], true) => 'No',
+                        default => 'Respuesta por revisar',
+                    },
+                    'cod_opcion' => collect($pregunta['opciones'])->firstWhere('codigo', $valor)['nombre'] ?? 'Opción por revisar',
+                    default => is_scalar($valor) ? (string) $valor : 'Respuesta por revisar',
+                };
+            }
+            $respuestasVista[] = ['pregunta' => $pregunta['enunciado'], 'valor' => $texto, 'registrada' => $registrada,
+                'puntaje' => $this->transcripcion ? ($this->puntajesOriginales[$pregunta['codigo']] ?? null) : null,
+                'observacion' => $this->transcripcion ? ($this->observacionesRespuesta[$pregunta['codigo']] ?? null) : null];
+        }
+        $instrumentoVista = $instrumentos->firstWhere('cod_instrumento', $this->cod_instrumento);
+        $resumenCaptura = ['instrumento' => $instrumentoVista?->nombre, 'version' => $instrumentoVista?->version,
+            'total' => count($respuestasVista), 'respondidas' => count(array_filter($respuestasVista, fn ($r) => $r['registrada'])),
+            'respuestas' => $respuestasVista];
+
+        return view('livewire.valoraciones.evaluacion-geriatrica-modal', compact('instrumentos', 'residentes', 'documentos', 'resumenCaptura', 'atenciones', 'atencionVista', 'puedeVerAtenciones', 'puedeVerInformantes'));
+    }
+}

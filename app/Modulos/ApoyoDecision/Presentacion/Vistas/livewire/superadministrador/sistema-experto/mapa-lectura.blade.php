@@ -1,0 +1,7 @@
+<div x-data="rmExpertKnowledgeGraph(@js($grafoLectura))" class="rm-expert-read-map">
+    <p class="rm-expert-guide">Seleccione un registro para ver su procedencia. Las flechas representan pertenencia documentada a este expediente.</p>
+    <div class="rm-lab-actions"><button type="button" class="rm-btn rm-btn-secondary" @click="zoom(-.15)" aria-label="Reducir mapa del expediente">−</button><button type="button" class="rm-btn rm-btn-secondary" @click="zoom(.15)" aria-label="Ampliar mapa del expediente">+</button><button type="button" class="rm-btn rm-btn-secondary" @click="centrar()">Ajustar mapa del expediente</button></div>
+    <x-ui.expert-graph-canvas class="rm-knowledge-canvas" label="Conexiones documentadas del expediente" />
+    <div x-show="actual" x-cloak class="rm-expert-source-detail" aria-live="polite"><h4 x-text="actual?.nombre"></h4><p x-text="actual?.estado"></p><dl class="rm-lab-data"><template x-for="(valor, etiqueta) in actual?.datos || {}" :key="etiqueta"><div><dt x-text="etiqueta"></dt><dd x-text="valor ?? 'No disponible'"></dd></div></template></dl></div>
+    <details class="rm-expert-source-detail"><summary>Lista accesible de registros y relaciones</summary><div class="rm-expert-record__links"><template x-for="n in nodos" :key="n.id"><button type="button" @click="seleccionar(n.id)"><span><strong x-text="n.nombre"></strong><small x-text="n.estado"></small></span></button></template></div></details>
+</div>

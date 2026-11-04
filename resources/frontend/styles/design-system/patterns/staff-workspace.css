@@ -1,0 +1,148 @@
+/* Personal institucional: reflow según el espacio del contenido y del diálogo.
+   Conserva superficies, tipografía, permisos y acciones del sistema compartido. */
+.rm-staff-workspace { container: staff-workspace / inline-size; min-width: 0; }
+.rm-staff-workspace :is(.rm-card, .rm-filter-bar, .rm-chart-card, .rm-collection-results) { min-width: 0; max-width: 100%; }
+.rm-staff-workspace :is(button, input:not([type="checkbox"], [type="radio"]), select),
+.rm-staff-dialog :is(button, input:not([type="checkbox"], [type="radio"]), select) { min-height: 44px; }
+.rm-staff-workspace :is(button, a, input, select):focus-visible,
+.rm-staff-dialog :is(button, a, input, select):focus-visible { outline: 2px solid var(--rm-focus); outline-offset: 2px; }
+.rm-staff-workspace button:has(> i:only-child), .rm-staff-dialog button:has(> i:only-child) { min-width: 44px; flex-shrink: 0; }
+.rm-staff-workspace :is(input, select), .rm-staff-dialog :is(input, select, textarea) { min-width: 0; max-width: 100%; font-size: var(--rm-font-size-body); }
+.rm-staff-workspace .rm-collection-header { flex-direction: row; align-items: center; flex-wrap: wrap; }
+.rm-staff-workspace .rm-collection-header__identity { flex: 1 1 360px; }
+.rm-staff-workspace .rm-collection-header__aside { flex: 1 1 280px; }
+.rm-staff-workspace .rm-collection-header__actions { width: 100%; }
+.rm-staff-tabs__items { display: flex; flex-wrap: wrap; gap: var(--rm-space-1); }
+.rm-staff-tabs__items > button { flex: 1 1 100px; justify-content: center; white-space: normal; text-align: center; line-height: 1.4; font-size: var(--rm-font-size-label); }
+.rm-staff-tabs__items > button[aria-pressed="true"] { background: var(--rm-selected-bg); border-radius: var(--rm-radius-sm) var(--rm-radius-sm) 0 0; }
+.rm-staff-workspace .rm-staff-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.rm-staff-workspace .rm-staff-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.rm-staff-filters > * { min-width: 0; }
+.rm-staff-workspace .rm-staff-filters__search { grid-column: 1 / -1; }
+.rm-staff-workspace .rm-person-entity-card .truncate,
+.rm-staff-workspace .rm-staff-table .truncate { overflow: visible; white-space: normal; text-overflow: clip; overflow-wrap: anywhere; }
+.rm-staff-workspace .rm-person-entity-card > .relative { flex-wrap: wrap; }
+.rm-staff-workspace .rm-person-entity-card .min-w-0 { overflow-wrap: anywhere; }
+.rm-staff-workspace .rm-staff-table-wrap, .rm-staff-schedule .rm-staff-table-wrap { container: staff-table / inline-size; min-width: 0; }
+.rm-staff-workspace table.rm-staff-table, .rm-staff-schedule table.rm-staff-table { min-width: 0; width: 100%; table-layout: fixed; }
+.rm-staff-workspace table.rm-staff-table :is(th, td), .rm-staff-schedule table.rm-staff-table :is(th, td) { overflow-wrap: anywhere; white-space: normal; }
+.rm-shell [data-rm-main] :is(.rm-staff-workspace, .rm-staff-schedule) table.rm-staff-table th { white-space: normal; }
+.rm-shell [data-rm-main] :is(.rm-staff-workspace, .rm-staff-schedule) table.rm-staff-table :is(th, td):last-child { width: 148px; white-space: normal; }
+.rm-shell [data-rm-main] :is(.rm-staff-workspace, .rm-staff-schedule) table.rm-staff-table :is(th, td):first-child { width: 28%; }
+.rm-staff-workspace table.rm-staff-table td:last-child > div, .rm-staff-schedule table.rm-staff-table td:last-child > div { flex-wrap: wrap; }
+.rm-staff-workspace .rm-chart-card { height: auto; min-height: 300px; }
+.rm-staff-workspace .rm-chart-card > [wire\:ignore] { min-height: 230px; }
+.rm-staff-workspace .rm-chart-title { flex-wrap: wrap; }
+.rm-staff-workspace .rm-staff-directory-search { min-width: 0; }
+
+/* Una superficie de resumen y un único panel de trabajo, sin tarjetas anidadas. */
+/* Contexto en texto; la lista de personas es la superficie principal. */
+html .rm-shell[class] [data-rm-main] .rm-staff-workspace .rm-collection-header.rm-staff-heading { --rm-shadow-card: none; min-height: 0; padding: 0; border: 0; border-radius: 0; background: transparent; }
+.rm-staff-heading .rm-collection-header__icon { display: none; }
+.rm-staff-overview { display: flex; flex-wrap: wrap; gap: var(--rm-space-2) var(--rm-space-5); margin: 0; padding: var(--rm-space-2) 0; }
+.rm-staff-overview > div { display: flex; align-items: baseline; gap: var(--rm-space-2); }
+.rm-staff-overview dt { color: var(--rm-text-secondary-readable); font: 500 var(--rm-font-size-label)/1.5 var(--rm-font-body); }
+.rm-staff-overview dd { order: -1; margin: 0; color: var(--rm-text-primary); font: 700 var(--rm-font-size-body)/1.5 var(--rm-font-body); }
+.rm-staff-summary-toolbar { --rm-shadow-card: none; --rm-shadow-card-hover: none; }
+.rm-staff-list { margin: 0; padding: 0; list-style: none; }
+.rm-staff-list > li + li { border-top: 1px solid var(--rm-border-soft); }
+.rm-staff-workspace .rm-staff-list .rm-staff-list__row { --rm-shadow-card: none; --rm-shadow-card-hover: none; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--rm-space-3); margin: 0; padding: var(--rm-space-4); border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.rm-staff-list__identity { flex: 1 1 320px; min-width: 0; }
+.rm-shell [data-rm-main] .rm-staff-list__identity h3 { margin: 0; color: var(--rm-text-primary); font: 700 var(--rm-font-size-body)/1.4 var(--rm-font-body); overflow-wrap: anywhere; text-transform: none; }
+.rm-staff-list__identity p { margin: var(--rm-space-1) 0 0; color: var(--rm-text-secondary-readable); font: 500 var(--rm-font-size-label)/1.5 var(--rm-font-body); overflow-wrap: anywhere; }
+.rm-staff-list__facts { display: flex; flex-wrap: wrap; gap: var(--rm-space-1) var(--rm-space-4); margin: var(--rm-space-2) 0 0; }
+.rm-staff-list__facts > div { display: flex; flex-wrap: wrap; gap: var(--rm-space-1); min-width: 0; font: 500 var(--rm-font-size-label)/1.5 var(--rm-font-body); }
+.rm-staff-list__facts dt { color: var(--rm-text-secondary-readable); }
+.rm-staff-list__facts dt::after { content: ':'; }
+.rm-staff-list__facts dd { margin: 0; overflow-wrap: anywhere; color: var(--rm-text-primary); }
+.rm-staff-list__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--rm-space-3); }
+.rm-staff-list__actions > div { display: flex; flex-wrap: wrap; gap: var(--rm-space-2); }
+.rm-staff-directory-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--rm-space-3); padding: var(--rm-space-4); }
+.rm-staff-directory-toolbar .rm-section-title { margin: 0; font-size: var(--rm-font-size-card); }
+.rm-staff-directory-toolbar .rm-body { margin: var(--rm-space-1) 0 0; font-size: var(--rm-font-size-label); }
+.rm-staff-directory-toolbar .rm-view-toggle { width: auto; flex: 0 1 auto; }
+.rm-staff-workspace .rm-filter-bar.rm-staff-summary-toolbar { display: block; padding: 0 var(--rm-space-4) var(--rm-space-4); border: 0; border-bottom: 1px solid var(--rm-border-soft); border-radius: 0; background: transparent; box-shadow: none; }
+.rm-staff-search-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--rm-space-3); align-items: end; }
+.rm-staff-search-row > * { min-width: 0; }
+.rm-staff-workspace .rm-filter-bar.rm-staff-summary-toolbar > .rm-staff-search-row { align-items: end; }
+.rm-staff-workspace .rm-staff-search-row .rm-staff-filters__search { grid-column: auto; }
+.rm-staff-summary-toolbar #staff-summary-filters { margin-top: var(--rm-space-3); }
+.rm-staff-workspace .rm-staff-summary-toolbar .rm-staff-filters { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.rm-staff-workspace .rm-person-entity-card { --rm-shadow-card: var(--rm-shadow-xs); --rm-shadow-card-hover: var(--rm-shadow-xs); box-shadow: var(--rm-shadow-xs); }
+.rm-staff-person-facts { display: grid; gap: var(--rm-space-2); margin: var(--rm-space-4) 0 0; }
+.rm-staff-person-facts > div { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: var(--rm-space-3); }
+.rm-staff-person-facts dt { color: var(--rm-text-secondary-readable); font: 500 var(--rm-font-size-label)/1.5 var(--rm-font-body); }
+.rm-staff-person-facts dd { margin: 0; overflow-wrap: anywhere; color: var(--rm-text-primary); font: 600 var(--rm-font-size-label)/1.5 var(--rm-font-body); }
+
+@container staff-workspace (min-width: 960px) {
+    .rm-staff-workspace .rm-staff-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .rm-staff-workspace .rm-staff-metrics--professions { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .rm-staff-workspace .rm-staff-metrics--availability { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .rm-staff-workspace .rm-staff-filters { grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(150px, 1fr)); }
+    .rm-staff-workspace .rm-staff-filters__search { grid-column: auto; }
+}
+/* El breakpoint compartido cambia el eje flex. Reiniciar ambas bases evita
+   que los anchos de identidad/acciones se conviertan en alturas vacías. */
+@container staff-workspace (max-width: 799px) {
+    .rm-staff-workspace .rm-collection-header { flex-direction: column; align-items: stretch; }
+    .rm-staff-workspace .rm-collection-header__identity,
+    .rm-staff-workspace .rm-collection-header__aside { flex: 0 1 auto; width: 100%; }
+    .rm-staff-workspace .rm-collection-header__actions { justify-content: flex-start; }
+}
+@container staff-workspace (max-width: 639px) {
+    .rm-staff-workspace .rm-collection-header__identity { gap: var(--rm-space-3); }
+    .rm-staff-workspace .rm-filter-bar { padding: var(--rm-space-3); }
+    .rm-staff-workspace .rm-staff-filters { grid-template-columns: minmax(0, 1fr); }
+    .rm-staff-workspace .rm-staff-summary-toolbar .rm-staff-filters { grid-template-columns: minmax(0, 1fr); }
+    .rm-staff-workspace .rm-filter-bar > div:first-child { align-items: stretch; }
+    .rm-staff-workspace .rm-filter-bar .sm\:w-72 { width: 100%; }
+    .rm-staff-workspace .rm-filter-bar .sm\:flex-row { flex-wrap: wrap; align-items: end; }
+    .rm-staff-workspace .rm-metric-card { padding: var(--rm-space-3); }
+    .rm-staff-workspace .rm-metric-card__label { overflow-wrap: anywhere; }
+}
+@container staff-workspace (max-width: 319px) { .rm-staff-workspace .rm-staff-metrics { grid-template-columns: minmax(0, 1fr); } }
+
+/* Las filas conservan todas sus celdas; cada campo mantiene su nombre. */
+@container staff-table (max-width: 959px) {
+    :is(.rm-staff-workspace, .rm-staff-schedule) table.rm-staff-table { display: block; table-layout: auto; }
+    table.rm-staff-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    table.rm-staff-table tbody { display: grid; gap: var(--rm-space-3); padding: var(--rm-space-3); }
+    table.rm-staff-table tbody tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); height: auto; min-height: 0; border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-card); padding: var(--rm-space-3); background: var(--rm-surface); }
+    .rm-shell [data-rm-main] :is(.rm-staff-workspace, .rm-staff-schedule) table.rm-staff-table tbody td:nth-child(n) { display: block; position: static; min-width: 0; width: auto; max-width: none; padding: var(--rm-space-2); border: 0; text-align: left; background: transparent; box-shadow: none; white-space: normal; }
+    table.rm-staff-table tbody td:first-child, table.rm-staff-table tbody td:last-child, table.rm-staff-table td[colspan] { grid-column: 1 / -1; }
+    table.rm-staff-table td[data-label]::before { content: attr(data-label); display: block; margin-bottom: var(--rm-space-1); color: var(--rm-text-secondary-readable); font: 700 var(--rm-font-size-label)/1.4 var(--rm-font-body); }
+    .rm-shell [data-rm-main] :is(.rm-staff-workspace, .rm-staff-schedule) table.rm-staff-table tbody td:last-child > div { justify-content: flex-start; opacity: 1; }
+}
+@container staff-table (max-width: 479px) { table.rm-staff-table tbody tr { grid-template-columns: minmax(0, 1fr); } }
+
+.rm-staff-overlay { padding: var(--rm-space-3); }
+.rm-staff-dialog { container: staff-dialog / inline-size; max-height: calc(100dvh - 24px); margin-block: 0; border-radius: var(--rm-radius-panel); }
+.rm-staff-dialog .rm-staff-dialog__header { flex-shrink: 0; gap: var(--rm-space-3); padding: var(--rm-space-4); }
+.rm-staff-dialog__header > div > div:last-child { min-width: 0; }
+.rm-staff-dialog__header h3 { overflow-wrap: anywhere; }
+.rm-staff-dialog .rm-staff-dialog__body, .rm-staff-dialog .rm-staff-dialog__content { min-width: 0; min-height: 0; }
+.rm-staff-dialog .rm-staff-dialog__nav { flex-shrink: 0; }
+.rm-staff-dialog .rm-staff-dialog__content { padding: var(--rm-space-4); container: staff-content / inline-size; }
+.rm-shell [data-rm-main] :is(.rm-staff-workspace, .rm-staff-schedule) table.rm-staff-table tbody td:last-child :is(button, a) { min-width: 44px; min-height: 44px; }
+.rm-staff-schedule { min-width: 0; }
+.rm-staff-schedule__heading { flex-wrap: wrap; gap: var(--rm-space-3); }
+.rm-staff-schedule__heading > div { flex: 1 1 220px; min-width: 0; }
+.rm-staff-schedule h4 { flex-wrap: wrap; }
+.rm-staff-schedule label:has(input[type="checkbox"]) > span { min-height: 44px; }
+.rm-staff-schedule label:has(input[type="checkbox"]:focus-visible) > span { outline: 2px solid var(--rm-focus); outline-offset: 2px; }
+@container staff-dialog (max-width: 767px) {
+    .rm-staff-dialog .rm-staff-dialog__body { flex-direction: column; }
+    .rm-staff-dialog .rm-staff-dialog__nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); width: 100%; padding: var(--rm-space-2); gap: var(--rm-space-1); border-right: 0; border-bottom: 1px solid var(--rm-border-soft); overflow: visible; }
+    .rm-staff-dialog__nav > div { display: none; }
+    .rm-staff-dialog__nav > button { padding: var(--rm-space-2); font-size: var(--rm-font-size-label); }
+    .rm-staff-dialog__header > div > div:first-child { display: none; }
+    .rm-staff-dialog .rm-staff-dialog__content { padding: var(--rm-space-3); }
+}
+@container staff-content (max-width: 639px) {
+    .rm-staff-dialog__content .md\:grid-cols-2 { grid-template-columns: minmax(0, 1fr); }
+    .rm-staff-dialog__content .p-5 { padding: var(--rm-space-3); }
+    .rm-staff-dialog__content .justify-end { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .rm-staff-workspace *, .rm-staff-dialog * { animation: none !important; transition: none !important; }
+}

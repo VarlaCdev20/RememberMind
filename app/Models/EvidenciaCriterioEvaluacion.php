@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-// O.R.I.O.N. 4.16.14; restricciones físicas D-137.
+// sistema experto 4.16.14; restricciones físicas D-137.
 class EvidenciaCriterioEvaluacion extends ModeloExperto
 {
     protected $table = 'evidencias_criterio_evaluacion';
@@ -26,5 +26,10 @@ class EvidenciaCriterioEvaluacion extends ModeloExperto
     public function evidencia(): BelongsTo
     {
         return $this->belongsTo(EvidenciaEvaluacion::class, 'cod_evidencia_evaluacion', 'cod_evidencia_evaluacion');
+    }
+
+    public function hecho(): BelongsTo
+    {
+        return $this->belongsTo(HechoInstantaneaExperta::class, 'cod_hecho_instantanea', 'cod_hecho_instantanea');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Personal;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -53,6 +54,18 @@ class RolesVistasPermisosMatrixTest extends TestCase
         $response->assertRedirect(route('admin.medico.dashboard'));
     }
 
+    public function test_navbar_medico_busca_en_su_listado_de_pacientes(): void
+    {
+        $medico = $this->crearUsuarioConRol('MEDICO GENERAL/GERIATRA');
+
+        $this->actingAs($medico)
+            ->get(route('admin.medico.dashboard'))
+            ->assertOk()
+            ->assertSee('action="'.route('admin.medico.pacientes.observacion').'"', false)
+            ->assertSee('name="busqueda"', false)
+            ->assertSee('Buscar pacientes');
+    }
+
     public function test_enfermero_se_redirige_a_dashboard_enfermeria(): void
     {
         $enfermero = $this->crearUsuarioConRol('ENFERMEROS');
@@ -86,9 +99,9 @@ class RolesVistasPermisosMatrixTest extends TestCase
 
         // Rutas clave del administrador
         $this->get(route('admin.adultos-mayores.index'))->assertOk();
-        // El directorio antiguo redirige al explorador administrativo vigente.
+        // La consulta compartida abre directamente sin exigir el dashboard administrativo.
         $this->get(route('admin.habitaciones.index'))
-            ->assertRedirect(route('admin.administracion.habitaciones'));
+            ->assertOk()->assertSee('Mapa de alojamiento');
         $this->get(route('admin.administracion.habitaciones'))->assertOk();
         $this->get(route('admin.turnos-enfermeria.index'))->assertOk();
         $this->get(route('admin.actividades.index'))->assertOk();
@@ -110,11 +123,21 @@ class RolesVistasPermisosMatrixTest extends TestCase
     public function test_psicologo_tiene_permisos_para_sus_vistas_de_evaluacion(): void
     {
         $psicologo = $this->crearUsuarioConRol('PSICOLOGO/A');
+        Personal::create(['cod_usuario' => $psicologo->getKey(), 'nombres' => 'Psicóloga', 'apellido_paterno' => 'Sintética',
+            'numero_documento' => 'PSI-MATRIX-TEST', 'profesion' => 'PSICOLOGIA', 'estado' => 'ACTIVO']);
         $this->actingAs($psicologo);
 
         $this->get(route('admin.psicologia.dashboard'))->assertOk();
         $this->get(route('admin.psicologia.evaluacion.cognitiva'))->assertOk();
         $this->get(route('admin.psicologia.evaluacion.afectiva'))->assertOk();
+    }
+
+    public function test_cuenta_psicologica_sin_personal_activo_no_accede_a_evaluaciones(): void
+    {
+        $psicologo = $this->crearUsuarioConRol('PSICOLOGO/A');
+        $this->actingAs($psicologo);
+        $this->get(route('admin.psicologia.evaluacion.cognitiva'))->assertForbidden();
+        $this->get(route('admin.psicologia.evaluacion.afectiva'))->assertForbidden();
     }
 
     public function test_seguridad_clinica_enfermero_no_puede_prescribir_medicacion(): void

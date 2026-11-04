@@ -263,7 +263,7 @@ Además administra contratos roles, permissions, model_has_roles, model_has_perm
 | Entidad / modelo | Tabla propietaria | Relaciones de negocio | CRUD y regla |
 |---|---|---|---|
 | ExpertRuleSet: Familia de reglas de apoyo clínico | expert_rule_sets | Catálogo raíz | Perfil M de 06; U(name); no diagnóstico autónomo |
-| ExpertRuleVersion: Reglas reproducibles aprobadas | expert_rule_versions | expert_rule_set_id → expert_rule_sets; approved_by → users | Perfil V de 06; U(expert_rule_set_id,version); despliegue requiere validación clínica |
+| ExpertRuleVersion: Reglas reproducibles aprobadas | expert_rule_versions | expert_rule_set_id → expert_rule_sets; approved_by → users | Perfil V de 06; U(expert_rule_set_id,version); despliegue requiere evaluación posterior en uso real |
 | ExpertRun: Ejecución con entradas y explicación congeladas | expert_runs | person_id → persons; expert_rule_version_id → expert_rule_versions | Perfil H de 06; U(request_key); snapshot no fuente editable de clínica, referencias con tipo/id/versión/hash |
 | ExpertReview: Revisión humana del resultado | expert_reviews | expert_run_id → expert_runs; professional_id → professionals; encounter_id → encounters | Perfil H de 06; Aceptar recomendación no registra prescripción automáticamente |
 

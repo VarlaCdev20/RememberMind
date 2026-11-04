@@ -40,7 +40,7 @@ class SignoVital extends ModeloOperativo
     {
         static::creating(function (self $signo): void {
             if (empty($signo->cod_signo)) {
-                $signo->cod_signo = 'SGN_' . strtoupper(\Illuminate\Support\Str::random(10));
+                $signo->cod_signo = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('signos_vitales', $signo->getConnectionName());
             }
             if (empty($signo->fecha_hora)) {
                 $signo->fecha_hora = now();

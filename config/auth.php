@@ -3,6 +3,8 @@
 use App\Models\User;
 
 return [
+    // Activar únicamente después de instalar la extensión aprobada de usuarios.
+    'remember_enabled' => env('AUTH_REMEMBER_ENABLED', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -41,6 +43,7 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
+            'remember' => (int) env('AUTH_REMEMBER_MINUTES', 43200),
         ],
     ],
 
@@ -63,7 +66,7 @@ return [
 
     'providers' => [
         'users' => [
-            'driver' => 'eloquent',
+            'driver' => 'usuarios_activos',
             'model' => env('AUTH_MODEL', User::class),
         ],
 

@@ -224,7 +224,7 @@
     </span>
     @if($lvlPA !== 'normal' && $lvlPA !== 'sin_dato')
     <span class="mt-0.5 text-[9px] font-black {{ $lvlPA === 'critico' ? 'text-[var(--rm-danger)]' : 'text-estado-advertencia' }}">
-     {{ $sist >= 180 ? 'HTA II' : ($sist >= 160 ? 'HTA I' : ($sist < 90 ? 'HIPOT' : 'Pre-HTA')) }}
+     {{ $interpretacionesPorResidente[$pac->cod_residente]['metricas']['PA']['label'] ?? 'Sin interpretación automática' }}
     </span>
     @endif
     @else
@@ -386,7 +386,7 @@
   <div class="rm-chart-header border-b border-[var(--rm-border)] pb-3 mb-3">
   <div>
    <h3 class="rm-chart-title">Distribución PA</h3>
-   <p class="rm-chart-subtitle">Clasificación sistólica actual</p>
+   <p class="rm-chart-subtitle">Interpretación de PA con ambas mediciones y objetivo médico</p>
   </div>
   <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--rm-surface-alt)] text-[var(--rm-action-primary)] border border-[var(--rm-border)]">
    <i class="ph-bold ph-chart-donut text-base"></i>
@@ -398,25 +398,9 @@
  </div>
  </div>
 
- {{-- Referencia de valores --}}
- <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 text-center">
- @foreach([
-  ['label'=>'Hipotensión', 'range'=>'PA < 90', 'color'=>'text-estado-info', 'bg'=>'bg-estado-infoBg', 'icon'=>'ph-arrow-down'],
-  ['label'=>'Normal', 'range'=>'PA 90–139', 'color'=>'text-estado-exito', 'bg'=>'bg-estado-exitoBg', 'icon'=>'ph-check'],
-  ['label'=>'Pre-HTA', 'range'=>'PA 140–159', 'color'=>'text-[var(--rm-warning)]', 'bg'=>'bg-[var(--rm-warning)]/10', 'icon'=>'ph-warning'],
-  ['label'=>'HTA Grado I', 'range'=>'PA 160–179', 'color'=>'text-estado-advertencia', 'bg'=>'bg-estado-advertenciaBg', 'icon'=>'ph-warning-circle'],
-  ['label'=>'HTA Grado II', 'range'=>'PA ≥ 180', 'color'=>'text-[var(--rm-danger)]', 'bg'=>'bg-[var(--rm-danger)]/10', 'icon'=>'ph-warning-diamond'],
-  ['label'=>'SpO₂ crítica', 'range'=>'< 88%', 'color'=>'text-[var(--rm-danger)]', 'bg'=>'bg-[var(--rm-danger)]/10', 'icon'=>'ph-drop-slash'],
- ] as $ref)
- <div class="flex flex-col items-center gap-1 rounded-xl border border-borde bg-fondo-card p-3">
-  <div class="flex h-8 w-8 items-center justify-center rounded-full {{ $ref['bg'] }} {{ $ref['color'] }}">
-  <i class="ph-bold {{ $ref['icon'] }} text-sm"></i>
-  </div>
-  <div class="text-[10px] font-black text-titulo">{{ $ref['label'] }}</div>
-  <div class="text-[9px] text-apoyo">{{ $ref['range'] }}</div>
- </div>
- @endforeach
- </div>
+ <p class="text-xs text-[var(--rm-text-muted)]">
+  Las clasificaciones proceden del evaluador clínico. SpO₂ se interpreta con el objetivo médico individual válido en la fecha de cada toma; no tiene un límite crítico universal automático.
+ </p>
 
  {{-- MODAL de registro --}}
  @livewire('clinica.registro-signos-vitales-modal')

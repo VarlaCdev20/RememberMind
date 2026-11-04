@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-// O.R.I.O.N. 4.16.1; restricciones físicas D-137.
+// sistema experto 4.16.1; restricciones físicas D-137.
 class VersionModeloExperto extends ModeloExperto
 {
     protected $table = 'versiones_modelo_experto';

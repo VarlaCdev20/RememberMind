@@ -49,7 +49,7 @@ final class ServicioDecisionAlertaClinica
             'estado' => 'ABIERTA',
         ]);
         $alerta->eventos()->create([
-            'cod_evento_alerta' => 'EVA_'.strtoupper(Str::random(10)),
+            'cod_evento_alerta' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('eventos_alerta'),
             'cod_usuario' => $autor->cod_usuario,
             'tipo_evento' => 'CREACION',
             'estado_nuevo' => 'ABIERTA',

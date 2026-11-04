@@ -9,6 +9,23 @@ use Illuminate\Support\Facades\DB;
 class TendenciaIncidentesService
 {
     /**
+     * Compara incidentes originales ya autorizados y filtrados en dos ventanas.
+     * Cada fila plana contiene código y tipo; las claves repetidas cuentan una sola vez.
+     * Devuelve recuentos por categoría sin deducir riesgo, gravedad o pronóstico.
+     */
+    public function compararRegistros(array $actuales, array $anteriores): array
+    {
+        $actuales = collect($actuales)->unique('codigo');
+        $anteriores = collect($anteriores)->unique('codigo');
+        $tipos = $actuales->pluck('tipo')->merge($anteriores->pluck('tipo'))->unique()->sort()->values();
+
+        return $tipos->map(fn ($tipo) => [
+            'tipo' => $tipo, 'actual' => $actuales->where('tipo', $tipo)->count(),
+            'anterior' => $anteriores->where('tipo', $tipo)->count(),
+        ])->all();
+    }
+
+    /**
      * Resume incidentes registrados de los residentes visibles en el turno.
      * La BDD usa datetime local sin zona; los límites siguen config('app.timezone').
      */

@@ -6,7 +6,7 @@ use App\Compartido\Aplicacion\Contratos\EnlacesAplicacion;
 use App\Models\Residente;
 use App\Models\User;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
-use Carbon\Carbon;
+use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
 
 final class AlertasOrientativasSalud
 {
@@ -16,21 +16,35 @@ final class AlertasOrientativasSalud
     {
 
         abort_unless($usuario && $usuario->estado === 'ACTIVO' && $usuario->can('alertas.ver') && ! $usuario->hasRole('FAMILIAR'), 403);
-        // Cargamos solo adultos activos con relaciones acotadas para evitar timeout
-        $adultos = Residente::with(['fichasMedicas' => fn ($q) => $q->where('estado', 'ACTIVA')->latest()->limit(1), 'medicaciones' => fn ($q) => $q->whereIn('estado', ['ACTIVA', 'ACTIVO']), 'administracionesMedicacion' => fn ($q) => $q->latest('fecha_hora_programada')->limit(3), 'valoracionesFuncionales' => fn ($q) => $q->latest('fecha_hora')->limit(1)])->when(! $usuario->hasAnyRole(['SUPERADMINISTRADOR', 'GERENTE', 'ADMINISTRADOR']), fn ($q) => $q->whereIn('cod_residente', app(TurnoEnfermeriaService::class)->obtenerPacientesAsignadosQuery($usuario)->select('cod_residente')))->whereIn('estado', ['ACTIVO', 'ADMITIDO', 'SEGUIMIENTO_ESPECIAL'])->orderBy('apellido_paterno')->get();
+        $usuario = $usuario->fresh();
+        abort_unless($usuario?->estado === 'ACTIVO', 403);
+        $mostrarFicha = $usuario->can('atenciones.ver');
+        $mostrarValoracion = $usuario->can('valoraciones_funcionales.ver');
+        $mostrarMedicacion = $usuario->canAny(['prescripciones.ver', 'administraciones_medicacion.ver']);
+        $relaciones = [];
+        if ($mostrarFicha) {
+            $relaciones['fichasMedicas'] = fn ($q) => $q->where('estado', 'ACTIVA')->latest('fecha_hora')->limit(1);
+        }
+        if ($mostrarValoracion) {
+            $relaciones['valoracionesFuncionales'] = fn ($q) => $q->latest('fecha_hora')->limit(1);
+        }
+        $adultos = Residente::with($relaciones)
+            ->when(! $usuario->hasAnyRole(['SUPERADMINISTRADOR', 'GERENTE', 'ADMINISTRADOR']), fn ($q) => $q->whereIn('cod_residente', app(TurnoEnfermeriaService::class)->obtenerPacientesAsignadosQuery($usuario)->select('cod_residente')))
+            ->whereIn('estado', ['ACTIVO', 'ADMITIDO', 'SEGUIMIENTO_ESPECIAL'])->orderBy('apellido_paterno')->get();
+        $vencidas = $mostrarMedicacion
+            ? app(AgendaMedicacionService::class)->paraAdultos($adultos->modelKeys())->where('estado', 'VENCIDA')->groupBy(fn ($dosis) => $dosis['medicacion']->cod_residente)
+            : collect();
         $alertas = collect();
         foreach ($adultos as $adulto) {
-            $fichaMedica = $adulto->fichasMedicas->where('estado', 'ACTIVA')->first();
-            $medicacionesActivas = $adulto->medicaciones->whereIn('estado', ['ACTIVA', 'ACTIVO']);
-            $valFuncional = $adulto->valoracionesFuncionales->sortByDesc('fecha_hora')->first();
-            if (! $fichaMedica) {
+            $fichaMedica = $mostrarFicha ? $adulto->fichasMedicas->first() : null;
+            $valFuncional = $mostrarValoracion ? $adulto->valoracionesFuncionales->first() : null;
+            if ($mostrarFicha && ! $fichaMedica) {
                 $alertas->push(['adulto' => $adulto, 'tipo' => 'Ficha Médica', 'nivel' => 'atencion', 'mensaje' => 'Ficha médica no registrada.', 'accion' => 'requiere revisión', 'ruta' => $this->enlaces->destino('admin.salud-seguimiento.ficha', $adulto->cod_residente)]);
             }
-            if ($medicacionesActivas->isNotEmpty()) {
-                $ultimaToma = $adulto->administracionesMedicacion->sortByDesc('fecha_hora_programada')->first();
-                if (! $ultimaToma || Carbon::parse($ultimaToma->fecha_hora_programada)->diffInDays(now()) >= 1) {
-                    $alertas->push(['adulto' => $adulto, 'tipo' => 'Medicación', 'nivel' => 'atencion', 'mensaje' => 'Medicación activa sin administración reciente (más de 24h).', 'accion' => 'requiere revisión', 'ruta' => $this->enlaces->destino('admin.salud-seguimiento.administracion', $adulto->cod_residente)]);
-                }
+            if ($vencidas->has($adulto->cod_residente)) {
+                $alertas->push(['adulto' => $adulto, 'tipo' => 'Medicación', 'nivel' => 'atencion',
+                    'mensaje' => $vencidas->get($adulto->cod_residente)->count().' dosis programada(s) vencida(s) sin administración u omisión registrada.',
+                    'accion' => 'revisar agenda', 'ruta' => $this->enlaces->destino('admin.salud-seguimiento.administracion', $adulto->cod_residente)]);
             }
             if ($valFuncional) {
                 if ($valFuncional->riesgo_caida === 'ALTO') {
@@ -39,7 +53,7 @@ final class AlertasOrientativasSalud
                 if (\in_array($valFuncional->nivel_dependencia, ['ALTA_DEPENDENCIA', 'SUPERVISION_PERMANENTE'])) {
                     $alertas->push(['adulto' => $adulto, 'tipo' => 'Valoración', 'nivel' => 'atencion', 'mensaje' => 'Dependencia funcional alta.', 'accion' => 'requiere revisión', 'ruta' => $this->enlaces->destino('admin.salud-seguimiento.valoracion', $adulto->cod_residente)]);
                 }
-            } else {
+            } elseif ($mostrarValoracion) {
                 $alertas->push(['adulto' => $adulto, 'tipo' => 'Valoración', 'nivel' => 'atencion', 'mensaje' => 'Sin valoración funcional registrada.', 'accion' => 'requiere revisión', 'ruta' => $this->enlaces->destino('admin.salud-seguimiento.valoracion', $adulto->cod_residente)]);
             }
         }

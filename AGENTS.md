@@ -8,12 +8,22 @@ A feature is complete only when the applicable process, actors, states, business
 
 ## Sources of truth
 
+### Remitente institucional protegido
+
+Decisión expresa de la propietaria del 2026-10-26: el correo saliente de
+RememberMind debe usar exclusivamente `remembermind.health@gmail.com`.
+No sustituir esa dirección, la cuenta SMTP de Gmail ni la protección del
+remitente sin una nueva autorización expresa de la propietaria. Las claves de
+aplicación se mantienen exclusivamente en la configuración local secreta;
+nunca en código, documentación, logs ni commits. Los destinatarios de cada
+notificación conservan su flujo y permisos propios.
+
 Use project sources contextually. Do not design RememberMind from memory when the repository already defines the behavior.
 
 Priority when sources conflict:
 
 1. Current explicit instruction from the project owner.
-2. `docs/base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md` and `docs/base-de-datos/REMEMBERMIND_BDD_70_TABLAS.md` for DB structure, persistence terminology, PK/FK, relationships and structural invariants.
+2. `docs/base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md`, `docs/base-de-datos/REMEMBERMIND_BDD_70_TABLAS.md` and later owner-approved, scope-specific DB decisions for structure, persistence terminology, PK/FK, relationships and structural invariants. Their original 70-table core and later inventories describe different dates; use the latest applicable decision for the current count.
 3. Current functional documentation for the module.
 4. Current V2 code as implementation evidence, not automatic functional truth.
 5. Tests as executable evidence; they may be outdated.
@@ -24,7 +34,13 @@ Never silently blend contradictory sources. Follow the higher-authority source a
 
 ## Frozen DB governance
 
-The Operational DB V2.1 baseline is frozen and contains exactly 70 operational tables. The owner approved the V2.2 `objetivos_signos_vitales` extension on 2026-10-04, bringing the current inventory to 71; see `docs/base-de-datos/DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md`. `residentes` is the central entity. Always consult `docs/base-de-datos/` before DB analysis or changes; the 69-table V2.0 document is historical only.
+Owner-adopted shared planning notice, installed locally2026-10-27: six nullable columns on `eventos_asignacion_personal`, with no new tables or permissions. Original acts and affected-account FK remain immutable; only publication metadata evolve. See `docs/base-de-datos/DECISION_AVISO_COMPARTIDO_CAMPOS_2026_10_27.md`. Inventory remains106 business+16 technical; do not infer delivery/read tracking for each administrator.
+
+Latest owner decision,2026-10-27: **do not create any additional tables**. The owner permits developing column extensions on existing relations while preserving their grain, integrity and applicable contracts. Current inventory remains106 business+16 technical. The previous110-table design ceiling is not approval or available quota for new tables. See `docs/base-de-datos/DECISION_SIN_NUEVAS_TABLAS_2026_10_27.md`. This does not authorize unrelated clinical rules, permissions, relationship changes or destructive transitions.
+
+Current installed extension, owner-authorized on 2026-10-27: Gerencia designs35/37 add six operational relations and eight nullable columns. The verified local inventory is now **81 operational +25 expert =106 business tables**, plus **16 technical tables**. See `docs/base-de-datos/DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md`. The100-table count below is the preceding 2026-10-22 cut; do not treat it as today's count. The110-table design ceiling remains unchanged and does not approve other DDL.
+
+The frozen Operational DB V2.1 **core** contains 70 operational tables. Later owner-approved extensions are cumulative; the four owner-approved expert consolidations installed on 2026-10-22 leave **75 operational + 25 expert = 100 business tables**, plus **16 technical tables**. See `docs/base-de-datos/DECISION_CONSOLIDACION_BLOQUES_EXPERTOS_2026_10_22.md`. The 104-business-table inventory describes 2026-10-21, before that transition. The owner set a **maximum of 110 business tables for design**, not approval of any specific DDL; see `docs/sistema-experto/DECISION_MAXIMO_110_TABLAS_2026_10_21.md`. The original 70-table dictionary and intermediate counts of 71–108 remain historical snapshots, not today's inventory. `residentes` is the central entity. Consult the baseline, dictionary and subsequent scope-specific decisions before DB analysis or changes.
 
 Without explicit owner approval, do not add/delete/merge/split/rename/modify:
 - tables or columns;
@@ -97,6 +113,16 @@ Ask before decisions that create or change:
 - real-data destruction or exposure.
 
 Technical autonomy means Codex decides **how** to implement. It does not mean Codex invents **what** the institution should require.
+
+## Orden de desarrollo adoptado el 30/10/2026
+
+La propietaria exige terminar el funcionamiento integral mediante ingeniería y pruebas técnicas, sin solicitar durante el desarrollo estudios con residentes, firmas, referencias humanas ni avales externos. La evaluación posterior en uso real se hará después y no es un requisito para desarrollar, probar o integrar. Conservar datos originales, reglas aprobadas, autorización, trazabilidad y abstenciones justificadas. Esta secuencia no autoriza inventar mediciones, declarar resultados no comprobados o incorporar contenido de terceros fuera de su alcance permitido.
+
+## Documentation and approved work
+
+Start at `docs/README.md`; use `docs/modulos/README.md` to locate the twelve owners and process contracts. `docs/ESTADO_ACTUAL.md` summarizes the latest local evidence; dated delivery reports remain evidence of their own cut. A historical scope restriction such as "documentation only", "during the move", or a previous phase ceiling does not govern unrelated later work. Do not repeat an approval already recorded for the same scope. Existing clinical/structural boundaries still apply.
+
+Develop and test already-authorized behavior without requiring a professional signature before each execution. Keep technical implementation, original measurements, structural approval and post-development assessment separate. Missing measurements cause a justified limitation or abstention, not a blanket development freeze.
 
 ## Responsible scope
 

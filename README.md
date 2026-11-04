@@ -1,12 +1,12 @@
 ---
 title: "RememberMind"
 status: CURRENT
-version: "1.0"
-last_reviewed: 2026-10-11
+version: "1.1"
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
-verified_against_commit: null
-verification_scope: STATIC_REPOSITORY_REVIEW
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_AND_REGISTERED_ROUTES
 runtime_verified: false
 supersedes: []
 related_docs: []
@@ -28,7 +28,7 @@ Entrada oficial: [RememberMind Documentation](docs/README.md).
 - [Migración híbrida ejecutada](docs/arquitectura/INFORME_MIGRACION_HIBRIDA.md) y [auditoría/limpieza posterior](docs/arquitectura/AUDITORIA_LIMPIEZA_2026_10_10.md).
 - [Gobernanza/changelog documental](docs/CHANGELOG.md).
 
-Desacoplamiento de fronteras verificado el 11/10/2026 en `PODEMOS-SEGUIR`: suite SQLite completa sin fallos (1.094 pruebas, 32.023 aserciones, 15 omisiones), cohorte PostgreSQL aislada (183/3.035), frontend (151) y build aprobados. [Informe vigente y límites](docs/arquitectura/DESACOPLAMIENTO_2026_10_11.md); [preparación anterior](docs/sistema/PREPARACION_DESARROLLO_2026_10_11.md). No acredita producción ni validación clínica.
+Estado documental revisado al **04/11/2026**: [estado actual](docs/ESTADO_ACTUAL.md), [inventario de código y rutas](docs/sistema/INVENTARIO_ACTUAL.md) y [catálogo documental](docs/INDICE_DOCUMENTAL.md). La auditoría del 25/10 conserva su corte histórico; no es una certificación del árbol actual. [Responsabilidades de los doce módulos](docs/modulos/README.md).
 
 ## Dominio y flujo institucional
 
@@ -36,14 +36,14 @@ Postulante ≠ residente ≠ usuario ≠ personal ≠ contacto.
 
 Preadmisión → revisión → APROBADA/RECHAZADA → admisión formal con cama → residente admitido. Aprobación no crea residente; formalización es transaccional. Fuente: [AGENTS](AGENTS.md) y [baseline](docs/base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md); valores físicos divergentes están en DEC-OPEN-001.
 
-Áreas: institucional/alojamiento, clínica, cuidado continuo, medicación, trabajo interdisciplinario, actividades/visitas, documentación, alertas, reportes, seguridad/auditoría, UX/testing. El [sistema experto](docs/sistema-experto/README.md) tiene núcleo técnico, esquema y revisión administrativa implementados; su conocimiento institucional y activación clínica siguen pendientes.
+Áreas: institucional/alojamiento, clínica, cuidado continuo, medicación, trabajo interdisciplinario, actividades/visitas, documentación, alertas, reportes, seguridad/auditoría, UX/testing. El [sistema experto](docs/sistema-experto/README.md) reutiliza el motor simbólico y los contratos institucionales adoptados; conserva la rama observacional, mientras la conservación conjunta instrumental/Petersen y la aceptación integral siguen pendientes.
 
 ## Stack y requisitos
 
-Versiones bloqueadas y motores: [estado actual](docs/ESTADO_ACTUAL.md) y [baseline técnico](docs/arquitectura/REMEMBERMIND_BASELINE_TECNICO.md).
+Versiones bloqueadas: [inventario actual](docs/sistema/INVENTARIO_ACTUAL.md). Motores y condiciones: [baseline técnico](docs/arquitectura/REMEMBERMIND_BASELINE_TECNICO.md).
 
 - PHP ^8.3 y extensiones de la instalación; verificación local con PHP 8.3.33.
-- Laravel 13.33.0, Livewire 4.4.6, Tailwind 3.4.19 y Vite 8.3.1 según locks.
+- Laravel 13.33.0, Livewire 4.4.8, Tailwind 3.4.19 y Vite 8.3.5 según locks.
 - Node >=22.12.0 para satisfacer el lock completo, incluido Puppeteer; Composer según entorno.
 - PostgreSQL para desarrollo integrado/staging/producción; SQLite :memory: para tests rápidos. MySQL/MariaDB fuera del baseline.
 
@@ -76,7 +76,11 @@ composer test -- --filter=BddOperativaV2Test
 npm test
 npm run build
 php motor-experto/tests/independencia.php
+php motor-experto/tests/dominio_independencia.php
+php scripts/verificar-documentacion.php --check
 ```
+
+`composer dev` arranca PHP en loopback con límites por proceso de 8 MB por archivo y 45 MB por petición para evidencia fotográfica clínica. Para arrancar solo PHP o elegir otro puerto: `php scripts/servir-local.php 8000`. No modifica el `php.ini` global; los despliegues deben configurar sus propios límites PHP/proxy.
 
 Usar las pruebas mediante Composer para activar el aislamiento antes de cargar Laravel. PostgreSQL desechable en Windows: `pwsh -File scripts/probar-postgres.ps1`; requisitos y perfiles en [desarrollo seguro](docs/sistema/DESARROLLO_SEGURO.md). PostgreSQL verifica garantías físicas/concurrencia; QA visual es independiente del build. Producción tiene [procedimiento propio](docs/produccion/DESPLIEGUE_SEGURO.md).
 
@@ -93,6 +97,8 @@ Fuente: [roles congelados](docs/arquitectura/REMEMBERMIND_ROLES_BASELINE_CONGELA
 - Familiar: solo información autorizada de residentes vinculados; ver residente no publica expediente completo.
 
 Cuenta ACTIVO autenticada por correo + permiso + Policy + estado/regla + vínculo/scope/competencia. Registro público deshabilitado; archivos clínicos privados y descargas reautorizadas. Las deudas conocidas no se ocultan con un resumen de seguridad.
+
+El remitente saliente protegido es **remembermind.health@gmail.com**. Las claves se guardan exclusivamente en configuración secreta local; no se documentan ni se incluyen en commits. [Configuración y comprobaciones fechadas](docs/sistema/CORREO_SMTP_CONFIGURACION.md).
 
 ## Agentes
 

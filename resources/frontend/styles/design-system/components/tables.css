@@ -17,7 +17,7 @@
     --rm-table-border: var(--rm-border-soft); /* borde */
     --rm-table-row-hover: var(--rm-surface-soft); /* hover */
     --rm-table-row-selected: var(--rm-action-primary-soft); /* seleccionada */
-    --rm-table-cell-padding-y: 7px; /* padding vertical */
+    --rm-table-cell-padding-y: 10px; /* padding vertical */
     --rm-table-cell-padding-x: 12px; /* padding horizontal */
 
     /* Alias para compatibilidad */
@@ -42,7 +42,7 @@
     text-align: left;
     border-collapse: collapse;
     font-family: var(--rm-font-family);
-    font-size: 13px;
+    font-size: var(--rm-font-size-table);
     font-weight: 500;
     color: var(--rm-text-primary);
 }
@@ -57,12 +57,11 @@
 .rm-table thead th,
 .rm-table-header th {
     padding: var(--rm-table-cell-padding-y) var(--rm-table-cell-padding-x);
-    font-family: var(--rm-font-family);
     font-family: var(--rm-font-display);
-    font-size: 11px;
+    font-size: var(--rm-font-size-label);
     font-weight: var(--rm-weight-bold);
-    text-transform: uppercase;
-    letter-spacing: var(--rm-letter-spacing-wide);
+    text-transform: none;
+    letter-spacing: var(--rm-letter-spacing-normal);
     color: var(--rm-text-primary);
     white-space: nowrap;
 }
@@ -73,7 +72,7 @@
     border-bottom: 1px solid var(--rm-table-border);
     background-color: var(--rm-table-row-bg);
     transition: background-color var(--rm-duration-fast) var(--rm-ease-standard);
-    min-height: 36px;
+    height: var(--rm-table-row-height);
 }
 
 .rm-table tbody td,
@@ -109,13 +108,13 @@
 .rm-table.is-compact tbody td {
     padding: var(--rm-space-2) var(--rm-space-3);
     min-height: 30px;
-    font-size: 11.5px;
+    font-size: var(--rm-font-size-compact);
 }
 
 .rm-table-compact thead th,
 .rm-table.is-compact thead th {
     padding: var(--rm-space-2) var(--rm-space-3);
-    font-size: 10.5px;
+    font-size: var(--rm-font-size-meta);
 }
 
 /* Estado Vacío de Tabla */

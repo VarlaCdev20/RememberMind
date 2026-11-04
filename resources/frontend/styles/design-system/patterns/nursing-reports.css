@@ -1,0 +1,6 @@
+/* Resumen de Enfermería: geometría local sobre los componentes institucionales. */
+.rm-nursing-report,
+.rm-nursing-report > :is(form, section) { min-width: 0; }
+.rm-nursing-report :is(.rm-input, .rm-select) { min-height: 44px; height: 44px; }
+.rm-nursing-report .rm-select { padding: 0 36px 0 12px; line-height: 1.4; }
+.rm-nursing-report__count { color: var(--rm-text-primary); font: 750 28px/1.2 var(--rm-font-heading); }

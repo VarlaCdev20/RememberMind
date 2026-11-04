@@ -16,9 +16,14 @@ class RolePreviewController extends Controller
 
         $validated = $request->validate([
             'role' => ['required', 'string', Rule::in(array_keys($preview->availableRoles()))],
+            'destino' => ['nullable', Rule::in(['alertas'])],
         ]);
 
         $preview->activate($request->user(), $validated['role']);
+
+        if (($validated['destino'] ?? null) === 'alertas' && $validated['role'] !== 'FAMILIAR') {
+            return redirect()->route('admin.alertas-clinicas.index');
+        }
 
         return redirect()->route('dashboard');
     }

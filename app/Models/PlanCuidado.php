@@ -90,7 +90,7 @@ class PlanCuidado extends ModeloOperativo
 
         static::creating(function (self $model) {
             if (empty($model->cod_plan)) {
-                $model->cod_plan = 'PLC_' . strtoupper(Str::random(10));
+                $model->cod_plan = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('planes_cuidado', $model->getConnectionName());
             }
 
             if (empty($model->cod_area)) {

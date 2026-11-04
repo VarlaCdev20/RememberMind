@@ -1,6 +1,6 @@
 ---
 title: "Limpieza segura de archivos y carpetas"
-status: CURRENT
+status: HISTORICAL
 version: "1.0"
 last_reviewed: 2026-10-10
 owner: RememberMind
@@ -13,6 +13,8 @@ related_docs: ["README.md", "ARQUITECTURA_VIGENTE.md", "AUDITORIA_LIMPIEZA_2026_
 ---
 
 # Limpieza segura de archivos y carpetas
+
+> **Informe de su corte original.** Sus pruebas, cifras y limitaciones se conservan como evidencia fechada. El [estado actual](../ESTADO_ACTUAL.md) incorpora las entregas posteriores; este informe no certifica nuevamente el árbol vigente.
 
 Limpieza autorizada sobre `PODEMOS-SEGUIR`, en la carpeta original
 `C:\Users\CARLAENCINAS\Desktop\RememberMind`. La base de este corte es

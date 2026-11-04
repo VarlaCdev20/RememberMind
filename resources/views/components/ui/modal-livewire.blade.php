@@ -15,8 +15,14 @@
     'draggable' => false,
     'backMethod' => null,
     'backLabel' => 'Volver',
+    'backText' => false,
+    'dragIcon' => 'ph-dots-six',
     'alpineModel' => null,
     'alpineClose' => null,
+    'alpineBack' => null,
+    'autoFocus' => true,
+    'surface' => 'standard',
+    'alpineBusy' => null,
 ])
 
 @php
@@ -34,6 +40,7 @@ $modalId = $id ?: 'modal-'.\Illuminate\Support\Str::slug((string) ($attributes->
 @endphp
 
 <div
+    id="{{ $modalId }}"
     x-data="{
         @if($alpineModel)
         get show() { return {{ $alpineModel }} },
@@ -73,11 +80,11 @@ $modalId = $id ?: 'modal-'.\Illuminate\Support\Str::slug((string) ($attributes->
     }"
     x-show="show"
     :class="{ 'is-open': show }"
-    x-trap.noscroll="show"
+    @if($autoFocus) x-trap.inert.noscroll="show" @else x-trap.inert.noscroll.noautofocus="show" @endif
     x-cloak
     @if($draggable) x-init="$watch('show', value => { if (value) { dragX = 0; dragY = 0 } })" x-on:resize.window="if (show) { if (window.innerWidth <= 640) { dragX = 0; dragY = 0 } else { moveBy(0, 0) } }" @endif
     x-on:keydown.escape.window="if (show && @js($dismissOnEscape)) { $event.stopPropagation(); {{ $alpineClose ?: '$wire.'.$closeMethod.'()' }} }"
-    class="rm-modal-shell fixed inset-0 flex items-center justify-center overflow-y-auto overflow-x-hidden p-4 font-sans {{ $attributes->get('class') }}"
+    class="rm-modal-shell {{ $surface === 'reading' ? 'rm-modal-shell--reading' : '' }} fixed inset-0 flex items-center justify-center overflow-y-auto overflow-x-hidden p-4 font-sans {{ $attributes->get('class') }}"
 >
     <!-- Overlay Accesible Cálido -->
     <div
@@ -112,9 +119,10 @@ $modalId = $id ?: 'modal-'.\Illuminate\Support\Str::slug((string) ($attributes->
         <!-- Header -->
         <header class="rm-modal-header shrink-0 flex items-start justify-between gap-4 px-5 sm:px-6 py-4 bg-[var(--rm-surface-soft)] border-b border-[var(--rm-border-soft)]">
             <div class="rm-modal-header__heading min-w-0">
-                @if($backMethod)
-                    <button type="button" class="rm-btn-icon rm-modal-panel__back" wire:click="{{ $backMethod }}" aria-label="{{ $backLabel }}">
+                @if($backMethod || $alpineBack)
+                    <button type="button" class="rm-btn-icon rm-modal-panel__back" @if($alpineBack) @click="{{ $alpineBack }}" @else wire:click="{{ $backMethod }}" @endif aria-label="{{ $backLabel }}">
                         <i class="ph-bold ph-arrow-left text-base" aria-hidden="true"></i>
+                        @if($backText)<span aria-hidden="true">Volver</span>@endif
                     </button>
                 @endif
                 <div class="min-w-0">
@@ -123,7 +131,11 @@ $modalId = $id ?: 'modal-'.\Illuminate\Support\Str::slug((string) ($attributes->
                 @endif
                 <h3 id="{{ $modalId }}-titulo" class="rm-modal-panel__title flex items-center gap-2.5 leading-tight">
                     @if(isset($icon) && $icon)
-                        {{ $icon }}
+                        @if(is_string($icon) && preg_match('/^ph-[a-z0-9-]+$/', $icon))
+                            <i class="ph-bold {{ $icon }}" aria-hidden="true"></i>
+                        @else
+                            {{ $icon }}
+                        @endif
                     @endif
                     {{ $title }}
                 </h3>
@@ -135,10 +147,10 @@ $modalId = $id ?: 'modal-'.\Illuminate\Support\Str::slug((string) ($attributes->
             <div class="rm-modal-header__actions">
                 @if($draggable)
                     <button type="button" class="rm-modal-panel__drag-handle" aria-label="Mover ventana: arrastra o usa las flechas; Inicio la centra" title="Mover ventana" @pointerdown="startDrag($event)" @pointermove="drag($event)" @pointerup="endDrag($event)" @pointercancel="endDrag($event)" @keydown.arrow-left.prevent="moveBy(-24, 0)" @keydown.arrow-right.prevent="moveBy(24, 0)" @keydown.arrow-up.prevent="moveBy(0, -24)" @keydown.arrow-down.prevent="moveBy(0, 24)" @keydown.home.prevent="dragX = 0; dragY = 0">
-                        <i class="ph-bold ph-dots-six" aria-hidden="true"></i><span aria-hidden="true">Mover</span>
+                        <i class="ph-bold {{ $dragIcon }}" aria-hidden="true"></i><span aria-hidden="true">Mover</span>
                     </button>
                 @endif
-                <button type="button" @click="{{ $alpineClose ?: '$wire.'.$closeMethod.'()' }}" class="rm-btn-icon rm-modal-panel__close text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)]" aria-label="Cerrar">
+                <button type="button" @if($alpineBusy) :disabled="{{ $alpineBusy }}" @endif @click="{{ $alpineClose ?: '$wire.'.$closeMethod.'()' }}" class="rm-btn-icon rm-modal-panel__close text-[var(--rm-text-secondary)] hover:text-[var(--rm-text-primary)]" aria-label="Cerrar">
                     <i class="ph-bold ph-x text-base" aria-hidden="true"></i>
                 </button>
             </div>

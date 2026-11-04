@@ -2,11 +2,11 @@
 title: "Decisiones pendientes de RememberMind"
 status: CURRENT
 version: "1.0"
-last_reviewed: 2026-10-08
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
-verified_against_commit: null
-verification_scope: STATIC_REPOSITORY_REVIEW
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_AND_REGISTERED_ROUTES
 runtime_verified: false
 supersedes: []
 related_docs: []
@@ -14,6 +14,13 @@ related_modules: []
 ---
 
 # Decisiones pendientes
+
+## Lectura vigente al 04/11/2026
+
+[Estado actual](ESTADO_ACTUAL.md) y [roadmap](ROADMAP.md) resumen las entregas posteriores. Los registros y líneas que siguen conservan la evidencia de sus fases originales; un estado antiguo no se reafirma como fallo actual sin reproducción o revisión posterior. Las rutas enlazadas se presentan con su ubicación vigente. Esta revisión documental no ejecuta las pruebas históricas.
+
+**Decisiones ya resueltas por alcance:** no crear tablas adicionales; contexto de escolaridad y de idioma/informante por atención autorizado; materiales/permisos declarados y tres perfiles iniciales activados; propuesta de nuevas relaciones/permiso para conservación conjunta rechazada. No volver a solicitar esos acuerdos como si siguieran abiertos. Su detalle está en los índices BDD y experto.
+
 
 Registro de ambigüedades materiales, no preguntas técnicas triviales. OPEN no modifica el contrato vigente. Opciones no son aprobación. Solo se bloquea el cambio dependiente; el trabajo seguro/documental continúa.
 
@@ -117,27 +124,25 @@ C. Mantener regla vigente, documentando límite, hasta decisión concreta.
 
 ## DEC-OPEN-005
 
-**Título:** Método, derechos y validación del experto cognitivo
+**Título:** Medición original, derechos y evaluación posterior en uso real del experto.
 
-**Área:** Investigación / experto
+**Estado al 04/11/2026: PARCIALMENTE RESUELTA por decisiones específicas.** Existen motor, reglas, red y perfiles iniciales descriptivos. Continúan pendientes la conservación conjunta y la interpretación/vinculación aplicable que no esté definida; las adopciones ya registradas no se vuelven a pedir.
 
-**Problema:** O.R.I.O.N. define la arquitectura cognitiva, el esquema D-123/D-137 y el contrato piloto D-131/D-143/D-144. El [núcleo técnico V1](sistema-experto/IMPLEMENTACION_V1.md) usa datos artificiales. Permanecen pendientes los contratos específicos de contenido, instrumentos/derechos, responsables y validación profesional para activación clínica. No se requieren ni se autorizan pesos, scores o agregación global por esta referencia.
+| Alcance | Estado y fuente |
+|---|---|
+| Contenido institucional A–D | Adoptado el 19/10: [contrato](sistema-experto/PROPUESTA_CONTRATO_INSTITUCIONAL_FASE_4_2026_10_19.md) |
+| Petersen E–H | Adoptado el 19/10 y concretado por [C01–C05](sistema-experto/CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md) |
+| Captura original y gobierno | Aprobaciones específicas registradas; [captura](sistema-experto/PROPUESTA_CAPTURA_PETERSEN_ORIGINAL_2026_10_19.md) y [gobierno](sistema-experto/PROPUESTA_GOBIERNO_REGLAS_2026_10_18.md) |
+| Revisión posterior | Medicina y Psicología por separado; el alcance conjunto depende de conservación real |
+| Conservación conjunta | Diseño institucional y guardado SQL íntegro pendientes; no se equiparan al prototipo |
+| Aplicaciones originales, método y licencias | Requeridos por evidencia/instrumento concreto; no completados por una aprobación documental |
+| Evaluación posterior en uso real de desempeño | Pendiente de casos y revisión profesional independiente |
 
-**Por qué requiere decisión:** Crear skill Buchanan/multicriterio no aprueba método clínico, licencias, algoritmo, datos o persistencia.
+No reabrir A–D/E–H como si faltara su adopción. No exigir firma previa para desarrollar, probar o ejecutar técnicamente los contratos aprobados; conservar estado, límites y abstenciones. Tampoco convertir una investigación o consentimiento de desarrollo en medición, certificación o validación profesional inexistente.
 
-**Opciones conocidas:**
+**Bloquea exclusivamente:** contenido clínico nuevo no aprobado, uso no autorizado de instrumentos, instalación de DDL no autorizada y declaración de evaluación posterior en uso real sin evidencia. No bloquea correcciones técnicas compatibles, pruebas desechables ni implementación del alcance ya aprobado.
 
-A. Aprobar protocolo y responsabilidades con fuentes/versiones/casos de referencia.
-B. Mantener diseño y fixtures sintéticas sin activación clínica.
-C. Acotar una etapa/piloto con decisiones específicas previas.
-
-**Impacto:** Resultado cognitivo, explicaciones, recomendaciones, validación, posibles alertas y modelo futuro.
-
-**Bloquea:** Activación clínica, copia de reactivos y aceptación clínica del motor; no diseño documental independiente.
-
-**Evidencia:** [Índice experto](sistema-experto/README.md), [implementación técnica y fuentes O.R.I.O.N.](sistema-experto/IMPLEMENTACION_V1.md). Los tres diseños de árboles siguen PROPOSED y no sustituyen la red semántica aprobada. La autorización técnica de migraciones y pruebas no es aprobación clínica.
-
-**Estado:** OPEN
+**Evidencia actual:** [índice experto](sistema-experto/README.md) y sus entregas del 31/10–04/11. La auditoría del 25/10 es antecedente, no un listado actualizado de fallos. Las opciones generales anteriores se sustituyen por esta separación de alcances; no se crean nuevas reglas.
 
 ## DEC-OPEN-006
 

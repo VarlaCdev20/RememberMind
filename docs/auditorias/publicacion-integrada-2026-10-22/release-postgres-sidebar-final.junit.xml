@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\phpunit.postgres.xml" tests="2" assertions="3" errors="0" failures="0" skipped="0" time="10.831293">
+    <testsuite name="Feature" tests="2" assertions="3" errors="0" failures="0" skipped="0" time="10.831293">
+      <testsuite name="Tests\Feature\SidebarServiceTest" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" tests="2" assertions="3" errors="0" failures="0" skipped="0" time="10.831293">
+        <testcase name="test_pedagogo_sidebar_estructura" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="205" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="2" time="7.608015"/>
+        <testcase name="test_familiar_sidebar_muestra_solo_inicio" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="222" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="1" time="3.223278"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

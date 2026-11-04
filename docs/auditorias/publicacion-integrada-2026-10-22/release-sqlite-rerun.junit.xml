@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\phpunit.xml" tests="30" assertions="2366" errors="0" failures="4" skipped="0" time="100.511610">
+    <testsuite name="Feature" tests="30" assertions="2366" errors="0" failures="4" skipped="0" time="100.511610">
+      <testsuite name="Tests\Feature\CohorteInferencia30Test" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\CohorteInferencia30Test.php" tests="4" assertions="2199" errors="0" failures="0" skipped="0" time="47.155836">
+        <testcase name="test_treinta_admisiones_fuentes_originales_dos_ramas_y_cuatro_perfiles_reproducibles" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\CohorteInferencia30Test.php" line="40" class="Tests\Feature\CohorteInferencia30Test" classname="Tests.Feature.CohorteInferencia30Test" assertions="2174" time="30.464835"/>
+        <testcase name="test_rechaza_entorno_local_antes_de_escribir" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\CohorteInferencia30Test.php" line="287" class="Tests\Feature\CohorteInferencia30Test" classname="Tests.Feature.CohorteInferencia30Test" assertions="3" time="0.830870"/>
+        <testcase name="test_seeder_artisan_rechaza_destino_no_confirmado_sin_escrituras" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\CohorteInferencia30Test.php" line="302" class="Tests\Feature\CohorteInferencia30Test" classname="Tests.Feature.CohorteInferencia30Test" assertions="4" time="0.696408"/>
+        <testcase name="test_fallo_parcial_revierte_admision_fuentes_auditoria_y_correlativos" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\CohorteInferencia30Test.php" line="324" class="Tests\Feature\CohorteInferencia30Test" classname="Tests.Feature.CohorteInferencia30Test" assertions="18" time="15.163724"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\MisResidentesPsicologiaTest" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\MisResidentesPsicologiaTest.php" tests="5" assertions="21" errors="0" failures="0" skipped="0" time="10.586724">
+        <testcase name="test_lista_residentes_admitidos_y_abre_la_ficha_sin_mostrar_codigos" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\MisResidentesPsicologiaTest.php" line="42" class="Tests\Feature\MisResidentesPsicologiaTest" classname="Tests.Feature.MisResidentesPsicologiaTest" assertions="6" time="2.732946"/>
+        <testcase name="test_busqueda_por_nombre_compuesto_y_cambio_de_vista" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\MisResidentesPsicologiaTest.php" line="68" class="Tests\Feature\MisResidentesPsicologiaTest" classname="Tests.Feature.MisResidentesPsicologiaTest" assertions="4" time="1.937720"/>
+        <testcase name="test_buscador_compartido_envia_la_busqueda_a_mis_residentes" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\MisResidentesPsicologiaTest.php" line="83" class="Tests\Feature\MisResidentesPsicologiaTest" classname="Tests.Feature.MisResidentesPsicologiaTest" assertions="7" time="1.999894"/>
+        <testcase name="test_rol_ajeno_y_personal_inactivo_no_pueden_consultar_el_listado" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\MisResidentesPsicologiaTest.php" line="101" class="Tests\Feature\MisResidentesPsicologiaTest" classname="Tests.Feature.MisResidentesPsicologiaTest" assertions="2" time="1.945761"/>
+        <testcase name="test_permiso_revocado_impide_actualizar_una_vista_livewire_abierta" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\MisResidentesPsicologiaTest.php" line="113" class="Tests\Feature\MisResidentesPsicologiaTest" classname="Tests.Feature.MisResidentesPsicologiaTest" assertions="2" time="1.970403"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\NavegacionSistemaExpertoTest" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\NavegacionSistemaExpertoTest.php" tests="4" assertions="36" errors="0" failures="0" skipped="0" time="8.367232">
+        <testcase name="test_psicologia_consulta_resultados_y_abre_valoracion_desde_area_cognitiva" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\NavegacionSistemaExpertoTest.php" line="44" class="Tests\Feature\NavegacionSistemaExpertoTest" classname="Tests.Feature.NavegacionSistemaExpertoTest" assertions="26" time="2.228679"/>
+        <testcase name="test_medicina_consulta_resultados_y_abre_valoracion_desde_ficha" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\NavegacionSistemaExpertoTest.php" line="87" class="Tests\Feature\NavegacionSistemaExpertoTest" classname="Tests.Feature.NavegacionSistemaExpertoTest" assertions="6" time="2.233878"/>
+        <testcase name="test_visitante_y_superadministracion_no_acceden_a_entrada_de_captura_clinica" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\NavegacionSistemaExpertoTest.php" line="102" class="Tests\Feature\NavegacionSistemaExpertoTest" classname="Tests.Feature.NavegacionSistemaExpertoTest" assertions="2" time="1.953854"/>
+        <testcase name="test_cuenta_inactiva_o_sin_personal_competente_no_recibe_el_listado" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\NavegacionSistemaExpertoTest.php" line="111" class="Tests\Feature\NavegacionSistemaExpertoTest" classname="Tests.Feature.NavegacionSistemaExpertoTest" assertions="2" time="1.950821"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\PsychologyDashboardDataTest" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\PsychologyDashboardDataTest.php" tests="3" assertions="28" errors="0" failures="0" skipped="0" time="5.894760">
+        <testcase name="test_panel_sin_personal_activo_no_muestra_totales_institucionales" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\PsychologyDashboardDataTest.php" line="19" class="Tests\Feature\PsychologyDashboardDataTest" classname="Tests.Feature.PsychologyDashboardDataTest" assertions="3" time="1.978166"/>
+        <testcase name="test_panel_muestra_instrumentos_propios_sin_exponer_los_de_otro_profesional" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\PsychologyDashboardDataTest.php" line="31" class="Tests\Feature\PsychologyDashboardDataTest" classname="Tests.Feature.PsychologyDashboardDataTest" assertions="18" time="1.973564"/>
+        <testcase name="test_graficas_omiten_registros_anulados_y_muestran_vacio_sin_datos" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\PsychologyDashboardDataTest.php" line="77" class="Tests\Feature\PsychologyDashboardDataTest" classname="Tests.Feature.PsychologyDashboardDataTest" assertions="7" time="1.943029"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\SidebarServiceTest" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" tests="14" assertions="82" errors="0" failures="4" skipped="0" time="28.507057">
+        <testcase name="test_superadministrador_sidebar_estructura_y_sin_duplicados" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="39" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="9" time="1.976397"/>
+        <testcase name="test_superadmin_conserva_sidebar_global_en_cualquier_contexto" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="62" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="5" time="2.097777"/>
+        <testcase name="test_administrador_sidebar_estructura_y_sin_duplicados" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="77" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="23" time="1.923029"/>
+        <testcase name="test_medico_sidebar_estructura" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="122" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="2" time="1.927603">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SidebarServiceTest::test_medico_sidebar_estructura&#13;
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+     4 =&gt; 'admin.medico.signos-vitales',
+     5 =&gt; 'admin.salud-seguimiento.ficha.index',
+     6 =&gt; 'admin.salud-seguimiento.medicacion.index',
+-    7 =&gt; 'admin.salud-seguimiento.alertas',
++    7 =&gt; 'admin.alertas-clinicas.index',
+     8 =&gt; 'admin.salud-seguimiento.reportes',
+ ]
+&#13;
+C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php:132</failure>
+        </testcase>
+        <testcase name="test_psicologo_sidebar_muestra_valoraciones_y_oculta_placeholders" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="145" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="14" time="1.985514"/>
+        <testcase name="test_fisioterapeuta_sidebar_muestra_solo_inicio" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="172" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="1" time="2.036804">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SidebarServiceTest::test_fisioterapeuta_sidebar_muestra_solo_inicio&#13;
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+     0 =&gt; 'dashboard',
++    1 =&gt; 'admin.alertas-clinicas.index',
+ ]
+&#13;
+C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php:181</failure>
+        </testcase>
+        <testcase name="test_nutricionista_sidebar_muestra_solo_inicio" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="184" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="1" time="2.018818">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SidebarServiceTest::test_nutricionista_sidebar_muestra_solo_inicio&#13;
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+     0 =&gt; 'dashboard',
++    1 =&gt; 'admin.alertas-clinicas.index',
+ ]
+&#13;
+C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php:193</failure>
+        </testcase>
+        <testcase name="test_pedagogo_sidebar_estructura" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="205" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="2" time="1.977578">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SidebarServiceTest::test_pedagogo_sidebar_estructura&#13;
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+     0 =&gt; 'dashboard',
+-    1 =&gt; 'admin.adultos-mayores.index',
++    1 =&gt; 'admin.alertas-clinicas.index',
++    2 =&gt; 'admin.adultos-mayores.index',
+ ]
+&#13;
+C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php:215</failure>
+        </testcase>
+        <testcase name="test_familiar_sidebar_muestra_solo_inicio" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="221" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="1" time="2.046380"/>
+        <testcase name="test_layout_desktop_sidebar_fixed_y_accordion_en_superadmin_usuarios" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="233" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="10" time="2.236256"/>
+        <testcase name="test_layout_superadmin_en_consulta_de_residentes_conserva_sidebar_tecnico" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="255" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="5" time="2.056948"/>
+        <testcase name="test_layout_desktop_en_administrador" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="269" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="3" time="2.047444"/>
+        <testcase name="test_layout_desktop_en_enfermero" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="281" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="4" time="2.095870"/>
+        <testcase name="test_superadmin_puede_consultar_dashboard_operativo_de_administracion" file="C:\Users\CARLAENCINAS\AppData\Local\Temp\remembermind-release-3a69ab009cad4d468ca9ac5095c85a1a\tests\Feature\SidebarServiceTest.php" line="293" class="Tests\Feature\SidebarServiceTest" classname="Tests.Feature.SidebarServiceTest" assertions="2" time="2.080641"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

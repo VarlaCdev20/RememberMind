@@ -6,7 +6,7 @@
             @if($destinoMapa)
                 <p class="rm-alert rm-alert--info mb-4">Destino: {{ $destinoMapa->habitacion->codigo }} · cama {{ $destinoMapa->codigo }}. Elige un residente ya admitido; después revisarás el traslado antes de confirmarlo.</p>
                 <label for="alojamiento-persona" class="rm-label">Residente con admisión formal</label>
-                <x-ui.selector id="alojamiento-persona" label="Residente" wire:model.live="residenteElegido" teleport="#alojamiento-portales"><option value="">Seleccionar residente</option>@foreach($residentesElegibles as $persona)<option value="{{ $persona->cod_residente }}">{{ trim($persona->nombres.' '.$persona->apellido_paterno.' '.$persona->apellido_materno) }} · {{ $persona->cod_residente }}</option>@endforeach</x-ui.selector>
+                <x-ui.selector id="alojamiento-persona" label="Residente" wire:model.live="residenteElegido" teleport="#alojamiento-portales"><option value="">Seleccionar residente</option>@foreach($residentesElegibles as $persona)<option value="{{ $persona->cod_residente }}">{{ trim($persona->nombres.' '.$persona->apellido_paterno.' '.$persona->apellido_materno) }}</option>@endforeach</x-ui.selector>
                 @if($residentesElegibles->isEmpty())<p class="rm-control-help">No hay residentes admitidos disponibles para este flujo. Un nuevo ingreso se formaliza desde Admisiones.</p>@endif
                 @error('residenteElegido')<p class="rm-field-error" role="alert">{{ $message }}</p>@enderror
             @else<p class="rm-alert rm-alert--warning" role="alert">La cama ya no está disponible. Cierra y actualiza el mapa.</p>@endif

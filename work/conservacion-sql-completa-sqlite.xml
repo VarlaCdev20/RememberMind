@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\CARLAENCINAS\Desktop\RememberMind\phpunit.xml" tests="3" assertions="220" errors="0" failures="0" skipped="1" time="71.179243">
+    <testsuite name="Feature" tests="3" assertions="220" errors="0" failures="0" skipped="1" time="71.179243">
+      <testsuite name="Tests\Feature\ConservacionCompletaSQLTest" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\ConservacionCompletaSQLTest.php" tests="3" assertions="220" errors="0" failures="0" skipped="1" time="71.179243">
+        <testcase name="test_sql_recupera_el_dto_completo_y_replay_se_comprueba_por_separado" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\ConservacionCompletaSQLTest.php" line="88" class="Tests\Feature\ConservacionCompletaSQLTest" classname="Tests.Feature.ConservacionCompletaSQLTest" assertions="84" time="56.930820"/>
+        <testcase name="test_fallo_parcial_revierte_tambien_salidas_y_membresias_y_el_cierre_impide_mutaciones" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\ConservacionCompletaSQLTest.php" line="111" class="Tests\Feature\ConservacionCompletaSQLTest" classname="Tests.Feature.ConservacionCompletaSQLTest" assertions="135" time="13.428406"/>
+        <testcase name="test_postgres_lee_sql_en_otro_proceso_con_el_motor_inaccesible" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\ConservacionCompletaSQLTest.php" line="145" class="Tests\Feature\ConservacionCompletaSQLTest" classname="Tests.Feature.ConservacionCompletaSQLTest" assertions="1" time="0.820016">
+          <skipped/>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

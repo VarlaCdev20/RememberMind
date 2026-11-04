@@ -366,6 +366,7 @@
  <td class="px-5 py-4">
  <p class="font-black text-parrafo uppercase">{{ $item['nombre'] }}</p>
  <p class="text-[10px] text-meta leading-relaxed mt-0.5 font-bold">{{ $item['descripcion'] }}</p>
+ <x-ui.document-requirement-warning :item="$item" />
  </td>
  <td class="px-5 py-4 font-black">
  @if($item['obligatorio'])
@@ -385,15 +386,21 @@
  };
  @endphp
  <span class="rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-wider {{ $pillColor }}">
- {{ $item['estado'] }}
+ {{ ($item['conflicto'] ?? false) ? 'Revisión necesaria' : $item['estado'] }}
  </span>
  </td>
  <td class="px-5 py-4">
  <div class="flex items-center justify-center gap-1.5 flex-wrap">
- @if(!$item['cargado'])
+ @if($item['conflicto'] ?? false)
+ @can('documentos.ver')
+ @foreach($item['documentos_candidatos'] as $candidato)
+ <a class="rm-btn-secondary" href="{{ route('admin.personal.documento.archivo', $candidato) }}" target="_blank" rel="noopener">Ver {{ $candidato->nombre }}</a>
+ @endforeach
+ @endcan
+ @elseif(!$item['cargado'])
  @can('documentos.subir')
  <button type="button"
- wire:click="abrirSubida('{{ $item['cod_tipo_doc'] }}')"
+ wire:click="abrirSubida('{{ $item['documento']?->tipo_documento ?? $item['cod_tipo_doc'] }}')"
  class="inline-flex items-center gap-1 rounded-full bg-boton-acento px-3.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-inverso shadow-sm hover:shadow active:scale-95">
  <i class="ph-bold ph-upload-simple"></i> Subir
  </button>
@@ -401,7 +408,7 @@
  @else
  @can('documentos.ver')
  <button type="button"
- wire:click="descargarDoc('{{ $item['documento']->cod_doc_usu }}')"
+ wire:click="descargarDoc('{{ $item['documento']->getKey() }}')"
  class="flex h-8 w-8 items-center justify-center rounded-xl bg-fondo-panel text-parrafo hover:bg-boton-principal hover:text-inverso transition shadow-sm active:scale-90"
  title="Descargar documento">
  <i class="ph-bold ph-download-simple"></i>
@@ -412,7 +419,7 @@
  @if(in_array($item['estado'], ['OBSERVADO', 'VENCIDO']))
  @can('documentos.gestionar')
  <button type="button"
- wire:click="abrirSubida('{{ $item['cod_tipo_doc'] }}')"
+ wire:click="abrirSubida('{{ $item['documento']?->tipo_documento ?? $item['cod_tipo_doc'] }}')"
  class="inline-flex items-center gap-1 rounded-full bg-boton-acento px-3.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-inverso shadow-sm hover:bg-fondo-panel active:scale-95"
  title="Reemplazar por nueva versión">
  <i class="ph-bold ph-arrows-counter-clockwise"></i> Reemplazar
@@ -424,7 +431,7 @@
  @if($item['estado'] === 'CARGADO')
  @can('documentos.gestionar')
  <button type="button"
- wire:click="validarDoc('{{ $item['documento']->cod_doc_usu }}')"
+ wire:click="validarDoc('{{ $item['documento']->getKey() }}')"
  wire:confirm="¿Está seguro de validar este documento?"
  class="inline-flex items-center gap-1 rounded-full bg-estado-exitoBg px-3.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-inverso shadow-sm hover:bg-fondo-panel active:scale-95"
  title="Validar documento">
@@ -434,7 +441,7 @@
 
  @can('documentos.gestionar')
  <button type="button"
- wire:click="abrirObservarDoc('{{ $item['documento']->cod_doc_usu }}')"
+ wire:click="abrirObservarDoc('{{ $item['documento']->getKey() }}')"
  class="inline-flex items-center gap-1 rounded-full bg-fondo-app border border-borde/65 px-3.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-parrafo shadow-sm hover:bg-boton-acento hover:text-inverso active:scale-95"
  title="Observar documento">
  <i class="ph-bold ph-warning"></i> Observar
@@ -445,7 +452,7 @@
  @can('documentos.archivar')
  @if($item['estado'] !== 'ANULADO')
  <button type="button"
- wire:click="abrirAnularDoc('{{ $item['documento']->cod_doc_usu }}')"
+ wire:click="abrirAnularDoc('{{ $item['documento']->getKey() }}')"
  class="flex h-8 w-8 items-center justify-center rounded-xl bg-red-100 text-red-700 hover:bg-red-700 hover:text-inverso transition shadow-sm active:scale-90"
  title="Anular documento">
  <i class="ph-bold ph-trash"></i>
@@ -827,11 +834,13 @@
  </div>
 
  <div>
- <label class="block text-[10px] font-bold uppercase tracking-widest text-apoyo mb-1">Seleccionar Archivo (PDF, JPG, PNG) *</label>
+ <label for="documento-archivo-subida" class="rm-label">Archivo original (PDF, JPG o PNG) *</label>
  <input type="file"
- wire:model="archivoSubida"
+ id="documento-archivo-subida" wire:model="archivoSubida"
+ aria-invalid="{{ $errors->has('archivoSubida') ? 'true' : 'false' }}"
+ @if($errors->has('archivoSubida')) aria-describedby="documento-archivo-subida-error" @endif
  class="w-full text-xs font-bold text-parrafo bg-fondo-card p-3 rounded-xl border border-borde outline-none">
- @error('archivoSubida') <span class="text-[9px] font-bold text-boton-acento uppercase mt-1 block">{{ $message }}</span> @enderror
+ @error('archivoSubida') <p id="documento-archivo-subida-error" class="rm-error" role="alert">{{ $message }}</p> @enderror
  </div>
 
  <div class="grid grid-cols-2 gap-4">

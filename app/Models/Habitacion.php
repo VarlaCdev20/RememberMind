@@ -58,7 +58,7 @@ class Habitacion extends ModeloOperativo
         static::saving(function (self $model) { if (empty($model->capacidad)) $model->capacidad = 1; });
         static::saving(function (self $hab) {
             if (empty($hab->attributes['cod_habitacion'])) {
-                $hab->attributes['cod_habitacion'] = 'HAB_' . Str::upper(Str::random(10));
+                $hab->attributes['cod_habitacion'] = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('habitaciones', $hab->getConnectionName());
             }
             if (empty($hab->attributes['codigo'])) {
                 $hab->attributes['codigo'] = (string) ($hab->attributes['numero'] ?? ('HAB-' . rand(100, 999)));

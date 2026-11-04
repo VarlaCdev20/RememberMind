@@ -55,8 +55,8 @@
 }
 
 /* Superficies consistentes incluso en pantallas heredadas. */
-.rm-nursing-shell main :is(.rounded-2xl, .rounded-3xl).border:not(.rm-ficha-detalles *):not(.rm-nursing-dashboard *):not(.rm-chart-card),
-.rm-nursing-shell main :is(.enf-card, .rm-card, .rm-panel, .rm-section-card):not(.rm-ficha-detalles *):not(.rm-nursing-dashboard *):not(.rm-chart-card) {
+.rm-nursing-shell main :is(.rounded-2xl, .rounded-3xl).border:not(.rm-ficha-detalles *):not(.rm-nursing-dashboard *):not(.rm-chart-card):not(:where(.rm-clinical-form *)),
+.rm-nursing-shell main :is(.enf-card, .rm-card, .rm-panel, .rm-section-card):not(.rm-ficha-detalles *):not(.rm-dashboard-composition *):not(.rm-chart-card):not(:where(.rm-clinical-form *)) {
     border-radius: var(--rm-radius-card) !important;
     border-color: var(--rm-dashboard-card-border, var(--rm-border)) !important;
     background-color: var(--rm-dashboard-card-bg, var(--rm-surface)) !important;
