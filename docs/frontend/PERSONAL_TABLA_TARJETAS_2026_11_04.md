@@ -66,3 +66,9 @@ Se añade la variante reutilizable rm-pagination--compact al componente canónic
 El filtro conserva búsqueda, estado y limpieza existentes, con mayor separación entre controles, opción Todos los accesos y región con nombre accesible. Se elimina la superficie/sombra heredada para integrarlo con el listado; escritorio en una fila y móvil con búsqueda completa y estado junto a Limpiar. Sin cambios de consultas, permisos, reglas ni BDD.
 
 Verificación final: build correcto (advertencia existente de bundle); E2E focal PASS en26 s, diez combinaciones de tabla/tarjetas en cinco anchos, búsqueda/vacío/limpieza, menú/Escape/foco y oscuro390. Sin desbordamientos, superposición ni errores JS/HTTP. Inspección visual de capturas sintéticas; no se ejecutó la CI completa.
+
+## Distribución de la cabecera de Personal
+
+Se ajusta el componente compartido collection-header mediante su clase de composición existente: identidad y acciones en dos columnas en escritorio, separación uniforme y controles planos de44 px con tipografía del sistema. En espacios menores de850 px las acciones ocupan una fila de dos columnas iguales; por debajo de420 px se apilan a ancho completo. Icono de44 px y padding de16 px sin altura fija. Se conservan etiquetas, enlaces, permisos, colores y orden de teclado.
+
+Verificación de cabecera: build correcto y E2E focal PASS (22 s), diez combinaciones en1440/1280/1024/768/390 px, sin overflow ni controles pequeños; filtros y menús/Escape/foco conservados. Capturas revisadas en1440,768 y390 px. Sin cambios de backend o permisos; CI completa fuera de esta verificación localizada.
