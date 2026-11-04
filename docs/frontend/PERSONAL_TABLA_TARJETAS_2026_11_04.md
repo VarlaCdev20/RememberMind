@@ -72,3 +72,9 @@ Verificación final: build correcto (advertencia existente de bundle); E2E focal
 Se ajusta el componente compartido collection-header mediante su clase de composición existente: identidad y acciones en dos columnas en escritorio, separación uniforme y controles planos de44 px con tipografía del sistema. En espacios menores de850 px las acciones ocupan una fila de dos columnas iguales; por debajo de420 px se apilan a ancho completo. Icono de44 px y padding de16 px sin altura fija. Se conservan etiquetas, enlaces, permisos, colores y orden de teclado.
 
 Verificación de cabecera: build correcto y E2E focal PASS (22 s), diez combinaciones en1440/1280/1024/768/390 px, sin overflow ni controles pequeños; filtros y menús/Escape/foco conservados. Capturas revisadas en1440,768 y390 px. Sin cambios de backend o permisos; CI completa fuera de esta verificación localizada.
+
+## Buscador compacto y reutilización del filtro canónico
+
+Se reemplaza el input local por ui.filter-search con lupa, conservando busquedaResumen, debounce e identificador. Props opcionales inputId y showClear mantienen los valores anteriores en otros consumidores; label vacío permite una única etiqueta visible proporcionada por ui.field. El buscador queda limitado a26 rem (416 px), estado a14 rem y Limpiar contiguo, sin estirar el grupo por todo el listado. Se conserva adaptación móvil y tokens existentes.
+
+Build correcto y E2E focal PASS (25 s): tabla/tarjetas en cinco anchos, búsqueda/vacío/limpieza, menú/Escape/foco y oscuro390, sin errores JS/HTTP o desbordamientos. Ajuste final de etiqueta verificado en navegador operativo: una sola etiqueta asociada, lupa presente y buscador de416 px. Pestaña recargada para mostrar los cambios. Sin cambios de backend, permisos o persistencia; no se ejecutó la CI completa.
