@@ -6,7 +6,7 @@ namespace Tests\Unit;
 
 use App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratoFuentesPetersen as C;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\CapturaPetersenPanel;
-use MotorExperto\dominio\petersen\EvaluarPetersenInstitucional as E;
+use MotorExperto\inferencia\EvaluarPetersenInstitucional as E;
 use PHPUnit\Framework\TestCase;
 
 final class MapaFuentesCriteriosTest extends TestCase

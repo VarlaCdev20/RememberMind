@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MotorExperto\investigacion\g09;
 
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\conocimiento\PaqueteConocimiento;
 
 /**
  * Materializa G09-EXP como grafo/paquete D-123 exclusivamente para

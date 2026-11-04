@@ -12,7 +12,7 @@ use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoObservacional;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Gate;
-use MotorExperto\dominio\conocimiento\reglas\EvaluadorObservaciones;
+use MotorExperto\conocimiento\ReglasObservacionales;
 
 /**
  * Consulta autorizada del primer nivel observacional sobre controles originales.
@@ -55,7 +55,7 @@ final class ConsultarHallazgosObservacionales
         $fechas = [];
         foreach ($registros as $r) {
             $valores = [];
-            foreach (EvaluadorObservaciones::REGLAS as $regla) {
+            foreach (ReglasObservacionales::REGLAS as $regla) {
                 // Se validan los escalares originales: el cast booleano no debe convertir texto inválido en true.
                 $original = $r->getRawOriginal($regla['campo']);
                 $valores[$regla['campo']] = match (true) {
@@ -73,7 +73,7 @@ final class ConsultarHallazgosObservacionales
                 'episodio' => $r->cod_atencion ? 'atencion:'.$r->cod_atencion : 'control:'.$r->getKey(), 'valores' => $valores];
         }
         $conocimiento = app(ConocimientoObservacional::class)->vigente();
-        $informe = (new EvaluadorObservaciones)->evaluar($residente->getKey(), $corte->toDateTimeImmutable(), $instantanea, $conocimiento);
+        $informe = (new ReglasObservacionales)->evaluar($residente->getKey(), $corte->toDateTimeImmutable(), $instantanea, $conocimiento);
         foreach ($informe['resultados'] as &$resultado) {
             $resultado['fuente']['nombre_autor'] = $autores[$resultado['fuente']['registro']];
             $resultado['fuente']['fecha_visible'] = $fechas[$resultado['fuente']['registro']];

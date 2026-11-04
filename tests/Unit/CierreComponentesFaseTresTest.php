@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use MotorExperto\dominio\instrumentos\CatalogoCapturaCognitiva;
-use MotorExperto\dominio\instrumentos\NormalizadorReferenciaBarcelona2011 as Barcelona;
-use MotorExperto\dominio\instrumentos\NormalizadorReferenciaCancelacionScand2023 as Scand;
-use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
+use MotorExperto\instrumentos\CatalogoCapturaCognitiva;
+use MotorExperto\instrumentos\NormalizadorReferenciaBarcelona2011 as Barcelona;
+use MotorExperto\instrumentos\NormalizadorReferenciaCancelacionScand2023 as Scand;
+use MotorExperto\instrumentos\RegistroMetodosInstrumentales;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

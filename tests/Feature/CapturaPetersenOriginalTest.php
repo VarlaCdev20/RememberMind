@@ -36,9 +36,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
-use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
-use MotorExperto\soporte\conservacion\InstantaneaEvaluacionInstitucional;
-use MotorExperto\soporte\conservacion\InstantaneaPetersen;
+use MotorExperto\instrumentos\RegistroMetodosInstrumentales;
+use MotorExperto\conservacion\InstantaneaEvaluacionInstitucional;
+use MotorExperto\conservacion\InstantaneaPetersen;
 use OrionNominal\MembresiasSQL;
 use PDO;
 use PDOException;
@@ -281,8 +281,8 @@ final class CapturaPetersenOriginalTest extends TestCase
         $d = $dto->contenido;
         $d['procedencia_valoraciones'][0]['registrado_en'] = '2026-10-19T11:59:59.999999-04:00';
         // La inferencia y las FK nominales no bastan para detectar esta fecha histórica falsa.
-        $alterada = InstantaneaPetersen::verificar($d, \MotorExperto\soporte\conservacion\CodecInstantanea::huella(
-            \MotorExperto\soporte\conservacion\CapturaInstrumentalCanonica::ordenar($d)));
+        $alterada = InstantaneaPetersen::verificar($d, \MotorExperto\conservacion\CodecInstantanea::huella(
+            \MotorExperto\conservacion\CapturaInstrumentalCanonica::ordenar($d)));
         try {
             $repo->guardar('MEMBRESIAS-TEST', $alterada);
             self::fail('La fecha debe coincidir con el registro SQL original.');
@@ -372,9 +372,9 @@ final class CapturaPetersenOriginalTest extends TestCase
         $d['valoraciones'] = $d['procedencia_valoraciones'] = $d['membresias_soportes'] = $d['soportes_originales'] = [];
         $d['adquisicion']['valoraciones_al_corte'] = 0;
         // Crear una captura vacía legítima ejecuta el motor con cero juicios; no altera una salida ya emitida.
-        $vacia = InstantaneaPetersen::crear(new \MotorExperto\dominio\objetos_valor\ContextoEjecucion(
+        $vacia = InstantaneaPetersen::crear(new \MotorExperto\hechos\ContextoEjecucion(
             $d['contexto']['evaluacion'], $d['contexto']['residente'], $d['contexto']['version'],
-            \MotorExperto\soporte\conservacion\CodecInstantanea::leerFecha('corte', (object) $d['contexto']['fecha_corte'])),
+            \MotorExperto\conservacion\CodecInstantanea::leerFecha('corte', (object) $d['contexto']['fecha_corte'])),
             [], null, null, $this->usuario->getKey(), $d['adquisicion'], soportesOriginales: []);
         self::assertTrue($repo->guardar('MEMBRESIAS-TEST', $vacia));
         $fila = (array) DB::table('evaluaciones_expertas')->where('cod_evaluacion_experta', 'MEMBRESIAS-TEST')->sole();

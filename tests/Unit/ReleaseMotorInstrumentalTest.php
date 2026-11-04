@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use DomainException;
-use MotorExperto\soporte\conservacion\CapturaInstrumentalCanonica;
-use MotorExperto\soporte\conservacion\CodecInstantanea;
-use MotorExperto\soporte\conservacion\ReleaseMotorInstrumental;
+use MotorExperto\conservacion\CapturaInstrumentalCanonica;
+use MotorExperto\conservacion\CodecInstantanea;
+use MotorExperto\conservacion\ReleaseMotorInstrumental;
 use PHPUnit\Framework\TestCase;
 use ZipArchive;
 
@@ -39,7 +39,7 @@ final class ReleaseMotorInstrumentalTest extends TestCase
         self::assertFalse($m['incluye_datos_clinicos']);
         self::assertSame('ARTEFACTO-MOTOR-2', $m['contrato']);
         self::assertArrayHasKey('app/Modulos/ApoyoDecision/Infraestructura/Persistencia/datos/orion-v1-conceptos.json', $m['archivos']);
-        self::assertArrayHasKey('motor-experto/src/motor_experto/soporte/conservacion/InstantaneaInstrumental.php', $m['archivos']);
+        self::assertArrayHasKey('motor-experto/src/motor_experto/conservacion/InstantaneaInstrumental.php', $m['archivos']);
         foreach (array_keys($m['archivos']) as $nombre) {
             self::assertDoesNotMatchRegularExpression('~(^|/)(\.env|storage|work|attachments|config)(/|$)~', $nombre);
         }

@@ -19,16 +19,16 @@ use Carbon\CarbonImmutable;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
-use MotorExperto\dominio\petersen\EvaluarPetersenInstitucional as E;
-use MotorExperto\dominio\petersen\FuentePetersenInstitucional as Fuente;
-use MotorExperto\dominio\petersen\ValoracionOriginalPetersen as V;
-use MotorExperto\soporte\conservacion\CapturaInstrumentalCanonica;
-use MotorExperto\soporte\conservacion\CodecInstantanea;
-use MotorExperto\soporte\conservacion\InstantaneaInstrumental;
-use MotorExperto\soporte\conservacion\InstantaneaPetersen;
-use MotorExperto\soporte\conservacion\MembresiasOriginalesPetersen;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\hechos\ContextoEjecucion;
+use MotorExperto\inferencia\EvaluarPetersenInstitucional as E;
+use MotorExperto\hechos\FuentePetersenInstitucional as Fuente;
+use MotorExperto\hechos\ValoracionOriginalPetersen as V;
+use MotorExperto\conservacion\CapturaInstrumentalCanonica;
+use MotorExperto\conservacion\CodecInstantanea;
+use MotorExperto\conservacion\InstantaneaInstrumental;
+use MotorExperto\conservacion\InstantaneaPetersen;
+use MotorExperto\conservacion\MembresiasOriginalesPetersen;
 
 /** Adquiere juicios originales autorizados al corte y orquesta el motor; no guarda ni atribuye resultados al laboratorio. */
 final class ConsultarPetersenInstitucional

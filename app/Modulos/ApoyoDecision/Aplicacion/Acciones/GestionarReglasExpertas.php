@@ -17,11 +17,11 @@ use DomainException;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use MotorExperto\dominio\conocimiento\CompiladorObservacional;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\dominio\conocimiento\PertenenciaVariableCognitiva;
-use MotorExperto\dominio\conocimiento\reglas\EvaluadorReglas;
-use MotorExperto\dominio\conocimiento\versiones\PaquetePetersenInstitucional;
+use MotorExperto\conocimiento\CompiladorObservacional;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\conocimiento\PertenenciaVariableCognitiva;
+use MotorExperto\inferencia\EvaluadorReglas;
+use MotorExperto\conocimiento\ReglasPetersen;
 
 /** Gobierno institucional del conocimiento. Ninguna aprobación se inventa o se exige al crear. */
 final class GestionarReglasExpertas
@@ -177,8 +177,8 @@ final class GestionarReglasExpertas
                 }
             }
             if ($petersen) {
-                $c = PaquetePetersenInstitucional::contratos();
-                (new PaquetePetersenInstitucional)->validar(new PaqueteConocimiento($id,
+                $c = ReglasPetersen::contratos();
+                (new ReglasPetersen)->validar(new PaqueteConocimiento($id,
                     array_intersect_key($traducidas, PaqueteConocimiento::CLAVES), $c['relaciones'], false, $c['tipo_regla_resultado'], []));
             }
             foreach ($traducidas['reglas_expertas'] as &$rule) {

@@ -9,7 +9,7 @@ use MotorExperto\dominio\orion\Entities\Conocimiento\ReglaExperta;
 use MotorExperto\dominio\orion\Services\Dcl\ClasificadorPetersenService;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum;
 use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
-use MotorExperto\soporte\conservacion\CodecInstantanea;
+use MotorExperto\conservacion\CodecInstantanea;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades;
 

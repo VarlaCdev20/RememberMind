@@ -19,7 +19,7 @@ use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use DateTimeImmutable;
 use DomainException;
 use Illuminate\Support\Facades\DB;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\conocimiento\PaqueteConocimiento;
 
 /** Acceso Eloquent por versión concreta; no ejecuta ni activa conocimiento. */
 final class CargadorConocimiento implements ConocimientoVersionado

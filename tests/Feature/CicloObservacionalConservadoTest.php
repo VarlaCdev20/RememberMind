@@ -19,7 +19,7 @@ use Carbon\CarbonImmutable;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Tests\Support\EsquemaSinTransaccion;
 use Livewire\Livewire;
-use MotorExperto\soporte\conservacion\CodecInstantanea;
+use MotorExperto\conservacion\CodecInstantanea;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 

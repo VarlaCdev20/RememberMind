@@ -12,8 +12,8 @@ use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoOrion;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use MotorExperto\dominio\conocimiento\PerfilConceptualCognitivo;
-use MotorExperto\dominio\conocimiento\versiones\PaqueteCognitivoInstitucional as P;
+use MotorExperto\conocimiento\PerfilConceptualCognitivo;
+use MotorExperto\conocimiento\ReglasCognitivas as P;
 
 /** Registro atómico por Medicina/Psicología; no atribuye firmas ni modifica historias de residentes. */
 final class RegistrarConocimientoInstitucional

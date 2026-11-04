@@ -7,10 +7,10 @@ namespace App\Modulos\ApoyoDecision\Infraestructura\Persistencia;
 use App\Compartido\Aplicacion\Contratos\CodigosEntidad;
 use App\Compartido\Infraestructura\Persistencia\CatalogoCodigos;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConservacionObservacional;
-use MotorExperto\soporte\conservacion\CodecInstantanea as Codec;
+use MotorExperto\conservacion\CodecInstantanea as Codec;
 use DateTimeImmutable;
 use Illuminate\Support\Facades\DB;
-use MotorExperto\dominio\conocimiento\reglas\EvaluadorObservaciones;
+use MotorExperto\conocimiento\ReglasObservacionales;
 
 /** Escribe exclusivamente tablas expertas existentes dentro de la transacción de la acción. */
 final class ConservarObservaciones implements ConservacionObservacional
@@ -21,7 +21,7 @@ final class ConservarObservaciones implements ConservacionObservacional
         $originales = [];
         foreach ($registros as $r) {
             $valores = [];
-            foreach (EvaluadorObservaciones::REGLAS as $regla) {
+            foreach (ReglasObservacionales::REGLAS as $regla) {
                 $valores[$regla['campo']] = $r['valores'][$regla['campo']];
             }
             $originales[] = ['id' => $r['id'], 'residente' => $r['residente'], 'autor' => $r['autor'],
@@ -116,7 +116,7 @@ final class ConservarObservaciones implements ConservacionObservacional
             'fecha_hora_inicio' => $fecha, 'fecha_hora_fin' => $fecha, 'id_evaluacion_dominio' => 'OBS:'.$solicitud,
             'version_conservacion' => 'OBS-SNAP-2', 'huella_memoria_cognicion' => $this->huella($registros, $informe, $p)]
             + Codec::fecha('fecha_corte', new DateTimeImmutable($informe['fecha_corte'])));
-        $literal = (new EvaluadorObservaciones)->evaluar($residente, new DateTimeImmutable($informe['fecha_corte']), $registros);
+        $literal = (new ReglasObservacionales)->evaluar($residente, new DateTimeImmutable($informe['fecha_corte']), $registros);
         $decisiones = [];
         foreach ($literal['resultados'] as $decision) {
             $decisiones[$decision['fuente']['registro']][$decision['condicion']['campo']] = $decision;

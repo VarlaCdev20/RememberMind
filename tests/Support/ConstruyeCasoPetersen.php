@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Tests\Support;
 
 use DateTimeImmutable;
-use MotorExperto\dominio\instrumentos\NormalizadorHvltBolivia2015 as Hvlt;
-use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
-use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
-use MotorExperto\dominio\petersen\EvaluarPetersenInstitucional as E;
-use MotorExperto\dominio\petersen\FuentePetersenInstitucional as F;
-use MotorExperto\dominio\petersen\ValoracionOriginalPetersen as V;
+use MotorExperto\instrumentos\NormalizadorHvltBolivia2015 as Hvlt;
+use MotorExperto\instrumentos\RegistroMetodosInstrumentales;
+use MotorExperto\hechos\ContextoEjecucion;
+use MotorExperto\inferencia\EvaluarPetersenInstitucional as E;
+use MotorExperto\hechos\FuentePetersenInstitucional as F;
+use MotorExperto\hechos\ValoracionOriginalPetersen as V;
 
 /** Juicios y brutos de ingeniería, sin reactivos protegidos ni datos reales. */
 trait ConstruyeCasoPetersen

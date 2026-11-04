@@ -27,7 +27,7 @@ use Database\Seeders\PermisosPetersenOriginalSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
-use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
+use MotorExperto\instrumentos\RegistroMetodosInstrumentales;
 use Tests\Support\EsquemaSinTransaccion;
 use Tests\TestCase;
 

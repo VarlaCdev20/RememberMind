@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modulos\ApoyoDecision\Aplicacion\DTOs;
 
-use MotorExperto\dominio\conocimiento\reglas\EvaluadorObservaciones;
+use MotorExperto\conocimiento\ReglasObservacionales;
 use DomainException;
 
 /** Contrato de lectura: no normaliza, interpreta ni reconstruye inferencias. */
@@ -68,7 +68,7 @@ final class ConsultaCognitivaEnfermeria
         $items = [];
         foreach ($lectura['resumen'] as $codigo => $regla) {
             $items[] = [
-                'nombre' => $regla['nombre'] ?? EvaluadorObservaciones::REGLAS[$codigo]['nombre'],
+                'nombre' => $regla['nombre'] ?? ReglasObservacionales::REGLAS[$codigo]['nombre'],
                 'estado' => match ($regla['estado']) {
                     'CUMPLE' => 'Observado en los controles revisados',
                     'NO_CUMPLE' => 'No señalado en los controles revisados',

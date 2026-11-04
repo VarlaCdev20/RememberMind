@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 use App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratoFuentesPetersen;
-use MotorExperto\dominio\conocimiento\PerfilConceptualCognitivo;
-use MotorExperto\dominio\conocimiento\reglas\EvaluadorObservaciones;
-use MotorExperto\dominio\conocimiento\versiones\PaqueteCognitivoInstitucional;
-use MotorExperto\dominio\conocimiento\versiones\PaquetePetersenInstitucional;
-use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
+use MotorExperto\conocimiento\PerfilConceptualCognitivo;
+use MotorExperto\conocimiento\ReglasObservacionales;
+use MotorExperto\conocimiento\ReglasCognitivas;
+use MotorExperto\conocimiento\ReglasPetersen;
+use MotorExperto\instrumentos\RegistroMetodosInstrumentales;
 
 // Verificador documental offline: sin arranque Laravel, .env, SQL, casos o inferencias.
 $raiz = dirname(__DIR__);
@@ -33,7 +33,7 @@ function anexoTrazabilidad(string $raiz): string
     $fuente = json_decode(file_get_contents($raiz.'/app/Modulos/ApoyoDecision/Infraestructura/Persistencia/datos/orion-v1-conceptos.json'), true, flags: JSON_THROW_ON_ERROR);
     $red = (new PerfilConceptualCognitivo)->construir($fuente);
     $metodos = (new RegistroMetodosInstrumentales)->metodos();
-    $reglas = PaqueteCognitivoInstitucional::reglasG09();
+    $reglas = ReglasCognitivas::reglasG09();
     $componentes = [];
     foreach ($red['dominios'] as $dominio) {
         $componentes += $dominio['componentes'];
@@ -82,12 +82,12 @@ function anexoTrazabilidad(string $raiz): string
     }
     foreach (['PET-01', 'PET-02', 'PET-03', 'PET-04'] as $patron) {
         $condiciones = [];
-        foreach (PaquetePetersenInstitucional::condiciones($patron) as $campo => $valor) {
+        foreach (ReglasPetersen::condiciones($patron) as $campo => $valor) {
             $condiciones[] = $campo.'='.$valor;
         }
         $s .= filaMatriz(['`'.$patron.'`', listaMatriz($condiciones), 'Patrón orientativo; sujeto además a admisibilidad, precedencia y abstención del caso.']);
     }
-    foreach (EvaluadorObservaciones::REGLAS as $id => $regla) {
+    foreach (ReglasObservacionales::REGLAS as $id => $regla) {
         $s .= filaMatriz(['`'.$id.'`', '`controles_cognitivos.'.$regla['campo'].' = true`, registro admisible al corte.', $regla['hallazgo'].' No acredita C02.']);
     }
     $s .= "\n### D. Soportes y comprobaciones de los requisitos y dominios\n\n";

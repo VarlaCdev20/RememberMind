@@ -1,7 +1,7 @@
 ---
 title: "Sistema experto: fuentes, funcionamiento y límites"
 status: CURRENT
-version: "3.25"
+version: "3.26"
 last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
@@ -21,6 +21,7 @@ Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años,
 
 | Necesito encontrar… | Abrir |
 |---|---|
+| Leer el código con menos carpetas: reglas, hechos y motor | [Empieza en el README del motor: seis componentes y archivos principales](../../motor-experto/README.md) |
 | Perfiles iniciales activos: ediciones, captura, puntuación e instalación | [Activación MoCA8.1, RUDAS-PE2020 y FAQ B7S,04/11](ENTREGA_ACTIVACION_PERFILES_INICIALES_2026_11_04.md) |
 | Matriz actual: qué dato alimenta cada instrumento/regla, qué resultado permite y qué debe guardarse | [Matriz única de trazabilidad, perfiles exactos, brechas y conservación/4FN](MATRIZ_TRAZABILIDAD_DCL.md) |
 | Cierre técnico actual: documentos Petersen, lectura consistente, Enfermería, reglas y depuración | [Entregable único actualizado al04/11: correcciones, pruebas y pendientes precisos](ENTREGABLE_REGLAS_Y_DEPURACION_2026_10_31.md) |

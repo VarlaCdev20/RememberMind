@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Modulos\ApoyoDecision\Presentacion\Soporte;
 
 use DomainException;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\conocimiento\PaqueteConocimiento;
 
 /** Relaciones de lectura por identidad exacta en una instantánea ya autorizada. */
 final class DatosConocimientoVisible

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use MotorExperto\soporte\conservacion\CapturaInstrumentalCanonica;
+use MotorExperto\conservacion\CapturaInstrumentalCanonica;
 use PDO;
 use PDOException;
 use PHPUnit\Framework\TestCase;

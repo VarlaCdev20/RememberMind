@@ -34,7 +34,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
-use MotorExperto\dominio\instrumentos\NormalizadorHvltBolivia2015;
+use MotorExperto\instrumentos\NormalizadorHvltBolivia2015;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;

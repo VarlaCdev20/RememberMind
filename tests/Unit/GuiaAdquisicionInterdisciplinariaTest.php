@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\GuiaAdquisicionInterdisciplinaria;
-use MotorExperto\dominio\instrumentos\CatalogoCapturaCognitiva;
+use MotorExperto\instrumentos\CatalogoCapturaCognitiva;
 use PHPUnit\Framework\TestCase;
 
 final class GuiaAdquisicionInterdisciplinariaTest extends TestCase

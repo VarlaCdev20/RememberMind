@@ -2,7 +2,7 @@
 
 namespace MotorExperto\dominio\conocimiento\versiones;
 
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\conocimiento\PaqueteConocimiento;
 
 /** Propuesta de representación observacional; no acredita una evaluación posterior en uso real. */
 final class PaqueteInvestigadoCOGMEM

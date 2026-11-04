@@ -6,17 +6,17 @@ namespace Tests\Unit;
 
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\DisponibilidadReglaCatalogo;
 use Carbon\CarbonImmutable;
-use MotorExperto\dominio\conocimiento\versiones\PaquetePetersenInstitucional;
+use MotorExperto\conocimiento\ReglasPetersen;
 use PHPUnit\Framework\TestCase;
 
 final class DisponibilidadReglaCatalogoTest extends TestCase
 {
     private function caso(): array
     {
-        $p = (new PaquetePetersenInstitucional)->construir('VERSION-UNIT', 'AUTOR-UNIT', '2026-10-30 10:00:00');
+        $p = (new ReglasPetersen)->construir('VERSION-UNIT', 'AUTOR-UNIT', '2026-10-30 10:00:00');
 
         return [$p->tabla('reglas_expertas')[0], ['cod_version_modelo' => $p->version,
-            'codigo_version' => PaquetePetersenInstitucional::CODIGO, 'estado' => 'ACTIVO',
+            'codigo_version' => ReglasPetersen::CODIGO, 'estado' => 'ACTIVO',
             'fecha_hora_vigencia' => '2026-10-30 10:00:00', 'fecha_hora_retiro' => null], $p->declaracion()['tablas'],
             CarbonImmutable::parse('2026-10-31 12:00:00')];
     }

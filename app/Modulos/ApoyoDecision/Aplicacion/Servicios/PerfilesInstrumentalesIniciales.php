@@ -8,7 +8,7 @@ use App\Models\Instrumento;
 use DomainException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\ValidationException;
-use MotorExperto\dominio\instrumentos\CircuitoInstrumentalInicial;
+use MotorExperto\instrumentos\CircuitoInstrumentalInicial;
 
 /** Resuelve identidades exactas del catálogo instalado; no completa PK ni versiones por semejanza. */
 final class PerfilesInstrumentalesIniciales

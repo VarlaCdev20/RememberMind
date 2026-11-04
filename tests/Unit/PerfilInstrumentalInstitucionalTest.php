@@ -6,8 +6,8 @@ namespace Tests\Unit;
 
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoOrion;
 use DomainException;
-use MotorExperto\dominio\conocimiento\PerfilConceptualCognitivo;
-use MotorExperto\dominio\instrumentos\PerfilInstrumentalCognitivo;
+use MotorExperto\conocimiento\PerfilConceptualCognitivo;
+use MotorExperto\instrumentos\PerfilInstrumentalCognitivo;
 use PHPUnit\Framework\TestCase;
 
 final class PerfilInstrumentalInstitucionalTest extends TestCase

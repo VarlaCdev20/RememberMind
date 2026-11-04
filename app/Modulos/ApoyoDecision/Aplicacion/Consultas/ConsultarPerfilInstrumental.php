@@ -12,9 +12,9 @@ use App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratosConocimiento;
 use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoOrion;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Gate;
-use MotorExperto\dominio\conocimiento\PerfilConceptualCognitivo;
-use MotorExperto\dominio\instrumentos\PerfilInstrumentalCognitivo;
-use MotorExperto\soporte\conservacion\InstantaneaEvaluacionInstitucional;
+use MotorExperto\conocimiento\PerfilConceptualCognitivo;
+use MotorExperto\instrumentos\PerfilInstrumentalCognitivo;
+use MotorExperto\conservacion\InstantaneaEvaluacionInstitucional;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /** Orquesta fuentes institucionales autorizadas y la red documental; no usa casos del laboratorio. */

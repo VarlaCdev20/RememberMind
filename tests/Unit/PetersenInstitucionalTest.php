@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use DomainException;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\dominio\conocimiento\versiones\PaquetePetersenInstitucional as P;
-use MotorExperto\dominio\petersen\EvaluarPetersenInstitucional as E;
-use MotorExperto\dominio\petersen\ValoracionOriginalPetersen as V;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\conocimiento\ReglasPetersen as P;
+use MotorExperto\inferencia\EvaluarPetersenInstitucional as E;
+use MotorExperto\hechos\ValoracionOriginalPetersen as V;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Tests\Support\ConstruyeCasoPetersen;

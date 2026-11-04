@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MotorExperto\investigacion\dcl;
 
-use MotorExperto\dominio\conocimiento\red_semantica\RedSemantica;
+use MotorExperto\conocimiento\RedSemantica;
 use MotorExperto\investigacion\g09\CatalogoReglasG09Experimental;
 
 /**

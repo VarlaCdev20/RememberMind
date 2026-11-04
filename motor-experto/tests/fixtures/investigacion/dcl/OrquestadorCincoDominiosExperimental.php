@@ -6,13 +6,13 @@ namespace MotorExperto\investigacion\dcl;
 
 use DateTimeImmutable;
 use DomainException;
-use MotorExperto\adaptadores\entrada\AdaptadorHechosCOGMEM;
+use MotorExperto\hechos\AdaptadorHechosCOGMEM;
 use MotorExperto\adaptadores\entrada\EjemploTecnicoCOGMEM;
 use MotorExperto\aplicacion\casos_uso\MotorExperto;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\dominio\inferencia\MemoriaTrabajo;
-use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
-use MotorExperto\dominio\objetos_valor\FuenteBrutaCOGMEM;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\hechos\MemoriaTrabajo;
+use MotorExperto\hechos\ContextoEjecucion;
+use MotorExperto\hechos\FuenteBrutaCOGMEM;
 use MotorExperto\investigacion\g09\CatalogoReglasG09Experimental;
 use MotorExperto\investigacion\g09\EjecutorPerfilG09Experimental;
 

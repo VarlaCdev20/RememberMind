@@ -6,7 +6,7 @@ namespace App\Modulos\ApoyoDecision\Aplicacion\Consultas;
 
 use App\Models\VersionModeloExperto;
 use Illuminate\Support\Facades\Gate;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\conocimiento\PaqueteConocimiento;
 
 /** Proyección del paquete real, sin inferencias ni escrituras. */
 final class ExplorarConocimientoExperto

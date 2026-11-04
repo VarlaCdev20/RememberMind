@@ -41,7 +41,7 @@ use MotorExperto\dominio\orion\ValueObjects\Dcl\SubtipoDclEnum as Patron;
 use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum as Diferencial;
 use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoIadlEnum as EstadoIadl;
 use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\OportunidadIadlEnum as Oportunidad;
-use MotorExperto\soporte\conservacion\CodecInstantanea;
+use MotorExperto\conservacion\CodecInstantanea;
 
 /**
  * TÍTULO:

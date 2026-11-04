@@ -11,8 +11,8 @@ use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoObservacional;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use DomainException;
 use Illuminate\Support\Facades\DB;
-use MotorExperto\dominio\conocimiento\CompiladorObservacional;
-use MotorExperto\dominio\conocimiento\reglas\EvaluadorObservaciones as Motor;
+use MotorExperto\conocimiento\CompiladorObservacional;
+use MotorExperto\conocimiento\ReglasObservacionales as Motor;
 
 /** Conserva el paquete literal aprobado; cada versión es inmutable y no habilita Petersen. */
 final class PaqueteObservacional implements ConocimientoObservacional

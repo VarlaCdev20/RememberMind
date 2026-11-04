@@ -8,7 +8,7 @@ use Database\Seeders\CircuitoInstrumentalInicialSeeder;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
+use MotorExperto\instrumentos\RegistroMetodosInstrumentales;
 
 // CLI explícita para la configuración local vigente. Sin migraciones, historias ni usuarios de respaldo.
 $modo = $argv[1] ?? '--comprobar';

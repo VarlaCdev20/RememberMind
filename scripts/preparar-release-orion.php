@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-use MotorExperto\soporte\conservacion\ReleaseMotorInstrumental;
+use MotorExperto\conservacion\ReleaseMotorInstrumental;
 
 // Solo código y composer.lock. No inicia Laravel, SQL ni usa .env.
 spl_autoload_register(static function (string $clase): void {

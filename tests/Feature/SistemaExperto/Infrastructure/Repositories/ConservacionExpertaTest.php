@@ -33,7 +33,7 @@ use MotorExperto\dominio\orion\ValueObjects\Cognicion\EvaluabilidadEnum as V;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum as H;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\SubcomponenteCognitivoEnum as Sub;
 use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum as Op;
-use MotorExperto\soporte\conservacion\CodecInstantanea as Codec;
+use MotorExperto\conservacion\CodecInstantanea as Codec;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;

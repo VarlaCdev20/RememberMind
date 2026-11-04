@@ -19,7 +19,7 @@ use DomainException;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
-use MotorExperto\soporte\conservacion\InstantaneaInstrumental;
+use MotorExperto\conservacion\InstantaneaInstrumental;
 use Tests\Support\EsquemaSinTransaccion;
 use Tests\TestCase;
 

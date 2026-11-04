@@ -22,7 +22,7 @@ use Tests\Support\EsquemaSinTransaccion;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
-use MotorExperto\dominio\conocimiento\reglas\EvaluadorObservaciones as Motor;
+use MotorExperto\conocimiento\ReglasObservacionales as Motor;
 use Tests\TestCase;
 
 final class SucesionObservacionalTest extends TestCase

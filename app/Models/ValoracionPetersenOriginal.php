@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use LogicException;
-use MotorExperto\dominio\petersen\ValoracionOriginalPetersen;
+use MotorExperto\hechos\ValoracionOriginalPetersen;
 
 /** Juicio clínico original inmutable; corregir crea otra fila y nunca modifica el resultado del motor. */
 #[UsePolicy(ValoracionPetersenPolicy::class)]

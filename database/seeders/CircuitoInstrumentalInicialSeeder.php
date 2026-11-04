@@ -10,7 +10,7 @@ use App\Modulos\ApoyoDecision\Aplicacion\Servicios\PerfilesInstrumentalesInicial
 use DomainException;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use MotorExperto\dominio\instrumentos\CircuitoInstrumentalInicial;
+use MotorExperto\instrumentos\CircuitoInstrumentalInicial;
 
 /** Catálogo de referencia autorizado el04/11/2026. Idempotente; no altera instrumentos o aplicaciones anteriores. */
 final class CircuitoInstrumentalInicialSeeder extends Seeder

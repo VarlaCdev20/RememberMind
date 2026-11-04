@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use DomainException;
 use Illuminate\Support\Facades\DB;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\conocimiento\PaqueteConocimiento;
 use MotorExperto\dominio\conocimiento\versiones\PaqueteInvestigadoCOGMEM as P;
 
 /** Registro de una propuesta: nunca cambia vigencias, aprobaciones o historia clínica. */

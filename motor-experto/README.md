@@ -1,4 +1,46 @@
-# Motor experto tecnico
+# Sistema experto: empieza aquí
+
+El código principal está agrupado en **seis carpetas por componente**, sin niveles de `dominio/conocimiento/versiones`, `adaptadores/entrada` o `aplicacion/casos_uso` para recorrer el experto institucional.
+
+```text
+src/motor_experto/
+├── conocimiento/   → reglas y red semántica
+├── hechos/         → fuentes, contexto y memoria del caso
+├── inferencia/     → ejecución de reglas y clasificación orientativa
+├── explicacion/    → trazas, motivos y procedencia
+├── instrumentos/   → captura, puntuación y métodos instrumentales
+└── conservacion/   → instantáneas, integridad y reproducción
+```
+
+## Los archivos que necesitas abrir
+
+| Quiero ver… | Archivo |
+|---|---|
+| Las 17 reglas cognitivas | [ReglasCognitivas.php](src/motor_experto/conocimiento/ReglasCognitivas.php): `reglasG09()` y `MEMORIA`. |
+| Las 4 reglas Petersen | [ReglasPetersen.php](src/motor_experto/conocimiento/ReglasPetersen.php): `condiciones()` y sus resultados. |
+| Las 3 reglas observacionales | [ReglasObservacionales.php](src/motor_experto/conocimiento/ReglasObservacionales.php): constante `REGLAS`. |
+| La red semántica | [RedSemantica.php](src/motor_experto/conocimiento/RedSemantica.php) y [PerfilConceptualCognitivo.php](src/motor_experto/conocimiento/PerfilConceptualCognitivo.php). |
+| Qué hechos recibe el motor | [ConstructorMemoriaInstrumental.php](src/motor_experto/hechos/ConstructorMemoriaInstrumental.php) y [MemoriaTrabajo.php](src/motor_experto/hechos/MemoriaTrabajo.php). |
+| Cómo razona con esos hechos | [EvaluarPerfilInstitucional.php](src/motor_experto/inferencia/EvaluarPerfilInstitucional.php); [EvaluarPetersenInstitucional.php](src/motor_experto/inferencia/EvaluarPetersenInstitucional.php). |
+| Cómo explica el resultado | [ConstructorTraza.php](src/motor_experto/explicacion/ConstructorTraza.php). |
+| MoCA, RUDAS-PE y FAQ | [CircuitoInstrumentalInicial.php](src/motor_experto/instrumentos/CircuitoInstrumentalInicial.php). |
+| Resultado y explicación adquiridos | [InstantaneaEvaluacionInstitucional.php](src/motor_experto/conservacion/InstantaneaEvaluacionInstitucional.php); su guardado conjunto sigue pendiente. |
+
+Recorrido: **originales autorizados → hechos → conocimiento → inferencia → resultado y explicación**.
+
+Las reglas registradas y sus versiones vigentes están en la BDD; los tres archivos `Reglas*` definen los paquetes iniciales. El motor aplica la versión que recibe: no se modifican las reglas actuales de un residente editando una pantalla o estos constructores.
+
+## Dónde se conecta con Laravel
+
+La entrada del caso completo es [PrepararEvaluacionInstitucional.php](../app/Modulos/ApoyoDecision/Aplicacion/Consultas/PrepararEvaluacionInstitucional.php). Autorización, lectura SQL, pantallas y persistencia permanecen en `app/Modulos/ApoyoDecision/`. Los formularios originales continúan en sus módulos institucionales. No se necesita abrirlos para localizar las reglas.
+
+`dominio/orion/` conserva tipos y contratos con consumidores e identidad histórica; no es una segunda entrada al motor institucional. `aplicacion/puertos/` contiene el contrato técnico anterior usado por las regresiones aisladas. `tests/fixtures/` conserva exclusivamente pruebas retiradas del producto. No se trasladan ni mezclan con las seis carpetas principales.
+
+## Verificación de la reorganización del 04/11/2026
+
+Se reducen 12 ubicaciones del recorrido principal a 6 carpetas y se trasladan 62 archivos, conservando sus responsabilidades. Se actualizan imports, rutas y enlaces; sin alias permanentes de clases antiguas, cambios de reglas/umbrales, permisos, esquema o datos. Las identidades de versiones, reglas y formatos históricos permanecen. Las comprobaciones anteriores y posteriores se registran en el [mapa técnico vigente](../docs/sistema-experto/organizacion/MAPA_COMPONENTES.md).
+
+## Antecedentes técnicos conservados
 
 ## Consolidación del 18/10/2026
 

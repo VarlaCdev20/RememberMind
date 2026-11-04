@@ -3,9 +3,9 @@
 namespace MotorExperto\adaptadores\entrada;
 
 use DateTimeImmutable;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
-use MotorExperto\dominio\objetos_valor\FuenteBrutaCOGMEM;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\hechos\ContextoEjecucion;
+use MotorExperto\hechos\FuenteBrutaCOGMEM;
 
 /** Conocimiento artificial en memoria. No se siembra ni se activa en la institución. */
 final class EjemploTecnicoCOGMEM

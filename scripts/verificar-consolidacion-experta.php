@@ -16,7 +16,7 @@ use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\ContextoSimulacionLocal
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use MotorExperto\soporte\conservacion\CodecInstantanea;
+use MotorExperto\conservacion\CodecInstantanea;
 
 require dirname(__DIR__).'/vendor/autoload.php';
 $app = require dirname(__DIR__).'/bootstrap/app.php';

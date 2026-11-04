@@ -164,8 +164,8 @@ Los logs de ejecución están en la carpeta temporal del sistema con prefijo `co
  M app/Modulos/Valoraciones/Presentacion/Livewire/Paginas/DashboardPsicologo.php
  M app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/dashboard-psicologo.blade.php
  M app/Providers/ArquitecturaModularServiceProvider.php
- M motor-experto/src/motor_experto/adaptadores/entrada/ConstructorMemoriaInstrumental.php
- M motor-experto/src/motor_experto/soporte/conservacion/InstantaneaInstrumental.php
+ M motor-experto/src/motor_experto/hechos/ConstructorMemoriaInstrumental.php
+ M motor-experto/src/motor_experto/conservacion/InstantaneaInstrumental.php
  M resources/frontend/scripts/app.js
  M resources/frontend/styles/design-system/charts/chart-theme.js
  M resources/frontend/styles/design-system/components/drawers.css
@@ -208,7 +208,7 @@ Los logs de ejecución están en la carpeta temporal del sistema con prefijo `co
 ?? docs/sistema-experto/ENTREGA_INTEGRAL_ORION_2026_10_20.md
 ?? docs/sistema-experto/FASE_0_1_CONSERVACION_PENDIENTE_2026_10_20.md
 ?? docs/sistema-experto/FASE_0_1_ESTABILIZACION_2026_10_20.md
-?? motor-experto/src/motor_experto/dominio/instrumentos/CorteDocumentoInstrumental.php
+?? motor-experto/src/motor_experto/instrumentos/CorteDocumentoInstrumental.php
 ?? prototipos/orion-conservacion-0_2/
 ?? prototipos/orion-conservacion-100/
 ?? resources/frontend/scripts/modules/orion-explorador.js

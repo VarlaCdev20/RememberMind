@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MotorExperto\investigacion\g09;
 
 use DomainException;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\conocimiento\PaqueteConocimiento;
 
 /**
  * Flujo integral TEST_ONLY de cuatro criterios G09:

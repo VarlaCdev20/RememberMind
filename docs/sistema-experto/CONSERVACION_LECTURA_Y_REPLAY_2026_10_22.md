@@ -122,7 +122,7 @@ Se descarta instalar ese candidato o afirmar que las diez relaciones disponibles
 
 | Cambio | Archivo | Evidencia |
 |---|---|---|
-| Forma/huella/contexto sin inferencia | `motor-experto/src/motor_experto/soporte/conservacion/IntegridadPreparacion.php` | Fechas tipadas, identidad, objetos y huellas inválidas |
+| Forma/huella/contexto sin inferencia | `motor-experto/src/motor_experto/conservacion/IntegridadPreparacion.php` | Fechas tipadas, identidad, objetos y huellas inválidas |
 | Dos API instrumentales | `.../InstantaneaInstrumental.php` | Replay de normalización, salida y hash histórico sin cambios |
 | Dos API Petersen | `.../InstantaneaPetersen.php` | Recuperación de salida y replay de cuatro perfiles/abstenciones |
 | Dos recorridos de evaluación compuesta | `.../InstantaneaEvaluacionInstitucional.php` | Huellas internas, contexto y capturas de ambas ramas |

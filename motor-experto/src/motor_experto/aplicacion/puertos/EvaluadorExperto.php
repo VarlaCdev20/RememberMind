@@ -2,8 +2,8 @@
 
 namespace MotorExperto\aplicacion\puertos;
 
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\dominio\inferencia\MemoriaTrabajo;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\hechos\MemoriaTrabajo;
 
 interface EvaluadorExperto
 {

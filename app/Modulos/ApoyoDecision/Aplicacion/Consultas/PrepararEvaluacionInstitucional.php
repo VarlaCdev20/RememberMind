@@ -7,7 +7,7 @@ namespace App\Modulos\ApoyoDecision\Aplicacion\Consultas;
 use App\Models\Residente;
 use App\Models\User;
 use Carbon\CarbonImmutable;
-use MotorExperto\soporte\conservacion\InstantaneaEvaluacionInstitucional;
+use MotorExperto\conservacion\InstantaneaEvaluacionInstitucional;
 
 /** Preparación backend autorizada; no es una operación de guardado ni un endpoint para descargar historia. */
 final readonly class PrepararEvaluacionInstitucional

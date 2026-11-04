@@ -6,7 +6,7 @@ namespace Tests\Unit;
 
 use DateTimeImmutable;
 use DomainException;
-use MotorExperto\dominio\conocimiento\reglas\EvaluadorObservaciones;
+use MotorExperto\conocimiento\ReglasObservacionales;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -24,7 +24,7 @@ final class ObservacionesExpertasTest extends TestCase
     {
         $r = $this->registro();
         $antes = serialize($r);
-        $motor = new EvaluadorObservaciones;
+        $motor = new ReglasObservacionales;
         $corte = new DateTimeImmutable('2026-10-17T12:00:00-04:00');
         $salida = $motor->evaluar('RES-1', $corte, [$r]);
         self::assertSame($salida, $motor->evaluar('RES-1', $corte, [$r]));
@@ -52,7 +52,7 @@ final class ObservacionesExpertasTest extends TestCase
     #[DataProvider('invalidos')]
     public function test_registros_invalidos_no_generan_hallazgos(array $cambios): void
     {
-        $salida = (new EvaluadorObservaciones)->evaluar('RES-1', new DateTimeImmutable('2026-10-17T12:00:00-04:00'), [$this->registro($cambios)]);
+        $salida = (new ReglasObservacionales)->evaluar('RES-1', new DateTimeImmutable('2026-10-17T12:00:00-04:00'), [$this->registro($cambios)]);
         self::assertSame(['NO_EVALUABLE', 'NO_EVALUABLE', 'NO_EVALUABLE'], array_column($salida['resultados'], 'estado'));
         self::assertSame([null, null, null], array_column($salida['resultados'], 'hallazgo'));
     }
@@ -60,7 +60,7 @@ final class ObservacionesExpertasTest extends TestCase
     public function test_fuente_duplicada_no_duplica_hallazgos_ni_convierte_frecuencia_en_recurrencia(): void
     {
         $r = $this->registro();
-        $salida = (new EvaluadorObservaciones)->evaluar('RES-1', new DateTimeImmutable('2026-10-17T12:00:00-04:00'), [$r, $r]);
+        $salida = (new ReglasObservacionales)->evaluar('RES-1', new DateTimeImmutable('2026-10-17T12:00:00-04:00'), [$r, $r]);
         self::assertCount(3, $salida['resultados']);
         self::assertStringContainsString('No acreditan', $salida['limite']);
     }
@@ -68,13 +68,13 @@ final class ObservacionesExpertasTest extends TestCase
     public function test_fuente_de_otro_residente_se_rechaza(): void
     {
         $this->expectException(DomainException::class);
-        (new EvaluadorObservaciones)->evaluar('RES-2', new DateTimeImmutable, [$this->registro()]);
+        (new ReglasObservacionales)->evaluar('RES-2', new DateTimeImmutable, [$this->registro()]);
     }
 
     public function test_fuente_duplicada_con_valores_distintos_es_error_tecnico_y_no_no_cumplio(): void
     {
         $this->expectException(DomainException::class);
-        (new EvaluadorObservaciones)->evaluar('RES-1', new DateTimeImmutable,
+        (new ReglasObservacionales)->evaluar('RES-1', new DateTimeImmutable,
             [$this->registro(), $this->registro(['valores' => ['repite_preguntas' => false]])]);
     }
 }

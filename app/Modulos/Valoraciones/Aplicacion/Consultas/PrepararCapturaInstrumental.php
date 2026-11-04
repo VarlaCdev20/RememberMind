@@ -21,7 +21,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use LogicException;
-use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
+use MotorExperto\instrumentos\RegistroMetodosInstrumentales;
 
 /** Prepara fuentes de captura sin crear instrumentos, preguntas ni registros clínicos. */
 final readonly class PrepararCapturaInstrumental

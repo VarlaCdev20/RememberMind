@@ -394,7 +394,7 @@ El diagrama no representa el resultado de ningún residente.
 | `APORTA_EVIDENCIA` | VARIABLE → CRITERIO | El contrato permite participación inferencial; además exige relación activa y tipos/modalidad compatibles | Que exista un hecho suficiente o que la condición se cumpla |
 | `CONTEXTUALIZA` | VARIABLE → CRITERIO | Conserva contexto sin habilitar participación como antecedente instrumental | Que una observación sustituya una medición instrumental |
 
-Fuente: [PaqueteCognitivoInstitucional.php:22](../../../motor-experto/src/motor_experto/dominio/conocimiento/versiones/PaqueteCognitivoInstitucional.php:22).
+Fuente: [PaqueteCognitivoInstitucional.php:22](../../../motor-experto/src/motor_experto/conocimiento/ReglasCognitivas.php:22).
 Estos son predicados de ese paquete; no una lista universal para cualquier
 contrato de conocimiento o versión experimental.
 
@@ -421,9 +421,9 @@ contrato de conocimiento o versión experimental.
    las conexiones mostradas en evidencia utilizada. Reautoriza y recupera la
    lectura en el servidor antes de preparar ambos grafos.
 
-Fuentes: [RedSemantica.php:15](../../../motor-experto/src/motor_experto/dominio/conocimiento/red_semantica/RedSemantica.php:15),
-[PertenenciaVariableCognitiva.php:12](../../../motor-experto/src/motor_experto/dominio/conocimiento/PertenenciaVariableCognitiva.php:12),
-[PaqueteConocimiento.php:88](../../../motor-experto/src/motor_experto/dominio/conocimiento/PaqueteConocimiento.php:88),
+Fuentes: [RedSemantica.php:15](../../../motor-experto/src/motor_experto/conocimiento/RedSemantica.php:15),
+[PertenenciaVariableCognitiva.php:12](../../../motor-experto/src/motor_experto/conocimiento/PertenenciaVariableCognitiva.php:12),
+[PaqueteConocimiento.php:88](../../../motor-experto/src/motor_experto/conocimiento/PaqueteConocimiento.php:88),
 [ConsultarExploracionOrion.php:20](../../../app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarExploracionOrion.php:20).
 
 ## Cómo mejorar su explicación

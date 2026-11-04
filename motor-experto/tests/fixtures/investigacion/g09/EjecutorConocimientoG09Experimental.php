@@ -6,12 +6,12 @@ namespace MotorExperto\investigacion\g09;
 
 use DateTimeImmutable;
 use DomainException;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\dominio\conocimiento\reglas\EvaluadorReglasCognitivas;
-use MotorExperto\dominio\inferencia\MemoriaTrabajo;
-use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
-use MotorExperto\dominio\objetos_valor\EvidenciaExperta;
-use MotorExperto\dominio\objetos_valor\FuenteBrutaCOGMEM;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\inferencia\EvaluadorReglasCognitivas;
+use MotorExperto\hechos\MemoriaTrabajo;
+use MotorExperto\hechos\ContextoEjecucion;
+use MotorExperto\hechos\EvidenciaExperta;
+use MotorExperto\hechos\FuenteBrutaCOGMEM;
 
 /** D-130 es la autoridad de reglas declarativas; G09 aporta solo sus hechos/compuerta de prueba. */
 final class EjecutorConocimientoG09Experimental

@@ -6,13 +6,13 @@ namespace Tests\Unit;
 
 use DateTimeImmutable;
 use DomainException;
-use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
-use MotorExperto\dominio\petersen\FuentePetersenInstitucional as F;
-use MotorExperto\dominio\petersen\ValoracionOriginalPetersen as V;
-use MotorExperto\soporte\conservacion\CapturaInstrumentalCanonica as C;
-use MotorExperto\soporte\conservacion\CodecInstantanea as Codec;
-use MotorExperto\soporte\conservacion\InstantaneaPetersen;
-use MotorExperto\soporte\conservacion\MembresiasOriginalesPetersen as M;
+use MotorExperto\hechos\ContextoEjecucion;
+use MotorExperto\hechos\FuentePetersenInstitucional as F;
+use MotorExperto\hechos\ValoracionOriginalPetersen as V;
+use MotorExperto\conservacion\CapturaInstrumentalCanonica as C;
+use MotorExperto\conservacion\CodecInstantanea as Codec;
+use MotorExperto\conservacion\InstantaneaPetersen;
+use MotorExperto\conservacion\MembresiasOriginalesPetersen as M;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

@@ -106,7 +106,7 @@
                             <div class="rm-orion-petersen-observations__heading"><span class="rm-orion-petersen-observations__icon" aria-hidden="true"><i class="ph ph-clipboard-text"></i></span><div><h3 id="senales-seguimiento-titulo">Señales observadas en el seguimiento</h3><p>Revise cada hallazgo junto con su control original.</p></div></div>
                             <ul class="rm-orion-petersen-observations__list">
                                 @foreach($senalesDelSeguimiento as $codigoRegla => $senal)
-                                    <li><span class="rm-orion-petersen-observations__item-icon" aria-hidden="true"><i class="ph ph-note-pencil"></i></span><div><h4>{{ $senal['nombre'] ?? \MotorExperto\dominio\conocimiento\reglas\EvaluadorObservaciones::REGLAS[$codigoRegla]['nombre'] }}</h4>@if($senal['hallazgo'])<p>{{ $senal['hallazgo'] }}</p>@endif</div></li>
+                                    <li><span class="rm-orion-petersen-observations__item-icon" aria-hidden="true"><i class="ph ph-note-pencil"></i></span><div><h4>{{ $senal['nombre'] ?? \MotorExperto\conocimiento\ReglasObservacionales::REGLAS[$codigoRegla]['nombre'] }}</h4>@if($senal['hallazgo'])<p>{{ $senal['hallazgo'] }}</p>@endif</div></li>
                                 @endforeach
                             </ul>
                             <div class="rm-orion-petersen-observations__footer"><p><i class="ph ph-info" aria-hidden="true"></i><span>Estos hechos observados no sustituyen mediciones instrumentales ni establecen un diagnóstico.</span></p><button type="button" wire:click="irASeccion('hallazgos-observacionales')" class="rm-btn rm-btn-secondary">Ver controles y reglas</button></div>

@@ -7,13 +7,13 @@ namespace Tests\Unit;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoOrion;
 use DateTimeImmutable;
 use DomainException;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\dominio\instrumentos\NormalizadorHvltBolivia2015 as Hvlt;
-use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
-use MotorExperto\soporte\conservacion\CapturaInstrumentalCanonica;
-use MotorExperto\soporte\conservacion\CodecInstantanea;
-use MotorExperto\soporte\conservacion\InstantaneaInstrumental;
-use MotorExperto\soporte\conservacion\ReleaseMotorInstrumental;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\instrumentos\NormalizadorHvltBolivia2015 as Hvlt;
+use MotorExperto\hechos\ContextoEjecucion;
+use MotorExperto\conservacion\CapturaInstrumentalCanonica;
+use MotorExperto\conservacion\CodecInstantanea;
+use MotorExperto\conservacion\InstantaneaInstrumental;
+use MotorExperto\conservacion\ReleaseMotorInstrumental;
 use PHPUnit\Framework\TestCase;
 use ZipArchive;
 
@@ -151,7 +151,7 @@ final class InstantaneaInstrumentalCompletaTest extends TestCase
                     }
                 });
                 $entrada = unserialize(stream_get_contents(STDIN), ['allowed_classes' => false]);
-                $dto = MotorExperto\soporte\conservacion\InstantaneaInstrumental::verificar($entrada['contenido'], $entrada['huella']);
+                $dto = MotorExperto\conservacion\InstantaneaInstrumental::verificar($entrada['contenido'], $entrada['huella']);
                 foreach (get_included_files() as $incluido) {
                     if ($incluido !== __FILE__ && ! str_starts_with(str_replace('\\', '/', $incluido), str_replace('\\', '/', $raiz).'/')) {
                         throw new RuntimeException('El replay cargó código fuera del release.');

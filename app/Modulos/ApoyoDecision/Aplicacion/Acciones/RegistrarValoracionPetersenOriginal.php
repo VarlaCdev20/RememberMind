@@ -20,10 +20,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use MotorExperto\dominio\petersen\EvaluarPetersenInstitucional;
-use MotorExperto\dominio\petersen\ValoracionOriginalPetersen as V;
-use MotorExperto\soporte\conservacion\CapturaInstrumentalCanonica;
-use MotorExperto\soporte\conservacion\CodecInstantanea;
+use MotorExperto\inferencia\EvaluarPetersenInstitucional;
+use MotorExperto\hechos\ValoracionOriginalPetersen as V;
+use MotorExperto\conservacion\CapturaInstrumentalCanonica;
+use MotorExperto\conservacion\CodecInstantanea;
 
 /** Captura original transaccional, atribuida a la sesión, idempotente y sin actualización de historia. */
 final class RegistrarValoracionPetersenOriginal

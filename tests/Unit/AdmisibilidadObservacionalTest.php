@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use MotorExperto\adaptadores\entrada\AdaptadorHechosCOGMEM;
+use MotorExperto\hechos\AdaptadorHechosCOGMEM;
 use MotorExperto\adaptadores\entrada\EjemploTecnicoCOGMEM as Ejemplo;
-use MotorExperto\dominio\inferencia\MemoriaTrabajo;
-use MotorExperto\dominio\objetos_valor\FuenteBrutaCOGMEM;
+use MotorExperto\hechos\MemoriaTrabajo;
+use MotorExperto\hechos\FuenteBrutaCOGMEM;
 use PHPUnit\Framework\TestCase;
 
 final class AdmisibilidadObservacionalTest extends TestCase

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MotorExperto\investigacion\g09;
 
 use DomainException;
-use MotorExperto\adaptadores\entrada\InspectorComponenteInstrumental;
+use MotorExperto\hechos\InspectorComponenteInstrumental;
 
 /**
  * Puente de datos con estructura de aplicaciones_instrumento y respuestas_instrumento

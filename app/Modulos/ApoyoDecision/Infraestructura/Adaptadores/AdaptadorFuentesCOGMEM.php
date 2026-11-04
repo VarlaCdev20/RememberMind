@@ -9,12 +9,12 @@ use App\Models\PreguntaInstrumento;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ExtraccionFuentesCOGMEM;
 use DateTimeImmutable;
 use DomainException;
-use MotorExperto\adaptadores\entrada\AdaptadorHechosCOGMEM;
-use MotorExperto\adaptadores\entrada\InspectorComponenteInstrumental;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\dominio\inferencia\MemoriaTrabajo;
-use MotorExperto\dominio\objetos_valor\EvidenciaExperta;
-use MotorExperto\dominio\objetos_valor\FuenteBrutaCOGMEM;
+use MotorExperto\hechos\AdaptadorHechosCOGMEM;
+use MotorExperto\hechos\InspectorComponenteInstrumental;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\hechos\MemoriaTrabajo;
+use MotorExperto\hechos\EvidenciaExperta;
+use MotorExperto\hechos\FuenteBrutaCOGMEM;
 
 final class AdaptadorFuentesCOGMEM implements ExtraccionFuentesCOGMEM
 {

@@ -13,7 +13,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use MotorExperto\dominio\orion\Services\Dcl\ClasificadorPetersenService;
-use MotorExperto\soporte\conservacion\CodecInstantanea;
+use MotorExperto\conservacion\CodecInstantanea;
 use RuntimeException;
 use Tests\Support\InformeCognitivoFixture;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;

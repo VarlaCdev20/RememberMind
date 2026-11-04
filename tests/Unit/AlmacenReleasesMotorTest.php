@@ -6,7 +6,7 @@ namespace Tests\Unit;
 
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\AlmacenReleasesMotor;
 use DomainException;
-use MotorExperto\soporte\conservacion\ReleaseMotorInstrumental;
+use MotorExperto\conservacion\ReleaseMotorInstrumental;
 use PHPUnit\Framework\TestCase;
 use ZipArchive;
 

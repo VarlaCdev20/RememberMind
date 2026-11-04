@@ -113,11 +113,11 @@ pruebas. No se modifica frontend; build y QA visual no aplican a este incremento
 
 ## Archivos propios del incremento
 
-- `motor-experto/src/motor_experto/dominio/instrumentos/CalculadorReconocimientoHvlt.php` (nuevo).
-- `motor-experto/src/motor_experto/dominio/instrumentos/ExplicacionMatematicaInstrumental.php` (nuevo).
-- `motor-experto/src/motor_experto/dominio/instrumentos/RegistroMetodosInstrumentales.php`.
-- `motor-experto/src/motor_experto/dominio/instrumentos/NormalizadorHvltBolivia2015.php`.
-- `motor-experto/src/motor_experto/dominio/instrumentos/CatalogoCapturaCognitiva.php`.
+- `motor-experto/src/motor_experto/instrumentos/CalculadorReconocimientoHvlt.php` (nuevo).
+- `motor-experto/src/motor_experto/instrumentos/ExplicacionMatematicaInstrumental.php` (nuevo).
+- `motor-experto/src/motor_experto/instrumentos/RegistroMetodosInstrumentales.php`.
+- `motor-experto/src/motor_experto/instrumentos/NormalizadorHvltBolivia2015.php`.
+- `motor-experto/src/motor_experto/instrumentos/CatalogoCapturaCognitiva.php`.
 - `tests/Unit/InterpretacionInstrumentalFaseTresTest.php` (nuevo).
 - `docs/sistema-experto/INVESTIGACION_PROFESIONAL_19_COMPONENTES_2026_10_19.md` (nuevo).
 - Este seguimiento, el índice `README.md` del experto y el plan integral.
@@ -304,9 +304,9 @@ cambio frontend: build/QA visual no aplican.
 
 Archivos propios de este incremento:
 
-- `motor-experto/src/motor_experto/dominio/instrumentos/NormalizadorReferenciasEspana.php` (nuevo).
-- `motor-experto/src/motor_experto/dominio/instrumentos/RegistroMetodosInstrumentales.php`.
-- `motor-experto/src/motor_experto/dominio/instrumentos/CatalogoCapturaCognitiva.php`.
+- `motor-experto/src/motor_experto/instrumentos/NormalizadorReferenciasEspana.php` (nuevo).
+- `motor-experto/src/motor_experto/instrumentos/RegistroMetodosInstrumentales.php`.
+- `motor-experto/src/motor_experto/instrumentos/CatalogoCapturaCognitiva.php`.
 - `tests/Unit/NormalizacionReferenciasEspanaTest.php` (nuevo).
 - `tests/Feature/CapturaInstrumentalInstitucionalTest.php`.
 - `docs/sistema-experto/NORMALIZACIONES_REFERENCIA_2026_10_19.md` (nuevo).
@@ -385,12 +385,12 @@ y sintéticas no constituyen una revisión experta independiente o evaluación p
 
 Archivos propios del incremento:
 
-- `motor-experto/src/motor_experto/dominio/instrumentos/NormalizadorReferenciaColombia2019.php` (nuevo).
-- `motor-experto/src/motor_experto/dominio/instrumentos/NormalizadorReferenciaTolF2019.php` (nuevo).
-- `motor-experto/src/motor_experto/dominio/instrumentos/NormalizadorReferenciaTokenColombia2017.php` (nuevo).
-- `motor-experto/src/motor_experto/dominio/instrumentos/RegistroMetodosInstrumentales.php`.
-- `motor-experto/src/motor_experto/dominio/instrumentos/CatalogoCapturaCognitiva.php`.
-- `motor-experto/src/motor_experto/dominio/instrumentos/ExplicacionMatematicaInstrumental.php`.
+- `motor-experto/src/motor_experto/instrumentos/NormalizadorReferenciaColombia2019.php` (nuevo).
+- `motor-experto/src/motor_experto/instrumentos/NormalizadorReferenciaTolF2019.php` (nuevo).
+- `motor-experto/src/motor_experto/instrumentos/NormalizadorReferenciaTokenColombia2017.php` (nuevo).
+- `motor-experto/src/motor_experto/instrumentos/RegistroMetodosInstrumentales.php`.
+- `motor-experto/src/motor_experto/instrumentos/CatalogoCapturaCognitiva.php`.
+- `motor-experto/src/motor_experto/instrumentos/ExplicacionMatematicaInstrumental.php`.
 - `tests/Unit/NormalizacionReferenciasGeriatricasAdicionalesTest.php` (nuevo).
 - `tests/Unit/NormalizacionTokenColombiaInvestigadaTest.php` (nuevo).
 - `tests/Unit/NormalizacionReferenciasEspanaTest.php`.

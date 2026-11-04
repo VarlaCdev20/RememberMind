@@ -4,12 +4,12 @@ namespace MotorExperto\aplicacion\casos_uso;
 
 use DomainException;
 use MotorExperto\aplicacion\puertos\EvaluadorExperto;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\dominio\conocimiento\reglas\EvaluadorReglasCognitivas;
-use MotorExperto\dominio\explicacion\ConstructorTraza;
-use MotorExperto\dominio\inferencia\EvaluadorEvaluabilidadCOGMEM;
-use MotorExperto\dominio\inferencia\MemoriaTrabajo;
-use MotorExperto\dominio\inferencia\ResolvedorSoportesCOGMEM;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\inferencia\EvaluadorReglasCognitivas;
+use MotorExperto\explicacion\ConstructorTraza;
+use MotorExperto\inferencia\EvaluadorEvaluabilidadCOGMEM;
+use MotorExperto\hechos\MemoriaTrabajo;
+use MotorExperto\inferencia\ResolvedorSoportesCOGMEM;
 
 final class MotorExperto implements EvaluadorExperto
 {

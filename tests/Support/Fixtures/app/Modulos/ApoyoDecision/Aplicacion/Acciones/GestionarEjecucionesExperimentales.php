@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Gate;
 use MotorExperto\aplicacion\casos_uso\EjecutarPerfilExperimental;
 use MotorExperto\investigacion\g09\CatalogoReglasG09Experimental;
 use MotorExperto\investigacion\g09\PaqueteSemanticoG09Experimental;
-use MotorExperto\soporte\conservacion\CodecInstantanea;
+use MotorExperto\conservacion\CodecInstantanea;
 
 /** Ejecución y evidencia histórica exclusivamente de ingeniería, con cuenta técnica y destino desechable. */
 final class GestionarEjecucionesExperimentales

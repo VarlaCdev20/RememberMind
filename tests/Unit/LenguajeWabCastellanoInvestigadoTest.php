@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use MotorExperto\dominio\instrumentos\CalculadorLenguajeWabCastellano2000 as Wab;
-use MotorExperto\dominio\instrumentos\CatalogoCapturaCognitiva;
-use MotorExperto\dominio\instrumentos\ExtractorCapturaInstrumental;
-use MotorExperto\dominio\instrumentos\NormalizadorReferenciaBarcelona2011;
-use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
+use MotorExperto\instrumentos\CalculadorLenguajeWabCastellano2000 as Wab;
+use MotorExperto\instrumentos\CatalogoCapturaCognitiva;
+use MotorExperto\instrumentos\ExtractorCapturaInstrumental;
+use MotorExperto\instrumentos\NormalizadorReferenciaBarcelona2011;
+use MotorExperto\instrumentos\RegistroMetodosInstrumentales;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

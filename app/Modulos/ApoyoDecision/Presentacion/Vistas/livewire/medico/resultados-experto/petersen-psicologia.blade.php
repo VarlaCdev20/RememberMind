@@ -107,7 +107,7 @@
             @if($senalesSeguimiento->isNotEmpty())
                 <section class="rm-psychology-panel" aria-labelledby="psicologia-observaciones-titulo">
                     <header><div><h2 id="psicologia-observaciones-titulo">Observaciones del seguimiento</h2><p>Hechos registrados que conviene revisar en su fuente original.</p></div></header>
-                    <ul class="rm-psychology-observation-list">@foreach($senalesSeguimiento as $codigoRegla => $senal)<li><strong>{{ $senal['nombre'] ?? \MotorExperto\dominio\conocimiento\reglas\EvaluadorObservaciones::REGLAS[$codigoRegla]['nombre'] }}</strong>@if($senal['hallazgo'])<span>{{ $senal['hallazgo'] }}</span>@endif</li>@endforeach</ul>
+                    <ul class="rm-psychology-observation-list">@foreach($senalesSeguimiento as $codigoRegla => $senal)<li><strong>{{ $senal['nombre'] ?? \MotorExperto\conocimiento\ReglasObservacionales::REGLAS[$codigoRegla]['nombre'] }}</strong>@if($senal['hallazgo'])<span>{{ $senal['hallazgo'] }}</span>@endif</li>@endforeach</ul>
                     <p class="rm-psychology-panel-note">Estas observaciones no son una medición instrumental ni establecen un diagnóstico.</p>
                     <button type="button" wire:click="irASeccion('hallazgos-observacionales')" class="rm-psychology-link">Ver controles originales <i class="ph ph-arrow-right" aria-hidden="true"></i></button>
                 </section>

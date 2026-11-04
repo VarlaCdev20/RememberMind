@@ -6,8 +6,8 @@ namespace MotorExperto\investigacion\dcl;
 
 use DomainException;
 use MotorExperto\adaptadores\entrada\EjemploTecnicoCOGMEM;
-use MotorExperto\dominio\conocimiento\CompiladorPerfilCognitivo;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\conocimiento\CompiladorPerfilCognitivo;
+use MotorExperto\conocimiento\PaqueteConocimiento;
 
 /**
  * Revisión integrada de ingeniería: D-131 y G09 comparten grafo y versión.

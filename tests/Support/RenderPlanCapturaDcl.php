@@ -13,8 +13,8 @@ $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 Illuminate\Support\Facades\DB::listen(static function (): never {
     throw new RuntimeException('El render de la guía no puede consultar datos.');
 });
-$salida = (new MotorExperto\dominio\petersen\EvaluarPetersenInstitucional)->evaluar(
-    new MotorExperto\dominio\objetos_valor\ContextoEjecucion('GUIA-TEST', 'SINTETICO-GUIA', 'VERSION-GUIA',
+$salida = (new MotorExperto\inferencia\EvaluarPetersenInstitucional)->evaluar(
+    new MotorExperto\hechos\ContextoEjecucion('GUIA-TEST', 'SINTETICO-GUIA', 'VERSION-GUIA',
         new DateTimeImmutable('2026-10-31T12:00:00-04:00')), []);
 echo view('apoyodecision::livewire.medico.resultados-experto.plan-captura', [
     'perfilInstrumental' => ['plan_captura' => (new App\Modulos\ApoyoDecision\Aplicacion\DTOs\PlanCapturaDcl)->desdePetersen($salida)],

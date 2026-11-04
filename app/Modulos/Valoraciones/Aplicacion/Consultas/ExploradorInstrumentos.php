@@ -7,7 +7,7 @@ namespace App\Modulos\Valoraciones\Aplicacion\Consultas;
 use App\Models\Instrumento;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
+use MotorExperto\instrumentos\RegistroMetodosInstrumentales;
 
 /** Proyección de lectura. Nunca instala instrumentos ni ejecuta métodos investigados. */
 final class ExploradorInstrumentos

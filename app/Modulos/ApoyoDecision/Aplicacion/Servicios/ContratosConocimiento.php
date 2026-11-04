@@ -9,8 +9,8 @@ use Carbon\CarbonImmutable;
 use DomainException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use MotorExperto\dominio\conocimiento\versiones\PaqueteCognitivoInstitucional;
-use MotorExperto\dominio\conocimiento\versiones\PaquetePetersenInstitucional;
+use MotorExperto\conocimiento\ReglasCognitivas;
+use MotorExperto\conocimiento\ReglasPetersen;
 
 /** Contratos del servidor heredados por linaje; no recibe predicados ni mapeos del cliente. */
 final class ContratosConocimiento
@@ -18,12 +18,12 @@ final class ContratosConocimiento
     /** Selecciona exclusivamente la familia adoptada; una ambigüedad nunca elige una fila arbitraria. */
     public function versionInstitucionalVigente(CarbonImmutable $corte): ?string
     {
-        return $this->versionFamiliaVigente($corte, PaqueteCognitivoInstitucional::CODIGO, PaqueteCognitivoInstitucional::FUNDAMENTO);
+        return $this->versionFamiliaVigente($corte, ReglasCognitivas::CODIGO, ReglasCognitivas::FUNDAMENTO);
     }
 
     public function versionPetersenVigente(CarbonImmutable $corte): ?string
     {
-        return $this->versionFamiliaVigente($corte, PaquetePetersenInstitucional::CODIGO, PaquetePetersenInstitucional::FUNDAMENTO);
+        return $this->versionFamiliaVigente($corte, ReglasPetersen::CODIGO, ReglasPetersen::FUNDAMENTO);
     }
 
     private function versionFamiliaVigente(CarbonImmutable $corte, string $codigo, string $fundamento): ?string
@@ -69,8 +69,8 @@ final class ContratosConocimiento
             }
             $vistos[$version] = true;
             $cabecera = VersionModeloExperto::query()->whereKey($version)->sole();
-            if ($cabecera->codigo_version === PaquetePetersenInstitucional::CODIGO) {
-                if ($cabecera->observacion !== PaquetePetersenInstitucional::FUNDAMENTO) {
+            if ($cabecera->codigo_version === ReglasPetersen::CODIGO) {
+                if ($cabecera->observacion !== ReglasPetersen::FUNDAMENTO) {
                     throw new DomainException('La raíz Petersen no identifica el contrato adoptado.');
                 }
 
@@ -93,15 +93,15 @@ final class ContratosConocimiento
             $vistos[$version] = true;
             $contrato = config('sistema_experto.contratos_conocimiento.'.$version);
             $cabecera = VersionModeloExperto::query()->whereKey($version)->sole();
-            if ($contrato === null && $cabecera->codigo_version === PaqueteCognitivoInstitucional::CODIGO
-                && $cabecera->observacion === PaqueteCognitivoInstitucional::FUNDAMENTO) {
-                $contrato = PaqueteCognitivoInstitucional::contratos();
+            if ($contrato === null && $cabecera->codigo_version === ReglasCognitivas::CODIGO
+                && $cabecera->observacion === ReglasCognitivas::FUNDAMENTO) {
+                $contrato = ReglasCognitivas::contratos();
                 // Los mapeos TEST históricos se conservan, pero no se conectan al contrato operativo.
                 $contrato['vinculos_instrumentales'] = [];
             }
-            if ($cabecera->codigo_version === PaquetePetersenInstitucional::CODIGO
-                && $cabecera->observacion === PaquetePetersenInstitucional::FUNDAMENTO) {
-                $contrato = PaquetePetersenInstitucional::contratos() + ['petersen' => true];
+            if ($cabecera->codigo_version === ReglasPetersen::CODIGO
+                && $cabecera->observacion === ReglasPetersen::FUNDAMENTO) {
+                $contrato = ReglasPetersen::contratos() + ['petersen' => true];
             }
             if (is_array($contrato) && is_array($contrato['relaciones'] ?? null)
                 && is_array($contrato['extracciones'] ?? null) && is_string($contrato['tipo_regla_resultado'] ?? null)) {

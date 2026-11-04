@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoOrion;
-use MotorExperto\dominio\conocimiento\PerfilConceptualCognitivo;
-use MotorExperto\dominio\instrumentos\AplicabilidadGeriatrica;
-use MotorExperto\dominio\instrumentos\NormalizadorHvltBolivia2015;
-use MotorExperto\dominio\instrumentos\PerfilInstrumentalCognitivo;
+use MotorExperto\conocimiento\PerfilConceptualCognitivo;
+use MotorExperto\instrumentos\AplicabilidadGeriatrica;
+use MotorExperto\instrumentos\NormalizadorHvltBolivia2015;
+use MotorExperto\instrumentos\PerfilInstrumentalCognitivo;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

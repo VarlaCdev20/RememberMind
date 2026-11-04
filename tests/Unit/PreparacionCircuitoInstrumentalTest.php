@@ -6,7 +6,7 @@ namespace Tests\Unit;
 
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\PreparacionCircuitoInstrumental;
 use DomainException;
-use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
+use MotorExperto\instrumentos\RegistroMetodosInstrumentales;
 use PHPUnit\Framework\TestCase;
 
 final class PreparacionCircuitoInstrumentalTest extends TestCase
@@ -61,7 +61,7 @@ final class PreparacionCircuitoInstrumentalTest extends TestCase
 
     public function test_un_metodo_y_una_edicion_no_suplantan_cotejo_de_catalogo(): void
     {
-        $c = new \MotorExperto\dominio\instrumentos\CircuitoInstrumentalInicial;
+        $c = new \MotorExperto\instrumentos\CircuitoInstrumentalInicial;
         $d = $c->definiciones()[$c::MOCA];
         $r = (new PreparacionCircuitoInstrumental)->resumir([], $c->metodos(), ['I01' => ['metodo' => $c::MOCA, 'edicion' => $d['version']]]);
         self::assertNull($r['familias']['I01']['perfil_ejecutable']);

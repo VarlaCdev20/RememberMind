@@ -23,8 +23,8 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\dominio\conocimiento\versiones\PaquetePetersenInstitucional as P;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\conocimiento\ReglasPetersen as P;
 use Tests\TestCase;
 
 /** Gobierno relacional real; los estados de la prueba administrativa no se convierten en historia clínica. */

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use DomainException;
-use MotorExperto\dominio\instrumentos\CatalogoCapturaCognitiva;
-use MotorExperto\dominio\instrumentos\ExtractorCapturaInstrumental;
-use MotorExperto\dominio\instrumentos\NormalizadorBateriaBolivia2015;
-use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
+use MotorExperto\instrumentos\CatalogoCapturaCognitiva;
+use MotorExperto\instrumentos\ExtractorCapturaInstrumental;
+use MotorExperto\instrumentos\NormalizadorBateriaBolivia2015;
+use MotorExperto\instrumentos\RegistroMetodosInstrumentales;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

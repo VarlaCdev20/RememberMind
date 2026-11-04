@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MotorExperto\aplicacion\casos_uso;
 
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\conocimiento\PaqueteConocimiento;
 use MotorExperto\dominio\explicacion\ConstructorResultadoExperimental;
 use MotorExperto\investigacion\dcl\ComparadorLongitudinalExperimental;
 use MotorExperto\investigacion\dcl\IncorporadorContextoExperimental;

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Modulos\ApoyoDecision\Aplicacion\DTOs;
 
 use DomainException;
-use MotorExperto\dominio\instrumentos\GuiaAdquisicionDcl;
-use MotorExperto\dominio\petersen\EvaluarPetersenInstitucional;
+use MotorExperto\instrumentos\GuiaAdquisicionDcl;
+use MotorExperto\inferencia\EvaluarPetersenInstitucional;
 
 /** Proyecta una salida ya autorizada; no consulta fuentes, decide estados ni concede escritura. */
 final class PlanCapturaDcl

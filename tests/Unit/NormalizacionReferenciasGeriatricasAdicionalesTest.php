@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use MotorExperto\dominio\instrumentos\CatalogoCapturaCognitiva;
-use MotorExperto\dominio\instrumentos\NormalizadorReferenciaColombia2019 as Colombia;
-use MotorExperto\dominio\instrumentos\NormalizadorReferenciaTolF2019 as Tol;
-use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
+use MotorExperto\instrumentos\CatalogoCapturaCognitiva;
+use MotorExperto\instrumentos\NormalizadorReferenciaColombia2019 as Colombia;
+use MotorExperto\instrumentos\NormalizadorReferenciaTolF2019 as Tol;
+use MotorExperto\instrumentos\RegistroMetodosInstrumentales;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

@@ -6,11 +6,11 @@ namespace MotorExperto\investigacion\g09;
 
 use DateTimeImmutable;
 use DomainException;
-use MotorExperto\dominio\conocimiento\reglas\EvaluadorReglasCognitivas;
-use MotorExperto\dominio\inferencia\MemoriaTrabajo;
-use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
-use MotorExperto\dominio\objetos_valor\EvidenciaExperta;
-use MotorExperto\dominio\objetos_valor\FuenteBrutaCOGMEM;
+use MotorExperto\inferencia\EvaluadorReglasCognitivas;
+use MotorExperto\hechos\MemoriaTrabajo;
+use MotorExperto\hechos\ContextoEjecucion;
+use MotorExperto\hechos\EvidenciaExperta;
+use MotorExperto\hechos\FuenteBrutaCOGMEM;
 
 /**
  * Verifica las conclusiones G09 con el núcleo D-130 real (EvaluadorReglas,

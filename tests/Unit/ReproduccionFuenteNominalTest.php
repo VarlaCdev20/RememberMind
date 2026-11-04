@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use DateTimeImmutable;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\hechos\ContextoEjecucion;
 use MotorExperto\investigacion\dcl\PaqueteCincoDominiosExperimental;
 use MotorExperto\investigacion\g09\PaqueteSemanticoG09Experimental;
-use MotorExperto\soporte\conservacion\InstantaneaInstrumental;
+use MotorExperto\conservacion\InstantaneaInstrumental;
 use PHPUnit\Framework\TestCase;
 
 final class ReproduccionFuenteNominalTest extends TestCase

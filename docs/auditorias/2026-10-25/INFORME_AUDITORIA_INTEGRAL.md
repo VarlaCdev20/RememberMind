@@ -232,7 +232,7 @@ No se concluye que el sistema carezca de inferencia porque tenga cero revisiones
 
 ### H07 — Alta: conservación institucional conjunta no terminada
 
-`motor-experto/src/motor_experto/soporte/conservacion/InstantaneaEvaluacionInstitucional.php:20`, `:54`; `ConsultarPerfilInstrumental.php:33–43`.
+`motor-experto/src/motor_experto/conservacion/InstantaneaEvaluacionInstitucional.php:20`, `:54`; `ConsultarPerfilInstrumental.php:33–43`.
 
 El DTO se construye y verifica como `persistido=false` y `release_retenido=false`. No hay aquí un repositorio institucional instalado que cierre ambas ramas. `ResultadosExpertoResidente.php:154–161` descarta el análisis transitorio al hidratar otra petición.
 

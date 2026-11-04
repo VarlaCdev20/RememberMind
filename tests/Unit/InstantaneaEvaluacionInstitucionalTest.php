@@ -6,18 +6,18 @@ namespace Tests\Unit;
 
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoOrion;
 use DomainException;
-use MotorExperto\dominio\conocimiento\PerfilConceptualCognitivo;
-use MotorExperto\dominio\conocimiento\versiones\PaqueteCognitivoInstitucional;
-use MotorExperto\dominio\conocimiento\versiones\PaquetePetersenInstitucional;
-use MotorExperto\dominio\instrumentos\ExtractorCapturaInstrumental;
-use MotorExperto\dominio\petersen\FuentePetersenInstitucional as F;
-use MotorExperto\dominio\petersen\ValoracionOriginalPetersen as V;
-use MotorExperto\soporte\conservacion\CapturaInstrumentalCanonica as C;
-use MotorExperto\soporte\conservacion\CodecInstantanea as Codec;
-use MotorExperto\soporte\conservacion\InstantaneaEvaluacionInstitucional as Compuesta;
-use MotorExperto\soporte\conservacion\InstantaneaInstrumental;
-use MotorExperto\soporte\conservacion\InstantaneaPetersen;
-use MotorExperto\soporte\conservacion\ReleaseMotorInstrumental;
+use MotorExperto\conocimiento\PerfilConceptualCognitivo;
+use MotorExperto\conocimiento\ReglasCognitivas;
+use MotorExperto\conocimiento\ReglasPetersen;
+use MotorExperto\instrumentos\ExtractorCapturaInstrumental;
+use MotorExperto\hechos\FuentePetersenInstitucional as F;
+use MotorExperto\hechos\ValoracionOriginalPetersen as V;
+use MotorExperto\conservacion\CapturaInstrumentalCanonica as C;
+use MotorExperto\conservacion\CodecInstantanea as Codec;
+use MotorExperto\conservacion\InstantaneaEvaluacionInstitucional as Compuesta;
+use MotorExperto\conservacion\InstantaneaInstrumental;
+use MotorExperto\conservacion\InstantaneaPetersen;
+use MotorExperto\conservacion\ReleaseMotorInstrumental;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
@@ -68,15 +68,15 @@ final class InstantaneaEvaluacionInstitucionalTest extends TestCase
             $v = array_values(array_filter($v, fn ($j) => $j->elemento !== 'C03'));
         }
         $fuente = (new ArchivoConocimientoOrion)->leer();
-        $p = (new PaqueteCognitivoInstitucional)->construir((new PerfilConceptualCognitivo)->construir($fuente), $c->version, 'AUTOR-TEST', '2026-10-19 10:00:00');
+        $p = (new ReglasCognitivas)->construir((new PerfilConceptualCognitivo)->construir($fuente), $c->version, 'AUTOR-TEST', '2026-10-19 10:00:00');
         $i = InstantaneaInstrumental::crear($p, $c, ['disponible' => true, 'fecha_corte' => $c->fechaCorte->format('Y-m-d\TH:i:s.uP'),
             'capturas' => $capturas], [], 'USUARIO-TEST', ['cod_version_modelo' => $c->version], 'INSTRUMENTAL-DECLARATIVO-3', $fuente);
-        $g = $sinGobierno ? null : (new PaquetePetersenInstitucional)->construir('GOBIERNO-TEST', 'AUTOR-TEST', '2026-10-19 10:00:00');
-        $cabecera = $sinGobierno ? null : ['cod_version_modelo' => $g->version, 'codigo_version' => PaquetePetersenInstitucional::CODIGO,
-            'nombre' => 'Gobierno sintético', 'descripcion' => PaquetePetersenInstitucional::FUNDAMENTO, 'estado' => 'ACTIVO',
+        $g = $sinGobierno ? null : (new ReglasPetersen)->construir('GOBIERNO-TEST', 'AUTOR-TEST', '2026-10-19 10:00:00');
+        $cabecera = $sinGobierno ? null : ['cod_version_modelo' => $g->version, 'codigo_version' => ReglasPetersen::CODIGO,
+            'nombre' => 'Gobierno sintético', 'descripcion' => ReglasPetersen::FUNDAMENTO, 'estado' => 'ACTIVO',
             'fecha_hora_creacion' => '2026-10-19T10:00:00.000000-04:00', 'fecha_hora_vigencia' => '2026-10-19T10:00:00.000000-04:00',
             'fecha_hora_retiro' => null, 'motivo_cambio' => 'Ensayo de conservación', 'cod_version_anterior' => null,
-            'cod_usuario_creacion' => 'AUTOR-TEST', 'observacion' => PaquetePetersenInstitucional::FUNDAMENTO];
+            'cod_usuario_creacion' => 'AUTOR-TEST', 'observacion' => ReglasPetersen::FUNDAMENTO];
         $procedencia = array_map(fn ($j) => ['cod_valoracion_petersen' => $j->origen->registro, 'cod_residente' => $c->residente,
             'cod_personal' => $j->origen->autor, 'cod_usuario_registro' => 'USUARIO-TEST', 'registrado_en' => '2026-10-19T10:00:00.000000-04:00',
             'fecha_hora' => $j->origen->fecha->format('Y-m-d\TH:i:s.uP'), 'elemento' => $j->elemento, 'tipo_registro' => 'REGISTRO',
@@ -355,7 +355,7 @@ final class InstantaneaEvaluacionInstitucionalTest extends TestCase
                     }
                 });
                 $entrada = unserialize(stream_get_contents(STDIN), ['allowed_classes' => false]);
-                $dto = MotorExperto\soporte\conservacion\InstantaneaEvaluacionInstitucional::verificar($entrada['contenido'], $entrada['huella']);
+                $dto = MotorExperto\conservacion\InstantaneaEvaluacionInstitucional::verificar($entrada['contenido'], $entrada['huella']);
                 foreach (get_included_files() as $incluido) {
                     if ($incluido !== __FILE__ && ! str_starts_with(str_replace('\\', '/', $incluido), str_replace('\\', '/', $raiz).'/')) {
                         throw new RuntimeException('El replay cargó código fuera del release.');
@@ -378,7 +378,7 @@ final class InstantaneaEvaluacionInstitucionalTest extends TestCase
             // Un ZIP internamente válido con otro conjunto src sirve para verificar su historia,
             // pero no se acepta como el ejecutor de esta preparación.
             self::assertTrue($zip->open($archivo));
-            $nombre = 'motor-experto/src/motor_experto/soporte/conservacion/InstantaneaPetersen.php';
+            $nombre = 'motor-experto/src/motor_experto/conservacion/InstantaneaPetersen.php';
             $bytes = $zip->getFromName($nombre)."\n/* Variante sintética de release */\n";
             self::assertTrue($zip->addFromString($nombre, $bytes));
             $m['archivos'][$nombre] = hash('sha256', $bytes);

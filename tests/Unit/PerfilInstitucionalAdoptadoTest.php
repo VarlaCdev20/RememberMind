@@ -6,16 +6,16 @@ namespace Tests\Unit;
 
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoOrion;
 use DateTimeImmutable;
-use MotorExperto\aplicacion\casos_uso\EvaluarPerfilInstitucional;
-use MotorExperto\dominio\conocimiento\AdmisibilidadCognitivaInstitucional;
-use MotorExperto\dominio\conocimiento\AdmisibilidadFuenteCOGMEM;
-use MotorExperto\dominio\conocimiento\MapeadorSemantico;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\dominio\conocimiento\PerfilConceptualCognitivo;
-use MotorExperto\dominio\conocimiento\versiones\PaqueteCognitivoInstitucional as P;
-use MotorExperto\dominio\inferencia\MemoriaTrabajo;
-use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
-use MotorExperto\dominio\objetos_valor\FuenteBrutaCOGMEM;
+use MotorExperto\inferencia\EvaluarPerfilInstitucional;
+use MotorExperto\conocimiento\AdmisibilidadCognitivaInstitucional;
+use MotorExperto\conocimiento\AdmisibilidadFuenteCOGMEM;
+use MotorExperto\conocimiento\MapeadorSemantico;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\conocimiento\PerfilConceptualCognitivo;
+use MotorExperto\conocimiento\ReglasCognitivas as P;
+use MotorExperto\hechos\MemoriaTrabajo;
+use MotorExperto\hechos\ContextoEjecucion;
+use MotorExperto\hechos\FuenteBrutaCOGMEM;
 use PHPUnit\Framework\TestCase;
 
 /** Casos sintéticos de software; ningún predicado se importa como historia clínica. */

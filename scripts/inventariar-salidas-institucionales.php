@@ -7,7 +7,7 @@ require dirname(__DIR__).'/vendor/autoload.php';
 require dirname(__DIR__).'/prototipos/orion-conservacion-0_2/CasoCanonico.php';
 require dirname(__DIR__).'/prototipos/orion-conservacion-0_2/VariantesCanonicas.php';
 
-use MotorExperto\soporte\conservacion\InstantaneaEvaluacionInstitucional;
+use MotorExperto\conservacion\InstantaneaEvaluacionInstitucional;
 use OrionFase02\VariantesCanonicas;
 
 $comprobar = ($argv[1] ?? null) === '--check';

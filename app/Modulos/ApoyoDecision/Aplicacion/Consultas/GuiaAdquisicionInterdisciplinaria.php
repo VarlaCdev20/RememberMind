@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Modulos\ApoyoDecision\Aplicacion\Consultas;
 
 use LogicException;
-use MotorExperto\dominio\instrumentos\CatalogoCapturaCognitiva;
-use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
+use MotorExperto\instrumentos\CatalogoCapturaCognitiva;
+use MotorExperto\instrumentos\RegistroMetodosInstrumentales;
 
 /** Selección de adquisición propuesta; nunca acredita una aplicación ni publica una interpretación. */
 final class GuiaAdquisicionInterdisciplinaria

@@ -16,7 +16,7 @@ use Carbon\CarbonImmutable;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use MotorExperto\dominio\conocimiento\reglas\EvaluadorObservaciones;
+use MotorExperto\conocimiento\ReglasObservacionales;
 
 /** Operación explícita, atómica e idempotente; nunca se ejecuta al leer una evaluación histórica. */
 final class EjecutarObservaciones
@@ -46,7 +46,7 @@ final class EjecutarObservaciones
             }
             $paquete = app(ConocimientoObservacional::class)->preparar($usuario);
             $lectura = app(ConsultarHallazgosObservacionales::class)->instantaneaCompleta($usuario, $residente, CarbonImmutable::now());
-            $informe = (new EvaluadorObservaciones)->evaluar($residente->getKey(), new \DateTimeImmutable($lectura['fecha_corte']), $lectura['instantanea'], $paquete);
+            $informe = (new ReglasObservacionales)->evaluar($residente->getKey(), new \DateTimeImmutable($lectura['fecha_corte']), $lectura['instantanea'], $paquete);
             $id = app(ConservacionObservacional::class)->guardar($residente->getKey(), $autor->getKey(), $solicitud, $paquete, $lectura['instantanea'], $informe);
             // La operación no confirma si la reconstrucción independiente no recupera la traza completa.
             app(ConsultarObservacionesConservadas::class)->consultar($usuario, $residente, $id);
@@ -58,7 +58,7 @@ final class EjecutarObservaciones
         }, 3);
 
         // Solo la primera carga toma el contador antes de actor/residente, igual que el gestor.
-        return DB::table('versiones_modelo_experto')->where('codigo_version', EvaluadorObservaciones::VERSION)->exists()
+        return DB::table('versiones_modelo_experto')->where('codigo_version', ReglasObservacionales::VERSION)->exists()
             ? $operacion() : app(CodigosEntidad::class)->serializar('versiones_modelo_experto', $operacion);
     }
 }

@@ -16,7 +16,7 @@ use MotorExperto\dominio\orion\Entities\Hechos\HechoExperto;
 use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\SubcomponenteCognitivoEnum;
-use MotorExperto\soporte\conservacion\CodecInstantanea;
+use MotorExperto\conservacion\CodecInstantanea;
 
 $fecha = new DateTimeImmutable('2026-10-18T12:00:00-04:00');
 $hecho = new HechoExperto('SIM-H', 'SIM-EVAL', 'SINTETICO', 'SIM-EP', 'SIM-SRC', 'SIM-OR', 'SIM-V1', 'OBS', $fecha, null);

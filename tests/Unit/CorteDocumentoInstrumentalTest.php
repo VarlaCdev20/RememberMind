@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use DateTimeImmutable;
-use MotorExperto\dominio\instrumentos\CorteDocumentoInstrumental;
+use MotorExperto\instrumentos\CorteDocumentoInstrumental;
 use PHPUnit\Framework\TestCase;
 
 final class CorteDocumentoInstrumentalTest extends TestCase

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Modulos\ApoyoDecision\Aplicacion\Consultas;
 
 use DomainException;
-use MotorExperto\dominio\instrumentos\GuiaAdquisicionDcl;
-use MotorExperto\dominio\instrumentos\CircuitoInstrumentalInicial;
+use MotorExperto\instrumentos\GuiaAdquisicionDcl;
+use MotorExperto\instrumentos\CircuitoInstrumentalInicial;
 
 /**
  * Estado de preparación de las familias seleccionadas, sin leer casos ni ejecutar perfiles.

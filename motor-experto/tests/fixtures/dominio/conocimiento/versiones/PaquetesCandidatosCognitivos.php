@@ -2,7 +2,7 @@
 
 namespace MotorExperto\dominio\conocimiento\versiones;
 
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\conocimiento\PaqueteConocimiento;
 
 /** Manifiestos documentales D-108/D-135 en memoria. No son PaqueteConocimiento ejecutable. */
 final class PaquetesCandidatosCognitivos

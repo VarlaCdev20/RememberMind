@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use DomainException;
-use MotorExperto\dominio\conocimiento\red_semantica\RedSemantica;
+use MotorExperto\conocimiento\RedSemantica;
 use MotorExperto\dominio\orion\ValueObjects\Cognicion\SubcomponenteCognitivoEnum;
 use MotorExperto\investigacion\dcl\CatalogoPerfilCincoDominios as Catalogo;
 use PHPUnit\Framework\TestCase;

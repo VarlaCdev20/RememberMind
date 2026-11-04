@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace MotorExperto\dominio\conocimiento;
 
+use MotorExperto\conocimiento\AdmisibilidadFuenteCOGMEM;
+use MotorExperto\conocimiento\MapeadorSemantico;
+
 use DomainException;
-use MotorExperto\dominio\conocimiento\reglas\EvaluadorReglas;
-use MotorExperto\dominio\inferencia\MemoriaTrabajo;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\inferencia\EvaluadorReglas;
+use MotorExperto\hechos\MemoriaTrabajo;
 
 /** Edición declarativa de otra revisión: nunca modifica el paquete recibido ni ejecuta código del conocimiento. */
 final class EditorPaqueteExperimental

@@ -5,11 +5,12 @@ declare(strict_types=1);
 // Proceso de prueba aislado: recibe exclusivamente un fixture sintético por stdin.
 require dirname(__DIR__, 2).'/vendor/autoload.php';
 
-use MotorExperto\soporte\conservacion\InstantaneaEvaluacionInstitucional;
+use MotorExperto\conservacion\InstantaneaEvaluacionInstitucional;
 
 $intentos = [];
 spl_autoload_register(static function (string $clase) use (&$intentos): void {
-    foreach (['MotorExperto\\aplicacion\\', 'MotorExperto\\dominio\\', 'MotorExperto\\adaptadores\\'] as $prefijo) {
+    foreach (['MotorExperto\\inferencia\\', 'MotorExperto\\conocimiento\\', 'MotorExperto\\hechos\\',
+        'MotorExperto\\instrumentos\\', 'MotorExperto\\explicacion\\', 'MotorExperto\\dominio\\'] as $prefijo) {
         if (str_starts_with($clase, $prefijo)) {
             $intentos[] = $clase;
             throw new RuntimeException('INFERENCIA_BLOQUEADA_EN_LECTURA');

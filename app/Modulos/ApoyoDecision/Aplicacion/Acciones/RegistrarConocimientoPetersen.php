@@ -11,7 +11,7 @@ use App\Modulos\ApoyoDecision\Aplicacion\Contratos\IdentidadesConocimiento;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use MotorExperto\dominio\conocimiento\versiones\PaquetePetersenInstitucional as P;
+use MotorExperto\conocimiento\ReglasPetersen as P;
 
 /** Registra conocimiento E–H adoptado, sin crear juicios clínicos ni atribuir una revisión humana. */
 final class RegistrarConocimientoPetersen

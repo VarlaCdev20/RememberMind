@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use MotorExperto\dominio\instrumentos\CatalogoCapturaCognitiva;
-use MotorExperto\dominio\instrumentos\ExtractorCapturaInstrumental;
-use MotorExperto\dominio\instrumentos\NormalizadorReferenciaColombia2019;
-use MotorExperto\dominio\instrumentos\NormalizadorReferenciasEspana as Norma;
-use MotorExperto\dominio\instrumentos\NormalizadorReferenciaTokenColombia2017;
-use MotorExperto\dominio\instrumentos\PerfilInstrumentalCognitivo;
-use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
+use MotorExperto\instrumentos\CatalogoCapturaCognitiva;
+use MotorExperto\instrumentos\ExtractorCapturaInstrumental;
+use MotorExperto\instrumentos\NormalizadorReferenciaColombia2019;
+use MotorExperto\instrumentos\NormalizadorReferenciasEspana as Norma;
+use MotorExperto\instrumentos\NormalizadorReferenciaTokenColombia2017;
+use MotorExperto\instrumentos\PerfilInstrumentalCognitivo;
+use MotorExperto\instrumentos\RegistroMetodosInstrumentales;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

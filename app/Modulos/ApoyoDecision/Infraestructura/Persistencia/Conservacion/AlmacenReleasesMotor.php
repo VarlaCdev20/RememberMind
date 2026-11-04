@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion;
 
 use DomainException;
-use MotorExperto\soporte\conservacion\ReleaseMotorInstrumental;
+use MotorExperto\conservacion\ReleaseMotorInstrumental;
 
 /** Retiene únicamente software verificado en un directorio privado y nunca datos clínicos. */
 final readonly class AlmacenReleasesMotor

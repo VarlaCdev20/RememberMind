@@ -15,9 +15,9 @@ use Carbon\CarbonImmutable;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
-use MotorExperto\soporte\conservacion\InstantaneaInstrumental;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\hechos\ContextoEjecucion;
+use MotorExperto\conservacion\InstantaneaInstrumental;
 
 /** Consulta declarativa de fuentes autorizadas; no guarda ni sustituye una evaluación histórica. */
 final class ConsultarConocimientoCognitivo

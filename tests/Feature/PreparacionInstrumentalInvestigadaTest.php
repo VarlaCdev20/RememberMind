@@ -13,7 +13,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use MotorExperto\dominio\conocimiento\versiones\PaqueteInvestigadoCOGMEM;
-use MotorExperto\dominio\instrumentos\NormalizadorHvltBolivia2015;
+use MotorExperto\instrumentos\NormalizadorHvltBolivia2015;
 use Tests\Support\InformeCognitivoFixture as F;
 use Tests\TestCase;
 

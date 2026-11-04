@@ -4,7 +4,7 @@ namespace App\Modulos\ApoyoDecision\Aplicacion\Contratos;
 
 use DateTimeImmutable;
 use DomainException;
-use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
+use MotorExperto\hechos\ContextoEjecucion;
 
 /** Sobre técnico del contexto ya existente; no autoriza una evaluación clínica. */
 final readonly class SolicitudEvaluacionTecnicaV1

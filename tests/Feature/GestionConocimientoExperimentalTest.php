@@ -14,13 +14,13 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
-use MotorExperto\adaptadores\entrada\AdaptadorHechosCOGMEM;
+use MotorExperto\hechos\AdaptadorHechosCOGMEM;
 use MotorExperto\adaptadores\entrada\EjemploTecnicoCOGMEM;
 use MotorExperto\dominio\conocimiento\EditorPaqueteExperimental as Editor;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\dominio\inferencia\MemoriaTrabajo;
-use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
-use MotorExperto\dominio\objetos_valor\FuenteBrutaCOGMEM;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\hechos\MemoriaTrabajo;
+use MotorExperto\hechos\ContextoEjecucion;
+use MotorExperto\hechos\FuenteBrutaCOGMEM;
 use Tests\Support\InformeCognitivoFixture;
 use Tests\TestCase;
 

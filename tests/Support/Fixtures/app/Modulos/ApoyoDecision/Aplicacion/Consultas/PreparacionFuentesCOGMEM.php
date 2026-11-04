@@ -11,7 +11,7 @@ use App\Models\User;
 use App\Models\VersionModeloExperto;
 use Illuminate\Support\Facades\Gate;
 use MotorExperto\dominio\conocimiento\versiones\PaqueteInvestigadoCOGMEM as P;
-use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
+use MotorExperto\instrumentos\RegistroMetodosInstrumentales;
 
 /** Inventario autorizado de fuentes; no remapea, ejecuta reglas ni asigna EV-CM. */
 final class PreparacionFuentesCOGMEM

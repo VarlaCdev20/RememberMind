@@ -17,8 +17,8 @@ use App\Modulos\ApoyoDecision\Dominio\Reglas\BaseTecnicaDesechable;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 use MotorExperto\aplicacion\puertos\EvaluadorExperto;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\dominio\inferencia\MemoriaTrabajo;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\hechos\MemoriaTrabajo;
 
 /** Persistencia real D-133 en BDD desechable; no es una entrada clínica institucional. */
 final class PersistirEvaluacionTecnica

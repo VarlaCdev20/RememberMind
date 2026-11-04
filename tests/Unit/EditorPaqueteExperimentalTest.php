@@ -6,15 +6,15 @@ namespace Tests\Unit;
 
 use DateTimeImmutable;
 use DomainException;
-use MotorExperto\adaptadores\entrada\AdaptadorHechosCOGMEM;
+use MotorExperto\hechos\AdaptadorHechosCOGMEM;
 use MotorExperto\adaptadores\entrada\EjemploTecnicoCOGMEM as Ejemplo;
 use MotorExperto\dominio\conocimiento\EditorPaqueteExperimental;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\dominio\conocimiento\reglas\EvaluadorReglas;
-use MotorExperto\dominio\inferencia\MemoriaTrabajo;
-use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
-use MotorExperto\dominio\objetos_valor\EvidenciaExperta;
-use MotorExperto\dominio\objetos_valor\FuenteBrutaCOGMEM;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\inferencia\EvaluadorReglas;
+use MotorExperto\hechos\MemoriaTrabajo;
+use MotorExperto\hechos\ContextoEjecucion;
+use MotorExperto\hechos\EvidenciaExperta;
+use MotorExperto\hechos\FuenteBrutaCOGMEM;
 use PHPUnit\Framework\TestCase;
 
 final class EditorPaqueteExperimentalTest extends TestCase

@@ -11,12 +11,12 @@ use App\Models\User;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoObservacional;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConservacionObservacional;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos;
-use MotorExperto\soporte\conservacion\CodecInstantanea as Codec;
+use MotorExperto\conservacion\CodecInstantanea as Codec;
 use DomainException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use MotorExperto\dominio\conocimiento\reglas\EvaluadorObservaciones as Motor;
+use MotorExperto\conocimiento\ReglasObservacionales as Motor;
 
 /** Recupera únicamente la instantánea guardada; verifica huella, conocimiento y decisiones originales. */
 final class ConsultarObservacionesConservadas

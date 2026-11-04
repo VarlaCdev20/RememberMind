@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use MotorExperto\dominio\instrumentos\CalculadorRecuerdoConClavesFcsrt as Fcsrt;
-use MotorExperto\dominio\instrumentos\CatalogoCapturaCognitiva;
-use MotorExperto\dominio\instrumentos\ExtractorCapturaInstrumental;
-use MotorExperto\dominio\instrumentos\PerfilInstrumentalCognitivo;
-use MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales;
+use MotorExperto\instrumentos\CalculadorRecuerdoConClavesFcsrt as Fcsrt;
+use MotorExperto\instrumentos\CatalogoCapturaCognitiva;
+use MotorExperto\instrumentos\ExtractorCapturaInstrumental;
+use MotorExperto\instrumentos\PerfilInstrumentalCognitivo;
+use MotorExperto\instrumentos\RegistroMetodosInstrumentales;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

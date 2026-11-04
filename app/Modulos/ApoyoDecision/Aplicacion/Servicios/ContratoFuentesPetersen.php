@@ -12,8 +12,8 @@ use App\Models\Diagnostico;
 use App\Models\DocumentoClinico;
 use App\Models\ValoracionPetersenOriginal;
 use App\Models\ValoracionPsicologica;
-use MotorExperto\dominio\petersen\EvaluarPetersenInstitucional;
-use MotorExperto\dominio\petersen\ValoracionOriginalPetersen;
+use MotorExperto\inferencia\EvaluarPetersenInstitucional;
+use MotorExperto\hechos\ValoracionOriginalPetersen;
 
 /** Matriz cerrada de fuentes del diccionario aprobado; ningún código recibido selecciona una tabla arbitraria. */
 final class ContratoFuentesPetersen

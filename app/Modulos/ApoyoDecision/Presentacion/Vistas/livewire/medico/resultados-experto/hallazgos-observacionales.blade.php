@@ -16,7 +16,7 @@
         <summary>Reglas aplicadas y alcance</summary>
         <p class="text-sm mt-2">Información considerada hasta el {{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($hallazgosObservacionales['fecha_corte'] ?? null, 'momento de la consulta') }}.</p>
         <ul class="text-sm mt-2 space-y-2">@foreach($hallazgosObservacionales['resumen'] as $codigoRegla => $resumenRegla)
-            <li>{{ $resumenRegla['nombre'] ?? \MotorExperto\dominio\conocimiento\reglas\EvaluadorObservaciones::REGLAS[$codigoRegla]['nombre'] }} · {{ ['CUMPLE' => 'Cumplió', 'NO_CUMPLE' => 'No cumplió', 'NO_EVALUABLE' => 'No evaluable'][$resumenRegla['estado']] }}@if($resumenRegla['hallazgo']): {{ $resumenRegla['hallazgo'] }}@endif</li>
+            <li>{{ $resumenRegla['nombre'] ?? \MotorExperto\conocimiento\ReglasObservacionales::REGLAS[$codigoRegla]['nombre'] }} · {{ ['CUMPLE' => 'Cumplió', 'NO_CUMPLE' => 'No cumplió', 'NO_EVALUABLE' => 'No evaluable'][$resumenRegla['estado']] }}@if($resumenRegla['hallazgo']): {{ $resumenRegla['hallazgo'] }}@endif</li>
         @endforeach</ul>
         @if($hallazgosObservacionales['resumen'] === [])<p class="text-sm mt-2">Esta versión no tiene reglas observacionales elegibles. Los registros se conservan sin emitir hallazgos.</p>@endif
     </details>

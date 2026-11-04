@@ -14,9 +14,9 @@ use DomainException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use MotorExperto\dominio\conocimiento\EditorPaqueteExperimental;
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
-use MotorExperto\dominio\conocimiento\reglas\EvaluadorReglas;
-use MotorExperto\dominio\inferencia\MemoriaTrabajo;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\inferencia\EvaluadorReglas;
+use MotorExperto\hechos\MemoriaTrabajo;
 
 /** Gestión técnica explícita en testing descartable. No es autorización institucional ni entrada HTTP. */
 final class GestionarConocimientoExperimental

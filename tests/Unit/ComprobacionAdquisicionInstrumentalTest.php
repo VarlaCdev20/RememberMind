@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use DomainException;
-use MotorExperto\dominio\instrumentos\ComprobacionAdquisicionInstrumental;
-use MotorExperto\dominio\instrumentos\ExtractorCapturaInstrumental;
-use MotorExperto\dominio\instrumentos\NormalizadorHvltBolivia2015 as Hvlt;
+use MotorExperto\instrumentos\ComprobacionAdquisicionInstrumental;
+use MotorExperto\instrumentos\ExtractorCapturaInstrumental;
+use MotorExperto\instrumentos\NormalizadorHvltBolivia2015 as Hvlt;
 use PHPUnit\Framework\TestCase;
 
 final class ComprobacionAdquisicionInstrumentalTest extends TestCase

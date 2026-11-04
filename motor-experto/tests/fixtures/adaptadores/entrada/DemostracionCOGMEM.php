@@ -2,10 +2,12 @@
 
 namespace MotorExperto\adaptadores\entrada;
 
+use MotorExperto\hechos\AdaptadorHechosCOGMEM;
+
 use DomainException;
 use MotorExperto\adaptadores\entrada\EjemploTecnicoCOGMEM as E;
 use MotorExperto\aplicacion\casos_uso\MotorExperto;
-use MotorExperto\dominio\inferencia\MemoriaTrabajo;
+use MotorExperto\hechos\MemoriaTrabajo;
 
 /** Casos artificiales que ejecutan el motor real en memoria, sin leer residentes ni persistir. */
 final class DemostracionCOGMEM

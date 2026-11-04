@@ -16,7 +16,7 @@ use Illuminate\Support\Str;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithPagination;
-use MotorExperto\dominio\petersen\ValoracionOriginalPetersen as V;
+use MotorExperto\hechos\ValoracionOriginalPetersen as V;
 
 /** Interacción sobre actos originales; la Action aplica las mismas garantías fuera de esta pantalla. */
 final class CapturaPetersenPanel extends Component

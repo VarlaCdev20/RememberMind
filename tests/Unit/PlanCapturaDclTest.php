@@ -7,9 +7,9 @@ namespace Tests\Unit;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\PlanCapturaDcl;
 use DateTimeImmutable;
 use DomainException;
-use MotorExperto\dominio\instrumentos\GuiaAdquisicionDcl;
-use MotorExperto\dominio\objetos_valor\ContextoEjecucion;
-use MotorExperto\dominio\petersen\EvaluarPetersenInstitucional as Motor;
+use MotorExperto\instrumentos\GuiaAdquisicionDcl;
+use MotorExperto\hechos\ContextoEjecucion;
+use MotorExperto\inferencia\EvaluarPetersenInstitucional as Motor;
 use PHPUnit\Framework\TestCase;
 
 final class PlanCapturaDclTest extends TestCase
