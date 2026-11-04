@@ -78,3 +78,7 @@ Verificación de cabecera: build correcto y E2E focal PASS (22 s), diez combinac
 Se reemplaza el input local por ui.filter-search con lupa, conservando busquedaResumen, debounce e identificador. Props opcionales inputId y showClear mantienen los valores anteriores en otros consumidores; label vacío permite una única etiqueta visible proporcionada por ui.field. El buscador queda limitado a26 rem (416 px), estado a14 rem y Limpiar contiguo, sin estirar el grupo por todo el listado. Se conserva adaptación móvil y tokens existentes.
 
 Build correcto y E2E focal PASS (25 s): tabla/tarjetas en cinco anchos, búsqueda/vacío/limpieza, menú/Escape/foco y oscuro390, sin errores JS/HTTP o desbordamientos. Ajuste final de etiqueta verificado en navegador operativo: una sola etiqueta asociada, lupa presente y buscador de416 px. Pestaña recargada para mostrar los cambios. Sin cambios de backend, permisos o persistencia; no se ejecutó la CI completa.
+
+## Paginador más delgado
+
+Se elimina el padding vertical, el recuadro/fondo del grupo de páginas y su separación interna; margen superior reducido a4 px. Se conserva el resaltado salvia y los controles de44 px. Medición en la pestaña operativa recargada: franja de45,6 px, padding0 y sin borde exterior de navegación. Build y E2E focal PASS (25 s), diez combinaciones en cinco anchos, filtros, menús/foco y oscuro390; capturas actualizadas y revisadas. Sin cambios funcionales o de permisos. CI completa no ejecutada para este ajuste CSS.
