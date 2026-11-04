@@ -31,16 +31,22 @@ final class ReglasObservacionales
      * - OBS-COG-01: Señalamiento de cambios cognitivos respecto al nivel previo.
      */
     public const REGLAS = [
+        // OBS-MEM-01 — REPETICIÓN DE PREGUNTAS
+        // señala un episodio documentado con repetición de preguntas marcada afirmativamente.
         'OBS-MEM-01' => [
             'campo' => 'repite_preguntas',
             'nombre' => 'Repetición de preguntas',
             'hallazgo' => 'Se documentó un episodio de repetición de preguntas.',
         ],
+        // OBS-MEM-02 — OLVIDO DE INDICACIONES
+        // señala un episodio documentado con olvido de indicaciones marcado afirmativamente.
         'OBS-MEM-02' => [
             'campo' => 'olvida_indicaciones',
             'nombre' => 'Olvido de indicaciones',
             'hallazgo' => 'Se documentó un episodio de olvido de indicaciones.',
         ],
+        // OBS-COG-01 — CAMBIO COGNITIVO SEÑALADO
+        // señala un cambio cognitivo registrado que requiere corroboración.
         'OBS-COG-01' => [
             'campo' => 'cambio_cognitivo',
             'nombre' => 'Cambio cognitivo señalado',

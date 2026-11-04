@@ -87,8 +87,21 @@ final class ReglasPetersen
             $id = self::id('G', $patron);
             $t['reglas_expertas'][] = $sello + ['cod_regla_experta' => $id, 'cod_version_modelo' => $version, 'codigo_regla' => $patron,
                 'nombre' => match ($patron) {
-                    'PET-01' => 'Amnésico de dominio único', 'PET-02' => 'Amnésico multidominio',
-                    'PET-03' => 'No amnésico de dominio único', 'PET-04' => 'No amnésico multidominio',
+                    // PET-01 — AMNÉSICO DE DOMINIO ÚNICO
+                    // orienta a este patrón con memoria alterada, un dominio alterado y requisitos comunes cumplidos.
+                    'PET-01' => 'Amnésico de dominio único',
+
+                    // PET-02 — AMNÉSICO MULTIDOMINIO
+                    // orienta a este patrón con memoria alterada, varios dominios alterados y requisitos comunes cumplidos.
+                    'PET-02' => 'Amnésico multidominio',
+
+                    // PET-03 — NO AMNÉSICO DE DOMINIO ÚNICO
+                    // orienta a este patrón con memoria preservada, un dominio alterado y requisitos comunes cumplidos.
+                    'PET-03' => 'No amnésico de dominio único',
+
+                    // PET-04 — NO AMNÉSICO MULTIDOMINIO
+                    // orienta a este patrón con memoria preservada, varios dominios alterados y requisitos comunes cumplidos.
+                    'PET-04' => 'No amnésico multidominio',
                 }, 'tipo_regla' => 'RESULTADO', 'descripcion' => self::FUNDAMENTO, 'cod_regla_anterior' => null,
                 'estado_revision' => 'PENDIENTE', 'cod_usuario_revision' => null, 'fecha_hora_revision' => null, 'justificacion_revision' => null];
             foreach (self::condiciones($patron) as $variable => $valor) {

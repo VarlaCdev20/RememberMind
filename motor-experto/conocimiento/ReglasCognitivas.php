@@ -23,7 +23,12 @@ final class ReglasCognitivas
     public const FUNDAMENTO = 'Contrato institucional A–D adoptado el 19/10/2026. C1: interpretación específica versionada; C2: atribución de tarea; C3: contexto suficiente. Sin umbral universal ni equivalencia observación/instrumento. Revisión profesional posterior pendiente.';
 
     public const MEMORIA = [
+        // MEM-DIFICULTAD — DIFICULTAD DE MEMORIA EVIDENCIADA
+        // conserva la dificultad indicada por una interpretación instrumental original admisible.
         'DIFICULTAD_INSTRUMENTAL' => 'DIFICULTAD_EVIDENCIADA',
+
+        // MEM-SIN-DIFICULTAD — SIN DIFICULTAD DE MEMORIA EVIDENCIADA
+        // conserva una interpretación instrumental admisible sin dificultad evidenciada.
         'SIN_DIFICULTAD_INSTRUMENTAL' => 'SIN_DIFICULTAD_EVIDENCIADA',
     ];
 
@@ -44,12 +49,67 @@ final class ReglasCognitivas
 
     public static function reglasG09(): array
     {
-        return ['ATE-S01' => 'ATE-R-SOSTENIMIENTO', 'ATE-S02' => 'ATE-R-SELECCION', 'ATE-S03' => 'ATE-R-DISTRIBUCION',
-            'EJE-S01' => 'EJE-R-INHIBICION', 'EJE-S02' => 'EJE-R-FLEXIBILIDAD', 'EJE-S03' => 'EJE-R-ACTUALIZACION',
-            'EJE-S04' => 'EJE-R-PLANIFICACION', 'EJE-S05' => 'EJE-R-RAZONAMIENTO',
-            'LEN-S01' => 'LEN-R-DENOMINACION', 'LEN-S02' => 'LEN-R-FLUIDEZ', 'LEN-S03' => 'LEN-R-COMPRENSION',
-            'LEN-S04' => 'LEN-R-REPETICION', 'LEN-S05' => 'LEN-R-DISCURSO',
-            'VIS-S01' => 'VIS-R-PERCEPCION', 'VIS-S02' => 'VIS-R-CONSTRUCCION'];
+        return [
+            // R-ATE-S01-P01 — ATENCIÓN SOSTENIDA
+            // emite la salida sobre mantener la atención con las tres condiciones acreditadas.
+            'ATE-S01' => 'ATE-R-SOSTENIMIENTO',
+
+            // R-ATE-S02-P01 — ATENCIÓN SELECTIVA
+            // emite la salida sobre seleccionar estímulos relevantes con las tres condiciones acreditadas.
+            'ATE-S02' => 'ATE-R-SELECCION',
+
+            // R-ATE-S03-P01 — ATENCIÓN DIVIDIDA
+            // emite la salida sobre distribuir la atención con las tres condiciones acreditadas.
+            'ATE-S03' => 'ATE-R-DISTRIBUCION',
+
+            // R-EJE-S01-P01 — CONTROL INHIBITORIO
+            // emite la salida sobre inhibir respuestas con las tres condiciones acreditadas.
+            'EJE-S01' => 'EJE-R-INHIBICION',
+
+            // R-EJE-S02-P01 — FLEXIBILIDAD COGNITIVA
+            // emite la salida sobre cambiar de criterio o estrategia con las tres condiciones acreditadas.
+            'EJE-S02' => 'EJE-R-FLEXIBILIDAD',
+
+            // R-EJE-S03-P01 — ACTUALIZACIÓN EN MEMORIA DE TRABAJO
+            // emite la salida sobre actualizar y manipular información con las tres condiciones acreditadas.
+            'EJE-S03' => 'EJE-R-ACTUALIZACION',
+
+            // R-EJE-S04-P01 — PLANIFICACIÓN Y RESOLUCIÓN DE PROBLEMAS
+            // emite la salida sobre organizar acciones hacia una meta con las tres condiciones acreditadas.
+            'EJE-S04' => 'EJE-R-PLANIFICACION',
+
+            // R-EJE-S05-P01 — RAZONAMIENTO Y ABSTRACCIÓN
+            // emite la salida sobre establecer relaciones y conceptos con las tres condiciones acreditadas.
+            'EJE-S05' => 'EJE-R-RAZONAMIENTO',
+
+            // R-LEN-S01-P01 — DENOMINACIÓN Y ACCESO LÉXICO
+            // emite la salida sobre recuperar nombres y palabras con las tres condiciones acreditadas.
+            'LEN-S01' => 'LEN-R-DENOMINACION',
+
+            // R-LEN-S02-P01 — FLUIDEZ VERBAL
+            // emite la salida sobre generar palabras con las tres condiciones acreditadas.
+            'LEN-S02' => 'LEN-R-FLUIDEZ',
+
+            // R-LEN-S03-P01 — COMPRENSIÓN DEL LENGUAJE
+            // emite la salida sobre comprender mensajes con las tres condiciones acreditadas.
+            'LEN-S03' => 'LEN-R-COMPRENSION',
+
+            // R-LEN-S04-P01 — REPETICIÓN
+            // emite la salida sobre repetir material verbal con las tres condiciones acreditadas.
+            'LEN-S04' => 'LEN-R-REPETICION',
+
+            // R-LEN-S05-P01 — PRODUCCIÓN VERBAL Y DISCURSO
+            // emite la salida sobre elaborar discurso con las tres condiciones acreditadas.
+            'LEN-S05' => 'LEN-R-DISCURSO',
+
+            // R-VIS-S01-P01 — PERCEPCIÓN Y RELACIONES VISUOESPACIALES
+            // emite la salida sobre percibir relaciones espaciales con las tres condiciones acreditadas.
+            'VIS-S01' => 'VIS-R-PERCEPCION',
+
+            // R-VIS-S02-P01 — VISUOCONSTRUCCIÓN
+            // emite la salida sobre organizar y reproducir formas con las tres condiciones acreditadas.
+            'VIS-S02' => 'VIS-R-CONSTRUCCION'
+        ];
     }
 
     public static function id(string $tipo, string $codigo): string
