@@ -1,0 +1,10 @@
+PHPUnit 12.5.36 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.3.33
+Configuration: C:\Users\CARLAENCINAS\Desktop\RememberMind\phpunit.postgres.xml
+
+.......                                                             7 / 7 (100%)
+
+Time: 01:55.392, Memory: 200.00 MB
+
+OK (7 tests, 154 assertions)

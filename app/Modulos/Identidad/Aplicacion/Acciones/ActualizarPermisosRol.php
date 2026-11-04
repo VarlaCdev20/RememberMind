@@ -12,9 +12,23 @@ final class ActualizarPermisosRol
     public function guardar(User $actor, Role $rol, array $permisosSeleccionados): void
     {
         abort_unless($actor->can('roles.editar_permisos'), 403);
+        foreach ($permisosSeleccionados as $permiso) {
+            abort_unless(is_string($permiso), 422);
+        }
+        $seleccion = Permission::query()->where('guard_name', $rol->guard_name)->whereIn('name', $permisosSeleccionados)->get();
+        abort_unless($seleccion->count() === count(array_unique($permisosSeleccionados)), 422);
+        $permisosExpertosReservados = ['evaluaciones_expertas.ejecutar_observaciones', 'reglas_expertas.gestionar', 'reglas_expertas.revisar',
+            'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar',
+            'controles_funcionales_iadl.crear', 'controles_funcionales_iadl.rectificar'];
+        abort_if($seleccion->whereIn('name', $permisosExpertosReservados)->isNotEmpty()
+            && ! in_array($rol->name, ['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A'], true), 403);
+        abort_if($seleccion->contains('name', 'controles_funcionales_iadl.ver')
+            && ! in_array($rol->name, ['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'SUPERADMINISTRADOR'], true), 403);
+        $permisosSuperadminExcluidos = [...$permisosExpertosReservados,
+            'fotografias_institucionales.gestionar', 'aplicaciones_instrumento.transcribir'];
         $rol->syncPermissions($rol->name === 'SUPERADMINISTRADOR'
-            ? Permission::query()->where('guard_name', $rol->guard_name)->get()
-            : $permisosSeleccionados);
+            ? Permission::query()->where('guard_name', $rol->guard_name)->whereNotIn('name', $permisosSuperadminExcluidos)->get()
+            : $seleccion);
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         if (function_exists('activity')) {

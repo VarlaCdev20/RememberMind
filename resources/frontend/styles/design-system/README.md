@@ -15,35 +15,29 @@ Los nombres de la paleta identifican una función, nunca una escala como brown-1
 Los alias existentes `--color-*` y las familias numéricas de Tailwind consumen
 el mismo contrato durante la migración progresiva. No introducir otra paleta por rol.
 
-## Paleta oficial en modo claro
+Revisión documental del 04/11/2026: la fuente de valores es `tokens/colors.css`. Los informes del 14/10 conservan su corte; no definen la paleta actual por llevar «final» en el nombre. La captura utiliza superficies cálidas claras, tramas del lienzo, transparencia/blur moderados y sombras compartidas. [Contrato visual actualizado](../../../../docs/frontend/CONTRATO_VISUAL_UX_UI.md).
 
-| Token semántico | Valor | Uso |
+## Tokens observados al 04/11/2026
+
+La implementación usa [tokens/colors.css](tokens/colors.css) y el [Design System](README.md). Los siguientes valores base de modo claro describen el código, sin constituir una nueva decisión de diseño. Las variantes y el resultado compuesto dependen de los tokens semánticos/componentes y del tema.
+
+| Token base | Valor | Uso observado |
 |---|---|---|
-| `--rm-bg-app` | #F1EAE4 | Fondo de la aplicación |
-| `--rm-bg-sidebar` | #D6C6B9 | Estructura y sidebar |
-| `--rm-surface` | Mezcla 20% de #A69E96 con el fondo | Capuchino suave para cards, formularios, menús y modales |
-| `--rm-surface-soft` | Mezcla 30% de #A69E96 con el fondo | Hover y subdivisiones |
-| `--rm-surface-muted` | Mezcla 50% de #A69E96 con el fondo | Superficie atenuada |
-| `--rm-text-primary` | #59524B | Títulos, datos, navegación e iconos |
-| `--rm-text-secondary` | #665F57 | Descripciones y metadatos |
-| `--rm-primary` | #78826E | Verde principal salvia |
-| `--rm-primary-ink` | #56604F | Texto, iconos y foco contrastados sobre fondos claros |
-| `--rm-primary-soft` | #C9CDC5 | Salvia suave para acentos |
-| `--rm-selected-bg` | #D6D9D3 | Selección suave con texto #56604F |
-| `--rm-sage` | #A8BAA3 | Acento de cuidado y seguimiento |
-| `--rm-sage-soft` | #C2CEBE | Grupo abierto y estado positivo suave |
-| `--rm-info` | #8699AC | Acento clínico, información y datos |
-| `--rm-info-soft` | #C2CCD5 | Fondo informativo |
-| `--rm-psychology` | #CEB0B0 | Acento de bienestar emocional |
-| `--rm-nutrition` | #C4C4A0 | Acento de alimentación y nutrición |
-| `--rm-warning` | #C69245 | Advertencia real |
-| `--rm-danger` | #B85C58 | Error, riesgo o acción destructiva |
-| `--rm-border` | rgba(74,53,47,.14) | Separación discreta |
-| `--rm-border-strong` | rgba(74,53,47,.24) | Separación reforzada |
+| `--rm-palette-page` | `#F3EEE8` | Lienzo cálido |
+| `--rm-palette-capuchino` | `#DDD6CF` | Estructura/sidebar |
+| `--rm-palette-header` | `#E6E0D9` | Encabezados |
+| `--rm-palette-surface` | `#F7F3EF` | Cards más claras que el lienzo |
+| `--rm-palette-surface-soft` | `#EFEAE4` | Superficie secundaria |
+| `--rm-palette-ink` | `#4A4642` | Texto principal |
+| `--rm-palette-ink-secondary` | `#67615B` | Texto secundario |
+| `--rm-palette-primary` | `#78826E` | Acción salvia |
+| `--rm-palette-primary-hover` | `#5F7567` | Interacción/selección |
+| `--rm-palette-info` | `#7D94A8` | Información |
+| `--rm-palette-warning` | `#C69245` | Advertencia del dominio |
+| `--rm-palette-danger` | `#B85C58` | Error/peligro |
+| `--rm-palette-input` | `#E7E2DE` | Campos |
 
-Las variantes `*-strong` y `*-action` se derivan con `color-mix()`:
-los acentos suaves no se utilizan directamente como texto pequeño.
-El modo oscuro adapta superficies y contraste manteniendo los mismos contratos.
+Hay mezclas con transparencia (`--rm-capture-card`, `--rm-capture-glass-*`), blur y tramas en el lienzo; las superficies no son uniformemente sólidas. Conservar legibilidad, jerarquía y separación entre cards. El relieve y el movimiento utilizan las fuentes compartidas `shadows.css` y `motion.css`. El dominio decide el significado de cada estado. Esta revisión no acredita contraste computado ni una nueva QA visual.
 
 ## Utilidades Tailwind
 
@@ -71,9 +65,9 @@ La referencia histórica autorizada es
 `SUPERADMINISTRADOR:resources/views/components/layout/barra-lateral-sistema.blade.php`.
 Se conservan marca, grupos, jerarquía, iconografía, submenús, badges,
 colapsado desktop, flyouts y drawer móvil.
-En el shell autenticado, sidebar, barra superior y lienzo comparten el fondo
-tierra-ceniza `#D8D2CC` (petróleo en modo oscuro). El sidebar abierto mide
-`224px` y el colapsado `80px`. El hover de los iconos superiores consume la
+En el shell autenticado, sidebar y barra superior usan capuchino `#D7CEC7`;
+el lienzo usa el fondo aclarado `#D7CEC7` (petróleo en modo oscuro). El sidebar abierto mide
+`224 px` y el colapsado `80 px`. El hover de los iconos superiores consume la
 misma superficie salvia translúcida que la selección del sidebar.
 
 | Estado | Tratamiento |
@@ -162,15 +156,9 @@ reducido. No sustituye la aprobación visual de cada pantalla institucional.
 Los tonos intermedios sirven para bordes y profundidad; el texto pequeño usa
 los dos tonos oscuros sobre superficies aclaradas para mantener contraste.
 
-### Salvia complementaria
+### Paleta final y relieve
 
-`#78826E · #858E7C · #939B8B · #A0A799 · #AEB4A8 · #BBC0B6 · #C9CDC5 · #D6D9D3 · #E4E6E2`.
-Se conservan los mentas originales. La selección usa #D6D9D3 y la tinta
-activa #56604F; hover principal #858E7C.
-
-El verde principal es `#78826E`; `#56604F` es tinta contrastada sobre
-superficies claras. Se mantiene `--rm-palette-mint: #C4C6B4` y los mentas anteriores. Sobre botones rellenos se usa tinta neutra más oscura
-para alcanzar contraste de texto, sin oscurecer el fondo salvia aprobado.
+La salvia institucional es #689D7C y el fondo general #D7CEC7. La serie de gráficas es salvia, petróleo, coral, oro, menta y lavanda. Las superficies y rellenos de gráficas son uniformes. El degradado de letras de la cabecera se conserva. Los tokens rm-relief-card-shadow y rm-relief-panel-shadow centralizan el relieve.
 
 ### Familia earth y superficies
 
@@ -184,8 +172,32 @@ iconos neutros: earth-600. Los iconos acompañados de texto son decorativos.
 Earth-400 y earth-300 son tonos de divisores y superficies, no texto importante.
 Los bordes semánticos son rgba(89, 82, 75, .14) y rgba(89, 82, 75, .24).
 
-El sidebar estructural conserva capuchino #D6C6B9. Los submenús usan una
+El sidebar estructural conserva cacao #D7CEC7. Los submenús usan una
 superficie lino aclarada para permitir texto earth-800; los captions pequeños
 conservan earth-800 cuando earth-700 no alcanza 4.5:1 sobre su superficie.
-El fondo general lino #F1EAE4 y las cards aclaradas conservan la separación visual.
+El fondo general #D7CEC7 y las cards aclaradas conservan la separación visual.
 El tema oscuro reinterpreta texto, iconos y superficies sin alterar las primitivas.
+
+Corrección del 14 de octubre: el fondo general usa café grisáceo #D7CEC7; navbar y sidebar conservan capuchino #D7CEC7. Solo el lienzo tiene una trama discreta de puntos menudos: radio de 0.6 px y separación de 16 px, adaptada a ambos temas. Conserva la profundidad interior. Los tokens rm-canvas-relief-* están en tokens/shadows.css; tarjetas y controles siguen sólidos.
+
+El listado de residentes conserva su sección, contador y estados, sin superficie, borde ni sombra envolvente. Las tarjetas individuales mantienen su relieve.
+
+Superficies cálidas unificadas: cabeceras, filtros, cards, paneles, modales y menús usan #E6DED6; los campos #D6CCC3. Header reutiliza la superficie principal; soft y elevated tienen tonos cálidos propios para distinguir profundidad. Las utilidades blancas heredadas del shell reciben la superficie semántica del tema. El relieve distingue elevación sin aclarar los paneles hasta blanco.
+
+Dirección vigente: neutros arena/cacao de intensidad media, superficies de apoyo #D2C5BB y elevadas #EBE3DC. Acentos salvia, petróleo, coral, oro, menta y lavanda más presentes en sus funciones existentes. Relieve con bordes y sombras cálidas; el color de estado sigue procediendo del dominio. No se cambian layout ni reglas clínicas.
+
+Corrección vigente: sidebar y navbar se aclaran al mismo café grisáceo #D7CEC7 del fondo. El token capuchino reutiliza el de página, sin duplicar color; acentos y relieve de Inicio se conservan.
+
+## Composición global vigente (14/10/2026)
+
+La actualización de legibilidad comparte Nunito Sans en títulos funcionales e Inter en texto: página 28 px, sección 18 px, card 16 px, cuerpo 15 px, tablas 14 px y labels 13 px. Outfit conserva la marca y el saludo destacado. Los contenedores usan separación de 20 px, grids de 16 px y filtros de 44 px de alto, con selección sin bisel. La base cálida y los acentos de estado conservan su significado. Ver [alcance y evidencia](../../../../docs/frontend/COMPOSICION_GLOBAL_2026_10_14.md).
+
+Iconografía compartida: `--rm-icon-md` para iconos de tarjetas/acciones con texto (20 px), `--rm-icon-lg` para navegación y controles de solo icono (24 px). El soporte conserva espacio suficiente y las tintas se verifican sobre la superficie compuesta en claro/oscuro. Los estados conservan sus variantes semánticas. Véase la sección de iconos del informe de composición global.
+
+Escala vigente tras la petición de compactar (15/10/2026): títulos de página 26 px, dashboard 28 px, sección 17 px, card 15 px y cuerpo 14 px. Espacios principales 14/18/22 px y card base 14 px. Se conservan iconos legibles y targets de acción. Esta actualización sustituye los tamaños superiores de la sección de composición global; ver su informe para evidencia.
+
+## Consulta del Sistema experto (22/10/2026)
+
+`patterns/expert-laboratory.css` incorpora las composiciones `rm-knowledge-summary`, `rm-knowledge-overview`, `rm-knowledge-graph-layout`, filtros, inspector y catálogos. Consumen exclusivamente los tokens existentes y `rm-btn`/`section-card`/`drawer-livewire`; no añaden paleta, fuentes ni controles paralelos. Su consumidor es `ApoyoDecision/…/sistema-experto/conocimiento-panel` y sus parciales. `rm-knowledge-workspace` evita colisionar con `rm-expert-workspace`, que ya pertenece a la lectura del residente.
+
+`patterns/expert-results.css` añade la matriz documental de dominios, navegación de lectura y resumen operacional de Enfermería. Los cinco dominios representan disponibilidad, nunca una escala de deterioro. El grafo administrativo reutiliza el visor SVG local mediante `rmExpertKnowledgeGraph`; los tipos de nodo tienen etiqueta textual, el inspector conserva entradas/salidas y las fuentes proceden de mapeos declarados. El lienzo muestra como máximo 36 nodos por página y ofrece el mismo contenido en lista accesible. El grafo histórico mantiene su contrato y permisos propios. Referencias, adaptaciones y QA: [informe de entrega](../../../../docs/frontend/SISTEMA_EXPERTO_REFERENCIAS_2026_10_22.md).

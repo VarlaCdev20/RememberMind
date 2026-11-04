@@ -26,7 +26,7 @@ class AsignacionResidenteJornada extends ModeloOperativo
     {
         static::creating(function (self $asig): void {
             if (empty($asig->cod_asignacion)) {
-                $asig->cod_asignacion = 'ARJ_'.Str::upper(Str::random(10));
+                $asig->cod_asignacion = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('asignaciones_residente_jornada', $asig->getConnectionName());
             }
             if (empty($asig->fecha_hora)) {
                 $asig->fecha_hora = now();

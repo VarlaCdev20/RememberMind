@@ -1125,7 +1125,7 @@
   },
   {
     "origen": "app/Backend/Modulos/SistemaExperto/Adaptadores/InspectorComponenteInstrumental.php",
-    "destino": "motor-experto/src/motor_experto/adaptadores/entrada/InspectorComponenteInstrumental.php",
+    "destino": "motor-experto/adaptadores/entrada/InspectorComponenteInstrumental.php",
     "estado": "Migrado"
   },
   {
@@ -1140,7 +1140,7 @@
   },
   {
     "origen": "app/Backend/Modulos/SistemaExperto/Conocimiento/EjemploTecnicoCOGMEM.php",
-    "destino": "motor-experto/src/motor_experto/adaptadores/entrada/EjemploTecnicoCOGMEM.php",
+    "destino": "motor-experto/adaptadores/entrada/EjemploTecnicoCOGMEM.php",
     "estado": "Migrado"
   },
   {
@@ -1150,72 +1150,72 @@
   },
   {
     "origen": "app/Backend/Modulos/SistemaExperto/Conocimiento/MapeadorSemantico.php",
-    "destino": "motor-experto/src/motor_experto/dominio/conocimiento/MapeadorSemantico.php",
+    "destino": "motor-experto/dominio/conocimiento/MapeadorSemantico.php",
     "estado": "Migrado"
   },
   {
     "origen": "app/Backend/Modulos/SistemaExperto/Conocimiento/PaqueteConocimiento.php",
-    "destino": "motor-experto/src/motor_experto/dominio/conocimiento/PaqueteConocimiento.php",
+    "destino": "motor-experto/dominio/conocimiento/PaqueteConocimiento.php",
     "estado": "Migrado"
   },
   {
     "origen": "app/Backend/Modulos/SistemaExperto/Conocimiento/PaqueteInvestigadoCOGMEM.php",
-    "destino": "motor-experto/src/motor_experto/dominio/conocimiento/versiones/PaqueteInvestigadoCOGMEM.php",
+    "destino": "motor-experto/dominio/conocimiento/versiones/PaqueteInvestigadoCOGMEM.php",
     "estado": "Migrado"
   },
   {
     "origen": "app/Backend/Modulos/SistemaExperto/Conocimiento/PaquetesCandidatosCognitivos.php",
-    "destino": "motor-experto/src/motor_experto/dominio/conocimiento/versiones/PaquetesCandidatosCognitivos.php",
+    "destino": "motor-experto/dominio/conocimiento/versiones/PaquetesCandidatosCognitivos.php",
     "estado": "Migrado"
   },
   {
     "origen": "app/Backend/Modulos/SistemaExperto/Conocimiento/RedSemantica.php",
-    "destino": "motor-experto/src/motor_experto/dominio/conocimiento/red_semantica/RedSemantica.php",
+    "destino": "motor-experto/dominio/conocimiento/red_semantica/RedSemantica.php",
     "estado": "Migrado"
   },
   {
     "origen": "app/Backend/Modulos/SistemaExperto/Conocimiento/ValidadorPaqueteConocimiento.php",
-    "destino": "motor-experto/src/motor_experto/dominio/conocimiento/ValidadorPaqueteConocimiento.php",
+    "destino": "motor-experto/dominio/conocimiento/ValidadorPaqueteConocimiento.php",
     "estado": "Migrado"
   },
   {
     "origen": "app/Backend/Modulos/SistemaExperto/DTO/ContextoEjecucion.php",
-    "destino": "motor-experto/src/motor_experto/dominio/objetos_valor/ContextoEjecucion.php",
+    "destino": "motor-experto/dominio/objetos_valor/ContextoEjecucion.php",
     "estado": "Migrado"
   },
   {
     "origen": "app/Backend/Modulos/SistemaExperto/DTO/EvidenciaExperta.php",
-    "destino": "motor-experto/src/motor_experto/dominio/objetos_valor/EvidenciaExperta.php",
+    "destino": "motor-experto/dominio/objetos_valor/EvidenciaExperta.php",
     "estado": "Migrado"
   },
   {
     "origen": "app/Backend/Modulos/SistemaExperto/DTO/FuenteBrutaCOGMEM.php",
-    "destino": "motor-experto/src/motor_experto/dominio/objetos_valor/FuenteBrutaCOGMEM.php",
+    "destino": "motor-experto/dominio/objetos_valor/FuenteBrutaCOGMEM.php",
     "estado": "Migrado"
   },
   {
     "origen": "app/Backend/Modulos/SistemaExperto/Evaluadores/EvaluadorAdmisibilidad.php",
-    "destino": "motor-experto/src/motor_experto/dominio/inferencia/EvaluadorAdmisibilidad.php",
+    "destino": "motor-experto/dominio/inferencia/EvaluadorAdmisibilidad.php",
     "estado": "Migrado"
   },
   {
     "origen": "app/Backend/Modulos/SistemaExperto/Evaluadores/EvaluadorContextoCOGMEM.php",
-    "destino": "motor-experto/src/motor_experto/dominio/inferencia/EvaluadorContextoCOGMEM.php",
+    "destino": "motor-experto/dominio/inferencia/EvaluadorContextoCOGMEM.php",
     "estado": "Migrado"
   },
   {
     "origen": "app/Backend/Modulos/SistemaExperto/Evaluadores/EvaluadorEvaluabilidadCOGMEM.php",
-    "destino": "motor-experto/src/motor_experto/dominio/inferencia/EvaluadorEvaluabilidadCOGMEM.php",
+    "destino": "motor-experto/dominio/inferencia/EvaluadorEvaluabilidadCOGMEM.php",
     "estado": "Migrado"
   },
   {
     "origen": "app/Backend/Modulos/SistemaExperto/Inferencia/EvaluadorReglas.php",
-    "destino": "motor-experto/src/motor_experto/dominio/conocimiento/reglas/EvaluadorReglas.php",
+    "destino": "motor-experto/dominio/conocimiento/reglas/EvaluadorReglas.php",
     "estado": "Migrado"
   },
   {
     "origen": "app/Backend/Modulos/SistemaExperto/MemoriaTrabajo/MemoriaTrabajo.php",
-    "destino": "motor-experto/src/motor_experto/dominio/inferencia/MemoriaTrabajo.php",
+    "destino": "motor-experto/dominio/inferencia/MemoriaTrabajo.php",
     "estado": "Migrado"
   },
   {
@@ -1225,12 +1225,12 @@
   },
   {
     "origen": "app/Backend/Modulos/SistemaExperto/Resolucion/ResolvedorSoportesCOGMEM.php",
-    "destino": "motor-experto/src/motor_experto/dominio/inferencia/ResolvedorSoportesCOGMEM.php",
+    "destino": "motor-experto/dominio/inferencia/ResolvedorSoportesCOGMEM.php",
     "estado": "Migrado"
   },
   {
     "origen": "app/Backend/Modulos/SistemaExperto/Servicios/DemostracionCOGMEM.php",
-    "destino": "motor-experto/src/motor_experto/aplicacion/casos_uso/DemostracionCOGMEM.php",
+    "destino": "motor-experto/aplicacion/casos_uso/DemostracionCOGMEM.php",
     "estado": "Migrado"
   },
   {
@@ -1250,7 +1250,7 @@
   },
   {
     "origen": "app/Backend/Modulos/SistemaExperto/Servicios/MotorExperto.php",
-    "destino": "motor-experto/src/motor_experto/aplicacion/casos_uso/MotorExperto.php",
+    "destino": "motor-experto/aplicacion/casos_uso/MotorExperto.php",
     "estado": "Migrado"
   },
   {
@@ -1260,7 +1260,7 @@
   },
   {
     "origen": "app/Backend/Modulos/SistemaExperto/Trazabilidad/ConstructorTraza.php",
-    "destino": "motor-experto/src/motor_experto/dominio/explicacion/ConstructorTraza.php",
+    "destino": "motor-experto/dominio/explicacion/ConstructorTraza.php",
     "estado": "Migrado"
   },
   {

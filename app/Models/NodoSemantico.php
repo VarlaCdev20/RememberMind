@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-// O.R.I.O.N. 4.16.2; restricciones físicas D-137.
+// sistema experto 4.16.2; restricciones físicas D-137.
 class NodoSemantico extends ModeloExperto
 {
     protected $table = 'nodos_semanticos';

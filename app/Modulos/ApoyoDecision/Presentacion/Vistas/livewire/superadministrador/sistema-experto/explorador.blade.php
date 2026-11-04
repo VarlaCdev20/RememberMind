@@ -1,0 +1,57 @@
+<section class="rm-card rm-expert-scopebar" aria-label="Procedencia del conocimiento">
+    <div><label for="expert-version-scope"><i class="ph ph-stack" aria-hidden="true"></i>Versión que desea consultar</label><select id="expert-version-scope" wire:change="seleccionarVersion($event.target.value)" class="rm-select w-full"><option value="" @selected($version === null)>Seleccione una versión institucional</option>@foreach($versiones as $v)<option value="{{ $v->cod_version_modelo }}" @selected($version === $v->cod_version_modelo)>{{ \App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto::version($v->codigo_version) }} · {{ $v->fecha_hora_retiro ? 'Retirada' : $v->estado }}</option>@endforeach</select></div>
+    <div><label for="lab-modo">Vista del conocimiento</label><select id="lab-modo" wire:model.live="modoConocimiento" class="rm-select w-full"><option value="reglas">Catálogo de reglas</option><option value="catalogo">Todos los datos y sus conexiones</option><option value="red">Red semántica</option><option value="versiones">Comparación de versiones</option></select></div>
+    <div class="rm-expert-origin"><i class="ph ph-eye" aria-hidden="true"></i><span>{{ $version ? 'Instantánea almacenada · solo consulta' : 'Seleccione una versión institucional · sin publicación clínica' }}</span></div>
+</section>
+<nav class="rm-expert-local-tabs" aria-label="Explorar el conocimiento"><button type="button" wire:click="explorarRed" aria-pressed="{{ $modoConocimiento === 'red' ? 'true' : 'false' }}"><i class="ph ph-graph" aria-hidden="true"></i>Mapa semántico</button><button type="button" wire:click="explorarCategoria('reglas_expertas')" aria-pressed="{{ $modoConocimiento === 'catalogo' && $tablaCatalogo === 'reglas_expertas' ? 'true' : 'false' }}"><i class="ph ph-gear" aria-hidden="true"></i>Reglas y condiciones</button><button type="button" wire:click="explorarCategoria('fuentes_datos_expertas')"><i class="ph ph-books" aria-hidden="true"></i>Fuentes y mapeos</button><button type="button" wire:click="explorarCategoria('nodos_semanticos')"><i class="ph ph-squares-four" aria-hidden="true"></i>Todos los datos</button></nav>
+@if($errorConocimiento)
+    <div class="rm-alert rm-alert-danger" role="alert"><div><strong>Error de integridad del conocimiento</strong><p>{{ $errorConocimiento }}</p></div></div>
+@elseif($conocimiento)
+    @if($modoConocimiento === 'reglas')
+        <x-ui.section-card title="Catálogo de reglas" subtitle="Condiciones y consecuencias del paquete seleccionado, sin duplicar reglas en la interfaz.">
+            <div class="rm-lab-filters">
+                <div><label for="lab-buscar-reglas">Buscar código, nombre o fundamento</label><input id="lab-buscar-reglas" wire:model.live.debounce.300ms="buscarReglas" type="search" class="rm-input w-full" maxlength="120"></div>
+                <div><label for="lab-dominio">Dominio</label><select id="lab-dominio" wire:model.live="dominio" class="rm-input w-full"><option value="">Todos</option>@foreach($dominios as $id => $nombre)<option value="{{ $id }}">{{ $nombre }}</option>@endforeach</select></div>
+                <div><label for="lab-estado-regla">Estado</label><select id="lab-estado-regla" wire:model.live="estadoRegla" class="rm-input w-full"><option value="">Todos</option><option value="ACTIVO">Activo</option><option value="INACTIVO">Inactivo</option></select></div>
+                <div><label for="lab-subcomponente">Subcomponente</label><select id="lab-subcomponente" wire:model.live="subcomponente" class="rm-input w-full"><option value="">Todos</option>@foreach(array_unique(array_column($conocimiento['reglas'], 'subcomponente')) as $sub)<option value="{{ $sub }}">{{ $sub }}</option>@endforeach</select></div>
+            </div>
+            <table class="rm-lab-table mt-4"><caption class="sr-only">Reglas de la versión seleccionada</caption><thead><tr><th scope="col">Código y nombre</th><th scope="col">Dominio y subcomponente</th><th scope="col">Versión y estado</th><th scope="col">Fundamento y modificación</th><th scope="col">Acciones</th></tr></thead><tbody>
+                @forelse($reglas as $r)
+                    <tr><td data-label="Código y nombre"><strong>{{ $r['nombre'] ?? $r['codigo'] }}</strong><p class="text-sm">{{ $r['codigo'] }}</p></td><td data-label="Dominio y subcomponente">{{ $dominios[$r['dominio']] ?? $r['dominio'] }}<p class="text-sm">{{ $r['subcomponente'] }}</p></td><td data-label="Versión y estado">{{ \App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto::version($r['version']) }}<p>{{ $r['estado'] }}</p></td><td data-label="Fundamento y modificación">{{ $r['fundamento'] ?? 'Fundamento no disponible en este contrato' }}<p class="text-sm text-rm-secondary">Última modificación: {{ $r['updated_at'] ?? 'No disponible' }}</p></td><td data-label="Acciones"><button type="button" data-expert-detail wire:click="abrirRegla(@js($r['id']))" class="rm-btn rm-btn-secondary">Consultar detalle<span class="sr-only"> de {{ $r['codigo'] }}</span></button></td></tr>
+                @empty
+                    <tr><td colspan="5"><x-ui.empty-state compact title="Sin reglas que coincidan" description="Revise los filtros o seleccione otra versión del conocimiento." /></td></tr>
+                @endforelse
+            </tbody></table>
+            {{ $reglas->links() }}
+        </x-ui.section-card>
+    @elseif($modoConocimiento === 'catalogo')
+        <x-ui.section-card title="Catálogo del conocimiento" subtitle="Filas originales de conceptos, dominios, variables, fuentes, relaciones y mapeos de esta versión.">
+            <nav class="rm-knowledge-categories" aria-label="Categorías de conocimiento">
+                @foreach(['nodos_semanticos' => 'Conceptos', 'relaciones_semanticas' => 'Relaciones', 'variables_expertas' => 'Variables', 'fuentes_datos_expertas' => 'Fuentes', 'mapeos_variables_fuente' => 'Mapeos de variables', 'mapeos_valores_fuente' => 'Mapeos de valores', 'reglas_expertas' => 'Reglas', 'condiciones_regla_experta' => 'Condiciones', 'consecuencias_regla_experta' => 'Consecuencias', 'dominios_valores_expertos' => 'Dominios de valores', 'valores_semanticos' => 'Valores', 'criterios_dominios_resultado' => 'Criterios'] as $tabla => $nombre)
+                    <button type="button" wire:click="$set('tablaCatalogo', '{{ $tabla }}')" class="rm-btn {{ $tablaCatalogo === $tabla ? 'rm-btn-primary' : 'rm-btn-secondary' }}" aria-pressed="{{ $tablaCatalogo === $tabla ? 'true' : 'false' }}">{{ $nombre }} <span>{{ count($conocimiento['tablas'][$tabla] ?? []) }}</span></button>
+                @endforeach
+            </nav>
+            <div class="mt-4"><label for="expert-catalog-search" class="block font-semibold">Buscar en la categoría seleccionada</label><input id="expert-catalog-search" class="rm-input w-full" type="search" maxlength="120" wire:model.live.debounce.300ms="buscarCatalogo"></div>
+            <div class="rm-knowledge-records mt-4">
+                @forelse($filasCatalogo as $fila)
+                    <article class="rm-knowledge-version"><div><h3 class="font-semibold">{{ $fila['nombre'] ?? $fila['codigo_semantico'] ?? $fila['codigo_regla'] ?? $fila['tipo_relacion'] ?? $fila[$pkCatalogo] }}</h3><p>{{ $fila['definicion'] ?? $fila['descripcion'] ?? $fila['estado'] ?? 'Registro declarado en la versión seleccionada' }}</p><small>{{ $fila[$pkCatalogo] }}</small></div><button type="button" data-expert-detail wire:click="abrirRegistro(@js($fila[$pkCatalogo]))" class="rm-btn rm-btn-secondary">Ver detalle<span class="sr-only"> de {{ $fila[$pkCatalogo] }}</span></button></article>
+                @empty
+                    <x-ui.empty-state compact title="Sin registros en esta categoría" description="Revise la búsqueda o seleccione otra categoría del conocimiento." />
+                @endforelse
+            </div>
+            {{ $filasCatalogo->links() }}
+        </x-ui.section-card>
+    @elseif($modoConocimiento === 'red')
+        @include('livewire.superadministrador.sistema-experto.red-semantica')
+    @elseif($modoConocimiento === 'versiones')
+        <x-ui.section-card title="Comparación técnica de versiones" subtitle="Consulta los cambios entre versiones de las reglas por su código semántico.">
+            <label for="lab-comparada" class="block font-semibold mb-2">Comparar la versión consultada con</label>
+            <select id="lab-comparada" wire:model.live="versionComparada" class="rm-input w-full"><option value="">Seleccione una versión almacenada</option>@foreach($versiones as $v)<option value="{{ $v->cod_version_modelo }}">{{ \App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto::version($v->codigo_version) }} · {{ $v->estado }}</option>@endforeach</select>
+            @forelse($comparacion as $id => $c)
+                <details class="rm-expert-source mt-3"><summary>{{ $id }} · {{ $c['estado'] }}</summary><div class="rm-lab-grid mt-3"><div><h3 class="font-semibold">Versión consultada</h3>@include('livewire.superadministrador.sistema-experto.datos', ['datos' => $c['antes']])</div><div><h3 class="font-semibold">Versión comparada</h3>@include('livewire.superadministrador.sistema-experto.datos', ['datos' => $c['despues']])</div></div></details>
+            @empty
+                <p class="mt-4 text-rm-secondary">Seleccione dos versiones disponibles para consultar diferencias. El impacto sobre resultados de casos sigue restringido a las pruebas técnicas de consola.</p>
+            @endforelse
+        </x-ui.section-card>
+    @endif
+@endif

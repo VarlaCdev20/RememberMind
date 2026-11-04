@@ -59,7 +59,12 @@ class RolesAndPermissionsSeeder extends Seeder
             'roles.editar_permisos',
         ];
         $permisos = array_merge($permisos, [
+            'valoraciones_petersen.ver', 'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar',
+            'controles_funcionales_iadl.ver', 'controles_funcionales_iadl.crear', 'controles_funcionales_iadl.rectificar',
+            'reglas_expertas.ver', 'reglas_expertas.gestionar', 'reglas_expertas.revisar',
+            'evaluaciones_expertas.revisar_medicina', 'evaluaciones_expertas.revisar_psicologia', 'evaluaciones_expertas.ejecutar_observaciones',
             'auditoria.ver', 'usuarios.gestionar', 'personal.gestionar', 'areas.gestionar', 'turnos.gestionar',
+            'fotografias_institucionales.ver', 'fotografias_institucionales.gestionar',
             'jornadas.gestionar', 'asignaciones_personal.gestionar',
             'preadmisiones.crear', 'preadmisiones.revisar', 'admisiones.formalizar',
             'residentes.gestionar', 'residentes.actualizar_administrativo', 'residentes_contactos.gestionar',
@@ -77,7 +82,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'ejecuciones_cuidado.crear', 'prescripciones.crear', 'prescripciones.editar', 'prescripciones.suspender',
             'atenciones.editar', 'atenciones.anular', 'notas_clinicas.editar', 'notas_clinicas.anular',
             'signos_vitales.editar', 'signos_vitales.anular', 'administraciones_medicacion.crear',
-            'aplicaciones_instrumento.crear', 'aplicaciones_instrumento.editar', 'aplicaciones_instrumento.anular',
+            'aplicaciones_instrumento.crear', 'aplicaciones_instrumento.editar', 'aplicaciones_instrumento.anular', 'aplicaciones_instrumento.transcribir',
             'valoraciones_psicologicas.crear', 'valoraciones_nutricionales.crear',
             'valoraciones_funcionales.crear', 'valoraciones_funcionales.editar', 'seguimientos_pedagogicos.crear', 'actividades.gestionar',
             'visitas.gestionar', 'alertas.gestionar', 'alertas.reconocer', 'alertas.asignar',
@@ -95,18 +100,20 @@ class RolesAndPermissionsSeeder extends Seeder
         // Durante la construcción del sistema recibe todos los permisos web,
         // incluidos los que se hayan creado fuera de este seeder.
         $roles['SUPERADMINISTRADOR']->syncPermissions(
-            Permission::query()->where('guard_name', 'web')->get()
+            Permission::query()->where('guard_name', 'web')->whereNotIn('name', ['fotografias_institucionales.gestionar', 'evaluaciones_expertas.ejecutar_observaciones', 'reglas_expertas.gestionar', 'reglas_expertas.revisar', 'aplicaciones_instrumento.transcribir', 'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar', 'controles_funcionales_iadl.crear', 'controles_funcionales_iadl.rectificar'])->get()
         );
 
         // Dirección institucional: personal, organización, planificación maestra
         // y lectura de los indicadores necesarios para conducir la residencia.
         $roles['GERENTE']->syncPermissions(array_values(array_unique(array_merge($this->permitir($permisos, [
             'personal', 'areas', 'turnos', 'jornadas.ver', 'asignaciones_personal.ver',
+            'contactos.ver', 'contactos.gestionar', 'residentes_contactos.ver', 'residentes_contactos.gestionar',
             'residentes.ver', 'habitaciones.ver', 'camas.ver', 'ocupaciones_cama.ver',
             'preadmisiones.ver', 'admisiones.ver', 'alertas.ver', 'incidentes.ver',
             'reportes.ver', 'reportes.institucional',
         ]), [
             'personal_institucional.ver', 'areas.reportes', 'turnos.crear', 'turnos.editar',
+            'fotografias_institucionales.ver', 'fotografias_institucionales.gestionar',
             'turnos.cambiar_estado', 'asignacion_turno.ver', 'asignaciones.ver',
         ]))));
 
@@ -119,20 +126,23 @@ class RolesAndPermissionsSeeder extends Seeder
             'incidentes.ver',
         ]), [
             'admisiones.ver_dashboard', 'admisiones.crear', 'asignacion_turno.ver', 'asignaciones.ver',
+            'fotografias_institucionales.ver', 'fotografias_institucionales.gestionar',
             'turnos.asignar', 'turnos.finalizar',
             'reportes.ver', 'reportes.institucional', 'reportes.exportar_pdf', 'reportes.individual',
             'documentos.subir', 'documentos.archivar',
         ]))));
 
         $roles['MEDICO GENERAL/GERIATRA']->syncPermissions(array_values(array_unique(array_merge($this->permitir($permisos, [
+            'reglas_expertas',
             'residentes.ver', 'atenciones', 'notas_clinicas', 'antecedentes_clinicos', 'diagnosticos', 'alergias',
             'seguros_residente.ver', 'dispositivos_clinicos', 'signos_vitales', 'objetivos_signos_vitales', 'valoraciones_dolor',
             'mediciones_antropometricas', 'estudios_clinicos', 'resultados_estudio', 'informes_estudio',
             'documentos_clinicos', 'derivaciones', 'incidentes', 'indicaciones_clinicas', 'controles_cognitivos',
             'registros_', 'heridas', 'curaciones_herida', 'planes_cuidado', 'prescripciones',
             'horarios_prescripcion.ver', 'administraciones_medicacion', 'aplicaciones_instrumento',
+            'respuestas_instrumento.ver', 'instrumentos.ver', 'preguntas_instrumento.ver', 'opciones_pregunta.ver',
             'valoraciones_', 'alertas.ver',
-        ]), ['salud.ver', 'valoracion_medica.ver', 'valoracion_enfermeria.ver']))));
+        ]), ['salud.ver', 'valoracion_medica.ver', 'valoracion_enfermeria.ver', 'evaluaciones_expertas.revisar_medicina']))));
 
         $roles['ENFERMEROS']->syncPermissions(array_values(array_unique(array_merge($this->permitir($permisos, [
             'residentes.ver', 'ocupaciones_cama.ver', 'atenciones.ver', 'atenciones.crear', 'atenciones.editar', 'notas_clinicas', 'antecedentes_clinicos.ver',
@@ -148,12 +158,30 @@ class RolesAndPermissionsSeeder extends Seeder
             // Lecturas de cuidados aprobadas por la propietaria el 2026-10-07.
             'registros_conductuales.ver', 'registros_sueno.ver', 'registros_ingesta.ver',
             'registros_hidratacion.ver', 'registros_eliminacion.ver', 'registros_movilidad.ver',
+            // Creación contextual de episodios independientes aprobada el 2026-10-13.
+            'registros_conductuales.crear',
         ]))));
 
         $roles['PSICOLOGO/A']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'controles_cognitivos.ver', 'registros_conductuales', 'registros_sueno.ver', 'instrumentos.ver', 'preguntas_instrumento.ver', 'opciones_pregunta.ver', 'aplicaciones_instrumento', 'respuestas_instrumento.ver', 'valoraciones_psicologicas', 'planes_cuidado.ver', 'alertas.ver']));
-        $roles['NUTRICIONISTA']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'diagnosticos.ver', 'alergias.ver', 'indicaciones_clinicas.ver', 'mediciones_antropometricas', 'registros_ingesta.ver', 'registros_hidratacion.ver', 'registros_eliminacion.ver', 'valoraciones_nutricionales', 'planes_cuidado']));
-        $roles['FISIOTERAPEUTA']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'diagnosticos.ver', 'dispositivos_clinicos.ver', 'signos_vitales.ver', 'valoraciones_dolor', 'registros_movilidad', 'valoraciones_funcionales', 'planes_cuidado']));
-        $roles['PEDAGOGO']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'atenciones', 'notas_clinicas', 'indicaciones_clinicas.ver', 'controles_cognitivos.ver', 'registros_conductuales.ver', 'planes_cuidado', 'seguimientos_pedagogicos', 'actividades']));
+        $roles['PSICOLOGO/A']->givePermissionTo('evaluaciones_expertas.revisar_psicologia');
+        $roles['PSICOLOGO/A']->givePermissionTo(['reglas_expertas.ver', 'reglas_expertas.gestionar', 'reglas_expertas.revisar']);
+        $roles['MEDICO GENERAL/GERIATRA']->givePermissionTo('evaluaciones_expertas.ejecutar_observaciones');
+        $roles['PSICOLOGO/A']->givePermissionTo('evaluaciones_expertas.ejecutar_observaciones');
+        $roles['MEDICO GENERAL/GERIATRA']->givePermissionTo('aplicaciones_instrumento.transcribir');
+        $roles['PSICOLOGO/A']->givePermissionTo('aplicaciones_instrumento.transcribir');
+        $roles['MEDICO GENERAL/GERIATRA']->givePermissionTo(['valoraciones_petersen.ver', 'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar']);
+        $roles['PSICOLOGO/A']->givePermissionTo(['valoraciones_petersen.ver', 'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar']);
+        $roles['MEDICO GENERAL/GERIATRA']->givePermissionTo('controles_funcionales_iadl.ver');
+        $roles['PSICOLOGO/A']->givePermissionTo('controles_funcionales_iadl.ver');
+        // Captura descriptiva aprobada por la propietaria el 28/10/2026.
+        foreach (['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A'] as $rolIadl) {
+            $roles[$rolIadl]->givePermissionTo(['controles_funcionales_iadl.crear', 'controles_funcionales_iadl.rectificar']);
+        }
+        // Consulta de Alertas aprobada por la propietaria (21/10/2026).
+        // Cada especialidad conserva su ámbito; no se concede gestión del aviso.
+        $roles['NUTRICIONISTA']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'alertas.ver', 'atenciones', 'notas_clinicas', 'diagnosticos.ver', 'alergias.ver', 'indicaciones_clinicas.ver', 'mediciones_antropometricas', 'registros_ingesta.ver', 'registros_hidratacion.ver', 'registros_eliminacion.ver', 'valoraciones_nutricionales', 'planes_cuidado']));
+        $roles['FISIOTERAPEUTA']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'alertas.ver', 'atenciones', 'notas_clinicas', 'diagnosticos.ver', 'dispositivos_clinicos.ver', 'signos_vitales.ver', 'valoraciones_dolor', 'registros_movilidad', 'valoraciones_funcionales', 'planes_cuidado']));
+        $roles['PEDAGOGO']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'alertas.ver', 'atenciones', 'notas_clinicas', 'indicaciones_clinicas.ver', 'controles_cognitivos.ver', 'registros_conductuales.ver', 'planes_cuidado', 'seguimientos_pedagogicos', 'actividades']));
         $roles['FAMILIAR']->syncPermissions($this->permitir($permisos, ['residentes.ver', 'residentes_contactos.ver', 'documentos.ver', 'consentimientos.ver', 'actividades.ver', 'participantes_actividad.ver', 'visitas.ver']));
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();

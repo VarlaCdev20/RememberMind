@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\CARLAENCINAS\Desktop\RememberMind\phpunit.xml" tests="7" assertions="3009" errors="0" failures="0" skipped="0" time="51.657277">
+    <testsuite name="Unit" tests="2" assertions="186" errors="0" failures="0" skipped="0" time="0.008947">
+      <testsuite name="Tests\Unit\ManifiestoCognitivo30Test" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Unit\ManifiestoCognitivo30Test.php" tests="2" assertions="186" errors="0" failures="0" skipped="0" time="0.008947">
+        <testcase name="test_cobertura_versionada_y_metodos_existentes_sin_afirmar_datos_individuales_importados" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Unit\ManifiestoCognitivo30Test.php" line="14" class="Tests\Unit\ManifiestoCognitivo30Test" classname="Tests.Unit.ManifiestoCognitivo30Test" assertions="176" time="0.007753"/>
+        <testcase name="test_retroalimentacion_detecta_discrepancia_dominio_salida_omitida_duplicacion_y_caso_no_ejecutado" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Unit\ManifiestoCognitivo30Test.php" line="39" class="Tests\Unit\ManifiestoCognitivo30Test" classname="Tests.Unit.ManifiestoCognitivo30Test" assertions="10" time="0.001193"/>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Feature" tests="5" assertions="2823" errors="0" failures="0" skipped="0" time="51.648331">
+      <testsuite name="Tests\Feature\CohorteInferencia30Test" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CohorteInferencia30Test.php" tests="4" assertions="2185" errors="0" failures="0" skipped="0" time="48.654347">
+        <testcase name="test_treinta_admisiones_fuentes_originales_dos_ramas_y_cuatro_perfiles_reproducibles" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CohorteInferencia30Test.php" line="32" class="Tests\Feature\CohorteInferencia30Test" classname="Tests.Feature.CohorteInferencia30Test" assertions="2161" time="31.442667"/>
+        <testcase name="test_rechaza_entorno_local_antes_de_escribir" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CohorteInferencia30Test.php" line="255" class="Tests\Feature\CohorteInferencia30Test" classname="Tests.Feature.CohorteInferencia30Test" assertions="3" time="0.691336"/>
+        <testcase name="test_seeder_artisan_rechaza_destino_no_confirmado_sin_escrituras" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CohorteInferencia30Test.php" line="270" class="Tests\Feature\CohorteInferencia30Test" classname="Tests.Feature.CohorteInferencia30Test" assertions="4" time="0.693395"/>
+        <testcase name="test_fallo_parcial_revierte_admision_fuentes_auditoria_y_correlativos" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\CohorteInferencia30Test.php" line="292" class="Tests\Feature\CohorteInferencia30Test" classname="Tests.Feature.CohorteInferencia30Test" assertions="17" time="15.826949"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\ObservacionesVariadasSinteticasTest" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\ObservacionesVariadasSinteticasTest.php" tests="1" assertions="638" errors="0" failures="0" skipped="0" time="2.993984">
+        <testcase name="test_registra_veinte_episodios_ficticios_con_fechas_autoria_y_hallazgos_reales_del_motor" file="C:\Users\CARLAENCINAS\Desktop\RememberMind\tests\Feature\ObservacionesVariadasSinteticasTest.php" line="31" class="Tests\Feature\ObservacionesVariadasSinteticasTest" classname="Tests.Feature.ObservacionesVariadasSinteticasTest" assertions="638" time="2.993984"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

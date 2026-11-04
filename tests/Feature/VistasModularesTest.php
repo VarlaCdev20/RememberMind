@@ -22,6 +22,24 @@ class VistasModularesTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_horario_de_enfermeria_abre_con_su_clasificacion_institucional(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $administrador = User::factory()->create();
+        $administrador->assignRole('SUPERADMINISTRADOR');
+        $enfermera = User::factory()->create();
+        $enfermera->assignRole('ENFERMEROS');
+        Personal::create(['cod_usuario' => $enfermera->getKey(), 'nombres' => 'Enfermera sintética',
+            'apellido_paterno' => 'Prueba', 'numero_documento' => 'DOC-HORARIO-UI', 'profesion' => 'ENFERMERÍA', 'estado' => 'ACTIVO']);
+        $this->actingAs($administrador);
+
+        Livewire::test(PersonalInstitucionalPanel::class)
+            ->call('abrirHorariosPersonal', $enfermera->getKey())
+            ->assertSet('modalGestionAbierto', true)->assertSet('modalTabInicial', 'horarios')
+            ->assertSeeLivewire(\App\Modulos\Institucion\Presentacion\Livewire\Funcionalidades\PersonalInstitucionalHorarios::class)
+            ->assertSee('ENFERMEROS')->assertSee('Horarios y turnos');
+    }
+
     public function test_formularios_extraidos_abren_y_cierran_en_sus_componentes(): void
     {
         $this->seed(RolesAndPermissionsSeeder::class);

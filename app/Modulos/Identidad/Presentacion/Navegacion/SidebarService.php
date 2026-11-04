@@ -98,6 +98,7 @@ class SidebarService
             $this->buildSection('Dashboard', 'ph-house', 'dashboard', [], false, null, null, 'INICIO'),
             $this->buildSection('Gestión del sistema', 'ph-shield-check', null, [
                 $this->buildItem('Usuarios', 'admin.usuarios.index', 'usuarios.ver'),
+                $this->buildItem('Mis envíos de correo', 'admin.usuarios.correos.index', 'usuarios.ver'),
                 $this->buildItem('Roles y permisos', 'admin.roles-permisos.index', 'roles.ver'),
                 $this->buildItem('Auditoría', 'admin.bitacora.index', 'bitacora.ver'),
                 $this->buildItem('Sistema experto · revisión', 'admin.sistema-experto.index', 'auditoria.ver'),
@@ -130,7 +131,7 @@ class SidebarService
                 $this->buildItem('Medicación', 'admin.salud-seguimiento.medicacion.index', 'prescripciones.ver'),
                 $this->buildItem('Seguimiento', 'admin.salud-seguimiento.index', 'atenciones.ver'),
                 $this->buildItem('Valoraciones', 'admin.salud-seguimiento.valoracion.index', 'valoraciones_funcionales.ver'),
-                $this->buildItem('Instrumentos', 'admin.instrumentos.index', 'instrumentos.ver'),
+                $this->buildItem('Instrumentos y guías', 'admin.psicologia.evaluacion.cognitiva', 'instrumentos.ver', null, [], ['admin.psicologia.evaluacion.*']),
             ], false, null, null, 'ÁREA CLÍNICA'),
             $this->buildSection('Reportes', 'ph-chart-bar', 'admin.reportes.institucional.preview', [], false, 'reportes.institucional', null, 'INFORMACIÓN'),
             $this->buildSection('Mi perfil', 'ph-user-circle', 'profile.show', [], false, null, null, 'CUENTA'),
@@ -148,19 +149,21 @@ class SidebarService
             $this->buildSection('Inicio', 'ph-house', 'dashboard'),
             $this->buildSection('Personal', 'ph-identification-badge', null, [
                 $this->buildItem('Personal institucional', 'admin.personal-institucional', 'personal_institucional.ver'),
-                $this->buildItem('Personal por área', 'admin.areas-institucionales.index', 'areas.ver'),
+                $this->buildItem('Documentación laboral', 'admin.personal.documentacion', 'personal_institucional.ver'),
+                $this->buildItem('Familiares y contactos', 'admin.familia-social.red-apoyo', 'residentes_contactos.ver'),
             ]),
             $this->buildSection('Organización', 'ph-buildings', null, [
-                $this->buildItem('Áreas', 'admin.areas-institucionales.index', 'areas.ver'),
-                $this->buildItem('Turnos y planificación', 'admin.turnos-asignaciones.index', 'turnos.ver'),
-                $this->buildItem('Cobertura', 'admin.turnos-enfermeria.index', 'jornadas.ver'),
+                $this->buildItem('Áreas y equipo', 'admin.areas-institucionales.index', 'areas.ver'),
+                $this->buildItem('Planificación del equipo', 'admin.turnos-asignaciones.index', 'turnos.ver'),
+                $this->buildItem('Cobertura del equipo', 'admin.cobertura-equipo.index', 'jornadas.ver'),
             ]),
             $this->buildSection('Consulta institucional', 'ph-chart-line-up', null, [
-                $this->buildItem('Residentes', 'admin.adultos-mayores.index', 'residentes.ver'),
+                $this->buildItem('Residentes', 'admin.residentes.index', 'residentes.ver'),
                 $this->buildItem('Ocupación', 'admin.habitaciones.index', 'habitaciones.ver'),
-                $this->buildItem('Alertas relevantes', 'admin.alertas-clinicas.index', 'alertas.ver'),
+                $this->buildItem('Alertas', 'admin.alertas-clinicas.index', 'alertas.ver'),
                 $this->buildItem('Reportes gerenciales', 'admin.reportes.institucional.preview', 'reportes.institucional'),
             ]),
+            $this->buildSection('Galería', 'ph-images', 'admin.galeria.index', [], false, 'fotografias_institucionales.ver'),
         ]));
     }
 
@@ -185,12 +188,14 @@ class SidebarService
                 $this->buildItem('Ocupación', 'admin.administracion.ocupacion', 'ocupaciones_cama.ver'),
             ]),
             $this->buildAdministradorGroup('Operación diaria', 'ph-calendar-check', [
+                $this->buildItem('Galería del centro', 'admin.galeria.index', 'fotografias_institucionales.ver'),
                 $this->buildItem('Jornadas', 'admin.administracion.jornadas', 'jornadas.ver'),
                 $this->buildItem('Asignaciones', 'admin.administracion.asignaciones', 'asignaciones_personal.ver'),
                 $this->buildItem('Actividades', 'admin.administracion.actividades', 'actividades.ver'),
                 $this->buildItem('Visitas', 'admin.administracion.visitas', 'visitas.ver'),
             ]),
             $this->buildAdministradorGroup('Documentación', 'ph-files', [
+                $this->buildItem('Mis envíos de correo', 'admin.usuarios.correos.index', 'usuarios.ver'),
                 $this->buildItem('Contactos y responsables', 'admin.administracion.contactos', 'contactos.ver'),
                 $this->buildItem('Documentos', 'admin.administracion.documentacion', 'documentos.ver', $badges['documentacion']),
                 $this->buildItem('Consentimientos', 'admin.administracion.consentimientos', 'consentimientos.ver'),
@@ -279,19 +284,18 @@ class SidebarService
         // Rol de enfermería: navegación operativa breve, sin módulos administrativos.
         $sections[] = $this->buildSection('Mi turno', 'ph-sun-horizon', 'admin.enfermeria.dashboard', [], false, 'enfermeria.ver_dashboard');
         $sections[] = $this->buildSection('Mis residentes', 'ph-users', 'admin.enfermeria.pacientes', [], false, 'enfermeria.ver_pacientes_asignados');
-        $cuidados = [];
-        foreach (NavegacionCuidadosService::opciones() as $clave => $opcion) {
-            $cuidados[] = $this->buildItem(
-                $opcion['label'], $opcion['route'] ?? 'admin.enfermeria.pacientes',
-                $opcion['permission'], null,
-                array_merge($opcion['parameters'] ?? [], ['cuidado' => $clave]),
-                isset($opcion['route']) ? ['admin.enfermeria.pacientes'] : [],
-            );
-        }
-        $sections[] = $this->buildSection('Cuidados', 'ph-heartbeat', null, $cuidados, true);
         $sections[] = $this->buildSection('Medicación', 'ph-pill', 'admin.enfermeria.medicacion', [], false, 'enfermeria.ver_dashboard');
         $sections[] = $this->buildSection('Alertas', 'ph-warning', 'admin.enfermeria.alertas', [], false, 'alertas.ver', $alertasBadge);
         $sections[] = $this->buildSection('Incidentes', 'ph-first-aid', 'admin.enfermeria.incidentes', [], false, 'atenciones.ver');
+        $cuidados = $this->buildSection('Cuidados', 'ph-heartbeat', 'admin.enfermeria.cuidados', [], false, 'enfermeria.ver_dashboard');
+        if ($cuidados && collect(NavegacionCuidadosService::opciones())->contains(fn ($opcion) => $user?->can($opcion['permission']))) {
+            $cuidados['active_routes'] = ['admin.enfermeria.registros', 'admin.enfermeria.seguimiento'];
+            if (is_string(request()->query('cuidado')) && request()->query('cuidado') !== '') {
+                $cuidados['active_routes'][] = 'admin.enfermeria.pacientes';
+                $cuidados['parameters'] = ['cuidado' => request()->query('cuidado')];
+            }
+            $sections[] = $cuidados;
+        }
         $sections[] = $this->buildSection('Pase de turno', 'ph-arrows-clockwise', 'admin.enfermeria.pase-turno', [], false, 'pases_turno.ver');
 
         return array_values(array_filter($sections));
@@ -315,8 +319,11 @@ class SidebarService
         $sidebar[] = $this->buildSection('Interconsultas', 'ph-chats-circle', 'admin.medico.interconsultas');
         $sidebar[] = $this->buildSection('Signos vitales', 'ph-heartbeat', 'admin.medico.signos-vitales');
         $sidebar[] = $this->buildSection('Fichas clínicas', 'ph-folder-user', 'admin.salud-seguimiento.ficha.index');
+        if ($user->personal()->where('estado', 'ACTIVO')->where('profesion', 'MEDICINA')->exists()) {
+            $sidebar[] = $this->buildSection('Sistema experto', 'ph-brain', 'admin.sistema-experto.residentes', [], false, 'residentes.ver');
+        }
         $sidebar[] = $this->buildSection('Medicación', 'ph-pill', 'admin.salud-seguimiento.medicacion.index');
-        $sidebar[] = $this->buildSection('Alertas clínicas', 'ph-bell-ringing', 'admin.salud-seguimiento.alertas');
+        $sidebar[] = $this->buildSection('Alertas clínicas', 'ph-bell-ringing', 'admin.alertas-clinicas.index', [], false, 'alertas.ver');
         $sidebar[] = $this->buildSection('Reportes', 'ph-chart-bar', 'admin.salud-seguimiento.reportes');
 
         return array_values(array_filter($sidebar));
@@ -327,7 +334,6 @@ class SidebarService
     // =========================================================
     private function getPsicologoSidebar($user = null, bool $isSuperadminSupervising = false): array
     {
-        $user ??= auth()->user();
         $sidebar = [];
 
         if ($isSuperadminSupervising) {
@@ -335,15 +341,33 @@ class SidebarService
         }
 
         $sidebar[] = $this->buildSection('Inicio', 'ph-house', 'admin.psicologia.dashboard');
-        $sidebar[] = $this->buildSection('Mis pacientes', 'ph-users-three', 'admin.psicologia.evaluaciones');
+        $sidebar[] = $this->buildSection('Alertas de Psicología', 'ph-bell-ringing', 'admin.alertas-clinicas.index', [], false, 'alertas.ver');
+        $misResidentes = $this->buildSection('Mis residentes', 'ph-users-three', 'admin.psicologia.evaluaciones');
+        if ($misResidentes !== null) {
+            $misResidentes['active_routes'] = [
+                'admin.psicologia.residente.ficha',
+                'admin.psicologia.residente.resultados-experto',
+            ];
+            $sidebar[] = $misResidentes;
+        }
+
+        $user ??= auth()->user();
+        if ($user?->hasRole('PSICOLOGO/A')
+            && $user->personal()->where('estado', 'ACTIVO')->where('profesion', 'PSICOLOGIA')->exists()) {
+            $sidebar[] = $this->buildSection('Sistema experto', 'ph-brain', 'admin.sistema-experto.residentes', [], false, 'residentes.ver');
+        }
+
+        $sidebar[] = $this->buildSection('Agenda y sesiones', 'ph-calendar-check', 'admin.psicologia.agenda', [], false, 'atenciones.ver');
 
         $sidebar[] = $this->buildSection('Valoraciones', 'ph-list-magnifying-glass', null, [
             $this->buildItem('Cognitiva', 'admin.psicologia.evaluacion.cognitiva'),
-            $this->buildItem('Afectiva', 'admin.psicologia.evaluacion.afectiva'),
+            $this->buildItem('Afectiva y emocional', 'admin.psicologia.evaluacion.afectiva'),
             $this->buildItem('Funcionamiento', 'admin.psicologia.evaluacion.funcionamiento'),
             $this->buildItem('Entorno y red social', 'admin.psicologia.evaluacion.entorno'),
         ]);
 
+        $sidebar[] = $this->buildSection('Seguimiento psicológico', 'ph-heartbeat', 'admin.psicologia.seguimiento', [], false, 'atenciones.ver');
+        $sidebar[] = $this->buildSection('Informes psicológicos', 'ph-file-text', 'admin.psicologia.informes', [], false, 'valoraciones_psicologicas.ver');
         return array_values(array_filter($sidebar));
     }
 
@@ -354,6 +378,7 @@ class SidebarService
     {
         $sidebar = [
             $this->buildSection('Inicio', 'ph-house', 'dashboard'),
+            $this->buildSection('Alertas de mi especialidad', 'ph-bell-ringing', 'admin.alertas-clinicas.index', [], false, 'alertas.ver'),
             $this->buildSection('Residentes', 'ph-users-four', 'admin.adultos-mayores.index'),
             $this->buildSection('Reportes', 'ph-chart-bar', 'admin.reportes.adultos.preview'),
         ];
@@ -362,24 +387,26 @@ class SidebarService
     }
 
     // =========================================================
-    //  FISIOTERAPEUTA (todas las rutas son placeholder)
+    //  FISIOTERAPEUTA
     // =========================================================
     private function getFisioterapeutaSidebar(): array
     {
         $sidebar = [
             $this->buildSection('Inicio', 'ph-house', 'dashboard'),
+            $this->buildSection('Alertas de mi especialidad', 'ph-bell-ringing', 'admin.alertas-clinicas.index', [], false, 'alertas.ver'),
         ];
 
         return array_values(array_filter($sidebar));
     }
 
     // =========================================================
-    //  NUTRICIONISTA (sin módulo navegable activo en esta fase)
+    //  NUTRICIONISTA
     // =========================================================
     private function getNutricionistaSidebar(): array
     {
         $sidebar = [
             $this->buildSection('Inicio', 'ph-house', 'dashboard'),
+            $this->buildSection('Alertas de mi especialidad', 'ph-bell-ringing', 'admin.alertas-clinicas.index', [], false, 'alertas.ver'),
         ];
 
         return array_values(array_filter($sidebar));
@@ -569,7 +596,7 @@ class SidebarService
 
             return [
                 'preadmisiones' => $badge(DB::table('preadmisiones')->where('estado', 'PENDIENTE')->count()),
-                'alertas' => $badge(DB::table('alertas')->whereNotIn('estado', ['CERRADA', 'ANULADA'])->count()),
+                'alertas' => $badge(DB::table('alertas')->whereIn('estado', Alerta::ESTADOS_ACTIVOS)->count()),
                 'incidentes' => $badge(DB::table('incidentes')->whereNotIn('estado', ['CERRADO', 'CERRADA', 'ANULADO', 'ANULADA'])->count()),
             ];
         });
@@ -586,7 +613,7 @@ class SidebarService
                     ->whereNotExists(fn ($query) => $query->selectRaw('1')->from('admisiones as ad')
                         ->whereColumn('ad.cod_preadmision', 'pre.cod_preadmision'))->count()),
                 'documentacion' => $badge(DB::table('documentos')->whereIn('estado', ['PENDIENTE', 'POR_VALIDAR'])->count()),
-                'alertas' => $badge(DB::table('alertas')->whereNotIn('estado', ['CERRADA', 'ANULADA'])->count()),
+                'alertas' => $badge(DB::table('alertas')->whereIn('estado', Alerta::ESTADOS_ACTIVOS)->count()),
             ];
         });
     }

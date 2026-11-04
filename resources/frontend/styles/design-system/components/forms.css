@@ -9,6 +9,28 @@
    - Controles: Checkbox, radio y toggle con acento institucional
    ============================================================ */
 
+.rm-free-text-select { min-width:0; }
+.rm-free-text-select__control { position:relative; }
+.rm-free-text-select__control > i { position:absolute; inset-inline-start:12px; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--rm-text-secondary); font-size:18px; }
+.rm-free-text-select__control .rm-select { width:100%; padding-inline-start:38px; }
+.rm-free-text-select__custom { display:grid; gap:6px; min-width:0; }
+.rm-free-text-select__custom .rm-input { width:100%; }
+.rm-free-text-select__examples { min-width:0; border:1px solid var(--rm-border-soft); border-radius:var(--rm-radius-md); background:var(--rm-surface-soft); }
+.rm-free-text-select__examples > summary { display:flex; align-items:center; gap:7px; min-height:44px; padding:9px 11px; list-style:none; cursor:pointer; color:var(--rm-primary-ink); font:700 var(--rm-font-size-label)/1.4 var(--rm-font-friendly); }
+.rm-free-text-select__examples > summary::-webkit-details-marker { display:none; }
+.rm-free-text-select__examples > summary > i:last-child { margin-left:auto; }
+.rm-free-text-select__examples[open] > summary > i:last-child { transform:rotate(180deg); }
+.rm-free-text-select__examples > summary:focus-visible { outline:2px solid var(--rm-focus); outline-offset:2px; }
+.rm-free-text-select__examples-body { display:grid; gap:9px; padding:0 10px 10px; }
+.rm-free-text-select__examples-body .rm-input { width:100%; }
+.rm-free-text-select__examples-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; max-height:300px; overflow-y:auto; overscroll-behavior:contain; padding:4px; scrollbar-width:thin; }
+.rm-free-text-select__examples-grid > button { display:flex; align-items:center; gap:9px; min-width:0; min-height:84px; padding:9px; border:1px solid var(--rm-border-soft); border-radius:var(--rm-radius-sm); background:var(--rm-surface-raised); color:var(--rm-text-primary); font:700 var(--rm-font-size-label)/1.4 var(--rm-font-friendly); text-align:left; overflow-wrap:anywhere; }
+.rm-free-text-select__examples-grid > button > span:last-child { min-width:0; }
+.rm-free-text-select__examples-grid > button:is(:hover,[aria-pressed="true"]) { border-color:var(--rm-primary); background:var(--rm-selected-bg); color:var(--rm-primary-ink); box-shadow:var(--rm-shadow-input); }
+.rm-free-text-select__examples-grid > button[aria-pressed="true"] { outline:1px solid var(--rm-primary); outline-offset:-2px; }
+.rm-free-text-select__write-option { display:flex; justify-content:center; align-items:center; gap:7px; min-height:44px; padding:9px; border:1px dashed var(--rm-border-soft); border-radius:var(--rm-radius-sm); color:var(--rm-primary-ink); background:var(--rm-surface-raised); font:700 var(--rm-font-size-label)/1.4 var(--rm-font-friendly); }
+@media(max-width:480px) { .rm-free-text-select__examples-grid { grid-template-columns:minmax(0,1fr); max-height:260px; } }
+
 :root {
     /* ------------------------------------------------------------
        CONTRATO DE FORMULARIOS E INPUTS
@@ -262,14 +284,15 @@
     display: inline-flex;
     align-items: center;
     gap: var(--rm-space-2);
-    font-family: var(--rm-font-family);
-    font-size: var(--rm-font-size-label);
-    font-weight: var(--rm-font-weight-extrabold);
-    text-transform: uppercase;
-    letter-spacing: var(--rm-letter-spacing-wide);
+    font-family: var(--rm-font-friendly);
+    font-size: var(--rm-font-size-section);
+    font-weight: var(--rm-font-weight-bold);
+    text-transform: none;
+    letter-spacing: var(--rm-letter-spacing-normal);
     color: var(--rm-text-primary);
     padding: 0 var(--rm-space-2);
 }
+.rm-form-section-title > i { font-size: var(--rm-icon-md); line-height: 1; flex-shrink: 0; }
 
 .rm-form-section-step {
     display: inline-flex;

@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Modulos\Identidad\Aplicacion\Acciones\DocumentacionUsuarioService;
 use App\Modulos\Identidad\Aplicacion\Acciones\GestionarUsuariosHttp;
 use App\Modulos\Identidad\Aplicacion\Consultas\UsuarioFichaService;
-use App\Modulos\Identidad\Infraestructura\Jobs\EnviarFichaUsuarioJob;
+use App\Modulos\Identidad\Aplicacion\Servicios\EnviosCorreoDocumental;
 use App\Modulos\Identidad\Presentacion\Http\Requests\StoreUsuarioRequest;
 use App\Modulos\Identidad\Presentacion\Http\Requests\UpdateUsuarioRequest;
 use App\Modulos\Identidad\Presentacion\Livewire\Paginas\UsuariosPanel;
@@ -98,7 +98,7 @@ class UsuarioController extends Controller
             $docService = app(DocumentacionUsuarioService::class);
             $expediente = $fichaService->obtenerExpedienteCompleto($usuario);
             $checklist = $docService->obtenerChecklistUsuario($usuario);
-            $viewData = ['usuario' => $usuario, 'rol' => $expediente['rol'], 'nombre_rol' => $expediente['nombre_rol'], 'area' => $expediente['area'], 'horarios' => $expediente['horarios'], 'avance_documental' => $expediente['avance_documental'], 'checklist' => $checklist, 'fecha' => now()->format('d/m/Y H:i'), 'usuario_solicitante' => auth()->user()->name];
+            $viewData = ['usuario' => $usuario, 'rol' => $expediente['rol'], 'nombre_rol' => $expediente['nombre_rol'], 'area' => $expediente['area'], 'horarios' => $expediente['horarios'], 'avance_documental' => $expediente['avance_documental'], 'checklist' => $checklist, 'fecha_ingreso' => $expediente['fecha_ingreso'], 'fecha' => now()->format('d/m/Y H:i'), 'usuario_solicitante' => auth()->user()->name];
             $fileNameService = app(ReportFileNameService::class);
             $filename = $fileNameService->generate('expediente_'.$usuario->cod_usuario, 'pdf');
             $exportService = app(ReportExportService::class);
@@ -117,7 +117,7 @@ class UsuarioController extends Controller
             $docService = app(DocumentacionUsuarioService::class);
             $expediente = $fichaService->obtenerExpedienteCompleto($usuario);
             $checklist = $docService->obtenerChecklistUsuario($usuario);
-            $viewData = ['usuario' => $usuario, 'rol' => $expediente['rol'], 'nombre_rol' => $expediente['nombre_rol'], 'area' => $expediente['area'], 'avance_documental' => $expediente['avance_documental'], 'checklist' => $checklist, 'fecha' => now()->format('d/m/Y H:i'), 'usuario_solicitante' => auth()->user()->name];
+            $viewData = ['usuario' => $usuario, 'rol' => $expediente['rol'], 'nombre_rol' => $expediente['nombre_rol'], 'area' => $expediente['area'], 'avance_documental' => $expediente['avance_documental'], 'checklist' => $checklist, 'fecha_ingreso' => $expediente['fecha_ingreso'], 'fecha' => now()->format('d/m/Y H:i'), 'usuario_solicitante' => auth()->user()->name];
             $fileNameService = app(ReportFileNameService::class);
             $filename = $fileNameService->generate('checklist_documentacion_'.$usuario->cod_usuario, 'pdf');
             $exportService = app(ReportExportService::class);
@@ -152,13 +152,25 @@ class UsuarioController extends Controller
             if (empty($usuario->correo)) {
                 return response()->json(['success' => false, 'message' => 'El usuario no tiene un correo electrónico institucional configurado.'], 422);
             }
-            // Despachar el Job en segundo plano para no congelar la interfaz
-            EnviarFichaUsuarioJob::dispatch($usuario, auth()->user());
+            app(\App\Compartido\Infraestructura\Notificaciones\ExigirTransporteCorreoReal::class)->verificar();
+            $estado = app(EnviosCorreoDocumental::class)->solicitar(auth()->user(), $usuario, 'ficha');
 
-            return response()->json(['success' => true, 'message' => 'La solicitud de envío de ficha ha sido encolada correctamente. Se enviará a '.$usuario->correo]);
+            return response()->json(['success' => true, ...$estado,
+                'estado_url' => route('admin.usuarios.correo.estado', [$usuario, $estado['solicitud']])], 202);
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e) {
+            throw $e;
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Error al despachar el envío de ficha: '.$e->getMessage()], 500);
+            report($e);
+
+            return response()->json(['success' => false, 'message' => 'No se pudo solicitar el envío de la ficha. Revisa la configuración del correo o inténtalo nuevamente.'], 500);
         }
+    }
+
+    public function estadoCorreo(User $usuario, string $solicitud)
+    {
+        $estado = app(EnviosCorreoDocumental::class)->estado(auth()->user(), $usuario, $solicitud);
+
+        return response()->json(['success' => true, ...$estado])->header('Cache-Control', 'no-store');
     }
 
     public function solicitudDocumentalPdf(User $usuario)

@@ -6,6 +6,10 @@
         <i class="ph-bold ph-clock" aria-hidden="true"></i><div><strong>Momento del registro</strong><time>{{ \Carbon\Carbon::parse($hidratacionMomento)->format('d/m/Y · H:i') }}</time></div>
         <span><i class="ph-bold ph-lock" aria-hidden="true"></i> Fecha y hora automáticas · No editables<small>La hora definitiva se asigna al guardar.</small></span>
     </div>
+    <x-ui.clinical-consultation-bar>
+        <x-ui.action-button variant="secondary" icono="ph-clock-counter-clockwise" @click="openTrend($event.currentTarget); $nextTick(() => rmFocusClinicalHistory($refs.trendDialog))" x-bind:aria-expanded="trendOpen" aria-controls="hidratacion-grafica-popup" aria-haspopup="dialog">Ver historial</x-ui.action-button>
+        <button class="rm-btn rm-btn-secondary rm-hidratacion__evolution" type="button" @click="openTrend($event.currentTarget)" aria-controls="hidratacion-grafica-popup" :aria-expanded="trendOpen"><i class="ph-bold ph-chart-line-up" aria-hidden="true"></i> Ver evolución</button>
+    </x-ui.clinical-consultation-bar>
     <div class="rm-hidratacion__layout">
         <div class="rm-hidratacion__column">
             <x-ui.form-section title="Volumen del aporte" icon="ph-drop" :columns="1" class="rm-clinical-form__section">
@@ -57,7 +61,7 @@
                 <x-ui.form-section title="Historial reciente" icon="ph-list-bullets" :columns="1" class="rm-clinical-form__section">
                     <p class="rm-help" x-show="!history.length">Sin registros anteriores.</p>
                     <ol class="rm-hidratacion__recent"><template x-for="(row, index) in [...history].reverse()" :key="row.code || index"><li><time x-text="row.date"></time><strong x-text="row.value + ' mL'"></strong><span x-text="row.liquid"></span><small x-text="row.tolerance"></small></li></template></ol>
-                    <button class="rm-btn-secondary rm-hidratacion__evolution" type="button" @click="openTrend($event.currentTarget)" aria-controls="hidratacion-grafica-popup" :aria-expanded="trendOpen"><i class="ph-bold ph-chart-line-up" aria-hidden="true"></i> Ver evolución</button>
+
                 </x-ui.form-section>
             @endcan
         </aside>

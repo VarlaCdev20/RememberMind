@@ -117,9 +117,9 @@ test('la ventana se adapta a móvil y a cambios de viewport sin salirse', () => 
         window.innerWidth = 390; window.innerHeight = 640;
         estado.fitTrend();
         assert.equal(estado.trendBounds.width, 374);
-        assert.equal(estado.trendBounds.height, 280);
+        assert.equal(estado.trendBounds.height, 461);
         assert.equal(estado.trendBounds.x, 8);
-        assert.equal(estado.trendBounds.y, 352);
+        assert.equal(estado.trendBounds.y, 171);
     } finally { window.innerWidth = previous.width; window.innerHeight = previous.height; }
 });
 

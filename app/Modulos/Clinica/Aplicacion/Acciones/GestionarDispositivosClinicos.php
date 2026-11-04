@@ -16,7 +16,7 @@ final class GestionarDispositivosClinicos
         Validator::make($entrada, ['tipoDispositivo' => 'required|in:OXIGENO,SONDA_URINARIA,OSTOMIA,ALIMENTACION_ENTERAL,OTRO,SONDA_VESICAL', 'ubicacionDispositivo' => 'nullable|string|max:120', 'indicacionDispositivo' => 'required|string|min:5|max:1000'], ['indicacionDispositivo.required' => 'Registre la indicación clínica del dispositivo.'])->validate();
         $personal = $usuario?->personal;
         abort_unless($personal, 403, 'Personal clínico no vinculado.');
-        DispositivoClinico::create(['cod_dispositivo' => 'DIS_'.strtoupper(Str::random(10)), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'tipo' => $entrada['tipoDispositivo'], 'ubicacion' => $entrada['ubicacionDispositivo'] ?: null, 'descripcion' => $entrada['indicacionDispositivo'] ?: null, 'fecha_colocacion' => now(), 'estado' => 'ACTIVO', 'observacion' => null]);
+        DispositivoClinico::create(['cod_dispositivo' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('dispositivos_clinicos'), 'cod_residente' => $entrada['codResidente'], 'cod_personal' => $personal->cod_personal, 'tipo' => $entrada['tipoDispositivo'], 'ubicacion' => $entrada['ubicacionDispositivo'] ?: null, 'descripcion' => $entrada['indicacionDispositivo'] ?: null, 'fecha_colocacion' => now(), 'estado' => 'ACTIVO', 'observacion' => null]);
     }
 
     public function retirarDispositivo(User $usuario, array $entrada, string $codigo): void

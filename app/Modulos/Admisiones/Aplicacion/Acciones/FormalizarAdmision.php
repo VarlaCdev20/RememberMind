@@ -70,7 +70,7 @@ class FormalizarAdmision
             $contacto = $this->resolverContacto($solicitud, $datos);
 
             $residente = Residente::crearDesdeAdmision([
-                'cod_residente' => $this->codigo('RES'),
+                'cod_residente' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('residentes'),
                 'nombres' => $solicitud->nombres,
                 'apellido_paterno' => $solicitud->apellido_paterno,
                 'apellido_materno' => $solicitud->apellido_materno,
@@ -92,7 +92,7 @@ class FormalizarAdmision
             ]);
 
             $admision = Admision::query()->create([
-                'cod_admision' => $this->codigo('ADM'),
+                'cod_admision' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('admisiones'),
                 'cod_preadmision' => $solicitud->cod_preadmision,
                 'cod_residente' => $residente->cod_residente,
                 'cod_usuario_registro' => $usuario->cod_usuario,
@@ -105,7 +105,7 @@ class FormalizarAdmision
             ]);
 
             $vinculo = ResidenteContacto::query()->create([
-                'cod_residente_contacto' => $this->codigo('RCO'),
+                'cod_residente_contacto' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('residentes_contactos'),
                 'cod_residente' => $residente->cod_residente,
                 'cod_contacto' => $contacto->cod_contacto,
                 'parentesco' => $datos['parentesco'] ?? 'RESPONSABLE',
@@ -118,7 +118,7 @@ class FormalizarAdmision
             ]);
 
             OcupacionCama::query()->create([
-                'cod_ocupacion' => $this->codigo('OCU'),
+                'cod_ocupacion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('ocupaciones_cama'),
                 'cod_residente' => $residente->cod_residente,
                 'cod_cama' => $cama->cod_cama,
                 'cod_admision' => $admision->cod_admision,
@@ -128,7 +128,7 @@ class FormalizarAdmision
             ]);
 
             HistorialEstadoResidente::query()->create([
-                'cod_historial_estado' => $this->codigo('HES'),
+                'cod_historial_estado' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('historial_estados_residente'),
                 'cod_residente' => $residente->cod_residente,
                 'cod_usuario_registro' => $usuario->cod_usuario,
                 'estado_anterior' => null,
@@ -139,7 +139,7 @@ class FormalizarAdmision
 
             $firmaResidente = (bool) ($datos['firma_residente'] ?? false);
             Consentimiento::query()->create([
-                'cod_consentimiento' => $this->codigo('CON'),
+                'cod_consentimiento' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('consentimientos'),
                 'cod_residente' => $residente->cod_residente,
                 'cod_admision' => $admision->cod_admision,
                 'cod_residente_contacto' => $firmaResidente ? null : $vinculo->cod_residente_contacto,
@@ -154,7 +154,7 @@ class FormalizarAdmision
 
             if (! empty($datos['seguro_entidad'])) {
                 SeguroResidente::query()->create([
-                    'cod_seguro' => $this->codigo('SEG'),
+                    'cod_seguro' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('seguros_residente'),
                     'cod_residente' => $residente->cod_residente,
                     'entidad' => $datos['seguro_entidad'],
                     'plan' => $datos['seguro_plan'] ?? null,
@@ -187,13 +187,9 @@ class FormalizarAdmision
         }
 
         return Contacto::query()->create(array_merge($contacto, [
-            'cod_contacto' => $this->codigo('CTO'),
+            'cod_contacto' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('contactos'),
             'estado' => $contacto['estado'] ?? 'ACTIVO',
         ]));
     }
 
-    private function codigo(string $prefijo): string
-    {
-        return $prefijo.'_'.Str::upper(Str::random(12));
-    }
 }

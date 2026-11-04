@@ -1,10 +1,10 @@
 /* Composición del espacio administrativo sobre los contratos de tarjetas, filtros y modales. */
 .rm-shell--administracion {
     --rm-admin-content-max: 1320px;
-    --rm-clinical-page-gap: 16px;
-    --rm-clinical-grid-gap: 12px;
-    --rm-clinical-card-padding: 14px;
-    --rm-clinical-control-height: 40px;
+    --rm-clinical-page-gap: var(--rm-page-gap);
+    --rm-clinical-grid-gap: var(--rm-grid-gap);
+    --rm-clinical-card-padding: var(--rm-card-padding);
+    --rm-clinical-control-height: var(--rm-filter-control-height);
     --rm-admin-gap: var(--rm-clinical-page-gap);
     --rm-admin-card-gap: var(--rm-clinical-grid-gap);
     --rm-admin-card-padding: var(--rm-clinical-card-padding);
@@ -104,8 +104,10 @@
 .rm-admin-dashboard__analysis { display: flex; flex-direction: column; gap: var(--rm-space-2); min-height: 264px; }
 .rm-admin-dashboard__analysis:has(.rm-empty-state) { min-height: 180px; }
 .rm-admin-dashboard__analysis .rm-admin-dashboard__panel-heading, .rm-admin-dashboard__alert-chart .rm-admin-dashboard__panel-heading { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.rm-admin-dashboard__panel-heading .rm-admin-dashboard__chart-icon { display: grid; place-items: center; flex: 0 0 34px; width: 34px; height: 34px; border-radius: 10px; background: var(--rm-chart-sage-soft); color: var(--rm-chart-sage); font-size: 18px; }
-.rm-admin-dashboard__alert-chart .rm-admin-dashboard__panel-heading .rm-admin-dashboard__chart-icon { background: var(--rm-chart-coral-soft); color: var(--rm-chart-coral); }
+.rm-admin-dashboard__panel-heading .rm-admin-dashboard__chart-icon { display: grid; place-items: center; flex: 0 0 34px; width: 34px; height: 34px; border-radius: 10px; background: var(--rm-chart-sage-soft); color: var(--rm-action-primary-ink); font-size: var(--rm-icon-md); }
+:is(.dark, [data-theme="dark"]) .rm-admin-dashboard__panel-heading .rm-admin-dashboard__chart-icon { background: color-mix(in srgb, var(--rm-primary) 18%, var(--rm-surface)); color: var(--rm-text-primary); }
+.rm-admin-dashboard__alert-chart .rm-admin-dashboard__panel-heading .rm-admin-dashboard__chart-icon { background: var(--rm-chart-coral-soft); color: var(--rm-danger-strong); }
+:is(.dark, [data-theme="dark"]) .rm-admin-dashboard__alert-chart .rm-admin-dashboard__panel-heading .rm-admin-dashboard__chart-icon { background: color-mix(in srgb, var(--rm-danger) 18%, var(--rm-surface)); color: var(--rm-danger-strong); }
 .rm-admin-dashboard__chart-heading { flex: 1 1 auto; min-width: 0; }
 .rm-admin-dashboard__panel-heading .rm-admin-dashboard__chart-period { flex: 0 0 auto; align-self: flex-start; padding: 6px 9px; border: 1px solid var(--rm-chart-card-border); border-radius: 999px; background: var(--rm-chart-card-glass); color: var(--rm-chart-label); font: 600 11px/1.2 var(--rm-font-friendly); }
 .rm-admin-dashboard__analysis .rm-admin-dashboard__panel-heading h3, .rm-admin-dashboard__alert-chart .rm-admin-dashboard__panel-heading h3 { color: var(--rm-chart-title); font-family: var(--rm-font-friendly); font-weight: 700; line-height: 1.25; }

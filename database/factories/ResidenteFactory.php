@@ -16,7 +16,7 @@ class ResidenteFactory extends Factory
     public function definition(): array
     {
         return [
-            'cod_residente' => 'RES_' . Str::upper(Str::random(10)),
+            'cod_residente' => app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('residentes'),
             'nombres' => fake()->firstName(),
             'apellido_paterno' => fake()->lastName(),
             'apellido_materno' => fake()->lastName(),

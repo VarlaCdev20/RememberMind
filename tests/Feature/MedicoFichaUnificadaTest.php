@@ -163,4 +163,26 @@ class MedicoFichaUnificadaTest extends TestCase
             ->assertSee('Aurelio')
             ->assertSee('Beatriz');
     }
+
+    public function test_modal_medico_e_informe_usan_motor_sin_un_umbral_universal_de_saturacion(): void
+    {
+        $this->actingAs($this->medico);
+        $modal = Livewire::test(\App\Modulos\Clinica\Presentacion\Livewire\Funcionalidades\RegistroSignosVitalesModal::class)
+            ->call('abrir', $this->residente->cod_residente)
+            ->assertSet('cod_residente', $this->residente->cod_residente)
+            ->set('saturacion', '89')
+            ->assertDontSee('Saturación crítica');
+        $this->assertSame([], $modal->viewData('avisosClinicos'));
+        $modal->set('fc', '131');
+        $this->assertSame('CRITICO', $modal->viewData('avisosClinicos')[0]['severidad']);
+        $modal->set('fc', '75')->call('guardar')->assertForbidden();
+        $this->assertDatabaseCount('signos_vitales', 1);
+        $signo = SignoVital::create(['cod_residente' => $this->residente->cod_residente,
+            'cod_personal' => $this->medico->personal->cod_personal, 'fecha_hora' => now()->addMinute(),
+            'saturacion_oxigeno' => 89, 'frecuencia_cardiaca' => 75, 'estado' => 'VIGENTE']);
+
+        $panel = Livewire::test(\App\Modulos\Clinica\Presentacion\Livewire\Paginas\PacientesSeguimientoPanel::class);
+        $this->assertSame($signo->cod_signo, $panel->viewData('ultimosSignos')[$this->residente->cod_residente]->cod_signo);
+        $this->assertSame('Sin interpretación automática', $panel->viewData('interpretacionesSignos')[$signo->cod_signo]['metricas']['SPO2']['label']);
+    }
 }

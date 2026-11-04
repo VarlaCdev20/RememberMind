@@ -31,7 +31,7 @@
         <div><span>Actual · Sin guardar</span><strong x-text="current() === null ? '—' : current() + ' / 10'"></strong></div>
         <div><span>Diferencia</span><strong x-text="comparison()"></strong></div>
     </div>
-    <details class="rm-dolor__history" open>
+    <details class="rm-dolor__history" data-clinical-history open>
         <summary>Últimos registros guardados</summary>
         <p x-show="!history.length">Sin valoraciones anteriores.</p>
         <ol>

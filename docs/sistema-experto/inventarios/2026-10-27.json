@@ -1,0 +1,329 @@
+{
+  "fecha": "2026-10-27T22:06:38-04:00",
+  "alcance": "CATALOGOS_Y_CONFIGURACION_EFECTIVA_SIN_DATOS_CLINICOS",
+  "driver": "pgsql",
+  "transaccion_solo_lectura": true,
+  "tablas_disponibles": {
+    "instrumentos": true,
+    "preguntas_instrumento": true,
+    "versiones_modelo_experto": true,
+    "reglas_expertas": true,
+    "condiciones_regla_experta": true,
+    "consecuencias_regla_experta": true,
+    "nodos_semanticos": true,
+    "relaciones_semanticas": true
+  },
+  "instrumentos": [
+    {
+      "cod_instrumento": "COD_INS_000001",
+      "codigo": "BARTHEL_100",
+      "nombre": "Índice de Barthel",
+      "tipo": "FUNCIONAL",
+      "version": "10 actividades / 100 puntos",
+      "estado": "ACTIVO",
+      "preguntas_catalogadas": 10
+    },
+    {
+      "cod_instrumento": "LP_INS_BARTHEL",
+      "codigo": "BARTHEL_LP_100",
+      "nombre": "Índice de Barthel",
+      "tipo": "FUNCIONAL",
+      "version": "10 actividades / 100 puntos",
+      "estado": "ACTIVO",
+      "preguntas_catalogadas": 10
+    },
+    {
+      "cod_instrumento": "COD_INS_000022",
+      "codigo": "COH30-COG-ATE",
+      "nombre": "Captura sintética COG-ATE",
+      "tipo": "COGNITIVO",
+      "version": "TEST-1",
+      "estado": "ACTIVO",
+      "preguntas_catalogadas": 9
+    },
+    {
+      "cod_instrumento": "COD_INS_000023",
+      "codigo": "COH30-COG-EJE",
+      "nombre": "Captura sintética COG-EJE",
+      "tipo": "COGNITIVO",
+      "version": "TEST-1",
+      "estado": "ACTIVO",
+      "preguntas_catalogadas": 10
+    },
+    {
+      "cod_instrumento": "COD_INS_000024",
+      "codigo": "COH30-COG-LEN",
+      "nombre": "Captura sintética COG-LEN",
+      "tipo": "COGNITIVO",
+      "version": "TEST-1",
+      "estado": "ACTIVO",
+      "preguntas_catalogadas": 9
+    },
+    {
+      "cod_instrumento": "COD_INS_000021",
+      "codigo": "COH30-COG-MEM",
+      "nombre": "Captura sintética COG-MEM",
+      "tipo": "COGNITIVO",
+      "version": "TEST-1",
+      "estado": "ACTIVO",
+      "preguntas_catalogadas": 11
+    },
+    {
+      "cod_instrumento": "COD_INS_000025",
+      "codigo": "COH30-COG-VIS",
+      "nombre": "Captura sintética COG-VIS",
+      "tipo": "COGNITIVO",
+      "version": "TEST-1",
+      "estado": "ACTIVO",
+      "preguntas_catalogadas": 9
+    },
+    {
+      "cod_instrumento": "COD_INS_000006",
+      "codigo": "TEST-ATE-S01",
+      "nombre": "Registro de tarea: Atención sostenida",
+      "tipo": "OBSERVACIONAL",
+      "version": "G08-TEST-v1",
+      "estado": "INACTIVO",
+      "preguntas_catalogadas": 1
+    },
+    {
+      "cod_instrumento": "COD_INS_000007",
+      "codigo": "TEST-ATE-S02",
+      "nombre": "Registro de tarea: Atención selectiva",
+      "tipo": "OBSERVACIONAL",
+      "version": "G08-TEST-v1",
+      "estado": "INACTIVO",
+      "preguntas_catalogadas": 1
+    },
+    {
+      "cod_instrumento": "COD_INS_000008",
+      "codigo": "TEST-ATE-S03",
+      "nombre": "Registro de tarea: Atención dividida",
+      "tipo": "OBSERVACIONAL",
+      "version": "G08-TEST-v1",
+      "estado": "INACTIVO",
+      "preguntas_catalogadas": 1
+    },
+    {
+      "cod_instrumento": "COD_INS_000009",
+      "codigo": "TEST-EJE-S01",
+      "nombre": "Registro de tarea: Inhibición",
+      "tipo": "OBSERVACIONAL",
+      "version": "G08-TEST-v1",
+      "estado": "INACTIVO",
+      "preguntas_catalogadas": 1
+    },
+    {
+      "cod_instrumento": "COD_INS_000010",
+      "codigo": "TEST-EJE-S02",
+      "nombre": "Registro de tarea: Flexibilidad cognitiva",
+      "tipo": "OBSERVACIONAL",
+      "version": "G08-TEST-v1",
+      "estado": "INACTIVO",
+      "preguntas_catalogadas": 1
+    },
+    {
+      "cod_instrumento": "COD_INS_000011",
+      "codigo": "TEST-EJE-S03",
+      "nombre": "Registro de tarea: Actualización memoria trabajo",
+      "tipo": "OBSERVACIONAL",
+      "version": "G08-TEST-v1",
+      "estado": "INACTIVO",
+      "preguntas_catalogadas": 1
+    },
+    {
+      "cod_instrumento": "COD_INS_000012",
+      "codigo": "TEST-EJE-S04",
+      "nombre": "Registro de tarea: Planificación",
+      "tipo": "OBSERVACIONAL",
+      "version": "G08-TEST-v1",
+      "estado": "INACTIVO",
+      "preguntas_catalogadas": 1
+    },
+    {
+      "cod_instrumento": "COD_INS_000013",
+      "codigo": "TEST-EJE-S05",
+      "nombre": "Registro de tarea: Razonamiento/abstracción",
+      "tipo": "OBSERVACIONAL",
+      "version": "G08-TEST-v1",
+      "estado": "INACTIVO",
+      "preguntas_catalogadas": 1
+    },
+    {
+      "cod_instrumento": "COD_INS_000014",
+      "codigo": "TEST-LEN-S01",
+      "nombre": "Registro de tarea: Denominación",
+      "tipo": "OBSERVACIONAL",
+      "version": "G08-TEST-v1",
+      "estado": "INACTIVO",
+      "preguntas_catalogadas": 1
+    },
+    {
+      "cod_instrumento": "COD_INS_000015",
+      "codigo": "TEST-LEN-S02",
+      "nombre": "Registro de tarea: Fluidez verbal",
+      "tipo": "OBSERVACIONAL",
+      "version": "G08-TEST-v1",
+      "estado": "INACTIVO",
+      "preguntas_catalogadas": 1
+    },
+    {
+      "cod_instrumento": "COD_INS_000016",
+      "codigo": "TEST-LEN-S03",
+      "nombre": "Registro de tarea: Comprensión",
+      "tipo": "OBSERVACIONAL",
+      "version": "G08-TEST-v1",
+      "estado": "INACTIVO",
+      "preguntas_catalogadas": 1
+    },
+    {
+      "cod_instrumento": "COD_INS_000017",
+      "codigo": "TEST-LEN-S04",
+      "nombre": "Registro de tarea: Repetición",
+      "tipo": "OBSERVACIONAL",
+      "version": "G08-TEST-v1",
+      "estado": "INACTIVO",
+      "preguntas_catalogadas": 1
+    },
+    {
+      "cod_instrumento": "COD_INS_000018",
+      "codigo": "TEST-LEN-S05",
+      "nombre": "Registro de tarea: Discurso",
+      "tipo": "OBSERVACIONAL",
+      "version": "G08-TEST-v1",
+      "estado": "INACTIVO",
+      "preguntas_catalogadas": 1
+    },
+    {
+      "cod_instrumento": "COD_INS_000002",
+      "codigo": "TEST-MEM-S01",
+      "nombre": "Registro de tarea: Aprendizaje/adquisición",
+      "tipo": "OBSERVACIONAL",
+      "version": "G08-TEST-v1",
+      "estado": "INACTIVO",
+      "preguntas_catalogadas": 1
+    },
+    {
+      "cod_instrumento": "COD_INS_000003",
+      "codigo": "TEST-MEM-S02",
+      "nombre": "Registro de tarea: Recuerdo diferido libre",
+      "tipo": "OBSERVACIONAL",
+      "version": "G08-TEST-v1",
+      "estado": "INACTIVO",
+      "preguntas_catalogadas": 1
+    },
+    {
+      "cod_instrumento": "COD_INS_000004",
+      "codigo": "TEST-MEM-S03",
+      "nombre": "Registro de tarea: Recuerdo con claves",
+      "tipo": "OBSERVACIONAL",
+      "version": "G08-TEST-v1",
+      "estado": "INACTIVO",
+      "preguntas_catalogadas": 1
+    },
+    {
+      "cod_instrumento": "COD_INS_000005",
+      "codigo": "TEST-MEM-S04",
+      "nombre": "Registro de tarea: Reconocimiento",
+      "tipo": "OBSERVACIONAL",
+      "version": "G08-TEST-v1",
+      "estado": "INACTIVO",
+      "preguntas_catalogadas": 1
+    },
+    {
+      "cod_instrumento": "COD_INS_000019",
+      "codigo": "TEST-VIS-S01",
+      "nombre": "Registro de tarea: Relaciones visuoespaciales",
+      "tipo": "OBSERVACIONAL",
+      "version": "G08-TEST-v1",
+      "estado": "INACTIVO",
+      "preguntas_catalogadas": 1
+    },
+    {
+      "cod_instrumento": "COD_INS_000020",
+      "codigo": "TEST-VIS-S02",
+      "nombre": "Registro de tarea: Visuoconstrucción",
+      "tipo": "OBSERVACIONAL",
+      "version": "G08-TEST-v1",
+      "estado": "INACTIVO",
+      "preguntas_catalogadas": 1
+    }
+  ],
+  "versiones_conocimiento": [
+    {
+      "cod_version_modelo": "COD_VME_000001",
+      "codigo_version": "MEM-INV-20261008",
+      "estado": "INACTIVO"
+    },
+    {
+      "cod_version_modelo": "COD_VME_000006",
+      "codigo_version": "OBS-20261017-v1",
+      "estado": "ACTIVO"
+    },
+    {
+      "cod_version_modelo": "COD_VME_000004",
+      "codigo_version": "ORION-COGNITIVO-1",
+      "estado": "ACTIVO"
+    },
+    {
+      "cod_version_modelo": "COD_VME_000005",
+      "codigo_version": "ORION-PETERSEN-1",
+      "estado": "ACTIVO"
+    },
+    {
+      "cod_version_modelo": "COD_VME_000002",
+      "codigo_version": "ORION-V1-20261008",
+      "estado": "INACTIVO"
+    },
+    {
+      "cod_version_modelo": "COD_VME_000003",
+      "codigo_version": "SIM-EXPERTO-LOCAL-1",
+      "estado": "ACTIVO"
+    }
+  ],
+  "totales_conocimiento": {
+    "reglas_expertas": 32,
+    "condiciones_regla_experta": 90,
+    "consecuencias_regla_experta": 32,
+    "nodos_semanticos": 205,
+    "relaciones_semanticas": 130
+  },
+  "reglas_por_version_y_estado": [
+    {
+      "cod_version_modelo": "COD_VME_000003",
+      "estado": "ACTIVO",
+      "estado_revision": null,
+      "cantidad": 8
+    },
+    {
+      "cod_version_modelo": "COD_VME_000004",
+      "estado": "ACTIVO",
+      "estado_revision": "PENDIENTE",
+      "cantidad": 17
+    },
+    {
+      "cod_version_modelo": "COD_VME_000005",
+      "estado": "ACTIVO",
+      "estado_revision": "PENDIENTE",
+      "cantidad": 4
+    },
+    {
+      "cod_version_modelo": "COD_VME_000006",
+      "estado": "ACTIVO",
+      "estado_revision": null,
+      "cantidad": 3
+    }
+  ],
+  "configuracion_cantidad": {
+    "perfiles_instrumentales": 0,
+    "perfiles_interpretativos": 0,
+    "contratos_conocimiento": 0,
+    "lectura_clinica": 0
+  },
+  "version_cognitiva_fijada_en_config": false,
+  "limites": [
+    "No acredita instrumentos administrados, licencias, baremos ni validez clínica.",
+    "No ejecuta inferencia, activa reglas ni valida autorización de pantallas.",
+    "Un catálogo activo no equivale a una evaluación persistida ni a revisión profesional."
+  ]
+}

@@ -73,21 +73,26 @@ class FrontendArchitectureTest extends TestCase
                 if ($archivo->getExtension() !== 'php') {
                     continue;
                 }
-                $componentes++;
                 $codigo = File::get($archivo->getPathname());
                 preg_match('/namespace ([^;]+);/', $codigo, $namespace);
                 preg_match('/class (\w+)/', $codigo, $clase);
-                $render = new \ReflectionMethod($namespace[1].'\\'.$clase[1], 'render');
-                $lineas = explode("\n", $codigo);
+                $reflexion = new \ReflectionClass($namespace[1].'\\'.$clase[1]);
+                if ($reflexion->isAbstract()) {
+                    continue;
+                }
+                $componentes++;
+                $render = $reflexion->getMethod('render');
+                $lineas = explode("\n", File::get($render->getFileName()));
                 $codigoRender = implode("\n", array_slice($lineas, $render->getStartLine() - 1, $render->getEndLine() - $render->getStartLine() + 1));
                 if (preg_match("/view\\(['\"]([^'\"]+)['\"]/", $codigoRender, $coincidencia)) {
-                    $resuelta = app('view.finder')->find($coincidencia[1]);
+                    $resuelta = view()->getFinder()->find($coincidencia[1]);
                     $this->assertFileExists($resuelta);
                     $this->assertStringStartsWith(str_replace('\\', '/', $modulo).'/Presentacion/Vistas/', str_replace('\\', '/', $resuelta));
                 }
             }
         }
-        $this->assertSame(71, $componentes);
+        // Incluye gobierno de reglas y captura original Petersen de ApoyoDecision.
+        $this->assertSame(77, $componentes);
     }
 
     /**
@@ -134,31 +139,32 @@ class FrontendArchitectureTest extends TestCase
         $tailwind = File::get(base_path('tailwind.config.js'));
 
         foreach ([
-            '--rm-palette-page: #F3EEE8',
-            '--rm-earth-900: #59524B',
-            '--rm-earth-800: #665F57',
-            '--rm-earth-700: #746B62',
-            '--rm-earth-600: #82786E',
-            '--rm-earth-500: #8F857B',
-            '--rm-earth-400: #9B9288',
+            '--rm-palette-page: #D8D2CD',
+            '--rm-earth-900: #5B514B',
+            '--rm-earth-800: #6E625A',
+            '--rm-earth-700: #7D6F65',
+            '--rm-earth-600: #8F8075',
+            '--rm-earth-500: #A49589',
+            '--rm-earth-400: #B7AAA0',
             '--rm-earth-300: #A69E96',
-            '--rm-palette-capuchino: #DDD6CF',
-            '--rm-palette-header: #E6E0D9',
-            '--rm-selected-bg: var(--rm-palette-sage-200)',
+            '--rm-palette-capuchino: var(--rm-palette-page)',
+            '--rm-palette-header: var(--rm-palette-surface)',
+            '--rm-selected-bg: var(--rm-primary-soft)',
             '--rm-icon-default: var(--rm-earth-600)',
             '--rm-palette-sidebar: var(--rm-palette-capuchino)',
-            '--rm-palette-surface: #F7F3EF',
-            '--rm-palette-surface-soft: #EFEAE4',
-            '--rm-palette-ink: #4A4642',
-            '--rm-palette-ink-secondary: #67615B',
-            '--rm-palette-primary: #78826E',
-            '--rm-palette-primary-ink: var(--rm-palette-forest-ink)',
-            '--rm-palette-primary-soft: color-mix(in srgb, var(--rm-palette-mint) 50%, var(--rm-palette-page))',
-            '--rm-palette-info: #8699AC',
-            '--rm-palette-psychology: #CEB0B0',
-            '--rm-palette-nutrition: #C4C4A0',
-            '--rm-palette-warning: #C69245',
-            '--rm-palette-danger: #B85C58',
+            '--rm-palette-surface: #ECE9E6',
+            '--rm-palette-surface-soft: #DFD9D4',
+            '--rm-palette-ink: #4F4742',
+            '--rm-palette-ink-secondary: #7D6F65',
+            '--rm-palette-sage-900: var(--rm-palette-primary-strong)',
+            '--rm-palette-primary: #7D9282',
+            '--rm-palette-primary-ink: #354C3D',
+            '--rm-palette-primary-soft: #C4D3C7',
+            '--rm-palette-info: #7D94A8',
+            '--rm-palette-psychology: #9B83BF',
+            '--rm-palette-nutrition: var(--rm-palette-gold)',
+            '--rm-palette-warning: #C7A56B',
+            '--rm-palette-danger: #C97C73',
             '--rm-action-primary: var(--rm-primary)',
             '--rm-sidebar-open: var(--rm-sage-soft)',
             '--rm-selected-text: var(--rm-primary-ink)',
@@ -166,9 +172,9 @@ class FrontendArchitectureTest extends TestCase
             $this->assertStringContainsString($token, $colores);
         }
 
-        $this->assertStringContainsString('--rm-chart-care-500: #7FA883', $graficas);
-        $this->assertStringContainsString('--rm-chart-clinical-500: #7FAFD8', $graficas);
-        $this->assertStringContainsString('--rm-chart-alert-500: #E28B79', $graficas);
+        $this->assertStringContainsString('--rm-chart-care-500: var(--rm-palette-primary)', $graficas);
+        $this->assertStringContainsString('--rm-chart-clinical-500: var(--rm-palette-info)', $graficas);
+        $this->assertStringContainsString('--rm-chart-alert-500: var(--rm-palette-coral)', $graficas);
         $this->assertStringContainsString('--rm-chart-1: var(--rm-chart-sage)', $graficas);
         $this->assertStringContainsString('--rm-chart-danger:       var(--rm-chart-alert-500)', $graficas);
         $this->assertStringContainsString('--rm-chart-token-medication-primary: var(--rm-chart-care-500)', $graficas);
@@ -207,14 +213,14 @@ class FrontendArchitectureTest extends TestCase
             $this->assertStringContainsString($token, $layout);
         }
 
-        $this->assertStringContainsString('--rm-page-gap: var(--rm-space-4)', $spacing);
+        $this->assertStringContainsString('--rm-page-gap: var(--rm-space-5)', $spacing);
         $this->assertStringContainsString('--rm-card-padding: var(--rm-space-card)', $spacing);
-        $this->assertStringContainsString('--rm-font-size-dashboard: 30px', $typography);
-        $this->assertStringContainsString('--rm-font-size-section: 18px', $typography);
+        $this->assertStringContainsString('--rm-font-size-dashboard: 28px', $typography);
+        $this->assertStringContainsString('--rm-font-size-section: 17px', $typography);
         $this->assertStringContainsString('--rm-font-size-card-title: 15px', $typography);
         $this->assertStringContainsString('--rm-font-size-body: 14px', $typography);
         $this->assertStringContainsString('--rm-font-size-meta: 12px', $typography);
-        $this->assertStringContainsString('--rm-font-size-kpi: 27px', $typography);
+        $this->assertStringContainsString('--rm-font-size-kpi: 25px', $typography);
         $this->assertStringContainsString('--rm-control-md: 40px', $sizing);
         $this->assertStringContainsString('[class~="text-5xl"]', $density);
         $this->assertStringContainsString('[class~="min-h-[400px]"]', $density);
@@ -310,7 +316,7 @@ class FrontendArchitectureTest extends TestCase
 
         $signos = File::get(base_path('app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/salud-signos-panel.blade.php'));
         $seguimiento = File::get(base_path('app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/salud-seguimiento-list-panel.blade.php'));
-        $resumenFicha = File::get(base_path('app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/tab-resumen.blade.php'));
+        $resumenFicha = $this->contenidoVistaConParciales('livewire.cuidados.ficha.tab-resumen');
         $ficha = File::get(base_path('app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha-paciente.blade.php'));
         $cabeceraFicha = File::get(base_path('app/Modulos/Clinica/Presentacion/Vistas/livewire/cuidados/ficha/cabecera.blade.php'));
         $this->assertStringContainsString('<x-ui.filter-bar', $signos, 'Signos vitales debe usar la barra de filtros canónica.');
@@ -320,7 +326,16 @@ class FrontendArchitectureTest extends TestCase
         $this->assertStringContainsString('rm-clinical-card', $resumenFicha, 'El resumen de ficha debe usar cards clínicas canónicas.');
         $this->assertStringContainsString('rm-data-tile', $resumenFicha, 'Los datos de la ficha deben usar subpaneles canónicos.');
         $this->assertDoesNotMatchRegularExpression('/#[0-9a-fA-F]{3,8}\b/', $resumenFicha, 'El resumen de ficha no debe contener colores HEX locales.');
-        $this->assertStringNotContainsString('</a>', $resumenFicha, 'El resumen de ficha no debe conservar cierres de enlace inválidos.');
+        // Los parciales de trazabilidad enlazan al control original y al análisis;
+        // se rechazan cierres huérfanos y anidamiento, no enlaces válidos.
+        preg_match_all('/<\/?a(?=\s|>)[^>]*>/i', $resumenFicha, $enlaces);
+        $abierto = false;
+        foreach ($enlaces[0] as $enlace) {
+            $cierre = str_starts_with(strtolower($enlace), '</a');
+            $this->assertSame($cierre, $abierto, 'El resumen no debe contener enlaces anidados ni cierres huérfanos.');
+            $abierto = ! $cierre;
+        }
+        $this->assertFalse($abierto, 'El resumen no debe contener un enlace sin cierre.');
         $this->assertStringContainsString('$diagnosticosActivos', $ficha, 'La ficha debe preparar diagnósticos legibles para presentación.');
         $this->assertStringContainsString('$alergiasTexto', $ficha, 'La ficha debe preparar alergias legibles para presentación.');
         $this->assertStringNotContainsString('{{ $adultoMayor->diagnosticos }}', $resumenFicha, 'La ficha no debe serializar relaciones clínicas en la interfaz.');
@@ -351,14 +366,16 @@ class FrontendArchitectureTest extends TestCase
         $this->assertStringContainsString('rm-alert-danger', $validation);
         $this->assertStringContainsString('<x-ui.drawer-livewire', $detalleAlerta);
         $this->assertStringContainsString('<x-ui.status-badge', $panelAlertas);
-        $this->assertStringContainsString('overflow-x-auto', $panelAlertas);
+        $this->assertStringContainsString('rm-alert-board__list', $panelAlertas);
+        $this->assertStringContainsString('Detalle e historial', $panelAlertas);
+        $this->assertStringNotContainsString('min-w-[980px]', $panelAlertas);
     }
 
     public function test_dashboards_por_rol_comparten_hero_editorial_y_fotografia_institucional(): void
     {
         $componente = File::get(resource_path('views/components/ui/role-dashboard-hero.blade.php'));
         $encabezadoAdmin = File::get(resource_path('views/components/ui/encabezado-dashboard.blade.php'));
-        $enfermeria = File::get(base_path('app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados/dashboard-turno.blade.php'));
+        $enfermeria = $this->contenidoVistaConParciales('livewire.cuidados.dashboard-turno');
         $medicina = File::get(base_path('app/Modulos/Clinica/Presentacion/Vistas/livewire/clinica/dashboard-medico.blade.php'));
         $psicologia = File::get(base_path('app/Modulos/Valoraciones/Presentacion/Vistas/livewire/valoraciones/dashboard-psicologo.blade.php'));
         $workspaceRol = File::get(resource_path('views/components/ui/role-workspace-dashboard.blade.php'));
@@ -383,7 +400,7 @@ class FrontendArchitectureTest extends TestCase
         foreach ([$encabezadoAdmin, $medicina, $psicologia] as $dashboard) {
             $this->assertStringContainsString('images/FOTOS CENTRO DE ADULTOS MAYORES/', $dashboard);
         }
-        $this->assertStringContainsString('image="images/FOTOS CENTRO DE ADULTOS MAYORES/489963938_1158744422930145_8442506970304201426_n.jpg"', $enfermeria);
+        $this->assertStringContainsString('image="images/dashboard/enfermera-manos.webp"', $enfermeria);
         $this->assertStringContainsString('rotation-context=', $medicina);
         $this->assertStringContainsString('rotation-context=', $psicologia);
         $this->assertStringContainsString('rotation-context=', $workspaceRol);
@@ -441,7 +458,7 @@ class FrontendArchitectureTest extends TestCase
         ];
 
         foreach ($vistasConGraficas as $vista) {
-            $contenido = File::get($this->rutaVistaArchivo($vista));
+            $contenido = $this->contenidoVistaConParciales($vista);
             $this->assertStringContainsString(
                 'rm-chart-card',
                 $contenido,
@@ -494,11 +511,22 @@ class FrontendArchitectureTest extends TestCase
         $this->assertStringContainsString('Control cognitivo observacional', $seguimiento);
         $this->assertStringContainsString('No constituye diagnóstico cognitivo', $seguimiento);
         $this->assertStringContainsString('Orden médica · solo lectura', $medicacion);
-        $this->assertStringContainsString('wire:model="dosis_administrada"', $medicacion);
-        $this->assertStringContainsString('wire:model="reaccion_adversa"', $medicacion);
+        $this->assertStringContainsString('wire:model.live.debounce.300ms="dosis_administrada"', $medicacion);
+        $this->assertStringContainsString('wire:model.live.debounce.400ms="reaccion_adversa"', $medicacion);
 
         foreach (File::files(base_path('app/Modulos/Cuidados/Presentacion/Vistas/livewire/cuidados')) as $vista) {
             $this->assertStringNotContainsString('[[var(', File::get($vista->getPathname()), $vista->getFilename().' contiene un token Tailwind mal formado.');
         }
+    }
+
+    private function contenidoVistaConParciales(string $vista): string
+    {
+        $contenido = File::get($this->rutaVistaArchivo($vista));
+        preg_match_all("/@include\\('([^']+)'/", $contenido, $parciales);
+        foreach ($parciales[1] as $parcial) {
+            $contenido .= $this->contenidoVistaConParciales($parcial);
+        }
+
+        return $contenido;
     }
 }

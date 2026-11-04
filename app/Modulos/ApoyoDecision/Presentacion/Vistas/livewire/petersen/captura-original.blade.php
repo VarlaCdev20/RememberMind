@@ -1,0 +1,101 @@
+<div class="space-y-6 text-rm-primary" x-data="{ sucio: false, confirmarGuardado: false, confirmarDescarte: false }" x-on:input="sucio = true" x-on:change="sucio = true"
+    x-on:petersen-captura-cerrada.window="sucio = false"
+    x-on:petersen-registro-mostrado.window="$nextTick(() => document.getElementById('pet-original-' + $event.detail.registro)?.scrollIntoView({ block: 'center' }))"
+    x-on:beforeunload.window="if (sucio) { $event.preventDefault(); $event.returnValue = ''; }">
+    @php($elementos = \App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\CapturaPetersenPanel::ELEMENTOS)
+    @php($tiposTodos = \App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\CapturaPetersenPanel::TIPOS)
+    <x-ui.section-card title="Valoración cognitiva y funcional" subtitle="Registro de información original para la evaluación cognitiva." icon="ph-notebook">
+        <p class="text-sm">Valoraciones originales para Petersen</p>
+        <div class="flex flex-wrap items-start justify-between gap-4">
+            <div><p class="font-semibold">{{ $residente->nombre_completo }} · {{ $residente->edad !== null ? $residente->edad.' años' : 'Edad no disponible' }}</p>
+                <p class="text-sm mt-1">Profesional de la sesión: {{ $profesional ? trim($profesional->nombres.' '.$profesional->apellido_paterno.' '.$profesional->apellido_materno) : 'No identificado' }} · {{ $profesional->profesion ?? 'Área no disponible' }}</p></div>
+            <p class="text-sm" role="status">{{ $registrados }} de 9 elementos con algún registro original vigente. Este avance describe captura, no validez clínica ni probabilidad de DCL.</p>
+        </div>
+        <a href="{{ $urlRetorno }}" class="rm-btn rm-btn-secondary mt-3">{{ $textoRetorno }}</a>
+        @can('consultar', [\App\Models\ControlFuncionalIadl::class, $residente])
+            <a href="{{ route('admin.funcionamiento-cotidiano', $residente) }}" class="rm-btn rm-btn-secondary mt-3">Funcionamiento cotidiano</a>
+        @endcan
+        @error('historial')<p role="alert" class="mt-3">{{ $message }}</p>@enderror
+        <p class="text-sm mt-2">Registre lo que valoró y sus soportes originales. El estado del dominio es una interpretación clínica documentada; el sistema calcula C02 y el patrón. La información que no esté acreditada permanece pendiente.</p>
+        @if($mensaje)<p role="status" class="mt-3">{{ $mensaje }}</p>@endif
+        @if($puedeCrear && $solicitud === null)
+            <ol class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 mt-4" aria-label="Etapas de la valoración">
+                @foreach($elementos as $codigo => $nombre)<li class="rounded-xl border border-rm p-3 min-w-0">
+                    <p class="font-semibold">{{ $loop->iteration }}. {{ $nombre }} <span class="text-sm">({{ $codigo }})</span></p>
+                    <p class="text-sm mt-1">{{ $cobertura[$codigo]['cantidad'] ? $cobertura[$codigo]['cantidad'].' registro(s) original(es) vigente(s) · '.implode(', ', $cobertura[$codigo]['estados']) : 'Sin valoración original vigente' }}</p>
+                    <button type="button" wire:click="nuevo('{{ $codigo }}')" wire:loading.attr="disabled" class="rm-btn rm-btn-secondary mt-3">Registrar {{ $nombre }}</button>
+                </li>@endforeach
+            </ol>
+            <p class="text-sm mt-3">C02 se calcula automáticamente a partir de los cinco dominios. No requiere ni admite un registro manual.</p>
+        @endif
+    </x-ui.section-card>
+    @if($solicitud !== null)
+        <x-ui.section-card :title="($tipoRegistro === 'ANULACION' ? 'Anular: ' : ($tipoRegistro === 'RECTIFICACION' ? 'Rectificar: ' : 'Registrar: ')).$elementos[$form['elemento']]" icon="ph-pencil-line">
+            <form x-on:submit.prevent="confirmarGuardado = true" class="space-y-4">
+                @if($errors->any())<div role="alert" class="text-sm"><p>Revise la información antes de guardar:</p><ul class="list-disc pl-5">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+                @if($anterior)<p>Registro anterior: {{ $anterior }}. La corrección conservará ese original.</p>@endif
+                <p class="text-sm">Estado de esta captura: {{ $tipoRegistro === 'ANULACION' ? 'anulación documentada' : ($tipoRegistro === 'RECTIFICACION' ? 'rectificación del original' : 'nuevo juicio original') }}. Fecha clínica: {{ $form['fecha_hora'] ?: 'pendiente' }}.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label for="pet-fecha" class="block text-sm font-semibold">Fecha y hora del acto original</label><input id="pet-fecha" type="datetime-local" step="0.000001" wire:model="form.fecha_hora" class="rm-input w-full" @readonly($tipoRegistro === 'ANULACION') required><p class="text-sm">Indique cuándo se realizó la valoración.</p></div>
+                    @if($tipoRegistro !== 'ANULACION')<div><label for="pet-estado" class="block text-sm font-semibold">Conclusión original del elemento</label><select id="pet-estado" wire:model="form.estado_original" class="rm-select w-full !leading-normal !min-h-11" required><option value="">Seleccione</option>
+                        @if(str_starts_with($form['elemento'], 'COG-'))<option value="A">Alteración objetiva interpretada del dominio</option><option value="P">Rendimiento esperado acreditado del dominio</option><option value="I">No interpretable</option>
+                        @else<option value="S">Acreditado con soporte explícito</option><option value="N">No acreditado con soporte explícito</option>@endif
+                    </select></div>@endif
+                </div>
+                @if($anterior && $tipoRegistro === 'RECTIFICACION')<div><label for="pet-error-fecha" class="block text-sm font-semibold">Error de fecha original, si corresponde</label><input id="pet-error-fecha" wire:model="form.error_fecha_original" class="rm-input w-full"><p class="text-sm">Solo si corrige la fecha: explique el error identificado en el original.</p></div>@endif
+                <div><label for="pet-justificacion" class="block text-sm font-semibold">{{ $tipoRegistro === 'ANULACION' ? 'Motivo de anulación' : 'Fundamento de la valoración original' }}</label><textarea id="pet-justificacion" wire:model="form.justificacion" class="rm-textarea w-full" rows="3" required></textarea></div>
+                <details class="rounded-xl border border-rm p-4">
+                    <summary class="font-semibold cursor-pointer">Referencia del acto original, si existe</summary>
+                    <p class="text-sm mt-2">Vincule únicamente una atención o un documento original de este residente. El documento y su página o sección se indican juntos; no se crea una atención para completar estos campos.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                        <div><label for="pet-atencion" class="block text-sm font-semibold">Código de atención, opcional</label><input id="pet-atencion" wire:model="form.cod_atencion" maxlength="20" class="rm-input w-full"></div>
+                        <div><label for="pet-documento" class="block text-sm font-semibold">Código del documento clínico original</label><input id="pet-documento" wire:model="form.cod_documento_clinico" maxlength="20" class="rm-input w-full"></div>
+                        <div class="md:col-span-2"><label for="pet-localizador" class="block text-sm font-semibold">Página o sección del documento</label><input id="pet-localizador" wire:model="form.localizador_fuente" maxlength="120" class="rm-input w-full"></div>
+                    </div>
+                </details>
+                @if($tipoRegistro !== 'ANULACION')
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">@foreach($comprobaciones as $campo)
+                        <div><label for="pet-{{ $campo }}" class="block text-sm font-semibold">{{ $labelsComprobaciones[$campo] }}</label><select id="pet-{{ $campo }}" wire:model="form.{{ $campo }}" class="rm-select w-full !leading-normal !min-h-11"><option value="">Sin información acreditada</option><option value="1">Sí, documentado</option><option value="0">No, documentado</option></select></div>
+                    @endforeach</div>
+                    <fieldset class="rounded-xl border border-rm p-4 min-w-0"><legend class="font-semibold px-2">Soportes originales</legend>
+                        <p class="text-sm">Seleccione registros del residente. Una referencia compartida no se convierte en corroboración independiente. En C05, identifique también las cinco valoraciones de dominio revisadas.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                            <div><label for="pet-tipo-fuente" class="block text-sm">Tipo de soporte</label><select id="pet-tipo-fuente" wire:model.live="tipoSoporte" class="rm-select w-full !leading-normal !min-h-11"><option value="">Seleccione</option>@foreach($tipos as $codigo => $nombre)<option value="{{ $codigo }}">{{ $nombre }}</option>@endforeach</select></div>
+                            <div><label for="pet-fuente" class="block text-sm">Fuente original autorizada</label><select id="pet-fuente" wire:model.live="campoFuente" class="rm-select w-full !leading-normal !min-h-11"><option value="">Seleccione</option>@foreach($fuentes as $campo)<option value="{{ $campo }}">{{ $labelsFuentes[$campo] }}</option>@endforeach</select></div>
+                            <div><label for="pet-buscar" class="block text-sm">Buscar por código de registro</label><input id="pet-buscar" wire:model.live.debounce.300ms="busquedaFuente" class="rm-input w-full"><p class="text-sm">Se muestran hasta 50 coincidencias.</p></div>
+                            <div><label for="pet-registro" class="block text-sm">Registro original · fecha, autor, episodio y estado</label><select id="pet-registro" wire:model="registroFuente" class="rm-select w-full !leading-normal !min-h-11"><option value="">Seleccione</option>@foreach($opciones as $opcion)<option value="{{ $opcion['id'] }}">{{ $opcion['etiqueta'] }}</option>@endforeach</select></div>
+                        </div>
+                        <p class="text-sm mt-2">Antes de vincular, compruebe que el registro tiene fecha clínica, autor, estado vigente y corresponde al episodio. El servidor verificará estos datos otra vez al guardar.</p>
+                        <button type="button" wire:click="agregarSoporte" class="rm-btn rm-btn-secondary mt-3">Vincular soporte</button>
+                        <ul class="space-y-2 mt-3">@foreach($form['soportes'] as $orden => $soporte)<li class="flex flex-wrap items-center gap-2 break-all" wire:key="pet-soporte-{{ $orden }}"><span>{{ $tiposTodos[$soporte['tipo_soporte']] ?? $soporte['tipo_soporte'] }} · {{ implode(' · ', array_values(array_diff_key($soporte, ['tipo_soporte' => true]))) }}</span><button type="button" wire:click="quitarSoporte({{ $orden }})" class="rm-btn rm-btn-ghost" aria-label="Quitar soporte {{ $orden + 1 }}">Quitar</button></li>@endforeach</ul>
+                    </fieldset>
+                @endif
+                <div class="flex flex-wrap gap-3"><button type="submit" wire:loading.attr="disabled" class="rm-btn rm-btn-primary">Guardar valoración original</button><button type="button" x-on:click="confirmarDescarte = true" class="rm-btn rm-btn-secondary">Cancelar captura</button></div>
+                <p wire:loading wire:target="guardar" role="status" class="text-sm">Validando y registrando…</p>
+            </form>
+            <x-ui.modal-livewire id="pet-confirmar-guardado" title="Confirmar valoración original" alpine-model="confirmarGuardado" alpine-close="confirmarGuardado = false" :show-validation="false">
+                <p>Se registrará la valoración de {{ $elementos[$form['elemento']] }} para {{ $residente->nombre_completo }} con sus soportes. El original permanecerá en el historial; las correcciones se registran por separado.</p>
+                <x-slot:footer>
+                    <button type="button" x-on:click="confirmarGuardado = false" class="rm-btn rm-btn-secondary">Seguir editando</button>
+                    <button type="button" x-on:click="confirmarGuardado = false; $wire.guardar()" wire:loading.attr="disabled" class="rm-btn rm-btn-primary">Confirmar registro</button>
+                </x-slot:footer>
+            </x-ui.modal-livewire>
+            <x-ui.modal-livewire id="pet-confirmar-descarte" title="Descartar captura sin guardar" alpine-model="confirmarDescarte" alpine-close="confirmarDescarte = false" :show-validation="false">
+                <p>Los cambios de esta captura para {{ $residente->nombre_completo }} se descartarán. Los registros ya guardados se conservarán.</p>
+                <x-slot:footer>
+                    <button type="button" x-on:click="confirmarDescarte = false" class="rm-btn rm-btn-secondary">Seguir editando</button>
+                    <button type="button" x-on:click="confirmarDescarte = false; $wire.cancelar()" wire:loading.attr="disabled" class="rm-btn rm-btn-primary">Descartar captura</button>
+                </x-slot:footer>
+            </x-ui.modal-livewire>
+        </x-ui.section-card>
+    @endif
+    <x-ui.section-card title="Historial de valoraciones originales" icon="ph-clock-counter-clockwise">
+        <div class="space-y-3">@forelse($registros as $registro)
+            <article id="pet-original-{{ $registro->getKey() }}" class="rounded-xl border border-rm p-4 min-w-0" wire:key="pet-original-{{ $registro->getKey() }}"><h2 class="font-semibold">{{ $elementos[$registro->elemento] }} · {{ $registro->tipo_registro }}</h2><p class="text-sm break-words">{{ $registro->getKey() }} · {{ $registro->fecha_hora->format('d/m/Y H:i:s') }} · {{ $registro->personal?->nombres }} {{ $registro->personal?->apellido_paterno }}</p><p class="text-sm mt-2">{{ $registro->justificacion }}</p><p class="text-sm">Registrado el {{ $registro->registrado_en->format('d/m/Y H:i:s') }}. Estado original: {{ $registro->estado_original ?? 'Anulado mediante este registro' }}.</p>
+                @if($registro->sucesora)<p class="text-sm mt-2">Registro histórico. Sucesora: {{ $registro->sucesora->getKey() }} · {{ $registro->sucesora->tipo_registro }}.</p><button type="button" wire:click="mostrarRegistro('{{ $registro->sucesora->getKey() }}')" class="rm-btn rm-btn-secondary">Consultar sucesora</button>@endif
+                @if($solicitud === null && $registro->tipo_registro !== 'ANULACION' && $registro->sucesora === null)@can('rectificarOriginal', $registro)<div class="flex flex-wrap gap-2 mt-2"><button type="button" wire:click="corregir('{{ $registro->getKey() }}')" class="rm-btn rm-btn-secondary">Rectificar este registro</button><button type="button" wire:click="corregir('{{ $registro->getKey() }}', true)" class="rm-btn rm-btn-secondary">Registrar anulación</button></div>@endcan @endif
+            </article>
+        @empty<p>No hay valoraciones originales de Petersen registradas para este residente.</p>@endforelse</div>
+        <div class="mt-4">{{ $registros->links() }}</div>
+    </x-ui.section-card>
+</div>

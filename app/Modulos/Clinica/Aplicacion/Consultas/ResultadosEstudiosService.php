@@ -35,8 +35,8 @@ final class ResultadosEstudiosService
             ->whereNull('cod_estudio')
             ->where(function ($query): void {
                 $query->whereIn('tipo_documento', ['MEDICO', 'ESTUDIO', 'LABORATORIO', 'EXAMEN', 'IMAGEN', 'CARDIOLOGICO'])
-                    ->orWhere('titulo', 'like', '%laboratorio%')->orWhere('titulo', 'like', '%estudio%')
-                    ->orWhere('titulo', 'like', '%informe%');
+                    ->orWhereRaw('LOWER(titulo) LIKE ?', ['%laboratorio%'])->orWhereRaw('LOWER(titulo) LIKE ?', ['%estudio%'])
+                    ->orWhereRaw('LOWER(titulo) LIKE ?', ['%informe%']);
             })->with('personal')->get();
 
         foreach ($documentos as $documento) {

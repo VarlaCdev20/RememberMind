@@ -52,7 +52,6 @@ class AdultoGeneralSheet implements FromCollection, ShouldAutoSize, WithHeadings
         $edad = $a->fecha_nac ? Carbon::parse($a->fecha_nac)->age : '—';
 
         return collect([
-            ['Código expediente',       $a->cod_residente],
             ['Nombres',                 $a->nombres],
             ['Apellido paterno',        $a->ap_paterno],
             ['Apellido materno',        $a->ap_materno ?? '—'],

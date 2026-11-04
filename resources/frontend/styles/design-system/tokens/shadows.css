@@ -4,11 +4,11 @@
    --rm-shadow-2xs: 0 1px 2px color-mix(in srgb, var(--rm-shadow-ink) 3%, transparent);
    --rm-shadow-xs: 0 1px 2px color-mix(in srgb, var(--rm-shadow-ink) 4%, transparent);
    --rm-shadow-sm:
-      0 1px 2px color-mix(in srgb, var(--rm-shadow-ink) 4%, transparent),
-      0 8px 24px color-mix(in srgb, var(--rm-shadow-ink) 6%, transparent);
+      0 1px 2px color-mix(in srgb, var(--rm-shadow-ink) 9%, transparent),
+      0 8px 24px color-mix(in srgb, var(--rm-shadow-ink) 12%, transparent);
    --rm-shadow-md:
-      0 2px 6px color-mix(in srgb, var(--rm-shadow-ink) 5%, transparent),
-      0 12px 28px color-mix(in srgb, var(--rm-shadow-ink) 8%, transparent);
+      0 2px 6px color-mix(in srgb, var(--rm-shadow-ink) 12%, transparent),
+      0 12px 28px color-mix(in srgb, var(--rm-shadow-ink) 18%, transparent);
    --rm-shadow-lg:
       0 4px 12px color-mix(in srgb, var(--rm-shadow-ink) 6%, transparent),
       0 20px 40px color-mix(in srgb, var(--rm-shadow-ink) 10%, transparent);
@@ -16,11 +16,36 @@
       0 4px 12px color-mix(in srgb, var(--rm-shadow-ink) 8%, transparent),
       0 24px 56px color-mix(in srgb, var(--rm-shadow-ink) 18%, transparent);
    --rm-shadow-input: var(--rm-shadow-2xs);
-   --rm-shadow-card: var(--rm-shadow-sm);
+   --rm-shadow-card:
+      0 2px 5px color-mix(in srgb, var(--rm-shadow-ink) 12%, transparent),
+      0 10px 22px -7px color-mix(in srgb, var(--rm-shadow-ink) 24%, transparent);
    --rm-shadow-raised: var(--rm-shadow-md);
    --rm-shadow-floating: var(--rm-shadow-lg);
-   --rm-shadow-card-hover: var(--rm-shadow-md);
+   --rm-shadow-card-hover:
+      0 3px 7px color-mix(in srgb, var(--rm-shadow-ink) 14%, transparent),
+      0 14px 28px -7px color-mix(in srgb, var(--rm-shadow-ink) 28%, transparent);
    --rm-shadow-dropdown: var(--rm-shadow-md);
    --rm-shadow-drawer: var(--rm-shadow-lg);
    --rm-shadow-modal: var(--rm-shadow-overlay);
+   --rm-capture-box-shadow: var(--rm-shadow-card);
+}
+
+
+/* Trama vigente: puntos menudos sobre la base compartida, con relieve interior. */
+:root {
+   --rm-canvas-relief-shade: color-mix(in srgb, var(--rm-shadow-ink) 9%, transparent);
+   --rm-canvas-relief-light: color-mix(in srgb, var(--rm-text-on-dark) 30%, transparent);
+   --rm-canvas-dot-radius: 0.6px;
+   --rm-canvas-dot-spacing: 16px;
+   --rm-canvas-relief-pattern:
+      radial-gradient(circle at calc(50% + 0.5px) calc(50% + 0.5px), var(--rm-canvas-relief-shade) var(--rm-canvas-dot-radius), transparent var(--rm-canvas-dot-radius));
+   --rm-canvas-relief-shadow: inset 0 1px 0 var(--rm-canvas-relief-light), inset 0 12px 24px -18px var(--rm-shadow-ink);
+}
+:is(.dark, [data-theme="dark"]) {
+   --rm-canvas-relief-shade: color-mix(in srgb, var(--rm-text-on-dark) 12%, transparent);
+   --rm-canvas-relief-light: color-mix(in srgb, var(--rm-text-on-dark) 7%, transparent);
+}
+
+:root {
+   --rm-button-relief-shadow: none;
 }

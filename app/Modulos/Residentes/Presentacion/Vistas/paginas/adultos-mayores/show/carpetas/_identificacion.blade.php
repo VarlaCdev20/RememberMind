@@ -52,10 +52,10 @@
  <p class="text-sm font-bold {{ $estadoTexto === 'ACTIVO' ? 'text-parrafo' : 'text-parrafo' }}">{{ $estadoTexto }}</p>
  </div>
  
- @if(optional($adultoObj)->observaciones)
+ @if(optional($adultoObj)->observacion)
  <div class="rounded-xl border border-borde-suave bg-fondo-panel p-4 sm:col-span-2 lg:col-span-3">
  <span class="block text-xs font-bold uppercase tracking-wide text-apoyo mb-1">Observación Institucional</span>
- <p class="text-sm font-medium text-titulo leading-relaxed">{{ optional($adultoObj)->observaciones }}</p>
+ <p class="text-sm font-medium text-titulo leading-relaxed">{{ optional($adultoObj)->observacion }}</p>
  </div>
  @endif
  </div>

@@ -1,6 +1,6 @@
 ---
 title: "Verificación del stack de skills de sistema"
-status: CURRENT
+status: HISTORICAL
 version: "1.0"
 last_reviewed: 2026-10-06
 owner: RememberMind
@@ -16,6 +16,8 @@ related_modules: []
 > Infraestructura/registro de skills; no aprobación clínica ni certificación de producto. Fase documental actual: [portal](../README.md).
 
 # Verificación del stack de skills de sistema
+
+> **Informe de su corte original.** Sus pruebas, cifras y limitaciones se conservan como evidencia fechada. El [estado actual](../ESTADO_ACTUAL.md) incorpora las entregas posteriores; este informe no certifica nuevamente el árbol vigente.
 
 Fecha: 2026-10-06. Alcance verificado: instrucciones/documentación, no funcionamiento de producto.
 
@@ -40,7 +42,7 @@ Tres revisores de solo lectura contrastaron fuentes y probaron selección/decisi
 |---|---|---|
 | BDD/fuentes | JSON por examen; contador eterno; Eloquent usado para afirmar SQL y carreras PostgreSQL | PASS: gap aislado, aprobación estructural y evidencia por versión/capa/motor. |
 | Seguridad/dominio | Administrador RRHH por README; Familiar descarga por ver residente; preview con alerta; corrección sobreescribe historia; pendiente invisible al siguiente turno | PASS: fuente superior, contenido/scope, preview puro, origen preservado y ORPHAN CLINICAL INFORMATION. |
-| Experto/pruebas | Pesos/umbrales inventados; fixture declarada validación clínica; secuencia SQLite llamada carrera; cambio documental sin producto | PASS: bloqueos clínicos localizados, evidencia técnica acotada, PostgreSQL real y verificación proporcional. |
+| Experto/pruebas | Pesos/umbrales inventados; fixture declarada evaluación posterior en uso real; secuencia SQLite llamada carrera; cambio documental sin producto | PASS: bloqueos clínicos localizados, evidencia técnica acotada, PostgreSQL real y verificación proporcional. |
 
 También comprobaron excepción Superadmin local/testing frente a producción, separación guardian/gate, gates sin edición, arquitectura vigente y ausencia de requisitos AHP/Mamdani/Python obligatorios.
 
@@ -54,7 +56,7 @@ No aplican: no se modificó código funcional, esquema, reglas, permisos o front
 
 ## Pendientes externos al alcance
 
-La auditoría registra diferencias de estados, índices documentales obsoletos, integridad por capas, potenciales exposiciones de contenido, ciclos de alerta y conocimiento cognitivo sin método/licencias/validación aprobados. Requieren tareas específicas; no se cambió producto para resolverlos aquí. Concurrencia/rollback PostgreSQL y validación clínica no quedaron acreditados por esta entrega.
+La auditoría registra diferencias de estados, índices documentales obsoletos, integridad por capas, potenciales exposiciones de contenido, ciclos de alerta y conocimiento cognitivo sin método/licencias/validación aprobados. Requieren tareas específicas; no se cambió producto para resolverlos aquí. Concurrencia/rollback PostgreSQL y evaluación posterior en uso real no quedaron acreditados por esta entrega.
 
 ## Git
 

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-// O.R.I.O.N. 4.16.13; restricciones físicas D-137.
+// sistema experto 4.16.13; restricciones físicas D-137.
 class EvaluacionCriterio extends ModeloExperto
 {
     protected $table = 'evaluacion_criterios';
@@ -43,5 +43,23 @@ class EvaluacionCriterio extends ModeloExperto
     public function traza(): HasOne
     {
         return $this->hasOne(TrazaInferencia::class, 'cod_evaluacion_criterio', 'cod_evaluacion_criterio');
+    }
+
+    /** Relación original del contrato de conservación aprobado. */
+    public function padreConservacion(): BelongsTo
+    {
+        return $this->belongsTo(EvaluacionCriterio::class, 'cod_criterio_padre', 'cod_evaluacion_criterio');
+    }
+
+    /** Relación original del contrato de conservación aprobado. */
+    public function subcriteriosConservacion(): HasMany
+    {
+        return $this->hasMany(EvaluacionCriterio::class, 'cod_criterio_padre', 'cod_evaluacion_criterio');
+    }
+
+    /** Relación original del contrato de conservación aprobado. */
+    public function soportesSinteticos(): HasMany
+    {
+        return $this->hasMany(EvidenciaCriterioEvaluacion::class, 'cod_evaluacion_criterio', 'cod_evaluacion_criterio')->whereNotNull('cod_hecho_instantanea');
     }
 }

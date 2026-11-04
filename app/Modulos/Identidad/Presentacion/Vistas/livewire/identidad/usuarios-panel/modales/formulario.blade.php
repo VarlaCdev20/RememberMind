@@ -384,9 +384,7 @@
     <select wire:model="cod_area" class="rm-select {{ $errors->has('cod_area') ? 'is-invalid' : '' }}">
     <option value="">SELECCIONE ÁREA...</option>
     @foreach($areas as $ar)
-     @if($ar->cod_area !== 'ARE_0009')
      <option value="{{ $ar->cod_area }}">{{ $ar->nombre }}</option>
-     @endif
     @endforeach
     </select>
     @error('cod_area') <p class="rm-error">{{ $message }}</p> @enderror

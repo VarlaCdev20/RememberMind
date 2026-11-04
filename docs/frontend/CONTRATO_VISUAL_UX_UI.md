@@ -2,11 +2,11 @@
 title: "Contrato compartido de UX/UI de RememberMind"
 status: CURRENT
 version: "1.0"
-last_reviewed: 2026-10-06
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: true
-verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
-verification_scope: STATIC_REPOSITORY_REVIEW
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_RECONCILIATION
 runtime_verified: false
 supersedes: []
 related_docs: []
@@ -66,25 +66,28 @@ Transmitir cuidado, tranquilidad, acompañamiento, seguridad y claridad mediante
 
 Las superficies ordinarias son neutras. Normal se representa con badge, icono, borde, tinte pequeño y texto. Una alerta crítica puede ocupar mayor superficie semántica y permanece reconocible; la calidez nunca la suaviza ni la oculta en un toast.
 
-## Paleta objetivo y correspondencia con el producto
+## Tokens observados al 04/11/2026
 
-Estos valores vienen de la tarea de la propietaria. La futura implementación los consolida en el Design System, sin HEX locales ni una segunda paleta por rol.
+La implementación usa [tokens/colors.css](../../resources/frontend/styles/design-system/tokens/colors.css) y el [Design System](../../resources/frontend/styles/design-system/README.md). Los siguientes valores base de modo claro describen el código, sin constituir una nueva decisión de diseño. Las variantes y el resultado compuesto dependen de los tokens semánticos/componentes y del tema.
 
-| Nombre del brief | Objetivo | Contrato implementado a inspeccionar |
+| Token base | Valor | Uso observado |
 |---|---|---|
-| `--rm-app-bg` | `#F3EEE8` | `--rm-bg-app` |
-| `--rm-shell-bg` | `#DDD6CF` | `--rm-bg-shell` |
-| `--rm-header-bg` | `#E6E0D9` | Tokens de topbar/header y superficies |
-| `--rm-card-bg` | `#F7F3EF` | `--rm-surface` y tokens de cards |
-| `--rm-surface-soft` | `#EFEAE4` | `--rm-surface-soft` |
-| `--rm-text-primary` | `#4A4642` | `--rm-text-primary` |
-| `--rm-text-secondary` | `#67615B` | `--rm-text-secondary` |
-| `--rm-text-muted` | `#847D76` | `--rm-text-muted` |
-| Acento Enfermería | `#3F8F76` | Acento de cuidado/acción compartido, según función |
+| `--rm-palette-page` | `#F3EEE8` | Lienzo cálido |
+| `--rm-palette-capuchino` | `#DDD6CF` | Estructura/sidebar |
+| `--rm-palette-header` | `#E6E0D9` | Encabezados |
+| `--rm-palette-surface` | `#F7F3EF` | Cards más claras que el lienzo |
+| `--rm-palette-surface-soft` | `#EFEAE4` | Superficie secundaria |
+| `--rm-palette-ink` | `#4A4642` | Texto principal |
+| `--rm-palette-ink-secondary` | `#67615B` | Texto secundario |
+| `--rm-palette-primary` | `#78826E` | Acción salvia |
+| `--rm-palette-primary-hover` | `#5F7567` | Interacción/selección |
+| `--rm-palette-info` | `#7D94A8` | Información |
+| `--rm-palette-warning` | `#C69245` | Advertencia del dominio |
+| `--rm-palette-danger` | `#B85C58` | Error/peligro |
+| `--rm-palette-input` | `#E7E2DE` | Campos |
 
-Los nombres del brief son conceptuales; preferir evolucionar el token semántico existente y documentar alias realmente necesarios. No crear `--rm-enf-*` ni convertir todas las superficies en verdes. Sage, tonos tierra y acentos clínicos acompañan la base neutral.
+Hay mezclas con transparencia (`--rm-capture-card`, `--rm-capture-glass-*`), blur y tramas en el lienzo; las superficies no son uniformemente sólidas. Conservar legibilidad, jerarquía y separación entre cards. El relieve y el movimiento utilizan las fuentes compartidas `shadows.css` y `motion.css`. El dominio decide el significado de cada estado. Esta revisión no acredita contraste computado ni una nueva QA visual.
 
-Medir contraste de cada par sobre la superficie compuesta real, incluido glass y modo oscuro. El muted objetivo no se presupone válido para texto pequeño. Si un par no pasa, conservar la paleta en superficies y proponer una tinta semántica contrastada, documentando la adaptación. Ningún HEX de este documento promete accesibilidad por sí mismo.
 
 ## Tipografía por función
 
@@ -135,3 +138,9 @@ Antes de crear: buscar componente, comparar responsabilidad, extender si procede
 Cada ejecución informa, proporcionalmente al alcance: ANTES (diagnóstico), PLAN (qué conservar/cambiar y por qué), IMPLEMENTACIÓN (archivos, o «sin edición» si es análisis/QA), VERIFICACIÓN (desktop/tablet/mobile/estados realmente revisados y limitaciones). Usar datos sintéticos en pruebas y capturas. No exponer datos clínicos en servicios externos.
 
 Para aceptación visual revisar 1440, 1280, 1024, 768 y 390 px; teclado, foco, touch aproximado mínimo de 44 × 44 CSS px, contraste, ausencia de scroll horizontal, loading/empty/error/success y estados pertinentes. Tests y build no sustituyen inspección visual. Si falta evidencia requerida, QA produce `FAIL` por verificación incompleta, sin inventar un defecto observado.
+
+Corrección de superficies del 14/10/2026: la propietaria pide unificar las áreas y retirar blancos. En el shell operativo, cabeceras/filtros/cards/paneles/modales/menús comparten #E6DED6; campos #D6CCC3. Se conservan el fondo general aclarado, puntos menudos, chrome capuchino, texto legible y estados semánticos. El tema oscuro mantiene su reinterpretación petróleo.
+
+Dirección vigente: neutros arena/cacao de intensidad media, superficies de apoyo #D2C5BB y elevadas #EBE3DC. Acentos salvia, petróleo, coral, oro, menta y lavanda más presentes en sus funciones existentes. Relieve con bordes y sombras cálidas; el color de estado sigue procediendo del dominio. No se cambian layout ni reglas clínicas.
+
+Corrección vigente: sidebar y navbar se aclaran al mismo café grisáceo #D7CEC7 del fondo. El token capuchino reutiliza el de página, sin duplicar color; acentos y relieve de Inicio se conservan.

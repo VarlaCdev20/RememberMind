@@ -21,12 +21,21 @@
                     <x-ui.callout variant="danger" title="No se pudo registrar el control">{{ $message }}</x-ui.callout>
                 @enderror
 
+                <div class="space-y-2" aria-live="polite">
+                    @foreach($avisosClinicos as $aviso)
+                        <x-ui.callout :variant="$aviso['severidad'] === 'CRITICO' ? 'danger' : 'warning'" title="Interpretación de la toma">
+                            {{ $aviso['mensaje'] }}
+                        </x-ui.callout>
+                    @endforeach
+                    <p class="text-xs text-[var(--rm-text-secondary)]">La vista previa usa el evaluador clínico del servidor. SpO₂ requiere un objetivo médico individual para su interpretación automática.</p>
+                </div>
+
                 <x-ui.form-section title="Fecha y hora" icon="ph-calendar-blank" :columns="2">
                     <x-ui.field label="Fecha" for="signos-fecha" required error="fecha">
-                        <input id="signos-fecha" wire:model="fecha" type="date" @class(['rm-input', 'rm-input-error' => $errors->has('fecha')])>
+                        <input id="signos-fecha" wire:model.live="fecha" type="date" @class(['rm-input', 'rm-input-error' => $errors->has('fecha')])>
                     </x-ui.field>
                     <x-ui.field label="Hora" for="signos-hora" error="hora">
-                        <input id="signos-hora" wire:model="hora" type="time" @class(['rm-input', 'rm-input-error' => $errors->has('hora')])>
+                        <input id="signos-hora" wire:model.live="hora" type="time" @class(['rm-input', 'rm-input-error' => $errors->has('hora')])>
                     </x-ui.field>
                 </x-ui.form-section>
 
@@ -40,12 +49,6 @@
                     <x-ui.field label="Frecuencia cardiaca (bpm)" for="signos-fc" error="fc">
                         <input id="signos-fc" wire:model.live="fc" type="number" min="1" max="300" placeholder="70" @class(['rm-input', 'rm-input-error' => $errors->has('fc')])>
                     </x-ui.field>
-
-                    @if($pa_sistolica && ($pa_sistolica > 140 || $pa_sistolica < 90))
-                        <x-ui.callout class="md:col-span-3" variant="warning" title="Presión arterial fuera del rango esperado">
-                            PA {{ $pa_sistolica > 140 ? 'elevada' : 'baja' }}; requiere valoración según protocolo.
-                        </x-ui.callout>
-                    @endif
 
                     @if(is_numeric($pa_sistolica) && is_numeric($pa_diastolica) && (int) $pa_sistolica <= (int) $pa_diastolica)
                         <label class="md:col-span-3 flex cursor-pointer items-start gap-3 rounded-[var(--rm-radius-input)] border border-[var(--rm-warning)] bg-[var(--rm-warning-soft)] p-3 text-xs font-semibold text-[var(--rm-warning-strong)]">
@@ -62,11 +65,6 @@
                     <x-ui.field label="Saturación O₂ (%)" for="signos-saturacion" error="saturacion">
                         <input id="signos-saturacion" wire:model.live="saturacion" type="number" min="0" max="100" placeholder="98" @class(['rm-input', 'rm-input-error' => $errors->has('saturacion')])>
                     </x-ui.field>
-                    @if($saturacion && $saturacion < 92)
-                        <x-ui.callout class="md:col-span-2" variant="danger" title="Saturación crítica">
-                            Saturación registrada: {{ $saturacion }}%. Active el protocolo asistencial correspondiente.
-                        </x-ui.callout>
-                    @endif
                 </x-ui.form-section>
 
                 <x-ui.form-section title="Temperatura y glucemia" icon="ph-thermometer" :columns="2">

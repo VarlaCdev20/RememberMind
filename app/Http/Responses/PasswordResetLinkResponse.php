@@ -83,6 +83,6 @@ class PasswordResetLinkResponse implements
             ->with(
                 'status',
                 self::MESSAGE
-            );
+            )->with('recovery_requested', true);
     }
 }

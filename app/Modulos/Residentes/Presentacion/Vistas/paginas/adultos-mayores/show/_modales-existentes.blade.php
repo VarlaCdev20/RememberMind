@@ -236,14 +236,17 @@
  <input type="hidden" name="_method" :value="isEditing ? 'PATCH' : 'POST'">
  <input type="hidden" name="estado" value="ACTIVO">
  <div class="md:col-span-2">
- <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">Nombre completo del Familiar</label>
- <input name="nombre_nuevo" :value="recordData.usuario?.name || recordData.nombres || ''" :disabled="isViewing" required class="w-full rounded-xl border {{ $errors->has('nombre_nuevo') ? 'border-[var(--rm-action-primary)] bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="Ej. Juan Pérez">
- @error('nombre_nuevo') <span class="mt-1 block text-xs font-bold text-[var(--rm-action-primary)]">{{ $message }}</span> @enderror
- </div>
+ <label for="contacto-modal-nombres" class="rm-label">Nombres</label>
+ <input id="contacto-modal-nombres" name="nombres" :value="recordData.nombres || ''" :disabled="isViewing || isEditing" required maxlength="100" class="rm-input">
+ <label for="contacto-modal-paterno" class="rm-label">Apellido paterno</label>
+ <input id="contacto-modal-paterno" name="apellido_paterno" :value="recordData.apellido_paterno || ''" :disabled="isViewing || isEditing" required maxlength="80" class="rm-input">
+ <label for="contacto-modal-materno" class="rm-label">Apellido materno</label>
+ <input id="contacto-modal-materno" name="apellido_materno" :value="recordData.apellido_materno || ''" :disabled="isViewing || isEditing" maxlength="80" class="rm-input">
+ <p class="rm-help">La corrección de identidad compartida se realiza en Familiares y contactos, por separado del vínculo.</p> </div>
  <div class="md:col-span-2">
  <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">Correo Electrónico (Opcional)</label>
- <input name="email_nuevo" type="email" :value="recordData.usuario?.email || recordData.email || ''" :disabled="isViewing" class="w-full rounded-xl border {{ $errors->has('email_nuevo') ? 'border-[var(--rm-action-primary)] bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="ejemplo@correo.com">
- @error('email_nuevo') <span class="mt-1 block text-xs font-bold text-[var(--rm-action-primary)]">{{ $message }}</span> @enderror
+ <input name="correo" type="email" :value="recordData.usuario?.email || recordData.email || ''" :disabled="isViewing" class="w-full rounded-xl border {{ $errors->has('correo') ? 'border-[var(--rm-action-primary)] bg-boton-acento/5' : 'border-borde-suave bg-fondo-panel' }} px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="ejemplo@correo.com">
+ @error('correo') <span class="mt-1 block text-xs font-bold text-[var(--rm-action-primary)]">{{ $message }}</span> @enderror
  </div>
  <div>
  <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">Parentesco</label>
@@ -479,32 +482,13 @@
  </div>
  </form>
 
- {{-- Evaluación Cognitiva --}}
- <form id="form-evaluacion" method="POST" action="{{ route('admin.adultos-mayores.evaluaciones.store', $idAdulto) }}" x-show="modal === 'evaluacion'" class="grid gap-4 md:grid-cols-2" onsubmit="procesarFormulario(event)">
- @csrf
- <input type="hidden" name="_method" :value="isEditing ? 'PATCH' : 'POST'">
- <div>
- <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">Tipo de Evaluación</label>
- <select name="cod_tipo_eval" :value="recordData.cod_tipo_eval || ''" :disabled="isViewing || isEditing" required class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus">
- <option value="">Seleccione prueba</option>
- @foreach($tiposEvaluaciones as $tipo)
- <option value="{{ $tipo->cod_tipo_eval }}">{{ $tipo->nombre }} (Máx: {{ $tipo->puntaje_maximo }})</option>
- @endforeach
- </select>
- </div>
- <div>
- <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">Puntaje Obtenido (0-30)</label>
- <input type="number" name="puntaje_total" :value="recordData.puntaje_total || ''" :disabled="isViewing || isEditing" min="0" max="30" step="1" required class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" placeholder="Ej. 26">
- </div>
- <div class="md:col-span-2">
- <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">Fecha de Aplicación</label>
- <input type="date" name="fecha_eval" :value="recordData.fecha_eval?.split(' ')[0] || '{{ now()->format('Y-m-d') }}'" :disabled="isViewing || isEditing" required class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus">
- </div>
- <div class="md:col-span-2">
- <label class="mb-1 block text-[10px] font-bold uppercase text-apoyo">Observaciones y Hallazgos</label>
- <textarea name="observaciones" :value="recordData.observaciones || ''" :disabled="isViewing || isEditing" class="w-full rounded-xl border border-borde-suave bg-fondo-panel px-4 py-3 text-sm font-bold outline-none focus:border-borde-focus" rows="4" placeholder="Detalle fallos en subpruebas específicas (ej. memoria, orientación, dibujo)..."></textarea>
- </div>
- </form>
+ {{-- Captura instrumental compartida por todas las entradas. --}}
+ <section x-show="modal === 'evaluacion'" class="space-y-4">
+ <p>Consulta el historial y registra las respuestas del instrumento aplicado, con su fecha y hora originales.</p>
+ @can('aplicaciones_instrumento.ver')
+ <a href="{{ route('admin.salud-seguimiento.evaluaciones-geriatricas', ['adulto' => $idAdulto]) }}" class="rm-btn rm-btn-primary">Abrir mediciones e historial</a>
+ @endcan
+ </section>
 
  {{-- Actividad --}}
  <form
@@ -672,7 +656,6 @@
  <button type="submit" form="form-familiar" x-show="modal === 'FAMILIAR' && !isViewing" class="rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold text-inverso transition hover:bg-fondo-panel active:scale-95" x-text="isEditing ? 'Actualizar Familiar' : 'Vincular Familiar'"></button>
  <button type="submit" form="form-observacion" x-show="modal === 'observacion' && !isViewing" :disabled="cargando" class="rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold text-inverso transition hover:bg-fondo-panel active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" x-text="cargando ? 'Guardando...' : (isEditing ? 'Actualizar Observación' : 'Guardar Observación')"></button>
  <button type="submit" form="form-atencion" x-show="modal === 'atencion' && !isViewing" :disabled="cargando" class="rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold text-inverso transition hover:bg-fondo-panel active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" x-text="cargando ? 'Guardando...' : (isEditing ? 'Actualizar Atención' : 'Guardar Atención')"></button>
- <button type="submit" form="form-evaluacion" x-show="modal === 'evaluacion' && !isViewing" class="rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold text-inverso transition hover:bg-fondo-panel active:scale-95">Guardar Evaluación</button>
  <button type="submit" form="form-actividad" x-show="modal === 'actividad' && !isViewing" :disabled="cargando" class="rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold text-inverso transition hover:bg-fondo-panel active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" x-text="cargando ? 'Guardando...' : (isEditing ? 'Actualizar Actividad' : 'Guardar Actividad')"></button>
  <button type="submit" form="form-documento" x-show="modal === 'documento' && !isViewing" :disabled="cargando" class="rounded-xl bg-boton-acento px-4 py-2.5 text-xs font-bold text-inverso transition hover:bg-fondo-panel active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" x-text="cargando ? 'Guardando...' : (isEditing ? 'Actualizar Metadatos' : 'Subir Documento')"></button>
  </div>

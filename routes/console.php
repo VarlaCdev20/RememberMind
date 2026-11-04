@@ -8,8 +8,6 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::call(function () {
-    $detector = app(\App\Modulos\Alertas\Aplicacion\Acciones\DeteccionAlertasService::class);
-    $detector->detectar();
-    $detector->detectarPreventivas();
-})->name('vigilancia-asistencial')->everyFiveMinutes()->withoutOverlapping();
+// El diagnóstico falla explícitamente hasta aprobar autoría; no simula una sesión web.
+Schedule::command('alertas:verificar-vigilancia')
+    ->name('vigilancia-asistencial')->everyFiveMinutes()->withoutOverlapping();

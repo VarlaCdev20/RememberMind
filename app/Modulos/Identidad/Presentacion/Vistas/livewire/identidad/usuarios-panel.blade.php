@@ -58,6 +58,7 @@
  </div>
  </div>
  <div class="flex flex-wrap items-center gap-2">
+ <a href="{{ route('admin.usuarios.correos.index', ['usuario' => $usuarioDetalle->getKey()]) }}" class="rm-btn rm-btn-secondary"><i class="ph ph-envelope" aria-hidden="true"></i> Historial de correos</a>
  @can('usuarios.editar')
  <button type="button"
  wire:click="abrirEdicionDesdeDetalle"
@@ -463,9 +464,10 @@
  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl border border-borde/25 bg-fondo-card/40 transition hover:bg-fondo-card/60">
  <div class="min-w-0 flex-1">
  <p class="font-black text-parrafo truncate uppercase leading-tight" title="{{ $item['nombre'] }}">{{ $item['nombre'] }}</p>
+ <x-ui.document-requirement-warning :item="$item" />
  <p class="text-[8px] text-meta font-black uppercase tracking-wider mt-0.5 flex items-center gap-1.5">
  <span>{{ $item['obligatorio'] ? 'Obligatorio' : 'Opcional' }}</span>
- @if($item['requiere_vencimiento'] && $item['cargado'] && $item['documento']->fecha_vencimiento)
+ @if($item['requiere_vencimiento'] && $item['documento']?->fecha_vencimiento)
  <span class="text-boton-acento">| Vence: {{ \Carbon\Carbon::parse($item['documento']->fecha_vencimiento)->format('d/m/Y') }}</span>
  @endif
  </p>
@@ -473,7 +475,9 @@
  <div class="flex items-center gap-2 shrink-0">
  <!-- Badge de estado -->
  <div>
- @if($item['cargado'])
+ @if($item['conflicto'] ?? false)
+ <span class="rm-help">Revisión necesaria</span>
+ @elseif($item['cargado'])
  @if($item['estado'] === 'VALIDADO')
  <span class="inline-flex items-center gap-1 text-[8px] font-black text-estado-exito bg-estado-exitoBg px-2 py-0.5 rounded-full uppercase">
  <i class="ph-bold ph-check-circle text-[10px]"></i> Validado
@@ -496,10 +500,12 @@
 
  <!-- Acciones de archivo -->
  <div class="flex items-center gap-1">
- @if($item['cargado'])
+ @if($item['conflicto'] ?? false)
+ <span class="rm-help">Consulta los archivos originales en la ficha.</span>
+ @elseif($item['cargado'])
  <!-- Ver documento -->
  @can('documentos.ver')
- <a href="{{ Storage::url($item['documento']->archivo) }}" target="_blank"
+ <a href="{{ route('admin.personal.documento.archivo', $item['documento']) }}" target="_blank" rel="noopener"
  class="flex h-7 w-7 items-center justify-center rounded-lg bg-fondo-panel text-parrafo transition hover:bg-boton-principal hover:text-inverso"
  title="Ver Documento">
  <i class="ph-bold ph-eye text-xs"></i>
@@ -508,7 +514,7 @@
 
  <!-- Reemplazar documento -->
  @canany(['documentos.subir', 'documentos.gestionar'])
- <button type="button" wire:click="abrirModalSubirDoc('{{ $item['cod_tipo_doc'] }}')"
+ <button type="button" wire:click="abrirModalSubirDoc('{{ $item['documento']?->tipo_documento ?? $item['cod_tipo_doc'] }}')"
  class="flex h-7 w-7 items-center justify-center rounded-lg bg-estado-peligroBg text-boton-acento transition hover:bg-boton-acento hover:text-inverso"
  title="Reemplazar Archivo">
  <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
@@ -724,13 +730,14 @@
 
  {{-- Cabecera compartida para pantallas de colección. --}}
  <x-ui.collection-header class="mb-5" title="Usuarios del sistema" subtitle="Administra cuentas, accesos y perfiles autorizados dentro del Centro Geriátrico Jardín de los Recuerdos." icon="ph-users-three" eyebrow="Gestión institucional">
-  @can('usuarios.crear')
    <x-slot:actions>
+    <a href="{{ route('admin.usuarios.correos.index') }}" class="rm-btn rm-btn-secondary"><i class="ph ph-envelope" aria-hidden="true"></i> Mis envíos de correo</a>
+    @can('usuarios.crear')
     <button type="button" wire:click="crearUsuario" class="rm-btn rm-btn-accent">
      <i class="ph-bold ph-plus-circle text-lg" aria-hidden="true"></i><span>Nuevo usuario</span>
     </button>
+    @endcan
    </x-slot:actions>
-  @endcan
  </x-ui.collection-header>
 
  {{-- MÉTRICAS PRINCIPALES (KPIS) --}}

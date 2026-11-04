@@ -104,7 +104,7 @@ class IntegridadFisicaBddV2Test extends TestCase
         ]);
         $administracion = [
             'cod_administracion' => 'AMD_F4_PROPIA', 'cod_prescripcion' => $this->codPrescripcion,
-            'cod_residente' => 'RES_BASE', 'cod_jornada' => 'JOR_F4_SQL', 'cod_personal' => 'PER_0001',
+            'cod_residente' => 'RES_BASE', 'cod_jornada' => 'JOR_F4_SQL', 'cod_personal' => 'COD_PER_000001',
             'fecha_hora_administracion' => now(), 'resultado' => 'ADMINISTRADA',
             'dosis_administrada' => 1, 'estado' => 'REGISTRADA',
         ];
@@ -153,7 +153,7 @@ class IntegridadFisicaBddV2Test extends TestCase
             'cod_atencion' => $this->codAtencion,
             'cod_residente' => 'RES_BASE',
             'cod_area' => 'ARE_INTEGRIDAD',
-            'cod_personal' => 'PER_0001',
+            'cod_personal' => 'COD_PER_000001',
             'tipo_atencion' => 'MEDICA',
             'fecha_hora' => now(),
             'estado' => 'ABIERTA',
@@ -169,7 +169,7 @@ class IntegridadFisicaBddV2Test extends TestCase
             'cod_residente' => 'RES_BASE',
             'cod_atencion' => $this->codAtencion,
             'cod_medicamento' => 'MED_INTEGRIDAD',
-            'cod_personal' => 'PER_0001',
+            'cod_personal' => 'COD_PER_000001',
             'dosis' => 1,
             'via_administracion' => 'ORAL',
             'segun_necesidad' => false,
@@ -191,7 +191,7 @@ class IntegridadFisicaBddV2Test extends TestCase
         DB::table('admisiones')->insert([
             'cod_admision' => 'ADM_INTEGRIDAD',
             'cod_residente' => 'RES_BASE',
-            'cod_usuario_registro' => 'USU_0001',
+            'cod_usuario_registro' => 'COD_USU_000001',
             'fecha_hora_admision' => now(),
             'motivo_ingreso' => 'Prueba de integridad',
             'estado' => 'ACTIVA',
@@ -201,7 +201,7 @@ class IntegridadFisicaBddV2Test extends TestCase
             'cod_residente' => 'RES_BASE',
             'cod_cama' => 'CAM_INTEGRIDAD',
             'cod_admision' => 'ADM_INTEGRIDAD',
-            'cod_usuario_registro' => 'USU_0001',
+            'cod_usuario_registro' => 'COD_USU_000001',
             'fecha_hora_asignacion' => now(),
             'estado' => 'ACTIVA',
         ]);

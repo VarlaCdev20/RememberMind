@@ -9,7 +9,7 @@
        ------------------------------------------------------------ */
     --rm-filter-bg: var(--rm-surface-main);
     --rm-filter-control-bg: var(--rm-input-bg);
-    --rm-filter-control-height: 38px;
+    --rm-filter-control-height: 44px;
     --rm-filter-border: var(--rm-border-soft);
     --rm-filter-active-bg: var(--rm-action-primary-soft);
     --rm-filter-focus: var(--rm-action-primary);
@@ -22,9 +22,9 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
+    gap: var(--rm-space-3);
     width: 100%;
-    padding: 11px 15px;
+    padding: var(--rm-space-4);
     color: var(--rm-text-primary);
     background-color: var(--rm-filter-bg);
     background-image:
@@ -81,7 +81,7 @@
     padding: 0 12px;
     color: var(--rm-text-primary);
     font-family: var(--rm-font-body);
-    font-size: 12px;
+    font-size: var(--rm-font-size-table);
     font-weight: 500;
     line-height: 1.25rem;
     background: var(--rm-filter-control-bg, var(--rm-input-bg));
@@ -137,11 +137,10 @@
 ):not(:disabled):not([aria-invalid="true"]),
 .rm-filter-control[data-rm-filter-active="true"]:not(:disabled):not([aria-invalid="true"]) {
     background: color-mix(in srgb, var(--rm-filter-tone-accent, var(--rm-action-primary)) 25%, var(--rm-surface-main)) !important;
-    border: 2px solid var(--rm-filter-tone-accent, var(--rm-action-primary-active)) !important;
+    border: 1px solid var(--rm-filter-tone-accent, var(--rm-action-primary-active)) !important;
     color: color-mix(in srgb, var(--rm-filter-tone-accent, var(--rm-action-primary-ink)) 60%, var(--rm-text-primary)) !important;
     font-weight: 700 !important;
-    box-shadow: inset 3px 0 0 var(--rm-filter-tone-accent, var(--rm-action-primary-active)),
-                0 0 0 1px color-mix(in srgb, var(--rm-filter-tone-accent, var(--rm-action-primary)) 35%, transparent) !important;
+    box-shadow: none !important;
 }
 
 .rm-filter-bar.rm-filter-bar :is(
@@ -152,8 +151,7 @@
 .rm-filter-control[data-rm-filter-active="true"]:not(:disabled):not([aria-invalid="true"]):focus {
     background: color-mix(in srgb, var(--rm-filter-tone-accent, var(--rm-action-primary)) 25%, var(--rm-surface-main)) !important;
     border-color: var(--rm-filter-tone-accent, var(--rm-action-primary-active)) !important;
-    box-shadow: inset 3px 0 0 var(--rm-filter-tone-accent, var(--rm-action-primary-active)),
-                0 0 0 3px color-mix(in srgb, var(--rm-focus) 38%, transparent) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--rm-focus) 38%, transparent) !important;
 }
 
 .rm-filter-bar :is(.rm-filter-search, .relative):has(input[data-rm-filter-active="true"]) > :is(.rm-filter-search-icon, span.pointer-events-none) {

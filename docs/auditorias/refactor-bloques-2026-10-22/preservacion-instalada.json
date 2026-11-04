@@ -1,0 +1,12 @@
+{
+    "base": "remembermind_dev",
+    "instalada": true,
+    "tablas_fisicas": 116,
+    "filas_bloques": {
+        "resultados_criterio": 147,
+        "trazas_inferencia": 18,
+        "variables_expertas": 87,
+        "clasificaciones_dcl_instantanea": 5
+    },
+    "huella_bloques": "31acc560bc09b9f14c9a80f7619fbfb7fb9fb0d10acc25494a0cad63899b3a2d"
+}

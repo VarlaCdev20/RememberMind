@@ -1,6 +1,6 @@
 # Flujo Git de RememberMind
 
-Decisión del propietario, 11/10/2026: conservar los doce módulos de la arquitectura híbrida como base técnica; mantener visibles las capacidades pendientes. Main no acredita por sí sola aceptación institucional, producción ni validación clínica.
+Decisión del propietario, 11/10/2026: conservar los doce módulos de la arquitectura híbrida como base técnica; mantener visibles las capacidades pendientes. Main no acredita por sí sola aceptación institucional, producción ni evaluación posterior en uso real.
 
 ## Ramas y recorrido
 

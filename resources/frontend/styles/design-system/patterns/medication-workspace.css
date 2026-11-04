@@ -1,0 +1,188 @@
+/* Agenda de medicación: componentes compartidos, datos y permisos del módulo. */
+.rm-medication-workspace { --rm-clinical-control-height: 44px; container: medication-workspace / inline-size; display: grid; gap: var(--rm-section-gap); min-width: 0; font-family: var(--rm-font-body); }
+.rm-shell main .rm-medication-workspace button { min-height: 44px; }
+.rm-medication-workspace .rm-collection-header { min-height: 104px; padding: var(--rm-space-4) var(--rm-space-5); }
+.rm-shell main .rm-medication-workspace .rm-collection-header h1 { font: 800 var(--rm-font-size-page)/1.2 var(--rm-font-friendly); color: var(--rm-text-primary); }
+.rm-medication-workspace .rm-collection-header__icon { width: 48px; height: 48px; font-size: 24px; border-radius: var(--rm-radius-card); }
+.rm-medication-workspace .rm-collection-header__context { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; color: var(--rm-text-primary); }
+.rm-medication-workspace__shift { display: block; max-width: 38ch; color: var(--rm-text-secondary); font-size: var(--rm-font-size-label); overflow-wrap: anywhere; }
+.rm-medication-workspace__notice { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border-radius: var(--rm-radius-card); border: 1px solid var(--rm-border-soft); background: var(--rm-action-primary-soft); color: var(--rm-text-primary); font-size: var(--rm-font-size-body); }
+.rm-medication-workspace__notice--attention { background: var(--rm-warning-soft); color: var(--rm-text-primary); }
+.rm-medication-workspace__notice > i { flex: none; font-size: 22px; }
+.rm-medication-workspace__notice p { margin: 0; line-height: 1.5; }
+.rm-medication-workspace__navigation { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 5px; width: min(100%, 760px); border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-card); background: var(--rm-surface-raised); box-shadow: var(--rm-shadow-xs); }
+.rm-medication-workspace__tab { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1px solid transparent; border-radius: var(--rm-radius-md); color: var(--rm-text-secondary); font-size: var(--rm-font-size-body); font-weight: 700; transition: background-color 140ms ease, color 140ms ease; }
+.rm-medication-workspace__tab:hover { background: var(--rm-surface-soft); color: var(--rm-text-primary); }
+.rm-medication-workspace__tab[aria-current="page"] { background: color-mix(in srgb, var(--rm-action-primary) 32%, var(--rm-surface-raised)); border-color: var(--rm-action-primary); color: var(--rm-text-primary); box-shadow: var(--rm-shadow-xs); }
+.rm-medication-workspace__tab > i { font-size: 20px; }
+.rm-medication-workspace__content, .rm-medication-workspace__list { min-width: 0; display: grid; gap: var(--rm-space-4); }
+.rm-medication-workspace__content, .rm-medication-workspace__dose-list { container: medication-doses / inline-size; }
+.rm-medication-workspace__agenda-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--rm-grid-gap); align-items: start; min-width: 0; }
+.rm-medication-workspace__dose-list, .rm-medication-workspace__sidebar { min-width: 0; }
+.rm-medication-workspace__content.is-loading { opacity: .65; }
+.rm-medication-workspace__content > .space-y-5 { padding: 0; background: transparent; }
+.rm-medication-workspace__content > .space-y-5 .rm-filter-bar input { padding-left: 36px; }
+.rm-medication-workspace__content > .space-y-5 .rm-filter-bar input[type="date"] { padding-left: 10px; }
+.rm-medication-workspace__content > .space-y-5 .rm-filter-bar button[title*="Limpiar"] { min-width: 44px; padding: 0; }
+.rm-medication-workspace__filters { container: medication-filters / inline-size; }
+.rm-medication-workspace__filter-primary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: center; }
+.rm-medication-workspace__search { position: relative; min-width: 0; }
+.rm-medication-workspace__search > i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 20px; color: var(--rm-text-secondary); }
+.rm-medication-workspace__search input { padding-left: 40px !important; }
+.rm-medication-workspace .rm-filter-bar { padding: 12px; margin: 0; }
+.rm-medication-workspace .rm-filter-bar :is(input, select) { width: 100%; min-width: 0; min-height: 44px; border: 1px solid var(--rm-input-border); border-radius: var(--rm-radius-md); background: var(--rm-input-bg); color: var(--rm-text-primary); padding: 0 12px; font-size: var(--rm-font-size-body); }
+.rm-medication-workspace__filter-extra { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; border-top: 1px solid var(--rm-border-soft); padding-top: 12px; }
+.rm-medication-workspace__filter-extra label { display: block; margin-bottom: 5px; color: var(--rm-text-secondary); font-size: var(--rm-font-size-label); font-weight: 600; }
+.rm-medication-workspace .rm-active-filter-chip { max-width: 100%; min-width: 0; padding-block: 0; }
+.rm-medication-workspace .rm-active-filter-chip__label { min-width: 0; overflow-wrap: anywhere; }
+.rm-medication-workspace .rm-active-filter-chip__remove { flex: none; width: 44px; height: 44px; background: transparent; }
+.rm-medication-workspace .rm-active-filter-chip__remove:hover { transform: none; }
+.rm-medication-workspace .rm-clear-all-filters-btn { min-height: 44px; }
+.rm-medication-workspace .rm-filter-bar .rm-clear-all-filters-btn { position: static; inset: auto; transform: none; animation: none; }
+.rm-medication-workspace__count { color: var(--rm-text-secondary); font-size: var(--rm-font-size-label); }
+.rm-medication-workspace__table-panel { background: var(--rm-surface-main); }
+.rm-medication-workspace__table-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding: 12px 16px; background: var(--rm-surface-raised); border-bottom: 1px solid var(--rm-border-soft); }
+.rm-medication-workspace__table-heading > div:first-child { flex-wrap: wrap; }
+.rm-medication-workspace__table-heading > div:first-child > i { color: var(--rm-action-primary-ink); font-size: 22px; }
+.rm-medication-workspace__table-heading h3 { font: 800 var(--rm-font-size-card-title)/1.35 var(--rm-font-friendly); }
+.rm-medication-workspace__table-heading > div:first-child > span { font-size: var(--rm-font-size-meta); color: var(--rm-text-primary); }
+.rm-medication-workspace__priority { color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); }
+.rm-medication-workspace__dose-count { padding: 5px 10px; border-radius: var(--rm-radius-pill); background: var(--rm-action-primary-soft); color: var(--rm-text-primary); font-size: var(--rm-font-size-label); font-weight: 800; white-space: nowrap; }
+.rm-medication-workspace .rm-medication-workspace__time { display: inline-flex; align-items: center; gap: 6px; padding: 6px 8px; background: color-mix(in srgb, var(--rm-info) 24%, var(--rm-surface-raised)); color: var(--rm-text-primary); font-size: var(--rm-font-size-label); font-variant-numeric: tabular-nums; }
+.rm-medication-workspace .rm-medication-workspace__time i { color: var(--rm-info-strong); font-size: 16px; }
+.rm-shell [data-rm-main] .rm-medication-workspace table.rm-data-table tbody tr.rm-dose-row { background: var(--rm-surface-raised); transition: background-color 140ms ease; }
+.rm-shell [data-rm-main] .rm-medication-workspace table.rm-data-table tbody tr.rm-dose-row:hover { background: color-mix(in srgb, var(--rm-action-primary) 8%, var(--rm-surface-raised)); }
+.rm-shell [data-rm-main] .rm-medication-workspace table.rm-data-table tbody tr.rm-dose-row.is-clinical-alert { background: color-mix(in srgb, var(--rm-danger) 10%, var(--rm-surface-raised)); }
+.rm-shell [data-rm-main] .rm-medication-workspace table.rm-data-table tbody tr.rm-dose-row.is-selected { background: var(--rm-action-primary-soft); outline: 2px solid var(--rm-selected-border); outline-offset: -2px; }
+.rm-medication-workspace .rm-dose-row td { padding-inline: 10px; }
+.rm-medication-workspace .rm-dose-avatar { width: 30px; height: 30px; border-radius: 50%; background: color-mix(in srgb, var(--rm-action-primary) 28%, var(--rm-surface-raised)); color: var(--rm-text-primary); font-size: var(--rm-font-size-meta); }
+.rm-medication-workspace .rm-dose-room > span { display: flex; align-items: center; gap: 6px; white-space: normal; }
+.rm-medication-workspace .rm-dose-room i { display: none; flex: none; font-size: 18px; color: var(--rm-action-primary-ink); }
+.rm-medication-workspace .rm-dose-action-long { display: none; }
+.rm-medication-workspace .rm-dose-drug-icon { flex: none; color: var(--rm-info-strong); font-size: 20px; }
+.rm-medication-workspace .rm-dose-alert { color: var(--rm-danger-strong); font-size: var(--rm-font-size-meta); }
+.rm-medication-workspace .rm-dose-row :is(.rm-medication-workspace__resident, .rm-medication-workspace__drug) { overflow-wrap: anywhere; }
+.rm-medication-workspace .rm-dose-row .rm-badge-warning { background: color-mix(in srgb, var(--rm-warning) 28%, var(--rm-surface-raised)); color: var(--rm-text-primary); border: 1px solid var(--rm-warning); }
+.rm-medication-workspace .rm-dose-row .rm-badge-critical { background: color-mix(in srgb, var(--rm-danger) 24%, var(--rm-surface-raised)); color: var(--rm-text-primary); border: 1px solid var(--rm-danger); }
+.rm-medication-workspace .rm-dose-row .rm-badge-success { background: color-mix(in srgb, var(--rm-success) 24%, var(--rm-surface-raised)); color: var(--rm-text-primary); border: 1px solid var(--rm-success); }
+.rm-medication-workspace .rm-dose-row .rm-badge-info { background: color-mix(in srgb, var(--rm-info) 24%, var(--rm-surface-raised)); color: var(--rm-text-primary); border: 1px solid var(--rm-info); }
+.rm-shell main .rm-medication-workspace :is(.rm-medication-workspace__resident, .rm-medication-workspace__drug) { font-size: var(--rm-font-size-body); line-height: 1.4; }
+.rm-medication-workspace__analysis { min-width: 0; display: grid; gap: var(--rm-space-3); }
+.rm-medication-workspace__analysis-heading h2 { display: flex; align-items: center; gap: 8px; font: 800 var(--rm-font-size-section)/1.35 var(--rm-font-friendly); color: var(--rm-text-primary); }
+.rm-medication-workspace__analysis-heading h2 i { color: var(--rm-action-primary); font-size: 22px; }
+.rm-medication-workspace__analysis-heading p, .rm-medication-workspace__chart-note { font-size: var(--rm-font-size-label); line-height: 1.5; color: var(--rm-text-secondary); }
+.rm-medication-workspace__charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: var(--rm-grid-gap); }
+.rm-medication-workspace .rm-medication-workspace__chart { height: auto; min-width: 0; min-height: 0; gap: 8px; background: var(--rm-surface-main); padding: 14px; box-shadow: var(--rm-shadow-sm); }
+.rm-medication-workspace__chart .rm-chart-header { min-height: 40px; gap: 8px; padding-bottom: 8px; border-color: var(--rm-border-soft); flex-wrap: wrap; }
+.rm-medication-workspace__chart .rm-chart-header h3 { display: flex; align-items: center; gap: 8px; font: 800 var(--rm-font-size-card-title)/1.35 var(--rm-font-friendly); color: var(--rm-text-primary); }
+.rm-medication-workspace__chart .rm-chart-header h3 i { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; flex: none; border-radius: var(--rm-radius-md); font-size: 20px; }
+.rm-medication-workspace__chart--states .rm-chart-header h3 i { background: var(--rm-action-primary-soft); color: var(--rm-action-primary-ink); }
+.rm-medication-workspace__chart--hours .rm-chart-header h3 i { background: var(--rm-info-soft); color: var(--rm-info-strong); }
+.rm-medication-workspace__chart .rm-chart-header > span { font-size: var(--rm-font-size-meta); color: var(--rm-text-secondary); }
+.rm-medication-workspace__state-layout { display: grid; grid-template-columns: minmax(100px, 140px) minmax(0, 1fr); gap: 12px; align-items: center; }
+.rm-medication-workspace__donut { position: relative; min-width: 0; }
+.rm-medication-workspace__canvas { height: 144px; }
+.rm-medication-workspace__donut-total { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; color: var(--rm-text-primary); }
+.rm-medication-workspace__donut-total strong { font: 800 var(--rm-font-size-kpi)/1 var(--rm-font-friendly); font-variant-numeric: tabular-nums; }
+.rm-medication-workspace__donut-total span { font-size: var(--rm-font-size-meta); }
+.rm-medication-workspace__legend { display: grid; gap: 4px; padding: 0; list-style: none; }
+.rm-medication-workspace__legend li { display: flex; gap: 12px; align-items: center; justify-content: space-between; font-size: var(--rm-font-size-label); color: var(--rm-text-primary); }
+.rm-medication-workspace__legend li > span { display: inline-flex; align-items: center; gap: 8px; }
+.rm-medication-workspace__legend li { padding: 3px 6px; border-radius: var(--rm-radius-md); }
+.rm-medication-workspace__legend .is-info { --medication-state-color: var(--rm-info); }
+.rm-medication-workspace__legend .is-warning { --medication-state-color: var(--rm-warning); }
+.rm-medication-workspace__legend .is-danger { --medication-state-color: var(--rm-danger); }
+.rm-medication-workspace__legend .is-success { --medication-state-color: var(--rm-success); }
+.rm-medication-workspace__legend .is-neutral { --medication-state-color: var(--rm-text-muted); }
+.rm-medication-workspace__legend .has-doses { background: color-mix(in srgb, var(--medication-state-color) 16%, var(--rm-surface-main)); }
+.rm-medication-workspace__legend strong { font-size: var(--rm-font-size-card-title); font-variant-numeric: tabular-nums; }
+.rm-medication-workspace__dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.rm-medication-workspace__dot.is-info { background: var(--rm-chart-info); }
+.rm-medication-workspace__dot.is-warning { background: var(--rm-chart-warning); }
+.rm-medication-workspace__dot.is-danger { background: var(--rm-chart-danger); }
+.rm-medication-workspace__dot.is-success { background: var(--rm-chart-success); }
+.rm-medication-workspace__dot.is-neutral { background: var(--rm-chart-neutral); }
+.rm-medication-workspace__hours-canvas { position: relative; height: 144px; min-width: 0; }
+.rm-medication-workspace__hours-detail { font-size: var(--rm-font-size-label); color: var(--rm-text-primary); }
+.rm-medication-workspace__hours-detail summary { display: flex; align-items: center; gap: 8px; min-height: 44px; cursor: pointer; font-weight: 700; }
+.rm-medication-workspace__hours-detail summary::before { content: '+'; font-size: 18px; color: var(--rm-action-primary); }
+.rm-medication-workspace__hours-detail[open] summary::before { content: '−'; }
+.rm-medication-workspace__hours-detail ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; padding-block: 8px; }
+.rm-medication-workspace__hours-detail li { display: flex; justify-content: space-between; gap: 8px; }
+.rm-medication-workspace__chart-note { font-size: var(--rm-font-size-meta); line-height: 1.4; }
+.rm-medication-workspace .rm-data-table { background: var(--rm-surface-raised); }
+.rm-medication-workspace .rm-data-table :is(th, td) { padding: 12px; font-family: var(--rm-font-body); }
+.rm-shell main .rm-medication-workspace .rm-data-table th { font-size: var(--rm-font-size-label); color: var(--rm-text-secondary); text-transform: none; letter-spacing: normal; }
+.rm-medication-workspace .rm-data-table thead tr { background: color-mix(in srgb, var(--rm-action-primary) 15%, var(--rm-surface-main)); }
+.rm-medication-workspace .rm-data-table td { font-size: var(--rm-font-size-body); border-left: 0; }
+.rm-medication-workspace .rm-data-table td :is(.text-xs, .text-\[11px\], .text-\[10\.5px\]) { font-size: var(--rm-font-size-label); }
+.rm-medication-workspace .rm-data-table tbody tr { border-left: 0; opacity: 1; }
+.rm-shell [data-rm-main] .rm-medication-workspace table.rm-data-table--actions tbody td:last-child button { min-width: 64px; min-height: 44px; border-radius: var(--rm-radius-md); background: color-mix(in srgb, var(--rm-action-primary) 28%, var(--rm-surface-main)); border-color: var(--rm-action-primary); color: var(--rm-text-primary); font-size: var(--rm-font-size-label); }
+.rm-shell [data-rm-main] .rm-medication-workspace table.rm-data-table--actions tbody td:last-child button:hover { transform: none; }
+.rm-medication-workspace :is(button, a, input, select, summary):focus-visible { outline: 2px solid var(--rm-focus); outline-offset: 2px; }
+@container medication-filters (min-width: 720px) {
+    .rm-medication-workspace__filter-primary { grid-template-columns: minmax(200px, 1.7fr) minmax(140px, 1fr) minmax(150px, 1.1fr) auto; }
+}
+@media (max-width: 1100px) {
+    .rm-medication-workspace__filter-extra { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container medication-workspace (max-width: 739px) {
+    .rm-medication-workspace__charts { grid-template-columns: minmax(0, 1fr); }
+}
+@container medication-workspace (max-width: 860px) {
+    .rm-medication-workspace__tab { padding-inline: 8px; }
+}
+@container medication-doses (max-width: 860px) {
+    .rm-medication-workspace .rm-medication-workspace__dose-table { min-width: 0; width: 100%; display: block; }
+    .rm-medication-workspace__dose-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    .rm-medication-workspace__dose-table tbody { display: grid; gap: 12px; padding: 12px; width: 100%; }
+    .rm-medication-workspace__dose-table tbody tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 12px; gap: 12px; border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-card); background: var(--rm-surface-raised); box-shadow: var(--rm-shadow-xs); }
+    .rm-medication-workspace .rm-medication-workspace__dose-table td { display: block; width: auto; min-width: 0; padding: 0; text-align: left; white-space: normal; overflow-wrap: anywhere; border: 0; }
+    .rm-shell [data-rm-main] .rm-medication-workspace table.rm-medication-workspace__dose-table tbody td { padding: 0; }
+    .rm-medication-workspace__dose-table td[data-label]::before { content: attr(data-label); display: block; margin-bottom: 4px; color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); font-weight: 600; }
+    .rm-medication-workspace__dose-table td:is([data-label="Residente"], [data-label="Medicamento"], [data-label="Motivo"], [colspan]) { grid-column: 1 / -1; }
+    .rm-medication-workspace__dose-table td[data-label="Residente"] { order: -2; }
+    .rm-medication-workspace__dose-table td[data-label="Medicamento"] { order: -1; }
+    .rm-shell [data-rm-main] .rm-medication-workspace table.rm-data-table--actions tbody td:last-child { position: static; right: auto; width: auto; min-width: 0; padding: 0; background: transparent; box-shadow: none; }
+    .rm-medication-workspace .rm-medication-workspace__dose-table tbody tr.rm-dose-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'resident time' 'medication medication' 'room room' 'amount route' 'state action'; gap: 8px 12px; padding: 14px; border-color: var(--rm-border-soft); background: color-mix(in srgb, var(--rm-surface-raised) 94%, transparent); box-shadow: var(--rm-shadow-sm); }
+    .rm-medication-workspace .rm-dose-row .rm-dose-resident { grid-area: resident; align-self: center; }
+    .rm-medication-workspace .rm-dose-row .rm-dose-time { grid-area: time; align-self: start; }
+    .rm-medication-workspace .rm-dose-row .rm-dose-medication { grid-area: medication; }
+    .rm-shell [data-rm-main] .rm-medication-workspace table.rm-data-table--actions tbody .rm-dose-row .rm-dose-medication { padding: 8px 10px; border-radius: var(--rm-radius-md); background: color-mix(in srgb, var(--rm-info) 12%, var(--rm-surface-raised)); }
+    .rm-medication-workspace .rm-dose-row .rm-dose-room { grid-area: room; }
+    .rm-medication-workspace .rm-dose-row .rm-dose-room i { display: inline; }
+    .rm-medication-workspace .rm-dose-row .rm-dose-amount { grid-area: amount; }
+    .rm-medication-workspace .rm-dose-row .rm-dose-route { grid-area: route; justify-self: start; }
+    .rm-medication-workspace .rm-dose-row .rm-dose-state { grid-area: state; align-self: center; }
+    .rm-medication-workspace .rm-dose-row .rm-dose-action { grid-area: action; justify-self: end; align-self: center; }
+    .rm-medication-workspace .rm-dose-row .rm-dose-action-short { display: none; }
+    .rm-medication-workspace .rm-dose-row .rm-dose-action-long { display: inline; }
+    .rm-medication-workspace .rm-dose-row :is(.rm-dose-resident, .rm-dose-time, .rm-dose-room, .rm-dose-state, .rm-dose-action)::before { display: none; }
+    .rm-medication-workspace .rm-dose-row :is(.rm-dose-amount, .rm-dose-route) { padding-bottom: 8px; }
+    .rm-medication-workspace .rm-dose-row.is-clinical-alert { border-color: var(--rm-danger); }
+}
+@container medication-doses (min-width: 600px) and (max-width: 860px) {
+    .rm-medication-workspace__dose-table tbody { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+    .rm-medication-workspace__dose-table tbody tr:has(td[colspan]) { grid-column: 1 / -1; }
+}
+@container medication-workspace (min-width: 900px) {
+    .rm-medication-workspace__agenda-layout { grid-template-columns: minmax(0, 1fr) 320px; }
+    .rm-medication-workspace__sidebar .rm-medication-workspace__charts { grid-template-columns: minmax(0, 1fr); }
+    .rm-medication-workspace__sidebar .rm-medication-workspace__state-layout { grid-template-columns: 120px minmax(0, 1fr); gap: 8px; }
+    .rm-medication-workspace__sidebar .rm-medication-workspace__canvas { height: 120px; }
+    .rm-medication-workspace__sidebar .rm-medication-workspace__analysis-heading { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
+@container medication-workspace (max-width: 599px) {
+    .rm-medication-workspace__navigation { grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }
+    .rm-medication-workspace__state-layout { grid-template-columns: minmax(100px, .8fr) minmax(0, 1fr); gap: 8px; }
+    .rm-medication-workspace__legend li { padding-inline: 4px; }
+}
+@media (max-width: 480px) {
+    .rm-medication-workspace__filter-primary > .rm-medication-workspace__search { grid-column: 1 / -1; }
+    .rm-medication-workspace__filter-primary > button { grid-column: 1 / -1; }
+    .rm-medication-workspace__filter-extra { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .rm-medication-workspace__tab, .rm-shell [data-rm-main] .rm-medication-workspace table.rm-data-table tbody tr.rm-dose-row { transition: none; }
+    .rm-medication-workspace :is(.rm-active-filter-chip, .rm-active-filters-row) { animation: none; }
+}

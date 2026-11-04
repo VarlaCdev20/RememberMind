@@ -5,6 +5,8 @@ namespace App\Modulos\Cuidados\Aplicacion\Acciones;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\PlanCuidado;
 use App\Models\User;
+use App\Models\Area;
+use Illuminate\Support\Facades\DB;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -74,6 +76,11 @@ final class GestionarPlanesCuidado
             'observacion' => $entrada['origen'],
         ];
 
+        return DB::transaction(function () use ($entrada,$datos) {
+        $area=Area::whereKey($datos['cod_area'])->lockForUpdate()->firstOrFail();
+        if ($datos['estado']==='ACTIVO' && !in_array($area->estado,['ACTIVO','ACTIVA'],true)) {
+            throw ValidationException::withMessages(['estadoPlan'=>'El área debe estar activa antes de activar el plan.']);
+        }
         if ($entrada['editandoId']) {
             PlanCuidado::findOrFail($entrada['editandoId'])->update($datos);
             $msg = 'Plan de cuidado actualizado.';
@@ -83,6 +90,7 @@ final class GestionarPlanesCuidado
         }
 
         return $msg;
+        });
     }
 
     public function cerrarPlan(User $usuario, array $entrada, string $id): void

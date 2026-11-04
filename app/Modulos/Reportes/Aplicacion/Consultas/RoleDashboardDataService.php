@@ -2,7 +2,9 @@
 
 namespace App\Modulos\Reportes\Aplicacion\Consultas;
 
+use App\Models\Alerta;
 use App\Models\User;
+use App\Modulos\Alertas\Aplicacion\Consultas\BandejaAlertas;
 use Illuminate\Support\Facades\DB;
 
 /** Datos de presentación para los roles que usan el dashboard compartido. */
@@ -11,8 +13,8 @@ final class RoleDashboardDataService
     public function forRole(User $user, string $role): array
     {
         return match ($role) {
-            'SUPERADMINISTRADOR' => $this->institutional(),
-            'GERENTE' => $this->management(),
+            'SUPERADMINISTRADOR' => $this->institutional($user),
+            'GERENTE' => $this->management($user),
             'MEDICO GENERAL/GERIATRA' => $this->medical($user),
             'NUTRICIONISTA' => $this->professional($user, 'nutricion'),
             'FISIOTERAPEUTA' => $this->professional($user, 'fisioterapia'),
@@ -34,8 +36,8 @@ final class RoleDashboardDataService
         $code = $personal->cod_personal;
         $care = DB::table('atenciones')->where('cod_personal', $code);
         $studies = DB::table('estudios_clinicos')->where('cod_personal', $code);
-        $alerts = DB::table('alertas')->whereIn('estado', ['ABIERTA', 'EN_ATENCION'])
-            ->whereIn('prioridad', ['CRITICO', 'CRITICA', 'ALTA']);
+        $alerts = app(BandejaAlertas::class)->pendientes($user)
+            ->whereIn('prioridad', Alerta::PRIORIDADES_ALTAS);
         $pendingStudies = (clone $studies)->whereNull('fecha_realizacion')
             ->whereNotIn('estado', ['CANCELADO', 'CANCELADA', 'ANULADO', 'ANULADA']);
         $upcoming = (clone $care)->join('residentes as r', 'r.cod_residente', '=', 'atenciones.cod_residente')
@@ -74,11 +76,10 @@ final class RoleDashboardDataService
         ];
     }
 
-    private function institutional(): array
+    private function institutional(User $user): array
     {
         $today = today();
-        $activeAlerts = DB::table('alertas')
-            ->whereIn('estado', ['ABIERTA', 'EN_ATENCION']);
+        $activeAlerts = app(BandejaAlertas::class)->pendientes($user);
         $staffToday = DB::table('asignaciones_personal as ap')
             ->join('jornadas as j', 'j.cod_jornada', '=', 'ap.cod_jornada')
             ->join('personal as p', 'p.cod_personal', '=', 'ap.cod_personal')
@@ -87,7 +88,7 @@ final class RoleDashboardDataService
             ->where('ap.estado', 'ACTIVA')
             ->where('p.estado', 'ACTIVO');
 
-        $alerts = (clone $activeAlerts)->whereIn('prioridad', ['CRITICO', 'CRITICA', 'ALTA']);
+        $alerts = (clone $activeAlerts)->whereIn('prioridad', Alerta::PRIORIDADES_ALTAS);
         $residentStates = DB::table('residentes')->select('estado')
             ->selectRaw('COUNT(*) as total')->groupBy('estado')->orderByDesc('total')->get();
         $preadmissions = DB::table('preadmisiones')->select('estado')
@@ -120,7 +121,7 @@ final class RoleDashboardDataService
                         ->whereColumn('o.cod_cama', 'c.cod_cama')->whereIn('o.estado', ['ACTIVA', 'ACTIVO'])
                         ->whereNull('o.fecha_hora_liberacion')->where('o.fecha_hora_asignacion', '<=', now()))
                     ->count(), 'Sin ocupación activa', 'ph-bed', 'sky'),
-                $this->metric('Alertas prioritarias', (clone $alerts)->count(), 'Críticas o altas abiertas', 'ph-warning-circle', 'critical'),
+                $this->metric('Alertas prioritarias', (clone $alerts)->count(), 'Críticas o altas activas', 'ph-warning-circle', 'critical'),
                 $this->metric('Personal de hoy', (clone $staffToday)->distinct('ap.cod_personal')->count('ap.cod_personal'), 'Asignado a jornada activa', 'ph-identification-badge', 'neutral'),
             ],
             'activeShift' => $activeShiftNames->count() === 1 ? $activeShiftNames->first() : null,
@@ -145,31 +146,44 @@ final class RoleDashboardDataService
         ];
     }
 
-    private function management(): array
+    private function management(User $user): array
     {
+        $gerencia = app(ConsultarIndicadoresGerencia::class)->consultar($user);
         $today = today();
         $assignments = DB::table('asignaciones_personal as ap')
             ->join('jornadas as j', 'j.cod_jornada', '=', 'ap.cod_jornada')
+            ->join('personal as p', 'p.cod_personal', '=', 'ap.cod_personal')
+            ->join('areas as a', 'a.cod_area', '=', 'ap.cod_area')
+            ->join('turnos as t', 't.cod_turno', '=', 'j.cod_turno')
             ->whereDate('j.fecha_jornada', $today)
-            ->whereIn('j.estado', ['ABIERTA', 'ACTIVA'])
-            ->where('ap.estado', 'ACTIVA');
-        $coverage = (clone $assignments)->join('areas as a', 'a.cod_area', '=', 'ap.cod_area')
+            ->whereIn('j.estado', ['ABIERTA', 'ACTIVA', 'ACTIVO', 'EN_CURSO'])
+            ->whereIn('ap.estado', ['ACTIVO', 'ACTIVA'])
+            ->where('p.estado', 'ACTIVO')
+            ->whereIn('a.estado', ['ACTIVO', 'ACTIVA'])
+            ->whereIn('t.estado', ['ACTIVO', 'ACTIVA']);
+        $verCobertura = $user->can('asignaciones_personal.ver') && $user->can('jornadas.ver');
+        if (! $verCobertura) {
+            $assignments->whereRaw('1 = 0');
+        }
+        $coverage = (clone $assignments)
             ->select('a.nombre as label')->selectRaw('COUNT(DISTINCT ap.cod_personal) as total')
-            ->groupBy('a.cod_area', 'a.nombre')->orderByDesc('total')->limit(8)->get();
-        $professions = DB::table('personal')->where('estado', 'ACTIVO')->select('profesion as label')
-            ->selectRaw('COUNT(*) as total')->groupBy('profesion')->orderByDesc('total')->limit(8)->get();
+            ->groupBy('a.cod_area', 'a.nombre')->orderByDesc('total')->orderBy('a.nombre')->get();
+        $professions = $user->can('personal_institucional.ver')
+            ? DB::table('personal')->where('estado', 'ACTIVO')->select('profesion as label')
+                ->selectRaw('COUNT(*) as total')->groupBy('profesion')->orderByDesc('total')->get() : collect();
 
         return [
             'metrics' => [
-                $this->metric('Personal activo', DB::table('personal')->where('estado', 'ACTIVO')->count(), 'Plantilla vigente', 'ph-identification-badge', 'mint'),
-                $this->metric('Personal asignado hoy', (clone $assignments)->distinct('ap.cod_personal')->count('ap.cod_personal'), 'Jornadas abiertas', 'ph-calendar-check', 'sky'),
-                $this->metric('Áreas cubiertas hoy', $coverage->count(), 'Con personal asignado', 'ph-buildings', 'neutral'),
-                $this->metric('Actividades próximas', DB::table('actividades')->where('estado', 'PROGRAMADA')->whereBetween('fecha_hora', [now(), now()->addDays(7)])->count(), 'Próximos siete días', 'ph-calendar-blank', 'coral'),
+                $this->metric('Personal activo', $gerencia['personal'], 'Trabajadores, no cuentas', 'ph-identification-badge', 'neutral'),
+                $this->metric('Camas ocupadas', $gerencia['ocupadas'], 'Ocupaciones vigentes', 'ph-bed', 'neutral'),
+                $this->metric('Alertas activas', $gerencia['alertas'], 'Avisos persistidos', 'ph-bell', 'neutral'),
             ],
+            'gerencia' => $gerencia,
+            'coverage' => ['personas' => $verCobertura ? (clone $assignments)->distinct('ap.cod_personal')->count('ap.cod_personal') : null, 'areas' => $verCobertura ? $coverage->count() : null],
             'panels' => [
-                $this->panel('Cobertura por área hoy', 'bars', $this->countItems($coverage), 'No hay asignaciones activas hoy.', 'ph-buildings', 'wide', 'Personal asignado por área', 'Hoy'),
-                $this->panel('Equipo por profesión', 'bars', $this->countItems($professions), 'No hay personal activo registrado.', 'ph-users-three', subtitle: 'Distribución del personal activo', period: 'Actual'),
-                $this->panel('Próximas actividades', 'timeline', $this->upcomingActivities(), 'No hay actividades programadas.', 'ph-calendar-check'),
+                ...($verCobertura ? [$this->panel('Cobertura por área hoy', 'bars', $this->countItems($coverage), 'No hay asignaciones laborales activas para hoy. Revisa la planificación y la cobertura.', 'ph-buildings', 'wide', 'Personal único por área · no acredita presencia física', 'Hoy')] : []),
+                ...($user->can('personal_institucional.ver') ? [$this->panel('Equipo por profesión', 'bars', $this->countItems($professions), 'No hay personal activo registrado.', 'ph-users-three', subtitle: 'Distribución del personal activo', period: 'Actual')] : []),
+                ...($user->can('actividades.ver') ? [$this->panel('Próximas actividades', 'timeline', $this->upcomingActivities(), 'No hay actividades programadas.', 'ph-calendar-check')] : []),
             ],
         ];
     }
@@ -192,8 +206,7 @@ final class RoleDashboardDataService
             ->where('fecha_hora', '>=', now()->subDays(90));
         $plans = DB::table('planes_cuidado')->where('cod_personal', $code)
             ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'ABIERTO', 'ABIERTA']);
-        $alerts = DB::table('alertas')->where('cod_personal_responsable', $code)
-            ->whereIn('estado', ['ABIERTA', 'EN_ATENCION']);
+        $alerts = app(BandejaAlertas::class)->pendientes($user)->where('cod_personal_responsable', $code);
         $recent = (clone $valuations)->join('residentes as r', 'r.cod_residente', '=', $table.'.cod_residente')
             ->orderByDesc($table.'.fecha_hora')->limit(6)
             ->get(['r.nombres', 'r.apellido_paterno', $table.'.fecha_hora'])
@@ -221,7 +234,7 @@ final class RoleDashboardDataService
                 $this->metric('Residentes atendidos', (clone $care)->distinct('cod_residente')->count('cod_residente'), 'Por ti · últimos 90 días', 'ph-users-three', 'mint'),
                 $this->metric($title.' · 30 días', (clone $valuations)->where('fecha_hora', '>=', now()->subDays(30))->count(), 'Registros propios', $icon, 'sky'),
                 $this->metric('Planes a tu cargo', (clone $plans)->count(), 'Planes abiertos', 'ph-notebook', 'neutral'),
-                $this->metric('Alertas a tu cargo', (clone $alerts)->count(), 'Abiertas o en atención', 'ph-warning-circle', 'critical'),
+                ...($user->can('alertas.ver') ? [$this->metric('Alertas a tu cargo', (clone $alerts)->count(), 'Pendientes activos autorizados', 'ph-warning-circle', 'critical')] : []),
             ],
             'panels' => [
                 $this->panel($title.' recientes', 'list', $recent, 'Aún no hay valoraciones registradas a tu nombre.', $icon, 'wide'),
@@ -338,7 +351,7 @@ final class RoleDashboardDataService
         ])->all();
     }
 
-    private function metric(string $label, int $value, string $description, string $icon, string $variant): array
+    private function metric(string $label, ?int $value, string $description, string $icon, string $variant): array
     {
         return compact('label', 'value', 'description', 'icon', 'variant');
     }

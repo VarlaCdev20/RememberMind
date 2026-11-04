@@ -9,6 +9,7 @@ use App\Models\Residente;
 use App\Modulos\Cuidados\Aplicacion\Acciones\PaseTurnoService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -40,6 +41,7 @@ class PaseTurnoPanel extends Component
     public bool $modalVer = false;
 
     // Residente seleccionado para preparar pase
+    #[Locked]
     public ?string $codResidenteSeleccionado = null;
 
     public ?Residente $residenteSeleccionado = null;
@@ -60,11 +62,16 @@ class PaseTurnoPanel extends Component
     public string $recomendacionTurno = '';
 
     // Modal de Revisión / Recepción
+    #[Locked]
     public ?string $paseSeleccionadoId = null;
 
     public ?PaseTurno $paseSeleccionado = null;
 
     public string $observacionRecepcion = '';
+
+    public bool $mostrarAnulacion = false;
+
+    public string $motivoAnulacion = '';
 
     // ==========================================
     // PROPIEDADES DE COMPATIBILIDAD CON TESTS
@@ -103,12 +110,7 @@ class PaseTurnoPanel extends Component
 
     public function mount(): void
     {
-        abort_unless(
-            Auth::user()?->hasRole('SUPERADMINISTRADOR') ||
-            Auth::user()?->can('pases_turno.ver') ||
-            Auth::user()?->can('enfermeria.ver_dashboard'),
-            403
-        );
+        abort_unless(Auth::user()?->estado === 'ACTIVO' && Auth::user()?->can('pases_turno.ver'), 403);
         $this->tabActivo = 'entrega';
 
         $this->filtroFechaHistorial = today()->format('Y-m-d');
@@ -121,6 +123,30 @@ class PaseTurnoPanel extends Component
             $this->tabActivo = ($tab === 'historial') ? 'historial' : 'entrega';
         }
         $this->resetPage();
+    }
+
+    public function updated($property): void
+    {
+        if (in_array($property, ['searchHistorial', 'filtroFechaHistorial', 'filtroEstadoHistorial'], true)) {
+            $this->resetPage();
+        }
+    }
+
+    public function limpiarHistorial(): void
+    {
+        $this->reset('searchHistorial', 'filtroFechaHistorial', 'filtroEstadoHistorial');
+        $this->resetPage();
+    }
+
+    private function mostrarErrores(ValidationException $exception): void
+    {
+        $mapa = ['resumen' => 'resumenTurno', 'estado_general' => 'estadoGeneral', 'pendientes' => 'pendientesTurno',
+            'vigilancia' => 'vigilanciaTurno', 'recomendacion' => 'recomendacionTurno', 'observacion_recepcion' => 'observacionRecepcion'];
+        foreach ($exception->errors() as $campo => $mensajes) {
+            foreach ($mensajes as $mensaje) {
+                $this->addError($mapa[$campo] ?? 'error_general', $mensaje);
+            }
+        }
     }
 
     // ========================================================
@@ -168,6 +194,8 @@ class PaseTurnoPanel extends Component
             ->first();
 
         if ($paseExistente) {
+            abort_unless($paseExistente->puedeEditarse(), 409, 'El pase ya fue confirmado. Consúltelo en el historial.');
+            abort_unless($paseExistente->cod_personal_saliente === $user->personal?->cod_personal, 403);
             $this->estadoGeneral = $paseExistente->estado_general ?? '';
             $this->resumenTurno = $paseExistente->resumen ?? '';
             $this->pendientesTurno = $paseExistente->pendientes ?? '';
@@ -182,14 +210,17 @@ class PaseTurnoPanel extends Component
         }
 
         $this->modalPreparar = true;
+        $this->dispatch('pase-captura-abierta');
     }
 
     public function cerrarModalPreparar(): void
     {
+        $this->resetValidation();
         $this->modalPreparar = false;
         $this->codResidenteSeleccionado = null;
         $this->residenteSeleccionado = null;
         $this->contextoClinico = [];
+        $this->dispatch('pase-ventana-cerrada');
     }
 
     public function guardarBorrador(): void
@@ -200,7 +231,7 @@ class PaseTurnoPanel extends Component
 
         $datos = [
             'estado_general' => $this->estadoGeneral,
-            'resumen' => trim($this->resumenTurno) ?: 'Borrador de pase en elaboración',
+            'resumen' => trim($this->resumenTurno),
             'pendientes' => $this->pendientesTurno,
             'vigilancia' => $this->vigilanciaTurno,
             'recomendacion' => $this->recomendacionTurno,
@@ -209,9 +240,9 @@ class PaseTurnoPanel extends Component
         try {
             app(PaseTurnoService::class)->guardarBorrador($this->codResidenteSeleccionado, $datos, Auth::user());
             session()->flash('mensaje', 'Borrador guardado correctamente.');
-            $this->modalPreparar = false;
+            $this->cerrarModalPreparar();
         } catch (ValidationException $e) {
-            $this->setErrorBag($e->validator->getMessageBag());
+            $this->mostrarErrores($e);
         } catch (\Throwable $e) {
             if ($e instanceof HttpExceptionInterface) {
                 throw $e;
@@ -245,9 +276,9 @@ class PaseTurnoPanel extends Component
         try {
             app(PaseTurnoService::class)->confirmarEntrega($this->codResidenteSeleccionado, $datos, Auth::user());
             session()->flash('mensaje', 'Pase de turno confirmado y entregado formalmente.');
-            $this->modalPreparar = false;
+            $this->cerrarModalPreparar();
         } catch (ValidationException $e) {
-            $this->setErrorBag($e->validator->getMessageBag());
+            $this->mostrarErrores($e);
         } catch (\Throwable $e) {
             if ($e instanceof HttpExceptionInterface) {
                 throw $e;
@@ -279,13 +310,16 @@ class PaseTurnoPanel extends Component
 
         $this->observacionRecepcion = $this->paseSeleccionado->observacion_recepcion ?? '';
         $this->modalRevisar = true;
+        $this->dispatch('pase-recepcion-abierta');
     }
 
     public function cerrarModalRevisar(): void
     {
+        $this->resetValidation();
         $this->modalRevisar = false;
         $this->paseSeleccionadoId = null;
         $this->paseSeleccionado = null;
+        $this->dispatch('pase-ventana-cerrada');
     }
 
     public function confirmarRecepcion(): void
@@ -302,10 +336,10 @@ class PaseTurnoPanel extends Component
             );
 
             session()->flash('mensaje', 'Recepción del pase de turno confirmada exitosamente.');
-            $this->modalRevisar = false;
+            $this->cerrarModalRevisar();
         } catch (\Throwable $e) {
             if ($e instanceof ValidationException) {
-                $this->setErrorBag($e->validator->getMessageBag());
+                $this->mostrarErrores($e);
 
                 return;
             }
@@ -323,6 +357,8 @@ class PaseTurnoPanel extends Component
 
     public function abrirVer(string $id): void
     {
+        $this->resetValidation();
+        $this->reset('mostrarAnulacion', 'motivoAnulacion');
         app(PaseTurnoService::class)->autorizarLecturaPase(PaseTurno::findOrFail($id), Auth::user());
         $this->paseSeleccionadoId = $id;
         $this->paseSeleccionado = PaseTurno::with([
@@ -338,8 +374,26 @@ class PaseTurnoPanel extends Component
 
     public function cerrarModalVer(): void
     {
+        $this->resetValidation();
+        $this->reset('mostrarAnulacion', 'motivoAnulacion');
         $this->modalVer = false;
         $this->paseSeleccionado = null;
+        $this->dispatch('pase-ventana-cerrada');
+    }
+
+    public function solicitarAnulacion(): void
+    {
+        abort_unless($this->paseSeleccionado && app(PaseTurnoService::class)->puedeAnular($this->paseSeleccionado, Auth::user()), 403);
+        $this->mostrarAnulacion = true;
+    }
+
+    public function confirmarAnulacion(): void
+    {
+        abort_unless($this->paseSeleccionado && $this->mostrarAnulacion, 409);
+        $this->validate(['motivoAnulacion' => 'nullable|string|max:3000']);
+        app(PaseTurnoService::class)->anularPase($this->paseSeleccionado, Auth::user(), trim($this->motivoAnulacion) ?: null);
+        $this->cerrarModalVer();
+        session()->flash('mensaje', 'Pase anulado. Se conservan el contenido, la recepción y la auditoría.');
     }
 
     // ========================================================
@@ -447,55 +501,27 @@ class PaseTurnoPanel extends Component
         $residentesAEntregar = collect();
         $pasesPendientesRecibir = [];
 
+        abort_unless($user?->estado === 'ACTIVO' && $user->can('pases_turno.ver'), 403);
         try {
-            // 1. Resolver jornadas reales, sin crearlas durante una consulta.
             $jornadaSaliente = $service->resolverJornadaSaliente($user);
-            $jornadaEntrante = $service->resolverJornadaEntrante($jornadaSaliente);
-
-            // 2. Obtener residentes a entregar (si el usuario es personal)
+            try {
+                $jornadaEntrante = $service->resolverJornadaEntrante($jornadaSaliente);
+            } catch (ValidationException $exception) {
+                $errorConfiguracion = collect($exception->errors())->flatten()->first();
+            }
             if ($personal) {
                 $residentesAEntregar = $service->obtenerResidentesAEntregar($personal, $jornadaSaliente, $jornadaEntrante);
             }
-
             if ($this->filtroEntrega === 'criticos') {
-                $residentesAEntregar = $residentesAEntregar->filter(
-                    fn ($residente) => $residente['tiene_alerta_critica'] || $residente['incidentes_count'] > 0
-                );
+                $residentesAEntregar = $residentesAEntregar->filter(fn ($r) => $r['alertas_count'] > 0 || $r['incidentes_count'] > 0);
             } elseif ($this->filtroEntrega === 'pendientes') {
-                $residentesAEntregar = $residentesAEntregar->filter(
-                    fn ($residente) => ! in_array($residente['estado_pase'], ['ENTREGADO', 'RECIBIDO'], true)
-                );
-            }
-
-            // 3. Obtener pases pendientes de recibir para este profesional
-            if ($personal) {
-                $pasesPendientesRecibir = $service->obtenerPasesPendientesRecibir($personal, $jornadaSaliente);
-                if (empty($pasesPendientesRecibir)) {
-                    $pasesPendientesRecibir = $service->obtenerPasesPendientesRecibir($personal, $jornadaEntrante);
-                }
+                $residentesAEntregar = $residentesAEntregar->filter(fn ($r) => ! $r['pase'] || $r['pase']->esBorrador());
             }
         } catch (ValidationException $exception) {
-            $errorConfiguracion = collect($exception->errors())->flatten()->first()
-                ?? 'No existe una configuración operativa completa para realizar el pase de turno.';
-
-            // Un receptor puede consultar y aceptar pases de una jornada ya planificada,
-            // aunque su jornada todavía no esté abierta como jornada saliente.
-            if ($personal) {
-                $asignacionRecepcion = AsignacionResidenteJornada::query()
-                    ->with('jornada.turno')
-                    ->where('cod_personal', $personal->cod_personal)
-                    ->whereIn('estado', ['ACTIVO', 'ACTIVA', 'ASIGNADO'])
-                    ->whereHas('jornada', fn ($query) => $query
-                        ->whereDate('fecha_jornada', today())
-                        ->whereIn('estado', ['PLANIFICADA', 'ABIERTA', 'ACTIVA', 'EN_CURSO']))
-                    ->latest('fecha_hora')
-                    ->first();
-
-                if ($asignacionRecepcion?->jornada) {
-                    $jornadaEntrante = $asignacionRecepcion->jornada;
-                    $pasesPendientesRecibir = $service->obtenerPasesPendientesRecibir($personal, $jornadaEntrante);
-                }
-            }
+            $errorConfiguracion = collect($exception->errors())->flatten()->first();
+        }
+        if ($personal) {
+            $pasesPendientesRecibir = $service->obtenerPasesPendientesRecibir($personal);
         }
 
         // 4. Query de Historial (Paginado y filtrable)
@@ -515,7 +541,7 @@ class PaseTurnoPanel extends Component
                     ->orWhere('estado_general', 'LIKE', $term)
                     ->orWhereHas('residente', function ($r) use ($term) {
                         $r->where('nombres', 'LIKE', $term)
-                            ->orWhere('apellido_paterno', 'LIKE', $term);
+                            ->orWhere('apellido_paterno', 'LIKE', $term)->orWhere('apellido_materno', 'LIKE', $term);
                     });
             });
         }
@@ -538,6 +564,8 @@ class PaseTurnoPanel extends Component
             'pasesPendientesRecibir' => $pasesPendientesRecibir,
             'historialPases' => $historialPases,
             'errorConfiguracion' => $errorConfiguracion,
+            'puedeRecibirSeleccionado' => $this->paseSeleccionado && $service->puedeRecibir($this->paseSeleccionado, $user),
+            'puedeAnularSeleccionado' => $this->paseSeleccionado && $service->puedeAnular($this->paseSeleccionado, $user),
         ])->layout(request()->routeIs('admin.enfermeria.*') ? 'layouts.enfermeria' : 'layouts.sistema');
     }
 }

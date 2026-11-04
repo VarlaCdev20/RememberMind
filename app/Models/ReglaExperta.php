@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-// O.R.I.O.N. 4.16.17; restricciones físicas D-137.
+// sistema experto 4.16.17; restricciones físicas D-137.
 class ReglaExperta extends ModeloExperto
 {
     protected $table = 'reglas_expertas';
@@ -16,6 +16,7 @@ class ReglaExperta extends ModeloExperto
     {
         return [
             'fecha_hora_creacion' => 'immutable_datetime',
+            'fecha_hora_revision' => 'immutable_datetime',
         ];
     }
 
@@ -27,6 +28,21 @@ class ReglaExperta extends ModeloExperto
     public function usuarioCreacion(): BelongsTo
     {
         return $this->belongsTo(User::class, 'cod_usuario_creacion', 'cod_usuario');
+    }
+
+    public function reglaAnterior(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'cod_regla_anterior', 'cod_regla_experta');
+    }
+
+    public function reglasSucesoras(): HasMany
+    {
+        return $this->hasMany(self::class, 'cod_regla_anterior', 'cod_regla_experta');
+    }
+
+    public function usuarioRevision(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'cod_usuario_revision', 'cod_usuario');
     }
 
     public function condicionesReglaExperta(): HasMany

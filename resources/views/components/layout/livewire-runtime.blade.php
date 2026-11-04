@@ -5,3 +5,4 @@
     $scriptUrl = url($scriptRoute->uri).'?rm_ui=20261003';
 @endphp
 @livewireScripts(['url' => $scriptUrl])
+<x-layout.livewire-access-notice />

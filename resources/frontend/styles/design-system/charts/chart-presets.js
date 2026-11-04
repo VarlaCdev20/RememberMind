@@ -412,19 +412,8 @@ export function rmSparklineChartConfig(labels, data, color = null, customOptions
     const sparklineWidth = rmChartNumber('--rm-sparkline-stroke-width', 2.5);
     const sparklineFill = rmChartNumber('--rm-sparkline-fill-opacity', .10);
 
-    // Gradiente vertical translúcido para el área
-    const fillGradient = (context) => {
-        const chart = context.chart;
-        const { ctx, chartArea } = chart;
-        if (!chartArea) {
-            return rmHexToRgba(mainColor, sparklineFill);
-        }
-        const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-        gradient.addColorStop(0, rmHexToRgba(mainColor, sparklineFill));
-        gradient.addColorStop(0.65, rmHexToRgba(mainColor, sparklineFill / 2));
-        gradient.addColorStop(1, rmHexToRgba(mainColor, 0.01));
-        return gradient;
-    };
+    // Área uniforme; datos, líneas y puntos conservan su contrato.
+    const fillGradient = rmHexToRgba(mainColor, sparklineFill);
 
     const isMultiDataset = Array.isArray(data) && typeof data[0] === 'object' && data[0] !== null && 'data' in data[0];
 
@@ -435,16 +424,7 @@ export function rmSparklineChartConfig(labels, data, color = null, customOptions
                 label: ds.label || `Serie ${idx + 1}`,
                 data: ds.data,
                 borderColor: dsColor,
-                backgroundColor: ds.backgroundColor || ((ctx) => {
-                    const chart = ctx.chart;
-                    const { ctx: cCtx, chartArea } = chart;
-                    if (!chartArea) return rmHexToRgba(dsColor, sparklineFill);
-                    const grad = cCtx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-                    grad.addColorStop(0, rmHexToRgba(dsColor, sparklineFill));
-                    grad.addColorStop(0.7, rmHexToRgba(dsColor, sparklineFill / 2));
-                    grad.addColorStop(1, rmHexToRgba(dsColor, 0.01));
-                    return grad;
-                }),
+                backgroundColor: ds.backgroundColor || rmHexToRgba(dsColor, sparklineFill),
                 borderWidth: sparklineWidth,
                 tension: 0.40,
                 fill: true,

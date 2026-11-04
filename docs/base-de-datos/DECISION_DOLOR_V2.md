@@ -11,6 +11,8 @@ runtime_verified: true
 
 # Decisión Dolor V2 — 09/10/2026
 
+> Alcance de inventario: las cifras de esta decisión describen su fecha. El [inventario vigente](README.md) incorpora las extensiones posteriores:106 tablas de negocio+16 técnicas. La decisión conserva exclusivamente sus columnas, relaciones y reglas autorizadas.
+
 La instrucción expresa de la propietaria autoriza tres columnas, la relación de
 origen y sus índices en `valoraciones_dolor`. El resto del modelo congelado no
 cambia. El inventario conserva **71 tablas operativas**; las 23 tablas expertas

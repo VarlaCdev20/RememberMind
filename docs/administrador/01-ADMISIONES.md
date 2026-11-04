@@ -42,11 +42,11 @@ Se conserva el Design System y la preferencia de tema. Tablas anchas se desplaza
 
 ## Archivos y lectura selectiva
 
-- [Controlador](../../app/Http/Controllers/Administracion/OperacionController.php): filtros, consulta y conexión de la nueva vista.
-- [Servicio de consultas](../../app/Backend/Modulos/Administracion/Servicios/ConsultaOperativaService.php): etapas, agregados y última ocupación.
-- [Bandeja](../../resources/views/pages/admin/administracion/admisiones.blade.php) y [registro](../../resources/views/pages/admin/administracion/partials/admision-registro.blade.php).
+- [Controlador](../../app/Modulos/Institucion/Presentacion/Http/Controllers/OperacionController.php): filtros, consulta y conexión de la nueva vista.
+- [Servicio de consultas](../../app/Modulos/Institucion/Aplicacion/Consultas/ConsultaOperativaService.php): etapas, agregados y última ocupación.
+- [Bandeja](../../app/Modulos/Admisiones/Presentacion/Vistas/paginas/admin/administracion/admisiones.blade.php) y [registro](../../app/Modulos/Admisiones/Presentacion/Vistas/paginas/admin/administracion/partials/admision-registro.blade.php).
 - [Interacción](../../resources/frontend/scripts/modules/admisiones-interactivas.js) y [estilo](../../resources/frontend/styles/design-system/patterns/admisiones-interactivas.css).
-- [Formalización](../../app/Backend/Modulos/Admisiones/Acciones/FormalizarAdmision.php) y [Livewire](../../app/Frontend/Livewire/Admisiones/PreadmisionesPanel.php).
+- [Formalización](../../app/Modulos/Admisiones/Aplicacion/Acciones/FormalizarAdmision.php) y [Livewire](../../app/Modulos/Admisiones/Presentacion/Livewire/Paginas/PreadmisionesPanel.php).
 - [Baseline de datos](../base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md), [extensión V2.2 aprobada](../base-de-datos/DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md), [responsabilidades](../arquitectura/REMEMBERMIND_ROLES_BASELINE_CONGELADO.md).
 
 Inventario vigente de 71 tablas; sin migraciones, seeders ni registros operativos creados en esta entrega. Se sustituyó el uso relacionado de entidad antigua por `residente`; la limpieza global del legado pertenece a otra etapa.

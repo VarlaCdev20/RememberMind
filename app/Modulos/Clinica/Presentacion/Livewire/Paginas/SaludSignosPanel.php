@@ -97,6 +97,8 @@ class SaludSignosPanel extends Component
 
     protected $paginationTheme = 'tailwind';
 
+    private ?AnalisisSignosPanel $analisisSignos = null;
+
     public function mount(?Residente $adulto = null): void
     {
         if ($adulto && $adulto->exists) {
@@ -127,6 +129,7 @@ class SaludSignosPanel extends Component
                 ->get();
         }
 
+        $this->analizador()->preparar($baseSignos);
         $signosFiltrados = $this->aplicarFiltros($baseSignos);
         $signosVigentesFiltrados = $signosFiltrados
             ->where('estado', 'VIGENTE')
@@ -565,7 +568,7 @@ class SaludSignosPanel extends Component
 
     public function detectarAlertas(): array
     {
-        return app(AnalisisSignosPanel::class)->detectarAlertas([
+        return $this->analizador()->detectarAlertas([
             'presion_sistolica' => $this->presion_sistolica,
             'presion_diastolica' => $this->presion_diastolica,
             'frecuencia_cardiaca' => $this->frecuencia_cardiaca,
@@ -573,7 +576,8 @@ class SaludSignosPanel extends Component
             'temperatura' => $this->temperatura,
             'frecuencia_respiratoria' => $this->frecuencia_respiratoria,
             'glucosa' => $this->glucosa,
-        ]);
+            'fecha_hora' => ($this->fecha && $this->hora && strtotime($this->fecha.' '.$this->hora) !== false) ? $this->fecha.' '.$this->hora : null,
+        ], $this->adulto?->cod_residente);
     }
 
     private function calcularImcVisual(): void
@@ -661,17 +665,17 @@ class SaludSignosPanel extends Component
 
     private function construirMetricas(Collection $signos): array
     {
-        return app(AnalisisSignosPanel::class)->construirMetricas($signos);
+        return $this->analizador()->construirMetricas($signos);
     }
 
     private function construirResumenPeriodo(Collection $signos, Collection $baseSignos): array
     {
-        return app(AnalisisSignosPanel::class)->construirResumenPeriodo($signos, $baseSignos);
+        return $this->analizador()->construirResumenPeriodo($signos, $baseSignos);
     }
 
     private function construirInterpretacion(Collection $signos): array
     {
-        return app(AnalisisSignosPanel::class)->construirInterpretacion($signos);
+        return $this->analizador()->construirInterpretacion($signos);
     }
 
     private function construirChartData(Collection $signos): array
@@ -700,13 +704,15 @@ class SaludSignosPanel extends Component
             'imc' => $serie->map(fn ($signo) => $signo->imc ? (float) $signo->imc : null)->all(),
             'monthly' => $this->construirResumenSemanal($signos),
             'states' => [
-                'labels' => ['Normal', 'En observación', 'Fuera de rango', 'Requiere revisión', 'Sin datos'],
+                'labels' => ['En referencia', 'Advertencia / revisión sugerida', 'Alto', 'Crítico', 'Sin datos', 'Sin interpretación automática', 'En objetivo médico'],
                 'data' => [
                     $estados->filter(fn ($key) => $key === 'normal')->count(),
                     $estados->filter(fn ($key) => $key === 'observacion')->count(),
                     $estados->filter(fn ($key) => $key === 'fuera_rango')->count(),
                     $estados->filter(fn ($key) => $key === 'requiere_revision')->count(),
                     $estados->filter(fn ($key) => $key === 'sin_datos')->count(),
+                    $estados->filter(fn ($key) => $key === 'sin_interpretacion')->count(),
+                    $estados->filter(fn ($key) => $key === 'objetivo_personalizado')->count(),
                 ],
             ],
             'hasEnough' => [
@@ -811,13 +817,18 @@ class SaludSignosPanel extends Component
         ];
     }
 
+    private function analizador(): AnalisisSignosPanel
+    {
+        return $this->analisisSignos ??= app(AnalisisSignosPanel::class);
+    }
+
     private function analizarRegistro(SignoVital $signo): array
     {
-        return app(AnalisisSignosPanel::class)->analizarRegistro($signo);
+        return $this->analizador()->analizarRegistro($signo);
     }
 
     private function formatearFechaHora(SignoVital $signo): string
     {
-        return app(AnalisisSignosPanel::class)->formatearFechaHora($signo);
+        return $this->analizador()->formatearFechaHora($signo);
     }
 }

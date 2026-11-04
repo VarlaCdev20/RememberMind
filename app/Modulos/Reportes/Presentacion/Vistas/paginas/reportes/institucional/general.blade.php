@@ -240,7 +240,7 @@
  @endphp
  <div class="rm-alerta {{ $clsAlerta }}">
  <div class="rm-alerta-nivel">{{ $nivel }}</div>
- <div>{{ $alerta['descripcion'] ?? '' }}</div>
+ <div>{{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($alerta['descripcion'] ?? '') }}</div>
  @if(!empty($alerta['accion']))
  <div style="font-size:8pt; color:#888888; margin-top:2px;">Acción sugerida: {{ $alerta['accion'] }}</div>
  @endif

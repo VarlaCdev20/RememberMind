@@ -14,6 +14,7 @@
  Ficha <span class="text-[var(--rm-action-primary)]">Institucional</span>
  </h1>
  <div class="flex items-center gap-3">
+ <a href="{{ route('admin.usuarios.correos.index', ['usuario' => $usuario->getKey()]) }}" class="rm-btn rm-btn-secondary">Historial de correos</a>
  <a href="{{ route('admin.usuarios.index') }}"
  class="inline-flex items-center gap-2 rounded-full border border-borde-suave px-5 py-2 text-xs font-bold text-titulo transition hover:bg-fondo-panel active:scale-95">
  <i class="ph-bold ph-arrow-left"></i>

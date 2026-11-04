@@ -16,16 +16,13 @@ class MedicamentosInvestigadosSeeder extends Seeder
 
         DB::transaction(function (): void {
             foreach (require __DIR__.'/data/medicamentos_investigados.php' as [$code, $name, $strength, $form, $unit, $route]) {
-                $id = 'MED_LIN_'.$code;
                 // Conservar la identidad del medicamento que ya tiene órdenes ajenas al dataset.
                 $existing = DB::table('medicamentos')->where('concentracion', $strength)
                     ->whereIn('nombre_generico', $name === 'Losartán' ? [$name, 'Losartán Potásico'] : [$name])->first();
                 if ($existing) {
                     continue;
                 }
-                if (DB::table('medicamentos')->where('cod_medicamento', $id)->exists()) {
-                    throw new RuntimeException('Colisión de identidad del catálogo LINAME: '.$code);
-                }
+                $id = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('medicamentos');
                 DB::table('medicamentos')->insert([
                     'cod_medicamento' => $id, 'nombre_generico' => $name,
                     'nombre_comercial' => null, 'concentracion' => $strength,

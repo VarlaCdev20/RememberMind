@@ -29,7 +29,7 @@ class AsignacionPersonal extends ModeloOperativo
     {
         static::creating(function (self $asig): void {
             if (empty($asig->cod_asignacion_personal)) {
-                $asig->cod_asignacion_personal = 'ASP_'.Str::upper(Str::random(10));
+                $asig->cod_asignacion_personal = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('asignaciones_personal', $asig->getConnectionName());
             }
             if (empty($asig->fecha_asignacion)) {
                 $asig->fecha_asignacion = now();

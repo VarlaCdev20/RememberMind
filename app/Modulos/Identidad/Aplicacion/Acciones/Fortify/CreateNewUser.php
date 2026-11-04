@@ -15,6 +15,6 @@ class CreateNewUser implements CreatesNewUsers
     {
         Validator::make($input, ['correo' => ['required', 'email', 'max:120', 'unique:usuarios,correo'], 'password' => $this->passwordRules()])->validate();
 
-        return User::query()->create(['cod_usuario' => 'USU_'.Str::upper(Str::random(12)), 'correo' => Str::lower($input['correo']), 'contrasena' => $input['password'], 'estado' => 'ACTIVO']);
+        return User::query()->create(['cod_usuario' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('usuarios'), 'correo' => Str::lower($input['correo']), 'contrasena' => $input['password'], 'estado' => 'ACTIVO']);
     }
 }

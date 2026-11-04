@@ -50,13 +50,27 @@ class AreasInstitucionalesPanel extends Component
     // Ficha de detalle de área
     public $areaSeleccionada = null;
 
+    public string $fechaEquipo = '';
+
     public function mount()
     {
-        // No se requiere precargar roles ya que no se editan aquí
+        $this->fechaEquipo = today()->toDateString();
     }
 
     public function render()
     {
+        abort_unless($this->usuarioAutorizado('areas.ver'), 403);
+        if (auth()->user()->hasRole('GERENTE') && !auth()->user()->hasRole('SUPERADMINISTRADOR')) {
+            $areas = Area::query()->when(trim($this->search) !== '', fn ($q) => $q->whereLike('nombre', '%'.trim($this->search).'%'))
+                ->when($this->filtroEstado, fn ($q) => $q->whereIn('estado', $this->filtroEstado === 'ACTIVO' ? ['ACTIVO','ACTIVA'] : ['INACTIVO','INACTIVA']))->orderBy('nombre')->get();
+            $equipo = null;
+            $areaActual = $this->mostrarFicha && $this->areaSeleccionada ? Area::findOrFail($this->areaSeleccionada->getKey()) : null;
+            if ($areaActual && auth()->user()->can('jornadas.ver') && auth()->user()->can('asignaciones_personal.ver')) {
+                $equipo = app(\App\Modulos\Institucion\Aplicacion\Consultas\ConsultarCoberturaEquipo::class)->consultar(auth()->user(), ['area'=>$areaActual->getKey(),'fecha'=>$this->fechaEquipo]);
+            }
+
+            return view('institucion::livewire.gerencia.areas-equipo', compact('areas','areaActual','equipo'));
+        }
         $reporte = app(AreasReportDataService::class)->getGeneralReportData();
         $areas = $reporte['areas']
             ->when($this->search, fn ($items) => $items->filter(fn ($area) => str_contains(mb_strtolower($area->nombre.' '.$area->cod_area), mb_strtolower($this->search))))
@@ -98,7 +112,7 @@ class AreasInstitucionalesPanel extends Component
 
     private function usuarioAutorizado(string $permiso): bool
     {
-        $usuario = Auth::user();
+        $usuario = Auth::user()?->fresh();
 
         return $usuario !== null
             && strtoupper((string) $usuario->estado) === 'ACTIVO'
@@ -215,6 +229,13 @@ class AreasInstitucionalesPanel extends Component
 
     public function verArea($codArea)
     {
+        abort_unless($this->usuarioAutorizado('areas.ver'), 403);
+        if (auth()->user()->hasRole('GERENTE') && !auth()->user()->hasRole('SUPERADMINISTRADOR')) {
+            $this->areaSeleccionada = Area::findOrFail($codArea);
+            $this->mostrarFicha = true;
+            $this->mostrarFormulario = false;
+            return;
+        }
         $this->areaSeleccionada = app(AreasReportDataService::class)
             ->getAreaReportData($codArea)['area'];
 

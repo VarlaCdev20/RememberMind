@@ -10,7 +10,7 @@ Fuente de alcance: tarea actual de skills; diseños existentes son propuestas, s
 | Conceptualización | Fuentes, hechos, variables/criterios, relaciones, contexto, incertidumbre y falta de datos | No transformar dato ausente en normal |
 | Formalización | Representación, normalización, pesos, reglas, agregación/inferencia y conflictos | Aplicar método aprobado; Buchanan no elige algoritmo |
 | Implementación | Contratos versionados/reproducibles, motor separado, explicación e integración | Arquitectura vigente, no raíces/repositorios/servicios externos impuestos por propuestas |
-| Prueba | Casos esperados, consistencia, sensibilidad/fronteras, comparación profesional y límites | Separar verificación técnica y validación clínica |
+| Prueba | Casos esperados, consistencia, sensibilidad/fronteras, comparación profesional y límites | Separar verificación técnica y evaluación posterior en uso real |
 
 ## Vocabulario y cadena
 
@@ -45,7 +45,7 @@ Conocimiento no pertenece a if/else médico disperso en Livewire; descubrir comp
 
 Para cada resultado documentar: procedencia/fecha de datos, versión del conocimiento/método/instrumento, criterios usados y contribuciones cuando el método las define, reglas/operadores activados, faltantes/exclusiones, incertidumbre/limitaciones y fundamento de recomendación revisable.
 
-No todos los métodos producen un score global; no inventarlo. No convertir riesgo en diagnóstico. No diseñar textos que afirmen validación clínica inexistente. Registro del juicio profesional y trazabilidad técnica separados según modelos aprobados.
+No todos los métodos producen un score global; no inventarlo. No convertir riesgo en diagnóstico. No diseñar textos que afirmen evaluación posterior en uso real inexistente. Registro del juicio profesional y trazabilidad técnica separados según modelos aprobados.
 
 ## Instrumentos y derechos
 
@@ -59,7 +59,7 @@ Instrumentos V2 ya tienen versión según diccionario; no crear instrument_versi
 2. Conocimiento: completitud y consistencia, reglas imposibles, solapamientos, contradicciones, prioridades/exclusiones.
 3. Multicriterio: normalización/unidades, pesos, agregación, evidencia duplicada y sensibilidad conforme método. No asumir monotonía/umbral global.
 4. Casos: esperado/actual, normales/frontera/faltantes/contradictorios aplicables; reproducibilidad de explicación.
-5. Clínica: referencia profesional independiente; desacuerdos y limitaciones registrados.
+5. Después del funcionamiento integral: comparación con referencia profesional y datos de uso real, registrando desacuerdos y limitaciones. No solicitar esa etapa durante el desarrollo.
 6. Métricas de confusión/exactitud/sensibilidad/especificidad/Kappa solo cuando metodología, referencia y datos aprobados permiten su cálculo. Sin muestra/resultados inventados.
 
-Reporte por dimensión: criterio + fuente + caso + esperado/actual + evidencia + PASS/FAIL/BLOQUEADO + límite. Sin motor, verificación de diseño únicamente; sin método/referencia humana, validación clínica BLOQUEADA, aunque algún contrato técnico esté comprobado.
+Reporte por dimensión: criterio + fuente + caso + esperado/actual + evidencia + PASS/FAIL/BLOQUEADO + límite. Sin motor, verificar solo diseño. Con motor, verificar lógica, contratos y flujo técnico. No solicitar una referencia humana o estudio externo para desarrollar; la comparación en uso real se realiza después del funcionamiento integral.

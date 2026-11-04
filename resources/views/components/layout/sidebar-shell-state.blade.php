@@ -9,7 +9,7 @@ initSidebar() {
     this.$watch('sidebarOpen', () => this.syncSidebarScrollLock());
 },
 syncSidebarViewport() {
-    const range = window.innerWidth >= 1280 ? 'desktop' : (window.innerWidth >= 1024 ? 'laptop' : 'drawer');
+    const range = window.innerWidth >= 1280 ? 'desktop' : (window.innerWidth >= 768 ? 'laptop' : 'drawer');
     if (range === this.sidebarRange) return;
     this.sidebarRange = range;
     this.sidebarOpen = false;

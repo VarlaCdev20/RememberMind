@@ -12,8 +12,21 @@
     $subtituloModulo = $isAdministracionTopbar ? 'Administración' : 'Panel General';
     $puedeBuscarAdministracion = app(\App\Modulos\Identidad\Presentacion\Navegacion\VisibilidadNavegacion::class)
         ->puedeVerRuta('admin.administracion.buscar');
-    $rutaBuscar = $puedeBuscarAdministracion ? route('admin.administracion.buscar') : null;
-    $placeholderBuscar = $isAdministracionTopbar ? 'Buscar en Administración (residentes, documentos, etc.)…' : 'Buscar en el sistema…';
+    $puedeBuscarPsicologia = request()->routeIs('admin.psicologia.*')
+        && app(\App\Modulos\Identidad\Presentacion\Navegacion\VisibilidadNavegacion::class)->puedeVerRuta('admin.psicologia.evaluaciones');
+    $puedeBuscarMedicina = request()->routeIs('admin.medico.*')
+        && app(\App\Modulos\Identidad\Presentacion\Navegacion\VisibilidadNavegacion::class)->puedeVerRuta('admin.medico.pacientes.observacion');
+    $rutaBuscar = $puedeBuscarPsicologia ? route('admin.psicologia.evaluaciones')
+        : ($puedeBuscarMedicina ? route('admin.medico.pacientes.observacion')
+            : ($puedeBuscarAdministracion ? route('admin.administracion.buscar') : null));
+    $campoBuscar = $puedeBuscarPsicologia ? 'buscar' : ($puedeBuscarMedicina ? 'busqueda' : 'q');
+    $valorBuscar = request()->routeIs('admin.psicologia.evaluaciones', 'admin.medico.pacientes.observacion', 'admin.administracion.buscar')
+        ? request()->query($campoBuscar, '') : '';
+    $valorBuscar = is_string($valorBuscar) ? $valorBuscar : '';
+    $etiquetaBuscar = $puedeBuscarPsicologia ? 'Buscar residentes' : ($puedeBuscarMedicina ? 'Buscar pacientes' : 'Buscar en Administración');
+    $placeholderBuscar = $puedeBuscarPsicologia ? 'Buscar residente por nombre o habitación…'
+        : ($puedeBuscarMedicina ? 'Buscar paciente por nombre o habitación…'
+            : 'Buscar en Administración (residentes, documentos, etc.)…');
 @endphp
 
 <header
@@ -34,19 +47,19 @@
     </div>
 
     {{-- CENTRO: BARRA DE BÚSQUEDA PILL CON DISEÑO EXACTO DE ENFERMERÍA --}}
-    @if($puedeBuscarAdministracion)
+    @if($rutaBuscar)
     <div class="rm-topbar__search-slot">
         <div class="rm-topbar-search" x-data="{ searchOpen: false }" @click.outside="searchOpen = false" @keydown.escape.window="if (searchOpen) { searchOpen = false; $refs.searchToggle.focus() }" x-on:livewire:navigating.window="searchOpen = false">
             <button type="button" class="rm-topbar-search__toggle" x-ref="searchToggle" @click="searchOpen = !searchOpen; if (searchOpen) $nextTick(() => $refs.topbarSearch.focus())"
-                    :aria-expanded="searchOpen.toString()" aria-controls="topbar-admin-search-form" aria-label="Buscar en Administración">
+                    :aria-expanded="searchOpen.toString()" aria-controls="topbar-system-search-form" aria-label="{{ $etiquetaBuscar }}">
                 <i class="ph-bold ph-magnifying-glass" aria-hidden="true"></i>
             </button>
-            <form id="topbar-admin-search-form" action="{{ $rutaBuscar }}" method="GET"
+            <form id="topbar-system-search-form" action="{{ $rutaBuscar }}" method="GET"
                   class="rm-topbar-search__form" :class="{ 'is-open': searchOpen }" role="search">
-                <label for="topbar-admin-search" class="sr-only">Búsqueda administrativa</label>
+                <label for="topbar-system-search" class="sr-only">{{ $etiquetaBuscar }}</label>
                 <i class="ph-bold ph-magnifying-glass rm-topbar-search__icon" aria-hidden="true"></i>
-                <input id="topbar-admin-search" x-ref="topbarSearch" type="search" name="q"
-                       value="{{ request('q', '') }}" minlength="2" maxlength="100"
+                <input id="topbar-system-search" x-ref="topbarSearch" type="search" name="{{ $campoBuscar }}"
+                       value="{{ $valorBuscar }}" maxlength="100"
                        placeholder="{{ $placeholderBuscar }}" autocomplete="off">
                 <button type="submit" class="rm-topbar-search__submit" aria-label="Enviar búsqueda">
                     <i class="ph-bold ph-arrow-right" aria-hidden="true"></i>

@@ -103,7 +103,7 @@ class PresentationBoundaryTest extends TestCase
     public function test_nucleo_experto_no_depende_de_adaptadores_o_laravel(): void
     {
         foreach (['dominio', 'aplicacion'] as $capa) {
-            foreach (File::allFiles(base_path('motor-experto/src/motor_experto/'.$capa)) as $file) {
+            foreach (File::allFiles(base_path('motor-experto/'.$capa)) as $file) {
                 $contenido = File::get($file->getPathname());
                 foreach (['MotorExperto\\adaptadores\\', 'Illuminate\\', 'App\\Models\\', 'Livewire\\'] as $dependencia) {
                     $this->assertStringNotContainsString($dependencia, $contenido, $file->getPathname());

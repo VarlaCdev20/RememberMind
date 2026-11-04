@@ -3,6 +3,7 @@
 use App\Modulos\Alertas\Presentacion\Http\Controllers\AlertaController;
 use App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPanel;
 use App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPendientesPanel;
+use App\Modulos\Alertas\Presentacion\Livewire\Paginas\CompararAlertasRoles;
 use App\Modulos\Alertas\Presentacion\Livewire\Paginas\IncidentesPanel;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +16,7 @@ return [
     },
     'ruta_135' => static function (): void {
         Route::get('/', AlertasPanel::class)->name('index');
+        Route::get('/por-rol', CompararAlertasRoles::class)->name('por-rol');
     },
     'ruta_146' => static function (): void {
         Route::get('/incidentes', IncidentesPanel::class)

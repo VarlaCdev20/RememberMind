@@ -1,9 +1,9 @@
 @props(['sections' => [], 'onSelect'])
-<div class="rm-quick-register">
+<div {{ $attributes->class(['rm-quick-register']) }}>
     @foreach($sections as $section)
         <section aria-labelledby="quick-register-section-{{ $loop->index }}">
             <h4 id="quick-register-section-{{ $loop->index }}">{{ $section['title'] }}</h4>
-            <div class="rm-quick-register__grid {{ ($section['columns'] ?? 3) === 2 ? 'rm-quick-register__grid--care' : '' }}">
+            <div class="rm-quick-register__grid {{ ($section['columns'] ?? 3) === 1 ? 'rm-quick-register__grid--single' : (($section['columns'] ?? 3) === 2 ? 'rm-quick-register__grid--care' : '') }}">
                 @foreach($section['actions'] as $action)
                     @can($action['permiso'])
                         @if(auth()->user()->can($action['permisos_adicionales'] ?? []))

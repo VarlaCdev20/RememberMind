@@ -14,14 +14,17 @@ class StoreFamiliarAdultoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cod_fam' => 'nullable|exists:contactos,cod_contacto',
-            'parentesco_vinculo' => 'required|string|max:100',
+            'cod_contacto' => 'nullable|exists:contactos,cod_contacto',
+            'parentesco_vinculo' => 'required|string|max:40',
             'es_responsable' => 'required|boolean',
             'estado' => 'required|in:ACTIVO,INACTIVO',
             'observaciones' => 'nullable|string|max:1000',
             // Si es familiar nuevo (opcional, dependiendo de la implementación UI)
-            'nombre_nuevo' => 'nullable|required_without:cod_fam|string|max:100',
-            'email_nuevo' => 'nullable|email|unique:contactos,correo',
+            'nombres' => 'required_without:cod_contacto|nullable|string|max:100',
+            'apellido_paterno' => 'required_without:cod_contacto|nullable|string|max:80',
+            'apellido_materno' => 'nullable|string|max:80',
+            'correo' => 'nullable|email|max:120',
+            'contacto_emergencia' => 'nullable|boolean',
         ];
     }
 

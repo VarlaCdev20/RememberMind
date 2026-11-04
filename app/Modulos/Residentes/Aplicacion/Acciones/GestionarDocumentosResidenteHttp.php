@@ -20,7 +20,7 @@ final class GestionarDocumentosResidenteHttp
         $data = $entrada;
         $file = data_get($entrada, 'archivo');
         $path = $this->ficheros->recibir($file, 'documentos/residentes', 'local');
-        $adulto_mayor->documentos()->create(['cod_documento' => 'DOC_'.Str::upper(Str::random(10)), 'cod_residente' => $adulto_mayor->cod_residente, 'tipo_documento' => $data['tipo_documento'], 'nombre' => $data['nombre'], 'ruta_archivo' => $path, 'tipo_archivo' => $file->getMimeType() ?: 'application/octet-stream', 'hash_archivo' => $this->ficheros->hash('local', $path), 'estado' => 'ACTIVO', 'observacion' => $data['observaciones'] ?? null]);
+        $adulto_mayor->documentos()->create(['cod_documento' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('documentos'), 'cod_residente' => $adulto_mayor->cod_residente, 'tipo_documento' => $data['tipo_documento'], 'nombre' => $data['nombre'], 'ruta_archivo' => $path, 'tipo_archivo' => $file->getMimeType() ?: 'application/octet-stream', 'hash_archivo' => $this->ficheros->hash('local', $path), 'estado' => 'ACTIVO', 'observacion' => $data['observaciones'] ?? null]);
         activity('Adulto Mayor')->causedBy($actor)->performedOn($adulto_mayor)->log("Se subió un documento para el adulto mayor: {$adulto_mayor->nombres}");
 
         return null;

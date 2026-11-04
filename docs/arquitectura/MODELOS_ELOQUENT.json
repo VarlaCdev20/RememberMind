@@ -85,7 +85,7 @@
         "app/Models/ModeloExperto.php",
         "app/Modulos/ApoyoDecision/Infraestructura/Persistencia/Eloquent/BuilderExperto.php",
         "app/Modulos/ApoyoDecision/Infraestructura/Persistencia/Eloquent",
-        "motor-experto/src/motor_experto"
+        "motor-experto"
       ]
     },
     {

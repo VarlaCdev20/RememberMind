@@ -458,6 +458,9 @@ class SeguimientoDiarioPanel extends Component
             $opcion = NavegacionCuidadosService::opcion($this->cuidado);
             abort_unless(in_array($this->cuidado, ['cognicion', 'conducta'], true), 404);
             abort_unless(Auth::user()?->can($opcion['permission']), 403);
+            if ($this->cuidado === 'conducta') {
+                return view('livewire.cuidados.conducta-page', ['codResidente' => $this->filtroAdulto])->layout('layouts.enfermeria');
+            }
         }
         $turnoService = app(TurnoEnfermeriaService::class);
         $seguimientosQuery = Atencion::query()->when($this->filtroAdulto, fn ($q) => $q->where('cod_residente', $this->filtroAdulto))->with(['adultoMayor', 'personal']);

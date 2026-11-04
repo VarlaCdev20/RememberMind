@@ -1,0 +1,34 @@
+/* Barra y distribución compartidas por las consultas clínicas existentes. */
+.rm-clinical-consultation-bar { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: var(--rm-space-3); padding: var(--rm-space-2) var(--rm-space-3); border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-card); background: color-mix(in srgb, var(--rm-info) 8%, var(--rm-surface)); box-shadow: var(--rm-shadow-xs); }
+.rm-clinical-consultation-bar__meta { flex: 1 1 240px; min-width: 0; font-size: var(--rm-font-size-meta); color: var(--rm-text-secondary); }
+.rm-clinical-consultation-bar__actions { display: flex; flex-wrap: wrap; gap: var(--rm-space-2); }
+.rm-clinical-consultation-bar__actions > :is(button, a) { width: auto; flex: 0 1 auto; }
+.rm-clinical-consultation-bar__actions .rm-btn { min-height: 44px; min-width: 160px; justify-content: center; white-space: normal; }
+.rm-medication__toolbar .rm-clinical-consultation-bar { padding: 0; border: 0; background: transparent; box-shadow: none; }
+.rm-clinical-consultation-panel[popover] { position: fixed; inset: 16px; width: min(620px, calc(100vw - 32px)); height: calc(100dvh - 32px); max-height: calc(100dvh - 32px); border: 0; margin: auto; padding: 0; background: transparent; color: var(--rm-text-primary); }
+.rm-clinical-consultation-panel[popover]:popover-open { display: flex; }
+.rm-clinical-consultation-panel[popover]:not(:popover-open) { display: none; }
+.rm-wound__workspace:has(> div:only-child) { grid-template-columns: minmax(0, 1fr); }
+.rm-clinical-consultation-panel[popover] > div { display: flex; flex-direction: column; align-items: stretch; gap: var(--rm-space-4); width: 100%; min-width: 0; max-height: 100%; overflow-y: auto; padding: var(--rm-space-4); background: var(--rm-surface-main); border-radius: var(--rm-radius-modal); box-shadow: var(--rm-shadow-floating); }
+.rm-clinical-consultation-panel[popover] > div > * { flex: 0 0 auto; min-width: 0; }
+.rm-clinical-consultation-panel[popover] > div > header { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: var(--rm-space-3); margin: 0; padding-block: var(--rm-space-2); background: var(--rm-surface-main); }
+.rm-clinical-consultation-panel[popover] > div > header h3 { font: 800 var(--rm-font-size-section)/1.25 var(--rm-font-friendly); color: var(--rm-text-primary); }
+.rm-clinical-consultation-panel[popover] > div > header button { flex-shrink: 0; min-height: 44px; min-width: 44px; }
+@media (min-width: 1280px) {
+    body .rm-modal-shell[data-clinical-consultation-side] > .rm-modal-panel {
+        width: var(--rm-consultation-form-width);
+        max-width: var(--rm-consultation-form-width);
+        translate: none;
+    }
+    body .rm-modal-shell[data-clinical-consultation-side="left"] > .rm-modal-panel { margin-left: 0; margin-right: auto; }
+    body .rm-modal-shell[data-clinical-consultation-side="right"] > .rm-modal-panel { margin-left: auto; margin-right: 0; }
+    .rm-modal-shell[data-clinical-consultation-side] :is(.rm-signos__workspace,.rm-dolor__workspace,.rm-ingesta__layout,.rm-hidratacion__layout,.rm-eliminacion__layout,.rm-movilidad__layout,.rm-conducta__workspace,.rm-cognicion__workspace,.rm-wound__workspace,.rm-medication__workspace) { grid-template-columns: minmax(0, 1fr); }
+    .rm-modal-shell[data-clinical-consultation-side] .rm-medication__workspace > .rm-medication__section { grid-column: 1; grid-row: auto; }
+    body .rm-clinical-consultation-panel[popover] { position: fixed; inset: 16px 16px 16px auto; width: 520px; height: calc(100dvh - 32px); max-height: none; padding: 0; background: transparent; }
+    body .rm-clinical-consultation-panel[popover] > div { width: 100%; max-width: 100%; height: 100%; max-height: 100%; margin: 0; overflow-y: auto; overflow-wrap: anywhere; background: var(--rm-surface-main); border-radius: var(--rm-radius-modal); box-shadow: var(--rm-shadow-floating); }
+}
+@media (max-width: 639px) {
+    .rm-clinical-consultation-bar { padding-block: var(--rm-space-1); }
+    .rm-clinical-consultation-bar__actions { width: 100%; }
+    .rm-clinical-consultation-bar__actions .rm-btn { min-width: 0; flex: 1 1 140px; padding-inline: var(--rm-space-2); }
+}

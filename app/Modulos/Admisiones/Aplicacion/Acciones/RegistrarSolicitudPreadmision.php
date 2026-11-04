@@ -23,7 +23,7 @@ final class RegistrarSolicitudPreadmision
             $fechaLimite48h = now()->addHours(48);
 
             $contacto = Contacto::create([
-                'cod_contacto' => 'CTO_'.Str::upper(Str::random(12)),
+                'cod_contacto' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('contactos'),
                 'nombres' => $this->normalizar($datos['familiar_nombres']),
                 'apellido_paterno' => $this->normalizar($datos['familiar_ap_paterno']),
                 'apellido_materno' => $this->normalizar($datos['familiar_ap_materno']),
@@ -35,7 +35,7 @@ final class RegistrarSolicitudPreadmision
             ]);
 
             $preadmision = Preadmision::create([
-                'cod_preadmision' => 'PRE_'.Str::upper(Str::random(12)),
+                'cod_preadmision' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('preadmisiones'),
                 'cod_contacto' => $contacto->cod_contacto,
                 'cod_usuario_registro' => $usuario->cod_usuario,
                 'estado' => 'PENDIENTE',
@@ -82,7 +82,7 @@ final class RegistrarSolicitudPreadmision
                     $path = $this->ficheros->recibir($archivo, "preadmisiones/{$preadmision->cod_pre}", 'public');
 
                     Documento::create([
-                        'cod_documento' => 'DOC_'.Str::upper(Str::random(12)),
+                        'cod_documento' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('documentos'),
                         'cod_preadmision' => $preadmision->cod_preadmision,
                         'cod_contacto' => $contacto->cod_contacto,
                         'tipo_documento' => $tipo,
@@ -133,7 +133,7 @@ final class RegistrarSolicitudPreadmision
 
                 if ($archivoPdf) {
                     Documento::create([
-                        'cod_documento' => 'DOC_'.Str::upper(Str::random(12)),
+                        'cod_documento' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('documentos'),
                         'cod_preadmision' => $preadmision->cod_preadmision,
                         'cod_contacto' => $contacto->cod_contacto,
                         'tipo_documento' => $docConfig['tipo'],

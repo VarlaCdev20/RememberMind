@@ -16,8 +16,9 @@
 ])
 
 @php
+    $rotadorFotos = app(\App\Modulos\Reportes\Presentacion\DashboardPhotoRotation::class);
     $heroImage = $rotationContext
-        ? app(\App\Modulos\Reportes\Presentacion\DashboardPhotoRotation::class)->heroImage($rotationContext, $image)
+        ? $rotadorFotos->heroImage($rotationContext, $image)
         : $image;
 @endphp
 
@@ -29,7 +30,7 @@
     :date="$date ?? ($meta[0]['label'] ?? '')"
     :scope="$scope ?? ($meta[2]['label'] ?? '')"
     :image="$heroImage"
-    :image-alt="$rotationContext ? 'Actividades y acompañamiento de residentes en Los Almendros' : $imageAlt"
+    :image-alt="$rotadorFotos->altFor($heroImage, $rotationContext ? 'Actividades y acompañamiento de residentes en Los Almendros' : $imageAlt)"
     :image-label="$imageLabel"
     {{ $attributes }}
 />

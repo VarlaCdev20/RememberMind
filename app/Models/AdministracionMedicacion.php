@@ -64,7 +64,7 @@ class AdministracionMedicacion extends ModeloOperativo
     {
         static::creating(function (self $registro): void {
             if (empty($registro->cod_administracion)) {
-                $registro->cod_administracion = 'ADM_'.strtoupper(Str::random(10));
+                $registro->cod_administracion = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('administraciones_medicacion', $registro->getConnectionName());
             }
             $rawMed = $registro->attributes['cod_med_adulto'] ?? $registro->attributes['cod_prescripcion'] ?? null;
             if (empty($registro->cod_prescripcion) && ! empty($rawMed)) {

@@ -2,7 +2,7 @@
 
 namespace App\Modulos\ApoyoDecision\Aplicacion\Contratos;
 
-use MotorExperto\dominio\conocimiento\PaqueteConocimiento;
+use MotorExperto\conocimiento\PaqueteConocimiento;
 
 interface ConocimientoVersionado
 {

@@ -1,0 +1,70 @@
+<?php
+
+namespace App\Modulos\ApoyoDecision\Aplicacion\Acciones;
+
+use App\Models\User;
+use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
+use DomainException;
+use Illuminate\Support\Facades\DB;
+use MotorExperto\conocimiento\PaqueteConocimiento;
+use MotorExperto\dominio\conocimiento\versiones\PaqueteInvestigadoCOGMEM as P;
+
+/** Registro de una propuesta: nunca cambia vigencias, aprobaciones o historia clínica. */
+final class CargarPaqueteInvestigadoCOGMEM
+{
+    public function __construct(private readonly ConocimientoVersionado $conocimiento) {}
+
+    public function ejecutar(User $autor): array
+    {
+        return app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->serializar('versiones_modelo_experto', function () use ($autor): array {
+            $usuario = User::query()->lockForUpdate()->findOrFail($autor->getKey());
+            if ($usuario->estado !== 'ACTIVO' || ! $usuario->hasRole('SUPERADMINISTRADOR')
+                || ! $usuario->checkPermissionTo('auditoria.ver', 'web')) {
+                throw new DomainException('La carga requiere Superadministración activa y permiso de auditoría.');
+            }
+            $guardada = DB::table('versiones_modelo_experto')->where('codigo_version', P::CODIGO)->lockForUpdate()->first();
+            $versionReal = $guardada?->cod_version_modelo ?? app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('versiones_modelo_experto');
+            $fecha = $guardada?->fecha_hora_creacion ?? now()->format('Y-m-d H:i:s');
+            $creador = $guardada?->cod_usuario_creacion ?? $usuario->getKey();
+            $p = new P;
+            $p->paquete($creador, $fecha);
+            $tablas = $p->tablas($creador, $fecha);
+            $version = ['cod_version_modelo' => P::VERSION, 'codigo_version' => P::CODIGO,
+                'nombre' => 'COG-MEM · propuesta observacional investigada', 'descripcion' => P::LIMITES,
+                'estado' => 'INACTIVO', 'fecha_hora_creacion' => $fecha, 'fecha_hora_vigencia' => null,
+                'fecha_hora_retiro' => null, 'motivo_cambio' => 'Investigación e implementación solicitadas por la propietaria el 08/10/2026.',
+                'cod_usuario_creacion' => $creador, 'cod_version_anterior' => null,
+                'observacion' => 'Fuentes consultadas el 08/10/2026: '.implode(' ; ', P::FUENTES)
+                    .'. Sin dictamen profesional de este contenido nuevo; no reemplaza EXPERTO-V1.'];
+            $convertidas = app(\App\Modulos\ApoyoDecision\Aplicacion\Contratos\IdentidadesConocimiento::class)->traducir(['versiones_modelo_experto'=>[$version]] + $tablas, P::VERSION, $versionReal, $guardada !== null);
+            $version = $convertidas['versiones_modelo_experto'][0];
+            unset($convertidas['versiones_modelo_experto']);
+            $tablas = $convertidas;
+            if ($guardada) {
+                if ((array) $guardada != $version) {
+                    throw new DomainException('La propuesta conservada difiere. Requiere otra versión; no se sobrescribe.');
+                }
+                $actual = $this->conocimiento->instantanea($versionReal);
+                foreach ($tablas as $tabla => $filas) {
+                    $pk = PaqueteConocimiento::CLAVES[$tabla];
+                    if (collect($actual[$tabla])->keyBy($pk)->all() != collect($filas)->keyBy($pk)->all()) {
+                        throw new DomainException('El contenido conservado difiere. No se sobrescribe ni reactiva.');
+                    }
+                }
+            } else {
+                DB::table('versiones_modelo_experto')->insert($version);
+                foreach ($tablas as $tabla => $filas) {
+                    if ($filas) {
+                        \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::insertar($tabla, $filas);
+                    }
+                }
+                activity('sistema_experto')->causedBy($usuario)->event('paquete_investigado_registrado')
+                    ->withProperties(['version' => $versionReal, 'mapeos_propuestos' => 6, 'activacion_clinica' => false])
+                    ->log('Propuesta investigada COG-MEM registrada, sin validación ni inferencia clínica.');
+            }
+
+            return ['version' => $versionReal, 'mapeos_propuestos' => 6, 'activacion_clinica' => false,
+                'cargado_previamente' => $guardada !== null];
+        });
+    }
+}

@@ -5,9 +5,11 @@ namespace Tests\Feature;
 use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\User;
+use App\Modulos\Valoraciones\Presentacion\Livewire\Paginas\DashboardPsicologo;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class PsychologyDashboardDataTest extends TestCase
@@ -23,7 +25,7 @@ class PsychologyDashboardDataTest extends TestCase
         $this->actingAs($usuario)->get(route('admin.psicologia.dashboard'))
             ->assertOk()
             ->assertSee('No hay una vinculación de personal activo')
-            ->assertDontSee('Residentes atendidos');
+            ->assertDontSee('Aplicaciones registradas');
     }
 
     public function test_panel_muestra_instrumentos_propios_sin_exponer_los_de_otro_profesional(): void
@@ -53,6 +55,61 @@ class PsychologyDashboardDataTest extends TestCase
             ->assertOk()
             ->assertSee('Rosa Visible')
             ->assertDontSee('Eva Reservada')
-            ->assertSee('Instrumentos aplicados');
+            ->assertSee('Aplicaciones registradas')
+            ->assertDontSee('Ver mis residentes')
+            ->assertDontSee('Actualizar panel')
+            ->assertDontSee('Registros a tu nombre; cada tarjeta indica su período.')
+            ->assertSee('Aplicaciones recientes')
+            ->assertSee('Instrumento sintético')
+            ->assertSee('Aplicaciones por instrumento')
+            ->assertDontSee('Distribución por área clínica')
+            ->assertSee('No hay atenciones futuras registradas a tu nombre.')
+            ->assertDontSee('No hay alertas prioritarias abiertas a tu cargo.')
+            ->assertDontSee('+12% respecto al mes anterior')
+            ->assertDontSee('Mª Carmen López');
+
+        $vista = Livewire::test(DashboardPsicologo::class);
+        $this->assertSame(1, $vista->viewData('chartInstrumentos')['total']);
+        $this->assertSame(['Instrumento sintético'], $vista->viewData('chartInstrumentos')['labels']);
+        $this->assertSame(1, array_sum($vista->viewData('chartEvolucion')['aplicaciones']));
+    }
+
+    public function test_graficas_omiten_registros_anulados_y_muestran_vacio_sin_datos(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $usuario = User::factory()->create(['estado' => 'ACTIVO']);
+        $usuario->assignRole('PSICOLOGO/A');
+        Personal::create([
+            'cod_personal' => 'PER_PSI_GRAF', 'cod_usuario' => $usuario->cod_usuario,
+            'nombres' => 'Ana', 'apellido_paterno' => 'Prueba',
+            'numero_documento' => 'DOC-PSI-GRAF', 'profesion' => 'PSICOLOGIA', 'estado' => 'ACTIVO',
+        ]);
+        $residente = Residente::factory()->create();
+        DB::table('instrumentos')->insert([
+            'cod_instrumento' => 'INS_PSI_GRAF', 'codigo' => 'PSI-GRAF', 'nombre' => 'Escala de prueba', 'tipo' => 'CUANTITATIVO', 'estado' => 'ACTIVO',
+        ]);
+        DB::table('aplicaciones_instrumento')->insert([
+            ['cod_aplicacion' => 'APL_PSI_GRAF_1', 'cod_instrumento' => 'INS_PSI_GRAF', 'cod_residente' => $residente->cod_residente, 'cod_personal' => 'PER_PSI_GRAF', 'fecha_hora' => now(), 'estado' => 'ANULADA'],
+            ['cod_aplicacion' => 'APL_PSI_GRAF_2', 'cod_instrumento' => 'INS_PSI_GRAF', 'cod_residente' => $residente->cod_residente, 'cod_personal' => 'PER_PSI_GRAF', 'fecha_hora' => now()->subMonths(7), 'estado' => 'COMPLETA'],
+        ]);
+
+        $this->actingAs($usuario);
+        $vista = Livewire::test(DashboardPsicologo::class)->assertSee('Sin actividad registrada en este período');
+        $this->assertSame(0, $vista->viewData('chartInstrumentos')['total']);
+        $this->assertFalse($vista->viewData('chartEvolucion')['tieneDatos']);
+
+        DB::table('aplicaciones_instrumento')->where('cod_aplicacion', 'APL_PSI_GRAF_1')->update(['estado' => 'VIGENTE']);
+        $vista = Livewire::test(DashboardPsicologo::class);
+        $this->assertSame(['Escala de prueba'], $vista->viewData('chartInstrumentos')['labels']);
+        $this->assertSame([1], $vista->viewData('chartInstrumentos')['data']);
+
+        DB::table('aplicaciones_instrumento')->insert([
+            'cod_aplicacion' => 'APL_PSI_GRAF_3', 'cod_instrumento' => 'INS_PSI_GRAF',
+            'cod_residente' => $residente->cod_residente, 'cod_personal' => 'PER_PSI_GRAF',
+            'fecha_hora' => now(), 'estado' => 'COMPLETA',
+        ]);
+        $vista = Livewire::test(DashboardPsicologo::class);
+        $this->assertSame(2, $vista->viewData('chartInstrumentos')['total']);
+        $this->assertSame(2, array_sum($vista->viewData('chartEvolucion')['aplicaciones']));
     }
 }

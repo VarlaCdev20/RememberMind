@@ -18,8 +18,8 @@ final class GestionarActividadResidenteHttp
         $data = $entrada;
         [$personal, $codArea] = $this->contextoPersonal($usuario);
         DB::transaction(function () use ($data, $adulto_mayor, $personal, $codArea): void {
-            $actividad = Actividad::query()->create(['cod_actividad' => 'ACT_'.Str::upper(Str::random(10)), 'cod_area' => $codArea, 'cod_personal' => $personal->cod_personal, 'tipo' => Str::upper($data['cod_tipo_act']), 'nombre' => Str::title(str_replace('_', ' ', $data['cod_tipo_act'])), 'descripcion' => $data['obs'] ?? null, 'fecha_hora' => $data['fecha'].' '.$data['hora'], 'estado' => Str::upper($data['estado']), 'observacion' => $data['obs'] ?? null]);
-            ParticipanteActividad::query()->create(['cod_participante' => 'PAR_'.Str::upper(Str::random(10)), 'cod_actividad' => $actividad->cod_actividad, 'cod_residente' => $adulto_mayor->cod_residente, 'asistencia' => 'PROGRAMADA', 'observacion' => $data['obs'] ?? null]);
+            $actividad = Actividad::query()->create(['cod_actividad' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('actividades'), 'cod_area' => $codArea, 'cod_personal' => $personal->cod_personal, 'tipo' => Str::upper($data['cod_tipo_act']), 'nombre' => Str::title(str_replace('_', ' ', $data['cod_tipo_act'])), 'descripcion' => $data['obs'] ?? null, 'fecha_hora' => $data['fecha'].' '.$data['hora'], 'estado' => Str::upper($data['estado']), 'observacion' => $data['obs'] ?? null]);
+            ParticipanteActividad::query()->create(['cod_participante' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('participantes_actividad'), 'cod_actividad' => $actividad->cod_actividad, 'cod_residente' => $adulto_mayor->cod_residente, 'asistencia' => 'PROGRAMADA', 'observacion' => $data['obs'] ?? null]);
         });
 
         return null;

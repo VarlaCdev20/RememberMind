@@ -148,8 +148,10 @@ Do not include copyrighted clinical instrument content merely to test infrastruc
 
 ## DB baseline
 
+Installed local inventory after the specifically approved Gerencia designs35/37 on2026-10-27 is **106 business +16 technical tables**; see `docs/base-de-datos/DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md`. Core-only disposable migrations still produce100 business tables until the two explicit extension paths are applied. Test each stage rather than changing a core-only expectation to106 without installing its extensions.
+
 Maintain tests that validate:
-- exactly 70 V2.1 baseline operational tables plus the owner-approved V2.2 `objetivos_signos_vitales` extension (71 current);
+- the 70-table V2.1 operational core and each later owner-approved extension; the installed inventory after the approved 2026-10-22 consolidations is 75 operational + 25 expert = 100 business tables, plus 16 technical tables; the previous 104 count is historical. The 110-business-table design ceiling is not approval of a specific DDL. Derive inventory expectations from the baseline and latest applicable decision, not a copied older test;
 - technical package/framework tables excluded from the count;
 - key V2 names/columns exist;
 - important V1 tables/columns are absent;

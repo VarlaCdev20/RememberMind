@@ -1,0 +1,679 @@
+{
+    "fecha": "2026-10-22T12:10:44-04:00",
+    "base_local": "remembermind_dev",
+    "sintetico": true,
+    "carga_nueva": false,
+    "residentes_anteriores": 80,
+    "residentes_actuales": 110,
+    "comparacion": {
+        "version": "INVESTIGACION-COGNITIVA-30-20261022-V1",
+        "satisfactorio": true,
+        "casos_esperados": 30,
+        "casos_ejecutados": 30,
+        "discrepancias": [],
+        "validez_clinica_demostrada": false,
+        "reglas_modificadas": false
+    },
+    "casos": [
+        {
+            "caso": "S01",
+            "cod_residente": "COD_RES_000081",
+            "nombre": "Carmen Salvatierra Rueda",
+            "patron_calculado": "PET-01",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000081\/resultados-experto"
+        },
+        {
+            "caso": "S02",
+            "cod_residente": "COD_RES_000082",
+            "nombre": "Ernesto Villarroel Céspedes",
+            "patron_calculado": "PET-01",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000082\/resultados-experto"
+        },
+        {
+            "caso": "S03",
+            "cod_residente": "COD_RES_000083",
+            "nombre": "Lucía Arandia Mercado",
+            "patron_calculado": "PET-01",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000083\/resultados-experto"
+        },
+        {
+            "caso": "S04",
+            "cod_residente": "COD_RES_000084",
+            "nombre": "Beatriz Montellano Ruiz",
+            "patron_calculado": "PET-02",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "A",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000084\/resultados-experto"
+        },
+        {
+            "caso": "S05",
+            "cod_residente": "COD_RES_000085",
+            "nombre": "Ricardo Castañeda Vargas",
+            "patron_calculado": "PET-02",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "A",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000085\/resultados-experto"
+        },
+        {
+            "caso": "S06",
+            "cod_residente": "COD_RES_000086",
+            "nombre": "Amelia Rocabado Serrano",
+            "patron_calculado": "PET-02",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "A"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000086\/resultados-experto"
+        },
+        {
+            "caso": "S07",
+            "cod_residente": "COD_RES_000087",
+            "nombre": "Héctor Saavedra Molina",
+            "patron_calculado": "PET-03",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "A",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000087\/resultados-experto"
+        },
+        {
+            "caso": "S08",
+            "cod_residente": "COD_RES_000088",
+            "nombre": "Isabel Valcárcel Robles",
+            "patron_calculado": "PET-03",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "A",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000088\/resultados-experto"
+        },
+        {
+            "caso": "S09",
+            "cod_residente": "COD_RES_000089",
+            "nombre": "Alfonso Bustamante Leiva",
+            "patron_calculado": "PET-03",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "A",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000089\/resultados-experto"
+        },
+        {
+            "caso": "S10",
+            "cod_residente": "COD_RES_000090",
+            "nombre": "Matilde Pacheco Luján",
+            "patron_calculado": "PET-04",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "A",
+                "COG-EJE": "A",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000090\/resultados-experto"
+        },
+        {
+            "caso": "S11",
+            "cod_residente": "COD_RES_000091",
+            "nombre": "Ramón Escalante Núñez",
+            "patron_calculado": "PET-04",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "A",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "A"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000091\/resultados-experto"
+        },
+        {
+            "caso": "S12",
+            "cod_residente": "COD_RES_000092",
+            "nombre": "Inés Velasco Benavides",
+            "patron_calculado": "PET-04",
+            "estado": "PATRON_ORIENTATIVO_CON_SOPORTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "A",
+                "COG-MEM": "P",
+                "COG-VIS": "A"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000092\/resultados-experto"
+        },
+        {
+            "caso": "S13",
+            "cod_residente": "COD_RES_000093",
+            "nombre": "Jorge Mendizábal Durán",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000093\/resultados-experto"
+        },
+        {
+            "caso": "S14",
+            "cod_residente": "COD_RES_000094",
+            "nombre": "Cecilia Quiroga Valverde",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000094\/resultados-experto"
+        },
+        {
+            "caso": "S15",
+            "cod_residente": "COD_RES_000095",
+            "nombre": "Arturo Figueroa Salcedo",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000095\/resultados-experto"
+        },
+        {
+            "caso": "S16",
+            "cod_residente": "COD_RES_000096",
+            "nombre": "Leonor Benavente Cruz",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000096\/resultados-experto"
+        },
+        {
+            "caso": "S17",
+            "cod_residente": "COD_RES_000097",
+            "nombre": "Mario Orellana Vidal",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000097\/resultados-experto"
+        },
+        {
+            "caso": "S18",
+            "cod_residente": "COD_RES_000098",
+            "nombre": "Pilar Cordero Espinoza",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "P",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "N",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000098\/resultados-experto"
+        },
+        {
+            "caso": "S19",
+            "cod_residente": "COD_RES_000099",
+            "nombre": "Tomás Alvarado Salinas",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "N",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000099\/resultados-experto"
+        },
+        {
+            "caso": "S20",
+            "cod_residente": "COD_RES_000100",
+            "nombre": "Susana Ledesma Cabrera",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "N",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000100\/resultados-experto"
+        },
+        {
+            "caso": "S21",
+            "cod_residente": "COD_RES_000101",
+            "nombre": "Enrique Peñaranda Vela",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_EVALUACION_DIFERENCIAL",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "N",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000101\/resultados-experto"
+        },
+        {
+            "caso": "S22",
+            "cod_residente": "COD_RES_000102",
+            "nombre": "Clara Barrientos Solano",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_EVALUACION_DIFERENCIAL",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000102\/resultados-experto"
+        },
+        {
+            "caso": "S23",
+            "cod_residente": "COD_RES_000103",
+            "nombre": "Julián Amat Flores",
+            "patron_calculado": null,
+            "estado": "SIN_PATRON_CLASIFICABLE_POR_REQUISITO",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "N"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000103\/resultados-experto"
+        },
+        {
+            "caso": "S24",
+            "cod_residente": "COD_RES_000104",
+            "nombre": "Alicia Treviño Prado",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "U"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "U"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000104\/resultados-experto"
+        },
+        {
+            "caso": "S25",
+            "cod_residente": "COD_RES_000105",
+            "nombre": "Samuel Baldivieso Rojas",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "I"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "U"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000105\/resultados-experto"
+        },
+        {
+            "caso": "S26",
+            "cod_residente": "COD_RES_000106",
+            "nombre": "Graciela Montalvo Aguirre",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "U",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "U",
+                "C03": "S",
+                "C04": "S",
+                "C05": "U"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000106\/resultados-experto"
+        },
+        {
+            "caso": "S27",
+            "cod_residente": "COD_RES_000107",
+            "nombre": "Adela Gamarra Villalobos",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "U",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000107\/resultados-experto"
+        },
+        {
+            "caso": "S28",
+            "cod_residente": "COD_RES_000108",
+            "nombre": "Rubén Santillán Arce",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "U",
+                "C04": "S",
+                "C05": "S"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000108\/resultados-experto"
+        },
+        {
+            "caso": "S29",
+            "cod_residente": "COD_RES_000109",
+            "nombre": "Victoria Iturralde Méndez",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_CONTRADICCION",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "X",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "X",
+                "C03": "S",
+                "C04": "S",
+                "C05": "U"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000109\/resultados-experto"
+        },
+        {
+            "caso": "S30",
+            "cod_residente": "COD_RES_000110",
+            "nombre": "Manuel Segovia Cárdenas",
+            "patron_calculado": null,
+            "estado": "ABSTENCION_INFORMACION_INSUFICIENTE",
+            "dominios": {
+                "COG-ATE": "P",
+                "COG-EJE": "P",
+                "COG-LEN": "P",
+                "COG-MEM": "A",
+                "COG-VIS": "P"
+            },
+            "requisitos": {
+                "C01": "S",
+                "C02": "S",
+                "C03": "S",
+                "C04": "S",
+                "C05": "U"
+            },
+            "ruta": "\/admin\/psicologia\/residente\/COD_RES_000110\/resultados-experto"
+        }
+    ]
+}

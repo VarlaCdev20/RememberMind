@@ -19,8 +19,8 @@
  <p class="text-2xl font-black text-titulo">{{ $documentosLista->count() }}</p>
  </div>
  <div class="rounded-xl bg-fondo-panel p-3 border border-borde">
- <span class="block text-xs font-bold uppercase tracking-wide text-apoyo mb-1">Último Ingresado</span>
- <p class="text-sm font-bold text-titulo mt-2">{{ $documentosLista->first()->created_at->format('d/m/Y') }}</p>
+ <span class="block text-xs font-bold uppercase tracking-wide text-apoyo mb-1">Última validación</span>
+ <p class="text-sm font-bold text-titulo mt-2">{{ $documentosLista->max('fecha_validacion')?->format('d/m/Y') ?? 'Sin fecha de validación' }}</p>
  </div>
  </div>
 
@@ -32,7 +32,7 @@
  <i class="ph-fill ph-file-pdf text-2xl text-parrafo"></i>
  <div class="min-w-0">
  <a href="{{ route('admin.adultos-mayores.documentos.archivo', [$idAdulto, $doc->cod_documento]) }}" class="block truncate text-xs font-bold text-titulo underline">{{ $doc->nombre }}</a>
- <p class="text-xs font-bold text-apoyo mt-0.5 uppercase tracking-wide">{{ $doc->tipo_documento ?? 'Documento' }} • {{ $doc->created_at->format('d/m/Y') }}</p>
+ <p class="text-xs font-bold text-apoyo mt-0.5 uppercase tracking-wide">{{ $doc->tipo_documento ?? 'Documento' }} • {{ $doc->fecha_validacion ? 'Validación: '.$doc->fecha_validacion->format('d/m/Y') : 'Sin fecha de validación' }}</p>
  </div>
  </div>
  @endforeach

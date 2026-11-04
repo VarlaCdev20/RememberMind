@@ -5,6 +5,7 @@ namespace App\Modulos\Reportes\Aplicacion\Consultas;
 use App\Compartido\Aplicacion\Contratos\EnlacesAplicacion;
 use App\Models\Personal;
 use App\Models\User;
+use App\Modulos\Alertas\Aplicacion\Consultas\BandejaAlertas;
 use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -23,7 +24,7 @@ class DashboardService
         $perfil = $rolEfectivo ?? $usuario->getRoleNames()->sort()->implode('|');
         $claveCache = 'dashboard_roles_v2_'.$usuario->cod_usuario.'_'.md5($perfil);
 
-        return Cache::remember($claveCache, 60, function () use ($usuario, $rolEfectivo) {
+        $cargar = function () use ($usuario, $rolEfectivo) {
             $rol = $rolEfectivo ?? $usuario->getRoleNames()->first();
             $esSalud = in_array($rol, ['ENFERMEROS', 'MEDICO GENERAL/GERIATRA'], true);
 
@@ -31,6 +32,9 @@ class DashboardService
             $datosPorRol = $this->roleDashboardData->forRole($usuario, $rol ?? 'USUARIO');
             $perfil['indicadores'] = $datosPorRol['metrics'];
             $perfil['panels'] = $datosPorRol['panels'];
+            if ($rol === 'GERENTE') {
+                $perfil['gerencia'] = $datosPorRol['gerencia'];
+            }
             if ($rol === 'SUPERADMINISTRADOR') {
                 $perfil['jornada'] = $datosPorRol['activeShift'] ?? null;
             }
@@ -43,7 +47,11 @@ class DashboardService
                     'nombre_rol' => $rol ?? 'Usuario',
                 ],
             ];
-        });
+        };
+
+        // El resumen gerencial revalida permisos y fuentes en cada petición.
+        return ($rolEfectivo === 'GERENTE' || (! $rolEfectivo && $usuario->hasRole('GERENTE')))
+            ? $cargar() : Cache::remember($claveCache, 60, $cargar);
     }
 
     public function obtenerSaludoUsuario($usuario, ?string $rolEfectivo = null): array
@@ -131,7 +139,7 @@ class DashboardService
             'GERENTE' => [
                 'title' => 'Dirección institucional,',
                 'highlight' => 'con visión de cobertura',
-                'description' => 'Conduce personal, áreas, turnos y planificación general con indicadores institucionales de consulta.',
+                'description' => 'Organiza el equipo, revisa la planificación y consulta la cobertura de la residencia.',
                 'quote' => 'Planificar es cuidar la capacidad institucional',
                 'areas' => [
                     ['icon' => 'ph-identification-badge', 'title' => 'Personal', 'copy' => 'Incorporación, profesión, especialidad y vigencia.'],
@@ -140,9 +148,11 @@ class DashboardService
                     ['icon' => 'ph-chart-line-up', 'title' => 'Cobertura', 'copy' => 'Planificación y disponibilidad futura.'],
                 ],
                 'accesos' => [
-                    ['route' => 'admin.personal-institucional', 'permission' => 'personal_institucional.ver', 'icon' => 'ph-identification-badge', 'label' => 'Personal'],
-                    ['route' => 'admin.turnos-asignaciones.index', 'permission' => 'turnos.ver', 'icon' => 'ph-clock', 'label' => 'Turnos'],
-                    ['route' => 'admin.reportes.institucional.preview', 'permission' => 'reportes.institucional', 'icon' => 'ph-chart-bar', 'label' => 'Reportes gerenciales'],
+                    ['route' => 'admin.personal-institucional', 'permission' => 'personal_institucional.ver', 'icon' => 'ph-identification-badge', 'label' => 'Personal', 'description' => 'Perfiles y documentación laboral.'],
+                    ['route' => 'admin.areas-institucionales.index', 'permission' => 'areas.ver', 'icon' => 'ph-buildings', 'label' => 'Áreas y equipo', 'description' => 'Organización del equipo por área.'],
+                    ['route' => 'admin.turnos-asignaciones.index', 'permission' => 'turnos.ver', 'icon' => 'ph-calendar-check', 'label' => 'Planificación', 'description' => 'Turnos y horarios del personal.'],
+                    ['route' => 'admin.cobertura-equipo.index', 'permission' => 'jornadas.ver', 'icon' => 'ph-users-three', 'label' => 'Cobertura', 'description' => 'Asignaciones guardadas por fecha, área y turno.'],
+                    ['route' => 'admin.reportes.institucional.preview', 'permission' => 'reportes.institucional', 'icon' => 'ph-chart-bar', 'label' => 'Reportes gerenciales', 'description' => 'Información institucional consolidada.'],
                 ],
             ],
             'ADMINISTRADOR' => [
@@ -426,23 +436,23 @@ class DashboardService
         );
     }
 
-    public function obtenerAlertasEstructuradas(): array
+    public function obtenerAlertasEstructuradas(User $usuario): array
     {
         $alertas = [];
 
-        $alertasDB = DB::table('alertas')
-            ->whereIn('estado', ['ABIERTA', 'PENDIENTE', 'EN_PROCESO'])
+        $alertasDB = app(BandejaAlertas::class)->pendientes($usuario)
             ->orderByDesc('fecha_hora')
             ->limit(4)
             ->get();
 
         foreach ($alertasDB as $a) {
             $alertas[] = [
-                'nivel' => $a->nivel_gravedad ?? 'URGENTE',
+                'nivel' => $a->prioridad,
                 'descripcion' => $a->descripcion,
                 'icono' => 'ph-warning-octagon',
                 'accion' => 'Revisar en módulo de alertas',
-                'url' => $this->enlaces->destino('admin.alertas.index'),
+                'url' => $this->enlaces->destino('admin.alertas-clinicas.index'),
+                'fuente' => 'Alerta persistida',
             ];
         }
 
@@ -457,8 +467,8 @@ class DashboardService
                 ? '1 residente no tiene atención clínica activa'
                 : "{$sinFicha} residentes no tienen atención clínica activa";
             $alertas[] = [
-                'nivel' => 'URGENTE',
-                'descripcion' => "{$etiqueta} — requiere revisión.",
+                'nivel' => 'INFORMATIVA',
+                'descripcion' => "Aviso orientativo: {$etiqueta}. La ausencia de registro no acredita una urgencia.",
                 'icono' => 'ph-warning-circle',
                 'accion' => 'Ir a Residentes',
                 'url' => $this->enlaces->destino('admin.residentes.index'),
@@ -471,7 +481,7 @@ class DashboardService
                 ? '1 residente requiere'
                 : "{$seguimiento} residentes requieren";
             $alertas[] = [
-                'nivel' => 'URGENTE',
+                'nivel' => 'INFORMATIVA',
                 'descripcion' => "{$etiqueta} seguimiento especial — alerta orientativa.",
                 'icono' => 'ph-eye',
                 'accion' => 'Ver residentes',

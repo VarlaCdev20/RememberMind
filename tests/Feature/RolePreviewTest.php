@@ -2,11 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Models\Alerta;
+use App\Models\Residente;
+use App\Models\User;
 use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use App\Modulos\Identidad\Presentacion\Navegacion\SidebarService;
-use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class RolePreviewTest extends TestCase
@@ -17,6 +20,42 @@ class RolePreviewTest extends TestCase
     {
         parent::setUp();
         $this->seed(RolesAndPermissionsSeeder::class);
+    }
+
+    public function test_preview_alertas_permite_buscar_y_filtrar_sin_permitir_guardados_ni_lotes_mixtos(): void
+    {
+        $usuario = $this->usuarioConRol('SUPERADMINISTRADOR');
+        $this->actingAs($usuario)->withSession([RolePreviewService::SESSION_KEY => 'NUTRICIONISTA']);
+        $residente = Residente::factory()->create();
+        $nutricionista = User::factory()->create(['nombres' => 'Profesional nutricional de prueba']);
+        $nutricionista->assignRole('NUTRICIONISTA');
+        Alerta::create(['cod_residente' => $residente->getKey(), 'cod_personal_responsable' => $nutricionista->personal->getKey(), 'tipo' => 'SEGUIMIENTO', 'prioridad' => 'MEDIA', 'estado' => 'ABIERTA']);
+        $html = $this->get(route('admin.alertas-clinicas.index'))->assertOk()->getContent();
+        preg_match_all('/wire:snapshot="([^"]+)"/', $html, $matches);
+        $snapshot = collect($matches[1])->map(fn ($s) => html_entity_decode($s, ENT_QUOTES, 'UTF-8'))
+            ->first(fn ($s) => json_decode($s, true)['memo']['name'] === 'alertas.alertas-panel');
+        $this->assertNotNull($snapshot);
+        $consulta = ['snapshot' => $snapshot, 'updates' => ['search' => 'sin coincidencia', 'filtroEspecialidad' => 'NUTRICIONISTA'], 'calls' => []];
+        $respuesta = $this->withHeader('X-Livewire', 'true')->postJson(Livewire::getUpdateUri(), ['components' => [$consulta]])
+            ->assertOk()->assertSee('Ninguna alerta coincide', false);
+        $consulta['snapshot'] = $respuesta->json('components.0.snapshot');
+        $consulta['updates'] = [];
+        $consulta['calls'] = [['path' => '', 'method' => 'filtrarResumen', 'params' => ['todas']]];
+        $resumen = $this->postJson(Livewire::getUpdateUri(), ['components' => [$consulta]])->assertOk();
+        $consulta['snapshot'] = $resumen->json('components.0.snapshot');
+        $consulta['calls'] = [['path' => '', 'method' => 'filtrarEquipo', 'params' => ['SIN_RESPONSABLE']]];
+        $equipo = $this->postJson(Livewire::getUpdateUri(), ['components' => [$consulta]])->assertOk();
+        $consulta['snapshot'] = $equipo->json('components.0.snapshot');
+        $consulta['calls'] = [['path' => '', 'method' => 'filtrarResumen', 'params' => ['fuera_plazo']]];
+        $this->postJson(Livewire::getUpdateUri(), ['components' => [$consulta]])->assertOk()->assertSee('Ninguna alerta coincide', false);
+        $escritura = $consulta;
+        $escritura['calls'] = [['path' => '', 'method' => 'guardarRegistroEspecialidad', 'params' => []]];
+        $this->postJson(Livewire::getUpdateUri(), ['components' => [$consulta, $escritura]])->assertForbidden();
+        $escritura['calls'] = [['path' => '', 'method' => '$set', 'params' => ['accionTomada', 'No autorizado']]];
+        $this->postJson(Livewire::getUpdateUri(), ['components' => [$escritura]])->assertForbidden();
+        $this->assertDatabaseCount('alertas', 1);
+        $this->assertDatabaseCount('eventos_alerta', 0);
+        $this->assertDatabaseCount('valoraciones_nutricionales', 0);
     }
 
     public function test_solo_superadmin_puede_activar_preview(): void

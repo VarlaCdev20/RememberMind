@@ -1,6 +1,6 @@
 ---
 title: "Auditoría de skills de sistema de RememberMind"
-status: CURRENT
+status: HISTORICAL
 version: "1.0"
 last_reviewed: 2026-10-06
 owner: RememberMind
@@ -16,6 +16,8 @@ related_modules: []
 > Infraestructura/registro de skills; no aprobación clínica ni certificación de producto. Fase documental actual: [portal](../README.md).
 
 # Auditoría de skills de sistema de RememberMind
+
+> **Informe de su corte original.** Sus pruebas, cifras y limitaciones se conservan como evidencia fechada. El [estado actual](../ESTADO_ACTUAL.md) incorpora las entregas posteriores; este informe no certifica nuevamente el árbol vigente.
 
 Fecha de corte: 2026-10-06. Alcance: instrucciones, referencias y documentación; sin modificaciones de producto. Fuente de alcance: tarea maestra adjunta de la propietaria. Revisión de dominio/seguridad, BDD/fuentes y experto/pruebas por tres agentes de solo lectura; plan consolidado e implementación por un responsable.
 
@@ -101,13 +103,13 @@ Esta tarea los registra; la autorización actual excluye corregir código funcio
 |---|---|---|
 | Auditor BDD fijaba el inventario del núcleo anterior | Frontmatter original de database-audit; decisión V2.2 aprobada | EVOLVE: resolver baseline + decisiones vigentes. El nombre del diccionario no cambia. |
 | Índices documentales presentan auditorías V1 como vigentes | [auditoria.md](../auditoria.md), [auditoria_roles_permisos.md](../auditoria_roles_permisos.md) | Clasificar HISTÓRICA y corregir el índice raíz; conservar evidencia histórica. |
-| Estado físico/documentado de admisión difiere | Baseline §§6 y 29: ACTIVO; [FormalizarAdmision](../../app/Backend/Modulos/Admisiones/Acciones/FormalizarAdmision.php): ADMITIDO/ADMITIDA; AGENTS: condición institucional ADMITIDO | SOURCE CONFLICT localizado. La condición institucional tiene instrucción actual; no deducir todos los valores del catálogo de esa condición. Resolver contrato específico antes de cambiar estados. |
+| Estado físico/documentado de admisión difiere | Baseline §§6 y 29: ACTIVO; [FormalizarAdmision](../../app/Modulos/Admisiones/Aplicacion/Acciones/FormalizarAdmision.php): ADMITIDO/ADMITIDA; AGENTS: condición institucional ADMITIDO | SOURCE CONFLICT localizado. La condición institucional tiene instrucción actual; no deducir todos los valores del catálogo de esa condición. Resolver contrato específico antes de cambiar estados. |
 | Lista de migraciones agrupadas obsoleta | [índice BDD](../base-de-datos/README.md), migraciones actuales desagregadas | Deuda de índice; descubrir archivos existentes, no copiar rutas ausentes. |
 | Bloqueo de admisión marcado pendiente pese a Action con lockForUpdate | Baseline §§13 y 26, FormalizarAdmision | Distinguir deuda documental de prueba de concurrencia. No afirmar PostgreSQL verificado. |
 | Integridad instrumento/pregunta atribuida al hardening | Baseline §§22 y 30; RespuestaInstrumento/InstrumentoController; BddOperativaV2Test | Evidencia por capa: modelo/controlador no equivalen a restricción física SQL. |
 | Objetivos individuales de signos aún “PROPUESTOS” en auditoría antigua | Auditoría formulario signos; decisión V2.2 posterior aprobada | DEPRECADA solo esa afirmación; aprobación posterior resuelve el alcance. |
 | Propuesta experta usa otra raíz y Repository Pattern | Arquitectura experta §8; arquitectura vigente/AGENTS | CONFLICTIVA en ubicación; aplica Backend/Modulos. No imponer repositorios. |
-| Clasificaciones MoCA/MMSE en controlador heredado | [AdultoMayorEvaluacionController](../../app/Http/Controllers/Valoraciones/AdultoMayorEvaluacionController.php):54–80 | Evidencia de riesgo y legacy; no acredita método o licencia aprobados. |
+| Clasificaciones MoCA/MMSE en controlador heredado | AdultoMayorEvaluacionController — referencia local no disponible: `../../app/Http/Controllers/Valoraciones/AdultoMayorEvaluacionController.php`:54–80 | Evidencia de riesgo y legacy; no acredita método o licencia aprobados. |
 | Posible exposición de expediente a familiar por permiso genérico | ReporteV2Controller:15–16 y routes/web.php:1014; DocumentoController:30 | Hallazgo de lectura para revisión posterior por recurso/contenido. Ver residente no concede expediente/descarga; no se reparó producto en esta tarea. |
 | Ciclos de alerta con eventos distintos entre entradas | AlertaController:91, AlertasService:98, DeteccionAlertasService:152 frente a ServicioDecisionAlertaClinica | Riesgo a verificar por operación y contrato; creación/eventos no certificados por esta auditoría de skills. |
 | Texto de la tarea de sistema insertado previamente en guía UX | Diff preexistente de STACK_SKILLS_UX_UI.md | Preservar cambio del usuario; no elevar el pegado a protocolo clínico ni extender su autoridad visual. |
@@ -120,6 +122,6 @@ Pendientes de decisiones/documentación: catálogos clínicos aún abiertos, PRN
 - Cada skill de sistema nueva/evolucionada contiene frontmatter y las once secciones de cuerpo solicitadas, fuentes y límite de responsabilidad.
 - Referencias de detalle se cargan por necesidad; no replican diccionario, matriz completa de permisos o UX.
 - Lectura de fuentes distingue vigente/histórico/propuesta/conflicto/deprecación parcial/no resuelto.
-- Pruebas operativas, validación clínica experta, build y revisión visual se informan por separado.
+- Pruebas operativas, evaluación posterior en uso real experta, build y revisión visual se informan por separado.
 - Ninguna instrucción autoriza cambios de esquema, reglas clínicas, permisos o eliminación de datos sin la decisión aplicable.
 - Revisión por escenarios y validación mecánica se registran en [el informe de verificación](VERIFICACION_SKILLS_SISTEMA.md).

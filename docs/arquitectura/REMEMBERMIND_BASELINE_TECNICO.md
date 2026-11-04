@@ -1,19 +1,19 @@
 ---
 title: "RememberMind — Baseline técnico y entorno de ejecución"
 status: CURRENT
-version: "2.1"
-last_reviewed: 2026-10-06
+version: "2.2"
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: true
-verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
-verification_scope: STATIC_REPOSITORY_REVIEW
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_AND_REGISTERED_ROUTES
 runtime_verified: false
 supersedes: []
 related_docs: []
 related_modules: []
 ---
 
-> Versiones declaradas compatibles; versiones concretas del lock y runtime no verificado se separan en [ESTADO_ACTUAL](../ESTADO_ACTUAL.md).
+> Versiones declaradas compatibles; versiones concretas del lock y alcance de ejecución se separan en el [inventario actual](../sistema/INVENTARIO_ACTUAL.md) y [Estado actual](../ESTADO_ACTUAL.md).
 
 # RememberMind — Baseline técnico y entorno de ejecución
 
@@ -42,7 +42,7 @@ Es el único motor soportado para desarrollo integrado, staging y producción. E
 
 ### SQLite
 
-Se utiliza exclusivamente con `:memory:` para pruebas automatizadas rápidas. Las migraciones emulan mediante triggers las restricciones necesarias para que esas pruebas mantengan reglas equivalentes.
+Se utiliza con `:memory:` para pruebas PHP rápidas y archivos SQLite temporales aislados en arneses de navegador/concurrencia. Esos archivos son desechables, contienen fixtures sintéticas y no constituyen una instalación institucional soportada. Las migraciones emulan mediante triggers las restricciones necesarias para que esas pruebas mantengan reglas equivalentes.
 
 MySQL y MariaDB no forman parte del baseline soportado. La presencia de configuración genérica de Laravel para esos motores no implica compatibilidad de RememberMind.
 
