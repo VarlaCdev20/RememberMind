@@ -1,8 +1,18 @@
+---
+title: "Antecedente del sistema experto — README"
+status: HISTORICAL
+last_reviewed: 2026-11-04
+owner: RememberMind
+source_of_truth: false
+verification_scope: HISTORICAL_BOUNDARY_AND_CURRENT_LOCATORS
+runtime_verified: false
+---
+
 > Archivo histórico: el recorrido experimental descrito aquí fue retirado del producto el 27/10/2026. Sus fixtures están bajo `tests/Support/Fixtures` y `motor-experto/tests/fixtures`. La entrada vigente está en `docs/sistema-experto/README.md`.
 
 # sistema experto — módulo experimental aislado
 
-> Antecedente histórico. Desde el 18/10/2026 esta carpeta no contiene PHP ejecutable. El dominio está en `motor-experto/src/motor_experto/dominio`, el codec en `motor-experto/src/motor_experto/soporte/conservacion`, y Application/Infrastructure en `app/Modulos/ApoyoDecision/Aplicacion` e `Infraestructura`. El contenido siguiente describe el corte anterior; no define otra implementación vigente. Véase `docs/sistema-experto/CORRECCIONES_POR_PUNTOS_2026_10_18.md`.
+> Antecedente histórico. Desde el 18/10/2026 esta carpeta no contiene PHP ejecutable. El dominio está en `motor-experto/dominio`, el codec en `motor-experto/conservacion`, y Application/Infrastructure en `app/Modulos/ApoyoDecision/Aplicacion` e `Infraestructura`. El contenido siguiente describe el corte anterior; no define otra implementación vigente. Véase `docs/sistema-experto/CORRECCIONES_POR_PUNTOS_2026_10_18.md`.
 
 Domain contiene los 15 Value Objects, 14 Entities, 4 interfaces y 10 servicios.
 Application contiene 5 DTOs y los 6 casos de uso del reglamento. Domain y

@@ -112,11 +112,11 @@ Residente y ocupación habilitan contexto posterior; no se crean jornadas/asigna
 
 ## 23. Livewire / Controllers
 
-[app/Frontend/Livewire/Admisiones/PreadmisionesPanel.php](../../../app/Modulos/Admisiones/Presentacion/Livewire/Paginas/PreadmisionesPanel.php), [app/Http/Controllers/Admisiones/PreadmisionController.php](../../../app/Modulos/Admisiones/Presentacion/Http/Controllers/PreadmisionController.php), [app/Http/Controllers/Admisiones/AdmisionController.php](../../../app/Modulos/Admisiones/Presentacion/Http/Controllers/AdmisionController.php), [app/Frontend/Livewire/Admisiones/DecisionAdmisionModal.php](../../../app/Modulos/Admisiones/Presentacion/Livewire/Funcionalidades/DecisionAdmisionModal.php)
+[app/Modulos/Admisiones/Presentacion/Livewire/Paginas/PreadmisionesPanel.php](../../../app/Modulos/Admisiones/Presentacion/Livewire/Paginas/PreadmisionesPanel.php), [app/Http/Controllers/Admisiones/PreadmisionController.php](../../../app/Modulos/Admisiones/Presentacion/Http/Controllers/PreadmisionController.php), [app/Http/Controllers/Admisiones/AdmisionController.php](../../../app/Modulos/Admisiones/Presentacion/Http/Controllers/AdmisionController.php), [app/Modulos/Admisiones/Presentacion/Livewire/Funcionalidades/DecisionAdmisionModal.php](../../../app/Modulos/Admisiones/Presentacion/Livewire/Funcionalidades/DecisionAdmisionModal.php)
 
 ## 24. Actions
 
-[app/Backend/Modulos/Admisiones/Acciones/FormalizarAdmision.php](../../../app/Modulos/Admisiones/Aplicacion/Acciones/FormalizarAdmision.php)
+[app/Modulos/Admisiones/Aplicacion/Acciones/FormalizarAdmision.php](../../../app/Modulos/Admisiones/Aplicacion/Acciones/FormalizarAdmision.php)
 
 ## 25. Services
 

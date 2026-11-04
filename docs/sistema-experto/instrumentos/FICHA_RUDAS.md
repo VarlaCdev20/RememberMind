@@ -2,14 +2,17 @@
 title: "Ficha documental I02 — RUDAS"
 status: CURRENT
 version: "1.1"
-last_reviewed: 2026-10-28
+last_reviewed: 2026-11-04
 owner: ApoyoDecision
 source_of_truth: false
-verification_scope: INSTRUMENT_IDENTITY_RESEARCH_NOT_ACTIVATION
+verification_scope: CURRENT_TREE_DOCUMENTATION_RECONCILIATION
 runtime_verified: false
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
 ---
 
 # I02 — RUDAS
+
+**Estado al 04/11/2026:** RUDAS-PE 2020 está activado localmente para captura completa de puntuaciones y cálculo descriptivo, usando la hoja original de esa edición. [Activación, identidad, fuentes y límites](../ENTREGA_ACTIVACION_PERFILES_INICIALES_2026_11_04.md). Las gestiones pendientes descritas en cortes anteriores no son el estado de esta activación. No se habilitan interpretaciones diagnósticas desde el total.
 
 **Actualización del 29/10/2026:** [entrega integrada, perfil de preparación y condiciones de incorporación](../ENTREGA_INSTRUMENTOS_Y_PERFILES_INICIALES_2026_10_29.md). Se mantiene la distinción entre original inglés y adaptación RUDAS-PE; no se adopta una edición ni un baremo automáticamente.
 

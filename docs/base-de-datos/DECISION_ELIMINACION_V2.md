@@ -12,6 +12,8 @@ runtime_verified: false
 
 # Eliminación V2 — extensión aditiva aprobada
 
+> Alcance de inventario: las cifras de esta decisión describen su fecha. El [inventario vigente](README.md) incorpora las extensiones posteriores:106 tablas de negocio+16 técnicas. La decisión conserva exclusivamente sus columnas, relaciones y reglas autorizadas.
+
 La propietaria autorizó explícitamente el 2026-10-09, en «REMEMBERMIND — ELIMINACIÓN V2 — EXTENSIÓN APROBADA DE BDD + FORMULARIO COMPLETO», ampliar exclusivamente `registros_eliminacion` con los siguientes trece campos nullable. No se crean tablas ni se cambia otra tabla, PK, FK, relación, catálogo SQL o índice. Inventario operativo: **71 tablas**, sin cambio; las tablas expertas se inventarían aparte.
 
 | Columna | Tipo |

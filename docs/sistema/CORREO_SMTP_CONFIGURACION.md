@@ -1,5 +1,10 @@
 # Conexión del correo saliente
 
+## Contrato vigente al 04/11/2026
+
+El único remitente autorizado es **remembermind.health@gmail.com**. La protección permanece en código y la contraseña de aplicación solo en configuración secreta local. Las comprobaciones del 26/10 que siguen son históricas; esta actualización no lee credenciales, no prueba SMTP ni acredita entrega actual de mensajes. La comprobación posterior a «listo» resolvió el aviso de configuración en ese corte; no presentar el diagnóstico previo como estado actual.
+
+
 ## Última comprobación del aviso en login — 26/10/2026
 
 Ante una nueva captura de «El correo del sistema aún no está disponible», se

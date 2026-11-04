@@ -1,6 +1,16 @@
+---
+title: "Antecedente del sistema experto — README"
+status: HISTORICAL
+last_reviewed: 2026-11-04
+owner: RememberMind
+source_of_truth: false
+verification_scope: HISTORICAL_BOUNDARY_AND_CURRENT_LOCATORS
+runtime_verified: false
+---
+
 # Infrastructure de sistema experto
 
-> Ubicación histórica de documentación. Las clases fueron trasladadas a `app/Modulos/ApoyoDecision/Infraestructura` el 18/10/2026 y no quedan clases ni alias aquí. El codec puro reside en `motor-experto/src/motor_experto/soporte/conservacion`. Las restricciones y contratos que se describen abajo conservan su alcance experimental; el traslado no activa uso clínico.
+> Ubicación histórica de documentación. Las clases fueron trasladadas a `app/Modulos/ApoyoDecision/Infraestructura` el 18/10/2026 y no quedan clases ni alias aquí. El codec puro reside en `motor-experto/conservacion`. Las restricciones y contratos que se describen abajo conservan su alcance experimental; el traslado no activa uso clínico.
 
 Alcance: PoC experimental con datos sintéticos. Las lecturas se restringen a
 `testing` y a destinos admitidos por `BaseTecnicaDesechable`. No hay registro

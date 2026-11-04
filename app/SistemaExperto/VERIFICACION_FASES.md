@@ -1,6 +1,16 @@
+---
+title: "Antecedente del sistema experto — VERIFICACION_FASES"
+status: HISTORICAL
+last_reviewed: 2026-11-04
+owner: RememberMind
+source_of_truth: false
+verification_scope: HISTORICAL_BOUNDARY_AND_CURRENT_LOCATORS
+runtime_verified: false
+---
+
 # Verificación de las fases — 17/10/2026
 
-> Rutas históricas: el 18/10/2026 las 43 clases Domain se trasladaron a `motor-experto/src/motor_experto/dominio` y las 30 clases de Application/Infrastructure a `ApoyoDecision`. Esta evidencia anterior no acredita por sí sola el traslado; el nuevo corte está en `docs/sistema-experto/CORRECCIONES_POR_PUNTOS_2026_10_18.md`.
+> Rutas históricas: el 18/10/2026 las 43 clases Domain se trasladaron a `motor-experto/dominio` y las 30 clases de Application/Infrastructure a `ApoyoDecision`. Esta evidencia anterior no acredita por sí sola el traslado; el nuevo corte está en `docs/sistema-experto/CORRECCIONES_POR_PUNTOS_2026_10_18.md`.
 
 La evidencia inicial de este documento se conserva como antecedente. La
 incorporación aprobada posterior se describe en el apartado de conservación V2.

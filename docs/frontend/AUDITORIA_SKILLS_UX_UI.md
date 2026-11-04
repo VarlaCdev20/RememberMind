@@ -1,6 +1,6 @@
 ---
 title: "Auditoría del stack de skills UX/UI"
-status: CURRENT
+status: HISTORICAL
 version: "1.0"
 last_reviewed: 2026-10-06
 owner: RememberMind
@@ -16,6 +16,8 @@ related_modules: []
 > Auditoría de la entrega de skills UX; evidencia de instrucciones, no certificación de pantallas actuales.
 
 # Auditoría del stack de skills UX/UI
+
+> **Informe de su corte original.** Sus pruebas, cifras y limitaciones se conservan como evidencia fechada. El [estado actual](../ESTADO_ACTUAL.md) incorpora las entregas posteriores; este informe no certifica nuevamente el árbol vigente.
 
 Fecha: 6 de octubre de 2026. Alcance: infraestructura de skills y documentación; sin cambios de producto.
 

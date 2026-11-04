@@ -1,34 +1,35 @@
 ---
-title: "Inventario Blade — medicacion"
+title: "Inventario Blade — Medicacion"
 status: CURRENT
-version: "1.0"
-last_reviewed: 2026-10-25
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
-verification_scope: DOCUMENTATION_STRUCTURE_AND_STATIC_INVENTORY
+source_of_truth_scope: [static_blade_inventory]
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_AND_REGISTERED_ROUTES
 runtime_verified: false
 ---
 
-# Vistas: medicacion
+# Vistas: Medicacion
 
-**Corte estático:** 25/10/2026. **15 plantillas** localizadas. El tipo y conexión real se validarán al escribir su ficha; no se atribuye una pantalla operativa a cada parcial.
+**Corte estático:04/11/2026. 15 plantillas.** Incluye páginas, parciales, modales y componentes; no equivale a ese número de pantallas operativas. Controles contados por etiquetas HTML literales; Alpine, componentes Blade, condiciones y generación dinámica requieren inspección específica. Sin nueva QA visual en esta revisión documental.
 
-| Archivo | Tipo orientativo por ubicación | Botones declarados | Formularios | Tablas | Ficha detallada |
-|---|---|---:|---:|---:|---|
-| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/administracion-medicacion-modal.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/administracion-medicacion-modal.blade.php) | Vista/fragmento: clasificar | 2 | 1 | 0 | Por elaborar |
-| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/medicacion-adulto-modal.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/medicacion-adulto-modal.blade.php) | Vista/fragmento: clasificar | 2 | 1 | 0 | Por elaborar |
-| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/administracion-consultas.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/administracion-consultas.blade.php) | Parcial o detalle | 8 | 1 | 1 | Por elaborar |
-| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/drawer-dosis.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/drawer-dosis.blade.php) | Parcial o detalle | 3 | 0 | 0 | Por elaborar |
-| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/historial.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/historial.blade.php) | Parcial o detalle | 11 | 0 | 0 | Por elaborar |
-| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/kardex-filtros.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/kardex-filtros.blade.php) | Parcial o detalle | 1 | 0 | 0 | Por elaborar |
-| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/kardex-graficas.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/kardex-graficas.blade.php) | Parcial o detalle | 0 | 0 | 0 | Por elaborar |
-| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/kardex-matriz.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/kardex-matriz.blade.php) | Parcial o detalle | 1 | 0 | 1 | Por elaborar |
-| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/modal-administrar.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/modal-administrar.blade.php) | Parcial o detalle | 2 | 1 | 0 | Por elaborar |
-| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/modal-medicamento.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/modal-medicamento.blade.php) | Parcial o detalle | 1 | 0 | 0 | Por elaborar |
-| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/modal-omision.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/modal-omision.blade.php) | Parcial o detalle | 2 | 1 | 0 | Por elaborar |
-| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/omisiones.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/omisiones.blade.php) | Parcial o detalle | 1 | 0 | 1 | Por elaborar |
-| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/proximas-dosis.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/proximas-dosis.blade.php) | Parcial o detalle | 1 | 0 | 1 | Por elaborar |
-| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/salud-administracion-medicacion.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/salud-administracion-medicacion.blade.php) | Vista/fragmento: clasificar | 1 | 0 | 0 | Por elaborar |
-| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/salud-medicacion.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/salud-medicacion.blade.php) | Vista/fragmento: clasificar | 13 | 1 | 1 | Por elaborar |
+| Archivo | `<button>` | `<form>` | `<table>` |
+|---|---:|---:|---:|
+| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/administracion-medicacion-modal.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/administracion-medicacion-modal.blade.php) | 2 | 1 | 0 |
+| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/medicacion-adulto-modal.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/medicacion-adulto-modal.blade.php) | 2 | 1 | 0 |
+| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/administracion-consultas.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/administracion-consultas.blade.php) | 8 | 1 | 1 |
+| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/drawer-dosis.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/drawer-dosis.blade.php) | 3 | 0 | 0 |
+| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/historial.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/historial.blade.php) | 11 | 0 | 0 |
+| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/kardex-filtros.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/kardex-filtros.blade.php) | 1 | 0 | 0 |
+| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/kardex-graficas.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/kardex-graficas.blade.php) | 0 | 0 | 0 |
+| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/kardex-matriz.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/kardex-matriz.blade.php) | 1 | 0 | 1 |
+| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/modal-administrar.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/modal-administrar.blade.php) | 2 | 1 | 0 |
+| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/modal-medicamento.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/modal-medicamento.blade.php) | 1 | 0 | 0 |
+| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/modal-omision.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/modal-omision.blade.php) | 2 | 1 | 0 |
+| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/omisiones.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/omisiones.blade.php) | 1 | 0 | 1 |
+| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/proximas-dosis.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/partials/proximas-dosis.blade.php) | 1 | 0 | 1 |
+| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/salud-administracion-medicacion.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/salud-administracion-medicacion.blade.php) | 1 | 0 | 0 |
+| [app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/salud-medicacion.blade.php](../../../../app/Modulos/Medicacion/Presentacion/Vistas/livewire/medicacion/salud-medicacion.blade.php) | 13 | 1 | 1 |
 
-La ficha detallada deberá enlazarse en esta tabla al completarla. «Por elaborar» indica documentación pendiente, no ausencia de la vista.
+[Inventario general](../README.md) · [Estado actual](../../../ESTADO_ACTUAL.md)

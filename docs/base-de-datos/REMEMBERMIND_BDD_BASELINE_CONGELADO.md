@@ -17,16 +17,20 @@ related_modules: []
 
 # RememberMind — Baseline Rector de la BDD Operativa
 
+> Alcance de inventario: las cifras de esta decisión describen su fecha. El [inventario vigente](README.md) incorpora las extensiones posteriores:106 tablas de negocio+16 técnicas. La decisión conserva exclusivamente sus columnas, relaciones y reglas autorizadas.
+
 **Extensión autorizada e instalada del 29/10/2026:** [idioma principal e informante principal por atención](PROPUESTA_CONTEXTO_IDIOMA_INFORMANTE_2026_10_29.md), tres columnas nullable, FK restrictiva al vínculo existente e índice de soporte. Conserva 4FN en este alcance,28.107 atenciones previas e inventario 106 de negocio + 16 técnicas; sin backfill ni uso inferencial automático.
 
-**Extensión acotada del28/10/2026:** [contexto escalar por atención y justificación de 4FN](DECISION_CONTEXTO_ESCOLARIDAD_4FN_2026_10_28.md): `escolaridad_anios SMALLINT NULL`, `puede_leer BOOLEAN NULL` y `puede_escribir BOOLEAN NULL`. Sin tablas/FK nuevas, backfill o inferencia automática; conserva el grano del episodio. Los límites y la evidencia están en la decisión específica.
+**Extensión acotada del 28/10/2026:** [contexto escalar por atención y justificación de 4FN](DECISION_CONTEXTO_ESCOLARIDAD_4FN_2026_10_28.md): `escolaridad_anios SMALLINT NULL`, `puede_leer BOOLEAN NULL` y `puede_escribir BOOLEAN NULL`. Sin tablas/FK nuevas, backfill o inferencia automática; conserva el grano del episodio. Los límites y la evidencia están en la decisión específica.
+
+**Extensión posterior del 27/10/2026:** [aviso compartido adoptado e instalado](DECISION_AVISO_COMPARTIDO_CAMPOS_2026_10_27.md), seis columnas nullable en `eventos_asignacion_personal`, sin tablas ni permisos nuevos. Se conservan106 de negocio+16 técnicas. Originales inmutables; metadatos anteriores NULL. La [decisión de no crear más tablas](DECISION_SIN_NUEVAS_TABLAS_2026_10_27.md) prevalece sobre el techo histórico110 de los apartados anteriores.
 
 **Inventario vigente — 27/10/2026:** la instalación expresamente autorizada
 de Gerencia35/37 añade seis relaciones operativas y ocho columnas nullable:
 **81 operativas +25 expertas =106 de negocio**, más16 técnicas.
 [Decisión, diccionarios, instalación y reversión](DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md).
 Se verificó contenido previo conservado; no se completaron fechas o autorías
-históricas desconocidas. El máximo de diseño sigue en110. Los conteos de las
+históricas desconocidas. El máximo de diseño sigue en 110. Los conteos de las
 decisiones anteriores conservan su fecha y alcance.
 
 **Extensión aprobada — 26/10/2026:** `usuarios.remember_token VARCHAR(100) NULL`

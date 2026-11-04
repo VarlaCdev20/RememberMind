@@ -2,11 +2,11 @@
 title: Changelog documental de RememberMind
 status: CURRENT
 version: "1.0"
-last_reviewed: 2026-10-27
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
-verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
-verification_scope: STATIC_REPOSITORY_REVIEW
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_AND_REGISTERED_ROUTES
 runtime_verified: false
 supersedes: []
 related_docs: [README.md, GOBERNANZA_DOCUMENTAL.md]
@@ -14,6 +14,26 @@ related_modules: []
 ---
 
 # Changelog documental
+
+## 2026-11-04 — Conciliación documental del árbol actual
+
+- Estado y roadmap reescritos con fuentes actuales; cortes anteriores conservados en histórico.
+- Inventario de 12 módulos, 10 roles, 112 archivos Eloquent, 593 plantillas y 325 rutas registradas; se distingue código de aceptación y tablas físicas.
+- Perfiles iniciales activos,26 métodos,24 reglas fuente y conservación conjunta pendiente; rutas actuales del motor y retirada del nombre de investigación.
+- Inventarios Blade regenerados, enlaces a archivos retirados corregidos, decisiones del 27–31/10 conciliadas y correo institucional protegido.
+- Comprobación final:535 documentos, enlaces/anclas locales, inventarios Blade, locks, tokens de color y rutas coherentes. Matriz DCL comprobada sin BDD ni inferencia. Sintaxis PHP y diff correctos; sin nueva ejecución de suites/build por tratarse de documentación. Sin migraciones, envíos o modificación de reglas.
+
+
+## 2026-10-27 — Aviso compartido integrado e instalado
+
+- La propietaria adoptó «Aviso compartido por cambio»; [decisión específica](base-de-datos/DECISION_AVISO_COMPARTIDO_CAMPOS_2026_10_27.md) con seis campos, sin tablas ni permisos nuevos. Se mantiene 106 de negocio+16 técnicas.
+- [Informe44](especificacion-funcional/vistas/gerencia/44-INTEGRACION-AVISO-COMPARTIDO.md): postcommit, cola nominal, bandeja compartida y propia, fallos durables, reintento bajo lock y alcance antes de paginar. Instalación local respaldada, datos originales y protección de vínculos idénticos; no se completó historia desconocida.
+- SQLite/PostgreSQL desechables, cuatro carreras reales, trabajo SQL de cola, navegador cinco anchos/tema oscuro y build. PC14/PC15 acreditados en alcance adoptado; sin afirmar aceptación de los 212 casos. Sin subagentes, staging, commit, push o despliegue. La entrada de ensayo siguiente conserva el corte previo a la respuesta de la propietaria.
+
+## 2026-10-27 — Avisos de planificación sin tablas nuevas
+
+- La propietaria rechazó nuevas tablas; propuesta42 nunca instalada y DDL/Model/flujo propuestos retirados. No se concedieron sus permisos ni se elevó el inventario a107.
+- [Alternativa43](especificacion-funcional/vistas/gerencia/43-AVISOS-SIN-TABLAS-NUEVAS.md): seis campos nominales de publicación sobre eventos existentes, originales y FK inmutables, SQL null-safe, sin inicializar seguimiento desconocido y reversión protegida. SQLite/PostgreSQL desechables4/31 cada uno. Bandeja compartida pendiente de decisión; PC14/PC15 siguen abiertos. Sin cambios a la base institucional.
 
 ## 2026-10-27 — Revisión del trabajo acumulado para commit y push
 

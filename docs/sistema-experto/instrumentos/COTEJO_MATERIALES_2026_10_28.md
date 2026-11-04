@@ -1,6 +1,6 @@
 ---
 title: "Cotejo y obtención documental del circuito inicial"
-status: CURRENT
+status: HISTORICAL
 version: "1.1"
 last_reviewed: 2026-10-28
 owner: ApoyoDecision
@@ -10,6 +10,8 @@ runtime_verified: false
 ---
 
 # Materiales obtenidos y condiciones comprobadas
+
+> **Corte de obtención del 28/10.** Posteriormente la propietaria declaró disponer de materiales/permisos y autorizó digitalizar; el 04/11 se [activaron tres ediciones exactas para captura/puntuación](../ENTREGA_ACTIVACION_PERFILES_INICIALES_2026_11_04.md). Los pendientes y borradores siguientes pertenecen a ese corte anterior. No enviar comunicaciones externas ni volver a exigir esas gestiones para desarrollar el alcance ya autorizado.
 
 Continuación autorizada por la propietaria el **28/10/2026** («HAGAMOSLO»), después de los [formularios propios de captura](../../frontend/FORMULARIOS_CAPTURA_COGNITIVA_2026_10_28.md). Se obtuvieron y cotejaron seis documentos públicos; no se concedió una licencia, se eligió una edición operativa ni se activó un instrumento. La [selección por familias](SELECCION_ADOPTADA_2026_10_28.md) permanece vigente.
 

@@ -1,12 +1,12 @@
 ---
 title: "Gobernanza documental de RememberMind"
 status: CURRENT
-version: "2.0"
-last_reviewed: 2026-10-25
+version: "2.1"
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: true
-verified_against_commit: 6d7b8c6d6bc03eecd2ee35add04677f2778272cd
-verification_scope: DOCUMENTATION_RECONCILIATION_WITH_LOCAL_AUDIT
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_AND_REGISTERED_ROUTES
 runtime_verified: false
 supersedes: []
 related_docs: []
@@ -14,6 +14,11 @@ related_modules: []
 ---
 
 # Gobernanza documental
+
+## Entradas vigentes
+
+[Estado actual](ESTADO_ACTUAL.md), [inventario de implementación](sistema/INVENTARIO_ACTUAL.md) y [catálogo completo](INDICE_DOCUMENTAL.md), reconciliados al 04/11/2026. Los inventarios estáticos se generan del árbol; los informes de ejecución conservan fecha, entorno y alcance. `php scripts/verificar-documentacion.php --check` comprueba enlaces locales y consistencia de los recuentos documentados sin acceder a datos clínicos.
+
 
 ## Metadatos de documentos importantes
 
@@ -52,6 +57,8 @@ El portal `docs/README.md` delimita su autoridad con `source_of_truth_scope: [do
 | CURRENT | Fuente aplicable hoy en su ámbito, con conflictos parciales visibles |
 | DEPRECATED | Sustituido para uso normativo; conservar motivo y reemplazo |
 | HISTORICAL | Snapshot/antecedente; DO NOT USE AS CURRENT SOURCE OF TRUTH |
+
+También existen estados de alcance en entregas y decisiones: `ADOPTED_INSTALLED_LOCAL` / `APPROVED_INSTALLED_LOCAL` registran adopción e instalación local fechada; `REJECTED`, `PARTIALLY_SUPERSEDED` y `SUPERSEDED_IN_SCOPE` delimitan rechazo/sustitución; `VERIFIED_LOCAL`, `ACCEPTED`, `IMPLEMENTED_ACCEPTANCE_PENDING` e `IMPLEMENTADA_QA_SESION_PENDIENTE` describen evidencia o aceptación parcial de su corte. No convierten el documento en autorización universal ni aceptan el módulo completo. El catálogo conserva su estado declarado y distingue su uso.
 
 CONFLICTING y UNKNOWN son hallazgos de auditoría, no estados YAML. Declarar parte afectada y enlazar decisión/deuda. No usar FINAL, FINAL2 o NUEVO como criterio de autoridad.
 

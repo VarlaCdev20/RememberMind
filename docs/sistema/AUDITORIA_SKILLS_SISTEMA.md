@@ -1,6 +1,6 @@
 ---
 title: "Auditoría de skills de sistema de RememberMind"
-status: CURRENT
+status: HISTORICAL
 version: "1.0"
 last_reviewed: 2026-10-06
 owner: RememberMind
@@ -16,6 +16,8 @@ related_modules: []
 > Infraestructura/registro de skills; no aprobación clínica ni certificación de producto. Fase documental actual: [portal](../README.md).
 
 # Auditoría de skills de sistema de RememberMind
+
+> **Informe de su corte original.** Sus pruebas, cifras y limitaciones se conservan como evidencia fechada. El [estado actual](../ESTADO_ACTUAL.md) incorpora las entregas posteriores; este informe no certifica nuevamente el árbol vigente.
 
 Fecha de corte: 2026-10-06. Alcance: instrucciones, referencias y documentación; sin modificaciones de producto. Fuente de alcance: tarea maestra adjunta de la propietaria. Revisión de dominio/seguridad, BDD/fuentes y experto/pruebas por tres agentes de solo lectura; plan consolidado e implementación por un responsable.
 

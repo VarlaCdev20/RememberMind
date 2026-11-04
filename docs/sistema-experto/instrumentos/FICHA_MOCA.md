@@ -2,14 +2,17 @@
 title: "Ficha documental I01 — MoCA completo"
 status: CURRENT
 version: "1.1"
-last_reviewed: 2026-10-28
+last_reviewed: 2026-11-04
 owner: ApoyoDecision
 source_of_truth: false
-verification_scope: INSTRUMENT_IDENTITY_RESEARCH_NOT_ACTIVATION
+verification_scope: CURRENT_TREE_DOCUMENTATION_RECONCILIATION
 runtime_verified: false
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
 ---
 
 # I01 — MoCA completo
+
+**Estado al 04/11/2026:** MoCA Full 8.1 español está activado localmente para captura completa de puntuaciones y cálculo descriptivo, usando la hoja original de esa edición. [Activación, identidad, fuentes y límites](../ENTREGA_ACTIVACION_PERFILES_INICIALES_2026_11_04.md). Las gestiones pendientes descritas en cortes anteriores no son el estado de esta activación. No se habilitan interpretaciones diagnósticas desde el total.
 
 **Actualización del 29/10/2026:** [entrega integrada y cotejo actual](../ENTREGA_INSTRUMENTOS_Y_PERFILES_INICIALES_2026_10_29.md). Se verificaron de nuevo las secciones 5 y 10 de los términos oficiales; no se obtuvo el paquete ni autorización de incorporación a software. La ficha conserva su carácter documental, sin perfil ejecutable.
 

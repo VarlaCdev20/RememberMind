@@ -1,6 +1,6 @@
 ---
 title: "Auditoría documental de Fase 1"
-status: CURRENT
+status: HISTORICAL
 version: "1.0"
 last_reviewed: 2026-10-06
 owner: RememberMind
@@ -14,6 +14,8 @@ related_modules: []
 ---
 
 # DOCUMENT AUDIT
+
+> **Informe de su corte original.** Sus pruebas, cifras y limitaciones se conservan como evidencia fechada. El [estado actual](ESTADO_ACTUAL.md) incorpora las entregas posteriores; este informe no certifica nuevamente el árbol vigente.
 
 ## Alcance y método
 

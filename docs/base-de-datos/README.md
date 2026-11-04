@@ -1,13 +1,13 @@
 ---
 title: "Base de datos: inventario y decisiones"
 status: CURRENT
-version: "2.0"
-last_reviewed: 2026-10-25
+version: "2.1"
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: true
 source_of_truth_scope: [schema_routing]
-verified_against_commit: 6d7b8c6d6bc03eecd2ee35add04677f2778272cd
-verification_scope: DOCUMENTATION_RECONCILIATION_WITH_LOCAL_AUDIT
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_AND_REGISTERED_ROUTES
 runtime_verified: false
 ---
 
@@ -19,7 +19,11 @@ runtime_verified: false
 
 **Contexto escalar por atención —28/10/2026:** [tres columnas opcionales y conservación de 4FN](DECISION_CONTEXTO_ESCOLARIDAD_4FN_2026_10_28.md), sin nuevas tablas/FK/permisos ni listas de informantes/idiomas. La instrucción posterior autoriza esta extensión acotada; el inventario permanece106 de negocio+16 técnicas.
 
-La [extensión de Gerencia35/37 autorizada e instalada el27/10/2026](DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md) deja **81 operativas +25 expertas =106 tablas de negocio**, además de **16 técnicas**:122 físicas. Añade seis relaciones y ocho columnas nullable, con contenido previo conservado. La [consolidación del22/10](DECISION_CONSOLIDACION_BLOQUES_EXPERTOS_2026_10_22.md) y la auditoría del25/10 describen el inventario anterior de100 de negocio y116 físicas.
+**Aviso compartido instalado —27/10/2026:** [decisión y diccionario](DECISION_AVISO_COMPARTIDO_CAMPOS_2026_10_27.md), seis columnas en eventos existentes,106 de negocio+16 técnicas, sin nuevas tablas/permisos. [Integración y verificación44](../especificacion-funcional/vistas/gerencia/44-INTEGRACION-AVISO-COMPARTIDO.md) resuelven la pregunta posterior al ensayo43.
+
+**Decisión posterior vigente —27/10/2026:** [no crear tablas adicionales](DECISION_SIN_NUEVAS_TABLAS_2026_10_27.md). La propietaria permite ampliar campos manteniendo grano e integridad; no autoriza JSON/EAV o listas de destinatarios en texto. El techo histórico110 no permite añadir tablas por iniciativa técnica. El inventario siguiente permanece106.
+
+La [extensión de Gerencia35/37 autorizada e instalada el 27/10/2026](DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md) deja **81 operativas +25 expertas =106 tablas de negocio**, además de **16 técnicas**: 122 físicas. Añade seis relaciones y ocho columnas nullable, con contenido previo conservado. La [consolidación del 22/10](DECISION_CONSOLIDACION_BLOQUES_EXPERTOS_2026_10_22.md) y la auditoría del 25/10 describen el inventario anterior de100 de negocio y116 físicas.
 
 El [máximo de diseño de 110](../sistema-experto/DECISION_MAXIMO_110_TABLAS_2026_10_21.md) sigue siendo capacidad de diseño, no aprobación de DDL. Su presupuesto inicial de seis relaciones correspondía al inventario entonces instalado de 104; no es un presupuesto fijo perpetuo ni autoriza diez tablas ahora.
 
@@ -31,7 +35,7 @@ El [máximo de diseño de 110](../sistema-experto/DECISION_MAXIMO_110_TABLAS_202
 - [Diccionario del núcleo V2.1](REMEMBERMIND_BDD_70_TABLAS.md): el nombre histórico no representa el total instalado.
 - [Reducción anterior del 20/10](DECISION_REDUCCION_EXPERTA_2026_10_20.md) → [consolidación posterior del 22/10](DECISION_CONSOLIDACION_BLOQUES_EXPERTOS_2026_10_22.md). Las dos decisiones conservan sus alcances y transiciones.
 
-La conservación conjunta instrumental/Petersen no está instalada. Una referencia SQL de ensayo no modifica este inventario ni acredita integridad institucional.
+La conservación conjunta instrumental/Petersen no está instalada. La [propuesta del 31/10](PROPUESTA_CONSERVACION_RESULTADO_INSTITUCIONAL_2026_10_31.md) fue rechazada para mantener relaciones y permisos actuales. No es un DDL pendiente de ejecución autorizada. Los tres catálogos instrumentales activados el 04/11 reutilizan instrumentos/preguntas existentes y no añaden tablas.
 
 ## Decisiones estructurales localizadas
 

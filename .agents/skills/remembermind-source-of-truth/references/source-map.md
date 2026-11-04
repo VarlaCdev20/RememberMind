@@ -1,10 +1,14 @@
 # Mapa de fuentes y conflictos
 
-Fecha de revisión: 2026-10-25. Catálogo de descubrimiento, no copia de los contratos. Verificar estado/alcance y decisiones posteriores antes de cada tarea.
+Fecha de revisión:2026-11-04. Catálogo de descubrimiento, no copia de los contratos. Verificar estado/alcance y decisiones posteriores antes de cada tarea.
 
 ## Resolución
 
-Decisión estructural posterior vigente: [Gerencia35/37 instalada el27/10/2026](../../../../docs/base-de-datos/DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md),106 tablas de negocio +16 técnicas. Las referencias a100 corresponden al corte anterior; el núcleo de pruebas sin las dos rutas explícitas conserva ese inventario anterior.
+La [decisión de aviso compartido del 27/10](../../../../docs/base-de-datos/DECISION_AVISO_COMPARTIDO_CAMPOS_2026_10_27.md) adopta seis columnas y su alcance; instalada localmente según informe44, sin nuevas tablas/permisos. Las menciones siguientes a la alternativa todavía sin instalar describen el corte previo a esa adopción.
+
+Decisión posterior del 27/10: [no crear más tablas](../../../../docs/base-de-datos/DECISION_SIN_NUEVAS_TABLAS_2026_10_27.md). Se permiten ampliaciones de campos compatibles; el techo histórico110 no es cupo disponible para nuevas tablas. Inventario106 sin cambios por la instalación posterior del aviso compartido, limitada a columnas existentes.
+
+Decisión estructural posterior vigente: [Gerencia35/37 instalada el 27/10/2026](../../../../docs/base-de-datos/DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md),106 tablas de negocio +16 técnicas. Las referencias a100 corresponden al corte anterior; el núcleo de pruebas sin las dos rutas explícitas conserva ese inventario anterior.
 
 1. Leer instrucción actual de la propietaria y [AGENTS raíz](../../../../AGENTS.md), más AGENTS de carpetas afectadas.
 2. Consultar [índice general](../../../../docs/README.md), [índice BDD](../../../../docs/base-de-datos/README.md) y [arquitectura](../../../../docs/arquitectura/README.md).
@@ -18,13 +22,13 @@ Decisión estructural posterior vigente: [Gerencia35/37 instalada el27/10/2026](
 | Fuente o familia | Estado revisado | Alcance y cautela |
 |---|---|---|
 | AGENTS raíz/app/database/resources/tests | VIGENTE | Contratos del proyecto por ámbito. |
-| docs/README.md, docs/modulos/README.md y arquitectura/README.md | VIGENTE | Entradas de documentación, doce propietarios y organización canónica. Estado comprobado en docs/ESTADO_ACTUAL.md; informes fechados conservan el alcance de su corte. |
+| docs/README.md, docs/modulos/README.md y arquitectura/README.md | VIGENTE | Entradas de documentación, doce propietarios y organización canónica. Árbol e inventarios del 04/11 en docs/ESTADO_ACTUAL.md y docs/sistema/INVENTARIO_ACTUAL.md; informes fechados conservan el alcance de su corte. |
 | REMEMBERMIND_BASELINE_TECNICO.md | VIGENTE | Stack y motores soportados; contrastar locks para versión realmente instalada. PostgreSQL integrado; SQLite rápido; MySQL/MariaDB fuera del baseline. |
 | REMEMBERMIND_ROLES_BASELINE_CONGELADO.md | VIGENTE | Competencias y límites por rol; no otorgar permisos desde una lista conceptual. |
 | PERMISOS_TEMPORALES_SUPERADMIN.md | VIGENTE, excepción acotada | Solo entorno/flag/identidad y condiciones allí definidos; no autorización clínica permanente. |
 | DASHBOARDS_POR_ROL.md | VIGENTE para contrato específico | Algunas propuestas/expectativas necesitan contraste con límites actuales y código. |
 | REMEMBERMIND_ARQUITECTURA_FRONTEND.md | DEPRECADA como norma | Fase 1 marcó sustitución por arquitectura canónica/resources/contrato visual; se conserva como antecedente. Features/Pages y prescripciones divergentes no gobiernan implementación. |
-| Baseline congelado y diccionario físico | VIGENTE con extensiones aprobadas | 100 tablas de negocio (75 operativas + 25 expertas) y 16 técnicas tras la consolidación del 22/10; máximo de diseño 110. El diccionario de 70 describe el núcleo. No sustituir decisiones por conteos copiados de informes anteriores. |
+| Baseline congelado y diccionario físico | VIGENTE con extensiones aprobadas | 106 tablas de negocio (81 operativas+25 expertas) y16 técnicas según extensiones aprobadas del 27/10; el techo histórico110 no autoriza nuevas tablas. El diccionario de 70 describe el núcleo. No sustituir decisiones por conteos copiados de informes anteriores. |
 | DECISION_ARQUITECTURA_BDD_V2_1.md | VIGENTE aprobada | Normalización y autor clínico frente a actor técnico. |
 | DECISION_UNIDAD_TALLA_CM.md | VIGENTE aprobada | Unidad y migración de talla; no convertir silenciosamente datos ambiguos. |
 | DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md | VIGENTE aprobada | Extensión versionada de objetivos; validación PostgreSQL pendiente según documento. |
@@ -39,7 +43,7 @@ Decisión estructural posterior vigente: [Gerencia35/37 instalada el27/10/2026](
 | PLAN_UNIFICACION_VISUAL.md y FASE_9*, FASE_11* | HISTÓRICA como evidencia de entregas; contratos puntuales a contrastar | Fotografías de implementación y limitaciones, no nuevas reglas clínicas. |
 | PENDIENTE_BADGES_ESTADO_RESIDENTE.md | NO RESUELTA la clasificación clínica; VIGENTE su restricción | No inferir estabilidad por ausencia de alertas. |
 | docs/produccion/DESPLIEGUE_SEGURO.md | VIGENTE como procedimiento | Núcleo y extensiones vigentes enlazados; despliegue/backup/restauración no acreditados por presencia de guía. No ejecutar producción por leerla. |
-| docs/sistema-experto/README.md, contratos A–D/E–H y C01–C05 | VIGENTES por alcance | Motor PHP independiente y ApoyoDecision; reglas y captura adoptadas. Conservación observacional comprobada, conjunta instrumental/Petersen pendiente. IMPLEMENTACION_V1.md no está en el árbol; no pedir leerlo ni reconstruir su contenido. La evaluación posterior en uso real sigue separada de la ejecución técnica. |
+| docs/sistema-experto/README.md, contratos A–D/E–H y C01–C05 | VIGENTES por alcance | Motor PHP independiente y ApoyoDecision;24 reglas fuente,26 métodos y tres perfiles iniciales descriptivos activados localmente el 04/11. Captura y puntuación no acreditan diagnóstico. Conservación observacional comprobada, conjunta instrumental/Petersen pendiente. IMPLEMENTACION_V1.md no está en el árbol; no pedir leerlo ni reconstruir su contenido. La evaluación posterior en uso real sigue separada de la ejecución técnica. |
 | Tres diseños en docs/sistema-experto/ | PROPUESTA; CONFLICTIVA ubicación/arquitectura vieja | Árboles/arquitectura futura, no reglas ejecutables aprobadas. |
 | RM-EXPERT-001 en baseline | PROPUESTA para aprobación formal / DOCUMENTAL | No fingir aprobación del sistema experto por estar en el baseline. |
 | Pesos, umbrales, catálogos abiertos, PRN/reintentos, licencias de instrumentos | NO RESUELTA donde no haya decisión concreta | Aislar requisito, ofrecer opciones; continuar trabajo técnico independiente. |

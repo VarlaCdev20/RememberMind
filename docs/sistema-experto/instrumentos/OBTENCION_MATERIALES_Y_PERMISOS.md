@@ -1,6 +1,6 @@
 ---
 title: "Obtención de materiales y condiciones de uso del circuito inicial"
-status: CURRENT
+status: HISTORICAL
 version: "1.2"
 last_reviewed: 2026-10-28
 owner: ApoyoDecision
@@ -10,6 +10,8 @@ runtime_verified: false
 ---
 
 # Obtención de MoCA, RUDAS y FAQ
+
+> **Corte de obtención del 28/10.** Posteriormente la propietaria declaró disponer de materiales/permisos y autorizó digitalizar; el 04/11 se [activaron tres ediciones exactas para captura/puntuación](../ENTREGA_ACTIVACION_PERFILES_INICIALES_2026_11_04.md). Los pendientes y borradores siguientes pertenecen a ese corte anterior. No enviar comunicaciones externas ni volver a exigir esas gestiones para desarrollar el alcance ya autorizado.
 
 La propietaria confirmó el **28/10/2026**: **«Aún hay que obtenerlos»**, en respuesta sobre formularios oficiales y autorizaciones. La [selección institucional](SELECCION_ADOPTADA_2026_10_28.md) ya está aprobada; faltan los materiales y condiciones concretos del [circuito inicial](CIRCUITO_INICIAL.md).
 

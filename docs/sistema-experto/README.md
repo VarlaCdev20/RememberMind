@@ -1,39 +1,41 @@
 ---
 title: "Sistema experto: fuentes, funcionamiento y límites"
 status: CURRENT
-version: "3.26"
+version: "3.27"
 last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
 source_of_truth_scope: [expert_contract_routing]
-verified_against_commit: 6d7b8c6d6bc03eecd2ee35add04677f2778272cd
-verification_scope: DOCUMENT_ROUTING_STATIC_CODE_MAP_AND_SCOPED_CATALOG_METADATA
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_AND_REGISTERED_ROUTES
 runtime_verified: false
 ---
 
 # Consulta cognitiva y sistema experto
 
+**Revisión documental del 04/11:** el [estado actual](../ESTADO_ACTUAL.md) y el [mapa del código](../../motor-experto/README.md) recogen el árbol posterior a la limpieza de nombres. La denominación de investigación, su importador y su fallback están retirados del producto; las huellas históricas conservan sus identificadores originales. Las entregas siguientes mantienen su fecha y alcance.
+
 **Orden vigente del 30/10/2026:** [estado funcional y desarrollo técnico primero](ESTADO_FUNCIONAL_Y_ORDEN_DESARROLLO_2026_10_30.md). Durante todo el desarrollo no se solicitan estudios con residentes, firmas o avales externos para continuar. Primero se completa y prueba el funcionamiento integral; la evaluación posterior en uso real se realiza después. Los controles de datos, permisos y coherencia de inferencia se conservan.
 
 ## Entrada única: dónde encontrar cada parte
 
-Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años, con evidencias explicables y revisión profesional. La propietaria aprobó el28/10 una selección escalonada: entrevista e informante + MoCA o RUDAS + FAQ como prioridad inicial; apoyos y evaluación ampliada según el caso. El04/11 se activaron tres ediciones exactas para captura y puntuación, tras su declaración de materiales/permisos y autorización de digitalización. Los totales no sustituyen interpretación de dominios ni requisitos Petersen; véase la entrega de activación.
+Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años, con evidencias explicables y revisión profesional. La propietaria aprobó el 28/10 una selección escalonada: entrevista e informante + MoCA o RUDAS + FAQ como prioridad inicial; apoyos y evaluación ampliada según el caso. El04/11 se activaron tres ediciones exactas para captura y puntuación, tras su declaración de materiales/permisos y autorización de digitalización. Los totales no sustituyen interpretación de dominios ni requisitos Petersen; véase la entrega de activación.
 
 | Necesito encontrar… | Abrir |
 |---|---|
 | Leer el código con menos carpetas: reglas, hechos y motor | [Empieza en el README del motor: seis componentes y archivos principales](../../motor-experto/README.md) |
-| Perfiles iniciales activos: ediciones, captura, puntuación e instalación | [Activación MoCA8.1, RUDAS-PE2020 y FAQ B7S,04/11](ENTREGA_ACTIVACION_PERFILES_INICIALES_2026_11_04.md) |
+| Perfiles iniciales activos: ediciones, captura, puntuación e instalación | [Activación MoCA 8.1, RUDAS-PE 2020 y FAQ B7S,04/11](ENTREGA_ACTIVACION_PERFILES_INICIALES_2026_11_04.md) |
 | Matriz actual: qué dato alimenta cada instrumento/regla, qué resultado permite y qué debe guardarse | [Matriz única de trazabilidad, perfiles exactos, brechas y conservación/4FN](MATRIZ_TRAZABILIDAD_DCL.md) |
-| Cierre técnico actual: documentos Petersen, lectura consistente, Enfermería, reglas y depuración | [Entregable único actualizado al04/11: correcciones, pruebas y pendientes precisos](ENTREGABLE_REGLAS_Y_DEPURACION_2026_10_31.md) |
+| Entrega técnica fechada: documentos Petersen, lectura consistente, Enfermería, reglas y depuración | [Entregable único actualizado al 04/11: correcciones, pruebas y pendientes precisos](ENTREGABLE_REGLAS_Y_DEPURACION_2026_10_31.md) |
 | Cierre técnico actual con relaciones y permisos conservados; reglas para la siguiente etapa | [Entregable único de correcciones y estado pendiente](ENTREGABLE_CORRECCIONES_TECNICAS_2026_10_31.md) |
-| Entregable único actual: fundamento médico, guía integrada de captura y brechas pendientes | [Entrega del 31/10: fuentes profesionales, plan de faltantes y límites técnicos](ENTREGABLE_INTEGRACION_Y_FUENTES_DCL_2026_10_31.md) |
+| Entregable fechado: fundamento médico, guía integrada de captura y brechas pendientes | [Entrega del 31/10: fuentes profesionales, plan de faltantes y límites técnicos](ENTREGABLE_INTEGRACION_Y_FUENTES_DCL_2026_10_31.md) |
 | Entrega única de instrumentos iniciales, versiones y perfiles de preparación | [Circuito inicial, conexión a hechos/inferencia y condiciones reales de activación](ENTREGA_INSTRUMENTOS_Y_PERFILES_INICIALES_2026_10_29.md) |
 | Entrega completa de la fase de contexto: conceptos, captura, integración y pruebas | [Cierre de contexto y procedencia del 29/10](ENTREGA_FASE_CONTEXTO_COGNITIVO_2026_10_29.md) |
 | Primer bloque: qué registrar y cómo validarlo | [Contrato de captura y preparación sin residentes](organizacion/REGISTROS_ORIGINALES_Y_VALIDACION.md) |
 | De cada fuente a las evidencias del caso | [Mapa de fuentes, áreas y criterios](organizacion/MAPA_FUENTES_A_HECHOS.md) |
 | Los componentes y el diagrama adoptados | [Estructura por ocho componentes](organizacion/ESTRUCTURA_POR_COMPONENTES.md) |
 | El código de hechos, red semántica, reglas e inferencia | [Mapa único de componentes y recorridos](organizacion/MAPA_COMPONENTES.md) |
-| Antecedente de la matriz de datos y sus entregas de contexto | [Corte histórico D01–D27 del27–29/10](MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md); la matriz vigente está en la primera fila |
+| Antecedente de la matriz de datos y sus entregas de contexto | [Corte histórico D01–D27 del 27–29/10](MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md); la matriz vigente está en la primera fila |
 | Los 45 instrumentos y evaluaciones candidatos | [Catálogo de investigación por finalidad](instrumentos/CATALOGO_CANDIDATOS.md) |
 | Qué instrumentos se seleccionaron y qué integramos primero | [Selección escalonada adoptada y pendientes de activación](instrumentos/SELECCION_ADOPTADA_2026_10_28.md) |
 | Ediciones, condiciones, derechos y captura de los tres iniciales | [Fichas MoCA, RUDAS y FAQ; pendientes concretos de incorporación](instrumentos/CIRCUITO_INICIAL.md) |
@@ -48,17 +50,17 @@ Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años,
 | Retirada de simulaciones y laboratorio | [Alcance, conservación y verificación](RETIRADA_LABORATORIO_2026_10_27.md) |
 | Contratos aprobados y límites pendientes | Tablas y secciones siguientes; [catálogo documental completo](INDICE_DOCUMENTAL.md) para antecedentes |
 
-El inventario histórico del27/10 comprobó **26 entradas de instrumentos** (2 Barthel,5 capturas sintéticas y19 registros de tarea inactivos),6 versiones de conocimiento y32 reglas. El04/11 se añadieron los tres catálogos iniciales de captura/puntuación; esos26 describen el corte anterior. El [inventario vigente](../../scripts/inventariar-experto.php) informa sus perfiles activos por separado. Los conteos no acreditan instrumentos administrados, evaluación posterior en uso real o cierre del experto, ni equivalen a los45 candidatos investigados.
+El inventario histórico del 27/10 comprobó **26 entradas de instrumentos** (2 Barthel,5 capturas sintéticas y19 registros de tarea inactivos),6 versiones de conocimiento y32 reglas. El04/11 se añadieron los tres catálogos iniciales de captura/puntuación; esos26 describen el corte anterior. El [inventario vigente](../../scripts/inventariar-experto.php) informa sus perfiles activos por separado. Los conteos no acreditan instrumentos administrados, evaluación posterior en uso real o cierre del experto, ni equivalen a los 45 candidatos investigados.
 
 ## Recorrido vigente
 
 Fuentes originales autorizadas → adaptadores de ApoyoDecision → motor simbólico PHP → cinco dominios/19 componentes → perfil orientativo Petersen o abstención → explicación. La rama observacional tiene conservación y revisión posterior comprobadas. **La conservación institucional conjunta instrumental/Petersen sigue pendiente.**
 
-La implementación usa `motor-experto/` y `app/Modulos/ApoyoDecision/`; no existe un segundo motor que deba reconstruirse. [Estado actual](../ESTADO_ACTUAL.md) y [auditoría del 25/10](../auditorias/2026-10-25/INFORME_AUDITORIA_INTEGRAL.md) delimitan los defectos abiertos.
+La implementación usa `motor-experto/` y `app/Modulos/ApoyoDecision/`; no existe un segundo motor que deba reconstruirse. [Estado actual](../ESTADO_ACTUAL.md) distingue las entregas posteriores de los hallazgos de la [auditoría histórica del 25/10](../auditorias/2026-10-25/INFORME_AUDITORIA_INTEGRAL.md).
 
 ## Contratos y decisiones aplicables
 
-Preparación actual para detección temprana en personas mayores de60 años: [matriz única de trazabilidad](MATRIZ_TRAZABILIDAD_DCL.md), actualizada el31/10. Conecta D01–D27 con19 componentes,23 métodos,24 reglas existentes y requisitos de conservación por grano. Su anexo se contrasta offline con el código; no activa perfiles, cambia reglas ni certifica un despliegue. La [ficha del27–29/10](MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md) conserva el antecedente.
+Preparación actual para detección temprana en personas mayores de60 años: [matriz única de trazabilidad](MATRIZ_TRAZABILIDAD_DCL.md), actualizada al 04/11 con 26 métodos y los tres perfiles iniciales descriptivos. Conecta D01–D27 con 19 componentes,23 métodos,24 reglas existentes y requisitos de conservación por grano. Su anexo se contrasta offline con el código; no activa perfiles, cambia reglas ni certifica un despliegue. La [ficha del 27–29/10](MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md) conserva el antecedente.
 
 La [decisión de selección del 28/10/2026](instrumentos/SELECCION_ADOPTADA_2026_10_28.md) complementa ese corte: cierra las familias y niveles, sin declarar perfiles instalados, derechos obtenidos o evaluación posterior en uso real.
 

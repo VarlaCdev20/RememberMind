@@ -15,37 +15,29 @@ Los nombres de la paleta identifican una función, nunca una escala como brown-1
 Los alias existentes `--color-*` y las familias numéricas de Tailwind consumen
 el mismo contrato durante la migración progresiva. No introducir otra paleta por rol.
 
-Paleta final aprobada el 14/10/2026 y corrección posterior: superficies y controles sólidos, relieve con bordes/sombras y conservación de los degradados tipográficos. Reemplaza las propuestas anteriores. Ver [implementación y verificación](../../../../docs/frontend/PALETA_FINAL_SOLIDA_Y_RELIEVE.md).
+Revisión documental del 04/11/2026: la fuente de valores es `tokens/colors.css`. Los informes del 14/10 conservan su corte; no definen la paleta actual por llevar «final» en el nombre. La captura utiliza superficies cálidas claras, tramas del lienzo, transparencia/blur moderados y sombras compartidas. [Contrato visual actualizado](../../../../docs/frontend/CONTRATO_VISUAL_UX_UI.md).
 
-## Paleta oficial en modo claro
+## Tokens observados al 04/11/2026
 
-| Token semántico | Valor | Uso |
+La implementación usa [tokens/colors.css](tokens/colors.css) y el [Design System](README.md). Los siguientes valores base de modo claro describen el código, sin constituir una nueva decisión de diseño. Las variantes y el resultado compuesto dependen de los tokens semánticos/componentes y del tema.
+
+| Token base | Valor | Uso observado |
 |---|---|---|
-| `--rm-bg-app` | #E7E0D9 | Fondo de la aplicación |
-| `--rm-bg-sidebar` | #D6C6B9 | Estructura y sidebar |
-| `--rm-surface` | Mezcla 20% de #A69E96 con el fondo | Capuchino suave para cards, formularios, menús y modales |
-| `--rm-surface-soft` | Mezcla 30% de #A69E96 con el fondo | Hover y subdivisiones |
-| `--rm-surface-muted` | Mezcla 50% de #A69E96 con el fondo | Superficie atenuada |
-| `--rm-text-primary` | #59524B | Títulos, datos, navegación e iconos |
-| `--rm-text-secondary` | #665F57 | Descripciones y metadatos |
-| `--rm-primary` | #8DA18A | Verde principal salvia |
-| `--rm-primary-ink` | #56604F | Texto, iconos y foco contrastados sobre fondos claros |
-| `--rm-primary-soft` | #C9CDC5 | Salvia suave para acentos |
-| `--rm-selected-bg` | #D6D9D3 | Selección suave con texto #56604F |
-| `--rm-sage` | #A8BAA3 | Acento de cuidado y seguimiento |
-| `--rm-sage-soft` | #C2CEBE | Grupo abierto y estado positivo suave |
-| `--rm-info` | #8699AC | Acento clínico, información y datos |
-| `--rm-info-soft` | #C2CCD5 | Fondo informativo |
-| `--rm-psychology` | #CEB0B0 | Acento de bienestar emocional |
-| `--rm-nutrition` | #C4C4A0 | Acento de alimentación y nutrición |
-| `--rm-warning` | #C69245 | Advertencia real |
-| `--rm-danger` | #B85C58 | Error, riesgo o acción destructiva |
-| `--rm-border` | rgba(74,53,47,.14) | Separación discreta |
-| `--rm-border-strong` | rgba(74,53,47,.24) | Separación reforzada |
+| `--rm-palette-page` | `#F3EEE8` | Lienzo cálido |
+| `--rm-palette-capuchino` | `#DDD6CF` | Estructura/sidebar |
+| `--rm-palette-header` | `#E6E0D9` | Encabezados |
+| `--rm-palette-surface` | `#F7F3EF` | Cards más claras que el lienzo |
+| `--rm-palette-surface-soft` | `#EFEAE4` | Superficie secundaria |
+| `--rm-palette-ink` | `#4A4642` | Texto principal |
+| `--rm-palette-ink-secondary` | `#67615B` | Texto secundario |
+| `--rm-palette-primary` | `#78826E` | Acción salvia |
+| `--rm-palette-primary-hover` | `#5F7567` | Interacción/selección |
+| `--rm-palette-info` | `#7D94A8` | Información |
+| `--rm-palette-warning` | `#C69245` | Advertencia del dominio |
+| `--rm-palette-danger` | `#B85C58` | Error/peligro |
+| `--rm-palette-input` | `#E7E2DE` | Campos |
 
-Las variantes `*-strong` y `*-action` se derivan con `color-mix()`:
-los acentos suaves no se utilizan directamente como texto pequeño.
-El modo oscuro adapta superficies y contraste manteniendo los mismos contratos.
+Hay mezclas con transparencia (`--rm-capture-card`, `--rm-capture-glass-*`), blur y tramas en el lienzo; las superficies no son uniformemente sólidas. Conservar legibilidad, jerarquía y separación entre cards. El relieve y el movimiento utilizan las fuentes compartidas `shadows.css` y `motion.css`. El dominio decide el significado de cada estado. Esta revisión no acredita contraste computado ni una nueva QA visual.
 
 ## Utilidades Tailwind
 
@@ -75,7 +67,7 @@ Se conservan marca, grupos, jerarquía, iconografía, submenús, badges,
 colapsado desktop, flyouts y drawer móvil.
 En el shell autenticado, sidebar y barra superior usan capuchino `#D7CEC7`;
 el lienzo usa el fondo aclarado `#D7CEC7` (petróleo en modo oscuro). El sidebar abierto mide
-`224px` y el colapsado `80px`. El hover de los iconos superiores consume la
+`224 px` y el colapsado `80 px`. El hover de los iconos superiores consume la
 misma superficie salvia translúcida que la selección del sidebar.
 
 | Estado | Tratamiento |

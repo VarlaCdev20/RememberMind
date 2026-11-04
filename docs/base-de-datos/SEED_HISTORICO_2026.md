@@ -9,6 +9,8 @@ last_reviewed: 2026-10-08
 
 # Carga sintética histórica 2026
 
+> Alcance de inventario: las cifras de esta decisión describen su fecha. El [inventario vigente](README.md) incorpora las extensiones posteriores:106 tablas de negocio+16 técnicas. La decisión conserva exclusivamente sus columnas, relaciones y reglas autorizadas.
+
 Datos exclusivamente de desarrollo. No representan personas, diagnósticos ni órdenes reales. No cambian la estructura V2.1 + V2.2, las reglas clínicas ni los permisos.
 
 ## Autorizaciones y alcance

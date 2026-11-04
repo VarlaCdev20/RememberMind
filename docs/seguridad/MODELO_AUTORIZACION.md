@@ -2,12 +2,12 @@
 title: "Modelo de autorización"
 status: CURRENT
 version: "2.1"
-last_reviewed: 2026-10-25
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
 source_of_truth_scope: [authorization_description]
-verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
-verification_scope: STATIC_REPOSITORY_REVIEW
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_RECONCILIATION
 runtime_verified: false
 runtime_evidence_status: PARTIAL
 runtime_evidence_scope: FASE_3_TARGETED_TESTS_ISOLATED_POSTGRESQL
@@ -18,9 +18,11 @@ related_modules: []
 
 # Modelo de autorización
 
+[Estado actual](../ESTADO_ACTUAL.md) e [inventario de implementación](../sistema/INVENTARIO_ACTUAL.md) localizan el árbol observado. La revisión documental no acredita autorización universal ni concede permisos.
+
 Fase 2 fue contraste estático del commit base y cambios previos. Fase 3 acredita casos acotados en PostgreSQL aislado según TRAZABILIDAD. CURRENT no aprueba reglas nuevas; verified_against_commit identifica base, no commit de correcciones; runtime_verified=false no certifica autorización universal.
 
-Fuentes rectoras: [AGENTS](../../AGENTS.md), [baseline](../../docs/base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md), [diccionario](../../docs/base-de-datos/REMEMBERMIND_BDD_70_TABLAS.md), [extensión aprobada V2.2](../../docs/base-de-datos/DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md), [roles](../../docs/arquitectura/REMEMBERMIND_ROLES_BASELINE_CONGELADO.md). Inventario 70+1=71 es evidencia estática del repositorio, no BDD instalada comprobada.
+Fuentes rectoras: [AGENTS](../../AGENTS.md), [baseline](../../docs/base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md), [diccionario](../../docs/base-de-datos/REMEMBERMIND_BDD_70_TABLAS.md), [extensión aprobada V2.2](../../docs/base-de-datos/DECISION_OBJETIVOS_SIGNOS_VITALES_V2_2.md), [roles](../../docs/arquitectura/REMEMBERMIND_ROLES_BASELINE_CONGELADO.md). El recuento70+1=71 es histórico. Inventario documentado vigente:106 de negocio+16 técnicas; [decisiones y extensiones](../base-de-datos/README.md). Esta revisión no consulta la BDD operativa.
 
 ## Contrato compuesto
 

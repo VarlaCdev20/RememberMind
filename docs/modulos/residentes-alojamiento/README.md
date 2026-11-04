@@ -112,11 +112,11 @@ Ubicación alimenta directorio/ficha; lectura debe respetar ámbito y contenido.
 
 ## 23. Livewire / Controllers
 
-[app/Frontend/Livewire/Admisiones/HabitacionesPanel.php](../../../app/Modulos/Institucion/Presentacion/Livewire/Paginas/HabitacionesPanel.php), [app/Frontend/Livewire/Compartido/Residentes/AdultosMayoresPanel.php](../../../app/Modulos/Residentes/Presentacion/Livewire/Paginas/AdultosMayoresPanel.php), [app/Http/Controllers/Residentes/ResidenteController.php](../../../app/Modulos/Residentes/Presentacion/Http/Controllers/ResidenteController.php)
+[app/Modulos/Institucion/Presentacion/Livewire/Paginas/HabitacionesPanel.php](../../../app/Modulos/Institucion/Presentacion/Livewire/Paginas/HabitacionesPanel.php), [app/Modulos/Residentes/Presentacion/Livewire/Paginas/AdultosMayoresPanel.php](../../../app/Modulos/Residentes/Presentacion/Livewire/Paginas/AdultosMayoresPanel.php), [app/Http/Controllers/Residentes/ResidenteController.php](../../../app/Modulos/Residentes/Presentacion/Http/Controllers/ResidenteController.php)
 
 ## 24. Actions
 
-[app/Backend/Modulos/Admisiones/Acciones/FormalizarAdmision.php](../../../app/Modulos/Admisiones/Aplicacion/Acciones/FormalizarAdmision.php)
+[app/Modulos/Admisiones/Aplicacion/Acciones/FormalizarAdmision.php](../../../app/Modulos/Admisiones/Aplicacion/Acciones/FormalizarAdmision.php)
 
 ## 25. Services
 

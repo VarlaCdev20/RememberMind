@@ -1,19 +1,24 @@
 ---
 title: "Responsabilidad funcional — Cuidados"
 status: CURRENT
-version: "2.0"
-last_reviewed: 2026-10-25
+version: "2.2"
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
 source_of_truth_scope: [module_responsibility]
-verified_against_commit: 6d7b8c6d6bc03eecd2ee35add04677f2778272cd
-verification_scope: DOCUMENTATION_RECONCILIATION_WITH_LOCAL_AUDIT
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_AND_REGISTERED_ROUTES
 runtime_verified: false
 ---
 
 # Cuidados
 
-**Revisión documental: 25/10/2026.** Esta compilación localiza responsabilidades y comportamiento exigido por contratos existentes; no crea permisos, estados, umbrales o estructura. Las fuentes específicas prevalecen. Documentar el recorrido no significa que todos sus pasos hayan superado aceptación.
+## Estado localizado al 04/11/2026
+
+El árbol contiene **22 rutas con acción de este módulo, 11 clases en Livewire y 68 plantillas Blade**. Las plantillas incluyen parciales y no equivalen a pantallas aceptadas. [Inventario reproducible](../../../docs/sistema/INVENTARIO_ACTUAL.md) y [estado del producto](../../../docs/ESTADO_ACTUAL.md). Esta actualización no reejecuta las pruebas citadas ni concede permisos.
+
+
+**Revisión de estructura y fuentes:04/11/2026.** Esta compilación localiza responsabilidades y comportamiento exigido por contratos existentes; no crea permisos, estados, umbrales o estructura. Las fuentes específicas prevalecen. Documentar el recorrido no significa que todos sus pasos hayan superado aceptación.
 
 ## Propósito y actores
 
@@ -68,6 +73,6 @@ Identificar persona/contexto y acción principal. Diferenciar sin registros, sin
 
 Estas pruebas están localizadas, no reejecutadas por la limpieza documental. [El estado actual](../../../docs/ESTADO_ACTUAL.md) y [la auditoría](../../../docs/auditorias/2026-10-25/INFORME_AUDITORIA_INTEGRAL.md) indican lo realmente ejecutado. Cierre: camino positivo y negativos relevantes, permisos revocados, fuentes ajenas, integridad, recuperación de errores y recorrido visual comprobados; PostgreSQL para concurrencia.
 
-## Brechas comprobadas
+## Hallazgos del corte anterior y seguimiento
 
 El contexto puede verse afectado por H03. La navegación auditada sin guardia no acredita todas las actuaciones clínicas del turno.

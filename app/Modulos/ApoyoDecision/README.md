@@ -1,21 +1,28 @@
 ---
 title: "Responsabilidad funcional — ApoyoDecision"
 status: CURRENT
-version: "2.1"
-last_reviewed: 2026-10-27
+version: "2.2"
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
 source_of_truth_scope: [module_responsibility]
-verified_against_commit: 6d7b8c6d6bc03eecd2ee35add04677f2778272cd
-verification_scope: DOCUMENTATION_RECONCILIATION_WITH_LOCAL_AUDIT
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_AND_REGISTERED_ROUTES
 runtime_verified: false
 ---
 
 # ApoyoDecision
 
+## Estado localizado al 04/11/2026
+
+El árbol contiene **7 rutas con acción de este módulo, 6 clases en Livewire y 37 plantillas Blade**. Las plantillas incluyen parciales y no equivalen a pantallas aceptadas. [Inventario reproducible](../../../docs/sistema/INVENTARIO_ACTUAL.md) y [estado del producto](../../../docs/ESTADO_ACTUAL.md). Esta actualización no reejecuta las pruebas citadas ni concede permisos.
+
+Motor independiente con 24 reglas fuente,26 métodos y tres perfiles iniciales descriptivos activos localmente. El dominio está directamente en `motor-experto/dominio/`; el importador de investigación y el fallback documental están retirados. La conservación conjunta instrumental/Petersen sigue pendiente; [mapa del código](../../../motor-experto/README.md).
+
+
 [Entrada única del experto](../../../docs/sistema-experto/README.md): mapa de componentes, matriz de datos, instrumentos candidatos e inventario instalado. La [estructura por componentes adoptada el 27/10/2026](../../../docs/sistema-experto/organizacion/ESTRUCTURA_POR_COMPONENTES.md) sigue el diagrama de la propietaria; el [mapa de código](../../../docs/sistema-experto/organizacion/MAPA_COMPONENTES.md) localiza sus implementaciones. El laboratorio fue retirado del circuito operativo.
 
-**Revisión documental: 25/10/2026.** Esta compilación localiza responsabilidades y comportamiento exigido por contratos existentes; no crea permisos, estados, umbrales o estructura. Las fuentes específicas prevalecen. Documentar el recorrido no significa que todos sus pasos hayan superado aceptación.
+**Revisión de estructura y fuentes:04/11/2026.** Esta compilación localiza responsabilidades y comportamiento exigido por contratos existentes; no crea permisos, estados, umbrales o estructura. Las fuentes específicas prevalecen. Documentar el recorrido no significa que todos sus pasos hayan superado aceptación.
 
 ## Propósito y actores
 
@@ -71,6 +78,6 @@ Identificar persona/contexto y acción principal. Diferenciar sin registros, sin
 
 Estas pruebas están localizadas, no reejecutadas por la limpieza documental. [El estado actual](../../../docs/ESTADO_ACTUAL.md) y [la auditoría](../../../docs/auditorias/2026-10-25/INFORME_AUDITORIA_INTEGRAL.md) indican lo realmente ejecutado. Cierre: camino positivo y negativos relevantes, permisos revocados, fuentes ajenas, integridad, recuperación de errores y recorrido visual comprobados; PostgreSQL para concurrencia.
 
-## Brechas comprobadas
+## Hallazgos del corte anterior y seguimiento
 
-H07–H13: DTO conjunto transitorio, prototipo no instalable, consulta duplicada, corte con estado actual, lectura/firma acopladas, traza clínica limitada y manifiesto 104 no localizado. La rama observacional conservada no cierra esas brechas.
+La conservación conjunta transitoria continúa pendiente. La auditoría del 25/10 conserva H07–H13 como hallazgos de ese corte; las correcciones posteriores de consulta, explicación, contexto y retirada de laboratorio constan en el índice experto. No trasladar todo ese grupo como fallos actuales sin contrastar la entrega posterior.

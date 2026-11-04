@@ -1,13 +1,13 @@
 ---
 title: "Matriz de roles, permisos y entradas"
 status: CURRENT
-version: "2.1"
-last_reviewed: 2026-10-25
+version: "2.2"
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
 source_of_truth_scope: [permission_mapping]
-verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
-verification_scope: STATIC_REPOSITORY_REVIEW
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_AND_REGISTERED_ROUTES
 runtime_verified: false
 runtime_evidence_status: PARTIAL
 runtime_evidence_scope: FASE_3_TARGETED_TESTS_ISOLATED_POSTGRESQL
@@ -17,6 +17,8 @@ related_modules: []
 ---
 
 # Matriz de roles, permisos y entradas
+
+**Revisión documental al 04/11:** los 10 roles siguen definidos en el seeder. La instalación local de Gerencia35/37 y del aviso compartido, la extensión contextual del 28–29/10 y la activación de catálogos instrumentales tienen decisiones específicas. Las notas anteriores de «implementación pendiente» describen su corte previo; el [estado actual](../ESTADO_ACTUAL.md) enlaza las entregas posteriores. No se conceden permisos por esta conciliación.
 
 Fase 2 fue revisión estática sobre el commit base y cambios previos. Fase 3 ejecutó pruebas/BDD acotadas según TRAZABILIDAD. Metadatos identifican esa base y no certifican runtime global; CURRENT no aprueba reglas nuevas.
 

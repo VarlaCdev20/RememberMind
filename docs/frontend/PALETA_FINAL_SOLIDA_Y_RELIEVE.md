@@ -1,11 +1,13 @@
 ---
 title: "Paleta final: superficies sólidas y relieve"
-status: CURRENT
+status: HISTORICAL
 last_reviewed: 2026-10-14
 verification_scope: UI_PALETTE_AND_CHART_RENDERING
 ---
 
 # Paleta final: superficies sólidas y relieve
+
+> Informe visual del 14/10. Sus HEX y la prohibición general de transparencia/degradados describen ese corte. El [contrato visual con tokens observados](CONTRATO_VISUAL_UX_UI.md#tokens-observados-al-04112026) y el [Design System](../../resources/frontend/styles/design-system/README.md) localizan la implementación actual. No restaurar aquella paleta por el nombre «final». Las pruebas siguientes conservan su fecha.
 
 Decisión vigente de la propietaria: paleta institucional completa y corrección posterior que elimina degradados de superficies/controles/gráficas, conserva los de las letras y aumenta el relieve. Sustituye las propuestas #8DA18A/#E7E0D9.
 

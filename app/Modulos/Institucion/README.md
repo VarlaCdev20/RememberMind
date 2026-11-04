@@ -1,19 +1,28 @@
 ---
 title: "Responsabilidad funcional — Institucion"
 status: CURRENT
-version: "2.0"
-last_reviewed: 2026-10-25
+version: "2.2"
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
 source_of_truth_scope: [module_responsibility]
-verified_against_commit: 6d7b8c6d6bc03eecd2ee35add04677f2778272cd
-verification_scope: DOCUMENTATION_RECONCILIATION_WITH_LOCAL_AUDIT
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_AND_REGISTERED_ROUTES
 runtime_verified: false
 ---
 
 # Institucion
 
-**Revisión documental: 25/10/2026.** Esta compilación localiza responsabilidades y comportamiento exigido por contratos existentes; no crea permisos, estados, umbrales o estructura. Las fuentes específicas prevalecen. Documentar el recorrido no significa que todos sus pasos hayan superado aceptación.
+## Estado localizado al 04/11/2026
+
+El árbol contiene **36 rutas con acción de este módulo, 8 clases en Livewire y 33 plantillas Blade**. Las plantillas incluyen parciales y no equivalen a pantallas aceptadas. [Inventario reproducible](../../../docs/sistema/INVENTARIO_ACTUAL.md) y [estado del producto](../../../docs/ESTADO_ACTUAL.md). Esta actualización no reejecuta las pruebas citadas ni concede permisos.
+
+Gerencia35/37 y aviso compartido disponen de decisiones de instalación local; [fuentes BDD](../../../docs/base-de-datos/README.md). La aceptación restante de Gerencia se conserva por escenario, no por conteo de archivos.
+
+
+**Integración posterior del 27/10:** [avisos compartidos de planificación](../../../docs/especificacion-funcional/vistas/gerencia/44-INTEGRACION-AVISO-COMPARTIDO.md), con publicación postcommit, bandeja autorizada, cuenta afectada original, cola nominal y reintento sin repetir asignaciones. Seis campos instalados sin nuevas tablas/permisos. Las brechas de la auditoría del 25/10 conservan aquel corte; informes34/36/40/41/44 acreditan correcciones posteriores específicas.
+
+**Revisión de estructura y fuentes:04/11/2026.** Esta compilación localiza responsabilidades y comportamiento exigido por contratos existentes; no crea permisos, estados, umbrales o estructura. Las fuentes específicas prevalecen. Documentar el recorrido no significa que todos sus pasos hayan superado aceptación.
 
 ## Propósito y actores
 
@@ -68,6 +77,6 @@ Identificar persona/contexto y acción principal. Diferenciar sin registros, sin
 
 Estas pruebas están localizadas, no reejecutadas por la limpieza documental. [El estado actual](../../../docs/ESTADO_ACTUAL.md) y [la auditoría](../../../docs/auditorias/2026-10-25/INFORME_AUDITORIA_INTEGRAL.md) indican lo realmente ejecutado. Cierre: camino positivo y negativos relevantes, permisos revocados, fuentes ajenas, integridad, recuperación de errores y recorrido visual comprobados; PostgreSQL para concurrencia.
 
-## Brechas comprobadas
+## Hallazgos del corte anterior y seguimiento
 
 H02/H03/H04/H24: asignación sin permiso, solapamiento nocturno, Ocupación de Gerencia con 403 y drawer de Áreas. Deben cerrarse con correcciones de producto y pruebas.

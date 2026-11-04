@@ -1,13 +1,13 @@
 ---
 title: "Mapa de arquitectura vigente de RememberMind"
 status: CURRENT
-version: "3.0"
-last_reviewed: 2026-10-10
+version: "3.1"
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
 source_of_truth_scope: [architecture_description]
-verified_against_commit: ed9dd523e8a5287f7fc6d7d90c75aaab6fea1dc8
-verification_scope: STATIC_REPOSITORY_REVIEW_AND_SCOPED_CLEANUP
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_AND_REGISTERED_ROUTES
 runtime_verified: false
 supersedes: []
 related_docs: ["README.md", "ADR_ARQUITECTURA_HIBRIDA.md", "AUDITORIA_LIMPIEZA_2026_10_10.md"]
@@ -16,7 +16,7 @@ related_modules: []
 
 # Mapa de arquitectura vigente
 
-> Lectura vigente del 25/10/2026: este documento conserva las decisiones de organización y la evidencia de migración del 10/10. Sus cifras de modelos, vistas, rutas y tablas pertenecen a ese corte; el [estado actual](../ESTADO_ACTUAL.md) y [los doce propietarios funcionales](../modulos/README.md) recogen la evolución posterior. No restaurar conteos, clases o tablas solo para reproducir aquel inventario.
+> Revisión del 04/11/2026: [inventario actual](../sistema/INVENTARIO_ACTUAL.md) y [estado observado](../ESTADO_ACTUAL.md). Los informes de migración enlazados conservan sus cifras históricas.
 
 La organización canónica y sus excepciones están en el [índice](README.md) y en el [ADR aprobado](ADR_ARQUITECTURA_HIBRIDA.md). Este mapa describe el código posterior a la migración, sin redefinir reglas clínicas, permisos ni estructura de PostgreSQL. El contenido anterior de esta ruta describía el corte de Fase 2; su historial permanece en Git.
 
@@ -59,9 +59,9 @@ La consulta general de presentación todavía puede usar Eloquent; las escritura
 
 ## Integración conservada
 
-Los providers registran explícitamente Policies y alias Livewire. El finder resuelve 248 vistas trasladadas por sus nombres lógicos, sin copias paralelas. routes/web.php compone los registros de propietarios conservando 296 contratos ordenados. El Design System mantiene sus entrypoints y tokens existentes.
+Los providers registran Policies, nombres de vistas y aliases Livewire. `routes/web.php` compone los registros modulares; el árbol observado registra 325 definiciones de ruta. El inventario de Blade actual contiene 593 plantillas, incluidas piezas compartidas; no equivale a593 pantallas. El Design System mantiene sus entrypoints y tokens existentes.
 
-Los 96 modelos conservan su identidad pública; no se modifican migraciones, factories, PK/FK ni relaciones estructurales. El [inventario individual](MODELOS_ELOQUENT.json) identifica propietario y motivo. El núcleo experto PHP es independiente; sus 23 tablas técnicas existentes se mantienen dentro del contrato aprobado.
+Los 112 archivos Eloquent no representan112 tablas. El [inventario individual de migración](MODELOS_ELOQUENT.json) conserva su corte de96 modelos. El inventario documentado vigente contiene 106 tablas de negocio (81 operativas+25 expertas) y16 técnicas; las decisiones del [índice BDD](../base-de-datos/README.md) gobiernan cada extensión. El núcleo PHP del experto sigue independiente de Laravel.
 
 ## Transacciones y límites observados
 
@@ -71,8 +71,8 @@ Los 96 modelos conservan su identidad pública; no se modifican migraciones, fac
 - La generación documental/correo sigue siendo un efecto externo; no se presenta una transacción SQL como garantía del filesystem o de entrega de correo.
 - Existen servicios con coordinación bidireccional entre Clinica, Cuidados, Medicacion y Alertas. El corte no añade Repository, CQRS ni separación artificial de interfaces.
 
-## Deuda que sigue abierta
+## Límites e incidencias que requieren contraste actual
 
-GestionarAtenciones y GestionarNotasClinicas mantienen operaciones que dependen de la autorización en sus rutas; recibir User no demuestra autorización autónoma del caso. Los endpoints conservan middleware y alcance por residente, pero el refuerzo de llamadas directas requiere un corte específico con pruebas. También continúan las excepciones de seguridad, estados institucionales e interpretación histórica descritas en el [informe de migración](INFORME_MIGRACION_HIBRIDA.md). Esta auditoría no acredita que toda operación sea segura al invocarla desde cualquier nuevo consumidor.
+El informe de migración localizó operaciones de GestionarAtenciones y GestionarNotasClinicas que dependen de la autorización en sus rutas; recibir User no demuestra autorización autónoma del caso. Los endpoints conservan middleware y alcance por residente, pero el refuerzo de llamadas directas requiere un corte específico con pruebas. También continúan las excepciones de seguridad, estados institucionales e interpretación histórica descritas en el [informe de migración](INFORME_MIGRACION_HIBRIDA.md). Esta auditoría no acredita que toda operación sea segura al invocarla desde cualquier nuevo consumidor.
 
 La inferencia clínica asíncrona, conocimiento nuevo, revisión profesional y deduplicación durable del transporte no se activan por la presencia de carpetas, contrato o evento. Las [verificaciones y eliminaciones de este corte](AUDITORIA_LIMPIEZA_2026_10_10.md) son distintas de una certificación clínica o de producción.

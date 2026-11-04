@@ -1,17 +1,18 @@
 ---
 title: "Especificación funcional detallada de RememberMind"
 status: CURRENT
-version: "1.0"
-last_reviewed: 2026-10-25
+version: "1.1"
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
-verification_scope: DOCUMENTATION_STRUCTURE_AND_STATIC_INVENTORY
+verification_scope: CURRENT_TREE_DOCUMENTATION_AND_REGISTERED_ROUTES
 runtime_verified: false
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
 ---
 
 # Especificación funcional detallada
 
-**Carpeta creada el 25/10/2026.** Espacio de trabajo solicitado por la propietaria para documentar cada módulo, cada pantalla y la experiencia completa de cada rol. La estructura y los inventarios están preparados; las fichas detalladas están **en elaboración**. Crear esta carpeta no declara los módulos terminados.
+**Carpeta creada el 25/10; inventarios reconciliados al 04/11/2026.** Espacio de trabajo solicitado por la propietaria para documentar cada módulo, cada pantalla y la experiencia completa de cada rol. La estructura y los inventarios están preparados; las fichas detalladas están **en elaboración**. Crear esta carpeta no declara los módulos terminados.
 
 ## Entradas
 
@@ -38,4 +39,4 @@ Para cada elemento registrar por separado:
 - **Pendiente:** brecha concreta y criterio de cierre.
 - **Propuesto:** decisión nueva aún no adoptada.
 
-Los errores de producto de la [auditoría actual](../auditorias/2026-10-25/INFORME_AUDITORIA_INTEGRAL.md) siguen abiertos hasta su corrección. Las plantillas no son pruebas aprobadas ni autorizaciones nuevas.
+La [auditoría del 25/10](../auditorias/2026-10-25/INFORME_AUDITORIA_INTEGRAL.md) conserva sus hallazgos históricos; [Estado actual](../ESTADO_ACTUAL.md) y entregas posteriores determinan los alcances corregidos y los pendientes que requieren reproducción. Las plantillas no son pruebas aprobadas ni autorizaciones nuevas.

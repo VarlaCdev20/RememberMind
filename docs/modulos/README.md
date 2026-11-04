@@ -1,17 +1,19 @@
 ---
 title: "Contratos y responsabilidades de los doce módulos"
 status: CURRENT
-version: "1.0"
-last_reviewed: 2026-10-25
+version: "1.1"
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
 source_of_truth_scope: [module_routing]
-verified_against_commit: 6d7b8c6d6bc03eecd2ee35add04677f2778272cd
-verification_scope: DOCUMENTATION_RECONCILIATION_WITH_LOCAL_AUDIT
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_AND_REGISTERED_ROUTES
 runtime_verified: false
 ---
 
 # Módulos de RememberMind
+
+Revisión del 04/11/2026: doce propietarios y diez roles. [Inventario de implementación](../sistema/INVENTARIO_ACTUAL.md) para rutas/clases/vistas; [estado actual](../ESTADO_ACTUAL.md) para capacidades y límites. Un módulo no se declara completo por existir su README.
 
 La [especificación funcional detallada](../especificacion-funcional/README.md) se desarrolla por módulo, vista y rol. Esta entrada conserva los contratos y responsabilidades existentes; las nuevas fichas distinguen detalle pendiente e implementación observada.
 
@@ -58,4 +60,4 @@ Un proceso puede cruzar varios propietarios; estos contratos se reutilizan en lu
 
 ## Estado y decisiones
 
-[Estado actual](../ESTADO_ACTUAL.md) y [auditoría H01–H32](../auditorias/2026-10-25/INFORME_AUDITORIA_INTEGRAL.md) gobiernan la lectura de evidencia técnica actual. Los contratos clínicos/BDD y competencias mantienen su autoridad propia; esta compilación no amplía permisos ni activa reglas.
+[Estado actual](../ESTADO_ACTUAL.md) localiza la evidencia posterior. La [auditoría H01–H32 del 25/10](../auditorias/2026-10-25/INFORME_AUDITORIA_INTEGRAL.md) conserva ese corte y no acredita por sí sola fallos presentes. Los contratos clínicos/BDD y competencias mantienen su autoridad propia; esta compilación no amplía permisos ni activa reglas.

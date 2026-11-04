@@ -12,6 +12,8 @@ runtime_verified: false
 
 # Movilidad V2 — extensión aditiva aprobada
 
+> Alcance de inventario: las cifras de esta decisión describen su fecha. El [inventario vigente](README.md) incorpora las extensiones posteriores:106 tablas de negocio+16 técnicas. La decisión conserva exclusivamente sus columnas, relaciones y reglas autorizadas.
+
 Autoridad: instrucción explícita de la propietaria «REMEMBERMIND — MOVILIDAD V2» del 10/10/2026. Amplía exclusivamente `registros_movilidad` con nueve columnas nullable. No crea tablas, índices, catálogos SQL ni modifica PK/FK, relaciones o columnas anteriores. El inventario sigue en **71 tablas operativas**; las tablas expertas se cuentan por separado.
 
 | Columna | Tipo |

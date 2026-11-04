@@ -2,18 +2,20 @@
 title: "Mapa funcional y límites de RememberMind"
 status: CURRENT
 version: "2.0"
-last_reviewed: 2026-10-25
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
 source_of_truth_scope: [domain_mapping]
-verified_against_commit: 6d7b8c6d6bc03eecd2ee35add04677f2778272cd
-verification_scope: DOCUMENTATION_RECONCILIATION_WITH_LOCAL_AUDIT
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_RECONCILIATION
 runtime_verified: false
 ---
 
 # Mapa funcional y límites de RememberMind
 
-Revisión de fuentes y localizadores del **25/10/2026**. Doce propietarios de código; residente como identidad central. No se impone un aggregate técnico universal ni una nueva arquitectura. [ADR aprobado](../arquitectura/ADR_ARQUITECTURA_HIBRIDA.md) y [contratos por módulo](../modulos/README.md).
+[Estado actual](../ESTADO_ACTUAL.md) e [inventario de implementación](INVENTARIO_ACTUAL.md) separan el árbol observado de las pruebas históricas. Esta conciliación no redefine catálogos, competencias ni reglas.
+
+Revisión de fuentes y localizadores del **04/11/2026**. Doce propietarios de código; residente como identidad central. No se impone un aggregate técnico universal ni una nueva arquitectura. [ADR aprobado](../arquitectura/ADR_ARQUITECTURA_HIBRIDA.md) y [contratos por módulo](../modulos/README.md).
 
 ## Identidades y recorrido institucional
 
@@ -21,7 +23,7 @@ Postulante/adulto mayor ≠ residente ≠ usuario ≠ personal ≠ contacto. La 
 
 `Preadmisión PENDIENTE → revisión → APROBADA/RECHAZADA → admisión formal con cama → residente ADMITIDO`
 
-El inventario actual está en [BDD](../base-de-datos/README.md): 100 tablas de negocio, 16 técnicas; el núcleo de 70 y otros cortes no son inventarios actuales.
+El inventario actual está en [BDD](../base-de-datos/README.md):106 tablas de negocio,16 técnicas; el núcleo de 70 y otros cortes no son inventarios actuales.
 
 ## Propietarios y continuidad
 

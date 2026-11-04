@@ -1,12 +1,12 @@
 ---
 title: "RememberMind"
 status: CURRENT
-version: "1.0"
-last_reviewed: 2026-10-25
+version: "1.1"
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
-verified_against_commit: null
-verification_scope: STATIC_REPOSITORY_REVIEW
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_AND_REGISTERED_ROUTES
 runtime_verified: false
 supersedes: []
 related_docs: []
@@ -28,7 +28,7 @@ Entrada oficial: [RememberMind Documentation](docs/README.md).
 - [Migración híbrida ejecutada](docs/arquitectura/INFORME_MIGRACION_HIBRIDA.md) y [auditoría/limpieza posterior](docs/arquitectura/AUDITORIA_LIMPIEZA_2026_10_10.md).
 - [Gobernanza/changelog documental](docs/CHANGELOG.md).
 
-Estado auditado al 25/10/2026: [informe integral](docs/auditorias/2026-10-25/INFORME_AUDITORIA_INTEGRAL.md), con fallos técnicos pendientes y cobertura visual incompleta. El [desacoplamiento del 11/10](docs/arquitectura/DESACOPLAMIENTO_2026_10_11.md) conserva su evidencia histórica, sin certificar el árbol actual. [Responsabilidades y recorridos de los doce módulos](docs/modulos/README.md).
+Estado documental revisado al **04/11/2026**: [estado actual](docs/ESTADO_ACTUAL.md), [inventario de código y rutas](docs/sistema/INVENTARIO_ACTUAL.md) y [catálogo documental](docs/INDICE_DOCUMENTAL.md). La auditoría del 25/10 conserva su corte histórico; no es una certificación del árbol actual. [Responsabilidades de los doce módulos](docs/modulos/README.md).
 
 ## Dominio y flujo institucional
 
@@ -40,7 +40,7 @@ Preadmisión → revisión → APROBADA/RECHAZADA → admisión formal con cama 
 
 ## Stack y requisitos
 
-Versiones bloqueadas y motores: [estado actual](docs/ESTADO_ACTUAL.md) y [baseline técnico](docs/arquitectura/REMEMBERMIND_BASELINE_TECNICO.md).
+Versiones bloqueadas: [inventario actual](docs/sistema/INVENTARIO_ACTUAL.md). Motores y condiciones: [baseline técnico](docs/arquitectura/REMEMBERMIND_BASELINE_TECNICO.md).
 
 - PHP ^8.3 y extensiones de la instalación; verificación local con PHP 8.3.33.
 - Laravel 13.33.0, Livewire 4.4.6, Tailwind 3.4.19 y Vite 8.3.1 según locks.
@@ -76,6 +76,8 @@ composer test -- --filter=BddOperativaV2Test
 npm test
 npm run build
 php motor-experto/tests/independencia.php
+php motor-experto/tests/dominio_independencia.php
+php scripts/verificar-documentacion.php --check
 ```
 
 `composer dev` arranca PHP en loopback con límites por proceso de 8 MB por archivo y 45 MB por petición para evidencia fotográfica clínica. Para arrancar solo PHP o elegir otro puerto: `php scripts/servir-local.php 8000`. No modifica el `php.ini` global; los despliegues deben configurar sus propios límites PHP/proxy.
@@ -95,6 +97,8 @@ Fuente: [roles congelados](docs/arquitectura/REMEMBERMIND_ROLES_BASELINE_CONGELA
 - Familiar: solo información autorizada de residentes vinculados; ver residente no publica expediente completo.
 
 Cuenta ACTIVO autenticada por correo + permiso + Policy + estado/regla + vínculo/scope/competencia. Registro público deshabilitado; archivos clínicos privados y descargas reautorizadas. Las deudas conocidas no se ocultan con un resumen de seguridad.
+
+El remitente saliente protegido es **remembermind.health@gmail.com**. Las claves se guardan exclusivamente en configuración secreta local; no se documentan ni se incluyen en commits. [Configuración y comprobaciones fechadas](docs/sistema/CORREO_SMTP_CONFIGURACION.md).
 
 ## Agentes
 

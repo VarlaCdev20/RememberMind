@@ -2,11 +2,11 @@
 title: "Decisiones pendientes de RememberMind"
 status: CURRENT
 version: "1.0"
-last_reviewed: 2026-10-25
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
-verified_against_commit: null
-verification_scope: STATIC_REPOSITORY_REVIEW
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_AND_REGISTERED_ROUTES
 runtime_verified: false
 supersedes: []
 related_docs: []
@@ -14,6 +14,13 @@ related_modules: []
 ---
 
 # Decisiones pendientes
+
+## Lectura vigente al 04/11/2026
+
+[Estado actual](ESTADO_ACTUAL.md) y [roadmap](ROADMAP.md) resumen las entregas posteriores. Los registros y líneas que siguen conservan la evidencia de sus fases originales; un estado antiguo no se reafirma como fallo actual sin reproducción o revisión posterior. Las rutas enlazadas se presentan con su ubicación vigente. Esta revisión documental no ejecuta las pruebas históricas.
+
+**Decisiones ya resueltas por alcance:** no crear tablas adicionales; contexto de escolaridad y de idioma/informante por atención autorizado; materiales/permisos declarados y tres perfiles iniciales activados; propuesta de nuevas relaciones/permiso para conservación conjunta rechazada. No volver a solicitar esos acuerdos como si siguieran abiertos. Su detalle está en los índices BDD y experto.
+
 
 Registro de ambigüedades materiales, no preguntas técnicas triviales. OPEN no modifica el contrato vigente. Opciones no son aprobación. Solo se bloquea el cambio dependiente; el trabajo seguro/documental continúa.
 
@@ -119,7 +126,7 @@ C. Mantener regla vigente, documentando límite, hasta decisión concreta.
 
 **Título:** Medición original, derechos y evaluación posterior en uso real del experto.
 
-**Estado al 25/10/2026: PARCIALMENTE RESUELTA por decisiones específicas; siguen abiertos los alcances enumerados.**
+**Estado al 04/11/2026: PARCIALMENTE RESUELTA por decisiones específicas.** Existen motor, reglas, red y perfiles iniciales descriptivos. Continúan pendientes la conservación conjunta y la interpretación/vinculación aplicable que no esté definida; las adopciones ya registradas no se vuelven a pedir.
 
 | Alcance | Estado y fuente |
 |---|---|
@@ -135,7 +142,7 @@ No reabrir A–D/E–H como si faltara su adopción. No exigir firma previa para
 
 **Bloquea exclusivamente:** contenido clínico nuevo no aprobado, uso no autorizado de instrumentos, instalación de DDL no autorizada y declaración de evaluación posterior en uso real sin evidencia. No bloquea correcciones técnicas compatibles, pruebas desechables ni implementación del alcance ya aprobado.
 
-**Evidencia actual:** [índice experto](sistema-experto/README.md) y [auditoría del 25/10](auditorias/2026-10-25/INFORME_AUDITORIA_INTEGRAL.md), H07–H13. Las opciones generales anteriores se sustituyen por esta separación de alcances; no se crean nuevas reglas.
+**Evidencia actual:** [índice experto](sistema-experto/README.md) y sus entregas del 31/10–04/11. La auditoría del 25/10 es antecedente, no un listado actualizado de fallos. Las opciones generales anteriores se sustituyen por esta separación de alcances; no se crean nuevas reglas.
 
 ## DEC-OPEN-006
 

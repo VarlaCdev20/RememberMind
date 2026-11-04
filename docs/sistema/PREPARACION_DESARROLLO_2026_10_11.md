@@ -1,6 +1,6 @@
 ---
 title: "Preparación para continuar desarrollo"
-status: CURRENT
+status: HISTORICAL
 version: "1.0"
 last_reviewed: 2026-10-11
 owner: RememberMind
@@ -14,6 +14,8 @@ related_modules: []
 ---
 
 # Preparación para continuar desarrollo — 11/10/2026
+
+> **Informe de su corte original.** Sus pruebas, cifras y limitaciones se conservan como evidencia fechada. El [estado actual](../ESTADO_ACTUAL.md) incorpora las entregas posteriores; este informe no certifica nuevamente el árbol vigente.
 
 RememberMind queda preparado para continuar desarrollo sobre la arquitectura híbrida aprobada. Copia local: `C:\Users\CARLAENCINAS\Desktop\RememberMind`, rama `PODEMOS-SEGUIR`. Los informes de Codex y sus temporales están fuera de esta raíz. No se trasladó el sistema a una nueva carpeta.
 

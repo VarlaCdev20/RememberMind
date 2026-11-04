@@ -2,11 +2,11 @@
 title: "Contrato compartido de UX/UI de RememberMind"
 status: CURRENT
 version: "1.0"
-last_reviewed: 2026-10-06
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: true
-verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
-verification_scope: STATIC_REPOSITORY_REVIEW
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_RECONCILIATION
 runtime_verified: false
 supersedes: []
 related_docs: []
@@ -66,29 +66,28 @@ Transmitir cuidado, tranquilidad, acompañamiento, seguridad y claridad mediante
 
 Las superficies ordinarias son neutras. Normal se representa con badge, icono, borde, tinte pequeño y texto. Una alerta crítica puede ocupar mayor superficie semántica y permanece reconocible; la calidez nunca la suaviza ni la oculta en un toast.
 
-## Paleta objetivo y correspondencia con el producto
+## Tokens observados al 04/11/2026
 
-Actualización final aprobada el 14/10/2026: paleta completa institucional y posterior eliminación de degradados en fondos/controles/gráficas. Solo permanecen los degradados tipográficos. El relieve procede de bordes y sombras compartidas. La corrección posterior mantiene navbar y sidebar en capuchino (#D7CEC7) y aclara el fondo general (#D7CEC7), con trama de puntos menudos solo en el fondo. La instrucción vigente sustituye el corrugado y la propuesta orgánica por puntos de radio 0.6 px, separados 16 px, conservando la profundidad interior. Esta decisión sustituye la propuesta salvia #8DA18A/fondo #E7E0D9. Ver [paleta final y verificación](PALETA_FINAL_SOLIDA_Y_RELIEVE.md).
+La implementación usa [tokens/colors.css](../../resources/frontend/styles/design-system/tokens/colors.css) y el [Design System](../../resources/frontend/styles/design-system/README.md). Los siguientes valores base de modo claro describen el código, sin constituir una nueva decisión de diseño. Las variantes y el resultado compuesto dependen de los tokens semánticos/componentes y del tema.
 
-Corrección posterior vigente: fondo café grisáceo `#D8D2CD`, cards más claras `#ECE9E6`, apoyo `#DFD9D4`, ventanas `#F0EDEA` y campos `#E7E2DE`, sin dominante amarilla. Sustituye los valores de la propuesta anterior descrita arriba. Véanse [paleta cálida](PALETA_CALIDA_COMPOSICION_2026_10_14.md) y [composición global](COMPOSICION_GLOBAL_2026_10_14.md).
-
-Estos valores vienen de la tarea de la propietaria. La futura implementación los consolida en el Design System, sin HEX locales ni una segunda paleta por rol.
-
-| Nombre del brief | Objetivo | Contrato implementado a inspeccionar |
+| Token base | Valor | Uso observado |
 |---|---|---|
-| `--rm-app-bg` | `#D8D2CD` | `--rm-bg-app` y trama solo en el lienzo |
-| `--rm-shell-bg` | `#D7CEC7` | `--rm-bg-shell` |
-| Navbar | `#D7CEC7` | `--rm-bg-shell` en topbar; headers de contenido conservan su superficie |
-| `--rm-card-bg` | `#ECE9E6` | `--rm-surface` y tokens de cards |
-| `--rm-surface-soft` | `#DFD9D4` | `--rm-surface-soft` |
-| `--rm-text-primary` | `#4F4742` | `--rm-text-primary` |
-| `--rm-text-secondary` | `#6B625C` | `--rm-text-secondary` |
-| `--rm-text-muted` | `#8A8078` | `--rm-text-muted` |
-| Acento Enfermería | `#3F8F76` | Acento de cuidado/acción compartido, según función |
+| `--rm-palette-page` | `#F3EEE8` | Lienzo cálido |
+| `--rm-palette-capuchino` | `#DDD6CF` | Estructura/sidebar |
+| `--rm-palette-header` | `#E6E0D9` | Encabezados |
+| `--rm-palette-surface` | `#F7F3EF` | Cards más claras que el lienzo |
+| `--rm-palette-surface-soft` | `#EFEAE4` | Superficie secundaria |
+| `--rm-palette-ink` | `#4A4642` | Texto principal |
+| `--rm-palette-ink-secondary` | `#67615B` | Texto secundario |
+| `--rm-palette-primary` | `#78826E` | Acción salvia |
+| `--rm-palette-primary-hover` | `#5F7567` | Interacción/selección |
+| `--rm-palette-info` | `#7D94A8` | Información |
+| `--rm-palette-warning` | `#C69245` | Advertencia del dominio |
+| `--rm-palette-danger` | `#B85C58` | Error/peligro |
+| `--rm-palette-input` | `#E7E2DE` | Campos |
 
-Los nombres del brief son conceptuales; preferir evolucionar el token semántico existente y documentar alias realmente necesarios. No crear `--rm-enf-*` ni convertir todas las superficies en verdes. Sage, tonos tierra y acentos clínicos acompañan la base neutral.
+Hay mezclas con transparencia (`--rm-capture-card`, `--rm-capture-glass-*`), blur y tramas en el lienzo; las superficies no son uniformemente sólidas. Conservar legibilidad, jerarquía y separación entre cards. El relieve y el movimiento utilizan las fuentes compartidas `shadows.css` y `motion.css`. El dominio decide el significado de cada estado. Esta revisión no acredita contraste computado ni una nueva QA visual.
 
-Medir contraste de cada par sobre la superficie compuesta real, incluido glass y modo oscuro. El muted objetivo no se presupone válido para texto pequeño. Si un par no pasa, conservar la paleta en superficies y proponer una tinta semántica contrastada, documentando la adaptación. Ningún HEX de este documento promete accesibilidad por sí mismo.
 
 ## Tipografía por función
 

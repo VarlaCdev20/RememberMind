@@ -11,6 +11,8 @@ runtime_verified: true
 
 # Mapa único del sistema experto
 
+**Actualización de nombres del 04/11:** el dominio está directamente en `motor-experto/dominio`; no se conservan namespaces con la denominación de investigación. El importador documental anterior y su fallback de consulta están retirados. La lectura conceptual se denomina `ArchivoConocimientoCognitivo` y el explorador `ConsultarGrafoExperto`. Esta revisión de localizadores no vuelve a ejecutar las verificaciones históricas siguientes.
+
 Entrada: [portal del experto](../README.md). Este mapa organiza la implementación existente para detección temprana de DCL en personas mayores de 60 años. No crea otro motor, cambia reglas, traslada historia ni renombra identificadores.
 
 La [estructura adoptada según el diagrama de la propietaria](ESTRUCTURA_POR_COMPONENTES.md) define los ocho componentes y su orden funcional. Este archivo conserva el índice técnico de sus implementaciones.

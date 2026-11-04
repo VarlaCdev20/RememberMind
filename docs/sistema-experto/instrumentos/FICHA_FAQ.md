@@ -2,14 +2,17 @@
 title: "Ficha documental I04 — FAQ/Pfeffer"
 status: CURRENT
 version: "1.1"
-last_reviewed: 2026-10-28
+last_reviewed: 2026-11-04
 owner: ApoyoDecision
 source_of_truth: false
-verification_scope: VERSION_DISAMBIGUATION_AND_STATIC_IADL_MAPPING_NOT_ACTIVATION
+verification_scope: CURRENT_TREE_DOCUMENTATION_RECONCILIATION
 runtime_verified: false
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
 ---
 
 # I04 — FAQ/Pfeffer
+
+**Estado al 04/11/2026:** FAQ/Pfeffer UDSv2 B7S español está activado localmente para captura completa de puntuaciones y cálculo descriptivo, usando la hoja original de esa edición. [Activación, identidad, fuentes y límites](../ENTREGA_ACTIVACION_PERFILES_INICIALES_2026_11_04.md). Las gestiones pendientes descritas en cortes anteriores no son el estado de esta activación. No se habilitan interpretaciones diagnósticas desde el total.
 
 **Actualización del 29/10/2026:** [entrega integrada y perfil de preparación](../ENTREGA_INSTRUMENTOS_Y_PERFILES_INICIALES_2026_10_29.md). El cotejo actual confirma el alcance limitado de la vía NACC; no se declara concedida autorización asistencial digital ni una equivalencia FAQ–IADL–C03.
 

@@ -2,12 +2,12 @@
 title: "Flujos geriátricos"
 status: CURRENT
 version: "2.0"
-last_reviewed: 2026-10-06
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
 source_of_truth_scope: [process_mapping]
-verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
-verification_scope: STATIC_REPOSITORY_REVIEW
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_RECONCILIATION
 runtime_verified: false
 supersedes: []
 related_docs: ["../../docs/README.md", "../../docs/TRAZABILIDAD.md"]
@@ -16,7 +16,9 @@ related_modules: []
 
 # Flujos geriátricos
 
-> **Conciliación del 25/10/2026:** los conteos 70+1=71 y las pruebas/estados observados más abajo pertenecen al corte original indicado. El inventario instalado vigente es 100 tablas de negocio + 16 técnicas, según [BDD](../base-de-datos/README.md). Las fuentes y requisitos siguen su alcance; la actualización de enlaces no reejecuta pruebas ni cierra deuda. [Estado actual](../ESTADO_ACTUAL.md).
+[Estado actual](../ESTADO_ACTUAL.md) e [inventario de implementación](INVENTARIO_ACTUAL.md) separan el árbol observado de las pruebas históricas. Esta conciliación no redefine catálogos, competencias ni reglas.
+
+> **Conciliación del 04/11/2026:** los conteos 70+1=71 y las pruebas/estados observados más abajo pertenecen al corte original indicado. El inventario documentado vigente es106 tablas de negocio +16 técnicas, según [BDD](../base-de-datos/README.md). Las fuentes y requisitos siguen su alcance; la actualización de enlaces no reejecuta pruebas ni cierra deuda. [Estado actual](../ESTADO_ACTUAL.md).
 
 Revisión estática del commit base y del árbol de trabajo con cambios previos sin commit. No se ejecutaron migraciones, seed, suites, build ni una BDD real. CURRENT identifica esta compilación vigente; no aprueba reglas nuevas. `verified_against_commit` no certifica runtime.
 
@@ -78,7 +80,7 @@ flowchart LR
 |---|---|---|---|
 | Gerente planifica; Administrador opera; Enfermería actúa sobre asignados y jornada aplicable | Contrato/contexto clínico requiere turno/jornada aplicables; ABIERTA HTTP / ACTIVA en panel | InstitucionalController crea jornada y asignación laboral sin transaction conjunta; panel asigna plaza en transaction; CuidadoController::asignarJornada bloquea jornada para asignación de residente | Panel/ARJ/contexto clínico deniegan personal inactivo o jornada/relación inválida cuando los comprueban. InstitucionalController::abrirJornada solo valida turno existente/fecha; asignarPersonal valida exists personal/área sin revalidar estados/vigencia. Rollback solo en boundaries observados; asignación ACTIVA |
 
-[app/Http/Controllers/Identidad/InstitucionalController.php](../../app/Modulos/Institucion/Presentacion/Http/Controllers/InstitucionalController.php), [app/Frontend/Livewire/Administracion/Identidad/TurnosAsignacionesPanel.php](../../app/Modulos/Institucion/Presentacion/Livewire/Paginas/TurnosAsignacionesPanel.php), [app/Http/Controllers/Cuidados/CuidadoController.php](../../app/Modulos/Cuidados/Presentacion/Http/Controllers/CuidadoController.php), [app/Backend/Modulos/Enfermeria/Servicios/TurnoEnfermeriaService.php](../../app/Modulos/Cuidados/Aplicacion/Consultas/TurnoEnfermeriaService.php). Cierre administrativo integral de jornada: NOT VERIFIED en estos segmentos; no inventar transición.
+[app/Http/Controllers/Identidad/InstitucionalController.php](../../app/Modulos/Institucion/Presentacion/Http/Controllers/InstitucionalController.php), [app/Modulos/Institucion/Presentacion/Livewire/Paginas/TurnosAsignacionesPanel.php](../../app/Modulos/Institucion/Presentacion/Livewire/Paginas/TurnosAsignacionesPanel.php), [app/Http/Controllers/Cuidados/CuidadoController.php](../../app/Modulos/Cuidados/Presentacion/Http/Controllers/CuidadoController.php), [app/Modulos/Cuidados/Aplicacion/Consultas/TurnoEnfermeriaService.php](../../app/Modulos/Cuidados/Aplicacion/Consultas/TurnoEnfermeriaService.php). Cierre administrativo integral de jornada: NOT VERIFIED en estos segmentos; no inventar transición.
 
 ## FLOW-MED-001 — Medicación
 
@@ -97,7 +99,7 @@ flowchart LR
 |---|---|---|---|
 | Médico prescribe con competencia/permiso/atención del residente. Enfermería administra con contexto propio | Prescripción ACTIVA; horario ACTIVO o PRN sin horario | Prescripción + horarios transaction; administración programada transaction y locks; PRN create sin transaction propia observada | Orden suspendida, residente/horario ajeno, duplicado o ausencia de jornada: rechazo. Omisión con motivo; administración resultado ADMINISTRADA/OMITIDA y estado REGISTRADA. Reintentos PRN DEC-OPEN-004 |
 
-[app/Http/Controllers/Medicacion/MedicacionController.php](../../app/Modulos/Medicacion/Presentacion/Http/Controllers/MedicacionController.php), [app/Backend/Modulos/Medicacion/Servicios/RegistrarAdministracionMedicacionService.php](../../app/Modulos/Medicacion/Aplicacion/Acciones/RegistrarAdministracionMedicacionService.php). Administrar no altera la orden médica.
+[app/Http/Controllers/Medicacion/MedicacionController.php](../../app/Modulos/Medicacion/Presentacion/Http/Controllers/MedicacionController.php), [app/Modulos/Medicacion/Aplicacion/Acciones/RegistrarAdministracionMedicacionService.php](../../app/Modulos/Medicacion/Aplicacion/Acciones/RegistrarAdministracionMedicacionService.php). Administrar no altera la orden médica.
 
 ```mermaid
 sequenceDiagram
@@ -142,7 +144,7 @@ flowchart LR
 
 **APPROVED CONTRACT:** conservar origen, autor, acciones y eventos. **OBSERVED IMPLEMENTATION:** Controller crea CREADA, decisión de signos CREACION; Panel/AlertasService manual no crea evento inicial. Panel asigna responsable sin cambiar a ASIGNADA; HTTP admite ese estado y RECONOCIDA/ATENDIDA. No son etapas obligatorias idénticas en todas las entradas. TECH-002.
 
-Actor/contexto: Enfermería asignada para creación/intervención; Administración dispone de reconocimiento/asignación/seguimiento/cierre por permiso en HTTP. mutarActiva/transiciones bloquean y usan transaction; Panel creación simple sin evento/transaction multientidad. Cerrada/anulada: terminal en HTTP; Panel/Service solo mutan ABIERTA/EN_ATENCION. Fallo revierte evento+estado dentro de transaction cuando existe. [app/Http/Controllers/Alertas/AlertaController.php](../../app/Modulos/Alertas/Presentacion/Http/Controllers/AlertaController.php), [app/Backend/Modulos/Alertas/Servicios/AlertasService.php](../../app/Modulos/Alertas/Aplicacion/Acciones/AlertasService.php), [app/Frontend/Livewire/Compartido/Alertas/AlertasPanel.php](../../app/Modulos/Alertas/Presentacion/Livewire/Paginas/AlertasPanel.php).
+Actor/contexto: Enfermería asignada para creación/intervención; Administración dispone de reconocimiento/asignación/seguimiento/cierre por permiso en HTTP. mutarActiva/transiciones bloquean y usan transaction; Panel creación simple sin evento/transaction multientidad. Cerrada/anulada: terminal en HTTP; Panel/Service solo mutan ABIERTA/EN_ATENCION. Fallo revierte evento+estado dentro de transaction cuando existe. [app/Http/Controllers/Alertas/AlertaController.php](../../app/Modulos/Alertas/Presentacion/Http/Controllers/AlertaController.php), [app/Modulos/Alertas/Aplicacion/Acciones/AlertasService.php](../../app/Modulos/Alertas/Aplicacion/Acciones/AlertasService.php), [app/Modulos/Alertas/Presentacion/Livewire/Paginas/AlertasPanel.php](../../app/Modulos/Alertas/Presentacion/Livewire/Paginas/AlertasPanel.php).
 
 ## FLOW-PAS-001 — Pase de turno
 
@@ -157,7 +159,7 @@ flowchart LR
 
 Panel/Service observado: resumen mínimo, resolución de receptor por residente cuando existe asignación entrante, jornada entrante ya planificada, procesarPase con transaction y protección contra edición tras entrega/recepción; confirmarRecepcion con lock. procesarPase permite cod_personal_entrante null; no exigir receptor previo como regla universal de esa entrada. **EXCEPTION:** generar exige otro enfermero activo y crea GENERADO sin transaction propia; HTTP crea EMITIDO con receptor opcional; anularPase actual no valida todas las condiciones. TECH-009.
 
-Errores por entrada: jornada ausente, emisor sin asignación, resumen vacío o doble recepción; generar también rechaza receptor inválido. confirmarRecepcion exige receptor por designación o asignación entrante; ausencia de receptor previo no impide por sí sola procesarPase. Rollback solo en transaction observada. Estado final no ejecutado. La proyección de medicación/cuidados/alertas tiene gaps TECH-008; pase no garantiza hoy que cada pendiente haya sido transferido. [app/Backend/Modulos/Enfermeria/Servicios/PaseTurnoService.php](../../app/Modulos/Cuidados/Aplicacion/Acciones/PaseTurnoService.php), [app/Frontend/Livewire/Enfermeria/Cuidados/PaseTurnoPanel.php](../../app/Modulos/Cuidados/Presentacion/Livewire/Paginas/PaseTurnoPanel.php), [docs/sistema/CONTINUIDAD_ASISTENCIAL.md](../../docs/sistema/CONTINUIDAD_ASISTENCIAL.md).
+Errores por entrada: jornada ausente, emisor sin asignación, resumen vacío o doble recepción; generar también rechaza receptor inválido. confirmarRecepcion exige receptor por designación o asignación entrante; ausencia de receptor previo no impide por sí sola procesarPase. Rollback solo en transaction observada. Estado final no ejecutado. La proyección de medicación/cuidados/alertas tiene gaps TECH-008; pase no garantiza hoy que cada pendiente haya sido transferido. [app/Modulos/Cuidados/Aplicacion/Acciones/PaseTurnoService.php](../../app/Modulos/Cuidados/Aplicacion/Acciones/PaseTurnoService.php), [app/Modulos/Cuidados/Presentacion/Livewire/Paginas/PaseTurnoPanel.php](../../app/Modulos/Cuidados/Presentacion/Livewire/Paginas/PaseTurnoPanel.php), [docs/sistema/CONTINUIDAD_ASISTENCIAL.md](../../docs/sistema/CONTINUIDAD_ASISTENCIAL.md).
 
 ## FLOW-EST-001 — Estudio clínico
 
@@ -199,4 +201,4 @@ sequenceDiagram
  A-->>UI: RegistroSignosVitales
 ```
 
-Fuentes: [app/Backend/Modulos/Clinica/Acciones/RegistrarSignosVitalesAction.php](../../app/Modulos/Clinica/Aplicacion/Acciones/RegistrarSignosVitalesAction.php), [app/Backend/Modulos/Clinica/Servicios/SignosVitalesService.php](../../app/Modulos/Clinica/Aplicacion/Acciones/SignosVitalesService.php), [app/Backend/Modulos/Clinica/SignosVitales/ServicioDecisionAlertaClinica.php](../../app/Modulos/Alertas/Aplicacion/Acciones/ServicioDecisionAlertaClinica.php). No se inventa Policy específica de signos; control backend está en Action/Services.
+Fuentes: [app/Modulos/Clinica/Aplicacion/Acciones/RegistrarSignosVitalesAction.php](../../app/Modulos/Clinica/Aplicacion/Acciones/RegistrarSignosVitalesAction.php), [app/Modulos/Clinica/Aplicacion/Acciones/SignosVitalesService.php](../../app/Modulos/Clinica/Aplicacion/Acciones/SignosVitalesService.php), [app/Modulos/Alertas/Aplicacion/Acciones/ServicioDecisionAlertaClinica.php](../../app/Modulos/Alertas/Aplicacion/Acciones/ServicioDecisionAlertaClinica.php). No se inventa Policy específica de signos; control backend está en Action/Services.

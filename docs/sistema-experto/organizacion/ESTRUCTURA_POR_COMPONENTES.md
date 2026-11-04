@@ -2,16 +2,18 @@
 title: "Estructura adoptada por componentes del sistema experto"
 status: CURRENT
 version: "1.4"
-last_reviewed: 2026-10-28
+last_reviewed: 2026-11-04
 owner: ApoyoDecision
 source_of_truth: true
 source_of_truth_scope: [expert_component_organization]
-verified_against_commit: e952a34cf64025607b94ec7345bdb6561ba33188
-verification_scope: OWNER_DIAGRAM_ADOPTION_AND_STATIC_CODE_MAPPING
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_RECONCILIATION
 runtime_verified: false
 ---
 
 # Estructura por componentes del sistema experto
+
+**Correspondencia con el código al 04/11:** las ocho responsabilidades del diagrama no son ocho directorios principales. El motor agrupa seis componentes (`conocimiento`, `hechos`, `inferencia`, `explicacion`, `instrumentos`, `conservacion`) y utiliza `dominio`/`aplicacion` para tipos y puertos auxiliares. Registros/validación se integran además con módulos Laravel. [Mapa físico actual](../../../motor-experto/README.md).
 
 La propietaria indicó el 27/10/2026 que el experto se estructure siguiendo el diagrama adjunto `mermaid-diagram.png`. Se adoptan sus ocho componentes principales y sus conexiones. La red semántica y las reglas versionadas pertenecen a la base de conocimiento.
 

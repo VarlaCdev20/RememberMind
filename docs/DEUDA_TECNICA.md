@@ -2,11 +2,11 @@
 title: "Deuda técnica de RememberMind"
 status: CURRENT
 version: "1.0"
-last_reviewed: 2026-10-06
+last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
-verified_against_commit: 8e9e20325519c5da5a6b25f6fb26568cad78efe1
-verification_scope: STATIC_REPOSITORY_REVIEW
+verified_against_commit: 57285c7e3988cf5df86cdbd24f03e6a9650807bf
+verification_scope: CURRENT_TREE_DOCUMENTATION_AND_REGISTERED_ROUTES
 runtime_verified: false
 runtime_evidence_status: PARTIAL
 runtime_evidence_scope: FASE_3_AND_4_AUTOMATED_TESTS_ISOLATED_POSTGRESQL
@@ -16,6 +16,13 @@ related_modules: []
 ---
 
 # Deuda técnica
+
+## Lectura vigente al 04/11/2026
+
+[Estado actual](ESTADO_ACTUAL.md) y [roadmap](ROADMAP.md) resumen las entregas posteriores. Los registros y líneas que siguen conservan la evidencia de sus fases originales; un estado antiguo no se reafirma como fallo actual sin reproducción o revisión posterior. Las rutas enlazadas se presentan con su ubicación vigente. Esta revisión documental no ejecuta las pruebas históricas.
+
+**Pendiente confirmado por contrato/código:** conservación institucional conjunta instrumental/Petersen. Los perfiles iniciales de captura/puntuación ya están activados localmente; el motor, las reglas y la red no son desarrollos futuros. La disponibilidad actual de SMTP, los avisos de dependencias y la aceptación integral de módulos no se reevalúan aquí.
+
 
 Actualización arquitectónica del 11/10/2026: el [desacoplamiento de fronteras](arquitectura/DESACOPLAMIENTO_2026_10_11.md) retira request/session y efectos concretos de los flujos de Aplicación auditados. Se corrigió el falso éxito al escribir PDFs de preadmisión y recibir archivos. Permanecen la excepción Eloquent/Laravel aprobada, el tipo Symfony UploadedFile en gestión de usuarios, hashes con retorno false, riesgo de archivos huérfanos ante fallos posteriores de DB y privacidad del disco público. Este corte no cierra TECH ni decisiones institucionales ajenas a su alcance.
 

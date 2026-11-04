@@ -1,6 +1,6 @@
 ---
 title: "Auditoría de arquitectura y limpieza posterior"
-status: CURRENT
+status: HISTORICAL
 version: "1.0"
 last_reviewed: 2026-10-10
 owner: RememberMind
@@ -15,6 +15,8 @@ related_modules: [Alertas, Cuidados, Clinica]
 ---
 
 # Auditoría de arquitectura y limpieza — 10/10/2026
+
+> **Informe de su corte original.** Sus pruebas, cifras y limitaciones se conservan como evidencia fechada. El [estado actual](../ESTADO_ACTUAL.md) incorpora las entregas posteriores; este informe no certifica nuevamente el árbol vigente.
 
 Auditoría y limpieza ejecutadas en ARQUI-NUEVA sobre la entrega ed9dd523e8a5287f7fc6d7d90c75aaab6fea1dc8. Se retiraron **108 archivos versionados** (315813 bytes; aproximadamente 308 KiB), seis imports sin uso y se corrigió una operación clínica que podía persistir parcialmente. No se cambió el esquema, las factories, los roles, los permisos ni las reglas/umbrales clínicos. REINICIO se conserva sin push ni merge.
 

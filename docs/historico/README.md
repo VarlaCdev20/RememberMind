@@ -34,3 +34,10 @@ No se mueven masivamente documentos en Fase 1. Una futura migración a docs/hist
 - [Estado vigente](../ESTADO_ACTUAL.md) y [contratos funcionales por propietario](../modulos/README.md).
 
 El archivo conserva decisiones y evidencia única. La limpieza retira instrucciones obsoletas de entradas vigentes, pero no borra historias ni pruebas históricas útiles para simular un cierre. La limitación de no mover archivos de la Fase 1 describía aquella ejecución y no es una prohibición global para tareas posteriores autorizadas.
+
+## Cortes preservados en la conciliación del04/11/2026
+
+- [Estado anterior a la revisión](ESTADO_ANTERIOR_A_2026_11_04.md).
+- [Roadmap de fases anteriores](ROADMAP_ANTERIOR_A_2026_11_04.md).
+
+El [estado vigente](../ESTADO_ACTUAL.md) describe el árbol actual. Estos documentos conservan sus pruebas y cifras originales.
