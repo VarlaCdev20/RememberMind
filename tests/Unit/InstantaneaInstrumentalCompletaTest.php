@@ -147,7 +147,7 @@ final class InstantaneaInstrumentalCompletaTest extends TestCase
                 spl_autoload_register(static function (string $clase) use ($raiz): void {
                     $prefijo = 'MotorExperto\\';
                     if (str_starts_with($clase, $prefijo)) {
-                        require $raiz.'/motor-experto/src/motor_experto/'.str_replace('\\', '/', substr($clase, strlen($prefijo))).'.php';
+                        require $raiz.'/motor-experto/'.str_replace('\\', '/', substr($clase, strlen($prefijo))).'.php';
                     }
                 });
                 $entrada = unserialize(stream_get_contents(STDIN), ['allowed_classes' => false]);

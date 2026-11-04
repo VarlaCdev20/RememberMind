@@ -181,9 +181,9 @@ verificación de ingeniería como evaluación posterior en uso real o gate exper
 
 ## Archivos de este incremento
 
-- `motor-experto/src/motor_experto/instrumentos/NormalizadorReferenciasEspana.php` (nuevo).
-- `motor-experto/src/motor_experto/instrumentos/RegistroMetodosInstrumentales.php`.
-- `motor-experto/src/motor_experto/instrumentos/CatalogoCapturaCognitiva.php`.
+- `motor-experto/instrumentos/NormalizadorReferenciasEspana.php` (nuevo).
+- `motor-experto/instrumentos/RegistroMetodosInstrumentales.php`.
+- `motor-experto/instrumentos/CatalogoCapturaCognitiva.php`.
 - `tests/Unit/NormalizacionReferenciasEspanaTest.php` (nuevo).
 - `tests/Feature/CapturaInstrumentalInstitucionalTest.php`.
 - Este contrato, manual investigado, seguimiento de fase 3 e índice del experto.

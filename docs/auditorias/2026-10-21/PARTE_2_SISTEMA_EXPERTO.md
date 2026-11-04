@@ -55,7 +55,7 @@ clínicos de sustitución.
 
 Estado: **revisión estática; conservación institucional y evaluación posterior en uso real completas pendientes**. Árbol compartido con cambios intencionales sin commit, referencia HEAD `8eee364ed32c079703b95c0eb63204dcb5512cbe` más WIP. La coordinación conserva el manifiesto técnico del corte en `storage/app/private/auditoria-corte-20261021.json`; este informe no sustituye ese manifiesto ni atribuye al HEAD los cambios no confirmados. No se consultaron datos de residentes, no se mutó SQL, no se aplicó DDL ni se ejecutaron suites en este encargo. Las cifras documentadas de pruebas anteriores pertenecen a sus cortes, no son pruebas nuevas del auditor. Único archivo escrito: este informe.
 
-Skills: `remembermind-source-of-truth` y `remembermind-expert-validation`. Las citas `ruta:línea` son del árbol leído; cambios posteriores pueden desplazarlas. Los prefijos abreviados **APP** y **MOTOR** significan respectivamente `app/Modulos/ApoyoDecision` y `motor-experto/src/motor_experto`.
+Skills: `remembermind-source-of-truth` y `remembermind-expert-validation`. Las citas `ruta:línea` son del árbol leído; cambios posteriores pueden desplazarlas. Los prefijos abreviados **APP** y **MOTOR** significan respectivamente `app/Modulos/ApoyoDecision` y `motor-experto`.
 
 ## Fuentes y autoridad
 
@@ -394,7 +394,7 @@ El diagrama no representa el resultado de ningún residente.
 | `APORTA_EVIDENCIA` | VARIABLE → CRITERIO | El contrato permite participación inferencial; además exige relación activa y tipos/modalidad compatibles | Que exista un hecho suficiente o que la condición se cumpla |
 | `CONTEXTUALIZA` | VARIABLE → CRITERIO | Conserva contexto sin habilitar participación como antecedente instrumental | Que una observación sustituya una medición instrumental |
 
-Fuente: [PaqueteCognitivoInstitucional.php:22](../../../motor-experto/src/motor_experto/conocimiento/ReglasCognitivas.php:22).
+Fuente: [PaqueteCognitivoInstitucional.php:22](../../../motor-experto/conocimiento/ReglasCognitivas.php:22).
 Estos son predicados de ese paquete; no una lista universal para cualquier
 contrato de conocimiento o versión experimental.
 
@@ -421,9 +421,9 @@ contrato de conocimiento o versión experimental.
    las conexiones mostradas en evidencia utilizada. Reautoriza y recupera la
    lectura en el servidor antes de preparar ambos grafos.
 
-Fuentes: [RedSemantica.php:15](../../../motor-experto/src/motor_experto/conocimiento/RedSemantica.php:15),
-[PertenenciaVariableCognitiva.php:12](../../../motor-experto/src/motor_experto/conocimiento/PertenenciaVariableCognitiva.php:12),
-[PaqueteConocimiento.php:88](../../../motor-experto/src/motor_experto/conocimiento/PaqueteConocimiento.php:88),
+Fuentes: [RedSemantica.php:15](../../../motor-experto/conocimiento/RedSemantica.php:15),
+[PertenenciaVariableCognitiva.php:12](../../../motor-experto/conocimiento/PertenenciaVariableCognitiva.php:12),
+[PaqueteConocimiento.php:88](../../../motor-experto/conocimiento/PaqueteConocimiento.php:88),
 [ConsultarExploracionOrion.php:20](../../../app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarExploracionOrion.php:20).
 
 ## Cómo mejorar su explicación

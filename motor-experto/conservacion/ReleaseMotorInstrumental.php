@@ -12,6 +12,9 @@ use ZipArchive;
 /** Artefacto recuperable de código y red documental; nunca incorpora capturas, historia, configuración local o .env. */
 final class ReleaseMotorInstrumental
 {
+    private const DIRECTORIOS_CODIGO = ['conocimiento', 'hechos', 'inferencia', 'explicacion',
+        'instrumentos', 'conservacion', 'dominio', 'aplicacion'];
+
     private const ARCHIVOS_FIJOS = ['motor-experto/composer.json', 'composer.lock', 'motor-experto/tests/independencia.php',
         'motor-experto/tests/orion_independencia.php',
         'app/Modulos/ApoyoDecision/Infraestructura/Persistencia/datos/orion-v1-conceptos.json'];
@@ -22,16 +25,7 @@ final class ReleaseMotorInstrumental
             throw new DomainException('Indique revisión Git completa y un archivo nuevo en una carpeta existente.');
         }
         $raiz = realpath($raiz) ?: throw new DomainException('Raíz de código inexistente.');
-        $archivos = self::ARCHIVOS_FIJOS;
-        $directorio = $raiz.'/motor-experto/src';
-        if (! is_dir($directorio)) {
-            throw new DomainException('Falta el código del motor.');
-        }
-        foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directorio, \FilesystemIterator::SKIP_DOTS)) as $archivo) {
-            if ($archivo->isFile() && $archivo->getExtension() === 'php') {
-                $archivos[] = str_replace('\\', '/', substr($archivo->getPathname(), strlen($raiz) + 1));
-            }
-        }
+        $archivos = array_merge(self::ARCHIVOS_FIJOS, self::archivosCodigo($raiz));
         sort($archivos, SORT_STRING);
         $contenido = $huellas = [];
         foreach ($archivos as $relativo) {
@@ -105,7 +99,7 @@ final class ReleaseMotorInstrumental
                 }
                 foreach (array_keys($m['archivos']) as $nombre) {
                     if (! in_array($nombre, self::ARCHIVOS_FIJOS, true)
-                        && ! preg_match('~^motor-experto/src/(?:[A-Za-z0-9_]+/)*[A-Za-z0-9_]+\.php$~D', $nombre)) {
+                        && ! self::esRutaCodigo($nombre)) {
                         throw new DomainException('El release contiene una ruta fuera del contrato de software.');
                     }
                 }
@@ -143,7 +137,7 @@ final class ReleaseMotorInstrumental
     /** Identidad de software capturada al crear el DTO; nunca lee fuentes clínicas. */
     public function identidadEjecutorActual(): array
     {
-        $raiz = dirname(__DIR__, 4);
+        $raiz = dirname(__DIR__, 2);
         $actuales = [];
         foreach (self::ARCHIVOS_FIJOS as $nombre) {
             $ruta = $raiz.'/'.$nombre;
@@ -156,18 +150,16 @@ final class ReleaseMotorInstrumental
             }
             $actuales[$nombre] = $huella;
         }
-        foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($raiz.'/motor-experto/src', \FilesystemIterator::SKIP_DOTS)) as $archivo) {
-            if ($archivo->isFile() && $archivo->getExtension() === 'php') {
-                $nombre = str_replace('\\', '/', substr($archivo->getPathname(), strlen($raiz) + 1));
-                if (! $archivo->isReadable()) {
-                    throw new DomainException('No se pudo identificar un archivo del ejecutor actual.');
-                }
-                $huella = hash_file('sha256', $archivo->getPathname());
-                if ($huella === false) {
-                    throw new DomainException('No se pudo identificar un archivo del ejecutor actual.');
-                }
-                $actuales[$nombre] = $huella;
+        foreach (self::archivosCodigo($raiz) as $nombre) {
+            $ruta = $raiz.'/'.$nombre;
+            if (! is_readable($ruta)) {
+                throw new DomainException('No se pudo identificar un archivo del ejecutor actual.');
             }
+            $huella = hash_file('sha256', $ruta);
+            if ($huella === false) {
+                throw new DomainException('No se pudo identificar un archivo del ejecutor actual.');
+            }
+            $actuales[$nombre] = $huella;
         }
 
         return self::identidadEjecutor($actuales);
@@ -175,10 +167,35 @@ final class ReleaseMotorInstrumental
 
     public static function identidadEjecutor(array $archivos): array
     {
-        $fuentes = array_filter($archivos, static fn ($nombre) => str_starts_with($nombre, 'motor-experto/src/'), ARRAY_FILTER_USE_KEY);
+        $fuentes = array_filter($archivos, static fn ($nombre) => self::esRutaCodigo($nombre), ARRAY_FILTER_USE_KEY);
         $identidad = array_intersect_key($archivos, array_fill_keys(self::ARCHIVOS_FIJOS, true)) + $fuentes;
 
         // huella_src conserva el nombre del contrato V1; incluye también los archivos fijos del release.
         return ['cantidad_archivos' => count($fuentes), 'huella_src' => CodecInstantanea::huella(CapturaInstrumentalCanonica::ordenar($identidad))];
+    }
+
+    /** Solo código productivo: los fixtures de tests nunca forman parte del ejecutor. */
+    private static function archivosCodigo(string $raiz): array
+    {
+        $archivos = [];
+        foreach (self::DIRECTORIOS_CODIGO as $nombre) {
+            $directorio = $raiz.'/motor-experto/'.$nombre;
+            if (! is_dir($directorio)) {
+                throw new DomainException('Falta un componente del código del motor.');
+            }
+            foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directorio, \FilesystemIterator::SKIP_DOTS)) as $archivo) {
+                if ($archivo->isFile() && $archivo->getExtension() === 'php') {
+                    $archivos[] = str_replace('\\', '/', substr($archivo->getPathname(), strlen($raiz) + 1));
+                }
+            }
+        }
+
+        return $archivos;
+    }
+
+    private static function esRutaCodigo(string $nombre): bool
+    {
+        // Leer artefactos históricos conserva sus rutas y huellas originales.
+        return (bool) preg_match('~^motor-experto/(?:src|'.implode('|', self::DIRECTORIOS_CODIGO).')/(?:[A-Za-z0-9_]+/)*[A-Za-z0-9_]+\.php$~D', $nombre);
     }
 }

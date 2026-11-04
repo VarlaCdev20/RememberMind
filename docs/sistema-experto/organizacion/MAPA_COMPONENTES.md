@@ -1,7 +1,7 @@
 ---
 title: "Mapa único de componentes del sistema experto"
 status: CURRENT
-version: "1.3"
+version: "1.4"
 last_reviewed: 2026-11-04
 owner: ApoyoDecision
 source_of_truth: false
@@ -17,7 +17,7 @@ La [estructura adoptada según el diagrama de la propietaria](ESTRUCTURA_POR_COM
 
 ## Para leer el código sin recorrer tantas carpetas
 
-Abrir primero [motor-experto/README.md](../../../motor-experto/README.md). El recorrido principal se simplificó el 04/11: 62 archivos distribuidos antes en 12 ubicaciones pasan a **seis carpetas planas**, bajo `motor-experto/src/motor_experto/`:
+Abrir primero [motor-experto/README.md](../../../motor-experto/README.md). El recorrido principal se simplificó el 04/11: 62 archivos distribuidos antes en 12 ubicaciones pasan a **seis carpetas planas**, directamente bajo `motor-experto/`. Después se eliminaron las carpetas intermedias `src/motor_experto/` para los 105 archivos productivos. Los namespaces no cambian en este segundo traslado; Composer apunta a la raíz del motor y excluye sus fixtures:
 
 | Carpeta | Archivos principales |
 |---|---|
@@ -32,7 +32,7 @@ Los tres archivos `Reglas*` concentran la entrada legible a las 24 definiciones 
 
 Los tipos históricos en `dominio/orion/` y el contrato anterior de `aplicacion/puertos/` no son el punto de entrada al recorrido institucional y no se mezclan con las pruebas exclusivas de `tests/fixtures/`. Se conservaron sus identidades y los cambios locales previos.
 
-### Comprobación de esta reorganización
+### Comprobación del agrupamiento inicial
 
 - Misma batería antes/después: 566 casos, 10.282 aserciones, sin fallos; una omisión idéntica en ambos cortes corresponde a `ConservacionB02PostgresTest`, que requiere su perfil PostgreSQL específico. No se presenta como caso ejecutado en SQLite.
 - Integración SQLite: 53 pruebas y 255 aserciones correctas en captura inicial, gobierno de reglas y retirada del laboratorio.
@@ -43,18 +43,27 @@ Los tipos históricos en `dominio/orion/` y el contrato anterior de `aplicacion/
 
 No se modifica la BDD operativa ni se instala un perfil nuevo; la comprobación de catálogo confirma los mismos tres perfiles iniciales y 35 campos. No cambia el diseño visual, CSS o JavaScript del producto, por lo que no se repite el build; sí se ejercitan las vistas afectadas en el navegador. No se ejecuta la suite global ni se cierra el guardado conjunto pendiente. Evidencias locales: `output/orden-experto-20261104-*` y `output/orden-experto-patrones-20261104-*`, fuera del commit. Se actualizan enlaces existentes en lugar de crear otro entregable o una capa de alias.
 
+### Comprobación del traslado directo, sin `src`
+
+- Batería previa: 566 casos, 10.282 aserciones; posterior: 568 casos, 10.831 aserciones. Sin fallos y con la misma omisión del perfil específico `ConservacionB02PostgresTest`. Los dos casos añadidos prueban lectura del release con rutas anteriores y rechazo de fixtures dentro de un release con huellas consistentes.
+- Integración SQLite: 53 pruebas y 255 aserciones correctas. PostgreSQL desechable: 12 pruebas y 88 aserciones correctas del circuito inicial; clúster propio detenido y retirado.
+- Arquitectura focal: tres pruebas y 932 aserciones correctas para carpetas, namespaces, pureza del motor y carga Composer sin fixtures. La comprobación general de dependencia entre capas detecta un fallo previo en `Identidad/Aplicacion/Acciones/DocumentacionUsuarioService.php`, que importa una Policy de Presentación; ese import existe en HEAD y no se modifica aquí.
+- Composer válido y autoload regenerado; ambos ejecutores PHP independientes y matriz offline correctos. Los namespaces se conservan; el release enumera únicamente las ocho carpetas productivas y sigue leyendo los formatos históricos sin traducir sus rutas o huellas.
+
+No se modifica BDD, reglas, permisos, UI, CSS ni JavaScript del producto; build y nueva revisión visual no aplican a este traslado. Evidencias locales: `output/directo-experto-*`. Los cambios locales anteriores se conservan fuera del commit de este traslado.
+
 ## 1. Dónde buscar cada parte
 
 | Parte | Entrada principal | Qué contiene / límite |
 |---|---|---|
-| Datos y base de hechos | [Matriz D01–D27 vigente](../MATRIZ_TRAZABILIDAD_DCL.md), [lector de originales](../../../app/Modulos/ApoyoDecision/Aplicacion/Consultas/CapturasInstrumentalesResidente.php) y [ConstructorMemoriaInstrumental](../../../motor-experto/src/motor_experto/hechos/ConstructorMemoriaInstrumental.php) | Fuentes autorizadas del residente → evidencia de una ejecución. No confundir una respuesta original, una interpretación y un resultado inferido. |
+| Datos y base de hechos | [Matriz D01–D27 vigente](../MATRIZ_TRAZABILIDAD_DCL.md), [lector de originales](../../../app/Modulos/ApoyoDecision/Aplicacion/Consultas/CapturasInstrumentalesResidente.php) y [ConstructorMemoriaInstrumental](../../../motor-experto/hechos/ConstructorMemoriaInstrumental.php) | Fuentes autorizadas del residente → evidencia de una ejecución. No confundir una respuesta original, una interpretación y un resultado inferido. |
 | Instrumentos | [Candidatos](../instrumentos/CATALOGO_CANDIDATOS.md), [instalado](../inventarios/README.md) y [captura](../../../app/Modulos/Valoraciones/Aplicacion/Acciones/AplicarInstrumento.php) | Candidato investigado, catálogo instalado y prueba administrada son estados distintos. Este inventario no lee aplicaciones clínicas. |
-| Base de conocimiento | [CargadorConocimiento](../../../app/Modulos/ApoyoDecision/Infraestructura/Persistencia/Eloquent/CargadorConocimiento.php) y [PaqueteConocimiento](../../../motor-experto/src/motor_experto/conocimiento/PaqueteConocimiento.php) | Carga una versión concreta de conceptos, valores, fuentes, relaciones y reglas. |
+| Base de conocimiento | [CargadorConocimiento](../../../app/Modulos/ApoyoDecision/Infraestructura/Persistencia/Eloquent/CargadorConocimiento.php) y [PaqueteConocimiento](../../../motor-experto/conocimiento/PaqueteConocimiento.php) | Carga una versión concreta de conceptos, valores, fuentes, relaciones y reglas. |
 | Reglas: catálogo único | [GobiernoReglasPanel](../../../app/Modulos/ApoyoDecision/Presentacion/Livewire/Paginas/GobiernoReglasPanel.php) y [GestionarReglasExpertas](../../../app/Modulos/ApoyoDecision/Aplicacion/Acciones/GestionarReglasExpertas.php) | Consulta y gestión autorizada de reglas, condiciones, consecuencias, revisiones y versiones. La fuente institucional registrada es la BDD por versión. |
-| Red semántica | [red del paquete](../../../motor-experto/src/motor_experto/conocimiento/RedSemantica.php) y [PerfilConceptualCognitivo](../../../motor-experto/src/motor_experto/conocimiento/PerfilConceptualCognitivo.php) | Conceptos y relaciones con contratos explícitos. Pertenecer a un dominio o estar conectado no acredita alteración. |
-| Motor de inferencia institucional | [EvaluarPerfilInstitucional](../../../motor-experto/src/motor_experto/inferencia/EvaluarPerfilInstitucional.php), [EvaluarConocimientoCognitivo](../../../motor-experto/src/motor_experto/inferencia/EvaluarConocimientoCognitivo.php) y [EvaluarPetersenInstitucional](../../../motor-experto/src/motor_experto/inferencia/EvaluarPetersenInstitucional.php) | Evaluadores puros de los contratos adoptados. No consultan historias por su cuenta ni inventan mediciones. |
-| Resultado y explicación | [ConstructorTraza](../../../motor-experto/src/motor_experto/explicacion/ConstructorTraza.php), [TrazaFuentesInstrumentales](../../../motor-experto/src/motor_experto/explicacion/TrazaFuentesInstrumentales.php) y [ResultadosExpertoResidente](../../../app/Modulos/ApoyoDecision/Presentacion/Livewire/Paginas/ResultadosExpertoResidente.php) | Salida, motivos y evidencias; la explicación y el acceso clínico siguen sujetos al contrato y permisos. |
-| Conservación y revisión | [preparación conjunta](../../../app/Modulos/ApoyoDecision/Aplicacion/Consultas/PrepararEvaluacionInstitucional.php), [instantánea conjunta](../../../motor-experto/src/motor_experto/conservacion/InstantaneaEvaluacionInstitucional.php) y [RevisarValoracionExperta](../../../app/Modulos/ApoyoDecision/Aplicacion/Acciones/RevisarValoracionExperta.php) | El conjunto instrumental/Petersen sigue transitorio; no atribuirle revisiones ni replay institucional completo. Observaciones conservadas tienen otro alcance. |
+| Red semántica | [red del paquete](../../../motor-experto/conocimiento/RedSemantica.php) y [PerfilConceptualCognitivo](../../../motor-experto/conocimiento/PerfilConceptualCognitivo.php) | Conceptos y relaciones con contratos explícitos. Pertenecer a un dominio o estar conectado no acredita alteración. |
+| Motor de inferencia institucional | [EvaluarPerfilInstitucional](../../../motor-experto/inferencia/EvaluarPerfilInstitucional.php), [EvaluarConocimientoCognitivo](../../../motor-experto/inferencia/EvaluarConocimientoCognitivo.php) y [EvaluarPetersenInstitucional](../../../motor-experto/inferencia/EvaluarPetersenInstitucional.php) | Evaluadores puros de los contratos adoptados. No consultan historias por su cuenta ni inventan mediciones. |
+| Resultado y explicación | [ConstructorTraza](../../../motor-experto/explicacion/ConstructorTraza.php), [TrazaFuentesInstrumentales](../../../motor-experto/explicacion/TrazaFuentesInstrumentales.php) y [ResultadosExpertoResidente](../../../app/Modulos/ApoyoDecision/Presentacion/Livewire/Paginas/ResultadosExpertoResidente.php) | Salida, motivos y evidencias; la explicación y el acceso clínico siguen sujetos al contrato y permisos. |
+| Conservación y revisión | [preparación conjunta](../../../app/Modulos/ApoyoDecision/Aplicacion/Consultas/PrepararEvaluacionInstitucional.php), [instantánea conjunta](../../../motor-experto/conservacion/InstantaneaEvaluacionInstitucional.php) y [RevisarValoracionExperta](../../../app/Modulos/ApoyoDecision/Aplicacion/Acciones/RevisarValoracionExperta.php) | El conjunto instrumental/Petersen sigue transitorio; no atribuirle revisiones ni replay institucional completo. Observaciones conservadas tienen otro alcance. |
 | Consulta administrativa | [ConocimientoPanel](../../../app/Modulos/ApoyoDecision/Presentacion/Livewire/Paginas/ConocimientoPanel.php) | Consulta de versiones institucionales registradas; sin ejecución de casos, laboratorio ni conocimiento ficticio de respaldo. |
 
 ## 2. Cómo se conectan
@@ -88,7 +97,7 @@ La reproducción de un DTO verificado en memoria no prueba su guardado relaciona
 | Condiciones SI | [CondicionReglaExperta](../../../app/Models/CondicionReglaExperta.php), `condiciones_regla_experta`. |
 | Consecuencias ENTONCES | [ConsecuenciaReglaExperta](../../../app/Models/ConsecuenciaReglaExperta.php), `consecuencias_regla_experta`. |
 | Identidad y vigencia | [VersionModeloExperto](../../../app/Models/VersionModeloExperto.php). |
-| Definiciones iniciales de contratos adoptados | [ReglasCognitivas](../../../motor-experto/src/motor_experto/conocimiento/ReglasCognitivas.php), [ReglasPetersen](../../../motor-experto/src/motor_experto/conocimiento/ReglasPetersen.php) y [ReglasObservacionales](../../../motor-experto/src/motor_experto/conocimiento/ReglasObservacionales.php). No sustituyen las versiones históricas registradas. |
+| Definiciones iniciales de contratos adoptados | [ReglasCognitivas](../../../motor-experto/conocimiento/ReglasCognitivas.php), [ReglasPetersen](../../../motor-experto/conocimiento/ReglasPetersen.php) y [ReglasObservacionales](../../../motor-experto/conocimiento/ReglasObservacionales.php). No sustituyen las versiones históricas registradas. |
 | Registro inicial autorizado | [RegistrarConocimientoInstitucional](../../../app/Modulos/ApoyoDecision/Aplicacion/Acciones/RegistrarConocimientoInstitucional.php) y [RegistrarConocimientoPetersen](../../../app/Modulos/ApoyoDecision/Aplicacion/Acciones/RegistrarConocimientoPetersen.php). |
 | Carga y evaluación | El cargador reúne la versión y el motor interpreta sus condiciones. No copiar el conocimiento a Blade/Livewire. |
 

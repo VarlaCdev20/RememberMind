@@ -58,8 +58,8 @@ Cada disciplina mantiene su cadena: profesional y cuenta reales, fecha, decisió
 
 Ubicaciones canónicas actuales:
 
-- `motor-experto/src/motor_experto/dominio/orion`: 43 clases puras originales, sin cambios en su comportamiento.
-- `motor-experto/src/motor_experto/conservacion/CodecInstantanea.php`: codec puro de escalares, fechas y huellas.
+- `motor-experto/dominio/orion`: 43 clases puras originales, sin cambios en su comportamiento.
+- `motor-experto/conservacion/CodecInstantanea.php`: codec puro de escalares, fechas y huellas.
 - `app/Modulos/ApoyoDecision/Aplicacion/CasosDeUso` y `DTOs`: seis casos de uso y cinco DTOs trasladados.
 - `app/Modulos/ApoyoDecision/Infraestructura`: adaptadores, configuración, mapeadores, repositorios y conservación Laravel.
 - `app/SistemaExperto`: antecedentes documentales, sin PHP ejecutable ni alias de clases.

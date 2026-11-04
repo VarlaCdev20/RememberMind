@@ -7,7 +7,7 @@ require_once __DIR__.'/bootstrap.php';
 spl_autoload_register(static function (string $clase): void {
     $prefix = 'MotorExperto\\';
     if (str_starts_with($clase, $prefix)) {
-        require dirname(__DIR__).'/src/motor_experto/'.
+        require dirname(__DIR__).'/'.
             str_replace('\\', '/', substr($clase, strlen($prefix))).'.php';
     }
 });

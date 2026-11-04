@@ -6,7 +6,7 @@ use MotorExperto\conservacion\ReleaseMotorInstrumental;
 // Solo código y composer.lock. No inicia Laravel, SQL ni usa .env.
 spl_autoload_register(static function (string $clase): void {
     if (str_starts_with($clase, 'MotorExperto\\')) {
-        require dirname(__DIR__).'/motor-experto/src/motor_experto/'.str_replace('\\', '/', substr($clase, strlen('MotorExperto\\'))).'.php';
+        require dirname(__DIR__).'/motor-experto/'.str_replace('\\', '/', substr($clase, strlen('MotorExperto\\'))).'.php';
     }
 });
 

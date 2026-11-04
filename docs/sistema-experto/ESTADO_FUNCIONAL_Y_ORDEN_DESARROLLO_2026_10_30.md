@@ -58,9 +58,9 @@ Decisión posterior del mismo día: la propietaria mantiene relaciones y permiso
 
 Inventario local: `output/estado-experto-20261029.json`, transacción de solo lectura, sin consultar historias. Revisión independiente de código: distingue correctamente reglas institucionales, simulación excluida, fallback de contratos y conservación pendiente.
 
-- Motor institucional: `motor-experto/src/motor_experto/inferencia/EvaluarPerfilInstitucional.php`.
-- Evaluador de reglas: `motor-experto/src/motor_experto/inferencia/EvaluadorReglas.php`.
-- Petersen: `motor-experto/src/motor_experto/inferencia/EvaluarPetersenInstitucional.php` y `PaquetePetersenInstitucional`.
+- Motor institucional: `motor-experto/inferencia/EvaluarPerfilInstitucional.php`.
+- Evaluador de reglas: `motor-experto/inferencia/EvaluadorReglas.php`.
+- Petersen: `motor-experto/inferencia/EvaluarPetersenInstitucional.php` y `PaquetePetersenInstitucional`.
 - Contratos incorporados: `app/Modulos/ApoyoDecision/Aplicacion/Servicios/ContratosConocimiento.php`.
 - Vínculos pendientes: `ConsultarConocimientoCognitivo` y `CapturasInstrumentalesResidente` en ApoyoDecision.
 - Persistencia conjunta pendiente: `InstantaneaEvaluacionInstitucional`.

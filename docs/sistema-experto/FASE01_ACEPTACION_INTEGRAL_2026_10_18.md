@@ -22,7 +22,7 @@ Estado final: **A–M implementados y verificados en ese alcance compatible**. R
 | L | Esta matriz y los 24 grupos siguientes | Archivo + método/clase + reporte de ejecución | Cada pendiente tiene ámbito, sin presentar cobertura clínica inexistente |
 | M | RFC de conservación y decisiones reservadas | Sección de restricciones del manual y RFC | Sin cambios de tablas, columnas, catálogos o permisos en este incremento |
 
-Las rutas de pruebas anteriores son relativas a `tests/Feature/` o `tests/Unit/`; los programas independientes están en `motor-experto/tests/`. Las clases del motor están bajo `motor-experto/src/motor_experto/`, las Actions/CLI/adaptadores bajo `app/Modulos/ApoyoDecision/`.
+Las rutas de pruebas anteriores son relativas a `tests/Feature/` o `tests/Unit/`; los programas independientes están en `motor-experto/tests/`. Las clases del motor están bajo `motor-experto/`, las Actions/CLI/adaptadores bajo `app/Modulos/ApoyoDecision/`.
 
 ## Los 24 grupos de prueba del §16
 

@@ -37,8 +37,11 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
-            "MotorExperto\\": "motor-experto/src/motor_experto/"
-        }
+            "MotorExperto\\": "motor-experto/"
+        },
+        "exclude-from-classmap": [
+            "motor-experto/tests/"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

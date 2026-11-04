@@ -24,7 +24,7 @@ No se han creado mediciones ni valoraciones originales para los residentes.
 
 | Responsabilidad | Archivo o directorio |
 |---|---|
-| Contrato puro, originales y clasificación | `motor-experto/src/motor_experto/dominio/petersen/` |
+| Contrato puro, originales y clasificación | `motor-experto/dominio/petersen/` |
 | Registro atómico, autoría propia y reintento | `app/Modulos/ApoyoDecision/Aplicacion/Acciones/RegistrarValoracionPetersenOriginal.php` |
 | Fuentes cerradas por elemento y tipo | `app/Modulos/ApoyoDecision/Aplicacion/Servicios/ContratoFuentesPetersen.php` |
 | Integridad del documento original privado | `app/Modulos/ApoyoDecision/Aplicacion/Servicios/VerificarOriginalDocumentalPetersen.php` |

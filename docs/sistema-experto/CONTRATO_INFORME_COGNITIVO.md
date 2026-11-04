@@ -28,7 +28,7 @@ G09 está fuera de este checkout: se inspeccionaron, sin modificar ni importar,
 `C:/Users/CARLAENCINAS/.codex/worktrees/pr15-ci-utf8/RememberMind/`:
 
 - `docs/sistema-experto/G09_EXPERIMENTAL_GUIA_EJECUCION.md`.
-- `motor-experto/src/motor_experto/investigacion/g09/EvaluadorG09Experimental.php`.
+- `motor-experto/investigacion/g09/EvaluadorG09Experimental.php`.
 - `ConstructorInformeG09Experimental.php` y `CatalogoReglasG09Experimental.php`
   en la misma carpeta.
 

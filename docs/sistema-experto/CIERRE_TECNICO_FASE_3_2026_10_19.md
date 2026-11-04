@@ -270,11 +270,11 @@ inventadas. Las diferencias de una aserción entre motores se conservan.
 
 ## 8. Archivos propios de este cierre
 
-- `motor-experto/src/motor_experto/instrumentos/NormalizadorReferenciaBarcelona2011.php` (nuevo).
-- `motor-experto/src/motor_experto/instrumentos/NormalizadorReferenciaCancelacionScand2023.php` (nuevo).
-- `motor-experto/src/motor_experto/instrumentos/RegistroMetodosInstrumentales.php`.
-- `motor-experto/src/motor_experto/instrumentos/CatalogoCapturaCognitiva.php`.
-- `motor-experto/src/motor_experto/instrumentos/ExplicacionMatematicaInstrumental.php`.
+- `motor-experto/instrumentos/NormalizadorReferenciaBarcelona2011.php` (nuevo).
+- `motor-experto/instrumentos/NormalizadorReferenciaCancelacionScand2023.php` (nuevo).
+- `motor-experto/instrumentos/RegistroMetodosInstrumentales.php`.
+- `motor-experto/instrumentos/CatalogoCapturaCognitiva.php`.
+- `motor-experto/instrumentos/ExplicacionMatematicaInstrumental.php`.
 - `tests/Unit/CierreComponentesFaseTresTest.php` (nuevo).
 - `tests/Unit/NormalizacionReferenciasEspanaTest.php`.
 - `tests/Unit/NormalizacionReferenciasGeriatricasAdicionalesTest.php`.

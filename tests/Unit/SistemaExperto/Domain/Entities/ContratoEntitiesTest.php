@@ -57,7 +57,7 @@ final class ContratoEntitiesTest extends TestCase
      */
     public function test_catorce_clases_final_readonly_con_documentacion_completa(): void
     {
-        $root = realpath(dirname(__DIR__, 5).'/motor-experto/src/motor_experto/dominio/orion/Entities');
+        $root = realpath(dirname(__DIR__, 5).'/motor-experto/dominio/orion/Entities');
         $clases = [ReglaExperta::class, NodoSemantico::class, RelacionSemantica::class, RedSemantica::class,
             HechoExperto::class, EvidenciaCognitiva::class, MemoriaTrabajo::class,
             ResultadoSubcomponente::class, ResultadoDominio::class, VectorCognitivo::class,

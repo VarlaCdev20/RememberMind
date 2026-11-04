@@ -132,11 +132,12 @@ final class GestionarEjecucionesExperimentales
 
     private function huellaMotor(): string
     {
-        $raiz = base_path('motor-experto/src');
+        $raiz = base_path('motor-experto');
         $hashes = [];
         $iterador = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($raiz, \FilesystemIterator::SKIP_DOTS));
         foreach ($iterador as $archivo) {
-            if ($archivo->isFile() && $archivo->getExtension() === 'php') {
+            if ($archivo->isFile() && $archivo->getExtension() === 'php'
+                && ! str_starts_with(str_replace('\\', '/', substr($archivo->getPathname(), strlen($raiz) + 1)), 'tests/')) {
                 $hash = hash_file('sha256', $archivo->getPathname());
                 if ($hash === false) {
                     throw new \RuntimeException('No se pudo verificar una fuente del motor.');

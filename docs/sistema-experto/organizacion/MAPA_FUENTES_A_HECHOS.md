@@ -46,13 +46,13 @@ El mapa contiene **10 destinos**: cinco áreas y C01–C05. Nueve admiten valora
 
 ### Mediciones instrumentales
 
-[CapturasInstrumentalesResidente](../../../app/Modulos/ApoyoDecision/Aplicacion/Consultas/CapturasInstrumentalesResidente.php) reúne originales del mismo residente y fecha de corte. [ExtractorCapturaInstrumental](../../../motor-experto/src/motor_experto/instrumentos/ExtractorCapturaInstrumental.php) aplica únicamente un perfil explícito con identidad, versión y selectores. La disponibilidad de una normalización no adopta automáticamente una batería ni genera un juicio profesional.
+[CapturasInstrumentalesResidente](../../../app/Modulos/ApoyoDecision/Aplicacion/Consultas/CapturasInstrumentalesResidente.php) reúne originales del mismo residente y fecha de corte. [ExtractorCapturaInstrumental](../../../motor-experto/instrumentos/ExtractorCapturaInstrumental.php) aplica únicamente un perfil explícito con identidad, versión y selectores. La disponibilidad de una normalización no adopta automáticamente una batería ni genera un juicio profesional.
 
-[ConstructorMemoriaInstrumental](../../../motor-experto/src/motor_experto/hechos/ConstructorMemoriaInstrumental.php) exige el mismo residente y versión de conocimiento, mapeos y selectores explícitos, pregunta y aplicación coherentes, tipos originales compatibles y soporte acreditado. Un valor numérico o su resultado normalizado no se transforma en un literal clínico mediante un umbral inventado.
+[ConstructorMemoriaInstrumental](../../../motor-experto/hechos/ConstructorMemoriaInstrumental.php) exige el mismo residente y versión de conocimiento, mapeos y selectores explícitos, pregunta y aplicación coherentes, tipos originales compatibles y soporte acreditado. Un valor numérico o su resultado normalizado no se transforma en un literal clínico mediante un umbral inventado.
 
 ### Soportes y juicios originales
 
-[ConsultarPetersenInstitucional](../../../app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarPetersenInstitucional.php) adquiere los juicios y sus soportes autorizados, con estado, corte, autoría y correcciones aplicables. [FuentePetersenInstitucional](../../../motor-experto/src/motor_experto/hechos/FuentePetersenInstitucional.php) representa su procedencia; [ValoracionOriginalPetersen](../../../motor-experto/src/motor_experto/hechos/ValoracionOriginalPetersen.php) comprueba los soportes y el alcance del juicio. El motor evalúa ese conjunto, no los códigos de una tabla por sí solos.
+[ConsultarPetersenInstitucional](../../../app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarPetersenInstitucional.php) adquiere los juicios y sus soportes autorizados, con estado, corte, autoría y correcciones aplicables. [FuentePetersenInstitucional](../../../motor-experto/hechos/FuentePetersenInstitucional.php) representa su procedencia; [ValoracionOriginalPetersen](../../../motor-experto/hechos/ValoracionOriginalPetersen.php) comprueba los soportes y el alcance del juicio. El motor evalúa ese conjunto, no los códigos de una tabla por sí solos.
 
 ## 4. Procedencia que acompaña al hecho
 

@@ -1,6 +1,6 @@
 {
     "name": "remembermind/motor-experto",
-    "description": "Piloto tecnico COG-MEM independiente de Laravel; sin activacion clinica",
+    "description": "Motor experto cognitivo independiente de Laravel",
     "type": "library",
     "license": "proprietary",
     "require": {
@@ -8,7 +8,10 @@
     },
     "autoload": {
         "psr-4": {
-            "MotorExperto\\": "src/motor_experto/"
-        }
+            "MotorExperto\\": "./"
+        },
+        "exclude-from-classmap": [
+            "/tests/"
+        ]
     }
 }

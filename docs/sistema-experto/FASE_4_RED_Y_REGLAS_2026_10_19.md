@@ -37,12 +37,12 @@ Esta entrega integra el conocimiento existente. No define nuevos umbrales, pesos
 
 | Responsabilidad | Implementación |
 |---|---|
-| Pertenencia estructural, sin transitividad inferida | `motor-experto/src/motor_experto/conocimiento/PertenenciaVariableCognitiva.php` |
-| Compilación de dominios, componentes y rutas de reglas | `motor-experto/src/motor_experto/conocimiento/CompiladorPerfilCognitivo.php` |
-| Alcance de la conjunción por aplicación/componente | `motor-experto/src/motor_experto/inferencia/EvaluadorReglasCognitivas.php` |
-| Integración explícita de las familias de conocimiento | `motor-experto/src/motor_experto/investigacion/dcl/PaqueteCincoDominiosExperimental.php` |
-| Entrada integral y reproducción | `motor-experto/src/motor_experto/aplicacion/casos_uso/EjecutarPerfilExperimental.php` |
-| Entrada declarativa desde fuentes originales, sin generadores | `motor-experto/src/motor_experto/inferencia/EvaluarConocimientoCognitivo.php` |
+| Pertenencia estructural, sin transitividad inferida | `motor-experto/conocimiento/PertenenciaVariableCognitiva.php` |
+| Compilación de dominios, componentes y rutas de reglas | `motor-experto/conocimiento/CompiladorPerfilCognitivo.php` |
+| Alcance de la conjunción por aplicación/componente | `motor-experto/inferencia/EvaluadorReglasCognitivas.php` |
+| Integración explícita de las familias de conocimiento | `motor-experto/investigacion/dcl/PaqueteCincoDominiosExperimental.php` |
+| Entrada integral y reproducción | `motor-experto/aplicacion/casos_uso/EjecutarPerfilExperimental.php` |
+| Entrada declarativa desde fuentes originales, sin generadores | `motor-experto/inferencia/EvaluarConocimientoCognitivo.php` |
 | Gobierno, autoría, revisión, sucesión y archivo | `app/Modulos/ApoyoDecision/Aplicacion/Acciones/GestionarReglasExpertas.php` |
 
 Los hechos conservan su fuente y sus mapeos. La red verifica la participación de la variable en el criterio; la pertenencia de un componente por sí sola no activa una regla. El evaluador D-130 conserva su contrato general de AND positivo. El evaluador cognitivo añade el alcance por aplicación, tanto en el ejecutor declarativo G09 como en su verificador y en Memoria.

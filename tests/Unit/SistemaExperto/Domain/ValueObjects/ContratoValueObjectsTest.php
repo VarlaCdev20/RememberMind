@@ -116,7 +116,7 @@ final class ContratoValueObjectsTest extends TestCase
      */
     public function test_estructura_y_documentacion_completas(): void
     {
-        $root = dirname(__DIR__, 5).'/motor-experto/src/motor_experto/dominio/orion/ValueObjects';
+        $root = dirname(__DIR__, 5).'/motor-experto/dominio/orion/ValueObjects';
         $actual = [];
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root)) as $file) {
             if ($file->isFile() && $file->getExtension() === 'php') {
@@ -168,7 +168,7 @@ final class ContratoValueObjectsTest extends TestCase
      */
     public function test_domain_no_depende_de_laravel(): void
     {
-        $root = dirname(__DIR__, 5).'/motor-experto/src/motor_experto/dominio/orion';
+        $root = dirname(__DIR__, 5).'/motor-experto/dominio/orion';
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root)) as $file) {
             if (! $file->isFile() || $file->getExtension() !== 'php') {
                 continue;

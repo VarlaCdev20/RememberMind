@@ -351,7 +351,7 @@ final class InstantaneaEvaluacionInstitucionalTest extends TestCase
                 spl_autoload_register(static function (string $clase) use ($raiz): void {
                     $prefijo = 'MotorExperto\\';
                     if (str_starts_with($clase, $prefijo)) {
-                        require $raiz.'/motor-experto/src/motor_experto/'.str_replace('\\', '/', substr($clase, strlen($prefijo))).'.php';
+                        require $raiz.'/motor-experto/'.str_replace('\\', '/', substr($clase, strlen($prefijo))).'.php';
                     }
                 });
                 $entrada = unserialize(stream_get_contents(STDIN), ['allowed_classes' => false]);
@@ -378,7 +378,7 @@ final class InstantaneaEvaluacionInstitucionalTest extends TestCase
             // Un ZIP internamente válido con otro conjunto src sirve para verificar su historia,
             // pero no se acepta como el ejecutor de esta preparación.
             self::assertTrue($zip->open($archivo));
-            $nombre = 'motor-experto/src/motor_experto/conservacion/InstantaneaPetersen.php';
+            $nombre = 'motor-experto/conservacion/InstantaneaPetersen.php';
             $bytes = $zip->getFromName($nombre)."\n/* Variante sintética de release */\n";
             self::assertTrue($zip->addFromString($nombre, $bytes));
             $m['archivos'][$nombre] = hash('sha256', $bytes);
