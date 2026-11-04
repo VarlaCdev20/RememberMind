@@ -8,9 +8,9 @@ use App\Compartido\Aplicacion\Contratos\DocumentosUsuario;
 use App\Models\Documento;
 use App\Models\User;
 use App\Modulos\Identidad\Aplicacion\Consultas\CapacidadDocumentalPersonal;
-use App\Modulos\Identidad\Presentacion\Policies\DocumentoLaboralPolicy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -208,7 +208,7 @@ class DocumentacionUsuarioService
     {
         if ($titular->personal) {
             $contexto = new Documento(['cod_usuario' => $titular->getKey()]);
-            abort_unless(app(DocumentoLaboralPolicy::class)->view($actor, $contexto), 403);
+            abort_unless(Gate::forUser($actor)->allows('consultar-documento-laboral', [$contexto]), 403);
         }
     }
 
@@ -218,7 +218,7 @@ class DocumentacionUsuarioService
         abort_unless($actor?->estado === 'ACTIVO', 403);
         if (($actor?->hasRole('GERENTE') && ! $actor->hasRole('SUPERADMINISTRADOR'))
             || ($documento->cod_usuario && $documento->usuario?->personal)) {
-            abort_unless(app(DocumentoLaboralPolicy::class)->review($actor, $documento->fresh()), 403);
+            abort_unless(Gate::forUser($actor)->allows('revisar-documento-laboral', [$documento->fresh()]), 403);
 
             return $actor;
         }

@@ -21,6 +21,7 @@ related_modules: []
 - Livewire4.4.8/Symfony Mime7.4.22 y los parches compatibles de Puppeteer/Vite/follow-redirects corrigen los avisos detectados por Composer y npm; no se modifica el remitente protegido ni se envían mensajes.
 - CI inspecciona la ruta actual del motor y exige descubrir pruebas del circuito vigente; no invoca el verificador retirado del laboratorio.
 - Inventarios del corte limpio:111 archivos Eloquent,591 plantillas y323 rutas. Los artefactos locales ausentes se distinguen de los archivos publicados; los informes conservan su fecha y alcance.
+- Se retira una dependencia directa de Aplicación hacia DocumentoLaboralPolicy mediante dos abilities que delegan a la misma Policy. Sin permisos nuevos; se comprueban titulares, Gerencia, permisos aislados en roles ajenos y cuenta inactivada.
 - La integración sigue sujeta a CI y a la aprobación independiente exigida por la protección de develop. No se desactivan esos controles.
 
 

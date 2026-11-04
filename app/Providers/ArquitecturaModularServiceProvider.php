@@ -27,6 +27,7 @@ use App\Models\Prescripcion;
 use App\Models\Residente;
 use App\Models\ValoracionEnfermeriaPreadmision;
 use App\Models\VersionModeloExperto;
+use App\Modulos\Identidad\Presentacion\Policies\DocumentoLaboralPolicy;
 use App\Modulos\Admisiones\Presentacion\Livewire\Funcionalidades\DecisionAdmisionModal;
 use App\Modulos\Admisiones\Presentacion\Livewire\Paginas\AlojamientoResidente;
 use App\Modulos\Admisiones\Presentacion\Livewire\Paginas\PreadmisionesPanel;
@@ -189,6 +190,8 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
         Gate::policy(Habitacion::class, HabitacionPolicy::class);
         Gate::policy(Prescripcion::class, PrescripcionPolicy::class);
         Gate::policy(Residente::class, ResidentePolicy::class);
+        Gate::define('consultar-documento-laboral', [DocumentoLaboralPolicy::class, 'view']);
+        Gate::define('revisar-documento-laboral', [DocumentoLaboralPolicy::class, 'review']);
         Gate::define('consultar-evidencia-herida', [DocumentoHeridaPolicy::class, 'consultar']);
         Gate::define('consultar-contexto-evidencia-herida', [DocumentoHeridaPolicy::class, 'consultarHerida']);
         Gate::define('adjuntar-evidencia-herida', [DocumentoHeridaPolicy::class, 'adjuntar']);
