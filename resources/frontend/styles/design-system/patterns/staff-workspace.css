@@ -189,12 +189,17 @@ html .rm-shell[class] [data-rm-main] .rm-staff-workspace .rm-collection-header.r
 .rm-staff-directory__menu-content > button { justify-content: start; width: 100%; white-space: normal; text-align: start; box-shadow: none; }
 .rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table { width: 100%; min-width: 0; table-layout: fixed; }
 .rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table tbody tr { height: auto; min-height: 0; max-height: none; }
-.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td) { white-space: normal; overflow-wrap: anywhere; vertical-align: middle; padding: var(--rm-space-2) var(--rm-space-3); }
-.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td):first-child { width: 33%; }
-.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td):nth-child(2) { width: 16%; }
+.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td) { white-space: normal; overflow-wrap: anywhere; vertical-align: middle; padding: var(--rm-space-2); }
+.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td):first-child { width: 35%; }
+.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td):nth-child(2) { width: 14%; }
 .rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td):nth-child(3),
-.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td):nth-child(4) { width: 13%; }
-.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td):last-child { width: 25%; }
+.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td):nth-child(4) { width: 12%; }
+.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td):last-child { width: 27%; }
+@container management-workspace (min-width: 850px) {
+    .rm-staff-directory__table .rm-staff-directory__actions { justify-content: flex-start; }
+}
+.rm-staff-directory .rm-pagination { min-height: 44px; gap: var(--rm-space-2); margin-top: var(--rm-space-2); padding: 0; border: 0; border-top: 1px solid var(--rm-border-soft); border-radius: 0; background: transparent; box-shadow: none; }
+.rm-staff-directory .rm-pagination__pages { margin-inline-start: auto; }
 .rm-staff-directory__table-wrap { min-width: 0; }
 @container management-workspace (max-width: 1099px) {
     .rm-staff-directory__cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }

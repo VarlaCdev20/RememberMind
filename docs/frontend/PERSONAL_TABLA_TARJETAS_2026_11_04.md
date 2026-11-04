@@ -51,4 +51,10 @@ Verificación limitada a la presentación y regresiones indicadas. No se reejecu
 ## Ajuste posterior de densidad y botones
 
 A petición de la propietaria se reducen padding y separaciones de cabecera, filtros, tarjetas y filas; avatar de56 px en tarjetas y títulos con la escala de sección. Las acciones se agrupan al final de la fila; en tarjetas Ver ficha ocupa el espacio junto a Acciones, eliminando la separación amplia. Se conservan controles de44 px, estados y permisos. Verificación posterior: build correcto y E2E focal PASS (10 combinaciones en cinco anchos, filtros, menús/Escape/foco y oscuro390), sin superposiciones ni desbordamientos; cero errores JS/HTTP. Capturas sintéticas actualizadas en el mismo directorio de evidencia.
+## Ajuste de columnas y paginación solicitado mediante anotaciones
 
+Se reduce el relleno horizontal de celdas y se redistribuyen los anchos de las cinco columnas. En escritorio, las acciones comienzan junto a su encabezado; en móvil conservan su alineación para mantener los menús dentro de pantalla. La paginación usa una franja integrada, sin recuadro ni relleno exterior y con controles de44 px.
+
+Se retira exclusivamente de esta vista el selector de tamaño sin conexión funcional: el backend pagina en12 registros y no expone la propiedad porPagina. Se conservan el rango, el total y los botones del paginador compartido. No cambia el tamaño de página, los permisos ni la persistencia.
+
+Verificación final del ajuste: build correcto y E2E focal PASS (35 s), tabla/tarjetas en1440/1280/1024/768/390 px, filtros, menús, Escape/foco y oscuro390. Sin desbordamientos, superposición de filas, controles pequeños ni errores JS/HTTP. Capturas sintéticas actualizadas; no se reejecutó la CI completa.
