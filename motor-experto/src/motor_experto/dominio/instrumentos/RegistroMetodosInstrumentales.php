@@ -26,13 +26,17 @@ final class RegistroMetodosInstrumentales
                 NormalizadorReferenciaBarcelona2011::METODO => (new NormalizadorReferenciaBarcelona2011)->metadatos()]
             + [CalculadorReconocimientoHvlt::METODO => (new CalculadorReconocimientoHvlt)->metadatos(),
                 CalculadorLenguajeWabCastellano2000::METODO => (new CalculadorLenguajeWabCastellano2000)->metadatos(),
-                CalculadorRecuerdoConClavesFcsrt::METODO => (new CalculadorRecuerdoConClavesFcsrt)->metadatos()];
+                CalculadorRecuerdoConClavesFcsrt::METODO => (new CalculadorRecuerdoConClavesFcsrt)->metadatos()]
+            + (new CircuitoInstrumentalInicial)->metodos();
     }
 
     public function ejecutar(string $metodo, array $captura): array
     {
         if (! isset($this->metodos()[$metodo])) {
             throw new DomainException('No existe un método instrumental registrado con esa identidad.');
+        }
+        if (isset((new CircuitoInstrumentalInicial)->metodos()[$metodo])) {
+            return (new CircuitoInstrumentalInicial)->calcular($metodo, $captura);
         }
 
         // Las referencias nuevas conservan identidad y contexto; no reemplazan los métodos previos.

@@ -11,6 +11,8 @@ runtime_verified: true
 
 # Resultado y alcance
 
+**Actualización posterior del04/11:** se [activaron los tres perfiles iniciales de captura y puntuación](ENTREGA_ACTIVACION_PERFILES_INICIALES_2026_11_04.md). Las menciones de este corte a perfiles iniciales pendientes quedan sustituidas en ese alcance. La conservación conjunta instrumental/Petersen sigue separada y pendiente; no se habilitó clasificación de dominios desde los totales de cribado.
+
 Se cierra la corrección técnica de la prueba de reglas, se detalla el catálogo real y se retiran ocho componentes exclusivamente experimentales que seguían dentro de `app/`. No se modifican las definiciones médicas, condiciones, consecuencias, umbrales o criterios institucionales. Tampoco se crean tablas, relaciones o permisos: se mantiene la decisión de la propietaria de conservarlos.
 
 **Actualización posterior del mismo día:** se corrigen también la adquisición ordinaria de fuentes y la consulta de Enfermería; alcance y evidencia en la sección9. Este documento reúne ambos cambios para conservar un solo entregable de cierre técnico.

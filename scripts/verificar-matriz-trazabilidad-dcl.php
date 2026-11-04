@@ -38,8 +38,8 @@ function anexoTrazabilidad(string $raiz): string
     foreach ($red['dominios'] as $dominio) {
         $componentes += $dominio['componentes'];
     }
-    if (count($componentes) !== 19 || count($reglas) !== 15 || count($metodos) !== 23) {
-        throw new DomainException('Cambió el alcance 19 componentes/15 reglas específicas/23 métodos: revisar la matriz y su decisión de alcance.');
+    if (count($componentes) !== 19 || count($reglas) !== 15 || count($metodos) !== 26) {
+        throw new DomainException('Cambió el alcance 19 componentes/15 reglas específicas/26 métodos: revisar la matriz y su decisión de alcance.');
     }
     foreach ($metodos as $metodo) {
         if (array_diff($metodo['componentes'], array_keys($componentes)) !== []) {
@@ -110,7 +110,7 @@ function anexoTrazabilidad(string $raiz): string
     foreach (['perfiles_instrumentales', 'perfiles_interpretativos', 'contratos_conocimiento', 'lectura_clinica'] as $clave) {
         $s .= filaMatriz(['`'.$clave.'`', (string) count($config[$clave])]);
     }
-    $s .= "\nLos contratos institucionales incorporados pueden resolverse desde la versión vigente aunque estas listas estén vacías. Una lista vacía no significa ausencia de motor; tampoco crea conexiones instrumentales.\n";
+    $s .= "\nLos contratos institucionales incorporados pueden resolverse desde la versión vigente aunque estas listas estén vacías. Los tres perfiles iniciales se resuelven mediante PerfilesInstrumentalesIniciales desde el catálogo exacto instalado; no se fija una PK en configuración. Su estado efectivo requiere consultar el inventario de catálogo. Los otros23 métodos conservan sus bindings explícitos.\n";
 
     return rtrim($s);
 }
@@ -164,7 +164,7 @@ try {
     } elseif (str_replace("\r\n", "\n", $texto) !== str_replace("\r\n", "\n", $esperado)) {
         throw new DomainException('El anexo difiere del código. Revisar los cambios y regenerarlo con --actualizar.');
     }
-    echo "PASS: 27 datos; 19 componentes; 23 métodos; 15 reglas específicas + 4 Petersen + 3 observacionales; 2 agregadas documentadas manualmente; soportes y enlaces locales. Sin BDD ni inferencia.\n";
+    echo "PASS: 27 datos; 19 componentes; 26 métodos (23 por componentes y3 iniciales descriptivos); 15 reglas específicas + 4 Petersen + 3 observacionales; 2 agregadas documentadas manualmente; soportes y enlaces locales. Sin BDD ni inferencia.\n";
 } catch (InvalidArgumentException|DomainException|RuntimeException|JsonException $e) {
     fwrite(STDERR, 'FAIL: '.$e->getMessage()."\n");
     exit(1);

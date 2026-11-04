@@ -1,8 +1,8 @@
 ---
 title: "Matriz única: dato, instrumento, regla y resultado de DCL"
 status: CURRENT
-version: "1.0"
-last_reviewed: 2026-10-31
+version: "1.1"
+last_reviewed: 2026-11-04
 owner: ApoyoDecision
 source_of_truth: false
 verification_scope: SOURCE_RECONCILIATION_OFFLINE_METADATA_AND_PRIMARY_MEDICAL_REFERENCES
@@ -11,6 +11,8 @@ supersedes: [MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md]
 ---
 
 # Matriz única de trazabilidad del sistema experto
+
+**Actualización del04/11:** [MoCA8.1, RUDAS-PE2020 y FAQ B7S activados para captura/puntuación](ENTREGA_ACTIVACION_PERFILES_INICIALES_2026_11_04.md). El anexo contiene26 métodos:23 previos por componentes y3 iniciales descriptivos con componentes vacíos. La configuración estática vacía no cuenta estos vínculos resueltos desde el catálogo exacto instalado. Las brechas sobre interpretación de dominios y conservación conjunta permanecen; el cuerpo del31/10 conserva su corte salvo esta actualización y el anexo regenerado.
 
 ## 1. Resultado y autoridad
 
@@ -199,6 +201,9 @@ Los identificadores siguientes son claves del método, no columnas nuevas ni pre
 | `HVLT-R-F5-RECONOCIMIENTO-BRUTO-1` | `aciertos_reconocimiento:ENTERO`<br>`falsas_alarmas_relacionadas:ENTERO`<br>`falsas_alarmas_no_relacionadas:ENTERO`<br>`demora_minutos:NUMERO`<br>`administracion_estandarizada:LOGICO` | [Fuente declarada](https://fitbir.nih.gov/dictionary/publicData/dataElementAction!view.action?dataElementName=HVLTRRecogDiscrimIndexRawScore&publicArea=true&style.key=fitbir-style) |
 | `WAB-ES-2000-ORAL-BRUTO-1` | `repeticion_total:ENTERO`<br>`contenido_informacion:ENTERO`<br>`fluidez:ENTERO`<br>`audicion_compatible:LOGICO`<br>`muestra_discurso_documentada:LOGICO`<br>`administracion_estandarizada:LOGICO` | [Fuente declarada](https://talkbank.org/aphasia/protocol/languages/Spanish/WAB.pdf) |
 | `FCSRT-PALABRAS-NEURONORMA-BRUTO-1` | `libre_1:ENTERO`<br>`adicional_claves_1:ENTERO`<br>`libre_2:ENTERO`<br>`adicional_claves_2:ENTERO`<br>`libre_3:ENTERO`<br>`adicional_claves_3:ENTERO`<br>`libre_diferido:ENTERO`<br>`adicional_claves_diferido:ENTERO`<br>`demora_minutos:NUMERO`<br>`codificacion_verificada:LOGICO`<br>`administracion_estandarizada:LOGICO` | [Fuente declarada](https://doi.org/10.3390/ijerph182412977) |
+| `MOCA81-ES-PUNTUACION-1` | `alternancia:ENTERO`<br>`copia:ENTERO`<br>`reloj:ENTERO`<br>`identificacion:ENTERO`<br>`aprendizaje_1:ENTERO`<br>`aprendizaje_2:ENTERO`<br>`digitos:ENTERO`<br>`vigilancia:ENTERO`<br>`calculo:ENTERO`<br>`repeticion:ENTERO`<br>`fluidez:ENTERO`<br>`abstraccion:ENTERO`<br>`recuerdo_libre:ENTERO`<br>`recuerdo_categoria:ENTERO`<br>`recuerdo_eleccion:ENTERO`<br>`orientacion:ENTERO`<br>`ajuste_educativo:LOGICO` | [Fuente declarada](https://championsforhealth.org/wp-content/uploads/2018/12/MOCA-8.1-Spanish.pdf) |
+| `RUDASPE20-ES-PUNTUACION-1` | `registro_aprendizaje:LOGICO`<br>`orientacion:ENTERO`<br>`praxias:ENTERO`<br>`construccion:ENTERO`<br>`juicio:ENTERO`<br>`recuerdo:ENTERO`<br>`lenguaje:ENTERO` | [Fuente declarada](https://www.frontiersin.org/journals/neurology/articles/10.3389/fneur.2020.00374/full) |
+| `FAQB7S08-ES-PUNTUACION-1` | `actividad_1:ENTERO`<br>`actividad_2:ENTERO`<br>`actividad_3:ENTERO`<br>`actividad_4:ENTERO`<br>`actividad_5:ENTERO`<br>`actividad_6:ENTERO`<br>`actividad_7:ENTERO`<br>`actividad_8:ENTERO`<br>`actividad_9:ENTERO`<br>`actividad_10:ENTERO`<br>`informante_participo:LOGICO` | [Fuente declarada](https://files.alz.washington.edu/documentation/uds2-ivp-b7-sp.pdf) |
 
 ### C. Antecedentes y salidas específicas existentes
 
@@ -257,7 +262,7 @@ Conteos del archivo de configuración, sin cargar `.env` ni consultar un desplie
 | `contratos_conocimiento` | 0 |
 | `lectura_clinica` | 0 |
 
-Los contratos institucionales incorporados pueden resolverse desde la versión vigente aunque estas listas estén vacías. Una lista vacía no significa ausencia de motor; tampoco crea conexiones instrumentales.
+Los contratos institucionales incorporados pueden resolverse desde la versión vigente aunque estas listas estén vacías. Los tres perfiles iniciales se resuelven mediante PerfilesInstrumentalesIniciales desde el catálogo exacto instalado; no se fija una PK en configuración. Su estado efectivo requiere consultar el inventario de catálogo. Los otros23 métodos conservan sus bindings explícitos.
 
 <!-- FIN_ANEXO_TRAZABILIDAD -->
 

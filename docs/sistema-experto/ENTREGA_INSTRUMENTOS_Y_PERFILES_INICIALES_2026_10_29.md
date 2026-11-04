@@ -11,6 +11,8 @@ runtime_verified: true
 
 # Resultado ejecutivo
 
+**Corte posterior vigente:** [activación del04/11/2026](ENTREGA_ACTIVACION_PERFILES_INICIALES_2026_11_04.md). Están instalados los tres perfiles de captura y puntuación identificados allí. Este documento conserva la evidencia de preparación del29/10; las frases sobre perfiles no habilitados describen ese corte y quedan sustituidas por la entrega posterior para ese alcance. No se habilita clasificación automática desde un total de cribado.
+
 Esta entrega reúne en un único documento el circuito inicial aprobado —**entrevista e informante + MoCA o RUDAS + FAQ**—, sus conceptos, referencias de versión, requisitos de incorporación, conexión al experto, comprobación técnica y pendientes verificables.
 
 **Resultado real del corte:** preparación documental y consulta técnica implementadas; **incorporación clínica e interpretación automática de los tres instrumentos todavía no habilitadas**. No se pueden cerrar derechos de terceros, cotejar materiales que no se obtuvieron o certificar aplicabilidad clínica por decisión de programación. La elección de familias por la propietaria no resuelve esas condiciones. No se enviarán consultas externas, conforme a su instrucción vigente.

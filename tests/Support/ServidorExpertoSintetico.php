@@ -72,6 +72,12 @@ if ($preparar) {
     ControlCognitivo::create(['cod_residente' => $r->getKey(), 'cod_personal' => $personal['MED']->getKey(),
         'fecha_hora' => now()->subHour(), 'estado' => 'VIGENTE', 'observacion' => 'Registro sintético para comprobar procedencia y lectura.']);
     $medico = User::findOrFail('QA_EXP_MED');
+    if (getenv('RM_EXPERTO_CIRCUITO') === '1') {
+        Artisan::call('db:seed', ['--class' => \Database\Seeders\CircuitoInstrumentalInicialSeeder::class, '--force' => true]);
+        $area = \App\Models\Area::create(['nombre' => 'Área de captura sintética', 'estado' => 'ACTIVA']);
+        \App\Models\AsignacionPersonal::create(['cod_personal' => $personal['MED']->getKey(), 'cod_jornada' => $jornada->getKey(),
+            'cod_area' => $area->getKey(), 'fecha_asignacion' => now(), 'estado' => 'ACTIVA']);
+    }
     $medico->givePermissionTo(['reglas_expertas.ver', 'reglas_expertas.gestionar']);
     app(\App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoInstitucional::class)->ejecutar($medico);
     echo 'PREPARADO';
@@ -90,6 +96,11 @@ final class AutenticarExpertoSintetico
 }
 $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 $kernel->bootstrap();
+if (getenv('RM_EXPERTO_CIRCUITO') === '1') {
+    \Illuminate\Support\Facades\Route::get('/__qa/circuito', static fn () => \Illuminate\Support\Facades\Blade::render(
+        '<x-app-layout><div class="p-4"><button type="button" class="rm-btn rm-btn-primary" x-data @click="$dispatch(\'evaluacion-geriatrica-abrir\', {cod_residente: \'RES_QA_EXPERTO\'})">Capturar evaluación</button><livewire:valoraciones.evaluacion-geriatrica-modal cod_residente="RES_QA_EXPERTO" /></div></x-app-layout>'
+    ))->middleware('web');
+}
 // La prueba sirve los assets compilados desde el mismo host sintético, aunque
 // el proyecto local tenga un servidor Vite activo para la sesión de desarrollo.
 Vite::useHotFile($archivo.'.hot');

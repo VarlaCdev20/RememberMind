@@ -8,6 +8,23 @@
                 </dl>
             </x-slot:context>
             @error('registro')<p class="rm-error mb-3" role="alert">{{ $message }}</p>@enderror
+            @error('respuestas')<p class="rm-error mb-3" role="alert">{{ $message }}</p>@enderror
+            @if(($vinculoMetodo['inicial'] ?? null) !== null)
+                @php($resumenInicial = $this->resumenInicial())
+                <div class="rounded-xl bg-rm-surface p-4 mb-4 space-y-2" aria-live="polite" aria-atomic="true">
+                    <p class="font-semibold">{{ $vinculoMetodo['inicial']['nombre'] }}</p>
+                    <p class="text-sm">Vista previa · {{ $resumenInicial['total'] === null ? 'Puntuación incompleta' : $resumenInicial['total'].' de 30 puntos' }}</p>
+                    @if($resumenInicial['total_bruto'] !== null && $resumenInicial['ajuste_educativo'] !== null)
+                        <p class="text-sm">Bruto: {{ $resumenInicial['total_bruto'] }} · Ajuste educativo: {{ $resumenInicial['ajuste_educativo'] }} (máximo final: 30).</p>
+                    @endif
+                    @if($resumenInicial['indice_memoria'] !== null)<p class="text-sm">Índice de memoria: {{ $resumenInicial['indice_memoria'] }} de 15. Se conserva por separado.</p>@endif
+                    @if($resumenInicial['invalidos'] !== [])<p class="rm-error">Revisa los rangos y la coherencia de las puntuaciones.</p>@endif
+                    @if($resumenInicial['no_aplicables'] !== [])<p class="text-sm">Hay actividades no aplicables. Se conserva el original sin calcular una suma parcial como total.</p>@endif
+                    @foreach($resumenInicial['avisos'] as $aviso)<p class="text-sm text-rm-secondary">{{ $aviso }}</p>@endforeach
+                    <p class="text-sm text-rm-secondary">Utiliza la hoja oficial de esta edición. Puntuaciones descriptivas, sin diagnóstico automático.</p>
+                    <a class="rm-btn rm-btn-secondary" href="{{ $vinculoMetodo['inicial']['fuente'] }}" target="_blank" rel="noopener noreferrer">Consultar protocolo de referencia <i class="ph-bold ph-arrow-square-out" aria-hidden="true"></i></a>
+                </div>
+            @endif
             <p x-show="errorSolicitud" x-cloak x-text="errorSolicitud" role="alert" class="rm-error"></p>
             @if($confirmarDescarte)
                 <x-ui.form-section title="Cambios sin guardar" description="Puedes volver a revisarlos o descartarlos para cerrar." :columns="1" icon="ph-note-pencil">
@@ -171,6 +188,7 @@
                     @endif
                     <div class="space-y-4">
                         @foreach($preguntas as $pregunta)
+                            @php($campoInicial = $vinculoMetodo['inicial']['campos_por_pk'][$pregunta['codigo']] ?? null)
                             <div class="rm-captura__pregunta" wire:key="pregunta-captura-{{ $pregunta['codigo'] }}">
                                 <p class="text-xs text-rm-secondary">Respuesta {{ $loop->iteration }}@if($pregunta['dominio']) · {{ $pregunta['dominio'] }}@endif</p>
                                 <x-ui.field :for="'captura-valor-'.$this->getId().'-'.$pregunta['codigo']" :label="$pregunta['enunciado']" :error="'valores.'.$pregunta['codigo']">
@@ -184,14 +202,22 @@
                                             @foreach($pregunta['opciones'] as $opcion)<option value="{{ $opcion['codigo'] }}">{{ $opcion['nombre'] }}</option>@endforeach
                                         </x-ui.selector>
                                     @elseif($pregunta['campo'] === 'valor_numero')
-                                        <input id="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}" type="number" step="0.0001" class="rm-input" wire:model.live.debounce.350ms="valores.{{ $pregunta['codigo'] }}" aria-invalid="{{ $errors->has('valores.'.$pregunta['codigo']) ? 'true' : 'false' }}" @if($errors->has('valores.'.$pregunta['codigo'])) aria-describedby="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}-error" @endif @disabled($confirmando)>
+                                        @if(isset($campoInicial['opciones']))
+                                            <x-ui.selector :id="'captura-valor-'.$this->getId().'-'.$pregunta['codigo']" :label="$pregunta['enunciado']" wire:model.live="valores.{{ $pregunta['codigo'] }}" :disabled="$confirmando" teleport="">
+                                                <option value="">Desconocido o sin registrar</option>
+                                                @foreach($campoInicial['opciones'] as $valor => $nombre)<option value="{{ $valor }}">{{ $nombre }}</option>@endforeach
+                                            </x-ui.selector>
+                                        @else
+                                            <input id="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}" type="number" step="{{ $campoInicial === null ? '0.0001' : '1' }}" @if($campoInicial !== null) min="0" max="{{ $campoInicial['maximo'] }}" @endif class="rm-input" wire:model.live.debounce.350ms="valores.{{ $pregunta['codigo'] }}" aria-invalid="{{ $errors->has('valores.'.$pregunta['codigo']) ? 'true' : 'false' }}" @if($errors->has('valores.'.$pregunta['codigo'])) aria-describedby="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}-error" @endif @disabled($confirmando)>
+                                            @if($campoInicial !== null)<p class="text-sm text-rm-secondary">{{ isset($campoInicial['permitidos']) ? 'Valores: '.implode(', ', $campoInicial['permitidos']).'.' : 'De 0 a '.$campoInicial['maximo'].'; solo enteros.' }} Vacío significa que no consta.</p>@endif
+                                        @endif
                                     @elseif($pregunta['campo'] === 'valor_texto')
                                         <textarea id="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}" rows="2" class="rm-textarea" wire:model.live.debounce.350ms="valores.{{ $pregunta['codigo'] }}" aria-invalid="{{ $errors->has('valores.'.$pregunta['codigo']) ? 'true' : 'false' }}" @if($errors->has('valores.'.$pregunta['codigo'])) aria-describedby="captura-valor-{{ $this->getId() }}-{{ $pregunta['codigo'] }}-error" @endif @disabled($confirmando)></textarea>
                                     @else
                                         <p class="text-sm" role="status">El tipo de respuesta de esta pregunta requiere revisión del catálogo.</p>
                                     @endif
                                 </x-ui.field>
-                                @if($transcripcion && $pregunta['campo'] !== null)
+                                @if($transcripcion && $pregunta['campo'] !== null && $campoInicial === null)
                                     <details class="mt-2 space-y-3" @if($errors->has('puntajesOriginales.'.$pregunta['codigo']) || $errors->has('observacionesRespuesta.'.$pregunta['codigo'])) open @endif>
                                         <summary class="cursor-pointer text-sm font-semibold">Puntuación y observación del original, si constan</summary>
                                         <x-ui.field :for="'captura-puntaje-'.$this->getId().'-'.$pregunta['codigo']" label="Puntuación original de esta respuesta" :error="'puntajesOriginales.'.$pregunta['codigo']" help="Deja vacío si no consta. Cero debe escribirse como 0; no se completa desde el catálogo actual.">
@@ -218,8 +244,8 @@
                                 <p class="font-semibold">Registro observacional</p>
                                 <p class="text-sm text-rm-secondary">Estas respuestas conservan observaciones clínicas. No se interpretan como medidas de una prueba cognitiva.</p>
                             @elseif(($vinculoMetodo['estado'] ?? null) === 'VINCULADO')
-                                <p class="font-semibold">Método vinculado al protocolo</p>
-                                <p class="text-sm text-rm-secondary">Componentes: {{ implode(', ', $vinculoMetodo['componentes']) }}. La identidad configurada debe coincidir con el protocolo realmente aplicado; esta vinculación no certifica la aplicación.</p>
+                                <p class="font-semibold">{{ ($vinculoMetodo['inicial'] ?? null) !== null ? 'Captura y puntuación del protocolo' : 'Método vinculado al protocolo' }}</p>
+                                <p class="text-sm text-rm-secondary">{{ ($vinculoMetodo['inicial'] ?? null) !== null ? 'El total es descriptivo: no completa dominios cognitivos, C02 o C03.' : 'Componentes: '.implode(', ', $vinculoMetodo['componentes']).'.' }} La identidad debe coincidir con el protocolo realmente aplicado.</p>
                                 <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-sm">
                                     @foreach($vinculoMetodo['identidad'] as $nombre => $valor)
                                         <div><dt class="inline font-semibold">{{ str_replace('_', ' ', $nombre) }}:</dt> <dd class="inline">{{ is_scalar($valor) ? $valor : 'Sin identificar' }}</dd></div>

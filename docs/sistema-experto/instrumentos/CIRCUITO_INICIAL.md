@@ -11,6 +11,8 @@ runtime_verified: false
 
 # Circuito inicial: entrevista + MoCA o RUDAS + FAQ
 
+**Actualización vigente del04/11/2026:** [tres perfiles de captura y puntuación activados localmente](../ENTREGA_ACTIVACION_PERFILES_INICIALES_2026_11_04.md), con identidad exacta, fuentes cotejadas y pruebas. La propietaria declaró disponer de materiales/permisos y autorizó la digitalización. Los apartados siguientes conservan el estado del28–29/10; sus pendientes de adquisición y perfiles no describen la activación posterior. La puntuación no acredita cinco dominios ni C02/C03 y la conservación conjunta sigue separada.
+
 **Entrega integrada del 29/10:** [instrumentos, versiones y perfiles de preparación](../ENTREGA_INSTRUMENTOS_Y_PERFILES_INICIALES_2026_10_29.md) reúne el contrato técnico, fuentes actualizadas, mapa hacia hechos e inferencia y criterios de aceptación. La consulta de preparación está integrada al inventario existente; no activa estos instrumentos. El [contexto de captura](../ENTREGA_FASE_CONTEXTO_COGNITIVO_2026_10_29.md) ya conserva escolaridad, idioma e informante principal por atención. Las referencias a brechas de contexto de los apartados siguientes describen el corte anterior o la aplicabilidad instrumental aún pendiente, no ausencia de esa captura ya instalada.
 
 La [selección por familias y niveles está aprobada](SELECCION_ADOPTADA_2026_10_28.md). Esta entrega concreta fichas documentales para su preparación: no declara instrumentos activados, materiales adquiridos o interpretaciones clínicas habilitadas.

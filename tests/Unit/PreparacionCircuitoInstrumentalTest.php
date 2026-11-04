@@ -23,7 +23,7 @@ final class PreparacionCircuitoInstrumentalTest extends TestCase
             self::assertNull($familia['edicion_operativa']);
             self::assertNull($familia['perfil_ejecutable']);
             self::assertFalse($familia['autoriza_inferencia']);
-            self::assertSame('NO_ACREDITADOS', $familia['derechos_uso_previsto']);
+            self::assertSame('DECLARADOS_POR_PROPIETARIA_2026_11_04', $familia['derechos_uso_previsto']);
             self::assertNotEmpty($familia['faltantes']);
             self::assertDoesNotMatchRegularExpression('/FIRMA|AVAL|REFERENCIA_HUMANA|ESTUDIO_EXTERNO|ACEPTACION/', implode('|', $familia['faltantes']));
         }
@@ -57,5 +57,14 @@ final class PreparacionCircuitoInstrumentalTest extends TestCase
     {
         $this->expectException(DomainException::class);
         (new PreparacionCircuitoInstrumental)->resumir(['perfil_no_estructurado'], []);
+    }
+
+    public function test_un_metodo_y_una_edicion_no_suplantan_cotejo_de_catalogo(): void
+    {
+        $c = new \MotorExperto\dominio\instrumentos\CircuitoInstrumentalInicial;
+        $d = $c->definiciones()[$c::MOCA];
+        $r = (new PreparacionCircuitoInstrumental)->resumir([], $c->metodos(), ['I01' => ['metodo' => $c::MOCA, 'edicion' => $d['version']]]);
+        self::assertNull($r['familias']['I01']['perfil_ejecutable']);
+        self::assertSame('CATALOGO_EXACTO_PENDIENTE_DE_INSTALAR', $r['familias']['I01']['estado_preparacion']);
     }
 }

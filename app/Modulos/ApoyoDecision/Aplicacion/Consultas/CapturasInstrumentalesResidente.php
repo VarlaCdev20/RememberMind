@@ -50,7 +50,8 @@ final class CapturasInstrumentalesResidente
             abort(403);
         }
         $respuestas = $aplicaciones->flatMap(fn ($a) => $a->respuestas);
-        $perfiles = config('sistema_experto.perfiles_instrumentales', []);
+        $perfiles = app(\App\Modulos\ApoyoDecision\Aplicacion\Servicios\PerfilesInstrumentalesIniciales::class)
+            ->resolver(new \Illuminate\Database\Eloquent\Collection($aplicaciones->pluck('instrumento')->filter()->all()));
         $preguntasSeleccionadas = [];
         foreach ($perfiles as $perfil) {
             foreach ($perfil['selectores'] ?? [] as $selector) {

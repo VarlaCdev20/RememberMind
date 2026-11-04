@@ -346,6 +346,10 @@ abstract class CapturaInstrumentalModal extends Component
         if ($respuestas === []) {
             throw ValidationException::withMessages(['registro' => 'Registra al menos una respuesta original. Las preguntas sin dato se mantienen sin respuesta.']);
         }
+        if (($catalogo['vinculo_metodo']['inicial'] ?? null) !== null) {
+            app(\App\Modulos\ApoyoDecision\Aplicacion\Servicios\PerfilesInstrumentalesIniciales::class)
+                ->puntuacion($catalogo['vinculo_metodo']['inicial'], $respuestas);
+        }
 
         return ['fecha_hora' => $fechaOriginal, 'cod_atencion' => $this->cod_atencion ?: null,
             'observacion' => $this->observaciones === '' ? null : $this->observaciones, 'respuestas' => $respuestas]
@@ -355,6 +359,14 @@ abstract class CapturaInstrumentalModal extends Component
                 'localizador_fuente' => $this->localizador_fuente, 'original_cotejado' => $this->original_cotejado,
                 'cod_aplicacion_existente' => $this->cod_aplicacion_existente ?: null,
                 'cod_aplicacion_anterior' => $this->cod_aplicacion_anterior ?: null, 'motivo_rectificacion' => $this->motivo_rectificacion ?: null] : []);
+    }
+
+    public function resumenInicial(): ?array
+    {
+        $definicion = $this->vinculoMetodo['inicial'] ?? null;
+
+        return $definicion === null ? null
+            : app(\App\Modulos\ApoyoDecision\Aplicacion\Servicios\PerfilesInstrumentalesIniciales::class)->previsualizar($definicion, $this->valores);
     }
 
     private function tieneCambios(): bool

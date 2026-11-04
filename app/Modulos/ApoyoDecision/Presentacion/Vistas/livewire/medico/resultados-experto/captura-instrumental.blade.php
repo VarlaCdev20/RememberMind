@@ -5,6 +5,17 @@
             <summary class="cursor-pointer min-h-11 font-semibold break-words">{{ ($captura['instrumento_actual']['tipo'] ?? null) === 'OBSERVACIONAL' ? 'Observación clínica' : 'Aplicación instrumental' }} · {{ $captura['nombre_instrumento'] }} · {{ $captura['version_instrumento'] ?: 'Versión no registrada' }}</summary>
             <p class="text-sm mt-3 break-words">Fecha original: {{ $captura['fecha_hora'] }} · Profesional: {{ $captura['autor'] }} · Estado registrado: {{ $captura['estado_original'] }}</p>
             @if($captura['extraccion'])
+                @if(isset($captura['extraccion']['normalizacion']['resumen_inicial']))
+                    @php($inicial = $captura['extraccion']['normalizacion']['resumen_inicial'])
+                    <div class="rounded-xl bg-rm-surface p-4 mt-3 space-y-2">
+                        <p class="font-semibold">{{ $inicial['nombre'] }}</p>
+                        <p>{{ $inicial['total'] === null ? 'Puntuación incompleta' : $inicial['total'].' de 30 puntos' }}</p>
+                        @if($inicial['total_bruto'] !== null && $inicial['ajuste_educativo'] !== null)<p class="text-sm">Bruto: {{ $inicial['total_bruto'] }} · Ajuste educativo: {{ $inicial['ajuste_educativo'] }} (máximo final: 30).</p>@endif
+                        @if($inicial['indice_memoria'] !== null)<p class="text-sm">Índice de memoria: {{ $inicial['indice_memoria'] }} de 15, separado del total.</p>@endif
+                        @foreach($inicial['avisos'] as $aviso)<p class="text-sm text-rm-secondary">{{ $aviso }}</p>@endforeach
+                        <p class="text-sm text-rm-secondary">Resultado descriptivo de esta edición. No equivale a una clasificación de DCL ni completa los dominios o la independencia funcional.</p>
+                    </div>
+                @endif
                 @foreach($captura['extraccion']['normalizacion']['componentes'] as $componente => $calculo)
                     @foreach($calculo['medidas'] ?? [$calculo] as $medida)
                         <p class="text-sm mt-3 break-words"><strong>{{ $componente }}{{ isset($medida['medida']) ? ' · '.$medida['medida'] : '' }}</strong>: {{ $medida['estado'] }}
@@ -23,7 +34,7 @@
                         </p>
                     @endforeach
                 @endforeach
-                <p class="text-sm text-rm-secondary mt-3">La normalización compara la medición con su referencia publicada. La interpretación del dominio requiere sus condiciones y soportes.</p>
+                @if(!isset($captura['extraccion']['normalizacion']['resumen_inicial']))<p class="text-sm text-rm-secondary mt-3">La normalización compara la medición con su referencia publicada. La interpretación del dominio requiere sus condiciones y soportes.</p>@endif
             @elseif(($captura['instrumento_actual']['tipo'] ?? null) === 'OBSERVACIONAL')
                 <p class="text-sm text-rm-secondary mt-3">Esta observación clínica se presenta sin puntuación instrumental. Sus respuestas registradas figuran a continuación.</p>
             @else

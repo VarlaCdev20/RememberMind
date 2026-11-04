@@ -6,6 +6,7 @@ namespace App\Modulos\ApoyoDecision\Aplicacion\Consultas;
 
 use DomainException;
 use MotorExperto\dominio\instrumentos\GuiaAdquisicionDcl;
+use MotorExperto\dominio\instrumentos\CircuitoInstrumentalInicial;
 
 /**
  * Estado de preparación de las familias seleccionadas, sin leer casos ni ejecutar perfiles.
@@ -15,7 +16,7 @@ final class PreparacionCircuitoInstrumental
 {
     public const CONTRATO = 'PREPARACION-CIRCUITO-INICIAL-1';
 
-    public function resumir(array $perfilesConfigurados, array $metodosRegistrados): array
+    public function resumir(array $perfilesConfigurados, array $metodosRegistrados, array $catalogosIniciales = []): array
     {
         foreach ($perfilesConfigurados as $perfil) {
             if (! is_array($perfil)) {
@@ -52,9 +53,31 @@ final class PreparacionCircuitoInstrumental
                 'autoriza_inferencia' => false];
         }
         unset($familia);
+        foreach ((new CircuitoInstrumentalInicial)->definiciones() as $metodo => $d) {
+            $f = &$familias[$d['familia']];
+            $instalado = $catalogosIniciales[$d['familia']] ?? null;
+            $verificado = is_array($instalado) && ($instalado['metodo'] ?? null) === $metodo
+                && ($instalado['edicion'] ?? null) === $d['version'] && ($instalado['codigo'] ?? null) === $d['codigo']
+                && ($instalado['perfil'] ?? null) === 'INICIAL-'.$d['codigo'].'-1'
+                && ($instalado['campos_vinculados'] ?? null) === count($d['campos']) && isset($metodosRegistrados[$metodo]);
+            $f['edicion_preparada'] = $d['version'];
+            $f['referencia_candidata'] = $d['version'].' · edición de captura cerrada el04/11/2026.';
+            $f['material'] = 'PROTOCOLO_DE_REFERENCIA_COTEJADO';
+            $f['fuentes'] = [$d['fuente']];
+            $f['derechos_uso_previsto'] = 'DECLARADOS_POR_PROPIETARIA_2026_11_04';
+            $f['estado_preparacion'] = $verificado ? 'CAPTURA_Y_PUNTUACION_ACTIVAS' : 'CATALOGO_EXACTO_PENDIENTE_DE_INSTALAR';
+            $f['edicion_operativa'] = $verificado ? $d['version'] : null;
+            $f['perfil_ejecutable'] = $verificado ? $instalado['perfil'] : null;
+            $f['metodo_puntuacion'] = $metodo;
+            $f['alcance_perfil'] = 'PUNTUACIONES_DE_SECCIONES_SIN_ESTIMULOS_NI_CLASIFICACION';
+            $f['faltantes'] = $verificado ? [] : ['INSTALACION_Y_COTEJO_DE_CATALOGO_EXACTO'];
+            $f['faltante_especifico'] = $verificado ? 'No falta configuración para capturar y puntuar esta edición. El total no acredita dominios, C02 o C03.'
+                : 'Instalar el catálogo autorizado; no se crean PK ficticias desde una familia.';
+        }
+        unset($f);
 
-        return ['contrato' => self::CONTRATO, 'fecha_cotejo' => '2026-10-29',
-            'alcance' => 'PREPARACION_DE_FAMILIAS_NO_PERFILES_EJECUTABLES',
+        return ['contrato' => self::CONTRATO, 'fecha_cotejo' => '2026-11-04',
+            'alcance' => 'CAPTURA_Y_PUNTUACION_INICIALES_SEGUN_CATALOGO_INSTALADO',
             'poblacion_objetivo' => 'PERSONAS_MAYORES_DE_60_ANIOS',
             'familias' => $familias, 'guia_captura' => (new GuiaAdquisicionDcl)->contrato(),
             'observacion_tecnica' => ['perfiles_configurados_total' => count($perfilesConfigurados),

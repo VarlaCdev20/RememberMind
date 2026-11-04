@@ -120,7 +120,8 @@ try {
         'configuracion_cantidad' => $configuracion,
         'preparacion_circuito_inicial' => (new \App\Modulos\ApoyoDecision\Aplicacion\Consultas\PreparacionCircuitoInstrumental)->resumir(
             config('sistema_experto.perfiles_instrumentales', []),
-            (new \MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales)->metodos()),
+            (new \MotorExperto\dominio\instrumentos\RegistroMetodosInstrumentales)->metodos(),
+            app(\App\Modulos\ApoyoDecision\Aplicacion\Servicios\PerfilesInstrumentalesIniciales::class)->estado()),
         'version_cognitiva_fijada_en_config' => filled(config('sistema_experto.version_cognitiva')),
         'limites' => ['No acredita instrumentos administrados, licencias, baremos ni validez clínica.',
             'La estructura de entrada se verifica sin consultar filas clínicas; no certifica datos completos ni preparación clínica.',

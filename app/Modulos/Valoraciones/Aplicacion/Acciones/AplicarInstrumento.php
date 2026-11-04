@@ -108,9 +108,16 @@ final class AplicarInstrumento
                 }
             }
             unset($respuesta);
+            $perfilInicial = app(\App\Modulos\ApoyoDecision\Aplicacion\Servicios\PerfilesInstrumentalesIniciales::class)
+                ->definicion($instrumento, $preguntas->values());
             $datos['puntaje_total'] = count($respuestas) === $preguntas->count()
                 ? $this->sumarPuntajes(array_map(fn ($r) => $r['puntaje'] ?? null, $respuestas)) : null;
             $datos['puntaje_maximo'] = $this->sumarPuntajes($preguntas->pluck('puntaje_maximo')->all());
+            if ($perfilInicial !== null) {
+                $puntuacion = app(\App\Modulos\ApoyoDecision\Aplicacion\Servicios\PerfilesInstrumentalesIniciales::class)->puntuacion($perfilInicial, $respuestas);
+                $datos['puntaje_total'] = $puntuacion['total'] === null ? null : number_format($puntuacion['total'], 2, '.', '');
+                $datos['puntaje_maximo'] = '30.00';
+            }
             $cabecera = ['cod_instrumento' => $instrumento->getKey(), 'cod_residente' => $residente->getKey(), 'cod_personal' => $aplicador,
                 'cod_atencion' => $datos['cod_atencion'] ?? null, 'puntaje_total' => $datos['puntaje_total'], 'puntaje_maximo' => $datos['puntaje_maximo'],
                 'clasificacion' => $datos['clasificacion'] ?? null, 'interpretacion' => $datos['interpretacion'] ?? null, 'observacion' => $datos['observacion'] ?? null,

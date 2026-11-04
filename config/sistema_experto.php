@@ -13,6 +13,7 @@ return [
     // Bindings a PK/versión/preguntas originales e identidad_instrumento (edición/forma/idioma cotejados).
     // El extractor no completa esa identidad desde la bibliografía del método ni por parecido de nombre.
     // Véase docs/sistema-experto/METODOS_Y_CAMPOS_INVESTIGADOS_V2_2026_10_18.md.
+    // Los tres iniciales se resuelven desde su catálogo exacto mediante PerfilesInstrumentalesIniciales.
     'perfiles_instrumentales' => [],
     // Registro de contratos de PUBLICACIÓN, nunca activación de inferencia.
     // Vacío hasta decisión institucional: ACTIVO por sí solo no acredita el paquete.

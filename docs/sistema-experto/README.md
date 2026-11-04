@@ -1,7 +1,7 @@
 ---
 title: "Sistema experto: fuentes, funcionamiento y límites"
 status: CURRENT
-version: "3.24"
+version: "3.25"
 last_reviewed: 2026-11-04
 owner: RememberMind
 source_of_truth: false
@@ -17,10 +17,11 @@ runtime_verified: false
 
 ## Entrada única: dónde encontrar cada parte
 
-Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años, con evidencias explicables y revisión profesional. La propietaria aprobó el 28/10/2026 una selección escalonada: entrevista e informante + MoCA o RUDAS + FAQ como prioridad inicial; apoyos y evaluación ampliada según el caso. Las versiones, condiciones y derechos de incorporación permanecen por cerrar en su alcance.
+Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años, con evidencias explicables y revisión profesional. La propietaria aprobó el28/10 una selección escalonada: entrevista e informante + MoCA o RUDAS + FAQ como prioridad inicial; apoyos y evaluación ampliada según el caso. El04/11 se activaron tres ediciones exactas para captura y puntuación, tras su declaración de materiales/permisos y autorización de digitalización. Los totales no sustituyen interpretación de dominios ni requisitos Petersen; véase la entrega de activación.
 
 | Necesito encontrar… | Abrir |
 |---|---|
+| Perfiles iniciales activos: ediciones, captura, puntuación e instalación | [Activación MoCA8.1, RUDAS-PE2020 y FAQ B7S,04/11](ENTREGA_ACTIVACION_PERFILES_INICIALES_2026_11_04.md) |
 | Matriz actual: qué dato alimenta cada instrumento/regla, qué resultado permite y qué debe guardarse | [Matriz única de trazabilidad, perfiles exactos, brechas y conservación/4FN](MATRIZ_TRAZABILIDAD_DCL.md) |
 | Cierre técnico actual: documentos Petersen, lectura consistente, Enfermería, reglas y depuración | [Entregable único actualizado al04/11: correcciones, pruebas y pendientes precisos](ENTREGABLE_REGLAS_Y_DEPURACION_2026_10_31.md) |
 | Cierre técnico actual con relaciones y permisos conservados; reglas para la siguiente etapa | [Entregable único de correcciones y estado pendiente](ENTREGABLE_CORRECCIONES_TECNICAS_2026_10_31.md) |
@@ -46,7 +47,7 @@ Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años,
 | Retirada de simulaciones y laboratorio | [Alcance, conservación y verificación](RETIRADA_LABORATORIO_2026_10_27.md) |
 | Contratos aprobados y límites pendientes | Tablas y secciones siguientes; [catálogo documental completo](INDICE_DOCUMENTAL.md) para antecedentes |
 
-El inventario comprobó **26 entradas de instrumentos** (2 Barthel, 5 capturas sintéticas y 19 registros de tarea inactivos), **6 versiones de conocimiento** y **32 reglas**. Estos conteos describen metadatos, no instrumentos aplicados, evaluación posterior en uso real ni cierre del experto. No confundir los 45 candidatos investigados con el catálogo instalado.
+El inventario histórico del27/10 comprobó **26 entradas de instrumentos** (2 Barthel,5 capturas sintéticas y19 registros de tarea inactivos),6 versiones de conocimiento y32 reglas. El04/11 se añadieron los tres catálogos iniciales de captura/puntuación; esos26 describen el corte anterior. El [inventario vigente](../../scripts/inventariar-experto.php) informa sus perfiles activos por separado. Los conteos no acreditan instrumentos administrados, evaluación posterior en uso real o cierre del experto, ni equivalen a los45 candidatos investigados.
 
 ## Recorrido vigente
 

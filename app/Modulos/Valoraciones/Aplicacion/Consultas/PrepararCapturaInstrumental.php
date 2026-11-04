@@ -132,7 +132,8 @@ final readonly class PrepararCapturaInstrumental
         if ($instrumento->tipo === 'OBSERVACIONAL') {
             return ['estado' => 'OBSERVACIONAL'];
         }
-        $perfiles = array_values(array_filter(config('sistema_experto.perfiles_instrumentales', []),
+        $perfiles = array_values(array_filter(app(\App\Modulos\ApoyoDecision\Aplicacion\Servicios\PerfilesInstrumentalesIniciales::class)
+            ->resolver(new \Illuminate\Database\Eloquent\Collection([$instrumento])),
             static fn ($perfil): bool => is_array($perfil)
                 && ($perfil['cod_instrumento'] ?? null) === $instrumento->getKey()
                 && ($perfil['version_instrumento'] ?? null) === $instrumento->version));
@@ -173,7 +174,10 @@ final readonly class PrepararCapturaInstrumental
         $incompleto = array_diff(array_keys($perfil['selectores']), array_keys($meta['entradas'])) !== []
             || count(array_filter($entradas, static fn ($e) => ! $e['disponible'])) > 0;
 
-        return ['estado' => $incompleto ? 'VINCULO_INCOMPLETO' : 'VINCULADO',
+        $inicial = app(\App\Modulos\ApoyoDecision\Aplicacion\Servicios\PerfilesInstrumentalesIniciales::class)
+            ->definicion($instrumento, $instrumento->preguntas()->with('opciones')->get());
+
+        return ['estado' => $incompleto ? 'VINCULO_INCOMPLETO' : 'VINCULADO', 'inicial' => $inicial,
             'metodo' => $perfil['metodo'], 'componentes' => $meta['componentes'] ?? [], 'fuente' => $meta['fuente'] ?? null,
             'identidad' => $perfil['identidad_instrumento'] ?? [], 'entradas' => $entradas];
     }
