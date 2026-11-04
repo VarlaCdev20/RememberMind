@@ -7,46 +7,28 @@ namespace MotorExperto\conocimiento;
 use DateTimeImmutable;
 use DomainException;
 
-/**
- * EMPEZAR AQUÍ: REGLAS contiene las 3 implicaciones observacionales.
- * evaluar() comprueba cada registro y conserva sus motivos y procedencia.
- *
- * Ejecuta las tres implicaciones observacionales de la propuesta funcional v0.1.
- * Evalúa hechos conductuales y de memoria cotidiana documentados en el seguimiento.
- * Conserva condición, valor original, fuente, autor y episodio en cada resultado.
- *
- * Límites epistémicos y clínicos:
- * No interpreta instrumentos estandarizados, no calcula recurrencias ni acredita
- * por sí solo deterioro cognitivo leve (DCL).
- */
+/** Interpreta observaciones del seguimiento; no establece un diagnóstico de DCL. */
 final class ReglasObservacionales
 {
-    /** Versión del motor de inferencia observacional. */
     public const VERSION = 'OBS-20261017-v1';
 
-    /**
-     * Catálogo canónico de reglas observacionales:
-     * - OBS-MEM-01: Documentación de repetición de preguntas.
-     * - OBS-MEM-02: Documentación de olvido de indicaciones o consignas.
-     * - OBS-COG-01: Señalamiento de cambios cognitivos respecto al nivel previo.
-     */
     public const REGLAS = [
         // OBS-MEM-01 — REPETICIÓN DE PREGUNTAS
-        // señala un episodio documentado con repetición de preguntas marcada afirmativamente.
+        // registra un episodio afirmativo de repetición de preguntas.
         'OBS-MEM-01' => [
             'campo' => 'repite_preguntas',
             'nombre' => 'Repetición de preguntas',
             'hallazgo' => 'Se documentó un episodio de repetición de preguntas.',
         ],
         // OBS-MEM-02 — OLVIDO DE INDICACIONES
-        // señala un episodio documentado con olvido de indicaciones marcado afirmativamente.
+        // registra un episodio afirmativo de olvido de indicaciones.
         'OBS-MEM-02' => [
             'campo' => 'olvida_indicaciones',
             'nombre' => 'Olvido de indicaciones',
             'hallazgo' => 'Se documentó un episodio de olvido de indicaciones.',
         ],
         // OBS-COG-01 — CAMBIO COGNITIVO SEÑALADO
-        // señala un cambio cognitivo registrado que requiere corroboración.
+        // registra un cambio cognitivo pendiente de corroborar.
         'OBS-COG-01' => [
             'campo' => 'cambio_cognitivo',
             'nombre' => 'Cambio cognitivo señalado',
@@ -55,55 +37,36 @@ final class ReglasObservacionales
     ];
 
     /**
-     * Evalúa las observaciones documentadas para un residente hasta la fecha de corte.
-     *
-     * Invariantes de inferencia:
-     * - Cada registro origina la evaluación de las tres reglas de manera independiente.
-     * - Un valor false refleja no marcación en el episodio; no prueba ausencia de enfermedad.
-     * - Registros con misma fuente se deduplican; si presentan datos divergentes se rechazan.
-     *
-     * @param  string  $residente  Identificador único del residente evaluado.
-     * @param  DateTimeImmutable  $corte  Límite temporal estricto (no se evalúan hechos posteriores).
-     * @param  list<array>  $registros  Instantánea escalar extraída y autorizada por la capa de aplicación.
-     * @param  array|null  $conocimiento  Base de reglas y código de versión dinámico opcional.
-     * @return array Inferencia con resultados trazables por registro, resumen consolidado y límites.
-     *
-     * @throws DomainException Si el contexto es inválido o se detectan fuentes incompatibles.
+     * Evalúa registros autorizados del residente hasta la fecha de corte.
+     * @param list<array> $registros
      */
     public function evaluar(string $residente, DateTimeImmutable $corte, array $registros, ?array $conocimiento = null): array
     {
-        // 1. Resolver reglas y versión (prioriza conocimiento dinámico si se suministra)
         $reglas = $conocimiento['reglas'] ?? self::REGLAS;
         $version = $conocimiento['codigo'] ?? self::VERSION;
 
-        // 2. Validación de precondiciones: residente definido y lista indexada de registros
         if ($residente === '' || ! array_is_list($registros)) {
             throw new DomainException('Contexto observacional inválido.');
         }
 
-        // 3. Deduplicación e integridad: agrupar por id y rechazar instantáneas contradictorias
         $unicos = [];
         foreach ($registros as $r) {
-            // Verificar pertenencia estricta al residente e identificador válido
             if (($r['residente'] ?? null) !== $residente || ! is_string($r['id'] ?? null) || $r['id'] === '') {
                 throw new DomainException('Fuente observacional ausente o de otro residente.');
             }
-            // Rechazar conflicto: mismo ID con diferente contenido en la misma evaluación
             if (isset($unicos[$r['id']]) && $unicos[$r['id']] !== $r) {
                 throw new DomainException('La misma fuente presenta instantáneas incompatibles.');
             }
             $unicos[$r['id']] = $r;
         }
 
-        // 4. Ordenamiento determinístico por clave para garantizar reproducibilidad
+        // El orden estable permite reproducir la misma evaluación.
         ksort($unicos, SORT_STRING);
 
-        // 5. Evaluación individual de cada regla sobre cada registro
         $resultados = [];
         foreach ($unicos as $r) {
             $fecha = $r['fecha'] ?? null;
 
-            // Comprobar validez clínica: estado vigente, fecha dentro del corte, autor y coherencia
             $valida = ($r['estado'] ?? null) === 'VIGENTE'
                 && $fecha instanceof DateTimeImmutable
                 && $fecha <= $corte
@@ -115,10 +78,9 @@ final class ReglasObservacionales
                 $valor = $r['valores'][$regla['campo']] ?? null;
                 $evaluable = $valida && is_bool($valor);
 
-                // Determinar estado inferido: CUMPLE, NO_CUMPLE o NO_EVALUABLE
+                // No marcado no equivale a ausencia de enfermedad.
                 $estado = ! $evaluable ? 'NO_EVALUABLE' : ($valor ? 'CUMPLE' : 'NO_CUMPLE');
 
-                // Motivo explícito de auditoría para trazabilidad médica
                 $motivo = ! $valida
                     ? 'El registro requiere estado vigente, fecha válida, responsable identificable y contexto coherente.'
                     : (! is_bool($valor)
@@ -127,7 +89,6 @@ final class ReglasObservacionales
                             ? 'El campo está marcado afirmativamente en el registro.'
                             : 'El campo está registrado como no marcado. Esto no demuestra ausencia de dificultad.'));
 
-                // Registrar evidencia trazable con condición evaluada y procedencia de origen
                 $resultados[] = [
                     'regla' => $codigo,
                     'version' => $version,
@@ -154,12 +115,11 @@ final class ReglasObservacionales
             }
         }
 
-        // 6. Resumen consolidado por regla (búsqueda de al menos un hecho afirmativo)
         $resumen = [];
         foreach ($reglas as $codigo => $regla) {
             $estados = array_column(array_values(array_filter($resultados, fn ($r) => $r['regla'] === $codigo)), 'estado');
 
-            // CUMPLE si existe al menos una afirmación; NO_EVALUABLE si no hay datos evaluables; NO_CUMPLE en caso contrario.
+            // Una afirmación prevalece; si no la hay, se conserva la falta de datos evaluables.
             $estado = in_array('CUMPLE', $estados, true)
                 ? 'CUMPLE'
                 : ($estados === [] || in_array('NO_EVALUABLE', $estados, true) ? 'NO_EVALUABLE' : 'NO_CUMPLE');
@@ -174,7 +134,6 @@ final class ReglasObservacionales
             }
         }
 
-        // 7. Retornar paquete final de inferencia observacional con advertencia de límite clínico
         return [
             'version' => $version,
             'residente' => $residente,

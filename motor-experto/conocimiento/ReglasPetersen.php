@@ -8,14 +8,7 @@ use DomainException;
 use MotorExperto\conocimiento\PaqueteConocimiento;
 use MotorExperto\inferencia\EvaluadorReglas;
 
-/**
- * EMPEZAR AQUÍ: cuatro reglas de patrón orientativo; condiciones() contiene el SI.
- * Todas requieren cambio corroborado(C01), alteración objetiva(C02), independencia
- * instrumental relativa(C03), revisión diferencial(C04) y calidad/interpretabilidad(C05).
- * PET-01: memoria alterada y un dominio; PET-02: memoria alterada y varios dominios.
- * PET-03: memoria preservada y un dominio no mnésico; PET-04:varios no mnésicos.
- * El motor comprueba originales y abstenciones; este archivo define el conocimiento.
- */
+/** Define cuatro patrones orientativos según requisitos, memoria y dominios alterados. */
 final class ReglasPetersen
 {
     public const CODIGO = 'ORION-PETERSEN-1';
@@ -42,6 +35,7 @@ final class ReglasPetersen
         return $tipo.'_'.substr(hash('sha256', self::CODIGO.'|'.$codigo), 0, 16);
     }
 
+    /** Todos los patrones exigen cinco requisitos cumplidos y un perfil interpretable. */
     public static function condiciones(string $patron): array
     {
         if (! in_array($patron, self::VALORES['RESULTADO'], true)) {
@@ -88,19 +82,19 @@ final class ReglasPetersen
             $t['reglas_expertas'][] = $sello + ['cod_regla_experta' => $id, 'cod_version_modelo' => $version, 'codigo_regla' => $patron,
                 'nombre' => match ($patron) {
                     // PET-01 — AMNÉSICO DE DOMINIO ÚNICO
-                    // orienta a este patrón con memoria alterada, un dominio alterado y requisitos comunes cumplidos.
+                    // memoria alterada y un único dominio alterado.
                     'PET-01' => 'Amnésico de dominio único',
 
                     // PET-02 — AMNÉSICO MULTIDOMINIO
-                    // orienta a este patrón con memoria alterada, varios dominios alterados y requisitos comunes cumplidos.
+                    // memoria alterada y varios dominios alterados.
                     'PET-02' => 'Amnésico multidominio',
 
                     // PET-03 — NO AMNÉSICO DE DOMINIO ÚNICO
-                    // orienta a este patrón con memoria preservada, un dominio alterado y requisitos comunes cumplidos.
+                    // memoria preservada y un único dominio no mnésico alterado.
                     'PET-03' => 'No amnésico de dominio único',
 
                     // PET-04 — NO AMNÉSICO MULTIDOMINIO
-                    // orienta a este patrón con memoria preservada, varios dominios alterados y requisitos comunes cumplidos.
+                    // memoria preservada y varios dominios no mnésicos alterados.
                     'PET-04' => 'No amnésico multidominio',
                 }, 'tipo_regla' => 'RESULTADO', 'descripcion' => self::FUNDAMENTO, 'cod_regla_anterior' => null,
                 'estado_revision' => 'PENDIENTE', 'cod_usuario_revision' => null, 'fecha_hora_revision' => null, 'justificacion_revision' => null];
@@ -117,7 +111,7 @@ final class ReglasPetersen
         return new PaqueteConocimiento($version, $t, $c['relaciones'], false, $c['tipo_regla_resultado'], []);
     }
 
-    /** Identidades SQL regeneradas admitidas; semántica cerrada para impedir quitar requisitos desde el gestor. */
+    /** Impide eliminar requisitos o cambiar consecuencias del contrato adoptado. */
     public function validar(PaqueteConocimiento $p): void
     {
         $codigos = array_column($p->tabla('reglas_expertas'), 'codigo_regla');
